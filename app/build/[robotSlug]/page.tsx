@@ -11,7 +11,7 @@ import { BuildClient } from './BuildClient'
 export const runtime = 'nodejs'
 export const dynamicParams = false
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app'
 
 export function generateStaticParams() {
   return listProjectSlugs().map((robotSlug) => ({ robotSlug }))

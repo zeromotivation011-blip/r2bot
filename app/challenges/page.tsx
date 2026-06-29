@@ -6,7 +6,7 @@ import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { currentChallenges, currentISOWeek } from '@/lib/weekly-challenges';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 export const metadata: Metadata = {
   title: 'Weekly Robotics Challenges — R2BOT',

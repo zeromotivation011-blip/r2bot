@@ -395,7 +395,7 @@ function AssistantBubble({ msg, onRate }: { msg: Message; onRate: (m: Message, r
   const related = useMemo(() => (msg.content ? findRelatedLesson(msg.content) : null), [msg.content]);
 
   const onShare = async () => {
-    const shareText = `Ask R2BOT:\n\n${msg.content}\n\n— https://robot-tan.vercel.app/copilot`;
+    const shareText = `Ask R2BOT:\n\n${msg.content}\n\n— https://r2bot-psi.vercel.app/copilot`;
     try {
       if (navigator.share) {
         await navigator.share({ title: 'R2 Co-pilot answer', text: shareText });

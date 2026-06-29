@@ -9,7 +9,7 @@ import { CHAPTERS, getAllMilestones } from '@/lib/history-chapters'
 export const runtime = 'nodejs'
 export const revalidate = 3600
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app'
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app'
 
 export const metadata: Metadata = {
   title: 'The Story of Robots — Robotics History | R2BOT',

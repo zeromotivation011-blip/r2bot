@@ -10,7 +10,7 @@ import { loadAllProjects } from '@/lib/build/loader'
 export const runtime = 'nodejs'
 export const revalidate = 3600
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app'
 
 export const metadata: Metadata = {
   title: "R2BOT — From Zero to Robotics Engineer | Learn, Build, Explore",

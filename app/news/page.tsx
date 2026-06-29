@@ -6,7 +6,7 @@ import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { NewsPageClient } from './NewsPageClient';
 import { getNewsData } from '@/lib/news';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 export const metadata: Metadata = {
   title: 'Robotics News | Latest Robotics Breakthroughs — R2BOT',

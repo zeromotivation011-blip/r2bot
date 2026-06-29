@@ -7,7 +7,7 @@ import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
 import { CareersClient } from './CareersClient';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 export const metadata: Metadata = {
   title: 'Career paths in robotics — India',

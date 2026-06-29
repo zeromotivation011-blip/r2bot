@@ -53,7 +53,7 @@ import { readTime, plainTextFromMd } from '@/lib/reading';
 
 type Params = { type: AtlasType; slug: string };
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 export async function generateStaticParams() {
   return getAllAtlasEntries().map((e) => ({ type: e.type, slug: e.slug }));

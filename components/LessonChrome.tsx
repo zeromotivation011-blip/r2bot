@@ -11,7 +11,7 @@ import { LessonComplete } from './LessonComplete';
 import { LessonCertificate } from './LessonCertificate';
 import { LabThread } from './lab/LabThread';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 const KEY_CONCEPTS: Record<string, string[]> = {
   '01': ['sense-think-act-loop', 'robot', 'autonomy'],

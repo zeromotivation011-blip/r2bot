@@ -11,7 +11,7 @@ import { AuthProvider } from '@/components/auth/AuthProvider';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { organizationJsonLD } from '@/lib/seo/jsonld';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body', display: 'swap' });
 const display = Space_Grotesk({ subsets: ['latin'], variable: '--font-display', display: 'swap' });
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'https://robot-tan.vercel.app',
+    url: 'https://r2bot-psi.vercel.app',
     siteName: 'R2BOT',
     title: 'R2BOT — Learn Robotics in India',
     description: 'From zero to ROS2 engineer. India-first robotics education with real hands-on projects.',

@@ -4,7 +4,7 @@ import KidsEntryClient from './KidsEntryClient'
 
 export const runtime = 'nodejs'
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app'
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app'
 
 export const metadata: Metadata = {
   title: 'Robot World for Kids | R2BOT — Learn Robotics Ages 5–14',

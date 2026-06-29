@@ -8,7 +8,7 @@ import { CopilotProvider } from '@/components/CopilotProvider';
 import { ROS2Playground } from '@/components/ROS2Playground';
 import { CopyButtonClient } from '@/components/CopyButtonClient';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 export const metadata: Metadata = {
   title: 'Run Real ROS2 In Your Browser — R2BOT',

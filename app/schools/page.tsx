@@ -8,7 +8,7 @@ import { SchoolsClient } from './SchoolsClient'
 
 export const runtime = 'nodejs'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app'
 
 export const metadata: Metadata = {
   title: 'R2BOT for Schools — Robotics in Every Classroom | CBSE & NEP 2020',

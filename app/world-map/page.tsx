@@ -2,7 +2,7 @@
 import type { Metadata } from 'next';
 import WorldMapDynamic from './WorldMapDynamic';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 const PAGE_URL = `${BASE_URL}/world-map`;
 
 export const metadata: Metadata = {

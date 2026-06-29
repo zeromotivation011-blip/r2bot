@@ -8,7 +8,7 @@ import { CopilotProvider } from '@/components/CopilotProvider';
 import { XPLeaderboard, type LeaderboardPeriod } from '@/components/XPLeaderboard';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 export const dynamic = 'force-dynamic';
 

@@ -6,7 +6,7 @@ import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { RobotsIndexClient } from './RobotsIndexClient';
 import { ROBOTS } from '@/lib/robots-data';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 const PAGE_URL = `${BASE_URL}/robots`;
 
 export const revalidate = 3600;

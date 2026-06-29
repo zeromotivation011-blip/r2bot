@@ -5,7 +5,7 @@ import { CopilotProvider } from '@/components/CopilotProvider';
 import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 export const metadata: Metadata = {
   title: 'Robotics Curriculum Map — R2BOT for Schools',

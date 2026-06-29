@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ section: 
 export default async function EmbedSectionPage({ params }: { params: Promise<{ section: string }> }) {
   const { section } = await params;
   const meta = KNOWN_SECTIONS[section];
-  const fullUrl = `https://robot-tan.vercel.app/visualizer#${section}`;
+  const fullUrl = `https://r2bot-psi.vercel.app/visualizer#${section}`;
 
   if (!meta) {
     return (

@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 export type Crumb = { label: string; href?: string };
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 export function Breadcrumbs({
   trail,

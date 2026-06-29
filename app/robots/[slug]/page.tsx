@@ -17,7 +17,7 @@ import { RobotVote } from '@/components/robots/RobotVote';
 import { RobotFamilyTree } from '@/components/robots/RobotFamilyTree';
 import { getRobotExtra } from '@/lib/robots-extra';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 export function generateStaticParams() {
   return ROBOTS.map((r) => ({ slug: r.slug }));

@@ -17,7 +17,7 @@ import {
 import type { AcademyLesson, AcademyTrack } from '@/lib/academy';
 import { getLessonsForTrack, TRACK_ACCENT, trackLabel, isoDuration } from '@/lib/academy';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
 
 export function AcademyLessonView({ lesson }: { lesson: AcademyLesson }) {
   const accent = TRACK_ACCENT[lesson.track];

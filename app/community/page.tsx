@@ -6,7 +6,7 @@ import { CopilotDrawer } from '@/components/CopilotDrawer'
 import { createSupabaseAdminClient } from '@/lib/supabase/server'
 import { CommunityGalleryClient, type CommunityBuild } from './CommunityGalleryClient'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://robot-tan.vercel.app'
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app'
 
 export const runtime = 'nodejs'
 export const revalidate = 300 // 5 minutes — fresh enough for new submissions
