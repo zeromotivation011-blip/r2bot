@@ -1,0 +1,80 @@
+---
+title: Sim-to-real
+category: ai-and-perception
+summary: >-
+  Sim-to-real is the challenge — and the set of techniques — involved in
+  training a robot in a computer simulation and then deploying that trained
+  behaviour on a physical robot in the real world without starting over.
+seeAlso: []
+sources:
+  - title: OpenAI — Learning Dexterous In-Hand Manipulation (2019)
+    url: 'https://arxiv.org/abs/1808.00177'
+  - title: >-
+      Zhao et al. — Sim-to-Real Transfer in Deep Reinforcement Learning for
+      Robotics: a Survey (2020)
+    url: 'https://arxiv.org/abs/2009.05963'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - robot-learning
+  - simulation
+  - training
+difficulty: 3
+oneLiner: 'The concept concept: Sim-to-real is the challenge — and the set'
+laymanExplanation: >-
+  Training a robot to walk by letting it fall over and recover, over and over
+  again, is the most natural way to learn locomotion. But a real robot is
+  expensive, its joints wear out, and a single training run might require
+  millions of attempts. The obvious solution: teach it in a computer simulation,
+  where gravity is free, crashes cost nothing, and you can run 
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without sim-to-real, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Sim-to-real is the challenge — and the set of techniques — involved in
+  training a robot in a computer simulation and then deploying that trained
+  behaviour on a physical robot in the real world without starting over.
+slug: sim-to-real
+bucket: concept
+---
+
+Training a [robot](/atlas/concept/robot) to walk by letting it fall over and recover, over and over again, is the most natural way to learn locomotion. But a real robot is expensive, its joints wear out, and a single training run might require millions of attempts. The obvious solution: teach it in a computer simulation, where gravity is free, crashes cost nothing, and you can run a thousand copies of the robot in parallel overnight. The catch comes the moment you switch on the real robot and it does not work.
+
+That gap between simulated competence and real-world performance is called the **sim-to-real transfer problem** — and the collection of techniques used to bridge it goes by the shorthand **sim-to-real**.
+
+## Why simulations lie
+
+A physics simulation is a mathematical approximation of the real world. It cannot perfectly model every friction coefficient, every motor imperfection, every millimetre of manufacturing tolerance. A robot policy trained in simulation learns to exploit those tiny unrealistic details, and when those details vanish in the real world, performance collapses. The formal name for this is the **reality gap**.
+
+## The main bridging techniques
+
+**Domain randomisation** deliberately injects noise into the simulation: random friction values, random masses, random lighting, random visual textures. If the policy learns to work across all these variations, it encounters nothing surprising in reality because reality is just one more sample from that range of environments.
+
+**Domain adaptation** takes the opposite approach — make the simulation look and behave as much like reality as possible, using more accurate physics engines (MuJoCo, Isaac Sim) and photorealistic rendering.
+
+**Real-world fine-tuning** uses sim training to produce a good starting policy, then refines it with a small amount of real-world experience. The simulation does the heavy lifting; real data provides the correction.
+
+## A landmark example
+
+In 2019, OpenAI trained a robotic hand to solve a Rubik's cube in simulation, running the equivalent of 10,000 years of experience in parallel across a large computing cluster, then deployed the trained policy directly on a physical hand. The key to transfer was aggressive domain randomisation — the simulation randomised over hundreds of physical parameters simultaneously.
+
+## Why it matters
+
+Without sim-to-real techniques, robot training would be slow, expensive, and limited to simple tasks. With them, researchers can solve problems in days of simulation time that would take years in reality.
+
+---
+
+*The same domain-randomisation technique used to train robot hands is now being applied to train entire humanoid robots to walk on terrain the simulation never showed them.*

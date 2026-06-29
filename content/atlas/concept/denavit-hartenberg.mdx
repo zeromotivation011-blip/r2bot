@@ -1,0 +1,130 @@
+---
+title: Denavit-Hartenberg Parameters — Complete Guide | R2BOT
+summary: >-
+  Denavit-Hartenberg (DH) parameters are a compact way to describe robot arm
+  geometry. Standard input to forward kinematics calculations.
+category: fundamentals
+bucket: mechanical-design
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - denavit-hartenberg
+  - dh
+  - kinematics
+  - arm
+  - parameters
+relatedTerms:
+  - forward-kinematics
+  - inverse-kinematics
+  - robot-arm
+  - kinematics
+seeAlso:
+  - forward-kinematics
+  - inverse-kinematics
+  - robot-arm
+  - kinematics
+youtubeSearchQuery: Denavit Hartenberg parameters explained
+oneLiner: >-
+  The mechanical design concept: Denavit-Hartenberg (DH) parameters are a
+  compact way to
+laymanExplanation: >-
+  Denavit-Hartenberg (DH) parameters describe the geometry of a robot arm using
+  just four numbers per joint: link length (a), link twist (α), link offset (d),
+  and joint angle (θ). With these four parameters per joint you can compute the
+  position and orientation of the arm's tool in any configuration.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without denavit-hartenberg parameters — complete guide | r2bot, many
+  mechanical design systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Denavit-Hartenberg (DH) parameters are a compact way to describe robot arm
+  geometry. Standard input to forward kinematics calculations.
+slug: denavit-hartenberg
+---
+
+# Denavit-Hartenberg Parameters
+
+## What is Denavit-Hartenberg Parameters?
+
+Denavit-Hartenberg (DH) parameters describe the geometry of a robot arm using just four numbers per joint: link length (a), link twist (α), link offset (d), and joint angle (θ). With these four parameters per joint you can compute the position and orientation of the arm's tool in any configuration.
+
+## How It Works
+
+DH builds a transformation matrix for each joint that goes from one link frame to the next. The four parameters precisely capture the geometric relationship between consecutive joint axes. Multiplying transforms from base to tool gives the forward-kinematics result. Modern variants (Modified DH by Craig) place the frame origins differently but follow the same idea. Robotics texts and software packages (Robotics Toolbox, MoveIt2 setup) all consume DH tables.
+
+## Real-World Example
+
+Every undergraduate robotics course in India (IIT, NIT, BITS) teaches DH parameters in the first semester of the robotics elective. KUKA and Yaskawa publish DH tables for every commercial arm they sell. ISRO uses DH for its space-manipulator designs.
+
+## Why It Matters for Robotics
+
+DH is the lingua franca of arm kinematics — universally taught, widely used in legacy code, and the language of every robotics textbook. Even though modern code increasingly uses URDF/Xacro, every senior interview will probe DH understanding.
+
+## Try It Yourself
+
+Take any 6-DOF arm (e.g., the UR5). Look up its DH table from Universal Robots' docs. Implement forward kinematics in Python (15 lines) and verify against MoveIt2's published end-effector pose at the home configuration.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "A DH parameter set has how many numbers per joint?",
+    "options": [
+      "Two",
+      "Four",
+      "Six",
+      "Ten"
+    ],
+    "answer": 1,
+    "explain": "Classic DH uses 4: link length a, twist α, offset d, joint angle θ."
+  },
+  {
+    "q": "DH parameters are used to compute:",
+    "options": [
+      "Battery level",
+      "Forward kinematics of an arm",
+      "Camera exposure",
+      "Wi-Fi range"
+    ],
+    "answer": 1,
+    "explain": "The product of transforms built from DH gives the base-to-tool pose at any configuration."
+  },
+  {
+    "q": "Modified DH (Craig convention) differs by:",
+    "options": [
+      "Using 8 parameters",
+      "Frame-origin placement at the joint axis instead of next link",
+      "Adding cameras",
+      "Using radians only"
+    ],
+    "answer": 1,
+    "explain": "Craig's modified DH attaches each frame at the current joint axis — minor but important difference for some derivations."
+  }
+]
+```
+
+## Further Reading
+
+- [Forward Kinematics](/atlas/concept/forward-kinematics)
+- [Inverse Kinematics](/atlas/concept/inverse-kinematics)
+- [Robot Arm](/atlas/concept/robot-arm)
+- [Kinematics](/atlas/concept/kinematics)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Denavit-Hartenberg Parameters for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

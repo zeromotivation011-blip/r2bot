@@ -1,0 +1,79 @@
+---
+title: Mapping (robotics)
+category: control
+summary: >-
+  Mapping is the process by which a robot builds a representation of its
+  environment from sensor data — turning raw readings from lidar, cameras, or
+  sonar into a structured model that can be used for navigation and planning.
+seeAlso: []
+sources:
+  - title: 'Thrun, Burgard, Fox — Probabilistic Robotics (MIT Press)'
+    url: 'https://mitpress.mit.edu/9780262201629/probabilistic-robotics/'
+  - title: 'Cadena et al. — Past, Present, and Future of SLAM (IEEE T-RO 2016)'
+    url: 'https://ieeexplore.ieee.org/document/7747236'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - navigation
+  - autonomy
+  - sensors
+difficulty: 3
+oneLiner: 'The concept concept: Mapping is the process by which a robot'
+laymanExplanation: >-
+  Before a ship's navigator could plot a course, cartographers had to sail the
+  coastlines and draw charts. The navigator could then look at the chart, find
+  their current position, and plan where to go. A robot needs the same thing:
+  before it can navigate, it needs a map.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without mapping (robotics), many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Mapping is the process by which a robot builds a representation of its
+  environment from sensor data — turning raw readings from lidar, cameras, or
+  sonar into a structured model that can be used for navigation and planning.
+slug: mapping
+bucket: concept
+---
+
+Before a ship's navigator could plot a course, cartographers had to sail the coastlines and draw charts. The navigator could then look at the chart, find their current position, and plan where to go. A [robot](/atlas/concept/robot) needs the same thing: before it can navigate, it needs a map.
+
+In [robotics](/atlas/concept/robotics), **mapping** is the process of building that representation from scratch, using the robot's own sensors.
+
+## What a map represents
+
+A map is an answer to the question: "what does this environment look like?" The answer can take several forms depending on the task.
+
+An **[occupancy grid](/atlas/concept/occupancy-grid)** (covered separately) divides the environment into cells and marks each one as free, occupied, or unknown. It's the most common representation for 2D navigation. A **[point cloud](/atlas/concept/point-cloud) map** stores millions of 3D points — one per [lidar](/atlas/concept/lidar) return — and is used for outdoor and 3D navigation. A **topological map** represents the environment as a graph of places and connections between them, more abstract and compact but less geometrically precise. Newer systems use **neural implicit maps** that encode geometry as the weights of a [neural network](/atlas/concept/neural-network), enabling photorealistic reconstruction.
+
+## Building a map in practice
+
+Mapping usually works by accumulating sensor data — lidar scans, [camera](/atlas/concept/camera-vision) images, sonar returns — and aligning consecutive readings to build a consistent whole. The alignment process is called **scan matching**: take two lidar scans from slightly different positions, find the transformation that makes them agree, and stitch them together. Repeat thousands of times and you get a map.
+
+The catch: the robot needs to know its position to build a map, but it needs a map to know its position. This circular dependency is the **[SLAM](/atlas/concept/slam) problem** (Simultaneous [Localisation](/atlas/concept/localisation) and Mapping), which modern algorithms solve by estimating both at once.
+
+## A real example: iRobot Roomba and beyond
+
+The iRobot Roomba j-series uses a visual-inertial [odometry](/atlas/concept/odometry) system to build a floor plan of your home during its first cleaning run. It stores the map so future runs can be more efficient — covering every patch systematically rather than randomly bouncing. Industrial robots like the MiR series build high-precision lidar maps of factory floors and update them dynamically as workers rearrange equipment.
+
+## Why mapping quality matters
+
+A map that is even slightly distorted — perhaps because loop closures (recognising that you've returned to a previously visited place) were not handled correctly — can cause a robot to navigate into walls or become permanently lost. Mapping algorithms invest considerable effort in loop closure detection and pose graph optimisation to keep accumulated errors from corrupting the final map.
+
+---
+
+*The first probabilistic occupancy grid was proposed by Alberto Elfes and Hans Moravec at Carnegie Mellon in 1985, and it remains the dominant map format for indoor robots four decades later.*

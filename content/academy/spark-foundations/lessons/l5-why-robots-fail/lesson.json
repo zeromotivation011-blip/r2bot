@@ -1,0 +1,17 @@
+{
+  "id": "l5-why-robots-fail",
+  "module_id": "m2-real-world",
+  "order_index": 0,
+  "slug": "why-robots-fail",
+  "title": "Why robots fail",
+  "lesson_type": "reading",
+  "duration_minutes": 9,
+  "xp_reward": 120,
+  "is_free_preview": false,
+  "passing_score": 75,
+  "objectives": [
+    "Trace any robot failure to Sense, Think, or Act",
+    "Use that taxonomy to debug your own projects later"
+  ],
+  "atlas_links": ["feedback-loop", "redundancy", "failsafe"]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "l2-how-robots-move",
+  "module_id": "m1-foundations",
+  "order_index": 1,
+  "slug": "how-robots-move",
+  "title": "How robots move",
+  "lesson_type": "reading",
+  "duration_minutes": 8,
+  "xp_reward": 90,
+  "is_free_preview": true,
+  "passing_score": 75,
+  "objectives": [
+    "Tell DC motors, servos, and steppers apart",
+    "Explain when each motor type is the right pick"
+  ],
+  "atlas_links": ["actuator", "servo-motor", "stepper-motor", "dc-motor"]
+}

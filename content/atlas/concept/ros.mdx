@@ -1,0 +1,112 @@
+---
+title: ROS (Robot Operating System)
+hindi_name: ROS (रोबोट ऑपरेटिंग सिस्टम)
+category: hardware
+summary: >-
+  ROS isn't really an operating system — it's the toolkit that lets the dozens
+  of programs inside a robot talk to each other. It's how nearly every modern
+  research robot is built.
+seeAlso:
+  - slam
+  - robot
+  - lidar
+sources:
+  - title: ROS 2 documentation
+    url: 'https://docs.ros.org/'
+  - title: Open Robotics
+    url: 'https://www.openrobotics.org/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - software
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: ROS isn''t really an operating system — it''s'
+laymanExplanation: >-
+  ROS isn't really an operating system — it's the toolkit that lets the dozens
+  of programs inside a robot talk to each other. It's how nearly every modern
+  research robot is built.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros (robot operating system), many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis:
+  - Spot by Boston Dynamics
+  - NASA's JPL robots
+  - Most university research robots
+indianExample: >-
+  IIT Bombay's Eklavya autonomous underwater vehicle runs on ROS. TCS and Wipro
+  have dedicated ROS engineering teams.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ROS uses a publish-subscribe model. What are the message channels called?
+  options:
+    - Streams
+    - Topics
+    - Pipes
+    - Wires
+  answer: 1
+  explanation: >-
+    Nodes publish to topics; other nodes subscribe to topics. It is essentially
+    a robot-internal message bus.
+mindBlowingFact: >-
+  ROS was created at Stanford in 2007. Today it runs on robots on Mars (NASA
+  missions use ROS-compatible frameworks).
+industryApplications:
+  - research
+  - autonomous vehicles
+  - industrial automation
+  - healthcare robots
+  - space
+difficultyLabel: Classroom
+technicalDefinition: >-
+  ROS isn't really an operating system — it's the toolkit that lets the dozens
+  of programs inside a robot talk to each other. It's how nearly every modern
+  research robot is built.
+slug: ros
+bucket: concept
+---
+
+ROS isn't really an operating system — it's the toolkit that lets the dozens of programs inside a [robot](/atlas/concept/robot) talk to each other. It's how nearly every modern research robot is built.
+
+## Why a robot needs ROS
+
+A modern robot is not one program. It's many programs running at once:
+
+- One program reads the [camera](/atlas/concept/camera-vision)
+- Another reads the [lidar](/atlas/concept/lidar)
+- Another fuses the two readings into a 3D map
+- Another plans a path through that map
+- Another sends velocity commands to the motors
+- Another logs everything for debugging
+
+If you wrote all of this as a single program, any change in one part would risk breaking the others. ROS is the plumbing that keeps them separate — yet able to talk.
+
+## The three big ideas
+
+**Nodes.** Each program is a "node". Each node has one job. Each node runs in its own process. A typical robot has 20-50 nodes.
+
+**Topics.** Nodes publish messages onto named "topics" — `/camera/image`, `/lidar/scan`, `/cmd_vel`. Other nodes subscribe to topics they care about. It's a publish-subscribe pattern. Nodes never address each other directly — they only know the topic names.
+
+**Services and actions.** Two more communication patterns: services for quick request-response, actions for long-running goals like "drive to this location."
+
+That's basically all of ROS in three concepts.
+
+## ROS 1 vs. ROS 2
+
+ROS 1 was released in 2007 by Willow Garage. It powered an entire generation of [robotics](/atlas/concept/robotics) research but had real limitations: a single point of failure (the ROS master), poor support for real-time control, weak security.
+
+**ROS 2** (released 2018) rebuilt the same ideas on top of DDS (Data Distribution Service) — an industrial-grade pub/sub middleware. It has no master, supports real-time guarantees, runs on tiny embedded devices, and has security built in. As of 2026, all new robotics projects start with ROS 2. ROS 1 is officially end-of-life.
+
+## Who uses it
+
+[Boston Dynamics](/atlas/company/boston-dynamics)' research demos. NASA's Robonaut. Most autonomous mobile robots in warehouses. Most university robotics courses. Most quadruped startups. The Indian robotics ecosystem leans heavily on ROS 2 too — it's free, open-source, and reduces engineering time by months.
+
+Notably *not* using ROS: [Tesla](/atlas/company/tesla), Apple, most automotive self-driving stacks. They use custom in-house frameworks because their products are commercial and they want full control of every byte.
+
+---
+
+*To see ROS 2 in action, that's [Forge 01](/diagnostic) in our learning track — the 6-lesson "ROS 2 from scratch" course.*

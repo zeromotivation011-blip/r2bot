@@ -1,0 +1,78 @@
+---
+title: State machine
+category: control
+summary: >-
+  A state machine is a way of organising a robot's behaviour into distinct modes
+  — called states — with clear rules for when and how to switch between them,
+  making complex behaviour predictable and debuggable.
+seeAlso: []
+sources:
+  - title: ROS 2 — SMACH state machine library
+    url: 'https://wiki.ros.org/smach'
+  - title: Miro Samek — Practical UML Statecharts in C/C++
+    url: 'https://www.state-machine.com/qm/sm_intro.html'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - control
+  - software
+  - algorithms
+difficulty: 3
+oneLiner: 'The concept concept: A state machine is a way of organising'
+laymanExplanation: >-
+  Think of a traffic light. It doesn't exist in a confused in-between state — it
+  is either red, amber, or green, and nothing else. When a timer fires, it
+  switches to the next colour according to a fixed sequence. It doesn't need to
+  "think" about all the possibilities at once. It only needs to know what it's
+  doing right now, and what could trigger a change.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without state machine, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A state machine is a way of organising a robot's behaviour into distinct modes
+  — called states — with clear rules for when and how to switch between them,
+  making complex behaviour predictable and debuggable.
+slug: state-machine
+bucket: concept
+---
+
+Think of a traffic light. It doesn't exist in a confused in-between state — it is either red, amber, or green, and nothing else. When a timer fires, it switches to the next colour according to a fixed sequence. It doesn't need to "think" about all the possibilities at once. It only needs to know what it's doing right now, and what could trigger a change.
+
+That simple idea — a system that's always in exactly one well-defined mode — is a **finite-state machine** (FSM), usually just called a state machine.
+
+## States, events, and transitions
+
+A state machine has three building blocks:
+
+- **States** — the distinct modes the system can be in. For a delivery [robot](/atlas/concept/robot): *Idle*, *Navigating*, *Delivering*, *Charging*, *Error*.
+- **Events** — triggers that can cause a change. A sensor reading, a timer expiry, a command from an operator, an obstacle detection.
+- **Transitions** — the rules that say "if you're in state X and event Y happens, move to state Z."
+
+At any moment the robot is in exactly one state. Everything it does — which sensors it reads, how it moves, what it ignores — is determined by that state. When an event matches a transition rule, it jumps cleanly to the next state. This makes behaviour explicit and testable.
+
+## A real system: [Boston Dynamics](/atlas/company/boston-dynamics) [Spot](/atlas/robot/spot)
+
+Spot's operational software uses hierarchical state machines to manage its gait. At the top level, states might be: *Idle*, *Standing*, *Walking*, *Climbing*, *Recovering*. Inside *Walking* there's a nested state machine managing individual leg phase cycles. This hierarchy keeps the logic manageable — the high-level states don't need to understand foot trajectories; the low-level states don't need to know why they were invoked. Boston [Dynamics](/atlas/concept/dynamics) engineers can test each state in isolation, which would be nearly impossible with a single undivided logic blob.
+
+## Why state machines matter for [robotics](/atlas/concept/robotics)
+
+Robots need to be predictable. When a [surgical robot](/atlas/concept/surgical-robot) is cutting tissue, no one wants it to accidentally enter "rapid transit" mode because a stray variable happened to be true. State machines enforce that only the right transitions happen in the right conditions. They also make debugging tractable: if something goes wrong, you can ask "what state was the system in, and what event triggered the transition?" — and get a clear answer.
+
+The limitation is scalability. With dozens of states and hundreds of transitions, FSMs become hard to maintain. Behaviour trees (a more recent alternative used heavily in game AI and robotics) address some of these problems, but state machines remain widely used for low-level controllers and hardware interfaces.
+
+---
+
+*The Apollo Guidance Computer used state machine logic to manage lunar landing phases — a 1969 example of why robots need clear modes rather than continuous fuzzy reasoning.*

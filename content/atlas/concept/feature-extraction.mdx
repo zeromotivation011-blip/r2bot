@@ -1,0 +1,73 @@
+---
+title: Feature Extraction in Robotics Vision — Complete Guide
+summary: >-
+  Feature extraction reduces raw sensor data — especially images — into compact,
+  useful descriptors. Foundation of SLAM, object detection, and place
+  recognition.
+category: ai-and-perception
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - vision
+  - features
+  - descriptors
+seeAlso:
+  - computer-vision
+  - object-detection
+  - slam
+difficulty: 3
+oneLiner: 'The concept concept: Feature extraction reduces raw sensor data — especially'
+laymanExplanation: >-
+  Feature extraction transforms raw sensor data into compact descriptors that
+  capture the essence of what's being observed — typically corners, edges, or
+  learned embeddings. Without feature extraction, robots would have to process
+  every pixel from scratch every frame.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without feature extraction in robotics vision — complete guide, many concept
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Feature extraction reduces raw sensor data — especially images — into compact,
+  useful descriptors. Foundation of SLAM, object detection, and place
+  recognition.
+slug: feature-extraction
+bucket: concept
+---
+
+# Feature Extraction in Robotics Vision
+
+## What is it?
+
+Feature extraction transforms raw sensor data into compact descriptors that capture the essence of what's being observed — typically corners, edges, or learned embeddings. Without feature extraction, robots would have to process every pixel from scratch every frame.
+
+## How it works
+
+Classical feature extractors like SIFT, SURF, ORB, and FAST detect interest points in an image and produce a fixed-length descriptor for each — invariant to scale, rotation, and (somewhat) illumination. Modern deep-learning features are produced by convolutional networks (e.g., ResNet features) or self-supervised transformers (e.g., DINO).
+
+## Real-world example
+
+Visual SLAM systems like ORB-SLAM rely entirely on ORB features. Visual place recognition for autonomous vehicles uses learned features. Boston Dynamics Spot's localisation uses both classical and learned features.
+
+## Why it matters for robotics
+
+Feature extraction underpins every perception system. Choosing the right features (classical vs learned, dense vs sparse) is a fundamental design trade-off that every robotics engineer faces.
+
+## See also
+
+- [Computer Vision](/atlas/concept/computer-vision)
+- [Object Detection](/atlas/concept/object-detection)
+- [Slam](/atlas/concept/slam)

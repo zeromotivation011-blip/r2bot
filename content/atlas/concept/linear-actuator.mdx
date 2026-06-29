@@ -1,0 +1,82 @@
+---
+title: Linear actuator
+category: actuators
+summary: >-
+  A linear actuator converts energy into straight-line push-or-pull motion
+  rather than rotation, giving a robot the ability to extend, retract, lift, or
+  press along a single axis.
+seeAlso: []
+sources:
+  - title: Wikipedia — Linear actuator
+    url: 'https://en.wikipedia.org/wiki/Linear_actuator'
+  - title: Thomson Industries — Linear motion fundamentals
+    url: 'https://www.thomsonlinear.com/en/solutions/linear-actuators'
+  - title: IEEE Spectrum — Electric linear actuators in robotics
+    url: 'https://spectrum.ieee.org/the-basics-of-linear-actuators'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - actuators
+  - linear-motion
+  - mechanisms
+difficulty: 3
+oneLiner: >-
+  The concept concept: A linear actuator converts energy into straight-line
+  push-or-pull
+laymanExplanation: >-
+  A door handle that you push straight down. A syringe plunger you press in. A
+  car seat that slides forward when you pull a lever. All of these produce
+  useful force not by spinning but by moving in a straight line. In robotics,
+  producing controlled straight-line motion on demand is one of the most common
+  mechanical requirements, and it is exactly what a linear
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without linear actuator, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A linear actuator converts energy into straight-line push-or-pull motion
+  rather than rotation, giving a robot the ability to extend, retract, lift, or
+  press along a single axis.
+slug: linear-actuator
+bucket: concept
+---
+
+A door handle that you push straight down. A syringe plunger you press in. A car seat that slides forward when you pull a lever. All of these produce useful force not by spinning but by moving in a straight line. In [robotics](/atlas/concept/robotics), producing controlled straight-line motion on demand is one of the most common mechanical requirements, and it is exactly what a linear actuator does.
+
+A **linear actuator** is any device that converts energy into linear (straight-line) mechanical displacement. While rotating motors are more common in mechanical design, a great deal of [robot](/atlas/concept/robot) work is inherently linear — extending a [gripper](/atlas/concept/gripper) toward an object, raising a platform, pressing a button, or sliding a drawer. Linear actuators provide that straight-line push or pull cleanly, without the robot needing to first generate rotation and then convert it through linkages.
+
+## Types of linear actuator
+
+There are several distinct technologies under this umbrella:
+
+- **Electric lead-screw actuators.** A DC or [stepper motor](/atlas/concept/stepper-motor) spins a threaded rod (the lead screw). A nut travelling on the thread cannot rotate, so it moves linearly instead. Compact, quiet, and precise — the most common type in small robots.
+- **Ball-screw actuators.** Like lead screws but with ball bearings between thread and nut, drastically reducing friction. Used where efficiency and backlash matter, such as CNC machine axes.
+- **Rack-and-pinion.** A rotating gear (pinion) meshes with a flat toothed bar (rack); the bar moves linearly. Common in large-stroke applications — steering systems, gantry robots.
+- **Hydraulic and pneumatic cylinders.** These are linear actuators in the strictest sense. Fluid or air pushes a piston in a straight line. (See the separate hydraulic and [pneumatic actuator](/atlas/concept/pneumatic-actuator) entries.)
+- **Voice-coil actuators.** An electromagnetic coil moves within a permanent magnet field — the same principle as a loudspeaker, but used to push a rod a small, precise distance very quickly. Common in hard-drive read heads and optical-focus mechanisms.
+
+## Real-world example
+
+The [surgical robot](/atlas/concept/surgical-robot) Da Vinci, made by Intuitive Surgical, uses electric lead-screw linear actuators extensively throughout its instrument arms. Each millimetre of extension or retraction is controlled to sub-millimetre precision, translating a surgeon's hand gestures at a console into fine movements inside a patient's body. The robustness and precision of electric linear actuators — no hydraulic fluid, no air lines — make them the preferred choice in [medical robotics](/atlas/concept/medical-robotics) where contamination is unacceptable.
+
+## Why it matters
+
+Without reliable linear actuators, many robotic tasks become awkward or mechanically complicated. Converting rotary motion to linear through linkages introduces backlash, compliance, and complexity. A linear actuator solves this directly. From the telescoping masts of inspection drones to the Z-axis of a desktop 3D printer, linear actuators are what let robots interact with a world built around straight lines — shelves, buttons, doors, and flat surfaces.
+
+---
+
+*The quest for linear actuators that are as light and powerful as biological muscle — which is itself a linear actuator at the molecular level — is one of the oldest unsolved problems in robotics engineering.*

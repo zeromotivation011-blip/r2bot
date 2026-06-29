@@ -1,0 +1,133 @@
+---
+title: ROS2 URDF — Complete Guide | R2BOT
+summary: >-
+  URDF (Unified Robot Description Format) describes a robot's links, joints, and
+  visuals as XML. The standard way to model robots in ROS2 + Gazebo.
+category: control
+bucket: programming-software
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - urdf
+  - ros2
+  - xml
+  - simulation
+  - description
+relatedTerms:
+  - ros2
+  - ros2-tf
+  - gazebo-simulation
+  - kinematics
+  - forward-kinematics
+seeAlso:
+  - ros2
+  - ros2-tf
+  - gazebo-simulation
+  - kinematics
+  - forward-kinematics
+youtubeSearchQuery: ROS2 URDF robot description tutorial
+oneLiner: >-
+  The programming software concept: URDF (Unified Robot Description Format)
+  describes a robot's
+laymanExplanation: >-
+  URDF (Unified Robot Description Format) is an XML format that describes a
+  robot's physical structure — its links (rigid parts), joints (how they connect
+  and move), masses, visuals, and collision shapes. It is the standard input for
+  ROS2 visualisation, simulation, and motion planning.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros2 urdf — complete guide | r2bot, many programming software systems
+  in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  URDF (Unified Robot Description Format) describes a robot's links, joints, and
+  visuals as XML. The standard way to model robots in ROS2 + Gazebo.
+slug: ros2-urdf
+---
+
+# ROS2 URDF
+
+## What is ROS2 URDF?
+
+URDF (Unified Robot Description Format) is an XML format that describes a robot's physical structure — its links (rigid parts), joints (how they connect and move), masses, visuals, and collision shapes. It is the standard input for ROS2 visualisation, simulation, and motion planning.
+
+## How It Works
+
+A URDF file lists `<link>` elements (each with inertial, visual, and collision children) and `<joint>` elements (each with parent, child, type — fixed, revolute, prismatic, etc. — and limits). Robot State Publisher reads the URDF and `joint_states` topic, then publishes a tf tree describing exactly where every link is in space. The same URDF feeds Gazebo for physics, RViz2 for visualisation, MoveIt2 for motion planning, and Webots/Isaac Sim for advanced simulation. Modern projects use Xacro (XML macro) to compose URDFs from parametric building blocks.
+
+## Real-World Example
+
+Every ROS2-compatible robot ships a URDF: TurtleBot4, Spot, Universal Robots UR5, Franka Panda. Indian academic robots (the IIT Madras swimming robot, IISc humanoid leg) all have URDFs. Even tutorials on R2BOT's Academy include URDFs you can load in the Visualizer.
+
+## Why It Matters for Robotics
+
+Without a URDF, your robot cannot be simulated, visualised, or motion-planned in ROS2. Reading and writing URDF is a daily skill. Knowing how to debug `<inertial>` blocks (zero mass, wrong CoG) is essential — most simulation problems trace back to bad URDF.
+
+## Try It Yourself
+
+Write a minimal URDF with one base link and one wheel joint. Load it with `ros2 launch urdf_tutorial display.launch.py model:=my_robot.urdf`, open RViz2, and move the wheel slider to see it spin live. Then expand to a full differential-drive robot.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "URDF is written in which format?",
+    "options": [
+      "Binary protobuf",
+      "XML",
+      "Markdown",
+      "YAML only"
+    ],
+    "answer": 1,
+    "explain": "URDF is XML — typically generated from Xacro macros for parametric robot descriptions."
+  },
+  {
+    "q": "Which is NOT a typical URDF element?",
+    "options": [
+      "<link>",
+      "<joint>",
+      "<sensor>",
+      "<sql>"
+    ],
+    "answer": 3,
+    "explain": "URDF has links and joints; sensors can be added but `<sql>` is not part of the schema."
+  },
+  {
+    "q": "A URDF feeds which of the following tools?",
+    "options": [
+      "Photoshop",
+      "RViz2, Gazebo, MoveIt2",
+      "Excel",
+      "GarageBand"
+    ],
+    "answer": 1,
+    "explain": "URDF is the shared description used across the entire ROS2 simulation and planning stack."
+  }
+]
+```
+
+## Further Reading
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Tf](/atlas/concept/ros2-tf)
+- [Gazebo Simulation](/atlas/concept/gazebo-simulation)
+- [Kinematics](/atlas/concept/kinematics)
+- [Forward Kinematics](/atlas/concept/forward-kinematics)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain ROS2 URDF for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

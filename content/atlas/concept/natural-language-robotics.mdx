@@ -1,0 +1,86 @@
+---
+title: Natural-language robotics
+category: ai-and-perception
+summary: >-
+  Natural-language robotics is the field of research and engineering that
+  enables robots to understand and act on instructions given in ordinary spoken
+  or written human language, without requiring specialised commands or
+  programming.
+seeAlso: []
+sources:
+  - title: >-
+      Ahn et al. — Do As I Can, Not As I Say: Grounding Language in Robotic
+      Affordances (Google, 2022)
+    url: 'https://arxiv.org/abs/2204.01691'
+  - title: >-
+      Brohan et al. — RT-2: Vision-Language-Action Models (Google DeepMind,
+      2023)
+    url: 'https://robotics-transformer2.github.io/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - ai
+  - human-robot-interaction
+  - large-models
+difficulty: 3
+oneLiner: 'The concept concept: Natural-language robotics is the field of research and'
+laymanExplanation: >-
+  For most of robotics history, telling a robot to do something required a
+  programmer. You did not speak to a robot; you wrote code for it. Even recent
+  advances made robots more capable but not more conversational — you might
+  teach them by demonstration, but you could not simply say "put the apple next
+  to the blue cup, and be gentle." That kind of instruction 
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without natural-language robotics, many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Natural-language robotics is the field of research and engineering that
+  enables robots to understand and act on instructions given in ordinary spoken
+  or written human language, without requiring specialised commands or
+  programming.
+slug: natural-language-robotics
+bucket: concept
+---
+
+For most of [robotics](/atlas/concept/robotics) history, telling a [robot](/atlas/concept/robot) to do something required a programmer. You did not speak to a robot; you wrote code for it. Even recent advances made robots more capable but not more conversational — you might teach them by demonstration, but you could not simply say "put the apple next to the blue cup, and be gentle." That kind of instruction assumes an enormous amount of shared context, common sense, and linguistic understanding that machines simply did not have. Until very recently.
+
+**Natural-language robotics** is the emerging field that connects large language models (LLMs) and vision-language models with physical robot systems, so that a person can instruct a robot in plain speech or text and the robot can interpret, plan, and execute the task.
+
+## The two hard problems it solves together
+
+Giving a robot language instructions requires solving two problems simultaneously. The first is **language understanding** — parsing what the instruction actually means, including ambiguity, context, and implied goals. The second is **grounding** — [mapping](/atlas/concept/mapping) that linguistic understanding onto the robot's physical reality: which object in this room is "the apple," is the robot physically capable of reaching it, and in what sequence of movements?
+
+Large language models, trained on vast text, handle the first problem well. Connecting them to robot perception and action is the active research frontier.
+
+## A landmark example
+
+Google's SayCan system (2022) was an early demonstration. A large language model proposed plans — "first pick up the sponge, then carry it to the sink" — but only from actions the robot had been verified to be capable of executing in its current environment. Perception and capability grounding filtered the LLM's suggestions into something physically achievable.
+
+The successor system, RT-2 (2023), went further: a single model that simultaneously reads visual input, interprets text commands, and outputs robot actions — trained partly on internet-scale data.
+
+## What it changes
+
+Before natural-language robotics, deploying a robot in a new environment required specialist engineers to programme new task libraries. With it, a robot can be given novel instructions by an ordinary person on the first day it arrives. This dramatically lowers the barrier to deploying robots in unstructured environments like homes, hospitals, and small businesses.
+
+## What remains genuinely hard
+
+Reliability is still an open problem. Robots following natural-language instructions perform well on average but fail unpredictably on edge cases. Safety — ensuring a misunderstood instruction does not cause harm — is an active area of research that remains unsolved.
+
+---
+
+*The long-term question in natural-language robotics is whether a robot given a sufficiently capable language model will eventually be able to learn new physical skills just by reading about them.*

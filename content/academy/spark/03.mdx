@@ -1,0 +1,60 @@
+---
+title: "How robots sense the world"
+description: "Before a robot can do anything, it needs to know where it is and what's around it. That's harder than it sounds."
+track: spark
+lesson: 3
+duration: "6 min read"
+xp: 70
+estimated_minutes: 6
+sources:
+  - name: "Roland Siegwart et al. — Introduction to Autonomous Mobile Robots"
+    url: "https://mitpress.mit.edu/9780262015356/introduction-to-autonomous-mobile-robots/"
+  - name: "NASA — Mars Rover Instruments"
+    url: "https://mars.nasa.gov/mer/mission/instruments/"
+---
+
+Close your eyes. You can still feel where your hands are. You know if you're sitting or standing. You can sense the temperature of the room.
+
+That's not vision — it's a collection of other senses working quietly in the background. Robots need something similar before they can do anything useful in the world. The question is: which senses, and how?
+
+## Two kinds of sensors
+
+Robot sensors fall into two categories: **external** (what's out there?) and **internal** (what am I doing?).
+
+Both matter. A robot that can see the world but doesn't know what its own joints are doing is like trying to catch a ball with your eyes open but your arm numb.
+
+## External sensors — reading the world
+
+**Cameras** are the most information-rich sensor available. A camera captures light across millions of pixels, giving the robot a detailed picture of its environment. The problem: pictures are 2D. The world is 3D. Turning a flat image into an understanding of depth, distance, and object identity is a genuinely hard computing problem. It's what most modern AI research in robotics is about.
+
+**Ultrasonic sensors** send out a pulse of sound and time how long it takes to bounce back. Distance = speed of sound × time ÷ 2. They're cheap, simple, and good enough for "is there a wall in front of me?" Not good enough for "what exactly is that wall made of, and is there a gap I can fit through?" A Roomba's cliff sensors work this way.
+
+**LiDAR** (Light Detection And Ranging) fires thousands of laser pulses per second in all directions and builds a precise 3D map of everything nearby. Self-driving cars use LiDAR to know the exact shape and distance of every object around them. It's extraordinarily accurate — and extraordinarily expensive. Prices have dropped from $75,000 per unit to under $500 in a decade, which is a big part of why self-driving cars are suddenly possible.
+
+**Infrared sensors** detect heat. A robot designed to find people in a burning building uses infrared — humans glow brightly in infrared against a cold background, even through smoke.
+
+## Internal sensors — knowing yourself
+
+**Encoders** attach to motors or joints and count rotations. If a wheel rotates 10 times and has a circumference of 20cm, the robot has moved 200cm. Simple, reliable, and essential — almost every robot with moving parts has encoders.
+
+**IMUs** (Inertial Measurement Units) measure acceleration and rotation using tiny silicon structures that flex under force. Your phone has one — it's how it knows you've tilted it. A robot uses an IMU to track which way it's pointing and whether it's accelerating.
+
+## Sensor fusion — when one isn't enough
+
+No single sensor is perfect. Cameras fail in the dark. Ultrasonic sensors get confused by soft surfaces. LiDAR struggles with rain and glass. Encoders accumulate error over distance.
+
+The solution is **sensor fusion**: combining multiple sensors so their weaknesses cancel each other out. A self-driving car doesn't trust any single sensor — it combines cameras, radar, LiDAR, GPS, and encoders into one picture of the world, constantly cross-checking each against the others.
+
+This is one of the genuinely hard problems in robotics: not just collecting sensor data, but figuring out what to believe when the sensors disagree.
+
+---
+
+## Check your understanding
+
+**1.** A robot needs to operate in a completely dark warehouse. Which sensors could still work? Which ones couldn't?
+
+**2.** Why do encoders accumulate error over distance? (Hint: think about what small errors do when you add them up over many wheel rotations.)
+
+---
+
+*LiDAR fires laser pulses and measures the time they take to return — building a 3D picture of the world from timing alone. Bats do something almost identical using sound. What's the bat's biological version of LiDAR called, and why do bats need it?*

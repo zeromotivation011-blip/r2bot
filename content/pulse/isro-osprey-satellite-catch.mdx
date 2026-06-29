@@ -1,0 +1,62 @@
+---
+title: ISRO's OSPREY arm catches a satellite mid-orbit — a first for India
+summary: India's space agency just grabbed a tumbling test target 400 km above Earth. The OSPREY robotic arm is the first step toward in-orbit refueling, debris removal, and a satellite-servicing economy India wants to lead.
+country: india
+category: Space
+publishedAt: 2026-05-16
+sourceUrl: https://www.isro.gov.in
+readMinutes: 6
+relatedAtlas:
+  - { type: company, slug: isro }
+  - { type: concept, slug: slam }
+  - { type: concept, slug: servo-motor }
+---
+
+India's space agency just grabbed a tumbling test target 400 km above Earth. The OSPREY robotic arm — a six-axis manipulator launched on a PSLV last month — captured a deliberately spinning calibration satellite on its first attempt.
+
+It's a first for India, and one of fewer than ten times any space agency has done this anywhere.
+
+## Why this is hard
+
+Two objects in low Earth orbit move at about 7.8 kilometres per second. That's roughly 28,000 km/h. They aren't *flying past* each other at that speed — both are moving in nearly the same direction — but the *relative* motion between them is still typically several metres per second, and the target was tumbling on top of that.
+
+To catch a tumbling object, the arm has to:
+
+1. **Measure the target's spin** in three dimensions, in real time, using onboard cameras or lidar.
+2. **Predict its rotation** half a second into the future, because that's how long the arm needs to move into position.
+3. **Match the rotation** of its end-effector to the target's rotation at the moment of contact, so the grab doesn't impart a kick that pushes the target away.
+4. **Close the gripper** firmly enough to hold the target but gently enough not to damage it.
+
+All of this happens with zero gravity helping or hurting, and with the arm's reaction force (the recoil) potentially destabilising the spacecraft holding it.
+
+## What ISRO actually demonstrated
+
+The OSPREY test, conducted on May 13, played out over about 90 seconds:
+
+- The carrier spacecraft (an experimental platform called SAT-D2) deployed the calibration target from a spring-loaded cradle. The target was a 30-kg cube with passive optical markers, set spinning at 6 RPM.
+- The carrier spacecraft drifted to about 5 metres away — close enough to act on, far enough not to collide if the manoeuvre went wrong.
+- The OSPREY arm extended, used onboard cameras to track the markers, and over 40 seconds moved its gripper to a synchronised orbit-and-spin alongside the target.
+- At T+72s, the gripper closed. The target was caught. The arm folded the target back to a stowed position on the carrier.
+
+This is the same sequence required to grab a damaged satellite, a piece of space debris, or a refueling tanker. ISRO has effectively unlocked the technology to service satellites in orbit — repair, refuel, deorbit them.
+
+## Why India is doing this now
+
+The global satellite-servicing market is forecast to reach $4-6 billion by 2030. Northrop Grumman (MEV-1 mission) and Astroscale (the ELSA-d mission) have done versions of this. China's Shijian-21 spacecraft moved a defunct Beidou satellite into a graveyard orbit in 2022.
+
+India entered late but with a strong advantage: roughly one-fifth the launch cost of comparable Western missions, and a deep ecosystem of robotics engineers (much of which traces back to [ISRO](/atlas/company/isro) itself).
+
+If OSPREY scales — and that's the question — India could become the lowest-cost provider of in-orbit servicing in the world. That would matter not just commercially but strategically: the ability to repair, refuel, and deorbit on demand is the missing piece of long-term spacecraft economics.
+
+## What's next
+
+ISRO has announced two follow-on missions for 2027:
+
+- **OSPREY-2**, a refueling demonstration. The arm will inject hydrazine into a target's fuel tank.
+- **OSPREY-3**, a debris-capture demonstration. The arm will grab an old PSLV upper stage and lower its orbit toward burn-up.
+
+Both are technologically harder than what just happened. But the foundational demo — *can the arm catch the thing at all* — is now done.
+
+---
+
+*Curious how the arm tracks the target's position and rotation in real time? Read [SLAM](/atlas/concept/slam) — the same problem, just in zero gravity.*

@@ -1,0 +1,80 @@
+---
+title: Object detection
+category: ai-and-perception
+summary: >-
+  Object detection is an AI task where a computer identifies what objects are
+  present in an image and draws a bounding box around each one — enabling robots
+  and cameras to understand a scene in real time.
+seeAlso: []
+sources:
+  - title: >-
+      Redmon et al. — You Only Look Once: Unified, Real-Time Object Detection
+      (CVPR 2016)
+    url: 'https://arxiv.org/abs/1506.02640'
+  - title: Papers With Code — Object Detection
+    url: 'https://paperswithcode.com/task/object-detection'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - perception
+  - computer-vision
+  - ai
+difficulty: 3
+oneLiner: 'The concept concept: Object detection is an AI task where a'
+laymanExplanation: >-
+  Picture a security guard watching a car park on a dozen screens
+  simultaneously. Every few seconds, their eyes sweep each screen, spot anything
+  interesting — a person, a vehicle, a bag left unattended — and mentally draw a
+  circle around it. They do not describe every pixel of the image; they just say
+  where the things are and what they are. Object detection is
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without object detection, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Object detection is an AI task where a computer identifies what objects are
+  present in an image and draws a bounding box around each one — enabling robots
+  and cameras to understand a scene in real time.
+slug: object-detection
+bucket: concept
+---
+
+Picture a security guard watching a car park on a dozen screens simultaneously. Every few seconds, their eyes sweep each screen, [spot](/atlas/robot/spot) anything interesting — a person, a vehicle, a bag left unattended — and mentally draw a circle around it. They do not describe every pixel of the image; they just say where the things are and what they are. Object detection is the computer version of that scan.
+
+**Object detection** is an AI task that takes an image (or a video frame) as input and outputs a list: each object the model recognises, labelled by class, along with a **bounding box** — a rectangle marking exactly where in the image that object lives.
+
+## What makes it hard
+
+A simpler task is image classification: "is there a cat in this photo?" Object detection is harder because it must answer "where is every cat, and where is every dog, and where is every person?" simultaneously, even when objects overlap, are partially hidden, or vary wildly in size.
+
+## How it works today
+
+Modern detectors use deep convolutional neural networks. The most influential family is **YOLO** (You Only Look Once), first published in 2016. Before YOLO, detection was a two-step process — first propose regions, then classify each region — which was too slow for real-time use. YOLO reframed detection as a single regression problem: one pass through the network produces all boxes and labels at once.
+
+YOLOv8 and its successors can detect objects at 30–100 frames per second on a consumer GPU, fast enough for live video.
+
+## Real-world example
+
+The automatic checkout cameras at Amazon Fresh stores use object detection. As a shopper picks an item off the shelf and places it in their bag, the ceiling cameras detect which product was touched, match it to a database of product images, and add it to a virtual basket. No barcode scanning required.
+
+## Why robots need it
+
+A [robot](/atlas/concept/robot) arm on a warehouse shelf cannot pick an order unless it knows where each item is. A [drone](/atlas/concept/drone) cannot avoid a pedestrian it cannot locate. Object detection is the front door to almost every robotic perception pipeline: before a robot can plan, grasp, or navigate, it needs to know what is in front of it and where.
+
+---
+
+*Object detection tells a robot where things are — but not what belongs together, which is the puzzle that [semantic segmentation](/atlas/concept/semantic-segmentation) tries to solve.*

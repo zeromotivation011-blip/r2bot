@@ -1,0 +1,60 @@
+---
+title: How a Roomba decides where to clean
+summary: It's not random. A modern Roomba runs SLAM, builds a map of your home, and plans a route. Here's what's inside.
+topic: Consumer
+durationSeconds: 228
+externalUrl: https://www.youtube.com/results?search_query=roomba+slam
+publishedAt: 2026-05-10
+relatedAtlas:
+  - { type: concept, slug: slam }
+  - { type: concept, slug: lidar }
+  - { type: concept, slug: robot }
+---
+
+It's not random. A modern Roomba runs SLAM, builds a map of your home, and plans a route. The early Roombas (pre-2015) really did bounce around at random — they just covered enough distance to hit most of the floor eventually. The current ones (Roomba j7+, j9+, Roborock S8) are genuine little robots.
+
+Here's what's inside.
+
+## The eight things that make a Roomba a robot
+
+**A lidar (on premium models) or a camera (on cheaper ones).** This is how the Roomba sees the world. Premium Roombas have a small spinning lidar on top, doing 5-10 full sweeps per second. Cheaper models use a forward-facing camera and computer vision.
+
+**A bumper sensor.** When the Roomba bumps into something its sensors didn't see (a chair leg, a power cable), this senses the contact and tells the brain to back off.
+
+**Cliff sensors** — infrared detectors under the edges. They notice when the floor suddenly drops away (the top of a stairwell, the edge of a sunken living room) and tell the Roomba to stop.
+
+**Wheel encoders.** Tiny sensors that count the rotations of each wheel. This is how the Roomba estimates how far it's moved between sensor updates — basic odometry.
+
+**Dirt-detect microphone.** Yes, really. There's a piezo microphone above the suction inlet. Crumbs and gritty dirt make a different sound from clean floor; the microphone tells the brain to slow down and scrub more carefully when it detects "dirty" sounds.
+
+**A brain.** A small ARM processor running custom firmware. The premium models have an additional inference chip for running their computer-vision models.
+
+**Three brushes plus a vacuum.** The actual cleaning hardware.
+
+**A battery and dock.** When the Roomba's battery gets low, the dock emits an infrared beacon and the Roomba follows the beacon home, using camera or lidar to do the final precise alignment.
+
+## How the map gets built
+
+On the first cleaning run, the Roomba doesn't know your home. It uses its lidar or camera to do [SLAM](/atlas/concept/slam) — building a map of the rooms while figuring out where it is on that map.
+
+By the end of run 1, the Roomba has a decent map. By run 2 or 3, the map stabilises — the Roomba recognises the same walls and furniture each time.
+
+Once it has a stable map, you can name rooms in the app ("Kitchen", "Living Room"), exclude zones ("don't clean my baby's nursery"), and schedule selective cleans ("kitchen only on Tuesdays").
+
+## How the route gets chosen
+
+Different vendors choose different strategies. iRobot's current approach is **boustrophedon coverage** — that's a fancy word for "back and forth like a lawnmower". The robot picks a direction, drives in straight lines, then reverses 180° and offsets by a robot-width. This is provably efficient for rectangular areas.
+
+For non-rectangular rooms, the algorithm decomposes the room into roughly rectangular sub-areas, covers each, then moves to the next. Edges and corners get a final pass with the side brush.
+
+## How it was built
+
+The premium-tier Roomba is a small marvel of low-cost robotics: $700-900 retail for everything described above. The lidar alone would have cost $10,000+ on a research robot in 2012. The economics work because vacuum cleaners are a multi-billion-dollar market — there's volume to amortise the engineering over.
+
+## What's still wrong with it
+
+Wires confuse it. Black furniture confuses the camera (low contrast). Stairs are still risky. Pet accidents are catastrophic (the j7+ does have a feature to *avoid* pet waste using its camera; iRobot reportedly guarantees a refund if it fails). And the suction is real but limited compared to a corded upright vacuum.
+
+---
+
+*Curious how the same SLAM technique works on a Mars rover or a humanoid? Read [SLAM](/atlas/concept/slam).*

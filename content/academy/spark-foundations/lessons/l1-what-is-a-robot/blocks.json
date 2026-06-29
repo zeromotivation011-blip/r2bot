@@ -1,0 +1,43 @@
+[
+  {
+    "id": "l1-text",
+    "order_index": 0,
+    "type": "text",
+    "is_required": true,
+    "data": {
+      "estimated_read_minutes": 5,
+      "content_mdx": "The robot in your head — the one from movies — probably walks, talks, and has opinions about humanity. That robot doesn't really exist yet.\n\nThe ones that do exist are stranger. And honestly more interesting.\n\n## Every robot does three things\n\nNo matter how simple or complex, every robot ever built follows the same loop:\n\n**Sense** — it takes in information from the world. A camera. A microphone. A distance sensor. GPS coordinates.\n\n**Think** — it processes that information and makes a decision. What does this data mean? What should I do next?\n\n**Act** — it does something physical in the world. Moves a wheel. Opens a valve. Picks up an object.\n\nThis is the **Sense-Think-Act loop**. It's the skeleton of every robot ever built — from a ₹2,000 toy to a Mars rover.\n\n## Three robots. Same loop.\n\n**A Roomba**\n- Sense: bump and cliff sensors\n- Think: \"I hit something — turn right.\"\n- Act: wheels reverse, robot turns\n\n**A factory robotic arm**\n- Sense: position encoders at each joint\n- Think: follow the pre-programmed path\n- Act: motors move with millimetre precision\n\n**A self-driving car**\n- Sense: cameras, radar, LiDAR\n- Think: neural networks + path planning\n- Act: steers, brakes, accelerates\n\nThe loop is identical. The \"Think\" step is what varies — from a few lines of if-else to deep neural networks.\n\n## Why this matters\n\nOnce you see the loop, you see it everywhere. Thermostats. Autopilots. Recommendation algorithms. They all follow Sense → Think → Act.\n\nIt also tells you exactly where robots fail: it sensed wrong, it thought wrong, or it acted wrong. That's the whole list."
+    }
+  },
+  {
+    "id": "l1-quiz",
+    "order_index": 1,
+    "type": "quiz-mcq",
+    "is_required": true,
+    "data": {
+      "question": "A motion-sensor light turns ON when you walk past. Which part of the loop is the motion sensor?",
+      "options": [
+        { "id": "a", "text": "Sense — it detects the world", "correct": true, "explanation": "Exactly. Motion detection is information about the world coming in." },
+        { "id": "b", "text": "Think — it makes the choice", "correct": false, "explanation": "Detection is taking input; deciding what to do with it is the Think step." },
+        { "id": "c", "text": "Act — it turns the light on", "correct": false, "explanation": "Turning on the light is Act. The sensor itself only senses." },
+        { "id": "d", "text": "None of the above", "correct": false, "explanation": "It does fit — Sense covers any input from the world." }
+      ],
+      "points": 100
+    }
+  },
+  {
+    "id": "l1-flashcards",
+    "order_index": 2,
+    "type": "flashcard",
+    "is_required": false,
+    "data": {
+      "points_per_card": 5,
+      "cards": [
+        { "front": "Sense", "back": "Taking information in from the world (cameras, distance, GPS…)" },
+        { "front": "Think", "back": "Processing input + deciding what to do next" },
+        { "front": "Act", "back": "Doing something physical — moving, gripping, signalling" },
+        { "front": "Sense-Think-Act loop", "back": "The skeleton of every robot ever built" }
+      ]
+    }
+  }
+]

@@ -1,0 +1,57 @@
+---
+title: "The brain inside a robot"
+description: "A Roomba and a self-driving car are both robots. The biggest difference between them isn't sensors or wheels — it's what happens in the middle."
+track: spark
+lesson: 4
+duration: "5 min read"
+xp: 80
+estimated_minutes: 5
+sources:
+  - name: "Quigley et al. — Programming Robots with ROS"
+    url: "https://www.oreilly.com/library/view/programming-robots-with/9781449325480/"
+  - name: "Arduino Documentation"
+    url: "https://docs.arduino.cc"
+---
+
+A Roomba costs around £200. A self-driving car costs, depending on the sensors and compute, somewhere between £50,000 and £200,000. The wheels are different. The sensors are definitely different. But the biggest difference is what happens between sensing and acting — the **Think** step.
+
+The Think step is code, running on hardware. Let's look at both.
+
+## The hardware — from tiny to enormous
+
+**Microcontrollers** are small, cheap chips that run a single program, repeatedly, very fast. They have no operating system. They don't multitask. They just run your code, read sensor inputs, and send outputs to actuators — thousands of times per second. An Arduino is a microcontroller board. A Roomba's brain is a microcontroller. They're perfect when the job is simple, predictable, and needs to happen in real time.
+
+**Single-board computers** like the Raspberry Pi are a step up. They run a full operating system (usually Linux), handle multiple tasks at once, and can run more complex software. They're the brain of choice for hobby robots, research platforms, and anything that needs to process images or run machine learning models at low cost.
+
+**PLCs** (Programmable Logic Controllers) are the unglamorous workhorses of industrial robotics. They're slow by computing standards, but extremely reliable — designed to run without failure for years in dusty, hot, electrically noisy factories. Most of the robots that actually build things in the world run on PLCs.
+
+**GPU clusters** are what self-driving cars use. Processing camera, LiDAR, and radar feeds simultaneously, running neural networks for object detection, planning a safe path through traffic in real time — that takes serious computing power. Some autonomous vehicle platforms use more processing power than a mid-range server rack.
+
+## The software — what "programming a robot" means
+
+At its core, robot software does three things:
+1. **Read** sensor data (what's the distance? what does the camera see? where is the joint?)
+2. **Run logic** (given what I sense, what should I do?)
+3. **Send commands** to actuators (turn this motor at this speed, move that joint to this angle)
+
+In a simple robot, this might be 50 lines of code. In a self-driving car, it's millions.
+
+Most professional robotics software is built on **ROS** — the Robot Operating System. ROS isn't really an operating system; it's a framework for connecting different software components (sensor drivers, perception algorithms, planners, controllers) so they can pass data between each other. It's the lingua franca of research and industrial robotics. You'll encounter it in the Wire and Forge tracks.
+
+## More compute isn't always better
+
+A Roomba doesn't need a GPU. Giving it one wouldn't make it clean your floor better — it would just make it expensive and hot. The engineering challenge is matching the compute to the task: powerful enough to handle the hardest case, cheap and efficient enough to actually ship.
+
+This is why embedded systems engineers (the people who programme microcontrollers) are a completely different specialisation from AI researchers (the people who train neural networks for robot perception). Both are roboticists. Their day-to-day work looks nothing alike.
+
+---
+
+## Check your understanding
+
+**1.** Why would you choose a microcontroller over a Raspberry Pi for a simple line-following robot?
+
+**2.** A robot needs to recognise faces in real time to unlock a door. Which type of compute would you reach for — microcontroller, single-board computer, or GPU? Why?
+
+---
+
+*The Apollo Guidance Computer that took humans to the Moon in 1969 had 4 kilobytes of RAM and ran at 0.043 MHz. Your phone has roughly 6 billion times more memory and runs thousands of times faster. Could you land on the Moon with a smartphone — and if so, what would be the hardest part?*

@@ -1,0 +1,79 @@
+---
+title: Point cloud
+category: ai-and-perception
+summary: >-
+  A point cloud is a collection of millions of individual 3D coordinates, each
+  one marking a surface that a laser or depth camera measured, together forming
+  a precise three-dimensional map of the environment.
+seeAlso: []
+sources:
+  - title: Velodyne Lidar — Understanding Point Clouds
+    url: 'https://velodynelidar.com/blog/what-is-a-point-cloud/'
+  - title: Open3D — Open-source library for 3D data processing
+    url: 'http://www.open3d.org/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - perception
+  - sensors
+  - 3d-mapping
+difficulty: 3
+oneLiner: 'The concept concept: A point cloud is a collection of millions'
+laymanExplanation: >-
+  Imagine pressing a piece of tracing paper against a brick wall and dotting
+  every pore, every groove, every bump with a pencil. Lift the paper away and
+  you have a flat scatter of dots that, together, describe the wall's surface
+  with surprising accuracy. Now do the same thing in three dimensions — instead
+  of a flat paper, a sphere of dots radiating outward fro
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without point cloud, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A point cloud is a collection of millions of individual 3D coordinates, each
+  one marking a surface that a laser or depth camera measured, together forming
+  a precise three-dimensional map of the environment.
+slug: point-cloud
+bucket: concept
+---
+
+Imagine pressing a piece of tracing paper against a brick wall and dotting every pore, every groove, every bump with a pencil. Lift the paper away and you have a flat scatter of dots that, together, describe the wall's surface with surprising accuracy. Now do the same thing in three dimensions — instead of a flat paper, a sphere of dots radiating outward from the sensor in every direction — and you have a rough idea of what a point cloud looks like.
+
+A **point cloud** is a set of data points in three-dimensional space. Each point has an X, Y, and Z coordinate (and sometimes additional information like colour or intensity), and together the millions of points describe the surfaces of everything the sensor could see, like a 3D dot-to-dot picture of the real world.
+
+## Where point clouds come from
+
+The most common source is [lidar](/atlas/concept/lidar): a laser fires pulses in every direction, measures the distance to whatever each pulse hits, and records the 3D coordinates of each impact. A spinning automotive lidar like a Velodyne HDL-64 generates roughly 1.3 million points per second. Depth cameras — like the Intel RealSense or the structured-light sensor in the Microsoft Kinect — produce denser but shorter-range point clouds. Photogrammetry, the process of calculating depth from many overlapping photographs, is another source.
+
+## What robots do with a point cloud
+
+Raw point clouds are too large and unstructured to act on directly. A standard pipeline processes them through several stages:
+
+- **Downsampling** — reduce the number of points while preserving shape, to fit in memory and speed up computation.
+- **Segmentation** — separate the cloud into clusters that correspond to individual objects.
+- **Registration** — align two clouds taken from different positions to build a larger consistent map.
+- **Surface reconstruction** — convert the cloud into a solid mesh that other algorithms can reason about.
+
+## A real example
+
+When a construction company wants to document a partially-built structure, a surveyor walks the site with a handheld lidar scanner. The resulting point cloud captures every beam, pipe, and wall at millimetre accuracy. Engineers back at the office overlay this cloud on the original CAD model to see exactly where the construction deviates from the plan — work that used to take weeks of manual measurement now takes hours.
+
+## Why it matters for robots
+
+A [robot](/atlas/concept/robot) cannot grasp what it cannot locate in 3D space. Point clouds are often the richest 3D description a robot has of the objects around it, and algorithms that process point clouds are central to grasping, obstacle avoidance, and map building.
+
+---
+
+*The same point-cloud techniques used by self-driving cars are being applied to ancient ruins — archaeologists now scan crumbling temples into digital 3D archives before they deteriorate further.*

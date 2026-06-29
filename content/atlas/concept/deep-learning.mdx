@@ -1,0 +1,100 @@
+---
+title: Deep learning
+prerequisites:
+  - neural-network
+category: ai-and-perception
+summary: >-
+  Deep learning is a branch of machine learning that stacks many layers of
+  neural-network calculations on top of each other, allowing computers to learn
+  complex skills — like understanding images or speech — directly from raw data.
+seeAlso: []
+sources:
+  - title: 'LeCun, Bengio, Hinton — Deep learning (Nature, 2015)'
+    url: 'https://www.nature.com/articles/nature14539'
+  - title: Stanford CS231n — Convolutional Neural Networks for Visual Recognition
+    url: 'https://cs231n.stanford.edu/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - ai
+  - machine-learning
+  - perception
+difficulty: 3
+oneLiner: 'The concept concept: Deep learning is a branch of machine learning'
+laymanExplanation: >-
+  For decades, teaching a computer to recognise a dog in a photo required a
+  programmer to hand-write rules: look for fur texture, snout shape, four legs.
+  The rules were brittle — they failed on dogs at odd angles, dogs in snow, dogs
+  half-hidden behind furniture. Then researchers discovered that if you stack
+  enough layers of simple maths, the computer writes it
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without deep learning, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Tesla Autopilot
+  - Voice assistants
+  - Surgical AI
+indianExample: >-
+  Sarvam AI in Bengaluru built a deep-learning Indian-language model from
+  scratch — Hindi, Tamil, Marathi all working at GPT-3.5 quality.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What makes deep learning different from "shallow" machine learning?
+  options:
+    - Bigger budget
+    - Many layers of neurons stacked together
+    - Different language
+    - Less data
+  answer: 1
+  explanation: >-
+    The "deep" in deep learning refers to the depth — many layers stacked, each
+    learning more abstract features than the last.
+mindBlowingFact: >-
+  GPT-4 has ~1.8 trillion parameters. Training it cost more electricity than the
+  city of Bengaluru uses in a day.
+industryApplications:
+  - healthcare
+  - finance
+  - autonomous vehicles
+  - language
+  - creative tools
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Deep learning is a branch of machine learning that stacks many layers of
+  neural-network calculations on top of each other, allowing computers to learn
+  complex skills — like understanding images or speech — directly from raw data.
+slug: deep-learning
+bucket: concept
+---
+
+For decades, teaching a computer to recognise a dog in a photo required a programmer to hand-write rules: look for fur texture, snout shape, four legs. The rules were brittle — they failed on dogs at odd angles, dogs in snow, dogs half-hidden behind furniture. Then researchers discovered that if you stack enough layers of simple maths, the computer writes its own rules, and those rules are much better than anything a human could craft.
+
+That approach is called **deep learning** — the "deep" refers to the depth of the network, meaning the number of layers stacked between input and output.
+
+## What depth buys you
+
+A shallow network can learn simple patterns. Add more layers and each layer builds on the one before it, extracting progressively more abstract features. In a deep image-recognition network:
+
+- Early layers detect edges and colour blobs.
+- Middle layers detect textures, parts, and shapes.
+- Deep layers detect full objects — faces, wheels, cups.
+
+No programmer decided this structure. The network discovered it by itself during training.
+
+## The revolution it triggered
+
+Deep learning is why voice assistants started working reliably around 2012, why photo apps can tag your friends automatically, and why self-driving cars can interpret a [camera](/atlas/concept/camera-vision) feed in real time. The breakthrough was partly theoretical and partly practical: researchers had the right architectures (deep convolutional networks, transformers), cheap GPU computing, and massive datasets, all arriving at roughly the same time.
+
+## Deep learning in robots
+
+A [robot](/atlas/concept/robot) vacuum that uses deep learning to identify cables on the floor (and navigate around them instead of getting tangled) is already in your home — the Roborock S8 MaxV does exactly this. Industrial robots use deep learning to inspect products on an assembly line for defects that are invisible to a rule-based system. Surgical robots use it to distinguish tissue types in real time.
+
+## The honest caveat
+
+Deep learning requires enormous amounts of labelled training data and computing power. It can also fail in ways that are hard to predict — confidently misclassifying something a human would never mistake. Understanding *why* a deep network gives a particular answer is an active research problem. It is powerful and imperfect simultaneously.
+
+---
+
+*Researchers are now asking whether the same deep-learning techniques that mastered vision and language can teach a robot hand the dexterity of a five-year-old child.*

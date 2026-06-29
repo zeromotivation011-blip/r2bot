@@ -1,0 +1,73 @@
+---
+title: Bang-Bang Control in Robotics — Complete Guide
+summary: >-
+  Bang-bang (on/off) control switches the actuator between two extremes — fully
+  on or fully off — based on whether the output is above or below the setpoint.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - control
+  - on-off
+  - hysteresis
+seeAlso:
+  - pid-controller
+  - feedback-loop
+  - closed-loop-control
+difficulty: 3
+oneLiner: >-
+  The concept concept: Bang-bang (on/off) control switches the actuator between
+  two
+laymanExplanation: >-
+  Bang-bang control is the simplest closed-loop control law: if the measured
+  value is below the setpoint, the actuator is fully on; otherwise it is fully
+  off. It is also called on-off control, two-position control, or hysteresis
+  control.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without bang-bang control in robotics — complete guide, many concept systems
+  in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Bang-bang (on/off) control switches the actuator between two extremes — fully
+  on or fully off — based on whether the output is above or below the setpoint.
+slug: bang-bang-control
+bucket: concept
+---
+
+# Bang-Bang Control in Robotics
+
+## What is it?
+
+Bang-bang control is the simplest closed-loop control law: if the measured value is below the setpoint, the actuator is fully on; otherwise it is fully off. It is also called on-off control, two-position control, or hysteresis control.
+
+## How it works
+
+The controller compares the measured value to the setpoint. If error is positive, the actuator turns fully on; if error is negative, it turns fully off. To avoid rapid chattering near the setpoint, a hysteresis band is used — the actuator only switches when the error crosses outside a small dead zone around the setpoint.
+
+## Real-world example
+
+Your home refrigerator is a bang-bang controller. So is most household heating. In robotics, a simple line-following robot toggles its motors fully left or fully right based on which IR sensor sees the line.
+
+## Why it matters for robotics
+
+Bang-bang control is cheap, simple, and good enough for many tasks — perfect for first robotics projects. Indian students often start with bang-bang in their Arduino line-follower before moving to PID.
+
+## See also
+
+- [Pid Controller](/atlas/concept/pid-controller)
+- [Feedback Loop](/atlas/concept/feedback-loop)
+- [Closed Loop Control](/atlas/concept/closed-loop-control)

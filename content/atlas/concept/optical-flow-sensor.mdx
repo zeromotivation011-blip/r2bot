@@ -1,0 +1,132 @@
+---
+title: Optical Flow Sensor in Robotics — Complete Guide | R2BOT
+summary: >-
+  Optical flow sensors estimate motion by tracking how pixels shift between
+  frames. Used by drones, mice, and self-balancing robots to hold position.
+category: sensors
+bucket: sensors
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - optical-flow
+  - vision
+  - motion
+  - drone
+  - velocity
+relatedTerms:
+  - camera-vision
+  - imu
+  - visual-odometry
+  - sensor-fusion
+  - slam
+seeAlso:
+  - camera-vision
+  - imu
+  - visual-odometry
+  - sensor-fusion
+  - slam
+youtubeSearchQuery: optical flow sensor drone explained
+oneLiner: 'The sensors concept: Optical flow sensors estimate motion by tracking how'
+laymanExplanation: >-
+  An optical flow sensor measures how the world moves across a camera between
+  successive frames. By tracking the apparent shift of pixels, it estimates
+  velocity in two axes without needing GPS. The same principle is used in every
+  modern computer mouse — translated to fly-above-the-floor at thousands of feet
+  for drones.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without optical flow sensor in robotics — complete guide | r2bot, many sensors
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Optical flow sensors estimate motion by tracking how pixels shift between
+  frames. Used by drones, mice, and self-balancing robots to hold position.
+slug: optical-flow-sensor
+---
+
+# Optical Flow Sensor in Robotics
+
+## What is Optical Flow Sensor in Robotics?
+
+An optical flow sensor measures how the world moves across a camera between successive frames. By tracking the apparent shift of pixels, it estimates velocity in two axes without needing GPS. The same principle is used in every modern computer mouse — translated to fly-above-the-floor at thousands of feet for drones.
+
+## How It Works
+
+A small image sensor captures frames at 100–4000 Hz. A built-in DSP compares each frame with the previous one and finds the average pixel shift using block-matching or Lucas–Kanade flow. Combined with the camera height (from a ToF or barometer), the sensor outputs metres-per-second velocity over a serial bus. The PX4FLOW module pairs a CMOS camera, sonar altimeter, and gyroscope; it spits out clean XY velocity at 250 Hz — exactly what a drone autopilot needs.
+
+## Real-World Example
+
+DJI Mini and Mavic drones use optical-flow downward-facing cameras to hold position indoors where GPS is unavailable. Roomba J7 uses optical flow to detect when it has been picked up. Every modern computer mouse is an optical-flow sensor with a tiny CMOS imager that tracks the surface beneath it.
+
+## Why It Matters for Robotics
+
+Optical flow gives a robot a sense of motion using just a camera — no expensive IMUs, no GPS. For Indian drone startups (Ideaforge, Garuda) and indoor delivery robots, optical-flow is a cost-saving must. It is also one of the easiest CV topics for students to implement and visualise.
+
+## Try It Yourself
+
+Open `/visualizer` on R2BOT, scroll to the optical-flow demo, and drag the mouse — watch the live arrows showing pixel velocity. Then read about Lucas–Kanade and try writing it yourself in OpenCV (10 lines of Python).
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "Optical flow estimates:",
+    "options": [
+      "Battery state of charge",
+      "Pixel-level motion between camera frames",
+      "Surface temperature",
+      "Wireless signal strength"
+    ],
+    "answer": 1,
+    "explain": "Optical flow tracks how pixels shift between frames to infer the camera (or world) motion."
+  },
+  {
+    "q": "A common everyday device that uses optical flow is the:",
+    "options": [
+      "Microwave oven",
+      "Computer mouse",
+      "Refrigerator",
+      "Headphone"
+    ],
+    "answer": 1,
+    "explain": "Modern computer mice are tiny optical-flow imaging systems sampling the surface they ride over."
+  },
+  {
+    "q": "For a drone, optical flow is most useful when:",
+    "options": [
+      "Flying through clouds",
+      "GPS is weak or unavailable indoors",
+      "The drone is sleeping",
+      "Battery is full"
+    ],
+    "answer": 1,
+    "explain": "Indoors and in urban canyons, GPS is unreliable — optical flow holds position visually."
+  }
+]
+```
+
+## Further Reading
+
+- [Camera Vision](/atlas/concept/camera-vision)
+- [Imu](/atlas/concept/imu)
+- [Visual Odometry](/atlas/concept/visual-odometry)
+- [Sensor Fusion](/atlas/concept/sensor-fusion)
+- [Slam](/atlas/concept/slam)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Optical Flow Sensor in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

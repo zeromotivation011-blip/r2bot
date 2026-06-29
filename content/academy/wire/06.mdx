@@ -1,0 +1,197 @@
+---
+title: "Wire Capstone — Autonomous Navigator"
+description: "Integrate sensors + PID + state machine into a complete obstacle-avoiding robot. Your Wire-track graduation piece."
+track: wire
+lesson: 6
+duration: "45 min read"
+url_slug: w-06-capstone-navigator
+hindi_name: "वायर ट्रैक कैपस्टोन"
+xp: 250
+estimated_minutes: 45
+atlas_links: [slam, pid-controller, ros, ros2, mobile-robot, lidar]
+sources:
+  - name: "Nav2 documentation"
+    url: "https://docs.nav2.org/"
+  - name: "Reactive vs. deliberative robot architectures — Brooks 1986"
+    url: "https://people.csail.mit.edu/brooks/papers/AIM-864.pdf"
+---
+
+## What you'll build
+
+A **complete obstacle-avoiding robot** in simulation. A state machine drives the behaviour — FORWARD → AVOID → ROTATE → FORWARD — using your Wire-track skills: ROS2 nodes, sensor QoS, a PID velocity controller, differential drive kinematics, and reactive logic. Your graduation piece. After this lesson you can credibly claim "I can build a working ROS2 robot."
+
+## Architecture
+
+```
+┌──────────┐   /scan      ┌────────────┐   /cmd_vel  ┌─────────────┐
+│  LiDAR   │ ───────────▶ │  Navigator │ ──────────▶ │  PID + Diff │
+│  driver  │              │   (FSM)    │             │  drive      │
+└──────────┘              └────────────┘             └─────────────┘
+                                                            │
+                                                            ▼ /motor_cmd
+                                                       (Gazebo plugin)
+```
+
+One LiDAR driver node. One navigator node holding the FSM. One PID-velocity controller from **Wire 03**. One differential-drive kinematics node from **Wire 04**. ~5 ROS2 nodes total, all of them yours.
+
+## The state machine
+
+```
+        ┌──── obstacle close ────┐
+        ▼                         │
+   ┌─────────┐                ┌───┴────┐
+   │ ROTATE  │ ◀── still ──── │ AVOID  │
+   │ (search │     blocked    │ (back  │
+   │  for    │                │  off)  │
+   │  gap)   │                └────────┘
+   └────┬────┘                     ▲
+        │ found gap                │
+        ▼                          │
+   ┌────────────┐  obstacle close  │
+   │  FORWARD   │ ─────────────────┘
+   └────────────┘
+```
+
+This is Brooks' **subsumption architecture** at its simplest: reactive, no planning. It scales surprisingly far — Roomba's classic vacuum and AgniKul's rocket-recovery rover both use variants of it.
+
+## The navigator node
+
+```python
+import math
+from enum import Enum
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import LaserScan
+
+OBSTACLE_THRESHOLD = 0.5   # m — start avoiding
+SAFE_DISTANCE = 0.8        # m — clear to drive forward
+FRONT_CONE = math.radians(30)  # ±30° is "front"
+
+class State(Enum):
+    FORWARD = 'FORWARD'
+    AVOID = 'AVOID'
+    ROTATE = 'ROTATE'
+
+class Navigator(Node):
+    def __init__(self):
+        super().__init__('navigator')
+        self.create_subscription(
+            LaserScan, '/scan', self.on_scan, qos_profile_sensor_data
+        )
+        self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.state = State.FORWARD
+        self.front_dist = float('inf')
+        self.left_dist = float('inf')
+        self.right_dist = float('inf')
+        # FSM tick at 10Hz
+        self.create_timer(0.1, self.tick)
+        self.get_logger().info('Navigator starting in FORWARD')
+
+    def on_scan(self, msg: LaserScan):
+        # Bucket ranges into front / left / right
+        front, left, right = [], [], []
+        for i, r in enumerate(msg.ranges):
+            if not math.isfinite(r) or r < msg.range_min:
+                continue
+            angle = msg.angle_min + i * msg.angle_increment
+            if abs(angle) < FRONT_CONE:
+                front.append(r)
+            elif angle > 0:
+                left.append(r)
+            else:
+                right.append(r)
+        self.front_dist = min(front) if front else float('inf')
+        self.left_dist = min(left) if left else float('inf')
+        self.right_dist = min(right) if right else float('inf')
+
+    def tick(self):
+        twist = Twist()
+
+        # Transitions
+        if self.state == State.FORWARD:
+            if self.front_dist < OBSTACLE_THRESHOLD:
+                self.state = State.AVOID
+                self.get_logger().info(f'FORWARD → AVOID (front={self.front_dist:.2f})')
+        elif self.state == State.AVOID:
+            if self.front_dist > SAFE_DISTANCE:
+                self.state = State.FORWARD
+                self.get_logger().info(f'AVOID → FORWARD (front={self.front_dist:.2f})')
+            else:
+                self.state = State.ROTATE
+                self.get_logger().info('AVOID → ROTATE')
+        elif self.state == State.ROTATE:
+            if self.front_dist > SAFE_DISTANCE:
+                self.state = State.FORWARD
+                self.get_logger().info(f'ROTATE → FORWARD (front={self.front_dist:.2f})')
+
+        # Actions
+        if self.state == State.FORWARD:
+            twist.linear.x = 0.3
+            twist.angular.z = 0.0
+        elif self.state == State.AVOID:
+            twist.linear.x = -0.1  # back off slightly
+            twist.angular.z = 0.0
+        elif self.state == State.ROTATE:
+            # Turn toward the side with more space
+            twist.linear.x = 0.0
+            twist.angular.z = 0.6 if self.left_dist > self.right_dist else -0.6
+
+        self.cmd_pub.publish(twist)
+
+def main():
+    rclpy.init()
+    rclpy.spin(Navigator())
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+Run it alongside the PID controller from Wire 03 and the diff-drive controller from Wire 04, with any 2D LiDAR driver providing `/scan`. The robot will wander, avoid walls, and not get stuck.
+
+## Where this breaks (and where Forge picks up)
+
+Reactive FSMs are simple and robust for **small spaces**. They fail when:
+
+- You need to reach a **specific goal** (this robot just wanders).
+- The environment has **traps** — a U-shaped corridor will defeat the FSM forever.
+- You need a **map** to plan around obstacles you can't currently see.
+
+For all three, you need **planning** — A*, Dijkstra, RRT — running on top of a SLAM-built map. That's what Nav2 gives you. We cover Nav2 properly in **Forge 01**.
+
+> **Try this in the visualizer:** open [/visualizer#astar](/visualizer#astar) — draw a wall maze and watch A* find the shortest path. The capstone you just wrote is the reactive layer; A* is the deliberative layer that production robots add on top.
+
+## In India: who runs this exact stack
+
+**Ati Motors** Sherpa AGVs use a reactive layer almost identical to your FSM as the **safety bottom layer** — even when Nav2 is in charge, if the reactive layer detects an imminent collision it overrides and stops. **Genrobotics**' Bandicoot has a similar architecture — it operates in sewers where map-based planning is unreliable, so the reactive layer does most of the work.
+
+If you understand both layers (reactive + deliberative), you can debug almost any mobile-robot problem in the field.
+
+## Test Your Understanding
+
+**1.** Your capstone robot gets stuck in a corner — it rotates left, sees obstacle, rotates right, sees obstacle, oscillates forever. Walk through *two distinct fixes* — one at the FSM level, one at the control level — and explain which is more robust.
+
+**2.** You demo the robot to a friend; it works perfectly. They place a clear glass panel in front of it. The robot crashes. What sensor would prevent this, and where would it fit in your state machine?
+
+**3.** Your manager asks you to extend the capstone so the robot patrols a known route between three points. You realise the FSM doesn't have a notion of "where it is." Sketch the minimum changes needed — what new state, what new sensor data, what new node.
+
+## India Opportunity
+
+A working Wire capstone in your portfolio is enough to get interviews for:
+
+- **Junior Robotics Engineer** at any of: Ati Motors, Asimov Robotics, Systemantics, Ideaforge, Genrobotics, Niqo Robotics.
+- **AGV Engineer** at warehouse-automation companies — GreyOrange, Addverb Technologies, Locus Robotics India.
+- **Robotics Trainee** at TCS Innovation Labs, Tata Elxsi, L&T Technology Services.
+- **Robotics Researcher (RA)** at IIT Madras CFI, IIT Delhi Robotics, IIIT-H TiHAN.
+
+Typical entry-level package: ₹8–14 LPA in 2026.
+
+## What's next: Forge
+
+Wire taught you to **build** a working robot. Forge teaches you to make it **production-grade** — Nav2 navigation, MoveIt2 manipulation, edge AI on Jetson, and a full warehouse-robot capstone.
+
+→ Continue to **[Forge 01 · ROS2 Navigation Stack](/academy/forge/01)**.
+
+Or — celebrate your Wire completion 🎉. Download your certificate from your dashboard.

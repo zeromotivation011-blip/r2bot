@@ -1,0 +1,116 @@
+---
+title: Lidar
+phonetic: LIE-dar
+category: sensors
+summary: >-
+  Lidar is a sensor that measures distance by firing invisible laser pulses and
+  timing how long they take to bounce back. It gives a robot 3D vision in the
+  dark.
+seeAlso:
+  - slam
+  - robot
+  - optimus
+  - boston-dynamics
+sources:
+  - title: Velodyne — How lidar works
+    url: 'https://velodynelidar.com/what-is-lidar/'
+  - title: NASA — Lidar history and applications
+    url: 'https://www.nasa.gov/missions/icesat-2/what-is-lidar'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - sensors
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: Lidar is a sensor that measures distance by'
+laymanExplanation: >-
+  Lidar is a sensor that measures distance by firing invisible laser pulses and
+  timing how long they take to bounce back. It gives a robot 3D vision — even in
+  the dark.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without lidar, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Waymo self-driving car
+  - Perseverance Rover
+  - Boston Dynamics Spot
+indianExample: >-
+  Ola Electric is testing LiDAR-equipped autonomous vehicles on Indian roads in
+  Bengaluru. Survey of India uses LiDAR drones for terrain mapping.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What does LiDAR stand for?
+  options:
+    - Light Detection And Ranging
+    - Linear Distance Ranger
+    - Laser Indirect Range
+    - Light Display And Recovery
+  answer: 0
+  explanation: >-
+    LiDAR = Light Detection And Ranging. Same idea as radar, but with laser
+    light instead of radio waves.
+mindBlowingFact: >-
+  A car-grade LiDAR fires 2.8 million laser pulses every second. Each pulse
+  travels at the speed of light and returns in nanoseconds.
+industryApplications:
+  - autonomous vehicles
+  - surveying
+  - agriculture
+  - mining
+  - smart cities
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Lidar is a sensor that measures distance by firing invisible laser pulses and
+  timing how long they take to bounce back. It gives a robot 3D vision in the
+  dark.
+slug: lidar
+bucket: concept
+---
+
+Lidar is a sensor that measures distance by firing invisible laser pulses and timing how long they take to bounce back. It gives a [robot](/atlas/concept/robot) 3D vision — even in the dark.
+
+The name is a portmanteau: **Li**ght **D**etection **A**nd **R**anging. If you've heard of radar (radio detection and ranging) or sonar (sound), lidar is the same idea but using light.
+
+## How a single laser pulse becomes a measurement
+
+A lidar fires a tiny pulse of laser light. The pulse travels outward at roughly the speed of light (300,000 km/s), hits something, and reflects back. A sensor inside the lidar catches the returning photon and records the exact time of flight.
+
+Distance = speed × time ÷ 2 (divided by 2 because the light made a round trip).
+
+The math is simple. The engineering is hard, because you're timing events that last billionths of a second.
+
+## How that becomes a 3D map
+
+One pulse only tells you the distance to one tiny dot. To get a full picture of the world, a lidar fires thousands or millions of pulses per second, sweeping the laser in all directions — usually by spinning a mirror or the whole sensor head. The result is a **[point cloud](/atlas/concept/point-cloud)**: hundreds of thousands of dots in 3D space, each one a surface the laser hit.
+
+If you've seen a self-driving car with a spinning cylinder on top — that's a 360-degree lidar building a live point cloud of everything around the car, dozens of times per second.
+
+## Why robots love lidar
+
+**It works in the dark.** Cameras need light. Lidar makes its own.
+
+**It gives geometry directly.** A [camera](/atlas/concept/camera-vision) sees pixels and has to figure out depth. A lidar sees depth straight away.
+
+**It's accurate.** Good lidars measure to within a centimetre at 100 metres.
+
+**It's fast.** Modern solid-state lidars can update 10-30 times per second — fast enough for a car moving at 100 km/h.
+
+## Why some teams skip lidar
+
+**It's expensive.** A good automotive lidar still costs ₹2-10 lakh. A camera costs ₹500.
+
+**It struggles with shiny or transparent surfaces.** Glass walls confuse it. So does heavy rain or fog.
+
+**It can't read colour or text.** A robot using only lidar can't tell the difference between a stop sign and a yield sign.
+
+[Tesla](/atlas/company/tesla) famously decided cameras + AI alone are enough for self-driving — no lidar. Waymo, Cruise, and most Chinese self-driving companies bet the opposite way. The argument is still alive.
+
+## Lidar in everyday life
+
+You've probably already used a lidar without knowing it. The iPhone Pro (since the 12 Pro) has a tiny lidar near the camera. It's why your portrait-mode photos have such accurate edge detection, and why AR apps can place virtual furniture exactly on your floor. Vacuum robots like the Roborock series use lidar to map your home. The iRobot Roomba j7+ does too.
+
+---
+
+*Curious how multiple lidar readings come together into a usable map? Read [SLAM](/atlas/concept/slam).*

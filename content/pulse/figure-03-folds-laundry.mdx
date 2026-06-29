@@ -1,0 +1,49 @@
+---
+title: Figure 03 folds laundry — without being told how
+summary: The newest humanoid from Figure AI just folded a t-shirt on stage. The interesting part isn't the folding — it's that no one programmed the folding.
+country: usa
+category: Humanoid
+publishedAt: 2026-05-18
+sourceUrl: https://www.figure.ai/news
+readMinutes: 4
+relatedAtlas:
+  - { type: robot, slug: optimus }
+  - { type: robot, slug: atlas }
+  - { type: company, slug: boston-dynamics }
+---
+
+The newest humanoid from Figure AI just folded a t-shirt on stage. The interesting part isn't the folding — it's that no one programmed the folding.
+
+## What happened
+
+At a livestream this week, Figure CEO Brett Adcock demoed Figure 03 picking a crumpled t-shirt out of a laundry basket, spreading it on a table, and folding it into a neat rectangle. It took about 90 seconds. Then it did the same with a pair of jeans.
+
+The clip went viral because the robot doesn't *look* like it's working from a script — it adjusts to where the shirt actually lands, picks the right corner, smooths the fabric. That's the kind of fluid behaviour we'd seen from humans, but not from a machine.
+
+## Why folding a t-shirt is harder than welding a car
+
+Welding a car is one of the most-performed tasks in industrial robotics — and it's been solved for forty years. The reason: the car comes to the robot, in a known pose, on a moving line. The robot's job is to apply weld X to point Y. Repeatable. Predictable.
+
+A t-shirt is the opposite. It can land in a million configurations. It's deformable — squeeze it and it changes shape. The corners aren't always visible. Pick the wrong corner and you get a useless tangle. This is what roboticists call **deformable-object manipulation**, and it's one of the genuinely hard open problems.
+
+## How they did it
+
+Figure 03 runs on a vision-language-action model — what's increasingly called a **VLA**. Think of it as a single neural network that takes camera input + a written goal ("fold this shirt") and outputs a stream of joint commands. The same architecture Tesla is pushing with [Optimus](/atlas/robot/optimus) and 1X is pushing with NEO.
+
+What's specific to Figure here is the training data: 11,000 hours of human demonstrations, captured by people wearing tracking suits and folding laundry, doing dishes, opening fridges, stacking boxes. The robot learns from watching, then practises in simulation, then deploys.
+
+## What it means
+
+If this generalises — and that's the key "if" — Figure has shown that the manipulation problem can be cracked with enough demonstration data + the right neural architecture. No careful programming per task. Just demonstrate, and the robot figures out the pattern.
+
+If it doesn't generalise — if Figure 03 only folds *that* shirt on *that* table — we've seen another impressive demo and not much else. Humanoid demos have a long history of looking better than they are.
+
+## What to watch next
+
+The next thing to look for: does Figure 03 fold a shirt it has never seen, in a kitchen it has never been in, on the first try? If yes, this is the start of something real. If it needs hours of retraining for every new environment, it's still a research curiosity.
+
+The current best in deformable manipulation, [Boston Dynamics](/atlas/company/boston-dynamics) Atlas-electric and Tesla [Optimus](/atlas/robot/optimus), are racing toward the same target. The next year of humanoid demos will tell us which approach scales.
+
+---
+
+*Curious how Atlas does its manipulation? Read about [Atlas the robot](/atlas/robot/atlas).*

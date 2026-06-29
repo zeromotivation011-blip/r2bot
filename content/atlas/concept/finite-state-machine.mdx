@@ -1,0 +1,89 @@
+---
+title: Finite State Machine in Robotics — Complete Guide
+summary: >-
+  A finite state machine (FSM) models a robot as a set of states and
+  transitions. It's a classic, easy-to-debug way to structure behaviour.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - fsm
+  - state-machine
+  - behavior
+seeAlso:
+  - state-machine
+  - behavior-trees
+  - ros2
+difficulty: 3
+oneLiner: 'The concept concept: A finite state machine (FSM) models a robot'
+laymanExplanation: >-
+  A finite state machine is a model where the robot is always in exactly one
+  state from a finite set, and transitions between states are triggered by
+  inputs or events. FSMs are easy to draw, easy to debug, and remain widely used
+  in robotics.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without finite state machine in robotics — complete guide, many concept
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis:
+  - Roomba (mode states)
+  - Vending machines
+  - NPCs in games
+indianExample: >-
+  Indian robotics-club projects (line-follower + obstacle-avoider combinations)
+  are almost always implemented as 3-4 state FSMs.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: 'In a finite state machine, how many states can the robot be in at once?'
+  options:
+    - Many
+    - Exactly one
+    - Zero
+    - Depends on speed
+  answer: 1
+  explanation: >-
+    By definition, an FSM is in exactly one state at any moment. Transitions
+    move it to a new state.
+mindBlowingFact: >-
+  The vending machine that gives you Lays inside your Indian school cafeteria is
+  an FSM with 5–6 states — coin received, dispensing, complete, etc.
+industryApplications:
+  - robotics
+  - game development
+  - compilers
+  - industrial automation
+  - web frameworks
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A finite state machine (FSM) models a robot as a set of states and
+  transitions. It's a classic, easy-to-debug way to structure behaviour.
+slug: finite-state-machine
+bucket: concept
+---
+
+# Finite State Machine in Robotics
+
+## What is it?
+
+A finite state machine is a model where the robot is always in exactly one state from a finite set, and transitions between states are triggered by inputs or events. FSMs are easy to draw, easy to debug, and remain widely used in robotics.
+
+## How it works
+
+Each state has on-entry, during, and on-exit code. Transitions specify the source state, the trigger condition, and the destination state. At each control tick, the FSM evaluates whether the current state's transitions can fire, and if so updates accordingly. FSMs can be implemented as switch statements, transition tables, or via libraries like SMACH.
+
+## Real-world example
+
+A robot vacuum's behaviour — Idle → Cleaning → Returning → Charging — is a classic FSM. Industrial robots use FSMs for safety modes (Normal, Estop, Manual, Auto).
+
+## Why it matters for robotics
+
+FSMs remain the easiest way to model finite, well-bounded behaviour. Knowing when to choose an FSM versus a behaviour tree is an architectural skill expected in robotics engineering.
+
+## See also
+
+- [State Machine](/atlas/concept/state-machine)
+- [Behavior Trees](/atlas/concept/behavior-trees)
+- [Ros2](/atlas/concept/ros2)

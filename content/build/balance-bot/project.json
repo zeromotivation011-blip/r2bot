@@ -1,0 +1,22 @@
+{
+  "id": "build-balance-bot",
+  "slug": "balance-bot",
+  "title": "Self-Balancing Robot",
+  "tagline": "An MPU-6050 IMU, a PID loop, and two wheels — meet the inverted pendulum that taught Segway how to stand up.",
+  "level": "intermediate",
+  "duration_hours": 6,
+  "total_xp": 1100,
+  "components": [
+    { "name": "Arduino Uno (or Nano)" },
+    { "name": "MPU-6050 6-axis IMU module" },
+    { "name": "L298N motor driver module" },
+    { "name": "2× N20 micro-gear motors with wheels (encoders ideal)" },
+    { "name": "Two-tier acrylic chassis" },
+    { "name": "Li-ion 2S battery pack (7.4V)" },
+    { "name": "Jumper wires" },
+    { "name": "Screws + standoffs" }
+  ],
+  "simulation_only": false,
+  "color": "#fb923c",
+  "icon": "⚖️"
+}

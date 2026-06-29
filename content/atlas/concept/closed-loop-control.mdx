@@ -1,0 +1,83 @@
+---
+title: Closed-loop control
+category: control
+summary: >-
+  Closed-loop control uses sensor feedback to continuously compare what a robot
+  is doing with what it should be doing, then adjusts its output to close the
+  gap — making robots accurate even when conditions change.
+seeAlso: []
+sources:
+  - title: MathWorks — Feedback Control Basics
+    url: 'https://www.mathworks.com/help/control/ug/feedback-control-basics.html'
+  - title: Stuart Bennett — A History of Control Engineering
+    url: 'https://digital-library.theiet.org/content/books/ce/pbce047e'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - control
+  - feedback
+  - fundamentals
+difficulty: 3
+oneLiner: >-
+  The concept concept: Closed-loop control uses sensor feedback to continuously
+  compare
+laymanExplanation: >-
+  A cyclist riding with their eyes open and a cyclist riding blindfolded are
+  doing very different things. Eyes open, they see the kerb approaching, steer
+  away from it, check they've moved enough, and correct again — thousands of
+  micro-adjustments per second. Eyes closed, they pedal and hope. The cyclist
+  with eyes open is running a closed-loop system. The one w
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without closed-loop control, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Closed-loop control uses sensor feedback to continuously compare what a robot
+  is doing with what it should be doing, then adjusts its output to close the
+  gap — making robots accurate even when conditions change.
+slug: closed-loop-control
+bucket: concept
+---
+
+A cyclist riding with their eyes open and a cyclist riding blindfolded are doing very different things. Eyes open, they see the kerb approaching, steer away from it, check they've moved enough, and correct again — thousands of micro-adjustments per second. Eyes closed, they pedal and hope. The cyclist with eyes open is running a closed-loop system. The one who is blindfolded is running open-loop.
+
+The difference is [feedback](/atlas/concept/feedback): information that flows back from the world into the decision-making process.
+
+## The feedback loop explained
+
+A closed-loop control system has four parts working in a cycle:
+
+1. **Reference** — the desired state (target speed, target angle, target temperature).
+2. **Sensor** — a device measuring the actual current state.
+3. **Controller** — compares reference against actual, computes the error, decides how to correct.
+4. **Actuator** — applies the correction (motor, valve, heater).
+
+Then the sensor measures again, the controller compares again, and the cycle repeats — dozens to thousands of times per second. Because the loop closes back on itself, any disturbance that pushes the system off target gets detected and corrected automatically.
+
+## A concrete example: a robotic arm [joint](/atlas/concept/joint)
+
+A robotic arm from KUKA or Fanuc needs to move its elbow joint to exactly 47 degrees. An [encoder](/atlas/concept/encoder) — a sensor that counts tiny notches on a rotating disc — reports the current angle 1,000 times per second. If the joint reaches only 44 degrees (perhaps because a heavy payload resisted), the controller detects the 3-degree error and applies more motor current. When the encoder reports 47 degrees, the controller reduces current to hold position. If the arm is nudged by a worker, the system corrects back within milliseconds. The arm doesn't "know" about the disturbance; it simply keeps closing the gap.
+
+## Why closed-loop control changed [robotics](/atlas/concept/robotics)
+
+Open-loop systems are fine until something unexpected happens. Manufacturing, surgery, and autonomous driving are full of unexpected things: varying loads, temperature changes, wear, uneven terrain. Closed-loop control makes a [robot](/atlas/concept/robot) robust to those surprises. A [surgical robot](/atlas/concept/surgical-robot) using closed-loop force control can detect the resistance of tissue and stop before cutting too deep. A self-driving car using closed-loop steering can hold a lane even as crosswinds push it sideways.
+
+The cost is complexity: you need sensors, and sensors can fail. You also have to tune the controller carefully — too aggressive a correction and the system oscillates; too timid and it responds slowly. This is precisely what PID controllers and more advanced methods like model-predictive control are designed to handle.
+
+---
+
+*Almost everything precise in modern engineering — from a phone's image stabiliser to a nuclear plant's cooling system — runs a closed feedback loop of some kind.*

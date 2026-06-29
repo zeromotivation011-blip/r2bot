@@ -1,0 +1,47 @@
+---
+title: Unitree H1 hits 3.3 m/s — the fastest bipedal robot ever made
+summary: A Chinese humanoid just broke the speed record for walking robots. That's about jogging speed for an adult. The achievement is less about the legs and more about the policy.
+country: china
+category: Humanoid
+publishedAt: 2026-05-17
+sourceUrl: https://www.unitree.com
+readMinutes: 5
+relatedAtlas:
+  - { type: robot, slug: atlas }
+  - { type: robot, slug: optimus }
+  - { type: concept, slug: servo-motor }
+---
+
+A Chinese humanoid just broke the speed record for walking robots. The Unitree H1 — a 1.8-metre, 47-kilogram bipedal robot from Hangzhou-based Unitree Robotics — hit a sustained pace of 3.3 metres per second on a treadmill. That's roughly an 8-minute-per-kilometre jog. Adult humans walk at 1.4 m/s. Most "humanoid" robots cruise at 1 m/s. This is a big jump.
+
+## Why this is impressive (and why it isn't)
+
+Speed alone isn't impressive — you can build a wheeled robot that goes 50 km/h with a $100 motor. Speed *on two legs* is impressive, because every step is a controlled fall. The faster you walk, the less time you have to catch yourself if anything goes wrong.
+
+What's impressive about H1: it didn't fall.
+
+What's *not* unique here: it ran on a treadmill, in a controlled lab, on a flat surface, with no obstacles. Real-world walking — uneven floors, crowds, doors, stairs — is still a much harder problem. Speed in a lab does not mean speed everywhere.
+
+## The breakthrough isn't the motors
+
+Unitree has been quietly building powerful joint motors for years (their quadruped Go2 is one of the cheaper "robot dogs" on the market). But fast walking isn't a motor problem; it's a **control policy** problem. You can have all the torque in the world, and if your controller can't figure out where to put the next foot in time, you faceplant.
+
+H1 uses a **reinforcement-learning-trained policy**. The robot was trained in simulation by trying millions of step combinations, rewarding ones that stayed upright and moved forward, punishing ones that fell. After enough simulated practice, the policy could be transferred to the real robot — what roboticists call **sim-to-real**.
+
+This is the same general approach that [Boston Dynamics](/atlas/company/boston-dynamics) and Tesla [Optimus](/atlas/robot/optimus) use, but Unitree is doing it with smaller engineering teams, on cheaper hardware, faster. That's the story.
+
+## The pricing story
+
+H1's headline number isn't actually the speed. It's the price. Unitree is selling H1 for around ₹15-25 lakh (US$18-30k). The previous "cheapest" humanoid in this class was Tesla's not-yet-shipped [Optimus](/atlas/robot/optimus) at a stated $20-30k target. Unitree is shipping today. The first H1s have already gone to research labs in China and the US.
+
+For comparison, [Boston Dynamics' Atlas](/atlas/robot/atlas) has never been sold publicly — it's been a research platform. The fact that you can *buy* a 3.3 m/s bipedal robot today, off the shelf, is what makes this story matter.
+
+## What it means for India
+
+India doesn't have a humanoid program yet. The closest is ISRO's planned Vyommitra (a robotic torso for Gaganyaan), and a handful of startups doing early work. The Unitree H1 sale price is low enough that Indian universities and startups can finally afford to **work with** humanoids, even if not yet build them.
+
+The next two years will see the first wave of Indian humanoid research — papers, theses, hackathons — running on imported H1s. After that, the question is whether someone in India builds the equivalent.
+
+---
+
+*Curious how reinforcement learning teaches a robot to walk? It'll be the subject of Forge 03 in our Academy track once we ship it.*

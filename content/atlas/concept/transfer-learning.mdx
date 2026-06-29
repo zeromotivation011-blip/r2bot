@@ -1,0 +1,83 @@
+---
+title: Transfer learning
+category: ai-and-perception
+summary: >-
+  Transfer learning is a machine-learning technique where a model trained on one
+  task or dataset is reused as the starting point for a different but related
+  task, dramatically reducing the data and compute needed to reach good
+  performance.
+seeAlso: []
+sources:
+  - title: 'Pan & Yang — A Survey on Transfer Learning (IEEE TKDE, 2010)'
+    url: 'https://ieeexplore.ieee.org/document/5288526'
+  - title: >-
+      Radford et al. — Language Models are Unsupervised Multitask Learners
+      (OpenAI, 2019)
+    url: >-
+      https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - machine-learning
+  - ai
+  - training
+difficulty: 3
+oneLiner: 'The concept concept: Transfer learning is a machine-learning technique where a'
+laymanExplanation: >-
+  A doctor who decides to become a lawyer does not go back to secondary school.
+  They already know how to read technical documents, construct arguments,
+  evaluate evidence, and stay calm under pressure. Medical school trained those
+  general skills; law school applies them to a new domain. They are starting
+  from a far more capable baseline than a fresh graduate, a
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without transfer learning, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Transfer learning is a machine-learning technique where a model trained on one
+  task or dataset is reused as the starting point for a different but related
+  task, dramatically reducing the data and compute needed to reach good
+  performance.
+slug: transfer-learning
+bucket: concept
+---
+
+A doctor who decides to become a lawyer does not go back to secondary school. They already know how to read technical documents, construct arguments, evaluate evidence, and stay calm under pressure. Medical school trained those general skills; law school applies them to a new domain. They are starting from a far more capable baseline than a fresh graduate, and they get competent much faster because of it.
+
+**Transfer learning** applies the same logic to machine-learning models. Instead of training a new model from random initial values for every new task, you start from a model already trained on a large dataset — where it has learned general, broadly useful representations — and fine-tune it on your specific task. The pretrained model's knowledge transfers.
+
+## Why it works
+
+In a deep [neural network](/atlas/concept/neural-network), early layers tend to learn general features that are useful across many tasks: edges and textures in image models, grammar and word relationships in language models. Later layers learn task-specific patterns. Transfer learning keeps the general early-layer knowledge and retrains the later layers for the new task.
+
+## The standard workflow
+
+1. Take a large **pretrained model** — for images, something like ResNet or ViT, trained on ImageNet's 1.4 million labelled photos; for language, a transformer trained on a vast text corpus.
+2. Replace or add a task-specific **head** (the final output layers).
+3. **Fine-tune** on your own dataset, which may be far smaller than the original training data.
+
+## A real example
+
+A [robotics](/atlas/concept/robotics) company wants to train a camera-based quality-inspection system for a circuit-board factory. They have only 800 labelled images of defective boards. Training a deep network from scratch on 800 images would produce a poor model. Using a network pretrained on ImageNet as the base, they fine-tune with their 800 images and reach high accuracy — because the network already knows how to see.
+
+## Why it matters for robotics
+
+Robotics datasets are expensive to collect. Transfer learning lets teams build on the vast visual and linguistic knowledge baked into large pretrained models instead of starting every project from zero. This is one reason foundation models have become so central to robotics research.
+
+---
+
+*When a model trained on internet text can, with modest fine-tuning, control a [robot](/atlas/concept/robot) arm — the boundary between language understanding and physical action starts to blur.*

@@ -1,0 +1,75 @@
+---
+title: Kinematics
+category: fundamentals
+summary: >-
+  Kinematics describes the geometry of a robot's motion — where each part is and
+  where it will be — without asking why it moves. It is the mathematics that
+  lets a robot know where its hand is, even without looking at it.
+seeAlso: []
+sources:
+  - title: >-
+      Modern Robotics: Mechanics, Planning, and Control — Lynch & Park
+      (Northwestern)
+    url: 'https://modernrobotics.northwestern.edu/'
+  - title: Introduction to Robotics — John J. Craig (Pearson)
+    url: >-
+      https://www.pearson.com/en-us/subject-catalog/p/introduction-to-robotics-mechanics-and-control/P200000003227
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - mechanics
+  - kinematics
+difficulty: 3
+oneLiner: 'The concept concept: Kinematics describes the geometry of a robot''s motion'
+laymanExplanation: >-
+  A pianist doesn't look at their hands when playing a scale. Their brain knows,
+  purely from the angles of their finger joints and the position of their arm,
+  exactly where each fingertip is on the keyboard. They don't need to see it —
+  they can calculate it. Robots do something remarkably similar, using a branch
+  of mathematics called **kinematics**.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without kinematics, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Kinematics describes the geometry of a robot's motion — where each part is and
+  where it will be — without asking why it moves. It is the mathematics that
+  lets a robot know where its hand is, even without looking at it.
+slug: kinematics
+bucket: concept
+---
+
+A pianist doesn't look at their hands when playing a scale. Their brain knows, purely from the angles of their finger joints and the position of their arm, exactly where each fingertip is on the keyboard. They don't need to see it — they can calculate it. Robots do something remarkably similar, using a branch of mathematics called **kinematics**.
+
+Kinematics is the study of motion purely in terms of geometry: positions, velocities, and accelerations, without any reference to the forces or torques that cause the motion. In [robotics](/atlas/concept/robotics), it answers one fundamental question: given the angles and lengths of all the joints and links in the arm, where exactly is the [end effector](/atlas/concept/end-effector) (the [robot](/atlas/concept/robot)'s "hand") in space? That question sounds simple. The mathematics can get complicated very quickly.
+
+## Forward and [inverse kinematics](/atlas/concept/inverse-kinematics)
+
+There are two directions to solve the problem. **[Forward kinematics](/atlas/concept/forward-kinematics)** starts from the [joint](/atlas/concept/joint) angles and calculates the end-effector position. If joint one is at 30°, joint two at 45°, joint three at -20°, where does the hand end up? This direction is always solvable — there is exactly one answer, and it requires only substitution into the geometric equations.
+
+**Inverse kinematics** is the reverse: given a target position for the hand, work out what joint angles are needed to get there. This is the direction robots actually need in practice — the task says "reach this point," and the controller must figure out how to set the joints. Inverse kinematics is much harder. For a six-joint arm, the same target position may have multiple valid solutions, and for some target positions no solution exists at all. Robust inverse kinematics solvers are one of the workhorses of real-time robot control.
+
+## Jacobians and velocity kinematics
+
+Once a robot is moving, kinematics extends to velocities. A mathematical object called the **Jacobian matrix** maps joint velocities to end-effector velocities. If you want the hand to move at exactly 0.5 m/s in a straight horizontal line, the Jacobian tells you how fast each joint needs to rotate to achieve that. The Jacobian also reveals **singularities** — configurations where the robot loses the ability to move in certain directions no matter how fast its joints spin. Walking a robot arm into a singularity is a classic way to cause alarming, jerky motion or a complete control failure.
+
+## Where kinematics lives in real systems
+
+Every [industrial robot](/atlas/concept/industrial-robot) arm ships with a kinematics solver embedded in its controller. The [ROS](/atlas/concept/ros) (Robot Operating System) ecosystem provides an open-source library called KDL (Kinematics and [Dynamics](/atlas/concept/dynamics) Library) that robotics researchers use across dozens of platforms. When you see a robot arm smoothly tracing a curved path in the air, it is re-solving its inverse kinematics hundreds of times per second to stay on that path.
+
+---
+
+*If forward kinematics always has one answer but inverse kinematics can have many — or none — how does a robot choose which of the valid joint configurations to actually use?*

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 200" width="240" height="200" role="img" aria-label="Self-driving car">
+  <ellipse cx="120" cy="170" rx="100" ry="6" fill="#0f172a" opacity=".4"/>
+  <path d="M28 130 L60 80 L180 80 L210 110 L210 145 L28 145 Z" fill="#3b82f6" stroke="#1e3a8a" stroke-width="3"/>
+  <path d="M75 88 L100 100 L160 100 L175 88 Z" fill="#1f2937"/>
+  <rect x="50" y="60" width="20" height="24" rx="3" fill="#1f2937"/>
+  <circle cx="60" cy="60" r="6" fill="#fde047"/>
+  <circle cx="60" cy="60" r="8" fill="none" stroke="#fde047" stroke-width="1" opacity=".5"/>
+  <circle cx="75" cy="145" r="14" fill="#1f2937"/>
+  <circle cx="75" cy="145" r="6" fill="#475569"/>
+  <circle cx="170" cy="145" r="14" fill="#1f2937"/>
+  <circle cx="170" cy="145" r="6" fill="#475569"/>
+  <circle cx="205" cy="120" r="4" fill="#fde047"/>
+</svg>

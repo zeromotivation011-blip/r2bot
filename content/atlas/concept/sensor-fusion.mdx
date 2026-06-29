@@ -1,0 +1,81 @@
+---
+title: Sensor fusion
+category: ai-and-perception
+summary: >-
+  Sensor fusion is the process of combining data from multiple sensors —
+  cameras, lidar, radar, IMU — into a single, more reliable picture of the world
+  than any one sensor could produce alone.
+seeAlso: []
+sources:
+  - title: 'Thrun, Burgard, Fox — Probabilistic Robotics (MIT Press)'
+    url: 'https://mitpress.mit.edu/9780262201629/probabilistic-robotics/'
+  - title: IEEE Sensors Journal — Sensor Fusion in Autonomous Vehicles (2022)
+    url: 'https://ieeexplore.ieee.org/document/9756468'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - perception
+  - sensors
+  - robotics
+difficulty: 3
+oneLiner: 'The concept concept: Sensor fusion is the process of combining data'
+laymanExplanation: >-
+  A doctor does not diagnose a patient using a single test. They combine a blood
+  test, a physical examination, an X-ray, and the patient's own description of
+  their symptoms. Each source has gaps; each source has strengths. Together they
+  build a picture no single source could. Roboticists discovered the same
+  principle is essential for machines that must underst
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without sensor fusion, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Sensor fusion is the process of combining data from multiple sensors —
+  cameras, lidar, radar, IMU — into a single, more reliable picture of the world
+  than any one sensor could produce alone.
+slug: sensor-fusion
+bucket: concept
+---
+
+A doctor does not diagnose a patient using a single test. They combine a blood test, a physical examination, an X-ray, and the patient's own description of their symptoms. Each source has gaps; each source has strengths. Together they build a picture no single source could. Roboticists discovered the same principle is essential for machines that must understand the physical world.
+
+**Sensor fusion** is the technique of combining raw data from multiple sensors — cameras, [lidar](/atlas/concept/lidar), radar, inertial measurement units (IMUs), [GPS](/atlas/concept/gps-gnss), microphones — into a unified, more accurate and more reliable representation of the [robot](/atlas/concept/robot)'s environment than any individual sensor could produce on its own.
+
+## Why no single sensor is enough
+
+Every sensor has characteristic weaknesses:
+
+- **Cameras** produce rich colour and texture but struggle in darkness, glare, and heavy rain, and they cannot directly measure distance.
+- **Lidar** measures distance precisely and works in the dark, but cannot read colour or text and struggles with glass and mirrors.
+- **Radar** works in any weather and measures relative velocity accurately, but its resolution is low and it cannot distinguish object shapes well.
+- **IMUs** (gyroscopes and accelerometers) measure motion with no external reference, but their errors accumulate over time — a problem called drift.
+
+Sensor fusion lets each sensor cover the blind spots of the others.
+
+## How fusion works
+
+The most famous fusion algorithm is the **Kalman filter**, developed in 1960 and still used in almost every [autonomous vehicle](/atlas/concept/autonomous-vehicle) on the road. It maintains a probabilistic estimate of the robot's state (position, velocity, orientation) and updates that estimate every time a new sensor reading arrives, weighting each reading by how trustworthy the sensor is in the current conditions.
+
+## A real example
+
+A self-driving car approaching a busy junction uses sensor fusion to handle a scenario no single sensor could manage: a pedestrian in a dark raincoat stepping off the kerb at night. The [camera](/atlas/concept/camera-vision) sees almost nothing. The lidar sees a shape but the rain creates noise. The radar sees a moving object clearly but cannot tell it is human. Fused together, the system correctly identifies a pedestrian and brakes.
+
+## Why robots cannot skip it
+
+A robot acting on a single sensor is brittle. Sensor fusion is what turns individual unreliable data streams into the confident situational awareness a robot needs to operate safely in the real world.
+
+---
+
+*The Kalman filter was originally developed for NASA's Apollo navigation computer in the 1960s — the same algorithm now helps electric scooters know where they are on city streets.*

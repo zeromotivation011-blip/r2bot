@@ -1,0 +1,23 @@
+{
+  "id": "build-line-follower",
+  "slug": "line-follower",
+  "title": "Line Follower Robot",
+  "tagline": "Build a robot that follows a black line using two IR sensors, an L298N motor driver, and an Arduino — your first taste of sensor-driven decisions.",
+  "level": "beginner",
+  "duration_hours": 3,
+  "total_xp": 600,
+  "components": [
+    { "name": "Arduino Uno (or Nano)" },
+    { "name": "2× IR proximity sensor modules" },
+    { "name": "L298N motor driver module" },
+    { "name": "2× BO geared motors with wheels" },
+    { "name": "Caster wheel" },
+    { "name": "Chassis (acrylic or 3D-printed)" },
+    { "name": "Li-ion battery pack (7.4V)" },
+    { "name": "Jumper wires" },
+    { "name": "Black electrical tape (track)", "optional": true }
+  ],
+  "simulation_only": false,
+  "color": "#22d3ee",
+  "icon": "🛤️"
+}

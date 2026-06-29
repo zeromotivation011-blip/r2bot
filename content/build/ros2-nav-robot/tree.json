@@ -1,0 +1,378 @@
+{
+  "root": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "explanation",
+      "title": "The Operating System of Professional Robotics",
+      "body": "Every robot you've built so far runs one Python script. Sensors → logic → motors, all in one file. That works for a toy. It doesn't work for a Boston Dynamics Spot, a NASA Mars rover, or a surgical robot.\n\nThose robots have dozens of sensors, multiple computers, code written by teams across years. They need a way to pass data between components reliably, run algorithms in parallel, and swap hardware without rewriting software. That's what **ROS2** (Robot Operating System 2) is for.\n\nBoston Dynamics uses ROS2. NASA JPL uses ROS2. ABB industrial arms use ROS2. It's the de facto standard for serious robotics.\n\nHere's the good news: you don't need a physical robot. **Gazebo** is a full physics simulator that runs inside ROS2. Real engineers use it daily — it's how they test code before deploying to a $500,000 robot arm. You'll use it too.\n\nBy the end of this project you'll understand nodes, topics, SLAM, LiDAR, costmaps, and the Nav2 navigation stack. That's a robotics engineering interview ready.",
+      "branches": [{ "on": "next", "to": "q-what-is-ros" }],
+      "xp": 10
+    },
+
+    "q-what-is-ros": {
+      "id": "q-what-is-ros",
+      "type": "question",
+      "title": "What Is ROS2, Actually?",
+      "body": "The name 'Robot Operating System' is slightly misleading — ROS2 doesn't replace Linux. It runs on top of it. Think of it as the connective tissue between all the different pieces of a robot.",
+      "question": {
+        "style": "mcq",
+        "prompt": "What is ROS2, in the most accurate technical description?",
+        "options": [
+          "A Linux distribution designed for robotics hardware",
+          "A middleware framework that connects sensors, algorithms, and actuators via a structured message-passing system",
+          "A proprietary programming language for robot control",
+          "A robot manufacturer that open-sourced their software stack"
+        ],
+        "correct": 1,
+        "explanation_correct": "Correct. ROS2 is middleware — it sits between the operating system (Linux) and your robot application code. Its main job is message passing: letting a camera driver node publish images that any other node (detection, SLAM, recording) can subscribe to, without those nodes needing to know anything about each other.",
+        "explanation_wrong": "ROS2 is middleware — software that connects other software. It runs on standard Linux (Ubuntu 22.04 for ROS2 Humble). It's not a language (you write nodes in Python or C++). It's not made by a robot manufacturer — it's maintained by Open Robotics and the ROS2 community. Its core job: structured message passing between components."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-node-concept" },
+        { "on": "wrong", "to": "q-node-concept" }
+      ],
+      "xp": 20
+    },
+
+    "q-node-concept": {
+      "id": "q-node-concept",
+      "type": "question",
+      "title": "The Node: ROS2's Building Block",
+      "body": "ROS2 is built around a simple philosophy: one process, one job. Each independent process is called a **node**. A camera driver node. A SLAM node. A motor controller node. A path planner node. Each runs independently, communicates via ROS2 infrastructure.",
+      "question": {
+        "style": "mcq",
+        "prompt": "A ROS2 node is best described as:",
+        "options": [
+          "A physical sensor attached to the robot",
+          "An independent process that does one specific job and communicates with other nodes via topics, services, or actions",
+          "A navigation waypoint in the robot's path",
+          "A single battery cell in the robot's power system"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly. A node is an independent executable. It has a name, it runs a specific function, and it talks to the rest of the system through ROS2's communication mechanisms. The camera driver is a node. The SLAM algorithm is a node. The Nav2 planner is a node. They're all separate processes that can be started, stopped, and replaced independently.",
+        "explanation_wrong": "A node is an independent process — a running executable that does one job. The camera driver is a node (job: publish images). The SLAM system is a node (job: build maps). The motor controller is a node (job: move wheels). They communicate through ROS2 but run completely independently. This separation means you can upgrade the SLAM node without touching the motor controller."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-topic-vs-service" },
+        { "on": "wrong", "to": "q-topic-vs-service" }
+      ],
+      "xp": 20
+    },
+
+    "q-topic-vs-service": {
+      "id": "q-topic-vs-service",
+      "type": "question",
+      "title": "Topics vs Services",
+      "body": "ROS2 has several ways for nodes to communicate. The two most important are **topics** and **services**.\n\n**Topics:** like a TV broadcast. Publisher sends data continuously. Any number of subscribers can tune in. Great for sensor streams — camera images, LiDAR scans, IMU readings.\n\n**Services:** like a phone call. One node requests, another responds. One-shot interaction. Works for things that happen on demand.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Topics are ideal for continuous data streams like sensor readings. Services are designed for what kind of communication?",
+        "options": [
+          "The same thing — topics and services are interchangeable",
+          "One-shot request/response interactions, like asking a node to take a single photo or execute a specific action",
+          "Long-term data storage and retrieval from disk",
+          "Connecting the robot to WiFi networks"
+        ],
+        "correct": 1,
+        "explanation_correct": "Right. Services follow a strict request-response pattern. Client sends request → server processes it → server sends response → done. Perfect for: 'start recording', 'save map', 'reset odometry', 'take one photo'. For anything that streams continuously (every frame of camera video), use topics instead.",
+        "explanation_wrong": "Services are for request-response — one shot, not continuous. A node asks for something, another node does it and confirms. Examples: save the current map, reset a sensor, trigger a specific action. Topics are for streams: LiDAR at 10Hz, camera at 30Hz, IMU at 200Hz. Choosing wrong causes either dropped data (service for a stream) or blocking (topic for a request)."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-publisher" },
+        { "on": "wrong", "to": "q-publisher" }
+      ],
+      "xp": 20
+    },
+
+    "q-publisher": {
+      "id": "q-publisher",
+      "type": "question",
+      "title": "Publishers and Subscribers",
+      "body": "Topics have two sides: the node sending data and the node receiving it. These roles have specific names in ROS2 terminology.\n\nA LiDAR driver sends scan data on the `/scan` topic. A SLAM algorithm reads from `/scan` to build a map. A monitoring dashboard also reads from `/scan` to display raw data. Three different subscribers, one publisher — topics handle it automatically.",
+      "question": {
+        "style": "boolean",
+        "prompt": "In ROS2, a node that sends data to a topic is called a publisher, and a node that receives data from a topic is called a subscriber.",
+        "correct": "yes",
+        "explanation_correct": "Correct. Publisher → topic → subscriber(s). The beauty: publishers don't know who's subscribed, and subscribers don't know who's publishing. You can add a new subscriber node (say, a data logger) without modifying the publisher at all. This loose coupling is what makes ROS2 systems maintainable at scale.",
+        "explanation_wrong": "Yes, those are exactly the terms. Publisher sends to a topic. Subscriber receives from a topic. A topic can have multiple publishers and multiple subscribers simultaneously. The key design principle is decoupling — publishers and subscribers don't reference each other directly, they only agree on a topic name and message type."
+      },
+      "branches": [
+        { "on": "correct", "to": "code-fill-topic" },
+        { "on": "wrong", "to": "code-fill-topic" }
+      ],
+      "xp": 15
+    },
+
+    "code-fill-topic": {
+      "id": "code-fill-topic",
+      "type": "question",
+      "title": "Creating a Publisher in Python",
+      "body": "Here's how a ROS2 Python node creates a publisher. The three arguments are: message type, topic name, and queue size (how many messages to buffer if the subscriber is slow).",
+      "hint": "The topic name is a string — it can be anything you choose. The classic ROS2 tutorial uses a specific well-known topic name for a simple string publisher.",
+      "hint2": "The ROS2 beginner tutorial publishes to a topic called 'chatter'. But any descriptive name like '/robot/status' or '/sensor/data' is equally valid.",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Complete the publisher creation (topic name can be any valid string — the classic tutorial example is shown):\n\n```python\nself.publisher_ = self.create_publisher(String, '___', 10)\n```",
+        "correct": "chatter",
+        "explanation_correct": "The blank is the topic name — 'chatter' is the classic ROS2 Python tutorial example. In real robots you'd use descriptive names like '/camera/image_raw', '/lidar/scan', or '/cmd_vel'. The topic name is how publisher and subscriber find each other — they must use the same string. The 10 is the queue size (discard oldest messages if the queue fills up).",
+        "explanation_wrong": "The blank is the topic name — a string that identifies this communication channel. 'chatter' is the canonical ROS2 tutorial example. In production code you'd see names like '/scan', '/odom', '/cmd_vel', '/camera/image_raw'. The publisher and subscriber must use the same topic name and same message type — that's the entire 'contract' between them."
+      },
+      "branches": [
+        { "on": "correct", "to": "explanation-slam" },
+        { "on": "wrong", "to": "explanation-slam" }
+      ],
+      "xp": 25
+    },
+
+    "explanation-slam": {
+      "id": "explanation-slam",
+      "type": "explanation",
+      "title": "SLAM: Building a Map While Lost in It",
+      "body": "Here's the paradox at the heart of autonomous navigation: **to know where you are, you need a map. To build a map, you need to know where you are.**\n\nSLAM — Simultaneous Localisation and Mapping — solves both problems at once.\n\nImagine exploring a completely dark room with a flashlight. As you walk, you sketch what you can see: walls, furniture, doorways. Each time you recognise something you've seen before (a distinctive corner, a known landmark), you update both the map and your estimated position. You're building the map and localising yourself within it simultaneously.\n\nIn ROS2, SLAM Toolbox is the standard package. It subscribes to `/scan` (LiDAR data) and `/odom` (wheel odometry), and publishes to `/map` (the growing occupancy grid) and `/tf` (the robot's estimated position in the map).\n\nThe output is an **occupancy grid** — a 2D array where each cell is: 0 (free space), 100 (occupied/wall), or -1 (unknown). Nav2 uses this grid to plan paths.\n\n```\nros2 launch slam_toolbox online_async_launch.py\n```\n\nOne command. The robot starts driving, the map builds in real time in RViz. This is genuinely magical to watch.",
+      "branches": [{ "on": "next", "to": "q-slam-sensors" }],
+      "xp": 10
+    },
+
+    "q-slam-sensors": {
+      "id": "q-slam-sensors",
+      "type": "question",
+      "title": "The Sensor that Powers SLAM",
+      "body": "SLAM needs a sensor that can measure distances to surrounding obstacles accurately, in all directions, fast enough to update as the robot moves. Different sensors have been tried — cameras, sonar, GPS — but one dominates modern indoor SLAM.",
+      "question": {
+        "style": "mcq",
+        "prompt": "What sensor is used in the vast majority of modern ROS2 SLAM systems?",
+        "options": [
+          "GPS — highly accurate outdoor positioning",
+          "LiDAR (laser scanner) — measures precise distances in 360° by spinning a laser",
+          "Magnetic compass — measures orientation relative to magnetic north",
+          "Barometer — measures altitude via air pressure"
+        ],
+        "correct": 1,
+        "explanation_correct": "LiDAR. It spins (or uses a phased array) to shoot laser pulses in 360° and measures time-of-flight for each pulse. Result: a ring of distance measurements — a 2D 'slice' of the environment, 10 times per second. SLAM Toolbox uses these scans to match against its growing map and compute position. Cheap 2D LiDARs (RPLIDAR, SICK TiM) cost $100-300 — totally accessible.",
+        "explanation_wrong": "LiDAR is the answer. GPS doesn't work indoors and isn't precise enough for room-scale navigation. Compass gives orientation but not distance. Barometer gives altitude. LiDAR shoots laser pulses in 360° and measures how long each takes to return — giving a precise distance map of the surroundings 10+ times per second. Perfect for SLAM."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-lidar-working" },
+        { "on": "wrong", "to": "q-lidar-working" }
+      ],
+      "xp": 20
+    },
+
+    "q-lidar-working": {
+      "id": "q-lidar-working",
+      "type": "question",
+      "title": "How LiDAR Actually Measures Distance",
+      "body": "LiDAR produces extremely precise distance measurements — millimetre accuracy at 30m range. To achieve this, it uses a fundamentally different principle than sonar (which uses sound echoes) or IR (which uses reflectance intensity).",
+      "question": {
+        "style": "mcq",
+        "prompt": "LiDAR measures distance using which physical principle?",
+        "options": [
+          "Sound echo time — like sonar but with higher frequency",
+          "Laser pulse time-of-flight — how long a laser pulse takes to travel to the target and return",
+          "Magnetic field strength — objects disrupt a local magnetic field proportionally to distance",
+          "Infrared reflectance intensity — brighter return = closer object"
+        ],
+        "correct": 1,
+        "explanation_correct": "Time-of-flight. Fire a nanosecond laser pulse, start a timer, catch the returning photons, stop the timer. Distance = (speed of light × time) / 2. The division by 2 is because the pulse travels out AND back. At the speed of light, measuring nanoseconds gives centimetre precision. This is also how autonomous vehicle LiDARs (Velodyne, Ouster) work.",
+        "explanation_wrong": "LiDAR uses laser time-of-flight. A pulse of laser light is fired, the timer starts. When reflected photons return to the detector, the timer stops. Distance = (c × Δt) / 2. Because the speed of light is constant and precisely known, measuring time in nanoseconds yields millimetre-precision distances. Sonar uses sound (1000× slower, less precise). IR uses intensity (affected by surface colour). LiDAR uses light speed."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-costmap" },
+        { "on": "wrong", "to": "q-costmap" }
+      ],
+      "xp": 20
+    },
+
+    "q-costmap": {
+      "id": "q-costmap",
+      "type": "question",
+      "title": "The Costmap: Where Can the Robot Go?",
+      "body": "Nav2 doesn't just need a map of walls — it needs to know which areas are safe to drive through. An area adjacent to a wall might be geometrically clear but would cause the robot to scrape its side. Nav2 solves this with the **costmap**.\n\nThe costmap inflates obstacles outward by the robot's radius, marking nearby cells as 'high cost'. The path planner avoids high-cost areas, effectively giving the robot a safety margin around every obstacle automatically.",
+      "question": {
+        "style": "mcq",
+        "prompt": "What is the primary purpose of Nav2's costmap?",
+        "options": [
+          "To calculate the energy cost of different routes to optimise battery usage",
+          "To represent which areas of the map are safe for the robot to navigate through, with inflation around obstacles based on robot size",
+          "To track motor temperature and flag expensive repair costs",
+          "To count and display the total number of active ROS2 nodes"
+        ],
+        "correct": 1,
+        "explanation_correct": "Right. The costmap is a navigability map. Occupied cells (walls) have maximum cost. The inflation layer adds a gradient of cost around every obstacle, sized to the robot's footprint. This prevents the path planner from routing the robot through a gap that's technically open but too narrow to pass safely. Nav2 maintains two: a global costmap (whole map) and a local costmap (immediate area).",
+        "explanation_wrong": "The costmap represents safe vs unsafe space. It takes the SLAM occupancy grid, inflates obstacles outward by the robot's radius, and assigns cost values: 0 = completely free, 253 = inscribed (robot center can't go here), 254 = lethal (actual obstacle). The path planner minimises total path cost — naturally routing around obstacles and staying away from walls."
+      },
+      "branches": [
+        { "on": "correct", "to": "simulation" },
+        { "on": "wrong", "to": "simulation" }
+      ],
+      "xp": 20
+    },
+
+    "simulation": {
+      "id": "simulation",
+      "type": "simulation",
+      "title": "Try It: Gazebo + Nav2 Simulation",
+      "body": "The simulation below runs a Gazebo environment with a TurtleBot3 navigating using the full ROS2 Nav2 stack. You can see the occupancy grid map building in real time (via SLAM), the costmap overlay, and the planned path.\n\nClick anywhere on the map to send the robot a navigation goal. Watch how it plans a path around obstacles using A* and then executes it while avoiding new obstacles the local planner detects.",
+      "simulation_url": "/visualizer?mode=ros2-nav",
+      "branches": [{ "on": "next", "to": "q-tf-tree" }],
+      "xp": 10
+    },
+
+    "q-tf-tree": {
+      "id": "q-tf-tree",
+      "type": "question",
+      "title": "TF2: Knowing Where Everything Is",
+      "body": "A robot has many coordinate frames: the base (centre of the robot), the LiDAR (offset forward and up), the camera (different angle), each wheel. When LiDAR detects an obstacle 1m ahead of the LiDAR frame, where is that in the robot's base frame? Where is it on the map?\n\n**TF2** (Transform 2) is the ROS2 system that tracks and broadcasts all coordinate frame transformations continuously.",
+      "question": {
+        "style": "boolean",
+        "prompt": "ROS2 TF2 tracks the coordinate frame transformation between every component of the robot (base, sensors, wheels) in real time, so any node can convert coordinates between any two frames instantly.",
+        "correct": "yes",
+        "explanation_correct": "Correct. TF2 maintains a transform tree — a graph of how every frame relates to every other frame, updated in real time as the robot moves. When Nav2 needs to know where an obstacle detected by the LiDAR is relative to the map origin, it calls tf_buffer.lookup_transform() and gets the answer instantly, accounting for the robot's current position and sensor offsets.",
+        "explanation_wrong": "Yes, TF2 does exactly this. It's one of the most important (and underappreciated) parts of ROS2. Every sensor has an offset from the robot's base — TF2 tracks these relationships and lets any node ask 'where is this LiDAR point in map coordinates?' without doing the geometry manually. Without TF2, multi-sensor fusion would require custom transformation code everywhere."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-nav2-stack" },
+        { "on": "wrong", "to": "q-nav2-stack" }
+      ],
+      "xp": 15
+    },
+
+    "q-nav2-stack": {
+      "id": "q-nav2-stack",
+      "type": "question",
+      "title": "Nav2's Global Path Planner",
+      "body": "Nav2 splits navigation into two problems: **global planning** (finding a route from current position to goal across the full map) and **local planning** (executing the next few steps safely given real-time sensor data).\n\nFor global planning, Nav2 uses a well-known graph search algorithm that guarantees the shortest path if one exists.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Nav2 uses which algorithm for global path planning by default?",
+        "options": [
+          "Random Walk — explores randomly until it reaches the goal",
+          "Dijkstra's algorithm — explores uniformly from the start",
+          "A* (A-star) — uses a heuristic to guide exploration toward the goal efficiently",
+          "Genetic algorithm — evolves a population of candidate paths"
+        ],
+        "correct": 2,
+        "explanation_correct": "A* (pronounced 'A-star'). Nav2's default global planner (NavFn) implements A*. It works on the costmap grid, treating each cell as a graph node with a cost. A* uses a heuristic (usually Euclidean distance to goal) to prioritise which cells to explore — making it dramatically faster than Dijkstra for large maps. Smac Planner (also in Nav2) offers hybrid A* for kinodynamic constraints.",
+        "explanation_wrong": "Nav2 uses A* (A-star) for global planning. A* is like Dijkstra's algorithm but with a heuristic — it estimates remaining distance to goal and uses that to prioritise which cells to explore next. This makes it far more efficient than random walk or pure Dijkstra on large costmaps. It guarantees the optimal path if the heuristic doesn't overestimate."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-local-planner" },
+        { "on": "wrong", "to": "q-local-planner" }
+      ],
+      "xp": 25
+    },
+
+    "q-local-planner": {
+      "id": "q-local-planner",
+      "type": "question",
+      "title": "Local Planner: Moment-to-Moment Navigation",
+      "body": "The global planner produces a complete path from A to B on the map. But the map was built at SLAM time — it doesn't know about the box someone just left in the hallway. The **local planner** runs continuously, looking at live sensor data to follow the global path while reacting to new obstacles.",
+      "question": {
+        "style": "mcq",
+        "prompt": "What does Nav2's local planner handle that the global planner does not?",
+        "options": [
+          "Computing the complete route from start to goal across the entire map",
+          "Real-time obstacle avoidance and trajectory smoothing over the next 2–5 seconds of travel",
+          "Building the occupancy grid map from LiDAR scans",
+          "Calibrating the LiDAR sensor before each navigation run"
+        ],
+        "correct": 1,
+        "explanation_correct": "The local planner operates on a rolling local costmap (the area immediately around the robot) using live sensor data. Nav2's default local planner DWB (Dynamic Window Approach) samples hundreds of possible velocity commands, simulates them forward in time, scores each against criteria (clearance, progress toward global path, goal heading), and picks the best. It's recalculating 10-20 times per second.",
+        "explanation_wrong": "The local planner handles the immediate execution — following the global path while avoiding obstacles the global planner didn't know about. DWB (Dynamic Window Approach), Nav2's default local planner, samples possible velocity commands, simulates their trajectories, and scores them in real time. New obstacles cause it to find a slightly different local trajectory while still tracking the global path."
+      },
+      "branches": [
+        { "on": "correct", "to": "checkpoint" },
+        { "on": "wrong", "to": "checkpoint" }
+      ],
+      "xp": 20
+    },
+
+    "checkpoint": {
+      "id": "checkpoint",
+      "type": "checkpoint",
+      "title": "ROS2 Nav Stack Checkpoint",
+      "body": "You're covering serious ground. Let's consolidate the full architecture:\n\n**ROS2 Architecture:**\n- **Nodes** — independent processes, each does one job\n- **Topics** — continuous data streams (publish/subscribe)\n- **Services** — one-shot request/response\n- **TF2** — real-time coordinate frame tracking\n\n**Navigation Stack:**\n- **LiDAR** → publishes `/scan` (time-of-flight distance measurements, 360°, 10Hz)\n- **SLAM Toolbox** → subscribes to `/scan`, `/odom` → publishes `/map` (occupancy grid) + TF pose\n- **Costmap** → inflates obstacles by robot radius, global + local layers\n- **Global Planner (A*)** → plans full path on global costmap\n- **Local Planner (DWB)** → follows path + avoids new obstacles in real time\n- **Nav2 Action Server** → accepts goal poses, coordinates the full pipeline\n\nThis is the actual architecture running on real autonomous robots today.",
+      "branches": [{ "on": "next", "to": "q-real-hardware" }],
+      "xp": 10
+    },
+
+    "q-real-hardware": {
+      "id": "q-real-hardware",
+      "type": "question",
+      "title": "From Simulation to Real Robot",
+      "body": "You've run everything in Gazebo. The beauty of ROS2's abstraction is what happens when you want to deploy to a real physical robot. Gazebo publishes to the same topic names (`/scan`, `/odom`, `/cmd_vel`) that real hardware drivers do.",
+      "question": {
+        "style": "mcq",
+        "prompt": "To deploy the same Nav2 stack from Gazebo simulation to a real physical robot, what's the primary change needed?",
+        "options": [
+          "Rewrite all the Nav2 Python code to target the physical hardware APIs",
+          "Replace the Gazebo simulator with real hardware driver nodes (LiDAR driver, motor driver) — the Nav2 stack code is unchanged",
+          "Purchase special Nav2-certified hardware that matches the Gazebo simulation models",
+          "Switch from Python to C++ because Python is too slow for real robots"
+        ],
+        "correct": 1,
+        "explanation_correct": "This is the killer feature of ROS2's abstraction. Swap `gazebo_ros` (publishes fake `/scan` from simulated LiDAR) for `rplidar_ros` (publishes real `/scan` from physical RPLIDAR). Swap Gazebo's motor simulation for your actual motor driver. Nav2 never knows the difference — it still sees `/scan`, `/odom`, `/map`, and sends `/cmd_vel`. Same code, real robot.",
+        "explanation_wrong": "The genius of ROS2 abstraction: swap the Gazebo plugins for real hardware driver nodes. The RPLIDAR driver publishes `/scan` exactly like Gazebo did. A real motor controller subscribes to `/cmd_vel` exactly like Gazebo did. Nav2's planner and controller code is completely untouched. This is why serious teams develop in simulation — deployment to hardware is almost painless."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-dds" },
+        { "on": "wrong", "to": "q-dds" }
+      ],
+      "xp": 25
+    },
+
+    "q-dds": {
+      "id": "q-dds",
+      "type": "question",
+      "title": "ROS2's Secret Networking Layer",
+      "body": "ROS1 had a central 'rosmaster' server that brokered all communications — if it crashed, the whole robot stopped. ROS2 replaced this with something more robust underneath.\n\n**DDS (Data Distribution Service)** is an industrial-grade publish-subscribe standard used in military, aerospace, and medical systems. ROS2 uses it as its communication backbone, which gives it a major capability that ROS1 never had.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Because ROS2 uses DDS as its communication layer, ROS2 nodes can communicate across:",
+        "options": [
+          "Only a single computer — ROS2 is single-machine only",
+          "Multiple computers on the same network — automatically, without configuration",
+          "Only Linux machines — DDS doesn't support other operating systems",
+          "Only Raspberry Pi hardware — DDS is optimised for ARM processors"
+        ],
+        "correct": 1,
+        "explanation_correct": "ROS2 nodes discover each other automatically across the network using DDS discovery. Set the same ROS_DOMAIN_ID on two machines on the same network and their nodes can publish/subscribe to each other's topics with zero extra configuration. This enables distributed robot architectures: heavy computation on a workstation, sensors on the robot hardware, all coordinated through ROS2.",
+        "explanation_wrong": "DDS enables automatic peer-to-peer discovery across a network. Two computers with the same ROS_DOMAIN_ID on the same network will automatically see each other's nodes and topics — no central broker, no configuration needed. This means you can run Nav2's heavy computation on a desktop while the robot hardware (motor drivers, sensor nodes) runs on a Pi. ROS2 handles the networking transparently."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-industry" },
+        { "on": "wrong", "to": "q-industry" }
+      ],
+      "xp": 20
+    },
+
+    "q-industry": {
+      "id": "q-industry",
+      "type": "question",
+      "title": "ROS2 in the Real World",
+      "body": "You might think ROS2 is a research or hobbyist tool. Some high-stakes applications might surprise you.",
+      "question": {
+        "style": "boolean",
+        "prompt": "ROS2 is used in real medical surgical robots — including systems similar to Intuitive Surgical's da Vinci platform — in research and development contexts.",
+        "correct": "yes",
+        "explanation_correct": "Yes. ROS2's reliability improvements over ROS1 (DDS, real-time support, no single point of failure) have made it viable for safety-critical research. Surgical robotics researchers at major universities use ROS2 extensively. The MoveIt2 framework (which runs on ROS2) is standard in surgical robot research. Commercial deployments require additional safety certification layers, but ROS2 is the foundation.",
+        "explanation_wrong": "This is true. ROS2's design improvements — no central master, DDS reliability, real-time capable middleware — make it suitable for research in high-stakes domains including surgical robotics. MoveIt2 (motion planning for robot arms) is widely used in surgical robot research. Commercial deployment requires additional FDA/CE safety layers, but ROS2 is the underlying framework."
+      },
+      "branches": [
+        { "on": "correct", "to": "complete" },
+        { "on": "wrong", "to": "complete" }
+      ],
+      "xp": 15
+    },
+
+    "complete": {
+      "id": "complete",
+      "type": "complete",
+      "title": "ROS2 Nav Robot — Complete!",
+      "body": "You just learned the architecture that powers professional autonomous robots.\n\n**What you actually learned:**\n- ROS2 middleware architecture: nodes, topics, services, TF2\n- Publisher/subscriber pattern and why decoupling matters\n- SLAM: building a map while localising within it simultaneously\n- LiDAR: time-of-flight laser scanning for 360° distance measurement\n- Occupancy grid maps and costmap inflation\n- A* global path planning\n- DWB local planning for real-time obstacle avoidance\n- ROS2 DDS networking: multi-machine distributed robots\n- Simulation-to-hardware transfer with zero Nav2 code changes\n\n**Where this takes you:**\nROS2 proficiency is one of the most in-demand skills in robotics engineering. Boston Dynamics, FANUC, ABB, Clearpath Robotics, and hundreds of autonomous vehicle startups all hire engineers who know this stack. The Gazebo simulation you ran is exactly what these teams use daily.\n\n**XP Earned: 310**\n\n**Up next:** AI Sorting Arm — combine computer vision (YOLOv8 real-time object detection) with a 4-DOF robotic arm for autonomous pick-and-place. This is the final boss of the Build track.",
+      "branches": [],
+      "xp": 50
+    }
+  }
+}

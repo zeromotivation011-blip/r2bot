@@ -1,0 +1,17 @@
+{
+  "id": "l3-how-robots-sense",
+  "module_id": "m1-foundations",
+  "order_index": 2,
+  "slug": "how-robots-sense",
+  "title": "How robots sense the world",
+  "lesson_type": "reading",
+  "duration_minutes": 9,
+  "xp_reward": 100,
+  "is_free_preview": true,
+  "passing_score": 75,
+  "objectives": [
+    "Recognise the 6 sensors every roboticist knows",
+    "Pick the right sensor for a real-world task"
+  ],
+  "atlas_links": ["sensor", "ultrasonic-sensor", "ir-sensor", "imu", "lidar"]
+}

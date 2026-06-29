@@ -1,0 +1,100 @@
+---
+title: Swarm robotics
+category: robot-types
+summary: >-
+  Swarm robotics is the study and practice of coordinating large numbers of
+  simple robots to achieve complex tasks collectively — taking inspiration from
+  the decentralised behaviour of ant colonies, bee hives, and flocks of birds.
+seeAlso: []
+sources:
+  - title: Harvard Wyss Institute — Kilobot swarm
+    url: >-
+      https://wyss.harvard.edu/technology/kilobot-a-low-cost-swarm-robotics-platform/
+  - title: IEEE Transactions on Robotics — Swarm Robotics Survey
+    url: 'https://ieeexplore.ieee.org/document/6079994'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - swarm-robotics
+  - multi-robot
+  - emergent-behaviour
+  - distributed
+difficulty: 3
+oneLiner: 'The concept concept: Swarm robotics is the study and practice of'
+laymanExplanation: >-
+  A single ant is not intelligent. It cannot plan, reason, or make complex
+  decisions. Yet a colony of fifty million ants collectively builds
+  climate-controlled underground cities, farms fungus, wages territorial wars,
+  and efficiently harvests food across kilometres of terrain. No ant is in
+  charge. No ant has a map. The colony-level intelligence emerges from mi
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without swarm robotics, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Intel drone light shows
+  - Harvard Kilobot swarm
+  - Military drone swarms
+indianExample: >-
+  DRDO's Air-Launched Flexible Asset (ALFA-S) demonstrated swarm-drone
+  capability — a key Indian defence capability since 2021.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What is the main advantage of swarm robotics over a single robot?
+  options:
+    - Cheaper batteries
+    - 'Robustness — lose one, the rest still work'
+    - Faster speed
+    - Less code
+  answer: 1
+  explanation: >-
+    A swarm tolerates individual failures — losing 5% of the swarm barely
+    affects the overall mission.
+mindBlowingFact: >-
+  Intel's drone light show used 2,018 synchronised drones — a single GPU
+  controlled all of them in real time.
+industryApplications:
+  - defence
+  - agriculture
+  - search and rescue
+  - mapping
+  - entertainment
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Swarm robotics is the study and practice of coordinating large numbers of
+  simple robots to achieve complex tasks collectively — taking inspiration from
+  the decentralised behaviour of ant colonies, bee hives, and flocks of birds.
+slug: swarm-robotics
+bucket: concept
+---
+
+A single ant is not intelligent. It cannot plan, reason, or make complex decisions. Yet a colony of fifty million ants collectively builds climate-controlled underground cities, farms fungus, wages territorial wars, and efficiently harvests food across kilometres of terrain. No ant is in charge. No ant has a map. The colony-level intelligence emerges from millions of simple individuals following simple rules, responding to local signals.
+
+Swarm [robotics](/atlas/concept/robotics) is the attempt to build that same kind of intelligence into groups of machines.
+
+## What makes it "swarm"
+
+A swarm is not just a collection of robots doing the same job in the same place. The defining features of swarm robotics are:
+
+**Decentralisation** — no [robot](/atlas/concept/robot) is the leader. There is no master computer coordinating the group. Every robot makes its own decisions based on what it can sense locally.
+
+**Simplicity of individuals** — each robot is deliberately kept simple and inexpensive. It may only be able to sense its immediate neighbours, move in a direction, and communicate a handful of signals.
+
+**Emergent behaviour** — the useful collective behaviour (exploring an area, building a structure, sorting objects) arises from the interaction of many simple robots following simple rules. No robot was programmed to "build the structure" — it emerges.
+
+**Robustness** — if ten percent of the robots fail or are removed, the swarm continues functioning. This is a significant advantage over systems that depend on a central unit.
+
+## A real example
+
+Harvard University's **Kilobot** project demonstrated a swarm of 1,024 tiny robots — each the size of a ten-rupee coin — that could collectively assemble into arbitrary pre-specified two-dimensional shapes. Each Kilobot could only sense light and communicate with its nearest neighbours using infrared. Yet the swarm, starting from a random scatter, organised itself into stars, letters, and wrenches over the course of several hours. No robot knew the target shape directly; they followed simple local rules that collectively produced it.
+
+## Why swarms are interesting — and hard to deploy
+
+The robustness and scalability of swarm systems are genuinely valuable. A swarm of drones can survey a disaster zone faster than a single [drone](/atlas/concept/drone), and losing half of them to battery failure or obstacles does not stop the mission. Swarms of small autonomous submarines could map ocean floors at a scale no individual AUV could match.
+
+The challenge is that swarm behaviour is notoriously difficult to design. You cannot simply tell a swarm what to do — you have to design the local rules that produce the desired global outcome, and predicting what complex emergent behaviours those rules will generate is an open research problem. Verification and testing are also harder than for single robots.
+
+---
+
+*If a swarm of a thousand robots disagrees about where to go, the swarm still goes somewhere — the question is whether that somewhere is where anyone intended.*

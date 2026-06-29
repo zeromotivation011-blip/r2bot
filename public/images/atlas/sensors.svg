@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="Radar wave pattern">
+  <rect width="800" height="400" fill="#050810"/>
+  <g stroke="#00B8D4" fill="none">
+    <g opacity="0.18" stroke-width="1">
+      <path d="M0 80 H800 M0 160 H800 M0 240 H800 M0 320 H800"/>
+      <path d="M100 0 V400 M300 0 V400 M500 0 V400 M700 0 V400"/>
+    </g>
+    <g transform="translate(160,330)" stroke-width="1.6">
+      <path d="M0,0 L640,0" opacity="0.4"/>
+      <path d="M0,0 A80,80 0 0 1 138.6,-80" opacity="0.95"/>
+      <path d="M0,0 A160,160 0 0 1 277.1,-160" opacity="0.7"/>
+      <path d="M0,0 A240,240 0 0 1 415.7,-240" opacity="0.5"/>
+      <path d="M0,0 A320,320 0 0 1 554.3,-320" opacity="0.3"/>
+      <path d="M0,0 L600,-300" stroke-dasharray="3 6" opacity="0.6"/>
+      <circle r="6" fill="#00B8D4" stroke="none"/>
+      <circle cx="320" cy="-160" r="10" fill="#050810" stroke="#00E5FF" stroke-width="2"/>
+      <circle cx="320" cy="-160" r="3" fill="#00E5FF" stroke="none"/>
+    </g>
+  </g>
+  <g font-family="'JetBrains Mono', monospace" fill="#E8ECF1" font-size="12" letter-spacing="3">
+    <text x="40" y="50">SENSORS · RADAR ECHO</text>
+  </g>
+  <g font-family="'JetBrains Mono', monospace" fill="#00B8D4" font-size="10" letter-spacing="2" opacity="0.7">
+    <text x="640" y="50">λ 24GHz</text>
+  </g>
+</svg>

@@ -1,0 +1,116 @@
+---
+title: Computer vision (for robots)
+hindi_name: कंप्यूटर विज़न (दृष्टि प्रणाली)
+prerequisites:
+  - camera-vision
+  - deep-learning
+category: ai-and-perception
+summary: >-
+  Computer vision is how a robot makes sense of what its camera sees. It turns
+  pixels into objects, distances, and decisions — and it's done a lot more of
+  the heavy lifting in modern robotics than you'd guess.
+seeAlso:
+  - slam
+  - lidar
+  - robot
+  - optimus
+sources:
+  - title: OpenCV
+    url: 'https://opencv.org/'
+  - title: PyTorch — Vision Models
+    url: 'https://pytorch.org/vision/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - ai
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: Computer vision is how a robot makes sense'
+laymanExplanation: >-
+  Computer vision is how a robot makes sense of what its camera sees. It turns a
+  flat grid of pixels into "there's a person 3 metres ahead, facing me, walking
+  forward at 1 m/s." It's done a lot more of the heavy lifting in modern
+  robotics than you'd guess.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without computer vision (for robots), many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis:
+  - Perseverance Rover
+  - Da Vinci Surgical
+  - Amazon warehouse robots
+indianExample: >-
+  Cropnosis, an Indian startup, uses computer vision on drone footage to detect
+  crop diseases before they spread — saving lakhs of rupees per farm.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What neural network architecture revolutionised computer vision in 2012?
+  options:
+    - Recurrent neural network
+    - Convolutional neural network (CNN)
+    - Decision tree
+    - Linear regression
+  answer: 1
+  explanation: >-
+    AlexNet (a CNN) won ImageNet 2012 by a huge margin and started the
+    deep-learning era of computer vision.
+mindBlowingFact: >-
+  A state-of-the-art vision model can classify 1,000 object categories in under
+  1 millisecond. A human takes ~100 ms to consciously identify an object.
+industryApplications:
+  - healthcare
+  - agriculture
+  - retail
+  - security
+  - autonomous vehicles
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Computer vision is how a robot makes sense of what its camera sees. It turns
+  pixels into objects, distances, and decisions — and it's done a lot more of
+  the heavy lifting in modern robotics than you'd guess.
+slug: computer-vision
+bucket: concept
+---
+
+Computer vision is how a [robot](/atlas/concept/robot) makes sense of what its [camera](/atlas/concept/camera-vision) sees. It turns a flat grid of pixels into "there's a person 3 metres ahead, facing me, walking forward at 1 m/s." It's done a lot more of the heavy lifting in modern [robotics](/atlas/concept/robotics) than you'd guess.
+
+## The five jobs computer vision does for robots
+
+**Classification.** "What is this thing?" — given a picture, output a label: dog, traffic light, screwdriver.
+
+**Detection.** "Where is the thing?" — given a picture, output a bounding box around every object of interest plus its label.
+
+**Segmentation.** "Which pixels are the thing?" — given a picture, output a precise outline of every object, pixel-perfect.
+
+**Depth estimation.** "How far is the thing?" — given a picture (or two from stereo cameras), output a depth map.
+
+**Tracking.** "Where is the same thing going?" — given a sequence of pictures, follow each object frame by frame.
+
+Most robot vision pipelines chain these together: detect objects → estimate their depth → track their motion → decide what to do.
+
+## How it actually works today
+
+Until ~2012, computer vision was hand-engineered: humans wrote rules ("if the pixels here are dark and edge-aligned, it's probably a road"). It mostly didn't work.
+
+After 2012 (the AlexNet moment), the field switched to **convolutional neural networks** (CNNs). You feed millions of labelled pictures to a network. The network learns the features on its own.
+
+After 2021, **transformer-based vision models** (ViT, DINO, SAM) became state of the art. These can be trained on much larger, less-labelled datasets, and they generalise better.
+
+A modern robot like [Optimus](/atlas/robot/optimus) or Figure 03 has a single [neural network](/atlas/concept/neural-network) that does detection, segmentation, depth, and tracking in one pass — at 30 frames per second, running on a few-hundred-watt onboard computer.
+
+## [Tesla](/atlas/company/tesla) vs. Waymo — the classic vision debate
+
+Tesla uses **vision-only** self-driving: just cameras, no [lidar](/atlas/concept/lidar), no radar.
+
+Waymo uses **[sensor fusion](/atlas/concept/sensor-fusion)**: cameras plus lidar plus radar.
+
+Tesla's argument: humans drive with just two cameras (eyes), so cars should be able to. Waymo's argument: cars don't need to be limited to human senses — give them lidar too and they're safer.
+
+Neither approach is finished. The argument is one of the biggest open questions in modern robotics.
+
+---
+
+*The first practical use of computer vision most people have touched is the Roomba's navigation cameras. Read [How a Roomba decides where to clean](/lens/roomba-how-it-cleans).*

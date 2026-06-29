@@ -1,0 +1,130 @@
+---
+title: Mecanum Wheel in Robotics — Complete Guide | R2BOT
+summary: >-
+  Mecanum wheels allow a robot to translate sideways without turning. Used in
+  warehouse AMRs, mecanum chassis, and FRC robotics teams.
+category: fundamentals
+bucket: mechanical-design
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - mecanum
+  - wheel
+  - omnidirectional
+  - amr
+  - holonomic
+relatedTerms:
+  - holonomic-drive
+  - wheels-vs-tracks
+  - differential-drive
+  - autonomous-mobile-robot
+seeAlso:
+  - holonomic-drive
+  - wheels-vs-tracks
+  - differential-drive
+  - autonomous-mobile-robot
+youtubeSearchQuery: mecanum wheel robot omnidirectional explained
+oneLiner: >-
+  The mechanical design concept: Mecanum wheels allow a robot to translate
+  sideways
+laymanExplanation: >-
+  A mecanum wheel is a special wheel with passive rollers angled at 45° around
+  its outer edge. When four mecanum wheels are arranged in a specific pattern on
+  a chassis, they let the robot move in any direction — including sideways —
+  without first rotating the body.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without mecanum wheel in robotics — complete guide | r2bot, many mechanical
+  design systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Mecanum wheels allow a robot to translate sideways without turning. Used in
+  warehouse AMRs, mecanum chassis, and FRC robotics teams.
+slug: mecanum-wheel
+---
+
+# Mecanum Wheel in Robotics
+
+## What is Mecanum Wheel in Robotics?
+
+A mecanum wheel is a special wheel with passive rollers angled at 45° around its outer edge. When four mecanum wheels are arranged in a specific pattern on a chassis, they let the robot move in any direction — including sideways — without first rotating the body.
+
+## How It Works
+
+Each roller can only push tangentially because of its angle. When all four wheels spin forward, the longitudinal components add and the sideways components cancel — the robot moves forward. If diagonal pairs spin opposite ways, the longitudinal cancels and sideways components add — the robot crabs sideways. By mixing speeds and directions, any planar motion (vx, vy, ω) is achievable. The inverse kinematics that translate desired chassis motion into wheel speeds is a 4×3 matrix.
+
+## Real-World Example
+
+Many warehouse AMRs and hospital delivery bots use mecanum wheels to squeeze through tight aisles. FIRST Robotics Competition (FRC) teams favour mecanum for tournament robots. The KUKA youBot used mecanum drives. Domino's pizza-delivery indoor robots in India trials used mecanum-style chassis.
+
+## Why It Matters for Robotics
+
+Mecanum drives unlock motion that differential or Ackermann robots cannot do — critical for tight indoor spaces. They are a standard topic in mobile-robotics curricula and a frequent choice for India's warehouse-automation startups.
+
+## Try It Yourself
+
+On YouTube, search "FRC mecanum demonstration" and watch a team robot strafe in place. Then in `/visualizer` open the mecanum kinematics demo and adjust vx, vy, ω sliders to see the four wheel speeds compute live.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "Mecanum wheels have rollers angled at:",
+    "options": [
+      "0°",
+      "45° around the wheel rim",
+      "90°",
+      "180°"
+    ],
+    "answer": 1,
+    "explain": "The classic mecanum design uses 45° rollers; specific arrangement is crucial for omnidirectional motion."
+  },
+  {
+    "q": "A 4-wheel mecanum robot can:",
+    "options": [
+      "Only go forward",
+      "Translate in any direction and rotate independently",
+      "Only rotate",
+      "Only climb stairs"
+    ],
+    "answer": 1,
+    "explain": "A correctly configured 4-wheel mecanum gives full 2D holonomic motion."
+  },
+  {
+    "q": "Mecanum drives are best suited to:",
+    "options": [
+      "Off-road racing",
+      "Tight indoor warehouse aisles",
+      "Climbing trees",
+      "Deep underwater"
+    ],
+    "answer": 1,
+    "explain": "Their ability to crab sideways makes them ideal for confined indoor spaces with little turning room."
+  }
+]
+```
+
+## Further Reading
+
+- [Holonomic Drive](/atlas/concept/holonomic-drive)
+- [Wheels Vs Tracks](/atlas/concept/wheels-vs-tracks)
+- [Differential Drive](/atlas/concept/differential-drive)
+- [Autonomous Mobile Robot](/atlas/concept/autonomous-mobile-robot)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Mecanum Wheel in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

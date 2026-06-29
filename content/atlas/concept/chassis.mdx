@@ -1,0 +1,76 @@
+---
+title: Chassis (robot)
+category: hardware
+summary: >-
+  A robot's chassis is its structural skeleton — the rigid frame that holds all
+  components in their correct positions and transmits forces between them
+  without bending, twisting, or breaking.
+seeAlso: []
+sources:
+  - title: ROS Discourse — Chassis design considerations for ground robots
+    url: 'https://discourse.ros.org/t/chassis-design-for-mobile-robots/23456'
+  - title: MIT OpenCourseWare — Introduction to mechanical design for robots
+    url: 'https://ocw.mit.edu/courses/2-12-introduction-to-robotics-fall-2005/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - hardware
+  - mechanical
+  - structural
+difficulty: 3
+oneLiner: 'The concept concept: A robot''s chassis is its structural skeleton —'
+laymanExplanation: >-
+  Before a robot can think, sense, or move, it needs to hold together. Drop a
+  battery, a computer, four motors, and twelve sensors into a pile and you have
+  a parts list, not a robot. Mount them onto a rigid frame that keeps each
+  component exactly where it belongs, and suddenly the whole system works as
+  one. That frame is the chassis.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without chassis (robot), many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A robot's chassis is its structural skeleton — the rigid frame that holds all
+  components in their correct positions and transmits forces between them
+  without bending, twisting, or breaking.
+slug: chassis
+bucket: concept
+---
+
+Before a [robot](/atlas/concept/robot) can think, sense, or move, it needs to hold together. Drop a battery, a computer, four motors, and twelve sensors into a pile and you have a parts list, not a robot. Mount them onto a rigid frame that keeps each component exactly where it belongs, and suddenly the whole system works as one. That frame is the chassis.
+
+A **chassis** is the structural backbone of a robot — the rigid assembly of plates, tubes, brackets, and fasteners that gives the machine its shape, supports every component, and carries loads between them. The word comes from French automotive engineering, where it described the frame onto which a car's body and drivetrain were bolted. The meaning in [robotics](/atlas/concept/robotics) is identical.
+
+## What a chassis must do
+
+A chassis is not just a mounting plate. It must be stiff enough to keep components in alignment (a [camera](/atlas/concept/camera-vision) that flexes relative to the wheels it is supposed to guide is useless), strong enough to survive the forces the robot generates or encounters (a jumping robot lands hard; a manipulator arm pushes back against whatever it grabs), and light enough not to become the biggest drain on the battery. Those three requirements — stiffness, strength, and low mass — are almost always in tension with each other.
+
+## Materials
+
+**Aluminium alloy** (6061 or 7075 series) dominates hobby and small commercial robots. It is light, easy to machine or laser-cut, and strong enough for most tasks. **Carbon-fibre composite** is stiffer and lighter still, preferred for drones and high-performance legged robots where every gram costs battery life. **Steel** is heavier but cheaper and better at absorbing impacts — common in combat robotics. **3D-printed plastics** (PLA, PETG, ABS) are ideal for prototyping and low-load applications: fast to produce, cheap to iterate, but more flexible and less heat-tolerant than metal.
+
+## Chassis types in ground robots
+
+A differential-drive robot (two driven wheels, one passive castor) often uses a flat platform chassis — simple, low, easy to build. A legged robot needs a central body chassis that houses the compute and power while attaching to multiple leg mechanisms. An arm robot's chassis is typically a base plate that must absorb the torque reaction when the arm pushes against an object.
+
+## Why it matters
+
+A poorly designed chassis makes everything else harder: motors that vibrate loose, sensors that drift out of calibration, wiring that chafes against a sharp edge. Good chassis design is invisible — the robot simply works, holds together, and does not surprise the engineer with structural failures mid-demonstration.
+
+---
+
+*The word "chassis" entered engineering English from the French word for a window frame — a reminder that even the most utilitarian structural concept has a surprisingly elegant origin.*

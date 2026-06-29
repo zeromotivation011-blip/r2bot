@@ -1,0 +1,78 @@
+---
+title: Stepper motor
+category: actuators
+summary: >-
+  A stepper motor moves in precise, discrete jumps rather than continuous
+  rotation, letting a robot know exactly where it is without needing a position
+  sensor.
+seeAlso: []
+sources:
+  - title: Wikipedia — Stepper motor
+    url: 'https://en.wikipedia.org/wiki/Stepper_motor'
+  - title: MIT OpenCourseWare — Actuators and Stepper Motors
+    url: >-
+      https://ocw.mit.edu/courses/6-01sc-introduction-to-electrical-engineering-and-computer-science-i-spring-2011/
+  - title: Trinamic / Analog Devices — Stepper Motor Basics
+    url: >-
+      https://www.analog.com/en/resources/technical-articles/stepper-motor-fundamentals.html
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - actuators
+  - motors
+  - precision
+difficulty: 3
+oneLiner: 'The concept concept: A stepper motor moves in precise, discrete jumps'
+laymanExplanation: >-
+  Think of a clock with a sweeping second hand versus one that ticks in crisp,
+  audible jumps. A regular DC motor is the sweeping kind — smooth but hard to
+  position exactly. A stepper motor is the ticking kind. Every electrical pulse
+  moves it by a fixed, predictable angle, and it stops there, holding its
+  position against gentle resistance.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without stepper motor, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A stepper motor moves in precise, discrete jumps rather than continuous
+  rotation, letting a robot know exactly where it is without needing a position
+  sensor.
+slug: stepper-motor
+bucket: concept
+---
+
+Think of a clock with a sweeping second hand versus one that ticks in crisp, audible jumps. A regular [DC motor](/atlas/concept/dc-motor) is the sweeping kind — smooth but hard to position exactly. A stepper motor is the ticking kind. Every electrical pulse moves it by a fixed, predictable angle, and it stops there, holding its position against gentle resistance.
+
+That ticking behaviour is the whole point. A **stepper motor** divides a full rotation into a fixed number of discrete steps — typically 200 steps per revolution, or 1.8° per step — by using a rotor with many small teeth and a set of coils that pull those teeth into alignment one group at a time. The controller pulses the coils in a precise sequence, and each pulse advances the rotor by exactly one step.
+
+## How it works
+
+The rotor of a stepper motor is made of a magnetically soft material machined into small teeth, or of permanent magnets arranged in a toothed pattern. Surrounding it are several electromagnet coils arranged in groups called **phases**. When a controller energises phase A, the nearest rotor teeth align with phase A's poles and lock there. Energise phase B next, and the closest teeth snap to phase B — advancing the shaft by one step. March through all the phases in sequence, and the motor turns continuously at whatever rate the pulses arrive.
+
+Because the controller always knows how many pulses it has sent, it always knows the shaft angle — no separate position sensor needed. This is called **open-loop position control**, and it is what makes stepper motors so popular: the control is in the software, not in expensive sensors.
+
+The trade-off is torque at speed. Stepper motors have excellent holding torque (the force needed to push them off a position) but lose torque rapidly as step rate increases. Push them too fast and they stall, losing track of position entirely — a condition called **losing steps**, which is catastrophic if precise position is required.
+
+## Real-world example
+
+The 3D printer on a school workbench almost certainly uses stepper motors. The Prusa i3 MK4, one of the most widely used desktop printers in the world, uses four NEMA 17 stepper motors — two for the Y-axis bed, one for the X-axis print head, and one for the extruder. Each layer of a print is a precise sequence of hundreds of thousands of pulses. The printer needs no encoders because it trusts the steps.
+
+## Why it matters
+
+Stepper motors brought precision positioning into low-cost hardware. CNC machines, laser cutters, plotters, [camera](/atlas/concept/camera-vision) sliders, telescope mounts, and automated lab equipment all rely on steppers to move to a known position repeatably. They are the reason consumer 3D printing is affordable — a servo-based equivalent system would cost ten times as much. When a [robot](/atlas/concept/robot) task needs exact, repeatable positioning without demanding high speed, the stepper motor is almost always the first choice.
+
+---
+
+*The same open-loop logic that makes a stepper easy to control is also its weakness — research teams are now adding tiny encoders directly to stepper shafts to catch lost steps before they ruin a delicate operation.*

@@ -1,0 +1,73 @@
+---
+title: Microcontroller
+hindi_name: माइक्रोकंट्रोलर (सूक्ष्म-नियंत्रक)
+category: hardware
+summary: >-
+  A microcontroller is a tiny self-contained computer — processor, memory, and
+  input/output pins all on a single chip — designed to run one specific
+  programme and control physical hardware in real time.
+seeAlso: []
+sources:
+  - title: Arduino — What is a microcontroller?
+    url: 'https://www.arduino.cc/en/Guide/Introduction'
+  - title: Microchip Technology — Microcontroller basics
+    url: >-
+      https://www.microchip.com/en-us/education/technical-learning-center/microcontroller-basics
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - hardware
+  - electronics
+  - embedded-systems
+difficulty: 3
+oneLiner: 'The concept concept: A microcontroller is a tiny self-contained computer —'
+laymanExplanation: >-
+  Imagine a vending machine. It doesn't browse the internet, run spreadsheets,
+  or play video games. It does exactly one job: accept coins, check your
+  selection, check its stock, and dispense a snack. Whatever runs the logic
+  inside that machine is almost certainly a microcontroller.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without microcontroller, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A microcontroller is a tiny self-contained computer — processor, memory, and
+  input/output pins all on a single chip — designed to run one specific
+  programme and control physical hardware in real time.
+slug: microcontroller
+bucket: concept
+---
+
+Imagine a vending machine. It doesn't browse the internet, run spreadsheets, or play video games. It does exactly one job: accept coins, check your selection, check its stock, and dispense a snack. Whatever runs the logic inside that machine is almost certainly a microcontroller.
+
+A **microcontroller** (often abbreviated MCU) is a single-chip computer designed to do one job, reliably, forever, on almost no power. Unlike the processor in your laptop — which hands off all memory, storage, and connectivity to separate chips — a microcontroller bundles everything onto a single piece of silicon: a CPU core (the "brain"), a small amount of flash memory (to hold the programme), a small amount of RAM (for working data), and a set of **GPIO pins** (General Purpose Input/Output — the physical legs of the chip that can read sensors or switch things on and off).
+
+## What makes it different from a "real" computer
+
+A microcontroller typically runs at 8 to 400 MHz, has kilobytes to a few megabytes of memory, and draws milliwatts of power. A Raspberry Pi (a [single-board computer](/atlas/concept/single-board-computer)) runs at 1.8 GHz, needs gigabytes of RAM, and draws 2–5 watts. The microcontroller wins on cost (as cheap as ₹30 per chip), power consumption, and simplicity — it boots in microseconds and never crashes into a desktop.
+
+## In [robotics](/atlas/concept/robotics)
+
+The Arduino Uno, built around Atmel's ATmega328P chip, has probably introduced more beginners to robotics than any other device. Its 14 digital pins can read a bump sensor, drive a servo, blink an LED, and send data to a laptop — all at the same time — with a programme you can write in an afternoon. Higher-end robots use ARM Cortex-M microcontrollers (STM32 family, ESP32, or Texas Instruments C2000) that can close a motor control loop thousands of times per second — fast enough to feel instant to the human holding the [robot](/atlas/concept/robot)'s arm.
+
+## Why it matters
+
+Almost every piece of electronics you own has at least one microcontroller hidden inside it: your keyboard, your USB charger, your washing machine's drum control. In a robot, microcontrollers sit at the lowest layer of the software stack — closest to the metal — handling time-critical tasks that a Linux computer would be too slow and too unpredictable to do well.
+
+---
+
+*The ATmega328P inside an Arduino Uno is essentially the same microcontroller architecture Intel used in its 8051 chip in 1980 — one of the most influential hardware designs ever made.*

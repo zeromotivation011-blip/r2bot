@@ -1,0 +1,95 @@
+---
+title: Gyroscope in Robotics — Complete Guide
+summary: >-
+  A gyroscope measures angular velocity around an axis. In robotics, gyroscopes
+  enable balance, orientation, and motion estimation — central to drones,
+  humanoids, and self-driving cars.
+category: sensors
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - imu
+  - orientation
+  - balance
+  - sensor-fusion
+seeAlso:
+  - imu
+  - accelerometer
+  - sensor-fusion
+  - humanoid-robot
+difficulty: 3
+oneLiner: 'The concept concept: A gyroscope measures angular velocity around an axis.'
+laymanExplanation: >-
+  A gyroscope is a sensor that measures how fast an object is rotating around an
+  axis — its angular velocity. In modern robotics it's a MEMS
+  (micro-electro-mechanical systems) chip a few millimetres square, but the
+  principle goes back to spinning mechanical tops used for navigation on early
+  ships and aircraft.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without gyroscope in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis:
+  - Every drone
+  - Self-balancing robots
+  - Mars rovers
+indianExample: >-
+  ISRO's Chandrayaan-3 lander used MEMS gyroscopes throughout its descent to
+  know its orientation in real time.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What does a gyroscope primarily measure?
+  options:
+    - Linear acceleration
+    - Angular velocity (rotation rate)
+    - Distance
+    - Voltage
+  answer: 1
+  explanation: >-
+    A gyroscope outputs angular velocity in degrees-per-second around each axis.
+    Integrate it to get orientation.
+mindBlowingFact: >-
+  A MEMS gyroscope chip in your phone is 1 mm across — and accurate enough to
+  land a spacecraft on the Moon.
+industryApplications:
+  - aerospace
+  - consumer electronics
+  - automotive
+  - robotics
+  - navigation
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A gyroscope measures angular velocity around an axis. In robotics, gyroscopes
+  enable balance, orientation, and motion estimation — central to drones,
+  humanoids, and self-driving cars.
+slug: gyroscope
+bucket: concept
+---
+
+# Gyroscope in Robotics
+
+## What is it?
+
+A gyroscope is a sensor that measures how fast an object is rotating around an axis — its angular velocity. In modern robotics it's a MEMS (micro-electro-mechanical systems) chip a few millimetres square, but the principle goes back to spinning mechanical tops used for navigation on early ships and aircraft.
+
+## How it works
+
+MEMS gyroscopes use a vibrating proof mass. When the device rotates, the Coriolis effect pushes the mass sideways. Tiny capacitive electrodes detect this deflection and convert it to a voltage proportional to rotation rate. The chip outputs degrees-per-second (or radians-per-second) across three axes — roll, pitch, and yaw. Robotics computers integrate the angular velocity over time to estimate orientation, though raw integration drifts, so gyros are nearly always fused with an accelerometer and sometimes a magnetometer.
+
+## Real-world example
+
+Your smartphone uses a gyroscope to detect when you tilt the screen. A DJI quadcopter uses three gyros to stabilise its flight; if one fails mid-air, the drone tumbles. Boston Dynamics Atlas uses high-end gyros at over 1 kHz to remain balanced during parkour.
+
+## Why it matters for robotics
+
+Without gyros, robots cannot know which way is up. Every walking robot, every drone, every autonomous car relies on gyros for moment-to-moment orientation. For a robotics learner in India, understanding gyroscopes opens the door to building self-balancing robots, drone autopilots, and IMU sensor fusion — all extremely common interview topics.
+
+## See also
+
+- [Imu](/atlas/concept/imu)
+- [Accelerometer](/atlas/concept/accelerometer)
+- [Sensor Fusion](/atlas/concept/sensor-fusion)
+- [Humanoid Robot](/atlas/concept/humanoid-robot)

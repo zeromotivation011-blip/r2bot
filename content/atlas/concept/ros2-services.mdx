@@ -1,0 +1,74 @@
+---
+title: ROS2 Services — Complete Guide for Robotics
+summary: >-
+  ROS2 services are synchronous request/response calls between nodes — used for
+  short, infrequent commands like calibration or mode changes.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - ros2
+  - service
+  - rpc
+seeAlso:
+  - ros2
+  - ros2-nodes
+  - ros2-topics
+  - ros2-actions
+difficulty: 3
+oneLiner: >-
+  The concept concept: ROS2 services are synchronous request/response calls
+  between nodes
+laymanExplanation: >-
+  A ROS2 service is a synchronous remote procedure call between nodes. A client
+  sends a request with typed data; the server processes it and returns a
+  response. Unlike topics, services are 1-to-1 and wait for an answer.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros2 services — complete guide for robotics, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  ROS2 services are synchronous request/response calls between nodes — used for
+  short, infrequent commands like calibration or mode changes.
+slug: ros2-services
+bucket: concept
+---
+
+# ROS2 Services
+
+## What is it?
+
+A ROS2 service is a synchronous remote procedure call between nodes. A client sends a request with typed data; the server processes it and returns a response. Unlike topics, services are 1-to-1 and wait for an answer.
+
+## How it works
+
+Each service has a name and a service type (defining request/response fields). The server node advertises the service; clients call it. The call blocks (or awaits, in async clients) until a response is received or the timeout fires. Internally, services also run on DDS but use a request/response pattern.
+
+## Real-world example
+
+A robot might expose `/save_map` as a service so an operator can save the current SLAM map. `/set_parameters` is a built-in service every ROS2 node provides. Calibration, mode switches, and teleop arming commonly use services.
+
+## Why it matters for robotics
+
+Services are perfect for short, infrequent commands where you need a yes/no answer. Misusing topics for what should be a service is a common ROS2 anti-pattern.
+
+## See also
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Nodes](/atlas/concept/ros2-nodes)
+- [Ros2 Topics](/atlas/concept/ros2-topics)
+- [Ros2 Actions](/atlas/concept/ros2-actions)

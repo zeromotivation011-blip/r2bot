@@ -1,0 +1,290 @@
+{
+  "root": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "explanation",
+      "title": "Meet the obstacle avoider",
+      "body": "You're building a robot that drives around a room on its own — and doesn't crash into anything.\n\nSounds simple. But this exact problem — detect obstacle, decide how to avoid, execute — is the same loop your **Roomba** runs hundreds of times per second. It's how parking sensors on every modern car work. It's how a Mars rover decides whether to drive forward or take a safer path.\n\nYour version uses an **HC-SR04 ultrasonic sensor** (the two-eyed 'face' on the front), an **Arduino Uno** as the brain, an **L298N motor driver**, and two DC motors.\n\nThe robot drives forward continuously. The moment it detects something closer than **20 cm**, it stops, reverses a little, turns, and tries a new direction.\n\nEvery concept — from how ultrasonic physics works to how you write the distance formula in code — you'll reason out yourself first. The quiz always comes before the answer. That's how real engineers learn.\n\nLet's go.",
+      "branches": [{ "on": "next", "to": "q-sound-travel" }],
+      "xp": 10
+    },
+    "q-sound-travel": {
+      "id": "q-sound-travel",
+      "type": "question",
+      "title": "How does the sensor actually 'see'?",
+      "body": "The HC-SR04 doesn't use light or radio. Look at it closely: two cylinders side by side — one that **transmits** a pulse, one that **receives** the echo.\n\nUnlike a camera (light) or a wifi module (radio waves), this sensor works on a completely different physical principle. Which one?",
+      "hint": "Think about how a bat navigates in the dark. What sense does it rely on?",
+      "hint2": "Bats use **echolocation** — they emit sound pulses and listen for the echo to bounce back from walls and prey. The HC-SR04 does exactly the same thing.",
+      "question": {
+        "style": "mcq",
+        "prompt": "How does an HC-SR04 ultrasonic sensor detect distance?",
+        "options": [
+          "It bounces a beam of light off objects (like a laser rangefinder)",
+          "It emits a burst of sound and measures the time for the echo to return",
+          "It detects changes in the local magnetic field",
+          "It sends out a radio wave and listens for a reflected signal"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly — **sound echo**. The transmitter cylinder fires a 40 kHz ultrasonic pulse (above the range of human hearing). That pulse travels through the air, hits an object, and bounces back. The receiver cylinder detects the returning echo, and the sensor reports how long the round trip took.",
+        "explanation_wrong": "The correct principle is **sound echo**. The HC-SR04 fires a 40 kHz ultrasonic pulse (way above human hearing range) and times how long the echo takes to return. The time tells you the distance. Bats have been doing this for 50 million years — we just borrowed the idea."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-speed-of-sound" },
+        { "on": "wrong", "to": "q-speed-of-sound" }
+      ],
+      "xp": 20
+    },
+    "q-speed-of-sound": {
+      "id": "q-speed-of-sound",
+      "type": "question",
+      "title": "How fast does sound travel?",
+      "body": "To convert the echo **time** into a **distance**, you need to know how fast sound travels through air.\n\nYou've probably heard this number before — perhaps when someone told you to count seconds between lightning and thunder to guess how far away a storm is.\n\nWhat is the approximate speed of sound in air at room temperature (in metres per second)?",
+      "hint": "It's a three-digit number. Much slower than light (300,000,000 m/s) but fast enough to bounce off a wall and return in milliseconds.",
+      "hint2": "Speed of sound in air at ~20°C is approximately **343 m/s**. Anything from 330 to 350 m/s is considered a valid answer in engineering practice.",
+      "question": {
+        "style": "number-input",
+        "prompt": "Approximate speed of sound in air (m/s):",
+        "correct": 343,
+        "explanation_correct": "**343 m/s** — that's the textbook value at 20°C. In practice, 330–350 m/s is fine for robot calculations; temperature changes it slightly (higher temp = faster sound). For our 20 cm obstacle detection range, the round-trip time is only about 1.2 milliseconds — fast enough that our Arduino loop can react long before a crash.",
+        "explanation_wrong": "The speed of sound in air is approximately **343 m/s** at room temperature (the range 330–350 m/s is engineering-accurate). For comparison, light travels at 300,000,000 m/s — a million times faster. That's why you see lightning before you hear thunder."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-distance-formula" },
+        { "on": "wrong", "to": "q-distance-formula" }
+      ],
+      "xp": 30
+    },
+    "q-distance-formula": {
+      "id": "q-distance-formula",
+      "type": "question",
+      "title": "Calculate the distance",
+      "body": "Let's put the numbers together. Suppose your HC-SR04 fires a pulse and the echo returns **2 milliseconds** later. Sound travels at approximately **340 m/s**.\n\nThe pulse had to travel **to the wall AND back**, so the round-trip was 2 ms. Which of these gives the correct one-way distance to the obstacle?",
+      "hint": "Distance = speed × time. But the sound travelled *to* the obstacle and *back*, so the actual one-way distance is half the total travel.",
+      "hint2": "Total path = 340 m/s × 0.002 s = 0.68 m. That's the *round trip*. Divide by 2 for the actual distance: 0.34 m = 34 cm.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Sound round-trip time = 2 ms, speed ≈ 340 m/s. Distance to obstacle = ?",
+        "options": [
+          "340 m (way too big — forgot to convert ms to s)",
+          "0.34 m (forgot to halve the round trip)",
+          "34 cm (correct: 340 × 0.001 = 0.34 m ÷ 1 = 0.34 m, then × 100 = 34 cm)",
+          "68 cm (forgot to divide by 2)"
+        ],
+        "correct": 2,
+        "explanation_correct": "**34 cm** is right. Path = 340 m/s × 0.002 s = 0.68 m. That's round-trip. Divide by 2 = 0.34 m = 34 cm. The ÷ 2 is the key step everyone forgets the first time.",
+        "explanation_wrong": "Answer: **34 cm**. Here's the full working: 340 m/s × 0.002 s = 0.68 m total path. But sound went *there and back*, so divide by 2 = 0.34 m = 34 cm. Option D (68 cm) is the mistake of forgetting to halve. Option A forgot to convert milliseconds to seconds."
+      },
+      "branches": [
+        { "on": "correct", "to": "explain-formula" },
+        { "on": "wrong", "to": "explain-formula" }
+      ],
+      "xp": 40
+    },
+    "explain-formula": {
+      "id": "explain-formula",
+      "type": "explanation",
+      "title": "The formula you'll use in code",
+      "body": "Here's the formula, written exactly as it appears in every HC-SR04 tutorial on Earth:\n\n```\ndistance_cm = (duration_us * 0.034) / 2\n```\n\nLet's decode each part:\n\n- **`duration_us`** — the echo time in **microseconds** (µs). Arduino's `pulseIn()` function returns microseconds.\n- **`0.034`** — this is 340 m/s converted to **cm/µs**. (340 m/s = 0.034 cm/µs. Check: 340 × 100 cm/m ÷ 1,000,000 µs/s = 0.034 ✓)\n- **`/ 2`** — because the sound travels **both ways**: from sensor to wall, then wall back to sensor. We only want the one-way distance.\n\nThat **÷ 2** is the single most common mistake beginners make. Write it on a sticky note if you have to.\n\nThe formula in sensor terms: `distance = (duration × speed) / 2`. Everything else is just unit conversion.",
+      "branches": [{ "on": "next", "to": "q-trigger-pin" }],
+      "xp": 20
+    },
+    "q-trigger-pin": {
+      "id": "q-trigger-pin",
+      "type": "question",
+      "title": "Firing the sensor: the TRIG pin",
+      "body": "The HC-SR04 has four pins: `VCC`, `GND`, `TRIG`, and `ECHO`.\n\nTo **fire** one ultrasonic pulse, you need to send a specific signal on the `TRIG` pin. Think of it like cocking a gun — you pull it HIGH for a brief moment to send the burst.\n\nThe datasheet specifies exactly how long the HIGH pulse on TRIG should be.",
+      "hint": "It's a very short pulse — measured in **microseconds**, not milliseconds. The magic number is 10 µs.",
+      "hint2": "The HC-SR04 datasheet says: drive TRIG HIGH for **at least 10 microseconds**, then pull it LOW again. The module does the rest.",
+      "question": {
+        "style": "boolean",
+        "prompt": "True or false: the HC-SR04 requires a 10-microsecond HIGH pulse on the TRIG pin to trigger a distance measurement.",
+        "correct": "yes",
+        "explanation_correct": "True. You pull TRIG HIGH for 10 µs (using `delayMicroseconds(10)` in Arduino), then LOW again. The module fires 8 cycles of 40 kHz ultrasound automatically. You don't have to time those cycles yourself — you just give it the 10 µs trigger.",
+        "explanation_wrong": "This is **TRUE**. In Arduino code it looks like:\n```\ndigitalWrite(TRIG_PIN, HIGH);\ndelayMicroseconds(10);\ndigitalWrite(TRIG_PIN, LOW);\n```\nThat 10 µs pulse tells the module to fire 8 ultrasonic pulses. Then you switch to listening on ECHO."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-echo-pin" },
+        { "on": "wrong", "to": "q-echo-pin" }
+      ],
+      "xp": 30
+    },
+    "q-echo-pin": {
+      "id": "q-echo-pin",
+      "type": "question",
+      "title": "Receiving the echo: the ECHO pin",
+      "body": "After you fire the TRIG pulse, the module sends the ultrasound burst. Now the ECHO pin does something useful.\n\nThe ECHO pin is normally LOW. When the module fires the burst, it goes **HIGH**. When the echo returns and is detected, it goes **LOW** again.\n\nSo the ECHO pin is HIGH for exactly as long as the sound is in the air (round trip). Is that statement correct?",
+      "hint": "The pulse width (HIGH duration) of ECHO directly encodes the travel time. `pulseIn(ECHO_PIN, HIGH)` measures this width for you.",
+      "hint2": "Yes — the ECHO pin's HIGH duration equals the sound's round-trip travel time. `pulseIn()` measures that duration in microseconds, which you then plug into the distance formula.",
+      "question": {
+        "style": "boolean",
+        "prompt": "True or false: the ECHO pin goes HIGH for exactly the duration that the ultrasonic pulse is in the air (round-trip travel time).",
+        "correct": "yes",
+        "explanation_correct": "Correct. The ECHO pulse width IS the travel time. `pulseIn(ECHO_PIN, HIGH)` returns that duration in microseconds automatically. You never have to manually time it with `millis()` — `pulseIn()` does it for you.",
+        "explanation_wrong": "This is **TRUE**. ECHO goes HIGH when the burst fires and goes LOW the instant the echo is detected. That HIGH duration = round-trip travel time. `pulseIn(ECHO_PIN, HIGH)` measures it precisely in microseconds."
+      },
+      "branches": [
+        { "on": "correct", "to": "code-fill-distance" },
+        { "on": "wrong", "to": "code-fill-distance" }
+      ],
+      "xp": 30
+    },
+    "code-fill-distance": {
+      "id": "code-fill-distance",
+      "type": "question",
+      "title": "Code: read the echo duration",
+      "body": "Here's the line of Arduino code that reads the ECHO pulse duration and stores it in a variable called `duration`:\n\n```\nlong duration = pulseIn(___, HIGH);\n```\n\nThe `pulseIn()` function takes two arguments: the pin to listen on, and the state to measure (`HIGH` in our case). Fill in the first argument — the name of the constant you'd define for the echo pin.",
+      "hint": "You'd typically define `#define ECHO_PIN 7` at the top of your sketch. So the argument is just the constant name you defined for the echo pin.",
+      "hint2": "The blank should be filled with `ECHO_PIN` — the identifier for whichever Arduino pin you wired the ECHO line to. The exact pin number doesn't matter here; only the name of the constant.",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Fill in the blank:\n\n`long duration = pulseIn(___, HIGH);`",
+        "correct": "ECHO_PIN",
+        "explanation_correct": "`pulseIn(ECHO_PIN, HIGH)` — it listens on the ECHO pin, waits for it to go HIGH, then times how long it stays HIGH, returning that duration in microseconds. Typical return value for a 20 cm obstacle: about 1,176 µs.",
+        "explanation_wrong": "The answer is `ECHO_PIN`. Full line:\n```\nlong duration = pulseIn(ECHO_PIN, HIGH);\n```\n`pulseIn()` starts timing when the pin goes HIGH and stops when it goes LOW. The result is in microseconds. You'd typically have `#define ECHO_PIN 7` at the top of your sketch."
+      },
+      "branches": [
+        { "on": "correct", "to": "code-fill-cm" },
+        { "on": "wrong", "to": "code-fill-cm" }
+      ],
+      "xp": 50
+    },
+    "code-fill-cm": {
+      "id": "code-fill-cm",
+      "type": "question",
+      "title": "Code: calculate distance in cm",
+      "body": "Now you have `duration` in microseconds. Apply the formula we derived earlier to get the distance in centimetres.\n\nRecall: `distance_cm = (duration × 0.034) / ___`\n\nWhat goes in the blank? This is the key number that accounts for the fact that sound travels *to* the obstacle and *back*.",
+      "hint": "Sound travels out AND comes back. So the total path is twice the actual distance. You need to divide by that factor.",
+      "hint2": "The answer is `2`. You divide by 2 because the measured time is the **round-trip** time — the sound went out AND came back.",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Fill in the blank:\n\n`float distance = (duration * 0.034) / ___;`",
+        "correct": "2",
+        "explanation_correct": "Dividing by **2** converts round-trip distance to one-way distance. For duration = 1,176 µs: (1176 × 0.034) / 2 = 39.984 / 2 ≈ 20 cm. Exactly our threshold! The formula works.",
+        "explanation_wrong": "The blank is **2**. Complete line:\n```\nfloat distance = (duration * 0.034) / 2;\n```\nWithout ÷ 2, every reading would be double the real distance. For a 20 cm obstacle you'd get 40 cm — and your robot would turn too late. This single `/2` is the most important thing to remember about this sensor."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-threshold" },
+        { "on": "wrong", "to": "q-threshold" }
+      ],
+      "xp": 60
+    },
+    "q-threshold": {
+      "id": "q-threshold",
+      "type": "question",
+      "title": "Choosing the obstacle threshold",
+      "body": "Your robot is moving forward at a reasonable speed. The sensor measures distance 10 times per second. An obstacle appears in front.\n\nYou need to set a **threshold distance** — the moment the reading drops below this number, the robot should stop and turn.\n\nToo small (e.g. 5 cm) = robot bumps into things before it has time to react. Too large (e.g. 60 cm) = robot turns away from things that are still far away and navigates poorly in tight spaces.\n\nFor a small tabletop robot moving at ~20 cm/s, what's a good threshold (in cm)?",
+      "hint": "At 20 cm/s, the robot travels 2 cm in 100 ms. The sensor updates 10× per second. So at the worst case, 2 cm of travel happens per sensor reading. A threshold of 15–25 cm gives comfortable reaction time.",
+      "hint2": "**20 cm** is the classic answer for small indoor robots. It gives 1 second of stopping distance at 20 cm/s, which is more than enough for the motor driver to stop the wheels.",
+      "question": {
+        "style": "number-input",
+        "prompt": "What distance threshold (cm) should trigger the obstacle-avoidance routine for a small, slow indoor robot?",
+        "correct": 20,
+        "explanation_correct": "**20 cm** is a great default. At typical indoor robot speeds, 20 cm gives you comfortable reaction time. In practice, 15–25 cm all work — tune it based on your robot's speed. Faster robot = higher threshold. Slower robot = lower threshold. 20 cm also happens to be the HC-SR04's minimum reliable measurement range.",
+        "explanation_wrong": "**20 cm** is the standard answer for small indoor robots. Anything from 15–25 cm is defensible. Lower than 10 cm and you'll physically bump obstacles before stopping. Higher than 40 cm and the robot avoids empty space unnecessarily. Tune it once you test on real hardware."
+      },
+      "branches": [
+        { "on": "correct", "to": "simulation" },
+        { "on": "wrong", "to": "simulation" }
+      ],
+      "xp": 40
+    },
+    "simulation": {
+      "id": "simulation",
+      "type": "simulation",
+      "title": "Watch it avoid — live simulation",
+      "body": "Your obstacle avoider is now fully specified:\n\n- Sensor: HC-SR04, TRIG on D9, ECHO on D10\n- Formula: `distance = (duration * 0.034) / 2`\n- Threshold: **20 cm**\n- On obstacle: stop → reverse 300 ms → turn right ~90° → continue forward\n\nPress **Start** in the simulator. Notice:\n\n- The sensor beam (visualised as a cone) sweeps the area ahead.\n- When the cone hits a wall, the distance number drops.\n- At 20 cm the robot stops — there's a brief pause, then it reverses and turns.\n- Notice which direction it turns. Is it always the same?\n\nLet it bounce around the room a few times, then come back.",
+      "simulation_url": "/visualizer?mode=obstacle",
+      "branches": [{ "on": "next", "to": "q-turn-direction" }],
+      "xp": 60
+    },
+    "q-turn-direction": {
+      "id": "q-turn-direction",
+      "type": "question",
+      "title": "What should the robot do when it hits the threshold?",
+      "body": "Your robot is driving forward. Distance reading drops below 20 cm. **Obstacle ahead.**\n\nThere are a few possible responses:\n\n1. Slam the brakes and sit there\n2. Stop, reverse briefly, then turn\n3. Floor it and push through\n4. Play a warning sound and sit there\n\nWhich is actually the right first action sequence?",
+      "hint": "The robot needs to create space between itself and the obstacle before turning — otherwise it turns *into* the obstacle.",
+      "hint2": "You can't turn in place if you're already touching something (motors can stall). You need to **reverse first** to create clearance, *then* turn. Stop immediately would work if space allows, but reversing before turning is more reliable.",
+      "question": {
+        "style": "mcq",
+        "prompt": "When obstacle is detected within 20 cm, the best sequence is:",
+        "options": [
+          "Stop immediately and wait for the obstacle to move",
+          "Stop → reverse briefly → turn and resume forward",
+          "Speed up and push through the obstacle",
+          "Honk a buzzer and stop permanently"
+        ],
+        "correct": 1,
+        "explanation_correct": "**Stop → reverse → turn** is the correct sequence. Stopping creates no clearance. Reversing creates space. Then turning away gives you a clear path. In code this is three `delay()`-separated motor commands. Simple and robust.",
+        "explanation_wrong": "The answer is **stop → reverse → turn**. Stopping in place without reversing means you might try to turn while still touching the wall — motors stall, gears grind. Reversing 200–400 ms creates enough space to rotate freely. Then you turn and go forward again."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-random-or-fixed" },
+        { "on": "wrong", "to": "q-random-or-fixed" }
+      ],
+      "xp": 50
+    },
+    "q-random-or-fixed": {
+      "id": "q-random-or-fixed",
+      "type": "question",
+      "title": "Always turn the same way?",
+      "body": "Here's a classic beginner trap. You code your robot to **always turn right** when it hits an obstacle. It works great in the open room.\n\nThen you put it in a corner with walls on the right AND in front.\n\nThe robot hits the front wall, reverses, turns right — hits the right wall, reverses, turns right — now it's pointing at the front wall again. It loops forever in the corner.\n\nShould the robot always turn the same direction?",
+      "hint": "A robot that always turns the same direction can get trapped in corners or U-shaped spaces. Is there a better strategy?",
+      "hint2": "Randomising the turn direction (or alternating) prevents the corner-trap. You can use `random(2)` in Arduino to randomly pick left or right turn.",
+      "question": {
+        "style": "boolean",
+        "prompt": "Should the obstacle avoider always turn the same direction (e.g. always right) when avoiding obstacles?",
+        "correct": "no",
+        "explanation_correct": "**No** — always turning the same way creates corner traps. A simple fix: use `random(0,2)` to pick left or right randomly each time. Now the robot will eventually escape any corner just by probability. More advanced: look before you turn (servo-sweep the sensor) and turn toward the more open side.",
+        "explanation_wrong": "The answer is **no**. A fixed-turn robot gets stuck in corners — it loops back to the same wall forever. The fix is to randomise the turn direction using `random(0,2)`, or better yet, use a servo to sweep the sensor left and right and turn toward whichever direction has more open space."
+      },
+      "branches": [
+        { "on": "correct", "to": "checkpoint" },
+        { "on": "wrong", "to": "checkpoint" }
+      ],
+      "xp": 60
+    },
+    "checkpoint": {
+      "id": "checkpoint",
+      "type": "checkpoint",
+      "title": "Checkpoint — the full obstacle avoider",
+      "body": "You've assembled everything. Let's make sure it all fits together:\n\n**How the sensor works**\n- Fire: 10 µs HIGH pulse on TRIG\n- Listen: `pulseIn(ECHO_PIN, HIGH)` returns round-trip time in µs\n- Calculate: `distance = (duration × 0.034) / 2` → distance in cm\n\n**The decision**\n- `if (distance < 20)` → stop → reverse → turn random direction → continue\n- `else` → drive forward at full speed\n\n**Why ÷ 2**\n- Sound goes *out and back* — you only want the one-way trip to the obstacle\n\n**Why random turns**\n- Prevents corner-trapping that a fixed-direction robot would fall into\n\nThis is a complete autonomous robot loop. Every iteration of the `loop()` function: sense → decide → act. That's robotics.\n\nOne more concept to cover before you're done.",
+      "branches": [{ "on": "next", "to": "q-improve" }],
+      "xp": 100
+    },
+    "q-improve": {
+      "id": "q-improve",
+      "type": "question",
+      "title": "How would you make it smarter?",
+      "body": "Your robot currently has **one sensor** pointing forward. It works great for head-on obstacles — walls, chair legs, boxes.\n\nBut what happens if the robot has already turned and is approaching a corner at an angle? The front sensor clears the corner (it sees open space ahead) but the side of the robot clips the wall.\n\nWhat's the simplest hardware upgrade to handle this?",
+      "hint": "If you can't see the wall to the side, you'll hit it with your side. What would give you side-awareness?",
+      "hint2": "A second sensor, mounted pointing to the **side** (left or right), gives you side clearance detection. Now you can avoid walls you're approaching at an angle.",
+      "question": {
+        "style": "mcq",
+        "prompt": "To help the robot avoid clipping walls at an angle, the best hardware upgrade is:",
+        "options": [
+          "Add a second HC-SR04 sensor pointing to the side",
+          "Fit a louder buzzer so it beeps more dramatically",
+          "Switch to bigger wheels for better traction",
+          "Add more RAM to the Arduino for faster processing"
+        ],
+        "correct": 0,
+        "explanation_correct": "A **side-facing sensor** gives you the spatial awareness to detect walls you're approaching at an angle. Many professional obstacle-avoiders have three sensors: front, front-left, front-right. The robot sweeps its view and turns toward the direction with the most open space — almost like peripheral vision.",
+        "explanation_wrong": "The answer is a **second sensor on the side**. With a front sensor and a side sensor, you get a wider view. Three-sensor setups (front, front-left angled, front-right angled) are the industry standard for small indoor robots. They dramatically reduce corner-clips and can plan turns before the robot is committed to one direction."
+      },
+      "branches": [
+        { "on": "correct", "to": "complete" },
+        { "on": "wrong", "to": "complete" }
+      ],
+      "xp": 70
+    },
+    "complete": {
+      "id": "complete",
+      "type": "complete",
+      "title": "Obstacle Avoider — Built",
+      "body": "You've done it. You now understand the physics of ultrasonic ranging, the round-trip formula, the complete avoidance sequence, and why random turns beat fixed turns.\n\nYou know why your Roomba sometimes spins before backing away from a chair leg. You know why parking sensors on cars get louder as you get closer — they're measuring that same echo delay and beeping proportionally.\n\n**Total concepts unlocked:**\n- Ultrasonic echo physics (40 kHz burst → echo time → distance)\n- The formula: `distance = (duration × 0.034) / 2`\n- Reaction threshold design\n- Stop → reverse → random-turn avoidance loop\n- Why a single front sensor is just the beginning\n\n**XP collected this session:** all of it.\n\n**Suggested next robot:** The **Maze Solver** builds directly on this. Instead of random turns, it uses a wall-following algorithm to systematically explore a maze. Same HC-SR04, same loop structure — but now you plan instead of react.",
+      "branches": [],
+      "xp": 100
+    }
+  }
+}

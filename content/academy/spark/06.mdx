@@ -1,0 +1,84 @@
+---
+title: "What comes next — for robots, and for you"
+description: "Where robotics is actually heading, what skills matter if you want to work in it, and your next step from here."
+track: spark
+lesson: 6
+duration: "6 min read"
+xp: 150
+estimated_minutes: 6
+sources:
+  - name: "International Federation of Robotics — World Robotics Report 2023"
+    url: "https://ifr.org/worldrobotics/"
+  - name: "MIT Technology Review — The state of robotics"
+    url: "https://www.technologyreview.com/topic/robotics/"
+---
+
+In 1961, the first industrial robot — a machine called Unimate — started work on a General Motors assembly line in New Jersey. Its job: take hot metal parts off a die-casting machine and stack them in a pile. It did this 24 hours a day, without breaks, without complaint, for years. The workers called it "the old arm."
+
+That was the beginning. Here's where things stand now.
+
+## What's actually changed
+
+Three things have made modern robotics possible in a way 1961 couldn't have imagined:
+
+**Computing got cheap.** The processing power that required a room-sized computer in 1970 fits on a chip smaller than your thumbnail today, for a few pounds. Robots can now "think" in ways that were computationally impossible a generation ago.
+
+**Sensors got better and cheaper.** A LiDAR unit that cost $75,000 in 2007 costs under $500 today. Camera resolution doubled and doubled again. The data robots can collect about the world has become richer and faster than anyone anticipated.
+
+**Machine learning arrived.** For decades, robot perception was programmed by hand — engineers wrote rules for every situation. Then deep learning changed everything. Instead of writing rules, you show a neural network millions of examples and it learns the rules itself. This is why robots can now recognise arbitrary objects, understand spoken instructions, and navigate environments they've never seen before.
+
+## Where robots are already working
+
+Industrial robotics has been here for 60 years — robot arms welding cars, spray-painting, pick-and-place assembly. What's changed is scale and precision. Modern factories have robots performing tasks with sub-millimetre accuracy, 24 hours a day, for years without maintenance.
+
+**Logistics and warehousing** is the fastest-growing area. Amazon's fulfilment centres have hundreds of thousands of mobile robots moving shelves to human pickers. Automated guided vehicles navigate warehouses without fixed rails or markers, using computer vision and SLAM (Simultaneous Localisation And Mapping — you'll meet this properly in the Wire track).
+
+**Surgical robotics** is transforming operating theatres. The da Vinci system lets surgeons operate through tiny incisions with robotic arms that filter out hand tremor and scale movements down — a 1cm hand movement becomes a 1mm instrument movement. Over 10 million procedures have been performed worldwide.
+
+**Agriculture** is catching up. Robots that pick strawberries, prune vines, and monitor crop health autonomously are moving from research labs to commercial farms. The labour shortage in agriculture is one of the clearest economic pressures driving robotics adoption.
+
+## What's still hard
+
+Honest answer: a lot.
+
+**Manipulation** remains the hardest open problem. A two-year-old can pick up an object they've never seen before and figure out how to hold it. Robots still struggle with this. Grasping arbitrary objects in unstructured environments — without dropping them, without breaking them — is an active research area that has resisted solution for decades.
+
+**Working alongside humans** is genuinely complicated. A robot in a factory cage is safe because the cage keeps humans out. A robot working next to a human on an assembly line needs to predict human movement, respond to unexpected behaviour, and stop or redirect itself without causing harm. This is called **human-robot collaboration**, and it's where a lot of current research lives.
+
+**Unstructured environments** defeat robots that work perfectly in controlled settings. A warehouse robot that navigates perfectly in a clean, well-lit, predictably stocked warehouse might be completely lost in a cluttered garage. Generalising from controlled training environments to messy reality is an unsolved problem.
+
+## What skills matter if you want to work in robotics
+
+The honest answer is: it depends enormously on which part of robotics.
+
+A controls engineer and an AI researcher and an embedded systems programmer all work in robotics. Their day-to-day skills overlap very little. But across all of them, a few things show up consistently:
+
+**Programming.** Python for prototyping, data, and machine learning. C++ for embedded systems and performance-critical code. You don't need both immediately, but you'll need one.
+
+**Mathematics.** Linear algebra (how you represent positions, rotations, and transformations in 3D space), calculus (how controllers and learning algorithms work). Not at research level — but you need to be able to read and reason with equations.
+
+**Systems thinking.** Robotics is always a system of systems. The ability to think about how components interact, where failures propagate, and how to design for the unexpected — this is what separates engineers who can build things that work in the real world from those who can only build things that work in the lab.
+
+**Curiosity.** This one sounds soft but it's real. Robotics moves fast. The researcher who knows how to ask good questions and dig into primary sources will stay current. The one who stops learning after their degree won't.
+
+## Your next step
+
+You've finished Spark. You now understand what robots are, how they move, how they sense, how they think, why they fail, and where they're going.
+
+The Wire track goes deeper into the "how" — sensors and actuators in detail, basic control theory, and how software actually talks to hardware. It's where intuition becomes understanding.
+
+If you haven't taken the diagnostic yet, it's worth doing — it might confirm Wire is right for you, or point you somewhere different.
+
+Either way: you're no longer someone who doesn't understand robots. That's not nothing.
+
+---
+
+## Check your understanding
+
+**1.** Name one area where robots are already widely deployed, and one area where they're still mostly in research labs. What's the difference between those two areas?
+
+**2.** Why is manipulation (grasping arbitrary objects) so much harder than it appears?
+
+---
+
+*The biggest unsolved problem in robotics, according to most researchers, isn't computation or sensors — it's manipulation. Teaching a robot to pick up any object it has never seen before, the way a two-year-old can, has resisted decades of effort. What do you think makes this so hard? What would you need to solve it?*

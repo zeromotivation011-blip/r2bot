@@ -1,0 +1,81 @@
+---
+title: Joint degrees of freedom
+category: hardware
+summary: >-
+  A joint's degrees of freedom is the count of independent ways it can move —
+  one for a simple hinge, up to six for an unconstrained connection — and it
+  determines how much freedom that joint contributes to the robot's overall
+  motion.
+seeAlso: []
+sources:
+  - title: 'Craig, J.J. — Introduction to Robotics: Mechanics and Control (3rd ed.)'
+    url: >-
+      https://www.pearson.com/en-us/subject-catalog/p/introduction-to-robotics-mechanics-and-control/P200000003486
+  - title: 'Siciliano et al. — Robotics: Modelling, Planning and Control'
+    url: 'https://link.springer.com/book/10.1007/978-1-84628-642-1'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - hardware
+  - mechanical
+  - kinematics
+difficulty: 3
+oneLiner: 'The concept concept: A joint''s degrees of freedom is the count'
+laymanExplanation: >-
+  A door hinge moves in exactly one way: it rotates around one axis. You cannot
+  slide the door sideways along the hinge, or tilt it up and down, or twist it.
+  One motion, one variable needed to describe its position. Now think of your
+  hip joint — you can swing your leg forward, swing it sideways, and rotate it
+  along its length, all independently. Three motions,
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without joint degrees of freedom, many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A joint's degrees of freedom is the count of independent ways it can move —
+  one for a simple hinge, up to six for an unconstrained connection — and it
+  determines how much freedom that joint contributes to the robot's overall
+  motion.
+slug: degrees-of-freedom-joint
+bucket: concept
+---
+
+A door hinge moves in exactly one way: it rotates around one axis. You cannot slide the door sideways along the hinge, or tilt it up and down, or twist it. One motion, one variable needed to describe its position. Now think of your hip [joint](/atlas/concept/joint) — you can swing your leg forward, swing it sideways, and rotate it along its length, all independently. Three motions, three variables. That difference in the number of independent motions is what engineers mean when they talk about [degrees of freedom](/atlas/concept/degrees-of-freedom) at a joint.
+
+The **degrees of freedom** (DoF) of a joint is the number of independent parameters required to completely describe the relative position of the two links it connects. Each DoF corresponds to one possible type of motion — either a rotation around an axis or a translation along an axis. A rigid body in free space has six DoF (three translational, three rotational), so any joint can have between one and six.
+
+## The common joint types and their DoF
+
+**Revolute joint (1 DoF):** Rotates around a single fixed axis. Think door hinge, elbow, or knee. One angle fully describes its state. The most common joint in [robot](/atlas/concept/robot) arms.
+
+**Prismatic joint (1 DoF):** Slides along a single axis — no rotation. A drawer, a hydraulic cylinder, or the Z-axis of a 3D printer. One linear displacement fully describes its state.
+
+**Cylindrical joint (2 DoF):** Rotation and translation along the same axis, independently. Imagine a bolt that can both spin and slide in its hole. Two variables needed: angle and displacement.
+
+**Universal joint (2 DoF):** Rotation around two perpendicular axes — like the coupling between a car's driveshaft and axle. It allows the angle between two shafts to change in any direction but does not permit twisting along the shaft's own axis.
+
+**Spherical joint (3 DoF):** Rotation around three axes — like a ball-and-socket hip or shoulder. Three angles needed to describe it fully. Mechanically the most flexible single joint available.
+
+**Planar joint (3 DoF):** Two translations in a plane plus one rotation around the axis perpendicular to that plane. Rare in robot arms but relevant in parallel mechanisms and surface-contact models.
+
+## Why it matters per joint, not just per robot
+
+A robot arm's total DoF is the sum of its individual joint DoFs. But the *type* of DoF at each joint determines the arm's reachable workspace and its kinematic character. Two robot arms can both have 6 DoF overall and yet move very differently — one built from six revolute joints (like most industrial arms) reaches a complex curved workspace, while one built from three prismatic joints (a Cartesian gantry) reaches a simple rectangular box. Choosing joint type is one of the earliest and most consequential mechanical design decisions.
+
+---
+
+*A standard [industrial robot](/atlas/concept/industrial-robot) arm with six revolute joints has exactly enough degrees of freedom to place its end-effector at any position and orientation in its workspace — add a seventh joint and it gains the ability to "elbow around" obstacles the way a human arm can.*

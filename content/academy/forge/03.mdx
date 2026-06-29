@@ -1,0 +1,167 @@
+---
+title: "ML on Robots — Edge AI"
+description: "YOLOv8 on Jetson Nano/Xavier, TensorRT optimization, wrapping inference in a ROS2 node. Real-time perception that fits in 8 watts."
+track: forge
+lesson: 3
+duration: "60 min read"
+url_slug: f-03-edge-ai-robots
+hindi_name: "रोबोट पर ML"
+xp: 400
+estimated_minutes: 60
+atlas_links: [computer-vision, neural-network, edge-computing]
+sources:
+  - name: "NVIDIA Jetson developer kit"
+    url: "https://developer.nvidia.com/embedded-computing"
+  - name: "Ultralytics YOLOv8"
+    url: "https://docs.ultralytics.com/"
+  - name: "TensorRT documentation"
+    url: "https://docs.nvidia.com/deeplearning/tensorrt/"
+---
+
+## What you'll build
+
+A **ROS2 node that runs YOLOv8** on a live camera stream, detects objects, and publishes a `DetectedObject` array on a ROS topic. Optimised with TensorRT for ~30 FPS on a Jetson Orin Nano (8W power envelope). Production-grade edge perception in ~150 lines of Python.
+
+## Why edge AI, not cloud
+
+A robot can't wait 200ms to round-trip an image to AWS — by then the obstacle is already a crash. **Edge AI** = inference on-device. Three reasons it's now everywhere:
+
+1. **NVIDIA Jetson family** — Nano, Orin Nano, Xavier, AGX Orin. 8W to 60W envelopes, all run TensorRT.
+2. **Model distillation** — YOLOv8n is 6MB, runs 30+ FPS on Jetson, gets 37% mAP on COCO.
+3. **TensorRT** — NVIDIA's inference compiler. 2–10× speedup from FP32 → FP16 / INT8.
+
+In India, **Niqo Robotics** runs YOLOv8 on Jetson Xavier for spot-spray weeding (only spray actual weeds, save 80% pesticide). **CynLr** does vision-guided picking on Jetson Orin. **Ati Motors** uses Jetson for warehouse-aisle obstacle detection.
+
+## YOLOv8 in 5 lines (laptop, then port)
+
+Prototype on your laptop first:
+
+```python
+from ultralytics import YOLO
+model = YOLO('yolov8n.pt')        # 6MB, fast
+results = model('image.jpg')
+for r in results:
+    print(r.boxes.xyxy, r.boxes.cls, r.boxes.conf)
+```
+
+Once it works, the ROS2 node:
+
+```python
+import rclpy
+import numpy as np
+from rclpy.node import Node
+from sensor_msgs.msg import Image
+from vision_msgs.msg import Detection2DArray, Detection2D, ObjectHypothesisWithPose
+from cv_bridge import CvBridge
+from ultralytics import YOLO
+
+class YOLODetector(Node):
+    def __init__(self):
+        super().__init__('yolo_detector')
+        self.declare_parameter('model_path', 'yolov8n.engine')
+        self.declare_parameter('confidence', 0.4)
+        model_path = self.get_parameter('model_path').value
+        self.conf_threshold = self.get_parameter('confidence').value
+
+        self.bridge = CvBridge()
+        self.model = YOLO(model_path)  # .engine = pre-compiled TensorRT
+        self.get_logger().info(f'YOLO loaded: {model_path}')
+
+        self.sub = self.create_subscription(Image, '/camera/image_raw', self.on_image, 10)
+        self.pub = self.create_publisher(Detection2DArray, '/detections', 10)
+
+    def on_image(self, msg: Image):
+        frame = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
+        results = self.model(frame, conf=self.conf_threshold, verbose=False)
+
+        det_array = Detection2DArray()
+        det_array.header = msg.header
+
+        for r in results:
+            for box, cls, conf in zip(r.boxes.xyxy, r.boxes.cls, r.boxes.conf):
+                x1, y1, x2, y2 = [float(v) for v in box]
+                d = Detection2D()
+                d.bbox.center.position.x = (x1 + x2) / 2
+                d.bbox.center.position.y = (y1 + y2) / 2
+                d.bbox.size_x = x2 - x1
+                d.bbox.size_y = y2 - y1
+                hyp = ObjectHypothesisWithPose()
+                hyp.hypothesis.class_id = self.model.names[int(cls)]
+                hyp.hypothesis.score = float(conf)
+                d.results.append(hyp)
+                det_array.detections.append(d)
+
+        self.pub.publish(det_array)
+
+def main():
+    rclpy.init()
+    rclpy.spin(YOLODetector())
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+## TensorRT optimization
+
+Convert `yolov8n.pt` → `yolov8n.engine` on the Jetson (do it on the deploy device — TensorRT engines are device-specific):
+
+```bash
+# On the Jetson:
+yolo export model=yolov8n.pt format=engine half=True device=0
+```
+
+`half=True` uses FP16 — typically 2× speedup with negligible accuracy loss. INT8 is faster still but needs a calibration dataset.
+
+Benchmarks on Jetson Orin Nano (8W) at 640×640:
+- yolov8n.pt FP32 — 8 FPS
+- yolov8n.engine FP16 — 28 FPS
+- yolov8n.engine INT8 — 42 FPS
+
+## Where you train the model
+
+For production you almost always fine-tune YOLOv8 on your own data:
+
+```python
+from ultralytics import YOLO
+model = YOLO('yolov8n.pt')
+model.train(
+    data='warehouse_pallets.yaml',  # YOLO dataset format
+    epochs=50,
+    imgsz=640,
+    batch=16,
+    device=0,
+)
+```
+
+Indian startups typically:
+- Collect 2-5k labelled images of their specific objects (CVAT for labelling)
+- Train on a workstation with an RTX 3090/4090 — ~3-6 hours
+- Export to TensorRT engine on the target Jetson
+- Deploy
+
+## ROS2 node performance tips
+
+1. **Don't copy frames.** Use `passthrough` encoding when possible.
+2. **Match camera framerate to inference rate.** No point running camera at 60 FPS if inference is 30 FPS.
+3. **Use a single executor and `MultiThreadedExecutor` only if needed** — most CV nodes are GIL-bound on the Python inference call.
+4. **Publish at native rate** of detection — downstream nodes use `qos_profile_sensor_data` and only care about the latest.
+
+## Test Your Understanding
+
+**1.** Your YOLOv8 node hits 28 FPS on a test image but only 8 FPS on the live camera. Walk through three possible causes, in order of how cheaply you can test each.
+
+**2.** Your detector misses small objects in the corners of the frame even though they're clearly visible. Without retraining the model, what *two changes* might fix it?
+
+**3.** A team-mate proposes running YOLO at 30 FPS on a 10 FPS camera "for better tracking." Are they right or wrong, and why?
+
+## India Opportunity
+
+- **ML Engineer (Robotics) · Niqo Robotics, Bangalore** — Jetson + YOLO + ROS2 for weed detection, ₹18–32 LPA.
+- **Edge AI Engineer · CynLr, Bangalore** — vision-guided picking on Orin, ₹22–40 LPA.
+- **Computer Vision Engineer · Detect Technologies, Chennai** — industrial visual inspection on edge, ₹16–30 LPA.
+- **Perception Lead · TCS Innovation Labs (Robotics), Pune** — multi-sensor + ML for AVs, ₹28–48 LPA.
+
+## Next Step
+
+→ Continue to **[Forge 04 · Capstone — Warehouse Robot](/academy/forge/04)**.

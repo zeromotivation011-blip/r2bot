@@ -1,0 +1,75 @@
+---
+title: Waypoint
+category: control
+summary: >-
+  A waypoint is a specific named position — and optionally orientation — that a
+  robot is instructed to reach on its way to a final goal, breaking a long
+  journey into manageable, checkable intermediate steps.
+seeAlso: []
+sources:
+  - title: ROS 2 Nav2 — Waypoint following
+    url: >-
+      https://navigation.ros.org/tutorials/docs/navigation2_with_waypoint_follower.html
+  - title: FAA — Waypoint definition in aviation
+    url: 'https://www.faa.gov/air_traffic/technology/rnav'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - navigation
+  - autonomy
+  - fundamentals
+difficulty: 3
+oneLiner: 'The concept concept: A waypoint is a specific named position —'
+laymanExplanation: >-
+  Long before GPS, sailors crossing an ocean would aim for a series of known
+  islands — not because they needed to stop at each one, but because each island
+  was a checkable landmark that confirmed they were still on course. The islands
+  were waypoints: intermediate goals that made an overwhelming journey
+  tractable.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without waypoint, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A waypoint is a specific named position — and optionally orientation — that a
+  robot is instructed to reach on its way to a final goal, breaking a long
+  journey into manageable, checkable intermediate steps.
+slug: waypoint
+bucket: concept
+---
+
+Long before [GPS](/atlas/concept/gps-gnss), sailors crossing an ocean would aim for a series of known islands — not because they needed to stop at each one, but because each island was a checkable landmark that confirmed they were still on course. The islands were waypoints: intermediate goals that made an overwhelming journey tractable.
+
+The concept transferred directly into [robotics](/atlas/concept/robotics). A **waypoint** is a specific pose — position, and sometimes orientation — that a [robot](/atlas/concept/robot) must pass through on the way to its destination.
+
+## Why waypoints instead of just a goal?
+
+A single destination might be reachable by many routes, some of which pass through dangerous or restricted areas. Waypoints let an operator or planner constrain the path — not just where to end up, but roughly how to get there. A hospital delivery robot might be told: go to waypoint A (lift lobby), then waypoint B (corridor junction), then deliver to Room 412. The waypoints encode implicit knowledge about the building — which corridors are normally clear, which routes avoid ICU disturbance — that a pure end-point planner couldn't deduce from the map alone.
+
+Waypoints also make progress observable. Instead of "the robot is somewhere between start and end," an operator can see "the robot has passed waypoints 1 through 4 and is heading to waypoint 5." For fault detection, this is enormously useful.
+
+## Waypoints in autonomous vehicles and drones
+
+DJI [drone](/atlas/concept/drone) mission planning apps (Waypoints missions) let you place a sequence of GPS coordinates on a satellite map, specify the altitude and action at each point (photograph, hover, circle), and launch the [drone](/atlas/concept/drone-uav) to execute autonomously. The waypoints encode the full mission intent. The drone's onboard planner handles low-level obstacle avoidance between waypoints.
+
+Self-driving vehicle research platforms like Apollo (Baidu) and Autoware use GPS waypoint sequences pre-recorded by a human driver to define a nominal route, then add real-time perception and local planning on top.
+
+## Waypoints are not trajectories
+
+A waypoint says "be here." It doesn't say when, how fast, or by what exact path. Converting a list of waypoints into a time-stamped, physically executable [trajectory](/atlas/concept/trajectory) is a separate planning step. The two are often confused, but the waypoint is just a checkpoint — a spatial constraint. Everything else has to be filled in by the planner.
+
+---
+
+*The word "waypoint" comes from maritime and aviation navigation, where it described fixed coordinates used to mark a route across featureless ocean or sky — and its meaning transferred to robotics almost unchanged.*

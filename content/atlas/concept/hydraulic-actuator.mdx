@@ -1,0 +1,78 @@
+---
+title: Hydraulic actuator
+category: actuators
+summary: >-
+  A hydraulic actuator uses pressurised liquid — usually oil — to produce force
+  far beyond what any electric motor of the same size could manage, making it
+  the muscle of choice for heavy-duty robots and construction machinery.
+seeAlso: []
+sources:
+  - title: Wikipedia — Hydraulic actuator
+    url: 'https://en.wikipedia.org/wiki/Hydraulic_actuator'
+  - title: Boston Dynamics — Atlas hydraulic robot
+    url: 'https://bostondynamics.com/atlas/'
+  - title: Parker Hannifin — Hydraulic actuator engineering guide
+    url: 'https://www.parker.com/literature/literature-files/hydraulics.htm'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - actuators
+  - hydraulics
+  - heavy-duty
+difficulty: 3
+oneLiner: 'The concept concept: A hydraulic actuator uses pressurised liquid — usually'
+laymanExplanation: >-
+  A car jack works because a small force applied to a narrow piston gets
+  transmitted through oil to a much wider piston, multiplying the force
+  enormously. With one hand you raise a tonne of car. That force-multiplication
+  trick — using trapped liquid to transmit and amplify mechanical work — is the
+  foundation of every hydraulic system ever built.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without hydraulic actuator, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A hydraulic actuator uses pressurised liquid — usually oil — to produce force
+  far beyond what any electric motor of the same size could manage, making it
+  the muscle of choice for heavy-duty robots and construction machinery.
+slug: hydraulic-actuator
+bucket: concept
+---
+
+A car jack works because a small force applied to a narrow piston gets transmitted through oil to a much wider piston, multiplying the force enormously. With one hand you raise a tonne of car. That force-multiplication trick — using trapped liquid to transmit and amplify mechanical work — is the foundation of every hydraulic system ever built.
+
+A **hydraulic actuator** is a device that converts pressurised fluid (almost always oil) into mechanical movement. A pump driven by an electric motor or combustion engine pressurises the oil. Control valves direct that pressurised oil into a cylinder or a rotating motor, which moves the [robot](/atlas/concept/robot)'s [joint](/atlas/concept/joint) or limb. The force produced is proportional to pressure multiplied by piston area — and because oil is nearly incompressible, every push at one end appears almost instantly at the other.
+
+## Power density: why hydraulics win on brute force
+
+The key advantage is **power density** — how much force or torque a system produces per kilogram of hardware. An electric motor producing 10,000 N of linear force would be enormous. A hydraulic cylinder producing the same force can be the size of a forearm. This is why excavator arms, aircraft flight control surfaces, and heavy industrial presses are hydraulic rather than electric — there is simply no electric alternative of comparable weight for the forces involved.
+
+Hydraulic actuators also absorb shock loads well. When a robot leg lands hard on uneven ground, the oil acts as a buffer, spreading the impact load across the system. This is much harder to achieve with electric motors.
+
+The disadvantages are significant. Hydraulic systems need a pump, a reservoir, pipes, seals, and control valves — all of which can leak. Oil spills are messy and environmentally problematic. Maintenance is demanding. Efficiency is lower than a direct-drive electric motor because energy is lost to heat in the valves and lines.
+
+## Real-world example
+
+The original [Atlas](/atlas/robot/atlas) robot, built by [Boston Dynamics](/atlas/company/boston-dynamics), was hydraulic — a deliberate choice made because no electric actuator in 2013 could match the power density needed for a full-size humanoid to jump, run, and recover from shoves. Engineers described the robot as "a very athletic hydraulic system." In 2024, Boston [Dynamics](/atlas/concept/dynamics) released a fully electric version of Atlas, arguing that electric actuator technology had finally caught up. The original hydraulic Atlas is now retired, but it remains the benchmark for what hydraulic [robotics](/atlas/concept/robotics) achieved.
+
+## Why it matters
+
+Hydraulics defined industrial automation for decades and still dominate wherever mass and force are paramount — construction, mining, aerospace, and heavy manufacturing. Understanding hydraulic actuators explains why early humanoid robots were so bulky, why the shift to electric has taken so long, and what engineering trade-offs underpin every powerful robot ever built.
+
+---
+
+*The transition from hydraulic to electric actuators in humanoid robots mirrors, almost exactly, the earlier shift from hydraulic to electric power steering in cars — each time, the question was whether electronics could finally replace fluid power.*

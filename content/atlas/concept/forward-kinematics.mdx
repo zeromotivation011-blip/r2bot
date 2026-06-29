@@ -1,0 +1,80 @@
+---
+title: Forward kinematics
+category: control
+summary: >-
+  Forward kinematics calculates where a robot's end-effector ends up in space
+  given a specific set of joint angles — the straightforward direction of the
+  geometry problem, from joints to position.
+seeAlso: []
+sources:
+  - title: 'Siciliano et al. — Robotics: Modelling, Planning and Control'
+    url: 'https://www.springer.com/gp/book/9781846286414'
+  - title: 'Peter Corke — Robotics, Vision and Control (Springer)'
+    url: 'https://petercorke.com/RVC/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - kinematics
+  - control
+  - robotic-arms
+difficulty: 3
+oneLiner: >-
+  The concept concept: Forward kinematics calculates where a robot's
+  end-effector ends
+laymanExplanation: >-
+  Hold your right arm straight out in front of you. Now bend your elbow 90
+  degrees. Now rotate your wrist. Your hand has moved to a new position in space
+  — a position determined entirely by the angles of your shoulder, elbow, and
+  wrist joints. You didn't consciously compute where your hand would end up; you
+  set the joint angles and your geometry did the rest.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without forward kinematics, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Forward kinematics calculates where a robot's end-effector ends up in space
+  given a specific set of joint angles — the straightforward direction of the
+  geometry problem, from joints to position.
+slug: forward-kinematics
+bucket: concept
+---
+
+Hold your right arm straight out in front of you. Now bend your elbow 90 degrees. Now rotate your wrist. Your hand has moved to a new position in space — a position determined entirely by the angles of your shoulder, elbow, and wrist joints. You didn't consciously compute where your hand would end up; you set the [joint](/atlas/concept/joint) angles and your geometry did the rest.
+
+That calculation — given these joint angles, where does the hand end up? — is called **forward [kinematics](/atlas/concept/kinematics)**.
+
+## The mathematics
+
+A robotic arm is a chain of rigid links connected by joints. Each joint rotates (or translates, for prismatic joints) by some amount. Forward kinematics works through the chain from base to tip, applying each joint's transformation in sequence. The standard tool is the **Denavit-Hartenberg (DH) convention**, a systematic way of describing each [link](/atlas/concept/link-robot)'s geometry with four parameters. Chain all the DH matrices together with matrix multiplication and you get a single transformation matrix that maps from the [robot](/atlas/concept/robot)'s base frame to its end-effector — the [gripper](/atlas/concept/gripper) or tool tip.
+
+The result gives you the position (x, y, z) and orientation (roll, pitch, yaw, or a rotation matrix) of the end-effector for any combination of joint angles. The calculation is always uniquely defined: for a given set of joint angles, there is exactly one end-effector pose.
+
+## A concrete example
+
+A KUKA KR 6 R900 arm has six rotational joints. Feed in six joint angles — say (0°, −45°, 90°, 0°, 45°, 0°) — and forward kinematics returns the exact 3D position and orientation of the gripper. The arm's control software runs this calculation continuously (at 1 kHz or faster) so it always knows where the tool tip is, even as the joints move.
+
+## Forward versus [inverse kinematics](/atlas/concept/inverse-kinematics)
+
+Forward kinematics is the easy direction. Give me joint angles, I'll tell you the tool position. **Inverse kinematics** is the hard direction: give me the desired tool position, I'll tell you the joint angles needed to achieve it. Inverse kinematics can have zero, one, or multiple solutions; forward kinematics always has exactly one. This asymmetry is why forward kinematics is computed in real time analytically, while inverse kinematics often requires numerical iteration or lookup tables.
+
+## Why it matters
+
+Without forward kinematics, a robot arm cannot know where its tool is. Without that, it cannot perform closed-loop Cartesian control, check for self-collision, visualise its current pose in a simulation, or plan safe motions. It is the geometric foundation on which all arm control is built.
+
+---
+
+*Even the human brain solves a continuous forward kinematics problem — the body's proprioceptive system computes your limb positions from joint angle signals so you can reach for a glass without looking at your hand.*

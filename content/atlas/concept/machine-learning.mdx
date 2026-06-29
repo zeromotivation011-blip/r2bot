@@ -1,0 +1,82 @@
+---
+title: Machine Learning
+slug: machine-learning
+bucket: ai-and-perception
+summary: >-
+  A family of algorithms that learn patterns from data instead of following
+  explicit instructions — the foundation of modern AI in robotics.
+seeAlso:
+  - neural-network
+  - deep-learning
+  - reinforcement-learning
+  - computer-vision
+tags:
+  - ai
+  - ml
+  - fundamentals
+lastReviewed: 2025-01-15T00:00:00.000Z
+difficulty: 4
+difficultyLabel: advanced
+oneLiner: Teaching robots to learn from data instead of explicit instructions.
+laymanExplanation: >-
+  Instead of telling a robot 'if you see a cat, do this' for every possible cat
+  photo, you show it 10,000 cat photos and it figures out what cats look like on
+  its own.
+analogy: >-
+  Machine learning is like how you learned to recognise your mum's voice —
+  nobody gave you a formula, you just heard it enough times.
+whyItMatters: >-
+  ML is why robots can now recognise faces, understand speech, and drive cars.
+  It's the leap from 'programmed' to 'intelligent'.
+indianExample: >-
+  Niramai Health Analytics in Bengaluru uses ML to detect breast cancer from
+  thermal images — no radiation, 90%+ accuracy.
+realRobotsThatUseThis:
+  - Optimus by Tesla
+  - Pepper
+  - Amazon Kiva
+mindBlowingFact: >-
+  DeepMind's AlphaFold ML model solved a 50-year-old biology problem in 2020 —
+  predicting protein folding — in weeks, not decades.
+industryApplications:
+  - healthcare
+  - agriculture
+  - finance
+  - autonomous vehicles
+  - manufacturing
+quizQuestion:
+  q: What are the three main types of machine learning?
+  options:
+    - 'Easy, medium, hard'
+    - 'Fast, slow, medium'
+    - 'Supervised, unsupervised, reinforcement'
+    - 'Read, write, run'
+  answer: 2
+  explanation: >-
+    Supervised (labelled data), unsupervised (find patterns) and reinforcement
+    (reward/punishment) are the three foundations.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+technicalDefinition: >-
+  A family of algorithms that learn patterns from data instead of following
+  explicit instructions — the foundation of modern AI in robotics.
+---
+
+**Machine learning** is the art of building algorithms that improve with experience. Instead of hand-coding every rule, you give the algorithm examples and let it derive the rules itself.
+
+## The three families
+
+- **Supervised learning** — you give the model labelled examples ("this is a cat", "this is a dog") and it learns the mapping. The bulk of modern ML, including image classifiers and spam filters.
+- **Unsupervised learning** — no labels. The model finds structure on its own — clusters of customers, anomalies, latent topics in text.
+- **Reinforcement learning** — the model takes actions, sees a reward signal, and learns the strategy that maximises long-term reward. See [reinforcement learning](/atlas/concept/reinforcement-learning).
+
+## ML inside robotics
+
+- Object detection in computer-vision pipelines
+- Speech recognition (Pepper, Mitra)
+- Anomaly detection (industrial fault prediction)
+- Manipulation policies (Tesla Optimus, DeepMind's robotic arm)
+- Path planning under uncertainty
+
+ML is built on [neural networks](/atlas/concept/neural-network) — particularly deep neural networks (see [deep learning](/atlas/concept/deep-learning)) — for the most powerful applications. Image-focused work uses [computer vision](/atlas/concept/computer-vision) techniques.

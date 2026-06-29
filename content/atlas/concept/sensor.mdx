@@ -1,0 +1,81 @@
+---
+title: Sensor
+slug: sensor
+bucket: sensors
+summary: >-
+  A robot's eyes, ears, and skin — devices that turn the physical world into
+  electrical signals a robot brain can read.
+seeAlso:
+  - actuator
+  - robot
+  - lidar
+  - ultrasonic-sensor
+  - encoder
+tags:
+  - sensors
+  - fundamentals
+lastReviewed: 2025-01-15T00:00:00.000Z
+difficulty: 1
+difficultyLabel: beginner
+oneLiner: 'A robot''s eyes, ears, and skin — it turns the physical world into data.'
+laymanExplanation: >-
+  Just like you use your eyes to see and your fingers to feel, a robot uses
+  sensors to understand what's happening around it.
+analogy: >-
+  A sensor is like a WhatsApp message from the real world — it tells the robot
+  what's actually going on.
+whyItMatters: >-
+  Without sensors, a robot is blind and deaf. Sensors are what make robots aware
+  of their environment.
+indianExample: >-
+  Indian farmers are using soil-moisture sensors attached to drones to know
+  exactly when and where to water crops — saving 40% water.
+realRobotsThatUseThis:
+  - Perseverance Rover
+  - Pepper
+  - Roomba
+mindBlowingFact: >-
+  The human body has 11 types of sensory receptors. Modern robots can have 50+
+  sensor types.
+industryApplications:
+  - agriculture
+  - smart homes
+  - autonomous vehicles
+  - manufacturing
+  - healthcare
+quizQuestion:
+  q: Name the sensor a Roomba uses to avoid falling down stairs.
+  options:
+    - Camera
+    - GPS
+    - Cliff sensor (infrared down)
+    - Microphone
+  answer: 2
+  explanation: >-
+    Roombas use small infrared cliff sensors pointed at the floor — when the
+    reflection disappears, the robot knows there is an edge.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+technicalDefinition: >-
+  A robot's eyes, ears, and skin — devices that turn the physical world into
+  electrical signals a robot brain can read.
+---
+
+A **sensor** is any device that converts a physical phenomenon — light, sound, distance, temperature, force — into a signal that a computer can read. In robotics, sensors are the foundation: without them, a robot has no idea what is happening around it and is reduced to a deaf, blind machine that can only follow open-loop instructions.
+
+## The three properties every sensor has
+
+1. **Range** — the minimum and maximum values it can measure (e.g. an HC-SR04 ultrasonic sensor: 2 cm to 400 cm).
+2. **Accuracy** — how close the measurement is to the actual value.
+3. **Sampling rate** — how many times per second it can read.
+
+## Common sensor families in robotics
+
+- **Distance**: ultrasonic, infrared, LiDAR
+- **Vision**: RGB camera, depth camera, thermal camera
+- **Orientation**: IMU (gyroscope + accelerometer), compass
+- **Force/touch**: load cell, force-torque sensor, capacitive touch
+- **Environment**: temperature, humidity, gas, light
+
+Sensors pair with [actuators](/atlas/concept/actuator) — the muscles — and a [controller](/atlas/concept/robot) — the brain — to form the classic SENSE → THINK → ACT loop that defines every [robot](/atlas/concept/robot).

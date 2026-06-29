@@ -1,0 +1,77 @@
+---
+title: PWM Signal in Robotics — Complete Guide
+summary: >-
+  Pulse-Width Modulation (PWM) is the standard technique for controlling motor
+  speed, LED brightness, and servo position. Found in every microcontroller and
+  every robot.
+category: hardware
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - pwm
+  - signal
+  - control
+seeAlso:
+  - pwm
+  - motor-driver
+  - servo-motor
+  - arduino-control
+difficulty: 3
+oneLiner: >-
+  The concept concept: Pulse-Width Modulation (PWM) is the standard technique
+  for
+laymanExplanation: >-
+  Pulse-Width Modulation (PWM) is a method of encoding a continuous value (like
+  a motor power level) into a digital signal by rapidly switching it on and off.
+  The fraction of time the signal is 'on' — called the duty cycle — represents
+  the encoded value.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without pwm signal in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Pulse-Width Modulation (PWM) is the standard technique for controlling motor
+  speed, LED brightness, and servo position. Found in every microcontroller and
+  every robot.
+slug: pwm-signal
+bucket: concept
+---
+
+# PWM Signal in Robotics
+
+## What is it?
+
+Pulse-Width Modulation (PWM) is a method of encoding a continuous value (like a motor power level) into a digital signal by rapidly switching it on and off. The fraction of time the signal is 'on' — called the duty cycle — represents the encoded value.
+
+## How it works
+
+A PWM signal has two parameters: frequency (cycles per second) and duty cycle (% of each cycle the signal is HIGH). At 50% duty cycle, the average voltage is half the supply. A motor connected via PWM through a driver runs at half its top speed. Frequencies range from 1 kHz to 50 kHz depending on application — too low causes audible whine, too high stresses the driver.
+
+## Real-world example
+
+Every Arduino pin marked with a tilde (~) supports PWM. RC servos use a 50 Hz PWM where pulse width 1–2 ms maps to position 0–180°. ESCs for drones use 50–500 Hz PWM (now increasingly DShot digital signals).
+
+## Why it matters for robotics
+
+PWM is the universal interface between digital controllers and analog actuators. You cannot build a robot that moves without using PWM somewhere.
+
+## See also
+
+- [Pwm](/atlas/concept/pwm)
+- [Motor Driver](/atlas/concept/motor-driver)
+- [Servo Motor](/atlas/concept/servo-motor)
+- [Arduino Control](/atlas/concept/arduino-control)

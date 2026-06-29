@@ -1,0 +1,97 @@
+---
+title: Edge Computing
+hindi_name: एज कंप्यूटिंग
+phonetic: ej kom-pyoo-ting
+category: hardware
+summary: >-
+  Running computation near the data source — on the robot itself, not in the
+  cloud. Necessary for any decision that can't wait for a network round-trip.
+seeAlso:
+  - neural-network
+  - computer-vision
+  - ros2
+  - embodied-ai
+sources:
+  - title: NVIDIA Jetson family
+    url: 'https://developer.nvidia.com/embedded-computing'
+  - title: TensorRT documentation
+    url: 'https://docs.nvidia.com/deeplearning/tensorrt/'
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - hardware
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: Running computation near the data source — on'
+laymanExplanation: 'A typical perception → control loop in a mobile robot:'
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without edge computing, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Running computation near the data source — on the robot itself, not in the
+  cloud. Necessary for any decision that can't wait for a network round-trip.
+slug: edge-computing
+bucket: concept
+---
+
+**Edge computing** = doing the work on the device instead of in the cloud. For robots, this isn't an architectural preference — it's a hard requirement. A self-driving car can't wait 200ms to round-trip an image to AWS. By the time the response arrives, the obstacle is already a crash.
+
+## The latency budget
+
+A typical perception → control loop in a mobile robot:
+
+- Camera capture: 10–30ms
+- Image processing + neural net inference: 30–100ms
+- Path-planning / safety check: 10–50ms
+- Motor command: 1ms
+
+Total: ~50–180ms. Add a cellular network round-trip (50–200ms each way) and you're already in crash territory.
+
+## The hardware
+
+- **Raspberry Pi 4/5** — ₹5–8k. Good enough for ROS2 nodes and lightweight CV. No GPU.
+- **NVIDIA Jetson Nano** — ₹15k. 4-core ARM + small GPU. Older, but still common.
+- **NVIDIA Jetson Orin Nano** — ₹40-50k. 6-core ARM + 1024-CUDA-core GPU. 8W envelope. Runs YOLOv8 at 30+ FPS.
+- **NVIDIA Jetson AGX Orin** — ₹1.5-2L. Production-grade autonomy compute.
+- **Google Coral** — ₹6-10k. TPU-only, very low power, good for inference-only.
+- **Intel NUC + RealSense** — Higher power, x86 compatibility. Used when you want to run desktop ROS2 stacks.
+
+## TensorRT — the secret sauce
+
+NVIDIA's inference compiler. Takes a PyTorch / ONNX model and produces a device-specific optimized engine. Typical speedups:
+
+- FP32 → FP16: 2× faster, near-zero accuracy loss
+- FP16 → INT8 (with calibration): 1.5× faster, small accuracy hit
+
+A YOLOv8n on Jetson Orin Nano: 8 FPS in PyTorch → 28 FPS as a TensorRT FP16 engine → 42 FPS at INT8. That's the difference between unusable and shippable.
+
+## In India
+
+- **CynLr** (Bangalore) — vision-guided picking, runs everything on Orin AGX.
+- **Niqo Robotics** (Bangalore) — Jetson Xavier on tractor-mounted sprayers.
+- **Ati Motors** (Bangalore) — Jetson for warehouse-aisle perception.
+- **Detect Technologies** (Chennai) — industrial visual inspection on the edge.
+- **Garuda Aerospace** (Chennai) — Jetson on agricultural and inspection drones.
+
+Indian companies prefer Jetson over Coral because NVIDIA's CUDA ecosystem means you can train and deploy from the same codebase.
+
+## See it in action
+
+The [Forge 03 lesson](/academy/forge/03) walks through running YOLOv8 on a Jetson in a ROS2 node — including the TensorRT conversion step.
+
+## Related concepts
+
+[[neural-network]] · [[computer-vision]] · [[ros2]] · [[embodied-ai]]

@@ -1,0 +1,171 @@
+---
+title: "Computer Vision for Robots"
+description: "OpenCV in ROS2 — image topics, CvBridge, color segmentation, and a real HSV-based ball tracker that publishes /cmd_vel."
+track: wire
+lesson: 5
+duration: "35 min read"
+url_slug: w-05-computer-vision-robots
+hindi_name: "रोबोट कंप्यूटर विज़न"
+xp: 175
+estimated_minutes: 35
+atlas_links: [computer-vision, pid-controller, feedback-loop, neural-network]
+sources:
+  - name: "OpenCV documentation"
+    url: "https://docs.opencv.org/4.x/"
+  - name: "cv_bridge in ROS 2"
+    url: "https://github.com/ros-perception/vision_opencv"
+---
+
+## What you'll build
+
+A **color-based ball tracker**: a ROS2 node that subscribes to `/camera/image_raw`, finds a red ball using HSV color segmentation, and publishes a `/cmd_vel` that drives the robot to keep the ball centred. Your robot becomes a one-trick dog — but the *plumbing* you learn here (ROS image topics + OpenCV + a control loop) is exactly what fancier perception is built on.
+
+## ROS images ↔ OpenCV images: cv_bridge
+
+OpenCV uses NumPy arrays (`numpy.ndarray`). ROS uses `sensor_msgs/msg/Image`. The bridge:
+
+```python
+from cv_bridge import CvBridge
+bridge = CvBridge()
+
+# ROS → OpenCV
+cv_image = bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+
+# OpenCV → ROS
+ros_image = bridge.cv2_to_imgmsg(cv_image, encoding='bgr8')
+```
+
+Install: `sudo apt install ros-humble-cv-bridge ros-humble-vision-opencv`. Use `bgr8` for color (OpenCV's default), `mono8` for grayscale, `32FC1` for depth.
+
+## HSV — why it beats RGB for color detection
+
+RGB is sensitive to brightness. A red ball in shadow has RGB ~ (80, 0, 0). The same ball in bright light is (255, 30, 30). Same color, completely different RGB.
+
+**HSV** (Hue, Saturation, Value) separates color (Hue) from intensity (Value). The hue of red stays ~0° (or ~180° — red wraps around) whether the ball is in shadow or bright light. That's what you want.
+
+OpenCV's HSV is awkward: H is 0–179 (not 360), S and V are 0–255.
+
+Red is split because hue wraps:
+
+```python
+# Red has TWO HSV ranges in OpenCV:
+LOWER_RED_1 = (0, 120, 70)     # First range
+UPPER_RED_1 = (10, 255, 255)
+LOWER_RED_2 = (170, 120, 70)   # Wrapped range
+UPPER_RED_2 = (179, 255, 255)
+```
+
+## The full ball-tracker node
+
+```python
+import cv2
+import numpy as np
+import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import Image
+from geometry_msgs.msg import Twist
+from cv_bridge import CvBridge
+
+LOWER_RED_1 = np.array([0, 120, 70])
+UPPER_RED_1 = np.array([10, 255, 255])
+LOWER_RED_2 = np.array([170, 120, 70])
+UPPER_RED_2 = np.array([179, 255, 255])
+
+MIN_AREA = 500    # ignore tiny noise blobs
+LINEAR_SPEED = 0.2
+
+class BallTracker(Node):
+    def __init__(self):
+        super().__init__('ball_tracker')
+        self.bridge = CvBridge()
+        self.create_subscription(Image, '/camera/image_raw', self.on_image, 10)
+        self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.image_width = 640  # will be auto-set from first frame
+        self.get_logger().info('Ball tracker started')
+
+    def on_image(self, msg: Image):
+        try:
+            frame = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
+        except Exception as e:
+            self.get_logger().error(f'cv_bridge: {e}')
+            return
+
+        h, w, _ = frame.shape
+        self.image_width = w
+
+        # Detect red
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        mask1 = cv2.inRange(hsv, LOWER_RED_1, UPPER_RED_1)
+        mask2 = cv2.inRange(hsv, LOWER_RED_2, UPPER_RED_2)
+        mask = cv2.bitwise_or(mask1, mask2)
+        # Clean up — morphological operations remove noise
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+
+        # Find largest contour above threshold
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        target = None
+        if contours:
+            largest = max(contours, key=cv2.contourArea)
+            if cv2.contourArea(largest) > MIN_AREA:
+                M = cv2.moments(largest)
+                if M['m00'] > 0:
+                    cx = int(M['m10'] / M['m00'])
+                    target = cx
+
+        # Control logic
+        twist = Twist()
+        if target is None:
+            # Lost — rotate slowly to search
+            twist.angular.z = 0.4
+        else:
+            # P-controller: turn toward the ball
+            error = (target - w / 2) / (w / 2)  # -1..1
+            twist.linear.x = LINEAR_SPEED
+            twist.angular.z = -1.5 * error
+        self.cmd_pub.publish(twist)
+
+def main():
+    rclpy.init()
+    rclpy.spin(BallTracker())
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+Run it. Hold a red object in front of the camera. The robot turns to follow.
+
+This is a **proportional controller** in image space — error is "pixels off-centre," output is angular velocity. The same pattern, with a real PID, drives lane-keeping in self-driving cars.
+
+## What CV doesn't solve
+
+This tracker fails in five obvious ways. Spot them before you read on:
+
+1. **Bad lighting** — a red ball in low light might map to brown HSV.
+2. **Other red things** — chair, t-shirt, fire extinguisher.
+3. **Distance** — at 5m the ball is 20 pixels and `MIN_AREA` rejects it.
+4. **Occlusion** — half the ball behind a leg.
+5. **No depth** — the robot doesn't know how *far* the ball is, only where in the image it appears.
+
+This is why production CV moves to **YOLO / neural networks** + **stereo depth / LiDAR**. We cover that in **Forge 03**. But — every YOLO-on-Jetson stack still uses the same ROS2 image plumbing you learned today.
+
+> **Try this in the visualizer:** open [/visualizer](/visualizer) and watch the Sense → Think → Act loop. Your CV node *is* the Sense; your control logic *is* the Think; `/cmd_vel` *is* the Act.
+
+## Test Your Understanding
+
+**1.** Your ball tracker works in a bright room but fails outdoors at noon. Walk through three specific things you'd change before reaching for a neural network.
+
+**2.** A team-mate suggests using RGB thresholding instead of HSV "because it's simpler and avoids the hue-wrap problem." Construct one concrete scenario where their approach will fail badly and yours will keep working.
+
+**3.** You want to extend this to track **two balls of different colors** and follow the closer one. Without depth, can you estimate which ball is closer from a single 2D image? What single OpenCV measurement gives you a reasonable proxy?
+
+## India Opportunity
+
+- **Computer Vision Engineer · CynLr, Bangalore** — vision-based robotic picking, ₹16–28 LPA.
+- **Perception Engineer · Niqo Robotics, Bangalore** — agriculture-spraying drones, ROS2 + OpenCV + ML, ₹12–22 LPA.
+- **Vision Engineer · GreyOrange, Gurgaon** — barcode + pallet recognition in warehouse robots, ₹14–24 LPA.
+- **Computer Vision Intern · Skylark Drones, Bangalore** — aerial imagery analysis, ₹40–60k/month.
+
+## Next Step
+
+→ Continue to **[Wire 06 · Capstone — Autonomous Navigator](/academy/wire/06)** — combine everything into one obstacle-avoiding robot.

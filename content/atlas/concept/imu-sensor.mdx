@@ -1,0 +1,75 @@
+---
+title: IMU Sensor in Robotics — Complete Guide
+summary: >-
+  An IMU (Inertial Measurement Unit) combines accelerometer, gyroscope, and
+  often a magnetometer to estimate orientation and motion in 3D space.
+category: sensors
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - imu
+  - sensor-fusion
+  - orientation
+seeAlso:
+  - imu
+  - gyroscope
+  - accelerometer
+  - sensor-fusion
+difficulty: 3
+oneLiner: >-
+  The concept concept: An IMU (Inertial Measurement Unit) combines
+  accelerometer, gyroscope,
+laymanExplanation: >-
+  An IMU (Inertial Measurement Unit) is a compact sensor module that combines an
+  accelerometer, a gyroscope, and often a magnetometer into a single chip. It
+  outputs raw inertial data that — when fused — gives a robot its real-time 3D
+  orientation and motion.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without imu sensor in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An IMU (Inertial Measurement Unit) combines accelerometer, gyroscope, and
+  often a magnetometer to estimate orientation and motion in 3D space.
+slug: imu-sensor
+bucket: concept
+---
+
+# IMU Sensor in Robotics
+
+## What is it?
+
+An IMU (Inertial Measurement Unit) is a compact sensor module that combines an accelerometer, a gyroscope, and often a magnetometer into a single chip. It outputs raw inertial data that — when fused — gives a robot its real-time 3D orientation and motion.
+
+## How it works
+
+The accelerometer measures linear acceleration on three axes, the gyroscope measures angular velocity on three axes, and the magnetometer measures the Earth's magnetic field for heading. A sensor-fusion algorithm — typically an Extended Kalman Filter or Madgwick filter — combines these signals to reject noise and bias drift. The result is a clean quaternion or Euler-angle estimate of the robot's attitude.
+
+## Real-world example
+
+DJI drones, Tesla Autopilot, every modern smartphone, and ISRO's Vyommitra all carry IMUs. In a Webots simulation or a Raspberry Pi project, the MPU-6050 (₹150 on Robu.in) is the most common starter IMU for Indian students.
+
+## Why it matters for robotics
+
+IMUs are the most cost-effective way to give a robot proprioception — a sense of its own motion. Mastery of IMU fusion is a recurring interview topic at Indian robotics companies including GreyOrange and Ideaforge.
+
+## See also
+
+- [Imu](/atlas/concept/imu)
+- [Gyroscope](/atlas/concept/gyroscope)
+- [Accelerometer](/atlas/concept/accelerometer)
+- [Sensor Fusion](/atlas/concept/sensor-fusion)

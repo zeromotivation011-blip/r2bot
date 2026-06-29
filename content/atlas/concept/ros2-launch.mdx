@@ -1,0 +1,130 @@
+---
+title: ROS2 Launch — Complete Guide | R2BOT
+summary: >-
+  ROS2 launch files start, configure, and monitor multiple nodes from a single
+  command. The backbone of every real ROS2 deployment.
+category: control
+bucket: programming-software
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - ros2
+  - launch
+  - python
+  - orchestration
+  - startup
+relatedTerms:
+  - ros2
+  - ros2-nodes
+  - ros2-parameters
+  - ros2-composition
+seeAlso:
+  - ros2
+  - ros2-nodes
+  - ros2-parameters
+  - ros2-composition
+youtubeSearchQuery: ROS2 launch file tutorial
+oneLiner: >-
+  The programming software concept: ROS2 launch files start, configure, and
+  monitor multiple
+laymanExplanation: >-
+  A ROS2 launch file describes which nodes to start, with which parameters, in
+  which order, and what to do when they exit. Real robots run dozens of nodes —
+  drivers, planners, controllers, recorders — and launch files orchestrate them
+  with one command.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros2 launch — complete guide | r2bot, many programming software
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  ROS2 launch files start, configure, and monitor multiple nodes from a single
+  command. The backbone of every real ROS2 deployment.
+slug: ros2-launch
+---
+
+# ROS2 Launch
+
+## What is ROS2 Launch?
+
+A ROS2 launch file describes which nodes to start, with which parameters, in which order, and what to do when they exit. Real robots run dozens of nodes — drivers, planners, controllers, recorders — and launch files orchestrate them with one command.
+
+## How It Works
+
+Launch files are written in Python (ROS2 supports XML and YAML too). You compose a `LaunchDescription` containing `Node()` actions, `IncludeLaunchDescription()` (to compose other launch files), `ExecuteProcess()` (to run shell commands), and event handlers (`OnProcessExit`, `OnShutdown`). The `ros2 launch` command runs the file, expands all variables, starts every action in the requested order, and tracks lifecycles. Arguments allow the same launch file to be reused across robots and environments.
+
+## Real-World Example
+
+Nav2 and MoveIt2 ship dozens of launch files for different robot setups. Spot, TurtleBot, GreyOrange's Butler stack — every real ROS2 robot has a top-level launch file that boots the entire system. CI pipelines use launch files to start sim-test environments.
+
+## Why It Matters for Robotics
+
+If ROS2 nodes are the bricks of a robot, launch files are the blueprints that turn the bricks into a house. Writing clean, parametric launch files is one of the most-tested skills in ROS2 interviews.
+
+## Try It Yourself
+
+Write a Python launch file that starts (1) a TurtleSim node and (2) a teleop_twist_keyboard node. Run with `ros2 launch your_pkg my_demo.launch.py` and drive the turtle around — your first multi-node orchestration.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "ROS2 launch files are most commonly written in:",
+    "options": [
+      "JSON",
+      "Python",
+      "Rust",
+      "Lua"
+    ],
+    "answer": 1,
+    "explain": "Python is the default, with XML and YAML supported. Python gives full programmatic flexibility."
+  },
+  {
+    "q": "You start a launch file from the terminal with:",
+    "options": [
+      "ros2 run",
+      "ros2 launch",
+      "ros2 topic",
+      "ros2 doctor"
+    ],
+    "answer": 1,
+    "explain": "`ros2 launch <package> <file>` is the standard way to run a launch description."
+  },
+  {
+    "q": "A great use of launch files is to:",
+    "options": [
+      "Compile C++ code",
+      "Start multiple nodes with their parameters in one command",
+      "Edit videos",
+      "Run a database migration"
+    ],
+    "answer": 1,
+    "explain": "Launch files orchestrate complex multi-node setups so an operator only runs one command."
+  }
+]
+```
+
+## Further Reading
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Nodes](/atlas/concept/ros2-nodes)
+- [Ros2 Parameters](/atlas/concept/ros2-parameters)
+- [Ros2 Composition](/atlas/concept/ros2-composition)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain ROS2 Launch for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

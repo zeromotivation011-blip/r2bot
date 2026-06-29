@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="Motor cross-section diagram">
+  <rect width="800" height="400" fill="#050810"/>
+  <g stroke="#00B8D4" fill="none">
+    <g opacity="0.18" stroke-width="1">
+      <path d="M0 80 H800 M0 160 H800 M0 240 H800 M0 320 H800"/>
+      <path d="M100 0 V400 M300 0 V400 M500 0 V400 M700 0 V400"/>
+    </g>
+    <g transform="translate(400,210)" stroke-width="1.6">
+      <circle r="150" />
+      <circle r="118" opacity="0.7"/>
+      <circle r="60" opacity="0.9"/>
+      <circle r="14" fill="#00B8D4" stroke="none"/>
+      <g>
+        <line x1="-60" y1="0" x2="-150" y2="0"/>
+        <line x1="60" y1="0" x2="150" y2="0"/>
+        <line x1="0" y1="-60" x2="0" y2="-150"/>
+        <line x1="0" y1="60" x2="0" y2="150"/>
+        <line x1="-42" y1="-42" x2="-106" y2="-106"/>
+        <line x1="42" y1="-42" x2="106" y2="-106"/>
+        <line x1="-42" y1="42" x2="-106" y2="106"/>
+        <line x1="42" y1="42" x2="106" y2="106"/>
+      </g>
+      <g opacity="0.5">
+        <circle cx="0" cy="-100" r="6"/>
+        <circle cx="100" cy="0" r="6"/>
+        <circle cx="0" cy="100" r="6"/>
+        <circle cx="-100" cy="0" r="6"/>
+      </g>
+      <path d="M-150,0 L-180,0 L-180,-30 L-210,-30" stroke-linecap="round"/>
+      <path d="M150,0 L180,0 L180,30 L210,30" stroke-linecap="round"/>
+    </g>
+  </g>
+  <g font-family="'JetBrains Mono', monospace" fill="#E8ECF1" font-size="12" letter-spacing="3">
+    <text x="40" y="50">ACTUATORS · ROTOR/STATOR</text>
+  </g>
+  <g font-family="'JetBrains Mono', monospace" fill="#00B8D4" font-size="10" letter-spacing="2" opacity="0.7">
+    <text x="630" y="50">τ = Iα</text>
+  </g>
+</svg>

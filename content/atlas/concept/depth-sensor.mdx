@@ -1,0 +1,82 @@
+---
+title: Depth sensor
+category: sensors
+summary: >-
+  A depth sensor measures the distance to every visible point in a scene
+  simultaneously, producing a 2D image where each pixel encodes depth rather
+  than colour. It gives robots instant 3D awareness of their immediate
+  surroundings.
+seeAlso: []
+sources:
+  - title: Intel RealSense — Depth camera technology overview
+    url: >-
+      https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html
+  - title: 'IEEE — Structured light 3D scanning: a survey'
+    url: 'https://ieeexplore.ieee.org/document/8118815'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - sensors
+  - depth
+  - perception
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: A depth sensor measures the distance to every'
+laymanExplanation: >-
+  Imagine a photograph where instead of recording how red, green, or blue each
+  spot is, every pixel records how far away that spot is from the camera. A wall
+  one metre away would be a uniform pale shade; a table two metres away slightly
+  darker; a doorway three metres away darker still. The result is not a colour
+  image — it is a map of distances, a frozen cross
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without depth sensor, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A depth sensor measures the distance to every visible point in a scene
+  simultaneously, producing a 2D image where each pixel encodes depth rather
+  than colour. It gives robots instant 3D awareness of their immediate
+  surroundings.
+slug: depth-sensor
+bucket: concept
+---
+
+Imagine a photograph where instead of recording how red, green, or blue each [spot](/atlas/robot/spot) is, every pixel records how far away that spot is from the [camera](/atlas/concept/camera-vision). A wall one metre away would be a uniform pale shade; a table two metres away slightly darker; a doorway three metres away darker still. The result is not a colour image — it is a map of distances, a frozen cross-section of three-dimensional space.
+
+That is a **depth map**, and the sensor that produces one in real time is a depth sensor.
+
+## Three ways to measure depth at every pixel
+
+Depth sensors use one of three main technologies, each with different trade-offs.
+
+**Structured light** projects an invisible pattern of infrared dots or stripes onto the scene. A second camera, offset from the projector, photographs that pattern. Because the offset camera sees the pattern from a slightly different angle, any surface that is closer or further away distorts the pattern in predictable ways. A processor analyses the distortion and computes depth at each point. The original Microsoft Kinect (2010) used this approach and brought depth sensing to the mass market for the first time at under $150.
+
+**Time-of-flight (ToF)** is conceptually simpler: flood the scene with a pulse of infrared light and measure how long the reflection takes to return — not from one beam like a [lidar](/atlas/concept/lidar), but from the entire scene simultaneously, using a sensor array where each pixel is a tiny time-measuring detector. The iPhone's Face ID system uses a ToF depth sensor to map a user's face in 3D; the same technology appears in the TrueDepth camera for AR features.
+
+**Active stereo** is a refinement of basic stereo vision: two cameras offset like eyes, plus projected infrared texture to help matching even on featureless surfaces. Intel's RealSense D400 series uses this, and it is common in research [robotics](/atlas/concept/robotics) because it balances accuracy, range, and cost.
+
+## What a [robot](/atlas/concept/robot) does with a depth image
+
+A depth map, combined with the camera's known geometry, can be converted into a **[point cloud](/atlas/concept/point-cloud)** — the same kind of 3D dot map that lidar produces, but at video frame rates and from a palm-sized sensor costing under ₹15,000. Robots use these point clouds for obstacle avoidance, 3D object recognition, bin-picking (identifying and grasping parts randomly piled in a container), and [mapping](/atlas/concept/mapping).
+
+The Amazon Robotics fulfilment arms that pick items from shelves use depth sensors to locate objects regardless of their orientation. Humanoid research robots like Agility Robotics' Digit rely on depth cameras to perceive stairs and uneven terrain. Even consumer devices have adopted the technology: robotic vacuum cleaners increasingly use small ToF sensors to build 3D maps of rooms rather than the simpler lidar ring.
+
+## Depth sensors versus lidar
+
+Depth sensors and lidar both produce 3D geometry, and the line between them is blurring. Lidar excels outdoors at long range (1–200 m), in any lighting condition, and in rain. Depth sensors are cheaper, faster to set up, and denser at short range (0.3–6 m), but almost all are defeated by bright outdoor sunlight, which drowns out their infrared signals. For indoor robots, depth cameras are often the better choice; for outdoor autonomous vehicles, lidar remains dominant.
+
+---
+
+*If every phone now has a depth sensor capable of mapping a face in 3D, what is stopping someone from using the same sensor to 3D-print a fake face and unlock a phone with it?*

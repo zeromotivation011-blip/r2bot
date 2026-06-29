@@ -1,0 +1,62 @@
+---
+title: Boston Dynamics' Atlas parkour — what the video doesn't tell you
+summary: The viral Atlas parkour video is not what it looks like. It's both more impressive AND less impressive than you think. Here's the real story.
+topic: Humanoid
+durationSeconds: 312
+externalUrl: https://bostondynamics.com/atlas/
+publishedAt: 2026-05-06
+relatedAtlas:
+  - { type: robot, slug: atlas }
+  - { type: company, slug: boston-dynamics }
+  - { type: person, slug: marc-raibert }
+---
+
+The viral Atlas parkour video — the one where Atlas runs up uneven boxes, jumps a gap, and does a backflip — is not what it looks like. It's both more impressive AND less impressive than you think.
+
+Here's the real story.
+
+## What you see
+
+A two-legged humanoid robot runs up a series of boxes of varying heights, jumps a gap between two platforms, vaults sideways over a beam, and lands a clean backflip. The whole thing is one continuous take, 41 seconds long, set to dramatic music.
+
+The video has been watched over 50 million times. It is, by a wide margin, the most successful piece of robotics PR ever made.
+
+## Why it's MORE impressive than it looks
+
+Most viewers assume the robot is following pre-recorded motions — that someone programmed each move and Atlas plays them back. That's NOT what's happening.
+
+The robot is doing **real-time whole-body model-predictive control**. At every moment — roughly 500 times per second — it's:
+
+1. Sensing its joint angles, foot pressures, and orientation.
+2. Simulating, in its onboard computer, what would happen for the next half-second if it applied various combinations of joint torques.
+3. Picking the combination that gets closest to the goal (e.g., "get the right foot onto that box without falling").
+4. Executing the first millisecond of that plan.
+5. Re-doing the whole thing.
+
+This is the same math used to land rockets. Atlas is solving an optimisation problem in real time, on a moving body, in a changing environment. That's why it can recover from a slip — the math just re-plans from wherever it is.
+
+The course was new to the robot. Not pre-rehearsed.
+
+## Why it's LESS impressive than it looks
+
+It took **many takes**. Boston Dynamics has been candid about this in interviews. Atlas fell, mis-stepped, and aborted runs many times before the perfect take was captured.
+
+A human gymnast would also need many takes. But a human gymnast can also do parkour on a course they've literally never seen before. Atlas — at the time of the parkour video — could only run pre-mapped courses. The boxes and gap had been measured and surveyed by the robot before the run. The route was planned in advance, even if the moment-to-moment execution was real-time.
+
+That's a real limitation. As of 2025, Atlas couldn't walk into an unfamiliar warehouse and improvise. It can now. The parkour video was a milestone, not the destination.
+
+## How it was built
+
+The hydraulic Atlas (the one in the video) had 28 hydraulically-actuated joints, driven by an onboard 5-litre/minute pump. Hydraulics are powerful but messy — they leak, they're heavy, they're noisy. That's why Boston Dynamics retired the hydraulic Atlas in April 2024 and replaced it with an all-electric version.
+
+The new electric Atlas can do most of the same moves — it has rotating joints that the hydraulic one couldn't — but isn't as raw-powerful per kilo. The trade-off is acceptable because the electric one is quieter, cleaner, lighter, and manufacturable.
+
+## What this video really proves
+
+It proves that dynamic balance — the engineering principle [Marc Raibert](/atlas/person/marc-raibert) bet his career on in the 1980s — has won. Static-balance robots (which most early industrial humanoids used) cannot do this. Dynamic-balance robots, with whole-body model-predictive control, can.
+
+That's the unlock. Every humanoid built after this video — Optimus, Figure 03, 1X Neo — has dynamic balance baked in from day one. The parkour video was, in a sense, the moment robotics shifted definitively to a new paradigm.
+
+---
+
+*Read about [Atlas (the robot)](/atlas/robot/atlas) for the full history, including the 2024 transition to electric.*

@@ -1,0 +1,73 @@
+---
+title: Cascade Control in Robotics — Complete Guide
+summary: >-
+  Cascade control uses two nested feedback loops — an inner fast loop for the
+  actuator and an outer slow loop for the high-level goal — to deliver fast,
+  stable response.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - control
+  - cascade
+  - nested-loops
+seeAlso:
+  - feedback-loop
+  - pid-controller
+  - closed-loop-control
+difficulty: 3
+oneLiner: 'The concept concept: Cascade control uses two nested feedback loops —'
+laymanExplanation: >-
+  Cascade control is a control architecture with two nested feedback loops. The
+  inner loop runs fast and regulates a primary variable (such as motor current
+  or velocity); the outer loop runs slower and sets the setpoint for the inner
+  loop based on a higher-level goal (such as position).
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without cascade control in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Cascade control uses two nested feedback loops — an inner fast loop for the
+  actuator and an outer slow loop for the high-level goal — to deliver fast,
+  stable response.
+slug: cascade-control
+bucket: concept
+---
+
+# Cascade Control in Robotics
+
+## What is it?
+
+Cascade control is a control architecture with two nested feedback loops. The inner loop runs fast and regulates a primary variable (such as motor current or velocity); the outer loop runs slower and sets the setpoint for the inner loop based on a higher-level goal (such as position).
+
+## How it works
+
+The outer controller compares the desired output (e.g., joint position) with the measured output and produces a setpoint for the inner controller (e.g., desired velocity). The inner controller then closes the loop on velocity using current feedback. The inner loop is typically 5–10× faster than the outer, so disturbances are rejected quickly before they propagate.
+
+## Real-world example
+
+Industrial robot arms almost universally use cascade control — current loop at 20 kHz, velocity loop at 2 kHz, position loop at 200 Hz. Pressure-controlled hydraulic systems use cascade with pressure-inside-flow loops.
+
+## Why it matters for robotics
+
+Cascade control delivers faster response and better disturbance rejection than a single-loop PID, especially when the actuator dynamics are slow. Understanding cascade is essential before working on real motion-control systems.
+
+## See also
+
+- [Feedback Loop](/atlas/concept/feedback-loop)
+- [Pid Controller](/atlas/concept/pid-controller)
+- [Closed Loop Control](/atlas/concept/closed-loop-control)

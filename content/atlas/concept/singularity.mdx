@@ -1,0 +1,131 @@
+---
+title: Robot Singularity — Complete Guide | R2BOT
+summary: >-
+  A singularity is a robot pose where the arm loses a degree of freedom — joints
+  can't produce certain end-effector motions. Causes crashes if ignored.
+category: fundamentals
+bucket: mechanical-design
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - singularity
+  - kinematics
+  - jacobian
+  - arm
+  - workspace
+relatedTerms:
+  - inverse-kinematics
+  - workspace
+  - robot-arm
+  - redundancy
+  - forward-kinematics
+seeAlso:
+  - inverse-kinematics
+  - workspace
+  - robot-arm
+  - redundancy
+  - forward-kinematics
+youtubeSearchQuery: robot singularity explained
+oneLiner: 'The mechanical design concept: A singularity is a robot pose where the'
+laymanExplanation: >-
+  A singularity is a configuration where a robot's arm loses one or more degrees
+  of freedom — a direction in which the end-effector cannot be moved no matter
+  how the joints rotate. Near singularities, small end-effector motions demand
+  huge joint speeds, often causing dangerous behaviour.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without robot singularity — complete guide | r2bot, many mechanical design
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A singularity is a robot pose where the arm loses a degree of freedom — joints
+  can't produce certain end-effector motions. Causes crashes if ignored.
+slug: singularity
+---
+
+# Robot Singularity
+
+## What is Robot Singularity?
+
+A singularity is a configuration where a robot's arm loses one or more degrees of freedom — a direction in which the end-effector cannot be moved no matter how the joints rotate. Near singularities, small end-effector motions demand huge joint speeds, often causing dangerous behaviour.
+
+## How It Works
+
+The robot Jacobian matrix maps joint velocities to end-effector velocities. At a singular configuration the Jacobian loses rank — its determinant goes to zero. This means certain end-effector velocity directions become unreachable; equivalently, the inverse Jacobian blows up. Examples: a fully extended elbow (boundary singularity), shoulder over the spine (interior singularity), wrist axes aligned (wrist singularity). Motion planners must detect and avoid singularities or use redundancy-resolution to work through them.
+
+## Real-World Example
+
+If you've ever seen a robot arm 'lock up' or whip violently in a video, you've watched a singularity event. KUKA, FANUC, and ABB all ship singularity-avoidance algorithms in their controllers. Surgical robots ship with sensors that simply refuse to move into wrist singularities — a hard safety stop.
+
+## Why It Matters for Robotics
+
+Misjudging singularities causes broken arms, crashed payloads, and injured humans. Senior robotics engineers must understand the Jacobian, singular values, and how to design around or out of singularities. This is core PhD-level robotics material.
+
+## Try It Yourself
+
+Simulate a 6-DOF arm in MoveIt2. Plan a path that crosses a wrist singularity and watch the joint velocities spike. Then re-plan with singularity avoidance enabled and feel the difference.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "At a robot singularity:",
+    "options": [
+      "Battery dies",
+      "The Jacobian loses rank — a DOF is lost in end-effector space",
+      "Wi-Fi disconnects",
+      "The robot grows new joints"
+    ],
+    "answer": 1,
+    "explain": "The defining condition is rank loss of the geometric Jacobian — the inverse blows up."
+  },
+  {
+    "q": "Near a singularity, joint velocities required for small end-effector moves tend to:",
+    "options": [
+      "Stay the same",
+      "Become very large (and dangerous)",
+      "Become zero",
+      "Reverse polarity"
+    ],
+    "answer": 1,
+    "explain": "As det(J) → 0, the inverse-Jacobian solution explodes, demanding huge joint speeds."
+  },
+  {
+    "q": "Which arm pose typically causes a wrist singularity?",
+    "options": [
+      "All joints at zero",
+      "Wrist axes aligned (gimbal lock)",
+      "Random orientation",
+      "Maximum reach only"
+    ],
+    "answer": 1,
+    "explain": "Wrist singularities occur when two or more wrist rotation axes become collinear."
+  }
+]
+```
+
+## Further Reading
+
+- [Inverse Kinematics](/atlas/concept/inverse-kinematics)
+- [Workspace](/atlas/concept/workspace)
+- [Robot Arm](/atlas/concept/robot-arm)
+- [Redundancy](/atlas/concept/redundancy)
+- [Forward Kinematics](/atlas/concept/forward-kinematics)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Robot Singularity for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

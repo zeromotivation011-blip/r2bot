@@ -1,0 +1,60 @@
+---
+title: "Why robots fail"
+description: "Every robot failure is a failure in one of three places. Understanding this changes how you think about building anything."
+track: spark
+lesson: 5
+duration: "6 min read"
+xp: 90
+estimated_minutes: 6
+sources:
+  - name: "NASA — Spirit Rover Mission Overview"
+    url: "https://www.nasa.gov/mission_pages/mer/index.html"
+  - name: "Leveson, Nancy — Engineering a Safer World"
+    url: "https://mitpress.mit.edu/9780262533690/"
+---
+
+On 10 June 2003, NASA's Spirit rover landed on Mars. It was designed to operate for 90 days. It worked for 6 years — 25 times longer than planned.
+
+Then, in 2009, one wheel jammed. The motor burned out. Spirit could no longer steer properly.
+
+Engineers on Earth spent months writing new software — teaching the rover to drive backwards, dragging its dead wheel, using the drag itself as a crude steering mechanism. Spirit kept going for another year before it finally got stuck in soft soil and lost contact with Earth.
+
+That's what robotics actually looks like. Not failure, then done. Failure, then adapt.
+
+## The three places robots fail
+
+You already know the Sense-Think-Act loop. Here's the useful thing about it: **every robot failure is a failure in exactly one of those three places.** Nothing else is possible.
+
+**Sense failures** happen when the robot gets bad information about the world. A camera lens gets dirty. A LiDAR sensor gets confused by heavy rain. An encoder slips and starts undercounting rotations. The robot isn't broken — it just believes something false about the world, and acts on that false belief.
+
+This is why robustness to sensor failure is engineered in from the start. Redundant sensors. Cross-checking. Confidence thresholds: "I'll only act on this reading if I'm above 90% confident." Ignoring it silently is dangerous. Flagging it and stopping is usually safer.
+
+**Think failures** are software bugs, logic errors, and models that don't generalise. The Therac-25 is the most sobering example in robotics and computing history: a radiation therapy machine in the 1980s had a software bug that, under a specific sequence of operator inputs, delivered radiation doses hundreds of times above what was intended. At least six patients died. The machine's sensors were working. The actuator was working. The software was wrong.
+
+Think failures are also the hardest to find before deployment. You can test a motor until it breaks. You cannot test software against every possible input a messy real world will throw at it.
+
+**Act failures** are mechanical: motors wear out, joints seize, gears strip, hydraulic lines leak. Every physical component degrades over time. The engineering response is redundancy (two motors where one would do), monitoring (current sensors that detect when a motor is working harder than it should), and planned maintenance (replacing parts before they fail, not after).
+
+## Graceful degradation
+
+The best-engineered robots don't just fail — they **fail gracefully**. They detect that something has gone wrong, reduce their capabilities accordingly, and keep operating at a lower level rather than stopping entirely.
+
+Spirit kept roving on five wheels. A self-driving car that loses one camera falls back on its radar and other cameras rather than pulling over. A factory robot that detects a joint fault pauses the current task and alerts a technician rather than continuing and damaging the part it's working on.
+
+Graceful degradation is a design choice made at the beginning, not an afterthought. It asks: "When this component fails — not if — what should the system do?"
+
+## What this means for you
+
+Understanding failure modes changes how you look at any robot you encounter. When you read about a robot accident or a malfunction, your first question should be: was it the sensors, the software, or the actuator? The answer tells you a lot about where the engineering challenge actually lives.
+
+---
+
+## Check your understanding
+
+**1.** A self-driving car misidentifies a white lorry against a bright sky as sky, and drives under it. Is this a Sense failure, a Think failure, or an Act failure?
+
+**2.** Name one design choice that could make a robot more resilient to Sense failures specifically.
+
+---
+
+*"Fail-safe" and "fail-secure" are two different engineering philosophies. A fail-safe system defaults to the safest physical state when something goes wrong — a lift stops between floors rather than dropping. A fail-secure system maintains access control — a security door stays locked even when power fails, rather than opening. Can you think of a robot where these two goals might directly conflict?*

@@ -1,0 +1,73 @@
+---
+title: Feedforward Control in Robotics — Complete Guide
+summary: >-
+  Feedforward control predicts the disturbance or load on a robot and
+  pre-compensates for it, instead of waiting to react. Used with feedback for
+  high-performance motion.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - control
+  - feedforward
+  - motion
+seeAlso:
+  - feedback-loop
+  - pid-controller
+  - model-predictive-control
+difficulty: 3
+oneLiner: 'The concept concept: Feedforward control predicts the disturbance or load on'
+laymanExplanation: >-
+  Feedforward control is a strategy where the controller adds an a-priori
+  command based on a model of the system's expected behaviour — so the robot
+  doesn't have to wait for an error before acting. It is the natural complement
+  to feedback.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without feedforward control in robotics — complete guide, many concept systems
+  in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Feedforward control predicts the disturbance or load on a robot and
+  pre-compensates for it, instead of waiting to react. Used with feedback for
+  high-performance motion.
+slug: feedforward-control
+bucket: concept
+---
+
+# Feedforward Control in Robotics
+
+## What is it?
+
+Feedforward control is a strategy where the controller adds an a-priori command based on a model of the system's expected behaviour — so the robot doesn't have to wait for an error before acting. It is the natural complement to feedback.
+
+## How it works
+
+A feedforward term is calculated from a known model — for example, the gravity torque on each joint of a robotic arm. The controller adds this term to the feedback-driven correction. The combined command moves the actuator more accurately because most of the load is already cancelled before any error appears.
+
+## Real-world example
+
+When Boston Dynamics Atlas lifts a heavy box, a feedforward term anticipates the load and pre-energises the relevant joint motors. Cruise control adds feedforward when it detects an incline. Industrial paint robots compensate for spray-nozzle inertia with feedforward.
+
+## Why it matters for robotics
+
+Feedforward dramatically improves tracking accuracy and reduces lag. It's a recurring topic in robotics interviews — and the secret behind why high-end robots feel so much smoother than DIY ones.
+
+## See also
+
+- [Feedback Loop](/atlas/concept/feedback-loop)
+- [Pid Controller](/atlas/concept/pid-controller)
+- [Model Predictive Control](/atlas/concept/model-predictive-control)

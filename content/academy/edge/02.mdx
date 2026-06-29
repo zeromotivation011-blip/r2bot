@@ -1,0 +1,220 @@
+---
+title: "SLAM from Scratch"
+description: "EKF-SLAM math from first principles. Landmark extraction, data association, loop closure. A working Python EKF-SLAM in 2D."
+track: edge
+lesson: 2
+duration: "90 min read"
+url_slug: e-02-slam-from-scratch
+hindi_name: "SLAM स्क्रैच से"
+xp: 600
+estimated_minutes: 90
+atlas_links: [slam, lidar, odometry, imu]
+sources:
+  - name: "Thrun, Burgard, Fox — Probabilistic Robotics"
+    url: "https://mitpress.mit.edu/9780262201629/probabilistic-robotics/"
+  - name: "Cyrill Stachniss — SLAM lectures"
+    url: "https://www.ipb.uni-bonn.de/sf/"
+---
+
+## What you'll build
+
+A **working Python EKF-SLAM** that takes simulated robot odometry + landmark observations and produces an estimate of (a) the robot's pose and (b) the locations of all landmarks. By the end you can explain *every line* of the code — and the math behind it.
+
+This isn't a wrapper around SLAM Toolbox. This is the algorithm.
+
+## Why build SLAM from scratch
+
+Because you can't really *use* SLAM until you understand its failure modes — drift, divergence, bad data association. Production SLAM (Cartographer, ORB-SLAM3, SLAM Toolbox) hides the math; that's great for shipping, terrible for diagnosis. After this lesson you can read a Cartographer log and know *why* it failed.
+
+ISRO's lunar rover team, Mahindra's autonomous farming research at IIT Bombay's Innov8 lab, and DRDO's robotic platforms all have people who can derive EKF-SLAM on a whiteboard. That's the level we're climbing to.
+
+## EKF-SLAM in three equations
+
+The state vector — robot pose + all landmark positions:
+
+```
+x = [ x_r, y_r, θ_r, x_1, y_1, x_2, y_2, ..., x_N, y_N ]^T
+```
+
+The Extended Kalman Filter has two steps:
+
+**Predict** — use motion model to advance the state:
+
+```
+x_{t+1} = f(x_t, u_t)        # nonlinear motion
+P_{t+1} = F P_t F^T + Q       # propagate covariance
+```
+
+where `F = ∂f/∂x` is the motion Jacobian, `Q` is process noise.
+
+**Update** — incorporate observations:
+
+```
+K = P H^T (H P H^T + R)^{-1}   # Kalman gain
+x = x + K (z - h(x))            # state correction
+P = (I - K H) P                 # covariance update
+```
+
+where `h(x)` is the predicted observation, `H = ∂h/∂x` is the observation Jacobian, `R` is sensor noise, `z` is the actual measurement.
+
+If those four formulas feel dense, that's OK. The code below is what they *do*.
+
+## A working 2D EKF-SLAM
+
+```python
+import numpy as np
+import math
+
+class EKFSlam:
+    """Online EKF-SLAM for 2D differential drive robot + point landmarks."""
+
+    def __init__(self):
+        # State: [x_r, y_r, theta_r, x_1, y_1, x_2, y_2, ...]
+        self.mu = np.array([0.0, 0.0, 0.0])     # robot only at start
+        self.Sigma = np.zeros((3, 3))            # zero uncertainty at origin
+        self.landmark_ids: list[int] = []        # ID for each known landmark
+        # Noise models
+        self.Q = np.diag([0.05, 0.05, 0.01])     # motion noise
+        self.R = np.diag([0.1, 0.1])             # observation noise (range, bearing)
+
+    # --- PREDICT ---
+    def predict(self, v: float, omega: float, dt: float):
+        """Apply motion: linear velocity v, angular velocity omega, over dt."""
+        theta = self.mu[2]
+        # Motion model (unicycle)
+        dx = v * dt * math.cos(theta)
+        dy = v * dt * math.sin(theta)
+        dtheta = omega * dt
+
+        # Update robot pose
+        self.mu[0] += dx
+        self.mu[1] += dy
+        self.mu[2] = self._wrap(self.mu[2] + dtheta)
+
+        # Jacobian wrt robot pose
+        F = np.eye(len(self.mu))
+        F[0, 2] = -v * dt * math.sin(theta)
+        F[1, 2] = v * dt * math.cos(theta)
+
+        # Q expanded to full state size — only the robot block is non-zero
+        Q_full = np.zeros_like(self.Sigma)
+        Q_full[:3, :3] = self.Q
+
+        self.Sigma = F @ self.Sigma @ F.T + Q_full
+
+    # --- UPDATE ---
+    def observe(self, landmark_id: int, range_m: float, bearing_rad: float):
+        """Process a (range, bearing) observation of a known or new landmark."""
+        if landmark_id not in self.landmark_ids:
+            self._add_new_landmark(landmark_id, range_m, bearing_rad)
+            return
+
+        # Find landmark index in state vector
+        i = self.landmark_ids.index(landmark_id)
+        lx_idx = 3 + 2 * i
+        ly_idx = 4 + 2 * i
+
+        x_r, y_r, theta_r = self.mu[0], self.mu[1], self.mu[2]
+        x_l, y_l = self.mu[lx_idx], self.mu[ly_idx]
+
+        # Predicted observation
+        dx = x_l - x_r
+        dy = y_l - y_r
+        q = dx * dx + dy * dy
+        z_hat = np.array([math.sqrt(q), self._wrap(math.atan2(dy, dx) - theta_r)])
+        z = np.array([range_m, self._wrap(bearing_rad)])
+
+        # Innovation
+        y = z - z_hat
+        y[1] = self._wrap(y[1])
+
+        # Observation Jacobian
+        H = np.zeros((2, len(self.mu)))
+        sq = math.sqrt(q)
+        H[0, 0] = -dx / sq
+        H[0, 1] = -dy / sq
+        H[0, lx_idx] = dx / sq
+        H[0, ly_idx] = dy / sq
+        H[1, 0] = dy / q
+        H[1, 1] = -dx / q
+        H[1, 2] = -1.0
+        H[1, lx_idx] = -dy / q
+        H[1, ly_idx] = dx / q
+
+        # Kalman gain and update
+        S = H @ self.Sigma @ H.T + self.R
+        K = self.Sigma @ H.T @ np.linalg.inv(S)
+        self.mu = self.mu + K @ y
+        self.Sigma = (np.eye(len(self.mu)) - K @ H) @ self.Sigma
+
+    def _add_new_landmark(self, lid: int, range_m: float, bearing_rad: float):
+        """Initialise a newly observed landmark in the state."""
+        x_r, y_r, theta_r = self.mu[0], self.mu[1], self.mu[2]
+        x_l = x_r + range_m * math.cos(theta_r + bearing_rad)
+        y_l = y_r + range_m * math.sin(theta_r + bearing_rad)
+
+        # Extend state and covariance
+        self.mu = np.concatenate([self.mu, [x_l, y_l]])
+        n = len(self.mu)
+        new_Sigma = np.zeros((n, n))
+        new_Sigma[:n - 2, :n - 2] = self.Sigma
+        # Large initial uncertainty for the new landmark
+        new_Sigma[n - 2, n - 2] = 1e3
+        new_Sigma[n - 1, n - 1] = 1e3
+        self.Sigma = new_Sigma
+        self.landmark_ids.append(lid)
+
+    @staticmethod
+    def _wrap(theta: float) -> float:
+        """Wrap angle to [-pi, pi]."""
+        while theta > math.pi:
+            theta -= 2 * math.pi
+        while theta < -math.pi:
+            theta += 2 * math.pi
+        return theta
+```
+
+Drive it:
+
+```python
+slam = EKFSlam()
+for t in range(100):
+    slam.predict(v=0.2, omega=0.05, dt=0.1)
+    # Simulated observation of landmark 0
+    slam.observe(landmark_id=0, range_m=3.5, bearing_rad=0.1)
+    if t % 10 == 0:
+        print(f't={t} robot=({slam.mu[0]:.2f}, {slam.mu[1]:.2f}, {slam.mu[2]:.2f})')
+```
+
+## Data association — the hard part
+
+So far we've assumed *known data association* — the observation tells us *which* landmark it is. In reality the robot sees a blob and has to figure out: is this a new landmark, or is this the one I saw 30s ago?
+
+The standard approach: **Mahalanobis distance** — for each existing landmark, compute `(z - z_hat)^T S^{-1} (z - z_hat)` and accept the smallest match if it's below a threshold. Above threshold = new landmark.
+
+Bad data association is the #1 reason EKF-SLAM diverges. Production systems use particle filters (FastSLAM) or graph-SLAM (g2o, GTSAM, ceres) precisely because they're more robust here.
+
+## Loop closure — the magic moment
+
+Loop closure happens when the robot re-observes a landmark it saw at the start of a long trajectory. The covariance suddenly collapses across the whole map. In EKF-SLAM you get this *for free* — the math just works. In particle filters and graph-SLAM you need explicit loop-closure detection (often via deep learning these days — NetVLAD, etc.).
+
+> **Try this in the visualizer:** open [/visualizer#slam](/visualizer#slam) and watch the live map grow. Imagine each cyan dot is a landmark; the robot's covariance shrinks around dots it re-observes. That's loop closure in action.
+
+## Test Your Understanding
+
+**1.** Your EKF-SLAM diverges after ~200 timesteps — the estimated pose drifts wildly. Walk through *three distinct causes* (motion model, observation model, data association) and how you'd diagnose each from the covariance matrix alone.
+
+**2.** You add a second sensor (a magnetometer giving heading). Where in the math does it slot in — predict step, observe step, or both? What new failure mode does it introduce?
+
+**3.** Why does EKF-SLAM get *worse* as the number of landmarks grows (cubic complexity), and what does FastSLAM do differently to escape that?
+
+## India Opportunity
+
+- **SLAM Engineer · Swaayatt Robots, Bhopal** — autonomous driving SLAM for India roads, ₹22–40 LPA.
+- **Senior Robotics Research Engineer · TCS Innovation Labs, Pune** — production SLAM, ₹30–55 LPA.
+- **Research Scientist · ISRO Vikram Sarabhai Space Centre, Trivandrum** — robotic servicing + SLAM, government scale.
+- **PhD Position · IIIT-H TiHAN, Hyderabad** — autonomous mobility research, stipend ₹37k/month.
+
+## Next Step
+
+→ Continue to **[Edge 03 · Edge Capstone — Research Robot](/academy/edge/03)**.

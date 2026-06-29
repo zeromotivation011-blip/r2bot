@@ -1,0 +1,85 @@
+---
+title: Occupancy grid
+category: control
+summary: >-
+  An occupancy grid is a map of the environment divided into a regular grid of
+  cells, where each cell stores a probability value indicating whether that
+  patch of space is occupied by an obstacle, free, or unknown.
+seeAlso: []
+sources:
+  - title: >-
+      Elfes — Using Occupancy Grids for Mobile Robot Perception and Navigation
+      (IEEE Computer, 1989)
+    url: 'https://ieeexplore.ieee.org/document/30720'
+  - title: ROS 2 Nav2 — Costmap 2D
+    url: >-
+      https://navigation.ros.org/configuration/packages/configuring-costmaps.html
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - navigation
+  - mapping
+  - sensors
+difficulty: 3
+oneLiner: 'The concept concept: An occupancy grid is a map of the'
+laymanExplanation: >-
+  Imagine printing a satellite photo of a city on graph paper, then going
+  through each small square and colouring it black if a building occupies it,
+  white if it's open road, and grey if you're not sure. You've just drawn an
+  occupancy grid. Each square holds a single fact: is this patch of the world
+  blocked or not?
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without occupancy grid, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An occupancy grid is a map of the environment divided into a regular grid of
+  cells, where each cell stores a probability value indicating whether that
+  patch of space is occupied by an obstacle, free, or unknown.
+slug: occupancy-grid
+bucket: concept
+---
+
+Imagine printing a satellite photo of a city on graph paper, then going through each small square and colouring it black if a building occupies it, white if it's open road, and grey if you're not sure. You've just drawn an occupancy grid. Each square holds a single fact: is this patch of the world blocked or not?
+
+It sounds almost too simple, but this structure is the backbone of navigation for the vast majority of mobile robots operating in the real world today.
+
+## What each cell stores
+
+An occupancy grid divides the environment into a two-dimensional array of cells, each representing a fixed area of floor space — typically 5 cm × 5 cm or 10 cm × 10 cm for indoor robots. Each cell stores a probability between 0 and 1:
+
+- Near **1.0** — the cell is almost certainly occupied (wall, table leg, box).
+- Near **0.0** — the cell is almost certainly free (open corridor, empty floor).
+- Near **0.5** — unknown; the sensor hasn't observed this area clearly.
+
+This probabilistic representation is honest about uncertainty. A single noisy [lidar](/atlas/concept/lidar) reading doesn't make a cell definitively occupied — it updates the probability, which multiple consistent readings gradually push towards certainty.
+
+## Building the grid from sensor data
+
+A lidar scan produces a set of distance measurements radiating outward from the sensor. For each laser ray, the cells the ray passed through before hitting something are marked more free (the laser got through, so nothing blocked it), and the cell where the ray terminated is marked more occupied (something reflected the laser there). This update rule, applied thousands of times per second across many rays, builds a crisp map of free and occupied space.
+
+The standard update mechanism uses a **log-odds** representation — storing log(p / (1−p)) instead of p directly — which makes incremental Bayesian updates a simple addition operation, fast enough to run in real time.
+
+## A real system: [ROS](/atlas/concept/ros) Costmap 2D
+
+The Nav2 navigation stack uses a "costmap" — a layered occupancy grid — as its core planning representation. One layer holds the static map built during a prior [mapping](/atlas/concept/mapping) session. Another layer shows dynamic obstacles detected in real time. A third applies an "inflation radius" — marking cells near obstacles as high-cost even if technically free, so the planner keeps the [robot](/atlas/concept/robot) away from walls by a safe margin. The path planner then searches through this costmap for the lowest-cost route to the goal.
+
+## Limitations
+
+Occupancy grids assume a flat 2D world. They struggle with multi-floor environments, ramps, or objects at different heights (a table is a forbidden obstacle, but the space under it is navigable). 3D occupancy grids (voxel grids, OctoMaps) address this but require far more memory and computation. For most indoor mobile robots on flat floors, the 2D grid remains the practical standard.
+
+---
+
+*Alberto Elfes and Hans Moravec invented the occupancy grid at Carnegie Mellon in 1985, and it remains so effective that forty years later it is still the default map format for indoor robots worldwide.*

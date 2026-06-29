@@ -1,0 +1,196 @@
+---
+title: "Forge Capstone — Warehouse Robot"
+description: "Integrate SLAM mapping, Nav2 navigation, MoveIt2 manipulation, and YOLO perception into a complete warehouse pick-and-place pipeline."
+track: forge
+lesson: 4
+duration: "90 min read"
+url_slug: f-04-capstone-warehouse
+hindi_name: "फोर्ज कैपस्टोन"
+xp: 500
+estimated_minutes: 90
+atlas_links: [slam, ros2, mobile-robot, robot-arm, computer-vision, neural-network, edge-computing]
+sources:
+  - name: "GreyOrange — Robotic Mobile Fulfilment"
+    url: "https://www.greyorange.com/"
+  - name: "Nav2 multi-robot patterns"
+    url: "https://docs.nav2.org/tutorials/docs/get_started.html"
+---
+
+## What you'll build
+
+A **complete warehouse-robot pipeline** in simulation — a mobile manipulator that:
+
+1. Builds a map of its warehouse with SLAM Toolbox
+2. Localises against the map with AMCL
+3. Navigates to a pickup zone with Nav2
+4. Uses YOLO on the wrist camera to find the target box
+5. Plans an arm trajectory with MoveIt2 to grasp it
+6. Navigates to a dropoff zone
+7. Releases the box
+
+A state machine ties them together. This is the production architecture **GreyOrange**, **Addverb**, **Locus Robotics India**, and **Amazon India's** warehouse robots use — at scale.
+
+## The India context
+
+GreyOrange's Butler robots run in 40+ warehouses worldwide, including major Indian fulfilment centres for Flipkart and Myntra. Each warehouse runs 200–800 robots simultaneously. Locus Robotics' LocusBot handles e-commerce returns processing at Amazon's Bangalore hubs.
+
+This isn't aspirational. The pipeline you write today *is* what these companies run, with bigger maps, more robots, and harder-tuned costmaps.
+
+## Architecture
+
+```
+┌──────────────┐
+│ Mission      │  ──── /mission_state ───▶ Dashboard
+│ Manager      │
+│ (FSM)        │ ◀──── /detections ─────  YOLO Detector
+└──┬───────────┘
+   │
+   ├── Nav2 action: NavigateToPose(pickup_zone)
+   │
+   ├── MoveIt2 action: PlanToPose(grasp_pose)
+   │
+   ├── Gripper service: Close()
+   │
+   ├── Nav2 action: NavigateToPose(dropoff_zone)
+   │
+   └── Gripper service: Open()
+```
+
+## The mission FSM
+
+```python
+import asyncio
+from enum import Enum
+from geometry_msgs.msg import Pose, PoseStamped
+import rclpy
+from rclpy.action import ActionClient
+from rclpy.node import Node
+from nav2_msgs.action import NavigateToPose
+from vision_msgs.msg import Detection2DArray
+
+class MissionState(Enum):
+    IDLE = 'IDLE'
+    GO_TO_PICKUP = 'GO_TO_PICKUP'
+    FIND_BOX = 'FIND_BOX'
+    GRASP = 'GRASP'
+    GO_TO_DROPOFF = 'GO_TO_DROPOFF'
+    RELEASE = 'RELEASE'
+    DONE = 'DONE'
+    FAILED = 'FAILED'
+
+class WarehouseRobot(Node):
+    def __init__(self):
+        super().__init__('warehouse_robot')
+        self.state = MissionState.IDLE
+        self.target_pickup = self._make_pose(2.0, 1.0, 0.0)
+        self.target_dropoff = self._make_pose(-2.0, 1.0, 0.0)
+        self.latest_detections = []
+
+        self.nav_client = ActionClient(self, NavigateToPose, '/navigate_to_pose')
+        self.create_subscription(Detection2DArray, '/detections', self.on_detections, 10)
+
+        # Tick FSM at 1Hz
+        self.create_timer(1.0, self.tick)
+
+    def _make_pose(self, x: float, y: float, yaw: float) -> PoseStamped:
+        ps = PoseStamped()
+        ps.header.frame_id = 'map'
+        ps.pose.position.x = x
+        ps.pose.position.y = y
+        # Naive yaw → quaternion (small angle)
+        import math
+        ps.pose.orientation.z = math.sin(yaw / 2)
+        ps.pose.orientation.w = math.cos(yaw / 2)
+        return ps
+
+    def on_detections(self, msg: Detection2DArray):
+        self.latest_detections = [
+            d for d in msg.detections
+            if d.results and d.results[0].hypothesis.class_id == 'box'
+        ]
+
+    def tick(self):
+        self.get_logger().info(f'state={self.state.value}')
+
+        if self.state == MissionState.IDLE:
+            self.state = MissionState.GO_TO_PICKUP
+            self._send_nav_goal(self.target_pickup, on_done=self._on_pickup_reached)
+
+        elif self.state == MissionState.FIND_BOX:
+            if self.latest_detections:
+                self.get_logger().info(f'Found {len(self.latest_detections)} box(es)')
+                self.state = MissionState.GRASP
+                # Triggers a MoveIt2 plan + execute (see Forge 02)
+
+        # ... other transitions
+
+    def _send_nav_goal(self, pose: PoseStamped, on_done):
+        goal = NavigateToPose.Goal()
+        goal.pose = pose
+        future = self.nav_client.send_goal_async(goal)
+        future.add_done_callback(lambda f: self._on_goal_accepted(f, on_done))
+
+    def _on_goal_accepted(self, future, on_done):
+        handle = future.result()
+        if not handle.accepted:
+            self.get_logger().error('Nav goal rejected')
+            self.state = MissionState.FAILED
+            return
+        result_future = handle.get_result_async()
+        result_future.add_done_callback(lambda f: on_done())
+
+    def _on_pickup_reached(self):
+        self.get_logger().info('Arrived at pickup zone')
+        self.state = MissionState.FIND_BOX
+
+def main():
+    rclpy.init()
+    rclpy.spin(WarehouseRobot())
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+This is real production-shaped code: actions for long-running goals (nav), callbacks chained via futures, a clean FSM. In a full system you'd add: timeouts on every state, retry logic, a behaviour tree instead of a hand-rolled FSM (more flexible), telemetry to the fleet manager, and graceful shutdown.
+
+## Recovery — the thing that makes the difference
+
+A demo robot succeeds when nothing goes wrong. A production robot succeeds when **15% of operations fail and the robot recovers gracefully**.
+
+For your capstone, add three recoveries minimum:
+1. **Nav failure** → re-plan, then call human after 3 retries.
+2. **Box not detected** within 30s → move to a different viewpoint, retry.
+3. **Grasp failure** (force-torque sensor reports no payload) → retry up to 2 times, then skip.
+
+In GreyOrange production, every state has at least one named recovery branch. Without that, fleet uptime hovers around 60%. With it, 95%+.
+
+## What's the manager looking at?
+
+Real warehouse fleet managers (the role: **Robotics Operations Engineer**, ₹18–32 LPA at GreyOrange/Addverb) live in Grafana dashboards showing:
+
+- Robots' current state across the fleet
+- Pick success rate
+- Time per cycle
+- Battery curves
+- Failed-pick reasons (rolled-up)
+
+Build one. A Grafana view of your `/mission_state` topic across simulated robots is a hireable portfolio piece.
+
+## Test Your Understanding
+
+**1.** Your robot succeeds on the first 5 missions, then suddenly fails the navigation phase repeatedly. The map looks fine in RViz. Walk through the diagnostic order — what do you check first, second, third?
+
+**2.** A customer asks: "Why doesn't the robot just plan the whole pickup-grasp-dropoff as one motion?" Give a one-paragraph answer that's honest about both the technical reason and the business reason.
+
+**3.** You're handed a robot that fails grasp 30% of the time. Two engineers propose fixes: (a) retrain YOLO with more box images, (b) add a force-torque sensor and retry on no-payload. Which would you try first, and why?
+
+## You've finished the Forge track
+
+If you can build, debug, and demo a working warehouse-robot pipeline — you're hireable as a mid-level production robotics engineer in India. Typical packages: ₹14–28 LPA at GreyOrange, Addverb, Locus, Ati Motors, Asimov.
+
+Add this to your portfolio. Record a 90-second video walkthrough. Put both in your GitHub README. Apply to 10 jobs. Some will reply.
+
+## Next Step
+
+→ Continue to **[Edge 01 · Multi-Robot Systems](/academy/edge/01)** if you want research-level depth. Or — celebrate 🎉 and download your Forge certificate from the dashboard.

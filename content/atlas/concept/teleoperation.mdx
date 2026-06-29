@@ -1,0 +1,92 @@
+---
+title: Teleoperation
+category: fundamentals
+summary: >-
+  Teleoperation means controlling a robot from a distance, with a human in the
+  loop making the decisions. It combines human intelligence with robotic reach —
+  letting people act in environments that are too dangerous, too distant, or too
+  small for the human body to enter.
+seeAlso: []
+sources:
+  - title: NASA — Robonaut and Remote Operations
+    url: 'https://robonaut.jsc.nasa.gov/'
+  - title: IEEE Spectrum — Teleoperation and Haptics
+    url: 'https://spectrum.ieee.org/tag/teleoperation'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - human-robot-interaction
+  - control
+difficulty: 3
+oneLiner: 'The concept concept: Teleoperation means controlling a robot from a distance,'
+laymanExplanation: >-
+  On 11 March 2011, an earthquake and tsunami struck the Fukushima Daiichi
+  nuclear power plant in Japan. In the days that followed, some of the first
+  responders who entered the reactor buildings were not human — they were
+  tracked robots, controlled by operators sitting safely outside the radiation
+  zone, using joysticks and camera feeds to guide the machines th
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without teleoperation, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Da Vinci Surgical
+  - Mars rovers (with 20-min delay)
+  - DRDO Daksh
+indianExample: >-
+  DRDO Daksh is teleoperated from up to 500 metres away. Indian Army EOD teams
+  use it for IED disposal in Kashmir.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What is the biggest challenge in teleoperating a robot on Mars?
+  options:
+    - Battery
+    - Communication latency (signal delay)
+    - Cost
+    - Heat
+  answer: 1
+  explanation: >-
+    Mars is 4–20 light-minutes away. Round-trip latency makes real-time control
+    impossible — operators send commands in batches.
+mindBlowingFact: >-
+  A surgeon in New York performed gallbladder surgery on a patient in France in
+  2001 using teleoperation — across the Atlantic.
+industryApplications:
+  - surgery
+  - defence
+  - undersea
+  - space
+  - nuclear
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Teleoperation means controlling a robot from a distance, with a human in the
+  loop making the decisions. It combines human intelligence with robotic reach —
+  letting people act in environments that are too dangerous, too distant, or too
+  small for the human body to enter.
+slug: teleoperation
+bucket: concept
+---
+
+On 11 March 2011, an earthquake and tsunami struck the Fukushima Daiichi nuclear power plant in Japan. In the days that followed, some of the first responders who entered the reactor buildings were not human — they were tracked robots, controlled by operators sitting safely outside the radiation zone, using joysticks and [camera](/atlas/concept/camera-vision) feeds to guide the machines through rubble and read instrument panels. The operators' hands never entered the building. Their agency did.
+
+This is **teleoperation** — controlling a [robot](/atlas/concept/robot) from a distance, with a human making the decisions in real time. The word fuses the Greek *tele* (far) and *operation*. It is distinct from both full [autonomy](/atlas/concept/autonomy) (where the robot decides on its own) and simple remote control (which implies the human is just issuing movement commands to a dumb machine). In teleoperation, the human provides intelligence; the robot provides physical presence somewhere the human cannot or should not be.
+
+## The anatomy of a teleoperation system
+
+A teleoperation system has three essential components. First, a **command interface** — whatever the human operator uses to express their intent. This might be a joystick, a haptic glove, a pair of tracked motion-capture controllers, or even a full [exoskeleton](/atlas/concept/exoskeleton) that the operator wears and moves naturally. Second, a **communication [link](/atlas/concept/link-robot)** — the channel between operator and robot. This might be a radio link, a fibre-optic cable, or an internet connection. Third, a **[feedback](/atlas/concept/feedback) channel** — information flowing back from the robot to the operator, most critically video but increasingly also force and tactile feedback (so the operator can feel what the robot is touching).
+
+## Time delay: the central engineering challenge
+
+When the distance is small — a surgeon at a console controlling arms across a sterile field, as in the da Vinci Surgical System — the communication delay is essentially zero and teleoperation is smooth and intuitive. When the distance is large, delay becomes the defining constraint. Controlling a robot on the surface of Mars from Earth involves a one-way signal travel time of between 3 and 22 minutes, depending on orbital positions. You cannot drive a Mars rover in real time; every command requires a wait-and-see cycle. NASA's Curiosity and Perseverance rovers handle this by executing pre-planned sequences of moves, with human oversight happening in discrete review sessions.
+
+Even at terrestrial distances, a delay of more than about 200 milliseconds makes teleoperation noticeably awkward, and delays over 500 milliseconds make it genuinely dangerous. Techniques like **predictive displays** (showing the operator a simulation of where the robot will be based on their current input, rather than waiting for the delayed camera feed) help bridge the gap.
+
+## Teleoperation versus autonomy
+
+The two are not mutually exclusive. Most sophisticated field robots combine them: the robot handles low-level navigation autonomously while a human operator makes higher-level decisions, designates targets, and intervenes when the autonomous behaviour fails. This model — sometimes called **supervised autonomy** — captures the complementary strengths of both.
+
+---
+
+*As robots become more capable, does it become less ethical to send them into danger — or does that question only apply to robots that can suffer?*

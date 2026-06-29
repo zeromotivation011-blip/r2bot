@@ -1,0 +1,87 @@
+---
+title: Arduino
+slug: arduino
+bucket: hardware
+summary: >-
+  The most popular open-source microcontroller platform for beginner robotics —
+  ₹350 in India and the on-ramp for millions of student projects.
+seeAlso:
+  - pwm
+  - servo-motor
+  - dc-motor
+  - motor-driver
+  - raspberry-pi
+tags:
+  - hardware
+  - beginner
+  - education
+lastReviewed: 2025-01-15T00:00:00.000Z
+difficulty: 1
+difficultyLabel: beginner
+oneLiner: >-
+  The most popular robotics brain for beginners — open-source, cheap, and
+  Indian-friendly.
+laymanExplanation: >-
+  Arduino is like a tiny computer that you can program to control motors, LEDs,
+  and sensors. It's the heart of most beginner robot projects.
+analogy: >-
+  Arduino is like a translator between you and the machine — you write simple
+  instructions, it makes hardware obey.
+whyItMatters: >-
+  Arduino democratised robotics education globally. For ₹500, a student in rural
+  India can build a line-following robot.
+indianExample: >-
+  Over 2 million Arduino boards are sold in India annually. Most school robotics
+  clubs start with Arduino Uno.
+realRobotsThatUseThis:
+  - DIY line-following robots
+  - Smart-home projects
+  - Automated irrigation systems
+mindBlowingFact: >-
+  Arduino was invented in Italy in 2005 as a cheap alternative to proprietary
+  microcontrollers. Now 10 million+ boards are sold every year worldwide.
+industryApplications:
+  - education
+  - prototyping
+  - IoT
+  - agriculture
+  - art installations
+quizQuestion:
+  q: What language do you use to program an Arduino?
+  options:
+    - Python
+    - Arduino C/C++
+    - JavaScript
+    - HTML
+  answer: 1
+  explanation: >-
+    Arduino uses a simplified C/C++ dialect inside its IDE — easy enough for
+    beginners, real enough to be useful.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+technicalDefinition: >-
+  The most popular open-source microcontroller platform for beginner robotics —
+  ₹350 in India and the on-ramp for millions of student projects.
+---
+
+**Arduino** is an open-source microcontroller platform created in Italy in 2005. It is the default starting point for almost every Indian school robotics club. A genuine Arduino Uno costs about ₹2,500; clones sell for ₹350.
+
+## Why Arduino changed everything
+
+Before Arduino, embedded programming meant proprietary chips, expensive programmers, and obscure toolchains. Arduino opened up three things:
+
+- A cheap board (Atmel ATmega328 + USB-serial)
+- A simple IDE in Java that flashes the board with one click
+- A C/C++ dialect with two functions — `setup()` and `loop()` — that fits most beginner mental models
+
+## What you can build
+
+- Line-following robots
+- Obstacle-avoiding robots (with an HC-SR04 [ultrasonic sensor](/atlas/concept/ultrasonic-sensor))
+- Smart-irrigation systems with soil-moisture probes
+- IoT-connected bins, plant monitors, weather stations
+
+Arduino's analog-write function uses [PWM](/atlas/concept/pwm) under the hood — the same trick that controls servo motors and dims LEDs. To drive real motors, you pair Arduino with a [motor driver](/atlas/concept/motor-driver) like the L298N.
+
+For more compute (computer vision, ROS), graduate to a [Raspberry Pi](/atlas/concept/raspberry-pi).

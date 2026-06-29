@@ -1,0 +1,23 @@
+{
+  "id": "build-vision-line-follower",
+  "slug": "vision-line-follower",
+  "title": "Vision-Based Line Follower",
+  "tagline": "Ditch the IR sensors. Use a Raspberry Pi, a camera, and OpenCV to actually see the line — your first real computer vision project.",
+  "level": "advanced",
+  "duration_hours": 8,
+  "total_xp": 1400,
+  "components": [
+    { "name": "Raspberry Pi 4 (2GB or more)" },
+    { "name": "Pi Camera Module v2 or v3" },
+    { "name": "L298N motor driver module" },
+    { "name": "2× DC motors with wheels" },
+    { "name": "Caster wheel" },
+    { "name": "Chassis" },
+    { "name": "Li-ion battery pack + 5V buck converter" },
+    { "name": "MicroSD card 32GB+ with Raspberry Pi OS" },
+    { "name": "Jumper wires" }
+  ],
+  "simulation_only": false,
+  "color": "#f87171",
+  "icon": "👁️"
+}

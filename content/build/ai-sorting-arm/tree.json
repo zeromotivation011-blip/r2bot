@@ -1,0 +1,357 @@
+{
+  "root": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "explanation",
+      "title": "The Final Boss: AI + Arm",
+      "body": "This is the most advanced project on R2BOT. If you've worked through the track from line follower to ROS2, you're ready. If you're jumping straight here — respect, but it'll be steep.\n\nHere's what you're building: a camera above a conveyor belt spots objects, classifies them in real time, calculates their 3D position, and commands a 4-DOF robotic arm to pick them up and drop them into the correct bin. Repeat. Indefinitely. Without a human.\n\n**This is not a demo concept.** Amazon's Sparrow robot does exactly this — it's in their fulfilment centres right now, sorting individual items from shelves. FANUC uses the same computer vision + arm combination for quality control on automotive production lines. The technology you're learning is running at industrial scale.\n\nThe stack:\n- **YOLOv8** — real-time neural network object detection\n- **Jetson Nano** — NVIDIA GPU-on-a-board for inference at the edge\n- **cv2.solvePnP()** — coordinate transformation from camera pixels to arm world coordinates\n- **4-DOF arm** — inverse kinematics to reach any point in 3D space\n\nLet's break each layer apart.",
+      "branches": [{ "on": "next", "to": "q-what-is-yolo" }],
+      "xp": 10
+    },
+
+    "q-what-is-yolo": {
+      "id": "q-what-is-yolo",
+      "type": "question",
+      "title": "What Does YOLO Stand For?",
+      "body": "Before YOLO (2015), object detection worked in two stages: first propose candidate regions, then classify each one. This was accurate but too slow for real-time. YOLO changed everything with a radically different approach captured in its name.",
+      "question": {
+        "style": "mcq",
+        "prompt": "YOLO stands for:",
+        "options": [
+          "You Only Look Once",
+          "Yellow Object Location Overlay",
+          "Your Own Learning Optimizer",
+          "Yet Another Object Locator"
+        ],
+        "correct": 0,
+        "explanation_correct": "You Only Look Once. The entire name is the innovation — the neural network looks at the whole image exactly once in a single forward pass, simultaneously predicting all bounding boxes and class labels. No separate proposal stage. This made detection fast enough for real-time video.",
+        "explanation_wrong": "YOLO = You Only Look Once. The name describes the core innovation: instead of processing candidate regions separately, YOLO runs the entire image through the neural network once and outputs all detections simultaneously. One pass → all bounding boxes + labels + confidence scores. This is what made real-time detection possible."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-yolo-speed" },
+        { "on": "wrong", "to": "q-yolo-speed" }
+      ],
+      "xp": 15
+    },
+
+    "q-yolo-speed": {
+      "id": "q-yolo-speed",
+      "type": "question",
+      "title": "Why YOLO Changed Everything",
+      "body": "Before YOLO, the state of the art was R-CNN (Region-based CNN), which ran at about 0.5 FPS — too slow for video. YOLO v1 ran at 45 FPS. YOLOv8 (2023) runs at 100+ FPS on a GPU. The difference is architectural.",
+      "question": {
+        "style": "mcq",
+        "prompt": "YOLO's primary advantage over older two-stage detection methods (R-CNN, Faster R-CNN) is:",
+        "options": [
+          "Higher detection accuracy — it makes fewer false positive errors",
+          "Real-time detection speed achieved through a single neural network forward pass",
+          "Works without a GPU — optimised for CPU-only systems",
+          "Requires no training data — detects objects without prior examples"
+        ],
+        "correct": 1,
+        "explanation_correct": "Speed through single-pass architecture. Two-stage detectors propose regions then classify them — two expensive passes. YOLO divides the image into a grid, predicts boxes and classes from each cell simultaneously in one pass. YOLOv8 specifically improves on this with anchor-free detection and a decoupled head, making it both faster and more accurate than its predecessors.",
+        "explanation_wrong": "The key advantage is speed via single-pass architecture. Two-stage detectors (R-CNN family) run the image through a region proposal network, then classify each proposal separately — expensive. YOLO processes the whole image once and outputs everything simultaneously. YOLOv8 also needs GPU for full speed, requires training data, and trades some accuracy for speed compared to two-stage methods."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-bounding-box" },
+        { "on": "wrong", "to": "q-bounding-box" }
+      ],
+      "xp": 20
+    },
+
+    "q-bounding-box": {
+      "id": "q-bounding-box",
+      "type": "question",
+      "title": "What YOLO Actually Outputs",
+      "body": "For each object detected, YOLO produces a structured output that tells you everything you need to act on the detection: where the object is, what it is, and how confident the network is.\n\nFor a sorting robot, you need all three pieces to make a pick decision.",
+      "question": {
+        "style": "boolean",
+        "prompt": "For each detected object, YOLO outputs: a bounding box (x, y, width, height), a class label (e.g. 'red_block'), and a confidence score (0.0–1.0).",
+        "correct": "yes",
+        "explanation_correct": "Correct. Those three outputs per detection are the standard YOLO interface: bounding box localises the object, class label classifies it, confidence score tells you how certain the network is. In YOLOv8's Python API: `results[0].boxes.xyxy` (box coordinates), `.cls` (class index), `.conf` (confidence). You filter by confidence threshold before acting on a detection.",
+        "explanation_wrong": "Yes — bounding box + class label + confidence is exactly what YOLO outputs per detection. The bounding box gives (x, y, width, height) or (x1, y1, x2, y2) depending on the format. The class label is an integer index into your trained class list. The confidence is 0.0–1.0. You typically filter out detections below a confidence threshold (e.g., 0.5) to ignore weak, uncertain predictions."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-confidence" },
+        { "on": "wrong", "to": "q-confidence" }
+      ],
+      "xp": 15
+    },
+
+    "q-confidence": {
+      "id": "q-confidence",
+      "type": "question",
+      "title": "Setting the Confidence Threshold",
+      "body": "YOLO produces detections continuously — including ones it's not very sure about. A detection with 12% confidence on 'red_block' is almost certainly a false positive. You need to filter these out before commanding the arm.\n\nSet the threshold too high: miss real objects. Too low: pick up phantom objects.",
+      "hint": "Think about what 'confident enough to act on' means as a percentage. 50% means the network thinks it's more likely right than wrong.",
+      "question": {
+        "style": "number-input",
+        "prompt": "What's a common confidence threshold (in whole number percent, 0–100) for filtering YOLO detections before acting on them in an industrial sorting application?",
+        "correct": 50,
+        "explanation_correct": "50% (0.5) is the standard starting threshold — the network is more likely right than wrong. In practice, sorting applications often push this to 70–80% to minimise false picks, which are expensive (dropped objects, jammed bins). The trade-off: higher threshold means more missed detections. Tune based on your error cost: is a false pick or a missed object worse?",
+        "explanation_wrong": "50% is the conventional midpoint threshold — above this, the network is more confident it's right than wrong. Industrial deployments often use 65–80% to reduce false picks. The value you choose depends on your cost function: in pharmaceutical sorting, a false pick (wrong pill in wrong bin) might be catastrophic, pushing the threshold to 90%+. For colour block sorting, 50% is perfectly reasonable."
+      },
+      "branches": [
+        { "on": "correct", "to": "explanation-jetson" },
+        { "on": "wrong", "to": "explanation-jetson" }
+      ],
+      "xp": 15
+    },
+
+    "explanation-jetson": {
+      "id": "explanation-jetson",
+      "type": "explanation",
+      "title": "Jetson Nano: GPU at the Edge",
+      "body": "Here's the problem: YOLOv8 runs great on a desktop GPU (RTX 3080 = 300+ FPS). But a sorting robot isn't near a desktop GPU. It needs to run inference *at the edge* — on the robot itself, in real time, at low power.\n\n**NVIDIA Jetson Nano** is the solution. It's a single-board computer with an integrated **128-core Maxwell GPU**. The whole thing draws 5–10 watts — less than a phone charger.\n\nBenchmarks on Jetson Nano with YOLOv8n (nano model):\n- CPU only: ~2–3 FPS (not usable)\n- With GPU (TensorRT optimised): ~20–30 FPS ✓\n\nThat 10× GPU speedup comes from **parallelism**. A neural network's forward pass is mostly matrix multiplications. A CPU does these sequentially. A GPU has 128 cores that can run 128 multiply-accumulate operations simultaneously.\n\n**TensorRT** (NVIDIA's inference optimiser) takes a trained YOLOv8 model and recompiles it specifically for the Jetson's GPU — quantising weights from 32-bit to 8-bit, fusing layers, and optimising memory layout. The result: same accuracy, 2–4× faster.\n\n```bash\n# Export to TensorRT engine\nyolo export model=yolov8n.pt format=engine device=0\n```\n\nFor the simulation, YOLOv8 runs on your browser's CPU — slower, but the algorithm is identical.",
+      "branches": [{ "on": "next", "to": "q-inference-speed" }],
+      "xp": 10
+    },
+
+    "q-inference-speed": {
+      "id": "q-inference-speed",
+      "type": "question",
+      "title": "Why GPU Crushes CPU for Neural Networks",
+      "body": "The performance gap between GPU and CPU for neural network inference is dramatic — 10–100× faster. This isn't because GPUs have higher clock speeds (they're actually often lower than CPUs). It's architectural.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Why does neural network inference run dramatically faster on a GPU than a CPU?",
+        "options": [
+          "GPUs operate at much higher clock speeds, executing more instructions per second",
+          "GPUs have thousands of smaller cores that execute matrix multiplications (the dominant operation in neural networks) massively in parallel",
+          "GPUs have more RAM, reducing memory bottlenecks",
+          "GPUs run Python code more efficiently due to special interpreter optimizations"
+        ],
+        "correct": 1,
+        "explanation_correct": "Parallelism is the answer. A neural network forward pass is mostly matrix multiplications — multiply two matrices element by element, sum the results. On a CPU with 8 cores, you do 8 multiplications at a time. On a GPU with 10,000+ CUDA cores, you do 10,000 at a time. The neural network doesn't get smarter — it gets the same answer just ~1000× faster on large batches.",
+        "explanation_wrong": "It's parallelism, not clock speed. CPUs are designed for sequential, branchy workloads — few fast cores. GPUs are designed for massively parallel workloads — thousands of slower cores all doing the same operation simultaneously. Neural network matrix multiplications are perfectly parallelisable: every output element can be computed independently. GPUs exploit this completely; CPUs can't."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-transfer-learning" },
+        { "on": "wrong", "to": "q-transfer-learning" }
+      ],
+      "xp": 20
+    },
+
+    "q-transfer-learning": {
+      "id": "q-transfer-learning",
+      "type": "question",
+      "title": "Transfer Learning: Don't Start from Scratch",
+      "body": "Training a neural network from scratch requires millions of images, weeks of compute time, and expensive GPU hardware. But you only need to detect 3 coloured blocks.\n\n**Transfer learning:** take a network already trained on millions of general images (ImageNet, COCO), which has already learned to detect edges, shapes, textures, and object parts — then fine-tune just the final layers on your specific objects.\n\nYOLOv8 pretrained on COCO can already detect 80 classes. Fine-tuning on 300 images of your blocks takes 30 minutes on a laptop.",
+      "question": {
+        "style": "boolean",
+        "prompt": "Instead of training YOLOv8 from random weights, you can fine-tune a model pretrained on COCO (80 classes, 330,000 images) using just a few hundred images of your specific target objects.",
+        "correct": "yes",
+        "explanation_correct": "Correct. This is standard practice. The pretrained model has already learned rich visual features — edges, textures, shapes — that transfer to any visual detection task. Fine-tuning updates only the detection head weights (or all layers with a low learning rate) to map those features to your specific classes. 100–500 images per class is usually enough. Without transfer learning, you'd need tens of thousands.",
+        "explanation_wrong": "Transfer learning is real and this is exactly how it works. A COCO-pretrained YOLOv8 model has already learned powerful visual features. Fine-tuning means continuing training with your own images at a low learning rate, adjusting the final layers to detect your classes. Ultralytics (YOLOv8's creators) made this as simple as: `yolo train model=yolov8n.pt data=mydata.yaml epochs=50`."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-class-labels" },
+        { "on": "wrong", "to": "q-class-labels" }
+      ],
+      "xp": 20
+    },
+
+    "q-class-labels": {
+      "id": "q-class-labels",
+      "type": "question",
+      "title": "Defining Output Classes",
+      "body": "When you train or fine-tune YOLO, you define the list of object categories it should detect. The number of output classes determines the size of the final detection layer.\n\nFor the sorting robot: red block, blue block, green block.",
+      "question": {
+        "style": "mcq",
+        "prompt": "To sort 3 types of objects (red block, blue block, green block), how many output classes does your YOLO model need?",
+        "options": [
+          "1 — just detect 'block', handle colour separately",
+          "2 — blocks and non-blocks (binary classification)",
+          "3 — one class per object type",
+          "255 — YOLO always uses 255 output classes regardless"
+        ],
+        "correct": 2,
+        "explanation_correct": "3 classes: `red_block`, `blue_block`, `green_block`. Each class gets its own output channel in the detection head. When the model detects an object, it outputs the class index (0, 1, or 2) plus confidence for that specific class. Your `data.yaml` file lists these three class names, and the fine-tuned model learns to distinguish them based on colour and shape features.",
+        "explanation_wrong": "3 classes — one per object type. Your training data YAML lists: `names: ['red_block', 'blue_block', 'green_block']`. Each class has its own bounding box prediction outputs. If you used 1 class, you'd detect 'something' but not know which bin to sort into. YOLO dynamically supports any number of classes — from 1 to 80 (COCO) to 1000+ for large classification tasks."
+      },
+      "branches": [
+        { "on": "correct", "to": "explanation-coordinate-transform" },
+        { "on": "wrong", "to": "explanation-coordinate-transform" }
+      ],
+      "xp": 20
+    },
+
+    "explanation-coordinate-transform": {
+      "id": "explanation-coordinate-transform",
+      "type": "explanation",
+      "title": "From Pixel to Pick Point",
+      "body": "YOLO tells you: 'there's a red block, bounding box centre at pixel (347, 218) in a 640×480 image.' Your arm needs to know: 'move end-effector to world coordinate (X=123mm, Y=47mm, Z=0mm) above the conveyor.'\n\nThis translation from 2D pixel coordinates to 3D world coordinates requires two things:\n\n**1. Camera calibration** — every camera has intrinsic parameters: focal length (fx, fy), optical centre (cx, cy), and lens distortion coefficients. These are found by filming a checkerboard pattern and running `cv2.calibrateCamera()`. They describe exactly how the camera projects 3D space onto the 2D sensor.\n\n**2. Pose estimation with solvePnP** — given the camera intrinsics, the known real-world size of the object, and its position in the image, `cv2.solvePnP()` solves for the 3D position and orientation of the object relative to the camera.\n\n```python\nretval, rvec, tvec = cv2.solvePnP(\n    object_points,   # 3D corners of the known object (in mm)\n    image_points,    # corresponding 2D pixel positions\n    camera_matrix,   # from calibration\n    dist_coeffs      # from calibration\n)\n# tvec = [X, Y, Z] translation of object from camera origin\n```\n\nFinally, transform from camera frame to arm base frame using the known camera-to-arm mount transform (measured physically and stored as a 4×4 transformation matrix).\n\nResult: `(X, Y, Z)` in arm coordinates → send to arm's inverse kinematics solver → joint angles → motor commands → pick.",
+      "branches": [{ "on": "next", "to": "q-pick-sequence" }],
+      "xp": 10
+    },
+
+    "q-pick-sequence": {
+      "id": "q-pick-sequence",
+      "type": "question",
+      "title": "The Pick-and-Place Sequence",
+      "body": "The full pick-and-place operation involves several steps that must happen in a specific order. Getting the order wrong causes collisions, missed picks, or objects dropped in the wrong bin.",
+      "question": {
+        "style": "mcq",
+        "prompt": "What is the correct sequence for a pick-and-place operation?",
+        "options": [
+          "Detect object → move arm to pick position → close gripper → move to target bin → open gripper",
+          "Move arm to bin → detect object → close gripper → open gripper",
+          "Close gripper → detect object → move arm → open gripper",
+          "Detect object → move to bin → close gripper at bin → open gripper at pick point"
+        ],
+        "correct": 0,
+        "explanation_correct": "Correct sequence. Detect first (so you know where to go), then move above the object, lower, close gripper (grab), lift, move to bin, open gripper (release). In practice there are intermediate steps: 'approach' position above the object before lowering, 'retreat' after picking, and collision checking at each stage. The arm never moves with the gripper closed toward another object.",
+        "explanation_wrong": "The correct sequence is: detect (find the object's position), approach (move above pick point), lower, close gripper, lift, move to bin, lower slightly, open gripper, retreat. You must detect before moving — you need the target coordinates. You grip before moving to the bin — moving without the object defeats the purpose. This sequence is encoded in the arm's state machine controller."
+      },
+      "branches": [
+        { "on": "correct", "to": "simulation" },
+        { "on": "wrong", "to": "simulation" }
+      ],
+      "xp": 25
+    },
+
+    "simulation": {
+      "id": "simulation",
+      "type": "simulation",
+      "title": "Try It: AI Sorting Arm Simulation",
+      "body": "The simulation shows the full pipeline running: overhead camera feed with YOLOv8 detections (bounding boxes + class labels + confidence scores), the coordinate transformation to arm space, and the arm executing pick-and-place operations.\n\nYou can add objects to the conveyor belt and watch the complete pipeline: detection → classification → coordinate transform → arm trajectory → bin placement. Try placing an ambiguous object to see how confidence thresholding handles uncertainty.",
+      "simulation_url": "/visualizer?mode=ai-arm",
+      "branches": [{ "on": "next", "to": "q-false-positive" }],
+      "xp": 10
+    },
+
+    "q-false-positive": {
+      "id": "q-false-positive",
+      "type": "question",
+      "title": "Fixing False Positives",
+      "body": "The robot misidentifies a blue block as a red block and sorts it into the wrong bin. This is a false positive — the detection was confident but wrong. This happens more often than you'd think in real deployments (lighting changes, partial occlusion, worn objects).\n\nWhat's the most effective fix specifically for reducing incorrect classifications (not missed detections)?",
+      "question": {
+        "style": "mcq",
+        "prompt": "The robot is making false positive classification errors (sorting objects into wrong bins with high confidence). What's the most effective fix?",
+        "options": [
+          "Increase the confidence threshold to require higher certainty before acting on a detection",
+          "Make the arm move more slowly so it has more time to reconsider",
+          "Repaint the objects with brighter, more saturated colours",
+          "Add more bins to give the robot more options"
+        ],
+        "correct": 0,
+        "explanation_correct": "Increasing the confidence threshold forces the model to be more certain before triggering a pick. But this alone might not fix systematic misclassifications (e.g., the model consistently confuses red and orange under certain lighting). The full fix is: raise threshold + retrain with more examples of the confused classes + use data augmentation (brightness/colour jitter) during training to make the model robust to lighting variation.",
+        "explanation_wrong": "Increasing the confidence threshold is the first tool — require 80% instead of 50% confidence before picking. But if the model is systematically confusing specific classes, retraining with more diverse examples of those classes (especially under different lighting conditions) is the deeper fix. Slow arm movement doesn't change detection. Repainting might help but doesn't fix the model's learned features."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-depth-camera" },
+        { "on": "wrong", "to": "q-depth-camera" }
+      ],
+      "xp": 20
+    },
+
+    "q-depth-camera": {
+      "id": "q-depth-camera",
+      "type": "question",
+      "title": "Getting Z: The Depth Problem",
+      "body": "A regular camera is a 2D sensor. It gives you (x, y) in pixel coordinates. But picking requires (X, Y, Z) in 3D space — you need to know how far down to lower the arm.\n\nFor flat objects on a conveyor belt, Z is approximately constant (known belt height). For irregular objects at varying heights, you need actual depth measurement.\n\nTwo main approaches exist:",
+      "hint": "Think about what gives you the actual distance to each pixel — not just the 2D image.",
+      "question": {
+        "style": "mcq",
+        "prompt": "To measure the 3D depth (Z distance) of objects directly, what hardware approaches are used?",
+        "options": [
+          "Stereo vision (two cameras separated by a known distance) or a dedicated depth camera like Intel RealSense (structured light or ToF)",
+          "A single regular camera with a zoom lens",
+          "An ultrasonic sensor mounted pointing upward on the conveyor",
+          "GPS with centimetre-accurate RTK positioning"
+        ],
+        "correct": 0,
+        "explanation_correct": "Both stereo and dedicated depth cameras work. Stereo cameras use parallax (the same object appears shifted between two cameras by an amount proportional to distance) to triangulate depth. Intel RealSense uses structured light (projecting an IR pattern and measuring its distortion) or time-of-flight. RealSense is plug-and-play with ROS2 and produces a depth image aligned pixel-by-pixel with the colour image — ideal for this application.",
+        "explanation_wrong": "Stereo cameras or dedicated depth cameras (Intel RealSense, Microsoft Azure Kinect) are the right tools. Stereo triangulates depth from parallax between two cameras. RealSense D435 uses active stereo + structured light to produce a dense depth map at 30 FPS, aligned to the RGB frame. In ROS2, the `realsense2_camera` driver publishes both color and depth as aligned topics — depth per pixel, usable directly with the bounding box coordinates."
+      },
+      "branches": [
+        { "on": "correct", "to": "checkpoint" },
+        { "on": "wrong", "to": "checkpoint" }
+      ],
+      "xp": 20
+    },
+
+    "checkpoint": {
+      "id": "checkpoint",
+      "type": "checkpoint",
+      "title": "AI Sorting Arm — Full Stack Checkpoint",
+      "body": "You're in the home stretch. The complete AI sorting arm pipeline:\n\n**Detection Layer:**\n- **YOLOv8** (fine-tuned via transfer learning) → bounding box + class label + confidence\n- **Confidence threshold** (0.5–0.8) filters weak detections\n- Runs on **Jetson Nano** at 20–30 FPS using TensorRT-optimised model\n\n**Coordinate Transform Layer:**\n- Camera calibration provides intrinsic parameters (focal length, optical centre)\n- `cv2.solvePnP()` converts bounding box centre → 3D position in camera frame\n- Camera-to-arm transform matrix converts to arm base frame coordinates (X, Y, Z)\n\n**Arm Control Layer:**\n- Inverse kinematics converts (X, Y, Z) target → joint angles (θ1, θ2, θ3, θ4)\n- Pick sequence: detect → approach → lower → grip → lift → move to bin → release\n- State machine ensures safe ordering and handles pick failures\n\n**Reliability:**\n- Higher confidence threshold → fewer false picks\n- Depth camera or stereo → accurate Z for variable-height objects\n- Retraining with augmented data → robust to lighting changes",
+      "branches": [{ "on": "next", "to": "q-throughput" }],
+      "xp": 10
+    },
+
+    "q-throughput": {
+      "id": "q-throughput",
+      "type": "question",
+      "title": "Calculating Sorting Throughput",
+      "body": "Industrial customers care about throughput — objects sorted per unit time. Your system has two bottlenecks: detection speed (how fast YOLO runs) and arm cycle time (how long a pick-and-place takes).\n\nYOLO can detect 25 objects per second. But the arm needs 2 seconds to complete one pick-and-place cycle (approach, grip, move, release, return). These two rates don't match — the arm is the bottleneck.",
+      "hint": "The system throughput is limited by the slowest component. With a 2-second arm cycle, how many picks can it complete in 60 seconds?",
+      "question": {
+        "style": "number-input",
+        "prompt": "If YOLOv8 runs at 25 FPS and the arm's pick-and-place cycle takes 2 seconds, what is the maximum sorting throughput in objects per minute?",
+        "correct": 30,
+        "explanation_correct": "30 objects per minute. The arm is the bottleneck: 1 pick per 2 seconds = 0.5 picks/second = 30 picks/minute. YOLO at 25 FPS is far faster than needed — the arm can only pick once every 2 seconds, so YOLO running at 25 FPS is overkill for this scenario (though useful for detecting the next object while the arm is still moving). Industrial arms with faster cycle times (0.5s) can reach 120 objects/minute.",
+        "explanation_wrong": "The answer is 30 objects per minute. The arm takes 2 seconds per cycle → 60 seconds ÷ 2 = 30 picks per minute. YOLO's 25 FPS detection rate is irrelevant to throughput — the arm is the bottleneck. In production, you'd add multiple arms or reduce arm cycle time (faster motors, shorter travel paths, optimised trajectories) to increase throughput. Or run parallel conveyor lanes."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-real-world" },
+        { "on": "wrong", "to": "q-real-world" }
+      ],
+      "xp": 25
+    },
+
+    "q-real-world": {
+      "id": "q-real-world",
+      "type": "question",
+      "title": "Who Uses This at Scale?",
+      "body": "The combination of computer vision + robotic arm for sorting is now mainstream in logistics and manufacturing. One company operates this system at a scale that dwarfs all others.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Which company uses computer vision + robotic arm sorting at the largest global scale?",
+        "options": [
+          "Amazon (Sparrow robot — sorting individual items in fulfilment centres)",
+          "Apple (sorting iPhone components in assembly lines)",
+          "Google (sorting data centre hardware)",
+          "ISRO (sorting payload components for satellite assembly)"
+        ],
+        "correct": 0,
+        "explanation_correct": "Amazon Sparrow. Announced in 2022, Sparrow uses computer vision to identify individual items (recognising specific products from visual appearance) and a robotic arm to pick and move them between shelves and conveyor systems in fulfilment centres. It handles millions of items daily. This is the direct industrial-scale version of what you just built.",
+        "explanation_wrong": "Amazon Sparrow is the world's largest deployment of CV + arm sorting. It operates in Amazon's fulfilment centres, picking individual products using computer vision for identification and a robotic arm for manipulation. Amazon also has Robin (larger item sorting) and Cardinal (item packaging). These systems handle millions of picks per day across hundreds of facilities — the exact technology you just built, at industrial scale."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-future" },
+        { "on": "wrong", "to": "q-future" }
+      ],
+      "xp": 20
+    },
+
+    "q-future": {
+      "id": "q-future",
+      "type": "question",
+      "title": "The Trajectory",
+      "body": "The technology you've learned — computer vision, neural network inference at the edge, coordinate transformation, robotic arm control — is advancing rapidly. Costs are dropping (Jetson Nano was $99, YOLOv8 is free, arms are getting cheaper). Capability is rising (better models, faster inference, more dexterous arms).",
+      "question": {
+        "style": "boolean",
+        "prompt": "In the next 10 years, robots combining computer vision and robotic arms will likely automate the majority of repetitive sorting, picking, and assembly tasks currently performed by humans in warehouses and manufacturing.",
+        "correct": "yes",
+        "explanation_correct": "Yes — and this is not controversial among robotics engineers and economists. McKinsey estimates 45–73 million manufacturing jobs globally will be automated by 2030. The technology is already proven (Amazon, FANUC, Foxconn deploy it at scale). The falling cost of Jetson-class hardware, open-source neural networks, and collaborative robot arms means the economics now favour automation for a growing range of tasks. Understanding this stack — as you now do — is understanding the technology reshaping global labour.",
+        "explanation_wrong": "The evidence strongly suggests yes. The technology is already deployed at scale (Amazon Sparrow, FANUC vision systems, Foxconn assembly robots). Costs are falling rapidly — a Jetson Nano costs $99, YOLOv8 is free, collaborative robot arms start under $20,000. McKinsey, Oxford Economics, and the World Economic Forum all project substantial automation of repetitive physical tasks. The timeline is 10–20 years for majority displacement of repetitive sorting/picking jobs."
+      },
+      "branches": [
+        { "on": "correct", "to": "complete" },
+        { "on": "wrong", "to": "complete" }
+      ],
+      "xp": 15
+    },
+
+    "complete": {
+      "id": "complete",
+      "type": "complete",
+      "title": "AI Sorting Arm — Complete! R2BOT Build Track: Finished.",
+      "body": "You just completed the hardest project on R2BOT — and the full Build track.\n\n**What you learned in this project:**\n- YOLO architecture: why single-pass detection enables real-time performance\n- YOLOv8 output format: bounding box + class label + confidence score\n- Transfer learning: fine-tuning pretrained models on custom objects with minimal data\n- Jetson Nano: GPU-accelerated inference at 5–10W using TensorRT optimisation\n- Why GPUs dominate neural network inference: massive parallelism for matrix ops\n- Camera calibration and coordinate transformation with cv2.solvePnP()\n- Pick-and-place sequencing and state machine control\n- Confidence thresholding and false positive mitigation\n- Depth sensing: stereo vision and Intel RealSense\n- Throughput analysis: identifying and addressing bottlenecks\n\n**The full Build track you've completed:**\nLine Follower → Vision Line Follower → Obstacle Avoider → Maze Solver → Balance Bot → ROS2 Nav Robot → AI Sorting Arm\n\nYou've gone from a beginner robot with two IR sensors to a full AI-powered pick-and-place system running real-time neural network inference. That is the complete journey from hobbyist to professional robotics engineering foundations.\n\n**XP Earned: 340**\n**Total Build Track XP: 1,450+**\n\n**What's next:** R2BOT Academy Edge Track — advanced topics including multi-robot coordination, reinforcement learning for robot control, ROS2 real hardware deployment, and SLAM with 3D LiDAR. You've earned it.",
+      "branches": [],
+      "xp": 50
+    }
+  }
+}

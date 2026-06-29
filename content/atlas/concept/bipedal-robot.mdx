@@ -1,0 +1,83 @@
+---
+title: Bipedal robot
+category: robot-types
+summary: >-
+  A bipedal robot is a robot that walks on two legs — matching the locomotion
+  pattern of humans and birds — balancing dynamically to move through
+  environments built for the human body.
+seeAlso: []
+sources:
+  - title: Boston Dynamics — Atlas bipedal robot
+    url: 'https://bostondynamics.com/atlas/'
+  - title: IEEE Robotics — Bipedal locomotion research
+    url: 'https://ieeexplore.ieee.org/document/9562050'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - bipedal
+  - humanoid
+  - locomotion
+  - dynamic-balance
+difficulty: 3
+oneLiner: 'The concept concept: A bipedal robot is a robot that walks'
+laymanExplanation: >-
+  Stand on one leg. Notice how your ankle, knee, hip, and trunk are all making
+  tiny continuous adjustments to keep you upright — corrections you are not
+  consciously aware of, performed dozens of times per second by a nervous system
+  that has spent years learning the trick. Now try to teach a machine to do
+  that.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without bipedal robot, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A bipedal robot is a robot that walks on two legs — matching the locomotion
+  pattern of humans and birds — balancing dynamically to move through
+  environments built for the human body.
+slug: bipedal-robot
+bucket: concept
+---
+
+Stand on one leg. Notice how your ankle, knee, hip, and trunk are all making tiny continuous adjustments to keep you upright — corrections you are not consciously aware of, performed dozens of times per second by a nervous system that has spent years learning the trick. Now try to teach a machine to do that.
+
+Two-legged walking is so natural to humans that we forget it is a genuinely extraordinary balancing act. Engineers have been trying to replicate it mechanically for sixty years, and only in the last decade has it begun to work reliably outside the laboratory.
+
+## Why walk on two legs at all
+
+Most robots use wheels or tracks. They are simpler, more energy-efficient, and far easier to stabilise. So why build a bipedal [robot](/atlas/concept/robot)?
+
+The answer is the human environment. Stairs, kerbs, ladders, loose rubble, slopes, narrow doorways — almost every built environment on earth was designed around the assumption that the user has two legs and can balance. A robot on wheels cannot climb a staircase. A bipedal robot, at least in principle, can go wherever a human can go.
+
+This is why bipedal locomotion is a central goal in humanoid [robotics](/atlas/concept/robotics): if you want a general-purpose machine that can work in a house, a factory, a disaster site, or a hospital without rebuilding the environment around it, two legs are the practical choice.
+
+## The engineering challenge
+
+Balancing on two legs means the robot is always in an unstable state — its centre of mass is high above a small support base. Unlike a table (stable) or a wheeled robot (always in contact), a biped is constantly falling and catching itself.
+
+Early bipeds used **static walking** — always keeping their centre of mass over their support foot, moving so slowly that at any frozen moment they would be perfectly balanced. This works but is painfully slow and unnatural-looking.
+
+Modern bipeds use **dynamic walking** — they are always in the process of falling forward, and each step is essentially a controlled catch. This is how humans walk, and it is far more efficient. Implementing it requires fast, accurate sensors (inertial measurement units, force sensors in the feet), powerful actuators that can respond in milliseconds, and sophisticated control algorithms that plan multiple steps ahead.
+
+## A real example
+
+**[Boston Dynamics](/atlas/company/boston-dynamics)' [Atlas](/atlas/robot/atlas)** is the most capable bipedal robot publicly demonstrated. As of 2025, Atlas can run, jump, perform backflips, climb obstacles, and navigate complex unstructured terrain. Its latest iteration uses electric actuators throughout. In demonstration videos, it moves with a fluidity that genuinely surprises people seeing it for the first time — not because it was programmed to do each specific motion, but because it uses model predictive control and [reinforcement learning](/atlas/concept/reinforcement-learning) to plan and adapt its movement in real time. Boston [Dynamics](/atlas/concept/dynamics) is now testing Atlas in Hyundai manufacturing facilities for industrial tasks.
+
+## Where bipedal robotics is heading
+
+Companies including [Tesla](/atlas/company/tesla) ([Optimus](/atlas/robot/optimus)), [Figure AI](/atlas/company/figure-ai), Agility Robotics (Digit), and [Unitree](/atlas/company/unitree) (H1) are all developing commercially-targeted bipedal humanoids for warehouse and manufacturing work. The field has moved faster in 2023–2025 than in the previous three decades combined, driven by improvements in actuator design, battery energy density, and AI-based control methods. Whether bipedal robots will reach the reliability and cost needed for mass commercial deployment in the next five years is, honestly, uncertain.
+
+---
+
+*A bipedal robot that stumbles and recovers looks clumsy; a bipedal robot that stumbles and recovers faster than a human eye can track looks, for a moment, uncannily alive.*

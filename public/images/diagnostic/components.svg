@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 200" width="360" height="200" role="img" aria-label="Common robotics components">
+  <g font-family="sans-serif" font-weight="700" font-size="11" text-anchor="middle" fill="#fde047">
+    <!-- IR -->
+    <g transform="translate(50 70)">
+      <rect x="-22" y="-22" width="44" height="44" rx="6" fill="#1f2937" stroke="#3b82f6" stroke-width="2"/>
+      <circle cx="0" cy="0" r="8" fill="#ef4444"/>
+      <text y="40">IR sensor</text>
+    </g>
+    <!-- Encoder -->
+    <g transform="translate(140 70)">
+      <circle cx="0" cy="0" r="22" fill="#1f2937" stroke="#10b981" stroke-width="2"/>
+      <g fill="#10b981">
+        <rect x="-2" y="-22" width="4" height="8"/>
+        <rect x="-2" y="14" width="4" height="8"/>
+        <rect x="-22" y="-2" width="8" height="4"/>
+        <rect x="14" y="-2" width="8" height="4"/>
+      </g>
+      <text y="40">Encoder</text>
+    </g>
+    <!-- Buzzer -->
+    <g transform="translate(230 70)">
+      <circle cx="0" cy="0" r="20" fill="#1f2937" stroke="#f97316" stroke-width="2"/>
+      <circle cx="0" cy="0" r="6" fill="#f97316"/>
+      <text y="40">Buzzer</text>
+    </g>
+    <!-- LED -->
+    <g transform="translate(320 70)">
+      <ellipse cx="0" cy="-4" rx="14" ry="18" fill="#fde047" stroke="#a16207" stroke-width="2"/>
+      <rect x="-3" y="14" width="2" height="14" fill="#94a3b8"/>
+      <rect x="2" y="14" width="2" height="14" fill="#94a3b8"/>
+      <text y="40">LED</text>
+    </g>
+  </g>
+</svg>

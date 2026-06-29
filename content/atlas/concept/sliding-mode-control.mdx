@@ -1,0 +1,127 @@
+---
+title: Sliding Mode Control in Robotics — Complete Guide | R2BOT
+summary: >-
+  Sliding mode control drives a robot onto a chosen "sliding surface" with
+  strong disturbance rejection. Robust but prone to chattering.
+category: control
+bucket: control-systems
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - sliding-mode
+  - robust-control
+  - nonlinear
+  - disturbance
+relatedTerms:
+  - robust-control
+  - feedback-loop
+  - pid-controller
+  - model-predictive-control
+seeAlso:
+  - robust-control
+  - feedback-loop
+  - pid-controller
+  - model-predictive-control
+youtubeSearchQuery: sliding mode control robotics tutorial
+oneLiner: 'The control systems concept: Sliding mode control drives a robot onto a'
+laymanExplanation: >-
+  Sliding mode control is a robust nonlinear control technique that forces the
+  system state onto a designer-chosen surface in state space, then keeps it
+  sliding along that surface to the target. It is famously robust to large
+  disturbances and unmodelled dynamics.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without sliding mode control in robotics — complete guide | r2bot, many
+  control systems systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Sliding mode control drives a robot onto a chosen "sliding surface" with
+  strong disturbance rejection. Robust but prone to chattering.
+slug: sliding-mode-control
+---
+
+# Sliding Mode Control in Robotics
+
+## What is Sliding Mode Control in Robotics?
+
+Sliding mode control is a robust nonlinear control technique that forces the system state onto a designer-chosen surface in state space, then keeps it sliding along that surface to the target. It is famously robust to large disturbances and unmodelled dynamics.
+
+## How It Works
+
+First you design a sliding surface — a function s(x) that equals zero exactly when the system has the desired behaviour. Then you design a control law that drives s(x) toward zero in finite time, typically using a switching term sign(s) multiplied by a gain. Once s = 0, the system slides along the surface to the goal. The switching term gives the controller's strong robustness to disturbances but also causes 'chattering' — high-frequency oscillation around the surface — which must be mitigated with boundary layers or super-twisting algorithms.
+
+## Real-World Example
+
+Sliding-mode controllers stabilise nuclear-reactor control rods, electric-motor drives, and hydraulic manipulators. Quadcopters subject to wind gusts use sliding-mode attitude control. Tesla Model S Plaid's motor inverters use sliding-mode-derived schemes for high-bandwidth torque control.
+
+## Why It Matters for Robotics
+
+When you cannot accurately model the system or expect heavy disturbances, sliding-mode is one of the most robust control techniques available. It is a standard topic in PhD-level robotics curricula and appears regularly in defence and aerospace robotics careers in India (DRDO, ISRO, BrahMos).
+
+## Try It Yourself
+
+Simulate a 2nd-order system in Simulink or Python with a sliding-mode controller. Add a step disturbance and compare the response to a PID controller — feel the trade-off between robustness and chattering.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "Sliding-mode control drives the system to behave along a:",
+    "options": [
+      "Random path",
+      "Designer-chosen sliding surface in state space",
+      "Wi-Fi signal",
+      "GPS track"
+    ],
+    "answer": 1,
+    "explain": "The designer picks s(x) and the controller forces s → 0, then keeps the system on it."
+  },
+  {
+    "q": "A known problem with classical sliding-mode controllers is:",
+    "options": [
+      "No robustness",
+      "High-frequency chattering due to the switching term",
+      "High latency",
+      "High energy density"
+    ],
+    "answer": 1,
+    "explain": "Chattering is the price of robust switching control — modern variants like super-twisting reduce it."
+  },
+  {
+    "q": "Sliding-mode control is most attractive when:",
+    "options": [
+      "You have a perfect model",
+      "You expect large disturbances or unmodelled dynamics",
+      "There are no actuators",
+      "There is no feedback"
+    ],
+    "answer": 1,
+    "explain": "Its main appeal is robustness to disturbances and modelling uncertainty."
+  }
+]
+```
+
+## Further Reading
+
+- [Robust Control](/atlas/concept/robust-control)
+- [Feedback Loop](/atlas/concept/feedback-loop)
+- [Pid Controller](/atlas/concept/pid-controller)
+- [Model Predictive Control](/atlas/concept/model-predictive-control)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Sliding Mode Control in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

@@ -1,0 +1,19 @@
+{
+  "id": "build-ros2-nav-robot",
+  "slug": "ros2-nav-robot",
+  "title": "ROS2 Autonomous Nav Robot",
+  "tagline": "Build, map, and navigate inside Gazebo using ROS2 Humble and Nav2 — the same stack production warehouse robots run.",
+  "level": "advanced",
+  "duration_hours": 10,
+  "total_xp": 1700,
+  "components": [
+    { "name": "Laptop with Ubuntu 22.04 (native or WSL2)" },
+    { "name": "ROS2 Humble + Gazebo Classic" },
+    { "name": "Nav2 stack" },
+    { "name": "TurtleBot3 Burger model (simulated)" },
+    { "name": "SLAM Toolbox" }
+  ],
+  "simulation_only": true,
+  "color": "#7c3aed",
+  "icon": "🗺️"
+}

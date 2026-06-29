@@ -1,0 +1,71 @@
+---
+title: A* (A-Star) Pathfinding in Robotics — Complete Guide
+summary: >-
+  A* finds the shortest path between two points on a grid or graph. It is the
+  most-used pathfinding algorithm in robotics — from Roomba to delivery robots.
+category: ai-and-perception
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - pathfinding
+  - search
+  - algorithm
+seeAlso:
+  - path-planning
+  - motion-planning
+  - occupancy-grid
+difficulty: 3
+oneLiner: 'The concept concept: A* finds the shortest path between two points'
+laymanExplanation: >-
+  A* (pronounced 'A-star') is a graph search algorithm that finds the shortest
+  path between two nodes by combining the actual cost so far (g) with a
+  heuristic estimate to the goal (h). Its evaluation function is f(n) = g(n) +
+  h(n).
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without a* (a-star) pathfinding in robotics — complete guide, many concept
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A* finds the shortest path between two points on a grid or graph. It is the
+  most-used pathfinding algorithm in robotics — from Roomba to delivery robots.
+slug: a-star-algorithm
+bucket: concept
+---
+
+# A* (A-Star) Pathfinding in Robotics
+
+## What is it?
+
+A* (pronounced 'A-star') is a graph search algorithm that finds the shortest path between two nodes by combining the actual cost so far (g) with a heuristic estimate to the goal (h). Its evaluation function is f(n) = g(n) + h(n).
+
+## How it works
+
+A* maintains an open set of nodes to expand and a closed set of nodes already evaluated. At each step, it picks the open node with the lowest f score, evaluates its neighbours, updates their costs, and continues until the goal is reached. With an admissible heuristic (e.g., Euclidean distance), A* is guaranteed to find the shortest path.
+
+## Real-world example
+
+A Roomba uses A* (or a variant) to plan a path around your room. Google Maps uses A* variants for routing. Most warehouse robots, including GreyOrange Butlers, run A* on a grid representation of the warehouse floor.
+
+## Why it matters for robotics
+
+A* is the canonical robotics algorithm taught in every robotics course — from school programs to IIT classes. Understanding A* is the gateway to D*, RRT, and modern motion planners.
+
+## See also
+
+- [Path Planning](/atlas/concept/path-planning)
+- [Motion Planning](/atlas/concept/motion-planning)
+- [Occupancy Grid](/atlas/concept/occupancy-grid)

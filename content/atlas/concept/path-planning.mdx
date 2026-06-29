@@ -1,0 +1,100 @@
+---
+title: Path planning
+category: control
+summary: >-
+  Path planning is the process of finding a route through space from a starting
+  point to a goal, avoiding obstacles along the way — the geometric question of
+  where a robot should go, before asking how it should move.
+seeAlso: []
+sources:
+  - title: LaValle — Planning Algorithms (free online)
+    url: 'http://planning.cs.uiuc.edu/'
+  - title: ROS Navigation Stack documentation
+    url: 'https://navigation.ros.org/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - navigation
+  - algorithms
+  - autonomy
+difficulty: 3
+oneLiner: 'The concept concept: Path planning is the process of finding a'
+laymanExplanation: >-
+  You're late for class and there's a fire drill blocking the main corridor.
+  Without thinking hard, you reroute — down the back stairs, through the
+  canteen, out the side door. You didn't compute a mathematical solution; you
+  did something even more impressive: you pictured the building, identified
+  obstacles, and found an alternative sequence of connected spaces
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without path planning, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Amazon Kiva
+  - Self-driving cars
+  - Mars rovers
+indianExample: >-
+  Bengaluru's Wakefit warehouses use AMRs that re-plan their paths every 200 ms
+  to avoid colliding with humans.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: >-
+    Which famous algorithm finds the shortest path between two points on a
+    graph?
+  options:
+    - Bubble sort
+    - A* (A-star)
+    - Quicksort
+    - Linear regression
+  answer: 1
+  explanation: >-
+    A* combines actual distance walked with an estimated distance to goal —
+    fast, optimal, and the foundation of most path planners.
+mindBlowingFact: >-
+  A* — invented in 1968 for the SRI Shakey robot — is still the most-used
+  path-planning algorithm in robotics, games and even Uber routing.
+industryApplications:
+  - logistics
+  - autonomous vehicles
+  - gaming
+  - space exploration
+  - drones
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Path planning is the process of finding a route through space from a starting
+  point to a goal, avoiding obstacles along the way — the geometric question of
+  where a robot should go, before asking how it should move.
+slug: path-planning
+bucket: concept
+---
+
+You're late for class and there's a fire drill blocking the main corridor. Without thinking hard, you reroute — down the back stairs, through the canteen, out the side door. You didn't compute a mathematical solution; you did something even more impressive: you pictured the building, identified obstacles, and found an alternative sequence of connected spaces that gets you there. A [robot](/atlas/concept/robot) needs to do exactly the same thing, but explicitly, in code.
+
+That process — finding a collision-free geometric route from A to B — is called **path planning**.
+
+## What a path planner actually produces
+
+A path is a sequence of positions (or poses — position plus orientation) that, when followed in order, move the robot from its start to its goal without passing through any obstacle. The path planner doesn't care yet about speed, acceleration, or how long each segment takes — that's the job of [trajectory](/atlas/concept/trajectory) planning. It cares only about *geometry*: what route is feasible?
+
+The map of free versus occupied space is usually represented as an [occupancy grid](/atlas/concept/occupancy-grid) (a discretised grid where each cell is marked free or blocked) or as a configuration space — a mathematical representation of all valid robot configurations.
+
+## Common algorithms
+
+Two algorithms appear in virtually every [robotics](/atlas/concept/robotics) course and deployed system:
+
+**A\*** (A-star) treats the map as a graph, searches from start to goal, and uses a heuristic (a smart guess about remaining distance) to avoid exploring irrelevant parts of the map. It guarantees finding the shortest path if one exists. Most ROS-based mobile robots use A* or a variant like Dijkstra's algorithm as their global planner.
+
+**RRT** (Rapidly-exploring Random Tree) is better suited for high-dimensional spaces and robot arms. It grows a tree by sampling random points in the configuration space and connecting them, until the tree reaches the goal region. It doesn't guarantee the shortest path, but it finds *a* path efficiently even in complex, cluttered environments.
+
+## A real example: warehouse robots
+
+Amazon's Kiva robots (now Amazon Robotics) navigate warehouse floors by planning paths on a known grid map. A central server runs path planning for hundreds of robots simultaneously, assigning routes that avoid collisions between robots, not just between robot and shelf. The planner re-routes a robot within milliseconds if another robot's path creates a conflict.
+
+## Path planning versus [motion planning](/atlas/concept/motion-planning)
+
+Path planning answers "where do I go?" Motion planning — a broader concept — also answers "how exactly do I move my joints or wheels to follow that path?" The two are often discussed together, but distinguishing them is useful: a valid path in abstract space still needs a motion planner to translate it into motor commands.
+
+---
+
+*The classic A\* algorithm was invented in 1968 to help a robot called Shakey navigate its room — making it one of the first algorithms ever written for a [mobile robot](/atlas/concept/mobile-robot).*

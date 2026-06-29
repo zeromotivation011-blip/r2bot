@@ -1,0 +1,75 @@
+---
+title: FPGA
+category: hardware
+summary: >-
+  An FPGA is a chip you can rewire in software — instead of a fixed set of
+  circuits, it contains thousands of programmable logic blocks that can be
+  connected into almost any digital circuit you need.
+seeAlso: []
+sources:
+  - title: Xilinx (AMD) — What is an FPGA?
+    url: 'https://www.xilinx.com/products/silicon-devices/fpga/what-is-an-fpga.html'
+  - title: Intel FPGA — FPGA technology overview
+    url: >-
+      https://www.intel.com/content/www/us/en/products/programmable/fpga/new-to-fpgas/resource-center/overview.html
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - hardware
+  - electronics
+  - advanced
+difficulty: 3
+oneLiner: 'The concept concept: An FPGA is a chip you can rewire'
+laymanExplanation: >-
+  Suppose you could buy a blank Lego set — not a specific kit, but a bag of
+  universal connectors — and snap them together into whatever shape you needed
+  today, then rearrange them tomorrow into something completely different. A
+  microprocessor is like buying a pre-built Lego spaceship: powerful, but the
+  shape is fixed. An FPGA is the bag of universal connectors
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without fpga, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An FPGA is a chip you can rewire in software — instead of a fixed set of
+  circuits, it contains thousands of programmable logic blocks that can be
+  connected into almost any digital circuit you need.
+slug: fpga
+bucket: concept
+---
+
+Suppose you could buy a blank Lego set — not a specific kit, but a bag of universal connectors — and snap them together into whatever shape you needed today, then rearrange them tomorrow into something completely different. A microprocessor is like buying a pre-built Lego spaceship: powerful, but the shape is fixed. An FPGA is the bag of universal connectors.
+
+**FPGA** stands for *Field-Programmable Gate Array*. "Gate array" refers to the actual silicon — a grid of thousands of tiny logic gates (the most basic digital building blocks: AND, OR, NOT, and so on) along with flip-flops (memory elements) and routing channels. "Field-programmable" means you — out in the field, not the chip manufacturer — can configure how those gates connect to each other, in software, as many times as you like.
+
+## How programming an FPGA works
+
+You do not write C or Python. You write a **hardware description language** (HDL) — most commonly VHDL or Verilog — that describes what the circuit should look like, not what steps a processor should follow. A synthesis tool then translates your description into a configuration file (called a **bitstream**) that is loaded onto the FPGA and literally rewires the chip's internal connections. Change the bitstream, change the circuit.
+
+## Why speed matters here
+
+A microprocessor executes instructions one after another — even a fast CPU doing 3 billion operations per second is still working through a queue. An FPGA can process many things **in parallel** because you can create many independent circuits on the same chip simultaneously. If you need to read 16 sensors and update 16 motor controllers every microsecond, an FPGA can handle all 16 at once. A software loop on a CPU would need to visit each one in turn, which is often too slow for hard real-time [robotics](/atlas/concept/robotics).
+
+## Where FPGAs appear in robotics
+
+High-speed motor control, real-time vision processing (reading a [camera](/atlas/concept/camera-vision) and filtering noise before a CPU ever sees the data), [space robotics](/atlas/concept/space-robotics) (where radiation-hardened FPGAs are the only programmable option), and surgical robots where timing precision is a safety requirement. NASA's Mars rovers carry FPGAs partly for their ability to survive radiation.
+
+## The honest trade-off
+
+FPGAs are harder to programme than a [microcontroller](/atlas/concept/microcontroller), more expensive, and overkill for most hobby projects. They occupy a niche between a fixed processor and a fully custom chip — which makes them indispensable for the applications that need that niche.
+
+---
+
+*Every modern CPU, GPU, and phone chip was first prototyped as an FPGA design — which means the chip in your pocket was once running on a board that looked a lot like the one in a research lab.*

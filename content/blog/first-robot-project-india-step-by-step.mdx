@@ -1,0 +1,167 @@
+---
+title: "Build Your First Robot in India: Step-by-Step Project Guide (₹1,200 Total)"
+description: "A complete tutorial to build an obstacle-avoiding robot using components available in India. Includes circuit, code, and troubleshooting."
+date: "2025-03-01"
+author: "R2BOT Team"
+authorRole: "India's Robotics Education Platform"
+tags: ["Tutorials", "Beginner", "Arduino"]
+readTime: 15
+coverEmoji: "⚡"
+featured: false
+keywords: ["build robot india beginners", "obstacle avoiding robot arduino india", "first robot project india", "arduino robot tutorial hindi"]
+---
+
+# Build Your First Robot in India: Step-by-Step (₹1,200 Total)
+
+This guide takes you from zero to a working obstacle-avoiding robot in one weekend. Every component is available on Robu.in or Amazon India. Total cost ₹1,100-1,300 depending on shop.
+
+## Final result
+
+A two-wheeled robot that drives forward, detects obstacles with an ultrasonic sensor, and turns to avoid them. Battery-powered, no laptop needed once you upload the code.
+
+## Parts list
+
+| Part | Quantity | Price (₹) | Where |
+|---|---|---|---|
+| Arduino Uno (clone) | 1 | 350 | Robu / Amazon |
+| L298N motor driver | 1 | 120 | Robu / Amazon |
+| BO motor + wheel pair | 1 (2 motors) | 200 | Robu |
+| HC-SR04 ultrasonic sensor | 1 | 80 | Robu |
+| SG90 servo motor | 1 | 90 | Robu |
+| Acrylic chassis (2-wheel) | 1 | 200 | Robu |
+| Jumper wires (M-M, M-F) | 1 pack | 50 | Robu |
+| 9V battery + clip | 1 | 50 | Local shop |
+| **Total** | | **~1,140** | |
+
+Buy from one shop to save on shipping. Robu.in usually has all of this in one combined kit at ~₹1,200 with shipping.
+
+## Tools you need
+
+A small Phillips screwdriver, scissors, double-sided foam tape (₹20 from any stationery shop), a USB-A to USB-B cable (you probably have one for old printers). That's it. No soldering required.
+
+## Step 1 — Build the chassis (30 min)
+
+Most acrylic chassis kits come with peel-off film on both sides. Remove the film, screw the two motors to the underside of the bottom plate using the M3 screws and brackets included. Add the caster wheel at the back. Snap the wheels onto the motor shafts. **The chassis is now done** — you have a rolling platform.
+
+## Step 2 — Mount the electronics (15 min)
+
+Place the Arduino on top of the chassis using double-sided foam tape. Place the L298N motor driver next to it. Mount the ultrasonic sensor on the SG90 servo (some kits include a small bracket; otherwise foam tape works), then mount the servo at the front of the chassis facing forward.
+
+## Step 3 — Wire it up
+
+**Motors to L298N:**
+- Left motor wires → L298N OUT1, OUT2 (either polarity — we'll fix direction in code)
+- Right motor wires → L298N OUT3, OUT4
+
+**L298N to Arduino:**
+- IN1 → Arduino pin 5
+- IN2 → Arduino pin 6
+- IN3 → Arduino pin 9
+- IN4 → Arduino pin 10
+- ENA and ENB → leave the jumper caps ON (uses full speed)
+
+**Ultrasonic to Arduino:**
+- VCC → 5V
+- GND → GND
+- TRIG → pin 7
+- ECHO → pin 8
+
+**Servo to Arduino:**
+- Orange (signal) → pin 11
+- Red (5V) → 5V
+- Brown (GND) → GND
+
+**Power:**
+- 9V battery + → L298N 12V input
+- 9V battery − → L298N GND
+- L298N 5V output → Arduino VIN (so one battery powers both)
+- Common GND between Arduino and L298N
+
+Double-check GND is shared between Arduino and L298N. This is the #1 mistake.
+
+## Step 4 — Upload the code
+
+Open Arduino IDE on your laptop. Paste this code:
+
+```c
+#include <Servo.h>
+Servo head;
+const int TRIG = 7, ECHO = 8;
+const int IN1 = 5, IN2 = 6, IN3 = 9, IN4 = 10;
+
+long cm() {
+  digitalWrite(TRIG, LOW); delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH); delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+  long us = pulseIn(ECHO, HIGH, 30000);
+  return us == 0 ? 999 : us / 58;
+}
+
+void drive(int l, int r) {
+  digitalWrite(IN1, l > 0); digitalWrite(IN2, l < 0);
+  digitalWrite(IN3, r > 0); digitalWrite(IN4, r < 0);
+}
+
+void setup() {
+  pinMode(TRIG, OUTPUT); pinMode(ECHO, INPUT);
+  pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+  head.attach(11); head.write(90);
+  delay(500);
+}
+
+void loop() {
+  long d = cm();
+  if (d > 25) {
+    drive(1, 1);                       // clear → forward
+  } else {
+    drive(0, 0); delay(200);
+    head.write(30); delay(400);
+    long right = cm();
+    head.write(150); delay(400);
+    long left = cm();
+    head.write(90); delay(300);
+    if (right > left) { drive(1, -1); delay(350); }
+    else              { drive(-1, 1); delay(350); }
+  }
+}
+```
+
+Connect Arduino to your laptop via USB. In Arduino IDE, select **Tools → Board → Arduino Uno** and **Tools → Port → (your COM port)**. Click **Upload**.
+
+## Step 5 — Disconnect and run
+
+Once uploaded, unplug the USB cable. Connect the 9V battery. The robot should start driving forward, stop when something is within 25 cm, look right and left with its sensor, then turn toward the open side.
+
+## Common problems and fixes
+
+**"Motors don't move at all"** — check that L298N's 12V input is wired correctly and battery has charge. Also, the ENA/ENB jumper caps must be ON.
+
+**"Motors spin wrong direction"** — swap IN1↔IN2 (or IN3↔IN4) in code, OR swap the two motor wires on the L298N. Either works.
+
+**"Robot just spins in circles"** — one motor is reversed. Same fix as above.
+
+**"Ultrasonic reads weird numbers"** — check VCC and GND are firmly seated. Loose ground = noise. Move TRIG/ECHO wires away from motor wires.
+
+**"Servo jitters constantly"** — undervoltage. The L298N's 5V output sometimes can't drive a servo while motors run. Solution: power the servo from Arduino's 5V (not L298N) or use a separate 5V power bank.
+
+**"Robot drives backward, not forward"** — flip the chassis around. Joke. But also, swap which motor pair is IN1/IN2 vs IN3/IN4 in the code.
+
+## Extend the project
+
+Once it works:
+
+- **Add Bluetooth** with an HC-05 module (₹150) → control from your phone
+- **Add a buzzer** that beeps when an obstacle is detected
+- **Tune the avoidance** — change the 25cm threshold, the turn time, the speed
+- **Add a line-follower mode** with two IR sensors → robot follows a black line
+
+## Why this matters
+
+You just built a real working robot. It has [sensors](/atlas/concept/sensor), a [controller](/atlas/concept/arduino), [actuators](/atlas/concept/actuator), and feedback control. Everything from Mars rovers to warehouse AMRs uses the same fundamental loop you just programmed.
+
+## Test it virtually first
+
+If you want to test the logic before building, R2BOT's browser simulator runs the same loop — you can experiment with turn timing and thresholds without burning components.
+
+[Try the in-browser simulator →](/schools/simulate) · [Learn every concept used here →](/atlas)

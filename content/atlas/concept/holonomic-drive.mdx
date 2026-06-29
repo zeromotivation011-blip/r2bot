@@ -1,0 +1,70 @@
+---
+title: Holonomic Drive in Robotics — Complete Guide
+summary: >-
+  Holonomic drives allow a robot to translate in any direction without first
+  rotating. Used in omniwheel robots, mecanum platforms, and warehouse AMRs.
+category: fundamentals
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - locomotion
+  - omniwheel
+  - mecanum
+seeAlso:
+  - mobile-robot
+  - differential-drive
+  - wheels-vs-tracks
+difficulty: 3
+oneLiner: 'The concept concept: Holonomic drives allow a robot to translate in'
+laymanExplanation: >-
+  A holonomic drive can move in any direction in its plane without first turning
+  to face that direction. Holonomic robots use omniwheels (with rollers on the
+  outside) or mecanum wheels (rollers at 45°) to achieve omnidirectional motion.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without holonomic drive in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Holonomic drives allow a robot to translate in any direction without first
+  rotating. Used in omniwheel robots, mecanum platforms, and warehouse AMRs.
+slug: holonomic-drive
+bucket: concept
+---
+
+# Holonomic Drive in Robotics
+
+## What is it?
+
+A holonomic drive can move in any direction in its plane without first turning to face that direction. Holonomic robots use omniwheels (with rollers on the outside) or mecanum wheels (rollers at 45°) to achieve omnidirectional motion.
+
+## How it works
+
+Each wheel has small passive rollers around its circumference. The robot's controller commands the wheel speeds independently. By picking the right combination of speeds, the robot's resulting velocity vector can point in any direction (and include rotation). Mecanum wheels are arranged with rollers at 45°, giving four wheels independent control over x, y, and yaw motion.
+
+## Real-world example
+
+Many warehouse AMRs use mecanum wheels because they can sidle in tight aisles. Robotics competition platforms (FRC, RoboCup small-size league) often use omniwheel chassis for fast, agile motion.
+
+## Why it matters for robotics
+
+Holonomic drives are more complex and expensive than differential drives but offer maneuverability that's impossible otherwise. Whenever a robot needs to manoeuvre in confined spaces, holonomic is the answer.
+
+## See also
+
+- [Mobile Robot](/atlas/concept/mobile-robot)
+- [Differential Drive](/atlas/concept/differential-drive)
+- [Wheels Vs Tracks](/atlas/concept/wheels-vs-tracks)

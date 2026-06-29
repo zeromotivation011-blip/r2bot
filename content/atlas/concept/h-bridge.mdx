@@ -1,0 +1,89 @@
+---
+title: H-Bridge Circuit in Robotics — Complete Guide
+summary: >-
+  An H-bridge is a circuit of four transistors that lets a DC motor spin in
+  either direction. It is the heart of nearly every DC motor driver.
+category: hardware
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - h-bridge
+  - motor-driver
+  - circuit
+seeAlso:
+  - motor-driver
+  - dc-motor
+  - pwm
+difficulty: 3
+oneLiner: 'The concept concept: An H-bridge is a circuit of four transistors'
+laymanExplanation: >-
+  An H-bridge is an electronic circuit with four switching elements arranged in
+  the shape of the letter 'H', with a motor connected horizontally across the
+  middle. Closing one pair of opposing switches drives current through the motor
+  one way; closing the other pair reverses it.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without h-bridge circuit in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis:
+  - Most DIY robots
+  - RC cars
+  - Industrial drives
+indianExample: >-
+  The L298N H-bridge module is in nearly every Indian school robotics kit —
+  costs ₹120 and drives 2 motors.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: An H-bridge gets its name from…
+  options:
+    - Its inventor
+    - Its layout looking like the letter H
+    - Hospital Bridge
+    - Hardware
+  answer: 1
+  explanation: >-
+    The four switches around the motor form the shape of the letter H in a
+    circuit diagram.
+mindBlowingFact: >-
+  Inside every Tesla, eight giant H-bridges (made of MOSFETs) control the motor
+  — pushing 800 amps per phase.
+industryApplications:
+  - robotics
+  - electric vehicles
+  - industrial drives
+  - appliances
+  - RC vehicles
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An H-bridge is a circuit of four transistors that lets a DC motor spin in
+  either direction. It is the heart of nearly every DC motor driver.
+slug: h-bridge
+bucket: concept
+---
+
+# H-Bridge Circuit in Robotics
+
+## What is it?
+
+An H-bridge is an electronic circuit with four switching elements arranged in the shape of the letter 'H', with a motor connected horizontally across the middle. Closing one pair of opposing switches drives current through the motor one way; closing the other pair reverses it.
+
+## How it works
+
+The four switches are usually MOSFETs or BJTs. To spin the motor forward, the controller turns on the top-left and bottom-right switches. To reverse, it turns on the top-right and bottom-left. PWM applied to the switches controls speed. Care must be taken not to turn on both switches on the same side simultaneously — that creates a short circuit known as 'shoot-through'.
+
+## Real-world example
+
+Every L298N, TB6612, and DRV8833 chip contains an H-bridge. Some advanced robots use discrete MOSFET-based H-bridges for higher current. Even Tesla's electric car drivetrains contain massive H-bridges.
+
+## Why it matters for robotics
+
+Understanding H-bridges demystifies how a microcontroller can reverse a motor's direction without changing the wiring. It is a foundational electronics concept for any hardware-focused roboticist.
+
+## See also
+
+- [Motor Driver](/atlas/concept/motor-driver)
+- [Dc Motor](/atlas/concept/dc-motor)
+- [Pwm](/atlas/concept/pwm)

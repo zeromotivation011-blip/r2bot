@@ -1,0 +1,80 @@
+---
+title: Imitation learning
+category: ai-and-perception
+summary: >-
+  Imitation learning is a training approach where a robot learns to behave by
+  watching demonstrations of a task performed by a human or another expert,
+  rather than being given explicit rules or a reward signal.
+seeAlso: []
+sources:
+  - title: >-
+      Argall et al. — A survey of robot learning from demonstration (Robotics
+      and Autonomous Systems, 2009)
+    url: 'https://www.sciencedirect.com/science/article/pii/S0921889008001772'
+  - title: Stanford ILIAD Group — Imitation learning research
+    url: 'https://iliad.stanford.edu/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - machine-learning
+  - robot-learning
+  - training
+difficulty: 3
+oneLiner: 'The concept concept: Imitation learning is a training approach where a'
+laymanExplanation: >-
+  Think about how you learnt to tie your shoelaces. Nobody gave you a manual
+  with force equations and finger-position coordinates. Someone sat next to you,
+  did it slowly in front of you, maybe guided your hands through the motion, and
+  you copied. After enough repetitions, it clicked. Learning by watching and
+  imitating is one of the most natural things humans a
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without imitation learning, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Imitation learning is a training approach where a robot learns to behave by
+  watching demonstrations of a task performed by a human or another expert,
+  rather than being given explicit rules or a reward signal.
+slug: imitation-learning
+bucket: concept
+---
+
+Think about how you learnt to tie your shoelaces. Nobody gave you a manual with force equations and finger-position coordinates. Someone sat next to you, did it slowly in front of you, maybe guided your hands through the motion, and you copied. After enough repetitions, it clicked. Learning by watching and imitating is one of the most natural things humans and animals do. Roboticists have spent decades trying to give machines the same ability.
+
+**Imitation learning** is a training strategy where a [robot](/atlas/concept/robot) learns a skill by studying recorded demonstrations of that skill — observations, actions, and outcomes — rather than by following hand-crafted rules or discovering everything through trial and error.
+
+## Why not just programme the robot?
+
+For simple, well-defined tasks in controlled environments, programming works fine. But for tasks like "fold this towel" or "pack this irregular object without crushing it," writing every rule explicitly is virtually impossible. The geometry changes with every new towel. Imitation learning sidesteps the programming problem: show the robot many examples of a human doing it well, and let the robot learn the pattern.
+
+## Two broad flavours
+
+**Behavioural cloning** is the simplest form — record demonstrations and train a network to copy the actions directly. It is fast but fragile: the robot may fail the moment it encounters a situation that differs even slightly from the training data.
+
+**Inverse [reinforcement learning](/atlas/concept/reinforcement-learning)** goes deeper. Instead of copying actions, the robot infers the *goals* behind the demonstrations — what the expert was trying to achieve. This produces a more flexible policy but is harder to implement.
+
+## A real example
+
+In 2023, researchers at Google and Stanford released demonstrations of robotic manipulation — a human teleoperated a robot arm to stack blocks, sort objects, and handle fragile items. Imitation learning on those demonstrations produced robots that could generalise the tasks to novel objects they had never seen during training.
+
+## The honest limitation
+
+Imitation learning is only as good as the demonstrations it receives. Bad habits, inconsistent technique, or demonstrations that do not cover edge cases will all be faithfully imitated, flaws included.
+
+---
+
+*Researchers are exploring whether a robot trained on millions of internet videos of humans cooking, folding, and building things could learn general-purpose manipulation skills purely by watching.*

@@ -1,0 +1,84 @@
+---
+title: Sergey Levine
+summary: >-
+  Sergey Levine is the Berkeley professor whose research more or less defined
+  how modern robots learn from data. If a humanoid in 2026 walks via
+  reinforcement learning, it's standing on Levine's papers.
+seeAlso:
+  - reinforcement-learning
+  - computer-vision
+  - optimus
+sources:
+  - title: Sergey Levine — UC Berkeley page
+    url: 'https://people.eecs.berkeley.edu/~svlevine/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - people
+  - researchers
+difficulty: 3
+oneLiner: 'The person concept: Sergey Levine is the Berkeley professor whose research'
+laymanExplanation: >-
+  Sergey Levine is a professor of Electrical Engineering and Computer Sciences
+  at UC Berkeley, and the co-founder of robotics startup Physical Intelligence.
+  His research more or less defined how modern robots learn from data. If a
+  humanoid in 2026 walks via reinforcement learning, or grasps an object via
+  imitation learning, it's standing on Levine's papers.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without sergey levine, many person systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Sergey Levine is the Berkeley professor whose research more or less defined
+  how modern robots learn from data. If a humanoid in 2026 walks via
+  reinforcement learning, it's standing on Levine's papers.
+slug: sergey-levine
+bucket: person
+---
+
+Sergey Levine is a professor of Electrical Engineering and Computer Sciences at UC Berkeley, and the co-founder of [robotics](/atlas/concept/robotics) startup Physical Intelligence. His research more or less defined how modern robots learn from data. If a humanoid in 2026 walks via [reinforcement learning](/atlas/concept/reinforcement-learning), or grasps an object via [imitation learning](/atlas/concept/imitation-learning), it's standing on Levine's papers.
+
+## Why his work matters
+
+Before about 2015, two big approaches dominated robotic learning:
+
+- **Classical control** — write the math by hand for every [robot](/atlas/concept/robot) behaviour. Reliable but inflexible. A robot only does what's been explicitly programmed.
+- **Reinforcement learning** — let the robot try and learn. Theoretically elegant but, in practice, took millions of attempts and barely worked on real robots.
+
+Levine and his Berkeley group (BAIR — Berkeley AI Research) pushed a third approach: **deep reinforcement learning combined with imitation learning**. Show the robot demonstrations from humans (or simulated experts). Let it improve from there with RL. The combination dramatically reduced the amount of trial-and-error needed.
+
+His 2015 paper "End-to-end training of deep visuomotor policies" was one of the first showing a robot could learn manipulation tasks (stacking blocks, fitting plugs) by [mapping](/atlas/concept/mapping) [camera](/atlas/concept/camera-vision) pixels directly to motor commands — no hand-engineered features in between. That paper is the foundation of what's now called **end-to-end robot learning**.
+
+## What he's working on now (2026)
+
+Levine co-founded **Physical Intelligence** (sometimes branded as π) in 2024, alongside Karol Hausman and others. The startup's mission: build a general-purpose AI brain that can transfer between any robot body. Backed by Jeff Bezos and others; the company has demonstrated VLA models running on a dozen different robotic platforms.
+
+If you think of the humanoid race as a contest between "build the body" companies ([Tesla](/atlas/company/tesla), Figure, [Boston Dynamics](/atlas/company/boston-dynamics)) and "build the brain" companies, Physical Intelligence is the leading "build the brain" play.
+
+## What to read
+
+- *End-to-end training of deep visuomotor policies* (2015) — the foundational paper
+- *RT-2: Vision-Language-Action Models* (2023, Google DeepMind with Levine as advisor) — the VLA paradigm
+- *Physical Intelligence π0 model* (2024) — the first cross-embodiment robot foundation model
+
+His students and collaborators include Chelsea Finn (Stanford), Pulkit Agrawal (MIT), Karol Hausman (Physical Intelligence) — together this generation of researchers shapes most of the academic work robotics startups are now commercialising.
+
+## Why this matters for the field
+
+For the past decade, the bottleneck in robotics has shifted from hardware to software. The robots can move; the question is whether they can decide *what to do*. Levine's research arc — and his current commercial bet — is essentially the answer to that question. If general-purpose robot brains are possible, his pipeline of work is the most direct path there.
+
+---
+
+*If you want to actually try the ideas Levine pioneered, reinforcement learning will be Forge 03 in our learning track.*

@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1800" font-family="'Inter', 'Helvetica Neue', sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#050810"/>
+      <stop offset="1" stop-color="#0B2540"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00E5FF"/>
+      <stop offset="1" stop-color="#00B8D4"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softglow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1400" height="1800" fill="url(#bg)"/>
+
+  <!-- TITLE -->
+  <text x="700" y="80" text-anchor="middle" font-size="38" font-weight="700" fill="#E8ECF1" letter-spacing="6">R2BOT — LOGO CONCEPTS</text>
+  <text x="700" y="115" text-anchor="middle" font-size="18" fill="#6E7886" letter-spacing="3">ONE GLYPH · THREE MEANINGS · 2 / 0 / ∞</text>
+  <line x1="500" y1="135" x2="900" y2="135" stroke="#00B8D4" stroke-width="2"/>
+
+  <!-- =========================================================== -->
+  <!-- CONCEPT A — LOOP & TAIL                                      -->
+  <!-- =========================================================== -->
+  <g transform="translate(0,180)">
+    <text x="100" y="40" font-size="22" font-weight="700" fill="#00B8D4">CONCEPT A · LOOP &amp; TAIL</text>
+    <text x="100" y="68" font-size="14" fill="#A0A8B2">Geometric 2 where the head is a perfect circle, the tail a single descending stroke that joins a smaller circle — making ∞ emerge.</text>
+
+    <!-- Wordmark -->
+    <g transform="translate(120,180)" filter="url(#softglow)">
+      <text font-size="180" font-weight="800" fill="#E8ECF1" letter-spacing="-2">R</text>
+      <!-- The "2/0/∞" glyph: top ring + tail + bottom ring -->
+      <g transform="translate(140,-10)">
+        <circle cx="80" cy="55" r="55" fill="none" stroke="url(#cyan)" stroke-width="14"/>
+        <path d="M 30 110 Q 80 150 130 110" fill="none" stroke="url(#cyan)" stroke-width="14" stroke-linecap="round"/>
+        <circle cx="80" cy="155" r="20" fill="none" stroke="url(#cyan)" stroke-width="14"/>
+      </g>
+      <text x="290" font-size="180" font-weight="800" fill="#E8ECF1" letter-spacing="-2">BOT</text>
+    </g>
+
+    <!-- Three readings strip -->
+    <g transform="translate(820,150)">
+      <rect width="480" height="200" rx="14" fill="#0B2540" stroke="#1E3050"/>
+      <text x="240" y="32" text-anchor="middle" font-size="14" fill="#6E7886" letter-spacing="3">READS AS</text>
+
+      <g transform="translate(60,60)">
+        <text font-size="80" font-weight="800" fill="#E8ECF1">R</text>
+        <text x="50" font-size="80" font-weight="800" fill="#00B8D4">2</text>
+        <text x="100" font-size="80" font-weight="800" fill="#E8ECF1">BOT</text>
+        <text y="100" font-size="12" fill="#6E7886" letter-spacing="3">R-2-BOT</text>
+      </g>
+      <g transform="translate(60,170)">
+        <text font-size="22" fill="#E8ECF1">R</text>
+        <circle cx="22" cy="-7" r="11" fill="none" stroke="#00B8D4" stroke-width="3"/>
+        <text x="40" font-size="22" fill="#E8ECF1">BOT  ·  </text>
+        <text x="110" font-size="22" fill="#E8ECF1">R</text>
+        <path d="M 132 -7 q -8 -10 0 -16 q 8 -6 16 0 q 8 6 16 0 q 8 -6 0 -16 q -8 -10 -16 0 q -8 6 -16 0 q -8 -6 0 -16" transform="translate(0,3) scale(.9)" fill="none" stroke="#A56BFF" stroke-width="3"/>
+        <text x="175" font-size="22" fill="#E8ECF1">BOT</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- =========================================================== -->
+  <!-- CONCEPT B — ROBOT EYE                                        -->
+  <!-- =========================================================== -->
+  <g transform="translate(0,580)">
+    <text x="100" y="40" font-size="22" font-weight="700" fill="#00B8D4">CONCEPT B · ROBOT EYE</text>
+    <text x="100" y="68" font-size="14" fill="#A0A8B2">The 2 is a stylised lens. Thick ring (= 0) with a diagonal slash + base. Inner cyan pupil glows. Hover → pupil unspools into ∞.</text>
+
+    <g transform="translate(120,180)" filter="url(#softglow)">
+      <text font-size="180" font-weight="800" fill="#E8ECF1" letter-spacing="-2">R</text>
+      <!-- Eye glyph -->
+      <g transform="translate(140,-20)">
+        <circle cx="90" cy="90" r="80" fill="none" stroke="#E8ECF1" stroke-width="18"/>
+        <circle cx="90" cy="90" r="38" fill="url(#cyan)" filter="url(#glow)"/>
+        <!-- 2's diagonal hint -->
+        <path d="M 50 50 L 150 150" stroke="#0B2540" stroke-width="6" opacity=".55"/>
+        <line x1="35" y1="180" x2="155" y2="180" stroke="#E8ECF1" stroke-width="18" stroke-linecap="round"/>
+      </g>
+      <text x="320" font-size="180" font-weight="800" fill="#E8ECF1" letter-spacing="-2">BOT</text>
+    </g>
+
+    <g transform="translate(820,150)">
+      <rect width="480" height="200" rx="14" fill="#0B2540" stroke="#1E3050"/>
+      <text x="240" y="32" text-anchor="middle" font-size="14" fill="#6E7886" letter-spacing="3">FEELS LIKE</text>
+      <text x="240" y="80" text-anchor="middle" font-size="22" fill="#E8ECF1">Sci-fi. Premium.</text>
+      <text x="240" y="115" text-anchor="middle" font-size="16" fill="#A0A8B2">Lens reading dominates.</text>
+      <text x="240" y="155" text-anchor="middle" font-size="14" fill="#FFB020">Best for: investor decks,</text>
+      <text x="240" y="178" text-anchor="middle" font-size="14" fill="#FFB020">research-grade audience.</text>
+    </g>
+  </g>
+
+  <!-- =========================================================== -->
+  <!-- CONCEPT C — CIRCUIT LOOP                                     -->
+  <!-- =========================================================== -->
+  <g transform="translate(0,980)">
+    <text x="100" y="40" font-size="22" font-weight="700" fill="#00B8D4">CONCEPT C · CIRCUIT LOOP</text>
+    <text x="100" y="68" font-size="14" fill="#A0A8B2">The 2 is a literal copper trace. Loops back on itself — a finger on it would travel forever. Solder pad at top.</text>
+
+    <g transform="translate(120,180)" filter="url(#softglow)">
+      <text font-size="180" font-weight="800" fill="#E8ECF1" letter-spacing="-2">R</text>
+      <g transform="translate(140,-20)">
+        <!-- circuit-style 2 -->
+        <path d="M 20 60 Q 20 10 90 10 Q 160 10 160 70 Q 160 115 90 130 L 30 175 L 160 175" fill="none" stroke="url(#cyan)" stroke-width="14" stroke-linecap="square"/>
+        <!-- solder pads -->
+        <circle cx="20" cy="60" r="9" fill="#00B8D4"/>
+        <circle cx="160" cy="70" r="9" fill="#00B8D4"/>
+        <circle cx="160" cy="175" r="9" fill="#00B8D4"/>
+        <!-- via marks -->
+        <circle cx="20" cy="60" r="3" fill="#050810"/>
+        <circle cx="160" cy="70" r="3" fill="#050810"/>
+        <circle cx="160" cy="175" r="3" fill="#050810"/>
+      </g>
+      <text x="320" font-size="180" font-weight="800" fill="#E8ECF1" letter-spacing="-2">BOT</text>
+    </g>
+
+    <g transform="translate(820,150)">
+      <rect width="480" height="200" rx="14" fill="#0B2540" stroke="#1E3050"/>
+      <text x="240" y="32" text-anchor="middle" font-size="14" fill="#6E7886" letter-spacing="3">FEELS LIKE</text>
+      <text x="240" y="80" text-anchor="middle" font-size="22" fill="#E8ECF1">Maker. Engineer.</text>
+      <text x="240" y="115" text-anchor="middle" font-size="16" fill="#A0A8B2">Earned authenticity.</text>
+      <text x="240" y="155" text-anchor="middle" font-size="14" fill="#FFB020">Best for: hackathons,</text>
+      <text x="240" y="178" text-anchor="middle" font-size="14" fill="#FFB020">DIY/maker audience.</text>
+    </g>
+  </g>
+
+  <!-- =========================================================== -->
+  <!-- CONCEPT D — MÖBIUS 2  (RECOMMENDED)                          -->
+  <!-- =========================================================== -->
+  <g transform="translate(0,1380)">
+    <rect x="60" y="0" width="1280" height="380" rx="20" fill="#0B2540" stroke="url(#cyan)" stroke-width="2"/>
+    <text x="100" y="40" font-size="22" font-weight="700" fill="#00B8D4">CONCEPT D · MÖBIUS 2  ★ RECOMMENDED</text>
+    <text x="100" y="68" font-size="14" fill="#A0A8B2">A Möbius strip rendered as the digit 2. Top loop is a perfect ring (= 0). Tilt 90°: the twist + loop becomes a clean ∞. The mark IS the promise.</text>
+
+    <g transform="translate(140,180)" filter="url(#softglow)">
+      <text font-size="180" font-weight="800" fill="#E8ECF1" letter-spacing="-2">R</text>
+      <g transform="translate(140,-30)">
+        <!-- top ring -->
+        <ellipse cx="90" cy="65" rx="68" ry="62" fill="none" stroke="url(#cyan)" stroke-width="16"/>
+        <!-- mobius twist -->
+        <path d="M 28 90 Q 90 145 158 95 Q 175 165 90 175 L 20 195" fill="none" stroke="url(#cyan)" stroke-width="16" stroke-linecap="round"/>
+        <!-- base bar -->
+        <line x1="20" y1="195" x2="160" y2="195" stroke="url(#cyan)" stroke-width="16" stroke-linecap="round"/>
+        <!-- twist highlight -->
+        <path d="M 95 105 Q 110 125 130 115" fill="none" stroke="#FFFFFF" stroke-width="3" opacity=".55"/>
+      </g>
+      <text x="320" font-size="180" font-weight="800" fill="#E8ECF1" letter-spacing="-2">BOT</text>
+    </g>
+
+    <!-- 3-up reading proof -->
+    <g transform="translate(880,140)">
+      <text font-size="12" fill="#6E7886" letter-spacing="3">READS AS 2</text>
+      <g transform="translate(0,15)" stroke="url(#cyan)" stroke-width="6" fill="none">
+        <ellipse cx="30" cy="22" rx="22" ry="20"/>
+        <path d="M 9 30 Q 30 50 51 32 Q 58 56 30 60 L 6 68"/>
+        <line x1="6" y1="68" x2="54" y2="68" stroke-linecap="round"/>
+      </g>
+
+      <text x="120" font-size="12" fill="#6E7886" letter-spacing="3">READS AS 0</text>
+      <g transform="translate(120,15)" stroke="url(#cyan)" stroke-width="6" fill="none">
+        <ellipse cx="30" cy="22" rx="22" ry="20"/>
+        <path d="M 9 30 Q 30 50 51 32 Q 58 56 30 60 L 6 68" opacity=".15"/>
+        <line x1="6" y1="68" x2="54" y2="68" stroke-linecap="round" opacity=".15"/>
+      </g>
+
+      <text x="240" font-size="12" fill="#6E7886" letter-spacing="3">TILT → ∞</text>
+      <g transform="translate(245,55) rotate(-90)" stroke="url(#cyan)" stroke-width="6" fill="none">
+        <ellipse cx="30" cy="22" rx="22" ry="20"/>
+        <path d="M 9 30 Q 30 50 51 32 Q 58 56 30 60 L 6 68" opacity=".95"/>
+        <line x1="6" y1="68" x2="54" y2="68" stroke-linecap="round" opacity=".15"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Tagline footer -->
+  <text x="700" y="1790" text-anchor="middle" font-size="22" font-weight="600" fill="#E8ECF1" letter-spacing="6">ROBOT, DECODED.</text>
+</svg>

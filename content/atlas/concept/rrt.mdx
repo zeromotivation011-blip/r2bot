@@ -1,0 +1,130 @@
+---
+title: RRT (Rapidly-exploring Random Tree) — Complete Guide | R2BOT
+summary: >-
+  RRT is a sampling-based motion-planning algorithm that finds paths in complex
+  high-DOF spaces. Standard for robotic arms and self-driving cars.
+category: ai-and-perception
+bucket: navigation-localization
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - rrt
+  - planning
+  - sampling
+  - motion-planning
+  - tree
+relatedTerms:
+  - path-planning
+  - motion-planning
+  - a-star-algorithm
+  - inverse-kinematics
+seeAlso:
+  - path-planning
+  - motion-planning
+  - a-star-algorithm
+  - inverse-kinematics
+youtubeSearchQuery: RRT motion planning robotics explained
+oneLiner: >-
+  The navigation localization concept: RRT is a sampling-based motion-planning
+  algorithm that finds
+laymanExplanation: >-
+  RRT (Rapidly-exploring Random Tree) is a sampling-based path-planning
+  algorithm that builds a tree of feasible states by randomly sampling the
+  configuration space and growing the tree toward each sample. RRT excels in
+  high-dimensional spaces where grid-based methods like A* fail.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without rrt (rapidly-exploring random tree) — complete guide | r2bot, many
+  navigation localization systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  RRT is a sampling-based motion-planning algorithm that finds paths in complex
+  high-DOF spaces. Standard for robotic arms and self-driving cars.
+slug: rrt
+---
+
+# RRT (Rapidly-exploring Random Tree)
+
+## What is RRT (Rapidly-exploring Random Tree)?
+
+RRT (Rapidly-exploring Random Tree) is a sampling-based path-planning algorithm that builds a tree of feasible states by randomly sampling the configuration space and growing the tree toward each sample. RRT excels in high-dimensional spaces where grid-based methods like A* fail.
+
+## How It Works
+
+Start with a tree containing only the start state. Randomly sample a point in the configuration space. Find the nearest node already in the tree. Extend a short distance from that node toward the sample. If the extension is collision-free, add it as a new node. Repeat until a node is close enough to the goal. RRT is probabilistically complete and easy to implement, but the resulting path is not optimal. RRT* and informed-RRT* variants converge to optimal paths in the limit.
+
+## Real-World Example
+
+MoveIt2 ships RRT-Connect as its default arm planner. NASA's Mars rovers use RRT-derived planners. Tesla's autonomous lane-change planner is RRT-based. Indian robotics groups use RRT for 6+ DOF arm planning.
+
+## Why It Matters for Robotics
+
+RRT is the workhorse algorithm for motion planning in spaces too big for grid search. Knowing RRT, RRT*, and their variants is mandatory for manipulation and autonomous-driving engineers. Indian PhD interviews routinely test RRT theory.
+
+## Try It Yourself
+
+Open `/visualizer` and load the RRT demo. Draw obstacles in a 2D maze, place start and goal, and step through RRT one sample at a time. Watch the tree grow and the first feasible path emerge.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "RRT samples:",
+    "options": [
+      "Only the start state",
+      "Random points in the configuration space",
+      "Only the goal",
+      "Battery levels"
+    ],
+    "answer": 1,
+    "explain": "Each iteration draws a random sample and extends the tree toward it."
+  },
+  {
+    "q": "Compared with A*, RRT is better at:",
+    "options": [
+      "Small 2D grids",
+      "High-dimensional continuous spaces (e.g., 7-DOF arms)",
+      "Database lookups",
+      "Audio compression"
+    ],
+    "answer": 1,
+    "explain": "Sampling-based planners scale to high-DOF spaces where grid search is intractable."
+  },
+  {
+    "q": "RRT* differs from RRT by:",
+    "options": [
+      "Using gradient descent",
+      "Re-wiring the tree to converge toward optimal paths",
+      "Running slower for no reason",
+      "Using sound waves"
+    ],
+    "answer": 1,
+    "explain": "RRT* periodically re-wires nearby nodes for lower cost — asymptotically optimal."
+  }
+]
+```
+
+## Further Reading
+
+- [Path Planning](/atlas/concept/path-planning)
+- [Motion Planning](/atlas/concept/motion-planning)
+- [A Star Algorithm](/atlas/concept/a-star-algorithm)
+- [Inverse Kinematics](/atlas/concept/inverse-kinematics)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain RRT (Rapidly-exploring Random Tree) for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

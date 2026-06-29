@@ -1,0 +1,133 @@
+---
+title: Extended Kalman Filter in Robotics — Complete Guide | R2BOT
+summary: >-
+  The Extended Kalman Filter (EKF) handles nonlinear motion and sensor models by
+  local linearisation. The default state estimator in drones and robots.
+category: control
+bucket: control-systems
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - ekf
+  - kalman
+  - nonlinear
+  - state-estimation
+  - sensor-fusion
+relatedTerms:
+  - kalman-filter
+  - particle-filter
+  - sensor-fusion
+  - slam
+  - visual-slam
+seeAlso:
+  - kalman-filter
+  - particle-filter
+  - sensor-fusion
+  - slam
+  - visual-slam
+youtubeSearchQuery: extended kalman filter robotics tutorial
+oneLiner: >-
+  The control systems concept: The Extended Kalman Filter (EKF) handles
+  nonlinear motion
+laymanExplanation: >-
+  The Extended Kalman Filter (EKF) is the most-used variant of the Kalman filter
+  in real robotics. It handles nonlinear motion models and sensor models by
+  computing Jacobians (linear approximations) at the current estimate. Almost
+  every drone and mobile robot in production uses an EKF.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without extended kalman filter in robotics — complete guide | r2bot, many
+  control systems systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  The Extended Kalman Filter (EKF) handles nonlinear motion and sensor models by
+  local linearisation. The default state estimator in drones and robots.
+slug: extended-kalman-filter
+---
+
+# Extended Kalman Filter in Robotics
+
+## What is Extended Kalman Filter in Robotics?
+
+The Extended Kalman Filter (EKF) is the most-used variant of the Kalman filter in real robotics. It handles nonlinear motion models and sensor models by computing Jacobians (linear approximations) at the current estimate. Almost every drone and mobile robot in production uses an EKF.
+
+## How It Works
+
+Like the standard KF, the EKF predicts and updates. But instead of multiplying with constant matrices, it computes the Jacobian of the nonlinear motion function and measurement function at the current state estimate. These Jacobians then play the role of F and H matrices in the standard KF equations. Linearisation introduces error — the EKF is no longer mathematically optimal — but for most practical robotics problems the approximation is good enough.
+
+## Real-World Example
+
+PX4 and ArduPilot drone autopilots use multi-state EKFs to fuse IMU, GPS, magnetometer, barometer, and airspeed. ORB-SLAM uses EKF-like updates. Tesla's earlier Autopilot stack relied on EKFs for sensor fusion. Indian drone startups like Garuda Aerospace tune EKFs as part of every product release.
+
+## Why It Matters for Robotics
+
+If you ever work on a real drone or mobile robot, you will encounter EKF tuning. It is the single most common state-estimation tool deployed today. Interview questions about EKF Jacobians, divergence, and tuning are standard for senior robotics roles.
+
+## Try It Yourself
+
+Read the PX4 ECL/EKF2 source code on GitHub — it is the production-quality EKF used in thousands of drones. Then implement a simple 2D EKF for differential-drive odometry in Python.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "The EKF differs from the standard Kalman filter by:",
+    "options": [
+      "Using neural networks",
+      "Linearising nonlinear models around the current estimate",
+      "Using only one sensor",
+      "Running on GPUs only"
+    ],
+    "answer": 1,
+    "explain": "The EKF takes Jacobians (first-order Taylor expansion) of nonlinear functions to apply Kalman-style updates."
+  },
+  {
+    "q": "A common drawback of EKFs is:",
+    "options": [
+      "They cannot run in real time",
+      "Linearisation error can cause divergence in highly nonlinear cases",
+      "They need a quantum computer",
+      "They cannot use sensors"
+    ],
+    "answer": 1,
+    "explain": "Strong nonlinearities can make the EKF estimate drift or diverge — use UKF or particle filter then."
+  },
+  {
+    "q": "Which is a production drone autopilot using EKF?",
+    "options": [
+      "Microsoft Word",
+      "PX4",
+      "Spotify",
+      "Photoshop"
+    ],
+    "answer": 1,
+    "explain": "PX4 (and ArduPilot) ships with a multi-state EKF as the primary state estimator."
+  }
+]
+```
+
+## Further Reading
+
+- [Kalman Filter](/atlas/concept/kalman-filter)
+- [Particle Filter](/atlas/concept/particle-filter)
+- [Sensor Fusion](/atlas/concept/sensor-fusion)
+- [Slam](/atlas/concept/slam)
+- [Visual Slam](/atlas/concept/visual-slam)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Extended Kalman Filter in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

@@ -1,0 +1,133 @@
+---
+title: Kalman Filter in Robotics — Complete Guide | R2BOT
+summary: >-
+  The Kalman filter optimally fuses noisy sensor data to estimate a robot's true
+  state. Foundation of GPS+IMU fusion, SLAM, and tracking.
+category: control
+bucket: control-systems
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - kalman
+  - filter
+  - estimation
+  - sensor-fusion
+  - state
+relatedTerms:
+  - sensor-fusion
+  - extended-kalman-filter
+  - particle-filter
+  - imu
+  - gps-module
+seeAlso:
+  - sensor-fusion
+  - extended-kalman-filter
+  - particle-filter
+  - imu
+  - gps-module
+youtubeSearchQuery: kalman filter robotics tutorial
+oneLiner: >-
+  The control systems concept: The Kalman filter optimally fuses noisy sensor
+  data
+laymanExplanation: >-
+  The Kalman filter is a mathematical algorithm that combines noisy measurements
+  with a model of how a system evolves to produce the optimal estimate of the
+  system's true state. In robotics, it fuses GPS, IMU, encoders, and other
+  sensors to give one clean position and velocity.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without kalman filter in robotics — complete guide | r2bot, many control
+  systems systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  The Kalman filter optimally fuses noisy sensor data to estimate a robot's true
+  state. Foundation of GPS+IMU fusion, SLAM, and tracking.
+slug: kalman-filter
+---
+
+# Kalman Filter in Robotics
+
+## What is Kalman Filter in Robotics?
+
+The Kalman filter is a mathematical algorithm that combines noisy measurements with a model of how a system evolves to produce the optimal estimate of the system's true state. In robotics, it fuses GPS, IMU, encoders, and other sensors to give one clean position and velocity.
+
+## How It Works
+
+At each step the filter does two things. **Predict**: it uses a motion model (e.g., constant velocity) to advance its belief forward in time, growing the uncertainty. **Update**: when a new sensor reading arrives, it computes how much to trust the reading vs the prediction (the Kalman gain) and pulls the estimate toward the measurement. The math optimally minimises mean-squared error if the system is linear and noise is Gaussian. Implementations come in under 50 lines of Python — but tuning the process and measurement covariance matrices is its own art.
+
+## Real-World Example
+
+Apollo 11's onboard computer used a Kalman filter to navigate to the Moon. Every modern drone autopilot (PX4, ArduPilot) uses one. Tesla Autopilot fuses radar, camera, and IMU with Kalman-family filters. Indian Mars Orbiter Mission used Kalman filters for its trajectory estimation.
+
+## Why It Matters for Robotics
+
+If you want to do serious robotics — drones, autonomous cars, mobile robots — you must understand Kalman filtering. It comes up in every senior robotics interview in India. The Kalman filter is also a gateway to modern state-estimation methods like the EKF, UKF, and factor graphs.
+
+## Try It Yourself
+
+Open `/visualizer` and load the Kalman demo: you can play with measurement noise, process noise, and watch the filter converge. Then implement a 1D position-velocity Kalman filter in Python (20 lines) on a noisy random-walk simulation.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "A Kalman filter combines:",
+    "options": [
+      "Two cameras only",
+      "A motion model with noisy measurements",
+      "Two batteries in parallel",
+      "No data at all"
+    ],
+    "answer": 1,
+    "explain": "It fuses a predictive model with noisy sensor readings using an optimal weighting (Kalman gain)."
+  },
+  {
+    "q": "The Kalman gain controls:",
+    "options": [
+      "Sensor brightness",
+      "How much to trust the new measurement vs the prediction",
+      "Power consumption",
+      "Motor speed"
+    ],
+    "answer": 1,
+    "explain": "High gain → trust the measurement more; low gain → trust the model prediction more."
+  },
+  {
+    "q": "Standard Kalman filtering assumes:",
+    "options": [
+      "Nonlinear dynamics",
+      "Linear dynamics and Gaussian noise",
+      "Discrete-only states",
+      "Pure deterministic systems"
+    ],
+    "answer": 1,
+    "explain": "The classic KF is optimal under linear dynamics and Gaussian noise — for nonlinear cases use the EKF or UKF."
+  }
+]
+```
+
+## Further Reading
+
+- [Sensor Fusion](/atlas/concept/sensor-fusion)
+- [Extended Kalman Filter](/atlas/concept/extended-kalman-filter)
+- [Particle Filter](/atlas/concept/particle-filter)
+- [Imu](/atlas/concept/imu)
+- [Gps Module](/atlas/concept/gps-module)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Kalman Filter in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

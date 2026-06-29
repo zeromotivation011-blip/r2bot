@@ -1,0 +1,132 @@
+---
+title: Workspace of a Robot — Complete Guide | R2BOT
+summary: >-
+  A robot's workspace is the full set of positions its end-effector can reach.
+  Defines what tasks the robot can physically perform.
+category: fundamentals
+bucket: mechanical-design
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - workspace
+  - reach
+  - kinematics
+  - arm
+  - manipulator
+relatedTerms:
+  - robot-arm
+  - forward-kinematics
+  - inverse-kinematics
+  - singularity
+  - degrees-of-freedom
+seeAlso:
+  - robot-arm
+  - forward-kinematics
+  - inverse-kinematics
+  - singularity
+  - degrees-of-freedom
+youtubeSearchQuery: robot workspace reachable space tutorial
+oneLiner: 'The mechanical design concept: A robot''s workspace is the full set of'
+laymanExplanation: >-
+  The workspace of a robot is the volume of 3D space its end-effector (the tool
+  at the tip) can reach. It is determined by the lengths of the links and the
+  limits of each joint. Engineers split the workspace into the reachable
+  workspace (can touch) and the dexterous workspace (can touch from any
+  orientation).
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without workspace of a robot — complete guide | r2bot, many mechanical design
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A robot's workspace is the full set of positions its end-effector can reach.
+  Defines what tasks the robot can physically perform.
+slug: workspace
+---
+
+# Workspace of a Robot
+
+## What is Workspace of a Robot?
+
+The workspace of a robot is the volume of 3D space its end-effector (the tool at the tip) can reach. It is determined by the lengths of the links and the limits of each joint. Engineers split the workspace into the reachable workspace (can touch) and the dexterous workspace (can touch from any orientation).
+
+## How It Works
+
+Each link extends the maximum reach; each joint bends the reach into curves. By sweeping all joint angles through their limits, you trace a 3D shell — typically a partial sphere, donut, or complex solid. Numerical tools (MoveIt2, the Robotics Toolbox, custom Python scripts) plot the workspace by sampling joint space and computing forward kinematics. The dexterous workspace is smaller and is where the robot can also achieve any required tool orientation.
+
+## Real-World Example
+
+A KUKA KR16 industrial arm has a workspace of ~1.6 m reach — perfect for car-door welding. The da Vinci surgical robot's workspace is just a few cm³ inside the patient's body, but every cm is dexterous. ISRO's ROBOT-3 manipulator has a workspace designed for the geometry of the future Bharatiya Antariksh Station modules.
+
+## Why It Matters for Robotics
+
+Choosing or designing a robot starts with workspace analysis: can the arm physically reach every required point? Mis-specified workspaces cause real production failures. Every robot mechanical-engineer interview includes workspace and reachability questions.
+
+## Try It Yourself
+
+Open `/visualizer` and load the IK demo for a 2-link arm. Drag the goal point and watch the workspace boundary glow red as you exit it. Then change one link length and see how the workspace reshapes.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "A robot's workspace is:",
+    "options": [
+      "Its memory in MB",
+      "The set of points its end-effector can reach",
+      "Its programming language",
+      "Its colour"
+    ],
+    "answer": 1,
+    "explain": "Workspace is a geometric concept — the volume in 3D space the tool can physically reach."
+  },
+  {
+    "q": "The dexterous workspace is:",
+    "options": [
+      "Larger than the reachable workspace",
+      "A subset where the tool can reach with any orientation",
+      "Always the same as reachable",
+      "Imaginary"
+    ],
+    "answer": 1,
+    "explain": "Dexterous ⊆ reachable. The dexterous region also allows any required tool orientation, not just position."
+  },
+  {
+    "q": "Increasing link lengths usually:",
+    "options": [
+      "Shrinks the workspace",
+      "Expands the reach but may add inertia and singularities",
+      "Has no effect",
+      "Cools the robot"
+    ],
+    "answer": 1,
+    "explain": "Longer links reach farther but cost in inertia and can introduce new singular configurations."
+  }
+]
+```
+
+## Further Reading
+
+- [Robot Arm](/atlas/concept/robot-arm)
+- [Forward Kinematics](/atlas/concept/forward-kinematics)
+- [Inverse Kinematics](/atlas/concept/inverse-kinematics)
+- [Singularity](/atlas/concept/singularity)
+- [Degrees Of Freedom](/atlas/concept/degrees-of-freedom)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Workspace of a Robot for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

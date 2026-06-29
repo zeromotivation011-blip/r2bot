@@ -1,0 +1,54 @@
+---
+title: "How robots move"
+description: "Every millimetre of robot movement is something an engineer had to design. Here's how they do it."
+track: spark
+lesson: 2
+duration: "5 min read"
+xp: 60
+estimated_minutes: 5
+sources:
+  - name: "Bruno Siciliano et al. — Robotics: Modelling, Planning and Control"
+    url: "https://link.springer.com/book/10.1007/978-1-84628-642-1"
+  - name: "IEEE Spectrum — The Actuator Problem"
+    url: "https://spectrum.ieee.org"
+---
+
+Pick up your pen. You didn't think about which muscles to use — your brain just said "pick up pen" and it happened. Robots don't have that luxury. Every millimetre of movement is something an engineer had to design, wire, and program.
+
+This is the **Act** part of the Sense-Think-Act loop. And it's harder than it looks.
+
+## The part that touches the world
+
+The components that make robots physically move are called **actuators**. An actuator converts electrical energy into motion. There are three main types you'll encounter everywhere in robotics.
+
+**DC motors** spin continuously when power is applied. They're fast, cheap, and simple — but they don't know where they are. A Roomba's wheels use DC motors. The robot doesn't know exactly how far it's moved; it estimates based on time and speed. Good enough for vacuuming. Not good enough for surgery.
+
+**Servo motors** are DC motors with a position sensor and a small control circuit built in. You can tell a servo: "go to exactly 90 degrees" — and it will, and it will stay there. Robot arms use servos at every joint. That's how they reach precise positions repeatedly, thousands of times a day, without drifting.
+
+**Stepper motors** divide a full rotation into tiny equal steps — typically 200 steps per revolution. Send it 100 pulses, it rotates exactly halfway. This predictability makes stepper motors the choice for 3D printers, CNC machines, and anything where you need to count distance rather than sense it.
+
+## Matching actuator to task
+
+Choosing the wrong actuator is like choosing the wrong tool — it works, sort of, until it doesn't.
+
+A Roomba uses cheap DC motors because slight navigation drift doesn't matter. A surgical robot uses high-precision servos because one millimetre of error is the difference between success and harm. Boston Dynamics' Atlas robot uses **hydraulic actuators** — pistons powered by pressurised fluid — because hydraulics can generate enormous force relative to their size, which you need if you want a robot to jump.
+
+And then there's an entire emerging field called **soft robotics**: robots made from silicone and inflatable chambers instead of rigid metals and electric motors. A soft actuator can squeeze around an irregular object the way your hand can. A rigid arm cannot.
+
+## Why this matters for everything else
+
+The actuator is where the robot meets the world. All the sensing and computing in the world means nothing if the actuator can't execute the decision accurately, fast enough, and without breaking down.
+
+Most robot failures you'll read about trace back here — a motor burns out, a joint seizes, a hydraulic line leaks. The "Act" step is where physics pushes back.
+
+---
+
+## Check your understanding
+
+**1.** A robot arm needs to pick up a wine glass and place it in a box, 500 times an hour, without breaking it. Which actuator type would you choose — DC motor, servo, or hydraulic? Why?
+
+**2.** Why would a 3D printer use stepper motors instead of servos?
+
+---
+
+*Soft robotics researchers are building robots from silicone that move like octopus tentacles — with no rigid skeleton at all. What do you think a soft robot could do that a rigid one never could?*

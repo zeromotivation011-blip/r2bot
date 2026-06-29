@@ -1,0 +1,136 @@
+---
+title: Time-of-Flight Sensor in Robotics — Complete Guide | R2BOT
+summary: >-
+  Time-of-Flight (ToF) sensors measure distance by timing reflected light
+  pulses. Used in depth cameras, gesture sensing, and drone obstacle avoidance.
+category: sensors
+bucket: sensors
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - tof
+  - distance
+  - depth
+  - sensor
+  - lidar-cousin
+  - optical
+relatedTerms:
+  - lidar
+  - depth-camera
+  - ultrasonic-sensor
+  - infrared-sensor
+  - sensor-fusion
+seeAlso:
+  - lidar
+  - depth-camera
+  - ultrasonic-sensor
+  - infrared-sensor
+  - sensor-fusion
+suggestedLessons:
+  - spark/sensors-explained
+youtubeSearchQuery: time of flight sensor robotics explained
+oneLiner: >-
+  The sensors concept: Time-of-Flight (ToF) sensors measure distance by timing
+  reflected
+laymanExplanation: >-
+  A Time-of-Flight (ToF) sensor measures how long an emitted light pulse takes
+  to bounce off an object and return. From that travel time, the sensor computes
+  distance with millimetre-to-centimetre precision. Unlike ultrasonic sensors,
+  ToF works at the speed of light, giving readings hundreds of times per second.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without time-of-flight sensor in robotics — complete guide | r2bot, many
+  sensors systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Time-of-Flight (ToF) sensors measure distance by timing reflected light
+  pulses. Used in depth cameras, gesture sensing, and drone obstacle avoidance.
+slug: tof-sensor
+---
+
+# Time-of-Flight Sensor in Robotics
+
+## What is Time-of-Flight Sensor in Robotics?
+
+A Time-of-Flight (ToF) sensor measures how long an emitted light pulse takes to bounce off an object and return. From that travel time, the sensor computes distance with millimetre-to-centimetre precision. Unlike ultrasonic sensors, ToF works at the speed of light, giving readings hundreds of times per second.
+
+## How It Works
+
+A ToF sensor emits an invisible infrared or laser pulse and starts a high-speed timer. Photons reflect off whatever they hit and return to a sensitive detector on the chip; the timer stops. Distance equals the round-trip time multiplied by the speed of light, divided by two. Modern ToF chips like the VL53L0X use a tiny SPAD (single-photon avalanche diode) array and on-chip phase-difference processing — so the host microcontroller just reads a clean distance value over I²C. Some ToF modules output a full depth image per frame, similar to LIDAR but on a single chip.
+
+## Real-World Example
+
+Your iPhone's Face ID uses a ToF depth camera to map your face in 3D. DJI drones use ToF sensors to sense obstacles below them during landing. Industrial robots use ToF to detect humans entering a workspace and trigger a safety stop in under 20 ms.
+
+## Why It Matters for Robotics
+
+ToF sensors are the cheap bridge between simple ultrasonic and full LIDAR — under ₹500 on Robu.in for a VL53L0X module that gives 2 m range. For Indian robotics students, ToF unlocks projects that would otherwise need a costly LIDAR: drone landing, gesture control, smart parking, queue counters.
+
+## Try It Yourself
+
+Buy a VL53L0X breakout board and hook it to an Arduino. With 10 lines of code you can print live distance to the serial monitor — try it on your hand, a wall, a glass surface (which it surprisingly handles well).
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "What does a Time-of-Flight sensor primarily measure?",
+    "options": [
+      "Sound travel time",
+      "Light travel time",
+      "Magnetic field strength",
+      "Temperature change"
+    ],
+    "answer": 1,
+    "explain": "ToF sensors emit a light pulse and time the reflected return — speed of light × time / 2 gives the distance."
+  },
+  {
+    "q": "Which everyday device commonly uses a ToF sensor?",
+    "options": [
+      "Microwave oven",
+      "iPhone Face ID",
+      "Electric kettle",
+      "Ceiling fan"
+    ],
+    "answer": 1,
+    "explain": "Apple's Face ID uses a small ToF camera that builds a 3D depth map of your face."
+  },
+  {
+    "q": "Compared with ultrasonic, ToF is mainly:",
+    "options": [
+      "Slower",
+      "Faster and uses light instead of sound",
+      "Cheaper but lower range",
+      "Only works underwater"
+    ],
+    "answer": 1,
+    "explain": "ToF uses light (much faster than sound) and is unaffected by airflow or soft surfaces that confuse ultrasonic."
+  }
+]
+```
+
+## Further Reading
+
+- [Lidar](/atlas/concept/lidar)
+- [Depth Camera](/atlas/concept/depth-camera)
+- [Ultrasonic Sensor](/atlas/concept/ultrasonic-sensor)
+- [Infrared Sensor](/atlas/concept/infrared-sensor)
+- [Sensor Fusion](/atlas/concept/sensor-fusion)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Time-of-Flight Sensor in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

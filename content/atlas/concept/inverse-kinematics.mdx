@@ -1,0 +1,103 @@
+---
+title: Inverse kinematics
+category: control
+summary: >-
+  Inverse kinematics is the math a robot uses to figure out which joint angles
+  will put its hand exactly where you want it. It's the difference between "move
+  forward" and "touch this specific point."
+seeAlso:
+  - servo-motor
+  - robot
+  - atlas
+  - optimus
+sources:
+  - title: Modern Robotics — Lynch & Park (textbook)
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+  - title: ROS Industrial — IK documentation
+    url: 'https://moveit.ros.org/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - math
+  - advanced
+difficulty: 3
+oneLiner: 'The concept concept: Inverse kinematics is the math a robot uses'
+laymanExplanation: >-
+  Inverse kinematics is the math a robot uses to figure out which joint angles
+  will put its hand (or end-effector) exactly where you want it. It's the
+  difference between "move forward" and "touch this specific point in 3D space."
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without inverse kinematics, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis:
+  - KUKA KR industrial arms
+  - Universal Robots UR5
+  - Da Vinci Surgical
+indianExample: >-
+  IIT Madras-built robot arms used in pharma packaging use IK solvers to pick
+  vials at angles, no matter where the conveyor places them.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What is the opposite of inverse kinematics?
+  options:
+    - Reverse kinematics
+    - Forward kinematics
+    - Dynamic kinematics
+    - Static kinematics
+  answer: 1
+  explanation: >-
+    Forward kinematics: joints → end-effector position. Inverse kinematics:
+    end-effector position → joints.
+mindBlowingFact: >-
+  For a 6-axis robot arm, the inverse-kinematics solver often has 16
+  mathematically valid solutions — the controller has to pick the safest one.
+industryApplications:
+  - industrial assembly
+  - surgery
+  - animation
+  - manufacturing
+  - space robotics
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Inverse kinematics is the math a robot uses to figure out which joint angles
+  will put its hand exactly where you want it. It's the difference between "move
+  forward" and "touch this specific point."
+slug: inverse-kinematics
+bucket: concept
+---
+
+Inverse [kinematics](/atlas/concept/kinematics) is the math a [robot](/atlas/concept/robot) uses to figure out which [joint](/atlas/concept/joint) angles will put its hand (or end-effector) exactly where you want it. It's the difference between "move forward" and "touch this specific point in 3D space."
+
+## The simple case: [forward kinematics](/atlas/concept/forward-kinematics)
+
+If you know all the joint angles of a robotic arm, calculating where the hand ends up is straightforward — just add up the rotations and translations. That's **forward kinematics**: angles in, position out. Computers can do this in microseconds, even for arms with seven joints.
+
+## The hard case: inverse kinematics
+
+But what we actually want is the opposite: given a target position for the hand, what joint angles get us there? That's **inverse kinematics** (IK). And it's hard, for three reasons:
+
+1. **Multiple solutions.** For most arms, there's more than one way to reach the same point. Your own arm: you can touch your nose with your elbow up or your elbow down. Two valid solutions. A 7-joint arm has roughly *infinite* solutions for most targets.
+
+2. **No solutions.** Some points are unreachable (out of arm length, or blocked by the body). IK has to detect this and give a sensible failure.
+
+3. **The math is nonlinear.** Forward kinematics is a sequence of matrix multiplications. IK is solving for the angles inside those matrices — a much harder algebraic problem.
+
+## How robots actually solve it
+
+**Analytical IK** — for simple arms (up to 6 joints, no funny geometry), there's a closed-form algebraic solution. Compute it in microseconds.
+
+**Numerical IK** — for complex arms (7+ joints, humanoid arms, robots with [redundancy](/atlas/concept/redundancy)), the solver iterates: start with a guess, see how far off the hand is, adjust the angles to reduce the error, repeat. Converges in milliseconds.
+
+**Neural IK** — newer: train a [neural network](/atlas/concept/neural-network) to learn the inverse [mapping](/atlas/concept/mapping) from data. Less accurate but much faster, and handles redundancy gracefully.
+
+## Why this matters for humanoids
+
+A [humanoid robot](/atlas/concept/humanoid-robot) has roughly 30 joints. Getting its right hand to a specific point isn't "pick angles for the 6 joints in the arm" — it's "pick angles for 30 joints such that the *whole body* keeps its balance, the *legs* stay where they are, and the *left hand* doesn't bump into the chest". This is called **whole-body IK**. It's the math problem that [Atlas](/atlas/robot/atlas), [Optimus](/atlas/robot/optimus), and Figure 03 are solving 500-1,000 times per second.
+
+---
+
+*The simplest place to see IK in action is a robotic arm with 6 joints. We'll build one in the Wire 06 course.*

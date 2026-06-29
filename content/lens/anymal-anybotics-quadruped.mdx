@@ -1,0 +1,34 @@
+---
+title: ANYmal — the academic quadruped that became an inspection robot
+summary: ETH Zurich's spinout. Four legs, IP67 weather seal, designed for industrial inspection — autonomous patrols in oil refineries and substations.
+topic: Legged Robots
+durationSeconds: 240
+originalDurationSeconds: 600
+externalUrl: https://www.anybotics.com/anymal/
+publishedAt: 2026-04-15
+relatedAtlas:
+  - { type: concept, slug: quadruped-robot }
+  - { type: concept, slug: reinforcement-learning }
+---
+
+ANYmal started life as a research robot at ETH Zurich's Robotic Systems Lab. It was the platform behind some of the earliest **reinforcement-learning-trained locomotion** papers — the kind where the robot learns to walk in simulation and then transfers to hardware without a single hand-tuned gain. ANYbotics commercialized it in 2017.
+
+## Why industry buys it
+
+ANYmal's pitch is not "look at this cute robot." It's: **24/7 autonomous inspection of dangerous places**. Refineries, offshore rigs, electrical substations. The robot does a pre-programmed route, takes thermal + visual readings of equipment, flags anomalies, and goes back to charge — all without a human nearby.
+
+The IP67 rating means it can walk in rain, dust, and oily floors. The thermal camera reads the temperature of pipes and joints to within a degree. The robot has logged tens of thousands of hours in real industrial sites, mostly in Switzerland and the Middle East.
+
+## What makes ANYmal's locomotion good
+
+The legs use **series elastic actuators** — springs in line with the motors. This makes the joints compliant (they give a little when something pushes back), which is critical for surfaces with unknown friction. The control loop is RL-based: a policy network trained in simulation outputs joint torques given proprioception inputs.
+
+The team has published several Nature/Science papers on the locomotion architecture, including a notable one in 2022 showing recovery from any fall pose without explicit programming.
+
+## Price
+
+Not advertised publicly. Industry rumours put a full ANYmal D system at around **$200,000 USD** — substantially more than a Spot, justified by the autonomous inspection use case where one robot replaces an inspection team.
+
+---
+
+*The Atlas entry [Reinforcement Learning](/atlas/concept/reinforcement-learning) covers the training approach used here.*

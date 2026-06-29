@@ -1,0 +1,97 @@
+---
+title: Cobot (collaborative robot)
+category: robot-types
+summary: >-
+  A cobot is a robotic arm designed to share workspace safely with humans. Soft
+  joints, force sensors, and slow speeds let it work next to a person without a
+  safety cage.
+seeAlso:
+  - industrial-robot
+  - robot
+  - servo-motor
+sources:
+  - title: Universal Robots — cobot pioneer
+    url: 'https://www.universal-robots.com/'
+  - title: ISO 10218 / TS 15066 — collaborative-robot safety standards
+    url: 'https://www.iso.org/standard/41571.html'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - robots
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: A cobot is a robotic arm designed to'
+laymanExplanation: >-
+  A cobot — short for *collaborative robot* — is a robotic arm designed to share
+  its workspace safely with humans. The big trick: it doesn't need a safety
+  cage. A human can stand next to it, hand it parts, work alongside it. If the
+  cobot bumps the human, it stops instantly without doing harm.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without cobot (collaborative robot), many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A cobot is a robotic arm designed to share workspace safely with humans. Soft
+  joints, force sensors, and slow speeds let it work next to a person without a
+  safety cage.
+slug: cobot
+bucket: concept
+---
+
+A cobot — short for *[collaborative robot](/atlas/concept/collaborative-robot)* — is a robotic arm designed to share its workspace safely with humans. The big trick: it doesn't need a safety cage. A human can stand next to it, hand it parts, work alongside it. If the cobot bumps the human, it stops instantly without doing harm.
+
+That changes the economics of factory floors completely.
+
+## How a cobot is safe
+
+A traditional [industrial robot](/atlas/concept/industrial-robot) is dangerous because it's fast and strong — it can swing a heavy welding torch in a tight arc without knowing or caring what's in the way. You keep humans out with physical fences, light curtains, and floor mats wired to emergency stops.
+
+A cobot is engineered the opposite way:
+
+- **Force-and-torque sensing in every [joint](/atlas/concept/joint).** If anything resists the motion, the cobot detects the resistance instantly and stops.
+- **Limited power.** Motors are sized so that even at full speed, the impact energy on a human is below an internationally-standardised safety threshold (ISO TS 15066).
+- **Rounded mechanical design.** No sharp edges, no pinch points.
+- **Slow speeds.** Most cobots top out at 1 m/s end-effector speed; many run much slower.
+
+The combination means a human can poke a moving cobot and the worst that happens is a bruise. Compare that to an old-school industrial [robot](/atlas/concept/robot), which could take a head off.
+
+## What they're good for
+
+Cobots fill the **small-batch, high-mix** segment that's awkward for traditional [robotics](/atlas/concept/robotics):
+
+- Loading parts into a CNC machine for a 3-week production run
+- Packing custom-mix gift boxes at a small e-commerce warehouse
+- Pick-and-place in a research lab
+- Assembly tasks that require human dexterity *and* robot precision side by side
+
+A traditional robot is overkill for these — the cage and integration cost more than the work it saves. A cobot can be set up in a day, programmed by demonstration (just guide its arm through the motion you want), and start paying for itself in weeks.
+
+## The market
+
+- **Universal Robots** (Denmark, owned by Teradyne) created the cobot category in 2008 and still leads — roughly 50% market share.
+- **Doosan Robotics** (South Korea), **Techman** (Taiwan), **Franka Emika** (Germany), and **Yaskawa Motoman HC series** are the other major players.
+- Chinese manufacturers (AUBO, Han's Robot) are scaling fast.
+
+Cobots are roughly 7% of all industrial-robot units shipped in 2026, but the fastest-growing segment — about 25% annual growth.
+
+## Where they don't fit
+
+Cobots are slow. For high-volume, high-repetition jobs (welding 5,000 car doors a shift), traditional industrial robots are 5-10× more productive. Cobots and industrial robots are complements, not competitors.
+
+---
+
+*Industrial robotics' big-iron cousin is the industrial robot — same arm shape, very different safety philosophy.*

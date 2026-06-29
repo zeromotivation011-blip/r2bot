@@ -1,0 +1,316 @@
+{
+  "root": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "explanation",
+      "title": "Mazes — a problem as old as Minos",
+      "body": "The first recorded maze was the Labyrinth of Crete, built (according to legend) to house the Minotaur. The first *algorithm* to escape a maze was described by Charles Pierre Trémaux in the 1800s. The first robot to solve a maze was Claude Shannon's *Theseus* — an electromechanical mouse that navigated a metal maze in 1950.\n\nToday you'll build the same idea with modern parts: a **5-sensor IR array** for eyes, an **L298N motor driver** for muscles, and an **Arduino** for the brain.\n\nYour algorithm: the **left-hand rule** (also called wall-following). The idea is simple enough to explain to a child:\n\n> Always keep your left hand touching the left wall. Never let go. Keep walking.\n\nAs long as the maze is *simply connected* (no islands), you'll find the exit. Let's understand exactly what that means — and where it breaks down.",
+      "branches": [{ "on": "next", "to": "q-left-hand-rule" }],
+      "xp": 10
+    },
+    "q-left-hand-rule": {
+      "id": "q-left-hand-rule",
+      "type": "question",
+      "title": "Does the left-hand rule always work?",
+      "body": "The left-hand rule is elegant and easy to implement. But there's a catch.\n\nConsider a maze with an **island** — a wall section in the middle that isn't connected to the outer boundary. If you enter the maze and start following the left wall, you might get stuck walking endlessly around the island, never reaching the exit.\n\nThis type of maze is called **multiply connected** — it has loops that aren't all part of one connected boundary.\n\nThe left-hand rule only guarantees success in **simply connected** mazes: mazes where every wall is connected to the outer boundary (i.e., the maze has no islands).",
+      "hint": "Think about a maze with a wall island floating in the middle, not touching any outer wall. What happens when you follow the left wall into that island?",
+      "hint2": "In a multiply-connected maze (one with wall islands), the left-hand rule can trap you in an infinite loop around the island. So it does NOT always work.",
+      "question": {
+        "style": "boolean",
+        "prompt": "The left-hand rule always finds the exit of ANY maze. True or false?",
+        "correct": "false",
+        "explanation_correct": "Correct — it's **false**. The left-hand rule only works in simply-connected mazes (no wall islands). In a multiply-connected maze, you can get trapped following the left wall around an island forever. Competition maze builders know this and often test for it.",
+        "explanation_wrong": "It's **false**. The left-hand rule fails in multiply-connected mazes — mazes that have wall islands not attached to the outer boundary. If the robot enters following the left wall and that wall is an island, it'll loop endlessly. For island mazes you need more advanced algorithms like flood-fill."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-sensor-array" },
+        { "on": "wrong", "to": "q-sensor-array" }
+      ],
+      "xp": 20
+    },
+    "q-sensor-array": {
+      "id": "q-sensor-array",
+      "type": "question",
+      "title": "How many patterns can 5 sensors produce?",
+      "body": "Your maze solver uses a **5-sensor IR array** — five IR sensors mounted side by side across the front of the robot. Each sensor returns a binary value: **1** (sees a wall/line) or **0** (sees open floor).\n\nFive binary sensors. Each can be 0 or 1 independently. How many *distinct patterns* can those five sensors produce altogether?\n\n(This is a combinatorics question. Think about binary numbers.)",
+      "hint": "Each sensor is one binary digit. 5 sensors = 5 binary digits. How many different 5-bit binary numbers exist?",
+      "hint2": "2^5 = 32. Five binary sensors can be in 2^5 = 32 different states.",
+      "question": {
+        "style": "mcq",
+        "prompt": "A 5-sensor IR array produces how many distinct sensor patterns?",
+        "options": [
+          "5",
+          "10",
+          "32",
+          "Infinite"
+        ],
+        "correct": 2,
+        "explanation_correct": "Correct — **32 patterns** (2^5). Each of the 5 sensors is independently either 0 or 1, giving 2×2×2×2×2 = 32 combinations. In practice, only a handful of these map to meaningful maze features — you only need to handle about 5–7 distinct cases.",
+        "explanation_wrong": "The answer is **32** (2^5). Five binary sensors = five binary digits = 2^5 = 32 possible states. That said, most of these 32 patterns never appear in a real maze. In practice you'll handle maybe 5–7 meaningful patterns and treat the rest as 'unknown'."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-which-sensors-matter" },
+        { "on": "wrong", "to": "q-which-sensors-matter" }
+      ],
+      "xp": 30
+    },
+    "q-which-sensors-matter": {
+      "id": "q-which-sensors-matter",
+      "type": "question",
+      "title": "Which sensors actually matter?",
+      "body": "You have sensors at positions: **far-left, left, centre, right, far-right**.\n\nThe centre sensor detects whether you're heading straight into a wall. The left and right sensors detect slight drift. The far-left and far-right sensors detect whether there's an open path to your left or right — critical for detecting junctions.\n\nFor maze solving decisions, which sensors are most important?",
+      "hint": "You need to detect: going straight, drifting left, drifting right, junction ahead, and dead end. Which sensors cover all of those?",
+      "hint2": "All 5 sensors serve a purpose in maze solving: centre for wall-ahead, left/right for path correction, far-left/far-right for detecting open side passages (junctions).",
+      "question": {
+        "style": "mcq",
+        "prompt": "For maze solving decisions, which sensor positions matter most?",
+        "options": [
+          "Far-left and far-right only",
+          "All 5 sensors",
+          "Centre sensor only",
+          "Alternating sensors (positions 1, 3, 5)"
+        ],
+        "correct": 1,
+        "explanation_correct": "All 5 matter. Centre: are we heading into a wall? Left/right: are we drifting? Far-left/far-right: is there an open passage to the side (junction detection)? Drop any one sensor and you lose information you'll need at some junction type.",
+        "explanation_wrong": "**All 5 sensors** matter. Each plays a role: centre detects forward walls, left/right detect path drift, far-left/far-right detect side openings (junctions). If you only used the outer sensors, you'd miss drift correction. If you only used the centre, you'd miss side passages entirely."
+      },
+      "branches": [
+        { "on": "correct", "to": "explanation-sensor-reading" },
+        { "on": "wrong", "to": "explanation-sensor-reading" }
+      ],
+      "xp": 40
+    },
+    "explanation-sensor-reading": {
+      "id": "explanation-sensor-reading",
+      "type": "explanation",
+      "title": "Reading sensors as binary patterns",
+      "body": "Here's the trick that makes the code clean: read all 5 sensors and combine them into a **single 5-bit integer**.\n\nSensor positions (left to right): S4 S3 S2 S1 S0\n\n```cpp\nint s4 = digitalRead(A0);  // far-left\nint s3 = digitalRead(A1);  // left\nint s2 = digitalRead(A2);  // centre\nint s1 = digitalRead(A3);  // right\nint s0 = digitalRead(A4);  // far-right\n\nint pattern = (s4<<4) | (s3<<3) | (s2<<2) | (s1<<1) | s0;\n```\n\nNow `pattern` is a number from 0 to 31. Key mappings:\n\n| Pattern (binary) | Decimal | Meaning |\n|-----------------|---------|------|\n| `00100`         | 4       | Centre only — go straight |\n| `00110`         | 6       | Centre + right — drift left, correct right |\n| `01100`         | 12      | Centre + left — drift right, correct left |\n| `11111`         | 31      | All sensors — open junction (T or cross) |\n| `00000`         | 0       | No sensors — dead end |\n\nA `switch(pattern)` statement can then dispatch to the right action for each meaningful pattern.",
+      "branches": [{ "on": "next", "to": "q-binary-pattern" }],
+      "xp": 30
+    },
+    "q-binary-pattern": {
+      "id": "q-binary-pattern",
+      "type": "question",
+      "title": "Pattern 00100 — what is it?",
+      "body": "Pattern `00100` in binary means only the **centre sensor** (bit 2) is triggered. The four outer sensors are all 0.\n\nLook at the sensor layout:\n\n```\nS4  S3  S2  S1  S0\n 0   0   1   0   0\nfar  lf  ctr rt  far\nleft            right\n```\n\nOnly the centre sensor sees the wall / path marker. The robot is perfectly aligned. What should it do?",
+      "hint": "Centre sensor is on, all others off. The robot is pointing straight down the corridor.",
+      "hint2": "Centre only = perfectly aligned with a straight corridor. Drive straight forward.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Sensor pattern `00100` (centre only triggered) means…",
+        "options": [
+          "Junction ahead — check both sides",
+          "Straight path — drive forward",
+          "T-junction — stop and decide",
+          "Dead end — reverse and turn"
+        ],
+        "correct": 1,
+        "explanation_correct": "Correct — **straight path**. Only the centre sensor is active; the robot is perfectly centred in a corridor. Keep driving forward at full base speed. No correction needed.",
+        "explanation_wrong": "The answer: **straight path**. Centre sensor only = the corridor is ahead and the robot is centred. Drive forward. If the left sensor also triggers, you've drifted right. If the right sensor triggers, you've drifted left. But with only the centre on, you're perfectly aligned."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-junction-detect" },
+        { "on": "wrong", "to": "q-junction-detect" }
+      ],
+      "xp": 50
+    },
+    "q-junction-detect": {
+      "id": "q-junction-detect",
+      "type": "question",
+      "title": "Pattern 11111 — the big one",
+      "body": "Pattern `11111` — **all five sensors triggered simultaneously**.\n\nThink about what this means physically. All sensors see something. The leftmost sensor sees it, the rightmost sensor sees it, and everything in between.\n\nThis only happens in one of two situations:\n1. The robot has reached a wide **T-junction or cross junction** — the path opens up dramatically to both sides.\n2. The robot has hit a completely **blank open space**.\n\nIn a typical maze, `11111` almost always means a junction.",
+      "hint": "If all 5 sensors are triggered, the path must be wide enough to cover all of them. A narrow corridor can't do that.",
+      "hint2": "When you roll into a T-junction or cross, the open space to both sides means all sensors suddenly see open path. Pattern 11111 = junction detected.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Sensor pattern `11111` (all sensors triggered) most likely means…",
+        "options": [
+          "Open space — no walls at all",
+          "T-junction or cross junction — need to decide which way to turn",
+          "Wall straight ahead — stop",
+          "Sensor array error"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly — **junction detected**. When all 5 sensors trigger, the robot has entered a space wide enough to cover the entire sensor array. In a structured maze, that's a T or cross junction. Time to apply the left-hand rule: check if left is open, and if so, turn left.",
+        "explanation_wrong": "The answer: **T-junction or cross junction**. When all sensors are covered, the path has opened dramatically to both sides — wider than the narrow corridors. That's the signature of a junction. The robot must now apply the decision algorithm (left-hand rule: turn left if possible; else go straight; else turn right; else turn back)."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-dead-end" },
+        { "on": "wrong", "to": "q-dead-end" }
+      ],
+      "xp": 60
+    },
+    "q-dead-end": {
+      "id": "q-dead-end",
+      "type": "question",
+      "title": "Pattern 00000 — the dead end",
+      "body": "The opposite extreme: pattern `00000`. **No sensors** are triggered at all.\n\nThe robot has been driving forward, and suddenly none of its sensors see anything. What just happened?\n\nIn a maze built from corridors, if you lose all sensor contact while driving forward, you've most likely entered a dead end and driven past the point where any wall or line is detectable. The corridor ended.\n\nWhat should the robot do?",
+      "hint": "No sensors = no corridor. You've driven into a dead end and there's nothing ahead. What do you do in a dead end?",
+      "hint2": "Dead end = reverse and turn around. In left-hand rule terms: if you can't go left, forward, or right, you go back — a 180° U-turn.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Sensor pattern `00000` (no sensors triggered) most likely means…",
+        "options": [
+          "Perfect straight path — accelerate",
+          "Dead end — reverse and turn around 180°",
+          "Obstacle directly ahead — stop",
+          "Maze exit reached"
+        ],
+        "correct": 1,
+        "explanation_correct": "Right — **dead end**. Pattern 00000 means the robot has driven into a dead end and is no longer over any path marker. The correct response is to reverse slightly and execute a 180° turn to backtrack. In the left-hand rule hierarchy: left blocked → forward blocked → right blocked → U-turn.",
+        "explanation_wrong": "Pattern 00000 = **dead end**. No sensors triggered means there's no corridor ahead — the robot drove into a cul-de-sac. Response: reverse a little, turn 180°, and proceed back the way it came. In the left-hand rule, this is the 'last resort' option after checking left, forward, and right."
+      },
+      "branches": [
+        { "on": "correct", "to": "explanation-decision-table" },
+        { "on": "wrong", "to": "explanation-decision-table" }
+      ],
+      "xp": 60
+    },
+    "explanation-decision-table": {
+      "id": "explanation-decision-table",
+      "type": "explanation",
+      "title": "The full decision table",
+      "body": "Here's the complete pattern-to-action mapping your Arduino code will implement:\n\n| Pattern (binary) | Situation | Action |\n|-----------------|-----------|--------|\n| `00100` (4)     | Straight corridor | Drive forward |\n| `00110` (6)     | Drifted slightly left | Steer right (speed up left motor) |\n| `01100` (12)    | Drifted slightly right | Steer left (speed up right motor) |\n| `00010` (2)     | Drifted far right | Hard right turn |\n| `01000` (8)     | Drifted far left | Hard left turn |\n| `11111` (31)    | Junction (T or cross) | Apply left-hand rule |\n| `11100` (28)    | Left junction | Turn left |\n| `00111` (7)     | Right junction | Turn right (if no left option) |\n| `00000` (0)     | Dead end | Reverse + U-turn |\n\nFor junctions, the left-hand rule priority is:\n1. Turn left (if left passage exists)\n2. Go straight (if no left passage, but forward is clear)\n3. Turn right (if only right passage exists)\n4. U-turn (if all options are blocked — dead end)\n\nThis maps cleanly to `if/else` logic in your `decideAtJunction()` function.",
+      "branches": [{ "on": "next", "to": "q-code-fill-junction" }],
+      "xp": 30
+    },
+    "q-code-fill-junction": {
+      "id": "q-code-fill-junction",
+      "type": "question",
+      "title": "Code: handling a junction",
+      "body": "Here's a snippet from the main loop. When pattern 31 (all sensors) is detected, we call a function to check the sides and then decide which way to turn.\n\nThe missing piece calls the turn decision after `checkSides()` has updated the direction flags.",
+      "hint": "After checking which sides are open, you need to actually execute the turn. The function that does that based on left-hand rule is `decide()`.",
+      "hint2": "The missing word is the function call that applies the left-hand rule after side-checking. It's `decide();`",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Complete this junction-handling code:\n\n```cpp\nif (pattern == 0b11111) {\n  checkSides();\n  ___\n}\n```\n\nWhat goes on the blank line?",
+        "correct": "decide();",
+        "explanation_correct": "Correct — `decide();`. `checkSides()` probes left and right by rotating the robot slightly to see which sides are open, then updates boolean flags `leftOpen` and `rightOpen`. Then `decide()` applies the left-hand rule: if `leftOpen`, turn left. Else go straight. Else if `rightOpen`, turn right. Else U-turn.",
+        "explanation_wrong": "The answer: `decide();`. The flow is: detect junction (pattern 31) → `checkSides()` to probe which sides are open → `decide()` to apply the left-hand rule priority: left first, then straight, then right, then U-turn."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-flood-fill" },
+        { "on": "wrong", "to": "q-flood-fill" }
+      ],
+      "xp": 70
+    },
+    "q-flood-fill": {
+      "id": "q-flood-fill",
+      "type": "question",
+      "title": "Going further: flood-fill",
+      "body": "The left-hand rule finds *a* path. But is it the *shortest* path? Not necessarily.\n\n**Flood-fill** is the algorithm used by the top Micromouse competitors. Imagine flooding the maze with water from the exit — every cell gets a number equal to its distance (in steps) from the exit. Then the robot simply follows descending numbers from start to finish.\n\nFlood-fill always finds the shortest path. But it requires the robot to first **map the maze** (explore all cells) before it can compute the flood values — which is why Micromouse robots do two runs: a slow mapping run, then a fast racing run.",
+      "hint": "Does left-hand rule guarantee shortest path? No — it just guarantees it finds *some* exit. Flood-fill specifically optimises for shortest.",
+      "hint2": "Flood-fill assigns a cost (distance to exit) to every cell. Then the robot greedily descends the cost map. This always produces the shortest path.",
+      "question": {
+        "style": "boolean",
+        "prompt": "The flood-fill algorithm is guaranteed to find the SHORTEST path through a maze (not just any path). True or false?",
+        "correct": "true",
+        "explanation_correct": "True. Flood-fill computes the shortest distance from every cell to the exit, then routes the robot through cells with strictly decreasing distance values. It's essentially Dijkstra's algorithm applied to a grid. Left-hand rule makes no shortest-path guarantee.",
+        "explanation_wrong": "This is **true**. Flood-fill computes the minimum number of steps from every cell to the exit (by propagating distance values outward from the exit like a rising flood). Then the robot moves to the adjacent cell with the lowest value — guaranteed optimal. Left-hand rule finds *an* exit, not the *fastest* route to it."
+      },
+      "branches": [
+        { "on": "correct", "to": "simulation-maze" },
+        { "on": "wrong", "to": "simulation-maze" }
+      ],
+      "xp": 70
+    },
+    "simulation-maze": {
+      "id": "simulation-maze",
+      "type": "simulation",
+      "title": "Watch the left-hand rule in action",
+      "body": "The simulator below shows your maze solver robot working through a simply-connected maze. Observe:\n\n- The **sensor pattern** (5 LEDs) updates in real time as the robot moves\n- When a junction is detected (all 5 LEDs on), the robot pauses briefly to check sides, then turns left\n- Dead ends trigger a visible reverse-and-U-turn sequence\n- The **path trace** shows everywhere the robot has been — notice it may re-visit cells before finding the exit\n\nTry toggling the maze type between **simply-connected** (left-hand rule succeeds) and **multiply-connected** (left-hand rule loops forever). The difference is dramatic.\n\nWhen you're satisfied, continue.",
+      "simulation_url": "/visualizer?mode=maze",
+      "branches": [{ "on": "next", "to": "q-memory" }],
+      "xp": 60
+    },
+    "q-memory": {
+      "id": "q-memory",
+      "type": "question",
+      "title": "Upgrading to shortest-path",
+      "body": "You saw in the simulation that left-hand rule re-visits cells and takes a winding route. To upgrade to flood-fill (shortest path), the robot needs to track which junctions it has visited and what the layout was at each one.\n\nThis requires storing the maze map in memory as the robot explores.",
+      "hint": "Flood-fill needs a complete map of the maze before it can compute the shortest path. How does a robot get that map?",
+      "hint2": "The robot has to explore and remember what it found at each junction — essentially building a graph of the maze in memory.",
+      "question": {
+        "style": "mcq",
+        "prompt": "To upgrade from left-hand rule to shortest-path routing, the robot needs to…",
+        "options": [
+          "Move faster on the second run",
+          "Remember which junctions it visited and the maze layout at each one",
+          "Add more IR sensors to the array",
+          "Connect to WiFi and download a map"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly — **memory of junctions and layout**. The robot builds a map (graph) in its memory during the first exploratory run: 'at junction 3, left was open, right was blocked, I came from south.' Then flood-fill computes shortest distances on that stored map. The second run is then a fast optimal sprint.",
+        "explanation_wrong": "The answer: **remember the maze layout**. During the first run, the robot stores which passages are open at every junction. After full exploration, flood-fill computes shortest distances from exit to start. On the second run, the robot just follows the precomputed optimal path — much faster."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-arduino-memory" },
+        { "on": "wrong", "to": "q-arduino-memory" }
+      ],
+      "xp": 70
+    },
+    "q-arduino-memory": {
+      "id": "q-arduino-memory",
+      "type": "question",
+      "title": "Arduino memory limits",
+      "body": "Here's a practical constraint. The Arduino Uno's **SRAM** (the working memory where your variables live) is quite small. If you want to store a maze map — say, a 16×16 grid with passage data for each cell — you need to be very memory-efficient.\n\nA 16×16 maze has 256 cells. If each cell needs 4 bits (open/closed for North, South, East, West walls), that's 128 bytes of maze data. Plus your program variables, stack, and sensor readings.\n\nKnowing the total SRAM of an Arduino Uno helps you plan how complex a maze you can store.",
+      "hint": "Look up Arduino Uno specs. The key spec is SRAM — Static Random Access Memory — measured in KB.",
+      "hint2": "Arduino Uno has 2 KB (2048 bytes) of SRAM. A 16×16 maze map at 4 bits/cell = 128 bytes — quite feasible, but leaves only ~1.9 KB for everything else.",
+      "question": {
+        "style": "number-input",
+        "prompt": "The Arduino Uno has ___ KB of SRAM for storing variables and maze data:",
+        "correct": 2,
+        "explanation_correct": "Correct — **2 KB (2048 bytes)**. That's enough for a 16×16 maze map (128 bytes at 4 bits/cell), but you have to be careful. Use `uint8_t` instead of `int`, pack bits where possible, and avoid the `String` class (it fragments memory). For bigger mazes, use an ESP32 which has 320 KB of SRAM.",
+        "explanation_wrong": "The Arduino Uno has **2 KB** of SRAM. That sounds tiny — and it is. A 16×16 maze map takes about 128 bytes at minimum, leaving under 2 KB for everything else. This is why Micromouse competitors often switch to more powerful microcontrollers (STM32, ESP32) for competition-level maze solving."
+      },
+      "branches": [
+        { "on": "correct", "to": "checkpoint-maze" },
+        { "on": "wrong", "to": "checkpoint-maze" }
+      ],
+      "xp": 70
+    },
+    "checkpoint-maze": {
+      "id": "checkpoint-maze",
+      "type": "checkpoint",
+      "title": "Checkpoint — maze solver concepts locked in",
+      "body": "Let's take stock of everything you've learned:\n\n**Algorithm:**\n- Left-hand rule: keep left wall, works for simply-connected mazes only\n- Multiply-connected mazes (with islands) defeat left-hand rule\n- Flood-fill: explore first, compute distances, race back optimal — always shortest path\n\n**Sensing:**\n- 5 IR sensors read as a 5-bit integer (0–31)\n- Key patterns: 00100=straight, 11111=junction, 00000=dead end\n- `(s4<<4)|(s3<<3)|(s2<<2)|(s1<<1)|s0` collapses 5 reads into one `switch`\n\n**Decision priority (left-hand rule):**\n- Check left → straight → right → U-turn\n\n**Hardware constraint:**\n- Arduino Uno has 2 KB SRAM — plan your maze map data structure carefully\n\nOne more question — the real-world competition context.",
+      "branches": [{ "on": "next", "to": "q-competition" }],
+      "xp": 80
+    },
+    "q-competition": {
+      "id": "q-competition",
+      "type": "question",
+      "title": "Micromouse: the world's oldest robot competition",
+      "body": "**Micromouse** is a robotic competition that has run since 1977. A small autonomous mouse-sized robot navigates a 16×16 grid maze. It has **two runs**:\n\n1. **First run** — the robot has never seen the maze. It explores, maps, and eventually finds the exit. Slow.\n2. **Second run** — the robot uses the map it built to race back through the optimal shortest path. Fast.\n\nThe best Micromouse robots complete their second run in under 5 seconds for a 16×16 maze. They use brushless motors, custom PCBs, IR sensors at multiple angles, and PID-controlled steering.\n\nWhat is the first run for?",
+      "hint": "On the first run the robot has zero knowledge of the maze. What does it gain by the end of that run?",
+      "hint2": "The first run is the exploration/mapping phase. The robot records junction layouts as it moves. By the time it exits, it has a complete (or near-complete) map.",
+      "question": {
+        "style": "mcq",
+        "prompt": "In Micromouse, the first run is primarily for…",
+        "options": [
+          "Racing as fast as possible to the exit",
+          "Mapping the maze layout",
+          "Calibrating the sensors",
+          "Showing the robot to the judges"
+        ],
+        "correct": 1,
+        "explanation_correct": "Correct — **mapping**. The first run is slow and exploratory. The robot records which passages are open at every junction. Once it reaches the exit, it has a complete map and can run flood-fill to compute the optimal path. The second run is the speed run — no exploration needed.",
+        "explanation_wrong": "The first run is for **mapping**. The robot carefully explores, records junction layouts, and exits (slowly). Then it computes the optimal route using flood-fill on its internal map. The second run is then a flat-out race — some competition bots complete this in under 5 seconds on a 16×16 grid."
+      },
+      "branches": [
+        { "on": "correct", "to": "complete" },
+        { "on": "wrong", "to": "complete" }
+      ],
+      "xp": 80
+    },
+    "complete": {
+      "id": "complete",
+      "type": "complete",
+      "title": "Maze Solver — Built",
+      "body": "You built a maze-solving robot and you understand the algorithm behind competition-level Micromouse. That's a real jump.\n\n**Total XP earned: 720**\n\nWhat you can now explain to anyone:\n- Why left-hand rule works (and exactly when it fails)\n- How 5 binary sensors collapse into a pattern integer and a `switch` statement\n- The difference between 'find a path' and 'find the shortest path'\n- Why flood-fill needs a two-run strategy\n- The 2 KB SRAM constraint and why it forces efficient data structures\n\n**Where to go next:**\n- **Balance Bot** — the hardest challenge so far. You'll learn PID control, IMU sensors, and the inverted pendulum problem. This is where amateur robotics meets real control engineering.\n- **Vision Line Follower** — add a camera module and follow lines using computer vision instead of IR. Introduction to image processing.\n- **ROS2 Nav Robot** — connect your maze solver to ROS2, use SLAM for mapping, and control it from your laptop. The professional path.\n\nMicromouse competitions happen worldwide. With what you've built today, you could enter one.",
+      "branches": [],
+      "xp": 100
+    }
+  }
+}

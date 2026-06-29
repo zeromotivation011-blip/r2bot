@@ -1,0 +1,75 @@
+---
+title: Single-board computer
+category: hardware
+summary: >-
+  A single-board computer is a full computer — processor, RAM, storage, and
+  ports — built onto a single circuit board the size of a credit card, powerful
+  enough to run a complete operating system.
+seeAlso: []
+sources:
+  - title: Raspberry Pi Foundation — What is a Raspberry Pi?
+    url: 'https://www.raspberrypi.com/documentation/computers/getting-started.html'
+  - title: NVIDIA Jetson — Edge AI computing platform
+    url: 'https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - hardware
+  - electronics
+  - embedded-systems
+difficulty: 3
+oneLiner: 'The concept concept: A single-board computer is a full computer —'
+laymanExplanation: >-
+  Picture a desktop computer. Now shrink the motherboard, CPU, RAM, and graphics
+  down until everything fits on a board roughly the size of a bank card. Plug in
+  a screen, keyboard, and power supply, and you have a working computer that
+  cost less than a textbook. That is a single-board computer.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without single-board computer, many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A single-board computer is a full computer — processor, RAM, storage, and
+  ports — built onto a single circuit board the size of a credit card, powerful
+  enough to run a complete operating system.
+slug: single-board-computer
+bucket: concept
+---
+
+Picture a desktop computer. Now shrink the motherboard, CPU, RAM, and graphics down until everything fits on a board roughly the size of a bank card. Plug in a screen, keyboard, and power supply, and you have a working computer that cost less than a textbook. That is a single-board computer.
+
+A **single-board computer** (SBC) puts all the components of a functional PC onto one printed circuit board. Unlike a [microcontroller](/atlas/concept/microcontroller) — which holds only a minimal CPU core and a few kilobytes of memory — an SBC runs a full operating system such as Linux or Android. It has megabytes or gigabytes of RAM, can store files on a microSD card or eMMC chip, and offers familiar ports: USB, HDMI, Wi-Fi, Ethernet.
+
+## The Raspberry Pi effect
+
+The Raspberry Pi, launched in 2012 to teach programming in UK schools, accidentally became the world's favourite [robot](/atlas/concept/robot) brain. A Raspberry Pi 5 runs a quad-core ARM Cortex-A76 at 2.4 GHz — faster than a mid-range laptop from 2010 — and costs around ₹5,000. Its 40-pin GPIO header lets it talk directly to motors, sensors, and other electronics, bridging the gap between "computer" and "controller" in a single board.
+
+## SBCs built for [robotics](/atlas/concept/robotics) and AI
+
+Not all SBCs are equal. The **[NVIDIA](/atlas/company/nvidia) Jetson** family (Nano, Orin, AGX) adds a powerful GPU to the mix, allowing real-time [computer vision](/atlas/concept/computer-vision) and machine-learning inference on the board itself — without sending data to a cloud server. A Jetson Orin AGX can run neural networks fast enough to guide a [drone](/atlas/concept/drone) or read a robot's [camera](/atlas/concept/camera-vision) at 60 frames per second. Google's **Coral Dev Board** adds a dedicated neural-network accelerator chip for even more efficient AI tasks.
+
+## SBC versus microcontroller
+
+The two are complementary, not rivals. An SBC handles the "thinking" — running [ROS](/atlas/concept/ros) (the Robot Operating System), processing camera images, deciding where to move. A microcontroller handles the "reflexes" — closing a motor-control loop 10,000 times per second, reading encoders, firing [PWM](/atlas/concept/pwm) signals. Many robots use both: an SBC as the high-level brain, one or more microcontrollers at the low-level limbs.
+
+## Why it matters
+
+SBCs collapsed the cost of putting a real computer inside a machine. A robot that once needed a ruggedised industrial PC costing lakhs can now use a Raspberry Pi costing thousands. That shift is why robotics became a hobby, a student project, and a startup opportunity all at once.
+
+---
+
+*The original Raspberry Pi 1 Model B (2012) had 256 MB of RAM — the same as an iPhone 3G from 2008. The Raspberry Pi 5 (2023) has 32× more RAM and runs roughly 40× faster.*

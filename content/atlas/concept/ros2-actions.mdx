@@ -1,0 +1,72 @@
+---
+title: ROS2 Actions — Complete Guide for Robotics
+summary: >-
+  ROS2 actions handle long-running, cancellable tasks like navigation or arm
+  trajectory execution — with progress feedback during the goal.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - ros2
+  - action
+  - long-running
+seeAlso:
+  - ros2
+  - ros2-nodes
+  - ros2-services
+difficulty: 3
+oneLiner: >-
+  The concept concept: ROS2 actions handle long-running, cancellable tasks like
+  navigation
+laymanExplanation: >-
+  A ROS2 action is a goal-oriented communication pattern for long-running tasks.
+  A client sends a goal, the server accepts it, sends periodic feedback, and
+  finally returns a result. The client can cancel at any time.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros2 actions — complete guide for robotics, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  ROS2 actions handle long-running, cancellable tasks like navigation or arm
+  trajectory execution — with progress feedback during the goal.
+slug: ros2-actions
+bucket: concept
+---
+
+# ROS2 Actions
+
+## What is it?
+
+A ROS2 action is a goal-oriented communication pattern for long-running tasks. A client sends a goal, the server accepts it, sends periodic feedback, and finally returns a result. The client can cancel at any time.
+
+## How it works
+
+An action has three sub-types: goal, feedback, and result. Under the hood, an action is built from several services and a topic — but `rclcpp_action` and `rclpy_action` give you a clean API. Common actions are `NavigateToPose` (move base) and `FollowJointTrajectory` (arm motion).
+
+## Real-world example
+
+Nav2 uses `NavigateToPose` as its action. MoveIt2 uses `FollowJointTrajectory` for arm planning. A delivery robot might expose `Deliver(parcel_id)` as a custom action with feedback like 'percent complete'.
+
+## Why it matters for robotics
+
+Actions are essential whenever a task is long, cancellable, or needs progress reporting. Building well-designed actions is the mark of a senior ROS2 engineer.
+
+## See also
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Nodes](/atlas/concept/ros2-nodes)
+- [Ros2 Services](/atlas/concept/ros2-services)

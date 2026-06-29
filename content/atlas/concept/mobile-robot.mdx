@@ -1,0 +1,75 @@
+---
+title: Mobile robot
+category: robot-types
+summary: >-
+  A mobile robot is any robot that can move through its environment under its
+  own power — on wheels, tracks, or legs — rather than staying bolted to one
+  spot.
+seeAlso: []
+sources:
+  - title: IEEE Spectrum — Mobile Robotics Overview
+    url: 'https://spectrum.ieee.org/robotics'
+  - title: Boston Dynamics — Spot robot
+    url: 'https://bostondynamics.com/products/spot/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - mobile
+  - navigation
+  - robot-types
+  - fundamentals
+difficulty: 3
+oneLiner: 'The concept concept: A mobile robot is any robot that can'
+laymanExplanation: >-
+  Picture a factory arm welding car doors. It is extraordinarily precise, but it
+  never goes anywhere — it swings back and forth in the same small arc, day
+  after day. Now picture a robot that can wheel itself down a warehouse aisle,
+  take a lift to the third floor, find a shelf, and bring a parcel back to a
+  loading bay. That second machine is a mobile robot.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without mobile robot, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A mobile robot is any robot that can move through its environment under its
+  own power — on wheels, tracks, or legs — rather than staying bolted to one
+  spot.
+slug: mobile-robot
+bucket: concept
+---
+
+Picture a factory arm welding car doors. It is extraordinarily precise, but it never goes anywhere — it swings back and forth in the same small arc, day after day. Now picture a [robot](/atlas/concept/robot) that can wheel itself down a warehouse aisle, take a lift to the third floor, find a shelf, and bring a parcel back to a loading bay. That second machine is a mobile robot.
+
+The defining quality of a mobile robot is **locomotion**: it moves through its environment rather than working from a fixed base. Everything else — the sensors, the arms, the software — is secondary to that one core capability.
+
+## How mobility works
+
+To move usefully, a mobile robot needs three things working together. First, **actuation**: wheels, tracks, legs, or propellers that physically translate the robot through space. Second, **perception**: sensors (cameras, [lidar](/atlas/concept/lidar), ultrasonic) that tell the robot what the world around it looks like. Third, **navigation**: software that turns sensor data into a plan and the plan into motion commands.
+
+The most common mobile platforms use wheels because they are mechanically simple and energy-efficient. Tracked robots (like a miniature tank) can handle rough or uneven terrain. Legged robots can climb stairs and step over obstacles but are far harder to engineer and more energy-hungry.
+
+## A real example
+
+Amazon's **Proteus** — officially unveiled in 2022 — is a fully autonomous wheeled mobile robot (AMR, for short) that moves drive units around fulfilment centres. It uses a mix of cameras and sensors to navigate alongside human workers without barriers or dedicated lanes. Unlike older warehouse robots that followed fixed magnetic strips on the floor, Proteus plans its own routes in real time.
+
+## Why it matters — and where it gets hard
+
+Mobile robots unlock tasks that fixed machines can never do: last-mile delivery, search and rescue in collapsed buildings, planetary exploration (NASA's Perseverance rover is a mobile robot). They are growing fast in logistics, healthcare, and agriculture.
+
+The hard part is the messiness of the real world. A welding arm only ever meets the same steel panels. A mobile robot meets wet floors, narrow doorways, crowds of people, and objects left in unexpected places. Building a robot that handles all of that reliably — without a human watching every move — remains one of [robotics](/atlas/concept/robotics)' central engineering challenges.
+
+---
+
+*The same robot that delivers parcels in a warehouse today might, with a software update, navigate a hospital ward tomorrow — the hardware is increasingly the same, the intelligence is everything.*

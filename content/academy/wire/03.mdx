@@ -1,0 +1,178 @@
+---
+title: "PID Control in Practice"
+description: "Implementing a real PID velocity controller in ROS2. Anti-windup, derivative kick, and the tuning pitfalls that break beginner robots."
+track: wire
+lesson: 3
+duration: "35 min read"
+url_slug: w-03-pid-control-practice
+hindi_name: "PID नियंत्रण अभ्यास"
+xp: 180
+estimated_minutes: 35
+atlas_links: [pid-controller, feedback-loop, servo-motor]
+sources:
+  - name: "Åström & Hägglund — PID Controllers: Theory, Design, and Tuning"
+    url: "https://www.isa.org/products/pid-controllers-theory-design-and-tuning-2nd-editi"
+  - name: "ROS 2 control framework"
+    url: "https://control.ros.org/master/index.html"
+---
+
+## What you'll build
+
+A **PID velocity controller** for a differential drive robot, running in ROS2 at 50Hz. It subscribes to a target velocity on `/cmd_vel`, reads the actual wheel velocity from `/odom`, and outputs a corrected motor command on `/motor_cmd`. The controller has **anti-windup**, **derivative filtering**, and **output clamping** — the three protections every real robot needs.
+
+This is not a textbook example. It's the code shape used at **Ati Motors**, **Systemantics**, and any company that builds production differential-drive robots in India.
+
+## Why theoretical PID isn't enough
+
+The textbook PID formula:
+
+```
+u(t) = Kp·e(t) + Ki·∫e(t)dt + Kd·de(t)/dt
+```
+
+…is correct, but if you implement it literally, three things will break:
+
+1. **Integral windup.** If your motor saturates (you command 200 RPM but it can only do 100), the integral term keeps growing. When the error finally reverses, you overshoot massively. Fix: **anti-windup** — stop integrating when the output saturates.
+
+2. **Derivative kick.** A sudden setpoint change (operator commands "stop" while moving) produces a giant `de/dt` spike. Your robot jolts. Fix: take the derivative of the *measurement*, not the error.
+
+3. **No output clamping.** PID will happily output -9999 m/s. Your motor driver won't. Fix: clamp at the physical limit and feed that back into the integrator.
+
+A real implementation:
+
+```python
+import time
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+from std_msgs.msg import Float32
+
+class PIDController:
+    def __init__(self, kp: float, ki: float, kd: float,
+                 u_min: float, u_max: float):
+        self.kp = kp
+        self.ki = ki
+        self.kd = kd
+        self.u_min = u_min
+        self.u_max = u_max
+        self.integral = 0.0
+        self.prev_meas = None
+        self.prev_time = None
+
+    def step(self, setpoint: float, measurement: float, now: float) -> float:
+        error = setpoint - measurement
+
+        # Time step (seconds)
+        if self.prev_time is None:
+            dt = 0.02  # initial guess
+        else:
+            dt = max(1e-3, now - self.prev_time)
+
+        # Proportional
+        p_term = self.kp * error
+
+        # Derivative of MEASUREMENT (avoids derivative kick)
+        if self.prev_meas is None:
+            d_term = 0.0
+        else:
+            d_meas = (measurement - self.prev_meas) / dt
+            d_term = -self.kd * d_meas
+
+        # Trial output without integral update
+        trial = p_term + self.ki * self.integral + d_term
+
+        # Clamp to actuator limits
+        u = max(self.u_min, min(self.u_max, trial))
+
+        # Anti-windup: only integrate if output is not saturated
+        # (or if integrating would push us further from saturation)
+        if u == trial or (u == self.u_max and error < 0) or (u == self.u_min and error > 0):
+            self.integral += error * dt
+
+        self.prev_meas = measurement
+        self.prev_time = now
+        return u
+
+class VelocityController(Node):
+    def __init__(self):
+        super().__init__('velocity_controller')
+        # Tunable parameters — start with these and tune
+        self.declare_parameter('kp', 2.5)
+        self.declare_parameter('ki', 0.5)
+        self.declare_parameter('kd', 0.1)
+        kp = self.get_parameter('kp').value
+        ki = self.get_parameter('ki').value
+        kd = self.get_parameter('kd').value
+
+        self.pid = PIDController(kp, ki, kd, u_min=-1.0, u_max=1.0)
+        self.setpoint = 0.0
+        self.measurement = 0.0
+
+        self.create_subscription(Twist, '/cmd_vel', self.on_cmd, 10)
+        self.create_subscription(Odometry, '/odom', self.on_odom, 10)
+        self.pub = self.create_publisher(Float32, '/motor_cmd', 10)
+        self.create_timer(0.02, self.tick)  # 50Hz
+
+        self.get_logger().info(f'PID started — Kp={kp}, Ki={ki}, Kd={kd}')
+
+    def on_cmd(self, msg: Twist):
+        self.setpoint = msg.linear.x
+
+    def on_odom(self, msg: Odometry):
+        self.measurement = msg.twist.twist.linear.x
+
+    def tick(self):
+        now = time.monotonic()
+        u = self.pid.step(self.setpoint, self.measurement, now)
+        out = Float32()
+        out.data = float(u)
+        self.pub.publish(out)
+
+def main():
+    rclpy.init()
+    rclpy.spin(VelocityController())
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+## Tuning — start manual, then refine
+
+The Ziegler-Nichols method is a textbook favourite but fragile on real robots. In practice:
+
+1. Set `Ki = 0`, `Kd = 0`. Increase `Kp` until the robot oscillates lightly around the setpoint. Halve it.
+2. Add `Kd` (start at ~10% of Kp). Increase until oscillation damps out cleanly.
+3. Add `Ki` *small* (1–5% of Kp) to remove steady-state error.
+
+In ROS2, expose your gains as **parameters** (as in the code above). Then tune live:
+
+```bash
+ros2 param set /velocity_controller kp 3.0
+```
+
+You can re-tune without recompiling — a massive productivity boost on real hardware.
+
+## Try it: tune a PID interactively
+
+> **Try this in the visualizer:** open [/visualizer](/visualizer) and play with the PID tuner. The cyan curve is your robot trying to hit the dashed target. Crank Kp too high — see the overshoot. Add Kd — see the damping. This is the same intuition you'll use on real hardware.
+
+## Test Your Understanding
+
+**1.** Your robot's PID controller works perfectly at 0.5 m/s, but at 2 m/s it overshoots badly. You haven't changed any gains. Explain three possible causes and how you'd distinguish them.
+
+**2.** A junior engineer says: "I removed the integral term — the robot is much more stable now." You suspect they've masked the real problem. What might they have actually done, and what symptom should they look for to confirm?
+
+**3.** You're tuning PID for a heavy mobile robot (50kg). Without doing the maths, would you expect Kp to be larger or smaller than for a 2kg robot, and why? What about Kd?
+
+## India Opportunity
+
+- **Control Systems Engineer · Hyperloop India, Mumbai** — pod motion control, ₹14–24 LPA.
+- **Motion Control Engineer · Systemantics, Bangalore** — collaborative-arm PID + cascade control, ₹12–20 LPA.
+- **Robotics Software Engineer · Tata Elxsi, Trivandrum/Bangalore** — AGV motion control, ₹10–18 LPA.
+- **Drone Flight Controller Engineer · Garuda Aerospace, Chennai** — attitude PID on STM32 + ROS2 logging, ₹8–16 LPA.
+
+## Next Step
+
+→ Continue to **[Wire 04 · Building a Mobile Robot](/academy/wire/04)** — differential drive kinematics, URDF, Gazebo.

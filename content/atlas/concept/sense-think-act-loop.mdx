@@ -1,0 +1,78 @@
+---
+title: Sense-Think-Act loop
+category: fundamentals
+summary: >-
+  The Sense-Think-Act loop is the repeating cycle at the heart of every robot —
+  gather information from the environment, process it, then do something
+  physical. Everything a robot does traces back to this three-step rhythm.
+seeAlso: []
+sources:
+  - title: MIT OpenCourseWare — Introduction to Robotics (6.832)
+    url: 'https://ocw.mit.edu/courses/6-832-underactuated-robotics-spring-2022/'
+  - title: Stanford Engineering — Robotic Autonomy Course Notes
+    url: 'https://cs.stanford.edu/groups/manips/teaching/cs327a/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - control
+  - autonomy
+difficulty: 3
+oneLiner: 'The concept concept: The Sense-Think-Act loop is the repeating cycle at'
+laymanExplanation: >-
+  Watch a goalkeeper save a penalty kick. Their eyes track the ball the moment
+  the striker's foot makes contact — that is sensing. Their brain predicts where
+  the ball is going in a fraction of a second — that is thinking. Their legs and
+  arms dive to intercept — that is acting. And then instantly the loop starts
+  again: where is the ball now? Do I still have it?
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without sense-think-act loop, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  The Sense-Think-Act loop is the repeating cycle at the heart of every robot —
+  gather information from the environment, process it, then do something
+  physical. Everything a robot does traces back to this three-step rhythm.
+slug: sense-think-act-loop
+bucket: concept
+---
+
+Watch a goalkeeper save a penalty kick. Their eyes track the ball the moment the striker's foot makes contact — that is sensing. Their brain predicts where the ball is going in a fraction of a second — that is thinking. Their legs and arms dive to intercept — that is acting. And then instantly the loop starts again: where is the ball now? Do I still have it? Should I roll it out or punch it away?
+
+Every [robot](/atlas/concept/robot), from a wheeled toy to a Mars rover, runs this same cycle. It is called the **Sense-Think-Act loop** (sometimes *Perceive-Plan-Act* or *Observe-Orient-Decide-Act* in military [robotics](/atlas/concept/robotics)). The names differ; the structure does not.
+
+## What each stage actually does
+
+**Sense** is the robot gathering raw data from its environment. A [camera](/atlas/concept/camera-vision) produces an image. A [lidar](/atlas/concept/lidar) fires laser pulses and measures how long they take to return. A force sensor in a [joint](/atlas/concept/joint) detects if the arm has hit something. The output of sensing is data — numbers, images, signals — that tell the robot something about the state of the world right now.
+
+**Think** is the robot processing that data into a decision. Depending on the robot's sophistication, this might be a simple rule ("if distance to wall < 20 cm, turn left") or a complex probabilistic model that fuses a dozen sensor streams, estimates its own position in a map, and plans a path through a cluttered room. In modern robots, the "thinking" step increasingly involves neural networks trained on millions of examples.
+
+**Act** is the robot sending commands to its actuators — motors, pneumatic pistons, servos — that produce motion or force in the physical world. "Act" always has a consequence: something moves, something changes.
+
+## How fast the loop runs
+
+A warehouse sorting robot might complete this loop 50 times per second. A spacecraft doing orbital manoeuvres might complete it once every few minutes. The frequency depends on how fast the world changes and how quickly the robot must respond. A robot doing open-heart surgery needs a faster loop than one that waters plants on a schedule.
+
+When a loop is too slow for the task — when the "think" step takes longer than the environment is willing to wait — bad things happen. An autonomous car that takes 200 milliseconds to process a camera frame will have driven two metres blind at motorway speed. Matching loop speed to task requirements is a core challenge in robotics system design.
+
+## Why everything else depends on it
+
+Strip away all the complexity from any robotic system and you find this loop underneath. Sensors, actuators, processors, control algorithms, machine-learning models — all of these are implementations of one of the three stages. When a robot fails, the failure almost always lives in one stage: a sensor that misreads, a planner that makes the wrong decision, an actuator that doesn't respond correctly. Tracing problems back to their stage in the loop is the first step in debugging any robotic system.
+
+---
+
+*What happens when the "think" step is so slow that the world has changed by the time the robot acts — and how do the most capable autonomous systems work around that fundamental constraint?*

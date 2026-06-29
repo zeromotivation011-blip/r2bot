@@ -1,0 +1,84 @@
+---
+title: Drone (UAV)
+category: robot-types
+summary: >-
+  A drone, or unmanned aerial vehicle (UAV), is an aircraft that flies without a
+  pilot on board — guided by remote control, onboard autopilot, or a combination
+  of both.
+seeAlso: []
+sources:
+  - title: DJI — How drones work
+    url: 'https://www.dji.com/uk/what-is-a-drone'
+  - title: NASA — Unmanned Aircraft Systems (UAS)
+    url: 'https://www.nasa.gov/directorates/armd/aosp/uas/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - drones
+  - uav
+  - aerial
+  - robotics
+difficulty: 3
+oneLiner: 'The concept concept: A drone, or unmanned aerial vehicle (UAV), is'
+laymanExplanation: >-
+  Hold a small plastic cross in your palm — four arms, a rotor on each tip, a
+  camera slung underneath. Press a button, and it leaps into the air, hovers
+  perfectly still against a ten-knot headwind, streams 4K video to your phone,
+  and lands itself when the battery drops low. It weighs 249 grams, costs less
+  than a decent dinner, and navigates three-dimensional s
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without drone (uav), many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A drone, or unmanned aerial vehicle (UAV), is an aircraft that flies without a
+  pilot on board — guided by remote control, onboard autopilot, or a combination
+  of both.
+slug: drone-uav
+bucket: concept
+---
+
+Hold a small plastic cross in your palm — four arms, a rotor on each tip, a [camera](/atlas/concept/camera-vision) slung underneath. Press a button, and it leaps into the air, hovers perfectly still against a ten-knot headwind, streams 4K video to your phone, and lands itself when the battery drops low. It weighs 249 grams, costs less than a decent dinner, and navigates three-dimensional space better than most birds.
+
+That is a consumer [drone](/atlas/concept/drone) — and it is also, in every meaningful sense, a flying [robot](/atlas/concept/robot).
+
+## What makes it a UAV
+
+**UAV** stands for Unmanned Aerial Vehicle: an aircraft with no pilot on board. The broader term is **UAS** — Unmanned Aerial System — which includes the aircraft, its ground control station, and the communication [link](/atlas/concept/link-robot) between them. Drones is the popular name for both.
+
+UAVs come in many shapes:
+
+- **Multirotor** (quadcopter, hexacopter) — most consumer and commercial drones; excellent for hovering and close inspection but energy-hungry, short range.
+- **Fixed-wing** — looks like a miniature plane; efficient over long distances, can't hover, harder to land.
+- **VTOL (Vertical Take-Off and Landing)** — hybrid designs that take off like a helicopter but cruise like a plane; used by delivery and military systems.
+- **Single-rotor** — essentially a small unmanned helicopter; carries heavy payloads.
+
+## How a multirotor stays airborne
+
+A quadcopter has four propellers. Two spin clockwise, two anticlockwise — the opposing torques cancel out, so the whole aircraft doesn't spin like a top. Speed up all four rotors and it climbs. Slow them all and it descends. Speed up the front pair and tilt the front down — it pitches forward and flies forward. By adjusting each rotor independently dozens of times per second, the flight controller (a tiny onboard computer) keeps the drone level and responds to your commands. The mathematics involved is control theory; the engineering is extremely tight tolerances on the motors and props.
+
+## A real example
+
+**DJI's Matrice 30T** is a professional-grade inspection drone used by power companies, emergency services, and infrastructure managers globally. It carries a thermal camera alongside its optical camera, can operate in wind and rain, and navigates semi-autonomously to [GPS](/atlas/concept/gps-gnss) waypoints. In wildfire response, it can locate heat signatures in smoke conditions where a human pilot would be flying blind.
+
+## Why drones matter — and where they're restricted
+
+Drones have transformed aerial photography, precision agriculture (spraying, crop monitoring), infrastructure inspection, search and rescue, and last-mile delivery pilots. Military applications have reshaped modern conflict in ways that are actively debated.
+
+The limitation is regulation. Most countries require registration, restrict flight near airports and crowds, and cap altitude. Fully autonomous beyond-visual-line-of-sight (BVLOS) operations — the prerequisite for mass delivery — require special approvals that are still being worked out country by country.
+
+---
+
+*A swarm of a thousand drones can paint a moving image across a night sky — and nobody on the ground can tell which drone is drawing which pixel.*

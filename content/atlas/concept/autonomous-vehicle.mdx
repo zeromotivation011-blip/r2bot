@@ -1,0 +1,88 @@
+---
+title: Autonomous vehicle
+category: robot-types
+summary: >-
+  An autonomous vehicle is a car, truck, or other ground vehicle that can
+  navigate roads and traffic without a human at the controls, using sensors,
+  maps, and AI to make driving decisions in real time.
+seeAlso: []
+sources:
+  - title: SAE International — Levels of Driving Automation (J3016)
+    url: 'https://www.sae.org/standards/content/j3016_202104/'
+  - title: Waymo — How Waymo's technology works
+    url: 'https://waymo.com/waymo-driver/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - autonomous-vehicles
+  - self-driving
+  - transportation
+  - ai
+difficulty: 3
+oneLiner: 'The concept concept: An autonomous vehicle is a car, truck, or'
+laymanExplanation: >-
+  Imagine falling asleep in the back seat of a taxi, and the car — completely on
+  its own — navigates city traffic, merges onto a motorway, exits at the right
+  junction, and drops you at your destination without anyone touching the
+  steering wheel. No driver. No remote operator watching on a screen. Just the
+  vehicle and its software, making thousands of decisions
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without autonomous vehicle, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An autonomous vehicle is a car, truck, or other ground vehicle that can
+  navigate roads and traffic without a human at the controls, using sensors,
+  maps, and AI to make driving decisions in real time.
+slug: autonomous-vehicle
+bucket: concept
+---
+
+Imagine falling asleep in the back seat of a taxi, and the car — completely on its own — navigates city traffic, merges onto a motorway, exits at the right junction, and drops you at your destination without anyone touching the steering wheel. No driver. No remote operator watching on a screen. Just the vehicle and its software, making thousands of decisions a minute.
+
+That is the promise of a fully autonomous vehicle — and the technology is both closer and further away than most headlines suggest.
+
+## Levels of [autonomy](/atlas/concept/autonomy)
+
+The industry uses a six-level scale defined by SAE International (the Society of Automotive Engineers) to describe how much a vehicle can do on its own:
+
+- **Level 0** — no automation; a human does everything.
+- **Level 1** — one assisted function (cruise control, lane-keep assist).
+- **Level 2** — two functions at once ([Tesla](/atlas/company/tesla) Autopilot, GM Super Cruise): the car steers and accelerates, but the human must stay alert and ready to take over.
+- **Level 3** — the car can handle a defined situation (motorway driving, say) without human attention, but the human must be ready to take over when asked.
+- **Level 4** — fully autonomous within a defined area (a city district, a mapped route); no human backup needed in that zone.
+- **Level 5** — fully autonomous everywhere, in any conditions.
+
+Most consumer cars in 2026 are Level 2. True Level 4 systems exist commercially in a handful of cities. Level 5 remains an engineering goal.
+
+## What an autonomous vehicle actually does
+
+At its core, an AV is a [mobile robot](/atlas/concept/mobile-robot) solving a very hard problem: making safe, legal, socially acceptable driving decisions in an environment it cannot fully predict — one filled with other drivers, cyclists, pedestrians, road works, and weather.
+
+The hardware stack typically includes cameras (for colour, detail, and reading signs), [lidar](/atlas/concept/lidar) (for precise 3D geometry), radar (for speed detection, works in rain and fog), [GPS](/atlas/concept/gps-gnss) and HD maps (for knowing exactly where on earth it is), and powerful onboard computers to fuse all of that into a coherent picture dozens of times per second.
+
+## A real example
+
+**Waymo One** operates a fully driverless robotaxi service (Level 4) in San Francisco, Phoenix, and Los Angeles. Passengers summon a car via app, get in, and ride without any human in the front seat. Waymo's vehicles have completed millions of autonomous miles. In fleet operation, they produce far fewer serious accidents per million miles than the average human driver — though they still encounter situations they handle awkwardly.
+
+## Why it is genuinely hard
+
+Humans are remarkably good drivers in ways we take for granted. We understand that a ball rolling into the street probably means a child is about to follow. We make eye contact with a lorry driver to confirm they see us. We interpret a parking attendant's hand gesture in seconds. Teaching a machine to handle the long tail of rare, ambiguous, chaotic situations — without a human to fall back on — remains the central unsolved problem.
+
+---
+
+*The most dangerous mile an autonomous vehicle drives may be the first mile in a city it has never mapped before.*

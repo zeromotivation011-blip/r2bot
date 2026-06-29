@@ -1,0 +1,105 @@
+---
+title: End effector
+category: actuators
+summary: >-
+  The end effector is the business end of a robot — the gripper, welder, suction
+  cup, or any other tool attached to the tip of the arm. It's the part that
+  actually touches the world and does the work.
+seeAlso:
+  - industrial-robot
+  - cobot
+  - inverse-kinematics
+  - servo-motor
+sources:
+  - title: Robotiq — end-effector catalogue (industry reference)
+    url: 'https://robotiq.com/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - hardware
+  - beginner
+difficulty: 3
+oneLiner: 'The concept concept: The end effector is the business end of'
+laymanExplanation: >-
+  The end effector is the business end of a robot — the gripper, welder, suction
+  cup, or any other tool attached to the tip of the arm. It's the part that
+  actually touches the world and does the work. The arm exists to put the end
+  effector in the right place; the end effector is what makes the robot useful
+  for any specific job.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without end effector, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Industrial robot arms
+  - Surgical robots
+  - Warehouse pick-and-place
+indianExample: >-
+  Maruti Suzuki's Manesar plant swaps end-effectors on KUKA arms 4 times a shift
+  — welding, gluing, picking and torquing.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: Which of these is NOT a common end-effector?
+  options:
+    - Suction cup
+    - Two-finger gripper
+    - Welding torch
+    - Steering wheel
+  answer: 3
+  explanation: >-
+    Steering wheels are for cars. The others are all end-effectors used on real
+    robot arms.
+mindBlowingFact: >-
+  NASA designed an end-effector for the Mars rovers that can survive 30 years of
+  dust storms — and still grip rocks.
+industryApplications:
+  - manufacturing
+  - logistics
+  - surgery
+  - agriculture
+  - food packaging
+difficultyLabel: Classroom
+technicalDefinition: >-
+  The end effector is the business end of a robot — the gripper, welder, suction
+  cup, or any other tool attached to the tip of the arm. It's the part that
+  actually touches the world and does the work.
+slug: end-effector
+bucket: concept
+---
+
+The end effector is the business end of a [robot](/atlas/concept/robot) — the [gripper](/atlas/concept/gripper), welder, suction cup, or any other tool attached to the tip of the arm. It's the part that actually touches the world and does the work. The arm exists to put the end effector in the right place; the end effector is what makes the robot useful for any specific job.
+
+## The five common types
+
+**Parallel jaw gripper.** Two flat fingers that move toward each other to pinch an object. Simple, reliable, cheap. The default end effector on most industrial arms. Good for: small consistent parts, electronics components, packaged goods.
+
+**Suction cup (vacuum gripper).** A rubber or silicone cup pulled against a flat surface by vacuum. Good for: cardboard boxes, glass panels, anything with a flat surface. Most warehouse pick-and-place robots use this.
+
+**Multi-finger hand.** Three to five articulated fingers, each with multiple joints. The most general-purpose gripper. Also the most expensive and the hardest to control. Common on humanoid hands; rare on industrial arms.
+
+**Magnetic gripper.** Electromagnet that picks up ferrous metal. Good for: steel sheets, automotive parts. Doesn't work on aluminum, plastic, or anything non-ferrous.
+
+**Specialised tools.** Welding torches, paint sprayers, screwdrivers, glue dispensers, cameras, lasers, deburring tools. Anything that mounts to the end of an arm to do a specific job.
+
+Plus: **soft grippers** — newer, made of compliant materials (silicone, fabric) that conform to the object's shape. Great for delicate items (fruit, surgical materials). An active research area.
+
+## Why end effectors are hard
+
+The world is full of weird, varied, unpredictable objects. A factory robot welding a known car body in a fixed pose? The end effector design is straightforward. A humanoid that needs to pick up a coffee mug, then a tomato, then a piece of paper, then a smartphone? Now you need an end effector that handles five different physics regimes.
+
+This is why **dexterous manipulation** — the field of designing and controlling general-purpose hands — is still one of the hardest open problems in [robotics](/atlas/concept/robotics). The end effector isn't just hardware; it's a coupled hardware/sensing/control problem.
+
+## Quick-change systems
+
+Most industrial robots can swap end effectors automatically — drive to a tool rack, release the current tool, pick up a new one, lock it on. This is called a **tool changer**. It lets one expensive arm do many jobs without manual reconfiguration.
+
+For cobots and small-batch work, the tool changer is what makes the economics work: a single arm + 5 end effectors can do 5 different jobs in a single day.
+
+## A useful rule of thumb
+
+If you can name the specific object the robot will manipulate, design a custom end effector around it — you'll get better performance for 1/10 the cost of a general gripper. If you genuinely don't know what the robot will handle, accept the expense of a multi-finger hand and invest equally in the control software to drive it.
+
+---
+
+*The end effector is the *what*. The math that gets it to the right point in space is [inverse kinematics](/atlas/concept/inverse-kinematics) — that's the *how*.*

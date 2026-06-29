@@ -1,0 +1,206 @@
+---
+title: "Building a Mobile Robot"
+description: "Differential drive kinematics, URDF basics, Gazebo simulation. Write your first robot description and spawn it in sim."
+track: wire
+lesson: 4
+duration: "40 min read"
+url_slug: w-04-mobile-robot-build
+hindi_name: "मोबाइल रोबोट निर्माण"
+xp: 200
+estimated_minutes: 40
+atlas_links: [mobile-robot, slam, kinematics, odometry]
+sources:
+  - name: "ROS 2 — URDF tutorials"
+    url: "https://docs.ros.org/en/humble/Tutorials/Intermediate/URDF/URDF-Main.html"
+  - name: "Gazebo Garden docs"
+    url: "https://gazebosim.org/docs"
+---
+
+## What you'll build
+
+A complete **URDF for a 2-wheel differential drive robot**, spawned in Gazebo, driven via `/cmd_vel`. By the end you'll see the robot move in simulation when you publish a Twist — and you'll understand exactly which equations are doing the work.
+
+## Differential drive math
+
+Two wheels. One spins at angular velocity ω_L, the other at ω_R. Wheel radius r. Wheel separation L.
+
+The robot's linear velocity:
+
+```
+v = r · (ω_R + ω_L) / 2
+```
+
+And its angular velocity around the centre:
+
+```
+ω = r · (ω_R - ω_L) / L
+```
+
+Inverse — given a desired (v, ω), solve for wheel speeds:
+
+```
+ω_R = (v + ω·L/2) / r
+ω_L = (v - ω·L/2) / r
+```
+
+That's it. Every differential-drive robot in the world — TurtleBot, Ati Sherpa, Roomba — uses these four equations. Memorise them.
+
+## URDF — your robot's body, written in XML
+
+URDF (Unified Robot Description Format) describes the robot's **links** (rigid bodies) and **joints** (how links connect and can move). A minimal 2-wheel differential drive:
+
+```xml
+<?xml version="1.0"?>
+<robot name="r2bot_mini">
+  <!-- Base body -->
+  <link name="base_link">
+    <visual>
+      <geometry><box size="0.3 0.2 0.1"/></geometry>
+      <material name="cyan"><color rgba="0 0.72 0.83 1"/></material>
+    </visual>
+    <collision>
+      <geometry><box size="0.3 0.2 0.1"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <inertia ixx="0.01" iyy="0.01" izz="0.01" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <!-- Left wheel -->
+  <link name="wheel_left">
+    <visual>
+      <geometry><cylinder radius="0.04" length="0.02"/></geometry>
+      <material name="dark"><color rgba="0.1 0.1 0.1 1"/></material>
+    </visual>
+    <collision>
+      <geometry><cylinder radius="0.04" length="0.02"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0001" iyy="0.0001" izz="0.0001" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <joint name="wheel_left_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_left"/>
+    <origin xyz="0 0.12 -0.04" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- Right wheel (mirror of left) -->
+  <link name="wheel_right">
+    <visual>
+      <geometry><cylinder radius="0.04" length="0.02"/></geometry>
+    </visual>
+    <collision><geometry><cylinder radius="0.04" length="0.02"/></geometry></collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0001" iyy="0.0001" izz="0.0001" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <joint name="wheel_right_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_right"/>
+    <origin xyz="0 -0.12 -0.04" rpy="-1.5708 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- Caster (passive sphere for stability) -->
+  <link name="caster">
+    <visual><geometry><sphere radius="0.02"/></geometry></visual>
+    <collision><geometry><sphere radius="0.02"/></geometry></collision>
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="1e-5" iyy="1e-5" izz="1e-5" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+  <joint name="caster_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="caster"/>
+    <origin xyz="0.13 0 -0.06"/>
+  </joint>
+</robot>
+```
+
+Save as `r2bot_mini.urdf`. Test by:
+
+```bash
+ros2 launch urdf_tutorial display.launch.py model:=r2bot_mini.urdf
+```
+
+You'll see your robot in RViz. **This is the moment most learners realise robotics is a hands-on craft, not just code.**
+
+## The differential drive controller node
+
+```python
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Twist
+from std_msgs.msg import Float32
+
+WHEEL_RADIUS = 0.04   # m
+WHEEL_SEP = 0.24      # m (left-to-right wheel distance)
+
+class DiffDriveController(Node):
+    def __init__(self):
+        super().__init__('diff_drive_controller')
+        self.create_subscription(Twist, '/cmd_vel', self.on_cmd, 10)
+        self.pub_left = self.create_publisher(Float32, '/wheel_left_cmd', 10)
+        self.pub_right = self.create_publisher(Float32, '/wheel_right_cmd', 10)
+
+    def on_cmd(self, msg: Twist):
+        v = msg.linear.x
+        w = msg.angular.z
+        wL = (v - w * WHEEL_SEP / 2) / WHEEL_RADIUS
+        wR = (v + w * WHEEL_SEP / 2) / WHEEL_RADIUS
+        l = Float32(); l.data = float(wL); self.pub_left.publish(l)
+        r = Float32(); r.data = float(wR); self.pub_right.publish(r)
+
+def main():
+    rclpy.init()
+    rclpy.spin(DiffDriveController())
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+## Odometry (your robot's dead-reckoning)
+
+Wheel encoders measure how far each wheel turned. Differentiate to get wheel velocity, then run the *forward* equations to estimate the robot's pose. This is **odometry** — see the Atlas entry on [odometry](/atlas/concept/odometry).
+
+Odometry drifts (encoder slip, uneven floors), which is why you also need [SLAM](/atlas/concept/slam) for any non-trivial navigation. We'll cover SLAM properly in **Wire 06** and **Forge 01**.
+
+> **Try this in the visualizer:** open [/visualizer#slam](/visualizer#slam) and watch a robot build a map of an unknown environment using a simulated LiDAR. The robot in your URDF would do exactly this with the right plugin.
+
+## In India: who builds mobile robots
+
+**Ati Motors** in Bangalore makes the Sherpa — an autonomous tow-tug for factories. Their stack is differential drive + LiDAR + ROS2.
+
+**Genrobotics** in Trivandrum makes the Bandicoot sewer robot — wheeled with a swappable manipulator. Their core navigation is straight from this lesson, scaled up.
+
+**Asimov Robotics** in Cochin makes restaurant-server robots — same fundamentals, different chassis.
+
+If you can build a working differential-drive robot in Gazebo, you have a portfolio piece that gets you interviews at any of these companies.
+
+## Test Your Understanding
+
+**1.** Your URDF robot drives perfectly straight when you publish `linear.x=0.5, angular.z=0`, but veers right by ~5° per metre. Walk through three possible causes — *physical, electrical, software* — and how you'd isolate each.
+
+**2.** A friend says: "The wheel encoders read 100 ticks per second on the left and 100 ticks per second on the right. So the robot is moving straight." Are they correct? What's missing from their reasoning?
+
+**3.** You need to extend the differential drive equations to a **4-wheel skid-steer** robot (Mars rover style — all 4 wheels can drive, no steering). What changes, what stays the same, and what new failure mode appears?
+
+## India Opportunity
+
+- **AGV Software Engineer · Ati Motors, Bangalore** — differential-drive Sherpa, full nav stack, ₹14–22 LPA.
+- **Robotics Engineer · Asimov Robotics, Kochi** — service robots, URDF + Gazebo + Nav2, ₹10–16 LPA.
+- **Field Robotics Engineer · TechEagle (BVLOS drones), Gurgaon** — wheeled ground-support robots, ₹8–14 LPA.
+- **Robot Build Intern · Robotics Lab IIT Madras / IIT Delhi** — research mobile robots, ₹25–40k/month.
+
+## Next Step
+
+→ Continue to **[Wire 05 · Computer Vision for Robots](/academy/wire/05)** — OpenCV in ROS2, color tracking, a real ball-following node.

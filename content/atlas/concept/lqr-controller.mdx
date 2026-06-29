@@ -1,0 +1,130 @@
+---
+title: LQR Controller in Robotics — Complete Guide | R2BOT
+summary: >-
+  The Linear Quadratic Regulator (LQR) computes optimal feedback gains for
+  linear systems. Used for inverted pendulums, drones, and gimbal stabilisation.
+category: control
+bucket: control-systems
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - lqr
+  - optimal-control
+  - state-space
+  - gain
+  - stabilisation
+relatedTerms:
+  - model-predictive-control
+  - pid-controller
+  - state-space-control
+  - feedback-loop
+seeAlso:
+  - model-predictive-control
+  - pid-controller
+  - state-space-control
+  - feedback-loop
+youtubeSearchQuery: LQR linear quadratic regulator robotics
+oneLiner: >-
+  The control systems concept: The Linear Quadratic Regulator (LQR) computes
+  optimal feedback
+laymanExplanation: >-
+  The Linear Quadratic Regulator (LQR) is an optimal control technique that
+  computes the best feedback gains to balance state error against control
+  effort. Given a linear system and a quadratic cost function, LQR solves a
+  Riccati equation and gives you the optimal full-state feedback matrix.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without lqr controller in robotics — complete guide | r2bot, many control
+  systems systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  The Linear Quadratic Regulator (LQR) computes optimal feedback gains for
+  linear systems. Used for inverted pendulums, drones, and gimbal stabilisation.
+slug: lqr-controller
+---
+
+# LQR Controller in Robotics
+
+## What is LQR Controller in Robotics?
+
+The Linear Quadratic Regulator (LQR) is an optimal control technique that computes the best feedback gains to balance state error against control effort. Given a linear system and a quadratic cost function, LQR solves a Riccati equation and gives you the optimal full-state feedback matrix.
+
+## How It Works
+
+You start with a linear state-space model dx/dt = Ax + Bu. You pick two weighting matrices: Q penalises state error and R penalises control effort. The solution to the algebraic Riccati equation gives a matrix P from which the optimal gain K = R⁻¹BᵀP. The controller is then u = −Kx — every state variable is fed back with the right weight to minimise the cost. Tuning Q and R is the practical art: bigger Q means tighter tracking, bigger R means lower control effort.
+
+## Real-World Example
+
+Boston Dynamics Atlas and Spot use LQR-family controllers for whole-body balance. Quadcopter autopilots often use LQR for attitude stabilisation. Camera gimbal stabilisation (DJI, Insta360) uses LQR or LQR+MPC. ISRO uses LQR-derived controllers for satellite attitude control.
+
+## Why It Matters for Robotics
+
+LQR is the gateway from PID to modern multivariable optimal control. Any robotics graduate programme and many senior roles ask about LQR design. Mastering LQR — its assumptions, limitations, and tuning — opens the door to MPC, robust control, and model-based RL.
+
+## Try It Yourself
+
+Simulate an inverted pendulum in Python using SciPy. Compute the LQR gain using `scipy.linalg.solve_continuous_are`. Plot the pendulum stabilising with Q = diag(10,1,10,1), then try doubling each weight and watch how the response changes.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "LQR finds the optimal feedback gain that minimises:",
+    "options": [
+      "Time to charge a battery",
+      "A quadratic cost on state error and control effort",
+      "Camera brightness",
+      "Wi-Fi latency"
+    ],
+    "answer": 1,
+    "explain": "LQR minimises ∫(xᵀQx + uᵀRu)dt — a quadratic cost trading tracking against effort."
+  },
+  {
+    "q": "LQR assumes the system is:",
+    "options": [
+      "Highly nonlinear",
+      "Linear with Gaussian disturbances (for LQG)",
+      "Stochastic only",
+      "Quantum mechanical"
+    ],
+    "answer": 1,
+    "explain": "LQR is designed around linear state-space dynamics; LQG adds Gaussian-noise estimation."
+  },
+  {
+    "q": "Increasing the matrix Q in LQR generally:",
+    "options": [
+      "Cools the motor",
+      "Penalises state error more — tighter tracking, higher control effort",
+      "Lowers battery use",
+      "Has no effect"
+    ],
+    "answer": 1,
+    "explain": "Larger Q values tell LQR you care more about tracking error than about control effort."
+  }
+]
+```
+
+## Further Reading
+
+- [Model Predictive Control](/atlas/concept/model-predictive-control)
+- [Pid Controller](/atlas/concept/pid-controller)
+- [State Space Control](/atlas/concept/state-space-control)
+- [Feedback Loop](/atlas/concept/feedback-loop)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain LQR Controller in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

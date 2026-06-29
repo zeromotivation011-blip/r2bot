@@ -1,0 +1,102 @@
+---
+title: Gripper
+category: actuators
+summary: >-
+  A gripper is the end-effector a robot uses to grasp, hold, and release
+  objects. It is the robot's hand — the final link between the mechanical arm
+  and the physical world it must manipulate.
+seeAlso: []
+sources:
+  - title: Wikipedia — Robot end effector
+    url: 'https://en.wikipedia.org/wiki/Robot_end_effector'
+  - title: IEEE Spectrum — The state of robot grasping
+    url: 'https://spectrum.ieee.org/the-hard-problem-of-grasping'
+  - title: Robotiq — Gripper selection guide
+    url: 'https://robotiq.com/learn/guide-to-robot-grippers'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - actuators
+  - end-effectors
+  - manipulation
+difficulty: 3
+oneLiner: 'The concept concept: A gripper is the end-effector a robot uses'
+laymanExplanation: >-
+  Your hand is astonishing. In a single morning you might turn a tap, type on a
+  keyboard, peel an orange, button a shirt, and carry a bag of shopping — each
+  task requiring a different configuration of force, contact area, and
+  compliance. Roboticists have spent decades trying to replicate even a fraction
+  of that versatility in a device bolted to the end of a ro
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without gripper, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Amazon picking robots
+  - Robotiq grippers
+  - Most cobots
+indianExample: >-
+  Indian quick-commerce companies (Zepto, Blinkit dark stores) are piloting
+  suction-cup grippers for grocery picking.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: Which type of gripper uses air pressure?
+  options:
+    - Magnetic
+    - Suction (vacuum)
+    - Two-finger
+    - Servo gripper
+  answer: 1
+  explanation: >-
+    Suction grippers use a vacuum pump to create negative air pressure that
+    holds the object.
+mindBlowingFact: >-
+  Researchers built a gripper inspired by gecko feet that can hold 1 kg using
+  only dry electrostatic adhesion — no glue.
+industryApplications:
+  - manufacturing
+  - logistics
+  - agriculture
+  - food handling
+  - recycling
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A gripper is the end-effector a robot uses to grasp, hold, and release
+  objects. It is the robot's hand — the final link between the mechanical arm
+  and the physical world it must manipulate.
+slug: gripper
+bucket: concept
+---
+
+Your hand is astonishing. In a single morning you might turn a tap, type on a keyboard, peel an orange, button a shirt, and carry a bag of shopping — each task requiring a different configuration of force, contact area, and compliance. Roboticists have spent decades trying to replicate even a fraction of that versatility in a device bolted to the end of a [robot](/atlas/concept/robot) arm. That device is a gripper.
+
+A **gripper** is an **end-effector** — the last [link](/atlas/concept/link-robot) in a robot's kinematic chain, the part that actually contacts and manipulates the world. Every robot arm, no matter how sophisticated, is useless without an appropriate gripper for its task. Getting the gripper wrong is one of the most common reasons robotic automation projects fail.
+
+## Common types
+
+Grippers divide broadly by how they create and maintain contact with an object:
+
+- **Two-finger parallel jaw grippers** — two flat plates that close symmetrically. Simple, robust, and the most common type in industrial settings. Robotiq's 2F-85 is an industry standard, seen on tens of thousands of UR cobots globally. Works well for boxy, uniform objects.
+- **Three-finger adaptive grippers** — three fingers arranged in a triangle, each with multiple joints that wrap around irregular shapes. Better for round or irregular objects.
+- **Vacuum/suction cup grippers** — a pump creates negative pressure through a silicone cup pressed against a smooth surface. Dominant in e-commerce fulfilment and electronics handling because flat-faced objects (cardboard boxes, phone screens) are ubiquitous. Cannot handle porous, perforated, or highly curved surfaces.
+- **Magnetic grippers** — electromagnets that grip ferrous metal parts. Common in metal fabrication and automotive stamping.
+- **Soft grippers** — silicone or fabric fingers that conform to objects on contact, distributing force gently. Growing rapidly in food handling, agriculture, and [medical robotics](/atlas/concept/medical-robotics).
+
+## The grasping problem
+
+Picking up a known object in a known position is a solved engineering problem. Picking up an unknown object in an unknown orientation from a cluttered pile is not. This is called the **bin-picking problem**, and it remains one of the harder challenges in applied [robotics](/atlas/concept/robotics).
+
+The difficulty is multidimensional: the gripper must approach the object without knocking others, apply enough force to hold the object securely, avoid applying so much force that it damages it, and release cleanly afterwards. Each of these requires sensing — force sensors, vision, or both.
+
+## Real-world example
+
+Amazon's robotic fulfilment systems combine suction-cup grippers for flat, smooth items with two-finger grippers for boxier products. The company's Sparrow system, introduced in 2022, uses a combination of [computer vision](/atlas/concept/computer-vision) and a multi-modal gripper to identify, grasp, and sort individual items from tote bins — a task that previously required human workers because the variety of products defeated any single gripper design. It is widely cited as one of the most capable deployed grasping systems in commercial use.
+
+## Why it matters
+
+A robot's intelligence — its perception, planning, and control — is worthless if the gripper drops the object, crushes it, or misses it entirely. Gripper design is where robotics meets materials science, mechanical engineering, and machine learning simultaneously. Much of the recent progress in humanoid robots and logistics automation is not in the arms or the legs but in developing grippers capable enough to handle the chaotic variety of the real world.
+
+---
+
+*The human hand has 27 bones, 29 joints, and over 30 muscles, yet children learn to use it without any explicit instruction — a reminder of how much unconscious intelligence is embedded in biological manipulation.*

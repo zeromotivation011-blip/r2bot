@@ -1,0 +1,26 @@
+{
+  "id": "spark-foundations",
+  "slug": "spark-foundations",
+  "title": "Your First Robot: Foundations of Robotics",
+  "subtitle": "Start with zero. End with a robot that moves and thinks.",
+  "track": "spark",
+  "level": "beginner",
+  "description": "The 6 ideas every roboticist starts with — sensing, deciding, moving, debugging, and where to go next. Zero hardware needed. Built around the way real Indian students learn.",
+  "price_inr": 0,
+  "is_free": true,
+  "duration_hours": 1.5,
+  "tags": ["beginner", "robotics-basics", "sense-think-act", "no-hardware"],
+  "language": "en",
+  "cbse_aligned": true,
+  "nep_aligned": true,
+  "published_at": "2026-05-23T00:00:00Z",
+  "what_youll_learn": [
+    "Explain what a robot is and what makes it different from a machine",
+    "Identify the three core systems of any robot (Sense, Think, Act)",
+    "Recognise how sensors, brains and motors fit together",
+    "Spot the failure mode behind any robot mishap",
+    "Tell which type of robot career path fits where you are",
+    "Read a real Atlas entry without getting lost"
+  ],
+  "free_preview_lesson_slugs": ["what-is-a-robot", "how-robots-move", "how-robots-sense"]
+}

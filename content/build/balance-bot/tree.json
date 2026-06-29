@@ -1,0 +1,354 @@
+{
+  "root": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "explanation",
+      "title": "The inverted pendulum — hardest beginner robot",
+      "body": "Try to balance a broomstick on your fingertip. You instinctively move your finger under it whenever it starts to fall. You're doing control engineering with your eyes and hand muscles.\n\nNow imagine doing that with a robot, 100 times per second, using a gyroscope instead of eyes and motors instead of fingers. That's the **balance bot** — an inverted pendulum on wheels.\n\nThis exact problem appears everywhere:\n- **Segway** — carried riders for 20 years using this principle\n- **Boston Dynamics** robots — their legs are solving a variation of this every millisecond\n- **Rocket landing** — SpaceX landing boosters upright is an inverted pendulum problem\n- **Drone hovering** — keeping 4 motors balanced against gravity and wind\n\nYour hardware: **MPU-6050 IMU** (angle sensor), **L298N motor driver**, **two DC motors**, **Arduino**. Your algorithm: **PID control** — the most important and widely-used control algorithm in engineering.\n\nLet's go. This one rewards the effort.",
+      "branches": [{ "on": "next", "to": "q-why-hard" }],
+      "xp": 10
+    },
+    "q-why-hard": {
+      "id": "q-why-hard",
+      "type": "question",
+      "title": "Why is balancing hard for a computer?",
+      "body": "Balancing a broom on your finger is hard for a human — but your brain has had 20 years of practice. For a computer starting from scratch with no prior learning, balancing is hard for a deeper reason.\n\nThe inverted pendulum is what control engineers call an **unstable system**. Stable systems naturally return to equilibrium when disturbed (like a pendulum hanging down). Unstable systems do the opposite — any disturbance grows and the system diverges away from equilibrium unless something actively corrects it, continuously.\n\nGravity is always working against you. The robot must constantly fight it, never rest.",
+      "hint": "What's the difference between a pendulum hanging down (stable) and a broomstick balanced upright (unstable)? What happens when each gets nudged?",
+      "hint2": "A hanging pendulum nudged comes back. A broomstick balanced upright nudged falls faster. The system is naturally unstable — gravity amplifies the error rather than correcting it.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Why is balancing fundamentally hard for a computer?",
+        "options": [
+          "Motors are too slow to react in time",
+          "The system is naturally unstable — gravity amplifies any error rather than correcting it",
+          "Sensors give incorrect angle readings",
+          "The maths requires too many calculations per second"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly — **naturally unstable**. A hanging pendulum self-corrects when pushed (stable). An inverted pendulum (broomstick upright) accelerates away from vertical when pushed (unstable). Without continuous active correction, it falls — always. The algorithm has to fight entropy every loop cycle.",
+        "explanation_wrong": "The answer: **naturally unstable**. The inverted pendulum is a classic unstable system in control theory. When it tilts, gravity creates a torque that *increases* the tilt — positive feedback, not negative. Active correction must run continuously (our code runs at ~100 Hz) to counteract this natural instability."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-imu-stands-for" },
+        { "on": "wrong", "to": "q-imu-stands-for" }
+      ],
+      "xp": 20
+    },
+    "q-imu-stands-for": {
+      "id": "q-imu-stands-for",
+      "type": "question",
+      "title": "What is an IMU?",
+      "body": "The **MPU-6050** is the sensor that tells the robot how much it's tilting. It's a type of sensor called an IMU.\n\nIMUs are used in smartphones (screen rotation), aircraft (autopilot), cars (electronic stability control), and satellites (attitude control). The MPU-6050 packs two sensors into one tiny IC:\n1. A **3-axis accelerometer** — measures linear acceleration (including gravity's pull)\n2. A **3-axis gyroscope** — measures rotational velocity (how fast the angle is changing)\n\nBefore we dig into how each works, what does IMU stand for?",
+      "hint": "Think of what the device measures: rotational and linear motion — both of which are aspects of moving through space, related to momentum and inertia.",
+      "hint2": "Inertial = related to inertia and motion. Measurement Unit = a device that measures. IMU = Inertial Measurement Unit.",
+      "question": {
+        "style": "mcq",
+        "prompt": "IMU stands for…",
+        "options": [
+          "Internal Motor Unit",
+          "Inertial Measurement Unit",
+          "Integrated Microcontroller Unit",
+          "Input Management Utility"
+        ],
+        "correct": 1,
+        "explanation_correct": "Correct — **Inertial Measurement Unit**. 'Inertial' refers to inertia — resistance to changes in motion. An IMU measures how the device is accelerating and rotating, which lets you calculate its orientation and movement through space. Your phone has one; that's how it knows to rotate the screen.",
+        "explanation_wrong": "IMU = **Inertial Measurement Unit**. Inertia is resistance to changes in motion. An IMU measures accelerations and rotational rates — from those, you can calculate the device's tilt angle, heading, and motion. The MPU-6050 is one of the most common IMU ICs for hobby robotics."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-mpu6050-axes" },
+        { "on": "wrong", "to": "q-mpu6050-axes" }
+      ],
+      "xp": 30
+    },
+    "q-mpu6050-axes": {
+      "id": "q-mpu6050-axes",
+      "type": "question",
+      "title": "How many axes does the MPU-6050 measure?",
+      "body": "The MPU-6050 contains two sensors:\n\n**Accelerometer** — measures acceleration (and gravity) along three spatial axes:\n- X-axis (left/right)\n- Y-axis (forward/backward)\n- Z-axis (up/down)\n\n**Gyroscope** — measures angular velocity (rotation rate) around three axes:\n- Roll (rotation around X — leaning left/right)\n- Pitch (rotation around Y — leaning forward/backward)\n- Yaw (rotation around Z — spinning in place)\n\nSo: 3 accelerometer axes + 3 gyroscope axes = ?",
+      "hint": "Count the axes: accelerometer gives 3, gyroscope gives 3. Add them.",
+      "hint2": "3 + 3 = 6. The MPU-6050 is called a '6-axis' or '6-DOF IMU' — six separate measurements.",
+      "question": {
+        "style": "number-input",
+        "prompt": "The MPU-6050 measures both accelerometer and gyroscope. How many total measurement axes does it have?",
+        "correct": 6,
+        "explanation_correct": "Correct — **6 axes**. 3 from the accelerometer (X, Y, Z linear acceleration) plus 3 from the gyroscope (roll, pitch, yaw angular velocity). That's why the MPU-6050 is called a 6-DOF IMU. Some newer IMUs also add a magnetometer (3 more axes for compass heading) — those are called 9-DOF IMUs.",
+        "explanation_wrong": "The answer is **6**. 3 accelerometer axes (X, Y, Z) + 3 gyroscope axes (roll, pitch, yaw) = 6. Hence '6-DOF IMU'. The MPU-6050 communicates over I2C, so you only need 2 wires (SDA + SCL) plus power to get all 6 measurements into your Arduino."
+      },
+      "branches": [
+        { "on": "correct", "to": "explanation-complementary-filter" },
+        { "on": "wrong", "to": "explanation-complementary-filter" }
+      ],
+      "xp": 40
+    },
+    "explanation-complementary-filter": {
+      "id": "explanation-complementary-filter",
+      "type": "explanation",
+      "title": "The complementary filter — getting a clean angle",
+      "body": "Here's the challenge: neither sensor alone gives a clean angle reading.\n\n**Gyroscope only:** Gives rotational rate (degrees/second). To get angle, you integrate over time: `angle += gyro_rate * dt`. The problem: any tiny error in the rate reading accumulates. Over time the angle **drifts** away from reality — even when the robot is perfectly still, the angle estimate creeps.\n\n**Accelerometer only:** Gravity always points down, so you can compute the tilt angle from the accelerometer's X and Z readings: `accel_angle = atan2(ax, az)`. The problem: acceleration (from motor movement, bumps, vibration) corrupts the reading. It's **noisy** short-term.\n\nThe solution: **complementary filter** — blend the two. Trust the gyro for fast, short-term changes. Trust the accelerometer for slow, long-term drift correction.\n\n```cpp\nangle = 0.98 * (angle + gyro_rate * dt) + 0.02 * accel_angle;\n```\n\n0.98 weight on gyro, 0.02 weight on accelerometer. Each loop (~10 ms), the gyro handles the fast dynamics while the 2% accelerometer slowly corrects any accumulated drift. Adjust the weights (0.95/0.05 or 0.99/0.01) depending on your noise levels.",
+      "branches": [{ "on": "next", "to": "q-gyro-drift" }],
+      "xp": 30
+    },
+    "q-gyro-drift": {
+      "id": "q-gyro-drift",
+      "type": "question",
+      "title": "The gyro drift problem",
+      "body": "You've just read about gyro drift. Let's make sure the concept is clear.\n\nImagine the robot is sitting perfectly still on a table. The true tilt angle is 0°. You start recording the angle using **only the gyroscope** — integrating `angle += gyro_rate * dt` each loop.\n\nEven though the robot isn't moving, the gyro will report tiny, random non-zero rotation rates (called bias and noise). These get integrated and accumulate. After 30 seconds, your angle estimate might read 2° or 5° even though the robot hasn't moved at all.",
+      "hint": "The gyro measures rate. To get angle, you integrate rate over time. Any small constant error in rate measurement accumulates into a growing angle error.",
+      "hint2": "Integration amplifies even tiny errors over time. A bias of 0.01°/s in the gyro reading becomes 36°/hour of drift. That's why we need the accelerometer to anchor the estimate.",
+      "question": {
+        "style": "boolean",
+        "prompt": "If you use ONLY the gyroscope for angle, the robot's perceived tilt angle will drift away from the true angle over time — even when the robot is stationary. True or false?",
+        "correct": "true",
+        "explanation_correct": "True — this is called **gyro drift**. Any sensor has a small constant offset error (bias) and random noise. When you integrate a biased rate, the error grows linearly over time. After minutes, the robot thinks it's tilted 10° when it's actually level. The complementary filter's 2% accelerometer weight corrects this slowly but continuously.",
+        "explanation_wrong": "This is **true** — and it's called gyro drift. Every gyro has a tiny bias: even when sitting still, it reads a small non-zero angular rate. Integrate that over time and the angle estimate wanders further and further from reality. This is why using the gyro alone doesn't work — you must fuse it with the accelerometer."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-p-term" },
+        { "on": "wrong", "to": "q-p-term" }
+      ],
+      "xp": 50
+    },
+    "q-p-term": {
+      "id": "q-p-term",
+      "type": "question",
+      "title": "PID — the P term",
+      "body": "Now we get to the heart of this project: **PID control**.\n\nPID stands for **Proportional, Integral, Derivative**. It's a three-term algorithm that calculates a control output based on the current error (difference between target and actual).\n\n**Error** = setpoint − measured_angle\n\nFor our balance bot: setpoint = 0° (upright). If the robot tilts 3° forward, error = -3°.\n\nThe **P term** responds to the *current* error:\n```cpp\nP_output = Kp * error;\n```\n\nIf the error is big (robot tilting a lot), the P output is big (drive hard to correct). If the error is small (barely tilting), the P output is small (gentle correction). This is why it's called proportional.",
+      "hint": "P = Proportional. The output scales with the size of the current error. Big error → big correction. Small error → small correction.",
+      "hint2": "The P term reacts to what's happening right now — the current error. It doesn't look at history or predict the future.",
+      "question": {
+        "style": "mcq",
+        "prompt": "The P (proportional) term in PID…",
+        "options": [
+          "Predicts the future error and corrects for it in advance",
+          "Reacts to the current error — output is proportional to how far off you are right now",
+          "Remembers and corrects accumulated past errors",
+          "Does nothing useful by itself"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly — P reacts to **current error**. `P_output = Kp * error`. The gain Kp scales how aggressively you respond. High Kp: fast response, risk of oscillation. Low Kp: sluggish response. P alone usually leaves a small steady-state error — that's where I comes in.",
+        "explanation_wrong": "The P term = **current error response**. It's proportional to how far you are from the target right now. Big tilt → big motor drive. Nearly upright → tiny motor drive. P alone works but often leaves a small constant offset (the robot leans slightly even when 'balanced'). That's what the I term fixes."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-i-term" },
+        { "on": "wrong", "to": "q-i-term" }
+      ],
+      "xp": 60
+    },
+    "q-i-term": {
+      "id": "q-i-term",
+      "type": "question",
+      "title": "PID — the I term",
+      "body": "With only the P term running, your balance bot will likely balance — but with a small persistent lean. It'll stay upright but it'll look like it's cheating slightly forward or backward.\n\nWhy? Because when the robot leans very slightly, `P_output = Kp * tiny_error` is a very small motor drive. But the motors themselves need a certain minimum drive just to overcome friction and hold position. If `Kp * error` is smaller than that minimum, the error never fully corrects.\n\nThe **I (Integral) term** fixes this by **accumulating** past error:\n```cpp\nintegral += error * dt;\nI_output = Ki * integral;\n```\n\nIf there's been a small persistent error for a long time, `integral` keeps growing, and `I_output` keeps growing until the motor drive is finally enough to eliminate the offset.",
+      "hint": "The I term sums up all past errors over time. A small persistent error, summed long enough, creates a large correction.",
+      "hint2": "Steady-state error = a small error that persists forever because P alone isn't strong enough to fully correct it. The I term's accumulation eventually grows large enough to push through.",
+      "question": {
+        "style": "mcq",
+        "prompt": "The I (integral) term accumulates past error over time. It's specifically good at correcting…",
+        "options": [
+          "Random sensor noise",
+          "Steady-state offset — a small persistent lean that P alone can't eliminate",
+          "Fast oscillations",
+          "Motor speed differences between left and right"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly — **steady-state offset**. If the robot leans 0.5° constantly because P alone can't generate enough drive to overcome friction at that tiny error, the integral term accumulates that 0.5° over hundreds of loop cycles until it finally generates enough output to fix it. That's the I term's superpower.",
+        "explanation_wrong": "The I term fixes **steady-state offset**: a small, persistent error that P alone can't eliminate because the motor drive at that tiny error level isn't enough to overcome friction or other constant disturbances. The integral accumulates the persistent error over time until it generates a strong enough correction."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-d-term" },
+        { "on": "wrong", "to": "q-d-term" }
+      ],
+      "xp": 70
+    },
+    "q-d-term": {
+      "id": "q-d-term",
+      "type": "question",
+      "title": "PID — the D term",
+      "body": "P responds to current error. I responds to accumulated past error. The **D (Derivative) term** responds to the *rate of change* of error — how fast the error is growing or shrinking.\n\n```cpp\nderivative = (error - prev_error) / dt;\nD_output = Kd * derivative;\nprev_error = error;\n```\n\nIf the robot is falling fast (error growing quickly), `derivative` is large → D output is large → apply a strong counter-force before the error gets worse.\n\nIf the robot is already correcting itself and the error is shrinking, `derivative` is negative → D output opposes the ongoing correction → prevents overshoot.\n\nThis is why engineers call the D term **'damping'** — it resists rapid changes in error, just like a shock absorber resists rapid movement.",
+      "hint": "The D term looks at how fast the error is changing. If error is growing fast, D applies a strong opposing force. If error is shrinking fast, D slows the correction to prevent overshoot.",
+      "hint2": "The D term is like a shock absorber or a brake. It opposes rapid changes in the error signal — damping oscillations.",
+      "question": {
+        "style": "mcq",
+        "prompt": "The D (derivative) term reacts to how fast the error is CHANGING. It acts like…",
+        "options": [
+          "An accelerator — speeds up corrections",
+          "A brake or shock absorber — damps rapid changes and prevents overshoot",
+          "A memory — stores all past errors",
+          "A compass — keeps orientation fixed"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly — **a brake / shock absorber**. D opposes rapid changes in error. When the robot is falling fast (error growing quickly), D adds a strong counter-force early. When the robot is successfully correcting and error is shrinking fast, D slows the correction to prevent overshooting past vertical. It's damping.",
+        "explanation_wrong": "D = **brake / damper**. It opposes rapid changes in error, like a shock absorber opposes rapid movement. When the error is growing fast (falling), D adds an early counter-force. When correcting fast (rising), D prevents you from overshooting. Without D, PID systems tend to oscillate — correct too hard, swing past, over-correct, swing past again, forever."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-code-fill-pid" },
+        { "on": "wrong", "to": "q-code-fill-pid" }
+      ],
+      "xp": 70
+    },
+    "q-code-fill-pid": {
+      "id": "q-code-fill-pid",
+      "type": "question",
+      "title": "Writing the PID equation",
+      "body": "Here's the complete PID output equation, with one term missing:\n\n```cpp\noutput = Kp * error + Ki * ___ + Kd * derivative;\n```\n\nThe three terms:\n- `Kp * error` — proportional (current error)\n- `Ki * ???` — integral (accumulated past error)\n- `Kd * derivative` — derivative (rate of change of error)\n\nFill in what goes after `Ki *` — the variable that represents the accumulated sum of past errors.",
+      "hint": "The I term's variable accumulates all past errors multiplied by time. It's typically called 'integral' or 'sum'.",
+      "hint2": "The line that builds it is: `integral += error * dt;`. The variable is `integral`.",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Complete the PID equation:\n\n```cpp\noutput = Kp * error + Ki * ___ + Kd * derivative;\n```\n\nWhat replaces `___`?",
+        "correct": "integral",
+        "explanation_correct": "Correct — `integral`. The full equation: `output = Kp*error + Ki*integral + Kd*derivative`. This single line, run every ~10 ms, drives the motors. The `integral` variable accumulates: `integral += error * dt;` each cycle. The `derivative` is: `(error - prev_error) / dt`.",
+        "explanation_wrong": "The answer: `integral`. The full PID equation is `output = Kp*error + Ki*integral + Kd*derivative`. You build `integral` by summing `error * dt` each loop cycle. You build `derivative` by taking `(error - prev_error) / dt`. Together, P+I+D produces a smooth, accurate, non-oscillating motor command."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-kp-too-high" },
+        { "on": "wrong", "to": "q-kp-too-high" }
+      ],
+      "xp": 70
+    },
+    "q-kp-too-high": {
+      "id": "q-kp-too-high",
+      "type": "question",
+      "title": "What happens if Kp is too high?",
+      "body": "Choosing the right **gain values** (Kp, Ki, Kd) is called **tuning**. It's part science, part art. Too low, and the robot is sluggish. Too high, and it goes unstable.\n\nLet's think through what happens when **Kp** is set too high.\n\nRemember: `P_output = Kp * error`. If Kp is very large, even a tiny tilt generates a massive motor command. The robot responds — hard. It overcorrects. Now it's tilting the other way. Another massive correction. Now it's tilting back. It oscillates, getting faster and more violent until either the PID loop breaks it or it falls.\n\nThis is why Kp tuning starts low and increases slowly.",
+      "hint": "High Kp = big output for any error. What happens when corrections are consistently too strong?",
+      "hint2": "Too strong a correction → overshoot → correction in opposite direction → overshoot again → oscillation. High Kp causes the robot to wobble wildly.",
+      "question": {
+        "style": "mcq",
+        "prompt": "If Kp is set too high, the robot will…",
+        "options": [
+          "Balance too slowly to keep up with disturbances",
+          "Oscillate wildly — overcorrecting in both directions",
+          "Stop balancing and fall over immediately",
+          "Only fall forward, never backward"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly — **oscillate wildly**. High Kp → every tiny tilt causes an enormous motor command → robot overcorrects → swings past vertical → enormous correction in the opposite direction → oscillates with growing amplitude. This is called **proportional gain instability**, and it's the most common mistake when tuning a balance bot.",
+        "explanation_wrong": "Too-high Kp → **wild oscillation**. Every tilt triggers an oversized correction. The robot swings past vertical. Another oversized correction. Swings back. The oscillations grow in amplitude (this is classic control theory instability). The fix: reduce Kp until oscillation stops, then add Kd to damp remaining wobble."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-tuning-order" },
+        { "on": "wrong", "to": "q-tuning-order" }
+      ],
+      "xp": 70
+    },
+    "q-tuning-order": {
+      "id": "q-tuning-order",
+      "type": "question",
+      "title": "The correct order to tune PID",
+      "body": "Tuning PID gains in the wrong order makes the process much harder. There's a standard approach:\n\n**Step 1: Tune P first** — set Ki=0, Kd=0. Increase Kp slowly until the robot starts to balance (still wobbly). Stop just before wild oscillation.\n\n**Step 2: Add D** — with Kp set, add Kd slowly to damp the wobble. Kd resists oscillations. Keep increasing until the wobble smooths out.\n\n**Step 3: Add I last** — once P and D give stable (but slightly offset) balance, add Ki slowly to eliminate the steady-state lean.\n\nReason for this order: I interacts with D — an over-aggressive I term fights D and destabilises the loop. You need D working well before I can be effective.",
+      "hint": "You can't damp what isn't there, and you can't correct offset if the system is oscillating. Which term establishes baseline balance?",
+      "hint2": "Start with P to get basic response. Then D to damp wobble. Then I to remove steady-state offset. In that order: P → D → I.",
+      "question": {
+        "style": "mcq",
+        "prompt": "What is the correct order to tune PID gains?",
+        "options": [
+          "D first, then I, then P",
+          "P first, then D, then I",
+          "I first — always start with the integral",
+          "Tune all three simultaneously for best results"
+        ],
+        "correct": 1,
+        "explanation_correct": "Correct — **P then D then I**. Kp establishes basic balance. Kd damps the wobble that Kp creates. Ki removes any remaining steady-state lean. Tuning D before P means you're damping nothing. Tuning I before D means the integrator grows out of control while the system oscillates.",
+        "explanation_wrong": "The order is **P → D → I**. Start with Kp alone until you get rough balance. Add Kd to smooth out oscillation. Finally add Ki to fix steady-state offset. This order ensures each term has a stable foundation to work from. Random-order tuning almost always leads to frustrating instability."
+      },
+      "branches": [
+        { "on": "correct", "to": "simulation-balance" },
+        { "on": "wrong", "to": "simulation-balance" }
+      ],
+      "xp": 80
+    },
+    "simulation-balance": {
+      "id": "simulation-balance",
+      "type": "simulation",
+      "title": "Tune PID in the simulator",
+      "body": "The simulator below shows your balance bot as an inverted pendulum. Use the sliders to adjust Kp, Ki, and Kd in real time.\n\n**Try these experiments:**\n- Set Kp=5, Ki=0, Kd=0 → watch it balance roughly but wobble\n- Increase Kp to 15 → watch wild oscillation\n- Back to Kp=5, increase Kd to 0.1 → wobble damps significantly\n- Now add Ki=0.05 → steady-state lean corrects over a few seconds\n\n**Push the robot** using the disturbance button. Watch how well-tuned PID recovers versus poorly-tuned PID.\n\nThe sweet spot for a physical SG90 balance bot is typically: Kp=8–12, Ki=0.02–0.1, Kd=0.05–0.3 — but every robot is different. Real tuning requires you to be there, watching, adjusting.\n\nWhen you're satisfied, move on.",
+      "simulation_url": "/visualizer?mode=balance",
+      "branches": [{ "on": "next", "to": "q-setpoint" }],
+      "xp": 60
+    },
+    "q-setpoint": {
+      "id": "q-setpoint",
+      "type": "question",
+      "title": "The setpoint — where is 'balanced'?",
+      "body": "The PID loop's target is called the **setpoint** — the angle the robot is trying to achieve. Ideally, setpoint = 0° (perfectly vertical).\n\nBut here's a real-world issue: your motors aren't perfectly aligned. Your robot's centre of mass might not be exactly over the wheel axle. Cables might pull slightly to one side. The result: the robot needs to actually lean slightly forward or backward just to stay still — because it needs the motors running to counteract friction.\n\nIf you measured that your robot naturally balances with a 2° forward lean (measured by the IMU), what should your setpoint be?",
+      "hint": "The PID loop tries to drive error to zero. Error = setpoint − angle. If the robot actually balances at 2°, what setpoint makes error = 0 when angle = 2°?",
+      "hint2": "If setpoint = 2° and angle = 2°, error = 0. The PID loop is satisfied at the robot's natural balancing angle. Set the setpoint equal to the measured lean angle.",
+      "question": {
+        "style": "number-input",
+        "prompt": "Your robot leans 2° forward when balancing stably. To compensate, your PID setpoint should be ___ degrees:",
+        "correct": 2,
+        "explanation_correct": "Exactly — set the setpoint to **2°**. Then error = setpoint − angle = 2° − 2° = 0 when balanced. The robot stops correcting at the angle where it naturally holds. This is called **setpoint offset** and every physical balance bot needs it adjusted after assembly.",
+        "explanation_wrong": "The answer is **2°**. Set the PID setpoint to the angle the robot naturally balances at. Error = setpoint − measured_angle. If both are 2°, error = 0, and the PID loop is satisfied at the correct physical balance point. Without this adjustment, the robot would try to straighten to 0° and fall backward."
+      },
+      "branches": [
+        { "on": "correct", "to": "checkpoint-balance" },
+        { "on": "wrong", "to": "checkpoint-balance" }
+      ],
+      "xp": 70
+    },
+    "checkpoint-balance": {
+      "id": "checkpoint-balance",
+      "type": "checkpoint",
+      "title": "Checkpoint — PID mastery check",
+      "body": "You've covered a lot of ground. Here's the complete picture:\n\n**The sensing problem:**\n- MPU-6050 = 6-axis IMU (3 accel + 3 gyro)\n- Gyro alone → drifts over time\n- Accelerometer alone → noisy in motion\n- Complementary filter: `angle = 0.98*(angle + gyro*dt) + 0.02*accel_angle`\n\n**The control algorithm (PID):**\n- P term: `Kp * error` — reacts to current error (how far off now?)\n- I term: `Ki * integral` — corrects steady-state offset (has it been wrong for a while?)\n- D term: `Kd * derivative` — damps rapid changes (how fast is error growing?)\n- Full equation: `output = Kp*error + Ki*integral + Kd*derivative`\n\n**Tuning:**\n- Order: P first → D second → I last\n- Kp too high → oscillation\n- Setpoint = robot's natural balance angle (not necessarily 0°)\n\n**Two more: a fun fact and a look at what's beyond PID.**",
+      "branches": [{ "on": "next", "to": "q-why-segway-banned" }],
+      "xp": 80
+    },
+    "q-why-segway-banned": {
+      "id": "q-why-segway-banned",
+      "type": "question",
+      "title": "Why were Segways banned in the UK?",
+      "body": "You've now built the same core technology that powered the Segway — the inverted pendulum balancing algorithm. The Segway launched in 2001 and was hyped as 'the biggest thing since the internet' by its inventor Dean Kamen. Cities would be redesigned around it.\n\nBy 2020, Segway stopped making the iconic two-wheeled personal transporter (not because of the algorithm — the algorithm was perfect). One interesting footnote: in many countries, Segways faced legal problems that had nothing to do with safety.\n\nIn the UK specifically, Segways were banned from public pavements (sidewalks) — but not for the reason most people assume.",
+      "hint": "It wasn't because they were dangerous. Think about how UK law categorises vehicles.",
+      "hint2": "UK law from 1835 (Highway Act) bans 'carriages' from pavements. Segways were classified as motor vehicles, which are banned from pavements — not because of any modern safety concern, but because of a Victorian-era law.",
+      "question": {
+        "style": "boolean",
+        "prompt": "Segways were banned from UK public pavements because they were legally classified as motor vehicles (under a law dating to 1835) — not because they were considered dangerous. True or false?",
+        "correct": "true",
+        "explanation_correct": "True — and it's a wonderful footnote. The 1835 Highways Act bans 'any carriage' from pavements. The UK's Driver and Vehicle Licensing Agency (DVLA) classified Segways as motor vehicles. Motor vehicles are banned from pavements. Therefore: Segways banned from pavements. A 186-year-old law, written before cars existed, grounded the Segway.",
+        "explanation_wrong": "This is **true**. The UK's 1835 Highways Act bans carriages from pavements. The DVLA classified Segways as motor vehicles. Motor vehicles cannot use pavements under UK law. Segways were technically also banned from roads (no lights, no registration). They were legal in... car parks. A Victorian law written for horse carriages killed a 21st-century personal transport vehicle."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-next-level" },
+        { "on": "wrong", "to": "q-next-level" }
+      ],
+      "xp": 60
+    },
+    "q-next-level": {
+      "id": "q-next-level",
+      "type": "question",
+      "title": "Beyond PID — what do Boston Dynamics use?",
+      "body": "PID is powerful. But there's a ceiling.\n\nPID is **reactive** — it corrects errors after they've happened. It works beautifully for a balance bot on a smooth floor. But if you want a robot to run across rough terrain, jump, do backflips (like Atlas), or predict that a pushed obstacle is about to hit it — PID isn't enough.\n\nModern high-performance robots like Boston Dynamics **Atlas** use more advanced control methods that can predict future states and optimise across a horizon of time steps — not just react to the current error.\n\nWhat category of control does this describe?",
+      "hint": "It's called 'predictive' control because it models future behaviour. Combined with neural networks, it's how legged robots achieve athletic movement.",
+      "hint2": "MPC = Model Predictive Control. It simulates future states and picks the optimal control sequence over a time window. Paired with neural networks for learned behaviours.",
+      "question": {
+        "style": "mcq",
+        "prompt": "What control method do Boston Dynamics Atlas legs use that goes beyond PID?",
+        "options": [
+          "Larger batteries and more powerful motors",
+          "Model Predictive Control (MPC) combined with neural network learned behaviours",
+          "More aggressive PID gains with faster loop rates",
+          "GPS-guided balancing"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly — **Model Predictive Control (MPC) with neural networks**. MPC simulates the robot's future states over a time horizon and picks the control inputs that minimise a cost function across that window. It 'thinks ahead' rather than just reacting. Combined with neural networks trained on motion data, this lets Atlas run, jump, and recover from pushes in ways no reactive PID could manage.",
+        "explanation_wrong": "The answer: **Model Predictive Control (MPC) + neural networks**. MPC predicts future states using a model of the robot's dynamics and optimises control inputs over a window of time steps. Neural networks add learned behaviours (like recognising terrain types). PID reacts to now; MPC plans ahead. That gap is the difference between your balance bot and Atlas."
+      },
+      "branches": [
+        { "on": "correct", "to": "complete" },
+        { "on": "wrong", "to": "complete" }
+      ],
+      "xp": 80
+    },
+    "complete": {
+      "id": "complete",
+      "type": "complete",
+      "title": "Balance Bot — Built",
+      "body": "You did the hardest project in the beginner track — and you understood every part of it.\n\n**Total XP earned: 900**\n\nPID is everywhere. It's not just robots:\n- **Cruise control** in every car — Kp responds to speed error, Ki corrects the hill-climbing lean, Kd resists sudden speed changes\n- **Drone altitude hold** — PID keeps altitude stable against wind and battery drain\n- **Industrial furnace temperature** — Kp reacts to temperature error, Ki corrects for wall heat loss, Kd resists thermal overshoot\n- **Your home thermostat** — a simplified P controller\n- **Camera autofocus** — PID drives the lens motor toward sharpest focus\n\nYou now understand the algorithm that touches more engineered systems than almost any other idea in the last 100 years.\n\n**Where to go next:**\n- **Vision Line Follower** — add a camera, replace IR sensors with OpenCV image processing. Introduction to computer vision.\n- **ROS2 Nav Robot** — bring your skills to the professional robotics framework. SLAM, navigation stacks, RViz.\n- **AI Sorting Arm** — combine your 3-DOF arm with a camera and machine learning to sort objects by colour, shape, or printed label.\n\nYou've earned your place in the intermediate tier. The next projects are genuinely hard — but so was this, and you handled it.",
+      "branches": [],
+      "xp": 100
+    }
+  }
+}

@@ -1,0 +1,212 @@
+---
+title: "Multi-Robot Systems"
+description: "ROS2 multi-robot namespacing, fleet coordination, task allocation. Build a 3-robot simulation with a centralized allocator."
+track: edge
+lesson: 1
+duration: "70 min read"
+url_slug: e-01-multi-robot-systems
+hindi_name: "मल्टी-रोबोट सिस्टम"
+xp: 500
+estimated_minutes: 70
+atlas_links: [ros2, mobile-robot]
+sources:
+  - name: "Multi-Robot ROS 2 setup"
+    url: "https://docs.ros.org/en/humble/Tutorials/Demos/dummy-robots.html"
+  - name: "Khamis et al. — Multi-Robot Task Allocation survey"
+    url: "https://doi.org/10.1016/j.eswa.2014.10.012"
+---
+
+## What you'll build
+
+A **3-robot ROS2 simulation** with a **centralized task allocator node**. Tasks (pick up object at location X) stream in at random intervals. The allocator assigns each task to the best robot using a simple cost function (distance + current workload). Robots accept/reject, navigate, and report back.
+
+This is the architecture used at **GreyOrange's** central WMS, **Locus Robotics'** fleet manager, and **Amazon Robotics'** Robotic Drive Unit allocation system.
+
+## Namespacing — the boring foundation
+
+Multi-robot ROS2 works because every node and topic can be prefixed with a robot ID:
+
+```
+/robot_1/cmd_vel
+/robot_1/scan
+/robot_1/odom
+/robot_2/cmd_vel
+/robot_2/scan
+...
+```
+
+You do this at launch with `--namespace`:
+
+```python
+Node(
+    package='nav2_bringup',
+    executable='bringup',
+    namespace='robot_1',
+    parameters=[...],
+)
+```
+
+Then `tf` becomes the tricky bit — every robot has its own `base_link`, but there's still one global `map` frame. You add a robot-prefixed TF tree (`robot_1/base_link`, `robot_1/odom`) connecting to the shared `map`.
+
+## DDS Domains for isolation
+
+For early development, run each simulated robot in its own DDS domain to avoid cross-talk:
+
+```bash
+ROS_DOMAIN_ID=10 ros2 launch r2bot_robot robot.launch.py robot_id:=robot_1
+ROS_DOMAIN_ID=11 ros2 launch r2bot_robot robot.launch.py robot_id:=robot_2
+ROS_DOMAIN_ID=12 ros2 launch r2bot_robot robot.launch.py robot_id:=robot_3
+ROS_DOMAIN_ID=0  ros2 run r2bot_fleet allocator   # central manager sees all via DDS bridge
+```
+
+In production you'd use **DDS-Security partitioning** instead — one domain, but cryptographic isolation between robots' control topics. The fleet manager subscribes via a discovery server.
+
+## Task allocation — the auction pattern
+
+Given N tasks and M robots, **Greedy assignment** is easy but suboptimal:
+
+```python
+for task in tasks:
+    best = min(robots, key=lambda r: r.cost(task))
+    best.assign(task)
+```
+
+**Centralised auction** is better — every robot bids on every task; the allocator picks the lowest-cost assignment across the whole batch. This is the **Hungarian algorithm** (Kuhn-Munkres) — runs in O(n³) for n × n matrices. For 800 robots × 1000 tasks it's not trivial; GreyOrange and Amazon use approximations.
+
+## The allocator node (simplified greedy)
+
+```python
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import String
+import json
+import math
+
+ROBOT_IDS = ['robot_1', 'robot_2', 'robot_3']
+
+class Robot:
+    def __init__(self, robot_id: str):
+        self.id = robot_id
+        self.x = 0.0
+        self.y = 0.0
+        self.busy = False
+
+class Task:
+    def __init__(self, task_id: str, x: float, y: float):
+        self.id = task_id
+        self.x = x
+        self.y = y
+
+class FleetAllocator(Node):
+    def __init__(self):
+        super().__init__('fleet_allocator')
+        self.robots = {rid: Robot(rid) for rid in ROBOT_IDS}
+        self.task_queue: list[Task] = []
+        self.task_counter = 0
+
+        # Listen to each robot's pose
+        for rid in ROBOT_IDS:
+            self.create_subscription(
+                PoseStamped, f'/{rid}/pose', self._make_pose_cb(rid), 10,
+            )
+            self.create_subscription(
+                String, f'/{rid}/status', self._make_status_cb(rid), 10,
+            )
+
+        # Per-robot assignment publishers
+        self.assignment_pubs = {
+            rid: self.create_publisher(String, f'/{rid}/assignment', 10)
+            for rid in ROBOT_IDS
+        }
+
+        # Tick: incoming tasks + allocation
+        self.create_timer(0.5, self.tick)
+
+    def _make_pose_cb(self, rid: str):
+        def cb(msg: PoseStamped):
+            r = self.robots[rid]
+            r.x = msg.pose.position.x
+            r.y = msg.pose.position.y
+        return cb
+
+    def _make_status_cb(self, rid: str):
+        def cb(msg: String):
+            try:
+                payload = json.loads(msg.data)
+                self.robots[rid].busy = bool(payload.get('busy', False))
+            except Exception:
+                pass
+        return cb
+
+    def add_task(self, x: float, y: float):
+        self.task_counter += 1
+        t = Task(f'task_{self.task_counter}', x, y)
+        self.task_queue.append(t)
+        self.get_logger().info(f'New task {t.id} at ({x:.1f}, {y:.1f})')
+
+    def cost(self, robot: Robot, task: Task) -> float:
+        if robot.busy:
+            return float('inf')
+        return math.hypot(robot.x - task.x, robot.y - task.y)
+
+    def tick(self):
+        if not self.task_queue:
+            return
+        # For each pending task, find best free robot
+        unassigned = []
+        for t in self.task_queue:
+            candidates = [(self.cost(r, t), r) for r in self.robots.values()]
+            candidates.sort(key=lambda c: c[0])
+            best_cost, best_robot = candidates[0]
+            if math.isinf(best_cost):
+                unassigned.append(t)
+                continue
+            # Assign
+            best_robot.busy = True
+            assignment = String()
+            assignment.data = json.dumps({'task_id': t.id, 'x': t.x, 'y': t.y})
+            self.assignment_pubs[best_robot.id].publish(assignment)
+            self.get_logger().info(f'{t.id} → {best_robot.id} (cost={best_cost:.2f})')
+        self.task_queue = unassigned
+
+def main():
+    rclpy.init()
+    rclpy.spin(FleetAllocator())
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+Each robot runs a separate node listening on `/robot_X/assignment`, navigating via Nav2, then publishing back `{busy: false}` when done.
+
+## Decentralised alternatives
+
+For research, look at **Consensus-Based Bundle Algorithm (CBBA)** — each robot bids on tasks and they negotiate via local messages. No central node, no single point of failure. Cool, hard, and what your PhD thesis could be about.
+
+## In India: who runs multi-robot fleets
+
+- **GreyOrange Butler** — 200–800 robots per warehouse, central WMS allocates tasks. Bangalore + Gurgaon offices.
+- **Addverb Veloce ASRS** — 50–200 robots per facility, hybrid centralized + local replanning. Noida.
+- **TCS Innovation Labs Robotics** (Pune) — research on swarm coordination for industrial assembly.
+- **IIT Madras Center for Innovation Robotics Group** — multi-robot agriculture research.
+
+## Test Your Understanding
+
+**1.** Your 3-robot demo works at small scale. You try 30 robots; the allocator pegs the CPU and tasks pile up faster than they're assigned. Walk through *two architectural changes* you'd make, with the tradeoffs of each.
+
+**2.** A team member proposes "let each robot pick its own task from a shared queue — no central allocator." Identify two specific failure modes this introduces that the centralised approach avoids.
+
+**3.** You need to add a *priority* dimension to tasks (some are urgent). Where in the cost function does priority go, and why might naive multiplication of cost × priority break things at scale?
+
+## India Opportunity
+
+- **Fleet Software Engineer · GreyOrange, Gurgaon** — Butler allocation algorithms, ₹22–40 LPA.
+- **Multi-Robot Research Engineer · Addverb, Noida** — Veloce fleet coordination, ₹18–32 LPA.
+- **Senior Research Engineer · TCS Robotics Innovation, Pune** — swarm research, ₹26–48 LPA.
+- **PhD Research Assistant · IIT Bombay / IIT Madras** — multi-robot coordination, stipend ₹35–45k/month + travel.
+
+## Next Step
+
+→ Continue to **[Edge 02 · SLAM from Scratch](/academy/edge/02)**.

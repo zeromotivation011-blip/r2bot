@@ -1,0 +1,83 @@
+---
+title: Force-torque sensor
+category: sensors
+summary: >-
+  A force-torque sensor measures the pushing, pulling, and twisting forces
+  acting on a robot's wrist or tool. It gives the robot a sense of touch —
+  letting it feel whether it is pressing too hard, too softly, or at the wrong
+  angle.
+seeAlso: []
+sources:
+  - title: ATI Industrial Automation — Force/Torque Sensor Technology
+    url: 'https://www.ati-ia.com/products/ft/ft_technology.aspx'
+  - title: IEEE Transactions on Robotics — Force control in robotic manipulation
+    url: 'https://ieeexplore.ieee.org/document/9286497'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - sensors
+  - force
+  - manipulation
+  - advanced
+difficulty: 3
+oneLiner: 'The concept concept: A force-torque sensor measures the pushing, pulling, and'
+laymanExplanation: >-
+  A surgeon stitching a wound does not stare at a ruler. She feels, through her
+  fingers and the needle driver, how much tension the suture can bear before
+  tearing. She adjusts her grip, her pull, her angle — all in real time, guided
+  by sensation rather than calculation. A robot performing the same task cannot
+  see this information in a camera feed; it has to fe
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without force-torque sensor, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A force-torque sensor measures the pushing, pulling, and twisting forces
+  acting on a robot's wrist or tool. It gives the robot a sense of touch —
+  letting it feel whether it is pressing too hard, too softly, or at the wrong
+  angle.
+slug: force-torque-sensor
+bucket: concept
+---
+
+A surgeon stitching a wound does not stare at a ruler. She feels, through her fingers and the needle driver, how much tension the suture can bear before tearing. She adjusts her grip, her pull, her angle — all in real time, guided by sensation rather than calculation. A [robot](/atlas/concept/robot) performing the same task cannot see this information in a [camera](/atlas/concept/camera-vision) feed; it has to feel it.
+
+The instrument that gives robots this sense of feel is the force-torque sensor.
+
+## What it measures
+
+A **force-torque sensor** (often abbreviated F/T sensor) measures all six components of mechanical loading acting at a point: three **forces** (push or pull along the X, Y, and Z axes) and three **torques** (twisting moments about each of those same axes). Together, these six numbers completely describe the mechanical interaction between a robot's tool and whatever it is touching.
+
+Most F/T sensors use **strain gauges** — tiny resistors bonded to a precision-machined metal structure. When force deforms the structure, even by micrometres, the strain gauges change resistance in proportion. Electronics convert those resistance changes into the six force/torque readings, typically hundreds or thousands of times per second.
+
+Some sensors use **piezoelectric elements** instead, which generate a voltage when mechanically stressed. These respond faster and handle higher loads, but drift over time and are less suited to sustained static forces.
+
+## Force control: the key capability
+
+Knowing force unlocks **force control** — a robot behaviour that adjusts motion based on what it feels rather than just what it was told. The simplest version is compliance: if the robot pushes against something and the force reading exceeds a threshold, it backs off. A more sophisticated version is **impedance control**, where the robot's controller makes the arm behave as if it were a spring: it yields to external forces proportionally, so a human can guide it by hand without fighting the motors. This is the same principle behind [cobot](/atlas/concept/cobot) safety — those joints are effectively running force control continuously.
+
+## Real-world examples
+
+Universal Robots ships an optional F/T sensor with its cobots for assembly tasks — inserting a bearing into a housing, for instance, requires sensing the exact moment the part seats correctly rather than jamming in at the wrong angle. The Intuitive Surgical da Vinci system (the dominant [surgical robot](/atlas/concept/surgical-robot) worldwide) has faced persistent criticism for lacking force [feedback](/atlas/concept/feedback), meaning surgeons cannot feel tissue tension; competitors like Avatera and CMR Surgical have positioned force sensing as a differentiator. In research, MIT's manipulation group and Stanford's AI Lab routinely use ATI and Robotiq F/T sensors as fundamental tools for studying how robots handle deformable objects.
+
+## The gap between feeling and understanding
+
+An F/T sensor solves the data problem but not the interpretation problem. Getting six numbers is easy; knowing what to do with them in a complex manipulation task is still one of [robotics](/atlas/concept/robotics)' hardest research challenges. Teaching a robot to crack an egg — firm enough to break the shell, gentle enough not to squeeze the yolk — requires not just F/T sensing but the control logic to act on it wisely.
+
+---
+
+*Could a robot ever learn to judge the ripeness of a mango by touch alone — and would that be easier or harder than learning to see it?*

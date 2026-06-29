@@ -1,0 +1,110 @@
+---
+title: Reinforcement learning (for robots)
+prerequisites:
+  - neural-network
+  - deep-learning
+category: ai-and-perception
+summary: >-
+  Reinforcement learning is how you teach a robot a skill by letting it try
+  millions of times, rewarding it when it gets closer and punishing it when it
+  gets worse. It's how Unitree H1 learned to run.
+seeAlso:
+  - robot
+  - slam
+  - optimus
+  - atlas
+sources:
+  - title: 'Sutton & Barto — Reinforcement Learning, 2nd edition'
+    url: 'http://incompleteideas.net/book/the-book-2nd.html'
+  - title: OpenAI Gym (now Gymnasium)
+    url: 'https://gymnasium.farama.org/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - ai
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: Reinforcement learning is how you teach a robot'
+laymanExplanation: >-
+  Reinforcement learning is how you teach a robot a skill by letting it try
+  millions of times, rewarding it when it gets closer to the goal and punishing
+  it when it gets worse. It's how Unitree's H1 learned to run. It's how Boston
+  Dynamics tuned Atlas's parkour. It's how DeepMind taught a humanoid to play
+  football.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without reinforcement learning (for robots), many concept systems in robotics
+  simply couldn't work.
+realRobotsThatUseThis:
+  - Tesla Optimus
+  - OpenAI robotic hand
+  - Boston Dynamics Atlas (later versions)
+indianExample: >-
+  Researchers at IIT Hyderabad use RL to train autonomous quadcopter manoeuvres
+  for emergency-response drone competitions.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What is the 'reward signal' in reinforcement learning?
+  options:
+    - A label
+    - A number telling the agent how well it did
+    - A picture
+    - A line of code
+  answer: 1
+  explanation: >-
+    The agent observes the world, takes an action, and gets a numeric reward —
+    it learns to maximise total reward over time.
+mindBlowingFact: >-
+  DeepMind's AlphaGo played itself 30 million times to learn Go — equivalent to
+  a human playing for 10,000 lifetimes.
+industryApplications:
+  - robotics
+  - game AI
+  - logistics optimisation
+  - finance
+  - autonomous driving
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Reinforcement learning is how you teach a robot a skill by letting it try
+  millions of times, rewarding it when it gets closer and punishing it when it
+  gets worse. It's how Unitree H1 learned to run.
+slug: reinforcement-learning
+bucket: concept
+---
+
+Reinforcement learning is how you teach a [robot](/atlas/concept/robot) a skill by letting it try millions of times, rewarding it when it gets closer to the goal and punishing it when it gets worse. It's how [Unitree](/atlas/company/unitree)'s H1 learned to run. It's how [Boston Dynamics](/atlas/company/boston-dynamics) tuned [Atlas](/atlas/robot/atlas)'s parkour. It's how DeepMind taught a humanoid to play football.
+
+## The recipe
+
+You need three things to do reinforcement learning (RL):
+
+1. **An environment** — usually a physics simulator ([NVIDIA](/atlas/company/nvidia) Isaac Sim, MuJoCo, Gazebo). Real robots are too expensive to break millions of times.
+2. **A reward function** — a number that says how well the robot is doing. Higher is better. Designing the reward is the art of RL.
+3. **A policy** — a [neural network](/atlas/concept/neural-network) that takes the robot's current state ([joint](/atlas/concept/joint) angles, sensors, target) and outputs the next action (joint torques, velocities). The policy starts random and improves over time.
+
+The training loop: simulate an episode → record reward → tweak the policy's weights so good actions get more likely. Repeat for millions of episodes.
+
+## Why this is suddenly everywhere
+
+Three things came together around 2018-2020:
+
+- **Big neural networks** ([deep learning](/atlas/concept/deep-learning)) can represent complex policies that older RL couldn't.
+- **Fast GPU simulators** can run thousands of robot lives per second on a single GPU.
+- **[Sim-to-real](/atlas/concept/sim-to-real) techniques** (domain randomisation, system identification) finally let policies trained in simulation work on real robots without re-training.
+
+Before this convergence, RL was a research curiosity. After it, RL became how nearly every legged robot is trained.
+
+## Where it works (and where it doesn't)
+
+**Works well:** locomotion (walking, running, recovering from pushes), dexterous manipulation (in-hand object rotation), [drone](/atlas/concept/drone) flight controllers. Anywhere the goal is clear and you can simulate millions of attempts cheaply.
+
+**Doesn't work well (yet):** open-ended tasks ("clean the kitchen"), long-horizon planning ("assemble a chair"), tasks involving humans (because humans behave unpredictably and can't be cheaply simulated).
+
+For the open-ended problems, the field is moving toward **VLA models** — vision-language-action neural networks that combine RL with [imitation learning](/atlas/concept/imitation-learning) from human demos. [Tesla](/atlas/company/tesla)'s [Optimus](/atlas/robot/optimus), Figure 03, and 1X NEO all use VLA architectures.
+
+---
+
+*Curious about the simulator side? NVIDIA Isaac is the most-used platform for sim-to-real these days.*

@@ -1,0 +1,80 @@
+---
+title: Actuator
+slug: actuator
+bucket: actuators
+summary: >-
+  The muscles of a robot — devices that convert electrical or pneumatic energy
+  into mechanical motion.
+seeAlso:
+  - sensor
+  - servo-motor
+  - dc-motor
+  - gripper
+  - robot
+tags:
+  - actuators
+  - fundamentals
+lastReviewed: 2025-01-15T00:00:00.000Z
+difficulty: 1
+difficultyLabel: beginner
+oneLiner: The muscles of a robot — converts energy into motion.
+laymanExplanation: >-
+  If sensors are the robot's eyes, actuators are its hands and legs. They're
+  what actually moves the robot.
+analogy: >-
+  An actuator is like your leg muscle — the brain (computer) sends a signal, the
+  muscle contracts, and you move.
+whyItMatters: >-
+  Actuators turn decisions into action. Without them, a robot can think all it
+  wants but can't do anything.
+indianExample: >-
+  ISRO's Chandrayaan-3 lander used actuators to adjust its legs in real time
+  during the Moon landing.
+realRobotsThatUseThis:
+  - Atlas by Boston Dynamics
+  - KUKA KR
+  - Da Vinci Surgical
+mindBlowingFact: >-
+  The human body has over 600 muscles. A humanoid robot like Atlas has only
+  about 28 actuators — but each is roughly 10× stronger per kilogram.
+industryApplications:
+  - manufacturing
+  - surgery
+  - aerospace
+  - automotive
+  - prosthetics
+quizQuestion:
+  q: What are the three main types of actuators used in robots?
+  options:
+    - 'Solid, liquid, gas'
+    - 'Electric, pneumatic, hydraulic'
+    - 'Big, medium, small'
+    - 'Manual, semi-auto, auto'
+  answer: 1
+  explanation: >-
+    Electric (servo/DC motors), pneumatic (air-powered) and hydraulic
+    (fluid-powered) are the three workhorse families.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+technicalDefinition: >-
+  The muscles of a robot — devices that convert electrical or pneumatic energy
+  into mechanical motion.
+---
+
+An **actuator** is the part of a robot that physically moves. Sensors give the robot information; the controller decides what to do; the actuator is what actually does it.
+
+## The three actuator families
+
+- **Electric** — DC motors, brushless motors, servos, stepper motors. Quiet, precise, easy to control. Used in 90% of robots you see.
+- **Pneumatic** — air-powered cylinders and grippers. Fast, light, but messy: needs a compressor and tubes.
+- **Hydraulic** — fluid-powered. Massive force per kilo. Used in heavy excavators, the old hydraulic Atlas, and the most powerful industrial arms.
+
+## Specs that matter
+
+- **Torque** — rotational force the actuator can produce.
+- **Speed** — how fast it can move (RPM for motors, mm/s for linear actuators).
+- **Backlash** — how much "play" exists when reversing direction.
+- **Repeatability** — how consistently the actuator returns to the same position.
+
+[Servo motors](/atlas/concept/servo-motor) are the most common actuator in beginner robotics. [DC motors](/atlas/concept/dc-motor) are the cheapest, and combined with an [encoder](/atlas/concept/encoder) become almost as good as servos for many tasks.

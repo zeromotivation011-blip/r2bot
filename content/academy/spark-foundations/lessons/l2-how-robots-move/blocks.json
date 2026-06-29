@@ -1,0 +1,43 @@
+[
+  {
+    "id": "l2-text",
+    "order_index": 0,
+    "type": "text",
+    "is_required": true,
+    "data": {
+      "estimated_read_minutes": 6,
+      "content_mdx": "Every millimetre of robot movement is something an engineer had to design. Movement isn't free — it costs power, time, and precision.\n\nThe component that turns electricity into motion is called an **actuator**. The most common kind is the **motor**.\n\n## Three motors that run the world\n\n**DC motor** — spins fast and cheaply. ₹50–₹500 on Amazon.in. Used in toys, drones, vacuum cleaners.\n\n**Servo motor** — knows its exact angle. Tell it \"go to 90°\" and it goes. ₹80–₹400 for hobby servos. Used in robotic arms, RC cars, camera gimbals.\n\n**Stepper motor** — moves in tiny precise steps. Used in 3D printers, CNC machines, anything that needs millimetre-accurate motion.\n\n## A simple rule\n\n- Need speed and cheap? DC motor.\n- Need precise position? Servo or stepper.\n- Need force at slow speed? Add a gearbox.\n\nThis is the first design decision in any robot project. Get it wrong and nothing else works."
+    }
+  },
+  {
+    "id": "l2-quiz",
+    "order_index": 1,
+    "type": "quiz-mcq",
+    "is_required": true,
+    "data": {
+      "question": "You're building a robot arm that needs to hold its position at 60° accurately. Which motor type fits best?",
+      "options": [
+        { "id": "a", "text": "DC motor", "correct": false, "explanation": "DC motors spin freely — they don't know what angle they're at." },
+        { "id": "b", "text": "Servo motor", "correct": true, "explanation": "Servos hold position. Tell it 60° and it stays at 60°." },
+        { "id": "c", "text": "Any motor will work", "correct": false, "explanation": "Position-holding is exactly what servos are designed for." },
+        { "id": "d", "text": "Linear actuator", "correct": false, "explanation": "Linear actuators move in straight lines, not angles." }
+      ],
+      "points": 100
+    }
+  },
+  {
+    "id": "l2-flashcards",
+    "order_index": 2,
+    "type": "flashcard",
+    "is_required": false,
+    "data": {
+      "points_per_card": 5,
+      "cards": [
+        { "front": "Actuator", "back": "Anything that turns a signal into physical motion" },
+        { "front": "DC motor", "back": "Cheap, fast, spins continuously" },
+        { "front": "Servo motor", "back": "Holds a specific angle" },
+        { "front": "Stepper motor", "back": "Moves in precise steps — great for printers/CNC" }
+      ]
+    }
+  }
+]

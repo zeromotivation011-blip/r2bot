@@ -1,0 +1,132 @@
+---
+title: "Edge Capstone — Research Robot"
+description: "Design a novel swarm-robotics system for Indian precision agriculture. Full architecture document, ROS2 sketch, deployment plan."
+track: edge
+lesson: 3
+duration: "120 min read"
+url_slug: e-03-capstone-research
+hindi_name: "एज कैपस्टोन"
+xp: 800
+estimated_minutes: 120
+atlas_links: [ros2, mobile-robot, slam, neural-network, edge-computing]
+sources:
+  - name: "Indian Council of Agricultural Research — Precision Agriculture"
+    url: "https://icar.org.in/"
+  - name: "Niqo Robotics — Spot spraying"
+    url: "https://www.niqo.in/"
+  - name: "Khanna et al. — Swarm robotics for agriculture (review)"
+    url: "https://doi.org/10.3390/agriculture12010119"
+---
+
+## What you'll build
+
+A **complete system design** for a swarm of low-cost ground robots that monitor an Indian smallholder farm — soil moisture, pest activity, crop health — and produce a daily report for the farmer. You'll deliver: a 3-page architecture document, a ROS2 implementation sketch, deployment considerations specific to rural India, and an honest risks-and-tradeoffs analysis.
+
+This is the lesson where there's no answer key. You're designing, not following. The artefact is the deliverable — and a strong version of it is what a research PI at IIT Bombay or a senior engineer at Niqo Robotics would expect from a PhD applicant.
+
+## The problem
+
+Indian agriculture is dominated by smallholders — average farm size is 1.08 hectares (vs ~50 hectares in the US). Existing precision-agriculture tools (John Deere monitors, Niqo's tractor-mounted sprayers) assume scale and capital that smallholders don't have. The market for sub-₹50,000 monitoring solutions is open — and barely served.
+
+A swarm of 5–10 small ground robots (~₹15k each) that together cover a 1-hectare field daily could give a farmer:
+- Soil moisture maps (drive sensors into the ground at sample points)
+- Pest scout images (cheap cameras flag visible damage)
+- Crop-height differential (where is growth lagging?)
+- A morning WhatsApp summary
+
+It's a real research question. **TiHAN at IIT Hyderabad** is funding work in this space. **Niqo Robotics** is interested in the ground-truth data. **ICAR-CIAE** (Central Institute of Agricultural Engineering) in Bhopal would partner.
+
+## What to deliver
+
+**Section A: Problem framing (~500 words)**
+- Who is the user? (smallholder, district co-op, agritech startup, govt research)
+- What do they pay for today, and what would they pay for this?
+- What does "good enough" look like in v1?
+
+**Section B: System architecture (1–2 pages, sketches OK)**
+- Individual robot — sensors, compute, motors, power, battery, cost target
+- Fleet — how do they coordinate? Centralised farmer's-phone hub or peer-to-peer?
+- Communication — 4G, LoRaWAN, or wifi from a portable router?
+- Data pipeline — on-robot processing vs cloud sync vs local edge gateway
+
+**Section C: ROS2 implementation sketch (~1 page)**
+- Top-level node graph (which nodes run on robot vs on hub)
+- Topics, services, actions — what flows between them
+- ROS2 vs micro-ROS choice (likely a mix — micro-ROS on the robot, ROS2 on the hub)
+- Multi-robot namespacing scheme (revisit Edge 01)
+
+**Section D: Deployment realities (~400 words)**
+- Rural connectivity — what works at 4G/LTE-NB-IoT/ no signal?
+- Power — solar charging stations, swappable batteries, both?
+- Weather — monsoon, dust, 45°C heat
+- Failure modes — what happens when one robot loses GPS or rolls into a ditch?
+- Support — who fixes a broken robot in a village 200km from Bangalore?
+
+**Section E: Risks & honest tradeoffs (~300 words)**
+- Why might this fail commercially even if the tech works?
+- What's the biggest technical risk?
+- Three things you'd test in a 30-day pilot before scaling
+
+## A starter ROS2 sketch
+
+Per robot:
+
+```
+┌─ Sensors ─┐   ┌─ Perception ─┐   ┌─ Behavior ─┐   ┌─ Comms ─┐
+│ /camera   │──▶│ /detections  │──▶│ /next_goal │──▶│ /upload │
+│ /soil     │──▶│ /soil_signal │──▶│            │   └─────────┘
+│ /gps      │──▶│ /pose        │──▶│            │
+└───────────┘   └──────────────┘   └────────────┘
+                                          │
+                                          ▼
+                                       Nav2 (cut-down)
+```
+
+Hub (the farmer's Android phone + cheap raspberry-pi gateway):
+
+```
+┌─ /upload (all robots) ─┐   ┌─ /reports ─┐   ┌─ WhatsApp ─┐
+│                        │──▶│ aggregate  │──▶│ send daily │
+└────────────────────────┘   └────────────┘   └────────────┘
+            │
+            ▼
+        Plot map / dashboard
+```
+
+Communication: LoRaWAN (free, long range, low bandwidth — perfect for soil readings + GPS + status) for telemetry, then sync image data over wifi when robots return to a charging station.
+
+## Why this matters in 2026
+
+In 2025, India launched the **National Mission on Agricultural Robotics** under the Ministry of Agriculture, allocating ₹1,200 Cr for precision-ag R&D over 5 years (announced Budget 2025). Universities and startups are bidding for grants. A research-quality system design for smallholder swarms is fundable work right now.
+
+If your design is rigorous, the next step is talking to:
+- **TiHAN-IIT Hyderabad** (autonomy fellowships)
+- **ICAR-CIAE Bhopal** (agri partnerships)
+- **Niqo Robotics, EFKON, Tractors and Farm Equipment Ltd (TAFE)** — companies that want to license tech
+
+## Test Your Understanding
+
+This time it's not 3 questions — it's the design document. Below are the *only* three rubric items:
+
+**1.** A technical reviewer (PI at IIT Madras) reads your design and says: "I see how it works. But why won't this fail in the monsoon?" — How do you respond? Be specific about ingress protection, electronics, and fallback modes.
+
+**2.** A business mentor asks: "Show me three measurable outcomes the farmer will care about after one season." — Each outcome should be (a) numerically defined, (b) measurable by the system, (c) tied to a rupee benefit the farmer can describe to their family.
+
+**3.** A senior robotics engineer reads your ROS2 sketch and asks: "Why does each robot run Nav2? That's a lot of compute for a ₹15k robot." — Defend your choice or propose an alternative. There's no single right answer — be specific.
+
+## India Opportunity
+
+If you deliver a serious version of this capstone, you're hireable / fundable for:
+
+- **PhD candidate (Agri-Robotics) · IIT Bombay / IIT Madras / IIT Kharagpur** — full stipend, 5 years.
+- **Research Engineer · TiHAN-IIT Hyderabad** — fellowship-funded research projects, ₹70k–1L/month.
+- **Founding Engineer · agritech startup pre-seed (YC India, Antler, Sequoia Surge)** — equity + ₹15–30 LPA.
+- **Senior Research Engineer · Niqo Robotics, Bharat Electronics** — applied ag-robotics research, ₹24–40 LPA.
+
+## You finished the Edge track
+
+There's no more lesson after this one. Add the design document to your portfolio. Submit it to the [/showcase](/showcase) page on R2BOT — we feature strong work. Apply for research positions and grants. Email it to PIs at IITs.
+
+Robotics in India is being built right now. Your name should be on it.
+
+→ Or revisit: **[Edge 01 · Multi-Robot Systems](/academy/edge/01)** · **[Edge 02 · SLAM from Scratch](/academy/edge/02)**.

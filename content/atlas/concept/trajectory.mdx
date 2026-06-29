@@ -1,0 +1,78 @@
+---
+title: Trajectory
+category: control
+summary: >-
+  A trajectory is a path through space with a time dimension added — specifying
+  not just where a robot should go, but exactly when it should be at each
+  position, with what velocity and acceleration at every instant.
+seeAlso: []
+sources:
+  - title: 'Siciliano et al. — Robotics: Modelling, Planning and Control'
+    url: 'https://www.springer.com/gp/book/9781846286414'
+  - title: >-
+      Biagiotti & Melchiorri — Trajectory Planning for Automatic Machines and
+      Robots
+    url: 'https://link.springer.com/book/10.1007/978-3-540-85629-0'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - control
+  - motion
+  - kinematics
+difficulty: 3
+oneLiner: 'The concept concept: A trajectory is a path through space with'
+laymanExplanation: >-
+  A map shows you the route from Delhi to Jaipur. It tells you the road to take,
+  the towns you'll pass through, the turns you'll make. But the map has no idea
+  whether you'll drive at 80 km/h or 120 km/h, whether you'll brake gently or
+  stamp on the pedal, or whether you'll arrive in three hours or five. The route
+  and the timing are two different things.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without trajectory, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A trajectory is a path through space with a time dimension added — specifying
+  not just where a robot should go, but exactly when it should be at each
+  position, with what velocity and acceleration at every instant.
+slug: trajectory
+bucket: concept
+---
+
+A map shows you the route from Delhi to Jaipur. It tells you the road to take, the towns you'll pass through, the turns you'll make. But the map has no idea whether you'll drive at 80 km/h or 120 km/h, whether you'll brake gently or stamp on the pedal, or whether you'll arrive in three hours or five. The route and the timing are two different things.
+
+In [robotics](/atlas/concept/robotics), the route is a **path**. The path plus the timing — when you're at each point, how fast you're moving, how quickly you're accelerating — is a **trajectory**.
+
+## What a trajectory specifies
+
+A trajectory is a function that maps time to [robot](/atlas/concept/robot) state. At every instant *t*, it tells you the robot's position, velocity, and usually acceleration. In a robotic arm, this means [joint](/atlas/concept/joint) angles, joint velocities, and joint accelerations as functions of time. In a [mobile robot](/atlas/concept/mobile-robot), it means x/y position, heading, and linear/angular velocity at every moment.
+
+The distinction matters enormously for real hardware. A motor can only follow commands it is physically capable of executing — it has a maximum speed, a maximum torque, and limits on how fast it can change velocity. A trajectory that violates these limits either fails silently (the robot doesn't follow it) or trips a fault. Good trajectory planning explicitly respects these physical constraints.
+
+## Smooth curves: why simple isn't enough
+
+The most obvious trajectory between two arm poses would be a straight line in joint space. But a straight line has instantaneous velocity changes at start and stop — mathematically, infinite acceleration — which would violently jerk the arm and stress the gearboxes. Instead, engineers use **polynomial trajectories** (cubic or quintic splines) that smoothly ramp velocity up from zero, cruise, then taper back to zero at the goal. The result is a smooth S-shaped velocity profile and no mechanical shock.
+
+## A real example: CNC machining
+
+A 5-axis CNC milling machine cutting a turbine blade follows a trajectory planned to keep the cutting tool in continuous smooth contact with the surface. The trajectory specifies tool position and orientation at every millisecond. If the velocity profile is poorly designed, the machine vibrates and leaves surface marks — measurable as chatter — on the expensive part. Trajectory smoothness is a manufacturing quality issue, not just an academic one.
+
+## Why trajectory matters in robotics
+
+An arm that follows a valid trajectory can be tuned for speed (compress the time scale), safety (expand it), or energy efficiency (optimise the shape). Autonomous vehicles plan trajectories that passengers find comfortable — low jerk, predictable braking. Surgical robots plan trajectories that minimise tissue stress. The trajectory is where physics, control, and application requirements meet.
+
+---
+
+*The concept of "jerk" — the rate of change of acceleration — was formalised partly because engineers noticed that smooth trajectories feel better to humans and cause less wear on machines.*

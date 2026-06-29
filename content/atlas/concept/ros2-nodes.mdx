@@ -1,0 +1,75 @@
+---
+title: ROS2 Nodes — Complete Guide for Robotics
+summary: >-
+  A ROS2 node is a single-process unit of computation that publishes and
+  subscribes to topics, services, and actions. Nodes are the building blocks of
+  every ROS2 robot.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - ros2
+  - node
+  - middleware
+seeAlso:
+  - ros2
+  - ros2-topics
+  - ros2-services
+  - ros2-actions
+difficulty: 3
+oneLiner: 'The concept concept: A ROS2 node is a single-process unit of'
+laymanExplanation: >-
+  A ROS2 node is a process — a single program — that performs one focused task
+  in a robot. Examples: read a camera, run a navigation stack, control a motor.
+  A real robot typically runs 20–100 nodes simultaneously, each communicating
+  over topics, services, and actions.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros2 nodes — complete guide for robotics, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A ROS2 node is a single-process unit of computation that publishes and
+  subscribes to topics, services, and actions. Nodes are the building blocks of
+  every ROS2 robot.
+slug: ros2-nodes
+bucket: concept
+---
+
+# ROS2 Nodes
+
+## What is it?
+
+A ROS2 node is a process — a single program — that performs one focused task in a robot. Examples: read a camera, run a navigation stack, control a motor. A real robot typically runs 20–100 nodes simultaneously, each communicating over topics, services, and actions.
+
+## How it works
+
+When a node starts, it registers itself with the ROS2 graph by name. It can then create publishers, subscribers, service clients/servers, and action clients/servers. Nodes can be implemented in C++ (`rclcpp`) or Python (`rclpy`). They can be run individually with `ros2 run`, or composed into a single process for efficiency.
+
+## Real-world example
+
+A typical Spot deployment runs a `lidar_driver` node, a `state_estimator` node, a `nav2_planner` node, and a `motor_controller` node — all talking to each other over topics. Indian companies like GreyOrange follow the same pattern in their warehouse robots.
+
+## Why it matters for robotics
+
+Thinking in terms of small, single-purpose nodes is the ROS2 design philosophy. It makes systems modular, testable, and language-agnostic. Every ROS2 interview asks about node design.
+
+## See also
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Topics](/atlas/concept/ros2-topics)
+- [Ros2 Services](/atlas/concept/ros2-services)
+- [Ros2 Actions](/atlas/concept/ros2-actions)

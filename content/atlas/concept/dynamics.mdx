@@ -1,0 +1,78 @@
+---
+title: Dynamics (robotics)
+category: fundamentals
+summary: >-
+  Dynamics extends kinematics by adding forces and torques to the picture — it
+  explains why a robot moves, not just how. Understanding dynamics is what
+  separates a robot that moves smoothly and efficiently from one that shakes,
+  stalls, or tips over.
+seeAlso: []
+sources:
+  - title: >-
+      Modern Robotics: Mechanics, Planning, and Control — Lynch & Park
+      (Northwestern)
+    url: 'https://modernrobotics.northwestern.edu/'
+  - title: Robot Dynamics — ETH Zurich Robotics Systems Lab
+    url: 'https://rsl.ethz.ch/education-students/lectures/robot-dynamics.html'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - mechanics
+  - control
+difficulty: 3
+oneLiner: 'The concept concept: Dynamics extends kinematics by adding forces and torques'
+laymanExplanation: >-
+  Push an empty shopping trolley and it moves easily. Push one piled with bricks
+  and your muscles have to work much harder, even though the wheels roll the
+  same way. The difference has nothing to do with geometry — it is entirely
+  about mass, inertia, and force. That difference is exactly what **dynamics**
+  is about.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without dynamics (robotics), many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Dynamics extends kinematics by adding forces and torques to the picture — it
+  explains why a robot moves, not just how. Understanding dynamics is what
+  separates a robot that moves smoothly and efficiently from one that shakes,
+  stalls, or tips over.
+slug: dynamics
+bucket: concept
+---
+
+Push an empty shopping trolley and it moves easily. Push one piled with bricks and your muscles have to work much harder, even though the wheels roll the same way. The difference has nothing to do with geometry — it is entirely about mass, inertia, and force. That difference is exactly what **dynamics** is about.
+
+Where [kinematics](/atlas/concept/kinematics) describes the geometry of motion — positions and angles — **dynamics** describes the causes of motion: forces, torques, mass, inertia, and friction. In [robotics](/atlas/concept/robotics), it answers questions like: how much torque must this motor produce to hold the arm level against gravity? If the arm is swinging fast and the payload is heavy, how much overshoot will there be when it stops? How should the controller compensate for the fact that the arm's effective inertia changes as it extends and retracts?
+
+## The two directions of dynamics
+
+Just as kinematics has a forward and inverse version, so does dynamics. **Forward dynamics** takes the forces and torques applied to a [robot](/atlas/concept/robot) and computes the resulting accelerations and motion. This is what a physics simulation runs: given these motor outputs, what will the robot do? **Inverse dynamics** takes a desired motion and computes what forces and torques are needed to produce it. This is what a robot controller runs in practice: given that I want the arm to follow this [trajectory](/atlas/concept/trajectory), how hard must each motor work at each moment?
+
+Inverse dynamics calculations are the foundation of **model-based control** — sophisticated control strategies that use a mathematical model of the robot's physics to pre-compute appropriate motor commands, rather than just reacting to errors after they occur.
+
+## Why gravity is a constant enemy
+
+Gravity is the most persistent dynamic force a robot deals with. A six-joint arm extended horizontally has significant gravitational torques on its shoulder and elbow joints, which the motors must counteract continuously just to hold the arm still. If the controller ignores dynamics and treats all joints as if gravity didn't exist, the arm sags. Real industrial arms from companies like KUKA and ABB include carefully tuned gravity compensation in their controllers as a baseline requirement.
+
+## Dynamics in legged robots
+
+Dynamics becomes even more critical for legged robots, which must balance and manage momentum while walking. [Boston Dynamics](/atlas/company/boston-dynamics)' [Atlas](/atlas/robot/atlas) [humanoid robot](/atlas/concept/humanoid-robot) runs a full dynamics model in real time to keep itself upright — it is constantly predicting how its body will respond to a given leg push, taking into account the inertia of every limb. Without this, a step on uneven ground would topple it. With it, Atlas can run, jump, and do backflips.
+
+---
+
+*Could a robot learn to move gracefully without ever being given an explicit model of its own mass and inertia — and if so, what would it have to learn instead?*

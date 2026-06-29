@@ -1,0 +1,112 @@
+---
+title: Servo motor
+hindi_name: सर्वो मोटर
+phonetic: SUR-voh MOH-ter
+category: actuators
+summary: >-
+  A servo motor is a small motor that knows its own angle — you tell it where to
+  point, and it goes there and holds.
+seeAlso:
+  - pwm
+  - robot
+  - optimus
+sources:
+  - title: Adafruit — Servo motor basics
+    url: 'https://learn.adafruit.com/adafruit-motor-shield/dc-motor'
+  - title: Hitec — RC servos technical guide
+    url: 'https://hitecrcd.com/products/servos'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - actuators
+  - beginner
+difficulty: 3
+oneLiner: 'The concept concept: A servo motor is a small motor that'
+laymanExplanation: >-
+  A servo motor is a small motor that knows its own angle. You tell it "point to
+  90 degrees" and it rotates there — and *holds* — no matter what tries to push
+  it back.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without servo motor, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Da Vinci Surgical Robot
+  - KUKA KR
+  - DIY Arduino robots
+indianExample: >-
+  Arduino kits sold in India come with SG90 servo motors — every student who has
+  built a robot arm has used one.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What signal does a servo motor use to know what position to go to?
+  options:
+    - Bluetooth signal
+    - PWM (Pulse Width Modulation) signal
+    - Wi-Fi packet
+    - Sound wave
+  answer: 1
+  explanation: >-
+    A servo decodes the width of a pulse (PWM) — a short pulse means one angle,
+    a longer pulse means another.
+mindBlowingFact: >-
+  A Da Vinci surgical robot's servo motors can position a scalpel with 0.1 mm
+  accuracy — about 10× more precise than a human hand.
+industryApplications:
+  - surgery
+  - manufacturing
+  - RC vehicles
+  - robotics education
+  - aerospace
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A servo motor is a small motor that knows its own angle — you tell it where to
+  point, and it goes there and holds.
+slug: servo-motor
+bucket: concept
+---
+
+A servo motor is a small motor that knows its own angle. You tell it "point to 90 degrees" and it rotates there — and *holds* — no matter what tries to push it back.
+
+That's the magic. A regular [DC motor](/atlas/concept/dc-motor) just spins as long as you apply power. A servo *positions itself* — and stays. It's the difference between a fan (just spin) and a [robot](/atlas/concept/robot) arm [joint](/atlas/concept/joint) (move precisely and hold).
+
+## What's inside
+
+Crack open a typical hobby servo (like an SG90, which costs less than ₹150) and you'll find:
+
+1. **A small DC motor** — the part that does the actual spinning.
+2. **A gearbox** — slows the motor down and multiplies its torque, the way bicycle gears do.
+3. **A potentiometer** — a sensor that measures the current angle of the output shaft.
+4. **A control board** — a tiny circuit that compares "where am I" (from the potentiometer) to "where do I want to be" (from your command). If there's a difference, it powers the motor in the right direction. When they match, it stops.
+
+That's a **[closed-loop control](/atlas/concept/closed-loop-control) system** — the simplest, most common form in [robotics](/atlas/concept/robotics). Even billion-dollar humanoid robots use the same idea, just with fancier sensors and motors.
+
+## How you tell it where to go
+
+You send a [PWM](/atlas/concept/pwm) signal — see the entry on PWM for how that works in general.
+
+For a standard hobby servo, the rule is:
+- **1.0 ms pulse** = 0° (one extreme)
+- **1.5 ms pulse** = 90° (centre)
+- **2.0 ms pulse** = 180° (the other extreme)
+
+The pulse repeats every 20 ms. The servo board measures the length of each pulse and adjusts.
+
+## Continuous-rotation servos
+
+Some servos are modified to spin continuously instead of holding an angle. In those, the PWM signal controls *speed and direction* — 1.5 ms means stopped, 1.0 ms is full speed one way, 2.0 ms is full speed the other.
+
+These are popular for small wheeled robots, because you can drive them straight from an Arduino without a motor driver.
+
+## What servos can and can't do
+
+**Can do:** precise positioning, slow movements, holding heavy weights against gravity (within their torque rating).
+
+**Can't do:** spin really fast (most hobby servos top out at 60° per 0.1-0.2 seconds), handle very large loads without stripping their plastic gears (metal-gear servos help), or run for years under heavy load without wearing out.
+
+For serious robotics — robot arms, drones, humanoid joints — engineers move up from hobby servos to **brushless motors with encoders** and proper motor drivers. Same closed-loop idea, just much more powerful and precise.
+
+---
+
+*Curious how an [Optimus](/atlas/robot/optimus) humanoid uses motors like these (just thousands of times bigger)? Read Optimus.*

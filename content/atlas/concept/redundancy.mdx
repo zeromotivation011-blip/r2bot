@@ -1,0 +1,78 @@
+---
+title: Redundancy (robotics)
+category: fundamentals
+summary: >-
+  Redundancy in robotics means having more capability than the minimum strictly
+  required — extra joints, extra sensors, extra computers — so that if one
+  component fails, the system can continue operating. It is the engineering
+  principle behind reliable machines.
+seeAlso: []
+sources:
+  - title: NASA Systems Engineering Handbook (SP-2016-6105)
+    url: 'https://www.nasa.gov/connect/ebooks/nasa-systems-engineering-handbook'
+  - title: IEC 61508 — Functional Safety of Electrical Systems
+    url: 'https://www.iec.ch/functional-safety'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - reliability
+  - safety
+difficulty: 3
+oneLiner: 'The concept concept: Redundancy in robotics means having more capability than'
+laymanExplanation: >-
+  Commercial aircraft engines are certified to fail at most once every billion
+  flight hours. Yet every commercial aircraft carries at least two engines. Not
+  because the engineers don't trust their own reliability figures, but because
+  when a machine carries human lives, "extremely unlikely" is not the same as
+  "acceptable." The extra engine is not wasteful — it 
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without redundancy (robotics), many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Redundancy in robotics means having more capability than the minimum strictly
+  required — extra joints, extra sensors, extra computers — so that if one
+  component fails, the system can continue operating. It is the engineering
+  principle behind reliable machines.
+slug: redundancy
+bucket: concept
+---
+
+Commercial aircraft engines are certified to fail at most once every billion flight hours. Yet every commercial aircraft carries at least two engines. Not because the engineers don't trust their own reliability figures, but because when a machine carries human lives, "extremely unlikely" is not the same as "acceptable." The extra engine is not wasteful — it is the entire reason passengers board without a second thought.
+
+That principle — carrying more capability than the bare minimum, so that failure of any single part doesn't bring down the whole system — is called **redundancy**, and it appears throughout engineering. In [robotics](/atlas/concept/robotics), it shows up in at least three distinct ways.
+
+## Mechanical redundancy
+
+A [robot](/atlas/concept/robot) arm needs a minimum of six joints ([degrees of freedom](/atlas/concept/degrees-of-freedom)) to position its [end effector](/atlas/concept/end-effector) at any point in 3D space with any orientation. An arm with seven joints has one extra — a **kinematically redundant** configuration. That extra [joint](/atlas/concept/joint) means there are multiple valid ways to reach the same target position, giving the arm options it wouldn't otherwise have. It can choose the configuration that avoids an obstacle, moves away from a singularity (a joint alignment where control becomes unstable), or minimises joint torques. The Franka Emika Panda and the KUKA LBR iiwa both use seven-joint designs for exactly this reason.
+
+## Sensor redundancy
+
+Critical measurements are often taken by two or three independent sensors. A spacecraft attitude control system might use three separate gyroscopes: not because one isn't accurate enough, but so that the system can detect and isolate a faulty sensor by comparing its reading to the others. Two sensors agreeing and one disagreeing identifies which one has failed. This pattern — called **voting** — is used in aviation, nuclear control systems, and any application where a single sensor failure must not cause catastrophe. Modern self-driving cars carry redundant cameras, radar, and [lidar](/atlas/concept/lidar) precisely so that the failure of any one sensor leaves the others intact.
+
+## Computational redundancy
+
+Mission-critical computers are duplicated. The Apollo Guidance Computer had a backup mode. Airbus fly-by-wire aircraft run three independent flight-control computers simultaneously. [Industrial robot](/atlas/concept/industrial-robot) controllers in safety-rated systems (meeting standards like IEC 61508 SIL 3) use dual-processor architectures where both processors run the same computation and the outputs are compared — any discrepancy triggers a safe stop.
+
+## The cost of redundancy
+
+Redundancy is not free. Extra joints mean extra mass, extra motors, extra control complexity. Extra sensors mean extra cost, extra wiring, extra data to process. Extra computers mean extra weight and power consumption. Every engineering decision about redundancy is a trade-off between reliability and cost, mass, and complexity. The right answer depends entirely on the consequences of failure — a toy robot and a [surgical robot](/atlas/concept/surgical-robot) justify very different levels of redundancy.
+
+---
+
+*Is there a point at which adding more redundancy to a system actually makes it less reliable — by introducing more components that can fail and more interactions between them?*

@@ -1,0 +1,77 @@
+---
+title: Link (robot mechanism)
+category: hardware
+summary: >-
+  A link is the rigid segment between two joints in a robot — the structural
+  member that transmits forces and defines the geometry of the kinematic chain,
+  the way a bone connects two joints in a limb.
+seeAlso: []
+sources:
+  - title: 'Craig, J.J. — Introduction to Robotics: Mechanics and Control (3rd ed.)'
+    url: >-
+      https://www.pearson.com/en-us/subject-catalog/p/introduction-to-robotics-mechanics-and-control/P200000003486
+  - title: 'Siciliano et al. — Robotics: Modelling, Planning and Control'
+    url: 'https://link.springer.com/book/10.1007/978-1-84628-642-1'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - hardware
+  - mechanical
+  - kinematics
+difficulty: 3
+oneLiner: 'The concept concept: A link is the rigid segment between two'
+laymanExplanation: >-
+  Your upper arm is a rigid rod of bone. It does not bend in the middle. At one
+  end, your shoulder joint connects it to your torso; at the other end, your
+  elbow joint connects it to your forearm. The bone itself is not where the
+  motion happens — it just carries force from one end to the other. In robotics,
+  that bone is called a link.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without link (robot mechanism), many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A link is the rigid segment between two joints in a robot — the structural
+  member that transmits forces and defines the geometry of the kinematic chain,
+  the way a bone connects two joints in a limb.
+slug: link-robot
+bucket: concept
+---
+
+Your upper arm is a rigid rod of bone. It does not bend in the middle. At one end, your shoulder [joint](/atlas/concept/joint) connects it to your torso; at the other end, your elbow joint connects it to your forearm. The bone itself is not where the motion happens — it just carries force from one end to the other. In [robotics](/atlas/concept/robotics), that bone is called a link.
+
+A **link** is any rigid structural segment in a [robot](/atlas/concept/robot) that connects two joints. It does not move on its own; it transmits the effect of movement from one joint to the next. Together, a sequence of links and joints forms a **kinematic chain** — the formal term for an arm, a leg, or any serially connected mechanism.
+
+## What a link actually does
+
+A link has two main jobs. First, it maintains a fixed geometric relationship between the joint at each of its ends — if link two is 300 mm long, joint three will always be exactly 300 mm from joint two regardless of how the arm moves. That geometric rigidity is what makes robot [kinematics](/atlas/concept/kinematics) predictable and mathematically tractable. Second, it carries loads: when a robot arm picks up an object, the weight travels back through each link and joint to the base, and each link must be stiff and strong enough not to deform under that load.
+
+## Describing a link: the Denavit-Hartenberg convention
+
+Robotics engineers need a standard way to describe the geometry of a link — its length, its twist, and how it connects to the joints at each end. The most widely used convention was proposed by Jacques Denavit and Richard Hartenberg in 1955. Each link is characterised by four parameters: two distances and two angles. Feed those parameters into a transformation matrix and you can calculate exactly where the end of a robot arm is in space given any set of joint angles. This is the foundation of **[forward kinematics](/atlas/concept/forward-kinematics)**.
+
+## Physical design
+
+Links are typically hollow tubes, machined plates, or cast structures in aluminium or carbon fibre. The goal is maximum stiffness with minimum mass. A link that flexes under load will cause the end-effector (the hand or tool at the tip of the arm) to be in the wrong position, introducing positioning errors. Long links also amplify angular errors at earlier joints — a 0.1° error at the shoulder of a 1-metre arm produces a 1.7 mm positional error at the tip.
+
+## The base link and the end link
+
+The first link in a serial chain, attached to the stationary base of the robot, is called the **base link**. The last link, at the free end where a [gripper](/atlas/concept/gripper) or tool is mounted, is sometimes called the end link or the terminal link. The **end-effector** (gripper, welding torch, [camera](/atlas/concept/camera-vision)) attaches to that last link.
+
+---
+
+*The mathematical framework for describing links and joints — Denavit-Hartenberg parameters — was published in a mechanical engineering journal in 1955, a decade before anyone had built a robot arm sophisticated enough to need it.*

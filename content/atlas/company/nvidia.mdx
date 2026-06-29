@@ -1,0 +1,87 @@
+---
+title: NVIDIA (the robotics platform company)
+summary: >-
+  NVIDIA isn't a robot company. It's the company that powers most of the world's
+  robot brains — through its Jetson computers, Isaac simulator, and Cosmos
+  foundation models for robotics.
+seeAlso:
+  - reinforcement-learning
+  - computer-vision
+  - optimus
+sources:
+  - title: NVIDIA Isaac — robotics platform
+    url: 'https://developer.nvidia.com/isaac'
+  - title: NVIDIA Jetson — edge AI compute
+    url: 'https://developer.nvidia.com/embedded-computing'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - companies
+  - ai-platform
+difficulty: 3
+oneLiner: 'The company concept: NVIDIA isn''t a robot company. It''s the company'
+laymanExplanation: >-
+  NVIDIA isn't a robot company. It's the company that powers most of the world's
+  robot brains. From the tiny Jetson computer inside a delivery drone, to the
+  massive H100 GPU running an Optimus training cluster, to the simulator where a
+  Unitree H1 learned to walk before its first physical step — NVIDIA hardware
+  and software touches almost every modern robot.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without nvidia (the robotics platform company), many company systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  NVIDIA isn't a robot company. It's the company that powers most of the world's
+  robot brains — through its Jetson computers, Isaac simulator, and Cosmos
+  foundation models for robotics.
+slug: nvidia
+bucket: company
+---
+
+NVIDIA isn't a [robot](/atlas/concept/robot) company. It's the company that powers most of the world's robot brains. From the tiny Jetson computer inside a delivery [drone](/atlas/concept/drone), to the massive H100 GPU running an [Optimus](/atlas/robot/optimus) training cluster, to the simulator where a [Unitree](/atlas/company/unitree) H1 learned to walk before its first physical step — NVIDIA hardware and software touches almost every modern robot.
+
+## The three pillars
+
+**Jetson** — small computers designed for AI inference at the edge. Jetson Nano (~₹15k) powers educational robots. Jetson Orin (~₹70k+) powers commercial robots. Jetson Thor (~₹2.5L+, 2024 release) is targeted specifically at humanoids and powers Figure 03, the new electric [Atlas](/atlas/robot/atlas), and a long list of others.
+
+**Isaac** — NVIDIA's [robotics](/atlas/concept/robotics) development platform. Has two parts:
+- **Isaac Sim** — a physics simulator built on Omniverse, accurate enough to do [sim-to-real](/atlas/concept/sim-to-real) training. This is where most modern robotics policies are first trained.
+- **Isaac [ROS](/atlas/concept/ros)** — a set of GPU-accelerated ROS 2 packages for perception, [SLAM](/atlas/concept/slam), and navigation.
+
+**Cosmos** — NVIDIA's "world foundation models" for robotics. Announced in 2025, these are pre-trained models that understand physics, objects, and motion. Robot makers fine-tune Cosmos for their specific application instead of training from scratch.
+
+## Why NVIDIA matters more than any single robot company
+
+A 2026 humanoid is, essentially, a Jetson Thor computer wrapped in actuators and sensors. The brain is the limit. The brain is NVIDIA. This means NVIDIA captures value from every humanoid program — [Tesla](/atlas/company/tesla) being the lone exception (they design their own AI chips for cars and Optimus).
+
+The strategic position is similar to Intel in PCs (1990s) or ARM in smartphones (2010s) — sell the picks-and-shovels to every gold miner.
+
+## Where it fits in India
+
+Indian robotics startups overwhelmingly build on Jetson. The CDAC and IISc robotics groups train on Isaac Sim. The Make in India electronics initiative has spurred local distribution and import simplification. As of 2026, India's largest single concentration of Jetson devices is at L&T's defence robotics division, with growing presence at IIT Madras, IIT Bombay, and a long tail of startups.
+
+## What's interesting next
+
+**Project GR00T** — NVIDIA's specific humanoid foundation model effort, announced 2024. The goal: a generalist humanoid model that any robot company can fine-tune. If GR00T works as advertised, it shortens humanoid time-to-market for every player except Tesla.
+
+**Cosmos for industrial automation** — extending the foundation-model idea to robotic arms and warehouse robots.
+
+NVIDIA's worst-case scenario is that one robot company (probably Tesla) succeeds at vertical integration and proves the picks-and-shovels strategy doesn't generalise. Their best-case scenario is that every humanoid company stays specialised — and they sell brains to all of them.
+
+---
+
+*Curious how a [neural network](/atlas/concept/neural-network) for vision actually works on a Jetson? Read [Computer vision](/atlas/concept/computer-vision) (for robots).*

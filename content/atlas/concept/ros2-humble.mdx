@@ -1,0 +1,129 @@
+---
+title: ROS2 Humble — Complete Guide | R2BOT
+summary: >-
+  ROS2 Humble Hawksbill is a long-term-support release running on Ubuntu 22.04.
+  The current default in nearly every production robotics deployment.
+category: control
+bucket: ros2-ecosystem
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - ros2
+  - humble
+  - distro
+  - lts
+  - ubuntu
+relatedTerms:
+  - ros2
+  - ros2-nodes
+  - ros2-launch
+  - ros2-jazzy
+seeAlso:
+  - ros2
+  - ros2-nodes
+  - ros2-launch
+  - ros2-jazzy
+youtubeSearchQuery: ROS2 Humble installation tutorial
+oneLiner: >-
+  The ros2 ecosystem concept: ROS2 Humble Hawksbill is a long-term-support
+  release running
+laymanExplanation: >-
+  ROS2 Humble Hawksbill is the long-term-support (LTS) release of ROS2, first
+  released in May 2022 and supported until May 2027. It runs on Ubuntu 22.04 and
+  is the most widely deployed ROS2 distribution in production today.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros2 humble — complete guide | r2bot, many ros2 ecosystem systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  ROS2 Humble Hawksbill is a long-term-support release running on Ubuntu 22.04.
+  The current default in nearly every production robotics deployment.
+slug: ros2-humble
+---
+
+# ROS2 Humble
+
+## What is ROS2 Humble?
+
+ROS2 Humble Hawksbill is the long-term-support (LTS) release of ROS2, first released in May 2022 and supported until May 2027. It runs on Ubuntu 22.04 and is the most widely deployed ROS2 distribution in production today.
+
+## How It Works
+
+Each ROS2 distro is a versioned snapshot of the entire stack — rclcpp/rclpy, DDS bindings, common packages, and tooling — released alongside a specific Ubuntu version. Humble shipped major improvements to lifecycle nodes, security (SROS2), and the launch system. The LTS designation means bug fixes and binary releases continue for five years — perfect for fleet deployments where you cannot upgrade casually.
+
+## Real-World Example
+
+Most Nav2, MoveIt2, and Isaac ROS releases target Humble first. Boston Dynamics' ROS2 SDK is Humble-based. Indian academic robotics programmes (IIT Bombay, IIT Madras, IIIT Hyderabad) standardise on Humble for their courses.
+
+## Why It Matters for Robotics
+
+Choosing the right ROS2 distro is one of the first decisions for any robotics project. Humble's LTS status makes it the safe choice for production. Knowing the differences between Humble, Iron, and Jazzy is standard ROS2 interview material.
+
+## Try It Yourself
+
+Install ROS2 Humble on Ubuntu 22.04 (or in Docker if you're on Mac/Windows): follow the official `apt install ros-humble-desktop` guide. Run the talker/listener demo — your first ROS2 nodes communicating live.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "ROS2 Humble runs on which Ubuntu version?",
+    "options": [
+      "Ubuntu 22.04",
+      "Ubuntu 18.04",
+      "Ubuntu 24.04",
+      "Ubuntu 14.04"
+    ],
+    "answer": 0,
+    "explain": "Humble targets Ubuntu 22.04 (Jammy)."
+  },
+  {
+    "q": "Humble is supported until:",
+    "options": [
+      "Forever",
+      "May 2027",
+      "Yesterday",
+      "Until 2030"
+    ],
+    "answer": 1,
+    "explain": "As an LTS release, Humble has 5 years of support from May 2022."
+  },
+  {
+    "q": "A typical reason to choose Humble over a non-LTS distro:",
+    "options": [
+      "It has fewer features",
+      "It is the latest experimental release",
+      "5-year support window for production stability",
+      "It has no documentation"
+    ],
+    "answer": 2,
+    "explain": "LTS = stability and predictable maintenance — ideal for fleet deployments."
+  }
+]
+```
+
+## Further Reading
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Nodes](/atlas/concept/ros2-nodes)
+- [Ros2 Launch](/atlas/concept/ros2-launch)
+- [Ros2 Jazzy](/atlas/concept/ros2-jazzy)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain ROS2 Humble for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

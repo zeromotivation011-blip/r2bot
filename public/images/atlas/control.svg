@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="Feedback control loop block diagram">
+  <rect width="800" height="400" fill="#050810"/>
+  <g stroke="#00B8D4" fill="none" stroke-width="1.6">
+    <g opacity="0.18" stroke-width="1">
+      <path d="M0 80 H800 M0 160 H800 M0 240 H800 M0 320 H800"/>
+      <path d="M100 0 V400 M300 0 V400 M500 0 V400 M700 0 V400"/>
+    </g>
+    <path d="M40 200 L130 200"/>
+    <circle cx="160" cy="200" r="22" fill="#050810"/>
+    <line x1="148" y1="200" x2="172" y2="200"/>
+    <line x1="160" y1="188" x2="160" y2="212"/>
+    <path d="M182 200 L240 200"/>
+    <rect x="240" y="170" width="120" height="60" fill="#050810"/>
+    <path d="M360 200 L420 200"/>
+    <rect x="420" y="170" width="140" height="60" fill="#050810"/>
+    <path d="M560 200 L640 200"/>
+    <path d="M640 200 L760 200" stroke-dasharray="4 4"/>
+    <path d="M620 200 L620 300 L160 300 L160 222" />
+    <rect x="380" y="280" width="120" height="40" fill="#050810"/>
+    <polygon points="174,196 184,200 174,204" fill="#00B8D4" stroke="none"/>
+    <polygon points="354,196 364,200 354,204" fill="#00B8D4" stroke="none"/>
+    <polygon points="554,196 564,200 554,204" fill="#00B8D4" stroke="none"/>
+    <polygon points="156,228 160,218 164,228" fill="#00B8D4" stroke="none"/>
+  </g>
+  <g font-family="'JetBrains Mono', monospace" fill="#E8ECF1" font-size="14" text-anchor="middle">
+    <text x="300" y="205">Controller</text>
+    <text x="490" y="205">Plant</text>
+    <text x="440" y="305">Sensor</text>
+  </g>
+  <g font-family="'JetBrains Mono', monospace" fill="#00B8D4" font-size="11" letter-spacing="2">
+    <text x="46" y="190">r(t)</text>
+    <text x="195" y="190">e</text>
+    <text x="585" y="190">y(t)</text>
+    <text x="120" y="278" opacity="0.7">−</text>
+  </g>
+  <g font-family="'JetBrains Mono', monospace" fill="#E8ECF1" font-size="12" letter-spacing="3">
+    <text x="40" y="50">CONTROL · FEEDBACK LOOP</text>
+  </g>
+</svg>

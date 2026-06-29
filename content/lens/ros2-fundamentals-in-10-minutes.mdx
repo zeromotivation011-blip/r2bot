@@ -1,0 +1,47 @@
+---
+title: ROS2 fundamentals — the 10-minute version of a 6-hour tutorial
+summary: Nodes, topics, services, actions, and DDS. Skip the historical detour through ROS1; here's the working mental model for ROS2.
+topic: ROS2
+durationSeconds: 600
+originalDurationSeconds: 21600
+externalUrl: https://docs.ros.org/en/humble/Tutorials.html
+publishedAt: 2026-04-29
+relatedAtlas:
+  - { type: concept, slug: ros2 }
+  - { type: concept, slug: ros-node }
+  - { type: concept, slug: ros-topic }
+---
+
+The single best mental model for ROS2: **everything is a process talking to other processes over a deterministic message bus.**
+
+## The five primitives
+
+**Nodes** are processes. Each does one thing — read from a sensor, run a controller, drive a motor. Nodes can be Python or C++. They start and stop independently.
+
+**Topics** are named channels for one-way streams. A camera node publishes to `/camera/image_raw`; any node that wants frames subscribes. Topics use a pub-sub model — many publishers, many subscribers, all loosely coupled.
+
+**Services** are request/response. Useful when you want a definite reply: "give me the current state of the gripper," "spawn a turtle at (3, 4)."
+
+**Actions** are services for long-running tasks with feedback. "Navigate to this point" returns periodic progress updates and a final success/fail. Most robot motion uses actions.
+
+**Parameters** are per-node config — set at startup, can be changed at runtime. Like environment variables for nodes.
+
+## DDS — the bit that's different from ROS1
+
+ROS2 runs on **DDS (Data Distribution Service)**, an industrial pub-sub middleware standard. DDS does the discovery (nodes find each other automatically), the serialization (turning structs into bytes), the QoS (reliability, durability, latency). You don't write any of this — you write nodes; DDS handles the wiring.
+
+This is the single biggest improvement over ROS1: no more `roscore` central master. Drop a new node onto the network and it just shows up.
+
+## The minimum command set
+
+- `ros2 run <pkg> <node>` — start a node
+- `ros2 topic list` / `ros2 topic echo /foo` — see what's flowing
+- `ros2 service call ...` — invoke a service
+- `ros2 launch <pkg> <file>` — start many nodes from one config
+- `colcon build` — build the workspace
+
+Spend an evening with these five commands on a turtlesim and you've crossed the ROS2 starting line.
+
+---
+
+*Then read [ROS2](/atlas/concept/ros2) and [Nodes & Topics](/atlas/concept/ros-node) for the full reference.*

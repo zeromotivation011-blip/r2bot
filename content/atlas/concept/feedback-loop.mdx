@@ -1,0 +1,75 @@
+---
+title: Feedback Loop in Robotics — Complete Guide
+summary: >-
+  A feedback loop continuously measures a robot's output and adjusts its input
+  to reach a desired target. It is the most fundamental control concept in all
+  of robotics.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - control
+  - pid
+  - closed-loop
+seeAlso:
+  - pid-controller
+  - closed-loop-control
+  - feedback
+  - state-machine
+difficulty: 3
+oneLiner: 'The concept concept: A feedback loop continuously measures a robot''s output'
+laymanExplanation: >-
+  A feedback loop is a control structure where the system measures its own
+  output, compares it with a target (the setpoint), computes the error, and
+  feeds that error back into the input to drive the output toward the target.
+  It's the backbone of every stable robotic system.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without feedback loop in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A feedback loop continuously measures a robot's output and adjusts its input
+  to reach a desired target. It is the most fundamental control concept in all
+  of robotics.
+slug: feedback-loop
+bucket: concept
+---
+
+# Feedback Loop in Robotics
+
+## What is it?
+
+A feedback loop is a control structure where the system measures its own output, compares it with a target (the setpoint), computes the error, and feeds that error back into the input to drive the output toward the target. It's the backbone of every stable robotic system.
+
+## How it works
+
+The loop has four parts: a sensor that measures the actual output, a comparator that subtracts measured from desired to compute error, a controller (often PID) that converts error into a command, and an actuator that applies the command. The cycle repeats continuously — typically hundreds to thousands of times per second — until the error is near zero.
+
+## Real-world example
+
+A cruise-control system in a car is a feedback loop — measure speed, compare to setpoint, adjust throttle. A robotic arm holding position uses feedback at each joint. A Roomba's wall-following is a feedback loop based on side-sensor distance.
+
+## Why it matters for robotics
+
+Open-loop systems blow up under disturbance; feedback loops self-correct. Mastering feedback is the difference between a robotics hobbyist and an engineer. Every PID tuner, ROS2 control node, and DRDO Daksh stabiliser is a feedback loop in disguise.
+
+## See also
+
+- [Pid Controller](/atlas/concept/pid-controller)
+- [Closed Loop Control](/atlas/concept/closed-loop-control)
+- [Feedback](/atlas/concept/feedback)
+- [State Machine](/atlas/concept/state-machine)

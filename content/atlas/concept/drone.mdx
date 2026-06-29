@@ -1,0 +1,89 @@
+---
+title: Drone (UAV)
+category: robot-types
+summary: >-
+  A drone is a flying robot — usually four or more electric rotors arranged
+  around a central body, controlled by a tiny computer doing math 1,000 times
+  per second to stay airborne.
+seeAlso:
+  - robot
+  - servo-motor
+  - pwm
+sources:
+  - title: DJI — official site
+    url: 'https://www.dji.com/'
+  - title: ArduPilot — open-source autopilot
+    url: 'https://ardupilot.org/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - robots
+  - drones
+  - beginner
+difficulty: 3
+oneLiner: 'The concept concept: A drone is a flying robot — usually'
+laymanExplanation: >-
+  A drone — or UAV (Unmanned Aerial Vehicle) — is a flying robot. The most
+  common shape is a quadcopter: four electric rotors arranged around a central
+  body, with no human pilot on board. A tiny onboard computer does math 1,000
+  times per second to keep the thing airborne.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without drone (uav), many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A drone is a flying robot — usually four or more electric rotors arranged
+  around a central body, controlled by a tiny computer doing math 1,000 times
+  per second to stay airborne.
+slug: drone
+bucket: concept
+---
+
+A [drone](/atlas/concept/drone-uav) — or UAV (Unmanned Aerial Vehicle) — is a flying [robot](/atlas/concept/robot). The most common shape is a quadcopter: four electric rotors arranged around a central body, with no human pilot on board. A tiny onboard computer does math 1,000 times per second to keep the thing airborne.
+
+## How quadcopters work
+
+A quadcopter has four spinning rotors, two clockwise and two counter-clockwise. By spinning all four equally, the drone hovers (lift balances gravity). By spinning the front two slower and the back two faster, the drone tips forward and accelerates forward. By making one diagonal pair faster than the other, the drone rotates (yaws).
+
+This sounds simple. It's not. A quadcopter is **inherently unstable** — without active control, it tips over instantly. The drone's stability comes entirely from a [feedback](/atlas/concept/feedback) loop: the flight controller reads the gyroscope and accelerometer 1,000+ times per second, calculates the current orientation, compares to the desired orientation, and adjusts each motor's speed in real time.
+
+Stop the flight controller for a fraction of a second and the drone falls out of the sky.
+
+## What's inside
+
+- **Frame** — usually carbon fibre or plastic, X- or +-shaped.
+- **Four motors and propellers** — brushless DC motors driven by ESCs (Electronic Speed Controllers) via [PWM](/atlas/concept/pwm).
+- **Flight controller** — the brain. Common chips: STM32, F4/F7-class.
+- **[IMU](/atlas/concept/imu)** — gyroscope + accelerometer, the inner ear.
+- **Battery** — usually a lithium-polymer pack, good for 15-45 minutes.
+- **Optional: [GPS](/atlas/concept/gps-gnss), [camera](/atlas/concept/camera-vision), gimbal, [lidar](/atlas/concept/lidar), downward sensors for indoor stabilisation.**
+
+The most popular open-source autopilot is **ArduPilot** (and its sibling, PX4). Most consumer drones (DJI, Autel, Skydio) run proprietary firmware.
+
+## Where drones matter today
+
+- **Photography and cinema** — the biggest consumer market, dominated by DJI.
+- **Agriculture** — spraying, [mapping](/atlas/concept/mapping), plant health monitoring. Huge in India, where the government has aggressively promoted "Kisan drones."
+- **Delivery** — pilot programmes by Amazon Prime Air, Wing, Zipline. Zipline delivers medical supplies in Rwanda, Ghana, and now parts of India.
+- **Defence and surveillance** — the largest category by spending.
+- **Inspection** — cell towers, wind turbines, pipelines.
+
+## Where India is
+
+India's drone manufacturing ecosystem has grown sharply since the 2021 Drone Rules. Indian-built drones now serve agriculture, defence, and infrastructure inspection. Garuda Aerospace, ideaForge, ASTERIA Aerospace, and AAVE are the most-visible Indian drone companies as of 2026.
+
+---
+
+*Curious how the gimbal that keeps drone shots steady actually works? Read [The DJI drone gimbal in slow-motion](/lens/dji-drone-gimbal-stabilization).*

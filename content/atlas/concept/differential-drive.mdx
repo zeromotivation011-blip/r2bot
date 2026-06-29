@@ -1,0 +1,75 @@
+---
+title: Differential Drive in Robotics — Complete Guide
+summary: >-
+  Differential drive uses two independently driven wheels and a passive caster
+  to steer a mobile robot. Simple, cheap, and the foundation of most beginner
+  robotics.
+category: fundamentals
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - locomotion
+  - drive
+  - mobile-robot
+seeAlso:
+  - mobile-robot
+  - wheels-vs-tracks
+  - odometry
+difficulty: 3
+oneLiner: >-
+  The concept concept: Differential drive uses two independently driven wheels
+  and
+laymanExplanation: >-
+  Differential drive is a mobile-robot locomotion scheme where two wheels on
+  either side of the chassis are driven independently. By varying the relative
+  speed of the two wheels, the robot moves forward, turns in place, or arcs
+  along a curved path. A passive caster wheel keeps the chassis level.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without differential drive in robotics — complete guide, many concept systems
+  in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Differential drive uses two independently driven wheels and a passive caster
+  to steer a mobile robot. Simple, cheap, and the foundation of most beginner
+  robotics.
+slug: differential-drive
+bucket: concept
+---
+
+# Differential Drive in Robotics
+
+## What is it?
+
+Differential drive is a mobile-robot locomotion scheme where two wheels on either side of the chassis are driven independently. By varying the relative speed of the two wheels, the robot moves forward, turns in place, or arcs along a curved path. A passive caster wheel keeps the chassis level.
+
+## How it works
+
+If both wheels turn at the same speed, the robot moves straight. If only the right wheel turns, the robot rotates around the stationary left wheel. If wheels turn in opposite directions at the same speed, the robot spins in place. The forward kinematics give linear velocity v = (v_left + v_right)/2 and angular velocity ω = (v_right − v_left) / wheelbase.
+
+## Real-world example
+
+Roomba, Pepper, GreyOrange Butler, and the typical Arduino line-follower all use differential drive. It is the default locomotion for educational robotics in India.
+
+## Why it matters for robotics
+
+Differential drive is simple enough for first-time builders but powerful enough to teach kinematics, odometry, and PID. Almost every robotics curriculum starts here.
+
+## See also
+
+- [Mobile Robot](/atlas/concept/mobile-robot)
+- [Wheels Vs Tracks](/atlas/concept/wheels-vs-tracks)
+- [Odometry](/atlas/concept/odometry)

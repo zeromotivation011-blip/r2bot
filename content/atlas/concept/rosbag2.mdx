@@ -1,0 +1,133 @@
+---
+title: ROS2 Bags (rosbag2) — Complete Guide | R2BOT
+summary: >-
+  rosbag2 records and replays ROS2 topics for offline analysis and regression
+  testing. The black-box recorder of every modern robot.
+category: control
+bucket: ros2-ecosystem
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - rosbag2
+  - ros2
+  - logging
+  - debug
+  - replay
+relatedTerms:
+  - ros2
+  - ros2-topics
+  - ros2-nodes
+  - ci-cd-robotics
+  - foxglove
+seeAlso:
+  - ros2
+  - ros2-topics
+  - ros2-nodes
+  - ci-cd-robotics
+  - foxglove
+youtubeSearchQuery: ROS2 rosbag2 record replay tutorial
+oneLiner: >-
+  The ros2 ecosystem concept: rosbag2 records and replays ROS2 topics for
+  offline
+laymanExplanation: >-
+  rosbag2 is the ROS2 tool to record any set of topics into a single
+  time-stamped file (a 'bag') and later replay them as if the live robot were
+  running. It is the standard way to capture data for offline analysis,
+  regression tests, and CI pipelines.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros2 bags (rosbag2) — complete guide | r2bot, many ros2 ecosystem
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  rosbag2 records and replays ROS2 topics for offline analysis and regression
+  testing. The black-box recorder of every modern robot.
+slug: rosbag2
+---
+
+# ROS2 Bags (rosbag2)
+
+## What is ROS2 Bags (rosbag2)?
+
+rosbag2 is the ROS2 tool to record any set of topics into a single time-stamped file (a 'bag') and later replay them as if the live robot were running. It is the standard way to capture data for offline analysis, regression tests, and CI pipelines.
+
+## How It Works
+
+From the command line, `ros2 bag record /scan /cmd_vel /tf` writes all messages on the listed topics into a MCAP or SQLite-backed bag with nanosecond timestamps. `ros2 bag play` reads the bag and republishes the messages with the original timing — your subscribers cannot tell whether they are reading from a live robot or a replayed bag. Bags can be sliced, filtered, and converted with `ros2 bag` subcommands.
+
+## Real-World Example
+
+Every Nav2 release runs regression tests on stored bag files. Boston Dynamics customers record bag files when robots misbehave and ship them to support. Indian autonomous-vehicle teams (Swaayatt, Flux Auto) record terabytes of bag data daily for training and replay.
+
+## Why It Matters for Robotics
+
+Without bag recordings, robotics debugging is nearly impossible. Capturing what the robot saw at the moment of failure — and replaying it offline — is the foundation of modern robotics engineering practice.
+
+## Try It Yourself
+
+Record a bag while you drive a TurtleBot3 in Gazebo. Stop the simulator. Run `ros2 bag play <bag>` while RViz2 is open. The robot appears to move in RViz exactly as it did before — pure replay magic.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "A rosbag2 file captures:",
+    "options": [
+      "Just text logs",
+      "Time-stamped ROS2 topic messages for replay",
+      "Network traffic only",
+      "Bash commands"
+    ],
+    "answer": 1,
+    "explain": "Bags store the actual messages with timestamps so they can be re-published later."
+  },
+  {
+    "q": "The default modern storage format for rosbag2 is:",
+    "options": [
+      "SQLite or MCAP",
+      "JPEG",
+      "PDF",
+      "WAV"
+    ],
+    "answer": 0,
+    "explain": "SQLite is the legacy default; MCAP is now the preferred Foxglove-compatible format."
+  },
+  {
+    "q": "Bag files are essential for:",
+    "options": [
+      "Cosmetic skin colour",
+      "Regression testing and offline robot debugging",
+      "Cooking food",
+      "Charging phones"
+    ],
+    "answer": 1,
+    "explain": "Bags = repeatable test data; you can re-run the same scenario on every code change."
+  }
+]
+```
+
+## Further Reading
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Topics](/atlas/concept/ros2-topics)
+- [Ros2 Nodes](/atlas/concept/ros2-nodes)
+- [Ci Cd Robotics](/atlas/concept/ci-cd-robotics)
+- [Foxglove](/atlas/concept/foxglove)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain ROS2 Bags (rosbag2) for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

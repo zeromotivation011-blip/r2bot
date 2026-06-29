@@ -1,0 +1,130 @@
+---
+title: Large Language Models for Robotics — Complete Guide | R2BOT
+summary: >-
+  LLMs let robots understand natural-language instructions and reason about
+  tasks. Foundation of Figure 02, RT-2, and the new humanoid wave.
+category: ai-and-perception
+bucket: ai-machine-learning
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - llm
+  - foundation-model
+  - language
+  - reasoning
+  - planning
+relatedTerms:
+  - transformer-architecture
+  - foundation-model-robotics
+  - reinforcement-learning
+  - embodied-ai
+seeAlso:
+  - transformer-architecture
+  - foundation-model-robotics
+  - reinforcement-learning
+  - embodied-ai
+youtubeSearchQuery: LLM robotics natural language tutorial
+oneLiner: >-
+  The ai machine learning concept: LLMs let robots understand natural-language
+  instructions and reason
+laymanExplanation: >-
+  Large Language Models (LLMs) like GPT-4, Claude, and Gemini are
+  billion-to-trillion-parameter transformer networks trained on internet-scale
+  text. In robotics, LLMs let robots understand natural-language commands,
+  generate task plans, and even produce code that the robot can run.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without large language models for robotics — complete guide | r2bot, many ai
+  machine learning systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  LLMs let robots understand natural-language instructions and reason about
+  tasks. Foundation of Figure 02, RT-2, and the new humanoid wave.
+slug: large-language-model-robotics
+---
+
+# Large Language Models for Robotics
+
+## What is Large Language Models for Robotics?
+
+Large Language Models (LLMs) like GPT-4, Claude, and Gemini are billion-to-trillion-parameter transformer networks trained on internet-scale text. In robotics, LLMs let robots understand natural-language commands, generate task plans, and even produce code that the robot can run.
+
+## How It Works
+
+An LLM takes a text prompt (and optionally images) and predicts the next token over and over. In robotics it is paired with the robot stack two ways. **Code generation**: ask the LLM 'pick up the red cup' and it writes a few lines of Python that call existing robot primitives. **High-level planning**: the LLM breaks a complex goal into subgoals (find object → grasp → move → release) that lower-level controllers execute. Recent vision-language-action models like RT-2 and OpenVLA combine LLMs with image inputs and direct action outputs.
+
+## Real-World Example
+
+Figure 02 uses OpenAI's GPT for natural-language conversation. RT-2 maps language + image to motor actions. R2BOT's own Co-pilot uses Anthropic's Claude. Indian assistive-robotics startups like Manipal Hospital's pilot use LLM planners for elderly-care robots.
+
+## Why It Matters for Robotics
+
+LLMs have made conversation-driven robotics a reality. Every modern humanoid programme now integrates an LLM. Robotics-AI engineering roles in India increasingly require both ROS2 and LLM-integration expertise.
+
+## Try It Yourself
+
+Use the Anthropic SDK (free credits) to prompt Claude: "I have a robot with these primitives: move_to(x,y), pick(object), place(object). Write a plan to clear a table of 5 cups." Read the output — that is LLM-as-planner in action.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "In a robotic LLM-as-planner setup, the LLM produces:",
+    "options": [
+      "Motor PWM signals directly",
+      "High-level steps using available robot primitives",
+      "Battery telemetry",
+      "GPS coordinates only"
+    ],
+    "answer": 1,
+    "explain": "The LLM produces a high-level plan; lower-level controllers execute the primitives."
+  },
+  {
+    "q": "RT-2 is a:",
+    "options": [
+      "Vintage car",
+      "Vision-language-action model from Google DeepMind",
+      "A washing machine",
+      "A children's book"
+    ],
+    "answer": 1,
+    "explain": "RT-2 takes image + language and outputs robot actions, trained on web data + robot data."
+  },
+  {
+    "q": "A key risk of using LLMs in robots is:",
+    "options": [
+      "Too low intelligence",
+      "Hallucination — plausible-sounding but wrong outputs",
+      "High battery use only",
+      "No risk at all"
+    ],
+    "answer": 1,
+    "explain": "LLMs sometimes hallucinate impossible or incorrect plans — guardrails and verifiers are essential."
+  }
+]
+```
+
+## Further Reading
+
+- [Transformer Architecture](/atlas/concept/transformer-architecture)
+- [Foundation Model Robotics](/atlas/concept/foundation-model-robotics)
+- [Reinforcement Learning](/atlas/concept/reinforcement-learning)
+- [Embodied Ai](/atlas/concept/embodied-ai)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Large Language Models for Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

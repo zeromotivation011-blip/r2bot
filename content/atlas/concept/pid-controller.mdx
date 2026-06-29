@@ -1,0 +1,102 @@
+---
+title: PID controller
+hindi_name: PID नियंत्रक
+phonetic: P-I-D controller
+prerequisites:
+  - closed-loop-control
+  - feedback
+category: control
+summary: >-
+  A PID controller is a feedback algorithm that continuously corrects a robot's
+  behaviour by measuring the gap between where it is and where it should be,
+  then calculating a precise corrective output in real time.
+seeAlso: []
+sources:
+  - title: 'Astrom & Hagglund — PID Controllers: Theory, Design, and Tuning'
+    url: >-
+      https://www.isa.org/products/pid-controllers-theory-design-and-tuning-2nd-editi
+  - title: MathWorks — Understanding PID Control
+    url: 'https://www.mathworks.com/videos/series/understanding-pid-control.html'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - control
+  - feedback
+  - algorithms
+difficulty: 3
+oneLiner: 'The concept concept: A PID controller is a feedback algorithm that'
+laymanExplanation: >-
+  Imagine you're in the shower and the water comes out too cold. You turn the
+  hot tap slightly — but you overshoot and now it's scalding. You turn it back.
+  After a few nervous adjustments you settle on just the right temperature.
+  Without realising it, you were doing what a PID controller does: measuring the
+  gap, correcting, and steadying.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without pid controller, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Every commercial drone
+  - Self-balancing robots
+  - Industrial CNC machines
+indianExample: >-
+  The self-balancing robots built in IIT robotics clubs use PID to stay upright.
+  Every drone you see in the sky is using PID.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: 'What do P, I and D stand for in PID?'
+  options:
+    - 'Pulse, Integer, Drive'
+    - 'Proportional, Integral, Derivative'
+    - 'Position, Index, Direction'
+    - 'Power, Input, Distance'
+  answer: 1
+  explanation: >-
+    Proportional reacts to current error, Integral to accumulated error,
+    Derivative to how fast the error is changing.
+mindBlowingFact: >-
+  PID was invented in 1911 for ship autopilots. The same 113-year-old math runs
+  inside your phone's camera stabiliser today.
+industryApplications:
+  - drones
+  - autonomous vehicles
+  - manufacturing
+  - HVAC
+  - chemical plants
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A PID controller is a feedback algorithm that continuously corrects a robot's
+  behaviour by measuring the gap between where it is and where it should be,
+  then calculating a precise corrective output in real time.
+slug: pid-controller
+bucket: concept
+---
+
+Imagine you're in the shower and the water comes out too cold. You turn the hot tap slightly — but you overshoot and now it's scalding. You turn it back. After a few nervous adjustments you settle on just the right temperature. Without realising it, you were doing what a PID controller does: measuring the gap, correcting, and steadying.
+
+That process — measure, compare, correct — is the heartbeat of almost every controlled machine on the planet.
+
+## What PID actually means
+
+PID stands for **Proportional–Integral–Derivative**. Each word describes one part of the correction calculation.
+
+**Proportional (P)** reacts to the current error. If the [robot](/atlas/concept/robot)'s arm is 10 degrees off target, the P term pushes it with a force proportional to that gap. Big gap, big push. Small gap, small push. The problem: the arm might never quite reach the target — there's often a small steady residual error.
+
+**Integral (I)** adds up all the past errors over time. If the arm has been slightly short for five seconds, the I term notices and adds extra force to cancel out that persistent shortfall. It fixes the long-term residual that P alone leaves behind.
+
+**Derivative (D)** looks at how fast the error is changing. If the arm is zooming towards the target, D applies a brake to prevent overshoot. It's essentially anticipating the future based on the present rate of change.
+
+Together, the three terms are summed into a single output signal — a motor voltage, a valve opening, a thrust level — that steers the system smoothly to its target.
+
+## A real example: [drone](/atlas/concept/drone) altitude hold
+
+When a DJI Mavic Mini hovers at 5 metres, a PID controller runs dozens of times per second. The P term pushes the motors up if altitude drops. The I term corrects for persistent wind. The D term damps the oscillation so the [drone](/atlas/concept/drone-uav) doesn't bob up and down like a cork. The result feels effortless, but underneath it's a tight control loop running at 100 Hz or faster.
+
+## Why it matters in [robotics](/atlas/concept/robotics)
+
+PID controllers are everywhere: robotic arms, self-balancing robots like Segways, autonomous vehicles maintaining lane position, CNC machines cutting to micrometer precision, temperature controllers inside 3D printers. The algorithm is only three terms, yet it handles an enormous range of real-world problems. Engineers spend considerable effort "tuning" the three gain values — setting P too high causes oscillation, I too high causes slow wobble, D too high amplifies noise.
+
+---
+
+*Despite being invented in the 1930s for ship steering, the PID controller still runs inside almost every [servo motor](/atlas/concept/servo-motor) and drone you'll ever touch.*

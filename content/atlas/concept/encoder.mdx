@@ -1,0 +1,99 @@
+---
+title: Encoder (rotary)
+category: sensors
+summary: >-
+  A rotary encoder is a sensor that counts how far a shaft has turned. It is how
+  a robot's motor knows its exact position — the difference between a controlled
+  arm and one that flails unpredictably.
+seeAlso: []
+sources:
+  - title: US Digital — Encoder Fundamentals
+    url: 'https://www.usdigital.com/resources/encoder-fundamentals/'
+  - title: 'MIT OpenCourseWare — 6.832 Underactuated Robotics: state estimation'
+    url: 'https://underactuated.mit.edu/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - sensors
+  - motion
+  - actuation
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: A rotary encoder is a sensor that counts'
+laymanExplanation: >-
+  Imagine trying to drive to a destination while blindfolded. Someone tells you:
+  "Turn the steering wheel exactly three full rotations clockwise, then two and
+  a half counter-clockwise." Without knowing how far the wheel has actually
+  turned — or confirming each rotation was completed — you are guessing. Now
+  imagine a thin disc mounted to the steering column, et
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without encoder (rotary), many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis:
+  - Amazon Kiva
+  - TurtleBot
+  - CNC machines
+indianExample: >-
+  GreyOrange Butler AMRs at Flipkart use wheel encoders combined with QR codes
+  on the floor to know their exact position in the warehouse.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What does an encoder primarily measure?
+  options:
+    - Temperature
+    - Rotation (or position) of a shaft
+    - Voltage
+    - Sound level
+  answer: 1
+  explanation: >-
+    Encoders are rotation/position sensors — quadrature, magnetic or optical,
+    all count shaft movement.
+mindBlowingFact: >-
+  A typical robot encoder can detect a rotation as small as 0.1° — that is finer
+  than the human eye can resolve at one metre.
+industryApplications:
+  - robotics
+  - CNC machining
+  - printing
+  - elevators
+  - industrial automation
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A rotary encoder is a sensor that counts how far a shaft has turned. It is how
+  a robot's motor knows its exact position — the difference between a controlled
+  arm and one that flails unpredictably.
+slug: encoder
+bucket: concept
+---
+
+Imagine trying to drive to a destination while blindfolded. Someone tells you: "Turn the steering wheel exactly three full rotations clockwise, then two and a half counter-clockwise." Without knowing how far the wheel has actually turned — or confirming each rotation was completed — you are guessing. Now imagine a thin disc mounted to the steering column, etched with hundreds of tiny lines, and a light sensor that counts each line as it passes. Suddenly you know not just that you turned, but exactly how much.
+
+That counting disc is a rotary encoder, and it is what separates a [robot](/atlas/concept/robot) that moves with precision from one that merely thrashes around.
+
+## What an encoder measures
+
+A **rotary encoder** is a sensor attached to a rotating shaft — typically a motor axle — that converts angular position into an electrical signal. Every time the shaft rotates by a tiny fixed amount, the encoder fires a pulse. Count the pulses and you know how far the shaft has turned. Measure how fast the pulses arrive and you know the rotational speed.
+
+The most common type is the **incremental optical encoder**: a disc with alternating opaque and transparent slots spins between an LED and a photodetector. Each time a slot passes, the light is interrupted and a pulse is generated. A 1,000-line encoder produces 1,000 pulses per revolution, giving a resolution of 0.36 degrees per pulse. High-end encoders produce tens of thousands of pulses per revolution.
+
+A second type, the **absolute encoder**, encodes the actual angular position in binary directly on the disc — so even if the motor is powered off and physically moved, the encoder knows exactly where it is when it restarts. Incremental encoders, by contrast, only know *relative* movement from wherever they started.
+
+## Why robots need them
+
+Without position [feedback](/atlas/concept/feedback), a robot arm is essentially open-loop: you command the motor to spin for a certain time and hope the arm ends up where intended. Friction, load variation, and mechanical wear mean it almost certainly will not. An encoder closes the loop: the motor controller continuously compares where the encoder says the [joint](/atlas/concept/joint) is versus where it should be, and corrects the difference thousands of times per second. This is called **PID control** (Proportional-Integral-Derivative), and it is the workhorse algorithm of almost every motor-driven robot in existence.
+
+## Encoders in action
+
+The FANUC robotic arms used on car assembly lines worldwide have absolute encoders in every joint. When the factory loses power and the robot is physically moved out of the way, it wakes up and immediately knows its exact configuration — no homing sequence required. Consumer 3D printers, by contrast, typically use cheaper stepper motors without encoders and rely on hard mechanical stops to find position at startup. This is one of the primary reasons industrial robots cost ₹20 lakh while desktop 3D printers cost ₹20,000.
+
+## The quiet authority behind every precise move
+
+Encoders are rarely discussed outside engineering circles because they have no glamour — they sit silently on shafts, counting. But every [surgical robot](/atlas/concept/surgical-robot), every CNC milling machine, every robotic telescope tracking a star across the sky depends on them. Without encoders, precision [robotics](/atlas/concept/robotics) collapses into guesswork.
+
+---
+
+*If an encoder tells a robot exactly how far its joints have moved, is that enough to know where its hand is in space — or does something more have to be calculated on top?*

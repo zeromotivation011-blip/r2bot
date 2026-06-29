@@ -1,0 +1,61 @@
+---
+title: A surgical robot ties a knot tighter than human fingers can — how
+summary: There's a famous video of a da Vinci surgical robot tying a microscopic knot inside a grape skin without bursting the grape. Here's what's actually happening — and why it matters.
+topic: Medical
+durationSeconds: 198
+externalUrl: https://www.intuitive.com/
+publishedAt: 2026-05-04
+relatedAtlas:
+  - { type: concept, slug: robot }
+  - { type: concept, slug: servo-motor }
+---
+
+There's a famous video of a da Vinci surgical robot tying a microscopic knot inside a grape skin — without bursting the grape. The grape skin is about a tenth of a millimetre thick. The knot is held by tools the size of a sewing needle.
+
+It's been used in thousands of marketing videos. It's also, accidentally, one of the clearest demonstrations of how medical robotics actually works. Here's what's happening.
+
+## What you see in the video
+
+A surgeon sits at a console about ten feet from the operating table. The console has stereo viewers (a separate image for each eye), and two finger-and-thumb controllers that the surgeon manipulates with both hands.
+
+The robot has four arms over the patient. Three hold instruments (cutters, graspers, needle-drivers). One holds a stereo camera. The surgeon's hand movements at the console drive the instrument tips. The 3D image from the camera is fed back to the surgeon's viewers.
+
+In the grape video, the robot threads a suture through a small slit in the grape skin and ties three knots — without applying enough force to burst the grape.
+
+## What the robot does that a human surgeon can't
+
+**Motion scaling.** The surgeon's hands at the console move several centimetres. The robot tips move millimetres. The robot is a precision multiplier — every gesture is scaled down by a factor the surgeon picks (typically 3:1 or 5:1).
+
+**Tremor filtering.** Even a steady human hand has a small involuntary tremor — around 8-12 Hz, a few hundred microns. The robot detects this and filters it out before driving the tip. The result is a steadier hand than any human is biologically capable of.
+
+**Wrist articulation.** The instrument tips have small "wristed" joints that can rotate in ways human wrists cannot — full 540 degrees in one axis, no problem. This lets the surgeon work in extreme angles inside the body that would be impossible by hand.
+
+**Stereo magnification.** The camera offers 10x optical magnification with full stereo depth. The surgeon is, in effect, working at near-microscope scale while sitting comfortably.
+
+## How it's built
+
+Each robot arm has 7 degrees of freedom and uses [brushless DC motors with high-resolution encoders](/atlas/concept/servo-motor) for every joint. The instruments themselves are tiny — about 8mm in diameter — and the motion is driven through cables routed through the arm.
+
+Each instrument is rated for a fixed number of uses (typically 10) before it must be discarded, for sterility reasons. The cost per use, even after amortising the $1.5-2 million capital cost of the robot itself, is non-trivial — surgical robotics is still expensive medicine.
+
+## Why this matters
+
+The grape-knot is a demo. The real-world surgical jobs are:
+
+- **Prostatectomies** — the most common da Vinci procedure. Better outcomes for nerve preservation.
+- **Mitral-valve repair** — heart surgery with smaller incisions.
+- **Gastric bypass** — easier suture work in the deep abdomen.
+
+For all of these, the case for the robot isn't speed or cost — it's *precision*. A robot-assisted suture is tighter, smaller, and more consistent than the human-only equivalent. For many procedures, that translates into faster patient recovery and fewer complications.
+
+## What's still wrong
+
+Cost. A da Vinci system runs $1.5-2 million for the robot plus $1,500-2,000 per procedure in instrument costs. That's why robot-assisted surgery is still concentrated in wealthy hospitals.
+
+Tactile feedback. The surgeon doesn't *feel* the tissue through the controls — they have to rely entirely on vision. The next generation of surgical robots (CMR Surgical's Versius, Medtronic's Hugo) are adding force feedback, but it's not yet equivalent to a human's hands-on touch.
+
+Training. A surgeon takes 50+ procedures to become proficient. That's a real bottleneck on how fast robotic surgery can scale.
+
+---
+
+*The same closed-loop motor control that lets a da Vinci tie a knot lets a hobby robot hold an angle. Read [Servo motor](/atlas/concept/servo-motor) for the basic principle.*

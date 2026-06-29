@@ -1,0 +1,134 @@
+---
+title: MoveIt2 (ROS2 Motion Planning) — Complete Guide | R2BOT
+summary: >-
+  MoveIt2 is the ROS2 motion-planning framework for robotic arms — kinematics,
+  planning, collision avoidance, and execution. Used in industry and research.
+category: control
+bucket: ros2-ecosystem
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - moveit2
+  - motion-planning
+  - ros2
+  - arm
+  - manipulation
+relatedTerms:
+  - ros2
+  - rrt
+  - inverse-kinematics
+  - forward-kinematics
+  - robot-arm
+seeAlso:
+  - ros2
+  - rrt
+  - inverse-kinematics
+  - forward-kinematics
+  - robot-arm
+youtubeSearchQuery: ROS2 MoveIt2 manipulation tutorial
+oneLiner: >-
+  The ros2 ecosystem concept: MoveIt2 is the ROS2 motion-planning framework for
+  robotic
+laymanExplanation: >-
+  MoveIt2 is the ROS2 motion-planning framework for robotic arms. It computes
+  collision-free joint trajectories from a goal pose, handles inverse
+  kinematics, plans around obstacles, and executes the result on real or
+  simulated robots. It is the backbone of nearly every ROS2 manipulation
+  project.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without moveit2 (ros2 motion planning) — complete guide | r2bot, many ros2
+  ecosystem systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  MoveIt2 is the ROS2 motion-planning framework for robotic arms — kinematics,
+  planning, collision avoidance, and execution. Used in industry and research.
+slug: moveit2-stack
+---
+
+# MoveIt2 (ROS2 Motion Planning)
+
+## What is MoveIt2 (ROS2 Motion Planning)?
+
+MoveIt2 is the ROS2 motion-planning framework for robotic arms. It computes collision-free joint trajectories from a goal pose, handles inverse kinematics, plans around obstacles, and executes the result on real or simulated robots. It is the backbone of nearly every ROS2 manipulation project.
+
+## How It Works
+
+MoveIt2 reads the robot URDF and SRDF (semantic description) to understand kinematics and self-collisions. The MoveGroup interface accepts goals (pose or joint state) and computes a plan using sampling-based planners (OMPL: RRT, RRT*, PRM) or trajectory-optimisation planners (CHOMP, STOMP, TrajOpt). A planning scene tracks the world's obstacles. Once a plan is found, it is sent through `ros2_control` to the robot's joint controllers for execution.
+
+## Real-World Example
+
+Universal Robots, Franka Emika, Kinova, ABB YuMi, and Yaskawa all ship MoveIt2 configurations. Research labs at IIT Madras and IISc build manipulation experiments on MoveIt2. Indian medical-robotics startups use it for surgical-arm trajectory planning.
+
+## Why It Matters for Robotics
+
+Writing a motion planner from scratch is a PhD thesis. MoveIt2 lets engineers focus on application logic instead. Mastery of MoveIt2 — setup assistant, planning groups, planning pipelines, hardware integration — is mandatory for ROS2 manipulation roles.
+
+## Try It Yourself
+
+Install MoveIt2 and run the official `panda_arm` demo in Gazebo + RViz2. Drag the interactive marker to set a goal and click Plan & Execute. Then try blocking the path with a virtual obstacle and re-plan — collision avoidance in action.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "MoveIt2 plans:",
+    "options": [
+      "Network routes only",
+      "Collision-free trajectories for robot arms",
+      "Recipes",
+      "Cricket strategies"
+    ],
+    "answer": 1,
+    "explain": "MoveIt2's core job is generating safe joint trajectories from goal poses."
+  },
+  {
+    "q": "OMPL inside MoveIt2 provides:",
+    "options": [
+      "Database queries",
+      "A library of sampling-based motion planners",
+      "GPS navigation",
+      "Audio mixing"
+    ],
+    "answer": 1,
+    "explain": "OMPL (Open Motion Planning Library) gives MoveIt2 RRT, PRM, KPIECE, and more."
+  },
+  {
+    "q": "Before planning, MoveIt2 reads the robot description from:",
+    "options": [
+      "URDF + SRDF",
+      "A YouTube video",
+      "A spreadsheet",
+      "Nothing"
+    ],
+    "answer": 0,
+    "explain": "URDF describes physical structure; SRDF adds semantic info like planning groups."
+  }
+]
+```
+
+## Further Reading
+
+- [Ros2](/atlas/concept/ros2)
+- [Rrt](/atlas/concept/rrt)
+- [Inverse Kinematics](/atlas/concept/inverse-kinematics)
+- [Forward Kinematics](/atlas/concept/forward-kinematics)
+- [Robot Arm](/atlas/concept/robot-arm)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain MoveIt2 (ROS2 Motion Planning) for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

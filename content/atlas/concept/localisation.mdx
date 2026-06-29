@@ -1,0 +1,80 @@
+---
+title: Localisation
+category: control
+summary: >-
+  Localisation is the process by which a robot figures out where it is — its
+  position and orientation — within a known or partially known environment,
+  using sensors and probability to maintain a confident best guess.
+seeAlso: []
+sources:
+  - title: 'Thrun, Burgard, Fox — Probabilistic Robotics (MIT Press)'
+    url: 'https://mitpress.mit.edu/9780262201629/probabilistic-robotics/'
+  - title: ROS 2 Nav2 — AMCL localisation
+    url: 'https://navigation.ros.org/configuration/packages/configuring-amcl.html'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - navigation
+  - autonomy
+  - sensors
+difficulty: 3
+oneLiner: 'The concept concept: Localisation is the process by which a robot'
+laymanExplanation: >-
+  You wake up in an unfamiliar hotel room in the dark. You have no idea which
+  direction you're facing. You reach out, feel a bedside table, stumble to the
+  window, peek through the curtain and spot a landmark — the Taj Mahal is right
+  there. In three seconds you've gone from "no idea" to "I know exactly where I
+  am and which way I'm facing." You just localised yo
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without localisation, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Localisation is the process by which a robot figures out where it is — its
+  position and orientation — within a known or partially known environment,
+  using sensors and probability to maintain a confident best guess.
+slug: localisation
+bucket: concept
+---
+
+You wake up in an unfamiliar hotel room in the dark. You have no idea which direction you're facing. You reach out, feel a bedside table, stumble to the window, peek through the curtain and [spot](/atlas/robot/spot) a landmark — the Taj Mahal is right there. In three seconds you've gone from "no idea" to "I know exactly where I am and which way I'm facing." You just localised yourself.
+
+A [robot](/atlas/concept/robot) must do the same thing — constantly, precisely, and without any human instinct to fall back on.
+
+## The three localisation problems
+
+Roboticists distinguish three versions of the problem:
+
+**Position tracking** — the robot knows roughly where it started and needs to keep track as it moves. Relatively easy; errors accumulate slowly and can be corrected incrementally.
+
+**Global localisation** — the robot is placed somewhere in a known map with no idea of its starting pose. It has to figure out where it is from scratch using only sensor data.
+
+**The kidnapped robot problem** — the robot is picked up and moved without warning while it thinks it knows where it is. The hardest case: it must detect that its current sensor readings no longer match its believed position and re-localise.
+
+## How robots localise: particle filters
+
+The dominant approach for mobile robots is the **particle filter** (also called Monte Carlo localisation, or MCL). The idea is elegant: represent the robot's uncertainty about its position as a cloud of thousands of "particles," each one a hypothesis about where the robot might be.
+
+At each step, every particle predicts where it would be after the robot's latest movement. Then each particle is weighted by how well its hypothetical sensor reading matches the actual sensor reading. Particles that match well survive and multiply; particles in wrong locations die out. Over a few seconds of movement, the cloud converges on the correct location.
+
+Nav2 — the navigation stack for [ROS](/atlas/concept/ros) 2 — ships AMCL (Adaptive Monte Carlo Localisation) as its standard localiser, and it runs on everything from warehouse robots to research rovers.
+
+## Why localisation is hard
+
+Sensor readings are noisy. Wheels slip. Environments look similar in different places (a long corridor looks the same at metre 10 and metre 50). [GPS](/atlas/concept/gps-gnss) is unavailable indoors and too imprecise for tight spaces. These factors mean localisation is never perfectly certain — it's always a probability distribution, and good systems represent and propagate that uncertainty honestly rather than pretending to know exactly.
+
+---
+
+*The mathematics behind particle filters for robot localisation was formalised in the late 1990s and is now used in everything from self-driving cars to spacecraft landing systems.*

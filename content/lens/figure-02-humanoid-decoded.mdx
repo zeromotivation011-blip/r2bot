@@ -1,0 +1,45 @@
+---
+title: Figure 02 — the humanoid building for factory work
+summary: Figure's pitch isn't a research demo. It's "this robot will work in a BMW plant in 2026." Here's what the hardware looks like and what they got right.
+topic: Humanoid
+durationSeconds: 300
+originalDurationSeconds: 720
+externalUrl: https://www.figure.ai/news/figure-02
+publishedAt: 2026-05-02
+relatedAtlas:
+  - { type: robot, slug: optimus }
+  - { type: concept, slug: humanoid-robot }
+  - { type: concept, slug: reinforcement-learning }
+---
+
+Figure 02 is the second generation of Figure AI's humanoid. The Gen 1 was a research platform; Gen 2 is the version they're shipping to industrial pilots. BMW is the public design partner — Figure 02 robots are now in BMW's Spartanburg plant doing actual work (mostly part-handling on the body-in-white line).
+
+## What changed from Gen 1
+
+**Battery** — moved into the torso, doubled capacity, runtime now ~5 hours of factory work.
+
+**Hands** — 16 degrees of freedom per hand (up from 6 on Gen 1). Each finger is independently actuated. This is where most of the engineering went, because manipulation is the gating factor for "useful humanoid in a factory."
+
+**Compute** — onboard NVIDIA Jetson Thor. The visual policy network runs at 200 Hz on-device. No cloud round trip — that wouldn't pass a factory's network/safety review anyway.
+
+**Communications** — speakers and microphones in the head. The robot can talk to workers and respond to spoken commands. OpenAI's GPT-4-class model handles the language layer.
+
+## The strategic bet
+
+Figure's bet is that **humanoids will become economically useful before "general purpose"**. They're targeting factories with very specific workflows that already have ergonomic and safety problems for humans (lifting, repetitive arm motions). The robot doesn't need to do everything; it needs to do *one task per shift*, reliably, at the speed of a human worker.
+
+This is different from Tesla Optimus, which is positioned more broadly toward "household + everywhere." Figure is much narrower and consequently easier to evaluate: either the BMW pilot extends or it doesn't.
+
+## What's still missing
+
+No humanoid today, including Figure 02, can match human dexterity for arbitrary objects. The robots demonstrated picking up a Tupperware lid, a battery pack, a coffee cup — all from known locations. They cannot, yet, reliably handle a tangle of cables or a deformable bag.
+
+The training pipeline is still teleoperation-heavy. A human operator does the task many times in VR; the robot's policy network learns from those demonstrations. True generalization to unseen tasks remains an open research question.
+
+## Funding
+
+Figure raised **$675M** at a $2.6B valuation in early 2024, backed by Microsoft, NVIDIA, OpenAI, Jeff Bezos. By any historical robotics benchmark, that's a lot of capital betting on humanoid factory work landing.
+
+---
+
+*Compare with [Tesla Optimus](/atlas/robot/optimus) and our other Lens piece on Tesla's walking demo.*

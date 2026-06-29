@@ -1,0 +1,22 @@
+{
+  "id": "build-light-chaser",
+  "slug": "light-chaser",
+  "title": "Light Chaser Robot",
+  "tagline": "Two LDRs and a servo team up so your robot tracks the brightest light source in the room — like a sunflower with wheels.",
+  "level": "beginner",
+  "duration_hours": 2,
+  "total_xp": 500,
+  "components": [
+    { "name": "Arduino Uno (or Nano)" },
+    { "name": "2× LDR (light-dependent resistors)" },
+    { "name": "2× 10kΩ resistors" },
+    { "name": "SG90 servo motor" },
+    { "name": "Breadboard" },
+    { "name": "Jumper wires" },
+    { "name": "9V battery", "optional": true },
+    { "name": "Torch or phone flashlight (target)" }
+  ],
+  "simulation_only": false,
+  "color": "#fbbf24",
+  "icon": "💡"
+}

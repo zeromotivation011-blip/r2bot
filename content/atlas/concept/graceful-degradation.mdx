@@ -1,0 +1,79 @@
+---
+title: Graceful degradation
+category: fundamentals
+summary: >-
+  Graceful degradation is the ability of a system to continue functioning at a
+  reduced level when part of it fails, rather than failing completely. For
+  robots operating in the real world, it is often the difference between a minor
+  setback and a catastrophic one.
+seeAlso: []
+sources:
+  - title: NASA Systems Engineering Handbook (SP-2016-6105)
+    url: 'https://www.nasa.gov/connect/ebooks/nasa-systems-engineering-handbook'
+  - title: IEEE Spectrum — Fault Tolerance in Robotic Systems
+    url: 'https://spectrum.ieee.org/tag/fault-tolerance'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - reliability
+  - safety
+difficulty: 3
+oneLiner: 'The concept concept: Graceful degradation is the ability of a system'
+laymanExplanation: >-
+  A candle provides worse light than a lamp. But when the power cuts out, a
+  candle is far better than total darkness. The ability to fall back to
+  something less capable — rather than giving up entirely — is not a failure. It
+  is a design feature, and sometimes the most important one a system can have.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without graceful degradation, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Graceful degradation is the ability of a system to continue functioning at a
+  reduced level when part of it fails, rather than failing completely. For
+  robots operating in the real world, it is often the difference between a minor
+  setback and a catastrophic one.
+slug: graceful-degradation
+bucket: concept
+---
+
+A candle provides worse light than a lamp. But when the power cuts out, a candle is far better than total darkness. The ability to fall back to something less capable — rather than giving up entirely — is not a failure. It is a design feature, and sometimes the most important one a system can have.
+
+**Graceful degradation** is the property of a system that continues to provide useful, safe function after a partial failure, rather than failing catastrophically. The degraded mode may be slower, less precise, or more limited in scope — but it keeps the system running, keeps passengers safe, keeps the mission progressing.
+
+## The opposite: brittle failure
+
+A system without graceful degradation is called **brittle**. Pull out one component and the whole thing stops. Brittleness is acceptable in systems where failure has no serious consequences — a cheap toy that won't turn on when one battery dies is annoying, not dangerous. But a [robot](/atlas/concept/robot) delivering medication in a hospital, navigating a public road, or operating on a human body cannot be brittle. The consequences of total failure in those contexts are too severe.
+
+## How robots implement it
+
+Graceful degradation is not a single technique — it is a design philosophy expressed through several mechanisms. **Fault detection** is the first requirement: the robot must know when something has gone wrong, which requires monitoring its own components. **Isolation** means containing the fault so it doesn't propagate — a failed sensor should not corrupt the data from working sensors. **Fallback modes** are pre-designed, tested alternatives: if the primary [camera](/atlas/concept/camera-vision) fails, use the secondary; if the secondary fails, slow down and rely only on [lidar](/atlas/concept/lidar); if lidar also fails, stop safely in place and request human assistance.
+
+NASA's Mars rovers are exemplary here. When the Spirit rover's right front wheel failed permanently in 2006, mission controllers reconfigured it to drag the dead wheel and drive backwards with the remaining five. Spirit continued operating in that degraded mode for another four years before getting stuck in soft soil — a fate unrelated to the wheel failure. The rover did not become useless; it became a six-year science mission running on five wheels.
+
+## The [link](/atlas/concept/link-robot) to [redundancy](/atlas/concept/redundancy)
+
+Graceful degradation and redundancy are closely related but distinct. Redundancy provides spare capacity so that the failure of one component can be transparently covered by another — ideally with no change in performance. Graceful degradation is the plan for what happens when redundancy has been exhausted, or when there was no redundancy to begin with. A well-designed system plans both: redundancy to prevent degradation as long as possible, and graceful degradation modes for when prevention isn't enough.
+
+## Software degrades too
+
+Graceful degradation applies to software, not just hardware. A robot's navigation stack might have a sophisticated, computationally expensive planning algorithm as its primary mode. When under heavy computational load, it can degrade to a simpler, faster algorithm that produces less optimal paths — but still keeps the robot moving safely. When the situation is genuinely unclear, the correct degraded behaviour may be simply to stop and wait for conditions to improve or a human to intervene.
+
+---
+
+*If a robot is designed to degrade gracefully all the way down to "stop and wait for help," at what point does it stop being autonomous and become a very expensive doorstop?*

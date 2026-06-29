@@ -1,0 +1,76 @@
+---
+title: Autonomy
+category: fundamentals
+summary: >-
+  Autonomy is a robot's ability to make decisions and take actions on its own,
+  without moment-to-moment human instruction. It exists on a spectrum — from a
+  machine that follows fixed rules to one that adapts intelligently to
+  situations it has never seen before.
+seeAlso: []
+sources:
+  - title: NASA — Levels of Autonomy in Robotics
+    url: 'https://www.nasa.gov/offices/oct/home/index.html'
+  - title: SAE International — Levels of Driving Automation (J3016)
+    url: 'https://www.sae.org/standards/content/j3016_202104/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - autonomy
+  - ai
+difficulty: 3
+oneLiner: 'The concept concept: Autonomy is a robot''s ability to make decisions'
+laymanExplanation: >-
+  A thermostat turns the heating on when the temperature drops below a set
+  point. Nobody would call that intelligent, but nobody has to tell it to act,
+  either — it decides on its own, based on a rule, every moment of the day. Now
+  imagine a robot that notices your home is usually empty on Tuesday afternoons
+  and adjusts the heating schedule proactively, without 
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without autonomy, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Autonomy is a robot's ability to make decisions and take actions on its own,
+  without moment-to-moment human instruction. It exists on a spectrum — from a
+  machine that follows fixed rules to one that adapts intelligently to
+  situations it has never seen before.
+slug: autonomy
+bucket: concept
+---
+
+A thermostat turns the heating on when the temperature drops below a set point. Nobody would call that intelligent, but nobody has to tell it to act, either — it decides on its own, based on a rule, every moment of the day. Now imagine a [robot](/atlas/concept/robot) that notices your home is usually empty on Tuesday afternoons and adjusts the heating schedule proactively, without being programmed to do so. Both machines act independently. Only one is exercising something we'd recognise as genuine autonomy.
+
+**Autonomy**, in [robotics](/atlas/concept/robotics), is the capacity of a machine to make decisions and take actions without requiring a human to direct each step. It sounds binary — either a robot is autonomous or it isn't — but in practice it is a spectrum, and where a system sits on that spectrum has enormous consequences for what it can do, where it can be deployed, and how safe it is.
+
+## The autonomy spectrum
+
+SAE International (the Society of Automotive Engineers) formulated a six-level framework for self-driving cars that is widely borrowed across robotics. At **Level 0**, the human does everything and the machine only provides information. At **Level 2**, the machine handles some tasks (like lane-keeping) but the human must remain attentive and ready to intervene at any moment. At **Level 5**, the machine handles all situations in all conditions — the steering wheel is optional.
+
+Most deployed robots in 2026 sit somewhere between Level 2 and Level 4. Warehouse robots from Fetch Robotics or 6 River Systems navigate autonomously within a known environment but depend on humans to handle exceptions. Waymo's robotaxi operates at Level 4 within specific geographic zones (it can handle anything within its operational design domain, but cannot go anywhere).
+
+## What autonomy requires technically
+
+A robot cannot be autonomous without competent sensing — it must know where it is and what is around it. It needs a planning capability to figure out what to do next. It needs robust execution to carry out that plan despite the messiness of the real world. And it needs a failure mode strategy: what does it do when the situation falls outside what it was designed for?
+
+The hardest part is the last one. Autonomous systems that handle known situations well are relatively achievable. Autonomous systems that handle genuinely novel, unexpected situations well — what researchers call handling "edge cases" — remain an open problem.
+
+## Why full autonomy is genuinely difficult
+
+The physical world is open-ended. A robot in a factory with a fixed layout and known objects faces a small, bounded set of situations. A robot driving on public roads or assisting in a home faces an essentially unlimited variety. Every increase in the scope of autonomy expands the number of situations the system must handle, including the rare and unexpected ones where mistakes are most likely and most costly.
+
+---
+
+*If a robot makes a mistake while acting autonomously, who is legally and morally responsible — the company that made it, the person who deployed it, or no one at all?*

@@ -1,0 +1,23 @@
+{
+  "id": "build-obstacle-avoider",
+  "slug": "obstacle-avoider",
+  "title": "Obstacle Avoiding Robot",
+  "tagline": "Use an HC-SR04 ultrasonic sensor to detect walls before you hit them, then turn away — the foundation of every autonomous robot.",
+  "level": "beginner",
+  "duration_hours": 3,
+  "total_xp": 600,
+  "components": [
+    { "name": "Arduino Uno (or Nano)" },
+    { "name": "HC-SR04 ultrasonic sensor" },
+    { "name": "SG90 servo motor (for sensor sweep)", "optional": true },
+    { "name": "L298N motor driver module" },
+    { "name": "2× BO geared motors with wheels" },
+    { "name": "Caster wheel" },
+    { "name": "Chassis" },
+    { "name": "Li-ion battery pack (7.4V)" },
+    { "name": "Jumper wires" }
+  ],
+  "simulation_only": false,
+  "color": "#34d399",
+  "icon": "📡"
+}

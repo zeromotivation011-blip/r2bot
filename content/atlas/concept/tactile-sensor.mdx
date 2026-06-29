@@ -1,0 +1,81 @@
+---
+title: Tactile sensor
+category: sensors
+summary: >-
+  A tactile sensor gives a robot spatially distributed touch — not just how hard
+  it is pressing in total, but exactly where across a surface contact is
+  happening. It is the difference between a numb hand and one that can feel a
+  grape.
+seeAlso: []
+sources:
+  - title: 'Science Robotics — Tactile sensors for robots: a review'
+    url: 'https://www.science.org/doi/10.1126/scirobotics.abn9020'
+  - title: MIT CSAIL — GelSight tactile sensor
+    url: 'https://www.csail.mit.edu/research/gelsight-high-resolution-tactile-sensor'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - sensors
+  - touch
+  - manipulation
+  - advanced
+difficulty: 3
+oneLiner: 'The concept concept: A tactile sensor gives a robot spatially distributed'
+laymanExplanation: >-
+  Human fingertips contain roughly 2,500 touch receptors per square centimetre —
+  four different types, each tuned to different qualities of contact: pressure,
+  vibration, stretch, and texture. Close your eyes and run your thumb across a
+  coin. You can feel the face, the lettering, the milled edge, without looking.
+  You are reading the coin through your skin. This
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without tactile sensor, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A tactile sensor gives a robot spatially distributed touch — not just how hard
+  it is pressing in total, but exactly where across a surface contact is
+  happening. It is the difference between a numb hand and one that can feel a
+  grape.
+slug: tactile-sensor
+bucket: concept
+---
+
+Human fingertips contain roughly 2,500 touch receptors per square centimetre — four different types, each tuned to different qualities of contact: pressure, vibration, stretch, and texture. Close your eyes and run your thumb across a coin. You can feel the face, the lettering, the milled edge, without looking. You are reading the coin through your skin. This is what roboticists have been trying to replicate for decades, with increasing success.
+
+The device at the centre of that effort is the tactile sensor.
+
+## The difference from force-torque sensing
+
+A [force-torque sensor](/atlas/concept/force-torque-sensor) tells a [robot](/atlas/concept/robot) the total force and twist acting at a single point — its wrist, say. That is useful, but it is like having one pressure gauge for your entire hand. A **tactile sensor** provides **spatial resolution**: it maps the distribution of pressure across a surface, recording which parts of a fingertip or palm are in contact, and how hard each region is pressing. This is what allows discriminating between gripping an object at its centre versus catching it at the edge, or detecting whether a surface is smooth or ridged.
+
+## How they work
+
+Tactile sensors come in many forms, but the most common research and commercial designs fall into a few categories.
+
+**Pressure-array sensors** use a grid of individual sensing elements — resistive, capacitive, or piezoelectric — embedded in a flexible material. Each element measures contact force at its location. A 16×16 array gives 256 independent readings across the sensor's face. Commercial products like BioTac (SynTouch) and Tekscan's pressure [mapping](/atlas/concept/mapping) sheets work this way.
+
+**Camera-based tactile sensors** take a radically different approach. MIT's **GelSight** sensor encapsulates a [camera](/atlas/concept/camera-vision) inside a transparent gel pad coated with a reflective membrane. When something presses into the gel, the membrane deforms, and the internal camera captures that deformation as a high-resolution image. By analysing the image, the system reconstructs the 3D shape and texture of whatever touched it — detailed enough to read embossed letters by touch alone.
+
+## Why it matters for manipulation
+
+The hardest manipulation tasks — picking ripe fruit without bruising it, threading a needle, reassembling a disassembled device — require knowing not just that contact has occurred but the precise geometry and distribution of that contact. A robot without tactile sensing is forced to rely entirely on vision, which cannot see what is happening between its fingertips and an object. Tactile [feedback](/atlas/concept/feedback) closes this gap. Research has shown robots with tactile sensors learning in-hand manipulation (rotating an object within the fingers) significantly faster than those relying on vision alone.
+
+## The current frontier
+
+Commercial tactile sensors are still fragile, expensive, and mechanically awkward to integrate into robot hands. The best academic sensors — including GelSight derivatives being commercialised by several MIT spinouts — are beginning to appear in research robots at scale. OpenAI's dextrous hand research and Google DeepMind's manipulation programme both treat tactile sensing as an open problem with major remaining progress needed. The human fingertip remains the gold standard that no artificial sensor has matched in density, sensitivity, and durability simultaneously.
+
+---
+
+*If a robot's tactile sensor can read text embossed on paper, could a future robot learn Braille — and what would it mean for accessibility technology?*

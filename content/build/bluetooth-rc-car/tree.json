@@ -1,0 +1,322 @@
+{
+  "root": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "explanation",
+      "title": "Drive your robot from your phone",
+      "body": "Remember those chunky plastic RC cars from childhood — the ones with a separate controller, a fat antenna, and batteries in both halves? You're building the modern version. Except your controller is the phone in your pocket, and your antenna is a $3 Bluetooth module.\n\nYour **Bluetooth RC Car** uses an **HC-05** module to receive commands from a free phone app called *Serial Bluetooth Terminal*. You send a single character — `F` for forward, `B` for back, `L` for left, `R` for right, `S` for stop — and the Arduino reads it and drives the motors accordingly.\n\nNo internet required. No server. No cloud. Just two devices talking directly to each other over Bluetooth — the same protocol your wireless headphones use, at roughly the same range: **about 10 metres** indoors.\n\nHardware: HC-05 Bluetooth module + Arduino Uno + L298N motor driver + 2 DC motors (or 4 for a 4WD build).\n\nThis project is intermediate — not because the hardware is harder, but because the **software pitfalls** are subtler. You'll discover the most dangerous one at the very end.\n\nLet's start with the wireless link itself.",
+      "branches": [{ "on": "next", "to": "q-bluetooth-vs-wifi" }],
+      "xp": 10
+    },
+    "q-bluetooth-vs-wifi": {
+      "id": "q-bluetooth-vs-wifi",
+      "type": "question",
+      "title": "Bluetooth vs. WiFi: which is faster for control?",
+      "body": "Both Bluetooth and WiFi are wireless protocols running in the 2.4 GHz band. You might assume WiFi is always better — it's faster for file transfers, after all.\n\nBut raw speed isn't what matters for robot control. What matters is **latency** — the time between you pressing the button and the robot responding.\n\nFor **short-range** control (under 10 metres, phone to robot directly), which protocol has lower latency?",
+      "hint": "WiFi requires connecting to a network infrastructure (a router, DHCP, IP stacks). Bluetooth creates a direct peer-to-peer connection with no intermediary.",
+      "hint2": "Bluetooth Classic (what HC-05 uses) creates a direct, persistent serial link. There's no router overhead, no packet routing, no DHCP. The latency for a serial character is typically 10–50 ms. WiFi with a router can add 50–200 ms of overhead just for the network stack.",
+      "question": {
+        "style": "mcq",
+        "prompt": "For direct short-range robot control (phone to Arduino, under 10m), which protocol typically has lower latency?",
+        "options": [
+          "WiFi — higher bandwidth means commands arrive faster",
+          "Bluetooth — direct peer-to-peer link with no router overhead",
+          "They're identical — both run at 2.4 GHz so latency is the same",
+          "It depends on your internet router speed"
+        ],
+        "correct": 1,
+        "explanation_correct": "**Bluetooth** wins for direct control. It forms a persistent, direct serial link between two devices — no router, no IP stack, no DHCP handshake. A single character goes from your phone to the Arduino in 10–50 ms. WiFi usually requires a router in the middle, adding 50–200 ms just for infrastructure overhead — noticeable when driving a robot.",
+        "explanation_wrong": "The answer is **Bluetooth**. It creates a direct, point-to-point serial connection. No router needed. No IP addressing overhead. A character from your phone arrives at the Arduino in 10–50 ms. WiFi, while higher bandwidth, routes through a network infrastructure that adds significant latency for control commands."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-hc05-baud" },
+        { "on": "wrong", "to": "q-hc05-baud" }
+      ],
+      "xp": 20
+    },
+    "q-hc05-baud": {
+      "id": "q-hc05-baud",
+      "type": "question",
+      "title": "The HC-05 default baud rate",
+      "body": "The HC-05 talks to the Arduino over a **UART** serial link (the same TX/RX pins as `Serial.begin()`). For them to understand each other, both devices must agree on the same **baud rate** — the number of bits transmitted per second.\n\nIf the baud rates don't match, you get garbage characters or silence. The HC-05 comes from the factory with a default baud rate, and your `Serial.begin()` in Arduino must match it.\n\nWhat is the HC-05's default baud rate?",
+      "hint": "This is the most common default baud rate for virtually every UART device in the Arduino ecosystem. It's a round number you've probably seen before.",
+      "hint2": "The HC-05 defaults to **9600 baud**. Your code must have `Serial.begin(9600)` to match. You can change it via AT commands, but 9600 works fine for single-character control commands.",
+      "question": {
+        "style": "number-input",
+        "prompt": "Default baud rate of the HC-05 (bits per second):",
+        "correct": 9600,
+        "explanation_correct": "**9600 baud** — the universal default. At 9600 bps, a single character (8 bits + start + stop = 10 bits) takes about 1 ms to transmit. For robot control that's effectively instantaneous. In your sketch: `Serial.begin(9600);` — that's it.",
+        "explanation_wrong": "The HC-05 defaults to **9600 baud**. Your Arduino sketch needs `Serial.begin(9600)` to match. At 9600 bps, each character takes ~1 ms — plenty fast for driving commands. You can change the HC-05's baud rate using AT commands (AT+UART=115200,0,0) if needed for higher-throughput applications."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-tx-rx-swap" },
+        { "on": "wrong", "to": "q-tx-rx-swap" }
+      ],
+      "xp": 30
+    },
+    "q-tx-rx-swap": {
+      "id": "q-tx-rx-swap",
+      "type": "question",
+      "title": "Wiring the UART: TX connects to RX",
+      "body": "UART is a two-wire communication: **TX** (transmit) and **RX** (receive).\n\nHere's the part that trips up almost every beginner: you do **not** connect TX to TX and RX to RX. That's like two people both talking at once and nobody listening.\n\nInstead, one device's TX goes to the other device's RX — a cross-connection. Think: the **output** of device A is the **input** of device B.\n\nIs this statement correct: HC-05 TX → Arduino RX, and HC-05 RX → Arduino TX?",
+      "hint": "TX = Transmit (output). RX = Receive (input). An output should connect to an input. So TX always goes to RX.",
+      "hint2": "Yes — HC-05 TX → Arduino RX, and HC-05 RX → Arduino TX. This is always the case for UART cross-connections. TX sends, RX receives. Always cross-connect.",
+      "question": {
+        "style": "boolean",
+        "prompt": "True or false: HC-05 TX connects to Arduino RX, and HC-05 RX connects to Arduino TX.",
+        "correct": "yes",
+        "explanation_correct": "True — and this is the rule for every UART connection ever: TX → RX, RX → TX. One side's output feeds the other side's input. It feels backwards until you think of it as: 'what I transmit, you receive.' Connecting TX to TX would mean both are outputting to each other — neither is listening.",
+        "explanation_wrong": "This is **TRUE**. UART wiring is always crossed:\n- HC-05 TX → Arduino RX (HC-05's output → Arduino's input)\n- HC-05 RX → Arduino TX (Arduino's output → HC-05's input)\n\nNever TX-to-TX. That's a common first-timer mistake that results in completely dead communication."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-voltage-hc05" },
+        { "on": "wrong", "to": "q-voltage-hc05" }
+      ],
+      "xp": 40
+    },
+    "q-voltage-hc05": {
+      "id": "q-voltage-hc05",
+      "type": "question",
+      "title": "The 3.3V problem",
+      "body": "Here's a wiring problem many builders ignore — until their HC-05 dies.\n\nThe HC-05 runs on **3.3V logic**. Its RX pin should never see more than 3.3V.\n\nThe Arduino Uno operates at **5V logic**. Its TX pin outputs 5V HIGH signals.\n\nIf you connect Arduino TX directly to HC-05 RX, you're sending 5V into a 3.3V input. Over time (or immediately in some batches) this damages the module.\n\nWhat's the standard solution?",
+      "hint": "You need to step the 5V signal down to 3.3V before it reaches the HC-05 RX pin. A resistor divider can do this simply with two resistors.",
+      "hint2": "A **voltage divider** on the Arduino TX → HC-05 RX line: e.g., 1kΩ from Arduino TX, 2kΩ to GND, junction to HC-05 RX. This steps 5V down to approximately 3.3V. Alternatively, a logic level converter (74AHCT125) handles it properly at higher speeds.",
+      "question": {
+        "style": "mcq",
+        "prompt": "HC-05 logic level is 3.3V, Arduino TX is 5V. What do you need on the TX→RX line?",
+        "options": [
+          "Nothing — HC-05 is tolerant of 5V anyway",
+          "A voltage divider (e.g. 1kΩ + 2kΩ) to step 5V down to 3.3V before HC-05 RX",
+          "A transformer to step down the voltage safely",
+          "A capacitor to smooth the signal"
+        ],
+        "correct": 1,
+        "explanation_correct": "**Voltage divider** on the Arduino TX → HC-05 RX line. Classic values: 1kΩ from Arduino TX, 2kΩ from that junction to GND, junction to HC-05 RX. Output = 5V × (2k/(1k+2k)) = 3.33V ✓. The HC-05 → Arduino direction (HC-05 TX → Arduino RX) is fine because 3.3V HIGH is above the Arduino's logic threshold (~2.5V) and reads correctly.",
+        "explanation_wrong": "The answer is a **voltage divider**. HC-05 datasheet: RX maximum 3.3V. Arduino TX: 5V. Connect a 1kΩ resistor from Arduino TX to a junction, then a 2kΩ from that junction to GND, and the junction goes to HC-05 RX. Output = 5 × (2/3) = 3.33V — safe. The other direction (HC-05 TX to Arduino RX) needs no treatment."
+      },
+      "branches": [
+        { "on": "correct", "to": "explain-serial-commands" },
+        { "on": "wrong", "to": "explain-serial-commands" }
+      ],
+      "xp": 50
+    },
+    "explain-serial-commands": {
+      "id": "explain-serial-commands",
+      "type": "explanation",
+      "title": "The command protocol: one character, one action",
+      "body": "The phone app (*Serial Bluetooth Terminal*) sends text over Bluetooth. On the Arduino side, that text arrives through `Serial` as bytes.\n\nYour command protocol is deliberately minimal:\n\n| Character | Action |\n|-----------|--------|\n| `F` | Forward — both motors forward |\n| `B` | Back — both motors reverse |\n| `L` | Left — left motor stops or reverses, right motor forward |\n| `R` | Right — right motor stops or reverses, left motor forward |\n| `S` | Stop — both motors off |\n\n**Why single characters?** Simplicity and speed. Sending `FORWARD` (7 bytes) is 7× the latency of `F` (1 byte). At 9600 baud, that's a difference of 6 ms vs. 1 ms — not huge, but single characters are also simpler to parse. No need to look for terminators or buffer multi-byte strings.\n\nIn *Serial Bluetooth Terminal*, configure each button to send the exact single character. Set the app to **not add newline** (or handle it in code with `if (cmd == '\\n') return;`).\n\nThis is your entire communication protocol. The Arduino's job: read one character, decide what to do, set the motor pins accordingly.",
+      "branches": [{ "on": "next", "to": "code-fill-serial" }],
+      "xp": 20
+    },
+    "code-fill-serial": {
+      "id": "code-fill-serial",
+      "type": "question",
+      "title": "Code: reading the Bluetooth command",
+      "body": "Here's the receive loop. Every iteration of `loop()`, you check if a character has arrived and read it:\n\n```\nvoid loop() {\n  if (Serial.available()) {\n    char cmd = Serial.___();\n    handleCommand(cmd);\n  }\n}\n```\n\n`Serial.available()` returns the number of bytes waiting in the buffer (0 = nothing arrived). When it's non-zero, you call a method on `Serial` to actually read that byte out of the buffer.\n\nFill in the method name.",
+      "hint": "There's a very common Serial method that reads one byte from the receive buffer and returns it. It's a short, obvious verb.",
+      "hint2": "The method is `read()`. `Serial.read()` takes one byte from the receive buffer and returns it as an int (cast to char here). Don't confuse with `readString()` or `readStringUntil()` — those are for multi-character reads.",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Fill in the blank:\n\n`char cmd = Serial.___();`",
+        "correct": "read",
+        "explanation_correct": "`Serial.read()` — it dequeues one byte from the receive buffer and returns it as an integer (here cast to `char`). Always check `Serial.available() > 0` before calling `read()`, otherwise you get -1 (empty buffer). After `read()`, the byte is gone from the buffer — you can't re-read it.",
+        "explanation_wrong": "The answer is `read`. Complete line:\n```\nchar cmd = Serial.read();\n```\n`Serial.read()` returns the next byte in the receive buffer as an `int`. Casting to `char` gives you the character. If the buffer is empty (you forgot to check `available()` first), it returns -1."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-switch-case" },
+        { "on": "wrong", "to": "q-switch-case" }
+      ],
+      "xp": 50
+    },
+    "q-switch-case": {
+      "id": "q-switch-case",
+      "type": "question",
+      "title": "switch-case vs. if-else for commands",
+      "body": "You have 5 possible commands: F, B, L, R, S. You could handle them with a chain of if-else:\n\n```\nif (cmd == 'F') motorForward();\nelse if (cmd == 'B') motorBack();\nelse if (cmd == 'L') motorLeft();\n// ...etc\n```\n\nOr with a switch-case:\n\n```\nswitch (cmd) {\n  case 'F': motorForward(); break;\n  case 'B': motorBack();    break;\n  // ...etc\n}\n```\n\nFor a fixed set of single-character commands, which approach is better practice?",
+      "hint": "Think about readability, adding new commands later, and how the compiler handles each form. Switch-case is specifically designed for this pattern.",
+      "hint2": "switch-case is idiomatic for dispatching on a set of known values. It's clearer to read, easier to extend (just add a new `case`), and the compiler may optimise it into a jump table — faster than sequential comparisons.",
+      "question": {
+        "style": "boolean",
+        "prompt": "True or false: switch-case is better than an if-else chain for dispatching a fixed set of single-character commands.",
+        "correct": "yes",
+        "explanation_correct": "True. switch-case is the idiomatic choice here. It's more readable (each case is visually parallel), easier to maintain (add/remove commands by adding/removing cases), and compilers often optimise it into an O(1) jump table rather than O(n) sequential comparisons. The `break` at the end of each case is mandatory — without it, execution 'falls through' to the next case.",
+        "explanation_wrong": "This is **TRUE**. switch-case is purpose-built for this pattern. It's cleaner than a long if-else chain, and with 5+ cases the difference in readability becomes significant. The compiler may also generate a jump table (constant time) instead of sequential comparisons. Just don't forget the `break` — fall-through is a classic bug."
+      },
+      "branches": [
+        { "on": "correct", "to": "code-fill-case" },
+        { "on": "wrong", "to": "code-fill-case" }
+      ],
+      "xp": 40
+    },
+    "code-fill-case": {
+      "id": "code-fill-case",
+      "type": "question",
+      "title": "Code: completing the switch-case",
+      "body": "Here's the switch-case structure for handling commands. Each case calls the appropriate motor function.\n\n```\nswitch (cmd) {\n  case 'F': motorForward(); ___;\n  case 'B': motorBack();    break;\n  case 'L': motorLeft();    break;\n  case 'R': motorRight();   break;\n  case 'S': motorStop();    break;\n  default:  break;\n}\n```\n\nThe first case is missing something critical. What goes in the blank?",
+      "hint": "Without the blank, after `motorForward()` executes, the code would continue into `case 'B'` and call `motorBack()` too — overriding the forward command immediately.",
+      "hint2": "The blank is `break`. Every `case` block must end with `break` (or `return`) to prevent fall-through to the next case.",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Fill in the blank:\n\n`case 'F': motorForward(); ___;`",
+        "correct": "break",
+        "explanation_correct": "`break` — it exits the switch block. Without it, execution falls through to `case 'B'` and calls `motorBack()` immediately after `motorForward()` — the motors would spin forward and backward simultaneously in the same millisecond, effectively stopping. This fall-through behaviour is intentional in C for some patterns but catastrophic here.",
+        "explanation_wrong": "The answer is `break`. Without `break`, C's switch falls through to the next case automatically. So 'F' would trigger `motorForward()` and then immediately `motorBack()` — your motor driver would try to spin forward and backward at the same time, which means zero net movement (or a stall). Always `break` after every case."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-pwm-speed" },
+        { "on": "wrong", "to": "q-pwm-speed" }
+      ],
+      "xp": 60
+    },
+    "q-pwm-speed": {
+      "id": "q-pwm-speed",
+      "type": "question",
+      "title": "Setting motor speed with PWM",
+      "body": "Your L298N's `ENA` and `ENB` pins accept PWM signals (0–255) to control motor speed.\n\nFor a remote-controlled car, 100% speed (255) might be too fast indoors — you'll crash before you can react. A safer starting point is **75% of maximum speed**.\n\nArduino's `analogWrite()` accepts values from 0 (off) to 255 (full). What value gives 75% speed?",
+      "hint": "75% of 255. Multiply: 255 × 0.75.",
+      "hint2": "255 × 0.75 = 191.25 → round to **191**. `analogWrite(ENA, 191)` sets the left motor to 75% speed.",
+      "question": {
+        "style": "mcq",
+        "prompt": "To set motor speed to 75%, the analogWrite value is:",
+        "options": [
+          "75 (percentage, not raw PWM value)",
+          "150 (that's ~59%, not 75%)",
+          "191 (correct: 0.75 × 255 = 191.25 ≈ 191)",
+          "255 (that's 100%)"
+        ],
+        "correct": 2,
+        "explanation_correct": "**191** — 75% of 255 = 191.25, rounded to 191. In your setup code: `analogWrite(ENA, 191); analogWrite(ENB, 191);`. You can make speed a variable and adjust it on the fly — receiving `+` to speed up and `-` to slow down is a common extension once the basic commands work.",
+        "explanation_wrong": "The answer is **191**. PWM 0–255, so 75% = 0.75 × 255 = 191.25 ≈ 191. Option A (75) is a common mistake — that's the percentage, not the raw value. `analogWrite()` always takes 0–255, not 0–100."
+      },
+      "branches": [
+        { "on": "correct", "to": "simulation" },
+        { "on": "wrong", "to": "simulation" }
+      ],
+      "xp": 60
+    },
+    "simulation": {
+      "id": "simulation",
+      "type": "simulation",
+      "title": "Drive it — simulation mode",
+      "body": "Your RC car is fully specified:\n\n- HC-05 → Arduino Serial (9600 baud, TX/RX crossed, voltage divider on RX line)\n- Commands: F/B/L/R/S via `Serial.read()` in a `switch-case`\n- Speed: `analogWrite(ENA, 191)` for 75%\n- Motor directions: L298N IN1/IN2/IN3/IN4 control forward/reverse per motor\n\nThe simulation lets you drive the car using keyboard keys (F=forward etc.) and shows the Bluetooth serial traffic on the right.\n\n**Try these:**\n1. Drive forward then quickly press L — notice the turn lag\n2. Press F then immediately press S — how fast does it stop?\n3. Drive toward a wall and press S late — what happens?\n\nPay close attention to #3. Come back when you've tested it.",
+      "simulation_url": "/visualizer?mode=rc-car",
+      "branches": [{ "on": "next", "to": "q-pairing" }],
+      "xp": 60
+    },
+    "q-pairing": {
+      "id": "q-pairing",
+      "type": "question",
+      "title": "Pairing the HC-05",
+      "body": "Before your phone can talk to the HC-05, you need to **pair** them — a one-time Bluetooth handshake where both devices exchange a PIN code.\n\nOn Android: Settings → Bluetooth → scan for devices → tap HC-05 → enter PIN.\n\nWhat is the HC-05's default pairing PIN?",
+      "hint": "It's a common 4-digit default PIN — the same as many cheap locks. Think about what someone might set as a 'default' numerical PIN.",
+      "hint2": "The HC-05 default PIN is **1234**. Some modules ship with **0000** — if 1234 fails, try 0000. You can change it in AT mode with `AT+PSWD=your_new_pin`.",
+      "question": {
+        "style": "mcq",
+        "prompt": "The HC-05 default Bluetooth pairing PIN is:",
+        "options": [
+          "0000",
+          "1234",
+          "9999",
+          "No PIN — it auto-pairs"
+        ],
+        "correct": 1,
+        "explanation_correct": "**1234** — the HC-05 factory default. If that fails, try 0000 (some batches differ). You can change it in AT mode: hold the button while applying power, then send `AT+PSWD=5678` via serial to set a new PIN. After pairing once, your phone remembers it.",
+        "explanation_wrong": "The default PIN is **1234** (with 0000 as a fallback for some batches). To change it, enter AT mode by holding the small button while powering on — the LED blinks slowly. Then send `AT+PSWD=newpin` from a serial terminal. Return to normal mode by removing and reapplying power without the button held."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-at-mode" },
+        { "on": "wrong", "to": "q-at-mode" }
+      ],
+      "xp": 30
+    },
+    "q-at-mode": {
+      "id": "q-at-mode",
+      "type": "question",
+      "title": "Configuring the HC-05: AT mode",
+      "body": "The HC-05 can be configured — name, baud rate, PIN, master/slave role — through **AT commands**. AT commands are a text-based configuration language that comes from old modem days (1980s) and is still used in virtually every wireless module on the market.\n\nTo enter AT mode on the HC-05 (so it listens for configuration commands instead of data), you need to do something physical when powering it on.\n\nIs it true that you enter AT mode by **holding the small button on the HC-05 while applying power**?",
+      "hint": "Most HC-05 modules have a tiny push button next to the main chip. Holding it during power-up forces the module into AT command mode (LED blinks slowly, 2s period) instead of normal data mode.",
+      "hint2": "Yes — hold the button while applying power. The LED changes from fast blinking (normal mode, ~5Hz) to slow blinking (AT mode, ~0.5Hz). Then connect via serial at **38400 baud** (AT mode uses 38400, not 9600) and send `AT` — you should get `OK` back.",
+      "question": {
+        "style": "boolean",
+        "prompt": "True or false: you enter AT command mode on the HC-05 by holding its small button while applying power (LED blinks slowly in AT mode).",
+        "correct": "yes",
+        "explanation_correct": "True. Hold the button → apply power → LED blinks slowly (~2s period). Now it's in AT mode. Connect at **38400 baud** (not 9600 — AT mode has a different baud rate). Send `AT` → `OK`. Then commands like `AT+NAME=MyRobot`, `AT+UART=115200,0,0`, `AT+PSWD=5678`. Power cycle without button held to return to data mode.",
+        "explanation_wrong": "This is **TRUE**. The procedure:\n1. Hold the small button on the HC-05\n2. Apply power while holding\n3. LED blinks slowly (~0.5 Hz) — you're in AT mode\n4. Connect serial at **38400 baud**\n5. Send `AT` — should get `OK`\n6. Configure away\n7. Power off, remove button hold, power on → data mode returns"
+      },
+      "branches": [
+        { "on": "correct", "to": "checkpoint" },
+        { "on": "wrong", "to": "checkpoint" }
+      ],
+      "xp": 40
+    },
+    "checkpoint": {
+      "id": "checkpoint",
+      "type": "checkpoint",
+      "title": "Checkpoint — the full communication stack",
+      "body": "Let's review the complete chain from your finger to the motor:\n\n**Phone → HC-05 (Bluetooth)**\n- Pair with PIN 1234\n- App sends single character: F / B / L / R / S\n- Bluetooth range: ~10m indoors\n\n**HC-05 → Arduino (UART)**\n- TX↔RX crossed (HC-05 TX → Arduino RX, HC-05 RX → Arduino TX)\n- Baud rate: 9600 on both sides\n- Voltage divider on Arduino TX → HC-05 RX line (5V → 3.3V)\n\n**Arduino → L298N → Motors**\n- `Serial.read()` gets the character\n- `switch-case` dispatches to motor function\n- `analogWrite(ENA, 191)` sets 75% speed\n- L298N H-bridge drives the motors\n\n**Configuring HC-05**\n- Hold button + power → AT mode (38400 baud)\n- `AT+NAME`, `AT+PSWD`, `AT+UART` to customise\n\nEverything works. Or does it?\n\nThere is one critical safety problem with this robot that you haven't addressed yet. The next two questions will reveal it — and the fix.",
+      "branches": [{ "on": "next", "to": "q-latency" }],
+      "xp": 100
+    },
+    "q-latency": {
+      "id": "q-latency",
+      "type": "question",
+      "title": "The runaway robot problem",
+      "body": "Your robot is driving forward — you sent `F` from the app. It's heading toward the edge of the table.\n\nYour Bluetooth connection drops for just **1 second** (common — phone lock screen, WiFi interference, anything). During that second, no new command arrives.\n\nWhat does your robot do?",
+      "hint": "Look at your `loop()` code. It checks `if (Serial.available())`. If nothing arrives, it does… nothing. It doesn't stop the motors. It just runs the previous motor command indefinitely.",
+      "hint2": "The motors keep running whatever direction they last received. If the last command was `F`, the robot keeps going forward until it hits something. This is the **runaway robot problem** — a real safety concern in any wireless control system.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Bluetooth drops for 1 second. Last received command was 'F' (forward). What does the robot do?",
+        "options": [
+          "Stops immediately — no signal means no power to motors",
+          "Keeps driving forward until a new command arrives or it hits something",
+          "Reverses as a safety behaviour",
+          "Beeps and waits for reconnection"
+        ],
+        "correct": 1,
+        "explanation_correct": "**Keeps going forward** — the motors are driven by the L298N which holds its last state until told otherwise. The Arduino loop sees no new characters and does nothing. The motors run indefinitely. This is not a bug in the code so much as a **missing feature** — the code doesn't handle the case of communication loss. A real RC car or drone has a failsafe that triggers after N ms of silence.",
+        "explanation_wrong": "Answer: **keeps driving forward**. The L298N holds the motor pins in whatever state they were last set. The Arduino sees no new `Serial.available()` data and does nothing. The motors run until the robot crashes, falls off a table, or the battery dies. This is called the **runaway problem** and it's why every serious remote control system has a **communication timeout watchdog**."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-safety-fix" },
+        { "on": "wrong", "to": "q-safety-fix" }
+      ],
+      "xp": 80
+    },
+    "q-safety-fix": {
+      "id": "q-safety-fix",
+      "type": "question",
+      "title": "The safety fix: communication timeout",
+      "body": "You've identified the problem: if communication drops, the robot runs away indefinitely.\n\nThe fix is a **timeout watchdog**: you record the timestamp of the last received command. In every `loop()` iteration, you check how long it's been since the last command. If it's been more than a threshold (say 200 ms), you automatically stop the motors — even if no `S` command was received.\n\n```\nunsigned long lastCmdTime = 0;\n\n// In loop():\nif (millis() - lastCmdTime > 200) {\n  motorStop(); // Safety fallback\n}\n\nif (Serial.available()) {\n  char cmd = Serial.read();\n  lastCmdTime = millis(); // Reset watchdog\n  handleCommand(cmd);\n}\n```\n\nNow the robot stops automatically if no command arrives within 200 ms. What's the best fix from the options below?",
+      "hint": "You want something that proactively stops the motors when communication is lost — not just something cosmetic like a bigger antenna or a different colour.",
+      "hint2": "A **communication timeout** — stop if no command received within ~200 ms — is exactly the right engineering answer. Real drones, RC planes, and autonomous vehicles all implement this.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Best fix for the runaway robot problem caused by Bluetooth dropout:",
+        "options": [
+          "Add a timeout: if no command received within 200ms, automatically stop the motors",
+          "Make the robot drive faster so it finishes manoeuvres before the connection drops",
+          "Use a longer Bluetooth antenna to reduce dropout frequency",
+          "Paint the robot red so you can see it when it runs away"
+        ],
+        "correct": 0,
+        "explanation_correct": "**Timeout watchdog** — the correct engineering answer. Record `lastCmdTime = millis()` every time a command arrives. In `loop()`, check `if (millis() - lastCmdTime > 200) motorStop();`. Now a 200 ms silence triggers a stop. This is standard practice in all wireless control systems: drones go into hover/land mode, RC planes go to neutral throttle, RC cars stop. Safety first.",
+        "explanation_wrong": "The answer is the **timeout watchdog**. The code pattern:\n```\nif (millis() - lastCmdTime > 200) motorStop();\n```\nThis runs every `loop()`. If 200 ms passes without a new command, motors stop. When the connection recovers and you send `F` again, `lastCmdTime` resets and the robot moves. This is identical to the 'failsafe' feature in commercial RC receivers — it's been legally required in RC aircraft for decades."
+      },
+      "branches": [
+        { "on": "correct", "to": "complete" },
+        { "on": "wrong", "to": "complete" }
+      ],
+      "xp": 80
+    },
+    "complete": {
+      "id": "complete",
+      "type": "complete",
+      "title": "Bluetooth RC Car — Built",
+      "body": "You've built a wireless robot you can drive from your phone — and more importantly, you know *why* every design choice was made.\n\n**What you understand now:**\n- Why Bluetooth has lower latency than WiFi for direct short-range control\n- HC-05 default settings: 9600 baud, PIN 1234, AT mode via button + power\n- UART cross-connection: TX always goes to RX\n- The 3.3V/5V mismatch and why a voltage divider is needed\n- Single-character command protocol and switch-case dispatch\n- PWM speed control: 75% = `analogWrite(ENA, 191)`\n- **The runaway robot problem** — and the 200 ms timeout watchdog that solves it\n\n**The safety lesson** is the most important thing you learned today. Wireless control without a timeout is dangerous. Every real system — from hobby drones to industrial AGVs — has a communication watchdog. You now know why.\n\n**Total XP:** all of it.\n\n**Suggested next robot:** **Balance Bot** — this is where real control engineering begins. The balance bot requires a **full PID controller** (P + I + D) running at 100+ Hz to keep an inverted pendulum upright. You've already used PWM, serial, and motor drivers. Now you'll add an IMU (MPU-6050), a complementary filter for angle estimation, and tune three gain constants that interact with each other. It's the project where engineers separate from hobbyists.",
+      "branches": [],
+      "xp": 100
+    }
+  }
+}

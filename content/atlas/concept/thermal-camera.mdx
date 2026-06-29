@@ -1,0 +1,130 @@
+---
+title: Thermal Camera in Robotics — Complete Guide | R2BOT
+summary: >-
+  Thermal cameras image infrared heat instead of visible light. Used in
+  search-and-rescue robots, predictive maintenance, and India's fever-screening
+  robots.
+category: sensors
+bucket: sensors
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - thermal
+  - ir
+  - imaging
+  - maintenance
+  - sar
+relatedTerms:
+  - camera-vision
+  - depth-camera
+  - object-detection
+  - search-and-rescue-robotics
+seeAlso:
+  - camera-vision
+  - depth-camera
+  - object-detection
+  - search-and-rescue-robotics
+youtubeSearchQuery: thermal camera robotics tutorial
+oneLiner: 'The sensors concept: Thermal cameras image infrared heat instead of visible'
+laymanExplanation: >-
+  A thermal camera images the infrared heat radiated by every object instead of
+  the visible light most cameras see. Hot regions glow brightly even in pitch
+  dark, through smoke or thin walls. In robotics, thermal cameras let robots
+  'see' people, hot machinery, and fires that normal cameras cannot.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without thermal camera in robotics — complete guide | r2bot, many sensors
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Thermal cameras image infrared heat instead of visible light. Used in
+  search-and-rescue robots, predictive maintenance, and India's fever-screening
+  robots.
+slug: thermal-camera
+---
+
+# Thermal Camera in Robotics
+
+## What is Thermal Camera in Robotics?
+
+A thermal camera images the infrared heat radiated by every object instead of the visible light most cameras see. Hot regions glow brightly even in pitch dark, through smoke or thin walls. In robotics, thermal cameras let robots 'see' people, hot machinery, and fires that normal cameras cannot.
+
+## How It Works
+
+A thermal sensor (a bolometer array) measures the temperature of each pixel by detecting long-wave infrared radiation. Pixels are tiny resistors whose resistance changes with the heat they absorb. A read-out circuit converts every pixel into a temperature reading, and a colour-mapped image is rendered (cool = blue, hot = red). Resolution is much lower than visible-light cameras — a $200 FLIR Lepton gives 160×120 pixels at 9 Hz — but for human or hotspot detection that is more than enough.
+
+## Real-World Example
+
+During COVID, Indian airports and offices used robots fitted with FLIR thermal cameras to screen passengers for fever in seconds. Power-grid inspection drones use thermal cameras to find overheating transformers. Search-and-rescue teams use thermal-equipped drones to find people in earthquake rubble at night.
+
+## Why It Matters for Robotics
+
+Thermal cameras open up perception that visible cameras cannot match: night-vision, smoke-penetration, fire detection, electrical-fault detection. Industries in India (power, oil & gas, agriculture, defence) have growing demand for thermal-equipped robots.
+
+## Try It Yourself
+
+A FLIR Lepton 3.5 breakout pairs with a Raspberry Pi over SPI. Read the official tutorial, capture a few frames of your laptop and your face, then overlay them onto a normal camera image to compare.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "A thermal camera detects:",
+    "options": [
+      "Visible light only",
+      "Infrared radiation emitted by objects",
+      "Ultrasound",
+      "Magnetism"
+    ],
+    "answer": 1,
+    "explain": "Thermal cameras detect long-wave infrared emitted as heat — letting them see through darkness and smoke."
+  },
+  {
+    "q": "A typical FLIR Lepton has resolution around:",
+    "options": [
+      "4K (3840×2160)",
+      "160×120 px",
+      "8 megapixels",
+      "1 px"
+    ],
+    "answer": 1,
+    "explain": "Microbolometer thermal sensors are low-res by visible-camera standards — 160×120 is common."
+  },
+  {
+    "q": "Which is NOT a typical use of thermal cameras in robotics?",
+    "options": [
+      "Detecting overheating motors",
+      "Reading printed text on a sign",
+      "Finding humans in dark/smoke",
+      "Detecting overheated power lines"
+    ],
+    "answer": 1,
+    "explain": "Thermal cameras have too low resolution and no colour-text contrast for OCR — use visible cameras for that."
+  }
+]
+```
+
+## Further Reading
+
+- [Camera Vision](/atlas/concept/camera-vision)
+- [Depth Camera](/atlas/concept/depth-camera)
+- [Object Detection](/atlas/concept/object-detection)
+- [Search And Rescue Robotics](/atlas/concept/search-and-rescue-robotics)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Thermal Camera in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

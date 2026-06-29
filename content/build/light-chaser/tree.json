@@ -1,0 +1,290 @@
+{
+  "root": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "explanation",
+      "title": "Sunflowers, solar panels, and you",
+      "body": "Every morning, a sunflower faces east. Every afternoon, it faces west. It's tracking the sun — a behaviour called **phototropism** — and it's been doing this for millions of years without a microcontroller.\n\nYou're about to build the electronic version.\n\nYour **Light Chaser** has two **LDR sensors** (light-dependent resistors) mounted left and right on its front. A servo motor sits in the middle. When more light hits the left LDR, the servo turns left. When more light hits the right one, it turns right. The robot always faces the brightest source — a torch, a desk lamp, a window.\n\nThis is exactly how **solar tracking systems** work in large-scale solar farms. The panels rotate on motorised mounts, following the sun across the sky to maximise energy collection all day. The physics is the same — just bigger motors and GPS timestamps instead of an Arduino and two LDRs.\n\nHardware: 2× LDR + 10kΩ resistors, Arduino Uno, SG90 servo motor.\n\nLet's start with the sensor itself.",
+      "branches": [{ "on": "next", "to": "q-ldr-resistance" }],
+      "xp": 10
+    },
+    "q-ldr-resistance": {
+      "id": "q-ldr-resistance",
+      "type": "question",
+      "title": "How does an LDR work?",
+      "body": "An **LDR** (light-dependent resistor, also called a photoresistor) is a component whose electrical resistance changes based on how much light hits it.\n\nIt looks like a little disc with a squiggly snake pattern on top — that snake is the light-sensitive material. When photons hit it, they knock electrons loose, which changes how easily current flows.\n\nWhat happens to an LDR's resistance in **bright light**?",
+      "hint": "Think about it this way: bright light makes it *easier* for current to flow. When current flows more easily, resistance is…",
+      "hint2": "More light → more free electrons → easier current flow → **lower resistance**. In darkness, almost no electrons are freed → very high resistance (megaohms). In bright light → low resistance (hundreds of ohms).",
+      "question": {
+        "style": "mcq",
+        "prompt": "In bright light, an LDR's resistance…",
+        "options": [
+          "Increases significantly",
+          "Decreases significantly",
+          "Stays exactly the same",
+          "Drops to exactly zero ohms"
+        ],
+        "correct": 1,
+        "explanation_correct": "**Decreases** — in bright light, resistance can drop from megaohms in total darkness to a few hundred ohms in bright sunlight. This large swing is what makes LDRs so useful as light sensors. The Arduino can't read resistance directly, though — which is why we need the next step.",
+        "explanation_wrong": "The answer is **decreases**. In total darkness an LDR might read 1 MΩ. In direct sunlight it might drop to 300 Ω. That's a 3,000× change — a huge signal to work with. But the Arduino reads **voltage**, not resistance, so we need to convert."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-voltage-divider" },
+        { "on": "wrong", "to": "q-voltage-divider" }
+      ],
+      "xp": 20
+    },
+    "q-voltage-divider": {
+      "id": "q-voltage-divider",
+      "type": "question",
+      "title": "Reading an LDR: the voltage divider",
+      "body": "Here's the problem: the Arduino's analog pins read **voltage** (0–5 V), not resistance. An LDR gives you a changing resistance. How do you convert resistance change into voltage change?\n\nThe answer is a **voltage divider** — a second, fixed resistor in series with the LDR, connected between 5V and GND. The midpoint between the two resistors is connected to the Arduino's analog pin.\n\nAs the LDR's resistance changes with light, the voltage at the midpoint changes too. Do you need a fixed resistor to build this?",
+      "hint": "You need two resistors in a voltage divider: one fixed (your 10kΩ) and one variable (the LDR). Without the fixed resistor, there's no divider — just a direct short or open circuit.",
+      "hint2": "Yes — you always need a second, fixed resistor to form a proper voltage divider with the LDR. Without it, the analog pin would just see 5V or 0V with nothing in between.",
+      "question": {
+        "style": "boolean",
+        "prompt": "True or false: to read an LDR with an Arduino analog pin, you need a fixed resistor in series with the LDR to form a voltage divider.",
+        "correct": "yes",
+        "explanation_correct": "True. The circuit is: **5V → fixed resistor → junction → LDR → GND**. The analog pin reads the junction voltage. When the LDR's resistance drops (bright light), the junction voltage rises toward 5V. When LDR resistance rises (darkness), the junction voltage drops toward 0V. Simple and reliable.",
+        "explanation_wrong": "This is **TRUE**. You need a voltage divider:\n```\n5V ─── 10kΩ ─── A0 ─── LDR ─── GND\n```\nWithout the 10kΩ, bright light would short the analog pin directly to 5V and dark would leave it floating. The fixed resistor creates the ratio that turns resistance change into a readable voltage."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-resistor-value" },
+        { "on": "wrong", "to": "q-resistor-value" }
+      ],
+      "xp": 30
+    },
+    "q-resistor-value": {
+      "id": "q-resistor-value",
+      "type": "question",
+      "title": "Which resistor value?",
+      "body": "The fixed resistor value matters. You want to pick one that puts the midpoint voltage **in the middle of the Arduino's readable range** under typical lighting conditions — not stuck near 0V or 5V.\n\nLDRs in normal indoor light typically read a few kilohms. You want a fixed resistor in the same ballpark so the division ratio gives you a good swing.\n\nWhich resistor value pairs best with an LDR in a voltage divider for indoor light sensing?",
+      "hint": "The LDR is in the kilohm range under indoor lighting. For the best voltage swing, you want the fixed resistor to be a similar magnitude — not 1Ω (too small) and not 1MΩ (too large).",
+      "hint2": "**10 kΩ** is the standard answer. It's close enough to the LDR's indoor resistance to give a midpoint voltage near 2.5V, giving you the full range of the ADC to work with.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Best fixed resistor to pair with an LDR in a voltage divider for light sensing:",
+        "options": [
+          "1 Ω (way too small — divider barely changes with light)",
+          "10 kΩ (matches typical LDR indoor resistance range)",
+          "1 MΩ (too large — divider would always read near 0V indoors)",
+          "0 Ω (a wire — this would short-circuit the LDR)"
+        ],
+        "correct": 1,
+        "explanation_correct": "**10 kΩ** is the standard choice. Your LDR in typical indoor light reads 5–20 kΩ, so a 10 kΩ partner gives a midpoint voltage near 2–3V — right in the comfortable middle of the ADC range. You get a big readable swing both ways as light changes.",
+        "explanation_wrong": "The answer is **10 kΩ**. It matches the order of magnitude of an LDR's indoor resistance (5–20 kΩ), giving you a voltage near 2.5V at the midpoint — perfectly centred in the ADC's 0–5V range. 1 Ω would nearly short the junction to GND. 1 MΩ would barely move the needle indoors."
+      },
+      "branches": [
+        { "on": "correct", "to": "explain-analogread" },
+        { "on": "wrong", "to": "explain-analogread" }
+      ],
+      "xp": 40
+    },
+    "explain-analogread": {
+      "id": "explain-analogread",
+      "type": "explanation",
+      "title": "What analogRead() actually returns",
+      "body": "The Arduino's `analogRead()` function reads the voltage on an analog pin and converts it to a number. But what range does it return?\n\nThe Arduino has a **10-bit ADC** (Analog-to-Digital Converter). 10 bits means 2¹⁰ = **1024 possible values**, ranging from **0 to 1023**.\n\n- `analogRead()` returns **0** when the pin sees **0V** (complete darkness → LDR very high resistance → all voltage dropped across LDR → 0V at midpoint)\n- `analogRead()` returns **1023** when the pin sees **5V** (bright light → LDR very low resistance → nearly all voltage dropped across fixed resistor → 5V at midpoint)\n\nSo with our 5V → 10kΩ → A0 → LDR → GND circuit:\n\n- **Bright light** → high `analogRead()` value (closer to 1023)\n- **Darkness** → low `analogRead()` value (closer to 0)\n\nThis is the number your code will use to compare left vs. right LDR brightness.\n\n```\nint leftVal  = analogRead(A0);  // 0–1023\nint rightVal = analogRead(A1);  // 0–1023\n```",
+      "branches": [{ "on": "next", "to": "q-analog-max" }],
+      "xp": 20
+    },
+    "q-analog-max": {
+      "id": "q-analog-max",
+      "type": "question",
+      "title": "The ADC ceiling",
+      "body": "Quick check — you need this number for the `map()` function coming up.\n\nThe Arduino's analog-to-digital converter is 10 bits wide. What is the maximum value that `analogRead()` can possibly return?",
+      "hint": "2¹⁰ = 1024 possible values. They start at 0, so the highest value is one less than 1024.",
+      "hint2": "2¹⁰ = 1024 steps. Numbered 0 through 1023. Maximum = **1023**.",
+      "question": {
+        "style": "number-input",
+        "prompt": "Maximum value returned by analogRead() on an Arduino Uno:",
+        "correct": 1023,
+        "explanation_correct": "**1023** — the ADC has 1024 steps (0 through 1023). 10 bits, 2¹⁰ = 1024. The reading represents the voltage as a fraction of 5V: `voltage = (reading / 1023.0) × 5`. You'll use 1023 as the boundary in the `map()` call coming next.",
+        "explanation_wrong": "The answer is **1023**. Arduino's ADC is 10-bit: 2¹⁰ = 1024 possible values, numbered 0 to 1023. 5V maps to 1023, 0V maps to 0. Many beginners say 1024 — that's the count of steps, but the maximum value index is always count − 1."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-two-ldrs" },
+        { "on": "wrong", "to": "q-two-ldrs" }
+      ],
+      "xp": 30
+    },
+    "q-two-ldrs": {
+      "id": "q-two-ldrs",
+      "type": "question",
+      "title": "Comparing left vs. right",
+      "body": "Your robot has two LDRs: one on the left side of the front, one on the right. Both are wired up with their own 10kΩ resistors.\n\nYou read them:\n```\nint leftVal  = analogRead(A0);\nint rightVal = analogRead(A1);\n```\n\nIn a bright environment, higher `analogRead()` value means brighter light hitting that sensor.\n\nIf `leftVal > rightVal`, which side has more light on it?",
+      "hint": "Higher analogRead = brighter light (in our wiring configuration). So if left reads higher than right, the left sensor sees brighter light.",
+      "hint2": "If `leftVal > rightVal`, the light source is on the **left** side. The servo should turn left to chase it.",
+      "question": {
+        "style": "boolean",
+        "prompt": "True or false: if leftVal > rightVal, the light source is on the LEFT side of the robot.",
+        "correct": "yes",
+        "explanation_correct": "True. Higher reading = brighter light on that sensor. Left reads higher = light is coming from the left. The servo should rotate left to face it. This is the entire brain of the light chaser — one comparison decides which way to steer.",
+        "explanation_wrong": "This is **TRUE**. In our voltage divider setup, bright light → lower LDR resistance → higher voltage at the midpoint → higher `analogRead()`. So `leftVal > rightVal` means the left sensor sees more light → light is on the left → turn servo left."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-servo-center" },
+        { "on": "wrong", "to": "q-servo-center" }
+      ],
+      "xp": 40
+    },
+    "q-servo-center": {
+      "id": "q-servo-center",
+      "type": "question",
+      "title": "Servo basics: center position",
+      "body": "The SG90 servo is a positional servo — unlike a DC motor that spins continuously, a servo turns to a **specific angle** and holds it there.\n\nYou control it with `myServo.write(angle)` where angle is 0° to 180°.\n\nIf you want the servo (and therefore the sensor array) to point **straight ahead**, what angle do you use?",
+      "hint": "0° is full left, 180° is full right. Straight ahead is halfway between those extremes.",
+      "hint2": "Halfway between 0° and 180° is **90°**. That's the center position — straight ahead.",
+      "question": {
+        "style": "number-input",
+        "prompt": "Servo angle for the straight-ahead (center) position:",
+        "correct": 90,
+        "explanation_correct": "**90°** is servo center. In code: `myServo.write(90)` points straight ahead. 0° points left, 180° points right. Your light-chasing servo will oscillate around 90 as it tracks a moving light source.",
+        "explanation_wrong": "The answer is **90°**. Servos sweep from 0° to 180°. Center is 90°. When the LDRs are balanced (equal light on both sides), you'd write 90 to hold the servo straight. As the light moves, the servo angle drifts left or right of 90."
+      },
+      "branches": [
+        { "on": "correct", "to": "code-fill-map" },
+        { "on": "wrong", "to": "code-fill-map" }
+      ],
+      "xp": 30
+    },
+    "code-fill-map": {
+      "id": "code-fill-map",
+      "type": "question",
+      "title": "Code: mapping sensor difference to servo angle",
+      "body": "Here's how you translate the LDR comparison into a servo angle:\n\n```\nint diff  = leftVal - rightVal;  // range: -1023 to +1023\nint angle = map(diff, -1023, 1023, ___, 180);\nmyServo.write(angle);\n```\n\nThe `map()` function remaps a value from one range to another. Here we're mapping `diff` (which ranges from -1023 to +1023) to a servo angle (0° to 180°).\n\nWhen `diff` = -1023 (maximum light on right), the servo should be at 0° (full right). When `diff` = +1023 (maximum light on left), servo should be at 180° (full left).\n\nFill in the missing lower bound of the output range.",
+      "hint": "The servo's minimum angle is 0°. When the difference is at its most negative (all light on right), the servo should point fully right — which is 0°.",
+      "hint2": "The `map()` call here is: `map(diff, -1023, 1023, 0, 180)`. The first output value (when diff = -1023) is **0**.",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Fill in the blank:\n\n`int angle = map(diff, -1023, 1023, ___, 180);`",
+        "correct": "0",
+        "explanation_correct": "`map(diff, -1023, 1023, 0, 180)` — when diff = -1023 (full right light), angle = 0°. When diff = 0 (equal light), angle = 90° (center). When diff = +1023 (full left light), angle = 180°. The servo smoothly follows the brightest point.",
+        "explanation_wrong": "The answer is **0**. Complete line:\n```\nint angle = map(diff, -1023, 1023, 0, 180);\n```\n`map()` does linear interpolation: diff of -1023 → 0°, diff of 0 → 90°, diff of +1023 → 180°. The servo smoothly tracks the light source without any if-else logic needed."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-dead-zone" },
+        { "on": "wrong", "to": "q-dead-zone" }
+      ],
+      "xp": 60
+    },
+    "q-dead-zone": {
+      "id": "q-dead-zone",
+      "type": "question",
+      "title": "Stopping the jitter: dead zone",
+      "body": "You upload the code and the servo starts — working! — but it never stops twitching. Even when you hold the torch perfectly still, the servo oscillates back and forth by a few degrees, making a constant buzzing noise.\n\nThe problem: tiny fluctuations in the LDR readings (from electrical noise, flickering lights, even vibrations) keep producing small non-zero `diff` values, which drive small servo corrections, which go on forever.\n\nShould you add a **dead zone** — a band around zero where you ignore small differences?",
+      "hint": "If `diff` is smaller than some threshold (say ±50), you could just hold the servo at its current position and not move. This eliminates reactions to noise.",
+      "hint2": "Yes — a dead zone (sometimes called a dead band) suppresses jitter. `if (abs(diff) < 50) { /* don't move */ }` prevents the servo from chasing noise.",
+      "question": {
+        "style": "boolean",
+        "prompt": "True or false: adding a dead zone (ignoring differences smaller than ~50) prevents servo jitter without meaningfully reducing tracking accuracy.",
+        "correct": "yes",
+        "explanation_correct": "True. A difference of 50 out of 1023 is less than 5% — imperceptible to the naked eye as a light position. But it eliminates constant micro-corrections driven by electrical noise. This technique appears in every servo control system, from robots to aircraft autopilots.",
+        "explanation_wrong": "This is **TRUE**. The dead zone code looks like:\n```\nif (abs(diff) > 50) {\n  int angle = map(diff, -1023, 1023, 0, 180);\n  myServo.write(angle);\n}\n```\nUnder 50 difference → ignore. Over 50 → track. Servo jitter disappears. This concept is called a **dead band** in control engineering."
+      },
+      "branches": [
+        { "on": "correct", "to": "simulation" },
+        { "on": "wrong", "to": "simulation" }
+      ],
+      "xp": 50
+    },
+    "simulation": {
+      "id": "simulation",
+      "type": "simulation",
+      "title": "Watch it chase — live simulation",
+      "body": "Your light chaser is now fully coded:\n\n- Two LDRs → voltage dividers → `analogRead(A0)` and `analogRead(A1)`\n- `diff = leftVal - rightVal`\n- Dead zone: ignore if `abs(diff) < 50`\n- Otherwise: `angle = map(diff, -1023, 1023, 0, 180)` → `myServo.write(angle)`\n\nOpen the simulator. You'll see a top-down view of the robot with a light source you can drag around.\n\n**Try this:**\n1. Drag the light source slowly left — watch the servo follow\n2. Move it fast — notice the servo lag\n3. Position it behind the robot — what happens?\n4. Put it exactly centre — confirm the servo centres at 90°",
+      "simulation_url": "/visualizer?mode=light-chaser",
+      "branches": [{ "on": "next", "to": "q-outdoor" }],
+      "xp": 60
+    },
+    "q-outdoor": {
+      "id": "q-outdoor",
+      "type": "question",
+      "title": "The outdoor problem",
+      "body": "You take your light chaser outside on a sunny day. You wave a torch in front of it to test it. Nothing happens — the servo doesn't move at all.\n\nThe robot worked perfectly indoors. What went wrong?\n\nThink about what the outdoor environment does to both LDR readings simultaneously.",
+      "hint": "Outdoors in direct sunlight, both LDRs are already receiving intense light from every direction. Your torch adds a tiny amount on top of an already-maxed reading.",
+      "hint2": "Both LDRs are saturated at maximum brightness. The difference between left and right is nearly zero — the robot can't distinguish the torch from general ambient sunlight.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Why does the light chaser stop working reliably in bright outdoor sunlight?",
+        "options": [
+          "LDRs overheat and melt in direct sunlight",
+          "Bright ambient sunlight saturates both LDRs equally — the small torch contribution disappears in the noise",
+          "The servo motor burns out from UV exposure",
+          "The Arduino resets due to temperature"
+        ],
+        "correct": 1,
+        "explanation_correct": "**Saturation** — both LDRs are flooded with solar light and read near-maximum values. The difference between them drops to nearly zero. The dead zone swallows it. The servo stops responding. This is a fundamental limitation of LDRs: they can't distinguish relative brightness when absolute brightness is overwhelming.",
+        "explanation_wrong": "The answer is **saturation**. In bright sunlight, both LDRs are near their minimum resistance (maximum analogRead). A torch adds barely 1–2% more. The diff is tiny — swamped by noise — and the dead zone blocks it. The fix is to use a **directional sensor** that physically blocks ambient light from the sides."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-improve-sensor" },
+        { "on": "wrong", "to": "q-improve-sensor" }
+      ],
+      "xp": 60
+    },
+    "q-improve-sensor": {
+      "id": "q-improve-sensor",
+      "type": "question",
+      "title": "Upgrading for outdoor use",
+      "body": "So LDRs have an outdoor saturation problem. For a light-chaser that can track the sun itself (not just a torch), you need a sensor that:\n\n1. Responds specifically to a **narrower wavelength** of light (so surrounding ambient doesn't saturate it)\n2. Has **much faster** response time (LDRs are slow — ~100ms)\n3. Is more **directional** — can tell apart angle-of-incidence rather than just overall brightness\n\nWhat component best replaces the LDR for outdoor solar tracking?",
+      "hint": "Think of a component specifically designed to convert light into electrical current — used in solar cells, optical receivers, and high-speed photosensors. Pair it with a filter that blocks visible light and passes only IR.",
+      "hint2": "A **photodiode with an IR filter** responds to a narrow infrared band. The IR filter blocks most visible ambient light while still letting the target wavelength through — dramatically improving outdoor SNR.",
+      "question": {
+        "style": "mcq",
+        "prompt": "For outdoor solar tracking, the best replacement for an LDR is:",
+        "options": [
+          "A photodiode with an infrared filter",
+          "A larger LDR (bigger surface area)",
+          "A thermistor (measures heat from the sun)",
+          "A Hall effect sensor (measures magnetic fields)"
+        ],
+        "correct": 0,
+        "explanation_correct": "**Photodiode + IR filter** — photodiodes respond to a much narrower wavelength band than LDRs and are orders of magnitude faster. The IR filter passes only a specific infrared band, blocking most visible ambient light. Real solar trackers often use a four-quadrant photodiode (a sensor split into four sections) to detect direction directly.",
+        "explanation_wrong": "The answer is **photodiode with IR filter**. Photodiodes:\n- Respond in microseconds (vs. 100ms for LDRs)\n- Cover a narrow wavelength band\n- Pair with a filter to reject ambient broadband light\n\nA thermistor measures *temperature*, not light intensity — useless here. Hall effect sensors measure magnetic fields. Only photodiodes solve the saturation problem."
+      },
+      "branches": [
+        { "on": "correct", "to": "checkpoint" },
+        { "on": "wrong", "to": "checkpoint" }
+      ],
+      "xp": 70
+    },
+    "checkpoint": {
+      "id": "checkpoint",
+      "type": "checkpoint",
+      "title": "Checkpoint — everything connected",
+      "body": "Here's the full picture you've built:\n\n**Sensing**\n- LDR resistance drops in bright light\n- 10kΩ voltage divider converts resistance change to voltage\n- `analogRead()` returns 0–1023 (0V = 0, 5V = 1023)\n\n**Decision**\n- `diff = leftVal - rightVal`\n- Dead zone: if `abs(diff) < 50`, hold position\n- Otherwise: `map(diff, -1023, 1023, 0, 180)` → servo angle\n\n**Actuation**\n- `myServo.write(angle)` → SG90 servo rotates\n- Servo faces the sensor array toward the brightest source\n\n**Limitations**\n- Outdoor saturation: both LDRs max out in direct sun\n- Fix: photodiode + IR filter for outdoor use\n\nThis is **proportional control** — the larger the difference, the larger the correction. You're doing PID's P term naturally here without even naming it.\n\nOne more question to round off the session.",
+      "branches": [{ "on": "next", "to": "q-solar-panel" }],
+      "xp": 100
+    },
+    "q-solar-panel": {
+      "id": "q-solar-panel",
+      "type": "question",
+      "title": "From toy to power plant",
+      "body": "Here's a thought experiment. What if, instead of a servo rotating a sensor array, you mounted a small **solar panel** on the servo?\n\nThe LDRs would still tell the servo which way to point. The servo would aim the solar panel at the sun. The solar panel would generate electricity — and stay aimed at the maximum energy source all day.\n\nIs this actually a real thing?",
+      "hint": "Solar farms spend a lot of money on — yes — exactly this system. They call them 'solar trackers' and they increase energy output by 25–40% compared to fixed-angle panels.",
+      "hint2": "This is **exactly** how single-axis and dual-axis solar trackers work in commercial solar farms. The sensing and control loop is the same as what you built — just scaled up.",
+      "question": {
+        "style": "boolean",
+        "prompt": "True or false: replacing the servo's sensor payload with a solar panel creates a functional solar tracker — the same type used in commercial solar power plants.",
+        "correct": "yes",
+        "explanation_correct": "**True** — and this is not a stretch. Commercial solar trackers are, at their core, exactly this circuit: light sensors, a control algorithm, and motors that rotate the panel. Single-axis trackers (east-west rotation) use one motor. Dual-axis trackers (east-west + elevation) use two. They improve annual energy yield by 25–40% vs. fixed panels. You just built the prototype.",
+        "explanation_wrong": "This is **TRUE** — and quite remarkable. Commercial solar trackers use photodiodes or pyranometers instead of LDRs, and servo actuators or large DC gear motors instead of SG90s, but the control loop is *identical*. Sense light imbalance → compute correction → actuate motor. Power plants have been doing this since the 1970s."
+      },
+      "branches": [
+        { "on": "correct", "to": "complete" },
+        { "on": "wrong", "to": "complete" }
+      ],
+      "xp": 70
+    },
+    "complete": {
+      "id": "complete",
+      "type": "complete",
+      "title": "Light Chaser — Built",
+      "body": "You built a robot that does something plants have done for millions of years — and that solar farms do today for billions of dollars.\n\nYou understand:\n- Why LDR resistance drops in light and how to read it\n- How a voltage divider converts resistance to a readable voltage\n- How `analogRead()` returns 0–1023 and what that means\n- How to compare two sensors and map the difference to a servo angle\n- Why dead zones prevent jitter in servo systems\n- Why outdoor saturation is a real engineering problem, and how pros solve it\n- That your robot is a working analogue of a commercial solar tracker\n\n**Total XP earned:** collected.\n\n**Real-world connection:** Every photovoltaic solar farm that uses trackers — and many large ones do — runs this control loop continuously. The energy gain over fixed panels pays back the hardware cost in 2–3 years.\n\n**Suggested next robot:** **Robotic Arm (3-DOF)** — more servos, 3D movement, and your first taste of inverse kinematics. You already know how to command a servo. Now learn to combine three of them to reach a point in space.",
+      "branches": [],
+      "xp": 100
+    }
+  }
+}

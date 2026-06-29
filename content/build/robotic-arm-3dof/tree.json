@@ -1,0 +1,310 @@
+{
+  "root": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "explanation",
+      "title": "Robotic arms — the original robot",
+      "body": "Before wheeled robots, before drones, before humanoids — there were **robotic arms**. The first industrial robot arm, Unimate, started working at a GM plant in 1961. Today you'll find them welding car frames, assembling iPhones, performing keyhole surgery (da Vinci surgical robot), and packing your Amazon parcels.\n\nYou're going to build a **3-DOF arm** using three SG90 servo motors and an Arduino. It won't weld car frames — but it will pick up small objects and place them somewhere else, which is the exact same fundamental challenge.\n\n**DOF** stands for Degrees of Freedom. Each joint adds one degree of freedom. Your arm has:\n- **Base** — rotates the whole arm left and right (yaw)\n- **Shoulder** — raises and lowers the upper arm (pitch)\n- **Elbow** — bends the forearm (pitch)\n\n3 joints. 3 DOF. 3 servos. Let's build it.",
+      "branches": [{ "on": "next", "to": "q-dof-meaning" }],
+      "xp": 10
+    },
+    "q-dof-meaning": {
+      "id": "q-dof-meaning",
+      "type": "question",
+      "title": "What does 3 DOF really mean?",
+      "body": "A robotic arm with **3 Degrees of Freedom** can move in 3 independent ways. Each DOF is controlled by one joint. Think of it as having 3 different knobs you can turn independently.\n\nA human arm has about 7 DOF (shoulder: 3, elbow: 1, wrist: 3) — which is why we can scratch our own back. Our 3-DOF arm is simpler, but for a small workspace it's enough.",
+      "hint": "DOF = the number of *independent* ways the arm can move. Count the joints.",
+      "hint2": "3 joints = 3 independent motions = 3 degrees of freedom. The word 'independent' is key.",
+      "question": {
+        "style": "mcq",
+        "prompt": "A robot arm with 3 DOF can move in how many independent ways?",
+        "options": [
+          "3",
+          "6",
+          "9",
+          "Infinite"
+        ],
+        "correct": 0,
+        "explanation_correct": "Exactly — **3 independent ways**. Base rotation, shoulder pitch, elbow pitch. Each joint is one knob. The word 'independent' matters — you can move any one joint without the others moving.",
+        "explanation_wrong": "The answer is **3**. DOF literally counts the number of independent motions. 3 joints → 3 DOF. (A 6-DOF arm can also control wrist roll, wrist pitch, and wrist yaw — that's where you start to get fully flexible positioning.)"
+      },
+      "branches": [
+        { "on": "correct", "to": "q-servo-vs-motor" },
+        { "on": "wrong", "to": "q-servo-vs-motor" }
+      ],
+      "xp": 20
+    },
+    "q-servo-vs-motor": {
+      "id": "q-servo-vs-motor",
+      "type": "question",
+      "title": "Why servos, not plain DC motors?",
+      "body": "For a robotic arm, you need each joint to go to a **specific angle** and **hold it there** — even when an object is pushing back on it. A plain DC motor just spins freely — it has no idea what angle it's at.\n\nThe SG90 servo is different. Inside it has:\n1. A DC motor\n2. A **potentiometer** (position sensor)\n3. A small control circuit\n\nThe circuit compares the target angle to the actual angle and corrects the motor until they match. This is a closed feedback loop — the servo automatically holds its position.",
+      "hint": "The key question is: does a plain DC motor know what angle it's currently at?",
+      "hint2": "A plain DC motor doesn't know its own position. A servo does — it has a built-in position sensor and feedback loop to hold an angle.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Why use servo motors instead of plain DC motors for a robot arm?",
+        "options": [
+          "Servos hold a specific angle and maintain position against load",
+          "Servos spin faster than DC motors",
+          "Servos are cheaper than DC motors",
+          "Servos run on AC power"
+        ],
+        "correct": 0,
+        "explanation_correct": "Right. Servos have a built-in closed feedback loop — position sensor + control circuit. You say 'go to 90°' and the servo holds that angle, even if you push on the arm. A plain DC motor would just spin.",
+        "explanation_wrong": "The answer: **servos hold position**. Inside every servo is a potentiometer (position sensor) and a tiny control circuit. You send a target angle; the circuit keeps adjusting until the shaft reaches that angle — then holds it there. Plain DC motors have none of that."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-servo-signal" },
+        { "on": "wrong", "to": "q-servo-signal" }
+      ],
+      "xp": 30
+    },
+    "q-servo-signal": {
+      "id": "q-servo-signal",
+      "type": "question",
+      "title": "The servo control signal",
+      "body": "Servos are controlled by **PWM (Pulse Width Modulation)** — a repeating digital pulse. The servo doesn't care about the pulse's voltage height; it only cares about the **width** of each pulse (how long it stays HIGH).\n\nThe pulse repeats every **20 ms** (50 Hz). The width of that pulse determines the angle:\n- 500 µs → 0°\n- **? µs → 90° (centre)**\n- 2500 µs → 180°\n\nWhat pulse width commands the servo to its centre position (90°)?",
+      "hint": "The range is 500 µs to 2500 µs, spread evenly across 0° to 180°. What's the midpoint of 500 and 2500?",
+      "hint2": "(500 + 2500) ÷ 2 = 1500. The midpoint of the PWM range maps to the midpoint angle.",
+      "question": {
+        "style": "number-input",
+        "prompt": "Centre position (90°) corresponds to a pulse width of ___ microseconds (µs):",
+        "correct": 1500,
+        "explanation_correct": "Correct — **1500 µs**. The range goes 500→2500 µs over 0→180°. The midpoint 1500 µs = 90°. The Arduino Servo library handles all this: `myServo.write(90)` automatically generates a 1500 µs pulse.",
+        "explanation_wrong": "The answer is **1500 µs**. The PWM range (500–2500 µs) maps linearly to the angle range (0–180°). Midpoint: (500+2500)÷2 = 1500. So 1500 µs = 90°. The Arduino Servo library handles this conversion for you."
+      },
+      "branches": [
+        { "on": "correct", "to": "explanation-pwm-servo" },
+        { "on": "wrong", "to": "explanation-pwm-servo" }
+      ],
+      "xp": 40
+    },
+    "explanation-pwm-servo": {
+      "id": "explanation-pwm-servo",
+      "type": "explanation",
+      "title": "PWM to angle — the full picture",
+      "body": "Here's the complete mapping:\n\n| Pulse Width | Angle |\n|-------------|-------|\n| 500 µs      | 0°    |\n| 1000 µs     | 45°   |\n| 1500 µs     | 90°   |\n| 2000 µs     | 135°  |\n| 2500 µs     | 180°  |\n\nThe formula is: `pulse_µs = 500 + (angle / 180) * 2000`\n\nBut here's the good news: **you never calculate this yourself**. The Arduino `Servo` library does it for you with one function:\n\n```cpp\n#include <Servo.h>\n\nServo shoulder;\nshoulder.attach(9);   // pin 9\nshoulder.write(90);   // go to 90°\n```\n\n`write(angle)` takes a value from 0 to 180 and generates the right pulse. Wire each servo signal pin to a separate Arduino PWM pin (3, 5, 6, 9, 10, 11 on the Uno).\n\nYou'll have three Servo objects — `base`, `shoulder`, `elbow` — one per joint.",
+      "branches": [{ "on": "next", "to": "q-servo-lib" }],
+      "xp": 20
+    },
+    "q-servo-lib": {
+      "id": "q-servo-lib",
+      "type": "question",
+      "title": "Using the Servo library",
+      "body": "Now let's check you can read Servo library code. Below is a snippet that declares a servo object for the shoulder joint and commands it to 90°.\n\nOne word is missing. Fill it in.",
+      "hint": "The function that sets a servo angle is a three-letter verb. You just read it above.",
+      "hint2": "The function is `write`. So: `shoulder.write(90);`",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Complete this line:\n\n```cpp\nServo shoulder;\nshoulder.___(90);\n```\n\nWhat replaces `___`?",
+        "correct": "write",
+        "explanation_correct": "Yes — `write`. `shoulder.write(90)` commands the servo to 90°. The Servo library converts that to a 1500 µs PWM pulse automatically.",
+        "explanation_wrong": "The answer is `write`. `shoulder.write(90)` tells the library to generate a 1500 µs pulse on the attached pin, which moves the servo to its centre (90°)."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-forward-kinematics" },
+        { "on": "wrong", "to": "q-forward-kinematics" }
+      ],
+      "xp": 50
+    },
+    "q-forward-kinematics": {
+      "id": "q-forward-kinematics",
+      "type": "question",
+      "title": "Forward kinematics — a first look",
+      "body": "Here's the central question of arm robotics: **if you know all the joint angles, can you figure out where the gripper is in space?**\n\nThis is called **forward kinematics** (FK). 'Forward' because you go from joint angles → end-effector position.\n\nIt's the easier direction. You have all the information, you just have to calculate the geometry.",
+      "hint": "FK goes from angles you know → position you calculate. You're not going backward from position to angles.",
+      "hint2": "Forward kinematics = angles → position. True or false: if you know all 3 joint angles, geometry alone can tell you exactly where the gripper is.",
+      "question": {
+        "style": "boolean",
+        "prompt": "Forward kinematics means: given the joint angles, calculate where the end-effector (gripper) is. True or false?",
+        "correct": "true",
+        "explanation_correct": "Correct. Forward kinematics goes from **angles → position**. It's 'forward' in the sense of following the chain from base to tip. Each link's position is calculated from the previous joint's angle plus the link's length.",
+        "explanation_wrong": "It's **true**. Forward kinematics: angles → position. 'Forward' because you follow the chain from the base outward to the tip. The opposite direction (position → angles) is inverse kinematics, which is much harder."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-inverse-kinematics" },
+        { "on": "wrong", "to": "q-inverse-kinematics" }
+      ],
+      "xp": 40
+    },
+    "q-inverse-kinematics": {
+      "id": "q-inverse-kinematics",
+      "type": "question",
+      "title": "The hard direction: inverse kinematics",
+      "body": "You've learned FK: angles → position. Now there's the harder problem.\n\nImagine you want your gripper to move to a specific point in 3D space: say, (x=15cm, y=10cm, z=5cm). What joint angles do you need?\n\nThat's **Inverse Kinematics (IK)** — the reverse problem. It's harder because:\n1. There might be **multiple solutions** (like reaching left-handed or right-handed)\n2. Some target positions are **out of reach** (no solution)\n3. With more joints, the maths gets non-linear fast\n\nIndustrial arms use sophisticated IK solvers. Our 3-DOF arm can use simpler trigonometry.",
+      "hint": "IK is the reverse of FK. FK: angles → position. IK: position → ?",
+      "hint2": "Inverse kinematics goes from a target position backward to find the joint angles needed to reach it.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Inverse kinematics (IK) means…",
+        "options": [
+          "Given a target position in space, calculate the joint angles needed to reach it",
+          "Reversing the arm's last movement",
+          "Moving the arm backward along its last path",
+          "Undoing the most recent servo command"
+        ],
+        "correct": 0,
+        "explanation_correct": "Exactly. IK = **target position → joint angles**. It's the hard direction because the same position can often be reached multiple ways, and some positions can't be reached at all (outside the arm's workspace).",
+        "explanation_wrong": "IK = given a **target position**, find the **joint angles** needed to reach it. That's the opposite of forward kinematics. It's harder because there may be multiple solutions, no solutions, or the maths becomes non-linear quickly."
+      },
+      "branches": [
+        { "on": "correct", "to": "explanation-trig" },
+        { "on": "wrong", "to": "explanation-trig" }
+      ],
+      "xp": 50
+    },
+    "explanation-trig": {
+      "id": "explanation-trig",
+      "type": "explanation",
+      "title": "Why robotic arms need trigonometry",
+      "body": "For a 2-link planar arm (flat, like a robot drawing on a table), the end-effector position is:\n\n```\nx = L1 * cos(θ1) + L2 * cos(θ1 + θ2)\ny = L1 * sin(θ1) + L2 * sin(θ1 + θ2)\n```\n\nWhere:\n- `L1` = length of upper arm\n- `L2` = length of forearm\n- `θ1` = shoulder angle\n- `θ2` = elbow angle (measured relative to upper arm)\n\nEach link contributes its own vector based on the *cumulative* angle of all joints before it. This is why the angles **add** — the forearm doesn't know where the shoulder points, so you always track the chain from the base.\n\nFor our 3-DOF arm we add a base rotation axis, which means the arm operates in 3D — but the same principle applies: each joint's contribution is computed relative to the sum of all previous joint angles.\n\nThis is the foundation of all arm robotics. The trig looks scary, but it's just vectors adding up.",
+      "branches": [{ "on": "next", "to": "q-link-length" }],
+      "xp": 20
+    },
+    "q-link-length": {
+      "id": "q-link-length",
+      "type": "question",
+      "title": "Link lengths and reach",
+      "body": "Let's test the FK formula on a simple case. Imagine a 2-link arm where:\n- Both links are **10 cm** long\n- Both joints are at **0°** (pointing straight forward)\n\nUsing the formula: `x = L1*cos(0°) + L2*cos(0°+0°)`\n\ncos(0°) = 1. So: `x = 10*1 + 10*1 = ?`",
+      "hint": "cos(0°) = 1. Both links point straight forward. They add directly.",
+      "hint2": "10 × 1 + 10 × 1 = 20. Both links point the same direction, so the reach is their sum.",
+      "question": {
+        "style": "mcq",
+        "prompt": "If both arm links are 10 cm and both joints are at 0°, where is the end effector?",
+        "options": [
+          "20 cm straight out from the base",
+          "10 cm out (they cancel)",
+          "0 cm (fully folded back)",
+          "14 cm at a diagonal"
+        ],
+        "correct": 0,
+        "explanation_correct": "Correct — **20 cm straight out**. At 0° both links point in the same direction, so they add: 10 + 10 = 20 cm. This is the arm's maximum reach. The 14 cm diagonal answer would come up if both joints were at 90°, where the links are perpendicular.",
+        "explanation_wrong": "The answer is **20 cm straight out**. cos(0°) = 1, so each 10 cm link contributes its full length in the x direction. 10 + 10 = 20 cm. That's the arm's maximum reach. Interesting note: if both joints were at 90°, the arm would fold on itself and reach = 0 cm."
+      },
+      "branches": [
+        { "on": "correct", "to": "simulation-arm" },
+        { "on": "wrong", "to": "simulation-arm" }
+      ],
+      "xp": 60
+    },
+    "simulation-arm": {
+      "id": "simulation-arm",
+      "type": "simulation",
+      "title": "Try the arm kinematics visualiser",
+      "body": "The simulator below lets you drag the shoulder and elbow angles and watch where the end effector moves in real time.\n\nTry these experiments:\n- Both joints at 0° → end effector is at maximum reach, straight out\n- Shoulder at 90°, elbow at 0° → arm points straight up\n- Shoulder at 45°, elbow at -45° → arm is roughly level\n\nNotice how the **elbow angle is relative to the upper arm** — it compounds on top of the shoulder angle. That's the `θ1 + θ2` in the formula.\n\nWhen you're ready, move on.",
+      "simulation_url": "/visualizer?mode=arm-kinematics",
+      "branches": [{ "on": "next", "to": "q-torque" }],
+      "xp": 50
+    },
+    "q-torque": {
+      "id": "q-torque",
+      "type": "question",
+      "title": "Torque — will the servo survive?",
+      "body": "The SG90 servo is rated at **1.8 kg·cm** of torque. This means it can hold a 1.8 kg weight at a distance of 1 cm from its shaft (or 0.18 kg at 10 cm — same torque, different lever arm).\n\nFor your arm:\n- Link length from shoulder to gripper = **10 cm**\n- Object you want to pick up = **50 g (0.05 kg)**\n\nTorque required = 0.05 kg × 10 cm = **0.5 kg·cm**\n\nIs that within the SG90's 1.8 kg·cm limit?",
+      "hint": "Calculate the torque: weight × distance from servo shaft. Compare to 1.8 kg·cm.",
+      "hint2": "0.05 kg × 10 cm = 0.5 kg·cm. The SG90 is rated at 1.8 kg·cm. Is 0.5 < 1.8?",
+      "question": {
+        "style": "mcq",
+        "prompt": "Shoulder servo: link = 10 cm, object = 50 g. Is this within the SG90's 1.8 kg·cm torque rating?",
+        "options": [
+          "Yes — 0.5 kg·cm is well within the 1.8 kg·cm limit",
+          "No — 50 g is too heavy for an SG90",
+          "Need more information — depends on speed",
+          "Depends on the battery voltage"
+        ],
+        "correct": 0,
+        "explanation_correct": "Correct. 0.05 kg × 10 cm = 0.5 kg·cm, comfortably below 1.8 kg·cm. You have 3.6× safety margin. Keep in mind: the elbow servo must also hold the weight of the forearm *plus* the object — and the shoulder must hold everything above it. The bottom-most servos always carry the heaviest load.",
+        "explanation_wrong": "The answer is **yes**. 0.05 kg × 10 cm = 0.5 kg·cm, which is well under the 1.8 kg·cm limit. But remember: lower joints (shoulder, base) carry the weight of all joints and links above them — so they see more torque load than the elbow alone."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-base-rotation" },
+        { "on": "wrong", "to": "q-base-rotation" }
+      ],
+      "xp": 60
+    },
+    "q-base-rotation": {
+      "id": "q-base-rotation",
+      "type": "question",
+      "title": "Why the base mounting matters most",
+      "body": "Your arm has three servos stacked: base at the bottom, shoulder above it, elbow at the top.\n\nThe **base servo** has to rotate the entire arm assembly — shoulder servo + upper arm + elbow servo + forearm + gripper — every time you want to point the arm left or right.\n\nThis is a significantly heavier load than the elbow servo, which only has to move the forearm and gripper.",
+      "hint": "Think about what the base servo is physically rotating. It's not just a single link.",
+      "hint2": "The base servo carries the weight of every component above it: shoulder servo, elbow servo, all links, and the gripper. It's the most heavily loaded servo.",
+      "question": {
+        "style": "boolean",
+        "prompt": "The base servo should be mounted on a sturdy, heavy platform because it carries the full weight of the entire arm assembly above it. True or false?",
+        "correct": "true",
+        "explanation_correct": "True. The base servo is the most loaded servo in the chain — it moves everything above it. A flimsy base will rock and wobble whenever the base servo moves, making accurate positioning impossible. Use a heavy base plate or attach the arm to a table clamp.",
+        "explanation_wrong": "This is **true**. The base servo rotates the entire arm: shoulder servo + upper arm + elbow servo + forearm + gripper. A wobbly base introduces positioning errors across the whole workspace. A solid, heavy base is the first thing experienced builders reinforce."
+      },
+      "branches": [
+        { "on": "correct", "to": "checkpoint-arm" },
+        { "on": "wrong", "to": "checkpoint-arm" }
+      ],
+      "xp": 50
+    },
+    "checkpoint-arm": {
+      "id": "checkpoint-arm",
+      "type": "checkpoint",
+      "title": "Checkpoint — arm fundamentals locked in",
+      "body": "You've got the core concepts. Let's recap what you know:\n\n**Mechanics:**\n- 3 DOF = 3 independent joint motions (base yaw, shoulder pitch, elbow pitch)\n- SG90 servo = DC motor + potentiometer + control circuit = position holding\n- Torque load stacks from tip to base — base servo carries everything\n\n**Control signals:**\n- Servo position = PWM pulse width (500–2500 µs maps to 0–180°)\n- Arduino Servo library handles this: `myServo.write(angle);`\n\n**Kinematics:**\n- Forward kinematics: angles → position (using trig)\n- Inverse kinematics: position → angles (harder, multiple solutions possible)\n- Each joint's contribution compounds on all previous joints\n\nTwo more concepts before we complete: the gripper, and sequencing moves safely.",
+      "branches": [{ "on": "next", "to": "q-gripper" }],
+      "xp": 80
+    },
+    "q-gripper": {
+      "id": "q-gripper",
+      "type": "question",
+      "title": "The simplest gripper design",
+      "body": "The end effector (gripper) turns your arm from a pointer into a tool. There are many gripper designs:\n\n- **Servo-driven fingers** — a fourth servo closes two fingers together\n- **Electromagnet** — turns on to grab ferrous metal objects, off to release\n- **Vacuum suction cup** — a small pump pulls air out to suction onto flat surfaces\n- **Shape-memory alloy** — exotic material that contracts when heated\n\nFor a beginner Arduino arm grabbing small objects like foam blocks or ping-pong balls, which is the simplest to build and code?",
+      "hint": "Which option uses the same technology (servos) that you already have, doesn't require a pump or magnet, and works on any object?",
+      "hint2": "A fourth SG90 servo driving two 3D-printed fingers. Same Servo library, same wiring pattern — just one more `myServo.write()` call.",
+      "question": {
+        "style": "mcq",
+        "prompt": "The simplest gripper for an Arduino 3-DOF arm uses…",
+        "options": [
+          "A fourth SG90 servo driving two opposing finger pieces",
+          "An electromagnet connected to a relay",
+          "A small vacuum pump with a suction cup",
+          "Shape-memory alloy wires that contract when current flows"
+        ],
+        "correct": 0,
+        "explanation_correct": "Exactly. A fourth SG90 driving two simple finger pieces is the simplest option — same library, same wiring pattern, 3D-printable fingers. Open: `gripper.write(0)`, closed: `gripper.write(180)`. Done. Electromagnets and vacuum pumps work well but require extra hardware (relay boards, pumps, vacuum tubing).",
+        "explanation_wrong": "The answer: **a fourth servo driving two fingers**. It's the simplest because it uses technology you already have — same Servo library, same wiring. `gripper.write(0)` = open, `gripper.write(90)` = closed. No pumps, relays, or exotic materials needed."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-sequencing" },
+        { "on": "wrong", "to": "q-sequencing" }
+      ],
+      "xp": 60
+    },
+    "q-sequencing": {
+      "id": "q-sequencing",
+      "type": "question",
+      "title": "The current-spike problem",
+      "body": "Here's a real gotcha that trips up almost every beginner building a multi-servo arm.\n\nServos draw a lot of current when they **start moving** — especially if they have to move far. An SG90 can pull 700 mA or more at startup. Three servos starting simultaneously means 2+ A in a single instant.\n\nThe Arduino's onboard regulator is rated for 200 mA max. If you power all servos from Arduino's 5V pin and all three move at once, that current spike can crash the Arduino — it resets mid-move, leaving your arm frozen in a weird position.\n\nThe fix: move joints **one at a time**, with a small delay between each move.",
+      "hint": "The risk is a power spike when multiple servos start moving simultaneously. What does powering them one at a time solve?",
+      "hint2": "Sequential movement means only one servo starts at any given moment. The current peak is 3× lower than all starting at once.",
+      "question": {
+        "style": "boolean",
+        "prompt": "For a pick-and-place sequence, moving joints one at a time (with delays between moves) helps prevent current spikes that could reset the Arduino. True or false?",
+        "correct": "true",
+        "explanation_correct": "True — and this is one of the most common bugs in beginner arm projects. Move base → delay(500) → move shoulder → delay(500) → move elbow → delay(500). Staggering the moves keeps the peak current manageable. Ideally, power servos from a separate 5V supply, not the Arduino's regulated pin.",
+        "explanation_wrong": "This is **true**. Multiple servos starting simultaneously can pull 1–2 A of current in a spike. The Arduino's 5V regulator can't handle that — it resets, crashing your sequence. The fix: stagger moves with `delay()` between each servo command, and ideally power the servos from a dedicated 5V supply rather than Arduino's onboard regulator."
+      },
+      "branches": [
+        { "on": "correct", "to": "complete" },
+        { "on": "wrong", "to": "complete" }
+      ],
+      "xp": 70
+    },
+    "complete": {
+      "id": "complete",
+      "type": "complete",
+      "title": "3-DOF Robotic Arm — Built",
+      "body": "You built it. Three servos, one brain, forward kinematics, and a gripper. You've crossed from 'wheeled robots that react' into 'arms that manipulate' — a fundamentally different class of robotics.\n\n**Total XP earned: 680**\n\nHere's what you now understand that most people don't:\n- How servos differ from DC motors, and *why* that matters\n- How PWM pulse width encodes an angle\n- What forward and inverse kinematics actually mean (not just buzzwords)\n- Why torque stacks toward the base, and why sequencing matters for power\n\n**Where to go next:**\n- **Maze Solver** — algorithm-heavy, wall-following, junction detection\n- **Balance Bot** — add PID control, IMU sensors, and tackle a genuinely hard control problem\n- **AI Sorting Arm** — attach a camera and teach the arm to sort objects by colour using computer vision\n\nThe robotic arm pattern — sensors + actuators + kinematics — appears everywhere from surgical robots to Mars rovers. You now speak that language.",
+      "branches": [],
+      "xp": 100
+    }
+  }
+}

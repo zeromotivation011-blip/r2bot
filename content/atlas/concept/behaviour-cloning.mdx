@@ -1,0 +1,81 @@
+---
+title: Behaviour cloning
+category: ai-and-perception
+summary: >-
+  Behaviour cloning is a machine-learning technique where a robot is trained to
+  copy an expert's actions as closely as possible by treating recorded
+  demonstrations as labelled training data for a supervised-learning model.
+seeAlso: []
+sources:
+  - title: >-
+      Pomerleau — ALVINN: An Autonomous Land Vehicle in a Neural Network
+      (NeurIPS 1989)
+    url: >-
+      https://proceedings.neurips.cc/paper/1988/hash/812b4ba287f5ee0bc9d43bbf5bbe87fb-Abstract.html
+  - title: >-
+      Ross, Gordon, Bagnell — A Reduction of Imitation Learning and Structured
+      Prediction to No-Regret Online Learning (AISTATS 2011)
+    url: 'https://arxiv.org/abs/1011.0686'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - machine-learning
+  - robot-learning
+  - training
+difficulty: 3
+oneLiner: 'The concept concept: Behaviour cloning is a machine-learning technique where a'
+laymanExplanation: >-
+  If you wanted to teach someone to drive by example, you might sit them in the
+  passenger seat of a car, record every turn of the steering wheel, every press
+  of the accelerator and brake over thousands of kilometres, and then show them
+  the recording and say: "Whatever I did in each situation, do the same." That
+  is the essential idea behind the simplest and mos
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without behaviour cloning, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Behaviour cloning is a machine-learning technique where a robot is trained to
+  copy an expert's actions as closely as possible by treating recorded
+  demonstrations as labelled training data for a supervised-learning model.
+slug: behaviour-cloning
+bucket: concept
+---
+
+If you wanted to teach someone to drive by example, you might sit them in the passenger seat of a car, record every turn of the steering wheel, every press of the accelerator and brake over thousands of kilometres, and then show them the recording and say: "Whatever I did in each situation, do the same." That is the essential idea behind the simplest and most widely used form of [imitation learning](/atlas/concept/imitation-learning).
+
+**Behaviour cloning** trains a model to copy expert behaviour by treating demonstrations as supervised learning data: the input is a sensor observation (a [camera](/atlas/concept/camera-vision) frame, a joint-angle reading), the target label is the action the expert took at that moment, and the model is trained to predict that action.
+
+## Why it is so appealing
+
+The approach is conceptually straightforward. You do not need to define a reward function, design a simulation, or run millions of rollouts. You gather demonstrations — a human teleoperating a [robot](/atlas/concept/robot) arm, a driver at the wheel of a car — extract (observation, action) pairs, and train a [neural network](/atlas/concept/neural-network) on them. If the demonstrations are good, the model often generalises reasonably well.
+
+Behaviour cloning is also old. Dean Pomerleau's ALVINN system in 1989 steered a van along a road using a camera and a neural network trained on human driving, decades before the term "imitation learning" was widely used.
+
+## The covariate shift problem
+
+The fundamental weakness of behaviour cloning is a mismatch called **covariate shift**. During training, the model only ever sees observations that come from expert trajectories. During deployment, if the robot drifts slightly from the expert's path — and it always does — it enters unfamiliar territory the model has never seen, and errors compound rapidly. A small deviation becomes a larger deviation becomes a crash.
+
+The fix, described in the DAgger algorithm (2011), is to let the robot run in the real world, record where it goes, query the expert for the correct action at each point, and add that new data to training. Iterating this loop produces a much more robust policy.
+
+## A real example
+
+OpenAI's early robotic hand work, Dexterous In-Hand Manipulation (2019), used behaviour cloning on human [teleoperation](/atlas/concept/teleoperation) data as the starting point before refining further with [reinforcement learning](/atlas/concept/reinforcement-learning). The cloning phase established a baseline far better than a randomly initialised policy.
+
+---
+
+*Behaviour cloning's biggest challenge — compounding errors — inspired a whole family of algorithms designed to make robots that correct their own mistakes rather than just replaying a script.*

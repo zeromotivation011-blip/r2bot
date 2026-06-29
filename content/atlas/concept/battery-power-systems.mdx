@@ -1,0 +1,82 @@
+---
+title: Battery and power systems
+category: hardware
+summary: >-
+  A robot's power system converts stored energy into the right voltages and
+  currents for every component on board — motors, computers, and sensors all
+  demand different power, and the battery must supply it all safely.
+seeAlso: []
+sources:
+  - title: Battery University — Lithium-ion cell fundamentals
+    url: 'https://batteryuniversity.com/article/bu-204-how-do-lithium-batteries-work'
+  - title: SparkFun — How to power your project
+    url: 'https://learn.sparkfun.com/tutorials/how-to-power-a-project/all'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - hardware
+  - electronics
+  - power
+difficulty: 3
+oneLiner: 'The concept concept: A robot''s power system converts stored energy into'
+laymanExplanation: >-
+  A robot at full charge is full of potential — literally. The moment you press
+  start, a race begins. Motors hungry for burst current, a computer trickling
+  through calculations, sensors pinging dozens of times a second: all of it
+  draining the same battery. Design the power system badly, and the robot browns
+  out mid-task, corrupts a file, or — if a lithium cell
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without battery and power systems, many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A robot's power system converts stored energy into the right voltages and
+  currents for every component on board — motors, computers, and sensors all
+  demand different power, and the battery must supply it all safely.
+slug: battery-power-systems
+bucket: concept
+---
+
+A [robot](/atlas/concept/robot) at full charge is full of potential — literally. The moment you press start, a race begins. Motors hungry for burst current, a computer trickling through calculations, sensors pinging dozens of times a second: all of it draining the same battery. Design the power system badly, and the robot browns out mid-task, corrupts a file, or — if a lithium cell is pushed too hard — catches fire.
+
+The **power system** of a robot is everything between stored energy and the components that consume it: the battery itself, protection circuits, voltage regulators, and power distribution wiring. Getting it right is as important as writing good software.
+
+## The battery
+
+Most modern robots use **lithium polymer** (LiPo) or **lithium-ion** (Li-ion) cells. Both store roughly 150–250 Wh per kilogram — far more energy density than older nickel-metal hydride or lead-acid batteries. LiPo cells are flat and flexible, preferred in drones and legged robots where weight and shape matter. Li-ion cylindrical cells (like the 18650 format used in laptops and [Tesla](/atlas/company/tesla) cars) are cheaper and more robust for ground robots.
+
+Key battery specifications:
+
+- **Voltage:** LiPo cells are 3.7 V nominal per cell; packs are assembled in series (2S = 7.4 V, 4S = 14.8 V) to match motor requirements.
+- **Capacity (mAh or Wh):** How much total energy is stored.
+- **C-rating:** How fast the battery can deliver current safely. A 5,000 mAh, 30C pack can deliver 150 A — enough to spin a large brushless motor at full throttle.
+
+## Voltage regulation
+
+A robot's battery voltage drops as it discharges. A motor controller can handle variable voltage; a [microcontroller](/atlas/concept/microcontroller) cannot — it needs a steady 3.3 V or 5 V. **Voltage regulators** (linear or switching) perform this conversion. Switching regulators (also called DC-DC converters or buck converters) are far more efficient than linear ones and are the standard choice wherever the voltage difference is large.
+
+## Protection and distribution
+
+Lithium cells can be permanently damaged — or ignite — if over-discharged, overcharged, or short-circuited. A **BMS** (Battery Management System) monitors cell voltages and temperatures and disconnects the battery if anything goes out of range. On larger robots, a power distribution board routes the battery to multiple subsystems, often with individual fuses or polyfuses for protection.
+
+## Why it matters
+
+Underspecify the power system and every other engineering decision becomes unreliable. A motor that stalls can draw ten times its rated current; if the battery or wiring cannot supply that, the whole robot resets. Power engineering is often the last thing a [robotics](/atlas/concept/robotics) student thinks about and the first thing that causes a demo to fail.
+
+---
+
+*The energy stored in a fully charged 5,000 mAh LiPo pack — enough to fly a racing [drone](/atlas/concept/drone) for 8 minutes — is equivalent to lifting a 70 kg person roughly 14 metres off the ground.*

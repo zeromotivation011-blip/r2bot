@@ -1,0 +1,80 @@
+---
+title: Open-loop control
+category: control
+summary: >-
+  Open-loop control means a robot sends a command and assumes it worked, with no
+  sensor feedback to check. Simple, fast, and cheap — but blind to errors and
+  disturbances.
+seeAlso: []
+sources:
+  - title: MIT OpenCourseWare — Feedback Control Systems
+    url: 'https://ocw.mit.edu/courses/2-04a-systems-and-controls-spring-2013/'
+  - title: 'Control Systems Engineering, Nise — Chapter 1'
+    url: >-
+      https://www.wiley.com/en-us/Control+Systems+Engineering%2C+8th+Edition-p-9781119721406
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - control
+  - fundamentals
+difficulty: 3
+oneLiner: 'The concept concept: Open-loop control means a robot sends a command'
+laymanExplanation: >-
+  Picture a toaster. You push the lever down, set the dial to "3", and walk
+  away. The toaster has no idea whether your bread is thin sandwich slices or
+  thick sourdough. It runs its heating elements for a fixed amount of time, pops
+  the toast up, and hopes for the best. If the bread is slightly damp, it comes
+  out pale. If the toaster is near a cold window on a w
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without open-loop control, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Open-loop control means a robot sends a command and assumes it worked, with no
+  sensor feedback to check. Simple, fast, and cheap — but blind to errors and
+  disturbances.
+slug: open-loop-control
+bucket: concept
+---
+
+Picture a toaster. You push the lever down, set the dial to "3", and walk away. The toaster has no idea whether your bread is thin sandwich slices or thick sourdough. It runs its heating elements for a fixed amount of time, pops the toast up, and hopes for the best. If the bread is slightly damp, it comes out pale. If the toaster is near a cold window on a winter morning, it might be slightly underdone. The toaster doesn't know. It doesn't care. It just executes its programme.
+
+That is open-loop control.
+
+## How it works
+
+In an open-loop system, the controller sends an output signal — a voltage, a duration, a set of steps — without ever checking whether the desired outcome actually happened. The system is called "open" because information flows in only one direction: command goes in, action comes out. There is no return path carrying information about the result back to the controller.
+
+The logic is simple: *if I send this signal, the right thing should happen*. It works well when the relationship between input and output is predictable, the environment is stable, and precision requirements are modest.
+
+## Where robots use open-loop control
+
+Stepper motors are the classic open-loop workhorse. A 3D printer's print head moves by sending a precise number of electrical pulses to the [stepper motor](/atlas/concept/stepper-motor) — each pulse rotates the motor a fixed, known angle. The printer counts pulses and trusts that the physical motion matched. Most consumer 3D printers (Prusa, Bambu Lab) rely on this for the X and Y axes, with no position sensors checking the actual position. They're accurate enough because stepper motors rarely slip under normal loads.
+
+Microwave ovens, washing machine spin cycles, automatic irrigation timers, and simple conveyor belts are all open-loop systems running around you every day.
+
+## The honest trade-off
+
+Open-loop control is fast to design, cheap to build, and requires no sensors. For stable, low-stakes, repetitive tasks, it's perfectly adequate and arguably the sensible choice.
+
+The weakness is brittleness. Any unexpected disturbance — a stronger-than-expected load, a slippery surface, a component wearing out — produces an uncorrected error. A [mobile robot](/atlas/concept/mobile-robot) navigating purely by open-loop dead reckoning (counting wheel rotations) will drift off its intended path because wheel slip and floor irregularities accumulate unchecked.
+
+For this reason, open-loop control is rarely used alone in precision [robotics](/atlas/concept/robotics). It often appears in combination with a closed-loop outer layer that corrects large deviations while the inner open-loop handles fast, fine-grained motion.
+
+---
+
+*The moment you add a single sensor that tells the controller what actually happened, you've crossed into [closed-loop control](/atlas/concept/closed-loop-control) — and the whole field of [feedback](/atlas/concept/feedback) theory opens up.*

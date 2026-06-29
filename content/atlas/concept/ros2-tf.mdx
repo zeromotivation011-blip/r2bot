@@ -1,0 +1,132 @@
+---
+title: ROS2 TF (tf2) — Complete Guide | R2BOT
+summary: >-
+  tf2 in ROS2 tracks every coordinate frame on a robot and lets nodes transform
+  points and poses between them. The geometry backbone of robotics.
+category: control
+bucket: programming-software
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - ros2
+  - tf2
+  - transform
+  - frames
+  - geometry
+relatedTerms:
+  - ros2
+  - ros2-urdf
+  - kinematics
+  - forward-kinematics
+  - localisation
+seeAlso:
+  - ros2
+  - ros2-urdf
+  - kinematics
+  - forward-kinematics
+  - localisation
+youtubeSearchQuery: ROS2 tf2 transforms tutorial
+oneLiner: 'The programming software concept: tf2 in ROS2 tracks every coordinate frame on'
+laymanExplanation: >-
+  tf2 (transform library version 2) is the ROS2 system for managing coordinate
+  frames over time. Every part of a robot — the base, each joint, each sensor —
+  has its own frame, and tf2 lets any node ask, 'where is point X in the world
+  frame right now?' tf2 answers using broadcast transforms from all over the
+  robot.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros2 tf (tf2) — complete guide | r2bot, many programming software
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  tf2 in ROS2 tracks every coordinate frame on a robot and lets nodes transform
+  points and poses between them. The geometry backbone of robotics.
+slug: ros2-tf
+---
+
+# ROS2 TF (tf2)
+
+## What is ROS2 TF (tf2)?
+
+tf2 (transform library version 2) is the ROS2 system for managing coordinate frames over time. Every part of a robot — the base, each joint, each sensor — has its own frame, and tf2 lets any node ask, 'where is point X in the world frame right now?' tf2 answers using broadcast transforms from all over the robot.
+
+## How It Works
+
+Each rigid component publishes its pose relative to its parent on a tf topic. tf2 maintains a global tree where every node has exactly one parent, except the root (typically `map`). A query like 'point in base_link frame, expressed in map frame at time t' walks the tree and chains transformations using interpolation in time. Static transforms (like sensor mounting) are published once. Dynamic transforms (like joint rotations or robot pose) are published continuously.
+
+## Real-World Example
+
+On a Spot robot, tf tracks `map → odom → base_link → leg_<id>_hip → ...` for every leg link. Every camera publishes its frame so you can project pixels back into world coordinates. Nav2 path planners rely entirely on tf to know where the robot and goals are.
+
+## Why It Matters for Robotics
+
+Coordinate frames are where 90% of robotics bugs happen. Mastering tf2 — broadcasters, listeners, static vs dynamic, time-interpolation — is non-negotiable. Every ROS2 interview will probe your tf knowledge.
+
+## Try It Yourself
+
+In a TurtleSim setup, launch the 'tf2 turtle demo' that has turtle1 chase turtle2. Visualise the transforms in RViz2, change which turtle is the parent frame, and watch the tree update live.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "tf2 tracks:",
+    "options": [
+      "Battery state of charge",
+      "Coordinate frame transforms over time",
+      "Audio streams",
+      "Topic latency only"
+    ],
+    "answer": 1,
+    "explain": "tf2 maintains a tree of frames and their poses, queryable across time."
+  },
+  {
+    "q": "Every node in a tf2 tree has:",
+    "options": [
+      "Multiple parents",
+      "Exactly one parent (except the root)",
+      "No relationships",
+      "A separate tree of its own"
+    ],
+    "answer": 1,
+    "explain": "tf trees are strict — one parent per frame — which keeps lookups unambiguous."
+  },
+  {
+    "q": "A static transform is best used for:",
+    "options": [
+      "Robot wheel rotation",
+      "Camera mounted rigidly on the chassis",
+      "Hour of the day",
+      "Battery voltage"
+    ],
+    "answer": 1,
+    "explain": "Static transforms are for fixed offsets (mounting positions) that never change at runtime."
+  }
+]
+```
+
+## Further Reading
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Urdf](/atlas/concept/ros2-urdf)
+- [Kinematics](/atlas/concept/kinematics)
+- [Forward Kinematics](/atlas/concept/forward-kinematics)
+- [Localisation](/atlas/concept/localisation)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain ROS2 TF (tf2) for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

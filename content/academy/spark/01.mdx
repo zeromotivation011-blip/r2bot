@@ -1,0 +1,77 @@
+---
+title: "What is a robot, actually?"
+description: "Every robot ever built does three things. Once you see the pattern, you can't unsee it."
+track: spark
+lesson: 1
+duration: "5 min read"
+xp: 50
+estimated_minutes: 5
+sources:
+  - name: "Robotics: Modelling, Planning and Control — Siciliano et al."
+    url: "https://link.springer.com/book/10.1007/978-1-84628-642-1"
+  - name: "Introduction to Robotics — Stanford University (CS223A)"
+    url: "https://cs.stanford.edu/groups/manips/teaching/cs223a/"
+---
+
+The robot in your head — the one from movies — probably walks, talks, and has opinions about humanity. That robot doesn't really exist yet.
+
+The ones that do exist are stranger. And honestly more interesting.
+
+## Every robot does three things
+
+No matter how simple or complex, every robot ever built follows the same loop:
+
+**Sense** — It takes in information from the world. A camera. A microphone. A distance sensor. GPS coordinates. The robot's version of eyes and ears.
+
+**Think** — It processes that information and makes a decision. What does this data mean? What should I do next?
+
+**Act** — It does something physical in the world. Moves a wheel. Opens a valve. Picks up an object. Turns a camera.
+
+This is called the **Sense-Think-Act loop**. It's the skeleton of every robot ever built — from a £20 toy to a Mars rover.
+
+## Three robots. Same loop.
+
+**A Roomba (robot vacuum)**
+- Sense: Bump sensors detect walls. Cliff sensors detect stairs.
+- Think: "I hit something. Turn right and keep going."
+- Act: Wheels reverse, robot turns, continues cleaning.
+
+The Roomba's "Think" step is a simple rule. No learning, no memory. Just: if this, then that.
+
+**A factory robotic arm**
+- Sense: Position encoders track the arm's exact angle at every joint.
+- Think: Follow the pre-programmed path to the next waypoint.
+- Act: Motors move each joint with millimetre precision.
+
+The arm is fast and accurate — but only because its world is completely controlled. Move one bolt on the assembly line and it's lost.
+
+**A self-driving car**
+- Sense: Cameras, radar, and LiDAR build a 3D map of everything nearby.
+- Think: Neural networks identify objects; path-planning algorithms decide the safest route.
+- Act: The car steers, accelerates, and brakes — without a human hand on the wheel.
+
+The self-driving car's "Think" step is orders of magnitude more complex than the Roomba's. But the loop is identical.
+
+## Why this matters
+
+Once you know the Sense-Think-Act loop, you start seeing it everywhere — in robots, yes, but also in thermostats, autopilots, and recommendation algorithms.
+
+It also tells you exactly where robots fail. A Roomba gets confused when its sensors are dirty. A factory arm stops working when the environment changes. A self-driving car struggles in heavy rain when its sensors are degraded.
+
+Every robot failure is a failure in one of three places: it sensed wrong, it thought wrong, or it acted wrong. That's the whole list.
+
+Want to go deeper on any part of the loop? The Atlas has entries on [sensors](/atlas/sensors), [actuators](/atlas/actuators), and [control systems](/atlas/control-systems).
+
+---
+
+## Check your understanding
+
+These aren't graded. Just think about them.
+
+**1.** A motion-sensor light turns on when you walk past. Which part of the Sense-Think-Act loop is the motion sensor? Which part is the light turning on?
+
+**2.** A Roomba bumps into a wall and turns. Where in the loop did something go "wrong" — or did anything go wrong at all?
+
+---
+
+*Here's something worth sitting with: a thermostat senses temperature and decides to turn on your heating. By the definition above — is it a robot?*

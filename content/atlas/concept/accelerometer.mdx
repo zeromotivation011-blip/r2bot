@@ -1,0 +1,96 @@
+---
+title: Accelerometer in Robotics — Complete Guide
+summary: >-
+  An accelerometer measures linear acceleration along an axis. In robotics,
+  accelerometers detect motion, tilt, vibration, and gravity — essential for
+  IMU-based pose estimation.
+category: sensors
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - imu
+  - motion
+  - tilt
+  - sensor-fusion
+seeAlso:
+  - imu
+  - gyroscope
+  - sensor-fusion
+  - humanoid-robot
+difficulty: 3
+oneLiner: >-
+  The concept concept: An accelerometer measures linear acceleration along an
+  axis.
+laymanExplanation: >-
+  An accelerometer measures linear acceleration — the rate at which an object
+  speeds up or slows down — along one or more axes. Modern MEMS accelerometers
+  are tiny silicon chips that sit alongside gyroscopes inside almost every
+  smartphone, drone, and robot.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without accelerometer in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis:
+  - Smartphones
+  - Drones
+  - Wearables
+indianExample: >-
+  Indian fitness-tracker startups (boAt, Fire-Boltt) use accelerometers in every
+  smartwatch — sourced from Bosch and ST.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: An accelerometer at rest pointing up reads roughly…
+  options:
+    - 0 g
+    - 1 g (gravity)
+    - 9.8 g
+    - 10 m
+  answer: 1
+  explanation: >-
+    A stationary accelerometer always reads 1 g downward — that is gravity
+    itself.
+mindBlowingFact: >-
+  The accelerometer in your phone is sensitive enough to detect your heartbeat
+  if you hold it against your chest.
+industryApplications:
+  - smartphones
+  - wearables
+  - automotive (airbags)
+  - robotics
+  - industrial monitoring
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An accelerometer measures linear acceleration along an axis. In robotics,
+  accelerometers detect motion, tilt, vibration, and gravity — essential for
+  IMU-based pose estimation.
+slug: accelerometer
+bucket: concept
+---
+
+# Accelerometer in Robotics
+
+## What is it?
+
+An accelerometer measures linear acceleration — the rate at which an object speeds up or slows down — along one or more axes. Modern MEMS accelerometers are tiny silicon chips that sit alongside gyroscopes inside almost every smartphone, drone, and robot.
+
+## How it works
+
+Inside the chip, a small proof mass is suspended on flexible springs. When the device accelerates, inertia keeps the mass behind, deflecting the springs by a measurable amount. Capacitive plates around the mass convert that deflection into a voltage signal. At rest, the accelerometer reads gravity (≈9.8 m/s²) on whichever axis points down — which is why an accelerometer can also be used to detect tilt and orientation when the robot is stationary.
+
+## Real-world example
+
+When you flip your phone to landscape mode, the accelerometer detects the rotation in real time. A Roomba uses accelerometers to detect when it has been picked up. Cars trigger airbags using accelerometers that detect crash-level deceleration in under 5 ms.
+
+## Why it matters for robotics
+
+Accelerometers paired with gyroscopes form an IMU — the heart of any motion-aware robot. Whether you're building a self-balancing robot, a drone, a wearable, or even a step counter for an Indian healthcare app, accelerometers are foundational hardware every robotics engineer must understand.
+
+## See also
+
+- [Imu](/atlas/concept/imu)
+- [Gyroscope](/atlas/concept/gyroscope)
+- [Sensor Fusion](/atlas/concept/sensor-fusion)
+- [Humanoid Robot](/atlas/concept/humanoid-robot)

@@ -1,0 +1,131 @@
+---
+title: RViz2 — Complete Guide | R2BOT
+summary: >-
+  RViz2 is the ROS2 3D visualisation tool. It shows your robot, sensor data,
+  planned paths, and tf frames in real time — the daily window into your robot.
+category: control
+bucket: ros2-ecosystem
+difficulty: beginner
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - rviz2
+  - visualisation
+  - ros2
+  - debug
+  - 3d
+relatedTerms:
+  - ros2
+  - ros2-tf
+  - ros2-urdf
+  - nav2-stack
+  - moveit2-stack
+seeAlso:
+  - ros2
+  - ros2-tf
+  - ros2-urdf
+  - nav2-stack
+  - moveit2-stack
+youtubeSearchQuery: ROS2 RViz2 tutorial
+oneLiner: 'The ros2 ecosystem concept: RViz2 is the ROS2 3D visualisation tool. It'
+laymanExplanation: >-
+  RViz2 is the official 3D visualisation tool for ROS2. It subscribes to ROS2
+  topics and renders the robot model, sensor readings, planned paths, tf
+  transforms, costmaps, and any other custom display in real time. It is the
+  daily debug window for every ROS2 engineer.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without rviz2 — complete guide | r2bot, many ros2 ecosystem systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  RViz2 is the ROS2 3D visualisation tool. It shows your robot, sensor data,
+  planned paths, and tf frames in real time — the daily window into your robot.
+slug: rviz2
+---
+
+# RViz2
+
+## What is RViz2?
+
+RViz2 is the official 3D visualisation tool for ROS2. It subscribes to ROS2 topics and renders the robot model, sensor readings, planned paths, tf transforms, costmaps, and any other custom display in real time. It is the daily debug window for every ROS2 engineer.
+
+## How It Works
+
+RViz2 is a Qt application that connects to ROS2 over DDS. You add `Display` plugins — Robot Model, TF, LaserScan, PointCloud2, Path, Marker, Map — and configure their topics and colours. Custom panels and plugins let you build interactive control GUIs. Saved RViz config files let teams share standard visualisation layouts. RViz2 also publishes goal poses and initial poses via interactive tools, integrating directly with Nav2.
+
+## Real-World Example
+
+Every ROS2 demo video you have ever seen — TurtleBot driving, robotic arm planning, Nav2 path overlay — is RViz2. Indian robotics labs use it for daily debugging. Every Nav2 and MoveIt2 tutorial relies on RViz2.
+
+## Why It Matters for Robotics
+
+Debugging a robot without RViz2 is like flying blind. Mastering RViz2 — adding displays, tuning, building custom plugins — is a daily ROS2 skill. Many production deployments add custom RViz2 panels for operators.
+
+## Try It Yourself
+
+Launch any ROS2 demo with simulated sensors. Run `rviz2`. Add a LaserScan display pointing at `/scan` and a RobotModel display. Drive the robot via teleop and watch the lasers and robot move in real time.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "RViz2 is best described as:",
+    "options": [
+      "A robot motor driver",
+      "A 3D ROS2 visualisation tool",
+      "A C++ compiler",
+      "A camera lens"
+    ],
+    "answer": 1,
+    "explain": "RViz2 visualises robot models, sensors, transforms, and plans in 3D."
+  },
+  {
+    "q": "You add data to RViz2 by:",
+    "options": [
+      "Recompiling ROS2",
+      "Adding Display plugins subscribed to topics",
+      "Editing the kernel",
+      "Restarting Wi-Fi"
+    ],
+    "answer": 1,
+    "explain": "Displays subscribe to topics — LaserScan, PointCloud2, RobotModel, etc."
+  },
+  {
+    "q": "RViz2 commonly integrates with which Nav2 feature?",
+    "options": [
+      "Sending 2D Goal Pose and Initial Pose",
+      "Booking a flight",
+      "Reading email",
+      "Storing data"
+    ],
+    "answer": 0,
+    "explain": "RViz2's '2D Pose Estimate' and '2D Goal Pose' tools publish to AMCL and Nav2."
+  }
+]
+```
+
+## Further Reading
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Tf](/atlas/concept/ros2-tf)
+- [Ros2 Urdf](/atlas/concept/ros2-urdf)
+- [Nav2 Stack](/atlas/concept/nav2-stack)
+- [Moveit2 Stack](/atlas/concept/moveit2-stack)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain RViz2 for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

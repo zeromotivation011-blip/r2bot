@@ -1,0 +1,23 @@
+{
+  "id": "build-bluetooth-rc-car",
+  "slug": "bluetooth-rc-car",
+  "title": "Bluetooth RC Car",
+  "tagline": "Drive your robot from your phone over Bluetooth Serial — your first wireless control system using HC-05 and Arduino.",
+  "level": "intermediate",
+  "duration_hours": 4,
+  "total_xp": 800,
+  "components": [
+    { "name": "Arduino Uno (or Nano)" },
+    { "name": "HC-05 Bluetooth module" },
+    { "name": "L298N motor driver module" },
+    { "name": "4× BO geared motors with wheels" },
+    { "name": "Chassis (4-wheel)" },
+    { "name": "Li-ion battery pack (7.4V)" },
+    { "name": "Jumper wires" },
+    { "name": "1kΩ + 2kΩ resistors (voltage divider for RX)" },
+    { "name": "Android phone with Serial Bluetooth Terminal app" }
+  ],
+  "simulation_only": false,
+  "color": "#60a5fa",
+  "icon": "📱"
+}

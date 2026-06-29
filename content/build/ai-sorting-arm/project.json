@@ -1,0 +1,23 @@
+{
+  "id": "build-ai-sorting-arm",
+  "slug": "ai-sorting-arm",
+  "title": "AI Object-Sorting Arm",
+  "tagline": "YOLOv8 detects objects in real time, a 4-DOF arm picks them up and sorts by class — your first taste of industrial AI robotics.",
+  "level": "advanced",
+  "duration_hours": 14,
+  "total_xp": 2200,
+  "components": [
+    { "name": "NVIDIA Jetson Nano 4GB" },
+    { "name": "USB camera (Logitech C270 or Pi camera adapter)" },
+    { "name": "4-DOF servo arm (LewanSoul / Hiwonder)" },
+    { "name": "PCA9685 16-channel servo driver" },
+    { "name": "External 5V 4A power supply" },
+    { "name": "YOLOv8n pretrained weights" },
+    { "name": "Coloured cubes or blocks (target objects)" },
+    { "name": "MicroSD card 64GB+ with JetPack" },
+    { "name": "Ethernet cable + monitor for setup" }
+  ],
+  "simulation_only": false,
+  "color": "#22c55e",
+  "icon": "🤖"
+}

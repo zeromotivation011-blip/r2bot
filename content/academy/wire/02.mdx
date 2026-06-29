@@ -1,0 +1,165 @@
+---
+title: "Sensor Integration"
+description: "LiDAR, ultrasonic, IMU, camera — reading sensor data in ROS2 with the right QoS profiles and message types."
+track: wire
+lesson: 2
+duration: "30 min read"
+url_slug: w-02-sensor-integration
+hindi_name: "सेंसर एकीकरण"
+xp: 150
+estimated_minutes: 30
+atlas_links: [lidar, imu, slam, feedback-loop]
+sources:
+  - name: "ROS 2 sensor_msgs reference"
+    url: "https://docs.ros.org/en/humble/p/sensor_msgs/"
+  - name: "About QoS settings — ROS 2 docs"
+    url: "https://docs.ros.org/en/humble/Concepts/Intermediate/About-Quality-of-Service-Settings.html"
+---
+
+## What you'll build
+
+A ROS2 node that subscribes to a 2D LiDAR's `/scan` topic, finds the **nearest obstacle in front of the robot**, and logs the distance every reading. Add a second subscription to `/imu/data` and log when the robot tilts more than 5°. This is the kernel of every reactive-control loop you'll ever write.
+
+## Sensors are streams, not snapshots
+
+A LiDAR doesn't produce a "reading." It produces 5–40 *scans per second*, each scan containing 360–2000 distance measurements. A camera doesn't produce "a photo." It produces 30 frames per second. An IMU produces 100–500 samples per second.
+
+ROS2 models all of this as **topics with the right message types**:
+
+- `/scan` → `sensor_msgs/msg/LaserScan` (2D LiDAR)
+- `/points2` → `sensor_msgs/msg/PointCloud2` (3D LiDAR or depth camera)
+- `/imu/data` → `sensor_msgs/msg/Imu`
+- `/camera/image_raw` → `sensor_msgs/msg/Image`
+- `/ultrasonic` → `sensor_msgs/msg/Range`
+
+Every message type has a fixed schema. Learn 4–5 of them well; they map to 90% of sensor work.
+
+## QoS — the thing that breaks beginners
+
+ROS2's killer feature over ROS1 is **Quality of Service (QoS)** — per-topic settings for reliability, durability, history, and depth. The defaults are good for *commands* (reliable, keep-last 10) but **bad for sensors**.
+
+The convention for sensor data is:
+
+- **Reliability: BEST_EFFORT** — if a packet drops, don't retry. By the time the retransmit arrives, the data is stale anyway.
+- **History: KEEP_LAST 5** — only the most recent matters.
+- **Durability: VOLATILE** — late subscribers don't get backfilled history.
+
+If you subscribe to a LiDAR with the default RELIABLE QoS, the publisher won't match you, and you'll see silence with no error. This is the single most common ROS2 newcomer bug.
+
+In Python:
+
+```python
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
+
+SENSOR_QOS = QoSProfile(
+    reliability=ReliabilityPolicy.BEST_EFFORT,
+    history=HistoryPolicy.KEEP_LAST,
+    depth=5,
+)
+```
+
+Or use the convenience constant:
+
+```python
+from rclpy.qos import qos_profile_sensor_data
+# Pass qos_profile_sensor_data wherever a QoSProfile is expected.
+```
+
+## The LiDAR nearest-obstacle node
+
+```python
+import math
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
+from sensor_msgs.msg import LaserScan
+from sensor_msgs.msg import Imu
+
+class SafetyMonitor(Node):
+    def __init__(self):
+        super().__init__('safety_monitor')
+
+        # LiDAR subscription with sensor QoS
+        self.create_subscription(
+            LaserScan, '/scan', self.on_scan, qos_profile_sensor_data
+        )
+        # IMU subscription
+        self.create_subscription(
+            Imu, '/imu/data', self.on_imu, qos_profile_sensor_data
+        )
+
+        self.get_logger().info('Safety monitor up — listening on /scan and /imu/data')
+
+    def on_scan(self, msg: LaserScan):
+        # msg.ranges is a list of distances, one per ray.
+        # angle_min = leftmost ray angle, angle_increment = step between rays.
+        # We care about the front 60° (±30° from straight ahead).
+        ahead = []
+        for i, r in enumerate(msg.ranges):
+            angle = msg.angle_min + i * msg.angle_increment
+            if -math.radians(30) <= angle <= math.radians(30):
+                # Filter out invalid readings (0, inf, NaN)
+                if math.isfinite(r) and r > msg.range_min:
+                    ahead.append(r)
+        if not ahead:
+            return
+        nearest = min(ahead)
+        self.get_logger().info(f'Nearest obstacle ahead: {nearest:.2f}m')
+
+    def on_imu(self, msg: Imu):
+        # Convert quaternion to roll angle (simplified — small angle assumption)
+        # For real code use tf_transformations.euler_from_quaternion.
+        q = msg.orientation
+        roll = math.atan2(2 * (q.w * q.x + q.y * q.z), 1 - 2 * (q.x * q.x + q.y * q.y))
+        if abs(math.degrees(roll)) > 5:
+            self.get_logger().warn(f'Robot tilted: roll={math.degrees(roll):.1f}°')
+
+def main():
+    rclpy.init()
+    node = SafetyMonitor()
+    try:
+        rclpy.spin(node)
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+The key beats: **the right QoS**, **filter invalid readings** (LaserScan defines `range_min`/`range_max` precisely so you can drop noise), and **respect the message frame** (`msg.header.frame_id` tells you which sensor coordinate frame the data is in — critical for multi-sensor fusion).
+
+## Indian sensors you'll meet in the wild
+
+Wire-track engineers in India usually start with these specific units because they're cheap, available, and have ROS2 drivers maintained on GitHub:
+
+- **RPLidar A1/A2 (Slamtec)** — 6m range, 8000 samples/s, ~₹8,000. Default for hobby and university work.
+- **MPU6050** — 6-DOF IMU on every Arduino-based robot — ~₹150. Pair with an ESP32 over micro-ROS.
+- **HC-SR04 ultrasonic** — ~₹40. Slow and noisy but learners cut their teeth on it.
+- **Intel RealSense D435i / Orbbec Astra** — depth cameras under ₹25k. **Ideaforge** uses RealSense on their drones for obstacle avoidance.
+- **Velodyne VLP-16** — proper 3D LiDAR, ~₹4 lakh. **TCS Innovation Labs** and **TiHAN-IIT Hyderabad** use these for autonomous-vehicle research.
+
+## Sensor fusion sneak peek
+
+LiDAR is accurate but slow. IMU is fast but drifts. Combine them and you get smooth, accurate state estimation — the basis of localization.
+
+> **Try this in the visualizer:** open [/visualizer#fusion](/visualizer#fusion) and watch GPS + IMU fuse into a stable position estimate. The same principle scales to LiDAR + odometry + IMU on real robots.
+
+## Test Your Understanding
+
+**1.** You set up an RPLidar A1 driver node and write a subscriber. The driver clearly works (`ros2 topic hz /scan` shows ~10Hz), but your subscriber's callback never fires. List the *first three things* you'd check, with one sentence on each.
+
+**2.** Your robot's IMU reports a roll of 4.8° on flat ground. Is the IMU broken? Walk through three possible causes (sensor, mounting, software) and how you'd distinguish them.
+
+**3.** You're fusing LiDAR and wheel odometry to estimate position. The LiDAR says you've moved 0.5m forward; odometry says 0.6m. Which do you trust more, and *why*? What additional information would change your answer?
+
+## India Opportunity
+
+- **Sensor Integration Engineer · Ati Motors, Bangalore** — autonomous indoor logistics robots, ROS2 + RPLidar + RealSense, ₹14–22 LPA.
+- **Perception Engineer · Swaayatt Robots, Bhopal** — autonomous driving for Indian road conditions, sensor fusion, ₹16–28 LPA.
+- **Robotics Software Engineer · TCS Innovation Labs, Pune** — Velodyne + radar fusion for autonomous shuttles, ₹12–22 LPA.
+- **Embedded Systems Intern · Genrobotics, Trivandrum** — sewer-robot sensor stacks, ₹35–50k/month.
+
+## Next Step
+
+→ Continue to **[Wire 03 · PID Control in Practice](/academy/wire/03)** — write a real PID velocity controller in ROS2.

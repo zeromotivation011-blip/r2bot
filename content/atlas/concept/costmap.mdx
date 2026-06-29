@@ -1,0 +1,132 @@
+---
+title: Costmap in ROS2 Navigation — Complete Guide | R2BOT
+summary: >-
+  A costmap is a 2D grid where each cell holds a cost reflecting how desirable
+  it is to traverse. Backbone of Nav2 local and global planners.
+category: ai-and-perception
+bucket: navigation-localization
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - costmap
+  - nav2
+  - ros2
+  - navigation
+  - inflation
+relatedTerms:
+  - nav2-stack
+  - path-planning
+  - occupancy-grid
+  - a-star-algorithm
+  - ros2
+seeAlso:
+  - nav2-stack
+  - path-planning
+  - occupancy-grid
+  - a-star-algorithm
+  - ros2
+youtubeSearchQuery: ROS2 Nav2 costmap layers tutorial
+oneLiner: 'The navigation localization concept: A costmap is a 2D grid where each'
+laymanExplanation: >-
+  A costmap is a 2D grid representation of the world where each cell holds a
+  numeric cost indicating how undesirable it is for the robot to be there.
+  Obstacles get high cost, free space gets zero, and areas near obstacles get
+  inflated cost. Planners like A* and Dijkstra navigate by minimising total path
+  cost.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without costmap in ros2 navigation — complete guide | r2bot, many navigation
+  localization systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A costmap is a 2D grid where each cell holds a cost reflecting how desirable
+  it is to traverse. Backbone of Nav2 local and global planners.
+slug: costmap
+---
+
+# Costmap in ROS2 Navigation
+
+## What is Costmap in ROS2 Navigation?
+
+A costmap is a 2D grid representation of the world where each cell holds a numeric cost indicating how undesirable it is for the robot to be there. Obstacles get high cost, free space gets zero, and areas near obstacles get inflated cost. Planners like A* and Dijkstra navigate by minimising total path cost.
+
+## How It Works
+
+Nav2 builds costmaps in layers. The static layer reads a known map. The obstacle layer adds dynamic obstacles from LIDAR/depth sensors. The inflation layer adds a halo of decreasing cost around every obstacle to keep the robot at a safe distance. The voxel layer extends to 3D. Each layer can be enabled or disabled per planner. The global costmap covers the entire environment for long-range planning; the local costmap is a small, fast-updating window around the robot for reactive avoidance.
+
+## Real-World Example
+
+Every Nav2-based warehouse robot uses costmaps with inflation tuned to its physical width. Hospital delivery robots inflate human-sized buffers around detected legs. Outdoor mowing robots add custom layers for grass-height and slope.
+
+## Why It Matters for Robotics
+
+Costmap tuning is the single most impactful factor in whether a Nav2 robot behaves well or terribly. Inflation radius too low → robot scrapes walls. Too high → robot refuses to enter narrow doorways. Every Nav2 engineer must master costmap layers and parameters.
+
+## Try It Yourself
+
+Launch the Nav2 TurtleBot3 demo in Gazebo + RViz2. Visualise the global and local costmaps in RViz. Change the inflation radius parameter live with `ros2 param set` and watch the robot's path change in real time.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "A costmap cell encodes:",
+    "options": [
+      "Battery level",
+      "How costly it is for the robot to traverse that cell",
+      "GPS time",
+      "Audio sample"
+    ],
+    "answer": 1,
+    "explain": "Higher cost = more undesirable; obstacles are highest, free space is lowest."
+  },
+  {
+    "q": "The inflation layer in Nav2 adds:",
+    "options": [
+      "Random noise",
+      "A decaying cost halo around obstacles",
+      "Audio comments",
+      "Sensor calibration"
+    ],
+    "answer": 1,
+    "explain": "Inflation keeps the planned path away from walls by extending cost outward from obstacles."
+  },
+  {
+    "q": "Local vs global costmaps differ in:",
+    "options": [
+      "Material",
+      "Range and update frequency",
+      "Manufacturer",
+      "Programming language"
+    ],
+    "answer": 1,
+    "explain": "Global covers the whole map slowly; local covers a window around the robot quickly."
+  }
+]
+```
+
+## Further Reading
+
+- [Nav2 Stack](/atlas/concept/nav2-stack)
+- [Path Planning](/atlas/concept/path-planning)
+- [Occupancy Grid](/atlas/concept/occupancy-grid)
+- [A Star Algorithm](/atlas/concept/a-star-algorithm)
+- [Ros2](/atlas/concept/ros2)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Costmap in ROS2 Navigation for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

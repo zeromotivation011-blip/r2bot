@@ -1,0 +1,17 @@
+{
+  "id": "l1-what-is-a-robot",
+  "module_id": "m1-foundations",
+  "order_index": 0,
+  "slug": "what-is-a-robot",
+  "title": "What is a robot, actually?",
+  "lesson_type": "reading",
+  "duration_minutes": 8,
+  "xp_reward": 80,
+  "is_free_preview": true,
+  "passing_score": 75,
+  "objectives": [
+    "Define a robot in your own words",
+    "Identify the Sense-Think-Act loop in any machine"
+  ],
+  "atlas_links": ["sensor", "actuator", "controller", "feedback-loop"]
+}

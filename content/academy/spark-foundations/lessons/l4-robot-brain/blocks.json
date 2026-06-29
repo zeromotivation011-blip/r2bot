@@ -1,0 +1,28 @@
+[
+  {
+    "id": "l4-text",
+    "order_index": 0,
+    "type": "text",
+    "is_required": true,
+    "data": {
+      "estimated_read_minutes": 5,
+      "content_mdx": "A Roomba and a self-driving car are both robots. The biggest difference between them isn't sensors or wheels — it's what happens in the middle.\n\n## Two kinds of brains\n\n**Microcontroller (Arduino Uno — ₹650)** — a tiny chip with just enough computing to run simple if-this-then-that logic. Boots in milliseconds. Doesn't have an operating system. Great for: line followers, small bots, sensor projects.\n\n**Single-board computer (Raspberry Pi 4 — ₹4,500)** — a full Linux computer the size of a credit card. Has WiFi, can run Python, ROS2, even computer vision. Great for: anything that needs to think hard.\n\n## When to use which\n\n- Beginner physical project? **Arduino**.\n- Need a camera or AI? **Raspberry Pi**.\n- Both? Many real robots use them together — Arduino for low-level motor control, Pi for high-level perception.\n\nThis pairing is the most common architecture in hobbyist robotics today."
+    }
+  },
+  {
+    "id": "l4-quiz",
+    "order_index": 1,
+    "type": "quiz-mcq",
+    "is_required": true,
+    "data": {
+      "question": "You want to build a small bot that recognises faces and waves. What's the right brain (or combination)?",
+      "options": [
+        { "id": "a", "text": "Arduino Uno alone", "correct": false, "explanation": "Arduino can't run face recognition — it doesn't have enough memory." },
+        { "id": "b", "text": "Raspberry Pi alone", "correct": false, "explanation": "Works, but Pi is overkill for waving a servo. Combining is more efficient." },
+        { "id": "c", "text": "Raspberry Pi + Arduino", "correct": true, "explanation": "Classic split: Pi does vision, Arduino moves the servo." },
+        { "id": "d", "text": "No microcontroller — just a battery", "correct": false, "explanation": "A robot needs a brain — that's the whole point of the Think step." }
+      ],
+      "points": 100
+    }
+  }
+]

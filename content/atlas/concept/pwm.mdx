@@ -1,0 +1,112 @@
+---
+title: PWM (Pulse Width Modulation)
+category: fundamentals
+summary: >-
+  PWM is a trick for making a digital chip — which can only turn things fully on
+  or fully off — behave as if it's dimming a light or running a motor at
+  half-speed.
+seeAlso:
+  - servo-motor
+  - robot
+sources:
+  - title: SparkFun — Pulse Width Modulation
+    url: 'https://learn.sparkfun.com/tutorials/pulse-width-modulation'
+  - title: Arduino — analogWrite() reference
+    url: >-
+      https://docs.arduino.cc/language-reference/en/functions/analog-io/analogWrite/
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - electronics
+  - beginner
+difficulty: 3
+oneLiner: 'The concept concept: PWM is a trick for making a digital'
+laymanExplanation: >-
+  PWM stands for **Pulse Width Modulation**. It's a trick that lets a digital
+  chip — which can only turn things fully on or fully off — behave as if it's
+  dimming a light, fading a sound, or running a motor at half-speed.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without pwm (pulse width modulation), many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis:
+  - Every Arduino robot
+  - Most drones
+  - Servo motors everywhere
+indianExample: >-
+  Every Arduino-based robot built in Indian schools uses analogWrite() — which
+  is PWM under the hood.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: A 50% duty cycle PWM signal means…
+  options:
+    - Power is off
+    - 'On for half the time, off for half the time'
+    - Twice the voltage
+    - Random output
+  answer: 1
+  explanation: >-
+    Duty cycle is the fraction of time the signal is HIGH. 50% means equal on
+    and off — so the average output is half the supply voltage.
+mindBlowingFact: >-
+  Your microwave oven uses a slow PWM (a relay clicking on/off) to control 50%
+  power — same idea, longer period.
+industryApplications:
+  - robotics
+  - lighting
+  - power electronics
+  - audio
+  - automotive
+difficultyLabel: Classroom
+technicalDefinition: >-
+  PWM is a trick for making a digital chip — which can only turn things fully on
+  or fully off — behave as if it's dimming a light or running a motor at
+  half-speed.
+slug: pwm
+bucket: concept
+---
+
+PWM stands for **Pulse Width Modulation**. It's a trick that lets a digital chip — which can only turn things fully on or fully off — behave as if it's dimming a light, fading a sound, or running a motor at half-speed.
+
+## The fan analogy
+
+Imagine a desk fan with only two settings: full blast or completely off. You want to feel a gentle breeze.
+
+You could flip the switch on for 1 second, off for 1 second, on for 1 second — and you'd feel pulses of cold air. Not great.
+
+Now flip it 100 times per second: on for 1/200 of a second, off for 1/200 of a second. Your skin and eyes can't possibly track that fast. What you'd feel is a steady, half-strength breeze.
+
+That's PWM. The fan is still only ever fully on or fully off — but the *fraction of the time* it spends on (the "duty cycle") decides the average power.
+
+## Duty cycle, the only thing that matters
+
+A 0% duty cycle means it's always off. A 100% duty cycle means it's always on. 50% means it's on half the time and off half the time. 25% means a quarter of the time.
+
+When you write `analogWrite(pin, 128)` in Arduino, you're telling the chip: "send PWM at 50% duty cycle to this pin" (128 is half of 255, which is the max).
+
+## Why robots can't live without it
+
+Every motor in a [robot](/atlas/concept/robot) is controlled with PWM. So is every LED that dims. So is every servo that holds a precise angle. PWM is the universal language between a tiny digital brain and a physical, analog world.
+
+**LEDs** dim by being on-off fast enough that your eyes blur it into "half-bright."
+
+**DC motors** spin at variable speed because their inertia smooths out the on-off pulses into a steady rotation.
+
+**Servos** (the small motors with a horn that can hold a specific angle) read the *length* of the PWM pulse — usually between 1 and 2 milliseconds — and rotate to a position based on it.
+
+**Sound** — PWM at audio frequencies (a few kilohertz) can make a piezo buzzer play a melody.
+
+## What can go wrong
+
+If the PWM frequency is too slow (say, 50 Hz on an LED), you'll *see* it flickering. That's why nicer LED bulbs and dashboards use 1 kHz or higher.
+
+If a motor is run at very low duty cycle, it might just *hum* without spinning, because the small bursts of power aren't enough to overcome friction. You need a minimum duty cycle to get motion. This is called the **stall threshold**.
+
+If the chip's pin can't supply enough current, the motor or LED will dim only weakly, or the chip itself might overheat. That's why we use a **motor driver** (like an L298N or a TB6612FNG) — a beefy intermediate chip that the [microcontroller](/atlas/concept/microcontroller) commands via PWM, but which actually carries the current.
+
+---
+
+*Curious how a servo actually decodes a PWM signal into an angle? Read [Servo motor](/atlas/concept/servo-motor).*

@@ -1,0 +1,40 @@
+---
+title: How Boston Dynamics' Spot actually works
+summary: A 7-minute decode of the quadruped that started the legged-robotics revolution — 12 actuated joints, three perception cameras, and the control loop that keeps it upright.
+topic: Legged Robots
+durationSeconds: 280
+originalDurationSeconds: 443
+externalUrl: https://bostondynamics.com/products/spot/
+publishedAt: 2026-04-22
+relatedAtlas:
+  - { type: concept, slug: quadruped-robot }
+  - { type: concept, slug: slam }
+  - { type: concept, slug: servo-motor }
+---
+
+Spot has 12 actuated joints — three per leg (hip yaw, hip pitch, knee). Every joint reports its position, velocity, and torque back to the central controller at 333 Hz. The controller decides what the next 3 milliseconds look like, then commands every motor accordingly.
+
+## How it stays upright
+
+The trick that makes Spot look "alive" is a **model predictive controller (MPC)** running on the body. The MPC has a physics model of Spot (mass, inertia, leg geometry) and constantly asks: "given the forces I'm applying right now, where will my center of mass be in 0.3 seconds?" If that future position is outside the support polygon (the area bounded by feet on the ground), the MPC adjusts foot placement *now* to recover.
+
+This is why Spot can be kicked, shoved, or step on a banana peel and not fall over — the controller is already computing the recovery move before the disturbance finishes.
+
+## The perception stack
+
+Spot has five fisheye cameras and a stereo depth camera. It builds a real-time occupancy grid of its surroundings — what's solid, what's traversable, what's an obstacle. The grid plus the SLAM map together let Spot plan a path through a cluttered space.
+
+The arm version (Spot Arm) adds a 6-DOF manipulator. It can open doors, pick up boxes up to 14 kg, and push elevator buttons. Most demonstrations you see online are scripted, but the underlying perception + grasping is real.
+
+## Where Spot is deployed today
+
+- Construction sites (BIM verification — comparing the as-built site to the planned model)
+- Oil and gas inspections (gauge reading, thermal patrols)
+- Hyundai's factories
+- Some R&D labs for general legged-locomotion research
+
+The price tag is around **$74,900 USD** for the basic model. Not consumer hardware. But the engineering inside is now finding its way into much cheaper quadrupeds — Unitree's Go2 starts around $1,600 with similar control concepts.
+
+---
+
+*If you want the algorithmic underpinnings, read [SLAM](/atlas/concept/slam) and [Inverse Kinematics](/atlas/concept/inverse-kinematics).*

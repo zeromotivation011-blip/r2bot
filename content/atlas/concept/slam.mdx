@@ -1,0 +1,108 @@
+---
+title: SLAM
+hindi_name: SLAM (एकसाथ स्थान-निर्धारण व मानचित्रण)
+prerequisites:
+  - localisation
+  - mapping
+  - sensor-fusion
+category: control
+summary: >-
+  SLAM is the technique a robot uses to build a map of an unfamiliar place —
+  while figuring out where it is on that map. Both at the same time.
+seeAlso:
+  - robot
+  - lidar
+  - optimus
+  - atlas
+sources:
+  - title: 'Cadena et al. — Past, Present, and Future of SLAM'
+    url: 'https://arxiv.org/abs/1606.05830'
+  - title: ROS — Nav2 documentation
+    url: 'https://docs.nav2.org/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - navigation
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: SLAM is the technique a robot uses to'
+laymanExplanation: >-
+  SLAM is the technique a robot uses to build a map of an unfamiliar place —
+  while figuring out where it is on that map. Both at the same time. The letters
+  stand for **Simultaneous Localization And Mapping**.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without slam, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Roomba (modern)
+  - Boston Dynamics Spot
+  - Most warehouse AMRs
+indianExample: >-
+  Indoor robot vacuums sold in India (Mi, Eufy, Roborock) all use vSLAM (visual
+  SLAM) — a single camera plus IMU.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What does SLAM stand for?
+  options:
+    - Smart Land And Mapping
+    - Simultaneous Localisation And Mapping
+    - Sensor Linked Aerial Mapping
+    - Single Level Autonomous Motion
+  answer: 1
+  explanation: >-
+    SLAM = Simultaneous Localisation And Mapping. The robot maps its environment
+    WHILE working out where it is.
+mindBlowingFact: >-
+  A robot vacuum can build a complete 3D map of your home in 10 minutes — and
+  remember it for the next year.
+industryApplications:
+  - consumer robotics
+  - warehouse logistics
+  - autonomous vehicles
+  - mining
+  - AR/VR
+difficultyLabel: Classroom
+technicalDefinition: >-
+  SLAM is the technique a robot uses to build a map of an unfamiliar place —
+  while figuring out where it is on that map. Both at the same time.
+slug: slam
+bucket: concept
+---
+
+SLAM is the technique a [robot](/atlas/concept/robot) uses to build a map of an unfamiliar place — while figuring out where it is on that map. Both at the same time. The letters stand for **Simultaneous Localization And [Mapping](/atlas/concept/mapping)**.
+
+## The blindfolded warehouse problem
+
+Imagine being dropped into a dark warehouse, blindfolded, with nothing but a flashlight and a sketchpad. Every step you take, you mark on the pad what you can see in the flashlight beam. After a while, you have a real map of the warehouse — *and* you know exactly where you are on it. You did both at once. That's SLAM.
+
+This is harder than it sounds, because if your steps are even slightly off (say you thought you walked exactly one metre but actually walked 1.05 metres), errors pile up. Walk for 100 metres and you might be 5 metres off. After a long enough walk, the map you've drawn no longer matches reality.
+
+## How robots do it
+
+Real robots use sensors instead of flashlights. The three most common ones for SLAM are:
+
+**[Lidar](/atlas/concept/lidar)** — a laser that spins around 360°, measuring distance to every wall and object up to 30+ metres away. Very accurate. Used by most self-driving cars, vacuum robots, and warehouse robots.
+
+**Cameras** — using one or two cameras and tracking visual features (a corner of a doorway, a unique pattern on a wall). Cheaper, but harder to compute. [Tesla](/atlas/company/tesla) famously uses cameras only.
+
+**Depth cameras** — like Microsoft's Kinect or Intel's RealSense. They give you a 3D [point cloud](/atlas/concept/point-cloud) directly, which makes SLAM easier than with regular cameras.
+
+The robot's computer takes thousands of sensor readings per second and runs an algorithm — usually a particle filter, a Kalman filter, or a graph-optimization technique — that keeps the map and the position consistent.
+
+## Loop closure: the magic step
+
+The biggest moment in any SLAM run is **loop closure** — when the robot recognizes "wait, I've been here before." At that instant, all the small errors that built up over the journey can be corrected at once. The map snaps into shape. Modern SLAM systems are mostly about how well they detect and use loop closures.
+
+## Where SLAM matters
+
+Anywhere a robot needs to move around a place it doesn't already have a perfect map of. Your Roomba runs SLAM every time it cleans. A Mars rover uses SLAM because there's no [GPS](/atlas/concept/gps-gnss) on Mars. A [surgical robot](/atlas/concept/surgical-robot) uses a kind of SLAM inside the body. Even some AR headsets (Apple Vision Pro, Meta Quest) run SLAM continuously, because they need to know exactly where you are in your room to overlay digital objects.
+
+## What's hard about it
+
+SLAM works beautifully when the world stays still. As soon as people walk around, or chairs get moved, or lighting changes drastically — the robot can get confused. The current research frontier is **dynamic SLAM** (handling moving things) and **lifelong SLAM** (keeping a useful map of a place that changes over months and years).
+
+---
+
+*Curious how a lidar actually measures distance with light? Read Lidar.*

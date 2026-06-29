@@ -1,0 +1,359 @@
+{
+  "root": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "explanation",
+      "title": "Welcome — your first real robot",
+      "body": "You're about to build a **Line Follower** — a small two-wheeled robot that detects a black line on the floor and drives along it on its own.\n\nThis is the same idea factories use to move parts between machines, hospitals use to deliver medicine trays at night, and Amazon's old Kiva warehouse bots used before lidar.\n\nThe magic is simple: **two eyes (IR sensors), one brain (Arduino), two legs (motors)**. You'll wire it, code it, test it in our simulator, and — if you have the parts — actually build it.\n\nBut we won't *tell* you how. At every step, you'll be asked a question first. Get it right, you move on. Get it wrong twice, we explain. That's how real engineers learn.\n\nReady?",
+      "branches": [{ "on": "next", "to": "q1-seen-before" }],
+      "xp": 10
+    },
+    "q1-seen-before": {
+      "id": "q1-seen-before",
+      "type": "question",
+      "title": "Have you seen one before?",
+      "body": "Line follower robots are the most common entry-point robot in the world. They show up at every school science fair, every robotics club, every hackathon.\n\nQuick check before we start.",
+      "hint": "Think about science exhibitions, YouTube robotics videos, or any factory tour.",
+      "hint2": "There's no wrong answer here — we're just calibrating where to start.",
+      "question": {
+        "style": "boolean",
+        "prompt": "Have you seen a line-following robot before (in person, on YouTube, or at school)?",
+        "correct": "yes",
+        "explanation_correct": "Great — then you already have a mental picture. We'll skip the over-explaining and dive into *how* it actually works under the hood.",
+        "explanation_wrong": "No problem — imagine a tiny car the size of your palm, with two wheels and two little eyes pointing down. A black strip of tape on the floor, like a road. The car follows the road. That's it."
+      },
+      "branches": [
+        { "on": "correct", "to": "q2-ir-meaning" },
+        { "on": "wrong", "to": "q2-ir-meaning" }
+      ],
+      "xp": 20
+    },
+    "q2-ir-meaning": {
+      "id": "q2-ir-meaning",
+      "type": "question",
+      "title": "What does \"IR\" stand for?",
+      "body": "Our line follower uses **IR sensors** pointing down at the floor. They are the cheapest, simplest way to tell *light* surface from *dark* surface.\n\nBut first — what does IR even mean?",
+      "hint": "It's a kind of light — just one your eyes can't see. Think TV remotes.",
+      "hint2": "The 'I' is the same word as in 'infrared sauna' or 'infrared thermometer'. Look closely at the options.",
+      "question": {
+        "style": "mcq",
+        "prompt": "IR stands for…",
+        "options": [
+          "Infrared",
+          "Internal Radio",
+          "Image Recognition",
+          "Inductive Reflection"
+        ],
+        "correct": 0,
+        "explanation_correct": "Exactly. **Infrared** — invisible light just beyond the red end of the visible spectrum. An IR sensor module shoots out IR light from a tiny LED and measures how much bounces back into a phototransistor.",
+        "explanation_wrong": "IR = **Infrared**. It's the same kind of invisible light your TV remote uses. The sensor module has a little IR LED that emits, and a phototransistor right next to it that listens for the reflection."
+      },
+      "branches": [
+        { "on": "correct", "to": "q3-why-two-sensors" },
+        { "on": "wrong", "to": "q3-why-two-sensors" }
+      ],
+      "xp": 30
+    },
+    "q3-why-two-sensors": {
+      "id": "q3-why-two-sensors",
+      "type": "question",
+      "title": "Why two sensors, not one?",
+      "body": "An IR module gives you a simple binary reading:\n\n- **Light surface (white floor)** → most IR bounces back → sensor reads **LOW** (0).\n- **Dark surface (black tape)** → light is absorbed → sensor reads **HIGH** (1).\n\nSo with **one** sensor you can detect *whether* you're on the line. But that's not enough to follow it. Why?",
+      "hint": "If one sensor tells you 'on line / off line', what does the robot do when it drifts? Which side did it drift to?",
+      "hint2": "One sensor can answer 'am I on the line?' but cannot answer 'which way did I fall off?' — and without that, you can't correct.",
+      "question": {
+        "style": "mcq",
+        "prompt": "What's the main limitation of using only ONE IR sensor?",
+        "options": [
+          "One sensor is too slow to react",
+          "It can detect the line but can't tell which side it drifted off to",
+          "Arduino has only one analog pin",
+          "IR sensors must come in pairs to work"
+        ],
+        "correct": 1,
+        "explanation_correct": "Right. One sensor says *on* or *off* — but if you've drifted off, you need a second reference point to know **which direction** to steer back. Two sensors straddle the line so you can detect drift in either direction.",
+        "explanation_wrong": "The answer is: **you can detect the line, but not which side you fell off to.** With two sensors placed slightly apart, if the left one goes off the line, you know you've drifted right and need to steer left — and vice versa."
+      },
+      "branches": [
+        { "on": "correct", "to": "explain-sensor-position" },
+        { "on": "wrong", "to": "explain-sensor-position" }
+      ],
+      "xp": 40
+    },
+    "explain-sensor-position": {
+      "id": "explain-sensor-position",
+      "type": "explanation",
+      "title": "Where the two sensors go",
+      "body": "Mount the two IR sensors at the **front of the robot**, pointing straight down, spaced **slightly wider than the line is thick**.\n\nA typical black-tape line is ~2 cm wide. Put the sensors about **3 cm apart**, centred on the robot's midline.\n\nWhen the robot is perfectly centred on the line, **both sensors see white** (because the line passes between them). The instant the robot drifts, one sensor crosses over the line and reads **HIGH** — that's your signal to correct.\n\nThis is the entire intuition. Everything that follows is just translating it into wires and code.",
+      "branches": [{ "on": "next", "to": "q4-differential-drive" }],
+      "xp": 20
+    },
+    "q4-differential-drive": {
+      "id": "q4-differential-drive",
+      "type": "question",
+      "title": "How do two wheels steer?",
+      "body": "Your robot has **two driven wheels** (left and right) and one free **caster wheel** in front for balance. There is no steering wheel, no servo for turning.\n\nSo how do you turn? By driving the two wheels at **different speeds**. This is called **differential drive** — the same way a tank, a wheelchair, or a bulldozer steers.",
+      "hint": "If the left wheel spins faster than the right wheel, which way does the robot pivot?",
+      "hint2": "Think of yourself on a swivel chair. Push harder with your left foot than your right foot. Which way do you spin?",
+      "question": {
+        "style": "mcq",
+        "prompt": "If the **left wheel** spins faster than the **right wheel**, the robot turns…",
+        "options": [
+          "Left",
+          "Right",
+          "Goes straight",
+          "Backs up"
+        ],
+        "correct": 1,
+        "explanation_correct": "Correct. The faster wheel travels more distance, so it 'pushes' the robot toward the slower side. Left fast → robot pivots to the **right**.",
+        "explanation_wrong": "The robot turns **right**. The faster wheel covers more ground per second, so the robot pivots toward the slower (right) side. Same physics as a tank track."
+      },
+      "branches": [
+        { "on": "correct", "to": "wiring-circuit" },
+        { "on": "wrong", "to": "wiring-circuit" }
+      ],
+      "xp": 50
+    },
+    "wiring-circuit": {
+      "id": "wiring-circuit",
+      "type": "simulation",
+      "title": "Wire the circuit",
+      "body": "Time to wire it up. The connections are:\n\n**IR Sensors → Arduino**\n- Left IR `OUT` → Arduino pin **D2**\n- Right IR `OUT` → Arduino pin **D3**\n- Both sensors: `VCC` → Arduino **5V**, `GND` → Arduino **GND**\n\n**L298N Motor Driver → Arduino**\n- `IN1` → Arduino pin **D5**\n- `IN2` → Arduino pin **D6**\n- `IN3` → Arduino pin **D9**\n- `IN4` → Arduino pin **D10**\n- `ENA` and `ENB` jumpered HIGH (or connected to PWM pins for speed control)\n\n**Power**\n- 7.4V battery → L298N `+12V` and `GND` input\n- L298N **5V output** → Arduino `Vin` (acts as on-board regulator)\n\n**Motors**\n- Left motor → L298N `OUT1` / `OUT2`\n- Right motor → L298N `OUT3` / `OUT4`\n\nOpen the simulator below and trace each connection. When it looks right, continue.",
+      "simulation_url": "/visualizer?mode=line-follower&view=wiring",
+      "branches": [{ "on": "next", "to": "q5-code-read" }],
+      "xp": 60
+    },
+    "q5-code-read": {
+      "id": "q5-code-read",
+      "type": "question",
+      "title": "Reading the sensors in code",
+      "body": "On the Arduino, you read a digital pin using the `digitalRead()` function. It takes one argument — the pin number — and returns either `HIGH` or `LOW`.\n\nFill in the blanks below to read both IR sensors into variables `leftIR` and `rightIR`.",
+      "hint": "The left sensor is on pin D2, the right is on D3. The function name is `digitalRead`.",
+      "hint2": "The full line is: `int leftIR = digitalRead(2);` — fill in the second line the same way for pin 3.",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Complete the sensor reading code:\n\n```\nint leftIR  = ___(2);\nint rightIR = digitalRead(___);\n```\n\nEnter the two missing pieces, separated by a comma (e.g. `foo,3`).",
+        "correct": "digitalRead,3",
+        "explanation_correct": "Perfect. `digitalRead(2)` returns the left sensor reading, `digitalRead(3)` returns the right. These are now `HIGH` (1) when over the black line, `LOW` (0) when over white.",
+        "explanation_wrong": "The complete code is:\n```\nint leftIR  = digitalRead(2);\nint rightIR = digitalRead(3);\n```\n`digitalRead()` is the Arduino function that returns the binary state (HIGH or LOW) of a digital pin."
+      },
+      "branches": [
+        { "on": "correct", "to": "q6-both-on-line" },
+        { "on": "wrong", "to": "q6-both-on-line" }
+      ],
+      "xp": 70
+    },
+    "q6-both-on-line": {
+      "id": "q6-both-on-line",
+      "type": "question",
+      "title": "Decision: both sensors over white",
+      "body": "Now we write the **decision logic** — what the robot does for every possible sensor combination.\n\nRemember the geometry: the two sensors straddle the line. When the robot is perfectly centred, **both sensors see WHITE** (line passes between them).\n\nIn that case…",
+      "hint": "If you're perfectly centred and the line is going straight, you don't need to correct anything.",
+      "hint2": "Both sensors see white means the line is right between them — you're on track. So…",
+      "question": {
+        "style": "boolean",
+        "prompt": "When **both** IR sensors read LOW (both seeing white), the robot should drive STRAIGHT forward. True or false?",
+        "correct": "true",
+        "explanation_correct": "Yes. Both white means the line is centred between the sensors — you're tracking perfectly. Both motors get equal forward speed.",
+        "explanation_wrong": "It's **TRUE**. Both sensors seeing white means the line is centred between them — exactly where it should be. So both motors run forward at equal speed. No correction needed."
+      },
+      "branches": [
+        { "on": "correct", "to": "q7-left-off" },
+        { "on": "wrong", "to": "q7-left-off" }
+      ],
+      "xp": 60
+    },
+    "q7-left-off": {
+      "id": "q7-left-off",
+      "type": "question",
+      "title": "Decision: left sensor over the line",
+      "body": "Now the interesting case. Suppose the **left** sensor reads HIGH (it's now over the black line), while the right sensor still reads LOW (white).\n\nWhat happened? The robot drifted — but which way? And what do we do?",
+      "hint": "If the left sensor is now ON the line, the line must have shifted to the left relative to the robot. Which way did the robot drift?",
+      "hint2": "Left sensor hits the line means the robot drifted to the *right* of the line. To get back, we need to steer *left*. Left turn = slow down the left wheel, speed up the right.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Left IR = HIGH (on line), right IR = LOW (white). The robot should…",
+        "options": [
+          "Stop completely",
+          "Turn right (slow right wheel, speed left wheel)",
+          "Turn left (slow left wheel, speed right wheel)",
+          "Reverse"
+        ],
+        "correct": 2,
+        "explanation_correct": "Exactly. Left sensor on line = robot drifted **right** = correct by turning **left**. To turn left, the **left wheel slows** (or stops) and the **right wheel keeps going**.",
+        "explanation_wrong": "Answer: **Turn LEFT**. If the left sensor is now over the line, the robot has drifted to the right. To get back to centre, the robot must turn left — which means slowing the left wheel and keeping the right wheel running."
+      },
+      "branches": [
+        { "on": "correct", "to": "q8-right-off" },
+        { "on": "wrong", "to": "q8-right-off" }
+      ],
+      "xp": 70
+    },
+    "q8-right-off": {
+      "id": "q8-right-off",
+      "type": "question",
+      "title": "Decision: right sensor over the line",
+      "body": "Mirror case. The **right** sensor reads HIGH (on the line), the left reads LOW (white).\n\nApply the same reasoning — but in mirror.",
+      "hint": "If the right sensor is on the line, the line has shifted to the right, meaning the robot drifted left.",
+      "hint2": "Right sensor on line → robot drifted left → correct by turning *right* → slow the right wheel, keep the left wheel running.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Right IR = HIGH (on line), left IR = LOW (white). The robot should…",
+        "options": [
+          "Turn left",
+          "Turn right (slow right wheel, keep left wheel running)",
+          "Stop",
+          "Go straight"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly the mirror of the last step. Right sensor on line = drifted left = turn right. Slow the right wheel, keep the left wheel running. Now you have all three rules.",
+        "explanation_wrong": "Answer: **Turn RIGHT.** Right sensor on the line means the robot drifted left; correcting means turning right; that means slowing the right wheel."
+      },
+      "branches": [
+        { "on": "correct", "to": "q9-speed-pwm" },
+        { "on": "wrong", "to": "q9-speed-pwm" }
+      ],
+      "xp": 70
+    },
+    "q9-speed-pwm": {
+      "id": "q9-speed-pwm",
+      "type": "question",
+      "title": "Setting the motor speed",
+      "body": "The L298N's `ENA` and `ENB` pins accept a **PWM** signal — a value from 0 (off) to 255 (full speed).\n\nFor a line follower, you don't want **full speed** — the robot will overshoot every curve. A good starting point is roughly **60% of maximum**.\n\nWhat PWM value is closest to 60% of 255?",
+      "hint": "60% of 255. Multiply: 255 × 0.6.",
+      "hint2": "255 × 0.6 = 153. Type that number.",
+      "question": {
+        "style": "number-input",
+        "prompt": "Enter the PWM value (0–255) for approximately 60% speed:",
+        "correct": 153,
+        "explanation_correct": "Right. **PWM 153** ≈ 60% duty cycle. You'd write `analogWrite(enaPin, 153);` to set the left motor to this speed. Tune up or down depending on your motors and track tightness.",
+        "explanation_wrong": "The answer is **153**. PWM goes from 0–255, so 60% × 255 ≈ 153. You'd write `analogWrite(enaPin, 153);` to set that speed. Real values are tuned by trial — slower for sharp tracks, faster for straight ones."
+      },
+      "branches": [
+        { "on": "correct", "to": "q10-l298n-why" },
+        { "on": "wrong", "to": "q10-l298n-why" }
+      ],
+      "xp": 70
+    },
+    "q10-l298n-why": {
+      "id": "q10-l298n-why",
+      "type": "question",
+      "title": "Why we need the L298N at all",
+      "body": "You might wonder: why can't we just plug the motors directly into the Arduino's digital pins? Pin D5 outputs HIGH (5V) — won't that spin the motor?\n\nIt'll spin… for about three seconds before something burns. Why?",
+      "hint": "Look up how much current an Arduino digital pin can supply (around 20 mA) versus how much a DC motor pulls (hundreds of mA at startup, sometimes amps under load).",
+      "hint2": "An Arduino pin = max ~20 mA. A small DC motor under load = 200–1000 mA. The pin can't supply that current — it will overheat and the MCU may die.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Why is the L298N motor driver needed?",
+        "options": [
+          "Arduino pins are too slow to switch motors",
+          "Arduino pins cannot supply the high current motors need; the driver also lets us reverse direction safely",
+          "The L298N converts digital signals to analog",
+          "Motors only work with USB power"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly. An Arduino pin can only deliver ~20 mA — a motor needs hundreds of milliamps, sometimes amps. The L298N uses transistors to switch the **battery's** current under control of the Arduino's tiny logic-level signals. Bonus: with two control pins per motor (IN1/IN2), you can reverse direction by flipping which one is HIGH.",
+        "explanation_wrong": "An Arduino pin tops out around 20 mA, while even a small DC motor can pull 500 mA or more under load. The L298N is a transistor H-bridge: it uses tiny signals from Arduino to switch the much larger current from the battery. And the H-bridge lets us reverse polarity, so the motor can spin either direction."
+      },
+      "branches": [
+        { "on": "correct", "to": "checkpoint-1" },
+        { "on": "wrong", "to": "checkpoint-1" }
+      ],
+      "xp": 80
+    },
+    "checkpoint-1": {
+      "id": "checkpoint-1",
+      "type": "checkpoint",
+      "title": "Checkpoint — full robot in your head",
+      "body": "Take a breath. You just built — at least mentally — your first complete robot.\n\nWhat you know now:\n\n- **Sensors:** Two IR modules, mounted ~3 cm apart at the front, pointing down. HIGH on black, LOW on white.\n- **Brain:** Arduino reads both sensors every loop and decides what to do.\n- **Decision rules:**\n  - Both LOW → go straight\n  - Left HIGH → turn left\n  - Right HIGH → turn right\n- **Muscles:** L298N takes Arduino's tiny logic signals and switches the battery's heavy current into the motors. PWM controls speed (153 ≈ 60%).\n\nThis is the core of every reactive robot ever built. Cleaning Roomba, factory AGV, autonomous rover — same loop. The only difference is the sensor and the rules.\n\nMilestone XP unlocked. Onward.",
+      "branches": [{ "on": "next", "to": "sim-1" }],
+      "xp": 100
+    },
+    "sim-1": {
+      "id": "sim-1",
+      "type": "simulation",
+      "title": "Run it in the simulator",
+      "body": "Time to see your robot move. The simulator below has your line follower placed on a curved track. The code you reasoned through is loaded — both sensors, the decision rules, PWM 153.\n\nPress **Start**. Watch:\n\n- The two sensor LEDs flicker as they pass over the line.\n- The robot oscillates slightly — that's the **bang-bang** behaviour of binary sensors.\n- When the track curves, the robot pivots correctly.\n\nLet it complete at least one loop, then come back here.",
+      "simulation_url": "/visualizer?mode=line-follower",
+      "branches": [{ "on": "next", "to": "q11-curve-limitation" }],
+      "xp": 80
+    },
+    "q11-curve-limitation": {
+      "id": "q11-curve-limitation",
+      "type": "question",
+      "title": "What happens on a sharp curve?",
+      "body": "Did you notice the robot wobble — sometimes losing the line entirely on a sharp curve?\n\nThe binary on/off logic has a fundamental limitation. What is it?",
+      "hint": "Our logic only has three states: straight, hard-left, hard-right. There's no in-between. What does a sharp curve need?",
+      "hint2": "We can either go straight, turn fully left, or turn fully right — there is no 'turn a little bit'. On a sharp curve the robot **overshoots** because the correction is binary, not proportional.",
+      "question": {
+        "style": "mcq",
+        "prompt": "Why does the robot struggle on sharp curves?",
+        "options": [
+          "The IR sensors are too slow",
+          "Our binary on/off logic only allows full corrections, never partial — it overshoots",
+          "The Arduino can't process curves",
+          "PWM 153 is too fast for any robot"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly. We have only three outputs: straight, hard-left, hard-right. There's no 'turn a little'. On a sharp curve, by the time the sensor reacts, we've already drifted too far and our correction is too strong — so we overshoot to the other side. Hello, wobble.",
+        "explanation_wrong": "The answer: **our logic is binary, not proportional**. We can only go full-straight, full-left, or full-right. There's no 'turn a little bit'. On a sharp curve the robot overshoots, then over-corrects, and oscillates."
+      },
+      "branches": [
+        { "on": "correct", "to": "explain-proportional" },
+        { "on": "wrong", "to": "explain-proportional" }
+      ],
+      "xp": 80
+    },
+    "explain-proportional": {
+      "id": "explain-proportional",
+      "type": "explanation",
+      "title": "The next idea: proportional control",
+      "body": "Here's the fix. Instead of binary sensors, use **analog** ones — sensors that return a *number* representing how dark the surface is (e.g. 0–1023 on Arduino's analog input).\n\nThen instead of turning **fully** left/right, your correction can be **proportional** to how far you've drifted:\n\n```\nerror   = leftReading - rightReading;\ncorrection = Kp * error;\nleftMotor  = baseSpeed - correction;\nrightMotor = baseSpeed + correction;\n```\n\nIf you've drifted a tiny bit, `error` is small → correction is small → smooth steering. If you've drifted a lot, `error` is large → big correction → fast recovery.\n\nThis is **proportional control** — the **P** in **PID**. It's the single most important concept in control engineering, and you'd use it in everything from a balance bot to a quadcopter to a thermostat.\n\nLet's check you've got the name right.",
+      "branches": [{ "on": "next", "to": "q12-pid-p" }],
+      "xp": 30
+    },
+    "q12-pid-p": {
+      "id": "q12-pid-p",
+      "type": "question",
+      "title": "PID — what does P stand for?",
+      "body": "**PID** stands for three things: a P term, an I term, and a D term. Together they make the most-used control algorithm on Earth.\n\nWe've just learned the P term. What does it stand for?",
+      "hint": "We literally just used the word a dozen times. It means 'proportional to the error.'",
+      "hint2": "P = Proportional. (I = Integral, D = Derivative — for later projects like the balance-bot.)",
+      "question": {
+        "style": "mcq",
+        "prompt": "In PID, the **P** stands for…",
+        "options": [
+          "Positional",
+          "Proportional",
+          "Pulse",
+          "Predictive"
+        ],
+        "correct": 1,
+        "explanation_correct": "Yes — **Proportional**. The output is proportional to the error. The **I** is Integral (accumulated past error) and **D** is Derivative (rate of change of error). Together they form a near-universal control law. You'll meet I and D in the balance-bot project.",
+        "explanation_wrong": "P = **Proportional**. The correction is proportional to the size of the error. (For completeness: I = Integral, D = Derivative — but you only need P for a line follower.)"
+      },
+      "branches": [
+        { "on": "correct", "to": "next-projects" },
+        { "on": "wrong", "to": "next-projects" }
+      ],
+      "xp": 80
+    },
+    "next-projects": {
+      "id": "next-projects",
+      "type": "explanation",
+      "title": "What you can build next",
+      "body": "You now have the foundation of every reactive robot. The next projects build directly on this:\n\n- **Obstacle Avoider** — same chassis, swap IR sensors for an HC-SR04 ultrasonic. Same `loop()` structure, different decision rules.\n- **Maze Solver** — line follower plus the wall-follower algorithm and recursive backtracking. You'll add an IR array and write your first real graph search.\n- **Balance Bot** — your first full PID. The line follower used only P; now you'll add I and D to keep an inverted pendulum upright.\n- **Bluetooth RC Car** — same motor driver, but instead of sensors you'll take input from an HC-05 module and your phone.\n\nPick whichever excites you most. There's no required order from here.",
+      "branches": [{ "on": "next", "to": "complete" }],
+      "xp": 30
+    },
+    "complete": {
+      "id": "complete",
+      "type": "complete",
+      "title": "Line Follower — Built ✅",
+      "body": "You did it. You designed a complete sensor → decision → actuator loop. You understand why two sensors beat one, why an H-bridge is non-negotiable, and why binary control wobbles on curves.\n\nMost importantly: you can now **read another robot's code** and recognise the same pattern. That recognition is the single biggest unlock in robotics — and it only happens by building, not reading.\n\nYour certificate is ready. Pick your next robot from the build hub.",
+      "branches": [],
+      "xp": 100
+    }
+  }
+}

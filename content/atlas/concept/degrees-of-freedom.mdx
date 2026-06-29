@@ -1,0 +1,92 @@
+---
+title: Degrees of freedom
+category: fundamentals
+summary: >-
+  Degrees of freedom (DOF) count the independent ways a robot or object can
+  move. More DOF means more flexibility but also more complexity to control —
+  every extra DOF is both a capability and a design challenge.
+seeAlso: []
+sources:
+  - title: 'Robotics Academy — Carnegie Mellon University: Degrees of Freedom'
+    url: 'https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf'
+  - title: IEEE Spectrum — Robot Arms and Degrees of Freedom
+    url: 'https://spectrum.ieee.org/robots'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - mechanics
+  - kinematics
+difficulty: 3
+oneLiner: 'The concept concept: Degrees of freedom (DOF) count the independent ways'
+laymanExplanation: >-
+  Hold your arm straight out in front of you and notice everything it can do.
+  Your shoulder lets you swing the arm up-down and side-to-side, and rotate it
+  along its length — that is three independent directions of movement right
+  there. Your elbow adds one more: bend and straighten. Your wrist gives you
+  another two. Before you even reach your fingers, your arm 
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without degrees of freedom, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis:
+  - Industrial KUKA arms (6-DOF)
+  - Da Vinci Surgical (7-DOF)
+  - Humanoid arms (7+ DOF)
+indianExample: >-
+  Indian-built robotic arms for pharma packaging usually have 4 DOF — enough for
+  pick-and-place but cheaper than 6-DOF arms.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: A free-floating object in 3D space has how many DOF?
+  options:
+    - '3'
+    - '6'
+    - '9'
+    - '12'
+  answer: 1
+  explanation: >-
+    3 translations (x, y, z) + 3 rotations (roll, pitch, yaw) = 6 degrees of
+    freedom.
+mindBlowingFact: >-
+  A human arm has roughly 7 degrees of freedom — exactly one more than a typical
+  industrial robot arm. That is why we are so versatile.
+industryApplications:
+  - industrial robotics
+  - surgery
+  - animation
+  - aerospace
+  - underwater robotics
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Degrees of freedom (DOF) count the independent ways a robot or object can
+  move. More DOF means more flexibility but also more complexity to control —
+  every extra DOF is both a capability and a design challenge.
+slug: degrees-of-freedom
+bucket: concept
+---
+
+Hold your arm straight out in front of you and notice everything it can do. Your shoulder lets you swing the arm up-down and side-to-side, and rotate it along its length — that is three independent directions of movement right there. Your elbow adds one more: bend and straighten. Your wrist gives you another two. Before you even reach your fingers, your arm already has six ways to move independently. Each independent direction of movement is what engineers call a **degree of freedom**, or DOF.
+
+A **degree of freedom** is any independent way a mechanical system can move. "Independent" is the key word — if moving one [joint](/atlas/concept/joint) necessarily moves another, those two don't count separately. DOF are counted for both position (translation: moving left-right, up-down, forward-back) and orientation (rotation: tilting, spinning, nodding). A free object floating in three-dimensional space has six DOF: three translational and three rotational. A door on a hinge has exactly one.
+
+## Why six is the magic number for [robot](/atlas/concept/robot) arms
+
+To place an object anywhere in 3D space with any orientation, you need exactly six DOF — three to position the end of the arm at the right location, three more to orient it correctly. This is why most [industrial robot](/atlas/concept/industrial-robot) arms have six joints. With six joints, the arm can reach any point within its workspace and hold a tool at any angle. Fewer than six and there are positions or orientations it simply cannot achieve. More than six — called **[redundancy](/atlas/concept/redundancy)** — means there are multiple joint configurations that achieve the same end-point position, which is useful for avoiding obstacles but harder to compute.
+
+The human arm-plus-wrist system has seven DOF (the extra one is a redundant elbow rotation), which is why you can reach the same point on a table with your elbow pointing up or pointing sideways. Robots modelled on the human arm, like the Franka Emika Panda, also use seven joints for exactly this reason.
+
+## DOF beyond robot arms
+
+The concept extends far beyond arm robots. A wheeled robot on a flat floor has three DOF: it can move forward-backward, side-to-side, and rotate in place — though a standard differential-drive robot (two independently driven wheels) can only directly control two of those three, which makes it **non-holonomic**. A [quadruped robot](/atlas/concept/quadruped-robot) like [Boston Dynamics](/atlas/company/boston-dynamics)' [Spot](/atlas/robot/spot) has twelve DOF just in its legs (three per leg), plus more in its body. A [drone](/atlas/concept/drone) has six DOF and uses four spinning rotors to control all of them.
+
+## What breaks without understanding it
+
+If a robot arm is told to move its [end effector](/atlas/concept/end-effector) to a position that would require more DOF than it has, no valid solution exists — the software throws an error or the motion simply doesn't happen. Mis-counting DOF is one of the most common errors in early robot design, leading to mechanisms that look like they should work but cannot reach the task they were built for.
+
+---
+
+*Is it theoretically possible to build a robot arm with so many degrees of freedom that it becomes harder, not easier, to control precisely?*

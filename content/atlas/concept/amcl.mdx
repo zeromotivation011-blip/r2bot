@@ -1,0 +1,133 @@
+---
+title: AMCL (Adaptive Monte Carlo Localisation) — Complete Guide | R2BOT
+summary: >-
+  AMCL is ROS2's standard particle-filter localiser. Given a known map, it
+  tracks where the robot is using laser scans.
+category: ai-and-perception
+bucket: navigation-localization
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - amcl
+  - particle-filter
+  - localisation
+  - ros2
+  - nav2
+relatedTerms:
+  - particle-filter
+  - slam
+  - lidar-slam
+  - occupancy-grid
+  - nav2-stack
+seeAlso:
+  - particle-filter
+  - slam
+  - lidar-slam
+  - occupancy-grid
+  - nav2-stack
+youtubeSearchQuery: AMCL ROS2 navigation tutorial
+oneLiner: >-
+  The navigation localization concept: AMCL is ROS2's standard particle-filter
+  localiser. Given a
+laymanExplanation: >-
+  AMCL (Adaptive Monte Carlo Localisation) is a particle-filter algorithm that
+  localises a robot in a previously built map using LIDAR (or sonar) data. It is
+  the default localiser in ROS2 Nav2 and runs on thousands of mobile robots
+  worldwide.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without amcl (adaptive monte carlo localisation) — complete guide | r2bot,
+  many navigation localization systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  AMCL is ROS2's standard particle-filter localiser. Given a known map, it
+  tracks where the robot is using laser scans.
+slug: amcl
+---
+
+# AMCL (Adaptive Monte Carlo Localisation)
+
+## What is AMCL (Adaptive Monte Carlo Localisation)?
+
+AMCL (Adaptive Monte Carlo Localisation) is a particle-filter algorithm that localises a robot in a previously built map using LIDAR (or sonar) data. It is the default localiser in ROS2 Nav2 and runs on thousands of mobile robots worldwide.
+
+## How It Works
+
+AMCL maintains a population of particle hypotheses about the robot's pose. At each control step it predicts each particle forward using odometry plus noise, then weights it by how well its predicted scan matches the actual LIDAR scan. Resampling concentrates particles on high-likelihood poses. The 'adaptive' part dynamically adjusts the number of particles based on convergence — fewer when localised, more when uncertain (e.g., after the robot is kidnapped).
+
+## Real-World Example
+
+Almost every Nav2-based robot uses AMCL out of the box. GreyOrange Butlers, Robotis TurtleBots, hospital delivery robots, and Indian academic mobile-robotics projects all rely on it. AMCL handles minor map changes (people walking by) gracefully.
+
+## Why It Matters for Robotics
+
+AMCL is the first localiser most ROS2 users touch. Knowing how to tune its parameters — number of particles, motion model noise, laser model — is essential for any real deployment. AMCL bugs (poor convergence, slow recovery) are a daily occurrence in production.
+
+## Try It Yourself
+
+Launch the Nav2 TurtleBot3 demo in Gazebo. Use RViz to publish an initial pose estimate and watch the particle cloud collapse. Then teleport the robot to a random spot and use the '2D Pose Estimate' tool to recover — feel AMCL converge.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "AMCL is based on which underlying algorithm?",
+    "options": [
+      "Kalman filter",
+      "Particle filter",
+      "A* search",
+      "Gradient descent"
+    ],
+    "answer": 1,
+    "explain": "AMCL stands for Adaptive Monte Carlo Localisation — Monte Carlo = particle filter."
+  },
+  {
+    "q": "AMCL requires:",
+    "options": [
+      "Only GPS",
+      "A pre-built map plus laser/sensor data",
+      "No sensors at all",
+      "A neural network"
+    ],
+    "answer": 1,
+    "explain": "AMCL is a localiser, not a SLAM system — you give it a map and current sensor data."
+  },
+  {
+    "q": "The \"adaptive\" in AMCL refers to:",
+    "options": [
+      "Adaptive Wi-Fi",
+      "Adjusting the number of particles based on convergence",
+      "Changing the robot colour",
+      "Adapting the battery"
+    ],
+    "answer": 1,
+    "explain": "AMCL increases particles when uncertain and decreases when localised — saving compute."
+  }
+]
+```
+
+## Further Reading
+
+- [Particle Filter](/atlas/concept/particle-filter)
+- [Slam](/atlas/concept/slam)
+- [Lidar Slam](/atlas/concept/lidar-slam)
+- [Occupancy Grid](/atlas/concept/occupancy-grid)
+- [Nav2 Stack](/atlas/concept/nav2-stack)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain AMCL (Adaptive Monte Carlo Localisation) for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

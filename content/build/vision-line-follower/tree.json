@@ -1,0 +1,348 @@
+{
+  "root": "intro",
+  "nodes": {
+    "intro": {
+      "id": "intro",
+      "type": "explanation",
+      "title": "Same Problem, Zero IR Sensors",
+      "body": "You've seen the beginner line follower — IR sensors on the bottom, reads black vs white, simple threshold. Now forget all of that.\n\nThis version uses a Raspberry Pi 4 and a Pi Camera. No IR sensors anywhere. Just a camera staring at the floor and a Python script doing maths 30 times per second.\n\nHere's why this matters: **lane detection in self-driving cars is exactly this algorithm**, scaled up. Tesla's vision stack, Waymo's cameras, even the lane-keep assist in your parents' car — all doing some version of what you're about to build.\n\nThe core idea: grab a frame → convert to grayscale → threshold → find the line blob → measure how far it is from center → correct motors. Let's break each step apart.",
+      "branches": [{ "on": "next", "to": "q-why-vision" }],
+      "xp": 10
+    },
+
+    "q-why-vision": {
+      "id": "q-why-vision",
+      "type": "question",
+      "title": "Why Ditch IR Sensors?",
+      "body": "IR sensors are cheap and fast. So why go to the trouble of strapping a camera on and doing all this image processing?",
+      "question": {
+        "style": "mcq",
+        "prompt": "What's the real advantage of using a camera over IR sensors for line following?",
+        "options": [
+          "Cameras are significantly cheaper than IR sensors",
+          "A camera sees shape, width, colour, and texture — far more information than a simple on/off IR reading",
+          "Cameras consume much less power than IR sensors",
+          "IR sensors are restricted by electronics regulations in many countries"
+        ],
+        "correct": 1,
+        "explanation_correct": "Exactly right. An IR sensor tells you one bit of information: line detected or not. A camera gives you a full image — you can detect line width, curvature, colour, whether there's an intersection ahead, even road markings. Same hardware cost as a few IR sensors on a Pi, but the information density is orders of magnitude higher.",
+        "explanation_wrong": "Not quite. IR sensors are actually very cheap (often under $1 each), use minimal power, and there are no regulations against them. The real reason to switch to a camera is information richness — a camera captures the full scene, letting you detect shape, width, colour, and curvature that IR sensors simply can't see."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-rgb-to-gray" },
+        { "on": "wrong", "to": "q-rgb-to-gray" }
+      ],
+      "xp": 20
+    },
+
+    "q-rgb-to-gray": {
+      "id": "q-rgb-to-gray",
+      "type": "question",
+      "title": "Grayscale: Throwing Away Colour on Purpose",
+      "body": "A Pi Camera captures frames in RGB — three channels (red, green, blue) per pixel. For line detection, we don't care about colour yet. We care about brightness contrast between the line and the floor.",
+      "hint": "Think about data size: RGB has 3 values per pixel, grayscale has 1.",
+      "question": {
+        "style": "boolean",
+        "prompt": "Converting an RGB image to grayscale before thresholding significantly reduces processing load on the Pi.",
+        "correct": "yes",
+        "explanation_correct": "Yes. Grayscale collapses 3 bytes per pixel into 1 byte. That's a 3× reduction in data for every single operation that follows. At 640×480, that's the difference between processing ~900KB vs ~300KB per frame — at 30 FPS, those savings stack up fast on a Pi 4.",
+        "explanation_wrong": "Actually, it does. RGB is 3 channels — grayscale is 1. Every pixel goes from 3 values to 1. At 640×480 resolution, you're cutting the data per frame from ~900KB down to ~300KB. When you're doing this 30 times per second, that 3× reduction matters."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-threshold" },
+        { "on": "wrong", "to": "q-threshold" }
+      ],
+      "xp": 15
+    },
+
+    "q-threshold": {
+      "id": "q-threshold",
+      "type": "question",
+      "title": "Binary Thresholding",
+      "body": "After grayscale, we apply binary thresholding. Every pixel gets forced to either 0 (black) or 255 (white) depending on whether it's above or below a cutoff value.\n\nSetup: black line on a white floor. In grayscale: black ≈ 0–50, white ≈ 200–255.",
+      "hint": "Black is 0 in grayscale. White is 255. The line is black. Pixels below the threshold are...",
+      "question": {
+        "style": "mcq",
+        "prompt": "With a black line on a white floor (0=black, 255=white), pixels with brightness BELOW the threshold value become what colour after binary thresholding?",
+        "options": [
+          "White (255)",
+          "Black (0)",
+          "Gray (128)",
+          "Red (in a special error channel)"
+        ],
+        "correct": 1,
+        "explanation_correct": "Correct. In standard binary thresholding (cv2.THRESH_BINARY), pixels below the threshold → 0 (black), pixels above → 255 (white). So a dark line on a bright floor comes out as a clear black blob on white — easy to find with contour detection.",
+        "explanation_wrong": "Not quite. In cv2.THRESH_BINARY: below threshold → 0 (black), above threshold → 255 (white). So dark pixels (the line) stay black, and the bright floor becomes white. This gives you a crisp binary image with the line as a distinct black blob."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-threshold-value" },
+        { "on": "wrong", "to": "q-threshold-value" }
+      ],
+      "xp": 20
+    },
+
+    "q-threshold-value": {
+      "id": "q-threshold-value",
+      "type": "question",
+      "title": "Picking the Threshold Value",
+      "body": "The threshold value is the dividing line between 'this pixel is part of the line' and 'this pixel is floor'. Too low and you miss parts of the line. Too high and the floor gets included as line.",
+      "hint": "The grayscale scale goes 0 to 255. A midpoint starting value is reasonable — but anything between 100 and 150 is considered good practice.",
+      "hint2": "Black line pixels tend to be around 20–60. White floor pixels around 200–240. You want the threshold somewhere comfortably between those two clusters.",
+      "question": {
+        "style": "number-input",
+        "prompt": "What's a typical starting threshold value for black line detection on the 0–255 grayscale scale? (Any value between 100 and 150 is accepted.)",
+        "correct": 128,
+        "explanation_correct": "128 is the classic midpoint — right in the middle of the 0–255 scale. In practice, engineers tune this per environment (maybe 110 in bright rooms, 140 in dim ones). Otsu's method can auto-calculate the optimal value by analysing the histogram of the image.",
+        "explanation_wrong": "A good threshold sits between the dark line pixels (~20–60) and the bright floor pixels (~200–240). Any value in the 100–150 range works well as a starting point. 128 is the textbook midpoint. In production you'd use Otsu's automatic threshold to adapt to lighting changes."
+      },
+      "branches": [
+        { "on": "correct", "to": "explanation-contours" },
+        { "on": "wrong", "to": "explanation-contours" }
+      ],
+      "xp": 15
+    },
+
+    "explanation-contours": {
+      "id": "explanation-contours",
+      "type": "explanation",
+      "title": "Finding the Line: Contours and Moments",
+      "body": "After thresholding you have a binary image — mostly white with a black blob where the line is. Now you need to find that blob and figure out exactly where it is.\n\n**Step 1 — FindContours:** `cv2.findContours()` traces the outline of every blob in the image and returns a list of contours. Each contour is just an array of (x, y) points forming the boundary.\n\n**Step 2 — Pick the biggest one:** `max(contours, key=cv2.contourArea)` gives you the largest blob, which is almost certainly the line (not a shadow or noise artifact).\n\n**Step 3 — Moments:** `cv2.moments(contour)` calculates statistical properties of the blob — including m00 (total area), m10 and m01 (weighted sums of x and y coordinates). From these you can calculate the **centroid** — the geometric centre point of the blob.\n\n```python\nM = cv2.moments(contour)\ncx = int(M['m10'] / M['m00'])  # centroid x\ncy = int(M['m01'] / M['m00'])  # centroid y\n```\n\nThat `(cx, cy)` point is where the robot 'thinks' the line is. Now we just need to steer toward it.",
+      "branches": [{ "on": "next", "to": "q-centroid" }],
+      "xp": 10
+    },
+
+    "q-centroid": {
+      "id": "q-centroid",
+      "type": "question",
+      "title": "What Does the Centroid Tell Us?",
+      "body": "We've computed `cx` and `cy` from the blob moments. Before we use this value to steer the robot, make sure you know what it actually represents.",
+      "question": {
+        "style": "mcq",
+        "prompt": "The centroid of the largest contour gives you what information?",
+        "options": [
+          "The dominant colour of the blob",
+          "The geometric centre point (x, y) of the detected line blob",
+          "The total perimeter length of the contour",
+          "The total pixel count above the threshold"
+        ],
+        "correct": 1,
+        "explanation_correct": "Correct. The centroid is the average position of all pixels in the blob — the 'centre of mass' if every pixel had equal weight. For a line blob, this lands roughly in the middle of the line. That x-coordinate is what we'll compare to the image centre to calculate steering error.",
+        "explanation_wrong": "The centroid from cv2.moments() gives you the geometric centre (x, y) of the blob — the average position of all its pixels. It's not colour (that would need a histogram), not perimeter (that's cv2.arcLength()), and not just pixel count (that's m00). It's the single (x, y) coordinate representing where the line is in the frame."
+      },
+      "branches": [
+        { "on": "correct", "to": "code-fill-moments" },
+        { "on": "wrong", "to": "code-fill-moments" }
+      ],
+      "xp": 20
+    },
+
+    "code-fill-moments": {
+      "id": "code-fill-moments",
+      "type": "question",
+      "title": "Fill in the Moments Formula",
+      "body": "The centroid x-coordinate formula uses two moment values: m10 (sum of all pixel x-coordinates weighted by brightness) divided by m00 (total area/mass of the blob).",
+      "hint": "m10 ÷ m___ gives centroid x. m00 is the 'zeroth moment' — it represents the total area.",
+      "question": {
+        "style": "code-fill",
+        "prompt": "Complete the centroid calculation:\n\n```python\nM = cv2.moments(contour)\ncx = int(M['m10'] / M['___'])\n```",
+        "correct": "m00",
+        "explanation_correct": "Perfect. m00 is the zeroth moment — it equals the total pixel area of the contour. m10 is the first-order moment in x (sum of x × pixel_value for all pixels). Dividing m10 by m00 gives the x-coordinate of the centroid. Same logic: cy = int(M['m01'] / M['m00']).",
+        "explanation_wrong": "The blank should be 'm00'. In image moments: m00 = total area (zeroth moment), m10 = sum of (x × pixel intensity), m01 = sum of (y × pixel intensity). Centroid x = m10/m00, centroid y = m01/m00. These are the standard formulas — they appear in every computer vision textbook."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-error-calculation" },
+        { "on": "wrong", "to": "q-error-calculation" }
+      ],
+      "xp": 25
+    },
+
+    "q-error-calculation": {
+      "id": "q-error-calculation",
+      "type": "question",
+      "title": "Calculating Steering Error",
+      "body": "Now the key step. The robot should follow the line by keeping it centred in the camera frame.\n\nImage width = 640 pixels. Image centre = 320px. The line centroid is detected at x = 200px.",
+      "hint": "Error = (where the line is) minus (where we want it to be). Negative error = line is to the left of centre.",
+      "question": {
+        "style": "mcq",
+        "prompt": "If the image is 640px wide and the line centroid is at x=200, what is the error (deviation from center)?",
+        "options": [
+          "200 (just the centroid position)",
+          "120 (positive, line is right of center)",
+          "-120 (negative, line is left of center)",
+          "440 (distance to right edge)"
+        ],
+        "correct": 2,
+        "explanation_correct": "Exactly. Error = centroid_x − image_center = 200 − 320 = −120. Negative means the line is to the left of where we want it. The motor correction should steer the robot left to re-centre the line. This single number drives the entire control loop.",
+        "explanation_wrong": "Error = centroid_x − image_center = 200 − 320 = −120. The centre of a 640px wide image is at x=320. The line is at x=200, which is 120 pixels to the LEFT of centre. That gives a negative error of −120. The sign tells you which direction to correct — negative means turn left."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-p-control" },
+        { "on": "wrong", "to": "q-p-control" }
+      ],
+      "xp": 20
+    },
+
+    "q-p-control": {
+      "id": "q-p-control",
+      "type": "question",
+      "title": "Proportional Control",
+      "body": "We have the error. Now we need to turn it into a motor speed correction.\n\nProportional control: `correction = Kp × error`\n\nIf error = −120 and Kp = 0.3, then correction = −36. Subtract from one motor, add to the other. The further the line drifts, the harder the robot turns — proportionally.",
+      "question": {
+        "style": "boolean",
+        "prompt": "Multiplying the centroid error by a gain constant Kp to get motor correction is proportional control — the same 'P' in PID control.",
+        "correct": "yes",
+        "explanation_correct": "Correct. This is textbook P-control. The proportional term reacts to current error — bigger error, bigger correction. In a full PID: I (integral) fixes accumulated drift over time, D (derivative) damps oscillation. For a line follower on a smooth track, pure P or PD is often enough.",
+        "explanation_wrong": "It actually is. Proportional control is defined as: output = Kp × error. That's exactly what's happening here — error is the centroid offset, and we multiply by Kp to get a motor correction. This is the P in PID (Proportional-Integral-Derivative). Most beginner line followers stop at P-control. Advanced ones add D to reduce wobbling."
+      },
+      "branches": [
+        { "on": "correct", "to": "simulation" },
+        { "on": "wrong", "to": "simulation" }
+      ],
+      "xp": 20
+    },
+
+    "simulation": {
+      "id": "simulation",
+      "type": "simulation",
+      "title": "Try It: Vision Line Follower Simulation",
+      "body": "Time to see the algorithm running live. The simulation shows the camera feed, the thresholded binary image, the detected centroid (red dot), the error value, and motor outputs — all in real time.\n\nTry dragging the line left and right to see how the error and motor corrections respond. Adjust Kp to watch the robot oscillate (too high) or respond sluggishly (too low).",
+      "simulation_url": "/visualizer?mode=vision-line",
+      "branches": [{ "on": "next", "to": "q-lighting" }],
+      "xp": 10
+    },
+
+    "q-lighting": {
+      "id": "q-lighting",
+      "type": "question",
+      "title": "The Achilles Heel of Camera Vision",
+      "body": "You've built something that works beautifully in the simulation. Now imagine deploying this on a real floor — sunlight through a window, a shadow from the robot itself, fluorescent lights flickering at 50Hz.",
+      "question": {
+        "style": "mcq",
+        "prompt": "What's the biggest practical challenge with camera-based line following compared to IR sensors?",
+        "options": [
+          "Camera processing lag makes the robot too slow to react",
+          "Changing lighting conditions dramatically shift pixel brightness values, breaking a fixed threshold",
+          "The camera module is too heavy for most small robots",
+          "Python is too slow to process images fast enough on a Pi"
+        ],
+        "correct": 1,
+        "explanation_correct": "Spot on. A fixed threshold of 128 works perfectly in your lab, then fails completely in direct sunlight where the 'black' line now reads as 80 and the floor reads as 255 — or vice versa in dim conditions. Lighting variation is the #1 real-world failure mode for camera-based CV systems.",
+        "explanation_wrong": "The main culprit is lighting. A threshold set for one lighting condition breaks in another — the same pixel can read as 50 in indoor light and 180 in direct sunlight. IR sensors are immune to this because they emit their own light. Camera systems need adaptive thresholding to handle lighting changes."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-fix-lighting" },
+        { "on": "wrong", "to": "q-fix-lighting" }
+      ],
+      "xp": 20
+    },
+
+    "q-fix-lighting": {
+      "id": "q-fix-lighting",
+      "type": "question",
+      "title": "Solving the Lighting Problem",
+      "body": "There's an elegant algorithmic solution to the lighting problem that doesn't require any extra hardware. Instead of using a fixed threshold, you calculate the optimal threshold from the image itself.",
+      "hint": "The solution is built into OpenCV. It analyses the histogram of the image to find the natural valley between dark pixels and bright pixels.",
+      "question": {
+        "style": "mcq",
+        "prompt": "What's the best algorithmic fix for a camera line follower that breaks under changing lighting conditions?",
+        "options": [
+          "Adaptive thresholding using Otsu's method — automatically finds the optimal threshold per frame",
+          "Adding a very bright LED ring light to overpower ambient lighting",
+          "Painting the floor with a special non-reflective material",
+          "Only running the robot in indoor environments with controlled lighting"
+        ],
+        "correct": 0,
+        "explanation_correct": "Otsu's method is the right answer. It analyses the pixel brightness histogram of each frame, finds the valley between the two dominant peaks (dark pixels = line, bright pixels = floor), and sets the threshold there automatically. One line change: `cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)`. The 0 is ignored — Otsu calculates the real value per frame.",
+        "explanation_wrong": "Otsu's method is the industry solution. It analyses the pixel histogram of each frame to automatically find the optimal threshold — no hardcoding needed. `cv2.THRESH_OTSU` as a flag does all the work. LED rings help too, but they don't eliminate the problem and add power draw. Otsu is pure software and free."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-fps" },
+        { "on": "wrong", "to": "q-fps" }
+      ],
+      "xp": 25
+    },
+
+    "q-fps": {
+      "id": "q-fps",
+      "type": "question",
+      "title": "Real-Time Processing on the Pi",
+      "body": "For a line follower to work, the robot needs to react fast enough that it doesn't overshoot the line before the next correction arrives. That means enough frames per second.",
+      "hint": "Pi Camera V2 at 640×480 is well within the Pi 4's processing capability for simple OpenCV operations like threshold + contour.",
+      "question": {
+        "style": "number-input",
+        "prompt": "Approximately how many frames per second (FPS) can a Pi 4 achieve running grayscale → threshold → contour detection on a 640×480 Pi Camera feed?",
+        "correct": 30,
+        "explanation_correct": "30 FPS is achievable for this pipeline on a Pi 4. The operations — grayscale conversion, Otsu threshold, findContours, moments — are all highly optimised C++ under the OpenCV Python bindings. The bottleneck is usually camera capture latency, not computation. With threading (capture in one thread, process in another), you can push higher.",
+        "explanation_wrong": "Around 30 FPS is realistic for this exact pipeline on a Pi 4. OpenCV's Python bindings call highly optimised C++ routines, so grayscale + threshold + findContours + moments is fast. The Pi Camera interface adds some latency. 30 FPS means a new correction every ~33ms — more than fast enough for a robot moving at walking pace."
+      },
+      "branches": [
+        { "on": "correct", "to": "checkpoint" },
+        { "on": "wrong", "to": "checkpoint" }
+      ],
+      "xp": 15
+    },
+
+    "checkpoint": {
+      "id": "checkpoint",
+      "type": "checkpoint",
+      "title": "Vision Pipeline Checkpoint",
+      "body": "Let's make sure the full pipeline is locked in before the final questions.\n\n**The complete vision line-following pipeline:**\n\n1. **Capture frame** → Pi Camera → BGR image\n2. **Grayscale** → `cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)` → 3× less data\n3. **Threshold** → `cv2.threshold(..., cv2.THRESH_OTSU)` → binary image, adapts to lighting\n4. **Find contours** → `cv2.findContours()` → list of blob outlines\n5. **Largest contour** → `max(contours, key=cv2.contourArea)` → the line\n6. **Centroid** → `cv2.moments()` → cx, cy\n7. **Error** → `error = cx - image_width/2`\n8. **P-control** → `correction = Kp * error`\n9. **Motor outputs** → `left = base_speed + correction`, `right = base_speed - correction`\n10. **Loop** → repeat 30× per second\n\nThis is the complete algorithm. Every step is necessary. Every step maps to a real computer vision concept used in professional systems.",
+      "branches": [{ "on": "next", "to": "q-lane-detection" }],
+      "xp": 10
+    },
+
+    "q-lane-detection": {
+      "id": "q-lane-detection",
+      "type": "question",
+      "title": "From Robot to Tesla",
+      "body": "You've built a camera-guided robot that detects a line, calculates centroid, measures error from centre, and applies proportional correction. Sound familiar?",
+      "question": {
+        "style": "boolean",
+        "prompt": "Tesla's lane detection system uses the same fundamental concept: find lane markings in camera images, calculate lateral deviation from lane centre, apply steering correction.",
+        "correct": "yes",
+        "explanation_correct": "Yes — and that's not an oversimplification. The core concept is identical: image → detect lane/line → calculate error from desired position → apply correction. Tesla's system is vastly more sophisticated (neural network feature detection, multi-camera fusion, predictive models), but the underlying control loop is the same one you just built.",
+        "explanation_wrong": "Actually, yes. Tesla's Autopilot and every other lane-keep assist system fundamentally does: detect lane markings → calculate lateral error → apply steering correction. The technology is more advanced (neural networks, sensor fusion, prediction), but the control loop concept is identical to what you just built. Your robot is a 1:1 conceptual match."
+      },
+      "branches": [
+        { "on": "correct", "to": "q-next-step" },
+        { "on": "wrong", "to": "q-next-step" }
+      ],
+      "xp": 15
+    },
+
+    "q-next-step": {
+      "id": "q-next-step",
+      "type": "question",
+      "title": "Night Mode",
+      "body": "Your robot works perfectly in daylight. Someone asks you to make it work in complete darkness — a warehouse at night, a tunnel, underground parking. No ambient light, camera sees nothing.",
+      "hint": "The camera still works — it just needs light to illuminate the scene. Think about what kind of light humans can't see but cameras can be tuned to detect.",
+      "question": {
+        "style": "mcq",
+        "prompt": "To make your vision line follower work in complete darkness, what's the correct hardware+software approach?",
+        "options": [
+          "Add infrared LEDs to illuminate the scene + use an IR-sensitive camera (or remove the Pi Camera's IR filter) + apply the same CV pipeline",
+          "Give up on the camera approach and fall back to IR sensors",
+          "Use ultrasonic sensors pointed at the floor to detect the line by echo",
+          "Paint the line with retroreflective paint and use a bright white LED"
+        ],
+        "correct": 0,
+        "explanation_correct": "Exactly. IR LEDs emit light at ~850nm — invisible to humans, perfectly visible to a camera without an IR-cut filter. The Pi Camera V2 has a built-in IR filter, but the Pi Camera NoIR version doesn't. Add a ring of IR LEDs, use the NoIR camera, run the exact same CV pipeline. This is how night-vision surveillance cameras work.",
+        "explanation_wrong": "The right answer is IR illumination + IR-sensitive camera. Infrared LEDs (850nm) flood the scene with invisible light. A Pi Camera NoIR (no infrared filter) captures it like daylight. The line still appears darker than the floor in the IR image, so your threshold → contour → centroid pipeline runs unchanged. This is exactly how security cameras see in the dark."
+      },
+      "branches": [
+        { "on": "correct", "to": "complete" },
+        { "on": "wrong", "to": "complete" }
+      ],
+      "xp": 25
+    },
+
+    "complete": {
+      "id": "complete",
+      "type": "complete",
+      "title": "Vision Line Follower — Complete!",
+      "body": "You've just built and understood a computer vision pipeline from first principles.\n\n**What you actually learned:**\n- Why cameras beat IR sensors in information density\n- RGB → grayscale → binary thresholding\n- Contour detection and blob analysis with OpenCV\n- Image moments and centroid calculation\n- Proportional control from visual error\n- Otsu's adaptive thresholding for lighting robustness\n- IR illumination for night operation\n\n**Where this technology goes:**\nOpenCV is used in self-driving cars, surgical robots, sports tracking (the yellow first-down line in NFL broadcasts is a CV overlay), satellite image analysis, and medical imaging (tumour detection uses contour finding). You just learned the foundation of a $50B+ industry.\n\n**XP Earned: 250**\n\n**Up next:** ROS2 Nav Robot — build a fully autonomous navigation system with SLAM, maps, and path planning. The same stack that real robotics engineers use at Boston Dynamics.",
+      "branches": [],
+      "xp": 50
+    }
+  }
+}

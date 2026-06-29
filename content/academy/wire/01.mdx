@@ -1,0 +1,168 @@
+---
+title: "ROS2 Fundamentals"
+description: "Nodes, topics, services, actions, and the DDS middleware that ties them together. Your first Python node — talker and listener."
+track: wire
+lesson: 1
+duration: "25 min read"
+url_slug: w-01-ros2-fundamentals
+hindi_name: "ROS2 मूल बातें"
+xp: 120
+estimated_minutes: 25
+atlas_links: [ros, ros2, computer-vision, feedback-loop]
+sources:
+  - name: "ROS 2 Documentation — docs.ros.org"
+    url: "https://docs.ros.org/en/humble/index.html"
+  - name: "Open Robotics — ROS 2 architecture overview"
+    url: "https://design.ros2.org/articles/ros_on_dds.html"
+---
+
+## What you'll build
+
+By the end of this lesson you'll have a working **talker / listener pair** running on your machine: one Python node publishing a `String` message every second on the `/chatter` topic, and a second node subscribing to that topic and printing what it hears. Same machine, two terminals — and you'll watch ROS2 do everything else.
+
+That's not a toy. It's the literal shape of every ROS2 robot — different node, different topic, different message type. Once you understand this, you understand the whole system.
+
+## Why ROS2 (and not ROS1)
+
+ROS1 had a single point of failure: the **ROS master**. If the master died, every node disconnected. Real-time was poor. Security was an afterthought. Multi-robot setups were a hack.
+
+ROS2 throws all of that out. It's built on **DDS (Data Distribution Service)** — an industrial pub/sub middleware used in aerospace and defence since the early 2000s. No master. Real-time guarantees. Built-in security via DDS-Security. Lifecycle nodes that can be started/stopped/reset cleanly. Multi-robot is native — every node has a domain ID.
+
+In India, this matters concretely. **AgniKul Cosmos** in Chennai launches semi-cryogenic rockets — their telemetry stacks need real-time guarantees that ROS1 couldn't provide. **Ideaforge** drones in Mumbai use ROS2 because DDS works over unreliable wireless links. **ISRO's** robotic arms for satellite servicing run ROS2 because the lifecycle node model maps cleanly to mission phases.
+
+If you're applying for a robotics job in India in 2026, the answer to "ROS1 or ROS2?" is always ROS2. ROS1 is end-of-life.
+
+## The four communication patterns
+
+A ROS2 robot is a graph of nodes. Each node communicates in one of four ways:
+
+**Topics** — Pub/sub. A node publishes messages onto a named channel; any number of nodes subscribe. Use for sensor data and continuous streams. `/cmd_vel`, `/scan`, `/odom` are all topics.
+
+**Services** — Request/response. Like a function call across the network. Use for short queries: "what's the battery level?", "switch into autonomous mode."
+
+**Actions** — Long-running goals with feedback. Use for "drive to this room" — the action server streams progress and can be cancelled. Nav2 uses actions everywhere.
+
+**Parameters** — Per-node configuration values that can be read and set at runtime. Use for tunable values: PID gains, sensor thresholds, mode flags.
+
+You'll touch all four by the time you finish the Wire track. Today: just topics.
+
+## Your first node
+
+ROS2 Python uses **rclpy** (ROS Client Library for Python). Here's a minimal talker:
+
+```python
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+
+class TalkerNode(Node):
+    def __init__(self):
+        super().__init__('talker')
+        # Create a publisher on /chatter with queue depth 10
+        self.publisher_ = self.create_publisher(String, '/chatter', 10)
+        # Fire self.publish() every 1.0 seconds
+        self.timer = self.create_timer(1.0, self.publish)
+        self.count = 0
+        self.get_logger().info('Talker started')
+
+    def publish(self):
+        msg = String()
+        msg.data = f'Hello, R2BOT! count={self.count}'
+        self.publisher_.publish(msg)
+        self.get_logger().info(f'Sent: {msg.data}')
+        self.count += 1
+
+def main():
+    rclpy.init()
+    node = TalkerNode()
+    try:
+        rclpy.spin(node)
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+And the matching listener:
+
+```python
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+
+class ListenerNode(Node):
+    def __init__(self):
+        super().__init__('listener')
+        self.subscription = self.create_subscription(
+            String, '/chatter', self.callback, 10
+        )
+        self.get_logger().info('Listener started')
+
+    def callback(self, msg: String):
+        self.get_logger().info(f'Heard: {msg.data}')
+
+def main():
+    rclpy.init()
+    node = ListenerNode()
+    try:
+        rclpy.spin(node)
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+Run them in two terminals:
+
+```bash
+# Terminal 1
+python3 talker.py
+# Terminal 2
+python3 listener.py
+```
+
+The listener will print every message the talker publishes. No master, no config, no extra setup — DDS does the discovery.
+
+## What's actually happening
+
+When the talker calls `create_publisher`, rclpy registers the publication with the local DDS participant. The DDS participant broadcasts on the multicast group "I publish `std_msgs/String` on `/chatter`." Any DDS participant on the same network with a matching subscription connects directly — peer-to-peer. There's no central broker.
+
+This is why ROS2 works across robots without configuration. Plug a Raspberry Pi-based robot into the same wifi as your laptop and they discover each other automatically (assuming the same `ROS_DOMAIN_ID`).
+
+## Try it: explore in the Visualizer
+
+The Sense → Think → Act loop maps directly to ROS2: your sensor node publishes, your planner node subscribes and publishes commands, your motor controller subscribes to the commands and acts. Play with the visualizer to feel the rhythm.
+
+<!-- Embed the Sense-Think-Act visual: import { SenseThinkActVisual } from '@/components/visuals/SenseThinkActVisual' -->
+
+> **Try this in the visualizer:** open [/visualizer](/visualizer) and watch the Sense → Think → Act loop. Each block is conceptually a ROS2 node; each arrow is a topic.
+
+## Test Your Understanding
+
+These aren't multiple choice. Write your answers in your own words before checking.
+
+**1.** You're debugging a robot where the LiDAR node is publishing data fine (`ros2 topic echo /scan` shows messages) but the obstacle-avoidance node never reacts. The avoidance node was working yesterday. List the first three things you'd check, in order, and why.
+
+**2.** You need to control a robot arm to "pick up the red cube." Topics, services, or actions? Defend your choice — what specifically about the task pushes you toward that pattern?
+
+**3.** Your team is building a 4-robot warehouse fleet. You're using `ROS_DOMAIN_ID=0` (the default) on all four robots and noticing weird cross-talk: robot A's `/cmd_vel` is sometimes affecting robot B. Explain what's happening at the DDS level and propose a fix.
+
+## India Opportunity
+
+Roles in 2026 that hire on ROS2 fundamentals — Wire-track skills are the *minimum* bar to apply:
+
+- **Junior Robotics Engineer · Ideaforge Technology, Mumbai/Bangalore** — drone telemetry stack on ROS2, ₹8–14 LPA fresh grads with 1 ROS2 project.
+- **Robotics Software Engineer · Systemantics, Bangalore** — collaborative robot arm controllers in ROS2, ₹10–18 LPA.
+- **Robotics Software Engineer (Trainee) · ISRO's Vikram Sarabhai Space Centre, Trivandrum** — robotic servicing systems for space, ROS2 + lifecycle nodes, ₹56k/month + benefits.
+- **ROS2 Developer · GreyOrange, Gurgaon** — warehouse-robot fleet, multi-robot ROS2, ₹12–22 LPA.
+- **Robotics Intern · AgniKul Cosmos, Chennai** — ground systems telemetry, ₹40–60k/month, conversion likely.
+
+Browse live openings in our [/jobs](/jobs) feed — filter by "Wire" to see roles that match this level.
+
+## Next Step
+
+→ Continue to **[Wire 02 · Sensor Integration](/academy/wire/02)** — read a LiDAR scan in ROS2 and log the nearest obstacle.

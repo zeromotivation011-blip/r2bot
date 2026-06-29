@@ -1,0 +1,83 @@
+---
+title: Edge AI
+category: ai-and-perception
+summary: >-
+  Edge AI means running artificial-intelligence computations directly on the
+  device — a robot, a camera, a smartphone — rather than sending data to a
+  distant cloud server, enabling real-time decisions with lower latency and no
+  internet dependency.
+seeAlso: []
+sources:
+  - title: NVIDIA Jetson — Edge AI computing platform
+    url: 'https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/'
+  - title: Google — TensorFlow Lite for on-device ML
+    url: 'https://www.tensorflow.org/lite'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - ai
+  - hardware
+  - real-time
+difficulty: 3
+oneLiner: >-
+  The concept concept: Edge AI means running artificial-intelligence
+  computations directly on
+laymanExplanation: >-
+  Suppose a hospital installs a robot that monitors patients in a ward. The
+  robot's camera constantly watches for a patient falling out of bed. Now
+  imagine the camera sends every video frame to a computer in a data centre
+  halfway across the city, which analyses the frame, decides whether someone has
+  fallen, and sends back an alert. The round trip — even on a f
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without edge ai, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Edge AI means running artificial-intelligence computations directly on the
+  device — a robot, a camera, a smartphone — rather than sending data to a
+  distant cloud server, enabling real-time decisions with lower latency and no
+  internet dependency.
+slug: edge-ai
+bucket: concept
+---
+
+Suppose a hospital installs a [robot](/atlas/concept/robot) that monitors patients in a ward. The robot's [camera](/atlas/concept/camera-vision) constantly watches for a patient falling out of bed. Now imagine the camera sends every video frame to a computer in a data centre halfway across the city, which analyses the frame, decides whether someone has fallen, and sends back an alert. The round trip — even on a fast connection — takes a fraction of a second. That fraction, multiplied across a medical emergency, could matter. And what happens if the internet connection drops?
+
+**Edge AI** is the practice of running AI models directly on the device that collects the data — the robot, the camera, the sensor — rather than routing that data to a remote cloud server. "Edge" refers to the edge of the network, the physical place where data enters the digital world.
+
+## The cloud versus the edge
+
+Cloud AI is powerful but has a fundamental constraint: data must travel over a network, be processed on remote hardware, and the result must travel back. For non-urgent tasks — transcribing a voice message, translating text — this is fine. For a robot navigating a busy warehouse, making collision-avoidance decisions in milliseconds, or for a [drone](/atlas/concept/drone) that may fly out of mobile coverage, it is not acceptable.
+
+Edge AI shifts computation to specialised local hardware. Modern **edge AI chips** — [NVIDIA](/atlas/company/nvidia) Jetson, Google Coral TPU, Qualcomm AI Hub — can run inference on neural-network models at speeds and energy levels that would have required a server room five years ago.
+
+## What it enables
+
+- **Low latency** — decision time is measured in microseconds, not the tens or hundreds of milliseconds a cloud round-trip adds.
+- **Privacy** — sensitive video or audio never leaves the device.
+- **Offline operation** — the robot keeps working even without connectivity.
+- **Reduced bandwidth costs** — a factory with 500 cameras does not need to stream petabytes of video to a cloud.
+
+## A real example
+
+The [Spot](/atlas/robot/spot) robot from [Boston Dynamics](/atlas/company/boston-dynamics) uses an onboard NVIDIA GPU to run its perception and locomotion models locally. When Spot steps across rubble or avoids an unexpected obstacle, that decision is made in milliseconds on hardware strapped to its back, with no network involved.
+
+## The tradeoff
+
+Edge hardware is less powerful than a cloud data centre. Very large models — the kind behind the most capable language and vision systems — still require cloud or data-centre scale. Edge AI is not a replacement for cloud computing; it is a complement, used when speed, privacy, or reliability require local processing.
+
+---
+
+*As edge AI chips shrink and grow more efficient, the question roboticists are asking is no longer whether a robot can be intelligent without the cloud, but how intelligent it can become.*

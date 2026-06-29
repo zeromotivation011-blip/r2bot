@@ -1,0 +1,73 @@
+---
+title: Model Predictive Control (MPC) in Robotics — Complete Guide
+summary: >-
+  MPC predicts future robot behaviour over a horizon and solves an optimisation
+  problem to choose the best control input — used in self-driving cars and
+  quadrupeds.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - mpc
+  - optimization
+  - control
+seeAlso:
+  - feedforward-control
+  - feedback-loop
+  - pid-controller
+difficulty: 3
+oneLiner: 'The concept concept: MPC predicts future robot behaviour over a horizon'
+laymanExplanation: >-
+  Model Predictive Control (MPC) is an advanced control strategy that uses a
+  model of the robot to predict its future states across a short time window,
+  then solves an optimisation problem at every step to pick the control input
+  that minimises a cost (such as tracking error plus energy).
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without model predictive control (mpc) in robotics — complete guide, many
+  concept systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  MPC predicts future robot behaviour over a horizon and solves an optimisation
+  problem to choose the best control input — used in self-driving cars and
+  quadrupeds.
+slug: model-predictive-control
+bucket: concept
+---
+
+# Model Predictive Control (MPC) in Robotics
+
+## What is it?
+
+Model Predictive Control (MPC) is an advanced control strategy that uses a model of the robot to predict its future states across a short time window, then solves an optimisation problem at every step to pick the control input that minimises a cost (such as tracking error plus energy).
+
+## How it works
+
+At each control step, MPC: (1) predicts the trajectory of the robot for the next N steps using a dynamics model, (2) formulates an objective function (e.g., minimise position error + penalise large control efforts) plus constraints (e.g., max joint torque), (3) numerically solves this constrained optimisation, (4) applies only the first control input of the optimal sequence, then re-plans on the next step. This rolling-horizon approach is robust to disturbances.
+
+## Real-world example
+
+Boston Dynamics Atlas uses MPC at 1 kHz to plan whole-body motions during parkour. Tesla Autopilot uses MPC for lane keeping. Quadrupeds like ANYmal and Unitree B2 use MPC to walk over rough terrain.
+
+## Why it matters for robotics
+
+MPC handles constraints elegantly — something PID cannot. It is the dominant control method for high-performance modern robots. Any senior robotics role in India increasingly expects familiarity with MPC.
+
+## See also
+
+- [Feedforward Control](/atlas/concept/feedforward-control)
+- [Feedback Loop](/atlas/concept/feedback-loop)
+- [Pid Controller](/atlas/concept/pid-controller)

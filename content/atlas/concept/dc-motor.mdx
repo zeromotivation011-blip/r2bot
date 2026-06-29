@@ -1,0 +1,96 @@
+---
+title: DC motor
+category: actuators
+summary: >-
+  A DC motor converts direct-current electricity into continuous spinning
+  motion. Feed it voltage, it turns; reverse the voltage, it turns the other way
+  — the simplest way to give a robot movement.
+seeAlso: []
+sources:
+  - title: MIT OpenCourseWare — DC Motors and Generators
+    url: >-
+      https://ocw.mit.edu/courses/2-017j-design-of-electromechanical-robotic-systems-fall-2009/
+  - title: Wikipedia — DC motor
+    url: 'https://en.wikipedia.org/wiki/DC_motor'
+  - title: Maxon Group — DC motor fundamentals
+    url: 'https://www.maxongroup.com/maxon/view/content/motor-technology'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - actuators
+  - motors
+  - beginner
+difficulty: 3
+oneLiner: >-
+  The concept concept: A DC motor converts direct-current electricity into
+  continuous
+laymanExplanation: >-
+  Imagine you hold two magnets close together — unlike poles snap together, like
+  poles push away. Now arrange things so the pushing and pulling keeps happening
+  in a circle, never letting the moving part settle. That endless push-pull is,
+  at heart, what a DC motor does.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without dc motor, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - DIY line-follower robots
+  - Drone propellers (BLDC variant)
+  - Roomba wheels
+indianExample: >-
+  ₹120 Indian DC gear motors with rubber wheels power 90% of school-level robot
+  kits in Indian classrooms.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: How do you reverse a DC motor?
+  options:
+    - Add a sensor
+    - Flip the polarity (swap + and −)
+    - Increase voltage
+    - Use Bluetooth
+  answer: 1
+  explanation: A DC motor reverses direction when you swap which wire is + and which is −.
+mindBlowingFact: >-
+  DC motors were invented in 1834 — long before electricity was in most homes.
+  Same physics still powers your drone today.
+industryApplications:
+  - robotics education
+  - automotive
+  - appliances
+  - toys
+  - industrial conveyors
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A DC motor converts direct-current electricity into continuous spinning
+  motion. Feed it voltage, it turns; reverse the voltage, it turns the other way
+  — the simplest way to give a robot movement.
+slug: dc-motor
+bucket: concept
+---
+
+Imagine you hold two magnets close together — unlike poles snap together, like poles push away. Now arrange things so the pushing and pulling keeps happening in a circle, never letting the moving part settle. That endless push-pull is, at heart, what a DC motor does.
+
+A **DC motor** — DC stands for *direct current*, electricity that flows in one steady direction, like from a battery — converts electrical energy into continuous rotational motion. It is the most common actuator in everyday [robotics](/atlas/concept/robotics) and the first motor most people wire up on a [microcontroller](/atlas/concept/microcontroller).
+
+## How it works
+
+Every DC motor has two main parts: a **stator** (the fixed outer shell, holding permanent magnets) and a **rotor** (the spinning inner part, wrapped in wire coils). When current flows through the coils, they become electromagnets. The permanent magnets in the stator push and pull them, and the rotor spins.
+
+The clever part is the **commutator** — a split copper ring that flips the direction of current through each coil at exactly the right moment to keep the rotor accelerating. Without it, the rotor would snap to a stop at the nearest magnet and stay there.
+
+Speed is controlled by voltage: more volts means faster spinning. Direction is controlled by polarity: swap positive and negative leads and the motor reverses instantly. This makes DC motors trivially easy to control with a simple circuit called an **H-bridge**, which a microcontroller can command with a few digital signals.
+
+A modern variant — the **brushless DC motor (BLDC)** — removes the physical commutator and replaces it with electronic switching. This dramatically reduces friction and wear, which is why [drone](/atlas/concept/drone) propellers, electric-vehicle wheels, and surgical robots favour brushless motors.
+
+## Real-world example
+
+The wheels on a [Boston Dynamics](/atlas/company/boston-dynamics) [Spot](/atlas/robot/spot) quadruped are not DC-motored — Spot uses custom brushless actuators — but the small [gripper](/atlas/concept/gripper) fingers on research arms like the Robotis OpenMANIPULATOR use brushed DC motors precisely because they are cheap, easy to replace, and easy to drive from a standard Arduino or Raspberry Pi. At the consumer end, every RC car, basic wheeled [robot](/atlas/concept/robot) kit, and conveyor motor in a school lab runs on brushed DC motors.
+
+## Why it matters
+
+DC motors are the "hello world" of robotics hardware. Understanding how voltage maps to speed, and how current maps to torque, is the foundation for understanding every more complex actuator — servo motors, stepper motors, and brushless actuators are all variations on the same electromagnet-and-rotation idea. Before a robot designer reaches for something exotic, a simple DC motor with an [encoder](/atlas/concept/encoder) is usually the first thing they try.
+
+---
+
+*The same coils-and-magnets principle that spins a DC motor can run in reverse — turning mechanical spin back into electricity — which is how regenerative braking works in electric vehicles.*

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "m1-foundations",
+    "order_index": 0,
+    "title": "Foundations — what a robot actually is",
+    "description": "The Sense-Think-Act loop and the three things that go inside every robot.",
+    "duration_minutes": 30
+  },
+  {
+    "id": "m2-real-world",
+    "order_index": 1,
+    "title": "The real world — failures, futures, and next steps",
+    "description": "Why robots fail, where robotics is heading, and where YOU fit in.",
+    "duration_minutes": 30
+  }
+]

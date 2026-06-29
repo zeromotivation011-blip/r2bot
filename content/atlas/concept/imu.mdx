@@ -1,0 +1,99 @@
+---
+title: IMU (Inertial Measurement Unit)
+category: sensors
+summary: >-
+  An IMU is a chip that measures how fast something is accelerating and
+  rotating. It is what lets a robot — or a phone, or a spacecraft — know which
+  way is up and whether it is moving, without any external reference.
+seeAlso: []
+sources:
+  - title: InvenSense (TDK) — IMU fundamentals
+    url: 'https://invensense.tdk.com/products/motion-tracking/'
+  - title: NASA Technical Reports — Inertial Navigation Systems
+    url: 'https://ntrs.nasa.gov/citations/19890015690'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - sensors
+  - orientation
+  - motion
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: An IMU is a chip that measures how'
+laymanExplanation: >-
+  Close your eyes and tilt your head sideways. You immediately feel it — not
+  because you looked at the horizon, but because tiny fluid-filled canals in
+  your inner ear detected the change in orientation and sent that information
+  straight to your brain. Now lean forward and straighten up again. You felt
+  both motions without seeing them. Your body has its own bui
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without imu (inertial measurement unit), many concept systems in robotics
+  simply couldn't work.
+realRobotsThatUseThis:
+  - Self-driving cars
+  - VR headsets
+  - Spot by Boston Dynamics
+indianExample: >-
+  Bengaluru's Bellatrix Aerospace builds IMUs for Indian satellites — competing
+  with Honeywell and Northrop Grumman.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: A typical IMU contains how many degrees of freedom?
+  options:
+    - '3'
+    - 6 or 9
+    - '12'
+    - '24'
+  answer: 1
+  explanation: >-
+    6-DOF IMU = accelerometer + gyro (3 axes each). 9-DOF adds a magnetometer
+    for absolute heading.
+mindBlowingFact: >-
+  An aviation-grade IMU can fly a plane for 8 hours without GPS and still know
+  its position within a few hundred metres.
+industryApplications:
+  - aerospace
+  - automotive
+  - VR/AR
+  - industrial robotics
+  - wearables
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An IMU is a chip that measures how fast something is accelerating and
+  rotating. It is what lets a robot — or a phone, or a spacecraft — know which
+  way is up and whether it is moving, without any external reference.
+slug: imu
+bucket: concept
+---
+
+Close your eyes and tilt your head sideways. You immediately feel it — not because you looked at the horizon, but because tiny fluid-filled canals in your inner ear detected the change in orientation and sent that information straight to your brain. Now lean forward and straighten up again. You felt both motions without seeing them. Your body has its own built-in motion sensor, independent of anything outside itself.
+
+A [robot](/atlas/concept/robot) has the same capability through a component the size of a fingernail.
+
+## What is inside an IMU
+
+An **Inertial Measurement Unit** (IMU) is a small electronic package containing two types of sensors: an **accelerometer** and a **gyroscope**.
+
+An **accelerometer** measures linear acceleration — how quickly something is speeding up or slowing down along each axis (forward/backward, left/right, up/down). In practice it measures force per unit mass, which is why a stationary accelerometer on a table still reads 9.8 m/s² upward — it detects Earth's gravity pulling on it, which it cannot distinguish from upward acceleration.
+
+A **gyroscope** in an IMU is almost never the spinning-top kind from physics class. Instead it uses **MEMS technology** (Micro-Electro-Mechanical Systems): tiny vibrating structures etched into silicon that twist measurably when the chip is rotated. The rate of that twist is the angular velocity — how fast the robot is turning, in degrees per second, around each axis.
+
+Put accelerometer and gyroscope data together and you can track orientation and movement through space with no external reference at all. This process is called **dead reckoning**.
+
+## The drift problem
+
+IMUs have one fundamental weakness: **drift**. Every reading contains tiny errors. Integrate those errors over time (to convert acceleration into velocity and then into position) and the errors accumulate. After a few minutes of pure inertial navigation, even a good IMU can be off by metres. Spacecraft IMUs (enormously more expensive) drift by centimetres over hours. Cheap MEMS IMUs drift by metres over seconds.
+
+This is why real systems fuse IMU data with other sensors — [GPS](/atlas/concept/gps-gnss) for position, magnetometers for heading, cameras or [lidar](/atlas/concept/lidar) for relative position. The IMU provides the high-speed, low-latency backbone between those slower corrections.
+
+## IMUs in the real world
+
+Every modern smartphone contains an IMU — it is what rotates the screen when you tilt the phone and what enables step-counting. Quadcopter drones could not fly without one: the flight controller reads the IMU hundreds of times per second and constantly adjusts the four motors to keep the [drone](/atlas/concept/drone) level and on course. [Boston Dynamics](/atlas/company/boston-dynamics)' [Atlas](/atlas/robot/atlas) robot uses IMU data to detect when it is falling and trigger its recovery reflexes. In aviation, an IMU is part of every aircraft's navigation system, providing attitude data (which way the nose is pointing) in the moments GPS drops out.
+
+---
+
+*If IMUs drift over time and GPS is intermittent, how do submarine robots navigate for hours underwater with no signal from the surface whatsoever?*

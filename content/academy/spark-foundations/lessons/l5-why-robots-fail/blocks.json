@@ -1,0 +1,43 @@
+[
+  {
+    "id": "l5-text",
+    "order_index": 0,
+    "type": "text",
+    "is_required": true,
+    "data": {
+      "estimated_read_minutes": 6,
+      "content_mdx": "Every robot failure is a failure in one of three places. That's the whole list.\n\n## Sense failures\n\n- Dust on a Roomba's cliff sensor → it thinks the floor disappeared → it stops.\n- Sun in a self-driving car's camera → it can't read the lane.\n- Encoder wire comes loose → robot has no idea how far it has moved.\n\nThe fix is usually one of: clean the sensor, add a backup sensor, fuse multiple sensors.\n\n## Think failures\n\n- A buggy if-else statement.\n- An ML model that wasn't trained on the situation it's now in.\n- Latency — by the time the decision arrives, it's already too late.\n\nThe fix is usually one of: better algorithms, more data, more compute, simpler logic.\n\n## Act failures\n\n- Motor burns out.\n- Wheel slips on a wet floor.\n- Servo goes out of range and breaks the linkage.\n\nThe fix is usually one of: better hardware, gentler control, mechanical safety limits.\n\n## The pattern\n\nAt every R2BOT debugging session, you ask three questions in order:\n\n1. Did the sensor data look right?\n2. Did the brain make the right decision?\n3. Did the act actually happen?\n\nThis is what professional roboticists do — and now so do you."
+    }
+  },
+  {
+    "id": "l5-quiz",
+    "order_index": 1,
+    "type": "quiz-mcq",
+    "is_required": true,
+    "data": {
+      "question": "A self-driving car's lane-keeping fails on a sunny day because of glare. Which kind of failure is this?",
+      "options": [
+        { "id": "a", "text": "Sense failure", "correct": true, "explanation": "Glare degraded the camera's input. The brain and motors were fine." },
+        { "id": "b", "text": "Think failure", "correct": false, "explanation": "The algorithm got bad data — but the algorithm itself didn't break." },
+        { "id": "c", "text": "Act failure", "correct": false, "explanation": "Steering was working — it just got the wrong instruction." },
+        { "id": "d", "text": "None — driver error", "correct": false, "explanation": "There's no driver; the car is autonomous." }
+      ],
+      "points": 100
+    }
+  },
+  {
+    "id": "l5-flashcards",
+    "order_index": 2,
+    "type": "flashcard",
+    "is_required": false,
+    "data": {
+      "points_per_card": 5,
+      "cards": [
+        { "front": "Sense failure", "back": "Sensor gave bad/missing input" },
+        { "front": "Think failure", "back": "Algorithm or model made the wrong call" },
+        { "front": "Act failure", "back": "Hardware broke or couldn't execute" },
+        { "front": "Redundancy", "back": "Backup sensor/path that takes over when the primary fails" }
+      ]
+    }
+  }
+]

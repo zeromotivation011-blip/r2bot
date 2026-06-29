@@ -1,0 +1,77 @@
+---
+title: Feedback
+category: fundamentals
+summary: >-
+  Feedback is the mechanism by which a system uses information about its own
+  output to correct its future behaviour. Without it, robots act blind — they
+  cannot know whether they have succeeded or compensate when the world doesn't
+  cooperate.
+seeAlso: []
+sources:
+  - title: The Art of Electronics — Horowitz & Hill (Cambridge University Press)
+    url: 'https://artofelectronics.net/'
+  - title: Control Systems Engineering — Nise (Wiley)
+    url: >-
+      https://www.wiley.com/en-us/Control+Systems+Engineering%2C+8th+Edition-p-9781119474227
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - control
+  - systems
+difficulty: 3
+oneLiner: 'The concept concept: Feedback is the mechanism by which a system'
+laymanExplanation: >-
+  When you reach for a glass of water, you don't just fire off your arm muscles
+  once and hope. Your eyes track the glass continuously. Your brain notices if
+  your hand is drifting slightly left and corrects the trajectory. Your fingers
+  feel when they've made contact and adjust grip force so you don't crush the
+  glass or drop it. The entire motion is a constant l
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without feedback, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Feedback is the mechanism by which a system uses information about its own
+  output to correct its future behaviour. Without it, robots act blind — they
+  cannot know whether they have succeeded or compensate when the world doesn't
+  cooperate.
+slug: feedback
+bucket: concept
+---
+
+When you reach for a glass of water, you don't just fire off your arm muscles once and hope. Your eyes track the glass continuously. Your brain notices if your hand is drifting slightly left and corrects the [trajectory](/atlas/concept/trajectory). Your fingers feel when they've made contact and adjust grip force so you don't crush the glass or drop it. The entire motion is a constant loop of doing and adjusting, doing and adjusting — guided by information flowing back from your senses.
+
+That loop is **feedback**, and it is one of the most powerful ideas in all of engineering.
+
+In control systems — the field that underpins how robots are commanded — feedback means using a measurement of a system's output to adjust its input. Instead of computing the "correct" command once and sending it, a feedback controller continuously measures what is actually happening and closes the gap between where the system is and where it should be.
+
+## Open-loop versus [closed-loop control](/atlas/concept/closed-loop-control)
+
+A system without feedback is called **open-loop**. A timer that runs a sprinkler for ten minutes regardless of soil moisture is open-loop. A [robot](/atlas/concept/robot) arm that moves to a preset angle without checking whether it arrived is open-loop. [Open-loop control](/atlas/concept/open-loop-control) is simple and cheap but fragile: any disturbance — a gust of wind, a heavier-than-expected load, a slight miscalibration — causes error that accumulates uncorrected.
+
+A system with feedback is called **closed-loop**. The output is measured (using a sensor), compared to the desired output (the **setpoint**), and the difference (the **error**) is used to generate a corrective action. The loop is "closed" because information flows from output back to input, completing a circuit.
+
+## PID: the workhorse of feedback control
+
+The most widely deployed feedback controller in the world is the **[PID controller](/atlas/concept/pid-controller)** — standing for Proportional, Integral, Derivative. It computes a corrective command from three terms: a term proportional to the current error (react to how far off you are now), a term based on the accumulated error over time (correct persistent biases), and a term based on how fast the error is changing (dampen oscillations). Tuning a PID controller — setting the weights for each term — is a fundamental skill in [robotics](/atlas/concept/robotics) engineering. Virtually every motor controller, temperature regulator, and flight-stabilisation system in the world uses some variant of PID.
+
+## Why feedback is irreplaceable
+
+Robots operate in a physical world that is noisy, variable, and full of surprises. Loads change, surfaces shift, batteries drain, motors wear. A robot controlled without feedback is a robot that assumes the world will cooperate perfectly — an assumption that fails constantly. Feedback is what makes control **robust**: it doesn't matter exactly why the error arose, only that it exists and must be reduced. This property — correcting for disturbances without needing to know their cause — is what makes feedback controllers so durable in practice.
+
+---
+
+*If feedback is so powerful, why do some highly capable robots deliberately limit how much feedback they use — and what does that reveal about the hidden costs of always knowing where you are?*

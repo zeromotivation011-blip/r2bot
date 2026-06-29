@@ -1,0 +1,74 @@
+---
+title: Digital twin
+category: applications
+summary: >-
+  A digital twin is a live virtual replica of a physical object or system —
+  updated continuously by real-world sensor data — that engineers use to
+  simulate, monitor, predict faults, and test changes without touching the
+  physical thing.
+seeAlso: []
+sources:
+  - title: NVIDIA Isaac Sim — Digital twins for robotics
+    url: 'https://developer.nvidia.com/isaac/sim'
+  - title: Gartner — Digital twin technology overview
+    url: 'https://www.gartner.com/en/information-technology/glossary/digital-twin'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - simulation
+  - digital-twin
+  - robotics-software
+difficulty: 3
+oneLiner: 'The concept concept: A digital twin is a live virtual replica'
+laymanExplanation: >-
+  Imagine you could test whether a bridge would survive a once-in-a-century
+  flood without waiting a century — or causing the flood. You build an exact
+  virtual copy of the bridge, feed it real-time data from sensors embedded in
+  the actual bridge, and run the simulation. The virtual bridge behaves the way
+  the real one would. When the simulation shows a stress fr
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without digital twin, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A digital twin is a live virtual replica of a physical object or system —
+  updated continuously by real-world sensor data — that engineers use to
+  simulate, monitor, predict faults, and test changes without touching the
+  physical thing.
+slug: digital-twin
+bucket: concept
+---
+
+Imagine you could test whether a bridge would survive a once-in-a-century flood without waiting a century — or causing the flood. You build an exact virtual copy of the bridge, feed it real-time data from sensors embedded in the actual bridge, and run the simulation. The virtual bridge behaves the way the real one would. When the simulation shows a stress fracture forming at a particular rivet, you go fix that rivet in the real world before it matters. That virtual copy, continuously synchronised with reality, is a digital twin.
+
+A digital twin is a computational model of a physical object or system that is kept in sync with its real counterpart through live data feeds. The concept was formalised by NASA in the 2000s — they used simulation models of spacecraft to diagnose problems in orbit from the ground. The term "digital twin" was later popularised by Gartner and has since spread from aerospace to manufacturing, infrastructure, healthcare, and [robotics](/atlas/concept/robotics).
+
+## How it works in robotics
+
+For robots, digital twins serve two distinct purposes. During development, a [robot](/atlas/concept/robot)'s digital twin is a simulation environment where engineers test software and motion plans before any physical hardware is at risk. If the code tells the robot arm to reach for a part but the [trajectory](/atlas/concept/trajectory) clips a table edge, the simulation crashes — not the arm. [NVIDIA](/atlas/company/nvidia)'s Isaac Sim platform, built on the Omniverse rendering engine, creates photorealistic physics simulations of robots that are accurate enough for trained neural networks to transfer directly to real hardware, a technique called *[sim-to-real](/atlas/concept/sim-to-real) transfer*.
+
+During deployment, a digital twin becomes an operational monitoring tool. Sensors on the real robot — [joint](/atlas/concept/joint) torques, temperatures, vibration signatures — stream data into the twin in real time. Engineers watch the virtual robot, not the physical one, and the twin can run ahead of reality to predict when a component is likely to fail. This is called *predictive maintenance*, and it can prevent costly downtime.
+
+## A real deployment
+
+Siemens uses digital twins across its manufacturing sites, including its Amberg Electronics Plant in Germany — one of the most automated factories in the world. Every product produced in the plant has a digital counterpart that tracks its entire manufacturing history. If a fault is detected in the field months after a product ships, engineers can replay the digital twin's record for that specific unit to understand exactly what happened at every stage of production. The plant runs with an error rate of less than twelve defects per million operations.
+
+## The limits
+
+A digital twin is only as good as its sensor data and its model. If the physical world deviates from the model — a part degrades in an unexpected way, an unusual environmental condition arises — the twin may give misleading predictions. Building an accurate model in the first place requires deep engineering knowledge and significant upfront investment. For complex systems, the twin itself can become an enormously complicated piece of software that needs its own maintenance. The promise is real; so is the implementation overhead.
+
+---
+
+*The most powerful use of a digital twin is not simulating what will happen — it is running ten thousand simulations to find the one scenario where everything goes wrong.*

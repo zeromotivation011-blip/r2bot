@@ -1,0 +1,55 @@
+---
+title: Tesla Optimus walking — the 4-minute version of a 22-minute reveal
+summary: Tesla's Optimus reveal video was 22 minutes long. The actually-new robotics in it fits in 4 minutes. Here's what changed in Gen 3, and what didn't.
+topic: Humanoid
+durationSeconds: 252
+originalDurationSeconds: 1320
+externalUrl: https://www.tesla.com/AI
+publishedAt: 2026-05-12
+relatedAtlas:
+  - { type: robot, slug: optimus }
+  - { type: concept, slug: servo-motor }
+  - { type: robot, slug: atlas }
+---
+
+Tesla's Optimus reveal video was 22 minutes long. The actually-new robotics in it fits in 4 minutes. Here's what changed in Gen 3, and what didn't.
+
+## What you see in the video
+
+The video opens with the Gen 3 Optimus walking on a Tesla factory floor. Two minutes of slow-motion shots. A demo of it picking up a battery and placing it in a tray. A demo of it walking up a small ramp. A demo of it carrying a basket of laundry to a table. Then 14 minutes of Elon Musk talking about the future of work, the price of the robot, and the bull case for Tesla.
+
+## The actually-new robotics
+
+The big change in Gen 3 is **torque-controlled actuators with heel-strike walking**.
+
+**Torque control** means the motors don't just rotate — they sense and command *how much force they're producing*. The old way (used by every legacy industrial robot) is position control: tell the motor "move to angle X" and it gets there as fast as it can. The problem with position control on a humanoid is that the moment the foot hits the ground, the controller doesn't know what force is being applied; it just keeps trying to reach the target position. That's why early humanoids walked like they had stiff knees.
+
+Torque control lets the robot say "apply 12 newtons of forward force on this foot push-off, then go limp during the swing phase." That's how human muscles work. It's also how this generation of humanoid walking is being unlocked across the board — Boston Dynamics, Figure, 1X, Tesla — they're all on the same hardware trend.
+
+**Heel-strike walking** means the foot lands heel-first, then rolls forward to toe-off. This is how humans walk. It's much more energy-efficient than the flat-footed shuffle that earlier robots used, because the rolling motion conserves momentum. Gen 1 Optimus walked flat-footed. Gen 3 doesn't.
+
+## What didn't change
+
+The hands are still the bottleneck. Optimus has 22 degrees of freedom per hand — roughly equivalent to a human — but the dexterity demonstrated in the video is well below human level. Picking up a battery from a known position is easier than picking up an arbitrary tool. That's the next problem to solve.
+
+The brain is also still very dependent on training data. Optimus's neural network is trained on thousands of hours of human demonstrations. It can replicate tasks it's been shown. It cannot, yet, generalise to a task it's seen for the first time.
+
+## How it was built
+
+The actuators are designed in-house at Tesla. The brain runs on a smaller version of the same compute used for full self-driving cars. The training pipeline takes human-demo data + simulator data + on-robot reinforcement.
+
+The estimated bill-of-materials cost is around $20,000 per robot — about the same as a low-end electric car. Tesla wants to make these at the volume of cars, which would be unprecedented for any robot. Whether the cost target is real is still an open question.
+
+## How to watch
+
+If you've only got 4 minutes for the original Tesla video, skip to:
+- 0:30 — first walking demo
+- 2:15 — battery placement
+- 8:40 — ramp walking
+- 17:20 — the only line worth listening to ("torque-controlled actuators")
+
+The rest is marketing.
+
+---
+
+*Read [Optimus](/atlas/robot/optimus) for the full picture of where this robot fits in the humanoid race.*

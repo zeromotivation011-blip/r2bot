@@ -1,0 +1,75 @@
+---
+title: Adaptive Control in Robotics — Complete Guide
+summary: >-
+  Adaptive control automatically adjusts its parameters as the robot operates —
+  handling changing payloads, friction, or environments without manual
+  re-tuning.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - control
+  - adaptive
+  - learning
+seeAlso:
+  - feedback-loop
+  - pid-controller
+  - model-predictive-control
+difficulty: 3
+oneLiner: >-
+  The concept concept: Adaptive control automatically adjusts its parameters as
+  the
+laymanExplanation: >-
+  Adaptive control is a class of controllers that update their own gains or
+  model parameters in real time, in response to changes in the system being
+  controlled. Where classical PID requires a human to retune when conditions
+  change, adaptive control retunes itself.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without adaptive control in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Adaptive control automatically adjusts its parameters as the robot operates —
+  handling changing payloads, friction, or environments without manual
+  re-tuning.
+slug: adaptive-control
+bucket: concept
+---
+
+# Adaptive Control in Robotics
+
+## What is it?
+
+Adaptive control is a class of controllers that update their own gains or model parameters in real time, in response to changes in the system being controlled. Where classical PID requires a human to retune when conditions change, adaptive control retunes itself.
+
+## How it works
+
+An adaptive controller couples a standard control law (e.g., PID or LQR) with a parameter-adjustment mechanism. The adjustment mechanism observes the tracking error and modifies the controller gains using a known update rule — for instance, the MIT rule or Model Reference Adaptive Control (MRAC). Over time, the gains converge to values appropriate for the current operating condition.
+
+## Real-world example
+
+Aircraft autopilots use adaptive control to handle fuel burn-off changing aircraft weight. Robotic arms picking up unknown payloads use adaptive control to retune in real time. Tesla Autopilot's lane-keeping uses an adaptive component to handle different road surfaces.
+
+## Why it matters for robotics
+
+Adaptive control is essential whenever conditions vary unpredictably. For real-world Indian robotics — where dust, humidity, and load vary daily — adaptive control is more practical than re-tuning PID gains every morning.
+
+## See also
+
+- [Feedback Loop](/atlas/concept/feedback-loop)
+- [Pid Controller](/atlas/concept/pid-controller)
+- [Model Predictive Control](/atlas/concept/model-predictive-control)

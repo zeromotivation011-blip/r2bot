@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400" role="img" aria-label="Circuit board trace pattern">
+  <rect width="800" height="400" fill="#050810"/>
+  <g stroke="#00B8D4" fill="none">
+    <g opacity="0.12" stroke-width="1">
+      <path d="M0 40 H800 M0 80 H800 M0 120 H800 M0 160 H800 M0 200 H800 M0 240 H800 M0 280 H800 M0 320 H800 M0 360 H800"/>
+      <path d="M40 0 V400 M80 0 V400 M120 0 V400 M160 0 V400 M200 0 V400 M240 0 V400 M280 0 V400 M320 0 V400 M360 0 V400 M400 0 V400 M440 0 V400 M480 0 V400 M520 0 V400 M560 0 V400 M600 0 V400 M640 0 V400 M680 0 V400 M720 0 V400 M760 0 V400"/>
+    </g>
+    <g stroke-width="1.6">
+      <!-- MCU square -->
+      <rect x="320" y="160" width="160" height="120" />
+      <rect x="335" y="175" width="130" height="90" opacity="0.4"/>
+      <g stroke-linecap="round">
+        <line x1="320" y1="180" x2="280" y2="180"/>
+        <line x1="320" y1="210" x2="280" y2="210"/>
+        <line x1="320" y1="240" x2="280" y2="240"/>
+        <line x1="320" y1="260" x2="280" y2="260"/>
+        <line x1="480" y1="180" x2="520" y2="180"/>
+        <line x1="480" y1="210" x2="520" y2="210"/>
+        <line x1="480" y1="240" x2="520" y2="240"/>
+        <line x1="480" y1="260" x2="520" y2="260"/>
+        <line x1="360" y1="160" x2="360" y2="120"/>
+        <line x1="400" y1="160" x2="400" y2="120"/>
+        <line x1="440" y1="160" x2="440" y2="120"/>
+        <line x1="360" y1="280" x2="360" y2="320"/>
+        <line x1="400" y1="280" x2="400" y2="320"/>
+        <line x1="440" y1="280" x2="440" y2="320"/>
+      </g>
+      <!-- traces -->
+      <path d="M280 180 L200 180 L200 100 L120 100"/>
+      <path d="M280 210 L160 210 L160 280 L60 280"/>
+      <path d="M280 260 L240 260 L240 360 L120 360"/>
+      <path d="M520 180 L600 180 L600 120 L720 120"/>
+      <path d="M520 210 L640 210 L640 280 L760 280"/>
+      <path d="M520 240 L680 240 L680 340 L740 340"/>
+      <path d="M520 260 L560 260 L560 360 L640 360"/>
+      <path d="M360 120 L360 60 L260 60"/>
+      <path d="M400 120 L400 60 L500 60"/>
+      <path d="M440 320 L440 380 L540 380"/>
+      <!-- pads -->
+      <circle cx="120" cy="100" r="6"/>
+      <circle cx="60" cy="280" r="6"/>
+      <circle cx="120" cy="360" r="6"/>
+      <circle cx="720" cy="120" r="6"/>
+      <circle cx="760" cy="280" r="6"/>
+      <circle cx="740" cy="340" r="6"/>
+      <circle cx="640" cy="360" r="6"/>
+      <circle cx="260" cy="60" r="6"/>
+      <circle cx="500" cy="60" r="6"/>
+      <circle cx="540" cy="380" r="6"/>
+    </g>
+  </g>
+  <g font-family="'JetBrains Mono', monospace" fill="#E8ECF1" font-size="14" text-anchor="middle">
+    <text x="400" y="225">MCU</text>
+  </g>
+  <g font-family="'JetBrains Mono', monospace" fill="#E8ECF1" font-size="12" letter-spacing="3">
+    <text x="40" y="30">HARDWARE · CIRCUIT</text>
+  </g>
+</svg>

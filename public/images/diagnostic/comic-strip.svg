@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="480" height="160" role="img" aria-label="Comic strip: robot sees a wall">
+  <g font-family="sans-serif" font-weight="800" font-size="11" fill="#fde047">
+    <!-- Panel 1: robot moving -->
+    <g transform="translate(0 10)">
+      <rect x="4" y="4" width="148" height="142" rx="10" fill="#1f2937" stroke="#3b82f6" stroke-width="3"/>
+      <text x="78" y="22" text-anchor="middle">1 — Sees a wall</text>
+      <rect x="40" y="90" width="40" height="40" rx="6" fill="#3b82f6"/>
+      <circle cx="52" cy="105" r="3" fill="#fde047"/>
+      <circle cx="68" cy="105" r="3" fill="#fde047"/>
+      <rect x="120" y="50" width="14" height="84" fill="#94a3b8"/>
+      <path d="M84 110 L116 110" stroke="#fde047" stroke-dasharray="3 3"/>
+    </g>
+    <!-- Panel 2: ??? -->
+    <g transform="translate(166 10)">
+      <rect x="4" y="4" width="148" height="142" rx="10" fill="#1f2937" stroke="#facc15" stroke-width="3"/>
+      <text x="78" y="22" text-anchor="middle">2 — ???</text>
+      <text x="78" y="90" text-anchor="middle" font-size="40" fill="#facc15">?</text>
+    </g>
+    <!-- Panel 3: outcome -->
+    <g transform="translate(332 10)">
+      <rect x="4" y="4" width="148" height="142" rx="10" fill="#1f2937" stroke="#10b981" stroke-width="3"/>
+      <text x="78" y="22" text-anchor="middle">3 — Safe & moving</text>
+      <rect x="20" y="90" width="40" height="40" rx="6" fill="#3b82f6"/>
+      <circle cx="32" cy="105" r="3" fill="#fde047"/>
+      <circle cx="48" cy="105" r="3" fill="#fde047"/>
+      <rect x="100" y="50" width="14" height="84" fill="#94a3b8"/>
+      <path d="M64 110 q14 -30 36 0" stroke="#10b981" fill="none" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "edge-m1-foundations",
+    "order_index": 0,
+    "title": "AI + Robotics: The Intersection",
+    "description": "Why AI changes everything in robotics. The perception-planning-action loop revisited.",
+    "duration_minutes": 60,
+    "is_checkpoint": false
+  },
+  {
+    "id": "edge-m2-cv",
+    "order_index": 1,
+    "title": "Computer Vision for Robots",
+    "description": "Image pipelines, object detection with YOLOv8, semantic segmentation, real-time inference.",
+    "duration_minutes": 120,
+    "is_checkpoint": false
+  },
+  {
+    "id": "edge-m3-slam",
+    "order_index": 2,
+    "title": "SLAM: Mapping Unknown Worlds",
+    "description": "Simultaneous Localisation and Mapping from scratch. EKF-SLAM, particle filters, graph SLAM.",
+    "duration_minutes": 120,
+    "is_checkpoint": false
+  },
+  {
+    "id": "edge-m4-rl",
+    "order_index": 3,
+    "title": "Reinforcement Learning for Control",
+    "description": "MDP, Q-learning, PPO for continuous robot control. Train a robot to walk in simulation.",
+    "duration_minutes": 150,
+    "is_checkpoint": false
+  },
+  {
+    "id": "edge-m5-edge-inference",
+    "order_index": 4,
+    "title": "Edge Inference & Deployment",
+    "description": "TensorRT, ONNX, quantisation. Run models at 60fps on Jetson Nano and Raspberry Pi.",
+    "duration_minutes": 90,
+    "is_checkpoint": false
+  },
+  {
+    "id": "edge-m6-fusion",
+    "order_index": 5,
+    "title": "Multi-Modal Sensor Fusion",
+    "description": "Combine camera, lidar, and IMU into a coherent world model. Kalman filter deep dive.",
+    "duration_minutes": 120,
+    "is_checkpoint": false
+  },
+  {
+    "id": "edge-m7-systems",
+    "order_index": 6,
+    "title": "Autonomous System Architecture",
+    "description": "Behaviour trees, state machines, mission planners. How real autonomous systems are structured.",
+    "duration_minutes": 90,
+    "is_checkpoint": false
+  },
+  {
+    "id": "edge-m8-capstone",
+    "order_index": 7,
+    "title": "Research Capstone",
+    "description": "Design and implement an original AI robotics system. Peer review + R2BOT team evaluation.",
+    "duration_minutes": 240,
+    "is_checkpoint": true
+  }
+]

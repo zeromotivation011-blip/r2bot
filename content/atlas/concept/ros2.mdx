@@ -1,0 +1,109 @@
+---
+title: ROS2
+hindi_name: ROS2
+phonetic: ros-two
+category: hardware
+summary: >-
+  Robot Operating System 2 — the DDS-based middleware that runs nearly every
+  modern research and commercial robot. Successor to ROS1.
+seeAlso:
+  - ros
+  - lidar
+  - slam
+  - computer-vision
+sources:
+  - title: ROS 2 documentation (docs.ros.org)
+    url: 'https://docs.ros.org/en/humble/'
+  - title: ROS 2 design rationale
+    url: 'https://design.ros2.org/articles/ros_on_dds.html'
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - software
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: Robot Operating System 2 — the DDS-based middleware'
+laymanExplanation: >-
+  ROS2 is the successor to [[ros]]. Where ROS1 had a single master node and a
+  custom transport, ROS2 is built on **DDS** (Data Distribution Service) — an
+  industrial-grade pub/sub middleware used in aerospace and defence for two
+  decades. No master, real-time support, security built in, and multi-robot is
+  native.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without ros2, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Robot Operating System 2 — the DDS-based middleware that runs nearly every
+  modern research and commercial robot. Successor to ROS1.
+slug: ros2
+bucket: concept
+---
+
+ROS2 is the successor to [[ros]]. Where ROS1 had a single master node and a custom transport, ROS2 is built on **DDS** (Data Distribution Service) — an industrial-grade pub/sub middleware used in aerospace and defence for two decades. No master, real-time support, security built in, and multi-robot is native.
+
+## The four communication patterns
+
+- **Topics** — pub/sub. Sensor data, continuous streams. `/scan`, `/cmd_vel`.
+- **Services** — request/response. Short queries.
+- **Actions** — long-running goals with feedback and cancellation. Nav2 uses these heavily.
+- **Parameters** — per-node configuration values that can be read and set at runtime.
+
+## What makes it different from ROS1
+
+| Feature | ROS1 | ROS2 |
+| --- | --- | --- |
+| Discovery | Central master | Peer-to-peer via DDS |
+| Real-time | No | Yes (with right DDS) |
+| Security | Hacked-on | DDS-Security built in |
+| Multi-robot | Manual | Native (domain ID) |
+| Lifecycle | None | Managed nodes |
+| Build system | catkin | colcon |
+| Current status (2026) | EOL | Active LTS = Humble, Iron, Jazzy |
+
+## Lifecycle nodes
+
+A ROS2 lifecycle node has explicit states: `unconfigured → inactive → active → inactive → finalized`. You can `configure()` and `cleanup()` cleanly. Critical for safety-critical robots — your motor controller comes up only after sensors are validated.
+
+## In India
+
+[[ISRO]]'s robotic-servicing prototypes run ROS2 for lifecycle guarantees. **Ideaforge** uses it on drones because DDS handles flaky wireless. **GreyOrange**, **Ati Motors**, **Asimov Robotics**, and **Systemantics** all build their products on ROS2 Humble or Iron. Indian university robotics programmes (IIT Madras, IIT Bombay, IIIT-H, BITS Pilani) have switched curricula from ROS1 to ROS2.
+
+## See it in action
+
+A minimal ROS2 publisher in Python — the entire stack discovers, connects, and starts streaming with no config:
+
+```python
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+
+class Talker(Node):
+    def __init__(self):
+        super().__init__('talker')
+        self.pub = self.create_publisher(String, '/chatter', 10)
+        self.create_timer(1.0, lambda: self.pub.publish(String(data='hello')))
+
+rclpy.init()
+rclpy.spin(Talker())
+```
+
+Open a second terminal: `ros2 topic echo /chatter`. Messages appear. No master, no config, no glue.
+
+## Related concepts
+
+[[ros]] · [[lidar]] · [[slam]] · [[computer-vision]] · [[edge-computing]]
+
+Start the [Wire track](/academy/wire/01) to learn ROS2 hands-on.

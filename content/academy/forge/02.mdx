@@ -1,0 +1,158 @@
+---
+title: "Robot Manipulation & MoveIt2"
+description: "MoveIt2 pipeline, URDF/SRDF, motion planning, collision objects. Plan and execute a real arm trajectory to a pose goal."
+track: forge
+lesson: 2
+duration: "55 min read"
+url_slug: f-02-moveit2-manipulation
+hindi_name: "रोबोट मैनिपुलेशन"
+xp: 350
+estimated_minutes: 55
+atlas_links: [kinematics, inverse-kinematics, robot-arm]
+sources:
+  - name: "MoveIt 2 documentation"
+    url: "https://moveit.picknik.ai/main/index.html"
+  - name: "MoveIt Setup Assistant"
+    url: "https://moveit.picknik.ai/main/doc/examples/setup_assistant/setup_assistant_tutorial.html"
+---
+
+## What you'll build
+
+A **Python script using MoveIt2** that plans and executes a trajectory: move the end-effector from its current pose to a target pose (position + orientation), avoiding a virtual collision object you add to the scene. This is the literal core of every pick-and-place pipeline in production.
+
+## MoveIt2 in one paragraph
+
+MoveIt2 wraps motion-planning libraries (OMPL, CHOMP, Pilz) behind a unified API. You describe your robot (URDF + SRDF), MoveIt provides: forward/inverse kinematics, collision checking, trajectory planning, execution against ros2_control, and a planning scene that tracks obstacles.
+
+You almost never call IK or planners directly. You ask MoveIt: "move to this pose." It figures out the rest.
+
+## URDF + SRDF — describing the arm to MoveIt
+
+**URDF** describes the physical robot (you wrote one in Wire 04). For a manipulator, you add joint *limits* (position, velocity, effort) and *types* (revolute, continuous, prismatic).
+
+**SRDF** (Semantic Robot Description Format) layers on top:
+- **Groups** — name sets of joints together (e.g., `"arm"` = the 6 main joints, `"gripper"` = the 2 finger joints).
+- **End effectors** — which group is the gripper, what's the parent link.
+- **Disable collisions** — pairs of links that *should* be allowed to touch (e.g., adjacent links on the arm).
+- **Named poses** — `"home"`, `"ready"`, `"tucked"`.
+
+MoveIt's **Setup Assistant** generates the SRDF for you given a URDF. Run it once per robot.
+
+## The plan + execute script
+
+```python
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import Pose
+from moveit.planning import MoveItPy
+from moveit.core.robot_state import RobotState
+from moveit_msgs.msg import CollisionObject
+from shape_msgs.msg import SolidPrimitive
+
+class ArmController(Node):
+    def __init__(self):
+        super().__init__('arm_controller')
+        # Initialise MoveItPy — pass the robot description loaded from params
+        self.moveit = MoveItPy(node_name='moveit_py')
+        self.arm = self.moveit.get_planning_component('arm')
+        self.scene = self.moveit.get_planning_scene_monitor()
+        self.get_logger().info('Arm controller ready')
+
+    def add_obstacle(self):
+        """Place a 10×10×10cm box at (0.3, 0, 0.3) — to plan around."""
+        obj = CollisionObject()
+        obj.header.frame_id = 'base_link'
+        obj.id = 'box_obstacle'
+        prim = SolidPrimitive()
+        prim.type = SolidPrimitive.BOX
+        prim.dimensions = [0.1, 0.1, 0.1]
+        obj.primitives.append(prim)
+
+        pose = Pose()
+        pose.position.x = 0.3
+        pose.position.y = 0.0
+        pose.position.z = 0.3
+        pose.orientation.w = 1.0
+        obj.primitive_poses.append(pose)
+        obj.operation = CollisionObject.ADD
+
+        with self.scene.read_write() as ps:
+            ps.apply_collision_object(obj)
+            ps.current_state.update()
+        self.get_logger().info('Added obstacle')
+
+    def plan_and_execute(self, target: Pose):
+        # Start state = current robot state
+        self.arm.set_start_state_to_current_state()
+        # Goal — pose for the named link "tool_link"
+        self.arm.set_goal_state(pose_stamped_msg=self._stamp(target), pose_link='tool_link')
+
+        plan = self.arm.plan()
+        if not plan:
+            self.get_logger().error('Planning failed')
+            return False
+        self.get_logger().info(f'Plan found — {len(plan.trajectory.joint_trajectory.points)} waypoints')
+
+        self.moveit.execute(plan.trajectory, controllers=[])
+        self.get_logger().info('Execution complete')
+        return True
+
+    def _stamp(self, p: Pose):
+        from geometry_msgs.msg import PoseStamped
+        ps = PoseStamped()
+        ps.header.frame_id = 'base_link'
+        ps.pose = p
+        return ps
+
+def main():
+    rclpy.init()
+    arm = ArmController()
+    arm.add_obstacle()
+
+    target = Pose()
+    target.position.x = 0.4
+    target.position.y = 0.2
+    target.position.z = 0.5
+    target.orientation.w = 1.0
+    arm.plan_and_execute(target)
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+## What MoveIt is actually doing
+
+1. **Collision check** — Is the current state in collision with anything in the scene? If yes, fail early.
+2. **Sample IK** — Try to find joint angles that put `tool_link` at the target pose. There may be 0, 1, or many solutions (singularities and redundancy).
+3. **Plan** — Search joint-space for a smooth, collision-free trajectory from current angles to a valid IK solution. OMPL's default planner is RRT-Connect — fast, anytime, good defaults.
+4. **Smooth** — Run a time-parameterisation step (TOPP or iterative-parabolic) to respect joint velocity/acceleration limits.
+5. **Execute** — Send the trajectory to `ros2_control`, which actually moves the motors.
+
+> **Try this in the visualizer:** open [/visualizer#ik](/visualizer#ik) and drag the gripper. You'll see live IK on a 2-DOF planar arm. MoveIt does the same thing in 6+ DOF, in 3D, with collision avoidance. The math scales; the intuition is identical.
+
+## Indian arms you'll work on
+
+- **Systemantics SyMo / SyMo-S** (Bangalore) — 6-DOF collaborative arm, ROS2 + MoveIt2 native.
+- **Asimov Robotics** prototypes (Cochin) — research arms for restaurant service.
+- **CMR Surgical CMR-X** prototypes via India partners — surgical arms (MoveIt2 + custom planners for trocar constraints).
+- **IIT Bombay's Innov8** — research manipulators for assembly research.
+
+## Test Your Understanding
+
+**1.** Your MoveIt plan succeeds in RViz but the arm crashes into a table when you execute on the real robot. Walk through three places (SRDF, planning scene, controller) where the bug could be.
+
+**2.** A user complains that the same goal pose works on Monday but fails Tuesday with "no IK solution." What environmental factor (not code) could cause this, and how would you confirm it?
+
+**3.** You need to add a *kinematic constraint* — "keep the end-effector orientation level while moving" (for carrying a tray of glasses). Without writing code, sketch what MoveIt feature you'd reach for and why.
+
+## India Opportunity
+
+- **Robotics Engineer · Systemantics, Bangalore** — collaborative-arm planning, MoveIt2, ₹16–28 LPA.
+- **Manipulation Engineer · CynLr, Bangalore** — vision-guided picking, MoveIt2 + perception, ₹20–35 LPA.
+- **Research Engineer · Bharat Forge KSSL, Pune** — industrial manipulation, ₹18–30 LPA.
+- **MoveIt Engineer · Niqo Robotics, Bangalore** — spraying-arm motion planning, ₹14–24 LPA.
+
+## Next Step
+
+→ Continue to **[Forge 03 · ML on Robots — Edge AI](/academy/forge/03)**.

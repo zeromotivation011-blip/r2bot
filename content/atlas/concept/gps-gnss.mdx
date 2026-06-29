@@ -1,0 +1,80 @@
+---
+title: GPS / GNSS
+category: sensors
+summary: >-
+  GPS is the American satellite navigation system; GNSS is the broader term for
+  all such systems worldwide. Together they let a robot know its position on
+  Earth's surface to within centimetres — when the sky is visible.
+seeAlso: []
+sources:
+  - title: 'NASA — GPS: The Global Positioning System'
+    url: >-
+      https://www.nasa.gov/directorates/somd/space-communications-navigation-program/gps/
+  - title: European Space Agency — GNSS explained
+    url: 'https://www.esa.int/Applications/Navigation/GNSS'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - sensors
+  - navigation
+  - outdoor
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: GPS is the American satellite navigation system; GNSS'
+laymanExplanation: >-
+  Picture four friends standing at known positions around a large park, each
+  with a loud speaker playing a steady tone. If you know exactly how long each
+  tone took to reach your ears, you can calculate your distance from each
+  friend. With distances from three speakers you can triangulate your position
+  in two dimensions; add a fourth and you fix your position i
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without gps / gnss, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  GPS is the American satellite navigation system; GNSS is the broader term for
+  all such systems worldwide. Together they let a robot know its position on
+  Earth's surface to within centimetres — when the sky is visible.
+slug: gps-gnss
+bucket: concept
+---
+
+Picture four friends standing at known positions around a large park, each with a loud speaker playing a steady tone. If you know exactly how long each tone took to reach your ears, you can calculate your distance from each friend. With distances from three speakers you can triangulate your position in two dimensions; add a fourth and you fix your position in three dimensions. Now move those friends to orbit 20,000 km above Earth, replace sound with precisely timed radio signals, and replace your ears with a small chip in your phone — you have just invented GPS.
+
+## GPS versus GNSS
+
+**GPS** (Global Positioning System) is the United States military's satellite navigation network, operational since 1993 and freely available to anyone with a receiver. It is so dominant that "GPS" has become the colloquial term for all satellite navigation, the way "Hoover" became a word for all vacuum cleaners.
+
+**GNSS** (Global Navigation Satellite System) is the correct umbrella term. It includes GPS (USA), GLONASS (Russia), Galileo (European Union), BeiDou (China), NavIC (India), and QZSS (Japan). Modern receivers — including those in smartphones and robots — listen to multiple constellations simultaneously for better accuracy and reliability.
+
+## How the timing works
+
+Each GPS satellite carries an extremely precise atomic clock and continuously broadcasts its position and the exact time of that broadcast. A GNSS receiver in a [robot](/atlas/concept/robot) catches signals from at least four satellites and computes how long each signal took to arrive. Since radio signals travel at the speed of light, a timing error of one microsecond translates to a 300-metre position error. The receivers compensate by solving for their own clock error as a fourth unknown, alongside the three position coordinates (latitude, longitude, altitude).
+
+Standard GPS accuracy for a consumer receiver is about 3–5 metres. That is fine for navigation, but not for a robot arm picking a component or an [autonomous vehicle](/atlas/concept/autonomous-vehicle) changing lanes.
+
+## RTK: centimetre-grade accuracy
+
+Precision [robotics](/atlas/concept/robotics) uses **RTK GPS** (Real-Time Kinematic). A fixed base station at a precisely known location continuously measures the tiny errors in GPS signals caused by atmospheric interference. It broadcasts those corrections over radio or the internet to a mobile receiver (called a "rover") on the robot. The rover applies the corrections in real time, shrinking positional error from metres to 1–2 centimetres. Agricultural robots that drive tractors with sub-centimetre furrow accuracy, and survey drones that map land without ground markers, all use RTK.
+
+## Why outdoor robots depend on it — and why it fails indoors
+
+For outdoor robots, GNSS provides the global reference frame that no other sensor can: an absolute position on Earth's surface. Without it, a delivery robot navigating across a city would have to build and maintain a perfect map from scratch with no way to anchor it to reality.
+
+GNSS fails the moment the sky disappears. Underground, indoors, in dense urban canyons where signals reflect off buildings, accuracy degrades or the signal is lost entirely. This is why indoor robots use [lidar](/atlas/concept/lidar), cameras, and IMUs instead — GNSS is simply not available to them.
+
+---
+
+*India's own NavIC constellation is designed to give sub-5-metre accuracy across the Indian subcontinent and 1,500 km beyond its borders — so why do most Indian phones still default to American GPS?*

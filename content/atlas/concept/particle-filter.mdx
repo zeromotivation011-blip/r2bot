@@ -1,0 +1,133 @@
+---
+title: Particle Filter in Robotics — Complete Guide | R2BOT
+summary: >-
+  Particle filters represent uncertainty with thousands of weighted samples —
+  perfect for nonlinear, multi-modal robot localisation problems like AMCL.
+category: control
+bucket: control-systems
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - particle-filter
+  - monte-carlo
+  - localisation
+  - amcl
+  - estimation
+relatedTerms:
+  - kalman-filter
+  - extended-kalman-filter
+  - amcl
+  - slam
+  - sensor-fusion
+seeAlso:
+  - kalman-filter
+  - extended-kalman-filter
+  - amcl
+  - slam
+  - sensor-fusion
+youtubeSearchQuery: particle filter monte carlo localization robotics
+oneLiner: >-
+  The control systems concept: Particle filters represent uncertainty with
+  thousands of weighted
+laymanExplanation: >-
+  A particle filter (Monte Carlo localisation) represents a robot's belief about
+  its pose as a cloud of thousands of weighted samples (particles). Each
+  particle is a hypothesis about where the robot might be; their weights encode
+  how likely each one is given recent measurements.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without particle filter in robotics — complete guide | r2bot, many control
+  systems systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Particle filters represent uncertainty with thousands of weighted samples —
+  perfect for nonlinear, multi-modal robot localisation problems like AMCL.
+slug: particle-filter
+---
+
+# Particle Filter in Robotics
+
+## What is Particle Filter in Robotics?
+
+A particle filter (Monte Carlo localisation) represents a robot's belief about its pose as a cloud of thousands of weighted samples (particles). Each particle is a hypothesis about where the robot might be; their weights encode how likely each one is given recent measurements.
+
+## How It Works
+
+At each step the filter does three things. **Predict**: every particle is moved according to the motion command plus random noise — making the cloud spread. **Weigh**: every particle's weight is updated by how well its predicted sensor readings match the actual readings. **Resample**: particles with low weight are discarded and high-weight ones are duplicated, focusing the cloud on the most likely locations. Over time, the cloud collapses to the true robot pose.
+
+## Real-World Example
+
+ROS2's AMCL package (Adaptive Monte Carlo Localisation) is a particle filter used in thousands of warehouse robots. Roomba uses a particle filter to recover localisation after being picked up. Self-driving cars often run particle filters in parallel with Kalman-family filters as a backup.
+
+## Why It Matters for Robotics
+
+Particle filters handle situations where Kalman and EKF fail: highly nonlinear maps, kidnapped-robot recovery, and ambiguous corridors. They are computationally heavier but rock-solid in the messy real world. Every senior robotics engineer should be able to explain and tune one.
+
+## Try It Yourself
+
+Open Nav2 docs and run the AMCL tutorial in Gazebo. Pick the robot up mid-simulation (the "kidnapped robot" test) and watch the particle cloud explode and re-converge — a visceral demonstration of why particle filters matter.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "A particle filter represents belief as:",
+    "options": [
+      "One Gaussian",
+      "Many weighted sample hypotheses",
+      "A single number",
+      "A neural network only"
+    ],
+    "answer": 1,
+    "explain": "Thousands of weighted particles approximate any (possibly multi-modal) probability distribution."
+  },
+  {
+    "q": "The \"resample\" step in a particle filter:",
+    "options": [
+      "Adds new sensors",
+      "Duplicates high-weight particles and drops low-weight ones",
+      "Increases battery",
+      "Reduces dimension"
+    ],
+    "answer": 1,
+    "explain": "Resampling concentrates compute on the most likely hypotheses and is the key step that keeps the filter sharp."
+  },
+  {
+    "q": "Particle filters beat EKFs at:",
+    "options": [
+      "Battery life",
+      "Multi-modal and highly nonlinear distributions",
+      "Single-Gaussian small problems",
+      "Memory usage"
+    ],
+    "answer": 1,
+    "explain": "When the belief is multi-modal (kidnapped robot, symmetric corridors), particle filters keep all hypotheses alive."
+  }
+]
+```
+
+## Further Reading
+
+- [Kalman Filter](/atlas/concept/kalman-filter)
+- [Extended Kalman Filter](/atlas/concept/extended-kalman-filter)
+- [Amcl](/atlas/concept/amcl)
+- [Slam](/atlas/concept/slam)
+- [Sensor Fusion](/atlas/concept/sensor-fusion)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Particle Filter in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

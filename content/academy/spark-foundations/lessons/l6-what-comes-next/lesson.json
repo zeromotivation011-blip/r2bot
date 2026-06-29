@@ -1,0 +1,17 @@
+{
+  "id": "l6-what-comes-next",
+  "module_id": "m2-real-world",
+  "order_index": 1,
+  "slug": "what-comes-next",
+  "title": "What comes next — for robots, and for you",
+  "lesson_type": "reading",
+  "duration_minutes": 8,
+  "xp_reward": 150,
+  "is_free_preview": false,
+  "passing_score": 75,
+  "objectives": [
+    "Name the three skills that matter most for a robotics career in India",
+    "Pick your next R2BOT track honestly"
+  ],
+  "atlas_links": ["robotics-india", "career-paths"]
+}

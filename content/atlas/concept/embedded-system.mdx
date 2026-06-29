@@ -1,0 +1,76 @@
+---
+title: Embedded system
+category: fundamentals
+summary: >-
+  An embedded system is a computer built into a device to perform one specific
+  job — invisible to the user but essential to the machine's function. Almost
+  every robot, sensor, and actuator contains at least one.
+seeAlso: []
+sources:
+  - title: Barr Group — Introduction to Embedded Systems
+    url: 'https://barrgroup.com/embedded-systems/books/programming-embedded-systems'
+  - title: ARM — Embedded Processors and Microcontrollers
+    url: 'https://developer.arm.com/architectures'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - computing
+  - electronics
+difficulty: 3
+oneLiner: 'The concept concept: An embedded system is a computer built into'
+laymanExplanation: >-
+  The engine management unit in a car doesn't have a keyboard, a screen, or a
+  user manual. You never interact with it directly. But it is running a
+  programme, right now, monitoring a dozen sensors and making thousands of
+  adjustments per second to fuel injection and ignition timing. Take it out and
+  the car won't start. That invisible, purpose-built computer is 
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without embedded system, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An embedded system is a computer built into a device to perform one specific
+  job — invisible to the user but essential to the machine's function. Almost
+  every robot, sensor, and actuator contains at least one.
+slug: embedded-system
+bucket: concept
+---
+
+The engine management unit in a car doesn't have a keyboard, a screen, or a user manual. You never interact with it directly. But it is running a programme, right now, monitoring a dozen sensors and making thousands of adjustments per second to fuel injection and ignition timing. Take it out and the car won't start. That invisible, purpose-built computer is an **embedded system**.
+
+An **embedded system** is a computer designed to perform a specific, dedicated function within a larger device. Unlike a general-purpose laptop that can run any software you install, an embedded system runs one programme (or a small fixed set of programmes) for the life of the device. It is almost always invisible: hidden inside a product, with no keyboard or monitor, often running on a [microcontroller](/atlas/concept/microcontroller) no larger than your thumbnail.
+
+## What makes it different from a regular computer
+
+Three properties define embedded systems. First, **dedication** — the system does one job, not many. Second, **resource constraints** — embedded processors are often slower, have less memory, and run on less power than general-purpose computers, because the application doesn't need more. Third, **real-time requirements** — many embedded systems must respond to physical events within precise time windows, because the device they control cannot wait.
+
+A microcontroller (often abbreviated MCU) is the most common form. It integrates a processor, memory, and input/output peripherals on a single chip. The Arduino Uno, popular in [robotics](/atlas/concept/robotics) education, uses an 8-bit Atmel AVR microcontroller running at 16 MHz with 32 KB of flash storage — vastly less powerful than any laptop, but perfectly suited for reading sensors and driving motors. Higher-end embedded systems, like the STM32 series or the [NVIDIA](/atlas/company/nvidia) Jetson family, bridge into real computing territory while remaining purpose-built.
+
+## Embedded systems in a [robot](/atlas/concept/robot)
+
+A typical robot contains many embedded systems, not one. Each motor controller is a small embedded system, reading [encoder](/atlas/concept/encoder) pulses and adjusting motor current at kilohertz frequencies. Each sensor — [IMU](/atlas/concept/imu), [force-torque sensor](/atlas/concept/force-torque-sensor), [camera](/atlas/concept/camera-vision) — has its own embedded processor pre-processing data before passing it upstream. The main "brain" of the robot may be a more powerful embedded system (or a full computer), running the navigation and planning software. All of these communicate over serial buses like CAN, I2C, SPI, or Ethernet.
+
+This distributed architecture — many small, purpose-built computers collaborating — is almost universal in modern robotics. It is more reliable than centralising everything in one processor (a failure in the motor controller doesn't crash the planner) and more efficient (each processor is sized for its specific workload).
+
+## Firmware: the software that lives inside
+
+The programme running on an embedded system is called **firmware** — a name that captures how it sits between software (changeable) and hardware (fixed). Firmware is typically written in C or C++, runs on bare metal or a lightweight RTOS, and is compiled specifically for the target processor's architecture. Updating it requires either a physical connection or a carefully designed over-the-air update mechanism.
+
+---
+
+*If the embedded systems inside a robot are each individually simple, how does their interaction produce behaviour that appears complex and intelligent?*

@@ -1,0 +1,128 @@
+---
+title: Safety Laser Scanner — Complete Guide | R2BOT
+summary: >-
+  A safety laser scanner is a safety-rated 2D LIDAR that defines virtual safety
+  zones. Standard on AGVs, AMRs, and many industrial cells.
+category: applications
+bucket: safety-standards
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - safety-scanner
+  - lidar
+  - amr
+  - safety
+  - sick
+relatedTerms:
+  - light-curtain
+  - lidar
+  - robot-safety
+  - autonomous-mobile-robot
+seeAlso:
+  - light-curtain
+  - lidar
+  - robot-safety
+  - autonomous-mobile-robot
+youtubeSearchQuery: SICK safety laser scanner AGV tutorial
+oneLiner: 'The safety standards concept: A safety laser scanner is a safety-rated 2D'
+laymanExplanation: >-
+  A safety laser scanner is a 2D LIDAR certified for functional safety. It scans
+  a horizontal plane and triggers a safe stop when objects enter user-defined
+  virtual safety zones. It is the standard safety sensor on AGVs and AMRs
+  worldwide.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without safety laser scanner — complete guide | r2bot, many safety standards
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A safety laser scanner is a safety-rated 2D LIDAR that defines virtual safety
+  zones. Standard on AGVs, AMRs, and many industrial cells.
+slug: safety-scanner
+---
+
+# Safety Laser Scanner
+
+## What is Safety Laser Scanner?
+
+A safety laser scanner is a 2D LIDAR certified for functional safety. It scans a horizontal plane and triggers a safe stop when objects enter user-defined virtual safety zones. It is the standard safety sensor on AGVs and AMRs worldwide.
+
+## How It Works
+
+The scanner spins a rotating mirror that pulses infrared laser at 10–30 Hz, measuring distance to anything in its plane (typically 270° field, 4–20 m range). Operators define configurable zones — protective fields that trigger safe stop, warning fields that slow the robot. Multiple field-sets can be switched dynamically based on speed or task. The scanner is certified to Performance Level d or e (ISO 13849) and SIL 2/3 (IEC 61508).
+
+## Real-World Example
+
+Every GreyOrange Butler, every Locus Robotics bot, and every modern industrial AGV uses a SICK microScan3 or Hokuyo UAM scanner. Indian system integrators routinely include these in AMR builds. Hospital delivery robots use them to slow near humans.
+
+## Why It Matters for Robotics
+
+Safety scanners are the difference between a legal, deployable AMR and one that cannot pass any factory acceptance test. Engineers building or integrating mobile robots in India must understand their selection, mounting, and certification.
+
+## Try It Yourself
+
+Visit SICK's online scanner-configuration tool (free). Define a protective field and warning field on a virtual AMR layout. Simulate a person walking in — feel the click of the safe stop. That is exactly what happens in a real warehouse.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "A safety laser scanner differs from a regular LIDAR by:",
+    "options": [
+      "Being certified to functional-safety standards (PL d / e)",
+      "Being cheaper",
+      "Working only at night",
+      "Having no laser"
+    ],
+    "answer": 0,
+    "explain": "The safety rating + redundant hardware + diagnostics is the key differentiator."
+  },
+  {
+    "q": "Typical horizontal field of view of a safety scanner:",
+    "options": [
+      "10°",
+      "~270°",
+      "5°",
+      "0°"
+    ],
+    "answer": 1,
+    "explain": "Around 270° is common; specific models cover up to 275°."
+  },
+  {
+    "q": "A protective field on a safety scanner triggers:",
+    "options": [
+      "A song",
+      "A safe stop of the AMR",
+      "A photograph",
+      "Cloud backup"
+    ],
+    "answer": 1,
+    "explain": "Entering the protective field commands the AMR to a certified safe state."
+  }
+]
+```
+
+## Further Reading
+
+- [Light Curtain](/atlas/concept/light-curtain)
+- [Lidar](/atlas/concept/lidar)
+- [Robot Safety](/atlas/concept/robot-safety)
+- [Autonomous Mobile Robot](/atlas/concept/autonomous-mobile-robot)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Safety Laser Scanner for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

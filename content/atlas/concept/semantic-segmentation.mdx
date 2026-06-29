@@ -1,0 +1,82 @@
+---
+title: Semantic segmentation
+category: ai-and-perception
+summary: >-
+  Semantic segmentation is a computer-vision technique that classifies every
+  single pixel in an image into a named category — road, pedestrian, sky —
+  giving a robot a detailed, boundary-precise understanding of its surroundings.
+seeAlso: []
+sources:
+  - title: >-
+      Long, Shelhamer, Darrell — Fully Convolutional Networks for Semantic
+      Segmentation (CVPR 2015)
+    url: 'https://arxiv.org/abs/1411.4038'
+  - title: Cityscapes Dataset — Benchmark for semantic urban scene understanding
+    url: 'https://www.cityscapes-dataset.com/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - perception
+  - computer-vision
+  - ai
+difficulty: 3
+oneLiner: >-
+  The concept concept: Semantic segmentation is a computer-vision technique that
+  classifies
+laymanExplanation: >-
+  Imagine colouring a photograph with felt-tip pens, but instead of colouring
+  for fun, you colour each object a specific shade: every road surface gets
+  green, every pedestrian gets orange, every parked car gets blue, every patch
+  of sky gets yellow. When you are done, every single pixel on the page has been
+  assigned to a category. That is — almost exactly — wha
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without semantic segmentation, many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Semantic segmentation is a computer-vision technique that classifies every
+  single pixel in an image into a named category — road, pedestrian, sky —
+  giving a robot a detailed, boundary-precise understanding of its surroundings.
+slug: semantic-segmentation
+bucket: concept
+---
+
+Imagine colouring a photograph with felt-tip pens, but instead of colouring for fun, you colour each object a specific shade: every road surface gets green, every pedestrian gets orange, every parked car gets blue, every patch of sky gets yellow. When you are done, every single pixel on the page has been assigned to a category. That is — almost exactly — what semantic segmentation does.
+
+**Semantic segmentation** is a computer-vision technique that takes an image and outputs another image of the same size, where each pixel is labelled with the category of whatever it belongs to.
+
+## The difference from [object detection](/atlas/concept/object-detection)
+
+Object detection draws a rectangle around each object and labels the rectangle. It is fast and good enough for counting things. But rectangles are crude — they include background pixels, they blur together when two objects are close.
+
+Semantic segmentation is pixel-precise. It does not draw a box around a pedestrian; it traces the exact outline of their coat, right down to the gap between their fingers if the resolution is high enough. The tradeoff is that it is computationally heavier, and it treats every pixel of a given class as identical — two separate pedestrians get the same label, "person," with no distinction between them. (The variant that separates individual instances is called **instance segmentation**, which combines the best of both worlds at even greater cost.)
+
+## A real example
+
+Autonomous vehicles use semantic segmentation on their [camera](/atlas/concept/camera-vision) feeds to understand the road surface in fine detail. The model must know, pixel by pixel, where the driveable lane ends and the kerb begins, where a pothole interrupts the surface, and where a white line marks a crossing. A bounding box around "road" would be useless for this level of navigation precision.
+
+The Cityscapes dataset, captured from a camera-equipped car driving through European cities, has been the standard training benchmark for urban segmentation since 2016.
+
+## Why it matters for [robotics](/atlas/concept/robotics)
+
+A [surgical robot](/atlas/concept/surgical-robot) using semantic segmentation can distinguish a tumour from healthy tissue in a live endoscope feed, pixel by pixel. A farm [robot](/atlas/concept/robot) can identify which leaves are diseased and which are healthy without cutting an entire plant. A warehouse robot can find the exact boundary of a product surface to plan a precise grasp.
+
+The richer the pixel-level understanding of a scene, the more precisely a robot can act within it.
+
+---
+
+*When the same pixel-labelling idea is applied to 3D point clouds rather than flat images, robots can segment the entire three-dimensional world around them.*

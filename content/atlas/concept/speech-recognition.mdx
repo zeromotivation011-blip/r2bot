@@ -1,0 +1,126 @@
+---
+title: Speech Recognition for Robots — Complete Guide | R2BOT
+summary: >-
+  Speech recognition lets robots understand spoken commands. Powered by deep
+  learning, now accurate even in Indian-language and accent variations.
+category: ai-and-perception
+bucket: human-robot-interaction
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - speech
+  - asr
+  - language
+  - voice
+  - hri
+relatedTerms:
+  - large-language-model-robotics
+  - natural-language-robotics
+  - human-robot-interaction
+seeAlso:
+  - large-language-model-robotics
+  - natural-language-robotics
+  - human-robot-interaction
+youtubeSearchQuery: speech recognition robotics tutorial
+oneLiner: >-
+  The human robot interaction concept: Speech recognition lets robots understand
+  spoken commands. Powered
+laymanExplanation: >-
+  Automatic Speech Recognition (ASR) converts spoken audio into text. In
+  robotics it enables voice control of robots — from saying 'pick up the cup' to
+  an Indian-language voice for elderly-care robots.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without speech recognition for robots — complete guide | r2bot, many human
+  robot interaction systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Speech recognition lets robots understand spoken commands. Powered by deep
+  learning, now accurate even in Indian-language and accent variations.
+slug: speech-recognition
+---
+
+# Speech Recognition for Robots
+
+## What is Speech Recognition for Robots?
+
+Automatic Speech Recognition (ASR) converts spoken audio into text. In robotics it enables voice control of robots — from saying 'pick up the cup' to an Indian-language voice for elderly-care robots.
+
+## How It Works
+
+Modern ASR systems use deep neural networks. Audio is first converted to a mel-spectrogram. An encoder (often a transformer) compresses the spectrogram into hidden representations. A decoder (CTC, RNN-T, or transformer) predicts the most likely text. Recent open-source models (OpenAI Whisper, Meta SeamlessM4T) handle 100+ languages including Hindi, Tamil, and Bengali with high accuracy.
+
+## Real-World Example
+
+Alexa, Siri, Google Assistant — all ASR. Indian voice startups (Reverie, AI4Bharat's IndicSUPERB models) build Indian-language ASR. Service robots in airports use ASR for directions. Robotic surgery now uses ASR for hands-free instrument commands.
+
+## Why It Matters for Robotics
+
+Voice is the most natural human interface. As India's smartphone-first population skews to voice over text, robotics that listen well will dominate. India-specific ASR (regional accents, code-mixing) is a hot startup space.
+
+## Try It Yourself
+
+Install OpenAI Whisper (`pip install openai-whisper`). Run it on a 30-second audio clip in Hindi or any Indian language — accuracy is impressive. Plug it into a ROS2 node that publishes recognised text on a topic, and a robot can listen.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "Modern ASR systems are primarily built on:",
+    "options": [
+      "Hand-crafted phonetic rules",
+      "Deep neural networks (encoder-decoder/transformers)",
+      "Cookies",
+      "Radio waves"
+    ],
+    "answer": 1,
+    "explain": "Classical ASR was rules + HMM; modern ASR is deep learning, often transformer-based."
+  },
+  {
+    "q": "A popular open-source multilingual ASR model is:",
+    "options": [
+      "ChatGPT",
+      "Whisper from OpenAI",
+      "Photoshop",
+      "Excel"
+    ],
+    "answer": 1,
+    "explain": "Whisper handles 100+ languages including major Indian ones."
+  },
+  {
+    "q": "A typical robotics use of ASR is:",
+    "options": [
+      "Computing kinematics",
+      "Voice-commanding a service robot",
+      "Charging a battery",
+      "Designing PCBs"
+    ],
+    "answer": 1,
+    "explain": "Voice control of robots is one of ASR's most direct robotics applications."
+  }
+]
+```
+
+## Further Reading
+
+- [Large Language Model Robotics](/atlas/concept/large-language-model-robotics)
+- [Natural Language Robotics](/atlas/concept/natural-language-robotics)
+- [Human Robot Interaction](/atlas/concept/human-robot-interaction)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Speech Recognition for Robots for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

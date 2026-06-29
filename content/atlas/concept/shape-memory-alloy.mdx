@@ -1,0 +1,76 @@
+---
+title: Shape-memory alloy
+category: actuators
+summary: >-
+  A shape-memory alloy is a metal that remembers a shape it was trained to hold,
+  snapping back to that shape when heated — giving roboticists a wire that
+  contracts like a muscle when current flows through it.
+seeAlso: []
+sources:
+  - title: Wikipedia — Shape-memory alloy
+    url: 'https://en.wikipedia.org/wiki/Shape-memory_alloy'
+  - title: NASA — Nitinol and shape memory alloys in aerospace
+    url: 'https://www.nasa.gov/feature/nitinol-the-metal-with-a-memory'
+  - title: MIT Research — Shape memory alloys in robotics
+    url: 'https://web.mit.edu/course/3/3.064/www/slides/SMA.pdf'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - actuators
+  - smart-materials
+  - micro-robotics
+difficulty: 3
+oneLiner: 'The concept concept: A shape-memory alloy is a metal that remembers'
+laymanExplanation: >-
+  Bend a paper clip back and forth and it stays bent — the metal deforms
+  permanently. Now imagine a wire that you crumple into a ball, and when you
+  warm it gently in your palm, it straightens out perfectly, returning to
+  exactly the shape it had before. It seems like a magic trick. It is, in fact,
+  a phase transition happening inside the crystal structure of the
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without shape-memory alloy, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A shape-memory alloy is a metal that remembers a shape it was trained to hold,
+  snapping back to that shape when heated — giving roboticists a wire that
+  contracts like a muscle when current flows through it.
+slug: shape-memory-alloy
+bucket: concept
+---
+
+Bend a paper clip back and forth and it stays bent — the metal deforms permanently. Now imagine a wire that you crumple into a ball, and when you warm it gently in your palm, it straightens out perfectly, returning to exactly the shape it had before. It seems like a magic trick. It is, in fact, a phase transition happening inside the crystal structure of the metal.
+
+A **shape-memory alloy (SMA)** is a metal that has been trained to remember a specific shape at a higher temperature. When cooled and deformed, the alloy enters a ductile phase called **martensite** — it bends easily and stays bent. Heat it above a transition temperature and it shifts back into a stiffer phase called **austenite**, recovering its memorised shape with surprising force. The most common SMA is **Nitinol** (nickel–titanium), developed at the US Naval Ordnance Laboratory in the 1960s — hence the name: **Ni**ckel **Ti**tanium **N**aval **O**rdnance **L**aboratory.
+
+## Using SMA as an actuator
+
+Run electrical current through a thin Nitinol wire and resistance heating warms it above the transition temperature in a fraction of a second. The wire contracts — typically by 4 to 8 percent of its length — generating a tensile force proportional to its cross-sectional area. Cut the current, let the wire cool, and an antagonistic spring or a second SMA wire stretches it back. The result is a silent, smooth, [linear actuator](/atlas/concept/linear-actuator) with no gears, no motor, and no moving parts beyond the wire itself.
+
+The constraints are significant. SMA actuators are slow — cooling limits cycle rates to a few hertz at best in air, faster in liquid cooling. They are energy-inefficient; most of the electrical energy becomes heat. Fatigue accumulates over tens of thousands of cycles. Precise position control is tricky because the force-displacement behaviour is non-linear and hysteretic (the heating and cooling paths differ).
+
+## Real-world example
+
+Nitinol is used extensively in medical devices — surgical stents that are compressed for insertion through a catheter and then self-expand to their trained diameter once inside an artery, guided entirely by body heat. In [robotics](/atlas/concept/robotics), researchers at MIT and ETH Zurich have built millimetre-scale walking robots driven entirely by SMA wires, where conventional motors would be impossibly bulky. The Soft Robotics group at Harvard has embedded Nitinol coils into soft silicone fingers to create thermally activated grippers.
+
+## Why it matters
+
+Shape-memory alloys offer something no conventional motor can: a muscle-like actuator with no rotating parts, operating in absolute silence, at scales where motors cannot be miniaturised further. For medical micro-robots that must navigate blood vessels, for tiny satellites with deployable structures, for wearable robots that must be quiet and skin-safe, SMA is often the only viable actuator. The trade-off between its elegance at small scale and its inefficiency at large scale makes it one of the more strategically interesting materials in robotics research.
+
+---
+
+*The same Nitinol phase-transition principle is being investigated in thermally reactive architectural structures — buildings whose vents, louvres, or shading fins could open and close automatically in response to temperature without any electronics.*

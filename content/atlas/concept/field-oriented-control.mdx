@@ -1,0 +1,130 @@
+---
+title: Field-Oriented Control (FOC) in Robotics — Complete Guide | R2BOT
+summary: >-
+  FOC is the dominant control technique for BLDC motors — turning a 3-phase
+  motor into a smooth, torque-controllable actuator. Used in every EV, drone
+  ESC, and modern robot joint.
+category: control
+bucket: power-electronics
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - foc
+  - bldc
+  - motor-control
+  - torque
+  - inverter
+relatedTerms:
+  - brushless-motor
+  - motor-driver
+  - pwm
+  - h-bridge
+seeAlso:
+  - brushless-motor
+  - motor-driver
+  - pwm
+  - h-bridge
+youtubeSearchQuery: field oriented control BLDC tutorial
+oneLiner: 'The power electronics concept: FOC is the dominant control technique for BLDC'
+laymanExplanation: >-
+  Field-Oriented Control (FOC), also called vector control, is a technique that
+  transforms 3-phase motor currents into two perpendicular axes — direct (d) and
+  quadrature (q). By controlling these axes independently, FOC delivers smooth
+  torque, high efficiency, and instant response from BLDC and PMSM motors.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without field-oriented control (foc) in robotics — complete guide | r2bot,
+  many power electronics systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  FOC is the dominant control technique for BLDC motors — turning a 3-phase
+  motor into a smooth, torque-controllable actuator. Used in every EV, drone
+  ESC, and modern robot joint.
+slug: field-oriented-control
+---
+
+# Field-Oriented Control (FOC) in Robotics
+
+## What is Field-Oriented Control (FOC) in Robotics?
+
+Field-Oriented Control (FOC), also called vector control, is a technique that transforms 3-phase motor currents into two perpendicular axes — direct (d) and quadrature (q). By controlling these axes independently, FOC delivers smooth torque, high efficiency, and instant response from BLDC and PMSM motors.
+
+## How It Works
+
+FOC uses the Clarke and Park transforms to convert measured phase currents (a, b, c) into rotor-frame components (d, q). The d-axis aligns with the rotor magnetic field; the q-axis is perpendicular. Torque is proportional to q-current, so torque control becomes a simple PI loop on q. Two PI controllers regulate d and q currents; their outputs go through inverse Park + space-vector PWM to generate the inverter switching pattern. Rotor angle for the transforms comes from Hall sensors, encoders, or sensorless back-EMF estimation.
+
+## Real-World Example
+
+Tesla's drive inverters use FOC. Every quadcopter ESC uses FOC. Universal Robots cobots use FOC at every joint. VESC, the open-source motor controller from Benjamin Vedder, is built around FOC. Indian EV startups (Ola Electric, Ather, Bounce) all hire FOC firmware engineers.
+
+## Why It Matters for Robotics
+
+Without FOC, BLDC motors deliver jerky torque and waste energy. With FOC, they become precision instruments. FOC is one of the most valuable specialised skills in modern robotics and EV engineering — Indian electric two-wheeler and drone companies are critically short of FOC engineers.
+
+## Try It Yourself
+
+Clone the SimpleFOC library (Arduino-compatible). Wire a small gimbal motor, magnetic encoder, and BTS7960 driver. Run the FOC torque-control example and feel how a tiny commanded torque produces smooth rotation — your first FOC experience.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "FOC controls a 3-phase motor by transforming into:",
+    "options": [
+      "Two perpendicular axes (d and q)",
+      "Six axes",
+      "A single axis",
+      "No transformation"
+    ],
+    "answer": 0,
+    "explain": "Clarke + Park transform the 3-phase currents into the rotor-frame d (direct) and q (quadrature) axes."
+  },
+  {
+    "q": "In FOC, motor torque is proportional to:",
+    "options": [
+      "d-axis current",
+      "q-axis current",
+      "phase voltage only",
+      "rotor resistance"
+    ],
+    "answer": 1,
+    "explain": "q-axis current produces torque; d-axis controls flux (used for field-weakening at high speed)."
+  },
+  {
+    "q": "FOC is the standard control method for:",
+    "options": [
+      "Brushed DC motors",
+      "BLDC and PMSM motors",
+      "Stepper motors only",
+      "Hydraulic motors"
+    ],
+    "answer": 1,
+    "explain": "FOC dominates BLDC/PMSM control in EVs, drones, robotics, and industry."
+  }
+]
+```
+
+## Further Reading
+
+- [Brushless Motor](/atlas/concept/brushless-motor)
+- [Motor Driver](/atlas/concept/motor-driver)
+- [Pwm](/atlas/concept/pwm)
+- [H Bridge](/atlas/concept/h-bridge)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Field-Oriented Control (FOC) in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

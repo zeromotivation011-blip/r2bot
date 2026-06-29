@@ -1,0 +1,76 @@
+---
+title: Mechatronics
+category: fundamentals
+summary: >-
+  Mechatronics is the engineering discipline that integrates mechanics,
+  electronics, and computing into a single unified design — rather than bolting
+  three separate systems together. Most modern robots, cameras, and appliances
+  are mechatronic systems.
+seeAlso: []
+sources:
+  - title: 'Rolf Isermann — Mechatronics: Components and Design (Springer)'
+    url: 'https://link.springer.com/book/10.1007/978-3-540-32437-8'
+  - title: IEEE/ASME Transactions on Mechatronics
+    url: 'https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=3516'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - engineering
+  - systems
+difficulty: 3
+oneLiner: >-
+  The concept concept: Mechatronics is the engineering discipline that
+  integrates mechanics,
+laymanExplanation: >-
+  A modern washing machine has a steel drum, an electric motor, a water pump, a
+  temperature sensor, a door-lock solenoid, and a microprocessor running a
+  control programme that co-ordinates all of them. You could design each of
+  those components in isolation and then wire them together. Or you could design
+  them as one integrated system from the start, where the 
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without mechatronics, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Mechatronics is the engineering discipline that integrates mechanics,
+  electronics, and computing into a single unified design — rather than bolting
+  three separate systems together. Most modern robots, cameras, and appliances
+  are mechatronic systems.
+slug: mechatronics
+bucket: concept
+---
+
+A modern washing machine has a steel drum, an electric motor, a water pump, a temperature sensor, a door-lock solenoid, and a microprocessor running a control programme that co-ordinates all of them. You could design each of those components in isolation and then wire them together. Or you could design them as one integrated system from the start, where the electronics shape the mechanics and the software shapes the electronics. The second approach produces a cheaper, more reliable, more capable machine. That integrated approach has a name: **mechatronics**.
+
+Mechatronics is the discipline that treats mechanical systems, electronic systems, and computing as a single, interdependent design problem. The term was coined in Japan in 1969 by Tetsuro Mori, an engineer at Yaskawa Electric, who needed a word for the increasingly inseparable fusion of *mecha*nics and elec*tronics* he was seeing in precision machines. Software was added as a third pillar as microprocessors became affordable in the 1980s.
+
+## Why integration matters
+
+The traditional engineering model separated disciplines: a mechanical engineer designed the structure and moving parts, an electrical engineer designed the circuits and motors, and a software engineer wrote the control code. Each group optimised for their own domain and then handed work over to the next. The results were often systems where the mechanical design didn't leave room for the sensors the electrical team needed, or where the software had to fight against the physics the mechanical team had created.
+
+Mechatronics asks all three groups to design together from the start. A [joint](/atlas/concept/joint)'s stiffness and the motor's bandwidth and the control loop's update rate are all designed as one system, with each constraint informing the others. This co-design often makes it possible to achieve performance with simpler, lighter, or cheaper components than the sum of three separately optimised subsystems would require.
+
+## Mechatronics in practice
+
+Almost every sophisticated modern machine is a mechatronic system. The antilock braking system in a car integrates wheel-speed sensors, a hydraulic modulator, and a control algorithm into a single design — you cannot separate those three components without destroying the function. A DSLR [camera](/atlas/concept/camera-vision)'s autofocus system uses an optical sensor, a miniature motor, and a prediction algorithm that all co-evolved. [Boston Dynamics](/atlas/company/boston-dynamics) designed the hydraulic actuators, joint sensors, and balance algorithms in its [Atlas](/atlas/robot/atlas) [robot](/atlas/concept/robot) as one integrated problem from the beginning.
+
+## The [link](/atlas/concept/link-robot) to [robotics](/atlas/concept/robotics)
+
+Robotics is perhaps the richest expression of mechatronics. A robot arm is a structural mechanism (mechanics), powered by motors and measured by encoders (electronics), and commanded by a real-time controller running [inverse kinematics](/atlas/concept/inverse-kinematics) and [dynamics](/atlas/concept/dynamics) models (computing). None of these three layers can be designed sensibly in isolation — the mass and geometry of the links determine what motors you need, the motor bandwidth determines what control strategies are feasible, and the control strategies determine what sensor precision is required.
+
+---
+
+*If every modern machine is becoming mechatronic by default, will the separate engineering disciplines of mechanical, electrical, and software engineering eventually merge into one — or is there value in keeping them distinct?*

@@ -1,0 +1,76 @@
+---
+title: Foundation models in robotics
+category: ai-and-perception
+summary: >-
+  Foundation models are large AI systems trained on vast, diverse datasets that
+  can be adapted to many tasks — and researchers are now applying them to
+  robotics so that a single model can control arms, interpret instructions, and
+  reason about novel situations.
+seeAlso: []
+sources:
+  - title: >-
+      Bommasani et al. — On the Opportunities and Risks of Foundation Models
+      (Stanford HAI, 2021)
+    url: 'https://arxiv.org/abs/2108.07258'
+  - title: 'Google DeepMind — RT-2: Vision-Language-Action Models'
+    url: 'https://robotics-transformer2.github.io/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - ai
+  - robot-learning
+  - large-models
+difficulty: 3
+oneLiner: 'The concept concept: Foundation models are large AI systems trained on'
+laymanExplanation: >-
+  When ChatGPT was released in late 2022, it surprised people not just by
+  answering questions well, but by answering questions it had never been
+  specifically trained to answer. It could write a limerick, then translate a
+  legal clause, then explain orbital mechanics — tasks that look completely
+  different on the surface. That generality came from training on an 
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without foundation models in robotics, many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Foundation models are large AI systems trained on vast, diverse datasets that
+  can be adapted to many tasks — and researchers are now applying them to
+  robotics so that a single model can control arms, interpret instructions, and
+  reason about novel situations.
+slug: foundation-model-robotics
+bucket: concept
+---
+
+When ChatGPT was released in late 2022, it surprised people not just by answering questions well, but by answering questions it had never been specifically trained to answer. It could write a limerick, then translate a legal clause, then explain orbital mechanics — tasks that look completely different on the surface. That generality came from training on an enormous, varied slice of human-written text. Roboticists immediately asked: could the same idea work for physical skills?
+
+A **foundation model** is a large AI system trained on such a wide and varied dataset that it develops broad, transferable capabilities. It can then be fine-tuned or prompted to handle specific tasks with far less additional training than a model built from scratch. In [robotics](/atlas/concept/robotics), the ambition is a model that understands instructions in natural language, perceives the visual world, and issues [robot](/atlas/concept/robot) actions — all in one system.
+
+## Why this is a big deal
+
+Traditional robot learning trains one model per task, in one environment. A model trained to pick up apples cannot pick up oranges without being retrained. Foundation models, because they are pretrained on vast data, may generalise across tasks, objects, and environments in ways task-specific models cannot.
+
+## RT-2: a concrete example
+
+In 2023, Google DeepMind published RT-2 (Robotics Transformer 2), a vision-language-action model. It was built by taking a large vision-language model already trained on billions of internet images and text, and fine-tuning it to output robot arm commands. The result: the robot could follow instructions like "move the extinct animal to the left" — identifying that a toy dinosaur was the extinct animal, a concept it had inferred from its internet-scale pretraining, not from robot-specific data.
+
+## The honest state of play
+
+Foundation models for robotics are exciting but early-stage. They are slower, more expensive to run, and less reliable than narrow specialist models on well-defined tasks. The field is genuinely unsettled about how far the approach will scale. What is not in dispute is the direction: most major robotics labs — Google DeepMind, Physical Intelligence, [Boston Dynamics](/atlas/company/boston-dynamics) — are investing heavily in it.
+
+---
+
+*If a robot foundation model trained on internet video of humans cooking could one day be deployed directly into a kitchen with no task-specific training, the economics of robotics would change entirely.*

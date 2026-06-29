@@ -1,0 +1,23 @@
+[
+  {
+    "id": "l6-text",
+    "order_index": 0,
+    "type": "text",
+    "is_required": true,
+    "data": {
+      "estimated_read_minutes": 6,
+      "content_mdx": "India added more robots in 2023 than any other Asian country except China. Salaries for robotics engineers range ₹8L–25L/year early-career, climbing higher fast.\n\n## Three skills that actually matter\n\n**1. Sense → Think → Act fluency.** You finished this course — you have it.\n\n**2. One language, deeply.** Python for high-level (ROS2, computer vision). C/C++ for embedded. Pick one and go deep.\n\n**3. Building things end-to-end.** Reading about robotics won't get you hired. Build a line follower. Then a maze solver. Then a Nav2 simulation. Each one stretches you.\n\n## Next tracks on R2BOT\n\n- **Wire (Arduino Robotics)** — build a physical robot with a ₹2,500 kit. ~15 hours.\n- **Forge (ROS2 Fundamentals)** — the language of professional robotics. ~20 hours.\n- **Edge (Research)** — frontier topics. SLAM, motion planning, neural control.\n\nDon't try to do all three. Pick the next one based on where you are."
+    }
+  },
+  {
+    "id": "l6-discussion",
+    "order_index": 1,
+    "type": "discussion",
+    "is_required": true,
+    "data": {
+      "prompt": "What's one robotics problem in YOUR city or village that no one is solving yet? Describe it in 3–4 sentences: what's the problem, what would the robot do, and which sensor + motor would it need?",
+      "min_words": 30,
+      "peer_visible": true
+    }
+  }
+]

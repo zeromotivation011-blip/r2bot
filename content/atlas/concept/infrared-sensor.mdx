@@ -1,0 +1,80 @@
+---
+title: Infrared sensor
+category: sensors
+summary: >-
+  An infrared sensor detects invisible light just beyond the red end of the
+  visible spectrum. Robots use it for short-range obstacle detection, line
+  following, and measuring the temperature of objects without touching them.
+seeAlso: []
+sources:
+  - title: NASA — Infrared Waves
+    url: 'https://science.nasa.gov/ems/07_infraredwaves'
+  - title: SICK AG — Infrared sensor technology overview
+    url: 'https://www.sick.com/gb/en/infrared-sensors/c/g294748'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - sensors
+  - infrared
+  - beginner
+difficulty: 3
+oneLiner: 'The concept concept: An infrared sensor detects invisible light just beyond'
+laymanExplanation: >-
+  Every object warmer than absolute zero radiates invisible energy. Hold your
+  hand near — not touching — a hot mug of tea and you can feel that energy on
+  your skin as warmth. That warmth is **infrared radiation**: light that exists
+  just past the red end of the rainbow, beyond what human eyes can see, but
+  perfectly detectable by the right electronics.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without infrared sensor, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An infrared sensor detects invisible light just beyond the red end of the
+  visible spectrum. Robots use it for short-range obstacle detection, line
+  following, and measuring the temperature of objects without touching them.
+slug: infrared-sensor
+bucket: concept
+---
+
+Every object warmer than absolute zero radiates invisible energy. Hold your hand near — not touching — a hot mug of tea and you can feel that energy on your skin as warmth. That warmth is **infrared radiation**: light that exists just past the red end of the rainbow, beyond what human eyes can see, but perfectly detectable by the right electronics.
+
+Robots have been exploiting infrared for decades — in some of the simplest and most reliable sensors ever built.
+
+## Two very different jobs, one type of light
+
+Infrared sensors in [robotics](/atlas/concept/robotics) come in two main flavours.
+
+The first is the **reflective IR sensor** (also called a proximity sensor). It works exactly like an [ultrasonic sensor](/atlas/concept/ultrasonic-sensor) but with light instead of sound. A small LED emits a beam of infrared light; a matching photodiode next to it watches for reflections. If an object is nearby, reflected light reaches the detector and the sensor triggers. If nothing is close, the beam disappears into the distance. These sensors are compact, cheap (often under ₹30), and fast — which is why nearly every introductory robotics kit includes a pair.
+
+The second is the **passive infrared sensor**, or **PIR sensor**. This one emits nothing at all. It only listens, detecting the infrared radiation that warm bodies — animals, humans — naturally emit. When a warm shape moves across its field of view, the PIR detects the change in radiation and fires an alarm. Every motion-activated outdoor light you have ever seen relies on a PIR sensor.
+
+## Line following: a surprisingly elegant trick
+
+One of the most elegant uses of reflective IR is **line-following**. A dark line on a pale floor absorbs infrared; the pale floor reflects it strongly. By mounting two IR sensors under a [robot](/atlas/concept/robot)'s [chassis](/atlas/concept/chassis) — one on each side of the line — a [microcontroller](/atlas/concept/microcontroller) can detect which sensor suddenly stops seeing a reflection (meaning that side has crossed off the line) and steer back. This is how hundreds of thousands of student robots worldwide navigate a track, and the same principle guides automated factory vehicles following painted floor paths.
+
+## Thermal cameras: infrared taken further
+
+A thermal [camera](/atlas/concept/camera-vision) is a 2D array of infrared detectors, producing a heat map rather than a single yes/no signal. [Boston Dynamics](/atlas/company/boston-dynamics) has explored thermal cameras for inspecting industrial equipment; the FLIR Lepton module gives even small robots the ability to see heat gradients and detect humans through smoke. This is the same technology fire-fighters use, now small enough to fit in a jacket pocket.
+
+## Limitations worth knowing
+
+Reflective IR sensors are easily fooled by ambient infrared — bright sunlight is full of it, which can wash out the sensor's own signal. They also cannot distinguish between a nearby bright object and a far-away highly-reflective one without more sophisticated processing. For complex environments, ultrasonic or [lidar](/atlas/concept/lidar) sensors take over. But for the simple tasks — stop before the wall, stay on the line, detect a warm body — infrared remains irreplaceable.
+
+---
+
+*The same infrared wavelengths that let a robot follow a black line on a floor are also what your TV remote uses to change the channel — which is why pointing a phone camera at a remote while pressing a button reveals an invisible flicker of light.*

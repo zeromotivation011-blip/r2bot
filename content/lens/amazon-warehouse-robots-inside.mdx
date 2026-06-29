@@ -1,0 +1,39 @@
+---
+title: Inside Amazon's warehouse — how 750,000 robots actually move
+summary: Amazon doesn't use one robot. It uses a coordinated fleet. The system, not any single machine, is the breakthrough.
+topic: Warehouse Automation
+durationSeconds: 360
+originalDurationSeconds: 1140
+externalUrl: https://www.aboutamazon.com/news/operations/amazon-introduces-new-robotics-solutions
+publishedAt: 2026-04-08
+relatedAtlas:
+  - { type: concept, slug: amr }
+  - { type: concept, slug: autonomous-navigation }
+  - { type: concept, slug: collaborative-robot }
+---
+
+The headline number — **750,000+ robots across Amazon fulfillment centers worldwide** — hides the actually-interesting story: nothing in that fleet is a single dexterous robot. It's an army of focused machines, each doing one job extremely well, coordinated by a central scheduler.
+
+## The cast
+
+**Hercules** — the orange disc you see in videos. Drives under a stack of shelves, lifts the whole stack, brings it to a human packer. There are over 500,000 of these worldwide. Hercules is what Amazon got when they acquired Kiva Systems in 2012.
+
+**Proteus** — the first Amazon "fully autonomous" mobile robot, meaning it can operate in spaces shared with humans (Hercules cannot — it lives in a fenced area). Proteus uses LIDAR and onboard navigation, not floor-mounted markers.
+
+**Cardinal** — a robotic arm that picks individual packages from a chute and places them into a stacked tower for outbound shipping. Computer vision + suction grippers + force feedback.
+
+**Sparrow** — newer (2022). The arm that picks individual *items* (not whole packages) from totes. This is closer to the long-standing "pick any object from any bin" problem. Sparrow can handle around 65% of Amazon's catalog autonomously; humans handle the rest.
+
+## The orchestration is the breakthrough
+
+Each robot is unremarkable by itself. The hard part is the **dispatch system** — a real-time scheduler that takes 100 million customer orders, the locations of every item in the warehouse, the current positions of every robot, and outputs a coordinated plan. The plan minimizes total robot travel time across the whole fleet.
+
+This is a multi-agent constraint-optimization problem at a scale most academic SLAM/planning work never approaches. Amazon doesn't publish the details. The job market for "robotics scheduler engineer" at Amazon Robotics is unusually competitive for that reason.
+
+## What this means for the industry
+
+Most "warehouse robotics startups" you read about are building variants of Hercules or Sparrow. The arbitrage is in the orchestration software, not the hardware. Companies like AutoStore (Norway), Locus Robotics, and GreyOrange (India) compete on this layer.
+
+---
+
+*Read [Autonomous Mobile Robots](/atlas/concept/amr) for the navigation stack underneath.*

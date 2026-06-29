@@ -1,0 +1,130 @@
+---
+title: ROS2 Parameters — Complete Guide | R2BOT
+summary: >-
+  ROS2 parameters let you configure nodes at runtime without recompiling. The
+  standard way to tune gains, sensor settings, and behaviour live.
+category: control
+bucket: programming-software
+difficulty: intermediate
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - ros2
+  - parameters
+  - config
+  - tuning
+  - node
+relatedTerms:
+  - ros2
+  - ros2-nodes
+  - ros2-launch
+  - ros2-services
+seeAlso:
+  - ros2
+  - ros2-nodes
+  - ros2-launch
+  - ros2-services
+youtubeSearchQuery: ROS2 parameters tutorial
+oneLiner: >-
+  The programming software concept: ROS2 parameters let you configure nodes at
+  runtime
+laymanExplanation: >-
+  ROS2 parameters are typed, named configuration values that a ROS2 node exposes
+  at runtime. Other tools can read and modify them without recompiling the node.
+  They are the standard way to expose tunable knobs — PID gains, frame IDs,
+  frequencies, thresholds — to operators and other software.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros2 parameters — complete guide | r2bot, many programming software
+  systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  ROS2 parameters let you configure nodes at runtime without recompiling. The
+  standard way to tune gains, sensor settings, and behaviour live.
+slug: ros2-parameters
+---
+
+# ROS2 Parameters
+
+## What is ROS2 Parameters?
+
+ROS2 parameters are typed, named configuration values that a ROS2 node exposes at runtime. Other tools can read and modify them without recompiling the node. They are the standard way to expose tunable knobs — PID gains, frame IDs, frequencies, thresholds — to operators and other software.
+
+## How It Works
+
+Each node declares parameters with a default value, a type (bool, int, float, string, array), and an optional descriptor (range, read-only). The parameter daemon stores them and exposes them via a service-like API. You can list them with `ros2 param list`, get them with `ros2 param get`, and set them with `ros2 param set` — even while the node is running. Nodes can register callbacks that fire whenever a parameter changes, so runtime retuning is straightforward.
+
+## Real-World Example
+
+Every Nav2 navigation parameter — costmap inflation radius, planner tolerance, max velocity — is a ROS2 parameter. Camera drivers expose exposure and gain as parameters. ros2_control hardware drivers expose joint limits and PID gains.
+
+## Why It Matters for Robotics
+
+ROS2 parameters separate code from configuration, making robots tunable in production without recompiling. They are a daily tool for every ROS2 engineer. Knowing how to declare, validate, and dynamically update parameters is a baseline interview expectation.
+
+## Try It Yourself
+
+Write a simple talker node that publishes a string at a frequency configured via a parameter. Run it, then change the frequency live with `ros2 param set /talker pub_rate 5.0` and watch the output rate change.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "A ROS2 parameter is best described as:",
+    "options": [
+      "A compiled constant",
+      "A node's runtime configuration value",
+      "A topic message",
+      "A USB cable"
+    ],
+    "answer": 1,
+    "explain": "Parameters live in a running node and can be read/written via ROS2 tooling without recompiling."
+  },
+  {
+    "q": "You change a running parameter with:",
+    "options": [
+      "ros2 topic echo",
+      "ros2 param set",
+      "ros2 launch",
+      "ros2 bag record"
+    ],
+    "answer": 1,
+    "explain": "`ros2 param set <node> <param> <value>` updates a parameter and triggers any registered callbacks."
+  },
+  {
+    "q": "A great use of parameters is:",
+    "options": [
+      "Streaming high-rate sensor data",
+      "Tuning PID gains live",
+      "Sending camera images",
+      "Running C++ tests"
+    ],
+    "answer": 1,
+    "explain": "Tuning controllers, thresholds, frame IDs — anything you might change at deploy time — is the right job for parameters."
+  }
+]
+```
+
+## Further Reading
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Nodes](/atlas/concept/ros2-nodes)
+- [Ros2 Launch](/atlas/concept/ros2-launch)
+- [Ros2 Services](/atlas/concept/ros2-services)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain ROS2 Parameters for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

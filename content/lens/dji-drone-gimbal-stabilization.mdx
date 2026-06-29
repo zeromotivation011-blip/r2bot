@@ -1,0 +1,61 @@
+---
+title: The DJI drone gimbal in slow-motion — three motors, 8,000 corrections per second
+summary: That impossibly steady drone shot you've seen on Instagram? It's a three-axis robotic arm fighting gravity 8,000 times every second. Here's how.
+topic: Drones
+durationSeconds: 330
+externalUrl: https://www.dji.com
+publishedAt: 2026-05-08
+relatedAtlas:
+  - { type: concept, slug: servo-motor }
+  - { type: concept, slug: pwm }
+---
+
+That impossibly steady drone shot you've seen on Instagram? It's a three-axis robotic arm fighting gravity 8,000 times every second. Here's how.
+
+## What a gimbal does
+
+A drone in flight is never still. It pitches forward when accelerating. It rolls when crosswind hits. It yaws when correcting heading. If the camera were rigidly bolted to the drone, every video would look like a queasy first-person shooter.
+
+A **gimbal** is a tiny three-axis robotic mount that holds the camera and rotates it in the opposite direction of every drone movement — keeping the camera pointed exactly where the operator wants, regardless of what the drone is doing.
+
+In slow-motion, you can see this clearly. The drone wobbles wildly. The camera doesn't move at all.
+
+## The three axes
+
+A camera in 3D space can rotate in three independent ways:
+
+- **Roll** — tilting left and right, like wagging your head from shoulder to shoulder.
+- **Pitch** — tilting up and down, like nodding.
+- **Yaw** — rotating left and right, like shaking your head "no".
+
+A three-axis gimbal has three [brushless DC motors](/atlas/concept/servo-motor), each driving one axis. The camera is mounted on a small frame that the motors articulate.
+
+## How it knows what to cancel out
+
+Inside the gimbal — usually mounted to the camera body itself, not the drone — sits an **IMU**: an Inertial Measurement Unit. The IMU contains a 3-axis accelerometer (sensing linear acceleration, including gravity) and a 3-axis gyroscope (sensing rotation rate).
+
+The IMU samples its sensors at typically 1 kHz (1,000 times per second). The gimbal's controller fuses the readings into a real-time estimate of "how is the camera oriented right now, in absolute world coordinates" — a process called **sensor fusion**, usually done with a Kalman filter or a Madgwick filter.
+
+When the operator sets the desired camera angle, the controller compares "where the camera is" against "where it should be" and commands each motor to push back against any error.
+
+This loop — measure, compare, correct — runs at around **8,000 Hz** on premium gimbals. That's 8,000 micro-corrections per second.
+
+## How it was built
+
+The motors are not regular DC motors — they're **brushless gimbal motors**, specifically designed for this job. They have a hollow shaft (so wires can pass through without tangling), they're capable of holding torque at zero RPM (essential — most of a gimbal motor's life is spent NOT spinning), and they're driven by special "field-oriented control" inverters that can produce smooth, jitter-free torque even at very slow speeds.
+
+The encoders are usually magnetic — small Hall-effect sensors that measure the rotor's angle without contact. They're cheap, robust, and surprisingly precise (0.1° resolution is common).
+
+The whole assembly, on a DJI Mavic 3 for example, weighs under 100 grams.
+
+## Why it works so well now (vs. five years ago)
+
+Two things:
+1. **MEMS sensors are cheap.** A 6-axis IMU costs under $5 in volume.
+2. **Microcontrollers are fast.** Running an 8 kHz control loop with sensor fusion used to require a desktop computer. Now it runs on a $2 STM32 microcontroller.
+
+The combination unlocked gimbals at consumer prices. Five years ago, only Hollywood had this; now every $400 drone has it.
+
+---
+
+*Curious how the brushless motor inside a gimbal works? Read [Servo motor](/atlas/concept/servo-motor) — the operating principle is the same, just scaled down.*

@@ -1,0 +1,73 @@
+---
+title: ROS2 Topics — Complete Guide for Robotics
+summary: >-
+  ROS2 topics are typed, asynchronous message buses that let robot nodes publish
+  and subscribe data — like sensor readings or control commands — anywhere in
+  the network.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - ros2
+  - pub-sub
+  - middleware
+seeAlso:
+  - ros2
+  - ros2-nodes
+  - ros2-services
+difficulty: 3
+oneLiner: 'The concept concept: ROS2 topics are typed, asynchronous message buses that'
+laymanExplanation: >-
+  A ROS2 topic is a named, typed channel for asynchronous many-to-many
+  communication. Nodes publish messages to a topic; other nodes subscribe to the
+  topic to receive them. Topics are the most common pattern in ROS2 — sensor
+  data, control commands, and odometry all flow over topics.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ros2 topics — complete guide for robotics, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  ROS2 topics are typed, asynchronous message buses that let robot nodes publish
+  and subscribe data — like sensor readings or control commands — anywhere in
+  the network.
+slug: ros2-topics
+bucket: concept
+---
+
+# ROS2 Topics
+
+## What is it?
+
+A ROS2 topic is a named, typed channel for asynchronous many-to-many communication. Nodes publish messages to a topic; other nodes subscribe to the topic to receive them. Topics are the most common pattern in ROS2 — sensor data, control commands, and odometry all flow over topics.
+
+## How it works
+
+Under the hood, ROS2 topics ride on DDS (Data Distribution Service). When a publisher and subscriber match on a topic name and message type, DDS sets up a low-level pub/sub channel. Publishers and subscribers can come and go independently — no central broker is required. Topic communication can be configured for Quality-of-Service (reliability, history, durability).
+
+## Real-world example
+
+A robot's LIDAR node publishes `/scan` messages. A SLAM node subscribes to `/scan` and publishes `/map`. A teleop joystick publishes `/cmd_vel`, and a motor controller subscribes to it. Run `ros2 topic list` and you see every channel live.
+
+## Why it matters for robotics
+
+Topics decouple components — a fundamental ROS2 design pattern. Mastery of topics, message types, and QoS settings is non-negotiable for any robotics engineer working with ROS2.
+
+## See also
+
+- [Ros2](/atlas/concept/ros2)
+- [Ros2 Nodes](/atlas/concept/ros2-nodes)
+- [Ros2 Services](/atlas/concept/ros2-services)

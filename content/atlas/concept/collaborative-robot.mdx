@@ -1,0 +1,84 @@
+---
+title: Collaborative robot
+category: robot-types
+summary: >-
+  A collaborative robot is any robot designed to work alongside humans in the
+  same space, sensing their presence and adjusting its behaviour to stay safe —
+  without a physical barrier between them.
+seeAlso: []
+sources:
+  - title: 'ISO/TS 15066 — Robots and robotic devices: Collaborative robots'
+    url: 'https://www.iso.org/standard/62996.html'
+  - title: Universal Robots — What is a collaborative robot?
+    url: 'https://www.universal-robots.com/blog/what-is-a-collaborative-robot/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - collaboration
+  - safety
+  - robot-types
+  - manufacturing
+difficulty: 3
+oneLiner: 'The concept concept: A collaborative robot is any robot designed to'
+laymanExplanation: >-
+  For most of industrial history, humans and robots operated on opposite sides
+  of a metal cage. The robot inside was fast, powerful, and utterly indifferent
+  to anything in its path. The human outside fed it parts through hatches and
+  hoped the safety locks held. The cage was not optional — it was what kept the
+  human alive.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without collaborative robot, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A collaborative robot is any robot designed to work alongside humans in the
+  same space, sensing their presence and adjusting its behaviour to stay safe —
+  without a physical barrier between them.
+slug: collaborative-robot
+bucket: concept
+---
+
+For most of industrial history, humans and robots operated on opposite sides of a metal cage. The [robot](/atlas/concept/robot) inside was fast, powerful, and utterly indifferent to anything in its path. The human outside fed it parts through hatches and hoped the safety locks held. The cage was not optional — it was what kept the human alive.
+
+Collaborative robots — and the broader category of **collaborative [robotics](/atlas/concept/robotics)** — exist to tear down that cage.
+
+A collaborative robot is designed from the ground up to share space with people. It senses when a human is near, slows down, adjusts its path, or stops altogether. The safety logic is baked into the hardware and software, not just bolted on as an afterthought.
+
+## Four collaboration modes (per ISO/TS 15066)
+
+The international safety standard defines four ways a robot can collaborate with a human, ranging from cautious to close:
+
+- **Safety-rated monitored stop** — the robot freezes whenever a human enters its zone and restarts when they leave.
+- **Hand guiding** — a human physically takes hold of the robot and steers it; the robot follows smoothly, like pushing a shopping trolley that weighs nothing.
+- **Speed and separation monitoring** — the robot watches the distance to the nearest human and slows down as they approach.
+- **Power and force limiting** — the robot runs continuously but its joints are capped so a collision cannot injure a human. This is the mode associated with cobots.
+
+## Cobots as the canonical example
+
+A **[cobot](/atlas/concept/cobot)** (collaborative robot) is the most commercially successful form of collaborative robot — a lightweight robotic arm with torque sensors in every [joint](/atlas/concept/joint) that detect an unexpected force and stop within milliseconds. Universal Robots, founded in Denmark in 2005, created the commercial cobot category and its UR3, UR5, and UR10 arms remain the industry benchmark. The key innovation is not just the sensors but the philosophy: a cobot is safe enough that its risk assessment, in many applications, permits human co-presence without any cage at all.
+
+But collaborative robotics is bigger than cobots. Mobile collaborative platforms — robots on wheels that navigate alongside workers — are increasingly common in hospitals and warehouses. Some surgical systems qualify as collaborative under a broader reading of the term. Even large industrial arms can be made collaborative by adding the right sensors and control software.
+
+## Why this matters
+
+The economics shift significantly when you remove the cage. A traditional [industrial robot](/atlas/concept/industrial-robot) requires a protected cell: fencing, light curtains, floor sensors, safety-rated PLCs, and an integration project that can cost more than the robot itself. A collaborative robot can be deployed on a bench, programmed by a non-specialist in a day, and repositioned to a different task next week. For smaller manufacturers running short production batches, this flexibility changes what automation is even viable.
+
+The limitation is speed. Collaborative safety modes require limiting power and velocity, which means collaborative robots are slower than their full-speed industrial counterparts. For high-volume, single-task work, a caged industrial robot is still faster and cheaper per part.
+
+---
+
+*The cage was never about robots — it was about what we hadn't yet taught robots to notice.*

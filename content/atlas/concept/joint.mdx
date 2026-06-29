@@ -1,0 +1,75 @@
+---
+title: Joint (robot)
+category: hardware
+summary: >-
+  A robot joint is the connection point between two rigid segments where
+  controlled movement occurs — it is the mechanical equivalent of a knee,
+  shoulder, or wrist, and every degree of flexibility in a robot comes from one.
+seeAlso: []
+sources:
+  - title: 'Craig, J.J. — Introduction to Robotics: Mechanics and Control (3rd ed.)'
+    url: >-
+      https://www.pearson.com/en-us/subject-catalog/p/introduction-to-robotics-mechanics-and-control/P200000003486
+  - title: Robotics Academy — Robot joints and links
+    url: 'https://www.roboticsacademy.cmu.edu/hardware/joints'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - hardware
+  - mechanical
+  - kinematics
+difficulty: 3
+oneLiner: 'The concept concept: A robot joint is the connection point between'
+laymanExplanation: >-
+  Hold your arm out straight. Now bend your elbow. The part that moved — the
+  hinge between your upper arm and your forearm — is a joint. Your shoulder adds
+  rotation in multiple directions; your wrist adds twist. Every position your
+  hand can reach is the combined result of those joints working together. A
+  robotic arm works on exactly the same principle.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without joint (robot), many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A robot joint is the connection point between two rigid segments where
+  controlled movement occurs — it is the mechanical equivalent of a knee,
+  shoulder, or wrist, and every degree of flexibility in a robot comes from one.
+slug: joint
+bucket: concept
+---
+
+Hold your arm out straight. Now bend your elbow. The part that moved — the hinge between your upper arm and your forearm — is a joint. Your shoulder adds rotation in multiple directions; your wrist adds twist. Every position your hand can reach is the combined result of those joints working together. A robotic arm works on exactly the same principle.
+
+A **joint** in a [robot](/atlas/concept/robot) is the connection between two adjacent rigid segments (called links) that allows controlled, relative motion between them. Joints are where actuation happens — where a motor, a hydraulic piston, or a pneumatic cylinder applies force to produce movement. Without joints, a robot is just a rigid sculpture.
+
+## The two fundamental joint types
+
+**Revolute joints** rotate. One [link](/atlas/concept/link-robot) turns relative to the other around a fixed axis — like a door hinge, an elbow, or a shoulder rotating in one plane. Most robotic arms are built almost entirely from revolute joints because rotation is easy to actuate with a motor and easy to control precisely. A revolute joint contributes one degree of freedom: one angle.
+
+**Prismatic joints** slide. One link translates linearly along an axis relative to the other — like a drawer, a hydraulic cylinder, or the height column of an office chair. Prismatic joints appear in Cartesian robots (the kind that move in X, Y, Z straight lines), in parallel robots, and wherever linear reach is more useful than rotational reach. A prismatic joint also contributes one degree of freedom: one linear displacement.
+
+## Less common but important
+
+A **spherical joint** (or ball joint) allows rotation around three axes simultaneously — like a human hip or shoulder at its full range. It contributes three [degrees of freedom](/atlas/concept/degrees-of-freedom). Spherical joints are mechanically complex to actuate because you need three independent torques at a single point; many robotic systems approximate a spherical joint by stacking three revolute joints with intersecting axes instead.
+
+A **screw joint** combines rotation and translation in a fixed ratio — turn the input shaft one revolution, the output translates one thread pitch. Lead-screw actuators in linear stages are the commonest example.
+
+## How joints are actuated
+
+Joints do not move themselves. Each one is driven by an actuator — almost always an electric motor in modern robots. The motor output is typically reduced through a gearbox to produce higher torque at lower speed, then connected to the joint through a shaft, belt, or cable. Harmonic drives are especially popular in robot arms because they provide very high gear reduction with almost zero backlash (slop).
+
+---
+
+*The human body has over 300 joints; the most sophisticated humanoid robots have fewer than 60 — yet they still struggle to match the fluid dexterity of a toddler tying a shoelace.*

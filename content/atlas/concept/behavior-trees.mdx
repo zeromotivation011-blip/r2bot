@@ -1,0 +1,74 @@
+---
+title: Behaviour Trees in Robotics — Complete Guide
+summary: >-
+  Behaviour trees are a hierarchical decision-making structure that lets robots
+  compose complex behaviour from reusable building blocks. Replacing state
+  machines in modern robotics.
+category: control
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - behavior-tree
+  - decision
+  - ai
+seeAlso:
+  - state-machine
+  - ros2
+  - motion-planning
+difficulty: 3
+oneLiner: >-
+  The concept concept: Behaviour trees are a hierarchical decision-making
+  structure that
+laymanExplanation: >-
+  A behaviour tree (BT) is a hierarchical tree of decision nodes that controls
+  what a robot should do moment to moment. Originally invented for video-game
+  AI, BTs are now standard in modern robotics — including Nav2 and MoveIt2.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without behaviour trees in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Behaviour trees are a hierarchical decision-making structure that lets robots
+  compose complex behaviour from reusable building blocks. Replacing state
+  machines in modern robotics.
+slug: behavior-trees
+bucket: concept
+---
+
+# Behaviour Trees in Robotics
+
+## What is it?
+
+A behaviour tree (BT) is a hierarchical tree of decision nodes that controls what a robot should do moment to moment. Originally invented for video-game AI, BTs are now standard in modern robotics — including Nav2 and MoveIt2.
+
+## How it works
+
+A BT is composed of control-flow nodes (Sequence, Selector, Parallel) and leaf nodes (Action, Condition). On each tick, the root ticks its children, and so on, evaluating until a SUCCESS, FAILURE, or RUNNING result returns. Sequences fail on first FAILURE; Selectors succeed on first SUCCESS. This composability lets engineers build complex behaviour from a few reusable primitives.
+
+## Real-world example
+
+Nav2's bt_navigator runs the entire navigation stack as a behaviour tree. Many warehouse robots use BTs to switch between picking, transporting, charging, and recovering from failures.
+
+## Why it matters for robotics
+
+Behaviour trees are far more readable and maintainable than nested if-else logic or large state machines. Any robotics engineer working on Nav2 today is expected to know BTs.
+
+## See also
+
+- [State Machine](/atlas/concept/state-machine)
+- [Ros2](/atlas/concept/ros2)
+- [Motion Planning](/atlas/concept/motion-planning)

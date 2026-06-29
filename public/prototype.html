@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="R2BOT — ROBOT, decoded. The world's most accessible robotics platform. Every robot, every breakthrough, every concept explained in plain English. Free forever." />
+<title>R2BOT — ROBOT, decoded.</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --void:#050810;
+    --ink:#0B2540;
+    --ink-2:#0F2F52;
+    --mist:#E8ECF1;
+    --muted:#6E7886;
+    --cyan:#00B8D4;
+    --cyan-bright:#00E5FF;
+    --purple:#A56BFF;
+    --amber:#FFB020;
+    --green:#22C55E;
+    --border:rgba(255,255,255,.06);
+    --border-2:rgba(0,184,212,.25);
+    --glow:0 0 40px rgba(0,229,255,.25);
+    --shadow-card: 0 14px 40px rgba(0,0,0,.4), 0 0 0 1px var(--border);
+    --shadow-card-hover: 0 18px 50px rgba(0,229,255,.18), 0 0 0 1px var(--border-2);
+    --radius:14px;
+    --radius-lg:20px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--void);color:var(--mist);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body{background:radial-gradient(ellipse at top, #0a1428 0%, var(--void) 60%) fixed}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
+  ::selection{background:var(--cyan);color:var(--void)}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:var(--void)}
+  ::-webkit-scrollbar-thumb{background:#1a2438;border-radius:8px}
+  ::-webkit-scrollbar-thumb:hover{background:#243049}
+
+  .display{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.05}
+  .mono{font-family:'JetBrains Mono',monospace;letter-spacing:.04em}
+  .container{max-width:1280px;margin:0 auto;padding:0 28px}
+
+  /* --- PARTICLE FIELD BACKGROUND --- */
+  #particles{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
+
+  /* --- CURSOR TRAIL --- */
+  .cursor-dot{position:fixed;width:6px;height:6px;border-radius:50%;background:var(--cyan-bright);box-shadow:0 0 12px var(--cyan-bright);pointer-events:none;z-index:9999;mix-blend-mode:screen;transition:opacity .3s}
+
+  /* --- NAV --- */
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:18px 0;transition:all .3s var(--ease);backdrop-filter:blur(0)}
+  nav.scrolled{background:rgba(5,8,16,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:14px 0}
+  .nav-wrap{display:flex;align-items:center;justify-content:space-between}
+  .nav-logo{display:flex;align-items:center;gap:10px}
+  .nav-logo .wordmark{font-family:'Space Grotesk';font-weight:700;font-size:22px;letter-spacing:-.02em}
+  .nav-logo .wordmark .two{color:var(--cyan);font-weight:800}
+  .nav-links{display:flex;gap:32px;font-size:14.5px;color:#B8C0CC}
+  .nav-links a{position:relative;padding:6px 0;transition:color .2s}
+  .nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--ease)}
+  .nav-links a:hover{color:var(--mist)}
+  .nav-links a:hover::after{transform:scaleX(1)}
+  .nav-right{display:flex;align-items:center;gap:14px}
+  .kbd-hint{display:flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:13px;background:rgba(255,255,255,.02);transition:all .2s}
+  .kbd-hint:hover{border-color:var(--border-2);color:var(--mist)}
+  .kbd-hint kbd{font-family:'JetBrains Mono';font-size:11px;padding:2px 6px;background:rgba(255,255,255,.06);border-radius:4px;border:1px solid var(--border)}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;font-size:14px;font-weight:500;transition:all .2s var(--ease);cursor:pointer}
+  .btn-ghost{color:#C8D0DC}
+  .btn-ghost:hover{color:var(--mist);background:rgba(255,255,255,.04)}
+  .btn-primary{background:var(--cyan);color:#001318;font-weight:600;box-shadow:0 0 0 0 rgba(0,229,255,.6)}
+  .btn-primary:hover{background:var(--cyan-bright);transform:translateY(-1px);box-shadow:0 8px 28px rgba(0,229,255,.35)}
+  .btn-outline{border:1px solid var(--border-2);color:var(--cyan)}
+  .btn-outline:hover{background:rgba(0,184,212,.08);border-color:var(--cyan)}
+
+  /* --- HERO --- */
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 0 80px;z-index:2}
+  .hero-inner{text-align:center;max-width:920px;margin:0 auto}
+  .logo-stage{display:flex;justify-content:center;margin-bottom:36px;filter:drop-shadow(0 0 60px rgba(0,229,255,.25))}
+  .hero-eyebrow{font-family:'JetBrains Mono';font-size:12.5px;letter-spacing:.4em;color:var(--cyan);text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fadeUp .8s var(--ease) .4s forwards}
+  h1.hero-title{font-size:clamp(56px,8.5vw,116px);margin:0 0 16px;color:var(--mist);opacity:0;animation:fadeUp .9s var(--ease) .55s forwards}
+  h1.hero-title .accent{background:linear-gradient(120deg,var(--cyan-bright),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-sub{font-size:clamp(17px,1.5vw,21px);color:#A8B0BC;max-width:660px;margin:0 auto 44px;opacity:0;animation:fadeUp .9s var(--ease) .7s forwards}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+  /* --- ASK BAR --- */
+  .askbar{max-width:660px;margin:0 auto;background:rgba(11,37,64,.55);border:1px solid var(--border);border-radius:18px;padding:6px;display:flex;align-items:center;backdrop-filter:blur(12px);opacity:0;animation:fadeUp .9s var(--ease) .85s forwards;transition:all .25s var(--ease)}
+  .askbar:hover,.askbar:focus-within{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(0,229,255,.1),0 14px 50px rgba(0,229,255,.2)}
+  .askbar-icon{padding:0 16px;color:var(--cyan)}
+  .askbar input{flex:1;background:transparent;border:none;outline:none;color:var(--mist);font-size:16.5px;padding:18px 0;font-family:inherit}
+  .askbar input::placeholder{color:var(--muted);transition:color .3s}
+  .askbar-cta{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--cyan),var(--cyan-bright));color:#001318;padding:14px 22px;border-radius:14px;font-weight:600;font-size:15px;transition:all .2s}
+  .askbar-cta:hover{transform:translateX(2px);filter:brightness(1.08)}
+  .quick-chips{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px;opacity:0;animation:fadeUp .9s var(--ease) 1s forwards}
+  .chip{padding:8px 14px;border:1px solid var(--border);border-radius:100px;background:rgba(255,255,255,.02);font-size:13.5px;color:#B8C0CC;cursor:pointer;transition:all .2s}
+  .chip:hover{border-color:var(--cyan);color:var(--mist);background:rgba(0,184,212,.08);transform:translateY(-1px)}
+
+  /* --- SCROLL HINT --- */
+  .scroll-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);color:var(--muted);font-size:12px;letter-spacing:.3em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:.6}
+  .scroll-hint::after{content:'';width:1px;height:34px;background:linear-gradient(to bottom,var(--cyan),transparent);animation:pulseDown 2.4s ease-in-out infinite}
+  @keyframes pulseDown{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+
+  /* --- SECTION HEADERS --- */
+  section{position:relative;padding:120px 0;z-index:2}
+  .section-eyebrow{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.35em;color:var(--cyan);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+  .section-eyebrow::before{content:'';width:24px;height:1px;background:var(--cyan)}
+  h2.section-title{font-size:clamp(36px,4vw,52px);margin:0 0 14px;color:var(--mist)}
+  .section-lede{color:#A8B0BC;max-width:640px;font-size:17px;margin-bottom:48px}
+
+  /* --- PULSE STRIP --- */
+  .pulse-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .pulse-card{background:linear-gradient(180deg,rgba(11,37,64,.5),rgba(11,37,64,.2));border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;transition:all .3s var(--ease);cursor:pointer;position:relative;overflow:hidden}
+  .pulse-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top left,rgba(0,229,255,.08),transparent 60%);opacity:0;transition:opacity .3s}
+  .pulse-card:hover{transform:translateY(-4px);border-color:var(--border-2);box-shadow:var(--shadow-card-hover)}
+  .pulse-card:hover::before{opacity:1}
+  .pulse-tag{display:inline-block;font-size:11px;font-family:'JetBrains Mono';letter-spacing:.2em;text-transform:uppercase;padding:4px 10px;border-radius:6px;margin-bottom:14px}
+  .pulse-tag.usa{background:rgba(0,184,212,.12);color:var(--cyan)}
+  .pulse-tag.china{background:rgba(255,176,32,.12);color:var(--amber)}
+  .pulse-tag.india{background:rgba(165,107,255,.12);color:var(--purple)}
+  .pulse-card h3{font-family:'Space Grotesk';font-size:21px;font-weight:600;color:var(--mist);margin:0 0 12px;line-height:1.3}
+  .pulse-card p{font-size:14.5px;color:#A0A8B5;margin:0 0 18px}
+  .pulse-meta{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);font-family:'JetBrains Mono'}
+  .pulse-arrow{color:var(--cyan);transition:transform .25s var(--ease)}
+  .pulse-card:hover .pulse-arrow{transform:translateX(4px)}
+
+  /* --- DIAGNOSTIC BLOCK --- */
+  .diag-block{background:linear-gradient(135deg,rgba(0,184,212,.08),rgba(165,107,255,.06));border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:56px;display:grid;grid-template-columns:1.2fr 1fr;gap:50px;align-items:center;position:relative;overflow:hidden}
+  .diag-block::after{content:'';position:absolute;right:-50px;top:-50px;width:300px;height:300px;background:radial-gradient(circle,rgba(0,229,255,.18),transparent 70%);pointer-events:none}
+  .diag-left h3{font-family:'Space Grotesk';font-size:38px;font-weight:600;margin:0 0 18px;color:var(--mist);line-height:1.15}
+  .diag-left p{color:#B0B8C5;margin:0 0 28px;font-size:16.5px}
+  .diag-cta{display:inline-flex;align-items:center;gap:10px;background:var(--cyan);color:#001318;padding:14px 24px;border-radius:12px;font-weight:600;transition:all .2s;font-size:15px}
+  .diag-cta:hover{background:var(--cyan-bright);transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,229,255,.3)}
+  .diag-preview{background:rgba(5,8,16,.6);border:1px solid var(--border);border-radius:14px;padding:24px;position:relative;z-index:1}
+  .diag-q{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+  .diag-q:last-child{border-bottom:none}
+  .diag-q-num{font-family:'JetBrains Mono';font-size:12px;color:var(--cyan);padding-top:3px;min-width:24px}
+  .diag-q-text{font-size:14.5px;color:#D0D6E0}
+  .diag-q-opts{font-size:12px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono'}
+
+  /* --- ATLAS CARD --- */
+  .atlas-feature{background:radial-gradient(ellipse at bottom right,rgba(0,184,212,.1),transparent 60%),rgba(11,37,64,.4);border:1px solid var(--border);border-radius:var(--radius-lg);padding:48px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+  .atlas-meta{display:flex;align-items:center;gap:12px;margin-bottom:18px;font-family:'JetBrains Mono';font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+  .atlas-meta .tag{padding:5px 10px;background:rgba(0,184,212,.12);color:var(--cyan);border-radius:6px}
+  .atlas-meta .muted{color:var(--muted)}
+  .atlas-feature h3{font-family:'Space Grotesk';font-size:46px;font-weight:700;color:var(--mist);margin:0 0 18px;line-height:1.1}
+  .atlas-feature .lede{font-size:18px;color:#C0C8D5;margin:0 0 22px;line-height:1.55}
+  .atlas-feature p{color:#A0A8B5;margin:0 0 22px}
+  .atlas-feature .see-also{display:flex;flex-wrap:wrap;gap:8px}
+  .atlas-feature .see-also a{padding:6px 12px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;font-size:13px;color:#B8C0CC;transition:all .2s}
+  .atlas-feature .see-also a:hover{border-color:var(--cyan);color:var(--cyan)}
+  .atlas-visual{display:flex;justify-content:center;align-items:center;min-height:280px;position:relative}
+
+  /* --- LENS CARDS --- */
+  .lens-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .lens-card{background:rgba(11,37,64,.4);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:all .3s var(--ease)}
+  .lens-card:hover{transform:translateY(-4px);border-color:var(--border-2);box-shadow:var(--shadow-card-hover)}
+  .lens-thumb{aspect-ratio:16/9;background:linear-gradient(135deg,#0a1428,#162340);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .lens-thumb::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,transparent 30%,rgba(5,8,16,.6) 90%)}
+  .play-btn{position:relative;z-index:1;width:54px;height:54px;border-radius:50%;background:rgba(0,184,212,.92);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 10px rgba(0,184,212,.15);transition:transform .25s}
+  .lens-card:hover .play-btn{transform:scale(1.08)}
+  .lens-body{padding:22px}
+  .lens-body h4{font-family:'Space Grotesk';font-size:18px;font-weight:600;color:var(--mist);margin:0 0 8px}
+  .lens-body p{font-size:14px;color:#A0A8B5;margin:0 0 14px}
+  .lens-time{font-family:'JetBrains Mono';font-size:11.5px;color:var(--muted);letter-spacing:.1em}
+
+  /* --- PROMISE COLUMNS --- */
+  .promise-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px}
+  .promise{padding:36px;border:1px solid var(--border);border-radius:var(--radius-lg);background:rgba(11,37,64,.25);transition:all .3s var(--ease)}
+  .promise:hover{border-color:var(--border-2);background:rgba(11,37,64,.4)}
+  .promise-icon{width:48px;height:48px;border-radius:12px;background:rgba(0,184,212,.1);display:flex;align-items:center;justify-content:center;color:var(--cyan);margin-bottom:22px}
+  .promise h3{font-family:'Space Grotesk';font-size:22px;font-weight:600;margin:0 0 12px;color:var(--mist)}
+  .promise p{color:#A8B0BC;margin:0;font-size:15px}
+
+  /* --- NEWSLETTER --- */
+  .newsletter{text-align:center;background:linear-gradient(135deg,rgba(0,184,212,.06),rgba(165,107,255,.04));border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:64px 32px;margin:80px 0;position:relative;overflow:hidden}
+  .newsletter::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,229,255,.08),transparent 60%)}
+  .newsletter > *{position:relative}
+  .newsletter h2{font-family:'Space Grotesk';font-size:42px;font-weight:600;margin:0 0 12px;color:var(--mist)}
+  .newsletter p{color:#B0B8C5;margin:0 0 32px;font-size:17px}
+  .newsletter-form{display:flex;max-width:480px;margin:0 auto;background:rgba(5,8,16,.6);border:1px solid var(--border);border-radius:14px;padding:6px;backdrop-filter:blur(8px);transition:border-color .25s}
+  .newsletter-form:focus-within{border-color:var(--cyan)}
+  .newsletter-form input{flex:1;background:transparent;border:none;outline:none;color:var(--mist);padding:14px 16px;font-family:inherit;font-size:15px}
+  .newsletter-form button{background:var(--cyan);color:#001318;padding:12px 22px;border-radius:10px;font-weight:600;transition:all .2s}
+  .newsletter-form button:hover{background:var(--cyan-bright)}
+
+  /* --- FOOTER --- */
+  footer{padding:60px 0 40px;border-top:1px solid var(--border);background:rgba(5,8,16,.6)}
+  .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+  .footer-brand .wordmark{font-family:'Space Grotesk';font-weight:700;font-size:24px;margin-bottom:10px;display:block}
+  .footer-brand .wordmark .two{color:var(--cyan)}
+  .footer-brand p{color:var(--muted);max-width:280px;font-size:14px;margin:8px 0 0}
+  .footer-col h5{font-family:'Space Grotesk';font-size:12px;color:var(--mist);text-transform:uppercase;letter-spacing:.15em;margin:0 0 16px}
+  .footer-col a{display:block;color:#90989F;font-size:14px;padding:5px 0;transition:color .2s}
+  .footer-col a:hover{color:var(--cyan)}
+  .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:30px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;font-family:'JetBrains Mono'}
+
+  /* --- DID YOU KNOW TOAST --- */
+  .toast{position:fixed;bottom:28px;right:28px;width:320px;background:linear-gradient(180deg,rgba(11,37,64,.95),rgba(15,47,82,.95));border:1px solid var(--cyan);border-radius:14px;padding:18px 20px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,229,255,.2),0 0 0 4px rgba(0,229,255,.06);z-index:80;transform:translateY(120%);opacity:0;transition:all .5s var(--ease)}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .toast-eyebrow{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.3em;color:var(--cyan);text-transform:uppercase}
+  .toast-close{color:var(--muted);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;transition:all .2s}
+  .toast-close:hover{background:rgba(255,255,255,.08);color:var(--mist)}
+  .toast-body{font-size:14.5px;color:var(--mist);margin-bottom:12px;line-height:1.5}
+  .toast-link{font-size:13px;color:var(--cyan);font-weight:500}
+  .toast-link:hover{color:var(--cyan-bright)}
+
+  /* --- R2 COPILOT BUBBLE & DRAWER --- */
+  .copilot-bubble{position:fixed;bottom:28px;left:28px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--cyan-bright));display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:75;box-shadow:0 10px 30px rgba(0,229,255,.4),0 0 0 0 rgba(0,229,255,.4);animation:bubblePulse 3s ease-in-out infinite;transition:transform .2s}
+  .copilot-bubble:hover{transform:scale(1.08)}
+  @keyframes bubblePulse{0%,100%{box-shadow:0 10px 30px rgba(0,229,255,.4),0 0 0 0 rgba(0,229,255,.4)}50%{box-shadow:0 10px 30px rgba(0,229,255,.4),0 0 0 12px rgba(0,229,255,0)}}
+  .copilot-drawer{position:fixed;inset:0;background:rgba(5,8,16,.85);backdrop-filter:blur(10px);z-index:100;display:none;align-items:flex-end;justify-content:center;padding:0}
+  .copilot-drawer.open{display:flex;animation:fadeIn .3s var(--ease)}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .copilot-panel{width:100%;max-width:780px;background:linear-gradient(180deg,#0a1428,#050810);border-top:1px solid var(--border-2);border-radius:24px 24px 0 0;padding:32px;max-height:88vh;overflow:auto;animation:slideUp .35s var(--ease)}
+  @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .copilot-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+  .copilot-head-l{display:flex;align-items:center;gap:14px}
+  .copilot-head-l .name{font-family:'Space Grotesk';font-weight:600;font-size:20px}
+  .copilot-head-l .status{font-family:'JetBrains Mono';font-size:11.5px;color:var(--green);display:flex;align-items:center;gap:6px}
+  .copilot-head-l .status::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+  .copilot-msg{display:flex;gap:14px;margin-bottom:20px}
+  .copilot-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--cyan-bright));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:13px;color:#001318}
+  .copilot-avatar.user{background:rgba(255,255,255,.08);color:var(--mist)}
+  .copilot-bubble-msg{background:rgba(11,37,64,.5);border:1px solid var(--border);border-radius:14px;padding:16px 18px;font-size:14.5px;line-height:1.6;flex:1}
+  .copilot-bubble-msg.user{background:rgba(0,184,212,.08);border-color:var(--border-2)}
+  .copilot-bubble-msg .src{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;font-size:12px}
+  .copilot-bubble-msg .src a{padding:3px 9px;background:rgba(0,184,212,.1);color:var(--cyan);border-radius:6px}
+  .copilot-input{display:flex;gap:8px;margin-top:24px}
+  .copilot-input input{flex:1;background:rgba(11,37,64,.5);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--mist);font-family:inherit;font-size:15px;outline:none;transition:border-color .2s}
+  .copilot-input input:focus{border-color:var(--cyan)}
+  .copilot-input button{background:var(--cyan);color:#001318;padding:0 22px;border-radius:12px;font-weight:600;transition:all .2s}
+  .copilot-input button:hover{background:var(--cyan-bright)}
+  .copilot-quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .copilot-quick .chip{font-size:12.5px}
+
+  /* --- LOGO MORPH STYLES --- */
+  .morph-glyph .stroke{stroke:url(#cyanGrad);stroke-width:14;fill:none;stroke-linecap:round;transition:opacity .8s var(--ease)}
+  @media (prefers-reduced-motion: reduce){
+    .logo-stage svg .anim-2,.logo-stage svg .anim-0,.logo-stage svg .anim-inf{animation:none !important}
+  }
+
+  /* --- RESPONSIVE --- */
+  @media (max-width:900px){
+    .nav-links{display:none}
+    .kbd-hint span{display:none}
+    .pulse-grid,.lens-grid,.promise-grid{grid-template-columns:1fr;gap:16px}
+    .diag-block,.atlas-feature{grid-template-columns:1fr;padding:36px;gap:32px}
+    .footer-grid{grid-template-columns:1fr 1fr;gap:30px}
+    .toast{right:14px;left:14px;width:auto;bottom:90px}
+    .copilot-bubble{bottom:18px;left:18px}
+  }
+</style>
+</head>
+<body>
+
+<!-- Particle field background -->
+<canvas id="particles"></canvas>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="container nav-wrap">
+    <a href="#" class="nav-logo" aria-label="R2BOT — ROBOT, decoded">
+      <svg width="36" height="36" viewBox="0 0 60 60" aria-hidden="true">
+        <defs>
+          <linearGradient id="navGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#00E5FF"/><stop offset="1" stop-color="#00B8D4"/>
+          </linearGradient>
+        </defs>
+        <g transform="translate(8,6)" fill="none" stroke="url(#navGrad)" stroke-width="5" stroke-linecap="round">
+          <ellipse cx="22" cy="16" rx="16" ry="14"/>
+          <path d="M 6 24 Q 22 38 38 26 Q 42 42 22 42 L 6 48"/>
+          <line x1="6" y1="48" x2="38" y2="48"/>
+        </g>
+      </svg>
+      <span class="wordmark">R<span class="two">2</span>BOT</span>
+    </a>
+    <div class="nav-links">
+      <a href="#pulse">Pulse</a>
+      <a href="#atlas">Atlas</a>
+      <a href="#academy">Academy</a>
+      <a href="#lens">Lens</a>
+      <a href="#about">About</a>
+    </div>
+    <div class="nav-right">
+      <button class="kbd-hint" onclick="openCopilot()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <span>Ask R2</span>
+        <kbd>⌘K</kbd>
+      </button>
+      <button class="btn btn-ghost">Sign in</button>
+      <button class="btn btn-primary">Get started</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner container">
+    <div class="logo-stage">
+      <!-- Animated Möbius 2 / 0 / ∞ logo -->
+      <svg width="280" height="280" viewBox="0 0 280 280" aria-label="R2BOT logo: the 2 reads as 0 and infinity">
+        <defs>
+          <linearGradient id="cyanGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#00E5FF"/><stop offset="1" stop-color="#00B8D4"/>
+          </linearGradient>
+          <linearGradient id="purpleGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#A56BFF"/><stop offset="1" stop-color="#00E5FF"/>
+          </linearGradient>
+          <filter id="logoGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- The morph: 3 shapes layered, fading between them -->
+        <g transform="translate(140,140)" filter="url(#logoGlow)">
+          <!-- 2 shape -->
+          <g class="anim-2" stroke="url(#cyanGrad)" stroke-width="14" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="0" cy="-35" rx="55" ry="48"/>
+            <path d="M -50 0 Q 0 50 50 -5 Q 60 70 0 75 L -55 90"/>
+            <line x1="-55" y1="90" x2="55" y2="90"/>
+          </g>
+          <!-- 0 shape -->
+          <g class="anim-0" stroke="url(#cyanGrad)" stroke-width="14" fill="none" stroke-linecap="round" opacity="0">
+            <ellipse cx="0" cy="0" rx="65" ry="78"/>
+          </g>
+          <!-- ∞ shape -->
+          <g class="anim-inf" stroke="url(#purpleGrad)" stroke-width="14" fill="none" stroke-linecap="round" opacity="0">
+            <path d="M -65 0 C -65 -40 -20 -40 0 0 C 20 40 65 40 65 0 C 65 -40 20 -40 0 0 C -20 40 -65 40 -65 0 Z"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div class="hero-eyebrow">India · USA · China · Japan · Europe</div>
+    <h1 class="display hero-title">ROBOT, <span class="accent">decoded.</span></h1>
+    <p class="hero-sub">The world's most accessible robotics platform. Every robot, every breakthrough, every concept — explained in plain English. Free forever.</p>
+
+    <form class="askbar" onsubmit="event.preventDefault();openCopilot();" role="search">
+      <span class="askbar-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a9 9 0 0 0-9 9c0 2 .5 3.5 1.5 5L3 22l6-1.5c1.5 1 3 1.5 5 1.5a9 9 0 1 0-2-19z"/></svg>
+      </span>
+      <input id="askInput" placeholder="Ask R2 anything…" aria-label="Ask R2 Co-pilot anything about robotics"/>
+      <button type="submit" class="askbar-cta">
+        Ask R2 →
+      </button>
+    </form>
+
+    <div class="quick-chips">
+      <button class="chip" onclick="openCopilotWith('What is SLAM?')">What is SLAM?</button>
+      <button class="chip" onclick="openCopilotWith('How does Optimus walk?')">How does Optimus walk?</button>
+      <button class="chip" onclick="openCopilotWith(&quot;I&apos;m 14 — where do I start?&quot;)">I'm 14 — where do I start?</button>
+      <button class="chip" onclick="openCopilotWith('Boston Dynamics vs Unitree')">Boston Dynamics vs Unitree</button>
+    </div>
+  </div>
+
+  <div class="scroll-hint">SCROLL</div>
+</section>
+
+<!-- PULSE -->
+<section id="pulse">
+  <div class="container">
+    <div class="section-eyebrow">Pulse · Today's robotics</div>
+    <h2 class="display section-title">What just happened in robotics</h2>
+    <p class="section-lede">Every major story, decoded in 60 seconds. What happened, why it matters, how it was built — in plain English, never engineering speak.</p>
+
+    <div class="pulse-grid">
+      <article class="pulse-card">
+        <span class="pulse-tag usa">USA · Humanoid</span>
+        <h3>Figure 03 demonstrates folding laundry — without scripted moves</h3>
+        <p>The latest humanoid uses a vision-language-action model trained on 11,000 hours of human demos. Here's why folding a t-shirt is harder than welding a car…</p>
+        <div class="pulse-meta">
+          <span>2 hours ago · 4 min read</span>
+          <span class="pulse-arrow">→</span>
+        </div>
+      </article>
+      <article class="pulse-card">
+        <span class="pulse-tag china">China · Industrial</span>
+        <h3>Unitree H1 hits 3.3 m/s — fastest bipedal robot ever</h3>
+        <p>That's about jogging speed for an adult. The breakthrough isn't the motors — it's the reinforcement learning policy that lets it recover from any push.</p>
+        <div class="pulse-meta">
+          <span>Yesterday · 5 min read</span>
+          <span class="pulse-arrow">→</span>
+        </div>
+      </article>
+      <article class="pulse-card">
+        <span class="pulse-tag india">India · Space</span>
+        <h3>ISRO's robotic arm catches a satellite mid-orbit — first ever for India</h3>
+        <p>The OSPREY arm grabbed a tumbling test target 400 km above Earth, paving the way for in-orbit refueling. Here's how a 6-axis arm tracks something moving at 7.8 km/s…</p>
+        <div class="pulse-meta">
+          <span>2 days ago · 6 min read</span>
+          <span class="pulse-arrow">→</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- DIAGNOSTIC -->
+<section id="academy">
+  <div class="container">
+    <div class="section-eyebrow">Academy · Find your level</div>
+    <h2 class="display section-title">Where do you start? Take the 60-second test.</h2>
+    <p class="section-lede">Five questions. No grades. We place you at the right level — Spark, Wire, Forge, or Edge — and your AI tutor picks up from there.</p>
+
+    <div class="diag-block">
+      <div class="diag-left">
+        <h3>Start at the right step. Skip the boredom.</h3>
+        <p>Whether you've never touched a wire or you've already built a robot — R2 builds a learning path that doesn't waste your time. 35 courses across 6 tracks. Free forever.</p>
+        <button class="diag-cta">
+          Start the diagnostic
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+        </button>
+      </div>
+      <div class="diag-preview">
+        <div class="diag-q"><span class="diag-q-num">01</span><div><div class="diag-q-text">Have you ever soldered a wire?</div><div class="diag-q-opts">Yes  ·  No  ·  What's solder?</div></div></div>
+        <div class="diag-q"><span class="diag-q-num">02</span><div><div class="diag-q-text">Can you write a for-loop in any language?</div><div class="diag-q-opts">Easily  ·  With Google  ·  Not yet</div></div></div>
+        <div class="diag-q"><span class="diag-q-num">03</span><div><div class="diag-q-text">Have you used Linux from the command line?</div><div class="diag-q-opts">Yes  ·  Tried  ·  No</div></div></div>
+        <div class="diag-q"><span class="diag-q-num">04</span><div><div class="diag-q-text">Do you know what PWM means?</div><div class="diag-q-opts">Yes  ·  Heard of it  ·  No</div></div></div>
+        <div class="diag-q"><span class="diag-q-num">05</span><div><div class="diag-q-text">Built anything that moves on its own?</div><div class="diag-q-opts">Yes  ·  Sort of  ·  No</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ATLAS -->
+<section id="atlas">
+  <div class="container">
+    <div class="section-eyebrow">Atlas · Today's featured entry</div>
+    <h2 class="display section-title">The robotics encyclopedia, decoded</h2>
+    <p class="section-lede">5,000 entries on every concept, every robot, every person, every paper. No jargon. No paywall. Just answers.</p>
+
+    <article class="atlas-feature">
+      <div>
+        <div class="atlas-meta">
+          <span class="tag">Concept</span>
+          <span class="muted">Last reviewed · 3 days ago</span>
+        </div>
+        <h3>What is SLAM?</h3>
+        <p class="lede">SLAM is the technique a robot uses to build a map of an unfamiliar place — while figuring out where it is on that map. Both at the same time.</p>
+        <p>Imagine being dropped into a dark warehouse, blindfolded, with nothing but a flashlight and a sketchpad. Every step, you mark what you can see. After enough steps, you have a map AND you know where you are on it. That's SLAM — Simultaneous Localization And Mapping.</p>
+        <div class="see-also">
+          <a href="#">Lidar</a>
+          <a href="#">Visual odometry</a>
+          <a href="#">Particle filter</a>
+          <a href="#">ROS Nav2</a>
+          <a href="#">Loop closure</a>
+        </div>
+      </div>
+      <div class="atlas-visual">
+        <!-- SLAM illustration: dot in middle, rings/scan lines -->
+        <svg width="280" height="280" viewBox="0 0 280 280" aria-hidden="true">
+          <defs>
+            <linearGradient id="atlasGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#00E5FF" stop-opacity=".9"/>
+              <stop offset="1" stop-color="#00B8D4" stop-opacity=".3"/>
+            </linearGradient>
+          </defs>
+          <g transform="translate(140,140)" fill="none" stroke="url(#atlasGrad)">
+            <circle r="30" stroke-width="1" stroke-dasharray="2 4" opacity=".4"/>
+            <circle r="60" stroke-width="1" stroke-dasharray="2 4" opacity=".35"/>
+            <circle r="95" stroke-width="1" stroke-dasharray="2 4" opacity=".3"/>
+            <circle r="130" stroke-width="1" stroke-dasharray="2 4" opacity=".22"/>
+            <!-- Scan beam -->
+            <path d="M 0 0 L 110 -55 A 123 123 0 0 1 110 55 Z" fill="rgba(0,229,255,.12)" stroke="none"/>
+            <!-- Robot dot -->
+            <circle r="9" fill="#00E5FF"/>
+            <circle r="14" fill="none" stroke="#00E5FF" stroke-width="2" opacity=".5"/>
+            <!-- Map dots -->
+            <g fill="#00E5FF">
+              <circle cx="80" cy="-30" r="2"/>
+              <circle cx="110" cy="-10" r="2"/>
+              <circle cx="100" cy="25" r="2"/>
+              <circle cx="-60" cy="60" r="2"/>
+              <circle cx="-90" cy="-40" r="2"/>
+              <circle cx="-30" cy="-100" r="2"/>
+              <circle cx="60" cy="80" r="2"/>
+              <circle cx="-100" cy="20" r="2"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- LENS -->
+<section id="lens">
+  <div class="container">
+    <div class="section-eyebrow">Lens · The best videos, decoded</div>
+    <h2 class="display section-title">Don't watch 45 minutes to learn 4</h2>
+    <p class="section-lede">We curate the best robotics videos on the internet, summarize them in plain English, and tell you exactly how the thing was built.</p>
+
+    <div class="lens-grid">
+      <article class="lens-card">
+        <div class="lens-thumb">
+          <div class="play-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#001318"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+        <div class="lens-body">
+          <h4>Tesla Optimus walking — explained in 4 minutes</h4>
+          <p>The video is 22 minutes. The 4-minute version covers what actually changed in Gen 3: torque-controlled actuators and the foot heel-strike model.</p>
+          <span class="lens-time">04:12 · Humanoid</span>
+        </div>
+      </article>
+      <article class="lens-card">
+        <div class="lens-thumb">
+          <div class="play-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#001318"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+        <div class="lens-body">
+          <h4>How a Roomba decides where to clean</h4>
+          <p>Spoiler: it's not random. We break down the SLAM, the bumper sensors, and the "dirt detect" microphone that catches crumbs.</p>
+          <span class="lens-time">03:48 · Consumer</span>
+        </div>
+      </article>
+      <article class="lens-card">
+        <div class="lens-thumb">
+          <div class="play-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#001318"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+        <div class="lens-body">
+          <h4>The DJI drone gimbal in slow-motion</h4>
+          <p>Three brushless motors, fighting gravity 8,000 times a second. Here's the controller loop that keeps your shot perfectly steady.</p>
+          <span class="lens-time">05:30 · Drones</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- PROMISE -->
+<section id="about">
+  <div class="container">
+    <div class="section-eyebrow">The promise</div>
+    <h2 class="display section-title">Three things we won't ever change.</h2>
+    <p class="section-lede">No paywall. No jargon. No making things up. This is the deal — for every learner, forever.</p>
+
+    <div class="promise-grid">
+      <div class="promise">
+        <div class="promise-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+        </div>
+        <h3>Free forever for learners</h3>
+        <p>All Atlas entries, all courses, the diagnostic test, R2 Co-pilot — free. We pay for it with affiliate links and ethical sponsorships, never your data.</p>
+      </div>
+      <div class="promise">
+        <div class="promise-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18M3 16h18M9 4v16M15 4v16"/></svg>
+        </div>
+        <h3>Plain English, always</h3>
+        <p>Every page begins with the answer in one sentence. Jargon is defined the moment we use it. Treat the reader as a smart adult, never as a beginner who needs talking down to.</p>
+      </div>
+      <div class="promise">
+        <div class="promise-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 12 2 2 4-4"/><path d="M21 12c0 5-4 9-9 9s-9-4-9-9 4-9 9-9c2 0 4 .8 5.5 2"/></svg>
+        </div>
+        <h3>Cited, never invented</h3>
+        <p>R2 Co-pilot grounds every answer in the Atlas — and if it doesn't know, it says so. Every entry shows its sources. No hallucinations dressed up as facts.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section>
+  <div class="container">
+    <div class="newsletter">
+      <h2 class="display">Get one Pulse per week.</h2>
+      <p>The most important thing that happened in robotics — explained in 3 paragraphs. No spam. No data sold. Unsubscribe in one click.</p>
+      <form class="newsletter-form" onsubmit="event.preventDefault();alert('Thanks! You\'ll get the first Pulse on the next Monday.');">
+        <input type="email" placeholder="you@email.com" required aria-label="Your email"/>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="wordmark" href="#">R<span class="two">2</span>BOT</a>
+        <p>The world's most accessible robotics platform. ROBOT, decoded.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Explore</h5>
+        <a href="#pulse">Pulse</a>
+        <a href="#atlas">Atlas</a>
+        <a href="#academy">Academy</a>
+        <a href="#lens">Lens</a>
+      </div>
+      <div class="footer-col">
+        <h5>Learn</h5>
+        <a href="#">Spark (Beginner)</a>
+        <a href="#">Wire (Intermediate)</a>
+        <a href="#">Forge (Advanced)</a>
+        <a href="#">Edge (Expert)</a>
+        <a href="#">Tiny Bots (Kids)</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="#">About</a>
+        <a href="#">Mission</a>
+        <a href="#">Press</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">DPDP compliance</a>
+        <a href="#">Sources & attribution</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 R2BOT · Built in India · For the world</span>
+      <span>v1.0 · Made with curiosity</span>
+    </div>
+  </div>
+</footer>
+
+<!-- DID YOU KNOW TOAST -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <div class="toast-head">
+    <span class="toast-eyebrow">Did you know?</span>
+    <button class="toast-close" onclick="closeToast()" aria-label="Dismiss">×</button>
+  </div>
+  <div class="toast-body" id="toastBody">A surgical robot's arm is more precise than a human hair is thick.</div>
+  <a class="toast-link" href="#">Read more in Atlas →</a>
+</div>
+
+<!-- COPILOT BUBBLE -->
+<button class="copilot-bubble" onclick="openCopilot()" aria-label="Open R2 Co-pilot">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#001318" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12c0 4.4-4 8-9 8-1.4 0-2.7-.3-3.9-.8L3 21l1.5-4.5C3.5 15.2 3 13.6 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/>
+    <circle cx="9" cy="12" r="1" fill="#001318"/>
+    <circle cx="15" cy="12" r="1" fill="#001318"/>
+  </svg>
+</button>
+
+<!-- COPILOT DRAWER -->
+<div class="copilot-drawer" id="copilotDrawer" onclick="if(event.target===this)closeCopilot()">
+  <div class="copilot-panel">
+    <div class="copilot-head">
+      <div class="copilot-head-l">
+        <svg width="38" height="38" viewBox="0 0 60 60">
+          <g transform="translate(8,6)" fill="none" stroke="url(#navGrad)" stroke-width="5" stroke-linecap="round">
+            <ellipse cx="22" cy="16" rx="16" ry="14"/>
+            <path d="M 6 24 Q 22 38 38 26 Q 42 42 22 42 L 6 48"/>
+            <line x1="6" y1="48" x2="38" y2="48"/>
+          </g>
+        </svg>
+        <div>
+          <div class="name">R2 Co-pilot</div>
+          <div class="status">Online · grounded in 4,832 Atlas entries</div>
+        </div>
+      </div>
+      <button class="toast-close" onclick="closeCopilot()" aria-label="Close" style="width:36px;height:36px;font-size:20px">×</button>
+    </div>
+
+    <div id="copilotMessages">
+      <div class="copilot-msg">
+        <div class="copilot-avatar">R2</div>
+        <div class="copilot-bubble-msg">
+          Hi! I'm <strong>R2 Co-pilot</strong> — the AI brain of R2BOT. Ask me anything about robotics, in any language, at any level. I'll explain it like you've never heard the terms before.<br/><br/>
+          Try one of the chips below, or type your own question.
+        </div>
+      </div>
+    </div>
+
+    <div class="copilot-input">
+      <input id="copilotInput" placeholder="What is a quadruped robot?" />
+      <button onclick="sendCopilot()">Send</button>
+    </div>
+    <div class="copilot-quick">
+      <button class="chip" onclick="askCopilot('What is SLAM?')">What is SLAM?</button>
+      <button class="chip" onclick="askCopilot('How does Optimus walk?')">How does Optimus walk?</button>
+      <button class="chip" onclick="askCopilot('Best robot kit for a 10-year-old')">Best robot kit for a 10-year-old</button>
+      <button class="chip" onclick="askCopilot('Difference between AI and a robot')">AI vs robot</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // -------- Nav scroll effect --------
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 12);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // -------- Logo morph animation: 2 → 0 → ∞ → 2 --------
+  (function morphLogo(){
+    const a2 = document.querySelector('.anim-2');
+    const a0 = document.querySelector('.anim-0');
+    const aInf = document.querySelector('.anim-inf');
+    if (!a2 || !a0 || !aInf) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+    const seq = [
+      [a2,'1'], [a0,'0'], [a2,'0'],
+      [a2,'0'], [aInf,'1'],
+      [aInf,'0'], [a2,'1']
+    ];
+    let i = 0;
+    function tick(){
+      // Cross-fade between current and next
+      const phase = i % 3;
+      if (phase === 0){ a2.style.opacity='1'; a0.style.opacity='0'; aInf.style.opacity='0'; }
+      if (phase === 1){ a2.style.opacity='0'; a0.style.opacity='1'; aInf.style.opacity='0'; }
+      if (phase === 2){ a2.style.opacity='0'; a0.style.opacity='0'; aInf.style.opacity='1'; }
+      i++;
+      setTimeout(tick, 2400);
+    }
+    tick();
+  })();
+
+  // -------- Particle field --------
+  (function particles(){
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let w, h, particles = [];
+    const COUNT = 60;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function resize(){
+      w = canvas.width = window.innerWidth * devicePixelRatio;
+      h = canvas.height = window.innerHeight * devicePixelRatio;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+    }
+    function init(){
+      particles = [];
+      for (let i = 0; i < COUNT; i++){
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.18 * devicePixelRatio,
+          vy: (Math.random() - 0.5) * 0.18 * devicePixelRatio,
+          r: (Math.random() * 1.2 + 0.4) * devicePixelRatio
+        });
+      }
+    }
+    function draw(){
+      ctx.clearRect(0,0,w,h);
+      // dots
+      ctx.fillStyle = 'rgba(0,229,255,.55)';
+      for (const p of particles){
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+      }
+      // connections
+      ctx.strokeStyle = 'rgba(0,229,255,.08)';
+      ctx.lineWidth = devicePixelRatio * 0.5;
+      for (let i = 0; i < particles.length; i++){
+        for (let j = i + 1; j < particles.length; j++){
+          const a = particles[i], b = particles[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const d = dx*dx + dy*dy;
+          const max = 18000 * devicePixelRatio * devicePixelRatio;
+          if (d < max){
+            ctx.globalAlpha = 1 - d/max;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+      if (!reduce) requestAnimationFrame(draw);
+    }
+    resize(); init(); draw();
+    window.addEventListener('resize', () => { resize(); init(); });
+  })();
+
+  // -------- Cursor trail --------
+  (function cursor(){
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || 'ontouchstart' in window) return;
+    const dots = [];
+    const NUM = 8;
+    for (let i = 0; i < NUM; i++){
+      const d = document.createElement('div');
+      d.className = 'cursor-dot';
+      d.style.opacity = (1 - i / NUM) * 0.5;
+      d.style.transform = `scale(${1 - i*0.08})`;
+      document.body.appendChild(d);
+      dots.push({ el: d, x: 0, y: 0 });
+    }
+    let mx = -100, my = -100;
+    window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function loop(){
+      let px = mx, py = my;
+      for (const d of dots){
+        d.x += (px - d.x) * 0.35;
+        d.y += (py - d.y) * 0.35;
+        d.el.style.left = (d.x - 3) + 'px';
+        d.el.style.top = (d.y - 3) + 'px';
+        px = d.x; py = d.y;
+      }
+      requestAnimationFrame(loop);
+    }
+    loop();
+  })();
+
+  // -------- Did you know toast (rotates) --------
+  const facts = [
+    "A surgical robot's arm is more precise than a human hair is thick.",
+    "ISRO's Vikas engine has flown 90+ missions — it's a robot you don't see.",
+    "The first industrial robot, Unimate, was installed at a GM plant in 1961.",
+    "A Roomba doesn't clean randomly — it builds a real map of your home.",
+    "China makes more industrial robots per year than the next 5 countries combined.",
+    "Boston Dynamics' Atlas has fallen on stage more than any human comedian.",
+    "The cheapest humanoid robot you can buy in 2026 costs less than a used car."
+  ];
+  let factIndex = 0;
+  function showToast(){
+    document.getElementById('toastBody').textContent = facts[factIndex % facts.length];
+    document.getElementById('toast').classList.add('show');
+    factIndex++;
+    setTimeout(closeToast, 14000);
+  }
+  function closeToast(){ document.getElementById('toast').classList.remove('show'); }
+  // First trigger after 8s (demo). Re-trigger every 75s.
+  setTimeout(showToast, 8000);
+  setInterval(showToast, 75000);
+
+  // -------- Ask bar placeholder rotation --------
+  (function cycleAskbar(){
+    const input = document.getElementById('askInput');
+    const placeholders = [
+      "Ask R2 anything…",
+      "What is SLAM?",
+      "How does Optimus walk?",
+      "I'm 14 — where do I start?",
+      "Difference between AI and a robot",
+      "Best Arduino kit for beginners"
+    ];
+    let i = 0;
+    setInterval(() => {
+      if (document.activeElement === input) return;
+      i = (i + 1) % placeholders.length;
+      input.placeholder = placeholders[i];
+    }, 3200);
+  })();
+
+  // -------- R2 Co-pilot drawer --------
+  function openCopilot(){ document.getElementById('copilotDrawer').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('copilotInput').focus(),300); }
+  function closeCopilot(){ document.getElementById('copilotDrawer').classList.remove('open'); document.body.style.overflow=''; }
+  function openCopilotWith(q){ openCopilot(); setTimeout(()=>askCopilot(q),300); }
+
+  const demoAnswers = {
+    "what is slam?": {
+      a: "<strong>SLAM</strong> — Simultaneous Localization And Mapping — is how a robot builds a map of a place it's never been to, while figuring out where it is on that map. Both at the same time.<br/><br/>Picture being dropped into a dark warehouse with a flashlight and a notepad. Every step you take, you mark what you see. After enough steps, you have a real map — and you know exactly where you are on it. That's SLAM, just done thousands of times per second by a lidar or a camera.",
+      sources: ["Atlas: SLAM", "Atlas: Lidar", "Atlas: Visual odometry"]
+    },
+    "how does optimus walk?": {
+      a: "Tesla's Optimus walks using <strong>torque-controlled actuators</strong> — motors that don't just rotate, but sense how much force they're producing. The robot's controller predicts, 200 times a second, where its center of mass will be a half-second from now. Then it places the next foot exactly where it needs to be to stay upright.<br/><br/>The Gen 3 model added a <strong>heel-strike walking pattern</strong> — landing on the heel first, then rolling to the toe. That's how humans walk too, and it's much more energy-efficient than the flat-footed shuffle the early versions used.",
+      sources: ["Atlas: Optimus", "Atlas: Bipedal walking", "Atlas: Inverse kinematics"]
+    },
+    "i'm 14 — where do i start?": {
+      a: "Welcome — 14 is a perfect age to start.<br/><br/>I'd recommend this exact path:<br/>1. Take the <strong>60-second diagnostic</strong> — it'll tell us if you start at Spark or Wire.<br/>2. <strong>Spark 01: What is a Robot, Really?</strong> — 15 minutes. Builds your foundation.<br/>3. <strong>Spark 06: Your Very First Circuit</strong> — order a ₹500 starter kit, do the lesson, blink an LED. That's hour one of your robotics life.<br/>4. Come back next week. I'll remember where we left off.",
+      sources: ["Academy: Spark track", "Academy: Diagnostic test", "Atlas: What is a robot"]
+    }
+  };
+
+  function askCopilot(q){
+    document.getElementById('copilotInput').value = q;
+    sendCopilot();
+  }
+
+  function sendCopilot(){
+    const input = document.getElementById('copilotInput');
+    const q = input.value.trim();
+    if (!q) return;
+    input.value = '';
+    const msgs = document.getElementById('copilotMessages');
+
+    // User message
+    const u = document.createElement('div');
+    u.className = 'copilot-msg';
+    u.innerHTML = `<div class="copilot-avatar user">You</div><div class="copilot-bubble-msg user">${escapeHtml(q)}</div>`;
+    msgs.appendChild(u);
+
+    // Thinking
+    const t = document.createElement('div');
+    t.className = 'copilot-msg';
+    t.innerHTML = `<div class="copilot-avatar">R2</div><div class="copilot-bubble-msg"><span class="mono" style="color:var(--cyan)">R2 thinking</span><span id="dots">…</span></div>`;
+    msgs.appendChild(t);
+    msgs.parentElement.scrollTop = msgs.parentElement.scrollHeight;
+
+    // Animate dots
+    let n = 0;
+    const dots = t.querySelector('#dots');
+    const id = setInterval(()=>{ n=(n+1)%4; dots.textContent = '.'.repeat(n); }, 220);
+
+    setTimeout(() => {
+      clearInterval(id);
+      const key = q.toLowerCase();
+      const match = Object.keys(demoAnswers).find(k => key.includes(k.replace(/[^a-z ]/g,'')) || k.includes(key));
+      let answer = match ? demoAnswers[match] : {
+        a: `Great question. In production, R2 Co-pilot would now:<br/>1. Embed your question and find the top 8 most-relevant Atlas entries.<br/>2. Send them as context to Claude.<br/>3. Stream back a grounded, cited answer in plain English.<br/><br/>This is a homepage demo, so the live AI isn't wired up yet — but the architecture is documented in the strategy doc, section 5 and 8.`,
+        sources: ["Strategy: Section 5 — R2 Co-pilot", "Strategy: Section 8 — Tech Architecture"]
+      };
+      t.querySelector('.copilot-bubble-msg').innerHTML = answer.a + `<div class="src">${answer.sources.map(s=>`<a href="#">${s}</a>`).join('')}</div>`;
+      msgs.parentElement.scrollTop = msgs.parentElement.scrollHeight;
+    }, 1100);
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // -------- Cmd+K / Ctrl+K --------
+  window.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k'){
+      e.preventDefault();
+      openCopilot();
+    }
+    if (e.key === 'Escape'){ closeCopilot(); closeToast(); }
+  });
+
+  // -------- Scroll reveals --------
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries){
+      if (e.isIntersecting){
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        io.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0.12 });
+  document.querySelectorAll('section > .container > *').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = `opacity .6s ${i * 60}ms var(--ease), transform .6s ${i * 60}ms var(--ease)`;
+    io.observe(el);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+---
+title: Motor Driver in Robotics — Complete Guide
+summary: >-
+  A motor driver is an electronic circuit that lets a low-power microcontroller
+  control a high-power motor. The bridge between brain (Arduino) and muscle
+  (motor).
+category: hardware
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - motor
+  - driver
+  - h-bridge
+  - pwm
+seeAlso:
+  - h-bridge
+  - pwm
+  - dc-motor
+  - brushless-motor
+difficulty: 3
+oneLiner: 'The concept concept: A motor driver is an electronic circuit that'
+laymanExplanation: >-
+  A motor driver (sometimes called motor controller) is an electronic circuit
+  that takes low-power control signals from a microcontroller (e.g., 5 V PWM
+  from Arduino) and switches a much higher-power supply to drive a motor.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without motor driver in robotics — complete guide, many concept systems in
+  robotics simply couldn't work.
+realRobotsThatUseThis:
+  - Every motor-controlled robot
+  - CNC machines
+  - Printers
+indianExample: >-
+  L293D, L298N, TB6612 — all motor-driver ICs widely sold in Indian electronics
+  shops at ₹50–₹200.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: Why is a motor driver needed between a microcontroller and a motor?
+  options:
+    - To translate code
+    - To handle the higher voltage and current the motor needs
+    - For Wi-Fi
+    - For balance
+  answer: 1
+  explanation: >-
+    Motors draw far more current than a microcontroller pin can supply. The
+    driver isolates and amplifies.
+mindBlowingFact: >-
+  Modern motor drivers can shut themselves down in 1 microsecond if they detect
+  over-current — faster than you can blink.
+industryApplications:
+  - robotics
+  - industrial
+  - automotive
+  - appliances
+  - 3D printers
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A motor driver is an electronic circuit that lets a low-power microcontroller
+  control a high-power motor. The bridge between brain (Arduino) and muscle
+  (motor).
+slug: motor-driver
+bucket: concept
+---
+
+# Motor Driver in Robotics
+
+## What is it?
+
+A motor driver (sometimes called motor controller) is an electronic circuit that takes low-power control signals from a microcontroller (e.g., 5 V PWM from Arduino) and switches a much higher-power supply to drive a motor.
+
+## How it works
+
+Most DC-motor drivers use an H-bridge of four power transistors (MOSFETs or BJTs). Closing diagonal pairs of transistors lets current flow through the motor in either direction. The microcontroller sends a PWM signal that the driver translates into motor voltage, controlling both direction (which diagonal is active) and speed (PWM duty cycle).
+
+## Real-world example
+
+L298N (the classic ₹120 driver from Robu.in) is the standard for beginner Arduino projects. TB6612FNG is more efficient. For BLDC motors, dedicated ESCs (Electronic Speed Controllers) act as motor drivers. Every robot's motors are connected to a motor driver.
+
+## Why it matters for robotics
+
+Without motor drivers, microcontrollers literally cannot move motors. Choosing the right motor driver — matched to current, voltage, and motor type — is one of the most common entry-level mistakes.
+
+## See also
+
+- [H Bridge](/atlas/concept/h-bridge)
+- [Pwm](/atlas/concept/pwm)
+- [Dc Motor](/atlas/concept/dc-motor)
+- [Brushless Motor](/atlas/concept/brushless-motor)

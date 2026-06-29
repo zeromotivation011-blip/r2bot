@@ -1,0 +1,78 @@
+---
+title: Motion planning
+category: control
+summary: >-
+  Motion planning determines the precise sequence of joint angles, wheel
+  velocities, or body configurations a robot must pass through to move safely
+  from one state to another, turning a high-level goal into executable commands.
+seeAlso: []
+sources:
+  - title: LaValle — Planning Algorithms (free online)
+    url: 'http://planning.cs.uiuc.edu/'
+  - title: MoveIt — motion planning framework for ROS
+    url: 'https://moveit.ros.org/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - navigation
+  - algorithms
+  - kinematics
+difficulty: 3
+oneLiner: 'The concept concept: Motion planning determines the precise sequence of joint'
+laymanExplanation: >-
+  Telling a robot arm to "pick up the cup" is like telling a first-year piano
+  student to "play the sonata." The instruction makes sense as a goal, but says
+  nothing about which finger goes where, at what speed, avoiding the other keys.
+  Every joint angle, every millisecond of motion, has to be worked out in
+  advance. That detailed planning — translating a goal in
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without motion planning, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Motion planning determines the precise sequence of joint angles, wheel
+  velocities, or body configurations a robot must pass through to move safely
+  from one state to another, turning a high-level goal into executable commands.
+slug: motion-planning
+bucket: concept
+---
+
+Telling a [robot](/atlas/concept/robot) arm to "pick up the cup" is like telling a first-year piano student to "play the sonata." The instruction makes sense as a goal, but says nothing about which finger goes where, at what speed, avoiding the other keys. Every [joint](/atlas/concept/joint) angle, every millisecond of motion, has to be worked out in advance. That detailed planning — translating a goal into every intermediate physical configuration the robot must pass through — is **motion planning**.
+
+## Configuration space: the key idea
+
+The most important concept in motion planning is **configuration space** (C-space). Rather than thinking about where each point on the robot's body is in 3D space, C-space collapses the robot's entire pose into a single point. A 6-joint robotic arm has a 6-dimensional C-space: one dimension per joint angle. Planning in C-space means finding a path from one point to another in this abstract space, where each point represents a fully defined pose of the robot.
+
+Obstacles in the real world become regions of "C-space" that are forbidden. Motion planning is then the problem of finding a curve through C-space that avoids those forbidden regions.
+
+## How it's done in practice
+
+Most industrial motion planners use one of two approaches. **Sampling-based planners** like RRT-Connect or CHOMP randomly sample configurations, test whether they're collision-free, and connect them into a path — fast and practical even for 7-DOF arms. **Optimisation-based planners** formulate motion planning as a mathematical optimisation problem, minimising path length or joint effort subject to collision and kinematic constraints, then solve it iteratively.
+
+The MoveIt framework — the de facto standard for robotic arm motion planning in [ROS](/atlas/concept/ros) — ships both kinds and lets engineers swap between them depending on the task.
+
+## A real example: surgical robots
+
+Intuitive Surgical's da Vinci system plans the motion of its instruments through a tight access port (a small incision) while avoiding the surrounding tissue. The planner must respect joint limits, avoid self-collision between arms, maintain the remote centre of motion (the instruments must pivot through the incision point, not drag across it), and react within milliseconds to surgeon inputs. This is motion planning under very hard geometric and safety constraints, in real time.
+
+## The difference from [path planning](/atlas/concept/path-planning)
+
+Path planning finds a geometric route — a sequence of positions in space. Motion planning finds a physically executable [trajectory](/atlas/concept/trajectory) — a sequence of configurations (joint angles, velocities, accelerations) that a real robot with real motors can actually follow. Motion planning subsumes path planning and adds the physical layer on top.
+
+---
+
+*Human arms have seven [degrees of freedom](/atlas/concept/degrees-of-freedom) — one more than most industrial robots — giving us a [redundancy](/atlas/concept/redundancy) that lets us reach the same point in infinitely many configurations, a fact that motion planners for humanoids are only beginning to exploit.*

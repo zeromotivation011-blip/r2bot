@@ -1,0 +1,79 @@
+---
+title: Camera (machine vision)
+category: sensors
+summary: >-
+  A machine-vision camera is a sensor that turns light into digital images a
+  robot can interpret. It is the closest thing robots have to eyes — and the
+  source of most of what they know about the visual world.
+seeAlso: []
+sources:
+  - title: IEEE Spectrum — How Computer Vision Works
+    url: 'https://spectrum.ieee.org/computer-vision'
+  - title: MIT OpenCourseWare — 6.801 Machine Vision
+    url: 'https://ocw.mit.edu/courses/6-801-machine-vision-fall-2004/'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - sensors
+  - vision
+  - perception
+  - intermediate
+difficulty: 3
+oneLiner: 'The concept concept: A machine-vision camera is a sensor that turns'
+laymanExplanation: >-
+  Imagine pointing a torch at a wall in a dark room. You can see the wall
+  perfectly, but you only know it exists in that one spot where the beam lands.
+  Now imagine replacing the torch with a million tiny buckets, each one catching
+  however many photons hit it in a fraction of a second. That grid of
+  light-measuring buckets is the heart of every digital camera — 
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without camera (machine vision), many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A machine-vision camera is a sensor that turns light into digital images a
+  robot can interpret. It is the closest thing robots have to eyes — and the
+  source of most of what they know about the visual world.
+slug: camera-vision
+bucket: concept
+---
+
+Imagine pointing a torch at a wall in a dark room. You can see the wall perfectly, but you only know it exists in that one [spot](/atlas/robot/spot) where the beam lands. Now imagine replacing the torch with a million tiny buckets, each one catching however many photons hit it in a fraction of a second. That grid of light-measuring buckets is the heart of every digital camera — in your phone, on a security system, or mounted to a [robot](/atlas/concept/robot)'s head.
+
+That grid is called an **image sensor**, and the science of using it to give machines useful visual information is called **machine vision**.
+
+## How a camera sensor works
+
+The most common image sensor today is the **CMOS sensor** (Complementary Metal-Oxide Semiconductor). It is a flat chip covered in millions of tiny photodiodes — components that generate a small electrical charge when struck by light. Each photodiode corresponds to one **pixel** (picture element). The brighter the light hitting a photodiode, the higher the charge it produces. Read all those charges out at once and you have a grid of brightness values: an image.
+
+Colour cameras add a **Bayer filter** — a pattern of red, green, and blue micro-lenses placed over pairs of pixels. By comparing adjacent R, G, and B readings, the camera's processor reconstructs colour at every point.
+
+A robot's software then takes that grid of numbers and runs algorithms to answer questions: Is there an object here? How far away is it? What is it? This is the field of **[computer vision](/atlas/concept/computer-vision)**, which is distinct from the hardware camera itself but inseparable from it in practice.
+
+## A real-world example
+
+[Boston Dynamics](/atlas/company/boston-dynamics)' Spot robot uses five stereo camera pairs covering 360 degrees. Each pair combines two cameras offset by a fixed distance, much like human eyes. By comparing how the same point appears slightly differently in each camera, the robot's software triangulates distance — a technique called **stereo vision**. Spot uses this to avoid obstacles and climb stairs without a [lidar](/atlas/concept/lidar) in sight.
+
+## Why it matters
+
+Cameras are by far the cheapest and most information-dense sensors available to robots. A ₹1,000 webcam produces millions of data points per second; a lidar of equivalent spatial resolution costs orders of magnitude more. That density is also the challenge: processing a 1080p image 30 times per second is computationally expensive, and making sense of it reliably in changing lighting, rain, or cluttered environments remains one of [robotics](/atlas/concept/robotics)' hardest unsolved problems.
+
+Without cameras, a robot cannot read labels, recognise faces, track moving objects, or understand the fine detail of its environment. Every major autonomous system — self-driving cars, surgical robots, warehouse drones — treats camera data as its primary source of truth about the visual world.
+
+---
+
+*If cameras see colour and texture but struggle with distance, what happens when you give a robot two cameras spaced apart like a pair of eyes?*

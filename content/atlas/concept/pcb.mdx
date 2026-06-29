@@ -1,0 +1,74 @@
+---
+title: PCB (printed circuit board)
+category: hardware
+summary: >-
+  A PCB is a flat board of insulating material threaded with copper tracks that
+  connect electronic components without wires — the backbone of almost every
+  electronic device ever made.
+seeAlso: []
+sources:
+  - title: IPC — Introduction to printed circuit boards
+    url: 'https://www.ipc.org/resources/article/what-is-a-pcb'
+  - title: SparkFun — PCB basics
+    url: 'https://learn.sparkfun.com/tutorials/pcb-basics/all'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - hardware
+  - electronics
+  - manufacturing
+difficulty: 3
+oneLiner: 'The concept concept: A PCB is a flat board of insulating'
+laymanExplanation: >-
+  Open any electronic device — a mobile phone, a TV remote, a robot motor driver
+  — and you will find a green (or sometimes blue, red, or black) board studded
+  with chips, capacitors, and connectors. Thin copper lines snake between the
+  components like invisible streets on a city map. That is a printed circuit
+  board, and those copper streets carry the electricity
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without pcb (printed circuit board), many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A PCB is a flat board of insulating material threaded with copper tracks that
+  connect electronic components without wires — the backbone of almost every
+  electronic device ever made.
+slug: pcb
+bucket: concept
+---
+
+Open any electronic device — a mobile phone, a TV remote, a [robot](/atlas/concept/robot) motor driver — and you will find a green (or sometimes blue, red, or black) board studded with chips, capacitors, and connectors. Thin copper lines snake between the components like invisible streets on a city map. That is a printed circuit board, and those copper streets carry the electricity that makes everything work.
+
+A **PCB** (printed circuit board) is a flat, rigid board made of fibreglass-reinforced resin (called FR4 in most commercial boards) with copper pathways — called **traces** — etched directly into its surface. Components are soldered onto the board at specific pads, and the traces electrically connect them according to a design called a **schematic**. The result replaces what would otherwise be a rat's nest of individual wires.
+
+## How a PCB is made
+
+The process starts with a sheet of copper-clad fibreglass. A designer uses software (KiCad, Altium, Eagle) to draw the schematic and route the traces. The design is sent to a fabrication house. There, the copper is chemically etched away everywhere it is not needed, leaving only the intended traces. Holes are drilled for through-hole components; flat pads are left for surface-mount components. A layer of solder mask (the green coating) protects the copper from oxidising and prevents accidental solder bridges. Silkscreen labels (white text) identify each component.
+
+## Layers and complexity
+
+Simple hobby boards are two-layer: copper on top, copper on the bottom. A smartphone motherboard may have 12 or more layers of copper sandwiched in the fibreglass, each carrying different signals — power, ground, data — without interfering with each other. Connections between layers pass through tiny drilled holes called **vias**.
+
+## Why PCBs matter in [robotics](/atlas/concept/robotics)
+
+Every robot has at least one. The motor driver board, the power management board, the sensor breakout board, the main compute board — all PCBs. Custom PCBs replace jumper-wire prototypes once a robot design is finalised, making it smaller, lighter, more reliable, and easier to reproduce. A well-designed PCB can mean the difference between a robot that runs for hours and one that drops a sensor connection every time it vibrates.
+
+Designing your own PCB used to require professional training. Today, open-source tools and affordable fabrication services (JLCPCB in Shenzhen, for example, will make five two-layer boards for a few dollars) have put it within reach of students and hobbyists.
+
+---
+
+*The world's first recognised printed circuit board patent was filed by Austrian engineer Paul Eisler in 1943 while he was working in a London bedsit — he invented it partly to make a working radio more compact.*

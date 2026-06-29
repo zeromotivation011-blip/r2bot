@@ -1,0 +1,99 @@
+---
+title: Ultrasonic sensor
+category: sensors
+summary: >-
+  An ultrasonic sensor measures distance by sending out a burst of sound too
+  high-pitched for humans to hear and timing how long the echo takes to return.
+  Simple, cheap, and widely used in robots for obstacle detection.
+seeAlso: []
+sources:
+  - title: SparkFun Electronics — HC-SR04 Ultrasonic Sensor Hookup Guide
+    url: >-
+      https://learn.sparkfun.com/tutorials/ultrasonic-distance-sensor-hookup-guide
+  - title: IEEE — Ultrasonic Sensors in Robotics (survey)
+    url: 'https://ieeexplore.ieee.org/document/8964597'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - sensors
+  - distance
+  - beginner
+difficulty: 3
+oneLiner: 'The concept concept: An ultrasonic sensor measures distance by sending out'
+laymanExplanation: >-
+  A bat navigates a pitch-black cave at full speed without touching a single
+  wall. It does this not by seeing but by screaming — emitting bursts of sound
+  far above what human ears detect, then listening for the echoes that bounce
+  back from obstacles. The time between scream and echo tells the bat exactly
+  how far away something is.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without ultrasonic sensor, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis:
+  - Car parking sensors
+  - Roomba (older models)
+  - DIY obstacle-avoiders
+indianExample: >-
+  A HC-SR04 ultrasonic sensor costs ₹80 on Robu.in. It is in every Indian school
+  robotics kit.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What does an ultrasonic sensor send out?
+  options:
+    - Visible light
+    - Infrared
+    - High-frequency sound (above 20 kHz)
+    - Microwaves
+  answer: 2
+  explanation: >-
+    It sends ultrasonic sound — frequencies above what humans can hear
+    (typically 40 kHz).
+mindBlowingFact: >-
+  An ultrasonic sensor's accuracy depends on the speed of sound — which changes
+  with temperature. Robots in deserts and freezers need calibration.
+industryApplications:
+  - automotive (parking)
+  - robotics
+  - industrial level sensing
+  - medical imaging
+  - security
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An ultrasonic sensor measures distance by sending out a burst of sound too
+  high-pitched for humans to hear and timing how long the echo takes to return.
+  Simple, cheap, and widely used in robots for obstacle detection.
+slug: ultrasonic-sensor
+bucket: concept
+---
+
+A bat navigates a pitch-black cave at full speed without touching a single wall. It does this not by seeing but by screaming — emitting bursts of sound far above what human ears detect, then listening for the echoes that bounce back from obstacles. The time between scream and echo tells the bat exactly how far away something is.
+
+That is, in every meaningful sense, how an ultrasonic sensor works.
+
+## What "ultrasonic" means
+
+Sound is a wave of pressure travelling through air. Humans hear frequencies between roughly 20 Hz and 20,000 Hz. **Ultrasonic** means above that range — typically 40,000 Hz (40 kHz) in the sensors most commonly used in [robotics](/atlas/concept/robotics). At that frequency, the sound is completely inaudible to people but propagates through air just as reliably as the tones you can hear.
+
+The sensor has two components: a **transmitter** (a small piezoelectric speaker that emits the 40 kHz pulse) and a **receiver** (a matching microphone that listens for the echo). The [microcontroller](/atlas/concept/microcontroller) connected to the sensor starts a timer the moment the pulse is sent and stops it when the echo arrives. Distance is then straightforward arithmetic: distance = (speed of sound × time) ÷ 2. The division by two accounts for the round trip.
+
+## How precise is it?
+
+In still air at room temperature, sound travels at about 343 metres per second. A budget ultrasonic module like the **HC-SR04** — the most widely used teaching sensor in the world, found in millions of Arduino kits — can measure distances from about 2 cm to 400 cm with roughly ±3 mm accuracy. That is more than good enough to detect walls, furniture, or a person's leg.
+
+The catch is that accuracy drifts with temperature, because sound travels faster in warm air. Professional systems compensate with a thermometer reading; hobby projects usually ignore it.
+
+## Where robots use them
+
+The iRobot Roomba's earliest models used ultrasonic sensors to detect walls and furniture. Industrial AGVs (Automated Guided Vehicles) — the flat trolleys that ferry parts around a factory floor — use rings of ultrasonic sensors to stop before hitting anything. Parking-assist systems in cars are almost always ultrasonic, which is why you hear a gentle beep as you reverse toward a bollard.
+
+## What they cannot do
+
+Ultrasonic sensors are essentially blind to soft, sound-absorbing materials like carpets and thick curtains, which absorb the pulse rather than reflecting it cleanly. They also struggle with very narrow objects (a thin wire reflects almost no energy) and with angled surfaces that deflect the echo sideways. For fine detail or long range, [lidar](/atlas/concept/lidar) or cameras take over. But for close-range, low-cost obstacle detection, nothing else in robotics is as simple or as reliable.
+
+---
+
+*The same time-of-flight principle that lets a bat avoid a cave wall also underpins sonar used by submarines — just with much lower frequencies and in water instead of air.*

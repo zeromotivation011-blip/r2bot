@@ -1,0 +1,82 @@
+[
+  {
+    "id": "forge-m1-architecture",
+    "order_index": 0,
+    "title": "ROS2 Architecture",
+    "description": "Nodes, topics, services, actions — the 4 concepts that underpin every ROS2 system.",
+    "duration_minutes": 60,
+    "is_checkpoint": false
+  },
+  {
+    "id": "forge-m2-environment",
+    "order_index": 1,
+    "title": "Development Environment",
+    "description": "ROS2 Humble install on Ubuntu, OR use R2BOT's browser-based ROS2 playground (no install).",
+    "duration_minutes": 45,
+    "is_checkpoint": false
+  },
+  {
+    "id": "forge-m3-topics",
+    "order_index": 2,
+    "title": "Topics and Messages",
+    "description": "Message types, publishers, subscribers, rqt visualisation, and debugging with echo.",
+    "duration_minutes": 90,
+    "is_checkpoint": false
+  },
+  {
+    "id": "forge-m4-services",
+    "order_index": 3,
+    "title": "Services and Actions",
+    "description": "Request/response vs. streaming. Write a Python service server. Implement drive-to-goal action.",
+    "duration_minutes": 75,
+    "is_checkpoint": false
+  },
+  {
+    "id": "forge-m5-urdf",
+    "order_index": 4,
+    "title": "Robot Description (URDF)",
+    "description": "Describe your robot in XML. Joints, links, visualisation in RViz2.",
+    "duration_minutes": 75,
+    "is_checkpoint": false
+  },
+  {
+    "id": "forge-m6-tf2",
+    "order_index": 5,
+    "title": "TF2 — Coordinate Frames",
+    "description": "Why frames matter. Broadcasting and listening to transforms. Visualise your TF tree.",
+    "duration_minutes": 60,
+    "is_checkpoint": false
+  },
+  {
+    "id": "forge-m7-nav2",
+    "order_index": 6,
+    "title": "Navigation Stack — Nav2",
+    "description": "Nav2 architecture, costmaps, path planners (A*, DWB). Navigate a warehouse in simulation.",
+    "duration_minutes": 120,
+    "is_checkpoint": false
+  },
+  {
+    "id": "forge-m8-perception",
+    "order_index": 7,
+    "title": "Perception",
+    "description": "Camera integration, point cloud processing, YOLOv8 object detection, sensor fusion.",
+    "duration_minutes": 90,
+    "is_checkpoint": false
+  },
+  {
+    "id": "forge-m9-hardware",
+    "order_index": 8,
+    "title": "Real Hardware",
+    "description": "Connecting Raspberry Pi to ROS2, GPIO control, troubleshooting latency and tf errors.",
+    "duration_minutes": 75,
+    "is_checkpoint": false
+  },
+  {
+    "id": "forge-m10-capstone",
+    "order_index": 9,
+    "title": "Capstone Project",
+    "description": "Autonomous Warehouse Robot: SLAM mapping, 3-waypoint navigation, package detection.",
+    "duration_minutes": 180,
+    "is_checkpoint": true
+  }
+]

@@ -1,0 +1,90 @@
+---
+title: Neural network
+category: ai-and-perception
+summary: >-
+  A neural network is a mathematical system loosely inspired by the brain, made
+  of layers of simple calculations that together learn to recognise patterns —
+  like faces, words, or sensor readings.
+seeAlso: []
+sources:
+  - title: 3Blue1Brown — But what is a neural network?
+    url: 'https://www.3blue1brown.com/lessons/neural-networks'
+  - title: MIT Technology Review — Neural networks explained
+    url: >-
+      https://www.technologyreview.com/2017/04/14/3066/the-dark-secret-at-the-heart-of-ai/
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - ai
+  - machine-learning
+difficulty: 3
+oneLiner: 'The concept concept: A neural network is a mathematical system loosely'
+laymanExplanation: >-
+  Imagine you are trying to teach a child to recognise a cat without ever
+  writing down a rule. You show her a thousand photos: "cat," "not a cat,"
+  "cat." She doesn't memorise a checklist — she absorbs something vaguer and
+  more powerful, a feeling for what cat-ness looks like. A neural network does
+  something structurally similar, except instead of a child, it i
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without neural network, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis:
+  - Tesla Optimus
+  - Self-driving cars
+  - Surgical AI assistants
+indianExample: >-
+  Niramai's breast-cancer screening, Sigtuple's blood-test AI, Tata Motors'
+  visual quality inspection — all neural networks built in India.
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: What is a neural network's smallest building block called?
+  options:
+    - Layer
+    - Neuron (or node)
+    - Tensor
+    - Bias
+  answer: 1
+  explanation: >-
+    A neuron (or node) computes one weighted sum + an activation. Networks chain
+    millions of these.
+mindBlowingFact: >-
+  A modern large neural network has more parameters than the human brain has
+  synapses — but uses 100,000× less power.
+industryApplications:
+  - healthcare
+  - finance
+  - autonomous vehicles
+  - agriculture
+  - security
+difficultyLabel: Classroom
+technicalDefinition: >-
+  A neural network is a mathematical system loosely inspired by the brain, made
+  of layers of simple calculations that together learn to recognise patterns —
+  like faces, words, or sensor readings.
+slug: neural-network
+bucket: concept
+---
+
+Imagine you are trying to teach a child to recognise a cat without ever writing down a rule. You show her a thousand photos: "cat," "not a cat," "cat." She doesn't memorise a checklist — she absorbs something vaguer and more powerful, a feeling for what cat-ness looks like. A neural network does something structurally similar, except instead of a child, it is a chain of arithmetic operations, and instead of feelings, it is numbers.
+
+That system is called a **neural network** — a collection of mathematical functions, arranged in layers, that learns to map inputs to outputs by adjusting millions of internal numbers called **weights**.
+
+## How it works
+
+Each layer of a neural network is a set of **neurons** (also called nodes or units). A neuron does one thing: it takes several numbers in, multiplies each by a weight, adds them up, and passes the result through a simple squishing function. That is it. The power comes from stacking thousands of such neurons across dozens of layers.
+
+During training, the network sees labelled examples. It makes a guess, compares it to the correct answer, measures how wrong it was, and nudges every weight slightly to make the next guess a little better. This process — called **backpropagation** — repeats millions of times until the network is reliably right.
+
+## A real example
+
+The face unlock on a modern smartphone runs a neural network. It compares the infrared image of your face against a compressed mathematical signature it learned when you set up the device. The network was trained on millions of faces so it generalises — it still recognises you with a new haircut, in dim light, or wearing glasses.
+
+## Why it matters for [robotics](/atlas/concept/robotics)
+
+A [robot](/atlas/concept/robot)'s sensors — cameras, microphones, [lidar](/atlas/concept/lidar) — produce raw streams of numbers that mean nothing on their own. Neural networks are the layer that turns those numbers into understanding: "this blob of pixels is a person," "this vibration pattern means the [joint](/atlas/concept/joint) is slipping," "this voice command means pick up the red block." Without them, a robot is blind and deaf to meaning.
+
+---
+
+*The deeper a neural network gets — the more layers it has — the more surprising and powerful the things it can learn, which is the story of [deep learning](/atlas/concept/deep-learning).*

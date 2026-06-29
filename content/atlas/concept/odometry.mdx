@@ -1,0 +1,78 @@
+---
+title: Odometry
+phonetic: oh-DOM-eh-tree
+category: control
+summary: >-
+  Odometry is a method of estimating a robot's current position by tracking how
+  far and in what direction it has moved from a known starting point, using
+  wheel encoders, motor data, or inertial sensors.
+seeAlso: []
+sources:
+  - title: 'Thrun, Burgard, Fox — Probabilistic Robotics (MIT Press)'
+    url: 'https://mitpress.mit.edu/9780262201629/probabilistic-robotics/'
+  - title: >-
+      Siegwart, Nourbakhsh, Scaramuzza — Introduction to Autonomous Mobile
+      Robots
+    url: >-
+      https://mitpress.mit.edu/9780262015356/introduction-to-autonomous-mobile-robots/
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - navigation
+  - sensors
+  - fundamentals
+difficulty: 3
+oneLiner: 'The concept concept: Odometry is a method of estimating a robot''s'
+laymanExplanation: >-
+  Before GPS, sailors estimated their position at sea using a technique called
+  dead reckoning: start from a known point, record your speed and heading, and
+  keep a running total of where you must be. If you sailed north at 10 knots for
+  two hours, you were roughly 20 nautical miles north of where you started. It's
+  not perfect — currents and wind introduce errors
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without odometry, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Odometry is a method of estimating a robot's current position by tracking how
+  far and in what direction it has moved from a known starting point, using
+  wheel encoders, motor data, or inertial sensors.
+slug: odometry
+bucket: concept
+---
+
+Before [GPS](/atlas/concept/gps-gnss), sailors estimated their position at sea using a technique called dead reckoning: start from a known point, record your speed and heading, and keep a running total of where you must be. If you sailed north at 10 knots for two hours, you were roughly 20 nautical miles north of where you started. It's not perfect — currents and wind introduce errors — but it's far better than nothing, and it works without any external reference.
+
+Robots do the same thing with wheels. That technique is called **odometry**.
+
+## How wheel odometry works
+
+Most wheeled robots have **encoders** attached to their drive wheels — sensors that count tiny notches on a rotating disc, producing pulses with every fraction of a degree of wheel rotation. By counting pulses and knowing the wheel's circumference, the [robot](/atlas/concept/robot) computes how far each wheel has travelled. For a two-wheeled differential-drive robot (like most floor robots and Roombas), the difference in left and right wheel distances tells it how much it has turned. Integrating these measurements over time gives a continuous estimate of position and heading — the **odometric pose**.
+
+The mathematics is straightforward: at each timestep, update the x position by `Δd × cos(θ)`, the y position by `Δd × sin(θ)`, and the heading θ by `(Δright − Δleft) / wheelbase`. Small numbers, fast arithmetic, runs happily on a [microcontroller](/atlas/concept/microcontroller).
+
+## The drift problem
+
+Odometry suffers from one fundamental flaw: **error accumulates**. Every small slip, every slight wheel diameter asymmetry, every tiny [encoder](/atlas/concept/encoder) miscounting adds to the position estimate. Over short distances, odometry is excellent. Over long distances, the errors compound and the estimated position drifts arbitrarily far from the truth. A robot using only odometry will gradually spiral or veer as its estimate drifts.
+
+This is why odometry is almost always fused with other sensors — [lidar](/atlas/concept/lidar), cameras, [IMU](/atlas/concept/imu) (inertial measurement unit) — and corrected by a [localisation](/atlas/concept/localisation) algorithm. Odometry provides a fast, low-latency estimate between sensor updates; the other sensors provide periodic corrections to reset accumulated drift.
+
+## Visual and inertial odometry
+
+Wheel-based odometry isn't the only kind. **Visual odometry** tracks features in [camera](/atlas/concept/camera-vision) images to estimate motion, useful on legged robots or drones that have no wheels. **Inertial odometry** integrates accelerometer and gyroscope readings from an IMU. Both suffer the same drift problem as wheel odometry, but combining all three (wheel + visual + inertial) in a **[sensor fusion](/atlas/concept/sensor-fusion)** pipeline produces estimates accurate enough for warehouse navigation, Mars rover operations, and consumer robot vacuums.
+
+---
+
+*NASA's Mars rovers Spirit and Opportunity relied heavily on odometry for short-range navigation because GPS doesn't exist on Mars — their wheels even had deliberate cutout patterns to help cameras measure ground slip.*

@@ -1,0 +1,78 @@
+---
+title: Real-time computing
+category: fundamentals
+summary: >-
+  Real-time computing means a system that must produce a correct result within a
+  guaranteed time deadline — not just eventually, but by a specific moment. In
+  robotics, missing a deadline is not a performance issue; it can be a safety
+  failure.
+seeAlso: []
+sources:
+  - title: Real-Time Systems — Liu (MIT Press)
+    url: 'https://mitpress.mit.edu/9780262122184/real-time-systems/'
+  - title: Linux Foundation — PREEMPT_RT Real-Time Linux
+    url: 'https://wiki.linuxfoundation.org/realtime/start'
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - fundamentals
+  - computing
+  - control
+difficulty: 3
+oneLiner: 'The concept concept: Real-time computing means a system that must produce'
+laymanExplanation: >-
+  A violinist in an orchestra must play the right note at exactly the right
+  instant. Playing it a little flat is bad. Playing it a beat late — even just
+  200 milliseconds late — is worse, because now the performance has derailed.
+  The correctness of the note and the correctness of its timing are equally
+  important. An answer delivered late is, in a meaningful sen
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without real-time computing, many concept systems in robotics simply couldn't
+  work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Real-time computing means a system that must produce a correct result within a
+  guaranteed time deadline — not just eventually, but by a specific moment. In
+  robotics, missing a deadline is not a performance issue; it can be a safety
+  failure.
+slug: real-time-computing
+bucket: concept
+---
+
+A violinist in an orchestra must play the right note at exactly the right instant. Playing it a little flat is bad. Playing it a beat late — even just 200 milliseconds late — is worse, because now the performance has derailed. The correctness of the note and the correctness of its timing are equally important. An answer delivered late is, in a meaningful sense, the wrong answer.
+
+This is the defining idea of **real-time computing**: a system where correctness depends not only on what the computation produces but on when it produces it. A real-time system has explicit time deadlines, and meeting those deadlines is a design requirement, not an aspiration.
+
+## Hard, soft, and firm real-time
+
+Not all deadlines are equally unforgiving. Engineers distinguish three categories. In a **hard real-time** system, missing a single deadline is a system failure — potentially catastrophic. The flight-control computer on a commercial aircraft is hard real-time; a millisecond delay in processing a pilot input could result in a crash. In a **soft real-time** system, missing deadlines occasionally degrades quality but doesn't break the system — a video call that drops a frame is soft real-time. **Firm real-time** sits between: missing a deadline makes the result useless (a value that arrived too late has no value) but a single miss doesn't cause harm.
+
+[Robotics](/atlas/concept/robotics) spans all three. A [robot](/atlas/concept/robot)'s emergency stop must be hard real-time. A path-planning algorithm computing the next [waypoint](/atlas/concept/waypoint) is often firm. A diagnostic log is soft.
+
+## Why standard operating systems aren't enough
+
+A general-purpose operating system like standard Linux is not real-time. It makes no guarantees about when any particular programme will get CPU time. The kernel can decide to do housekeeping, swap memory, or serve another process at any moment, introducing unpredictable delays called **jitter**. For a word processor, that is fine. For a motor controller that must send a new position command every millisecond, unpredictable jitter can cause the motor to judder, overshoot, or destabilise entirely.
+
+Real-time robots use either dedicated real-time operating systems (RTOSes) like VxWorks or FreeRTOS, or specially patched versions of Linux (such as PREEMPT_RT) that add scheduling guarantees. The [ROS](/atlas/concept/ros) 2 framework, widely used in robotics research, is designed with real-time compatibility in mind, unlike its predecessor ROS 1.
+
+## Real-time in a robot's body
+
+In a modern robot arm, the motor control loop typically runs at 1,000 Hz — once per millisecond. At that frequency, the controller reads [encoder](/atlas/concept/encoder) positions, computes the required torque, and outputs motor commands, all within one millisecond. The [path planning](/atlas/concept/path-planning) and [sensor fusion](/atlas/concept/sensor-fusion) layers run at lower frequencies (10–100 Hz), and high-level planning may run at 1 Hz or slower. This layered architecture — with the strictest real-time requirements at the lowest level — is the standard pattern in industrial and research robots alike.
+
+---
+
+*If a robot's brain is a computer that cannot guarantee when it will finish thinking, what architectural tricks let it still behave reliably in a physical world that doesn't pause to wait?*

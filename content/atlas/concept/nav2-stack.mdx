@@ -1,0 +1,131 @@
+---
+title: Nav2 (ROS2 Navigation Stack) — Complete Guide | R2BOT
+summary: >-
+  Nav2 is the ROS2 navigation stack for mobile robots — planners, controllers,
+  behaviour trees, recovery. Used in thousands of production AMRs worldwide.
+category: control
+bucket: ros2-ecosystem
+difficulty: advanced
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - nav2
+  - navigation
+  - ros2
+  - amr
+  - autonomy
+relatedTerms:
+  - ros2
+  - amcl
+  - costmap
+  - behavior-trees
+  - path-planning
+seeAlso:
+  - ros2
+  - amcl
+  - costmap
+  - behavior-trees
+  - path-planning
+youtubeSearchQuery: ROS2 Nav2 navigation stack tutorial
+oneLiner: 'The ros2 ecosystem concept: Nav2 is the ROS2 navigation stack for mobile'
+laymanExplanation: >-
+  Nav2 is the official ROS2 navigation stack — a collection of packages that
+  together let a mobile robot autonomously move from point A to point B safely.
+  It includes planners, controllers, costmaps, behaviour trees, localisation,
+  and recovery behaviours.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without nav2 (ros2 navigation stack) — complete guide | r2bot, many ros2
+  ecosystem systems in robotics simply couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Nav2 is the ROS2 navigation stack for mobile robots — planners, controllers,
+  behaviour trees, recovery. Used in thousands of production AMRs worldwide.
+slug: nav2-stack
+---
+
+# Nav2 (ROS2 Navigation Stack)
+
+## What is Nav2 (ROS2 Navigation Stack)?
+
+Nav2 is the official ROS2 navigation stack — a collection of packages that together let a mobile robot autonomously move from point A to point B safely. It includes planners, controllers, costmaps, behaviour trees, localisation, and recovery behaviours.
+
+## How It Works
+
+Nav2 is structured as a set of ROS2 servers wired together by a top-level behaviour tree. The Planner Server runs a global planner (Smac, NavFn) over a costmap; the Controller Server runs a local planner (DWB, MPPI, Regulated Pure Pursuit); the Behaviour Server runs recovery actions when stuck; the BT Navigator orchestrates everything as a behaviour tree. Costmap layers provide static maps, dynamic obstacles, inflation, and voxels. AMCL provides localisation.
+
+## Real-World Example
+
+Almost every Nav2-based mobile robot starts with the TurtleBot3 demo. GreyOrange Butler, ROBOTIS, Clearpath Husky, hospital delivery robots, and Indian warehouse robots all build on Nav2. Foxconn's smart factories use Nav2 in dozens of AMR designs.
+
+## Why It Matters for Robotics
+
+Without Nav2 you would write a complete navigation stack from scratch — months of work. Nav2 fluency is non-negotiable for any AMR or service-robot engineering role in India. It is the most-asked-about stack in ROS2 interviews.
+
+## Try It Yourself
+
+Launch the `nav2_bringup tb3_simulation_launch.py` demo in Gazebo + RViz2. Use RViz's '2D Pose Estimate' and '2D Goal Pose' tools to drive a TurtleBot3 across the simulated map. Then change a costmap parameter live and watch the behaviour change.
+
+## Quick Quiz
+
+```quiz
+[
+  {
+    "q": "Nav2 orchestrates its components with:",
+    "options": [
+      "Shell scripts",
+      "A behaviour tree (BT Navigator)",
+      "A spreadsheet",
+      "Email"
+    ],
+    "answer": 1,
+    "explain": "Nav2 uses BT.CPP behaviour trees to orchestrate planning, control, and recovery."
+  },
+  {
+    "q": "Which is NOT a typical Nav2 component?",
+    "options": [
+      "Planner Server",
+      "Controller Server",
+      "Behaviour Server",
+      "Photo Editor Server"
+    ],
+    "answer": 3,
+    "explain": "Planner, Controller, and Behaviour are core Nav2 servers — photo editing is not."
+  },
+  {
+    "q": "A common local planner used in Nav2 is:",
+    "options": [
+      "MPPI or DWB",
+      "Excel",
+      "Microsoft Word",
+      "Photoshop"
+    ],
+    "answer": 0,
+    "explain": "DWB (Dynamic Window Approach) and MPPI are popular local planners in Nav2."
+  }
+]
+```
+
+## Further Reading
+
+- [Ros2](/atlas/concept/ros2)
+- [Amcl](/atlas/concept/amcl)
+- [Costmap](/atlas/concept/costmap)
+- [Behavior Trees](/atlas/concept/behavior-trees)
+- [Path Planning](/atlas/concept/path-planning)
+
+## Ask R2 About This
+
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Nav2 (ROS2 Navigation Stack) for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.

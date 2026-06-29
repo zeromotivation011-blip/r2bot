@@ -1,0 +1,77 @@
+---
+title: Embodied AI
+category: applications
+summary: >-
+  Embodied AI is artificial intelligence that learns and acts through a physical
+  body — a robot that understands the world not just by processing data but by
+  interacting with objects, navigating spaces, and experiencing the consequences
+  of its own actions.
+seeAlso: []
+sources:
+  - title: Stanford AI Lab — Embodied AI research
+    url: 'https://ai.stanford.edu/research/embodied-ai'
+  - title: 'Google DeepMind — RT-2: Vision-Language-Action Models'
+    url: >-
+      https://deepmind.google/discover/blog/rt-2-new-model-translates-vision-and-language-into-robot-actions/
+lastReviewed: 2026-05-19T00:00:00.000Z
+tags:
+  - embodied-ai
+  - machine-learning
+  - robotics-research
+difficulty: 3
+oneLiner: 'The concept concept: Embodied AI is artificial intelligence that learns and'
+laymanExplanation: >-
+  A child learns what "heavy" means not by reading a definition but by trying to
+  lift things and feeling the difference. They learn what "breakable" means by
+  accidentally dropping a cup. They learn what "around" means by walking around
+  a table. Language and concepts are grounded in physical experience — in a body
+  that moves, touches, fails, and succeeds. For m
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: 'Without embodied ai, many concept systems in robotics simply couldn''t work.'
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  Embodied AI is artificial intelligence that learns and acts through a physical
+  body — a robot that understands the world not just by processing data but by
+  interacting with objects, navigating spaces, and experiencing the consequences
+  of its own actions.
+slug: embodied-ai
+bucket: concept
+---
+
+A child learns what "heavy" means not by reading a definition but by trying to lift things and feeling the difference. They learn what "breakable" means by accidentally dropping a cup. They learn what "around" means by walking around a table. Language and concepts are grounded in physical experience — in a body that moves, touches, fails, and succeeds. For most of the history of artificial intelligence, the field tried to build intelligence without any of that. Embodied AI argues that was a mistake.
+
+Embodied AI is the approach to artificial intelligence in which a system learns through physical interaction with the world rather than purely from datasets. An *embodied* AI agent has a body — usually a [robot](/atlas/concept/robot) — that receives sensory inputs, takes actions, and experiences the results of those actions. The hypothesis, backed by decades of cognitive science and [robotics](/atlas/concept/robotics) research, is that this physical grounding is not a nice add-on but a fundamental ingredient for general intelligence.
+
+## Why embodiment matters
+
+Consider the difference between a language model that has read millions of sentences about cups and a robot that has picked up, dropped, balanced, and stacked thousands of cups. The language model can discuss cups fluently; it can describe their properties, explain their uses, compose poetry about them. But ask it to catch a falling cup — to predict the [trajectory](/atlas/concept/trajectory), time the grasp, account for the cup's weight and handle position — and it has no way to act. The robot has built an internal model of cups through physical experience that supports action in a way that text never can.
+
+This distinction becomes important as AI systems are deployed in physical environments. An AI assistant that can only process text or images is fundamentally limited when it needs to manipulate objects, navigate buildings, or respond to the physical state of the world.
+
+## RT-2 and the new generation
+
+Google DeepMind's Robotic Transformer 2 (RT-2), published in 2023, demonstrated a striking result: a robot that had been trained on internet-scale text and image data, then fine-tuned on robotic demonstrations, could generalise to tasks it had never been explicitly trained for. Asked to pick up the object that represents a country known for the Eiffel Tower, it picked up a toy miniature of the Eiffel Tower — connecting visual, linguistic, and motor knowledge in a single model. This class of models, called *vision-language-action* (VLA) models, is one of the most active frontiers in robotics.
+
+[Figure AI](/atlas/company/figure-ai), Physical Intelligence (pi), and several other startups are building general-purpose robots explicitly on the embodied AI philosophy — attempting to train a single model that can handle a wide range of household and industrial tasks through large-scale demonstration data.
+
+## The open questions
+
+The field is young and the claims are large. It remains disputed how much of human cognition truly depends on embodiment, and how much can be achieved through large-scale pattern matching over data. Training embodied AI systems is expensive: collecting robot interaction data is slow and costly compared to scraping text off the internet. [Sim-to-real](/atlas/concept/sim-to-real) transfer — training in simulation, deploying in the real world — is a workaround, but the gap between simulated and physical reality remains a genuine obstacle.
+
+---
+
+*The most provocative idea in embodied AI is that a robot which has never held a glass of water may fundamentally never understand thirst.*

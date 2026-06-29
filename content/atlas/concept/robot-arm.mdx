@@ -1,0 +1,100 @@
+---
+title: Robot Arm (Manipulator)
+hindi_name: रोबोट आर्म
+phonetic: ro-bot arm
+category: robot-types
+summary: >-
+  An articulated mechanical arm with multiple powered joints, designed to
+  position a tool — gripper, welder, spray nozzle — in 3D space.
+seeAlso:
+  - kinematics
+  - inverse-kinematics
+  - mobile-robot
+  - servo-motor
+sources:
+  - title: Universal Robots UR5e datasheet
+    url: 'https://www.universal-robots.com/products/ur5-robot/'
+  - title: Systemantics — Indian collaborative arms
+    url: 'https://systemantics.com/'
+lastReviewed: 2026-05-21T00:00:00.000Z
+tags:
+  - robot-types
+  - intermediate
+difficulty: 3
+oneLiner: >-
+  The concept concept: An articulated mechanical arm with multiple powered
+  joints,
+laymanExplanation: >-
+  A **robot arm** (formally: manipulator) is an articulated chain of rigid links
+  connected by powered joints, ending in an **end-effector** — gripper, vacuum
+  cup, welder, paint nozzle. The arm positions the end-effector somewhere in 3D
+  space. That's it. Everything else is detail.
+analogy: >-
+  Think of it like a household object that does the same job — the underlying
+  idea is the same, just adapted for robots.
+whyItMatters: >-
+  Without robot arm (manipulator), many concept systems in robotics simply
+  couldn't work.
+realRobotsThatUseThis: []
+indianExample: ''
+relatedTerms: []
+prerequisiteTerms: []
+unlocksTerms: []
+quizQuestion:
+  q: ''
+  options: []
+  answer: 0
+  explanation: ''
+mindBlowingFact: ''
+industryApplications: []
+difficultyLabel: Classroom
+technicalDefinition: >-
+  An articulated mechanical arm with multiple powered joints, designed to
+  position a tool — gripper, welder, spray nozzle — in 3D space.
+slug: robot-arm
+bucket: concept
+---
+
+A **robot arm** (formally: manipulator) is an articulated chain of rigid links connected by powered joints, ending in an **end-effector** — gripper, vacuum cup, welder, paint nozzle. The arm positions the end-effector somewhere in 3D space. That's it. Everything else is detail.
+
+## Degrees of freedom
+
+The number of independently-controllable joints. To reach any pose (position + orientation) in 3D space you need **6 DOF**. Most industrial arms are 6 DOF; some are 7 (extra elbow joint for dexterity in cluttered spaces) or 4 (SCARA arms — fast, top-down assembly).
+
+## Workspace
+
+The set of points the end-effector can reach. Drawing the workspace is one of the first things you do when designing an arm — it tells you what tasks are physically possible.
+
+## Payload
+
+The maximum weight the arm can lift *at full extension*. UR5e is 5kg. The same arm folded close to the base can lift much more — payload is rated at the worst case.
+
+## The arm family tree
+
+- **SCARA** (Selective Compliance Assembly Robot Arm) — 4-DOF, fast, top-down, used in electronics assembly.
+- **6-DOF articulated** — the classic — Universal Robots, KUKA, ABB, Systemantics SyMo.
+- **Cartesian / gantry** — translation-only joints. Slow but precise, big workspace. Plotters, 3D printers, CNC.
+- **Delta** — 3 parallel arms, ultra-fast pick-and-place (food packaging).
+- **Soft / continuum** — research-grade, biologically inspired.
+
+## Collaborative vs industrial
+
+- **Industrial** (KUKA, FANUC) — fast, strong, dangerous. Operate behind cages.
+- **Collaborative** (Universal Robots, Franka, Systemantics) — force-limited, designed to work alongside humans. Slower but safer. Driving the explosion of arms in SMEs.
+
+## In India
+
+- **Systemantics** (Bangalore) — designs and manufactures 6-DOF collaborative arms. India's most advanced indigenous manipulator company.
+- **Bharat Forge KSSL** (Pune) — heavy-industrial-arm manufacturing.
+- **TAL Manufacturing** (Tata, Pune) — TAL BRABO industrial arm.
+- **CMR Surgical's India arm** — research on surgical manipulators.
+
+A 6-DOF UR5-class arm costs ₹15-25 lakh. A Systemantics SyMo costs ₹8-15 lakh — increasingly the choice for Indian SME automation.
+
+## See it in action
+
+> Open the [3D Robot Explorer](/visualizer#robots) and toggle to the UR5 arm. Drag the joint sliders — watch the end-effector trace out the workspace. The math behind it is in the [[kinematics]] entry.
+
+## Related concepts
+
+[[kinematics]] · [[inverse-kinematics]] · [[servo-motor]] · [[mobile-robot]] · [[ros2]]

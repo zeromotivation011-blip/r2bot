@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" width="320" height="220" role="img" aria-label="Robot vacuum on a kitchen floor">
+  <rect x="0" y="180" width="320" height="40" fill="#fde68a"/>
+  <ellipse cx="160" cy="190" rx="120" ry="10" fill="#0f172a" opacity=".25"/>
+  <circle cx="160" cy="140" r="76" fill="#1f2937" stroke="#0f172a" stroke-width="3"/>
+  <circle cx="160" cy="140" r="34" fill="#0f172a"/>
+  <circle cx="160" cy="140" r="6" fill="#fde047"/>
+  <circle cx="160" cy="140" r="14" fill="none" stroke="#fde047" stroke-width="2" opacity=".6"/>
+  <rect x="92" y="124" width="22" height="6" rx="3" fill="#94a3b8"/>
+  <rect x="206" y="124" width="22" height="6" rx="3" fill="#94a3b8"/>
+  <circle cx="130" cy="100" r="4" fill="#3b82f6"/>
+  <circle cx="190" cy="100" r="4" fill="#3b82f6"/>
+  <!-- dust motion -->
+  <path d="M60 196 q10 -8 20 0 t20 0 t20 0" stroke="#a16207" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="50" cy="190" r="2" fill="#a16207"/>
+  <circle cx="44" cy="186" r="1.5" fill="#a16207"/>
+</svg>

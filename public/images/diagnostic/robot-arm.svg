@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" role="img" aria-label="Industrial robot arm with labelled parts">
+  <rect x="40" y="200" width="220" height="14" rx="4" fill="#475569"/>
+  <!-- A: base -->
+  <ellipse cx="80" cy="200" rx="36" ry="12" fill="#1f2937"/>
+  <rect x="60" y="160" width="40" height="40" rx="6" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+  <text x="80" y="232" font-family="sans-serif" font-size="14" font-weight="800" fill="#fde047" text-anchor="middle">A</text>
+
+  <!-- main arm segments -->
+  <rect x="74" y="100" width="12" height="62" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2"/>
+  <circle cx="80" cy="100" r="10" fill="#fde047" stroke="#1f2937" stroke-width="2"/>
+  <rect x="80" y="92" width="100" height="16" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2"/>
+  <!-- B: elbow -->
+  <circle cx="180" cy="100" r="14" fill="#facc15" stroke="#a16207" stroke-width="2"/>
+  <text x="180" y="135" font-family="sans-serif" font-size="14" font-weight="800" fill="#fde047" text-anchor="middle">B</text>
+  <rect x="178" y="62" width="14" height="40" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2"/>
+
+  <!-- D: wrist motor -->
+  <circle cx="185" cy="62" r="10" fill="#10b981" stroke="#065f46" stroke-width="2"/>
+  <text x="155" y="60" font-family="sans-serif" font-size="14" font-weight="800" fill="#fde047" text-anchor="middle">D</text>
+
+  <rect x="178" y="40" width="14" height="22" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2"/>
+
+  <!-- C: gripper -->
+  <path d="M170 30 L200 30 L210 18 L195 14 L195 28 L175 28 L175 14 L160 18 Z" fill="#f97316" stroke="#9a3412" stroke-width="2"/>
+  <text x="230" y="22" font-family="sans-serif" font-size="14" font-weight="800" fill="#fde047" text-anchor="middle">C</text>
+</svg>

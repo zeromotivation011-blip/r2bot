@@ -1,0 +1,21 @@
+{
+  "id": "build-robotic-arm-3dof",
+  "slug": "robotic-arm-3dof",
+  "title": "3-DOF Robotic Arm",
+  "tagline": "Three SG90 servos, a desktop chassis, and your first hands-on lesson in forward and inverse kinematics.",
+  "level": "intermediate",
+  "duration_hours": 5,
+  "total_xp": 900,
+  "components": [
+    { "name": "Arduino Uno" },
+    { "name": "3× SG90 servo motors" },
+    { "name": "3-DOF acrylic arm kit (base, shoulder, elbow)" },
+    { "name": "External 5V 2A power supply for servos" },
+    { "name": "10kΩ potentiometers (manual control)", "optional": true },
+    { "name": "Jumper wires" },
+    { "name": "Breadboard" }
+  ],
+  "simulation_only": false,
+  "color": "#f472b6",
+  "icon": "🦾"
+}
