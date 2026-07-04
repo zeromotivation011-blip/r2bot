@@ -555,16 +555,16 @@ async function PulseStrip() {
 
   return (
     <Section
-      title="Pulse for your level"
+      title="News for your level"
       right={
-        <a href="/pulse" style={{ fontSize: 13, color: 'var(--cyan)' }}>
+        <a href="/news" style={{ fontSize: 13, color: 'var(--cyan)' }}>
           View all news →
         </a>
       }
     >
       {items.length === 0 ? (
         <a
-          href="/pulse"
+          href="/news"
           style={{
             display: 'block',
             padding: 18,

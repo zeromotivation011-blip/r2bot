@@ -34,7 +34,7 @@ export default function AboutPage() {
 
       <h2>What you&apos;ll find here</h2>
       <ul>
-        <li><strong><a href="/pulse">Pulse</a></strong> — daily robotics stories from the USA, China, India, Japan, Europe — decoded.</li>
+        <li><strong><a href="/news">News</a></strong> — daily robotics stories from IEEE, MIT, The Robot Report and more, scored for India relevance — decoded.</li>
         <li><strong><a href="/atlas">Atlas</a></strong> — the encyclopedia. Every concept, robot, person, company — in plain English.</li>
         <li><strong><a href="/lens">Lens</a></strong> — the best robotics videos on the internet, summarized so you don&apos;t have to watch 45 minutes to learn 4.</li>
         <li><strong><a href="/diagnostic">Academy</a></strong> — structured courses from Spark (beginner) to Edge (frontier research).</li>

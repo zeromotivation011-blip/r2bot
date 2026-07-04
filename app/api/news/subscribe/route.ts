@@ -1,5 +1,5 @@
 // app/api/news/subscribe/route.ts
-// Newsletter signup for Pulse — weekly robotics digest.
+// Newsletter signup for R2BOT Weekly — the weekly robotics digest.
 
 import type { NextRequest } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createSupabaseServerClient()
     const { error } = await supabase
       .from('newsletter_subscribers')
-      .insert({ email, source: 'pulse' })
+      .insert({ email, source: 'news' })
 
     // 23505 = unique violation — treat as success ("already subscribed")
     if (error && error.code !== '23505') {

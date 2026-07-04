@@ -24,6 +24,11 @@ const nextConfig = {
     return [
       { source: '/world-map', destination: '/atlas', permanent: true },
       { source: '/world-map/embed', destination: '/atlas', permanent: true },
+      // Consolidation: Pulse is folded into the automated News feed.
+      { source: '/pulse', destination: '/news', permanent: true },
+      { source: '/pulse/weekly', destination: '/news', permanent: true },
+      { source: '/pulse/rss.xml', destination: '/news/rss.xml', permanent: true },
+      { source: '/pulse/:slug', destination: '/news', permanent: true },
     ];
   },
 };

@@ -1,0 +1,112 @@
+{
+  "topics": [
+    {
+      "id": "inverse_kinematics",
+      "title": "Inverse Kinematics",
+      "hook": "Every robot arm you've ever seen runs on ONE equation.",
+      "curiosity_angle": "The secret math behind every factory arm, surgical robot, and Mars rover",
+      "script": "Every robot arm you've ever seen runs on ONE equation. It's called Inverse Kinematics. You point to a spot — it figures out every joint angle automatically. Your brain solves this instantly. But a robot needs six simultaneous equations — recalculated every millisecond. This is the math inside every factory arm, every surgical robot, and every Mars rover. Follow R2BOT — and learn robotics from zero to engineer.",
+      "visuals": "robot_arm",
+      "tags": ["#robotics", "#inversekinematics", "#engineering", "#robots", "#STEM"]
+    },
+    {
+      "id": "lidar",
+      "title": "How Robots See in the Dark",
+      "hook": "Self-driving cars don't use cameras to see. They use something far stranger.",
+      "curiosity_angle": "LiDAR — the laser that maps the world 10 million times per second",
+      "script": "Self-driving cars don't use cameras to see. They fire 10 million laser pulses every second and listen for the echo. That's LiDAR. Each pulse hits an object and bounces back in nanoseconds. The car builds a 3D map of the world — in real time — faster than your eye can blink. Rain, fog, and darkness don't matter. Lasers don't care. This is how robots see. Follow R2BOT to learn the tech shaping the future.",
+      "visuals": "lidar_scan",
+      "tags": ["#LiDAR", "#selfdriving", "#autonomousvehicles", "#robotics", "#technology"]
+    },
+    {
+      "id": "pid_controller",
+      "title": "PID Controller",
+      "hook": "Three letters control almost every machine on the planet. P. I. D.",
+      "curiosity_angle": "The 80-year-old algorithm still running your thermostat, drone, and Tesla",
+      "script": "Three letters control almost every machine on Earth. P. I. D. Proportional. Integral. Derivative. Your thermostat uses it. Your drone uses it. Your Tesla uses it. A PID controller asks three questions every millisecond: How wrong am I right now? How long have I been wrong? How fast am I getting more wrong? The answers become a correction signal. It's 80 years old — and nothing better has replaced it. Follow R2BOT. Learn the classics.",
+      "visuals": "pid_graph",
+      "tags": ["#PIDcontroller", "#controlsystems", "#robotics", "#engineering", "#automation"]
+    },
+    {
+      "id": "slam",
+      "title": "SLAM — How Robots Map Unfamiliar Places",
+      "hook": "Drop a robot in an unknown room. How does it know where it is?",
+      "curiosity_angle": "SLAM solves a chicken-and-egg problem that stumped engineers for decades",
+      "script": "Drop a robot in a room it's never seen. How does it know where it is? This is the SLAM problem. Simultaneous Localization and Mapping. The robot must build a map while using that same map to navigate. It's a chicken-and-egg problem that stumped roboticists for decades. Today, your robot vacuum solves it. So does every autonomous drone and self-driving car. Follow R2BOT — and learn how robots find their way.",
+      "visuals": "slam_map",
+      "tags": ["#SLAM", "#robotics", "#autonomousrobots", "#AI", "#engineering"]
+    },
+    {
+      "id": "ros2",
+      "title": "What is ROS2?",
+      "hook": "There's one operating system that almost every serious robot runs on. You've never heard of it.",
+      "curiosity_angle": "ROS2 — the invisible OS powering Boston Dynamics, NASA, and every robotics startup",
+      "script": "There's one operating system that almost every serious robot runs on — and you've probably never heard of it. It's called ROS2. Robot Operating System 2. It's what Boston Dynamics uses. What NASA uses. What every robotics startup uses. It lets a robot's brain, eyes, arms, and wheels all talk to each other in real time. Without ROS2, modern robotics would collapse. Follow R2BOT — we'll teach you ROS2 from zero.",
+      "visuals": "ros2_nodes",
+      "tags": ["#ROS2", "#robotics", "#robotprogramming", "#engineering", "#BostonDynamics"]
+    },
+    {
+      "id": "reinforcement_learning",
+      "title": "How Robots Learn to Walk",
+      "hook": "Nobody programmed this robot to walk. It figured it out by failing 10 million times.",
+      "curiosity_angle": "Reinforcement learning — teaching robots through pain and reward",
+      "script": "Nobody programmed this robot how to walk. It figured it out by failing — ten million times — in a simulation. That's reinforcement learning. The robot tries a movement. Falls over. Gets penalized. Tries again. After millions of attempts, it discovers walking on its own. The same technique taught AlphaGo to beat world champions. And it's teaching robots to run, jump, and survive terrain humans can't. Follow R2BOT — the future of robotics is stranger than you think.",
+      "visuals": "rl_learning",
+      "tags": ["#reinforcementlearning", "#AI", "#robotics", "#machinelearning", "#deeplearning"]
+    },
+    {
+      "id": "degrees_of_freedom",
+      "title": "Degrees of Freedom",
+      "hook": "Your shoulder has 3 degrees of freedom. Most robots have 6. Here's why that matters.",
+      "curiosity_angle": "The hidden number that determines what a robot can and cannot do",
+      "script": "Your shoulder has 3 degrees of freedom. Your wrist adds 3 more. Together, your arm can reach almost any point in space at any angle. That's why industrial robot arms have exactly 6 joints. Add fewer and the robot can't reach everywhere. Add more and the math becomes nightmarish. 6 is the magic number — and it comes from pure geometry. Follow R2BOT to understand the hidden math behind every robot.",
+      "visuals": "dof_diagram",
+      "tags": ["#robotics", "#degreesoffreedom", "#robotiArm", "#engineering", "#STEM"]
+    },
+    {
+      "id": "computer_vision",
+      "title": "How Robots Recognize Your Face",
+      "hook": "Your phone recognizes your face in 0.1 seconds. Here's the math it's doing.",
+      "curiosity_angle": "Convolutional neural networks — the trick that made computers see",
+      "script": "Your phone recognizes your face in under a tenth of a second. Here's what it's actually doing. It breaks your face into thousands of tiny patches. Runs each patch through 50 layers of math. Each layer detects something — edges, curves, eyes, nose. By layer 50, it knows it's you. This is a Convolutional Neural Network — and it's the same technology inside every robot with eyes. Follow R2BOT. We'll teach you to build one.",
+      "visuals": "cnn_layers",
+      "tags": ["#computervision", "#AI", "#neuralnetworks", "#robotics", "#deeplearning"]
+    },
+    {
+      "id": "path_planning",
+      "title": "How Robots Navigate Obstacles",
+      "hook": "Getting from A to B sounds simple. For a robot, it's one of the hardest problems in math.",
+      "curiosity_angle": "A* algorithm — the 50-year-old trick that every game, robot, and GPS still uses",
+      "script": "Getting from A to B sounds simple. For a robot surrounded by obstacles, it's one of the hardest problems in mathematics. The solution? A star algorithm. A*. Invented in 1968 by NASA researchers. It searches for the shortest path by always moving toward the destination — but smart enough to go around walls. Every GPS. Every video game. Every autonomous robot. All using the same 56-year-old trick. Follow R2BOT — learn the classics.",
+      "visuals": "astar_grid",
+      "tags": ["#robotics", "#pathplanning", "#Astar", "#algorithms", "#autonomousrobots"]
+    },
+    {
+      "id": "torque_vs_speed",
+      "title": "Why Robots Are Strong But Slow",
+      "hook": "Why can a robot lift 500kg but struggle to open a door?",
+      "curiosity_angle": "The torque-speed tradeoff that every robotics engineer fights every day",
+      "script": "Why can an industrial robot lift 500 kilograms but struggle to open a delicate door? Torque and speed are opposites. High torque means low speed. High speed means low torque. A robot arm optimized for strength moves slowly and crushes things it touches. Optimized for speed — and it can't lift anything. Nature solved this with muscles and tendons over 500 million years. We've been trying to copy it for 50. Follow R2BOT. The problem is harder than it looks.",
+      "visuals": "torque_graph",
+      "tags": ["#robotics", "#motors", "#engineering", "#mechatronics", "#robots"]
+    },
+    {
+      "id": "sensor_fusion",
+      "title": "Why Self-Driving Cars Use 5 Different Sensors",
+      "hook": "One sensor is never enough. Here's why self-driving cars have five.",
+      "curiosity_angle": "Sensor fusion — combining imperfect data into perfect awareness",
+      "script": "One sensor is never enough. LiDAR is blind to color. Cameras fail in the dark. Radar misses pedestrians. GPS drifts by 3 meters. Ultrasonic sensors have a 10cm range. But combine all five — and they cover each other's blind spots perfectly. This is sensor fusion — using imperfect data to create perfect situational awareness. Your brain does this with your eyes, ears, and balance system simultaneously. Self-driving cars are learning to do the same. Follow R2BOT.",
+      "visuals": "sensor_fusion",
+      "tags": ["#selfdriving", "#sensorfusion", "#autonomousvehicles", "#robotics", "#AI"]
+    },
+    {
+      "id": "end_effector",
+      "title": "The Hardest Part of a Robot",
+      "hook": "The most advanced part of any robot isn't its brain. It's its hand.",
+      "curiosity_angle": "End effectors — why gripping a grape is harder than landing on Mars",
+      "script": "The most advanced part of any robot isn't its brain — it's its hand. Called an end effector. Gripping a fresh grape without crushing it requires sensing pressure to within 0.1 grams. Picking up a raw egg without breaking it requires knowing exactly how hard is too hard. Your fingers have 17,000 nerve endings per square centimeter. No robot comes close. This is why Amazon still has humans in its warehouses. The hand remains unsolved. Follow R2BOT.",
+      "visuals": "end_effector",
+      "tags": ["#robotics", "#robothand", "#grippers", "#engineering", "#hardproblem"]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+Drop a robot in an unknown room. How does it know where it is?
+
+SLAM solves a chicken-and-egg problem that stumped engineers for decades
+
+✅ Follow @r2bot.in to learn robotics from zero to job-ready.
+🔗 Free courses + AI mentor at r2bot.in
+
+#SLAM
+#robotics
+#autonomousrobots
+#AI
+#engineering
+#robotics #engineering #STEM #learnrobotics #r2bot

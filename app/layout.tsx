@@ -79,13 +79,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Perf: resolve font and Supabase DNS early. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-        <link rel="preconnect" href="https://acrdjpmvdscngldxilgm.supabase.co" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="//acrdjpmvdscngldxilgm.supabase.co" />
+        <link rel="preconnect" href="https://bxgtocghjypbomszwvfr.supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//bxgtocghjypbomszwvfr.supabase.co" />
         <link
           rel="alternate"
           type="application/rss+xml"
-          title="R2BOT Pulse — daily robotics, decoded"
-          href="/pulse/rss.xml"
+          title="R2BOT News — daily robotics, decoded"
+          href="/news/rss.xml"
         />
         <script
           type="application/ld+json"

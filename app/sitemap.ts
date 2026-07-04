@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next';
 import { getAllAtlasEntries } from '@/lib/atlas';
-import { getAllPulse } from '@/lib/pulse';
 import { getAllLens } from '@/lib/lens';
 import { getAllAcademyLessons } from '@/lib/academy';
 import { ROBOTS } from '@/lib/robots-data';
@@ -17,13 +16,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(e.lastReviewed ?? now),
     changeFrequency: 'monthly' as const,
     priority: 0.8,
-  }));
-
-  const pulse = getAllPulse().map((p) => ({
-    url: `${BASE}/pulse/${p.slug}`,
-    lastModified: new Date(p.publishedAt),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
   }));
 
   const lens = getAllLens().map((v) => ({
@@ -80,8 +72,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/about`,            lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
 
     // Secondary content surfaces
-    { url: `${BASE}/pulse`,            lastModified: now, changeFrequency: 'daily',   priority: 0.7 },
-    { url: `${BASE}/history`,          lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${BASE}/robots`,           lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
     { url: `${BASE}/visualizer`,       lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${BASE}/mission`,          lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
@@ -102,7 +92,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...atlas,
     ...buildProjects,
     ...blogPosts,
-    ...pulse,
     ...lens,
     ...ROBOTS.map((r) => ({
       url: `${BASE}/robots/${r.slug}`,

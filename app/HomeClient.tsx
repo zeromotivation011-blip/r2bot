@@ -163,9 +163,9 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
           }}>
             The{' '}
             <span style={{ background: 'linear-gradient(90deg, #00E5FF, #A56BFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Duolingo of Robotics
+              fastest way to learn robotics
             </span>
-            {' '}for India.
+            {' '}in India.
           </h1>
 
           <p style={{ fontSize: 18, color: '#c4b5fd', maxWidth: 560, lineHeight: 1.65, margin: '0 0 10px' }}>
@@ -215,8 +215,8 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
             <p style={{ fontSize: 11, color: '#94a3b8', margin: 0, fontWeight: 700 }}>Robotics concepts in Atlas</p>
           </div>
           <div style={{ position: 'absolute', bottom: 60, left: -28, background: 'rgba(15,10,30,0.92)', border: '1px solid rgba(165,107,255,0.3)', borderRadius: 14, padding: '10px 14px', minWidth: 160, backdropFilter: 'blur(12px)' }}>
-            <p style={{ fontSize: 20, fontWeight: 900, color: '#A56BFF', margin: 0 }}>CBSE + NEP 2020</p>
-            <p style={{ fontSize: 11, color: '#94a3b8', margin: 0, fontWeight: 700 }}>Curriculum aligned</p>
+            <p style={{ fontSize: 20, fontWeight: 900, color: '#A56BFF', margin: 0 }}>AI Co-pilot</p>
+            <p style={{ fontSize: 11, color: '#94a3b8', margin: 0, fontWeight: 700 }}>Your 24/7 robotics mentor</p>
           </div>
         </div>
       </div>
@@ -320,9 +320,9 @@ function Ticker() {
     '🇮🇳 Hindi + English content',
     '🔬 9 in-browser simulators — no install needed',
     '📚 261 Atlas concepts',
-    '🏫 CBSE + NEP 2020 aligned',
+    '🤖 R2 Co-pilot — your AI robotics mentor',
     '🌍 50 countries on the robotics map',
-    '🤖 Duolingo of Robotics for India',
+    '🛠️ 20+ guided robot builds',
     '🎓 Certificates for every course',
     '🔥 Spaced repetition built in',
   ]
@@ -367,7 +367,7 @@ function MissionStrip() {
             { stat: '4 Tracks', sub: 'Spark → Wire → Forge → Edge' },
             { stat: 'Hindi + English', sub: 'Vernacular learning, first-class' },
             { stat: 'No hardware needed', sub: 'Simulators do the heavy lifting' },
-            { stat: 'CBSE aligned', sub: 'Grades 6–12 curriculum maps' },
+            { stat: 'AI Co-pilot', sub: 'Your 24/7 robotics mentor' },
           ].map(({ stat, sub }) => (
             <div key={stat} style={{
               background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
@@ -530,19 +530,19 @@ function IndiaSpotlight() {
               Built for India. Rooted in Bharat.
             </h2>
             <p style={{ fontSize: 16, color: '#94a3b8', lineHeight: 1.7, margin: '0 0 24px', maxWidth: 560 }}>
-              Robotics is moving fast — and India is moving faster. Every concept is explained with Indian examples. Every price is in rupees. Every course is CBSE and NEP 2020 aligned.
+              Robotics is moving fast — and India is moving faster. Every concept is explained with Indian examples, and every price is in rupees.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
               <Pillar emoji="🏭" title="IFR 2023" body="India added 4,900 robots — fastest growing in Asia." />
-              <Pillar emoji="🎓" title="CBSE + NEP 2020" body="Curriculum aligned for every grade 6–12." />
+              <Pillar emoji="🛠️" title="Learn by building" body="20+ guided robot projects, in sim or on real hardware." />
               <Pillar emoji="🌐" title="Hindi first" body="Full Hindi content for every lesson." />
             </div>
-            <Link href="/history" style={{
+            <Link href="/atlas" style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 48, padding: '0 20px',
               background: '#f97316', color: '#0f0a1e', borderRadius: 12,
               fontWeight: 900, fontSize: 14, textDecoration: 'none',
             }}>
-              See India's Robotics Story →
+              Explore the Robotics Atlas →
             </Link>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -597,7 +597,7 @@ function Testimonials() {
     },
     {
       name: 'Priya Venkataraman', meta: 'Computer Science teacher, Pune',
-      quote: 'My students are obsessed with the robot simulator. I\'ve never seen them this engaged with any tool. The CBSE alignment makes it easy to integrate into lessons.',
+      quote: 'My students are obsessed with the robot simulator. I\'ve never seen them this engaged with any tool. It\'s so easy to fit into my lessons.',
       color: '#A56BFF', role: 'Teacher',
     },
     {
@@ -612,7 +612,7 @@ function Testimonials() {
     },
     {
       name: 'Sneha Kulkarni', meta: 'School Principal, Nashik',
-      quote: 'We integrated R2BOT into our CBSE technology curriculum. The teacher dashboard made it easy to track student progress across 3 classes.',
+      quote: 'We integrated R2BOT into our technology curriculum. The teacher dashboard made it easy to track student progress across 3 classes.',
       color: '#f97316', role: 'Principal',
     },
     {
@@ -845,7 +845,7 @@ function NewsletterCTA() {
 function Footer() {
   const cols: { h: string; links: { label: string; href: string }[] }[] = [
     { h: 'Academy',  links: [{ label: 'Spark Track', href: '/academy' }, { label: 'Wire Track', href: '/academy' }, { label: 'Forge Track', href: '/academy' }, { label: 'Edge Track', href: '/academy' }] },
-    { h: 'Explore',  links: [{ label: 'Atlas', href: '/atlas' }, { label: 'Simulators', href: '/visualizer' }, { label: 'Lens', href: '/lens' }, { label: 'Robotics History', href: '/history' }] },
+    { h: 'Explore',  links: [{ label: 'Atlas', href: '/atlas' }, { label: 'Simulators', href: '/visualizer' }, { label: 'Lens', href: '/lens' }, { label: 'Blog', href: '/blog' }] },
     { h: 'Discover', links: [{ label: 'Daily Life', href: '/daily-life' }, { label: 'Career Paths', href: '/careers' }, { label: 'Daily News', href: '/news' }, { label: 'Diagnostic Test', href: '/diagnostic' }] },
     { h: 'Company',  links: [{ label: 'Mission', href: '/mission' }, { label: 'Contact', href: 'mailto:hello@r2bot.in' }, { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' }] },
   ]
@@ -858,7 +858,7 @@ function Footer() {
               R<span style={{ color: '#fbbf24' }}>2</span>BOT
             </p>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 16px', lineHeight: 1.5 }}>
-              The Duolingo of Robotics for India. Spark to Edge. Hindi and English.
+              ROBOT, decoded — for India. Spark to Edge. Hindi and English.
             </p>
             <p style={{ fontSize: 14, color: '#f97316', fontFamily: 'serif', margin: 0 }}>
               रोबोटिक्स सीखो, भारत बदलो

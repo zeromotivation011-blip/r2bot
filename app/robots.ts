@@ -17,7 +17,16 @@ export default function robots(): MetadataRoute.Robots {
           '/signup',
           '/auth/',
           '/verify/',
+          // Parked features — kept in the codebase but hidden from nav and search
+          // until we hit scale (see CLAUDE.md §6). Not linked anywhere public.
           '/schools',
+          '/hardware',
+          '/kids',
+          '/jobs',
+          '/leaderboard',
+          '/history',
+          '/world-map',
+          '/pulse',
         ],
       },
     ],

@@ -1,0 +1,13 @@
+Nobody programmed this robot to walk. It figured it out by failing 10 million times.
+
+Reinforcement learning — teaching robots through pain and reward
+
+✅ Follow @r2bot.in to learn robotics from zero to job-ready.
+🔗 Free courses + AI mentor at r2bot.in
+
+#reinforcementlearning
+#AI
+#robotics
+#machinelearning
+#deeplearning
+#robotics #engineering #STEM #learnrobotics #r2bot

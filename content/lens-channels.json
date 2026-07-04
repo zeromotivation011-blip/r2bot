@@ -1,0 +1,10 @@
+{
+  "_comment": "Auto-ingested YouTube channels for Lens. Add more channels here. To find a channel_id: open the channel on YouTube, View Source, and search for \"channelId\". Only channel_id works for RSS (not @handles). alwaysRelevant:true skips the robotics keyword filter (use for pure-robotics channels); false means only videos matching robotics keywords are kept.",
+  "channels": [
+    { "name": "Boston Dynamics", "channelId": "UC7vVhkEfw4nOGp8TyDk7RcQ", "alwaysRelevant": true },
+    { "name": "Two Minute Papers", "channelId": "UCbfYPyITQ-7l4upoX8nvctg", "alwaysRelevant": true },
+    { "name": "NVIDIA", "channelId": "UCHuiy8bXnmK5nisYHUd1J5g", "alwaysRelevant": false },
+    { "name": "Tesla", "channelId": "UC5WjFrtBdufl6CZojX3D8dQ", "alwaysRelevant": false },
+    { "name": "Lex Fridman", "channelId": "UCSHZKyawb77ixDdsGog4iWA", "alwaysRelevant": false }
+  ]
+}

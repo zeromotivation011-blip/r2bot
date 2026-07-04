@@ -6,14 +6,14 @@
 //   RESEND_FROM_EMAIL   — e.g. "R2BOT <digest@r2bot.in>"
 //   SUPABASE_SERVICE_ROLE_KEY — to read auth.users.email and bypass RLS
 //
-// Triggered by Vercel cron every Monday at 08:00 UTC.
+// Triggered by Vercel cron every Friday at 08:00 UTC.
 
 import type { NextRequest } from 'next/server';
 import { Resend } from 'resend';
 import { createSupabaseAdminClient } from '@/lib/supabase/server';
 import { getAllAtlasEntries } from '@/lib/atlas';
 import { getAcademyLesson } from '@/lib/academy';
-import { getAllPulse } from '@/lib/pulse';
+import { getNewsData } from '@/lib/news';
 import { WeeklyDigest, buildSubject, type DigestProps } from '@/components/emails/WeeklyDigest';
 
 export const runtime = 'nodejs';
@@ -78,11 +78,18 @@ async function GET_or_POST(req: NextRequest): Promise<Response> {
   const weeklyIdx = sortedAtlas.length > 0 ? weekNumberUTC(new Date()) % sortedAtlas.length : 0;
   const termOfWeek = sortedAtlas[weeklyIdx] ?? null;
 
-  const pulseTop3 = getAllPulse().slice(0, 3).map((p) => ({
-    title: p.title,
-    summary: p.summary,
-    href: `/pulse/${p.slug}`,
-  }));
+  // Top 3 stories from the live automated news aggregator (was static Pulse).
+  let pulseTop3: Array<{ title: string; summary: string; href: string }> = [];
+  try {
+    const news = await getNewsData();
+    pulseTop3 = news.articles.slice(0, 3).map((a) => ({
+      title: a.title,
+      summary: a.aiSummary || a.description,
+      href: a.url,
+    }));
+  } catch {
+    pulseTop3 = [];
+  }
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
   const sent: string[] = [];
@@ -186,8 +193,69 @@ async function GET_or_POST(req: NextRequest): Promise<Response> {
     );
   }
 
+  // 4. Anonymous newsletter subscribers (public signups from the site).
+  //    They get the shared content (top news + term of week) without the
+  //    personalised learning stats. Deduped against profile emails above.
+  //    Wrapped in try/catch so a missing 0030 migration never blocks profiles.
+  const alreadySent = new Set(list.map((p) => (p.email as string).toLowerCase()));
+  let subscriberSent = 0;
+  try {
+    const { data: subs } = await supabase
+      .from('newsletter_subscribers')
+      .select('email, unsubscribe_token, active')
+      .eq('active', true);
+    const subList = (subs ?? []).filter(
+      (s) => !!s.email && !alreadySent.has(String(s.email).toLowerCase()),
+    );
+    for (let i = 0; i < subList.length; i += 10) {
+      const batch = subList.slice(i, i + 10);
+      await Promise.all(
+        batch.map(async (s) => {
+          const email = String(s.email);
+          try {
+            const token = (s.unsubscribe_token as string) ?? '';
+            const props: DigestProps = {
+              baseUrl: BASE_URL,
+              firstName: email.split('@')[0] || 'there',
+              streak: 0,
+              continueLearning: null,
+              pulse: pulseTop3,
+              termOfWeek: termOfWeek
+                ? {
+                    title: termOfWeek.title,
+                    summary: termOfWeek.summary,
+                    href: atlasHrefFor(`${termOfWeek.type}/${termOfWeek.slug}`),
+                  }
+                : null,
+              understoodThisWeek: 0,
+              lessonsCompleted: 0,
+              unsubscribeUrl: `${BASE_URL}/api/unsubscribe?token=${encodeURIComponent(token)}`,
+            };
+            const subject = buildSubject({ streak: 0, pulseCount: pulseTop3.length });
+            const { error: sendErr } = await resend.emails.send({
+              from,
+              to: email,
+              subject,
+              react: WeeklyDigest(props),
+            });
+            if (sendErr) {
+              errors.push({ email, error: sendErr.message });
+            } else {
+              subscriberSent += 1;
+            }
+          } catch (e) {
+            errors.push({ email, error: (e as Error).message });
+          }
+        }),
+      );
+    }
+  } catch (e) {
+    errors.push({ email: 'newsletter_subscribers', error: (e as Error).message });
+  }
+
   return Response.json({
     sent: sent.length,
+    subscriberSent,
     skipped: skipped.length,
     errors,
   });

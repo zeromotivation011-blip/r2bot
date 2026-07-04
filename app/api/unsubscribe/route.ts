@@ -38,19 +38,35 @@ export async function GET(req: NextRequest) {
   }
   try {
     const supabase = createSupabaseAdminClient();
-    const { data, error } = await supabase
+
+    // 1. Registered users unsubscribe via their profile token.
+    const { data: profile } = await supabase
       .from('profiles')
       .update({ email_digest_enabled: false })
       .eq('digest_unsubscribe_token', token)
       .select('email')
       .maybeSingle();
-    if (error || !data) {
+    if (profile) {
       return page(
-        '<h1>Link not recognised</h1><p>Either this link has already been used or it never existed. If you keep receiving emails, reply to one and we will sort it out.</p>',
+        `<h1>You&rsquo;re unsubscribed</h1><p>You&rsquo;ll no longer receive the R2BOT weekly digest. Want to come back any time? <a href="/dashboard">Re-enable from your dashboard</a>.</p>`,
       );
     }
+
+    // 2. Anonymous newsletter subscribers unsubscribe via their own token.
+    const { data: subscriber } = await supabase
+      .from('newsletter_subscribers')
+      .update({ active: false, unsubscribed_at: new Date().toISOString() })
+      .eq('unsubscribe_token', token)
+      .select('email')
+      .maybeSingle();
+    if (subscriber) {
+      return page(
+        `<h1>You&rsquo;re unsubscribed</h1><p>You&rsquo;ll no longer receive R2BOT Weekly. You can re-subscribe any time from the <a href="/news">News page</a>.</p>`,
+      );
+    }
+
     return page(
-      `<h1>You&rsquo;re unsubscribed</h1><p>You&rsquo;ll no longer receive the R2BOT weekly digest. Want to come back any time? <a href="/dashboard">Re-enable from your dashboard</a>.</p>`,
+      '<h1>Link not recognised</h1><p>Either this link has already been used or it never existed. If you keep receiving emails, reply to one and we will sort it out.</p>',
     );
   } catch {
     return page('<h1>Something went wrong</h1><p>Try again in a moment.</p>');

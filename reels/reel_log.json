@@ -1,0 +1,10 @@
+{
+  "used": [
+    "inverse_kinematics",
+    "lidar",
+    "pid_controller",
+    "slam",
+    "ros2",
+    "reinforcement_learning"
+  ]
+}
