@@ -12,9 +12,14 @@ interface Personalization {
   track: Track | null
 }
 
+export interface HomeNewsItem { title: string; url: string; source: string; topic: string }
+export interface HomeVideoItem { title: string; url: string; thumbnailUrl: string; channel: string }
+
 interface HomeClientProps {
   atlasCount: number
   projectCount: number
+  news?: HomeNewsItem[]
+  videos?: HomeVideoItem[]
 }
 
 function usePersonalization(): Personalization {
@@ -63,7 +68,7 @@ const TRACK_LABEL: Record<Track, string> = {
   spark: 'Spark', wire: 'Wire', forge: 'Forge', edge: 'Edge',
 }
 
-export default function HomeClient({ atlasCount, projectCount }: HomeClientProps) {
+export default function HomeClient({ atlasCount, projectCount, news = [], videos = [] }: HomeClientProps) {
   const personalization = usePersonalization()
   const showDiagnosticBanner = personalization.signedIn && !personalization.track
   return (
@@ -96,7 +101,8 @@ export default function HomeClient({ atlasCount, projectCount }: HomeClientProps
       <SimulatorShowcase />
       <IndiaSpotlight />
       <Testimonials />
-      <YouTubeTeaser />
+      <NewsTeaser items={news} />
+      <LensTeaser items={videos} />
       <NewsletterCTA />
       <Footer />
 
@@ -677,49 +683,128 @@ function Testimonials() {
   )
 }
 
-// ─── YOUTUBE TEASER ───────────────────────────────────────────────────────
-function YouTubeTeaser() {
+// ─── NEWS TEASER (live, from the automated aggregator) ────────────────────
+function NewsTeaser({ items }: { items: HomeNewsItem[] }) {
+  return (
+    <section style={{ padding: '72px 20px', background: '#0a0a0f', borderTop: '1px solid #1f1f2a' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 26 }}>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#00E5FF', display: 'inline-block', animation: 'r2pulse 1.6s infinite' }} />
+              <span style={{ fontSize: 11, fontWeight: 900, color: '#7dd3fc', letterSpacing: '2px', textTransform: 'uppercase' }}>Live · Auto-updated</span>
+            </div>
+            <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, margin: 0, color: '#fff' }}>
+              Latest in robotics
+            </h2>
+          </div>
+          <Link href="/news" style={{ fontSize: 14, fontWeight: 800, color: '#00E5FF', textDecoration: 'none' }}>
+            All news →
+          </Link>
+        </div>
+
+        {items.length === 0 ? (
+          <Link href="/news" style={{
+            display: 'block', padding: 28, textAlign: 'center', borderRadius: 16,
+            border: '1px dashed rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.03)',
+            color: '#94a3b8', textDecoration: 'none', fontWeight: 700,
+          }}>
+            Fresh robotics headlines from IEEE, MIT, The Robot Report and more — open the News feed →
+          </Link>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
+            {items.map((n) => (
+              <a
+                key={n.url}
+                href={n.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex', flexDirection: 'column', gap: 10, padding: 18,
+                  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: 14, textDecoration: 'none', minHeight: 118,
+                }}
+              >
+                <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '1px', textTransform: 'uppercase', color: '#7dd3fc' }}>
+                  {n.source} · {n.topic}
+                </span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: '#f4f4f5', lineHeight: 1.35 }}>
+                  {n.title}
+                </span>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+      <style jsx>{`@keyframes r2pulse { 0%,100% { opacity:1 } 50% { opacity:.35 } }`}</style>
+    </section>
+  )
+}
+
+// ─── LENS TEASER (live, auto-ingested YouTube videos) ─────────────────────
+function LensTeaser({ items }: { items: HomeVideoItem[] }) {
   return (
     <section style={{
       padding: '72px 20px',
       background: 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(249,115,22,0.06))',
       borderTop: '1px solid rgba(239,68,68,0.15)', borderBottom: '1px solid rgba(239,68,68,0.10)',
     }}>
-      <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 10,
-          background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)',
-          padding: '8px 18px', borderRadius: 999, marginBottom: 20,
-        }}>
-          <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444', display: 'inline-block', animation: 'pulse 1.5s infinite' }} />
-          <span style={{ fontSize: 12, fontWeight: 900, color: '#fca5a5', letterSpacing: '2px', textTransform: 'uppercase' }}>
-            YouTube Channel — Coming Soon
-          </span>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 26 }}>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="#ef4444" aria-hidden><path d="M19.6 3H4.4A2.4 2.4 0 0 0 2 5.4v13.2A2.4 2.4 0 0 0 4.4 21h15.2A2.4 2.4 0 0 0 22 18.6V5.4A2.4 2.4 0 0 0 19.6 3zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
+              <span style={{ fontSize: 11, fontWeight: 900, color: '#fca5a5', letterSpacing: '2px', textTransform: 'uppercase' }}>Lens · Best videos, decoded</span>
+            </div>
+            <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, margin: 0, color: '#fff' }}>
+              Don&apos;t watch 45 minutes to learn 4.
+            </h2>
+          </div>
+          <Link href="/lens" style={{ fontSize: 14, fontWeight: 800, color: '#fca5a5', textDecoration: 'none' }}>
+            All videos →
+          </Link>
         </div>
-        <h2 style={{ fontSize: 'clamp(24px,4vw,42px)', fontWeight: 900, margin: '0 0 16px', color: '#fff' }}>
-          Video lessons landing on YouTube.
-        </h2>
-        <p style={{ fontSize: 16, color: '#94a3b8', lineHeight: 1.7, marginBottom: 28 }}>
-          Every Academy lesson will have a companion YouTube video — bilingual, short, and packed with real robot examples.
-          Subscribe to get notified when we launch.
-        </p>
-        <a
-          href="https://www.youtube.com/@r2bot"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: 10, minHeight: 52, padding: '0 26px',
-            background: '#ef4444', color: '#fff', borderRadius: 14,
-            fontWeight: 900, fontSize: 15, textDecoration: 'none',
-            boxShadow: '0 8px 24px rgba(239,68,68,0.3)',
-          }}
-        >
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden><path d="M19.6 3H4.4A2.4 2.4 0 0 0 2 5.4v13.2A2.4 2.4 0 0 0 4.4 21h15.2A2.4 2.4 0 0 0 22 18.6V5.4A2.4 2.4 0 0 0 19.6 3zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
-          Subscribe on YouTube
-        </a>
-        <style jsx>{`
-          @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        `}</style>
+
+        {items.length === 0 ? (
+          <Link href="/lens" style={{
+            display: 'block', padding: 28, textAlign: 'center', borderRadius: 16,
+            border: '1px dashed rgba(239,68,68,0.25)', background: 'rgba(239,68,68,0.06)',
+            color: '#fca5a5', textDecoration: 'none', fontWeight: 700,
+          }}>
+            The best robotics videos on the internet, summarized — open Lens →
+          </Link>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+            {items.map((v) => (
+              <a
+                key={v.url}
+                href={v.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'block', borderRadius: 14, overflow: 'hidden',
+                  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                  textDecoration: 'none',
+                }}
+              >
+                <div style={{ position: 'relative', aspectRatio: '16 / 9', background: `#000 center/cover url(${v.thumbnailUrl})` }}>
+                  <span style={{
+                    position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(0,0,0,0.25)',
+                  }}>
+                    <span style={{ width: 46, height: 46, borderRadius: '50%', background: 'rgba(239,68,68,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z" /></svg>
+                    </span>
+                  </span>
+                </div>
+                <div style={{ padding: 14 }}>
+                  <p style={{ fontSize: 14, fontWeight: 800, color: '#f4f4f5', margin: '0 0 6px', lineHeight: 1.35 }}>{v.title}</p>
+                  <p style={{ fontSize: 12, color: '#94a3b8', margin: 0, fontWeight: 700 }}>{v.channel}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

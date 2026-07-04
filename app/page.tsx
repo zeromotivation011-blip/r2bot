@@ -6,6 +6,8 @@ import { CopilotDrawer } from '@/components/CopilotDrawer'
 import HomeClient from './HomeClient'
 import { getAllAtlasEntries } from '@/lib/atlas'
 import { loadAllProjects } from '@/lib/build/loader'
+import { getNewsData } from '@/lib/news'
+import { getLiveLensVideos } from '@/lib/lens-live'
 
 export const runtime = 'nodejs'
 export const revalidate = 3600
@@ -102,22 +104,43 @@ const faqJsonLd = {
       name: 'Do I need any hardware to use R2BOT?',
       acceptedAnswer: { '@type': 'Answer', text: 'No. Every R2BOT feature — Atlas, simulators, Academy lessons, R2 Co-pilot — runs in your browser. You can build real robots later; the learning works without any hardware.' },
     },
-    {
-      '@type': 'Question',
-      name: 'How does the school curriculum align with CBSE?',
-      acceptedAnswer: { '@type': 'Answer', text: 'R2BOT for Schools maps every unit to CBSE/ICSE chapters from Class 6 to Class 12, with NEP 2020 alignment for skill-based learning.' },
-    },
   ],
 }
 
-export default function HomePage() {
+export default async function HomePage() {
   const atlasCount = getAllAtlasEntries().length
   const projectCount = loadAllProjects().length
+
+  // Live homepage teasers — sourced from the automated News + Lens pipelines.
+  // Both are cached; failures degrade to an empty array (teasers self-hide).
+  const [news, videos] = await Promise.all([
+    getNewsData()
+      .then((d) =>
+        d.articles.slice(0, 4).map((a) => ({
+          title: a.title,
+          url: a.url,
+          source: a.source,
+          topic: a.topic,
+        })),
+      )
+      .catch(() => [] as { title: string; url: string; source: string; topic: string }[]),
+    getLiveLensVideos()
+      .then((v) =>
+        v.slice(0, 3).map((x) => ({
+          title: x.title,
+          url: x.url,
+          thumbnailUrl: x.thumbnailUrl,
+          channel: x.channel,
+        })),
+      )
+      .catch(() => [] as { title: string; url: string; thumbnailUrl: string; channel: string }[]),
+  ])
+
   return (
     <CopilotProvider>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteJsonLd, organizationJsonLd, faqJsonLd]) }} />
       <Nav />
-      <HomeClient atlasCount={atlasCount} projectCount={projectCount} />
+      <HomeClient atlasCount={atlasCount} projectCount={projectCount} news={news} videos={videos} />
       <CopilotBubble />
       <CopilotDrawer />
     </CopilotProvider>
