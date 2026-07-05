@@ -33,3 +33,4 @@ Thumbs.db
 
 # --- Supabase CLI cache ---
 supabase/.temp/
+.env*

@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { SkipToContent } from '@/components/SkipToContent';
+import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import { LowDataMode } from '@/components/LowDataMode';
 import { PWAPrompt } from '@/components/PWAPrompt';
 import { ToastProvider } from '@/components/Toast';
@@ -12,6 +14,8 @@ import { AuthModal } from '@/components/auth/AuthModal';
 import { organizationJsonLD } from '@/lib/seo/jsonld';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
+// Google Analytics 4 — set NEXT_PUBLIC_GA_ID (e.g. "G-XXXXXXX") in Vercel to turn on.
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body', display: 'swap' });
 const display = Space_Grotesk({ subsets: ['latin'], variable: '--font-display', display: 'swap' });
@@ -103,8 +107,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ToastProvider>
         </AuthProvider>
         <OnboardingModal />
+        <LeadCaptureModal />
         <LowDataMode />
         <PWAPrompt />
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_ID}');`}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );
