@@ -87,9 +87,45 @@ But what we actually want is the opposite: given a target position for the hand,
 
 **Neural IK** — newer: train a [neural network](/atlas/concept/neural-network) to learn the inverse [mapping](/atlas/concept/mapping) from data. Less accurate but much faster, and handles redundancy gracefully.
 
+## The Jacobian: how numerical IK actually works
+
+The workhorse of numerical IK is the **Jacobian matrix** `J`, which links small joint changes to small end-effector changes:
+
+```
+ẋ = J(θ)·θ̇      # end-effector velocity = Jacobian × joint velocities
+```
+
+To move the hand toward a target, you invert that relationship — but `J` is usually not square (a 7-joint arm mapping to a 6-D pose isn't invertible), so solvers use the **pseudo-inverse** `J⁺`:
+
+```
+θ̇ = J⁺·ẋ_error      # step the joints to shrink the position error, then repeat
+```
+
+Take a small step, recompute the error, iterate until the hand reaches the target. This is Newton-style root finding on the forward-kinematics function.
+
+## Singularities: where IK breaks
+
+At certain configurations — an arm stretched fully straight, or two joint axes lining up — the Jacobian **loses rank**. Near these **singularities**, `J⁺` blows up and demands enormous, unsafe joint velocities to make a tiny Cartesian move (think of the "gimbal lock" wrist flip on an industrial arm). The standard fix is **damped least squares** (the Levenberg-Marquardt IK): add a damping term `λ` so the solver trades a little accuracy for bounded, stable joint speeds:
+
+```
+θ̇ = Jᵀ(J·Jᵀ + λ²I)⁻¹·ẋ_error
+```
+
+## Redundancy and the null space
+
+A 7-DOF arm reaching a 6-D pose has one *extra* degree of freedom — a whole **null space** of joint motions that don't move the hand at all. This is a gift: you can move the elbow to dodge an obstacle, stay away from joint limits, or keep away from singularities *while the hand holds its target*. Solvers exploit it with a null-space projection term, which is exactly how humanoid arms look natural and avoid self-collision.
+
 ## Why this matters for humanoids
 
 A [humanoid robot](/atlas/concept/humanoid-robot) has roughly 30 joints. Getting its right hand to a specific point isn't "pick angles for the 6 joints in the arm" — it's "pick angles for 30 joints such that the *whole body* keeps its balance, the *legs* stay where they are, and the *left hand* doesn't bump into the chest". This is called **whole-body IK**. It's the math problem that [Atlas](/atlas/robot/atlas), [Optimus](/atlas/robot/optimus), and Figure 03 are solving 500-1,000 times per second.
+
+## Check your understanding
+
+**1.** Why can a 7-joint arm reach the same point infinitely many ways, and how is that useful? It has one more degree of freedom than the 6-D task needs — a **null space** of motions that don't move the hand. You exploit it to avoid obstacles, joint limits, and singularities while holding the target.
+
+**2.** Your arm demands wild joint speeds as it approaches a fully-extended pose — what's happening and what's the fix? You're near a **singularity** where the Jacobian loses rank and `J⁺` explodes. Use **damped least squares** (add a `λ` term) to keep joint velocities bounded at the cost of a little accuracy.
+
+**3.** When would you choose analytical IK over numerical IK? For a **simple arm (≤6 DOF) with clean geometry**, a closed-form solution is exact and runs in microseconds — no iteration, no convergence worries. Numerical IK is for redundant/complex arms where no closed form exists.
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: Transformer Architecture in Robotics — Complete Guide | R2BOT
+title: Transformer Architecture
 summary: >-
   Transformers use self-attention to handle sequences and multimodal inputs.
   They power foundation models, ChatGPT, and the new wave of robot policies.
@@ -57,9 +57,29 @@ The Transformer is a neural network architecture built around self-attention —
 
 Input tokens (words, image patches, or robot observations) get embedded as vectors. The self-attention layer computes how strongly each token relates to every other token, producing weighted combinations. Multi-head attention runs this in parallel across many subspaces. Layers stack with feed-forward networks and residual connections. Transformers scale extraordinarily well — bigger models trained on more data keep improving — which is why they have replaced CNNs and RNNs in most domains.
 
+## The attention mechanism, precisely
+
+Each token is projected into three vectors: a **query** (`Q`, "what am I looking for?"), a **key** (`K`, "what do I offer?"), and a **value** (`V`, "what I'll pass on"). Attention is one compact formula:
+
+```
+Attention(Q, K, V) = softmax( Q·Kᵀ / √dₖ ) · V
+```
+
+- `Q·Kᵀ` scores how relevant every token is to every other token (an n×n matrix).
+- Dividing by `√dₖ` keeps the scores from saturating the softmax as dimension grows.
+- `softmax` turns scores into weights that sum to 1; multiplying by `V` produces each token's context-aware output.
+
+**Multi-head** attention runs `h` of these in parallel with different learned projections, so one head can track syntax while another tracks long-range references, then concatenates the results.
+
+Two consequences matter for robotics. First, attention is **O(n²)** in sequence length — doubling the context quadruples the compute, which is why long-horizon robot policies and long video streams are expensive (and why FlashAttention and linear-attention variants exist). Second, attention is **permutation-invariant** — it has no built-in sense of order — so **positional encodings** (sinusoidal or rotary/RoPE) are added to tell the model where each token sits in space or time. **Encoder** stacks see the whole input at once (perception); **decoder** stacks mask future tokens to generate one step at a time (action/text generation).
+
+## Why transformers took over robotics specifically
+
+The unlock is that *anything* can be turned into tokens — words, image patches, joint states, even **discretized robot actions**. That lets one architecture fuse vision, language, and proprioception in a single model and output actions. This is the basis of **Vision-Language-Action (VLA)** models: the network is pretrained on web-scale image+text, then fine-tuned to emit action tokens, inheriting common-sense knowledge no robot dataset could teach.
+
 ## Real-World Example
 
-RT-1 and RT-2 from Google DeepMind are transformer policies that map images + language to robot actions. Tesla Autopilot's HydraNet uses transformer modules. Physical Intelligence's π₀ humanoid policy is built on a 3B-parameter transformer. Indian researchers at IIT Bombay use transformers for multimodal manipulation experiments.
+RT-1 and RT-2 from Google DeepMind are transformer policies that map images + language to robot actions. Modern self-driving perception stacks use transformer modules to fuse camera views over time. Physical Intelligence's π₀ policy is built on a multi-billion-parameter transformer. Across the world's labs — DeepMind, Stanford, Berkeley, ETH Zürich, IIT Bombay, and many more — transformers are now the default backbone for multimodal manipulation research.
 
 ## Why It Matters for Robotics
 
@@ -118,4 +138,4 @@ Train a tiny transformer (one head, two layers) on a sequence-prediction task in
 
 ## Ask R2 About This
 
-Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Transformer Architecture in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Walk me through self-attention step by step with a tiny worked example, then explain how a VLA model turns an image and an instruction into robot actions."* You'll get a tailored, sourced answer in seconds.

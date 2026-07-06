@@ -107,6 +107,29 @@ Tesla's argument: humans drive with just two cameras (eyes), so cars should be a
 
 Neither approach is finished. The argument is one of the biggest open questions in modern robotics.
 
+## The models an engineer actually reaches for
+
+- **Detection:** the **YOLO** family (v8/v11) — one forward pass, real-time on an onboard GPU — is the default for robots that must react at 30–60 fps. Two-stage detectors (Faster R-CNN) are more accurate but slower.
+- **Segmentation:** **Mask R-CNN** for instance masks; **SAM / SAM 2** (Segment Anything) for promptable, zero-shot masks that generalize to objects never seen in training — a big deal for open-world manipulation.
+- **Backbones:** CNNs (ResNet, EfficientNet) still win on tiny edge budgets; **Vision Transformers** (ViT, DINOv2) win when you have data and compute, and their features transfer better to downstream robot tasks.
+- **Depth:** stereo matching, or monocular depth models (Depth Anything) when you only have one camera.
+
+## How vision quality is measured
+
+You can't tune what you can't score. The core metric is **IoU** (Intersection over Union) — overlap between predicted and true boxes/masks. Detection is summarized by **mAP** (mean Average Precision) across IoU thresholds, the number every benchmark (COCO) reports. For a robot, though, the metric that matters is often downstream: did the grasp succeed? A model with high mAP can still fail the robot if it's wrong on the specific objects and lighting the robot faces.
+
+## Why robot vision is harder than benchmark vision
+
+A model that scores well on internet photos can fall apart on a robot because of the **domain gap**: motion blur, odd viewpoints, harsh or changing lighting, transparent/reflective objects (glass, metal), and cluttered scenes with heavy occlusion. Two consequences dominate real deployments — models trained in **simulation** need domain randomization to survive the **sim-to-real** jump, and latency is a hard constraint: a perfect detection that arrives 200 ms late is useless to a moving robot. This is why perception is co-designed with control, not bolted on.
+
+## Check your understanding
+
+**1.** What's the difference between object *detection* and *segmentation*? Detection outputs a **bounding box + label** per object; segmentation outputs a **per-pixel mask** — a precise outline. Segmentation is heavier but essential for grasping oddly-shaped objects.
+
+**2.** A detector scores high mAP on COCO but the robot keeps mis-grasping — what's likely wrong? The **domain gap**: the robot's lighting, viewpoints, motion blur, or object set differ from the benchmark data. Benchmark accuracy doesn't guarantee task success.
+
+**3.** Why might you pick YOLO over Faster R-CNN on a mobile robot? YOLO is **single-stage and real-time**; on a latency-constrained robot a slightly-less-accurate detection at 60 fps beats a more accurate one that arrives too late to act on.
+
 ---
 
 *The first practical use of computer vision most people have touched is the Roomba's navigation cameras. Read [How a Roomba decides where to clean](/lens/roomba-how-it-cleans).*
