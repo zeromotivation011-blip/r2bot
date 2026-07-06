@@ -21,6 +21,21 @@ CREATE TABLE IF NOT EXISTS public.atlas_entries (
   UNIQUE (type, slug)
 );
 
+-- Self-heal: if the table already existed (e.g. a partial earlier run) without
+-- these columns, add them so the policies below always work.
+ALTER TABLE public.atlas_entries
+  ADD COLUMN IF NOT EXISTS type       text,
+  ADD COLUMN IF NOT EXISTS slug       text,
+  ADD COLUMN IF NOT EXISTS title      text,
+  ADD COLUMN IF NOT EXISTS summary    text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS category   text,
+  ADD COLUMN IF NOT EXISTS status     text NOT NULL DEFAULT 'published',
+  ADD COLUMN IF NOT EXISTS data       jsonb NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS body       text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS origin     text NOT NULL DEFAULT 'mdx',
+  ADD COLUMN IF NOT EXISTS created_at timestamptz NOT NULL DEFAULT now(),
+  ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
+
 CREATE INDEX IF NOT EXISTS atlas_entries_type_idx   ON public.atlas_entries(type);
 CREATE INDEX IF NOT EXISTS atlas_entries_status_idx ON public.atlas_entries(status);
 CREATE INDEX IF NOT EXISTS atlas_entries_updated_idx ON public.atlas_entries(updated_at DESC);
