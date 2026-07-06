@@ -44,7 +44,7 @@ export async function GET(): Promise<Response> {
     <title>R2BOT News — robotics, decoded</title>
     <link>${BASE_URL}/news</link>
     <atom:link href="${BASE_URL}/news/rss.xml" rel="self" type="application/rss+xml" />
-    <description>Daily robotics news from IEEE Spectrum, MIT, The Robot Report, TechCrunch and more — summarized and scored for India relevance.</description>
+    <description>Daily robotics news from IEEE Spectrum, MIT, The Robot Report, TechCrunch and more — summarized and decoded for learners worldwide.</description>
     <language>en</language>
     <lastBuildDate>${new Date(lastUpdated).toUTCString()}</lastBuildDate>
 ${items}

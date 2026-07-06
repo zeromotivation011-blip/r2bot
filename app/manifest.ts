@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "R2BOT — India's Robotics Learning Platform",
+    name: "R2BOT — Learn Robotics, from Zero to Job-Ready",
     short_name: 'R2BOT',
     description:
       "The world's most accessible robotics platform. Every robot, every breakthrough, every concept — explained in plain English.",
