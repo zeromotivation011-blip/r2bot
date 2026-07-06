@@ -124,32 +124,30 @@ for _ in range(64):
     })
 
 def _draw_particles(frame_num):
-    # rendered at half resolution then upscaled -> much cheaper blur
-    hw, hh = WW // 2, HH // 2
-    layer = Image.new("RGBA", (hw, hh), (0, 0, 0, 0))
+    # drawn directly at full res via concentric alpha rings -> soft after the
+    # final LANCZOS downscale, and avoids an expensive blur+upscale.
+    layer = Image.new("RGBA", (WW, HH), (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
     t = frame_num / FRAMES
     for p in _PARTICLES:
         z = p["z"]
         y = (p["y"] - t * 0.12 * z) % 1.0
         x = (p["x"] + 0.012 * math.sin(p["ph"] + frame_num * 0.03 * p["sw"])) % 1.0
-        px, py = x * hw, y * hh
-        r = (2 + 9 * z) * (SS / 2)
+        px, py = x * WW, y * HH
+        r = (2 + 9 * z) * SS
         col = CYAN if p["cy"] else AMBER_HI
-        d.ellipse([px-r*2.2, py-r*2.2, px+r*2.2, py+r*2.2], fill=(*col, int(26 * z)))
-        d.ellipse([px-r, py-r, px+r, py+r], fill=(*col, int(150 * z)))
-    layer = layer.filter(ImageFilter.GaussianBlur(2.5))
-    return layer.resize((WW, HH), Image.BILINEAR)
+        d.ellipse([px-r*2.6, py-r*2.6, px+r*2.6, py+r*2.6], fill=(*col, int(16 * z)))
+        d.ellipse([px-r*1.6, py-r*1.6, px+r*1.6, py+r*1.6], fill=(*col, int(38 * z)))
+        d.ellipse([px-r, py-r, px+r, py+r], fill=(*col, int(170 * z)))
+    return layer
 
 # ── Bloom: additive glow from a bright RGBA layer ────────────────────────────
-def _add_bloom(base_rgb, bright_rgba, strength=0.9, radius=7):
-    small = bright_rgba.resize((WW // 2, HH // 2), Image.BILINEAR)
-    small = small.filter(ImageFilter.GaussianBlur(radius))
-    glow = small.resize((WW, HH), Image.BILINEAR).convert("RGB")
-    a = np.asarray(base_rgb, dtype=np.int16)
-    g = np.asarray(glow, dtype=np.int16)
-    out = np.clip(a + (g * strength).astype(np.int16), 0, 255).astype(np.uint8)
-    return Image.fromarray(out, "RGB")
+def _bloom_at_output(bright_rgba, strength=0.9):
+    """Compute additive glow directly at OUTPUT resolution (cheap)."""
+    small = bright_rgba.resize((W // 2, H // 2), Image.BILINEAR)
+    small = small.filter(ImageFilter.GaussianBlur(4))
+    glow = small.resize((W, H), Image.BILINEAR).convert("RGB")
+    return np.asarray(glow, dtype=np.int16), strength
 
 def _text(d, xy, s, fnt, fill, anchor="mm"):
     d.text((xy[0]*SS, xy[1]*SS), s, font=fnt, fill=fill, anchor=anchor)
@@ -252,9 +250,8 @@ def _hud_rings(bright, sharp, frame_num, cx, cy, alpha):
 
 # ── Main frame renderer ──────────────────────────────────────────────────────
 def render_frame(frame_num, topic):
-    base = _background()                                   # RGB @ SS
-    # particle field (soft, behind everything)
-    base = Image.alpha_composite(base.convert("RGBA"), _draw_particles(frame_num)).convert("RGB")
+    base = _background().convert("RGBA")                   # RGBA @ SS
+    base = Image.alpha_composite(base, _draw_particles(frame_num))
 
     bright = Image.new("RGBA", (WW, HH), (0, 0, 0, 0))     # -> bloom source
     sharp  = Image.new("RGBA", (WW, HH), (0, 0, 0, 0))     # -> crisp overlay
@@ -374,8 +371,11 @@ def render_frame(frame_num, topic):
         bd = ImageDraw.Draw(bright)
         bd.rounded_rectangle([40*SS, y0*SS, (W-40)*SS, y1*SS], radius=40*SS, outline=(*AMBER_HI, int(160*alpha)), width=int(6*SS))
 
-    # ── Compose: bloom then sharp overlay, downsample ────────────────────────
-    out_rgb = _add_bloom(base, bright, strength=0.85, radius=7)
-    out = Image.alpha_composite(out_rgb.convert("RGBA"), sharp).convert("RGB")
-    out = out.resize((W, H), Image.LANCZOS)
+    # ── Compose at output res: base+glow (behind) then crisp sharp on top ─────
+    base_out = base.convert("RGB").resize((W, H), Image.LANCZOS)
+    glow, strength = _bloom_at_output(bright, strength=0.85)
+    arr = np.clip(np.asarray(base_out, np.int16) + (glow * strength).astype(np.int16), 0, 255).astype(np.uint8)
+    base_out = Image.fromarray(arr, "RGB").convert("RGBA")
+    sharp_out = sharp.resize((W, H), Image.LANCZOS)
+    out = Image.alpha_composite(base_out, sharp_out).convert("RGB")
     return out

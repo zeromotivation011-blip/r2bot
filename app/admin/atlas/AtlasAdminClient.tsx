@@ -37,6 +37,22 @@ export function AtlasAdminClient({ items }: { items: AtlasListItem[] }) {
   const [editingKey, setEditingKey] = useState<string | null>(null) // "type/slug" when editing
   const [status, setStatus] = useState<'idle' | 'loading' | 'saving' | 'ok' | 'err'>('idle')
   const [msg, setMsg] = useState<string | null>(null)
+  const [importing, setImporting] = useState(false)
+  const [importMsg, setImportMsg] = useState<string | null>(null)
+
+  async function importFromFiles() {
+    setImporting(true); setImportMsg(null)
+    try {
+      const res = await fetch('/api/admin/atlas/import', { method: 'POST' })
+      const json = await res.json()
+      setImportMsg(json.ok ? `Imported ${json.processed} entries from files.` : (json.error || 'Import failed.'))
+      if (json.ok) router.refresh()
+    } catch {
+      setImportMsg('Network error.')
+    } finally {
+      setImporting(false)
+    }
+  }
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase()
@@ -103,6 +119,16 @@ export function AtlasAdminClient({ items }: { items: AtlasListItem[] }) {
             style={inputStyle}
           />
           <button onClick={newEntry} style={{ ...btnPrimary, whiteSpace: 'nowrap' }}>+ New</button>
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <button onClick={importFromFiles} disabled={importing} style={{
+            width: '100%', padding: '8px 12px', background: 'transparent', color: '#94a3b8',
+            border: '1px dashed rgba(255,255,255,0.2)', borderRadius: 10, fontSize: 12, cursor: 'pointer',
+            opacity: importing ? 0.6 : 1,
+          }}>
+            {importing ? 'Importing…' : '⤓ Import all entries from files'}
+          </button>
+          {importMsg && <p style={{ fontSize: 11, color: '#10b981', margin: '6px 0 0' }}>{importMsg}</p>}
         </div>
         <div style={{ maxHeight: 620, overflowY: 'auto', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12 }}>
           {filtered.length === 0 ? (
