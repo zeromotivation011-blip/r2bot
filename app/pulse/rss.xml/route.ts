@@ -1,6 +1,6 @@
 import { getAllPulse } from '@/lib/pulse';
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
 
 function escapeXml(s: string): string {
   return s

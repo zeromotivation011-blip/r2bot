@@ -16,7 +16,7 @@ import {
 } from '@/lib/academy';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
 
 export const dynamic = 'force-dynamic';
 

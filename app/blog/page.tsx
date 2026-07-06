@@ -8,7 +8,7 @@ import BlogIndexClient from './BlogIndexClient'
 
 export const runtime = 'nodejs'
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app'
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
 
 export const metadata: Metadata = {
   title: 'R2BOT Blog | Robotics for Students India | Learn Robotics 2025',

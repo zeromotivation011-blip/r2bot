@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
 
 export function VisualizerActions({ sectionId, title }: { sectionId: string; title: string }) {
   const [shared, setShared] = useState(false);

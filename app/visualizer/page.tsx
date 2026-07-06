@@ -17,7 +17,7 @@ import { MotorControlVisual } from '@/components/visuals/MotorControlVisual';
 import { RobotPlayground } from '@/components/visuals/RobotPlayground';
 import { URDFViewerWrapper } from '@/components/visuals/URDFViewerWrapper';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
 
 const SIMULATOR_LESSONS: Record<string, { href: string; title: string }> = {
   'pid': { href: '/academy/wire/w-03-pid-control-practice', title: 'W-03: PID Control in Practice' },

@@ -14,7 +14,7 @@ export type PulseEntry = {
   readMinutes: number;
 };
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
 
 export function PulseList({ entries }: { entries: PulseEntry[] }) {
   const [filter, setFilter] = useState<string>('All');

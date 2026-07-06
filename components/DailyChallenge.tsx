@@ -106,7 +106,7 @@ export function DailyChallenge({
   };
 
   const handleShare = useCallback(async () => {
-    const text = `I solved today's R2BOT challenge! Try it: https://r2bot-psi.vercel.app/challenge`;
+    const text = `I solved today's R2BOT challenge! Try it: https://www.r2bot.in/challenge`;
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({ title: "R2BOT Daily Challenge", text });

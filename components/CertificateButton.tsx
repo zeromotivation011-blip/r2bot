@@ -62,7 +62,7 @@ export function CertificateButton({
         completedAt: new Date(data.issuedAt),
         certificateId: data.certificateId,
       });
-      setVerifyUrl(`https://r2bot-psi.vercel.app/verify/${data.certificateId}`);
+      setVerifyUrl(`https://www.r2bot.in/verify/${data.certificateId}`);
     } catch (e) {
       setError((e as Error).message);
     } finally {

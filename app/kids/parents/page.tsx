@@ -3,7 +3,7 @@ import ParentsClient from './ParentsClient'
 
 export const runtime = 'nodejs'
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app'
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
 
 export const metadata: Metadata = {
   title: 'For Parents — Robot World | R2BOT',

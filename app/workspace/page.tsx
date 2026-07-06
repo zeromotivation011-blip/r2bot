@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { WorkspaceIDEClient } from '@/components/WorkspaceIDEClient';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
 
 export const metadata: Metadata = {
   title: 'R2BOT Workspace — Simulated ROS2 IDE',

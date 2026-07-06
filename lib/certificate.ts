@@ -155,7 +155,7 @@ export function generateCertificate(params: CertificateParams): void {
   // verify URL
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
-  doc.text(`Verify at r2bot-psi.vercel.app/verify/${certificateId}`, W / 2, 195, { align: 'center' });
+  doc.text(`Verify at www.r2bot.in/verify/${certificateId}`, W / 2, 195, { align: 'center' });
 
   // trigger download
   doc.save(`R2BOT-Certificate-${shortId}.pdf`);

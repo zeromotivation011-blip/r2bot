@@ -8,7 +8,7 @@ import DailyLifeClient from './DailyLifeClient'
 export const runtime = 'nodejs'
 export const revalidate = 3600
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app'
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
 
 export const metadata: Metadata = {
   title: 'Your Robot Day | Robots Already Running Your Life — R2BOT',
