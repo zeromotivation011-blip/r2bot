@@ -614,3 +614,12 @@ html[data-low-data="1"] .cursor-dot { display: none !important; }
   .r2-lift:hover, .r2-glow:hover { transform: none !important; }
   .r2-gradient-text, .r2-aurora { animation: none !important; }
 }
+
+/* Site-wide page entrance — a soft fade on every route for a polished, app-like
+   feel. Opacity-only (no transform) so it never disturbs fixed/sticky layout. */
+@keyframes r2PageIn { from { opacity: 0; } to { opacity: 1; } }
+main { animation: r2PageIn 460ms cubic-bezier(.16, 1, .3, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  main { animation: none !important; }
+}
