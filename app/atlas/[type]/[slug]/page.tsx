@@ -5,11 +5,14 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
   getAllAtlasEntries,
-  getAtlasEntry,
   getRelatedEntries,
   typeLabel,
   type AtlasType,
 } from '@/lib/atlas';
+import { getAtlasEntryMerged } from '@/lib/atlas-db';
+
+// Regenerate periodically so Content-Manager edits appear on the live page.
+export const revalidate = 300;
 import { getAcademyLessonForAtlasTerm, TRACK_EMOJI, TRACK_NAME } from '@/lib/atlas-academy-map';
 import { Nav } from '@/components/Nav';
 import { ParticleField } from '@/components/ParticleField';
@@ -63,7 +66,7 @@ export async function generateMetadata(
   { params }: { params: Promise<Params> },
 ): Promise<Metadata> {
   const { type, slug } = await params;
-  const entry = getAtlasEntry(type, slug);
+  const entry = await getAtlasEntryMerged(type, slug);
   if (!entry) return { title: 'Not found · Atlas' };
   const canonical = `${BASE_URL}/atlas/${type}/${slug}`;
   return {
@@ -102,7 +105,7 @@ export default async function AtlasEntryPage(
   { params }: { params: Promise<Params> },
 ) {
   const { type, slug } = await params;
-  const entry = getAtlasEntry(type, slug);
+  const entry = await getAtlasEntryMerged(type, slug);
   if (!entry) notFound();
 
   const related = getRelatedEntries(entry, 3);

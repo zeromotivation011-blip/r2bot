@@ -197,7 +197,7 @@ function normalizeCategory(v: unknown): AtlasCategory | undefined {
 }
 
 /** Build an AtlasEntry from raw frontmatter, coercing every field to a render-safe value. */
-function buildEntry(type: AtlasType, slug: string, data: Record<string, unknown>, body: string): AtlasEntry {
+export function buildEntry(type: AtlasType, slug: string, data: Record<string, unknown>, body: string): AtlasEntry {
   return {
     type,
     slug,
