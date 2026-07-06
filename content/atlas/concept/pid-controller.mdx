@@ -92,6 +92,51 @@ When a DJI Mavic Mini hovers at 5 metres, a PID controller runs dozens of times 
 
 PID controllers are everywhere: robotic arms, self-balancing robots like Segways, autonomous vehicles maintaining lane position, CNC machines cutting to micrometer precision, temperature controllers inside 3D printers. The algorithm is only three terms, yet it handles an enormous range of real-world problems. Engineers spend considerable effort "tuning" the three gain values — setting P too high causes oscillation, I too high causes slow wobble, D too high amplifies noise.
 
+## The math (what's actually computed)
+
+Let the **error** be `e(t) = setpoint − measurement`. The control output is:
+
+```
+u(t) = Kp·e(t) + Ki·∫₀ᵗ e(τ) dτ + Kd·de(t)/dt
+```
+
+- **Kp** (proportional gain) scales the present error.
+- **Ki** (integral gain) scales the accumulated past error — it eliminates the steady-state offset that P alone leaves.
+- **Kd** (derivative gain) scales the rate of change of error — it adds damping and anticipates overshoot.
+
+On a real robot this runs in discrete time at a fixed loop rate `dt`:
+
+```python
+integral += error * dt
+derivative = (error - prev_error) / dt
+output = Kp*error + Ki*integral + Kd*derivative
+prev_error = error
+```
+
+## How engineers actually tune it
+
+- **Manual / heuristic:** raise **Kp** until the response is fast but starts to oscillate, add **Kd** to damp the overshoot, then add just enough **Ki** to remove any remaining steady-state error.
+- **Ziegler–Nichols:** raise Kp (with Ki = Kd = 0) until the loop shows *sustained* oscillation. Record that ultimate gain `Ku` and oscillation period `Tu`, then set `Kp = 0.6·Ku`, `Ki = 1.2·Ku/Tu`, `Kd = 0.075·Ku·Tu`. A fast starting point — usually aggressive, so detune from there.
+- **Model-based / auto-tuning:** many industrial controllers estimate a plant model and compute gains (relay auto-tuning, IMC). Great when you have a decent model.
+
+## Three things that bite you in practice
+
+1. **Integral windup.** If the actuator saturates (motor already at 100%), the integral keeps accumulating and the system massively overshoots later. Fix: **clamp the integral** (anti-windup) or stop integrating while saturated.
+2. **Derivative kick.** A sudden setpoint change makes `de/dt` spike, slamming the actuator. Fix: take the **derivative of the measurement, not the error**.
+3. **Noise amplification.** The D term amplifies sensor noise. Fix: **low-pass filter** the derivative, or drop D and use a PI controller.
+
+## When PID isn't enough
+
+PID assumes a roughly linear, single-input/single-output system. For strongly **nonlinear**, **coupled (MIMO)**, or constraint-heavy systems — a legged robot's balance, a drone's full 6-DOF pose — engineers move to **gain scheduling**, **feedforward + PID**, or model-based controllers like **LQR** and **Model Predictive Control (MPC)**. PID is still often the inner loop underneath them.
+
+## Check your understanding
+
+**1.** Why does a pure P controller often leave a small steady-state error, and which term fixes it? The proportional term produces zero corrective push exactly when the error is zero, so it settles slightly short of target under a constant load; the **integral** term accumulates that residual and drives it out.
+
+**2.** Your arm overshoots badly every time it recovers from hitting a limit — what's happening and how do you fix it? **Integral windup** while the actuator was saturated; add **anti-windup** (clamp or freeze the integral during saturation).
+
+**3.** Adding derivative made the motor buzz and jitter — why, and what are two fixes? **D amplifies sensor noise**; **low-pass filter the derivative** or reduce/remove **Kd**.
+
 ---
 
 *Despite being invented in the 1930s for ship steering, the PID controller still runs inside almost every [servo motor](/atlas/concept/servo-motor) and drone you'll ever touch.*

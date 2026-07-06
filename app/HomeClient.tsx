@@ -594,90 +594,57 @@ function IndiaMap() {
   )
 }
 
-// ─── TESTIMONIALS ─────────────────────────────────────────────────────────
+// ─── WHY R2BOT — honest value props (no fabricated testimonials) ──────────
 function Testimonials() {
-  const quotes = [
-    {
-      name: 'Arjun Sharma', meta: 'Class 9 student, Delhi',
-      quote: 'The line follower simulator finally made PID click for me. I spent 2 hours tuning it — it felt like a game, not homework.',
-      color: '#00E5FF', role: 'Student',
-    },
-    {
-      name: 'Priya Venkataraman', meta: 'Computer Science teacher, Pune',
-      quote: 'My students are obsessed with the robot simulator. I\'ve never seen them this engaged with any tool. It\'s so easy to fit into my lessons.',
-      color: '#A56BFF', role: 'Teacher',
-    },
-    {
-      name: 'Rajesh Nair', meta: 'Parent, Bengaluru',
-      quote: 'My daughter finished all 14 kids levels in a week and started asking me about motors. She\'s 10. I have no idea what a PID controller is but she explained it to me.',
-      color: '#10b981', role: 'Parent',
-    },
-    {
-      name: 'Vikram Anand', meta: 'B.Tech Robotics, IIT Bombay',
-      quote: 'The Atlas is the best structured robotics reference I\'ve found anywhere. Every concept links to real examples.',
-      color: '#FFB800', role: 'Student',
-    },
-    {
-      name: 'Sneha Kulkarni', meta: 'School Principal, Nashik',
-      quote: 'We integrated R2BOT into our technology curriculum. The teacher dashboard made it easy to track student progress across 3 classes.',
-      color: '#f97316', role: 'Principal',
-    },
-    {
-      name: 'Ravi Kumar', meta: 'Class 11 student, Chennai',
-      quote: 'The simulation block for sensor fusion in the Wire course is incredible. I could literally see the Kalman filter working. Nothing in my textbooks explained it this well.',
-      color: '#ef4444', role: 'Student',
-    },
+  const points = [
+    { icon: '🎮', label: 'Interactive', color: '#00E5FF',
+      body: 'Concepts link to live simulators you tune in the browser. Read the theory, then run it — PID, kinematics, sensor fusion, pathfinding.' },
+    { icon: '🪜', label: 'Beginner → Advanced', color: '#A56BFF',
+      body: 'Every Atlas entry ladders from a plain-English analogy to the real math and code — so it answers your first question and your deepest one.' },
+    { icon: '🤖', label: 'AI Mentor', color: '#10b981',
+      body: 'R2 Co-pilot is on every page. It answers grounded in the Atlas, cites its sources, and is built not to invent specs.' },
+    { icon: '🛠️', label: 'Learn by Building', color: '#FFB800',
+      body: '20+ guided robot projects with full parts lists and code — in simulation, or on real hardware when you\'re ready.' },
+    { icon: '📡', label: 'Always Current', color: '#f97316',
+      body: 'The best robotics news and YouTube explainers are pulled in and summarized automatically, every single day.' },
+    { icon: '🎁', label: 'Free to Explore', color: '#ef4444',
+      body: 'The full Atlas, the Spark beginner track, and daily Co-pilot cost nothing. No card required to start learning.' },
   ]
   return (
     <section style={{ padding: '80px 20px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 40px' }}>
           <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#00E5FF', fontWeight: 900, margin: '0 0 12px' }}>
-            What Learners Say
+            Why R2BOT
           </p>
           <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 900, margin: 0 }}>
-            Students. Teachers. Parents. Engineers.
+            Built to make robotics actually click.
           </h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-          {quotes.map(q => (
-            <figure key={q.name} style={{
+          {points.map(p => (
+            <div key={p.label} className="r2-lift" style={{
               background: '#111118', border: '1px solid #1f1f2a',
-              borderRadius: 18, padding: '22px 20px', margin: 0,
+              borderRadius: 18, padding: '22px 20px',
             }}>
-              <blockquote style={{ margin: 0, marginBottom: 16 }}>
-                <span style={{ fontSize: 28, color: q.color, lineHeight: 1 }}>"</span>
-                <p style={{ fontSize: 14, color: '#c8d0dc', lineHeight: 1.7, margin: 0 }}>{q.quote}</p>
-              </blockquote>
-              <figcaption style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
                 <span style={{
-                  width: 40, height: 40, borderRadius: '50%',
-                  display: 'grid', placeItems: 'center',
-                  background: q.color + '22', color: q.color,
-                  fontWeight: 900, fontSize: 16, border: `1px solid ${q.color}44`,
-                }}>
-                  {q.name.slice(0, 1)}
-                </span>
-                <div>
-                  <p style={{ fontSize: 14, fontWeight: 800, color: '#fff', margin: 0 }}>{q.name}</p>
-                  <p style={{ fontSize: 11, color: '#64748b', margin: 0 }}>{q.meta}</p>
-                </div>
+                  width: 42, height: 42, borderRadius: 12, display: 'grid', placeItems: 'center',
+                  background: p.color + '18', border: `1px solid ${p.color}33`, fontSize: 20,
+                }}>{p.icon}</span>
                 <span style={{
-                  marginLeft: 'auto',
-                  fontSize: 9, fontWeight: 900, letterSpacing: '1.5px',
-                  textTransform: 'uppercase', color: q.color,
-                  background: q.color + '18', borderRadius: 999,
-                  padding: '2px 8px', border: `1px solid ${q.color}33`,
-                }}>
-                  {q.role}
-                </span>
-              </figcaption>
-            </figure>
+                  fontSize: 10, fontWeight: 900, letterSpacing: '1.5px', textTransform: 'uppercase',
+                  color: p.color, background: p.color + '14', borderRadius: 999,
+                  padding: '4px 10px', border: `1px solid ${p.color}33`,
+                }}>{p.label}</span>
+              </div>
+              <p style={{ fontSize: 14, color: '#c8d0dc', lineHeight: 1.7, margin: 0 }}>{p.body}</p>
+            </div>
           ))}
         </div>
-        <p style={{ marginTop: 24, textAlign: 'center', fontSize: 11, color: '#374151' }}>
-          Community feedback from our early learners. Join them →{' '}
-          <Link href="/academy" style={{ color: '#00E5FF', textDecoration: 'underline' }}>Start learning</Link>
+        <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: '#64748b' }}>
+          New here?{' '}
+          <Link href="/academy" style={{ color: '#00E5FF', textDecoration: 'underline' }}>Start with the free Spark track →</Link>
         </p>
       </div>
     </section>
