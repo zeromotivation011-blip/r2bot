@@ -1,5 +1,5 @@
 ---
-title: A* (A-Star) Pathfinding in Robotics — Complete Guide
+title: A* (A-Star) Pathfinding
 summary: >-
   A* finds the shortest path between two points on a grid or graph. It is the
   most-used pathfinding algorithm in robotics — from Roomba to delivery robots.
@@ -47,15 +47,60 @@ A* (pronounced 'A-star') is a graph search algorithm that finds the shortest pat
 
 ## How it works
 
-A* maintains an open set of nodes to expand and a closed set of nodes already evaluated. At each step, it picks the open node with the lowest f score, evaluates its neighbours, updates their costs, and continues until the goal is reached. With an admissible heuristic (e.g., Euclidean distance), A* is guaranteed to find the shortest path.
+A* maintains an **open set** of frontier nodes (a priority queue keyed by `f`) and a **closed set** of nodes already finalized. At each step it pops the open node with the lowest `f = g + h`, relaxes its neighbours (updating their `g` if a cheaper route is found), and stops when it pops the goal. It's best understood as Dijkstra's algorithm plus a heuristic that biases the search toward the goal instead of expanding uniformly in all directions.
+
+```python
+def a_star(start, goal, neighbors, cost, h):
+    from heapq import heappush, heappop
+    open = [(h(start), 0, start)]        # (f, g, node)
+    came_from, g_score = {}, {start: 0}
+    while open:
+        f, g, node = heappop(open)
+        if node == goal:
+            return reconstruct(came_from, goal)
+        for nxt in neighbors(node):
+            tentative = g + cost(node, nxt)
+            if tentative < g_score.get(nxt, float('inf')):
+                came_from[nxt] = node
+                g_score[nxt] = tentative
+                heappush(open, (tentative + h(nxt), tentative, nxt))
+    return None                          # no path
+```
+
+## The heuristic is everything
+
+A* is only as good as `h(n)`, and two properties decide its behaviour:
+
+- **Admissible** — `h` never *overestimates* the true remaining cost. This guarantees A* returns the **optimal** path. On a grid, straight-line (Euclidean) distance is admissible; for 4-connected movement, Manhattan distance is the right admissible choice; for 8-connected, use octile distance.
+- **Consistent (monotone)** — `h(n) ≤ cost(n, n′) + h(n′)` for every edge. Consistency is stronger than admissibility and guarantees you never need to re-open a closed node, so A* stays efficient.
+
+Tuning the heuristic trades optimality for speed. If `h = 0`, A* degenerates into **Dijkstra** (optimal, slow). If `h` overestimates — **Weighted A***, `f = g + ε·h` with `ε > 1` — the search is far faster and finds a path at most `ε×` longer than optimal, a trade real robots make constantly. Good **tie-breaking** (nudging `f` to prefer nodes closer to the goal) dramatically cuts the number of nodes expanded on open grids.
 
 ## Real-world example
 
-A Roomba uses A* (or a variant) to plan a path around your room. Google Maps uses A* variants for routing. Most warehouse robots, including GreyOrange Butlers, run A* on a grid representation of the warehouse floor.
+A robot vacuum uses A* (or a variant) to plan a route around your room. Web mapping and routing services use A*-family search over the road graph. Warehouse fleets run A* on a grid representation of the floor to route hundreds of robots without collisions.
+
+## When A* isn't the right tool
+
+A* shines on **discrete, low-dimensional** spaces (2D/3D grids, road graphs). It struggles when:
+
+- **The map keeps changing.** Re-running A* from scratch every tick is wasteful — incremental replanners **D\*** and **D\* Lite** repair only the affected part of the path. This is what mobile robots use for dynamic obstacles.
+- **The configuration space is high-dimensional.** A 7-DOF arm can't be gridded — sampling-based planners like **RRT / RRT\*** and **PRM** take over.
+- **The robot has motion constraints.** A car can't turn in place; **Hybrid A\*** searches over feasible (kinematically valid) motions instead of grid cells — it's what powers many self-driving and parking planners.
+
+In ROS2's Nav2, the default planners (**Smac Planner**: 2D A\*, Hybrid-A\*, and State Lattice variants) are exactly these ideas in production.
 
 ## Why it matters for robotics
 
-A* is the canonical robotics algorithm taught in every robotics course — from school programs to IIT classes. Understanding A* is the gateway to D*, RRT, and modern motion planners.
+A* is the canonical pathfinding algorithm taught in essentially every robotics and AI course worldwide. Understanding it — and precisely *why* the heuristic must be admissible — is the gateway to D\*, RRT, and every modern motion planner.
+
+## Check your understanding
+
+**1.** What happens to A* if you set `h(n) = 0` everywhere? It becomes **Dijkstra's algorithm** — still optimal, but it expands uniformly outward with no pull toward the goal, so it's much slower.
+
+**2.** Why does an *overestimating* heuristic break the optimality guarantee? A* can pop the goal before a cheaper path has been fully explored, because an inflated `h` made the better route look worse. You get a valid path, just not necessarily the shortest (the basis of Weighted A*).
+
+**3.** Your robot navigates a warehouse where obstacles appear and move — why is plain A* a poor fit and what's used instead? Re-planning the whole path each cycle is expensive; **D\* Lite** incrementally repairs only the portion of the path affected by the change.
 
 ## See also
 

@@ -72,9 +72,24 @@ ROS2 is the successor to [[ros]]. Where ROS1 had a single master node and a cust
 
 A ROS2 lifecycle node has explicit states: `unconfigured → inactive → active → inactive → finalized`. You can `configure()` and `cleanup()` cleanly. Critical for safety-critical robots — your motor controller comes up only after sensors are validated.
 
-## In India
+## Quality of Service (QoS): the thing that silently breaks everything
 
-[[ISRO]]'s robotic-servicing prototypes run ROS2 for lifecycle guarantees. **Ideaforge** uses it on drones because DDS handles flaky wireless. **GreyOrange**, **Ati Motors**, **Asimov Robotics**, and **Systemantics** all build their products on ROS2 Humble or Iron. Indian university robotics programmes (IIT Madras, IIT Bombay, IIIT-H, BITS Pilani) have switched curricula from ROS1 to ROS2.
+This is the single most common source of "my publisher is running, my subscriber is running, and nothing arrives." Because ROS2 rides on DDS, every topic has a **QoS profile**, and a publisher and subscriber only connect if their profiles are *compatible*. The policies that matter:
+
+- **Reliability** — `RELIABLE` (retransmit until delivered, like TCP) vs `BEST_EFFORT` (fire and forget, like UDP). A `BEST_EFFORT` publisher will **not** match a `RELIABLE` subscriber. Sensor streams (lidar, camera) use best-effort; commands use reliable.
+- **Durability** — `VOLATILE` (only future messages) vs `TRANSIENT_LOCAL` (latch the last message for subscribers that join late). This is how `/map` and `/tf_static` reach nodes that start after them.
+- **History & depth** — `KEEP_LAST` with a queue depth `N`, or `KEEP_ALL`. Depth is your buffer against bursty consumers.
+- **Deadline / Liveliness** — contracts that let a node detect "I stopped hearing from this publisher" — the backbone of failure detection on real robots.
+
+Rule of thumb: match your subscriber's QoS to the publisher's, and use the built-in `SensorDataQoS()` / `SystemDefaultsQoS()` presets rather than hand-rolling.
+
+## Executors and callback groups
+
+`rclpy.spin()` hides an **executor** — the loop that actually fires your callbacks. The default single-threaded executor runs one callback at a time, so a slow callback blocks everything (including timers). For concurrency you switch to a `MultiThreadedExecutor` and assign callbacks to **callback groups**: `MutuallyExclusive` (serialize within the group) or `Reentrant` (run in parallel). Getting this wrong is why a service call inside a subscriber callback can deadlock — a classic ROS2 trap.
+
+## Who builds on ROS2
+
+ROS2 is the default across the world's robotics industry. Open-source stacks like **Nav2** (navigation) and **MoveIt 2** (manipulation) are built on it; **NVIDIA Isaac ROS**, **Apex.AI** (automotive-grade ROS2), and countless AMR, drone, and humanoid companies ship it in production. Space and defence programs choose it for DDS's real-time and security guarantees. It's equally the industry standard in India — **GreyOrange**, **Ati Motors**, **Asimov Robotics**, **ideaForge**, and university programs (IIT Madras, IIT Bombay, IIIT-H) all build on ROS2 Humble/Jazzy — one strong region among many worldwide.
 
 ## See it in action
 
@@ -96,6 +111,14 @@ rclpy.spin(Talker())
 ```
 
 Open a second terminal: `ros2 topic echo /chatter`. Messages appear. No master, no config, no glue.
+
+## Check your understanding
+
+**1.** Your publisher and subscriber are both running on the same machine but no messages arrive — what's the first thing to check? **QoS incompatibility** — most often a `BEST_EFFORT` publisher paired with a `RELIABLE` subscriber (or a `VOLATILE` publisher when the subscriber needed `TRANSIENT_LOCAL` to catch a latched message).
+
+**2.** Why did ROS2 drop the central master that ROS1 had? DDS provides **peer-to-peer discovery**, so there's no single point of failure, multi-robot works natively via domain IDs, and there's no master to bring up before anything else can talk.
+
+**3.** A service call made inside a subscription callback hangs forever — why? The default **single-threaded executor** can't run the service response callback while it's still blocked inside the subscription callback. Fix: a `MultiThreadedExecutor` with the callbacks in a `Reentrant` (or separate) callback group.
 
 ## Related concepts
 
