@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { Reveal } from '@/components/Reveal'
 
 type Track = 'spark' | 'wire' | 'forge' | 'edge'
 
@@ -96,14 +97,14 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
         </section>
       )}
       <Ticker />
-      <MissionStrip />
-      <Features />
-      <SimulatorShowcase />
-      <IndiaSpotlight />
-      <Testimonials />
-      <NewsTeaser items={news} />
-      <LensTeaser items={videos} />
-      <NewsletterCTA />
+      <Reveal><MissionStrip /></Reveal>
+      <Reveal><Features /></Reveal>
+      <Reveal><SimulatorShowcase /></Reveal>
+      <Reveal><IndiaSpotlight /></Reveal>
+      <Reveal><Testimonials /></Reveal>
+      <Reveal><NewsTeaser items={news} /></Reveal>
+      <Reveal><LensTeaser items={videos} /></Reveal>
+      <Reveal><NewsletterCTA /></Reveal>
       <Footer />
 
       <style jsx global>{`
@@ -425,7 +426,7 @@ function Features() {
                 transition: 'transform .2s, border-color .2s, box-shadow .2s',
                 '--accent': c.color,
               } as React.CSSProperties}
-              className="feat-card"
+              className="feat-card r2-lift"
             >
               <div style={{ fontSize: 36, marginBottom: 12 }}>{c.icon}</div>
               <h3 style={{ fontSize: 20, fontWeight: 900, color: '#fff', margin: '0 0 8px' }}>{c.name}</h3>
@@ -501,7 +502,7 @@ function SimulatorShowcase() {
                   borderRadius: 14, textDecoration: 'none',
                   transition: 'transform .15s, border-color .15s',
                 }}
-                className="sim-card"
+                className="sim-card r2-lift"
               >
                 <p style={{ fontWeight: 900, color: s.color, fontSize: 13, margin: '0 0 6px' }}>{s.name}</p>
                 <p style={{ fontSize: 12, color: '#64748b', margin: 0, lineHeight: 1.5 }}>{s.desc}</p>
@@ -719,6 +720,7 @@ function NewsTeaser({ items }: { items: HomeNewsItem[] }) {
                 href={n.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="r2-lift"
                 style={{
                   display: 'flex', flexDirection: 'column', gap: 10, padding: 18,
                   background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
@@ -781,6 +783,7 @@ function LensTeaser({ items }: { items: HomeVideoItem[] }) {
                 href={v.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="r2-lift"
                 style={{
                   display: 'block', borderRadius: 14, overflow: 'hidden',
                   background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
