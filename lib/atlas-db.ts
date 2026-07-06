@@ -22,6 +22,7 @@ export async function getAtlasEntryMerged(type: AtlasType, slug: string): Promis
         .eq('type', type)
         .eq('slug', slug)
         .eq('status', 'published')
+        .abortSignal(AbortSignal.timeout(2500))
         .maybeSingle()
       if (data) {
         const frontmatter = (data.data && typeof data.data === 'object')

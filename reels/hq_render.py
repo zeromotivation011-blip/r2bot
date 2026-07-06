@@ -27,10 +27,15 @@ import numpy as np
 
 # ── Output geometry ──────────────────────────────────────────────────────────
 FPS, W, H = 30, 1080, 1920
-DURATION  = 20
+DURATION  = 60                     # seconds (long-form Reel)
 FRAMES    = FPS * DURATION
 SS        = 2                      # supersampling factor
 WW, HH    = W * SS, H * SS
+
+# ── Section timing (frames), derived from duration ───────────────────────────
+HOOK_END  = round(FRAMES * 5 / 60)         # ~5s hook
+CTA_START = round(FRAMES * 50 / 60)        # last ~10s = CTA
+FADE      = 30                             # ~1s cross-fade used throughout
 
 # ── Palette ──────────────────────────────────────────────────────────────────
 BG_TOP  = (13, 15, 30)
@@ -263,28 +268,29 @@ def render_frame(frame_num, topic):
         _logo(sd, 62, 84, 40, la)
 
     # ── Section 1: HOOK ──────────────────────────────────────────────────────
-    if frame_num < 90:
-        lines, fh, size = _wrap_fit(topic["hook"], "bold", 940, 82, 46, max_lines=4)
+    if frame_num < HOOK_END:
+        lines, fh, size = _wrap_fit(topic["hook"], "bold", 940, 82, 46, max_lines=5)
         lh = size * 1.2                                    # line height (output px)
         block_h = lh * len(lines)
         top = 560 - block_h / 2                             # vertically centered block
+        oa = 1 - ease_in(prg(frame_num, HOOK_END - FADE, HOOK_END))   # fade into concept
         bd = ImageDraw.Draw(bright)
         for i, ln in enumerate(lines):
             p = ease_back(prg(frame_num, i*7, 38 + i*7))
             yoff = (1 - clamp(p)) * 42
-            ya = int(255 * clamp(prg(frame_num, i*7, 32 + i*7)))
+            ya = int(255 * clamp(prg(frame_num, i*7, 32 + i*7)) * oa)
             y = top + lh*(i + 0.5) - yoff
             bd.text((W//2*SS, int(y*SS)), ln, font=fh, fill=(*AMBER_HI, int(ya*0.32)), anchor="mm")
             sd.text((W//2*SS, int(y*SS)), ln, font=fh, fill=(*WHITE, ya), anchor="mm")
         # underline bar spring-grows under the block
-        p2 = ease_out(prg(frame_num, 26, 78))
+        p2 = ease_out(prg(frame_num, 26, 78)) * oa
         bar = int(560 * p2)
         yb = int((top + block_h + 26) * SS)
         sd.rectangle([(W//2*SS - bar//2*SS, yb), (W//2*SS + bar//2*SS, yb + 6*SS)], fill=(*AMBER, int(235*p2)))
         bd.rectangle([(W//2*SS - bar//2*SS, yb-2*SS), (W//2*SS + bar//2*SS, yb + 8*SS)], fill=(*AMBER, int(150*p2)))
         # scroll-cue chevrons
         if frame_num > 55:
-            pc = ease_out(prg(frame_num, 55, 85))
+            pc = ease_out(prg(frame_num, 55, 85)) * oa
             for k in range(3):
                 cy = 1560 + k*26
                 ca = int(150*pc*(1 - k*0.25))

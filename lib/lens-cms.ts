@@ -16,6 +16,7 @@ export async function getAllLensMerged(): Promise<LensVideo[]> {
       .from('lens_entries')
       .select('slug, body, data, status')
       .eq('status', 'published')
+      .abortSignal(AbortSignal.timeout(2500))
     if (!data || data.length === 0) return mdx
     const dbVideos = data.map((r) => {
       const fm = (r.data && typeof r.data === 'object') ? (r.data as Record<string, unknown>) : {}

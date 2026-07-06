@@ -26,6 +26,7 @@ async function applyCuration(articles: EnrichedArticle[]): Promise<EnrichedArtic
       .from('news')
       .select('url, pinned, hidden, curated_summary')
       .in('url', articles.map(a => a.url))
+      .abortSignal(AbortSignal.timeout(2500))
     if (!data) return articles
     const map = new Map(
       (data as { url: string; pinned: boolean; hidden: boolean; curated_summary: string | null }[])

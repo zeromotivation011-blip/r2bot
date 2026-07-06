@@ -16,6 +16,7 @@ export async function getPostBySlugMerged(slug: string): Promise<BlogPost | null
         .select('slug, body, data, status')
         .eq('slug', slug)
         .eq('status', 'published')
+        .abortSignal(AbortSignal.timeout(2500))
         .maybeSingle()
       if (data) {
         const frontmatter = (data.data && typeof data.data === 'object')
