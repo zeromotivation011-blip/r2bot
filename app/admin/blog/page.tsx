@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Nav } from '@/components/Nav';
+import { CopilotProvider } from '@/components/CopilotProvider';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { BlogAdminClient, type BlogListItem } from './BlogAdminClient';
 
@@ -27,7 +28,7 @@ export default async function AdminBlogPage() {
   const items: BlogListItem[] = !error && data ? (data as BlogListItem[]) : [];
 
   return (
-    <>
+    <CopilotProvider>
       <Nav />
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 20px 80px' }}>
         <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: '0 0 6px' }}>Content Manager · Blog</h1>
@@ -36,6 +37,6 @@ export default async function AdminBlogPage() {
         </p>
         <BlogAdminClient items={items} />
       </main>
-    </>
+    </CopilotProvider>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Nav } from '@/components/Nav';
+import { CopilotProvider } from '@/components/CopilotProvider';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AtlasAdminClient, type AtlasListItem } from './AtlasAdminClient';
 
@@ -36,7 +37,7 @@ export default async function AdminAtlasPage() {
   const tableMissing = !!error;
 
   return (
-    <>
+    <CopilotProvider>
       <Nav />
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 20px 80px' }}>
         <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: '0 0 6px' }}>Content Manager · Atlas</h1>
@@ -47,6 +48,6 @@ export default async function AdminAtlasPage() {
         </p>
         <AtlasAdminClient items={items} />
       </main>
-    </>
+    </CopilotProvider>
   );
 }

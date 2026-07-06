@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Nav } from '@/components/Nav';
+import { CopilotProvider } from '@/components/CopilotProvider';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
@@ -29,7 +30,7 @@ export default async function AdminHome() {
   if ((profile?.role as string | undefined) !== 'admin') redirect('/dashboard');
 
   return (
-    <>
+    <CopilotProvider>
       <Nav />
       <main style={{ maxWidth: 1000, margin: '0 auto', padding: '120px 20px 80px' }}>
         <h1 style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: '0 0 6px' }}>Content Manager</h1>
@@ -50,6 +51,6 @@ export default async function AdminHome() {
           ))}
         </div>
       </main>
-    </>
+    </CopilotProvider>
   );
 }

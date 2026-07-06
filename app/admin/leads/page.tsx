@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Nav } from '@/components/Nav';
+import { CopilotProvider } from '@/components/CopilotProvider';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { LeadsClient, type Lead } from './LeadsClient';
 
@@ -35,7 +36,7 @@ export default async function AdminLeadsPage() {
   const leads: Lead[] = !error && data ? (data as Lead[]) : [];
 
   return (
-    <>
+    <CopilotProvider>
       <Nav />
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '120px 20px 80px' }}>
         <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: '0 0 6px' }}>Leads</h1>
@@ -44,6 +45,6 @@ export default async function AdminLeadsPage() {
         </p>
         <LeadsClient leads={leads} />
       </main>
-    </>
+    </CopilotProvider>
   );
 }
