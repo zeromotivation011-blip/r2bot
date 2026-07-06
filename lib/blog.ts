@@ -34,7 +34,7 @@ function asStringArray(v: unknown): string[] {
   return v.map(String)
 }
 
-function build(slug: string, data: Record<string, unknown>, content: string): BlogPost {
+export function build(slug: string, data: Record<string, unknown>, content: string): BlogPost {
   return {
     slug,
     title: String(data.title ?? slug),

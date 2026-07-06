@@ -4,10 +4,13 @@ import { Nav } from '@/components/Nav'
 import { CopilotProvider } from '@/components/CopilotProvider'
 import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
-import { getAllPosts, getPostBySlug, getRelatedPosts } from '@/lib/blog'
+import { getAllPosts, getRelatedPosts } from '@/lib/blog'
+import { getPostBySlugMerged } from '@/lib/blog-db'
 import BlogPostClient from './BlogPostClient'
 
 export const runtime = 'nodejs'
+// Regenerate periodically so Content-Manager edits appear on the live post.
+export const revalidate = 300
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.app'
 
@@ -17,7 +20,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const post = getPostBySlug(slug)
+  const post = await getPostBySlugMerged(slug)
   if (!post) return { title: 'Post not found | R2BOT' }
   const url = `${BASE}/blog/${post.slug}`
   return {
@@ -47,7 +50,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = getPostBySlug(slug)
+  const post = await getPostBySlugMerged(slug)
   if (!post) notFound()
 
   const related = getRelatedPosts(slug, post.tags, 3)

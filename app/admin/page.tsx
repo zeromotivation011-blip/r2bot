@@ -14,6 +14,7 @@ export const dynamic = 'force-dynamic';
 const TOOLS: { href: string; icon: string; title: string; desc: string }[] = [
   { href: '/admin/atlas', icon: '🧠', title: 'Atlas', desc: 'Create & edit robotics concept entries.' },
   { href: '/admin/news', icon: '📰', title: 'News', desc: 'Curate the news archive — pin, hide, rewrite.' },
+  { href: '/admin/blog', icon: '📝', title: 'Blog', desc: 'Write and publish long-form posts.' },
   { href: '/admin/leads', icon: '🎯', title: 'Leads', desc: 'Captured email + phone. Search & export CSV.' },
   { href: '/admin/discovery', icon: '🔭', title: 'Discovery', desc: 'Auto-discovered topics from arXiv, HN, Reddit.' },
   { href: '/admin/projects', icon: '🤖', title: 'Projects', desc: 'Manage robot build projects.' },
