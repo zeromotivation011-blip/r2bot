@@ -158,7 +158,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
             </p>
           )}
           <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 16px' }}>
-            R2BOT · Robotics Education for Bharat
+            R2BOT · ROBOT, decoded — for the world
           </p>
 
           <h1 style={{
@@ -170,16 +170,16 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
           }}>
             The{' '}
             <span style={{ background: 'linear-gradient(90deg, #00E5FF, #A56BFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              fastest way to learn robotics
+              clearest way to learn robotics
             </span>
-            {' '}in India.
+            {' '}on the internet.
           </h1>
 
           <p style={{ fontSize: 18, color: '#c4b5fd', maxWidth: 560, lineHeight: 1.65, margin: '0 0 10px' }}>
-            Project-based robotics learning from first principles to AI. Built for Indian schools, students, and self-learners — in Hindi and English.
+            Project-based robotics learning from first principles to AI — with an AI mentor, real simulators, and hands-on builds. For students, career-switchers, and the curious, everywhere.
           </p>
-          <p style={{ fontSize: 16, color: '#f97316', fontFamily: 'serif', margin: '0 0 28px' }}>
-            रोबोटिक्स सीखो, भारत बदलो
+          <p style={{ fontSize: 16, color: '#f97316', fontWeight: 700, margin: '0 0 28px' }}>
+            Learn it. Build it. Ship it.
           </p>
 
           {/* Stats pills */}
@@ -366,8 +366,8 @@ function MissionStrip() {
           Make robotics as learnable as a language.
         </h2>
         <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 720, margin: '0 auto 32px', lineHeight: 1.7 }}>
-          India is about to become the world's largest robotics market. But most Indian students have never seen a robot up close — let alone programmed one.
-          R2BOT exists to close that gap: structured courses, real simulators, and curriculum designed for the way Indian students think.
+          Robotics is about to reshape every industry on Earth. Yet most people who are curious about it have never seen a robot up close — let alone programmed one.
+          R2BOT exists to close that gap for everyone: structured courses, real simulators, an AI mentor, and the clearest robotics knowledge on the internet.
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 14 }}>
           {[
@@ -531,18 +531,18 @@ function IndiaSpotlight() {
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 48, alignItems: 'center' }}>
           <div>
             <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#f97316', fontWeight: 900, margin: '0 0 14px' }}>
-              India · Bharat
+              Global · Proven in India
             </p>
             <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 900, color: '#fff', margin: '0 0 16px', lineHeight: 1.2 }}>
-              Built for India. Rooted in Bharat.
+              Built for the world. Priced for everyone.
             </h2>
             <p style={{ fontSize: 16, color: '#94a3b8', lineHeight: 1.7, margin: '0 0 24px', maxWidth: 560 }}>
-              Robotics is moving fast — and India is moving faster. Every concept is explained with Indian examples, and every price is in rupees.
+              Robotics is the fastest-growing field on Earth. R2BOT makes it learnable anywhere — free to explore, affordable to master, in plain English (with more languages coming).
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
-              <Pillar emoji="🏭" title="IFR 2023" body="India added 4,900 robots — fastest growing in Asia." />
+              <Pillar emoji="🌍" title="Learn anywhere" body="Runs in your browser — no hardware, no install, no borders." />
               <Pillar emoji="🛠️" title="Learn by building" body="20+ guided robot projects, in sim or on real hardware." />
-              <Pillar emoji="🌐" title="Hindi first" body="Full Hindi content for every lesson." />
+              <Pillar emoji="🤖" title="AI mentor" body="R2 Co-pilot answers anything, grounded in the Atlas." />
             </div>
             <Link href="/atlas" style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 48, padding: '0 20px',
@@ -614,7 +614,7 @@ function Testimonials() {
     },
     {
       name: 'Vikram Anand', meta: 'B.Tech Robotics, IIT Bombay',
-      quote: 'The Atlas is the best structured robotics reference I\'ve found for Indian context. Every concept links to real examples.',
+      quote: 'The Atlas is the best structured robotics reference I\'ve found anywhere. Every concept links to real examples.',
       color: '#FFB800', role: 'Student',
     },
     {
@@ -946,10 +946,10 @@ function Footer() {
               R<span style={{ color: '#fbbf24' }}>2</span>BOT
             </p>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 16px', lineHeight: 1.5 }}>
-              ROBOT, decoded — for India. Spark to Edge. Hindi and English.
+              ROBOT, decoded — for the world. From your first concept to job-ready.
             </p>
-            <p style={{ fontSize: 14, color: '#f97316', fontFamily: 'serif', margin: 0 }}>
-              रोबोटिक्स सीखो, भारत बदलो
+            <p style={{ fontSize: 14, color: '#f97316', fontWeight: 700, margin: 0 }}>
+              Learn it. Build it. Ship it.
             </p>
           </div>
           {cols.map(c => (
@@ -966,7 +966,7 @@ function Footer() {
           ))}
         </div>
         <div style={{ paddingTop: 24, borderTop: '1px solid #1f1f2a', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <p style={{ fontSize: 12, color: '#374151' }}>Made with ❤️ in India · © 2026 R2BOT</p>
+          <p style={{ fontSize: 12, color: '#374151' }}>Made with ❤️ for robotics learners worldwide · © 2026 R2BOT</p>
           <div style={{ display: 'flex', gap: 20 }}>
             <a href="https://twitter.com/r2bot" target="_blank" rel="noopener" style={{ fontSize: 13, color: '#64748b', textDecoration: 'none' }}>Twitter</a>
             <a href="https://www.linkedin.com/company/r2bot" target="_blank" rel="noopener" style={{ fontSize: 13, color: '#64748b', textDecoration: 'none' }}>LinkedIn</a>

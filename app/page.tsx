@@ -17,25 +17,25 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://r2bot-psi.vercel.a
 export const metadata: Metadata = {
   title: "R2BOT — From Zero to Robotics Engineer | Learn, Build, Explore",
   description:
-    "From zero to robotics engineer. Learn ROS2, build real robots, and explore 1,000+ concepts with an AI mentor. Free to start — India's most complete robotics learning platform.",
+    'From zero to robotics engineer. Learn ROS2, build real robots, and explore 1,000+ concepts with an AI mentor. Free to start — the clearest robotics learning platform on the internet.',
   keywords: [
-    'learn robotics India',
+    'learn robotics',
     'ROS2 tutorial beginner',
-    'robotics for college students',
+    'robotics for students',
     'robotics learning platform',
     'robotics atlas',
     'robot projects',
-    'ROS2 tutorial India',
+    'how robots work',
     'robotics engineer career',
     'learn robotics online free',
-    'robotics in Hindi',
+    'robotics explained',
   ],
   alternates: { canonical: SITE_URL },
   openGraph: {
     type: 'website',
     url: SITE_URL,
     siteName: 'R2BOT',
-    title: "R2BOT — India's Robotics Learning Platform",
+    title: "R2BOT — The World's Clearest Robotics Learning Platform",
     description: '261 concepts. Real simulators. AI mentor. Free to explore, affordable to master.',
     images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: "R2BOT — India's robotics platform" }],
   },
@@ -77,7 +77,7 @@ const organizationJsonLd = {
     'https://www.linkedin.com/company/r2bot',
     'https://www.youtube.com/@r2bot',
   ],
-  areaServed: { '@type': 'Country', name: 'India' },
+  areaServed: 'Worldwide',
 }
 
 const faqJsonLd = {
