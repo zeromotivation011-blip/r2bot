@@ -1,11 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 const STORAGE_KEY = 'r2bot_lead_captured'
-const DELAY_MS = 12000 // let content render/index first; then invite
+const PV_KEY = 'r2bot_pageviews'
+const MIN_PAGES = 3          // invite once the visitor is engaged (viewed ~3 pages)
+const FALLBACK_MS = 45000    // or after a long single-page read
 
 export function LeadCaptureModal() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -13,18 +17,24 @@ export function LeadCaptureModal() {
   const [err, setErr] = useState<string | null>(null)
 
   useEffect(() => {
-    let done = false
     try {
       if (window.localStorage.getItem(STORAGE_KEY)) return
     } catch { /* ignore */ }
-    const t = setTimeout(() => {
-      if (!done) setOpen(true)
-    }, DELAY_MS)
-    return () => {
-      done = true
-      clearTimeout(t)
+
+    // Count pages viewed this session; open on the Nth page.
+    let views = 0
+    try {
+      views = Number(window.sessionStorage.getItem(PV_KEY) || '0') + 1
+      window.sessionStorage.setItem(PV_KEY, String(views))
+    } catch { /* ignore */ }
+
+    if (views >= MIN_PAGES) {
+      setOpen(true)
+      return
     }
-  }, [])
+    const t = setTimeout(() => setOpen(true), FALLBACK_MS)
+    return () => clearTimeout(t)
+  }, [pathname])
 
   function dismiss() {
     try { window.localStorage.setItem(STORAGE_KEY, 'dismissed') } catch { /* ignore */ }

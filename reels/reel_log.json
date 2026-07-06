@@ -5,6 +5,8 @@
     "pid_controller",
     "slam",
     "ros2",
-    "reinforcement_learning"
+    "reinforcement_learning",
+    "degrees_of_freedom",
+    "computer_vision"
   ]
 }
