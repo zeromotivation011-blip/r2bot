@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { getAllLens, formatDuration } from '@/lib/lens';
+import { formatDuration } from '@/lib/lens';
+import { getAllLensMerged } from '@/lib/lens-cms';
 import { getLiveLensVideos } from '@/lib/lens-live';
 import { Nav } from '@/components/Nav';
 import { ParticleField } from '@/components/ParticleField';
@@ -27,7 +28,7 @@ function timeAgo(iso: string): string {
 }
 
 export default async function LensIndex() {
-  const curated = getAllLens();
+  const curated = await getAllLensMerged();
   const live = await getLiveLensVideos();
 
   return (

@@ -38,7 +38,7 @@ function normalizeRelated(v: unknown): RelatedAtlasRef[] {
     .filter(r => r.type && r.slug);
 }
 
-function buildVideo(slug: string, data: Record<string, unknown>, body: string): LensVideo {
+export function buildVideo(slug: string, data: Record<string, unknown>, body: string): LensVideo {
   return {
     slug,
     title: String(data.title ?? slug),
