@@ -273,6 +273,16 @@ def generate_reel(topic, reel_index=1):
     print(f"  ✓ Caption: {caption_path}")
     return final_path, caption_path
 
+# ── High-quality renderer override ───────────────────────────────────────────
+# hq_render supersamples + adds glow/bloom/particles/spring motion. If it fails
+# to import for any reason, we transparently fall back to the basic renderer.
+try:
+    import hq_render as _HQ
+    render_frame = _HQ.render_frame            # used by render_and_encode + _chunk_driver
+    print("  ✨ Using high-quality renderer (hq_render)")
+except Exception as _e:                        # pragma: no cover
+    print(f"  ⚠️  hq_render unavailable ({_e}); using basic renderer")
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--topic", help="Topic ID from topic_bank.json (optional)")

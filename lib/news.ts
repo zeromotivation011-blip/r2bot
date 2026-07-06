@@ -9,6 +9,39 @@
 //   - Breaking / trending flags
 
 import { SOURCE_STYLES } from '@/lib/news-styles'
+import { createClient } from '@supabase/supabase-js'
+
+// ── Curation overlay ────────────────────────────────────────────────────────
+// Admins can pin / hide / rewrite the summary of any story (news table, 0033).
+// We read that as a light overlay on the live feed. Session-less anon client so
+// it works in ISR; any failure falls back to the un-curated feed.
+const _cvUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const _cvAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const _cvSb = _cvUrl && _cvAnon ? createClient(_cvUrl, _cvAnon, { auth: { persistSession: false } }) : null
+
+async function applyCuration(articles: EnrichedArticle[]): Promise<EnrichedArticle[]> {
+  if (!_cvSb || articles.length === 0) return articles
+  try {
+    const { data } = await _cvSb
+      .from('news')
+      .select('url, pinned, hidden, curated_summary')
+      .in('url', articles.map(a => a.url))
+    if (!data) return articles
+    const map = new Map(
+      (data as { url: string; pinned: boolean; hidden: boolean; curated_summary: string | null }[])
+        .map(r => [r.url, r]),
+    )
+    const visible = articles.filter(a => !map.get(a.url)?.hidden)
+    for (const a of visible) {
+      const c = map.get(a.url)
+      if (c?.curated_summary) a.aiSummary = c.curated_summary
+    }
+    visible.sort((a, b) => Number(!!map.get(b.url)?.pinned) - Number(!!map.get(a.url)?.pinned))
+    return visible
+  } catch {
+    return articles
+  }
+}
 
 interface RawFeed { name: string; url: string }
 
@@ -402,8 +435,9 @@ export async function getNewsData(): Promise<NewsPayload> {
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
     .slice(0, 80)
 
-  const enriched = merged.map(item => enrich(item, merged))
+  let enriched = merged.map(item => enrich(item, merged))
   await addAiSummaries(enriched)
+  enriched = await applyCuration(enriched) // pin / hide / summary overrides from admin
   const trending = computeTrending(enriched)
   const indiaHighlights = enriched.filter(a => a.indiaImpactScore >= 7).slice(0, 6)
   const topTopics = Array.from(new Set(enriched.map(a => a.topic))).slice(0, 6)
