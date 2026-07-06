@@ -98,6 +98,51 @@ Anywhere a robot needs to move around a place it doesn't already have a perfect 
 
 SLAM works beautifully when the world stays still. As soon as people walk around, or chairs get moved, or lighting changes drastically — the robot can get confused. The current research frontier is **dynamic SLAM** (handling moving things) and **lifelong SLAM** (keeping a useful map of a place that changes over months and years).
 
+## Front-end and back-end: how a SLAM system is actually built
+
+Every modern SLAM system splits into two halves.
+
+The **front-end** turns raw sensor data into geometric constraints. It extracts features (lidar scan segments, camera keypoints like ORB), matches them frame-to-frame to estimate motion (**odometry**), and — critically — decides *data association*: which observation corresponds to which real-world landmark. Bad data association is the single biggest cause of SLAM failure; one wrong match can warp the whole map.
+
+The **back-end** takes those constraints and finds the poses and landmark positions that best fit all of them at once. This is where the real estimation lives, and there are two dominant families:
+
+- **Filtering (EKF-SLAM, FastSLAM).** Keep one running estimate of the state — the robot pose plus every landmark — and update it with each measurement. The classic problem: a full [Kalman filter](/atlas/concept/kalman-filter) over *N* landmarks costs O(N²) per step, so it doesn't scale to large maps. FastSLAM uses a [particle filter](/atlas/concept/particle-filter) to sidestep this.
+- **Graph-based / smoothing (pose-graph optimization, factor graphs).** Treat every pose and landmark as a node and every measurement as an edge (a constraint) in a graph, then solve one big nonlinear least-squares problem: minimize the total mismatch across all edges. This is what essentially all production systems use today, because it's more accurate and handles loop closures cleanly.
+
+## The math, in one line
+
+Graph SLAM minimizes the sum of squared constraint errors:
+
+```
+X* = argmin  Σ ‖ f(xᵢ, xⱼ) ⊖ zᵢⱼ ‖²_Σ
+        X    i,j
+```
+
+`xᵢ` are the unknown poses/landmarks, `zᵢⱼ` is a measured relative transform between them, `f(·)` predicts that measurement from the current estimate, and `Σ` weights each constraint by its uncertainty. Solvers (Gauss-Newton, Levenberg-Marquardt) exploit the fact that this matrix is **sparse** — each pose only touches a few others — which is why a graph with 100,000 poses can still be optimized in real time. Libraries: **g2o**, **GTSAM**, **Ceres**.
+
+## Loop closure, more precisely
+
+Detecting "I've been here before" is a *place-recognition* problem, usually solved with a **bag-of-visual-words** model (DBoW2) for cameras or scan-context descriptors for lidar. When a candidate loop is found, the system adds one edge between the current pose and the old one; the back-end then redistributes the accumulated drift across the whole loop. Because a false loop closure is catastrophic, systems add a geometric verification step (RANSAC) before trusting one.
+
+## Systems you'll actually meet
+
+- **slam_toolbox** — the default 2D lidar SLAM in ROS2 Nav2; graph-based, supports lifelong mapping.
+- **Cartographer** (Google) — real-time 2D/3D lidar SLAM with submap-based loop closure.
+- **ORB-SLAM3** — the reference visual/visual-inertial SLAM; feature-based, excellent loop closing.
+- **LIO-SAM / FAST-LIO2** — tightly-coupled lidar-inertial odometry for drones and cars.
+
+## How SLAM quality is measured
+
+Two standard metrics compare the estimated trajectory against ground truth: **ATE** (Absolute Trajectory Error — global consistency after alignment) and **RPE** (Relative Pose Error — local drift over short segments). Benchmarks like KITTI, EuRoC, and TUM-RGBD are how papers prove a new method is actually better.
+
+## Check your understanding
+
+**1.** Why does classic EKF-SLAM struggle in large environments? The covariance matrix couples every landmark, so each update is **O(N²)** in the number of landmarks — cost explodes as the map grows. Graph/particle methods avoid the full dense covariance.
+
+**2.** What is "data association" and why is it the front-end's hardest job? Deciding which current observation matches which previously-seen landmark. A single wrong match injects a false constraint that the back-end faithfully bakes into the map, corrupting it.
+
+**3.** After a loop closure, why does the *whole* map improve, not just the current pose? The closure adds a constraint linking now to a much earlier pose; the back-end re-optimizes the entire graph, spreading the correction backward across every pose in the loop.
+
 ---
 
-*Curious how a lidar actually measures distance with light? Read Lidar.*
+*Curious how a lidar actually measures distance with light? Read [Lidar](/atlas/concept/lidar).*

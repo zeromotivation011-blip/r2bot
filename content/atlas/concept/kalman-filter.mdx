@@ -1,5 +1,5 @@
 ---
-title: Kalman Filter in Robotics — Complete Guide | R2BOT
+title: Kalman Filter
 summary: >-
   The Kalman filter optimally fuses noisy sensor data to estimate a robot's true
   state. Foundation of GPS+IMU fusion, SLAM, and tracking.
@@ -61,15 +61,82 @@ At each step the filter does two things. **Predict**: it uses a motion model (e.
 
 ## Real-World Example
 
-Apollo 11's onboard computer used a Kalman filter to navigate to the Moon. Every modern drone autopilot (PX4, ArduPilot) uses one. Tesla Autopilot fuses radar, camera, and IMU with Kalman-family filters. Indian Mars Orbiter Mission used Kalman filters for its trajectory estimation.
+Apollo 11's onboard computer used a Kalman filter to navigate to the Moon — the algorithm's first famous job. Every modern drone autopilot (PX4, ArduPilot) runs one to fuse GPS, barometer, and IMU into a single position and attitude estimate. Self-driving stacks fuse radar, camera, and IMU with Kalman-family filters. India's Mars Orbiter Mission, ESA's probes, and NASA's rovers have all leaned on Kalman filtering for trajectory estimation — it is the default tool for state estimation across the world's space and robotics programs.
+
+## The math (predict and update)
+
+The filter tracks two things: the state estimate **x** (e.g. position and velocity) and its uncertainty, the covariance matrix **P**. Each cycle has two stages.
+
+**Predict** — advance the state with the motion model `F`, and grow uncertainty by the process noise `Q`:
+
+```
+x = F·x + B·u
+P = F·P·Fᵀ + Q
+```
+
+**Update** — when a measurement `z` arrives (related to the state by `H`, with measurement noise `R`), compute the **Kalman gain** `K` and correct:
+
+```
+y = z − H·x                 # innovation (measurement surprise)
+S = H·P·Hᵀ + R              # innovation covariance
+K = P·Hᵀ·S⁻¹                # Kalman gain
+x = x + K·y                 # corrected state
+P = (I − K·H)·P             # shrunk uncertainty
+```
+
+The gain `K` is the whole story: when the sensor is trustworthy (small `R`), `K` is large and the estimate jumps to the measurement; when the sensor is noisy, `K` is small and the filter leans on its prediction. It works out this trade-off *optimally* — minimum mean-squared error — whenever the system is linear and the noise is Gaussian.
+
+## In code (1D constant-velocity, ~15 lines)
+
+```python
+import numpy as np
+x = np.array([[0.], [0.]])          # position, velocity
+P = np.eye(2) * 500.                 # start very uncertain
+F = np.array([[1., dt], [0., 1.]])   # constant-velocity model
+H = np.array([[1., 0.]])             # we only measure position
+Q = np.array([[0.05, 0.], [0., 0.05]])
+R = np.array([[2.0]])                # sensor variance
+
+def step(z):
+    global x, P
+    x = F @ x                        # predict
+    P = F @ P @ F.T + Q
+    y = z - H @ x                    # update
+    S = H @ P @ H.T + R
+    K = P @ H.T @ np.linalg.inv(S)
+    x = x + K @ y
+    P = (np.eye(2) - K @ H) @ P
+    return x
+```
+
+Notice the filter *estimates velocity it never directly measures* — it infers it from how position changes, which is the quiet magic of state estimation.
+
+## Tuning Q and R (where the real work is)
+
+The equations are easy; making a filter behave is not. Two knobs dominate:
+
+- **R (measurement noise)** — set it from the sensor's actual variance (datasheet or empirical). Too small and the filter chases every sensor glitch; too large and it ignores good data.
+- **Q (process noise)** — how much you trust your motion model. Too small and the filter becomes over-confident and *lags* real changes (or diverges when the model is wrong); too large and the output stays jittery. Q is usually hand-tuned until the estimate tracks without over-reacting.
+
+A useful diagnostic: the innovation `y` should look like zero-mean noise. If it trends, your model or `Q` is wrong.
+
+## When the plain Kalman filter isn't enough
+
+The classic KF assumes **linear** dynamics and **Gaussian** noise. Real robots break both:
+
+- **Nonlinear** models (a robot's heading, range-bearing sensors) → **Extended Kalman Filter** (linearize with Jacobians) or **Unscented Kalman Filter** (propagate sample points, more accurate for strong nonlinearity).
+- **Non-Gaussian / multi-modal** beliefs (kidnapped-robot localization, "am I in room A or the identical room B?") → **[particle filter](/atlas/concept/particle-filter)**, which represents the belief with thousands of weighted samples.
+- **Large SLAM back-ends** → **factor graphs** (GTSAM), which generalize the same least-squares idea across a whole trajectory.
+
+Divergence is the classic failure: if the true state leaves the region the covariance says is plausible (bad model, unmodeled bias, wildly wrong `R`), the filter grows over-confident and stops trusting correct measurements. Watching the innovation and covariance is how you catch it.
 
 ## Why It Matters for Robotics
 
-If you want to do serious robotics — drones, autonomous cars, mobile robots — you must understand Kalman filtering. It comes up in every senior robotics interview in India. The Kalman filter is also a gateway to modern state-estimation methods like the EKF, UKF, and factor graphs.
+If you want to do serious robotics — drones, autonomous cars, mobile robots — you must understand Kalman filtering. It's a standard topic in senior robotics interviews everywhere, and it's the gateway to modern state-estimation methods like the EKF, UKF, and factor graphs.
 
 ## Try It Yourself
 
-Open `/visualizer` and load the Kalman demo: you can play with measurement noise, process noise, and watch the filter converge. Then implement a 1D position-velocity Kalman filter in Python (20 lines) on a noisy random-walk simulation.
+Open `/visualizer` and load the Kalman demo: play with measurement noise, process noise, and watch the filter converge. Then implement the 1D position-velocity filter above on a noisy random-walk simulation and try mistuning `Q` and `R` to see it lag or jitter.
 
 ## Quick Quiz
 
@@ -121,4 +188,4 @@ Open `/visualizer` and load the Kalman demo: you can play with measurement noise
 
 ## Ask R2 About This
 
-Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Kalman Filter in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.
+Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain the Kalman filter to a beginner, then show me the predict/update equations for a 2D position tracker."* You'll get a tailored, sourced answer in seconds.
