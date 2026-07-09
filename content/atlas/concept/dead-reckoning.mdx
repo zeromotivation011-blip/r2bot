@@ -1,0 +1,76 @@
+---
+title: Dead Reckoning
+slug: dead-reckoning
+bucket: concept
+category: control
+summary: >-
+  Dead reckoning is estimating where a robot is by adding up how far it has moved from
+  a known start — cheap, always-available, and the reason robots drift and need GPS,
+  landmarks, or SLAM to stay honest.
+difficulty: 2
+tags:
+  - navigation
+  - localization
+  - odometry
+seeAlso:
+  - odometry
+  - sensor-fusion
+  - slam
+  - kalman-filter
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Dead reckoning — navigation fundamentals'
+    url: 'https://en.wikipedia.org/wiki/Dead_reckoning'
+  - title: 'Probabilistic Robotics — Thrun, Burgard, Fox'
+    url: 'http://www.probabilistic-robotics.org/'
+laymanExplanation: >-
+  Dead reckoning means figuring out where you are by tracking every step from a known
+  starting point — "I went 3 m forward, then turned and went 2 m." It works, but small
+  errors add up the longer you go without a fresh fix.
+technicalDefinition: >-
+  Dead reckoning estimates current pose by integrating motion (velocity/heading or wheel
+  odometry) over time from a known initial pose, accumulating unbounded drift.
+quizQuestion:
+  q: The main weakness of dead reckoning is…
+  options:
+    - It needs satellites to work
+    - Errors accumulate and drift grows without bound
+    - It only works indoors
+    - It cannot measure heading
+  answer: 1
+  explanation: >-
+    Because it integrates motion over time, every small error adds up — position drift
+    grows without bound until an external fix corrects it.
+---
+
+Close your eyes and try to walk to your kitchen counting steps. You'll get close — for a while. Keep going and you'll drift off course. That's **dead reckoning**: navigation by adding up your own motion, and its famous weakness.
+
+## What it is
+
+Dead reckoning estimates a robot's current position by **integrating its motion** from a known starting point. A wheeled robot counts wheel rotations ([odometry](/atlas/concept/odometry)); a drone integrates acceleration and rotation from its [IMU](/atlas/concept/imu); a ship historically used speed and heading over time. No external reference needed — just "I started here, and I've moved *this* much since."
+
+```diagram
+{ "type": "loop", "title": "Dead reckoning integrates motion each step", "nodes": ["Known pose", "Measure motion", "Add to estimate"], "caption": "Each cycle updates the estimate from the last one. That self-referential loop is exactly why errors compound — there's no outside check." }
+```
+
+## Why it drifts
+
+Every measurement has a small error, and dead reckoning **adds them up forever**. A wheel slips, a tire is slightly worn, the IMU has a tiny bias — each contributes a little, and the estimated position wanders further from the truth the longer you go without a fix. IMU-only dead reckoning can drift metres in seconds; good wheel odometry drifts slower but still without bound. There is no configuration of dead reckoning that doesn't eventually drift.
+
+## How robots keep it honest
+
+Because dead reckoning is smooth, fast, and always available, robots don't throw it away — they **correct** it with occasional absolute references:
+
+- **GPS/GNSS** outdoors, for a global fix.
+- **Landmarks / loop closure** via [SLAM](/atlas/concept/slam) indoors.
+- **[Sensor fusion](/atlas/concept/sensor-fusion)** — a [Kalman filter](/atlas/concept/kalman-filter) blends drift-free-but-noisy fixes with smooth-but-drifting dead reckoning to get the best of both.
+
+This is exactly the ROS convention where the `odom` frame is smooth but drifts, and the `map` frame is drift-free but jumps when a correction lands (see [tf](/atlas/concept/tf-transform)).
+
+## Why it matters
+
+Dead reckoning is the foundation every localization system builds on and then compensates for. Understanding *why* it drifts — and that no filter removes the need for an occasional real fix — is core to how robots know where they are.
+
+## Related
+
+[Odometry](/atlas/concept/odometry) · [Sensor fusion](/atlas/concept/sensor-fusion) · [SLAM](/atlas/concept/slam) · [Kalman filter](/atlas/concept/kalman-filter)

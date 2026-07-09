@@ -1,0 +1,78 @@
+---
+title: Stereo Vision
+slug: stereo-vision
+bucket: concept
+category: sensors
+summary: >-
+  Stereo vision gives a robot depth from two cameras the same way two eyes give you
+  depth — by measuring how far each object shifts between the left and right image,
+  then turning that shift into distance.
+difficulty: 3
+tags:
+  - perception
+  - depth
+  - cameras
+seeAlso:
+  - computer-vision
+  - depth-camera
+  - point-cloud
+  - lidar
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'OpenCV — Depth from stereo'
+    url: 'https://docs.opencv.org/'
+  - title: 'Szeliski — Computer Vision: Algorithms and Applications'
+    url: 'https://szeliski.org/Book/'
+laymanExplanation: >-
+  Stereo vision uses two cameras a fixed distance apart. Nearby objects shift more
+  between the two images than far ones — measure that shift and you get distance,
+  exactly how your two eyes judge depth.
+technicalDefinition: >-
+  Stereo vision computes per-pixel depth by matching features between two calibrated
+  cameras and converting their horizontal disparity to range via triangulation.
+quizQuestion:
+  q: In stereo vision, closer objects have a larger…
+  options:
+    - Colour saturation
+    - Disparity (shift between left and right images)
+    - Frame rate
+    - Focal length
+  answer: 1
+  explanation: >-
+    Disparity — the horizontal shift of a point between the two images — is larger for
+    near objects and smaller for far ones; depth is inversely proportional to it.
+---
+
+Hold a finger up and blink each eye in turn: the finger jumps side to side. Distant objects barely move. Your brain turns that jump into depth — and a robot with two cameras does exactly the same thing. That's **stereo vision**.
+
+## How it works
+
+Two cameras are mounted a known distance apart (the **baseline**). The same real-world point lands at slightly different horizontal positions in the two images — this shift is the **disparity**. Near objects shift a lot; far objects barely shift. Depth follows a simple triangulation formula:
+
+```
+depth = (focal_length × baseline) / disparity
+```
+
+```diagram
+{ "type": "flow", "title": "From two images to a depth map", "nodes": ["Left camera", "Right camera", "Match pixels", "Disparity", "Depth map"], "caption": "Rectify the two images, match each pixel across them, measure the horizontal shift (disparity), then triangulate that shift into distance for every pixel." }
+```
+
+## The hard part: matching
+
+The whole method rests on **stereo matching** — finding, for each pixel in the left image, its partner in the right. This is easy on richly textured surfaces and hard-to-impossible on blank ones: a plain white wall gives no features to match, so depth there is unreliable. Reflective and transparent surfaces fool it too. Modern systems use either classic block-matching / semi-global matching or learned networks, and many add a projected texture pattern (**active stereo**, as in the Intel RealSense) to give featureless surfaces something to match.
+
+## Stereo vs the alternatives
+
+Compared with [LiDAR](/atlas/concept/lidar), stereo is cheap, passive (no emitted laser), and gives dense color + depth together — but it's shorter-range, needs texture and good light, and is compute-heavy. Compared with a structured-light or time-of-flight [depth camera](/atlas/concept/depth-camera), stereo works outdoors in sunlight where those often fail. Many robots fuse several via [sensor fusion](/atlas/concept/sensor-fusion).
+
+## Where you'll see it
+
+Stereo rigs sit on drones (obstacle avoidance), the Mars rovers (they navigate almost entirely by stereo), AR headsets, and warehouse robots. The output — a per-pixel depth map — usually becomes a [point cloud](/atlas/concept/point-cloud) for downstream planning.
+
+## Why it matters
+
+Stereo vision is the cheapest route to dense 3D perception, and understanding disparity is the foundation for everything from depth cameras to visual [SLAM](/atlas/concept/slam).
+
+## Related
+
+[Computer vision](/atlas/concept/computer-vision) · [Depth camera](/atlas/concept/depth-camera) · [Point cloud](/atlas/concept/point-cloud) · [LiDAR](/atlas/concept/lidar)

@@ -1,0 +1,77 @@
+---
+title: URDF
+slug: urdf
+bucket: concept
+category: control
+summary: >-
+  URDF (Unified Robot Description Format) is the XML file that tells a robot's
+  software what its body looks like — every link, joint, and sensor — so simulators,
+  visualizers, and motion planners can reason about it.
+difficulty: 3
+tags:
+  - ros2
+  - simulation
+  - software
+seeAlso:
+  - ros2
+  - forward-kinematics
+  - tf-transform
+  - inverse-kinematics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ROS 2 — URDF tutorials'
+    url: 'https://docs.ros.org/'
+  - title: 'URDF specification (wiki.ros.org)'
+    url: 'http://wiki.ros.org/urdf'
+laymanExplanation: >-
+  A URDF is a description file — like a blueprint — that lists every part of a robot,
+  how the parts connect, and how they move. Software reads it to know the robot's shape.
+technicalDefinition: >-
+  URDF is an XML format describing a robot as a tree of links (rigid bodies) connected
+  by joints, plus visual, collision, and inertial properties.
+quizQuestion:
+  q: What does a URDF file describe?
+  options:
+    - The robot's Wi-Fi settings
+    - The robot's physical structure — links and joints
+    - The robot's battery chemistry
+    - The robot's paint colour only
+  answer: 1
+  explanation: >-
+    URDF describes the robot's body as links (rigid parts) connected by joints, with
+    visual, collision, and inertial data.
+---
+
+Before a robot's software can plan a motion, simulate a fall, or show the arm on screen, it needs to know what the robot's body actually *is*. That description lives in a **URDF** file.
+
+## What it is
+
+URDF — **Unified Robot Description Format** — is an XML file that models a robot as a **tree of links and joints**:
+
+- A **link** is a rigid part (a base, an upper arm, a gripper finger) with three descriptions: its **visual** mesh (what you see), its **collision** shape (for physics), and its **inertial** properties (mass, center of mass).
+- A **joint** connects two links and defines how they move relative to each other — revolute (rotates, like an elbow), prismatic (slides), fixed, or continuous — plus limits on angle, velocity, and effort.
+
+```diagram
+{ "type": "flow", "title": "A URDF is a chain of links and joints", "nodes": ["base_link", "joint1", "arm_link", "joint2", "gripper"], "caption": "Each box is a rigid link; each joint between them says how the next link can move. Chained together, they describe the whole robot's body." }
+```
+
+## What reads it
+
+Almost every tool in the [ROS 2](/atlas/concept/ros2) ecosystem consumes URDF:
+
+- **RViz** renders the robot from its visual meshes.
+- **Gazebo / Isaac Sim** simulate it physically using the collision + inertial data.
+- **MoveIt 2** plans collision-free arm motions from the joint tree.
+- The **robot_state_publisher** turns joint angles into the live [tf](/atlas/concept/tf-transform) transform tree — which is really just [forward kinematics](/atlas/concept/forward-kinematics) driven by the URDF.
+
+## In practice
+
+Real robots rarely hand-write raw URDF. They use **xacro** (XML macros) to keep it DRY — defining a leg once and instantiating it four times, for example. The golden rule that trips up beginners: your **visual** and **collision** geometry can differ (a detailed mesh to look good, a simple box to compute fast), and your **inertial** values must be sane or the physics simulation will explode.
+
+## Why it matters
+
+URDF is the single source of truth for a robot's body. Get it right and simulation, visualization, and planning all agree; get the inertias or joint axes wrong and nothing downstream works. It's the unglamorous file that every serious robot project starts from.
+
+## Related
+
+[ROS2](/atlas/concept/ros2) · [Forward kinematics](/atlas/concept/forward-kinematics) · [tf transforms](/atlas/concept/tf-transform) · [Inverse kinematics](/atlas/concept/inverse-kinematics)

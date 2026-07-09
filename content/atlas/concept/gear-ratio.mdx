@@ -1,0 +1,75 @@
+---
+title: Gear Ratio
+slug: gear-ratio
+bucket: concept
+category: actuators
+summary: >-
+  Gear ratio is the trade a robot makes between speed and force — gearing a fast, weak
+  motor down to turn slower but push far harder, which is why almost every robot joint
+  hides a gearbox.
+difficulty: 2
+tags:
+  - actuators
+  - mechanics
+  - motors
+seeAlso:
+  - servo-motor
+  - torque
+  - brushless-motor
+  - backlash
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'How gears work (Engineering Toolbox)'
+    url: 'https://www.engineeringtoolbox.com/'
+  - title: 'Harmonic Drive — principles'
+    url: 'https://www.harmonicdrive.net/'
+laymanExplanation: >-
+  A gear ratio trades speed for strength. A motor spins fast but weakly; gear it down
+  and the output turns slower but with much more turning force. It's the same idea as
+  a bicycle's low gear for climbing hills.
+technicalDefinition: >-
+  Gear ratio is the ratio of input to output rotational speed in a gear train; it
+  multiplies torque and divides speed by the same factor (minus friction losses).
+quizQuestion:
+  q: A 100:1 gearbox on a motor will…
+  options:
+    - Make the output spin 100× faster
+    - Make the output spin 100× slower with ~100× more torque
+    - Double the battery life
+    - Have no effect on torque
+  answer: 1
+  explanation: >-
+    A 100:1 reduction divides output speed by 100 and multiplies torque by ~100 (before
+    friction losses).
+---
+
+An electric motor, on its own, is almost useless to a robot: it spins thousands of times a minute but can barely push. The fix — used in nearly every robot joint — is a **gearbox**, and its key number is the **gear ratio**.
+
+## The core trade
+
+Gears trade **speed for [torque](/atlas/concept/torque)**, and the exchange rate is the gear ratio. A **100:1** reduction means the input shaft turns 100 times for every 1 turn of the output. In return:
+
+- Output **speed** is divided by 100 (slower).
+- Output **torque** is multiplied by ~100 (much stronger).
+
+```diagram
+{ "type": "flow", "title": "A gearbox trades speed for force", "nodes": ["Motor: fast, weak", "Gearbox 100:1", "Output: slow, strong"], "caption": "The same power comes out — but reshaped. High rpm and low torque become low rpm and high torque, which is what a robot joint actually needs." }
+```
+
+Power is (roughly) conserved — you don't get force for free, you *buy* it with speed. Friction means real gearboxes return 70–95% of the input power, not 100%.
+
+## Why robots need it so badly
+
+A [robot arm](/atlas/concept/robot-arm) joint must hold heavy loads steady and move slowly and precisely — the opposite of what a raw motor gives. Legged robots need bursts of high torque to push off the ground. Gearing makes a small, light, cheap motor do the job of a big one. This is why the reduction stage is often the single most important — and expensive — part of a joint.
+
+## The catch: backlash and stiffness
+
+Gears aren't perfect. **[Backlash](/atlas/concept/backlash)** — tiny slack between meshing teeth — creates a dead zone that ruins precision, so high-end robots use **harmonic drives** or **cycloidal gearboxes** that have almost none. High ratios also make a joint harder to *back-drive* (you can't easily push the output by hand), which matters for [collaborative robots](/atlas/concept/collaborative-robot) that need to feel and yield to contact.
+
+## Why it matters
+
+Nearly every meaningful motion in robotics passes through a gear ratio. Understanding the speed-vs-torque trade — and its costs in backlash and back-drivability — is fundamental to sizing any actuator.
+
+## Related
+
+[Servo motor](/atlas/concept/servo-motor) · [Torque](/atlas/concept/torque) · [Brushless motor](/atlas/concept/brushless-motor) · [Backlash](/atlas/concept/backlash)

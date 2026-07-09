@@ -1,0 +1,78 @@
+---
+title: Jacobian
+slug: jacobian
+bucket: concept
+category: control
+summary: >-
+  The Jacobian is the matrix that links how a robot's joints move to how its hand
+  moves — the bridge between joint space and the real world, and the engine behind
+  velocity control, numerical inverse kinematics, and singularity detection.
+difficulty: 4
+tags:
+  - math
+  - control
+  - kinematics
+seeAlso:
+  - inverse-kinematics
+  - forward-kinematics
+  - degrees-of-freedom
+  - singularity
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+  - title: 'MoveIt 2 — Kinematics'
+    url: 'https://moveit.ros.org/'
+laymanExplanation: >-
+  The Jacobian is a table of numbers that answers one question: if I nudge each of
+  the robot's joints a little, which way — and how fast — does its hand move? It's
+  the translator between "turn this motor" and "move the hand there."
+technicalDefinition: >-
+  The Jacobian J(θ) is the matrix of partial derivatives that maps joint velocities
+  to end-effector velocities: ẋ = J(θ)·θ̇.
+quizQuestion:
+  q: What does the manipulator Jacobian map?
+  options:
+    - Joint angles to motor currents
+    - Joint velocities to end-effector velocity
+    - Camera pixels to world coordinates
+    - Battery voltage to torque
+  answer: 1
+  explanation: >-
+    The Jacobian relates how fast the joints move (θ̇) to how fast the end-effector
+    moves (ẋ): ẋ = J·θ̇.
+---
+
+If [inverse kinematics](/atlas/concept/inverse-kinematics) is the question "what joint angles put the hand *there*?", the **Jacobian** is the tool that answers it — and much more. It's the single most useful matrix in robot arm control.
+
+## What it is
+
+The Jacobian `J(θ)` is a matrix that links **joint velocities** to **end-effector velocity**:
+
+```
+ẋ = J(θ) · θ̇
+```
+
+Read that as: "the speed and direction the hand moves (`ẋ`) equals the Jacobian times how fast each joint is turning (`θ̇`)." Each column of `J` says what a single joint does to the hand at the arm's current pose. Because the arm bends as it moves, `J` changes with the configuration `θ` — it's recomputed every control cycle.
+
+```diagram
+{ "type": "flow", "title": "What the Jacobian connects", "nodes": ["Joint velocities θ̇", "Jacobian J(θ)", "Hand velocity ẋ"], "caption": "Multiply the joint speeds by J and you get the hand's linear + angular velocity — the map from joint space to the real world." }
+```
+
+## How robots use it
+
+- **Velocity / Cartesian control.** Want the hand to move in a straight line at a set speed? Invert the relationship — `θ̇ = J⁻¹·ẋ` — to get the joint speeds that produce it. This is how a robot draws a straight weld seam even though its joints all rotate.
+- **Numerical inverse kinematics.** Most modern IK solvers step toward a target by repeatedly applying the pseudo-inverse `J⁺` to the remaining position error. (See [inverse kinematics](/atlas/concept/inverse-kinematics).)
+- **Force control.** The *transpose* `Jᵀ` maps forces at the hand to the joint torques needed to produce them — the basis of [impedance control](/atlas/concept/impedance-control) and gravity compensation.
+
+## Where it bites: singularities
+
+At certain poses — an arm stretched dead straight, or two axes lining up — the Jacobian **loses rank** and can't be cleanly inverted. These are [singularities](/atlas/concept/singularity): near them, a tiny hand motion demands enormous joint speeds. Robots detect them by watching the Jacobian's *manipulability* (roughly, its determinant) and either slow down or use **damped least squares** to stay safe.
+
+## Why it matters
+
+The Jacobian is where the abstract geometry of an arm meets real motion, force, and safety. Understanding it is the difference between commanding joints one at a time and commanding the *hand* to do exactly what you want — the leap every serious manipulation engineer makes.
+
+## Related
+
+[Inverse kinematics](/atlas/concept/inverse-kinematics) · [Forward kinematics](/atlas/concept/forward-kinematics) · [Degrees of freedom](/atlas/concept/degrees-of-freedom) · [Singularity](/atlas/concept/singularity)

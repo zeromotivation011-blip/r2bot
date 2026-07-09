@@ -1,0 +1,74 @@
+---
+title: Quaternion
+slug: quaternion
+bucket: concept
+category: fundamentals
+summary: >-
+  A quaternion is a four-number way to represent 3D rotation that robots and drones
+  prefer over Euler angles because it never suffers gimbal lock and interpolates
+  smoothly — the standard for orientation in every modern robotics stack.
+difficulty: 4
+tags:
+  - math
+  - orientation
+  - fundamentals
+seeAlso:
+  - imu
+  - sensor-fusion
+  - kalman-filter
+  - degrees-of-freedom
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: '3Blue1Brown — Visualizing quaternions'
+    url: 'https://eater.net/quaternions'
+  - title: 'ROS 2 — tf2 and quaternions'
+    url: 'https://docs.ros.org/'
+laymanExplanation: >-
+  A quaternion is a set of four numbers that describes which way an object is facing
+  in 3D. Robots use it instead of the familiar roll/pitch/yaw angles because it
+  never "locks up" and blends between orientations smoothly.
+technicalDefinition: >-
+  A quaternion q = w + xi + yj + zk is a four-component number that encodes a 3D
+  rotation as an axis and angle, avoiding the gimbal lock of Euler angles.
+quizQuestion:
+  q: Why do robots prefer quaternions over Euler angles for orientation?
+  options:
+    - They use less memory
+    - They avoid gimbal lock and interpolate smoothly
+    - They are easier for humans to read
+    - They work without a processor
+  answer: 1
+  explanation: >-
+    Quaternions never hit the gimbal-lock singularity that Euler angles do, and they
+    blend between orientations smoothly (slerp).
+---
+
+Ask a drone which way it's pointing and, internally, it won't answer in the roll/pitch/yaw angles a human would use. It'll use a **quaternion** — four numbers that describe 3D orientation without the traps that plague simpler representations.
+
+## What it is
+
+A quaternion packs a rotation into four values `(w, x, y, z)`. Geometrically, it encodes **one axis** to rotate around and **how far** to rotate — the cleanest possible description of "which way is this thing facing." It's the orientation format inside almost every [IMU](/atlas/concept/imu) driver, flight controller, game engine, and [tf2](/atlas/concept/tf-transform) transform.
+
+## Why not just use roll, pitch, yaw?
+
+Euler angles (roll/pitch/yaw) are intuitive but have a fatal flaw called **gimbal lock**: at certain orientations two of the three axes line up, you lose a degree of freedom, and the math blows up. It's the same failure that stranded Apollo's inertial platform. Quaternions have no such singularity — every orientation is represented smoothly and uniquely (up to sign).
+
+```diagram
+{ "type": "flow", "title": "Two ways to store orientation", "nodes": ["Euler angles", "gimbal lock ⚠", "Quaternion", "no singularities ✓"], "caption": "Euler angles are readable but break at certain poses; quaternions stay stable everywhere, which is why robots store orientation as quaternions and only convert to angles for display." }
+```
+
+## The other superpower: smooth blending
+
+To rotate an object smoothly from one orientation to another — a camera gimbal tracking a subject, a drone re-aiming — you interpolate. Quaternions support **slerp** (spherical linear interpolation), which takes the shortest, constant-speed rotational path. Interpolating Euler angles instead produces wobbly, unnatural motion. This is why animation, VR headsets, and drone camera mounts all live in quaternion space.
+
+## Where you'll meet them
+
+Every [sensor-fusion](/atlas/concept/sensor-fusion) filter that estimates a robot's attitude ([Kalman](/atlas/concept/kalman-filter)-family or complementary filters) outputs a quaternion. In [ROS 2](/atlas/concept/ros2), every `Pose` and `Transform` message stores orientation as a quaternion. You rarely hand-compute them — but you must know they exist, why they're there, and never to naively average or linearly interpolate them.
+
+## Why it matters
+
+Get orientation wrong and a drone flips, an arm twists the wrong way, or a camera tumbles. Quaternions are the robust, industry-standard answer to "which way is it facing?" — unglamorous, four numbers, and absolutely everywhere.
+
+## Related
+
+[IMU](/atlas/concept/imu) · [Sensor fusion](/atlas/concept/sensor-fusion) · [Kalman filter](/atlas/concept/kalman-filter) · [tf transforms](/atlas/concept/tf-transform)

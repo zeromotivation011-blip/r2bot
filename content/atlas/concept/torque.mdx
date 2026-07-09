@@ -1,0 +1,76 @@
+---
+title: Torque
+slug: torque
+bucket: concept
+category: fundamentals
+summary: >-
+  Torque is turning force — the twist a motor applies to move a joint. It's the number
+  that decides whether a robot can lift the load, hold a pose, or push off the ground,
+  and it's why gearboxes exist.
+difficulty: 2
+tags:
+  - fundamentals
+  - actuators
+  - mechanics
+seeAlso:
+  - gear-ratio
+  - servo-motor
+  - brushless-motor
+  - degrees-of-freedom
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Torque (Physics) — HyperPhysics'
+    url: 'http://hyperphysics.phy-astr.gsu.edu/'
+  - title: 'Motor torque basics — Maxon'
+    url: 'https://www.maxongroup.com/'
+laymanExplanation: >-
+  Torque is rotational force — how hard a motor twists. A long wrench needs less push
+  to loosen a bolt than a short one because it makes more torque. Robots need enough
+  torque at each joint to move and hold their loads.
+technicalDefinition: >-
+  Torque (τ = r × F) is the rotational equivalent of force, equal to force times the
+  perpendicular distance from the axis, measured in newton-metres.
+quizQuestion:
+  q: Torque is best described as…
+  options:
+    - The speed a motor spins
+    - Rotational (twisting) force
+    - The heat a motor produces
+    - The voltage across a motor
+  answer: 1
+  explanation: >-
+    Torque is turning force — force times the lever-arm distance from the axis, in
+    newton-metres.
+---
+
+Ask why one robot can lift a 5 kg payload at arm's length and another sags under 1 kg, and the answer is almost always **torque** — the turning force at its joints.
+
+## What it is
+
+Torque is the rotational cousin of force. Push on a door far from the hinge and it swings easily; push near the hinge and it barely moves. Same force, different **torque**, because torque is force times the distance from the axis:
+
+```
+τ = r × F      (newton-metres)
+```
+
+For a robot, the load's weight acting at the end of a link creates a torque the joint motor must *fight* just to hold still — and beat to move.
+
+```diagram
+{ "type": "flow", "title": "Why reach multiplies the torque a joint must supply", "nodes": ["Payload weight", "× arm length", "= joint torque needed"], "caption": "The farther out the load sits, the more torque the joint must produce to hold or lift it — which is why arms are strongest close to the body." }
+```
+
+## Speed vs torque: the motor's dilemma
+
+Electric motors naturally make **low torque at high speed** — the opposite of what a joint needs (high torque, low speed). A [gearbox](/atlas/concept/gear-ratio) resolves this, trading spin for twist: a 100:1 reduction turns a fast, weak motor into a slow, strong joint. Sizing that chain — motor torque × gear ratio × efficiency ≥ the worst-case joint torque, with margin — is one of the first calculations in any robot design.
+
+## Holding torque and thermal limits
+
+Two subtleties bite in practice. First, **holding** a heavy arm still can demand as much torque as moving it, and a motor stalled at high torque dumps heat — so continuous torque is limited by cooling, not just peak numbers. Second, [collaborative robots](/atlas/concept/collaborative-robot) deliberately *limit* torque so a collision with a person stays gentle; torque sensing is how they feel contact.
+
+## Why it matters
+
+Torque budgets decide what a robot can physically do. Under-spec it and joints sag, overheat, or stall; understand it and you can size actuators, pick gear ratios, and predict a robot's real-world strength.
+
+## Related
+
+[Gear ratio](/atlas/concept/gear-ratio) · [Servo motor](/atlas/concept/servo-motor) · [Brushless motor](/atlas/concept/brushless-motor) · [Degrees of freedom](/atlas/concept/degrees-of-freedom)

@@ -29,6 +29,7 @@ import { CopyHeadingPlugin } from '@/components/CopyHeadingPlugin';
 import { AtlasLinkTooltips } from '@/components/AtlasLinkTooltips';
 import { AskR2Inline } from '@/components/AskR2Inline';
 import { Quiz, type QuizQuestion } from '@/components/atlas/Quiz';
+import { AtlasDiagram, type DiagramSpec } from '@/components/atlas/AtlasDiagram';
 import { AtlasCompare, type AtlasCompareEntry } from '@/components/atlas/AtlasCompare';
 import { PythonPlayground } from '@/components/atlas/PythonPlayground';
 import { ConceptHero } from '@/components/atlas/ConceptHero';
@@ -380,12 +381,20 @@ export default async function AtlasEntryPage(
               components={{
                 code(props) {
                   const { className, children } = props as { className?: string; children?: React.ReactNode };
-                  const match = /language-quiz/.exec(className || '');
-                  if (match) {
+                  if (/language-quiz/.exec(className || '')) {
                     try {
                       const raw = String(children).trim();
                       const questions = JSON.parse(raw) as QuizQuestion[];
                       return <Quiz questions={questions} />;
+                    } catch {
+                      return <code className={className}>{children}</code>;
+                    }
+                  }
+                  if (/language-diagram/.exec(className || '')) {
+                    try {
+                      const raw = String(children).trim();
+                      const spec = JSON.parse(raw) as DiagramSpec;
+                      return <AtlasDiagram spec={spec} />;
                     } catch {
                       return <code className={className}>{children}</code>;
                     }

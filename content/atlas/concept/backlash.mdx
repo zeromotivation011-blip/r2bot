@@ -1,0 +1,73 @@
+---
+title: Backlash
+slug: backlash
+bucket: concept
+category: actuators
+summary: >-
+  Backlash is the tiny bit of slack between gear teeth that makes a joint lag when it
+  reverses direction — a small mechanical imperfection that quietly wrecks precision,
+  and the reason high-end robots pay for special gearboxes.
+difficulty: 3
+tags:
+  - actuators
+  - mechanics
+  - precision
+seeAlso:
+  - gear-ratio
+  - torque
+  - servo-motor
+  - closed-loop-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Backlash (gears) — engineering overview'
+    url: 'https://www.engineeringtoolbox.com/'
+  - title: 'Harmonic Drive — zero-backlash principles'
+    url: 'https://www.harmonicdrive.net/'
+laymanExplanation: >-
+  Backlash is the little bit of free play between gear teeth. When a joint changes
+  direction, it moves a hair before the teeth re-engage — like the tiny slack you feel
+  reversing a loose bicycle pedal. It blurs a robot's precision.
+technicalDefinition: >-
+  Backlash is the clearance between mating gear teeth, producing a lost-motion dead zone
+  when the drive direction reverses.
+quizQuestion:
+  q: When is backlash most noticeable?
+  options:
+    - When the joint holds perfectly still
+    - When the joint reverses direction
+    - When the battery is full
+    - When the motor is cold
+  answer: 1
+  explanation: >-
+    Backlash shows up as lost motion at the moment of direction reversal, when the gear
+    teeth must cross the clearance before re-engaging.
+---
+
+A robot arm reaches for the same point twice — once approaching from the left, once from the right — and lands a hair off between the two. The culprit is often **backlash**: microscopic slack hiding in the gears.
+
+## What it is
+
+Meshing gears can't fit perfectly tight, or they'd jam and wear. So there's a sliver of clearance between the teeth. When the joint drives one way, the teeth press on one side. **Reverse direction, and the output doesn't move until the teeth cross that gap and touch the other side** — a brief dead zone of lost motion.
+
+```diagram
+{ "type": "flow", "title": "Where the lost motion appears", "nodes": ["Drive forward", "Reverse", "Teeth cross the gap", "Output finally moves"], "caption": "On reversal the motor turns but the output stalls until the tooth clearance is taken up — that dead zone is backlash." }
+```
+
+## Why it matters so much
+
+For a robot that always pushes one direction, backlash barely shows. But most real tasks reverse constantly — tracing a circle, holding position against a wobbling load, threading a part. There, backlash becomes **positioning error and vibration** that no amount of motor precision can fix, because the encoder on the *motor* side can't even see it (the slack is downstream). It's a leading limit on repeatability for machining, assembly, and surgical robots.
+
+## How engineers beat it
+
+- **Harmonic drives** (strain-wave gears) and **cycloidal gearboxes** achieve near-**zero backlash**, which is why they're standard in precision robot joints despite the cost.
+- **Preloaded / anti-backlash gears** spring two gear halves apart to keep teeth in constant contact.
+- **Dual drives** or **direct-drive** motors skip reduction gearing entirely.
+- On the control side, [closed-loop](/atlas/concept/closed-loop-control) systems with an output-side encoder can measure and partly compensate for it.
+
+## The trade-off
+
+Zero-backlash gearboxes cost more, weigh more, and can be less efficient. Cheap robots tolerate some backlash; precision robots pay to eliminate it. Knowing where your task sits on that spectrum is a real design decision.
+
+## Related
+
+[Gear ratio](/atlas/concept/gear-ratio) · [Torque](/atlas/concept/torque) · [Servo motor](/atlas/concept/servo-motor) · [Closed-loop control](/atlas/concept/closed-loop-control)

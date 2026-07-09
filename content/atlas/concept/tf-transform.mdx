@@ -1,0 +1,72 @@
+---
+title: TF (Coordinate Transforms)
+slug: tf-transform
+bucket: concept
+category: control
+summary: >-
+  TF is the system robots use to keep track of where every part and sensor is relative
+  to everything else — a live tree of coordinate frames that answers "where is this
+  point in that frame?" at any moment.
+difficulty: 3
+tags:
+  - ros2
+  - navigation
+  - coordinate-frames
+seeAlso:
+  - ros2
+  - urdf
+  - quaternion
+  - odometry
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ROS 2 — tf2 documentation'
+    url: 'https://docs.ros.org/'
+  - title: 'REP 105 — Coordinate frames for mobile platforms'
+    url: 'https://www.ros.org/reps/rep-0105.html'
+laymanExplanation: >-
+  TF keeps track of where everything on a robot is in relation to everything else —
+  the camera to the wheels, the wheels to the room — so the robot can convert a point
+  seen by one sensor into any other frame of reference.
+technicalDefinition: >-
+  TF (tf2 in ROS 2) maintains a time-stamped tree of coordinate frame transforms,
+  letting any point be expressed in any frame via chained rigid-body transforms.
+quizQuestion:
+  q: What problem does TF solve?
+  options:
+    - Charging the robot's battery
+    - Tracking where each frame is relative to others over time
+    - Compressing camera images
+    - Scheduling motor updates
+  answer: 1
+  explanation: >-
+    TF maintains a tree of coordinate-frame transforms so any point can be expressed
+    in any frame, at any timestamp.
+---
+
+A robot sees a coffee cup with its camera. But to *pick it up*, the arm needs that cup's position in the arm's own frame — not the camera's. Converting between those viewpoints, hundreds of times a second, is the job of **TF**.
+
+## The problem it solves
+
+A robot is a bundle of coordinate frames: the map, the robot's base, each wheel, the camera, the gripper. A measurement always arrives in *one* frame (the camera's), but you usually need it in *another* (the base, or the world). TF (`tf2` in [ROS 2](/atlas/concept/ros2)) maintains the relationships between all of them and does the conversions for you.
+
+## How it works
+
+TF stores a **tree of frames** connected by transforms — each transform is a translation plus a rotation (stored as a [quaternion](/atlas/concept/quaternion)). To express a point from frame A in frame B, TF walks the path between them and chains the transforms.
+
+```diagram
+{ "type": "flow", "title": "A typical mobile-robot frame tree", "nodes": ["map", "odom", "base_link", "camera_link"], "caption": "Each arrow is a live transform. Ask TF for camera→map and it multiplies the chain, so a point the camera sees becomes a point on the map." }
+```
+
+The genius — and the tricky part — is that TF is **time-stamped**. The camera-to-base transform 200 ms ago may differ from now (the robot moved). TF buffers a short history so it can answer "where was the camera relative to the map *at the instant this image was taken*?" Getting this timing wrong is the classic TF bug: a valid transform at the wrong time puts objects in the wrong place.
+
+## Where you'll see it
+
+Every ROS 2 robot that navigates or manipulates runs a TF tree. Standard conventions (REP 105) fix the important frames: `map` (global, drift-free but jumpy after [loop closures](/atlas/concept/slam)), `odom` (smooth but drifts, from [odometry](/atlas/concept/odometry)), and `base_link` (the robot itself). Sensors hang off `base_link` via fixed transforms defined in the [URDF](/atlas/concept/urdf).
+
+## Why it matters
+
+TF is the quiet backbone of robot spatial reasoning. Without it, every node would re-implement the same fragile geometry. With it, perception, navigation, and manipulation all share one consistent, time-aware picture of where everything is.
+
+## Related
+
+[ROS2](/atlas/concept/ros2) · [URDF](/atlas/concept/urdf) · [Quaternion](/atlas/concept/quaternion) · [Odometry](/atlas/concept/odometry)
