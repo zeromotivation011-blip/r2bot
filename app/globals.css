@@ -623,3 +623,24 @@ main { animation: r2PageIn 460ms cubic-bezier(.16, 1, .3, 1) both; }
 @media (prefers-reduced-motion: reduce) {
   main { animation: none !important; }
 }
+
+/* ---- Google Translate: hide default chrome, keep our custom switcher ---- */
+.goog-te-banner-frame,
+.goog-te-balloon-frame,
+#goog-gt-tt,
+.goog-tooltip,
+.goog-tooltip:hover,
+iframe.skiptranslate,
+.skiptranslate > iframe { display: none !important; visibility: hidden !important; }
+body { top: 0 !important; position: static !important; }
+#google_translate_element { display: none !important; }
+.goog-text-highlight { background: none !important; box-shadow: none !important; }
+/* Google injects inline color on translated <font> tags — keep our text colors */
+font { color: inherit !important; background: transparent !important; }
+
+/* ---- Feature tour ---- */
+@keyframes r2TourFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes r2TourPop { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  [role="dialog"] { animation: none !important; }
+}

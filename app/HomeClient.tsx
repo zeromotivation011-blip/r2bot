@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { Reveal } from '@/components/Reveal'
+import { FeatureTour } from '@/components/FeatureTour'
 
 type Track = 'spark' | 'wire' | 'forge' | 'edge'
 
@@ -74,6 +75,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
   const showDiagnosticBanner = personalization.signedIn && !personalization.track
   return (
     <main style={{ background: '#0a0a0f', color: '#fff' }}>
+      <FeatureTour />
       <Hero personalization={personalization} atlasCount={atlasCount} projectCount={projectCount} />
       {showDiagnosticBanner && (
         <section style={{

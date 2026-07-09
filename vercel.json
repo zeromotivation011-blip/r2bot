@@ -5,9 +5,7 @@
   "devCommand": "next dev",
   "installCommand": "npm install",
   "crons": [
-    { "path": "/api/cron/discovery-refresh", "schedule": "0 6 * * *" },
-    { "path": "/api/cron/lens-refresh", "schedule": "0 5 * * *" },
-    { "path": "/api/cron/news-refresh", "schedule": "0 7 * * *" },
+    { "path": "/api/cron/daily", "schedule": "0 6 * * *" },
     { "path": "/api/cron/weekly-digest", "schedule": "0 8 * * 5" }
   ]
 }

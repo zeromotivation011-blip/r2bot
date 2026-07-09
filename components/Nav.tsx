@@ -6,6 +6,7 @@ import { MiniLogo } from './MorphingLogo';
 import { useCopilot } from './CopilotProvider';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { StreakBadge } from './StreakBadge';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { useAuth } from './auth/AuthProvider';
 
 type Leaf = {
@@ -334,6 +335,8 @@ export function Nav() {
         </div>
 
         <div className="nav-right">
+          <LanguageSwitcher />
+
           <StreakBadge />
 
           <AuthMenu />
