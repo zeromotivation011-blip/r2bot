@@ -1,0 +1,83 @@
+---
+title: RRT*
+slug: rrt-star
+bucket: concept
+category: control
+summary: >-
+  RRT* is the optimal version of the RRT motion planner — it rewires its search tree as it grows so the
+  path it finds converges toward the shortest one, combining sampling-based flexibility with quality.
+difficulty: 4
+tags:
+  - motion-planning
+  - sampling
+  - optimization
+seeAlso:
+  - rapidly-exploring-random-tree
+  - probabilistic-roadmap
+  - motion-planning
+  - a-star-algorithm
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Karaman & Frazzoli — Sampling-based algorithms for optimal motion planning'
+    url: 'https://arxiv.org/abs/1105.1186'
+  - title: 'RRT* (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Rapidly-exploring_random_tree'
+laymanExplanation: >-
+  RRT* is a smarter version of RRT. Plain RRT finds *a* path; RRT* keeps improving it as it explores,
+  reconnecting branches so the route gets shorter and smoother, converging toward the best possible path.
+technicalDefinition: >-
+  RRT* is an asymptotically optimal sampling-based planner that extends RRT with a rewiring step,
+  reconnecting nearby nodes to lower-cost parents so the tree converges toward the optimal path.
+quizQuestion:
+  q: RRT* improves on RRT by…
+  options:
+    - Sampling fewer points
+    - Rewiring the tree so paths converge toward optimal
+    - Ignoring obstacles
+    - Only working in 2D
+  answer: 1
+  explanation: >-
+    RRT* adds a rewiring step that reconnects nodes to cheaper parents, making the path quality converge
+    toward the optimum as more samples are added.
+---
+
+Plain [RRT](/atlas/concept/rapidly-exploring-random-tree) is great at *finding* a path through complex, high-dimensional spaces — but the path it finds is often jagged and far from shortest. **RRT\*** fixes that, keeping RRT's flexibility while converging toward the *optimal* path.
+
+## What it adds
+
+RRT* grows a tree by random sampling just like RRT, but adds a crucial **rewiring** step every time it adds a node:
+
+1. **Sample and extend** toward a new point (as in RRT).
+2. **Choose the best parent** — connect the new node to whichever nearby node gives it the lowest cost-to-reach, not just the nearest.
+3. **Rewire** — check nearby existing nodes and, if routing them *through the new node* would be cheaper, reconnect them.
+
+Over time this constant local improvement makes the whole tree's paths shorter and smoother.
+
+```diagram
+{ "type": "loop", "title": "Grow, then rewire for quality", "nodes": ["Sample + extend", "Pick cheapest parent", "Rewire nearby nodes"], "caption": "The extra 'choose best parent + rewire' steps continually shorten paths, so RRT*'s solution improves toward optimal the longer it runs." }
+```
+
+## Asymptotic optimality
+
+The key property: RRT* is **asymptotically optimal** — given enough samples, its path converges to the true shortest path. Plain RRT has no such guarantee; it just finds *some* feasible path. This makes RRT* the go-to when path **quality** matters, not just feasibility.
+
+## The trade-off
+
+- **More computation.** The rewiring and best-parent search cost more per sample than RRT, so RRT* is slower to a first solution.
+- **Anytime behavior.** But it's an *anytime* planner — it returns a valid path quickly and keeps improving it if given more time, which suits many robots (act on the current best, refine as you go).
+- **Variants** (Informed RRT*, RRT#, BIT*) speed up convergence by focusing sampling where it helps.
+
+## Where it fits
+
+- **[RRT](/atlas/concept/rapidly-exploring-random-tree)** — fast, feasible-path planning in high dimensions (arms, cars).
+- **RRT\*** — when you also want a good (near-optimal) path.
+- **[A*](/atlas/concept/a-star-algorithm)** — optimal on discrete grids/graphs; RRT* is its spirit for continuous, high-dimensional spaces.
+- **[PRM](/atlas/concept/probabilistic-roadmap)** — sampling-based, better for repeated queries in a fixed space.
+
+## Why it matters
+
+RRT* answered a key question in motion planning: can sampling-based planners give *optimal* paths, not just feasible ones? Its rewiring idea and asymptotic optimality made it a foundational algorithm for high-quality motion planning of arms, drones, and vehicles in complex spaces.
+
+## Related
+
+[RRT](/atlas/concept/rapidly-exploring-random-tree) · [Probabilistic roadmap](/atlas/concept/probabilistic-roadmap) · [Motion planning](/atlas/concept/motion-planning) · [A* algorithm](/atlas/concept/a-star-algorithm)

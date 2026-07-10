@@ -1,0 +1,77 @@
+---
+title: 6D Pose Estimation
+slug: six-dof-pose-estimation
+bucket: concept
+category: ai-and-perception
+summary: >-
+  6D pose estimation figures out an object's full position and orientation in 3D from a camera — not just
+  where it is, but which way it faces — the perception a robot needs to actually grasp and manipulate it.
+difficulty: 4
+tags:
+  - perception
+  - vision
+  - manipulation
+seeAlso:
+  - object-detection
+  - grasp-planning
+  - point-cloud
+  - synthetic-data
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: '6D pose estimation (research)'
+    url: 'https://en.wikipedia.org/wiki/Pose_(computer_vision)'
+  - title: 'PoseCNN / pose estimation benchmarks'
+    url: 'https://en.wikipedia.org/wiki/Pose_(computer_vision)'
+laymanExplanation: >-
+  6D pose estimation tells a robot exactly where an object is AND how it's turned — its position (3 numbers)
+  and orientation (3 numbers). A robot needs both to grab an object correctly rather than fumble it.
+technicalDefinition: >-
+  6D pose estimation predicts an object's 3D translation and 3D rotation (6 degrees of freedom) relative to
+  the camera, from images or depth data.
+quizQuestion:
+  q: The '6D' in 6D pose estimation refers to…
+  options:
+    - Six cameras
+    - 3D position plus 3D orientation
+    - Six colors
+    - Six seconds of video
+  answer: 1
+  explanation: >-
+    Six degrees of freedom: three for position (x, y, z) and three for orientation (rotation) — the full
+    pose of the object.
+---
+
+To pick up an object, a robot needs more than "there's a mug over there." It needs to know **exactly where the mug is and which way it's turned** — so it can align its gripper to the handle. Recovering that full pose is **6D pose estimation**.
+
+## What "6D" means
+
+An object's pose in 3D has **six degrees of freedom**: three for **position** (x, y, z — where it is) and three for **orientation** (its rotation — which way it faces). 6D pose estimation predicts all six from sensor data (a camera image, often plus depth), placing the object precisely in the robot's world.
+
+```diagram
+{ "type": "flow", "title": "Where AND which way", "nodes": ["Camera / depth input", "Detect object", "Estimate 3D position + 3D rotation", "Full 6D pose"], "caption": "Detection alone gives a rough location; 6D pose adds the crucial orientation, so a robot knows how to align its gripper — not just that the object exists." }
+```
+
+## Why it's essential (and hard)
+
+- **Manipulation depends on it.** [Grasp planning](/atlas/concept/grasp-planning) and assembly need the object's exact orientation — grabbing a mug by the handle requires knowing where the handle points. [Bin picking](/atlas/concept/bin-picking) is largely a 6D pose problem.
+- **It's genuinely difficult.** Objects are **occluded** (partly hidden), symmetric (a plain box has ambiguous orientation), textureless or shiny, and seen from odd angles. A cup seen from directly above hides the rotation that matters.
+
+## How robots do it
+
+- **Model-based.** Match a known 3D CAD model to the sensor data — align the model's [point cloud](/atlas/concept/point-cloud) to the observed one (via [ICP](/atlas/concept/iterative-closest-point)) or match features to the model. Precise when you have the model.
+- **Learned (deep networks).** Predict pose directly from images (PoseCNN, and many since), often trained heavily on **[synthetic data](/atlas/concept/synthetic-data)** because real 6D-pose labels are hard to annotate by hand. These generalize better to clutter and handle novel views.
+- **Keypoint-based.** Predict specific 3D keypoints of the object in the image, then solve for pose geometrically.
+
+Handling **symmetry** (multiple valid orientations) and **occlusion** robustly is where much of the research effort goes.
+
+## Where you'll see it
+
+Robotic [bin picking](/atlas/concept/bin-picking) and assembly, warehouse and manufacturing manipulation, augmented reality (placing virtual objects correctly), and any task where a robot must interact with an object's specific geometry.
+
+## Why it matters
+
+6D pose estimation is the bridge between *seeing* an object and *manipulating* it. Detection tells a robot an object is there; 6D pose tells it how to actually grasp and use it. It's a core, still-challenging perception capability for any robot that touches the physical world.
+
+## Related
+
+[Object detection](/atlas/concept/object-detection) · [Grasp planning](/atlas/concept/grasp-planning) · [Point cloud](/atlas/concept/point-cloud) · [Synthetic data](/atlas/concept/synthetic-data)

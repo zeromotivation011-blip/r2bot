@@ -1,0 +1,79 @@
+---
+title: Epipolar Geometry
+slug: epipolar-geometry
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Epipolar geometry is the math relating two camera views of the same scene — it constrains where a point
+  in one image can appear in the other, the foundation of stereo, structure-from-motion, and visual SLAM.
+difficulty: 4
+tags:
+  - perception
+  - vision
+  - geometry
+seeAlso:
+  - stereo-vision
+  - feature-matching
+  - structure-from-motion
+  - camera-calibration
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Epipolar geometry (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Epipolar_geometry'
+  - title: 'Hartley & Zisserman — Multiple View Geometry'
+    url: 'https://www.robots.ox.ac.uk/~vgg/hzbook/'
+laymanExplanation: >-
+  Epipolar geometry is the rule that, if you see a point in one camera image, it must lie along a specific
+  line in a second camera's image. That constraint hugely simplifies matching points between two views and
+  recovering 3D.
+technicalDefinition: >-
+  Epipolar geometry describes the geometric relationship between two views of a scene; a point in one image
+  constrains its match to a corresponding epipolar line in the other, encoded by the fundamental/essential
+  matrix.
+quizQuestion:
+  q: Epipolar geometry says a point seen in one image must lie, in the other image, on…
+  options:
+    - Any pixel
+    - A specific line (the epipolar line)
+    - The exact same pixel
+    - The image border
+  answer: 1
+  explanation: >-
+    The match is constrained to the epipolar line in the second view, reducing the search from 2D to 1D and
+    enabling robust matching and 3D recovery.
+---
+
+When two cameras (or one camera at two moments) view the same scene, there's a beautiful, strict relationship between the two images. **Epipolar geometry** captures it — and it's the mathematical backbone of stereo, 3D reconstruction, and visual SLAM.
+
+## The core constraint
+
+Here's the key insight: if you see a point in **one** image, its match in the **other** image can't be just anywhere — it must lie along a specific **line**, called the **epipolar line**. This is because the point, and the two camera centers, all lie in one plane (the epipolar plane), which slices each image in a line.
+
+The practical payoff is huge: **searching for a match drops from 2D (the whole image) to 1D (along one line)** — faster and far less error-prone.
+
+```diagram
+{ "type": "flow", "title": "One point, one line", "nodes": ["Point seen in image A", "Epipolar constraint", "Match lies on a line in image B", "Search 1D, not 2D"], "caption": "The geometry of two views forces a point's match onto a single line, turning a hard 2D search into an easy 1D one and rejecting impossible matches." }
+```
+
+## How it's encoded
+
+The relationship between the two views is captured in a matrix:
+
+- The **fundamental matrix (F)** relates the two images in pixel coordinates (uncalibrated cameras).
+- The **essential matrix (E)** does so for **[calibrated](/atlas/concept/camera-calibration)** cameras, and can be decomposed into the **relative rotation and translation** between the two views.
+
+That last point is the magic: from matched features and the essential matrix, you recover *how the camera moved* — the heart of [visual odometry](/atlas/concept/visual-odometry) and [structure from motion](/atlas/concept/structure-from-motion).
+
+## Where it's used
+
+- **[Stereo vision](/atlas/concept/stereo-vision).** Rectifying the two images aligns epipolar lines to image rows, so matching is a simple horizontal search — the basis of disparity/depth.
+- **[Feature matching](/atlas/concept/feature-matching) verification.** RANSAC fits the epipolar geometry to reject wrong matches (outliers) — the standard robustness step.
+- **Motion estimation.** Recovering camera pose from two views in SLAM and SfM.
+
+## Why it matters
+
+Epipolar geometry is one of the pillars of multi-view computer vision. It provides the constraint that makes matching tractable and the mathematics that recovers 3D structure and camera motion from images. Nearly every camera-based robotic 3D capability — stereo depth, visual odometry, reconstruction — rests on it.
+
+## Related
+
+[Stereo vision](/atlas/concept/stereo-vision) · [Feature matching](/atlas/concept/feature-matching) · [Structure from motion](/atlas/concept/structure-from-motion) · [Camera calibration](/atlas/concept/camera-calibration)

@@ -1,0 +1,81 @@
+---
+title: Probabilistic Roadmap (PRM)
+slug: probabilistic-roadmap
+bucket: concept
+category: control
+summary: >-
+  A probabilistic roadmap pre-builds a network of collision-free connections through a space, so a robot
+  can quickly find paths between many start-goal pairs — the sampling-based planner of choice when the
+  environment stays fixed.
+difficulty: 3
+tags:
+  - motion-planning
+  - sampling
+  - navigation
+seeAlso:
+  - rapidly-exploring-random-tree
+  - rrt-star
+  - configuration-space
+  - collision-checking
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Probabilistic roadmap (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Probabilistic_roadmap'
+  - title: 'Kavraki et al. — PRM (1996)'
+    url: 'https://en.wikipedia.org/wiki/Probabilistic_roadmap'
+laymanExplanation: >-
+  A probabilistic roadmap scatters random points through the free space and connects nearby ones into a web
+  of safe routes. Once that map exists, the robot can quickly plan a path between almost any two spots by
+  searching the web.
+technicalDefinition: >-
+  A PRM is a sampling-based planner that builds a graph (roadmap) of collision-free configurations and
+  connections in a learning phase, then answers path queries by graph search.
+quizQuestion:
+  q: A PRM is especially efficient when…
+  options:
+    - The environment changes constantly
+    - The environment is fixed and many paths are queried
+    - There is only one path to find, once
+    - No obstacles exist
+  answer: 1
+  explanation: >-
+    PRM pays an upfront cost to build a reusable roadmap, so it excels when the space is static and many
+    start-goal queries are made against it.
+---
+
+Some robots plan one path and move on; others must plan **many** paths through the **same** space over and over. For the latter, the **probabilistic roadmap (PRM)** is ideal — do the hard work once, then answer queries fast.
+
+## Two phases
+
+PRM splits planning into a **build phase** and a **query phase**:
+
+1. **Build (learning) the roadmap.** Randomly sample many points in the [configuration space](/atlas/concept/configuration-space), keep the **collision-free** ones, and connect each to its nearby neighbors with collision-free local paths. The result is a **graph (roadmap)** — a web of safe routes woven through the free space.
+2. **Query.** To plan from a start to a goal, connect both into the roadmap and run a graph search ([A*](/atlas/concept/a-star-algorithm)/Dijkstra) to find a path — fast, because the hard collision-checking work is already done.
+
+```diagram
+{ "type": "flow", "title": "Build a reusable web of safe routes", "nodes": ["Sample free-space points", "Connect neighbors (collision-free)", "Roadmap graph", "Query: search graph for any path"], "caption": "The roadmap is built once and reused. Any new start-goal pair becomes a quick graph search, not a fresh plan from scratch." }
+```
+
+## PRM vs RRT
+
+Both are sampling-based, but suit different situations:
+
+- **PRM** — **multi-query**: build the roadmap once, answer *many* path requests against a *fixed* environment cheaply. Great for a robot arm repeatedly moving in the same workspace.
+- **[RRT](/atlas/concept/rapidly-exploring-random-tree) / [RRT\*](/atlas/concept/rrt-star)** — **single-query**: grow a tree from the start toward the goal, ideal when you plan once, or when the environment changes so a prebuilt roadmap would be stale.
+
+The heavy cost in both is **[collision checking](/atlas/concept/collision-checking)** — PRM amortizes it across many queries.
+
+## Strengths and limits
+
+- **Efficient reuse.** Unbeatable when the space is static and queried repeatedly.
+- **Handles high dimensions.** Like all sampling planners, it scales where grids can't.
+- **Stale if the world changes.** A moving obstacle invalidates roadmap edges, requiring updates (dynamic/lazy PRM variants help).
+- **Completeness.** Probabilistically complete — with enough samples it finds a path if one exists.
+
+## Why it matters
+
+PRM introduced the powerful idea of **precomputing a reusable map of free space** for fast repeated planning. It's a foundational sampling-based planner, especially for fixed-workspace robot arms, and a cornerstone of the motion-planning toolkit alongside RRT.
+
+## Related
+
+[RRT](/atlas/concept/rapidly-exploring-random-tree) · [RRT*](/atlas/concept/rrt-star) · [Configuration space](/atlas/concept/configuration-space) · [Collision checking](/atlas/concept/collision-checking)

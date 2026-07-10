@@ -1,0 +1,84 @@
+---
+title: Hybrid A*
+slug: hybrid-a-star
+bucket: concept
+category: control
+summary: >-
+  Hybrid A* is a path planner for car-like robots that searches over feasible, drivable motions instead of
+  grid cells — producing smooth paths a vehicle can actually follow, the algorithm behind self-driving
+  parking and navigation.
+difficulty: 4
+tags:
+  - motion-planning
+  - navigation
+  - autonomous-vehicle
+seeAlso:
+  - a-star-algorithm
+  - nonholonomic-constraint
+  - ackermann-steering
+  - state-lattice-planner
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Dolgov et al. — Practical Search Techniques (Hybrid A*)'
+    url: 'https://ai.stanford.edu/~ddolgov/papers/dolgov_gpp_stair08.pdf'
+  - title: 'Hybrid A* (Nav2 Smac)'
+    url: 'https://docs.nav2.org/'
+laymanExplanation: >-
+  Hybrid A* plans routes for cars that can't turn on the spot. Instead of hopping between grid squares, it
+  searches using realistic little driving moves, so the path it finds is one the car can actually steer —
+  smooth curves, no impossible sideways jumps.
+technicalDefinition: >-
+  Hybrid A* extends A* by expanding nodes with continuous, kinematically feasible motion primitives and
+  tracking continuous state within grid cells, yielding drivable paths for nonholonomic vehicles.
+quizQuestion:
+  q: Hybrid A* differs from plain A* by…
+  options:
+    - Using no heuristic
+    - Searching over feasible vehicle motions, not just grid cells
+    - Ignoring obstacles
+    - Only working for walking robots
+  answer: 1
+  explanation: >-
+    It expands nodes using continuous, drivable motion primitives (respecting the vehicle's turning
+    limits), so the resulting path is kinematically feasible — unlike grid-only A*.
+---
+
+Plain [A*](/atlas/concept/a-star-algorithm) plans on a grid, hopping cell to cell — fine for a robot that can move any direction, useless for a **car** that can't turn in place or slide sideways. **Hybrid A\*** adapts A* to plan paths a car-like robot can actually drive.
+
+## The problem with grid A* for cars
+
+A car is [nonholonomic](/atlas/concept/nonholonomic-constraint) ([Ackermann steering](/atlas/concept/ackermann-steering)): it has a minimum turning radius and can't move laterally. A grid-A* path is a chain of cell-to-cell steps that ignores this — it might command a sharp turn or a sideways jump no car could follow. You'd get an "optimal" path that's physically undrivable.
+
+## The hybrid trick
+
+Hybrid A* keeps A*'s guided search but changes **what it expands**:
+
+- Instead of stepping to neighboring grid cells, it applies **continuous, feasible motion primitives** — short drivable arcs the vehicle *can* actually execute (respecting its turning radius, forward/reverse).
+- It tracks the vehicle's **continuous position and heading** within each grid cell (hence "hybrid": a grid for bookkeeping, continuous state for the actual pose).
+- It uses smart **heuristics** (a non-holonomic-without-obstacles heuristic and a holonomic-with-obstacles one) to guide the search efficiently.
+
+```diagram
+{ "type": "flow", "title": "Search over drivable moves", "nodes": ["Current vehicle pose", "Expand feasible arcs", "Track continuous heading", "Smooth drivable path"], "caption": "By expanding only motions the car can perform and keeping continuous state, the path that comes out is one the vehicle can actually steer along." }
+```
+
+## Where it's used
+
+Hybrid A* is a staple of **autonomous driving and mobile robotics**:
+
+- **Parking and low-speed maneuvering** — the classic use (it was developed in the DARPA Urban Challenge era), handling tight spaces with forward/reverse maneuvers.
+- **Unstructured navigation** — driving through open or cluttered areas where lanes don't exist.
+- **[Nav2](/atlas/concept/nav2)'s Smac planner** offers a Hybrid-A* option for car-like robots.
+
+The raw path is often **smoothed** afterward for comfort, but it's feasible from the start.
+
+## Hybrid A* vs lattice planners
+
+A related approach, the **[state lattice planner](/atlas/concept/state-lattice-planner)**, precomputes a fixed set of motion primitives forming a regular lattice. Hybrid A* generates motions on the fly from the continuous state; both aim to produce feasible paths for constrained vehicles, and they're often compared.
+
+## Why it matters
+
+Hybrid A* solved a core practical problem: planning **optimal-ish paths that a real vehicle can actually drive**. It bridges A*'s efficient search with the kinematic reality of cars, making it foundational to self-driving navigation and parking.
+
+## Related
+
+[A* algorithm](/atlas/concept/a-star-algorithm) · [Nonholonomic constraint](/atlas/concept/nonholonomic-constraint) · [Ackermann steering](/atlas/concept/ackermann-steering) · [State lattice planner](/atlas/concept/state-lattice-planner)

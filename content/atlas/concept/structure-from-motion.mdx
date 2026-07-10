@@ -1,0 +1,87 @@
+---
+title: Structure from Motion (SfM)
+slug: structure-from-motion
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Structure from motion reconstructs 3D scenes and camera positions from a set of ordinary 2D photos — the
+  classic pipeline behind photogrammetry, 3D mapping, and the initialization of visual SLAM and NeRFs.
+difficulty: 4
+tags:
+  - perception
+  - vision
+  - 3d
+seeAlso:
+  - feature-matching
+  - epipolar-geometry
+  - bundle-adjustment
+  - neural-radiance-field
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Structure from motion (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Structure_from_motion'
+  - title: 'COLMAP — SfM pipeline'
+    url: 'https://colmap.github.io/'
+laymanExplanation: >-
+  Structure from motion takes a bunch of ordinary photos of a scene from different spots and works out both
+  the 3D shape of the scene and where each photo was taken from — turning flat pictures into a 3D model.
+technicalDefinition: >-
+  Structure from motion jointly estimates 3D scene structure and camera poses from a set of 2D images by
+  matching features across views and solving the multi-view geometry, refined by bundle adjustment.
+quizQuestion:
+  q: Structure from motion recovers…
+  options:
+    - Only the camera colors
+    - Both 3D scene structure and the camera poses from 2D images
+    - Only a single 2D image
+    - Audio from video
+  answer: 1
+  explanation: >-
+    SfM jointly estimates the 3D structure of a scene and where each camera was, from overlapping 2D
+    images.
+---
+
+Give a computer a pile of photos of a building taken from different angles, and it can reconstruct the building in 3D *and* figure out where every photo was taken from. That's **structure from motion (SfM)** — recovering 3D from moving 2D views.
+
+## What it recovers
+
+SfM solves two intertwined unknowns at once from a set of overlapping images:
+
+- **Structure** — the 3D positions of scene points.
+- **Motion** — the camera's pose (position + orientation) for each image.
+
+Neither is known in advance, yet the geometry of multiple views constrains both — so SfM untangles them jointly, turning flat pictures into a 3D point cloud and a set of camera positions.
+
+```diagram
+{ "type": "flow", "title": "Photos to 3D + camera poses", "nodes": ["Overlapping photos", "Match features across views", "Solve multi-view geometry", "3D structure + camera poses"], "caption": "By matching the same points across images and exploiting the geometry between views, SfM recovers both the scene's 3D shape and where each camera was." }
+```
+
+## The pipeline
+
+1. **Detect and [match features](/atlas/concept/feature-matching)** ([SIFT](/atlas/concept/sift-features)/[ORB](/atlas/concept/orb-features)) across the images to find the same points in multiple views.
+2. **Estimate two-view geometry** using [epipolar geometry](/atlas/concept/epipolar-geometry) (the essential/fundamental matrix) to get relative camera poses and initial 3D points (triangulation).
+3. **Grow incrementally** — add images one by one, registering each camera and triangulating more points.
+4. **[Bundle adjustment](/atlas/concept/bundle-adjustment)** — jointly refine all cameras and points to minimize reprojection error, the accuracy step that makes the reconstruction crisp.
+
+Tools like **COLMAP** implement this pipeline and are widely used.
+
+## Where it's used
+
+- **Photogrammetry and 3D scanning** — reconstructing objects, buildings, and terrain from photos or drone imagery (mapping, surveying, heritage).
+- **Initializing modern methods** — SfM computes the camera poses that [NeRFs](/atlas/concept/neural-radiance-field) and [3D Gaussian splatting](/atlas/concept/3d-gaussian-splatting) need as input.
+- **Robotics mapping.** Related to visual SLAM — SfM is typically the *offline, batch* cousin (process all images together for best accuracy), while [SLAM](/atlas/concept/slam) is the *online, real-time* version.
+
+## SfM vs SLAM
+
+- **SfM** — offline, unordered image sets, maximum accuracy, no real-time constraint.
+- **[SLAM](/atlas/concept/slam)** — online, sequential frames, real-time, for a live robot.
+
+They share the same underlying multi-view geometry and bundle adjustment.
+
+## Why it matters
+
+Structure from motion is the classical foundation of 3D reconstruction from images — the pipeline that turns ordinary photos into 3D models and camera trajectories. It underlies photogrammetry, feeds modern neural reconstruction methods, and is the batch counterpart to visual SLAM, making it a cornerstone of geometric computer vision.
+
+## Related
+
+[Feature matching](/atlas/concept/feature-matching) · [Epipolar geometry](/atlas/concept/epipolar-geometry) · [Bundle adjustment](/atlas/concept/bundle-adjustment) · [Neural radiance field](/atlas/concept/neural-radiance-field)

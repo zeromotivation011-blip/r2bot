@@ -1,0 +1,80 @@
+---
+title: D* (Dynamic A*)
+slug: d-star
+bucket: concept
+category: control
+summary: >-
+  D* and D* Lite are replanning algorithms that efficiently repair a path when the map changes — instead of
+  planning from scratch each time an obstacle appears, they update only the affected part, ideal for robots
+  in changing worlds.
+difficulty: 4
+tags:
+  - motion-planning
+  - navigation
+  - replanning
+seeAlso:
+  - a-star-algorithm
+  - potential-field
+  - costmap-layers
+  - motion-planning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'D* (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/D*'
+  - title: 'Koenig & Likhachev — D* Lite'
+    url: 'https://en.wikipedia.org/wiki/D*'
+laymanExplanation: >-
+  D* is A* that can update its plan quickly. When a robot discovers a new obstacle, D* doesn't recompute the
+  whole route — it just fixes the part of the path that's affected, which is much faster for a robot moving
+  through a changing environment.
+technicalDefinition: >-
+  D* (Dynamic A*) and D* Lite are incremental heuristic search algorithms that efficiently repair an
+  optimal path when edge costs change, reusing previous computation instead of replanning from scratch.
+quizQuestion:
+  q: The advantage of D*/D* Lite over re-running A* is that it…
+  options:
+    - Finds worse paths
+    - Efficiently repairs only the part of the path affected by changes
+    - Needs no map
+    - Never updates the plan
+  answer: 1
+  explanation: >-
+    D* reuses prior search results and updates only what's affected by a map change, making replanning much
+    faster than computing a fresh A* path each time.
+---
+
+A robot exploring an unknown or changing environment discovers new obstacles as it goes. Re-running [A*](/atlas/concept/a-star-algorithm) from scratch every time it spots one is wasteful. **D\*** (and its cleaner successor **D\* Lite**) repair the plan efficiently instead.
+
+## The problem: constant replanning
+
+Real robots don't have a perfect map. As a robot drives, its sensors reveal new walls, closed doors, and moving obstacles — each change means the current path may no longer be valid or optimal. Planning a whole new A* path on every update, at every step, is expensive, especially in large maps. You want to **reuse** the work already done and only fix what changed.
+
+## The idea: incremental repair
+
+D* is an **incremental** search: it stores the results of its previous search and, when edge costs change (an obstacle appears or clears), it **updates only the affected portion** of the path rather than recomputing everything. Cleverly, D* Lite searches **from the goal back toward the robot**, so as the robot moves and discovers changes, most of the earlier computation near the goal stays valid and only the region around the change is repaired.
+
+```diagram
+{ "type": "flow", "title": "Repair, don't restart", "nodes": ["Follow current path", "Sensor reveals a change", "Update only affected nodes", "Continue on repaired path"], "caption": "Instead of a fresh full plan, D* patches the search where the map changed — far cheaper, so the robot keeps moving smoothly through a changing world." }
+```
+
+## Why robots use it
+
+- **Efficiency in dynamic/unknown maps.** Dramatically faster than replanning from scratch when only part of the map changes — the common case for a moving robot.
+- **Optimality preserved.** Unlike a purely reactive method (like a [potential field](/atlas/concept/potential-field)), D* keeps finding *optimal* paths, just incrementally.
+- **Proven in the field.** D* and D* Lite have guided Mars rovers and many mobile robots through partially-known, changing terrain.
+
+## Where it fits
+
+- **[A*](/atlas/concept/a-star-algorithm)** — plan once on a known static map.
+- **D\* / D\* Lite** — replan efficiently as the map changes or is discovered.
+- It typically runs over a live [costmap](/atlas/concept/costmap-layers) that updates from sensors, so the planner reacts to what the robot sees.
+
+D* Lite is generally preferred today for being simpler to implement than the original D* while achieving the same result.
+
+## Why it matters
+
+D* solved the *replanning* problem — making optimal path planning practical for robots in **changing, partially-known environments**, where the map is a moving target. It's a cornerstone of real-world mobile-robot navigation, from planetary rovers to indoor robots dodging newly-appeared obstacles.
+
+## Related
+
+[A* algorithm](/atlas/concept/a-star-algorithm) · [Potential field](/atlas/concept/potential-field) · [Costmap layers](/atlas/concept/costmap-layers) · [Motion planning](/atlas/concept/motion-planning)

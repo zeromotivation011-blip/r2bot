@@ -1,0 +1,85 @@
+---
+title: Semantic Mapping
+slug: semantic-mapping
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Semantic mapping builds a map that knows not just the shape of a space but the meaning of what's in it —
+  'this is a chair, that's a door, this room is a kitchen' — letting robots understand and act on human
+  environments.
+difficulty: 3
+tags:
+  - perception
+  - mapping
+  - slam
+seeAlso:
+  - slam
+  - occupancy-grid
+  - semantic-segmentation
+  - panoptic-segmentation
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Semantic mapping (robotics)'
+    url: 'https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping'
+  - title: 'Semantic SLAM research'
+    url: 'https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping'
+laymanExplanation: >-
+  Semantic mapping is a map that understands meaning. Instead of just knowing where walls and obstacles
+  are, the robot's map knows 'this is a chair,' 'that's the fridge,' 'this room is the kitchen' — so it can
+  follow commands like 'go to the kitchen.'
+technicalDefinition: >-
+  Semantic mapping augments a geometric map with semantic information — object identities, categories, and
+  region labels — enabling higher-level reasoning and human-meaningful navigation.
+quizQuestion:
+  q: Semantic mapping adds what to a normal geometric map?
+  options:
+    - More batteries
+    - The meaning/identity of objects and places
+    - Faster motors
+    - A bigger screen
+  answer: 1
+  explanation: >-
+    It attaches semantic meaning — what objects and regions are — onto the geometry, so the robot
+    understands its map, not just its shape.
+---
+
+A normal robot map knows *shape* — where the walls and obstacles are. But to obey "bring me a cup from the kitchen," a robot needs a map that knows *meaning*. Building that is **semantic mapping**.
+
+## What it adds
+
+Standard [SLAM](/atlas/concept/slam) produces a **geometric** map — an [occupancy grid](/atlas/concept/occupancy-grid) or point cloud of free and occupied space. Semantic mapping layers **meaning** on top:
+
+- **Objects** — "there's a chair here, a fridge there, a door at this spot."
+- **Regions** — "this area is the kitchen, that's a hallway."
+- **Categories and attributes** — types of surfaces, traversability, ownership of spaces.
+
+The result is a map the robot can *reason about* in human terms, not just navigate around.
+
+```diagram
+{ "type": "flow", "title": "Geometry plus meaning", "nodes": ["Geometric map (SLAM)", "Perceive object classes", "Attach semantics to the map", "Map that understands the scene"], "caption": "Combining a spatial map with per-region and per-object meaning turns 'occupied cells' into 'a chair in the kitchen' — a map a robot can reason with." }
+```
+
+## How it's built
+
+Semantic mapping fuses **geometry** and **[perception](/atlas/concept/semantic-segmentation)**:
+
+- A SLAM system provides the map and the robot's location.
+- [Semantic segmentation](/atlas/concept/semantic-segmentation), [instance segmentation](/atlas/concept/instance-segmentation), or [panoptic](/atlas/concept/panoptic-segmentation) perception identifies what's in each camera frame.
+- Those labels are **projected into the 3D map and accumulated** over time, so each object and region gets a consistent identity anchored in space. (This is often called **semantic SLAM** when done jointly.)
+
+Recent systems also build **3D scene graphs** — structured maps linking objects, rooms, and their relationships — and increasingly connect to language models so robots can be commanded in natural language.
+
+## Why robots need it
+
+- **Human-meaningful commands.** "Go to the kitchen," "pick up the mug on the table" — impossible without knowing what and where those things are.
+- **Task and motion planning.** Reasoning about objects and rooms, not just free space.
+- **Better navigation.** Avoiding a "person" differently than a "wall," or knowing a "door" can be opened.
+- **Long-term memory.** Remembering where objects usually are.
+
+## Why it matters
+
+Semantic mapping is the bridge from robots that merely **avoid obstacles** to robots that **understand environments** — a prerequisite for service, home, and assistive robots that must operate in human spaces and follow human instructions. It's where geometry, perception, and increasingly language come together.
+
+## Related
+
+[SLAM](/atlas/concept/slam) · [Occupancy grid](/atlas/concept/occupancy-grid) · [Semantic segmentation](/atlas/concept/semantic-segmentation) · [Panoptic segmentation](/atlas/concept/panoptic-segmentation)

@@ -1,0 +1,79 @@
+---
+title: Feature Matching
+slug: feature-matching
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Feature matching finds which points in one image correspond to points in another — the fundamental
+  step that links images together for SLAM, 3D reconstruction, tracking, and stitching.
+difficulty: 3
+tags:
+  - perception
+  - vision
+  - features
+seeAlso:
+  - orb-features
+  - sift-features
+  - epipolar-geometry
+  - visual-odometry
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Feature matching (computer vision)'
+    url: 'https://en.wikipedia.org/wiki/Feature_(computer_vision)'
+  - title: 'RANSAC for robust matching'
+    url: 'https://en.wikipedia.org/wiki/Random_sample_consensus'
+laymanExplanation: >-
+  Feature matching figures out which distinctive spot in one photo is the same spot in another photo. Do
+  that for many points and you can tell how the camera moved or build a 3D model — the glue that links
+  images together.
+technicalDefinition: >-
+  Feature matching establishes correspondences between keypoint descriptors across images, typically via
+  nearest-neighbor search and robust outlier rejection (e.g. Lowe's ratio test, RANSAC).
+quizQuestion:
+  q: Why is outlier rejection (like RANSAC) needed in feature matching?
+  options:
+    - To make images brighter
+    - Because some matches are wrong and must be filtered out
+    - To speed up the camera
+    - To add color
+  answer: 1
+  explanation: >-
+    Descriptor matching produces some false correspondences; robust methods like RANSAC filter these
+    outliers so downstream geometry isn't corrupted.
+---
+
+Detecting distinctive points ([ORB](/atlas/concept/orb-features), [SIFT](/atlas/concept/sift-features)) is only half the job. The payoff comes from **feature matching** — figuring out which point in one image is the *same* point in another. That correspondence is the glue that links images into motion estimates and 3D models.
+
+## What it does
+
+Each detected keypoint carries a **descriptor** (a fingerprint). Feature matching compares descriptors between two images and pairs up the ones that are most alike — establishing **correspondences**: "this corner here is that corner there." With enough good correspondences, you can compute how the camera moved between the images, or where points sit in 3D.
+
+```diagram
+{ "type": "flow", "title": "From two images to correspondences", "nodes": ["Descriptors in image A", "Compare to image B", "Nearest-neighbor matches", "Reject outliers (RANSAC)"], "caption": "Match descriptors between images, then filter the inevitable wrong matches — leaving reliable correspondences for geometry." }
+```
+
+## The hard part: bad matches
+
+Descriptor matching is never perfect — some pairs are **wrong** (a repeated pattern, similar textures, occlusion). And a few wrong matches can wreck the geometry computed from them. So robust feature matching has two standard defenses:
+
+- **Lowe's ratio test.** Accept a match only if the best candidate is clearly better than the second-best — ambiguous matches are discarded.
+- **[RANSAC](/atlas/concept/iterative-closest-point).** Fit the geometric relationship (via [epipolar geometry](/atlas/concept/epipolar-geometry)) to random subsets and keep the model most matches agree with, throwing out the **outliers**. This is what makes matching usable in the real world.
+
+## Where it's the foundation
+
+Feature matching underlies a huge swath of geometric vision:
+
+- **Visual [SLAM](/atlas/concept/slam) and [odometry](/atlas/concept/visual-odometry)** — match features between consecutive frames to estimate motion.
+- **[Structure from motion](/atlas/concept/structure-from-motion)** and 3D reconstruction — match across many photos to triangulate structure.
+- **Loop closure / place recognition** — match the current view against past ones.
+- **Panorama stitching, image alignment, and tracking.**
+
+Learned matchers (SuperGlue and successors) now push accuracy further, especially in hard conditions, but the pipeline — detect, describe, match, reject outliers — remains the same.
+
+## Why it matters
+
+Feature matching is the linchpin of geometric computer vision — the step that turns isolated images into connected information about motion and 3D structure. Nearly every camera-based robot capability, from mapping to reconstruction, rests on matching features reliably.
+
+## Related
+
+[ORB features](/atlas/concept/orb-features) · [SIFT features](/atlas/concept/sift-features) · [Epipolar geometry](/atlas/concept/epipolar-geometry) · [Visual odometry](/atlas/concept/visual-odometry)

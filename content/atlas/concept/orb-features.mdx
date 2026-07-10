@@ -1,0 +1,85 @@
+---
+title: ORB Features
+slug: orb-features
+bucket: concept
+category: ai-and-perception
+summary: >-
+  ORB is a fast, free way to find and describe distinctive points in an image — the feature detector
+  behind real-time visual SLAM and tracking on modest hardware, where speed matters as much as accuracy.
+difficulty: 3
+tags:
+  - perception
+  - vision
+  - features
+seeAlso:
+  - feature-matching
+  - sift-features
+  - slam
+  - visual-odometry
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ORB (Rublee et al., 2011)'
+    url: 'https://en.wikipedia.org/wiki/Oriented_FAST_and_rotated_BRIEF'
+  - title: 'OpenCV — ORB'
+    url: 'https://docs.opencv.org/'
+laymanExplanation: >-
+  ORB finds distinctive little spots in an image — corners and textured points — and gives each a compact
+  fingerprint, very fast. Robots use it to recognize the same points across frames for tracking and
+  mapping.
+technicalDefinition: >-
+  ORB (Oriented FAST and Rotated BRIEF) is a fast binary feature detector and descriptor combining FAST
+  keypoints with rotation-aware BRIEF descriptors for efficient matching.
+quizQuestion:
+  q: ORB is favored for real-time robotics mainly because it is…
+  options:
+    - The most accurate feature ever
+    - Fast, efficient, and free of patents
+    - Only for color images
+    - Unable to match points
+  answer: 1
+  explanation: >-
+    ORB is designed for speed and efficiency (binary descriptors) and is free to use, making it ideal for
+    real-time SLAM and tracking on limited hardware.
+---
+
+To track motion or build a map from a camera, a robot must find the *same* distinctive points across images. **ORB** is a fast, free way to find and describe those points — and it's the workhorse behind much of real-time visual robotics.
+
+## What it does
+
+ORB (**Oriented FAST and Rotated BRIEF**) does two jobs:
+
+- **Detect keypoints** — find distinctive spots (corners, textured points) using the very fast **FAST** corner detector.
+- **Describe them** — give each keypoint a compact **binary descriptor** (a rotation-aware version of BRIEF), a short fingerprint that identifies it so it can be recognized in another image.
+
+Because the descriptors are **binary**, comparing two of them is a lightning-fast bit operation — so [matching](/atlas/concept/feature-matching) thousands of features across frames is cheap.
+
+```diagram
+{ "type": "flow", "title": "Find distinctive points, fingerprint them", "nodes": ["Detect corners (FAST)", "Compute binary descriptor", "Match across images", "Track / map"], "caption": "Fast detection plus compact binary fingerprints make ORB efficient enough to run in real time on modest robot hardware." }
+```
+
+## Why robots love it
+
+- **Speed.** Fast enough for real-time [SLAM](/atlas/concept/slam) and tracking on limited onboard computers — a decisive advantage.
+- **Free.** Unlike the patented [SIFT](/atlas/concept/sift-features)/SURF, ORB is unencumbered, so it's used everywhere without licensing worries.
+- **Robust enough.** Handles rotation and scale reasonably well — good enough for many robotics tasks even if not as invariant as SIFT.
+
+This combination made ORB the feature behind **ORB-SLAM**, one of the most influential visual SLAM systems.
+
+## ORB vs SIFT
+
+- **[SIFT](/atlas/concept/sift-features)** — more accurate and invariant (scale, rotation, lighting), but slower and historically patented. Best when accuracy trumps speed.
+- **ORB** — faster, free, binary. Best for real-time, resource-limited robotics.
+
+Increasingly, **learned** feature detectors (SuperPoint and successors) are challenging both, but classic ORB remains a reliable, ubiquitous default.
+
+## Where you'll see it
+
+Visual [SLAM](/atlas/concept/slam) and [visual odometry](/atlas/concept/visual-odometry), object and image tracking, image stitching, and place recognition (bag-of-words built from ORB descriptors for loop closure). Anywhere a robot must match image points in real time.
+
+## Why it matters
+
+ORB solved a practical problem beautifully: distinctive, matchable image features **fast and free**. It's a foundation of real-time visual robotics — the reason a modest robot or phone can do camera-based tracking and mapping live.
+
+## Related
+
+[Feature matching](/atlas/concept/feature-matching) · [SIFT features](/atlas/concept/sift-features) · [SLAM](/atlas/concept/slam) · [Visual odometry](/atlas/concept/visual-odometry)

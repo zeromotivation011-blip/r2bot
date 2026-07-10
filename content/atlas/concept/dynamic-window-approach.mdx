@@ -1,0 +1,80 @@
+---
+title: Dynamic Window Approach (DWA)
+slug: dynamic-window-approach
+bucket: concept
+category: control
+summary: >-
+  The dynamic window approach is a fast local planner that picks a robot's next velocity by simulating
+  short candidate motions and scoring them — the reactive layer that follows a global plan while dodging
+  obstacles in real time.
+difficulty: 3
+tags:
+  - motion-planning
+  - navigation
+  - reactive-control
+seeAlso:
+  - motion-planning
+  - potential-field
+  - nav2
+  - costmap-layers
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Fox et al. — The Dynamic Window Approach (1997)'
+    url: 'https://en.wikipedia.org/wiki/Dynamic_window_approach'
+  - title: 'DWA local planner (Nav2)'
+    url: 'https://docs.nav2.org/'
+laymanExplanation: >-
+  The dynamic window approach decides how a robot should move in the next moment. It imagines several
+  possible speeds and turns, predicts where each would take it, and picks the one that heads toward the goal
+  while avoiding obstacles — recomputed constantly as it drives.
+technicalDefinition: >-
+  DWA samples achievable (velocity, angular-velocity) commands within the robot's dynamic limits, simulates
+  each forward briefly, and selects the trajectory maximizing progress-to-goal, clearance, and speed.
+quizQuestion:
+  q: The 'dynamic window' in DWA refers to…
+  options:
+    - A physical window on the robot
+    - The set of velocities the robot can actually reach given its limits
+    - The camera's field of view
+    - A time of day
+  answer: 1
+  explanation: >-
+    The dynamic window is the range of velocity commands achievable within the robot's acceleration limits
+    over the next short interval — the candidates DWA evaluates.
+---
+
+A global planner draws the overall route, but a robot still needs to decide, moment to moment, **exactly how fast to drive and turn** while avoiding obstacles that appear. The **dynamic window approach (DWA)** is a classic, fast way to make that call.
+
+## How it works
+
+DWA plans in **velocity space**, not position. Each control cycle it:
+
+1. **Builds the dynamic window** — the set of `(linear velocity, angular velocity)` commands the robot can *actually reach* in the next instant, given its current speed and **acceleration limits** (hence "dynamic": it respects what the robot can physically do right now).
+2. **Simulates** each candidate velocity forward a short time, predicting the short arc the robot would follow.
+3. **Scores** each trajectory by a weighted objective: progress toward the goal, clearance from obstacles, and forward speed. Trajectories that would hit something are discarded.
+4. **Executes** the best command — then repeats next cycle.
+
+```diagram
+{ "type": "loop", "title": "Simulate short moves, pick the best", "nodes": ["Compute reachable velocities", "Simulate each short arc", "Score: goal + clearance + speed", "Execute best, repeat"], "caption": "Every cycle DWA evaluates the motions the robot can immediately make and picks the one that best balances heading to the goal and avoiding obstacles." }
+```
+
+## Why it's useful
+
+- **Fast and reactive.** Cheap enough to run at high rate, so the robot dodges dynamic obstacles smoothly in real time.
+- **Respects real limits.** By planning in reachable velocity space, it never commands accelerations the robot can't achieve — its motions are always feasible.
+- **Pairs with a global planner.** DWA is a **local** planner: it follows the global path ([A*](/atlas/concept/a-star-algorithm)/[D*](/atlas/concept/d-star)) while handling immediate obstacles from the live [costmap](/atlas/concept/costmap-layers). This global-plus-local split is standard in [Nav2](/atlas/concept/nav2).
+
+## The limits
+
+- **Local minima.** Like other purely local/reactive methods (compare [potential fields](/atlas/concept/potential-field)), DWA can get stuck when short-horizon scoring can't see a way out — which is why it relies on a global planner and recovery behaviors.
+- **Short horizon.** It only looks a short time ahead, so it's about immediate reaction, not global optimality.
+
+Successors like the **[Timed Elastic Band](/atlas/concept/timed-elastic-band)** optimize a longer local trajectory for smoother, more anticipatory motion.
+
+## Why it matters
+
+DWA is a foundational local navigation method — the reactive velocity planner that lets a robot follow its route while safely handling the obstacles it encounters, all within its physical limits. It's a default building block of mobile-robot navigation stacks.
+
+## Related
+
+[Motion planning](/atlas/concept/motion-planning) · [Potential field](/atlas/concept/potential-field) · [Timed elastic band](/atlas/concept/timed-elastic-band) · [Nav2](/atlas/concept/nav2)

@@ -1,0 +1,86 @@
+---
+title: SIFT Features
+slug: sift-features
+bucket: concept
+category: ai-and-perception
+summary: >-
+  SIFT finds image features that stay recognizable despite changes in scale, rotation, and lighting — the
+  landmark algorithm that made robust image matching possible, and a benchmark for feature quality.
+difficulty: 3
+tags:
+  - perception
+  - vision
+  - features
+seeAlso:
+  - orb-features
+  - feature-matching
+  - epipolar-geometry
+  - structure-from-motion
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Scale-invariant feature transform (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Scale-invariant_feature_transform'
+  - title: 'Lowe — Distinctive image features (2004)'
+    url: 'https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf'
+laymanExplanation: >-
+  SIFT finds distinctive points in an image and describes them so well that they can be recognized even if
+  the image is zoomed, rotated, or lit differently. It was a breakthrough that made reliable image
+  matching possible.
+technicalDefinition: >-
+  SIFT (Scale-Invariant Feature Transform) detects keypoints across scales and assigns descriptors
+  invariant to scale, rotation, and moderate illumination and viewpoint change.
+quizQuestion:
+  q: SIFT's defining strength is that its features are…
+  options:
+    - The fastest to compute
+    - Invariant to scale, rotation, and lighting changes
+    - Only found in color images
+    - Unable to be matched
+  answer: 1
+  explanation: >-
+    SIFT features remain matchable despite changes in scale, rotation, and illumination — the invariance
+    that made robust matching possible.
+---
+
+Match two photos of the same scene taken from different distances, angles, and lighting, and naive methods fail. **SIFT** was the breakthrough that made this robust — and it set the standard for what a good image feature should be.
+
+## The breakthrough
+
+SIFT (**Scale-Invariant Feature Transform**, Lowe 2004) finds distinctive keypoints and describes them so that they stay **recognizable despite change**:
+
+- **Scale invariance** — the same point matches whether the object is near or far (found by searching across image scales).
+- **Rotation invariance** — matches even if the image is rotated (each feature gets a canonical orientation).
+- **Illumination and moderate viewpoint robustness** — tolerant of lighting and small perspective changes.
+
+Each keypoint gets a rich descriptor (a histogram of local gradient directions) that acts as a distinctive, comparable fingerprint.
+
+```diagram
+{ "type": "flow", "title": "Features that survive change", "nodes": ["Detect keypoints across scales", "Assign orientation + descriptor", "Match despite scale/rotation/light", "Reliable correspondences"], "caption": "By building in invariance to scale, rotation, and lighting, SIFT produces features that match across very different images — the key to robust correspondence." }
+```
+
+## Why it mattered so much
+
+Before SIFT, reliable image [matching](/atlas/concept/feature-matching) across real-world variation was hard. SIFT made it work, unlocking:
+
+- **[Structure from motion](/atlas/concept/structure-from-motion)** and 3D reconstruction from photo collections.
+- **Object recognition** and image retrieval.
+- **Panorama stitching** and image alignment.
+- Early visual [SLAM](/atlas/concept/slam) and localization.
+
+It became the *benchmark* feature — new methods are still compared against SIFT.
+
+## The trade-offs, and what came after
+
+- **Slow** — computing SIFT is expensive, historically too slow for real-time on limited hardware.
+- **Formerly patented** — which pushed real-time robotics toward free alternatives like [ORB](/atlas/concept/orb-features) (fast, binary, unencumbered). (SIFT's patent has since expired.)
+- **Learned features** (SuperPoint, and detectors trained end-to-end) now often surpass SIFT in robustness, especially under extreme viewpoint or lighting change.
+
+So in practice: **SIFT for accuracy** when time allows, **ORB for real-time** robotics, and increasingly **learned features** at the cutting edge.
+
+## Why it matters
+
+SIFT defined what robust image features look like and enabled a generation of computer-vision and robotics applications. Understanding it — invariance to scale, rotation, and lighting — is foundational to how robots recognize and match what their cameras see, and to the whole idea of image correspondence.
+
+## Related
+
+[ORB features](/atlas/concept/orb-features) · [Feature matching](/atlas/concept/feature-matching) · [Epipolar geometry](/atlas/concept/epipolar-geometry) · [Structure from motion](/atlas/concept/structure-from-motion)

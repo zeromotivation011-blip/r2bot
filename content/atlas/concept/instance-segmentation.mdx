@@ -1,0 +1,83 @@
+---
+title: Instance Segmentation
+slug: instance-segmentation
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Instance segmentation outlines each individual object in an image pixel-by-pixel and tells them apart —
+  not just 'these pixels are cups' but 'this is cup 1, that is cup 2' — the perception a robot needs to
+  pick one object out of many.
+difficulty: 3
+tags:
+  - perception
+  - vision
+  - segmentation
+seeAlso:
+  - semantic-segmentation
+  - object-detection
+  - panoptic-segmentation
+  - bin-picking
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Image segmentation (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Image_segmentation'
+  - title: 'Mask R-CNN'
+    url: 'https://arxiv.org/abs/1703.06870'
+laymanExplanation: >-
+  Instance segmentation draws a precise outline around every separate object in a picture and numbers them
+  — so a robot doesn't just see 'boxes' but knows box 1 from box 2 from box 3, each with its own exact
+  shape.
+technicalDefinition: >-
+  Instance segmentation produces a per-pixel mask for each distinct object instance, combining object
+  detection with pixel-level segmentation to separate individual objects of the same class.
+quizQuestion:
+  q: How does instance segmentation differ from semantic segmentation?
+  options:
+    - It uses no pixels
+    - It separates individual objects, not just labels each pixel by class
+    - It only detects one object
+    - It ignores object shape
+  answer: 1
+  explanation: >-
+    Semantic segmentation labels every pixel by class (all 'cup' pixels alike); instance segmentation
+    additionally separates each individual object (cup 1 vs cup 2).
+---
+
+To pick *one* object out of a pile, a robot must not only know what the objects are, but tell them **apart** — and know each one's exact shape. That's **instance segmentation**.
+
+## What it does
+
+Instance segmentation produces a **precise per-pixel mask for each individual object**, and distinguishes separate objects even of the same type. It combines two capabilities:
+
+- **[Object detection](/atlas/concept/object-detection)** — find and separate each distinct object.
+- **[Segmentation](/atlas/concept/semantic-segmentation)** — outline it pixel-by-pixel.
+
+So the output isn't "these pixels are cups" — it's "**this** mask is cup 1, **that** mask is cup 2, **this** is cup 3," each with its own exact outline.
+
+```diagram
+{ "type": "flow", "title": "Separate and outline every object", "nodes": ["Image of a pile", "Detect each object", "Pixel-precise mask per object", "cup 1, cup 2, cup 3…"], "caption": "Every individual object gets its own precise mask and identity — the information a robot needs to target and grasp one specific item." }
+```
+
+## Segmentation, three ways
+
+The distinction between segmentation types matters for robotics:
+
+- **[Semantic](/atlas/concept/semantic-segmentation)** — labels every pixel by *class* (all cups are just "cup"), but doesn't separate individuals. Good for "where is the floor/wall/road."
+- **Instance** — separates and outlines each *individual object* (cup 1 vs cup 2), but typically only for countable "things." Good for grasping one item.
+- **[Panoptic](/atlas/concept/panoptic-segmentation)** — the unified view: instance masks for objects *plus* semantic labels for background stuff.
+
+## Why robots need it
+
+- **Grasping one object.** [Bin picking](/atlas/concept/bin-picking) and manipulation require isolating a *single* target from a cluttered heap — instance masks give the exact shape and boundary to grasp.
+- **Counting and sorting.** Knowing how many distinct objects there are, and which is which.
+- **Precise interaction.** The pixel-accurate mask supports grasp point selection and [6D pose](/atlas/concept/six-dof-pose-estimation) estimation.
+
+**Mask R-CNN** was the landmark method; newer transformer-based and promptable models (like SAM) have pushed instance segmentation to generalize to novel objects.
+
+## Why it matters
+
+Instance segmentation gives a robot the ability to see the world as **distinct, individually-shaped objects** rather than an undifferentiated wash of categories — exactly what's needed to reach into clutter and pick the right thing. It's a workhorse of manipulation-oriented perception.
+
+## Related
+
+[Semantic segmentation](/atlas/concept/semantic-segmentation) · [Object detection](/atlas/concept/object-detection) · [Panoptic segmentation](/atlas/concept/panoptic-segmentation) · [Bin picking](/atlas/concept/bin-picking)

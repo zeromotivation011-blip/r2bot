@@ -1,0 +1,78 @@
+---
+title: Neural Radiance Field (NeRF)
+slug: neural-radiance-field
+bucket: concept
+category: ai-and-perception
+summary: >-
+  A NeRF learns a 3D scene from a set of photos by training a neural network to render it from any
+  viewpoint — a breakthrough in 3D reconstruction now being used to build rich maps and simulators for
+  robots.
+difficulty: 4
+tags:
+  - perception
+  - 3d
+  - machine-learning
+seeAlso:
+  - 3d-gaussian-splatting
+  - point-cloud
+  - structure-from-motion
+  - synthetic-data
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Neural radiance field (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Neural_radiance_field'
+  - title: 'Mildenhall et al. — NeRF (2020)'
+    url: 'https://www.matthewtancik.com/nerf'
+laymanExplanation: >-
+  A NeRF takes a bunch of photos of a scene and trains a small neural network to recreate that scene in 3D,
+  so you can view it from angles you never photographed. It produces stunningly realistic 3D
+  reconstructions from ordinary pictures.
+technicalDefinition: >-
+  A NeRF represents a 3D scene as a neural network mapping 3D position and viewing direction to color and
+  density, rendered into images via volumetric ray marching.
+quizQuestion:
+  q: A NeRF represents a 3D scene as…
+  options:
+    - A list of triangles
+    - A neural network that outputs color and density for any 3D point
+    - A single photo
+    - A sound file
+  answer: 1
+  explanation: >-
+    A NeRF is a neural network mapping 3D coordinates and view direction to color and density; images are
+    rendered by integrating along rays through this field.
+---
+
+In 2020, a surprising idea reshaped 3D reconstruction: represent a whole scene as a **neural network** you can render from any angle. That's a **NeRF**, and it's making its way into how robots build and use 3D worlds.
+
+## The idea
+
+A NeRF (**Neural Radiance Field**) trains a small neural network to answer one question: *for any 3D point, looked at from any direction, what color is it and how solid is it?* Feed it many photos of a scene (with known camera poses, from [structure from motion](/atlas/concept/structure-from-motion)) and it learns a continuous **radiance field**. To make an image from a new viewpoint, you shoot rays into the field and integrate color and density along them (volumetric rendering) — producing **photorealistic views of angles you never captured**.
+
+```diagram
+{ "type": "flow", "title": "Photos in, any view out", "nodes": ["Many photos + camera poses", "Train network: point → color+density", "Ray-march to render", "Novel photorealistic views"], "caption": "The scene lives inside a neural network as a continuous field; new images are synthesized by integrating along rays — reconstruction as a learned function." }
+```
+
+## Why it caused excitement
+
+- **Photorealism from photos.** Stunning reconstructions of real scenes and objects from ordinary images, capturing fine detail, reflections, and view-dependent effects that mesh-based methods miss.
+- **Continuous and compact.** The scene is a smooth function, not a discrete mesh or [point cloud](/atlas/concept/point-cloud).
+- **A new representation.** It reframed 3D as something you *learn and render*, sparking a huge research wave.
+
+## Relevance to robots
+
+- **Rich 3D maps and digital twins.** Reconstructing environments in high fidelity for planning, inspection, and visualization.
+- **[Synthetic data](/atlas/concept/synthetic-data) and simulation.** Rendering realistic novel views to train and test perception — bridging toward realistic simulators of real places.
+- **Object reconstruction** for manipulation and recognition.
+
+## The catch — and what came next
+
+Original NeRFs were **slow to train and render**, unfit for real-time robotics. Faster variants (Instant-NGP) cut training to seconds/minutes. But the bigger shift is **[3D Gaussian Splatting](/atlas/concept/3d-gaussian-splatting)**, which achieves comparable quality with real-time rendering, and is rapidly becoming the practical choice — while NeRF remains the conceptual breakthrough that started it.
+
+## Why it matters
+
+NeRF changed how the field thinks about 3D — as a learnable, renderable field rather than explicit geometry. For robotics, it and its successors point toward rich, photorealistic 3D maps and simulators built from ordinary images, a powerful new tool for perception, mapping, and sim-to-real.
+
+## Related
+
+[3D Gaussian splatting](/atlas/concept/3d-gaussian-splatting) · [Point cloud](/atlas/concept/point-cloud) · [Structure from motion](/atlas/concept/structure-from-motion) · [Synthetic data](/atlas/concept/synthetic-data)

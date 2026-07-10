@@ -1,0 +1,78 @@
+---
+title: State Lattice Planner
+slug: state-lattice-planner
+bucket: concept
+category: control
+summary: >-
+  A state lattice planner searches over a pre-built set of feasible motion primitives arranged in a regular
+  grid of states — giving vehicles drivable, high-quality paths by combining A*-style search with realistic
+  motions.
+difficulty: 4
+tags:
+  - motion-planning
+  - navigation
+  - autonomous-vehicle
+seeAlso:
+  - hybrid-a-star
+  - a-star-algorithm
+  - nonholonomic-constraint
+  - motion-planning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'State lattice planning (Pivtoraiko & Kelly)'
+    url: 'https://en.wikipedia.org/wiki/Motion_planning'
+  - title: 'Smac state lattice planner (Nav2)'
+    url: 'https://docs.nav2.org/'
+laymanExplanation: >-
+  A state lattice planner works from a fixed menu of realistic little moves the vehicle can make, laid out so
+  they connect neatly into a grid of reachable states. It then searches that grid for a route — every path it
+  finds is made of drivable moves.
+technicalDefinition: >-
+  A state lattice planner discretizes the state space into a regular lattice connected by precomputed,
+  kinematically feasible motion primitives, then applies graph search to find a feasible optimal path.
+quizQuestion:
+  q: A state lattice planner guarantees drivable paths by…
+  options:
+    - Ignoring the vehicle's kinematics
+    - Searching over precomputed feasible motion primitives on a lattice
+    - Only moving in straight lines
+    - Using random samples only
+  answer: 1
+  explanation: >-
+    Its edges are precomputed motion primitives the vehicle can actually execute, arranged in a lattice, so
+    any path assembled from them is kinematically feasible.
+---
+
+For a car-like robot, a path is only useful if the vehicle can actually **drive** it. The **state lattice planner** guarantees that by searching over a fixed menu of realistic, drivable moves arranged into a neat grid.
+
+## The idea
+
+A state lattice planner **precomputes a set of motion primitives** — short, kinematically feasible motions the vehicle can execute (gentle turns, straights, forward and reverse) — that are carefully designed to connect states in a **regular lattice** (a discretized grid of positions and headings). Because the primitives snap neatly onto lattice states, they can be chained together, and you can run a graph search ([A*](/atlas/concept/a-star-algorithm)) over the lattice to find an optimal route. Every edge in that graph is a real drivable move, so **any path the search returns is feasible by construction**.
+
+```diagram
+{ "type": "flow", "title": "Search a grid of drivable moves", "nodes": ["Precompute feasible primitives", "Arrange into a state lattice", "A* search over lattice", "Drivable optimal path"], "caption": "Because the building blocks are pre-verified drivable motions that connect lattice states, chaining them yields a path the vehicle can actually follow." }
+```
+
+## State lattice vs Hybrid A*
+
+Both produce feasible paths for [nonholonomic](/atlas/concept/nonholonomic-constraint) vehicles, and they're close cousins:
+
+- **State lattice** — uses a **fixed, precomputed** set of primitives on a regular grid. The regularity makes search clean and the primitives can be optimized offline for quality, but it's constrained to the lattice resolution.
+- **[Hybrid A\*](/atlas/concept/hybrid-a-star)** — generates motions **on the fly** from the continuous vehicle state, so it's more flexible in exactly where it ends up, at some cost in regularity.
+
+Both appear in [Nav2](/atlas/concept/nav2)'s Smac planner family, chosen by application.
+
+## Strengths and limits
+
+- **Feasible by design.** No post-hoc smoothing needed to make paths drivable.
+- **Optimizable primitives.** Motions can be designed offline to be smooth and efficient.
+- **Resolution trade-off.** Finer lattices give better paths but a larger graph to search; coarser lattices are faster but blockier.
+- **Best for structured motion** — road-like driving, parking, and defined maneuver sets.
+
+## Why it matters
+
+The state lattice planner brings the power of grid-based search ([A*](/atlas/concept/a-star-algorithm)) to vehicles that can't move arbitrarily — by making the search operate over **feasible motions** rather than idealized grid steps. It's a key technique for autonomous driving and constrained mobile robots, producing optimal *and* drivable paths.
+
+## Related
+
+[Hybrid A*](/atlas/concept/hybrid-a-star) · [A* algorithm](/atlas/concept/a-star-algorithm) · [Nonholonomic constraint](/atlas/concept/nonholonomic-constraint) · [Motion planning](/atlas/concept/motion-planning)

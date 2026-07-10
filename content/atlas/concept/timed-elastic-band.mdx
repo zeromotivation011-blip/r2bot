@@ -1,0 +1,81 @@
+---
+title: Timed Elastic Band (TEB)
+slug: timed-elastic-band
+bucket: concept
+category: control
+summary: >-
+  The timed elastic band is a local planner that treats a robot's path like a stretchy band pulled taut by
+  the goal and pushed by obstacles — optimizing a smooth, time-optimal trajectory that respects the robot's
+  motion limits.
+difficulty: 4
+tags:
+  - motion-planning
+  - navigation
+  - optimization
+seeAlso:
+  - dynamic-window-approach
+  - trajectory-optimization
+  - nonholonomic-constraint
+  - nav2
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Rösmann et al. — Timed Elastic Band'
+    url: 'https://en.wikipedia.org/wiki/Motion_planning'
+  - title: 'TEB local planner (ROS)'
+    url: 'http://wiki.ros.org/teb_local_planner'
+laymanExplanation: >-
+  The timed elastic band imagines the robot's path as a rubber band with timing built in. The goal pulls it,
+  obstacles push it away, and the robot's speed and turning limits shape it — the planner then relaxes the
+  band into a smooth, fast, drivable route.
+technicalDefinition: >-
+  TEB optimizes a time-parameterized sequence of robot poses by minimizing a multi-objective cost (path
+  length, time, clearance) subject to kinodynamic constraints, deforming the trajectory like an elastic band.
+quizQuestion:
+  q: What does the 'timed' in timed elastic band add over a plain elastic band?
+  options:
+    - Nothing
+    - Timing/velocity, so it optimizes a time-optimal, feasible trajectory
+    - A clock display
+    - Slower planning only
+  answer: 1
+  explanation: >-
+    TEB adds time information to each pose, letting it optimize speed and respect velocity/acceleration
+    limits — producing a time-optimal, kinematically feasible trajectory, not just a shape.
+---
+
+Imagine a robot's local path as a stretchy rubber band: the goal pulls it taut, obstacles push it out of the way, and the robot's own limits shape how it can bend. Optimizing that band into a smooth, fast, drivable motion is the **timed elastic band (TEB)**.
+
+## The idea
+
+TEB represents the local trajectory as a sequence of robot **poses with timing** between them (the "band"). It then **optimizes** this band against several competing objectives at once:
+
+- **Shortest / fastest** — pulled toward the goal, minimizing time (this is the "timed" part — it optimizes *speed*, not just shape).
+- **Obstacle clearance** — pushed away from obstacles.
+- **Kinodynamic feasibility** — respecting the robot's velocity and acceleration limits and, for cars, its [nonholonomic](/atlas/concept/nonholonomic-constraint) turning constraints.
+
+The optimizer deforms the band until it settles into a smooth, feasible, time-optimal trajectory — essentially local [trajectory optimization](/atlas/concept/trajectory-optimization) framed as an elastic band.
+
+```diagram
+{ "type": "flow", "title": "Relax the band into a good trajectory", "nodes": ["Initial path (band)", "Goal pulls, obstacles push", "Enforce speed/turn limits", "Smooth, time-optimal trajectory"], "caption": "The band deforms under competing pulls and constraints until it reaches a smooth, fast, drivable local trajectory the robot can follow." }
+```
+
+## TEB vs DWA
+
+Both are **local planners** that follow a global route while avoiding immediate obstacles, but they differ:
+
+- **[Dynamic window approach](/atlas/concept/dynamic-window-approach)** — samples and scores short candidate velocities each cycle; simple, fast, short-horizon, reactive.
+- **TEB** — *optimizes* a longer trajectory, so it produces smoother, more anticipatory motion and can find its way through trickier situations (narrow gaps, tight maneuvers) that pure reactive scoring struggles with. It's also better at handling car-like kinematics.
+
+The cost is more computation per cycle and more parameters to tune.
+
+## Where it's used
+
+TEB is a popular local planner in [Nav2](/atlas/concept/nav2) and the ROS navigation ecosystem, favored for **car-like and differential-drive robots** needing smooth, feasible, time-efficient local motion — warehouse robots, delivery robots, and vehicles maneuvering in tight or dynamic spaces.
+
+## Why it matters
+
+The timed elastic band brought **trajectory optimization** thinking to real-time local navigation — producing smoother, faster, more capable local motion than reactive samplers, while still respecting the robot's physical limits. It's a widely-used, practical bridge between planning quality and real-time navigation.
+
+## Related
+
+[Dynamic window approach](/atlas/concept/dynamic-window-approach) · [Trajectory optimization](/atlas/concept/trajectory-optimization) · [Nonholonomic constraint](/atlas/concept/nonholonomic-constraint) · [Nav2](/atlas/concept/nav2)

@@ -1,0 +1,80 @@
+---
+title: Trajectory Optimization
+slug: trajectory-optimization
+bucket: concept
+category: control
+summary: >-
+  Trajectory optimization computes a robot's motion by minimizing a cost — smoothness, effort, time — subject
+  to physics and constraints, producing efficient, dynamically-feasible motions for arms, legs, and vehicles.
+difficulty: 4
+tags:
+  - motion-planning
+  - optimization
+  - control
+seeAlso:
+  - model-predictive-control
+  - motion-planning
+  - equations-of-motion
+  - timed-elastic-band
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Trajectory optimization (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Trajectory_optimization'
+  - title: 'CHOMP / TrajOpt (motion optimization)'
+    url: 'https://en.wikipedia.org/wiki/Motion_planning'
+laymanExplanation: >-
+  Trajectory optimization finds the best way for a robot to move by treating the whole motion as a math
+  problem: minimize things you don't want (jerkiness, wasted effort, time) while obeying the rules (physics,
+  joint limits, no collisions). The solver returns a smooth, efficient motion.
+technicalDefinition: >-
+  Trajectory optimization formulates motion as a constrained optimization over a trajectory, minimizing a
+  cost functional subject to dynamics, actuator, and collision constraints.
+quizQuestion:
+  q: Trajectory optimization produces a motion by…
+  options:
+    - Picking random paths
+    - Minimizing a cost subject to physics and constraints
+    - Ignoring the robot's dynamics
+    - Only using a grid
+  answer: 1
+  explanation: >-
+    It solves a constrained optimization — minimizing cost (smoothness, effort, time) while satisfying
+    dynamics, limits, and collision constraints — to compute an efficient, feasible trajectory.
+---
+
+Sampling planners like [RRT](/atlas/concept/rapidly-exploring-random-tree) *find* a path; **trajectory optimization** computes the *best* motion — smooth, efficient, and physically feasible — by treating the whole trajectory as a math problem to solve.
+
+## The idea
+
+Trajectory optimization poses motion as a **constrained optimization**: find the trajectory (positions, velocities, and controls over time) that **minimizes a cost** while **satisfying constraints**.
+
+- **Cost** — what you want to minimize: jerkiness (for smoothness), control effort/energy, time, distance, or deviation from a reference.
+- **Constraints** — what must hold: the robot's **[dynamics](/atlas/concept/equations-of-motion)** (it must obey physics), actuator limits (torque, velocity), joint limits, and **collision avoidance** (stay clear of obstacles).
+
+A numerical solver then computes the trajectory that best balances these — the output is a ready-to-execute, dynamically-feasible motion.
+
+```diagram
+{ "type": "flow", "title": "Motion as an optimization", "nodes": ["Define cost (smooth, efficient)", "Add constraints (dynamics, limits, collision)", "Numerical solver", "Optimal feasible trajectory"], "caption": "Rather than search discrete options, it directly optimizes the continuous trajectory to be as good as possible while obeying every physical rule." }
+```
+
+## Why it's powerful
+
+- **Quality.** Produces genuinely smooth, efficient motions — not just feasible ones — respecting the robot's dynamics, which sampling planners often ignore.
+- **Rich constraints.** Naturally handles torque limits, contact, balance, and multiple objectives at once — essential for [legged robots](/atlas/concept/quadruped-locomotion) and dexterous arms.
+- **Foundation of modern control.** [Model predictive control](/atlas/concept/model-predictive-control) is trajectory optimization solved *repeatedly* over a rolling horizon, and whole-body controllers are optimization at heart.
+
+Methods include **CHOMP** and **TrajOpt** (optimize a motion for a manipulator away from collisions), direct collocation, and shooting methods.
+
+## The trade-offs
+
+- **Local minima.** Optimizers can get stuck in a poor local solution; a good initial guess (sometimes from a sampling planner) matters. A common hybrid: **RRT to find a feasible path, then optimize it** to smooth and improve it.
+- **Compute.** Solving can be expensive, though modern solvers and warm-starting make real-time use possible (as in MPC).
+- **Non-convexity.** Collision and dynamics constraints make the problem hard; robust formulations are an active area.
+
+## Why it matters
+
+Trajectory optimization is how robots compute *high-quality, physically-realistic* motion — the mathematical engine behind smooth manipulation, agile legged locomotion, aggressive drone flight, and predictive control. It's a central, unifying tool linking planning and control in modern robotics.
+
+## Related
+
+[Model predictive control](/atlas/concept/model-predictive-control) · [Motion planning](/atlas/concept/motion-planning) · [Equations of motion](/atlas/concept/equations-of-motion) · [Timed elastic band](/atlas/concept/timed-elastic-band)

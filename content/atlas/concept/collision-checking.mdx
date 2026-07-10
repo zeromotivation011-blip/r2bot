@@ -1,0 +1,76 @@
+---
+title: Collision Checking
+slug: collision-checking
+bucket: concept
+category: control
+summary: >-
+  Collision checking tests whether a robot in a given configuration hits itself or the world — the fast,
+  constantly-called routine that keeps every motion planner's paths safe, and often its computational
+  bottleneck.
+difficulty: 3
+tags:
+  - motion-planning
+  - simulation
+  - safety
+seeAlso:
+  - motion-planning
+  - probabilistic-roadmap
+  - configuration-space
+  - rapidly-exploring-random-tree
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Collision detection (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Collision_detection'
+  - title: 'FCL — Flexible Collision Library'
+    url: 'https://github.com/flexible-collision-library/fcl'
+laymanExplanation: >-
+  Collision checking asks a simple question over and over: in this pose, does the robot bump into anything —
+  a wall, an object, or itself? Planners call it thousands of times to make sure the path they pick is safe.
+technicalDefinition: >-
+  Collision checking determines whether a robot configuration (or motion between configurations) intersects
+  obstacles or itself, using geometric proximity tests, and is a core primitive of motion planning.
+quizQuestion:
+  q: Why is collision checking often a planner's bottleneck?
+  options:
+    - It is never used
+    - Planners call it thousands of times, so its speed dominates runtime
+    - It requires no computation
+    - It only runs once
+  answer: 1
+  explanation: >-
+    Sampling and optimization planners test collisions for enormous numbers of configurations and motions, so
+    the collision checker's speed largely determines overall planning time.
+---
+
+Every motion planner shares one unglamorous, essential subroutine, called constantly: does the robot, in *this* pose, **hit anything**? That's **collision checking**, and it quietly determines whether planned paths are safe — and how fast planning runs.
+
+## What it does
+
+Collision checking answers a geometric yes/no: given a robot **configuration** (a set of joint angles or a pose), does the robot's body **intersect** any obstacle in the world, or **itself** (self-collision)? Planners also need to check the **motion between** two configurations — sweeping a short path and verifying nothing is hit along the way.
+
+```diagram
+{ "type": "flow", "title": "Is this pose safe?", "nodes": ["Robot configuration", "Test geometry vs obstacles + self", "Intersection?", "Free ✓ or collision ✗"], "caption": "The checker reports whether a configuration (or a motion between two) is collision-free. Planners keep only the free ones — the basis of safe paths." }
+```
+
+## Why it's the hidden bottleneck
+
+Sampling planners ([RRT](/atlas/concept/rapidly-exploring-random-tree), [PRM](/atlas/concept/probabilistic-roadmap)) and optimizers test **enormous numbers** of configurations and motions — often thousands or millions. Since almost every planning step involves a collision check, the checker's **speed dominates total planning time**. Making collision checking fast is therefore one of the highest-leverage optimizations in motion planning.
+
+## How it's made fast
+
+- **Simplified geometry.** Represent the robot and obstacles with cheap shapes — spheres, capsules, convex hulls, oriented boxes — rather than full detailed meshes. (This is why [URDF](/atlas/concept/urdf) separates *collision* geometry from *visual* geometry.)
+- **Bounding-volume hierarchies.** Quick rejection: if two objects' coarse bounding boxes don't overlap, skip the detailed test.
+- **Broad phase + narrow phase.** First cheaply rule out most pairs (broad), then precisely test the few that might collide (narrow).
+- **Libraries.** FCL and similar do this efficiently and are used across the ecosystem (MoveIt, planners).
+
+## Where it lives
+
+It underpins **all** motion planning — sampling planners check each sampled node and edge; trajectory optimizers turn clearance into a constraint or cost; [MoveIt](/atlas/concept/inverse-kinematics)-style manipulation and [Nav2](/atlas/concept/nav2)-style navigation both rely on it (navigation often via a [costmap](/atlas/concept/costmap-layers)).
+
+## Why it matters
+
+Collision checking is the safety primitive of motion planning — the routine that keeps robots from crashing into the world or themselves. Because planners lean on it so heavily, understanding it (and why simplified geometry matters) is key to both safe *and* fast robot motion.
+
+## Related
+
+[Motion planning](/atlas/concept/motion-planning) · [Probabilistic roadmap](/atlas/concept/probabilistic-roadmap) · [Configuration space](/atlas/concept/configuration-space) · [RRT](/atlas/concept/rapidly-exploring-random-tree)

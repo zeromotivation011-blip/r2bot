@@ -1,0 +1,74 @@
+---
+title: 3D Gaussian Splatting
+slug: 3d-gaussian-splatting
+bucket: concept
+category: ai-and-perception
+summary: >-
+  3D Gaussian splatting represents a scene as millions of tiny colored blobs, rendering photorealistic 3D
+  in real time — the fast successor to NeRF that's rapidly becoming a practical tool for robot maps and
+  simulation.
+difficulty: 4
+tags:
+  - perception
+  - 3d
+  - reconstruction
+seeAlso:
+  - neural-radiance-field
+  - point-cloud
+  - structure-from-motion
+  - semantic-mapping
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: '3D Gaussian splatting (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Gaussian_splatting'
+  - title: 'Kerbl et al. — 3D Gaussian Splatting (2023)'
+    url: 'https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/'
+laymanExplanation: >-
+  3D Gaussian splatting builds a 3D scene out of millions of tiny fuzzy colored blobs. Rendering them is
+  extremely fast, so you get photorealistic 3D you can fly through in real time — even better for robots
+  than the slower NeRF approach.
+technicalDefinition: >-
+  3D Gaussian splatting represents a scene as many 3D Gaussians with color and opacity, rendered by
+  rasterizing (splatting) them, achieving photorealistic novel views at real-time rates.
+quizQuestion:
+  q: 3D Gaussian splatting's main advantage over NeRF is…
+  options:
+    - It needs no photos
+    - Real-time rendering speed at comparable quality
+    - It only works in 2D
+    - It uses no color
+  answer: 1
+  explanation: >-
+    Splatting renders by rasterizing explicit Gaussians, which is far faster than NeRF's ray marching —
+    enabling real-time photorealistic rendering.
+---
+
+[NeRF](/atlas/concept/neural-radiance-field) proved you could reconstruct photorealistic 3D from photos, but it was slow. **3D Gaussian splatting** (2023) delivered nearly the same quality in **real time** — and quickly became the practical successor.
+
+## The idea
+
+Instead of a neural network you query point by point, Gaussian splatting represents the scene **explicitly** as **millions of tiny 3D "Gaussians"** — little fuzzy, colored, semi-transparent blobs, each with a position, size, orientation, color, and opacity. Together they add up to the full scene. To render a view, the blobs are **projected (splatted) onto the image and blended** — a fast rasterization operation, not slow ray marching.
+
+```diagram
+{ "type": "flow", "title": "A scene made of fuzzy blobs", "nodes": ["Photos + camera poses", "Optimize millions of 3D Gaussians", "Splat + blend to render", "Real-time photorealistic views"], "caption": "The scene is explicit blobs, optimized to match the photos. Rendering them is fast rasterization — hence real-time, unlike NeRF's ray integration." }
+```
+
+## Why it took over so fast
+
+- **Real-time rendering.** Fast enough to fly through a reconstructed scene interactively — a decisive practical advantage over NeRF's slow rendering.
+- **High quality.** Photorealism comparable to (often exceeding) NeRF, with sharp detail.
+- **Explicit and editable.** Because the scene is actual 3D primitives (not a black-box network), it's easier to edit, manipulate, and integrate with existing graphics pipelines — and it connects naturally to [point cloud](/atlas/concept/point-cloud) thinking.
+
+## Why it matters for robots
+
+- **Real-time 3D maps and digital twins.** Fast, photorealistic reconstructions of real environments for planning, inspection, and visualization.
+- **Simulation and [synthetic data](/atlas/concept/synthetic-data).** Rendering realistic novel views of real places quickly enough to be useful for training and testing.
+- **SLAM integration.** A wave of research fuses Gaussian splatting with [SLAM](/atlas/concept/slam) for dense, photorealistic online mapping, and with [semantic mapping](/atlas/concept/semantic-mapping) for meaning-rich reconstructions.
+
+## Why it matters
+
+3D Gaussian splatting made high-fidelity 3D reconstruction **fast enough to be practical**, turning a research marvel into a usable tool. For robotics, it's a leading approach for building rich, real-time, photorealistic 3D representations of the world — a fast-moving frontier in perception and mapping.
+
+## Related
+
+[Neural radiance field](/atlas/concept/neural-radiance-field) · [Point cloud](/atlas/concept/point-cloud) · [Structure from motion](/atlas/concept/structure-from-motion) · [Semantic mapping](/atlas/concept/semantic-mapping)

@@ -1,0 +1,79 @@
+---
+title: Panoptic Segmentation
+slug: panoptic-segmentation
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Panoptic segmentation labels every pixel of a scene at once — separating countable objects individually
+  while classifying background regions — giving a robot one complete, unified understanding of everything
+  it sees.
+difficulty: 3
+tags:
+  - perception
+  - vision
+  - segmentation
+seeAlso:
+  - semantic-segmentation
+  - instance-segmentation
+  - semantic-mapping
+  - autonomous-vehicle
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Panoptic segmentation (Kirillov et al.)'
+    url: 'https://arxiv.org/abs/1801.00868'
+  - title: 'Image segmentation overview'
+    url: 'https://en.wikipedia.org/wiki/Image_segmentation'
+laymanExplanation: >-
+  Panoptic segmentation gives every pixel in an image a meaning: countable things (each car, each person)
+  are separated individually, and background areas (road, sky, grass) are labeled by type — one complete
+  picture of the whole scene.
+technicalDefinition: >-
+  Panoptic segmentation unifies semantic and instance segmentation, assigning every pixel both a class
+  label and, for countable 'things,' a unique instance ID.
+quizQuestion:
+  q: Panoptic segmentation combines…
+  options:
+    - Two cameras
+    - Semantic labels for 'stuff' and instance masks for 'things'
+    - Only object detection
+    - Audio and video
+  answer: 1
+  explanation: >-
+    It merges semantic segmentation (classifying background 'stuff') with instance segmentation
+    (separating countable 'things') into one complete per-pixel labeling.
+---
+
+A robot ideally wants to understand *everything* in a scene at once — every object separated, and every bit of background classified, with no pixel left unexplained. **Panoptic segmentation** delivers exactly that unified view.
+
+## The unified picture
+
+Panoptic segmentation merges the two other segmentation styles into one complete labeling. It distinguishes:
+
+- **"Things"** — countable objects (cars, people, cups) — each gets its own **instance mask and ID**, like [instance segmentation](/atlas/concept/instance-segmentation).
+- **"Stuff"** — uncountable background regions (road, sky, grass, wall) — each pixel gets a **class label**, like [semantic segmentation](/atlas/concept/semantic-segmentation).
+
+Every pixel ends up with a meaning: either "part of this specific object" or "this kind of background." Nothing is left unlabeled.
+
+```diagram
+{ "type": "flow", "title": "Every pixel explained", "nodes": ["Whole scene", "Things → per-object masks", "Stuff → class labels", "Complete panoptic map"], "caption": "One pass yields a full scene understanding: individual objects separated, background classified — no gaps, no overlaps." }
+```
+
+## Why the unified view matters
+
+Robots and self-driving cars need *both* kinds of information simultaneously:
+
+- **[Autonomous vehicles](/atlas/concept/autonomous-vehicle)** must separate each individual car and pedestrian (things — to track and predict them) while also knowing the drivable road, sidewalk, and lane markings (stuff). Panoptic segmentation gives both in one consistent map.
+- **Scene understanding for navigation and [semantic mapping](/atlas/concept/semantic-mapping)** — a robot benefits from a complete labeled picture, not fragments from separate models.
+- **Consistency.** Doing it jointly avoids conflicts between separate semantic and instance models disagreeing about the same pixels.
+
+## How it's done
+
+Modern approaches use unified network architectures (including transformer-based models like Mask2Former) that output both instance masks and semantic labels together, replacing older pipelines that ran separate networks and merged their results. Quality is scored with the **Panoptic Quality (PQ)** metric.
+
+## Why it matters
+
+Panoptic segmentation represents the goal of *complete* scene understanding — a robot perceiving every part of its surroundings, objects and background alike, in one coherent labeling. It's increasingly the perception target for self-driving and complex navigation, where knowing *everything* in view, precisely, is the aim.
+
+## Related
+
+[Semantic segmentation](/atlas/concept/semantic-segmentation) · [Instance segmentation](/atlas/concept/instance-segmentation) · [Semantic mapping](/atlas/concept/semantic-mapping) · [Autonomous vehicle](/atlas/concept/autonomous-vehicle)

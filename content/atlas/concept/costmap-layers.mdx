@@ -1,0 +1,77 @@
+---
+title: Costmap Layers
+slug: costmap-layers
+bucket: concept
+category: control
+summary: >-
+  A layered costmap builds a robot's picture of where it's safe to drive by stacking sources — static map,
+  live obstacles, and safety inflation — into one grid the planner reads, the standard structure behind
+  ROS navigation.
+difficulty: 3
+tags:
+  - motion-planning
+  - navigation
+  - mapping
+seeAlso:
+  - occupancy-grid
+  - nav2
+  - dynamic-window-approach
+  - a-star-algorithm
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'costmap_2d (ROS)'
+    url: 'http://wiki.ros.org/costmap_2d'
+  - title: 'Layered costmaps (Lu et al.)'
+    url: 'https://docs.nav2.org/'
+laymanExplanation: >-
+  A costmap is a grid that scores how risky each spot near the robot is to drive on. It's built in layers —
+  the known map, live sensor obstacles, and a safety buffer around obstacles — stacked together into one map
+  the planner uses to choose a safe route.
+technicalDefinition: >-
+  A layered costmap composes multiple semantic layers (static, obstacle, inflation, and custom) into a single
+  2D grid of traversal costs used by navigation planners for path and velocity planning.
+quizQuestion:
+  q: The 'inflation' layer of a costmap does what?
+  options:
+    - Makes the robot bigger physically
+    - Adds a safety buffer of rising cost around obstacles
+    - Deletes the map
+    - Speeds up the motors
+  answer: 1
+  explanation: >-
+    The inflation layer spreads a gradient of cost outward from obstacles, so planners keep a safe margin
+    rather than skimming obstacle edges.
+---
+
+Before a robot can plan a safe route, it needs a map of **how risky each nearby spot is** to drive on — not just occupied vs free, but with safety margins and live obstacles. That map is a **costmap**, and it's built in **layers**.
+
+## From occupancy grid to costmap
+
+An [occupancy grid](/atlas/concept/occupancy-grid) says whether each cell is occupied. A **costmap** goes further: each cell holds a **cost** — how undesirable or dangerous it is to be there — which a planner ([A*](/atlas/concept/a-star-algorithm), [DWA](/atlas/concept/dynamic-window-approach)) uses to prefer safe, low-cost routes. The clever part is building it from **multiple layers** that each contribute information, composed into one final grid.
+
+```diagram
+{ "type": "stack", "title": "Layers combine into one costmap", "nodes": ["Static map layer", "Obstacle layer (live sensors)", "Inflation layer (safety buffer)", "→ combined costmap"], "caption": "Each layer adds its costs; stacked together they form the single grid the planner reads. Layers can be updated independently as the world changes." }
+```
+
+## The standard layers
+
+- **Static layer.** The known map (from [SLAM](/atlas/concept/slam) or a saved map) — the walls and fixed structure.
+- **Obstacle layer.** Live obstacles detected by sensors (lidar, depth camera) marked in real time, and cleared when they move away. This is how the robot reacts to things not on the static map — people, boxes, doors.
+- **Inflation layer.** A **safety buffer**: cost radiates outward from every obstacle in a decaying gradient, so the planner keeps a margin instead of grazing obstacle edges (accounting for the robot's size and uncertainty).
+- **Custom layers.** Anything else useful — keep-out zones, one-way lanes, social/proxemic costs around people, terrain preferences.
+
+## Why layering is powerful
+
+- **Modular.** Add, remove, or reconfigure a layer without rewriting the whole costmap — plug in a "speed zone" or "no-go" layer as needed.
+- **Independently updated.** The static layer rarely changes; the obstacle layer updates every sensor cycle — layering lets each refresh at its own rate.
+- **Local + global.** Navigation typically keeps a **global costmap** (whole map, for the global planner) and a **local costmap** (a rolling window around the robot, for the local planner) — both layered.
+
+This is the structure of ROS's `costmap_2d` and [Nav2](/atlas/concept/nav2).
+
+## Why it matters
+
+Layered costmaps are how a navigating robot turns a jumble of map data, live sensor readings, and safety rules into **one coherent picture of where it can safely go**. It's the shared representation that connects mapping, perception, and planning — a foundational piece of practical mobile-robot navigation.
+
+## Related
+
+[Occupancy grid](/atlas/concept/occupancy-grid) · [Nav2](/atlas/concept/nav2) · [Dynamic window approach](/atlas/concept/dynamic-window-approach) · [A* algorithm](/atlas/concept/a-star-algorithm)
