@@ -1,0 +1,75 @@
+---
+title: Factor Graph
+slug: factor-graph
+bucket: concept
+category: ai-and-perception
+summary: >-
+  A factor graph is the flexible mathematical structure behind modern state estimation —
+  it represents unknowns and the measurements that constrain them, and lets robots fuse
+  odometry, GPS, IMU, and vision into one consistent estimate.
+difficulty: 4
+tags:
+  - estimation
+  - slam
+  - sensor-fusion
+seeAlso:
+  - pose-graph-optimization
+  - sensor-fusion
+  - slam
+  - kalman-filter
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Dellaert & Kaess — Factor Graphs for Robot Perception'
+    url: 'https://www.cs.cmu.edu/~kaess/pub/Dellaert17fnt.pdf'
+  - title: 'GTSAM library'
+    url: 'https://gtsam.org/'
+laymanExplanation: >-
+  A factor graph draws every unknown (like robot poses) as one kind of dot and every
+  measurement (like a GPS fix or a wheel count) as another kind of dot connecting them.
+  Solving the graph finds the unknowns that best fit all the measurements together.
+technicalDefinition: >-
+  A factor graph is a bipartite graph of variable nodes and factor nodes encoding a
+  probabilistic estimation problem, solved as sparse nonlinear least-squares (MAP).
+quizQuestion:
+  q: A factor graph is especially good at…
+  options:
+    - Charging batteries
+    - Fusing many sensor types into one consistent estimate
+    - Rendering 3D graphics
+    - Controlling motor current
+  answer: 1
+  explanation: >-
+    Its factors can encode any measurement type, so odometry, GPS, IMU, and vision all plug
+    into one graph and get solved jointly.
+---
+
+[Pose-graph optimization](/atlas/concept/pose-graph-optimization) is one example of a bigger, more powerful idea. That idea is the **factor graph** — the framework behind most modern robot state estimation.
+
+## What it is
+
+A factor graph has two kinds of nodes:
+
+- **Variables** — the unknowns you want to estimate (robot poses, landmark positions, sensor biases, velocities).
+- **Factors** — the measurements that constrain them (a wheel-[odometry](/atlas/concept/odometry) reading, a GPS fix, an IMU preintegration, a camera observation). Each factor connects the variables it relates and carries a cost for violating it.
+
+Solving the graph means finding the variable values that make all the factors as happy as possible — the **maximum a posteriori (MAP)** estimate, computed as sparse nonlinear least-squares.
+
+```diagram
+{ "type": "flow", "title": "Variables and factors form the estimation problem", "nodes": ["Unknowns (variables)", "Measurements (factors)", "Sparse least-squares", "Best joint estimate"], "caption": "Any sensor becomes a factor. The solver finds the variables that best satisfy every factor at once — one clean estimate from many sources." }
+```
+
+## Why robots love it
+
+The killer feature is **flexibility**. Because *any* measurement is just another factor, you can fuse wildly different sensors — lidar, camera, IMU, GPS, wheel odometry — in one unified estimate, each weighted by its uncertainty. Add a sensor? Add a factor type. This is why factor graphs power modern **visual-inertial odometry**, GPS-denied navigation, and large-scale SLAM back-ends. Incremental solvers (**iSAM2**) even update the solution as new factors arrive without re-solving everything, giving real-time performance.
+
+## Relationship to the Kalman filter
+
+A [Kalman filter](/atlas/concept/kalman-filter) is, in fact, a special case — a factor graph solved incrementally while throwing away the past. Factor graphs instead keep (a window of) history and re-linearize, which is why they're more accurate for nonlinear problems and can revisit old estimates when a [loop closure](/atlas/concept/loop-closure) arrives.
+
+## Why it matters
+
+The factor graph is the unifying language of modern robot perception — [sensor fusion](/atlas/concept/sensor-fusion), SLAM, and calibration all become the same kind of graph. Libraries like GTSAM made it the industry standard, and understanding it is the gateway to state-of-the-art estimation.
+
+## Related
+
+[Pose-graph optimization](/atlas/concept/pose-graph-optimization) · [Sensor fusion](/atlas/concept/sensor-fusion) · [SLAM](/atlas/concept/slam) · [Kalman filter](/atlas/concept/kalman-filter)

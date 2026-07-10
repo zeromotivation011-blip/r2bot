@@ -1,0 +1,74 @@
+---
+title: Inverse Reinforcement Learning (IRL)
+slug: inverse-reinforcement-learning
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Inverse reinforcement learning flips the usual problem: instead of learning behavior from a
+  reward, it infers the hidden reward from expert behavior — a way to teach robots goals that
+  are far easier to demonstrate than to write down.
+difficulty: 4
+tags:
+  - imitation-learning
+  - reinforcement-learning
+  - ai
+seeAlso:
+  - reinforcement-learning
+  - imitation-learning
+  - reward-shaping
+  - markov-decision-process
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Ng & Russell — Algorithms for Inverse Reinforcement Learning'
+    url: 'https://en.wikipedia.org/wiki/Inverse_reinforcement_learning'
+  - title: 'Ziebart et al. — Maximum Entropy IRL'
+    url: 'https://www.cs.cmu.edu/~bziebart/publications/maxentirl-bziebart.pdf'
+laymanExplanation: >-
+  Inverse reinforcement learning watches an expert and works out what they must have been
+  trying to achieve — the reward behind their actions. It's useful when a goal is easy to
+  show but nearly impossible to write as a formula.
+technicalDefinition: >-
+  IRL infers the reward function that best explains observed expert behavior, then a policy
+  can be optimized against that recovered reward.
+quizQuestion:
+  q: Inverse reinforcement learning infers…
+  options:
+    - The reward function from expert behavior
+    - The battery level from motion
+    - The map from sensors
+    - The camera calibration
+  answer: 0
+  explanation: >-
+    IRL recovers the reward that best explains an expert's demonstrations, rather than being
+    given the reward up front.
+---
+
+Normal [reinforcement learning](/atlas/concept/reinforcement-learning) starts with a reward and learns behavior. But for many real tasks the reward is the *hard* part — how do you write a formula for "drive courteously" or "fold the shirt neatly"? **Inverse reinforcement learning** turns the problem around: watch an expert, and infer the reward they must be optimizing.
+
+## The idea
+
+Given demonstrations of good behavior, IRL asks: **what reward function would make this behavior optimal?** Recover that reward, and you can then optimize a policy against it — including in situations the demonstrations never showed.
+
+```diagram
+{ "type": "flow", "title": "From behavior back to its goal", "nodes": ["Expert demonstrations", "Infer the reward", "Optimize a policy", "Generalize to new states"], "caption": "Instead of hand-writing the reward, IRL reads it off the expert's choices — then a standard RL policy can pursue that recovered goal." }
+```
+
+## Why it beats plain imitation
+
+Simple [imitation learning](/atlas/concept/imitation-learning) copies the expert's *actions*. IRL learns the expert's *intent* — and intent generalizes. If the robot drifts into a state the demos never covered, an action-copier is lost, but a reward-driven policy still knows what it's trying to achieve and can recover. This is why IRL is attractive for driving, navigation, and manipulation where you can't demonstrate every situation.
+
+## The hard parts
+
+IRL is fundamentally **ill-posed**: many different reward functions can explain the same behavior (including the trivial "everything is zero reward"). The influential fix, **maximum-entropy IRL**, resolves the ambiguity by preferring the reward that explains the demos while assuming the least beyond them. Modern deep variants (adversarial IRL, GAIL) scale it with neural networks and connect it to generative modeling. It's also compute-heavy — classically it runs RL in an inner loop for every candidate reward.
+
+## Where it fits
+
+IRL is the principled cousin of [reward shaping](/atlas/concept/reward-shaping): rather than hand-crafting a reward and risking reward hacking, you *learn* the reward from people who already do the task well. It underpins learning-from-human-preference pipelines used across robotics and beyond.
+
+## Why it matters
+
+Inverse reinforcement learning addresses one of RL's deepest practical bottlenecks — specifying the reward. By reading goals from behavior, it lets robots learn objectives that are natural to demonstrate but hopeless to formalize.
+
+## Related
+
+[Reinforcement learning](/atlas/concept/reinforcement-learning) · [Imitation learning](/atlas/concept/imitation-learning) · [Reward shaping](/atlas/concept/reward-shaping) · [Markov decision process](/atlas/concept/markov-decision-process)

@@ -1,0 +1,79 @@
+---
+title: Actor-Critic
+slug: actor-critic
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Actor-critic methods pair a policy that acts with a value estimator that critiques —
+  combining the strengths of policy-gradient and value-based RL, and forming the backbone of
+  the algorithms that train real robots (PPO, SAC, DDPG).
+difficulty: 4
+tags:
+  - reinforcement-learning
+  - ai
+  - control
+seeAlso:
+  - policy-gradient
+  - q-learning
+  - proximal-policy-optimization
+  - reinforcement-learning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Sutton & Barto — Reinforcement Learning'
+    url: 'http://incompleteideas.net/book/the-book.html'
+  - title: 'Actor-critic methods'
+    url: 'https://en.wikipedia.org/wiki/Reinforcement_learning'
+laymanExplanation: >-
+  Actor-critic uses two learners: an "actor" that decides what to do and a "critic" that
+  judges how good that was. The critic's feedback steadies the actor's learning, which is why
+  it trains robots more reliably than either idea alone.
+technicalDefinition: >-
+  Actor-critic methods jointly train a policy (actor) and a value function (critic); the
+  critic estimates the advantage used to reduce the variance of the actor's policy gradient.
+quizQuestion:
+  q: In actor-critic, the critic's job is to…
+  options:
+    - Choose the actions
+    - Estimate how good the actor's actions are
+    - Charge the battery
+    - Store the map
+  answer: 1
+  explanation: >-
+    The critic learns a value function that scores the actor's actions, providing a
+    lower-variance signal to improve the policy.
+---
+
+[Policy-gradient](/atlas/concept/policy-gradient) methods learn behavior but are noisy; [value-based](/atlas/concept/q-learning) methods are stable but struggle with continuous actions. **Actor-critic** takes the best of both by running two learners together.
+
+## The two roles
+
+- The **actor** is the policy — it chooses actions. It learns by policy gradient.
+- The **critic** is a value function — it estimates how good the current state or action is. It learns like [Q-learning](/atlas/concept/q-learning)/TD.
+
+The critic's estimate gives the actor a **low-variance advantage signal**: instead of waiting for noisy full-episode returns, the actor gets told "that action was better/worse than expected" right away. That single change turns slow, jumpy policy-gradient learning into something stable enough for real robots.
+
+```diagram
+{ "type": "loop", "title": "Actor acts, critic judges, both improve", "nodes": ["Actor picks action", "Critic scores it", "Update both"], "caption": "The critic's advantage estimate steers the actor's update, while the critic itself learns from the rewards — two networks bootstrapping each other." }
+```
+
+## Why it dominates robot RL
+
+Nearly every RL algorithm that controls real robots is an actor-critic:
+
+- **PPO** ([Proximal Policy Optimization](/atlas/concept/proximal-policy-optimization)) — the reliable default for locomotion and manipulation in sim.
+- **SAC** (Soft Actor-Critic) — sample-efficient, great for continuous control, adds an exploration bonus.
+- **DDPG / TD3** — deterministic actor-critic for continuous actions.
+
+They handle continuous joint commands (from the actor) while keeping learning stable (from the critic) — exactly what training a walking or grasping policy needs.
+
+## The catch
+
+Two learners means two things that can go wrong: if the critic is inaccurate, it feeds the actor bad advice, and the pair can chase each other into instability. Modern methods add tricks — target networks, clipped updates, entropy bonuses — to keep the coupling well-behaved.
+
+## Why it matters
+
+Actor-critic is the architectural template behind essentially all modern deep RL for control. Understanding the actor/critic split is the key to reading how PPO, SAC, and their kin actually teach robots to move.
+
+## Related
+
+[Policy gradient](/atlas/concept/policy-gradient) · [Proximal policy optimization](/atlas/concept/proximal-policy-optimization) · [Q-learning](/atlas/concept/q-learning) · [Reinforcement learning](/atlas/concept/reinforcement-learning)

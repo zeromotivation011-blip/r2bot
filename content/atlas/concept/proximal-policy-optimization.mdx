@@ -1,0 +1,76 @@
+---
+title: Proximal Policy Optimization (PPO)
+slug: proximal-policy-optimization
+bucket: concept
+category: ai-and-perception
+summary: >-
+  PPO is the workhorse reinforcement-learning algorithm of modern robotics — it improves a
+  policy in stable, bounded steps, which is why it reliably trains locomotion and
+  manipulation in simulation and transfers to real hardware.
+difficulty: 4
+tags:
+  - reinforcement-learning
+  - policy-based
+  - ai
+seeAlso:
+  - policy-gradient
+  - actor-critic
+  - reinforcement-learning
+  - sim-to-real
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Schulman et al. — Proximal Policy Optimization Algorithms'
+    url: 'https://arxiv.org/abs/1707.06347'
+  - title: 'OpenAI — PPO'
+    url: 'https://openai.com/research/openai-baselines-ppo'
+laymanExplanation: >-
+  PPO improves a robot's behavior in small, safe steps — never changing the policy too much
+  at once. That restraint is what makes it stable and dependable, so it became the default
+  method for teaching robots in simulation.
+technicalDefinition: >-
+  PPO is an actor-critic policy-gradient method that maximizes a clipped surrogate objective,
+  limiting how far the policy moves per update to keep training stable.
+quizQuestion:
+  q: PPO improves stability by…
+  options:
+    - Training without reward
+    - Limiting how much the policy changes each update
+    - Using no neural network
+    - Removing the critic
+  answer: 1
+  explanation: >-
+    PPO clips the policy update so each step stays 'proximal' to the previous policy,
+    preventing destabilizing jumps.
+---
+
+If you read a modern robot-learning paper — a quadruped learning to run, a hand learning to reorient a cube — odds are the algorithm is **PPO**. It became the default for a simple reason: it's stable and it just works.
+
+## The problem it solves
+
+[Policy-gradient](/atlas/concept/policy-gradient) methods can take a step that's *too big*, land on a much worse policy, and never recover — the reward collapses. PPO's fix is right in the name: keep each update **proximal** (close) to the current policy. It optimizes a **clipped objective** that gives no extra credit for moving the policy beyond a small trust region:
+
+```
+maximize  min( ratio · A,  clip(ratio, 1−ε, 1+ε) · A )
+```
+
+If an update tries to change an action's probability too much, the clip flattens the incentive — so the policy improves in safe, bounded steps.
+
+```diagram
+{ "type": "loop", "title": "Improve, but never leap", "nodes": ["Collect experience", "Estimate advantage", "Clipped policy update"], "caption": "The clip caps how far the policy can move per update, trading a little speed for the stability that makes training reliable." }
+```
+
+## Why it dominates robot RL
+
+PPO is an [actor-critic](/atlas/concept/actor-critic) method that hits a sweet spot: far more stable than raw policy gradients, far simpler to implement and tune than its predecessor TRPO, and robust across a huge range of tasks with little hyperparameter fuss. That reliability made it the backbone of large-scale robot training — it trained OpenAI's cube-solving hand and countless legged-locomotion policies in massively parallel simulation.
+
+## The workflow it enables
+
+PPO's stability is what makes the **[sim-to-real](/atlas/concept/sim-to-real)** pipeline practical: train thousands of simulated robots in parallel (Isaac Gym), each collecting experience, and PPO steadily distills a robust policy — then deploy it on hardware with domain randomization. Its main cost is sample-hunger; off-policy actor-critics like SAC squeeze more from each sample when real-world data is scarce.
+
+## Why it matters
+
+PPO is the practical default of deep reinforcement learning for control — the algorithm most likely to be quietly powering a robot that learned its skill rather than being programmed for it.
+
+## Related
+
+[Policy gradient](/atlas/concept/policy-gradient) · [Actor-critic](/atlas/concept/actor-critic) · [Reinforcement learning](/atlas/concept/reinforcement-learning) · [Sim-to-real](/atlas/concept/sim-to-real)

@@ -1,0 +1,77 @@
+---
+title: Bellman Equation
+slug: bellman-equation
+bucket: concept
+category: ai-and-perception
+summary: >-
+  The Bellman equation is the recursive rule that says the value of a situation equals the
+  reward now plus the value of what comes next — the single idea that makes reinforcement
+  learning and optimal control computable.
+difficulty: 4
+tags:
+  - reinforcement-learning
+  - optimization
+  - ai
+seeAlso:
+  - markov-decision-process
+  - q-learning
+  - reinforcement-learning
+  - policy-gradient
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Sutton & Barto — Reinforcement Learning: An Introduction'
+    url: 'http://incompleteideas.net/book/the-book.html'
+  - title: 'Bellman equation'
+    url: 'https://en.wikipedia.org/wiki/Bellman_equation'
+laymanExplanation: >-
+  The Bellman equation says the worth of being somewhere is the reward you get now plus the
+  worth of wherever you end up next. That simple recursion lets a robot work out the value
+  of every situation without simulating the whole future each time.
+technicalDefinition: >-
+  The Bellman equation expresses the value of a state as the expected immediate reward plus
+  the discounted value of successor states, giving a recursive consistency condition for
+  optimal value functions.
+quizQuestion:
+  q: The Bellman equation relates a state's value to…
+  options:
+    - Its color
+    - The immediate reward plus the value of the next state
+    - The robot's battery
+    - The number of motors
+  answer: 1
+  explanation: >-
+    Value(now) = reward(now) + discount × value(next). This recursion is the backbone of
+    dynamic programming and reinforcement learning.
+---
+
+Reinforcement learning has one idea at its core, and everything else is machinery around it. That idea is the **Bellman equation**.
+
+## The core insight
+
+How good is it to be in a given situation? [Richard Bellman's](/atlas/concept/markov-decision-process) answer is beautifully recursive: the value of a state equals the **reward you get now** plus the **(discounted) value of the state you move to next**.
+
+```
+V(state) = reward + γ · V(next state)
+```
+
+That's it. You don't need to simulate the entire future to value a situation — you only need to know the immediate reward and the value of the next step, which itself is defined the same way. The recursion bottoms out and the whole future collapses into a local relationship.
+
+```diagram
+{ "type": "flow", "title": "Value unrolls one step at a time", "nodes": ["Value here", "= reward now", "+ γ × value next", "(recurse)"], "caption": "Each state's value borrows from the next state's value. Solving this consistency condition everywhere gives the value of every state." }
+```
+
+## Why it's so powerful
+
+The Bellman equation turns a daunting problem — "what's the best long-term action?" — into a **local, solvable** condition. **Value iteration** and **policy iteration** solve it directly when the world model is known. When it isn't, **[Q-learning](/atlas/concept/q-learning)** learns a version of it (the action-value form) purely from experience, and deep RL replaces the value table with a [neural network](/atlas/concept/neural-network). The "**TD error**" that drives learning is literally how much the two sides of the Bellman equation currently disagree.
+
+## The optimal version
+
+The **Bellman optimality equation** adds a `max` over actions: the value of a state under the best policy is the immediate reward plus the discounted value of the *best* next state. Satisfy it everywhere and you've found the optimal policy — the goal of the whole enterprise.
+
+## Why it matters
+
+Every RL algorithm a robot uses to learn walking, grasping, or navigating is, underneath, chasing a solution to the Bellman equation. It's the load-bearing idea of sequential decision-making and optimal control alike.
+
+## Related
+
+[Markov decision process](/atlas/concept/markov-decision-process) · [Q-learning](/atlas/concept/q-learning) · [Reinforcement learning](/atlas/concept/reinforcement-learning) · [Policy gradient](/atlas/concept/policy-gradient)

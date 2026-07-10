@@ -1,0 +1,74 @@
+---
+title: Diffusion Policy
+slug: diffusion-policy
+bucket: concept
+category: ai-and-perception
+summary: >-
+  A diffusion policy is a robot control approach that borrows image-generation AI to
+  generate actions — turning noise into smooth, multi-modal motion. It's one of the most
+  effective recent methods for learning dexterous manipulation from demonstrations.
+difficulty: 4
+tags:
+  - imitation-learning
+  - manipulation
+  - ai
+seeAlso:
+  - imitation-learning
+  - transformer-architecture
+  - reinforcement-learning
+  - neural-network
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Chi et al. — Diffusion Policy (2023)'
+    url: 'https://diffusion-policy.cs.columbia.edu/'
+  - title: 'Denoising diffusion probabilistic models'
+    url: 'https://en.wikipedia.org/wiki/Diffusion_model'
+laymanExplanation: >-
+  A diffusion policy generates a robot's motion the same way AI image tools generate pictures:
+  start from random noise and repeatedly refine it into a clean action. This lets the robot
+  produce smooth motions and handle tasks that have several equally-good ways to do them.
+technicalDefinition: >-
+  A diffusion policy models the distribution of action sequences with a denoising diffusion
+  model, generating actions by iteratively denoising samples conditioned on observations.
+quizQuestion:
+  q: A diffusion policy generates actions by…
+  options:
+    - Looking them up in a table
+    - Iteratively denoising from random noise
+    - Copying the last action
+    - Random guessing once
+  answer: 1
+  explanation: >-
+    Like image diffusion models, it starts from noise and denoises step by step into a clean
+    action sequence conditioned on the robot's observations.
+---
+
+The same class of AI that turns noise into photorealistic images can turn noise into robot motion. That's the surprising, powerful idea behind the **diffusion policy** — one of the strongest recent methods for learning manipulation from demonstrations.
+
+## The idea
+
+A diffusion model learns to **reverse noise**: start from pure randomness and denoise, step by step, into a clean sample. A diffusion policy applies this to **actions** — it generates the robot's next short sequence of motions by denoising random noise, *conditioned* on what the robot currently sees.
+
+```diagram
+{ "type": "flow", "title": "From noise to motion", "nodes": ["Random noise", "Denoise (conditioned on observation)", "Refine", "Clean action sequence"], "caption": "Each step nudges the noisy action toward what the demonstrations suggest, ending in a smooth, feasible motion for the current situation." }
+```
+
+## Why it beats older imitation learning
+
+Classic [imitation learning](/atlas/concept/imitation-learning) that directly predicts one action has a well-known weakness: when a task has **several equally-good options** (go around the mug left *or* right), averaging them produces a broken middle path. Because a diffusion policy models the whole *distribution* of good actions, it can represent this **multi-modality** and commit to one clean option instead of averaging. It also naturally outputs **action sequences** (short horizons), giving smoother, more consistent motion, and it trains stably where other generative policies (GANs, energy models) are finicky.
+
+## Where it fits
+
+Diffusion policies (2023 onward) quickly became a leading choice for **dexterous, contact-rich manipulation** learned from human teleoperation demos — pouring, unplugging, flipping, spreading. They're a core building block in modern **Vision-Language-Action** systems, often paired with a [transformer](/atlas/concept/transformer-architecture) that encodes vision and language, with the diffusion head producing the motion.
+
+## The trade-off
+
+Denoising takes several network passes per action, so inference is heavier than a single-shot policy — a real concern for high-frequency control, and an active area of speedups (fewer denoising steps, consistency models). And like all imitation methods, it's only as good as the demonstrations it learns from.
+
+## Why it matters
+
+The diffusion policy shows how fast ideas now cross from generative AI into robot control. It's among the most capable ways to teach robots delicate, multi-step skills from example — a key piece of the current wave of learned manipulation.
+
+## Related
+
+[Imitation learning](/atlas/concept/imitation-learning) · [Transformer architecture](/atlas/concept/transformer-architecture) · [Reinforcement learning](/atlas/concept/reinforcement-learning) · [Neural network](/atlas/concept/neural-network)

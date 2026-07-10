@@ -1,0 +1,77 @@
+---
+title: Policy Gradient
+slug: policy-gradient
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Policy-gradient methods learn a robot's behavior directly — nudging the policy toward
+  actions that earned more reward — and are the family behind the continuous-control
+  algorithms that teach real robots to walk, fly, and manipulate.
+difficulty: 4
+tags:
+  - reinforcement-learning
+  - policy-based
+  - ai
+seeAlso:
+  - reinforcement-learning
+  - actor-critic
+  - proximal-policy-optimization
+  - q-learning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Sutton et al. — Policy gradient methods'
+    url: 'http://incompleteideas.net/book/the-book.html'
+  - title: 'Policy gradient (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Reinforcement_learning'
+laymanExplanation: >-
+  Policy-gradient methods learn the behavior itself: try things, and make the actions that
+  led to more reward more likely next time. Because the behavior can be smooth, they handle
+  continuous controls like joint torques that value-table methods struggle with.
+technicalDefinition: >-
+  Policy-gradient methods optimize a parameterized policy by ascending the gradient of
+  expected return, increasing the probability of actions that yield higher advantage.
+quizQuestion:
+  q: A key advantage of policy-gradient methods over Q-learning is…
+  options:
+    - They need no reward
+    - They handle continuous action spaces naturally
+    - They never need training
+    - They ignore the environment
+  answer: 1
+  explanation: >-
+    By parameterizing the policy directly, they output continuous actions (like joint
+    torques) naturally, where value-based methods need a max over actions.
+---
+
+[Q-learning](/atlas/concept/q-learning) learns *how good each action is* and then picks the best. **Policy-gradient** methods skip the middleman and learn the **behavior itself** — which turns out to matter enormously for real robots.
+
+## The idea
+
+Represent the policy as a function (usually a [neural network](/atlas/concept/neural-network)) with parameters `θ` that maps states to a distribution over actions. Then adjust `θ` to **increase the probability of actions that led to high reward** and decrease it for the rest. Formally, you ascend the gradient of expected return:
+
+```
+∇θ J ≈ Σ  ∇θ log π(a|s) · A
+              └ make good actions more likely, weighted by how good ┘
+```
+
+where `A` (the *advantage*) measures how much better an action was than expected.
+
+```diagram
+{ "type": "loop", "title": "Reinforce what worked", "nodes": ["Run policy, collect rewards", "Estimate advantage", "Shift policy toward good actions"], "caption": "Actions that beat expectations get more likely; actions that underperform get less likely. Repeat and the behavior improves." }
+```
+
+## Why robots need it
+
+The decisive advantage: policy gradients handle **continuous action spaces** naturally. A robot's command is a vector of joint torques or velocities — there's no sensible "max over all actions" as [DQN](/atlas/concept/deep-q-network) requires. A policy network just *outputs* the continuous action (often as a Gaussian). They also support **stochastic** policies, useful for exploration and for tasks with inherent randomness.
+
+## The trade-off
+
+Vanilla policy gradients (REINFORCE) are **high-variance** and sample-hungry — rewards are noisy, so the gradient estimate is jumpy and learning is slow. Two fixes define modern RL: pairing the policy with a value estimate to reduce variance ([actor-critic](/atlas/concept/actor-critic)), and constraining how far the policy changes each step so training stays stable ([PPO](/atlas/concept/proximal-policy-optimization)).
+
+## Why it matters
+
+Policy-gradient methods are the backbone of continuous robot control with RL — the lineage (A2C, TRPO, PPO, SAC) that trains locomotion, dexterous manipulation, and drone control in simulation and transfers it to hardware.
+
+## Related
+
+[Reinforcement learning](/atlas/concept/reinforcement-learning) · [Actor-critic](/atlas/concept/actor-critic) · [Proximal policy optimization](/atlas/concept/proximal-policy-optimization) · [Q-learning](/atlas/concept/q-learning)

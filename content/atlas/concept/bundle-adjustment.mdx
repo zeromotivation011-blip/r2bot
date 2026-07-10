@@ -1,0 +1,74 @@
+---
+title: Bundle Adjustment
+slug: bundle-adjustment
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Bundle adjustment is the optimization that refines camera poses and 3D points together
+  so they best explain every image observation — the accuracy engine inside visual SLAM,
+  structure-from-motion, and 3D reconstruction.
+difficulty: 4
+tags:
+  - vision
+  - slam
+  - optimization
+seeAlso:
+  - visual-odometry
+  - pose-graph-optimization
+  - camera-calibration
+  - slam
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Triggs et al. — Bundle Adjustment: A Modern Synthesis'
+    url: 'https://en.wikipedia.org/wiki/Bundle_adjustment'
+  - title: 'Ceres Solver'
+    url: 'http://ceres-solver.org/'
+laymanExplanation: >-
+  Bundle adjustment fine-tunes where the cameras were and where the 3D points are, all at
+  once, so that every point lands as close as possible to where it actually appeared in
+  each photo. It's what makes 3D reconstructions crisp.
+technicalDefinition: >-
+  Bundle adjustment jointly optimizes camera poses and 3D landmark positions to minimize
+  the total reprojection error across all image observations.
+quizQuestion:
+  q: Bundle adjustment minimizes…
+  options:
+    - Battery usage
+    - Reprojection error across all cameras and points
+    - Motor torque
+    - Network latency
+  answer: 1
+  explanation: >-
+    It adjusts camera poses and 3D points to minimize the reprojection error — the pixel
+    gap between where points are predicted and observed.
+---
+
+Reconstruct 3D structure from a set of photos and the first pass is always a little wrong — cameras slightly mislocated, points slightly off. **Bundle adjustment** is the optimization that polishes it all into agreement.
+
+## The idea
+
+Bundle adjustment jointly refines **two things at once**: where every camera was, and where every 3D point is. The quantity it minimizes is **reprojection error** — for each 3D point, project it into each camera using that camera's estimated pose and [calibration](/atlas/concept/camera-calibration), and measure the pixel gap between where it *lands* and where it was actually *observed*.
+
+```diagram
+{ "type": "flow", "title": "Refine cameras and points to fit every image", "nodes": ["3D points + camera poses", "Reproject into images", "Measure pixel error", "Adjust to minimize"], "caption": "The name comes from the 'bundles' of light rays from each point to each camera — bundle adjustment tweaks everything until the rays line up." }
+```
+
+Summed over thousands of points and images, this is a huge nonlinear least-squares problem, solved with Levenberg-Marquardt in solvers like **Ceres** and **g2o** — made tractable by the problem's **sparse** structure (each point is seen by only some cameras).
+
+## Where it lives
+
+- **Structure-from-motion** and photogrammetry — turning photo collections into 3D models; bundle adjustment is the final accuracy step.
+- **Visual SLAM** — systems like ORB-SLAM run **local** bundle adjustment over a sliding window of recent keyframes in real time, and **global** bundle adjustment after a [loop closure](/atlas/concept/loop-closure).
+- **[Visual odometry](/atlas/concept/visual-odometry)** and AR — keeping tracked geometry crisp.
+
+## Bundle adjustment vs pose-graph optimization
+
+They're cousins. [Pose-graph optimization](/atlas/concept/pose-graph-optimization) optimizes only *poses* using relative-pose constraints — lighter, great for the SLAM back-end. Bundle adjustment optimizes poses **and** the 3D points using raw image measurements — heavier but more accurate, the gold standard when you need precise structure. Many systems use a fast pose graph for large-scale consistency and bundle adjustment locally for precision.
+
+## Why it matters
+
+Bundle adjustment is the accuracy backbone of camera-based 3D perception — the reason a phone can rebuild a room or a drone can map a field to centimeters. It's decades old and still the final word on visual reconstruction precision.
+
+## Related
+
+[Visual odometry](/atlas/concept/visual-odometry) · [Pose-graph optimization](/atlas/concept/pose-graph-optimization) · [Camera calibration](/atlas/concept/camera-calibration) · [SLAM](/atlas/concept/slam)

@@ -1,0 +1,70 @@
+---
+title: Reward Shaping
+slug: reward-shaping
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Reward shaping is the art of designing the reward signal so a robot actually learns what
+  you intended — the make-or-break, deceptively hard part of applying reinforcement learning
+  to real tasks.
+difficulty: 3
+tags:
+  - reinforcement-learning
+  - ai
+  - design
+seeAlso:
+  - reinforcement-learning
+  - markov-decision-process
+  - inverse-reinforcement-learning
+  - proximal-policy-optimization
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Ng, Harada & Russell — Policy invariance under reward transformations'
+    url: 'https://en.wikipedia.org/wiki/Reward_shaping'
+  - title: 'Sutton & Barto — Reinforcement Learning'
+    url: 'http://incompleteideas.net/book/the-book.html'
+laymanExplanation: >-
+  Reward shaping is how you tell a learning robot what "good" means. Get it slightly wrong and
+  the robot will cheerfully learn to game your reward instead of doing the real task — so
+  designing the reward is often harder than the learning itself.
+technicalDefinition: >-
+  Reward shaping augments an environment's reward to guide learning; potential-based shaping
+  adds a term F = γΦ(s') − Φ(s) that speeds learning without changing the optimal policy.
+quizQuestion:
+  q: A common danger of poorly designed rewards is…
+  options:
+    - The robot learns too fast
+    - Reward hacking — optimizing the metric, not the intent
+    - The battery drains
+    - The sensors break
+  answer: 1
+  explanation: >-
+    Agents optimize exactly what you reward; a badly specified reward gets 'hacked' — the
+    robot maximizes the number while ignoring your true goal.
+---
+
+In [reinforcement learning](/atlas/concept/reinforcement-learning), the reward *is* the goal — the agent optimizes exactly what you pay it for. So designing that reward, **reward shaping**, is often the hardest and most consequential part of the whole project.
+
+## Why it's hard
+
+A sparse reward ("+1 only when the task is fully complete") is honest but nearly unlearnable — the robot flails randomly and almost never stumbles onto success, so there's nothing to learn from. So engineers add **shaping** rewards that guide the way: a little reward for moving toward the goal, for staying upright, for gripping the object. Done well, learning speeds up dramatically.
+
+```diagram
+{ "type": "flow", "title": "Shaping guides sparse goals", "nodes": ["Sparse goal reward", "Add guiding signals", "Faster learning", "Watch for reward hacking"], "caption": "Intermediate rewards give the agent a trail to follow — but every added term is a new thing the agent may exploit in unintended ways." }
+```
+
+## The classic trap: reward hacking
+
+Agents are relentless literalists. Reward the *proxy* instead of the *goal* and they'll optimize the proxy — a boat-racing agent that spins in circles hitting reward buoys instead of finishing the race; a robot rewarded for "lifting" that learns to flick the object rather than grasp it. Every shaping term is a potential loophole, and finding these unintended solutions is a constant part of RL engineering.
+
+## Doing it safely
+
+A key result: **potential-based shaping** — adding a term of the form `F = γΦ(s′) − Φ(s)` — provably speeds learning **without changing the optimal policy**, because the added rewards cancel over any path. This is the principled way to inject guidance without corrupting the goal. When rewards are truly hard to hand-write (what's the reward for "fold the laundry nicely"?), teams turn to [inverse reinforcement learning](/atlas/concept/inverse-reinforcement-learning) to *learn* the reward from human demonstrations, or use human preference feedback.
+
+## Why it matters
+
+Reward shaping is where good intentions meet an optimizer that takes you literally. Whether a robot learns the task you meant — or a clever way to cheat it — usually comes down to this design step, not the learning algorithm.
+
+## Related
+
+[Reinforcement learning](/atlas/concept/reinforcement-learning) · [Markov decision process](/atlas/concept/markov-decision-process) · [Inverse reinforcement learning](/atlas/concept/inverse-reinforcement-learning) · [PPO](/atlas/concept/proximal-policy-optimization)

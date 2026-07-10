@@ -1,0 +1,75 @@
+---
+title: Deep Q-Network (DQN)
+slug: deep-q-network
+bucket: concept
+category: ai-and-perception
+summary: >-
+  The Deep Q-Network fused Q-learning with deep neural networks, learning to act straight
+  from raw pixels — the 2013 breakthrough that kicked off the deep reinforcement learning
+  era and made RL viable for high-dimensional robot perception.
+difficulty: 4
+tags:
+  - reinforcement-learning
+  - deep-learning
+  - ai
+seeAlso:
+  - q-learning
+  - reinforcement-learning
+  - neural-network
+  - policy-gradient
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Mnih et al. — Human-level control through deep RL (Nature 2015)'
+    url: 'https://www.nature.com/articles/nature14236'
+  - title: 'DQN (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Deep_reinforcement_learning'
+laymanExplanation: >-
+  A Deep Q-Network replaces Q-learning's giant lookup table with a neural network, so it can
+  handle huge inputs like camera images. It famously learned to play dozens of Atari games
+  straight from the screen pixels, with no hand-coding.
+technicalDefinition: >-
+  DQN approximates the action-value function Q(s,a) with a deep neural network, stabilized by
+  experience replay and a target network, trained toward the Bellman target.
+quizQuestion:
+  q: Two key tricks that made DQN stable were…
+  options:
+    - More motors and bigger batteries
+    - Experience replay and a target network
+    - Faster Wi-Fi and GPS
+    - Larger wheels
+  answer: 1
+  explanation: >-
+    Experience replay breaks correlations in the data and a slowly-updated target network
+    keeps the learning target stable — both essential to DQN's success.
+---
+
+[Q-learning](/atlas/concept/q-learning) was elegant but stuck with a lookup table — useless for a robot whose "state" is a camera image. The **Deep Q-Network** broke that wall and launched modern deep reinforcement learning.
+
+## The leap
+
+Replace the Q-table with a **deep [neural network](/atlas/concept/neural-network)** that takes a raw observation (say, screen pixels) and outputs a Q-value for each action. Now the state can be enormous and high-dimensional — exactly what real perception looks like. Train the network toward the same [Bellman](/atlas/concept/bellman-equation) target Q-learning uses, and it learns to act directly from perception.
+
+In 2013–2015, DeepMind's DQN learned to play **49 Atari games from pixels alone**, matching or beating humans on many, using one architecture and no game-specific tuning — the result that convinced the field deep RL was real.
+
+```diagram
+{ "type": "flow", "title": "Perception straight to action values", "nodes": ["Raw pixels", "Deep network", "Q-value per action", "Pick best action"], "caption": "The network learns features and action values together, end to end — no hand-engineered state." }
+```
+
+## Two tricks that made it work
+
+Naively combining neural nets with Q-learning is unstable. DQN added two now-standard fixes:
+
+- **Experience replay** — store past transitions in a buffer and train on random samples, breaking the harmful correlations of consecutive frames.
+- **Target network** — compute the learning target from a *slowly-updated* copy of the network, so the target doesn't chase a constantly-moving estimate and diverge.
+
+## Relevance to robots
+
+DQN itself handles **discrete** actions, so it's a natural fit for decision-making but not for a robot's continuous joint torques. Its ideas, though — deep value approximation, replay, target networks — carry straight into the [actor-critic](/atlas/concept/actor-critic) and [policy-gradient](/atlas/concept/policy-gradient) methods (DDPG, SAC) that *do* control continuous robots. DQN is the ancestor of the whole family.
+
+## Why it matters
+
+The Deep Q-Network is the moment reinforcement learning met deep learning and scaled to raw perception. Every robot that learns from images or high-dimensional sensors builds on the door DQN opened.
+
+## Related
+
+[Q-learning](/atlas/concept/q-learning) · [Reinforcement learning](/atlas/concept/reinforcement-learning) · [Neural network](/atlas/concept/neural-network) · [Policy gradient](/atlas/concept/policy-gradient)

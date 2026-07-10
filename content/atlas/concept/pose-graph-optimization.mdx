@@ -1,0 +1,78 @@
+---
+title: Pose-Graph Optimization
+slug: pose-graph-optimization
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Pose-graph optimization is how modern SLAM builds a consistent map: treat every robot
+  pose as a node and every measurement as a constraint, then solve one big least-squares
+  problem that best satisfies them all — including loop closures.
+difficulty: 4
+tags:
+  - slam
+  - optimization
+  - mapping
+seeAlso:
+  - slam
+  - factor-graph
+  - loop-closure
+  - ekf-slam
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Grisetti et al. — A tutorial on graph-based SLAM'
+    url: 'https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping'
+  - title: 'g2o — General graph optimization'
+    url: 'https://github.com/RainerKuemmerle/g2o'
+laymanExplanation: >-
+  Pose-graph optimization treats each place the robot was as a dot and each movement or
+  recognition as a rubber band between dots. It then relaxes all the rubber bands at once
+  so every constraint is satisfied as well as possible — snapping the map into shape.
+technicalDefinition: >-
+  Pose-graph optimization minimizes the total weighted error of relative-pose constraints
+  over a graph of poses, solving a sparse nonlinear least-squares problem.
+quizQuestion:
+  q: In a pose graph, edges represent…
+  options:
+    - Battery levels
+    - Constraints between poses (motion or loop closures)
+    - Camera pixels
+    - Motor torques
+  answer: 1
+  explanation: >-
+    Nodes are poses; edges are measured relative-pose constraints (from odometry or loop
+    closure) that the optimizer tries to satisfy together.
+---
+
+Instead of tracking one running estimate like [EKF-SLAM](/atlas/concept/ekf-slam), modern [SLAM](/atlas/concept/slam) keeps the *whole trajectory* and solves for it all at once. The tool is **pose-graph optimization**.
+
+## The graph
+
+- **Nodes** are the robot's poses over time (and sometimes landmarks).
+- **Edges** are **constraints**: "odometry says pose 5 was 1.2 m ahead of pose 4," or a [loop closure](/atlas/concept/loop-closure) saying "pose 40 is actually the same place as pose 2."
+
+Every edge carries an uncertainty. The optimizer finds the set of poses that best satisfies *all* constraints simultaneously — minimizing the total weighted disagreement:
+
+```
+X* = argmin  Σ ‖ predict(xᵢ, xⱼ) ⊖ measurementᵢⱼ ‖²
+        X    edges
+```
+
+```diagram
+{ "type": "flow", "title": "Poses and constraints become a solvable graph", "nodes": ["Poses = nodes", "Constraints = edges", "Least-squares solve", "Consistent trajectory"], "caption": "Odometry links consecutive poses; a loop closure links a pose to a much earlier one. Solving the graph distributes the accumulated drift across the whole loop." }
+```
+
+## Why it scales
+
+The trick is **sparsity**: each pose only connects to a few others, so the matrix the solver handles is mostly zeros. Gauss-Newton or Levenberg-Marquardt exploit that, letting graphs with **hundreds of thousands of poses** be optimized in real time — impossible for EKF-SLAM's dense O(N²) covariance. Libraries like **g2o**, **GTSAM**, and **Ceres** do the heavy lifting.
+
+## The loop-closure payoff
+
+The dramatic moment in any SLAM run is a [loop closure](/atlas/concept/loop-closure): recognizing a previously-visited spot adds one edge linking now to long ago. Re-solving the graph then spreads the accumulated drift backward across every pose in the loop — the map visibly snaps into alignment. This global correction is exactly what a filter can't do cleanly and what makes graph SLAM the standard.
+
+## Why it matters
+
+Pose-graph optimization is the backbone of essentially every production SLAM system today — Cartographer, ORB-SLAM, slam_toolbox. It reframes mapping as a clean optimization problem, which is why it scales and why it corrects globally.
+
+## Related
+
+[SLAM](/atlas/concept/slam) · [Factor graph](/atlas/concept/factor-graph) · [Loop closure](/atlas/concept/loop-closure) · [EKF-SLAM](/atlas/concept/ekf-slam)

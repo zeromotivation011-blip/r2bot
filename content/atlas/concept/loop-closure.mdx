@@ -1,0 +1,75 @@
+---
+title: Loop Closure
+slug: loop-closure
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Loop closure is the moment a robot recognizes "I've been here before" — the single most
+  important event in SLAM, because it lets the system cancel out all the drift accumulated
+  since it last saw that place.
+difficulty: 3
+tags:
+  - slam
+  - mapping
+  - place-recognition
+seeAlso:
+  - slam
+  - pose-graph-optimization
+  - dead-reckoning
+  - visual-odometry
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Cadena et al. — Past, Present, and Future of SLAM'
+    url: 'https://arxiv.org/abs/1606.05830'
+  - title: 'Gálvez-López & Tardós — Bags of binary words (DBoW2)'
+    url: 'https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping'
+laymanExplanation: >-
+  Loop closure is when a robot realizes it has returned to a place it mapped before. That
+  recognition lets it correct all the small errors that piled up along the way, snapping
+  its map back into shape.
+technicalDefinition: >-
+  Loop closure detects revisited locations and adds a constraint linking the current pose
+  to the earlier one, enabling global drift correction in SLAM.
+quizQuestion:
+  q: Why is loop closure so important in SLAM?
+  options:
+    - It charges the robot
+    - It corrects accumulated drift by recognizing revisited places
+    - It speeds up the motors
+    - It compresses the map
+  answer: 1
+  explanation: >-
+    Recognizing a previously-seen place adds a constraint that lets the system redistribute
+    and cancel the drift built up since the last visit.
+---
+
+As a robot explores, tiny errors in its motion estimate quietly pile up — this is drift, the curse of [dead reckoning](/atlas/concept/dead-reckoning). **Loop closure** is the cure, and the most dramatic moment in any [SLAM](/atlas/concept/slam) run.
+
+## What it is
+
+Loop closure is the robot recognizing that its **current view matches a place it mapped earlier** — it has come full circle. That recognition creates a powerful new constraint: "wherever my drifting estimate thinks I am, I'm actually back *here*." Feeding that constraint into the map lets the system undo the accumulated error all at once.
+
+```diagram
+{ "type": "flow", "title": "Recognize, constrain, correct", "nodes": ["Revisit a place", "Recognize it", "Add loop constraint", "Redistribute drift"], "caption": "The new edge links now to a much earlier pose; re-optimizing spreads the built-up error backward across the whole loop, and the map snaps into alignment." }
+```
+
+## How robots detect it
+
+Recognizing a place is a **perception** problem, not a geometry one:
+
+- **Cameras** use appearance-based place recognition — **bag-of-visual-words** (DBoW2) or learned global descriptors — to find images that look like the current view.
+- **Lidar** uses scan descriptors (like Scan Context) to match 3D shapes.
+
+Because a **false** loop closure is catastrophic — it welds two unrelated places together and warps the whole map — systems add **geometric verification** (RANSAC-style checks) before trusting a match.
+
+## What happens after detection
+
+Once verified, the loop closure becomes an edge in the [pose graph](/atlas/concept/pose-graph-optimization). Re-optimizing distributes the correction across every pose in the loop, so the map visibly tightens — corridors line up, rooms stop duplicating. This global fix is exactly what pure odometry and filtering can't achieve.
+
+## Why it matters
+
+Loop closure is what separates a map that slowly warps into nonsense from one that stays globally consistent over hours of operation. Modern SLAM research is largely about detecting loop closures faster, more reliably, and across bigger changes in lighting and season.
+
+## Related
+
+[SLAM](/atlas/concept/slam) · [Pose-graph optimization](/atlas/concept/pose-graph-optimization) · [Dead reckoning](/atlas/concept/dead-reckoning) · [Visual odometry](/atlas/concept/visual-odometry)

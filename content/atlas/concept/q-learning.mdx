@@ -1,0 +1,77 @@
+---
+title: Q-Learning
+slug: q-learning
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Q-learning is a reinforcement-learning method that learns the value of each action in each
+  state purely from trial and error — no model of the world needed — and forms the basis of
+  deep RL breakthroughs like the Deep Q-Network.
+difficulty: 3
+tags:
+  - reinforcement-learning
+  - value-based
+  - ai
+seeAlso:
+  - reinforcement-learning
+  - markov-decision-process
+  - deep-q-network
+  - bellman-equation
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Watkins & Dayan — Q-learning'
+    url: 'https://en.wikipedia.org/wiki/Q-learning'
+  - title: 'Sutton & Barto — Reinforcement Learning'
+    url: 'http://incompleteideas.net/book/the-book.html'
+laymanExplanation: >-
+  Q-learning learns a big table of "how good is it to take this action in this situation?"
+  It fills the table in by trying actions, seeing the reward, and nudging its estimates — no
+  instructions and no model of the world required.
+technicalDefinition: >-
+  Q-learning is a model-free, off-policy RL algorithm that learns the action-value function
+  Q(s,a) via temporal-difference updates toward the Bellman optimality target.
+quizQuestion:
+  q: Q-learning is called 'model-free' because it…
+  options:
+    - Uses no neural network
+    - Learns without knowing the environment's dynamics
+    - Requires no reward
+    - Only works in simulation
+  answer: 1
+  explanation: >-
+    It learns action values directly from experience without needing a model of how the
+    environment transitions — hence model-free.
+---
+
+How does a robot learn a good behavior when nobody tells it the right move and it doesn't even have a model of how the world works? **Q-learning** was one of the first clean answers — learn by doing.
+
+## What it learns
+
+Q-learning estimates a function **Q(state, action)** — "how much total future reward can I expect if I take this action here, then act well afterward?" Learn Q accurately and the policy is trivial: in any state, pick the action with the highest Q.
+
+It fills Q in from raw experience. After each step, it nudges its estimate toward the [Bellman](/atlas/concept/bellman-equation) target — the reward just received plus the best Q available in the new state:
+
+```
+Q(s,a) ← Q(s,a) + α · [ r + γ·max Q(s',a') − Q(s,a) ]
+                        └────── TD error ──────┘
+```
+
+```diagram
+{ "type": "loop", "title": "Learn action values by trial and error", "nodes": ["Take action", "See reward + next state", "Nudge Q toward target"], "caption": "The gap between predicted and observed value (the TD error) drives each update. Repeat enough and Q converges to the true action values." }
+```
+
+## Why it was a big deal
+
+Q-learning is **model-free** (it needs no knowledge of the world's dynamics) and **off-policy** (it can learn the optimal behavior even while exploring with random actions). Under mild conditions it's *proven* to converge to the optimal Q. That combination — learn optimally, from messy experience, without a model — is what made it a cornerstone of [reinforcement learning](/atlas/concept/reinforcement-learning).
+
+## The catch and the sequel
+
+Classic Q-learning stores Q in a **table**, which is hopeless for robots: a camera image has astronomically many states. The breakthrough was to replace the table with a [neural network](/atlas/concept/neural-network) that *approximates* Q — the **[Deep Q-Network](/atlas/concept/deep-q-network)** that learned to play Atari from pixels. For continuous actions (a robot's joint torques), value-based methods give way to [policy-gradient](/atlas/concept/policy-gradient) and [actor-critic](/atlas/concept/actor-critic) approaches.
+
+## Why it matters
+
+Q-learning is the intuitive entry point to reinforcement learning — the idea that you can learn *what's worth doing* from consequences alone. Every deep-RL agent that grasps, walks, or navigates traces its lineage here.
+
+## Related
+
+[Reinforcement learning](/atlas/concept/reinforcement-learning) · [Deep Q-Network](/atlas/concept/deep-q-network) · [Markov decision process](/atlas/concept/markov-decision-process) · [Bellman equation](/atlas/concept/bellman-equation)

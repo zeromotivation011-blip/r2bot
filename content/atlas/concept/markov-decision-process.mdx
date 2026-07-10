@@ -1,0 +1,77 @@
+---
+title: Markov Decision Process (MDP)
+slug: markov-decision-process
+bucket: concept
+category: ai-and-perception
+summary: >-
+  A Markov Decision Process is the mathematical frame for sequential decision-making — states,
+  actions, rewards, and transitions — and the formal problem that all of reinforcement
+  learning for robots is trying to solve.
+difficulty: 3
+tags:
+  - reinforcement-learning
+  - decision-making
+  - ai
+seeAlso:
+  - reinforcement-learning
+  - q-learning
+  - policy-gradient
+  - bellman-equation
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Sutton & Barto — Reinforcement Learning: An Introduction'
+    url: 'http://incompleteideas.net/book/the-book.html'
+  - title: 'Markov decision process'
+    url: 'https://en.wikipedia.org/wiki/Markov_decision_process'
+laymanExplanation: >-
+  An MDP describes a decision problem as: you're in a situation (state), you pick an action,
+  you get a reward and land in a new situation. Solve it and you have a rule for what to do
+  in every situation to earn the most reward over time.
+technicalDefinition: >-
+  An MDP is a tuple (S, A, P, R, γ) of states, actions, transition probabilities, rewards,
+  and a discount factor, modeling sequential decisions where the next state depends only on
+  the current state and action.
+quizQuestion:
+  q: The 'Markov' property means the next state depends on…
+  options:
+    - The entire history
+    - Only the current state and action
+    - The battery level
+    - The time of day
+  answer: 1
+  explanation: >-
+    Markov = memoryless: the next state and reward depend only on the current state and
+    action, not the full past.
+---
+
+Before a robot can *learn* to act, we need a precise way to state the problem "what should I do, over and over, to do well?" That statement is the **Markov Decision Process** — the foundation of all [reinforcement learning](/atlas/concept/reinforcement-learning).
+
+## The five ingredients
+
+An MDP is defined by:
+
+- **States (S)** — the situations the robot can be in.
+- **Actions (A)** — what it can do in each state.
+- **Transitions (P)** — the (often uncertain) rule for which state an action leads to.
+- **Rewards (R)** — the numeric feedback for each step.
+- **Discount (γ)** — how much future reward is worth versus immediate reward.
+
+```diagram
+{ "type": "loop", "title": "The agent–environment loop of an MDP", "nodes": ["State", "Action", "Reward + new state"], "caption": "The agent observes a state, takes an action, receives a reward and a new state — then repeats. Solving the MDP means choosing actions that maximize total discounted reward." }
+```
+
+## The Markov property
+
+The defining assumption is that the future is **memoryless**: the next state depends only on the *current* state and action, not the entire history. This is what makes the problem tractable — you only need to reason about where you are now, not everything that led here. (When the robot can't fully observe its state, it becomes a **POMDP**, the harder partially-observed cousin.)
+
+## What "solving" it means
+
+The goal is a **policy** — a rule mapping each state to an action — that maximizes expected total discounted reward. The tools that find it define whole fields: **value iteration** and **dynamic programming** when the model is known; **[Q-learning](/atlas/concept/q-learning)** and **[policy gradient](/atlas/concept/policy-gradient)** methods when it isn't and the robot must learn from experience. All of them build on the [Bellman equation](/atlas/concept/bellman-equation), which relates the value of a state to the values of the states it leads to.
+
+## Why it matters for robots
+
+Locomotion, manipulation, and navigation are all naturally MDPs: a stream of states, actions, and rewards. Framing a robot task as an MDP is the first step to applying reinforcement learning — and understanding the frame is what makes the algorithms make sense.
+
+## Related
+
+[Reinforcement learning](/atlas/concept/reinforcement-learning) · [Q-learning](/atlas/concept/q-learning) · [Policy gradient](/atlas/concept/policy-gradient) · [Bellman equation](/atlas/concept/bellman-equation)

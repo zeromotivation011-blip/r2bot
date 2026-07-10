@@ -1,0 +1,75 @@
+---
+title: Scan Matching
+slug: scan-matching
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Scan matching estimates how a robot moved by aligning one lidar scan to the next — the
+  front-end that turns raw range data into motion estimates and feeds nearly every
+  lidar-based SLAM and navigation system.
+difficulty: 3
+tags:
+  - slam
+  - lidar
+  - localization
+seeAlso:
+  - iterative-closest-point
+  - lidar
+  - slam
+  - occupancy-grid
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Censi — An ICP variant using point-to-line metric (PL-ICP)'
+    url: 'https://en.wikipedia.org/wiki/Iterative_closest_point'
+  - title: 'Biber & Straßer — The Normal Distributions Transform'
+    url: 'https://en.wikipedia.org/wiki/Normal_distributions_transform'
+laymanExplanation: >-
+  Scan matching slides a fresh lidar scan over the previous one (or over the map) until the
+  walls and edges line up. How far it had to slide tells the robot how far it moved.
+technicalDefinition: >-
+  Scan matching estimates the relative transform between range scans (or a scan and a map)
+  by maximizing their geometric alignment, e.g. via ICP or NDT.
+quizQuestion:
+  q: Scan matching primarily gives a robot…
+  options:
+    - Its battery level
+    - An estimate of how far and which way it moved
+    - The color of walls
+    - Its Wi-Fi speed
+  answer: 1
+  explanation: >-
+    By aligning consecutive scans (or a scan to the map), it recovers the relative motion —
+    a lidar-based odometry and localization cue.
+---
+
+A [lidar](/atlas/concept/lidar) fires thousands of range measurements and returns a "scan" — a slice of the surrounding walls and objects. Take two scans a moment apart and figure out how one slid onto the other, and you know how the robot moved. That's **scan matching**.
+
+## What it does
+
+Scan matching computes the **rotation and translation** that best aligns one scan with another — either the previous scan (giving lidar *odometry*) or the existing map (giving *localization*). It's the geometric front-end that converts raw range data into a motion estimate.
+
+```diagram
+{ "type": "flow", "title": "Align scans to recover motion", "nodes": ["New lidar scan", "Align to previous/map", "Best-fit transform", "Motion estimate"], "caption": "How far the new scan must be shifted and rotated to line up with the reference is exactly how far the robot moved between them." }
+```
+
+## How it's done
+
+Several methods, trading speed for robustness:
+
+- **[ICP](/atlas/concept/iterative-closest-point)** (Iterative Closest Point) and its point-to-line/point-to-plane variants — match nearest points, solve, repeat.
+- **NDT** (Normal Distributions Transform) — model the reference scan as a grid of Gaussians and slide the new scan to maximize probability; robust and smooth.
+- **Correlative / grid-based matching** — exhaustively score candidate shifts against an [occupancy grid](/atlas/concept/occupancy-grid); slower but avoids bad local minima and gives a good initial guess.
+
+Most real systems combine them: a coarse correlative match to get close, then ICP/NDT to refine.
+
+## Where it fits
+
+Scan matching is the **odometry source** for lidar [SLAM](/atlas/concept/slam) (Cartographer, slam_toolbox, LIO-SAM all rely on it) and the localization step in AMCL-style systems. Its estimates become the edges in a [pose graph](/atlas/concept/pose-graph-optimization). Its weakness is geometrically **featureless** environments — a long, straight, empty corridor gives nothing to lock onto along its length, so the estimate slides. That's exactly where wheel odometry or an IMU is fused in to help.
+
+## Why it matters
+
+Scan matching is the quiet workhorse that turns a spinning laser into knowledge of motion. Nearly every lidar robot's sense of "how did I just move?" starts here.
+
+## Related
+
+[Iterative closest point](/atlas/concept/iterative-closest-point) · [LiDAR](/atlas/concept/lidar) · [SLAM](/atlas/concept/slam) · [Occupancy grid](/atlas/concept/occupancy-grid)

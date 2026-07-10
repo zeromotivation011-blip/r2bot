@@ -1,0 +1,74 @@
+---
+title: EKF-SLAM
+slug: ekf-slam
+bucket: concept
+category: ai-and-perception
+summary: >-
+  EKF-SLAM was the original solution to simultaneous localization and mapping — one big
+  Kalman filter tracking the robot's pose and every landmark at once. Elegant, historic,
+  and the reason engineers later switched to graph-based methods.
+difficulty: 4
+tags:
+  - slam
+  - estimation
+  - localization
+seeAlso:
+  - slam
+  - extended-kalman-filter
+  - kalman-filter
+  - pose-graph-optimization
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Durrant-Whyte & Bailey — SLAM Part I'
+    url: 'https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping'
+  - title: 'Thrun, Burgard, Fox — Probabilistic Robotics'
+    url: 'http://www.probabilistic-robotics.org/'
+laymanExplanation: >-
+  EKF-SLAM keeps a single running estimate of where the robot is AND where every landmark
+  is, updating them together every time the robot senses. It was the first real answer to
+  mapping and localizing at the same time.
+technicalDefinition: >-
+  EKF-SLAM uses an extended Kalman filter whose state contains the robot pose and all
+  landmark positions, with a joint covariance updated on every observation.
+quizQuestion:
+  q: The main scaling problem with EKF-SLAM is…
+  options:
+    - It needs no sensors
+    - Its covariance is O(N²) in the number of landmarks
+    - It only works outdoors
+    - It cannot use lidar
+  answer: 1
+  explanation: >-
+    The joint covariance couples every landmark, so each update costs O(N²) — this is why
+    EKF-SLAM doesn't scale to large maps.
+---
+
+When robots first solved [SLAM](/atlas/concept/slam) — mapping a place while figuring out where they are in it — the answer was a single, elegant idea: put *everything* into one [Kalman filter](/atlas/concept/kalman-filter). That's **EKF-SLAM**.
+
+## The idea
+
+The filter's **state** is the robot's pose *plus* the position of every landmark it has seen. As the robot moves and senses, an [extended Kalman filter](/atlas/concept/extended-kalman-filter) updates all of it together, along with a giant **covariance matrix** that captures how uncertain each thing is — and, crucially, how they're correlated.
+
+```diagram
+{ "type": "loop", "title": "One filter estimates robot + map together", "nodes": ["Move (predict)", "Observe landmark", "Update pose + all landmarks"], "caption": "Every observation corrects not just the seen landmark but the robot pose and, through correlations, the whole map at once." }
+```
+
+## The beautiful part
+
+The correlations are the secret. When the robot re-sees an old landmark, the correction ripples through the covariance and sharpens the *entire* map — the mathematical version of "now that I recognize this corner, everything else snaps into place." This insight (that the map's correlations matter and converge) is what made SLAM provably solvable.
+
+## Why it fell out of favor
+
+That same covariance is EKF-SLAM's downfall. It couples every landmark to every other, so each update costs **O(N²)** in the number of landmarks — a map with thousands of features grinds to a halt. It also inherits the EKF's weakness: **linearization error**. The EKF approximates nonlinear motion and sensing with a first-order Taylor expansion, and over a long trajectory those small errors compound and can make the filter overconfident and inconsistent.
+
+## What replaced it
+
+Modern systems moved to **[pose-graph optimization](/atlas/concept/pose-graph-optimization)** and **[factor graphs](/atlas/concept/factor-graph)**, which exploit sparsity and re-linearize, scaling to huge maps. **FastSLAM** kept the filter idea but used a [particle filter](/atlas/concept/particle-filter) to break the O(N²) bottleneck. EKF-SLAM is now mostly taught as the foundational idea rather than deployed at scale.
+
+## Why it matters
+
+EKF-SLAM is where SLAM began — the first rigorous answer to the chicken-and-egg problem of mapping and localizing together. Understanding its structure (and its O(N²) wall) is the key to appreciating why today's graph-based SLAM works the way it does.
+
+## Related
+
+[SLAM](/atlas/concept/slam) · [Extended Kalman filter](/atlas/concept/extended-kalman-filter) · [Pose-graph optimization](/atlas/concept/pose-graph-optimization) · [Kalman filter](/atlas/concept/kalman-filter)
