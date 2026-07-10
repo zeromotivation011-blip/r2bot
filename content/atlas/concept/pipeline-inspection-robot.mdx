@@ -1,0 +1,77 @@
+---
+title: Pipeline Inspection Robot
+slug: pipeline-inspection-robot
+bucket: concept
+category: applications
+summary: >-
+  Pipeline inspection robots travel inside pipes — from city sewers to oil and gas lines — surveying
+  for cracks, corrosion, and blockages in spaces no human can enter, a critical infrastructure
+  application.
+difficulty: 2
+tags:
+  - applications
+  - inspection
+  - mobile-robot
+seeAlso:
+  - inspection-robot
+  - computer-vision
+  - teleoperation
+  - autonomous-mobile-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Pipeline inspection gauge / robots'
+    url: 'https://en.wikipedia.org/wiki/Pipeline_inspection_gauge'
+  - title: 'In-pipe robots (research)'
+    url: 'https://en.wikipedia.org/wiki/Robot'
+laymanExplanation: >-
+  A pipeline inspection robot crawls or is carried through the inside of a pipe, filming and sensing as
+  it goes, to find cracks, rust, and blockages — checking pipes from the inside, where no person could
+  ever fit.
+technicalDefinition: >-
+  A pipeline inspection robot is an in-pipe mobile robot or instrumented tool that traverses the
+  interior of pipelines to detect defects, corrosion, deposits, and blockages via cameras and NDT
+  sensors.
+quizQuestion:
+  q: Pipeline inspection robots are needed mainly because pipe interiors are…
+  options:
+    - Easy to reach by hand
+    - Confined and inaccessible to humans
+    - Always transparent
+    - Never in need of inspection
+  answer: 1
+  explanation: >-
+    Pipe interiors are too small and hazardous for people, so robots and instrumented tools inspect
+    them from the inside.
+---
+
+Buried and hidden, pipelines carry water, sewage, oil, and gas — and when they fail, the results are costly or catastrophic. But you can't send a person inside a pipe. **Pipeline inspection robots** do exactly that job, from the inside.
+
+## What they do
+
+A pipeline inspection robot travels **through the interior of a pipe**, surveying it for problems: **cracks, corrosion, wall thinning, blockages, root intrusion, and leaks**. It carries cameras (often 360°) and non-destructive-testing sensors, sending back data (and sometimes a live [teleoperated](/atlas/concept/teleoperation) feed) that reveals the pipe's condition without digging it up.
+
+```diagram
+{ "type": "flow", "title": "Inspect from the inside", "nodes": ["Enter the pipe", "Traverse interior", "Camera + sensors survey", "Report defects & location"], "caption": "The robot moves through the pipe recording defects and their positions, so operators know exactly where to dig or repair — no excavation to inspect." }
+```
+
+## Different pipes, different robots
+
+- **Wheeled/tracked crawlers** — drive along the bottom of larger pipes and sewers; the common CCTV sewer-inspection tools.
+- **Wall-pressing / articulated robots** — brace against the pipe walls to handle varied diameters and bends; snake-like designs navigate tight, twisting pipes.
+- **PIGs (Pipeline Inspection Gauges)** — instrumented tools carried by the flow through long oil/gas pipelines ("smart pigs"), scanning the wall as they travel hundreds of kilometers.
+- **Amphibious/float units** — for partially flooded lines.
+
+## The challenges
+
+- **Confinement and navigation.** Bends, junctions, diameter changes, and debris make locomotion hard; getting stuck means a difficult retrieval.
+- **Localization.** Knowing *where along the pipe* a defect is (often via odometry, markers, or the launch/receive points) so crews can find it.
+- **Harsh conditions.** Water, sludge, pressure, corrosive or explosive contents (oil/gas) demand rugged, sometimes intrinsically-safe designs.
+- **Power and comms** over long distances underground, often solved with tethers or onboard recording.
+
+## Why it matters
+
+Pipeline inspection robots protect vital, invisible infrastructure — preventing sewage spills, water loss, and pipeline ruptures by catching deterioration early, from the one vantage point that matters: inside the pipe. It's a specialized but essential branch of [inspection robotics](/atlas/concept/inspection-robot), quietly keeping cities and energy systems running.
+
+## Related
+
+[Inspection robot](/atlas/concept/inspection-robot) · [Computer vision](/atlas/concept/computer-vision) · [Teleoperation](/atlas/concept/teleoperation) · [Autonomous mobile robot](/atlas/concept/autonomous-mobile-robot)

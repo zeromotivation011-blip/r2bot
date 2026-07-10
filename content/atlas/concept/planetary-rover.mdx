@@ -1,0 +1,73 @@
+---
+title: Planetary Rover
+slug: planetary-rover
+bucket: concept
+category: applications
+summary: >-
+  A planetary rover explores other worlds — driving across Mars or the Moon to study terrain and
+  search for signs of life — the pinnacle of autonomous robotics, where communication delays force the
+  robot to think for itself.
+difficulty: 3
+tags:
+  - applications
+  - space
+  - autonomy
+seeAlso:
+  - autonomy
+  - slam
+  - visual-odometry
+  - teleoperation
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Mars rover (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Mars_rover'
+  - title: 'NASA — Perseverance rover'
+    url: 'https://mars.nasa.gov/mars2020/'
+laymanExplanation: >-
+  A planetary rover is a robot car sent to another world, like Mars, to drive around and do science.
+  Because radio signals take minutes to arrive, it can't be joysticked in real time — it has to
+  navigate a lot of the way by itself.
+technicalDefinition: >-
+  A planetary rover is a mobile robot that traverses another planet or moon to conduct science,
+  operating with high autonomy due to long communication latency and no GPS.
+quizQuestion:
+  q: Why must a Mars rover be highly autonomous?
+  options:
+    - It has unlimited battery
+    - Radio delays of minutes make real-time driving impossible
+    - Mars has perfect roads
+    - It is controlled by GPS
+  answer: 1
+  explanation: >-
+    Signals to Mars take minutes each way, so a rover can't be teleoperated in real time — it must
+    navigate and make many decisions on its own.
+---
+
+A robot on the surface of another planet, hundreds of millions of kilometers away, driving across alien terrain — the **planetary rover** is one of robotics' greatest achievements, and a place where autonomy isn't optional.
+
+## Why it must think for itself
+
+The defining constraint is **communication delay**. A radio signal to Mars takes several minutes each way (and only during limited windows). You cannot joystick a rover in real time — by the time you saw a hazard and sent "stop," the rover would have driven into it long ago. So a planetary rover must **navigate autonomously**: perceive the terrain, plan a safe path, and drive itself, with humans sending high-level goals ("go to that rock") rather than steering. There's also **no GPS** off Earth, so it localizes with [visual odometry](/atlas/concept/visual-odometry) and terrain-relative methods.
+
+```diagram
+{ "type": "flow", "title": "Goals from Earth, driving on its own", "nodes": ["High-level goal uplinked", "Rover senses terrain", "Autonomously plans safe path", "Drives, avoids hazards"], "caption": "Minutes-long delays mean the rover executes and adapts by itself between infrequent human commands — autonomy out of necessity." }
+```
+
+## What makes it brutally hard
+
+- **You cannot fix it.** No repairs, ever. Everything must be extraordinarily reliable and fault-tolerant — a stuck wheel or software bug can end a mission.
+- **Extreme environment.** Radiation, temperature swings, dust, and terrain that can trap a rover (Spirit's fatal sand trap).
+- **Tiny power and slow computing.** Radiation-hardened processors are decades behind consumer chips; every watt (often from solar or a nuclear RTG) is precious. Rovers drive slowly and deliberately.
+- **Perception on alien ground.** No prior map, unfamiliar rocks and slopes — hazard detection must be conservative and robust.
+
+## The rovers
+
+Sojourner, Spirit and Opportunity, Curiosity, and Perseverance on Mars; lunar rovers from the Apollo era to today's international missions. Each pushed autonomy further — Perseverance's AutoNav lets it drive and plan continuously, covering far more ground per day than earlier rovers that stopped to think.
+
+## Why it matters
+
+Planetary rovers are autonomy in its purest, highest-stakes form — robots that must survive and make decisions entirely on their own, unreachable and unrepairable, in the harshest places humans have ever sent machines. They expand human knowledge of the solar system and drive robotics' most demanding standards for reliability and self-sufficiency.
+
+## Related
+
+[Autonomy](/atlas/concept/autonomy) · [SLAM](/atlas/concept/slam) · [Visual odometry](/atlas/concept/visual-odometry) · [Teleoperation](/atlas/concept/teleoperation)

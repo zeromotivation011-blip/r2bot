@@ -1,0 +1,76 @@
+---
+title: Inspection Robot
+slug: inspection-robot
+bucket: concept
+category: applications
+summary: >-
+  Inspection robots go where people can't or shouldn't — inside tanks, up towers, through tunnels —
+  carrying sensors to check for damage, corrosion, and leaks, keeping infrastructure safe without
+  putting humans in danger.
+difficulty: 2
+tags:
+  - applications
+  - inspection
+  - mobile-robot
+seeAlso:
+  - pipeline-inspection-robot
+  - computer-vision
+  - autonomous-mobile-robot
+  - thermal-camera
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Inspection robots (overview)'
+    url: 'https://en.wikipedia.org/wiki/Remotely_operated_underwater_vehicle'
+  - title: 'Industrial inspection robotics'
+    url: 'https://en.wikipedia.org/wiki/Robot'
+laymanExplanation: >-
+  Inspection robots carry cameras and sensors into places that are dangerous or hard to reach — inside
+  a boiler, up a wind turbine, along a bridge — to look for cracks, rust, and leaks so problems get
+  caught before they become disasters.
+technicalDefinition: >-
+  An inspection robot is a sensor-carrying mobile or aerial robot that surveys structures and
+  equipment for defects (corrosion, cracks, leaks, wear), often in hazardous or inaccessible areas.
+quizQuestion:
+  q: The main value of inspection robots is…
+  options:
+    - They are cheaper than any camera
+    - Accessing dangerous or hard-to-reach places to find defects safely
+    - They repair everything automatically
+    - They replace all engineers
+  answer: 1
+  explanation: >-
+    They reach hazardous or inaccessible locations and gather sensor data to detect defects, removing
+    humans from danger and reaching places people can't easily go.
+---
+
+Much of the world's critical infrastructure — pipelines, bridges, power plants, tanks, wind turbines — sits in places that are dangerous, confined, or high up. **Inspection robots** go there so people don't have to, catching problems before they become failures.
+
+## What they do
+
+An inspection robot is essentially a **mobile sensor platform**. It carries cameras and specialized sensors to a structure or piece of equipment and surveys it for **defects** — corrosion, cracks, leaks, thinning, hot spots, wear. It doesn't usually fix anything; its job is to **gather data** that engineers use to decide on maintenance.
+
+```diagram
+{ "type": "flow", "title": "Reach, sense, report", "nodes": ["Deploy to hard/dangerous area", "Carry sensors over structure", "Detect defects", "Report data for decisions"], "caption": "The robot removes the human from the dangerous or inaccessible location and brings back the sensor data that reveals a structure's condition." }
+```
+
+## Many forms for many places
+
+Inspection robots take whatever shape the environment demands:
+
+- **Aerial [drones](/atlas/concept/drone)** — bridges, wind turbine blades, power lines, tall structures, roofs.
+- **Crawlers and magnetic climbers** — tank walls, ship hulls, storage vessels, steel structures.
+- **[Pipeline robots](/atlas/concept/pipeline-inspection-robot)** — inside pipes and sewers (a whole specialty).
+- **Legged robots** — plants and facilities with stairs and rough footing (Spot on inspection rounds).
+- **Underwater ROVs** — dams, offshore platforms, submerged pipelines.
+
+## The sensing toolkit
+
+Beyond cameras, inspection robots carry **thermal cameras** ([hot spots](/atlas/concept/thermal-camera), heat leaks), **ultrasonic** sensors (wall thickness, hidden corrosion), **gas sensors** (leaks), and increasingly [computer vision](/atlas/concept/computer-vision) that automatically flags cracks and defects in the imagery, reducing the human review burden.
+
+## Why it matters
+
+Inspection is one of robotics' clearest wins: it keeps people out of confined spaces, off tall structures, and away from hazardous environments, while enabling **more frequent, consistent** monitoring than periodic human inspection allows. Catching a corroding pipe or a cracking blade early prevents catastrophic, expensive failures — which is why inspection is one of the largest and fastest-growing commercial robotics markets.
+
+## Related
+
+[Pipeline inspection robot](/atlas/concept/pipeline-inspection-robot) · [Computer vision](/atlas/concept/computer-vision) · [Thermal camera](/atlas/concept/thermal-camera) · [Autonomous mobile robot](/atlas/concept/autonomous-mobile-robot)

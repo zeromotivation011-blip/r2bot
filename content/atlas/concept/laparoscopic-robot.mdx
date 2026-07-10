@@ -1,0 +1,76 @@
+---
+title: Laparoscopic Robot
+slug: laparoscopic-robot
+bucket: concept
+category: applications
+summary: >-
+  A laparoscopic robot lets a surgeon operate through tiny incisions with tremor-filtered, wristed
+  instruments guided from a console — the technology, exemplified by the da Vinci system, behind
+  modern minimally invasive surgery.
+difficulty: 3
+tags:
+  - applications
+  - medical
+  - teleoperation
+seeAlso:
+  - surgical-robot
+  - teleoperation
+  - haptic-feedback
+  - inverse-kinematics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Robot-assisted surgery (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Robot-assisted_surgery'
+  - title: 'da Vinci Surgical System'
+    url: 'https://en.wikipedia.org/wiki/Da_Vinci_Surgical_System'
+laymanExplanation: >-
+  A laparoscopic robot lets a surgeon operate through a few small holes instead of a big cut. Sitting
+  at a console, the surgeon's hand movements are scaled down and steadied, and tiny wristed tools inside
+  the body copy them precisely.
+technicalDefinition: >-
+  A laparoscopic (minimally invasive) surgical robot teleoperates wristed instruments through small
+  ports, scaling and filtering the surgeon's hand motions for precise internal manipulation.
+quizQuestion:
+  q: A laparoscopic surgical robot primarily provides…
+  options:
+    - Fully autonomous surgery with no surgeon
+    - Precise, tremor-filtered teleoperated instruments through small incisions
+    - Faster ambulance transport
+    - Cheaper hospital food
+  answer: 1
+  explanation: >-
+    The surgeon teleoperates; the robot scales and steadies their motions and drives wristed tools
+    through tiny ports — it doesn't operate on its own.
+---
+
+Minimally invasive surgery — operating through a few small holes instead of a large incision — heals faster but is awkward for a human hand. The **laparoscopic robot** removes that awkwardness, giving surgeons superhuman steadiness and dexterity inside the body.
+
+## How it works
+
+The surgeon sits at a **console** (not over the patient) and moves hand controls while looking at a magnified 3D view. The robot translates those motions to **wristed instruments** inserted through small ports (~1 cm) in the patient. Crucially, it doesn't just copy the motion — it **improves** it:
+
+- **Motion scaling** — large, comfortable hand movements become tiny, precise tool movements.
+- **Tremor filtering** — natural hand tremor is removed for rock-steady manipulation.
+- **Wristed tools** — instruments bend and rotate with more freedom than a human wrist could inside a small opening.
+
+```diagram
+{ "type": "flow", "title": "Surgeon's motion, refined and miniaturized", "nodes": ["Surgeon at console", "Motion scaled + steadied", "Wristed tools in body", "Precise minimally-invasive surgery"], "caption": "The robot is a teleoperation system: it filters tremor and scales motion so delicate work through tiny incisions becomes precise and intuitive." }
+```
+
+## It's teleoperation, not autonomy
+
+An important clarification: a laparoscopic robot is a **[teleoperation](/atlas/concept/teleoperation)** tool — the surgeon is in control at all times; the robot doesn't decide or cut on its own. It's best thought of as an extension of the surgeon's hands, not an autonomous [surgical robot](/atlas/concept/surgical-robot). The da Vinci system is the dominant example, used in hundreds of thousands of procedures a year.
+
+## Benefits and limits
+
+- **For patients** — smaller incisions, less blood loss, less pain, faster recovery.
+- **For surgeons** — better visualization, precision, and ergonomics (seated, not hunched).
+- **Limits** — high cost, bulky equipment, a learning curve, and the loss of natural touch (limited [haptic feedback](/atlas/concept/haptic-feedback) is an active research gap).
+
+## Why it matters
+
+The laparoscopic robot is the most established and impactful application of robotics in medicine — a proven system that improves millions of surgeries. It's also the foundation from which more capable and eventually more autonomous surgical robotics will grow.
+
+## Related
+
+[Surgical robot](/atlas/concept/surgical-robot) · [Teleoperation](/atlas/concept/teleoperation) · [Haptic feedback](/atlas/concept/haptic-feedback) · [Inverse kinematics](/atlas/concept/inverse-kinematics)

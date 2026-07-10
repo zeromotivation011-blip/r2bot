@@ -1,0 +1,79 @@
+---
+title: Bomb-Disposal Robot
+slug: bomb-disposal-robot
+bucket: concept
+category: applications
+summary: >-
+  A bomb-disposal robot lets an operator inspect and neutralize explosives from a safe distance — a
+  teleoperated machine that has saved countless lives by putting a robot, not a person, next to the
+  danger.
+difficulty: 2
+tags:
+  - applications
+  - safety
+  - teleoperation
+seeAlso:
+  - teleoperation
+  - tracked-robot
+  - haptic-feedback
+  - inspection-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Bomb disposal robot (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Bomb_disposal#Robots'
+  - title: 'EOD robots'
+    url: 'https://en.wikipedia.org/wiki/Military_robot'
+laymanExplanation: >-
+  A bomb-disposal robot is a remote-controlled machine an operator drives up to a suspicious device to
+  look at it and disarm or destroy it — so if something goes wrong, the robot is lost instead of a
+  person.
+technicalDefinition: >-
+  A bomb-disposal (EOD) robot is a teleoperated mobile robot with cameras and a manipulator arm used to
+  inspect, move, and neutralize explosive devices from a safe standoff distance.
+quizQuestion:
+  q: A bomb-disposal robot is almost always…
+  options:
+    - Fully autonomous, deciding to disarm on its own
+    - Teleoperated by a human at a safe distance
+    - Left to detonate randomly
+    - Controlled by GPS
+  answer: 1
+  explanation: >-
+    EOD robots are teleoperated — a trained operator controls them from a safe distance; the robot puts
+    distance between the human and the explosive.
+---
+
+When there's a suspected bomb, the goal is simple: keep people away from it. The **bomb-disposal robot** — used by police and military Explosive Ordnance Disposal (EOD) teams — does exactly that by going in a human's place.
+
+## What it does
+
+A bomb-disposal robot is a rugged, [teleoperated](/atlas/concept/teleoperation) mobile robot with **cameras and a manipulator arm**. An operator drives it up to a suspicious package or device from a **safe standoff distance** and uses it to:
+
+- **Inspect** — look closely from multiple angles, sometimes with X-ray.
+- **Manipulate** — open bags, move objects, place tools.
+- **Neutralize** — deploy a disruptor (a water/charge jet) to disable a device, or carry it to a containment vessel.
+
+If something goes wrong, the **robot** is damaged — not a person. That single fact is why these robots exist and why they've saved so many lives.
+
+```diagram
+{ "type": "flow", "title": "A robot in harm's place", "nodes": ["Operator at safe distance", "Drive robot to device", "Inspect with cameras", "Disrupt / neutralize"], "caption": "The human stays back and controls the robot remotely. The robot absorbs the risk that would otherwise fall on the technician." }
+```
+
+## Why teleoperated, not autonomous
+
+Unlike some robots pushing toward autonomy, EOD robots are **deliberately human-controlled**. The stakes are extreme and each situation is unique and judgment-heavy, so a trained operator makes every critical decision. The engineering focus is therefore on a **great teleoperation experience**: clear multi-camera views, a capable and precise arm, and increasingly [haptic feedback](/atlas/concept/haptic-feedback) so the operator can "feel" delicate manipulation. Reliability and communication (wired or robust wireless) are paramount — losing control near a bomb is unacceptable.
+
+## Design traits
+
+- **Rugged mobility.** Often [tracked](/atlas/concept/tracked-robot) to climb stairs, curbs, and rubble and cross rough ground.
+- **Dexterous arm.** To handle, cut, and place tools with care.
+- **Expendable by design.** Valuable but replaceable — the whole point is that it can be sacrificed.
+- **Varied sizes.** From small throwable recon robots to large EOD platforms.
+
+## Why it matters
+
+The bomb-disposal robot is one of the oldest and most unambiguously valuable applications of robotics — a clear case of a machine taking on lethal risk so a human doesn't have to. It's also a benchmark for teleoperation and rugged mobile manipulation, and the template for robots deployed into any hazardous, high-stakes situation.
+
+## Related
+
+[Teleoperation](/atlas/concept/teleoperation) · [Tracked robot](/atlas/concept/tracked-robot) · [Haptic feedback](/atlas/concept/haptic-feedback) · [Inspection robot](/atlas/concept/inspection-robot)

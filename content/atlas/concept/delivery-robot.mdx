@@ -1,0 +1,74 @@
+---
+title: Delivery Robot
+slug: delivery-robot
+bucket: concept
+category: applications
+summary: >-
+  Delivery robots autonomously transport goods between locations — indoors through hospitals and
+  hotels, or outdoors across campuses and cities — automating point-to-point transport with onboard
+  navigation.
+difficulty: 2
+tags:
+  - applications
+  - delivery
+  - mobile-robot
+seeAlso:
+  - last-mile-delivery-robot
+  - autonomous-mobile-robot
+  - slam
+  - warehouse-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Delivery robot (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Delivery_robot'
+  - title: 'Service robots'
+    url: 'https://en.wikipedia.org/wiki/Service_robot'
+laymanExplanation: >-
+  A delivery robot carries things from one place to another on its own — medicines down a hospital
+  corridor, towels to a hotel room, lunch across a campus — navigating around people as it goes.
+technicalDefinition: >-
+  A delivery robot is a mobile robot that autonomously transports items between locations, navigating
+  indoor or outdoor environments with onboard localization and obstacle avoidance.
+quizQuestion:
+  q: An indoor delivery robot (e.g. in a hospital) mainly relies on…
+  options:
+    - GPS only
+    - Onboard SLAM and obstacle avoidance
+    - A fixed rail
+    - Remote-control joystick at all times
+  answer: 1
+  explanation: >-
+    Indoors GPS is unavailable, so delivery robots localize with SLAM and avoid people and obstacles
+    autonomously as they navigate corridors and elevators.
+---
+
+Somewhere right now, a small robot is quietly carrying medication down a hospital hallway or towels to a hotel room. **Delivery robots** automate point-to-point transport of goods — a fast-growing category of practical service robotics.
+
+## What it is
+
+A delivery robot **autonomously moves items from one place to another**. It's a specialized [autonomous mobile robot](/atlas/concept/autonomous-mobile-robot) with a compartment for cargo, onboard navigation, and the ability to interact with its environment (calling elevators, opening doors, notifying recipients). Unlike a [warehouse robot](/atlas/concept/warehouse-robot) working a structured facility, a delivery robot typically operates in **human spaces** — corridors, lobbies, sidewalks — shared with people.
+
+```diagram
+{ "type": "flow", "title": "Autonomous point-to-point transport", "nodes": ["Load item", "Navigate to destination", "Avoid people / use elevator", "Deliver & notify"], "caption": "The robot localizes, plans a route, negotiates the environment (doors, elevators, crowds), and completes the handoff — no human driver." }
+```
+
+## Indoor vs outdoor
+
+- **Indoor delivery robots** — hospitals (medications, samples, linens), hotels (room service, amenities), offices, and restaurants (food running). Since GPS is unavailable indoors, they rely on [SLAM](/atlas/concept/slam) to localize on a building map, plus integration with elevators and automatic doors.
+- **Outdoor / last-mile robots** — sidewalk rovers and delivery drones covering the final leg to customers (see [last-mile delivery robot](/atlas/concept/last-mile-delivery-robot)), which face the harder challenge of uncontrolled public space.
+
+## Why they work well in service settings
+
+- **Frees staff for higher-value work** (nurses stop fetching supplies; hotel staff stop running errands).
+- **Consistent and around-the-clock** — no breaks, predictable service.
+- **Contained environments** (a single hospital or hotel) are mapped once and reused, making indoor delivery reliable and increasingly common.
+
+The challenges are the human interface (handoff, notifications, sharing tight spaces politely) and integrating with building infrastructure.
+
+## Why it matters
+
+Delivery robots are among the most visible and successful **service robots** in daily life — bringing autonomous navigation into hospitals, hotels, and campuses. They demonstrate mobile robotics delivering everyday value in the human world, and they're a stepping stone to broader last-mile automation.
+
+## Related
+
+[Last-mile delivery robot](/atlas/concept/last-mile-delivery-robot) · [Autonomous mobile robot](/atlas/concept/autonomous-mobile-robot) · [SLAM](/atlas/concept/slam) · [Warehouse robot](/atlas/concept/warehouse-robot)

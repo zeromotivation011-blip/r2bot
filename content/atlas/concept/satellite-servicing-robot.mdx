@@ -1,0 +1,77 @@
+---
+title: Satellite-Servicing Robot
+slug: satellite-servicing-robot
+bucket: concept
+category: applications
+summary: >-
+  Satellite-servicing robots repair, refuel, and reposition spacecraft in orbit — extending
+  satellites' lives and cleaning up debris, an emerging field that turns satellites from disposable
+  into maintainable.
+difficulty: 3
+tags:
+  - applications
+  - space
+  - manipulation
+seeAlso:
+  - canadarm
+  - teleoperation
+  - inverse-kinematics
+  - autonomy
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'On-orbit servicing (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/On-orbit_servicing'
+  - title: 'NASA / DARPA robotic servicing missions'
+    url: 'https://en.wikipedia.org/wiki/On-orbit_servicing'
+laymanExplanation: >-
+  A satellite-servicing robot is a spacecraft with robotic arms that flies up to another satellite to
+  fix it, refuel it, or move it — so expensive satellites can be maintained instead of thrown away when
+  they run low on fuel.
+technicalDefinition: >-
+  A satellite-servicing robot performs on-orbit operations — refueling, repair, component replacement,
+  repositioning, and debris removal — via robotic manipulation on cooperative or uncooperative target
+  spacecraft.
+quizQuestion:
+  q: A key motivation for satellite servicing is that satellites often…
+  options:
+    - Last forever without help
+    - Are retired mainly because they run out of fuel, despite working hardware
+    - Are cheap and disposable
+    - Never need repositioning
+  answer: 1
+  explanation: >-
+    Many satellites are retired simply because they run out of propellant while otherwise functional —
+    refueling or repositioning can greatly extend their useful life.
+---
+
+A satellite that runs out of fuel is usually abandoned — even if everything else works perfectly. **Satellite-servicing robots** aim to change that: flying up to spacecraft in orbit to refuel, repair, and reposition them.
+
+## What they do
+
+A satellite-servicing robot is a spacecraft equipped with **robotic arms and tools** that rendezvous with another satellite and perform hands-on operations:
+
+- **Refueling** — topping up propellant so a working satellite can keep operating for years.
+- **Repositioning / life extension** — docking and providing propulsion/attitude control to a client satellite (as Northrop Grumman's MEV vehicles did commercially).
+- **Repair and upgrade** — replacing failed components or adding new instruments.
+- **Debris removal** — capturing and de-orbiting dead satellites and space junk, a growing necessity.
+
+```diagram
+{ "type": "flow", "title": "Rendezvous, capture, service", "nodes": ["Approach target satellite", "Capture / dock with arm", "Refuel / repair / reposition", "Release or de-orbit"], "caption": "The servicer must precisely rendezvous with and grapple another spacecraft in orbit, then manipulate it — often one never designed to be serviced." }
+```
+
+## Why it's extraordinarily hard
+
+- **Uncooperative targets.** Many satellites were **never designed to be serviced** — no grapple fixtures, possibly tumbling. Capturing them safely is a major manipulation and control challenge.
+- **Rendezvous and proximity operations.** Matching orbits and closing in on another fast-moving spacecraft with millimetric precision.
+- **No room for error.** A collision creates debris and can destroy both craft; everything must be extremely reliable.
+- **Autonomy and delay.** Like other space robots, communication latency pushes toward autonomous or supervised operation rather than pure real-time [teleoperation](/atlas/concept/teleoperation).
+
+It builds on the heritage of space manipulators like the [Canadarm](/atlas/concept/canadarm), extended to free-flying servicers.
+
+## Why it matters
+
+Satellite servicing could transform the economics and sustainability of space: turning satellites from single-use into maintainable assets, extending billion-dollar missions, and beginning to clean up the dangerous, growing cloud of orbital debris. It's an emerging frontier where advanced manipulation, rendezvous, and autonomy meet — with huge stakes for the future of space.
+
+## Related
+
+[Canadarm](/atlas/concept/canadarm) · [Teleoperation](/atlas/concept/teleoperation) · [Inverse kinematics](/atlas/concept/inverse-kinematics) · [Autonomy](/atlas/concept/autonomy)

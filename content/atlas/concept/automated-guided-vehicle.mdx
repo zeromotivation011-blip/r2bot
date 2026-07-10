@@ -1,0 +1,79 @@
+---
+title: Automated Guided Vehicle (AGV)
+slug: automated-guided-vehicle
+bucket: concept
+category: applications
+summary: >-
+  An automated guided vehicle follows fixed, pre-defined routes to move materials through factories
+  and warehouses — the simple, reliable, decades-old ancestor of today's free-roaming mobile robots.
+difficulty: 2
+tags:
+  - applications
+  - logistics
+  - mobile-robot
+seeAlso:
+  - autonomous-mobile-robot
+  - warehouse-robot
+  - differential-drive
+  - odometry
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Automated guided vehicle (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Automated_guided_vehicle'
+  - title: 'AGV vs AMR'
+    url: 'https://en.wikipedia.org/wiki/Autonomous_mobile_robot'
+laymanExplanation: >-
+  An AGV is a driverless cart that follows a set path — historically a wire or magnetic strip in the
+  floor — to haul materials around a factory or warehouse. It's simple and dependable, but it can't
+  reroute on its own.
+technicalDefinition: >-
+  An AGV is a mobile robot that transports loads along fixed, pre-defined guide paths (wires, magnetic
+  tape, markers) with limited autonomy to deviate.
+quizQuestion:
+  q: How does a traditional AGV differ from an AMR?
+  options:
+    - AGVs fly; AMRs drive
+    - AGVs follow fixed routes; AMRs navigate freely and reroute
+    - AGVs need no power
+    - They are identical
+  answer: 1
+  explanation: >-
+    AGVs follow pre-defined guide paths and stop when blocked; AMRs use onboard sensing/SLAM to
+    navigate freely and route around obstacles.
+---
+
+Long before robots roamed warehouses freely, driverless carts were already hauling materials along fixed tracks. The **automated guided vehicle (AGV)** is that workhorse — simple, reliable, and still everywhere in industry.
+
+## What it is
+
+An AGV is a **driverless vehicle that follows a pre-defined route** to move loads — pallets, carts, parts — around a factory or warehouse. Classic AGVs follow a physical guide: a **wire buried in the floor**, a **magnetic tape** strip, or optical markers. The vehicle senses the guide and tracks it, stopping if something blocks the path. Its autonomy is limited: it goes where the track goes.
+
+```diagram
+{ "type": "flow", "title": "Follow the fixed path", "nodes": ["Guide path in floor", "AGV tracks it", "Load transported", "Stop if blocked"], "caption": "The route is engineered into the environment. The AGV reliably follows it — simple and predictable, but it can't choose a new way around an obstacle." }
+```
+
+## AGV vs AMR — the key distinction
+
+The modern contrast defines the field:
+
+- **AGV** — follows **fixed, pre-defined paths**; when blocked, it simply **waits**. Infrastructure (tape/wire) must be installed and changed to alter routes. Cheap, extremely reliable, great for high-volume repetitive transport.
+- **[Autonomous mobile robot](/atlas/concept/autonomous-mobile-robot) (AMR)** — navigates **freely** using onboard sensing and [SLAM](/atlas/concept/slam), building its own map and **routing around** obstacles and people dynamically. Flexible but more complex.
+
+Neither is strictly better: AGVs win where routes are fixed and throughput is high; AMRs win where flexibility and shared human spaces matter.
+
+## Strengths and limits
+
+- **Reliable and safe.** Deterministic routes make behavior predictable — easy to certify around workers.
+- **Proven and mature.** Decades of industrial use; well-understood.
+- **Inflexible.** Rerouting means re-laying guides; a blockage stalls the vehicle until cleared.
+- **Infrastructure cost.** Installing and maintaining floor guides.
+
+Many facilities run **both** — AGVs for fixed heavy-haul loops, AMRs for flexible tasks.
+
+## Why it matters
+
+The AGV is the foundation of automated material handling — the reliable backbone that moved factories toward automation and set the stage for today's free-roaming [warehouse robots](/atlas/concept/warehouse-robot). Understanding the AGV-vs-AMR trade-off is essential to designing any material-transport system.
+
+## Related
+
+[Autonomous mobile robot](/atlas/concept/autonomous-mobile-robot) · [Warehouse robot](/atlas/concept/warehouse-robot) · [Differential drive](/atlas/concept/differential-drive) · [Odometry](/atlas/concept/odometry)

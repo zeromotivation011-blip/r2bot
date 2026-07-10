@@ -1,0 +1,76 @@
+---
+title: Harvesting Robot
+slug: harvesting-robot
+bucket: concept
+category: applications
+summary: >-
+  A harvesting robot picks fruit and vegetables autonomously — using vision to find ripe produce and
+  gentle grippers to pick it — tackling farm labor shortages on one of agriculture's hardest
+  automation problems.
+difficulty: 3
+tags:
+  - applications
+  - agriculture
+  - manipulation
+seeAlso:
+  - agricultural-robot
+  - computer-vision
+  - grasp-planning
+  - weeding-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Agricultural robot (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Agricultural_robot'
+  - title: 'Robotic harvesting research'
+    url: 'https://en.wikipedia.org/wiki/Agricultural_robot'
+laymanExplanation: >-
+  A harvesting robot is a farm machine that finds ripe fruit or vegetables with cameras and picks them
+  with a gentle gripper — doing the seasonal picking work that's increasingly hard to find people for.
+technicalDefinition: >-
+  A harvesting robot autonomously detects, localizes, and selectively picks ripe crops using computer
+  vision and specialized gentle end-effectors, often on mobile platforms in fields or greenhouses.
+quizQuestion:
+  q: A core challenge for fruit-harvesting robots is…
+  options:
+    - Fruit is always in the same fixed spot
+    - Detecting ripe fruit among leaves and picking it without bruising
+    - Fruit has no color
+    - There are no crops to pick
+  answer: 1
+  explanation: >-
+    Ripe fruit is occluded by foliage, varies in position, and bruises easily — perception and gentle
+    manipulation are the central difficulties.
+---
+
+Fruit and vegetable picking is seasonal, back-breaking, and increasingly short of workers. **Harvesting robots** aim to automate it — and in doing so tackle one of agriculture's toughest robotics problems.
+
+## Why it's genuinely hard
+
+Unlike a factory, a field or greenhouse is **unstructured and alive**:
+
+- **Perception in clutter.** Ripe fruit hides among leaves, branches, and other fruit, at every angle and lighting condition. Finding it and judging ripeness (color, size) needs strong [computer vision](/atlas/concept/computer-vision).
+- **Delicate manipulation.** Produce bruises easily, so the [grasp](/atlas/concept/grasp-planning) and detach motion must be gentle and precise — often a soft or suction gripper plus a careful twist or cut.
+- **Variability.** No two plants, fruits, or days are the same; the robot can't rely on fixed positions.
+- **Speed and economics.** It must pick fast enough and cheaply enough to beat human labor — a high bar.
+
+```diagram
+{ "type": "flow", "title": "See ripe, pick gentle", "nodes": ["Vision finds ripe fruit", "Localize in 3D among leaves", "Reach with soft gripper", "Detach without bruising"], "caption": "The two hard steps: reliably detecting ripe fruit amid foliage, and picking it gently enough not to damage it." }
+```
+
+## Where it's working
+
+Progress is fastest where the environment is more controlled or the crop is forgiving:
+
+- **Greenhouses** (tomatoes, cucumbers, peppers) — structured rows and consistent conditions help perception and navigation.
+- **Strawberries, apples, sweet peppers** — active commercial and research systems.
+- **Bulk/robust crops** — some harvesting (grains, and shake-harvest nuts) was mechanized long ago; the robotics frontier is **selective** picking of delicate produce.
+
+Harvesting robots often ride on mobile platforms and share the farm with [weeding robots](/atlas/concept/weeding-robot) and other [agricultural robots](/atlas/concept/agricultural-robot).
+
+## Why it matters
+
+Harvesting robots address a real, growing crisis — farm labor shortages — while pushing perception and gentle manipulation in the wild. Success means more resilient food production; the difficulty makes it a demanding, high-impact testbed for field robotics.
+
+## Related
+
+[Agricultural robot](/atlas/concept/agricultural-robot) · [Computer vision](/atlas/concept/computer-vision) · [Grasp planning](/atlas/concept/grasp-planning) · [Weeding robot](/atlas/concept/weeding-robot)

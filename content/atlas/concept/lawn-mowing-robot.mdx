@@ -1,0 +1,76 @@
+---
+title: Lawn-Mowing Robot
+slug: lawn-mowing-robot
+bucket: concept
+category: applications
+summary: >-
+  A robotic lawn mower cuts grass on its own — historically wandering within a buried boundary wire,
+  now increasingly navigating by GPS and vision — one of the most successful outdoor consumer robots.
+difficulty: 2
+tags:
+  - applications
+  - cleaning
+  - mobile-robot
+seeAlso:
+  - cleaning-robot
+  - rtk-gps
+  - path-planning
+  - autonomous-mobile-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Robotic lawn mower (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_lawn_mower'
+  - title: 'Coverage path planning'
+    url: 'https://en.wikipedia.org/wiki/Coverage_path_planning'
+laymanExplanation: >-
+  A lawn-mowing robot cuts the grass by itself. Older ones stay inside a buried wire loop and mow
+  randomly; newer ones use GPS and cameras to mow tidy stripes and know exactly where they are.
+technicalDefinition: >-
+  A robotic lawn mower is an outdoor mobile robot that autonomously cuts grass within a defined area,
+  using boundary wires or GPS/vision-based navigation and coverage planning.
+quizQuestion:
+  q: How did traditional robotic mowers stay within the yard?
+  options:
+    - GPS only
+    - A buried boundary wire they sense and turn back from
+    - A human joystick
+    - They didn't — they roamed anywhere
+  answer: 1
+  explanation: >-
+    Classic robotic mowers detect a buried perimeter wire and turn back at it, keeping them inside the
+    lawn; newer models use GPS/vision instead.
+---
+
+The robotic lawn mower is, quietly, one of the most successful outdoor consumer robots — automating a weekly chore for millions of homeowners. It's also a neat window into how outdoor navigation has evolved.
+
+## The classic design: boundary wire
+
+For years, robotic mowers worked with a **buried perimeter wire** around the lawn. The mower senses the wire's signal and turns back when it reaches it, staying inside the yard while cutting grass a little at a time. Early models navigated **randomly** — bouncing around within the boundary until, statistically, the whole lawn got cut. Simple, cheap, and effective for small lawns, but wasteful and messy-looking (no tidy stripes), and installing the wire is a chore.
+
+```diagram
+{ "type": "flow", "title": "From random-within-wire to mapped mowing", "nodes": ["Define area (wire or map)", "Localize (bump-turn or GPS)", "Cover the lawn", "Return to dock & charge"], "caption": "Older mowers bounce randomly inside a wire; newer ones localize precisely and follow a planned coverage pattern for efficient, striped cutting." }
+```
+
+## The modern shift: wire-free navigation
+
+Newer mowers ditch the wire and navigate like real robots:
+
+- **[RTK-GPS](/atlas/concept/rtk-gps)** gives centimeter-accurate position outdoors, so the mower knows exactly where it is and can follow efficient, striped **[coverage paths](/atlas/concept/path-planning)** — no wasted passes, no wandering.
+- **Vision and sensors** detect obstacles (toys, pets, garden beds) and, in some systems, define boundaries visually so no setup wire is needed.
+
+This turns the mower from a random bouncer into a proper [autonomous mobile robot](/atlas/concept/autonomous-mobile-robot) doing systematic coverage.
+
+## The challenges
+
+- **Outdoor perception.** Sun, shadows, rain, and varied terrain are harder than a clean indoor floor.
+- **Safety.** Spinning blades near pets, children, and hands demand lift/tilt sensors and blade cutoffs.
+- **Coverage efficiency and slopes.** Cutting the whole lawn without missing spots or getting stuck on hills or wet grass.
+- **GPS gaps** under trees or near buildings, handled by fusing other sensors.
+
+## Why it matters
+
+The lawn-mowing robot is a mass-market proof that autonomous outdoor robots work in ordinary people's yards. Its evolution from boundary-wire-and-random to GPS-and-coverage mirrors the broader story of mobile robotics — from crude confinement to genuine autonomous navigation.
+
+## Related
+
+[Cleaning robot](/atlas/concept/cleaning-robot) · [RTK-GPS](/atlas/concept/rtk-gps) · [Path planning](/atlas/concept/path-planning) · [Autonomous mobile robot](/atlas/concept/autonomous-mobile-robot)

@@ -1,0 +1,79 @@
+---
+title: Mining Robot
+slug: mining-robot
+bucket: concept
+category: applications
+summary: >-
+  Mining robots automate digging, hauling, and drilling underground and in open pits — from
+  driverless haul trucks to autonomous drills — making one of the world's most dangerous industries
+  safer and more productive.
+difficulty: 2
+tags:
+  - applications
+  - mining
+  - autonomous-vehicle
+seeAlso:
+  - autonomous-vehicle
+  - teleoperation
+  - slam
+  - inspection-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Automated mining (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Automated_mining'
+  - title: 'Autonomous haulage systems'
+    url: 'https://en.wikipedia.org/wiki/Autonomous_haulage_system'
+laymanExplanation: >-
+  Mining robots are the driverless trucks, diggers, and drills used in mines. They do heavy, dangerous
+  work deep underground or in huge pits, keeping people out of harm's way and running around the clock.
+technicalDefinition: >-
+  Mining robots are autonomous or teleoperated machines (haul trucks, drills, loaders) that perform
+  extraction and transport tasks in surface and underground mines.
+quizQuestion:
+  q: A major reason to automate mining is that mines are…
+  options:
+    - Always safe and comfortable
+    - Dangerous environments where automation removes people from harm
+    - Too small for machines
+    - Free of heavy work
+  answer: 1
+  explanation: >-
+    Mines are hazardous (cave-ins, dust, gas, heavy machinery); automation removes workers from danger
+    and enables continuous, productive operation.
+---
+
+Mining is essential, enormous, and dangerous — cave-ins, dust, gas, and giant machinery make it one of the deadliest industries. **Mining robots** automate the heaviest and riskiest work, pulling people back from the hazards.
+
+## What gets automated
+
+Modern mines deploy robots across the extraction cycle:
+
+- **Autonomous haul trucks.** The flagship success — driverless trucks (Autonomous Haulage Systems) carry ore across vast open-pit mines 24/7, navigating with GPS, [SLAM](/atlas/concept/slam)-like sensing, and fleet coordination. Major miners run large fleets of them.
+- **Autonomous drilling.** Robotic rigs drill blast holes precisely and repeatably, often remotely supervised.
+- **Loaders and diggers.** Automated or [teleoperated](/atlas/concept/teleoperation) loaders move material, especially underground.
+- **Underground robots.** [Inspection](/atlas/concept/inspection-robot) and mapping robots survey shafts and tunnels, checking stability and gas before people enter.
+
+```diagram
+{ "type": "flow", "title": "People out, machines in", "nodes": ["Drill (autonomous)", "Blast", "Load ore", "Haul (driverless trucks)"], "caption": "Each stage of extraction and transport can be automated or remotely operated, keeping workers out of the most dangerous zones while running continuously." }
+```
+
+## Why mining suits automation
+
+- **Safety.** Removing people from unstable, gassy, dusty environments directly saves lives.
+- **Around-the-clock productivity.** Machines don't tire; autonomous fleets run continuously.
+- **Consistency and efficiency.** Optimal driving and drilling reduce wear, fuel, and cost.
+- **Remote sites.** Mines are often remote and harsh; automation reduces the workforce that must live there, and enables remote operation centers hundreds of kilometers away.
+
+## The challenges
+
+- **Brutal environment.** Dust, vibration, heat, and rough terrain punish equipment and sensors.
+- **GPS-denied underground.** Deep mines need alternative localization (SLAM, beacons) where satellites don't reach.
+- **Scale and safety-criticality.** Coordinating huge, heavy autonomous machines safely around any remaining people is a serious systems challenge.
+
+## Why it matters
+
+Mining is one of the most **mature and commercially proven** deployments of large-scale autonomy — driverless haulage is real, at scale, today. It demonstrates robotics delivering safety and productivity in a heavy, hazardous industry, and pushes autonomous-vehicle and underground-navigation technology hard.
+
+## Related
+
+[Autonomous vehicle](/atlas/concept/autonomous-vehicle) · [Teleoperation](/atlas/concept/teleoperation) · [SLAM](/atlas/concept/slam) · [Inspection robot](/atlas/concept/inspection-robot)

@@ -1,0 +1,75 @@
+---
+title: Warehouse Robot
+slug: warehouse-robot
+bucket: concept
+category: applications
+summary: >-
+  Warehouse robots move goods, shelves, and orders through fulfillment centers — the fastest-growing
+  application of mobile robotics, and the reason same-day delivery is possible at scale.
+difficulty: 2
+tags:
+  - applications
+  - logistics
+  - mobile-robot
+seeAlso:
+  - automated-guided-vehicle
+  - autonomous-mobile-robot
+  - bin-picking
+  - warehouse-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Warehouse robotics (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Warehouse_robotics'
+  - title: 'Amazon Robotics'
+    url: 'https://en.wikipedia.org/wiki/Amazon_Robotics'
+laymanExplanation: >-
+  Warehouse robots are the machines that zip around fulfillment centers carrying shelves and packages
+  to human workers, so orders get picked and shipped fast. They're behind modern fast delivery.
+technicalDefinition: >-
+  Warehouse robots are mobile and manipulation robots that automate storage, transport, picking, and
+  sortation of goods in distribution and fulfillment centers.
+quizQuestion:
+  q: A common warehouse-robot strategy is 'goods-to-person,' meaning…
+  options:
+    - Workers walk to fixed shelves
+    - Robots bring shelves/items to a stationary worker
+    - The robot ships itself
+    - Goods are thrown across the room
+  answer: 1
+  explanation: >-
+    Instead of workers walking miles to shelves, robots carry the shelves or items to a picking
+    station — dramatically cutting travel time.
+---
+
+Modern e-commerce runs on robots you never see. **Warehouse robots** are the single biggest commercial success story in mobile robotics — moving goods through fulfillment centers at a scale and speed that make fast, cheap delivery possible.
+
+## The core idea: goods-to-person
+
+Traditional warehouses waste enormous time on **walking** — human pickers trek miles per shift to fetch items from shelves. The breakthrough (pioneered by Kiva, now Amazon Robotics) flipped it: instead of the worker going to the goods, robots bring the **goods to the person**. Squat drive units slide under mobile shelving pods and carry them to a stationary picking station, where a human (or increasingly a [bin-picking](/atlas/concept/bin-picking) robot) grabs the item.
+
+```diagram
+{ "type": "flow", "title": "Goods-to-person fulfillment", "nodes": ["Order comes in", "Robot fetches the shelf", "Brings it to picker", "Item picked & shipped"], "caption": "Robots do the traveling; the worker stays put. Cutting walking time is the productivity leap that transformed the warehouse." }
+```
+
+## The main robot types
+
+- **Shelf-movers / [AGVs](/atlas/concept/automated-guided-vehicle)** — carry pods or pallets along managed routes.
+- **[Autonomous mobile robots](/atlas/concept/autonomous-mobile-robot) (AMRs)** — navigate freely with [SLAM](/atlas/concept/slam) and dynamic obstacle avoidance, sharing space with people.
+- **Sortation robots** — small bots that route parcels to the right chute.
+- **Picking arms** — manipulators that grab items from bins ([bin picking](/atlas/concept/bin-picking)) or place them into orders.
+- **Palletizing arms** — stack finished orders onto pallets.
+
+## What makes it hard at scale
+
+- **Fleet coordination.** Hundreds or thousands of robots must share aisles without gridlock — a massive multi-robot traffic-management problem.
+- **Reliability and uptime.** A stalled robot blocks a lane; the system must route around failures.
+- **The last manual step — picking.** Grabbing arbitrary items from cluttered bins is the hardest part, which is why [visual grasp detection](/atlas/concept/visual-grasp-detection) and manipulation research target it directly.
+- **Safety** where robots and humans mix.
+
+## Why it matters
+
+Warehouse robotics is the proof that mobile robots deliver enormous economic value *today* — it's the industry that took autonomous navigation, fleet coordination, and manipulation from research to billions of real operations. It's also the frontier pushing picking and human-robot collaboration forward.
+
+## Related
+
+[Automated guided vehicle](/atlas/concept/automated-guided-vehicle) · [Autonomous mobile robot](/atlas/concept/autonomous-mobile-robot) · [Bin picking](/atlas/concept/bin-picking) · [Palletizing robot](/atlas/concept/palletizing-robot)

@@ -1,0 +1,75 @@
+---
+title: Prosthetic Hand
+slug: prosthetic-hand
+bucket: concept
+category: applications
+summary: >-
+  A robotic prosthetic hand restores grasping to people who've lost a hand — reading signals from the
+  residual muscles to drive motorized fingers, a deeply human application of robotics and control.
+difficulty: 3
+tags:
+  - applications
+  - medical
+  - manipulation
+seeAlso:
+  - underactuated-hand
+  - tendon-driven-hand
+  - brain-computer-interface
+  - tactile-sensor
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Prosthesis (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Prosthesis'
+  - title: 'Myoelectric prosthetics'
+    url: 'https://en.wikipedia.org/wiki/Powered_prosthesis'
+laymanExplanation: >-
+  A robotic prosthetic hand is a motorized replacement hand that reads the electrical signals from the
+  muscles in the remaining part of the arm, so when the person tries to close their hand, the
+  prosthetic fingers close too.
+technicalDefinition: >-
+  A robotic prosthetic hand is a powered upper-limb prosthesis that senses user intent (often via
+  myoelectric EMG signals) to actuate motorized fingers for functional grasping.
+quizQuestion:
+  q: A myoelectric prosthetic hand is controlled by…
+  options:
+    - The user's remaining muscle signals (EMG)
+    - Voice commands only
+    - A wall switch
+    - The weather
+  answer: 0
+  explanation: >-
+    Electrodes read EMG signals from the residual limb's muscles; the user contracts them to command
+    the prosthetic fingers to open and close.
+---
+
+Restoring a lost hand is one of robotics' most human missions. A modern **robotic prosthetic hand** brings back the ability to grasp — reading a person's intent from their own body and turning it into motion.
+
+## How it senses intent
+
+The most common control method is **myoelectric**: electrodes on the skin of the residual limb pick up the small electrical signals (**EMG**) that muscles produce when contracted. The user tenses the muscles they'd have used to move the missing hand, and the prosthesis interprets those signals to **open and close the fingers**. More advanced systems classify multiple muscle patterns to select different grips, and research interfaces (targeted muscle reinnervation, implanted electrodes, and even [brain-computer interfaces](/atlas/concept/brain-computer-interface)) aim for more natural, higher-bandwidth control.
+
+```diagram
+{ "type": "flow", "title": "From muscle signal to grasp", "nodes": ["User contracts muscles", "EMG electrodes read signal", "Controller picks grip", "Motorized fingers close"], "caption": "The person's own residual muscle activity becomes the command; the hand's motors and mechanism produce the grasp — intent in, motion out." }
+```
+
+## The robotics inside
+
+A prosthetic hand is a compact manipulation system under real constraints:
+
+- **Mechanism.** Often [underactuated](/atlas/concept/underactuated-hand) or [tendon-driven](/atlas/concept/tendon-driven-hand) so a few small motors produce many useful grips (power grasp, pinch, key grip) and the fingers **conform** to objects automatically — robust grasping without per-joint control.
+- **Weight and power.** It must be light enough to wear all day and sip battery — brutal constraints that shape every design choice.
+- **Sensing.** Emerging [tactile sensors](/atlas/concept/tactile-sensor) give feedback (grip force, slip) so the hand doesn't crush or drop objects — and can even convey touch back to the user.
+
+## The hard parts
+
+- **Intuitive control.** EMG is noisy and gives limited channels, so controlling many fingers naturally remains hard.
+- **Sensory feedback.** Users can't easily feel what the hand touches — a major gap researchers work to close.
+- **Cost and access.** Advanced hands are expensive; open-source and 3D-printed designs aim to widen access.
+
+## Why it matters
+
+The prosthetic hand fuses control, actuation, sensing, and human-machine interfacing toward a goal that directly changes lives. It's both a demanding engineering challenge and one of robotics' most meaningful applications — and progress in dexterous hands, tactile sensing, and neural interfaces flows directly into it.
+
+## Related
+
+[Underactuated hand](/atlas/concept/underactuated-hand) · [Tendon-driven hand](/atlas/concept/tendon-driven-hand) · [Brain-computer interface](/atlas/concept/brain-computer-interface) · [Tactile sensor](/atlas/concept/tactile-sensor)

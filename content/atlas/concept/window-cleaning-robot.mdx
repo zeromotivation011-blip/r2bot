@@ -1,0 +1,76 @@
+---
+title: Window-Cleaning Robot
+slug: window-cleaning-robot
+bucket: concept
+category: applications
+summary: >-
+  A window-cleaning robot climbs and scrubs glass — clinging with suction or magnets while it wipes —
+  automating a tedious chore at home and a dangerous job on skyscrapers.
+difficulty: 2
+tags:
+  - applications
+  - cleaning
+  - service
+seeAlso:
+  - cleaning-robot
+  - autonomous-mobile-robot
+  - suction-gripper
+  - autonomy
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Window cleaning (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Window_cleaner'
+  - title: 'Climbing robots'
+    url: 'https://en.wikipedia.org/wiki/Climbing_robot'
+laymanExplanation: >-
+  A window-cleaning robot sticks to glass — using suction or magnets — and drives across it wiping as
+  it goes. At home it does a boring chore; on tall buildings it does a job that's genuinely dangerous
+  for people.
+technicalDefinition: >-
+  A window-cleaning robot is a climbing service robot that adheres to glass surfaces (via vacuum or
+  magnetic coupling) and traverses them while cleaning, navigating edges and obstacles.
+quizQuestion:
+  q: A window-cleaning robot stays on vertical glass mainly by…
+  options:
+    - Gluing itself permanently
+    - Adhering with vacuum suction or magnets
+    - Floating on air
+    - Being very light only
+  answer: 1
+  explanation: >-
+    It clings to the glass using vacuum suction (or magnetic coupling on framed panes) so it can drive
+    across a vertical surface without falling.
+---
+
+Cleaning windows is boring at home and life-threatening on a skyscraper. The **window-cleaning robot** takes on both — a specialized climbing robot that clings to glass and scrubs.
+
+## How it stays on the glass
+
+The central challenge is not falling off a vertical (or overhead) surface. Two approaches:
+
+- **Vacuum suction** — a pump maintains suction against the smooth glass, letting the robot drive across it. Loss of suction is the critical failure mode, so home units add safety tethers and battery backups.
+- **Magnetic coupling** — for framed panes, two units (one each side of the glass) hold together magnetically; one cleans while the other provides the grip. This avoids relying on suction seals.
+
+```diagram
+{ "type": "flow", "title": "Cling, traverse, clean", "nodes": ["Adhere to glass", "Drive across surface", "Wipe / squeegee", "Detect edges & obstacles"], "caption": "The robot maintains adhesion while navigating the pane, cleaning as it goes and sensing frames and edges so it doesn't drive off." }
+```
+
+## Two very different markets
+
+- **Consumer.** Small robots that stick to a home or office window and follow a cleaning pattern — a convenience appliance, cousin to the robot vacuum ([cleaning robot](/atlas/concept/cleaning-robot) family).
+- **High-rise / commercial.** The high-value case: cleaning glass skyscraper façades is dangerous, expensive work for human window washers on suspended platforms. Robots (and semi-automated systems) reduce that risk and cost, tackling the huge glass surfaces of modern buildings.
+
+## The challenges
+
+- **Reliable adhesion and fail-safety.** A fall from height is catastrophic, so redundancy and safety systems are paramount.
+- **Edges, frames, and obstacles.** Navigating around window frames, mullions, and fixtures without getting stuck or driving off.
+- **Cleaning quality.** Actually removing grime, handling streaks, and dealing with varied dirt — plus water/solution management on tall buildings.
+- **Wind and weather** on exterior high-rise work.
+
+## Why it matters
+
+Window-cleaning robots are a clear case of robotics removing humans from **dull and dangerous** work — trivial convenience at home, genuine safety and economic value on high-rises. They're a practical showcase of climbing and adhesion technology in a real service market.
+
+## Related
+
+[Cleaning robot](/atlas/concept/cleaning-robot) · [Autonomous mobile robot](/atlas/concept/autonomous-mobile-robot) · [Suction gripper](/atlas/concept/suction-gripper) · [Autonomy](/atlas/concept/autonomy)

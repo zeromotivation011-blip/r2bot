@@ -1,0 +1,76 @@
+---
+title: Last-Mile Delivery Robot
+slug: last-mile-delivery-robot
+bucket: concept
+category: applications
+summary: >-
+  Last-mile delivery robots carry packages and food the final stretch to your door — small sidewalk
+  rovers and drones tackling the most expensive, hardest-to-automate leg of the supply chain.
+difficulty: 2
+tags:
+  - applications
+  - delivery
+  - mobile-robot
+seeAlso:
+  - delivery-robot
+  - autonomous-mobile-robot
+  - slam
+  - autonomy
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Delivery robot (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Delivery_robot'
+  - title: 'Last mile (transportation)'
+    url: 'https://en.wikipedia.org/wiki/Last_mile_(transportation)'
+laymanExplanation: >-
+  Last-mile delivery robots are the little sidewalk carts and drones that bring your food or parcel
+  the last stretch from a local hub to your door — automating the final, priciest step of delivery.
+technicalDefinition: >-
+  Last-mile delivery robots autonomously transport goods over the final leg from a local hub to the
+  customer, navigating sidewalks or airspace with onboard sensing and mapping.
+quizQuestion:
+  q: Why is the 'last mile' targeted for robot automation?
+  options:
+    - It is the cheapest part of delivery
+    - It is the most expensive and labor-intensive leg
+    - It requires no navigation
+    - It never involves customers
+  answer: 1
+  explanation: >-
+    The final leg to each individual door is disproportionately costly and labor-intensive, so
+    automating it offers big savings.
+---
+
+Goods travel efficiently across the world by ship and truck — until the very end. That final stretch to each individual doorstep, the **"last mile,"** is shockingly expensive, and it's the target of a wave of delivery robots.
+
+## Why the last mile is the hard, costly part
+
+Long-haul transport is cheap per package because it moves in bulk. But the **last mile** — delivering to each separate address — can be a large share of total delivery cost: many stops, low volume per stop, traffic, and human labor. Automating it promises major savings, which is why so many companies chase it.
+
+```diagram
+{ "type": "flow", "title": "The final leg to your door", "nodes": ["Goods at local hub", "Loaded into robot/drone", "Autonomous last mile", "Delivered to customer"], "caption": "Bulk transport gets goods to a nearby hub cheaply; the robot automates the costly final leg to each individual door." }
+```
+
+## The two main forms
+
+- **Sidewalk rovers** — small, slow, cooler-sized wheeled robots (Starship, Serve) that trundle along footpaths carrying food or parcels. They navigate with [SLAM](/atlas/concept/slam), cameras, and GPS, cross streets carefully, and often have remote human oversight for tricky moments.
+- **Delivery [drones](/atlas/concept/drone)** — aerial delivery (Wing, Zipline) that flies over traffic entirely, excellent for speed and for reaching remote or hard-to-drive areas (Zipline's medical deliveries in Rwanda are a landmark).
+
+Both are specialized [autonomous mobile robots](/atlas/concept/autonomous-mobile-robot) tuned for a public, uncontrolled environment.
+
+## What makes it hard
+
+- **Unstructured public space.** Sidewalks and airspace are shared with pedestrians, pets, cyclists, and weather — far messier than a warehouse.
+- **Edge cases everywhere.** Curbs, crosswalks, construction, doorways, apartment buildings — the "long tail" of situations is enormous.
+- **Regulation and public acceptance.** Operating on public paths and airspace needs permissions and community trust.
+- **Security and the final handoff.** Preventing theft and actually getting the item to the right person.
+
+Because of the long tail, many deployments keep a **human in the loop** for supervision.
+
+## Why it matters
+
+Last-mile delivery robots push autonomy out of controlled facilities and into the chaotic real world — arguably the hardest test of mobile robotics. Success would reshape logistics economics and is already improving access to goods and medicine in places trucks struggle to reach.
+
+## Related
+
+[Delivery robot](/atlas/concept/delivery-robot) · [Autonomous mobile robot](/atlas/concept/autonomous-mobile-robot) · [SLAM](/atlas/concept/slam) · [Drone](/atlas/concept/drone)
