@@ -1,0 +1,73 @@
+---
+title: rosbag
+slug: rosbag
+bucket: concept
+category: control
+summary: >-
+  rosbag records a robot's message streams to a file and plays them back later — the tool that
+  lets engineers capture real runs, debug offline, and test algorithms on identical data again and
+  again.
+difficulty: 2
+tags:
+  - software
+  - ros2
+  - tooling
+seeAlso:
+  - ros-topic
+  - ros2
+  - rviz
+  - sim-to-real
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ROS 2 — Recording and playing back data'
+    url: 'https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Recording-And-Playing-Back-Data.html'
+  - title: 'rosbag2 (GitHub)'
+    url: 'https://github.com/ros2/rosbag2'
+laymanExplanation: >-
+  rosbag is like a DVR for a robot. It records all the messages flowing through the robot — camera,
+  lidar, commands — into a file, so you can replay the exact run later to debug or test, without the
+  robot present.
+technicalDefinition: >-
+  rosbag records selected ROS topics to a file with timestamps and replays them with original
+  timing, enabling offline analysis and repeatable testing.
+quizQuestion:
+  q: The main use of rosbag is to…
+  options:
+    - Charge the battery
+    - Record and replay a robot's message streams
+    - Control the motors directly
+    - Render 3D graphics
+  answer: 1
+  explanation: >-
+    rosbag captures topic data to a file and plays it back with original timing, enabling offline
+    debugging and repeatable testing.
+---
+
+Something went wrong on the robot at 3pm and you weren't watching. Or you want to test three different algorithms on the *exact same* sensor data. Both are jobs for **rosbag** — a recorder for everything flowing through a robot.
+
+## What it does
+
+rosbag records the messages on chosen [topics](/atlas/concept/ros-topic) — camera images, lidar scans, commands, transforms — into a file, each stamped with its time. Later, `ros2 bag play` replays them **with the original timing**, so downstream nodes see the data exactly as it happened live. It's effectively a DVR for a robot's data.
+
+```diagram
+{ "type": "flow", "title": "Capture live, replay anytime", "nodes": ["Live robot topics", "ros2 bag record", "Bag file", "ros2 bag play → same data"], "caption": "Record once from the real robot; replay endlessly on your laptop. Downstream nodes can't tell the difference between live and replayed data." }
+```
+
+## Why it's indispensable
+
+- **Debug offline.** Capture a rare failure once, then replay it as many times as you need — no reproducing the fault on hardware.
+- **Repeatable testing.** Run competing perception or planning algorithms against the *identical* recorded run for a fair comparison.
+- **Data collection.** Bags are how teams gather real-world datasets to train and evaluate models (part of the [sim-to-real](/atlas/concept/sim-to-real) and learning pipeline).
+- **Development without hardware.** Work on the planner using yesterday's recorded sensor data while the robot is busy or unavailable.
+
+## Practical notes
+
+`ros2 bag record -a` grabs everything (careful — camera and lidar bags get huge fast), or name specific topics to keep it small. `ros2 bag info` summarizes a recording. Replay pairs naturally with [RViz](/atlas/concept/rviz) to *watch* a past run. The ROS 2 version (rosbag2) supports pluggable storage formats and compression.
+
+## Why it matters
+
+rosbag turns fleeting live data into a reusable asset. It's the backbone of debugging, testing, and dataset collection in robotics — the reason engineers can iterate on real-world behavior without the robot in front of them.
+
+## Related
+
+[ROS topic](/atlas/concept/ros-topic) · [ROS 2](/atlas/concept/ros2) · [RViz](/atlas/concept/rviz) · [Sim-to-real](/atlas/concept/sim-to-real)

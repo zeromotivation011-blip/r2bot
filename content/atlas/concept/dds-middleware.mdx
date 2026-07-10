@@ -1,0 +1,74 @@
+---
+title: DDS Middleware
+slug: dds-middleware
+bucket: concept
+category: control
+summary: >-
+  DDS is the industrial-grade messaging layer under ROS 2 — a decentralized, real-time
+  publish–subscribe system with no central master, built-in discovery, and configurable
+  reliability, which is what makes ROS 2 fit for production robots.
+difficulty: 3
+tags:
+  - software
+  - ros2
+  - middleware
+seeAlso:
+  - ros2
+  - publish-subscribe
+  - quality-of-service
+  - ros-topic
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Data Distribution Service (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Data_Distribution_Service'
+  - title: 'ROS 2 design — ROS on DDS'
+    url: 'https://design.ros2.org/articles/ros_on_dds.html'
+laymanExplanation: >-
+  DDS is the plumbing under ROS 2 that actually moves messages between programs. It's a proven,
+  industrial system with no central hub, automatic discovery of who's talking, and knobs to trade
+  speed for reliability.
+technicalDefinition: >-
+  DDS (Data Distribution Service) is an OMG-standard decentralized publish–subscribe middleware
+  providing peer discovery, QoS policies, and real-time data delivery, used as ROS 2's transport.
+quizQuestion:
+  q: A key advantage DDS brings to ROS 2 is…
+  options:
+    - A single central master node
+    - Decentralized peer-to-peer discovery with no master
+    - Slower communication
+    - No message types
+  answer: 1
+  explanation: >-
+    DDS provides peer-to-peer discovery and delivery with no central master — removing ROS 1's
+    single point of failure and enabling real-time, multi-robot operation.
+---
+
+The biggest change from ROS 1 to [ROS 2](/atlas/concept/ros2) isn't visible in your code — it's the plumbing underneath. ROS 2 replaced its custom transport with **DDS**, and that decision is why ROS 2 is trusted on real, production robots.
+
+## What it is
+
+DDS (**Data Distribution Service**) is a mature, standardized **[publish–subscribe](/atlas/concept/publish-subscribe) middleware** — the layer that actually carries messages between programs. It comes from aerospace and defense, where it's run mission-critical systems for two decades. ROS 2 sits on top of it: when your [nodes](/atlas/concept/ros-node) exchange messages on [topics](/atlas/concept/ros-topic), DDS is doing the real work of delivering them.
+
+```diagram
+{ "type": "flow", "title": "ROS 2 rides on DDS", "nodes": ["ROS 2 node", "ROS client library", "DDS middleware", "Network / other nodes"], "caption": "Your ROS code talks to a client library, which talks to DDS, which handles discovery, delivery, and reliability across the network." }
+```
+
+## What it gives ROS 2
+
+- **No master.** ROS 1 needed a central master to connect nodes — a single point of failure. DDS uses **peer-to-peer discovery**: nodes find each other automatically, so any node can come and go independently.
+- **[Quality of Service](/atlas/concept/quality-of-service).** DDS lets each stream be tuned — reliable vs best-effort, keep-last vs keep-all, deadlines and liveliness — so a robot can prioritize a control command over a video frame.
+- **Real-time capable.** With the right DDS implementation, ROS 2 can meet real-time deadlines.
+- **Security.** DDS-Security adds authentication and encryption, built in rather than bolted on.
+- **Native multi-robot.** Domain IDs partition the network, so fleets coexist cleanly.
+
+## The trade-offs
+
+DDS is powerful but adds complexity: there are multiple vendor implementations (Fast DDS, Cyclone DDS), discovery can flood large networks, and its QoS knobs are the very thing that trip up beginners when a publisher and subscriber silently fail to connect. ROS 2 abstracts most of it, but a serious deployment still tunes the DDS layer.
+
+## Why it matters
+
+DDS is the foundation that turned ROS from a research tool into production-capable robotics middleware. Understanding that ROS 2 *is DDS underneath* explains its biggest strengths — decentralization, real-time, security — and its quirks.
+
+## Related
+
+[ROS 2](/atlas/concept/ros2) · [Publish–subscribe](/atlas/concept/publish-subscribe) · [Quality of service](/atlas/concept/quality-of-service) · [ROS topic](/atlas/concept/ros-topic)

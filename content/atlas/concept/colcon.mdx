@@ -1,0 +1,79 @@
+---
+title: colcon
+slug: colcon
+bucket: concept
+category: control
+summary: >-
+  colcon is the build tool that compiles a ROS 2 workspace — resolving dependencies between many
+  packages and building them in the right order, the everyday command that turns source code into
+  a runnable robot.
+difficulty: 2
+tags:
+  - software
+  - ros2
+  - tooling
+seeAlso:
+  - ros2
+  - ros-node
+  - ros-topic
+  - rosbag
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'colcon documentation'
+    url: 'https://colcon.readthedocs.io/'
+  - title: 'ROS 2 — Using colcon to build packages'
+    url: 'https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html'
+laymanExplanation: >-
+  colcon is the command you run to build a ROS 2 project. A robot's software is made of many
+  packages, and colcon figures out the correct order to build them and compiles them all together.
+technicalDefinition: >-
+  colcon is a command-line meta-build tool that builds, tests, and manages collections of ROS 2
+  (and other) packages, resolving inter-package dependencies and build order.
+quizQuestion:
+  q: colcon is used to…
+  options:
+    - Charge the robot
+    - Build a ROS 2 workspace of packages in dependency order
+    - Stream camera data
+    - Plan robot paths
+  answer: 1
+  explanation: >-
+    colcon compiles a workspace of many packages, resolving their dependencies and building them in
+    the correct order.
+---
+
+A ROS 2 robot's software isn't one project — it's a **workspace** of many packages (drivers, message definitions, nodes, libraries) that depend on each other. The tool that builds them all correctly is **colcon**.
+
+## What it does
+
+`colcon build` scans your workspace, works out the **dependency graph** between packages (this node needs those messages, which need that library), and builds them in the right order. It replaced ROS 1's `catkin_make`, and it's the command every ROS 2 developer runs dozens of times a day.
+
+```diagram
+{ "type": "flow", "title": "Source packages to a runnable workspace", "nodes": ["Many source packages", "colcon resolves order", "Build each in sequence", "Sourced, runnable workspace"], "caption": "colcon figures out what depends on what, builds accordingly, and produces an install space you 'source' to run your nodes." }
+```
+
+## The everyday workflow
+
+A typical ROS 2 cycle:
+
+1. `colcon build` — compile the workspace (or `--packages-select my_pkg` to build just one).
+2. `source install/setup.bash` — make the freshly built packages available to your shell.
+3. `ros2 run` / `ros2 launch` — start your [nodes](/atlas/concept/ros-node).
+
+Handy options include `--symlink-install` (edit Python/config files without rebuilding), parallel builds across packages, and `colcon test` to run a package's tests.
+
+## Why it matters in practice
+
+- **Scales to big projects.** Real robots have dozens or hundreds of packages; colcon manages the build so you don't hand-order it.
+- **Language-agnostic.** It builds C++ (via CMake/ament) and Python packages in the same workspace.
+- **Isolated and reproducible.** Each package builds cleanly, and the resulting install space is what you deploy.
+
+The common beginner stumbles are forgetting to **source** the workspace after building (so `ros2 run` can't find the node), and building from the wrong directory — both quick to learn.
+
+## Why it matters
+
+colcon is the unglamorous but essential command that turns a ROS 2 codebase into a running robot. Every ROS 2 project passes through it, so knowing the build-source-run loop is day-one knowledge for ROS development.
+
+## Related
+
+[ROS 2](/atlas/concept/ros2) · [ROS node](/atlas/concept/ros-node) · [ROS topic](/atlas/concept/ros-topic) · [rosbag](/atlas/concept/rosbag)

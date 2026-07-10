@@ -1,0 +1,79 @@
+---
+title: ROS Topic
+slug: ros-topic
+bucket: concept
+category: control
+summary: >-
+  A ROS topic is a named channel that carries a continuous stream of messages between nodes — how
+  a robot's sensor data, commands, and state flow through its software, one publish–subscribe pipe
+  at a time.
+difficulty: 2
+tags:
+  - software
+  - ros2
+  - middleware
+seeAlso:
+  - ros-node
+  - publish-subscribe
+  - ros-service
+  - quality-of-service
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ROS 2 concepts — Topics'
+    url: 'https://docs.ros.org/'
+  - title: 'Understanding ROS 2 topics'
+    url: 'https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics.html'
+laymanExplanation: >-
+  A ROS topic is a named pipe for data — like '/camera/image' or '/cmd_vel'. One program pumps
+  messages in, others read them out. It's how streaming data moves around a robot's software.
+technicalDefinition: >-
+  A ROS topic is a named, typed channel over which nodes exchange messages using the
+  publish–subscribe pattern, carrying continuous data streams.
+quizQuestion:
+  q: A ROS topic is best suited for…
+  options:
+    - A one-time request that returns an answer
+    - Continuous streaming data like sensor feeds
+    - Storing the battery percentage permanently
+    - Charging the robot
+  answer: 1
+  explanation: >-
+    Topics carry ongoing streams (sensor data, velocity commands) via publish–subscribe; one-time
+    queries use services instead.
+---
+
+If [nodes](/atlas/concept/ros-node) are a robot's programs, **topics** are the pipes between them — the named channels that carry the constant flow of sensor data, commands, and state.
+
+## What it is
+
+A ROS topic is a **named, typed channel**. A node *publishes* messages onto it; other nodes *subscribe* to receive them — the [publish–subscribe](/atlas/concept/publish-subscribe) pattern in action. The name (like `/scan`, `/camera/image`, `/cmd_vel`) is how everyone finds it, and the **message type** (e.g. `sensor_msgs/LaserScan`) defines the data's structure so publisher and subscriber agree on the format.
+
+```diagram
+{ "type": "flow", "title": "Data streams along named topics", "nodes": ["Lidar node → /scan", "SLAM subscribes /scan", "Planner → /cmd_vel", "Motor node subscribes /cmd_vel"], "caption": "Each topic is one typed stream. Nodes connect by publishing to and subscribing from topic names, never to each other directly." }
+```
+
+## Topics vs services vs actions
+
+Choosing the right mechanism matters:
+
+- **Topics** — *continuous streams*: sensor feeds, velocity commands, robot state. Fire-and-forget, many-to-many.
+- **[Services](/atlas/concept/ros-service)** — *quick request/response*: "reset the map," "is the gripper open?" One-shot, blocking.
+- **Actions** — *long goals with feedback*: "navigate to the kitchen," which takes time and can report progress or be cancelled.
+
+Sensor and command data almost always flow over topics.
+
+## The gotcha: QoS
+
+In ROS 2, every topic has a **[Quality of Service](/atlas/concept/quality-of-service)** profile — reliability, durability, history depth — and a publisher and subscriber only connect if their profiles are compatible. The classic beginner bug is a running publisher and running subscriber that never exchange a message because their QoS settings don't match. Sensor streams typically use "best-effort," commands use "reliable."
+
+## Everyday tools
+
+The command line makes topics tangible: `ros2 topic list` shows every channel, `ros2 topic echo /scan` prints live messages, and `ros2 topic hz /scan` measures the rate — the first things anyone reaches for when debugging a robot.
+
+## Why it matters
+
+Topics are the circulatory system of a ROS robot — the streams that carry data from sensors through perception and planning to the motors. Understanding topics (and their QoS) is fundamental to building or debugging any ROS system.
+
+## Related
+
+[ROS node](/atlas/concept/ros-node) · [Publish–subscribe](/atlas/concept/publish-subscribe) · [ROS service](/atlas/concept/ros-service) · [Quality of service](/atlas/concept/quality-of-service)

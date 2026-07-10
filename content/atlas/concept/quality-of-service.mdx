@@ -1,0 +1,74 @@
+---
+title: Quality of Service (QoS)
+slug: quality-of-service
+bucket: concept
+category: control
+summary: >-
+  Quality of Service is the set of policies that tune how ROS 2 delivers each message stream —
+  reliable or best-effort, latched or not — and the number-one reason a running publisher and
+  subscriber sometimes exchange nothing at all.
+difficulty: 3
+tags:
+  - software
+  - ros2
+  - middleware
+seeAlso:
+  - ros-topic
+  - dds-middleware
+  - publish-subscribe
+  - ros2
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ROS 2 — About Quality of Service settings'
+    url: 'https://docs.ros.org/en/humble/Concepts/About-Quality-of-Service-Settings.html'
+  - title: 'DDS QoS policies (OMG)'
+    url: 'https://en.wikipedia.org/wiki/Data_Distribution_Service'
+laymanExplanation: >-
+  Quality of Service is a set of dials on each ROS 2 data stream that control how it's delivered —
+  guaranteed like a TCP download, or fast-and-lossy like live video. If a publisher and subscriber
+  set these dials differently, they may never connect.
+technicalDefinition: >-
+  QoS is a collection of DDS-derived policies (reliability, durability, history, deadline,
+  liveliness) that govern message delivery per topic in ROS 2; publisher and subscriber profiles
+  must be compatible to connect.
+quizQuestion:
+  q: A common cause of "publisher and subscriber both running but no messages" in ROS 2 is…
+  options:
+    - The battery is low
+    - Incompatible QoS settings between them
+    - The wrong paint color
+    - Too many motors
+  answer: 1
+  explanation: >-
+    If the QoS profiles (e.g. reliability) of publisher and subscriber don't match, DDS won't
+    connect them and no messages flow.
+---
+
+Here's a ROS 2 mystery that stumps nearly every beginner: the publisher is running, the subscriber is running, `ros2 topic list` shows the topic — and no messages arrive. The culprit is almost always **Quality of Service**.
+
+## What it is
+
+Because ROS 2 runs on [DDS](/atlas/concept/dds-middleware), every [topic](/atlas/concept/ros-topic) has a **QoS profile** — a set of policies controlling *how* messages are delivered. A publisher and a subscriber only connect if their profiles are **compatible**. Mismatch them and DDS quietly refuses to link them, with no error and no data.
+
+```diagram
+{ "type": "flow", "title": "Profiles must match to connect", "nodes": ["Publisher QoS", "Compatible?", "Subscriber QoS", "Messages flow only if yes"], "caption": "QoS is negotiated per connection. If reliability or durability don't line up, the link never forms — the silent failure that trips up newcomers." }
+```
+
+## The policies that matter
+
+- **Reliability** — `RELIABLE` (retransmit until delivered, like TCP) vs `BEST_EFFORT` (fire and forget, like UDP). A best-effort publisher won't match a reliable subscriber. Sensor streams use best-effort; commands use reliable.
+- **Durability** — `VOLATILE` (only future messages) vs `TRANSIENT_LOCAL` (latch the last message so late-joining subscribers still receive it). This is how `/map` and `/tf_static` reach nodes that start afterward.
+- **History & depth** — `KEEP_LAST` with a queue size N, or `KEEP_ALL` — your buffer against bursts.
+- **Deadline & Liveliness** — contracts that let a node detect "I've stopped hearing from this publisher," the basis of failure detection.
+
+## Doing it right
+
+The practical advice: don't hand-roll QoS. ROS 2 ships **presets** — `SensorDataQoS()` (best-effort, shallow queue) for high-rate sensor feeds, `SystemDefaultsQoS()` and reliable defaults for commands and services. Match a subscriber's QoS to the publisher it's reading. When debugging a dead topic, checking QoS compatibility should be the very first step.
+
+## Why it matters
+
+QoS is the price and the power of ROS 2's DDS foundation — it lets a robot prioritize a safety command over a dropped video frame, but it also introduces the most common "why is nothing working?" trap. Understanding it is essential to building reliable ROS 2 systems.
+
+## Related
+
+[ROS topic](/atlas/concept/ros-topic) · [DDS middleware](/atlas/concept/dds-middleware) · [Publish–subscribe](/atlas/concept/publish-subscribe) · [ROS 2](/atlas/concept/ros2)

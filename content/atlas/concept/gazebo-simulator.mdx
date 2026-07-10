@@ -1,0 +1,76 @@
+---
+title: Gazebo Simulator
+slug: gazebo-simulator
+bucket: concept
+category: control
+summary: >-
+  Gazebo is the physics simulator that lets roboticists test a full robot — sensors, motors, and
+  world — in software before touching hardware, saving time, money, and broken robots.
+difficulty: 2
+tags:
+  - software
+  - simulation
+  - ros2
+seeAlso:
+  - ros2
+  - urdf
+  - sim-to-real
+  - rviz
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Gazebo documentation'
+    url: 'https://gazebosim.org/'
+  - title: 'ROS 2 and Gazebo integration'
+    url: 'https://docs.ros.org/'
+laymanExplanation: >-
+  Gazebo is a virtual world with realistic physics where a robot can be tested as if it were real —
+  its sensors see simulated surroundings and its motors push against simulated gravity — so you can
+  develop and debug without risking real hardware.
+technicalDefinition: >-
+  Gazebo is a 3D robotics simulator with a physics engine that models rigid-body dynamics, sensors,
+  and environments, integrating with ROS to test robot software in simulation.
+quizQuestion:
+  q: Unlike RViz, Gazebo…
+  options:
+    - Only shows recorded data
+    - Simulates physics to generate sensor data as if from the real world
+    - Charges the battery
+    - Compiles code
+  answer: 1
+  explanation: >-
+    Gazebo runs a physics engine that generates realistic sensor data and robot dynamics; RViz only
+    visualizes existing data.
+---
+
+Testing new robot software on real hardware is slow and risky — a bug can break an expensive machine or hurt someone. **Gazebo** lets you test the whole robot in a physically realistic virtual world first.
+
+## What it does
+
+Gazebo runs a **physics engine** that simulates gravity, friction, contacts, and rigid-body dynamics, plus models of the robot's **sensors** (lidar, cameras, [IMU](/atlas/concept/imu)) and its **motors**. Load your robot's [URDF](/atlas/concept/urdf) into a virtual environment and it behaves much like the real thing: its simulated lidar "sees" simulated walls, its wheels push against simulated ground, and your [ROS 2](/atlas/concept/ros2) nodes drive it exactly as they would drive hardware.
+
+```diagram
+{ "type": "flow", "title": "A virtual robot your real code can drive", "nodes": ["Robot model (URDF)", "Physics + sensor simulation", "Publishes sensor topics", "Your ROS nodes control it"], "caption": "Gazebo generates realistic sensor data and responds to motor commands with physics — so the same software stack runs against simulation or the real robot." }
+```
+
+## RViz vs Gazebo — don't confuse them
+
+A classic beginner mix-up: **[RViz](/atlas/concept/rviz) visualizes** what the robot *believes* (its published data); **Gazebo simulates** a world to *generate* that data. RViz has no physics; Gazebo has a full physics engine. You often run both — Gazebo produces the sensor streams, RViz shows what the robot makes of them.
+
+## Why it's essential
+
+- **Safe, fast iteration.** Crash the robot in sim a hundred times at no cost; test edge cases you'd never dare on hardware.
+- **Develop without hardware.** Whole teams work before the physical robot exists or while it's occupied.
+- **Reproducible testing.** Run the identical scenario repeatedly for regression testing.
+- **[Sim-to-real](/atlas/concept/sim-to-real) and learning.** Train and validate controllers in simulation, then transfer to hardware — the backbone of modern robot learning (with heavier physics engines like Isaac Sim and MuJoCo for large-scale RL).
+
+## The caveat
+
+Simulation is never perfect — the **sim-to-real gap** means friction, sensor noise, and contact behave slightly differently in reality. Good practice narrows the gap (domain randomization, careful modeling) and always validates on hardware before trusting a result.
+
+## Why it matters
+
+Gazebo is where most robot software is born and debugged. It turns risky, slow hardware testing into fast, safe, repeatable virtual testing — an indispensable part of the modern robotics workflow.
+
+## Related
+
+[ROS 2](/atlas/concept/ros2) · [URDF](/atlas/concept/urdf) · [Sim-to-real](/atlas/concept/sim-to-real) · [RViz](/atlas/concept/rviz)

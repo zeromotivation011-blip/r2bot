@@ -1,0 +1,77 @@
+---
+title: RViz
+slug: rviz
+bucket: concept
+category: control
+summary: >-
+  RViz is ROS's 3D visualization tool — it shows what a robot sees and thinks, from lidar scans and
+  camera feeds to planned paths and coordinate frames, making the invisible state of a robot
+  visible for debugging.
+difficulty: 2
+tags:
+  - software
+  - ros2
+  - tooling
+seeAlso:
+  - ros2
+  - tf-transform
+  - rosbag
+  - point-cloud
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'RViz (ROS wiki)'
+    url: 'http://wiki.ros.org/rviz'
+  - title: 'ROS 2 — RViz user guide'
+    url: 'https://docs.ros.org/'
+laymanExplanation: >-
+  RViz is a 3D window that shows what a robot is sensing and planning — its lidar points, camera
+  image, the map, and where it intends to go. It turns a robot's invisible internal data into
+  something you can see and debug.
+technicalDefinition: >-
+  RViz is a 3D visualization tool for ROS that renders sensor data, robot models, transforms, and
+  algorithm output subscribed from live or recorded topics.
+quizQuestion:
+  q: RViz is primarily used to…
+  options:
+    - Physically move the robot
+    - Visualize a robot's sensor data and internal state in 3D
+    - Charge the battery
+    - Compile code
+  answer: 1
+  explanation: >-
+    RViz renders topics — lidar, camera, transforms, paths — in 3D so engineers can see what the
+    robot perceives and plans. It visualizes, it doesn't simulate physics.
+---
+
+A robot's inner life is invisible — streams of numbers for lidar points, transforms, and plans. **RViz** turns all of it into a 3D picture you can actually look at, and it's the first tool most engineers open when something's wrong.
+
+## What it does
+
+RViz subscribes to [topics](/atlas/concept/ros-topic) and **renders them in 3D**: the lidar's [point cloud](/atlas/concept/point-cloud), the camera image, the robot's own model (from its [URDF](/atlas/concept/urdf)), the [tf](/atlas/concept/tf-transform) coordinate frames, the occupancy map, the planned path, detected objects. You assemble a view by adding "displays," each tied to a topic. Whatever the robot is publishing, RViz can show.
+
+```diagram
+{ "type": "flow", "title": "Topics in, 3D picture out", "nodes": ["Robot publishes topics", "RViz subscribes", "Renders in 3D", "Engineer sees + debugs"], "caption": "RViz is a window onto the robot's data — lidar, frames, paths, maps — overlaid in one 3D scene so mismatches jump out visually." }
+```
+
+## Why it's essential for debugging
+
+Most robot bugs are spatial, and RViz makes them obvious:
+
+- A [transform](/atlas/concept/tf-transform) is wrong? The lidar points appear rotated or floating off the robot.
+- The map is misaligned? You see it drift against the scan.
+- The planner picked a weird path? It's drawn right there.
+- A sensor is dead? Its display goes empty.
+
+Pair RViz with [rosbag](/atlas/concept/rosbag) and you can *replay and watch* a past run frame by frame — the standard way to diagnose a failure after the fact.
+
+## RViz vs Gazebo — a key distinction
+
+Beginners often confuse them. **RViz visualizes** what the robot *believes* (its published data); **[Gazebo](/atlas/concept/gazebo-simulator) simulates** physics to *generate* data as if from a real world. RViz doesn't move the robot or model gravity — it's a viewer, not a simulator. You often run both: Gazebo produces sensor data, RViz shows what the robot makes of it.
+
+## Why it matters
+
+RViz is the eyes of a ROS developer — the tool that makes a robot's perception, transforms, and plans visible. Fluency with it is one of the most practical, everyday skills in robotics development.
+
+## Related
+
+[ROS 2](/atlas/concept/ros2) · [tf transforms](/atlas/concept/tf-transform) · [rosbag](/atlas/concept/rosbag) · [Point cloud](/atlas/concept/point-cloud)

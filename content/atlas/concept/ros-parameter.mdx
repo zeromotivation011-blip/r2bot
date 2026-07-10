@@ -1,0 +1,76 @@
+---
+title: ROS Parameter
+slug: ros-parameter
+bucket: concept
+category: control
+summary: >-
+  A ROS parameter is a named configuration value a node exposes — a gain, a frame name, a topic —
+  that can be set at launch and changed at runtime, so the same code adapts to different robots
+  without recompiling.
+difficulty: 2
+tags:
+  - software
+  - ros2
+  - configuration
+seeAlso:
+  - ros-node
+  - ros2
+  - ros-topic
+  - pid-controller
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ROS 2 concepts — Parameters'
+    url: 'https://docs.ros.org/'
+  - title: 'Understanding ROS 2 parameters'
+    url: 'https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Parameters.html'
+laymanExplanation: >-
+  A ROS parameter is a setting for a program — like a PID gain or a camera frame rate — that you
+  can change without editing and rebuilding the code. Set it when the node starts, or tweak it
+  while the robot runs.
+technicalDefinition: >-
+  A ROS parameter is a typed, named configuration value associated with a node, settable at launch
+  or runtime, used to configure behavior without changing code.
+quizQuestion:
+  q: ROS parameters let you…
+  options:
+    - Stream camera frames
+    - Configure a node's settings without recompiling
+    - Charge the battery
+    - Replace the motors
+  answer: 1
+  explanation: >-
+    Parameters hold configuration values (gains, frame names, limits) that can be set at launch or
+    tuned at runtime without editing and rebuilding code.
+---
+
+The same [node](/atlas/concept/ros-node) — a motor controller, a camera driver — often has to run on different robots with different settings: a different [PID](/atlas/concept/pid-controller) gain, a different frame name, a different speed limit. **ROS parameters** are how it adapts without touching the code.
+
+## What it is
+
+A parameter is a **named, typed configuration value** a node exposes — a number, string, boolean, or list. Instead of hard-coding "max speed = 1.2 m/s," the node reads it from a parameter named `max_speed`. You can set parameters:
+
+- **At launch**, from a YAML config file (the common way to configure a whole robot).
+- **At runtime**, via the command line or another node, and a well-written node can react to the change immediately.
+
+```diagram
+{ "type": "flow", "title": "Configure without recompiling", "nodes": ["YAML config / CLI", "Set node parameter", "Node reads value", "Behavior changes"], "caption": "One codebase, many robots: parameters carry the per-robot settings, so the same node behaves correctly everywhere without a rebuild." }
+```
+
+## Why it matters for real robots
+
+- **Reusability.** A generic lidar driver works on any robot; parameters supply the specific port, frame, and rate.
+- **Tuning without rebuilds.** Adjust a control gain live while the robot runs, watch the effect, and settle on a value — no compile cycle.
+- **Reproducibility.** A YAML file captures a robot's entire configuration, versioned alongside the code, so a setup is repeatable.
+- **Deployment.** The same software ships to a fleet; each unit's parameters localize it.
+
+## In practice
+
+`ros2 param list` shows a node's parameters, `ros2 param get /node name` reads one, and `ros2 param set /node name value` changes it live. Launch files load parameter YAMLs so an entire multi-node system comes up correctly configured. ROS 2 also supports parameter callbacks (to validate or react to changes) and declaring parameters with descriptions and bounds.
+
+## Why it matters
+
+Parameters are how ROS separates **code** from **configuration** — the reason one well-written node serves many robots and many situations. They're fundamental to building reusable, tunable, deployable robot software.
+
+## Related
+
+[ROS node](/atlas/concept/ros-node) · [ROS 2](/atlas/concept/ros2) · [ROS topic](/atlas/concept/ros-topic) · [PID controller](/atlas/concept/pid-controller)

@@ -1,0 +1,75 @@
+---
+title: MoveIt
+slug: moveit
+bucket: concept
+category: control
+summary: >-
+  MoveIt is the ROS motion-planning framework for robot arms — it takes "put the gripper here" and
+  produces a collision-free, executable joint trajectory, bundling kinematics, planning, and
+  collision checking into one system.
+difficulty: 3
+tags:
+  - software
+  - ros2
+  - manipulation
+seeAlso:
+  - inverse-kinematics
+  - rapidly-exploring-random-tree
+  - ros-action
+  - urdf
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'MoveIt documentation'
+    url: 'https://moveit.ros.org/'
+  - title: 'MoveIt 2 (GitHub)'
+    url: 'https://github.com/moveit/moveit2'
+laymanExplanation: >-
+  MoveIt is a ready-made planning brain for robot arms. Tell it where you want the hand to go and it
+  works out the joint angles, plans a path that avoids collisions, and hands back a motion the robot
+  can execute.
+technicalDefinition: >-
+  MoveIt is a ROS motion-planning framework integrating inverse kinematics, sampling-based planners,
+  collision checking, and trajectory execution for manipulators.
+quizQuestion:
+  q: MoveIt's main job is to…
+  options:
+    - Charge the arm's battery
+    - Plan collision-free arm motions to a target
+    - Stream camera frames
+    - Localize a mobile robot
+  answer: 1
+  explanation: >-
+    MoveIt plans collision-free trajectories for manipulators, combining IK, planning, and collision
+    checking, then executes them.
+---
+
+If [Nav2](/atlas/concept/nav2) is the navigation framework for mobile robots, **MoveIt** is its counterpart for **arms** — the standard [ROS](/atlas/concept/ros2) system that turns "move the gripper to this pose" into a safe, executable motion.
+
+## What it does
+
+Give MoveIt a target — a pose for the end-effector, or a set of joint angles — and it produces a **collision-free trajectory** to get there. Doing so requires stitching together several hard problems, which MoveIt integrates:
+
+- **[Inverse kinematics](/atlas/concept/inverse-kinematics)** — find joint angles that place the hand at the target.
+- **Motion planning** — find a path through the arm's [configuration space](/atlas/concept/configuration-space) that avoids obstacles (using [RRT](/atlas/concept/rapidly-exploring-random-tree)-family planners via OMPL).
+- **Collision checking** — ensure the whole arm avoids the environment, obstacles, and itself.
+- **Execution** — send the trajectory to the controllers (as a [ROS action](/atlas/concept/ros-action)) and monitor it.
+
+```diagram
+{ "type": "flow", "title": "From target pose to safe arm motion", "nodes": ["Target pose", "Solve IK", "Plan collision-free path", "Execute trajectory"], "caption": "MoveIt combines kinematics, planning, and collision checking so a request as simple as 'go here' yields a motion the arm can safely perform." }
+```
+
+## Why teams use it
+
+Building arm motion from scratch means implementing IK, a planner, a collision engine, and controller integration — months of work. MoveIt provides all of it, configured to your specific arm through its [URDF](/atlas/concept/urdf) and a setup wizard. It supports many robot arms out of the box, offers an interactive [RViz](/atlas/concept/rviz) plugin to drag the goal and preview plans, and exposes a clean API for programmatic use.
+
+## What it enables
+
+Pick-and-place, bin picking, welding, inspection, and any task where an arm must reach targets without hitting things. MoveIt also handles planning around a live perceived scene (attaching objects to the gripper, adding obstacles from a depth camera), and its MoveIt 2 version brings this to ROS 2 with real-time-friendly components.
+
+## Why it matters
+
+MoveIt is the de-facto motion-planning framework for manipulators — the reason building a capable robot arm application is a matter of configuration and integration rather than reinventing kinematics and planning. It's foundational to the ROS manipulation ecosystem.
+
+## Related
+
+[Inverse kinematics](/atlas/concept/inverse-kinematics) · [RRT](/atlas/concept/rapidly-exploring-random-tree) · [ROS action](/atlas/concept/ros-action) · [URDF](/atlas/concept/urdf)

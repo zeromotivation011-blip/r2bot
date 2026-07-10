@@ -1,0 +1,76 @@
+---
+title: Nav2
+slug: nav2
+bucket: concept
+category: control
+summary: >-
+  Nav2 is the ROS 2 navigation stack — the batteries-included framework that takes a mobile robot
+  from "go to that point" to actually driving there safely, handling localization, planning,
+  obstacle avoidance, and recovery.
+difficulty: 3
+tags:
+  - software
+  - ros2
+  - navigation
+seeAlso:
+  - ros2
+  - monte-carlo-localization
+  - a-star-algorithm
+  - costmap
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Nav2 documentation'
+    url: 'https://docs.nav2.org/'
+  - title: 'Macenski et al. — The Marathon 2 (Nav2)'
+    url: 'https://arxiv.org/abs/2003.00368'
+laymanExplanation: >-
+  Nav2 is a ready-made navigation brain for wheeled robots on ROS 2. You give it a goal and a map,
+  and it figures out where the robot is, plans a route, avoids obstacles as it drives, and recovers
+  if it gets stuck.
+technicalDefinition: >-
+  Nav2 is the ROS 2 navigation framework providing localization, global and local planning, control,
+  costmaps, behavior-tree orchestration, and recovery behaviors for mobile robots.
+quizQuestion:
+  q: Nav2 is best described as…
+  options:
+    - A single pathfinding algorithm
+    - A complete navigation framework (localize, plan, avoid, recover)
+    - A battery charger
+    - A camera driver
+  answer: 1
+  explanation: >-
+    Nav2 ties together localization, global/local planning, control, costmaps, and recovery into a
+    full navigation system, orchestrated by a behavior tree.
+---
+
+Getting a mobile robot to reliably drive across a building involves localization, mapping, planning, obstacle avoidance, and error recovery — a huge amount to build from scratch. **Nav2** provides it all as an integrated [ROS 2](/atlas/concept/ros2) framework.
+
+## What it ties together
+
+Nav2 orchestrates the whole navigation pipeline:
+
+- **Localization** — where am I on the map? (typically [Monte Carlo localization](/atlas/concept/monte-carlo-localization)/AMCL, or a SLAM source).
+- **Global planning** — a route from here to the goal across the map ([A*](/atlas/concept/a-star-algorithm), Hybrid-A\*, and other Smac planners).
+- **Local planning / control** — moment-to-moment commands that follow the route while dodging obstacles.
+- **[Costmaps](/atlas/concept/costmap)** — layered representations of where it's safe to drive, updated live from sensors.
+- **Recovery behaviors** — what to do when stuck (back up, spin, clear the costmap, re-plan).
+
+```diagram
+{ "type": "flow", "title": "From goal to safe motion", "nodes": ["Goal + map", "Localize", "Global + local plan", "Drive, avoid, recover"], "caption": "Nav2 runs the full loop continuously: localize, plan, follow, and — if things go wrong — trigger recovery, all coordinated by a behavior tree." }
+```
+
+## The behavior-tree brain
+
+A defining feature of Nav2 is that its high-level logic is a **behavior tree** — a flexible, editable structure deciding "plan, then follow; if blocked, try recovery A, then B." This makes the navigation logic configurable without rewriting code, and is why Nav2 can be tailored from a warehouse robot to a sidewalk delivery bot.
+
+## Why it matters in practice
+
+Nav2 is the de-facto standard for ROS 2 mobile-robot navigation, battle-tested on real fleets (its predecessor drove a robot a full marathon distance autonomously). Using it, a team configures planners, tunes costmap layers and robot footprint, and exposes navigation as a [ROS action](/atlas/concept/ros-action) — rather than reinventing the entire stack. It's commanded simply: send a `NavigateToPose` goal and monitor progress.
+
+## Why it matters
+
+Nav2 turns "make my robot navigate" from a multi-year project into a configuration exercise. It packages decades of navigation research into a maintained, production framework — the foundation most ROS 2 mobile robots build on.
+
+## Related
+
+[ROS 2](/atlas/concept/ros2) · [Monte Carlo localization](/atlas/concept/monte-carlo-localization) · [A* algorithm](/atlas/concept/a-star-algorithm) · [Costmap](/atlas/concept/costmap)

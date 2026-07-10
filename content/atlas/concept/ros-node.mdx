@@ -1,0 +1,82 @@
+---
+title: ROS Node
+slug: ros-node
+bucket: concept
+category: control
+summary: >-
+  A ROS node is a single program that does one job in a robot's software — a camera driver, a
+  planner, a controller — and talks to the others over topics and services. Nodes are the
+  building blocks of every ROS robot.
+difficulty: 2
+tags:
+  - software
+  - ros2
+  - architecture
+seeAlso:
+  - ros2
+  - ros-topic
+  - publish-subscribe
+  - ros-service
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ROS 2 concepts — Nodes'
+    url: 'https://docs.ros.org/'
+  - title: 'Understanding ROS 2 nodes'
+    url: 'https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes.html'
+laymanExplanation: >-
+  A ROS node is one small program with one job. A robot's software is built from many nodes — one
+  reads the camera, one plans the path, one drives the motors — each talking to the others through
+  shared channels.
+technicalDefinition: >-
+  A ROS node is a process that performs computation and communicates with other nodes via topics,
+  services, actions, and parameters within a ROS graph.
+quizQuestion:
+  q: A ROS node is best described as…
+  options:
+    - A physical sensor
+    - A single program doing one job that communicates with other nodes
+    - A type of battery
+    - The robot's chassis
+  answer: 1
+  explanation: >-
+    A node is one process handling a specific task, exchanging data with other nodes over topics,
+    services, and actions.
+---
+
+Open up the software of any [ROS](/atlas/concept/ros2) robot and you'll find it isn't one big program — it's a swarm of small ones, each with a single responsibility. Each of those is a **node**.
+
+## What it is
+
+A ROS node is a **single program that does one job**: one node reads the camera, another runs [SLAM](/atlas/concept/slam), another plans a path, another drives the wheels, another watches for e-stops. Each runs as its own process, and together they form the robot's software. This "many small programs" design is deliberate — it's what makes robot software modular, debuggable, and reusable.
+
+```diagram
+{ "type": "flow", "title": "Nodes cooperate through the ROS graph", "nodes": ["Camera node", "Perception node", "Planner node", "Motor node"], "caption": "Each node does one thing and passes results to the next over topics and services. Swap or restart any single node without rebuilding the whole robot." }
+```
+
+## How nodes talk
+
+A node communicates with others through four mechanisms:
+
+- **[Topics](/atlas/concept/ros-topic)** — streaming data via [publish–subscribe](/atlas/concept/publish-subscribe) (sensor feeds, commands).
+- **[Services](/atlas/concept/ros-service)** — request/response for quick queries.
+- **Actions** — long-running goals with feedback (navigate to a point).
+- **[Parameters](/atlas/concept/ros-parameter)** — configuration values it exposes.
+
+Because nodes are decoupled, you can run them on one computer or spread across several, in different languages (C++ via rclcpp, Python via rclpy), and mix and match freely.
+
+## Why this design wins
+
+- **Fault isolation.** One node crashing doesn't necessarily take down the rest.
+- **Reusability.** A well-written lidar driver node works on any robot with that lidar.
+- **Testability.** Run one node in isolation, feed it recorded data, and check its output.
+- **Teamwork.** Different engineers own different nodes without stepping on each other.
+
+In ROS 2, "lifecycle" and "composable" nodes add extra control — managed startup states and the option to run several nodes in one process for efficiency.
+
+## Why it matters
+
+The node is the atom of ROS software architecture. Every ROS robot is, at bottom, a graph of nodes exchanging messages — so understanding nodes is understanding how robot software is built.
+
+## Related
+
+[ROS 2](/atlas/concept/ros2) · [ROS topic](/atlas/concept/ros-topic) · [Publish–subscribe](/atlas/concept/publish-subscribe) · [ROS service](/atlas/concept/ros-service)

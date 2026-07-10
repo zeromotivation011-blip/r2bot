@@ -1,0 +1,79 @@
+---
+title: ROS Service
+slug: ros-service
+bucket: concept
+category: control
+summary: >-
+  A ROS service is a request–response call between nodes — one node asks a question and waits for
+  an answer, the right tool for quick, occasional commands where topics' fire-and-forget streaming
+  doesn't fit.
+difficulty: 2
+tags:
+  - software
+  - ros2
+  - middleware
+seeAlso:
+  - ros-topic
+  - ros-node
+  - ros-action
+  - ros2
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ROS 2 concepts — Services'
+    url: 'https://docs.ros.org/'
+  - title: 'Understanding ROS 2 services'
+    url: 'https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Services.html'
+laymanExplanation: >-
+  A ROS service is like a phone call between programs: one asks a question and waits for the answer,
+  then hangs up. It's for quick, occasional requests — "reset the map" — not for continuous data.
+technicalDefinition: >-
+  A ROS service is a synchronous request–response mechanism where a client sends a request to a
+  server node and blocks until it receives a response.
+quizQuestion:
+  q: A ROS service is the right choice for…
+  options:
+    - A continuous stream of camera frames
+    - A quick one-time request that returns a result
+    - Storing a map forever
+    - Powering the motors
+  answer: 1
+  explanation: >-
+    Services handle occasional request/response interactions (a query or command with a reply);
+    continuous data belongs on topics.
+---
+
+Not everything a robot's programs need to say is a continuous stream. Sometimes one [node](/atlas/concept/ros-node) needs to **ask another a question and get an answer** — "reset the map," "is the gripper open?", "compute this plan." That's a **ROS service**.
+
+## What it is
+
+A service is a **request–response** interaction. A **client** node sends a request and waits; a **server** node receives it, does the work, and sends back a response. It's synchronous and one-to-one — like a phone call, versus a [topic](/atlas/concept/ros-topic)'s radio broadcast. The service has a name (like `/reset_map`) and a defined request/response type.
+
+```diagram
+{ "type": "flow", "title": "Ask, wait, answer", "nodes": ["Client sends request", "Server processes", "Server returns response", "Client resumes"], "caption": "One question, one answer. The client blocks until the reply arrives — ideal for occasional queries and commands, not continuous data." }
+```
+
+## When to use which
+
+ROS gives three ways for nodes to interact, and picking correctly is a common judgment call:
+
+- **[Topics](/atlas/concept/ros-topic)** — continuous streams (sensor data, velocity). Don't wait, don't reply.
+- **Services** — quick request/response that finishes fast (a query, a config change, a short computation). The client waits.
+- **[Actions](/atlas/concept/ros-action)** — long-running goals that take seconds or minutes, need progress feedback, and can be cancelled (navigate somewhere, execute a trajectory).
+
+The rule of thumb: if it's fast and you need an answer, use a service; if it's slow, use an action; if it's a stream, use a topic.
+
+## The caution
+
+Because a service call **blocks** the client until it returns, calling a slow service from inside a callback can stall a node — a classic source of freezes. Services should do *quick* work; anything lengthy belongs in an action. This is also why calling a service from within another callback needs care with ROS 2's executor model.
+
+## Everyday tools
+
+`ros2 service list` shows available services, and `ros2 service call /reset_map std_srvs/srv/Empty` invokes one from the terminal — handy for triggering one-off actions while testing.
+
+## Why it matters
+
+Services are the request/response half of ROS communication — the tool for commands and queries that don't fit the streaming model. Knowing when to use a service versus a topic or action is core to designing clean robot software.
+
+## Related
+
+[ROS topic](/atlas/concept/ros-topic) · [ROS action](/atlas/concept/ros-action) · [ROS node](/atlas/concept/ros-node) · [ROS 2](/atlas/concept/ros2)

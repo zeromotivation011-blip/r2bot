@@ -1,0 +1,73 @@
+---
+title: micro-ROS
+slug: micro-ros
+bucket: concept
+category: control
+summary: >-
+  micro-ROS brings ROS 2 down onto tiny microcontrollers — the small, cheap chips that run motors
+  and sensors — so the smallest parts of a robot can speak the same language as its main computer.
+difficulty: 3
+tags:
+  - software
+  - ros2
+  - embedded
+seeAlso:
+  - ros2
+  - dds-middleware
+  - microcontroller
+  - ros-node
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'micro-ROS project'
+    url: 'https://micro.ros.org/'
+  - title: 'micro-ROS (GitHub)'
+    url: 'https://github.com/micro-ROS'
+laymanExplanation: >-
+  micro-ROS is a slimmed-down version of ROS 2 that runs on tiny microcontrollers — the little chips
+  controlling a motor or reading a sensor — so those small devices can join the robot's ROS network
+  directly instead of needing a full computer.
+technicalDefinition: >-
+  micro-ROS is a port of ROS 2 for microcontrollers, running a lightweight client over a real-time
+  OS and bridging to the DDS network via a micro-ROS agent.
+quizQuestion:
+  q: micro-ROS exists to run ROS 2 concepts on…
+  options:
+    - Supercomputers
+    - Resource-constrained microcontrollers
+    - Only in the cloud
+    - Camera sensors only
+  answer: 1
+  explanation: >-
+    micro-ROS brings ROS 2 nodes, topics, and services to tiny microcontrollers with kilobytes of
+    memory, extending the ROS graph to the embedded edge.
+---
+
+Full [ROS 2](/atlas/concept/ros2) needs a real computer — but a robot is full of **tiny microcontrollers** running individual motors, sensors, and safety circuits. **micro-ROS** lets those small chips join the ROS world directly.
+
+## The problem it solves
+
+A microcontroller (an [MCU](/atlas/concept/microcontroller)) has kilobytes of memory and no operating system in the usual sense — far too little to run standard ROS 2 and its [DDS](/atlas/concept/dds-middleware) middleware. Traditionally you'd write custom firmware and bridge it to ROS over a serial protocol. micro-ROS removes that seam: it's a **lightweight ROS 2 client** designed to fit on the MCU, so the chip can publish [topics](/atlas/concept/ros-topic), offer services, and use parameters like any other [node](/atlas/concept/ros-node).
+
+```diagram
+{ "type": "flow", "title": "ROS 2 all the way to the chip", "nodes": ["Microcontroller", "micro-ROS client", "micro-ROS agent", "Main ROS 2 DDS network"], "caption": "The tiny client on the MCU talks to an 'agent' on the main computer, which bridges it into the full DDS graph — so the chip appears as a normal ROS node." }
+```
+
+## How it works
+
+micro-ROS runs on a **real-time OS** (like FreeRTOS or Zephyr) on the microcontroller and uses a slimmed transport. Because the MCU can't run full DDS, it connects to a **micro-ROS agent** — a process on the main computer that bridges the MCU into the regular DDS network. To the rest of the robot, the microcontroller's topics and services look completely normal.
+
+## Why it matters for robots
+
+- **One ecosystem, edge to brain.** Motor controllers, sensor boards, and battery monitors become first-class ROS citizens — same messages, same tools ([rosbag](/atlas/concept/rosbag), introspection) — instead of opaque firmware.
+- **Real-time at the edge.** Time-critical control (a motor loop, a safety cutoff) runs deterministically on the MCU while still reporting into ROS.
+- **Simpler architectures.** No hand-written serial bridges for every custom board.
+
+It's increasingly used in drones, custom actuators, and sensor modules where a dedicated chip must both do hard real-time work and speak ROS.
+
+## Why it matters
+
+micro-ROS extends ROS 2 to the smallest, cheapest, most numerous parts of a robot — closing the gap between the embedded firmware world and the ROS software world so the whole machine, from chip to main computer, shares one language.
+
+## Related
+
+[ROS 2](/atlas/concept/ros2) · [DDS middleware](/atlas/concept/dds-middleware) · [Microcontroller](/atlas/concept/microcontroller) · [ROS node](/atlas/concept/ros-node)

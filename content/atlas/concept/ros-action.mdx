@@ -1,0 +1,86 @@
+---
+title: ROS Action
+slug: ros-action
+bucket: concept
+category: control
+summary: >-
+  A ROS action handles long-running goals — navigate somewhere, execute a trajectory — with live
+  progress feedback and the ability to cancel, filling the gap between fire-and-forget topics and
+  quick request-response services.
+difficulty: 3
+tags:
+  - software
+  - ros2
+  - middleware
+seeAlso:
+  - ros-service
+  - ros-topic
+  - nav2
+  - moveit
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ROS 2 concepts — Actions'
+    url: 'https://docs.ros.org/'
+  - title: 'Understanding ROS 2 actions'
+    url: 'https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Actions.html'
+laymanExplanation: >-
+  A ROS action is for tasks that take a while, like "drive to the kitchen." You send a goal, get
+  progress updates along the way, and can cancel it if you change your mind — unlike a quick
+  service call that just returns once.
+technicalDefinition: >-
+  A ROS action is an asynchronous goal-oriented interaction providing a goal request, periodic
+  feedback, a final result, and cancellation, built on topics and services.
+quizQuestion:
+  q: A ROS action is designed for tasks that…
+  options:
+    - Finish instantly
+    - Take time, need progress feedback, and may be cancelled
+    - Only stream sensor data
+    - Never return a result
+  answer: 1
+  explanation: >-
+    Actions suit long-running goals — they provide feedback during execution and support
+    cancellation, unlike a one-shot service.
+---
+
+"Navigate to the kitchen" isn't a quick question — it takes time, you want progress updates, and you might change your mind halfway. A [service](/atlas/concept/ros-service) can't do that, and a [topic](/atlas/concept/ros-topic) has no notion of a goal. The **ROS action** is built exactly for this.
+
+## What it is
+
+An action is an **asynchronous, goal-oriented** interaction with three parts:
+
+- **Goal** — the client requests something ("go to (x, y)").
+- **Feedback** — the server streams progress while it works ("2.3 m remaining").
+- **Result** — the final outcome when done ("arrived" or "failed").
+
+And critically, the client can **cancel** the goal mid-execution. Under the hood, an action is composed of topics and services, but it presents this richer lifecycle as one unit.
+
+```diagram
+{ "type": "flow", "title": "A goal with progress and an off-switch", "nodes": ["Send goal", "Receive feedback (repeated)", "Get final result", "(cancel anytime)"], "caption": "Unlike a service's single reply, an action keeps you informed while it runs and lets you abort — the model for any task that takes real time." }
+```
+
+## When to use it
+
+The three ROS interaction types map to three timescales:
+
+- **Topic** — continuous streams.
+- **Service** — instant request/response.
+- **Action** — anything **long-running** where you need progress or cancellation.
+
+If a client would be stuck waiting a long time for a service, it should be an action instead.
+
+## Where you'll see it
+
+Actions are everywhere a robot does something that *takes a while*:
+
+- **[Nav2](/atlas/concept/nav2)** exposes navigation as an action (`NavigateToPose`) — send a destination, watch progress, cancel if needed.
+- **[MoveIt](/atlas/concept/moveit)** executes arm trajectories as actions.
+- Gripper open/close, docking, and inspection routines are commonly actions.
+
+## Why it matters
+
+Actions give ROS a clean way to command **long tasks** — the everyday reality of robotics, where navigating, manipulating, and inspecting all take time and can go wrong partway. They're essential to how high-level robot behaviors are commanded and monitored.
+
+## Related
+
+[ROS service](/atlas/concept/ros-service) · [ROS topic](/atlas/concept/ros-topic) · [Nav2](/atlas/concept/nav2) · [MoveIt](/atlas/concept/moveit)

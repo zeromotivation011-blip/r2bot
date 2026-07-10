@@ -1,0 +1,76 @@
+---
+title: robot_state_publisher
+slug: robot-state-publisher
+bucket: concept
+category: control
+summary: >-
+  robot_state_publisher is the ROS node that turns a robot's joint angles into a live tree of
+  coordinate frames — the quiet bridge that lets the rest of the system know where every part of
+  the robot is in space.
+difficulty: 3
+tags:
+  - software
+  - ros2
+  - kinematics
+seeAlso:
+  - tf-transform
+  - urdf
+  - forward-kinematics
+  - rviz
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'robot_state_publisher (ROS wiki)'
+    url: 'http://wiki.ros.org/robot_state_publisher'
+  - title: 'ROS 2 — URDF and robot_state_publisher'
+    url: 'https://docs.ros.org/'
+laymanExplanation: >-
+  robot_state_publisher reads the robot's description and its current joint angles, then continuously
+  publishes where every part of the robot is. It's what lets the software know the hand is here and
+  the camera is there, moment to moment.
+technicalDefinition: >-
+  robot_state_publisher subscribes to joint states and a URDF, computes forward kinematics, and
+  publishes the resulting link transforms to the tf tree.
+quizQuestion:
+  q: robot_state_publisher converts joint angles into…
+  options:
+    - Motor currents
+    - A tree of coordinate-frame transforms (tf)
+    - Camera images
+    - Battery estimates
+  answer: 1
+  explanation: >-
+    It applies forward kinematics from the URDF to the current joint angles and publishes each
+    link's transform into the tf tree.
+---
+
+The rest of a robot's software constantly needs to know *where every part is* — the camera relative to the base, the gripper relative to the arm. Computing and broadcasting that, continuously, is the job of **robot_state_publisher**.
+
+## What it does
+
+robot_state_publisher takes two inputs — the robot's **[URDF](/atlas/concept/urdf)** description (its links and joints) and its **current joint angles** (the `/joint_states` topic) — and does the [forward kinematics](/atlas/concept/forward-kinematics): given the joint angles, where does each link end up? It then publishes every link's pose into the **[tf](/atlas/concept/tf-transform) transform tree**, updated as the robot moves.
+
+```diagram
+{ "type": "flow", "title": "Joint angles to a live frame tree", "nodes": ["URDF (structure)", "Joint states (angles)", "Forward kinematics", "Publish tf transforms"], "caption": "It marries the fixed structure (URDF) with the changing joint angles and broadcasts where every part is — so any node can ask 'where is the camera relative to the base?'" }
+```
+
+## Why it's the quiet keystone
+
+Almost everything spatial depends on it:
+
+- **[RViz](/atlas/concept/rviz)** draws the robot at the correct pose because robot_state_publisher supplies the frames.
+- **Perception** transforms a detected object from the camera frame into the base or map frame using these transforms.
+- **Manipulation and navigation** reason about the robot's geometry through the tf tree it maintains.
+
+Without it, the tf tree has gaps and half the stack breaks with "cannot find transform" errors — a very common ROS symptom that traces back to a missing or misconfigured robot_state_publisher (or an absent `/joint_states` source).
+
+## Fixed vs moving joints
+
+For **moving** joints it needs live `/joint_states` (from the real robot's [encoders](/atlas/concept/rotary-encoder) or a simulator). For **fixed** joints (a bolted-on sensor), it publishes a static transform once. A companion, `joint_state_publisher`, can supply joint values for testing when no hardware is present.
+
+## Why it matters
+
+robot_state_publisher is the unglamorous node that keeps the robot's self-model in sync with reality. It's the reason the whole system agrees on where every part of the robot is — the foundation beneath visualization, perception, and motion.
+
+## Related
+
+[tf transforms](/atlas/concept/tf-transform) · [URDF](/atlas/concept/urdf) · [Forward kinematics](/atlas/concept/forward-kinematics) · [RViz](/atlas/concept/rviz)

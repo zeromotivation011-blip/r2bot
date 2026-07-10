@@ -1,0 +1,77 @@
+---
+title: Publish–Subscribe
+slug: publish-subscribe
+bucket: concept
+category: control
+summary: >-
+  Publish–subscribe is the messaging pattern where senders broadcast data on named channels and
+  receivers listen without either knowing about the other — the decoupled backbone that lets a
+  robot's dozens of programs work together.
+difficulty: 2
+tags:
+  - software
+  - middleware
+  - ros2
+seeAlso:
+  - ros-topic
+  - ros2
+  - dds-middleware
+  - ros-node
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Publish–subscribe pattern (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern'
+  - title: 'ROS 2 concepts — Topics'
+    url: 'https://docs.ros.org/'
+laymanExplanation: >-
+  Publish–subscribe is like a radio station: a program broadcasts data on a named channel, and
+  any other program can tune in to listen. Neither has to know the other exists — they just share
+  a channel name.
+technicalDefinition: >-
+  Publish–subscribe is a messaging pattern where publishers send messages to named topics and
+  subscribers receive them, decoupled in identity, time, and number.
+quizQuestion:
+  q: In publish–subscribe, publishers and subscribers are connected by…
+  options:
+    - Direct knowledge of each other
+    - A shared named topic/channel
+    - A physical cable
+    - A single global variable
+  answer: 1
+  explanation: >-
+    They communicate through named topics; neither needs to know the other's identity, location,
+    or even existence.
+---
+
+A robot isn't one program — it's dozens: a camera driver, a planner, a motor controller, a safety monitor, all running at once and needing to share data. The pattern that lets them cooperate cleanly is **publish–subscribe**.
+
+## The idea
+
+Think of a **radio station**. A publisher broadcasts messages on a **named channel** (a "topic") — say, `/camera/image`. Any number of subscribers can tune into that topic and receive the messages. Crucially, the publisher doesn't know or care *who* is listening, and subscribers don't know *who* is broadcasting. They're linked only by the topic name.
+
+```diagram
+{ "type": "flow", "title": "Broadcast on a named topic", "nodes": ["Publisher", "Topic /scan", "Subscriber A", "Subscriber B"], "caption": "One publisher, many possible listeners, joined only by a topic name. Add or remove either side without touching the other." }
+```
+
+## Why robots use it
+
+This **decoupling** is exactly what a complex robot needs:
+
+- **Modularity.** Swap the camera driver for a better one — as long as it publishes the same topic, nothing downstream changes.
+- **Many-to-many.** The lidar publishes once; SLAM, obstacle avoidance, and logging all subscribe independently.
+- **Asynchrony.** Publishers and subscribers run at their own rates; a fast sensor and a slow planner coexist.
+- **Scalability.** Add a new node that listens to existing data without disturbing anything.
+
+It contrasts with **request–response** (like a [ROS service](/atlas/concept/ros-service)), where one node directly asks another and waits — good for occasional queries, not for continuous streams.
+
+## In ROS and beyond
+
+Publish–subscribe is the primary communication style in [ROS 2](/atlas/concept/ros2), implemented over [DDS](/atlas/concept/dds-middleware) as [topics](/atlas/concept/ros-topic) between [nodes](/atlas/concept/ros-node). The same pattern powers MQTT (IoT), Kafka (data pipelines), and countless distributed systems — it's a fundamental idea in software architecture, not just robotics.
+
+## Why it matters
+
+Publish–subscribe is *why* a robot's software can be built as many small, independent programs that still work as one system. Understanding it is the first step to understanding how any modern robot's software is organized.
+
+## Related
+
+[ROS topic](/atlas/concept/ros-topic) · [ROS 2](/atlas/concept/ros2) · [DDS middleware](/atlas/concept/dds-middleware) · [ROS node](/atlas/concept/ros-node)
