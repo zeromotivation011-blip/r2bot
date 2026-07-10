@@ -1,0 +1,84 @@
+---
+title: I2C
+slug: i2c
+bucket: concept
+category: hardware
+summary: >-
+  I2C is a simple two-wire bus that lets a microcontroller talk to many small sensors and chips using
+  just two shared lines — the everyday plumbing connecting IMUs, displays, and sensors inside a robot.
+difficulty: 2
+tags:
+  - electronics
+  - communication
+  - hardware
+seeAlso:
+  - spi
+  - uart
+  - microcontroller
+  - imu
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'I²C (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/I%C2%B2C'
+  - title: 'I2C bus specification'
+    url: 'https://www.nxp.com/'
+laymanExplanation: >-
+  I2C is a way for a robot's main chip to chat with lots of little sensor chips over just two wires. Each
+  chip has an address, so the controller can call any one of them on the shared line.
+technicalDefinition: >-
+  I2C is a two-wire (SDA data, SCL clock) synchronous serial bus where a controller addresses multiple
+  peripheral devices by 7-bit address at modest speeds.
+quizQuestion:
+  q: How many signal wires does I2C use?
+  options:
+    - One
+    - Two (data and clock)
+    - Four
+    - Eight
+  answer: 1
+  explanation: >-
+    I2C uses two lines — SDA (data) and SCL (clock) — shared by all devices, each selected by its
+    address.
+---
+
+Inside almost any robot's electronics, a main chip needs to read a handful of small sensors — an [IMU](/atlas/concept/imu), a temperature sensor, a display. The quiet workhorse connecting them is **I2C**.
+
+## What it is
+
+I2C (**Inter-Integrated Circuit**) is a **two-wire** bus:
+
+- **SDA** — the data line.
+- **SCL** — the clock line.
+
+A **controller** (usually the [microcontroller](/atlas/concept/microcontroller)) drives the clock and addresses **peripheral** devices, each of which has a unique **address**. Many devices share the same two wires; the controller calls whichever one it wants by its address. Just two pins connect a whole cluster of chips.
+
+```diagram
+{ "type": "flow", "title": "Two wires, many addressed chips", "nodes": ["Controller (SDA + SCL)", "Sensor @ address 0x68", "Display @ address 0x3C", "…more devices"], "caption": "Every device taps the same two lines; the controller selects one by its address. Adding a chip usually just means picking a free address." }
+```
+
+## Why it's everywhere
+
+- **Minimal wiring.** Two shared pins for many devices — precious on small controllers with few pins.
+- **Addressing built in.** No extra select wire per device (unlike [SPI](/atlas/concept/spi)); the address does the selecting.
+- **Ubiquitous parts.** A huge range of sensors and chips speak I2C out of the box.
+- **Simple.** Easy to wire and code for basic sensor reading.
+
+## The trade-offs
+
+- **Slower** than [SPI](/atlas/concept/spi) — standard modes run at 100 kHz–400 kHz (faster modes exist), fine for sensors but not for high-rate data.
+- **Shared-bus contention.** All devices share the lines, so a stuck device or address clash can hang the bus; long buses and many devices add capacitance issues.
+- **Not for streaming.** Great for occasional sensor reads, not for cameras or bulk transfer.
+
+I2C, [SPI](/atlas/concept/spi), and [UART](/atlas/concept/uart) are the three basic serial buses every robotics electronics designer juggles — each with a niche.
+
+## Where you'll see it
+
+Connecting IMUs, magnetometers, pressure/temperature sensors, real-time clocks, small OLED displays, and I/O expanders to a robot's microcontroller — the low-speed sensor bus inside countless robots and dev boards.
+
+## Why it matters
+
+I2C is fundamental practical robotics electronics — the simple, pin-efficient bus that hooks a controller up to its sensors. Anyone building robot hardware from microcontrollers meets it immediately, and knowing its speed and shared-bus limits guides sensible design.
+
+## Related
+
+[SPI](/atlas/concept/spi) · [UART](/atlas/concept/uart) · [Microcontroller](/atlas/concept/microcontroller) · [IMU](/atlas/concept/imu)

@@ -1,0 +1,78 @@
+---
+title: MuJoCo
+slug: mujoco
+bucket: concept
+category: control
+summary: >-
+  MuJoCo is a fast, accurate physics simulator built for robotics and machine learning — prized for its
+  stable contact modeling, and now free and open-source, it's a default tool for training robot control
+  policies.
+difficulty: 3
+tags:
+  - simulation
+  - software
+  - reinforcement-learning
+seeAlso:
+  - physics-engine
+  - pybullet
+  - reinforcement-learning
+  - sim-to-real
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'MuJoCo (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/MuJoCo'
+  - title: 'MuJoCo documentation'
+    url: 'https://mujoco.org/'
+laymanExplanation: >-
+  MuJoCo is a robot physics simulator known for being fast and realistic, especially at simulating
+  contact — things touching and gripping. Researchers use it constantly to teach robots to move in
+  simulation before trying it for real.
+technicalDefinition: >-
+  MuJoCo (Multi-Joint dynamics with Contact) is a physics engine optimized for contact-rich robotic and
+  biomechanical simulation, widely used for reinforcement learning research.
+quizQuestion:
+  q: MuJoCo is especially valued for simulating…
+  options:
+    - Weather
+    - Contact-rich dynamics accurately and fast
+    - Web pages
+    - Audio
+  answer: 1
+  explanation: >-
+    Its name (Multi-Joint dynamics with Contact) reflects its strength: stable, accurate, fast contact
+    simulation, ideal for robotics and RL.
+---
+
+Among robot simulators, one name comes up constantly in machine-learning research: **MuJoCo**. It earned that place by doing the hardest part of simulation — contact — exceptionally well.
+
+## What it is
+
+MuJoCo (**Multi-Joint dynamics with Contact**) is a [physics engine](/atlas/concept/physics-engine) built specifically for **robotics and biomechanics**. Its defining strength is accurate, **stable, and fast contact dynamics** — the touching, gripping, and impact interactions that dominate manipulation and locomotion and that many engines handle poorly. It simulates articulated bodies (robots) with many joints efficiently, making it ideal for the tight loop of robot learning. Originally commercial, it was acquired by DeepMind and made **free and open-source**, cementing its ubiquity.
+
+```diagram
+{ "type": "flow", "title": "Accurate contact, fast enough to learn", "nodes": ["Robot model + task", "MuJoCo simulates dynamics", "Stable, fast contact", "Millions of RL training steps"], "caption": "Its fast, stable contact modeling lets learning algorithms run enormous numbers of trials, which is why it became a research default." }
+```
+
+## Why it became a research staple
+
+- **Contact quality.** Stable, well-behaved contact even in tricky, contact-rich tasks — crucial for realistic manipulation and legged locomotion.
+- **Speed.** Fast enough to generate the millions of simulated interactions [reinforcement learning](/atlas/concept/reinforcement-learning) needs.
+- **RL benchmarks.** Many standard continuous-control benchmarks (the classic "Gym" locomotion tasks — HalfCheetah, Humanoid, Ant) run on MuJoCo, so it's woven into the RL research culture.
+- **Free and open.** Its open-sourcing removed the last barrier to widespread use.
+
+## MuJoCo vs the alternatives
+
+- **[PyBullet](/atlas/concept/pybullet)** — free, easy, general-purpose; great for getting started and for robotics prototyping.
+- **Isaac Sim / Isaac Gym** — GPU-accelerated, photorealistic, massively parallel — for large-scale training and perception.
+- **[Gazebo](/atlas/concept/gazebo-simulator)** — deeply integrated with ROS for full-system simulation.
+- **MuJoCo** — the sweet spot for accurate, fast contact dynamics in control and RL research.
+
+Teams often use several, matching the tool to the task.
+
+## Why it matters
+
+MuJoCo is one of the most important tools in modern robot learning — the simulator behind a large share of research on learned locomotion and manipulation. Its excellence at contest-rich physics directly enables the [sim-to-real](/atlas/concept/sim-to-real) pipeline that trains today's most capable robot controllers.
+
+## Related
+
+[Physics engine](/atlas/concept/physics-engine) · [PyBullet](/atlas/concept/pybullet) · [Reinforcement learning](/atlas/concept/reinforcement-learning) · [Sim-to-real](/atlas/concept/sim-to-real)

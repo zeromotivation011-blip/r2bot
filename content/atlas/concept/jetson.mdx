@@ -1,0 +1,75 @@
+---
+title: NVIDIA Jetson
+slug: jetson
+bucket: concept
+category: hardware
+summary: >-
+  NVIDIA Jetson is a family of compact computers with built-in GPUs that run AI and computer vision on
+  the robot itself — the go-to onboard 'brain' for perception-heavy robots that can't rely on the cloud.
+difficulty: 2
+tags:
+  - electronics
+  - computing
+  - ai
+seeAlso:
+  - edge-computing
+  - single-board-computer
+  - computer-vision
+  - field-programmable-gate-array
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'NVIDIA Jetson'
+    url: 'https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/'
+  - title: 'Edge AI computing'
+    url: 'https://en.wikipedia.org/wiki/Edge_computing'
+laymanExplanation: >-
+  A Jetson is a small, powerful computer with a graphics chip (GPU) built for robots. It can run AI and
+  vision models right on the robot, so it can see and think without sending data to a server.
+technicalDefinition: >-
+  NVIDIA Jetson is a line of embedded compute modules combining ARM CPUs with an NVIDIA GPU, designed to
+  run deep-learning inference and perception onboard robots and edge devices.
+quizQuestion:
+  q: The main reason robots use a Jetson is to…
+  options:
+    - Store more files
+    - Run AI/vision models onboard with GPU acceleration
+    - Replace the motors
+    - Provide Wi-Fi only
+  answer: 1
+  explanation: >-
+    Its onboard GPU accelerates deep-learning inference (vision, perception) directly on the robot,
+    without needing a remote server.
+---
+
+Modern robots see and think with neural networks — which are hungry for GPU power. But a robot can't always phone home to a server. The **NVIDIA Jetson** puts that AI power onboard, in a compact module.
+
+## What it is
+
+Jetson is a family of **embedded computers** that pair ARM CPUs with an **NVIDIA GPU** on a small, power-efficient module. The GPU is the point: it accelerates the deep-learning inference behind [computer vision](/atlas/concept/computer-vision), object detection, and perception — running models *on the robot* rather than in the cloud. Sizes range from the tiny, low-power **Jetson Nano/Orin Nano** to the powerful **Jetson AGX Orin** for demanding autonomy.
+
+```diagram
+{ "type": "flow", "title": "AI brain on the robot", "nodes": ["Cameras / sensors", "Jetson (CPU + GPU)", "Run neural nets onboard", "Perception → decisions"], "caption": "The GPU crunches vision and AI models locally, so the robot perceives and decides in real time without a network round-trip." }
+```
+
+## Why robots choose it
+
+- **Onboard AI.** GPU-accelerated inference for detection, segmentation, and depth — fast enough for real-time robot perception ([edge computing](/atlas/concept/edge-computing), not cloud).
+- **No network dependence.** Works where connectivity is poor or latency is unacceptable (a robot can't wait on a round-trip to dodge an obstacle).
+- **Software ecosystem.** CUDA, TensorRT, and NVIDIA's robotics stack (Isaac ROS) make deploying accelerated perception straightforward — a big reason for its popularity.
+- **Compact and efficient.** Fits a robot's size, weight, and power budget far better than a full GPU workstation.
+
+## The trade-offs
+
+- **Power and heat.** More capable modules draw more watts and need cooling — a real constraint on battery-powered robots.
+- **Cost.** Pricier than a plain [single-board computer](/atlas/concept/single-board-computer) like a Raspberry Pi (which lacks the AI-grade GPU).
+- **Right-sizing.** Match the module to the workload; an oversized Jetson wastes power and money.
+
+It often works alongside [microcontrollers](/atlas/concept/microcontroller) (for real-time motor control) and sometimes an [FPGA](/atlas/concept/field-programmable-gate-array) — the Jetson handling perception and high-level thinking, the MCU handling fast control.
+
+## Why it matters
+
+The Jetson (and edge-AI modules like it) is what makes **onboard intelligence** practical — letting robots run the vision and learning models modern autonomy demands, right where the action is. It's become a default compute choice for perception-driven robots, from research platforms to commercial products.
+
+## Related
+
+[Edge computing](/atlas/concept/edge-computing) · [Single-board computer](/atlas/concept/single-board-computer) · [Computer vision](/atlas/concept/computer-vision) · [FPGA](/atlas/concept/field-programmable-gate-array)

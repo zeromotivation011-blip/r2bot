@@ -1,0 +1,79 @@
+---
+title: CAN Bus
+slug: can-bus
+bucket: concept
+category: hardware
+summary: >-
+  CAN bus is the rugged two-wire network that lets a robot's many microcontrollers, motors, and
+  sensors talk over a single shared line — the reliable communication backbone of vehicles and
+  countless robots.
+difficulty: 3
+tags:
+  - electronics
+  - communication
+  - embedded
+seeAlso:
+  - ethercat
+  - microcontroller
+  - electromagnetic-interference
+  - real-time-operating-system
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'CAN bus (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/CAN_bus'
+  - title: 'Bosch CAN specification'
+    url: 'https://en.wikipedia.org/wiki/CAN_bus'
+laymanExplanation: >-
+  CAN bus is a tough little network that connects all the electronic parts of a robot or car over just
+  two wires. Any device can send a message and every other device hears it — simple, robust, and hard
+  to disrupt.
+technicalDefinition: >-
+  CAN (Controller Area Network) is a robust multi-master serial bus using differential signaling and
+  message-based arbitration, allowing many nodes to share one two-wire network.
+quizQuestion:
+  q: A defining feature of CAN bus is that messages are…
+  options:
+    - Addressed to one specific device only
+    - Broadcast with priority-based arbitration, no central controller
+    - Sent over Wi-Fi
+    - Only one per minute
+  answer: 1
+  explanation: >-
+    CAN is multi-master: nodes broadcast prioritized messages and arbitrate access to the shared bus
+    without a central controller.
+---
+
+A robot is full of separate electronic devices — motor controllers, sensor boards, a main computer — that must exchange data reliably, often in electrically noisy conditions. **CAN bus** is the tough, proven network that ties them together.
+
+## What it is
+
+CAN (**Controller Area Network**) is a **two-wire serial bus** where many devices ("nodes") share one line. It was born in automobiles (to replace bundles of point-to-point wiring) and spread into robotics and industry for the same reason: it's **simple, cheap, and extremely robust**. Key traits:
+
+- **Differential signaling** on a twisted pair makes it highly resistant to [electrical noise](/atlas/concept/electromagnetic-interference).
+- **Multi-master, message-based.** Any node can transmit; messages carry an identifier, not a destination address, and every node hears every message and picks out what it cares about.
+- **Priority arbitration.** If two nodes transmit at once, the message with the higher-priority identifier wins automatically, without collisions being lost — so urgent messages (a fault, an e-stop) get through first.
+
+```diagram
+{ "type": "flow", "title": "Many nodes, one shared line", "nodes": ["Motor node", "Sensor node", "Main computer", "Shared CAN bus"], "caption": "All devices hang off one twisted pair. Any node broadcasts; priority arbitration decides who transmits when two try at once — no central hub." }
+```
+
+## Why robots use it
+
+- **Reliability in noise.** Robots are full of motors and switching power — electrically hostile. CAN's differential, error-checked design shrugs it off, with built-in error detection and automatic retransmission.
+- **Simple wiring.** One bus instead of a wire per connection — lighter and easier, especially on a moving arm or vehicle.
+- **Deterministic-ish priority.** Important messages win the bus, useful for control and safety.
+- **Ubiquity.** Cheap [microcontrollers](/atlas/concept/microcontroller) have CAN built in; the ecosystem is mature.
+
+Higher-level protocols like **CANopen** and automotive standards run on top of it, and **CAN FD** raises the data rate. Many robot actuators and drives speak CAN natively.
+
+## The limits
+
+CAN is **modest bandwidth** (classic CAN ~1 Mbit/s) — great for control and status messages, not for streaming camera or lidar data (which go over Ethernet/USB). For hard real-time, tightly-synchronized multi-axis motion, industrial robots often step up to [EtherCAT](/atlas/concept/ethercat).
+
+## Why it matters
+
+CAN bus is the dependable nervous system of vehicles and countless robots — the reason a robot's distributed electronics communicate reliably in harsh conditions over minimal wiring. It's foundational, embedded-level knowledge for anyone building real robot hardware.
+
+## Related
+
+[EtherCAT](/atlas/concept/ethercat) · [Microcontroller](/atlas/concept/microcontroller) · [Electromagnetic interference](/atlas/concept/electromagnetic-interference) · [Real-time operating system](/atlas/concept/real-time-operating-system)

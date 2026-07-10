@@ -1,0 +1,77 @@
+---
+title: EtherCAT
+slug: ethercat
+bucket: concept
+category: hardware
+summary: >-
+  EtherCAT is a real-time industrial Ethernet protocol that synchronizes dozens of motors and sensors
+  with microsecond precision — the high-speed nervous system of advanced multi-joint robots.
+difficulty: 3
+tags:
+  - electronics
+  - communication
+  - real-time
+seeAlso:
+  - can-bus
+  - real-time-operating-system
+  - servo-motor
+  - closed-loop-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'EtherCAT (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/EtherCAT'
+  - title: 'EtherCAT Technology Group'
+    url: 'https://www.ethercat.org/'
+laymanExplanation: >-
+  EtherCAT is a super-fast, precisely-timed version of Ethernet used in factories and robots. It lets a
+  controller update lots of motors and read lots of sensors almost simultaneously, so every joint moves
+  in perfect sync.
+technicalDefinition: >-
+  EtherCAT is a real-time industrial Ethernet fieldbus where a frame passes through all nodes,
+  each reading/writing its data on the fly, enabling microsecond-level synchronized control.
+quizQuestion:
+  q: EtherCAT's key advantage for robots is…
+  options:
+    - It is wireless
+    - Microsecond-precise, synchronized real-time control of many devices
+    - It needs no controller
+    - It only sends video
+  answer: 1
+  explanation: >-
+    EtherCAT delivers deterministic, microsecond-synchronized updates across many nodes — ideal for
+    coordinating many motor axes in tight real-time control loops.
+---
+
+When a robot has many joints that must all move in perfect coordination — a humanoid, a fast industrial arm, a complex machine — it needs a network that's not just fast but **precisely timed**. That's **EtherCAT**.
+
+## What it is
+
+EtherCAT (**Ethernet for Control Automation Technology**) is a **real-time industrial Ethernet** protocol. Its clever trick: instead of sending a separate packet to each device, a single Ethernet frame is **passed through all the nodes in a chain**, and each node **reads its inputs and writes its outputs on the fly** as the frame flies past — "processing on the fly." One frame updates the whole network in one sweep, with **microsecond precision** and tight synchronization across all devices.
+
+```diagram
+{ "type": "flow", "title": "One frame sweeps every node", "nodes": ["Controller sends frame", "Node 1 reads/writes on the fly", "Node 2 … N do the same", "Frame returns, cycle done"], "caption": "The frame is processed as it passes each device, so dozens of motors and sensors update in one fast, synchronized cycle — the basis of deterministic real-time control." }
+```
+
+## Why advanced robots use it
+
+- **Determinism and speed.** Update cycles down to tens of microseconds with very low jitter — essential for high-performance, tightly-coordinated [closed-loop control](/atlas/concept/closed-loop-control) of many axes.
+- **Synchronization.** All joints sampled and commanded at effectively the same instant (distributed clocks), so multi-joint motion stays coordinated — critical for [servo](/atlas/concept/servo-motor)-driven arms and legged robots.
+- **High bandwidth.** Full Ethernet speed, far beyond [CAN bus](/atlas/concept/can-bus), handling many high-rate devices.
+- **Standard hardware.** Uses ordinary Ethernet cabling and physical layer.
+
+It typically pairs with a controller running a [real-time operating system](/atlas/concept/real-time-operating-system) so the timing guarantees hold end to end.
+
+## EtherCAT vs CAN
+
+- **CAN** — rugged, simple, low bandwidth; great for modest sensor/motor networks and noisy environments.
+- **EtherCAT** — high bandwidth, microsecond synchronization; the choice for many-axis, high-performance real-time control.
+
+Robots often use each where it fits, sometimes bridging between them.
+
+## Why it matters
+
+EtherCAT is the backbone that lets sophisticated robots coordinate many motors and sensors with the timing precision real-time control demands. It's a standard in industrial automation and increasingly in complex research and humanoid robots — the fast, synchronized layer beneath high-performance motion.
+
+## Related
+
+[CAN bus](/atlas/concept/can-bus) · [Real-time operating system](/atlas/concept/real-time-operating-system) · [Servo motor](/atlas/concept/servo-motor) · [Closed-loop control](/atlas/concept/closed-loop-control)

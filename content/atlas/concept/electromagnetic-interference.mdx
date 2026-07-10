@@ -1,0 +1,79 @@
+---
+title: Electromagnetic Interference (EMI)
+slug: electromagnetic-interference
+bucket: concept
+category: hardware
+summary: >-
+  Electromagnetic interference is the electrical noise that motors and switching power dump onto a
+  robot's signals — the invisible gremlin behind glitchy sensors and dropped communication, and a core
+  concern in robot electronics design.
+difficulty: 3
+tags:
+  - electronics
+  - hardware
+  - noise
+seeAlso:
+  - ground-loop
+  - can-bus
+  - brushless-motor
+  - electronic-speed-controller
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Electromagnetic interference (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Electromagnetic_interference'
+  - title: 'EMC in electronics'
+    url: 'https://en.wikipedia.org/wiki/Electromagnetic_compatibility'
+laymanExplanation: >-
+  Electromagnetic interference is electrical noise — mostly from motors and power electronics — that
+  leaks into a robot's sensor and data wires, causing glitches, wrong readings, and dropped
+  communication if it isn't controlled.
+technicalDefinition: >-
+  EMI is unwanted electromagnetic energy, radiated or conducted, that couples into circuits and
+  degrades signal integrity, sensor accuracy, and communication reliability.
+quizQuestion:
+  q: A common source of EMI inside a robot is…
+  options:
+    - The paint
+    - Motors and switching power electronics
+    - The plastic chassis
+    - The user manual
+  answer: 1
+  explanation: >-
+    Motors, motor drivers, and switching power supplies rapidly switch large currents, radiating and
+    conducting electrical noise that can disrupt nearby signals.
+---
+
+A robot's sensors read cleanly on the bench, then go haywire the moment the motors spin. The invisible culprit is almost always **electromagnetic interference (EMI)** — the electrical noise a robot generates within itself.
+
+## Where the noise comes from
+
+Robots are full of **EMI sources**: [brushless motors](/atlas/concept/brushless-motor) and their [ESC](/atlas/concept/electronic-speed-controller) drivers switch large currents thousands of times a second, and switching power supplies do the same. Every sharp switch of current radiates electromagnetic energy and injects noise back into the power and ground. That energy couples into nearby wires — especially sensitive, low-voltage sensor and data lines — as unwanted noise.
+
+```diagram
+{ "type": "flow", "title": "Noise leaks from power into signals", "nodes": ["Motor/ESC switches current", "Radiates + conducts noise", "Couples into signal wires", "Glitchy sensors / dropped comms"], "caption": "The same switching that drives motors efficiently sprays electrical noise; if it reaches sensitive lines, readings corrupt and communication fails." }
+```
+
+## What it breaks
+
+- **Sensor glitches.** Analog sensor readings jump; an [IMU](/atlas/concept/imu) or encoder throws bad values under load.
+- **Communication errors.** Serial buses ([I2C](/atlas/concept/i2c), [UART](/atlas/concept/uart)) drop or corrupt bytes; a device hangs.
+- **Resets and lockups.** Noise on the power rail browns out or crashes a [microcontroller](/atlas/concept/microcontroller).
+- **Intermittent, maddening bugs** that only appear when motors run — the classic EMI signature.
+
+## How engineers fight it
+
+Managing EMI (part of **EMC**, electromagnetic compatibility) is standard robot-electronics practice:
+
+- **Differential signaling.** Buses like [CAN](/atlas/concept/can-bus) and RS-485 use two wires carrying opposite signals so noise hits both equally and cancels — a big reason CAN is robust in motor-heavy robots.
+- **Shielding and twisted pairs.** Shielded cables and twisting reduce coupling.
+- **Grounding and layout.** Careful [grounding](/atlas/concept/ground-loop), separating power and signal grounds, and keeping noisy and sensitive traces apart on the PCB.
+- **Filtering.** Ferrite beads, capacitors, and snubbers suppress noise at the source and on power lines.
+- **Physical separation.** Route sensor wires away from motor cables.
+
+## Why it matters
+
+EMI is one of the most common and frustrating problems in real robot hardware — the reason a design that works in theory misbehaves once the power electronics run. Understanding and designing against it (shielding, differential buses, good grounding) is essential to building robots that work reliably, not just on the bench.
+
+## Related
+
+[Ground loop](/atlas/concept/ground-loop) · [CAN bus](/atlas/concept/can-bus) · [Brushless motor](/atlas/concept/brushless-motor) · [Electronic speed controller](/atlas/concept/electronic-speed-controller)

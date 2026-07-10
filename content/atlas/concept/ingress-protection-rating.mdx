@@ -1,0 +1,81 @@
+---
+title: Ingress Protection (IP) Rating
+slug: ingress-protection-rating
+bucket: concept
+category: hardware
+summary: >-
+  An IP rating is the two-digit code that says how well a robot's enclosure keeps out dust and water —
+  the spec that decides whether a robot can work outdoors, get washed down, or survive a dusty factory.
+difficulty: 2
+tags:
+  - hardware
+  - enclosure
+  - standards
+seeAlso:
+  - electromagnetic-interference
+  - underwater-robot
+  - agricultural-robot
+  - ce-marking
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'IP Code (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/IP_code'
+  - title: 'IEC 60529 ingress protection'
+    url: 'https://en.wikipedia.org/wiki/IP_code'
+laymanExplanation: >-
+  An IP rating is a code like 'IP67' that tells you how dust- and water-proof a device is. The first
+  number is dust protection, the second is water. Higher numbers mean more sealed — important for robots
+  that work outside or get hosed down.
+technicalDefinition: >-
+  The IP (Ingress Protection) rating, per IEC 60529, is a two-digit code specifying an enclosure's
+  protection against solid particles (first digit) and water (second digit).
+quizQuestion:
+  q: In an IP rating like IP67, the two digits describe protection against…
+  options:
+    - Heat and cold
+    - Solids (dust) and liquids (water)
+    - Voltage and current
+    - Speed and torque
+  answer: 1
+  explanation: >-
+    The first digit rates protection against solid objects/dust; the second rates protection against
+    water — higher numbers mean better sealing.
+---
+
+Can this robot work in the rain? Survive a dusty warehouse? Get hosed down for cleaning? The answer is captured in a small, standardized code: the **IP rating**.
+
+## What the code means
+
+**IP** stands for **Ingress Protection** (defined by IEC 60529). The rating is two digits:
+
+- **First digit — solids/dust** (0–6). How well the enclosure keeps out solid objects and dust. **6** = fully dust-tight.
+- **Second digit — water** (0–9). How well it resists water. **7** = survives temporary immersion; **8** = continuous immersion; higher levels cover pressurized jets and washdowns.
+
+So **IP67** means fully dust-tight and able to survive brief immersion; **IP54** means dust-*protected* (not fully sealed) and splash-resistant. A digit of **X** (e.g. IPX7) means that aspect wasn't rated.
+
+```diagram
+{ "type": "flow", "title": "Reading an IP code", "nodes": ["IP", "First digit: dust (0–6)", "Second digit: water (0–9)", "= sealing level"], "caption": "Two digits, two hazards. Higher numbers mean more protection — the quick spec for how sealed an enclosure is against the environment." }
+```
+
+## Why it matters for robots
+
+A robot's electronics are fragile; dust and water are their enemies. The IP rating tells you where a robot can safely operate:
+
+- **Outdoor robots** ([agricultural](/atlas/concept/agricultural-robot), delivery, inspection) need solid water and dust protection for rain, mud, and grime.
+- **Washdown environments** (food processing, medical) need high water ratings so the robot can be cleaned/sanitized.
+- **Dusty industry** (mining, construction, woodworking) needs strong dust sealing.
+- **[Underwater robots](/atlas/concept/underwater-robot)** go beyond IP into pressure-rated housings entirely.
+
+Choosing or specifying the right IP rating is a real engineering decision — over-sealing adds cost, weight, and heat problems (a sealed box traps heat); under-sealing kills the robot in the field.
+
+## Beyond IP
+
+IP covers dust and water, but rugged robots also face vibration, temperature, and impact (sometimes covered by other standards like MIL-STD or IK impact ratings), and must manage the heat that sealing traps. IP is one piece of designing for the real, harsh world, alongside EMC and [safety marking](/atlas/concept/ce-marking).
+
+## Why it matters
+
+The IP rating is the standard, at-a-glance answer to "can this robot survive its environment?" It's essential for anyone deploying robots outside a clean lab — a small code that determines whether hardware thrives or dies in the real world.
+
+## Related
+
+[Electromagnetic interference](/atlas/concept/electromagnetic-interference) · [Underwater robot](/atlas/concept/underwater-robot) · [Agricultural robot](/atlas/concept/agricultural-robot) · [CE marking](/atlas/concept/ce-marking)

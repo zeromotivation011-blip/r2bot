@@ -1,0 +1,77 @@
+---
+title: Synthetic Data
+slug: synthetic-data
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Synthetic data is computer-generated training data — rendered images, simulated sensor readings —
+  with perfect labels for free, letting robots learn perception without the cost and limits of
+  hand-labeled real data.
+difficulty: 3
+tags:
+  - perception
+  - simulation
+  - machine-learning
+seeAlso:
+  - domain-randomization
+  - sim-to-real
+  - computer-vision
+  - object-detection
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Synthetic data (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Synthetic_data'
+  - title: 'Synthetic data for perception'
+    url: 'https://en.wikipedia.org/wiki/Sim-to-real'
+laymanExplanation: >-
+  Synthetic data is training data made by a computer instead of collected in the real world. Because the
+  computer created the scene, it already knows exactly what's in it — so every image comes with perfect
+  labels, for free.
+technicalDefinition: >-
+  Synthetic data is algorithmically generated (often rendered or simulated) training data with
+  automatically produced ground-truth labels, used to train and validate perception models.
+quizQuestion:
+  q: A major advantage of synthetic data is that…
+  options:
+    - It is always more realistic than real data
+    - Perfect ground-truth labels come for free with each generated sample
+    - It requires manual labeling
+    - It cannot be used for training
+  answer: 1
+  explanation: >-
+    Because the generator creates the scene, it knows exactly what's in it, so labels (boxes, masks,
+    depth, poses) are produced automatically and perfectly.
+---
+
+Modern robot perception is hungry for labeled data — and labeling real images by hand is slow, expensive, and error-prone. **Synthetic data** sidesteps that: let the computer *generate* the training data, labels included.
+
+## The core advantage: free perfect labels
+
+When you photograph the real world, someone has to hand-annotate every object, box, or mask — costly and imperfect. But when a computer **renders** a scene, it already knows exactly what's in it and where. So every synthetic image comes with **flawless ground-truth labels automatically**: precise bounding boxes, pixel-perfect segmentation masks, exact depth, and 6D object poses — the kinds of labels that are tedious or impossible to annotate by hand.
+
+```diagram
+{ "type": "flow", "title": "Generate the scene, get labels free", "nodes": ["Render / simulate scene", "Computer knows contents", "Auto-generate perfect labels", "Train perception model"], "caption": "Because the generator authored the scene, exact labels (masks, depth, poses) fall out automatically — no human annotation needed." }
+```
+
+## Why robots use it
+
+- **Scale and cost.** Generate millions of labeled examples cheaply, far beyond what hand-labeling allows.
+- **Rare and dangerous cases.** Create scenarios that are hard to capture for real — edge cases, hazards, unusual object arrangements.
+- **Labels you can't get otherwise.** Perfect depth, surface normals, and object poses for every pixel.
+- **[Grasp](/atlas/concept/grasp-planning) and manipulation.** Simulate millions of grasp attempts with known outcomes (as Dex-Net did) to train [grasp detectors](/atlas/concept/visual-grasp-detection).
+
+## The catch: the reality gap
+
+Synthetic images aren't quite real — lighting, textures, and sensor noise differ, so a model trained purely on naive synthetic data may not transfer. The fix is the same idea as in control: **[domain randomization](/atlas/concept/domain-randomization)** — vary the rendering wildly (textures, lighting, backgrounds, camera) so the model learns robust features and treats reality as one more variation. Photorealistic rendering and mixing in some real data ("sim + real") further close the gap. This is the perception side of the broader [sim-to-real](/atlas/concept/sim-to-real) story.
+
+## Where you'll see it
+
+Training [object detection](/atlas/concept/object-detection) and segmentation for robots and self-driving, 6D pose estimation for [bin picking](/atlas/concept/bin-picking), depth and grasp networks, and any perception task where real labeled data is scarce or expensive.
+
+## Why it matters
+
+Synthetic data breaks the data bottleneck in robot perception — turning the expensive, limited resource of hand-labeled images into a cheap, scalable, perfectly-labeled one. Combined with domain randomization, it's a foundation of how modern robots learn to see.
+
+## Related
+
+[Domain randomization](/atlas/concept/domain-randomization) · [Sim-to-real](/atlas/concept/sim-to-real) · [Computer vision](/atlas/concept/computer-vision) · [Object detection](/atlas/concept/object-detection)

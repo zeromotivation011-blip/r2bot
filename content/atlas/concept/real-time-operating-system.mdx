@@ -1,0 +1,76 @@
+---
+title: Real-Time Operating System (RTOS)
+slug: real-time-operating-system
+bucket: concept
+category: hardware
+summary: >-
+  A real-time operating system guarantees that critical tasks run exactly on time — the deterministic
+  software foundation robots need for control loops, motor commands, and safety, where being late is
+  as bad as being wrong.
+difficulty: 3
+tags:
+  - software
+  - embedded
+  - real-time
+seeAlso:
+  - microcontroller
+  - closed-loop-control
+  - micro-ros
+  - ethercat
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Real-time operating system (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Real-time_operating_system'
+  - title: 'FreeRTOS'
+    url: 'https://www.freertos.org/'
+laymanExplanation: >-
+  A real-time operating system makes sure a robot's most important tasks — like updating a motor 1000
+  times a second — happen exactly on schedule, never late. Ordinary operating systems can't promise
+  that, but a robot's balance depends on it.
+technicalDefinition: >-
+  An RTOS is an operating system that guarantees bounded, deterministic task scheduling and response
+  times, ensuring high-priority tasks meet strict deadlines.
+quizQuestion:
+  q: The defining property of an RTOS is…
+  options:
+    - It runs the fastest possible average speed
+    - It guarantees tasks meet strict timing deadlines (determinism)
+    - It has the nicest graphics
+    - It never needs a processor
+  answer: 1
+  explanation: >-
+    An RTOS guarantees deterministic timing — high-priority tasks run within bounded, predictable
+    deadlines — which matters more than raw average speed for control.
+---
+
+A robot balancing on two legs runs a control loop that *must* update, say, a thousand times a second — and if one update is late, it falls. Ordinary operating systems can't promise that timing. A **real-time operating system** can.
+
+## Real-time means *on time*, not *fast*
+
+The common misconception: "real-time" means "very fast." It actually means **deterministic** — tasks are *guaranteed* to run within a bounded, predictable time. A general-purpose OS (Linux, Windows) optimizes for average throughput and can pause any task briefly to do housekeeping — usually fine, occasionally a few milliseconds late. For a motor control loop or a safety cutoff, **late is a failure**. An RTOS guarantees the deadline is met, every time.
+
+```diagram
+{ "type": "flow", "title": "Deadlines, guaranteed", "nodes": ["Control task due every 1 ms", "RTOS schedules by priority", "High-priority task always on time", "Deterministic behavior"], "caption": "The RTOS ensures the highest-priority task preempts everything and meets its deadline — predictability over average speed." }
+```
+
+## How it delivers determinism
+
+- **Priority-based preemptive scheduling.** The highest-priority ready task always runs immediately, preempting lower ones — so a critical control task never waits behind background work.
+- **Bounded, predictable timing.** Interrupt latency and task-switch times are small and known, so worst-case behavior can be analyzed and guaranteed.
+- **Lightweight.** Many RTOSes (FreeRTOS, Zephyr) are tiny, running on [microcontrollers](/atlas/concept/microcontroller) with kilobytes of memory.
+
+## Where robots use it
+
+- **On the microcontroller** running tight [closed-loop control](/atlas/concept/closed-loop-control) — motor commutation, balance, actuator loops — where jitter is unacceptable. (This is what [micro-ROS](/atlas/concept/micro-ros) runs on.)
+- **Synchronized fieldbuses** like [EtherCAT](/atlas/concept/ethercat) depend on real-time timing end to end.
+- **Safety-critical functions** where a guaranteed response time is required.
+
+Bigger robots often split work: an RTOS (or real-time Linux with the PREEMPT_RT patch) handles the hard real-time control, while a general-purpose OS handles perception, planning, and networking, which tolerate small delays.
+
+## Why it matters
+
+The RTOS is the deterministic foundation beneath a robot's most time-critical software. Anywhere being *late* means falling, crashing, or unsafe behavior, an RTOS provides the timing guarantees that ordinary operating systems can't — making it essential to real robot control.
+
+## Related
+
+[Microcontroller](/atlas/concept/microcontroller) · [Closed-loop control](/atlas/concept/closed-loop-control) · [micro-ROS](/atlas/concept/micro-ros) · [EtherCAT](/atlas/concept/ethercat)

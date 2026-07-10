@@ -1,0 +1,76 @@
+---
+title: PyBullet
+slug: pybullet
+bucket: concept
+category: control
+summary: >-
+  PyBullet is a free, easy-to-use physics simulator with a Python interface — the accessible on-ramp to
+  robot simulation and reinforcement learning, popular for prototyping and education.
+difficulty: 2
+tags:
+  - simulation
+  - software
+  - reinforcement-learning
+seeAlso:
+  - physics-engine
+  - mujoco
+  - gazebo-simulator
+  - reinforcement-learning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Bullet (software) (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Bullet_(software)'
+  - title: 'PyBullet documentation'
+    url: 'https://pybullet.org/'
+laymanExplanation: >-
+  PyBullet is a free robot simulator you control from Python. It's simple to install and start with, so
+  it's a favorite for learning robotics, prototyping ideas, and training simple robot AI.
+technicalDefinition: >-
+  PyBullet is the Python binding for the Bullet physics engine, providing rigid-body simulation, robot
+  loading (URDF/SDF), and RL environment support with an accessible API.
+quizQuestion:
+  q: PyBullet's main appeal is that it is…
+  options:
+    - The most photorealistic simulator
+    - Free, easy to install, and controlled from Python
+    - Only for supercomputers
+    - A hardware board
+  answer: 1
+  explanation: >-
+    PyBullet is valued for being free, simple to set up, and scriptable in Python — a low-friction entry
+    to physics simulation and RL.
+---
+
+Everyone needs a starting point for robot simulation, and for many that point is **PyBullet** — the free, friendly simulator you drive from Python.
+
+## What it is
+
+PyBullet is the **Python interface** to the **Bullet** [physics engine](/atlas/concept/physics-engine), a mature open-source engine long used in games and film. PyBullet wraps it in an easy API: load a robot from a [URDF](/atlas/concept/urdf), apply forces, step the simulation, read sensors, and render — all in a few lines of Python. It's free, cross-platform, and quick to install, which is exactly why so many people learn and prototype with it.
+
+```diagram
+{ "type": "flow", "title": "Simulate a robot in a few lines of Python", "nodes": ["Load robot (URDF)", "Step physics", "Read state / apply control", "Iterate & visualize"], "caption": "Its simple Python loop — load, step, control — makes PyBullet an easy on-ramp for prototyping robot behavior and RL environments." }
+```
+
+## Why it's popular
+
+- **Low friction.** `pip install pybullet` and you're simulating — no heavy setup. Ideal for **education** and quick experiments.
+- **Python-native.** Fits the machine-learning ecosystem (NumPy, PyTorch, RL libraries) directly, so it's common for prototyping [reinforcement learning](/atlas/concept/reinforcement-learning).
+- **Full-featured enough.** Robot loading, collision, contacts, sensors, inverse kinematics, and built-in example environments (including standard RL tasks).
+- **Free and open.** No license barrier.
+
+## Where it fits among simulators
+
+- **PyBullet** — accessible, free, great for prototyping and learning; contact accuracy and speed are good, not the absolute best.
+- **[MuJoCo](/atlas/concept/mujoco)** — more accurate/stable contact and faster, a research favorite (also now free).
+- **Isaac Sim / Gym** — GPU-accelerated, photorealistic, massively parallel for large-scale training and perception.
+- **[Gazebo](/atlas/concept/gazebo-simulator)** — deep ROS integration for full-system simulation.
+
+Many people **start** in PyBullet and graduate to MuJoCo or Isaac as their needs grow — but plenty of real research and prototyping happens entirely in PyBullet.
+
+## Why it matters
+
+PyBullet lowered the barrier to robot simulation — making physics-based experimentation, RL prototyping, and robotics education accessible to anyone who knows a little Python. It's a common first simulator and a staple of the robot-learning toolkit, embodying the value of an easy, free, well-integrated tool.
+
+## Related
+
+[Physics engine](/atlas/concept/physics-engine) · [MuJoCo](/atlas/concept/mujoco) · [Gazebo simulator](/atlas/concept/gazebo-simulator) · [Reinforcement learning](/atlas/concept/reinforcement-learning)

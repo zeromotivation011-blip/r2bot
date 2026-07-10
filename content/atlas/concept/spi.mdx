@@ -1,0 +1,80 @@
+---
+title: SPI
+slug: spi
+bucket: concept
+category: hardware
+summary: >-
+  SPI is a fast four-wire bus for high-speed communication between a controller and chips — used when a
+  robot needs to move data quickly to displays, high-rate sensors, SD cards, and ADCs.
+difficulty: 2
+tags:
+  - electronics
+  - communication
+  - hardware
+seeAlso:
+  - i2c
+  - uart
+  - microcontroller
+  - rotary-encoder
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Serial Peripheral Interface (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Serial_Peripheral_Interface'
+  - title: 'SPI bus basics'
+    url: 'https://www.analog.com/'
+laymanExplanation: >-
+  SPI is a fast way for a robot's main chip to talk to another chip — like a high-rate sensor, a screen,
+  or an SD card. It uses more wires than I2C but moves data much quicker.
+technicalDefinition: >-
+  SPI is a synchronous four-wire serial bus (clock, MOSI, MISO, chip-select) providing high-speed
+  full-duplex communication between a controller and peripherals, one selected at a time.
+quizQuestion:
+  q: Compared with I2C, SPI is generally…
+  options:
+    - Slower but uses fewer wires
+    - Faster but uses more wires (including a chip-select per device)
+    - Wireless
+    - Unable to send data
+  answer: 1
+  explanation: >-
+    SPI is faster and full-duplex but needs more lines, including a separate chip-select for each
+    peripheral, unlike I2C's two shared wires.
+---
+
+When a robot needs to move data *fast* between chips — refreshing a display, reading a high-rate sensor, logging to an SD card — the go-to bus is **SPI**.
+
+## What it is
+
+SPI (**Serial Peripheral Interface**) is a **four-wire synchronous** bus:
+
+- **SCLK** — clock (from the controller).
+- **MOSI** — Controller Out, Peripheral In (data to the device).
+- **MISO** — Controller In, Peripheral Out (data back).
+- **CS / SS** — chip-select, one per device, to pick which peripheral is active.
+
+It's **full-duplex** (data flows both ways at once) and runs **much faster** than [I2C](/atlas/concept/i2c) — many megahertz, sometimes tens.
+
+```diagram
+{ "type": "flow", "title": "Fast, full-duplex, one device at a time", "nodes": ["Controller (SCLK/MOSI/MISO)", "Assert chip-select", "Selected device talks", "High-speed data both ways"], "caption": "The controller pulls one device's chip-select low to talk to it. More wires than I2C, but faster and simpler at the signaling level." }
+```
+
+## SPI vs I2C — the classic choice
+
+Robotics designers constantly pick between the two:
+
+- **[I2C](/atlas/concept/i2c)** — two shared wires, device addresses, slower. Best for many low-speed sensors on minimal pins.
+- **SPI** — four wires plus a **chip-select per device**, faster, full-duplex. Best when **speed** matters or a device demands it.
+
+The cost of SPI's speed is **pins**: each peripheral needs its own chip-select line, so many SPI devices eat up controller pins. So a robot often uses I2C for its cluster of slow sensors and SPI for the few that need bandwidth.
+
+## Where you'll see it
+
+High-rate [IMUs](/atlas/concept/imu) and ADCs, displays (TFT/OLED), SD cards for logging, flash memory, some [encoders](/atlas/concept/rotary-encoder), and radio modules — anywhere fast, reliable chip-to-chip transfer is needed on a robot's board.
+
+## Why it matters
+
+SPI is one of the three essential serial buses ([I2C](/atlas/concept/i2c), SPI, [UART](/atlas/concept/uart)) that connect a robot's electronics. Knowing when to reach for SPI's speed versus I2C's simplicity is a basic, everyday design decision in building robot hardware.
+
+## Related
+
+[I2C](/atlas/concept/i2c) · [UART](/atlas/concept/uart) · [Microcontroller](/atlas/concept/microcontroller) · [Rotary encoder](/atlas/concept/rotary-encoder)

@@ -1,0 +1,73 @@
+---
+title: Ground Loop
+slug: ground-loop
+bucket: concept
+category: hardware
+summary: >-
+  A ground loop happens when a circuit has more than one path to ground at different voltages, letting
+  stray currents flow through signal lines — a subtle wiring flaw that injects noise and corrupts sensor
+  readings in robots.
+difficulty: 3
+tags:
+  - electronics
+  - hardware
+  - noise
+seeAlso:
+  - electromagnetic-interference
+  - strain-gauge
+  - microcontroller
+  - can-bus
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Ground loop (electricity) (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Ground_loop_(electricity)'
+  - title: 'Grounding for signal integrity'
+    url: 'https://en.wikipedia.org/wiki/Electromagnetic_compatibility'
+laymanExplanation: >-
+  A ground loop is a wiring problem where two parts of a robot connect to 'ground' through different
+  paths that aren't at the exact same voltage. Stray current then sneaks through the signal wires,
+  adding noise that messes up readings.
+technicalDefinition: >-
+  A ground loop occurs when two or more ground connections form a loop at differing potentials, driving
+  unwanted current through signal returns and introducing noise.
+quizQuestion:
+  q: A ground loop causes problems because…
+  options:
+    - It stores extra energy usefully
+    - Stray current flows through signal grounds, adding noise
+    - It speeds up the processor
+    - It charges the battery
+  answer: 1
+  explanation: >-
+    Differing ground potentials drive stray current through the signal return path, superimposing noise
+    on the measured signal.
+---
+
+You wire up a sensor carefully, yet its reading has a mysterious hum or drift. Often the cause isn't the sensor at all — it's a **ground loop**, one of the sneakiest problems in robot electronics.
+
+## What it is
+
+"Ground" is supposed to be a single, common zero-volt reference. A **ground loop** arises when a circuit has **more than one path to ground**, and those paths sit at **slightly different voltages** (because current flowing through wiring resistance creates small voltage differences). That difference drives a **stray current** around the loop — and if that loop includes a **signal wire's return path**, the stray current adds a noise voltage right on top of the signal you're trying to measure.
+
+```diagram
+{ "type": "flow", "title": "Two grounds, one sneaky current", "nodes": ["Two ground paths", "Slightly different voltages", "Stray current flows in loop", "Noise added to signal"], "caption": "Because the grounds aren't at exactly the same potential, current circulates through the loop — and any signal sharing that return picks up the noise." }
+```
+
+## Why robots are prone to it
+
+Robots draw **large, fluctuating motor currents** through their grounds. Those currents create shifting voltage differences across the ground wiring, so a sensitive sensor grounded at one point and the controller grounded at another can see a noisy difference between "their" grounds. Combined with [EMI](/atlas/concept/electromagnetic-interference) from the same motors, ground loops are a leading cause of flaky analog readings — especially from sensitive sensors like [strain gauges](/atlas/concept/strain-gauge), load cells, and analog sensors.
+
+## How engineers prevent it
+
+- **Single-point (star) grounding.** Route all grounds back to one common point so no loops form.
+- **Separate power and signal grounds**, joined at a single spot, keeping noisy motor-return current out of signal returns.
+- **Differential signaling.** Buses like [CAN](/atlas/concept/can-bus) measure the *difference* between two wires, so a shifting ground is ignored — inherently ground-loop-resistant.
+- **Isolation.** Opto-isolators or isolated converters break the loop entirely between noisy and sensitive sections.
+
+## Why it matters
+
+Ground loops are a classic, hard-to-find gremlin in real robot hardware — the reason a perfectly good sensor reads noisy once it's wired into a motor-driven machine. Understanding grounding (and using differential buses and isolation) is a fundamental skill for building robots whose electronics actually behave.
+
+## Related
+
+[Electromagnetic interference](/atlas/concept/electromagnetic-interference) · [Strain gauge](/atlas/concept/strain-gauge) · [Microcontroller](/atlas/concept/microcontroller) · [CAN bus](/atlas/concept/can-bus)

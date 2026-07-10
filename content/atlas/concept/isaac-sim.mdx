@@ -1,0 +1,80 @@
+---
+title: NVIDIA Isaac Sim
+slug: isaac-sim
+bucket: concept
+category: control
+summary: >-
+  Isaac Sim is NVIDIA's GPU-accelerated, photorealistic robot simulator — able to run thousands of
+  robots in parallel and generate lifelike sensor data, powering large-scale robot learning and
+  synthetic-data generation.
+difficulty: 3
+tags:
+  - simulation
+  - software
+  - reinforcement-learning
+seeAlso:
+  - physics-engine
+  - domain-randomization
+  - synthetic-data
+  - reinforcement-learning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'NVIDIA Isaac Sim'
+    url: 'https://developer.nvidia.com/isaac-sim'
+  - title: 'Isaac Gym — GPU-based RL'
+    url: 'https://developer.nvidia.com/isaac-gym'
+laymanExplanation: >-
+  Isaac Sim is a powerful robot simulator from NVIDIA that uses graphics cards to run huge numbers of
+  robots at once and make very realistic camera images. It's used to train robot AI at massive scale and
+  to generate labeled training pictures.
+technicalDefinition: >-
+  Isaac Sim is NVIDIA's Omniverse-based robotics simulator offering GPU-accelerated physics,
+  photorealistic rendering, massively parallel environments, and synthetic-data generation.
+quizQuestion:
+  q: A defining strength of Isaac Sim/Gym is…
+  options:
+    - It runs on a single CPU only
+    - GPU acceleration to run thousands of robots in parallel
+    - It has no graphics
+    - It cannot simulate sensors
+  answer: 1
+  explanation: >-
+    By running physics and rendering on the GPU, Isaac can simulate thousands of environments in
+    parallel — enabling large-scale reinforcement learning and synthetic data.
+---
+
+Training a robot policy can take millions or billions of trials. Doing that one simulation at a time is hopeless. **NVIDIA Isaac Sim** attacks the problem with brute GPU parallelism — and photorealism to match.
+
+## What it is
+
+Isaac Sim is NVIDIA's robotics simulator, built on the Omniverse platform. Two things set it apart:
+
+- **GPU-accelerated, massively parallel physics.** Its Isaac Gym / GPU-physics capability runs **thousands of robot environments simultaneously** on a single GPU — so an experience that would take a CPU simulator weeks runs in hours. This is transformative for [reinforcement learning](/atlas/concept/reinforcement-learning).
+- **Photorealistic rendering.** High-fidelity, ray-traced camera, lidar, and depth simulation — realistic enough to generate useful [synthetic data](/atlas/concept/synthetic-data) for perception and to narrow the visual [sim-to-real](/atlas/concept/sim-to-real) gap.
+
+```diagram
+{ "type": "flow", "title": "Thousands of robots, learning at once", "nodes": ["Load robot + task", "Run 1000s of envs on GPU", "Collect vast experience fast", "Train robust policy"], "caption": "Parallel GPU simulation floods the learning algorithm with experience, while photorealistic rendering also makes it a synthetic-data engine for perception." }
+```
+
+## What it's used for
+
+- **Large-scale RL training.** Learning locomotion and manipulation policies with the enormous sample counts modern RL needs — then transferring to hardware with [domain randomization](/atlas/concept/domain-randomization).
+- **Synthetic data generation.** Producing labeled photorealistic images for training [vision models](/atlas/concept/computer-vision) (part of NVIDIA's Isaac Replicator).
+- **Full-robot and warehouse simulation.** Testing complete systems, fleets, and factory/warehouse scenarios, integrated with ROS/Isaac ROS.
+- **Digital twins** of real facilities and robots.
+
+## The trade-offs
+
+- **Needs NVIDIA GPUs.** Its power comes from (and requires) capable NVIDIA hardware — a cost and platform constraint.
+- **Heavier to set up** than a lightweight tool like [PyBullet](/atlas/concept/pybullet), and more than many projects need.
+- **Ecosystem lock-in** to NVIDIA's stack (which is also a strength for those already in it).
+
+It sits at the high-capability end of the simulator spectrum, alongside [MuJoCo](/atlas/concept/mujoco) (accurate contact, now also GPU-capable), [Gazebo](/atlas/concept/gazebo-simulator) (ROS integration), and PyBullet (accessibility) — teams pick by need.
+
+## Why it matters
+
+Isaac Sim exemplifies where robot simulation is heading: **GPU-scale parallelism and photorealism** that make large-scale learning and synthetic-data pipelines practical. It's a major enabler of the modern train-in-sim, deploy-on-hardware approach behind today's most capable learned robot behaviors.
+
+## Related
+
+[Physics engine](/atlas/concept/physics-engine) · [Domain randomization](/atlas/concept/domain-randomization) · [Synthetic data](/atlas/concept/synthetic-data) · [Reinforcement learning](/atlas/concept/reinforcement-learning)

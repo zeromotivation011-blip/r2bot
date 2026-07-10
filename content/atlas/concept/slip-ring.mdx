@@ -1,0 +1,77 @@
+---
+title: Slip Ring
+slug: slip-ring
+bucket: concept
+category: actuators
+summary: >-
+  A slip ring carries power and signals across a continuously rotating joint — the component that lets a
+  spinning lidar, a turret, or a rotating robot part turn forever without twisting and snapping its
+  cables.
+difficulty: 2
+tags:
+  - electronics
+  - mechanism
+  - hardware
+seeAlso:
+  - lidar
+  - brushless-motor
+  - rotary-encoder
+  - electromagnetic-interference
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Slip ring (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Slip_ring'
+  - title: 'Rotary electrical connectors'
+    url: 'https://en.wikipedia.org/wiki/Slip_ring'
+laymanExplanation: >-
+  A slip ring is a rotating electrical connector. It lets electricity and signals pass from a still part
+  of a robot to a spinning part, so something can rotate endlessly without its wires wrapping up and
+  breaking.
+technicalDefinition: >-
+  A slip ring is a rotary electrical joint using conductive rings and brushes to transmit power and
+  signals between stationary and continuously rotating parts.
+quizQuestion:
+  q: A slip ring solves the problem of…
+  options:
+    - Making motors faster
+    - Passing power/signals to a part that rotates continuously without twisting wires
+    - Storing energy
+    - Cooling the robot
+  answer: 1
+  explanation: >-
+    It provides a rotating electrical connection so a continuously spinning part gets power and signals
+    without its cables winding up and snapping.
+---
+
+Here's a deceptively hard problem: how do you power and read data from something that **spins around forever**? A spinning [lidar](/atlas/concept/lidar) or a rotating turret can't have normal wires — they'd wind up and snap. The elegant fix is the **slip ring**.
+
+## What it is
+
+A slip ring is a **rotary electrical connector**. It has conductive **rings** on the rotating part and stationary **brushes** (or other contacts) that press against them. As the part spins, the brushes stay in continuous electrical contact with the rings, so **power and signals pass across the rotating joint** without any fixed wire spanning it. The result: something can rotate **endlessly in one direction** while staying electrically connected.
+
+```diagram
+{ "type": "flow", "title": "Electricity across a spinning joint", "nodes": ["Stationary side", "Brushes contact rings", "Rotating side spins freely", "Power + signals pass across"], "caption": "Rings turn with the rotating part while brushes stay put, maintaining contact — so the spinning side gets continuous power and data without twisting cables." }
+```
+
+## Where robots need it
+
+- **Spinning lidar.** A mechanical [lidar](/atlas/concept/lidar) rotates its laser assembly continuously; a slip ring powers it and carries the data out.
+- **Turrets and pan mechanisms.** Cameras, sensors, and weapons mounts that need to rotate without limit.
+- **Rotary tables and tool changers** in industrial cells.
+- **Cable-management relief.** Anywhere a joint would otherwise have to reverse to avoid winding up its wires, a slip ring removes that limit.
+
+## The trade-offs
+
+- **Wear.** Brushes and rings physically rub, so they wear over time and eventually need service — a maintenance item.
+- **Noise and resistance.** The sliding contact can add electrical noise and small resistance, a concern for sensitive signals (mitigated with gold contacts, or by using contactless rotary transfer for data).
+- **Cost and size** for high channel counts or high currents.
+
+Alternatives exist for specific needs: **rotary transformers** for power and **optical rotary joints** or wireless for data, avoiding physical contact — but the classic brush slip ring remains simple and widely used.
+
+## Why it matters
+
+The slip ring is the unsung component that makes **continuous rotation** electrically possible — the reason a lidar can spin, a turret can turn without end, and a robot joint can rotate freely without cable-wind limits. It's a small part that quietly enables a whole class of rotating robot mechanisms.
+
+## Related
+
+[LiDAR](/atlas/concept/lidar) · [Brushless motor](/atlas/concept/brushless-motor) · [Rotary encoder](/atlas/concept/rotary-encoder) · [Electromagnetic interference](/atlas/concept/electromagnetic-interference)

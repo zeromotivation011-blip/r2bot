@@ -1,0 +1,80 @@
+---
+title: Physics Engine
+slug: physics-engine
+bucket: concept
+category: control
+summary: >-
+  A physics engine is the software that simulates how objects move, collide, and respond to forces — the
+  core of every robot simulator, and the difference between a realistic virtual test and a useless one.
+difficulty: 3
+tags:
+  - simulation
+  - software
+  - dynamics
+seeAlso:
+  - gazebo-simulator
+  - mujoco
+  - sim-to-real
+  - equations-of-motion
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Physics engine (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Physics_engine'
+  - title: 'Rigid body dynamics simulation'
+    url: 'https://en.wikipedia.org/wiki/Rigid_body_dynamics'
+laymanExplanation: >-
+  A physics engine is the part of a simulator that calculates how things move — gravity pulling, objects
+  bumping, joints bending. It's what makes a virtual robot behave like a real one, so you can test in
+  software before touching hardware.
+technicalDefinition: >-
+  A physics engine numerically simulates rigid-body (and sometimes soft-body) dynamics — integrating
+  equations of motion and resolving collisions and contacts over discrete time steps.
+quizQuestion:
+  q: The hardest part for most robotics physics engines to simulate accurately is…
+  options:
+    - Gravity
+    - Contact and friction between objects
+    - The color of objects
+    - Straight-line motion
+  answer: 1
+  explanation: >-
+    Contact and friction — how objects touch, grip, and slip — are notoriously hard to model accurately,
+    and they dominate manipulation and locomotion.
+---
+
+Every robot simulator — [Gazebo](/atlas/concept/gazebo-simulator), Isaac Sim, MuJoCo — has a beating heart that computes how the virtual world behaves. That heart is the **physics engine**.
+
+## What it does
+
+A physics engine numerically **simulates dynamics**: it takes the forces acting on objects (gravity, motor torques, contacts) and computes how everything moves, step by tiny time step. It integrates the [equations of motion](/atlas/concept/equations-of-motion), detects when objects **collide**, and resolves the **contact forces** that stop them from passing through each other or make a foot grip the ground. For a robot, it turns "the motor applied this torque" into "the arm moved like this."
+
+```diagram
+{ "type": "flow", "title": "Forces to motion, step by step", "nodes": ["Apply forces + torques", "Integrate equations of motion", "Detect + resolve contacts", "Advance one time step"], "caption": "Each tiny time step, the engine computes new positions and velocities and handles collisions — repeat thousands of times a second to simulate the world." }
+```
+
+## Why it's the make-or-break part
+
+The realism of a robot simulation lives or dies by its physics engine — and the hardest thing to get right is **contact and friction**:
+
+- **Manipulation** is all about contact: grasping, pushing, inserting. If the engine models friction and contact poorly, grasps that work in sim fail on the real robot.
+- **Locomotion** is all about foot-ground contact: a walking policy trained on unrealistic contact won't transfer.
+
+This is the crux of the **[sim-to-real](/atlas/concept/sim-to-real) gap**: real friction, deformation, and contact are fiendishly complex, and engines approximate them. Better contact modeling means better transfer to hardware.
+
+## The trade-off: speed vs accuracy
+
+Physics engines constantly balance **fidelity against speed**:
+
+- **[MuJoCo](/atlas/concept/mujoco)** — prized for accurate, stable contact and fast simulation, a favorite for robot learning.
+- **PhysX / Isaac** — GPU-accelerated to run *thousands* of robots in parallel for reinforcement learning.
+- **Bullet / ODE / DART** — general-purpose engines behind many simulators.
+
+For training via [reinforcement learning](/atlas/concept/reinforcement-learning), raw speed (millions of simulated steps) can matter as much as per-step accuracy — hence GPU-parallel engines.
+
+## Why it matters
+
+The physics engine is the foundation of all robot simulation — and therefore of modern robot *learning*, testing, and design. Its accuracy (especially at contact) determines whether what you learn or verify in simulation actually works on the real robot. Understanding it explains both the power and the limits of simulating robots.
+
+## Related
+
+[Gazebo simulator](/atlas/concept/gazebo-simulator) · [MuJoCo](/atlas/concept/mujoco) · [Sim-to-real](/atlas/concept/sim-to-real) · [Equations of motion](/atlas/concept/equations-of-motion)

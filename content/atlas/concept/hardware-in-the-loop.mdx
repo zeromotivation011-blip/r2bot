@@ -1,0 +1,79 @@
+---
+title: Hardware-in-the-Loop (HIL)
+slug: hardware-in-the-loop
+bucket: concept
+category: control
+summary: >-
+  Hardware-in-the-loop testing connects a robot's real controller to a simulated world — so the actual
+  electronics and software can be tested safely and repeatably against virtual sensors and physics
+  before touching a real robot.
+difficulty: 3
+tags:
+  - simulation
+  - testing
+  - control
+seeAlso:
+  - physics-engine
+  - sim-to-real
+  - gazebo-simulator
+  - real-time-operating-system
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Hardware-in-the-loop simulation (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Hardware-in-the-loop_simulation'
+  - title: 'HIL testing'
+    url: 'https://en.wikipedia.org/wiki/Hardware-in-the-loop_simulation'
+laymanExplanation: >-
+  Hardware-in-the-loop testing plugs the robot's real control computer into a simulation. The controller
+  thinks it's driving a real robot, but the sensors and world are simulated — so you can test the actual
+  hardware and code safely, including crash scenarios.
+technicalDefinition: >-
+  HIL testing connects real controller hardware to a real-time simulation of the plant (robot and
+  environment), exchanging sensor and actuator signals to validate the embedded system.
+quizQuestion:
+  q: In hardware-in-the-loop testing, what is real and what is simulated?
+  options:
+    - Everything is simulated
+    - The controller hardware is real; the robot/world is simulated
+    - The robot is real; the controller is simulated
+    - Nothing is tested
+  answer: 1
+  explanation: >-
+    HIL keeps the actual controller hardware and software in the loop while simulating the robot and its
+    environment in real time.
+---
+
+There's a gap between pure software simulation and testing on a real robot. **Hardware-in-the-loop (HIL)** testing bridges it — putting the *real* controller into a *simulated* world.
+
+## What it is
+
+In HIL, the robot's **actual control hardware and software** (the controller, its firmware, sometimes real sensors or motor drivers) runs for real — but instead of driving a physical robot, it's connected to a **real-time simulation** of the robot and its environment. The controller sends actuator commands; the simulation computes how the virtual robot would respond and feeds back simulated sensor readings. The controller can't tell it isn't driving a real machine.
+
+```diagram
+{ "type": "flow", "title": "Real controller, simulated robot", "nodes": ["Real controller sends commands", "Real-time simulation of robot", "Simulated sensors respond", "Feed back to controller"], "caption": "The embedded system runs exactly as it would on hardware, but the physics and sensors are simulated in real time — testing the real software/hardware safely." }
+```
+
+## Why it's valuable
+
+- **Test the real thing, safely.** Unlike pure software simulation, HIL validates the *actual* controller, firmware, and timing — bugs that only appear on real hardware — without risking an expensive robot or people.
+- **Dangerous and edge cases.** Deliberately simulate faults, extreme conditions, and failure scenarios (a sensor dropping out, a motor stalling) that would be dangerous or destructive to trigger on a real robot.
+- **Repeatable and automated.** Run the exact same scenario thousands of times for regression testing — impossible with a physical robot where every run differs.
+- **Before hardware exists.** Test the control system against a simulated robot while the physical one is still being built.
+
+It demands a **real-time** simulation (often on a [real-time operating system](/atlas/concept/real-time-operating-system) or dedicated HIL rig) because the controller runs in real time and expects timely responses.
+
+## Where it sits in the testing ladder
+
+- **Software-in-the-loop (SIL)** — everything, including the controller, runs as software; fastest, least real.
+- **Hardware-in-the-loop (HIL)** — real controller, simulated plant; validates the embedded system.
+- **Real-robot testing** — the final, highest-fidelity, highest-risk step.
+
+HIL is the crucial middle rung, standard in automotive, aerospace, and increasingly robotics, feeding into the broader [sim-to-real](/atlas/concept/sim-to-real) validation process.
+
+## Why it matters
+
+Hardware-in-the-loop lets teams validate a robot's real control system thoroughly, safely, and repeatably — catching the bugs that pure simulation misses without endangering hardware or people. It's a key practice for building **reliable, safety-critical** robots and a bridge between simulation and deployment.
+
+## Related
+
+[Physics engine](/atlas/concept/physics-engine) · [Sim-to-real](/atlas/concept/sim-to-real) · [Gazebo simulator](/atlas/concept/gazebo-simulator) · [Real-time operating system](/atlas/concept/real-time-operating-system)

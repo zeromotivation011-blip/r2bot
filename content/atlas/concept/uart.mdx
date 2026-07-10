@@ -1,0 +1,82 @@
+---
+title: UART
+slug: uart
+bucket: concept
+category: hardware
+summary: >-
+  UART is the simple point-to-point serial link that connects two devices with just a transmit and
+  receive wire — the humble, universal way robots talk to GPS modules, debug consoles, and each other.
+difficulty: 2
+tags:
+  - electronics
+  - communication
+  - hardware
+seeAlso:
+  - i2c
+  - spi
+  - microcontroller
+  - gps-gnss
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'UART (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter'
+  - title: 'Serial communication basics'
+    url: 'https://en.wikipedia.org/wiki/Serial_communication'
+laymanExplanation: >-
+  UART is the simplest way for two devices to talk: one wire to send, one to receive. No shared bus, no
+  addresses — just a direct serial line, used for things like GPS modules and debug messages.
+technicalDefinition: >-
+  UART is an asynchronous point-to-point serial interface using TX and RX lines at an agreed baud rate,
+  with no shared clock, framing each byte with start/stop bits.
+quizQuestion:
+  q: UART communication is…
+  options:
+    - A shared bus with device addresses
+    - A simple point-to-point link (TX and RX) with no shared clock
+    - Wireless only
+    - Faster than all other buses
+  answer: 1
+  explanation: >-
+    UART is point-to-point and asynchronous — two devices exchange bytes over TX/RX at an agreed baud
+    rate, without a shared clock or addressing.
+---
+
+The simplest way two electronic devices can talk is a plain serial line — one wire each way. That's **UART**, and it's been connecting devices for decades, including inside robots.
+
+## What it is
+
+UART (**Universal Asynchronous Receiver-Transmitter**) is a **point-to-point** serial link between two devices, using two data lines:
+
+- **TX** — transmit (this device's output → other's input).
+- **RX** — receive (other device's output → this device's input).
+
+It's **asynchronous** — there's no shared clock line. Instead, both sides agree in advance on a speed (the **baud rate**, e.g. 115200), and each byte is wrapped in **start and stop bits** so the receiver can find where bytes begin and end. Simple, direct, no addresses, no bus arbitration.
+
+```diagram
+{ "type": "flow", "title": "A direct two-way serial link", "nodes": ["Device A TX → B RX", "Device B TX → A RX", "Agree on baud rate", "Bytes framed start/stop"], "caption": "Just cross TX and RX between two devices and pick a matching baud rate. No shared bus, no addressing — the simplest serial connection." }
+```
+
+## UART vs I2C vs SPI
+
+The three basic serial interfaces divide by use:
+
+- **UART** — **point-to-point** (two devices), no clock line, no addressing. Simple, and naturally suited to *streams* of data.
+- **[I2C](/atlas/concept/i2c)** — two-wire **shared bus**, many addressed devices, slower.
+- **[SPI](/atlas/concept/spi)** — four-wire, fast, chip-select per device.
+
+UART's limitation is it's inherently **one-to-one** — connecting many devices needs many UART ports or extra hardware.
+
+## Where you'll see it
+
+- **[GPS](/atlas/concept/gps-gnss) modules** stream position data over UART — a classic use.
+- **Debug/console output** — printing log messages from a [microcontroller](/atlas/concept/microcontroller) to a computer (over a USB-to-serial adapter) is how embedded developers see what's happening.
+- **Module-to-module links** — many radios, Bluetooth modules, and single-purpose sensors expose a UART.
+- It also underlies serial standards like RS-232 and RS-485 (the latter rugged for long industrial runs).
+
+## Why it matters
+
+UART is the most basic and universal serial link in electronics — the first tool for connecting two devices and the everyday channel for GPS, debugging, and module communication. Every robotics builder uses it constantly, especially the debug console that makes embedded development possible.
+
+## Related
+
+[I2C](/atlas/concept/i2c) · [SPI](/atlas/concept/spi) · [Microcontroller](/atlas/concept/microcontroller) · [GPS / GNSS](/atlas/concept/gps-gnss)

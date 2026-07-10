@@ -1,0 +1,81 @@
+---
+title: FPGA
+slug: field-programmable-gate-array
+bucket: concept
+category: hardware
+summary: >-
+  An FPGA is a chip whose digital circuitry you can reconfigure — giving robots custom, massively
+  parallel hardware for tasks like motor control, sensor processing, and vision that need speed and
+  precise timing.
+difficulty: 4
+tags:
+  - electronics
+  - computing
+  - hardware
+seeAlso:
+  - microcontroller
+  - jetson
+  - edge-computing
+  - real-time-operating-system
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Field-programmable gate array (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Field-programmable_gate_array'
+  - title: 'FPGA basics'
+    url: 'https://www.xilinx.com/'
+laymanExplanation: >-
+  An FPGA is a chip you can rewire with software to become whatever digital circuit you need. Because
+  the logic runs as real parallel hardware, it's extremely fast and precisely timed — great for jobs
+  like driving motors or processing sensor data with no delay.
+technicalDefinition: >-
+  An FPGA is a reconfigurable integrated circuit of programmable logic blocks and interconnects that
+  implements custom parallel digital hardware described in an HDL.
+quizQuestion:
+  q: What makes an FPGA different from a normal processor?
+  options:
+    - It runs software instructions sequentially
+    - Its digital hardware is reconfigurable and runs in true parallel
+    - It has no logic at all
+    - It only stores data
+  answer: 1
+  explanation: >-
+    An FPGA implements custom hardware circuits that run in parallel, rather than executing software
+    instructions one after another like a CPU.
+---
+
+Most robot computing runs *software* on a processor. But some tasks need custom *hardware* — fast, parallel, precisely timed. Rather than designing a new chip, engineers reach for an **FPGA**: a chip you can rewire.
+
+## What it is
+
+An FPGA (**Field-Programmable Gate Array**) is an integrated circuit made of a fabric of **reconfigurable logic blocks** and interconnects. You describe a digital circuit in a hardware-description language (VHDL/Verilog), and the FPGA *becomes* that circuit — real hardware, not software running on a processor. "Field-programmable" means you can reconfigure it after manufacture, even in the deployed robot.
+
+```diagram
+{ "type": "flow", "title": "Software describes, hardware runs", "nodes": ["Design a circuit (HDL)", "Configure the FPGA", "Chip becomes that hardware", "Runs massively parallel"], "caption": "Unlike a CPU executing instructions one by one, the FPGA implements your logic as physical parallel circuits — many operations truly at once, with tight timing." }
+```
+
+## Why robots use it
+
+- **True parallelism.** Hundreds of operations happen simultaneously in hardware — ideal for processing many sensor channels, camera pixels, or motor phases at once.
+- **Deterministic, low-latency timing.** Logic responds in nanoseconds with cycle-exact timing — perfect for high-rate motor commutation, [encoder](/atlas/concept/rotary-encoder) decoding, and fast control loops where even a [microcontroller](/atlas/concept/microcontroller) or CPU is too slow or jittery.
+- **Custom interfaces.** Implement any protocol or high-speed sensor interface in hardware.
+- **Vision and signal processing.** Pipeline image or lidar processing in hardware at the sensor, before it ever reaches the main CPU.
+
+## The trade-offs
+
+- **Hard to design.** Thinking in parallel hardware (HDL) is a specialized skill, far from ordinary programming.
+- **Cost and power.** More expensive and often more power-hungry than a microcontroller; overkill for simple tasks.
+- **Development time.** Longer design and debug cycles.
+
+So FPGAs are chosen for the *specific* fast, parallel, precisely-timed jobs where a CPU or MCU can't keep up — often as a co-processor alongside them. Many robot compute modules (like some [Jetson](/atlas/concept/jetson) and industrial boards) pair a CPU with an FPGA.
+
+## Where you'll see it
+
+High-performance motor drives and servo controllers, real-time sensor fusion front-ends, lidar and camera processing pipelines, high-speed data acquisition, and aerospace/defense robotics where deterministic hardware matters.
+
+## Why it matters
+
+The FPGA gives robots **custom hardware acceleration** without designing a chip — bridging the gap between flexible-but-slower software and fast-but-fixed dedicated silicon. For the timing-critical, highly parallel corners of a robot, it's an essential tool.
+
+## Related
+
+[Microcontroller](/atlas/concept/microcontroller) · [Jetson](/atlas/concept/jetson) · [Edge computing](/atlas/concept/edge-computing) · [Real-time operating system](/atlas/concept/real-time-operating-system)

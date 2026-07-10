@@ -1,0 +1,82 @@
+---
+title: Domain Randomization
+slug: domain-randomization
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Domain randomization trains robots in simulation with wildly varied physics and visuals, so the real
+  world looks like just another variation — the key trick that lets policies learned in sim work on
+  real hardware.
+difficulty: 3
+tags:
+  - simulation
+  - reinforcement-learning
+  - sim-to-real
+seeAlso:
+  - sim-to-real
+  - reinforcement-learning
+  - synthetic-data
+  - physics-engine
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Domain randomization (research)'
+    url: 'https://en.wikipedia.org/wiki/Sim-to-real'
+  - title: 'Tobin et al. — Domain Randomization'
+    url: 'https://arxiv.org/abs/1703.06907'
+laymanExplanation: >-
+  Domain randomization means training a robot in simulation while constantly changing everything —
+  colors, lighting, friction, weights — so it never learns to depend on any exact detail. Then the real
+  world just looks like one more variation it can handle.
+technicalDefinition: >-
+  Domain randomization trains models over a wide distribution of randomized simulation parameters
+  (visual and physical) so the learned policy generalizes to reality as another sample of that
+  distribution.
+quizQuestion:
+  q: Domain randomization helps close the sim-to-real gap by…
+  options:
+    - Making simulation perfectly realistic
+    - Training over many randomized variations so reality is just another one
+    - Avoiding simulation entirely
+    - Using only real data
+  answer: 1
+  explanation: >-
+    By randomizing physics and visuals across a wide range, the policy learns to be robust, so the real
+    world falls within the distribution it already handles.
+---
+
+Training robots in [simulation](/atlas/concept/physics-engine) is cheap and safe — but simulation is never perfectly realistic, so policies learned there often fail on real hardware (the **[sim-to-real](/atlas/concept/sim-to-real) gap**). **Domain randomization** is the clever trick that bridges it.
+
+## The counterintuitive idea
+
+Instead of trying to make **one** simulation match reality exactly (very hard), domain randomization makes **thousands of *different* simulations** and trains across all of them. It randomizes everything the robot might depend on:
+
+- **Visual** — colors, textures, lighting, camera position, backgrounds.
+- **Physical** — friction, masses, motor strengths, delays, sensor noise, object sizes.
+
+Faced with such wild variation in training, the policy can't latch onto any exact detail. It's forced to learn the **robust, essential** structure of the task. Then the real world simply looks like *yet another variation* — one sample from a distribution the robot already handles.
+
+```diagram
+{ "type": "flow", "title": "Vary everything, so reality is nothing special", "nodes": ["Randomize physics + visuals", "Train across many variations", "Policy learns robustly", "Real world = one more sample"], "caption": "Because the robot trained on a huge spread of conditions, the real world falls inside that spread — no exact sim-to-reality match required." }
+```
+
+## Why it works
+
+- **Robustness by construction.** A policy that survives random frictions, masses, and lighting isn't brittle to the specific (unknown) real values.
+- **No perfect model needed.** You sidestep the impossible task of measuring reality exactly — you just make sure reality is *inside* your randomized range.
+- **Scales with compute.** Modern GPU-parallel simulators run thousands of randomized robots at once, generating vast, varied training data cheaply.
+
+It powered landmark results — OpenAI's dexterous cube-manipulation hand and robust legged-locomotion policies were trained in sim with heavy randomization and transferred to hardware.
+
+## The limits and refinements
+
+- **Too much randomization** can make the task so hard the policy underperforms; too little and it doesn't transfer. Tuning the ranges matters.
+- **Automatic / adaptive** domain randomization adjusts the ranges during training, expanding difficulty as the policy improves.
+- It's closely tied to **[synthetic data](/atlas/concept/synthetic-data)** generation for perception, where randomized rendered images train vision models.
+
+## Why it matters
+
+Domain randomization is arguably the single most important idea for making simulation-trained robots work in reality. It reframes the sim-to-real problem from "match reality perfectly" to "be robust to everything," and it underpins much of modern robot learning — from dexterous manipulation to locomotion.
+
+## Related
+
+[Sim-to-real](/atlas/concept/sim-to-real) · [Reinforcement learning](/atlas/concept/reinforcement-learning) · [Synthetic data](/atlas/concept/synthetic-data) · [Physics engine](/atlas/concept/physics-engine)
