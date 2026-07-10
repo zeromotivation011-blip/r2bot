@@ -1,0 +1,76 @@
+---
+title: Iterative Closest Point (ICP)
+slug: iterative-closest-point
+bucket: concept
+category: ai-and-perception
+summary: >-
+  ICP is the algorithm that aligns two 3D scans by repeatedly matching nearest points and
+  nudging one cloud onto the other — the core of lidar odometry, 3D mapping, and fitting
+  scans to models.
+difficulty: 3
+tags:
+  - perception
+  - point-cloud
+  - registration
+seeAlso:
+  - point-cloud
+  - lidar
+  - slam
+  - visual-odometry
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Besl & McKay — A method for registration of 3-D shapes'
+    url: 'https://en.wikipedia.org/wiki/Iterative_closest_point'
+  - title: 'Point Cloud Library (PCL) — registration'
+    url: 'https://pointclouds.org/'
+laymanExplanation: >-
+  ICP lines up two 3D scans of the same place. It pairs each point with the nearest point
+  in the other scan, computes the move that best overlaps them, applies it, and repeats
+  until they snap together — like sliding two transparent maps until they match.
+technicalDefinition: >-
+  ICP registers two point clouds by iteratively matching nearest-neighbor correspondences
+  and solving for the rigid transform that minimizes their distance, until convergence.
+quizQuestion:
+  q: What does ICP compute?
+  options:
+    - The color of a point cloud
+    - The rigid transform that aligns two point clouds
+    - The battery usage of a lidar
+    - The number of points only
+  answer: 1
+  explanation: >-
+    ICP finds the rotation and translation that best aligns one point cloud onto another by
+    iteratively matching nearest points.
+---
+
+A [lidar](/atlas/concept/lidar) takes a 3D snapshot; a moment later it takes another from a slightly different spot. To know how the robot moved — or to stitch the scans into a map — you must figure out the exact rotation and translation between them. That's what **Iterative Closest Point** does.
+
+## How it works
+
+ICP aligns two [point clouds](/atlas/concept/point-cloud) by looping:
+
+1. For each point in cloud A, find the **closest** point in cloud B (the correspondence).
+2. Compute the single **rigid transform** (rotation + translation) that best maps A's points onto their matches.
+3. Apply it, then repeat — the matches improve, the clouds slide closer, and after a few iterations they lock together.
+
+```diagram
+{ "type": "loop", "title": "The ICP loop", "nodes": ["Match nearest points", "Solve best transform", "Move the cloud"], "caption": "Each pass improves the correspondences, so the alignment tightens step by step until the two scans overlap." }
+```
+
+## Where robots use it
+
+- **Lidar odometry** — align consecutive scans to estimate how far the robot moved, a drift-resistant complement to wheel [odometry](/atlas/concept/odometry).
+- **3D mapping and [SLAM](/atlas/concept/slam)** — register many scans into one consistent model; scan-matching front-ends lean on ICP or its variants.
+- **Object pose fitting** — snap a known CAD model onto sensor points to find a part's exact 6-DOF pose for grasping.
+
+## The pitfalls
+
+ICP needs a **decent initial guess** — start too far off and it locks onto the wrong local minimum and aligns things incorrectly. It also struggles with **partial overlap** (scans that only share part of the scene) and moving objects. Variants harden it: **point-to-plane** ICP converges faster on flat surfaces, and robust weighting or the **Normal Distributions Transform (NDT)** handle noise and outliers better. In practice a coarse global alignment feeds a fine ICP polish.
+
+## Why it matters
+
+ICP is the workhorse of 3D registration — the quiet step that turns a stream of disconnected scans into coherent motion estimates and maps. Understanding it is essential to lidar-based navigation and 3D perception.
+
+## Related
+
+[Point cloud](/atlas/concept/point-cloud) · [LiDAR](/atlas/concept/lidar) · [SLAM](/atlas/concept/slam) · [Visual odometry](/atlas/concept/visual-odometry)

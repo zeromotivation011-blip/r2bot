@@ -1,0 +1,80 @@
+---
+title: Linear Quadratic Regulator (LQR)
+slug: linear-quadratic-regulator
+bucket: concept
+category: control
+summary: >-
+  LQR is an optimal controller that computes the single best set of feedback gains by
+  balancing how far the robot is from its target against how much effort the correction
+  costs — the go-to method for balancing, hovering, and stabilizing robots.
+difficulty: 4
+tags:
+  - control
+  - optimal-control
+  - state-space
+seeAlso:
+  - pid-controller
+  - model-predictive-control
+  - state-observer
+  - closed-loop-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Underactuated Robotics — Russ Tedrake (MIT)'
+    url: 'https://underactuated.mit.edu/'
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  LQR is a way to design a controller that automatically finds the best balance between
+  correcting an error fast and not using too much energy or effort doing it. You tell it
+  how much you care about each, and it computes the ideal feedback.
+technicalDefinition: >-
+  LQR computes optimal state-feedback gains K that minimize a quadratic cost on state
+  error and control effort for a linear system, giving u = -Kx.
+quizQuestion:
+  q: What does LQR trade off?
+  options:
+    - Speed vs battery voltage
+    - State error vs control effort
+    - Sensor noise vs frame rate
+    - Weight vs cost
+  answer: 1
+  explanation: >-
+    LQR minimizes a quadratic cost that weighs how far the state is from target against
+    how much control effort is used, via the Q and R matrices.
+---
+
+A [PID controller](/atlas/concept/pid-controller) is brilliant for one input and one output. But a self-balancing robot or a hovering drone has *many* coupled states — angle, angular rate, position, velocity — all interacting. For those, engineers reach for the **Linear Quadratic Regulator**.
+
+## What it is
+
+LQR is an **optimal controller**. Given a linear model of the robot (`ẋ = Ax + Bu`), it computes the one set of feedback gains `K` that minimizes a cost function balancing two things you care about:
+
+```
+cost = Σ ( xᵀQx  +  uᵀRu )
+         └ error ┘  └ effort ┘
+```
+
+- **Q** says how much you dislike being away from the target (large Q → correct aggressively).
+- **R** says how much you dislike using control effort (large R → be gentle, save energy/actuators).
+
+Solve the associated Riccati equation and out pops the optimal gain matrix. The controller is then simply `u = -Kx`.
+
+```diagram
+{ "type": "loop", "title": "LQR is optimal state feedback", "nodes": ["State x", "u = -Kx", "Robot"], "caption": "K is computed once from the model and the Q/R weights. It reads the full state and produces the effort that optimally balances error against effort." }
+```
+
+## Why robots love it
+
+LQR handles **multi-input, multi-output** systems naturally, where hand-tuning a web of PID loops would be a nightmare. Tuning becomes intuitive: instead of guessing gains, you set Q and R to express *what you value*, and the math finds the gains. It's the classic controller for cart-poles, Segways, quadrotor attitude, and legged-robot balancing.
+
+## The catch, and the sequel
+
+LQR assumes a **linear** model and needs the **full state**. Real robots are nonlinear, so engineers linearize about an operating point (upright, hovering) — LQR then keeps you *near* that point beautifully but can't handle huge deviations. And if you can't measure every state, you pair LQR with a [state observer](/atlas/concept/state-observer) or [Kalman filter](/atlas/concept/kalman-filter) to estimate it (that combination is called LQG). When you also need to respect hard limits and look ahead, [model predictive control](/atlas/concept/model-predictive-control) generalizes the same optimal-cost idea across a future horizon.
+
+## Why it matters
+
+LQR is the gateway from single-loop PID into modern optimal control. Understanding Q, R, and the state-feedback form is essential for anyone stabilizing a genuinely multi-variable robot.
+
+## Related
+
+[PID controller](/atlas/concept/pid-controller) · [Model predictive control](/atlas/concept/model-predictive-control) · [State observer](/atlas/concept/state-observer) · [Closed-loop control](/atlas/concept/closed-loop-control)

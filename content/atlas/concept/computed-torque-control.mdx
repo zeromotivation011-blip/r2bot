@@ -1,0 +1,81 @@
+---
+title: Computed Torque Control
+slug: computed-torque-control
+bucket: concept
+category: control
+summary: >-
+  Computed torque control uses a robot's own physics model to cancel its nonlinear
+  dynamics — gravity, inertia, and coupling — so a simple linear controller can drive
+  each joint precisely, the backbone of high-performance arm control.
+difficulty: 4
+tags:
+  - control
+  - manipulation
+  - dynamics
+seeAlso:
+  - pid-controller
+  - inverse-kinematics
+  - feedforward-control
+  - torque
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+  - title: 'Robot Dynamics and Control — Spong'
+    url: 'https://en.wikipedia.org/wiki/Computed_torque_control'
+laymanExplanation: >-
+  Computed torque control uses the robot's known physics to predict exactly how much
+  torque each joint needs to fight gravity and inertia, then adds a small correction on
+  top. By cancelling the hard nonlinear part, the leftover control is easy.
+technicalDefinition: >-
+  Computed torque control applies the inverse dynamics model to linearize and decouple a
+  manipulator, so a linear (e.g. PD) law achieves precise trajectory tracking.
+quizQuestion:
+  q: What does computed torque control cancel?
+  options:
+    - Sensor noise
+    - The robot's nonlinear dynamics (gravity, inertia, coupling)
+    - Battery drain
+    - Communication delay
+  answer: 1
+  explanation: >-
+    It uses the inverse-dynamics model to cancel gravity, inertia, and coupling, leaving
+    a linear system a simple controller can handle.
+---
+
+A heavy robot arm is a nightmare for a plain [PID controller](/atlas/concept/pid-controller): gravity pulls harder when it's outstretched, one joint's motion flings the others around, and effective inertia changes with every pose. **Computed torque control** tackles this head-on — by doing the physics.
+
+## The idea
+
+A manipulator's dynamics are known (from its [URDF](/atlas/concept/urdf) and mass properties):
+
+```
+τ = M(θ)·θ̈ + C(θ,θ̇)·θ̇ + g(θ)
+    inertia      coupling     gravity
+```
+
+Computed torque control simply *computes* the [torque](/atlas/concept/torque) that model demands to follow the desired motion — cancelling gravity, inertia, and coupling — and adds a small **feedback** correction (usually PD) to mop up modeling error:
+
+```
+τ = M(θ)·(θ̈_desired + Kp·e + Kd·ė) + C·θ̇ + g(θ)
+```
+
+```diagram
+{ "type": "flow", "title": "Cancel the hard part, then control the easy part", "nodes": ["Desired motion", "Inverse dynamics model", "+ PD correction", "Joint torques"], "caption": "The model term does the heavy lifting (feedforward); the small PD term corrects whatever the model got slightly wrong." }
+```
+
+## Why it works so well
+
+Once the nonlinear terms are cancelled, every joint behaves like a simple, **decoupled** linear system — so a basic PD law delivers crisp, uniform tracking across the whole workspace, not just near one tuned pose. It's essentially **[feedforward](/atlas/concept/feedforward-control) from physics** plus light feedback.
+
+## The catch
+
+The method is only as good as the model. Unknown payloads, friction, and flexible links all leave residual error — which is why the feedback term stays, and why adaptive versions estimate uncertain parameters online. It also needs joint accelerations and a fast torque-controlled actuator, so it's most at home on research arms and torque-controlled robots rather than cheap position-only servos.
+
+## Why it matters
+
+Computed torque control is the classic bridge between robot *dynamics* and robot *control*. It's why a well-modeled arm can move fast and accurately everywhere in its workspace, and it underpins the whole-body controllers on modern humanoids.
+
+## Related
+
+[PID controller](/atlas/concept/pid-controller) · [Feedforward control](/atlas/concept/feedforward-control) · [Torque](/atlas/concept/torque) · [Inverse kinematics](/atlas/concept/inverse-kinematics)

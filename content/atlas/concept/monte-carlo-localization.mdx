@@ -1,0 +1,74 @@
+---
+title: Monte Carlo Localization
+slug: monte-carlo-localization
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Monte Carlo localization figures out where a robot is on a known map by scattering
+  thousands of guesses and letting sensor readings vote the wrong ones away — the particle
+  filter behind almost every indoor mobile robot's "where am I?".
+difficulty: 3
+tags:
+  - localization
+  - particle-filter
+  - navigation
+seeAlso:
+  - particle-filter
+  - slam
+  - occupancy-grid
+  - dead-reckoning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Thrun, Burgard, Fox — Probabilistic Robotics'
+    url: 'http://www.probabilistic-robotics.org/'
+  - title: 'ROS 2 — Nav2 AMCL'
+    url: 'https://docs.nav2.org/'
+laymanExplanation: >-
+  Monte Carlo localization spreads thousands of "maybe I'm here" guesses across the map.
+  Each time the robot senses walls, guesses that match get kept and multiplied; guesses that
+  don't die off. The cloud of survivors converges on the true location.
+technicalDefinition: >-
+  Monte Carlo localization is a particle filter that represents a robot's pose belief as a
+  set of weighted samples, updated by motion and re-weighted by sensor likelihood.
+quizQuestion:
+  q: In Monte Carlo localization, each particle represents…
+  options:
+    - A possible robot pose
+    - A single laser beam
+    - A map pixel
+    - A motor command
+  answer: 0
+  explanation: >-
+    Each particle is a hypothesis about the robot's pose; sensor data re-weights them and
+    resampling concentrates particles on likely poses.
+---
+
+Drop a robot somewhere on a map it already has and ask "where am I?" It can't just measure the answer — but it can *guess intelligently*. **Monte Carlo localization (MCL)** turns thousands of guesses into a confident answer.
+
+## How it works
+
+MCL is a [particle filter](/atlas/concept/particle-filter). It represents the robot's belief about its pose as a **cloud of particles**, each a hypothesis "maybe I'm here, facing this way." Each cycle:
+
+1. **Move** — when the robot drives, shift every particle by the same motion (plus noise). This is [dead reckoning](/atlas/concept/dead-reckoning) applied to each guess.
+2. **Sense & weight** — compare what each particle *would* see (given the [map](/atlas/concept/occupancy-grid)) to what the robot *actually* sensed. Particles that match get high weight; mismatches get low.
+3. **Resample** — draw a new set, keeping high-weight particles and dropping poor ones.
+
+```diagram
+{ "type": "loop", "title": "The MCL cycle", "nodes": ["Move particles", "Weight by sensor match", "Resample"], "caption": "Over a few cycles the scattered guesses collapse onto the poses that consistently explain the sensor readings — the robot's true location." }
+```
+
+## Why it's so widely used
+
+MCL handles the **global localization** and **kidnapped robot** problems that a single-estimate [Kalman filter](/atlas/concept/kalman-filter) can't: because it holds *many* hypotheses at once, it can represent "I might be in either of these two identical hallways" and let evidence decide. It works with cheap lidar or sonar against a simple occupancy grid, degrades gracefully, and is easy to implement — which is why **AMCL** (Adaptive MCL) is the default localizer in ROS 2's Nav2 and on countless warehouse and service robots.
+
+## The trade-offs
+
+More particles mean more accuracy but more compute. Too few and the filter can become **overconfident** and lose the true pose (particle depletion), especially after a bad motion estimate. Adaptive variants grow and shrink the particle count with uncertainty to balance cost and robustness. And MCL localizes within a *known* map — building that map first is the job of [SLAM](/atlas/concept/slam).
+
+## Why it matters
+
+Monte Carlo localization is how most indoor mobile robots answer "where am I?" — a beautifully intuitive use of random sampling that turns an unsolvable measurement into a solvable vote.
+
+## Related
+
+[Particle filter](/atlas/concept/particle-filter) · [SLAM](/atlas/concept/slam) · [Occupancy grid](/atlas/concept/occupancy-grid) · [Dead reckoning](/atlas/concept/dead-reckoning)

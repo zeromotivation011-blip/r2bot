@@ -1,0 +1,77 @@
+---
+title: State Observer
+slug: state-observer
+bucket: concept
+category: control
+summary: >-
+  A state observer estimates the internal states a robot can't directly measure — like
+  velocity or load — by running a model in parallel and correcting it with the sensors
+  it does have, so controllers get the full picture they need.
+difficulty: 4
+tags:
+  - control
+  - estimation
+  - state-space
+seeAlso:
+  - kalman-filter
+  - linear-quadratic-regulator
+  - closed-loop-control
+  - sensor-fusion
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Modern Control Engineering — Ogata'
+    url: 'https://en.wikipedia.org/wiki/State_observer'
+  - title: 'Underactuated Robotics — Russ Tedrake (MIT)'
+    url: 'https://underactuated.mit.edu/'
+laymanExplanation: >-
+  A state observer figures out things about a robot you can't measure directly — like how
+  fast a joint is really moving — by running a simulation alongside the real robot and
+  nudging it whenever the real sensors disagree.
+technicalDefinition: >-
+  A state observer estimates unmeasured states of a dynamic system by simulating its
+  model and correcting the estimate with the error between predicted and measured outputs.
+quizQuestion:
+  q: Why is a state observer needed?
+  options:
+    - To charge the robot faster
+    - To estimate states the sensors cannot measure directly
+    - To compress sensor data
+    - To replace the motors
+  answer: 1
+  explanation: >-
+    Controllers often need the full state (e.g. velocity, load), but sensors measure only
+    some of it — an observer estimates the rest from a model plus available measurements.
+---
+
+Modern controllers like [LQR](/atlas/concept/linear-quadratic-regulator) want the robot's *full state* — position, velocity, and more. But sensors rarely give you everything: an encoder measures angle, not velocity; a joint feels position, not the external load. A **state observer** fills the gap.
+
+## The idea
+
+Run a **copy of the robot's model** in software, driven by the same commands. That copy predicts what every state — including the hidden ones — should be. Then compare its predicted *output* to the real sensor reading. If they differ, the error nudges the estimate back toward reality:
+
+```
+x̂̇ = A·x̂ + B·u + L·(y − ŷ)
+              └ correction from measurement ┘
+```
+
+The gain `L` sets how hard the observer trusts the sensor versus its own model.
+
+```diagram
+{ "type": "loop", "title": "An observer runs a model and corrects it with sensors", "nodes": ["Model prediction", "Compare to sensor", "Correct estimate x̂"], "caption": "The estimate feeds the controller as if it were the true state. The correction term keeps the software copy locked onto the real robot." }
+```
+
+## Observer vs Kalman filter
+
+A basic (Luenberger) observer picks `L` for fast, stable convergence. The [Kalman filter](/atlas/concept/kalman-filter) is the *optimal* observer for systems with Gaussian noise — it computes the best `L` (the Kalman gain) automatically from the noise statistics. Both do the same job: reconstruct hidden state. The Kalman filter just does it optimally when you know how noisy things are.
+
+## Where you'll see it
+
+Sensorless motor control estimates rotor position without a dedicated sensor. Drones estimate velocity and wind disturbance they never directly measure. Manipulators estimate external contact force from motor currents (a "disturbance observer"). Pairing an observer with LQR gives the classic **LQG** controller — estimate the state, then feed it back optimally.
+
+## Why it matters
+
+You can't control what you can't see. Observers are how robots act on states no sensor reports — turning a partial view of the world into the full picture a good controller needs.
+
+## Related
+
+[Kalman filter](/atlas/concept/kalman-filter) · [Linear quadratic regulator](/atlas/concept/linear-quadratic-regulator) · [Sensor fusion](/atlas/concept/sensor-fusion) · [Closed-loop control](/atlas/concept/closed-loop-control)

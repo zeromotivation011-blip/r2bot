@@ -1,0 +1,75 @@
+---
+title: Camera Calibration
+slug: camera-calibration
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Camera calibration measures a camera's exact lens and geometry so a robot can turn pixels
+  into real directions and distances — the unglamorous first step that every accurate
+  vision system depends on.
+difficulty: 3
+tags:
+  - perception
+  - vision
+  - sensors
+seeAlso:
+  - computer-vision
+  - stereo-vision
+  - visual-servoing
+  - sensor-fusion
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Zhang — A flexible new technique for camera calibration'
+    url: 'https://en.wikipedia.org/wiki/Camera_resectioning'
+  - title: 'OpenCV — Camera calibration'
+    url: 'https://docs.opencv.org/'
+laymanExplanation: >-
+  Camera calibration figures out a camera's exact focal length, center, and lens distortion
+  by photographing a known checkerboard from several angles. With those numbers, the robot
+  can trust that a pixel really points in a specific direction.
+technicalDefinition: >-
+  Camera calibration estimates a camera's intrinsic parameters (focal length, principal
+  point, distortion) and extrinsics (pose), mapping between 3D world points and 2D pixels.
+quizQuestion:
+  q: Camera calibration mainly recovers…
+  options:
+    - The Wi-Fi password
+    - Focal length, principal point, and lens distortion
+    - The battery health
+    - The frame rate
+  answer: 1
+  explanation: >-
+    Calibration estimates the intrinsic parameters — focal length, optical center, and
+    distortion — plus the camera's pose, so pixels map correctly to 3D directions.
+---
+
+Before a robot can trust anything its camera reports — how far, which way, how big — it has to know the camera's exact optics. Measuring them is **camera calibration**, and skipping it quietly corrupts every downstream result.
+
+## What it recovers
+
+Calibration finds two sets of numbers:
+
+- **Intrinsics** — the camera's internal geometry: focal length, the optical center (principal point), and **lens distortion** (why straight lines bow near the edges of a wide lens).
+- **Extrinsics** — where the camera sits and points relative to the robot or world.
+
+Together they form the map between a 3D point in the world and the 2D pixel it lands on.
+
+```diagram
+{ "type": "flow", "title": "How calibration is done", "nodes": ["Photograph checkerboard", "Detect corners", "Solve intrinsics + distortion", "Undistort images"], "caption": "A known pattern seen from many angles gives enough constraints to solve for the lens parameters, which are then used to correct every future image." }
+```
+
+## Why it matters so much
+
+Every metric vision task assumes calibrated pixels. [Stereo vision](/atlas/concept/stereo-vision) depth is wrong if focal length is wrong. [SLAM](/atlas/concept/slam) and [visual odometry](/atlas/concept/visual-odometry) drift if distortion isn't removed. [Visual servoing](/atlas/concept/visual-servoing), 6-DOF pose estimation, and hand-eye coordination all inherit calibration error directly. A miscalibrated camera doesn't announce itself — it just makes everything slightly, consistently wrong.
+
+## In practice
+
+The classic method (Zhang's) photographs a **checkerboard** from a dozen angles; the known square size gives the geometry needed to solve for the parameters. For a multi-camera or camera-plus-arm setup you also do **hand-eye calibration** to find where the camera sits relative to the gripper. Calibration isn't one-and-done: temperature, focus changes, and knocks shift the parameters, so precision systems re-check it.
+
+## Why it matters
+
+Calibration is the foundation the entire vision stack stands on. Get it right once and everything above it can be trusted; get it wrong and no clever algorithm can fully recover.
+
+## Related
+
+[Computer vision](/atlas/concept/computer-vision) · [Stereo vision](/atlas/concept/stereo-vision) · [Visual servoing](/atlas/concept/visual-servoing) · [Sensor fusion](/atlas/concept/sensor-fusion)

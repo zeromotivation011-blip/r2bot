@@ -1,0 +1,76 @@
+---
+title: Admittance Control
+slug: admittance-control
+bucket: concept
+category: control
+summary: >-
+  Admittance control lets a stiff, position-controlled robot behave as if it were soft —
+  it senses contact force and moves in response, so a heavy industrial arm can push,
+  polish, and yield gently to a human touch.
+difficulty: 4
+tags:
+  - control
+  - force-control
+  - interaction
+seeAlso:
+  - impedance-control
+  - force-torque-sensor
+  - collaborative-robot
+  - closed-loop-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+  - title: 'Force control (Handbook of Robotics)'
+    url: 'https://en.wikipedia.org/wiki/Mechanical_impedance'
+laymanExplanation: >-
+  Admittance control makes a rigid robot feel springy. It measures how hard something
+  pushes on it, then moves out of the way as if it had a soft spring inside — so it can
+  press on surfaces or safely give way when a person leans on it.
+technicalDefinition: >-
+  Admittance control maps a measured interaction force to a commanded motion via a
+  virtual mass-spring-damper, executed on a position-controlled robot.
+quizQuestion:
+  q: Admittance control takes force as input and outputs…
+  options:
+    - Motion (position/velocity)
+    - Battery level
+    - Camera images
+    - Joint temperature
+  answer: 0
+  explanation: >-
+    Admittance control senses force and produces a commanded motion — the inverse causal
+    direction from impedance control, which senses motion and outputs force.
+---
+
+An industrial arm is built to be *stiff* — hold a position no matter what. But many jobs need the opposite: press a tool on a surface with steady force, insert a part that's slightly misaligned, or yield softly when a person bumps it. **Admittance control** gives a rigid robot that softness in software.
+
+## The core idea
+
+Admittance control senses the **force** on the robot (via a [force-torque sensor](/atlas/concept/force-torque-sensor)) and commands a **motion** in response, as if a virtual spring-and-damper sat between the robot and the world:
+
+```
+F_measured  →  virtual mass-spring-damper  →  motion command
+```
+
+Push on it, and it moves away proportionally; the virtual stiffness and damping you choose decide how soft or firm it feels.
+
+```diagram
+{ "type": "flow", "title": "Admittance: force in, motion out", "nodes": ["Measured force", "Virtual spring-damper", "Commanded motion", "Position controller"], "caption": "The robot stays position-controlled underneath; admittance just decides where to move based on how hard the world pushes." }
+```
+
+## Admittance vs impedance
+
+The two are duals. [Impedance control](/atlas/concept/impedance-control) senses **motion** and outputs **force** — natural for a back-drivable, torque-controlled robot. Admittance control senses **force** and outputs **motion** — natural for a stiff, position-controlled robot (most industrial arms). Rule of thumb: stiff robot on soft environment → admittance; soft robot on stiff environment → impedance. Choosing wrong can make the system buzz and go unstable on contact.
+
+## Where you'll see it
+
+Robotic polishing, deburring, and sanding (constant force on a curving surface); assembly with tight tolerances (let the part self-align); and [collaborative robots](/atlas/concept/collaborative-robot) with hand-guiding, where you grab the tool and lead it around and the arm flows with you.
+
+## Why it matters
+
+Admittance control is how the world's millions of stiff position-controlled arms gained a sense of touch — turning rigid automation into machines that can safely and skillfully interact with surfaces and people.
+
+## Related
+
+[Impedance control](/atlas/concept/impedance-control) · [Force-torque sensor](/atlas/concept/force-torque-sensor) · [Collaborative robot](/atlas/concept/collaborative-robot) · [Closed-loop control](/atlas/concept/closed-loop-control)

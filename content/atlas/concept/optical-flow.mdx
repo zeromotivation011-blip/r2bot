@@ -1,0 +1,77 @@
+---
+title: Optical Flow
+slug: optical-flow
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Optical flow is the pattern of apparent motion between video frames — the per-pixel
+  arrows showing which way things moved. It lets robots and drones sense their own motion,
+  track objects, and detect what's moving around them.
+difficulty: 3
+tags:
+  - perception
+  - motion
+  - vision
+seeAlso:
+  - computer-vision
+  - visual-odometry
+  - stereo-vision
+  - visual-servoing
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Lucas-Kanade & Horn-Schunck (classic methods)'
+    url: 'https://en.wikipedia.org/wiki/Optical_flow'
+  - title: 'OpenCV — Optical flow'
+    url: 'https://docs.opencv.org/'
+laymanExplanation: >-
+  Optical flow measures how each part of an image moves from one video frame to the next —
+  a field of little arrows. A drone uses it to tell how fast it's sliding sideways; a robot
+  uses it to spot moving objects.
+technicalDefinition: >-
+  Optical flow is the per-pixel apparent velocity field between consecutive images, computed
+  from brightness changes under the brightness-constancy assumption.
+quizQuestion:
+  q: Optical flow measures…
+  options:
+    - The color of each pixel
+    - The apparent motion of pixels between frames
+    - The temperature of the scene
+    - The camera's battery level
+  answer: 1
+  explanation: >-
+    Optical flow estimates how pixels move between consecutive frames — a dense or sparse
+    field of motion vectors.
+---
+
+Watch the ground rush past from a moving car and you instantly sense your speed and direction. A robot camera can extract the same cue from video: it's called **optical flow**.
+
+## What it is
+
+Optical flow is the field of **apparent motion** between two consecutive frames — for each pixel (or feature), an arrow showing which way and how fast it moved. It's computed from how brightness patterns shift, assuming a point's brightness stays roughly constant as it moves (the *brightness-constancy* assumption).
+
+```diagram
+{ "type": "flow", "title": "From two frames to a motion field", "nodes": ["Frame t", "Frame t+1", "Match brightness", "Flow vectors"], "caption": "Compare where each patch of brightness went between frames and you get a vector per pixel — the optical flow field." }
+```
+
+## Sparse vs dense
+
+- **Sparse flow** (Lucas-Kanade) tracks a handful of strong feature points — fast, robust, and enough for [visual odometry](/atlas/concept/visual-odometry) or object tracking.
+- **Dense flow** (Horn-Schunck, and modern networks like RAFT) computes a vector for *every* pixel — richer, used for segmentation of moving objects, video stabilization, and depth-from-motion.
+
+## What robots do with it
+
+- **Ego-motion / speed sensing.** A downward camera on a drone reads flow to estimate sideways drift and hold position indoors where there's no GPS — the trick behind consumer drones' rock-steady hover.
+- **Moving-object detection.** Subtract the flow caused by the robot's own motion and whatever's left is something *else* moving — a pedestrian, another vehicle.
+- **Tracking and [visual servoing](/atlas/concept/visual-servoing).** Following features frame-to-frame.
+
+## The limits
+
+Flow breaks where the brightness-constancy assumption does: sudden lighting changes, reflections, and large fast motions. It also suffers the **aperture problem** — looking through a small window at a moving edge, you can only tell motion *across* the edge, not along it — which is why flow needs texture and corners, not blank walls.
+
+## Why it matters
+
+Optical flow is one of the oldest and most useful motion cues in vision — the bridge between static images and understanding movement, and a building block of visual odometry, tracking, and drone stabilization.
+
+## Related
+
+[Computer vision](/atlas/concept/computer-vision) · [Visual odometry](/atlas/concept/visual-odometry) · [Stereo vision](/atlas/concept/stereo-vision) · [Visual servoing](/atlas/concept/visual-servoing)

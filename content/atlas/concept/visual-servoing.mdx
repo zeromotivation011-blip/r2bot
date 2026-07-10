@@ -1,0 +1,77 @@
+---
+title: Visual Servoing
+slug: visual-servoing
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Visual servoing closes the control loop with a camera — the robot moves to make what it
+  sees match what it wants to see, letting arms and drones track and grasp objects without
+  ever knowing exact 3D coordinates.
+difficulty: 4
+tags:
+  - perception
+  - control
+  - manipulation
+seeAlso:
+  - computer-vision
+  - camera-calibration
+  - closed-loop-control
+  - inverse-kinematics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Chaumette & Hutchinson — Visual servo control tutorial'
+    url: 'https://en.wikipedia.org/wiki/Visual_servoing'
+  - title: 'ViSP — Visual Servoing Platform'
+    url: 'https://visp.inria.fr/'
+laymanExplanation: >-
+  Visual servoing lets a robot steer using its camera directly: it compares the current
+  camera view to a target view and moves to close the difference — like parking a car by
+  lining up what you see in the mirror rather than measuring distances.
+technicalDefinition: >-
+  Visual servoing uses image features as direct feedback in the control loop, driving the
+  robot to minimize the error between current and desired feature positions.
+quizQuestion:
+  q: In image-based visual servoing, the error is measured in…
+  options:
+    - Metres of 3D distance
+    - The image (pixels / feature positions)
+    - Battery percentage
+    - Joint temperature
+  answer: 1
+  explanation: >-
+    Image-based visual servoing defines the error directly in image space (feature/pixel
+    positions), avoiding the need for accurate 3D reconstruction.
+---
+
+Most robot control needs precise coordinates: "move the hand to (0.4, 0.1, 0.6)." But what if you don't know exactly where the object is — only what it looks like? **Visual servoing** closes the loop straight through the camera.
+
+## The idea
+
+The robot has a **current view** and a **desired view** (where the target should appear in the image). The controller moves the robot to shrink the difference between them, updating continuously as the camera streams. The camera can be on the robot's hand (**eye-in-hand**) or watching from outside (**eye-to-hand**).
+
+```diagram
+{ "type": "loop", "title": "Servo on what the camera sees", "nodes": ["Camera view", "Compare to target view", "Move robot"], "caption": "The image error itself drives the motion. As the robot moves, the view updates, and the loop keeps closing until current matches desired." }
+```
+
+## Two families
+
+- **Image-based (IBVS)** defines the error directly in the **image** — feature points should move *here* in pixels. It's robust to camera-calibration error because it never leaves image space, but the 3D path can be odd.
+- **Position-based (PBVS)** first estimates the object's **3D pose** from the image, then servos in Cartesian space. Cleaner 3D motion, but sensitive to [calibration](/atlas/concept/camera-calibration) and pose-estimation error.
+
+Hybrid schemes mix the two to get the best of both.
+
+## Why it's powerful
+
+Visual servoing turns a camera into a real-time feedback sensor, so a robot can **track moving targets**, grasp objects whose exact position it never measured, and stay accurate even as things shift — because it's always correcting toward what it sees. It underpins vision-guided pick-and-place, drones that hold station on a visual marker, and cameras that keep a subject centered.
+
+## The catch
+
+It needs features it can reliably track frame-to-frame (see [optical flow](/atlas/concept/optical-flow) and feature detection), good lighting, and enough frame rate that the loop stays stable. Lose the target in view and the loop breaks.
+
+## Why it matters
+
+Visual servoing merges perception and control into one loop — the foundation for robots that act on what they see, not on coordinates handed to them in advance.
+
+## Related
+
+[Computer vision](/atlas/concept/computer-vision) · [Camera calibration](/atlas/concept/camera-calibration) · [Optical flow](/atlas/concept/optical-flow) · [Closed-loop control](/atlas/concept/closed-loop-control)

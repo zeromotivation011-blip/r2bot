@@ -1,0 +1,76 @@
+---
+title: Feedback Linearization
+slug: feedback-linearization
+bucket: concept
+category: control
+summary: >-
+  Feedback linearization is a control trick that cancels a system's nonlinearities with
+  math, transforming a hard nonlinear robot into an easy linear one so standard linear
+  controllers can take over.
+difficulty: 4
+tags:
+  - control
+  - nonlinear-control
+  - dynamics
+seeAlso:
+  - computed-torque-control
+  - pid-controller
+  - linear-quadratic-regulator
+  - sliding-mode-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Applied Nonlinear Control — Slotine & Li'
+    url: 'https://en.wikipedia.org/wiki/Feedback_linearization'
+  - title: 'Underactuated Robotics — Russ Tedrake (MIT)'
+    url: 'https://underactuated.mit.edu/'
+laymanExplanation: >-
+  Feedback linearization cancels the messy, nonlinear parts of a system using the system's
+  own model, so what's left behaves like a simple straight-line system that ordinary
+  controllers already handle well.
+technicalDefinition: >-
+  Feedback linearization applies a control law that algebraically cancels a system's
+  nonlinear dynamics, yielding equivalent linear input-output behavior for an outer
+  linear controller.
+quizQuestion:
+  q: The goal of feedback linearization is to…
+  options:
+    - Add nonlinearity to the system
+    - Cancel nonlinearities so the system behaves linearly
+    - Increase sensor noise
+    - Slow the control loop
+  answer: 1
+  explanation: >-
+    It uses the model to cancel nonlinear terms, transforming the system into an
+    equivalent linear one that linear control tools can handle.
+---
+
+Most control theory — [PID](/atlas/concept/pid-controller), [LQR](/atlas/concept/linear-quadratic-regulator), pole placement — assumes a *linear* system. Real robots are stubbornly nonlinear. **Feedback linearization** bridges that gap by cancelling the nonlinearity in software.
+
+## The idea
+
+If you know a system's nonlinear dynamics, you can design a control input that **exactly cancels** the nonlinear terms, leaving behind a clean linear relationship between a new "virtual" input and the output. Then you control that easy linear system with any standard method.
+
+```diagram
+{ "type": "flow", "title": "Cancel the nonlinearity, then control linearly", "nodes": ["Nonlinear robot", "Cancelling control law", "Linear system", "Linear controller"], "caption": "The inner law flattens the nonlinear dynamics into a straight line; the outer linear controller then does the actual tracking." }
+```
+
+[Computed torque control](/atlas/concept/computed-torque-control) for robot arms is the most famous special case: cancelling gravity, inertia, and coupling is exactly feedback linearization applied to a manipulator.
+
+## Two flavors
+
+- **Input-output linearization** makes a chosen output behave linearly (e.g. the end-effector position).
+- **Full-state linearization** transforms the entire state dynamics.
+
+A subtlety: cancelling the output dynamics can leave hidden **internal dynamics** running underneath (the "zero dynamics"). If those are unstable, the visible output looks perfect while something inside quietly diverges — a classic trap the control engineer must check.
+
+## Strengths and limits
+
+When the model is good, feedback linearization gives exact, global linear behavior — far beyond what linearizing "about a point" achieves. But it leans **entirely on the model**: unmodeled friction, flexing, or payload leaves the cancellation imperfect. That's why it's often paired with robust or adaptive terms — or why some engineers prefer [sliding mode control](/atlas/concept/sliding-mode-control), which tolerates model error by design.
+
+## Why it matters
+
+Feedback linearization is the key conceptual tool for controlling nonlinear robots with linear methods. Understanding it unlocks manipulator control, and it's the theory behind the computed-torque and whole-body controllers that make modern arms and humanoids move precisely.
+
+## Related
+
+[Computed torque control](/atlas/concept/computed-torque-control) · [PID controller](/atlas/concept/pid-controller) · [LQR](/atlas/concept/linear-quadratic-regulator) · [Sliding mode control](/atlas/concept/sliding-mode-control)

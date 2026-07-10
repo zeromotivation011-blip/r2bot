@@ -1,0 +1,77 @@
+---
+title: Rapidly-exploring Random Tree (RRT)
+slug: rapidly-exploring-random-tree
+bucket: concept
+category: control
+summary: >-
+  RRT is a motion-planning algorithm that finds a path through complex, high-dimensional
+  spaces by randomly growing a tree of reachable states — the go-to planner for robot arms
+  and self-driving cars where grid search can't cope.
+difficulty: 3
+tags:
+  - motion-planning
+  - sampling
+  - navigation
+seeAlso:
+  - a-star-algorithm
+  - motion-planning
+  - path-planning
+  - inverse-kinematics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'LaValle — Planning Algorithms'
+    url: 'http://lavalle.pl/planning/'
+  - title: 'OMPL — Open Motion Planning Library'
+    url: 'https://ompl.kavrakilab.org/'
+laymanExplanation: >-
+  RRT explores by throwing random points into the space and growing a branching tree
+  toward them, quickly reaching into every corner. When the tree touches the goal, you
+  trace back a path — great for arms and cars where a simple grid won't work.
+technicalDefinition: >-
+  RRT incrementally builds a tree by sampling random states and extending the nearest tree
+  node toward each sample, rapidly covering the configuration space to find a feasible path.
+quizQuestion:
+  q: Why use RRT instead of A* for a robot arm?
+  options:
+    - It is always shorter
+    - It handles high-dimensional continuous spaces a grid can't
+    - It needs no computer
+    - It ignores obstacles
+  answer: 1
+  explanation: >-
+    A robot arm's configuration space is high-dimensional and continuous; RRT samples it
+    directly instead of needing an explicit grid, which would be astronomically large.
+---
+
+[A*](/atlas/concept/a-star-algorithm) is perfect for a 2D grid. But how do you plan a collision-free motion for a **7-joint arm**, where the space of configurations has seven dimensions and no natural grid? You sample it — with a **Rapidly-exploring Random Tree**.
+
+## How it grows
+
+RRT builds a tree outward from the start configuration:
+
+1. **Sample** a random point in the configuration space.
+2. Find the **nearest** existing tree node to it.
+3. **Extend** a small step from that node toward the sample (if the step is collision-free).
+4. Repeat. When the tree reaches the goal region, trace back the branch — that's your path.
+
+```diagram
+{ "type": "loop", "title": "The RRT growth loop", "nodes": ["Sample random point", "Find nearest node", "Extend tree a step"], "caption": "Because samples are uniform, the tree is pulled toward large unexplored regions — it 'rapidly explores' the whole space, then connects to the goal." }
+```
+
+The magic is a **Voronoi bias**: random sampling naturally pulls the tree toward the biggest unexplored gaps, so it spreads to fill the space quickly rather than clustering.
+
+## Why robots rely on it
+
+RRT scales to **high-dimensional, continuous** spaces where grid methods explode — robot arms, humanoids, and car-like vehicles with motion constraints. It only needs a collision checker and a way to step between states, not an explicit map of every obstacle. It's the backbone of libraries like OMPL and planners inside [MoveIt](/atlas/concept/inverse-kinematics)-style manipulation stacks.
+
+## The trade-offs and the sequel
+
+Plain RRT finds *a* path, not the *shortest* — the route often looks jagged and needs smoothing. **RRT\*** fixes this: it rewires the tree as it grows and provably converges toward the optimal path, at more compute cost. Variants add goal-biasing, bidirectional search (RRT-Connect), and kinodynamic steering for vehicles that can't move in any direction.
+
+## Why it matters
+
+RRT is how robots plan motion when the world is too high-dimensional to enumerate. It, and its optimal cousin RRT\*, are the default sampling-based planners in modern robotics.
+
+## Related
+
+[A* algorithm](/atlas/concept/a-star-algorithm) · [Motion planning](/atlas/concept/motion-planning) · [Path planning](/atlas/concept/path-planning) · [Inverse kinematics](/atlas/concept/inverse-kinematics)

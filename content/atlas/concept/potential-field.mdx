@@ -1,0 +1,75 @@
+---
+title: Potential Field Method
+slug: potential-field
+bucket: concept
+category: control
+summary: >-
+  The potential field method steers a robot by pretending the goal pulls it like gravity
+  and obstacles push it away like magnets — a fast, intuitive way to react to obstacles in
+  real time, with one famous failure mode.
+difficulty: 3
+tags:
+  - motion-planning
+  - navigation
+  - reactive-control
+seeAlso:
+  - path-planning
+  - motion-planning
+  - a-star-algorithm
+  - rapidly-exploring-random-tree
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Khatib — Real-time obstacle avoidance (1986)'
+    url: 'https://en.wikipedia.org/wiki/Motion_planning'
+  - title: 'LaValle — Planning Algorithms'
+    url: 'http://lavalle.pl/planning/'
+laymanExplanation: >-
+  Imagine the goal is downhill and every obstacle is a hill. The robot simply rolls
+  downhill toward the goal while being pushed away from obstacles. That combined "slope"
+  is the potential field, and following it gives smooth, reactive motion.
+technicalDefinition: >-
+  The potential field method sums an attractive potential toward the goal and repulsive
+  potentials from obstacles; the robot follows the negative gradient of the total field.
+quizQuestion:
+  q: The classic weakness of potential fields is…
+  options:
+    - They need GPS
+    - The robot can get stuck in local minima
+    - They cannot represent goals
+    - They only work in 1D
+  answer: 1
+  explanation: >-
+    Attractive and repulsive forces can cancel out away from the goal, trapping the robot
+    in a local minimum where it stops making progress.
+---
+
+Sometimes a robot doesn't need a full plan — it needs to *react* to whatever's in front of it, right now. The **potential field method** gives it a beautifully simple instinct for that.
+
+## The idea
+
+Treat navigation like a landscape of hills and valleys:
+
+- The **goal** creates an *attractive* field — the robot is pulled toward it, like a ball rolling downhill.
+- Each **obstacle** creates a *repulsive* field — a hill that pushes the robot away, stronger the closer it gets.
+
+Add the two together and the robot simply follows the **negative gradient** (the downhill direction) of the combined field. The result is smooth, real-time obstacle avoidance with almost no computation.
+
+```diagram
+{ "type": "flow", "title": "Two forces combine into one motion", "nodes": ["Goal pulls in", "Obstacles push away", "Sum the forces", "Move downhill"], "caption": "At every instant the robot just adds the attractive and repulsive vectors and steps along the result — no global map or search needed." }
+```
+
+## The famous flaw: local minima
+
+Because it only looks at the *local* slope, the method can trap the robot in a **local minimum** — a spot where the pull toward the goal and the push from obstacles cancel out, but you're not at the goal. A robot heading into a U-shaped obstacle stalls at the mouth, unable to see that backing out would help. This is the defining weakness, and it's why pure potential fields aren't used for global planning.
+
+## How it's used in practice
+
+Modern systems keep the reactive elegance but fix the trap: they use potential fields as a **local** obstacle-avoidance layer beneath a global planner like [A*](/atlas/concept/a-star-algorithm) that guarantees the robot eventually escapes, or they use improved variants (navigation functions, harmonic fields) that are provably minima-free. The idea also lives on in the dynamic window approach and in swarm and formation control.
+
+## Why it matters
+
+The potential field method is the cleanest introduction to *reactive* navigation — and its local-minimum problem is one of the most instructive failure modes in all of robotics, teaching exactly why local and global planning must work together.
+
+## Related
+
+[Path planning](/atlas/concept/path-planning) · [Motion planning](/atlas/concept/motion-planning) · [RRT](/atlas/concept/rapidly-exploring-random-tree) · [A* algorithm](/atlas/concept/a-star-algorithm)

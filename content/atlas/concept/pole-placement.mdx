@@ -1,0 +1,70 @@
+---
+title: Pole Placement
+slug: pole-placement
+bucket: concept
+category: control
+summary: >-
+  Pole placement is a control design method that chooses feedback gains to put a system's
+  poles exactly where you want them — directly dialing in how fast and how smoothly a
+  robot settles.
+difficulty: 4
+tags:
+  - control
+  - state-space
+  - stability
+seeAlso:
+  - linear-quadratic-regulator
+  - state-observer
+  - closed-loop-control
+  - pid-controller
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Feedback Systems — Åström & Murray'
+    url: 'https://fbswiki.org/'
+  - title: 'Pole placement (control)'
+    url: 'https://en.wikipedia.org/wiki/Full_state_feedback'
+laymanExplanation: >-
+  Pole placement lets a designer decide exactly how quickly and smoothly a robot returns
+  to its target after a disturbance, by choosing feedback gains that set the system's
+  "poles" — the numbers that govern its response.
+technicalDefinition: >-
+  Pole placement computes state-feedback gains K so the closed-loop system matrix (A - BK)
+  has a chosen set of eigenvalues (poles), fixing the response dynamics.
+quizQuestion:
+  q: A system's poles determine…
+  options:
+    - Its color
+    - How fast and how stably it responds
+    - Its battery capacity
+    - Its weight
+  answer: 1
+  explanation: >-
+    Pole locations set the speed and damping of the response; pole placement chooses gains
+    to put them where the designer wants.
+---
+
+A control system's **poles** are the numbers that govern its personality: whether it settles fast or slow, smoothly or with overshoot, stable or not. **Pole placement** is the design method that lets you put them *exactly* where you want.
+
+## What it is
+
+For a system written in state-space form (`ẋ = Ax + Bu`), full-state feedback uses `u = -Kx`. That changes the system's dynamics to `(A - BK)`, whose **eigenvalues are the closed-loop poles**. Pole placement solves the reverse problem: pick the poles you want (from your desired settling time and damping), then compute the gain `K` that produces them.
+
+```diagram
+{ "type": "flow", "title": "From desired response to feedback gains", "nodes": ["Pick pole locations", "Solve for gain K", "u = -Kx", "Robot responds as designed"], "caption": "Choose how fast/smooth you want the response, translate that into pole positions, and pole placement hands you the exact gains." }
+```
+
+## The intuition
+
+Poles further left (more negative real part) mean a **faster** response. Poles near the imaginary axis mean **slow**; poles with large imaginary parts mean **oscillatory**. So placing poles is really placing *behavior*: "settle in 0.5 s with slight damping" becomes a specific pair of pole locations, which becomes a specific `K`.
+
+## Pole placement vs LQR
+
+Pole placement gives you *direct* control over the response but leaves you guessing at good pole locations for complex, multi-input systems — push a pole too far left and you demand huge, actuator-saturating gains. [LQR](/atlas/concept/linear-quadratic-regulator) instead lets you specify *what you value* (error vs effort) and computes well-behaved gains automatically; its poles land wherever the optimal trade-off puts them. Many engineers use pole placement for intuition and simple systems, LQR for serious multivariable ones. Both need the full state, so both pair with a [state observer](/atlas/concept/state-observer).
+
+## Why it matters
+
+Pole placement is the clearest illustration of the core idea of state feedback: that with the right gains you can *reshape* a robot's dynamics almost at will. It's foundational for understanding stability, response tuning, and why controllability matters.
+
+## Related
+
+[LQR](/atlas/concept/linear-quadratic-regulator) · [State observer](/atlas/concept/state-observer) · [Closed-loop control](/atlas/concept/closed-loop-control) · [PID controller](/atlas/concept/pid-controller)

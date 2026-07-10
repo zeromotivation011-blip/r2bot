@@ -1,0 +1,74 @@
+---
+title: Gain Scheduling
+slug: gain-scheduling
+bucket: concept
+category: control
+summary: >-
+  Gain scheduling runs different controller tunings for different operating conditions
+  and blends between them — a practical way to control a robot whose behavior changes
+  with speed, load, or configuration.
+difficulty: 3
+tags:
+  - control
+  - nonlinear-control
+  - tuning
+seeAlso:
+  - pid-controller
+  - feedback-linearization
+  - adaptive-control
+  - linear-quadratic-regulator
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Gain scheduling (control theory)'
+    url: 'https://en.wikipedia.org/wiki/Gain_scheduling'
+  - title: 'Feedback Systems — Åström & Murray'
+    url: 'https://fbswiki.org/'
+laymanExplanation: >-
+  Gain scheduling keeps a set of controller tunings, each best for a different situation —
+  slow vs fast, light vs heavy — and switches or blends between them as conditions change,
+  like a car shifting gears.
+technicalDefinition: >-
+  Gain scheduling selects or interpolates controller gains as a function of measured
+  operating variables, approximating a nonlinear controller with a family of linear ones.
+quizQuestion:
+  q: Gain scheduling changes the controller gains based on…
+  options:
+    - The time of day
+    - The current operating condition (speed, load, pose)
+    - The Wi-Fi signal
+    - The paint color
+  answer: 1
+  explanation: >-
+    Gains are scheduled against measured operating variables, so the controller adapts as
+    conditions like speed, load, or configuration change.
+---
+
+A controller tuned perfectly for a drone hovering may be sluggish at high speed; gains that balance a light robot arm may be too weak when it grabs a heavy payload. **Gain scheduling** is the pragmatic fix: keep several tunings and use the right one for the moment.
+
+## The idea
+
+Divide the robot's operating range into regions, design a good linear controller (a [PID](/atlas/concept/pid-controller) or [LQR](/atlas/concept/linear-quadratic-regulator)) for each, and switch or smoothly interpolate between them based on a measured **scheduling variable** — airspeed, joint angle, payload mass, rotor RPM.
+
+```diagram
+{ "type": "flow", "title": "Pick the controller that fits the moment", "nodes": ["Measure condition", "Look up / blend gains", "Apply controller", "Robot"], "caption": "As the scheduling variable changes, the effective controller changes with it — approximating one nonlinear controller with a family of linear ones." }
+```
+
+## Why it's everywhere
+
+Gain scheduling is one of the **oldest and most widely deployed** nonlinear control techniques in the real world — it flies in virtually every aircraft autopilot and runs in countless industrial and robotic systems. It's popular because it's intuitive and reuses the entire toolbox of well-understood linear design. You don't need a fancy nonlinear proof; you need good local controllers and a sensible schedule.
+
+## The pitfalls
+
+Two things bite. First, if the scheduling variable changes *fast*, the "assume it's slowly varying" logic breaks and stability isn't guaranteed by the local designs alone — abrupt gain switches can cause transients or instability, so smooth interpolation and "hidden coupling" checks matter. Second, you only get good behavior where you actually designed a controller; gaps in the schedule are gaps in performance.
+
+## Gain scheduling vs the alternatives
+
+Compared with [adaptive control](/atlas/concept/adaptive-control) (which *learns* gains online) and [feedback linearization](/atlas/concept/feedback-linearization) (which cancels nonlinearity with a model), gain scheduling is the low-risk, high-familiarity option: precomputed, predictable, and easy to verify region by region.
+
+## Why it matters
+
+Gain scheduling is how theory-clean linear control survives contact with nonlinear reality across a robot's full operating envelope — the workhorse behind stable flight and load-varying manipulation.
+
+## Related
+
+[PID controller](/atlas/concept/pid-controller) · [Adaptive control](/atlas/concept/adaptive-control) · [Feedback linearization](/atlas/concept/feedback-linearization) · [LQR](/atlas/concept/linear-quadratic-regulator)
