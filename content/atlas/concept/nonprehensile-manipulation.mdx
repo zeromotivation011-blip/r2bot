@@ -1,0 +1,78 @@
+---
+title: Nonprehensile Manipulation
+slug: nonprehensile-manipulation
+bucket: concept
+category: control
+summary: >-
+  Nonprehensile manipulation moves objects without grasping them — pushing, sliding, toppling, or
+  throwing — extending what a robot can do beyond what its gripper can hold, and letting it handle
+  objects too big, heavy, or awkward to grip.
+difficulty: 4
+tags:
+  - manipulation
+  - control
+  - contact
+seeAlso:
+  - grasp-planning
+  - dexterous-manipulation
+  - pick-and-place
+  - reinforcement-learning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Nonprehensile manipulation (research)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'Mason — Mechanics of Robotic Manipulation'
+    url: 'https://mitpress.mit.edu/9780262133968/'
+laymanExplanation: >-
+  Nonprehensile manipulation is moving something without picking it up — pushing a box across the
+  floor, sliding a card off a table, nudging a part into place. The robot uses contact, not a grip.
+technicalDefinition: >-
+  Nonprehensile manipulation controls an object's motion through contact interactions (pushing,
+  sliding, tilting, throwing) without forming a grasp that fully constrains it.
+quizQuestion:
+  q: Nonprehensile manipulation moves objects…
+  options:
+    - Only by fully grasping them
+    - Without grasping — e.g. pushing or sliding
+    - Only with suction
+    - Only in simulation
+  answer: 1
+  explanation: >-
+    It manipulates through contact — pushing, sliding, toppling, throwing — without a grasp that
+    fully constrains the object.
+---
+
+Not everything needs to be picked up. Slide a heavy box across the floor, nudge a part into a corner, tip a bottle upright, flick a card off a table — all are ways to move objects **without grasping** them. That's **nonprehensile manipulation**.
+
+## What it is
+
+"Prehensile" means grasping; **nonprehensile** manipulation controls an object's motion through **contact alone** — pushing, sliding, pivoting, toppling, rolling, even throwing — without a grip that fully constrains it. The object is free to move, and the robot shapes that motion through carefully applied contact forces and friction.
+
+```diagram
+{ "type": "flow", "title": "Move it without holding it", "nodes": ["Object on surface", "Apply contact (push/tilt)", "Object slides / pivots", "Reaches goal pose"], "caption": "Instead of enclosing the object in a grasp, the robot uses controlled contact and friction to drive it where it needs to go." }
+```
+
+## Why a robot would choose it
+
+- **Objects too big/heavy to grip.** Push a crate that no gripper could lift.
+- **No good grasp exists.** A flat object flush on a table, or one wedged in clutter, may be un-graspable but pushable into the open first.
+- **Speed and efficiency.** Sweeping several objects, or nudging a part the last centimeter, can beat a full pick-place-repeat cycle.
+- **Extending the workspace.** Toppling a tall object or throwing it can place it beyond the arm's normal reach.
+
+Often nonprehensile moves *enable* a grasp — pushing an object away from a wall so the gripper can get around it.
+
+## Why it's hard
+
+It hinges on **friction and contact mechanics**, which are notoriously hard to model precisely — the same push can slide or tip an object depending on subtle surface conditions and where the force is applied relative to the [center of mass](/atlas/concept/center-of-mass). The object is underactuated (fewer controls than its degrees of freedom), so guiding it precisely is a genuine control challenge. This makes it a natural fit for [reinforcement learning](/atlas/concept/reinforcement-learning) and contact-rich planning.
+
+## Where you'll see it
+
+Pushing-based rearrangement in clutter, "pre-grasp" manipulation to set up a pick, sweeping and sorting, and research on throwing (a robot tossing objects into bins faster than it could place them). It's a growing part of general [dexterous manipulation](/atlas/concept/dexterous-manipulation).
+
+## Why it matters
+
+Nonprehensile manipulation expands a robot's repertoire beyond the limits of its gripper — letting it handle objects it can't hold and act more like a resourceful human who pushes, slides, and nudges. It's key to robust manipulation in messy, real environments.
+
+## Related
+
+[Grasp planning](/atlas/concept/grasp-planning) · [Dexterous manipulation](/atlas/concept/dexterous-manipulation) · [Pick and place](/atlas/concept/pick-and-place) · [Reinforcement learning](/atlas/concept/reinforcement-learning)

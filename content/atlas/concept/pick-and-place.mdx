@@ -1,0 +1,86 @@
+---
+title: Pick and Place
+slug: pick-and-place
+bucket: concept
+category: applications
+summary: >-
+  Pick and place is the fundamental robot task — grab an object here, put it there — that underlies
+  most industrial automation, from assembly lines to warehouses, and the benchmark most manipulation
+  systems are built to perform.
+difficulty: 2
+tags:
+  - manipulation
+  - applications
+  - automation
+seeAlso:
+  - grasp-planning
+  - bin-picking
+  - inverse-kinematics
+  - parallel-jaw-gripper
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Pick and place (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Pick-and-place_machine'
+  - title: 'Industrial robotics tasks'
+    url: 'https://en.wikipedia.org/wiki/Industrial_robot'
+laymanExplanation: >-
+  Pick and place is exactly what it sounds like: a robot picks up an object from one spot and puts it
+  down in another. It's the most common robot job in the world — sorting, packing, feeding machines,
+  assembling.
+technicalDefinition: >-
+  Pick and place is a manipulation task cycle of perceiving, grasping, transporting, and releasing an
+  object at a target pose, repeated at high throughput.
+quizQuestion:
+  q: The pick-and-place cycle consists of…
+  options:
+    - Only grasping
+    - Perceive, grasp, move, and release
+    - Only moving the arm
+    - Charging the battery
+  answer: 1
+  explanation: >-
+    A full cycle perceives the object, grasps it, transports it, and releases it at the target — then
+    repeats.
+---
+
+If you had to name the single most common thing robots do, it's this: pick something up and put it somewhere else. **Pick and place** is the bread-and-butter task of industrial robotics.
+
+## The cycle
+
+Every pick-and-place operation is a loop of four steps:
+
+1. **Perceive** — locate the object (or trust a fixture that presents it in a known spot).
+2. **Grasp** — [plan](/atlas/concept/grasp-planning) and execute a grip, then close the [gripper](/atlas/concept/parallel-jaw-gripper).
+3. **Transport** — move the arm (via [inverse kinematics](/atlas/concept/inverse-kinematics) and trajectory planning) to the destination.
+4. **Release** — place the object at the target pose and open.
+
+Then repeat — often thousands of times an hour.
+
+```diagram
+{ "type": "loop", "title": "The pick-and-place cycle", "nodes": ["Perceive object", "Grasp it", "Move to target", "Release"], "caption": "The four steps repeat continuously. Cycle time — how fast one loop completes — is the key performance metric in production." }
+```
+
+## Structured vs unstructured
+
+The difficulty depends entirely on how much is known:
+
+- **Structured** — parts arrive in fixed positions (fixtures, feeders, conveyors with known spacing). Perception is minimal; the robot just repeats a taught motion very fast and precisely. This is classic high-speed factory automation.
+- **Unstructured** — objects are jumbled, varied, or randomly placed (a bin of mixed items). Now perception and [grasp planning](/atlas/concept/grasp-planning) do the heavy lifting, and it becomes [bin picking](/atlas/concept/bin-picking) — much harder, and the frontier where vision and learning matter.
+
+## What matters in practice
+
+- **Cycle time.** Throughput is money; shaving milliseconds per pick scales hugely.
+- **Reliability.** A failed grasp jams the line, so success rate is critical.
+- **Flexibility.** Handling more object types without reprogramming is the trend, powered by [visual grasp detection](/atlas/concept/visual-grasp-detection).
+
+## Where you'll see it
+
+Assembly lines, packaging, machine tending, electronics (component placement), palletizing, lab automation, and e-commerce fulfillment — pick and place is everywhere goods are made or moved.
+
+## Why it matters
+
+Pick and place is the foundational manipulation task and the economic backbone of robotic automation. Almost every advance in grasping, perception, and manipulation is ultimately measured by how much better and more flexibly it lets robots pick things up and put them down.
+
+## Related
+
+[Grasp planning](/atlas/concept/grasp-planning) · [Bin picking](/atlas/concept/bin-picking) · [Inverse kinematics](/atlas/concept/inverse-kinematics) · [Parallel-jaw gripper](/atlas/concept/parallel-jaw-gripper)

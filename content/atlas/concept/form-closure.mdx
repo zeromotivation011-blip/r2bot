@@ -1,0 +1,77 @@
+---
+title: Form Closure
+slug: form-closure
+bucket: concept
+category: control
+summary: >-
+  Form closure is a grasp so secure it holds an object purely by geometry — the contacts cage it so
+  it can't move even if the surfaces were frictionless, the most robust (and most demanding) kind of
+  hold.
+difficulty: 4
+tags:
+  - manipulation
+  - grasping
+  - theory
+seeAlso:
+  - force-closure
+  - grasp-planning
+  - grasp-quality
+  - gripper
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Form closure (grasping)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'Modern Robotics — Lynch & Park (grasping)'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  Form closure means the fingers surround an object so completely that it's trapped — it couldn't
+  wiggle free even if it were coated in oil. Security comes from the shape of the grip, not from
+  friction.
+technicalDefinition: >-
+  Form closure is the property that a set of contacts constrains all of an object's degrees of
+  freedom by geometry alone, resisting any wrench without relying on friction.
+quizQuestion:
+  q: Form closure differs from force closure in that it…
+  options:
+    - Requires friction
+    - Holds the object by geometry alone, no friction needed
+    - Only works on light objects
+    - Uses suction
+  answer: 1
+  explanation: >-
+    Form closure cages the object geometrically so it can't move even with frictionless contacts —
+    unlike force closure, which relies on friction.
+---
+
+Some grips hold because the fingers press hard enough that friction stops slipping. **Form closure** is stronger: the object is *trapped* by the geometry of the contacts, so it couldn't escape even if it were perfectly slippery.
+
+## What it means
+
+A grasp has **form closure** if the contacts constrain **every one of the object's degrees of freedom by geometry alone** — no friction required. Imagine a peg dropped into a matching hole, or fingers wrapping around an object so completely that it's caged. Push or twist it any way you like and the surfaces physically block the motion. It's the most secure hold possible.
+
+```diagram
+{ "type": "flow", "title": "Trapped by geometry, not grip", "nodes": ["Contacts surround object", "Every DOF blocked", "Frictionless still holds", "Fully caged"], "caption": "Form closure removes all freedom of motion through shape alone. Even an oiled object can't escape, because there's simply nowhere for it to move." }
+```
+
+## Form closure vs force closure
+
+The two are the pillars of grasp theory:
+
+- **[Force closure](/atlas/concept/force-closure)** — relies on **friction** within the contact cones; achievable with as few as two or three contacts (a [parallel-jaw](/atlas/concept/parallel-jaw-gripper) pinch). Most practical robot grasps are force-closure grasps.
+- **Form closure** — relies on **geometry**, no friction; but it needs **more contacts** to cage an object in all directions (in 3D, at least seven point contacts in general). More secure, but harder to arrange.
+
+## Where it shows up
+
+- **Fixtures and jigs** in manufacturing hold parts in form closure so they can't shift during machining.
+- **Enveloping / power grasps** by [underactuated hands](/atlas/concept/underactuated-hand) wrap fingers around an object, approaching form closure for a very secure hold.
+- **Feeders and part-mating** use form-closure geometry to constrain parts.
+
+Because full form closure needs many contacts, robots more often settle for [force closure](/atlas/concept/force-closure), reserving form-closure thinking for fixtures and enveloping grips.
+
+## Why it matters
+
+Form closure defines the strongest, friction-independent form of holding — the theoretical ceiling of grasp security. Understanding the form-vs-force distinction is fundamental to grasp theory and to knowing whether a hold depends on grip strength or on shape.
+
+## Related
+
+[Force closure](/atlas/concept/force-closure) · [Grasp planning](/atlas/concept/grasp-planning) · [Grasp quality](/atlas/concept/grasp-quality) · [Gripper](/atlas/concept/gripper)

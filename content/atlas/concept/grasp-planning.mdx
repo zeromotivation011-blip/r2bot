@@ -1,0 +1,79 @@
+---
+title: Grasp Planning
+slug: grasp-planning
+bucket: concept
+category: control
+summary: >-
+  Grasp planning is how a robot decides where and how to grip an object so it holds securely —
+  the make-or-break step between seeing an object and actually picking it up, spanning geometry,
+  physics, and increasingly deep learning.
+difficulty: 3
+tags:
+  - manipulation
+  - grasping
+  - perception
+seeAlso:
+  - force-closure
+  - grasp-quality
+  - visual-grasp-detection
+  - gripper
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Grasping (Springer Handbook of Robotics)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'Bohg et al. — Data-driven grasp synthesis: A survey'
+    url: 'https://arxiv.org/abs/1309.2660'
+laymanExplanation: >-
+  Grasp planning is a robot working out the best way to grab something — which surfaces to press on
+  and from what angle — so the object doesn't slip, twist, or get crushed when lifted.
+technicalDefinition: >-
+  Grasp planning computes gripper contact placements and approach that yield a stable hold of an
+  object, optimizing a grasp-quality criterion under the gripper's constraints.
+quizQuestion:
+  q: The core goal of grasp planning is to find contacts that produce…
+  options:
+    - The brightest object
+    - A stable, secure hold of the object
+    - The fastest motor speed
+    - The lowest battery use
+  answer: 1
+  explanation: >-
+    Grasp planning chooses where and how to grip so the object is held securely (e.g. force closure)
+    without slipping or being crushed.
+---
+
+Seeing an object is only half of picking it up. The robot still has to decide *how* to grab it — where to place its fingers, from what angle, how hard to squeeze. That decision is **grasp planning**, and it's where most pick-up failures happen.
+
+## The problem
+
+Given an object and a [gripper](/atlas/concept/gripper), grasp planning finds contact placements and an approach that will **hold the object securely** — resisting gravity and any disturbance without slipping, twisting, or crushing it. It has to respect the gripper's shape and opening, avoid collisions with the object and surroundings, and leave the arm a reachable path to execute the grasp.
+
+```diagram
+{ "type": "flow", "title": "From object to a secure hold", "nodes": ["Perceive object", "Generate candidate grasps", "Score for stability", "Pick best reachable grasp"], "caption": "Many possible grips exist; grasp planning generates candidates, scores each for stability and reachability, and selects the best one to execute." }
+```
+
+## Two broad approaches
+
+- **Analytic (model-based).** If the object's shape is known, use physics: find contacts that achieve **[force closure](/atlas/concept/force-closure)** (the ability to resist any wrench) and rank them by a [grasp-quality](/atlas/concept/grasp-quality) metric. Rigorous, but needs an accurate model and struggles with clutter and novel objects.
+- **Data-driven (learned).** Train a network on huge datasets of grasps to predict good grips directly from sensor data — the dominant modern approach ([visual grasp detection](/atlas/concept/visual-grasp-detection)). It generalizes to *unseen* objects and messy scenes where analytic methods break down.
+
+Most real systems blend perception, learning, and a physics check.
+
+## Why it's hard
+
+- **Novel objects.** A warehouse robot faces items it's never seen; the plan can't assume a known model.
+- **Clutter and occlusion.** Objects touch and hide each other; only part of each is visible.
+- **Gripper limits.** A two-finger [parallel jaw](/atlas/concept/parallel-jaw-gripper) grips differently than a [suction cup](/atlas/concept/suction-gripper) or a [dexterous hand](/atlas/concept/dexterous-manipulation).
+- **Uncertainty.** Perception is noisy and physics is only approximate, so robust grasps must tolerate error.
+
+## Where you'll see it
+
+Warehouse [bin picking](/atlas/concept/bin-picking), manufacturing pick-and-place, service robots handling household items, and any robot that must acquire objects to do its job.
+
+## Why it matters
+
+Grasp planning is the gateway skill of manipulation — without a good grasp, nothing downstream (moving, placing, assembling) can happen. It's one of robotics' central, still-open problems, and a major frontier for learning-based methods.
+
+## Related
+
+[Force closure](/atlas/concept/force-closure) · [Grasp quality](/atlas/concept/grasp-quality) · [Visual grasp detection](/atlas/concept/visual-grasp-detection) · [Gripper](/atlas/concept/gripper)

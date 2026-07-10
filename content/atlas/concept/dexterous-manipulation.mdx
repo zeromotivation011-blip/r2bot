@@ -1,0 +1,75 @@
+---
+title: Dexterous Manipulation
+slug: dexterous-manipulation
+bucket: concept
+category: control
+summary: >-
+  Dexterous manipulation is the frontier skill of robot hands — not just holding an object but
+  skillfully controlling it with the fingers, turning, repositioning, and using it like a human
+  would, and one of robotics' hardest open problems.
+difficulty: 4
+tags:
+  - manipulation
+  - grasping
+  - control
+seeAlso:
+  - in-hand-manipulation
+  - tendon-driven-hand
+  - underactuated-hand
+  - reinforcement-learning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Dexterous manipulation (survey)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'OpenAI — Learning dexterity'
+    url: 'https://openai.com/research/learning-dexterity'
+laymanExplanation: >-
+  Dexterous manipulation is a robot hand actually using an object skillfully — spinning a pen, turning
+  a key, adjusting its grip — not just clamping onto it. It's what separates a true robotic hand from
+  a simple gripper.
+technicalDefinition: >-
+  Dexterous manipulation is the fine, coordinated control of an object using multiple fingers,
+  including in-hand reorientation, rolling, and regrasping.
+quizQuestion:
+  q: Dexterous manipulation goes beyond grasping by…
+  options:
+    - Only lifting objects straight up
+    - Skillfully controlling and repositioning the object with the fingers
+    - Using suction only
+    - Avoiding all contact
+  answer: 1
+  explanation: >-
+    It involves finely controlling the object with the fingers — turning, rolling, regrasping — not
+    just holding it, which is far harder than a simple grasp.
+---
+
+Grabbing an object is one thing; skillfully *using* it is another. **Dexterous manipulation** — a robot hand's ability to finely control an object with its fingers — is one of the hardest and most sought-after capabilities in all of robotics.
+
+## What it means
+
+Dexterous manipulation goes beyond a static grasp to **coordinated, fine control of an object using multiple fingers**: turning a knob, spinning a pen, orienting a bolt to thread it, adjusting a grip, or handing an object from finger to finger. It's the difference between a clamp that holds and a hand that *works with* what it holds — the everyday dexterity humans barely think about.
+
+```diagram
+{ "type": "flow", "title": "Beyond holding — using", "nodes": ["Grasp object", "Control contacts with fingers", "Reorient / adjust in-hand", "Perform the task"], "caption": "Dexterous manipulation continuously manages the finger contacts to move and reorient the object itself, not just carry it." }
+```
+
+## Why it's so hard
+
+- **Rich, changing contact.** Fingers make and break contact, roll, and slide; the physics of these shifting contacts is complex and hard to model.
+- **High dimensionality.** A capable hand has many joints ([tendon-driven](/atlas/concept/tendon-driven-hand) or [underactuated](/atlas/concept/underactuated-hand)) that must coordinate.
+- **Uncertainty.** Small errors in contact or object pose compound quickly; the object can slip or jam.
+- **Tactile sensing.** Doing it well needs a sense of touch ([tactile sensors](/atlas/concept/tactile-sensor)) that robots have historically lacked.
+
+For decades, model-based methods made only limited progress on this.
+
+## The learning breakthrough
+
+The recent leap came from **[reinforcement learning](/atlas/concept/reinforcement-learning)** in [simulation](/atlas/concept/sim-to-real): train a policy over millions of simulated attempts to control a multi-fingered hand, then transfer it to hardware. OpenAI's cube-reorienting hand and subsequent work showed robots learning genuine [in-hand manipulation](/atlas/concept/in-hand-manipulation) — reorienting objects with the fingers — that hand-engineering never achieved. Combined with better tactile sensors and learned tactile control, dexterity is advancing fast.
+
+## Why it matters
+
+Dexterous manipulation is a defining goal for general-purpose robots: to be truly useful in human environments — kitchens, workshops, homes built for hands — a robot must not just grab but *manipulate*. It's a central research frontier and a key capability separating today's specialized pickers from tomorrow's versatile helpers.
+
+## Related
+
+[In-hand manipulation](/atlas/concept/in-hand-manipulation) · [Tendon-driven hand](/atlas/concept/tendon-driven-hand) · [Underactuated hand](/atlas/concept/underactuated-hand) · [Reinforcement learning](/atlas/concept/reinforcement-learning)

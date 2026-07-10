@@ -1,0 +1,81 @@
+---
+title: Bin Picking
+slug: bin-picking
+bucket: concept
+category: applications
+summary: >-
+  Bin picking is a robot grabbing objects one by one from a jumbled pile in a container — the hard,
+  high-value manipulation problem behind e-commerce fulfillment, and a showcase for modern 3D vision
+  and learned grasping.
+difficulty: 3
+tags:
+  - manipulation
+  - applications
+  - perception
+seeAlso:
+  - visual-grasp-detection
+  - grasp-planning
+  - pick-and-place
+  - suction-gripper
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Bin picking (robotics)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'Amazon Picking Challenge'
+    url: 'https://en.wikipedia.org/wiki/Amazon_Robotics'
+laymanExplanation: >-
+  Bin picking is a robot reaching into a bin full of mixed, jumbled objects and pulling them out one
+  at a time. It sounds simple but it's genuinely hard, because the objects overlap and there's no neat
+  arrangement.
+technicalDefinition: >-
+  Bin picking is the task of detecting and grasping individual objects from a cluttered, unstructured
+  pile in a container, requiring 3D perception and robust grasp planning.
+quizQuestion:
+  q: What makes bin picking harder than structured pick-and-place?
+  options:
+    - The objects are in fixed positions
+    - Objects are jumbled, overlapping, and randomly oriented
+    - There is no gripper
+    - The bin is empty
+  answer: 1
+  explanation: >-
+    In a bin, objects overlap and lie at random poses with occlusion — perception and grasp planning
+    must handle clutter, unlike neatly presented parts.
+---
+
+Reaching into a box of tangled parts and pulling out one at a time is trivial for a person and remarkably hard for a robot. **Bin picking** is the problem — and it's one of robotics' most valuable, because it's exactly what e-commerce warehouses need at massive scale.
+
+## Why it's hard
+
+Unlike structured [pick and place](/atlas/concept/pick-and-place), a bin is **chaos**:
+
+- **Clutter and occlusion.** Objects overlap and hide each other; only parts of each are visible.
+- **Random poses.** Every item lies at an arbitrary position and orientation.
+- **Mixed and novel objects.** Especially in fulfillment, the robot faces items it's never seen.
+- **The bin walls.** The gripper must reach in without colliding, including into corners.
+- **Sequential disturbance.** Grabbing one item shifts the others, so the scene changes every pick.
+
+```diagram
+{ "type": "loop", "title": "The bin-picking loop", "nodes": ["3D scan the bin", "Detect a graspable object", "Pick it out", "Pile shifts — rescan"], "caption": "Each pick changes the pile, so the robot must re-perceive and re-plan continuously until the bin is empty." }
+```
+
+## How robots solve it
+
+- **3D perception.** A depth camera or [structured-light](/atlas/concept/structured-light) sensor builds a point cloud of the pile; the system finds objects and reachable surfaces amid the clutter.
+- **[Visual grasp detection](/atlas/concept/visual-grasp-detection).** Learned networks predict good grasps directly from the depth image, generalizing to novel objects and messy scenes — the key modern advance.
+- **Gripper choice.** [Suction](/atlas/concept/suction-gripper) excels at picking a top-facing surface out of a pile; a [parallel jaw](/atlas/concept/parallel-jaw-gripper) grips exposed edges. Many robots carry both.
+- **Collision-aware motion.** Plan the arm to reach in and extract without hitting the bin or neighboring items.
+
+The Amazon Picking Challenge and its successors drove much of this progress.
+
+## Why it matters commercially
+
+Bin picking is the last big **manual** step in many warehouses — the "grab the item" that automation long couldn't do reliably. Solving it unlocks huge labor savings in fulfillment, manufacturing feeding, and recycling sortation, which is why it attracts enormous investment.
+
+## Why it matters
+
+Bin picking is the proving ground where 3D vision, learned grasping, and motion planning all come together on a task with real economic stakes. It's both a hard research benchmark and one of the most commercially important capabilities in applied robotics.
+
+## Related
+
+[Visual grasp detection](/atlas/concept/visual-grasp-detection) · [Grasp planning](/atlas/concept/grasp-planning) · [Pick and place](/atlas/concept/pick-and-place) · [Suction gripper](/atlas/concept/suction-gripper)

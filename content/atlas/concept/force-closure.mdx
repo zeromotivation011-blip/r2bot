@@ -1,0 +1,75 @@
+---
+title: Force Closure
+slug: force-closure
+bucket: concept
+category: control
+summary: >-
+  Force closure is the condition for a truly secure grasp — the fingers can resist a push or twist
+  from any direction using friction and contact forces, the gold-standard test grasp planners aim
+  to satisfy.
+difficulty: 4
+tags:
+  - manipulation
+  - grasping
+  - theory
+seeAlso:
+  - grasp-planning
+  - form-closure
+  - grasp-quality
+  - antipodal-grasp
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Force closure (grasping)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'Murray, Li & Sastry — A Mathematical Introduction to Robotic Manipulation'
+    url: 'https://www.cds.caltech.edu/~murray/mlswiki/'
+laymanExplanation: >-
+  Force closure means a grip is secure from every direction — no matter which way you try to push or
+  twist the object, the fingers can hold on. It's the mathematical definition of a grasp that won't
+  slip.
+technicalDefinition: >-
+  Force closure is the property that a set of contacts can resist any external wrench applied to the
+  object through contact forces within their friction cones.
+quizQuestion:
+  q: A grasp has force closure if the contacts can resist…
+  options:
+    - Only downward forces
+    - Any force or torque applied to the object
+    - No forces at all
+    - Only very light objects
+  answer: 1
+  explanation: >-
+    Force closure means the contacts (using friction) can resist an external wrench from any
+    direction — the object can't be pushed or twisted out of the grasp.
+---
+
+What separates a grip that holds from one that slips the moment you tilt the object? The precise answer is **force closure** — the mathematical gold standard for a secure grasp.
+
+## What it means
+
+A grasp has **force closure** if its contacts can resist an **external wrench (force + torque) from *any* direction**, using only the contact forces the fingers can produce. In plain terms: no matter how you try to push, pull, or twist the held object, the fingers can push back and hold it. If a grasp has force closure, it won't slip out under any disturbance (within the force limits).
+
+```diagram
+{ "type": "flow", "title": "Resist a disturbance from any direction", "nodes": ["Contacts apply forces", "External push/twist", "Contacts counter it", "Object stays put"], "caption": "Force closure = whatever wrench the world applies, the contact forces (within friction limits) can balance it. The grasp is secure in every direction." }
+```
+
+## The role of friction
+
+Force closure usually **relies on friction**. Each contact can only push within its **friction cone** — the range of directions friction allows before the finger slips. A grasp achieves force closure when the combined friction cones of all contacts "span" every possible direction of disturbance. More friction (grippier surfaces) makes force closure easier; slippery objects need more or better-placed contacts. A simple, classic example is an **[antipodal grasp](/atlas/concept/antipodal-grasp)** — two fingers pressing directly opposite each other on a suitably shaped object.
+
+## Force closure vs form closure
+
+- **Force closure** uses **friction** to resist disturbances — most real grasps, and achievable with few contacts.
+- **[Form closure](/atlas/concept/form-closure)** cages the object with geometry so it can't move *even without friction* — more secure but needs more contacts wrapping around the object.
+
+## Why it matters for planning
+
+Force closure is the **pass/fail criterion** at the heart of analytic [grasp planning](/atlas/concept/grasp-planning): candidate grasps are checked for it, and those that have it are ranked by a [grasp-quality](/atlas/concept/grasp-quality) metric (how *strongly* they achieve it — how far from slipping). It turns the fuzzy question "is this grip good?" into a precise, computable test.
+
+## Why it matters
+
+Force closure is the rigorous definition of a stable grasp — the theoretical foundation under all of robotic grasping. Understanding it explains *why* some grips hold and others slip, and it's the target every grasp planner is ultimately trying to satisfy.
+
+## Related
+
+[Grasp planning](/atlas/concept/grasp-planning) · [Form closure](/atlas/concept/form-closure) · [Grasp quality](/atlas/concept/grasp-quality) · [Antipodal grasp](/atlas/concept/antipodal-grasp)

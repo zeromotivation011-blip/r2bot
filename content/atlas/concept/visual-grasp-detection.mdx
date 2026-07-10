@@ -1,0 +1,76 @@
+---
+title: Visual Grasp Detection
+slug: visual-grasp-detection
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Visual grasp detection uses a neural network to predict where to grip an object straight from a
+  camera or depth image — the learning-based approach that lets robots pick up objects they've never
+  seen, in cluttered real-world bins.
+difficulty: 3
+tags:
+  - manipulation
+  - grasping
+  - perception
+seeAlso:
+  - grasp-planning
+  - antipodal-grasp
+  - bin-picking
+  - computer-vision
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Mahler et al. — Dex-Net'
+    url: 'https://berkeleyautomation.github.io/dex-net/'
+  - title: 'Data-driven grasp synthesis (survey)'
+    url: 'https://arxiv.org/abs/1309.2660'
+laymanExplanation: >-
+  Visual grasp detection is a robot looking at an object with a camera and a neural network instantly
+  suggesting where to grab it — even for objects it has never seen before, without needing a 3D model.
+technicalDefinition: >-
+  Visual grasp detection predicts grasp poses (and success likelihood) directly from RGB or depth
+  images using learned models trained on large grasp datasets.
+quizQuestion:
+  q: The big advantage of learned visual grasp detection is that it…
+  options:
+    - Needs an exact 3D model of every object
+    - Generalizes to novel objects from images alone
+    - Only works in simulation
+    - Requires no camera
+  answer: 1
+  explanation: >-
+    Trained on large datasets, it predicts grasps directly from images and generalizes to objects it
+    has never seen, without a per-object model.
+---
+
+Classic [grasp planning](/atlas/concept/grasp-planning) needs a model of the object. But a warehouse robot faces endless unfamiliar items in messy piles. **Visual grasp detection** — learning to grasp straight from images — is how modern robots handle that reality.
+
+## The idea
+
+Feed a camera or depth image to a **neural network** trained on huge numbers of grasps, and it predicts *where and how to grip* — typically an [antipodal grasp](/atlas/concept/antipodal-grasp) described by a position, approach angle, and gripper width — often with a **success probability** for each candidate. No per-object CAD model, no hand-tuned geometry: the network has learned what good grasps look like directly from data.
+
+```diagram
+{ "type": "flow", "title": "Image in, grasp out", "nodes": ["Camera / depth image", "Grasp-detection network", "Ranked grasp candidates", "Execute best grasp"], "caption": "The network maps pixels to grasp poses and confidence scores, so the robot can grip a novel object it has no model of." }
+```
+
+## Why it changed manipulation
+
+- **Novel objects.** It generalizes to items never seen in training — essential for the open-ended variety of real bins and homes.
+- **Clutter.** Trained on messy scenes, it finds graspable spots amid overlapping, partly hidden objects.
+- **Speed.** One forward pass yields grasps in milliseconds, fast enough for high-throughput picking.
+- **Scales with data.** Systems like **Dex-Net** trained on millions of *simulated* grasps and transferred to real robots; others learn from real robot attempts. More data, better grasping.
+
+## How it's trained
+
+Two main data sources: **simulation** (generate objects, physically simulate grasp outcomes, label success — cheap and vast, but with a [sim-to-real](/atlas/concept/sim-to-real) gap) and **real robot self-supervision** (let robots attempt thousands of grasps and learn from what held). Depth images are especially common because grasping is fundamentally about geometry.
+
+## The limits
+
+It inherits perception's weaknesses — transparent, reflective, or deformable objects are hard — and a predicted grasp can still fail on contact, so robust systems verify the hold (force sensing) and retry. It's usually paired with a reachability and collision check before executing.
+
+## Why it matters
+
+Visual grasp detection is the practical engine of modern robotic picking — the reason robots can now empty a bin of arbitrary objects. It moved grasping from "needs a model of everything" to "look and grab," and it's foundational to warehouse automation and general-purpose manipulation.
+
+## Related
+
+[Grasp planning](/atlas/concept/grasp-planning) · [Antipodal grasp](/atlas/concept/antipodal-grasp) · [Bin picking](/atlas/concept/bin-picking) · [Computer vision](/atlas/concept/computer-vision)

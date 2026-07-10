@@ -1,0 +1,71 @@
+---
+title: Antipodal Grasp
+slug: antipodal-grasp
+bucket: concept
+category: control
+summary: >-
+  An antipodal grasp pinches an object between two contacts pressing directly opposite each other —
+  the simplest reliable two-finger grip, and the pattern most robot grasp detectors are trained to
+  find.
+difficulty: 2
+tags:
+  - manipulation
+  - grasping
+  - gripper
+seeAlso:
+  - force-closure
+  - parallel-jaw-gripper
+  - grasp-planning
+  - visual-grasp-detection
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Antipodal grasps (robotic grasping)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'Grasp detection literature'
+    url: 'https://arxiv.org/abs/1309.2660'
+laymanExplanation: >-
+  An antipodal grasp is a pinch where two fingers squeeze an object from exactly opposite sides — like
+  picking up a coin between thumb and finger. It's simple and, on the right spot, very secure.
+technicalDefinition: >-
+  An antipodal grasp places two contacts whose contact normals are collinear and opposing, so their
+  friction cones overlap and enable force closure with just two fingers.
+quizQuestion:
+  q: An antipodal grasp uses two contacts that press…
+  options:
+    - In the same direction
+    - Directly opposite each other
+    - At right angles
+    - Only from above
+  answer: 1
+  explanation: >-
+    The two contacts oppose each other along a common line; this opposition lets a simple two-finger
+    pinch achieve force closure.
+---
+
+The simplest way for a robot to hold something securely is also one of the most reliable: pinch it between two fingers pressing from exactly opposite sides. That's an **antipodal grasp**.
+
+## What it is
+
+An antipodal grasp has **two contacts whose pressing directions are collinear and opposing** — they push straight toward each other along one line, with the object squeezed between. Think of picking up a coin between thumb and forefinger: as long as you press on two roughly parallel, opposite faces, it's secure. This opposition is exactly what lets a humble two-finger [parallel-jaw gripper](/atlas/concept/parallel-jaw-gripper) achieve a solid hold.
+
+```diagram
+{ "type": "flow", "title": "Two contacts, directly opposed", "nodes": ["Finger A presses in", "Finger B presses opposite", "Object squeezed between", "Secure pinch"], "caption": "Because the two contact directions oppose along one line, their friction can jointly resist disturbances — force closure from just two fingers." }
+```
+
+## Why it's important
+
+- **Achieves [force closure](/atlas/concept/force-closure) with two fingers.** When the two contacts each fall within the other's friction cone, the pinch can resist disturbances from any direction — the minimum-hardware secure grasp.
+- **It's what grippers actually do.** Most industrial [grippers](/atlas/concept/gripper) are two-finger; antipodal is their natural grasp, so planning for these robots largely means finding good antipodal grips.
+- **It's what detectors predict.** Modern learned [grasp detectors](/atlas/concept/visual-grasp-detection) typically output an antipodal grasp — a position, angle, and width for the two jaws — because it maps cleanly onto real hardware and is easy to represent.
+
+## Finding a good one
+
+A good antipodal grasp needs two roughly **parallel, opposing surfaces** on the object, ideally near its [center of mass](/atlas/concept/center-of-mass) so it doesn't tilt when lifted, and within the gripper's finger width. Antipodal points on a smooth object are where the surface normals point straight at each other. The friction available decides how much the surfaces can be non-parallel and still hold.
+
+## Why it matters
+
+The antipodal grasp is the bread-and-butter grip of practical robot manipulation — simple enough to compute and detect, secure enough to trust. It's the target of most two-finger grasp planning and the output of most grasp-detection networks, making it a cornerstone of real-world picking.
+
+## Related
+
+[Force closure](/atlas/concept/force-closure) · [Parallel-jaw gripper](/atlas/concept/parallel-jaw-gripper) · [Grasp planning](/atlas/concept/grasp-planning) · [Visual grasp detection](/atlas/concept/visual-grasp-detection)

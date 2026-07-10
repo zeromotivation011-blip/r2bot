@@ -1,0 +1,79 @@
+---
+title: Remote Center of Compliance (RCC)
+slug: remote-center-of-compliance
+bucket: concept
+category: actuators
+summary: >-
+  A remote center of compliance is a clever mechanical wrist that lets a gripped part tilt and shift
+  around its tip — so pegs self-align into holes with no sensors or control, a passive solution to
+  robotic assembly.
+difficulty: 3
+tags:
+  - manipulation
+  - assembly
+  - mechanism
+seeAlso:
+  - compliant-assembly
+  - peg-in-hole
+  - series-elastic-actuator
+  - end-effector
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Remote center compliance (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Remote_center_compliance'
+  - title: 'Whitney & Nevins — RCC device'
+    url: 'https://en.wikipedia.org/wiki/Remote_center_compliance'
+laymanExplanation: >-
+  A remote center of compliance is a springy wrist device that lets the part a robot is holding tilt
+  and slide right at its tip. When a peg touches the edge of a hole, it automatically pivots into
+  alignment — no computer, no sensors, just clever mechanics.
+technicalDefinition: >-
+  An RCC is a passive compliant mechanism placing the center of compliance at the tip of a held part,
+  so contact forces produce alignment motions (lateral and angular) about that point during insertion.
+quizQuestion:
+  q: A remote center of compliance helps assembly by…
+  options:
+    - Adding motors to each joint
+    - Passively letting a part self-align at its tip during insertion
+    - Making the robot stiffer
+    - Measuring temperature
+  answer: 1
+  explanation: >-
+    The RCC's compliance is centered at the part's tip, so contact forces during insertion pivot and
+    shift the part into alignment automatically — no sensing needed.
+---
+
+Before force sensors and clever control, engineers solved robotic insertion with pure mechanism — an elegant device called the **remote center of compliance**. It's still one of the neatest tricks in assembly.
+
+## The problem it solves
+
+In [peg-in-hole](/atlas/concept/peg-in-hole) insertion, a slightly misaligned peg jams against the hole's edge. What you *want* is for that edge contact to gently **pivot and slide the peg into alignment**. Ordinary compliance (a springy wrist) doesn't do this cleanly — push a springy wrist and the part swings about the wrist, not about the peg tip, often making misalignment worse.
+
+## The clever geometry
+
+An RCC is a passive mechanism (a special arrangement of springs and linkages) engineered so that its **center of compliance sits at the tip of the held part** — right where the contact happens. Because the give is centered there:
+
+- A **sideways** force at the tip makes the part **shift sideways** (lateral compliance) — correcting position error.
+- A **twisting** contact makes the part **rotate about its tip** (angular compliance) — correcting tilt error.
+
+So the contact forces of insertion automatically guide the peg straight in.
+
+```diagram
+{ "type": "flow", "title": "Compliance centered at the tip", "nodes": ["Peg hits hole edge", "Force acts at tip", "RCC lets tip shift/tilt", "Peg self-aligns and enters"], "caption": "Locating the compliance center at the part tip means contact forces produce exactly the corrective lateral and angular motions — passive self-alignment." }
+```
+
+## Why it's remarkable
+
+- **No sensors, no computer.** It's purely mechanical, so it works instantly and cheaply — a favorite in high-speed assembly automation.
+- **Fast.** Passive give reacts at the speed of physics, faster than any control loop.
+- **Robust.** Tolerates the small misalignments that otherwise jam insertion.
+
+The trade-off: it's **fixed and task-specific** — designed for a particular part and clearance, not adjustable like active [compliant assembly](/atlas/concept/compliant-assembly) via force control. Modern robots often use active compliance for flexibility, but the RCC remains ideal for dedicated, high-volume insertion.
+
+## Why it matters
+
+The remote center of compliance is a beautiful example of solving a control problem with *mechanism* — letting geometry do the alignment. It made reliable automated insertion possible decades ago and remains a smart, sensor-free tool for assembly today.
+
+## Related
+
+[Compliant assembly](/atlas/concept/compliant-assembly) · [Peg-in-hole](/atlas/concept/peg-in-hole) · [Series elastic actuator](/atlas/concept/series-elastic-actuator) · [End-effector](/atlas/concept/end-effector)

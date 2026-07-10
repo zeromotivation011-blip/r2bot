@@ -1,0 +1,73 @@
+---
+title: Compliant Assembly
+slug: compliant-assembly
+bucket: concept
+category: control
+summary: >-
+  Compliant assembly lets a robot fit parts together by being deliberately soft — yielding to contact
+  so pieces self-align instead of jamming — the key to automating insertion, mating, and fastening
+  tasks.
+difficulty: 3
+tags:
+  - manipulation
+  - assembly
+  - force-control
+seeAlso:
+  - peg-in-hole
+  - impedance-control
+  - remote-center-of-compliance
+  - admittance-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Compliant assembly (research)'
+    url: 'https://en.wikipedia.org/wiki/Remote_center_compliance'
+  - title: 'Force control in assembly'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+laymanExplanation: >-
+  Compliant assembly is a robot being gently springy while it fits parts together, so a piece can
+  slide and settle into place when it's slightly off — instead of a rigid robot forcing it and
+  jamming or breaking it.
+technicalDefinition: >-
+  Compliant assembly performs part mating by allowing controlled give (mechanical or via force
+  control) so contact forces guide parts into alignment rather than causing jamming.
+quizQuestion:
+  q: Compliance helps assembly because it lets parts…
+  options:
+    - Move faster
+    - Yield to contact and self-align instead of jamming
+    - Weigh less
+    - Skip the gripper
+  answer: 1
+  explanation: >-
+    By giving way to contact forces, a compliant robot lets slightly misaligned parts slide into
+    place rather than wedging — avoiding jams and damage.
+---
+
+The secret to a robot fitting parts together isn't precision — it's *softness*. **Compliant assembly** is the principle that a robot should yield to contact, letting parts guide themselves into place.
+
+## The core insight
+
+When two parts mate — a peg in a hole, a connector in a socket, a bearing on a shaft — perfect alignment is impossible, and a **rigid** robot forcing them together **jams** or breaks them. A **compliant** robot instead gives way to the contact forces. As the parts touch, those forces naturally nudge the pieces toward alignment, and the soft robot follows, so the part **slides into place**. It's how a person wiggles a key into a stiff lock without thinking.
+
+```diagram
+{ "type": "flow", "title": "Let contact guide alignment", "nodes": ["Parts touch (misaligned)", "Contact forces arise", "Compliant robot yields", "Parts self-align and seat"], "caption": "Compliance turns contact from an enemy (jamming) into a helper — the forces of contact do the fine alignment the robot can't sense precisely." }
+```
+
+## Two kinds of compliance
+
+- **Active compliance** — the robot *behaves* soft through control: [impedance](/atlas/concept/impedance-control) or [admittance](/atlas/concept/admittance-control) control, using a [force-torque sensor](/atlas/concept/force-torque-sensor) to react to contact. Flexible and tunable — the robot can be stiff for approach and soft for insertion.
+- **Passive compliance** — mechanical give built into the hardware, like a [remote center of compliance](/atlas/concept/remote-center-of-compliance) device or [series-elastic](/atlas/concept/series-elastic-actuator) joints. No sensing or computation needed; it just works, and fast — but it's fixed, not adjustable.
+
+Many systems combine both: passive give for speed and robustness, active control for adaptability.
+
+## Why it matters for automation
+
+Assembly — not just moving parts but **fitting** them — is a huge share of manufacturing that resisted automation precisely because rigid robots jam. Compliance (with force control and, increasingly, learned insertion policies) is what finally makes robotic assembly reliable: inserting connectors, seating bearings, threading fasteners, mating housings. The canonical test is [peg-in-hole](/atlas/concept/peg-in-hole).
+
+## Why it matters
+
+Compliant assembly reframes contact from a hazard to be avoided into a tool to be used. It's the enabling idea behind robotic assembly and any contact-rich task, and a core reason force control and soft actuation matter so much in modern manipulation.
+
+## Related
+
+[Peg-in-hole](/atlas/concept/peg-in-hole) · [Impedance control](/atlas/concept/impedance-control) · [Remote center of compliance](/atlas/concept/remote-center-of-compliance) · [Admittance control](/atlas/concept/admittance-control)

@@ -1,0 +1,79 @@
+---
+title: Suction Gripper
+slug: suction-gripper
+bucket: concept
+category: actuators
+summary: >-
+  A suction gripper picks things up with vacuum through a soft cup — the fast, gentle, one-touch way
+  robots grab flat or smooth objects, and the quiet workhorse of warehouse picking and packaging.
+difficulty: 2
+tags:
+  - manipulation
+  - gripper
+  - end-effector
+seeAlso:
+  - parallel-jaw-gripper
+  - gripper
+  - bin-picking
+  - end-effector
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Vacuum cup handling'
+    url: 'https://en.wikipedia.org/wiki/Suction_cup'
+  - title: 'Robot end effectors'
+    url: 'https://en.wikipedia.org/wiki/Robot_end_effector'
+laymanExplanation: >-
+  A suction gripper grabs objects with a vacuum cup — press it on a smooth surface, suck out the air,
+  and the object sticks. It's how robots quickly pick up boxes, sheets, and packaged goods.
+technicalDefinition: >-
+  A suction gripper holds objects using vacuum through one or more compliant cups pressed against a
+  surface; holding force equals pressure difference times sealed cup area.
+quizQuestion:
+  q: A suction gripper works best on objects that are…
+  options:
+    - Porous and jagged
+    - Flat or smooth with a sealable surface
+    - Extremely heavy and rough
+    - Made of loose powder
+  answer: 1
+  explanation: >-
+    Suction needs an airtight seal, so smooth, flat, non-porous surfaces work best; porous or uneven
+    surfaces leak and fail to hold.
+---
+
+Not everything is easy to pinch. A flat sheet, a sealed box, a smooth package — for these, robots reach for a completely different grip: **suction**.
+
+## How it works
+
+A suction gripper presses a soft **vacuum cup** against a surface and pumps out the air, creating lower pressure inside the cup than the atmosphere outside. The pressure difference times the sealed area gives the **holding force** — enough to lift the object. Release is instant: let air back in and it drops. Vacuum comes from a pump or a compressed-air **venturi** ejector.
+
+```diagram
+{ "type": "flow", "title": "Vacuum makes the grip", "nodes": ["Cup contacts surface", "Pump removes air", "Pressure difference holds", "Vent air to release"], "caption": "Holding force = pressure difference × sealed cup area. A good seal is everything — leak, and the grip fails." }
+```
+
+## Why it's everywhere in logistics
+
+- **One-touch, one-side grasping.** It grips from a *single* face, so it works where a two-finger [pinch](/atlas/concept/parallel-jaw-gripper) can't get around the object — sheets, boxes packed tight in a bin, panels.
+- **Fast and gentle.** No jaws to align; approach, touch, lift. Great for high-throughput picking and delicate surfaces.
+- **Simple and cheap.** Cups and a vacuum source, few moving parts.
+- **Scalable force.** Add more/larger cups to lift heavier or larger items (big vacuum arrays lift whole boxes or car panels).
+
+This makes suction the dominant end-effector in **warehouse [bin picking](/atlas/concept/bin-picking)** and packaging.
+
+## The limits
+
+Suction lives and dies by the **seal**:
+
+- **Needs smooth, non-porous, fairly flat** surfaces. Porous (fabric, mesh), heavily textured, or wet/dusty surfaces leak and fail.
+- **Curved or irregular** objects need specially shaped or bellows cups.
+- **Vacuum infrastructure.** A pump, hoses, and power — and a leak anywhere weakens every cup.
+
+Many robots carry **both** a suction cup and a [parallel jaw](/atlas/concept/parallel-jaw-gripper), choosing per object.
+
+## Why it matters
+
+The suction gripper is the reason robots can pick the huge category of flat, smooth, and boxed goods quickly and from one side — a backbone of e-commerce fulfillment and packaging. Knowing when suction beats a pinch (and vice versa) is essential applied-manipulation judgment.
+
+## Related
+
+[Parallel-jaw gripper](/atlas/concept/parallel-jaw-gripper) · [Gripper](/atlas/concept/gripper) · [Bin picking](/atlas/concept/bin-picking) · [End-effector](/atlas/concept/end-effector)

@@ -1,0 +1,81 @@
+---
+title: Tendon-Driven Hand
+slug: tendon-driven-hand
+bucket: concept
+category: actuators
+summary: >-
+  A tendon-driven hand moves its fingers with cables pulled by motors placed in the forearm — the
+  design that gives robot hands slim, light, human-like fingers, at the cost of tricky cable control.
+difficulty: 3
+tags:
+  - manipulation
+  - gripper
+  - end-effector
+seeAlso:
+  - underactuated-hand
+  - dexterous-manipulation
+  - in-hand-manipulation
+  - gripper
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Tendon-driven manipulators'
+    url: 'https://en.wikipedia.org/wiki/Robot_end_effector'
+  - title: 'Shadow Dexterous Hand'
+    url: 'https://www.shadowrobot.com/'
+laymanExplanation: >-
+  A tendon-driven hand works like your own: the "muscles" (motors) sit back in the forearm and pull
+  cables that run to the fingers, like tendons. This keeps the fingers slim and light while the bulky
+  motors stay out of the way.
+technicalDefinition: >-
+  A tendon-driven hand actuates finger joints via cables (tendons) routed from remotely located
+  motors, decoupling actuator mass from the fingers.
+quizQuestion:
+  q: In a tendon-driven hand, the motors are typically located…
+  options:
+    - Inside each fingertip
+    - Remotely (e.g. in the forearm), pulling cables to the fingers
+    - Not present
+    - On the object being grasped
+  answer: 1
+  explanation: >-
+    Motors sit away from the fingers (often in the forearm/palm) and pull tendons routed to the
+    joints, keeping the fingers light and slim.
+---
+
+Your fingers have almost no muscle in them — the muscles are in your forearm, pulling tendons. Robot hands that want human-like fingers copy exactly that arrangement: the **tendon-driven hand**.
+
+## How it works
+
+Instead of putting a motor at every finger joint (bulky and heavy), a tendon-driven hand places its **motors remotely** — in the forearm or palm — and routes **cables (tendons)** through the fingers to the joints. Pulling a tendon flexes a joint; a spring or an opposing tendon extends it back. The fingers themselves stay **slim and light** because the mass is elsewhere.
+
+```diagram
+{ "type": "flow", "title": "Muscles back, fingers slim", "nodes": ["Motors in forearm/palm", "Tendons routed to joints", "Pull to flex fingers", "Light, human-like fingers"], "caption": "Relocating the actuators off the fingers lets the hand be small and dexterous, like a human hand — the tendons transmit the force." }
+```
+
+## Why choose it
+
+- **Slim, low-inertia fingers.** Essential for a hand with many fingers and joints that must fit a human-scale form and move fast without heavy fingertips.
+- **High degrees of freedom.** It's the go-to design for highly [dexterous hands](/atlas/concept/dexterous-manipulation) (like the Shadow Hand) that need many independently controlled joints.
+- **Compliance.** Cables and their routing add natural give, useful for safe contact.
+
+## The challenges
+
+Tendons bring their own headaches:
+
+- **Friction and stretch.** Cables rub in their routing and stretch under load, so the commanded and actual joint angles drift — precise control needs tension sensing and calibration.
+- **Coupling.** Routing tendons across multiple joints can make one joint's motion affect another.
+- **Maintenance.** Cables wear, fray, and need re-tensioning — a real reliability concern.
+
+Simpler [underactuated hands](/atlas/concept/underactuated-hand) also use tendons but with few motors and passive springs, trading dexterity for robustness; fully tendon-driven dexterous hands maximize capability at the cost of complexity.
+
+## Where you'll see it
+
+Research and humanoid dexterous hands, advanced prosthetics, and any robot hand aiming for human-like slimness and finger count — the platforms exploring fine manipulation and [in-hand manipulation](/atlas/concept/in-hand-manipulation).
+
+## Why it matters
+
+The tendon-driven hand is the enabling mechanism for human-like robotic hands — the reason a robot can have slender, agile fingers instead of fat motorized knuckles. It's central to the pursuit of dexterous, general-purpose manipulation.
+
+## Related
+
+[Underactuated hand](/atlas/concept/underactuated-hand) · [Dexterous manipulation](/atlas/concept/dexterous-manipulation) · [In-hand manipulation](/atlas/concept/in-hand-manipulation) · [Gripper](/atlas/concept/gripper)

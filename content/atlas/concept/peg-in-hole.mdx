@@ -1,0 +1,80 @@
+---
+title: Peg-in-Hole
+slug: peg-in-hole
+bucket: concept
+category: control
+summary: >-
+  Peg-in-hole is the classic robotic assembly benchmark — inserting a part into a tight opening — that
+  looks trivial but demands force sensing and compliance, because pure position control jams the
+  moment anything is slightly misaligned.
+difficulty: 3
+tags:
+  - manipulation
+  - assembly
+  - force-control
+seeAlso:
+  - compliant-assembly
+  - remote-center-of-compliance
+  - force-torque-sensor
+  - impedance-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Peg-in-hole assembly (research)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'Whitney — Quasi-static assembly'
+    url: 'https://en.wikipedia.org/wiki/Remote_center_compliance'
+laymanExplanation: >-
+  Peg-in-hole is a robot fitting a pin into a hole — like putting a key in a lock. It seems easy, but
+  if the pin is even a hair off-center it jams, so the robot has to feel the contact and gently wiggle
+  it in.
+technicalDefinition: >-
+  Peg-in-hole is a canonical assembly task requiring alignment and insertion of a part into a
+  close-fitting hole, dominated by contact forces and requiring compliance or force control.
+quizQuestion:
+  q: Why is peg-in-hole hard for a position-only robot?
+  options:
+    - The peg is too heavy
+    - Tiny misalignment causes jamming; it needs force sensing/compliance
+    - The hole is invisible
+    - It requires no contact
+  answer: 1
+  explanation: >-
+    With tight tolerances, small misalignment wedges the peg. Success needs force feedback and
+    compliance to feel and correct the contact, not rigid position commands.
+---
+
+Putting a peg in a hole is a toddler's toy — and one of the most famous hard problems in robotic assembly. **Peg-in-hole** is the benchmark that exposes why manipulation is more than moving to coordinates.
+
+## Why it's deceptively hard
+
+A robot arm knows its position to fractions of a millimeter, so surely it can just move the peg to the hole? No — because the fits are **tight** (microns of clearance) and perception is never that precise. If the peg is even slightly off-center or tilted, pushing straight down **jams** it, wedging the peg against the hole's edge. A rigid, position-controlled robot then either stalls or breaks something. The problem isn't reaching the hole; it's the **contact** once you're there.
+
+```diagram
+{ "type": "flow", "title": "Feel your way in", "nodes": ["Approach hole", "Contact — sense forces", "Comply / wiggle to align", "Insert"], "caption": "Success comes from reacting to contact forces — letting the peg slide and self-align — not from commanding an exact rigid path." }
+```
+
+## How robots actually do it
+
+The winning idea is to **use contact forces, not fight them**:
+
+- **Force sensing.** A [force-torque sensor](/atlas/concept/force-torque-sensor) at the wrist feels how the peg is contacting the hole's edge, revealing which way it's misaligned.
+- **Compliance.** [Impedance](/atlas/concept/impedance-control) or [admittance](/atlas/concept/admittance-control) control makes the arm *soft*, so the peg can slide and settle into the hole instead of jamming — the essence of [compliant assembly](/atlas/concept/compliant-assembly).
+- **Search strategies.** Spiral or wiggle motions plus tilt-then-straighten sequences that reliably find and enter the hole.
+- **Passive help.** A mechanical [remote center of compliance](/atlas/concept/remote-center-of-compliance) device lets the peg self-align without any control at all.
+- **Learning.** Reinforcement and imitation learning now train contact-rich insertion policies directly.
+
+## Why it's a benchmark
+
+Peg-in-hole distills the core challenges of **contact-rich manipulation**: tight tolerances, unmodeled friction, and the need to blend position with force. Success on it demonstrates the skills every assembly task needs — which is why it's the standard test for new manipulation and force-control methods.
+
+## Where you'll see it
+
+Electronics assembly (connectors, chips), mechanical assembly (bearings, shafts, fasteners), and any insertion or mating operation on a production line.
+
+## Why it matters
+
+Peg-in-hole is the gateway to robotic **assembly** — the moment a robot stops just moving parts and starts *fitting* them together. Mastering it, through force control and compliance, is essential to automating manufacturing beyond simple pick-and-place.
+
+## Related
+
+[Compliant assembly](/atlas/concept/compliant-assembly) · [Remote center of compliance](/atlas/concept/remote-center-of-compliance) · [Force-torque sensor](/atlas/concept/force-torque-sensor) · [Impedance control](/atlas/concept/impedance-control)

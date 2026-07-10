@@ -1,0 +1,80 @@
+---
+title: Parallel-Jaw Gripper
+slug: parallel-jaw-gripper
+bucket: concept
+category: actuators
+summary: >-
+  A parallel-jaw gripper is the two-finger pincer that most robot arms use to grab things — simple,
+  reliable, and precise, it's the default end-effector of industrial manipulation.
+difficulty: 2
+tags:
+  - manipulation
+  - gripper
+  - end-effector
+seeAlso:
+  - gripper
+  - antipodal-grasp
+  - suction-gripper
+  - end-effector
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Robot gripper (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Robot_end_effector'
+  - title: 'Gripper technologies overview'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+laymanExplanation: >-
+  A parallel-jaw gripper is a two-fingered clamp that opens and closes with its fingers staying
+  parallel — like a pincer. It's the simple, dependable hand you see on most factory robot arms.
+technicalDefinition: >-
+  A parallel-jaw gripper is a two-finger end-effector whose jaws translate in parallel to pinch an
+  object, achieving grasps via opposed contacts (antipodal grasping).
+quizQuestion:
+  q: A parallel-jaw gripper grips an object by…
+  options:
+    - Blowing air on it
+    - Pinching it between two parallel fingers
+    - Wrapping five fingers around it
+    - Magnetizing it
+  answer: 1
+  explanation: >-
+    Its two jaws close in parallel to pinch the object between opposed contacts — an antipodal grasp.
+---
+
+Look at almost any industrial robot arm picking things up and you'll see the same simple hand: two fingers that squeeze together. That's the **parallel-jaw gripper**, the workhorse [end-effector](/atlas/concept/end-effector) of manipulation.
+
+## What it is
+
+A parallel-jaw gripper has **two jaws (fingers) that move in parallel** — staying aligned as they open and close — to pinch an object between them. Closing produces an [antipodal grasp](/atlas/concept/antipodal-grasp): two opposed contacts that, with a little friction, hold the object securely. Actuation is usually electric or pneumatic, and many report grip force and jaw position.
+
+```diagram
+{ "type": "flow", "title": "Two jaws, one pinch", "nodes": ["Open jaws", "Approach object", "Close in parallel", "Antipodal grasp"], "caption": "The jaws stay parallel so contact stays flat and predictable — simple mechanics that reliably produce a secure two-finger pinch." }
+```
+
+## Why it dominates
+
+- **Simplicity and reliability.** One degree of freedom (open/close), few parts, robust — cheap to build and hard to break.
+- **Precision.** Controlled position and force make it repeatable for assembly and pick-and-place.
+- **Predictable grasping.** Grasp planning for two fingers is well understood, and learned [grasp detectors](/atlas/concept/visual-grasp-detection) output exactly this kind of grip.
+- **Interchangeable fingertips.** Swap jaw shapes (flat, V-groove, soft, custom) for different parts.
+
+## The limits
+
+A parallel-jaw gripper is a specialist, not a hand:
+
+- **Only pinch grasps.** It can't wrap, re-orient in-hand, or perform [dexterous manipulation](/atlas/concept/dexterous-manipulation) — for that you need a multi-fingered hand.
+- **Needs graspable features.** Flat, thin, or awkward objects can defeat a two-finger pinch (where a [suction gripper](/atlas/concept/suction-gripper) may do better).
+- **Limited to its opening width and force.**
+
+For most structured tasks, those limits don't matter — which is why the parallel jaw remains the default.
+
+## Where you'll see it
+
+Assembly lines, machine tending, warehouse [bin picking](/atlas/concept/bin-picking), lab automation, and research arms — anywhere a robot needs to reliably pick and place discrete objects.
+
+## Why it matters
+
+The parallel-jaw gripper is the practical face of robot grasping — the simple, dependable hand that does the vast majority of real-world picking. Understanding it (and when to reach for suction or a dexterous hand instead) is core to applied manipulation.
+
+## Related
+
+[Gripper](/atlas/concept/gripper) · [Antipodal grasp](/atlas/concept/antipodal-grasp) · [Suction gripper](/atlas/concept/suction-gripper) · [End-effector](/atlas/concept/end-effector)

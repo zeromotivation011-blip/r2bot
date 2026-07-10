@@ -1,0 +1,73 @@
+---
+title: Grasp Quality
+slug: grasp-quality
+bucket: concept
+category: control
+summary: >-
+  Grasp quality is a score that rates how good a grip is — not just whether it holds, but how much
+  disturbance it can survive — letting a robot rank candidate grasps and pick the most robust one.
+difficulty: 3
+tags:
+  - manipulation
+  - grasping
+  - metrics
+seeAlso:
+  - force-closure
+  - grasp-planning
+  - antipodal-grasp
+  - visual-grasp-detection
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Grasp quality measures (survey)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'Ferrari & Canny — Planning optimal grasps'
+    url: 'https://ieeexplore.ieee.org/document/224748'
+laymanExplanation: >-
+  Grasp quality is a number rating how strong a grip is. Two grips might both hold an object, but one
+  can take a much bigger bump before slipping — grasp quality captures that difference so the robot
+  picks the sturdier grip.
+technicalDefinition: >-
+  A grasp-quality metric quantifies the robustness of a grasp, e.g. the largest wrench it can resist
+  in the worst-case direction (the epsilon metric) or measures of contact configuration.
+quizQuestion:
+  q: A grasp-quality metric lets a robot…
+  options:
+    - Charge faster
+    - Rank candidate grasps by how robust they are
+    - Measure battery level
+    - Detect colors
+  answer: 1
+  explanation: >-
+    It scores each candidate grasp's robustness (e.g. worst-case wrench resistance) so the planner
+    can choose the strongest, most reliable grip.
+---
+
+A robot often finds *many* grips that would technically hold an object. Which should it use? The one least likely to fail. **Grasp quality** puts a number on that, so the robot can choose.
+
+## From "holds" to "how well"
+
+[Force closure](/atlas/concept/force-closure) answers a yes/no question: can this grasp resist *any* disturbance at all? But two force-closure grasps aren't equal — one might barely hold while another could survive a hard shove. A **grasp-quality metric** measures *how strongly* a grasp holds, turning ranking into math.
+
+```diagram
+{ "type": "flow", "title": "Score every candidate, pick the best", "nodes": ["Candidate grasps", "Compute quality score", "Rank them", "Execute the strongest"], "caption": "Quality reduces each grasp to a comparable number, so the planner isn't guessing — it selects the most robust grip it can reach." }
+```
+
+## What the score captures
+
+Common grasp-quality ideas:
+
+- **Worst-case wrench resistance (the ε-metric).** The classic measure: the *largest* disturbance the grasp can resist in its *weakest* direction. A bigger number means the grip is far from slipping no matter how the object is pushed.
+- **Contact geometry.** How well-spread and opposed the contacts are — grips that surround the object's [center of mass](/atlas/concept/center-of-mass) and press along good directions score higher (an [antipodal grasp](/atlas/concept/antipodal-grasp) is a simple high-quality pattern).
+- **Robustness to uncertainty.** How much the grasp still works if the object's pose or the contacts are slightly off — crucial because perception is never perfect.
+
+## In modern systems
+
+Analytic planners compute these metrics explicitly. Learned systems ([visual grasp detection](/atlas/concept/visual-grasp-detection)) instead predict a **grasp success probability** directly from images — effectively a learned quality score — trained on millions of real or simulated grasp attempts (as in Dex-Net and similar). Either way, the robot ends up ranking grasps and choosing the top one.
+
+## Why it matters
+
+Grasp quality is what lets a robot be *reliable*, not just occasionally lucky — choosing grips that tolerate real-world bumps and sensing error. It's the deciding metric in [grasp planning](/atlas/concept/grasp-planning) and a core idea in making manipulation dependable.
+
+## Related
+
+[Force closure](/atlas/concept/force-closure) · [Grasp planning](/atlas/concept/grasp-planning) · [Antipodal grasp](/atlas/concept/antipodal-grasp) · [Visual grasp detection](/atlas/concept/visual-grasp-detection)

@@ -1,0 +1,77 @@
+---
+title: In-Hand Manipulation
+slug: in-hand-manipulation
+bucket: concept
+category: control
+summary: >-
+  In-hand manipulation is repositioning an object within the hand without putting it down — the
+  finger gymnastics that let a robot reorient a part to use or place it, a hallmark of true dexterity.
+difficulty: 4
+tags:
+  - manipulation
+  - grasping
+  - control
+seeAlso:
+  - dexterous-manipulation
+  - tendon-driven-hand
+  - tactile-sensor
+  - reinforcement-learning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'In-hand manipulation (research)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'OpenAI — Solving Rubik''s Cube with a robot hand'
+    url: 'https://openai.com/research/solving-rubiks-cube'
+laymanExplanation: >-
+  In-hand manipulation is a robot adjusting an object within its own hand — rotating it, shifting its
+  grip — without setting it down. Like flipping a pen in your fingers to write, it's fine, tricky
+  finger work.
+technicalDefinition: >-
+  In-hand manipulation reorients or repositions a grasped object relative to the hand using finger
+  motions such as rolling, sliding, and finger gaiting, without releasing to a surface.
+quizQuestion:
+  q: In-hand manipulation means the robot…
+  options:
+    - Puts the object down and regrasps from a table
+    - Repositions the object within the hand without releasing it
+    - Only lifts the object
+    - Uses suction
+  answer: 1
+  explanation: >-
+    It reorients the object within the hand itself — by rolling, sliding, or finger gaiting — without
+    setting it down.
+---
+
+Pick up a pen the wrong way and you'll flip it around in your fingers to write — without ever setting it down. That effortless human skill, **in-hand manipulation**, is one of the toughest things to give a robot.
+
+## What it is
+
+In-hand manipulation is **repositioning or reorienting a grasped object within the hand itself**, without releasing it to a surface. The alternatives — set the object down and regrasp, or move the whole arm — are clumsy and often impossible in clutter. Doing it *in the hand* is faster and more capable, but demands fine finger control.
+
+```diagram
+{ "type": "flow", "title": "Reorient without letting go", "nodes": ["Object grasped", "Fingers roll / slide / gait", "Object rotates in hand", "Now correctly oriented"], "caption": "The fingers cooperate to move the object relative to the hand — never putting it down — until it's positioned for the task." }
+```
+
+## The techniques
+
+- **Rolling** — fingertips roll the object like fingers turning a marble.
+- **Sliding** — deliberately letting the object slip in a controlled way to shift it.
+- **Finger gaiting** — one finger releases and repositions while the others keep hold, then swaps — like walking the fingers around the object to rotate it far.
+
+Each keeps the object secure through the transition, which is the hard part: relax too much and it drops.
+
+## Why it's difficult
+
+It combines everything hard about manipulation at once: **shifting contacts**, **high-dimensional finger control**, **friction and slip** that are tough to model, and a strong need for **touch**. A tiny misjudgment and the object falls. This is exactly the kind of problem where [tactile sensing](/atlas/concept/tactile-sensor) and [reinforcement learning](/atlas/concept/reinforcement-learning) shine — OpenAI's hand famously reoriented and even solved a Rubik's cube through learned in-hand manipulation, a landmark result.
+
+## Where it matters
+
+Assembly (orient a part before inserting it), tool use (adjust grip on a tool), and any task where a robot must *use* what it holds, not just carry it. It's a core component of broader [dexterous manipulation](/atlas/concept/dexterous-manipulation).
+
+## Why it matters
+
+In-hand manipulation is a benchmark for genuine robotic dexterity — the skill that lets a robot adjust and use objects the way people do. Progress here, driven by tactile sensing and learning, is a key marker on the road to general-purpose manipulation.
+
+## Related
+
+[Dexterous manipulation](/atlas/concept/dexterous-manipulation) · [Tendon-driven hand](/atlas/concept/tendon-driven-hand) · [Tactile sensor](/atlas/concept/tactile-sensor) · [Reinforcement learning](/atlas/concept/reinforcement-learning)

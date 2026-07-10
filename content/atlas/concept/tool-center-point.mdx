@@ -1,0 +1,72 @@
+---
+title: Tool Center Point (TCP)
+slug: tool-center-point
+bucket: concept
+category: control
+summary: >-
+  The tool center point is the exact spot on a robot's tool that it actually controls and moves —
+  the tip of the welding torch or the center of the gripper — and defining it correctly is
+  fundamental to making a robot go precisely where you mean.
+difficulty: 2
+tags:
+  - manipulation
+  - kinematics
+  - configuration
+seeAlso:
+  - end-effector
+  - forward-kinematics
+  - tf-transform
+  - inverse-kinematics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Tool center point (robotics)'
+    url: 'https://en.wikipedia.org/wiki/Robot_end_effector'
+  - title: 'TCP calibration'
+    url: 'https://en.wikipedia.org/wiki/Robot_calibration'
+laymanExplanation: >-
+  The tool center point is the working tip of whatever tool a robot is holding — the end of the glue
+  nozzle, the center of the gripper's grasp. It's the point the robot's commands actually refer to, so
+  it must be defined accurately.
+technicalDefinition: >-
+  The tool center point is the reference frame at the functional tip of a robot's end-effector,
+  relative to the wrist flange, used as the controlled point for motion and paths.
+quizQuestion:
+  q: The tool center point is…
+  options:
+    - The robot's base
+    - The functional tip of the tool that the robot controls
+    - The battery location
+    - The camera lens
+  answer: 1
+  explanation: >-
+    The TCP is the working point of the tool (torch tip, gripper center) that the robot's motion
+    commands and paths are defined around.
+---
+
+When you tell a robot to "move to this point," which part of it goes there? Not the base, not the wrist — the working tip of its tool. That point is the **tool center point**, and getting it right is a quiet fundamental of every robot program.
+
+## What it is
+
+The tool center point (TCP) is the **reference frame at the functional tip of the [end-effector](/atlas/concept/end-effector)** — the tip of a welding torch, the nozzle of a dispenser, the center of a [gripper](/atlas/concept/parallel-jaw-gripper)'s grasp, the point of a probe. It's defined *relative to the robot's wrist flange*. Every motion command, taught point, and path the robot follows is expressed in terms of where the **TCP** should be and how it should be oriented — not the arm's joints or flange.
+
+```diagram
+{ "type": "flow", "title": "The point the robot actually controls", "nodes": ["Robot joints", "Wrist flange", "Tool offset", "Tool center point (TCP)"], "caption": "Forward kinematics gives the flange pose; adding the tool's offset gives the TCP — the point paths and commands are really about." }
+```
+
+## Why defining it correctly matters
+
+- **Accuracy.** If the TCP is set wrong (wrong offset from the flange), the robot puts the tool tip in the wrong place — the weld misses the seam, the glue lands off-target. Even a few millimeters of error ruins precision work.
+- **Reorientation about the tip.** A correct TCP lets the robot **rotate the tool about its working point** — e.g. tilt a welding torch while keeping the tip on the seam. With a wrong TCP, rotating swings the tip away.
+- **Path programming.** Paths (a weld line, a glue bead, a cutting contour) are defined for the TCP, so it must correspond to the real tool tip.
+
+## Setting it up
+
+Defining a TCP means measuring the tool's offset and orientation from the flange. This is often done by **calibration**: touch the tool tip to a single fixed point from several different arm orientations, and the robot solves for the offset that keeps that tip stationary (the "4-point" or "N-point" method). The TCP is then stored and used for all motion.
+
+## Why it matters
+
+The tool center point is the bridge between a robot's mechanics and the *task* — it's the point the whole system is really trying to control. Defining and calibrating it accurately is a basic, essential step in deploying any robot that uses a tool, from welding to dispensing to assembly.
+
+## Related
+
+[End-effector](/atlas/concept/end-effector) · [Forward kinematics](/atlas/concept/forward-kinematics) · [tf transforms](/atlas/concept/tf-transform) · [Inverse kinematics](/atlas/concept/inverse-kinematics)

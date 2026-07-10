@@ -1,0 +1,76 @@
+---
+title: Underactuated Hand
+slug: underactuated-hand
+bucket: concept
+category: actuators
+summary: >-
+  An underactuated hand has more finger joints than motors — so its fingers passively conform around
+  whatever they touch, grabbing many shapes securely with simple, cheap, robust hardware.
+difficulty: 3
+tags:
+  - manipulation
+  - gripper
+  - end-effector
+seeAlso:
+  - tendon-driven-hand
+  - dexterous-manipulation
+  - form-closure
+  - gripper
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Underactuated robotic hands (survey)'
+    url: 'https://en.wikipedia.org/wiki/Robotic_grasping'
+  - title: 'Dollar & Howe — The SDM Hand'
+    url: 'https://en.wikipedia.org/wiki/Robot_end_effector'
+laymanExplanation: >-
+  An underactuated hand has fewer motors than joints, so when it closes, the fingers automatically
+  wrap and mold around the object's shape by themselves. Simple, cheap, and it grabs a huge range of
+  objects without careful control.
+technicalDefinition: >-
+  An underactuated hand has fewer actuators than joint degrees of freedom, using passive elements
+  (springs, tendons, linkages) so fingers self-adapt to object shape when closing.
+quizQuestion:
+  q: An underactuated hand has…
+  options:
+    - More motors than joints
+    - Fewer motors than joints, so fingers self-adapt
+    - No joints at all
+    - One rigid finger
+  answer: 1
+  explanation: >-
+    With fewer actuators than joints, passive elements let the fingers conform to the object's shape
+    automatically when the hand closes.
+---
+
+A human hand has dozens of muscles for dozens of joints. Copying that in a robot is expensive and hard to control. The **underactuated hand** takes a clever shortcut: fewer motors than joints, and let physics do the rest.
+
+## The idea
+
+An underactuated hand has **more joint degrees of freedom than actuators**. When it closes, a single motor drives a finger through **tendons or linkages** with **springs** at the joints. The finger's segments bend one after another as they meet resistance, so the finger **automatically wraps and conforms** to whatever it's touching — no per-joint control needed.
+
+```diagram
+{ "type": "flow", "title": "One motor, self-shaping fingers", "nodes": ["Motor closes finger", "Segments meet object", "Joints bend to conform", "Finger wraps the shape"], "caption": "Passive springs/linkages let the finger mold to the object automatically — one input produces a shape-adapted grasp." }
+```
+
+## Why it's so effective
+
+- **Shape adaptability.** One command grasps a ball, a pen, a bottle, or an odd part — the fingers find the shape themselves. This gives robust **enveloping grasps** that approach [form closure](/atlas/concept/form-closure).
+- **Simple and cheap.** Far fewer motors, sensors, and control complexity than a fully actuated [dexterous hand](/atlas/concept/dexterous-manipulation) — light, low-cost, and reliable.
+- **Forgiving of uncertainty.** Because the fingers conform, the hand tolerates imperfect perception and positioning — it doesn't need to know the object's exact shape to grip it well.
+- **Robust to impact.** Compliant joints absorb bumps instead of jamming.
+
+## The trade-off
+
+Giving up independent joint control means giving up fine **dexterity**. An underactuated hand grasps beautifully but can't precisely position each fingertip or perform delicate [in-hand manipulation](/atlas/concept/in-hand-manipulation) — for that you need more actuators and full control. So underactuation is the sweet spot for **robust general-purpose grabbing**, not for fine finger gymnastics.
+
+## Where you'll see it
+
+Prosthetic hands (secure everyday grasping on a budget), adaptive industrial grippers, humanoid hands where robustness matters more than fingertip precision, and research grippers designed to handle unknown objects gracefully.
+
+## Why it matters
+
+The underactuated hand is a beautiful example of *mechanical intelligence* — letting the hardware's passive dynamics solve the grasping problem, so a simple, cheap hand grabs a wide variety of objects reliably. It's a dominant design philosophy for practical robot hands.
+
+## Related
+
+[Tendon-driven hand](/atlas/concept/tendon-driven-hand) · [Dexterous manipulation](/atlas/concept/dexterous-manipulation) · [Form closure](/atlas/concept/form-closure) · [Gripper](/atlas/concept/gripper)

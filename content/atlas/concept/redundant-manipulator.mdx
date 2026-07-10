@@ -1,0 +1,78 @@
+---
+title: Redundant Manipulator
+slug: redundant-manipulator
+bucket: concept
+category: control
+summary: >-
+  A redundant manipulator has more joints than a task strictly needs — the extra freedom lets it
+  reach the same point many ways, so it can dodge obstacles, avoid singularities, and work in tight
+  spaces while still doing the job.
+difficulty: 3
+tags:
+  - manipulation
+  - kinematics
+  - control
+seeAlso:
+  - inverse-kinematics
+  - jacobian
+  - degrees-of-freedom
+  - whole-body-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Redundant manipulator (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Redundancy_(engineering)'
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  A redundant manipulator has more joints than it needs to reach a point — like your arm, which can
+  touch your nose with your elbow high or low. That spare freedom lets the robot pick a pose that also
+  avoids obstacles or awkward configurations.
+technicalDefinition: >-
+  A redundant manipulator has more degrees of freedom than the task requires, giving a null space of
+  self-motions that reposition the arm without moving the end-effector.
+quizQuestion:
+  q: The extra freedom of a redundant manipulator lets it…
+  options:
+    - Move faster only
+    - Reach a target many ways, e.g. to avoid obstacles or singularities
+    - Use less power always
+    - Skip having joints
+  answer: 1
+  explanation: >-
+    Redundancy provides a null space of motions that keep the end-effector fixed while repositioning
+    the arm — useful for avoiding obstacles, limits, and singularities.
+---
+
+Your arm has seven degrees of freedom, but placing your hand at a point in space only needs six. That spare one is why you can touch your nose with your elbow up *or* down. A robot arm built the same way is a **redundant manipulator**, and that redundancy is a gift.
+
+## What "redundant" means
+
+A task like "put the gripper at this pose" fixes **six** degrees of freedom (position + orientation). A manipulator with **more than six joints** — a 7-DOF arm, or a whole humanoid — has *extra* freedom left over. That surplus creates a **null space**: a continuum of arm configurations that all keep the end-effector in exactly the same place. The robot can move through these self-motions freely while its hand stays put.
+
+```diagram
+{ "type": "flow", "title": "Same hand pose, many arm shapes", "nodes": ["Fix end-effector pose", "Extra DOF remain", "Null-space self-motion", "Reshape arm freely"], "caption": "With more joints than the task needs, the arm can rearrange itself — elbow up or down, around an obstacle — without disturbing the gripper." }
+```
+
+## Why the extra freedom is valuable
+
+Redundancy lets the robot satisfy **secondary goals** while doing its primary task:
+
+- **Obstacle avoidance** — swing the elbow around a beam while the hand keeps welding.
+- **Avoiding [singularities](/atlas/concept/singularity)** — steer away from configurations where control degrades.
+- **Staying within joint limits** — keep joints comfortably mid-range.
+- **Better manipulability** — pose the arm where it can push and move most effectively.
+- **Human-like, natural motion** — the reason redundant arms look graceful, not contorted.
+
+Solvers exploit this with a **null-space projection** term in the [inverse kinematics](/atlas/concept/inverse-kinematics), optimizing secondary objectives through the [Jacobian](/atlas/concept/jacobian)'s null space. On humanoids, [whole-body control](/atlas/concept/whole-body-control) generalizes the same idea across dozens of joints.
+
+## The cost
+
+More joints mean more motors, weight, cost, and control complexity — and the IK now has infinitely many solutions, so the controller must *choose* wisely rather than just solve. That extra decision-making is exactly where redundancy is exploited (or wasted).
+
+## Why it matters
+
+The redundant manipulator is what lets robot arms work gracefully in cluttered, human spaces — reaching targets while dodging obstacles, limits, and singularities. Redundancy resolution is a core skill in advanced manipulation and the reason 7-DOF arms and humanoids move so capably.
+
+## Related
+
+[Inverse kinematics](/atlas/concept/inverse-kinematics) · [Jacobian](/atlas/concept/jacobian) · [Degrees of freedom](/atlas/concept/degrees-of-freedom) · [Whole-body control](/atlas/concept/whole-body-control)
