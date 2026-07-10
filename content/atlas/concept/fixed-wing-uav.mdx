@@ -1,0 +1,82 @@
+---
+title: Fixed-Wing UAV
+slug: fixed-wing-uav
+bucket: concept
+category: robot-types
+summary: >-
+  A fixed-wing UAV flies like an airplane — using wings for efficient lift rather than spinning
+  rotors — trading a drone's hover for far greater range and endurance, ideal for mapping,
+  surveillance, and long-distance missions.
+difficulty: 2
+tags:
+  - aerial
+  - drone
+  - robot-types
+seeAlso:
+  - drone
+  - quadrotor-dynamics
+  - vtol
+  - autonomous-vehicle
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Fixed-wing aircraft (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Fixed-wing_aircraft'
+  - title: 'Unmanned aerial vehicle'
+    url: 'https://en.wikipedia.org/wiki/Unmanned_aerial_vehicle'
+laymanExplanation: >-
+  A fixed-wing UAV is a drone shaped like a small airplane. Its wings do the lifting as it flies
+  forward, which is far more efficient than a quadcopter's spinning rotors — so it can fly much
+  farther and longer, but it can't hover.
+technicalDefinition: >-
+  A fixed-wing UAV is an unmanned aircraft that generates lift aerodynamically from wings in forward
+  flight, offering high efficiency and endurance but requiring continuous forward motion.
+quizQuestion:
+  q: Compared with a quadcopter, a fixed-wing UAV offers…
+  options:
+    - The ability to hover in place
+    - Much greater range and endurance
+    - Simpler vertical takeoff
+    - Slower flight
+  answer: 1
+  explanation: >-
+    Wings produce lift efficiently in forward flight, giving far longer range and flight time — but
+    it must keep moving and cannot hover.
+---
+
+Not every flying robot is a hovering quadcopter. When the mission is to cover *distance* — survey a farm, patrol a border, map a coastline — the right tool is a **fixed-wing UAV**: a drone built like an airplane.
+
+## Why wings win on endurance
+
+A [quadrotor](/atlas/concept/quadrotor-dynamics) stays up by constantly spinning rotors to fight gravity — energy-hungry work. A fixed-wing UAV instead uses **wings** to generate lift aerodynamically as it flies forward; the motor only needs to overcome drag, not hold the whole weight aloft. The result is dramatically better efficiency:
+
+- **Range and endurance** — hours of flight and tens or hundreds of kilometers, versus a multirotor's ~30 minutes.
+- **Speed** — faster cruising to cover ground.
+- **Payload efficiency** — more sensor time per battery.
+
+```diagram
+{ "type": "flow", "title": "Wings trade hover for reach", "nodes": ["Forward flight", "Wings generate lift", "Low energy to stay up", "Long range + endurance"], "caption": "Because lift comes from the wings, not from fighting gravity with thrust, a fixed-wing UAV flies far longer — at the cost of never being able to stop and hover." }
+```
+
+## The trade-off
+
+The cost of that efficiency is **it can't hover or stop**. A fixed-wing UAV must keep moving to stay airborne, which brings constraints:
+
+- **Takeoff and landing** need a runway, a hand/catapult launch, or a belly landing — no vertical takeoff.
+- **It can't inspect a fixed point up close** the way a hovering multirotor can.
+- **Minimum turn radius** — like a car in the sky, it flies arcs, not sharp stops.
+
+## Where you'll see it
+
+Aerial mapping and agriculture (long survey lines), military and border surveillance, wildlife and environmental monitoring, and delivery over long distances. When a mission needs coverage and time aloft more than pinpoint hovering, fixed-wing is the answer.
+
+## Bridging the gap: VTOL
+
+Because hover *and* endurance are both often desirable, hybrid **[VTOL](/atlas/concept/vtol)** designs combine vertical-takeoff rotors with fixed wings — taking off like a quadcopter, then flying efficiently like a plane.
+
+## Why it matters
+
+Fixed-wing UAVs represent the endurance end of aerial robotics — the platform for missions measured in kilometers and hours. Understanding the wing-vs-rotor trade-off is fundamental to choosing the right drone for a job.
+
+## Related
+
+[Drone](/atlas/concept/drone) · [Quadrotor dynamics](/atlas/concept/quadrotor-dynamics) · [VTOL](/atlas/concept/vtol) · [Autonomous vehicle](/atlas/concept/autonomous-vehicle)

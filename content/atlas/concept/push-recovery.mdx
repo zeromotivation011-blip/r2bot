@@ -1,0 +1,73 @@
+---
+title: Push Recovery
+slug: push-recovery
+bucket: concept
+category: control
+summary: >-
+  Push recovery is how a legged robot keeps its balance when shoved — the ankle, hip, and stepping
+  reflexes that let a humanoid take a hit and stay upright instead of toppling.
+difficulty: 4
+tags:
+  - control
+  - legged
+  - balance
+seeAlso:
+  - capture-point
+  - zero-moment-point
+  - whole-body-control
+  - bipedal-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Pratt et al. — Capture Point and push recovery'
+    url: 'https://en.wikipedia.org/wiki/Zero_moment_point'
+  - title: 'Humanoid balance strategies'
+    url: 'https://en.wikipedia.org/wiki/Humanoid_robot'
+laymanExplanation: >-
+  Push recovery is a robot's version of catching your balance when someone bumps you. Depending on
+  how hard the push is, it flexes its ankles, bends at the hips, or takes a quick step — the same
+  instincts people use.
+technicalDefinition: >-
+  Push recovery is the set of balance strategies (ankle, hip, and stepping) a legged robot uses to
+  reject disturbances and remain standing, often guided by the capture point.
+quizQuestion:
+  q: For a large shove, a robot's most effective push-recovery strategy is usually to…
+  options:
+    - Flex only its ankles
+    - Take a step to the capture point
+    - Turn off its motors
+    - Do nothing
+  answer: 1
+  explanation: >-
+    Small pushes are handled by ankle/hip strategies; a large disturbance needs a step to the capture
+    point to arrest the momentum.
+---
+
+Shove a standing person and they instinctively flex, sway, or step to stay up. Giving a robot those same reflexes is **push recovery** — and it's what separates a humanoid that survives the real world from one that topples at the first bump.
+
+## The three strategies
+
+Just like humans, robots reject disturbances with an escalating set of strategies, chosen by how big the push is:
+
+- **Ankle strategy** — for a **small** push, tilt at the ankles to shift the ground reaction and nudge the body back upright. Keeps the feet planted.
+- **Hip strategy** — for a **medium** push, rapidly bend at the hips/torso, using the body's angular momentum to recover. Feet still planted.
+- **Stepping strategy** — for a **large** push, when the first two can't cope, take a quick step to a new base of support — the robot's version of catching yourself.
+
+```diagram
+{ "type": "flow", "title": "Escalating balance reflexes", "nodes": ["Small push → ankle", "Medium → hip", "Large → step", "Stay upright"], "caption": "The controller picks the least drastic strategy that will work: flex the ankles, then the hips, and only step when it must." }
+```
+
+## The key idea: where to step
+
+When stepping is needed, *where* to plant the foot is critical — step short and you keep falling; step right and you stop. That target is the **[capture point](/atlas/concept/capture-point)**: the spot where planting the foot arrests the robot's momentum and brings it to rest. Push recovery is largely the practical application of capture-point (and [ZMP](/atlas/concept/zero-moment-point)) theory, executed through [whole-body control](/atlas/concept/whole-body-control) so the whole robot cooperates in the save.
+
+## Why it's hard
+
+The robot must **sense** the disturbance fast (via [IMU](/atlas/concept/imu) and force sensing), **decide** which strategy in milliseconds, and **execute** a coordinated whole-body response — all before it passes the point of no return. It's a fast, high-stakes control problem, and robust push recovery on rough ground is still an active research frontier.
+
+## Why it matters
+
+Push recovery is what makes legged robots trustworthy around people and in the messy real world, where bumps, slips, and uneven ground are inevitable. Those viral clips of humanoids taking a shove and striding on are push recovery at work — a hallmark of mature balance control.
+
+## Related
+
+[Capture point](/atlas/concept/capture-point) · [Zero-moment point](/atlas/concept/zero-moment-point) · [Whole-body control](/atlas/concept/whole-body-control) · [Bipedal robot](/atlas/concept/bipedal-robot)

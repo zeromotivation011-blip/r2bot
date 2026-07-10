@@ -1,0 +1,78 @@
+---
+title: Quadruped Locomotion
+slug: quadruped-locomotion
+bucket: concept
+category: control
+summary: >-
+  Quadruped locomotion is how four-legged robots like Spot walk, trot, and climb — balancing on
+  shifting sets of legs across terrain that wheels can't handle, using a mix of gait patterns,
+  balance control, and increasingly learning.
+difficulty: 3
+tags:
+  - locomotion
+  - legged
+  - control
+seeAlso:
+  - gait
+  - central-pattern-generator
+  - whole-body-control
+  - reinforcement-learning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Legged locomotion (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Legged_robot'
+  - title: 'Learning agile locomotion (ETH/Boston Dynamics work)'
+    url: 'https://www.science.org/doi/10.1126/scirobotics.abc5986'
+laymanExplanation: >-
+  Quadruped locomotion is the art of getting a four-legged robot to walk and run. It has to decide
+  which legs to move, where to put its feet, and how to stay balanced — over stairs, rubble, and
+  slopes that would stop a wheeled robot.
+technicalDefinition: >-
+  Quadruped locomotion coordinates four legs' gait timing, foot placement, and body balance to move a
+  robot across varied terrain, via model-based control or learned policies.
+quizQuestion:
+  q: A key advantage of quadruped robots over wheeled ones is…
+  options:
+    - Higher road speed
+    - Traversing stairs, rubble, and rough terrain
+    - Lower cost
+    - Simpler control
+  answer: 1
+  explanation: >-
+    Legs let quadrupeds step over and onto obstacles — stairs, rocks, gaps — that stop wheels, at the
+    cost of much harder control.
+---
+
+Four legs give a robot a remarkable ability: to walk over terrain no wheel can cross — stairs, rubble, gaps, steep slopes. Achieving it is **quadruped locomotion**, one of robotics' hardest and most visible control problems.
+
+## Why four legs are hard (and worth it)
+
+A [quadruped](/atlas/concept/gait) is constantly deciding **which legs to move, where to place each foot, and how to stay balanced** while some feet are in the air. Unlike a wheeled robot that's always supported, a walking quadruped shifts between different sets of grounded legs, momentarily reducing its support. The payoff is terrain access; the cost is that balance and coordination must be actively controlled every instant.
+
+```diagram
+{ "type": "flow", "title": "The quadruped locomotion loop", "nodes": ["Choose gait", "Plan foot placements", "Balance body", "Step & repeat"], "caption": "Pick a gait, decide where feet land, keep the body balanced over the support, and execute — continuously, adapting to what the terrain gives." }
+```
+
+## The ingredients
+
+- **[Gait](/atlas/concept/gait)** — the timing pattern (crawl for stability, trot for speed).
+- **Foot placement** — choosing safe footholds, critical on rough or gapped terrain.
+- **Balance control** — keeping the [center of mass](/atlas/concept/center-of-mass) supported, using ideas like [ZMP](/atlas/concept/zero-moment-point) and [capture point](/atlas/concept/capture-point), often via [whole-body control](/atlas/concept/whole-body-control).
+- **Compliance** — springy legs ([series elastic actuators](/atlas/concept/series-elastic-actuator)) absorb impacts and store energy.
+
+## Two eras of control
+
+- **Model-based** — the classic approach (Boston Dynamics' early BigDog/Spot): explicit dynamics models, foothold optimization, and balance controllers. Precise but demanding to engineer.
+- **Learned (RL)** — the modern wave: train a [reinforcement learning](/atlas/concept/reinforcement-learning) policy in massively parallel [simulation](/atlas/concept/sim-to-real), then transfer to hardware. This produced the robust, blind-and-perceptive locomotion that lets quadrupeds handle unseen rough terrain, recover from slips, and even get back up after falling.
+
+## Where you'll see it
+
+Boston Dynamics Spot, ANYmal, Unitree's quadrupeds — used for inspection, mapping, security, research, and increasingly logistics in environments built for human feet, not wheels.
+
+## Why it matters
+
+Quadruped locomotion is a flagship of modern robotics — the clearest demonstration of legs unlocking terrain, and a proving ground where learning-based control has recently leapt past decades of hand-engineering. It's central to the push toward robots that go where people and animals go.
+
+## Related
+
+[Gait](/atlas/concept/gait) · [Central pattern generator](/atlas/concept/central-pattern-generator) · [Whole-body control](/atlas/concept/whole-body-control) · [Reinforcement learning](/atlas/concept/reinforcement-learning)

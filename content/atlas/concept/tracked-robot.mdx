@@ -1,0 +1,81 @@
+---
+title: Tracked Robot
+slug: tracked-robot
+bucket: concept
+category: robot-types
+summary: >-
+  A tracked robot drives on continuous belts instead of wheels — spreading its weight and gripping
+  loose or broken ground, which makes tracks the go-to for search-and-rescue, military, and
+  rough-terrain robots.
+difficulty: 2
+tags:
+  - locomotion
+  - mobile-robot
+  - rugged
+seeAlso:
+  - skid-steer
+  - differential-drive
+  - search-and-rescue-robotics
+  - odometry
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Continuous track (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Continuous_track'
+  - title: 'Tracked mobile robots'
+    url: 'https://en.wikipedia.org/wiki/Tracked_vehicle'
+laymanExplanation: >-
+  A tracked robot rolls on belts (like a tank) instead of wheels. The belts spread its weight over a
+  big footprint and grip uneven ground, so it climbs rubble and crosses mud where wheels would sink
+  or get stuck.
+technicalDefinition: >-
+  A tracked robot uses continuous belts driven by sprockets for locomotion, distributing ground
+  pressure over a large contact area and steering via skid-steer.
+quizQuestion:
+  q: The main advantage of tracks over wheels is…
+  options:
+    - Higher top speed on roads
+    - Better traction and low ground pressure on rough/soft terrain
+    - Cheaper manufacturing
+    - Silent operation
+  answer: 1
+  explanation: >-
+    Tracks spread weight over a large contact area and grip loose or broken ground, giving mobility
+    where wheels sink or slip.
+---
+
+When a robot has to cross rubble, mud, sand, or stairs, wheels struggle. **Tracked robots** — rolling on tank-style belts — thrive exactly where wheels fail.
+
+## Why tracks win on rough ground
+
+A track is a continuous belt wrapped around drive sprockets and rollers. Two properties make it powerful:
+
+- **Low ground pressure.** The robot's weight spreads over the whole length of the track's footprint, so it floats over soft ground (sand, snow, mud) instead of sinking like a narrow wheel.
+- **High traction and obstacle climbing.** The long contact patch grips loose surfaces, and the track can catch on and climb edges, rubble, and stairs far larger than a wheel's radius.
+
+```diagram
+{ "type": "flow", "title": "Weight spread, grip gained", "nodes": ["Robot weight", "Spread over track footprint", "Low ground pressure", "Climbs rubble, crosses mud"], "caption": "The large contact area is the whole trick: it prevents sinking and multiplies grip, unlocking terrain that stops wheeled robots." }
+```
+
+## How it steers
+
+Tracked robots almost always use **[skid-steer](/atlas/concept/skid-steer)**: run the left and right tracks at different speeds to turn, spinning in place when they run opposite. That means the same odometry caveat applies — during turns the tracks **skid**, so wheel/track counts alone badly estimate heading, and these robots depend on an [IMU](/atlas/concept/imu) for orientation. Some designs add movable "flippers" (sub-tracks) to actively climb stairs and right themselves.
+
+## The trade-offs
+
+- **Slow and inefficient on hard, flat ground** — tracks have high rolling resistance and scrub in turns, so on pavement wheels win easily.
+- **Wear and complexity** — tracks, sprockets, and tensioners need maintenance; throwing a track immobilizes the robot.
+- **Weight** — the track mechanism is heavy.
+
+So tracks are a deliberate choice for terrain, not speed.
+
+## Where you'll see it
+
+[Search-and-rescue robots](/atlas/concept/search-and-rescue-robotics) in disaster rubble, bomb-disposal and military robots, agricultural and construction machines, and planetary/exploration platforms — anywhere the ground is unpredictable and mobility matters more than pace.
+
+## Why it matters
+
+Tracked robots are the rugged specialists of mobile robotics, extending reach into terrain that defeats wheels. Knowing when tracks beat wheels — and their odometry and efficiency costs — is core to choosing a mobile platform.
+
+## Related
+
+[Skid-steer](/atlas/concept/skid-steer) · [Differential drive](/atlas/concept/differential-drive) · [Search-and-rescue robot](/atlas/concept/search-and-rescue-robotics) · [Odometry](/atlas/concept/odometry)

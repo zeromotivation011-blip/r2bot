@@ -1,0 +1,76 @@
+---
+title: Omnidirectional Robot
+slug: omnidirectional-robot
+bucket: concept
+category: robot-types
+summary: >-
+  An omnidirectional robot can move in any direction — forward, sideways, diagonally — and rotate
+  at the same time, thanks to special wheels. That freedom makes it superb for tight, precise
+  maneuvering in warehouses and labs.
+difficulty: 2
+tags:
+  - locomotion
+  - wheeled
+  - mobile-robot
+seeAlso:
+  - mecanum-wheel
+  - holonomic-constraint
+  - swerve-drive
+  - differential-drive
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Omni wheel (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Omni_wheel'
+  - title: 'Holonomic drive systems'
+    url: 'https://en.wikipedia.org/wiki/Holonomic_(robotics)'
+laymanExplanation: >-
+  An omnidirectional robot can slide in any direction without turning first — left, right, diagonal —
+  and spin while it does. Special wheels with rollers on them make this possible, which is great for
+  squeezing into tight spaces.
+technicalDefinition: >-
+  An omnidirectional robot is a holonomic mobile platform that can independently control translation
+  in any direction and rotation, typically using omni or mecanum wheels.
+quizQuestion:
+  q: An omnidirectional robot's special ability is to…
+  options:
+    - Only move forward
+    - Move in any direction and rotate simultaneously
+    - Fly
+    - Climb walls
+  answer: 1
+  explanation: >-
+    Using omni/mecanum wheels it can translate in any direction and rotate at once — full holonomic
+    motion in the plane.
+---
+
+Most wheeled robots have to *turn* before they can go a new direction. An **omnidirectional robot** doesn't — it can glide straight sideways, diagonally, or spin while translating, all without reorienting first.
+
+## How it works
+
+The magic is in the wheels. Ordinary wheels only roll forward/back and grip sideways. **Omni wheels** and **[mecanum wheels](/atlas/concept/mecanum-wheel)** have small rollers around their rim, angled so the wheel can also slide *along* its axis. Combine three or four such wheels and coordinate their speeds, and the robot's net motion can point **any direction** in the plane — plus rotation — independently.
+
+```diagram
+{ "type": "flow", "title": "Any direction, no turning first", "nodes": ["Command a direction", "Blend wheel speeds", "Net motion any way", "+ rotate at same time"], "caption": "Because each special wheel can also roll sideways via its rollers, the combined motion covers all directions and rotation — full planar freedom." }
+```
+
+## Why it's powerful — and its cost
+
+An omnidirectional robot is **[holonomic](/atlas/concept/holonomic-constraint)**: its controllable directions equal its degrees of freedom, so a planner can command a straight line to any pose and the robot just goes. That makes it unbeatable for:
+
+- **Tight maneuvering** — sliding into a narrow dock or shelf without a multi-point turn.
+- **Precise positioning** — nudging in any direction to align with a target.
+- **Agile platforms** — camera dollies, some warehouse robots, competition robots.
+
+The trade-off is mechanical: omni/mecanum wheels are **less efficient**, worse on rough or dirty ground (the exposed rollers slip and clog), carry less load, and are more complex than plain wheels. That's why rugged and long-range robots stick with simpler [differential](/atlas/concept/differential-drive) or Ackermann drives, and reserve omnidirectional designs for smooth indoor floors where agility pays off.
+
+## Omnidirectional vs swerve
+
+For heavy or outdoor robots that still want any-direction motion, [swerve drive](/atlas/concept/swerve-drive) (steerable, powered normal wheels) is an alternative — more efficient and rugged, at the cost of mechanical and control complexity.
+
+## Why it matters
+
+The omnidirectional robot shows what full planar freedom buys: effortless, agile positioning that simpler drives can't match. It's the platform of choice wherever tight, precise indoor maneuvering matters more than efficiency or terrain.
+
+## Related
+
+[Mecanum wheel](/atlas/concept/mecanum-wheel) · [Holonomic constraint](/atlas/concept/holonomic-constraint) · [Swerve drive](/atlas/concept/swerve-drive) · [Differential drive](/atlas/concept/differential-drive)

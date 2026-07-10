@@ -1,0 +1,81 @@
+---
+title: Buoyancy Control
+slug: buoyancy-control
+bucket: concept
+category: control
+summary: >-
+  Buoyancy control lets an underwater robot rise, sink, and hover by adjusting its effective density —
+  the depth-keeping mechanism behind AUVs, gliders, and any robot that works beneath the surface.
+difficulty: 3
+tags:
+  - marine
+  - control
+  - underwater
+seeAlso:
+  - underwater-robot
+  - sensor-fusion
+  - dead-reckoning
+  - autonomy
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Buoyancy (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Buoyancy'
+  - title: 'Autonomous underwater vehicle'
+    url: 'https://en.wikipedia.org/wiki/Autonomous_underwater_vehicle'
+laymanExplanation: >-
+  Buoyancy control is how an underwater robot decides to float up, sink down, or hang still. By
+  changing how much it weighs relative to the water it displaces — like a fish's swim bladder — it
+  controls its depth.
+technicalDefinition: >-
+  Buoyancy control regulates an underwater vehicle's depth by adjusting its net buoyancy (the balance
+  of weight and displaced-water upthrust), via ballast, variable-buoyancy engines, or thrusters.
+quizQuestion:
+  q: An underwater robot rises when its…
+  options:
+    - Weight exceeds its buoyant force
+    - Buoyant force exceeds its weight
+    - Battery is full
+    - Lights turn on
+  answer: 1
+  explanation: >-
+    If the upward buoyant force (from displaced water) exceeds the robot's weight, net buoyancy is
+    positive and it rises; equal forces mean it hovers.
+---
+
+On land, gravity pins a robot down; in the air, a drone fights gravity constantly. Underwater, there's a third option — **buoyancy** — and controlling it is how a submarine robot manages its depth.
+
+## The physics
+
+Any submerged body feels two vertical forces: its **weight** pulling down, and the **buoyant force** (the upthrust from the water it displaces) pushing up. Their balance — the **net buoyancy** — decides everything:
+
+- Weight > buoyancy → **negative** → the robot **sinks**.
+- Buoyancy > weight → **positive** → the robot **rises**.
+- Equal → **neutral** → the robot **hovers** at depth.
+
+Buoyancy control is the act of tuning that balance to go up, down, or hold station — exactly what a fish does with its swim bladder.
+
+```diagram
+{ "type": "flow", "title": "Depth from the weight–buoyancy balance", "nodes": ["Change displaced volume / ballast", "Net buoyancy shifts", "Rise, sink, or hover", "Hold target depth"], "caption": "Adjust how much water the robot effectively displaces (or its ballast), and net buoyancy — and therefore vertical motion — follows." }
+```
+
+## How robots do it
+
+- **Ballast tanks** — flood with water to sink, blow out with air to rise (the classic submarine method).
+- **Variable-buoyancy engines** — pump oil between an internal reservoir and an external bladder to change displaced volume slightly. Efficient and precise, used by **underwater gliders** that sawtooth up and down across whole oceans on tiny power.
+- **Thrusters** — vertical props actively hold depth; simple and responsive but power-hungry, common on hovering ROVs.
+
+## Why it matters for underwater robots
+
+- **Endurance.** Buoyancy-driven gliders barely use energy to change depth, enabling months-long missions — a huge advantage where recharging is impossible.
+- **Stable operation.** Achieving **neutral buoyancy** lets an [AUV](/atlas/concept/underwater-robot) hover to inspect or sample without wasting thrust.
+- **Safety.** A well-designed vehicle is set slightly positive so it floats to the surface if power fails.
+
+Depth control pairs with pressure sensors, and since GPS doesn't work underwater, navigation leans on [dead reckoning](/atlas/concept/dead-reckoning) and [sensor fusion](/atlas/concept/sensor-fusion).
+
+## Why it matters
+
+Buoyancy control is the defining locomotion problem of underwater robotics — the equivalent of thrust for a drone or wheels for a rover. Mastering it is what lets robots explore, monitor, and work in the ocean, efficiently and for a long time.
+
+## Related
+
+[Underwater robot](/atlas/concept/underwater-robot) · [Sensor fusion](/atlas/concept/sensor-fusion) · [Dead reckoning](/atlas/concept/dead-reckoning) · [Autonomy](/atlas/concept/autonomy)

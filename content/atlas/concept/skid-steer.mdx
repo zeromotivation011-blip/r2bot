@@ -1,0 +1,81 @@
+---
+title: Skid-Steer
+slug: skid-steer
+bucket: concept
+category: robot-types
+summary: >-
+  Skid-steer drives a robot by running the wheels or tracks on each side at different speeds and
+  letting them scrub sideways to turn — a simple, rugged, tank-like scheme used by loaders,
+  tracked robots, and rovers.
+difficulty: 2
+tags:
+  - locomotion
+  - wheeled
+  - mobile-robot
+seeAlso:
+  - differential-drive
+  - tracked-robot
+  - nonholonomic-constraint
+  - odometry
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Skid steering (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Skid_steering'
+  - title: 'Skid-steer kinematics'
+    url: 'https://en.wikipedia.org/wiki/Differential_wheeled_robot'
+laymanExplanation: >-
+  Skid-steer turns a robot the way a tank does: speed up the wheels on one side and slow the other,
+  and the machine pivots — the wheels or tracks scrub sideways across the ground to make it happen.
+technicalDefinition: >-
+  Skid-steer locomotion turns a robot by commanding different speeds to the left and right wheel/track
+  banks, relying on lateral tire/track slip (skidding) to rotate.
+quizQuestion:
+  q: A skid-steer robot turns by…
+  options:
+    - Steering its front wheels
+    - Driving left and right sides at different speeds and skidding
+    - Tilting its body
+    - Using a rudder
+  answer: 1
+  explanation: >-
+    Different left/right speeds create a turning effect; the wheels or tracks skid sideways to allow
+    the rotation — no steered wheels needed.
+---
+
+Skid-steer is the "tank turn" of robotics: no steering wheels, no complex mechanism — just drive one side faster than the other and let the machine pivot. It's simple, tough, and everywhere in the rugged mobile-robot world.
+
+## How it works
+
+The wheels (or tracks) are fixed straight ahead and grouped into a **left bank** and a **right bank**. Drive both sides equally and the robot goes straight. Drive the right side faster than the left and it curves left; drive them in **opposite directions** and it spins on the spot. To rotate, the wheels or tracks must **skid sideways** across the ground — hence the name.
+
+```diagram
+{ "type": "flow", "title": "Turn by unequal side speeds", "nodes": ["Left bank speed", "Right bank speed", "Difference → turn", "Wheels/tracks skid"], "caption": "No steered wheels — turning comes entirely from the left/right speed difference, with lateral scrubbing making the rotation possible." }
+```
+
+## Strengths
+
+- **Mechanical simplicity.** Just two motor groups, no steering linkage — cheap, robust, few failure points.
+- **Zero-radius turns.** It spins in place, great for tight spaces (like a [differential-drive](/atlas/concept/differential-drive) robot, which is essentially skid-steer with two wheels).
+- **Great on tracks.** [Tracked robots](/atlas/concept/tracked-robot) use skid-steer naturally, spreading weight and gripping rough or soft terrain (mud, rubble, snow).
+
+## The catch: skidding
+
+That sideways scrub is also the weakness. Skidding means:
+
+- **Wheel [odometry](/atlas/concept/odometry) is unreliable.** During turns the wheels slip, so counting rotations badly overestimates rotation — skid-steer robots lean heavily on an [IMU](/atlas/concept/imu) and other sensors to know their heading.
+- **High friction and wear.** Scrubbing wastes energy and grinds tires/tracks and the ground beneath.
+- **Turning is terrain-dependent.** The same command turns differently on carpet vs gravel, complicating control.
+
+Like other differential schemes it's [nonholonomic](/atlas/concept/nonholonomic-constraint) — it can't move sideways.
+
+## Where you'll see it
+
+Skid-steer loaders (the Bobcat), military and search-and-rescue [tracked robots](/atlas/concept/tracked-robot), planetary rovers, agricultural machines, and countless research robots — anywhere ruggedness and simplicity beat efficiency and precise odometry.
+
+## Why it matters
+
+Skid-steer is the workhorse locomotion of rough-terrain and heavy mobile robots — dead simple, extremely robust, and the natural drive for tracks. Understanding its odometry pitfall is key to localizing these robots well.
+
+## Related
+
+[Differential drive](/atlas/concept/differential-drive) · [Tracked robot](/atlas/concept/tracked-robot) · [Nonholonomic constraint](/atlas/concept/nonholonomic-constraint) · [Odometry](/atlas/concept/odometry)

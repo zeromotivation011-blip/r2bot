@@ -1,0 +1,76 @@
+---
+title: Hexapod Robot
+slug: hexapod-robot
+bucket: concept
+category: robot-types
+summary: >-
+  A hexapod robot walks on six legs — insect-style — which makes it naturally stable, able to keep
+  moving even if a leg fails, and a favorite for rough-terrain and research locomotion.
+difficulty: 2
+tags:
+  - locomotion
+  - legged
+  - robot-types
+seeAlso:
+  - gait
+  - central-pattern-generator
+  - quadruped-locomotion
+  - bipedal-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Hexapod (walking robot) (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Hexapod_(robotics)'
+  - title: 'Insect-inspired locomotion'
+    url: 'https://en.wikipedia.org/wiki/Legged_robot'
+laymanExplanation: >-
+  A hexapod robot has six legs like an insect. With so many legs it can always keep several on the
+  ground, so it's very stable, walks over rough ground easily, and keeps going even if a leg breaks.
+technicalDefinition: >-
+  A hexapod robot is a six-legged walking machine that achieves static stability by keeping at least
+  three non-collinear legs grounded, using tripod and other insect-inspired gaits.
+quizQuestion:
+  q: A hexapod's classic 'tripod gait' keeps how many legs on the ground at once?
+  options:
+    - One
+    - Three (alternating sets)
+    - All six always
+    - Zero
+  answer: 1
+  explanation: >-
+    In the tripod gait, two alternating sets of three legs each support the body, giving a stable
+    triangle while the other three swing.
+---
+
+Six legs might seem like overkill, but for a walking robot they buy something precious: **stability by default**. The **hexapod robot** borrows the insect's body plan for exactly that reason.
+
+## Why six legs are stable
+
+A body needs at least three non-collinear support points to be statically stable (like a three-legged stool). A hexapod can keep **three legs planted while moving the other three**, so it's *always* supported — it never has to balance dynamically the way a [bipedal](/atlas/concept/bipedal-robot) robot does. This is the famous **tripod gait**: two alternating sets of three legs, each forming a stable triangle.
+
+```diagram
+{ "type": "flow", "title": "The tripod gait", "nodes": ["3 legs planted (triangle)", "Other 3 swing forward", "Swap the sets", "Always statically stable"], "caption": "At every instant three legs form a supporting triangle under the body, so the hexapod stays balanced without active dynamic control." }
+```
+
+## The advantages
+
+- **Static stability.** No falling-and-catching; it can even freeze mid-stride. Great for carrying delicate payloads or moving slowly and precisely.
+- **Fault tolerance.** Lose a leg (motor failure, damage) and a hexapod can adapt its [gait](/atlas/concept/gait) and keep walking — impossible for a biped and hard for a [quadruped](/atlas/concept/quadruped-locomotion).
+- **Rough terrain.** Many independent feet mean many chances for good footholds on uneven ground; it can also adjust body height and orientation over obstacles.
+
+## The trade-offs
+
+- **More motors, more weight, more cost** — eighteen-plus joints to build, power, and coordinate.
+- **Slower and less efficient** than dynamic runners — all those planted legs mean lower top speed.
+- **Coordination complexity** — many legs to sequence, often handled elegantly by a [central pattern generator](/atlas/concept/central-pattern-generator).
+
+## Where you'll see it
+
+Research and education platforms (the classic entry into legged robotics), rough-terrain inspection, search robots, and bio-inspired studies of insect locomotion. Their stability and redundancy make them forgiving to experiment with.
+
+## Why it matters
+
+The hexapod embodies the "stability through redundancy" philosophy of legged design — an approachable, robust, fault-tolerant walker. It's a foundational platform for understanding [gaits](/atlas/concept/gait) and legged locomotion before tackling the harder balance of two and four legs.
+
+## Related
+
+[Gait](/atlas/concept/gait) · [Central pattern generator](/atlas/concept/central-pattern-generator) · [Quadruped locomotion](/atlas/concept/quadruped-locomotion) · [Bipedal robot](/atlas/concept/bipedal-robot)

@@ -1,0 +1,75 @@
+---
+title: Whole-Body Control
+slug: whole-body-control
+bucket: concept
+category: control
+summary: >-
+  Whole-body control coordinates every joint of a complex robot at once to juggle many goals —
+  balance, reach, and contact — turning a humanoid's 30-plus joints into a single, unified control
+  problem solved in real time.
+difficulty: 4
+tags:
+  - control
+  - legged
+  - manipulation
+seeAlso:
+  - inverse-kinematics
+  - zero-moment-point
+  - quadruped-locomotion
+  - equations-of-motion
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Whole-body control (survey)'
+    url: 'https://en.wikipedia.org/wiki/Humanoid_robot'
+  - title: 'Sentis & Khatib — Whole-body control framework'
+    url: 'https://en.wikipedia.org/wiki/Humanoid_robot'
+laymanExplanation: >-
+  Whole-body control moves all of a robot's joints together to do several things at once — stay
+  balanced, reach for something, keep its feet planted — instead of controlling one limb at a time.
+  It's how a humanoid does everything in coordination.
+technicalDefinition: >-
+  Whole-body control computes coordinated joint commands for a high-DOF robot by solving a prioritized
+  optimization over multiple tasks and constraints (balance, contact, motion) simultaneously.
+quizQuestion:
+  q: Whole-body control is needed because a humanoid must…
+  options:
+    - Control only one arm at a time
+    - Satisfy many goals (balance, reach, contact) with all joints at once
+    - Avoid using its legs
+    - Stay perfectly still
+  answer: 1
+  explanation: >-
+    It coordinates all joints together to meet multiple prioritized objectives and constraints
+    simultaneously — balance while reaching while keeping feet planted.
+---
+
+A humanoid reaching for a high shelf must, at the same instant, keep its balance, keep its feet planted, avoid hitting itself, and actually reach the target. You can't solve those one limb at a time — they interact. **Whole-body control** solves them together.
+
+## The problem
+
+A [humanoid](/atlas/concept/humanoid-robot) has 30+ joints and must satisfy **many objectives and constraints at once**:
+
+- **Tasks** — reach the target, look at something, keep the [center of mass](/atlas/concept/center-of-mass) balanced.
+- **Constraints** — don't exceed joint limits, keep planted feet from slipping, respect contact forces, avoid self-collision.
+
+Controlling the arm alone would tip the robot; balancing alone would fail to reach. Whole-body control treats the **entire robot as one system** and finds joint commands that serve all goals simultaneously.
+
+```diagram
+{ "type": "flow", "title": "Many goals, one solve", "nodes": ["Tasks (reach, balance, gaze)", "Constraints (limits, contacts)", "Prioritized optimization", "Coordinated joint commands"], "caption": "All objectives and constraints go into one optimization each control cycle; the solution is a single set of joint torques that best serves them together." }
+```
+
+## How it works
+
+Whole-body controllers typically pose each control cycle as a **prioritized optimization** (often a quadratic program) over the robot's [equations of motion](/atlas/concept/equations-of-motion). High-priority objectives (don't fall, honor contacts) are satisfied first; lower-priority ones (reach, gaze) are met in the remaining freedom — exploiting the robot's [redundancy](/atlas/concept/inverse-kinematics), the extra degrees of freedom beyond what any single task needs. It generalizes [inverse kinematics](/atlas/concept/inverse-kinematics) from "place one hand" to "satisfy everything at once, including dynamics and forces."
+
+## Where you'll see it
+
+The balance and manipulation controllers on humanoids (Atlas, Digit, Optimus) and on advanced [quadrupeds](/atlas/concept/quadruped-locomotion) that must locomote *and* manipulate. It's what lets these robots do multiple things fluidly — walk while carrying, catch themselves ([push recovery](/atlas/concept/push-recovery)) while reaching, step onto uneven ground while staying upright.
+
+## Why it matters
+
+Whole-body control is the framework that makes truly capable legged, manipulating robots possible. It's the answer to the defining challenge of high-degree-of-freedom robots: doing many interdependent things at once, safely and in real time.
+
+## Related
+
+[Inverse kinematics](/atlas/concept/inverse-kinematics) · [Zero-moment point](/atlas/concept/zero-moment-point) · [Quadruped locomotion](/atlas/concept/quadruped-locomotion) · [Equations of motion](/atlas/concept/equations-of-motion)

@@ -1,0 +1,77 @@
+---
+title: Central Pattern Generator (CPG)
+slug: central-pattern-generator
+bucket: concept
+category: control
+summary: >-
+  A central pattern generator is a network of coupled oscillators that produces rhythmic motion —
+  the biology-inspired engine that gives legged and swimming robots smooth, self-sustaining gaits
+  without scripting every joint move.
+difficulty: 4
+tags:
+  - locomotion
+  - legged
+  - bio-inspired
+seeAlso:
+  - gait
+  - quadruped-locomotion
+  - bipedal-robot
+  - hexapod-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Central pattern generator (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Central_pattern_generator'
+  - title: 'Ijspeert — CPGs for locomotion control'
+    url: 'https://www.science.org/doi/10.1126/science.1138353'
+laymanExplanation: >-
+  A central pattern generator is a small "rhythm circuit" that produces repeating up-down signals on
+  its own, like a heartbeat. Feed those to a robot's legs and it walks in a steady rhythm, without a
+  controller planning every single step.
+technicalDefinition: >-
+  A CPG is a network of coupled nonlinear oscillators that generates coordinated rhythmic output
+  signals, used to drive legged, swimming, or crawling robot locomotion.
+quizQuestion:
+  q: A central pattern generator produces…
+  options:
+    - A single fixed position
+    - Self-sustaining rhythmic signals for coordinated motion
+    - Random noise
+    - A map of the room
+  answer: 1
+  explanation: >-
+    A CPG is a network of oscillators that outputs coordinated rhythmic patterns, driving cyclic
+    locomotion like walking or swimming.
+---
+
+Animals don't consciously plan each step — a rhythmic circuit in the spinal cord keeps their legs cycling. Robots can borrow that trick with a **central pattern generator**.
+
+## The biological idea
+
+In animals, **central pattern generators** are neural circuits that produce rhythmic muscle activity **without needing rhythmic input** — the source of walking, swimming, and breathing rhythms. A cat with its brain disconnected can still produce stepping patterns, because the CPG in its spinal cord generates them locally.
+
+## The robot version
+
+A robotic CPG is a **network of coupled oscillators** — small mathematical units that each output a repeating up-and-down signal, linked so they stay in a fixed phase relationship. Wire each oscillator to a leg (or body segment) and the network produces a coordinated, self-sustaining **[gait](/atlas/concept/gait)**.
+
+```diagram
+{ "type": "flow", "title": "Coupled oscillators make a gait", "nodes": ["Oscillator per leg", "Coupled in phase", "Rhythmic leg signals", "Smooth coordinated gait"], "caption": "The oscillators lock into a stable phase pattern, so the legs cycle in coordination automatically — no step-by-step planning of each joint." }
+```
+
+## Why it's useful
+
+- **Self-sustaining rhythm.** The gait keeps going on its own; you don't script every joint angle over time.
+- **Smooth transitions.** Slowly change the oscillators' frequency or coupling and the gait morphs smoothly — speeding up, or shifting from walk to trot — without discontinuities.
+- **Robustness and feedback.** Sensory feedback (foot contact, body tilt) can nudge the oscillators, so the gait adapts to disturbances and terrain, entraining to the body's dynamics.
+- **Few parameters.** A whole gait is controlled by a handful of numbers (frequency, amplitude, phase), which is also friendly to optimization and learning.
+
+## Where you'll see it
+
+Quadruped and [hexapod](/atlas/concept/hexapod-robot) walkers, **salamander and snake robots**, swimming and eel-like robots (where the traveling-wave gait is naturally a CPG), and as a low-level layer beneath higher planners. It competes with — and is sometimes combined with — model-based and learned gait controllers.
+
+## Why it matters
+
+The central pattern generator brings biology's elegant solution for rhythmic motion into robotics: coordinated, adaptable [gaits](/atlas/concept/gait) from a compact, self-sustaining rhythm engine. It's a foundational idea in bio-inspired locomotion.
+
+## Related
+
+[Gait](/atlas/concept/gait) · [Quadruped locomotion](/atlas/concept/quadruped-locomotion) · [Bipedal robot](/atlas/concept/bipedal-robot) · [Hexapod robot](/atlas/concept/hexapod-robot)

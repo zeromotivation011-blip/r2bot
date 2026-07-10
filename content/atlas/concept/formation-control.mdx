@@ -1,0 +1,79 @@
+---
+title: Formation Control
+slug: formation-control
+bucket: concept
+category: control
+summary: >-
+  Formation control keeps a group of robots moving in a coordinated shape — a drone show, a convoy,
+  a search line — using simple local rules so the whole team holds its pattern without a central
+  conductor.
+difficulty: 3
+tags:
+  - multi-robot
+  - control
+  - swarm
+seeAlso:
+  - swarm-robotics
+  - autonomous-vehicle
+  - drone
+  - formation-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Formation control (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Multi-agent_system'
+  - title: 'Distributed multi-robot coordination'
+    url: 'https://en.wikipedia.org/wiki/Swarm_robotics'
+laymanExplanation: >-
+  Formation control keeps a group of robots in a set shape as they move — like geese in a V or drones
+  in a light show. Each robot follows simple rules about its neighbors, so the pattern holds without
+  one boss directing everyone.
+technicalDefinition: >-
+  Formation control coordinates multiple robots to achieve and maintain a desired spatial pattern,
+  using leader-follower, virtual-structure, or behavior-based distributed strategies.
+quizQuestion:
+  q: In leader-follower formation control, followers…
+  options:
+    - Ignore the leader
+    - Maintain a set relative position to the leader
+    - Move randomly
+    - Stop moving
+  answer: 1
+  explanation: >-
+    Each follower keeps a specified offset from the leader (or its assigned neighbor), so the group
+    holds its shape as the leader moves.
+---
+
+A drone light show painting shapes in the sky, a convoy of delivery robots, a line of rovers sweeping a field — all need many robots to move as one coordinated whole. That's **formation control**.
+
+## The goal
+
+Formation control makes a group of robots **achieve and hold a desired spatial pattern** — a line, a V, a grid, a circle — while the group as a whole moves, turns, or reshapes. The challenge is doing this **without a single central controller** micromanaging every robot, since that doesn't scale and creates a single point of failure.
+
+```diagram
+{ "type": "flow", "title": "Local rules, global shape", "nodes": ["Each robot senses neighbors", "Correct toward target offset", "Shape emerges", "Group moves as one"], "caption": "No conductor: each robot follows simple rules about its neighbors, and the desired formation emerges and persists across the whole team." }
+```
+
+## Three common strategies
+
+- **Leader–follower.** One (or a few) leaders set the path; each follower maintains a fixed **relative position** to its leader or assigned neighbor. Simple and intuitive, but a leader failure can cascade.
+- **Virtual structure.** The whole formation is treated as one rigid body; each robot tracks its assigned slot in that virtual shape. Precise formations, at the cost of flexibility.
+- **Behavior-based / distributed.** Each robot blends simple behaviors (keep spacing, match heading, move to goal) using only local sensing — robust, scalable, and the basis of flocking and [swarm](/atlas/concept/swarm-robotics) approaches.
+
+## What makes it hard
+
+- **Only local information.** Robots typically sense just their neighbors, not the global state, so the formation must emerge from local rules.
+- **Communication limits.** Delays, dropouts, and limited bandwidth mean the control must tolerate imperfect coordination.
+- **Collision avoidance.** Holding a shape while not crashing into each other, especially when reshaping or avoiding obstacles.
+- **Scalability.** The approach must work for 5 robots or 500.
+
+## Where you'll see it
+
+Drone light shows and coordinated aerial mapping, autonomous vehicle platooning, multi-robot search-and-rescue sweeps, satellite constellations, and warehouse robot fleets. Anywhere a **team** of robots must act with spatial coordination.
+
+## Why it matters
+
+Formation control is the foundation of multi-robot coordination — turning individual robots into a purposeful collective. It's central to swarm robotics and to any application where many robots must cover, carry, or search together.
+
+## Related
+
+[Swarm robotics](/atlas/concept/swarm-robotics) · [Drone](/atlas/concept/drone) · [Autonomous vehicle](/atlas/concept/autonomous-vehicle) · [Differential drive](/atlas/concept/differential-drive)

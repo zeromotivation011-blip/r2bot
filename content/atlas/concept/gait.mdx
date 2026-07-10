@@ -1,0 +1,76 @@
+---
+title: Gait
+slug: gait
+bucket: concept
+category: control
+summary: >-
+  A gait is the pattern and timing of how a legged robot moves its feet — walk, trot, gallop — and
+  choosing and generating the right gait is the foundation of getting a legged robot to move at all.
+difficulty: 3
+tags:
+  - locomotion
+  - legged
+  - control
+seeAlso:
+  - quadruped-locomotion
+  - central-pattern-generator
+  - bipedal-robot
+  - zero-moment-point
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Gait (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Gait'
+  - title: 'Legged Robots That Balance — Raibert'
+    url: 'https://en.wikipedia.org/wiki/Marc_Raibert'
+laymanExplanation: >-
+  A gait is the rhythm of walking — which feet move when. Animals switch gaits (walk, trot, gallop)
+  depending on speed, and legged robots do the same: a slow careful gait for stability, a fast
+  bouncy one for speed.
+technicalDefinition: >-
+  A gait is the cyclic sequence and timing of leg swing and stance phases in legged locomotion,
+  defining foot placement and coordination.
+quizQuestion:
+  q: A robot's gait describes…
+  options:
+    - Its battery capacity
+    - The pattern and timing of how it moves its legs
+    - The color of its feet
+    - Its sensor resolution
+  answer: 1
+  explanation: >-
+    A gait is the cyclic pattern of which legs are in swing vs stance and their timing — the
+    coordination that produces walking, trotting, etc.
+---
+
+Before a legged robot can go anywhere, it has to answer a basic question: **which foot moves when?** That pattern — the rhythm of stepping — is the **gait**, and it's where legged locomotion begins.
+
+## What it is
+
+A gait is the **cyclic timing** of each leg's two phases: **swing** (foot in the air, moving forward) and **stance** (foot on the ground, pushing). Coordinating those phases across all legs defines the gait. A slow gait keeps most feet down for stability; a fast gait has more feet in the air at once for speed.
+
+```diagram
+{ "type": "flow", "title": "Legs cycle between swing and stance", "nodes": ["Leg lifts (swing)", "Moves forward", "Plants (stance)", "Pushes body ahead"], "caption": "Every leg repeats this cycle; the gait is how the cycles of different legs are timed relative to each other." }
+```
+
+## Static vs dynamic gaits
+
+The key spectrum:
+
+- **Statically stable gaits** — the robot's [center of mass](/atlas/concept/center-of-mass) stays over its planted feet at all times, so it could freeze mid-step and not fall. Slow but safe (a careful **crawl** for a [quadruped](/atlas/concept/quadruped-locomotion) or [hexapod](/atlas/concept/hexapod-robot)).
+- **Dynamically stable gaits** — the robot is momentarily "falling" and catching itself each step, like a **trot**, **run**, or **gallop**. Faster and more efficient, but they demand active balance ([ZMP](/atlas/concept/zero-moment-point), [capture-point](/atlas/concept/capture-point)) and can't just stop mid-stride.
+
+Animals switch gaits with speed for efficiency; advanced robots do too.
+
+## How robots generate gaits
+
+- **Scripted/parametric gaits** — predefined timing patterns (a fixed trot), simple and reliable on flat ground.
+- **[Central pattern generators](/atlas/concept/central-pattern-generator)** — biologically-inspired oscillators that produce rhythmic gaits and adapt them.
+- **Learned gaits** — reinforcement learning discovers robust, natural gaits (and gait transitions) that handle rough terrain, now standard on modern quadrupeds.
+
+## Why it matters
+
+The gait is the organizing principle of legged movement — the difference between a pile of legs and a robot that walks. Choosing the right gait (stability vs speed) and generating it robustly is the core problem of legged locomotion, from insect-like hexapods to running humanoids.
+
+## Related
+
+[Quadruped locomotion](/atlas/concept/quadruped-locomotion) · [Central pattern generator](/atlas/concept/central-pattern-generator) · [Bipedal robot](/atlas/concept/bipedal-robot) · [Zero-moment point](/atlas/concept/zero-moment-point)

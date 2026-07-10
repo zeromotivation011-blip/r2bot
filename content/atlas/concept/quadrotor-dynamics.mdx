@@ -1,0 +1,76 @@
+---
+title: Quadrotor Dynamics
+slug: quadrotor-dynamics
+bucket: concept
+category: control
+summary: >-
+  Quadrotor dynamics explain how a four-rotor drone flies — how varying four propeller speeds
+  produces thrust, tilt, and turn — and why a drone is inherently unstable and must be controlled
+  hundreds of times a second.
+difficulty: 4
+tags:
+  - aerial
+  - drone
+  - control
+seeAlso:
+  - drone
+  - pid-controller
+  - imu
+  - electronic-speed-controller
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Quadcopter (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Quadcopter'
+  - title: 'Quadrotor dynamics and control (Mahony et al.)'
+    url: 'https://ieeexplore.ieee.org/document/6289431'
+laymanExplanation: >-
+  A quadrotor flies by spinning four propellers. Speeding some up and slowing others tilts it, and
+  tilting is how it moves. It can't balance itself, so an onboard computer adjusts all four motors
+  hundreds of times a second to keep it steady.
+technicalDefinition: >-
+  Quadrotor dynamics describe how differential thrust from four fixed rotors produces total lift and
+  the roll, pitch, and yaw torques that control an underactuated, unstable flying body.
+quizQuestion:
+  q: A quadrotor changes direction primarily by…
+  options:
+    - Steering a rudder
+    - Varying the four rotor speeds to tilt and turn
+    - Flapping wings
+    - Shifting its battery
+  answer: 1
+  explanation: >-
+    Adjusting the relative speeds of the four rotors creates roll/pitch/yaw torques; tilting the
+    thrust vector is how the drone accelerates horizontally.
+---
+
+A quadrotor looks simple — four propellers on an X — but flying it is a genuine control challenge. Understanding **quadrotor dynamics** is understanding why a [drone](/atlas/concept/drone) can't fly itself and what its flight controller is constantly doing.
+
+## How four rotors control flight
+
+Each of the four fixed rotors only points up and only spins. Yet by varying their relative speeds, the drone controls all its motion:
+
+- **Thrust (up/down)** — speed all four up or down together.
+- **Roll / Pitch (tilt)** — speed up the rotors on one side and slow the opposite side; the drone tilts, and the tilted thrust pushes it sideways. *Tilting is how a quadrotor moves horizontally* — it has no separate way to go sideways.
+- **Yaw (turn)** — adjacent rotors spin opposite directions; speeding up one diagonal pair over the other creates a net twist that rotates the drone.
+
+```diagram
+{ "type": "flow", "title": "Four motor speeds → all motion", "nodes": ["Vary 4 rotor speeds", "Net thrust + roll/pitch/yaw torques", "Body tilts / turns", "Drone accelerates"], "caption": "Four inputs produce lift plus three rotational torques. To move sideways the drone must first tilt — thrust and direction are coupled." }
+```
+
+## Why it's inherently unstable
+
+A quadrotor is **underactuated** (four motors, six degrees of freedom) and **naturally unstable** — left alone it tips and tumbles, because there's nothing passively keeping it level. It stays airborne only because a controller reads the [IMU](/atlas/concept/imu) (attitude and angular rate) and adjusts the four motors — via [ESCs](/atlas/concept/electronic-speed-controller) — **hundreds of times per second**, typically with nested [PID](/atlas/concept/pid-controller) loops (an inner fast loop on angular rate, an outer loop on attitude and position).
+
+## What follows from the dynamics
+
+- **Coupling.** Because moving requires tilting, position and attitude control are linked — you can't accelerate forward without pitching.
+- **Agility.** Small, light quadrotors have low rotational inertia, enabling the aggressive flips and racing maneuvers drones are known for.
+- **Wind and disturbance.** The fast inner loop is what rejects gusts and keeps a hover rock-steady.
+
+## Why it matters
+
+Quadrotor dynamics are the foundation of drone flight control — they explain the coupling between tilt and motion, the need for high-rate stabilization, and why a flight controller is doing constant, invisible work. They're essential to anyone building, tuning, or programming multirotors.
+
+## Related
+
+[Drone](/atlas/concept/drone) · [PID controller](/atlas/concept/pid-controller) · [IMU](/atlas/concept/imu) · [Electronic speed controller](/atlas/concept/electronic-speed-controller)

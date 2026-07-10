@@ -1,0 +1,83 @@
+---
+title: Swerve Drive
+slug: swerve-drive
+bucket: concept
+category: robot-types
+summary: >-
+  Swerve drive gives a robot omnidirectional motion using normal wheels that can each both steer
+  and drive independently — the powerful, rugged answer when you want any-direction agility without
+  the fragility of omni wheels.
+difficulty: 3
+tags:
+  - locomotion
+  - wheeled
+  - mobile-robot
+seeAlso:
+  - omnidirectional-robot
+  - mecanum-wheel
+  - holonomic-constraint
+  - differential-drive
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Swerve drive (FRC / robotics)'
+    url: 'https://en.wikipedia.org/wiki/Holonomic_(robotics)'
+  - title: 'Swerve drive kinematics'
+    url: 'https://www.chiefdelphi.com/'
+laymanExplanation: >-
+  Swerve drive uses regular wheels, but each one can rotate to point any direction and drive at its
+  own speed. Aim them all the same way and the robot slides that direction; aim them in a circle and
+  it spins. It gets omni-directional motion with tough, normal wheels.
+technicalDefinition: >-
+  Swerve drive is a holonomic drivetrain where each wheel module independently steers its heading and
+  controls its drive speed, enabling arbitrary translation and rotation.
+quizQuestion:
+  q: A swerve-drive module can independently control…
+  options:
+    - Only its speed
+    - Both its steering direction and its drive speed
+    - Only its color
+    - Nothing
+  answer: 1
+  explanation: >-
+    Each swerve module both steers (points the wheel any direction) and drives (sets speed),
+    together giving full holonomic motion with standard wheels.
+---
+
+[Omni and mecanum wheels](/atlas/concept/mecanum-wheel) give any-direction motion but are fragile and inefficient. **Swerve drive** achieves the same freedom with tough, ordinary wheels — by making each one steerable.
+
+## How it works
+
+A swerve drive has several **modules** (usually four), and each module can do two things independently:
+
+- **Steer** — rotate the wheel to point in any direction.
+- **Drive** — spin the wheel at any speed.
+
+Point all four wheels the same way and drive them together, and the robot **slides straight in that direction** — no chassis rotation needed. Angle them tangent to a circle and it **spins in place**. Blend the two and it can translate any direction *while* rotating.
+
+```diagram
+{ "type": "flow", "title": "Each wheel steers and drives", "nodes": ["Desired motion", "Compute per-module angle + speed", "Modules steer & drive", "Any translation + rotation"], "caption": "The controller solves what heading and speed each module needs to produce the commanded overall motion — full holonomic freedom from normal wheels." }
+```
+
+## Why choose it over omni wheels
+
+Both give [holonomic](/atlas/concept/holonomic-constraint) motion, but swerve wins where it counts for serious robots:
+
+- **Traction and efficiency.** Full grippy wheels, not slippery rollers — better on carpet, rough floors, and inclines, and far more efficient.
+- **Load and speed.** Handles weight and higher speeds omni wheels can't.
+- **Ruggedness.** No exposed rollers to clog or wear.
+
+The price is **complexity**: two motors per module (steer + drive), a lot of mechanism, and non-trivial control (coordinating heading and speed across modules, avoiding module "flip" discontinuities). It's a favorite in competitive robotics (FRC) and increasingly in capable service and industrial platforms.
+
+## Swerve vs differential vs Ackermann
+
+- **[Differential](/atlas/concept/differential-drive)** — simplest, spins in place, but can't strafe.
+- **Ackermann** — car-like, efficient at speed, big turning radius.
+- **Swerve** — most agile (holonomic) *and* rugged, but the most complex.
+
+## Why it matters
+
+Swerve drive is the high-performance path to omnidirectional mobility — the choice when a robot needs to move any direction with real traction, load capacity, and durability. It's a defining example of trading mechanical/control complexity for maneuverability.
+
+## Related
+
+[Omnidirectional robot](/atlas/concept/omnidirectional-robot) · [Mecanum wheel](/atlas/concept/mecanum-wheel) · [Holonomic constraint](/atlas/concept/holonomic-constraint) · [Differential drive](/atlas/concept/differential-drive)

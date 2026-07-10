@@ -1,0 +1,72 @@
+---
+title: Ackermann Steering
+slug: ackermann-steering
+bucket: concept
+category: robot-types
+summary: >-
+  Ackermann steering is the car-like geometry where the front wheels turn at slightly different
+  angles so all four roll cleanly around a shared center — the steering model behind self-driving
+  cars and most car-like robots.
+difficulty: 3
+tags:
+  - locomotion
+  - wheeled
+  - kinematics
+seeAlso:
+  - nonholonomic-constraint
+  - differential-drive
+  - autonomous-vehicle
+  - motion-planning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Ackermann steering geometry (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Ackermann_steering_geometry'
+  - title: 'Vehicle dynamics — steering'
+    url: 'https://en.wikipedia.org/wiki/Vehicle_dynamics'
+laymanExplanation: >-
+  Ackermann steering is why a car's two front wheels point at slightly different angles when you
+  turn — the inside wheel turns sharper than the outside one, so both follow their natural circle
+  without scrubbing.
+technicalDefinition: >-
+  Ackermann steering geometry angles the inner and outer steered wheels differently so all wheels
+  trace concentric circles about a common instantaneous center of rotation.
+quizQuestion:
+  q: In Ackermann steering, during a turn the inside front wheel turns…
+  options:
+    - At the same angle as the outside wheel
+    - At a sharper angle than the outside wheel
+    - Backward
+    - Not at all
+  answer: 1
+  explanation: >-
+    The inside wheel follows a tighter circle, so it must turn at a sharper angle than the outside
+    wheel for both to roll without scrubbing.
+---
+
+Watch a car's front wheels closely as it turns and you'll notice they don't point the same way — the inside wheel is cranked sharper. That deliberate difference is **Ackermann steering**, and it's the steering model for most car-like robots.
+
+## The geometry problem
+
+When a vehicle turns, each wheel traces a **different-sized circle** around a shared center point. The inside wheels follow tighter circles than the outside wheels. If both front wheels pointed at the same angle, one would have to skid ("scrub") to keep up. Ackermann geometry links the steering so the **inner wheel turns more sharply than the outer**, letting all four wheels roll cleanly around one common **instantaneous center of rotation**.
+
+```diagram
+{ "type": "flow", "title": "Each wheel, its own circle", "nodes": ["Turn command", "Inner wheel: sharper angle", "Outer wheel: shallower angle", "All wheels roll, no scrub"], "caption": "Angling the steered wheels differently puts them on concentric circles about one center — clean rolling instead of tire scrub." }
+```
+
+## Why robots care
+
+- **It's [nonholonomic](/atlas/concept/nonholonomic-constraint).** A car-steered robot can't move sideways or spin in place — it has a minimum turning radius. This shapes how it must plan: no straight lines to arbitrary poses, only feasible curves and maneuvers (the reason parking takes shuffling).
+- **Predictable model.** The "bicycle model" (collapsing the two front wheels into one) gives a clean kinematic description used for path following, and Ackermann geometry is what makes that model accurate.
+- **Contrast with alternatives.** A [differential-drive](/atlas/concept/differential-drive) robot spins in place; an omnidirectional robot strafes. An Ackermann robot does neither — but it's efficient, stable at speed, and matches real cars.
+
+## Where you'll see it
+
+Self-driving cars and [autonomous vehicles](/atlas/concept/autonomous-vehicle), delivery rovers, agricultural machines, and RC-car-based research platforms all use Ackermann steering. Any robot shaped and driven like a car inherits this geometry and its planning constraints.
+
+## Why it matters
+
+Ackermann steering is the defining kinematics of car-like robots — it dictates their turning limits and therefore how they must be controlled and planned for. Understanding it is essential to autonomous driving and any wheeled robot that steers like a car.
+
+## Related
+
+[Nonholonomic constraint](/atlas/concept/nonholonomic-constraint) · [Differential drive](/atlas/concept/differential-drive) · [Autonomous vehicle](/atlas/concept/autonomous-vehicle) · [Motion planning](/atlas/concept/motion-planning)

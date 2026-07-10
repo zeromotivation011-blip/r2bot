@@ -1,0 +1,81 @@
+---
+title: VTOL
+slug: vtol
+bucket: concept
+category: robot-types
+summary: >-
+  VTOL — vertical takeoff and landing — lets an aircraft rise straight up like a helicopter, then
+  fly efficiently like a plane, giving drones both hover and long range without needing a runway.
+difficulty: 3
+tags:
+  - aerial
+  - drone
+  - robot-types
+seeAlso:
+  - fixed-wing-uav
+  - quadrotor-dynamics
+  - drone
+  - autonomous-vehicle
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'VTOL (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/VTOL'
+  - title: 'Hybrid VTOL UAVs'
+    url: 'https://en.wikipedia.org/wiki/Unmanned_aerial_vehicle'
+laymanExplanation: >-
+  VTOL means a flying robot can take off and land straight up and down, no runway needed, and then —
+  in hybrid designs — switch to flying forward on wings for long, efficient flight. Best of both a
+  helicopter and an airplane.
+technicalDefinition: >-
+  VTOL (Vertical Take-Off and Landing) describes aircraft that take off, hover, and land vertically;
+  hybrid VTOL UAVs combine multirotor lift for takeoff with fixed-wing flight for cruise.
+quizQuestion:
+  q: A hybrid VTOL UAV combines…
+  options:
+    - Two batteries
+    - Vertical rotor takeoff with efficient fixed-wing cruise
+    - Wheels and tracks
+    - Sonar and lidar
+  answer: 1
+  explanation: >-
+    Hybrid VTOL takes off and lands vertically using rotors, then transitions to wing-borne flight
+    for long, efficient cruising — combining hover and range.
+---
+
+A hovering [quadcopter](/atlas/concept/quadrotor-dynamics) can take off anywhere but has short range; a [fixed-wing UAV](/atlas/concept/fixed-wing-uav) flies far but needs a runway. **VTOL** designs aim to have both — rise straight up, then cruise efficiently.
+
+## What VTOL means
+
+**VTOL** stands for **Vertical Take-Off and Landing** — the ability to lift off, hover, and land straight up and down, no runway required. Helicopters are the classic example. In drone robotics, the exciting category is **hybrid VTOL**, which fuses two flight modes in one airframe.
+
+## The hybrid trick
+
+A hybrid VTOL UAV:
+
+1. **Takes off vertically** using multirotor-style lift (rotors pointing up), like a quadcopter.
+2. **Transitions** to forward flight — the aircraft accelerates and its **wings** begin carrying the weight.
+3. **Cruises efficiently** as a fixed-wing plane, covering long distances.
+4. **Transitions back** and lands vertically at the destination.
+
+```diagram
+{ "type": "flow", "title": "Take off up, cruise like a plane", "nodes": ["Vertical rotor takeoff", "Transition to forward flight", "Wing-borne efficient cruise", "Vertical landing"], "caption": "The vertical phase gives runway-free launch and hover; the wing phase gives range. The transition between them is the hard, critical part." }
+```
+
+Common configurations include **tilt-rotor** (rotors rotate from vertical to horizontal), **tail-sitter** (the whole aircraft pitches over), and **quadplane** (separate lift rotors plus a pusher prop and wings).
+
+## Why it's valuable — and hard
+
+- **Best of both worlds** — launch and recover anywhere (a ship deck, a field, a rooftop) yet fly the long, efficient missions wings enable.
+- **The transition is the challenge** — switching from rotor-borne to wing-borne flight passes through a tricky regime where control is delicate and failures are dangerous. Managing it robustly is the central VTOL engineering problem, and it adds weight and complexity (carrying both a lift system and wings).
+
+## Where you'll see it
+
+Long-range delivery drones, military surveillance UAVs launched without runways, maritime and disaster-response aircraft, and emerging passenger eVTOL "air taxi" concepts — all cases where vertical launch and long range are both required.
+
+## Why it matters
+
+VTOL resolves aerial robotics' core trade-off between hover and endurance. Hybrid VTOL UAVs are a fast-growing class precisely because they unlock missions that neither pure multirotors nor pure fixed-wing aircraft can fly.
+
+## Related
+
+[Fixed-wing UAV](/atlas/concept/fixed-wing-uav) · [Quadrotor dynamics](/atlas/concept/quadrotor-dynamics) · [Drone](/atlas/concept/drone) · [Autonomous vehicle](/atlas/concept/autonomous-vehicle)
