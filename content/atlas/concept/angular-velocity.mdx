@@ -1,0 +1,72 @@
+---
+title: Angular Velocity
+slug: angular-velocity
+bucket: concept
+category: fundamentals
+summary: >-
+  Angular velocity is how fast and about which axis something is spinning — the rotational
+  twin of linear velocity, and the quantity a robot's gyroscope measures and its controllers
+  regulate to stay upright and on course.
+difficulty: 2
+tags:
+  - math
+  - motion
+  - fundamentals
+seeAlso:
+  - quaternion
+  - rotation-matrix
+  - imu
+  - jacobian
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Angular velocity (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Angular_velocity'
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  Angular velocity tells you how fast something is turning and around what axis. A spinning
+  top, a drone yawing, a wheel rolling — each has an angular velocity, usually measured in
+  radians or degrees per second.
+technicalDefinition: >-
+  Angular velocity is a vector whose direction is the axis of rotation and whose magnitude is
+  the rate of rotation (rad/s), relating how orientation changes over time.
+quizQuestion:
+  q: A gyroscope in an IMU directly measures…
+  options:
+    - Position
+    - Angular velocity
+    - Battery charge
+    - Color
+  answer: 1
+  explanation: >-
+    A gyroscope measures angular velocity (rate of rotation); integrating it estimates change
+    in orientation.
+---
+
+Linear velocity tells you how fast a robot is moving through space. **Angular velocity** tells you how fast it's *turning* — and for anything that balances, flies, or steers, it's just as important.
+
+## What it is
+
+Angular velocity (often written **ω**) is a **vector**: its direction is the axis the object spins about (by the right-hand rule) and its length is how fast, in radians per second. A drone yawing, a wheel rolling, a satellite tumbling — each has one ω that fully captures its instantaneous rotation.
+
+```diagram
+{ "type": "flow", "title": "Angular velocity = axis + rate", "nodes": ["Spinning body", "Axis of rotation", "Rate (rad/s)", "ω vector"], "caption": "One vector encodes both which way it turns (the axis) and how fast (the length). Every point on the body moves with velocity ω × r." }
+```
+
+## Why robots care
+
+- **Sensing.** A [gyroscope](/atlas/concept/imu) inside an IMU measures angular velocity directly — the raw signal behind attitude estimation. Integrate ω over time and you get change in orientation (though that integration [drifts](/atlas/concept/dead-reckoning)).
+- **Control.** Balancing robots, drones, and camera gimbals regulate angular velocity constantly — a [PID](/atlas/concept/pid-controller) loop on ω is what damps wobble and holds a heading.
+- **Kinematics.** The rotational half of a manipulator's [Jacobian](/atlas/concept/jacobian) maps joint speeds to the end-effector's angular velocity, so the hand rotates the way you intend.
+
+## The subtle part
+
+Rotations don't add like ordinary vectors, but *angular velocities* do — at a single instant, ω from different sources sum cleanly. Relating ω to how an orientation representation changes takes care, though: for a [rotation matrix](/atlas/concept/rotation-matrix) it involves a skew-symmetric matrix, and for a [quaternion](/atlas/concept/quaternion) a specific update rule. Getting these right is what keeps an attitude estimate accurate.
+
+## Why it matters
+
+Angular velocity is the fundamental measure of rotational motion — sensed by every gyroscope, regulated by every balance controller, and woven through manipulator kinematics. It's the rotational counterpart you can't do dynamics or estimation without.
+
+## Related
+
+[Quaternion](/atlas/concept/quaternion) · [Rotation matrix](/atlas/concept/rotation-matrix) · [IMU](/atlas/concept/imu) · [Jacobian](/atlas/concept/jacobian)

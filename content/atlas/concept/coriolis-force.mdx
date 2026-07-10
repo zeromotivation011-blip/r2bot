@@ -1,0 +1,75 @@
+---
+title: Coriolis & Centrifugal Forces
+slug: coriolis-force
+bucket: concept
+category: fundamentals
+summary: >-
+  Coriolis and centrifugal forces are the velocity-dependent effects that make a robot's joints
+  tug on each other as they move — the coupling term in the equations of motion that fast,
+  precise robots must account for.
+difficulty: 4
+tags:
+  - dynamics
+  - control
+  - fundamentals
+seeAlso:
+  - equations-of-motion
+  - computed-torque-control
+  - inertia-tensor
+  - lagrangian-mechanics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Coriolis force (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Coriolis_force'
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  When a robot's joints are moving, they create extra forces that push on the other joints —
+  centrifugal (flinging outward) and Coriolis (from combined motions). At low speed you can
+  ignore them; at high speed they matter a lot.
+technicalDefinition: >-
+  Coriolis and centrifugal forces are the velocity-dependent terms C(θ,θ̇)θ̇ in a manipulator's
+  equations of motion, arising from products of joint velocities.
+quizQuestion:
+  q: Coriolis and centrifugal forces in a robot arm depend on…
+  options:
+    - Joint positions only
+    - Joint velocities (they vanish when the robot is still)
+    - Battery voltage
+    - Ambient temperature
+  answer: 1
+  explanation: >-
+    They scale with products of joint velocities, so they're zero when the arm is stationary and
+    grow with speed.
+---
+
+An arm that tracks a target beautifully at slow speed can wander off when it moves fast. A big reason is a set of forces that only appear *while things are moving*: the **Coriolis and centrifugal** terms.
+
+## What they are
+
+These are **velocity-dependent** forces inside a multi-joint robot:
+
+- **Centrifugal** — the outward effect of a joint rotating (like the pull you feel on a merry-go-round). It grows with the square of a joint's speed.
+- **Coriolis** — an effect that arises when *two* joints move at once, coupling their motions in a way that isn't obvious from either alone.
+
+Crucially, both are **zero when the robot is still** and grow as it speeds up — which is exactly why they're easy to ignore in slow motion and impossible to ignore in fast motion.
+
+```diagram
+{ "type": "flow", "title": "Motion creates coupling forces", "nodes": ["Joints in motion", "Centrifugal + Coriolis", "Joints tug each other", "Tracking error if ignored"], "caption": "The faster the joints move, the more they disturb one another. These forces are the C(θ,θ̇)θ̇ term in the equations of motion." }
+```
+
+## Where they live in the math
+
+In the manipulator [equations of motion](/atlas/concept/equations-of-motion), `M(θ)θ̈ + C(θ,θ̇)θ̇ + g(θ) = τ`, they are the **C(θ,θ̇)θ̇** term. A slow robot can drop it and rely on feedback to mop up the small error. A fast, high-performance robot must model it: [computed-torque control](/atlas/concept/computed-torque-control) explicitly cancels the Coriolis/centrifugal term (along with gravity and inertia) so each joint tracks cleanly regardless of speed.
+
+## Intuition
+
+Think of a spinning ice skater extending an arm — the arm feels forces purely because of the rotation, not because anyone pushed it. In a robot, one joint's rotation creates similar apparent forces on the links beyond it. They are "fictitious" in the sense of arising from motion in a rotating frame, but their effect on the real motors is very real.
+
+## Why it matters
+
+Coriolis and centrifugal forces are the reason robot dynamics can't be reduced to "just gravity and inertia" for fast machines. Accounting for them is what separates a controller that works at demo speed from one that works at production speed.
+
+## Related
+
+[Equations of motion](/atlas/concept/equations-of-motion) · [Computed torque control](/atlas/concept/computed-torque-control) · [Inertia tensor](/atlas/concept/inertia-tensor) · [Lagrangian mechanics](/atlas/concept/lagrangian-mechanics)

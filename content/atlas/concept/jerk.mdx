@@ -1,0 +1,75 @@
+---
+title: Jerk
+slug: jerk
+bucket: concept
+category: control
+summary: >-
+  Jerk is the rate of change of acceleration — the quantity that decides whether a robot's motion
+  feels smooth or slams. Limiting it protects mechanisms, payloads, and precision, and is why
+  high-end motion uses S-curve profiles.
+difficulty: 3
+tags:
+  - trajectory
+  - motion
+  - control
+seeAlso:
+  - trapezoidal-velocity-profile
+  - torque
+  - servo-motor
+  - backlash
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Jerk (physics) (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Jerk_(physics)'
+  - title: 'Motion control profiles'
+    url: 'https://en.wikipedia.org/wiki/Motion_control'
+laymanExplanation: >-
+  Jerk is how suddenly acceleration changes. A bus that eases into motion has low jerk; one that
+  lurches has high jerk. Robots limit jerk so their motion is smooth and doesn't rattle parts or
+  spill delicate payloads.
+technicalDefinition: >-
+  Jerk is the time derivative of acceleration (the third derivative of position); bounding it
+  yields smoother motion with finite rate-of-change of force.
+quizQuestion:
+  q: Jerk is the rate of change of…
+  options:
+    - Position
+    - Velocity
+    - Acceleration
+    - Temperature
+  answer: 2
+  explanation: >-
+    Jerk is the derivative of acceleration (third derivative of position). High jerk means
+    acceleration changes abruptly, causing shock and vibration.
+---
+
+Everyone knows position, speed, and acceleration. One step further is **jerk** — how *fast the acceleration itself changes* — and for robot motion quality, it's the number that matters most.
+
+## What it is
+
+Jerk is the **rate of change of acceleration** (the third derivative of position). Low jerk means force builds up gradually; high jerk means force changes abruptly. You feel it every day: a smooth elevator eases you into motion (low jerk), while a jerky bus throws you forward as it lurches (high jerk) — same acceleration, very different comfort, all down to how *suddenly* it arrived.
+
+```diagram
+{ "type": "flow", "title": "One derivative beyond acceleration", "nodes": ["Position", "Velocity", "Acceleration", "Jerk (how fast accel changes)"], "caption": "Each step is the rate of change of the one before. Jerk governs the abruptness of force, and therefore the shock and vibration a motion produces." }
+```
+
+## Why robots limit it
+
+Abrupt acceleration changes are hard on everything:
+
+- **Mechanism wear.** A sudden force change slams gear teeth and joints, exciting [backlash](/atlas/concept/backlash) and fatiguing parts.
+- **Vibration.** High jerk rings a flexible arm like a struck bell, so the end-effector wobbles after it stops — ruinous for precision.
+- **Payload.** A jerky move spills liquids, dislodges parts, or stresses a fragile object; a smooth one doesn't.
+- **[Torque](/atlas/concept/torque) demands.** Rapidly changing acceleration means rapidly changing torque, which strains motors and drives.
+
+## Where it shows up
+
+A plain [trapezoidal velocity profile](/atlas/concept/trapezoidal-velocity-profile) switches acceleration on and off instantly — that's *infinite* jerk at the corners, the source of the characteristic "clunk." The fix is the **S-curve profile**, which ramps acceleration gradually so jerk stays bounded. Jerk limits are standard settings on CNC machines, [servo](/atlas/concept/servo-motor) drives, elevators, and camera gimbals — anywhere smoothness, precision, or comfort matters.
+
+## Why it matters
+
+Jerk is the quiet arbiter of motion *quality*. Two robots can hit the same speed and acceleration, yet one moves like silk and the other rattles itself apart — the difference is jerk. Managing it is central to precision motion and long mechanism life.
+
+## Related
+
+[Trapezoidal velocity profile](/atlas/concept/trapezoidal-velocity-profile) · [Torque](/atlas/concept/torque) · [Servo motor](/atlas/concept/servo-motor) · [Backlash](/atlas/concept/backlash)

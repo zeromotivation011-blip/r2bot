@@ -1,0 +1,74 @@
+---
+title: Gimbal Lock
+slug: gimbal-lock
+bucket: concept
+category: fundamentals
+summary: >-
+  Gimbal lock is the orientation glitch where two rotation axes line up and a system loses a
+  degree of freedom — the failure that plagues Euler angles and the reason robots represent
+  orientation with quaternions instead.
+difficulty: 3
+tags:
+  - math
+  - orientation
+  - fundamentals
+seeAlso:
+  - euler-angles
+  - quaternion
+  - rotation-matrix
+  - degrees-of-freedom
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Gimbal lock (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Gimbal_lock'
+  - title: 'Apollo 11 and gimbal lock (NASA)'
+    url: 'https://en.wikipedia.org/wiki/Gimbal_lock#Apollo_11'
+laymanExplanation: >-
+  Gimbal lock happens when two of the three rotation axes point the same way, so turning one
+  does the same thing as turning the other — the system can no longer rotate freely in every
+  direction until it moves out of that pose.
+technicalDefinition: >-
+  Gimbal lock is the loss of one rotational degree of freedom that occurs when two axes of a
+  three-axis (Euler-angle) representation become parallel.
+quizQuestion:
+  q: Gimbal lock occurs when…
+  options:
+    - The battery dies
+    - Two rotation axes align, losing a degree of freedom
+    - The camera overexposes
+    - The motor overheats
+  answer: 1
+  explanation: >-
+    When two of the three gimbal/Euler axes become parallel, one rotational degree of freedom
+    is lost until the configuration changes.
+---
+
+Gimbal lock is one of the most famous failure modes in all of orientation math — it stranded an Apollo navigation system and it's why modern robots avoid a whole representation of rotation.
+
+## What goes wrong
+
+Represent orientation with three stacked rotations — physical gimbals, or [Euler angles](/atlas/concept/euler-angles) — and at certain attitudes **two of the axes line up**. When that happens, rotating about one is indistinguishable from rotating about the other: you've collapsed three independent controls into effectively two, **losing a [degree of freedom](/atlas/concept/degrees-of-freedom)**. The system can no longer rotate freely in every direction until it moves out of that pose.
+
+```diagram
+{ "type": "flow", "title": "Two axes collapse into one", "nodes": ["3 independent axes", "Pitch to 90°", "Two axes align", "Lost a DOF"], "caption": "At the singular orientation, two rotation axes point the same way — so two of your three angles now do the same job, and one direction of rotation becomes unreachable without reconfiguring." }
+```
+
+## The classic story
+
+On **Apollo 11**, the guidance platform used physical gimbals, and mission rules had to keep the spacecraft away from orientations that would lock it — Michael Collins joked about adding a fourth gimbal. In animation and early flight simulators, gimbal lock made cameras and models flip wildly when they pitched straight up or down.
+
+## Why it matters for robots
+
+Any robot that stores or computes orientation in Euler angles is vulnerable: a drone pitching to vertical, a camera gimbal pointing straight up, a wrist [joint](/atlas/concept/joint) reaching a singular pose. Near gimbal lock the control math becomes ill-conditioned — tiny orientation changes demand huge, jerky angle changes.
+
+## The fix
+
+Represent orientation with something that has **no singularities**: a [rotation matrix](/atlas/concept/rotation-matrix) or, most commonly, a [quaternion](/atlas/concept/quaternion). Both cover every orientation smoothly, so robots compute internally in those and only convert to Euler angles for human display. This single design choice makes gimbal lock a non-issue in well-built systems.
+
+## Why it matters
+
+Gimbal lock is the canonical lesson in *why representation matters*: the same rotation, stored two ways, is either fragile or robust. Understanding it explains one of the most important design decisions in robot orientation handling.
+
+## Related
+
+[Euler angles](/atlas/concept/euler-angles) · [Quaternion](/atlas/concept/quaternion) · [Rotation matrix](/atlas/concept/rotation-matrix) · [Degrees of freedom](/atlas/concept/degrees-of-freedom)

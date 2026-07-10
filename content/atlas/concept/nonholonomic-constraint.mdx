@@ -1,0 +1,76 @@
+---
+title: Nonholonomic Constraint
+slug: nonholonomic-constraint
+bucket: concept
+category: fundamentals
+summary: >-
+  A nonholonomic constraint limits how a robot can move without limiting where it can
+  ultimately go — the reason a car can reach any parking spot but can't slide sideways into
+  it, and a core idea in wheeled-robot planning.
+difficulty: 3
+tags:
+  - math
+  - motion-planning
+  - fundamentals
+seeAlso:
+  - configuration-space
+  - holonomic-constraint
+  - differential-drive
+  - motion-planning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'LaValle — Planning Algorithms'
+    url: 'http://lavalle.pl/planning/'
+  - title: 'Nonholonomic system (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Nonholonomic_system'
+laymanExplanation: >-
+  A nonholonomic constraint restricts the directions you can move right now, but not the places
+  you can eventually reach. A car can't move sideways, yet with enough back-and-forth it can
+  park anywhere — that's nonholonomic.
+technicalDefinition: >-
+  A nonholonomic constraint is a non-integrable constraint on a system's velocities that
+  restricts instantaneous motion without reducing the reachable configuration space.
+quizQuestion:
+  q: A car is nonholonomic because it…
+  options:
+    - Cannot reach every parking spot
+    - Cannot move sideways instantly, yet can still reach any pose
+    - Has no steering
+    - Runs on electricity
+  answer: 1
+  explanation: >-
+    Its instantaneous motion is constrained (no sideways slide), but through maneuvers it can
+    still reach any position and heading — the hallmark of a nonholonomic system.
+---
+
+Why is parallel parking hard? Because a car is **nonholonomic** — it can go anywhere, just not *directly*. This distinction shapes how wheeled robots must plan every move.
+
+## The idea
+
+A **nonholonomic constraint** restricts your *instantaneous* motion — the directions you can move *right now* — without restricting the *configurations* you can ultimately reach. A car can't slide sideways at any instant, yet through a sequence of forward/backward turns it can reach any position and heading. The constraint is on velocity, not on where you can end up.
+
+Contrast with a [holonomic](/atlas/concept/holonomic-constraint) robot (like an omniwheel platform), which *can* move directly in any direction — its motion is unconstrained, so planning is far simpler.
+
+```diagram
+{ "type": "flow", "title": "Constrained motion, unrestricted goals", "nodes": ["Car at start", "Can't move sideways", "Maneuver back-and-forth", "Reaches any pose"], "caption": "The instantaneous 'no sideways' rule never goes away, but clever maneuvers still reach every configuration — that gap is what makes nonholonomic planning tricky." }
+```
+
+## Why it matters for planning
+
+A nonholonomic robot's planner can't just draw a straight line in [configuration space](/atlas/concept/configuration-space) — that line might command a physically impossible sideways slide. Planners must respect the motion model, generating only **feasible** paths: smooth curves a car can actually follow, often assembled from arcs and reversals. This is exactly why parking maneuvers involve shuffling, and why planners like Hybrid A\* and RRT variants build in the vehicle's turning limits.
+
+## Where you'll see it
+
+- **Cars and car-like robots** — the classic example (can't move sideways or spin in place).
+- **[Differential-drive](/atlas/concept/differential-drive) robots** — can rotate in place but can't translate sideways.
+- **Bicycles, tractors, boats, some manipulators** — all nonholonomic.
+
+Omnidirectional (mecanum/omniwheel) platforms are the holonomic exception that *can* strafe.
+
+## Why it matters
+
+The holonomic/nonholonomic distinction determines how a mobile robot must plan and control its motion. Recognizing that a robot can reach anywhere but not move anywhere-instantly is fundamental to wheeled robotics.
+
+## Related
+
+[Configuration space](/atlas/concept/configuration-space) · [Holonomic constraint](/atlas/concept/holonomic-constraint) · [Differential drive](/atlas/concept/differential-drive) · [Motion planning](/atlas/concept/motion-planning)

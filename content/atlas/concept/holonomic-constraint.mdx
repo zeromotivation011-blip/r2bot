@@ -1,0 +1,75 @@
+---
+title: Holonomic Constraint
+slug: holonomic-constraint
+bucket: concept
+category: fundamentals
+summary: >-
+  A holonomic constraint restricts a robot's positions directly — and a holonomic robot is one
+  that can move in any direction it pleases. The concept explains why an omniwheel platform is
+  simple to control while a car is not.
+difficulty: 3
+tags:
+  - math
+  - motion-planning
+  - fundamentals
+seeAlso:
+  - nonholonomic-constraint
+  - configuration-space
+  - degrees-of-freedom
+  - motion-planning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Holonomic constraints (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Holonomic_constraints'
+  - title: 'LaValle — Planning Algorithms'
+    url: 'http://lavalle.pl/planning/'
+laymanExplanation: >-
+  A holonomic robot can move directly in any direction — forward, sideways, diagonally — with
+  no "you can't go that way right now" restriction. That freedom makes it much easier to
+  control and plan for than a car.
+technicalDefinition: >-
+  A holonomic constraint depends only on configuration (and possibly time) and is integrable;
+  a holonomic robot's controllable DOF equal its total DOF, allowing motion in any direction.
+quizQuestion:
+  q: A holonomic mobile robot can…
+  options:
+    - Only move forward
+    - Move directly in any direction, including sideways
+    - Never rotate
+    - Not be controlled
+  answer: 1
+  explanation: >-
+    A holonomic platform's controllable degrees of freedom match its total DOF, so it can
+    translate in any direction and rotate freely.
+---
+
+Some robots glide effortlessly in any direction; others, like a car, have to maneuver. The dividing line is whether the robot is **holonomic** — and it comes down to the kind of constraints acting on it.
+
+## What "holonomic" means
+
+A **holonomic constraint** is one that restricts the robot's *positions* directly and can be written purely in terms of configuration (mathematically, it's *integrable*). The practical upshot: a **holonomic robot** has as many *controllable* directions of motion as it has total [degrees of freedom](/atlas/concept/degrees-of-freedom) — so it can move directly toward any goal, including straight sideways, with no "you can't go that way at this instant" rule.
+
+```diagram
+{ "type": "flow", "title": "Holonomic = move any direction, directly", "nodes": ["Goal in any direction", "Move straight toward it", "Including sideways", "No maneuvering needed"], "caption": "With controllable DOF equal to total DOF, the robot commands motion in any direction at will — the straight-line path is always feasible." }
+```
+
+## Why it makes life easy
+
+For a holonomic robot, a planner can draw a **straight line in [configuration space](/atlas/concept/configuration-space)** to the goal and know the robot can follow it — no need to respect awkward motion limits. Control is simpler too: want to go northeast? Just go northeast. This is why omnidirectional platforms are prized in warehouses and labs where tight, precise repositioning matters.
+
+## Holonomic vs nonholonomic
+
+The contrast defines mobile robotics:
+
+- **Holonomic** — mecanum-wheel and omniwheel platforms, most robot arms in free space. Can move any direction; easy to plan.
+- **[Nonholonomic](/atlas/concept/nonholonomic-constraint)** — cars, [differential-drive](/atlas/concept/differential-drive) robots, bicycles. Instantaneous motion is restricted (no sideways slide), so paths must be feasible curves and maneuvers.
+
+The trade-off is mechanical: holonomic wheels are more complex, less efficient, and worse on rough ground, which is why most vehicles stay nonholonomic despite the harder planning.
+
+## Why it matters
+
+Knowing whether a robot is holonomic tells you immediately how hard its planning and control will be. It's one of the first questions to ask about any mobile platform.
+
+## Related
+
+[Nonholonomic constraint](/atlas/concept/nonholonomic-constraint) · [Configuration space](/atlas/concept/configuration-space) · [Degrees of freedom](/atlas/concept/degrees-of-freedom) · [Motion planning](/atlas/concept/motion-planning)

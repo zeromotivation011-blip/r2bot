@@ -1,0 +1,86 @@
+---
+title: Lagrangian Mechanics
+slug: lagrangian-mechanics
+bucket: concept
+category: fundamentals
+summary: >-
+  Lagrangian mechanics derives a robot's equations of motion from energy alone — a systematic
+  recipe that turns any complicated linkage into its dynamics without wrestling with every
+  internal force.
+difficulty: 4
+tags:
+  - dynamics
+  - math
+  - fundamentals
+seeAlso:
+  - equations-of-motion
+  - inertia-tensor
+  - coriolis-force
+  - computed-torque-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Lagrangian mechanics (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Lagrangian_mechanics'
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  Lagrangian mechanics is a method for finding how something moves by bookkeeping its energy —
+  motion energy minus stored energy — instead of tracking every push and pull. For robots, it
+  turns a tangle of links into clean equations.
+technicalDefinition: >-
+  Lagrangian mechanics derives equations of motion from L = T − V (kinetic minus potential
+  energy) via the Euler-Lagrange equation, avoiding explicit constraint forces.
+quizQuestion:
+  q: The Lagrangian L is defined as…
+  options:
+    - Mass times acceleration
+    - Kinetic energy minus potential energy
+    - Voltage times current
+    - Force times distance
+  answer: 1
+  explanation: >-
+    L = T − V, the difference of kinetic and potential energy; the Euler-Lagrange equation then
+    yields the equations of motion.
+---
+
+Deriving a robot arm's dynamics by tracking every force between links is a nightmare. **Lagrangian mechanics** offers a far cleaner route: work with **energy**, and the equations fall out systematically.
+
+## The idea
+
+Define the **Lagrangian** as kinetic energy minus potential energy:
+
+```
+L = T − V
+```
+
+Then the **Euler-Lagrange equation** cranks out the [equations of motion](/atlas/concept/equations-of-motion) for each joint automatically:
+
+```
+d/dt (∂L/∂θ̇) − ∂L/∂θ = τ
+```
+
+You write down the robot's total kinetic energy (from each link's mass, velocity, and [inertia tensor](/atlas/concept/inertia-tensor)) and potential energy (from gravity), turn the crank, and out come the `M(θ)θ̈ + C(θ,θ̇)θ̇ + g(θ) = τ` equations — no need to reason about internal joint reaction forces at all.
+
+```diagram
+{ "type": "flow", "title": "From energy to equations of motion", "nodes": ["Kinetic energy T", "Potential energy V", "L = T − V", "Euler-Lagrange → dynamics"], "caption": "Constraint and reaction forces cancel out of the energy bookkeeping, so a scalar energy expression yields the full vector equations of motion." }
+```
+
+## Why roboticists love it
+
+- **It scales.** A 7-joint arm's dynamics are hopeless to derive force-by-force, but writing kinetic and potential energy is mechanical. The method generalizes to any number of joints.
+- **Constraint forces vanish.** Because it uses energy and generalized coordinates, the internal forces that hold links together drop out — you never have to compute them.
+- **It's symbolic-friendly.** The recipe is so systematic that software can derive robot dynamics automatically from a model.
+
+The alternative, **Newton-Euler**, tracks forces link by link and is more computationally efficient for real-time inverse dynamics — so many systems derive with Lagrange for insight and compute with Newton-Euler for speed.
+
+## Where it shows up
+
+Every model-based controller ([computed-torque](/atlas/concept/computed-torque-control), whole-body control) rests on equations of motion that were, at some point, derived this way. Underactuated-robotics and legged-robot dynamics are almost always presented in Lagrangian form.
+
+## Why it matters
+
+Lagrangian mechanics is the standard, scalable way to turn a robot's physical structure into the math of how it moves. It's the derivation engine behind robot dynamics, and a core piece of any advanced controls education.
+
+## Related
+
+[Equations of motion](/atlas/concept/equations-of-motion) · [Inertia tensor](/atlas/concept/inertia-tensor) · [Coriolis force](/atlas/concept/coriolis-force) · [Computed torque control](/atlas/concept/computed-torque-control)

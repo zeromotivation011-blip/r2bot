@@ -1,0 +1,81 @@
+---
+title: Equations of Motion
+slug: equations-of-motion
+bucket: concept
+category: fundamentals
+summary: >-
+  The equations of motion are the physics that link a robot's joint torques to how it actually
+  accelerates — the model behind realistic simulation, model-based control, and understanding
+  why heavy arms are hard to move precisely.
+difficulty: 4
+tags:
+  - dynamics
+  - control
+  - fundamentals
+seeAlso:
+  - inertia-tensor
+  - computed-torque-control
+  - lagrangian-mechanics
+  - coriolis-force
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+  - title: 'Robot dynamics (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Robot_kinematics'
+laymanExplanation: >-
+  The equations of motion are the formula that says: given the forces or torques applied, this
+  is how the robot will accelerate. They capture gravity, inertia, and the way joints tug on
+  each other.
+technicalDefinition: >-
+  A manipulator's equations of motion, M(θ)θ̈ + C(θ,θ̇)θ̇ + g(θ) = τ, relate joint torques to
+  joint accelerations via inertia, Coriolis/centrifugal, and gravity terms.
+quizQuestion:
+  q: In the manipulator equation M(θ)θ̈ + C(θ,θ̇)θ̇ + g(θ) = τ, the g(θ) term is…
+  options:
+    - Gear ratio
+    - Gravity torques
+    - GPS position
+    - Grip force
+  answer: 1
+  explanation: >-
+    g(θ) is the gravity term — the torques each joint must supply just to hold the arm against
+    gravity in a given configuration.
+---
+
+Kinematics tells you *where* a robot's parts are; **dynamics** tells you how it *moves* when you push it. The equations of motion are the bridge between torque and acceleration — and the foundation of realistic control and simulation.
+
+## The manipulator equation
+
+For a robot arm, the whole of its dynamics condenses into one elegant equation:
+
+```
+M(θ)·θ̈  +  C(θ,θ̇)·θ̇  +  g(θ)  =  τ
+inertia     Coriolis/centrifugal   gravity   torque
+```
+
+- **M(θ)** — the inertia matrix: how hard each joint is to accelerate, built from every link's mass and [inertia tensor](/atlas/concept/inertia-tensor). It changes with the arm's pose.
+- **C(θ,θ̇)** — [Coriolis and centrifugal](/atlas/concept/coriolis-force) terms: the forces that arise *because* the joints are moving and flinging each other around.
+- **g(θ)** — gravity: the torque needed just to hold the arm up in a given configuration.
+- **τ** — the joint torques the motors provide.
+
+```diagram
+{ "type": "flow", "title": "Torque in, acceleration out", "nodes": ["Joint torques τ", "Equations of motion", "Joint accelerations θ̈", "Robot moves"], "caption": "Solve the equation one way (forward dynamics) to simulate motion from torques; solve it the other way (inverse dynamics) to find the torques a desired motion needs." }
+```
+
+## Why it matters two ways
+
+- **Forward dynamics** (torques → motion) is how a **physics simulator** predicts what the robot will do — essential for training in sim and testing controllers safely.
+- **Inverse dynamics** (motion → torques) is how **model-based controllers** work: [computed-torque control](/atlas/concept/computed-torque-control) plugs a desired motion into the equation to get exactly the torque that produces it, cancelling gravity and coupling.
+
+## The intuition it gives
+
+The equation explains everyday robot behavior: an arm sags without gravity compensation (the `g(θ)` term), a fast-swinging joint disturbs its neighbors (the `C` term), and the same joint feels "heavier" to accelerate when the arm is stretched out (the `M(θ)` term changing with pose). Deriving it comes from **Newton-Euler** or **[Lagrangian](/atlas/concept/lagrangian-mechanics)** mechanics.
+
+## Why it matters
+
+The equations of motion are where a robot stops being geometry and becomes physics. Every dynamic simulation, every model-based controller, and every serious understanding of why a robot moves the way it does starts here.
+
+## Related
+
+[Inertia tensor](/atlas/concept/inertia-tensor) · [Computed torque control](/atlas/concept/computed-torque-control) · [Lagrangian mechanics](/atlas/concept/lagrangian-mechanics) · [Coriolis force](/atlas/concept/coriolis-force)

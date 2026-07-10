@@ -1,0 +1,72 @@
+---
+title: Configuration Space
+slug: configuration-space
+bucket: concept
+category: fundamentals
+summary: >-
+  Configuration space is the abstract space of all the poses a robot can be in — the arena
+  where motion planning actually happens, turning "don't hit the wall" into "find a path
+  through this higher-dimensional space."
+difficulty: 3
+tags:
+  - math
+  - motion-planning
+  - fundamentals
+seeAlso:
+  - degrees-of-freedom
+  - motion-planning
+  - rapidly-exploring-random-tree
+  - inverse-kinematics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'LaValle — Planning Algorithms'
+    url: 'http://lavalle.pl/planning/'
+  - title: 'Configuration space (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Configuration_space_(physics)'
+laymanExplanation: >-
+  Configuration space is a map where each point is a complete pose of the robot — every joint
+  angle at once. Planning a motion becomes finding a path between two points in this map while
+  avoiding the regions that would cause a collision.
+technicalDefinition: >-
+  Configuration space (C-space) is the set of all possible configurations of a robot; each
+  point specifies every degree of freedom, and obstacles map to forbidden regions.
+quizQuestion:
+  q: A single point in configuration space represents…
+  options:
+    - One pixel of a camera
+    - One complete configuration (all joint values) of the robot
+    - One obstacle
+    - One motor
+  answer: 1
+  explanation: >-
+    Each point encodes the robot's entire configuration at once — every joint angle or DOF —
+    not a single position in the physical world.
+---
+
+Motion planning sounds like it happens in the physical world, but robots plan in a stranger, more powerful place: **configuration space**. Understanding it is the key that unlocks every planning algorithm.
+
+## The core idea
+
+A single point in **configuration space (C-space)** represents the robot's *entire* pose — all its [degrees of freedom](/atlas/concept/degrees-of-freedom) at once. A 2-joint arm has a 2D C-space (one axis per joint); a 7-joint arm has a 7D C-space. As the robot moves, that single point traces a path through this space.
+
+The trick: a whole robot (a complicated shape) becomes a **single point**, and planning its motion becomes finding a path for that point.
+
+```diagram
+{ "type": "flow", "title": "The whole robot becomes one point", "nodes": ["Robot pose", "= one point in C-space", "Obstacles → forbidden regions", "Plan a path for the point"], "caption": "Physical obstacles map into C-space as regions the point can't enter. A collision-free motion is any path through the free space between them." }
+```
+
+## Why it's so useful
+
+In C-space, obstacles become **forbidden regions** (C-obstacles), and any path through the remaining *free space* is automatically a collision-free motion. This reframing is what makes planning tractable — algorithms like [A*](/atlas/concept/a-star-algorithm), [RRT](/atlas/concept/rapidly-exploring-random-tree), and PRM all search C-space, not the physical world. [Inverse kinematics](/atlas/concept/inverse-kinematics), too, is really a search for a point in C-space that puts the hand at a target.
+
+## Why it gets hard
+
+C-space dimension equals the robot's DOF, and **volume explodes with dimension** — the "curse of dimensionality." A 2D C-space you can grid and search exhaustively; a 7D one has too many cells to ever enumerate. That single fact is *why* high-DOF robots need sampling-based planners like RRT that probe C-space with random points instead of gridding it. C-space also has odd topology — a revolute joint's axis wraps around (0° = 360°), so it's a circle, not a line.
+
+## Why it matters
+
+Configuration space is the mental model that makes robot motion planning make sense. Once you see the robot as a point moving through a space of its own poses, every planning algorithm — and why some scale and others don't — becomes clear.
+
+## Related
+
+[Degrees of freedom](/atlas/concept/degrees-of-freedom) · [Motion planning](/atlas/concept/motion-planning) · [RRT](/atlas/concept/rapidly-exploring-random-tree) · [Inverse kinematics](/atlas/concept/inverse-kinematics)

@@ -1,0 +1,79 @@
+---
+title: Euler Angles
+slug: euler-angles
+bucket: concept
+category: fundamentals
+summary: >-
+  Euler angles describe an orientation as three simple rotations — roll, pitch, and yaw.
+  They're the most human-readable way to state which way a robot faces, and the source of the
+  infamous gimbal-lock problem.
+difficulty: 2
+tags:
+  - math
+  - orientation
+  - fundamentals
+seeAlso:
+  - quaternion
+  - rotation-matrix
+  - gimbal-lock
+  - angular-velocity
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Euler angles (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Euler_angles'
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  Euler angles describe orientation with three familiar numbers — roll (tilt side to side),
+  pitch (nose up/down), and yaw (turn left/right). Easy for humans to picture, which is why
+  they're everywhere despite a nasty edge case.
+technicalDefinition: >-
+  Euler angles represent an orientation as a sequence of three rotations about specified axes
+  (e.g. roll–pitch–yaw), composed in a fixed order.
+quizQuestion:
+  q: The three aircraft-style Euler angles are…
+  options:
+    - Red, green, blue
+    - Roll, pitch, yaw
+    - X, Y, Z speed
+    - Sine, cosine, tangent
+  answer: 1
+  explanation: >-
+    In the common aerospace convention the three angles are roll (about forward axis), pitch
+    (about side axis), and yaw (about vertical axis).
+---
+
+Ask a person which way a drone is facing and they'll say something like "nose up a bit, banked left, pointing north." Those three numbers are **Euler angles** — the most intuitive way to describe orientation, and the reason it stays popular.
+
+## What they are
+
+An orientation is built from **three successive rotations** about chosen axes. The aerospace convention names them:
+
+- **Roll** — rotation about the forward axis (banking left/right).
+- **Pitch** — rotation about the side axis (nose up/down).
+- **Yaw** — rotation about the vertical axis (turning left/right).
+
+Apply them in order and you can reach any orientation. Their appeal is entirely human: each number means something you can picture.
+
+```diagram
+{ "type": "flow", "title": "Orientation as three simple turns", "nodes": ["Yaw (heading)", "Pitch (nose)", "Roll (bank)", "Final orientation"], "caption": "Compose the three rotations in a fixed order to reach any attitude. The order is part of the definition — change it and you get a different result." }
+```
+
+## The catch: gimbal lock
+
+Euler angles have a fatal flaw. At certain orientations — pitch straight up, for instance — two of the three axes align and you **lose a degree of freedom**: [gimbal lock](/atlas/concept/gimbal-lock). Near it the math becomes ill-conditioned and small motions demand wild angle changes. This is why flight controllers and robots don't do their internal orientation math in Euler angles.
+
+## Euler angles vs the alternatives
+
+- **[Rotation matrices](/atlas/concept/rotation-matrix)** and **[quaternions](/atlas/concept/quaternion)** have no gimbal lock and compose cleanly, so robots compute in *those* internally.
+- Euler angles are kept for the **human interface** — reading out a drone's attitude, setting a target heading, logging telemetry — and converted to/from quaternions under the hood.
+
+There are also 12 valid axis orderings (ZYX, XYZ…), so you must always know *which* convention a system uses, or your angles will be silently wrong.
+
+## Why it matters
+
+Euler angles are how humans talk about orientation, so every robotics engineer must know them — including exactly why they're the *display* format, not the computation format.
+
+## Related
+
+[Quaternion](/atlas/concept/quaternion) · [Rotation matrix](/atlas/concept/rotation-matrix) · [Gimbal lock](/atlas/concept/gimbal-lock) · [Angular velocity](/atlas/concept/angular-velocity)

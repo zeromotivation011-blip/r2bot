@@ -1,0 +1,72 @@
+---
+title: Center of Mass
+slug: center-of-mass
+bucket: concept
+category: fundamentals
+summary: >-
+  The center of mass is the single point where a robot's weight effectively acts — the thing a
+  legged or humanoid robot must constantly manage over its feet to keep from falling.
+difficulty: 2
+tags:
+  - dynamics
+  - balance
+  - fundamentals
+seeAlso:
+  - inertia-tensor
+  - bipedal-robot
+  - torque
+  - equations-of-motion
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Center of mass (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Center_of_mass'
+  - title: 'Introduction to Humanoid Robotics — Kajita'
+    url: 'https://link.springer.com/book/10.1007/978-3-642-54536-8'
+laymanExplanation: >-
+  The center of mass is the average location of all a robot's weight — the balance point. Keep
+  it over the feet and the robot stands; let it stray outside and the robot tips over.
+technicalDefinition: >-
+  The center of mass is the mass-weighted average position of all a body's parts; net gravity
+  and inertial forces act as if concentrated there.
+quizQuestion:
+  q: A standing robot stays balanced as long as its center of mass stays…
+  options:
+    - Above its head
+    - Over its base of support (the feet)
+    - Near the battery
+    - At the shoulder
+  answer: 1
+  explanation: >-
+    Static balance requires the center of mass to project down within the support polygon
+    formed by the feet; outside it, the robot tips.
+---
+
+Why can a humanoid robot stand on two feet, and why is it so hard? It comes down to managing one point: the **center of mass**.
+
+## What it is
+
+The center of mass (CoM) is the **mass-weighted average position** of everything the robot is made of — the single point where its total weight effectively acts. Gravity, and the robot's overall inertia, behave as if concentrated there. For balance, that's the point that matters.
+
+```diagram
+{ "type": "flow", "title": "Balance is keeping the CoM over the feet", "nodes": ["Sum every part's mass × position", "= center of mass", "Project down to floor", "Inside the feet? → stable"], "caption": "If the CoM's ground projection stays within the support polygon of the feet, the robot balances; stray outside and it topples." }
+```
+
+## Why it rules legged robots
+
+For a standing robot, **static balance** requires the CoM to project down *within the support polygon* — the area enclosed by the feet. Step wider and the polygon grows, giving more margin; stand on one foot and it shrinks to almost nothing. Every pose a humanoid takes is quietly constrained by keeping the CoM safely inside.
+
+Walking is even harder, because a moving robot is rarely statically balanced — it's constantly "falling" and catching itself. That's why dynamic walkers reason about the zero-moment point (ZMP) and CoM *trajectories*, not just the static CoM.
+
+## Beyond legs
+
+- **Manipulators** compute each link's CoM to know the gravity [torque](/atlas/concept/torque) every joint must hold — the basis of gravity compensation.
+- **Drones and vehicles** place the CoM carefully; an off-center CoM makes a quadrotor fight to stay level and a car prone to roll.
+- **Whole-body control** on humanoids treats CoM position as a primary quantity to regulate.
+
+## Why it matters
+
+The center of mass is the master variable of balance and stability. Whether a robot stands, walks, lifts, or flies steadily is, at bottom, a story about where its center of mass is and how it moves.
+
+## Related
+
+[Inertia tensor](/atlas/concept/inertia-tensor) · [Bipedal robot](/atlas/concept/bipedal-robot) · [Torque](/atlas/concept/torque) · [Equations of motion](/atlas/concept/equations-of-motion)

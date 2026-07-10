@@ -1,0 +1,74 @@
+---
+title: Trapezoidal Velocity Profile
+slug: trapezoidal-velocity-profile
+bucket: concept
+category: control
+summary: >-
+  A trapezoidal velocity profile moves a robot joint by accelerating, cruising, then
+  decelerating — the simplest smooth motion plan, and the default way machines get from A to B
+  quickly without jerking.
+difficulty: 2
+tags:
+  - trajectory
+  - control
+  - motion
+seeAlso:
+  - jerk
+  - pid-controller
+  - servo-motor
+  - torque
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Trajectory generation (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Motion_control'
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  A trapezoidal velocity profile speeds a joint up to a cruising speed, holds it, then slows it
+  down — like a car accelerating onto a highway, cruising, then braking. Plot the speed over
+  time and it looks like a trapezoid.
+technicalDefinition: >-
+  A trapezoidal velocity profile commands constant acceleration, constant velocity, then constant
+  deceleration, producing a trapezoid-shaped velocity-vs-time curve for a point-to-point move.
+quizQuestion:
+  q: The three phases of a trapezoidal velocity profile are…
+  options:
+    - Stop, wait, stop
+    - Accelerate, cruise, decelerate
+    - Spin, reverse, spin
+    - Charge, hold, discharge
+  answer: 1
+  explanation: >-
+    Constant acceleration up to cruise speed, a constant-velocity phase, then constant
+    deceleration to a stop — the trapezoid shape.
+---
+
+When a robot joint needs to move from one position to another, it can't just snap there — it has to plan a *speed over time*. The simplest good plan is the **trapezoidal velocity profile**.
+
+## The shape
+
+Plot the joint's speed against time and it forms a trapezoid, in three phases:
+
+1. **Accelerate** at a constant rate up to a cruising speed.
+2. **Cruise** at that constant speed.
+3. **Decelerate** at a constant rate down to a stop, arriving exactly at the target.
+
+```diagram
+{ "type": "flow", "title": "Speed over time: up, hold, down", "nodes": ["Accelerate", "Cruise (constant v)", "Decelerate", "Arrive at rest"], "caption": "Constant-slope ramps up and down with a flat top — a trapezoid. Short moves may skip the cruise phase entirely, giving a triangle." }
+```
+
+## Why it's used everywhere
+
+It hits a sweet spot: **fast but smooth**. Compared to naively commanding a target and letting a [PID](/atlas/concept/pid-controller) loop yank the joint there, a trapezoidal profile respects the motor's **acceleration and velocity limits** — so it doesn't demand impossible [torque](/atlas/concept/torque), doesn't overshoot, and doesn't slam the mechanism. It's the default in CNC machines, [servo](/atlas/concept/servo-motor) drives, 3D printers, and pick-and-place robots. For very short moves there's no room to reach cruise speed, so it becomes a **triangular** profile (accelerate then immediately decelerate).
+
+## The limitation, and the fix
+
+A trapezoidal profile has a hidden roughness: acceleration switches on and off **instantly** at the corners. That instant change is infinite [jerk](/atlas/concept/jerk) — and it shows up as a mechanical "clunk," vibration, and wear, and it can excite a flexible arm into oscillation. Where smoothness matters (delicate payloads, high precision, camera moves), engineers round those corners with an **S-curve** profile, which ramps the acceleration itself so the jerk stays finite.
+
+## Why it matters
+
+The trapezoidal velocity profile is the workhorse of point-to-point motion — the first tool for moving a joint quickly and controllably. Understanding it (and why its sharp corners sometimes aren't good enough) is the entry point to trajectory generation.
+
+## Related
+
+[Jerk](/atlas/concept/jerk) · [PID controller](/atlas/concept/pid-controller) · [Servo motor](/atlas/concept/servo-motor) · [Torque](/atlas/concept/torque)

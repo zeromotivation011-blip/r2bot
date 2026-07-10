@@ -1,0 +1,72 @@
+---
+title: Inertia Tensor
+slug: inertia-tensor
+bucket: concept
+category: fundamentals
+summary: >-
+  The inertia tensor describes how a robot's mass is distributed, and therefore how hard it is
+  to spin about each axis — the rotational counterpart of mass, and a must-have for accurate
+  dynamics and control.
+difficulty: 4
+tags:
+  - dynamics
+  - math
+  - fundamentals
+seeAlso:
+  - center-of-mass
+  - equations-of-motion
+  - torque
+  - angular-velocity
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Moment of inertia (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Moment_of_inertia'
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  The inertia tensor captures how a robot's weight is spread out, which decides how hard it is
+  to start or stop spinning around each direction. A figure skater pulling their arms in spins
+  faster — that's the inertia tensor changing.
+technicalDefinition: >-
+  The inertia tensor is a 3×3 matrix relating a body's angular velocity to its angular momentum,
+  encoding resistance to rotational acceleration about each axis.
+quizQuestion:
+  q: The inertia tensor is the rotational analog of…
+  options:
+    - Color
+    - Mass
+    - Voltage
+    - Friction
+  answer: 1
+  explanation: >-
+    Just as mass resists linear acceleration, the inertia tensor quantifies resistance to
+    angular acceleration about each axis.
+---
+
+Mass tells you how hard it is to push something into motion. But how hard is it to make a robot *spin*? That depends on how its mass is spread out — captured by the **inertia tensor**.
+
+## What it is
+
+The inertia tensor is a **3×3 matrix** that relates a body's [angular velocity](/atlas/concept/angular-velocity) to its angular momentum. Its diagonal entries say how hard the body is to spin about each axis; its off-diagonal entries (products of inertia) capture how rotation about one axis couples into another. Mass concentrated far from an axis makes it hard to spin about that axis — the same reason a long pole is harder to twirl than a short one.
+
+```diagram
+{ "type": "flow", "title": "How mass is spread sets rotational resistance", "nodes": ["Mass distribution", "Inertia tensor (3×3)", "Resistance per axis", "Feeds the dynamics"], "caption": "Mass far from an axis raises the inertia about it. The tensor packages this for all three axes, so controllers know the torque needed to angularly accelerate the body." }
+```
+
+## Why robots need it accurately
+
+The inertia tensor appears directly in the robot's [equations of motion](/atlas/concept/equations-of-motion): to compute the [torque](/atlas/concept/torque) that produces a desired angular acceleration, you need it. Get it wrong and model-based controllers — computed-torque, whole-body control, drone attitude — mis-predict the motion. This is why every link in a [URDF](/atlas/concept/urdf) carries an inertial block (mass, [center of mass](/atlas/concept/center-of-mass), and inertia tensor), and why bad inertia values make a physics simulation behave strangely or explode.
+
+## Handy facts
+
+- **Principal axes.** Every body has three special axes about which the tensor is diagonal (no coupling) — spin about them and rotation is clean and stable.
+- **Parallel axis theorem.** Shift the reference point away from the CoM and the inertia grows in a predictable way — how you combine link inertias into a whole robot.
+- **Spinning-skater effect.** Pull mass inward and inertia drops, so for fixed angular momentum the spin speeds up — the tensor changing in real time.
+
+## Why it matters
+
+The inertia tensor is to rotation what mass is to translation — indispensable for dynamics, model-based control, and faithful simulation. Any robot whose motion is computed rather than just sensed depends on getting it right.
+
+## Related
+
+[Center of mass](/atlas/concept/center-of-mass) · [Equations of motion](/atlas/concept/equations-of-motion) · [Torque](/atlas/concept/torque) · [Angular velocity](/atlas/concept/angular-velocity)

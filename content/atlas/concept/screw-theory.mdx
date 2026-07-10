@@ -1,0 +1,82 @@
+---
+title: Screw Theory
+slug: screw-theory
+bucket: concept
+category: fundamentals
+summary: >-
+  Screw theory is the elegant idea that any rigid-body motion is a screw — a rotation about an
+  axis combined with a translation along it — giving modern robotics a clean, unified language
+  for velocity, force, and kinematics.
+difficulty: 4
+tags:
+  - math
+  - kinematics
+  - fundamentals
+seeAlso:
+  - homogeneous-transformation
+  - forward-kinematics
+  - jacobian
+  - angular-velocity
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+  - title: 'Screw theory (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Screw_theory'
+laymanExplanation: >-
+  Screw theory says every way a rigid body can move is like a screw turning: spin around an axis
+  while sliding along it. This one idea describes all motion, and a matching idea describes all
+  forces — a tidy unified language for robot mechanics.
+technicalDefinition: >-
+  Screw theory represents rigid-body velocities as twists and forces as wrenches, using the fact
+  that any rigid motion is a rotation about plus translation along a single screw axis (Chasles'
+  theorem).
+quizQuestion:
+  q: Screw theory says any rigid-body motion can be described as…
+  options:
+    - A pure translation only
+    - A rotation about an axis combined with translation along it
+    - A random jump
+    - A color change
+  answer: 1
+  explanation: >-
+    Chasles' theorem: every rigid-body displacement is a screw motion — rotation about some axis
+    plus translation along that same axis.
+---
+
+Underneath the matrices and angles of robot kinematics is one beautifully simple idea: **every rigid-body motion is a screw**. Screw theory builds a whole clean framework on that fact.
+
+## The central insight
+
+**Chasles' theorem** says any motion of a rigid body — however complicated it looks — is equivalent to a **rotation about some axis combined with a translation along that same axis**: exactly what a screw does as it turns. There's always one screw axis that captures the whole motion.
+
+From this, screw theory names two dual objects:
+
+- A **twist** describes a body's *velocity* — its [angular velocity](/atlas/concept/angular-velocity) and linear velocity packaged together as motion about/along a screw axis.
+- A **wrench** describes a *force* — a force and a torque packaged the same way.
+
+```diagram
+{ "type": "flow", "title": "One axis captures the whole motion", "nodes": ["Any rigid motion", "= rotate about an axis", "+ translate along it", "= a screw (twist)"], "caption": "Motion becomes a twist, force becomes a wrench — both organized around a single screw axis. One language for velocity and force alike." }
+```
+
+## Why modern robotics uses it
+
+Screw theory (via the "product of exponentials" formulation) gives a **cleaner, more geometric** alternative to the older [Denavit-Hartenberg](/atlas/concept/denavit-hartenberg) tables:
+
+- **[Forward kinematics](/atlas/concept/forward-kinematics)** becomes a product of matrix exponentials, one per joint, each built directly from that joint's screw axis — fewer arbitrary conventions, less bookkeeping.
+- The **[Jacobian](/atlas/concept/jacobian)** falls out naturally as a matrix of the joint twists.
+- Forces and motions share one framework, which makes force control and constraint analysis elegant.
+
+It's the backbone of the widely used *Modern Robotics* curriculum for exactly this reason.
+
+## The trade-off
+
+Screw theory demands more mathematical maturity up front — twists, wrenches, and Lie-group ideas (SE(3), the matrix exponential). But once learned, it unifies kinematics, velocity, and force under one geometric picture, and avoids the fiddly frame-assignment rules that trip people up in the classical approach.
+
+## Why it matters
+
+Screw theory is the modern language of rigid-body motion in robotics. It reveals that the geometry of every robot arm, twist, and force is variations on a single idea — the screw — which is why it underpins today's cleanest treatments of manipulator kinematics.
+
+## Related
+
+[Homogeneous transformation](/atlas/concept/homogeneous-transformation) · [Forward kinematics](/atlas/concept/forward-kinematics) · [Jacobian](/atlas/concept/jacobian) · [Angular velocity](/atlas/concept/angular-velocity)

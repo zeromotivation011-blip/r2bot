@@ -1,0 +1,83 @@
+---
+title: Homogeneous Transformation
+slug: homogeneous-transformation
+bucket: concept
+category: fundamentals
+summary: >-
+  A homogeneous transformation is the 4×4 matrix that packs rotation and translation into one
+  object — the single tool robots use to describe full pose and to chain from one link or
+  frame to the next.
+difficulty: 3
+tags:
+  - math
+  - kinematics
+  - fundamentals
+seeAlso:
+  - rotation-matrix
+  - forward-kinematics
+  - tf-transform
+  - denavit-hartenberg
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+  - title: 'Homogeneous coordinates (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Transformation_matrix#Affine_transformations'
+laymanExplanation: >-
+  A homogeneous transformation is one 4×4 table that says both "how something is rotated" and
+  "where it is." Because both are bundled together, you can chain them by simple multiplication
+  to walk from one part of a robot to the next.
+technicalDefinition: >-
+  A homogeneous transformation is a 4×4 matrix combining a 3×3 rotation and a 3×1 translation,
+  representing a rigid-body pose in SE(3) and composable by matrix multiplication.
+quizQuestion:
+  q: A homogeneous transformation matrix combines…
+  options:
+    - Two rotations only
+    - Rotation and translation in one 4×4 matrix
+    - Color and depth
+    - Speed and torque
+  answer: 1
+  explanation: >-
+    It packs a 3×3 rotation and a translation vector into a single 4×4 matrix, describing full
+    pose and composing by multiplication.
+---
+
+Orientation alone isn't enough — a robot needs to know both which way something faces *and* where it sits. The **homogeneous transformation** bundles both into one tidy object.
+
+## What it is
+
+Take a 3×3 [rotation matrix](/atlas/concept/rotation-matrix) `R` and a translation vector `t`, and arrange them into a **4×4 matrix**:
+
+```
+T =  [ R   t ]
+     [ 0   1 ]
+```
+
+That single matrix describes a full **pose** — position and orientation together — an element of the group **SE(3)**. The extra row and the "1" appended to points (homogeneous coordinates) are a clever trick that turns "rotate *and* translate" into a single matrix multiplication.
+
+```diagram
+{ "type": "flow", "title": "One matrix carries pose from frame to frame", "nodes": ["Point in frame B", "× transform T (A←B)", "Same point in frame A"], "caption": "T holds both rotation and position, so one multiply moves a point between frames. Chain transforms to walk along a whole kinematic chain." }
+```
+
+## Why it's the backbone of kinematics
+
+The killer feature is **composition**. Walk down a robot arm link by link, and the pose of the hand in the base frame is just the product of each link's transform:
+
+```
+T_base→hand = T₁ · T₂ · T₃ · … · Tₙ
+```
+
+That product *is* [forward kinematics](/atlas/concept/forward-kinematics). The same chaining powers the [tf](/atlas/concept/tf-transform) tree (camera→base→map), and the [Denavit-Hartenberg](/atlas/concept/denavit-hartenberg) convention is just a systematic way to write each link's transform. To invert a transform (go the other direction), there's a clean closed-form using `Rᵀ`.
+
+## Where you'll see it
+
+Everywhere spatial: robot arm kinematics, camera-to-robot calibration, expressing a grasp pose, moving a point cloud between frames. If two things in a robot need to agree on "where and which way," a homogeneous transform connects them.
+
+## Why it matters
+
+The homogeneous transformation is the universal language of robot pose. Once rotation and translation live in one composable matrix, the whole geometry of a robot — arms, sensors, frames — becomes a matter of multiplying transforms.
+
+## Related
+
+[Rotation matrix](/atlas/concept/rotation-matrix) · [Forward kinematics](/atlas/concept/forward-kinematics) · [tf transforms](/atlas/concept/tf-transform) · [Denavit-Hartenberg](/atlas/concept/denavit-hartenberg)

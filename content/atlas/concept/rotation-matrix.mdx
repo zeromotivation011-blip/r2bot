@@ -1,0 +1,77 @@
+---
+title: Rotation Matrix
+slug: rotation-matrix
+bucket: concept
+category: fundamentals
+summary: >-
+  A rotation matrix is a 3×3 grid of numbers that encodes an orientation in 3D — the
+  workhorse representation robots use to turn a direction in one frame into the same
+  direction in another.
+difficulty: 3
+tags:
+  - math
+  - orientation
+  - fundamentals
+seeAlso:
+  - quaternion
+  - euler-angles
+  - homogeneous-transformation
+  - angular-velocity
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+  - title: 'Rotation matrix (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Rotation_matrix'
+laymanExplanation: >-
+  A rotation matrix is a small table of nine numbers that describes how one set of axes is
+  turned relative to another. Multiply a direction by it and you get that direction as seen
+  from the rotated frame.
+technicalDefinition: >-
+  A rotation matrix is a 3×3 orthogonal matrix with determinant +1 (an element of SO(3))
+  that maps vectors between orientations while preserving length and handedness.
+quizQuestion:
+  q: A valid 3D rotation matrix must be…
+  options:
+    - Any 3×3 matrix
+    - Orthogonal with determinant +1
+    - Full of zeros
+    - Larger than 4×4
+  answer: 1
+  explanation: >-
+    Rotation matrices are orthogonal (columns are perpendicular unit vectors) with
+    determinant +1, which preserves lengths and right-handedness.
+---
+
+When a robot needs to express "which way is the camera pointing, in the base frame?", the most direct answer is a **rotation matrix** — nine numbers that capture an orientation completely.
+
+## What it is
+
+A rotation matrix `R` is a **3×3** grid whose three columns are the rotated frame's x, y, and z axes written in the original frame's coordinates. Multiply any vector by `R` and you re-express it after the rotation. It belongs to the group **SO(3)** and has strict structure: its columns are **unit vectors, mutually perpendicular** (it's *orthogonal*), and its **determinant is +1** (so it rotates without flipping or scaling).
+
+```diagram
+{ "type": "flow", "title": "A rotation matrix maps directions between frames", "nodes": ["Vector in frame A", "× rotation matrix R", "Same vector in frame B"], "caption": "The columns of R are B's axes seen from A. Multiplying rotates a direction from one frame's viewpoint into another's, preserving its length." }
+```
+
+## Why robots use it
+
+- **Composability.** Chain rotations by multiplying matrices: `R_total = R₁·R₂`. Order matters — rotations don't commute.
+- **No singularities.** Unlike [Euler angles](/atlas/concept/euler-angles), rotation matrices never hit [gimbal lock](/atlas/concept/gimbal-lock); every orientation has a clean matrix.
+- **Easy inverse.** To undo a rotation, just take the transpose: `R⁻¹ = Rᵀ` — cheap and exact.
+- **Building block.** Bolt a translation onto it and you get the [homogeneous transformation](/atlas/concept/homogeneous-transformation) that describes full pose.
+
+## The trade-offs
+
+Nine numbers to store three degrees of freedom is **redundant**, and numerical error can slowly make a matrix drift away from being perfectly orthogonal (requiring occasional "re-orthogonalization"). For storing and interpolating orientation, robots often prefer the compact, drift-friendly [quaternion](/atlas/concept/quaternion) — but rotation matrices remain the clearest for *applying* a rotation to vectors and for kinematics math.
+
+## Where you'll meet it
+
+Every [forward kinematics](/atlas/concept/forward-kinematics) computation chains rotation matrices down the arm. Camera extrinsics, [IMU](/atlas/concept/imu) attitude, and coordinate transforms all use them. They're the bedrock notation of robot geometry.
+
+## Why it matters
+
+The rotation matrix is the foundational way to represent and apply 3D orientation in robotics. Master it and the rest of spatial math — transforms, kinematics, and pose — falls into place.
+
+## Related
+
+[Quaternion](/atlas/concept/quaternion) · [Euler angles](/atlas/concept/euler-angles) · [Homogeneous transformation](/atlas/concept/homogeneous-transformation) · [Angular velocity](/atlas/concept/angular-velocity)
