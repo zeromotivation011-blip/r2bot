@@ -1,0 +1,71 @@
+---
+title: Zero-Moment Point (ZMP)
+slug: zero-moment-point
+bucket: concept
+category: control
+summary: >-
+  The zero-moment point is the spot on the ground a walking robot must keep its dynamic forces
+  balanced over to avoid tipping — the criterion that made stable bipedal walking possible and
+  still underpins many humanoids.
+difficulty: 4
+tags:
+  - locomotion
+  - balance
+  - control
+seeAlso:
+  - center-of-mass
+  - bipedal-robot
+  - capture-point
+  - equations-of-motion
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Vukobratović — Zero-moment point'
+    url: 'https://en.wikipedia.org/wiki/Zero_moment_point'
+  - title: 'Introduction to Humanoid Robotics — Kajita'
+    url: 'https://link.springer.com/book/10.1007/978-3-642-54536-8'
+laymanExplanation: >-
+  The zero-moment point is the point under a walking robot's feet where all the forces balance
+  out. Keep it inside the foot and the robot stays planted; let it reach the edge and the robot
+  starts to tip.
+technicalDefinition: >-
+  The zero-moment point is the point on the ground where the net moment of gravity and inertial
+  forces has no horizontal component; dynamic balance requires it to stay within the support
+  polygon.
+quizQuestion:
+  q: A biped stays dynamically balanced as long as its zero-moment point stays…
+  options:
+    - Above its head
+    - Within the support polygon of its feet
+    - At the battery
+    - Outside the feet
+  answer: 1
+  explanation: >-
+    If the ZMP stays inside the foot support polygon, the foot doesn't rotate and the robot
+    doesn't tip; at the edge, tipping begins.
+---
+
+A standing robot just needs its [center of mass](/atlas/concept/center-of-mass) over its feet. But a *walking* robot is constantly accelerating, so static balance isn't enough. The tool that made dynamic bipedal walking possible is the **zero-moment point (ZMP)**.
+
+## What it is
+
+As a robot moves, gravity *and* its own inertial forces act on it. The **zero-moment point** is the spot on the ground where those combined forces produce **no tipping moment** — the point about which the robot is dynamically balanced. The rule is elegant: **as long as the ZMP stays inside the support polygon** (the area under and between the feet), the foot stays flat on the ground and the robot won't tip. Let the ZMP reach the edge of the foot, and the foot starts to rotate — the beginning of a fall.
+
+```diagram
+{ "type": "flow", "title": "Keep the ZMP inside the feet", "nodes": ["Gravity + inertial forces", "Compute ZMP on ground", "Inside support polygon?", "Yes → won't tip"], "caption": "Unlike the static center of mass, the ZMP accounts for motion. Planning footsteps and body sway to keep it inside the feet is the classic recipe for stable walking." }
+```
+
+## Why it was a breakthrough
+
+Before ZMP-based methods, making a two-legged robot walk without falling was extraordinarily hard. Treating balance as "plan the motion so the ZMP stays within the feet" turned walking into a **solvable control problem**: generate a [center-of-mass](/atlas/concept/center-of-mass) trajectory whose resulting ZMP stays safely inside the support region. Honda's ASIMO and many humanoids since walked this way, and ZMP remains a foundation of humanoid locomotion.
+
+## The limits
+
+ZMP-based walking tends to look **cautious** — flat feet, bent knees, careful steps — because it insists the foot never tips. Truly agile, dynamic motions (running, recovering from a shove, walking on rough terrain where footholds are points not flat areas) push beyond it, toward methods like the [capture point](/atlas/concept/capture-point) and full whole-body optimization that *allow* controlled tipping and stepping to catch a fall.
+
+## Why it matters
+
+The zero-moment point is the classic criterion for dynamic balance — the idea that turned bipedal walking from a near-impossible stunt into engineering. Understanding it is the entry point to all of legged-robot balance and locomotion.
+
+## Related
+
+[Center of mass](/atlas/concept/center-of-mass) · [Bipedal robot](/atlas/concept/bipedal-robot) · [Capture point](/atlas/concept/capture-point) · [Equations of motion](/atlas/concept/equations-of-motion)

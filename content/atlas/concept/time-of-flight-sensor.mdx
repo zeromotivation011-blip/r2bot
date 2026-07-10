@@ -1,0 +1,80 @@
+---
+title: Time-of-Flight Sensor
+slug: time-of-flight-sensor
+bucket: concept
+category: sensors
+summary: >-
+  A time-of-flight sensor measures distance by timing how long light takes to bounce back —
+  the compact ranging tech behind depth cameras, phone face-unlock, and short-range robot
+  obstacle detection.
+difficulty: 2
+tags:
+  - sensors
+  - depth
+  - perception
+seeAlso:
+  - lidar
+  - depth-camera
+  - ultrasonic-sensor
+  - structured-light
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Time-of-flight camera (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Time-of-flight_camera'
+  - title: 'ToF sensing — STMicroelectronics'
+    url: 'https://www.st.com/'
+laymanExplanation: >-
+  A time-of-flight sensor sends out a pulse of light and measures how long it takes to come back.
+  Since light travels at a known speed, that time tells it the distance to whatever it hit.
+technicalDefinition: >-
+  A time-of-flight sensor computes distance from the round-trip travel time (or phase shift) of
+  emitted light reflecting off a target, distance = c × time / 2.
+quizQuestion:
+  q: A time-of-flight sensor computes distance from…
+  options:
+    - The color of the target
+    - How long light takes to return
+    - The target's temperature
+    - The battery voltage
+  answer: 1
+  explanation: >-
+    It times the round trip of emitted light; since light speed is known, distance = c × time / 2.
+---
+
+The most direct way to measure distance is to bounce something off a target and time the echo. Do it with **light** and you have a **time-of-flight (ToF) sensor** — the compact ranging technology now inside phones, depth cameras, and small robots.
+
+## How it works
+
+The sensor emits a pulse or modulated beam of (usually infrared) light, and measures how long it takes to reflect back. Since light travels at a known, constant speed, the round-trip time gives the distance directly:
+
+```
+distance = (speed of light × round-trip time) / 2
+```
+
+Cheaper single-point ToF sensors time a pulse; ToF *cameras* measure the **phase shift** of modulated light across a whole sensor array, producing a depth value for every pixel at once.
+
+```diagram
+{ "type": "flow", "title": "Distance from the speed of light", "nodes": ["Emit light pulse", "Reflects off target", "Measure return time", "distance = c·t / 2"], "caption": "Because light's speed is fixed, timing the round trip yields distance. A full array of these gives a live depth image." }
+```
+
+## ToF vs its cousins
+
+- **[LiDAR](/atlas/concept/lidar)** is essentially ToF scaled up — often the same principle, but longer range, scanning across a scene, and higher precision. Short-range ToF chips are the cheap, solid-state end of the family.
+- **[Structured light](/atlas/concept/structured-light)** projects a pattern instead of timing light — better at very close range and fine detail, but shorter range and worse in sunlight.
+- **[Ultrasonic](/atlas/concept/ultrasonic-sensor)** does the same timing trick with sound — cheaper and works on glass, but coarse and slow.
+
+## Where you'll see it
+
+Phone face-unlock and portrait-mode depth, [depth cameras](/atlas/concept/depth-camera) (the Kinect Azure and many RealSense units are ToF), drone altitude and obstacle sensing, robot vacuum cliff/obstacle detection, and gesture interfaces. Its appeal is being **tiny, solid-state, and fast** — a whole depth camera on a chip.
+
+## The limits
+
+Bright sunlight can swamp the returning signal; highly reflective, dark, or transparent surfaces confuse it; and multiple ToF sensors can interfere with each other. Range is modest (centimeters to a few meters for the small ones).
+
+## Why it matters
+
+Time-of-flight sensing put depth perception into a cheap, compact package, bringing 3D sensing to phones and small robots. Understanding it clarifies the whole family of active depth sensors, LiDAR included.
+
+## Related
+
+[LiDAR](/atlas/concept/lidar) · [Depth camera](/atlas/concept/depth-camera) · [Ultrasonic sensor](/atlas/concept/ultrasonic-sensor) · [Structured light](/atlas/concept/structured-light)

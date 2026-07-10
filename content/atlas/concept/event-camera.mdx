@@ -1,0 +1,76 @@
+---
+title: Event Camera
+slug: event-camera
+bucket: concept
+category: sensors
+summary: >-
+  An event camera reports only the pixels that change, microsecond by microsecond, instead of
+  full frames — giving robots blur-free vision at extreme speed and in tricky lighting, at a
+  tiny fraction of the data.
+difficulty: 3
+tags:
+  - sensors
+  - vision
+  - perception
+seeAlso:
+  - computer-vision
+  - optical-flow
+  - visual-odometry
+  - camera-vision
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Event camera (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Event_camera'
+  - title: 'Gallego et al. — Event-based Vision: A Survey'
+    url: 'https://arxiv.org/abs/1904.08405'
+laymanExplanation: >-
+  An event camera doesn't take pictures. Each pixel independently reports the instant it sees a
+  brightness change. That makes it incredibly fast, immune to motion blur, and able to cope with
+  very bright and very dark scenes at once.
+technicalDefinition: >-
+  An event camera (dynamic vision sensor) outputs asynchronous per-pixel brightness-change events
+  with microsecond timestamps, rather than synchronous full frames.
+quizQuestion:
+  q: Unlike a normal camera, an event camera outputs…
+  options:
+    - Full frames at a fixed rate
+    - Only per-pixel brightness changes, as they happen
+    - Audio
+    - Temperature maps
+  answer: 1
+  explanation: >-
+    Each pixel fires asynchronously when its brightness changes, so the output is a sparse stream
+    of timed events, not fixed-rate frames.
+---
+
+A normal camera takes complete snapshots dozens of times a second. An **event camera** throws that model out — and in doing so solves problems that plague fast-moving robots.
+
+## How it works
+
+In an event camera (also called a dynamic vision sensor), each pixel is **independent and asynchronous**. A pixel stays silent until the brightness it sees changes by a threshold; then it instantly fires an "event" — its location, the time (to the microsecond), and whether the light went up or down. Nothing changing means no data. The output is a **sparse stream of events**, not frames.
+
+```diagram
+{ "type": "flow", "title": "Report change, not frames", "nodes": ["Pixel sees brightness change", "Fire timed event", "Stream of events", "Reconstruct motion / edges"], "caption": "Static scene → almost no data. Motion → a fine-grained stream of exactly where and when things changed, with microsecond timing." }
+```
+
+## Why it's special
+
+- **No motion blur.** Because pixels respond in microseconds, fast motion that smears a normal frame is captured crisply — huge for high-speed drones and fast manipulation.
+- **Enormous dynamic range.** Each pixel adapts locally, so an event camera sees detail in deep shadow and bright sun *in the same scene* — where a normal camera blows out or goes black.
+- **Low latency and low data.** Microsecond response and only-report-changes make it fast and efficient, ideal for reactive control.
+
+## The trade-off
+
+Event data is *weird* — a stream of asynchronous events, not an image — so standard [computer vision](/atlas/concept/computer-vision) algorithms don't apply directly. It needs new methods (or reconstructing pseudo-frames). It also sees only *change*: point it at a perfectly still scene and it reports almost nothing. This unfamiliarity, plus cost, keeps it a specialist tool for now.
+
+## Where you'll see it
+
+High-speed [visual odometry](/atlas/concept/visual-odometry) and drone obstacle avoidance, fast [optical-flow](/atlas/concept/optical-flow) estimation, high-dynamic-range perception, and vibration/monitoring — anywhere speed or lighting defeats a conventional [camera](/atlas/concept/camera-vision).
+
+## Why it matters
+
+The event camera is a fundamentally different way to sense light — biologically inspired, blur-free, and blazing fast. As robots move faster and into harsher lighting, it's an increasingly important tool in the perception kit.
+
+## Related
+
+[Computer vision](/atlas/concept/computer-vision) · [Optical flow](/atlas/concept/optical-flow) · [Visual odometry](/atlas/concept/visual-odometry) · [Camera vision](/atlas/concept/camera-vision)

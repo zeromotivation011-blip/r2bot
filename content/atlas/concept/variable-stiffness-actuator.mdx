@@ -1,0 +1,77 @@
+---
+title: Variable Stiffness Actuator (VSA)
+slug: variable-stiffness-actuator
+bucket: concept
+category: actuators
+summary: >-
+  A variable stiffness actuator can change how springy it is on command — stiff for precision,
+  soft for safety and efficiency — letting a robot adapt its compliance the way a human tenses or
+  relaxes a muscle.
+difficulty: 4
+tags:
+  - actuators
+  - compliance
+  - force-control
+seeAlso:
+  - series-elastic-actuator
+  - impedance-control
+  - collaborative-robot
+  - torque
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Variable stiffness actuator (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Variable_stiffness'
+  - title: 'Vanderborght et al. — Variable impedance actuators: A review'
+    url: 'https://en.wikipedia.org/wiki/Series_elastic_actuator'
+laymanExplanation: >-
+  A variable stiffness actuator can be made rigid or springy on demand. Like your arm — firm when
+  you write carefully, loose when you catch a ball — the robot tunes its softness to the task.
+technicalDefinition: >-
+  A variable stiffness actuator adjusts its mechanical compliance in real time, independently of
+  position, typically via antagonistic springs or a mechanism that changes effective spring rate.
+quizQuestion:
+  q: A variable stiffness actuator lets a robot…
+  options:
+    - Change how springy a joint is on command
+    - Change its paint color
+    - Charge faster
+    - Turn off gravity
+  answer: 0
+  explanation: >-
+    It adjusts mechanical stiffness in real time — stiff for precision, compliant for safety and
+    efficiency — independent of the joint's position.
+---
+
+A [series elastic actuator](/atlas/concept/series-elastic-actuator) has *one* fixed springiness. But the ideal softness depends on the task: you want a joint **stiff** to place a part precisely and **soft** to catch an impact or absorb a shock. A **variable stiffness actuator (VSA)** can be both — adjusting its compliance on command.
+
+## The human analogy
+
+Think of your own arm. Threading a needle, you tense your muscles and become stiff and precise. Catching a heavy ball, you relax and let your arm give, absorbing the blow. You're changing your *stiffness* without changing your *position* — co-contracting opposing muscles. A VSA does the mechanical equivalent.
+
+```diagram
+{ "type": "flow", "title": "Tune stiffness to the task", "nodes": ["Task needs precision", "Set stiff", "Task needs safety", "Set compliant"], "caption": "Stiffness becomes a controllable knob, separate from position — firm when accuracy matters, soft when absorbing impact or interacting safely matters." }
+```
+
+## How it's built
+
+Most VSAs use two actuators (or an actuator plus a mechanism) in an **antagonistic** arrangement — like a pair of opposing springs/muscles. Pulling both tighter raises stiffness without moving the joint; relaxing both softens it. Other designs mechanically change a spring's effective lever arm or pretension. The result: **position and stiffness can be set independently**.
+
+## Why robots want it
+
+- **Safety on demand.** Go soft when near people or during unexpected contact, stiff when working precisely away from them.
+- **Efficiency and dynamics.** Match the joint's natural springiness to a walking or hopping gait to store and return energy — a running robot tunes leg stiffness like a real animal.
+- **Robustness.** Compliance absorbs shocks that would damage a rigid, high-gear-ratio joint.
+
+The cost is real: VSAs are **mechanically complex, heavier, and harder to control** than a fixed actuator, so they're used where adaptable compliance genuinely pays off.
+
+## Where you'll see it
+
+Advanced legged robots, next-generation prosthetics and exoskeletons, and research [collaborative robots](/atlas/concept/collaborative-robot) exploring safe, dynamic, human-like interaction.
+
+## Why it matters
+
+The variable stiffness actuator makes *compliance itself* a controllable variable — a step toward robots that, like animals, tune their bodies to the moment: firm to be precise, soft to be safe and efficient.
+
+## Related
+
+[Series elastic actuator](/atlas/concept/series-elastic-actuator) · [Impedance control](/atlas/concept/impedance-control) · [Collaborative robot](/atlas/concept/collaborative-robot) · [Torque](/atlas/concept/torque)

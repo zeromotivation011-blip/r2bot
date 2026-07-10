@@ -1,0 +1,77 @@
+---
+title: Series Elastic Actuator (SEA)
+slug: series-elastic-actuator
+bucket: concept
+category: actuators
+summary: >-
+  A series elastic actuator deliberately puts a spring between the motor and the load — turning a
+  stiff, hard-to-control drive into one that can sense and gently regulate force, the key to safe,
+  compliant legged robots and exoskeletons.
+difficulty: 3
+tags:
+  - actuators
+  - force-control
+  - compliance
+seeAlso:
+  - variable-stiffness-actuator
+  - impedance-control
+  - torque
+  - collaborative-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Pratt & Williamson — Series Elastic Actuators (1995)'
+    url: 'https://en.wikipedia.org/wiki/Series_elastic_actuator'
+  - title: 'Series elastic actuators — IHMC'
+    url: 'https://robots.ihmc.us/'
+laymanExplanation: >-
+  A series elastic actuator adds a spring between the motor and whatever it moves. Measuring how
+  much the spring stretches tells you the force precisely, and the spring softens impacts — so the
+  robot can push gently and absorb shocks.
+technicalDefinition: >-
+  A series elastic actuator places a compliant element (spring) in series between the motor/gearbox
+  and the load; measuring its deflection gives accurate force and enables force control.
+quizQuestion:
+  q: Why add a spring in a series elastic actuator?
+  options:
+    - To make the robot heavier
+    - To measure force accurately and cushion impacts
+    - To charge the battery
+    - To increase top speed
+  answer: 1
+  explanation: >-
+    The spring's deflection directly indicates force (F = kx), and it cushions shocks and stores
+    energy — enabling safe, precise force control.
+---
+
+It sounds backwards: to make an actuator *better* at controlling force, you make it *softer* by adding a spring. But that's exactly the insight behind the **series elastic actuator (SEA)**, and it changed how legged robots and exoskeletons are built.
+
+## The idea
+
+Put a **spring** in series between the motor/gearbox and the load. Now measure how much that spring is compressed or stretched. Because a spring's force is simply `F = k·x` (stiffness times deflection), measuring the deflection gives you a **direct, accurate reading of the force** the actuator is applying — turning a force-control problem into a position-measurement problem, which is easy and precise.
+
+```diagram
+{ "type": "flow", "title": "A spring turns force control into position sensing", "nodes": ["Motor + gearbox", "Spring (measure deflection)", "Load", "Force = k × deflection"], "caption": "The spring's stretch reveals the force cleanly, and it mechanically decouples the motor's inertia from the load — softening impacts." }
+```
+
+## Why the spring helps so much
+
+- **Accurate, back-drivable force control.** A rigid geared motor is a poor force sensor (friction and inertia hide the true force). The spring exposes force directly and lets the joint yield to contact — the basis of [impedance control](/atlas/concept/impedance-control).
+- **Shock tolerance.** The spring absorbs impact energy instead of slamming it through the gearbox — vital for a running or jumping robot's feet hitting the ground.
+- **Energy storage.** Springs store and return energy, which can make walking and hopping more efficient (like a tendon).
+- **Safety.** Mechanical compliance means a collision with a person is cushioned by physics, not just software — key for [collaborative robots](/atlas/concept/collaborative-robot).
+
+## The trade-off
+
+The spring adds compliance you don't always want: it limits control **bandwidth** (the actuator can't respond to fast commands as crisply as a rigid one) and adds complexity and size. So SEAs shine where **safe, force-controlled, shock-tolerant** motion matters more than raw stiffness — and where you want tunable softness, engineers use a [variable-stiffness actuator](/atlas/concept/variable-stiffness-actuator).
+
+## Where you'll see it
+
+Legged robots and their ankles/knees, powered exoskeletons and prosthetics, rehabilitation robots, and force-controlled manipulators — anywhere a robot must interact gently and absorb impacts.
+
+## Why it matters
+
+The series elastic actuator showed that deliberate mechanical softness is a feature, not a flaw — enabling the safe, force-aware, shock-tolerant actuation behind modern legged and wearable robots.
+
+## Related
+
+[Variable-stiffness actuator](/atlas/concept/variable-stiffness-actuator) · [Impedance control](/atlas/concept/impedance-control) · [Torque](/atlas/concept/torque) · [Collaborative robot](/atlas/concept/collaborative-robot)

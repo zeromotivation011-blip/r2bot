@@ -1,0 +1,76 @@
+---
+title: Strain Gauge
+slug: strain-gauge
+bucket: concept
+category: sensors
+summary: >-
+  A strain gauge is a tiny sensor whose resistance changes when it's stretched — the basic
+  element that lets robots feel force and weight, from a gripper's grip strength to a load
+  cell's reading.
+difficulty: 2
+tags:
+  - sensors
+  - force
+  - fundamentals
+seeAlso:
+  - load-cell
+  - force-torque-sensor
+  - tactile-sensor
+  - strain-gauge
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Strain gauge (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Strain_gauge'
+  - title: 'Strain gauge measurement — NI'
+    url: 'https://www.ni.com/'
+laymanExplanation: >-
+  A strain gauge is a small foil pattern glued to a part. When the part flexes even slightly, the
+  foil stretches and its electrical resistance changes — and that tiny change reveals how much
+  force is being applied.
+technicalDefinition: >-
+  A strain gauge is a resistive element whose resistance changes proportionally with mechanical
+  strain, converting deformation into a measurable electrical signal.
+quizQuestion:
+  q: A strain gauge senses force by measuring…
+  options:
+    - A change in its electrical resistance as it deforms
+    - The color of the object
+    - The temperature of the air
+    - The speed of a motor
+  answer: 0
+  explanation: >-
+    Stretching or compressing the gauge changes its resistance; that change is proportional to
+    strain, which relates to the applied force.
+---
+
+How does a robot *feel* — sense how hard it's gripping, or how heavy an object is? At the bottom of almost every force sensor sits a humble, brilliant device: the **strain gauge**.
+
+## How it works
+
+A strain gauge is a fine metal-foil pattern bonded to a surface. When that surface deforms even microscopically under load, the foil stretches or compresses with it — and stretching a conductor **changes its electrical resistance**. Measure that tiny resistance change and you know the strain, which (through the material's known stiffness) tells you the **force**.
+
+```diagram
+{ "type": "flow", "title": "Deformation becomes an electrical signal", "nodes": ["Force applied", "Part flexes slightly", "Gauge resistance changes", "Read force"], "caption": "The gauge turns imperceptible mechanical strain into a measurable resistance change — the raw ingredient of force sensing." }
+```
+
+The resistance change is minuscule, so gauges are wired into a **Wheatstone bridge** — a clever circuit that turns a fractional resistance change into a clean voltage and cancels out temperature drift.
+
+## Where it becomes a robot sense
+
+A bare strain gauge is just the element; it becomes useful when bonded to a purpose-built structure:
+
+- **[Load cells](/atlas/concept/load-cell)** — a metal body with gauges that measures weight or a single force axis (robot scales, payload sensing).
+- **[Force-torque sensors](/atlas/concept/force-torque-sensor)** — arrangements of gauges on a machined element that read force *and* torque in all six axes, mounted at a robot's wrist for assembly and [admittance control](/atlas/concept/admittance-control).
+- **[Tactile sensors](/atlas/concept/tactile-sensor)** and grippers — sensing contact and grip strength.
+
+## Strengths and quirks
+
+Strain gauges are cheap, small, accurate, and fast. Their main enemies are **temperature** (handled by the bridge and compensation gauges) and **fatigue** — bonded foil under endless flexing eventually cracks, so mounting and material choice matter.
+
+## Why it matters
+
+The strain gauge is the foundational transducer of force in robotics. Every time a robot weighs a payload, regulates grip, or detects contact, a strain gauge is almost certainly doing the sensing underneath.
+
+## Related
+
+[Load cell](/atlas/concept/load-cell) · [Force-torque sensor](/atlas/concept/force-torque-sensor) · [Tactile sensor](/atlas/concept/tactile-sensor) · [Admittance control](/atlas/concept/admittance-control)

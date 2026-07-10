@@ -1,0 +1,76 @@
+---
+title: Supercapacitor
+slug: supercapacitor
+bucket: concept
+category: actuators
+summary: >-
+  A supercapacitor stores energy that it can release and absorb in bursts far faster than a
+  battery — powering a robot's sudden high-current demands, absorbing braking energy, and
+  surviving huge numbers of charge cycles.
+difficulty: 2
+tags:
+  - power
+  - energy
+  - electronics
+seeAlso:
+  - battery-management-system
+  - battery-power-systems
+  - brushless-motor
+  - electronic-speed-controller
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Supercapacitor (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Supercapacitor'
+  - title: 'Supercapacitors vs batteries — Maxwell/Eaton'
+    url: 'https://www.eaton.com/'
+laymanExplanation: >-
+  A supercapacitor is like a battery that charges and discharges extremely fast but holds less
+  total energy. It's great for quick bursts of power — a sudden motor surge or capturing braking
+  energy — and it lasts for hundreds of thousands of cycles.
+technicalDefinition: >-
+  A supercapacitor stores charge electrostatically with very high capacitance, offering high power
+  density, fast charge/discharge, and long cycle life but lower energy density than batteries.
+quizQuestion:
+  q: Compared with a battery, a supercapacitor offers…
+  options:
+    - More total energy storage
+    - Much faster charge/discharge and longer cycle life
+    - Cheaper per kWh
+    - No need for wiring
+  answer: 1
+  explanation: >-
+    Supercapacitors deliver and absorb power in fast bursts and last far more cycles, but store
+    less total energy than batteries.
+---
+
+Batteries store a lot of energy but hate being drained or charged fast. Sometimes a robot needs the opposite — a big, quick *burst* of power. That's the job of a **supercapacitor**.
+
+## Battery vs supercapacitor
+
+The core trade-off is **energy density vs power density**:
+
+- A **battery** holds lots of energy (runs the robot for hours) but delivers and accepts it slowly, and wears out after hundreds to a couple thousand charge cycles.
+- A **supercapacitor** holds far *less* total energy but can dump or soak it up in **seconds**, and survives **hundreds of thousands** of cycles with little degradation.
+
+```diagram
+{ "type": "flow", "title": "Two complementary energy stores", "nodes": ["Battery: lots of energy, slow", "Supercapacitor: little energy, fast", "Pair them", "Endurance + burst power"], "caption": "Batteries provide endurance; supercapacitors provide instantaneous power and cycle life. Many robots use both, each for what it's best at." }
+```
+
+## What robots use it for
+
+- **Peak current buffering.** When a [brushless motor](/atlas/concept/brushless-motor) or actuator suddenly demands a huge current (a jump, a hard acceleration), a supercapacitor supplies the spike so the battery isn't stressed and the voltage doesn't sag.
+- **Regenerative braking.** A robot slowing down can pour braking energy into a supercapacitor fast — a battery can't accept it quickly enough — then reuse it.
+- **Ride-through and backup.** Bridging brief power dips, or safely parking a robot on power loss.
+- **Fast opportunistic charging.** Some transit and warehouse robots top up in seconds at stations.
+
+## The limits
+
+Low energy density means a supercapacitor alone can't run a robot for long — it's a *power* device, not an *endurance* one. Its voltage also drops steadily as it discharges (unlike a battery's flatter curve), so it needs supporting electronics. That's why it usually **complements** a battery rather than replacing it, coordinated by a [battery management system](/atlas/concept/battery-management-system).
+
+## Why it matters
+
+The supercapacitor fills the gap batteries leave — instantaneous power and near-unlimited cycle life. For robots with bursty loads, braking energy to recover, or a need for extreme longevity, it's a key part of the power system.
+
+## Related
+
+[Battery management system](/atlas/concept/battery-management-system) · [Battery power systems](/atlas/concept/battery-power-systems) · [Brushless motor](/atlas/concept/brushless-motor) · [Electronic speed controller](/atlas/concept/electronic-speed-controller)

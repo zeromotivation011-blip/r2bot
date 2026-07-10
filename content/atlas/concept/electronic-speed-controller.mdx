@@ -1,0 +1,76 @@
+---
+title: Electronic Speed Controller (ESC)
+slug: electronic-speed-controller
+bucket: concept
+category: actuators
+summary: >-
+  An electronic speed controller is the driver that turns a battery's DC power into the precisely
+  timed pulses a brushless motor needs — the small board behind every drone propeller and many
+  robot wheels.
+difficulty: 2
+tags:
+  - actuators
+  - motors
+  - electronics
+seeAlso:
+  - brushless-motor
+  - field-oriented-control
+  - pwm
+  - drone
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Electronic speed control (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Electronic_speed_control'
+  - title: 'How ESCs work — Oscar Liang'
+    url: 'https://oscarliang.com/esc/'
+laymanExplanation: >-
+  An electronic speed controller is a small circuit that drives a brushless motor. It rapidly
+  switches battery power to the motor's coils in the right sequence and timing, setting how fast
+  the motor spins based on the command it receives.
+technicalDefinition: >-
+  An ESC drives a brushless DC motor by electronically commutating its phases and modulating power
+  (via PWM) to control speed and torque from a throttle command.
+quizQuestion:
+  q: An electronic speed controller is needed because a brushless motor…
+  options:
+    - Runs on gasoline
+    - Has no brushes, so its coils must be switched electronically
+    - Needs no power
+    - Only spins one direction
+  answer: 1
+  explanation: >-
+    A brushless motor lacks mechanical brushes to switch its coils, so the ESC performs that
+    commutation electronically in the correct sequence and timing.
+---
+
+Every drone propeller and many robot wheels are driven by a [brushless motor](/atlas/concept/brushless-motor) — but a brushless motor can't just be plugged into a battery. It needs a translator: the **electronic speed controller (ESC)**.
+
+## Why it's necessary
+
+A brushed motor switches its own coils mechanically as it spins. A **brushless** motor has no brushes, so *something* must energize its three phases in the right order and at the right moments to keep it turning. That job — called **commutation** — is what the ESC does electronically, using fast switching transistors, dozens of thousands of times a second.
+
+```diagram
+{ "type": "flow", "title": "From throttle command to spinning motor", "nodes": ["Throttle command", "ESC commutates phases", "Timed pulses to coils", "Motor spins at target speed"], "caption": "The ESC reads a desired speed, then switches battery power to each motor phase in sequence and modulates it (via PWM) to hit that speed." }
+```
+
+## How it controls speed
+
+The ESC takes a **throttle signal** (from a flight controller or robot controller) and modulates how much power reaches the motor using [PWM](/atlas/concept/pwm) — rapidly turning the switches on and off, with a longer "on" fraction meaning more power and faster spin. It also senses the rotor's position (via back-EMF or a sensor) so it knows *when* to switch each phase. More advanced ESCs run [field-oriented control](/atlas/concept/field-oriented-control) for smooth, efficient torque.
+
+## What to know in practice
+
+- **Current rating.** An ESC must handle the motor's peak current, or it overheats and fails — sizing it is a real design step.
+- **Firmware.** Drone ESCs run firmware (BLHeli, AM32) that tunes responsiveness; fast, low-latency ESC response is what makes a racing drone feel crisp.
+- **Regenerative braking / reversing.** Good ESCs can brake and reverse, useful for robot wheels.
+
+## Where you'll see it
+
+Every multirotor [drone](/atlas/concept/drone) (one ESC per motor), electric skateboards and scooters, robot drive wheels, and gimbals. It's the unglamorous power stage between the battery and the spinning part.
+
+## Why it matters
+
+The ESC is what makes brushless motors — the efficient, powerful, low-maintenance workhorses of modern robotics — actually usable. Without it, there's no drone flight and no clean brushless drive.
+
+## Related
+
+[Brushless motor](/atlas/concept/brushless-motor) · [Field-oriented control](/atlas/concept/field-oriented-control) · [PWM](/atlas/concept/pwm) · [Drone](/atlas/concept/drone)

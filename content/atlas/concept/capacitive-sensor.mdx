@@ -1,0 +1,74 @@
+---
+title: Capacitive Sensor
+slug: capacitive-sensor
+bucket: concept
+category: sensors
+summary: >-
+  A capacitive sensor detects nearby objects — especially a human hand — by sensing tiny changes
+  in an electric field, giving robots touchless proximity awareness and the "skin" that makes
+  collaborative robots safe to work beside.
+difficulty: 2
+tags:
+  - sensors
+  - proximity
+  - safety
+seeAlso:
+  - collaborative-robot
+  - tactile-sensor
+  - ultrasonic-sensor
+  - time-of-flight-sensor
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Capacitive sensing (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Capacitive_sensing'
+  - title: 'Capacitive proximity sensors — Fluke'
+    url: 'https://www.fluke.com/'
+laymanExplanation: >-
+  A capacitive sensor notices when something (especially a hand) comes near by detecting a small
+  change in an invisible electric field around it — the same tech that makes a touchscreen work,
+  used to give robots a sense of nearby people.
+technicalDefinition: >-
+  A capacitive sensor detects changes in capacitance caused by nearby conductive or dielectric
+  objects altering its electric field, enabling touch and proximity sensing.
+quizQuestion:
+  q: A capacitive sensor detects an approaching hand by sensing a change in…
+  options:
+    - Temperature
+    - Its electric field (capacitance)
+    - Sound
+    - Magnetic north
+  answer: 1
+  explanation: >-
+    A nearby object alters the sensor's electric field, changing its capacitance — the signal used
+    for touch and proximity detection.
+---
+
+The same technology that lets your phone screen feel a fingertip can give a robot a sense of who — or what — is nearby, without any contact. That's the **capacitive sensor**.
+
+## How it works
+
+A capacitive sensor sets up a small **electric field** around a conductive plate. When an object — especially something conductive or water-rich, like a **human hand** — enters that field, it changes the sensor's **capacitance** (its ability to store charge). The sensor measures that change and infers that something is near, and roughly how near.
+
+```diagram
+{ "type": "flow", "title": "A hand disturbs the field", "nodes": ["Sensor emits electric field", "Object enters field", "Capacitance changes", "Proximity / touch detected"], "caption": "No contact needed — the object's mere presence alters the field, which the sensor reads as proximity or, at zero distance, touch." }
+```
+
+## Why robots use it
+
+- **Safety skin.** Cover a robot arm in capacitive sensor pads and it can feel a person approaching *before* contact, slowing or stopping to avoid a collision — a leading approach to making [collaborative robots](/atlas/concept/collaborative-robot) safe without cages.
+- **Touch interfaces.** Buttons and touch zones on a robot's body.
+- **Presence and fill sensing.** Detecting objects, liquid levels, or material through a non-metallic wall.
+
+Because it responds strongly to the human body (which is conductive), it's especially good at the specific job of sensing *people*.
+
+## Strengths and limits
+
+Capacitive sensing is **cheap, solid-state, contactless, and has no moving parts**. But it's **short-range** (typically millimeters to a few centimeters), sensitive to humidity and nearby metal, and needs calibration to reject drift. Compared to [time-of-flight](/atlas/concept/time-of-flight-sensor) or [ultrasonic](/atlas/concept/ultrasonic-sensor) proximity sensors, it excels specifically at close-range human/hand detection rather than measuring distance to arbitrary objects.
+
+## Why it matters
+
+The capacitive sensor gives robots a close-range, touchless sense tuned to detecting people — a key ingredient in the "sensitive skin" that lets modern robots share space with humans safely.
+
+## Related
+
+[Collaborative robot](/atlas/concept/collaborative-robot) · [Tactile sensor](/atlas/concept/tactile-sensor) · [Ultrasonic sensor](/atlas/concept/ultrasonic-sensor) · [Time-of-flight sensor](/atlas/concept/time-of-flight-sensor)

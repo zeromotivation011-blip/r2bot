@@ -1,0 +1,77 @@
+---
+title: Load Cell
+slug: load-cell
+bucket: concept
+category: sensors
+summary: >-
+  A load cell is a force sensor that turns weight or push into a precise electrical reading —
+  how robots weigh payloads, verify a grip, and detect contact along a single axis.
+difficulty: 2
+tags:
+  - sensors
+  - force
+  - fundamentals
+seeAlso:
+  - strain-gauge
+  - force-torque-sensor
+  - gripper
+  - tactile-sensor
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Load cell (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Load_cell'
+  - title: 'Load cell basics — HBM'
+    url: 'https://www.hbm.com/'
+laymanExplanation: >-
+  A load cell is the sensor inside a digital scale. It's a metal part with strain gauges on it;
+  press or hang weight on it and it outputs a precise number for the force. Robots use them to
+  weigh things and to know how hard they're pushing.
+technicalDefinition: >-
+  A load cell is a force transducer, typically a machined metal element with bonded strain gauges
+  in a Wheatstone bridge, outputting a voltage proportional to applied load.
+quizQuestion:
+  q: A load cell most directly measures…
+  options:
+    - Rotation angle
+    - Force or weight along an axis
+    - Light intensity
+    - Temperature
+  answer: 1
+  explanation: >-
+    A load cell converts an applied force or weight into a proportional electrical signal, usually
+    along one primary axis.
+---
+
+The scale in your kitchen and the payload sensor on a warehouse robot share the same heart: a **load cell**, the device that turns a force into a number.
+
+## What it is
+
+A load cell is a precisely machined **metal element** — a block, beam, or ring — with [strain gauges](/atlas/concept/strain-gauge) bonded to it. Apply a load and the metal flexes by a microscopic, repeatable amount; the gauges sense that flex and output a voltage proportional to the force. The metal's shape is engineered so the strain is clean, linear, and concentrated where the gauges sit.
+
+```diagram
+{ "type": "flow", "title": "Weight to a precise number", "nodes": ["Load applied", "Metal element flexes", "Strain gauges read it", "Calibrated force output"], "caption": "The body is shaped so force produces predictable strain; calibration converts the gauge signal into an accurate weight or force reading." }
+```
+
+## Types by shape
+
+Different geometries suit different jobs: **beam** cells for benchtop scales and platform weighing, **S-type** cells for tension (hanging loads), **pancake/canister** cells for heavy compression, and **button** cells for compact spots. Each trades capacity, precision, and mounting.
+
+## What robots use it for
+
+- **Payload weighing** — a robot arm or mobile base confirming what it's carrying, or a smart shelf tracking inventory by weight.
+- **Grip and contact** — a [gripper](/atlas/concept/gripper) verifying it actually grasped an object, or sensing how hard it's squeezing so it doesn't crush.
+- **Process force** — pressing, testing, or inserting with a target force.
+
+For full 3D force *and* torque sensing (assembly, [admittance control](/atlas/concept/admittance-control)), robots step up to a six-axis [force-torque sensor](/atlas/concept/force-torque-sensor), which is essentially many load-cell elements arranged together.
+
+## Practical notes
+
+Load cells are accurate and inexpensive but need **calibration**, care against overload (which permanently damages them), and temperature compensation. Mounting matters — off-axis loading corrupts a single-axis cell's reading.
+
+## Why it matters
+
+The load cell is how robots put a number on force and weight. It's the difference between a robot that blindly moves and one that knows how heavy its cargo is, whether it's holding on, and how hard it's pressing.
+
+## Related
+
+[Strain gauge](/atlas/concept/strain-gauge) · [Force-torque sensor](/atlas/concept/force-torque-sensor) · [Gripper](/atlas/concept/gripper) · [Tactile sensor](/atlas/concept/tactile-sensor)

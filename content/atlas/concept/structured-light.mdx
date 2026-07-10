@@ -1,0 +1,77 @@
+---
+title: Structured Light
+slug: structured-light
+bucket: concept
+category: sensors
+summary: >-
+  Structured light measures 3D shape by projecting a known pattern and watching how it bends over
+  surfaces — the high-detail depth tech behind the original Kinect, face-unlock, and precise
+  short-range robot vision.
+difficulty: 3
+tags:
+  - sensors
+  - depth
+  - perception
+seeAlso:
+  - depth-camera
+  - stereo-vision
+  - time-of-flight-sensor
+  - point-cloud
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Structured-light 3D scanner (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Structured-light_3D_scanner'
+  - title: 'Kinect depth sensing'
+    url: 'https://en.wikipedia.org/wiki/Kinect'
+laymanExplanation: >-
+  Structured light shines a known pattern (like a grid of dots) onto a scene. Where the pattern
+  lands on something close, it looks different than on something far — and from how the pattern
+  distorts, the sensor computes the 3D shape.
+technicalDefinition: >-
+  Structured light projects a known pattern and computes depth from the pattern's deformation via
+  triangulation between the projector and camera.
+quizQuestion:
+  q: Structured light computes depth from…
+  options:
+    - The color of objects
+    - How a projected pattern deforms over the surface
+    - The sound of the scene
+    - The battery level
+  answer: 1
+  explanation: >-
+    A known pattern is projected; the camera sees it distorted by surface shape, and triangulation
+    turns that distortion into depth.
+---
+
+Instead of passively looking at a scene, why not *paint* it with a known pattern and watch how the pattern bends? That's **structured light** — one of the most accurate ways for a robot to see in 3D up close.
+
+## How it works
+
+A projector casts a known pattern — stripes, or a dense grid of infrared dots — onto the scene. A [camera](/atlas/concept/camera-vision) offset from the projector sees that pattern **distorted** by the surface: it shifts and warps depending on how far each point is. From the geometry between projector and camera, triangulation converts that distortion into a **depth value per point**.
+
+```diagram
+{ "type": "flow", "title": "Project a pattern, read the distortion", "nodes": ["Project known pattern", "Camera sees it deformed", "Triangulate the shift", "Depth map"], "caption": "Because the projected pattern is known, any deformation directly encodes surface shape — no need for the scene to have its own texture." }
+```
+
+## Why it beats stereo up close
+
+Passive [stereo vision](/atlas/concept/stereo-vision) fails on blank, textureless surfaces because it has no features to match. Structured light **supplies its own texture** (the pattern), so it reads even a plain white wall accurately, with fine detail. That makes it excellent for **short-range, high-precision** tasks — 3D scanning, bin-picking small parts, face recognition.
+
+## Structured light vs time-of-flight
+
+- **Structured light** — very accurate at close range and fine detail, but shorter range, slower, and easily washed out by **sunlight** (which drowns the projected pattern).
+- **[Time-of-flight](/atlas/concept/time-of-flight-sensor)** — better at longer range and faster, but typically lower spatial detail up close.
+
+The original **Kinect** used structured light (a projected IR dot pattern); later depth cameras and phone face-unlock systems use it or ToF depending on the range needed.
+
+## Where you'll see it
+
+[Depth cameras](/atlas/concept/depth-camera) for indoor robots, industrial 3D inspection and scanning, robotic bin-picking, and face authentication. Its output is typically a [point cloud](/atlas/concept/point-cloud) for downstream perception and grasping.
+
+## Why it matters
+
+Structured light gives robots dense, accurate close-range 3D even on featureless surfaces — a capability passive cameras can't match. It's a cornerstone of indoor depth sensing and precision inspection.
+
+## Related
+
+[Depth camera](/atlas/concept/depth-camera) · [Stereo vision](/atlas/concept/stereo-vision) · [Time-of-flight sensor](/atlas/concept/time-of-flight-sensor) · [Point cloud](/atlas/concept/point-cloud)

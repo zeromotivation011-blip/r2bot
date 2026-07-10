@@ -1,0 +1,75 @@
+---
+title: RTK-GPS
+slug: rtk-gps
+bucket: concept
+category: sensors
+summary: >-
+  RTK-GPS sharpens ordinary satellite positioning from meters down to centimeters using a nearby
+  reference station — the precision-outdoor-localization tech behind self-driving cars, survey
+  drones, and autonomous farm machinery.
+difficulty: 3
+tags:
+  - sensors
+  - localization
+  - navigation
+seeAlso:
+  - gps-gnss
+  - sensor-fusion
+  - dead-reckoning
+  - imu
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Real-time kinematic positioning (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Real-time_kinematic_positioning'
+  - title: 'RTK GNSS explained — u-blox'
+    url: 'https://www.u-blox.com/'
+laymanExplanation: >-
+  RTK-GPS makes normal GPS far more precise — from a few meters down to a couple of centimeters —
+  by using a fixed base station nearby to correct the errors. It's how farm robots and survey
+  drones know exactly where they are outdoors.
+technicalDefinition: >-
+  RTK (Real-Time Kinematic) GNSS achieves centimeter accuracy by using carrier-phase measurements
+  and corrections from a fixed base station to cancel common satellite errors.
+quizQuestion:
+  q: RTK-GPS improves accuracy from meters to centimeters by…
+  options:
+    - Using more batteries
+    - Applying corrections from a nearby fixed base station
+    - Flying higher
+    - Ignoring satellites
+  answer: 1
+  explanation: >-
+    A base station at a known location measures the same satellite errors and broadcasts
+    corrections, which the rover applies for centimeter-level accuracy.
+---
+
+Standard [GPS](/atlas/concept/gps-gnss) gets you within a few meters — fine for phone maps, useless for a robot that must drive a crop row or land on a pad. **RTK-GPS** closes that gap, delivering **centimeter** accuracy outdoors.
+
+## The core trick
+
+Ordinary GPS error comes mostly from the signal's trip through the atmosphere and satellite timing — errors that are nearly **the same** for any two receivers close together. RTK exploits this: a **base station** sitting at a precisely known location measures how wrong its own GPS reading currently is, and broadcasts that correction to the moving robot (the "rover"). The rover subtracts the shared error and is left with a position good to a couple of centimeters.
+
+It also uses the **carrier phase** of the satellite signal (counting the radio wavelengths themselves), which is far finer than the coarse code ordinary GPS uses.
+
+```diagram
+{ "type": "flow", "title": "A base station cancels shared error", "nodes": ["Satellites", "Base station (known spot)", "Broadcast correction", "Rover: cm-accurate fix"], "caption": "Because base and rover see the same atmospheric/timing errors, the base's correction removes them for the rover — turning meters of error into centimeters." }
+```
+
+## Where it's used
+
+- **Autonomous farm machinery** — driving perfectly straight rows and returning to the exact same spot season after season.
+- **Survey and mapping drones** — geotagging imagery to centimeter accuracy without ground control points.
+- **Self-driving and delivery robots** — precise outdoor lane and path following (fused with other sensors).
+- **Construction and machine control** — grading and layout to spec.
+
+## The limits
+
+RTK needs a **correction source** — your own base station or a subscription network (NTRIP) — and a data link to receive it. It requires a **clear sky view** (it fails under dense canopy or urban canyons where satellites are blocked or reflected), and it takes a moment to "fix" the solution. Because of these gaps, robots **fuse** RTK with an [IMU](/atlas/concept/imu) and wheel [odometry](/atlas/concept/odometry) via [sensor fusion](/atlas/concept/sensor-fusion), so they keep a good estimate when the signal briefly drops.
+
+## Why it matters
+
+RTK-GPS is what makes satellite positioning precise enough for real robotic tasks outdoors. It's the backbone of autonomous agriculture and aerial surveying, and a key input wherever a robot needs to know its global position to the centimeter.
+
+## Related
+
+[GPS / GNSS](/atlas/concept/gps-gnss) · [Sensor fusion](/atlas/concept/sensor-fusion) · [Dead reckoning](/atlas/concept/dead-reckoning) · [IMU](/atlas/concept/imu)

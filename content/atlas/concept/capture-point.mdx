@@ -1,0 +1,74 @@
+---
+title: Capture Point
+slug: capture-point
+bucket: concept
+category: control
+summary: >-
+  The capture point is where a legged robot must step to come to a complete stop — the modern
+  balance concept behind push recovery and dynamic walking, letting robots stumble, catch
+  themselves, and stay upright.
+difficulty: 4
+tags:
+  - locomotion
+  - balance
+  - control
+seeAlso:
+  - zero-moment-point
+  - center-of-mass
+  - bipedal-robot
+  - equations-of-motion
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Pratt et al. — Capture Point: A step toward humanoid push recovery'
+    url: 'https://en.wikipedia.org/wiki/Zero_moment_point'
+  - title: 'Introduction to Humanoid Robotics — Kajita'
+    url: 'https://link.springer.com/book/10.1007/978-3-642-54536-8'
+laymanExplanation: >-
+  The capture point is the exact spot a robot needs to plant its foot to stop moving and balance.
+  Get shoved? Step onto your capture point and you come to rest instead of falling — the same
+  instinctive step a person takes when pushed.
+technicalDefinition: >-
+  The capture point is the ground location where a legged robot should step so that, modeled as an
+  inverted pendulum, its center of mass comes to rest directly above the foot.
+quizQuestion:
+  q: Stepping to the capture point allows a robot to…
+  options:
+    - Jump higher
+    - Come to a stop and balance after a disturbance
+    - Charge faster
+    - Turn off its sensors
+  answer: 1
+  explanation: >-
+    The capture point is where the robot must place its foot so its momentum is arrested and it
+    settles into balance — the basis of push recovery.
+---
+
+Shove a person and they instinctively step in the direction they're falling to catch themselves. Teaching a robot that same reflex is the job of the **capture point** — a more dynamic balance idea than the classic [zero-moment point](/atlas/concept/zero-moment-point).
+
+## The idea
+
+Model the robot as an **inverted pendulum** — a mass ([center of mass](/atlas/concept/center-of-mass)) balancing over a pivot foot. If the mass is moving, there's exactly one place to plant the foot such that the robot's momentum is arrested and its center of mass comes to rest **directly above the new foot**. That place is the **capture point**. Step there, and you stop; step short or long, and you keep toppling or have to step again.
+
+```diagram
+{ "type": "flow", "title": "Step where your momentum takes you", "nodes": ["CoM moving / pushed", "Compute capture point", "Step onto it", "Momentum arrested → balanced"], "caption": "The capture point depends on the robot's velocity — the faster it's moving, the farther out it must step. Placing the foot there converts a stumble into a stable stop." }
+```
+
+## Why it matters
+
+ZMP-based walking keeps the foot flat and never lets the robot "fall," which makes it stable but **cautious**. The capture point embraces the opposite view: a walking or shoved robot *is* falling, and balance means **stepping to catch it**. This unlocked:
+
+- **Push recovery.** A robot shoved off balance computes its capture point and takes a quick corrective step, exactly like a human — the reason modern humanoids can take a hit and stay up.
+- **Dynamic walking.** Each step naturally targets the capture point, giving faster, more natural, less stiff gaits.
+- **Rough terrain.** Reasoning about where to step, not just how to keep feet flat.
+
+## Refinements
+
+The basic capture point assumes an idealized pendulum; real robots use extensions (the "N-step capturability" idea — can I stop in one step, or do I need several?) and blend it with whole-body control and [ZMP](/atlas/concept/zero-moment-point) methods. It's a key concept behind the balance controllers on robots like Atlas.
+
+## Why it matters
+
+The capture point reframed legged balance from "never fall" to "know how to catch yourself." It's the foundation of push recovery and agile, human-like walking — a central idea in getting humanoids to move robustly in the real world.
+
+## Related
+
+[Zero-moment point](/atlas/concept/zero-moment-point) · [Center of mass](/atlas/concept/center-of-mass) · [Bipedal robot](/atlas/concept/bipedal-robot) · [Equations of motion](/atlas/concept/equations-of-motion)

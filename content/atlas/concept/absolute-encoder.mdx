@@ -1,0 +1,74 @@
+---
+title: Absolute Encoder
+slug: absolute-encoder
+bucket: concept
+category: sensors
+summary: >-
+  An absolute encoder reports a shaft's exact angle the instant it powers on — no homing needed —
+  which makes it the safe, preferred position sensor for robot arm joints and any axis that must
+  know where it is immediately.
+difficulty: 3
+tags:
+  - sensors
+  - feedback
+  - actuators
+seeAlso:
+  - rotary-encoder
+  - servo-motor
+  - closed-loop-control
+  - resolver
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Absolute encoder (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Rotary_encoder#Absolute_encoders'
+  - title: 'Encoder basics — Dynapar'
+    url: 'https://www.dynapar.com/technology/encoder_basics/'
+laymanExplanation: >-
+  An absolute encoder always knows the exact angle of a shaft, even the moment you switch the
+  robot on. Unlike a counter that starts at zero, it reports the true position immediately.
+technicalDefinition: >-
+  An absolute encoder outputs a unique code for each shaft position, giving the true angle at
+  power-up without a reference move, often with multi-turn tracking.
+quizQuestion:
+  q: The key advantage of an absolute encoder is that it…
+  options:
+    - Is always cheaper
+    - Knows the true angle immediately at power-up
+    - Needs no wiring
+    - Measures temperature
+  answer: 1
+  explanation: >-
+    It reports the exact position on power-up with no homing move — critical for safety and for
+    axes that must know their angle immediately.
+---
+
+An [incremental encoder](/atlas/concept/rotary-encoder) wakes up not knowing where it is — it only counts *changes*, so the robot must first perform a homing move. For a heavy robot arm, that's both annoying and unsafe. The **absolute encoder** solves it.
+
+## What makes it "absolute"
+
+Instead of emitting anonymous pulses, an absolute encoder gives every shaft position a **unique code**. Read it and you instantly know the true angle — even the very first moment after power-on, with no reference move. The disk is patterned (often with a Gray code) so each angle maps to one distinct value.
+
+```diagram
+{ "type": "flow", "title": "Angle → unique code, always known", "nodes": ["Shaft at some angle", "Unique coded pattern", "Read exact angle", "Known even at power-up"], "caption": "Every position has its own code, so the true angle is available immediately — no counting from zero, no homing routine." }
+```
+
+## Single-turn vs multi-turn
+
+- **Single-turn** absolute encoders know the angle *within* one revolution (0–360°).
+- **Multi-turn** versions also track *how many full revolutions* have occurred — essential for a joint driven through a gearbox, or a lead screw that turns many times per stroke. They keep counting even while powered off, using a battery or an energy-harvesting mechanism.
+
+## Why robots prefer it on joints
+
+- **Safety.** A robot arm that knows its exact pose on power-up won't lurch during a blind homing move — important around people.
+- **Reliability.** Miss a few pulses on an incremental encoder (noise, a fast spin) and its count drifts silently; an absolute encoder simply reports the correct angle every read.
+- **Faster startup.** No homing sequence before the robot can work.
+
+The trade-off is **cost and complexity** — absolute encoders are pricier, which is why cheap wheels still use incremental encoders while precision arm joints use absolute (or a [resolver](/atlas/concept/resolver) for rugged environments).
+
+## Why it matters
+
+The absolute encoder is the position sensor of choice wherever a robot must *know where it is the instant it wakes up*. That guarantee underpins safe, reliable motion in industrial arms, [collaborative robots](/atlas/concept/collaborative-robot), and any axis where a wrong assumption about angle is dangerous.
+
+## Related
+
+[Rotary encoder](/atlas/concept/rotary-encoder) · [Resolver](/atlas/concept/resolver) · [Servo motor](/atlas/concept/servo-motor) · [Closed-loop control](/atlas/concept/closed-loop-control)

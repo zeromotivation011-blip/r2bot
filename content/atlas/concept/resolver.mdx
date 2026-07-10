@@ -1,0 +1,74 @@
+---
+title: Resolver
+slug: resolver
+bucket: concept
+category: sensors
+summary: >-
+  A resolver is a rugged, analog position sensor that survives heat, shock, and radiation where
+  optical encoders fail — the angle sensor of choice for aerospace, defense, and heavy
+  industrial robots.
+difficulty: 3
+tags:
+  - sensors
+  - feedback
+  - actuators
+seeAlso:
+  - absolute-encoder
+  - rotary-encoder
+  - servo-motor
+  - field-oriented-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Resolver (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Resolver_(electrical)'
+  - title: 'Resolvers vs encoders — Analog Devices'
+    url: 'https://www.analog.com/'
+laymanExplanation: >-
+  A resolver measures a shaft's angle using coils and magnetism instead of light. Because there
+  are no delicate optics, it keeps working in extreme heat, vibration, and dirt where other
+  sensors would fail.
+technicalDefinition: >-
+  A resolver is a rotary transformer that outputs sine and cosine voltages proportional to shaft
+  angle, giving rugged absolute angular position.
+quizQuestion:
+  q: A resolver is preferred over an optical encoder mainly because it…
+  options:
+    - Is cheaper
+    - Survives heat, shock, and harsh environments
+    - Needs no wiring
+    - Measures temperature too
+  answer: 1
+  explanation: >-
+    Its coil-based, optics-free construction tolerates extreme heat, vibration, and radiation,
+    making it the rugged choice for harsh environments.
+---
+
+When a position sensor has to work inside a jet engine bay, a tank turret, or a furnace-side robot, delicate optical encoders won't survive. The **resolver** will.
+
+## How it works
+
+A resolver is essentially a **rotary transformer**. An energized coil on the spinning rotor induces voltages in two stationary coils placed 90° apart, producing a **sine** and a **cosine** signal that vary with the shaft angle. Take the arctangent of the two and you recover the exact angle. There are no light sources, no glass disks, no fine electronics on the shaft — just robust copper windings and iron.
+
+```diagram
+{ "type": "flow", "title": "Angle from sine and cosine coils", "nodes": ["Rotor coil energized", "Two coils sense field", "Sine + cosine outputs", "arctan → shaft angle"], "caption": "Purely magnetic and analog — the ruggedness comes from having no optics or delicate parts on the rotating shaft." }
+```
+
+## Why it's chosen
+
+- **Extreme environments.** It tolerates high temperature, heavy vibration, shock, dust, moisture, and even radiation — conditions that destroy optical [encoders](/atlas/concept/rotary-encoder).
+- **Absolute within a turn.** Like an [absolute encoder](/atlas/concept/absolute-encoder), it gives the true angle at power-up, no homing.
+- **Longevity.** Simple, contactless construction means long life with little to fail.
+
+The cost is that resolvers need a **resolver-to-digital converter** and excitation electronics to interpret the analog signals, and their resolution is typically lower than a high-end optical encoder.
+
+## Where you'll see it
+
+Aerospace actuators, military and defense robotics, EV and hybrid traction motors (for [field-oriented control](/atlas/concept/field-oriented-control) of the [motor](/atlas/concept/servo-motor)), steel-mill and foundry robots — anywhere reliability in a brutal environment beats maximum precision.
+
+## Why it matters
+
+The resolver is the tough, no-nonsense angle sensor of robotics — the reason motion control keeps working where finer sensors would fail. Knowing when to reach for a resolver over an optical encoder is a real engineering decision driven by environment, not just accuracy.
+
+## Related
+
+[Absolute encoder](/atlas/concept/absolute-encoder) · [Rotary encoder](/atlas/concept/rotary-encoder) · [Servo motor](/atlas/concept/servo-motor) · [Field-oriented control](/atlas/concept/field-oriented-control)

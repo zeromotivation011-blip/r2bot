@@ -1,0 +1,76 @@
+---
+title: Rotary Encoder
+slug: rotary-encoder
+bucket: concept
+category: sensors
+summary: >-
+  A rotary encoder measures how far and how fast a shaft has turned — the sense of position
+  that lets a robot know where its joints and wheels are, and the feedback that closes almost
+  every motion-control loop.
+difficulty: 2
+tags:
+  - sensors
+  - feedback
+  - actuators
+seeAlso:
+  - absolute-encoder
+  - servo-motor
+  - closed-loop-control
+  - odometry
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Rotary encoder (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Rotary_encoder'
+  - title: 'Encoder basics — Dynapar'
+    url: 'https://www.dynapar.com/technology/encoder_basics/'
+laymanExplanation: >-
+  A rotary encoder is a sensor on a spinning shaft that counts how much it has turned. It's how
+  a robot knows the exact angle of a joint or how far a wheel has rolled.
+technicalDefinition: >-
+  A rotary encoder converts shaft angle or rotation into an electrical signal, typically optical
+  or magnetic, providing position and velocity feedback for control.
+quizQuestion:
+  q: A rotary encoder primarily measures…
+  options:
+    - Temperature
+    - Shaft angle and rotation
+    - Battery voltage
+    - Light color
+  answer: 1
+  explanation: >-
+    It converts how much a shaft has rotated into a signal, giving position (and, by
+    differentiation, velocity) feedback.
+---
+
+A robot can command a motor to turn, but how does it know the motor actually reached the right angle? The answer, on nearly every joint and wheel, is a **rotary encoder**.
+
+## What it does
+
+A rotary encoder sits on a rotating shaft and turns its motion into an electrical signal that says **how far it has turned**. Differentiate that over time and you also get **speed**. This is the feedback that lets a controller compare "where the joint is" to "where I told it to go" — the heart of [closed-loop control](/atlas/concept/closed-loop-control).
+
+```diagram
+{ "type": "loop", "title": "The encoder closes the control loop", "nodes": ["Command angle", "Motor turns", "Encoder measures actual angle"], "caption": "Without the encoder, the controller is guessing. With it, the loop can correct error every cycle — the basis of precise motion." }
+```
+
+## How it works
+
+Two common technologies:
+
+- **Optical** — a disk with fine slots spins past a light and detector; counting pulses gives rotation. High resolution, but sensitive to dust and shock.
+- **Magnetic** — a magnetized ring and a [Hall-effect](/atlas/concept/hall-effect-sensor) or magnetoresistive sensor read the field. Rugged, tolerant of dirt and vibration — favored on mobile robots and harsh environments.
+
+## Incremental vs absolute
+
+The big distinction: an **incremental** encoder outputs *pulses* as it turns — it counts *change* but doesn't know its absolute angle at power-up, so it needs a homing routine. An **[absolute encoder](/atlas/concept/absolute-encoder)** reports the *exact angle* directly, even right after power-on. Incremental is cheaper and common on wheels; absolute is preferred on robot arm joints where knowing the true angle immediately is a safety matter.
+
+## Where you'll see it
+
+Every [servo motor](/atlas/concept/servo-motor) has one for position feedback. Wheel encoders feed [odometry](/atlas/concept/odometry) — counting rotations to estimate how far a mobile robot drove. CNC machines, 3D printers, and camera gimbals all depend on encoder feedback for accuracy.
+
+## Why it matters
+
+The rotary encoder is the fundamental position sense of robotics. Without it, motion control is open-loop guesswork; with it, robots move precisely and repeatably. It's one of the most ubiquitous sensors in any robot.
+
+## Related
+
+[Absolute encoder](/atlas/concept/absolute-encoder) · [Servo motor](/atlas/concept/servo-motor) · [Closed-loop control](/atlas/concept/closed-loop-control) · [Odometry](/atlas/concept/odometry)
