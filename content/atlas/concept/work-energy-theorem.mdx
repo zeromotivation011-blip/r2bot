@@ -1,0 +1,77 @@
+---
+title: Work-Energy Theorem
+slug: work-energy-theorem
+bucket: concept
+category: fundamentals
+summary: >-
+  The work-energy theorem links force, motion, and energy — the reasoning behind how much power a robot needs,
+  how legged robots store and return energy, and why efficient motion is really energy management.
+difficulty: 2
+tags:
+  - dynamics
+  - physics
+  - fundamentals
+seeAlso:
+  - momentum
+  - series-elastic-actuator
+  - torque
+  - battery-power-systems
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Work-energy theorem (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Work_(physics)'
+  - title: 'Energy in mechanics'
+    url: 'https://en.wikipedia.org/wiki/Kinetic_energy'
+laymanExplanation: >-
+  The work-energy theorem says the work done on something (force times distance) equals the change in its
+  motion energy. For robots it explains how much energy a move costs, and how springs can store energy from one
+  motion and give it back in the next.
+technicalDefinition: >-
+  The work-energy theorem states that the net work done on a body equals its change in kinetic energy (W =
+  ΔKE); combined with potential energy it gives energy conservation.
+quizQuestion:
+  q: The work-energy theorem says net work done on a body equals…
+  options:
+    - Its change in temperature
+    - Its change in kinetic energy
+    - Its mass
+    - Its color
+  answer: 1
+  explanation: >-
+    W = ΔKE: the net work (force applied over distance) equals the change in the body's kinetic energy.
+---
+
+Behind every question of "how much battery does this robot need?" and "why is this gait efficient?" sits one principle connecting force, motion, and energy: the **work-energy theorem**.
+
+## The principle
+
+The work-energy theorem states that the **net work** done on a body equals its **change in kinetic energy**:
+
+```
+W = ΔKE
+```
+
+Work is **force applied over a distance** (`W = F·d`). Do positive work on a robot and it speeds up (gains kinetic energy); do negative work (braking) and it slows down (loses it). Add gravity's **potential energy** and you get the broader principle of **energy conservation** — energy shifts between kinetic, potential, and (via friction and motors) heat and electrical, but is never lost.
+
+```diagram
+{ "type": "flow", "title": "Force over distance becomes motion energy", "nodes": ["Apply force over distance", "= work done", "= change in kinetic energy", "Robot speeds up / slows down"], "caption": "Work and energy are two views of the same thing. Tracking energy — kinetic, potential, dissipated — tells you what a motion truly costs." }
+```
+
+## Why robots think in energy
+
+- **Power and battery sizing.** How much [battery](/atlas/concept/battery-power-systems) a robot needs comes down to the energy its tasks demand — lifting a load raises potential energy, accelerating raises kinetic energy, and friction and motor losses dissipate more. Energy accounting sizes the power system.
+- **Efficient locomotion is energy management.** Walking and running are constant conversions between kinetic and potential energy (and elastic energy in tendons). Efficient gaits **recycle** energy instead of wasting it — the reason legged robots and animals use springs.
+- **Energy storage and return.** [Series-elastic actuators](/atlas/concept/series-elastic-actuator) and passive springs **store** energy from one phase of motion (a landing) and **return** it in the next (a push-off) — dramatically improving efficiency for hopping and running robots. This is pure work-energy reasoning: negative work charges the spring, positive work discharges it.
+- **Braking and regeneration.** A robot slowing down does negative work; that energy can be dumped as heat or **recovered** (regenerative braking into a battery or [supercapacitor](/atlas/concept/supercapacitor)) — a direct energy-conservation optimization.
+
+## The bigger picture
+
+Energy methods also power the [Lagrangian](/atlas/concept/lagrangian-mechanics) approach to deriving robot dynamics, where the whole equations of motion come from bookkeeping kinetic minus potential energy. So energy isn't just for efficiency — it's a foundational lens on robot mechanics itself.
+
+## Why it matters
+
+The work-energy theorem is the practical foundation for understanding a robot's energetic cost, efficiency, and the clever storage-and-return tricks behind agile legged motion. Thinking in energy — not just force — is how engineers size power systems and design robots that move efficiently rather than wastefully.
+
+## Related
+
+[Momentum](/atlas/concept/momentum) · [Series elastic actuator](/atlas/concept/series-elastic-actuator) · [Torque](/atlas/concept/torque) · [Battery power systems](/atlas/concept/battery-power-systems)

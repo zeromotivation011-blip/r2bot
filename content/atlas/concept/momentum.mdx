@@ -1,0 +1,76 @@
+---
+title: Momentum
+slug: momentum
+bucket: concept
+category: fundamentals
+summary: >-
+  Momentum is mass times velocity — a conserved quantity that governs impacts, throws, and why a moving robot
+  can't stop instantly, central to legged locomotion, collisions, and dynamic maneuvers.
+difficulty: 2
+tags:
+  - dynamics
+  - physics
+  - fundamentals
+seeAlso:
+  - angular-momentum
+  - work-energy-theorem
+  - capture-point
+  - contact-mechanics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Momentum (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Momentum'
+  - title: 'Conservation of momentum'
+    url: 'https://en.wikipedia.org/wiki/Momentum'
+laymanExplanation: >-
+  Momentum is how much 'oomph' a moving object has — its mass times its speed. A heavy or fast robot has a lot
+  of it, which is why it can't stop or turn instantly, and why collisions with it are forceful.
+technicalDefinition: >-
+  Momentum (p = mv) is the product of mass and velocity, a conserved vector quantity; the net force equals the
+  rate of change of momentum (F = dp/dt).
+quizQuestion:
+  q: Momentum is defined as…
+  options:
+    - Mass divided by velocity
+    - Mass times velocity
+    - Force times time only
+    - Velocity squared
+  answer: 1
+  explanation: >-
+    p = mv — mass times velocity, a vector quantity that is conserved in the absence of external forces.
+---
+
+Why can't a fast-moving robot stop on a dime, and why does a running robot need to plan several steps ahead to halt? The answer is **momentum** — the "quantity of motion" a mass carries, and a governing idea in dynamic robotics.
+
+## What it is
+
+Momentum is simply **mass times velocity**:
+
+```
+p = m · v
+```
+
+It's a **vector** (has direction), and it's **conserved** — it can't just vanish. To change an object's momentum you must apply a **force over time**: Newton's law is really `F = dp/dt` (force equals rate of change of momentum). So bringing a moving robot to rest requires applying a decelerating force *for a duration* — the more momentum, the more force or time needed. You literally cannot stop instantly.
+
+```diagram
+{ "type": "flow", "title": "Motion that must be dealt with", "nodes": ["Mass moving (p = mv)", "Momentum is conserved", "Force over time to change it", "Can't stop or turn instantly"], "caption": "A robot's momentum must be actively removed by force over time. Heavier and faster means more momentum, so more distance and force to stop or redirect." }
+```
+
+## Why it's central to dynamic robots
+
+- **Legged locomotion.** A walking or running robot is a controlled exchange of momentum with the ground. It's constantly "falling forward" and catching itself — momentum is what it must manage, redirecting it each step. Stopping requires stepping to the [capture point](/atlas/concept/capture-point) to absorb it; you can't just freeze.
+- **Impacts and collisions.** When a robot (or its foot, or a manipulated object) strikes something, momentum determines the impact force — heavier/faster contact hits harder. This is core to [contact mechanics](/atlas/concept/contact-mechanics) and to designing safe robots ([power-and-force limiting](/atlas/concept/power-and-force-limiting) caps momentum so collisions stay gentle).
+- **Throwing and catching.** Dynamic manipulation (a robot tossing an object into a bin, or catching one) is momentum transfer — imparting or absorbing p.
+- **Conservation tricks.** A robot in the air (a jumping or flipping robot, or a free-flying space robot) can't change its total momentum, but can redistribute it — swinging a limb changes the body's motion, a key idea in aerial maneuvers.
+
+## Linear and angular
+
+Momentum has a rotational twin, [angular momentum](/atlas/concept/angular-momentum), which governs spinning and is just as important for balance and attitude control. Together they describe a robot's full state of motion.
+
+## Why it matters
+
+Momentum is a foundational conserved quantity that explains why dynamic robots must *plan* their motion rather than command instant stops and turns. It underlies legged locomotion, safe collision design, and dynamic manipulation — anywhere a robot's mass is in motion and must be controlled through force over time.
+
+## Related
+
+[Angular momentum](/atlas/concept/angular-momentum) · [Work-energy theorem](/atlas/concept/work-energy-theorem) · [Capture point](/atlas/concept/capture-point) · [Contact mechanics](/atlas/concept/contact-mechanics)

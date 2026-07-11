@@ -1,0 +1,76 @@
+---
+title: Center of Pressure
+slug: center-of-pressure
+bucket: concept
+category: control
+summary: >-
+  The center of pressure is the single point on a robot's foot where the ground reaction force effectively acts
+  — a measurable balance indicator that must stay under the foot, closely tied to the zero-moment point.
+difficulty: 4
+tags:
+  - dynamics
+  - legged
+  - balance
+seeAlso:
+  - ground-reaction-force
+  - zero-moment-point
+  - center-of-mass
+  - bipedal-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Center of pressure (terrestrial locomotion)'
+    url: 'https://en.wikipedia.org/wiki/Center_of_pressure_(terrestrial_locomotion)'
+  - title: 'ZMP and CoP'
+    url: 'https://en.wikipedia.org/wiki/Zero_moment_point'
+laymanExplanation: >-
+  The center of pressure is the exact spot under a robot's foot where all the ground's push effectively adds up
+  — like the balance point on the sole. If it drifts to the edge of the foot, the robot is about to tip.
+technicalDefinition: >-
+  The center of pressure is the point on the contact surface where the resultant ground reaction force acts
+  with zero moment; it must remain within the support area for the foot not to rotate.
+quizQuestion:
+  q: A robot's foot begins to tip when the center of pressure reaches…
+  options:
+    - The center of the foot
+    - The edge of the foot's support area
+    - The robot's head
+    - The battery
+  answer: 1
+  explanation: >-
+    The CoP can only exist within the physical contact area; when it reaches the edge, the foot rotates about
+    that edge — the onset of tipping.
+---
+
+If you could find the single point under a robot's foot where all the ground's push balances out, that point tells you whether the robot is stable or about to tip. That point is the **center of pressure (CoP)**.
+
+## What it is
+
+The [ground reaction force](/atlas/concept/ground-reaction-force) is actually spread over the whole sole of a foot as a pressure distribution. The **center of pressure** is the single point where that distributed force can be treated as acting with **zero moment** — the effective "balance point" of the contact. Crucially, the CoP can only ever be located **within the physical contact area** (you can't push from outside the foot). That constraint is what makes it a balance indicator.
+
+```diagram
+{ "type": "flow", "title": "Where the ground's push balances", "nodes": ["Pressure spread over sole", "Resultant acts at one point", "= center of pressure", "At foot edge → tipping"], "caption": "The distributed ground force reduces to a single point, the CoP. Because it must lie within the foot, its position relative to the foot edges signals stability." }
+```
+
+## CoP and ZMP — closely related
+
+The center of pressure is intimately tied to the [zero-moment point](/atlas/concept/zero-moment-point):
+
+- The **CoP** is a *physical, measurable* quantity — where the actual ground reaction force acts, readable from foot pressure/force sensors.
+- The **ZMP** is where the ground force *would* need to act to balance the robot's gravity and inertial forces with no tipping moment.
+- When the robot is **not tipping**, the **CoP and ZMP coincide** — they're the same point. When the ZMP would fall *outside* the foot (impossible for the CoP), the foot rotates and the robot begins to tip. So the ZMP "clipping" to the foot edge *is* the CoP hitting the edge.
+
+This is why balance control monitors the CoP: keep it comfortably inside the support area and the foot stays flat; let it reach the edge and rotation (tipping) starts.
+
+## Why it matters for robots
+
+- **Measurable balance feedback.** Foot force sensors give the CoP directly, so a robot can *sense* its true stability margin in real time — how close it is to tipping — and react.
+- **Balance control.** Controllers regulate the CoP (equivalently the ZMP) to stay within the foot, adjusting body motion and [center of mass](/atlas/concept/center-of-mass) trajectory to keep it safe — the practical implementation of ZMP-based walking.
+- **Gait quality.** How the CoP rolls across the foot during a step (heel-to-toe in humans) reflects a natural, efficient gait.
+
+## Why it matters
+
+The center of pressure is the *measurable* face of legged balance — the real point where a robot's foot meets the ground's push, and a direct, sensor-readable indicator of how close it is to tipping. Together with the ZMP and ground reaction force, it forms the core vocabulary of how legged robots stay upright.
+
+## Related
+
+[Ground reaction force](/atlas/concept/ground-reaction-force) · [Zero-moment point](/atlas/concept/zero-moment-point) · [Center of mass](/atlas/concept/center-of-mass) · [Bipedal robot](/atlas/concept/bipedal-robot)

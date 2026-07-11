@@ -1,0 +1,81 @@
+---
+title: Offline Reinforcement Learning
+slug: offline-reinforcement-learning
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Offline reinforcement learning trains a policy purely from a fixed dataset of past experience — no live
+  trial-and-error — letting robots learn from logged data safely, without the risky exploration standard RL
+  requires.
+difficulty: 4
+tags:
+  - reinforcement-learning
+  - ai
+  - data
+seeAlso:
+  - reinforcement-learning
+  - behavior-cloning
+  - model-based-reinforcement-learning
+  - rosbag
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Offline reinforcement learning (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Reinforcement_learning'
+  - title: 'Levine et al. — Offline RL tutorial'
+    url: 'https://arxiv.org/abs/2005.01643'
+laymanExplanation: >-
+  Offline reinforcement learning learns a good policy from a pile of recorded experience, without the robot
+  trying anything new during training. It's like learning to drive well by studying lots of driving logs,
+  instead of practicing on the road.
+technicalDefinition: >-
+  Offline (batch) RL learns a policy from a fixed, previously-collected dataset without further environment
+  interaction, aiming to improve on the behavior that generated the data while avoiding distribution shift.
+quizQuestion:
+  q: What distinguishes offline RL from standard (online) RL?
+  options:
+    - It uses no data
+    - It learns only from a fixed dataset, with no live interaction
+    - It never uses reward
+    - It only runs in simulation
+  answer: 1
+  explanation: >-
+    Offline RL trains entirely from a fixed, pre-collected dataset without any new environment interaction
+    during learning — unlike online RL, which explores as it learns.
+---
+
+Standard [reinforcement learning](/atlas/concept/reinforcement-learning) learns by **doing** — trying actions, seeing rewards, exploring. But for a real robot, live exploration is slow, expensive, and can be dangerous. **Offline reinforcement learning** offers an alternative: learn a good policy from **recorded data alone**.
+
+## The idea
+
+Offline RL (also "batch RL") trains a policy entirely from a **fixed dataset** of previously-collected experience — logs of robots, humans, or older policies acting in the environment — **without any new interaction during learning**. The goal is ambitious: learn a policy that's *better* than whatever generated the data, purely by analyzing it. It's like learning to drive expertly by studying a massive archive of driving logs, without ever taking the wheel during study.
+
+```diagram
+{ "type": "flow", "title": "Learn from logs, don't explore live", "nodes": ["Fixed dataset of past experience", "Offline RL training", "Improved policy", "Deploy (or fine-tune) carefully"], "caption": "No live trial-and-error during learning — the policy is squeezed out of a static dataset, then deployed. Safe and data-reusing, but tricky to do well." }
+```
+
+## Why it's valuable for robots
+
+- **Safety.** No risky exploration on real hardware or around people during training — a huge deal for robots.
+- **Data reuse.** Robots generate lots of logged experience ([rosbags](/atlas/concept/rosbag), fleet data). Offline RL turns that existing data into better policies without new data collection — very cost-effective.
+- **Learning from humans and mixed sources.** It can learn from demonstrations, past deployments, and heterogeneous logs together.
+
+This makes it especially attractive for real-world robotics and autonomous driving, where online exploration is impractical.
+
+## The core challenge: distribution shift
+
+Offline RL's central difficulty is subtle but severe. The learned policy might want to try actions the dataset **never contains** — and the value estimates for those unseen actions can be wildly, over-optimistically wrong (there's no data to correct them). The policy then chases these phantom high values and fails. So offline RL algorithms must be **conservative**: stay close to what the data supports, penalize out-of-distribution actions (methods like CQL, IQL). This is different from [behavior cloning](/atlas/concept/behavior-cloning), which just copies the data — offline RL tries to *improve* on it while not straying beyond what the data can justify.
+
+## Where it fits
+
+- **Offline RL** — learn from a fixed dataset, no interaction. Safe, data-reusing.
+- **[Behavior cloning](/atlas/concept/behavior-cloning)** — a simple special case: just imitate the dataset's actions (no improvement, no value reasoning).
+- **[Model-based RL](/atlas/concept/model-based-reinforcement-learning)** — can be done offline too (learn a model from the dataset, then plan).
+- **Online RL** — explore live; often offline RL pre-trains a policy that's then carefully fine-tuned online.
+
+## Why it matters
+
+Offline reinforcement learning addresses a fundamental barrier to using RL on real robots: the danger and cost of live exploration. By learning from logged experience, it promises safe, data-efficient policy improvement from the data robots already produce — a key enabler for practical, real-world robot learning at scale.
+
+## Related
+
+[Reinforcement learning](/atlas/concept/reinforcement-learning) · [Behavior cloning](/atlas/concept/behavior-cloning) · [Model-based reinforcement learning](/atlas/concept/model-based-reinforcement-learning) · [rosbag](/atlas/concept/rosbag)

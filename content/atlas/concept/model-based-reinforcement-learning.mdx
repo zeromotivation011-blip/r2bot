@@ -1,0 +1,80 @@
+---
+title: Model-Based Reinforcement Learning
+slug: model-based-reinforcement-learning
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Model-based reinforcement learning learns a model of how the world works and uses it to plan or train — far
+  more sample-efficient than learning by trial and error alone, and key to teaching real robots without endless
+  physical attempts.
+difficulty: 4
+tags:
+  - reinforcement-learning
+  - model-based
+  - ai
+seeAlso:
+  - world-model
+  - reinforcement-learning
+  - model-predictive-control
+  - sim-to-real
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Model-based reinforcement learning (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Model-based_reinforcement_learning'
+  - title: 'Dreamer / MBRL'
+    url: 'https://en.wikipedia.org/wiki/Reinforcement_learning'
+laymanExplanation: >-
+  Model-based reinforcement learning first learns how the world responds to actions, then uses that model to
+  practice in its head. Because it doesn't have to try everything for real, it learns from far less physical
+  experience — important for real robots.
+technicalDefinition: >-
+  Model-based RL learns a dynamics model of the environment and uses it for planning or policy optimization,
+  improving sample efficiency over model-free methods that learn only from direct experience.
+quizQuestion:
+  q: The main advantage of model-based RL over model-free RL is…
+  options:
+    - It needs no reward
+    - Much better sample efficiency (learns from less real experience)
+    - It ignores the environment
+    - It only works in games
+  answer: 1
+  explanation: >-
+    By learning a model and practicing in it, model-based RL needs far fewer real-world interactions than
+    model-free RL — crucial when real data is expensive, as with robots.
+---
+
+Model-free [reinforcement learning](/atlas/concept/reinforcement-learning) is powerful but data-hungry — it can take millions of trials. On a real robot, each trial costs time and risks hardware. **Model-based reinforcement learning (MBRL)** dramatically cuts that cost by learning *how the world works* first.
+
+## The two flavors of RL
+
+- **Model-free RL** ([Q-learning](/atlas/concept/q-learning), [PPO](/atlas/concept/proximal-policy-optimization)) learns a policy *directly* from experience — no explicit model of the environment. Robust and general, but **sample-hungry**.
+- **Model-based RL** first learns a **model of the dynamics** (a [world model](/atlas/concept/world-model)) — "if I'm here and do this, what happens?" — then uses that model to **plan** or to **generate imagined experience** for training a policy. Far more **sample-efficient**.
+
+```diagram
+{ "type": "loop", "title": "Learn the model, then exploit it", "nodes": ["Collect real experience", "Learn dynamics model", "Plan / train in the model", "Act, gather more data"], "caption": "Real interactions teach the model; the model then supplies cheap 'imagined' experience for planning and policy learning — so far less real trial-and-error is needed." }
+```
+
+## Why it matters for robots
+
+The decisive advantage is **sample efficiency**, and for robots that's everything:
+
+- **Real data is expensive.** Each robot trial takes real time and can break hardware. Learning from thousands of interactions instead of millions is the difference between practical and impossible.
+- **Safer learning.** Practicing in a learned model avoids some risky real-world exploration.
+- **Planning power.** With a model, the robot can *look ahead* and choose actions deliberately — a bridge to [model predictive control](/atlas/concept/model-predictive-control), but with a learned rather than hand-derived model.
+
+Systems like **Dreamer** learn a world model and train policies almost entirely in imagination, achieving strong results with little real data — attractive for robotics.
+
+## The trade-offs
+
+- **Model error is the catch.** If the learned model is wrong, the policy optimizes against a fantasy and fails in reality (**model bias**) — and errors **compound** over long imagined rollouts. Managing this (uncertainty-aware models, short horizons, mixing real and imagined data) is the central challenge.
+- **Complexity.** Learning a good dynamics model — especially for [contact-rich](/atlas/concept/contact-mechanics) tasks and high-dimensional observations — is hard.
+
+So the field blends approaches: model-based for efficiency, with model-free corrections and real-world validation ([sim-to-real](/atlas/concept/sim-to-real) shares the same spirit of learning cheaply then transferring carefully).
+
+## Why it matters
+
+Model-based RL is a leading answer to reinforcement learning's biggest obstacle for robots — the enormous appetite for real experience. By learning the world's dynamics and reasoning within them, it makes RL practical on physical hardware and connects learning to planning. It's central to the push for robots that learn efficiently and safely.
+
+## Related
+
+[World model](/atlas/concept/world-model) · [Reinforcement learning](/atlas/concept/reinforcement-learning) · [Model predictive control](/atlas/concept/model-predictive-control) · [Sim-to-real](/atlas/concept/sim-to-real)

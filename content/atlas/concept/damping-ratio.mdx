@@ -1,0 +1,77 @@
+---
+title: Damping Ratio
+slug: damping-ratio
+bucket: concept
+category: control
+summary: >-
+  Damping ratio measures how quickly a system's oscillations die out — the single number that decides whether
+  a robot joint settles crisply, overshoots and rings, or crawls to its target, and a central knob in control
+  tuning.
+difficulty: 3
+tags:
+  - dynamics
+  - control
+  - vibration
+seeAlso:
+  - natural-frequency
+  - spring-mass-damper
+  - pid-controller
+  - trapezoidal-velocity-profile
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Damping ratio (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Damping_ratio'
+  - title: 'Second-order system response'
+    url: 'https://en.wikipedia.org/wiki/Damping'
+laymanExplanation: >-
+  Damping ratio says how bouncy or how sluggish a system is. Low damping means it overshoots and wobbles a lot;
+  high damping means it settles slowly with no bounce. Just right and it settles fast and clean — the sweet
+  spot for a robot joint.
+technicalDefinition: >-
+  Damping ratio (ζ) is a dimensionless measure of how oscillations decay in a second-order system: ζ<1
+  underdamped, ζ=1 critically damped, ζ>1 overdamped.
+quizQuestion:
+  q: A critically damped system (ζ = 1)…
+  options:
+    - Oscillates forever
+    - Settles as fast as possible without overshooting
+    - Never moves
+    - Overshoots the most
+  answer: 1
+  explanation: >-
+    Critical damping (ζ = 1) reaches the target in the shortest time with no overshoot — often the ideal
+    response for a robot joint.
+---
+
+Command a robot joint to a target and it might snap there and ring, glide in smoothly, or sluggishly creep. Which one happens is set by the **damping ratio** — the number that governs how oscillations die out, and a central dial in every control loop.
+
+## What it is
+
+Damping ratio (**ζ**, "zeta") is a dimensionless measure of how quickly a disturbed system's oscillations **decay**. Together with [natural frequency](/atlas/concept/natural-frequency), it fully describes a second-order ([spring-mass-damper](/atlas/concept/spring-mass-damper)) system's response. It divides behavior into three regimes:
+
+- **Underdamped (ζ < 1)** — oscillates, overshooting the target and ringing before settling. Fast but wobbly.
+- **Critically damped (ζ = 1)** — the sweet spot: reaches the target in the **shortest time with no overshoot**.
+- **Overdamped (ζ > 1)** — no oscillation, but settles **slowly**. Safe but sluggish.
+
+```diagram
+{ "type": "flow", "title": "How the oscillations die out", "nodes": ["ζ < 1: overshoot + ring", "ζ = 1: fast, no overshoot", "ζ > 1: slow, no overshoot", "Choose for the task"], "caption": "Damping ratio sets the character of the settling response. Critical damping is often ideal; underdamped is faster but risks overshoot; overdamped is safe but slow." }
+```
+
+## Why it's a key control decision
+
+- **Overshoot vs speed.** For a robot placing a part or a drone holding altitude, **overshoot** can be unacceptable (it slams past the target) — so you want ζ ≥ 1. For other tasks a little overshoot buys speed. Choosing ζ is choosing this trade-off.
+- **PID tuning.** In a [PID](/atlas/concept/pid-controller) loop, the **derivative (D)** term adds damping. Too little D and the joint overshoots and rings (underdamped); too much and it becomes sluggish (overdamped). Tuning D is largely dialing in the damping ratio, while P sets the natural frequency.
+- **Comfort and wear.** Underdamped motion vibrates, stresses mechanisms, and feels jerky; well-damped motion is smooth and easy on hardware (related to why [jerk-limited profiles](/atlas/concept/trapezoidal-velocity-profile) matter).
+- **Real limits.** Achievable damping is bounded by friction, sensor noise (which the D term amplifies), and mechanical resonances.
+
+## The practical target
+
+Many robot controllers aim for a damping ratio a little below critical (ζ ≈ 0.7) — this gives a **fast** response with only slight, quickly-dying overshoot, often the best balance of speed and settling for precise motion. But the "right" ζ depends entirely on whether overshoot is tolerable.
+
+## Why it matters
+
+Damping ratio is one of the two numbers (with natural frequency) that define how any robot joint or control loop responds to commands — and it's the one you most directly tune to trade overshoot against speed. Understanding it is essential to control tuning, motion quality, and diagnosing why a robot wobbles or drags to its target.
+
+## Related
+
+[Natural frequency](/atlas/concept/natural-frequency) · [Spring-mass-damper](/atlas/concept/spring-mass-damper) · [PID controller](/atlas/concept/pid-controller) · [Trapezoidal velocity profile](/atlas/concept/trapezoidal-velocity-profile)

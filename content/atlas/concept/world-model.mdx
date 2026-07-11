@@ -1,0 +1,78 @@
+---
+title: World Model
+slug: world-model
+bucket: concept
+category: ai-and-perception
+summary: >-
+  A world model is a neural network that learns to predict how the world changes — letting a robot 'imagine'
+  the outcomes of its actions and plan or learn inside its own head, a fast-rising approach to sample-efficient
+  robot learning.
+difficulty: 4
+tags:
+  - reinforcement-learning
+  - model-based
+  - ai
+seeAlso:
+  - model-based-reinforcement-learning
+  - reinforcement-learning
+  - transformer-architecture
+  - foundation-model-robotics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'World models (Ha & Schmidhuber)'
+    url: 'https://worldmodels.github.io/'
+  - title: 'Model-based RL / Dreamer'
+    url: 'https://en.wikipedia.org/wiki/Model-based_reinforcement_learning'
+laymanExplanation: >-
+  A world model is an AI that learns how the world works well enough to predict what happens next. A robot with
+  one can 'imagine' the results of its actions internally and plan, instead of having to try everything for real
+  — which makes learning much faster.
+technicalDefinition: >-
+  A world model is a learned predictive model of environment dynamics that lets an agent simulate future states
+  and rewards, enabling planning and learning in imagination.
+quizQuestion:
+  q: A world model lets a robot…
+  options:
+    - Store more files
+    - Predict future outcomes of actions and plan/learn internally
+    - Charge faster
+    - See in the dark
+  answer: 1
+  explanation: >-
+    It learns to predict how the environment evolves, so the agent can simulate ('imagine') consequences of
+    actions to plan and learn without acting in the real world every time.
+---
+
+What if a robot could **imagine** what would happen if it took an action — before actually doing it? That's the promise of a **world model**: a learned simulator of reality inside the robot's own network, and one of the most exciting directions in robot learning.
+
+## The idea
+
+A world model is a neural network trained to **predict how the environment changes**: given the current state and an action, what state (and reward) comes next? Once it has learned the dynamics, the robot can **run this model forward in its "imagination"** — simulating the consequences of possible action sequences internally, without touching the real world. It can then **plan** (search for good action sequences) or **learn a policy** entirely inside the model.
+
+```diagram
+{ "type": "loop", "title": "Learn to predict, then imagine", "nodes": ["Observe + act in real world", "Learn dynamics (world model)", "Imagine action outcomes", "Plan / train in imagination"], "caption": "The robot learns a predictive model from real experience, then uses it to simulate futures internally — planning and learning far more cheaply than acting for real each time." }
+```
+
+## Why it matters for robots
+
+- **Sample efficiency.** [Model-free reinforcement learning](/atlas/concept/reinforcement-learning) needs enormous amounts of trial-and-error, which is expensive and slow on real robots. A world model lets the robot generate vast "imagined" experience from limited real data — **[model-based RL](/atlas/concept/model-based-reinforcement-learning)** (Dreamer and successors) learns policies with far fewer real interactions.
+- **Planning.** With a predictive model, a robot can look ahead and choose actions that lead to good imagined outcomes — connecting to [model predictive control](/atlas/concept/model-predictive-control), now with a *learned* model instead of hand-derived physics.
+- **Generalization and reasoning.** Rich world models capture intuitive physics and object relationships, a step toward robots that understand and reason about their environments.
+
+## The frontier
+
+World models have exploded recently. Large **video-and-action world models** learn to predict future video frames conditioned on actions, effectively learning a general simulator of the physical world from data — a foundation for [general robot policies](/atlas/concept/foundation-model-robotics). Powered by [transformers](/atlas/concept/transformer-architecture) and diffusion, they're a leading bet for scalable, sample-efficient, generalizable robot intelligence — some researchers see them as central to the path toward broadly capable robots.
+
+## The challenges
+
+- **Compounding error.** Small prediction errors accumulate over long imagined rollouts, so the robot's "imagination" can drift from reality — limiting how far ahead it can trust.
+- **Modeling contact and the unpredictable.** The hardest physics ([contact](/atlas/concept/contact-mechanics), other agents) is also hardest to predict.
+- **Compute.** Rich world models are large and expensive to train and run.
+
+## Why it matters
+
+The world model reframes robot learning from "try everything in the real world" to "learn how the world works, then think." It's a powerful route to sample-efficient, planning-capable, and increasingly general robots — and one of the most active frontiers in AI for robotics.
+
+## Related
+
+[Model-based reinforcement learning](/atlas/concept/model-based-reinforcement-learning) · [Reinforcement learning](/atlas/concept/reinforcement-learning) · [Transformer architecture](/atlas/concept/transformer-architecture) · [Foundation models for robotics](/atlas/concept/foundation-model-robotics)
