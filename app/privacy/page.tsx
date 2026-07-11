@@ -24,7 +24,7 @@ export default function PrivacyPage() {
         <li>R2 Co-pilot conversations are logged for 30 days to improve the Atlas, then deleted.</li>
         <li>We use one analytics tool (Plausible) that doesn&apos;t use cookies or track you across sites.</li>
         <li>We never sell, rent, or share your data with third parties for marketing.</li>
-        <li>You can delete everything we have about you by emailing <strong>ravi6703@gmail.com</strong>.</li>
+        <li>You can delete everything we have about you by emailing <strong>hello@r2bot.in</strong>.</li>
       </ul>
 
       <h2>What we collect</h2>
@@ -72,7 +72,7 @@ export default function PrivacyPage() {
         <li><strong>Port your data</strong> — get a copy of your data in a machine-readable format.</li>
         <li><strong>Lodge a complaint</strong> — with the Data Protection Board of India (under DPDP) or your local Data Protection Authority (under GDPR).</li>
       </ul>
-      <p>To exercise any of these rights, email <strong>ravi6703@gmail.com</strong> with &quot;DPDP request&quot; in the subject line. We respond within 30 days.</p>
+      <p>To exercise any of these rights, email <strong>hello@r2bot.in</strong> with &quot;DPDP request&quot; in the subject line. We respond within 30 days.</p>
 
       <h2>Children</h2>
       <p>
@@ -96,7 +96,7 @@ export default function PrivacyPage() {
       </p>
 
       <p>
-        Questions? Email <strong>ravi6703@gmail.com</strong>.
+        Questions? Email <strong>hello@r2bot.in</strong>.
       </p>
     </StaticPage>
   );

@@ -8,7 +8,7 @@ import { CopilotProvider } from '@/components/CopilotProvider';
 import { DiagnosticClient } from './DiagnosticClient';
 
 export const metadata: Metadata = {
-  title: 'Find Your Starting Point — R2BOT',
+  title: 'Find Your Starting Point',
   description:
     "Five-minute discovery experience to find your robotics starting point. Warm, illustrated, never an exam.",
 };

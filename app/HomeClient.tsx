@@ -98,9 +98,9 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
           </div>
         </section>
       )}
-      <Ticker />
+      <Ticker atlasCount={atlasCount} />
       <Reveal><MissionStrip /></Reveal>
-      <Reveal><Features /></Reveal>
+      <Reveal><Features atlasCount={atlasCount} /></Reveal>
       <Reveal><SimulatorShowcase /></Reveal>
       <Reveal><IndiaSpotlight /></Reveal>
       <Reveal><Testimonials /></Reveal>
@@ -220,7 +220,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
           <FloatingRobot />
           {/* Floating feature cards */}
           <div style={{ position: 'absolute', top: 20, right: -20, background: 'rgba(15,10,30,0.92)', border: '1px solid rgba(0,229,255,0.3)', borderRadius: 14, padding: '10px 14px', minWidth: 150, backdropFilter: 'blur(12px)' }}>
-            <p style={{ fontSize: 20, fontWeight: 900, color: '#00E5FF', margin: 0 }}>261</p>
+            <p style={{ fontSize: 20, fontWeight: 900, color: '#00E5FF', margin: 0 }}>{atlasCount.toLocaleString()}</p>
             <p style={{ fontSize: 11, color: '#94a3b8', margin: 0, fontWeight: 700 }}>Robotics concepts in Atlas</p>
           </div>
           <div style={{ position: 'absolute', bottom: 60, left: -28, background: 'rgba(15,10,30,0.92)', border: '1px solid rgba(165,107,255,0.3)', borderRadius: 14, padding: '10px 14px', minWidth: 160, backdropFilter: 'blur(12px)' }}>
@@ -239,28 +239,38 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
 
 function StatPill({ n, label, color, displayValue }: { n: number; label: string; color: string; displayValue?: string }) {
   const ref = useRef<HTMLDivElement | null>(null)
+  const startedRef = useRef(false)
+  const rafRef = useRef(0)
   const [count, setCount] = useState(0)
 
   useEffect(() => {
-    if (!ref.current) return
-    let raf = 0
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting && count === 0 && n > 0) {
-          const start = performance.now()
-          const dur = 900
-          const step = (now: number) => {
-            const t = Math.min(1, (now - start) / dur)
-            setCount(Math.round(n * (1 - Math.pow(1 - t, 3))))
-            if (t < 1) raf = requestAnimationFrame(step)
-          }
-          raf = requestAnimationFrame(step)
-        }
-      })
-    }, { threshold: 0.5 })
-    obs.observe(ref.current)
-    return () => { obs.disconnect(); cancelAnimationFrame(raf) }
-  }, [n, count])
+    if (displayValue != null) return
+    const el = ref.current
+    if (!el) return
+    const run = () => {
+      if (startedRef.current) return
+      startedRef.current = true
+      const reduceMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      if (reduceMotion || n <= 0) { setCount(Math.max(0, n)); return }
+      const start = performance.now()
+      const dur = 900
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / dur)
+        setCount(Math.round(n * (1 - Math.pow(1 - t, 3))))
+        if (t < 1) rafRef.current = requestAnimationFrame(step)
+      }
+      rafRef.current = requestAnimationFrame(step)
+    }
+    const obs = new IntersectionObserver(
+      entries => { if (entries.some(e => e.isIntersecting)) run() },
+      { threshold: 0.25 },
+    )
+    obs.observe(el)
+    const timer = window.setTimeout(run, 500)
+    return () => { obs.disconnect(); window.clearTimeout(timer); cancelAnimationFrame(rafRef.current) }
+  }, [n, displayValue])
 
   return (
     <div ref={ref} style={{
@@ -323,12 +333,12 @@ function FloatingRobot() {
 }
 
 // ─── TICKER ───────────────────────────────────────────────────────────────
-function Ticker() {
+function Ticker({ atlasCount }: { atlasCount: number }) {
   const items = [
     '⚡ Spark · Wire · Forge · Edge — four complete robotics tracks',
-    '🇮🇳 Hindi + English content',
+    '🌐 In English — Hindi & Spanish coming',
     '🔬 9 in-browser simulators — no install needed',
-    '📚 261 Atlas concepts',
+    `📚 ${atlasCount.toLocaleString()} Atlas concepts`,
     '🤖 R2 Co-pilot — your AI robotics mentor',
     '🌍 50 countries on the robotics map',
     '🛠️ 20+ guided robot builds',
@@ -374,7 +384,7 @@ function MissionStrip() {
         <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 14 }}>
           {[
             { stat: '4 Tracks', sub: 'Spark → Wire → Forge → Edge' },
-            { stat: 'Hindi + English', sub: 'Vernacular learning, first-class' },
+            { stat: 'Multilingual', sub: 'English now — more languages coming' },
             { stat: 'No hardware needed', sub: 'Simulators do the heavy lifting' },
             { stat: 'AI Co-pilot', sub: 'Your 24/7 robotics mentor' },
           ].map(({ stat, sub }) => (
@@ -393,10 +403,10 @@ function MissionStrip() {
 }
 
 // ─── FEATURES ─────────────────────────────────────────────────────────────
-function Features() {
+function Features({ atlasCount }: { atlasCount: number }) {
   const cards = [
     { icon: '🎓', name: 'Academy',            sub: '4 tracks from beginner to AI. Project-based. Certificates that mean something.', badge: 'Spark → Edge', cta: 'Explore Academy →', href: '/academy', color: '#00E5FF' },
-    { icon: '🧠', name: 'Atlas',              sub: '261 robotics concepts — sensors, motors, AI, SLAM — defined clearly and connected.', badge: '261 concepts', cta: 'Open Atlas →', href: '/atlas', color: '#A56BFF' },
+    { icon: '🧠', name: 'Atlas',              sub: `${atlasCount.toLocaleString()} robotics concepts — sensors, motors, AI, SLAM — defined clearly and connected.`, badge: `${atlasCount.toLocaleString()} concepts`, cta: 'Open Atlas →', href: '/atlas', color: '#A56BFF' },
     { icon: '🤖', name: 'Simulators',         sub: '9 real-time robotics simulators. Line followers, PID, kinematics, sensor fusion — in your browser.', badge: '9 simulators', cta: 'Launch Simulator →', href: '/visualizer', color: '#FFB800' },
     { icon: '🌐', name: 'ROS2 Playground',    sub: 'A live Linux shell in your browser. Write real ROS2 commands, no setup required.', badge: 'Live shell', cta: 'Open Playground →', href: '/ros2', color: '#10b981' },
     { icon: '🤖', name: 'R2 Co-pilot',            sub: 'Your AI mentor. Ask anything, get precise answers grounded in the Atlas. Available on every page.', badge: 'AI Mentor', cta: 'Meet R2 →', href: '/copilot', color: '#f59e0b' },
@@ -457,10 +467,10 @@ function Features() {
 // ─── SIMULATOR SHOWCASE ───────────────────────────────────────────────────
 function SimulatorShowcase() {
   const sims = [
-    { name: 'Line Follower',       slug: 'line-follower',    color: '#00E5FF', desc: 'PID tuning, sensor calibration, real-time path tracing' },
-    { name: 'Arm Kinematics',      slug: 'arm-kinematics',   color: '#A56BFF', desc: 'Forward + inverse kinematics for 3-DOF robotic arm' },
-    { name: 'Sensor Fusion',       slug: 'sensor-fusion',    color: '#FFB800', desc: 'Kalman filter combining accelerometer + gyroscope' },
-    { name: 'Grid Pathfinder',     slug: 'grid-navigator',   color: '#10b981', desc: 'A* and Dijkstra on adjustable obstacle grids' },
+    { name: 'PID Controller',      slug: 'pid',    color: '#00E5FF', desc: 'Tune P, I, and D gains and watch the robot reach its target' },
+    { name: 'Arm Kinematics',      slug: 'ik',     color: '#A56BFF', desc: 'Forward + inverse kinematics for a robotic arm' },
+    { name: 'Sensor Fusion',       slug: 'fusion', color: '#FFB800', desc: 'Kalman filter combining GPS + IMU for accuracy' },
+    { name: 'A* Pathfinder',       slug: 'astar',  color: '#10b981', desc: 'Draw a maze and watch A* find the shortest path' },
   ]
   return (
     <section style={{
@@ -496,7 +506,7 @@ function SimulatorShowcase() {
             {sims.map(s => (
               <Link
                 key={s.slug}
-                href={`/visualizer/${s.slug}`}
+                href={`/visualizer#${s.slug}`}
                 style={{
                   display: 'block', padding: '18px 16px',
                   background: 'rgba(255,255,255,0.04)',
@@ -533,7 +543,7 @@ function IndiaSpotlight() {
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 48, alignItems: 'center' }}>
           <div>
             <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#f97316', fontWeight: 900, margin: '0 0 14px' }}>
-              Global · Proven in India
+              Global · Built for the world
             </p>
             <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 900, color: '#fff', margin: '0 0 16px', lineHeight: 1.2 }}>
               Built for the world. Priced for everyone.
@@ -555,7 +565,7 @@ function IndiaSpotlight() {
             </Link>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <IndiaMap />
+            <GlobalReach />
           </div>
         </div>
       </div>
@@ -576,22 +586,42 @@ function Pillar({ emoji, title, body }: { emoji: string; title: string; body: st
   )
 }
 
-function IndiaMap() {
+function GlobalReach() {
+  const nodes = [
+    { cx: 96,  cy: 96,  r: 4 },
+    { cx: 120, cy: 150, r: 4 },
+    { cx: 150, cy: 84,  r: 4 },
+    { cx: 168, cy: 150, r: 4 },
+    { cx: 196, cy: 108, r: 5 },
+    { cx: 212, cy: 150, r: 4 },
+  ]
   return (
-    <svg viewBox="0 0 240 280" width="220" height="260" aria-hidden style={{ filter: 'drop-shadow(0 12px 30px rgba(249,115,22,0.28))' }}>
+    <svg viewBox="0 0 280 280" width="240" height="240" aria-hidden style={{ filter: 'drop-shadow(0 12px 30px rgba(249,115,22,0.22))' }}>
       <defs>
-        <linearGradient id="ind-g" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%"   stopColor="#f97316" stopOpacity="0.9" />
-          <stop offset="55%"  stopColor="#ffffff" stopOpacity="0.08" />
-          <stop offset="100%" stopColor="#10b981" stopOpacity="0.9" />
-        </linearGradient>
+        <radialGradient id="globe-g" cx="40%" cy="35%" r="75%">
+          <stop offset="0%"  stopColor="#1b2540" />
+          <stop offset="70%" stopColor="#0d1526" />
+          <stop offset="100%" stopColor="#080b14" />
+        </radialGradient>
       </defs>
-      <path
-        d="M70 18 L102 22 L132 12 L170 28 L188 50 L182 80 L208 100 L196 138 L172 158 L160 190 L142 218 L128 256 L106 268 L102 240 L84 218 L70 198 L46 170 L40 138 L52 110 L40 80 L46 50 Z"
-        fill="url(#ind-g)" stroke="#f97316" strokeWidth="2"
-      />
-      <circle cx="120" cy="140" r="6" fill="#fff" />
-      <text x="120" y="158" fontSize="11" fontWeight="800" fill="#fff" textAnchor="middle">India</text>
+      <circle cx="140" cy="130" r="110" fill="url(#globe-g)" stroke="#f97316" strokeWidth="1.5" strokeOpacity="0.5" />
+      {[70, 100, 130, 160, 190].map((cy, i) => (
+        <ellipse key={i} cx="140" cy={cy} rx={Math.max(18, 108 - Math.abs(130 - cy) * 0.9)} ry="10"
+          fill="none" stroke="#334155" strokeWidth="1" strokeOpacity="0.5" />
+      ))}
+      {[30, 62, 94].map((rx, i) => (
+        <ellipse key={i} cx="140" cy="130" rx={rx} ry="110"
+          fill="none" stroke="#334155" strokeWidth="1" strokeOpacity="0.5" />
+      ))}
+      {nodes.map((n, i) => (
+        <g key={i}>
+          <circle cx={n.cx} cy={n.cy} r={n.r + 4} fill="#f97316" opacity="0.18" />
+          <circle cx={n.cx} cy={n.cy} r={n.r} fill="#f97316" />
+        </g>
+      ))}
+      <text x="140" y="258" fontSize="12" fontWeight="800" fill="#fbbf24" textAnchor="middle" letterSpacing="1">
+        Learners in 50+ countries
+      </text>
     </svg>
   )
 }
@@ -861,10 +891,10 @@ function NewsletterCTA() {
           R2BOT Weekly
         </p>
         <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, color: '#fff', margin: '0 0 12px' }}>
-          India's robotics news, every Friday.
+          This week in robotics, every Friday.
         </h2>
         <p style={{ color: '#64748b', fontSize: 14, marginBottom: 28 }}>
-          IFR reports, new research, Indian robotics startups, and R2BOT updates. Curated, not dumped.
+          IFR reports, new research, standout robotics startups, and R2BOT updates. Curated, not dumped.
         </p>
         <form onSubmit={submit} style={{ display: 'flex', gap: 10, maxWidth: 440, margin: '0 auto 12px' }}>
           <input

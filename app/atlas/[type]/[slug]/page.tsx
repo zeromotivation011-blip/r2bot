@@ -558,7 +558,7 @@ export default async function AtlasEntryPage(
           <p style={{ marginTop: 50, fontSize: 13, color: 'var(--muted)', textAlign: 'center' }}>
             Spotted something off?{' '}
             <a
-              href={`mailto:ravi6703@gmail.com?subject=${encodeURIComponent(
+              href={`mailto:hello@r2bot.in?subject=${encodeURIComponent(
                 `Error report: ${entry.title}`,
               )}&body=${encodeURIComponent(
                 `Page: ${canonical}\nIssue: `,

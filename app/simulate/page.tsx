@@ -10,7 +10,7 @@ import { WebotsSimulator } from '@/components/WebotsSimulator';
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export const metadata: Metadata = {
-  title: '3D Robot Simulation — R2BOT',
+  title: '3D Robot Simulation',
   description: 'Real physics. Real robots. No installation. Webots-powered simulations of TurtleBot3, UR5e arm, and DJI Mavic drone — straight from your browser.',
   alternates: { canonical: `${BASE_URL}/simulate` },
 };

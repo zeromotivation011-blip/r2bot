@@ -8,7 +8,7 @@ import ProfileWrapper from './ProfileWrapper'
 export const runtime = 'nodejs'
 
 export const metadata: Metadata = {
-  title: 'My Profile — R2BOT',
+  title: 'My Profile',
   description: 'Your robotics learning profile — Atlas progress, kids stars, achievements.',
   robots: { index: false, follow: false },
 }

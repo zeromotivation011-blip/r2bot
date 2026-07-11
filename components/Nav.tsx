@@ -40,7 +40,7 @@ const GROUPS: Group[] = [
           { icon: '⚡️', label: 'Edge · Research', href: '/academy/edge', tone: 'edge' },
         ],
       },
-      { kind: 'link', icon: '📚', label: 'Atlas', sub: '1,000+ concepts explained', href: '/atlas' },
+      { kind: 'link', icon: '📚', label: 'Atlas', sub: '400+ concepts explained', href: '/atlas' },
       { kind: 'link', icon: '⚡', label: 'Daily Challenge', sub: 'Quick puzzle · streak', href: '/challenge' },
       {
         kind: 'link',

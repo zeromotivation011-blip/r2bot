@@ -134,7 +134,7 @@ export function LessonFooter({
       <p style={{ marginTop: 32, fontSize: 13, color: 'var(--muted)', textAlign: 'center' }}>
         Spotted something off?{' '}
         <a
-          href={`mailto:ravi6703@gmail.com?subject=${encodeURIComponent(
+          href={`mailto:hello@r2bot.in?subject=${encodeURIComponent(
             `Error report: ${lessonTitle}`,
           )}&body=${encodeURIComponent(`Page: ${url}\nIssue: `)}`}
           style={{ color: 'var(--cyan)', borderBottom: '1px dashed var(--border-2)' }}

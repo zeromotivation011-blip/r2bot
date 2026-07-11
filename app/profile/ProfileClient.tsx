@@ -192,7 +192,7 @@ function OverviewTab({ progress, mastered, kids }: {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-        <StatCard label="Atlas Mastered" value={mastered.length} sub="/ 261 terms" />
+        <StatCard label="Atlas Mastered" value={mastered.length} sub="/ 426 terms" />
         <StatCard label="Kids Stars"     value={kids.totalStars ?? 0} sub="from Robot World" />
         <StatCard label="Levels Done"    value={kids.completedLevels?.length ?? 0} sub="of 14 kids levels" />
       </div>
@@ -240,9 +240,9 @@ function AtlasTab({ mastered }: { mastered: string[] }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-[#111118] p-5">
       <p className="text-xs uppercase tracking-widest text-amber-300 font-bold">Atlas Mastered</p>
-      <p className="mt-1 text-2xl font-black text-white">{mastered.length} <span className="text-zinc-500 text-base font-normal">/ 261 terms</span></p>
+      <p className="mt-1 text-2xl font-black text-white">{mastered.length} <span className="text-zinc-500 text-base font-normal">/ 426 terms</span></p>
       <div className="mt-3 h-2 bg-black/40 rounded-full overflow-hidden">
-        <div className="h-full bg-gradient-to-r from-amber-400 to-orange-500" style={{ width: `${Math.min(100, (mastered.length / 261) * 100)}%` }} />
+        <div className="h-full bg-gradient-to-r from-amber-400 to-orange-500" style={{ width: `${Math.min(100, (mastered.length / 426) * 100)}%` }} />
       </div>
       <div className="mt-5 flex flex-wrap gap-1.5">
         {mastered.length === 0 ? (

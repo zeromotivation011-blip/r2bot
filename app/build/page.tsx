@@ -13,7 +13,7 @@ export const runtime = 'nodejs'
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const metadata: Metadata = {
-  title: 'Build Real Robots — Adaptive, Step-by-Step | R2BOT',
+  title: 'Build Real Robots — Adaptive, Step-by-Step',
   description:
     'Build 10 real robots from line follower to AI sorting arm. Every step is a question, not a tutorial. Adaptive hints, embedded simulator, end-to-end.',
   keywords: [

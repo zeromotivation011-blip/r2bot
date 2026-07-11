@@ -9,7 +9,7 @@ import CompareClient from './CompareClient'
 export const runtime = 'nodejs'
 
 export const metadata: Metadata = {
-  title: 'Robot vs Robot — Compare Famous Robots | R2BOT',
+  title: 'Robot vs Robot — Compare Famous Robots',
   description: 'Side-by-side compare any two famous robots. See specs, year, country, category and auto-generated insight.',
 }
 

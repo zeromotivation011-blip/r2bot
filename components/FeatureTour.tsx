@@ -63,6 +63,13 @@ const STEPS: Step[] = [
 export function FeatureTour() {
   const [show, setShow] = useState(false);
   const [i, setI] = useState(0);
+  // Direction of the last step change: 1 = forward, -1 = back. Drives the slide direction.
+  const [dir, setDir] = useState(1);
+
+  const go = (n: number) => {
+    setDir(n >= i ? 1 : -1);
+    setI(n);
+  };
 
   useEffect(() => {
     try {
@@ -89,8 +96,8 @@ export function FeatureTour() {
     if (!show) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') dismiss();
-      if (e.key === 'ArrowRight' && i < STEPS.length - 1) setI((n) => n + 1);
-      if (e.key === 'ArrowLeft' && i > 0) setI((n) => n - 1);
+      if (e.key === 'ArrowRight' && i < STEPS.length - 1) go(i + 1);
+      if (e.key === 'ArrowLeft' && i > 0) go(i - 1);
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -107,6 +114,7 @@ export function FeatureTour() {
       aria-modal="true"
       aria-label="Welcome to R2BOT"
       onClick={dismiss}
+      className="r2tour-overlay"
       style={{
         position: 'fixed',
         inset: 0,
@@ -122,10 +130,12 @@ export function FeatureTour() {
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="r2tour-card"
         style={{
           position: 'relative',
           width: '100%',
           maxWidth: 460,
+          overflow: 'hidden',
           background: 'linear-gradient(180deg, #0f172a 0%, #0b1220 100%)',
           border: '1px solid rgba(255,255,255,0.12)',
           borderRadius: 20,
@@ -157,55 +167,67 @@ export function FeatureTour() {
           ×
         </button>
 
-        {i === 0 && (
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, color: '#f59e0b', textTransform: 'uppercase', marginBottom: 10 }}>
-            Welcome to R2BOT
-          </div>
-        )}
-
+        {/* Keyed on `i` so React remounts it each step, replaying the slide+fade. */}
         <div
+          key={i}
+          className="r2tour-step"
           style={{
-            width: 58,
-            height: 58,
-            display: 'grid',
-            placeItems: 'center',
-            fontSize: 30,
-            borderRadius: 16,
-            background: `${step.accent}22`,
-            border: `1px solid ${step.accent}55`,
-            marginBottom: 16,
-          }}
-          aria-hidden
+            animation: 'r2TourStep 400ms cubic-bezier(0.16,1,0.3,1)',
+            ['--r2dx' as string]: dir === 1 ? '22px' : '-22px',
+          } as React.CSSProperties}
         >
-          {step.icon}
+          {i === 0 && (
+            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, color: '#f59e0b', textTransform: 'uppercase', marginBottom: 10 }}>
+              Welcome to R2BOT
+            </div>
+          )}
+
+          <div
+            className="r2tour-icon"
+            style={{
+              width: 58,
+              height: 58,
+              display: 'grid',
+              placeItems: 'center',
+              fontSize: 30,
+              borderRadius: 16,
+              background: `${step.accent}22`,
+              border: `1px solid ${step.accent}55`,
+              marginBottom: 16,
+              animation: 'r2TourIcon 460ms cubic-bezier(0.34,1.56,0.64,1) 60ms both',
+            }}
+            aria-hidden
+          >
+            {step.icon}
+          </div>
+
+          <h2 style={{ margin: '0 0 10px', fontSize: 21, fontWeight: 800, color: '#fff', lineHeight: 1.25 }}>
+            {step.title}
+          </h2>
+          <p style={{ margin: '0 0 22px', fontSize: 15, lineHeight: 1.6, color: '#cbd5e1' }}>
+            {step.body}
+          </p>
+
+          <a
+            href={step.href}
+            onClick={dismiss}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '9px 16px',
+              background: step.accent,
+              color: '#0b1220',
+              fontWeight: 700,
+              fontSize: 14,
+              borderRadius: 999,
+              textDecoration: 'none',
+              marginBottom: 24,
+            }}
+          >
+            {step.cta} <span aria-hidden>→</span>
+          </a>
         </div>
-
-        <h2 style={{ margin: '0 0 10px', fontSize: 21, fontWeight: 800, color: '#fff', lineHeight: 1.25 }}>
-          {step.title}
-        </h2>
-        <p style={{ margin: '0 0 22px', fontSize: 15, lineHeight: 1.6, color: '#cbd5e1' }}>
-          {step.body}
-        </p>
-
-        <a
-          href={step.href}
-          onClick={dismiss}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '9px 16px',
-            background: step.accent,
-            color: '#0b1220',
-            fontWeight: 700,
-            fontSize: 14,
-            borderRadius: 999,
-            textDecoration: 'none',
-            marginBottom: 24,
-          }}
-        >
-          {step.cta} <span aria-hidden>→</span>
-        </a>
 
         {/* Progress dots */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 18 }}>

@@ -244,6 +244,7 @@ export default function VisualizerPage() {
           </VisualSection>
 
           <VisualSection
+            id="pid"
             eyebrow="02 · Control theory"
             title="PID controller — tune it yourself"
             blurb="Drag the sliders to see how Proportional, Integral, and Derivative gains shape how a robot reaches its target."

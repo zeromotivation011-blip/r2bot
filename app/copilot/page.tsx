@@ -6,9 +6,9 @@ import { CopilotPageClient } from './CopilotPageClient';
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export const metadata: Metadata = {
-  title: 'R2 Co-pilot | AI Robotics Assistant for Indian Students — R2BOT',
+  title: 'R2 Co-pilot | AI Robotics Assistant for Students',
   description:
-    'Ask any robotics question. Get instant expert answers. Debug ROS2, understand papers, get career advice — your AI robotics mentor, free for Indian students.',
+    'Ask any robotics question. Get instant expert answers. Debug ROS2, understand papers, get career advice — your AI robotics mentor, free to start.',
   keywords: [
     'AI robotics assistant',
     'robotics chatbot India',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'R2 Co-pilot | R2BOT',
+    title: 'R2 Co-pilot',
     description: 'AI robotics assistant — ROS2 debugging, papers, projects, careers.',
     images: ['/og-default.svg'],
   },

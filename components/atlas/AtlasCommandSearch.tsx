@@ -253,7 +253,7 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
                 type="text"
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setActiveIdx(0) }}
-                placeholder={'Search 1,000+ concepts — try "PID", "SLAM", "self-driving"'}
+                placeholder={'Search 400+ concepts — try "PID", "SLAM", "self-driving"'}
                 aria-label="Search concepts"
                 autoComplete="off"
                 style={{

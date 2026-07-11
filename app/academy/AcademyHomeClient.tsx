@@ -110,7 +110,7 @@ export function AcademyHomeClient({ courses }: { courses: Course[] }) {
           Build robots. Properly.
         </h1>
         <p style={{ color: '#c4b5fd', fontSize: 17, maxWidth: 720, lineHeight: 1.55, margin: 0 }}>
-          Project-based robotics courses designed for India. Spark to Edge.{' '}
+          Project-based robotics courses for learners everywhere. Spark to Edge.{' '}
           <Link href="/diagnostic" style={{ color: '#00E5FF', textDecoration: 'underline', textUnderlineOffset: 4 }}>
             Not sure where to start? Take the 5-minute placement test →
           </Link>

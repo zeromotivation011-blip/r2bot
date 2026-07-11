@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react'
 export type Lead = {
   id: string
   email: string
-  phone: string
+  phone: string | null
   source: string | null
   page: string | null
   created_at: string
@@ -15,7 +15,7 @@ function toCsv(rows: Lead[]): string {
   const header = ['email', 'phone', 'source', 'page', 'created_at']
   const esc = (v: string) => `"${(v ?? '').replace(/"/g, '""')}"`
   const lines = rows.map((r) =>
-    [r.email, r.phone, r.source ?? '', r.page ?? '', r.created_at].map((v) => esc(String(v))).join(','),
+    [r.email, r.phone ?? '', r.source ?? '', r.page ?? '', r.created_at].map((v) => esc(String(v))).join(','),
   )
   return [header.join(','), ...lines].join('\n')
 }
@@ -29,7 +29,7 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
     return leads.filter(
       (l) =>
         l.email.toLowerCase().includes(s) ||
-        l.phone.toLowerCase().includes(s) ||
+        (l.phone ?? '').toLowerCase().includes(s) ||
         (l.page ?? '').toLowerCase().includes(s),
     )
   }, [leads, q])
@@ -86,7 +86,7 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
               filtered.map((l) => (
                 <tr key={l.id} style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   <td style={{ ...td, color: '#f4f4f5' }}>{l.email}</td>
-                  <td style={td}>{l.phone}</td>
+                  <td style={td}>{l.phone || '—'}</td>
                   <td style={td}>{l.source}</td>
                   <td style={{ ...td, color: '#64748b' }}>{l.page}</td>
                   <td style={{ ...td, color: '#64748b', whiteSpace: 'nowrap' }}>

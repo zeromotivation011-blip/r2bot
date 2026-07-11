@@ -18,7 +18,7 @@ import { type Job, formatSalary, timeAgo, TRACK_LABEL } from '@/lib/jobs';
 import { getUserSubscription } from '@/lib/subscription';
 
 export const metadata: Metadata = {
-  title: 'Mission control · R2BOT',
+  title: 'Mission control',
   description: 'Your robotics learning hub — progress, bookmarks, news, and the day’s term.',
 };
 

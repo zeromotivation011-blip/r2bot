@@ -1,6 +1,6 @@
 // app/api/leads/route.ts
-// Captures a lead (email + phone) from the site-wide popup, stores it, and
-// auto-subscribes them to the weekly digest. Both fields required.
+// Captures a lead from the site-wide popup, stores it, and auto-subscribes
+// them to the weekly digest. Email is required; phone is optional.
 
 import type { NextRequest } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
     if (!email || !EMAIL_RE.test(email)) {
       return Response.json({ ok: false, error: 'Please enter a valid email.' }, { status: 400 })
     }
-    if (!phone || !validPhone(phone)) {
+    // Phone is optional, but if one is given it must be valid.
+    if (phone && !validPhone(phone)) {
       return Response.json({ ok: false, error: 'Please enter a valid phone number.' }, { status: 400 })
     }
 
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     const { error: leadErr } = await supabase.from('leads').insert({
       email,
-      phone,
+      phone: phone || null,
       source: body.source || 'popup',
       page: body.page || null,
       user_agent: req.headers.get('user-agent') || null,

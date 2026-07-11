@@ -17,7 +17,7 @@ const TOOLS: { href: string; icon: string; title: string; desc: string }[] = [
   { href: '/admin/news', icon: '📰', title: 'News', desc: 'Curate the news archive — pin, hide, rewrite.' },
   { href: '/admin/blog', icon: '📝', title: 'Blog', desc: 'Write and publish long-form posts.' },
   { href: '/admin/lens', icon: '🔭', title: 'Lens', desc: 'Curate the best robotics video summaries.' },
-  { href: '/admin/leads', icon: '🎯', title: 'Leads', desc: 'Captured email + phone. Search & export CSV.' },
+  { href: '/admin/leads', icon: '🎯', title: 'Leads', desc: 'Captured emails (phone optional). Search & export CSV.' },
   { href: '/admin/discovery', icon: '🔭', title: 'Discovery', desc: 'Auto-discovered topics from arXiv, HN, Reddit.' },
   { href: '/admin/projects', icon: '🤖', title: 'Projects', desc: 'Manage robot build projects.' },
 ];

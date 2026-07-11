@@ -7,7 +7,7 @@ import { LeadsClient, type Lead } from './LeadsClient';
 
 export const metadata: Metadata = {
   title: 'Leads · Admin',
-  description: 'Captured leads (email + phone) from the site.',
+  description: 'Captured leads (email required, phone optional) from the site.',
   robots: { index: false, follow: false },
 };
 

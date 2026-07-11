@@ -170,8 +170,8 @@ Ordered. Each is a real project; do them completely.
 ### Phase B — World-class experience
 4. **Design/UX polish** — elevate visual + interaction quality to a global bar. Consistent design
    system, motion, typography, empty states, mobile perfection, Lighthouse > 90.
-5. **Retention system** — capture + return loops: page-engagement lead popup (email+phone after ~3
-   pages — DONE), weekly digest, streaks, "resume where you left off," return-visit nudges, optional
+5. **Retention system** — capture + return loops: page-engagement lead popup (email required, phone
+   optional, after ~3 pages — DONE), weekly digest, streaks, "resume where you left off," return-visit nudges, optional
    web push. Grow the email list and bring people back.
 6. **Best-in-class SEO pass** — JSON-LD on every template, internal-linking engine across Atlas,
    Core Web Vitals tuning, sitemap coverage, "explained/how it works" keyword ownership worldwide.
@@ -184,7 +184,7 @@ Ordered. Each is a real project; do them completely.
 
 ## 10. DATA & LEAD CAPTURE
 
-- **Leads:** site-wide dismissible popup captures email + phone (both required), triggered once the
+- **Leads:** site-wide dismissible popup captures email (required) + phone (optional), triggered once the
   visitor has viewed ~3 pages (engagement signal) or after a long single-page read. Stored in `leads`
   (migration 0031), auto-subscribed to the newsletter, admin-viewable at `/admin/leads` with CSV export.
 - **Newsletter:** `newsletter_subscribers` (0021/0030) → weekly digest (Friday cron), one-click

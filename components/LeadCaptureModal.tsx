@@ -131,8 +131,8 @@ export function LeadCaptureModal() {
                 style={inputStyle}
               />
               <input
-                type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)}
-                placeholder="Phone (WhatsApp preferred)" autoComplete="tel"
+                type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+                placeholder="Phone (optional, WhatsApp preferred)" autoComplete="tel"
                 style={inputStyle}
               />
               <button

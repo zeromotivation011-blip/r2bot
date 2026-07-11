@@ -30,7 +30,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const robot = getRobotBySlug(slug);
-  if (!robot) return { title: 'Robot not found | R2BOT' };
+  if (!robot) return { title: 'Robot not found' };
   const url = `${BASE_URL}/robots/${robot.slug}`;
   return {
     title: robot.metaTitle,

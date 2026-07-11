@@ -10,7 +10,7 @@ import { getDailyChallenge, getRecentChallenges } from '@/lib/challenges';
 import { ChallengeArchive } from './ChallengeArchive';
 
 export const metadata: Metadata = {
-  title: 'Daily Robot Challenge · R2BOT',
+  title: 'Daily Robot Challenge',
   description:
     'One scenario. Every day. Build engineering intuition with daily robotics puzzles — from beginner Spark to advanced Edge.',
 };

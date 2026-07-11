@@ -27,7 +27,7 @@ export async function generateMetadata(
   if (!project) return { title: 'Robot not found — R2BOT Build' }
   const { meta } = project
   return {
-    title: `${meta.title} — Build it Step-by-Step | R2BOT`,
+    title: `${meta.title} — Build it Step-by-Step`,
     description: meta.tagline,
     alternates: { canonical: `${BASE_URL}/build/${meta.slug}` },
     openGraph: {

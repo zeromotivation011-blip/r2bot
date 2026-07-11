@@ -12,7 +12,7 @@ export const runtime = 'nodejs'
 export const revalidate = 300 // 5 minutes — fresh enough for new submissions
 
 export const metadata: Metadata = {
-  title: 'Community Builds | R2BOT',
+  title: 'Community Builds',
   description:
     'Real robots built by R2BOT learners. Browse, like, and submit your own project — the proof that learning here turns into things that move.',
   alternates: { canonical: `${BASE_URL}/community` },
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: `${BASE_URL}/community`,
     siteName: 'R2BOT',
-    title: 'Community Builds — R2BOT',
+    title: 'Community Builds',
     description: 'Browse robots built by R2BOT learners.',
     images: [{ url: '/og-default.svg', width: 1200, height: 630 }],
   },

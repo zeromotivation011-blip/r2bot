@@ -11,7 +11,7 @@ import { CopyButtonClient } from '@/components/CopyButtonClient';
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export const metadata: Metadata = {
-  title: 'Run Real ROS2 In Your Browser — R2BOT',
+  title: 'Run Real ROS2 In Your Browser',
   description: 'No Linux. No installation. No VM. Real ROS2 Humble, powered by WebAssembly. Practise topics, nodes, and cmd_vel publishers live.',
   alternates: { canonical: `${BASE_URL}/ros2` },
 };

@@ -183,7 +183,7 @@ export default async function PulseArticlePage(
           <p style={{ marginTop: 40, fontSize: 13, color: 'var(--muted)', textAlign: 'center' }}>
             Spotted something off?{' '}
             <a
-              href={`mailto:ravi6703@gmail.com?subject=${encodeURIComponent(`Error report: ${article.title}`)}&body=${encodeURIComponent(`Page: ${canonical}\nIssue: `)}`}
+              href={`mailto:hello@r2bot.in?subject=${encodeURIComponent(`Error report: ${article.title}`)}&body=${encodeURIComponent(`Page: ${canonical}\nIssue: `)}`}
               style={{ color: 'var(--cyan)', borderBottom: '1px dashed var(--border-2)' }}
             >
               Report an error →

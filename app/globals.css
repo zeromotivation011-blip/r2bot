@@ -641,6 +641,14 @@ font { color: inherit !important; background: transparent !important; }
 /* ---- Feature tour ---- */
 @keyframes r2TourFade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes r2TourPop { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+/* Per-step content transition — direction set via the --r2dx custom property */
+@keyframes r2TourStep { from { opacity: 0; transform: translateX(var(--r2dx, 18px)); } to { opacity: 1; transform: translateX(0); } }
+/* Playful icon entrance on each step */
+@keyframes r2TourIcon {
+  0%   { opacity: 0; transform: scale(0.6) rotate(-8deg); }
+  60%  { opacity: 1; transform: scale(1.08) rotate(3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
 @media (prefers-reduced-motion: reduce) {
-  [role="dialog"] { animation: none !important; }
+  .r2tour-overlay, .r2tour-card, .r2tour-step, .r2tour-icon { animation: none !important; }
 }

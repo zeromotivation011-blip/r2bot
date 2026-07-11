@@ -8,7 +8,7 @@ import SettingsWrapper from './SettingsWrapper'
 export const runtime = 'nodejs'
 
 export const metadata: Metadata = {
-  title: 'Settings — R2BOT',
+  title: 'Settings',
   description: 'Manage your R2BOT profile, password, and preferences.',
   robots: { index: false, follow: false },
 }
