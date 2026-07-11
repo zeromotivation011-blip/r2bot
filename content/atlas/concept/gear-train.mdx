@@ -1,0 +1,78 @@
+---
+title: Gear Train
+slug: gear-train
+bucket: concept
+category: actuators
+summary: >-
+  A gear train is a series of meshing gears that transmits and transforms rotation — multiplying torque,
+  changing speed, or redirecting motion, the mechanical heart of how a robot's motors drive its joints.
+difficulty: 2
+tags:
+  - actuators
+  - mechanism
+  - mechanics
+seeAlso:
+  - gear-ratio
+  - planetary-gearbox
+  - harmonic-drive
+  - backlash
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Gear train (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Gear_train'
+  - title: 'Gears and gear trains'
+    url: 'https://en.wikipedia.org/wiki/Gear'
+laymanExplanation: >-
+  A gear train is a set of gears working together to pass power along, changing the speed and force as it
+  goes. It's how a fast, weak motor gets turned into the slow, strong motion a robot joint needs.
+technicalDefinition: >-
+  A gear train is a set of meshing gears transmitting rotation between shafts, with the overall gear ratio
+  set by the ratio of driven to driving teeth, multiplying torque and dividing speed accordingly.
+quizQuestion:
+  q: The overall ratio of a gear train is determined by…
+  options:
+    - The color of the gears
+    - The ratio of driven to driving gear teeth
+    - The battery voltage
+    - The number of motors
+  answer: 1
+  explanation: >-
+    The gear ratio comes from the tooth counts (driven ÷ driving); a larger driven gear turns slower with
+    more torque.
+---
+
+A motor spins fast and weak; a robot joint needs to turn slow and strong, sometimes in a different direction or place. The mechanism that bridges the two is a **gear train** — meshing gears that reshape rotation.
+
+## What it is
+
+A gear train is a **series of meshing gears** that transmits rotation from a motor to an output. As gears mesh, a small gear driving a large one turns the large one **slower but with more torque** (and vice versa). Chain several stages and you can achieve big transformations. The overall **[gear ratio](/atlas/concept/gear-ratio)** is set by the tooth counts — driven teeth ÷ driving teeth — and it multiplies torque and divides speed by that factor.
+
+```diagram
+{ "type": "flow", "title": "Reshaping rotation, stage by stage", "nodes": ["Motor: fast, weak", "Gear stage(s)", "Ratio changes speed/torque", "Output: slow, strong"], "caption": "Each meshing pair changes the speed-torque balance; chaining stages gives large reductions to turn motor spin into useful joint motion." }
+```
+
+## What gear trains do
+
+- **Reduce speed / multiply torque** — the most common job in robots: a reduction gear train turns a fast, weak motor into a slow, strong joint drive.
+- **Change direction of rotation** — meshing gears reverse spin; an idler gear can preserve it.
+- **Redirect and relocate** — bevel gears turn motion 90°, worm gears do that with huge reduction, and gear trains move power across a mechanism.
+- **Split or combine** — drive multiple outputs from one input.
+
+## Types you'll meet in robots
+
+- **Spur / helical trains** — simple parallel-shaft reductions (helical are quieter, smoother).
+- **[Planetary gearbox](/atlas/concept/planetary-gearbox)** — compact, coaxial, high torque density — extremely common on robot joints.
+- **[Harmonic drive](/atlas/concept/harmonic-drive)** — near-zero-[backlash](/atlas/concept/backlash) high reduction, standard in precision robot arms.
+- **Worm, bevel, and cycloidal** — for right-angle drive, self-locking, or heavy-duty low-backlash needs.
+
+## The trade-offs
+
+Gearing isn't free: it adds **[backlash](/atlas/concept/backlash)** (slack that hurts precision), **friction** (lost efficiency and reduced [backdrivability](/atlas/concept/backdrivability)), weight, and cost. Choosing the gear train — ratio, type, and quality — is a core robot-design decision balancing torque, precision, efficiency, and how the joint should feel and interact.
+
+## Why it matters
+
+The gear train is the fundamental power-transmission element between a robot's motors and its motion — the piece that makes practical robot joints possible by converting motor characteristics into what the task needs. Understanding gear trains (and their backlash, friction, and efficiency costs) is essential to designing and understanding any geared robot.
+
+## Related
+
+[Gear ratio](/atlas/concept/gear-ratio) · [Planetary gearbox](/atlas/concept/planetary-gearbox) · [Harmonic drive](/atlas/concept/harmonic-drive) · [Backlash](/atlas/concept/backlash)

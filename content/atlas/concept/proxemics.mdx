@@ -1,0 +1,80 @@
+---
+title: Proxemics (in Robotics)
+slug: proxemics
+bucket: concept
+category: control
+summary: >-
+  Proxemics is the study of personal space — and in robotics, teaching robots to respect it, so they move and
+  position themselves in ways that feel comfortable and non-threatening to the people around them.
+difficulty: 2
+tags:
+  - human-robot-interaction
+  - social
+  - navigation
+seeAlso:
+  - human-robot-interaction
+  - social-robotics
+  - companion-robot
+  - autonomous-mobile-robot
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Proxemics (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Proxemics'
+  - title: 'Social robot navigation'
+    url: 'https://en.wikipedia.org/wiki/Human-robot_interaction'
+laymanExplanation: >-
+  Proxemics is about personal space — how close is too close. A robot with good proxemics keeps a comfortable
+  distance, doesn't sneak up behind you, and approaches from where you can see it, so it feels polite rather
+  than creepy.
+technicalDefinition: >-
+  Proxemics in robotics models human personal-space zones and social spatial norms so robots navigate,
+  approach, and position themselves in socially acceptable, comfortable ways.
+quizQuestion:
+  q: Applying proxemics helps a robot…
+  options:
+    - Move faster
+    - Respect people's personal space so it feels comfortable, not threatening
+    - Use less battery
+    - See in the dark
+  answer: 1
+  explanation: >-
+    Proxemics guides a robot to keep socially appropriate distances and approach angles, so people feel
+    comfortable rather than crowded or startled.
+---
+
+A robot can navigate perfectly by the geometry and still make people uncomfortable — by getting too close, cutting them off, or looming from behind. Teaching robots to respect personal space is **proxemics**, and it's central to robots that share human environments pleasantly.
+
+## What it is
+
+Proxemics is the study (originally from anthropology, by Edward Hall) of how people use **personal space** — the invisible comfort zones around us. Roughly:
+
+- **Intimate** (very close) — reserved for close relationships.
+- **Personal** (about an arm's length) — friends and conversation.
+- **Social** — normal interactions with acquaintances and strangers.
+- **Public** — larger distances, e.g. an audience.
+
+In robotics, proxemics means **modeling these zones and social norms** so a robot positions and moves itself in ways that feel **comfortable and appropriate**, not intrusive or alarming.
+
+```diagram
+{ "type": "flow", "title": "Respecting the comfort zones", "nodes": ["Person with personal-space zones", "Robot senses the person", "Keep appropriate distance + approach", "Interaction feels comfortable"], "caption": "A socially-aware robot treats the space around a person as costly to invade, keeping polite distances and approaching from considerate directions." }
+```
+
+## Why robots need it
+
+A robot that ignores proxemics is technically safe but socially clumsy — and that undermines acceptance:
+
+- **Comfort and trust.** People dislike a robot that crowds them, blocks their path, or approaches from behind unseen. Good proxemics makes robots feel considerate and predictable.
+- **Social navigation.** A delivery or [service robot](/atlas/concept/autonomous-mobile-robot) in a hallway should pass people the way a polite person would — leaving room, not playing chicken. This adds "social cost" layers to navigation (people are more than obstacles to skim past).
+- **Approach behavior.** How a [companion](/atlas/concept/companion-robot) or assistant robot comes up to someone — from the front, at a comfortable distance, at a non-threatening speed — strongly shapes how it's perceived.
+
+## How it's applied
+
+Robots incorporate proxemics by adding **social/proxemic cost** around people in their navigation (inflating personal-space zones in the costmap), choosing socially acceptable **approach angles and distances**, moving at **comfortable speeds**, and signaling intent (where they'll go next). It's a key part of **socially-aware navigation** and broader [human-robot interaction](/atlas/concept/human-robot-interaction).
+
+## Why it matters
+
+As robots move out of cages and factories into homes, hospitals, shops, and sidewalks, being *socially* acceptable matters as much as being *physically* safe. Proxemics is how robots learn the unspoken rules of personal space — turning a technically-correct machine into one people are comfortable sharing their world with.
+
+## Related
+
+[Human-robot interaction](/atlas/concept/human-robot-interaction) · [Social robotics](/atlas/concept/social-robotics) · [Companion robot](/atlas/concept/companion-robot) · [Autonomous mobile robot](/atlas/concept/autonomous-mobile-robot)

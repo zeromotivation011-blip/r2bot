@@ -1,0 +1,81 @@
+---
+title: Levels of Autonomy
+slug: levels-of-autonomy
+bucket: concept
+category: control
+summary: >-
+  Levels of autonomy classify how much a machine does on its own versus how much a human does — from full
+  manual control to full self-driving — a framework that clarifies what 'autonomous' actually means for any
+  robot.
+difficulty: 2
+tags:
+  - autonomy
+  - self-driving
+  - concepts
+seeAlso:
+  - autonomy
+  - autonomous-vehicle
+  - shared-autonomy
+  - teleoperation
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'SAE J3016 — Levels of driving automation'
+    url: 'https://en.wikipedia.org/wiki/Self-driving_car#Levels_of_driving_automation'
+  - title: 'Levels of autonomy'
+    url: 'https://en.wikipedia.org/wiki/Vehicular_automation'
+laymanExplanation: >-
+  Levels of autonomy are a scale for how much a robot or vehicle handles by itself. At the bottom a human does
+  everything; at the top the machine does everything. The famous version is the 0–5 scale for self-driving
+  cars.
+technicalDefinition: >-
+  Levels of autonomy define a graded scale of machine self-governance versus human involvement; SAE J3016
+  specifies levels 0–5 for driving automation, from no automation to full autonomy.
+quizQuestion:
+  q: In the SAE self-driving scale, the key jump is between which levels?
+  options:
+    - 0 and 1
+    - Levels 2 and 3 (when the car, not the human, monitors the driving)
+    - 4 and 5
+    - There is no key jump
+  answer: 1
+  explanation: >-
+    Levels 0–2 keep the human responsible for monitoring; at Level 3+ the system takes over monitoring the
+    driving environment — a major responsibility shift.
+---
+
+"Autonomous" is a fuzzy word — a Roomba and a self-driving taxi are both "autonomous," but wildly different. **Levels of autonomy** give a precise scale for *how much* a machine governs itself versus how much a human does.
+
+## The idea
+
+Autonomy isn't binary; it's a **spectrum** from full manual control to full self-governance. A levels framework pins down where a given system sits: what the machine handles, what the human handles, and — crucially — **who is responsible** when something happens.
+
+```diagram
+{ "type": "flow", "title": "A spectrum, not a switch", "nodes": ["Human does everything", "Human + machine share", "Machine does most", "Machine does everything"], "caption": "Autonomy ranges continuously from fully manual to fully self-governing. A levels scale marks defined points along it and clarifies the human's role at each." }
+```
+
+## The famous example: self-driving levels
+
+The best-known scheme is **SAE J3016** for driving, levels **0–5**:
+
+- **Level 0** — no automation; the human does everything.
+- **Level 1** — driver assistance (adaptive cruise *or* lane-keeping).
+- **Level 2** — partial automation (steering *and* speed together), but the **human must monitor constantly** and be ready to take over.
+- **Level 3** — conditional automation; the **car monitors the driving** in defined conditions, but the human must take over when asked.
+- **Level 4** — high automation; fully self-driving within a limited domain (a mapped city, good weather), no human needed there.
+- **Level 5** — full automation; drives anywhere a human could, no steering wheel required.
+
+The pivotal jump is **2 → 3**: below it, the *human* is responsible for watching the road; at 3 and above, the *system* is — a profound shift in responsibility, and where much of the legal and technical difficulty lies.
+
+## Why the framework matters
+
+- **Clarity and honesty.** It cuts through marketing hype — a "self-driving" claim means something specific. Level 2 systems that get treated as Level 4 by drivers are a real safety problem.
+- **Regulation and liability.** Who's responsible in a crash depends heavily on the level.
+- **Beyond cars.** Similar autonomy scales apply to drones, ships, [industrial robots](/atlas/concept/autonomy), and military systems — anywhere the human-vs-machine division of labor needs defining, including [shared-autonomy](/atlas/concept/shared-autonomy) and [teleoperation](/atlas/concept/teleoperation) at the lower end.
+
+## Why it matters
+
+Levels of autonomy give the field a shared, precise language for *how autonomous* a system really is — essential for safety, regulation, honest communication, and design. Understanding the scale (especially the responsibility shift in the middle) is key to reasoning clearly about any "autonomous" robot or vehicle.
+
+## Related
+
+[Autonomy](/atlas/concept/autonomy) · [Autonomous vehicle](/atlas/concept/autonomous-vehicle) · [Shared autonomy](/atlas/concept/shared-autonomy) · [Teleoperation](/atlas/concept/teleoperation)

@@ -1,0 +1,81 @@
+---
+title: Risk Assessment (Robotics)
+slug: risk-assessment-robotics
+bucket: concept
+category: control
+summary: >-
+  Risk assessment is the systematic process of identifying what could go wrong with a robot and reducing each
+  hazard to an acceptable level — the required first step before any robot is deployed near people.
+difficulty: 2
+tags:
+  - safety
+  - standards
+  - process
+seeAlso:
+  - iso-10218
+  - functional-safety
+  - emergency-stop
+  - collaborative-robot-safety
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ISO 12100 — Risk assessment for machinery'
+    url: 'https://en.wikipedia.org/wiki/Risk_assessment'
+  - title: 'ISO 10218 — Robot safety'
+    url: 'https://en.wikipedia.org/wiki/ISO_10218'
+laymanExplanation: >-
+  Risk assessment is thinking through every way a robot could hurt someone or cause damage, then adding
+  safeguards until each risk is acceptably low. It's the required homework before a robot is allowed to work
+  around people.
+technicalDefinition: >-
+  Risk assessment systematically identifies hazards, estimates the risk (severity × probability) of each, and
+  applies risk-reduction measures until residual risk is acceptable, per standards like ISO 12100.
+quizQuestion:
+  q: The preferred first choice in reducing a robot hazard is to…
+  options:
+    - Add a warning sign
+    - Eliminate or reduce the hazard by design
+    - Hope it never happens
+    - Speed the robot up
+  answer: 1
+  explanation: >-
+    The hierarchy of controls prioritizes designing out the hazard first; guarding and warnings come after,
+    because inherently safe design is most reliable.
+---
+
+Before any robot is allowed to work near people, one process comes first — and it's required by law and standards worldwide: **risk assessment**. It's the disciplined way of asking "what could go wrong, and have we made it safe enough?"
+
+## The process
+
+Risk assessment (formalized in ISO 12100 for machinery and [ISO 10218](/atlas/concept/iso-10218) for robots) follows a systematic loop:
+
+1. **Identify hazards.** List every way the robot could cause harm — crushing, impact, pinch points, sharp tools, electrical, the workpiece, unexpected motion, and interactions with people.
+2. **Estimate the risk** of each — combining **severity** (how bad the harm) with **probability** (how likely, how often exposed, how avoidable).
+3. **Reduce the risk** with safeguards, then **re-assess** the residual risk. Repeat until every risk is acceptably low.
+
+```diagram
+{ "type": "loop", "title": "Identify, estimate, reduce, repeat", "nodes": ["Identify hazards", "Estimate risk (severity × likelihood)", "Apply risk reduction", "Re-assess residual risk"], "caption": "The cycle continues until residual risk is acceptable. It's iterative — each safeguard changes the picture and is re-evaluated." }
+```
+
+## The hierarchy of controls
+
+Not all safeguards are equal. Risk reduction follows a strict **priority order**:
+
+1. **Inherently safe design first** — eliminate or reduce the hazard itself (remove pinch points, limit force and speed as in [power and force limiting](/atlas/concept/power-and-force-limiting), round edges). Most reliable, because it can't be bypassed.
+2. **Safeguarding and protective measures** — guards, [light curtains](/atlas/concept/safety-light-curtain), interlocks, [emergency stops](/atlas/concept/emergency-stop), [functional-safety](/atlas/concept/functional-safety) systems.
+3. **Information for use** — warnings, training, signage, procedures. Weakest, because it relies on people behaving correctly.
+
+You always prefer the highest level that's feasible — a warning label is a last resort, not a substitute for a guard.
+
+## Why it's non-negotiable
+
+- **It's required.** Regulations and standards mandate a documented risk assessment before deployment; it's central to CE marking and legal compliance.
+- **It's specific.** The same robot in two different cells has different risks — the assessment is about *this* application, not the robot in the abstract.
+- **It drives the design.** It determines which safeguards ([SRMS](/atlas/concept/safety-rated-monitored-stop), fencing, force limits) are needed and to what [safety integrity level](/atlas/concept/functional-safety).
+
+## Why it matters
+
+Risk assessment is the foundation of all robot safety — the structured discipline that turns "seems fine" into "demonstrably safe enough." Every safeguard on a robot exists because a risk assessment called for it. It's the essential, mandatory groundwork for deploying robots responsibly around humans.
+
+## Related
+
+[ISO 10218](/atlas/concept/iso-10218) · [Functional safety](/atlas/concept/functional-safety) · [Emergency stop](/atlas/concept/emergency-stop) · [Collaborative robot safety](/atlas/concept/collaborative-robot-safety)

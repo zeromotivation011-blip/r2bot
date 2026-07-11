@@ -1,0 +1,74 @@
+---
+title: Safety-Rated Monitored Stop
+slug: safety-rated-monitored-stop
+bucket: concept
+category: control
+summary: >-
+  A safety-rated monitored stop halts a robot — with power still on — whenever a person enters its shared
+  space, and lets it resume automatically when they leave, the simplest of the four collaborative-safety
+  methods.
+difficulty: 2
+tags:
+  - safety
+  - collaborative-robots
+  - standards
+seeAlso:
+  - collaborative-robot-safety
+  - speed-and-separation-monitoring
+  - emergency-stop
+  - iso-ts-15066
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ISO/TS 15066 — Collaborative operation'
+    url: 'https://en.wikipedia.org/wiki/Cobot'
+  - title: 'Monitored standstill'
+    url: 'https://en.wikipedia.org/wiki/Cobot'
+laymanExplanation: >-
+  A safety-rated monitored stop makes a robot pause and hold still (but stay powered) when a person steps into
+  its area, then continue on its own once the person steps back out — no button press needed to restart.
+technicalDefinition: >-
+  A safety-rated monitored stop is a collaborative method where the robot maintains a monitored standstill
+  (power on, position held) while a human is present, resuming automatically when the space is clear.
+quizQuestion:
+  q: A safety-rated monitored stop differs from an emergency stop in that it…
+  options:
+    - Cuts all power permanently
+    - Holds position with power on and resumes automatically when clear
+    - Requires a manual reset every time
+    - Speeds the robot up
+  answer: 1
+  explanation: >-
+    It keeps power on and holds the robot still while a person is present, resuming automatically — unlike an
+    e-stop, which is a hard, latched halt requiring deliberate reset.
+---
+
+The simplest way to let a person safely enter a robot's space is also intuitive: the robot just **stops and waits** while they're there, then carries on when they leave. That's a **safety-rated monitored stop (SRMS)**.
+
+## What it is
+
+A safety-rated monitored stop puts the robot into a **monitored standstill**: it holds its position and **keeps power on** (so it's still holding a part, still ready) but does not move while a human is in the shared zone. Safety-rated sensors (area scanners, light curtains, mats) detect the person's presence, and safety-rated logic guarantees the robot truly is stopped. When the person **leaves**, the robot **resumes automatically** — no manual restart.
+
+```diagram
+{ "type": "flow", "title": "Stop while present, resume when clear", "nodes": ["Person enters zone", "Robot holds still (power on)", "Person leaves", "Robot resumes automatically"], "caption": "The robot pauses only while someone shares its space, then continues on its own — enabling safe hand-offs and shared tasks without a full shutdown." }
+```
+
+## SRMS vs emergency stop
+
+They sound similar but serve different roles:
+
+- **[Emergency stop](/atlas/concept/emergency-stop)** — a *hard*, latched halt (often cutting power) for a fault or danger; requires a deliberate human reset to restart.
+- **Safety-rated monitored stop** — a *routine*, automatic pause for collaboration; power stays on, position is held, and it resumes by itself when safe.
+
+SRMS is for the normal rhythm of people and robots sharing a task; the e-stop is the emergency backstop.
+
+## Where it fits
+
+SRMS is the first and simplest of the four collaborative methods in [ISO/TS 15066](/atlas/concept/iso-ts-15066), alongside hand guiding, [speed and separation monitoring](/atlas/concept/speed-and-separation-monitoring), and [power and force limiting](/atlas/concept/power-and-force-limiting). It's common in **hand-off stations** (a robot presents a part, stops while the worker takes it, resumes) and shared cells where a person only occasionally enters. Because the robot fully stops when anyone is near, it's easy to justify safely — the trade-off being lost productivity during those pauses (which SSM avoids by slowing rather than stopping).
+
+## Why it matters
+
+The safety-rated monitored stop is a foundational, easy-to-understand method for human-robot collaboration — letting people safely share a robot's space with automatic, frictionless resumption. It's often the entry point to fenceless operation and a building block of flexible, collaborative automation.
+
+## Related
+
+[Collaborative robot safety](/atlas/concept/collaborative-robot-safety) · [Speed and separation monitoring](/atlas/concept/speed-and-separation-monitoring) · [Emergency stop](/atlas/concept/emergency-stop) · [ISO/TS 15066](/atlas/concept/iso-ts-15066)

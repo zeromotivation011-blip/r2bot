@@ -1,0 +1,77 @@
+---
+title: Power and Force Limiting
+slug: power-and-force-limiting
+bucket: concept
+category: control
+summary: >-
+  Power and force limiting makes a robot inherently gentle — capped in speed and force so that even if it
+  touches a person, it can't hurt them — the collaborative-safety method behind fenceless cobots that share a
+  workbench with people.
+difficulty: 3
+tags:
+  - safety
+  - collaborative-robots
+  - standards
+seeAlso:
+  - collaborative-robot-safety
+  - speed-and-separation-monitoring
+  - iso-ts-15066
+  - series-elastic-actuator
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ISO/TS 15066 — biomechanical limits'
+    url: 'https://en.wikipedia.org/wiki/Cobot'
+  - title: 'Power and force limiting cobots'
+    url: 'https://en.wikipedia.org/wiki/Cobot'
+laymanExplanation: >-
+  Power and force limiting means a robot is built and controlled to be gentle enough that bumping into a
+  person can't injure them. It moves slowly and softly, and stops or gives way at the first sign of contact —
+  so no fence is needed.
+technicalDefinition: >-
+  Power and force limiting is a collaborative-safety method that keeps a robot's speed, force, and pressure
+  below biomechanical injury thresholds, so incidental contact with a human is inherently safe.
+quizQuestion:
+  q: Power and force limiting makes contact safe by…
+  options:
+    - Moving faster
+    - Keeping speed and force below injury thresholds and stopping on contact
+    - Adding a cage
+    - Ignoring collisions
+  answer: 1
+  explanation: >-
+    The robot is inherently limited in speed and force (below biomechanical pain/injury limits) and detects
+    contact to stop or yield, so touching a person doesn't harm them.
+---
+
+Most collaborative-safety methods keep a robot *away* from people. **Power and force limiting (PFL)** takes the opposite approach: make the robot so **inherently gentle** that touching a person is safe — so it can share a workbench with no fence at all.
+
+## The idea
+
+A PFL robot is designed and controlled so its **speed, force, and contact pressure stay below the levels that would injure a human**. If it does bump into someone, the contact is limited to a harmless push, and the robot **detects the collision and stops or backs off** immediately. Safety comes from the robot's *own* limits, not from keeping distance — which is why these are the true "collaborative" robots you see working elbow-to-elbow with people.
+
+```diagram
+{ "type": "flow", "title": "Gentle by design", "nodes": ["Cap speed + force", "Sense contact", "Stop / yield on touch", "Contact stays harmless"], "caption": "Because force and speed are kept below injury thresholds and contact is detected instantly, incidental touch causes no harm — no barrier required." }
+```
+
+## How it's achieved
+
+- **Limited speed and force** in software, monitored by safety-rated systems.
+- **Collision detection** — the robot senses unexpected resistance ([force-torque](/atlas/concept/force-torque-sensor) or motor-current sensing) and reacts in milliseconds.
+- **Physical gentleness** — rounded edges, no pinch points, low inertia, and sometimes compliant actuation ([series-elastic actuators](/atlas/concept/series-elastic-actuator)) that cushion contact.
+- **Validated against biomechanical limits.** [ISO/TS 15066](/atlas/concept/iso-ts-15066) specifies pain/injury thresholds for each body region; a PFL robot's contact forces must stay under them (verified by testing).
+
+## The trade-off
+
+Inherent gentleness has a cost: PFL robots are **slower and weaker** than caged industrial arms. Keeping forces safe limits payload and speed, so they're used where light, delicate, collaborative tasks matter more than raw throughput. For heavier or faster work near people, [speed and separation monitoring](/atlas/concept/speed-and-separation-monitoring) (keep distance) is used instead — and many cells blend both.
+
+## Where you'll see it
+
+The classic collaborative "cobots" (Universal Robots, Franka, and kin) on assembly benches, machine tending, light packaging, and lab automation — working directly alongside people without fencing.
+
+## Why it matters
+
+Power and force limiting is the method that most fully realizes the collaborative-robot vision: a robot safe enough to *touch*, sharing a person's workspace with no barrier. It reframes safety from "separate the human" to "make the machine harmless," and it's central to flexible, human-centered automation.
+
+## Related
+
+[Collaborative robot safety](/atlas/concept/collaborative-robot-safety) · [Speed and separation monitoring](/atlas/concept/speed-and-separation-monitoring) · [ISO/TS 15066](/atlas/concept/iso-ts-15066) · [Series elastic actuator](/atlas/concept/series-elastic-actuator)

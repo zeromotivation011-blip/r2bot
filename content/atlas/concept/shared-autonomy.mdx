@@ -1,0 +1,88 @@
+---
+title: Shared Autonomy
+slug: shared-autonomy
+bucket: concept
+category: control
+summary: >-
+  Shared autonomy blends human intent with robot autonomy — the person gives high-level guidance while the
+  robot handles the fine details — combining human judgment with machine precision for assistive robots,
+  teleoperation, and beyond.
+difficulty: 3
+tags:
+  - autonomy
+  - human-robot-interaction
+  - control
+seeAlso:
+  - teleoperation
+  - levels-of-autonomy
+  - human-robot-interaction
+  - prosthetic-hand
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Shared control (robotics)'
+    url: 'https://en.wikipedia.org/wiki/Shared_control'
+  - title: 'Shared autonomy research'
+    url: 'https://en.wikipedia.org/wiki/Human-robot_interaction'
+laymanExplanation: >-
+  Shared autonomy means a human and a robot drive together: the person indicates what they want, and the
+  robot fills in the precise, tricky parts. It's like power steering for robot control — you steer, the
+  system smooths and assists.
+technicalDefinition: >-
+  Shared autonomy blends human input with autonomous control, with the robot inferring the operator's intent
+  and assisting to achieve it, dividing responsibility dynamically between human and machine.
+quizQuestion:
+  q: In shared autonomy, the typical division of labor is…
+  options:
+    - The human does everything
+    - The human gives high-level intent; the robot handles fine execution
+    - The robot ignores the human
+    - Neither does anything
+  answer: 1
+  explanation: >-
+    The human provides goals/guidance and the robot autonomously handles the precise, low-level details —
+    blending judgment with precision.
+---
+
+Full teleoperation is exhausting and imprecise; full autonomy can't handle every situation or know what the user *wants*. **Shared autonomy** splits the difference — human and robot control *together*, each doing what they're best at.
+
+## The idea
+
+In shared autonomy, control is **divided dynamically** between person and machine:
+
+- The **human** provides **high-level intent and judgment** — *what* to do, *which* object, *where* to go.
+- The **robot** handles the **precise, difficult low-level execution** — the exact trajectory, the fine grasp, the stability.
+
+Often the robot **infers the operator's intent** from their partial input and **assists** toward it, correcting shaky or imprecise commands. It's like power steering or a driver-assist system for robot control: you point, it perfects.
+
+```diagram
+{ "type": "flow", "title": "Human intent + robot precision", "nodes": ["Human signals intent", "Robot infers the goal", "Robot executes finely", "Blended result"], "caption": "The person supplies judgment and direction; the robot supplies precision and handles the hard details — neither fully in charge, both contributing." }
+```
+
+## Why it's powerful
+
+- **Best of both.** Human adaptability and common sense, plus machine precision and speed — better than either alone in messy, real tasks.
+- **Reduces operator burden.** [Teleoperating](/atlas/concept/teleoperation) a complex robot is hard; letting the robot handle stabilization and fine motion makes control far easier and less tiring.
+- **Handles the unmodeled.** The human covers situations the autonomy can't, while autonomy covers the tedious precision the human can't manage remotely.
+
+## Where you'll see it
+
+- **Assistive robotics.** A wheelchair-mounted arm where a person with limited motor control indicates "grab that cup" and the robot does the delicate grasping — hugely empowering. Similar ideas assist [prosthetic](/atlas/concept/prosthetic-hand) control.
+- **Teleoperation.** Space, undersea, and surgical robots where the operator sets intent and the robot handles latency, stabilization, and fine motion.
+- **Assisted driving.** Lane-keeping and collision avoidance that correct a human driver — shared control on the road.
+- **Robot learning.** A human corrects or guides a learning policy (shared control during training).
+
+It sits in the middle of the [levels of autonomy](/atlas/concept/levels-of-autonomy) spectrum — neither full manual nor full autonomy.
+
+## The challenges
+
+- **Intent inference.** Guessing what the human wants from ambiguous input is hard and can feel wrong if mis-inferred.
+- **Arbitration.** Deciding *how much* the robot should assist vs defer, and handing control back and forth smoothly, without fighting the user.
+- **Trust and transparency.** The person must understand and trust what the robot is doing on their behalf ([HRI](/atlas/concept/human-robot-interaction)).
+
+## Why it matters
+
+Shared autonomy is a practical, powerful middle ground between teleoperation and full autonomy — the model behind assistive robots that restore capability to people, easier remote operation, and safer human-machine driving. As robots get more capable but not yet fully autonomous, blending human and machine control is often the *right* answer, not a compromise.
+
+## Related
+
+[Teleoperation](/atlas/concept/teleoperation) · [Levels of autonomy](/atlas/concept/levels-of-autonomy) · [Human-robot interaction](/atlas/concept/human-robot-interaction) · [Prosthetic hand](/atlas/concept/prosthetic-hand)

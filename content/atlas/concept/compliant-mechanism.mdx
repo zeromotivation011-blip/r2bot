@@ -1,0 +1,78 @@
+---
+title: Compliant Mechanism
+slug: compliant-mechanism
+bucket: concept
+category: actuators
+summary: >-
+  A compliant mechanism gets its motion by flexing rather than from joints and bearings — a single elastic
+  part that bends to move, giving robots hinge-free, friction-free, ultra-precise mechanisms in one piece.
+difficulty: 3
+tags:
+  - mechanism
+  - design
+  - hardware
+seeAlso:
+  - flexure-joint
+  - series-elastic-actuator
+  - metamaterial-robot
+  - additive-manufacturing
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Compliant mechanism (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Compliant_mechanism'
+  - title: 'Howell — Compliant Mechanisms'
+    url: 'https://www.compliantmechanisms.byu.edu/'
+laymanExplanation: >-
+  A compliant mechanism moves by bending, not by using hinges. Think of a plastic clip or a binder clip's
+  spring — it's one flexible piece that flexes to do its job, with no separate moving parts to wear or
+  loosen.
+technicalDefinition: >-
+  A compliant mechanism achieves motion and force transmission through the elastic deformation of flexible
+  members, rather than through rigid links connected by traditional joints.
+quizQuestion:
+  q: A compliant mechanism produces motion by…
+  options:
+    - Using many ball bearings
+    - Elastically flexing a flexible structure
+    - Burning fuel
+    - Spinning a motor only
+  answer: 1
+  explanation: >-
+    Its motion comes from the elastic deformation (bending) of flexible members, not from rigid links and
+    traditional joints.
+---
+
+Most machines move through joints, hinges, and bearings that rub, wear, and loosen. A **compliant mechanism** does something elegant instead: it **moves by bending**, achieving motion from the flex of a flexible structure — often a single piece with no separate joints at all.
+
+## The idea
+
+Instead of rigid links connected by pin joints, a compliant mechanism transmits force and motion through the **elastic deformation** of flexible members. Bend a strategically-shaped flexible part and it produces a precise, repeatable motion — then springs back. Everyday examples: a one-piece plastic snap clip, a paperclip, a nail clipper's flexing lever, or the living hinge on a flip-top bottle cap.
+
+```diagram
+{ "type": "flow", "title": "Motion from flex, not joints", "nodes": ["Apply force", "Flexible member bends", "Elastic deformation → motion", "Springs back when released"], "caption": "A single flexible structure deforms to produce the desired motion, replacing an assembly of rigid links and wear-prone joints." }
+```
+
+## Why they're powerful
+
+- **No friction or wear at joints.** Because there are no rubbing surfaces or bearings, there's nothing to wear out, no lubrication, no [backlash](/atlas/concept/backlash) — enabling extreme **precision** and long life.
+- **Fewer parts, one piece.** A whole mechanism can be a **single monolithic component**, cutting assembly, cost, and weight — and easy to make by injection molding or [3D printing](/atlas/concept/additive-manufacturing).
+- **Built-in return spring.** The elasticity provides restoring force for free.
+- **Miniaturizable.** Works down to tiny (MEMS) scales where conventional joints are impossible.
+
+## The trade-offs
+
+- **Limited range of motion.** A flexure can only bend so far before it yields or breaks — great for small, precise motions, not large rotations.
+- **Fatigue.** Repeated flexing stresses the material; design and material choice must avoid fatigue failure over the required cycles.
+- **Force-deflection coupling.** Position and force are linked through stiffness (the flex resists as it bends), which must be accounted for.
+
+## Where you'll see it
+
+Precision positioning stages (nanometer-scale motion via [flexure joints](/atlas/concept/flexure-joint)), MEMS and micro-robots, grippers and end-effectors that conform, medical and surgical instruments, and increasingly 3D-printed robot parts. The compliance idea also links to soft robotics, [series-elastic actuators](/atlas/concept/series-elastic-actuator), and [mechanical metamaterials](/atlas/concept/metamaterial-robot).
+
+## Why it matters
+
+Compliant mechanisms turn a machine's structure into its motion — trading joints for clever bending to gain precision, simplicity, and durability. They're a foundational tool for precision robotics, miniaturization, and elegant one-piece designs, and a bridge toward soft and metamaterial-based robots.
+
+## Related
+
+[Flexure joint](/atlas/concept/flexure-joint) · [Series elastic actuator](/atlas/concept/series-elastic-actuator) · [Metamaterial robot](/atlas/concept/metamaterial-robot) · [Additive manufacturing](/atlas/concept/additive-manufacturing)

@@ -1,0 +1,78 @@
+---
+title: SOTIF (Safety of the Intended Functionality)
+slug: sotif
+bucket: concept
+category: control
+summary: >-
+  SOTIF addresses a safety problem unique to AI-driven robots and self-driving cars — being unsafe even when
+  nothing is 'broken,' because the system's perception or decisions are inadequate in some situation it wasn't
+  ready for.
+difficulty: 4
+tags:
+  - safety
+  - self-driving
+  - standards
+seeAlso:
+  - functional-safety
+  - autonomous-vehicle
+  - risk-assessment-robotics
+  - domain-randomization
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ISO 21448 (SOTIF)'
+    url: 'https://en.wikipedia.org/wiki/ISO_21448'
+  - title: 'Safety of the intended functionality'
+    url: 'https://en.wikipedia.org/wiki/ISO_21448'
+laymanExplanation: >-
+  SOTIF is about a robot being unsafe even though nothing has broken — because its AI simply didn't handle a
+  situation well. A self-driving car that misreads an unusual scene isn't 'faulty,' but it's still unsafe.
+  SOTIF is the discipline of finding and closing those gaps.
+technicalDefinition: >-
+  SOTIF (ISO 21448) addresses hazards arising from functional insufficiencies or foreseeable misuse — unsafe
+  behavior without any system fault — especially in perception- and AI-based automated systems.
+quizQuestion:
+  q: SOTIF differs from traditional functional safety by addressing…
+  options:
+    - Only hardware failures
+    - Unsafe behavior even when nothing has failed (functional insufficiency)
+    - Battery life
+    - Paint quality
+  answer: 1
+  explanation: >-
+    Functional safety handles faults/malfunctions; SOTIF handles cases where the system works as built but its
+    intended function is inadequate for the situation — no fault, yet unsafe.
+---
+
+Traditional safety asks "what if something *breaks*?" But a self-driving car can be dangerous with **nothing broken at all** — if its AI simply misjudges an unusual scene. Addressing that new kind of hazard is **SOTIF**.
+
+## The problem it names
+
+[Functional safety](/atlas/concept/functional-safety) (ISO 26262) is about hazards from **faults and malfunctions** — a sensor fails, a chip glitches. But AI-driven robots have a different, subtler danger: the system can be working **exactly as built**, with no fault, yet still behave unsafely because its **intended functionality is insufficient** for the situation. A perception network that's never seen a particular lighting, an unusual obstacle, or an edge-case scene may quietly get it wrong. Nothing failed — the function itself just wasn't good enough. **SOTIF** (Safety Of The Intended Functionality, ISO 21448) is the discipline for exactly these hazards.
+
+```diagram
+{ "type": "flow", "title": "Unsafe without any fault", "nodes": ["No component failed", "But function is inadequate for the scene", "System behaves unsafely", "SOTIF addresses this gap"], "caption": "Functional safety covers 'it broke'; SOTIF covers 'it worked as designed but wasn't smart enough for this situation' — the AI-era safety problem." }
+```
+
+## The four-quadrant view
+
+SOTIF organizes scenarios into **known/unknown** × **safe/unsafe**:
+
+- **Known safe** — situations the system handles correctly (the goal to expand).
+- **Known unsafe** — situations you've identified where it fails; add mitigations.
+- **Unknown unsafe** — the scary ones: failure modes you *haven't discovered yet*. SOTIF's core work is shrinking this quadrant by finding edge cases before they cause harm.
+
+Much of SOTIF practice is **searching for the unknown unsafe**: extensive scenario testing, edge-case mining, simulation, and validation ([domain randomization](/atlas/concept/domain-randomization) and vast test miles) to surface where perception and decision-making fall short, then improving the system or constraining its operating domain.
+
+## Why it's essential for autonomous systems
+
+- **Perception is never perfect.** Cameras and neural nets have inherent limitations, so functional insufficiency is guaranteed — the question is whether the residual risk is acceptable.
+- **The long tail.** The real world offers endless rare situations; you can't test them all, so SOTIF is about *systematically* covering enough and bounding the rest.
+- **It complements functional safety.** A safe autonomous system needs *both*: functional safety for faults, SOTIF for insufficiencies. Together with [risk assessment](/atlas/concept/risk-assessment-robotics), they form the safety case.
+
+## Why it matters
+
+SOTIF names and tackles the defining safety challenge of the AI era in robotics: systems that are dangerous not because they broke, but because they weren't *capable enough* for a situation. It's central to certifying self-driving cars and any perception-driven robot, and to the honest question of "how do we know it's safe *enough*?"
+
+## Related
+
+[Functional safety](/atlas/concept/functional-safety) · [Autonomous vehicle](/atlas/concept/autonomous-vehicle) · [Risk assessment](/atlas/concept/risk-assessment-robotics) · [Domain randomization](/atlas/concept/domain-randomization)

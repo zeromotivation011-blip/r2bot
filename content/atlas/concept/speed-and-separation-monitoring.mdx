@@ -1,0 +1,87 @@
+---
+title: Speed and Separation Monitoring
+slug: speed-and-separation-monitoring
+bucket: concept
+category: control
+summary: >-
+  Speed and separation monitoring keeps a robot and a person at a safe distance by watching where the human
+  is and slowing or stopping as they get closer — one of the four collaborative-robot safety methods that
+  let robots and people share space.
+difficulty: 3
+tags:
+  - safety
+  - collaborative-robots
+  - standards
+seeAlso:
+  - collaborative-robot-safety
+  - power-and-force-limiting
+  - iso-ts-15066
+  - safety-rated-monitored-stop
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'ISO/TS 15066 — Collaborative robots'
+    url: 'https://en.wikipedia.org/wiki/Cobot'
+  - title: 'Speed and separation monitoring'
+    url: 'https://en.wikipedia.org/wiki/Cobot'
+laymanExplanation: >-
+  Speed and separation monitoring lets a robot keep working near people by tracking how close a person is: as
+  someone approaches, the robot slows down, and if they get too close, it stops — then speeds back up when
+  they move away.
+technicalDefinition: >-
+  Speed and separation monitoring is a collaborative-safety method that maintains a protective separation
+  distance, reducing robot speed as a human approaches and stopping if the minimum distance is breached.
+quizQuestion:
+  q: Under speed and separation monitoring, as a person gets closer the robot…
+  options:
+    - Speeds up
+    - Slows down, and stops if too close
+    - Ignores them
+    - Turns off its sensors
+  answer: 1
+  explanation: >-
+    It scales speed down with decreasing separation and halts if the minimum protective distance is breached,
+    resuming as the person retreats.
+---
+
+How can a robot keep working productively while a person walks right up to it? One of the four collaborative-safety methods answers this by **watching the distance** and adjusting: **speed and separation monitoring (SSM)**.
+
+## The idea
+
+SSM continuously **monitors where humans are** relative to the robot (via laser area scanners, 3D cameras, or safety mats) and maintains a **protective separation distance**. The rule is graduated:
+
+- **Person far away** → robot runs at **full speed**.
+- **Person approaching** → robot **slows down**, so it could stop before contact.
+- **Person too close** (minimum distance breached) → robot **stops**.
+- **Person retreats** → robot **resumes** and speeds back up.
+
+The minimum safe distance isn't fixed — it depends on the robot's speed, its stopping time, and the person's approach speed, all computed live so the robot can always halt before contact.
+
+```diagram
+{ "type": "flow", "title": "Distance sets the speed", "nodes": ["Track human position", "Far → full speed", "Near → slow down", "Too close → stop"], "caption": "The robot's speed scales with how much room there is to stop safely. It keeps working when it's safe and slows or halts only when a person is close." }
+```
+
+## Why it's valuable
+
+- **Productivity + safety together.** The robot doesn't have to crawl or stop just because a person is *somewhere* in the area — only when they're genuinely close. It runs fast when the space is clear.
+- **No cage, no constant stops.** People can share the workspace and approach as needed, and the robot recovers automatically.
+
+It's especially suited to **larger or faster robots** that can't rely on being inherently gentle.
+
+## The four collaborative methods
+
+[ISO/TS 15066](/atlas/concept/iso-ts-15066) defines four ways robots and humans safely share space:
+
+- **[Safety-rated monitored stop](/atlas/concept/safety-rated-monitored-stop)** — robot halts (power on) when a person is in the shared zone.
+- **Hand guiding** — the operator physically leads the robot.
+- **Speed and separation monitoring** — this one: distance-based slowdown/stop.
+- **[Power and force limiting](/atlas/concept/power-and-force-limiting)** — the robot is inherently gentle enough that contact is safe.
+
+Real cells often combine them.
+
+## Why it matters
+
+Speed and separation monitoring is a key enabler of **[human-robot collaboration](/atlas/concept/collaborative-robot-safety)** — letting capable robots keep working while people move freely around them, by trading speed for distance in real time. It's central to modern flexible manufacturing where fences are giving way to shared, sensed spaces.
+
+## Related
+
+[Collaborative robot safety](/atlas/concept/collaborative-robot-safety) · [Power and force limiting](/atlas/concept/power-and-force-limiting) · [ISO/TS 15066](/atlas/concept/iso-ts-15066) · [Safety-rated monitored stop](/atlas/concept/safety-rated-monitored-stop)

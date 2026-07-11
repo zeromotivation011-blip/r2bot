@@ -1,0 +1,78 @@
+---
+title: Timing Belt
+slug: timing-belt
+bucket: concept
+category: actuators
+summary: >-
+  A timing belt is a toothed belt that transmits motion between pulleys without slipping — a light, quiet,
+  cheap way to move power around a robot, used in 3D printers, robot axes, and belt-driven joints.
+difficulty: 2
+tags:
+  - actuators
+  - mechanism
+  - mechanics
+seeAlso:
+  - gear-train
+  - cable-driven-mechanism
+  - backlash
+  - servo-motor
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Timing belt (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Timing_belt_(camshaft)'
+  - title: 'Synchronous belt drives'
+    url: 'https://en.wikipedia.org/wiki/Belt_(mechanical)'
+laymanExplanation: >-
+  A timing belt is a rubber belt with teeth that grip matching pulleys, so it drives them without slipping.
+  It's a light, quiet, inexpensive way to move a motor's power to another spot — like the belts that move a 3D
+  printer's head.
+technicalDefinition: >-
+  A timing belt is a toothed (synchronous) belt whose teeth mesh with grooved pulleys, transmitting rotation
+  without slip and maintaining exact position synchronization.
+quizQuestion:
+  q: Why is a timing belt 'synchronous' unlike a plain flat belt?
+  options:
+    - It glows in sync
+    - Its teeth mesh with the pulley so it can't slip, keeping exact timing
+    - It has no teeth
+    - It uses magnets
+  answer: 1
+  explanation: >-
+    The meshing teeth prevent slippage, so the driven pulley stays in exact positional sync with the driver —
+    unlike a friction-based flat/V belt that can slip.
+---
+
+To move a motor's power a short distance — to another shaft, or along a rail — you don't always need gears. Often the neat answer is a **timing belt**: a toothed belt that drives pulleys precisely, without slipping.
+
+## What it is
+
+A timing belt (or **synchronous belt**) is a flexible belt with **teeth** on its inner face that **mesh with grooved pulleys**. Because the teeth interlock, the belt **can't slip** — the driven pulley stays in exact positional synchronization with the driver (hence "timing"). This distinguishes it from plain flat or V-belts, which rely on friction and can slip. Spin one pulley and the belt faithfully turns the other, transmitting motion (and a [gear-ratio](/atlas/concept/gear-ratio)-like change if the pulleys differ in size).
+
+```diagram
+{ "type": "flow", "title": "Toothed belt, no slip", "nodes": ["Motor pulley", "Toothed belt meshes", "Driven pulley", "Synchronized motion"], "caption": "Interlocking teeth mean the belt drives the pulley in exact sync — transmitting motion over a distance without the slip of a friction belt." }
+```
+
+## Why robots use it
+
+- **Light and low-inertia.** A belt is far lighter than a gear train, so belt-driven joints and axes move fast with little added mass — good for speed and safety.
+- **Quiet and smooth.** No metal-on-metal gear whine.
+- **Cheap and simple.** Inexpensive, easy to route power across a distance or around a structure.
+- **Some compliance.** The belt's slight stretch cushions shocks a bit (though it also limits stiffness).
+- **Remote motors.** Like [cable drives](/atlas/concept/cable-driven-mechanism), belts let the motor sit away from the moving part, reducing limb mass — common on robot arms (belt-driven joints) and gantries.
+
+The classic example: a **3D printer** moves its print head and bed with timing belts — precise, fast, and cheap.
+
+## The limits
+
+- **Stretch and compliance.** Belts stretch under load and aren't perfectly stiff, so they're less precise than a rigid gear train for high-force, high-accuracy joints (though tensioners and stiff belts help).
+- **Tension matters.** Too loose and teeth can skip (losing position — a form of [backlash](/atlas/concept/backlash)); too tight and bearings wear. Proper tensioning is key.
+- **Wear.** Belts age, crack, and eventually need replacing.
+- **Limited torque** versus gears for the same size.
+
+## Why it matters
+
+The timing belt is a workhorse power-transmission element in robotics — a light, quiet, affordable way to move motion where you need it without slippage. It's especially valuable for keeping moving parts light and motors remote, which is why belt drives appear throughout printers, gantries, [servo](/atlas/concept/servo-motor) axes, and robot arms.
+
+## Related
+
+[Gear train](/atlas/concept/gear-train) · [Cable-driven mechanism](/atlas/concept/cable-driven-mechanism) · [Backlash](/atlas/concept/backlash) · [Servo motor](/atlas/concept/servo-motor)

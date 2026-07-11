@@ -1,0 +1,74 @@
+---
+title: Cable-Driven Mechanism
+slug: cable-driven-mechanism
+bucket: concept
+category: actuators
+summary: >-
+  A cable-driven mechanism transmits force through tensioned cables instead of rigid gears — letting motors
+  sit far from the moving parts, so robots can have light, fast limbs or reach huge workspaces with cables
+  alone.
+difficulty: 3
+tags:
+  - mechanism
+  - actuators
+  - design
+seeAlso:
+  - tendon-driven-hand
+  - backdrivability
+  - series-elastic-actuator
+  - slip-ring
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Cable-driven parallel robot (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Cable_robot'
+  - title: 'Tendon-driven mechanisms'
+    url: 'https://en.wikipedia.org/wiki/Robot_end_effector'
+laymanExplanation: >-
+  A cable-driven mechanism moves parts by pulling cables, like tendons or the cables on a bike brake. This
+  lets the heavy motors sit somewhere else while thin cables do the pulling — great for light limbs or for
+  moving things across a big space.
+technicalDefinition: >-
+  A cable-driven mechanism transmits actuation force via tensioned cables routed from remote motors to the
+  moving element, enabling remote actuation and large or lightweight workspaces.
+quizQuestion:
+  q: A key advantage of cable-driven mechanisms is that they…
+  options:
+    - Push and pull equally through the cable
+    - Let motors sit remotely while cables transmit force, reducing moving mass
+    - Need no motors
+    - Only work underwater
+  answer: 1
+  explanation: >-
+    Cables let the actuators be located away from the moving parts, cutting the mass that has to move — though
+    cables can only pull, not push.
+---
+
+Bicycle brakes, tendons, and elevator cables all share a trick: move something by **pulling a cable** rather than pushing rigid parts. Robots use the same idea — the **cable-driven mechanism** — to build light limbs and giant workspaces.
+
+## The core idea
+
+A cable-driven mechanism routes **tensioned cables** from motors to the moving element. Pull the cable and the part moves; the motor supplying the pull can sit **far away**, so its mass isn't on the moving structure. The key limitation shapes everything: **a cable can only pull, not push.** So mechanisms use either an **opposing cable** (antagonistic pair, like biceps/triceps) or a **spring** to provide the return force.
+
+```diagram
+{ "type": "flow", "title": "Remote motor, cable does the work", "nodes": ["Motor (located remotely)", "Tensioned cable routed to part", "Cable pulls", "Return via opposing cable / spring"], "caption": "Force is transmitted along the cable from a distant motor. Since cables only pull, motion in both directions needs an antagonist or a spring." }
+```
+
+## Two big use cases
+
+The idea scales in two opposite directions:
+
+- **Light, fast limbs (tendon-driven).** Put the motors in the body/base and run cables to the joints, so the arm or [hand](/atlas/concept/tendon-driven-hand) itself is slim and low-inertia — able to move fast and safely. This is exactly how [tendon-driven hands](/atlas/concept/tendon-driven-hand) and many legged-robot legs work.
+- **Huge workspaces (cable robots).** Suspend a platform from **several cables** anchored around a large space (a stadium camera like Spidercam, warehouse-scale positioning, 3D printers for buildings). The cables reel in and out to move the platform anywhere in a volume far larger than any rigid arm could reach — cheaply, because only cables span the space.
+
+## Strengths and challenges
+
+- **Strengths.** Low moving mass (fast, safe), remote/relocatable actuators, very large or reconfigurable workspaces, natural compliance, and the ability to route around a structure.
+- **Challenges.** Cables **stretch and have friction** in their routing, so precise control needs tension sensing and calibration. They must stay **taut** (slack cable = lost control). They **wear and fray** over time. And "pull-only" complicates design (needing antagonists, which also relates to [backdrivability](/atlas/concept/backdrivability) and [series-elastic](/atlas/concept/series-elastic-actuator) ideas).
+
+## Why it matters
+
+Cable-driven mechanisms decouple *where the motor is* from *where the motion happens* — a powerful design freedom. It gives robots either whisper-light agile limbs or the ability to work across spaces no rigid arm could span, making it a key tool in humanoid hands, legged robots, and large-scale positioning systems.
+
+## Related
+
+[Tendon-driven hand](/atlas/concept/tendon-driven-hand) · [Backdrivability](/atlas/concept/backdrivability) · [Series elastic actuator](/atlas/concept/series-elastic-actuator) · [Slip ring](/atlas/concept/slip-ring)

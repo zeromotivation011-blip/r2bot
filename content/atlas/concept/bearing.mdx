@@ -1,0 +1,83 @@
+---
+title: Bearing
+slug: bearing
+bucket: concept
+category: actuators
+summary: >-
+  A bearing lets one part rotate or slide against another with minimal friction — the humble component that
+  makes every robot joint, wheel, and spinning shaft possible, quietly carrying loads while allowing smooth
+  motion.
+difficulty: 2
+tags:
+  - mechanism
+  - hardware
+  - mechanics
+seeAlso:
+  - flexure-joint
+  - gear-train
+  - slip-ring
+  - rotary-encoder
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Bearing (mechanical) (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Bearing_(mechanical)'
+  - title: 'Rolling-element bearings'
+    url: 'https://en.wikipedia.org/wiki/Rolling-element_bearing'
+laymanExplanation: >-
+  A bearing is the part that lets a wheel or joint spin smoothly instead of grinding. It usually has little
+  balls or rollers inside that let two parts turn against each other with almost no friction, while still
+  carrying the load.
+technicalDefinition: >-
+  A bearing is a machine element that constrains relative motion to a desired type (usually rotation) while
+  minimizing friction and supporting loads, commonly via rolling elements or sliding surfaces.
+quizQuestion:
+  q: A bearing's main job is to…
+  options:
+    - Generate power
+    - Allow low-friction motion while carrying loads
+    - Store data
+    - Cool the motor
+  answer: 1
+  explanation: >-
+    A bearing enables smooth relative motion (usually rotation) with minimal friction while supporting the
+    forces acting on the shaft or joint.
+---
+
+Every wheel that rolls and every joint that turns on a robot relies on an unglamorous but essential part: the **bearing**. Without it, motion means grinding, wear, and lost power.
+
+## What it does
+
+A bearing sits between two parts and lets them **move relative to each other (usually rotate) with minimal friction**, while **carrying the load** pressing them together. It **constrains** the motion to the type you want (e.g. only rotation about an axis) and resists forces in the other directions. Most robot bearings are **rolling-element** bearings — little **balls or rollers** between two races — which convert sliding friction into much lower rolling friction.
+
+```diagram
+{ "type": "flow", "title": "Smooth motion under load", "nodes": ["Shaft + housing", "Rolling elements between them", "Low friction rotation", "Load carried, motion smooth"], "caption": "Balls or rollers let the shaft spin against the housing with little friction while transmitting the load — the basis of every smooth-turning joint and wheel." }
+```
+
+## Types and what they handle
+
+Bearings are chosen by the loads and motion:
+
+- **Ball bearings** — general-purpose, low friction, moderate loads (most robot joints, wheels, motor shafts).
+- **Roller bearings** — higher load capacity (cylindrical, tapered for combined loads).
+- **Thrust bearings** — carry axial (along-the-shaft) loads.
+- **Crossed-roller bearings** — handle loads and moments from all directions in a compact ring — common in robot arm joints where the joint sees complex loading.
+- **Plain / bushing bearings** — a simple low-friction sleeve, cheap and quiet for light loads.
+
+## Why it matters for robot performance
+
+The bearing quietly sets limits on a joint's quality:
+
+- **Friction.** Lower-friction bearings improve efficiency and [backdrivability](/atlas/concept/backdrivability) (feeling contact).
+- **Stiffness and precision.** A joint is only as rigid and accurate as its bearings; play or flex in a bearing shows up as positioning error.
+- **Load capacity and life.** Bearings must carry the forces (and moments) the joint sees, for the required lifetime, or they wear and fail — a common maintenance point.
+- **Integration.** Bearings support the shafts that [gear trains](/atlas/concept/gear-train), [encoders](/atlas/concept/rotary-encoder), and [slip rings](/atlas/concept/slip-ring) attach to.
+
+For the most demanding precision (nanometer positioning), where even bearing friction and play are too much, designers turn to [flexure joints](/atlas/concept/flexure-joint) instead.
+
+## Why it matters
+
+The bearing is a foundational mechanical element of every moving robot — enabling smooth, low-friction, load-bearing motion at every joint, wheel, and shaft. Its quality directly bounds a joint's friction, stiffness, precision, and lifespan, making it a small part with outsized influence on how well a robot moves.
+
+## Related
+
+[Flexure joint](/atlas/concept/flexure-joint) · [Gear train](/atlas/concept/gear-train) · [Slip ring](/atlas/concept/slip-ring) · [Rotary encoder](/atlas/concept/rotary-encoder)

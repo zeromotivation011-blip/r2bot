@@ -1,0 +1,80 @@
+---
+title: Safety Light Curtain
+slug: safety-light-curtain
+bucket: concept
+category: sensors
+summary: >-
+  A safety light curtain is an invisible wall of light beams that stops a machine the instant someone
+  reaches through it — a standard guarding device that protects workers around industrial robots without a
+  physical fence.
+difficulty: 2
+tags:
+  - safety
+  - sensors
+  - standards
+seeAlso:
+  - emergency-stop
+  - collaborative-robot-safety
+  - speed-and-separation-monitoring
+  - functional-safety
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Light curtain (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Light_curtain'
+  - title: 'Safety light curtains (IEC 61496)'
+    url: 'https://en.wikipedia.org/wiki/Light_curtain'
+laymanExplanation: >-
+  A safety light curtain is a row of light beams across an opening. If a person's arm or body breaks the
+  beams, the machine stops immediately — an invisible guard that protects people without needing a physical
+  gate.
+technicalDefinition: >-
+  A safety light curtain is an opto-electronic protective device projecting an array of infrared beams; an
+  interruption triggers a safety-rated stop of the guarded machine.
+quizQuestion:
+  q: A safety light curtain stops a machine when…
+  options:
+    - The lights are turned off at night
+    - Something breaks the array of light beams
+    - The machine finishes its task
+    - The temperature rises
+  answer: 1
+  explanation: >-
+    Breaking the infrared beam array (e.g. a hand reaching in) is detected instantly and triggers a
+    safety-rated stop.
+---
+
+How do you protect a worker who needs to reach into a robot's workspace, without building a wall and a gate? A common answer is a curtain — made of **light**. The **safety light curtain** is invisible, instant, and standard equipment around industrial machines.
+
+## How it works
+
+A safety light curtain has a **transmitter** projecting a row of infrared beams and a **receiver** detecting them, forming an invisible "curtain" across an opening or around a hazard. As long as all beams reach the receiver, the machine runs. The moment **anything breaks the beams** — a hand, arm, or body reaching through — the device triggers a **safety-rated stop** of the machine, faster than a human could react.
+
+```diagram
+{ "type": "flow", "title": "Break the beam, stop the machine", "nodes": ["Beams span the opening", "Person reaches through", "Beam broken", "Safety-rated stop"], "caption": "An unbroken curtain of light means clear; interrupting it instantly signals the machine to stop — guarding an opening without a physical barrier." }
+```
+
+## Why it's used
+
+- **Access without a gate.** Workers load/unload parts or tend a machine reaching *through* the curtain; no door to open and close each cycle — faster and ergonomic.
+- **Instant, reliable detection.** Purpose-built to safety standards (IEC 61496), with redundancy and self-checking so a fault fails safe.
+- **Configurable.** Resolution (finger, hand, or body detection) and muting (temporarily allowing material, not people, to pass) suit different tasks.
+
+The **resolution** matters: a fine curtain detects fingers (needing close mounting), a coarse one detects a body — chosen from the [risk assessment](/atlas/concept/risk-assessment-robotics) and how close the hazard is.
+
+## Where it fits among safeguards
+
+Light curtains are one tool in the machine-safety kit, alongside:
+
+- **[Emergency stops](/atlas/concept/emergency-stop)** — the manual backstop.
+- **Physical guards and interlocked gates** — fixed barriers.
+- **Area scanners / [speed and separation monitoring](/atlas/concept/speed-and-separation-monitoring)** — for [collaborative](/atlas/concept/collaborative-robot-safety) and mobile-robot spaces, where light curtains give way to laser scanners defining safety zones.
+
+A key rule: the curtain must be far enough from the hazard that the machine can **stop before a reaching hand arrives** — the "minimum safety distance" calculation.
+
+## Why it matters
+
+The safety light curtain is a workhorse of industrial robot safety — an invisible, instant guard that lets people work near and reach into machines while guaranteeing the machine stops the moment they cross the line. It embodies the shift from caging robots to sensing people, a stepping stone toward true human-robot collaboration.
+
+## Related
+
+[Emergency stop](/atlas/concept/emergency-stop) · [Speed and separation monitoring](/atlas/concept/speed-and-separation-monitoring) · [Collaborative robot safety](/atlas/concept/collaborative-robot-safety) · [Functional safety](/atlas/concept/functional-safety)

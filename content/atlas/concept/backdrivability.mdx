@@ -1,0 +1,81 @@
+---
+title: Backdrivability
+slug: backdrivability
+bucket: concept
+category: actuators
+summary: >-
+  Backdrivability is how easily you can move a robot's joint by pushing on it from the outside — a property
+  that decides whether a robot can feel and yield to contact, crucial for safe, force-sensitive interaction.
+difficulty: 3
+tags:
+  - actuators
+  - force-control
+  - mechanism
+seeAlso:
+  - gear-ratio
+  - series-elastic-actuator
+  - power-and-force-limiting
+  - impedance-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Backdrivability (robotics)'
+    url: 'https://en.wikipedia.org/wiki/Backdrive'
+  - title: 'Transmission and backdrivability'
+    url: 'https://en.wikipedia.org/wiki/Mechanical_advantage'
+laymanExplanation: >-
+  Backdrivability is whether you can move a robot's joint by hand. A backdrivable joint gives way when you
+  push it; a non-backdrivable one (lots of gearing) stays locked. Backdrivable joints let a robot feel and
+  respond to contact.
+technicalDefinition: >-
+  Backdrivability is the degree to which an actuator's output can be moved by an external force, inversely
+  related to transmission friction and gear ratio.
+quizQuestion:
+  q: A highly geared joint is usually…
+  options:
+    - Very backdrivable
+    - Hard to backdrive (nearly non-backdrivable)
+    - Unable to move at all
+    - Frictionless
+  answer: 1
+  explanation: >-
+    High gear ratios multiply friction and reflected inertia at the output, making the joint very hard to
+    move by hand — low backdrivability.
+---
+
+Grab a robot arm and try to push its joint. Some give way easily; others feel rigidly locked. That difference — **backdrivability** — quietly determines whether a robot can *feel* and *respond to* the world's forces, and it's central to safe interaction.
+
+## What it means
+
+Backdrivability is how easily an external force can **move an actuator's output** — i.e., drive it *backward* through the transmission. A **backdrivable** joint yields when pushed; a **non-backdrivable** one resists and holds. It's mostly determined by the **transmission**: friction and, above all, the [gear ratio](/atlas/concept/gear-ratio).
+
+```diagram
+{ "type": "flow", "title": "Can you push it back?", "nodes": ["Push on the output", "Force reflected through transmission", "High gearing/friction → resists", "Low gearing → yields"], "caption": "A high gear ratio multiplies the felt inertia and friction at the output, so external pushes barely move it — low backdrivability. Direct or low-gear drives move easily." }
+```
+
+## Why gearing kills it
+
+A [gearbox](/atlas/concept/gear-ratio) trades speed for torque — great for lifting loads. But it works *both ways* the wrong way: pushing on the output has to spin the motor *fast* through the reduction, and the gearing **multiplies the reflected friction and inertia** you feel. A 100:1 gearbox makes the joint feel ~100²× harder to backdrive and adds a lot of friction. So high-torque geared joints tend to be **stiff and non-backdrivable** — strong, but blind to contact.
+
+## Why robots care
+
+- **Force sensing without a force sensor.** A backdrivable joint lets the motor *feel* external forces (via current), enabling gentle [force control](/atlas/concept/impedance-control), hand-guiding, and detecting collisions — key to [power-and-force-limited](/atlas/concept/power-and-force-limiting) safety.
+- **Safety and compliance.** A joint that yields when it bumps a person is inherently safer than one that pushes rigidly through.
+- **Dynamic tasks.** Legged robots want backdrivable legs so impacts flow back and can be absorbed and sensed, not slammed through gears.
+
+Non-backdrivable joints have their place too: they **hold position without power** (a benefit for a robot holding a heavy load steady), which back-drivable ones can't.
+
+## How engineers get both strength and backdrivability
+
+The tension — you want torque (needs gearing) *and* backdrivability (hurt by gearing) — is solved by:
+
+- **Low gear ratios / direct drive** with strong motors (quasi-direct-drive, as on modern quadrupeds).
+- **[Series-elastic actuators](/atlas/concept/series-elastic-actuator)** and special low-friction gearboxes ([harmonic drives](/atlas/concept/harmonic-drive) are moderately backdrivable) that add force sensing/compliance.
+- **Active backdriving** — sensing force and commanding the motor to yield in software (making a stiff joint *behave* compliant).
+
+## Why it matters
+
+Backdrivability is a defining property of how a robot interacts physically with the world — the difference between a machine that blindly forces its way and one that feels, yields, and cooperates. It's fundamental to safe, force-aware robots, and the reason modern interaction-focused robots move away from heavily-geared, rigid joints.
+
+## Related
+
+[Gear ratio](/atlas/concept/gear-ratio) · [Series elastic actuator](/atlas/concept/series-elastic-actuator) · [Power and force limiting](/atlas/concept/power-and-force-limiting) · [Impedance control](/atlas/concept/impedance-control)

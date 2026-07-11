@@ -1,0 +1,74 @@
+---
+title: Kinematic Coupling
+slug: kinematic-coupling
+bucket: concept
+category: actuators
+summary: >-
+  A kinematic coupling is a way to join two parts so they mate in the exact same position every time — using
+  precisely six contact points to remove all wobble, the trick behind repeatable tool changers and precision
+  fixtures.
+difficulty: 3
+tags:
+  - mechanism
+  - precision
+  - design
+seeAlso:
+  - degrees-of-freedom
+  - flexure-joint
+  - tool-center-point
+  - bearing
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Kinematic coupling (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Kinematic_coupling'
+  - title: 'Exact constraint design'
+    url: 'https://en.wikipedia.org/wiki/Kinematic_coupling'
+laymanExplanation: >-
+  A kinematic coupling lets two parts snap together in precisely the same spot every single time. By touching
+  at exactly the right few points, it removes all the slop, so a tool taken off and put back lands in the
+  identical position.
+technicalDefinition: >-
+  A kinematic coupling constrains all six degrees of freedom of a joined part using exactly six independent
+  contact points, achieving highly repeatable, deterministic positioning without over-constraint.
+quizQuestion:
+  q: A kinematic coupling achieves exact positioning by constraining…
+  options:
+    - Zero degrees of freedom
+    - All six degrees of freedom with exactly six contact points
+    - Only rotation
+    - Nothing
+  answer: 1
+  explanation: >-
+    Six well-placed contact points remove exactly the six degrees of freedom, fully and deterministically
+    locating the part with no over-constraint or wobble.
+---
+
+When a robot swaps a tool and picks it up again, will the tool be in *exactly* the same place as before? For precision work, "close" isn't good enough. The **kinematic coupling** guarantees "identical" — every time — using an elegant idea from precision engineering.
+
+## The idea: exact constraint
+
+A rigid body has **six [degrees of freedom](/atlas/concept/degrees-of-freedom)** (three translations, three rotations). To locate it perfectly, you must remove **exactly six** — no more, no fewer. A kinematic coupling does this with **exactly six independent contact points**, each removing one degree of freedom. Remove exactly six and the part is **fully and uniquely located** with no wobble and no over-constraint. The classic realization: **three balls** on one part settling into **three V-grooves** on the other (each ball-in-vee gives two contact points, 3 × 2 = 6).
+
+```diagram
+{ "type": "flow", "title": "Six points remove six freedoms", "nodes": ["Part has 6 DOF", "6 precise contact points", "Each removes one DOF", "Exact, repeatable seating"], "caption": "Exactly six contacts uniquely constrain the part — so it seats in the identical position every time, with no slop and no fight between constraints." }
+```
+
+## Why "exactly six" matters
+
+The magic is in *not over-constraining*. A normal bolted joint has **many** contact points fighting each other, so tiny variations (dust, deformation, tolerances) shift where it settles — it's **not repeatable** to high precision. A kinematic coupling with exactly six contacts has a **single, deterministic** resting position; nothing fights, so it returns to the same spot to **sub-micron** repeatability, again and again.
+
+## Where robots use it
+
+- **Tool changers.** A robot arm that swaps grippers/tools needs each tool to return to the exact [tool-center-point](/atlas/concept/tool-center-point) so programs stay accurate — kinematic couplings on the tool interface make swaps precisely repeatable.
+- **Precision fixtures and pallets.** Parts placed for machining or inspection seat identically, so measurements are trustworthy.
+- **Instrument and optics mounting**, calibration targets, and any "remove and replace exactly" need.
+
+It pairs conceptually with [flexure joints](/atlas/concept/flexure-joint) and exact-constraint design in the precision-engineering toolkit.
+
+## Why it matters
+
+The kinematic coupling embodies a beautiful principle — *exact constraint* — that turns "assemble it and hope" into "seats identically every time." For robots that swap tools or handle precision fixtures, it's the difference between accumulating error and staying calibrated. It's a small, elegant idea with outsized impact on precision and repeatability.
+
+## Related
+
+[Degrees of freedom](/atlas/concept/degrees-of-freedom) · [Flexure joint](/atlas/concept/flexure-joint) · [Tool center point](/atlas/concept/tool-center-point) · [Bearing](/atlas/concept/bearing)

@@ -1,0 +1,73 @@
+---
+title: Emergency Stop (E-Stop)
+slug: emergency-stop
+bucket: concept
+category: control
+summary: >-
+  An emergency stop is the big red button that halts a robot instantly and reliably — the last line of
+  safety defense, engineered to work even when the rest of the robot's software and hardware fail.
+difficulty: 2
+tags:
+  - safety
+  - hardware
+  - standards
+seeAlso:
+  - functional-safety
+  - safety-rated-monitored-stop
+  - collaborative-robot-safety
+  - risk-assessment-robotics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Kill switch / emergency stop (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Kill_switch'
+  - title: 'ISO 13850 — Emergency stop function'
+    url: 'https://en.wikipedia.org/wiki/Emergency_stop'
+laymanExplanation: >-
+  An emergency stop is the big red button that shuts a robot down immediately. It's built so simply and
+  reliably that it works even if the robot's computer has crashed — the ultimate 'stop now' safeguard.
+technicalDefinition: >-
+  An emergency stop is a fail-safe, hardwired function that overrides all controls to bring a machine to a
+  safe halt, designed to remain functional independent of the control system.
+quizQuestion:
+  q: Why is an emergency stop typically hardwired rather than software-controlled?
+  options:
+    - Software is cheaper
+    - So it works even if the control software or computer fails
+    - To make it slower
+    - It looks nicer
+  answer: 1
+  explanation: >-
+    Hardwiring makes the e-stop a fail-safe independent of the (possibly failed) control system, so it can
+    always halt the machine.
+---
+
+Every robot that can hurt someone has one non-negotiable feature: a way to **stop it instantly and reliably**, no matter what's gone wrong. That's the **emergency stop (e-stop)** — the big red button, and the last line of safety defense.
+
+## What makes it different
+
+An e-stop isn't just a "stop" command sent to the software. Its defining property is that it works **even when the robot's software or normal hardware has failed**. It's typically **hardwired** — a physical circuit that, when the button is pressed (or a wire is cut), directly cuts power or triggers a fail-safe brake, independent of the control computer. That way a crashed program, a frozen controller, or a runaway command can't prevent the stop.
+
+```diagram
+{ "type": "flow", "title": "A stop that can't be overridden", "nodes": ["Button pressed", "Hardwired safety circuit", "Cut power / apply brakes", "Robot halts safely"], "caption": "The e-stop bypasses normal control entirely — a direct physical path from button to safe halt that works regardless of software state." }
+```
+
+## Design principles
+
+E-stops follow strict safety-engineering rules (standardized in ISO 13850):
+
+- **Fail-safe.** Wired **normally-closed**, so a broken wire or lost power *triggers* the stop rather than disabling it — failure defaults to safe.
+- **Maintained action.** The button latches when pressed; the robot stays stopped until someone deliberately resets it (you can't just release it and have the robot lurch back to life).
+- **Directly accessible.** Big, red, on a yellow background, reachable — findable in a panic without thinking.
+- **Redundant and monitored** in higher-safety systems ([functional safety](/atlas/concept/functional-safety) categories), so a single fault can't defeat it.
+
+## E-stop vs a safe monitored stop
+
+An e-stop is a *hard* stop — often removing power. It's distinct from a [safety-rated monitored stop](/atlas/concept/safety-rated-monitored-stop), where a [collaborative robot](/atlas/concept/collaborative-robot-safety) holds position with power on and resumes automatically when the person leaves. E-stops are the emergency backstop; monitored stops are for routine human-robot sharing. Both come out of a proper [risk assessment](/atlas/concept/risk-assessment-robotics).
+
+## Why it matters
+
+The emergency stop is the most fundamental, universally-required safety device in robotics — the guarantee that a human can always halt a machine that's misbehaving, no matter how badly its brains have failed. Its fail-safe design philosophy (failure defaults to safe) is a cornerstone of all robot safety engineering.
+
+## Related
+
+[Functional safety](/atlas/concept/functional-safety) · [Safety-rated monitored stop](/atlas/concept/safety-rated-monitored-stop) · [Collaborative robot safety](/atlas/concept/collaborative-robot-safety) · [Risk assessment](/atlas/concept/risk-assessment-robotics)

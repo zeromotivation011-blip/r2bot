@@ -1,0 +1,81 @@
+---
+title: Four-Bar Linkage
+slug: 4-bar-linkage
+bucket: concept
+category: actuators
+summary: >-
+  A four-bar linkage is the simplest and most useful mechanical linkage — four rigid bars and four joints
+  arranged so one input motion produces a specific, repeatable output path, the building block behind
+  countless robot and machine motions.
+difficulty: 2
+tags:
+  - mechanism
+  - kinematics
+  - design
+seeAlso:
+  - degrees-of-freedom
+  - forward-kinematics
+  - compliant-mechanism
+  - robot-arm
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Four-bar linkage (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Four-bar_linkage'
+  - title: 'Mechanisms and linkages'
+    url: 'https://en.wikipedia.org/wiki/Linkage_(mechanical)'
+laymanExplanation: >-
+  A four-bar linkage is four stiff bars pinned together in a loop. Turn one bar and the others follow a fixed,
+  repeatable motion. This simple arrangement can turn rotation into all sorts of useful paths — the workhorse
+  of mechanical design.
+technicalDefinition: >-
+  A four-bar linkage is a one-degree-of-freedom mechanism of four rigid links connected by four revolute
+  joints, converting an input rotation into a determined output motion.
+quizQuestion:
+  q: A four-bar linkage has how many degrees of freedom?
+  options:
+    - Zero
+    - One
+    - Four
+    - Eight
+  answer: 1
+  explanation: >-
+    With four links and four revolute joints, a planar four-bar linkage has a single degree of freedom — one
+    input fully determines the motion.
+---
+
+The most useful mechanism in all of mechanical engineering is also one of the simplest: four bars and four pins. The **four-bar linkage** turns a single input motion into a precise, repeatable output — and it's everywhere, including inside robots.
+
+## What it is
+
+A four-bar linkage is a closed loop of **four rigid links** connected by **four revolute (pin) joints**. One link is fixed (the "ground"), one is the **input** (driven by a motor), one is the **output**, and one **couples** them. It has exactly **one [degree of freedom](/atlas/concept/degrees-of-freedom)**: turn the input, and every other link follows a single, fully-determined motion. That constraint is the point — you get a specific, repeatable path for free from the geometry.
+
+```diagram
+{ "type": "flow", "title": "One input, a determined output", "nodes": ["Fixed ground link", "Input link (driven)", "Coupler link", "Output link follows a set path"], "caption": "Four links, four pins, one degree of freedom: drive one link and the geometry dictates exactly how the output moves — a designed, repeatable motion." }
+```
+
+## Why it's so useful
+
+By choosing the four link lengths, a designer can make the four-bar do wildly different, useful things:
+
+- **Convert rotation to rotation** at a changed ratio or range (a **crank-rocker** turns continuous rotation into a back-and-forth swing).
+- **Trace specific paths** — the coupler point can follow approximate straight lines, arcs, or figure-eights (used historically in engines and machines).
+- **Amplify or reduce force and motion**, and reach around obstacles.
+
+This makes four-bars the go-to for **cheap, reliable, motor-free-except-one-input** motion: no complex control, just geometry doing the work.
+
+## Where you'll see it in robots
+
+- **Parallel-motion joints.** Four-bar (and parallelogram) linkages keep a robot's end-effector or a gripper's fingers **parallel or level** as the arm moves — common in [pick-and-place](/atlas/concept/pick-and-place) arms (SCARA/delta-adjacent designs) and grippers.
+- **Legged robots.** Linkages transmit motor motion to legs and keep feet oriented, and reduce the number of actuators needed.
+- **Grippers.** Parallel-jaw grippers often use a linkage to keep the jaws parallel as they close.
+- **Suspensions and mechanisms** throughout mobile robots.
+
+Linkage design (and its computed [kinematics](/atlas/concept/forward-kinematics)) is a whole discipline; the four-bar is its foundation.
+
+## Why it matters
+
+The four-bar linkage is the atom of mechanism design — the simplest way to sculpt a precise, repeatable motion from a single input using nothing but rigid bars and pins. Understanding it is fundamental to mechanical robot design, where clever linkages often replace extra motors and control with elegant, reliable geometry.
+
+## Related
+
+[Degrees of freedom](/atlas/concept/degrees-of-freedom) · [Forward kinematics](/atlas/concept/forward-kinematics) · [Compliant mechanism](/atlas/concept/compliant-mechanism) · [Robot arm](/atlas/concept/robot-arm)

@@ -1,0 +1,79 @@
+---
+title: Flexure Joint
+slug: flexure-joint
+bucket: concept
+category: actuators
+summary: >-
+  A flexure joint provides rotation or motion by bending a thin elastic section instead of using a pin and
+  bearing — giving robots and precision instruments smooth, frictionless, backlash-free movement with no
+  wear.
+difficulty: 3
+tags:
+  - mechanism
+  - design
+  - precision
+seeAlso:
+  - compliant-mechanism
+  - backlash
+  - bearing
+  - harmonic-drive
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Flexure (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Flexure'
+  - title: 'Flexure bearings in precision engineering'
+    url: 'https://en.wikipedia.org/wiki/Flexure_bearing'
+laymanExplanation: >-
+  A flexure joint is a hinge made by thinning down a piece of material so it bends easily at that spot. It
+  rotates by flexing, so there's no pin, no rubbing, no slack — perfect for tiny, ultra-precise movements.
+technicalDefinition: >-
+  A flexure joint achieves relative rotation or translation via the elastic bending of a thin compliant
+  section, providing frictionless, backlash-free, wear-free motion over a limited range.
+quizQuestion:
+  q: Compared with a pin-and-bearing hinge, a flexure joint has…
+  options:
+    - More friction and backlash
+    - No friction, no backlash, no wear — but limited range
+    - Unlimited rotation
+    - No stiffness
+  answer: 1
+  explanation: >-
+    Bending an elastic section gives frictionless, backlash-free, wear-free motion, at the cost of a limited
+    range of travel.
+---
+
+How do you build a hinge with **zero friction, zero backlash, and zero wear** — but that costs almost nothing and needs no lubrication? You don't use a pin at all. You use a **flexure joint**: a hinge that works by bending.
+
+## What it is
+
+A flexure joint is the simplest [compliant mechanism](/atlas/concept/compliant-mechanism) building block: a **thin, flexible section** of material designed to **bend elastically** at a chosen spot, producing rotation (or translation) there. The rest of the part stays rigid; the thinned section acts as the "hinge." Because motion comes from elastic bending, there are **no rubbing surfaces**.
+
+```diagram
+{ "type": "flow", "title": "A hinge that bends, not pivots", "nodes": ["Thin flexible section", "Apply moment", "Section bends elastically", "Rotation with no rubbing"], "caption": "The thinned region flexes to provide the joint's motion; there's no pin and no contact, so no friction, slack, or wear — just a small range of travel." }
+```
+
+## Why precision engineers love it
+
+- **No [backlash](/atlas/concept/backlash).** A pin joint has slack between parts; a flexure has none — its motion is perfectly continuous and repeatable, essential for nanometer-scale positioning.
+- **No friction or stiction.** Nothing rubs, so motion is smooth all the way down to infinitesimal movements (unlike a [bearing](/atlas/concept/bearing) that "sticks" then "slips" at tiny scales).
+- **No wear, no lubrication.** Nothing to degrade; ideal for vacuum, clean rooms, and maintenance-free lifetimes.
+- **Monolithic and cheap.** Can be cut or printed as part of a single component — no assembly.
+- **Predictable.** Its stiffness is well-defined, so its behavior is precisely designable.
+
+## The limits
+
+- **Small range of motion.** A flexure can only bend so far before it over-stresses or yields — flexures are for **small, precise** angles, not continuous rotation.
+- **Off-axis stiffness and drift.** It's not perfectly constrained like a bearing; the center of rotation shifts slightly and it has some compliance in unwanted directions, which precise designs manage carefully.
+- **Fatigue** over many cycles must be designed against.
+
+## Where you'll see it
+
+Precision positioning stages (microscopes, semiconductor and optics equipment), MEMS and micro-mechanisms, gimbals and instruments needing exquisite smoothness, and compliant grippers. Anywhere motion must be **tiny, precise, and repeatable**, flexures beat conventional joints.
+
+## Why it matters
+
+The flexure joint is the workhorse of precision compliant design — trading unlimited rotation for perfect, frictionless, backlash-free small motion. It's fundamental to nanopositioning, micro-robotics, and any mechanism where the smoothness and repeatability of the joint is what limits performance.
+
+## Related
+
+[Compliant mechanism](/atlas/concept/compliant-mechanism) · [Backlash](/atlas/concept/backlash) · [Bearing](/atlas/concept/bearing) · [Harmonic drive](/atlas/concept/harmonic-drive)
