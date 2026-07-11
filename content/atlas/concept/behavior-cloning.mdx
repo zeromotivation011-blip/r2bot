@@ -1,0 +1,77 @@
+---
+title: Behavior Cloning
+slug: behavior-cloning
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Behavior cloning teaches a robot a skill by training it to copy a human's demonstrations — the simplest form
+  of imitation learning, powerful and direct, but with a famous compounding-error weakness.
+difficulty: 3
+tags:
+  - imitation-learning
+  - machine-learning
+  - ai
+seeAlso:
+  - imitation-learning
+  - diffusion-policy
+  - inverse-reinforcement-learning
+  - reinforcement-learning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Behavioral cloning (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Behavioral_cloning'
+  - title: 'Imitation learning'
+    url: 'https://en.wikipedia.org/wiki/Imitation_learning'
+laymanExplanation: >-
+  Behavior cloning trains a robot to copy exactly what a human did in each situation — like learning to drive by
+  memorizing 'when you see this, do that.' Simple and effective, but it struggles when the robot ends up
+  somewhere the human never demonstrated.
+technicalDefinition: >-
+  Behavior cloning is supervised imitation learning that trains a policy to map observations to the
+  demonstrator's actions, minimizing action-prediction error on demonstration data.
+quizQuestion:
+  q: The classic weakness of behavior cloning is…
+  options:
+    - It needs no data
+    - Compounding error when the robot drifts into unseen states
+    - It only works with reward
+    - It cannot use a neural network
+  answer: 1
+  explanation: >-
+    Small errors take the robot to states the demonstrations never covered, where it makes bigger errors — a
+    compounding distribution-shift problem (addressed by methods like DAgger).
+---
+
+The most direct way to teach a robot a skill is to **show it, and have it copy you**. That's **behavior cloning** — the simplest form of [imitation learning](/atlas/concept/imitation-learning), and a workhorse of modern robot skill acquisition.
+
+## How it works
+
+Behavior cloning is plain **supervised learning** applied to actions. Collect demonstrations — a human teleoperating the robot, or driving, or performing a task — recording **(observation → action)** pairs. Then train a network to predict the demonstrator's **action** from each **observation**. At run time, the robot sees an observation and outputs the action it learned to associate with it. No reward function, no exploration — just "in this situation, do what the human did."
+
+```diagram
+{ "type": "flow", "title": "Copy the demonstrator", "nodes": ["Human demonstrates", "Record observation→action pairs", "Train policy to predict actions", "Robot mimics in new situations"], "caption": "It's supervised learning: map what you see to what the expert did. Simple, direct, and effective when the robot stays near the demonstrated situations." }
+```
+
+## Why it's popular
+
+- **Simple and effective.** No reward engineering ([reward shaping](/atlas/concept/reward-shaping) is hard), no risky exploration — just imitate. Fast to train with standard supervised methods.
+- **Great with modern data.** Paired with rich demonstration datasets (human teleoperation) and expressive policies like [diffusion policies](/atlas/concept/diffusion-policy) and transformers, behavior cloning drives much of today's learned manipulation and is the base of many [Vision-Language-Action](/atlas/concept/transformer-architecture) models.
+
+## The famous flaw: compounding error
+
+Behavior cloning's classic weakness is **distribution shift**. The robot is only trained on the situations the *expert* visited. But the robot makes small mistakes, which take it to slightly-off states the demonstrations never covered — where it's *more* likely to err, taking it further off, and so on. Errors **compound**, and the robot can spiral into failure it was never shown how to recover from. (The textbook example: a self-driving policy trained only on centered-in-lane demos never learned how to recover once it drifts to the edge.)
+
+## The fixes
+
+- **DAgger (Dataset Aggregation).** Let the robot act, have the expert label the *states the robot actually reached*, add those to the data, retrain — teaching it recovery. Directly attacks the distribution-shift problem.
+- **More and richer demonstrations**, including recoveries and diverse situations.
+- **Combine with RL.** Use behavior cloning to bootstrap a policy, then refine with [reinforcement learning](/atlas/concept/reinforcement-learning) to handle unseen states and improve beyond the demonstrator.
+- **Learn intent, not just actions.** [Inverse reinforcement learning](/atlas/concept/inverse-reinforcement-learning) recovers the *goal* behind demonstrations, which generalizes better than copying actions.
+
+## Why it matters
+
+Behavior cloning is the foundational, most-used way to turn human demonstrations into robot skills — the engine behind much of modern learned manipulation. Understanding both its power (simple, effective imitation) and its compounding-error weakness is essential to how robots learn from people today.
+
+## Related
+
+[Imitation learning](/atlas/concept/imitation-learning) · [Diffusion policy](/atlas/concept/diffusion-policy) · [Inverse reinforcement learning](/atlas/concept/inverse-reinforcement-learning) · [Reinforcement learning](/atlas/concept/reinforcement-learning)

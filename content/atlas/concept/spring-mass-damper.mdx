@@ -1,0 +1,86 @@
+---
+title: Spring-Mass-Damper
+slug: spring-mass-damper
+bucket: concept
+category: control
+summary: >-
+  The spring-mass-damper is the simplest model of a vibrating, settling system — three elements that capture
+  how almost any robot joint or structure responds to a disturbance, and the mental model behind impedance
+  control and tuning.
+difficulty: 3
+tags:
+  - dynamics
+  - control
+  - fundamentals
+seeAlso:
+  - natural-frequency
+  - damping-ratio
+  - impedance-control
+  - pid-controller
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Mass-spring-damper (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Mass-spring-damper_model'
+  - title: 'Second-order systems'
+    url: 'https://en.wikipedia.org/wiki/Harmonic_oscillator'
+laymanExplanation: >-
+  A spring-mass-damper is a weight on a spring with a shock absorber. Push it and it bounces back and settles.
+  This tiny model describes how almost any robot part reacts to being disturbed — whether it wobbles or
+  settles smoothly.
+technicalDefinition: >-
+  The spring-mass-damper is a second-order dynamic system (mass m, spring k, damper c) whose response to
+  disturbance is characterized by natural frequency and damping ratio.
+quizQuestion:
+  q: The three elements of a spring-mass-damper are…
+  options:
+    - Battery, motor, wheel
+    - Mass, spring (stiffness), and damper (damping)
+    - Camera, lidar, IMU
+    - Gear, belt, chain
+  answer: 1
+  explanation: >-
+    A mass, a spring providing stiffness (restoring force), and a damper providing damping (energy
+    dissipation) — the canonical second-order system.
+---
+
+If you understand one dynamic system, make it the **spring-mass-damper** — because almost every robot joint, structure, and control loop behaves like one. It's the single most useful mental model for how things vibrate and settle.
+
+## The three elements
+
+Picture a **mass** on a **spring** with a **damper** (shock absorber):
+
+- **Mass (m)** — resists acceleration (inertia).
+- **Spring (k)** — provides a **restoring force** pulling it back toward rest (stiffness).
+- **Damper (c)** — dissipates energy, resisting velocity (damping).
+
+Displace the mass and release it: the spring pulls it back, the mass overshoots, the damper bleeds energy, and it eventually **settles**. This "second-order system" has a characteristic response captured by two numbers: its [natural frequency](/atlas/concept/natural-frequency) (how fast it oscillates) and its [damping ratio](/atlas/concept/damping-ratio) (how quickly oscillations die out).
+
+```diagram
+{ "type": "flow", "title": "Disturb, oscillate, settle", "nodes": ["Displace the mass", "Spring pulls back", "Damper dissipates energy", "Settles to rest"], "caption": "The interplay of inertia, stiffness, and damping decides whether the response is a smooth settle or a ringing wobble — the essence of second-order dynamics." }
+```
+
+## Why it's everywhere in robotics
+
+- **Every joint is one.** A robot joint with its motor stiffness and inertia, plus friction/damping, behaves as a spring-mass-damper. Its natural frequency and damping determine whether it settles cleanly or oscillates.
+- **[Impedance control](/atlas/concept/impedance-control).** A robot rendered "soft" behaves as a *programmable* spring-mass-damper — you literally set its virtual stiffness and damping. Understanding this model is understanding impedance/admittance control.
+- **[Series-elastic actuators](/atlas/concept/series-elastic-actuator)** and legged robots deliberately introduce springs and dampers, tuned via this model.
+- **Control tuning.** A [PID](/atlas/concept/pid-controller) loop closed around a system makes it behave like a second-order spring-mass-damper — the "P" gain acts like stiffness, "D" like damping. Tuning is choosing the response.
+- **Vibration and structures.** Flexible robot links, suspensions, and mounts are analyzed this way.
+
+## The universal insight
+
+Because so much reduces to this model, its two parameters tell you the response *type*:
+
+- **Underdamped** — oscillates before settling (fast but wobbly).
+- **Critically damped** — settles fastest without oscillating (often the goal).
+- **Overdamped** — settles slowly without overshoot (sluggish).
+
+Choosing where a robot sits on this spectrum — via stiffness and damping — is a core design and control decision.
+
+## Why it matters
+
+The spring-mass-damper is the Rosetta Stone of dynamic behavior in robotics: master it and you understand how joints respond, how impedance control works, how PID tuning shapes motion, and why things oscillate or settle. It's the simplest model that explains an enormous amount of real robot behavior.
+
+## Related
+
+[Natural frequency](/atlas/concept/natural-frequency) · [Damping ratio](/atlas/concept/damping-ratio) · [Impedance control](/atlas/concept/impedance-control) · [PID controller](/atlas/concept/pid-controller)

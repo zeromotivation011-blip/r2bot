@@ -1,0 +1,80 @@
+---
+title: Manipulability Ellipsoid
+slug: manipulability-ellipsoid
+bucket: concept
+category: control
+summary: >-
+  A manipulability ellipsoid is a visual measure of how easily a robot arm can move or exert force in each
+  direction at a given pose — showing where the arm is dexterous and where it's near a stiff, weak singularity.
+difficulty: 4
+tags:
+  - manipulation
+  - kinematics
+  - analysis
+seeAlso:
+  - jacobian
+  - singularity
+  - redundant-manipulator
+  - inverse-kinematics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Manipulability (Yoshikawa)'
+    url: 'https://en.wikipedia.org/wiki/Manipulability'
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  A manipulability ellipsoid is a stretched blob drawn at a robot's hand that shows which directions it can move
+  easily and which are hard. A round blob means the arm is dexterous; a flat, squashed one means it's near a
+  bad pose where it can barely move one way.
+technicalDefinition: >-
+  The manipulability ellipsoid visualizes the mapping of unit joint velocities to end-effector velocities via
+  the Jacobian; its shape shows directional ease of motion and proximity to singularities.
+quizQuestion:
+  q: A flat, squashed manipulability ellipsoid indicates the arm is…
+  options:
+    - Highly dexterous
+    - Near a singularity, weak/slow in some direction
+    - Turned off
+    - Out of battery
+  answer: 1
+  explanation: >-
+    A degenerate (flattened) ellipsoid means the Jacobian is near-singular — the arm can barely move or exert
+    force in the collapsed direction.
+---
+
+At some poses a robot arm moves freely in every direction; at others it's stiff and struggles one way. The **manipulability ellipsoid** turns this into a picture — a shape drawn at the hand showing exactly how capable the arm is, and in which directions.
+
+## What it shows
+
+Imagine spinning the arm's joints at unit speed in every possible combination and plotting how fast the **hand** moves as a result. The set of achievable hand velocities traces out an **ellipsoid**. Its shape, computed from the [Jacobian](/atlas/concept/jacobian), reveals the arm's dexterity at that pose:
+
+- **Long axes** — directions the hand moves **easily** (a little joint motion → lots of hand motion).
+- **Short axes** — directions that are **hard** (much joint effort → little hand motion).
+- **Round ellipsoid** — the arm is **well-conditioned and dexterous**, equally capable in all directions.
+- **Flat, squashed ellipsoid** — a direction has nearly **collapsed**: the arm is close to a [singularity](/atlas/concept/singularity), barely able to move (or exert force) that way.
+
+```diagram
+{ "type": "flow", "title": "A shape that reveals dexterity", "nodes": ["Arm at a pose", "Jacobian maps joint→hand velocity", "Draw the velocity ellipsoid", "Round = dexterous, flat = singular"], "caption": "The ellipsoid's shape shows directional ease of motion. A balanced round shape means the arm is capable everywhere; a flattened one warns of a nearby singularity." }
+```
+
+## Velocity vs force
+
+There are two dual ellipsoids:
+
+- **Velocity ellipsoid** — directions of easy *motion* (above).
+- **Force ellipsoid** — its inverse: directions of easy *force*. Here's the neat twist — directions where the arm moves *easily* are directions where it's *weak* at pushing, and vice versa. Near a singularity the arm can push very hard in the collapsed direction but barely move it.
+
+## Why it's useful
+
+- **Avoiding singularities.** The ellipsoid (and its scalar summary, Yoshikawa's **manipulability measure** — essentially its volume) warns when the arm is approaching a [singularity](/atlas/concept/singularity), where control degrades and joint speeds blow up.
+- **Choosing poses.** For a task needing dexterity or force in a certain direction, pick an arm configuration whose ellipsoid is favorable there — a real consideration for [redundant arms](/atlas/concept/redundant-manipulator) with freedom to choose their pose.
+- **Design and placement.** Positioning a workpiece where the robot is most manipulable improves speed and accuracy.
+- **Redundancy resolution.** A [redundant](/atlas/concept/redundant-manipulator) arm can use its extra freedom to *maximize* manipulability while doing its task.
+
+## Why it matters
+
+The manipulability ellipsoid makes the abstract idea of "how good is the arm's pose?" visible and quantifiable. It's a core analysis tool for understanding robot arm dexterity, avoiding singularities, and choosing configurations — connecting the Jacobian's math to practical decisions about where and how a robot should work.
+
+## Related
+
+[Jacobian](/atlas/concept/jacobian) · [Singularity](/atlas/concept/singularity) · [Redundant manipulator](/atlas/concept/redundant-manipulator) · [Inverse kinematics](/atlas/concept/inverse-kinematics)

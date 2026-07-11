@@ -1,0 +1,77 @@
+---
+title: Angular Momentum
+slug: angular-momentum
+bucket: concept
+category: fundamentals
+summary: >-
+  Angular momentum is the rotational version of momentum — conserved, and the key to how robots balance, spin,
+  flip, and control their orientation, from reaction wheels to a cat-like mid-air twist.
+difficulty: 3
+tags:
+  - dynamics
+  - physics
+  - balance
+seeAlso:
+  - momentum
+  - inertia-tensor
+  - angular-velocity
+  - whole-body-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Angular momentum (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Angular_momentum'
+  - title: 'Conservation of angular momentum'
+    url: 'https://en.wikipedia.org/wiki/Angular_momentum'
+laymanExplanation: >-
+  Angular momentum is the spinning version of momentum — how much rotational 'oomph' something has. It's why a
+  spinning top stays up, why a figure skater speeds up pulling their arms in, and how robots control spinning
+  and balance.
+technicalDefinition: >-
+  Angular momentum (L = Iω) is the product of a body's inertia tensor and its angular velocity, a conserved
+  quantity changed only by external torques.
+quizQuestion:
+  q: A robot in mid-air (no ground contact) can change its body orientation by…
+  options:
+    - Instantly teleporting
+    - Redistributing angular momentum by moving its limbs
+    - Changing its total angular momentum freely
+    - Using its wheels
+  answer: 1
+  explanation: >-
+    Total angular momentum is conserved in the air, but the robot can move limbs to redistribute it and rotate
+    its body — the cat-righting / diver's twist trick.
+---
+
+Angular momentum is momentum's rotational twin — and for anything that balances, spins, or flips, it's the master quantity. It explains a spinning top, a figure skater's spin, and how a robot controls its orientation.
+
+## What it is
+
+Angular momentum (**L**) is the rotational analog of [linear momentum](/atlas/concept/momentum): the product of a body's [inertia tensor](/atlas/concept/inertia-tensor) and its [angular velocity](/atlas/concept/angular-velocity):
+
+```
+L = I · ω
+```
+
+Like linear momentum, it's **conserved** — it changes only when an external **torque** acts. And like linear momentum, you can't change a body's rotation instantly; it takes torque over time.
+
+```diagram
+{ "type": "flow", "title": "Rotational momentum, conserved", "nodes": ["Spinning body (L = Iω)", "Conserved without external torque", "Change I → change ω", "Or apply torque to change L"], "caption": "With no external torque, L stays fixed — so pulling mass inward (lower I) speeds up spin (higher ω). External torque is needed to change L itself." }
+```
+
+## The two big consequences for robots
+
+**1. Conservation lets robots reorient in mid-air.** A robot in flight — jumping, flipping, or a free-floating [space robot](/atlas/concept/satellite-servicing-robot) — has fixed total angular momentum (no ground to push on). But it can **redistribute** it: swing an arm or leg one way and the body rotates the other, so it can twist to land feet-first. This is the **falling-cat / diver's-twist** trick, and robots use it for aerial maneuvers and self-righting. Reaction wheels and control-moment gyroscopes exploit the same principle to steer orientation by storing and exchanging angular momentum.
+
+**2. It's central to balance.** A walking or running robot must manage not just its [center of mass](/atlas/concept/center-of-mass) but its **angular momentum** — an uncontrolled spin means falling. Modern balance and [whole-body controllers](/atlas/concept/whole-body-control) explicitly regulate the robot's angular momentum (windmilling arms to arrest a tipping motion is a robot deliberately generating angular momentum to recover — exactly what humans do).
+
+## The skater effect
+
+The classic demo: a spinning figure skater pulls their arms in, **reducing their inertia (I)**, so their **spin speed (ω) increases** to keep L constant. Robots use the reverse to slow a spin (extend limbs) or to trade rotation between body parts — a direct, useful application of conservation.
+
+## Why it matters
+
+Angular momentum governs every rotational aspect of a robot's motion — balance, spinning, flipping, attitude control, and self-righting. Its conservation is what lets robots reorient in the air and stabilize with reaction wheels, and its regulation is central to keeping legged and flying robots upright. It's a foundational quantity for all dynamic and balancing robotics.
+
+## Related
+
+[Momentum](/atlas/concept/momentum) · [Inertia tensor](/atlas/concept/inertia-tensor) · [Angular velocity](/atlas/concept/angular-velocity) · [Whole-body control](/atlas/concept/whole-body-control)

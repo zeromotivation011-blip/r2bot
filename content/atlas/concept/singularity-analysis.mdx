@@ -1,0 +1,75 @@
+---
+title: Singularity Analysis
+slug: singularity-analysis
+bucket: concept
+category: control
+summary: >-
+  Singularity analysis finds the configurations where a robot arm loses the ability to move or exert force in
+  some direction — mapping the 'no-go' poses that must be avoided in planning, design, and control.
+difficulty: 4
+tags:
+  - kinematics
+  - manipulation
+  - analysis
+seeAlso:
+  - singularity
+  - jacobian
+  - manipulability-ellipsoid
+  - inverse-kinematics
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Singularity (robotics)'
+    url: 'https://en.wikipedia.org/wiki/Singularity_(robotics)'
+  - title: 'Modern Robotics — Lynch & Park'
+    url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
+laymanExplanation: >-
+  Singularity analysis is figuring out which arm poses are 'stuck' — configurations where the robot can't move
+  its hand in some direction no matter how it turns its joints. Knowing where these poses are lets engineers
+  plan and design around them.
+technicalDefinition: >-
+  Singularity analysis identifies configurations where a manipulator's Jacobian loses rank, causing loss of a
+  degree of freedom of motion or force, and characterizes their locations and types.
+quizQuestion:
+  q: A robot arm is at a singularity when its Jacobian…
+  options:
+    - Is the identity matrix
+    - Loses rank (becomes degenerate)
+    - Is very large
+    - Has no entries
+  answer: 1
+  explanation: >-
+    At a singularity the Jacobian loses rank, so the arm can't produce end-effector motion in some direction —
+    the hallmark condition singularity analysis detects.
+---
+
+Every robot arm has poses where it becomes momentarily "stuck" — unable to move its hand in some direction, no matter how it spins its joints. Finding and understanding these poses is **singularity analysis**, and it's essential to designing, planning, and controlling arms safely.
+
+## What a singularity is
+
+At most configurations, a robot arm can move its hand in any direction. But at a **[singularity](/atlas/concept/singularity)**, the arm loses the ability to move (or exert force) in at least one direction. Mathematically, the [Jacobian](/atlas/concept/jacobian) — the matrix mapping joint speeds to hand motion — **loses rank** (becomes degenerate). Near such a pose, producing even a tiny hand motion in the lost direction demands *enormous, unsafe* joint velocities, so control breaks down. The [manipulability ellipsoid](/atlas/concept/manipulability-ellipsoid) collapses flat there.
+
+```diagram
+{ "type": "flow", "title": "Finding the stuck poses", "nodes": ["Compute the Jacobian", "Where does it lose rank?", "= singular configurations", "Avoid / handle them"], "caption": "Singularity analysis maps the configurations where the Jacobian degenerates — the poses where the arm can't move a certain way and control becomes ill-conditioned." }
+```
+
+## The types
+
+Singularity analysis classifies where and why they occur:
+
+- **Boundary (workspace-limit) singularities.** The arm is fully **stretched out** (or folded); it's at the edge of its reach and can't extend further in that direction. Unavoidable at the workspace boundary.
+- **Interior singularities.** Occur *inside* the workspace when joint axes **align** — famously the **wrist singularity**, where two wrist axes line up (the robot equivalent of [gimbal lock](/atlas/concept/gimbal-lock)) and a degree of freedom is lost. These are the tricky ones because they appear in the middle of otherwise-usable space.
+
+## Why the analysis matters
+
+- **Planning.** Motion planners and [IK](/atlas/concept/inverse-kinematics) solvers must **route around** singularities, since paths through them cause control to blow up. Knowing where they are is a prerequisite.
+- **Design.** Robot arm geometries are designed to push singularities to convenient locations or shrink singular regions — a core mechanical-design consideration.
+- **Control.** Near singularities, controllers use **damped least squares** to keep joint velocities bounded (trading a little accuracy for safety), and monitor **manipulability** to detect approach.
+- **Task placement.** Positioning the workpiece so the robot operates in a well-conditioned, singularity-free region improves speed and accuracy.
+
+## Why it matters
+
+Singularity analysis maps the fundamental "no-go" configurations of a robot arm — the poses where its kinematics degenerate and control fails. It's indispensable to designing capable arms, planning feasible motions, and controlling manipulators safely near their limits. Understanding singularities is core to serious manipulator engineering.
+
+## Related
+
+[Singularity](/atlas/concept/singularity) · [Jacobian](/atlas/concept/jacobian) · [Manipulability ellipsoid](/atlas/concept/manipulability-ellipsoid) · [Inverse kinematics](/atlas/concept/inverse-kinematics)

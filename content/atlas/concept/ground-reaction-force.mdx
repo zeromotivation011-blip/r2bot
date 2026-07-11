@@ -1,0 +1,72 @@
+---
+title: Ground Reaction Force
+slug: ground-reaction-force
+bucket: concept
+category: control
+summary: >-
+  The ground reaction force is the push the ground exerts back on a robot's foot — the only external force a
+  legged robot can use to move and balance, and the quantity its controllers ultimately shape.
+difficulty: 3
+tags:
+  - dynamics
+  - legged
+  - balance
+seeAlso:
+  - zero-moment-point
+  - center-of-pressure
+  - contact-mechanics
+  - whole-body-control
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Ground reaction force (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Ground_reaction_force'
+  - title: 'Legged locomotion dynamics'
+    url: 'https://en.wikipedia.org/wiki/Legged_robot'
+laymanExplanation: >-
+  The ground reaction force is the force the floor pushes back with when a robot's foot presses down. It's the
+  only thing a walking robot can push against to move and stay upright, so controlling it is everything for
+  legged robots.
+technicalDefinition: >-
+  The ground reaction force is the force exerted by the ground on a body in contact with it, equal and opposite
+  to the force the body applies; it is the sole external force (besides gravity) driving legged locomotion.
+quizQuestion:
+  q: For a legged robot, the ground reaction force is important because it's…
+  options:
+    - Just friction
+    - The only external force (besides gravity) it can use to move and balance
+    - Irrelevant to walking
+    - The battery output
+  answer: 1
+  explanation: >-
+    Aside from gravity, the ground reaction force is the only external force acting on a legged robot, so all
+    locomotion and balance come from shaping it.
+---
+
+Here's a profound fact about walking robots: aside from gravity, **the only external force they have to work with is the push of the ground on their feet**. Master that force — the **ground reaction force** — and you master legged locomotion.
+
+## What it is
+
+When a robot's foot presses on the ground, Newton's third law says the ground pushes back with an equal and opposite force: the **ground reaction force (GRF)**. It has a **normal** component (holding the robot up against gravity) and a **friction** component (letting it push forward, sideways, and turn without slipping). Everything a legged robot does — standing, stepping, running, turning, jumping — is achieved by **shaping this force** through how and where it places and loads its feet.
+
+```diagram
+{ "type": "flow", "title": "The one force a robot pushes against", "nodes": ["Foot presses ground", "Ground pushes back (GRF)", "Normal + friction components", "Robot accelerates / balances"], "caption": "Gravity pulls down; the GRF is the only other external force. Controlling its magnitude, direction, and location is how a legged robot moves and stays up." }
+```
+
+## Why it's the master quantity for legged robots
+
+- **It's all you've got.** A robot can only influence its [center of mass](/atlas/concept/center-of-mass) motion through the GRF. Want to accelerate forward? You must generate a backward-leaning GRF at the feet. Want to not fall? Keep the GRF's line of action right.
+- **Balance criteria are GRF criteria.** The [zero-moment point](/atlas/concept/zero-moment-point) and [center of pressure](/atlas/concept/center-of-pressure) are both descriptions of *where* the GRF effectively acts on the foot. Staying balanced means keeping that point inside the support.
+- **Friction limits it.** The horizontal GRF can't exceed what [friction](/atlas/concept/coulomb-friction) allows (the friction cone) — push too hard sideways and the foot slips. This is why traction and friction models matter so much for walking.
+- **Force control targets it.** Advanced legged controllers ([whole-body control](/atlas/concept/whole-body-control)) compute the desired GRF at each foot to produce the wanted body motion, then command joint torques to realize it. Force-controlled and backdrivable legs let robots regulate GRF directly.
+
+## How robots sense and use it
+
+Legged robots estimate GRF from **force-torque sensors** in the feet, from joint torque sensing, or from contact and IMU-based estimation. Modern locomotion — model-predictive control on quadrupeds, whole-body control on humanoids — plans **contact forces** (GRFs) as the primary variable, because they *are* the levers of motion. Running and jumping are bursts of large, well-timed GRF; soft landings absorb it.
+
+## Why it matters
+
+The ground reaction force is the fundamental external interaction of any legged robot with the world — the single force through which all locomotion and balance flow. Understanding that "walking is shaping the ground reaction force" reframes legged robotics and connects [center of mass](/atlas/concept/center-of-mass), ZMP, friction, and force control into one coherent picture.
+
+## Related
+
+[Zero-moment point](/atlas/concept/zero-moment-point) · [Center of pressure](/atlas/concept/center-of-pressure) · [Contact mechanics](/atlas/concept/contact-mechanics) · [Whole-body control](/atlas/concept/whole-body-control)

@@ -35,6 +35,7 @@ import { PythonPlayground } from '@/components/atlas/PythonPlayground';
 import { ConceptHero } from '@/components/atlas/ConceptHero';
 import { NextTopicBar } from '@/components/atlas/NextTopicBar';
 import { ConceptLayers } from '@/components/atlas/ConceptLayers';
+import { Reveal } from '@/components/Reveal';
 
 const PROGRAMMING_BUCKETS = new Set([
   'programming-software',
@@ -482,34 +483,36 @@ export default async function AtlasEntryPage(
 
           {/* You might also like */}
           {related.length > 0 && (
-            <section style={{ margin: '50px 0' }}>
-              <div className="section-eyebrow">You might also like</div>
-              <h2 className="display" style={{ fontSize: 24, margin: '0 0 18px' }}>
-                Keep going
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
-                {related.slice(0, 3).map((r) => (
-                  <a key={r.slug} href={`/atlas/${r.type}/${r.slug}`} className="pulse-card">
-                    <span
-                      className={`pulse-tag ${
-                        r.type === 'concept'
-                          ? 'usa'
-                          : r.type === 'company'
-                          ? 'india'
-                          : 'china'
-                      }`}
-                    >
-                      {typeLabel(r.type)}
-                    </span>
-                    <h3>{r.title}</h3>
-                    <p style={{ marginBottom: 0 }}>
-                      {r.summary.slice(0, 110)}
-                      {r.summary.length > 110 ? '…' : ''}
-                    </p>
-                  </a>
-                ))}
-              </div>
-            </section>
+            <Reveal>
+              <section style={{ margin: '50px 0' }}>
+                <div className="section-eyebrow">You might also like</div>
+                <h2 className="display" style={{ fontSize: 24, margin: '0 0 18px' }}>
+                  Keep going
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
+                  {related.slice(0, 3).map((r) => (
+                    <a key={r.slug} href={`/atlas/${r.type}/${r.slug}`} className="pulse-card">
+                      <span
+                        className={`pulse-tag ${
+                          r.type === 'concept'
+                            ? 'usa'
+                            : r.type === 'company'
+                            ? 'india'
+                            : 'china'
+                        }`}
+                      >
+                        {typeLabel(r.type)}
+                      </span>
+                      <h3>{r.title}</h3>
+                      <p style={{ marginBottom: 0 }}>
+                        {r.summary.slice(0, 110)}
+                        {r.summary.length > 110 ? '…' : ''}
+                      </p>
+                    </a>
+                  ))}
+                </div>
+              </section>
+            </Reveal>
           )}
 
           {/* Last updated */}
@@ -527,23 +530,25 @@ export default async function AtlasEntryPage(
 
           {/* Sources */}
           {entry.sources && entry.sources.length > 0 && (
-            <section style={{ margin: '30px 0 20px', paddingTop: 24, borderTop: '1px solid var(--border)' }}>
-              <div className="section-eyebrow">Sources</div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {entry.sources.map((s) => (
-                  <li key={s.url} style={{ marginBottom: 10 }}>
-                    <a
-                      href={s.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: 'var(--cyan)', fontSize: 14.5 }}
-                    >
-                      {s.title} →
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </section>
+            <Reveal>
+              <section style={{ margin: '30px 0 20px', paddingTop: 24, borderTop: '1px solid var(--border)' }}>
+                <div className="section-eyebrow">Sources</div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {entry.sources.map((s) => (
+                    <li key={s.url} style={{ marginBottom: 10 }}>
+                      <a
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: 'var(--cyan)', fontSize: 14.5 }}
+                      >
+                        {s.title} →
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </Reveal>
           )}
 
           {/* Community Lab thread for this entry */}

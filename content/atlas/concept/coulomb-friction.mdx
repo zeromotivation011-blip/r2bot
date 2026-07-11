@@ -1,0 +1,82 @@
+---
+title: Coulomb Friction
+slug: coulomb-friction
+bucket: concept
+category: fundamentals
+summary: >-
+  Coulomb friction is the classic model where sliding resistance is proportional to the pressing force — the
+  simple rule (and its 'friction cone') that underpins how robots reason about grasping, walking, and
+  contact.
+difficulty: 3
+tags:
+  - dynamics
+  - contact
+  - fundamentals
+seeAlso:
+  - friction-model
+  - force-closure
+  - contact-mechanics
+  - grasp-planning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Friction — Coulomb model (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Friction#Dry_friction'
+  - title: 'Friction cone (grasping)'
+    url: 'https://en.wikipedia.org/wiki/Friction'
+laymanExplanation: >-
+  Coulomb friction is the basic rule that the harder you press two surfaces together, the more they grip
+  before sliding. The 'friction cone' is the range of push directions the surface can resist without
+  slipping — key to whether a robot's grip holds.
+technicalDefinition: >-
+  Coulomb friction models kinetic friction force as proportional to the normal force (F = μN), independent of
+  contact area and sliding speed, bounding tangential force before slip.
+quizQuestion:
+  q: In Coulomb friction, the maximum friction force is proportional to…
+  options:
+    - The contact area
+    - The normal (pressing) force
+    - The color of the surface
+    - The time of day
+  answer: 1
+  explanation: >-
+    Coulomb's law: friction force ≤ μ times the normal force — proportional to how hard the surfaces are
+    pressed together, independent of contact area.
+---
+
+The most-used friction rule in robotics is also the oldest and simplest: press harder, grip more. That's **Coulomb friction**, and its "friction cone" is the geometric idea behind whether a robot's grasp holds or its foot slips.
+
+## The law
+
+Coulomb (dry) friction says the friction force resisting sliding is at most **proportional to the normal (pressing) force**:
+
+```
+F_friction ≤ μ · N
+```
+
+where **N** is how hard the surfaces are pressed together and **μ** is the friction coefficient. Two consequences a robot relies on: friction is (approximately) **independent of contact area** and of sliding speed, and there's a **threshold** — the contact holds without sliding until the tangential force exceeds μN, then it slips.
+
+```diagram
+{ "type": "flow", "title": "Press harder, resist more — up to a limit", "nodes": ["Normal force N", "Max friction = μ·N", "Below limit → no slip", "Above limit → slides"], "caption": "Friction can resist tangential force up to μ·N. Stay inside that budget and the contact holds; exceed it and it slips — the basic contact rule for grasping and walking." }
+```
+
+## The friction cone
+
+Coulomb's law has a beautiful geometric form: the **friction cone**. At a contact point, the total contact force must stay within a cone (half-angle arctan μ) around the surface normal — otherwise the surface would have to supply more sideways force than friction allows, and it slips. This cone is the workhorse of grasp analysis: a grasp achieves [force closure](/atlas/concept/force-closure) when the contacts' friction cones together can resist any disturbance. Bigger μ = wider cone = easier grip; slippery surface = narrow cone = precarious.
+
+## Where robots use it
+
+- **[Grasping](/atlas/concept/grasp-planning).** Every grasp-stability calculation checks whether forces stay inside the friction cones.
+- **Locomotion.** A foot doesn't slip as long as the ground reaction force stays inside its friction cone — the constraint behind stable stepping and traction.
+- **Manipulation and pushing.** Predicting whether a pushed object slides or sticks.
+
+## The limits
+
+Coulomb friction is an **idealization**. Real friction has distinct static vs kinetic values (stick-slip), depends on speed at low velocities, and varies with surface condition — captured only by richer [friction models](/atlas/concept/friction-model). But Coulomb's simplicity and its friction-cone geometry make it the default for reasoning about contact, with margins added for reality.
+
+## Why it matters
+
+Coulomb friction — and especially the friction cone — is the fundamental way robots reason about contact stability. It's the mathematical bedrock of grasp planning and legged locomotion, turning "will it slip?" into a clean geometric condition. Understanding it is essential to all of contact-rich robotics.
+
+## Related
+
+[Friction model](/atlas/concept/friction-model) · [Force closure](/atlas/concept/force-closure) · [Contact mechanics](/atlas/concept/contact-mechanics) · [Grasp planning](/atlas/concept/grasp-planning)

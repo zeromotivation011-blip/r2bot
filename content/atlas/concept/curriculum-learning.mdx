@@ -1,0 +1,76 @@
+---
+title: Curriculum Learning
+slug: curriculum-learning
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Curriculum learning trains a robot on progressively harder tasks — easy first, then building up — the way
+  people learn, which makes hard skills learnable that would be impossible to master all at once.
+difficulty: 3
+tags:
+  - reinforcement-learning
+  - machine-learning
+  - ai
+seeAlso:
+  - reinforcement-learning
+  - reward-shaping
+  - domain-randomization
+  - sim-to-real
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Curriculum learning (Bengio et al.)'
+    url: 'https://en.wikipedia.org/wiki/Curriculum_learning'
+  - title: 'Automatic curriculum in RL'
+    url: 'https://en.wikipedia.org/wiki/Reinforcement_learning'
+laymanExplanation: >-
+  Curriculum learning teaches a robot the way a good class does — start with easy versions of a task and slowly
+  make them harder. This lets it eventually master skills that would be too hard to learn if thrown in at the
+  deep end.
+technicalDefinition: >-
+  Curriculum learning structures training as a sequence of tasks of increasing difficulty, improving learning
+  speed and enabling mastery of complex tasks that are intractable to learn from scratch.
+quizQuestion:
+  q: Curriculum learning helps mainly by…
+  options:
+    - Making tasks harder from the start
+    - Ordering training from easy to hard so complex skills become learnable
+    - Removing the reward
+    - Using no data
+  answer: 1
+  explanation: >-
+    Presenting tasks in increasing difficulty lets the agent build up capability gradually, making hard skills
+    learnable that would fail if attempted all at once.
+---
+
+You don't teach someone to run before they can walk. **Curriculum learning** brings that obvious teaching principle to robots — training on a sequence of increasingly hard tasks, which turns out to be the difference between learning a hard skill and never learning it at all.
+
+## The idea
+
+Instead of throwing a robot straight at a hard task, curriculum learning **orders training from easy to hard**. Start with a simplified version the robot can succeed at, then gradually increase difficulty as it improves — smaller steps toward the full challenge. Each stage builds on the last, so the robot is always learning at the edge of its current ability rather than flailing at something far beyond it.
+
+```diagram
+{ "type": "flow", "title": "Easy first, then harder", "nodes": ["Start with easy task", "Succeed, then increase difficulty", "Build on prior skill", "Master the full task"], "caption": "Difficulty ramps up as competence grows. Skills that are hopeless to learn from scratch become learnable when approached through a graded sequence." }
+```
+
+## Why it's often essential
+
+In [reinforcement learning](/atlas/concept/reinforcement-learning), a hard task can have such **sparse reward** that a fresh agent almost never stumbles onto success — so it never gets a learning signal and never improves. A curriculum fixes this: early easy tasks *do* yield success and reward, bootstrapping the agent's ability, which then transfers to harder stages. It's closely related to [reward shaping](/atlas/concept/reward-shaping) (both guide learning toward a hard goal) — curriculum shapes the *tasks*, shaping shapes the *reward*.
+
+Classic robotics examples: teaching a legged robot to walk by first learning on flat ground, then adding slopes, then rough terrain; teaching manipulation by starting with large easy-to-grasp objects before small tricky ones; or gradually widening [domain randomization](/atlas/concept/domain-randomization) ranges.
+
+## Manual vs automatic curricula
+
+- **Hand-designed curricula.** An engineer defines the difficulty stages — effective but requires insight and effort.
+- **Automatic curriculum learning.** The system *itself* generates the sequence — adjusting difficulty to keep the agent challenged but succeeding, or generating new sub-goals. This ties into **self-play** (where opponents co-evolve in difficulty) and goal-generation methods, an active research area.
+
+## Where it fits in robot learning
+
+Curriculum learning is a key ingredient in training complex robot behaviors in simulation — combined with massively-parallel [simulation](/atlas/concept/sim-to-real) and domain randomization, it's part of the recipe behind robust learned locomotion and manipulation that then transfers to hardware.
+
+## Why it matters
+
+Curriculum learning encodes a deep truth about learning — that hard things become achievable when approached step by step. For robots, it's often what makes an otherwise-unlearnable skill trainable, and a standard tool for teaching complex behaviors efficiently. It brings the structure of good teaching to machine learning.
+
+## Related
+
+[Reinforcement learning](/atlas/concept/reinforcement-learning) · [Reward shaping](/atlas/concept/reward-shaping) · [Domain randomization](/atlas/concept/domain-randomization) · [Sim-to-real](/atlas/concept/sim-to-real)

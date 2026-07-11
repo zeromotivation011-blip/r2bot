@@ -1,0 +1,81 @@
+---
+title: Self-Supervised Learning
+slug: self-supervised-learning
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Self-supervised learning trains models on unlabeled data by inventing the labels from the data itself — the
+  technique that lets robots learn rich representations from raw sensor streams without expensive human
+  annotation.
+difficulty: 3
+tags:
+  - machine-learning
+  - perception
+  - ai
+seeAlso:
+  - transfer-learning
+  - foundation-model-robotics
+  - synthetic-data
+  - transformer-architecture
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Self-supervised learning (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Self-supervised_learning'
+  - title: 'Representation learning'
+    url: 'https://en.wikipedia.org/wiki/Feature_learning'
+laymanExplanation: >-
+  Self-supervised learning lets an AI teach itself from raw data by hiding part of the data and predicting it —
+  like covering a word in a sentence and guessing it. This means robots can learn from oceans of unlabeled
+  sensor data without humans labeling everything.
+technicalDefinition: >-
+  Self-supervised learning derives training signals from unlabeled data via pretext tasks (e.g. predicting
+  masked or future parts), learning representations transferable to downstream tasks.
+quizQuestion:
+  q: Self-supervised learning gets its training labels from…
+  options:
+    - Expensive human annotation
+    - The unlabeled data itself (e.g. predicting hidden parts)
+    - Random guessing
+    - A reward function
+  answer: 1
+  explanation: >-
+    It creates supervision from the data itself — predicting masked, future, or transformed parts — so no
+    manual labels are needed to learn useful representations.
+---
+
+Labeling data is the bottleneck of machine learning — slow, costly, and limited. **Self-supervised learning** sidesteps it entirely: the model **teaches itself** from raw, unlabeled data by inventing its own learning task, unlocking the vast oceans of sensor data robots produce.
+
+## The idea
+
+Self-supervised learning creates a **training signal from the data itself**, with no human labels. It does this through **pretext tasks** — puzzles where the answer is already in the data:
+
+- **Predict a hidden part.** Mask a word in a sentence and predict it; mask a patch of an image and reconstruct it. (This is how large language models and masked image models learn.)
+- **Predict the future.** Given part of a video or sensor stream, predict what comes next.
+- **Contrastive learning.** Learn that two augmented views of the same thing are "the same" and different things are "different."
+
+Solving these puzzles forces the model to learn **rich, general representations** of the data's structure — which then transfer to real downstream tasks with little labeled data.
+
+```diagram
+{ "type": "flow", "title": "The data supervises itself", "nodes": ["Raw unlabeled data", "Hide/transform part of it", "Predict the hidden part", "Learn useful representations"], "caption": "By turning the data into its own prediction puzzle, the model learns structure with no human labels — then transfers that knowledge to real tasks." }
+```
+
+## Why it matters for robots
+
+- **Unlabeled data is everywhere; labels are scarce.** Robots generate endless raw camera, lidar, and proprioceptive streams. Labeling it all is impossible — self-supervision learns from it *as-is*.
+- **Rich representations.** Self-supervised pretraining yields general-purpose features (like DINOv2 for vision) that make downstream perception work better with far less labeled data — a form of [transfer learning](/atlas/concept/transfer-learning).
+- **Foundation of foundation models.** The large [foundation models](/atlas/concept/foundation-model-robotics) and [transformers](/atlas/concept/transformer-architecture) powering modern robot perception and Vision-Language-Action systems are pretrained self-supervised on web-scale data — inheriting broad knowledge no robot dataset could provide.
+- **Learning from interaction.** A robot can self-supervise from its own experience — predicting the sensory consequences of its actions — learning about the world without external labels.
+
+## Relationship to other learning
+
+- **Supervised learning** needs labels (expensive).
+- **Self-supervised learning** invents labels from data (cheap, scalable) — often used to *pretrain*, then fine-tune on a small labeled set.
+- It complements [synthetic data](/atlas/concept/synthetic-data) (which provides free labels via simulation) as a way around the annotation bottleneck.
+
+## Why it matters
+
+Self-supervised learning removed the biggest constraint in modern AI — the need for human-labeled data — and it's the engine behind the large pretrained models transforming robot perception and control. For robotics, where labeled data is especially scarce but raw data is abundant, learning from data without labels is a foundational capability.
+
+## Related
+
+[Transfer learning](/atlas/concept/transfer-learning) · [Foundation models for robotics](/atlas/concept/foundation-model-robotics) · [Synthetic data](/atlas/concept/synthetic-data) · [Transformer architecture](/atlas/concept/transformer-architecture)

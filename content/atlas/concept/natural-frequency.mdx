@@ -1,0 +1,78 @@
+---
+title: Natural Frequency
+slug: natural-frequency
+bucket: concept
+category: control
+summary: >-
+  Natural frequency is the rate at which a system wants to oscillate when disturbed — the number that decides
+  how fast a robot joint responds, when it resonates dangerously, and the ceiling on control bandwidth.
+difficulty: 3
+tags:
+  - dynamics
+  - control
+  - vibration
+seeAlso:
+  - spring-mass-damper
+  - damping-ratio
+  - series-elastic-actuator
+  - pid-controller
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Natural frequency (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Natural_frequency'
+  - title: 'Resonance'
+    url: 'https://en.wikipedia.org/wiki/Resonance'
+laymanExplanation: >-
+  Natural frequency is how fast something vibrates on its own after you nudge it — like a plucked guitar string
+  or a wobbling ruler. For robots it sets how quickly a joint can respond and warns where damaging vibrations
+  (resonance) can build up.
+technicalDefinition: >-
+  Natural frequency is the frequency at which a system oscillates freely without driving force, set by its
+  stiffness and mass (ω = √(k/m) for a spring-mass system).
+quizQuestion:
+  q: A stiffer, lighter robot joint will have a…
+  options:
+    - Lower natural frequency
+    - Higher natural frequency
+    - Zero natural frequency
+    - No relationship
+  answer: 1
+  explanation: >-
+    Natural frequency rises with stiffness and falls with mass (ω = √(k/m)), so stiffer and lighter means a
+    higher natural frequency and faster response.
+---
+
+Pluck a guitar string and it vibrates at a specific pitch; nudge a robot joint and it settles at its own rate. That rate — the **natural frequency** — is a number with outsized importance: it bounds how fast a robot can move and warns where vibration turns dangerous.
+
+## What it is
+
+Natural frequency is the rate at which a system **oscillates freely** after a disturbance, with no continuing push. For a [spring-mass](/atlas/concept/spring-mass-damper) system it's:
+
+```
+ω = √(k / m)
+```
+
+— rising with **stiffness (k)** and falling with **mass (m)**. Stiffer and lighter → higher natural frequency → faster, snappier response. Floppier and heavier → lower → slow and prone to wobble.
+
+```diagram
+{ "type": "flow", "title": "How fast it wants to oscillate", "nodes": ["Disturb the system", "Stiffness pulls back", "Mass carries momentum", "Oscillates at ω = √(k/m)"], "caption": "The tug-of-war between stiffness and inertia sets the natural rate of oscillation — higher for stiff, light systems; lower for soft, heavy ones." }
+```
+
+## Why robots care
+
+- **Control bandwidth ceiling.** A joint can't be controlled *faster* than its natural frequency without exciting vibration. A low natural frequency (a floppy, heavy arm) *limits how fast you can command it* — you can't out-run its own dynamics. This is a fundamental limit on performance.
+- **Resonance danger.** If a robot is driven (by a motor, a repetitive motion, a gait) at or near a natural frequency, oscillations **build up** dramatically — **resonance** — causing violent vibration, errors, or damage. Engineers deliberately keep operating frequencies away from natural frequencies.
+- **Compliance trade-off.** Adding a [series-elastic](/atlas/concept/series-elastic-actuator) spring for safety/force-sensing *lowers* the joint's natural frequency, which is exactly why it reduces control bandwidth — a direct, quantified trade-off.
+- **Structural design.** Flexible links and mounts must have natural frequencies well above the robot's motion frequencies, or they'll ring.
+
+## The tuning connection
+
+When you close a [PID](/atlas/concept/pid-controller) loop, you effectively *set* the system's natural frequency (via the P gain, which acts like added stiffness) and its [damping](/atlas/concept/damping-ratio). Raise P for faster response (higher ω), but push too far and you approach the mechanical limits and instability. Tuning is largely choosing a natural frequency you can actually achieve and damp.
+
+## Why it matters
+
+Natural frequency is a fundamental descriptor of any robot's dynamic behavior — it sets the speed ceiling for control, flags the resonances to avoid, and quantifies the cost of compliance. Understanding it explains why some robots move crisply and others must go slow, and it's essential to control tuning and mechanical design.
+
+## Related
+
+[Spring-mass-damper](/atlas/concept/spring-mass-damper) · [Damping ratio](/atlas/concept/damping-ratio) · [Series elastic actuator](/atlas/concept/series-elastic-actuator) · [PID controller](/atlas/concept/pid-controller)

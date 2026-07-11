@@ -1,0 +1,78 @@
+---
+title: Few-Shot Learning
+slug: few-shot-learning
+bucket: concept
+category: ai-and-perception
+summary: >-
+  Few-shot learning lets a model pick up a new task or object from just a handful of examples — the ability
+  robots need to adapt on the fly to new items and situations without collecting and training on thousands of
+  samples.
+difficulty: 3
+tags:
+  - machine-learning
+  - perception
+  - ai
+seeAlso:
+  - transfer-learning
+  - self-supervised-learning
+  - foundation-model-robotics
+  - imitation-learning
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Few-shot learning (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/One-shot_learning'
+  - title: 'Meta-learning'
+    url: 'https://en.wikipedia.org/wiki/Meta-learning_(computer_science)'
+laymanExplanation: >-
+  Few-shot learning is a model learning something new from just a few examples — like recognizing a new object
+  after seeing it once or twice. Robots need this to handle new items and tasks without huge new datasets each
+  time.
+technicalDefinition: >-
+  Few-shot learning enables a model to generalize to new tasks or classes from very few labeled examples, often
+  via meta-learning or by leveraging strong pretrained representations.
+quizQuestion:
+  q: Few-shot learning is valuable for robots because it…
+  options:
+    - Needs thousands of examples per new task
+    - Lets them adapt to new objects/tasks from just a few examples
+    - Removes the need for any data
+    - Only works in simulation
+  answer: 1
+  explanation: >-
+    It enables adapting to new classes or tasks from a handful of examples — essential for robots facing novel
+    objects and situations without collecting large new datasets.
+---
+
+A person shown a new tool once can usually use it again. Most machine learning needs *thousands* of examples to learn something new — hopeless for a robot meeting an unfamiliar object mid-task. **Few-shot learning** aims to close that gap: learn from just a handful of examples.
+
+## What it means
+
+Few-shot learning enables a model to **generalize to a new task or category from very few labeled examples** — sometimes just one ("one-shot") or a handful. Instead of training a fresh model on a big dataset for each new object or task, the model **adapts quickly** using what it already knows plus a few new samples.
+
+```diagram
+{ "type": "flow", "title": "Learn new from a handful", "nodes": ["Strong prior knowledge", "See a few new examples", "Rapidly adapt", "Handle the new task/object"], "caption": "Leaning on broad pretrained knowledge, the model needs only a few examples to pick up something new — rather than a full dataset and retraining." }
+```
+
+## How it's achieved
+
+- **Leverage strong pretrained representations.** A model pretrained on huge data ([self-supervised](/atlas/concept/self-supervised-learning), or a [foundation model](/atlas/concept/foundation-model-robotics)) has already learned general features, so a new category is just a small adjustment on top — a form of [transfer learning](/atlas/concept/transfer-learning). This is why large pretrained models are naturally good few-shot learners.
+- **Meta-learning ("learning to learn").** Explicitly train the model across many tasks so it becomes good at *adapting quickly* to new ones from few examples (methods like MAML, prototypical networks).
+- **In-context learning.** Large models can adapt from examples given at inference time, with no weight updates — "here are two examples, now do the third."
+
+## Why robots need it
+
+- **Novel objects and tasks.** A home or warehouse robot constantly meets items it's never seen. Few-shot ability lets it recognize or manipulate a new object from a couple of examples instead of demanding a fresh dataset.
+- **Fast on-site adaptation.** Deploying to a new environment or a new part on a line without a lengthy data-collection-and-retraining cycle.
+- **Learning skills from few demos.** Few-shot [imitation learning](/atlas/concept/imitation-learning) — teaching a robot a new task from just one or a few demonstrations — is a major goal, made increasingly possible by large pretrained policies.
+
+## The challenge
+
+Generalizing from tiny data is fundamentally hard — with few examples it's easy to overfit or misjudge. Success depends heavily on the **quality of prior knowledge**: the richer and more general the pretrained representation, the better the few-shot performance. This is a big reason the field has moved toward large, broadly-pretrained models.
+
+## Why it matters
+
+Few-shot learning is what will let robots be **adaptable** rather than brittle — handling the endless novelty of the real world without a data-collection project for every new object or task. Together with strong pretrained representations, it's central to the vision of general-purpose robots that learn new things quickly, like people do.
+
+## Related
+
+[Transfer learning](/atlas/concept/transfer-learning) · [Self-supervised learning](/atlas/concept/self-supervised-learning) · [Foundation models for robotics](/atlas/concept/foundation-model-robotics) · [Imitation learning](/atlas/concept/imitation-learning)

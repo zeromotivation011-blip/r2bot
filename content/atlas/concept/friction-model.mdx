@@ -1,0 +1,81 @@
+---
+title: Friction Model
+slug: friction-model
+bucket: concept
+category: fundamentals
+summary: >-
+  A friction model is the math a robot uses to predict how surfaces resist sliding — deceptively hard to get
+  right, and a major reason grasps, walking, and simulations behave differently in reality than on paper.
+difficulty: 3
+tags:
+  - dynamics
+  - contact
+  - fundamentals
+seeAlso:
+  - coulomb-friction
+  - contact-mechanics
+  - grasp-planning
+  - physics-engine
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Friction (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Friction'
+  - title: 'Friction models in robotics'
+    url: 'https://en.wikipedia.org/wiki/Friction'
+laymanExplanation: >-
+  A friction model is a formula for how much surfaces grip and resist sliding. It sounds simple, but real
+  friction is messy and unpredictable, which is why robot grasps and walking don't always behave the way the
+  math says.
+technicalDefinition: >-
+  A friction model mathematically describes the tangential resistance between contacting surfaces, ranging
+  from simple Coulomb friction to complex velocity- and state-dependent models.
+quizQuestion:
+  q: Why is friction hard to model accurately for robots?
+  options:
+    - It doesn't exist
+    - It's highly variable and depends on surfaces, speed, and conditions
+    - It's always exactly known
+    - It only affects color
+  answer: 1
+  explanation: >-
+    Real friction varies with materials, surface state, speed, contamination, and load, so simple models are
+    only approximations — a big source of sim-to-real error.
+---
+
+Friction sounds like a simple physics-class formula, but it's one of the most troublesome things in robotics — the hidden reason a grasp that works in simulation slips in reality, or a walking robot's foot skids unexpectedly. A **friction model** is the robot's attempt to predict it.
+
+## What it is
+
+A friction model is the **math describing how contacting surfaces resist sliding**. The simplest is [Coulomb friction](/atlas/concept/coulomb-friction): friction force is proportional to the normal (pressing) force, up to a limit, with a coefficient μ. It captures the basics — more pressing force means more grip, and there's a threshold before sliding starts. Robots use it constantly for [grasping](/atlas/concept/grasp-planning), walking, and manipulation.
+
+```diagram
+{ "type": "flow", "title": "Predicting resistance to sliding", "nodes": ["Normal force + surfaces", "Friction model (μ, etc.)", "Predicted grip / slip", "Reality often differs"], "caption": "The model estimates how much sliding resistance the contact provides — but real friction's variability means the prediction is an approximation." }
+```
+
+## Why it's genuinely hard
+
+Real friction refuses to fit neat formulas:
+
+- **It's variable.** μ depends on both materials, surface finish, contamination (dust, oil, moisture), temperature, and wear — and it *changes* over time.
+- **Static ≠ kinetic.** It takes more force to *start* sliding (static friction) than to keep sliding (kinetic) — the "stick-slip" that makes joints jerk and grasps twitch.
+- **Speed and load effects.** Advanced models (Stribeck, Dahl, LuGre) add velocity dependence and pre-sliding micro-displacement — more accurate but more complex.
+- **You can't measure it live** for every contact, so robots plan with uncertain values.
+
+## Where it bites
+
+- **Grasping.** Whether a grip holds ([force closure](/atlas/concept/grasp-planning)) hinges on friction; a slightly-too-low real μ means the object slips.
+- **Locomotion.** Foot-ground friction decides whether a robot walks or skids; unexpected low friction (wet floor) causes falls.
+- **[Contact-rich manipulation](/atlas/concept/contact-mechanics).** Insertion, pushing, and sliding all depend on friction that's hard to predict.
+- **Simulation.** A [physics engine](/atlas/concept/physics-engine)'s friction model is a leading cause of the **sim-to-real gap** — behaviors learned with idealized friction fail on real, messy contact.
+
+## How robots cope
+
+Since friction can't be known exactly, robust robots **don't rely on precise values**: they use safety margins (grip harder than the nominal μ requires), sense slip and react (via [tactile](/atlas/concept/tactile-sensor) or force sensing), and learn contact behavior from real data rather than pure models. [Domain randomization](/atlas/concept/domain-randomization) deliberately varies friction in training so policies stay robust to the real value.
+
+## Why it matters
+
+Friction modeling sits at the heart of every physical interaction a robot has — grasping, walking, pushing, inserting. Its stubborn variability is a defining challenge of contact-rich robotics and a primary reason the real world surprises robots trained in simulation. Understanding it explains much about why manipulation and locomotion are so hard.
+
+## Related
+
+[Coulomb friction](/atlas/concept/coulomb-friction) · [Contact mechanics](/atlas/concept/contact-mechanics) · [Grasp planning](/atlas/concept/grasp-planning) · [Physics engine](/atlas/concept/physics-engine)

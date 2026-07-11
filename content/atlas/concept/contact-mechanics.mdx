@@ -1,0 +1,83 @@
+---
+title: Contact Mechanics
+slug: contact-mechanics
+bucket: concept
+category: fundamentals
+summary: >-
+  Contact mechanics is the physics of what happens when surfaces touch — the forces, deformation, and friction
+  at the interface — and the single hardest thing to model in robot manipulation and locomotion.
+difficulty: 4
+tags:
+  - dynamics
+  - contact
+  - fundamentals
+seeAlso:
+  - friction-model
+  - coulomb-friction
+  - grasp-planning
+  - physics-engine
+lastReviewed: 2026-07-10T00:00:00.000Z
+sources:
+  - title: 'Contact mechanics (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Contact_mechanics'
+  - title: 'Contact dynamics in robotics'
+    url: 'https://en.wikipedia.org/wiki/Contact_dynamics'
+laymanExplanation: >-
+  Contact mechanics is the study of what happens when two things touch — how they push on each other, deform,
+  grip, and slip. It's central to grasping and walking, and famously hard to predict, which is why robots
+  struggle with contact-rich tasks.
+technicalDefinition: >-
+  Contact mechanics analyzes the forces, stresses, deformation, and friction at interfaces between touching
+  bodies, governing manipulation, locomotion, and any contact-based robot behavior.
+quizQuestion:
+  q: Why is contact mechanics considered hard for robots?
+  options:
+    - Nothing ever touches
+    - Contacts are stiff, discontinuous, and hard to model accurately
+    - It only involves gravity
+    - It has been fully solved
+  answer: 1
+  explanation: >-
+    Contact introduces stiff, discontinuous forces (make/break, stick/slip) and complex friction and
+    deformation that are notoriously difficult to model and simulate accurately.
+---
+
+Almost everything useful a robot does — grasp, walk, push, insert, assemble — happens **at a contact**. And contact is, notoriously, the hardest physics in robotics to get right. **Contact mechanics** is the study of it.
+
+## What it covers
+
+Contact mechanics analyzes what happens when surfaces touch: the **normal forces** pressing them together, the **friction** resisting sliding, the tiny **deformation** at the interface, and how contacts **form and break**. It combines [friction models](/atlas/concept/friction-model), material deformation (elastic/plastic), and the geometry of the touching surfaces to predict how bodies interact through contact.
+
+```diagram
+{ "type": "flow", "title": "The physics where surfaces meet", "nodes": ["Surfaces approach + touch", "Normal force + deformation", "Friction: stick or slip", "Determines the interaction"], "caption": "At every contact, normal forces, deformation, and friction jointly decide whether things hold, slide, roll, or bounce — the crux of manipulation and locomotion." }
+```
+
+## Why it's the hard part
+
+Contact makes a robot's dynamics **stiff and discontinuous** — the properties that break clean math and simulation:
+
+- **Make and break.** A contact suddenly appears or vanishes, causing abrupt force changes an [equations-of-motion](/atlas/concept/equations-of-motion) solver must handle carefully.
+- **Stick and slip.** [Coulomb friction](/atlas/concept/coulomb-friction) means a contact can be stuck (no motion) or sliding, and switches between them — a non-smooth behavior.
+- **Rigid-body idealization breaks down.** Real bodies deform; treating them as perfectly rigid creates ambiguous or unstable contact forces.
+- **Impacts.** Collisions involve huge forces over tiny times, hard to resolve numerically.
+
+This is exactly why [physics engines](/atlas/concept/physics-engine) are judged mostly on their **contact handling**, and why contact is the primary source of the **sim-to-real gap**: idealized contact models don't match messy reality.
+
+## Where it decides success
+
+- **[Grasping](/atlas/concept/grasp-planning).** Whether fingers hold, roll, or slip an object is pure contact mechanics — the basis of grasp stability and in-hand manipulation.
+- **Locomotion.** Foot-ground contact (normal force, friction, ground reaction) determines traction, balance, and whether the robot walks or falls.
+- **Assembly.** [Peg-in-hole](/atlas/concept/peg-in-hole) and part mating are contact-force problems — the whole reason compliance and force control exist.
+- **Manipulation.** Pushing, pivoting, and sliding objects.
+
+## How robots handle it
+
+Because contact is so hard to model precisely, robots increasingly **sense and react** ([tactile](/atlas/concept/tactile-sensor) and force feedback), use **compliance** to be forgiving of contact (impedance/admittance control), and **learn** contact-rich skills from real data rather than pure models. Simulation with careful contact models plus [domain randomization](/atlas/concept/domain-randomization) helps bridge to reality.
+
+## Why it matters
+
+Contact mechanics is where robots meet the physical world, and its difficulty defines much of what's hard in robotics. Manipulation and legged locomotion are, at bottom, contact problems — so understanding contact (and why it resists clean modeling) is fundamental to the field's central challenges.
+
+## Related
+
+[Friction model](/atlas/concept/friction-model) · [Coulomb friction](/atlas/concept/coulomb-friction) · [Grasp planning](/atlas/concept/grasp-planning) · [Physics engine](/atlas/concept/physics-engine)
