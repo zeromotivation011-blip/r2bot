@@ -34,7 +34,7 @@ export async function generateMetadata(
   const { slug } = await params;
   const article = getPulseArticle(slug);
   if (!article) return { title: 'Not found · Pulse' };
-  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+  const base = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
   const canonical = `${base}/pulse/${slug}`;
   return {
     title: article.title,
@@ -72,7 +72,7 @@ export default async function PulseArticlePage(
     articleSection: article.category,
   };
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+  const base = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
   const canonical = `${base}/pulse/${slug}`;
 
   // Scan body for atlas-term mentions and surface them in a "Concepts behind this story" strip.

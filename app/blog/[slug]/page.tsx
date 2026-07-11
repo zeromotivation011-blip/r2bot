@@ -12,7 +12,7 @@ export const runtime = 'nodejs'
 // Regenerate periodically so Content-Manager edits appear on the live post.
 export const revalidate = 300
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
+const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export function generateStaticParams() {
   return getAllPosts().map(p => ({ slug: p.slug }))

@@ -11,7 +11,7 @@ import AtlasHomeClient, { type AtlasNode } from './AtlasHomeClient'
 export const runtime = 'nodejs'
 export const revalidate = 3600
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
+const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const metadata: Metadata = {
   title: 'Robotics Atlas — Every Concept Explained Simply | R2BOT',

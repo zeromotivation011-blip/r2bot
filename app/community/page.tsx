@@ -6,7 +6,7 @@ import { CopilotDrawer } from '@/components/CopilotDrawer'
 import { createSupabaseAdminClient } from '@/lib/supabase/server'
 import { CommunityGalleryClient, type CommunityBuild } from './CommunityGalleryClient'
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const runtime = 'nodejs'
 export const revalidate = 300 // 5 minutes — fresh enough for new submissions
