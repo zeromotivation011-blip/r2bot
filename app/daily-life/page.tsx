@@ -8,10 +8,10 @@ import DailyLifeClient from './DailyLifeClient'
 export const runtime = 'nodejs'
 export const revalidate = 3600
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
+const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const metadata: Metadata = {
-  title: 'Your Robot Day | Robots Already Running Your Life — R2BOT',
+  title: 'Your Robot Day | Robots Already Running Your Life',
   description:
     'Walk through a single Indian day. 47 robots help you — and you only notice 5. The end of the page asks: will you build them, or just use them?',
   alternates: { canonical: `${BASE}/daily-life` },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     type: 'article',
     url: `${BASE}/daily-life`,
     siteName: 'R2BOT',
-    title: 'Your Robot Day — R2BOT',
+    title: 'Your Robot Day',
     description: '47 robots, one day, one Indian person. Most are invisible.',
     images: [{ url: '/og-default.svg', width: 1200, height: 630 }],
   },

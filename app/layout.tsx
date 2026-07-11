@@ -13,7 +13,7 @@ import { AuthProvider } from '@/components/auth/AuthProvider';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { organizationJsonLD } from '@/lib/seo/jsonld';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 // Google Analytics 4 — set NEXT_PUBLIC_GA_ID (e.g. "G-XXXXXXX") in Vercel to turn on.
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 

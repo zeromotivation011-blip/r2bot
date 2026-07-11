@@ -6,10 +6,10 @@ import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { currentChallenges, currentISOWeek } from '@/lib/weekly-challenges';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export const metadata: Metadata = {
-  title: 'Weekly Robotics Challenges — R2BOT',
+  title: 'Weekly Robotics Challenges',
   description:
     'Three new robotics learning challenges every week. Complete them for bonus XP, badges, and streaks.',
   alternates: { canonical: `${BASE_URL}/challenges` },

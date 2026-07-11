@@ -2,11 +2,11 @@
 import type { Metadata } from 'next';
 import WorldMapDynamic from './WorldMapDynamic';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 const PAGE_URL = `${BASE_URL}/world-map`;
 
 export const metadata: Metadata = {
-  title: 'World Robotics Map 2024 | Robot Density by Country — R2BOT',
+  title: 'World Robotics Map 2024 | Robot Density by Country',
   description:
     "Interactive world robotics map with IFR 2023 data. Compare robot density across 50 countries. India vs South Korea: a 253× gap. Explore the global automation race, GDP vs automation scatter, and India's opportunity calculator.",
   keywords: [
@@ -26,14 +26,14 @@ export const metadata: Metadata = {
     type: 'website',
     url: PAGE_URL,
     siteName: 'R2BOT',
-    title: 'World Robotics Map 2024 — R2BOT',
+    title: 'World Robotics Map 2024',
     description:
       "50 countries · IFR 2023 data · India's 4 vs South Korea's 1,012. The world's most feature-rich interactive robotics map.",
     images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'World Robotics Map — R2BOT' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'World Robotics Map 2024 — R2BOT',
+    title: 'World Robotics Map 2024',
     description:
       "Interactive map of robot density across 50 countries (IFR 2023). India's +59% growth vs South Korea's 1,012 density.",
     images: ['/og-default.svg'],

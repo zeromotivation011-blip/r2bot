@@ -83,7 +83,7 @@ export default function TermsPage() {
       <h2>8. Termination</h2>
       <p>
         You can stop using R2BOT at any time. You can delete your account by emailing
-        <strong> ravi6703@gmail.com</strong>. We can suspend or terminate any account that violates these
+        <strong> hello@r2bot.in</strong>. We can suspend or terminate any account that violates these
         Terms. If we do, we&apos;ll tell you why.
       </p>
 
@@ -96,7 +96,7 @@ export default function TermsPage() {
 
       <h2>10. Contact</h2>
       <p>
-        Questions about these Terms? Email <strong>ravi6703@gmail.com</strong>.
+        Questions about these Terms? Email <strong>hello@r2bot.in</strong>.
       </p>
     </StaticPage>
   );

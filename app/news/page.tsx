@@ -6,10 +6,10 @@ import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { NewsPageClient } from './NewsPageClient';
 import { getNewsData } from '@/lib/news';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export const metadata: Metadata = {
-  title: 'Robotics News | Latest Robotics Breakthroughs — R2BOT',
+  title: 'Robotics News | Latest Robotics Breakthroughs',
   description:
     'Daily robotics news from IEEE Spectrum, The Robot Report, MIT, TechCrunch. Latest robot launches, research breakthroughs, India robotics updates.',
   keywords: [
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
     type: 'website',
     url: `${BASE_URL}/news`,
     siteName: 'R2BOT',
-    title: 'Robotics News — R2BOT',
+    title: 'Robotics News',
     description: 'Latest robotics news, breakthroughs, and India updates from 6 leading sources.',
     images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'Robotics News — R2BOT' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Robotics News | R2BOT',
+    title: 'Robotics News',
     description: 'Live robotics news aggregated from IEEE, MIT, TechCrunch, Wired, and more.',
     images: ['/og-default.svg'],
   },

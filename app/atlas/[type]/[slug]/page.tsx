@@ -58,7 +58,7 @@ import { readTime, plainTextFromMd } from '@/lib/reading';
 
 type Params = { type: AtlasType; slug: string };
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export async function generateStaticParams() {
   return getAllAtlasEntries().map((e) => ({ type: e.type, slug: e.slug }));
@@ -558,7 +558,7 @@ export default async function AtlasEntryPage(
           <p style={{ marginTop: 50, fontSize: 13, color: 'var(--muted)', textAlign: 'center' }}>
             Spotted something off?{' '}
             <a
-              href={`mailto:ravi6703@gmail.com?subject=${encodeURIComponent(
+              href={`mailto:hello@r2bot.in?subject=${encodeURIComponent(
                 `Error report: ${entry.title}`,
               )}&body=${encodeURIComponent(
                 `Page: ${canonical}\nIssue: `,

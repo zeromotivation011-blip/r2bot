@@ -17,7 +17,7 @@ import { RobotVote } from '@/components/robots/RobotVote';
 import { RobotFamilyTree } from '@/components/robots/RobotFamilyTree';
 import { getRobotExtra } from '@/lib/robots-extra';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export function generateStaticParams() {
   return ROBOTS.map((r) => ({ slug: r.slug }));
@@ -30,7 +30,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const robot = getRobotBySlug(slug);
-  if (!robot) return { title: 'Robot not found | R2BOT' };
+  if (!robot) return { title: 'Robot not found' };
   const url = `${BASE_URL}/robots/${robot.slug}`;
   return {
     title: robot.metaTitle,

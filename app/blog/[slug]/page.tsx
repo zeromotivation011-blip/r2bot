@@ -12,7 +12,7 @@ export const runtime = 'nodejs'
 // Regenerate periodically so Content-Manager edits appear on the live post.
 export const revalidate = 300
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
+const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export function generateStaticParams() {
   return getAllPosts().map(p => ({ slug: p.slug }))
@@ -21,10 +21,10 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const post = await getPostBySlugMerged(slug)
-  if (!post) return { title: 'Post not found | R2BOT' }
+  if (!post) return { title: 'Post not found' }
   const url = `${BASE}/blog/${post.slug}`
   return {
-    title: `${post.title} | R2BOT Blog`,
+    title: `${post.title}`,
     description: post.description,
     keywords: post.keywords,
     alternates: { canonical: url },

@@ -6,7 +6,7 @@ import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 
 export const metadata: Metadata = {
-  title: 'Page Not Found — R2BOT',
+  title: 'Page Not Found',
   description:
     "Looks like this robot got lost. The page you're looking for doesn't exist — but the rest of R2BOT does.",
   robots: { index: false, follow: true },

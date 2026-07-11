@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const data = loadLesson(courseSlug, lessonSlug)
   if (!data) return { title: 'Lesson not found · R2BOT Academy' }
   return {
-    title: `${data.lesson.title} · ${data.course.title} · R2BOT`,
+    title: `${data.lesson.title} · ${data.course.title}`,
     description: data.lesson.objectives.join(' · '),
   }
 }

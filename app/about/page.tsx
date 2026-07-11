@@ -69,7 +69,7 @@ export default function AboutPage() {
       <h2>Talk to us</h2>
       <p>
         Found an error? Want to suggest an Atlas entry? Want to collaborate? Email
-        <strong> ravi6703@gmail.com</strong> with the subject line &quot;R2BOT&quot; and we&apos;ll read it.
+        <strong> hello@r2bot.in</strong> with the subject line &quot;R2BOT&quot; and we&apos;ll read it.
       </p>
     </StaticPage>
   );

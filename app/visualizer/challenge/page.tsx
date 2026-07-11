@@ -6,7 +6,7 @@ import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { PIDChallengeClient } from './PIDChallengeClient';
 
 export const metadata: Metadata = {
-  title: 'PID Tuner Challenge — R2BOT',
+  title: 'PID Tuner Challenge',
   description:
     'Tune a PID controller to reach setpoint 80 with <10% overshoot in <5 seconds. Score yourself against the target.',
 };

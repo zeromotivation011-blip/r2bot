@@ -9,10 +9,10 @@ import { CHAPTERS, getAllMilestones } from '@/lib/history-chapters'
 export const runtime = 'nodejs'
 export const revalidate = 3600
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
+const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const metadata: Metadata = {
-  title: 'The Story of Robots — Robotics History | R2BOT',
+  title: 'The Story of Robots — Robotics History',
   description: "From a 1920 Czech play to a robot walking on Mars. The full narrative of robotics — chapter by chapter, with India's parallel story.",
   alternates: { canonical: `${BASE}/history` },
 }

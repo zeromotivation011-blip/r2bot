@@ -55,7 +55,7 @@ export default function SourcesPage() {
       <h2>Reporting errors</h2>
       <p>
         If you spot a factual error — and we genuinely want to know — email
-        <strong> ravi6703@gmail.com</strong> with &quot;R2BOT error&quot; in the subject line and the URL
+        <strong> hello@r2bot.in</strong> with &quot;R2BOT error&quot; in the subject line and the URL
         of the entry. We aim to verify and fix within 7 days. Each correction updates the
         &quot;Last reviewed&quot; date on the entry.
       </p>

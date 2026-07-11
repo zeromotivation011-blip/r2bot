@@ -12,12 +12,12 @@ import { getLiveLensVideos } from '@/lib/lens-live'
 export const runtime = 'nodejs'
 export const revalidate = 3600
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const metadata: Metadata = {
   title: "R2BOT — From Zero to Robotics Engineer | Learn, Build, Explore",
   description:
-    'From zero to robotics engineer. Learn ROS2, build real robots, and explore 1,000+ concepts with an AI mentor. Free to start — the clearest robotics learning platform on the internet.',
+    'From zero to robotics engineer. Learn ROS2, build real robots, and explore 400+ concepts with an AI mentor. Free to start — the clearest robotics learning platform on the internet.',
   keywords: [
     'learn robotics',
     'ROS2 tutorial beginner',
@@ -36,13 +36,13 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: 'R2BOT',
     title: "R2BOT — The World's Clearest Robotics Learning Platform",
-    description: '261 concepts. Real simulators. AI mentor. Free to explore, affordable to master.',
-    images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: "R2BOT — India's robotics platform" }],
+    description: '400+ concepts. Real simulators. AI mentor. Free to explore, affordable to master.',
+    images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'R2BOT — the clearest way to learn robotics' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'R2BOT — From Zero to Robotics Engineer',
-    description: "Learn ROS2, build real robots, explore 1,000+ concepts. AI mentor included. Free to start.",
+    description: "Learn ROS2, build real robots, explore 400+ concepts. AI mentor included. Free to start.",
     images: ['/og-default.svg'],
   },
   robots: {

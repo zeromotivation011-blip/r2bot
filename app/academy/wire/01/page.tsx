@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { getAcademyLesson } from '@/lib/academy';
 import { AcademyLessonView } from '@/components/AcademyLessonView';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export async function generateMetadata(): Promise<Metadata> {
   const lesson = getAcademyLesson('wire', '01');

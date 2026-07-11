@@ -17,7 +17,7 @@ import { MotorControlVisual } from '@/components/visuals/MotorControlVisual';
 import { RobotPlayground } from '@/components/visuals/RobotPlayground';
 import { URDFViewerWrapper } from '@/components/visuals/URDFViewerWrapper';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 const SIMULATOR_LESSONS: Record<string, { href: string; title: string }> = {
   'pid': { href: '/academy/wire/w-03-pid-control-practice', title: 'W-03: PID Control in Practice' },
@@ -244,6 +244,7 @@ export default function VisualizerPage() {
           </VisualSection>
 
           <VisualSection
+            id="pid"
             eyebrow="02 · Control theory"
             title="PID controller — tune it yourself"
             blurb="Drag the sliders to see how Proportional, Integral, and Derivative gains shape how a robot reaches its target."

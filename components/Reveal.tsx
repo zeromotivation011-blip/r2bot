@@ -12,7 +12,7 @@ type Direction = 'up' | 'down' | 'left' | 'right' | 'scale'
 export function Reveal({
   children,
   delay = 0,
-  distance = 26,
+  distance = 16,
   direction = 'up',
   className,
 }: {
@@ -45,10 +45,11 @@ export function Reveal({
           }
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+      { threshold: 0.01, rootMargin: '0px 0px 15% 0px' },
     )
     io.observe(el)
-    return () => io.disconnect()
+    const failsafe = window.setTimeout(() => setShown(true), 1200)
+    return () => { io.disconnect(); window.clearTimeout(failsafe) }
   }, [])
 
   const hidden =

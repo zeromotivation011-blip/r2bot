@@ -6,13 +6,13 @@ import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { RobotsIndexClient } from './RobotsIndexClient';
 import { ROBOTS } from '@/lib/robots-data';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 const PAGE_URL = `${BASE_URL}/robots`;
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Famous Robots | Encyclopedia of Real Robots — R2BOT',
+  title: 'Famous Robots | Encyclopedia of Real Robots',
   description:
     "Explore 20+ famous real robots — ASIMO, Boston Dynamics Atlas, NASA Curiosity, da Vinci Surgical System and more. Detailed specs, videos, and fun facts.",
   keywords: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Famous Robots | R2BOT',
+    title: 'Famous Robots',
     description: '20+ real-robot profiles with specs, videos, and fun facts.',
     images: ['/og-default.svg'],
   },

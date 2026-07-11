@@ -7,7 +7,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
  *
  *   "Ravi Bohra"           → "Ravi B."
  *   "Ravi"                 → "Ravi"
- *   no display_name        → email prefix, e.g. "ravi6703@gmail.com" → "Ravi6703"
+ *   no display_name        → email prefix, e.g. "asha.patel@example.com" → "Asha.patel"
  */
 export async function deriveAuthorDisplay(
   supabase: SupabaseClient,
