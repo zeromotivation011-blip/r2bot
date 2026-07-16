@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm';
 import { MODES, MODE_BY_ID, type CopilotMode } from './copilot-modes';
 import { autoLinkAtlasTerms, findRelatedLesson } from './copilot-links';
 import { UpgradeModal } from '@/components/UpgradeModal';
+import { trackEvent } from '@/lib/analytics';
 
 type Message = {
   id: string;
@@ -140,6 +141,7 @@ export function CopilotPageClient() {
       setMessages((prev) => [...prev, userMsg, placeholder]);
       setInput('');
       setLoading(true);
+      trackEvent('copilot_message', { surface: 'copilot_page' });
 
       try {
         const res = await fetch('/api/copilot', {
@@ -272,7 +274,7 @@ export function CopilotPageClient() {
           </span>
         </h1>
         <p className="mx-auto mt-2 max-w-xl text-zinc-400">
-          Debug ROS2 errors, decode papers, plan your first robot, or get an India-specific career roadmap.
+          Debug ROS2 errors, decode papers, plan your first robot, or map out your career roadmap.
         </p>
         {ratingsTotal >= 5 ? (
           <p className="mt-2 text-xs text-zinc-500">
