@@ -96,8 +96,8 @@ const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: 'Is R2BOT available in Hindi?',
-      acceptedAnswer: { '@type': 'Answer', text: 'English is the primary language today. Hindi-language content is rolling out across Atlas and Academy. More Indian languages are planned.' },
+      name: 'What languages is R2BOT available in?',
+      acceptedAnswer: { '@type': 'Answer', text: 'English is the primary language today. Additional languages — including Hindi and Spanish — are rolling out across Atlas and Academy, starting with the highest-demand markets.' },
     },
     {
       '@type': 'Question',

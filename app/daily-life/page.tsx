@@ -13,14 +13,14 @@ const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_
 export const metadata: Metadata = {
   title: 'Your Robot Day | Robots Already Running Your Life',
   description:
-    'Walk through a single Indian day. 47 robots help you — and you only notice 5. The end of the page asks: will you build them, or just use them?',
+    'Walk through a single ordinary day. 47 robots help you — and you only notice 5. The end of the page asks: will you build them, or just use them?',
   alternates: { canonical: `${BASE}/daily-life` },
   openGraph: {
     type: 'article',
     url: `${BASE}/daily-life`,
     siteName: 'R2BOT',
     title: 'Your Robot Day',
-    description: '47 robots, one day, one Indian person. Most are invisible.',
+    description: '47 robots, one day, one ordinary person. Most are invisible.',
     images: [{ url: '/og-default.svg', width: 1200, height: 630 }],
   },
 }
@@ -29,7 +29,7 @@ const articleJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'Your Robot Day — Robots Already Running Your Daily Life',
-  description: 'A narrative walk through one Indian day with 47 robots — most invisible.',
+  description: 'A narrative walk through one ordinary day with 47 robots — most invisible.',
   url: `${BASE}/daily-life`,
   publisher: { '@type': 'Organization', name: 'R2BOT', logo: { '@type': 'ImageObject', url: `${BASE}/icon.svg` } },
   datePublished: '2025-01-01',

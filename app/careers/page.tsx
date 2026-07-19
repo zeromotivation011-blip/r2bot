@@ -10,9 +10,9 @@ import { CareersClient } from './CareersClient';
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export const metadata: Metadata = {
-  title: 'Career paths in robotics — India',
+  title: 'Robotics Career Paths — From Zero to Robotics Engineer',
   description:
-    'Concrete career roadmaps for robotics in India across four tracks — Spark, Wire, Forge, Edge. Atlas terms to master, projects to build, companies to apply to, salary ranges, certifications.',
+    'Concrete robotics career roadmaps across four tracks — Spark, Wire, Forge, Edge. Atlas terms to master, projects to build, companies to apply to, salary ranges, and certifications.',
   alternates: { canonical: `${BASE_URL}/careers` },
 };
 
@@ -24,12 +24,12 @@ export default function CareersPage() {
       <Nav />
       <main id="main-content" style={{ paddingTop: 140, paddingBottom: 90, position: 'relative', zIndex: 2 }}>
         <div className="container" style={{ maxWidth: 1000 }}>
-          <div className="section-eyebrow">Careers · India</div>
+          <div className="section-eyebrow">Careers</div>
           <h1
             className="display"
             style={{ fontSize: 'clamp(40px, 5.5vw, 64px)', margin: '0 0 16px' }}
           >
-            Your robotics career in India — from zero to researcher.
+            Your robotics career — from zero to researcher.
           </h1>
           <p style={{ fontSize: 19, color: '#B0B8C5', maxWidth: 680, margin: '0 0 36px' }}>
             Pick your current level. We&apos;ll show you exactly where to go next.

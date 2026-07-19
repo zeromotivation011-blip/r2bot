@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     'Ask any robotics question. Get instant expert answers. Debug ROS2, understand papers, get career advice — your AI robotics mentor, free to start.',
   keywords: [
     'AI robotics assistant',
-    'robotics chatbot India',
+    'robotics chatbot',
     'ROS2 debugger AI',
     'robot career advisor',
     'R2 copilot',

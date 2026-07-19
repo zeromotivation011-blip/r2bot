@@ -13,7 +13,7 @@ const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_
 
 export const metadata: Metadata = {
   title: 'The Story of Robots — Robotics History',
-  description: "From a 1920 Czech play to a robot walking on Mars. The full narrative of robotics — chapter by chapter, with India's parallel story.",
+  description: 'From a 1920 Czech play to a robot walking on Mars. The full narrative of robotics — chapter by chapter, from the first automatons to today.',
   alternates: { canonical: `${BASE}/history` },
 }
 
@@ -21,7 +21,7 @@ const articleJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
   headline: 'The Story of Robots — A Narrative History of Robotics',
-  description: "The complete history of robotics told in 6 chapters with India's parallel timeline woven in.",
+  description: 'The complete history of robotics told in 6 chapters, from the first automatons to modern autonomous machines.',
   url: `${BASE}/history`,
   author: { '@type': 'Organization', name: 'R2BOT' },
   publisher: { '@type': 'Organization', name: 'R2BOT', logo: { '@type': 'ImageObject', url: `${BASE}/icon.svg` } },

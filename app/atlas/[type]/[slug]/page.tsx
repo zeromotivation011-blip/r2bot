@@ -71,12 +71,30 @@ export async function generateMetadata(
   const entry = await getAtlasEntryMerged(type, slug);
   if (!entry) return { title: 'Not found · Atlas' };
   const canonical = `${BASE_URL}/atlas/${type}/${slug}`;
+
+  // SEO title: target real search intent ("[concept] explained") instead of the
+  // bare term. This is exactly the query pattern CLAUDE.md wants Atlas to own —
+  // "X explained", "how X works" — and it captures far more long-tail traffic
+  // than the raw entry name. The visible <h1> stays the clean term; only the
+  // <title>/OG string changes. We skip the suffix for entries whose title is
+  // already a phrase (company/robot names, or titles that already say
+  // "Explained"/"How"/a question) so we never produce awkward doubled titles.
+  const rawTitle = entry.title.trim();
+  const alreadyIntentful = /(explained|how |what |guide|\?|:)/i.test(rawTitle);
+  const suffix = ' Explained — How It Works';
+  const seoTitle =
+    type === 'concept' && !alreadyIntentful && (rawTitle.length + suffix.length) <= 60
+      ? `${rawTitle} Explained — How It Works`
+      : type === 'concept' && !alreadyIntentful
+        ? `${rawTitle} Explained`
+        : rawTitle;
+
   return {
-    title: entry.title,
+    title: seoTitle,
     description: entry.summary,
     alternates: { canonical },
     openGraph: {
-      title: entry.title,
+      title: `${seoTitle} | R2BOT`,
       description: entry.summary,
       url: canonical,
       type: 'article',

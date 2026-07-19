@@ -11,13 +11,13 @@ const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_S
 export const metadata: Metadata = {
   title: 'Robotics News | Latest Robotics Breakthroughs',
   description:
-    'Daily robotics news from IEEE Spectrum, The Robot Report, MIT, TechCrunch. Latest robot launches, research breakthroughs, India robotics updates.',
+    'Daily robotics news from IEEE Spectrum, The Robot Report, MIT, and TechCrunch. Latest robot launches, research breakthroughs, and industry updates.',
   keywords: [
     'robotics news',
     'latest robotics news',
     'robot news today',
     'IEEE Spectrum robotics',
-    'India robotics news',
+    'humanoid robot news',
     'robot breakthroughs',
   ],
   alternates: { canonical: `${BASE_URL}/news` },
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     url: `${BASE_URL}/news`,
     siteName: 'R2BOT',
     title: 'Robotics News',
-    description: 'Latest robotics news, breakthroughs, and India updates from 6 leading sources.',
+    description: 'Latest robotics news, breakthroughs, and industry updates from 6 leading sources.',
     images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'Robotics News — R2BOT' }],
   },
   twitter: {

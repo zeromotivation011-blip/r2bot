@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { useAuth } from './AuthProvider'
+import { trackEvent } from '@/lib/analytics'
 
 type Tab = 'in' | 'up'
 
@@ -59,6 +60,7 @@ export function AuthModal() {
           grade,
         })
       }
+      trackEvent('sign_up', { method: 'email' })
       setInfo("Account created. Check your email if confirmation is required, then sign in.")
       setTab('in')
     } finally { setLoading(false) }
