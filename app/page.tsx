@@ -73,6 +73,7 @@ const organizationJsonLd = {
   description: "From zero to robotics engineer — with an AI mentor, real simulators, and hands-on projects.",
   logo: `${SITE_URL}/icon.svg`,
   sameAs: [
+    'https://www.instagram.com/r2bot.in',
     'https://twitter.com/r2bot',
     'https://www.linkedin.com/company/r2bot',
     'https://www.youtube.com/@r2bot',

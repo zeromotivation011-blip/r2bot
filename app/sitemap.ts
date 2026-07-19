@@ -5,11 +5,22 @@ import { getAllAcademyLessons } from '@/lib/academy';
 import { ROBOTS } from '@/lib/robots-data';
 import { getAllPosts } from '@/lib/blog';
 import { listProjectSlugs } from '@/lib/build/loader';
+import { SIMULATORS } from '@/lib/simulators';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
+
+  // Each simulator is its own indexable page targeting a low-competition
+  // "tool" query. High priority: these are the pages most likely to earn
+  // external links, which is what the whole domain's authority depends on.
+  const simulators = SIMULATORS.map((s) => ({
+    url: `${BASE}/visualizer/${s.id}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.85,
+  }));
 
   const atlas = getAllAtlasEntries().map((e) => ({
     url: `${BASE}/atlas/${e.type}/${e.slug}`,
@@ -89,6 +100,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Dynamic content surfaces
     ...academyTracks,
     ...academyLessons,
+    ...simulators,
     ...atlas,
     ...buildProjects,
     ...blogPosts,

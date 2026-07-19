@@ -6,6 +6,7 @@ import { CursorTrail } from '@/components/CursorTrail';
 import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
+import { SIMULATORS } from '@/lib/simulators';
 import { SenseThinkActVisual } from '@/components/visuals/SenseThinkActVisual';
 import { PIDSimulator } from '@/components/visuals/PIDSimulator';
 import { RobotTypesVisual } from '@/components/visuals/RobotTypesVisual';
@@ -165,6 +166,45 @@ export default function VisualizerPage() {
             >
               Browse all sims
             </a>
+          </div>
+
+          {/* Every simulator also lives at its own URL. These links are the
+              crawl path to those pages and give visitors something clean to
+              share — a hash anchor cannot rank or be linked to on its own. */}
+          <div style={{ marginTop: 30 }}>
+            <div className="section-eyebrow" style={{ marginBottom: 12 }}>
+              Open any simulator on its own page
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
+                gap: 10,
+              }}
+            >
+              {SIMULATORS.map((s) => (
+                <Link
+                  key={s.id}
+                  href={`/visualizer/${s.id}`}
+                  className="r2-lift"
+                  style={{
+                    display: 'block',
+                    padding: '12px 14px',
+                    borderRadius: 12,
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    background: 'rgba(255,255,255,0.03)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <div style={{ color: 'var(--mist)', fontWeight: 700, fontSize: 14 }}>
+                    {s.title}
+                  </div>
+                  <div style={{ color: '#6E7886', fontSize: 12, marginTop: 3, lineHeight: 1.45 }}>
+                    {s.blurb}
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
 

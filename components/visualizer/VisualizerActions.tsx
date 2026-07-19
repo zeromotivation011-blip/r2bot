@@ -7,7 +7,10 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
 export function VisualizerActions({ sectionId, title }: { sectionId: string; title: string }) {
   const [shared, setShared] = useState(false);
   const [embedCopied, setEmbedCopied] = useState(false);
-  const url = `${SITE}/visualizer#${sectionId}`;
+  // Point at the simulator's own page, not the hash anchor on this index.
+  // A hash link cannot rank or accrue links independently; the dedicated page
+  // can, and it is the URL we want people pasting into Reddit and HN.
+  const url = `${SITE}/visualizer/${sectionId}`;
   const embed = `<iframe src="${SITE}/visualizer/embed/${sectionId}" width="800" height="500" frameborder="0" allowfullscreen></iframe>`;
 
   async function copy(text: string, setFn: (b: boolean) => void) {
@@ -50,12 +53,10 @@ export function VisualizerActions({ sectionId, title }: { sectionId: string; tit
         {embedCopied ? '✓ Embed copied' : '⧉ Embed code'}
       </button>
       <a
-        href={`/visualizer/embed/${sectionId}`}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={`/visualizer/${sectionId}`}
         className="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-zinc-200 hover:border-white/30"
       >
-        Open embed view ↗
+        Open full page →
       </a>
     </div>
   );
