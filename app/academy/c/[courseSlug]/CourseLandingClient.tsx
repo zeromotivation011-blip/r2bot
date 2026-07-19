@@ -18,6 +18,8 @@ export function CourseLandingClient({ course }: { course: Course }) {
   const [openModule, setOpenModule] = useState<string | null>(course.modules[0]?.id ?? null)
   const [enrolled, setEnrolled] = useState(() => isEnrolled(course.id))
   const [waitlisted, setWaitlisted] = useState(false)
+  const [waitlistBusy, setWaitlistBusy] = useState(false)
+  const [waitlistError, setWaitlistError] = useState<string | null>(null)
   const [email, setEmail] = useState('')
 
   const accent = TRACK_ACCENT[course.track] ?? '#00E5FF'
@@ -27,10 +29,42 @@ export function CourseLandingClient({ course }: { course: Course }) {
     setEnrolled(true)
   }
 
-  const handleWaitlist = (e: React.FormEvent) => {
+  const handleWaitlist = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: POST /api/waitlist { courseId: course.id, email }
-    setWaitlisted(true)
+    setWaitlistError(null)
+    setWaitlistBusy(true)
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          source: 'academy-waitlist',
+          page: typeof window !== 'undefined' ? window.location.pathname : null,
+          meta: {
+            courseId: course.id,
+            courseSlug: course.slug,
+            courseTitle: course.title,
+            track: course.track,
+          },
+        }),
+      })
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+      if (!res.ok || !data.ok) {
+        setWaitlistError(data.error || 'Something went wrong. Please try again.')
+        return
+      }
+      try {
+        ;(window as unknown as { gtag?: (...a: unknown[]) => void }).gtag?.(
+          'event', 'lead_capture', { method: 'academy-waitlist', course: course.slug },
+        )
+      } catch { /* ignore */ }
+      setWaitlisted(true)
+    } catch {
+      setWaitlistError('Network error. Please try again.')
+    } finally {
+      setWaitlistBusy(false)
+    }
   }
 
   const firstLesson = course.modules[0]?.lessons[0]
@@ -318,15 +352,23 @@ export function CourseLandingClient({ course }: { course: Course }) {
                     />
                     <button
                       type="submit"
+                      disabled={waitlistBusy}
                       style={{
                         padding: '13px 20px',
                         background: `linear-gradient(135deg, ${accent}, #A56BFF)`,
                         color: '#0f0a1e', fontWeight: 900, fontSize: 15,
-                        border: 'none', borderRadius: 10, cursor: 'pointer',
+                        border: 'none', borderRadius: 10,
+                        cursor: waitlistBusy ? 'not-allowed' : 'pointer',
+                        opacity: waitlistBusy ? 0.7 : 1,
                       }}
                     >
-                      Notify me at launch →
+                      {waitlistBusy ? 'Adding you…' : 'Notify me at launch →'}
                     </button>
+                    {waitlistError && (
+                      <p role="alert" style={{ margin: 0, fontSize: 13, color: '#f87171' }}>
+                        {waitlistError}
+                      </p>
+                    )}
                   </form>
                 ) : (
                   <div style={{

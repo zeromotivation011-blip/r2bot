@@ -140,6 +140,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 function SchoolContactForm() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
+  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({ schoolName: '', city: '', grade: '', teacherName: '', email: '', phone: '', message: '' })
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
@@ -148,18 +149,50 @@ function SchoolContactForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setError(null)
     setStatus('sending')
-    // TODO: POST /api/schools/interest
-    await new Promise(r => setTimeout(r, 900))
-    setStatus('sent')
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          name: formData.teacherName,
+          phone: formData.phone,
+          source: 'schools-interest',
+          page: typeof window !== 'undefined' ? window.location.pathname : null,
+          meta: {
+            schoolName: formData.schoolName,
+            city: formData.city,
+            grade: formData.grade,
+            message: formData.message,
+          },
+        }),
+      })
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+      if (!res.ok || !data.ok) {
+        setError(data.error || 'Something went wrong. Please try again.')
+        setStatus('idle')
+        return
+      }
+      try {
+        ;(window as unknown as { gtag?: (...a: unknown[]) => void }).gtag?.(
+          'event', 'lead_capture', { method: 'schools-interest' },
+        )
+      } catch { /* ignore */ }
+      setStatus('sent')
+    } catch {
+      setError('Network error. Please try again.')
+      setStatus('idle')
+    }
   }
 
   if (status === 'sent') {
     return (
       <div style={{ borderRadius: 20, border: '1px solid rgba(52,211,153,0.3)', background: 'rgba(52,211,153,0.08)', padding: 40, textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 12 }}>🎉</div>
-        <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', margin: 0 }}>We&apos;ll reach out within 24 hours!</h3>
-        <p style={{ marginTop: 8, color: '#9ca3af', fontSize: 14 }}>Check your email — we&apos;ll send a personalised demo link and onboarding kit for {formData.schoolName || 'your school'}.</p>
+        <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', margin: 0 }}>Got it — thank you.</h3>
+        <p style={{ marginTop: 8, color: '#9ca3af', fontSize: 14 }}>We&apos;ve recorded your interest for {formData.schoolName || 'your school'} and will be in touch personally. School pilots are onboarded in small batches, so this may take a few days rather than a few hours.</p>
       </div>
     )
   }
@@ -213,6 +246,11 @@ function SchoolContactForm() {
         style={{ marginTop: 20, width: '100%', background: '#f59e0b', color: '#000', padding: '13px 24px', borderRadius: 12, fontWeight: 700, fontSize: 15, border: 'none', cursor: status === 'sending' ? 'not-allowed' : 'pointer', opacity: status === 'sending' ? 0.7 : 1 }}>
         {status === 'sending' ? 'Sending…' : 'Request your school pilot →'}
       </button>
+      {error && (
+        <p role="alert" style={{ marginTop: 12, marginBottom: 0, fontSize: 13, color: '#f87171', textAlign: 'center' }}>
+          {error}
+        </p>
+      )}
       <p style={{ marginTop: 12, textAlign: 'center', fontSize: 12, color: '#4b5563' }}>
         No credit card. No commitment. We reply within 24 hours on business days.
       </p>
