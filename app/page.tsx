@@ -72,12 +72,9 @@ const organizationJsonLd = {
   url: SITE_URL,
   description: "From zero to robotics engineer — with an AI mentor, real simulators, and hands-on projects.",
   logo: `${SITE_URL}/icon.svg`,
-  sameAs: [
-    'https://www.instagram.com/r2bot.in',
-    'https://twitter.com/r2bot',
-    'https://www.linkedin.com/company/r2bot',
-    'https://www.youtube.com/@r2bot',
-  ],
+  // Verified accounts only — a wrong URL here maps another account to this
+  // brand in Google's knowledge graph. Add YouTube back once confirmed.
+  sameAs: ['https://www.instagram.com/r2bot.in'],
   areaServed: 'Worldwide',
 }
 
