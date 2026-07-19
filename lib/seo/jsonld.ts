@@ -21,8 +21,11 @@ export function organizationJsonLD() {
     educationalCredentialAwarded: 'Robotics Certificates',
     // Only accounts we have verified. A wrong URL here tells Google to
     // associate someone else's account with this brand, which is worse than
-    // listing nothing. Add YouTube back once the correct handle is confirmed.
-    sameAs: ['https://www.instagram.com/r2bot.in'] as string[],
+    // listing nothing.
+    sameAs: [
+      'https://www.instagram.com/r2bot.in',
+      'https://www.youtube.com/channel/UCkqlyCeLtTpT_j6Q-3NFxww',
+    ] as string[],
   };
 }
 
