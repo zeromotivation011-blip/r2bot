@@ -2,8 +2,9 @@ import type { CSSProperties } from 'react';
 
 export type Crumb = { label: string; href?: string };
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+// Guarded: an unguarded value emits *.vercel.app into BreadcrumbList JSON-LD
+// site-wide, telling Google the content lives on the preview domain.
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export function Breadcrumbs({
   trail,

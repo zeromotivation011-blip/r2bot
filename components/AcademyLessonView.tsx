@@ -17,7 +17,8 @@ import {
 import type { AcademyLesson, AcademyTrack } from '@/lib/academy';
 import { getLessonsForTrack, TRACK_ACCENT, trackLabel, isoDuration } from '@/lib/academy';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+// Guarded so Course JSON-LD never advertises the *.vercel.app preview domain.
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export function AcademyLessonView({ lesson }: { lesson: AcademyLesson }) {
   const accent = TRACK_ACCENT[lesson.track];
