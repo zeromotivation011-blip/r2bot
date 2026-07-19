@@ -34,3 +34,15 @@ Thumbs.db
 # --- Supabase CLI cache ---
 supabase/.temp/
 .env*
+
+# --- Reel generation artefacts ---
+# reels/ is a local video workspace (2.8 GB of rendered frames). The scripts
+# belong in git; the rendered output and Python caches do not — they are what
+# bloated .git and the Vercel upload.
+reels/_frames/
+reels/**/*.mp4
+reels/**/*.mov
+reels/**/*.wav
+reels/**/*.mp3
+__pycache__/
+*.pyc
