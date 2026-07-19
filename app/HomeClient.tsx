@@ -74,7 +74,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
   const personalization = usePersonalization()
   const showDiagnosticBanner = personalization.signedIn && !personalization.track
   return (
-    <main style={{ background: '#0a0a0f', color: '#fff' }}>
+    <main style={{ background: '#0A0E17', color: '#fff' }}>
       <FeatureTour />
       <Hero personalization={personalization} atlasCount={atlasCount} projectCount={projectCount} />
       {showDiagnosticBanner && (
@@ -110,7 +110,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
       <Footer />
 
       <style jsx global>{`
-        :global(body) { background: #0a0a0f; }
+        :global(body) { background: #0A0E17; }
       `}</style>
     </main>
   )
@@ -132,7 +132,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
         overflow: 'hidden',
         padding: '120px 20px 60px',
         background:
-          'radial-gradient(circle at 18% 32%, rgba(0,184,212,.14), transparent 50%), radial-gradient(circle at 82% 60%, rgba(165,107,255,.12), transparent 50%), #0a0a0f',
+          'radial-gradient(ellipse at 20% 30%, rgba(245,165,36,.07), transparent 55%), #0A0E17',
       }}
     >
       {/* Grid background */}
@@ -149,8 +149,8 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
       />
 
       {/* Glow orbs */}
-      <div aria-hidden style={{ position: 'absolute', top: '15%', left: '5%', width: 320, height: 320, borderRadius: '50%', background: 'rgba(0,229,255,0.06)', filter: 'blur(80px)', pointerEvents: 'none' }} />
-      <div aria-hidden style={{ position: 'absolute', bottom: '20%', right: '8%', width: 280, height: 280, borderRadius: '50%', background: 'rgba(165,107,255,0.07)', filter: 'blur(80px)', pointerEvents: 'none' }} />
+      
+      
 
       <div style={{ position: 'relative', maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: 48, alignItems: 'center' }}>
         <div>
@@ -171,13 +171,13 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
             letterSpacing: '-1px',
           }}>
             The{' '}
-            <span style={{ background: 'linear-gradient(90deg, #00E5FF, #A56BFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{ color: '#F5A524' }}>
               clearest way to learn robotics
             </span>
             {' '}on the internet.
           </h1>
 
-          <p style={{ fontSize: 18, color: '#c4b5fd', maxWidth: 560, lineHeight: 1.65, margin: '0 0 10px' }}>
+          <p style={{ fontSize: 18, color: '#AEB7C4', maxWidth: 560, lineHeight: 1.65, margin: '0 0 10px' }}>
             Project-based robotics learning from first principles to AI — with an AI mentor, real simulators, and hands-on builds. For students, career-switchers, and the curious, everywhere.
           </p>
           <p style={{ fontSize: 16, color: '#f97316', fontWeight: 700, margin: '0 0 28px' }}>
@@ -304,14 +304,14 @@ function FloatingRobot() {
         <line x1="110" y1="14" x2="110" y2="36" stroke="#fbbf24" strokeWidth="3" />
         <circle cx="110" cy="10" r="6" fill="#fde047" />
         <rect x="50" y="36" width="120" height="80" rx="16" fill="url(#rg1)" stroke="#00E5FF" strokeWidth="1.5" />
-        <rect x="62" y="48" width="96" height="50" rx="8" fill="#0a0a0f" />
+        <rect x="62" y="48" width="96" height="50" rx="8" fill="#0A0E17" />
         <circle cx="88" cy="70" r="7" fill="#00E5FF" />
         <circle cx="132" cy="70" r="7" fill="#A56BFF" />
-        <circle cx="90" cy="68" r="2.5" fill="#0a0a0f" />
-        <circle cx="134" cy="68" r="2.5" fill="#0a0a0f" />
+        <circle cx="90" cy="68" r="2.5" fill="#0A0E17" />
+        <circle cx="134" cy="68" r="2.5" fill="#0A0E17" />
         <path d="M82 88 Q110 102 138 88" stroke="#fde047" strokeWidth="3" fill="none" strokeLinecap="round" />
         <rect x="62" y="122" width="96" height="76" rx="10" fill="url(#rg2)" />
-        <rect x="84" y="138" width="52" height="32" rx="4" fill="#0a0a0f" />
+        <rect x="84" y="138" width="52" height="32" rx="4" fill="#0A0E17" />
         <circle cx="94" cy="154" r="3" fill="#fde047" />
         <circle cx="106" cy="154" r="3" fill="#10b981" />
         <circle cx="118" cy="154" r="3" fill="#ef4444" />
@@ -319,8 +319,8 @@ function FloatingRobot() {
         <rect x="164" y="130" width="34" height="14" rx="6" fill="#00B8D4" />
         <circle cx="82" cy="216" r="20" fill="#1f1f2a" stroke="#00B8D4" strokeWidth="2" />
         <circle cx="138" cy="216" r="20" fill="#1f1f2a" stroke="#00B8D4" strokeWidth="2" />
-        <circle cx="82" cy="216" r="7" fill="#0a0a0f" />
-        <circle cx="138" cy="216" r="7" fill="#0a0a0f" />
+        <circle cx="82" cy="216" r="7" fill="#0A0E17" />
+        <circle cx="138" cy="216" r="7" fill="#0A0E17" />
       </svg>
       <style jsx>{`
         @keyframes float {
@@ -475,7 +475,7 @@ function SimulatorShowcase() {
   return (
     <section style={{
       padding: '80px 20px',
-      background: 'linear-gradient(180deg, #0a0a0f 0%, #0d0818 50%, #0a0a0f 100%)',
+      background: 'linear-gradient(180deg, #0A0E17 0%, #0d0818 50%, #0A0E17 100%)',
       borderTop: '1px solid rgba(255,255,255,0.06)',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -536,7 +536,7 @@ function IndiaSpotlight() {
   return (
     <section style={{
       position: 'relative', padding: '80px 20px',
-      background: 'linear-gradient(180deg, rgba(249,115,22,.08) 0%, rgba(16,185,129,.06) 100%), #0a0a0f',
+      background: 'linear-gradient(180deg, rgba(249,115,22,.08) 0%, rgba(16,185,129,.06) 100%), #0A0E17',
       borderTop: '1px solid rgba(249,115,22,.18)', borderBottom: '1px solid rgba(16,185,129,.15)',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -686,7 +686,7 @@ function Testimonials() {
 // ─── NEWS TEASER (live, from the automated aggregator) ────────────────────
 function NewsTeaser({ items }: { items: HomeNewsItem[] }) {
   return (
-    <section style={{ padding: '72px 20px', background: '#0a0a0f', borderTop: '1px solid #1f1f2a' }}>
+    <section style={{ padding: '72px 20px', background: '#0A0E17', borderTop: '1px solid #1f1f2a' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 26 }}>
           <div>

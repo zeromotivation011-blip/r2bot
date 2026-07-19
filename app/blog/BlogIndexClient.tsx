@@ -47,7 +47,7 @@ export default function BlogIndexClient({ posts, tags }: { posts: PostLite[]; ta
   }, [posts, activeTag, search, featured])
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white pt-24 pb-20 px-4">
+    <main className="min-h-screen bg-[#0A0E17] text-white pt-24 pb-20 px-4">
       {/* Hero */}
       <section className="mx-auto max-w-5xl text-center">
         <p className="text-xs uppercase tracking-[3px] font-black text-blue-400">R2BOT Blog</p>

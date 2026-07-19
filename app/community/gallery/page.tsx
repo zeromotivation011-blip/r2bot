@@ -17,7 +17,7 @@ export default function GalleryPage() {
   return (
     <CopilotProvider>
       <Nav />
-      <main id="main-content" className="bg-[#050810] min-h-screen pt-32 pb-16">
+      <main id="main-content" className="bg-[#0A0E17] min-h-screen pt-32 pb-16">
         <GalleryClient />
       </main>
       <CopilotBubble />

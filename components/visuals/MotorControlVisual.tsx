@@ -106,7 +106,7 @@ export function MotorControlVisual() {
           <svg
             viewBox={`0 0 ${PWM_W} ${PWM_H}`}
             width="100%"
-            style={{ maxWidth: PWM_W, background: '#050810', borderRadius: 10, display: 'block' }}
+            style={{ maxWidth: PWM_W, background: '#0A0E17', borderRadius: 10, display: 'block' }}
             aria-label="PWM oscilloscope"
           >
             {/* grid lines */}

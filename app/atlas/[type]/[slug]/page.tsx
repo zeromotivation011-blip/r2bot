@@ -222,7 +222,7 @@ export default async function AtlasEntryPage(
                 overflow: 'hidden',
                 border: '1px solid var(--border-2)',
                 aspectRatio: '2 / 1',
-                background: '#050810',
+                background: '#0A0E17',
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

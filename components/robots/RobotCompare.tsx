@@ -138,7 +138,7 @@ export function CompareDrawer() {
   if (robots.length === 0) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#050810]/97 shadow-[0_-20px_60px_rgba(0,0,0,0.7)] backdrop-blur">
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#0A0E17]/97 shadow-[0_-20px_60px_rgba(0,0,0,0.7)] backdrop-blur">
       <div className="mx-auto max-w-6xl px-4 py-4">
         <div className="mb-3 flex flex-wrap items-center gap-3">
           <span className="font-mono text-xs uppercase tracking-wider text-amber-300">

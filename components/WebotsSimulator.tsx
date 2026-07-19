@@ -126,7 +126,7 @@ export function WebotsSimulator() {
           style={{
             padding: 14,
             borderRadius: 10,
-            background: '#050810',
+            background: '#0A0E17',
             border: '1px solid var(--border-2)',
             fontSize: 12.5,
             color: '#C8D0DC',
@@ -165,7 +165,7 @@ function Fallback({ sim }: { sim: Sim }) {
       style={{
         height: 550,
         borderRadius: 8,
-        background: 'linear-gradient(135deg, #050810, #0a1a2e)',
+        background: 'linear-gradient(135deg, #0A0E17, #0a1a2e)',
         border: '1px solid var(--border-2)',
         display: 'flex',
         flexDirection: 'column',

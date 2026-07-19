@@ -23,7 +23,7 @@ export default function DailyLifeClient() {
   const modeRef = useRef<HTMLDivElement | null>(null)
 
   return (
-    <main className="min-h-screen bg-[#050810] text-white pt-20 pb-16">
+    <main className="min-h-screen bg-[#0A0E17] text-white pt-20 pb-16">
       <HeroCounter
         total={TOTAL_ROBOTS_PER_DAY}
         onShowMe={() => modeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}

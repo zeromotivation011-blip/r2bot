@@ -134,7 +134,7 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
   }
 
   return (
-    <main className="min-h-screen bg-[#050810] text-white pt-24 pb-16">
+    <main className="min-h-screen bg-[#0A0E17] text-white pt-24 pb-16">
       <div className="px-4 max-w-7xl mx-auto">
         <div className="text-center mb-6">
           <p className="text-xs tracking-[3px] uppercase font-bold text-amber-300">Pulse</p>

@@ -33,7 +33,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: '#050810',
+          background: '#0A0E17',
           padding: '64px 72px',
           position: 'relative',
         }}
