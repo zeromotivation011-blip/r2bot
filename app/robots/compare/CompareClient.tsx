@@ -40,7 +40,7 @@ export default function CompareClient({ robots }: { robots: LiteRobot[] }) {
   const shareText = `Compare ${a.name} vs ${b.name} — ${insight} · r2bot.in/robots/compare?a=${a.slug}&b=${b.slug}`
 
   return (
-    <main className="min-h-screen bg-[#050810] text-white pt-24 pb-16 px-4">
+    <main className="min-h-screen bg-[#0A0E17] text-white pt-24 pb-16 px-4">
       <div className="mx-auto max-w-5xl">
         <Link href="/robots" className="text-amber-300 text-sm hover:underline">← All robots</Link>
         <h1 className="mt-3 text-3xl md:text-4xl font-black">⚖️ Robot vs Robot</h1>

@@ -587,7 +587,7 @@ export function RobotPlayground() {
             ref={consoleRef}
             style={{
               marginTop: 12,
-              background: '#050810',
+              background: '#0A0E17',
               border: '1px solid var(--border-2)',
               borderRadius: 8,
               padding: '8px 12px',

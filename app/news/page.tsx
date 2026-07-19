@@ -44,7 +44,7 @@ export default async function NewsPage() {
   return (
     <CopilotProvider>
       <Nav />
-      <main id="main-content" className="bg-[#050810] min-h-screen pt-24 pb-12">
+      <main id="main-content" className="bg-[#0A0E17] min-h-screen pt-24 pb-12">
         <NewsPageClient initialData={initialData} />
       </main>
       <CopilotBubble />

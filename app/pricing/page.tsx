@@ -61,7 +61,7 @@ export default function PricingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
       <Nav />
-      <main id="main-content" style={{ paddingTop: 120, paddingBottom: 80, minHeight: '100vh', background: '#0a0a0f', color: '#fff' }}>
+      <main id="main-content" style={{ paddingTop: 120, paddingBottom: 80, minHeight: '100vh', background: '#0A0E17', color: '#fff' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
           <header style={{ textAlign: 'center', maxWidth: 720, margin: '0 auto 48px' }}>
             <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 14px' }}>

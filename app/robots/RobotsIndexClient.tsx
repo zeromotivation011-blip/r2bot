@@ -57,7 +57,7 @@ function RobotsIndexInner() {
     <>
       <HallOfFameTicker />
 
-      <section className="relative overflow-hidden bg-[#050810] px-4 pb-8 pt-24">
+      <section className="relative overflow-hidden bg-[#0A0E17] px-4 pb-8 pt-24">
         <div className="mx-auto max-w-5xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
             🏆 Hall of Fame · documentary deep dives
@@ -81,7 +81,7 @@ function RobotsIndexInner() {
         </div>
       </section>
 
-      <section className="bg-[#050810] px-4 pb-6">
+      <section className="bg-[#0A0E17] px-4 pb-6">
         <div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-2">
           {FILTERS.map((f) => {
             const active = filter === f.key;
@@ -104,7 +104,7 @@ function RobotsIndexInner() {
         </div>
       </section>
 
-      <section className="bg-[#050810] px-4 pb-6">
+      <section className="bg-[#0A0E17] px-4 pb-6">
         <div className="mx-auto max-w-6xl">
           <RobotTagFilter
             selected={tags}
@@ -114,7 +114,7 @@ function RobotsIndexInner() {
         </div>
       </section>
 
-      <section className="bg-[#050810] px-4 pb-24">
+      <section className="bg-[#0A0E17] px-4 pb-24">
         <div className="mx-auto max-w-6xl">
           <p className="mb-5 text-sm text-zinc-500">
             Showing <strong className="text-white">{filtered.length}</strong> of {ROBOTS.length} robots

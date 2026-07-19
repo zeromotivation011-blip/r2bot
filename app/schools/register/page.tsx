@@ -15,7 +15,7 @@ export default function SchoolRegisterPage() {
   return (
     <CopilotProvider>
       <Nav />
-      <main id="main-content" className="bg-[#050810] min-h-screen pt-32 pb-16">
+      <main id="main-content" className="bg-[#0A0E17] min-h-screen pt-32 pb-16">
         <div className="mx-auto max-w-2xl px-4">
           <header className="text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-1.5 text-sm font-semibold text-amber-300">

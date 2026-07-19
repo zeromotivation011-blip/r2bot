@@ -18,7 +18,7 @@ function page(body: string, accent = '#00B8D4'): Response {
     <title>R2BOT — Unsubscribed</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <style>
-      body { background:#050810; color:#E8ECF1; font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif; margin:0; }
+      body { background:#0A0E17; color:#E8ECF1; font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif; margin:0; }
       main { max-width:520px; margin:0 auto; padding:80px 24px; text-align:center; }
       h1 { font-family:"Space Grotesk",sans-serif; font-size:32px; margin:0 0 14px; }
       p { color:#B0B8C5; font-size:16px; line-height:1.55; }
