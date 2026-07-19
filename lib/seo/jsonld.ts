@@ -19,12 +19,10 @@ export function organizationJsonLD() {
     // else — India remains a key market, but it is not the identity.
     areaServed: 'Worldwide',
     educationalCredentialAwarded: 'Robotics Certificates',
-    sameAs: [
-      'https://www.instagram.com/r2bot.in',
-      'https://twitter.com/r2bot',
-      'https://www.linkedin.com/company/r2bot',
-      'https://www.youtube.com/@r2bot',
-    ] as string[],
+    // Only accounts we have verified. A wrong URL here tells Google to
+    // associate someone else's account with this brand, which is worse than
+    // listing nothing. Add YouTube back once the correct handle is confirmed.
+    sameAs: ['https://www.instagram.com/r2bot.in'] as string[],
   };
 }
 
