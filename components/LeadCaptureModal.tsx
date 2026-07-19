@@ -121,7 +121,7 @@ export function LeadCaptureModal() {
               Get robotics news, projects &amp; job alerts.
             </h3>
             <p style={{ color: '#94a3b8', fontSize: 14, lineHeight: 1.6, margin: '0 0 20px' }}>
-              Join Indian students learning robotics with R2BOT. Weekly, curated, and free.
+              Join learners worldwide getting one useful robotics email a week. Curated, and free.
             </p>
 
             <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -132,7 +132,7 @@ export function LeadCaptureModal() {
               />
               <input
                 type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
-                placeholder="Phone (optional, WhatsApp preferred)" autoComplete="tel"
+                placeholder="Phone (optional)" autoComplete="tel"
                 style={inputStyle}
               />
               <button

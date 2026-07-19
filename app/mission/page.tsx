@@ -57,7 +57,7 @@ export default function MissionPage() {
       <ul>
         <li>Charge a learner for any course or any encyclopedia entry.</li>
         <li>Sell user data, ever.</li>
-        <li>Run pop-up ads, exit-intent capture, or any dark pattern.</li>
+        <li>Run ads, sell your attention, or use dark patterns. We ask for your email once, in a dismissable box you can close and never see again — and we tell you exactly what we&apos;ll send.</li>
         <li>Publish unsourced claims or AI-hallucinated &quot;facts.&quot;</li>
         <li>Talk down to a beginner.</li>
       </ul>

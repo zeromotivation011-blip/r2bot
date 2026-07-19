@@ -53,7 +53,7 @@ function MasterThisLink({ lessonKey }: { lessonKey?: string }) {
 export const metadata: Metadata = {
   title: 'Interactive Robotics Simulators',
   description:
-    '9 browser-based robotics simulators. PID tuner, A* pathfinder, SLAM, inverse kinematics, sensor fusion — no install required.',
+    '10 free browser-based robotics simulators. PID tuner, A* pathfinder, SLAM, inverse kinematics, sensor fusion — no install, no signup.',
   alternates: { canonical: `${BASE_URL}/visualizer` },
 };
 
@@ -127,7 +127,7 @@ export default function VisualizerPage() {
             R2BOT Lab — Interactive Robotics Simulations.
           </h1>
           <p style={{ fontSize: 19, color: '#B0B8C5', maxWidth: 680, margin: 0 }}>
-            9 hands-on simulations. No installation. No signup. Just learn.
+            10 hands-on simulations. No installation. No signup. Just learn.
           </p>
           <div style={{ marginTop: 22, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <a

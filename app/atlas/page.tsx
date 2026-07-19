@@ -4,7 +4,7 @@ import { Nav } from '@/components/Nav'
 import { CopilotProvider } from '@/components/CopilotProvider'
 import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
-import { getAllAtlasEntries } from '@/lib/atlas'
+import { getAllAtlasEntriesMerged } from '@/lib/atlas-db'
 import { ATLAS_BUCKETS, resolveBucket } from '@/lib/atlas-buckets'
 import AtlasHomeClient, { type AtlasNode } from './AtlasHomeClient'
 
@@ -16,7 +16,7 @@ const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_
 export const metadata: Metadata = {
   title: 'Robotics Atlas — Every Concept Explained Simply',
   description:
-    "249+ robotics concepts explained in plain English. From servo motors to neural networks — the world's most accessible robotics knowledge base.",
+    "480+ robotics concepts explained in plain English. From servo motors to neural networks — the clearest robotics knowledge base on the internet.",
   alternates: { canonical: `${BASE}/atlas` },
   openGraph: {
     type: 'website',
@@ -34,7 +34,7 @@ const appJsonLd = {
   name: 'R2BOT Atlas',
   applicationCategory: 'EducationalApplication',
   operatingSystem: 'Any (browser)',
-  description: 'Interactive robotics knowledge universe with 249+ concepts, learning paths and a force-directed concept map.',
+  description: 'Interactive robotics knowledge universe with 480+ concepts, learning paths and a force-directed concept map.',
   url: `${BASE}/atlas`,
   isAccessibleForFree: true,
 }
@@ -101,8 +101,8 @@ const datasetJsonLd = {
   ],
 }
 
-export default function AtlasIndex() {
-  const all = getAllAtlasEntries()
+export default async function AtlasIndex() {
+  const all = await getAllAtlasEntriesMerged()
 
   const nodes: AtlasNode[] = all.map(e => {
     const b = resolveBucket(e)

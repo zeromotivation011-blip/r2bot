@@ -9,7 +9,7 @@ import {
   typeLabel,
   type AtlasType,
 } from '@/lib/atlas';
-import { getAtlasEntryMerged } from '@/lib/atlas-db';
+import { getAtlasEntryMerged, getAllAtlasEntriesMerged } from '@/lib/atlas-db';
 
 // Regenerate periodically so Content-Manager edits appear on the live page.
 export const revalidate = 300;
@@ -61,7 +61,7 @@ type Params = { type: AtlasType; slug: string };
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export async function generateStaticParams() {
-  return getAllAtlasEntries().map((e) => ({ type: e.type, slug: e.slug }));
+  return (await getAllAtlasEntriesMerged()).map((e) => ({ type: e.type, slug: e.slug }));
 }
 
 export async function generateMetadata(
