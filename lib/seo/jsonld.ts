@@ -11,11 +11,20 @@ export function organizationJsonLD() {
     alternateName: 'R2BOT — ROBOT, decoded',
     url: BASE_URL,
     logo: `${BASE_URL}/icon.svg`,
-    description: "India's most accessible robotics learning platform.",
+    description:
+      'From zero to robotics engineer — with an AI mentor, real simulators and hands-on projects. The clearest robotics knowledge on the internet.',
     foundingDate: '2024',
-    areaServed: { '@type': 'Country', name: 'India' },
+    // Worldwide, not a single country. Declaring areaServed: India told Google
+    // this was a regional site and worked directly against ranking anywhere
+    // else — India remains a key market, but it is not the identity.
+    areaServed: 'Worldwide',
     educationalCredentialAwarded: 'Robotics Certificates',
-    sameAs: [] as string[],
+    sameAs: [
+      'https://www.instagram.com/r2bot.in',
+      'https://twitter.com/r2bot',
+      'https://www.linkedin.com/company/r2bot',
+      'https://www.youtube.com/@r2bot',
+    ] as string[],
   };
 }
 
@@ -31,7 +40,8 @@ export function courseJsonLD(name: string, description: string, url: string) {
       name: 'R2BOT',
       sameAs: BASE_URL,
     },
-    inLanguage: 'en-IN',
+    // 'en' not 'en-IN' — the content is written for a global English audience.
+    inLanguage: 'en',
     isAccessibleForFree: true,
   };
 }

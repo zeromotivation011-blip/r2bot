@@ -3,7 +3,8 @@ import { Nav } from '@/components/Nav'
 import { CopilotProvider } from '@/components/CopilotProvider'
 import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
-import { getAllPosts, getAllTags } from '@/lib/blog'
+import { getAllTags } from '@/lib/blog'
+import { getAllPostsMerged } from '@/lib/blog-db'
 import BlogIndexClient from './BlogIndexClient'
 
 export const runtime = 'nodejs'
@@ -34,8 +35,8 @@ export const metadata: Metadata = {
   },
 }
 
-export default function BlogIndexPage() {
-  const posts = getAllPosts()
+export default async function BlogIndexPage() {
+  const posts = await getAllPostsMerged()
   const tags = getAllTags()
 
   const blogJsonLd = {

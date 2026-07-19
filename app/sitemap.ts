@@ -1,15 +1,15 @@
 import type { MetadataRoute } from 'next';
-import { getAllAtlasEntries } from '@/lib/atlas';
-import { getAllLens } from '@/lib/lens';
+import { getAllAtlasEntriesMerged } from '@/lib/atlas-db';
+import { getAllLensMerged } from '@/lib/lens-cms';
 import { getAllAcademyLessons } from '@/lib/academy';
 import { ROBOTS } from '@/lib/robots-data';
-import { getAllPosts } from '@/lib/blog';
+import { getAllPostsMerged } from '@/lib/blog-db';
 import { listProjectSlugs } from '@/lib/build/loader';
 import { SIMULATORS } from '@/lib/simulators';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   // Each simulator is its own indexable page targeting a low-competition
@@ -22,14 +22,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.85,
   }));
 
-  const atlas = getAllAtlasEntries().map((e) => ({
+  // Merged sources: MDX on disk PLUS anything published through the CMS.
+  // Reading the filesystem alone meant browser-created content never entered
+  // the sitemap, so Google never discovered it.
+  const [atlasEntries, blogPostsData, lensVideos] = await Promise.all([
+    getAllAtlasEntriesMerged(),
+    getAllPostsMerged(),
+    getAllLensMerged(),
+  ]);
+
+  const atlas = atlasEntries.map((e) => ({
     url: `${BASE}/atlas/${e.type}/${e.slug}`,
     lastModified: new Date(e.lastReviewed ?? now),
     changeFrequency: 'monthly' as const,
     priority: 0.8,
   }));
 
-  const lens = getAllLens().map((v) => ({
+  const lens = lensVideos.map((v) => ({
     url: `${BASE}/lens/${v.slug}`,
     lastModified: new Date(v.publishedAt),
     changeFrequency: 'monthly' as const,
@@ -57,7 +66,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }));
 
-  const blogPosts = getAllPosts().map((p) => ({
+  const blogPosts = blogPostsData.map((p) => ({
     url: `${BASE}/blog/${p.slug}`,
     lastModified: new Date(p.date ?? now),
     changeFrequency: 'monthly' as const,
