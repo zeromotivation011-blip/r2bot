@@ -968,6 +968,7 @@ function Footer() {
           <p style={{ fontSize: 12, color: '#374151' }}>Made with ❤️ for robotics learners worldwide · © 2026 R2BOT</p>
           <div style={{ display: 'flex', gap: 20 }}>
             <a href="https://www.instagram.com/r2bot.in" target="_blank" rel="noopener" style={{ fontSize: 13, color: '#e1306c', textDecoration: 'none', fontWeight: 700 }}>◉ Instagram</a>
+            <a href="https://www.youtube.com/channel/UCkqlyCeLtTpT_j6Q-3NFxww" target="_blank" rel="noopener" style={{ fontSize: 13, color: '#ef4444', textDecoration: 'none', fontWeight: 700 }}>▶ YouTube</a>
           </div>
         </div>
       </div>

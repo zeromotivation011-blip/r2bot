@@ -73,8 +73,11 @@ const organizationJsonLd = {
   description: "From zero to robotics engineer — with an AI mentor, real simulators, and hands-on projects.",
   logo: `${SITE_URL}/icon.svg`,
   // Verified accounts only — a wrong URL here maps another account to this
-  // brand in Google's knowledge graph. Add YouTube back once confirmed.
-  sameAs: ['https://www.instagram.com/r2bot.in'],
+  // brand in Google's knowledge graph.
+  sameAs: [
+    'https://www.instagram.com/r2bot.in',
+    'https://www.youtube.com/channel/UCkqlyCeLtTpT_j6Q-3NFxww',
+  ],
   areaServed: 'Worldwide',
 }
 
