@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
 import { Nav } from '@/components/Nav'
@@ -15,7 +15,14 @@ import {
   type SimulatorId,
 } from '@/lib/simulators'
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in'
+// NEXT_PUBLIC_SITE_URL is set to the *.vercel.app deployment URL in some
+// environments. Emitting that as the canonical tells Google the content lives
+// on the preview domain, which is worse than having no canonical at all. Every
+// other file in this repo guards the same way — keep this consistent.
+const SITE =
+  process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app')
+    ? process.env.NEXT_PUBLIC_SITE_URL
+    : 'https://www.r2bot.in'
 
 // Each simulator is a heavy client component (Three.js, Monaco, canvas loops).
 // They are dynamically imported so a visitor landing on the PID page never
@@ -49,6 +56,13 @@ const COMPONENTS: Record<SimulatorId, React.ComponentType> = {
 }
 
 export const revalidate = 86400
+
+// Anything not returned by generateStaticParams 404s properly instead of being
+// rendered on demand. Without this an unknown slug returned HTTP 200 with a
+// "not found" body — a soft 404, which Google will index as a real page.
+// Legacy aliases are handled as 308 redirects in next.config.mjs, so they never
+// reach this route.
+export const dynamicParams = false
 
 export function generateStaticParams() {
   return SIMULATORS.map((s) => ({ slug: s.id }))
@@ -91,12 +105,11 @@ export default async function SimulatorPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  // With dynamicParams = false only canonical ids reach this point; aliases are
+  // 308-redirected by next.config.mjs before routing. resolveSimulatorId still
+  // runs as a safety net.
   const id = resolveSimulatorId(slug)
   if (!id) notFound()
-
-  // A legacy alias resolves, but must redirect to the canonical slug so link
-  // equity lands on one URL rather than being split across spellings.
-  if (id !== slug.toLowerCase()) redirect(`/visualizer/${id}`)
 
   const sim = getSimulator(id)
   if (!sim) notFound()
