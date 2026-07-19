@@ -1,40 +1,46 @@
 # Files excluded from the Vercel deployment upload.
 #
-# WHY: without this file the CLI uploaded the whole working directory — 293 MB,
-# almost all of it reels/_frames (2.8 GB of rendered video frames on disk).
+# WHY THIS FILE EXISTS: without it the CLI uploaded the whole working directory
+# — 293 MB, almost all of it reels/_frames (2.8 GB of rendered video frames).
 # Vercel answered the oversized upload with an HTML error page, which the CLI
 # tried to parse as JSON and reported as:
 #   Error: Unexpected token '<', "<html><h"... is not valid JSON
 #
-# Only exclude things the BUILD does not need. The build runs on Vercel, so
-# app/, components/, lib/, content/ (MDX), public/ and the config files must all
-# stay. Nothing below is imported by the application.
+# EVERY PATTERN HERE IS ANCHORED WITH A LEADING SLASH, ON PURPOSE.
+# These are gitignore-style patterns, which match at EVERY depth unless
+# anchored. An unanchored "supabase/" excluded lib/supabase/ as well as the
+# root supabase/ directory, and broke the build with:
+#   Module not found: Can't resolve '@/lib/supabase/client'
+# The leading slash restricts each rule to the repository root. Do not remove
+# it, and anchor anything new you add here.
+#
+# Only exclude what the BUILD does not need. The build runs on Vercel, so app/,
+# components/, lib/, content/ (MDX), public/ and the config files must all stay.
 
 # Local video/reel generation workspace — nothing imports it
-reels/
+/reels/
 
-# Brand source assets (working files; shipped assets live in public/)
-brand/
-design/
+# Brand and design source files (shipped assets live in public/)
+/brand/
+/design/
 
 # One-off and maintenance scripts, not part of the build
-scripts/
+/scripts/
 
-# Docs and planning notes.
-# Leading slash matters: a bare "*.md" would match at every depth, and the
-# content loaders (lib/atlas.ts, lib/blog.ts, lib/academy.ts …) all accept .md
-# as well as .mdx — so an unscoped rule would silently drop any .md entry from
-# production the day one is added. Root-level only.
-docs/
+# Docs and planning notes. Root-level markdown only: the content loaders
+# (lib/atlas.ts, lib/blog.ts, lib/academy.ts …) all accept .md as well as .mdx,
+# so an unanchored "*.md" would silently drop content from production.
+/docs/
 /*.md
 
-# Database migrations are applied through Supabase, not at build time
-supabase/
+# Database migrations are applied through Supabase, not at build time.
+# Anchored so it cannot match lib/supabase/, which the app imports.
+/supabase/
 
-# Local build/tooling artefacts
-.next/
-node_modules/
-.git/
+# Local build and tooling artefacts
+/.next/
+/node_modules/
+/.git/
 *.tsbuildinfo
 __pycache__/
 *.pyc
