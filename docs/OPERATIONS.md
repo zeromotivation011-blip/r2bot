@@ -41,7 +41,7 @@ Never commit real values. This repo is public.
 - Schema lives in `supabase/migrations/*.sql`. They were applied by pasting into the Supabase
   SQL editor, so the live project's migration history table is empty. Treat the files as the
   source of truth and apply new ones in order.
-- Migration `0037_function_hardening.sql` is already applied live (2026-11-05).
+- Migrations `0037_function_hardening.sql` and `0038_xp_award_once.sql` are already applied live (2026-11-05). `0039_revoke_client_award_xp.sql` must wait until the XP code is deployed.
 - **Backups: the Free plan has none.** Take one by hand before any schema change and at least
   monthly:
 
@@ -64,10 +64,12 @@ Never commit real values. This repo is public.
 
 ## Known issues / backlog (in priority order)
 
-1. **`award_xp` can be farmed.** Any signed-in user can call it from the browser
-   (`components/LessonComplete.tsx`) up to 1000 XP per call, repeatedly. Fix: award XP on the
-   server in `/api/academy/complete-lesson`, once per lesson, then revoke EXECUTE from
-   `authenticated`.
+1. **`award_xp` can be farmed** (fix prepared; finish the rollout). Any signed-in user could call
+   `award_xp` from the browser, up to 1000 XP per call, repeatedly. New flow: the browser calls
+   `POST /api/academy/award-xp`, the server reads the real XP from the lesson and calls
+   `award_xp_once()` (pays each user+lesson once; service role only).
+   Rollout order: (a) migration `0038` (additive; already applied live 2026-11-05),
+   (b) deploy the code, (c) apply `0039_revoke_client_award_xp.sql`. Do not apply 0039 before the deploy.
 2. **Three SECURITY DEFINER views** bypass RLS: `public_leaderboard`, `schools_public`,
    `robot_vote_tally`. They feed public pages on purpose; replace with narrow definer
    functions or `security_invoker` views plus explicit read policies, and test the pages.
