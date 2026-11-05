@@ -10,7 +10,8 @@ import BlogPostClient from './BlogPostClient'
 
 export const runtime = 'nodejs'
 // Regenerate periodically so Content-Manager edits appear on the live post.
-export const revalidate = 300
+// Edits refresh on demand (revalidatePath in /api/admin/blog); daily timer is a safety net.
+export const revalidate = 86400
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 

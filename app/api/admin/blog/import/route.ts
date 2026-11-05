@@ -2,6 +2,7 @@
 // Admin-only: seed blog_posts from the bundled MDX files. Idempotent (won't
 // overwrite CMS-edited posts). Server-side, no local env needed.
 
+import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getAllPosts } from '@/lib/blog'
 
@@ -36,5 +37,7 @@ export async function POST() {
 
   const { error } = await supabase.from('blog_posts').upsert(rows, { onConflict: 'slug', ignoreDuplicates: true })
   if (error) return Response.json({ ok: false, error: error.message }, { status: 500 })
+  revalidatePath('/blog/[slug]', 'page')
+  revalidatePath('/blog')
   return Response.json({ ok: true, processed: rows.length })
 }
