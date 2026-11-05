@@ -9,18 +9,25 @@
   "thumbnail_url": null,
   "trailer_url": null,
   "instructor": null,
-  "price_inr": 2499,
-  "is_free": false,
-  "duration_hours": 20,
-  "total_lessons": 40,
-  "total_xp": 8000,
-  "tags": ["ros2", "gazebo", "navigation", "perception", "python", "professional", "intermediate"],
-  "prerequisites": ["wire-arduino-robotics"],
+  "price_inr": 0,
+  "is_free": true,
+  "tags": [
+    "ros2",
+    "gazebo",
+    "navigation",
+    "perception",
+    "python",
+    "professional",
+    "intermediate"
+  ],
+  "prerequisites": [
+    "wire-arduino-robotics"
+  ],
   "certificate_template": "forge-ros2",
   "published_at": null,
-  "language": "both",
+  "language": "en",
   "cbse_aligned": false,
-  "nep_aligned": true,
+  "nep_aligned": false,
   "hardware_kit": null,
   "what_youll_learn": [
     "Understand ROS2 architecture: nodes, topics, services, and actions",
@@ -32,8 +39,12 @@
     "Run a full Gazebo simulation of a warehouse navigation robot",
     "Debug ROS2 systems with rqt, ros2 topic echo, and TF tree inspection"
   ],
-  "free_preview_lesson_slugs": ["what-is-ros2", "ros2-architecture", "your-first-node"],
+  "free_preview_lesson_slugs": [
+    "what-is-ros2",
+    "ros2-architecture",
+    "your-first-node"
+  ],
   "coming_soon": true,
-  "waitlist_cta": "Join the Forge waitlist — first 100 get early access",
+  "waitlist_cta": "Free when it launches. Leave your email and we will tell you the day it opens.",
   "hardware_requirements": []
 }

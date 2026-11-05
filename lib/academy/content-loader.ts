@@ -153,8 +153,9 @@ export function loadCourse(slug: string): Course | null {
     thumbnail_url: meta.thumbnail_url,
     trailer_url: meta.trailer_url,
     instructor: meta.instructor,
-    price_inr: meta.price_inr ?? 0,
-    is_free: meta.is_free ?? (meta.price_inr ?? 0) === 0,
+    // Everything is free for now: never expose a price.
+    price_inr: 0,
+    is_free: true,
     duration_hours: meta.duration_hours,
     total_lessons: totalLessons,
     total_xp: totalXp,

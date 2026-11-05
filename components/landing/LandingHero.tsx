@@ -78,13 +78,13 @@ export function LandingHero() {
               color: 'transparent',
             }}
           >
-            <span style={{ visibility: 'hidden' }}>Get Hired in India.</span>
+            <span style={{ visibility: 'hidden' }}>Get Hired Anywhere.</span>
             <span className="r2-cycle r2-cycle-1">Build Real Robots.</span>
-            <span className="r2-cycle r2-cycle-2">Get Hired in India.</span>
+            <span className="r2-cycle r2-cycle-2">Get Hired Anywhere.</span>
             <span className="r2-cycle r2-cycle-3">Change the World.</span>
           </span>
           {/* Screen-reader-friendly static line */}
-          <span className="sr-only">Build real robots. Get hired in India. Change the world.</span>
+          <span className="sr-only">Build real robots. Get hired anywhere. Change the world.</span>
         </h1>
 
         {/* Subparagraph */}

@@ -699,7 +699,7 @@ function AtlasEnrichmentHero({ entry }: { entry: import('@/lib/atlas').AtlasEntr
           borderRadius: 12, padding: 12,
         }}>
           <p style={{ fontSize: 11, color: '#fbbf24', fontWeight: 900, letterSpacing: 1, textTransform: 'uppercase' }}>
-            🇮🇳 In India
+            🌍 An example from India
           </p>
           <p style={{ fontSize: 14, color: '#fde68a', marginTop: 4, lineHeight: 1.5 }}>{indianExample}</p>
         </div>

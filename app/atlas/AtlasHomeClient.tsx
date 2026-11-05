@@ -909,7 +909,7 @@ function TermDrawer({
               )}
               {term.indianExample && (
                 <div className="india-box">
-                  <p className="amber-h">🇮🇳 In India</p>
+                  <p className="amber-h">🌍 An example from India</p>
                   <p>{term.indianExample}</p>
                 </div>
               )}

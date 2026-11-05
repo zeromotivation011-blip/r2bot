@@ -4,6 +4,7 @@
 
 export const FREE_COURSES: readonly string[] = ['spark-foundations']
 
-export function isFreeCourse(slug: string): boolean {
-  return FREE_COURSES.includes(slug)
+// Everything on R2BOT is free for now, so every course counts as free.
+export function isFreeCourse(_slug: string): boolean {
+  return true
 }

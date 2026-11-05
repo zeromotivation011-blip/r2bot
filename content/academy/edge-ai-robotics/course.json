@@ -9,13 +9,20 @@
   "thumbnail_url": null,
   "trailer_url": null,
   "instructor": null,
-  "price_inr": 4999,
-  "is_free": false,
-  "duration_hours": 30,
-  "total_lessons": 50,
-  "total_xp": 12000,
-  "tags": ["AI", "computer-vision", "reinforcement-learning", "SLAM", "deep-learning", "advanced", "research"],
-  "prerequisites": ["forge-ros2"],
+  "price_inr": 0,
+  "is_free": true,
+  "tags": [
+    "AI",
+    "computer-vision",
+    "reinforcement-learning",
+    "SLAM",
+    "deep-learning",
+    "advanced",
+    "research"
+  ],
+  "prerequisites": [
+    "forge-ros2"
+  ],
   "certificate_template": "edge-ai-robotics",
   "published_at": null,
   "language": "en",
@@ -32,8 +39,11 @@
     "Evaluate and benchmark AI models for robotics deployment",
     "Contribute to open-source robotics AI projects"
   ],
-  "free_preview_lesson_slugs": ["ai-in-robotics-today", "perception-pipeline-overview"],
+  "free_preview_lesson_slugs": [
+    "ai-in-robotics-today",
+    "perception-pipeline-overview"
+  ],
   "coming_soon": true,
-  "waitlist_cta": "Edge is in design. Join the research preview list.",
+  "waitlist_cta": "Free when it launches. Leave your email and we will tell you the day it opens.",
   "hardware_requirements": []
 }
