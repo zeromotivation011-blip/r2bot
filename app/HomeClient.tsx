@@ -152,7 +152,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
       
       
 
-      <div style={{ position: 'relative', maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: 48, alignItems: 'center' }}>
+      <div className="m-stack" style={{ position: 'relative', maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: 48, alignItems: 'center' }}>
         <div>
           {personalization.signedIn && personalization.firstName && (
             <p style={{ fontSize: 13, color: '#cbd5e1', fontWeight: 700, margin: '0 0 8px' }}>
@@ -479,7 +479,7 @@ function SimulatorShowcase() {
       borderTop: '1px solid rgba(255,255,255,0.06)',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
+        <div className="m-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
           <div>
             <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FFB800', fontWeight: 900, margin: '0 0 14px' }}>
               Interactive Simulators
@@ -502,7 +502,7 @@ function SimulatorShowcase() {
               Open Simulator Lab →
             </Link>
           </div>
-          <div style={{ display: 'grid', gap: 12, gridTemplateColumns: '1fr 1fr' }}>
+          <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))' }}>
             {sims.map(s => (
               <Link
                 key={s.slug}
@@ -540,7 +540,7 @@ function IndiaSpotlight() {
       borderTop: '1px solid rgba(249,115,22,.18)', borderBottom: '1px solid rgba(16,185,129,.15)',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 48, alignItems: 'center' }}>
+        <div className="m-stack" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 48, alignItems: 'center' }}>
           <div>
             <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#f97316', fontWeight: 900, margin: '0 0 14px' }}>
               Global · Built for the world
@@ -817,7 +817,7 @@ function SchoolsTeaser() {
   return (
     <section style={{ padding: '80px 20px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{
+        <div className="m-stack" style={{
           background: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(0,229,255,0.08))',
           border: '1px solid rgba(16,185,129,0.3)', borderRadius: 24, padding: '48px 40px',
           display: 'grid', gridTemplateColumns: '1fr auto', gap: 32, alignItems: 'center',
@@ -896,13 +896,13 @@ function NewsletterCTA() {
         <p style={{ color: '#64748b', fontSize: 14, marginBottom: 28 }}>
           IFR reports, new research, standout robotics startups, and R2BOT updates. Curated, not dumped.
         </p>
-        <form onSubmit={submit} style={{ display: 'flex', gap: 10, maxWidth: 440, margin: '0 auto 12px' }}>
+        <form onSubmit={submit} style={{ display: 'flex', gap: 10, maxWidth: 440, margin: '0 auto 12px', flexWrap: 'wrap' }}>
           <input
             type="email" required value={email}
             onChange={e => setEmail(e.target.value)}
             placeholder="your@email.com"
             style={{
-              flex: 1, background: 'rgba(255,255,255,0.06)',
+              flex: '1 1 200px', minWidth: 0, background: 'rgba(255,255,255,0.06)',
               border: '1px solid rgba(255,255,255,0.15)',
               color: '#f4f4f5', padding: '12px 16px',
               borderRadius: 12, fontSize: 14, outline: 'none',
@@ -911,7 +911,7 @@ function NewsletterCTA() {
           <button
             type="submit" disabled={status === 'loading'}
             style={{
-              padding: '0 20px', background: '#fbbf24', color: '#0f0a1e',
+              padding: '12px 20px', flex: '1 1 auto', background: '#fbbf24', color: '#0f0a1e',
               fontWeight: 900, fontSize: 14, border: 'none',
               borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap',
               opacity: status === 'loading' ? 0.6 : 1,
@@ -939,7 +939,7 @@ function Footer() {
   return (
     <footer style={{ padding: '56px 20px', background: '#08080d', borderTop: '1px solid #1f1f2a' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr', gap: 32, marginBottom: 40 }}>
+        <div className="m-stack-2" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr', gap: 32, marginBottom: 40 }}>
           <div>
             <p style={{ fontWeight: 900, fontSize: 24, color: '#fff', margin: '0 0 8px' }}>
               R<span style={{ color: '#fbbf24' }}>2</span>BOT

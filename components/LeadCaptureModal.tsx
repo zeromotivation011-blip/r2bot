@@ -19,6 +19,8 @@ export function LeadCaptureModal() {
   useEffect(() => {
     try {
       if (window.localStorage.getItem(STORAGE_KEY)) return
+      // One popup at a time: never stack on top of the welcome modal or tour.
+      if (!window.localStorage.getItem('r2bot_onboarded')) return
     } catch { /* ignore */ }
 
     // Count pages viewed this session; open on the Nth page.

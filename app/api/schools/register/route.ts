@@ -2,7 +2,7 @@
 // Public school registration endpoint. Inserts into Supabase + (best-effort) sends a Resend email.
 
 import type { NextRequest } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -51,7 +51,8 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Invalid email' }, { status: 400 });
   }
 
-  const supabase = await createSupabaseServerClient();
+  // Server-only writes (service role): the public INSERT policy on `schools` is being removed.
+  const supabase = createSupabaseAdminClient();
 
   // Generate unique class code with up to 5 retries on collision.
   let classCode = '';

@@ -346,19 +346,19 @@ export function CopilotPageClient() {
       </div>
 
       {/* Input */}
-      <form onSubmit={onSubmit} className="flex items-center gap-2">
+      <form onSubmit={onSubmit} className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={`Ask R2 in ${modeDef.label} mode…`}
           aria-label="Ask R2"
-          className="flex-1 rounded-2xl border border-white/15 bg-white/[0.04] px-5 py-3 text-base text-white placeholder-zinc-500 outline-none transition-colors focus:border-amber-400/60"
+          className="min-w-0 basis-full flex-1 rounded-2xl border border-white/15 bg-white/[0.04] px-5 py-3 text-base sm:basis-0 text-white placeholder-zinc-500 outline-none transition-colors focus:border-amber-400/60"
         />
         <button
           type="submit"
           disabled={loading || input.trim().length === 0}
-          className="rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 px-5 py-3 font-bold text-[#1a0f00] transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex-1 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 px-5 py-3 sm:flex-none font-bold text-[#1a0f00] transition-transform hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? '…' : 'Send'}
         </button>

@@ -1,6 +1,7 @@
 // app/api/admin/blog/route.ts — Admin-only: fetch one post + create/update posts.
 
 import type { NextRequest } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
@@ -48,5 +49,7 @@ export async function POST(req: NextRequest) {
     .from('blog_posts')
     .upsert({ slug, title, description, date, status, body, data, origin: 'cms' }, { onConflict: 'slug' })
   if (error) return Response.json({ ok: false, error: error.message }, { status: 500 })
+  revalidatePath(`/blog/${slug}`)
+  revalidatePath('/blog')
   return Response.json({ ok: true })
 }

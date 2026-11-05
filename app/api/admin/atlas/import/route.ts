@@ -4,6 +4,7 @@
 // admin's session, so no local env / terminal is needed. Idempotent: existing
 // rows are left untouched (won't clobber Content-Manager edits).
 
+import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getAllAtlasEntries } from '@/lib/atlas'
 
@@ -51,5 +52,7 @@ export async function POST() {
     inserted += batch.length
   }
 
+  revalidatePath('/atlas/[type]/[slug]', 'page')
+  revalidatePath('/atlas')
   return Response.json({ ok: true, found: entries.length, processed: inserted })
 }

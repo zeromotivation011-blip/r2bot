@@ -36,13 +36,13 @@ export const metadata: Metadata = {
     title: 'Famous Robots — Encyclopedia of Real Robots',
     description:
       "20+ profiles of real robots — humanoid, industrial, space, medical, India. Specs, fun facts, video.",
-    images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'Famous Robots — R2BOT' }],
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'Famous Robots — R2BOT' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Famous Robots',
     description: '20+ real-robot profiles with specs, videos, and fun facts.',
-    images: ['/og-default.svg'],
+    images: ['/og-default.png'],
   },
   robots: {
     index: true,

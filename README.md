@@ -28,7 +28,7 @@ The world's most accessible robotics platform — every robot, every breakthroug
 | `lib/atlas.ts`, `lib/pulse.ts`, `lib/lens.ts` | MDX loaders with safe date coercion |
 | `content/atlas/`, `content/pulse/`, `content/lens/` | Canonical MDX source for every content type |
 | `scripts/seed-atlas.ts` | One-shot script: pushes every Atlas MDX into Supabase + generates embeddings |
-| `supabase/migrations/0001_initial_schema.sql` | Full database schema (10 tables + pgvector + RLS + RPC) |
+| `supabase/migrations/0001_initial_schema.sql` | Initial schema (9 tables + pgvector + RLS + RPC). 36 further migrations in the same folder; the live database now has ~45 tables |
 | `components/AuthForm.tsx` | Magic-link form shared by `/login` and `/signup` |
 | `components/Nav.tsx` | Top nav — swaps "Sign in / Get started" for "Dashboard" when logged in |
 | `docs/R2BOT-Strategic-Blueprint.docx` | Founder's strategy document |
@@ -57,7 +57,7 @@ The world's most accessible robotics platform — every robot, every breakthroug
 - **Embeddings + RAG**: OpenAI `text-embedding-3-small` (1536-dim) → Supabase pgvector → `match_atlas_entries()` RPC
 - **Content**: MDX with `gray-matter` + `react-markdown` + `remark-gfm`
 - **Database + Auth**: Supabase (Postgres + Auth + pgvector + RLS)
-- **Hosting**: Vercel (auto-deploy on push to `main`)
+- **Hosting**: Vercel. Production is deployed with the Vercel CLI today; connect Git in Vercel for auto-deploys (see `docs/OPERATIONS.md`)
 - **SEO**: sitemap, robots.txt, schema.org JSON-LD, Open Graph
 
 ## Local development
@@ -87,7 +87,7 @@ The schema lives in `supabase/migrations/0001_initial_schema.sql`. To apply it:
 1. Open https://supabase.com/dashboard → your project
 2. Left sidebar → **SQL Editor** → **+ New query**
 3. Copy the entire migration file → paste → **Run**
-4. Verify in **Table Editor**: 9 tables should exist (`profiles`, `atlas_entries`, `pulse_articles`, `lens_videos`, `courses`, `lessons`, `user_progress`, `copilot_conversations`, `atlas_gaps`)
+4. Then apply the rest of `supabase/migrations/` in numeric order. Verify in **Table Editor**: the first migration alone creates 9 tables (`profiles`, `atlas_entries`, `pulse_articles`, `lens_videos`, `courses`, `lessons`, `user_progress`, `copilot_conversations`, `atlas_gaps`)
 
 Then seed the Atlas:
 
@@ -134,6 +134,10 @@ This reads every MDX in `content/atlas/`, upserts it into `atlas_entries`, and (
 - [x] **v0.9 — Supabase wiring + magic-link auth + RAG on Co-pilot — current**
 - [ ] Domain registered (`r2bot.com` or `r2bot.in`)
 - [ ] v1.0 — Public soft launch (more content + courses + custom domain)
+
+## Operations
+
+Accounts, deploys, env vars, backups, cost guards and the known-issues backlog: [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
 
 ## License
 

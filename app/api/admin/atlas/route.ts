@@ -3,6 +3,7 @@
 // in the atlas_entries table. RLS also enforces admin, this is defense-in-depth.
 
 import type { NextRequest } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
@@ -62,5 +63,7 @@ export async function POST(req: NextRequest) {
     .upsert({ type, slug, title, summary, category, status, body, data, origin: 'cms' }, { onConflict: 'type,slug' })
 
   if (error) return Response.json({ ok: false, error: error.message }, { status: 500 })
+  revalidatePath(`/atlas/${type}/${slug}`)
+  revalidatePath('/atlas')
   return Response.json({ ok: true })
 }

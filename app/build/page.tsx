@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     description:
       'Adaptive question-first robot builds. No tutorials. No watching. Just doing.',
     images: [
-      { url: '/og-default.svg', width: 1200, height: 630, alt: 'R2BOT Build' },
+      { url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT Build' },
     ],
   },
 }

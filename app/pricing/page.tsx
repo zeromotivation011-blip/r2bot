@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: 'R2BOT Pro — Unlock Your Full Robotics Journey',
     description:
       'Get unlimited AI mentoring, full course access, and certificates. ₹799/month or ₹5,999/year.',
-    images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'R2BOT Pro' }],
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT Pro' }],
   },
 }
 

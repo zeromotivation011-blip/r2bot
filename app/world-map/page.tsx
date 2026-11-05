@@ -29,14 +29,14 @@ export const metadata: Metadata = {
     title: 'World Robotics Map 2024',
     description:
       "50 countries · IFR 2023 data · India's 4 vs South Korea's 1,012. The world's most feature-rich interactive robotics map.",
-    images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'World Robotics Map — R2BOT' }],
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'World Robotics Map — R2BOT' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'World Robotics Map 2024',
     description:
       "Interactive map of robot density across 50 countries (IFR 2023). India's +59% growth vs South Korea's 1,012 density.",
-    images: ['/og-default.svg'],
+    images: ['/og-default.png'],
   },
   robots: {
     index: true,

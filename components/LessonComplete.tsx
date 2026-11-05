@@ -92,13 +92,21 @@ export function LessonComplete({
           );
         if (error) throw error;
 
-        // Best-effort XP award. Degrades silently if RPC or column missing.
+        // Best-effort XP award. The server decides the amount from the lesson itself and
+        // pays each lesson once, so the client cannot farm XP. Failure never blocks completion.
         if (xp && xp > 0) {
           try {
-            await supabase.rpc('award_xp', { amount: xp });
-            setXpAwarded(xp);
+            const res = await fetch('/api/academy/award-xp', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ track, lessonSlug }),
+            });
+            const out = (await res.json().catch(() => null)) as { awarded?: number } | null;
+            if (res.ok && out && typeof out.awarded === 'number' && out.awarded > 0) {
+              setXpAwarded(out.awarded);
+            }
           } catch {
-            /* RPC may not exist yet — that's OK */
+            /* XP is best-effort */
           }
         }
       } catch {

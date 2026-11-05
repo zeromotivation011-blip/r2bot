@@ -69,7 +69,7 @@ export function articleJsonLD(
       name: 'R2BOT',
       logo: { '@type': 'ImageObject', url: `${BASE_URL}/icon.svg` },
     },
-    image: `${BASE_URL}/og-default.svg`,
+    image: `${BASE_URL}/og-default.png`,
   };
 }
 

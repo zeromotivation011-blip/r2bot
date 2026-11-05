@@ -11,8 +11,10 @@ import {
 } from '@/lib/atlas';
 import { getAtlasEntryMerged, getAllAtlasEntriesMerged } from '@/lib/atlas-db';
 
-// Regenerate periodically so Content-Manager edits appear on the live page.
-export const revalidate = 300;
+// Content-Manager edits refresh their page on demand (revalidatePath in /api/admin/atlas).
+// The daily timer is only a safety net: a 5-minute timer across ~490 pages burned the
+// Vercel Hobby ISR-write quota (361K/200K in 30 days).
+export const revalidate = 86400;
 import { getAcademyLessonForAtlasTerm, TRACK_EMOJI, TRACK_NAME } from '@/lib/atlas-academy-map';
 import { Nav } from '@/components/Nav';
 import { ParticleField } from '@/components/ParticleField';

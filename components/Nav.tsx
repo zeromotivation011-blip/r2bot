@@ -40,7 +40,7 @@ const GROUPS: Group[] = [
           { icon: '⚡️', label: 'Edge · Research', href: '/academy/edge', tone: 'edge' },
         ],
       },
-      { kind: 'link', icon: '📚', label: 'Atlas', sub: '400+ concepts explained', href: '/atlas' },
+      { kind: 'link', icon: '📚', label: 'Atlas', sub: '480+ concepts explained', href: '/atlas' },
       { kind: 'link', icon: '⚡', label: 'Daily Challenge', sub: 'Quick puzzle · streak', href: '/challenge' },
       {
         kind: 'link',
@@ -335,7 +335,7 @@ export function Nav() {
         </div>
 
         <div className="nav-right">
-          <LanguageSwitcher />
+          <span className="nav-lang-desktop"><LanguageSwitcher /></span>
 
           <StreakBadge />
 
@@ -436,6 +436,7 @@ export function Nav() {
             );
           })}
 
+          <div className="nav-mob-lang"><LanguageSwitcher /></div>
           <div className="nav-mob-foot">
             {signedIn === true ? (
               <a href="/dashboard" className="btn btn-primary">Dashboard</a>
