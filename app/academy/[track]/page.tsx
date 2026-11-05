@@ -15,6 +15,7 @@ import {
   type AcademyTrack,
 } from '@/lib/academy';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { breadcrumbJsonLD, courseJsonLD } from '@/lib/seo/jsonld';
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -72,6 +73,19 @@ export default async function TrackOverviewPage({ params }: { params: Params }) 
       <ParticleField />
       <CursorTrail />
       <Nav />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            courseJsonLD(`${trackLabel(t)} · R2BOT Academy`, TRACK_BLURB[t], `${BASE_URL}/academy/${t}`),
+            breadcrumbJsonLD([
+              { name: 'Home', path: '/' },
+              { name: 'Academy', path: '/academy' },
+              { name: trackLabel(t), path: `/academy/${t}` },
+            ]),
+          ]),
+        }}
+      />
       <main id="main-content" style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>
         <div className="container" style={{ maxWidth: 880 }}>
           {/* Track badge */}

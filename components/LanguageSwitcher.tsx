@@ -6,7 +6,7 @@
 // dark dropdown that sets the `googtrans` cookie and reloads (the only reliable way
 // to persist a choice across Next.js client-side navigation).
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Lang = { code: string; label: string; flag: string };
 
@@ -63,10 +63,10 @@ export function LanguageSwitcher() {
   const [current, setCurrent] = useState('en');
   const ref = useRef<HTMLDivElement>(null);
 
-  // Inject the Google Translate element + script once.
-  useEffect(() => {
-    setCurrent(readGoogtrans());
-
+  // Load the Google Translate element + script (~110 KB) only when it is needed:
+  // when the visitor opens the menu, or when a translation is already active.
+  // Loading it on every page slowed the first paint for people who never translate.
+  const loadTranslate = useCallback(() => {
     if (!document.getElementById('google_translate_element')) {
       const host = document.createElement('div');
       host.id = 'google_translate_element';
@@ -98,6 +98,12 @@ export function LanguageSwitcher() {
     }
   }, []);
 
+  useEffect(() => {
+    const lang = readGoogtrans();
+    setCurrent(lang);
+    if (lang !== 'en') loadTranslate();
+  }, [loadTranslate]);
+
   // Close on outside click.
   useEffect(() => {
     if (!open) return;
@@ -122,7 +128,7 @@ export function LanguageSwitcher() {
     <div ref={ref} className="notranslate" style={{ position: 'relative' }} translate="no">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => { loadTranslate(); setOpen((o) => !o); }}
         aria-label="Change language"
         aria-haspopup="listbox"
         aria-expanded={open}

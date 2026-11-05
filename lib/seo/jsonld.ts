@@ -85,6 +85,19 @@ export function faqJsonLD(faqs: { q: string; a: string }[]) {
   };
 }
 
+export function breadcrumbJsonLD(items: { name: string; path: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: it.name,
+      item: `${BASE_URL}${it.path}`,
+    })),
+  };
+}
+
 /** Helper to render any JSON-LD object as a <script> string. */
 export function jsonldScript(data: unknown): string {
   return JSON.stringify(data);

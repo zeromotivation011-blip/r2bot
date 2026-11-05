@@ -1,3 +1,4 @@
+import { breadcrumbJsonLD } from '@/lib/seo/jsonld';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -205,6 +206,16 @@ export default async function AtlasEntryPage(
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLD([
+            { name: 'Home', path: '/' },
+            { name: 'Atlas', path: '/atlas' },
+            { name: entry.title, path: `/atlas/${type}/${slug}` },
+          ])),
+        }}
       />
       {faqSchema && (
         <script
