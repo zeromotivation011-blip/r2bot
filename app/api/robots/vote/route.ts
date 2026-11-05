@@ -1,6 +1,6 @@
 // app/api/robots/vote/route.ts
 import type { NextRequest } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,12 +24,29 @@ export async function POST(req: NextRequest) {
   }
   const ip = (req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? '').split(',')[0]?.trim() || null;
 
-  const supabase = await createSupabaseServerClient();
+  // Server-only writes (service role): the public INSERT policy on robot_votes is being removed,
+  // so votes can no longer be stuffed directly through the public REST API.
+  const supabase = createSupabaseAdminClient();
 
-  const { error: insertErr } = await supabase.from('robot_votes').insert({ robot_slug: slug, vote_type: vote, user_ip: ip });
-  if (insertErr) {
-    console.error('[robots/vote] insert failed', insertErr);
-    return Response.json({ error: 'Could not record vote' }, { status: 500 });
+  // One vote per IP per robot per 24h (best-effort: skipped when the IP is unknown).
+  let duplicate = false;
+  if (ip) {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { count } = await supabase
+      .from('robot_votes')
+      .select('id', { count: 'exact', head: true })
+      .eq('robot_slug', slug)
+      .eq('user_ip', ip)
+      .gte('created_at', since);
+    duplicate = (count ?? 0) > 0;
+  }
+
+  if (!duplicate) {
+    const { error: insertErr } = await supabase.from('robot_votes').insert({ robot_slug: slug, vote_type: vote, user_ip: ip });
+    if (insertErr) {
+      console.error('[robots/vote] insert failed', insertErr);
+      return Response.json({ error: 'Could not record vote' }, { status: 500 });
+    }
   }
 
   const { data: tally } = await supabase
@@ -41,5 +58,6 @@ export async function POST(req: NextRequest) {
   return Response.json({
     cool_count: (tally?.cool_votes as number) ?? 0,
     creepy_count: (tally?.creepy_votes as number) ?? 0,
+    duplicate,
   });
 }

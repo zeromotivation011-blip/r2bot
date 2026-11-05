@@ -2,7 +2,7 @@
 // Newsletter signup for R2BOT Weekly — the weekly robotics digest.
 
 import type { NextRequest } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { createSupabaseAdminClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
 
@@ -14,18 +14,21 @@ export async function POST(req: NextRequest) {
       return Response.json({ ok: false, error: 'Invalid email' }, { status: 400 })
     }
 
-    const supabase = await createSupabaseServerClient()
+    // Server-only write (service role): the public INSERT policy on this table is being removed.
+    const supabase = createSupabaseAdminClient()
     const { error } = await supabase
       .from('newsletter_subscribers')
       .insert({ email, source: 'news' })
 
     // 23505 = unique violation — treat as success ("already subscribed")
     if (error && error.code !== '23505') {
-      return Response.json({ ok: false, error: error.message }, { status: 500 })
+      console.error('[news/subscribe] insert failed', error)
+      return Response.json({ ok: false, error: 'Could not subscribe, please try again.' }, { status: 500 })
     }
 
     return Response.json({ ok: true })
   } catch (e: unknown) {
-    return Response.json({ ok: false, error: e instanceof Error ? e.message : 'Unknown' }, { status: 500 })
+    console.error('[news/subscribe] failed', e)
+    return Response.json({ ok: false, error: 'Could not subscribe, please try again.' }, { status: 500 })
   }
 }

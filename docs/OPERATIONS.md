@@ -70,12 +70,14 @@ Never commit real values. This repo is public.
    `award_xp_once()` (pays each user+lesson once; service role only).
    Rollout order: (a) migration `0038` (additive; already applied live 2026-11-05),
    (b) deploy the code, (c) apply `0039_revoke_client_award_xp.sql`. Do not apply 0039 before the deploy.
-2. **Three SECURITY DEFINER views** bypass RLS: `public_leaderboard`, `schools_public`,
-   `robot_vote_tally`. They feed public pages on purpose; replace with narrow definer
-   functions or `security_invoker` views plus explicit read policies, and test the pages.
+2. **Views and voter privacy** (fix prepared in migration `0040`; safe to apply any time).
+   `robot_votes` let anyone read every row including voter IP addresses. 0040 limits the public API
+   to non-identifying columns and switches `robot_vote_tally`, `public_leaderboard` and
+   `schools_public` to `security_invoker`, which also clears the three Security Advisor errors.
 3. **Open INSERT policies** (`WITH CHECK (true)`) on `leads`, `lead_events`,
-   `newsletter_subscribers`, `schools`, `robot_votes`. Confirm all writes go through rate-limited
-   API routes (service role), then drop the public policies.
+   `newsletter_subscribers`, `schools`, `robot_votes` (fix prepared: the public routes now write
+   with the service role, and the vote route allows one vote per IP per robot per day).
+   Migration `0041` drops the open policies. **Apply 0041 only after the code is deployed.**
 4. **RLS performance**: wrap `auth.uid()` as `(select auth.uid())` in policies and merge the
    duplicate permissive policies (school_*, user_achievements). Matters once there are many users.
 5. `vector` extension is installed in `public`; move to `extensions` in a quiet window.
