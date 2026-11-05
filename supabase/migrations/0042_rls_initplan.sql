@@ -5,8 +5,8 @@
 -- policy is identical; only the plan changes.
 --
 -- This rewrites every public-schema policy that still contains a bare
--- auth.uid() / auth.role() / auth.jwt(). Policies already wrapped are skipped,
--- so it is safe to run twice. Run it in a transaction first if you like:
+-- auth.uid() / auth.role() / auth.jwt(). Already wrapped calls are kept as is,
+-- so it is safe to run twice (the notice count is then only a re-write to the same text). Run it in a transaction first if you like:
 --   begin; <this file>; select ...; rollback;
 -- Rollback: there is no semantic change; to undo, re-create the policies from
 -- the earlier migrations.
@@ -21,6 +21,7 @@ declare
   -- bare call not already preceded by "select "
   fn text[] := array['auth.uid()', 'auth.role()', 'auth.jwt()'];
   f text;
+  i int;
 begin
   for r in
     select schemaname, tablename, policyname, qual, with_check
@@ -31,18 +32,19 @@ begin
   loop
     new_using := r.qual;
     new_check := r.with_check;
-    foreach f in array fn loop
+    for i in 1 .. array_length(fn, 1) loop
+      f := fn[i];
       -- pg_policies renders an already wrapped call as "( SELECT auth.uid() AS uid)";
       -- protect those by temporarily tagging them.
       if new_using is not null then
-        new_using := regexp_replace(new_using, '\(\s*SELECT\s+' || replace(replace(f,'(','\('),')','\)') || '\s+AS\s+\w+\)', '@@WRAPPED@@' || f || '@@', 'gi');
+        new_using := regexp_replace(new_using, '\(\s*SELECT\s+' || replace(replace(f,'(','\('),')','\)') || '\s+AS\s+\w+\)', '@@W' || i || '@@', 'gi');
         new_using := replace(new_using, f, '(select ' || f || ')');
-        new_using := replace(new_using, '@@WRAPPED@@' || f || '@@', '(select ' || f || ')');
+        new_using := replace(new_using, '@@W' || i || '@@', '(select ' || f || ')');
       end if;
       if new_check is not null then
-        new_check := regexp_replace(new_check, '\(\s*SELECT\s+' || replace(replace(f,'(','\('),')','\)') || '\s+AS\s+\w+\)', '@@WRAPPED@@' || f || '@@', 'gi');
+        new_check := regexp_replace(new_check, '\(\s*SELECT\s+' || replace(replace(f,'(','\('),')','\)') || '\s+AS\s+\w+\)', '@@W' || i || '@@', 'gi');
         new_check := replace(new_check, f, '(select ' || f || ')');
-        new_check := replace(new_check, '@@WRAPPED@@' || f || '@@', '(select ' || f || ')');
+        new_check := replace(new_check, '@@W' || i || '@@', '(select ' || f || ')');
       end if;
     end loop;
 
