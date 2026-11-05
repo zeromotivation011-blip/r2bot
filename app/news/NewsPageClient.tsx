@@ -340,8 +340,8 @@ function FeaturedCard({ article: a, styles, onSave, saved }: {
         <p className="mt-1 text-xs text-zinc-200">{a.whyItMatters}</p>
       </div>
       <div className="mt-2 flex items-center gap-2">
-        <button onClick={() => onSave(a)} className="text-xs text-zinc-300 hover:text-amber-300">{saved ? '🔖 Saved' : '🔖 Save'}</button>
-        <a href={a.url} target="_blank" rel="noopener" className="ml-auto text-xs font-bold text-amber-300 hover:text-amber-200">Open →</a>
+        <button onClick={() => onSave(a)} className="inline-flex min-h-[44px] items-center text-xs text-zinc-300 hover:text-amber-300">{saved ? '🔖 Saved' : '🔖 Save'}</button>
+        <a href={a.url} target="_blank" rel="noopener" className="ml-auto inline-flex min-h-[44px] items-center text-xs font-bold text-amber-300 hover:text-amber-200">Open →</a>
       </div>
     </article>
   )
@@ -387,11 +387,11 @@ function ArticleRow({ article: a, styles, expanded, onToggle, onSave, saved }: {
 
       {/* Actions */}
       <div className="mt-3 flex items-center gap-3 text-xs">
-        <button onClick={onToggle} className="text-amber-300 hover:text-amber-200 font-bold">
+        <button onClick={onToggle} className="inline-flex min-h-[44px] items-center text-amber-300 hover:text-amber-200 font-bold">
           {expanded ? '✕ Hide context' : 'R2BOT context →'}
         </button>
-        <button onClick={() => onSave(a)} className="text-zinc-300 hover:text-amber-300">{saved ? '🔖 Saved' : '🔖 Save'}</button>
-        <a href={a.url} target="_blank" rel="noopener" className="ml-auto text-zinc-200 hover:text-amber-300">Open →</a>
+        <button onClick={() => onSave(a)} className="inline-flex min-h-[44px] items-center text-zinc-300 hover:text-amber-300">{saved ? '🔖 Saved' : '🔖 Save'}</button>
+        <a href={a.url} target="_blank" rel="noopener" className="ml-auto inline-flex min-h-[44px] items-center text-zinc-200 hover:text-amber-300">Open →</a>
       </div>
 
       {expanded && (

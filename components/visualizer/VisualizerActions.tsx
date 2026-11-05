@@ -45,20 +45,20 @@ export function VisualizerActions({ sectionId, title }: { sectionId: string; tit
       <button
         type="button"
         onClick={share}
-        className="rounded-md border border-cyan-400/40 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/20"
+        className="rounded-md border border-cyan-400/40 bg-cyan-500/10 px-3 py-2.5 text-xs font-semibold inline-flex items-center min-h-[40px] text-cyan-200 hover:bg-cyan-500/20"
       >
         {shared ? '✓ Link copied' : '🔗 Share'}
       </button>
       <button
         type="button"
         onClick={() => copy(embed, setEmbedCopied)}
-        className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200 hover:bg-amber-500/20"
+        className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2.5 text-xs font-semibold inline-flex items-center min-h-[40px] text-amber-200 hover:bg-amber-500/20"
       >
         {embedCopied ? '✓ Embed copied' : '⧉ Embed code'}
       </button>
       <a
         href={`/visualizer/${sectionId}`}
-        className="rounded-md border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-zinc-200 hover:border-white/30"
+        className="rounded-md border border-white/15 bg-white/[0.04] px-3 py-2.5 text-xs font-semibold inline-flex items-center min-h-[40px] text-zinc-200 hover:border-white/30"
       >
         Open full page →
       </a>
