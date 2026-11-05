@@ -149,7 +149,7 @@ export function OnboardingModal() {
               Welcome to R2BOT 🤖
             </h2>
             <p style={{ fontSize: 17, color: 'var(--cyan-bright)', margin: '0 0 16px' }}>
-              India's Robotics Platform
+              Robotics, made simple
             </p>
             <p style={{ fontSize: 15, color: '#C8D0DC', lineHeight: 1.55, margin: '0 0 24px' }}>
               We'll help you find your level and give you a personalised learning path. Takes 2 minutes.

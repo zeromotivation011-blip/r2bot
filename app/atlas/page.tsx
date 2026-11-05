@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: 'R2BOT',
     title: 'Atlas — Robotics Knowledge Universe',
     description: 'Explore. Learn. Search. The world\'s most accessible robotics encyclopedia.',
-    images: [{ url: '/og-default.svg', width: 1200, height: 630 }],
+    images: [{ url: '/og-default.png', width: 1200, height: 630 }],
   },
 }
 

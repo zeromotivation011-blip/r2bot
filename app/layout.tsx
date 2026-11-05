@@ -24,8 +24,8 @@ const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono', displ
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   icons: {
-    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
-    apple: [{ url: '/icon.svg' }],
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }, { url: '/favicon.ico', sizes: '32x32' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
   },
   title: {
     default: 'R2BOT — Learn Robotics | ROS2, AI, and Real Robots, Explained',
@@ -54,13 +54,13 @@ export const metadata: Metadata = {
     siteName: 'R2BOT',
     title: 'R2BOT — Learn Robotics, from Zero to Job-Ready',
     description: 'From zero to robotics engineer — with an AI mentor, real simulators, and hands-on projects. The clearest robotics knowledge on the internet.',
-    images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'R2BOT — Learn Robotics' }],
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT — Learn Robotics' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'R2BOT — Learn Robotics, from Zero to Job-Ready',
     description: 'From zero to robotics engineer — AI mentor, real simulators, hands-on projects. Free to explore.',
-    images: ['/og-default.svg'],
+    images: ['/og-default.png'],
   },
   robots: {
     index: true,

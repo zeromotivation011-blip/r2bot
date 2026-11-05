@@ -73,7 +73,8 @@ export function FeatureTour() {
 
   useEffect(() => {
     try {
-      if (!window.localStorage.getItem(FLAG)) {
+      // One popup at a time: wait until the welcome modal has been completed.
+      if (!window.localStorage.getItem(FLAG) && window.localStorage.getItem('r2bot_onboarded')) {
         // Small delay so the page paints first — the tour feels like a welcome, not a wall.
         const t = setTimeout(() => setShow(true), 900);
         return () => clearTimeout(t);

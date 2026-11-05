@@ -23,23 +23,23 @@
 
   <!-- Tagline -->
   <text x="80" y="310" font-family="Inter, sans-serif" font-weight="600" font-size="38" fill="#E1E7EE">
-    Learn Robotics in India.
+    Learn robotics, from zero to job-ready.
   </text>
   <text x="80" y="360" font-family="JetBrains Mono, monospace" font-size="22" fill="#94A3B8">
-    From zero to ROS2 engineer. Free lessons, real projects, India jobs.
+    ROS2, AI mentor, real simulators and hands-on projects.
   </text>
 
   <!-- Stats row -->
   <g transform="translate(80, 460)" font-family="JetBrains Mono, monospace" fill="#C8D0DC">
-    <text font-size="22">⚡  13 lessons</text>
-    <text x="240" font-size="22">🔌  4 tracks</text>
-    <text x="430" font-size="22">🇮🇳  India-first</text>
-    <text x="720" font-size="22">🏆  Free to start</text>
+    <text font-size="22">480+ concepts</text>
+    <text x="240" font-size="22">4 learning tracks</text>
+    <text x="430" font-size="22">AI mentor</text>
+    <text x="720" font-size="22">Free to start</text>
   </g>
 
   <!-- Footer URL -->
   <text x="80" y="570" font-family="JetBrains Mono, monospace" font-size="20" fill="#475569">
-    robot-tan.vercel.app
+    www.r2bot.in
   </text>
 
   <!-- Decorative circuit -->

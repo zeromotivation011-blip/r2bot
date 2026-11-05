@@ -24,13 +24,13 @@ export const metadata: Metadata = {
     siteName: 'R2BOT',
     title: 'R2 Co-pilot — AI Robotics Assistant',
     description: 'Your free AI robotics mentor: debug ROS2, explain papers, plan projects, career guidance.',
-    images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'R2 Co-pilot' }],
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2 Co-pilot' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'R2 Co-pilot',
     description: 'AI robotics assistant — ROS2 debugging, papers, projects, careers.',
-    images: ['/og-default.svg'],
+    images: ['/og-default.png'],
   },
 };
 

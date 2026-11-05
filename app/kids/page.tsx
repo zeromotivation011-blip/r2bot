@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: 'R2BOT',
     title: 'Robot World — Robotics adventures for kids 5–14',
     description: 'Meet Spark. Explore 6 worlds. Build your own robot. Free, fun and made in India.',
-    images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'Robot World — R2BOT' }],
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'Robot World — R2BOT' }],
   },
 }
 

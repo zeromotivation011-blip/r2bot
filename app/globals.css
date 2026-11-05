@@ -429,9 +429,16 @@ footer { padding: 60px 0 40px; border-top: 1px solid var(--border); background: 
   .nav-ask span { display: none; }
   .nav-ask { padding: 8px 10px; }
   .nav-wrap { gap: 12px; }
+  /* Phones: logo + Ask + hamburger only. Language, Sign in and Get started
+     live in the slide-down menu, so the bar can never overflow. */
+  .nav-lang-desktop, .nav-login, .nav-cta { display: none !important; }
+  .nav-right { gap: 8px; min-width: 0; }
+  .nav-ask, .nav-hamburger { min-width: 44px; min-height: 44px; justify-content: center; }
+  .nav-mob-lang { padding: 12px 4px 4px; }
 }
 @media (min-width: 769px) {
   .nav-mobile { display: none; }
+  .nav-mob-lang { display: none; }
 }
 
 /* Low-data mode — strip purely decorative animations / images. */
@@ -679,4 +686,17 @@ font { color: inherit !important; background: transparent !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .r2tour-overlay, .r2tour-card, .r2tour-step, .r2tour-icon { animation: none !important; }
+}
+
+/* Mobile polish: prevent iOS input zoom, keep media inside the viewport. */
+@media (max-width: 768px) {
+  input, select, textarea { font-size: 16px; }
+  img, video, canvas, svg { max-width: 100%; }
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+/* Multi-column layouts that use inline grid styles collapse on phones. */
+@media (max-width: 768px) {
+  .m-stack { grid-template-columns: minmax(0, 1fr) !important; gap: 24px !important; }
+  .m-stack-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 24px !important; }
 }

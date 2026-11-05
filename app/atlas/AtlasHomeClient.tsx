@@ -131,7 +131,7 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
         </div>
 
         {/* Search + curious */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 12, margin: '12px 0 18px', alignItems: 'stretch' }}>
+        <div className="atlas-searchrow">
           <AtlasCommandSearch
             nodes={nodes.map(n => ({
               slug: n.slug,
@@ -251,8 +251,11 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
         h1 { font-size: clamp(34px, 5.5vw, 56px); font-weight: 900; color: #fff; margin: 6px 0 8px; line-height: 1.05; }
         .sub { font-size: 17px; color: #b0b8c5; max-width: 720px; line-height: 1.5; }
         .atlas-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
-        .atlas-meta { display: flex; gap: 10px; }
-        .mode-bar { display: flex; gap: 6px; margin-bottom: 18px; }
+        .atlas-meta { display: flex; gap: 10px; flex-wrap: wrap; max-width: 100%; }
+        .atlas-searchrow { display: grid; grid-template-columns: auto 1fr; gap: 12px; margin: 12px 0 18px; align-items: stretch; }
+        @media (max-width: 768px) { .atlas-searchrow { grid-template-columns: minmax(0, 1fr); } }
+        .mode-bar { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+        @media (max-width: 480px) { .mode-tab { padding: 10px 12px; font-size: 13px; } }
         .mode-tab {
           padding: 10px 18px; min-height: 44px;
           background: #181830; color: #9ca3af;

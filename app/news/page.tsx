@@ -27,13 +27,13 @@ export const metadata: Metadata = {
     siteName: 'R2BOT',
     title: 'Robotics News',
     description: 'Latest robotics news, breakthroughs, and industry updates from 6 leading sources.',
-    images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'Robotics News — R2BOT' }],
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'Robotics News — R2BOT' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Robotics News',
     description: 'Live robotics news aggregated from IEEE, MIT, TechCrunch, Wired, and more.',
-    images: ['/og-default.svg'],
+    images: ['/og-default.png'],
   },
 };
 

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: 'R2BOT',
     title: 'R2BOT for Schools — Robotics in Every Classroom',
     description: 'No lab. No kits. No setup. Just open a browser and start building.',
-    images: [{ url: '/og-default.svg', width: 1200, height: 630, alt: 'R2BOT for Schools' }],
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT for Schools' }],
   },
 }
 
