@@ -122,7 +122,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 function SchoolContactForm() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
   const [error, setError] = useState<string | null>(null)
-  const [formData, setFormData] = useState({ schoolName: '', city: '', grade: '', teacherName: '', email: '', phone: '', message: '' })
+  const [formData, setFormData] = useState({ schoolName: '', city: '', grade: '', teacherName: '', email: '', message: '' })
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     setFormData(p => ({ ...p, [e.target.name]: e.target.value }))
@@ -139,7 +139,6 @@ function SchoolContactForm() {
         body: JSON.stringify({
           email: formData.email,
           name: formData.teacherName,
-          phone: formData.phone,
           source: 'schools-interest',
           page: typeof window !== 'undefined' ? window.location.pathname : null,
           meta: {
@@ -211,10 +210,6 @@ function SchoolContactForm() {
         <label>
           <span style={labelStyle}>School email *</span>
           <input name="email" required type="email" value={formData.email} onChange={handleChange} placeholder="you@schooldomain.in" style={inputStyle} />
-        </label>
-        <label>
-          <span style={labelStyle}>WhatsApp number</span>
-          <input name="phone" type="tel" value={formData.phone} onChange={handleChange} placeholder="+91 98xxx xxxxx" style={inputStyle} />
         </label>
         <label style={{ gridColumn: '1 / -1' }}>
           <span style={labelStyle}>Anything specific you want to achieve?</span>

@@ -7,13 +7,14 @@
 //   1. public.lead_events — append-only. Every signal is kept, forever, with
 //      the context that produced it. Nothing is ever deduplicated away.
 //   2. public.leads       — one row per person (unique on lower(email)).
-//      A returning person is enriched (name/phone/last_seen), not discarded.
+//      A returning person is enriched (name/last_seen), not discarded.
 //
 // The second write uses the service-role client on purpose: enriching an
 // existing row would otherwise require an anonymous UPDATE policy, which would
 // let any visitor overwrite any other person's record. See migration 0036.
 
 import type { NextRequest } from 'next/server'
+import { BASE_URL, button, renderEmail } from '@/lib/email-layout'
 import { createSupabaseAdminClient, createSupabaseServerClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
@@ -22,10 +23,6 @@ export const dynamic = 'force-dynamic'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 // Accepts +, spaces, dashes, parens; requires 8–15 digits.
-function validPhone(p: string): boolean {
-  const digits = p.replace(/\D/g, '')
-  return digits.length >= 8 && digits.length <= 15
-}
 
 const KNOWN_SOURCES = new Set([
   'popup',
@@ -70,32 +67,28 @@ async function sendWelcome(email: string, source: string): Promise<void> {
   if (!apiKey || !from) return
 
   const isWaitlist = source === 'academy-waitlist'
-  const subject = isWaitlist
-    ? "You're on the list — R2BOT"
-    : 'Welcome to R2BOT 🤖'
-  const intro = isWaitlist
-    ? "You're on the waitlist. We'll email you the moment this course opens — no spam in between."
-    : "Thanks for joining. Once a week we send one genuinely useful robotics email — what shipped, what's worth reading, nothing else."
-
   try {
+    let token = ''
+    try {
+      const { data } = await createSupabaseAdminClient()
+        .from('newsletter_subscribers').select('unsubscribe_token').eq('email', email).maybeSingle()
+      token = String(data?.unsubscribe_token ?? '')
+    } catch { /* link falls back to the unsubscribe page */ }
+    const html = renderEmail({
+      preheader: 'Free robotics learning, one useful email a week.',
+      heading: isWaitlist ? "You're on the list" : 'Welcome to R2BOT',
+      bodyHtml: `<p>${isWaitlist
+        ? "You're on the waitlist. We'll email you the moment this course opens. Nothing in between."
+        : 'Thanks for joining. Once a week we send one useful robotics email: what is new, what is worth reading, nothing else.'}</p>
+        <p>Two good places to start:</p>
+        <p><a href="${BASE_URL}/courses" style="color:#FC6818">The free course path</a>: five short courses with quizzes and certificates.<br>
+        <a href="${BASE_URL}/atlas" style="color:#FC6818">The Atlas</a>: every robotics idea in plain English.</p>${button('Start learning', `${BASE_URL}/courses`)}`,
+      unsubscribeUrl: `${BASE_URL}/api/unsubscribe?token=${encodeURIComponent(token)}`,
+    })
     const { Resend } = await import('resend')
     await new Resend(apiKey).emails.send({
-      from,
-      to: email,
-      subject,
-      html: `
-        <div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;color:#0f172a">
-          <h1 style="font-size:22px;margin:0 0 16px">${isWaitlist ? "You're on the list" : 'Welcome to R2BOT'}</h1>
-          <p style="font-size:15px;line-height:1.6;margin:0 0 20px">${intro}</p>
-          <p style="font-size:15px;line-height:1.6;margin:0 0 24px">
-            While you wait, the two best places to start:<br>
-            <a href="https://www.r2bot.in/atlas" style="color:#FC6818">The Atlas</a> — every robotics concept, explained clearly.<br>
-            <a href="https://www.r2bot.in/visualizer" style="color:#FC6818">The Simulators</a> — ten interactive tools, no setup.
-          </p>
-          <p style="font-size:13px;color:#64748b;margin:0">
-            You can <a href="https://www.r2bot.in/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}" style="color:#64748b">unsubscribe</a> any time.
-          </p>
-        </div>`,
+      from, to: email, html,
+      subject: isWaitlist ? "You're on the list | R2BOT" : 'Welcome to R2BOT',
     })
   } catch {
     // A failed welcome email must never cost us the lead.
@@ -105,7 +98,6 @@ async function sendWelcome(email: string, source: string): Promise<void> {
 type Payload = {
   email?: string
   name?: string
-  phone?: string
   page?: string
   source?: string
   meta?: Record<string, unknown>
@@ -122,14 +114,10 @@ export async function POST(req: NextRequest) {
 
     const body = (await req.json().catch(() => ({}))) as Payload
     const email = (body.email || '').trim().toLowerCase()
-    const phone = (body.phone || '').trim()
     const name = (body.name || '').trim()
 
     if (!email || !EMAIL_RE.test(email)) {
       return Response.json({ ok: false, error: 'Please enter a valid email.' }, { status: 400 })
-    }
-    if (phone && !validPhone(phone)) {
-      return Response.json({ ok: false, error: 'Please enter a valid phone number.' }, { status: 400 })
     }
 
     const source = KNOWN_SOURCES.has(body.source || '') ? (body.source as string) : 'popup'
@@ -151,7 +139,6 @@ export async function POST(req: NextRequest) {
     const { error: eventErr } = await supabase.from('lead_events').insert({
       email,
       name: name || null,
-      phone: phone || null,
       source,
       page,
       meta,
@@ -165,7 +152,6 @@ export async function POST(req: NextRequest) {
     const { error: leadErr } = await supabase.from('leads').insert({
       email,
       name: name || null,
-      phone: phone || null,
       source,
       page,
       meta,
@@ -184,7 +170,7 @@ export async function POST(req: NextRequest) {
 
         const { data: existing } = await supabase
           .from('leads')
-          .select('name, phone')
+          .select('name')
           .eq('email', email)
           .maybeSingle()
 
@@ -192,7 +178,6 @@ export async function POST(req: NextRequest) {
           .from('leads')
           .update({
             name: existing?.name || name || null,
-            phone: existing?.phone || phone || null,
             last_seen: new Date().toISOString(),
           })
           .eq('email', email)

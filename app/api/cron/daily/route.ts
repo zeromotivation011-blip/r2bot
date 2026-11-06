@@ -9,6 +9,7 @@ import { createSupabaseAdminClient } from '@/lib/supabase/server';
 import { getNewsData } from '@/lib/news';
 import { getLiveLensVideos } from '@/lib/lens-live';
 import { runDiscovery } from '@/lib/discovery';
+import { runEmailAutomation } from '@/lib/email-automation';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -53,6 +54,11 @@ async function refreshDiscovery(): Promise<StepResult> {
   return { ok: true, detail: result };
 }
 
+async function sendAutomatedEmails(): Promise<StepResult> {
+  const r = await runEmailAutomation();
+  return { ok: r.errors.length === 0, detail: r, error: r.errors[0] };
+}
+
 async function handle(req: NextRequest): Promise<Response> {
   if (!authorized(req)) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -63,6 +69,7 @@ async function handle(req: NextRequest): Promise<Response> {
     ['news', archiveNews],
     ['lens', refreshLens],
     ['discovery', refreshDiscovery],
+    ['emails', sendAutomatedEmails],
   ] as const) {
     try {
       steps[name] = await fn();

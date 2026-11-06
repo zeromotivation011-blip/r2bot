@@ -12,7 +12,6 @@ export function LeadCaptureModal() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle')
   const [err, setErr] = useState<string | null>(null)
 
@@ -51,7 +50,7 @@ export function LeadCaptureModal() {
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), phone: phone.trim(), page: window.location.pathname }),
+        body: JSON.stringify({ email: email.trim(), page: window.location.pathname }),
       })
       const json = await res.json()
       if (json.ok) {
@@ -132,11 +131,6 @@ export function LeadCaptureModal() {
                 placeholder="your@email.com" autoComplete="email"
                 style={inputStyle}
               />
-              <input
-                type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
-                placeholder="Phone (optional)" autoComplete="tel"
-                style={inputStyle}
-              />
               <button
                 type="submit" disabled={status === 'loading'}
                 style={{
@@ -147,6 +141,7 @@ export function LeadCaptureModal() {
               >
                 {status === 'loading' ? 'Joining…' : 'Get free updates →'}
               </button>
+              <p style={{ color: '#64748b', fontSize: 12, margin: 0, lineHeight: 1.5 }}>One email a week. Free. Unsubscribe any time. We never ask for your phone number and never share your email.</p>
               {status === 'err' && <p style={{ color: '#ef4444', fontSize: 13, margin: 0 }}>{err}</p>}
               <button
                 type="button" onClick={dismiss}

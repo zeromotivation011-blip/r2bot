@@ -181,22 +181,22 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
           <p style={{ fontSize: 18, color: '#AEB7C4', maxWidth: 560, lineHeight: 1.65, margin: '0 0 10px' }}>
             Project-based robotics learning from first principles to AI — with an AI mentor, real simulators, and hands-on builds. For students, career-switchers, and the curious, everywhere.
           </p>
-          <p style={{ fontSize: 16, color: '#f97316', fontWeight: 700, margin: '0 0 28px' }}>
+          <p style={{ fontSize: 16, color: '#FC6818', fontWeight: 700, margin: '0 0 28px' }}>
             Learn it. Build it. Ship it.
           </p>
 
           {/* Stats pills */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 32 }}>
-            <StatPill n={atlasCount} label="Atlas concepts" color="#00E5FF" />
-            <StatPill n={9}           label="Simulators"     color="#A56BFF" />
+            <StatPill n={atlasCount} label="Atlas concepts" color="#FC6818" />
+            <StatPill n={9}           label="Simulators"     color="#FC6818" />
             <StatPill n={projectCount} label="Robot Projects" color="#FF8A4C" />
-            <StatPill n={4}           label="Learning tracks" color="#10b981" displayValue="4" />
+            <StatPill n={4}           label="Learning tracks" color="#FC6818" displayValue="4" />
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
             <Link href={continueHref} style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 54, padding: '0 28px',
-              background: 'linear-gradient(135deg, #00E5FF, #A56BFF)',
+              background: 'linear-gradient(135deg, #FC6818, #FC6818)',
               color: '#0f0a1e', borderRadius: 14,
               fontSize: 16, fontWeight: 900, textDecoration: 'none',
               boxShadow: '0 10px 36px rgba(0,229,255,0.28)',
@@ -221,11 +221,11 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
           <FloatingRobot />
           {/* Floating feature cards */}
           <div style={{ position: 'absolute', top: 20, right: -20, background: 'rgba(15,10,30,0.92)', border: '1px solid rgba(0,229,255,0.3)', borderRadius: 14, padding: '10px 14px', minWidth: 150, backdropFilter: 'blur(12px)' }}>
-            <p style={{ fontSize: 20, fontWeight: 900, color: '#00E5FF', margin: 0 }}>{atlasCount.toLocaleString()}</p>
+            <p style={{ fontSize: 20, fontWeight: 900, color: '#FC6818', margin: 0 }}>{atlasCount.toLocaleString()}</p>
             <p style={{ fontSize: 11, color: '#94a3b8', margin: 0, fontWeight: 700 }}>Robotics concepts in Atlas</p>
           </div>
           <div style={{ position: 'absolute', bottom: 60, left: -28, background: 'rgba(15,10,30,0.92)', border: '1px solid rgba(165,107,255,0.3)', borderRadius: 14, padding: '10px 14px', minWidth: 160, backdropFilter: 'blur(12px)' }}>
-            <p style={{ fontSize: 20, fontWeight: 900, color: '#A56BFF', margin: 0 }}>AI Co-pilot</p>
+            <p style={{ fontSize: 20, fontWeight: 900, color: '#FC6818', margin: 0 }}>AI Co-pilot</p>
             <p style={{ fontSize: 11, color: '#94a3b8', margin: 0, fontWeight: 700 }}>Your 24/7 robotics mentor</p>
           </div>
         </div>
@@ -294,32 +294,32 @@ function FloatingRobot() {
       <svg viewBox="0 0 220 260" width="280" height="340" aria-hidden style={{ animation: 'float 4s ease-in-out infinite' }}>
         <defs>
           <linearGradient id="rg1" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0%" stopColor="#00B8D4" />
+            <stop offset="0%" stopColor="#FC6818" />
             <stop offset="100%" stopColor="#0080A0" />
           </linearGradient>
           <linearGradient id="rg2" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0%" stopColor="#A56BFF" />
+            <stop offset="0%" stopColor="#FC6818" />
             <stop offset="100%" stopColor="#7c3aed" />
           </linearGradient>
         </defs>
         <line x1="110" y1="14" x2="110" y2="36" stroke="#FF8A4C" strokeWidth="3" />
         <circle cx="110" cy="10" r="6" fill="#fde047" />
-        <rect x="50" y="36" width="120" height="80" rx="16" fill="url(#rg1)" stroke="#00E5FF" strokeWidth="1.5" />
+        <rect x="50" y="36" width="120" height="80" rx="16" fill="url(#rg1)" stroke="#FC6818" strokeWidth="1.5" />
         <rect x="62" y="48" width="96" height="50" rx="8" fill="#0A0E17" />
-        <circle cx="88" cy="70" r="7" fill="#00E5FF" />
-        <circle cx="132" cy="70" r="7" fill="#A56BFF" />
+        <circle cx="88" cy="70" r="7" fill="#FC6818" />
+        <circle cx="132" cy="70" r="7" fill="#FC6818" />
         <circle cx="90" cy="68" r="2.5" fill="#0A0E17" />
         <circle cx="134" cy="68" r="2.5" fill="#0A0E17" />
         <path d="M82 88 Q110 102 138 88" stroke="#fde047" strokeWidth="3" fill="none" strokeLinecap="round" />
         <rect x="62" y="122" width="96" height="76" rx="10" fill="url(#rg2)" />
         <rect x="84" y="138" width="52" height="32" rx="4" fill="#0A0E17" />
         <circle cx="94" cy="154" r="3" fill="#fde047" />
-        <circle cx="106" cy="154" r="3" fill="#10b981" />
-        <circle cx="118" cy="154" r="3" fill="#ef4444" />
-        <rect x="22" y="130" width="34" height="14" rx="6" fill="#00B8D4" />
-        <rect x="164" y="130" width="34" height="14" rx="6" fill="#00B8D4" />
-        <circle cx="82" cy="216" r="20" fill="#1f1f2a" stroke="#00B8D4" strokeWidth="2" />
-        <circle cx="138" cy="216" r="20" fill="#1f1f2a" stroke="#00B8D4" strokeWidth="2" />
+        <circle cx="106" cy="154" r="3" fill="#FC6818" />
+        <circle cx="118" cy="154" r="3" fill="#FC6818" />
+        <rect x="22" y="130" width="34" height="14" rx="6" fill="#FC6818" />
+        <rect x="164" y="130" width="34" height="14" rx="6" fill="#FC6818" />
+        <circle cx="82" cy="216" r="20" fill="#1f1f2a" stroke="#FC6818" strokeWidth="2" />
+        <circle cx="138" cy="216" r="20" fill="#1f1f2a" stroke="#FC6818" strokeWidth="2" />
         <circle cx="82" cy="216" r="7" fill="#0A0E17" />
         <circle cx="138" cy="216" r="7" fill="#0A0E17" />
       </svg>
@@ -372,7 +372,7 @@ function MissionStrip() {
       borderBottom: '1px solid rgba(255,255,255,0.07)',
     }}>
       <div style={{ maxWidth: 960, margin: '0 auto', textAlign: 'center' }}>
-        <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#00E5FF', fontWeight: 900, margin: '0 0 16px' }}>
+        <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 16px' }}>
           Our Mission
         </p>
         <h2 style={{ fontSize: 'clamp(26px,4vw,48px)', fontWeight: 900, color: '#fff', margin: '0 0 18px', lineHeight: 1.2 }}>
@@ -393,7 +393,7 @@ function MissionStrip() {
               background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: 14, padding: '14px 20px', minWidth: 160, textAlign: 'center',
             }}>
-              <p style={{ fontWeight: 900, fontSize: 15, color: '#00E5FF', margin: '0 0 4px' }}>{stat}</p>
+              <p style={{ fontWeight: 900, fontSize: 15, color: '#FC6818', margin: '0 0 4px' }}>{stat}</p>
               <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{sub}</p>
             </div>
           ))}
@@ -440,18 +440,18 @@ function CoursePath() {
 // ─── FEATURES ─────────────────────────────────────────────────────────────
 function Features({ atlasCount }: { atlasCount: number }) {
   const cards = [
-    { icon: '🎓', name: 'Academy',            sub: '4 tracks from beginner to AI. Project-based. Certificates that mean something.', badge: 'Spark → Edge', cta: 'Explore Academy →', href: '/academy', color: '#00E5FF' },
-    { icon: '🧠', name: 'Atlas',              sub: `${atlasCount.toLocaleString()} robotics concepts — sensors, motors, AI, SLAM — defined clearly and connected.`, badge: `${atlasCount.toLocaleString()} concepts`, cta: 'Open Atlas →', href: '/atlas', color: '#A56BFF' },
-    { icon: '🤖', name: 'Simulators',         sub: '9 real-time robotics simulators. Line followers, PID, kinematics, sensor fusion — in your browser.', badge: '9 simulators', cta: 'Launch Simulator →', href: '/visualizer', color: '#FFB800' },
-    { icon: '🌐', name: 'ROS2 Playground',    sub: 'A live Linux shell in your browser. Write real ROS2 commands, no setup required.', badge: 'Live shell', cta: 'Open Playground →', href: '/ros2', color: '#10b981' },
+    { icon: '🎓', name: 'Academy',            sub: '4 tracks from beginner to AI. Project-based. Certificates that mean something.', badge: 'Spark → Edge', cta: 'Explore Academy →', href: '/academy', color: '#FC6818' },
+    { icon: '🧠', name: 'Atlas',              sub: `${atlasCount.toLocaleString()} robotics concepts — sensors, motors, AI, SLAM — defined clearly and connected.`, badge: `${atlasCount.toLocaleString()} concepts`, cta: 'Open Atlas →', href: '/atlas', color: '#FC6818' },
+    { icon: '🤖', name: 'Simulators',         sub: '9 real-time robotics simulators. Line followers, PID, kinematics, sensor fusion — in your browser.', badge: '9 simulators', cta: 'Launch Simulator →', href: '/visualizer', color: '#FC6818' },
+    { icon: '🌐', name: 'ROS2 Playground',    sub: 'A live Linux shell in your browser. Write real ROS2 commands, no setup required.', badge: 'Live shell', cta: 'Open Playground →', href: '/ros2', color: '#FC6818' },
     { icon: '🤖', name: 'R2 Co-pilot',            sub: 'Your AI mentor. Ask anything, get precise answers grounded in the Atlas. Available on every page.', badge: 'AI Mentor', cta: 'Meet R2 →', href: '/copilot', color: '#FC6818' },
-    { icon: '🌍', name: 'Robotics in Daily Life', sub: 'From surgical robots to self-driving cars — see how robotics is changing the world right now.', badge: 'Real world', cta: 'Explore →', href: '/daily-life', color: '#ef4444' },
+    { icon: '🌍', name: 'Robotics in Daily Life', sub: 'From surgical robots to self-driving cars — see how robotics is changing the world right now.', badge: 'Real world', cta: 'Explore →', href: '/daily-life', color: '#FC6818' },
   ]
   return (
     <section style={{ padding: '80px 20px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 40px' }}>
-          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#A56BFF', fontWeight: 900, margin: '0 0 12px' }}>
+          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 12px' }}>
             Everything Inside
           </p>
           <h2 style={{ fontSize: 'clamp(28px,4vw,46px)', fontWeight: 900, margin: 0, color: '#fff' }}>
@@ -491,8 +491,8 @@ function Features({ atlasCount }: { atlasCount: number }) {
       <style jsx>{`
         .feat-card:hover {
           transform: translateY(-4px);
-          border-color: var(--accent, #00E5FF);
-          box-shadow: 0 18px 50px rgba(0,0,0,.4), 0 0 0 1px var(--accent, #00E5FF);
+          border-color: var(--accent, #FC6818);
+          box-shadow: 0 18px 50px rgba(0,0,0,.4), 0 0 0 1px var(--accent, #FC6818);
         }
       `}</style>
     </section>
@@ -502,10 +502,10 @@ function Features({ atlasCount }: { atlasCount: number }) {
 // ─── SIMULATOR SHOWCASE ───────────────────────────────────────────────────
 function SimulatorShowcase() {
   const sims = [
-    { name: 'PID Controller',      slug: 'pid',    color: '#00E5FF', desc: 'Tune P, I, and D gains and watch the robot reach its target' },
-    { name: 'Arm Kinematics',      slug: 'ik',     color: '#A56BFF', desc: 'Forward + inverse kinematics for a robotic arm' },
-    { name: 'Sensor Fusion',       slug: 'fusion', color: '#FFB800', desc: 'Kalman filter combining GPS + IMU for accuracy' },
-    { name: 'A* Pathfinder',       slug: 'astar',  color: '#10b981', desc: 'Draw a maze and watch A* find the shortest path' },
+    { name: 'PID Controller',      slug: 'pid',    color: '#FC6818', desc: 'Tune P, I, and D gains and watch the robot reach its target' },
+    { name: 'Arm Kinematics',      slug: 'ik',     color: '#FC6818', desc: 'Forward + inverse kinematics for a robotic arm' },
+    { name: 'Sensor Fusion',       slug: 'fusion', color: '#FC6818', desc: 'Kalman filter combining GPS + IMU for accuracy' },
+    { name: 'A* Pathfinder',       slug: 'astar',  color: '#FC6818', desc: 'Draw a maze and watch A* find the shortest path' },
   ]
   return (
     <section style={{
@@ -516,7 +516,7 @@ function SimulatorShowcase() {
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div className="m-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
           <div>
-            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FFB800', fontWeight: 900, margin: '0 0 14px' }}>
+            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 14px' }}>
               Interactive Simulators
             </p>
             <h2 style={{ fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: 900, color: '#fff', margin: '0 0 16px', lineHeight: 1.2 }}>
@@ -530,7 +530,7 @@ function SimulatorShowcase() {
             </p>
             <Link href="/visualizer" style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 50, padding: '0 24px',
-              background: 'linear-gradient(135deg, #FFB800, #f97316)',
+              background: 'linear-gradient(135deg, #FC6818, #FC6818)',
               color: '#0f0a1e', borderRadius: 12, fontWeight: 900, fontSize: 15,
               textDecoration: 'none', boxShadow: '0 8px 24px rgba(255,184,0,0.22)',
             }}>
@@ -577,7 +577,7 @@ function IndiaSpotlight() {
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div className="m-stack" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 48, alignItems: 'center' }}>
           <div>
-            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#f97316', fontWeight: 900, margin: '0 0 14px' }}>
+            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 14px' }}>
               Global · Built for the world
             </p>
             <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 900, color: '#fff', margin: '0 0 16px', lineHeight: 1.2 }}>
@@ -593,7 +593,7 @@ function IndiaSpotlight() {
             </div>
             <Link href="/atlas" style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 48, padding: '0 20px',
-              background: '#f97316', color: '#0f0a1e', borderRadius: 12,
+              background: '#FC6818', color: '#0f0a1e', borderRadius: 12,
               fontWeight: 900, fontSize: 14, textDecoration: 'none',
             }}>
               Explore the Robotics Atlas →
@@ -615,7 +615,7 @@ function Pillar({ emoji, title, body }: { emoji: string; title: string; body: st
       background: '#111118', padding: 16,
     }}>
       <div style={{ fontSize: 22 }}>{emoji}</div>
-      <p style={{ marginTop: 8, fontSize: 10, textTransform: 'uppercase', letterSpacing: '2px', color: '#f97316', fontWeight: 900 }}>{title}</p>
+      <p style={{ marginTop: 8, fontSize: 10, textTransform: 'uppercase', letterSpacing: '2px', color: '#FC6818', fontWeight: 900 }}>{title}</p>
       <p style={{ marginTop: 4, fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>{body}</p>
     </div>
   )
@@ -639,7 +639,7 @@ function GlobalReach() {
           <stop offset="100%" stopColor="#080b14" />
         </radialGradient>
       </defs>
-      <circle cx="140" cy="130" r="110" fill="url(#globe-g)" stroke="#f97316" strokeWidth="1.5" strokeOpacity="0.5" />
+      <circle cx="140" cy="130" r="110" fill="url(#globe-g)" stroke="#FC6818" strokeWidth="1.5" strokeOpacity="0.5" />
       {[70, 100, 130, 160, 190].map((cy, i) => (
         <ellipse key={i} cx="140" cy={cy} rx={Math.max(18, 108 - Math.abs(130 - cy) * 0.9)} ry="10"
           fill="none" stroke="#334155" strokeWidth="1" strokeOpacity="0.5" />
@@ -650,8 +650,8 @@ function GlobalReach() {
       ))}
       {nodes.map((n, i) => (
         <g key={i}>
-          <circle cx={n.cx} cy={n.cy} r={n.r + 4} fill="#f97316" opacity="0.18" />
-          <circle cx={n.cx} cy={n.cy} r={n.r} fill="#f97316" />
+          <circle cx={n.cx} cy={n.cy} r={n.r + 4} fill="#FC6818" opacity="0.18" />
+          <circle cx={n.cx} cy={n.cy} r={n.r} fill="#FC6818" />
         </g>
       ))}
       <text x="140" y="258" fontSize="12" fontWeight="800" fill="#FF8A4C" textAnchor="middle" letterSpacing="1">
@@ -664,24 +664,24 @@ function GlobalReach() {
 // ─── WHY R2BOT — honest value props (no fabricated testimonials) ──────────
 function Testimonials() {
   const points = [
-    { icon: '🎮', label: 'Interactive', color: '#00E5FF',
+    { icon: '🎮', label: 'Interactive', color: '#FC6818',
       body: 'Concepts link to live simulators you tune in the browser. Read the theory, then run it — PID, kinematics, sensor fusion, pathfinding.' },
-    { icon: '🪜', label: 'Beginner → Advanced', color: '#A56BFF',
+    { icon: '🪜', label: 'Beginner → Advanced', color: '#FC6818',
       body: 'Every Atlas entry ladders from a plain-English analogy to the real math and code — so it answers your first question and your deepest one.' },
-    { icon: '🤖', label: 'AI Mentor', color: '#10b981',
+    { icon: '🤖', label: 'AI Mentor', color: '#FC6818',
       body: 'R2 Co-pilot is on every page. It answers grounded in the Atlas, cites its sources, and is built not to invent specs.' },
-    { icon: '🛠️', label: 'Learn by Building', color: '#FFB800',
+    { icon: '🛠️', label: 'Learn by Building', color: '#FC6818',
       body: '20+ guided robot projects with full parts lists and code — in simulation, or on real hardware when you\'re ready.' },
-    { icon: '📡', label: 'Always Current', color: '#f97316',
+    { icon: '📡', label: 'Always Current', color: '#FC6818',
       body: 'The best robotics news and YouTube explainers are pulled in and summarized automatically, every single day.' },
-    { icon: '🎁', label: 'Free to Explore', color: '#ef4444',
+    { icon: '🎁', label: 'Free to Explore', color: '#FC6818',
       body: 'The full Atlas, the Spark beginner track, and daily Co-pilot cost nothing. No card required to start learning.' },
   ]
   return (
     <section style={{ padding: '80px 20px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 40px' }}>
-          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#00E5FF', fontWeight: 900, margin: '0 0 12px' }}>
+          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 12px' }}>
             Why R2BOT
           </p>
           <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 900, margin: 0 }}>
@@ -711,7 +711,7 @@ function Testimonials() {
         </div>
         <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: '#64748b' }}>
           New here?{' '}
-          <Link href="/academy" style={{ color: '#00E5FF', textDecoration: 'underline' }}>Start with the free Spark track →</Link>
+          <Link href="/academy" style={{ color: '#FC6818', textDecoration: 'underline' }}>Start with the free Spark track →</Link>
         </p>
       </div>
     </section>
@@ -726,14 +726,14 @@ function NewsTeaser({ items }: { items: HomeNewsItem[] }) {
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 26 }}>
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#00E5FF', display: 'inline-block', animation: 'r2pulse 1.6s infinite' }} />
+              <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#FC6818', display: 'inline-block', animation: 'r2pulse 1.6s infinite' }} />
               <span style={{ fontSize: 11, fontWeight: 900, color: '#7dd3fc', letterSpacing: '2px', textTransform: 'uppercase' }}>Live · Auto-updated</span>
             </div>
             <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, margin: 0, color: '#fff' }}>
               Latest in robotics
             </h2>
           </div>
-          <Link href="/news" style={{ fontSize: 14, fontWeight: 800, color: '#00E5FF', textDecoration: 'none' }}>
+          <Link href="/news" style={{ fontSize: 14, fontWeight: 800, color: '#FC6818', textDecoration: 'none' }}>
             All news →
           </Link>
         </div>
@@ -789,7 +789,7 @@ function LensTeaser({ items }: { items: HomeVideoItem[] }) {
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 26 }}>
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="#ef4444" aria-hidden><path d="M19.6 3H4.4A2.4 2.4 0 0 0 2 5.4v13.2A2.4 2.4 0 0 0 4.4 21h15.2A2.4 2.4 0 0 0 22 18.6V5.4A2.4 2.4 0 0 0 19.6 3zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="#FC6818" aria-hidden><path d="M19.6 3H4.4A2.4 2.4 0 0 0 2 5.4v13.2A2.4 2.4 0 0 0 4.4 21h15.2A2.4 2.4 0 0 0 22 18.6V5.4A2.4 2.4 0 0 0 19.6 3zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
               <span style={{ fontSize: 11, fontWeight: 900, color: '#fca5a5', letterSpacing: '2px', textTransform: 'uppercase' }}>Lens · Best videos, decoded</span>
             </div>
             <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, margin: 0, color: '#fff' }}>
@@ -858,7 +858,7 @@ function SchoolsTeaser() {
           display: 'grid', gridTemplateColumns: '1fr auto', gap: 32, alignItems: 'center',
         }}>
           <div>
-            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#10b981', fontWeight: 900, margin: '0 0 12px' }}>
+            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 12px' }}>
               For Schools
             </p>
             <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, color: '#fff', margin: '0 0 14px', lineHeight: 1.2 }}>
@@ -870,7 +870,7 @@ function SchoolsTeaser() {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
               {['Browser-based simulators', 'Grade-wise curriculum', 'Teacher dashboard', 'Free for schools', 'Bulk certificates', 'CBSE/NEP alignment'].map(f => (
                 <span key={f} style={{
-                  fontSize: 12, fontWeight: 700, color: '#10b981',
+                  fontSize: 12, fontWeight: 700, color: '#FC6818',
                   background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)',
                   padding: '4px 12px', borderRadius: 999,
                 }}>
@@ -880,7 +880,7 @@ function SchoolsTeaser() {
             </div>
             <Link href="/schools" style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 48, padding: '0 22px',
-              background: '#10b981', color: '#0f0a1e', borderRadius: 12,
+              background: '#FC6818', color: '#0f0a1e', borderRadius: 12,
               fontWeight: 900, fontSize: 15, textDecoration: 'none',
             }}>
               Bring R2BOT to my school →
@@ -955,9 +955,9 @@ function NewsletterCTA() {
             {status === 'loading' ? '…' : 'Subscribe'}
           </button>
         </form>
-        {status === 'ok'  && <p style={{ color: '#10b981', fontSize: 13 }}>✓ Subscribed. Welcome to R2BOT Weekly.</p>}
-        {status === 'err' && <p style={{ color: '#ef4444', fontSize: 13 }}>{errText}</p>}
-        <p style={{ fontSize: 11, color: '#374151', marginTop: 8 }}>No spam. Unsubscribe anytime.</p>
+        {status === 'ok'  && <p style={{ color: '#FC6818', fontSize: 13 }}>✓ Subscribed. Welcome to R2BOT Weekly.</p>}
+        {status === 'err' && <p style={{ color: '#FC6818', fontSize: 13 }}>{errText}</p>}
+        <p style={{ fontSize: 11, color: '#374151', marginTop: 8 }}>One email a week. Free. We never ask for your phone number or share your email. Unsubscribe anytime.</p>
       </div>
     </section>
   )
@@ -982,7 +982,7 @@ function Footer() {
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 16px', lineHeight: 1.5 }}>
               ROBOT, decoded — for the world. From your first concept to job-ready.
             </p>
-            <p style={{ fontSize: 14, color: '#f97316', fontWeight: 700, margin: 0 }}>
+            <p style={{ fontSize: 14, color: '#FC6818', fontWeight: 700, margin: 0 }}>
               Learn it. Build it. Ship it.
             </p>
           </div>
@@ -1003,7 +1003,7 @@ function Footer() {
           <p style={{ fontSize: 12, color: '#374151' }}>Made with ❤️ for robotics learners worldwide · © 2026 R2BOT</p>
           <div style={{ display: 'flex', gap: 20 }}>
             <a href="https://www.instagram.com/r2bot.in" target="_blank" rel="noopener" style={{ fontSize: 13, color: '#e1306c', textDecoration: 'none', fontWeight: 700 }}>◉ Instagram</a>
-            <a href="https://www.youtube.com/channel/UCkqlyCeLtTpT_j6Q-3NFxww" target="_blank" rel="noopener" style={{ fontSize: 13, color: '#ef4444', textDecoration: 'none', fontWeight: 700 }}>▶ YouTube</a>
+            <a href="https://www.youtube.com/channel/UCkqlyCeLtTpT_j6Q-3NFxww" target="_blank" rel="noopener" style={{ fontSize: 13, color: '#FC6818', textDecoration: 'none', fontWeight: 700 }}>▶ YouTube</a>
           </div>
         </div>
       </div>
