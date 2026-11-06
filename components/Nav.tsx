@@ -41,7 +41,7 @@ const GROUPS: Group[] = [
         ],
       },
       { kind: 'link', icon: '🧭', label: 'Start here', sub: 'Pick your path · free', href: '/start' },
-      { kind: 'link', icon: '🎬', label: 'Video courses', sub: 'Short lessons · quiz · certificate', href: '/courses' },
+      { kind: 'link', icon: '🎬', label: 'Free course path', sub: '5 courses · quizzes · certificates', href: '/courses' },
       { kind: 'link', icon: '📚', label: 'Atlas', sub: '480+ concepts explained', href: '/atlas' },
       { kind: 'link', icon: '⚡', label: 'Daily Challenge', sub: 'Quick puzzle · streak', href: '/challenge' },
       {

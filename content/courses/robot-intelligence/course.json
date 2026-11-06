@@ -1,0 +1,536 @@
+{
+  "title": "Robot Intelligence",
+  "order": 5,
+  "tagline": "How robots find their way, plan, talk and stay safe.",
+  "description": "How robots map, plan, talk, learn and stay safe, then design your own. Ten simple story lessons.",
+  "outcome": "After this course you can explain how a robot maps a space, plans a route, understands people and stays safe.",
+  "level": "Intermediate",
+  "levelLabel": "Intermediate",
+  "whoFor": "Learners who finished the earlier courses and want to understand how robots find their way, plan, talk and stay safe.",
+  "prerequisites": "Courses 1 to 4 recommended.",
+  "status": "published",
+  "instructor": "R2BOT",
+  "presenters": [
+    "Dot",
+    "Bo",
+    "Pip",
+    "Ari"
+  ],
+  "updated": "2026-11-07",
+  "availability": "soon",
+  "minutes": 45,
+  "outcomes": [
+    "Explain how a robot builds and uses a map",
+    "Explain how a robot finds its own position",
+    "Describe how a robot plans a safe route and handles surprises",
+    "Explain how speech becomes action, and how robots learn from practice",
+    "Apply basic safety, teamwork and design steps to your own robot idea"
+  ],
+  "finalActivity": {
+    "lessonId": "10-your-robotics-future",
+    "title": "Design your own robot on paper",
+    "prompt": "Design your own robot on paper: write its job in one sentence, list its parts (what it senses, decides and does), and describe a first small test."
+  },
+  "lessons": [
+    {
+      "id": "01-maps-how-a-robot-remembers-a-place",
+      "title": "Maps: how a robot remembers a place",
+      "summary": "Explain what a map is to a robot.",
+      "youtubeId": "",
+      "videoNo": 41,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is a map to a robot?",
+          "options": [
+            "A stored picture of where things are",
+            "A battery chart",
+            "A coloured paper"
+          ],
+          "answer": 0,
+          "why": "A map records where walls and objects are."
+        },
+        {
+          "q": "Why does a robot need a map?",
+          "options": [
+            "To plan where to go",
+            "To look pretty",
+            "To save power only"
+          ],
+          "answer": 0,
+          "why": "Maps let robots plan routes."
+        },
+        {
+          "q": "A simple robot map can be…",
+          "options": [
+            "A video game score",
+            "A song",
+            "A grid showing free and blocked squares"
+          ],
+          "answer": 2,
+          "why": "Grid maps mark blocked and free cells."
+        },
+        {
+          "q": "When a new object appears, the map should…",
+          "options": [
+            "Be updated",
+            "Stay the same forever",
+            "Be deleted"
+          ],
+          "answer": 0,
+          "why": "Maps must change with the world."
+        }
+      ]
+    },
+    {
+      "id": "02-where-am-i",
+      "title": "Where am I?",
+      "summary": "Explain localisation: working out where the robot is on a map.",
+      "youtubeId": "",
+      "videoNo": 42,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Localisation means…",
+          "options": [
+            "Changing the battery",
+            "Cleaning the robot",
+            "Working out where the robot is on its map"
+          ],
+          "answer": 2,
+          "why": "It answers 'where am I?'."
+        },
+        {
+          "q": "Counting wheel turns can estimate position but…",
+          "options": [
+            "Small errors add up over time",
+            "It needs no wheels",
+            "It is always perfect"
+          ],
+          "answer": 0,
+          "why": "Drift grows as errors accumulate."
+        },
+        {
+          "q": "How can a robot correct its drift?",
+          "options": [
+            "Compare what it sees with the map",
+            "Drive faster",
+            "Ignore it"
+          ],
+          "answer": 0,
+          "why": "Landmarks fix the estimate."
+        },
+        {
+          "q": "A landmark is…",
+          "options": [
+            "Something easy to recognise that stays in place",
+            "A moving person",
+            "A flat battery"
+          ],
+          "answer": 0,
+          "why": "Landmarks give a fixed reference."
+        }
+      ]
+    },
+    {
+      "id": "03-planning-a-route",
+      "title": "Planning a route",
+      "summary": "Describe how a robot finds a path from A to B.",
+      "youtubeId": "",
+      "videoNo": 43,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Route planning finds…",
+          "options": [
+            "A path from start to goal",
+            "The loudest sound",
+            "The brightest light"
+          ],
+          "answer": 0,
+          "why": "It searches for a way from A to B."
+        },
+        {
+          "q": "A good route usually…",
+          "options": [
+            "Goes through walls",
+            "Avoids obstacles and is short",
+            "Is as long as possible"
+          ],
+          "answer": 1,
+          "why": "Planners avoid obstacles and prefer short paths."
+        },
+        {
+          "q": "If the direct path is blocked, the planner should…",
+          "options": [
+            "Find another route around",
+            "Give up forever",
+            "Push through"
+          ],
+          "answer": 0,
+          "why": "It searches for an alternative."
+        },
+        {
+          "q": "Planning on a map works best when the map is…",
+          "options": [
+            "Upside down",
+            "Reasonably accurate",
+            "Empty"
+          ],
+          "answer": 1,
+          "why": "A wrong map gives a wrong plan."
+        }
+      ]
+    },
+    {
+      "id": "04-dodging-the-unexpected",
+      "title": "Dodging the unexpected",
+      "summary": "Handle moving obstacles while following a plan.",
+      "youtubeId": "",
+      "videoNo": 44,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "A person steps into the robot's path. It should…",
+          "options": [
+            "Drive straight on",
+            "Slow or stop and avoid them",
+            "Speed up"
+          ],
+          "answer": 1,
+          "why": "Safety comes first."
+        },
+        {
+          "q": "Why keep sensing while following a plan?",
+          "options": [
+            "The world can change",
+            "Plans are always perfect",
+            "Sensors are free"
+          ],
+          "answer": 0,
+          "why": "New obstacles can appear anytime."
+        },
+        {
+          "q": "After dodging, the robot should…",
+          "options": [
+            "Return to its plan or make a new one",
+            "Spin forever",
+            "Forget its goal"
+          ],
+          "answer": 0,
+          "why": "It should get back on route."
+        },
+        {
+          "q": "Planning ahead and reacting quickly are both needed because…",
+          "options": [
+            "Plans guide, reactions keep you safe",
+            "They are the same thing",
+            "Neither matters"
+          ],
+          "answer": 0,
+          "why": "Both help reach the goal safely."
+        }
+      ]
+    },
+    {
+      "id": "05-talking-to-robots",
+      "title": "Talking to robots",
+      "summary": "Explain how a robot can understand spoken instructions.",
+      "youtubeId": "",
+      "videoNo": 45,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "The first step in understanding speech is…",
+          "options": [
+            "Turning words into wheels",
+            "Turning sound into words",
+            "Turning wheels into sound"
+          ],
+          "answer": 1,
+          "why": "Speech recognition makes text from audio."
+        },
+        {
+          "q": "After the words are known, the robot must…",
+          "options": [
+            "Play them back loudly",
+            "Delete them",
+            "Work out what action is meant"
+          ],
+          "answer": 2,
+          "why": "Meaning connects words to actions."
+        },
+        {
+          "q": "Why can speech commands be misunderstood?",
+          "options": [
+            "Words are always clear",
+            "Noise and different ways of speaking",
+            "Robots have no ears"
+          ],
+          "answer": 1,
+          "why": "Noise and accents add errors."
+        },
+        {
+          "q": "A safe robot should…",
+          "options": [
+            "Ignore people",
+            "Confirm risky commands before acting",
+            "Obey anything instantly"
+          ],
+          "answer": 1,
+          "why": "Confirming avoids dangerous mistakes."
+        }
+      ]
+    },
+    {
+      "id": "06-learning-from-experience",
+      "title": "Learning from experience",
+      "summary": "Explain trial, reward and improvement.",
+      "youtubeId": "",
+      "videoNo": 46,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Trial and reward learning means…",
+          "options": [
+            "Memorise a book",
+            "Never try anything",
+            "Try, see the result, do better next time"
+          ],
+          "answer": 2,
+          "why": "Results guide improvement."
+        },
+        {
+          "q": "A reward tells the robot…",
+          "options": [
+            "Where the wall is",
+            "That the result was good",
+            "That the battery is full"
+          ],
+          "answer": 1,
+          "why": "Rewards mark good outcomes."
+        },
+        {
+          "q": "Why do mistakes help learning?",
+          "options": [
+            "They are not allowed",
+            "They show what doesn't work",
+            "They break the robot"
+          ],
+          "answer": 1,
+          "why": "Failures give information."
+        },
+        {
+          "q": "Learning in a simulator first is useful because…",
+          "options": [
+            "Mistakes there are safe and cheap",
+            "It is the same as real life",
+            "Robots dislike reality"
+          ],
+          "answer": 0,
+          "why": "A simulator avoids real damage."
+        }
+      ]
+    },
+    {
+      "id": "07-safe-robots",
+      "title": "Safe robots",
+      "summary": "List safety ideas for robots near people.",
+      "youtubeId": "",
+      "videoNo": 47,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "A basic safety feature is…",
+          "options": [
+            "A louder horn only",
+            "A faster motor",
+            "An emergency stop"
+          ],
+          "answer": 2,
+          "why": "An emergency stop halts the robot at once."
+        },
+        {
+          "q": "Robots near people should…",
+          "options": [
+            "Move as fast as possible",
+            "Move slowly and keep distance",
+            "Ignore people"
+          ],
+          "answer": 1,
+          "why": "Slow and careful reduces risk."
+        },
+        {
+          "q": "Why test safety features regularly?",
+          "options": [
+            "They never change",
+            "Parts can fail over time",
+            "It makes the robot faster"
+          ],
+          "answer": 1,
+          "why": "Safety must be checked, not assumed."
+        },
+        {
+          "q": "If a sensor fails, a safe robot should…",
+          "options": [
+            "Speed up",
+            "Stop or enter a safe mode",
+            "Keep going normally"
+          ],
+          "answer": 1,
+          "why": "Failing safe protects people."
+        }
+      ]
+    },
+    {
+      "id": "08-robots-in-teams",
+      "title": "Robots in teams",
+      "summary": "Describe how several robots can share a job.",
+      "youtubeId": "",
+      "videoNo": 48,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Why use several robots for one job?",
+          "options": [
+            "They never collide",
+            "They can finish faster by sharing work",
+            "They always cost less"
+          ],
+          "answer": 1,
+          "why": "Teams split a large job."
+        },
+        {
+          "q": "Robots in a team must…",
+          "options": [
+            "Ignore each other",
+            "Share information so they don't clash",
+            "Use the same battery"
+          ],
+          "answer": 1,
+          "why": "Sharing information avoids collisions."
+        },
+        {
+          "q": "Splitting a job means…",
+          "options": [
+            "Each robot takes a part",
+            "No one works",
+            "One robot does everything"
+          ],
+          "answer": 0,
+          "why": "Each handles a share."
+        },
+        {
+          "q": "If one robot fails, a good team…",
+          "options": [
+            "Reassigns its work",
+            "Hides the problem",
+            "Stops forever"
+          ],
+          "answer": 0,
+          "why": "Teams can adapt to failures."
+        }
+      ]
+    },
+    {
+      "id": "09-design-your-own-robot",
+      "title": "Design your own robot",
+      "summary": "Use a simple process to plan a robot for a real need.",
+      "youtubeId": "",
+      "videoNo": 49,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "A good design starts with…",
+          "options": [
+            "A battery size",
+            "A colour choice",
+            "A real need or job"
+          ],
+          "answer": 2,
+          "why": "Start with the problem to solve."
+        },
+        {
+          "q": "Writing the job in one sentence helps because…",
+          "options": [
+            "It removes sensors",
+            "It keeps the design focused",
+            "It makes the robot lighter"
+          ],
+          "answer": 1,
+          "why": "A clear sentence prevents wandering ideas."
+        },
+        {
+          "q": "After the job, you list…",
+          "options": [
+            "Songs it can sing",
+            "Names for it",
+            "Parts the robot needs to sense, decide and act"
+          ],
+          "answer": 2,
+          "why": "Choose sensors, a brain and actuators."
+        },
+        {
+          "q": "A first small test should be…",
+          "options": [
+            "Skipped",
+            "Simple and quick to try",
+            "Huge and costly"
+          ],
+          "answer": 1,
+          "why": "Small tests teach quickly."
+        }
+      ]
+    },
+    {
+      "id": "10-your-robotics-future",
+      "title": "Your robotics future",
+      "summary": "Plan next steps for learning and careers in robotics.",
+      "youtubeId": "",
+      "videoNo": 50,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "A good next learning step is to…",
+          "options": [
+            "Avoid practising",
+            "Wait for years",
+            "Build a small project"
+          ],
+          "answer": 2,
+          "why": "Building teaches the most."
+        },
+        {
+          "q": "Which skills help in robotics?",
+          "options": [
+            "Only drawing",
+            "Only memorising",
+            "Curiosity, building, simple coding and maths"
+          ],
+          "answer": 2,
+          "why": "Robotics mixes many skills."
+        },
+        {
+          "q": "How can you keep learning?",
+          "options": [
+            "Stop after one course",
+            "Try projects and keep a notebook of what you learn",
+            "Never ask questions"
+          ],
+          "answer": 1,
+          "why": "Projects plus notes build skill."
+        },
+        {
+          "q": "Careers in robotics include…",
+          "options": [
+            "No jobs",
+            "Building, programming, testing and designing robots",
+            "Only one job type"
+          ],
+          "answer": 1,
+          "why": "Many different roles exist."
+        }
+      ]
+    }
+  ]
+}

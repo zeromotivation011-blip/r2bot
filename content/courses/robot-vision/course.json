@@ -1,0 +1,536 @@
+{
+  "title": "Robot Vision",
+  "order": 4,
+  "tagline": "Give a robot a camera, and teach it to find and follow things.",
+  "description": "Give a robot eyes: camera basics, colour and shape detection, tracking, and guiding an arm to what it sees.",
+  "outcome": "After this course you can explain how a robot finds an object in a picture and guides an arm to it.",
+  "level": "Intermediate",
+  "levelLabel": "Intermediate",
+  "whoFor": "Learners who want a robot that can see, find and follow objects.",
+  "prerequisites": "Course 3 recommended.",
+  "status": "published",
+  "instructor": "R2BOT",
+  "presenters": [
+    "Dot",
+    "Bo",
+    "Pip",
+    "Ari"
+  ],
+  "updated": "2026-11-07",
+  "availability": "soon",
+  "minutes": 45,
+  "outcomes": [
+    "Explain a picture as a grid of numbers",
+    "Find an object by colour and shape",
+    "Work out where an object is",
+    "Handle changing light and noise",
+    "Guide an arm to a seen object, and teach a robot to recognise things"
+  ],
+  "finalActivity": {
+    "lessonId": "10-the-big-fair",
+    "title": "Show-day checklist",
+    "prompt": "Write a show-day checklist for your robot: what you will test before the public sees it, how you will deal with glare, and how it stops safely."
+  },
+  "lessons": [
+    {
+      "id": "01-a-camera-is-a-grid-of-numbers",
+      "title": "A camera is a grid of numbers",
+      "summary": "Explain that a picture is made of pixels with numbers.",
+      "youtubeId": "",
+      "videoNo": 31,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is a pixel?",
+          "options": [
+            "One tiny dot of a picture",
+            "A type of battery",
+            "A kind of motor"
+          ],
+          "answer": 0,
+          "why": "A picture is made of many tiny dots called pixels."
+        },
+        {
+          "q": "To a robot, a picture is…",
+          "options": [
+            "A grid of numbers",
+            "A sound",
+            "A painting"
+          ],
+          "answer": 0,
+          "why": "Each pixel is stored as numbers."
+        },
+        {
+          "q": "A bigger number in a brightness picture usually means…",
+          "options": [
+            "A brighter pixel",
+            "A darker pixel",
+            "A louder pixel"
+          ],
+          "answer": 0,
+          "why": "Larger values are brighter."
+        },
+        {
+          "q": "A colour picture uses several numbers per pixel because…",
+          "options": [
+            "Colour is random",
+            "Each pixel has several batteries",
+            "Colour is built from red, green and blue amounts"
+          ],
+          "answer": 2,
+          "why": "Mixing red, green and blue makes colours."
+        }
+      ]
+    },
+    {
+      "id": "02-finding-colour",
+      "title": "Finding colour",
+      "summary": "Find an orange cup using a colour rule and a mask.",
+      "youtubeId": "",
+      "videoNo": 32,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is a colour rule?",
+          "options": [
+            "A test that checks whether a pixel is in a chosen colour range",
+            "A law about paint",
+            "A kind of lens"
+          ],
+          "answer": 0,
+          "why": "The rule says which pixels count as the target colour."
+        },
+        {
+          "q": "A mask shows…",
+          "options": [
+            "Which pixels passed the rule",
+            "The battery level",
+            "The robot's face"
+          ],
+          "answer": 0,
+          "why": "A mask marks matching pixels."
+        },
+        {
+          "q": "Why use a range of colours instead of one exact value?",
+          "options": [
+            "Ranges use less power",
+            "Colours never change",
+            "Lighting changes the exact colour you see"
+          ],
+          "answer": 2,
+          "why": "Real objects look slightly different in different light."
+        },
+        {
+          "q": "If the mask shows the cup as a white blob, then…",
+          "options": [
+            "The cup is broken",
+            "The robot has found where the colour is",
+            "The camera is off"
+          ],
+          "answer": 1,
+          "why": "The blob marks the matching area."
+        }
+      ]
+    },
+    {
+      "id": "03-where-is-it",
+      "title": "Where is it?",
+      "summary": "Work out an object position and rough distance from a picture.",
+      "youtubeId": "",
+      "videoNo": 33,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "How can you find an object's position in the picture?",
+          "options": [
+            "Count the colours",
+            "Measure the battery",
+            "Find the centre of its blob"
+          ],
+          "answer": 2,
+          "why": "The centre of the blob gives its position."
+        },
+        {
+          "q": "A cup that looks bigger in the picture is usually…",
+          "options": [
+            "Heavier",
+            "Farther away",
+            "Closer to the camera"
+          ],
+          "answer": 2,
+          "why": "Nearer objects appear larger."
+        },
+        {
+          "q": "If the blob is left of centre, the robot should…",
+          "options": [
+            "Turn left to centre it",
+            "Turn right",
+            "Stop for good"
+          ],
+          "answer": 0,
+          "why": "Turn toward the object to centre it."
+        },
+        {
+          "q": "Why is distance from a picture only rough?",
+          "options": [
+            "Pictures have no size",
+            "Size depends on the real object and the lens",
+            "Cameras measure exactly"
+          ],
+          "answer": 1,
+          "why": "You must know how big the object really is to be accurate."
+        }
+      ]
+    },
+    {
+      "id": "04-light-and-noise",
+      "title": "Light and noise",
+      "summary": "Handle changing light and speckles in a picture.",
+      "youtubeId": "",
+      "videoNo": 34,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is 'noise' in a picture?",
+          "options": [
+            "A broken wheel",
+            "Loud sound",
+            "Random speckles that are not real objects"
+          ],
+          "answer": 2,
+          "why": "Noise is stray pixels that confuse detection."
+        },
+        {
+          "q": "A simple way to remove tiny speckles is to…",
+          "options": [
+            "Make the picture bigger",
+            "Turn the robot off",
+            "Ignore blobs that are too small"
+          ],
+          "answer": 2,
+          "why": "Filtering by size removes specks."
+        },
+        {
+          "q": "Changing light can make a colour rule fail because…",
+          "options": [
+            "Rules do not use colour",
+            "The same object looks different in different light",
+            "Light is a kind of noise in motors"
+          ],
+          "answer": 1,
+          "why": "Brightness and tint change pixel values."
+        },
+        {
+          "q": "To cope with changing light you can…",
+          "options": [
+            "Close the camera",
+            "Widen the range or add steady lighting",
+            "Use a heavier battery"
+          ],
+          "answer": 1,
+          "why": "Better lighting or a wider range helps."
+        }
+      ]
+    },
+    {
+      "id": "05-edges-and-shapes",
+      "title": "Edges and shapes",
+      "summary": "Tell similar objects apart by their edges and shape.",
+      "youtubeId": "",
+      "videoNo": 35,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "An edge in a picture is…",
+          "options": [
+            "The border of the table",
+            "A broken pixel",
+            "A sudden change from dark to light"
+          ],
+          "answer": 2,
+          "why": "Edges are where brightness changes sharply."
+        },
+        {
+          "q": "Why use shape as well as colour?",
+          "options": [
+            "Shapes are free",
+            "Two objects can share a colour but differ in shape",
+            "Colour is never useful"
+          ],
+          "answer": 1,
+          "why": "Shape separates look-alikes."
+        },
+        {
+          "q": "A round cup and a square box can be told apart by…",
+          "options": [
+            "Their weight",
+            "Their name",
+            "Their outline"
+          ],
+          "answer": 2,
+          "why": "The outline differs."
+        },
+        {
+          "q": "Counting corners of an outline can help to…",
+          "options": [
+            "Tell shapes apart",
+            "Find the Wi-Fi",
+            "Charge the robot"
+          ],
+          "answer": 0,
+          "why": "Corner counts describe shapes."
+        }
+      ]
+    },
+    {
+      "id": "06-from-camera-to-arm",
+      "title": "From camera to arm",
+      "summary": "Turn a position in the picture into a position on the table.",
+      "youtubeId": "",
+      "videoNo": 36,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Why can't the arm use picture positions directly?",
+          "options": [
+            "The arm works in table positions, not pixels",
+            "Arms cannot move",
+            "Pictures are secret"
+          ],
+          "answer": 0,
+          "why": "Pixel positions must be converted to table positions."
+        },
+        {
+          "q": "A simple way to link them is to…",
+          "options": [
+            "Guess by eye",
+            "Mark known spots and match them to picture positions",
+            "Ignore the camera"
+          ],
+          "answer": 1,
+          "why": "Matching known spots builds the link."
+        },
+        {
+          "q": "If the camera moves after calibration, you should…",
+          "options": [
+            "Keep going",
+            "Calibrate again",
+            "Paint the camera"
+          ],
+          "answer": 1,
+          "why": "A moved camera breaks the link."
+        },
+        {
+          "q": "A good test is to…",
+          "options": [
+            "Skip testing",
+            "Test only once",
+            "Ask the arm to touch a spot the camera found"
+          ],
+          "answer": 2,
+          "why": "Touching the found spot checks the link."
+        }
+      ]
+    },
+    {
+      "id": "07-tracking-a-moving-object",
+      "title": "Tracking a moving object",
+      "summary": "Follow something that moves with look, compare, correct.",
+      "youtubeId": "",
+      "videoNo": 37,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "The tracking loop is…",
+          "options": [
+            "Paint, dry, sell",
+            "Sleep, wake, sleep",
+            "Look, compare, correct"
+          ],
+          "answer": 2,
+          "why": "The robot repeatedly looks and corrects."
+        },
+        {
+          "q": "If the object moves right, the robot should…",
+          "options": [
+            "Stop",
+            "Turn right to keep it centred",
+            "Turn left"
+          ],
+          "answer": 1,
+          "why": "Turn to follow it."
+        },
+        {
+          "q": "Why track many times per second?",
+          "options": [
+            "The object keeps moving",
+            "To waste power",
+            "Pictures expire"
+          ],
+          "answer": 0,
+          "why": "Fast updates keep up with motion."
+        },
+        {
+          "q": "If the robot loses the object, a good plan is to…",
+          "options": [
+            "Race away",
+            "Break the camera",
+            "Stop or search slowly"
+          ],
+          "answer": 2,
+          "why": "A safe search is better than guessing."
+        }
+      ]
+    },
+    {
+      "id": "08-learning-to-recognise",
+      "title": "Learning to recognise",
+      "summary": "Teach a robot to name objects from examples.",
+      "youtubeId": "",
+      "videoNo": 38,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "How do you teach a robot to recognise a cup?",
+          "options": [
+            "Describe it in a song",
+            "Hide the cups",
+            "Show it many example pictures"
+          ],
+          "answer": 2,
+          "why": "Learning uses many labelled examples."
+        },
+        {
+          "q": "Why show examples in different light and angles?",
+          "options": [
+            "To confuse it",
+            "So it works in real situations",
+            "To use more memory"
+          ],
+          "answer": 1,
+          "why": "Variety makes recognition robust."
+        },
+        {
+          "q": "If the robot names a cup 'bottle', it needs…",
+          "options": [
+            "More and better examples",
+            "A louder speaker",
+            "A new motor"
+          ],
+          "answer": 0,
+          "why": "More varied examples fix mistakes."
+        },
+        {
+          "q": "Recognising is different from colour finding because…",
+          "options": [
+            "It is always perfect",
+            "It uses no camera",
+            "It can tell what the object is, not just its colour"
+          ],
+          "answer": 2,
+          "why": "Recognition understands the type of object."
+        }
+      ]
+    },
+    {
+      "id": "09-see-decide-grab",
+      "title": "See, decide, grab",
+      "summary": "Join seeing, deciding and acting into one loop.",
+      "youtubeId": "",
+      "videoNo": 39,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "The full loop for picking up a cup is…",
+          "options": [
+            "See, decide, grab",
+            "Sleep, wake, grab",
+            "Grab, see, forget"
+          ],
+          "answer": 0,
+          "why": "Seeing leads to a decision and then an action."
+        },
+        {
+          "q": "If the cup is not found, the robot should…",
+          "options": [
+            "Drop everything",
+            "Grab anyway",
+            "Not move the arm and look again"
+          ],
+          "answer": 2,
+          "why": "Don't act without a target."
+        },
+        {
+          "q": "Checking after the grab helps to…",
+          "options": [
+            "Confirm the cup was really picked up",
+            "Hide the cup",
+            "Charge the arm"
+          ],
+          "answer": 0,
+          "why": "Verification catches missed grabs."
+        },
+        {
+          "q": "Combining parts works best when you…",
+          "options": [
+            "Test each part first, then together",
+            "Skip the camera",
+            "Join everything untested"
+          ],
+          "answer": 0,
+          "why": "Testing in stages finds problems early."
+        }
+      ]
+    },
+    {
+      "id": "10-the-big-fair",
+      "title": "The big fair",
+      "summary": "Prepare a robot for a real crowd, glare and surprises.",
+      "youtubeId": "",
+      "videoNo": 40,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Why make a checklist before a show?",
+          "options": [
+            "It charges the battery",
+            "It makes the robot louder",
+            "It stops you forgetting important checks"
+          ],
+          "answer": 2,
+          "why": "Checklists catch forgotten steps."
+        },
+        {
+          "q": "Glare from bright lights can…",
+          "options": [
+            "Improve every picture",
+            "Confuse the camera",
+            "Stop gravity"
+          ],
+          "answer": 1,
+          "why": "Glare washes out the picture."
+        },
+        {
+          "q": "A safe stop is important because…",
+          "options": [
+            "Robots like stopping",
+            "It saves paint",
+            "Crowds and surprises can happen"
+          ],
+          "answer": 2,
+          "why": "A safe stop limits harm around people."
+        },
+        {
+          "q": "Before the fair you should…",
+          "options": [
+            "Practise in similar light and crowds",
+            "Change the code on stage",
+            "Skip rehearsal"
+          ],
+          "answer": 0,
+          "why": "Rehearse in conditions like the real event."
+        }
+      ]
+    }
+  ]
+}

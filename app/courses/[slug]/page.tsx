@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { listPublishedCourses, loadCourseBySlug, totalMinutes } from '@/lib/courses'
+import { listPublishedCourses, loadCourseBySlug, totalMinutes, hasVideo } from '@/lib/courses'
 import { courseJsonLD, breadcrumbJsonLD } from '@/lib/seo/jsonld'
 import CourseOverviewClient from './CourseOverviewClient'
 
@@ -29,6 +29,10 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
   const c = loadCourseBySlug(slug)
   if (!c) notFound()
   const url = `${BASE}/courses/${c.slug}`
+  const all = listPublishedCourses()
+  const at = all.findIndex((x) => x.slug === c.slug)
+  const prev = at > 0 ? all[at - 1] : null
+  const nxt = at >= 0 && at < all.length - 1 ? all[at + 1] : null
   const ld = [
     courseJsonLD(c.title, c.description, url),
     breadcrumbJsonLD([{ name: 'Home', path: '/' }, { name: 'Courses', path: '/courses' }, { name: c.title, path: `/courses/${c.slug}` }]),
@@ -37,9 +41,13 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
     <>
       {ld.map((j, i) => <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(j) }} />)}
       <CourseOverviewClient
-        slug={c.slug} title={c.title} description={c.description} level={c.level}
+        slug={c.slug} title={c.title} description={c.description} tagline={c.tagline} outcome={c.outcome}
+        level={c.levelLabel ?? c.level} order={c.order} totalCourses={all.length}
+        whoFor={c.whoFor} prerequisites={c.prerequisites} presenters={c.presenters}
         outcomes={c.outcomes} minutes={totalMinutes(c)} draft={c.status === 'draft'}
-        lessons={c.lessons.map((l) => ({ id: l.id, title: l.title, summary: l.summary, durationMin: l.durationMin }))}
+        lessons={c.lessons.map((l) => ({ id: l.id, title: l.title, summary: l.summary, durationMin: l.durationMin, videoReady: hasVideo(l) }))}
+        finalActivity={c.finalActivity ? { title: c.finalActivity.title, prompt: c.finalActivity.prompt } : undefined}
+        prev={prev ? { slug: prev.slug, title: prev.title } : null} next={nxt ? { slug: nxt.slug, title: nxt.title } : null}
       />
     </>
   )

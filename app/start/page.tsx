@@ -11,6 +11,15 @@ export const metadata: Metadata = {
 
 const PATHS = [
   {
+    emoji: '🎬', title: 'I like short videos and a clear path', time: 'About 2 hours',
+    steps: [
+      { t: 'Course 1: Robotics Foundations', href: '/courses/robotics-foundations' },
+      { t: 'Course 2: Build Your First Robot', href: '/courses/build-your-first-robot-pip' },
+      { t: 'Course 3: Robot Arms', href: '/courses/robot-arms-build-ari' },
+      { t: 'See all 5 courses and certificates', href: '/courses' },
+    ],
+  },
+  {
     emoji: '🌱', title: 'I am brand new to robotics', time: 'About 4 hours',
     steps: [
       { t: 'Read: how robots work', href: '/blog/how-do-robots-work' },
