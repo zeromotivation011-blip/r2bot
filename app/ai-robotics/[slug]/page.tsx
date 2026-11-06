@@ -11,7 +11,7 @@ export function generateStaticParams() { return AI_TOPICS.map((t) => ({ slug: t.
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const t = getTopic((await params).slug)
   if (!t) return {}
-  return { title: t.title, description: t.short.slice(0, 158), alternates: { canonical: `${BASE}/ai-robotics/${t.slug}`, languages: { en: `${BASE}/ai-robotics/${t.slug}`, 'zh-CN': `${BASE}/zh/ai-robotics/${t.slug}`, hi: `${BASE}/hi/ai-robotics/${t.slug}` } } }
+  return { title: t.title, description: t.short.slice(0, 158), alternates: { canonical: `${BASE}/ai-robotics/${t.slug}`, languages: { en: `${BASE}/ai-robotics/${t.slug}`, 'zh-CN': `${BASE}/zh/ai-robotics/${t.slug}`, hi: `${BASE}/hi/ai-robotics/${t.slug}`, es: `${BASE}/es/ai-robotics/${t.slug}` } } }
 }
 
 const box = { padding: 16, borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' } as const

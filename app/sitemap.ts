@@ -9,6 +9,7 @@ import { SIMULATORS } from '@/lib/simulators';
 import { AI_TOPICS } from '@/lib/ai-robotics';
 import { ZH_TOPICS } from '@/lib/ai-robotics-zh';
 import { HI_TOPICS } from '@/lib/ai-robotics-hi';
+import { ES_TOPICS } from '@/lib/ai-robotics-es';
 import { listPublishedCourses, hasVideo } from '@/lib/courses';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
@@ -104,6 +105,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/hi/ai-robotics`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.8 },
     { url: `${BASE}/hi/ai-robotics/glossary`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
     ...HI_TOPICS.map((t) => ({ url: `${BASE}/hi/ai-robotics/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    { url: `${BASE}/es`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${BASE}/es/ai-robotics`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.8 },
+    { url: `${BASE}/es/ai-robotics/glossary`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
+    ...ES_TOPICS.map((t) => ({ url: `${BASE}/es/ai-robotics/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 })),
     ...AI_TOPICS.map((t) => ({ url: `${BASE}/ai-robotics/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 })),
   ];
 
