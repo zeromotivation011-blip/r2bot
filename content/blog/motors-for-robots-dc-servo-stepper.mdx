@@ -1,0 +1,77 @@
+---
+title: "DC Motor vs Servo vs Stepper: Which Motor Should Your Robot Use?"
+description: "A beginner-friendly comparison of DC, servo and stepper motors for robots, with what each is good at and what goes wrong if you choose badly."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["Beginner", "Motors", "Tutorials"]
+readTime: 6
+coverEmoji: "⚙️"
+featured: false
+keywords: ["dc motor vs servo vs stepper", "which motor for robot", "servo vs stepper motor", "motors for arduino robots", "best motor for robot wheels"]
+---
+
+# DC Motor vs Servo vs Stepper: Which Motor Should Your Robot Use?
+
+Motors are the muscles of a robot. The three you meet first are **DC motors**, **servos** and **steppers**. Each is good at one thing.
+
+## Quick answer
+
+- **Wheels that spin continuously:** DC gear motor.
+- **A joint that must point at an exact angle:** servo.
+- **Precise positioning without feedback, such as a 3D printer axis:** stepper.
+
+## DC motor
+
+A [DC motor](/atlas/concept/dc-motor) spins when you apply voltage. More voltage means more speed. To control speed you switch the power on and off very fast, called [PWM](/atlas/concept/pwm), usually through a [motor driver](/atlas/concept/motor-driver).
+
+**Good for:** driving wheels, fans, pumps. **Weak at:** knowing how far it has turned. Add an [encoder](/atlas/concept/encoder) to count rotations.
+
+**If you choose wrong:** using a DC motor for an arm joint means it will drift, because nothing tells it where to stop.
+
+## Servo motor
+
+A hobby [servo](/atlas/concept/servo-motor) has a motor, gears and a small circuit inside. You send it a target angle and it moves there and holds. Most hobby servos turn only part of a full circle.
+
+**Good for:** robot arm joints, grippers, steering, pan-tilt camera mounts. **Weak at:** continuous spinning and heavy loads on cheap models.
+
+**If you choose wrong:** using a small servo for a heavy joint makes it overheat and jitter.
+
+## Stepper motor
+
+A [stepper motor](/atlas/concept/stepper-motor) moves in tiny fixed steps. If you command 200 steps, it moves 200 steps, without needing a sensor in many cases. That is why 3D printers and CNC machines use them.
+
+**Good for:** accurate positioning, slow smooth motion. **Weak at:** high speed and efficiency. They draw current even when they are holding still.
+
+**If you choose wrong:** if a stepper is overloaded it can skip steps, and the robot will not know its position was lost.
+
+## Comparison
+
+| | DC gear motor | Servo | Stepper |
+|---|---|---|---|
+| Moves by | Continuous spin | Goes to an angle | Fixed steps |
+| Position known? | No (add encoder) | Yes, built in | Usually, if not overloaded |
+| Needs driver | Yes | No (plugs into a pin) | Yes |
+| Typical use | Wheels | Arm joints | 3D printers |
+| Beginner difficulty | Easy | Easiest | Medium |
+
+## Brushless motors
+
+Drones and advanced robots use [brushless motors](/atlas/concept/brushless-motor), which are efficient and powerful but need special controllers. Leave these until you are comfortable with the basics.
+
+## What to buy first
+
+For a first robot car, buy two DC gear motors and an L298N motor driver. Add one servo to turn a distance sensor. This is exactly the setup in our [first robot tutorial](/blog/first-robot-project-india-step-by-step).
+
+## Frequently asked questions
+
+**Can I use a servo as a wheel motor?**
+Only if it is a continuous-rotation servo, which spins instead of holding angles.
+
+**Do I need an encoder?**
+For a simple robot, no. For driving straight or measuring distance, yes.
+
+**Why is my motor weak or stalling?**
+Check battery voltage and current, and remember that motors need more current than a microcontroller pin can give.
+
+[Read more in the Atlas →](/atlas) · [Back to the beginner guide →](/blog/robotics-for-students-india-beginners-guide)
