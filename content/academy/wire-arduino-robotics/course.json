@@ -9,18 +9,25 @@
   "thumbnail_url": null,
   "trailer_url": null,
   "instructor": null,
-  "price_inr": 999,
-  "is_free": false,
-  "duration_hours": 15,
-  "total_lessons": 32,
-  "total_xp": 4800,
-  "tags": ["arduino", "hardware", "hands-on", "motors", "sensors", "navigation", "physical-robot"],
-  "prerequisites": ["spark-foundations"],
+  "price_inr": 0,
+  "is_free": true,
+  "tags": [
+    "arduino",
+    "hardware",
+    "hands-on",
+    "motors",
+    "sensors",
+    "navigation",
+    "physical-robot"
+  ],
+  "prerequisites": [
+    "spark-foundations"
+  ],
   "certificate_template": "wire-arduino-robotics",
   "published_at": null,
-  "language": "both",
-  "cbse_aligned": true,
-  "nep_aligned": true,
+  "language": "en",
+  "cbse_aligned": false,
+  "nep_aligned": false,
   "hardware_kit": "arduino-starter-kit",
   "what_youll_learn": [
     "Set up and program an Arduino Uno from scratch",
@@ -32,16 +39,42 @@
     "Understand voltage, current, and power limits that protect your hardware",
     "Structure Arduino projects with clean, readable code"
   ],
-  "free_preview_lesson_slugs": ["what-is-arduino", "arduino-ide-setup", "blink-led"],
+  "free_preview_lesson_slugs": [
+    "what-is-arduino",
+    "arduino-ide-setup",
+    "blink-led"
+  ],
   "coming_soon": true,
-  "waitlist_cta": "Get early access when Wire launches",
+  "waitlist_cta": "Free when it launches. Leave your email and we will tell you the day it opens.",
   "hardware_requirements": [
-    { "name": "Arduino Uno R3", "price_inr": 650, "buy_url": "https://robocraze.com/arduino-uno" },
-    { "name": "HC-SR04 Ultrasonic Sensor", "price_inr": 60 },
-    { "name": "L298N Motor Driver", "price_inr": 120 },
-    { "name": "2× DC Motors + Wheels + Chassis", "price_inr": 340 },
-    { "name": "Servo Motor SG90", "price_inr": 80 },
-    { "name": "Jumper Wires + Breadboard", "price_inr": 150 },
-    { "name": "9V Battery + Clip", "price_inr": 80 }
+    {
+      "name": "Arduino Uno R3",
+      "price_inr": 650,
+      "buy_url": "https://robocraze.com/arduino-uno"
+    },
+    {
+      "name": "HC-SR04 Ultrasonic Sensor",
+      "price_inr": 60
+    },
+    {
+      "name": "L298N Motor Driver",
+      "price_inr": 120
+    },
+    {
+      "name": "2× DC Motors + Wheels + Chassis",
+      "price_inr": 340
+    },
+    {
+      "name": "Servo Motor SG90",
+      "price_inr": 80
+    },
+    {
+      "name": "Jumper Wires + Breadboard",
+      "price_inr": 150
+    },
+    {
+      "name": "9V Battery + Clip",
+      "price_inr": 80
+    }
   ]
 }

@@ -120,12 +120,10 @@ export function CourseLandingClient({ course }: { course: Course }) {
           )}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
             {[
-              `📚 ${course.total_lessons} lessons`,
-              course.duration_hours ? `⏱ ${course.duration_hours}h` : null,
-              `⭐ ${course.total_xp} XP`,
-              course.cbse_aligned ? '🇮🇳 CBSE aligned' : null,
-              course.nep_aligned ? '🇮🇳 NEP 2020 aligned' : null,
-              course.language === 'both' ? '🌐 Hindi + English' : null,
+              course.total_lessons > 0 ? `📚 ${course.total_lessons} lessons` : '🛠 Lessons in production',
+              course.total_lessons > 0 && course.duration_hours ? `⏱ ${course.duration_hours}h` : null,
+              course.total_xp > 0 ? `⭐ ${course.total_xp} XP` : null,
+              '🆓 Free',
             ].filter(Boolean).map((label, i) => (
               <span key={i} style={{
                 fontSize: 13, color: '#d6f1ff', fontWeight: 700,
@@ -440,9 +438,9 @@ export function CourseLandingClient({ course }: { course: Course }) {
             gap: 10,
           }}>
             {[
-              { label: 'Lessons', value: course.total_lessons },
-              { label: 'XP to earn', value: `${course.total_xp.toLocaleString('en-IN')} XP` },
-              { label: 'Duration', value: course.duration_hours ? `${course.duration_hours}h` : '—' },
+              { label: 'Lessons', value: course.total_lessons > 0 ? course.total_lessons : 'Coming soon' },
+              { label: 'XP to earn', value: course.total_xp > 0 ? `${course.total_xp.toLocaleString('en-US')} XP` : '—' },
+              { label: 'Duration', value: course.total_lessons > 0 && course.duration_hours ? `${course.duration_hours}h` : '—' },
               { label: 'Level', value: course.level },
             ].map(({ label, value }) => (
               <div key={label} style={{

@@ -1,88 +1,61 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Nav } from '@/components/Nav'
 import { CopilotProvider } from '@/components/CopilotProvider'
 import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
-import { PricingClient } from './PricingClient'
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
-export const runtime = 'nodejs'
-export const revalidate = false
-
 export const metadata: Metadata = {
-  title: 'R2BOT Pro — Unlock Your Full Robotics Journey',
+  title: 'Free robotics learning — everything on R2BOT is free',
   description:
-    'Get unlimited AI mentoring, full course access, and certificates. ₹799/month or ₹5,999/year.',
+    'The Atlas, Academy lessons, simulators, robot builds and the AI mentor are all free to use. No card, no trial, no paywall.',
   alternates: { canonical: `${BASE_URL}/pricing` },
   openGraph: {
     type: 'website',
     url: `${BASE_URL}/pricing`,
     siteName: 'R2BOT',
-    title: 'R2BOT Pro — Unlock Your Full Robotics Journey',
-    description:
-      'Get unlimited AI mentoring, full course access, and certificates. ₹799/month or ₹5,999/year.',
-    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT Pro' }],
+    title: 'Everything on R2BOT is free',
+    description: 'Robotics, made simple — free for everyone, everywhere.',
+    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT is free' }],
   },
 }
 
-const productJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Product',
-  name: 'R2BOT Pro',
-  description:
-    'Full Academy access, unlimited R2 Co-pilot, project reviews, certificates, and offline downloads.',
-  brand: { '@type': 'Brand', name: 'R2BOT' },
-  offers: [
-    {
-      '@type': 'Offer',
-      name: 'Monthly',
-      price: 799,
-      priceCurrency: 'INR',
-      url: `${BASE_URL}/pricing`,
-      availability: 'https://schema.org/InStock',
-    },
-    {
-      '@type': 'Offer',
-      name: 'Yearly',
-      price: 5999,
-      priceCurrency: 'INR',
-      url: `${BASE_URL}/pricing`,
-      availability: 'https://schema.org/InStock',
-    },
-  ],
-}
+const items = [
+  { t: 'The Atlas', d: '480+ robotics concepts, robots, companies and people in plain English, with sources.', href: '/atlas' },
+  { t: 'Academy', d: 'Structured lessons from your first robot to ROS2, navigation and SLAM.', href: '/academy' },
+  { t: 'Simulators', d: 'Try PID control, kinematics and more in your browser. Nothing to install.', href: '/visualizer' },
+  { t: 'Robot builds', d: 'Guided projects from a line follower to a ROS2 navigation robot.', href: '/build' },
+  { t: 'R2 Co-pilot', d: 'An AI mentor for robotics questions. Free, with a fair daily limit so it stays free for everyone.', href: '/copilot' },
+  { t: 'News and Lens', d: 'Daily robotics news with context, and the best robotics videos explained.', href: '/news' },
+]
 
 export default function PricingPage() {
   return (
     <CopilotProvider>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
-      />
       <Nav />
-      <main id="main-content" style={{ paddingTop: 120, paddingBottom: 80, minHeight: '100vh', background: '#0A0E17', color: '#fff' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
-          <header style={{ textAlign: 'center', maxWidth: 720, margin: '0 auto 48px' }}>
-            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 14px' }}>
-              R2BOT Pro
-            </p>
-            <h1 style={{ fontSize: 'clamp(34px, 5vw, 56px)', fontWeight: 900, lineHeight: 1.08, margin: '0 0 14px' }}>
-              Unlock your full robotics journey.
-            </h1>
-            <p style={{ fontSize: 17, color: '#94a3b8', lineHeight: 1.65, margin: 0 }}>
-              Start free. Upgrade when you&apos;re ready to go from learner to engineer.
-            </p>
-          </header>
-
-          <PricingClient />
-
-          <section style={{ maxWidth: 720, margin: '60px auto 0', textAlign: 'center', padding: '24px 20px', borderTop: '1px solid #1f1f2a' }}>
-            <p style={{ fontSize: 13, color: '#64748b' }}>
-              Secure payments via Razorpay. Cancel anytime. Questions? Email{' '}
-              <a href="mailto:hello@r2bot.in" style={{ color: '#fbbf24', textDecoration: 'underline' }}>hello@r2bot.in</a>.
-            </p>
-          </section>
+      <main id="main-content" style={{ paddingTop: 130, paddingBottom: 100, minHeight: '100vh' }}>
+        <div className="container" style={{ maxWidth: 860, margin: '0 auto', padding: '0 20px' }}>
+          <p style={{ fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 800, color: '#f59e0b' }}>Pricing</p>
+          <h1 style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 900, lineHeight: 1.1, margin: '8px 0 14px' }}>
+            Everything is free.
+          </h1>
+          <p style={{ fontSize: 18, color: '#b0b8c5', lineHeight: 1.6, maxWidth: 680 }}>
+            R2BOT exists to make robotics interesting and understandable for everyone. There is no card to enter, no trial that expires, and no locked lesson. Create a free account to save your progress, streak and certificates.
+          </p>
+          <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', marginTop: 36 }}>
+            {items.map((i) => (
+              <Link key={i.t} href={i.href} style={{ display: 'block', padding: 20, borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)', textDecoration: 'none', color: 'inherit' }}>
+                <strong style={{ fontSize: 17 }}>{i.t}</strong>
+                <p style={{ margin: '6px 0 0', fontSize: 14, color: '#9ca3af', lineHeight: 1.55 }}>{i.d}</p>
+              </Link>
+            ))}
+          </div>
+          <div style={{ marginTop: 40, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <Link href="/signup" className="btn btn-primary">Create a free account</Link>
+            <Link href="/diagnostic" className="btn btn-ghost">Find my level</Link>
+          </div>
         </div>
       </main>
       <CopilotBubble />

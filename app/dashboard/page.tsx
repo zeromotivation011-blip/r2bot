@@ -189,19 +189,6 @@ export default async function DashboardPage() {
             </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-              {!subscription.isPro && (
-                <a
-                  href="/pricing"
-                  className="btn"
-                  style={{
-                    background: '#fbbf24', color: '#1a0f00',
-                    fontWeight: 900, padding: '8px 16px', borderRadius: 10,
-                    border: 'none', textDecoration: 'none',
-                  }}
-                >
-                  Upgrade to Pro →
-                </a>
-              )}
               <form action="/auth/sign-out" method="POST">
                 <button type="submit" className="btn btn-ghost" style={{ border: '1px solid var(--border)' }}>
                   Sign out
