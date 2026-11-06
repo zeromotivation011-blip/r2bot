@@ -21,7 +21,6 @@ export default function robots(): MetadataRoute.Robots {
           // until we hit scale (see CLAUDE.md §6). Not linked anywhere public.
           '/schools',
           '/hardware',
-          '/kids',
           '/jobs',
           '/leaderboard',
           '/history',

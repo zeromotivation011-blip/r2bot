@@ -89,6 +89,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const aiPages = [
     { url: `${BASE}/ai-robotics`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.9 },
+    { url: `${BASE}/kids`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${BASE}/kids/parents`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE}/kids/activities`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/india`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${BASE}/robots/directory`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
