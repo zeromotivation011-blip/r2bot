@@ -41,6 +41,7 @@ const GROUPS: Group[] = [
         ],
       },
       { kind: 'link', icon: '🇨🇳', label: '中文 (简体)', sub: 'AI 与机器人,通俗讲解', href: '/zh' },
+      { kind: 'link', icon: '🇮🇳', label: 'हिंदी', sub: 'AI और रोबोटिक्स, आसान भाषा में', href: '/hi' },
       { kind: 'link', icon: '🧭', label: 'Start here', sub: 'Pick your path · free', href: '/start' },
       { kind: 'link', icon: '🎬', label: 'Free course path', sub: '5 courses · quizzes · certificates', href: '/courses' },
       { kind: 'link', icon: '📚', label: 'Atlas', sub: '480+ concepts explained', href: '/atlas' },

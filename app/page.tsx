@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     'learn robotics online free',
     'robotics explained',
   ],
-  alternates: { canonical: SITE_URL, languages: { en: SITE_URL, 'zh-CN': `${SITE_URL}/zh` } },
+  alternates: { canonical: SITE_URL, languages: { en: SITE_URL, 'zh-CN': `${SITE_URL}/zh`, hi: `${SITE_URL}/hi` } },
   openGraph: {
     type: 'website',
     url: SITE_URL,

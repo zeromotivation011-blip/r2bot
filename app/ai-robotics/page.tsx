@@ -8,7 +8,7 @@ const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'AI and Robotics: Plain-English Guides',
   description: 'How AI works inside robots, explained simply. Vision, learning, SLAM, planning and language models, each with real examples, free.',
-  alternates: { canonical: `${BASE}/ai-robotics`, languages: { en: `${BASE}/ai-robotics`, 'zh-CN': `${BASE}/zh/ai-robotics` } },
+  alternates: { canonical: `${BASE}/ai-robotics`, languages: { en: `${BASE}/ai-robotics`, 'zh-CN': `${BASE}/zh/ai-robotics`, hi: `${BASE}/hi/ai-robotics` } },
 }
 
 const card = { padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' } as const

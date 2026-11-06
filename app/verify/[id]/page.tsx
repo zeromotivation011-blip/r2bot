@@ -4,6 +4,7 @@ import { ParticleField } from '@/components/ParticleField';
 import { CursorTrail } from '@/components/CursorTrail';
 import { CopilotProvider } from '@/components/CopilotProvider';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import ShareCert from './ShareCert';
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -43,14 +44,10 @@ export default async function VerifyPage({ params }: { params: Params }) {
   if (data?.user_id) {
     const { data: prof } = await supabase
       .from('profiles')
-      .select('display_name, email')
+      .select('display_name')
       .eq('id', data.user_id)
       .maybeSingle();
     recipient = (prof?.display_name as string | undefined) ?? '';
-    if (!recipient) {
-      const emailPart = (prof?.email as string | undefined)?.split('@')[0] ?? '';
-      recipient = emailPart;
-    }
   }
 
   const valid = !!data && !error;
@@ -130,6 +127,8 @@ export default async function VerifyPage({ params }: { params: Params }) {
                   </div>
                 </div>
               </div>
+
+              <ShareCert id={id} title={data!.lesson_title as string} issued={data!.issued_at as string} />
 
               <p style={{ marginTop: 28, fontSize: 13.5, color: '#94A3B8' }}>
                 Verified against the R2BOT certificate registry. Full Certificate ID:{' '}
