@@ -6,7 +6,7 @@ const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'AI and Robotics Glossary: Plain-English Definitions',
   description: 'Short, plain definitions of the words you meet in AI and robotics: SLAM, lidar, reinforcement learning, sensor fusion and more.',
-  alternates: { canonical: `${BASE}/ai-robotics/glossary` },
+  alternates: { canonical: `${BASE}/ai-robotics/glossary`, languages: { en: `${BASE}/ai-robotics/glossary`, 'zh-CN': `${BASE}/zh/ai-robotics/glossary` } },
 }
 
 export default function Glossary() {

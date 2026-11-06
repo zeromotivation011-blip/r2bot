@@ -36,7 +36,7 @@
       "id": "01-the-arm-box-and-the-plan",
       "title": "The arm box and the plan",
       "summary": "Plan a robot arm: what it must do, and which parts it needs.",
-      "youtubeId": "",
+      "youtubeId": "RY-WelpddX8",
       "videoNo": 21,
       "durationMin": 4,
       "quiz": [
@@ -86,7 +86,7 @@
       "id": "02-inside-a-servo",
       "title": "Inside a servo",
       "summary": "Explain what a servo is and how it holds an angle.",
-      "youtubeId": "",
+      "youtubeId": "60MmfaDbnQM",
       "videoNo": 22,
       "durationMin": 4,
       "quiz": [
@@ -136,7 +136,7 @@
       "id": "03-joints-and-degrees-of-freedom",
       "title": "Joints and degrees of freedom",
       "summary": "Count how many ways an arm can move.",
-      "youtubeId": "",
+      "youtubeId": "cLVCP3UfR0w",
       "videoNo": 23,
       "durationMin": 4,
       "quiz": [
@@ -186,7 +186,7 @@
       "id": "04-smooth-motion",
       "title": "Smooth motion",
       "summary": "Make the arm move gently instead of snapping to a position.",
-      "youtubeId": "",
+      "youtubeId": "a_xdeWQAOTU",
       "videoNo": 24,
       "durationMin": 4,
       "quiz": [

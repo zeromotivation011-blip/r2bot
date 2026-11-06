@@ -9,7 +9,7 @@ const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'Free Robotics Course Path: 5 Courses, Quizzes and Certificates',
   description: 'Five free robotics courses in order: foundations, build a robot, robot arms, vision and intelligence. Short videos, quizzes and certificates.',
-  alternates: { canonical: `${BASE}/courses` },
+  alternates: { canonical: `${BASE}/courses`, languages: { en: `${BASE}/courses`, 'zh-CN': `${BASE}/zh/courses` } },
 }
 
 export default function CoursesPage() {
