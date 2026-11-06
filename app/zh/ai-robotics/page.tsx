@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import InlineSignup from '@/components/InlineSignup'
 import { ZH_TOPICS } from '@/lib/ai-robotics-zh'
 
 const BASE = 'https://www.r2bot.in'
@@ -25,6 +26,7 @@ export default function ZhAiHub() {
           </Link>
         ))}
       </div>
+      <InlineSignup lang="zh" />
       <p style={{ color: '#cbd5e1' }}>不懂的词？<Link href="/zh/ai-robotics/glossary" style={{ color: '#FC6818', fontWeight: 700 }}>查看词汇表</Link>。想试互动演示？<Link href="/ai-robotics" style={{ color: '#FC6818', fontWeight: 700 }}>英文版有 10 个互动演示</Link>。</p>
     </main>
   )

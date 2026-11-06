@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import InlineSignup from '@/components/InlineSignup'
 import { notFound } from 'next/navigation'
 import { HI_TOPICS, getHiTopic } from '@/lib/ai-robotics-hi'
 
@@ -38,6 +39,7 @@ export default async function HiTopic({ params }: { params: Promise<{ slug: stri
       <div style={{ ...box, marginBottom: 24 }}><div style={{ color: '#FC6818', fontWeight: 800, fontSize: 13 }}>खुद आज़माइए (5 मिनट)</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.9 }}>{t.tryIt}</p></div>
       <h2 style={{ color: '#fff', fontSize: 22 }}>अक्सर पूछे जाने वाले सवाल</h2>
       {t.faq.map((f) => <div key={f.q} style={{ margin: '12px 0' }}><h3 style={{ color: '#fff', fontSize: 16, margin: '0 0 4px' }}>{f.q}</h3><p style={{ color: '#cbd5e1', margin: 0, lineHeight: 1.9 }}>{f.a}</p></div>)}
+      <InlineSignup lang="hi" />
       <p style={{ color: '#cbd5e1', marginTop: 28, lineHeight: 2 }}>खेलकर सीखना चाहते हैं? <Link href={`/ai-robotics/${t.slug}`} style={{ color: '#FC6818', fontWeight: 700 }}>अंग्रेज़ी पेज पर इंटरैक्टिव डेमो खोलिए →</Link> · <Link href="/hi/ai-robotics/glossary" style={{ color: '#FC6818' }}>शब्दावली</Link></p>
     </main>
   )
