@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import InlineSignup from '@/components/InlineSignup'
 import { notFound } from 'next/navigation'
 import { ZH_TOPICS, getZhTopic } from '@/lib/ai-robotics-zh'
 
@@ -38,6 +39,7 @@ export default async function ZhTopic({ params }: { params: Promise<{ slug: stri
       <div style={{ ...box, marginBottom: 24 }}><div style={{ color: '#FC6818', fontWeight: 800, fontSize: 13 }}>动手试试(5 分钟）</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.8 }}>{t.tryIt}</p></div>
       <h2 style={{ color: '#fff', fontSize: 22 }}>常见问题</h2>
       {t.faq.map((f) => <div key={f.q} style={{ margin: '12px 0' }}><h3 style={{ color: '#fff', fontSize: 16, margin: '0 0 4px' }}>{f.q}</h3><p style={{ color: '#cbd5e1', margin: 0, lineHeight: 1.8 }}>{f.a}</p></div>)}
+      <InlineSignup lang="zh" />
       <p style={{ color: '#cbd5e1', marginTop: 28, lineHeight: 1.9 }}>想动手玩？<Link href={`/ai-robotics/${t.slug}`} style={{ color: '#FC6818', fontWeight: 700 }}>打开英文版的互动演示 →</Link> · <Link href="/zh/ai-robotics/glossary" style={{ color: '#FC6818' }}>词汇表</Link></p>
     </main>
   )

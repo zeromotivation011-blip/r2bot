@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import InlineSignup from '@/components/InlineSignup'
 import { HI_TOPICS } from '@/lib/ai-robotics-hi'
 
 const BASE = 'https://www.r2bot.in'
@@ -25,6 +26,7 @@ export default function HiAiHub() {
           </Link>
         ))}
       </div>
+      <InlineSignup lang="hi" />
       <p style={{ color: '#cbd5e1', lineHeight: 1.9 }}>कोई शब्द समझ नहीं आया? <Link href="/hi/ai-robotics/glossary" style={{ color: '#FC6818', fontWeight: 700 }}>शब्दावली देखिए</Link>। डेमो आज़माना है? <Link href="/ai-robotics" style={{ color: '#FC6818', fontWeight: 700 }}>अंग्रेज़ी पेज पर 10 इंटरैक्टिव डेमो हैं</Link>।</p>
     </main>
   )
