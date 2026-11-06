@@ -1,19 +1,19 @@
 ---
-title: "Build Your First Robot in India: Step-by-Step Project Guide (₹1,200 Total)"
-description: "A complete tutorial to build an obstacle-avoiding robot using components available in India. Includes circuit, code, and troubleshooting."
-date: "2025-03-01"
-author: "R2BOT Team"
+title: "Build Your First Robot: Step-by-Step Obstacle-Avoiding Project"
+description: "Build a two-wheeled obstacle-avoiding robot in one weekend with common, low-cost parts. Includes parts list, wiring, full Arduino code and troubleshooting."
+date: "2026-11-06"
+author: "R2BOT"
 authorRole: "Robotics, made simple"
 tags: ["Tutorials", "Beginner", "Arduino"]
-readTime: 15
+readTime: 12
 coverEmoji: "⚡"
 featured: false
-keywords: ["build robot india beginners", "obstacle avoiding robot arduino india", "first robot project india", "arduino robot tutorial hindi"]
+keywords: ["build your first robot", "obstacle avoiding robot arduino", "first robot project", "arduino robot tutorial for beginners"]
 ---
 
-# Build Your First Robot in India: Step-by-Step (₹1,200 Total)
+# Build Your First Robot: Step-by-Step Obstacle Avoider
 
-This guide takes you from zero to a working obstacle-avoiding robot in one weekend. Every component is available on Robu.in or Amazon India. Total cost ₹1,100-1,300 depending on shop.
+This guide takes you from zero to a working obstacle-avoiding robot in one weekend. Every part is a common hobby component sold by electronics shops and online stores worldwide. The whole kit is inexpensive, and many sellers bundle these parts together.
 
 ## Final result
 
@@ -21,23 +21,22 @@ A two-wheeled robot that drives forward, detects obstacles with an ultrasonic se
 
 ## Parts list
 
-| Part | Quantity | Price (₹) | Where |
-|---|---|---|---|
-| Arduino Uno (clone) | 1 | 350 | Robu / Amazon |
-| L298N motor driver | 1 | 120 | Robu / Amazon |
-| BO motor + wheel pair | 1 (2 motors) | 200 | Robu |
-| HC-SR04 ultrasonic sensor | 1 | 80 | Robu |
-| SG90 servo motor | 1 | 90 | Robu |
-| Acrylic chassis (2-wheel) | 1 | 200 | Robu |
-| Jumper wires (M-M, M-F) | 1 pack | 50 | Robu |
-| 9V battery + clip | 1 | 50 | Local shop |
-| **Total** | | **~1,140** | |
+| Part | Quantity | Notes |
+|---|---|---|
+| Arduino Uno (or compatible) | 1 | A clone works fine |
+| L298N motor driver | 1 | Drives the two motors |
+| Gear motor + wheel pair | 1 (2 motors) | Often sold as "BO motors" or "TT motors" |
+| HC-SR04 ultrasonic sensor | 1 | Measures distance |
+| SG90 servo motor | 1 | Turns the sensor left and right |
+| 2-wheel chassis | 1 | Acrylic kits include a caster wheel |
+| Jumper wires (M-M, M-F) | 1 pack | |
+| 9V battery + clip | 1 | |
 
-Buy from one shop to save on shipping. Robu.in usually has all of this in one combined kit at ~₹1,200 with shipping.
+Buy everything from one seller to save on shipping. Many shops sell this exact set as a single "smart car kit".
 
 ## Tools you need
 
-A small Phillips screwdriver, scissors, double-sided foam tape (₹20 from any stationery shop), a USB-A to USB-B cable (you probably have one for old printers). That's it. No soldering required.
+A small Phillips screwdriver, scissors, double-sided foam tape, a USB-A to USB-B cable (the kind old printers use). That's it. No soldering required.
 
 ## Step 1 — Build the chassis (30 min)
 
@@ -151,14 +150,14 @@ Once uploaded, unplug the USB cable. Connect the 9V battery. The robot should st
 
 Once it works:
 
-- **Add Bluetooth** with an HC-05 module (₹150) → control from your phone
+- **Add Bluetooth** with an HC-05 module → control from your phone
 - **Add a buzzer** that beeps when an obstacle is detected
 - **Tune the avoidance** — change the 25cm threshold, the turn time, the speed
 - **Add a line-follower mode** with two IR sensors → robot follows a black line
 
 ## Why this matters
 
-You just built a real working robot. It has [sensors](/atlas/concept/sensor), a [controller](/atlas/concept/arduino), [actuators](/atlas/concept/actuator), and feedback control. Everything from Mars rovers to warehouse AMRs uses the same fundamental loop you just programmed.
+You just built a real working robot. It has [sensors](/atlas/concept/sensor), a [controller](/atlas/concept/arduino), [actuators](/atlas/concept/actuator), and feedback control. Robots from planetary rovers to warehouse carts use the same basic loop you just programmed: sense, decide, act.
 
 ## Test it virtually first
 
