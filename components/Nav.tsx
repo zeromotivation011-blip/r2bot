@@ -40,6 +40,7 @@ const GROUPS: Group[] = [
           { icon: '⚡️', label: 'Edge · Research', href: '/academy/edge', tone: 'edge' },
         ],
       },
+      { kind: 'link', icon: '🇨🇳', label: '中文 (简体)', sub: 'AI 与机器人,通俗讲解', href: '/zh' },
       { kind: 'link', icon: '🧭', label: 'Start here', sub: 'Pick your path · free', href: '/start' },
       { kind: 'link', icon: '🎬', label: 'Free course path', sub: '5 courses · quizzes · certificates', href: '/courses' },
       { kind: 'link', icon: '📚', label: 'Atlas', sub: '480+ concepts explained', href: '/atlas' },
@@ -84,6 +85,7 @@ const GROUPS: Group[] = [
     items: [
       { kind: 'link', icon: '💬', label: 'Lab', sub: 'Ask & discuss', href: '/lab' },
       { kind: 'link', icon: '🏆', label: 'Project Showcase', sub: 'Built by the community', href: '/showcase' },
+      { kind: 'link', icon: '🇮🇳', label: 'Robotics in India', sub: 'Milestones, companies, your path', href: '/india' },
       { kind: 'link', icon: '🛣️', label: 'Career Paths', sub: 'Roadmaps to robotics jobs', href: '/careers' },
       { kind: 'link', icon: '📢', label: 'About R2BOT', sub: 'Our mission', href: '/about' },
     ],

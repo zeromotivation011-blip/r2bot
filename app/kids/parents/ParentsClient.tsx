@@ -66,6 +66,7 @@ export default function ParentsClient() {
       <header className="head">
         <Link href="/kids" className="back">← Robot World</Link>
         <h1>👪 For Parents</h1>
+        <Link href="/kids/activities" className="back">Screen-free activities →</Link>
         <button onClick={() => window.print()} className="print">🖨 Print this page</button>
       </header>
 
