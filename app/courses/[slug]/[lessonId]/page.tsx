@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { listPublishedCourses, loadCourseBySlug, toPublicLesson } from '@/lib/courses'
+import { listPublishedCourses, loadCourseBySlug, toPublicLesson, hasVideo } from '@/lib/courses'
 import LessonClient from './LessonClient'
 
 export const revalidate = 86400
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: `${l.title} — ${c.title}`,
     description: l.summary,
     alternates: { canonical: `${BASE}/courses/${c.slug}/${l.id}` },
-    robots: c.status === 'draft' ? { index: false } : undefined,
+    robots: c.status === 'draft' || !hasVideo(l) ? { index: false } : undefined,
   }
 }
 
@@ -39,7 +39,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   }
   return (
     <>
-      {c.status === 'published' && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(video) }} />}
+      {c.status === 'published' && hasVideo(l) && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(video) }} />}
       <LessonClient
         courseSlug={c.slug} courseTitle={c.title} lesson={toPublicLesson(l)}
         index={idx} total={c.lessons.length}

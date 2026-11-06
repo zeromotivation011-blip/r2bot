@@ -100,6 +100,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
       )}
       <Ticker atlasCount={atlasCount} />
       <Reveal><MissionStrip /></Reveal>
+      <Reveal><CoursePath /></Reveal>
       <Reveal><Features atlasCount={atlasCount} /></Reveal>
       <Reveal><SimulatorShowcase /></Reveal>
       <Reveal><IndiaSpotlight /></Reveal>
@@ -396,6 +397,40 @@ function MissionStrip() {
               <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{sub}</p>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── COURSE PATH ──────────────────────────────────────────────────────────
+function CoursePath() {
+  const steps = [
+    { n: 1, name: 'Robotics Foundations', sub: 'How robots sense, think and act' },
+    { n: 2, name: 'Build Your First Robot', sub: 'A small wheeled robot, step by step' },
+    { n: 3, name: 'Robot Arms', sub: 'Build an arm that picks up a cup' },
+    { n: 4, name: 'Robot Vision', sub: 'Give your robot a camera' },
+    { n: 5, name: 'Robot Intelligence', sub: 'Maps, planning, speech and safety' },
+  ]
+  return (
+    <section style={{ padding: '70px 20px 20px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 28px' }}>
+          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 12px' }}>Free course path</p>
+          <h2 style={{ fontSize: 'clamp(26px,4vw,42px)', fontWeight: 900, margin: 0, color: '#fff' }}>Five courses. From zero to your own robot design.</h2>
+          <p style={{ marginTop: 10, color: '#94a3b8', fontSize: 15 }}>50 short video lessons, a quiz after each one, a final activity and a certificate for every course. Free, in plain English.</p>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
+          {steps.map((c) => (
+            <Link key={c.n} href="/courses" style={{ display: 'block', padding: 18, background: '#111118', border: '1px solid #1f1f2a', borderRadius: 16, textDecoration: 'none' }}>
+              <span style={{ display: 'inline-flex', width: 32, height: 32, borderRadius: 999, background: '#FC6818', color: '#000', fontWeight: 900, alignItems: 'center', justifyContent: 'center' }}>{c.n}</span>
+              <p style={{ color: '#fff', fontWeight: 800, margin: '10px 0 4px', fontSize: 15 }}>{c.name}</p>
+              <p style={{ color: '#94a3b8', fontSize: 13, margin: 0 }}>{c.sub}</p>
+            </Link>
+          ))}
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 22 }}>
+          <Link href="/courses" style={{ display: 'inline-block', padding: '12px 24px', borderRadius: 12, background: '#FC6818', color: '#000', fontWeight: 800, textDecoration: 'none' }}>See the full course path →</Link>
         </div>
       </div>
     </section>
@@ -931,7 +966,7 @@ function NewsletterCTA() {
 // ─── FOOTER ───────────────────────────────────────────────────────────────
 function Footer() {
   const cols: { h: string; links: { label: string; href: string }[] }[] = [
-    { h: 'Academy',  links: [{ label: 'Spark Track', href: '/academy' }, { label: 'Wire Track', href: '/academy' }, { label: 'Forge Track', href: '/academy' }, { label: 'Edge Track', href: '/academy' }] },
+    { h: 'Academy',  links: [{ label: 'Free Course Path', href: '/courses' }, { label: 'Spark Track', href: '/academy' }, { label: 'Wire Track', href: '/academy' }, { label: 'Forge Track', href: '/academy' }, { label: 'Edge Track', href: '/academy' }] },
     { h: 'Explore',  links: [{ label: 'Atlas', href: '/atlas' }, { label: 'Simulators', href: '/visualizer' }, { label: 'Lens', href: '/lens' }, { label: 'Blog', href: '/blog' }] },
     { h: 'Discover', links: [{ label: 'Daily Life', href: '/daily-life' }, { label: 'Career Paths', href: '/careers' }, { label: 'Daily News', href: '/news' }, { label: 'Diagnostic Test', href: '/diagnostic' }] },
     { h: 'Company',  links: [{ label: 'Mission', href: '/mission' }, { label: 'Contact', href: 'mailto:hello@r2bot.in' }, { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' }] },

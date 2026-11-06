@@ -3,10 +3,10 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Q { q: string; options: string[] }
-interface Lesson { id: string; title: string; summary: string; youtubeId: string; durationMin: number; quiz: Q[] }
+interface Lesson { id: string; title: string; summary: string; youtubeId: string; videoNo?: number; durationMin: number; quiz: Q[] }
 interface Props { courseSlug: string; courseTitle: string; lesson: Lesson; index: number; total: number; nextId: string | null; prevId: string | null }
 interface Review { ok: boolean; why: string | null; answer: number }
-interface Result { passed: boolean; score: number; review: Review[]; courseComplete?: boolean; certificateId?: string | null; completed?: number; total?: number; error?: string }
+interface Result { needsAssignment?: boolean; passed: boolean; score: number; review: Review[]; courseComplete?: boolean; certificateId?: string | null; completed?: number; total?: number; error?: string }
 
 // Minimal typing for the YouTube IFrame API.
 interface YTPlayer { getCurrentTime(): number; getDuration(): number; seekTo(s: number, a: boolean): void; destroy(): void }
@@ -25,7 +25,7 @@ export default function LessonClient({ courseSlug, courseTitle, lesson, index, t
   const [answers, setAnswers] = useState<number[]>(() => lesson.quiz.map(() => -1))
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<Result | null>(null)
-  const placeholder = lesson.youtubeId.startsWith('REPLACE')
+  const placeholder = !lesson.youtubeId.trim() || lesson.youtubeId.startsWith('REPLACE')
 
   const saveWatch = useCallback(() => {
     const p = player.current
@@ -110,17 +110,21 @@ export default function LessonClient({ courseSlug, courseTitle, lesson, index, t
 
       <div className="mt-6 rounded-xl overflow-hidden border border-white/10 bg-black" style={{ aspectRatio: '16 / 9' }}>
         {placeholder
-          ? <div className="h-full flex items-center justify-center text-gray-400 text-sm p-6 text-center">Video not added yet. Set <code className="mx-1">youtubeId</code> in course.json.</div>
+          ? <div className="h-full flex flex-col items-center justify-center text-center p-6 gap-2">
+              <span className="text-4xl" aria-hidden>🎬</span>
+              <p className="text-white font-bold">This video is coming soon</p>
+              <p className="text-gray-400 text-sm max-w-sm">Lesson {lesson.videoNo ?? index + 1} is being finished. Come back soon, or read the summary above and try the earlier lessons.</p>
+            </div>
           : <div ref={box} className="w-full h-full" />}
       </div>
 
-      <div className="mt-3">
+      {!placeholder && <div className="mt-3">
         <div className="flex justify-between text-xs text-gray-400"><span>Watched</span><span>{Math.round(pct * 100)}% {ready ? '· quiz unlocked' : `· watch ${Math.round(NEED * 100)}% to unlock the quiz`}</span></div>
         <div className="h-2 rounded bg-white/10 mt-1 overflow-hidden"><div className="h-full bg-amber-500" style={{ width: `${Math.round(pct * 100)}%` }} /></div>
-      </div>
+      </div>}
       {signedIn === false && <p className="text-sm text-gray-400 mt-3"><Link href="/login" className="text-amber-500 underline">Sign in</Link> so your progress and certificate are saved.</p>}
 
-      {(ready || placeholder) && lesson.quiz.length > 0 && !done && (
+      {ready && !placeholder && lesson.quiz.length > 0 && !done && (
         <section className="mt-8">
           <h2 className="text-xl font-bold text-white">Quick check</h2>
           <div className="mt-4 space-y-5">
@@ -149,7 +153,8 @@ export default function LessonClient({ courseSlug, courseTitle, lesson, index, t
           {!result.error && <p className={result.passed ? 'text-green-400 font-bold' : 'text-amber-400 font-bold'}>{result.passed ? 'Passed' : 'Not quite'} — {Math.round(result.score * 100)}%{result.passed ? '' : '. You need 70%. Review the video and try again.'}</p>}
           {result.review.map((r, i) => r.why && <p key={i} className="text-sm text-gray-400 mt-2">{i + 1}. {r.ok ? '✓' : '✗'} {r.why}</p>)}
           {result.courseComplete && result.certificateId && <Link href={`/verify/${result.certificateId}`} className="inline-block mt-3 text-amber-500 underline font-semibold">🎓 Course complete — view your certificate →</Link>}
-          {result.courseComplete && !result.certificateId && <p className="text-sm text-gray-400 mt-2">Course complete. Your certificate will appear on the course page shortly.</p>}
+          {result.courseComplete && !result.certificateId && result.needsAssignment && <Link href={`/courses/${courseSlug}#final-activity`} className="inline-block mt-3 text-amber-500 underline font-semibold">All lessons done — complete the final activity to get your certificate →</Link>}
+          {result.courseComplete && !result.certificateId && !result.needsAssignment && <p className="text-sm text-gray-400 mt-2">Course complete. Your certificate will appear on the course page shortly.</p>}
         </section>
       )}
 

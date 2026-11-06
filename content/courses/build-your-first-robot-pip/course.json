@@ -1,0 +1,536 @@
+{
+  "title": "Build Your First Robot: Pip",
+  "order": 2,
+  "tagline": "Build and drive a small wheeled robot, one step at a time.",
+  "description": "Build a small wheeled robot step by step: parts, power, motors, sensors, line following and debugging.",
+  "outcome": "After this course you can build a small wheeled robot that drives, avoids obstacles and follows a line.",
+  "level": "Beginner",
+  "levelLabel": "Beginner",
+  "whoFor": "Learners who finished Course 1, or any beginner who wants to build a small wheeled robot.",
+  "prerequisites": "Course 1 is helpful but not required.",
+  "status": "published",
+  "instructor": "R2BOT",
+  "presenters": [
+    "Dot",
+    "Bo",
+    "Pip",
+    "Ari"
+  ],
+  "updated": "2026-11-07",
+  "availability": "ready",
+  "minutes": 40,
+  "outcomes": [
+    "Identify the parts of a small robot kit",
+    "Power a robot safely",
+    "Make a robot drive and steer with two wheels",
+    "Use a distance sensor so the robot avoids walls",
+    "Find and fix problems step by step, and follow a line"
+  ],
+  "finalActivity": {
+    "lessonId": "10-the-big-day",
+    "title": "Present your finished robot",
+    "prompt": "Describe your finished robot: what it does, how you built it and one problem you fixed along the way. Say how you tested it on a track."
+  },
+  "lessons": [
+    {
+      "id": "01-the-box-of-parts",
+      "title": "The Box of Parts",
+      "summary": "Identify each part in a small robot kit and what it is for.",
+      "youtubeId": "",
+      "videoNo": 11,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Which part in a robot kit is the brain?",
+          "options": [
+            "The battery clip",
+            "The control board",
+            "The wheel"
+          ],
+          "answer": 1,
+          "why": "The control board runs the program."
+        },
+        {
+          "q": "What do the motors do?",
+          "options": [
+            "Turn the wheels",
+            "Store the program",
+            "Measure distance"
+          ],
+          "answer": 0,
+          "why": "Motors spin the wheels so the robot moves."
+        },
+        {
+          "q": "What is a chassis?",
+          "options": [
+            "A type of battery",
+            "The frame that holds all the parts",
+            "A kind of sensor"
+          ],
+          "answer": 1,
+          "why": "The chassis is the body everything is mounted on."
+        },
+        {
+          "q": "Why should you lay out and name every part before building?",
+          "options": [
+            "Because the parts expire",
+            "To make the box lighter",
+            "So you know what each part is for and nothing is missing"
+          ],
+          "answer": 2,
+          "why": "Knowing the parts first prevents mistakes later."
+        }
+      ]
+    },
+    {
+      "id": "02-power",
+      "title": "Power",
+      "summary": "Connect batteries safely and explain why polarity matters.",
+      "youtubeId": "",
+      "videoNo": 12,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What does polarity mean for a battery?",
+          "options": [
+            "How heavy it is",
+            "What colour it is",
+            "Which end is positive and which is negative"
+          ],
+          "answer": 2,
+          "why": "Batteries have a plus and a minus side."
+        },
+        {
+          "q": "What can happen if you connect power the wrong way round?",
+          "options": [
+            "Nothing ever happens",
+            "The robot gets faster",
+            "Parts can be damaged"
+          ],
+          "answer": 2,
+          "why": "Reversed power can burn or break electronic parts."
+        },
+        {
+          "q": "Before connecting the battery you should…",
+          "options": [
+            "Check the plus and minus marks",
+            "Shake the battery",
+            "Remove all wheels"
+          ],
+          "answer": 0,
+          "why": "Always check the marks before connecting."
+        },
+        {
+          "q": "If a wire or battery feels hot, you should…",
+          "options": [
+            "Keep going",
+            "Disconnect the power and check",
+            "Cover it with tape"
+          ],
+          "answer": 1,
+          "why": "Hot parts are a warning sign, so disconnect and check."
+        }
+      ]
+    },
+    {
+      "id": "03-the-brain",
+      "title": "The Brain",
+      "summary": "Power up the control board and see the first sign of life.",
+      "youtubeId": "",
+      "videoNo": 13,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is a good first sign that the control board is working?",
+          "options": [
+            "The wheels fall off",
+            "A light turns on or blinks",
+            "The battery disappears"
+          ],
+          "answer": 1,
+          "why": "A power or test light shows the board has power."
+        },
+        {
+          "q": "What does the control board do with a program?",
+          "options": [
+            "Prints it on paper",
+            "Runs it step by step",
+            "Charges the battery"
+          ],
+          "answer": 1,
+          "why": "The board follows the program's instructions in order."
+        },
+        {
+          "q": "If the board shows no light at all, check…",
+          "options": [
+            "The power connection first",
+            "The room temperature",
+            "The wheel colour"
+          ],
+          "answer": 0,
+          "why": "No light usually points to a power problem."
+        },
+        {
+          "q": "A simple first program is to…",
+          "options": [
+            "Build a city map",
+            "Recognise faces",
+            "Blink a light"
+          ],
+          "answer": 2,
+          "why": "Blinking a light proves the board and program work."
+        }
+      ]
+    },
+    {
+      "id": "04-first-moves",
+      "title": "First Moves",
+      "summary": "Fit the motors and wheels and explain how two wheels steer.",
+      "youtubeId": "",
+      "videoNo": 14,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "How can a robot with two driven wheels turn left?",
+          "options": [
+            "Spin both wheels equally",
+            "Remove a wheel",
+            "Turn the right wheel faster than the left"
+          ],
+          "answer": 2,
+          "why": "Different wheel speeds make the robot turn."
+        },
+        {
+          "q": "If both wheels spin the same speed forward, the robot…",
+          "options": [
+            "Spins on the spot",
+            "Goes straight",
+            "Flies"
+          ],
+          "answer": 1,
+          "why": "Equal speeds give a straight line."
+        },
+        {
+          "q": "If one wheel goes forward and the other backward, the robot…",
+          "options": [
+            "Goes straight",
+            "Stops moving",
+            "Spins in place"
+          ],
+          "answer": 2,
+          "why": "Opposite directions make it spin on the spot."
+        },
+        {
+          "q": "Why should the wheels be fitted firmly?",
+          "options": [
+            "So they do not wobble or slip off",
+            "Because loose wheels are faster",
+            "So the robot looks nicer"
+          ],
+          "answer": 0,
+          "why": "Loose wheels cause unreliable movement."
+        }
+      ]
+    },
+    {
+      "id": "05-first-eyes",
+      "title": "First Eyes",
+      "summary": "Make the robot drive and understand why it needs eyes.",
+      "youtubeId": "",
+      "videoNo": 15,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Without sensors, a driving robot will…",
+          "options": [
+            "Always avoid walls",
+            "Keep going even when it should stop",
+            "Know where it is"
+          ],
+          "answer": 1,
+          "why": "Without sensing, it cannot react to anything."
+        },
+        {
+          "q": "What does 'eyes' mean for a robot?",
+          "options": [
+            "Painted decoration",
+            "A bright light bulb",
+            "Sensors that tell it about the world"
+          ],
+          "answer": 2,
+          "why": "Sensors are the robot's eyes."
+        },
+        {
+          "q": "Why test driving on a clear floor first?",
+          "options": [
+            "To drain the battery",
+            "Because walls are not allowed",
+            "To see how it moves before adding complexity"
+          ],
+          "answer": 2,
+          "why": "Testing simple behaviour first makes problems easier to spot."
+        },
+        {
+          "q": "If the robot drives crooked, a likely cause is…",
+          "options": [
+            "The two motors run at different speeds",
+            "The robot is too quiet",
+            "Too much sunlight"
+          ],
+          "answer": 0,
+          "why": "Uneven motors make a robot veer."
+        }
+      ]
+    },
+    {
+      "id": "06-decisions",
+      "title": "Decisions",
+      "summary": "Use a distance sensor so the robot decides what to do near a wall.",
+      "youtubeId": "",
+      "videoNo": 16,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What does a distance sensor tell the robot?",
+          "options": [
+            "How heavy it is",
+            "What colour it is",
+            "How far away something is"
+          ],
+          "answer": 2,
+          "why": "It measures distance to objects."
+        },
+        {
+          "q": "A simple decision rule is…",
+          "options": [
+            "Ignore the sensor",
+            "If the wall is close, turn away",
+            "If the wall is close, speed up"
+          ],
+          "answer": 1,
+          "why": "Turning away avoids hitting the wall."
+        },
+        {
+          "q": "Why choose a distance at which to react?",
+          "options": [
+            "To make the sensor louder",
+            "To leave room to stop or turn in time",
+            "To save paint"
+          ],
+          "answer": 1,
+          "why": "Reacting early gives space to stop."
+        },
+        {
+          "q": "This sense-then-decide pattern is called…",
+          "options": [
+            "Charge, wait, stop",
+            "Cut, paste, save",
+            "Sense, think, act"
+          ],
+          "answer": 2,
+          "why": "The robot senses, thinks, then acts."
+        }
+      ]
+    },
+    {
+      "id": "07-when-things-go-wrong",
+      "title": "When Things Go Wrong",
+      "summary": "Find a problem step by step instead of guessing.",
+      "youtubeId": "",
+      "videoNo": 17,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is a good first step when a robot misbehaves?",
+          "options": [
+            "Check one thing at a time, starting with power",
+            "Change everything at once",
+            "Give up"
+          ],
+          "answer": 0,
+          "why": "Checking one thing at a time finds the real cause."
+        },
+        {
+          "q": "Why change only one thing between tests?",
+          "options": [
+            "To finish faster",
+            "So you know which change fixed or broke it",
+            "To use fewer batteries"
+          ],
+          "answer": 1,
+          "why": "One change at a time makes the cause clear."
+        },
+        {
+          "q": "A loose wire is best found by…",
+          "options": [
+            "Gently checking each connection",
+            "Hitting the robot",
+            "Replacing the control board"
+          ],
+          "answer": 0,
+          "why": "Checking connections one by one is simple and safe."
+        },
+        {
+          "q": "Writing down what you tried helps because…",
+          "options": [
+            "It makes the robot lighter",
+            "It charges the battery",
+            "You avoid repeating the same test"
+          ],
+          "answer": 2,
+          "why": "Notes stop you going round in circles."
+        }
+      ]
+    },
+    {
+      "id": "08-follow-the-line",
+      "title": "Follow the Line",
+      "summary": "Explain how a robot follows a line using light sensors.",
+      "youtubeId": "",
+      "videoNo": 18,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "How does a line sensor tell dark from light?",
+          "options": [
+            "It reads colours by taste",
+            "A dark line reflects less light than the floor",
+            "Dark lines make noise"
+          ],
+          "answer": 1,
+          "why": "The sensor measures reflected light."
+        },
+        {
+          "q": "If the left sensor sees the line, the robot should…",
+          "options": [
+            "Steer right",
+            "Steer left to get back on it",
+            "Stop forever"
+          ],
+          "answer": 1,
+          "why": "Steer towards the side that sees the line."
+        },
+        {
+          "q": "Why do two sensors work better than one?",
+          "options": [
+            "They make the robot taller",
+            "They double the battery",
+            "They show which side the line is on"
+          ],
+          "answer": 2,
+          "why": "Two sensors reveal the direction to correct."
+        },
+        {
+          "q": "A line-following robot works by repeating…",
+          "options": [
+            "Sense the line, decide, steer",
+            "Build, paint, sell",
+            "Charge, sleep, wake"
+          ],
+          "answer": 0,
+          "why": "It runs the sense-think-act loop continuously."
+        }
+      ]
+    },
+    {
+      "id": "09-pip-meets-the-world",
+      "title": "Pip Meets the World",
+      "summary": "Prepare a robot for light, floors and surprises outside the bench.",
+      "youtubeId": "",
+      "videoNo": 19,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Why might strong sunlight confuse a line sensor?",
+          "options": [
+            "It makes the battery bigger",
+            "It adds extra light the sensor did not expect",
+            "It turns wheels backward"
+          ],
+          "answer": 1,
+          "why": "Bright light changes what the sensor reads."
+        },
+        {
+          "q": "Different floors can change a robot because…",
+          "options": [
+            "Floors recharge the battery",
+            "Wheels grip differently on different surfaces",
+            "Floors change the code"
+          ],
+          "answer": 1,
+          "why": "Grip changes how the robot moves."
+        },
+        {
+          "q": "Before taking a robot somewhere new, you should…",
+          "options": [
+            "Remove the sensors",
+            "Test it there and adjust settings",
+            "Assume it will work"
+          ],
+          "answer": 1,
+          "why": "Test in the real place and adjust."
+        },
+        {
+          "q": "A good way to handle surprises is to…",
+          "options": [
+            "Hope nothing happens",
+            "Plan a safe stop if something is wrong",
+            "Run faster"
+          ],
+          "answer": 1,
+          "why": "A safe stop limits harm when something unexpected happens."
+        }
+      ]
+    },
+    {
+      "id": "10-the-big-day",
+      "title": "The Big Day",
+      "summary": "Present a finished robot and explain what it can do.",
+      "youtubeId": "",
+      "videoNo": 20,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "When presenting your robot, start by saying…",
+          "options": [
+            "The price of every part",
+            "Nothing at all",
+            "What job it does"
+          ],
+          "answer": 2,
+          "why": "Begin with the job so people understand the purpose."
+        },
+        {
+          "q": "Before a demo you should…",
+          "options": [
+            "Run it a few times on the real track",
+            "Change the code at the last second",
+            "Skip testing"
+          ],
+          "answer": 0,
+          "why": "Practice runs catch problems early."
+        },
+        {
+          "q": "If the demo fails, a good response is to…",
+          "options": [
+            "Hide the robot",
+            "Blame the audience",
+            "Explain what happened and try again"
+          ],
+          "answer": 2,
+          "why": "Calm debugging is part of robotics."
+        },
+        {
+          "q": "What shows that a robot is working well?",
+          "options": [
+            "It is very loud",
+            "It does its job reliably several times",
+            "It looks shiny"
+          ],
+          "answer": 1,
+          "why": "Repeatable success is the real test."
+        }
+      ]
+    }
+  ]
+}

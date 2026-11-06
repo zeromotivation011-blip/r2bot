@@ -1,0 +1,536 @@
+{
+  "title": "Robot Arms: Build Ari",
+  "order": 3,
+  "tagline": "Build a small robot arm, then teach it to pick up a cup.",
+  "description": "Build a small robot arm: servos, joints, smooth motion, a gentle gripper, calibration and a pick and place job.",
+  "outcome": "After this course you can plan and build a small robot arm and make it pick up and place an object.",
+  "level": "Intermediate",
+  "levelLabel": "Beginner to intermediate",
+  "whoFor": "Learners who want to build a small robot arm and make it pick up things.",
+  "prerequisites": "Course 2 recommended.",
+  "status": "published",
+  "instructor": "R2BOT",
+  "presenters": [
+    "Dot",
+    "Bo",
+    "Pip",
+    "Ari"
+  ],
+  "updated": "2026-11-07",
+  "availability": "soon",
+  "minutes": 45,
+  "outcomes": [
+    "Plan a robot arm from a job description",
+    "Explain how a servo holds an angle",
+    "Count joints and degrees of freedom",
+    "Make arm motion smooth, and build a gentle gripper",
+    "Calibrate the arm and run a pick and place job"
+  ],
+  "finalActivity": {
+    "lessonId": "10-the-first-job-together",
+    "title": "Drive, pick and drop",
+    "prompt": "Describe the drive, pick and drop job you built: list the steps in order, say what can go wrong at each step and how your robot handles it."
+  },
+  "lessons": [
+    {
+      "id": "01-the-arm-box-and-the-plan",
+      "title": "The arm box and the plan",
+      "summary": "Plan a robot arm: what it must do, and which parts it needs.",
+      "youtubeId": "",
+      "videoNo": 21,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What should you decide first when planning a robot arm?",
+          "options": [
+            "The colour",
+            "The name of the box",
+            "The job it must do"
+          ],
+          "answer": 2,
+          "why": "The job decides the reach, strength and parts."
+        },
+        {
+          "q": "If the arm must pick up a cup, which feature matters?",
+          "options": [
+            "A gripper that opens wide enough",
+            "Flashing lights",
+            "A very loud motor"
+          ],
+          "answer": 0,
+          "why": "The gripper must fit the cup."
+        },
+        {
+          "q": "Reach means…",
+          "options": [
+            "How heavy it is",
+            "How fast it spins",
+            "How far the arm can extend"
+          ],
+          "answer": 2,
+          "why": "Reach is the distance the arm can get to."
+        },
+        {
+          "q": "Why make a parts list before building?",
+          "options": [
+            "To make the arm lighter",
+            "To avoid reading instructions",
+            "To check you have what the job needs"
+          ],
+          "answer": 2,
+          "why": "A list shows missing parts early."
+        }
+      ]
+    },
+    {
+      "id": "02-inside-a-servo",
+      "title": "Inside a servo",
+      "summary": "Explain what a servo is and how it holds an angle.",
+      "youtubeId": "",
+      "videoNo": 22,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is special about a servo?",
+          "options": [
+            "It can move to and hold an angle",
+            "It only makes light",
+            "It only spins forever"
+          ],
+          "answer": 0,
+          "why": "A servo goes to a set angle and holds it."
+        },
+        {
+          "q": "What lets a servo know its angle?",
+          "options": [
+            "A position sensor inside",
+            "A timer on the wall",
+            "The colour of the case"
+          ],
+          "answer": 0,
+          "why": "A sensor reports the shaft position."
+        },
+        {
+          "q": "A servo is told which angle to go to by…",
+          "options": [
+            "A battery sticker",
+            "Gravity",
+            "A control signal"
+          ],
+          "answer": 2,
+          "why": "The control signal sets the target angle."
+        },
+        {
+          "q": "If a servo is asked to hold an angle and is pushed, it will…",
+          "options": [
+            "Turn into a motor",
+            "Break instantly",
+            "Push back to return to the angle"
+          ],
+          "answer": 2,
+          "why": "Feedback makes it correct itself."
+        }
+      ]
+    },
+    {
+      "id": "03-joints-and-degrees-of-freedom",
+      "title": "Joints and degrees of freedom",
+      "summary": "Count how many ways an arm can move.",
+      "youtubeId": "",
+      "videoNo": 23,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is a degree of freedom?",
+          "options": [
+            "One independent way a part can move",
+            "One screw",
+            "One battery"
+          ],
+          "answer": 0,
+          "why": "Each independent motion adds a degree of freedom."
+        },
+        {
+          "q": "An arm with three joints that each turn has…",
+          "options": [
+            "Three degrees of freedom",
+            "One degree of freedom",
+            "No degrees of freedom"
+          ],
+          "answer": 0,
+          "why": "Each turning joint adds one."
+        },
+        {
+          "q": "Why do more degrees of freedom help?",
+          "options": [
+            "The arm uses no power",
+            "The arm can reach more positions",
+            "The arm gets lighter"
+          ],
+          "answer": 1,
+          "why": "More ways to move means more places it can reach."
+        },
+        {
+          "q": "What is a downside of too many joints?",
+          "options": [
+            "More to control and more that can go wrong",
+            "It cannot move",
+            "It looks smaller"
+          ],
+          "answer": 0,
+          "why": "Extra joints add complexity."
+        }
+      ]
+    },
+    {
+      "id": "04-smooth-motion",
+      "title": "Smooth motion",
+      "summary": "Make the arm move gently instead of snapping to a position.",
+      "youtubeId": "",
+      "videoNo": 24,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Why is snapping suddenly to a position a problem?",
+          "options": [
+            "It saves time always",
+            "It cannot happen",
+            "It can shake the arm or drop things"
+          ],
+          "answer": 2,
+          "why": "Sudden moves cause jerks and drops."
+        },
+        {
+          "q": "How do you make an arm move smoothly?",
+          "options": [
+            "Jump straight to the target",
+            "Move in many small steps toward the target",
+            "Turn the servo off"
+          ],
+          "answer": 1,
+          "why": "Small steps spread the move over time."
+        },
+        {
+          "q": "Slowing down near the end of a move helps because…",
+          "options": [
+            "The arm arrives gently without overshoot",
+            "The battery lasts forever",
+            "The servo gets louder"
+          ],
+          "answer": 0,
+          "why": "Easing in stops overshoot."
+        },
+        {
+          "q": "A gentler move is also kinder to…",
+          "options": [
+            "The room lights",
+            "The gears and the object being carried",
+            "The internet"
+          ],
+          "answer": 1,
+          "why": "Smooth motion reduces wear and drops."
+        }
+      ]
+    },
+    {
+      "id": "05-the-gripper",
+      "title": "The gripper",
+      "summary": "Design a gripper that holds a cup without crushing it.",
+      "youtubeId": "",
+      "videoNo": 25,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is the goal of a good gripper?",
+          "options": [
+            "Never close",
+            "Hold firmly but not crush",
+            "Squeeze as hard as possible"
+          ],
+          "answer": 1,
+          "why": "Enough grip to hold, not enough to damage."
+        },
+        {
+          "q": "Soft pads on the fingers help because…",
+          "options": [
+            "They make it heavier",
+            "They grip better and protect the object",
+            "They block the servo"
+          ],
+          "answer": 1,
+          "why": "Soft pads add friction and cushioning."
+        },
+        {
+          "q": "How can you stop a gripper crushing a cup?",
+          "options": [
+            "Make it close fully every time",
+            "Limit how far or how hard it closes",
+            "Remove the servo"
+          ],
+          "answer": 1,
+          "why": "Limiting the closing stops over-squeezing."
+        },
+        {
+          "q": "Why test the gripper on the real cup?",
+          "options": [
+            "Cups are free",
+            "Real objects behave differently from guesses",
+            "It is required by law"
+          ],
+          "answer": 1,
+          "why": "Testing on the real thing reveals problems."
+        }
+      ]
+    },
+    {
+      "id": "06-reach-and-geometry",
+      "title": "Reach and geometry",
+      "summary": "Use two links and angles to reach a point.",
+      "youtubeId": "",
+      "videoNo": 26,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "An arm made of two links is useful because…",
+          "options": [
+            "It cannot bend",
+            "It is always fixed in place",
+            "Changing the angles moves the hand to different points"
+          ],
+          "answer": 2,
+          "why": "Two links with angles can reach many positions."
+        },
+        {
+          "q": "To reach a farther point, the arm should…",
+          "options": [
+            "Spin the base only",
+            "Fold up completely",
+            "Straighten its joints more"
+          ],
+          "answer": 2,
+          "why": "Straighter links reach farther."
+        },
+        {
+          "q": "Angles and link lengths together decide…",
+          "options": [
+            "Where the hand ends up",
+            "The battery size",
+            "The gripper colour"
+          ],
+          "answer": 0,
+          "why": "Geometry links joint angles to hand position."
+        },
+        {
+          "q": "If a point is beyond the arm's reach, the arm…",
+          "options": [
+            "Reaches it by turning faster",
+            "Reaches it with a new battery",
+            "Cannot reach it however it moves"
+          ],
+          "answer": 2,
+          "why": "Reach is limited by link lengths."
+        }
+      ]
+    },
+    {
+      "id": "07-calibration",
+      "title": "Calibration",
+      "summary": "Fix small errors so the arm goes where it should.",
+      "youtubeId": "",
+      "videoNo": 27,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What does calibration do?",
+          "options": [
+            "Paints the arm",
+            "Matches the arm's real position to what you ask for",
+            "Charges the battery"
+          ],
+          "answer": 1,
+          "why": "Calibration corrects small errors."
+        },
+        {
+          "q": "Why can an arm miss its target slightly?",
+          "options": [
+            "Parts are slightly loose or off-centre",
+            "The arm is too clever",
+            "The room is too bright"
+          ],
+          "answer": 0,
+          "why": "Small mechanical errors add up."
+        },
+        {
+          "q": "A good way to calibrate is to…",
+          "options": [
+            "Move to known positions and adjust until they match",
+            "Guess",
+            "Skip it"
+          ],
+          "answer": 0,
+          "why": "Compare against known spots and adjust."
+        },
+        {
+          "q": "After calibrating you should…",
+          "options": [
+            "Rebuild everything",
+            "Never use the arm",
+            "Test again to check the fix"
+          ],
+          "answer": 2,
+          "why": "Retesting confirms the improvement."
+        }
+      ]
+    },
+    {
+      "id": "08-pick-and-place",
+      "title": "Pick and place",
+      "summary": "Break a job into steps using a simple state machine.",
+      "youtubeId": "",
+      "videoNo": 28,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is a state machine?",
+          "options": [
+            "A big motor",
+            "A kind of battery",
+            "A list of steps where the robot is in one step at a time"
+          ],
+          "answer": 2,
+          "why": "A robot moves from one named step to the next."
+        },
+        {
+          "q": "A pick job might have steps…",
+          "options": [
+            "Move above, lower, close gripper, lift",
+            "Paint, dry, sell",
+            "Charge, sleep, wake"
+          ],
+          "answer": 0,
+          "why": "Pick is a clear sequence of small actions."
+        },
+        {
+          "q": "Why split the job into steps?",
+          "options": [
+            "It uses fewer motors",
+            "It makes the arm louder",
+            "Each step is easy to test and fix"
+          ],
+          "answer": 2,
+          "why": "Small steps make debugging easier."
+        },
+        {
+          "q": "What should happen if a step fails?",
+          "options": [
+            "Spin faster",
+            "The robot goes to a safe step or stops",
+            "Keep going blindly"
+          ],
+          "answer": 1,
+          "why": "Plan what to do when something goes wrong."
+        }
+      ]
+    },
+    {
+      "id": "09-mounting-ari-on-pip",
+      "title": "Mounting Ari on Pip",
+      "summary": "Join two robots and keep them stable.",
+      "youtubeId": "",
+      "videoNo": 29,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is the main risk when putting an arm on a wheeled robot?",
+          "options": [
+            "The arm will vanish",
+            "The robot may tip over",
+            "The wheels turn to metal"
+          ],
+          "answer": 1,
+          "why": "An extended arm shifts the weight."
+        },
+        {
+          "q": "To keep the robot stable you can…",
+          "options": [
+            "Hold the arm high",
+            "Keep the arm low and the weight central",
+            "Remove the wheels"
+          ],
+          "answer": 1,
+          "why": "A low, centred weight resists tipping."
+        },
+        {
+          "q": "Why check the power supply when joining the robots?",
+          "options": [
+            "Power is not needed",
+            "Batteries are decorative",
+            "Both need enough power to run together"
+          ],
+          "answer": 2,
+          "why": "More motors need more power."
+        },
+        {
+          "q": "Before running the combined robot you should…",
+          "options": [
+            "Run it fast at once",
+            "Skip all checks",
+            "Test each part alone, then together"
+          ],
+          "answer": 2,
+          "why": "Testing step by step finds problems safely."
+        }
+      ]
+    },
+    {
+      "id": "10-the-first-job-together",
+      "title": "The first job together",
+      "summary": "Combine driving and picking into one job.",
+      "youtubeId": "",
+      "videoNo": 30,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "A drive, pick and drop job is made of…",
+          "options": [
+            "Several small steps in order",
+            "No steps",
+            "One huge step"
+          ],
+          "answer": 0,
+          "why": "Break the job into drive, pick and drop."
+        },
+        {
+          "q": "Why should the robot stop before picking?",
+          "options": [
+            "Moving while picking makes errors",
+            "It is a rule of physics that robots rest",
+            "Stopping uses fewer motors"
+          ],
+          "answer": 0,
+          "why": "Standing still gives a steadier pick."
+        },
+        {
+          "q": "What should you do if the cup is missed?",
+          "options": [
+            "Drive away",
+            "Break the gripper",
+            "Back up and try again safely"
+          ],
+          "answer": 2,
+          "why": "Plan a retry for common failures."
+        },
+        {
+          "q": "The best sign the job works is…",
+          "options": [
+            "It is shiny",
+            "It succeeds once by luck",
+            "It succeeds several times in a row"
+          ],
+          "answer": 2,
+          "why": "Repeatability shows it really works."
+        }
+      ]
+    }
+  ]
+}

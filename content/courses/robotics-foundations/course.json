@@ -1,0 +1,536 @@
+{
+  "title": "Robotics Foundations",
+  "order": 1,
+  "tagline": "How any robot senses, thinks and acts, explained with no jargon.",
+  "description": "Learn how robots work with no jargon. Ten short story-based lessons on sensors, motors, walking and learning.",
+  "outcome": "After this course you can explain how a robot works, name its main parts, and describe how it learns.",
+  "level": "Beginner",
+  "levelLabel": "Beginner, no experience needed",
+  "whoFor": "Curious beginners, students from about age 12, parents and teachers who want a gentle first look at robotics.",
+  "prerequisites": "None. No maths or coding needed.",
+  "status": "published",
+  "instructor": "R2BOT",
+  "presenters": [
+    "Dot",
+    "Bo",
+    "Pip",
+    "Ari"
+  ],
+  "updated": "2026-11-07",
+  "availability": "ready",
+  "minutes": 40,
+  "outcomes": [
+    "Explain how a robot senses, thinks and acts",
+    "Name the main kinds of robots and what each is good at",
+    "Describe how sensors and motors work",
+    "Explain, in simple words, how robots walk and learn",
+    "Describe where robots really work today"
+  ],
+  "finalActivity": {
+    "lessonId": "10-future-and-your-first-robot",
+    "title": "Choose a small job for a robot",
+    "prompt": "Choose a small job for a robot and write it in one sentence. Then say what it must sense, what it must decide and what it must do."
+  },
+  "lessons": [
+    {
+      "id": "01-before-robots",
+      "title": "Before Robots",
+      "summary": "Explain how a self-opening temple door shows the idea of a machine acting on its own.",
+      "youtubeId": "",
+      "videoNo": 1,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What makes a self-opening door an early example of a machine acting on its own?",
+          "options": [
+            "A person pulls it open by hand",
+            "It is simply very light",
+            "A hidden mechanism reacts and opens it without anyone pushing"
+          ],
+          "answer": 2,
+          "why": "Such doors used a mechanism (heat, steam or weights) so the door moved by itself."
+        },
+        {
+          "q": "The big idea behind a robot is a machine that…",
+          "options": [
+            "Looks like a person",
+            "Does a job without a person controlling every step",
+            "Only works in factories"
+          ],
+          "answer": 1,
+          "why": "Acting on its own, without step-by-step human control, is the core idea."
+        },
+        {
+          "q": "Which of these is NOT needed for a machine to act on its own?",
+          "options": [
+            "A way to move",
+            "A human face",
+            "Something that triggers it"
+          ],
+          "answer": 1,
+          "why": "A face is optional; a trigger and a way to move are what matter."
+        },
+        {
+          "q": "Why do people study old machines when learning robotics?",
+          "options": [
+            "They show ideas that modern robots still use",
+            "Robots were invented last year",
+            "Old machines are always better"
+          ],
+          "answer": 0,
+          "why": "Many robot ideas, like reacting to the world, started long ago."
+        }
+      ]
+    },
+    {
+      "id": "02-rules-to-robots-at-work",
+      "title": "From Rules to Robots at Work",
+      "summary": "Describe what the first industrial robot arm did and why it mattered.",
+      "youtubeId": "",
+      "videoNo": 2,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What did the first industrial robot arm mostly do?",
+          "options": [
+            "Cook meals at home",
+            "Repeat a dull, heavy or dangerous job in a factory",
+            "Drive cars on the road"
+          ],
+          "answer": 1,
+          "why": "Early industrial arms lifted and moved parts in factories."
+        },
+        {
+          "q": "Why was it useful to let a robot arm do dangerous factory jobs?",
+          "options": [
+            "It removed the need for electricity",
+            "It made the factory quieter",
+            "It kept people away from harm"
+          ],
+          "answer": 2,
+          "why": "Moving danger from people to machines was a major benefit."
+        },
+        {
+          "q": "An early robot arm followed…",
+          "options": [
+            "Its own feelings",
+            "Instructions shouted from across the room",
+            "A fixed list of stored steps"
+          ],
+          "answer": 2,
+          "why": "It replayed steps it had been taught, over and over."
+        },
+        {
+          "q": "What was the main limit of those first arms?",
+          "options": [
+            "They were too slow to be used",
+            "They could not cope when the job changed unexpectedly",
+            "They needed no power"
+          ],
+          "answer": 1,
+          "why": "Fixed rules work only while the situation stays the same."
+        }
+      ]
+    },
+    {
+      "id": "03-kinds-of-robots",
+      "title": "Kinds of Robots",
+      "summary": "Group robots by how they move: rolling, walking, flying and fixed.",
+      "youtubeId": "",
+      "videoNo": 3,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "A robot vacuum belongs to which group?",
+          "options": [
+            "Rolling",
+            "Flying",
+            "Fixed"
+          ],
+          "answer": 0,
+          "why": "It moves on wheels, so it is a rolling robot."
+        },
+        {
+          "q": "A factory robot arm bolted to the floor is…",
+          "options": [
+            "Flying",
+            "Walking",
+            "Fixed"
+          ],
+          "answer": 2,
+          "why": "It stays in one place and reaches around, so it is a fixed robot."
+        },
+        {
+          "q": "Which robot group is usually best for looking at a large field from above?",
+          "options": [
+            "Walking",
+            "Fixed",
+            "Flying"
+          ],
+          "answer": 2,
+          "why": "Drones see wide areas from the air."
+        },
+        {
+          "q": "Why might a designer choose a walking robot over a rolling one?",
+          "options": [
+            "It never falls over",
+            "It uses less power always",
+            "It can cross stairs and rough ground"
+          ],
+          "answer": 2,
+          "why": "Legs can step over obstacles that wheels cannot."
+        }
+      ]
+    },
+    {
+      "id": "04-how-robots-sense",
+      "title": "How Robots Sense",
+      "summary": "Explain what sensors do and name a few kinds.",
+      "youtubeId": "",
+      "videoNo": 4,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What does a sensor do?",
+          "options": [
+            "Stores the battery power",
+            "Turns something in the world into a signal the robot can use",
+            "Moves the wheels"
+          ],
+          "answer": 1,
+          "why": "Sensors measure things like light, distance or touch."
+        },
+        {
+          "q": "Which sensor helps a robot judge how far away a wall is?",
+          "options": [
+            "Speaker",
+            "Battery gauge",
+            "Distance sensor"
+          ],
+          "answer": 2,
+          "why": "A distance sensor measures how far an object is."
+        },
+        {
+          "q": "A camera helps a robot mainly to…",
+          "options": [
+            "Feel temperature",
+            "Hear music",
+            "See shapes and colours"
+          ],
+          "answer": 2,
+          "why": "A camera captures images."
+        },
+        {
+          "q": "Why do many robots use more than one kind of sensor?",
+          "options": [
+            "One sensor is too heavy",
+            "Each sensor has things it cannot measure",
+            "Robots are required to by law"
+          ],
+          "answer": 1,
+          "why": "Different sensors cover each other's blind spots."
+        }
+      ]
+    },
+    {
+      "id": "05-how-a-robot-thinks",
+      "title": "How a Robot Thinks",
+      "summary": "Describe the sense-think-act loop using a robot vacuum.",
+      "youtubeId": "",
+      "videoNo": 5,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What are the three steps of the loop?",
+          "options": [
+            "Sense, think, act",
+            "Build, test, sell",
+            "Charge, wait, stop"
+          ],
+          "answer": 0,
+          "why": "A robot senses, decides, then acts, again and again."
+        },
+        {
+          "q": "A robot vacuum bumps into a chair leg. Which step is that?",
+          "options": [
+            "Think",
+            "Act",
+            "Sense"
+          ],
+          "answer": 2,
+          "why": "The bump is the robot sensing something."
+        },
+        {
+          "q": "After sensing the chair, the vacuum turns away. Turning is the…",
+          "options": [
+            "Sense step",
+            "Charge step",
+            "Act step"
+          ],
+          "answer": 2,
+          "why": "Turning is the action that follows the decision."
+        },
+        {
+          "q": "Why does the loop keep repeating?",
+          "options": [
+            "It cannot remember anything",
+            "To waste battery",
+            "The world keeps changing, so the robot keeps checking"
+          ],
+          "answer": 2,
+          "why": "Repeating lets the robot correct itself as things change."
+        }
+      ]
+    },
+    {
+      "id": "06-how-a-robot-acts",
+      "title": "How a Robot Acts",
+      "summary": "Explain how motors turn a decision into movement.",
+      "youtubeId": "",
+      "videoNo": 6,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What turns a robot's decision into movement?",
+          "options": [
+            "Motors and other actuators",
+            "The paint",
+            "The charger label"
+          ],
+          "answer": 0,
+          "why": "Actuators such as motors create motion."
+        },
+        {
+          "q": "A motor mainly changes electrical energy into…",
+          "options": [
+            "Movement",
+            "Light only",
+            "Sound only"
+          ],
+          "answer": 0,
+          "why": "Electric motors turn electricity into spinning motion."
+        },
+        {
+          "q": "What can a gear do for a motor?",
+          "options": [
+            "Trade speed for strength",
+            "Make it silent",
+            "Store data"
+          ],
+          "answer": 0,
+          "why": "Gears can give more turning force at lower speed."
+        },
+        {
+          "q": "If a robot makes a decision but has no actuator, what happens?",
+          "options": [
+            "It repairs itself",
+            "Nothing moves",
+            "It flies"
+          ],
+          "answer": 1,
+          "why": "Without an actuator the decision cannot become movement."
+        }
+      ]
+    },
+    {
+      "id": "07-how-robots-walk",
+      "title": "How Robots Walk",
+      "summary": "Explain why walking is harder than rolling and how balance is kept.",
+      "youtubeId": "",
+      "videoNo": 7,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Why is walking harder than rolling for a robot?",
+          "options": [
+            "Legs are always heavier than wheels",
+            "Walking uses no sensors",
+            "It must keep balance while each foot lifts"
+          ],
+          "answer": 2,
+          "why": "A walking robot is constantly at risk of falling over."
+        },
+        {
+          "q": "Which sensor helps a walking robot know if it is tilting?",
+          "options": [
+            "A microphone",
+            "A tilt (balance) sensor",
+            "A thermometer"
+          ],
+          "answer": 1,
+          "why": "Balance sensors tell the robot how it is leaning."
+        },
+        {
+          "q": "When a walking robot starts to lean, it should…",
+          "options": [
+            "Ignore it",
+            "Move a foot or shift weight to stay up",
+            "Turn off all sensors"
+          ],
+          "answer": 1,
+          "why": "Constant small corrections keep a robot upright."
+        },
+        {
+          "q": "Why are wheels often chosen when the floor is flat and smooth?",
+          "options": [
+            "They climb stairs better",
+            "They are simpler and steadier",
+            "They never wear out"
+          ],
+          "answer": 1,
+          "why": "On smooth floors wheels are simple and stable."
+        }
+      ]
+    },
+    {
+      "id": "08-how-robots-learn",
+      "title": "How Robots Learn",
+      "summary": "Explain learning from practice instead of writing a rule for every case.",
+      "youtubeId": "",
+      "videoNo": 8,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What is the idea behind a robot learning from practice?",
+          "options": [
+            "It improves by trying and seeing what works",
+            "It copies the weather",
+            "A person writes every rule in advance"
+          ],
+          "answer": 0,
+          "why": "Learning means improving from experience."
+        },
+        {
+          "q": "Why not just write a rule for every case?",
+          "options": [
+            "Rules are illegal",
+            "There are far too many cases to list",
+            "Robots cannot read"
+          ],
+          "answer": 1,
+          "why": "The real world has too many situations to cover with hand-written rules."
+        },
+        {
+          "q": "In practice learning, a good result usually earns…",
+          "options": [
+            "A louder motor",
+            "A new battery",
+            "A reward that tells the robot it did well"
+          ],
+          "answer": 2,
+          "why": "Rewards guide the robot toward better choices."
+        },
+        {
+          "q": "Which is an example of a robot learning?",
+          "options": [
+            "It gets better at grasping after many tries",
+            "It follows one fixed script forever",
+            "It switches off to save power"
+          ],
+          "answer": 0,
+          "why": "Getting better with tries is learning."
+        }
+      ]
+    },
+    {
+      "id": "09-robots-at-work",
+      "title": "Robots at Work",
+      "summary": "Describe where robots help people in factories, farms and hospitals.",
+      "youtubeId": "",
+      "videoNo": 9,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "A common robot job in factories is…",
+          "options": [
+            "Writing poems",
+            "Teaching school",
+            "Moving and assembling parts"
+          ],
+          "answer": 2,
+          "why": "Factories use robots for repeated, precise work."
+        },
+        {
+          "q": "How can robots help on farms?",
+          "options": [
+            "Replacing the sun",
+            "Drawing maps of the sky",
+            "Planting, watering or picking crops"
+          ],
+          "answer": 2,
+          "why": "Farm robots help with crop care and harvesting."
+        },
+        {
+          "q": "In hospitals, robots can help by…",
+          "options": [
+            "Assisting surgeons with precise movements",
+            "Replacing all doctors",
+            "Cooking for everyone"
+          ],
+          "answer": 0,
+          "why": "Surgical robots help doctors, they do not replace them."
+        },
+        {
+          "q": "What do many robot jobs have in common?",
+          "options": [
+            "They need no power",
+            "They are repeated, precise or risky for people",
+            "They are always secret"
+          ],
+          "answer": 1,
+          "why": "Robots shine where jobs are repeated, exact or dangerous."
+        }
+      ]
+    },
+    {
+      "id": "10-future-and-your-first-robot",
+      "title": "The Future and Your First Robot",
+      "summary": "Recognise the main parts that go into building a small robot.",
+      "youtubeId": "",
+      "videoNo": 10,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Which part acts as a small robot's brain?",
+          "options": [
+            "The wheels",
+            "A control board",
+            "The paint"
+          ],
+          "answer": 1,
+          "why": "A control board runs the program and makes decisions."
+        },
+        {
+          "q": "Which parts let a small robot move?",
+          "options": [
+            "Motors and wheels",
+            "Stickers",
+            "The case lid"
+          ],
+          "answer": 0,
+          "why": "Motors with wheels move a rolling robot."
+        },
+        {
+          "q": "A small robot needs power. What supplies it?",
+          "options": [
+            "Sunlight only",
+            "Magic",
+            "Batteries"
+          ],
+          "answer": 2,
+          "why": "Batteries store the energy a robot uses."
+        },
+        {
+          "q": "A first small robot should do…",
+          "options": [
+            "One simple job well",
+            "Everything at once",
+            "Nothing"
+          ],
+          "answer": 0,
+          "why": "Start with one small, clear job."
+        }
+      ]
+    }
+  ]
+}

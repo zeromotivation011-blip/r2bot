@@ -14,6 +14,7 @@ const TRACK_ACCENT: Record<string, string> = {
   wire: '#A56BFF',
   forge: '#00E5FF',
   edge: '#FFB800',
+  video: '#FF6A1A',
 };
 
 type Params = Promise<{ id: string }>;
@@ -93,7 +94,7 @@ export default async function VerifyPage({ params }: { params: Params }) {
                       textTransform: 'uppercase',
                     }}
                   >
-                    {data!.track}
+                    {data!.track === 'video' ? 'Course certificate' : data!.track}
                   </span>
                   <span style={{ fontSize: 12, color: '#94A3B8', fontFamily: 'var(--font-mono), monospace' }}>
                     ID: {id.slice(0, 8)}

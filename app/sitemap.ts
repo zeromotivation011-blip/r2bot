@@ -6,7 +6,7 @@ import { ROBOTS } from '@/lib/robots-data';
 import { getAllPostsMerged } from '@/lib/blog-db';
 import { listProjectSlugs } from '@/lib/build/loader';
 import { SIMULATORS } from '@/lib/simulators';
-import { listPublishedCourses } from '@/lib/courses';
+import { listPublishedCourses, hasVideo } from '@/lib/courses';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -59,7 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/courses`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.8 },
     ...listPublishedCourses().flatMap((c) => [
       { url: `${BASE}/courses/${c.slug}`, lastModified: new Date(c.updated), changeFrequency: 'monthly' as const, priority: 0.8 },
-      ...c.lessons.map((l) => ({ url: `${BASE}/courses/${c.slug}/${l.id}`, lastModified: new Date(c.updated), changeFrequency: 'monthly' as const, priority: 0.7 })),
+      ...c.lessons.filter((l) => hasVideo(l)).map((l) => ({ url: `${BASE}/courses/${c.slug}/${l.id}`, lastModified: new Date(c.updated), changeFrequency: 'monthly' as const, priority: 0.7 })),
     ]),
   ];
 
