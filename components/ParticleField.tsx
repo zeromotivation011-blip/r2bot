@@ -16,7 +16,7 @@ import { usePathname } from 'next/navigation';
 export function ParticleField() {
   const ref = useRef<HTMLCanvasElement>(null);
   const pathname = usePathname();
-  const enabled = pathname === '/';
+  const enabled = false && pathname === '/'; // sober theme: constellation backdrop switched off site-wide
 
   useEffect(() => {
     if (!enabled) return;

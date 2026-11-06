@@ -1,39 +1,19 @@
 import type { Metadata } from 'next'
-import { Nav } from '@/components/Nav'
-import { CopilotProvider } from '@/components/CopilotProvider'
-import { CopilotBubble } from '@/components/CopilotBubble'
-import { CopilotDrawer } from '@/components/CopilotDrawer'
-import { ROBOTS } from '@/lib/robots-data'
+import Link from 'next/link'
 import CompareClient from './CompareClient'
 
-export const runtime = 'nodejs'
-
 export const metadata: Metadata = {
-  title: 'Robot vs Robot — Compare Famous Robots',
-  description: 'Side-by-side compare any two famous robots. See specs, year, country, category and auto-generated insight.',
+  title: 'Compare Robots Side by Side',
+  description: 'Pick any two robots from the R2BOT directory and compare maker, country, year and type side by side. Free.',
+  alternates: { canonical: 'https://www.r2bot.in/robots/compare' },
 }
-
 export default function ComparePage() {
-  // Pass the minimal slug+name+meta the client needs (avoid sending entire descriptions)
-  const lite = ROBOTS.map(r => ({
-    slug: r.slug,
-    name: r.name,
-    maker: r.maker,
-    country: r.country,
-    countryFlag: r.countryFlag,
-    year: r.year,
-    type: r.type,
-    status: r.status,
-    emoji: r.emoji,
-    hookLine: r.hookLine,
-    statChips: r.statChips,
-  }))
   return (
-    <CopilotProvider>
-      <Nav />
-      <CompareClient robots={lite} />
-      <CopilotBubble />
-      <CopilotDrawer />
-    </CopilotProvider>
+    <main style={{ maxWidth: 900, margin: '0 auto', padding: '110px 20px 80px' }}>
+      <Link href="/robots/directory" style={{ color: '#94a3b8', fontSize: 13 }}>← Robot directory</Link>
+      <h1 style={{ fontSize: 'clamp(28px,5vw,40px)', fontWeight: 900, color: '#fff', margin: '8px 0 8px' }}>Compare two robots</h1>
+      <p style={{ color: '#cbd5e1', fontSize: 17, lineHeight: 1.7, margin: '0 0 20px' }}>Choose any two robots to see who built them, when, and what each is for.</p>
+      <CompareClient />
+    </main>
   )
 }

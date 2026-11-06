@@ -12,6 +12,7 @@ import { OnboardingModal } from '@/components/OnboardingModal';
 import { ProgressBanner } from '@/components/ProgressBanner';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { HideOnEmbed } from '@/components/HideOnEmbed';
 import { organizationJsonLD } from '@/lib/seo/jsonld';
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
@@ -102,16 +103,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SkipToContent />
         <AuthProvider>
           <ToastProvider>
-            <ProgressBanner />
+            <HideOnEmbed><ProgressBanner /></HideOnEmbed>
             {children}
             <AuthModal />
           </ToastProvider>
         </AuthProvider>
         <SiteViewCounter />
-        <OnboardingModal />
-        <LeadCaptureModal />
-        <LowDataMode />
-        <PWAPrompt />
+        <HideOnEmbed><OnboardingModal /></HideOnEmbed>
+        <HideOnEmbed><LeadCaptureModal /></HideOnEmbed>
+        <HideOnEmbed><LowDataMode /></HideOnEmbed>
+        <HideOnEmbed><PWAPrompt /></HideOnEmbed>
         {GA_ID && (
           <>
             <Script

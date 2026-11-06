@@ -5,14 +5,16 @@
 import { createSupabaseAdminClient } from '@/lib/supabase/server'
 import { listPublishedCourses } from '@/lib/courses'
 import { BASE_URL, button, esc, renderEmail } from '@/lib/email-layout'
+import { getNewsData } from '@/lib/news'
+import { getAllAtlasEntries } from '@/lib/atlas'
 
 const DAY = 86_400_000
 const MAX_PER_RUN = 80 // stay well inside Resend free limits (100/day)
 
-type Result = { welcome: number; nudges: number; certs: number; errors: string[] }
+type Result = { welcome: number; nudges: number; certs: number; weekly: number; errors: string[] }
 
 export async function runEmailAutomation(): Promise<Result> {
-  const out: Result = { welcome: 0, nudges: 0, certs: 0, errors: [] }
+  const out: Result = { welcome: 0, nudges: 0, certs: 0, weekly: 0, errors: [] }
   const apiKey = process.env.RESEND_API_KEY
   const fromEnv = process.env.RESEND_FROM_EMAIL
   if (!apiKey || !fromEnv) { out.errors.push('RESEND_API_KEY / RESEND_FROM_EMAIL missing'); return out }
@@ -137,6 +139,38 @@ export async function runEmailAutomation(): Promise<Result> {
       }
     }
   } catch (e) { out.errors.push(`nudges: ${(e as Error).message}`) }
+
+  // ── 3. R2BOT Weekly for every newsletter subscriber (Fridays, UTC) ─────
+  try {
+    const now = new Date()
+    if (now.getUTCDay() === 5) {
+      const yearStart = Date.UTC(now.getUTCFullYear(), 0, 1)
+      const week = Math.floor((Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - yearStart) / (7 * DAY))
+      const kind = `weekly-${now.getUTCFullYear()}-${week}`
+      let stories: { title: string; summary: string; href: string }[] = []
+      try {
+        const news = await getNewsData()
+        stories = news.articles.slice(0, 3).map((a) => ({ title: a.title, summary: a.aiSummary || a.description || '', href: a.url }))
+      } catch { stories = [] }
+      const atlas = [...getAllAtlasEntries()].sort((a, b) => a.slug.localeCompare(b.slug))
+      const term = atlas.length ? atlas[week % atlas.length] : null
+      const storiesHtml = stories.length
+        ? `<h3 style="margin:18px 0 6px">In the news</h3>` + stories.map((st) => `<p style="margin:0 0 12px"><a href="${esc(st.href)}" style="color:#0B2540;font-weight:700">${esc(st.title)}</a><br>${esc(st.summary.slice(0, 180))}</p>`).join('')
+        : ''
+      const termHtml = term ? `<h3 style="margin:18px 0 6px">Term of the week</h3><p style="margin:0 0 6px"><a href="${BASE_URL}/atlas/${esc(term.slug)}" style="color:#0B2540;font-weight:700">${esc(term.title)}</a> explained in plain English.</p>` : ''
+      const { data: subs } = await sb.from('newsletter_subscribers').select('email, unsubscribe_token').eq('active', true)
+      for (const sub of subs ?? []) {
+        const unsub = `${BASE_URL}/api/unsubscribe?token=${encodeURIComponent(String(sub.unsubscribe_token ?? ''))}`
+        const html = renderEmail({
+          preheader: 'Robotics this week, in plain English.',
+          heading: 'R2BOT Weekly',
+          bodyHtml: `<p>Three things worth knowing this week.</p>${storiesHtml}${termHtml}<h3 style="margin:18px 0 6px">Keep learning</h3><p style="margin:0 0 6px">Five free courses with quizzes and certificates.</p>${button('Open the courses', `${BASE_URL}/courses`)}`,
+          unsubscribeUrl: unsub,
+        })
+        if (await sendOnce(String(sub.email), kind, 'R2BOT Weekly: robotics in plain English', html)) out.weekly++
+      }
+    }
+  } catch (e) { out.errors.push(`weekly: ${e instanceof Error ? e.message : String(e)}`) }
 
   return out
 }

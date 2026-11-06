@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import InlineSignup from '@/components/InlineSignup'
+import ShareBar from '@/components/ShareBar'
 import { notFound } from 'next/navigation'
 import { AI_TOPICS, getTopic } from '@/lib/ai-robotics'
 import { DEMOS } from '../demos'
@@ -60,6 +61,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
         {t.related.map((r) => <li key={r.href}><Link href={r.href} style={{ color: '#FC6818' }}>{r.label}</Link></li>)}
         <li><Link href="/ai-robotics/glossary" style={{ color: '#FC6818' }}>AI and robotics glossary</Link></li>
       </ul>
+      <ShareBar url={`${BASE}/ai-robotics/${t.slug}`} title={t.title} embedSlug={DEMOS[t.slug] ? t.slug : undefined} />
       <InlineSignup lang="en" />
     </main>
   )
