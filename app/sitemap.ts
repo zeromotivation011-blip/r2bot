@@ -6,6 +6,7 @@ import { ROBOTS } from '@/lib/robots-data';
 import { getAllPostsMerged } from '@/lib/blog-db';
 import { listProjectSlugs } from '@/lib/build/loader';
 import { SIMULATORS } from '@/lib/simulators';
+import { AI_TOPICS } from '@/lib/ai-robotics';
 import { listPublishedCourses, hasVideo } from '@/lib/courses';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
@@ -84,6 +85,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const aiPages = [
+    { url: `${BASE}/ai-robotics`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.9 },
+    { url: `${BASE}/ai-robotics/glossary`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 },
+    ...AI_TOPICS.map((t) => ({ url: `${BASE}/ai-robotics/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 })),
+  ];
+
   return [
     // Core surfaces
     { url: BASE,                       lastModified: now, changeFrequency: 'daily',   priority: 1.0 },
@@ -122,6 +129,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...videoCourses,
     { url: `${BASE}/start`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
     ...academyLessons,
+    ...aiPages,
     ...simulators,
     ...atlas,
     ...buildProjects,

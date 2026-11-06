@@ -70,6 +70,7 @@ const GROUPS: Group[] = [
     label: 'Explore',
     matches: ['/lens', '/news', '/daily-life', '/blog'],
     items: [
+      { kind: 'link', icon: '🧠', label: 'AI + Robotics', sub: 'Plain-English guides', href: '/ai-robotics' },
       { kind: 'link', icon: '📚', label: 'Atlas', sub: 'Full knowledge universe', href: '/atlas' },
       { kind: 'link', icon: '🔭', label: 'Lens', sub: 'Best robotics videos, decoded', href: '/lens' },
       { kind: 'link', icon: '📰', label: 'News', sub: 'Daily robotics updates', href: '/news' },

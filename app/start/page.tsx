@@ -49,6 +49,7 @@ const PATHS = [
   {
     emoji: '🧠', title: 'I am curious about AI + robots', time: 'About 3 hours',
     steps: [
+      { t: 'AI and Robotics hub: plain-English guides', href: '/ai-robotics' },
       { t: 'AI and robotics: the complete guide', href: '/blog/ai-and-robotics-complete-guide' },
       { t: 'How robots learn', href: '/blog/how-robots-learn-machine-learning-and-reinforcement-learning' },
       { t: 'LLMs and robots', href: '/blog/large-language-models-and-robots' },
