@@ -1,0 +1,45 @@
+---
+title: "LiDAR vs Radar vs Camera: Which Sensor Does a Robot Need?"
+description: "Three common robot sensors compared in plain language: what each sees well, where each fails, and why many robots use more than one."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["Sensors","Comparison"]
+readTime: 7
+coverEmoji: "👁️"
+featured: false
+keywords: ["lidar vs radar vs camera","robot sensors compared","best sensor for robot","sensor fusion"]
+---
+
+# LiDAR vs Radar vs Camera: Which Sensor Does a Robot Need?
+
+**Short answer:** a **camera** is cheap and tells you *what* something is, a **lidar** tells you precisely *where* things are in 3D, and **radar** works in rain, fog and dark and measures speed directly. Most serious robots combine them, which is called [sensor fusion](/atlas/concept/sensor-fusion).
+
+## At a glance
+
+| | Camera | Lidar | Radar |
+|---|---|---|---|
+| Measures | Light (colour images) | Laser pulse timing (distance) | Radio wave echoes (distance and speed) |
+| Strength | Recognises objects, signs, people; low cost | Accurate shape and distance | Works in bad weather; measures speed |
+| Weakness | Poor in dark or glare; no direct distance | Costs more; can struggle with rain, fog and glass | Coarse detail |
+| Typical use | Object detection, lane finding | Mapping, obstacle avoidance | Collision warning, long range detection |
+
+Read more: [camera vision](/atlas/concept/camera-vision), [lidar](/atlas/concept/lidar), [radar](/atlas/concept/radar-sensor).
+
+## Which one to choose
+
+- **Learning or a hobby robot:** start with a camera and a cheap distance sensor.
+- **Indoor mapping robot:** a 2D lidar is the classic choice and pairs with [SLAM](/atlas/concept/slam).
+- **Outdoor robot or vehicle:** add radar because it keeps working when cameras and lidar are degraded.
+
+## Why not just one?
+
+Each sensor has blind spots in different conditions. A camera can be blinded by sun glare, and radar cannot read a road sign. Fusing them lets the strengths cover the weaknesses. Some companies deliberately use fewer sensor types to cut cost, and the right mix depends on the job and budget.
+
+## FAQ
+
+**Which is cheapest?** Cameras, by a wide margin.
+
+**Can a camera measure distance?** Yes, using two cameras (stereo) or software estimates, but it is less direct than lidar or radar.
+
+**What is the best sensor for a beginner robot?** A camera plus an ultrasonic or infrared distance sensor.

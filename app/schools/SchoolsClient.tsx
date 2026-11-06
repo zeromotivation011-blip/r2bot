@@ -5,24 +5,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 /* ─── Data ────────────────────────────────────────────────────────── */
-const TESTIMONIALS = [
-  {
-    quote: "We introduced R2BOT in our Grade 8 science period. Within two weeks every student had built and tested their own line-follower — completely in the browser. Parents were sending videos.",
-    name: 'Priya Sharma', role: 'Science & Computer Teacher', school: 'Kendriya Vidyalaya, Pune', avatar: '👩‍🏫',
-  },
-  {
-    quote: "Our school had zero robotics infrastructure. R2BOT removed that excuse entirely. The CBSE alignment table alone saved me 3 hours of lesson planning.",
-    name: 'Rajesh Verma', role: 'STEM Coordinator', school: 'Delhi Public School, Noida', avatar: '👨‍💼',
-  },
-  {
-    quote: "Students who never touched a keyboard were coding robots by day 3. The Hindi + English dual language is a huge equaliser for our Tier-2 city students.",
-    name: 'Anita Kulkarni', role: 'Principal', school: 'Vidya Bhavan English Medium, Nashik', avatar: '👩‍💼',
-  },
-  {
-    quote: "The teacher dashboard shows me exactly which student is stuck on which concept. I can intervene before the student gives up — that's never been possible before.",
-    name: 'Suresh Pillai', role: 'ICT Teacher', school: 'Christ Nagar School, Thiruvananthapuram', avatar: '👨‍🏫',
-  },
-]
 
 const FEATURES_TEACHER = [
   { icon: '📋', title: 'Class Codes', body: "Generate a 6-character class code instantly. Share with students on WhatsApp — they join in one tap, no email required." },
@@ -39,7 +21,7 @@ const FEATURES_STUDENT = [
   { icon: '🤖', title: 'Browser Simulator', body: "No download. No kit. Open a tab, program a robot, watch it move — works on any school or home laptop." },
   { icon: '🏆', title: 'XP & Leaderboard', body: "Earn XP for every lesson and quiz. See where you stand in your class on a weekly leaderboard." },
   { icon: '🎓', title: 'Certificates', body: "Complete a track, earn a verifiable certificate with a unique ID. Share on LinkedIn or print for your portfolio." },
-  { icon: '🌐', title: 'Hindi + English', body: "Every lesson available in English, Hindi, or both. Switch mid-lesson without losing progress." },
+  { icon: '🌐', title: 'Translate on demand', body: "Lessons are written in plain English, and the built-in translate menu lets students read them in their own language." },
   { icon: '📱', title: 'Works on Phone', body: "Full learning experience on a smartphone. Students with no laptop can still complete lessons and quizzes." },
   { icon: '🔄', title: 'Spaced Repetition', body: "Smart review system (SM-2) resurfaces concepts you're about to forget — the same technique used by medical students." },
 ]
@@ -73,15 +55,14 @@ const HOW_IT_WORKS = [
 ]
 
 const STATS = [
-  { n: '92%',    label: 'of Indian schools have no robotics lab',               tone: 'red'     as const },
-  { n: '₹15k+', label: 'average cost of a single robot kit — per student',     tone: 'amber'   as const },
+  { n: '$0',     label: 'to start — every lesson and simulator is free',        tone: 'amber'   as const },
   { n: '0',      label: 'lab, kit, or installation needed with R2BOT',          tone: 'emerald' as const },
   { n: '3 min',  label: 'from class code to first simulator session',           tone: 'cyan'    as const },
 ]
 
 const FAQ = [
   { q: 'Does R2BOT require any hardware?', a: 'No. The entire R2BOT platform — lessons, quizzes, simulators, projects — runs in any modern browser. Students who want to extend their projects can optionally buy an Arduino kit (~₹1,500), but this is never required.' },
-  { q: 'Is it available in Hindi?', a: 'Yes. Every lesson is available in English, Hindi, or a bilingual toggle. Students can switch languages mid-lesson without losing progress.' },
+  { q: 'Is it available in other languages?', a: 'Lessons are written in plain English. Students can use the language menu in the header to translate any page into their own language; native Hindi and Spanish editions are planned.' },
   { q: 'Is the content aligned to CBSE / NEP 2020?', a: "Yes. We have a full alignment table mapping every R2BOT unit to a CBSE chapter for grades 6–12. NEP 2020's competency-based learning framework is the design foundation of our curriculum." },
   { q: 'How do teachers access the dashboard?', a: 'Teachers sign up with a school email, create a class, and share the join code. The dashboard is web-based — no app download needed.' },
   { q: 'What data do you collect on students?', a: 'R2BOT collects only what is needed for the learning experience: username, progress data, and quiz scores. No ads, no data sold, DPDP-compliant. Student data is stored in Indian data centres.' },
@@ -277,9 +258,8 @@ export function SchoolsClient() {
             </span>
           </h1>
           <p style={{ marginTop: 16, fontSize: 17, color: '#9ca3af', maxWidth: 640, lineHeight: 1.7 }}>
-            India&apos;s only school robotics platform built for the classroom — not the robotics club. CBSE &amp; NEP 2020 aligned, Hindi + English, browser-native.
+            A free robotics platform built for the classroom — not the robotics club. Browser-native, with curriculum alignment tables for CBSE &amp; NEP 2020 schools.
           </p>
-          <p style={{ marginTop: 8, fontSize: 13, color: '#FC6818', fontWeight: 500 }}>रोबोटिक्स को हर कक्षा में लेकर जाओ।</p>
           <div style={{ marginTop: 28, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
             <a href="#contact" style={{ background: '#FC6818', color: '#000', padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
               Get Your School Started →
@@ -292,7 +272,7 @@ export function SchoolsClient() {
             </Link>
           </div>
           <div style={{ marginTop: 18, display: 'flex', flexWrap: 'wrap', gap: 16 }}>
-            {['CBSE & NEP 2020 aligned', 'Hindi + English', 'Works on any browser', 'No hardware needed', 'Auto-graded missions'].map(b => (
+            {['Free for every school', 'CBSE & NEP 2020 alignment table', 'Works on any browser', 'No hardware needed', 'Auto-graded missions'].map(b => (
               <span key={b} style={{ fontSize: 12, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ color: '#10b981' }}>✓</span> {b}
               </span>
@@ -304,7 +284,7 @@ export function SchoolsClient() {
       {/* STATS */}
       <section style={{ borderBottom: '1px solid #1a1a2e', background: 'rgba(255,255,255,0.01)', padding: '56px 24px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 6 }}>The state of school robotics in India</h2>
+          <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 6 }}>Why classrooms need a no-hardware option</h2>
           <p style={{ color: '#9ca3af', marginBottom: 28, fontSize: 14 }}>Most students read about robots in a textbook and never touch one. We&apos;re changing that.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
             {STATS.map(s => <StatCard key={s.n} {...s} />)}
@@ -389,26 +369,6 @@ export function SchoolsClient() {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section style={{ borderBottom: '1px solid #1a1a2e', background: 'rgba(255,255,255,0.01)', padding: '56px 24px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 6 }}>What educators are saying</h2>
-          <p style={{ color: '#9ca3af', marginBottom: 28, fontSize: 14 }}>Early access schools across India.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18 }}>
-            {TESTIMONIALS.map(t => (
-              <div key={t.name} style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 18, padding: 22 }}>
-                <p style={{ fontSize: 28, marginBottom: 10 }}>{t.avatar}</p>
-                <p style={{ fontSize: 13, color: '#d1d5db', lineHeight: 1.75, fontStyle: 'italic' }}>&ldquo;{t.quote}&rdquo;</p>
-                <div style={{ marginTop: 14 }}>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0 }}>{t.name}</p>
-                  <p style={{ fontSize: 12, color: '#FF8A4C', margin: '2px 0 0' }}>{t.role}</p>
-                  <p style={{ fontSize: 11, color: '#6b7280', margin: '2px 0 0' }}>{t.school}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* FAQ */}
       <section style={{ borderBottom: '1px solid #1a1a2e', padding: '56px 24px' }}>
@@ -432,7 +392,7 @@ export function SchoolsClient() {
           <div style={{ marginTop: 24, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 24, fontSize: 13, color: '#6b7280' }}>
             <a href="mailto:schools@r2bot.in" style={{ color: '#9ca3af', textDecoration: 'none' }}>📧 schools@r2bot.in</a>
             <a href="https://wa.me/919999999999?text=Hi%2C+I'm+interested+in+R2BOT+for+my+school" target="_blank" rel="noopener noreferrer" style={{ color: '#9ca3af', textDecoration: 'none' }}>💬 WhatsApp us</a>
-            <span>📍 India-wide (virtual onboarding)</span>
+            <span>🌍 Worldwide (virtual onboarding)</span>
           </div>
         </div>
       </section>

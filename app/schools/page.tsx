@@ -11,10 +11,10 @@ export const runtime = 'nodejs'
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const metadata: Metadata = {
-  title: 'R2BOT for Schools — Robotics in Every Classroom | CBSE & NEP 2020',
+  title: 'R2BOT for Schools — Free Robotics Curriculum for Any Classroom',
   description:
-    "India's only school robotics platform with hands-on browser simulation. CBSE/NEP aligned curriculum, teacher dashboard, auto-graded missions, certificates. No lab or kit needed.",
-  keywords: ['R2BOT for schools', 'robotics curriculum CBSE', 'robotics for schools India', 'STEM curriculum India', 'school robotics simulator', 'teacher dashboard robotics', 'NEP 2020 robotics'],
+    "A free robotics platform for classrooms anywhere: hands-on browser simulation, teacher dashboard, auto-graded missions and certificates. No lab or kit needed. Includes CBSE/NEP alignment for schools in India.",
+  keywords: ['R2BOT for schools', 'free robotics curriculum for schools', 'robotics for schools', 'STEM curriculum', 'robotics curriculum CBSE', 'school robotics simulator', 'teacher dashboard robotics', 'NEP 2020 robotics'],
   alternates: { canonical: `${BASE_URL}/schools` },
   openGraph: {
     type: 'website',
@@ -31,8 +31,8 @@ const orgJsonLd = {
   '@type': 'EducationalOrganization',
   name: 'R2BOT for Schools',
   url: `${BASE_URL}/schools`,
-  description: "India's only school robotics platform with browser-based simulator and CBSE/NEP aligned curriculum.",
-  areaServed: { '@type': 'Country', name: 'India' },
+  description: 'A free school robotics platform with a browser-based simulator, teacher dashboard and curriculum alignment tables.',
+  areaServed: { '@type': 'Place', name: 'Worldwide' },
 }
 
 export default function SchoolsPage() {

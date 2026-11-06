@@ -1,0 +1,50 @@
+---
+title: "Arduino vs ESP32 vs Raspberry Pi: Which Board for Your Robot?"
+description: "Three popular boards compared for robotics: what each is good at, how they differ, and which one a beginner should start with."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["Hardware","Comparison"]
+readTime: 7
+coverEmoji: "🔌"
+featured: false
+keywords: ["arduino vs esp32 vs raspberry pi","best board for robot","microcontroller vs single board computer","which board for robotics"]
+---
+
+# Arduino vs ESP32 vs Raspberry Pi: Which Board for Your Robot?
+
+**Short answer:** use an **Arduino** to learn and to drive motors and sensors reliably, an **ESP32** when you also want Wi-Fi or Bluetooth for a small price, and a **Raspberry Pi** when the robot needs a camera, AI, or ROS 2. Many robots use a Pi as the brain and an Arduino or ESP32 as the nervous system.
+
+## The key difference
+
+Arduino and ESP32 are [microcontrollers](/atlas/concept/microcontroller): tiny computers that run one program, start instantly and react in real time. A Raspberry Pi is a [single-board computer](/atlas/concept/single-board-computer): it runs a full operating system like Linux, which is powerful but not strictly real time.
+
+## Comparison
+
+| | [Arduino](/atlas/concept/arduino) (Uno) | [ESP32](/atlas/concept/esp32-robotics) | [Raspberry Pi](/atlas/concept/raspberry-pi-robotics) |
+|---|---|---|---|
+| Type | Microcontroller | Microcontroller with Wi-Fi and Bluetooth | Single-board computer |
+| Software | Arduino C/C++ | Arduino C/C++, MicroPython | Python, C++, ROS 2 on Linux |
+| Strength | Simple, forgiving, huge community | Fast, wireless, low price | Cameras, AI, networking |
+| Weakness | No built-in wireless, little memory | Easier to damage pins; more to learn | Needs an SD card and boot time; more power |
+| Best for | First robot, motor control | Connected sensor robots | Vision, mapping, ROS 2 |
+
+Prices vary by country and by model, so check a local shop before you buy.
+
+## What to buy first
+
+- **Complete beginner:** an Arduino Uno kit with motors and a distance sensor.
+- **Want wireless control from a phone:** an ESP32.
+- **Want a camera robot or to learn ROS 2:** a Raspberry Pi, ideally after you have done one Arduino project.
+
+## Why combine them?
+
+A Pi is poor at precise timing for motors, and an Arduino cannot run vision software. Putting a Pi on top for thinking and an Arduino underneath for motor control gives the best of both. Our Wire track in the [Academy](/academy) walks through that setup.
+
+## FAQ
+
+**Can an ESP32 replace an Arduino?** For most projects, yes. Arduino is simpler for a first week.
+
+**Can a Raspberry Pi drive motors directly?** Only with extra driver boards, and its timing is less reliable than a microcontroller.
+
+**Which has the most tutorials?** Arduino, followed closely by Raspberry Pi.

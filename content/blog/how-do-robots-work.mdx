@@ -1,0 +1,48 @@
+---
+title: "How Do Robots Work? The Sense-Think-Act Loop in Plain English"
+description: "Every robot, from a vacuum cleaner to a factory arm, runs the same three-step loop. Here is how it works, with everyday examples."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["Basics","Beginner"]
+readTime: 6
+coverEmoji: "🤖"
+featured: false
+keywords: ["how do robots work","what is a robot","sense think act","robot basics for beginners"]
+---
+
+# How Do Robots Work? The Sense-Think-Act Loop in Plain English
+
+**Short answer:** a robot repeats a loop thousands of times a second: it **senses** the world, **thinks** about what to do, then **acts**. Sensors are the eyes and ears, a computer is the brain, and motors are the muscles. See the [Sense-Think-Act loop](/atlas/concept/sense-think-act-loop) in the Atlas for the formal version.
+
+## The three steps
+
+**1. Sense.** Sensors turn the world into numbers. A [lidar](/atlas/concept/lidar) measures distance with laser pulses, a camera captures images, an [encoder](/atlas/concept/encoder) counts wheel turns.
+
+**2. Think.** Software decides what to do with those numbers. It might be a few lines ("if the wall is closer than 20 cm, turn") or a large [neural network](/atlas/concept/neural-network).
+
+**3. Act.** The computer commands [actuators](/atlas/concept/actuator), such as a [DC motor](/atlas/concept/dc-motor), to move. The movement changes the world, and the loop starts again.
+
+## A robot vacuum, step by step
+
+- **Sense:** bump sensors and a distance sensor notice a chair leg.
+- **Think:** the software marks the spot on its map and picks a path around it.
+- **Act:** the wheel motors steer left.
+
+Half a second later it senses the new position, and the loop repeats.
+
+## Why the loop matters
+
+Reality is messy: wheels slip, sensors are noisy, people walk in the way. Because the robot keeps sensing, it can correct itself. This idea is called [feedback](/atlas/concept/feedback). A robot without it is just a machine replaying a recording, which works only until something changes.
+
+## What goes wrong without it
+
+A toy that drives forward for exactly 3 seconds will hit the wall if the floor is slippery. A robot that senses distance will stop in time. That difference is the whole point of sensing.
+
+## FAQ
+
+**Is a thermostat a robot?** It senses and acts, but most definitions also want a physical body that does work in the world and some decision-making. It is a simple control system, not usually called a robot.
+
+**Do robots need AI?** No. Many industrial robots follow fixed programs. AI helps when the world is unpredictable, for example recognising objects.
+
+**What is the best way to start learning?** Build the loop yourself in a simulator, then on a small board such as an [Arduino](/atlas/concept/arduino). Try Lesson 1 of the free Spark track in the [Academy](/academy).

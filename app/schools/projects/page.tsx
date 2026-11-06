@@ -21,7 +21,7 @@ export default function ProjectsPage() {
             <div>
               <Link href="/schools/student" className="text-amber-400 text-sm hover:underline">← Dashboard</Link>
               <h1 className="mt-1 text-3xl font-bold">🚀 Project Lab</h1>
-              <p className="text-sm text-gray-400 mt-0.5">10 real-world buildable projects — Indian parts, Indian prices.</p>
+              <p className="text-sm text-gray-400 mt-0.5">10 real-world buildable projects — low-cost, easy-to-find parts.</p>
             </div>
             <div className="text-xs text-gray-500">All costs sourced from Robu.in (approximate, 2024)</div>
           </div>
