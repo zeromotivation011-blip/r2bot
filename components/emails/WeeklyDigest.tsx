@@ -3,14 +3,14 @@
 // element straight through.
 import type { ReactNode } from 'react';
 
-const BG = '#0A0E17';
-const PANEL = '#0B2540';
-const BORDER = 'rgba(255,255,255,0.08)';
-const BORDER_ACCENT = 'rgba(0,184,212,.35)';
-const MIST = '#E8ECF1';
-const MUTED = '#8893a4';
-const CYAN = '#00B8D4';
-const CYAN_BRIGHT = '#00E5FF';
+const BG = '#F1F5F9';
+const PANEL = '#FFFFFF';
+const BORDER = '#E2E8F0';
+const BORDER_ACCENT = '#FC6818';
+const MIST = '#1E293B';
+const MUTED = '#64748B';
+const CYAN = '#FC6818';
+const CYAN_BRIGHT = '#0B2540';
 
 export type DigestProps = {
   baseUrl: string;
@@ -32,8 +32,8 @@ export type DigestProps = {
 };
 
 export function buildSubject(props: { streak: number; pulseCount: number }): string {
-  const streakBit = props.streak >= 2 ? `${props.streak} day streak 🔥` : 'Your week in robotics';
-  return `Your R2BOT week — ${streakBit} | ${props.pulseCount} new robotics stor${props.pulseCount === 1 ? 'y' : 'ies'}`;
+  const streakBit = props.streak >= 2 ? `${props.streak} day streak` : 'Your week in robotics';
+  return `Your R2BOT week | ${streakBit} | ${props.pulseCount} new robotics stor${props.pulseCount === 1 ? 'y' : 'ies'}`;
 }
 
 function Section({ children, mt = 24 }: { children: ReactNode; mt?: number }) {
@@ -65,7 +65,7 @@ function Card({ children, accent = false }: { children: ReactNode; accent?: bool
         borderRadius: 12,
         border: `1px solid ${accent ? BORDER_ACCENT : BORDER}`,
         background: accent
-          ? 'linear-gradient(135deg, rgba(0,184,212,.10), rgba(11,37,64,.7))'
+          ? '#FFF7ED'
           : PANEL,
       }}
     >
@@ -158,7 +158,7 @@ export function WeeklyDigest(props: DigestProps) {
                       <Section>
                         <Card accent>
                           <div style={{ fontSize: 18, color: CYAN_BRIGHT }}>
-                            🔥 You&apos;re on a {streak}-day streak. Keep it up!
+                            You&apos;re on a {streak}-day streak. Keep it up!
                           </div>
                         </Card>
                       </Section>
@@ -183,7 +183,7 @@ export function WeeklyDigest(props: DigestProps) {
                               padding: '8px 14px',
                               borderRadius: 8,
                               background: CYAN,
-                              color: '#001318',
+                              color: '#FFFFFF',
                               fontWeight: 600,
                               fontSize: 13,
                               textDecoration: 'none',

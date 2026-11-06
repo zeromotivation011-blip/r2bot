@@ -6,7 +6,6 @@ export type Lead = {
   id: string
   email: string
   name?: string | null
-  phone: string | null
   source: string | null
   page: string | null
   meta?: Record<string, unknown> | null
@@ -26,13 +25,12 @@ function describeMeta(meta: Record<string, unknown> | null | undefined): string 
 }
 
 function toCsv(rows: Lead[]): string {
-  const header = ['email', 'name', 'phone', 'source', 'context', 'page', 'created_at']
+  const header = ['email', 'name', 'source', 'context', 'page', 'created_at']
   const esc = (v: string) => `"${(v ?? '').replace(/"/g, '""')}"`
   const lines = rows.map((r) =>
     [
       r.email,
       r.name ?? '',
-      r.phone ?? '',
       r.source ?? '',
       // Full JSON in the export so nothing is lost, even though the table
       // shows only a summary.
@@ -61,7 +59,6 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
       (l) =>
         l.email.toLowerCase().includes(s) ||
         (l.name ?? '').toLowerCase().includes(s) ||
-        (l.phone ?? '').toLowerCase().includes(s) ||
         (l.source ?? '').toLowerCase().includes(s) ||
         (l.page ?? '').toLowerCase().includes(s) ||
         describeMeta(l.meta).toLowerCase().includes(s),
@@ -84,7 +81,7 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search email, name, phone, source, course, school…"
+          placeholder="Search email, name, source, course, school…"
           style={{
             flex: 1, minWidth: 220, background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.12)', color: '#f4f4f5',
@@ -108,7 +105,6 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
             <tr style={{ background: 'rgba(255,255,255,0.04)', textAlign: 'left', color: '#94a3b8' }}>
               <th style={th}>Email</th>
               <th style={th}>Name</th>
-              <th style={th}>Phone</th>
               <th style={th}>Source</th>
               <th style={th}>Context</th>
               <th style={th}>Page</th>
@@ -117,7 +113,7 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={7} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No leads yet.</td></tr>
+              <tr><td colSpan={6} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No leads yet.</td></tr>
             ) : (
               filtered.map((l) => {
                 const context = describeMeta(l.meta)
@@ -126,7 +122,6 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
                   <tr key={l.id} style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                     <td style={{ ...td, color: '#f4f4f5' }}>{l.email}</td>
                     <td style={td}>{l.name || '—'}</td>
-                    <td style={td}>{l.phone || '—'}</td>
                     <td style={td}>
                       <span style={{
                         display: 'inline-block', padding: '2px 8px', borderRadius: 999,

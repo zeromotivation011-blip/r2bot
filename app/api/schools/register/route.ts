@@ -14,7 +14,6 @@ type Payload = {
   board?: string;
   teacher_name?: string;
   teacher_email?: string;
-  phone?: string;
   role?: string;
   grade_range?: string;
   student_count_estimate?: string | number;
@@ -83,7 +82,6 @@ export async function POST(req: NextRequest) {
     board: body.board,
     teacher_name: body.teacher_name?.trim(),
     teacher_email: body.teacher_email?.trim().toLowerCase(),
-    phone: body.phone?.trim() ?? null,
     role: body.role,
     grade_range: body.grade_range,
     student_count_estimate: studentCount,

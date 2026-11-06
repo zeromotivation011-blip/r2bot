@@ -13,12 +13,13 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 const TOOLS: { href: string; icon: string; title: string; desc: string }[] = [
+  { href: '/admin/growth', icon: '🚀', title: 'Growth', desc: 'Goal progress, course funnel, newsletter, stalled learners, CSV downloads.' },
   { href: '/admin/analytics', icon: '📊', title: 'Analytics', desc: 'Sign-ups, active learners, top pages, course progress.' },
   { href: '/admin/atlas', icon: '🧠', title: 'Atlas', desc: 'Create & edit robotics concept entries.' },
   { href: '/admin/news', icon: '📰', title: 'News', desc: 'Curate the news archive — pin, hide, rewrite.' },
   { href: '/admin/blog', icon: '📝', title: 'Blog', desc: 'Write and publish long-form posts.' },
   { href: '/admin/lens', icon: '🔭', title: 'Lens', desc: 'Curate the best robotics video summaries.' },
-  { href: '/admin/leads', icon: '🎯', title: 'Leads', desc: 'Captured emails (phone optional). Search & export CSV.' },
+  { href: '/admin/leads', icon: '🎯', title: 'Leads', desc: 'Captured emails. Search & export CSV.' },
   { href: '/admin/discovery', icon: '🔭', title: 'Discovery', desc: 'Auto-discovered topics from arXiv, HN, Reddit.' },
   { href: '/admin/projects', icon: '🤖', title: 'Projects', desc: 'Manage robot build projects.' },
 ];

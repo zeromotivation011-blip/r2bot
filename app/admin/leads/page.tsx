@@ -7,7 +7,7 @@ import { LeadsClient, type Lead } from './LeadsClient';
 
 export const metadata: Metadata = {
   title: 'Leads · Admin',
-  description: 'Captured leads (email required, phone optional) from the site.',
+  description: 'Captured leads (email only) from the site.',
   robots: { index: false, follow: false },
 };
 
@@ -33,7 +33,7 @@ export default async function AdminLeadsPage() {
   // if migration 0036 has not been applied yet.
   const { data: events, error: eventsErr } = await supabase
     .from('lead_events')
-    .select('id, email, name, phone, source, page, meta, created_at')
+    .select('id, email, name, source, page, meta, created_at')
     .order('created_at', { ascending: false })
     .limit(2000);
 
@@ -46,7 +46,7 @@ export default async function AdminLeadsPage() {
     migrationMissing = true;
     const { data, error } = await supabase
       .from('leads')
-      .select('id, email, phone, source, page, created_at')
+      .select('id, email, source, page, created_at')
       .order('created_at', { ascending: false })
       .limit(2000);
     leads = !error && data ? (data as Lead[]) : [];
