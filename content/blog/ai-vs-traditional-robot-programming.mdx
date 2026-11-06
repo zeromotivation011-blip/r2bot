@@ -1,0 +1,49 @@
+---
+title: "AI vs Traditional Robot Programming: When to Use Which"
+description: "Rule-based control is predictable and checkable; AI handles messy perception. How to choose, with examples of each and of the common hybrid."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["AI","Programming"]
+readTime: 5
+coverEmoji: "⚖️"
+featured: false
+keywords: ["ai vs traditional robot programming","rule based vs machine learning robot","when to use ai in robots"]
+---
+
+# AI vs Traditional Robot Programming: When to Use Which
+
+**Short answer:** use **traditional programming** when the situation is predictable and safety matters, use **AI** when the input is messy (images, speech, clutter), and combine them when you can: AI to perceive, rules to act.
+
+## Side by side
+
+| | Traditional (rules, control) | AI (learned) |
+|---|---|---|
+| Behaviour | Predictable | Can surprise you |
+| Needs data | No | Yes, often a lot |
+| Handles messy input | Poorly | Well |
+| Easy to verify | Yes | Harder |
+| Example | Motor speed with a [PID controller](/atlas/concept/pid-controller) | Recognising objects with a [neural network](/atlas/concept/neural-network) |
+
+## Choose by question
+
+- **Can I write the rule in a few lines?** Then do that. Example: stop when the distance sensor reads under 10 cm.
+- **Is the input a photo, sound or free text?** AI is probably needed.
+- **Could a wrong answer hurt someone?** Keep the final safety check as plain code.
+
+## The hybrid most robots use
+
+A vision model finds the object, normal code plans the reach, a classic controller drives the joints, and a rule stops everything if a force limit is exceeded.
+
+## Mistakes to avoid
+
+- **Using AI where a rule works.** It adds data needs, cost and unpredictability for no gain.
+- **Using only rules for a vision task.** A hand-written colour rule breaks when the lighting changes.
+
+## FAQ
+
+**Is AI always better?** No, it is a tool for specific problems.
+
+**Which should a beginner learn first?** Traditional control and the [sense-think-act loop](/blog/how-do-robots-work), then add AI.
+
+Overview: [AI and robotics, the complete guide](/blog/ai-and-robotics-complete-guide).

@@ -10,7 +10,7 @@ import { type Job, timeAgo, formatExperience } from '@/lib/jobs';
 import { JobsClient } from './JobsClient';
 
 export const metadata: Metadata = {
-  title: 'Robotics Jobs in India 2025',
+  title: 'Robotics Jobs in India: Live Listings',
   description:
     'Real-time robotics job listings from Naukri. ROS2 engineers, automation specialists, and robotics researchers across India.',
   openGraph: {

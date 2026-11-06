@@ -1,0 +1,48 @@
+---
+title: "Computer Vision for Robots: How a Robot Sees"
+description: "How cameras and software let robots recognise objects, measure distance and find their way, with simple examples and common pitfalls."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["AI","Vision"]
+readTime: 6
+coverEmoji: "📷"
+featured: false
+keywords: ["computer vision for robots","how robots see","robot camera object detection","machine vision robotics"]
+---
+
+# Computer Vision for Robots: How a Robot Sees
+
+**Short answer:** a robot "sees" by turning camera images into numbers and running software that finds objects, estimates distance and tracks movement. See [computer vision](/atlas/concept/computer-vision) in the Atlas.
+
+## What vision lets a robot do
+
+- **Detect objects:** find a cup, a person or a pallet ([object detection](/atlas/concept/object-detection)).
+- **Estimate position:** work out where the object is so an arm can reach it.
+- **Follow lines or lanes:** simple colour or edge detection is enough.
+- **Help with mapping:** camera-based [SLAM](/blog/what-is-slam-in-plain-words).
+
+## A simple example
+
+A sorting robot must separate red and green apples. A basic program thresholds colour and drives a motor. No neural network is needed. For mixed, tilted or dirty items, a trained model works better.
+
+## Common pitfalls
+
+- **Lighting changes.** Glare or darkness can break a model trained in a bright room. Test in the real lighting.
+- **Not enough varied training images.** The robot works on the test table and fails elsewhere.
+- **No distance information.** One camera does not directly give depth. Add stereo cameras, [lidar](/atlas/concept/lidar) or a depth camera. Compare them in [LiDAR vs radar vs camera](/blog/lidar-vs-radar-vs-camera-for-robots).
+- **Slow processing.** Large models can lag on small boards, so a delayed answer is a wrong answer for a moving robot. See [edge AI](/atlas/concept/edge-ai).
+
+## Getting started
+
+1. Use a USB camera with a Raspberry Pi and try colour tracking.
+2. Move on to a pretrained detector.
+3. Measure how fast it runs on your board before building the robot around it.
+
+## FAQ
+
+**Do I need a GPU?** Not for simple vision. For modern detection models, an accelerator helps a lot.
+
+**Camera or lidar for a first robot?** Start with a camera, because it is cheap and teaches the most.
+
+Overview: [AI and robotics, the complete guide](/blog/ai-and-robotics-complete-guide).

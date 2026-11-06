@@ -1,0 +1,53 @@
+---
+title: "AI and Robotics: The Complete Beginner Guide"
+description: "How artificial intelligence fits into robots: perception, learning, planning and language. A map of the field with links to deeper guides."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["AI","Guide"]
+readTime: 8
+coverEmoji: "🧠"
+featured: false
+keywords: ["ai and robotics","artificial intelligence in robots","how ai is used in robotics","ai robotics for beginners"]
+---
+
+# AI and Robotics: The Complete Beginner Guide
+
+**Short answer:** AI gives robots the parts of the job that are hard to write as rules: **seeing** (perception), **learning** from experience or demonstration, **planning** in messy places, and increasingly **understanding language**. The rest of a robot, its motors, sensors and control loops, is classic engineering, and the two work together.
+
+## The four jobs AI does in a robot
+
+1. **Perception.** Turning camera and sensor data into meaning: "that is a cup, 40 cm away." See [computer vision for robots](/blog/computer-vision-for-robots-explained) and [object detection](/atlas/concept/object-detection).
+2. **Learning.** Improving from data instead of hand-written rules. See [how robots learn](/blog/how-robots-learn-machine-learning-and-reinforcement-learning).
+3. **Planning.** Choosing a path or sequence of moves, using methods like [motion planning](/atlas/concept/motion-planning).
+4. **Language and reasoning.** Using [large language models](/atlas/concept/large-language-model-robotics) to turn "tidy the table" into steps. See [LLMs and robots](/blog/large-language-models-and-robots).
+
+## What stays non-AI
+
+Motor control, balance loops and safety limits are usually classic control such as a [PID controller](/atlas/concept/pid-controller). They are predictable and checkable, which matters when a robot can hurt someone. Most good robots mix both. Read [AI vs traditional robot programming](/blog/ai-vs-traditional-robot-programming).
+
+## Example: a warehouse picking robot
+
+- **Without AI:** it can only pick items that arrive in exactly the same position, so a tilted box stops it.
+- **With AI vision:** it recognises items in any pose and adapts its grip, so it handles variety.
+- **Still classic:** the arm's joint control and emergency stops.
+
+## Where it gets difficult
+
+- **Real world is messy.** Models trained in simulation can fail on real hardware. See [the sim-to-real gap](/blog/sim-to-real-gap-explained).
+- **Compute limits.** Robots have limited power, so models often run on small boards. See [edge AI](/atlas/concept/edge-ai).
+- **Safety.** A wrong guess from a model needs a safe fallback.
+
+## Where to start
+
+1. Learn the [sense-think-act loop](/blog/how-do-robots-work).
+2. Understand [machine learning](/atlas/concept/machine-learning) basics.
+3. Try the free [Academy](/academy) and ask the R2 Co-pilot questions as you go.
+
+## FAQ
+
+**Do all robots use AI?** No. Many industrial robots run fixed programs and work very well.
+
+**Is AI the same as machine learning?** Machine learning is the main part of AI used in robots today, but AI is the wider field.
+
+**Do I need a maths degree?** Not to begin. Basic algebra and curiosity are enough for the first projects.
