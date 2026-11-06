@@ -65,6 +65,9 @@ const nextConfig = {
       ...simulatorAliases,
       { source: '/world-map', destination: '/atlas', permanent: true },
       { source: '/world-map/embed', destination: '/atlas', permanent: true },
+      // Duplicate Atlas entries (same title) -> keep one indexable page each.
+      { source: '/atlas/concept/drone-uav', destination: '/atlas/concept/drone', permanent: true },
+      { source: '/atlas/concept/field-programmable-gate-array', destination: '/atlas/concept/fpga', permanent: true },
       // Consolidation: Pulse is folded into the automated News feed.
       { source: '/pulse', destination: '/news', permanent: true },
       { source: '/pulse/weekly', destination: '/news', permanent: true },

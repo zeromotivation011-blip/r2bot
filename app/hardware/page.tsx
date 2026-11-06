@@ -8,13 +8,13 @@ import { HardwareClient } from './HardwareClient';
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 export const metadata: Metadata = {
-  title: 'Robotics Hardware Guide | Sensors, Motors & Controllers for Indian Makers',
+  title: 'Robotics Hardware Guide: Sensors, Motors & Controllers',
   description:
-    'A searchable index of 50+ robotics components with Indian prices and store links. Arduino, ESP32, sensors, motors, LiPo batteries — perfect for Class 9–12 STEM projects.',
+    'A searchable index of 50+ robotics components with simple cost levels and example store links. Arduino, ESP32, sensors, motors and batteries for school and hobby robot projects.',
   keywords: [
-    'arduino sensors price india',
-    'servo motor for robot india',
-    'robotics components india',
+    'robot parts list',
+    'servo motor for robot',
+    'robotics components',
     'ESP32 robotics',
     'robot parts robocraze',
     'robu.in hardware list',

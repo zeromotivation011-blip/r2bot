@@ -16,7 +16,7 @@ export const DID_YOU_KNOWS: readonly DidYouKnowFact[] = [
   { emoji: '🇮🇳', fact: 'India added 4,900 industrial robots in 2023 — the fastest growth in Asia outside China.' },
   { emoji: '⚡', fact: 'Most modern dishwashers contain more logic than the entire Apollo 11 guidance computer.' },
   { emoji: '🛰️', fact: 'There are ~7,500 robots in orbit right now (active satellites). They quietly run your GPS.' },
-  { emoji: '🤖', fact: 'The first commercial robot — Unimate, 1961 — was sold to GM for $50,000. Today it would cost ~₹3 lakh.' },
+  { emoji: '🤖', fact: 'The first commercial robot — Unimate, 1961 — was sold to GM for $50,000. Today a comparable industrial arm costs a fraction of that.' },
   { emoji: '🧠', fact: 'A self-driving car generates ~4TB of sensor data every 8 hours. Your phone generates ~10MB.' },
 ] as const
 

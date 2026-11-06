@@ -3,6 +3,13 @@
 import { useMemo, useState } from 'react';
 import { HARDWARE, HARDWARE_BY_ID, HARDWARE_CATEGORIES } from '@/lib/hardware-index';
 
+function costTier(n: number): string {
+  if (n < 500) return '$';
+  if (n < 3000) return '$$';
+  if (n < 15000) return '$$$';
+  return '$$$$';
+}
+
 export function CostCalculator({ defaults = [] }: { defaults?: string[] }) {
   const [picked, setPicked] = useState<string[]>(defaults);
   const [adding, setAdding] = useState('');
@@ -23,8 +30,8 @@ export function CostCalculator({ defaults = [] }: { defaults?: string[] }) {
 
   async function copyBom() {
     const text = items
-      .map((h) => `- ${h!.name} (${h!.type}) — ₹${h!.priceLow}–${h!.priceHigh}`)
-      .concat([`\nTotal: ₹${min.toLocaleString('en-IN')} – ₹${max.toLocaleString('en-IN')}`, `\n— Built with the R2BOT Cost Calculator (r2bot.in/hardware)`])
+      .map((h) => `- ${h!.name} (${h!.type}) — ${costTier(h!.priceHigh)}`)
+      .concat([`\nBudget level: ${costTier(min)} – ${costTier(max)}`, `\n— Built with the R2BOT Cost Calculator (r2bot.in/hardware)`])
       .join('\n');
     try {
       await navigator.clipboard.writeText(text);
@@ -51,7 +58,7 @@ export function CostCalculator({ defaults = [] }: { defaults?: string[] }) {
             <optgroup key={c.id} label={`${c.emoji} ${c.label}`}>
               {HARDWARE.filter((h) => h.category === c.id).map((h) => (
                 <option key={h.id} value={h.id}>
-                  {h.name} (₹{h.priceLow}–{h.priceHigh})
+                  {h.name} ({costTier(h.priceHigh)})
                 </option>
               ))}
             </optgroup>
@@ -79,7 +86,7 @@ export function CostCalculator({ defaults = [] }: { defaults?: string[] }) {
                 <span className="font-mono text-[10px] text-zinc-400">({h!.type})</span>
               </span>
               <span className="flex items-center gap-3">
-                <span className="font-mono text-xs text-amber-200">₹{h!.priceLow}–{h!.priceHigh}</span>
+                <span className="font-mono text-xs text-amber-200">{costTier(h!.priceHigh)}</span>
                 <button
                   type="button"
                   onClick={() => remove(h!.id)}
@@ -100,7 +107,7 @@ export function CostCalculator({ defaults = [] }: { defaults?: string[] }) {
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1.5 font-mono text-sm font-extrabold text-amber-100">
-          Total: ₹{min.toLocaleString('en-IN')} – ₹{max.toLocaleString('en-IN')}
+          Budget level: {costTier(min)} – {costTier(max)}
         </span>
         <button
           type="button"

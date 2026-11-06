@@ -33,7 +33,7 @@ export async function generateMetadata({
   if (!robot) return { title: 'Robot not found' };
   const url = `${BASE_URL}/robots/${robot.slug}`;
   return {
-    title: robot.metaTitle,
+    title: robot.metaTitle.replace(/\s*\|\s*R2BOT$/, ''),
     description: robot.metaDescription,
     keywords: [
       `${robot.name} robot`,

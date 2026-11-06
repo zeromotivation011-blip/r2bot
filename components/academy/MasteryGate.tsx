@@ -46,11 +46,9 @@ function Upsell({ courseTitle, enrollHref, priceInr }: MasteryGateProps) {
         href={enrollHref ?? '/pricing'}
         className="mg-cta"
       >
-        {typeof priceInr === 'number' && priceInr > 0
-          ? `Enrol for ₹${priceInr.toLocaleString('en-IN')}`
-          : 'Enrol free'} →
+        Enrol free →
       </Link>
-      <p className="mg-fine">EMI available · cancel anytime</p>
+      <p className="mg-fine">Free · no card needed</p>
 
       <Styles />
     </div>

@@ -131,7 +131,7 @@ export const FAMOUS_ROBOT_DETAILS: FamousRobotDetail[] = [
     indiaRelevance:
       'India is a fast-growing Roomba market — Eufy, Roborock and Xiaomi all sell aggressively, and Mi vacuums have become the entry-level Indian consumer robot. Even smaller cities are seeing adoption.',
     indiaLearning:
-      "Roomba's key lesson: don't aim for technical elegance, aim for a single chore done autonomously and cheaply. India needs Indian-priced consumer robots — ₹5,000 mop robots that survive Indian floors, dust, hair and power cuts.",
+      "Roomba's key lesson: don't aim for technical elegance, aim for a single chore done autonomously and cheaply. The world needs affordable consumer robots — low-cost mop robots are proving the point",
     robotFamily: [],
     competitorRobots: [],
     atlasLinks: ['slam', 'consumer-robotics', 'autonomous-navigation'],

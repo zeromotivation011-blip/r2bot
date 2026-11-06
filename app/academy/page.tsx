@@ -10,6 +10,7 @@ import { listCourseSlugs, loadCourse } from '@/lib/academy/content-loader';
 import { AcademyHomeClient } from './AcademyHomeClient';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/academy' },
   title: 'Academy',
   description:
     'Project-based robotics courses for every level. Spark to Edge. Free to start, certificates that mean something.',

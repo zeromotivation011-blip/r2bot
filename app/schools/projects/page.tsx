@@ -1,5 +1,6 @@
 'use client'
 
+import { displayCost } from '@/lib/cost-display';
 import Link from 'next/link'
 import { SchoolSideNav } from '../_components/SchoolSideNav'
 import { PROJECTS, type Difficulty } from '@/lib/school-curriculum'
@@ -23,7 +24,7 @@ export default function ProjectsPage() {
               <h1 className="mt-1 text-3xl font-bold">🚀 Project Lab</h1>
               <p className="text-sm text-gray-400 mt-0.5">10 real-world buildable projects — low-cost, easy-to-find parts.</p>
             </div>
-            <div className="text-xs text-gray-500">All costs sourced from Robu.in (approximate, 2024)</div>
+            <div className="text-xs text-gray-500">Cost levels: $ cheap, $$ moderate, $$$ higher. Prices vary by country.</div>
           </div>
         </header>
 
@@ -50,7 +51,7 @@ export default function ProjectsPage() {
               </div>
 
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-amber-400 font-bold">{p.cost}</span>
+                <span className="text-amber-400 font-bold">{displayCost(p.cost)}</span>
                 <span className="text-sm text-amber-300">Start →</span>
               </div>
 

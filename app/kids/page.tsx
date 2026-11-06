@@ -38,7 +38,7 @@ const appJsonLd = {
   description: '6-zone robotics adventure for kids ages 5–14. Spark the robot guides every lesson.',
   audience: { '@type': 'EducationalAudience', educationalRole: 'student', audienceType: 'children' },
   isAccessibleForFree: true,
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   url: `${BASE}/kids`,
 }
 

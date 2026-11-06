@@ -38,10 +38,10 @@ export function HardwareClient() {
         </span>
         <h1 className="mt-4 text-4xl font-black text-white sm:text-5xl">
           50+ Components.{' '}
-          <span className="bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">Indian Prices.</span>
+          <span className="bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">Simple Cost Guide.</span>
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-zinc-400">
-          Every part you need to build a robot in India — with current price ranges and direct store links.
+          Every part you need to build a robot, with a simple cost level ($ to $$$$) and example store links. Prices vary by country, so check your local shop.
         </p>
       </header>
 
@@ -77,7 +77,7 @@ export function HardwareClient() {
       </div>
 
       <p className="mt-3 text-xs text-zinc-500">
-        Showing <strong className="text-white">{filtered.length}</strong> of {HARDWARE.length} components. Prices in ₹ are typical ranges and may vary.
+        Showing <strong className="text-white">{filtered.length}</strong> of {HARDWARE.length} components. Cost levels are rough guides: $ is very cheap, $$$$ is premium.
       </p>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-white/10">
@@ -87,7 +87,7 @@ export function HardwareClient() {
               <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-wider text-zinc-500">Component</th>
               <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-wider text-zinc-500">Type</th>
               <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-wider text-zinc-500">Typical use</th>
-              <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-wider text-zinc-500">Price (₹)</th>
+              <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-wider text-zinc-500">Cost</th>
               <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-wider text-zinc-500">Buy</th>
               <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-wider text-zinc-500">Level</th>
             </tr>
@@ -110,6 +110,16 @@ export function HardwareClient() {
   );
 }
 
+// Relative cost tier derived from the stored reference price, so the page shows
+// a worldwide-neutral guide instead of unverifiable local currency amounts.
+function costLevel(low: number, high: number): string {
+  const mid = (low + high) / 2;
+  if (mid < 500) return '$';
+  if (mid < 3000) return '$$';
+  if (mid < 15000) return '$$$';
+  return '$$$$';
+}
+
 function Row({ h }: { h: HardwareItem }) {
   const diff = DIFFS.find((d) => d.id === h.difficulty)!;
   return (
@@ -121,7 +131,7 @@ function Row({ h }: { h: HardwareItem }) {
       <td className="px-4 py-3 text-zinc-300">{h.type}</td>
       <td className="px-4 py-3 text-zinc-300">{h.use}</td>
       <td className="px-4 py-3 font-mono text-amber-200">
-        ₹{h.priceLow.toLocaleString('en-IN')} – ₹{h.priceHigh.toLocaleString('en-IN')}
+        {costLevel(h.priceLow, h.priceHigh)}
       </td>
       <td className="px-4 py-3">
         <div className="flex flex-wrap gap-1">

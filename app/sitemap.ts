@@ -32,7 +32,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getAllLensMerged(),
   ]);
 
-  const atlas = atlasEntries.map((e) => ({
+  // Slugs that 308 to another entry must not be listed in the sitemap.
+  const REDIRECTED_ATLAS = new Set(['drone-uav', 'field-programmable-gate-array']);
+  const atlas = atlasEntries.filter((e) => !REDIRECTED_ATLAS.has(e.slug)).map((e) => ({
     url: `${BASE}/atlas/${e.type}/${e.slug}`,
     lastModified: new Date(e.lastReviewed ?? now),
     changeFrequency: 'monthly' as const,

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { StaticPage } from '@/components/StaticPage';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/privacy' },
   title: 'Privacy Policy',
   description: "How R2BOT collects, uses, and protects your data — in plain English, in compliance with India's DPDP Act 2023 and GDPR.",
 };
