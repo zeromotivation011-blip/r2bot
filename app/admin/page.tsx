@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 const TOOLS: { href: string; icon: string; title: string; desc: string }[] = [
+  { href: '/admin/analytics', icon: '📊', title: 'Analytics', desc: 'Sign-ups, active learners, top pages, course progress.' },
   { href: '/admin/atlas', icon: '🧠', title: 'Atlas', desc: 'Create & edit robotics concept entries.' },
   { href: '/admin/news', icon: '📰', title: 'News', desc: 'Curate the news archive — pin, hide, rewrite.' },
   { href: '/admin/blog', icon: '📝', title: 'Blog', desc: 'Write and publish long-form posts.' },
