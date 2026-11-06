@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { AI_TOPICS, getTopic } from '@/lib/ai-robotics'
+import { DEMOS } from '../demos'
 
 const BASE = 'https://www.r2bot.in'
 export function generateStaticParams() { return AI_TOPICS.map((t) => ({ slug: t.slug })) }
@@ -21,6 +22,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
     { '@context': 'https://schema.org', '@type': 'Article', headline: t.title, description: t.short, author: { '@type': 'Organization', name: 'R2BOT' }, mainEntityOfPage: `${BASE}/ai-robotics/${t.slug}` },
     { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: t.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
   ]
+  const Demo = DEMOS[t.slug]
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '110px 20px 80px' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
@@ -30,6 +32,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
       <p style={{ color: '#e2e8f0', fontSize: 19, lineHeight: 1.6, margin: '0 0 18px' }}>{t.short}</p>
       {t.what.map((p, i) => <p key={i} style={{ color: '#cbd5e1', fontSize: 17, lineHeight: 1.7 }}>{p}</p>)}
 
+      {Demo && <Demo />}
       <div style={{ ...box, margin: '20px 0' }}>
         <div style={{ color: '#FC6818', fontWeight: 800, fontSize: 12 }}>REAL EXAMPLE</div>
         <p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.6 }}>{t.example}</p>
