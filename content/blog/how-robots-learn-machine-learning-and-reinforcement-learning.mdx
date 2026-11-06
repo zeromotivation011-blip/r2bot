@@ -1,0 +1,51 @@
+---
+title: "How Robots Learn: Machine Learning, Imitation and Reinforcement Learning"
+description: "Three ways robots learn skills: from labelled data, from watching a person, and from trial and reward. Plain-language examples of each."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["AI","Learning"]
+readTime: 7
+coverEmoji: "📈"
+featured: false
+keywords: ["how robots learn","reinforcement learning robots","imitation learning robot","machine learning robotics"]
+---
+
+# How Robots Learn: Machine Learning, Imitation and Reinforcement Learning
+
+**Short answer:** robots learn in three main ways: from **examples** (supervised [machine learning](/atlas/concept/machine-learning)), by **copying a demonstration** ([imitation learning](/atlas/concept/imitation-learning)), or by **trial and error with a score** ([reinforcement learning](/atlas/concept/reinforcement-learning)).
+
+## 1. Learning from labelled examples
+
+Show the system thousands of photos labelled "cup" or "not a cup" and it learns to spot cups. This powers [object detection](/atlas/concept/object-detection). **Good for:** perception. **Weak spot:** it needs lots of labelled data.
+
+## 2. Learning by imitation
+
+A person guides the robot arm through a task, and the robot learns to repeat it. **Good for:** manipulation tasks that are easy to demonstrate. **Weak spot:** it can struggle when the situation differs from the demos.
+
+## 3. Learning by trial and reward
+
+The robot tries actions, gets a **reward** when it does well, and gradually prefers actions that earn more. A simulated walking robot might get points for staying upright and moving forward. The reward design matters a lot: see [reward shaping](/atlas/concept/reward-shaping).
+
+- **Without a well-designed reward:** the robot may find a shortcut, like falling forward to "move forward" quickly.
+- **With good shaping:** it learns the behaviour you actually wanted.
+
+## Why simulation is used
+
+Trial and error on real hardware is slow and breaks things. So robots often practise millions of times in simulation first. The catch is the [sim-to-real gap](/blog/sim-to-real-gap-explained).
+
+## Choosing a method
+
+| If you have | Consider |
+|---|---|
+| Lots of labelled images | Supervised learning |
+| A human who can demonstrate | Imitation learning |
+| A good simulator and a clear score | Reinforcement learning |
+
+## FAQ
+
+**Can a robot learn on its own in the real world?** Yes, but slowly and with safety limits, so most training happens in simulation first.
+
+**Is deep learning the same thing?** [Deep learning](/atlas/concept/deep-learning) is a technique that can be used inside all three approaches.
+
+Back to the overview: [AI and robotics, the complete guide](/blog/ai-and-robotics-complete-guide).
