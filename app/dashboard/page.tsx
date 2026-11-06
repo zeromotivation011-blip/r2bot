@@ -13,6 +13,7 @@ import { XPLeaderboard } from '@/components/XPLeaderboard';
 import { EmailDigestToggle } from '@/components/EmailDigestToggle';
 import { ResumeChatButton } from '@/components/ResumeChatButton';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { ResumeStrip } from '@/components/ResumeStrip';
 import { getAllAtlasEntries, type AtlasCategory, ATLAS_CATEGORIES } from '@/lib/atlas';
 import { type Job, formatSalary, timeAgo, TRACK_LABEL } from '@/lib/jobs';
 import { getUserSubscription } from '@/lib/subscription';
@@ -87,6 +88,7 @@ export default async function DashboardPage() {
       <CursorTrail />
       <Nav />
       <main id="main-content" style={{ paddingTop: 130, paddingBottom: 80, position: 'relative', zIndex: 2 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto 24px', padding: '0 20px' }}><ResumeStrip /></div>
         <div className="container" style={{ maxWidth: 1100 }}>
           <WelcomeHeader
             firstName={firstName}

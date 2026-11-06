@@ -118,6 +118,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Dynamic content surfaces
     ...academyTracks,
     ...videoCourses,
+    { url: `${BASE}/start`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
     ...academyLessons,
     ...simulators,
     ...atlas,

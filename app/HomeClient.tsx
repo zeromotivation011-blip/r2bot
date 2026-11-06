@@ -118,7 +118,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
 
 // ─── HERO ─────────────────────────────────────────────────────────────────
 function Hero({ personalization, atlasCount, projectCount }: { personalization: Personalization; atlasCount: number; projectCount: number }) {
-  const continueHref = personalization.track ? `/academy/${personalization.track}` : '/academy'
+  const continueHref = personalization.track ? `/academy/${personalization.track}` : '/start'
   const primaryLabel = personalization.track
     ? `Continue ${TRACK_LABEL[personalization.track]} →`
     : 'Start Learning →'
