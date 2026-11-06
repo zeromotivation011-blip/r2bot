@@ -1,0 +1,50 @@
+---
+title: "What Is SLAM? A Plain-Words Guide to How Robots Map and Find Themselves"
+description: "SLAM lets a robot build a map while working out where it is on that map. Here is the idea, why it is hard, and where it is used."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["SLAM","Navigation"]
+readTime: 6
+coverEmoji: "🗺️"
+featured: false
+keywords: ["what is slam","slam explained","simultaneous localization and mapping","how robots map"]
+---
+
+# What Is SLAM? A Plain-Words Guide to How Robots Map and Find Themselves
+
+**Short answer:** **SLAM** stands for Simultaneous Localization And Mapping. A robot dropped in an unknown place builds a map of it while also working out where it is on that map. See [SLAM](/atlas/concept/slam) in the Atlas.
+
+## Why it is a chicken-and-egg problem
+
+To draw a good map you need to know exactly where you are. To know where you are you need a good map. SLAM solves both together, improving each estimate using the other.
+
+## How it works, simply
+
+1. The robot moves and estimates how far it went, using wheel counts ([odometry](/atlas/concept/odometry)). This drifts over time.
+2. It scans the surroundings, often with [lidar](/atlas/concept/lidar) or a camera.
+3. It matches the new scan with the map so far, and corrects its position.
+4. When it returns to a place it has seen before, it snaps the map shut. That is [loop closure](/atlas/concept/loop-closure).
+
+## Everyday example
+
+Walk through a new building with your eyes closed, counting steps. After a while you are unsure where you are. Open your eyes at a landmark and you instantly fix your position. SLAM does the same with sensors.
+
+## Where it is used
+
+- Robot vacuums mapping your home.
+- Warehouse robots moving between shelves.
+- Drones flying indoors without GPS.
+- Phone augmented reality apps.
+
+## Try it
+
+In ROS 2, navigation packages such as [Nav2](/atlas/concept/nav2) work with maps made by SLAM. The [lidar SLAM](/atlas/concept/lidar-slam) entry shows a typical setup.
+
+## FAQ
+
+**Does SLAM need GPS?** No, which is why it works indoors.
+
+**Does it need lidar?** No. Camera-based variants exist, called visual SLAM.
+
+**Is SLAM solved?** It works well in many settings, but crowds, mirrors and changing scenes still cause trouble.

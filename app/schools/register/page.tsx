@@ -7,7 +7,7 @@ const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_S
 
 export const metadata: Metadata = {
   title: 'Register Your School — R2BOT for Schools',
-  description: 'Sign up your school for the free R2BOT robotics curriculum. CBSE/ICSE aligned. Activation in 24 hours.',
+  description: 'Sign up your school for the free R2BOT robotics curriculum. Includes CBSE/ICSE alignment tables. Activation in 24 hours.',
   alternates: { canonical: `${BASE_URL}/schools/register` },
 };
 

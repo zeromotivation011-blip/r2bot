@@ -549,7 +549,7 @@ function IndiaSpotlight() {
               Built for the world. Priced for everyone.
             </h2>
             <p style={{ fontSize: 16, color: '#94a3b8', lineHeight: 1.7, margin: '0 0 24px', maxWidth: 560 }}>
-              Robotics is the fastest-growing field on Earth. R2BOT makes it learnable anywhere — free to explore, affordable to master, in plain English (with more languages coming).
+              Robotics is the fastest-growing field on Earth. R2BOT makes it learnable anywhere — free to explore and free to master, in plain English (with more languages coming).
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
               <Pillar emoji="🌍" title="Learn anywhere" body="Runs in your browser — no hardware, no install, no borders." />
@@ -830,10 +830,10 @@ function SchoolsTeaser() {
               Bring robotics to your classroom.
             </h2>
             <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.7, margin: '0 0 24px', maxWidth: 560 }}>
-              Auto-graded missions, teacher progress dashboard, CBSE-aligned curriculum, and verifiable certificates — everything a school needs to run a robotics programme.
+              Auto-graded missions, teacher progress dashboard, curriculum alignment tables, and verifiable certificates — everything a school needs to run a robotics programme.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
-              {['Browser-based simulators', 'Grade-wise curriculum', 'Teacher dashboard', 'Hindi + English', 'Bulk certificates', 'CBSE aligned'].map(f => (
+              {['Browser-based simulators', 'Grade-wise curriculum', 'Teacher dashboard', 'Free for schools', 'Bulk certificates', 'CBSE/NEP alignment'].map(f => (
                 <span key={f} style={{
                   fontSize: 12, fontWeight: 700, color: '#10b981',
                   background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)',

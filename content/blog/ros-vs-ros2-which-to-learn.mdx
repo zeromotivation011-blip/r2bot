@@ -1,0 +1,50 @@
+---
+title: "ROS vs ROS 2: Which Should You Learn First?"
+description: "ROS 1 is end-of-life and ROS 2 is the current standard. Here is the difference in plain terms and what a beginner should do."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["ROS2","Software"]
+readTime: 6
+coverEmoji: "🧩"
+featured: false
+keywords: ["ros vs ros2","should i learn ros or ros2","ros2 for beginners","robot operating system"]
+---
+
+# ROS vs ROS 2: Which Should You Learn First?
+
+**Short answer:** learn **ROS 2**. ROS 1 stopped receiving updates in May 2025, and new robotics work, tutorials and jobs have moved to ROS 2. Despite the name, [ROS](/atlas/concept/ros) is not an operating system. It is a set of tools and conventions that let the parts of a robot talk to each other.
+
+## What both of them do
+
+A robot is many small programs: one reads the camera, one plans a path, one drives the motors. ROS lets them run separately and exchange messages through named channels called [topics](/atlas/concept/ros2-topics). Each program is a [node](/atlas/concept/ros2-nodes).
+
+## The main differences
+
+| | ROS 1 | ROS 2 |
+|---|---|---|
+| Status | End-of-life (final release, Noetic, ended May 2025) | Actively developed |
+| Central server | Needs a master process; if it dies, everything stops | No master; nodes find each other |
+| Real-time and reliability | Limited | Configurable quality-of-service settings |
+| Platforms | Mainly Linux | Linux, Windows, macOS |
+| Security | Little built in | Built-in options |
+
+## Why this matters to you
+
+If you learn ROS 1 today, you will study material that is no longer maintained and many modern packages will not work. If you learn ROS 2 you can follow current tutorials, use [Nav2](/atlas/concept/nav2) for navigation, and your skills match what companies now ask for.
+
+## What to learn first
+
+1. Understand nodes and topics with a small example.
+2. Install a current LTS release such as [ROS 2 Humble](/atlas/concept/ros2-humble) or a newer long-term release.
+3. Try navigation in simulation before touching hardware.
+
+The Forge track in the [Academy](/academy) is built around ROS 2.
+
+## FAQ
+
+**Do I need Linux?** Ubuntu is the easiest path, though ROS 2 also runs on Windows and macOS.
+
+**Is ROS 2 hard for beginners?** The ideas are simple. The tooling takes some patience. Learn the concepts in a simulator first.
+
+**Can I skip ROS completely?** For small hobby robots, yes. It starts to pay off when a robot has several sensors and software parts.
