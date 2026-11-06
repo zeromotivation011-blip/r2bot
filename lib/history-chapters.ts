@@ -151,7 +151,7 @@ const CHAPTERS: HistoryChapter[] = [
     subtitle: 'The first real robot walked into a GM factory',
     years: '1961–1980',
     emoji: '🛠️',
-    color: '#f59e0b',
+    color: '#FC6818',
     chapterIntro:
       "From 1961 to 1980, robots stopped being a thought experiment and became a real industrial category. The first Unimate at General Motors moved hot castings; Stanford's mobile robot Shakey planned its own routes; Victor Scheinman built the first useful electric robot arm. By 1980, the foundations of every modern robotics company — sensors, actuators, controllers, programming languages — were in place. Most of the practitioners weren't yet 30.",
     pivotMoment: 'Unimate moves its first hot die-cast part at GM\'s Trenton plant in 1961. Robotics is officially a job.',
@@ -388,7 +388,7 @@ const CHAPTERS: HistoryChapter[] = [
     subtitle: 'India\'s robotics story — from ISRO mechanisms to a startup boom',
     years: '1969–2024',
     emoji: '🇮🇳',
-    color: '#fbbf24',
+    color: '#FF8A4C',
     chapterIntro:
       "India's robotics story has run parallel to the global one — quieter, slower, but real. ISRO built robotic mechanisms in the 1960s. BARC automated nuclear facilities in the 80s. TELCO Pune installed India's first industrial robot in 1983. DRDO produced Daksh in 2010. Invento Robotics shipped Mitra in 2017. GreyOrange built one of the world's largest AMR fleets. The chapter is still being written — and the protagonists are young.",
     pivotMoment: 'Invento Robotics ships Mitra to Apollo Hospitals in 2017 — proof India can manufacture a real commercial robot.',

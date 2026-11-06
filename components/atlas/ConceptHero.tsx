@@ -109,8 +109,8 @@ export function ConceptHero({
           color: #00E5FF;
         }
         .ch-badge-xp {
-          background: rgba(251,191,36,0.18);
-          color: #fbbf24;
+          background: rgba(255,138,76,0.18);
+          color: #FF8A4C;
         }
         .ch-media {
           display: grid;

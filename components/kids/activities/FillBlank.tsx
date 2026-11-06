@@ -58,7 +58,7 @@ export function FillBlank({
         .fb { display: flex; flex-direction: column; gap: 12px; }
         .fb-prompt {
           background: #1a1040;
-          color: #fde68a;
+          color: #FFC9A8;
           padding: 18px;
           border: 2px solid #4c1d95;
           border-radius: 14px;
@@ -77,9 +77,9 @@ export function FillBlank({
         }
         .fb-opt {
           min-height: 56px;
-          background: linear-gradient(135deg, #fde047, #fbbf24);
+          background: linear-gradient(135deg, #fde047, #FF8A4C);
           color: #1a1040;
-          border: 2px solid #f59e0b;
+          border: 2px solid #FC6818;
           border-radius: 14px;
           font-weight: 900; font-size: 15px;
           cursor: pointer;
@@ -98,7 +98,7 @@ export function FillBlank({
           25%     { transform: translateX(-6px); }
           75%     { transform: translateX(6px); }
         }
-        .fb-hint { color: #fcd34d; font-weight: 700; font-size: 13px; text-align: center; }
+        .fb-hint { color: #FFA878; font-weight: 700; font-size: 13px; text-align: center; }
       `}</style>
     </div>
   )

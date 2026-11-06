@@ -439,7 +439,7 @@ function EntryStyles() {
         box-shadow: 0 14px 36px rgba(124,58,237,0.4);
       }
       .ke-age-card-label { font-weight: 900; font-size: 18px; margin-top: 8px; }
-      .ke-age-card-caption { color: #fde68a; font-size: 13px; margin-top: 6px; }
+      .ke-age-card-caption { color: #FFC9A8; font-size: 13px; margin-top: 6px; }
 
       .ke-portal {
         position: relative;
@@ -453,7 +453,7 @@ function EntryStyles() {
       .ke-portal-ring {
         position: absolute; inset: -60px; margin: auto;
         width: 320px; height: 320px; border-radius: 50%;
-        background: conic-gradient(from 0deg, var(--accent, #fbbf24), #ef4444, #7c3aed, #06b6d4, #10b981, var(--accent, #fbbf24));
+        background: conic-gradient(from 0deg, var(--accent, #FF8A4C), #ef4444, #7c3aed, #06b6d4, #10b981, var(--accent, #FF8A4C));
         filter: blur(20px);
         opacity: 0.7;
         animation: ke-portal-spin 2.4s linear infinite;
@@ -510,10 +510,10 @@ function EntryStyles() {
       .ke-cta {
         display: inline-flex; align-items: center; justify-content: center;
         min-height: 54px; padding: 0 24px;
-        background: linear-gradient(135deg, #f59e0b, #ef4444);
+        background: linear-gradient(135deg, #FC6818, #ef4444);
         color: #fff; font-weight: 900; font-size: 17px;
         border: none; border-radius: 14px; cursor: pointer;
-        box-shadow: 0 10px 30px rgba(245,158,11,0.4);
+        box-shadow: 0 10px 30px rgba(252,104,24,0.4);
         text-decoration: none;
       }
       .ke-cta:hover { transform: translateY(-2px); }

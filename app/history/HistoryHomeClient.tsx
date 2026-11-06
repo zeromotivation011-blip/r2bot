@@ -51,7 +51,7 @@ export default function HistoryHomeClient({ chapters }: { chapters: HistoryChapt
     <main className="min-h-screen bg-[#0A0E17] text-white">
       {/* Hero */}
       <section className="relative px-4 pt-28 pb-12 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(245,158,11,0.15),transparent_40%),radial-gradient(circle_at_80%_50%,rgba(124,58,237,0.12),transparent_40%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(252,104,24,0.15),transparent_40%),radial-gradient(circle_at_80%_50%,rgba(124,58,237,0.12),transparent_40%)]" />
         <div className="relative mx-auto max-w-5xl text-center">
           <p className="text-xs tracking-[3px] uppercase text-amber-300 font-bold">The Greatest Story Never Told</p>
           <h1 className="mt-4 font-black leading-[1.05] text-[clamp(36px,6vw,64px)] text-white animate-fade-in">
@@ -159,13 +159,13 @@ function BirthYearPanel({ birthYear, onBirthChange, lifetimeSummary }: {
   // Era-appropriate background based on birth year
   const eraStyle = (() => {
     if (!birthYear) {
-      return { background: 'rgba(245,158,11,0.08)', borderColor: 'rgba(245,158,11,0.3)' }
+      return { background: 'rgba(252,104,24,0.08)', borderColor: 'rgba(252,104,24,0.3)' }
     }
     if (birthYear < 1950) return { background: 'linear-gradient(135deg, #4b3a1f, #2d2113)', borderColor: '#8B7355' }
     if (birthYear < 1970) return { background: 'linear-gradient(135deg, #3d4622, #232a15)', borderColor: '#849c40' }
-    if (birthYear < 1990) return { background: 'linear-gradient(135deg, #5e3a18, #3b240e)', borderColor: '#d97706' }
+    if (birthYear < 1990) return { background: 'linear-gradient(135deg, #5e3a18, #3b240e)', borderColor: '#E5550A' }
     if (birthYear < 2010) return { background: 'linear-gradient(135deg, #1e3a5f, #122440)', borderColor: '#3b82f6' }
-    return { background: 'rgba(245,158,11,0.10)', borderColor: 'rgba(245,158,11,0.45)' }
+    return { background: 'rgba(252,104,24,0.10)', borderColor: 'rgba(252,104,24,0.45)' }
   })()
 
   return (
@@ -277,8 +277,8 @@ function MilestoneCard({ milestone: m, index, color, birthYear }: {
       id={`${m.year}-${m.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40)}`}
       className={`rounded-2xl border bg-gradient-to-br from-white/[0.04] to-white/[0.01] p-5 md:p-6 ${inLifetime ? 'border-l-4' : 'border'}`}
       style={{
-        borderColor: inLifetime ? '#fbbf24' : 'rgba(255,255,255,0.1)',
-        borderLeftColor: inLifetime ? '#fbbf24' : undefined,
+        borderColor: inLifetime ? '#FF8A4C' : 'rgba(255,255,255,0.1)',
+        borderLeftColor: inLifetime ? '#FF8A4C' : undefined,
       }}
     >
       <div className={`md:flex gap-6 ${isLeft ? '' : 'md:flex-row-reverse'}`}>

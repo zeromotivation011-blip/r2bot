@@ -103,7 +103,7 @@ export function AcademyHomeClient({ courses }: { courses: Course[] }) {
 
       {/* ── HEADER ────────────────────────────────────────── */}
       <header style={{ marginBottom: 32 }}>
-        <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 8px' }}>
+        <p style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 8px' }}>
           R2BOT · Academy
         </p>
         <h1 style={{ fontSize: 'clamp(40px,6vw,72px)', fontWeight: 900, color: '#fff', margin: '0 0 14px', lineHeight: 1.05 }}>
@@ -152,7 +152,7 @@ export function AcademyHomeClient({ courses }: { courses: Course[] }) {
       {/* ── FEATURED COURSE ──────────────────────────────── */}
       {featured && !inProgress && (
         <section style={{ margin: '28px 0' }}>
-          <p style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 10px' }}>Start here</p>
+          <p style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 10px' }}>Start here</p>
           <div style={{
             padding: 28,
             background: 'linear-gradient(135deg, rgba(124,58,237,0.16), rgba(0,184,212,0.08))',
@@ -189,9 +189,9 @@ export function AcademyHomeClient({ courses }: { courses: Course[] }) {
             return (
               <div key={track} style={{
                 position: 'relative',
-                border: isRecommended ? `2px solid #fbbf24` : `1px solid ${accent}44`,
-                background: isRecommended ? 'rgba(251,191,36,0.08)' : `${accent}0d`,
-                boxShadow: isRecommended ? '0 0 0 4px rgba(251,191,36,0.12)' : 'none',
+                border: isRecommended ? `2px solid #FF8A4C` : `1px solid ${accent}44`,
+                background: isRecommended ? 'rgba(255,138,76,0.08)' : `${accent}0d`,
+                boxShadow: isRecommended ? '0 0 0 4px rgba(255,138,76,0.12)' : 'none',
                 borderRadius: 14, padding: '14px 16px',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
               }}>
@@ -200,7 +200,7 @@ export function AcademyHomeClient({ courses }: { courses: Course[] }) {
                     position: 'absolute', top: -10, left: 14,
                     fontSize: 9, fontWeight: 900, letterSpacing: '1.5px', textTransform: 'uppercase',
                     padding: '3px 8px', borderRadius: 999,
-                    background: '#fbbf24', color: '#1a0f00',
+                    background: '#FF8A4C', color: '#1a0f00',
                   }}>
                     Your recommended track
                   </span>
@@ -320,9 +320,9 @@ function CourseCard({ course }: { course: Course }) {
           display: 'inline-flex', alignItems: 'center', gap: 4,
           fontSize: 10, fontWeight: 900, letterSpacing: '1.5px', textTransform: 'uppercase',
           padding: '3px 8px', borderRadius: 999,
-          background: free ? 'rgba(16,185,129,0.18)' : 'rgba(251,191,36,0.18)',
-          border: `1px solid ${free ? 'rgba(16,185,129,0.5)' : 'rgba(251,191,36,0.5)'}`,
-          color: free ? '#34d399' : '#fbbf24',
+          background: free ? 'rgba(16,185,129,0.18)' : 'rgba(255,138,76,0.18)',
+          border: `1px solid ${free ? 'rgba(16,185,129,0.5)' : 'rgba(255,138,76,0.5)'}`,
+          color: free ? '#34d399' : '#FF8A4C',
         }}>
           {free ? 'Free' : <>🔒 Pro</>}
         </span>

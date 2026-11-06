@@ -115,7 +115,7 @@ export function TextBlock({ block, isCompleted, onComplete }: Props) {
         .prose-acad code {
           background: rgba(255,255,255,0.06);
           padding: 2px 6px; border-radius: 4px;
-          font-size: 13px; color: #fbbf24;
+          font-size: 13px; color: #FF8A4C;
         }
         .prose-acad pre {
           background: #0b1220;
@@ -125,8 +125,8 @@ export function TextBlock({ block, isCompleted, onComplete }: Props) {
           font-size: 13px; line-height: 1.5;
         }
         .prose-acad blockquote {
-          border-left: 3px solid #fbbf24;
-          padding-left: 14px; color: #fde68a;
+          border-left: 3px solid #FF8A4C;
+          padding-left: 14px; color: #FFC9A8;
           margin: 14px 0;
         }
         .prose-acad a { color: #00E5FF; text-decoration: underline; }

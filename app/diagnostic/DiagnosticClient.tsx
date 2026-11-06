@@ -302,7 +302,7 @@ export function DiagnosticClient() {
             <div
               style={{
                 width: `${((isDone ? total : step) / total) * 100}%`,
-                height: '100%', background: 'linear-gradient(90deg, #f59e0b, #f97316)',
+                height: '100%', background: 'linear-gradient(90deg, #FC6818, #f97316)',
                 transition: 'width .35s ease',
               }}
             />
@@ -331,8 +331,8 @@ export function DiagnosticClient() {
                       width: '100%',
                       padding: '16px 20px',
                       display: 'flex', alignItems: 'center', gap: 14,
-                      background: isSelected ? 'rgba(245, 158, 11, 0.12)' : '#111118',
-                      border: `1.5px solid ${isSelected ? '#f59e0b' : '#1f1f2a'}`,
+                      background: isSelected ? 'rgba(252,104,24, 0.12)' : '#111118',
+                      border: `1.5px solid ${isSelected ? '#FC6818' : '#1f1f2a'}`,
                       borderRadius: 14,
                       color: '#fff',
                       fontSize: 17,
@@ -341,16 +341,16 @@ export function DiagnosticClient() {
                       cursor: 'pointer',
                       transition: 'border-color .15s, background .15s, transform .15s',
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#f59e0b' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = isSelected ? '#f59e0b' : '#1f1f2a' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#FC6818' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = isSelected ? '#FC6818' : '#1f1f2a' }}
                   >
                     {opt.emoji && <span style={{ fontSize: 26, lineHeight: 1 }} aria-hidden>{opt.emoji}</span>}
                     <span style={{ flex: 1 }}>{opt.label}</span>
                     {current.multiSelect && (
                       <span style={{
                         width: 22, height: 22, borderRadius: 6,
-                        border: `1.5px solid ${isSelected ? '#f59e0b' : '#475569'}`,
-                        background: isSelected ? '#f59e0b' : 'transparent',
+                        border: `1.5px solid ${isSelected ? '#FC6818' : '#475569'}`,
+                        background: isSelected ? '#FC6818' : 'transparent',
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                         color: '#1a0f00', fontSize: 14, fontWeight: 900,
                       }} aria-hidden>{isSelected ? '✓' : ''}</span>
@@ -379,7 +379,7 @@ export function DiagnosticClient() {
                   onClick={handleMultiNext}
                   disabled={(answers[current.id] ?? []).length === 0}
                   style={{
-                    background: '#f59e0b', color: '#1a0f00',
+                    background: '#FC6818', color: '#1a0f00',
                     border: 'none', borderRadius: 12,
                     padding: '12px 22px', fontSize: 15, fontWeight: 900,
                     cursor: (answers[current.id] ?? []).length === 0 ? 'not-allowed' : 'pointer',
@@ -396,7 +396,7 @@ export function DiagnosticClient() {
         {isDone && finalTrack && (
           <section className="diagnostic-fade" style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 64, lineHeight: 1, marginBottom: 14 }}>{TRACK_META[finalTrack].icon}</div>
-            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 8px' }}>
+            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 8px' }}>
               You are a {TRACK_META[finalTrack].name} learner
             </p>
             <h1 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 900, margin: '0 0 12px', color: '#fff', lineHeight: 1.15 }}>
@@ -412,10 +412,10 @@ export function DiagnosticClient() {
                 style={{
                   display: 'inline-flex', alignItems: 'center',
                   minHeight: 52, padding: '0 26px',
-                  background: '#f59e0b', color: '#1a0f00',
+                  background: '#FC6818', color: '#1a0f00',
                   borderRadius: 12, fontWeight: 900, fontSize: 15,
                   textDecoration: 'none',
-                  boxShadow: '0 8px 24px rgba(245,158,11,0.30)',
+                  boxShadow: '0 8px 24px rgba(252,104,24,0.30)',
                 }}
               >
                 Start learning · {TRACK_META[finalTrack].firstCourseLabel} →

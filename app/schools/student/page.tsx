@@ -251,7 +251,7 @@ function DashCard(props: {
             <svg viewBox="0 0 36 36" className="w-12 h-12">
               <circle cx="18" cy="18" r="15" fill="none" stroke="#1f2937" strokeWidth="3" />
               <circle
-                cx="18" cy="18" r="15" fill="none" stroke="#f59e0b" strokeWidth="3"
+                cx="18" cy="18" r="15" fill="none" stroke="#FC6818" strokeWidth="3"
                 strokeDasharray={`${ringPercent}, 100`}
                 transform="rotate(-90 18 18)" strokeLinecap="round"
               />

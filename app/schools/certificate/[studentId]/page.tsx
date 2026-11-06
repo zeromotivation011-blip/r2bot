@@ -82,7 +82,7 @@ export default function CertificatePage() {
           body { background: white; }
           .no-print { display: none !important; }
           .cert-wrap { padding: 0; min-height: 100vh; }
-          .cert { box-shadow: none !important; border-color: #92400e !important; }
+          .cert { box-shadow: none !important; border-color: #8F3308 !important; }
         }
       `}</style>
 

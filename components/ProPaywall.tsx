@@ -45,7 +45,7 @@ export function ProPaywall({ children }: ProPaywallProps) {
           style={{
             maxWidth: 520, width: '100%',
             background: 'rgba(15,15,23,0.92)',
-            border: '1.5px solid rgba(245,158,11,0.45)',
+            border: '1.5px solid rgba(252,104,24,0.45)',
             borderRadius: 18,
             padding: '28px 26px',
             textAlign: 'center',
@@ -53,7 +53,7 @@ export function ProPaywall({ children }: ProPaywallProps) {
             boxShadow: '0 24px 64px rgba(0,0,0,0.55)',
           }}
         >
-          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 10px' }}>
+          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 10px' }}>
             🔒 R2BOT Pro
           </p>
           <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', margin: '0 0 10px', lineHeight: 1.2 }}>
@@ -71,10 +71,10 @@ export function ProPaywall({ children }: ProPaywallProps) {
               style={{
                 display: 'inline-flex', alignItems: 'center',
                 minHeight: 48, padding: '0 22px',
-                background: '#fbbf24', color: '#1a0f00',
+                background: '#FF8A4C', color: '#1a0f00',
                 border: 'none', borderRadius: 12,
                 fontWeight: 900, fontSize: 14, cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(251,191,36,0.30)',
+                boxShadow: '0 8px 24px rgba(255,138,76,0.30)',
               }}
             >
               Upgrade to Pro →

@@ -78,7 +78,7 @@ export function MotorControlVisual() {
   const tempLabel = (() => {
     const v = motorType === 'dc' ? duty : servoAngle / 1.8;
     if (v <= 30) return { label: '❄ Cool', color: '#3b82f6' };
-    if (v <= 70) return { label: '🌡️ Warm', color: '#f59e0b' };
+    if (v <= 70) return { label: '🌡️ Warm', color: '#FC6818' };
     return { label: '🔥 Hot', color: '#ef4444' };
   })();
 
@@ -129,7 +129,7 @@ export function MotorControlVisual() {
             <path d={buildPath()} stroke="#00B8D4" strokeWidth={2} fill="none" style={{ filter: 'drop-shadow(0 0 4px rgba(0,184,212,.5))' }} />
           </svg>
           <div style={{ marginTop: 8, fontFamily: 'var(--font-mono), monospace', fontSize: 12, color: '#C8D0DC' }}>
-            <span style={{ color: '#22c55e' }}>ON: {onMs.toFixed(1)}ms</span> &nbsp; <span style={{ color: '#f59e0b' }}>OFF: {offMs.toFixed(1)}ms</span>
+            <span style={{ color: '#22c55e' }}>ON: {onMs.toFixed(1)}ms</span> &nbsp; <span style={{ color: '#FC6818' }}>OFF: {offMs.toFixed(1)}ms</span>
             &nbsp; <span style={{ color: '#94A3B8' }}>(20ms period, 50Hz)</span>
           </div>
         </div>
@@ -187,7 +187,7 @@ export function MotorControlVisual() {
               y={166}
               width={Math.max(0, (MOTOR_W - 30) * dutyFrac)}
               height={6}
-              fill="#f59e0b"
+              fill="#FC6818"
               rx={2}
             />
             <text x={MOTOR_W - 15} y={163} textAnchor="end" fill={tempLabel.color} fontSize={9} fontFamily="JetBrains Mono, monospace">

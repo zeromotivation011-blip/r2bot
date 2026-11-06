@@ -345,7 +345,7 @@ function CheckMode() {
     ctx.fillStyle = '#ffffff'
     ctx.font = 'bold 48px sans-serif'
     ctx.fillText('robots running my day', 100, 400)
-    ctx.fillStyle = '#fbbf24'
+    ctx.fillStyle = '#FF8A4C'
     ctx.font = '32px sans-serif'
     ctx.fillText('Built with R2BOT — r2bot.in/daily-life', 100, 560)
     const a = document.createElement('a')
@@ -417,7 +417,7 @@ function ClimaxOverlay({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center px-4" onClick={onClose}>
       <div className="text-center max-w-2xl">
-        <p className="text-[120px] md:text-[200px] font-black text-amber-400 leading-none climax-47" style={{ textShadow: '0 0 80px rgba(251,191,36,.4)' }}>
+        <p className="text-[120px] md:text-[200px] font-black text-amber-400 leading-none climax-47" style={{ textShadow: '0 0 80px rgba(255,138,76,.4)' }}>
           47
         </p>
         <p className="mt-2 text-2xl md:text-3xl font-black text-white climax-line climax-line-1">ROBOTS.</p>

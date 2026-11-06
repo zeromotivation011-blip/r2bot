@@ -128,8 +128,8 @@ export function SparkGuide() {
           height: 80px;
           border-radius: 50%;
           border: 3px solid var(--spark-yellow);
-          background: radial-gradient(circle at 40% 30%, #fff8dc, #fcd34d 60%, #f59e0b);
-          box-shadow: 0 6px 25px rgba(245, 158, 11, 0.4), 0 0 30px rgba(252, 211, 77, 0.3);
+          background: radial-gradient(circle at 40% 30%, #fff8dc, #FFA878 60%, #FC6818);
+          box-shadow: 0 6px 25px rgba(252,104,24, 0.4), 0 0 30px rgba(252, 211, 77, 0.3);
           cursor: pointer;
           padding: 0;
           display: flex;
@@ -144,7 +144,7 @@ export function SparkGuide() {
           top: -10px;
           left: -10px;
           background: #1a1040;
-          border: 2px solid #f59e0b;
+          border: 2px solid #FC6818;
           color: #fde047;
           font-size: 10px;
           font-weight: 900;
@@ -169,8 +169,8 @@ export function SparkGuide() {
           width: 240px;
           padding: 10px 30px 10px 12px;
           background: #1a1040;
-          border: 2px solid #f59e0b;
-          color: #fde68a;
+          border: 2px solid #FC6818;
+          color: #FFC9A8;
           border-radius: 14px;
           font-size: 13px;
           line-height: 1.4;
@@ -185,13 +185,13 @@ export function SparkGuide() {
           width: 0; height: 0;
           border-top: 8px solid transparent;
           border-bottom: 8px solid transparent;
-          border-left: 8px solid #f59e0b;
+          border-left: 8px solid #FC6818;
         }
         .spark-bubble-close {
           position: absolute;
           top: 4px; right: 4px;
           background: transparent;
-          color: #fbbf24;
+          color: #FF8A4C;
           border: none;
           font-size: 18px;
           font-weight: bold;

@@ -49,7 +49,7 @@ export function BuildABot({ onComplete }: { onComplete?: () => void }) {
           {placed.head ? null : <text x="110" y="106" fontSize="12" textAnchor="middle" fill="#4c1d95">head</text>}
           {placed.antenna && (
             <g>
-              <line x1="110" y1="36" x2="110" y2="58" stroke="#fbbf24" strokeWidth="3" />
+              <line x1="110" y1="36" x2="110" y2="58" stroke="#FF8A4C" strokeWidth="3" />
               <circle cx="110" cy="34" r="6" fill="#fde047" />
             </g>
           )}
@@ -168,9 +168,9 @@ export function BuildABot({ onComplete }: { onComplete?: () => void }) {
         }
         .bb-part {
           min-height: 64px;
-          background: linear-gradient(135deg, #fde047, #fbbf24);
+          background: linear-gradient(135deg, #fde047, #FF8A4C);
           color: #1a1040;
-          border: 2px solid #f59e0b;
+          border: 2px solid #FC6818;
           border-radius: 14px;
           padding: 8px;
           font-weight: 800;

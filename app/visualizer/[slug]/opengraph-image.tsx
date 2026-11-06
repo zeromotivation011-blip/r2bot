@@ -22,7 +22,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
 
   const heading = sim?.heading ?? 'Interactive Robotics Simulators'
   const blurb = sim?.blurb ?? 'Free, hands-on robotics tools that run in your browser.'
-  const accent = sim?.accent ?? '#FFB020'
+  const accent = sim?.accent ?? '#FC6818'
 
   return new ImageResponse(
     (

@@ -371,9 +371,9 @@ export function WorkspaceIDE() {
           style={{
             padding: '2px 8px',
             borderRadius: 999,
-            background: 'rgba(245,158,11,.15)',
-            border: '1px solid #f59e0b',
-            color: '#f59e0b',
+            background: 'rgba(252,104,24,.15)',
+            border: '1px solid #FC6818',
+            color: '#FC6818',
             fontSize: 10,
             letterSpacing: '.15em',
             textTransform: 'uppercase',

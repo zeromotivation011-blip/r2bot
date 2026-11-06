@@ -89,8 +89,8 @@ function Tile({ label, value, accent }: { label: string; value: number; accent?:
       style={{
         padding: '16px 18px',
         borderRadius: 12,
-        border: '1px solid ' + (accent ? 'rgba(255,176,32,.5)' : 'var(--border)'),
-        background: accent ? 'rgba(255,176,32,.08)' : 'rgba(11,37,64,.4)',
+        border: '1px solid ' + (accent ? 'rgba(252,104,24,.5)' : 'var(--border)'),
+        background: accent ? 'rgba(252,104,24,.08)' : 'rgba(11,37,64,.4)',
       }}
     >
       <div

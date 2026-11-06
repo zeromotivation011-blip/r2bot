@@ -170,7 +170,7 @@ export function SensorFusionVisual() {
         {/* GPS */}
         {s.gpsPts.length > 1 && <polyline points={poly(s.gpsPts)} stroke="#ef4444" strokeWidth={1.5} fill="none" />}
         {/* IMU */}
-        {s.imuPts.length > 1 && <polyline points={poly(s.imuPts)} stroke="#f59e0b" strokeWidth={1.5} fill="none" />}
+        {s.imuPts.length > 1 && <polyline points={poly(s.imuPts)} stroke="#FC6818" strokeWidth={1.5} fill="none" />}
         {/* Fused */}
         {s.fusedPts.length > 1 && (
           <polyline
@@ -201,7 +201,7 @@ export function SensorFusionVisual() {
         {[
           { label: 'True path', color: '#ffffff' },
           { label: 'GPS only', color: '#ef4444' },
-          { label: 'IMU only', color: '#f59e0b' },
+          { label: 'IMU only', color: '#FC6818' },
           { label: 'Fused (Kalman)', color: '#00B8D4' },
         ].map((l) => (
           <span key={l.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#C8D0DC' }}>
@@ -246,7 +246,7 @@ export function SensorFusionVisual() {
             step={0.05}
             value={imuDrift}
             onChange={(e) => setImuDrift(parseFloat(e.target.value))}
-            style={{ width: '100%', accentColor: '#f59e0b' }}
+            style={{ width: '100%', accentColor: '#FC6818' }}
           />
         </label>
       </div>

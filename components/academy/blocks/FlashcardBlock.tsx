@@ -114,7 +114,7 @@ export function FlashcardBlock({ block, isCompleted, onComplete }: Props) {
         .fc-front {
           background: linear-gradient(135deg, #1e293b, #0f172a);
           color: #fde047;
-          border: 2px solid rgba(251,191,36,0.4);
+          border: 2px solid rgba(255,138,76,0.4);
         }
         .fc-back {
           background: linear-gradient(135deg, #1a1040, #0f0a1e);

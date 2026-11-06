@@ -149,7 +149,7 @@ function arenaFor(m: SimMission): ArenaSpec {
         ],
         start: { x: 50, y: 250, heading: 0 },
         markers: [
-          { x: 150, y: 120, r: 10, colour: '#f59e0b', label: 'Part A' },
+          { x: 150, y: 120, r: 10, colour: '#FC6818', label: 'Part A' },
           { x: 150, y: 250, r: 10, colour: '#06b6d4', label: 'Part B' },
           { x: 150, y: 380, r: 10, colour: '#a855f7', label: 'Part C' },
           { x: 540, y: 250, r: 20, colour: '#10b981', label: 'Assembly' },
@@ -448,7 +448,7 @@ export default function SimulatorClient() {
     // Sensor cone (ultrasonic)
     if (sensors.ultrasonic) {
       const d = raycast(r.x, r.y, r.heading)
-      ctx.strokeStyle = 'rgba(251, 191, 36, 0.35)'
+      ctx.strokeStyle = 'rgba(255,138,76, 0.35)'
       ctx.beginPath()
       ctx.moveTo(0, 0)
       ctx.lineTo(d, 0)
@@ -456,7 +456,7 @@ export default function SimulatorClient() {
     }
 
     // Robot body
-    ctx.fillStyle = robotState.current.alive ? '#f59e0b' : '#7f1d1d'
+    ctx.fillStyle = robotState.current.alive ? '#FC6818' : '#7f1d1d'
     ctx.fillRect(-15, -10, 30, 20)
     // Direction arrow
     ctx.fillStyle = '#000'

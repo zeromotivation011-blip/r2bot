@@ -165,7 +165,7 @@ export function DeepDive(props: {
               </p>
               <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0 0' }}>
                 {commonMistakes.map((m, i) => (
-                  <li key={i} style={{ color: '#fde68a', fontSize: 14, marginBottom: 4 }}>
+                  <li key={i} style={{ color: '#FFC9A8', fontSize: 14, marginBottom: 4 }}>
                     • {m}
                   </li>
                 ))}
@@ -279,7 +279,7 @@ export function RealWorldStrip({
         </p>
       )}
       {indianCompanies && indianCompanies.length > 0 && (
-        <p style={{ fontSize: 12, color: '#fde68a', margin: '4px 0 0' }}>
+        <p style={{ fontSize: 12, color: '#FFC9A8', margin: '4px 0 0' }}>
           🇮🇳 <span style={{ fontWeight: 700 }}>In India:</span> {indianCompanies.join(' · ')}
         </p>
       )}
@@ -398,7 +398,7 @@ export function QuickChallenge({
                 cursor: picked === null ? 'pointer' : 'default',
               }}
             >
-              <span style={{ color: '#fbbf24', fontWeight: 900, marginRight: 8 }}>
+              <span style={{ color: '#FF8A4C', fontWeight: 900, marginRight: 8 }}>
                 {String.fromCharCode(65 + i)}.
               </span>
               {opt}

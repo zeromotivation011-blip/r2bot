@@ -123,7 +123,7 @@ export function SubmitBuildModal({ open, onClose, projectSlug, projectTitle, def
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: 0 }}>
+          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: 0 }}>
             Share your build
           </p>
           <button
@@ -146,7 +146,7 @@ export function SubmitBuildModal({ open, onClose, projectSlug, projectTitle, def
                 href="/community/gallery"
                 style={{
                   display: 'inline-flex', alignItems: 'center',
-                  padding: '12px 20px', background: '#fbbf24', color: '#1a0f00',
+                  padding: '12px 20px', background: '#FF8A4C', color: '#1a0f00',
                   borderRadius: 12, fontWeight: 900, fontSize: 14,
                   textDecoration: 'none',
                 }}
@@ -214,13 +214,13 @@ export function SubmitBuildModal({ open, onClose, projectSlug, projectTitle, def
                   <span key={t} style={{
                     display: 'inline-flex', alignItems: 'center', gap: 4,
                     padding: '4px 10px', borderRadius: 999,
-                    background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.4)',
-                    color: '#fbbf24', fontSize: 12, fontWeight: 700,
+                    background: 'rgba(252,104,24,0.12)', border: '1px solid rgba(252,104,24,0.4)',
+                    color: '#FF8A4C', fontSize: 12, fontWeight: 700,
                   }}>
                     {t}
                     <button
                       type="button" onClick={() => removeTag(t)}
-                      style={{ background: 'transparent', border: 'none', color: '#fbbf24', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0 }}
+                      style={{ background: 'transparent', border: 'none', color: '#FF8A4C', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0 }}
                       aria-label={`Remove tag ${t}`}
                     >×</button>
                   </span>
@@ -266,7 +266,7 @@ export function SubmitBuildModal({ open, onClose, projectSlug, projectTitle, def
               <button
                 type="submit" disabled={submitting}
                 style={{
-                  padding: '11px 22px', background: '#fbbf24', color: '#1a0f00',
+                  padding: '11px 22px', background: '#FF8A4C', color: '#1a0f00',
                   border: 'none', borderRadius: 12,
                   fontWeight: 900, fontSize: 14, cursor: submitting ? 'wait' : 'pointer',
                   opacity: submitting ? 0.6 : 1,

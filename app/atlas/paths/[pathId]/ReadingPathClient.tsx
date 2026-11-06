@@ -99,7 +99,7 @@ export function ReadingPathClient({
               style={{
                 width: `${pct}%`,
                 height: '100%',
-                background: `linear-gradient(90deg, ${path.color}, #fbbf24)`,
+                background: `linear-gradient(90deg, ${path.color}, #FF8A4C)`,
                 transition: 'width .4s cubic-bezier(.22,.61,.36,1)',
               }}
             />
@@ -201,7 +201,7 @@ export function ReadingPathClient({
                   <p style={{ margin: 0, fontWeight: 800, color: '#fff', fontSize: 15 }}>
                     {c.title}
                     {c.missing && (
-                      <span style={{ marginLeft: 8, fontSize: 10, color: '#fbbf24', fontWeight: 700 }}>
+                      <span style={{ marginLeft: 8, fontSize: 10, color: '#FF8A4C', fontWeight: 700 }}>
                         (coming soon)
                       </span>
                     )}
@@ -223,7 +223,7 @@ export function ReadingPathClient({
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                   {typeof c.difficultyLevel === 'number' && (
-                    <span style={{ color: '#fbbf24', fontSize: 11, letterSpacing: 1 }}>
+                    <span style={{ color: '#FF8A4C', fontSize: 11, letterSpacing: 1 }}>
                       {'★'.repeat(c.difficultyLevel)}
                     </span>
                   )}
@@ -245,8 +245,8 @@ export function ReadingPathClient({
             marginTop: 26,
             padding: 24,
             borderRadius: 18,
-            background: 'linear-gradient(135deg, rgba(251,191,36,0.18), rgba(16,185,129,0.10))',
-            border: '1px solid rgba(251,191,36,0.4)',
+            background: 'linear-gradient(135deg, rgba(255,138,76,0.18), rgba(16,185,129,0.10))',
+            border: '1px solid rgba(255,138,76,0.4)',
             textAlign: 'center',
           }}
         >
@@ -254,7 +254,7 @@ export function ReadingPathClient({
           <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fde047', margin: '8px 0 6px' }}>
             Path Complete — {path.title}
           </h2>
-          <p style={{ color: '#fde68a', margin: '0 0 14px' }}>
+          <p style={{ color: '#FFC9A8', margin: '0 0 14px' }}>
             You&apos;ve mastered all {total} concepts. Share the win.
           </p>
           <button
@@ -269,7 +269,7 @@ export function ReadingPathClient({
             }}
             style={{
               padding: '12px 22px',
-              background: 'linear-gradient(135deg, #fbbf24, #f97316)',
+              background: 'linear-gradient(135deg, #FF8A4C, #f97316)',
               color: '#0a0a16',
               fontWeight: 900,
               borderRadius: 12,

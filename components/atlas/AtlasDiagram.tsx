@@ -17,11 +17,11 @@ export type DiagramSpec = {
   caption?: string;
 };
 
-const AMBER = '#f59e0b';
+const AMBER = '#FC6818';
 const INK = '#e2e8f0';
 const MUTED = '#94a3b8';
 const BOX = '#0f172a';
-const BORDER = 'rgba(245,158,11,0.45)';
+const BORDER = 'rgba(252,104,24,0.45)';
 
 function boxWidth(label: string): number {
   return Math.max(96, Math.min(220, label.length * 8.6 + 28));
@@ -155,7 +155,7 @@ function StackSvg({ nodes }: { nodes: string[] }) {
               width={w - 8}
               height={barH}
               rx="10"
-              fill={`rgba(245,158,11,${Math.max(0.04, alpha)})`}
+              fill={`rgba(252,104,24,${Math.max(0.04, alpha)})`}
               stroke={BORDER}
               strokeWidth="1.4"
             />

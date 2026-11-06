@@ -89,7 +89,7 @@ export default function ProfileClient() {
         <aside className="rounded-2xl border border-white/10 bg-[#111118] p-5 h-fit">
           <div
             className="w-20 h-20 rounded-full grid place-items-center text-3xl font-black mx-auto"
-            style={{ background: 'linear-gradient(135deg, #f97316, #f59e0b)', color: '#0A0E17' }}
+            style={{ background: 'linear-gradient(135deg, #f97316, #FC6818)', color: '#0A0E17' }}
           >
             {profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element

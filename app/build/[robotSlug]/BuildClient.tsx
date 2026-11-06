@@ -509,9 +509,9 @@ export function BuildClient({ meta, tree }: BuildClientProps) {
             style={{
               padding: '6px 12px',
               borderRadius: 999,
-              background: 'rgba(251,191,36,0.12)',
-              border: '1px solid rgba(251,191,36,0.3)',
-              color: '#fbbf24',
+              background: 'rgba(255,138,76,0.12)',
+              border: '1px solid rgba(255,138,76,0.3)',
+              color: '#FF8A4C',
               fontSize: 13,
               fontWeight: 700,
               display: 'flex',
@@ -699,7 +699,7 @@ export function BuildClient({ meta, tree }: BuildClientProps) {
               style={{
                 margin: '12px 0 0',
                 fontSize: 12,
-                color: '#fbbf24',
+                color: '#FF8A4C',
                 lineHeight: 1.55,
               }}
             >
@@ -716,9 +716,9 @@ export function BuildClient({ meta, tree }: BuildClientProps) {
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 90,
           display: 'inline-flex', alignItems: 'center', gap: 8,
-          padding: '12px 20px', background: '#fbbf24', color: '#1a0f00',
+          padding: '12px 20px', background: '#FF8A4C', color: '#1a0f00',
           border: 'none', borderRadius: 999, fontSize: 14, fontWeight: 900,
-          cursor: 'pointer', boxShadow: '0 12px 28px rgba(251,191,36,0.4)',
+          cursor: 'pointer', boxShadow: '0 12px 28px rgba(255,138,76,0.4)',
         }}
       >
         📸 Share your build →
@@ -1181,7 +1181,7 @@ function HintCard({
   body: string
   tone: 'amber' | 'orange'
 }) {
-  const c = tone === 'amber' ? '#fbbf24' : '#fb923c'
+  const c = tone === 'amber' ? '#FF8A4C' : '#fb923c'
   return (
     <div
       className="build-fade"
@@ -1252,11 +1252,11 @@ function FeedbackPanel({
             style={{
               fontSize: 12,
               fontWeight: 700,
-              color: '#fbbf24',
+              color: '#FF8A4C',
               padding: '2px 8px',
               borderRadius: 999,
-              background: 'rgba(251,191,36,0.12)',
-              border: '1px solid rgba(251,191,36,0.3)',
+              background: 'rgba(255,138,76,0.12)',
+              border: '1px solid rgba(255,138,76,0.3)',
             }}
           >
             +{xpEarned} XP

@@ -15,7 +15,7 @@ export function AtlasTermOfTheDay({ entries }: { entries: AtlasEntry[] }) {
   return (
     <Link
       href={`/atlas/${entry.type}/${entry.slug}`}
-      className="block rounded-3xl border border-amber-400/50 bg-gradient-to-br from-amber-500/[0.10] to-orange-500/[0.03] p-6 shadow-[0_10px_40px_rgba(245,158,11,0.15)] transition-transform hover:-translate-y-0.5"
+      className="block rounded-3xl border border-amber-400/50 bg-gradient-to-br from-amber-500/[0.10] to-orange-500/[0.03] p-6 shadow-[0_10px_40px_rgba(252,104,24,0.15)] transition-transform hover:-translate-y-0.5"
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-full border border-amber-400/60 bg-amber-500/20 px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-amber-100">

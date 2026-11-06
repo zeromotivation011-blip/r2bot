@@ -90,7 +90,7 @@ const FAQ = [
 
 /* ─── Sub-components ─────────────────────────────────────────────── */
 function StatCard({ n, label, tone }: { n: string; label: string; tone: 'red' | 'amber' | 'emerald' | 'cyan' }) {
-  const col = { red: '#f87171', amber: '#fbbf24', emerald: '#34d399', cyan: '#22d3ee' }[tone]
+  const col = { red: '#f87171', amber: '#FF8A4C', emerald: '#34d399', cyan: '#22d3ee' }[tone]
   return (
     <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', padding: 24 }}>
       <p style={{ fontSize: 36, fontWeight: 900, color: col, margin: 0 }}>{n}</p>
@@ -113,11 +113,11 @@ function StepCard({ n, title, body, detail }: { n: number; title: string; body: 
   return (
     <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.025)', padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-        <div style={{ flexShrink: 0, width: 36, height: 36, borderRadius: '50%', background: '#f59e0b', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 16 }}>{n}</div>
+        <div style={{ flexShrink: 0, width: 36, height: 36, borderRadius: '50%', background: '#FC6818', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 16 }}>{n}</div>
         <div>
           <h3 style={{ fontSize: 15, fontWeight: 700, color: '#fff', margin: 0 }}>{title}</h3>
           <p style={{ marginTop: 6, fontSize: 13, color: '#9ca3af', lineHeight: 1.6 }}>{body}</p>
-          <p style={{ marginTop: 8, fontSize: 12, color: '#fbbf24', fontWeight: 500 }}>{detail}</p>
+          <p style={{ marginTop: 8, fontSize: 12, color: '#FF8A4C', fontWeight: 500 }}>{detail}</p>
         </div>
       </div>
     </div>
@@ -131,7 +131,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
       <button type="button" onClick={() => setOpen(v => !v)}
         style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', textAlign: 'left', fontSize: 14, fontWeight: 600, color: '#fff', background: 'none', border: 'none', cursor: 'pointer', gap: 16 }}>
         <span>{q}</span>
-        <span style={{ flexShrink: 0, color: '#fbbf24', fontSize: 18 }}>{open ? '−' : '+'}</span>
+        <span style={{ flexShrink: 0, color: '#FF8A4C', fontSize: 18 }}>{open ? '−' : '+'}</span>
       </button>
       {open && <p style={{ paddingBottom: 16, fontSize: 13, color: '#9ca3af', lineHeight: 1.7 }}>{a}</p>}
     </div>
@@ -201,7 +201,7 @@ function SchoolContactForm() {
   const labelStyle: React.CSSProperties = { fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.06em', color: '#6b7280', display: 'block', marginBottom: 5 }
 
   return (
-    <form onSubmit={handleSubmit} style={{ borderRadius: 20, border: '1px solid rgba(251,191,36,0.15)', background: 'rgba(255,255,255,0.02)', padding: 32 }}>
+    <form onSubmit={handleSubmit} style={{ borderRadius: 20, border: '1px solid rgba(255,138,76,0.15)', background: 'rgba(255,255,255,0.02)', padding: 32 }}>
       <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginTop: 0, marginBottom: 24 }}>Get your school started</h3>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
         <label style={{ gridColumn: '1 / -1' }}>
@@ -243,7 +243,7 @@ function SchoolContactForm() {
         </label>
       </div>
       <button type="submit" disabled={status === 'sending'}
-        style={{ marginTop: 20, width: '100%', background: '#f59e0b', color: '#000', padding: '13px 24px', borderRadius: 12, fontWeight: 700, fontSize: 15, border: 'none', cursor: status === 'sending' ? 'not-allowed' : 'pointer', opacity: status === 'sending' ? 0.7 : 1 }}>
+        style={{ marginTop: 20, width: '100%', background: '#FC6818', color: '#000', padding: '13px 24px', borderRadius: 12, fontWeight: 700, fontSize: 15, border: 'none', cursor: status === 'sending' ? 'not-allowed' : 'pointer', opacity: status === 'sending' ? 0.7 : 1 }}>
         {status === 'sending' ? 'Sending…' : 'Request your school pilot →'}
       </button>
       {error && (
@@ -266,28 +266,28 @@ export function SchoolsClient() {
       {/* HERO */}
       <section style={{ borderBottom: '1px solid #1a1a2e', padding: '80px 24px 64px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 100, border: '1px solid rgba(251,191,36,0.3)', background: 'rgba(251,191,36,0.08)', padding: '4px 14px', fontSize: 12, color: '#fbbf24', fontWeight: 600 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 100, border: '1px solid rgba(255,138,76,0.3)', background: 'rgba(255,138,76,0.08)', padding: '4px 14px', fontSize: 12, color: '#FF8A4C', fontWeight: 600 }}>
             🏫 R2BOT for Schools
           </span>
           <h1 style={{ marginTop: 20, fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, lineHeight: 1.08, maxWidth: 800 }}>
             Robotics in every classroom.
             <br />
-            <span style={{ background: 'linear-gradient(90deg,#fbbf24,#f97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{ background: 'linear-gradient(90deg,#FF8A4C,#f97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               No lab. No kits. No setup.
             </span>
           </h1>
           <p style={{ marginTop: 16, fontSize: 17, color: '#9ca3af', maxWidth: 640, lineHeight: 1.7 }}>
             India&apos;s only school robotics platform built for the classroom — not the robotics club. CBSE &amp; NEP 2020 aligned, Hindi + English, browser-native.
           </p>
-          <p style={{ marginTop: 8, fontSize: 13, color: '#f59e0b', fontWeight: 500 }}>रोबोटिक्स को हर कक्षा में लेकर जाओ।</p>
+          <p style={{ marginTop: 8, fontSize: 13, color: '#FC6818', fontWeight: 500 }}>रोबोटिक्स को हर कक्षा में लेकर जाओ।</p>
           <div style={{ marginTop: 28, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-            <a href="#contact" style={{ background: '#f59e0b', color: '#000', padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
+            <a href="#contact" style={{ background: '#FC6818', color: '#000', padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
               Get Your School Started →
             </a>
             <Link href="/schools/teacher" style={{ border: '1px solid #374151', background: 'rgba(255,255,255,0.03)', color: '#fff', padding: '12px 24px', borderRadius: 12, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
               Teacher Dashboard
             </Link>
-            <Link href="/schools/simulate" style={{ border: '1px solid rgba(251,191,36,0.25)', background: 'rgba(251,191,36,0.08)', color: '#fbbf24', padding: '12px 24px', borderRadius: 12, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+            <Link href="/schools/simulate" style={{ border: '1px solid rgba(255,138,76,0.25)', background: 'rgba(255,138,76,0.08)', color: '#FF8A4C', padding: '12px 24px', borderRadius: 12, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
               Try Simulator →
             </Link>
           </div>
@@ -326,7 +326,7 @@ export function SchoolsClient() {
       {/* TEACHER FEATURES */}
       <section style={{ borderBottom: '1px solid #1a1a2e', background: 'rgba(255,255,255,0.01)', padding: '56px 24px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)', borderRadius: 100, padding: '3px 12px', fontSize: 12, color: '#fbbf24', marginBottom: 12 }}>👩‍🏫 For Teachers</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,138,76,0.08)', border: '1px solid rgba(255,138,76,0.2)', borderRadius: 100, padding: '3px 12px', fontSize: 12, color: '#FF8A4C', marginBottom: 12 }}>👩‍🏫 For Teachers</span>
           <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 6 }}>Everything a robotics teacher needs</h2>
           <p style={{ color: '#9ca3af', marginBottom: 28, fontSize: 14 }}>Run the curriculum without needing to know any robotics yourself.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 12 }}>
@@ -376,7 +376,7 @@ export function SchoolsClient() {
               <tbody>
                 {ALIGNMENT.map((r, i) => (
                   <tr key={i} style={{ borderTop: '1px solid #1a1a2e', background: i % 2 ? 'rgba(255,255,255,0.015)' : 'transparent' }}>
-                    <td style={{ padding: '11px 16px', fontFamily: 'monospace', color: '#fbbf24', fontWeight: 600 }}>{r.grade}</td>
+                    <td style={{ padding: '11px 16px', fontFamily: 'monospace', color: '#FF8A4C', fontWeight: 600 }}>{r.grade}</td>
                     <td style={{ padding: '11px 16px', color: '#d1d5db' }}>{r.cbse}</td>
                     <td style={{ padding: '11px 16px', color: '#00e5ff', fontWeight: 500 }}>{r.unit}</td>
                     <td style={{ padding: '11px 16px', color: '#9ca3af' }}>{r.mins} min</td>
@@ -401,7 +401,7 @@ export function SchoolsClient() {
                 <p style={{ fontSize: 13, color: '#d1d5db', lineHeight: 1.75, fontStyle: 'italic' }}>&ldquo;{t.quote}&rdquo;</p>
                 <div style={{ marginTop: 14 }}>
                   <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: 0 }}>{t.name}</p>
-                  <p style={{ fontSize: 12, color: '#fbbf24', margin: '2px 0 0' }}>{t.role}</p>
+                  <p style={{ fontSize: 12, color: '#FF8A4C', margin: '2px 0 0' }}>{t.role}</p>
                   <p style={{ fontSize: 11, color: '#6b7280', margin: '2px 0 0' }}>{t.school}</p>
                 </div>
               </div>
@@ -419,14 +419,14 @@ export function SchoolsClient() {
       </section>
 
       {/* CONTACT FORM */}
-      <section id="contact" style={{ padding: '64px 24px 80px', background: 'linear-gradient(135deg, rgba(251,191,36,0.04) 0%, rgba(249,115,22,0.04) 100%)' }}>
+      <section id="contact" style={{ padding: '64px 24px 80px', background: 'linear-gradient(135deg, rgba(255,138,76,0.04) 0%, rgba(249,115,22,0.04) 100%)' }}>
         <div style={{ maxWidth: 740, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 36 }}>
             <h2 style={{ fontSize: 30, fontWeight: 900, margin: 0 }}>Bring R2BOT to your school</h2>
             <p style={{ color: '#9ca3af', marginTop: 10, fontSize: 15, lineHeight: 1.7 }}>
               Founder-led onboarding for the first 50 schools. Fill the form — we set up a personalised demo and 30-day pilot. No commitment required.
             </p>
-            <p style={{ color: '#fbbf24', fontSize: 13, marginTop: 6 }}>अपने स्कूल में रोबोटिक्स लाएं — 30 दिन का पायलट, कोई प्रतिबद्धता नहीं।</p>
+            <p style={{ color: '#FF8A4C', fontSize: 13, marginTop: 6 }}>अपने स्कूल में रोबोटिक्स लाएं — 30 दिन का पायलट, कोई प्रतिबद्धता नहीं।</p>
           </div>
           <SchoolContactForm />
           <div style={{ marginTop: 24, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 24, fontSize: 13, color: '#6b7280' }}>

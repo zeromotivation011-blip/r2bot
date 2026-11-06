@@ -180,13 +180,13 @@ export function LessonComplete({
         }
         .lc-xp-plus, .lc-xp-num {
           font-size: clamp(48px, 9vw, 72px); font-weight: 900;
-          background: linear-gradient(135deg, #fbbf24, #f97316);
+          background: linear-gradient(135deg, #FF8A4C, #f97316);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
         }
         .lc-xp-label {
-          font-size: 18px; font-weight: 800; color: #fbbf24;
+          font-size: 18px; font-weight: 800; color: #FF8A4C;
         }
         .lc-xp-total { color: #94a3b8; font-size: 13px; margin: 0 0 18px; }
         .lc-skills {
@@ -208,15 +208,15 @@ export function LessonComplete({
         }
         .lc-skills li span { color: #10b981; font-weight: 900; }
         .lc-reward, .lc-cert {
-          background: rgba(251,191,36,0.1);
-          border: 1px solid rgba(251,191,36,0.3);
+          background: rgba(255,138,76,0.1);
+          border: 1px solid rgba(255,138,76,0.3);
           border-radius: 14px;
           padding: 14px 18px;
           margin-bottom: 18px;
         }
         .lc-reward-label, .lc-cert-label {
           font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-          color: #fbbf24; font-weight: 900; margin: 0 0 10px;
+          color: #FF8A4C; font-weight: 900; margin: 0 0 10px;
         }
         .lc-reward-card {
           display: flex; gap: 14px; align-items: center; justify-content: center;
@@ -230,7 +230,7 @@ export function LessonComplete({
         .lc-cert-link {
           display: inline-block;
           padding: 8px 16px;
-          background: linear-gradient(135deg, #fbbf24, #f97316);
+          background: linear-gradient(135deg, #FF8A4C, #f97316);
           color: #0f0a1e;
           border-radius: 999px;
           font-weight: 900; font-size: 14px;
@@ -261,7 +261,7 @@ export function LessonComplete({
 }
 
 function ConfettiBurst() {
-  const colours = ['#FBBF24', '#10B981', '#00E5FF', '#A56BFF', '#F97316', '#EF4444']
+  const colours = ['#FF8A4C', '#10B981', '#00E5FF', '#A56BFF', '#F97316', '#EF4444']
   return (
     <div className="cf" aria-hidden>
       {Array.from({ length: 50 }).map((_, i) => (

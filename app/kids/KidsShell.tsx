@@ -129,7 +129,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           padding: 0 14px;
           border-radius: 14px;
           background: #1a1040;
-          color: #fde68a;
+          color: #FFC9A8;
           font-weight: 800;
           text-decoration: none;
           border: 2px solid #312e81;
@@ -138,13 +138,13 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
         .kids-nav-link:hover { transform: scale(1.05); background: #2a1860; }
         .kids-nav-link-quiet { background: transparent; color: #c4b5fd; border-color: #4c1d95; }
         .kids-nav-stars {
-          background: linear-gradient(135deg, #f59e0b, #fbbf24);
+          background: linear-gradient(135deg, #FC6818, #FF8A4C);
           color: #1a1040;
           padding: 10px 14px;
           border-radius: 999px;
           font-weight: 900;
           font-size: 16px;
-          box-shadow: 0 4px 14px rgba(251, 191, 36, 0.35);
+          box-shadow: 0 4px 14px rgba(255,138,76, 0.35);
         }
         .kids-main {
           position: relative; z-index: 1;
@@ -179,7 +179,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           box-shadow: 0 12px 30px rgba(124,58,237,0.55);
         }
         .kids-voice-toggle:focus-visible {
-          outline: 3px solid #fbbf24;
+          outline: 3px solid #FF8A4C;
           outline-offset: 3px;
         }
       `}</style>

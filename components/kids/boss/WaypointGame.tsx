@@ -183,7 +183,7 @@ export function WaypointGame({ onWin, onFail }: {
           display: grid; place-items: center;
           font-size: 20px;
         }
-        .wg-cell.is-wp { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .wg-cell.is-wp { background: linear-gradient(135deg, #FC6818, #E5550A); }
         .wg-cell.is-visited { background: linear-gradient(135deg, #10b981, #047857); }
         .wg-sub { font-size: 28px; }
         .wg-wp { font-weight: 900; color: #fff; font-size: 18px; }
@@ -222,7 +222,7 @@ export function WaypointGame({ onWin, onFail }: {
         .wg-go:disabled { opacity: 0.4; cursor: not-allowed; }
         .wg-secondary {
           min-height: 52px; padding: 0 16px;
-          background: #1a1040; color: #fde68a;
+          background: #1a1040; color: #FFC9A8;
           border: 2px solid #4c1d95;
           border-radius: 14px; font-weight: 800; cursor: pointer;
         }

@@ -90,7 +90,7 @@ export function MatchPairs({
           min-height: 56px;
           background: #1a1040;
           border: 2px solid #4c1d95;
-          color: #fde68a;
+          color: #FFC9A8;
           border-radius: 12px;
           font-weight: 800;
           font-size: 14px;
@@ -99,11 +99,11 @@ export function MatchPairs({
           transition: transform .15s, border-color .15s, background .15s;
           text-align: center;
         }
-        .mp-btn:hover:not(:disabled) { transform: scale(1.04); border-color: #fbbf24; }
+        .mp-btn:hover:not(:disabled) { transform: scale(1.04); border-color: #FF8A4C; }
         .mp-btn.is-picked {
-          border-color: #fbbf24;
-          box-shadow: 0 0 18px rgba(251,191,36,0.4);
-          background: rgba(251,191,36,0.12);
+          border-color: #FF8A4C;
+          box-shadow: 0 0 18px rgba(255,138,76,0.4);
+          background: rgba(255,138,76,0.12);
         }
         .mp-btn.is-matched {
           background: rgba(16,185,129,0.18);

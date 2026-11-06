@@ -374,7 +374,7 @@ const buildItBay: KidsZone = {
   emoji: '🔧',
   tagline: 'Take robots apart and put them back together!',
   ageRange: '7–9',
-  color: '#F59E0B',
+  color: '#FC6818',
   bgGradient: 'from-amber-900 via-orange-900 to-amber-950',
   sparkMood: 'thinking',
   worldMap: 'A workshop with floating robot parts, wrenches, and rolling toolboxes',

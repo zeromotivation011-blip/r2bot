@@ -9,7 +9,7 @@ const DOMAIN_LABELS: Record<DomainId, { label: string; emoji: string; color: str
   healthcare:      { label: 'Healthcare',     emoji: '🏥', color: '#0891b2' },
   agriculture:     { label: 'Farming',        emoji: '🌾', color: '#16a34a' },
   home:            { label: 'Home',           emoji: '🏠', color: '#a855f7' },
-  finance:         { label: 'Money',          emoji: '💸', color: '#fbbf24' },
+  finance:         { label: 'Money',          emoji: '💸', color: '#FF8A4C' },
   transport:       { label: 'Transport',      emoji: '🚗', color: '#ef4444' },
   entertainment:   { label: 'Entertainment',  emoji: '🎭', color: '#ec4899' },
   education:       { label: 'Education',      emoji: '📚', color: '#3b82f6' },
@@ -32,7 +32,7 @@ export function DomainCards({ selected, onSelect, countsByDomain = {}, totalCoun
         type="button"
         onClick={() => onSelect('all')}
         className={`dc-card ${selected === 'all' ? 'is-selected' : ''}`}
-        style={{ ['--c' as keyof React.CSSProperties as string]: '#fbbf24' }}
+        style={{ ['--c' as keyof React.CSSProperties as string]: '#FF8A4C' }}
       >
         <span className="dc-emoji" aria-hidden>🤖</span>
         <span className="dc-label">All</span>

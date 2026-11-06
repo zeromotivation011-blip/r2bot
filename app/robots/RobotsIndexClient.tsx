@@ -150,7 +150,7 @@ function RobotCard({ robot }: { robot: Robot }) {
       <CompareButton slug={robot.slug} />
       <Link
         href={`/robots/${robot.slug}`}
-        className="group flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.01] transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/50 hover:shadow-[0_18px_60px_rgba(245,158,11,0.18)]"
+        className="group flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.01] transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/50 hover:shadow-[0_18px_60px_rgba(252,104,24,0.18)]"
       >
         <div className="relative flex h-32 items-center justify-center bg-gradient-to-br from-amber-500/[0.08] via-white/[0.02] to-purple-500/[0.06]">
           <span className="text-6xl" aria-hidden>

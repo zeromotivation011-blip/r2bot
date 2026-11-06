@@ -68,7 +68,7 @@ export function CuriousButton({ nodes }: { nodes: AtlasNodeLite[] }) {
           display: flex; align-items: center; gap: 16px;
           width: 100%;
           padding: 18px 22px;
-          background: linear-gradient(135deg, rgba(124,58,237,0.16), rgba(245,158,11,0.10));
+          background: linear-gradient(135deg, rgba(124,58,237,0.16), rgba(252,104,24,0.10));
           border: 1px solid rgba(124,58,237,0.4);
           border-radius: 16px;
           color: #f4f4f5;
@@ -76,14 +76,14 @@ export function CuriousButton({ nodes }: { nodes: AtlasNodeLite[] }) {
           text-align: left;
           transition: transform .15s, border-color .15s;
         }
-        .cb:hover:not(:disabled) { transform: translateY(-2px); border-color: #fbbf24; }
+        .cb:hover:not(:disabled) { transform: translateY(-2px); border-color: #FF8A4C; }
         .cb:disabled { opacity: 0.7; cursor: wait; }
         .cb-icon { font-size: 32px; }
         .cb-body { display: flex; flex-direction: column; flex: 1; gap: 4px; }
         .cb-title { font-size: 17px; font-weight: 900; color: #fde047; }
         .cb-sub { font-size: 13px; color: #c4b5fd; min-height: 18px; }
         .cb-arrow {
-          font-size: 22px; color: #fbbf24; font-weight: 900;
+          font-size: 22px; color: #FF8A4C; font-weight: 900;
         }
       `}</style>
     </button>

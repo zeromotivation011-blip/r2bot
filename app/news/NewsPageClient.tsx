@@ -356,7 +356,7 @@ function ArticleRow({ article: a, styles, expanded, onToggle, onSave, saved }: {
   saved: boolean
 }) {
   const s = styles[a.source] || { color: '#888', short: a.source.slice(0, 4).toUpperCase() }
-  const impactColor = a.indiaImpactScore >= 7 ? '#10b981' : a.indiaImpactScore >= 4 ? '#f59e0b' : a.indiaImpactScore >= 1 ? '#a3a3a3' : '#525252'
+  const impactColor = a.indiaImpactScore >= 7 ? '#10b981' : a.indiaImpactScore >= 4 ? '#FC6818' : a.indiaImpactScore >= 1 ? '#a3a3a3' : '#525252'
 
   return (
     <article className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 hover:border-amber-400/30 transition-colors">

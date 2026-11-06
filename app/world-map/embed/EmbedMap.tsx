@@ -53,7 +53,7 @@ export default function EmbedMap() {
                       onMouseLeave={() => setHover(null)}
                       style={{
                         default: { fill: getLayerColor(data, layer), stroke: '#374151', strokeWidth: 0.4, outline: 'none' },
-                        hover: { fill: '#f59e0b', stroke: '#fcd34d', outline: 'none' },
+                        hover: { fill: '#FC6818', stroke: '#FFA878', outline: 'none' },
                         pressed: { outline: 'none' },
                       }}
                     />

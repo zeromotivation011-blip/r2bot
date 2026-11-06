@@ -127,7 +127,7 @@ export function GalaxyMap({
       .append('circle')
       .attr('r', d => radius(d) + 8)
       .attr('fill', 'none')
-      .attr('stroke', '#fbbf24')
+      .attr('stroke', '#FF8A4C')
       .attr('stroke-width', 2)
       .attr('opacity', 0.55)
       .append('animate')
@@ -143,7 +143,7 @@ export function GalaxyMap({
     nodeGroup
       .append('circle')
       .attr('r', d => radius(d))
-      .attr('fill', d => masteredSet.has(d.slug) ? '#fbbf24' : colorFor(d.bucket))
+      .attr('fill', d => masteredSet.has(d.slug) ? '#FF8A4C' : colorFor(d.bucket))
       .attr('stroke', d => masteredSet.has(d.slug) ? '#fde047' : 'rgba(255,255,255,0.25)')
       .attr('stroke-width', 1.5)
       .attr('opacity', d => {
@@ -222,7 +222,7 @@ export function GalaxyMap({
         </div>
       )}
       <p className="gm-legend">
-        <span><span className="gm-dot" style={{ background: '#fbbf24' }} /> Mastered</span>
+        <span><span className="gm-dot" style={{ background: '#FF8A4C' }} /> Mastered</span>
         <span><span className="gm-dot" style={{ background: '#94a3b8', opacity: 0.4 }} /> Locked (prereqs)</span>
         <span>Drag to pan · scroll to zoom · click any star</span>
       </p>

@@ -650,8 +650,8 @@ function AtlasEnrichmentHero({ entry }: { entry: import('@/lib/atlas').AtlasEntr
       style={{
         margin: '0 0 32px',
         padding: 18,
-        background: 'rgba(245,158,11,.05)',
-        border: '1px solid rgba(245,158,11,.18)',
+        background: 'rgba(252,104,24,.05)',
+        border: '1px solid rgba(252,104,24,.18)',
         borderRadius: 16,
       }}
     >
@@ -663,7 +663,7 @@ function AtlasEnrichmentHero({ entry }: { entry: import('@/lib/atlas').AtlasEntr
       {difficultyLevel && (
         <span style={{
           display: 'inline-block', marginTop: 10,
-          fontSize: 11, color: '#fbbf24',
+          fontSize: 11, color: '#FF8A4C',
           background: 'rgba(0,0,0,.35)',
           padding: '4px 10px', borderRadius: 999, fontWeight: 800, letterSpacing: 0.8,
         }}>
@@ -680,28 +680,28 @@ function AtlasEnrichmentHero({ entry }: { entry: import('@/lib/atlas').AtlasEntr
       {analogy && (
         <div style={{
           marginTop: 14,
-          background: 'rgba(245,158,11,.1)',
-          border: '1px solid rgba(245,158,11,.3)',
+          background: 'rgba(252,104,24,.1)',
+          border: '1px solid rgba(252,104,24,.3)',
           borderRadius: 12, padding: 12,
         }}>
-          <p style={{ fontSize: 11, color: '#fbbf24', fontWeight: 900, letterSpacing: 1, textTransform: 'uppercase' }}>
+          <p style={{ fontSize: 11, color: '#FF8A4C', fontWeight: 900, letterSpacing: 1, textTransform: 'uppercase' }}>
             💡 Think of it like…
           </p>
-          <p style={{ fontSize: 14, color: '#fde68a', marginTop: 4, lineHeight: 1.5 }}>{analogy}</p>
+          <p style={{ fontSize: 14, color: '#FFC9A8', marginTop: 4, lineHeight: 1.5 }}>{analogy}</p>
         </div>
       )}
 
       {indianExample && (
         <div style={{
           marginTop: 10,
-          background: 'linear-gradient(135deg, rgba(245,158,11,.1), rgba(16,185,129,.06))',
-          border: '1px solid rgba(245,158,11,.25)',
+          background: 'linear-gradient(135deg, rgba(252,104,24,.1), rgba(16,185,129,.06))',
+          border: '1px solid rgba(252,104,24,.25)',
           borderRadius: 12, padding: 12,
         }}>
-          <p style={{ fontSize: 11, color: '#fbbf24', fontWeight: 900, letterSpacing: 1, textTransform: 'uppercase' }}>
+          <p style={{ fontSize: 11, color: '#FF8A4C', fontWeight: 900, letterSpacing: 1, textTransform: 'uppercase' }}>
             🌍 An example from India
           </p>
-          <p style={{ fontSize: 14, color: '#fde68a', marginTop: 4, lineHeight: 1.5 }}>{indianExample}</p>
+          <p style={{ fontSize: 14, color: '#FFC9A8', marginTop: 4, lineHeight: 1.5 }}>{indianExample}</p>
         </div>
       )}
 
@@ -723,7 +723,7 @@ function AtlasEnrichmentHero({ entry }: { entry: import('@/lib/atlas').AtlasEntr
               href={`/robots/${r}`}
               style={{
                 fontSize: 11, padding: '3px 8px',
-                background: '#11112a', color: '#fde68a',
+                background: '#11112a', color: '#FFC9A8',
                 border: '1px solid #2a2a45', borderRadius: 999,
                 textDecoration: 'none',
               }}
@@ -740,7 +740,7 @@ function AtlasEnrichmentHero({ entry }: { entry: import('@/lib/atlas').AtlasEntr
               key={a}
               style={{
                 fontSize: 11, padding: '3px 8px',
-                background: '#11112a', color: '#fde68a',
+                background: '#11112a', color: '#FFC9A8',
                 border: '1px solid #2a2a45', borderRadius: 999,
               }}
             >{a}</span>

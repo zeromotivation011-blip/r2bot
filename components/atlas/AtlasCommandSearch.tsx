@@ -199,9 +199,9 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
           <span style={{ color: '#94a3b8', flex: 1, textAlign: 'left' }}>Search concepts…</span>
           <span style={{
             fontSize: 11, fontWeight: 800, color: '#fde047',
-            background: 'rgba(251,191,36,0.14)',
+            background: 'rgba(255,138,76,0.14)',
             padding: '2px 8px', borderRadius: 6,
-            border: '1px solid rgba(251,191,36,0.3)',
+            border: '1px solid rgba(255,138,76,0.3)',
           }}>⌘K</span>
         </button>
       )}
@@ -312,7 +312,7 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
                     aria-label={`Max difficulty ${d}`}
                     style={{
                       background: 'transparent', border: 'none',
-                      color: d <= difficultyMax ? '#fbbf24' : 'rgba(255,255,255,0.18)',
+                      color: d <= difficultyMax ? '#FF8A4C' : 'rgba(255,255,255,0.18)',
                       fontSize: 14, cursor: 'pointer', padding: '0 2px',
                     }}
                   >★</button>
@@ -422,7 +422,7 @@ function ChipButton({ active, onClick, children }: {
         background: active
           ? 'linear-gradient(135deg, #00E5FF, #A56BFF)'
           : 'rgba(255,255,255,0.04)',
-        border: `1px solid ${active ? 'transparent' : hover ? '#fbbf24' : 'rgba(255,255,255,0.1)'}`,
+        border: `1px solid ${active ? 'transparent' : hover ? '#FF8A4C' : 'rgba(255,255,255,0.1)'}`,
         color: active ? '#0a0a16' : hover ? '#fde047' : '#c4b5fd',
         fontSize: 12, fontWeight: 700, cursor: 'pointer',
         transition: 'border-color 0.12s, color 0.12s',
@@ -471,7 +471,7 @@ function ResultRow({ node, isActive, onPick, onHover, idx }: {
         )}
       </span>
       {typeof node.difficultyLevel === 'number' && (
-        <span style={{ color: '#fbbf24', fontSize: 10, letterSpacing: 1 }}>
+        <span style={{ color: '#FF8A4C', fontSize: 10, letterSpacing: 1 }}>
           {'★'.repeat(node.difficultyLevel)}
         </span>
       )}

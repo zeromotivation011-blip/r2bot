@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 type Track = 'spark' | 'wire' | 'forge' | 'edge' | string;
 
 const TRACK_TONES: Record<string, { glow: string; accent: string; bg: string; border: string }> = {
-  spark: { glow: 'rgba(255,176,32,.45)', accent: '#FFB020', bg: 'rgba(255,176,32,.12)', border: 'rgba(255,176,32,.50)' },
+  spark: { glow: 'rgba(252,104,24,.45)', accent: '#FC6818', bg: 'rgba(252,104,24,.12)', border: 'rgba(252,104,24,.50)' },
   wire:  { glow: 'rgba(0,184,212,.45)',  accent: '#00B8D4', bg: 'rgba(0,184,212,.12)', border: 'rgba(0,184,212,.50)' },
   forge: { glow: 'rgba(165,107,255,.45)', accent: '#A56BFF', bg: 'rgba(165,107,255,.12)', border: 'rgba(165,107,255,.50)' },
   edge:  { glow: 'rgba(34,197,94,.45)',  accent: '#22C55E', bg: 'rgba(34,197,94,.12)', border: 'rgba(34,197,94,.50)' },
@@ -93,7 +93,7 @@ export function LessonCompleteModal({
       {/* Confetti */}
       <div aria-hidden style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
         {Array.from({ length: CONFETTI_COUNT }).map((_, i) => {
-          const palette = ['#00E5FF', '#FFB020', '#A56BFF', '#22C55E', '#E8ECF1'];
+          const palette = ['#00E5FF', '#FC6818', '#A56BFF', '#22C55E', '#E8ECF1'];
           const color = palette[i % palette.length];
           const left = (i * 97) % 100;
           const delay = (i % 8) * 90;

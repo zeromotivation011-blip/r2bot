@@ -95,7 +95,7 @@ const TRACKS: Record<Track, {
       { id: 'forge-05', title: 'Drones — From Build to Flight' },
       { id: 'forge-06', title: 'Simulation with Gazebo & Isaac Sim' },
     ],
-    color: '#FFB020',
+    color: '#FC6818',
   },
   edge: {
     label: 'Edge',

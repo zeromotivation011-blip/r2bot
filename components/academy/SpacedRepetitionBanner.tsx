@@ -41,8 +41,8 @@ export function SpacedRepetitionBanner() {
           display: grid; grid-template-columns: auto 1fr auto;
           align-items: center; gap: 16px;
           padding: 16px 20px;
-          background: linear-gradient(135deg, rgba(251,191,36,0.18), rgba(0,229,255,0.1));
-          border: 1px solid rgba(251,191,36,0.4);
+          background: linear-gradient(135deg, rgba(255,138,76,0.18), rgba(0,229,255,0.1));
+          border: 1px solid rgba(255,138,76,0.4);
           border-radius: 16px;
           color: #f4f4f5;
         }
@@ -52,7 +52,7 @@ export function SpacedRepetitionBanner() {
         .srb-sub { color: #c4b5fd; font-size: 13px; margin: 0; }
         .srb-cta {
           min-height: 44px; padding: 0 18px;
-          background: linear-gradient(135deg, #fbbf24, #f97316);
+          background: linear-gradient(135deg, #FF8A4C, #f97316);
           color: #0f0a1e;
           text-decoration: none; font-weight: 900;
           border-radius: 10px;

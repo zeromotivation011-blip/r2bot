@@ -106,9 +106,9 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
               style={{
                 padding: '6px 14px', borderRadius: 999, fontSize: 12, fontWeight: 700,
                 cursor: 'pointer', textTransform: 'capitalize',
-                background: trackFilter === t ? 'rgba(245,158,11,0.18)' : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${trackFilter === t ? 'rgba(245,158,11,0.5)' : 'rgba(255,255,255,0.12)'}`,
-                color: trackFilter === t ? '#fbbf24' : '#cbd5e1',
+                background: trackFilter === t ? 'rgba(252,104,24,0.18)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${trackFilter === t ? 'rgba(252,104,24,0.5)' : 'rgba(255,255,255,0.12)'}`,
+                color: trackFilter === t ? '#FF8A4C' : '#cbd5e1',
               }}
             >
               {t === 'all' ? 'All' : t}
@@ -124,7 +124,7 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
                 style={{
                   padding: '5px 12px', borderRadius: 999, fontSize: 12, fontWeight: 700,
                   border: 'none', cursor: 'pointer',
-                  background: sortMode === m ? '#fbbf24' : 'transparent',
+                  background: sortMode === m ? '#FF8A4C' : 'transparent',
                   color: sortMode === m ? '#1a0f00' : '#94a3b8',
                 }}
               >
@@ -135,9 +135,9 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
           <button
             type="button" onClick={handleSubmitClick}
             style={{
-              padding: '8px 18px', background: '#fbbf24', color: '#1a0f00',
+              padding: '8px 18px', background: '#FF8A4C', color: '#1a0f00',
               border: 'none', borderRadius: 999, fontSize: 13, fontWeight: 900, cursor: 'pointer',
-              boxShadow: '0 6px 18px rgba(245,158,11,0.25)',
+              boxShadow: '0 6px 18px rgba(252,104,24,0.25)',
             }}
           >
             📸 Submit Your Build
@@ -157,12 +157,12 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
             Be the first to share your build!
           </h2>
           <p style={{ fontSize: 14, color: '#94a3b8', margin: '0 0 22px', lineHeight: 1.6 }}>
-            Complete a <Link href="/build" style={{ color: '#fbbf24', textDecoration: 'underline' }}>Robot Project</Link> to submit here.
+            Complete a <Link href="/build" style={{ color: '#FF8A4C', textDecoration: 'underline' }}>Robot Project</Link> to submit here.
           </p>
           <button
             type="button" onClick={handleSubmitClick}
             style={{
-              padding: '10px 22px', background: '#fbbf24', color: '#1a0f00',
+              padding: '10px 22px', background: '#FF8A4C', color: '#1a0f00',
               border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 900, cursor: 'pointer',
             }}
           >
@@ -220,8 +220,8 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
                     {b.tags.slice(0, 5).map((t) => (
                       <span key={t} style={{
                         fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 999,
-                        background: 'rgba(245,158,11,0.10)', color: '#fbbf24',
-                        border: '1px solid rgba(245,158,11,0.3)',
+                        background: 'rgba(252,104,24,0.10)', color: '#FF8A4C',
+                        border: '1px solid rgba(252,104,24,0.3)',
                       }}>
                         {t}
                       </span>
@@ -247,7 +247,7 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
                       href={b.github_url || b.video_url || (b.project_slug ? `/build/${b.project_slug}` : '#')}
                       target={b.github_url || b.video_url ? '_blank' : undefined}
                       rel="noopener noreferrer"
-                      style={{ fontSize: 12, fontWeight: 700, color: '#fbbf24', textDecoration: 'none' }}
+                      style={{ fontSize: 12, fontWeight: 700, color: '#FF8A4C', textDecoration: 'none' }}
                     >
                       View project →
                     </a>
@@ -262,8 +262,8 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
       {toast && (
         <div role="status" style={{
           position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
-          background: '#111118', border: '1px solid rgba(245,158,11,0.4)',
-          color: '#fbbf24', padding: '12px 22px', borderRadius: 12,
+          background: '#111118', border: '1px solid rgba(252,104,24,0.4)',
+          color: '#FF8A4C', padding: '12px 22px', borderRadius: 12,
           fontSize: 13, fontWeight: 700, zIndex: 100,
           boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
         }}>

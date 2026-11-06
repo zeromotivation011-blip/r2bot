@@ -182,7 +182,7 @@ export function TimelineScrubber({ chapters, birthYear }: { chapters: HistoryCha
           cursor: pointer;
         }
         .tls-dot:hover { transform: translate(-50%, -50%) scale(1.4); }
-        .tls-dot.is-lifetime { border-color: #fbbf24; }
+        .tls-dot.is-lifetime { border-color: #FF8A4C; }
         .tls-dot.is-active {
           width: 22px; height: 22px;
           box-shadow: 0 0 0 4px rgba(255,255,255,0.12);
@@ -196,7 +196,7 @@ export function TimelineScrubber({ chapters, birthYear }: { chapters: HistoryCha
         .tls-birth {
           position: absolute; top: -8px;
           transform: translateX(-50%);
-          color: #fbbf24;
+          color: #FF8A4C;
           font-size: 12px;
           font-weight: 900;
           pointer-events: none;

@@ -62,7 +62,7 @@ export function DidYouKnow({
           display: flex; flex-direction: column;
           align-items: center; justify-content: center; gap: 14px;
           padding: 32px 20px;
-          background: radial-gradient(circle at 50% 30%, rgba(245,158,11,0.25), rgba(11,18,32,0.97));
+          background: radial-gradient(circle at 50% 30%, rgba(252,104,24,0.25), rgba(11,18,32,0.97));
           backdrop-filter: blur(12px);
           text-align: center;
           color: #fff;
@@ -75,24 +75,24 @@ export function DidYouKnow({
         .dyk-emoji { font-size: clamp(72px, 14vw, 120px); line-height: 1; }
         .dyk-eyebrow {
           font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
-          color: #fbbf24; font-weight: 900; margin: 0;
+          color: #FF8A4C; font-weight: 900; margin: 0;
         }
         .dyk-fact {
           font-size: clamp(20px, 3.5vw, 32px);
           font-weight: 800;
           max-width: 720px;
           line-height: 1.4;
-          color: #fde68a;
+          color: #FFC9A8;
           margin: 4px 0 18px;
         }
         .dyk-cta {
           min-height: 54px; padding: 0 26px;
-          background: linear-gradient(135deg, #fbbf24, #f97316);
+          background: linear-gradient(135deg, #FF8A4C, #f97316);
           color: #0a0a16;
           border: none; border-radius: 14px;
           font-weight: 900; font-size: 16px;
           cursor: pointer;
-          box-shadow: 0 12px 36px rgba(251,191,36,0.5);
+          box-shadow: 0 12px 36px rgba(255,138,76,0.5);
         }
       `}</style>
     </div>

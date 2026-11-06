@@ -828,8 +828,8 @@ const DENSITY_STOPS: { v: number; c: string }[] = [
   { v: 10,   c: '#3a2f1a' },
   { v: 50,   c: '#5a3a0e' },
   { v: 150,  c: '#a06010' },
-  { v: 300,  c: '#d97706' },
-  { v: 600,  c: '#f59e0b' },
+  { v: 300,  c: '#E5550A' },
+  { v: 600,  c: '#FC6818' },
   { v: 1000, c: '#fde047' },
 ]
 
@@ -871,7 +871,7 @@ const OPPORTUNITY_STOPS: { v: number; c: string }[] = [
   { v: 20,  c: '#be185d' },
   { v: 50,  c: '#ec4899' },
   { v: 100, c: '#f472b6' },
-  { v: 200, c: '#f59e0b' },
+  { v: 200, c: '#FC6818' },
   { v: 400, c: '#fde047' },
 ]
 

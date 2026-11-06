@@ -156,7 +156,7 @@ export function QuizBlock({ block, isCompleted, onComplete }: Props) {
           cursor: pointer;
           transition: border-color .15s, background .15s;
         }
-        .qb-opt:hover:not(:disabled) { border-color: #fbbf24; }
+        .qb-opt:hover:not(:disabled) { border-color: #FF8A4C; }
         .qb-opt.is-picked { border-color: #00E5FF; background: rgba(0,229,255,0.08); }
         .qb-opt.is-correct {
           border-color: #10b981;
@@ -184,23 +184,23 @@ export function QuizBlock({ block, isCompleted, onComplete }: Props) {
           font-size: 13px; line-height: 1.5;
         }
         .qb-explain.is-good { background: rgba(16,185,129,0.1); color: #6ee7b7; }
-        .qb-explain.is-warn { background: rgba(251,191,36,0.1); color: #fde68a; }
+        .qb-explain.is-warn { background: rgba(255,138,76,0.1); color: #FFC9A8; }
         .qb-hint-row { display: flex; flex-direction: column; gap: 6px; }
         .qb-hint-btn {
           align-self: flex-start;
           padding: 6px 12px; border-radius: 999px;
-          background: rgba(251,191,36,0.1);
-          color: #fbbf24;
-          border: 1px solid rgba(251,191,36,0.3);
+          background: rgba(255,138,76,0.1);
+          color: #FF8A4C;
+          border: 1px solid rgba(255,138,76,0.3);
           font-weight: 800; font-size: 12px;
           cursor: pointer;
         }
         .qb-hint {
           padding: 10px 12px;
-          background: rgba(251,191,36,0.06);
-          border: 1px dashed rgba(251,191,36,0.3);
+          background: rgba(255,138,76,0.06);
+          border: 1px dashed rgba(255,138,76,0.3);
           border-radius: 8px;
-          color: #fde68a; font-size: 13px;
+          color: #FFC9A8; font-size: 13px;
         }
         .qb-submit {
           min-height: 48px; padding: 0 22px;
@@ -219,12 +219,12 @@ export function QuizBlock({ block, isCompleted, onComplete }: Props) {
         }
         .qb-result-text { margin: 0; flex: 1; font-weight: 800; }
         .qb-result-text.is-good { color: #10b981; }
-        .qb-result-text.is-warn { color: #fbbf24; }
+        .qb-result-text.is-warn { color: #FF8A4C; }
         .qb-retry {
           padding: 8px 14px; border-radius: 8px;
-          background: rgba(251,191,36,0.18);
+          background: rgba(255,138,76,0.18);
           color: #fde047;
-          border: 1px solid rgba(251,191,36,0.4);
+          border: 1px solid rgba(255,138,76,0.4);
           font-weight: 800; cursor: pointer;
         }
       `}</style>

@@ -21,7 +21,7 @@ const WorldMapView = dynamic(() => import('@/app/world-map/WorldMapDynamic'), {
   loading: () => (
     <div style={{ minHeight: 480, display: 'grid', placeItems: 'center', color: '#94a3b8' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ width: 40, height: 40, border: '2px solid #f59e0b', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.9s linear infinite', margin: '0 auto 12px' }} />
+        <div style={{ width: 40, height: 40, border: '2px solid #FC6818', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.9s linear infinite', margin: '0 auto 12px' }} />
         <p style={{ fontSize: 13 }}>Loading world robotics data…</p>
       </div>
     </div>
@@ -66,7 +66,7 @@ type Mode = 'explore' | 'galaxy' | 'learn' | 'search' | 'world-map'
 
 // Stable bucket → color map
 const BUCKET_COLORS = [
-  '#f59e0b', '#3b82f6', '#10b981', '#a855f7', '#ec4899', '#06b6d4',
+  '#FC6818', '#3b82f6', '#10b981', '#a855f7', '#ec4899', '#06b6d4',
   '#ef4444', '#eab308', '#14b8a6', '#6366f1', '#84cc16', '#f97316',
   '#0ea5e9', '#d946ef', '#22c55e', '#fb7185', '#facc15', '#0284c7',
   '#a78bfa', '#34d399',
@@ -117,7 +117,7 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
         <div className="atlas-header">
           <div>
             <p className="eyebrow">Atlas · Knowledge Universe</p>
-            <h1>Every concept. <span style={{ color: '#f59e0b' }}>One map.</span></h1>
+            <h1>Every concept. <span style={{ color: '#FC6818' }}>One map.</span></h1>
             <p className="sub">
               <strong style={{ color: '#fff' }}>{nodes.length}</strong> robotics concepts across {buckets.length} buckets.
               No jargon. Sources at the bottom of every page.
@@ -247,7 +247,7 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
       <style jsx>{`
         :global(body) { background: #0a0a16; }
         .container { color: #e5e7eb; }
-        .eyebrow { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #fbbf24; font-weight: 800; }
+        .eyebrow { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #FF8A4C; font-weight: 800; }
         h1 { font-size: clamp(34px, 5.5vw, 56px); font-weight: 900; color: #fff; margin: 6px 0 8px; line-height: 1.05; }
         .sub { font-size: 17px; color: #b0b8c5; max-width: 720px; line-height: 1.5; }
         .atlas-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
@@ -262,8 +262,8 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
           border: 2px solid #2a2a45; border-radius: 12px;
           font-weight: 800; font-size: 14px; cursor: pointer;
         }
-        .mode-tab:hover { color: #fde68a; }
-        .mode-tab.on { background: #f59e0b; color: #0a0a16; border-color: #f59e0b; }
+        .mode-tab:hover { color: #FFC9A8; }
+        .mode-tab.on { background: #FC6818; color: #0a0a16; border-color: #FC6818; }
       `}</style>
     </main>
   )
@@ -272,7 +272,7 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div style={{
-      background: 'rgba(245,158,11,.1)', border: '1px solid rgba(245,158,11,.3)',
+      background: 'rgba(252,104,24,.1)', border: '1px solid rgba(252,104,24,.3)',
       padding: '8px 14px', borderRadius: 12, color: '#fde047', fontWeight: 800, fontSize: 13,
       display: 'inline-flex', alignItems: 'center', gap: 6,
     }}>
@@ -327,7 +327,7 @@ function ExploreMode({
           <label>Max difficulty: <strong>{difficultyMax}</strong></label>
           <input type="range" min="1" max="5" value={difficultyMax}
             onChange={e => setDifficultyMax(parseInt(e.target.value))}
-            style={{ width: '100%', accentColor: '#f59e0b' }} />
+            style={{ width: '100%', accentColor: '#FC6818' }} />
           <div className="diff-labels">
             <span>Layman</span><span>PhD</span>
           </div>
@@ -370,20 +370,20 @@ function ExploreMode({
         @media (max-width: 920px) { .explore-grid { grid-template-columns: 1fr; } }
         .explore-side { display: flex; flex-direction: column; gap: 14px; }
         .tod-card {
-          background: linear-gradient(135deg, rgba(245,158,11,.15), rgba(124,58,237,.1));
-          border: 2px solid rgba(245,158,11,.3); border-radius: 16px;
+          background: linear-gradient(135deg, rgba(252,104,24,.15), rgba(124,58,237,.1));
+          border: 2px solid rgba(252,104,24,.3); border-radius: 16px;
           padding: 14px; cursor: pointer; transition: transform .15s;
         }
-        .tod-card:hover { transform: translateY(-2px); border-color: #fbbf24; }
-        .tod-eyebrow { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #fbbf24; font-weight: 900; }
+        .tod-card:hover { transform: translateY(-2px); border-color: #FF8A4C; }
+        .tod-eyebrow { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #FF8A4C; font-weight: 900; }
         .tod-title { font-size: 18px; font-weight: 900; color: #fde047; margin-top: 4px; }
         .tod-sub { font-size: 13px; color: #d1d5db; margin-top: 4px; line-height: 1.4; }
         .random-btn {
-          min-height: 48px; background: #181830; color: #fde68a;
+          min-height: 48px; background: #181830; color: #FFC9A8;
           border: 2px solid #2a2a45; border-radius: 12px;
           font-weight: 800; cursor: pointer; padding: 0 16px;
         }
-        .random-btn:hover { border-color: #f59e0b; color: #fff; }
+        .random-btn:hover { border-color: #FC6818; color: #fff; }
         .diff-control { background: #11112a; border: 1px solid #2a2a45; border-radius: 12px; padding: 12px; }
         .diff-control label { font-size: 13px; color: #c4b5fd; }
         .diff-labels { display: flex; justify-content: space-between; font-size: 10px; color: #6b7280; margin-top: 2px; }
@@ -396,7 +396,7 @@ function ExploreMode({
           color: #d1d5db; font-size: 13px; font-weight: 700;
           cursor: pointer; text-align: left;
         }
-        .bucket-pill:hover { border-color: #fbbf24; }
+        .bucket-pill:hover { border-color: #FF8A4C; }
         .bucket-pill.on { color: #fff; font-weight: 800; }
         .ct { margin-left: auto; background: #2a2a45; padding: 2px 6px; border-radius: 999px; font-size: 11px; }
         .explore-main { min-height: 620px; background: #060611; border: 1px solid #1f1f3a; border-radius: 18px; overflow: hidden; }
@@ -596,7 +596,7 @@ function ConceptCanvas({ nodes, buckets, onSelect, bucketFilter }: {
         <div style={{
           position: 'absolute', left: pos.x + 14, top: pos.y - 30,
           background: '#11112a', border: '1px solid #2a2a45', borderRadius: 8,
-          padding: '6px 10px', fontSize: 12, color: '#fde68a',
+          padding: '6px 10px', fontSize: 12, color: '#FFC9A8',
           pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 5,
         }}>
           <strong>{hover.bucketEmoji} {hover.title}</strong>
@@ -629,7 +629,7 @@ function MobileBucketGrid({ nodes, buckets, onSelect }: {
             onClick={() => setOpenBucket(null)}
             style={{
               padding: '8px 12px', minHeight: 44, background: '#181830',
-              color: '#fde68a', border: '1px solid #2a2a45',
+              color: '#FFC9A8', border: '1px solid #2a2a45',
               borderRadius: 10, fontWeight: 700, marginBottom: 12,
             }}
           >← All buckets</button>
@@ -641,7 +641,7 @@ function MobileBucketGrid({ nodes, buckets, onSelect }: {
                   style={{
                     width: '100%', minHeight: 56, padding: '10px 14px', textAlign: 'left',
                     background: '#11112a', border: '1px solid #2a2a45', borderRadius: 12,
-                    color: '#fde68a',
+                    color: '#FFC9A8',
                   }}
                 >
                   <strong style={{ color: '#fff', fontSize: 15 }}>{n.title}</strong>
@@ -689,7 +689,7 @@ function LearnMode({ nodes }: { nodes: AtlasNode[] }) {
           <div key={path.id} className={`path-card bg-gradient-to-br ${path.gradient}`}>
             <div style={{ fontSize: 36 }}>{path.emoji}</div>
             <h3 style={{ fontSize: 22, fontWeight: 900, color: '#fff', marginTop: 8 }}>{path.title}</h3>
-            <p style={{ fontSize: 14, color: '#fde68a', marginTop: 4 }}>{path.description}</p>
+            <p style={{ fontSize: 14, color: '#FFC9A8', marginTop: 4 }}>{path.description}</p>
             <div style={{ marginTop: 10, fontSize: 12, color: '#fde047' }}>
               {path.duration} · {path.targetAudience} · ⭐ {done}/{total} mastered
             </div>
@@ -699,12 +699,12 @@ function LearnMode({ nodes }: { nodes: AtlasNode[] }) {
             <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
               {path.termSlugs.slice(0, 4).map(s => (
                 <span key={s} style={{
-                  fontSize: 10, background: 'rgba(0,0,0,.4)', color: '#fde68a',
+                  fontSize: 10, background: 'rgba(0,0,0,.4)', color: '#FFC9A8',
                   padding: '3px 7px', borderRadius: 999,
                 }}>{nodes.find(n => n.slug === s)?.title ?? s}</span>
               ))}
               {path.termSlugs.length > 4 && (
-                <span style={{ fontSize: 10, color: '#fde68a' }}>+{path.termSlugs.length - 4}</span>
+                <span style={{ fontSize: 10, color: '#FFC9A8' }}>+{path.termSlugs.length - 4}</span>
               )}
             </div>
             <Link
@@ -805,7 +805,7 @@ function SearchMode({ nodes, onSelect }: { nodes: AtlasNode[]; onSelect: (s: str
             <span style={{ fontSize: 10, color: '#6b7280' }}>{n.bucketLabel}</span>
             <span style={{
               fontSize: 10, color: '#fde047',
-              background: 'rgba(245,158,11,.15)', border: '1px solid rgba(245,158,11,.3)',
+              background: 'rgba(252,104,24,.15)', border: '1px solid rgba(252,104,24,.3)',
               padding: '2px 6px', borderRadius: 6,
             }}>D{n.difficultyLevel}</span>
           </li>
@@ -824,14 +824,14 @@ function SearchMode({ nodes, onSelect }: { nodes: AtlasNode[]; onSelect: (s: str
           padding: 0 18px; font-size: 17px; font-weight: 700;
           outline: none;
         }
-        .search-input:focus { border-color: #f59e0b; }
+        .search-input:focus { border-color: #FC6818; }
         .recent { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
         .recent-h { font-size: 11px; color: #6b7280; }
         .recent-pill {
-          background: #181830; color: #fde68a; border: 1px solid #2a2a45;
+          background: #181830; color: #FFC9A8; border: 1px solid #2a2a45;
           border-radius: 999px; padding: 4px 10px; font-size: 11px; cursor: pointer;
         }
-        .recent-pill:hover { border-color: #f59e0b; }
+        .recent-pill:hover { border-color: #FC6818; }
         .results { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-direction: column; gap: 4px; max-height: 480px; overflow-y: auto; }
         .results li {
           display: flex; align-items: center; gap: 10px;
@@ -839,8 +839,8 @@ function SearchMode({ nodes, onSelect }: { nodes: AtlasNode[]; onSelect: (s: str
           background: #060611; border: 1px solid transparent;
           border-radius: 10px; cursor: pointer;
         }
-        .results li.on { border-color: #f59e0b; background: rgba(245,158,11,.06); }
-        .results li strong { color: #fde68a; font-size: 15px; }
+        .results li.on { border-color: #FC6818; background: rgba(252,104,24,.06); }
+        .results li strong { color: #FFC9A8; font-size: 15px; }
         .results li p { color: #9ca3af; font-size: 12px; margin-top: 2px; line-height: 1.3; }
       `}</style>
     </div>
@@ -1036,53 +1036,53 @@ function TermDrawer({
             border: none; color: #9ca3af; font-weight: 800; cursor: pointer;
             border-bottom: 2px solid transparent;
           }
-          .tab.on { color: #fde047; border-bottom-color: #f59e0b; }
+          .tab.on { color: #fde047; border-bottom-color: #FC6818; }
           .tab-body { padding: 18px 22px; }
-          .prose { font-size: 16px; color: #fde68a; line-height: 1.55; }
+          .prose { font-size: 16px; color: #FFC9A8; line-height: 1.55; }
           .amber-box {
-            background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.3);
+            background: rgba(252,104,24,.1); border: 1px solid rgba(252,104,24,.3);
             border-radius: 12px; padding: 12px 14px; margin-top: 14px;
           }
-          .amber-h { font-size: 11px; color: #fbbf24; font-weight: 900; letter-spacing: 1; text-transform: uppercase; margin-bottom: 4px; }
-          .amber-box p:not(.amber-h) { font-size: 14px; color: #fde68a; line-height: 1.5; }
+          .amber-h { font-size: 11px; color: #FF8A4C; font-weight: 900; letter-spacing: 1; text-transform: uppercase; margin-bottom: 4px; }
+          .amber-box p:not(.amber-h) { font-size: 14px; color: #FFC9A8; line-height: 1.5; }
           .india-box {
-            background: linear-gradient(135deg, rgba(245,158,11,.1), rgba(16,185,129,.06));
-            border: 1px solid rgba(245,158,11,.3);
+            background: linear-gradient(135deg, rgba(252,104,24,.1), rgba(16,185,129,.06));
+            border: 1px solid rgba(252,104,24,.3);
             border-radius: 12px; padding: 12px 14px; margin-top: 12px;
           }
-          .india-box p:not(.amber-h) { font-size: 14px; color: #fde68a; line-height: 1.5; }
+          .india-box p:not(.amber-h) { font-size: 14px; color: #FFC9A8; line-height: 1.5; }
           .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
           .row-h { font-size: 12px; color: #9ca3af; font-weight: 700; }
           .chip {
             font-size: 11px; padding: 4px 10px;
-            background: #181830; color: #fde68a;
+            background: #181830; color: #FFC9A8;
             border: 1px solid #2a2a45; border-radius: 999px;
             text-decoration: none;
           }
-          .chip:hover { border-color: #f59e0b; color: #fff; }
+          .chip:hover { border-color: #FC6818; color: #fff; }
           .aspect { aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; margin-top: 14px; border: 1px solid #2a2a45; }
           .aspect :global(iframe) { width: 100%; height: 100%; border: 0; }
           .quiz-q { font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 12px; }
           .quiz-opt {
             min-height: 48px; padding: 10px 14px; text-align: left;
-            background: #181830; color: #fde68a; border: 2px solid #2a2a45;
+            background: #181830; color: #FFC9A8; border: 2px solid #2a2a45;
             border-radius: 12px; cursor: pointer; font-weight: 700;
           }
-          .quiz-opt:hover:not(:disabled) { border-color: #fbbf24; }
+          .quiz-opt:hover:not(:disabled) { border-color: #FF8A4C; }
           .quiz-opt.ok  { background: rgba(16,185,129,.2); border-color: #10b981; color: #6ee7b7; }
           .quiz-opt.bad { background: rgba(239,68,68,.2);  border-color: #ef4444; color: #fda4af; }
           .connections { padding: 0 22px; display: flex; flex-direction: column; gap: 10px; }
           .fact-box {
             margin: 16px 22px;
-            background: linear-gradient(135deg, rgba(245,158,11,.12), rgba(124,58,237,.08));
-            border: 1px solid rgba(245,158,11,.3);
+            background: linear-gradient(135deg, rgba(252,104,24,.12), rgba(124,58,237,.08));
+            border: 1px solid rgba(252,104,24,.3);
             border-radius: 14px; padding: 14px;
           }
           .fact-box p { font-style: italic; color: #fde047; font-weight: 700; line-height: 1.45; }
           .open-full {
             display: block; text-align: center; margin: 16px 22px 24px;
             min-height: 52px; line-height: 52px;
-            background: #f59e0b; color: #0a0a16;
+            background: #FC6818; color: #0a0a16;
             font-weight: 900; border-radius: 12px;
             text-decoration: none;
           }
@@ -1107,7 +1107,7 @@ function ConnRow({ label, nodes, onSelect }: {
             key={n.slug}
             onClick={() => onSelect(n.slug)}
             style={{
-              fontSize: 12, background: '#181830', color: '#fde68a',
+              fontSize: 12, background: '#181830', color: '#FFC9A8',
               border: '1px solid #2a2a45', borderRadius: 999, padding: '4px 10px',
               cursor: 'pointer', fontWeight: 700,
             }}

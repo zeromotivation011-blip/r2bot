@@ -144,24 +144,24 @@ export function FillBlankBlock({ block, isCompleted, onComplete }: Props) {
           font-size: 16px;
           font-family: monospace;
         }
-        .fb-input:focus { outline: none; border-color: #fbbf24; }
+        .fb-input:focus { outline: none; border-color: #FF8A4C; }
         .fb-input.is-ok { background: rgba(16,185,129,0.18); border-color: #10b981; color: #6ee7b7; }
         .fb-input.is-bad { background: rgba(249,115,22,0.18); border-color: #f97316; color: #fb923c; }
         .fb-hint-toggle {
           width: 22px; height: 22px;
-          background: rgba(251,191,36,0.2);
-          color: #fbbf24;
-          border: 1px solid rgba(251,191,36,0.4);
+          background: rgba(255,138,76,0.2);
+          color: #FF8A4C;
+          border: 1px solid rgba(255,138,76,0.4);
           border-radius: 50%;
           font-weight: 900;
           cursor: pointer;
         }
         .fb-hint {
-          background: rgba(251,191,36,0.08);
-          color: #fde68a;
+          background: rgba(255,138,76,0.08);
+          color: #FFC9A8;
           padding: 10px 14px;
           border-radius: 8px;
-          border: 1px dashed rgba(251,191,36,0.3);
+          border: 1px dashed rgba(255,138,76,0.3);
         }
         .fb-check {
           align-self: flex-start;
@@ -174,12 +174,12 @@ export function FillBlankBlock({ block, isCompleted, onComplete }: Props) {
         .fb-check:disabled { opacity: 0.4; cursor: not-allowed; }
         .fb-result { display: flex; gap: 12px; align-items: center; }
         .fb-result-ok { color: #10b981; font-weight: 800; margin: 0; }
-        .fb-result-warn { color: #fbbf24; font-weight: 800; margin: 0; }
+        .fb-result-warn { color: #FF8A4C; font-weight: 800; margin: 0; }
         .fb-retry {
           padding: 8px 14px; border-radius: 8px;
-          background: rgba(251,191,36,0.18);
+          background: rgba(255,138,76,0.18);
           color: #fde047; font-weight: 800;
-          border: 1px solid rgba(251,191,36,0.4);
+          border: 1px solid rgba(255,138,76,0.4);
           cursor: pointer;
         }
       `}</style>

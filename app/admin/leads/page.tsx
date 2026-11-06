@@ -64,8 +64,8 @@ export default async function AdminLeadsPage() {
         {migrationMissing && (
           <p style={{
             margin: '0 0 20px', padding: '12px 16px', borderRadius: 10, fontSize: 13,
-            color: '#fbbf24', background: 'rgba(251,191,36,0.08)',
-            border: '1px solid rgba(251,191,36,0.3)',
+            color: '#FF8A4C', background: 'rgba(255,138,76,0.08)',
+            border: '1px solid rgba(255,138,76,0.3)',
           }}>
             Showing the legacy <code>leads</code> table — migration{' '}
             <code>0036_lead_events.sql</code> has not been applied yet. Course-waitlist and

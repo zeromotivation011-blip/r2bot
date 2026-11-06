@@ -125,9 +125,9 @@ export function ConceptCard({
           color: #f4f4f5;
         }
         .cc.is-mastered .cc-front {
-          background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(15,18,32,0.6));
-          border-color: rgba(251,191,36,0.4);
-          border-left-color: #fbbf24;
+          background: linear-gradient(135deg, rgba(255,138,76,0.12), rgba(15,18,32,0.6));
+          border-color: rgba(255,138,76,0.4);
+          border-left-color: #FF8A4C;
         }
         .cc.is-locked .cc-front { filter: grayscale(0.5); opacity: 0.85; }
         .cc-front-head {
@@ -160,7 +160,7 @@ export function ConceptCard({
           margin-top: auto;
           display: flex; align-items: center; justify-content: space-between;
         }
-        .cc-lock { font-size: 14px; color: #fbbf24; }
+        .cc-lock { font-size: 14px; color: #FF8A4C; }
 
         .cc-back {
           transform: rotateY(180deg);
@@ -203,7 +203,7 @@ function MasteryRing({ rounds, mastered }: { rounds: number; mastered: boolean }
         <circle
           cx="18" cy="18" r={radius}
           fill="none"
-          stroke={mastered ? '#fbbf24' : '#00E5FF'}
+          stroke={mastered ? '#FF8A4C' : '#00E5FF'}
           strokeWidth="3"
           strokeDasharray={circ}
           strokeDashoffset={offset}
@@ -211,7 +211,7 @@ function MasteryRing({ rounds, mastered }: { rounds: number; mastered: boolean }
           transform="rotate(-90 18 18)"
           style={{ transition: 'stroke-dashoffset 0.4s' }}
         />
-        {mastered && <text x="18" y="22" textAnchor="middle" fontSize="14" fill="#fbbf24" fontWeight="900">⭐</text>}
+        {mastered && <text x="18" y="22" textAnchor="middle" fontSize="14" fill="#FF8A4C" fontWeight="900">⭐</text>}
         {!mastered && rounds > 0 && <text x="18" y="22" textAnchor="middle" fontSize="11" fill="#00E5FF" fontWeight="900">{rounds}/3</text>}
       </svg>
       <style jsx>{`
@@ -229,7 +229,7 @@ function Difficulty({ value }: { value: number }) {
         <span key={i} style={{ opacity: i < stars ? 1 : 0.2 }}>★</span>
       ))}
       <style jsx>{`
-        .dif { color: #fbbf24; font-size: 13px; letter-spacing: 1px; }
+        .dif { color: #FF8A4C; font-size: 13px; letter-spacing: 1px; }
       `}</style>
     </span>
   )

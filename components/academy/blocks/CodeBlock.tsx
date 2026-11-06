@@ -211,9 +211,9 @@ export function CodeBlock({ block, isCompleted, onComplete }: Props) {
         }
         .cb-lang-toggle {
           padding: 4px 10px; border-radius: 999px;
-          background: rgba(251,191,36,0.14);
-          color: #fbbf24;
-          border: 1px solid rgba(251,191,36,0.3);
+          background: rgba(255,138,76,0.14);
+          color: #FF8A4C;
+          border: 1px solid rgba(255,138,76,0.3);
           font-weight: 800; font-size: 11px; cursor: pointer;
         }
         .cb-instructions { color: #c8d0dc; font-size: 14px; margin: 0; }
@@ -233,18 +233,18 @@ export function CodeBlock({ block, isCompleted, onComplete }: Props) {
         .cb-run:disabled { opacity: 0.5; cursor: not-allowed; }
         .cb-hint-btn, .cb-solution-btn {
           min-height: 44px; padding: 0 14px;
-          background: rgba(251,191,36,0.14);
-          color: #fbbf24;
-          border: 1px solid rgba(251,191,36,0.3);
+          background: rgba(255,138,76,0.14);
+          color: #FF8A4C;
+          border: 1px solid rgba(255,138,76,0.3);
           border-radius: 10px;
           font-weight: 800; font-size: 13px; cursor: pointer;
         }
         .cb-hints { display: flex; flex-direction: column; gap: 6px; }
         .cb-hint {
           padding: 8px 12px;
-          background: rgba(251,191,36,0.08);
-          color: #fde68a;
-          border-left: 3px solid #fbbf24;
+          background: rgba(255,138,76,0.08);
+          color: #FFC9A8;
+          border-left: 3px solid #FF8A4C;
           border-radius: 6px;
           font-size: 13px; margin: 0;
         }

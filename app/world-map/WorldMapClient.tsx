@@ -50,7 +50,7 @@ const LAYER_OPTIONS: { id: DataLayer; label: string }[] = [
 ]
 
 const REGION_COLORS: Record<string, string> = {
-  Asia: '#f59e0b',
+  Asia: '#FC6818',
   Europe: '#3b82f6',
   Americas: '#10b981',
   Oceania: '#06b6d4',
@@ -381,7 +381,7 @@ function MapTab(props: {
                       let fill = getLayerColor(data, layer)
                       if (isA) fill = '#3b82f6'
                       else if (isB) fill = '#ec4899'
-                      else if (isSelected) fill = '#f59e0b'
+                      else if (isSelected) fill = '#FC6818'
 
                       return (
                         <Geography
@@ -412,14 +412,14 @@ function MapTab(props: {
                               cursor: data ? 'pointer' : 'default',
                             },
                             hover: {
-                              fill: data ? '#f59e0b' : fill,
-                              stroke: '#fcd34d',
+                              fill: data ? '#FC6818' : fill,
+                              stroke: '#FFA878',
                               strokeWidth: 1,
                               outline: 'none',
                               cursor: data ? 'pointer' : 'default',
                               opacity: isHovered ? 0.95 : 1,
                             },
-                            pressed: { outline: 'none', fill: '#f59e0b' },
+                            pressed: { outline: 'none', fill: '#FC6818' },
                           }}
                         />
                       )
@@ -430,8 +430,8 @@ function MapTab(props: {
                 {/* India hubs always visible */}
                 {INDIA_HUBS.map(hub => (
                   <Marker key={hub.name} coordinates={[hub.lng, hub.lat]}>
-                    <circle r={hub.intensity * 1.8} fill="#fbbf24" fillOpacity={0.35} className="animate-pulse" />
-                    <circle r={2} fill="#fbbf24" />
+                    <circle r={hub.intensity * 1.8} fill="#FF8A4C" fillOpacity={0.35} className="animate-pulse" />
+                    <circle r={2} fill="#FF8A4C" />
                   </Marker>
                 ))}
               </ZoomableGroup>
@@ -525,7 +525,7 @@ function RankedTable({ layer, onSelect }: { layer: DataLayer; onSelect: (c: Coun
               <span className="text-sm text-gray-200 truncate flex-1">{c.name}</span>
               <span
                 className="text-xs font-mono px-2 py-0.5 rounded"
-                style={{ backgroundColor: getLayerColor(c, layer) + '40', color: '#fcd34d' }}
+                style={{ backgroundColor: getLayerColor(c, layer) + '40', color: '#FFA878' }}
               >{c.density}</span>
               <span className={`text-xs font-mono ${c.densityGrowthRate > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                 {c.densityGrowthRate > 0 ? '↑' : '↓'}{Math.abs(c.densityGrowthRate)}%
@@ -601,7 +601,7 @@ function CountryPanel({ country, onClose, onShare, india }: {
       <div>
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Robot Mix</p>
         <div className="flex h-2 rounded-full overflow-hidden bg-gray-800">
-          <div style={{ width: `${country.robotTypes.industrial}%`, backgroundColor: '#f59e0b' }} />
+          <div style={{ width: `${country.robotTypes.industrial}%`, backgroundColor: '#FC6818' }} />
           <div style={{ width: `${country.robotTypes.service}%`, backgroundColor: '#3b82f6' }} />
           <div style={{ width: `${country.robotTypes.collaborative}%`, backgroundColor: '#10b981' }} />
         </div>
@@ -682,7 +682,7 @@ function Sparkline({ country }: { country: CountryData }) {
     <div className="bg-gray-800/60 rounded-xl p-2.5">
       <p className="text-[10px] text-gray-500 uppercase tracking-wide mb-1">5-year trend</p>
       <svg viewBox="0 0 100 30" className="w-full h-12">
-        <polyline fill="none" stroke="#f59e0b" strokeWidth="1.2" points={pts} />
+        <polyline fill="none" stroke="#FC6818" strokeWidth="1.2" points={pts} />
         <polyline
           fill="url(#sparkfill)"
           stroke="none"
@@ -691,8 +691,8 @@ function Sparkline({ country }: { country: CountryData }) {
         />
         <defs>
           <linearGradient id="sparkfill" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+            <stop offset="0%" stopColor="#FC6818" />
+            <stop offset="100%" stopColor="#FC6818" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>
@@ -765,7 +765,7 @@ function DensityLeaderboard({ onSelect }: { onSelect: (c: CountryData) => void }
                 className="h-full rounded-full transition-all duration-700"
                 style={{
                   width: `${(c.density / max) * 100}%`,
-                  backgroundColor: c.id === 'IND' ? '#f59e0b' : '#6366f1',
+                  backgroundColor: c.id === 'IND' ? '#FC6818' : '#6366f1',
                 }}
               />
             </div>
@@ -1057,9 +1057,9 @@ function ScatterPlot({ onSelect }: { onSelect: (c: CountryData) => void }) {
 
           {/* Global avg crosshair */}
           <line x1={margin.left} x2={width - margin.right} y1={yScale(GLOBAL_AVERAGE_DENSITY)} y2={yScale(GLOBAL_AVERAGE_DENSITY)}
-                stroke="#f59e0b" strokeDasharray="4 4" opacity={0.55} />
+                stroke="#FC6818" strokeDasharray="4 4" opacity={0.55} />
           <text x={width - margin.right} y={yScale(GLOBAL_AVERAGE_DENSITY) - 4} textAnchor="end"
-                fill="#fcd34d" fontSize="11">Global avg = 162</text>
+                fill="#FFA878" fontSize="11">Global avg = 162</text>
 
           {/* Trend line */}
           <line
@@ -1083,13 +1083,13 @@ function ScatterPlot({ onSelect }: { onSelect: (c: CountryData) => void }) {
                  onClick={() => onSelect(c)}
                  style={{ cursor: 'pointer' }}>
                 <circle cx={cx} cy={cy} r={r}
-                  fill={isIndia ? '#f59e0b' : REGION_COLORS[c.region]}
+                  fill={isIndia ? '#FC6818' : REGION_COLORS[c.region]}
                   fillOpacity={isFocus ? 0.95 : isIndia ? 0.95 : 0.7}
-                  stroke={isFocus || isIndia ? '#fde68a' : 'none'}
+                  stroke={isFocus || isIndia ? '#FFC9A8' : 'none'}
                   strokeWidth={isFocus ? 2 : isIndia ? 1.5 : 0}
                 />
                 {(isIndia || isKorea || isFocus) && (
-                  <text x={cx + r + 4} y={cy + 4} fontSize="11" fill="#fde68a" fontWeight={isIndia ? 700 : 500}>
+                  <text x={cx + r + 4} y={cy + 4} fontSize="11" fill="#FFC9A8" fontWeight={isIndia ? 700 : 500}>
                     {c.flagEmoji} {c.name}
                   </text>
                 )}
@@ -1103,10 +1103,10 @@ function ScatterPlot({ onSelect }: { onSelect: (c: CountryData) => void }) {
             const cx = xScale(ind.gdpPerCapitaUSD), cy = yScale(ind.density)
             return (
               <g>
-                <line x1={cx} y1={cy} x2={cx + 80} y2={cy - 60} stroke="#f59e0b" strokeWidth="1" />
-                <rect x={cx + 78} y={cy - 88} width={170} height={36} fill="#1f2937" stroke="#f59e0b" rx="6" />
-                <text x={cx + 86} y={cy - 72} fontSize="11" fill="#f59e0b" fontWeight={700}>🇮🇳 India</text>
-                <text x={cx + 86} y={cy - 58} fontSize="10" fill="#fde68a">Biggest opportunity gap</text>
+                <line x1={cx} y1={cy} x2={cx + 80} y2={cy - 60} stroke="#FC6818" strokeWidth="1" />
+                <rect x={cx + 78} y={cy - 88} width={170} height={36} fill="#1f2937" stroke="#FC6818" rx="6" />
+                <text x={cx + 86} y={cy - 72} fontSize="11" fill="#FC6818" fontWeight={700}>🇮🇳 India</text>
+                <text x={cx + 86} y={cy - 58} fontSize="10" fill="#FFC9A8">Biggest opportunity gap</text>
               </g>
             )
           })()}
@@ -1240,7 +1240,7 @@ function RaceTab() {
                   className="h-full transition-all duration-700 ease-out flex items-center justify-end pr-2"
                   style={{
                     width: `${(r.v / max) * 100}%`,
-                    backgroundColor: isIndia ? '#f59e0b' : '#475569',
+                    backgroundColor: isIndia ? '#FC6818' : '#475569',
                   }}
                 >
                   <span className={`text-xs font-mono font-bold ${isIndia ? 'text-black' : 'text-white'}`}>{r.v.toLocaleString()}</span>
@@ -1439,7 +1439,7 @@ function GovInitiatives() {
       {INDIA_INITIATIVES.map(it => (
         <li key={it.year + it.name} className="relative">
           <div className="absolute -left-[27px] top-1 w-3 h-3 rounded-full"
-               style={{ backgroundColor: it.status === 'launched' ? '#10b981' : it.status === 'milestone' ? '#f59e0b' : '#a78bfa' }} />
+               style={{ backgroundColor: it.status === 'launched' ? '#10b981' : it.status === 'milestone' ? '#FC6818' : '#a78bfa' }} />
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-mono bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded">{it.year}</span>
             <span className={`text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded ${

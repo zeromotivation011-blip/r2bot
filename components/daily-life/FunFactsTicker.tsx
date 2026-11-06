@@ -36,9 +36,9 @@ export function FunFactsTicker() {
         .fft {
           position: relative;
           padding: 10px 0;
-          background: linear-gradient(180deg, rgba(245,158,11,0.05), rgba(245,158,11,0.12));
-          border-top: 1px solid rgba(245,158,11,0.2);
-          border-bottom: 1px solid rgba(245,158,11,0.2);
+          background: linear-gradient(180deg, rgba(252,104,24,0.05), rgba(252,104,24,0.12));
+          border-top: 1px solid rgba(252,104,24,0.2);
+          border-bottom: 1px solid rgba(252,104,24,0.2);
           overflow: hidden;
         }
         .fft-shell {
@@ -55,9 +55,9 @@ export function FunFactsTicker() {
           align-items: center;
           padding: 6px 24px;
           font-size: 13px;
-          color: #fde68a;
+          color: #FFC9A8;
           font-weight: 700;
-          border-right: 1px solid rgba(245,158,11,0.2);
+          border-right: 1px solid rgba(252,104,24,0.2);
           letter-spacing: 0.3px;
         }
       `}</style>
