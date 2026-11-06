@@ -1,0 +1,71 @@
+---
+title: "How Robot Arms Work: Joints, Kinematics and Grippers in Plain Words"
+description: "What a robot arm is made of, what degrees of freedom mean, how forward and inverse kinematics work, and why grasping is hard."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["Beginner", "Robot Arms", "Explainer"]
+readTime: 6
+coverEmoji: "🦾"
+featured: false
+keywords: ["how robot arms work", "robot arm joints", "degrees of freedom robot", "inverse kinematics explained", "robot gripper types"]
+---
+
+# How Robot Arms Work
+
+A robot arm is a chain of rigid links connected by joints, with a tool at the end. Your own arm is a good model: shoulder, elbow, wrist, hand.
+
+## The parts
+
+- **Links:** the rigid sections.
+- **Joints:** where links turn or slide. Each joint is driven by a motor, often with gears. See [motors for robots](/blog/motors-for-robots-dc-servo-stepper).
+- **End effector:** the tool at the tip, usually a [gripper](/atlas/concept/gripper) but sometimes a welder, a paint gun or a suction cup.
+- **Sensors:** encoders at each joint tell the controller its angle.
+
+## Degrees of freedom
+
+A [degree of freedom](/atlas/concept/degrees-of-freedom) (DOF) is one independent way the arm can move. To place a tool anywhere in space and point it in any direction you need six: three for position and three for orientation. That is why many industrial arms have six joints. Simple hobby arms have three or four and are more limited.
+
+## Forward kinematics
+
+If you know every joint angle, you can calculate where the tip is. This is [forward kinematics](/atlas/concept/forward-kinematics), and it is basic geometry (sines and cosines of the angles).
+
+## Inverse kinematics
+
+The harder, more useful question: I want the tip at this point, so what angles should each joint take? That is [inverse kinematics](/atlas/concept/inverse-kinematics). There may be several answers, or none if the point is out of reach. Software solves this many times per second.
+
+## Why grasping is hard
+
+Picking up a known box in a fixed position is easy. Picking up different objects from a messy bin is hard, because the robot must see the object, decide how to hold it, and judge force. Vision and [force sensing](/atlas/concept/force-sensor) help. This is why many warehouses still use humans for picking.
+
+## Types of arms
+
+- **Articulated arms:** rotating joints like a human arm; the most common industrial type.
+- **SCARA arms:** fast, flat-moving arms used for assembly.
+- **Cartesian (gantry) robots:** move along straight axes like a 3D printer.
+- **Parallel robots:** several arms linked to one platform, very fast for light parts.
+
+See [industrial robot](/atlas/concept/industrial-robot) and [robot arm](/atlas/concept/robot-arm).
+
+## What goes wrong
+
+- If the arm is asked to reach beyond its limits, the maths has no solution and it stops or jams.
+- Gears can have backlash, small loose play that makes precise positioning harder.
+- Without enough torque, a joint sags under load.
+
+## Build one
+
+A three-joint hobby arm with servos is a great project once you have finished a wheeled robot. Start with [our first robot tutorial](/blog/first-robot-project-india-step-by-step).
+
+## Frequently asked questions
+
+**How many joints should a beginner arm have?**
+Three or four servos is enough to learn the idea.
+
+**Is inverse kinematics hard?**
+For simple arms it is a small amount of trigonometry. Libraries handle harder cases.
+
+**What is a cobot arm?**
+An arm built to work safely next to people. See [collaborative robot safety](/atlas/concept/collaborative-robot-safety).
+
+[Explore the Atlas →](/atlas) · [Types of robots →](/blog/types-of-robots-explained)

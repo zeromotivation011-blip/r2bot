@@ -1,0 +1,73 @@
+---
+title: "Robot Sensors Explained: How Robots See, Feel and Measure the World"
+description: "A plain guide to the main robot sensors: distance, vision, motion, touch and position. What each one measures, what it is good for, and where it fails."
+date: "2026-11-06"
+author: "R2BOT"
+authorRole: "Robotics, made simple"
+tags: ["Beginner", "Sensors", "Explainer"]
+readTime: 6
+coverEmoji: "👁️"
+featured: false
+keywords: ["robot sensors", "types of sensors in robotics", "how do robots sense", "ultrasonic vs infrared sensor", "imu encoder lidar explained"]
+---
+
+# Robot Sensors Explained
+
+A robot cannot act sensibly if it cannot sense. Sensors turn the real world into numbers a program can use. Here are the main kinds, in plain language.
+
+## Distance sensors
+
+**Ultrasonic sensors** send out a burst of sound above human hearing and time the echo. Longer echo means farther object. The common HC-SR04 is cheap and perfect for beginners. It struggles with soft surfaces that absorb sound and with angled surfaces that bounce it away. See [ultrasonic sensor](/atlas/concept/ultrasonic-sensor).
+
+**Infrared (IR) sensors** use light. They work well at short range and as line sensors, but bright sunlight can confuse them.
+
+**[Lidar](/atlas/concept/lidar)** spins a laser to measure distance in many directions, producing a map-like scan. It is accurate but costs more.
+
+## Vision sensors
+
+**Cameras** give rich information: colour, shape, text. Software must interpret the image, which is harder. **[Depth cameras](/atlas/concept/depth-camera)** also give distance for each pixel. See [Computer Vision for Robots](/blog/computer-vision-for-robots-explained).
+
+## Motion and orientation sensors
+
+An **[IMU](/atlas/concept/imu)** (inertial measurement unit) measures acceleration and rotation. It tells a robot if it is tilting or turning. Balancing robots and drones depend on it. Its weakness is drift: small errors add up over time.
+
+## Position sensors
+
+An **[encoder](/atlas/concept/encoder)** counts how much a wheel or joint has turned. With it, a robot can drive a set distance or hold a joint angle. Wheels can slip, so encoders alone can drift from the truth.
+
+## Touch and force sensors
+
+Bump switches tell a robot it has hit something. [Force sensors](/atlas/concept/force-sensor) measure how hard a gripper squeezes, which lets a robot hold an egg without crushing it.
+
+## Why robots use several sensors together
+
+Each sensor has weak spots. Combining them, called **sensor fusion**, gives a more reliable picture. A self-driving car mixes cameras, lidar and radar for this reason. See [LiDAR vs Radar vs Camera](/blog/lidar-vs-radar-vs-camera-for-robots).
+
+## What goes wrong with the wrong sensor
+
+- An ultrasonic sensor on a robot driving over a fluffy carpet may read nothing at all.
+- A camera-only robot struggles in the dark.
+- A robot that relies only on wheel encoders will slowly lose track of where it is.
+
+## Quick picker for beginners
+
+| I want my robot to... | Use |
+|---|---|
+| Avoid walls | Ultrasonic or IR distance sensor |
+| Follow a line | Two or more IR line sensors |
+| Know how far it drove | Wheel encoders |
+| Stay balanced | IMU |
+| Recognise objects | Camera + Raspberry Pi |
+
+## Frequently asked questions
+
+**What is the best sensor for a beginner?**
+The ultrasonic sensor: cheap, easy, and teaches distance sensing.
+
+**Can a robot work with just one sensor?**
+Yes, for simple tasks. Complex tasks need several.
+
+**What is sensor noise?**
+Random error in a reading. Good code averages or filters readings to reduce its effect.
+
+[Explore all sensors in the Atlas →](/atlas) · [Build a robot with sensors →](/blog/first-robot-project-india-step-by-step)
