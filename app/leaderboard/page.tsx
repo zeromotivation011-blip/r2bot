@@ -13,7 +13,7 @@ const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_S
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'R2BOT Leaderboard — Top Robotics Builders in India',
+  title: 'R2BOT Leaderboard — Top Robotics Learners',
   description: 'The top 50 R2BOT builders by XP. Earn XP by completing Academy lessons across Spark, Wire, Forge, and Edge tracks.',
   alternates: { canonical: `${BASE_URL}/leaderboard` },
 };

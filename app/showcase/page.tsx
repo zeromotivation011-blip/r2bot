@@ -10,6 +10,7 @@ import { type Project, shortAuthor } from '@/lib/projects';
 import { ShowcaseClient } from './ShowcaseClient';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/showcase' },
   title: 'Project Showcase',
   description:
     'Real robots built by R2BOT learners — from line followers and Arduino kits to ROS2 stacks and autonomous drones.',

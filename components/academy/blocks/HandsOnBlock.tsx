@@ -81,9 +81,6 @@ export function HandsOnBlock({ block, isCompleted, onComplete }: Props) {
                 ) : (
                   <span>{h.name}</span>
                 )}
-                {typeof h.price_inr === 'number' && (
-                  <span className="ho-price"> · ₹{h.price_inr}</span>
-                )}
               </li>
             ))}
           </ul>

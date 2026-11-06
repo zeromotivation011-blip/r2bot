@@ -35,64 +35,6 @@ const TRACK_COLORS: Record<string, { bg: string; border: string; text: string }>
   other:  { bg: 'rgba(107,114,128,0.1)', border: 'rgba(107,114,128,0.3)', text: '#9ca3af' },
 };
 
-/* ─── Dummy builds — shown when DB is empty ─────────────────────── */
-const DUMMY_BUILDS: Build[] = [
-  {
-    id: 'd1', title: 'Line-follower bot using Arduino + IR sensors',
-    description: 'Built during summer vacation! It follows any dark line on white paper. I used 2 IR sensors, an L298N motor driver and 2 DC motors. Total cost under ₹500.',
-    image_url: null, track: 'wire', cost_inr: 480, hours_spent: 6, created_at: '2025-05-01T10:00:00Z',
-    author_name: 'Arjun Mehta', location: 'Delhi', likes: 47,
-  },
-  {
-    id: 'd2', title: 'Obstacle-avoidance rover',
-    description: 'This rover uses an HC-SR04 ultrasonic sensor to detect walls and reverse + turn. Took me 2 weekends. My first ever robot!',
-    image_url: null, track: 'wire', cost_inr: 750, hours_spent: 10, created_at: '2025-04-18T08:00:00Z',
-    author_name: 'Priya Iyer', location: 'Chennai', likes: 63,
-  },
-  {
-    id: 'd3', title: 'ROS2 simulation — differential drive nav',
-    description: 'Got Nav2 working in Gazebo on my laptop! The robot navigates a maze without hitting walls using SLAM-generated maps. No hardware needed — pure simulation.',
-    image_url: null, track: 'forge', cost_inr: 0, hours_spent: 18, created_at: '2025-03-30T15:00:00Z',
-    author_name: 'Karan Shah', location: 'Bengaluru', likes: 89,
-  },
-  {
-    id: 'd4', title: 'Traffic signal robot — Kids track project',
-    description: 'I made a robot that stops at red and goes on green using LEDs and a light sensor. Made this in Grade 6!',
-    image_url: null, track: 'kids', cost_inr: 120, hours_spent: 3, created_at: '2025-05-08T12:00:00Z',
-    author_name: 'Aanya Singh', location: 'Pune', likes: 34,
-  },
-  {
-    id: 'd5', title: 'AI object-sorting arm on Jetson Nano',
-    description: 'YOLOv8 on Jetson Nano controlling a 4-DoF arm to sort colored blocks into bins. Inference at 22fps on 12W. This took 3 months of weekends.',
-    image_url: null, track: 'edge', cost_inr: 8500, hours_spent: 120, created_at: '2025-02-14T09:00:00Z',
-    author_name: 'Rohan Pillai', location: 'Hyderabad', likes: 204,
-  },
-  {
-    id: 'd6', title: 'Soil moisture bot for the farm',
-    description: 'My uncle has a farm. I built a bot that reads soil moisture and sends an alert on WhatsApp if it drops too low. Uses ESP8266 + capacitive sensor.',
-    image_url: null, track: 'spark', cost_inr: 280, hours_spent: 8, created_at: '2025-04-05T07:00:00Z',
-    author_name: 'Sneha Patil', location: 'Nashik', likes: 121,
-  },
-  {
-    id: 'd7', title: 'Gesture-controlled arm',
-    description: 'MPU-6050 on a glove maps my hand tilt to 3 servo motors on a 3D-printed arm. The lag is under 100ms. Printed the arm at school.',
-    image_url: null, track: 'wire', cost_inr: 620, hours_spent: 14, created_at: '2025-03-15T11:00:00Z',
-    author_name: 'Vikram Nair', location: 'Kochi', likes: 78,
-  },
-  {
-    id: 'd8', title: 'Mini sumo wrestler robot',
-    description: 'Built for our school\'s robotics tournament. It won 2nd place! Uses proximity sensors to detect the opponent and a powerful motor driver to push them out.',
-    image_url: null, track: 'wire', cost_inr: 890, hours_spent: 9, created_at: '2025-04-28T16:00:00Z',
-    author_name: 'Rahul Gupta', location: 'Jaipur', likes: 56,
-  },
-  {
-    id: 'd9', title: 'ROS2 teleoperated drone (simulated)',
-    description: 'Flew a simulated quadrotor in Gazebo, controlling it via ROS2 topics published from a PS4 controller. Working on real hardware next month.',
-    image_url: null, track: 'forge', cost_inr: 0, hours_spent: 30, created_at: '2025-01-22T10:00:00Z',
-    author_name: 'Pooja Sharma', location: 'Mumbai', likes: 167,
-  },
-];
-
 export function GalleryClient() {
   const [builds, setBuilds] = useState<Build[] | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -119,9 +61,9 @@ export function GalleryClient() {
         .order('created_at', { ascending: false })
         .limit(60);
       const real = (data as Build[]) ?? [];
-      setBuilds(real.length > 0 ? real : DUMMY_BUILDS);
+      setBuilds(real);
     } catch {
-      setBuilds(DUMMY_BUILDS);
+      setBuilds([]);
     }
   }, []);
 
@@ -137,8 +79,6 @@ export function GalleryClient() {
       return next;
     });
     setBuilds((prev) => prev ? prev.map((b) => b.id === id ? { ...b, likes: (b.likes ?? 0) + 1 } : b) : prev);
-    // Fire-and-forget POST. Dummy builds (id starts with 'd') stay local-only.
-    if (id.startsWith('d')) return;
     try { await fetch(`/api/community/like/${encodeURIComponent(id)}`, { method: 'POST' }); } catch { /* ignore */ }
   }, [likedSet]);
 
@@ -166,15 +106,9 @@ export function GalleryClient() {
           </span>
         </h1>
         <p style={{ color: '#9ca3af', marginTop: 10, fontSize: 15, maxWidth: 500, margin: '10px auto 0' }}>
-          Real robots built by real R2BOT learners across India. Share yours — the next builder is watching.
+          Robots built by R2BOT learners. Share yours — the next builder is watching.
         </p>
 
-        {/* Stats strip */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 24, marginTop: 20, fontSize: 13, color: '#6b7280' }}>
-          <span><span style={{ color: '#f97316', fontWeight: 700 }}>247</span> builds shared</span>
-          <span><span style={{ color: '#a56bff', fontWeight: 700 }}>38</span> cities</span>
-          <span><span style={{ color: '#00b8d4', fontWeight: 700 }}>₹0</span> average cost for Spark</span>
-        </div>
 
         <button
           type="button"
@@ -277,11 +211,6 @@ export function GalleryClient() {
 
                   {/* Meta chips */}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 12 }}>
-                    {b.cost_inr !== null && b.cost_inr !== undefined && (
-                      <span style={{ fontSize: 11, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', color: '#10b981', borderRadius: 100, padding: '2px 8px' }}>
-                        ₹{b.cost_inr === 0 ? '0 (simulation)' : b.cost_inr.toLocaleString('en-IN')}
-                      </span>
-                    )}
                     {b.hours_spent != null && (
                       <span style={{ fontSize: 11, background: 'rgba(0,184,212,0.1)', border: '1px solid rgba(0,184,212,0.25)', color: '#00b8d4', borderRadius: 100, padding: '2px 8px' }}>
                         ⏱ {b.hours_spent}h
@@ -401,7 +330,7 @@ function SubmitForm({ onDone }: { onDone: () => void }) {
             style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '9px 12px', fontSize: 13, color: '#fff', outline: 'none', resize: 'none', boxSizing: 'border-box' }} />
         </label>
         <label style={{ display: 'block' }}>
-          <span style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#6b7280', display: 'block', marginBottom: 4 }}>Cost (₹)</span>
+          <span style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#6b7280', display: 'block', marginBottom: 4 }}>Approx. cost (optional)</span>
           <input name="cost_inr" type="number" min="0"
             style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '9px 12px', fontSize: 13, color: '#fff', outline: 'none', boxSizing: 'border-box' }} />
         </label>

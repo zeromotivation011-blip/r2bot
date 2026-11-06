@@ -10,6 +10,7 @@ import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/lens' },
   title: 'Lens — The best robotics videos, decoded',
   description:
     "We watch the long robotics videos so you don't have to. Each Lens entry is a plain-English summary of what's worth knowing — and a link to the original.",

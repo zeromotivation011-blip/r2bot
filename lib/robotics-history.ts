@@ -1176,20 +1176,20 @@ export const MILESTONES: Milestone[] = [
   },
   {
     year: 2025,
-    title: 'India launches National Robotics Mission',
+    title: 'India moves toward a National Robotics Mission',
     description:
-      'India launches a national robotics mission to grow domestic robotics capacity. Target: 50 robots per 10,000 workers by 2030, up from 4.',
+      'India\'s IT ministry published a draft National Strategy on Robotics (2023, revised 2024) that proposes a National Robotics Mission to coordinate work in manufacturing, healthcare, agriculture and national security.',
     category: 'india',
     icon: '🇮🇳',
     countryFlag: '🇮🇳',
     isKeyMilestone: true,
     imageUrl: null,
     fullArticle:
-      "On 15 August 2025 — India's 78th Independence Day — the Government of India formally launched the National Robotics Mission (NRM). Coordinated by NITI Aayog and the Department of Science & Technology, the NRM commits to specific targets: increase India's industrial-robot density from approximately 8 (2024 figure) to 50 robots per 10,000 manufacturing workers by 2030; create a domestic humanoid-robotics programme through public-private consortium; double the number of Atal Tinkering Labs from 10,000 to 20,000 schools; fund 100+ Centres of Excellence in robotics R&D; provide Production-Linked Incentive subsidies for domestic robot manufacturing. Initial budget allocation was ₹15,000 crore over five years. Major beneficiaries identified include GreyOrange, Asimov Robotics, Systemantics, IIT Madras's TVASTA, ISRO's space-robotics programme, and a consortium for the Indian humanoid. The NRM is the largest single robotics policy commitment in Indian history. For Indian robotics careers, it sets up the next decade as one of unprecedented opportunity. R2BOT itself launches under the educational arm of the NRM in 2026.",
+      "India's Ministry of Electronics and Information Technology released a draft National Strategy on Robotics for public consultation in 2023 and a revised draft in 2024. It aims to make India a global robotics hub by 2030 and proposes a National Robotics Mission, supported by a Robotics Innovation Unit, to coordinate research, testing, supply chains and adoption in four priority sectors: manufacturing, healthcare, agriculture and national security. Details of funding and implementation continue to evolve, so check official government sources for the latest status.",
     whyItMattered: [
-      "Largest robotics policy commitment in Indian history.",
-      "Sets explicit 10× target for robot density by 2030 — closing the gap with China.",
-      "Allocates ₹15,000 crore over five years to seed Indian robotics industry growth.",
+      "Shows that a large economy now treats robotics as a national priority.",
+      "Names four priority sectors for robotics adoption.",
+      "Proposes dedicated institutions to coordinate research, testing and adoption.",
     ],
   },
   {

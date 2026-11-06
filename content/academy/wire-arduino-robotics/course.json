@@ -2,7 +2,7 @@
   "id": "wire-arduino-robotics",
   "slug": "wire-arduino-robotics",
   "title": "Arduino Robotics: Build Your First Physical Robot",
-  "subtitle": "From a ₹2,000 kit to a robot that navigates your room.",
+  "subtitle": "From a basic kit to a robot that navigates your room.",
   "track": "wire",
   "level": "beginner",
   "description": "Go hands-on. Wire real circuits, write real code, and build a robot that senses, thinks, and moves through your environment. Covers Arduino fundamentals, sensor integration, motor control, and navigation algorithms — entirely project-driven.",

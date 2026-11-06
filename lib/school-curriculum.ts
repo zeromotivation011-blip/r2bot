@@ -416,7 +416,7 @@ export const SCHOOL_CURRICULUM: Record<SchoolGradeId, GradeCurriculum> = {
         id: 'arduino-basics',
         title: 'Arduino: Your First Robot Brain',
         emoji: '🟦',
-        tagline: 'A ₹350 board that runs millions of real robots',
+        tagline: 'A tiny board that runs millions of real robots',
         duration: '25 min',
         videoUrl: 'https://www.youtube.com/embed/nL34zDTPkcs',
         videoTitle: 'Watch: Arduino in 60 seconds',

@@ -169,13 +169,12 @@ export function CourseLandingClient({ course }: { course: Course }) {
           {course.hardware_requirements && course.hardware_requirements.length > 0 && (
             <Section title="Hardware you'll need" accent={accent}>
               <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 0 12px' }}>
-                Estimated total cost: ₹{course.hardware_requirements.reduce((s, h) => s + (h.price_inr ?? 0), 0).toLocaleString('en-IN')} — all available on Amazon.in, Flipkart, and Robocraze.
+                These are common hobby parts, available from most electronics shops and online stores.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {course.hardware_requirements.map((h, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: 8, fontSize: 13 }}>
                     <span style={{ color: '#e2e8f0' }}>{h.name}</span>
-                    {h.price_inr && <span style={{ color: '#fde047', fontWeight: 700 }}>₹{h.price_inr}</span>}
                   </div>
                 ))}
               </div>

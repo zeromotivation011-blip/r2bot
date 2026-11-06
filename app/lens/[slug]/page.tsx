@@ -26,6 +26,7 @@ export async function generateMetadata(
   return {
     title: video.title,
     description: video.summary,
+    alternates: { canonical: `/lens/${slug}` },
     openGraph: {
       title: video.title,
       description: video.summary,

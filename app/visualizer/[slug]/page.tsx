@@ -80,7 +80,7 @@ export async function generateMetadata({
 
   const url = `${SITE}/visualizer/${sim.id}`
   return {
-    title: `${sim.heading} — Free & Interactive | R2BOT`,
+    title: `${sim.heading} — Free & Interactive`,
     description: sim.description,
     keywords: sim.keywords,
     alternates: { canonical: url },

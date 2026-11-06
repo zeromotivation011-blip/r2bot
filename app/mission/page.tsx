@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { StaticPage } from '@/components/StaticPage';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/mission' },
   title: 'Mission',
   description: "R2BOT's mission and 10-year vision — why every human on Earth should be able to understand robotics.",
 };

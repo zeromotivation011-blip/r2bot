@@ -12,7 +12,7 @@ export const runtime = 'nodejs'
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const metadata: Metadata = {
-  title: 'R2BOT Blog | Learn Robotics — Guides, Tutorials & Career Advice',
+  title: 'Robotics Blog: Guides, Tutorials & Career Advice',
   description:
     'Expert robotics guides for beginners and students worldwide — Arduino and ROS2 projects, career advice, and how-to tutorials. Clear, free, and hands-on.',
   keywords: [

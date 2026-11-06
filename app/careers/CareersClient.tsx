@@ -45,7 +45,7 @@ const ROADMAPS: Roadmap[] = [
     skills: ['Basic electronics', 'Arduino programming', 'CAD basics'],
     projects: ['Line-following robot', 'Obstacle-avoiding bot', 'Robotic arm with servo'],
     jobs: ['Intern — Robotics', 'Junior Technician', 'Lab Assistant'],
-    salary: { from: 2, to: 4, label: '₹2–4 LPA (entry / internship)' },
+    salary: { from: 2, to: 4, label: 'Level: entry / internship' },
     platforms: ['Internshala', 'LinkedIn', 'college placement cells'],
     certs: ['NPTEL Robotics', 'Coursera Robotics Specialization (UPenn)'],
   },
@@ -67,7 +67,7 @@ const ROADMAPS: Roadmap[] = [
     skills: ['ROS / ROS2', 'Python + C++', 'URDF', 'Gazebo simulation'],
     projects: ['ROS2 navigation stack on TurtleBot', 'Autonomous indoor mapping'],
     jobs: ['Robotics Software Engineer', 'Automation Engineer', 'Controls Engineer'],
-    salary: { from: 4, to: 10, label: '₹4–10 LPA' },
+    salary: { from: 4, to: 10, label: 'Level: early career' },
     companies: [
       'Addverb Technologies',
       'GreyOrange',
@@ -99,7 +99,7 @@ const ROADMAPS: Roadmap[] = [
     skills: ['MoveIt', 'OpenCV', 'PyTorch / TensorFlow for robotics', 'Embedded systems'],
     projects: ['Production pick-and-place pipeline', 'Perception stack on real hardware'],
     jobs: ['Senior Robotics Engineer', 'Perception Engineer', 'ML Engineer — Robotics'],
-    salary: { from: 12, to: 25, label: '₹12–25 LPA' },
+    salary: { from: 12, to: 25, label: 'Level: mid to senior' },
     companies: ['Pixxel', 'AgniKul Cosmos', 'Skyroot Aerospace', 'Bosch India', 'ABB Robotics', 'Honeywell'],
     platforms: ['LinkedIn', 'AngelList', 'iimjobs.com for senior roles'],
     certs: ['AWS Robotics', 'Google TensorFlow Developer'],
@@ -121,7 +121,7 @@ const ROADMAPS: Roadmap[] = [
     skills: ['Research methods', 'Paper writing', 'ROS2 advanced', 'GPU programming (CUDA)'],
     projects: ['Publish at ICRA / IROS', 'Lead a research codebase to open-source release'],
     jobs: ['Principal Engineer', 'Research Scientist', 'CTO / Co-founder', 'Professor'],
-    salary: { from: 30, to: 80, label: '₹30–80 LPA (industry) / ₹8–20 LPA (academia)' },
+    salary: { from: 30, to: 80, label: 'Level: senior / specialist (industry or academia)' },
     companies: [
       'IIT research labs',
       'Microsoft Research India',
@@ -384,7 +384,6 @@ export function CareersClient() {
             Skills · {current.skills.join(' · ')}
           </div>
           <div style={{ fontSize: 14, color: 'var(--cyan-bright)', marginBottom: 6 }}>{current.salary.label}</div>
-          <SalaryBar from={current.salary.from} to={current.salary.to} accent={accent} />
         </div>
 
         <div style={{ marginTop: 28, display: 'flex', flexWrap: 'wrap', gap: 12 }}>

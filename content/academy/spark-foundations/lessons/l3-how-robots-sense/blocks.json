@@ -6,7 +6,7 @@
     "is_required": true,
     "data": {
       "estimated_read_minutes": 7,
-      "content_mdx": "Before a robot can do anything, it needs to know where it is and what's around it. That's harder than it sounds.\n\n## The 6 sensors a robotics engineer can't avoid\n\n**Ultrasonic (HC-SR04 — ₹60)** — sends a sound pulse, measures the echo. Tells you distance. Cheap and reliable.\n\n**Infrared (IR) — ₹40** — detects light reflections. Line followers and proximity sensing.\n\n**Camera — ₹350+** — the most powerful and most complex sensor. A whole world of computer vision lives here.\n\n**IMU (MPU-6050 — ₹180)** — accelerometer + gyroscope. Tells the robot which way is up, how fast it's accelerating, how it's rotating.\n\n**Encoder — ₹250** — counts wheel rotations. Without one, your robot doesn't know how far it has moved.\n\n**LiDAR (RPLIDAR A1 — ₹6,500)** — laser-based 3D mapping. The reason self-driving cars work.\n\n## Sensor fusion\n\nNo single sensor is enough. A camera fails in the dark. An ultrasonic sensor can't see colour. Real robots combine 3–10 sensors at once and merge the data — this is called **sensor fusion**.\n\nThis is why the same robot can navigate a sunny street, a dark warehouse, and a foggy morning."
+      "content_mdx": "Before a robot can do anything, it needs to know where it is and what's around it. That's harder than it sounds.\n\n## The 6 sensors a robotics engineer can't avoid\n\n**Ultrasonic (HC-SR04)** — sends a sound pulse, measures the echo. Tells you distance. Cheap and reliable.\n\n**Infrared (IR)** — detects light reflections. Line followers and proximity sensing.\n\n**Camera** — the most powerful and most complex sensor. A whole world of computer vision lives here.\n\n**IMU (MPU-6050)** — accelerometer + gyroscope. Tells the robot which way is up, how fast it's accelerating, how it's rotating.\n\n**Encoder** — counts wheel rotations. Without one, your robot doesn't know how far it has moved.\n\n**LiDAR (RPLIDAR A1)** — laser-based 3D mapping. The reason self-driving cars work.\n\n## Sensor fusion\n\nNo single sensor is enough. A camera fails in the dark. An ultrasonic sensor can't see colour. Real robots combine 3–10 sensors at once and merge the data — this is called **sensor fusion**.\n\nThis is why the same robot can navigate a sunny street, a dark warehouse, and a foggy morning."
     }
   },
   {
@@ -33,7 +33,7 @@
     "data": {
       "points_per_card": 5,
       "cards": [
-        { "front": "Ultrasonic sensor", "back": "Sound waves measure distance — ₹60" },
+        { "front": "Ultrasonic sensor", "back": "Sound waves measure distance" },
         { "front": "IR sensor", "back": "Detects light reflections — used in line followers" },
         { "front": "IMU", "back": "Accelerometer + gyroscope — knows up, down, rotation" },
         { "front": "Encoder", "back": "Counts wheel rotations" },

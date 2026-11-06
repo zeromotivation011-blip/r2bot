@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { StaticPage } from '@/components/StaticPage';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/about' },
   title: 'About R2BOT',
   description: "Why R2BOT exists — the brand promise, the founder, and what we're building.",
 };

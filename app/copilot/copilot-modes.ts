@@ -69,7 +69,7 @@ export const MODES: ModeDef[] = [
       "You are guiding a student through their first robot project. Ask clarifying questions one at a time. Give small achievable steps. Always ask about the student's current skill level, available budget (in INR), and available components before recommending parts. Keep guidance specific to Indian e-commerce (Robu.in, Quartz Components, Amazon India).",
     quickPrompts: [
       'Help me plan a line-follower robot',
-      'Plan an obstacle-avoidance bot under ₹2000',
+      'Plan an obstacle-avoidance bot on a small budget',
       'My first ROS2 project ideas',
       'How to build a robot arm in Class 11',
       'Robotics project for Atal Tinkering Lab',

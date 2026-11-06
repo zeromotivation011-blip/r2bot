@@ -315,7 +315,7 @@ const robotHome: KidsZone = {
       analogy:
         "You touch a hot pan → your skin (sensor) sends signal → brain thinks 'HOT! DANGER!' → brain tells arm muscles (motor) → you pull back. A robot's brain follows the same 3-step loop: SENSE → THINK → ACT.",
       realRobotExample:
-        'The Arduino UNO — a ₹350 chip the size of a credit card — IS a robot brain. It can control motors, read sensors and make decisions. Kids your age use it to build robots!',
+        'The Arduino UNO — a few-dollar chip the size of a credit card — IS a robot brain. It can control motors, read sensors and make decisions. Kids your age use it to build robots!',
       activities: [
         {
           type: 'sequence-builder',

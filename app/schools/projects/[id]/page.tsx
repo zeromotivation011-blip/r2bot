@@ -1,5 +1,6 @@
 'use client'
 
+import { displayCost } from '@/lib/cost-display';
 import { useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
@@ -60,7 +61,7 @@ export default function ProjectDetailPage() {
               <span className={`font-semibold uppercase tracking-wide border rounded-full px-2 py-0.5 ${DIFFICULTY_COLOUR[project.difficulty]}`}>
                 {project.difficulty}
               </span>
-              <span className="bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">{project.cost}</span>
+              <span className="bg-amber-500/15 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">{displayCost(project.cost)}</span>
               {project.duration && <span className="bg-gray-800 border border-gray-700 text-gray-300 px-2 py-0.5 rounded-full">⏱ {project.duration}</span>}
               {project.steps && <span className="bg-gray-800 border border-gray-700 text-gray-300 px-2 py-0.5 rounded-full">{project.steps} steps</span>}
             </div>
@@ -138,10 +139,10 @@ export default function ProjectDetailPage() {
                     <tr key={p.name} className="border-t border-gray-800 odd:bg-gray-900/40">
                       <td className="px-4 py-3 text-white font-medium">{p.name}</td>
                       <td className="px-4 py-3 text-gray-300">{p.purpose}</td>
-                      <td className="px-4 py-3 text-right font-mono text-amber-300">{p.cost}</td>
+                      <td className="px-4 py-3 text-right font-mono text-amber-300">{displayCost(p.cost)}</td>
                       <td className="px-4 py-3 text-right">
                         {p.link ? (
-                          <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Robu.in →</a>
+                          <a href={p.link} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Example store →</a>
                         ) : <span className="text-gray-600">—</span>}
                       </td>
                     </tr>
@@ -150,7 +151,7 @@ export default function ProjectDetailPage() {
                 <tfoot>
                   <tr className="border-t-2 border-gray-700 bg-gray-900">
                     <td colSpan={2} className="px-4 py-3 font-semibold">Approx total</td>
-                    <td className="px-4 py-3 text-right font-mono text-amber-400 font-bold">{project.cost}</td>
+                    <td className="px-4 py-3 text-right font-mono text-amber-400 font-bold">{displayCost(project.cost)}</td>
                     <td />
                   </tr>
                 </tfoot>

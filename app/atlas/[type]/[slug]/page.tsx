@@ -17,6 +17,7 @@ import { getAtlasEntryMerged, getAllAtlasEntriesMerged } from '@/lib/atlas-db';
 // Vercel Hobby ISR-write quota (361K/200K in 30 days).
 export const revalidate = 86400;
 import { getAcademyLessonForAtlasTerm, TRACK_EMOJI, TRACK_NAME } from '@/lib/atlas-academy-map';
+import { ROBOTS_BY_SLUG } from '@/lib/robots-data';
 import { Nav } from '@/components/Nav';
 import { ParticleField } from '@/components/ParticleField';
 import { CursorTrail } from '@/components/CursorTrail';
@@ -67,6 +68,13 @@ export async function generateStaticParams() {
   return (await getAllAtlasEntriesMerged()).map((e) => ({ type: e.type, slug: e.slug }));
 }
 
+function clampDescription(s: string): string {
+  const t = (s || '').replace(/\s+/g, ' ').trim();
+  if (t.length <= 160) return t;
+  const cut = t.slice(0, 157);
+  return cut.slice(0, cut.lastIndexOf(' ')) + '…';
+}
+
 export async function generateMetadata(
   { params }: { params: Promise<Params> },
 ): Promise<Metadata> {
@@ -94,7 +102,7 @@ export async function generateMetadata(
 
   return {
     title: seoTitle,
-    description: entry.summary,
+    description: clampDescription(entry.summary),
     alternates: { canonical },
     openGraph: {
       title: `${seoTitle} | R2BOT`,
@@ -411,6 +419,10 @@ export default async function AtlasEntryPage(
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
+                // The page already renders the entry title as the one <h1>.
+                // 143 entries also start their body with "# Title", which
+                // produced a second <h1>; drop it so each page has exactly one.
+                h1: () => null,
                 code(props) {
                   const { className, children } = props as { className?: string; children?: React.ReactNode };
                   if (/language-quiz/.exec(className || '')) {
@@ -717,18 +729,20 @@ function AtlasEnrichmentHero({ entry }: { entry: import('@/lib/atlas').AtlasEntr
       {realRobotsThatUseThis && realRobotsThatUseThis.length > 0 && (
         <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
           <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>Real robots:</span>
-          {realRobotsThatUseThis.map((r) => (
-            <a
-              key={r}
-              href={`/robots/${r}`}
-              style={{
-                fontSize: 11, padding: '3px 8px',
-                background: '#11112a', color: '#FFC9A8',
-                border: '1px solid #2a2a45', borderRadius: 999,
-                textDecoration: 'none',
-              }}
-            >{r}</a>
-          ))}
+          {realRobotsThatUseThis.map((r) => {
+            const slug = r.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            const chip = {
+              fontSize: 11, padding: '3px 8px',
+              background: '#11112a', color: '#FFC9A8',
+              border: '1px solid #2a2a45', borderRadius: 999,
+              textDecoration: 'none',
+            } as const;
+            return ROBOTS_BY_SLUG.has(slug) ? (
+              <a key={r} href={`/robots/${slug}`} style={chip}>{r}</a>
+            ) : (
+              <span key={r} style={chip}>{r}</span>
+            );
+          })}
         </div>
       )}
 
