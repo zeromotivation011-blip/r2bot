@@ -6,6 +6,9 @@ import { createSupabaseServerClient, createSupabaseAdminClient } from '@/lib/sup
 export const metadata: Metadata = { title: 'Admin · Analytics', robots: { index: false, follow: false } }
 export const dynamic = 'force-dynamic'
 
+// Analytics is restricted to the site owner only, regardless of other admin roles.
+const OWNER_EMAILS = ['ravi6703@gmail.com']
+
 const DAY = 86400000
 const iso = (d: Date) => d.toISOString().slice(0, 10)
 
@@ -13,6 +16,7 @@ export default async function AnalyticsPage() {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/admin/analytics')
+  if (!OWNER_EMAILS.includes((user.email ?? '').toLowerCase())) redirect('/dashboard')
   const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
   if ((me?.role as string | undefined) !== 'admin') redirect('/dashboard')
 
