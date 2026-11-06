@@ -14,7 +14,7 @@ export type LevelInfo = {
 export const LEVELS: LevelInfo[] = [
   { name: 'Rookie', emoji: '🌱', color: '#94a3b8', minXp: 0, maxXp: 200 },
   { name: 'Apprentice', emoji: '🔧', color: '#22d3ee', minXp: 200, maxXp: 500 },
-  { name: 'Engineer', emoji: '🦾', color: '#f59e0b', minXp: 500, maxXp: 1000 },
+  { name: 'Engineer', emoji: '🦾', color: '#FC6818', minXp: 500, maxXp: 1000 },
   { name: 'Expert', emoji: '🤖', color: '#a78bfa', minXp: 1000, maxXp: 2500 },
   { name: 'Master Builder', emoji: '👑', color: '#facc15', minXp: 2500, maxXp: Infinity },
 ];

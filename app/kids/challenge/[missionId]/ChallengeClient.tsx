@@ -259,7 +259,7 @@ export default function ChallengeClient() {
           min-height: 48px;
           padding: 0 14px; line-height: 48px;
           background: rgba(26,16,64,.7);
-          color: #fde68a;
+          color: #FFC9A8;
           border: 2px solid #4c1d95;
           border-radius: 12px;
           text-decoration: none; font-weight: 800;
@@ -268,7 +268,7 @@ export default function ChallengeClient() {
         .ch-head { text-align: center; margin-bottom: 24px; }
         .ch-head .badge {
           display: inline-block;
-          background: linear-gradient(135deg, #fde047, #f59e0b);
+          background: linear-gradient(135deg, #fde047, #FC6818);
           color: #1a1040;
           font-weight: 900;
           font-size: 13px; letter-spacing: 2px;
@@ -291,9 +291,9 @@ export default function ChallengeClient() {
           display: block; width: 100%;
           padding: 20px 24px;
           background: #1a1040;
-          border: 3px solid #f59e0b;
+          border: 3px solid #FC6818;
           border-radius: 22px;
-          color: #fde68a;
+          color: #FFC9A8;
           font-weight: 800;
           text-align: center;
           cursor: pointer;
@@ -302,7 +302,7 @@ export default function ChallengeClient() {
         @keyframes rise { from { transform: translateY(10px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
         .intro-bubble .emoji { font-size: 56px; display: block; margin-bottom: 10px; }
         .intro-bubble p { font-size: 18px; line-height: 1.4; }
-        .intro-bubble .tap { font-size: 13px; color: #fcd34d; margin-top: 14px; animation: blink 1.4s ease-in-out infinite; }
+        .intro-bubble .tap { font-size: 13px; color: #FFA878; margin-top: 14px; animation: blink 1.4s ease-in-out infinite; }
         @keyframes blink { 50% { opacity: .35 } }
         .lives-row {
           text-align: center; font-weight: 900; color: #fde047;
@@ -385,11 +385,11 @@ function SequenceBoss({ steps, onComplete }: { steps: string[]; onComplete: (sta
           color: #c4b5fd;
           cursor: pointer; font-weight: 700;
         }
-        .slot.filled { border-style: solid; border-color: #fbbf24; color: #fde68a; background: rgba(251,191,36,.12); }
+        .slot.filled { border-style: solid; border-color: #FF8A4C; color: #FFC9A8; background: rgba(255,138,76,.12); }
         .num {
           width: 28px; height: 28px;
           display: grid; place-items: center;
-          background: #fbbf24; color: #1a1040;
+          background: #FF8A4C; color: #1a1040;
           border-radius: 50%; font-weight: 900;
           flex-shrink: 0;
         }
@@ -397,7 +397,7 @@ function SequenceBoss({ steps, onComplete }: { steps: string[]; onComplete: (sta
         .block {
           min-height: 52px;
           padding: 10px 14px;
-          background: linear-gradient(135deg, #fde047, #fbbf24);
+          background: linear-gradient(135deg, #fde047, #FF8A4C);
           color: #1a1040;
           border: none; border-radius: 12px;
           font-weight: 800; text-align: left; cursor: pointer;
@@ -464,7 +464,7 @@ function LogicBoss({ question, options, onComplete }: {
         .q {
           background: rgba(124,58,237,.18);
           border: 2px solid #7c3aed;
-          color: #fde68a;
+          color: #FFC9A8;
           padding: 14px 16px;
           border-radius: 14px;
           font-weight: 800;
@@ -478,7 +478,7 @@ function LogicBoss({ question, options, onComplete }: {
           padding: 12px 14px;
           background: #1a1040;
           border: 2px solid #4c1d95;
-          color: #fde68a;
+          color: #FFC9A8;
           border-radius: 14px;
           font-size: 14px;
           font-weight: 800;
@@ -486,7 +486,7 @@ function LogicBoss({ question, options, onComplete }: {
           cursor: pointer;
           transition: all .2s;
         }
-        .o:hover:not(:disabled) { transform: scale(1.02); border-color: #fbbf24; }
+        .o:hover:not(:disabled) { transform: scale(1.02); border-color: #FF8A4C; }
         .o.ok  { background: rgba(16,185,129,.22); border-color: #10b981; color: #6ee7b7; }
         .o.bad { background: rgba(239,68,68,.22); border-color: #ef4444; color: #fda4af; animation: shake .4s; }
         @keyframes shake { 25% { transform: translateX(-6px) } 75% { transform: translateX(6px) } }
@@ -541,19 +541,19 @@ function Result({ stars, partAwarded, zone, onBack }: {
         .part {
           margin-top: 22px;
           padding: 20px;
-          background: linear-gradient(135deg, rgba(251,191,36,.2), rgba(245,158,11,.1));
-          border: 3px solid #fbbf24;
+          background: linear-gradient(135deg, rgba(255,138,76,.2), rgba(252,104,24,.1));
+          border: 3px solid #FF8A4C;
           border-radius: 22px;
           animation: glow 1.8s ease-in-out infinite;
         }
         @keyframes glow {
-          0%,100% { box-shadow: 0 0 20px rgba(251,191,36,.3) }
-          50%     { box-shadow: 0 0 60px rgba(251,191,36,.7) }
+          0%,100% { box-shadow: 0 0 20px rgba(255,138,76,.3) }
+          50%     { box-shadow: 0 0 60px rgba(255,138,76,.7) }
         }
         .p-emoji { font-size: 64px; display: block; }
         .p-name { font-size: 12px; font-weight: 900; letter-spacing: 2px; color: #fde047; margin-top: 6px; }
-        .p-label { font-size: 22px; font-weight: 900; color: #fbbf24; margin-top: 4px; }
-        .p-desc { font-size: 13px; color: #fde68a; margin-top: 6px; }
+        .p-label { font-size: 22px; font-weight: 900; color: #FF8A4C; margin-top: 4px; }
+        .p-desc { font-size: 13px; color: #FFC9A8; margin-top: 6px; }
         .btns { margin-top: 22px; display: flex; flex-direction: column; gap: 10px; }
         @media (min-width: 480px) { .btns { flex-direction: row; justify-content: center; } }
         .btn {
@@ -565,8 +565,8 @@ function Result({ stars, partAwarded, zone, onBack }: {
           display: inline-flex; align-items: center; justify-content: center;
           border: none; cursor: pointer; font-size: 16px;
         }
-        .link { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a1040; }
-        .back { background: #1a1040; color: #fde68a; border: 2px solid #4c1d95; }
+        .link { background: linear-gradient(135deg, #FF8A4C, #FC6818); color: #1a1040; }
+        .back { background: #1a1040; color: #FFC9A8; border: 2px solid #4c1d95; }
       `}</style>
     </div>
   )

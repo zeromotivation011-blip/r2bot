@@ -22,7 +22,7 @@ export function ReadingPathsStrip() {
             fontSize: 11,
             letterSpacing: 3,
             textTransform: 'uppercase',
-            color: '#fbbf24',
+            color: '#FF8A4C',
             fontWeight: 900,
             margin: 0,
           }}
@@ -86,7 +86,7 @@ export function ReadingPathsStrip() {
                   style={{
                     width: `${pct}%`,
                     height: '100%',
-                    background: `linear-gradient(90deg, ${p.color}, #fbbf24)`,
+                    background: `linear-gradient(90deg, ${p.color}, #FF8A4C)`,
                     transition: 'width .4s',
                   }}
                 />

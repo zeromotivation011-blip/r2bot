@@ -24,7 +24,7 @@ const STEPS: Step[] = [
     body: 'Clear, beginner-to-advanced explanations of every robotics concept — from what a servo is to how SLAM and transformers work. Better than the top search result, and free forever to read.',
     href: '/atlas',
     cta: 'Explore the Atlas',
-    accent: '#f59e0b',
+    accent: '#FC6818',
   },
   {
     icon: '🤖',
@@ -178,7 +178,7 @@ export function FeatureTour() {
           } as React.CSSProperties}
         >
           {i === 0 && (
-            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, color: '#f59e0b', textTransform: 'uppercase', marginBottom: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, color: '#FC6818', textTransform: 'uppercase', marginBottom: 10 }}>
               Welcome to R2BOT
             </div>
           )}
@@ -284,7 +284,7 @@ export function FeatureTour() {
               onClick={() => (last ? dismiss() : setI((n) => n + 1))}
               style={{
                 padding: '8px 18px',
-                background: '#f59e0b',
+                background: '#FC6818',
                 border: 'none',
                 borderRadius: 999,
                 color: '#1a0f00',

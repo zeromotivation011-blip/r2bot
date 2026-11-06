@@ -59,7 +59,7 @@ export function HeroCounter({ total = 47, onShowMe }: { total?: number; onShowMe
           padding: 60px 20px 50px;
           overflow: hidden;
           color: #fff;
-          background: radial-gradient(circle at 50% 0%, rgba(245,158,11,0.18), transparent 60%);
+          background: radial-gradient(circle at 50% 0%, rgba(252,104,24,0.18), transparent 60%);
         }
         .hc-icons {
           position: absolute; inset: 0;
@@ -77,13 +77,13 @@ export function HeroCounter({ total = 47, onShowMe }: { total?: number; onShowMe
         }
         .hc-eyebrow {
           font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-          color: #fbbf24; font-weight: 900; margin: 0 0 10px;
+          color: #FF8A4C; font-weight: 900; margin: 0 0 10px;
         }
         .hc-counter {
           font-size: clamp(72px, 14vw, 144px);
           font-weight: 900;
           line-height: 1;
-          background: linear-gradient(135deg, #fbbf24, #f97316);
+          background: linear-gradient(135deg, #FF8A4C, #f97316);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -112,12 +112,12 @@ export function HeroCounter({ total = 47, onShowMe }: { total?: number; onShowMe
         .hc-cta {
           display: inline-flex; align-items: center; gap: 8px;
           min-height: 54px; padding: 0 26px;
-          background: linear-gradient(135deg, #fbbf24, #f97316);
+          background: linear-gradient(135deg, #FF8A4C, #f97316);
           color: #0a0a16;
           border: none; border-radius: 14px;
           font-weight: 900; font-size: 16px;
           cursor: pointer;
-          box-shadow: 0 10px 30px rgba(251,191,36,0.4);
+          box-shadow: 0 10px 30px rgba(255,138,76,0.4);
         }
         .hc-cta:hover { transform: translateY(-2px); }
       `}</style>

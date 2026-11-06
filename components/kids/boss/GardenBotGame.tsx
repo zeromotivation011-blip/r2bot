@@ -28,7 +28,7 @@ const BLOCK_INFO: Record<Block, { label: string; color: string; icon: string }> 
   forward: { label: 'Forward', color: '#10b981', icon: '↑' },
   left:    { label: 'Left',    color: '#3b82f6', icon: '↶' },
   right:   { label: 'Right',   color: '#a855f7', icon: '↷' },
-  sense:   { label: 'Sense',   color: '#fbbf24', icon: '👀' },
+  sense:   { label: 'Sense',   color: '#FF8A4C', icon: '👀' },
   wait:    { label: 'Wait',    color: '#94a3b8', icon: '⏸' },
 }
 
@@ -224,7 +224,7 @@ export function GardenBotGame({ onWin, onFail, onSpark }: {
           font-size: 24px;
         }
         .gb-cell.is-start { background: linear-gradient(135deg, #1d4ed8, #1e3a8a); }
-        .gb-cell.is-plant { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .gb-cell.is-plant { background: linear-gradient(135deg, #FC6818, #E5550A); }
         .gb-cell.is-rock { background: linear-gradient(135deg, #57534e, #292524); }
         .gb-bot { transition: transform .25s; display: inline-block; }
         .gb-plant { animation: gb-bob 1.6s ease-in-out infinite; display: inline-block; }
@@ -260,7 +260,7 @@ export function GardenBotGame({ onWin, onFail, onSpark }: {
           padding: 6px 10px;
           border: 2px solid;
           border-radius: 8px;
-          color: #fde68a;
+          color: #FFC9A8;
           font-weight: 800;
           font-size: 12px;
           cursor: pointer;
@@ -278,7 +278,7 @@ export function GardenBotGame({ onWin, onFail, onSpark }: {
         .gb-run:disabled { opacity: 0.4; cursor: not-allowed; }
         .gb-clear {
           min-height: 52px; padding: 0 18px;
-          background: #1a1040; color: #fde68a;
+          background: #1a1040; color: #FFC9A8;
           border: 2px solid #4c1d95;
           border-radius: 14px; font-weight: 800; cursor: pointer;
         }

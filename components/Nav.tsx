@@ -491,14 +491,14 @@ function AuthMenu() {
             alignItems: 'center',
             gap: 4,
             padding: '8px 14px',
-            background: '#f59e0b',
+            background: '#FC6818',
             color: '#1a0f00',
             fontWeight: 700,
             fontSize: 14,
             borderRadius: 999,
             textDecoration: 'none',
             transition: 'background 0.15s, transform 0.15s, box-shadow 0.15s',
-            boxShadow: '0 4px 14px rgba(245, 158, 11, 0.30)',
+            boxShadow: '0 4px 14px rgba(252,104,24, 0.30)',
           }}
         >
           Start Free <span aria-hidden>→</span>
@@ -518,7 +518,7 @@ function AuthMenu() {
         aria-label="Open profile menu"
         style={{
           width: 36, height: 36, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #f97316, #f59e0b)',
+          background: 'linear-gradient(135deg, #f97316, #FC6818)',
           color: '#0A0E17', border: 'none',
           fontWeight: 900, fontSize: 14, cursor: 'pointer',
           display: 'grid', placeItems: 'center',

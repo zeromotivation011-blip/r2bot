@@ -96,7 +96,7 @@ export function SparkCharacter({
               right: size * 0.12,
               fontSize: size * 0.28,
               fontWeight: 900,
-              color: '#fbbf24',
+              color: '#FF8A4C',
               textShadow: '0 2px 6px rgba(0,0,0,0.4)',
               animation: 'spark-question-float 1.6s ease-in-out infinite',
             }}
@@ -124,7 +124,7 @@ export function SparkCharacter({
             <radialGradient id="spark-eye" cx="50%" cy="40%" r="60%">
               <stop offset="0%" stopColor="#fffbe6" />
               <stop offset="65%" stopColor="#fde047" />
-              <stop offset="100%" stopColor="#f59e0b" />
+              <stop offset="100%" stopColor="#FC6818" />
             </radialGradient>
             <filter id="spark-glow" x="-30%" y="-30%" width="160%" height="160%">
               <feGaussianBlur stdDeviation="3" result="blur" />
@@ -136,7 +136,7 @@ export function SparkCharacter({
           </defs>
 
           {/* Antenna */}
-          <line x1="100" y1="8"  x2="100" y2="32" stroke="#fbbf24" strokeWidth="4" strokeLinecap="round" />
+          <line x1="100" y1="8"  x2="100" y2="32" stroke="#FF8A4C" strokeWidth="4" strokeLinecap="round" />
           <circle cx="100" cy="6" r="8" fill="#fde047" filter="url(#spark-glow)" />
 
           {/* Head */}
@@ -205,15 +205,15 @@ export function SparkCharacter({
             <g>
               <rect x="18"  y="116" width="22" height="42" rx="11" fill="#3b82f6" transform="rotate(-30 29 137)" />
               <rect x="160" y="116" width="22" height="42" rx="11" fill="#3b82f6" transform="rotate(30 171 137)" />
-              <circle cx="22"  cy="116" r="9" fill="#fbbf24" />
-              <circle cx="178" cy="116" r="9" fill="#fbbf24" />
+              <circle cx="22"  cy="116" r="9" fill="#FF8A4C" />
+              <circle cx="178" cy="116" r="9" fill="#FF8A4C" />
             </g>
           ) : (
             <g>
               <rect x="18"  y="146" width="22" height="36" rx="10" fill="#3b82f6" />
               <rect x="160" y="146" width="22" height="36" rx="10" fill="#3b82f6" />
-              <circle cx="29"  cy="186" r="8" fill="#fbbf24" />
-              <circle cx="171" cy="186" r="8" fill="#fbbf24" />
+              <circle cx="29"  cy="186" r="8" fill="#FF8A4C" />
+              <circle cx="171" cy="186" r="8" fill="#FF8A4C" />
             </g>
           )}
         </svg>

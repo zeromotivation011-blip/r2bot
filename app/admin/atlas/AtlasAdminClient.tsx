@@ -138,7 +138,7 @@ export function AtlasAdminClient({ items }: { items: AtlasListItem[] }) {
               key={i.id} onClick={() => edit(i)}
               style={{
                 display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px',
-                background: editingKey === `${i.type}/${i.slug}` ? 'rgba(245,158,11,0.1)' : 'transparent',
+                background: editingKey === `${i.type}/${i.slug}` ? 'rgba(252,104,24,0.1)' : 'transparent',
                 border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer',
               }}
             >
@@ -211,6 +211,6 @@ const inputStyle: React.CSSProperties = {
 }
 const lbl: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 5, fontSize: 12, color: '#94a3b8', fontWeight: 700 }
 const btnPrimary: React.CSSProperties = {
-  padding: '9px 18px', background: '#fbbf24', color: '#0f0a1e', fontWeight: 800,
+  padding: '9px 18px', background: '#FF8A4C', color: '#0f0a1e', fontWeight: 800,
   fontSize: 14, border: 'none', borderRadius: 10, cursor: 'pointer',
 }

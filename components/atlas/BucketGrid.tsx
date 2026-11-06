@@ -56,7 +56,7 @@ export function BucketGrid({
           const cardStyle: React.CSSProperties = {
             display: 'block',
             background: 'rgba(15, 18, 32, 0.55)',
-            border: `1.5px solid ${completed ? '#fbbf24' : 'rgba(255,255,255,0.08)'}`,
+            border: `1.5px solid ${completed ? '#FF8A4C' : 'rgba(255,255,255,0.08)'}`,
             borderLeft: `4px solid ${b.color}`,
             borderRadius: 14,
             padding: 16,
@@ -73,7 +73,7 @@ export function BucketGrid({
                 <span style={{ fontSize: 26, lineHeight: 1 }}>{b.emoji}</span>
                 <span style={{ fontWeight: 900, color: '#fff', fontSize: 15 }}>{b.name}</span>
                 {completed && (
-                  <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 800, color: '#fbbf24' }}>
+                  <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 800, color: '#FF8A4C' }}>
                     ⭐ done
                   </span>
                 )}
@@ -87,7 +87,7 @@ export function BucketGrid({
                   style={{
                     width: `${pct}%`,
                     height: '100%',
-                    background: completed ? 'linear-gradient(90deg, #fbbf24, #f97316)' : b.color,
+                    background: completed ? 'linear-gradient(90deg, #FF8A4C, #f97316)' : b.color,
                     transition: 'width .4s',
                   }}
                 />

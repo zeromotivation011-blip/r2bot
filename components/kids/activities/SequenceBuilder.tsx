@@ -113,7 +113,7 @@ export function SequenceBuilder({
         .seq-situation {
           background: rgba(124,58,237,0.18);
           border: 2px solid #7c3aed;
-          color: #fde68a;
+          color: #FFC9A8;
           padding: 12px;
           border-radius: 12px;
           text-align: center;
@@ -127,13 +127,13 @@ export function SequenceBuilder({
           border: 2px dashed #4c1d95;
           border-radius: 12px;
           cursor: pointer;
-          color: #fde68a; font-weight: 700;
+          color: #FFC9A8; font-weight: 700;
           transition: background .2s, border-color .2s;
         }
         .seq-slot.is-filled {
           border-style: solid;
-          border-color: #fbbf24;
-          background: rgba(251,191,36,0.12);
+          border-color: #FF8A4C;
+          background: rgba(255,138,76,0.12);
         }
         .seq-slot.is-running {
           background: rgba(16,185,129,0.18);
@@ -143,7 +143,7 @@ export function SequenceBuilder({
         .seq-num {
           width: 30px; height: 30px;
           display: grid; place-items: center;
-          background: #fbbf24; color: #1a1040;
+          background: #FF8A4C; color: #1a1040;
           border-radius: 50%; font-weight: 900;
           flex-shrink: 0;
         }
@@ -153,7 +153,7 @@ export function SequenceBuilder({
         .seq-item {
           min-height: 52px;
           padding: 10px 14px;
-          background: linear-gradient(135deg, #fde047, #fbbf24);
+          background: linear-gradient(135deg, #fde047, #FF8A4C);
           color: #1a1040;
           border: none; border-radius: 12px;
           font-weight: 800;

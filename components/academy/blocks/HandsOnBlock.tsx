@@ -160,7 +160,7 @@ export function HandsOnBlock({ block, isCompleted, onComplete }: Props) {
         }
         .ho-hardware ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
         .ho-hardware a { color: #00E5FF; text-decoration: underline; }
-        .ho-price { color: #fbbf24; font-weight: 800; }
+        .ho-price { color: #FF8A4C; font-weight: 800; }
         .ho-steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
         .ho-step {
           display: flex; gap: 10px; align-items: flex-start;
@@ -187,7 +187,7 @@ export function HandsOnBlock({ block, isCompleted, onComplete }: Props) {
           border: 1px solid rgba(255,255,255,0.1);
         }
         .ho-checkpoint {
-          font-size: 12px; color: #fbbf24; font-weight: 700; margin: 0;
+          font-size: 12px; color: #FF8A4C; font-weight: 700; margin: 0;
         }
         .ho-submit {
           background: rgba(255,255,255,0.03);

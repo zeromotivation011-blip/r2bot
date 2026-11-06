@@ -79,12 +79,12 @@ export function MarkCompleteButton({ courseSlug, lessonSlug, xpReward = 50 }: Ma
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           minHeight: 50, padding: '0 24px',
-          background: isDone ? '#10b981' : '#fbbf24',
+          background: isDone ? '#10b981' : '#FF8A4C',
           color: isDone ? '#022c22' : '#1a0f00',
           border: 'none', borderRadius: 12,
           fontSize: 15, fontWeight: 900,
           cursor: state === 'submitting' || isDone ? 'default' : 'pointer',
-          boxShadow: isDone ? 'none' : '0 8px 24px rgba(251,191,36,0.28)',
+          boxShadow: isDone ? 'none' : '0 8px 24px rgba(255,138,76,0.28)',
           opacity: state === 'submitting' ? 0.7 : 1,
         }}
       >

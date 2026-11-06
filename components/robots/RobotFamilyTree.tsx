@@ -34,7 +34,7 @@ function Pill({ entry }: { entry: FamilyTreeEntry }) {
     <span
       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ${
         entry.isCurrent
-          ? 'border-amber-400/60 bg-amber-500/15 font-bold text-amber-100 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
+          ? 'border-amber-400/60 bg-amber-500/15 font-bold text-amber-100 shadow-[0_0_20px_rgba(252,104,24,0.25)]'
           : entry.slug
           ? 'border-white/10 bg-white/[0.04] text-zinc-200 hover:border-amber-400/30'
           : 'border-white/10 bg-white/[0.02] text-zinc-400'

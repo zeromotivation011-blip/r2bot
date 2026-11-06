@@ -37,7 +37,7 @@ export default function PricingPage() {
       <Nav />
       <main id="main-content" style={{ paddingTop: 130, paddingBottom: 100, minHeight: '100vh' }}>
         <div className="container" style={{ maxWidth: 860, margin: '0 auto', padding: '0 20px' }}>
-          <p style={{ fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 800, color: '#f59e0b' }}>Pricing</p>
+          <p style={{ fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 800, color: '#FC6818' }}>Pricing</p>
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 900, lineHeight: 1.1, margin: '8px 0 14px' }}>
             Everything is free.
           </h1>

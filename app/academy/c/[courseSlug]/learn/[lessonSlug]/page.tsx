@@ -40,7 +40,7 @@ export default async function LearnPage({ params }: PageProps) {
       {locked ? (
         <main style={{ paddingTop: 110, paddingBottom: 80, minHeight: '100vh', background: '#0A0E17' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px' }}>
-            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 6px' }}>
+            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 6px' }}>
               {data.course.title}
             </p>
             <h1 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 900, color: '#fff', margin: '0 0 12px', lineHeight: 1.2 }}>

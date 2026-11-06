@@ -162,9 +162,9 @@ export function DiscussionBlock({ block, isCompleted, onComplete }: Props) {
         .db-prompt { flex: 1; margin: 0; color: #fde047; font-weight: 800; font-size: 15px; line-height: 1.5; }
         .db-lang {
           padding: 4px 12px; border-radius: 999px;
-          background: rgba(251,191,36,0.14);
-          color: #fbbf24;
-          border: 1px solid rgba(251,191,36,0.3);
+          background: rgba(255,138,76,0.14);
+          color: #FF8A4C;
+          border: 1px solid rgba(255,138,76,0.3);
           font-weight: 800; font-size: 12px; cursor: pointer;
         }
         .db-textarea {

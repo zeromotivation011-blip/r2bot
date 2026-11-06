@@ -79,9 +79,9 @@ const primaryBtn: React.CSSProperties = {
   borderRadius: 10,
   fontSize: 13,
   fontWeight: 700,
-  color: '#FFB020',
-  background: 'rgba(255,176,32,0.12)',
-  border: '1px solid rgba(255,176,32,0.4)',
+  color: '#FC6818',
+  background: 'rgba(252,104,24,0.12)',
+  border: '1px solid rgba(252,104,24,0.4)',
   cursor: 'pointer',
 }
 

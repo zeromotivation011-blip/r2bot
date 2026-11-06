@@ -49,7 +49,7 @@ export function ConveyorBugGame({ onWin, onFail }: {
         ? (Math.random() < 0.5 ? 'square' : 'triangle')
         : GOOD_SHAPE
       const color = isBug
-        ? (Math.random() < 0.5 ? '#ef4444' : '#fbbf24')
+        ? (Math.random() < 0.5 ? '#ef4444' : '#FF8A4C')
         : GOOD_COLOR
       setItems(prev => [
         ...prev,
@@ -165,7 +165,7 @@ export function ConveyorBugGame({ onWin, onFail }: {
         }
         .cb-stat {
           background: #1a1040;
-          color: #fde68a;
+          color: #FFC9A8;
           padding: 8px 14px;
           border-radius: 999px;
           font-weight: 900;

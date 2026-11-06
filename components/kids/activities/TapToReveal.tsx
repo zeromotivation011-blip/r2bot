@@ -78,9 +78,9 @@ export function TapToReveal({
           font-weight: 900;
         }
         .ttr-front {
-          background: linear-gradient(135deg, #fde047, #fbbf24);
+          background: linear-gradient(135deg, #fde047, #FF8A4C);
           color: #1a1040;
-          border: 3px solid #f59e0b;
+          border: 3px solid #FC6818;
         }
         .ttr-front-text {
           font-size: clamp(20px, 4vw, 28px);
@@ -88,8 +88,8 @@ export function TapToReveal({
         }
         .ttr-back {
           background: #1a1040;
-          color: #fde68a;
-          border: 3px solid #fbbf24;
+          color: #FFC9A8;
+          border: 3px solid #FF8A4C;
           transform: rotateY(180deg);
           text-align: center;
         }

@@ -294,7 +294,7 @@ function PlayerStyles() {
       }
       .acad-top-track {
         text-transform: uppercase; letter-spacing: 2px; font-size: 11px;
-        color: #fbbf24; font-weight: 900;
+        color: #FF8A4C; font-weight: 900;
       }
       .acad-top-sep { margin: 0 8px; color: #475569; }
       .acad-top-progress {
@@ -432,11 +432,11 @@ function PlayerStyles() {
 
       .acad-lesson-foot { margin-top: 22px; }
       .acad-foot-hint {
-        text-align: center; color: #fcd34d;
+        text-align: center; color: #FFA878;
         font-weight: 700; font-size: 14px;
         padding: 12px;
-        background: rgba(251,191,36,0.08);
-        border: 1px solid rgba(251,191,36,0.25);
+        background: rgba(255,138,76,0.08);
+        border: 1px solid rgba(255,138,76,0.25);
         border-radius: 10px;
       }
       .acad-finish-btn {

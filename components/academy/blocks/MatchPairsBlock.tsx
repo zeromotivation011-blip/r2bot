@@ -103,7 +103,7 @@ export function MatchPairsBlock({ block, isCompleted, onComplete }: Props) {
           cursor: pointer; text-align: center;
           transition: transform .15s, border-color .15s, background .15s;
         }
-        .mp-cell:hover:not(:disabled) { border-color: #fbbf24; transform: translateY(-1px); }
+        .mp-cell:hover:not(:disabled) { border-color: #FF8A4C; transform: translateY(-1px); }
         .mp-cell.is-picked { border-color: #00E5FF; box-shadow: 0 0 18px rgba(0,229,255,0.3); }
         .mp-cell.is-matched {
           background: rgba(16,185,129,0.18); border-color: #10b981; color: #6ee7b7;

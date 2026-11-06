@@ -15,7 +15,7 @@ export default function PathsIndexPage() {
       <Nav />
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '110px 18px 80px', color: '#f4f4f5' }}>
         <header style={{ marginBottom: 32 }}>
-          <p style={{ fontSize: 11, letterSpacing: 3, color: '#fbbf24', fontWeight: 900, textTransform: 'uppercase', margin: 0 }}>
+          <p style={{ fontSize: 11, letterSpacing: 3, color: '#FF8A4C', fontWeight: 900, textTransform: 'uppercase', margin: 0 }}>
             Atlas · Reading Paths
           </p>
           <h1 style={{ fontSize: 'clamp(36px, 6vw, 60px)', fontWeight: 900, color: '#fff', margin: '8px 0 12px', lineHeight: 1.05 }}>

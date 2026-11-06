@@ -82,7 +82,7 @@ export function SpotTheRobot({
         .str-scene {
           background: rgba(124,58,237,0.18);
           border: 2px solid #7c3aed;
-          color: #fde68a;
+          color: #FFC9A8;
           padding: 10px 14px;
           border-radius: 12px;
           font-weight: 800;
@@ -102,13 +102,13 @@ export function SpotTheRobot({
           background: #1a1040;
           border: 3px solid #4c1d95;
           border-radius: 18px;
-          color: #fde68a;
+          color: #FFC9A8;
           font-weight: 800;
           font-size: 16px;
           cursor: pointer;
           transition: transform .15s, border-color .15s;
         }
-        .str-tile:hover { transform: scale(1.04); border-color: #fbbf24; }
+        .str-tile:hover { transform: scale(1.04); border-color: #FF8A4C; }
         .str-tile.is-right {
           border-color: #10b981;
           background: rgba(16,185,129,0.22);

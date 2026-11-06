@@ -45,7 +45,7 @@ export default function NotFound() {
           <div className="mt-8">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-7 py-3 text-base font-extrabold text-[#1a0f00] shadow-[0_10px_30px_rgba(245,158,11,0.35)] transition-transform hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-7 py-3 text-base font-extrabold text-[#1a0f00] shadow-[0_10px_30px_rgba(252,104,24,0.35)] transition-transform hover:scale-[1.02]"
             >
               Go to Homepage →
             </Link>

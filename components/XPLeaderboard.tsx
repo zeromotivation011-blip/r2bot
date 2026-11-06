@@ -162,9 +162,9 @@ export async function XPLeaderboard({
                 style={{
                   padding: '2px 8px',
                   borderRadius: 999,
-                  border: '1px solid rgba(245,158,11,.4)',
-                  background: 'rgba(245,158,11,.12)',
-                  color: '#fbbf24',
+                  border: '1px solid rgba(252,104,24,.4)',
+                  background: 'rgba(252,104,24,.12)',
+                  color: '#FF8A4C',
                   fontSize: 10,
                   fontFamily: 'var(--font-mono), monospace',
                   whiteSpace: 'nowrap',

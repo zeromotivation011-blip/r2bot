@@ -30,7 +30,7 @@ const DEFAULT_PROGRESS: KidsProgress = {
   completedZones: [],
   earnedParts: [],
   robotName: 'Spark Jr.',
-  robotColor: '#F59E0B',
+  robotColor: '#FC6818',
   robotAccent: '#3B82F6',
   robotEyes: 'happy',
   lastPlayed: new Date().toISOString(),

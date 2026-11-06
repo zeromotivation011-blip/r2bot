@@ -161,7 +161,7 @@ export function GalleryClient() {
         }}>🛠️ I Made It! Gallery</span>
         <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 900, color: '#fff', margin: 0 }}>
           Builds from the{' '}
-          <span style={{ background: 'linear-gradient(90deg, #f9a8d4, #fde68a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <span style={{ background: 'linear-gradient(90deg, #f9a8d4, #FFC9A8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             R2BOT community
           </span>
         </h1>
@@ -180,7 +180,7 @@ export function GalleryClient() {
           type="button"
           onClick={() => setShowForm(v => !v)}
           style={{
-            marginTop: 20, background: 'linear-gradient(90deg, #f59e0b, #f97316)',
+            marginTop: 20, background: 'linear-gradient(90deg, #FC6818, #f97316)',
             color: '#000', padding: '11px 24px', borderRadius: 12, fontSize: 14,
             fontWeight: 700, border: 'none', cursor: 'pointer',
           }}
@@ -200,8 +200,8 @@ export function GalleryClient() {
             style={{
               padding: '5px 14px', borderRadius: 999, fontSize: 12, fontWeight: 700,
               border: '1px solid rgba(255,255,255,0.12)',
-              background: sortMode === m ? 'rgba(245,158,11,0.18)' : 'transparent',
-              color: sortMode === m ? '#fbbf24' : '#9ca3af',
+              background: sortMode === m ? 'rgba(252,104,24,0.18)' : 'transparent',
+              color: sortMode === m ? '#FF8A4C' : '#9ca3af',
               cursor: 'pointer',
             }}
           >
@@ -327,7 +327,7 @@ export function GalleryClient() {
       <div style={{ textAlign: 'center', marginTop: 48, padding: '32px', background: 'rgba(249,115,22,0.05)', border: '1px solid rgba(249,115,22,0.15)', borderRadius: 20 }}>
         <p style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>Your build could be next. 🤖</p>
         <p style={{ color: '#9ca3af', fontSize: 14, marginTop: 6 }}>Start with the Spark track — free, browser-only, takes 90 minutes.</p>
-        <a href="/academy" style={{ display: 'inline-block', marginTop: 16, background: '#f59e0b', color: '#000', padding: '10px 22px', borderRadius: 12, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+        <a href="/academy" style={{ display: 'inline-block', marginTop: 16, background: '#FC6818', color: '#000', padding: '10px 22px', borderRadius: 12, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
           Start Learning →
         </a>
       </div>
@@ -417,7 +417,7 @@ function SubmitForm({ onDone }: { onDone: () => void }) {
       </div>
       {err && <p style={{ marginTop: 12, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '8px 12px', fontSize: 13, color: '#fca5a5' }}>{err}</p>}
       <button type="submit" disabled={busy}
-        style={{ marginTop: 16, background: 'linear-gradient(90deg,#f59e0b,#f97316)', color: '#000', padding: '10px 22px', borderRadius: 12, fontWeight: 700, fontSize: 14, border: 'none', cursor: busy ? 'not-allowed' : 'pointer', opacity: busy ? 0.6 : 1 }}>
+        style={{ marginTop: 16, background: 'linear-gradient(90deg,#FC6818,#f97316)', color: '#000', padding: '10px 22px', borderRadius: 12, fontWeight: 700, fontSize: 14, border: 'none', cursor: busy ? 'not-allowed' : 'pointer', opacity: busy ? 0.6 : 1 }}>
         {busy ? 'Uploading…' : 'Submit build'}
       </button>
     </form>

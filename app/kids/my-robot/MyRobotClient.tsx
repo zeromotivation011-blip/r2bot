@@ -7,7 +7,7 @@ import { getProgress, saveProgress } from '@/lib/kids-progress'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { useKidsVoice } from '@/lib/kids-voice'
 
-const COLORS = ['#F59E0B', '#3B82F6', '#10B981', '#EF4444', '#7C3AED', '#EC4899', '#94A3B8', '#FACC15']
+const COLORS = ['#FC6818', '#3B82F6', '#10B981', '#EF4444', '#7C3AED', '#EC4899', '#94A3B8', '#FACC15']
 const EYES = [
   { id: 'happy',      label: '😊 Happy' },
   { id: 'cool',       label: '😎 Cool' },
@@ -78,7 +78,7 @@ export default function MyRobotClient() {
     ctx.fillText('R2BOT · Robot World', 60, 80)
 
     // robot name
-    ctx.fillStyle = '#FBBF24'
+    ctx.fillStyle = '#FF8A4C'
     ctx.font = 'bold 70px system-ui, sans-serif'
     ctx.fillText(name || 'My Robot', 60, 170)
 
@@ -86,7 +86,7 @@ export default function MyRobotClient() {
     drawRobotFace(ctx, 900, 280, primary, accent, eyes)
 
     // stars
-    ctx.fillStyle = '#FDE68A'
+    ctx.fillStyle = '#FFC9A8'
     ctx.font = 'bold 36px system-ui, sans-serif'
     ctx.fillText(`⭐ ${progress.totalStars} stars earned`, 60, 240)
     ctx.font = '24px system-ui, sans-serif'
@@ -100,7 +100,7 @@ export default function MyRobotClient() {
     })
 
     // footer
-    ctx.fillStyle = '#FBBF24'
+    ctx.fillStyle = '#FF8A4C'
     ctx.font = 'bold 22px system-ui, sans-serif'
     ctx.fillText('Built with R2BOT · r2bot.in/kids', 60, 580)
 
@@ -240,11 +240,11 @@ export default function MyRobotClient() {
         .mr-head h1 { font-size: clamp(22px, 5vw, 32px); font-weight: 900; color: #fde047; }
         .back {
           min-height: 48px; padding: 0 14px; line-height: 48px;
-          background: #1a1040; color: #fde68a;
+          background: #1a1040; color: #FFC9A8;
           border: 2px solid #4c1d95; border-radius: 12px;
           text-decoration: none; font-weight: 800;
         }
-        .stars { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a1040;
+        .stars { background: linear-gradient(135deg, #FF8A4C, #FC6818); color: #1a1040;
                  padding: 8px 14px; border-radius: 999px; font-weight: 900; }
         .mr-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
         @media (min-width: 780px) { .mr-grid { grid-template-columns: 1fr 1fr; } }
@@ -272,7 +272,7 @@ export default function MyRobotClient() {
           width: 100%;
           background: #0f0a1e;
           border: 2px solid #4c1d95;
-          color: #fde68a;
+          color: #FFC9A8;
           padding: 12px 14px;
           border-radius: 12px;
           font-size: 18px; font-weight: 800;
@@ -286,18 +286,18 @@ export default function MyRobotClient() {
           transition: transform .15s;
         }
         .sw:hover { transform: scale(1.1); }
-        .sw.on { border-color: #fde047; box-shadow: 0 0 16px #fbbf24; }
+        .sw.on { border-color: #fde047; box-shadow: 0 0 16px #FF8A4C; }
         .eyes-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .eyes-btn {
           min-height: 48px;
           background: #0f0a1e;
           border: 2px solid #4c1d95;
-          color: #fde68a;
+          color: #FFC9A8;
           border-radius: 12px;
           font-weight: 800;
           cursor: pointer;
         }
-        .eyes-btn.on { border-color: #fbbf24; background: rgba(251,191,36,.12); color: #fde047; }
+        .eyes-btn.on { border-color: #FF8A4C; background: rgba(255,138,76,.12); color: #fde047; }
         .stats {
           margin-top: 22px;
           display: grid;
@@ -331,17 +331,17 @@ export default function MyRobotClient() {
           color: #c4b5fd;
         }
         .part.owned {
-          border-color: #fbbf24;
-          background: linear-gradient(135deg, rgba(251,191,36,.15), rgba(245,158,11,.05));
-          color: #fde68a;
-          box-shadow: 0 0 16px rgba(251,191,36,.2);
+          border-color: #FF8A4C;
+          background: linear-gradient(135deg, rgba(255,138,76,.15), rgba(252,104,24,.05));
+          color: #FFC9A8;
+          box-shadow: 0 0 16px rgba(255,138,76,.2);
         }
         .part.locked { filter: grayscale(.5); opacity: .65; }
         .p-emoji { font-size: 36px; display: block; }
         .p-name { font-size: 14px; font-weight: 900; margin-top: 4px; color: #fde047; }
         .part.locked .p-name { color: #c4b5fd; }
         .p-zone, .p-desc { font-size: 11px; margin-top: 4px; }
-        .p-desc { color: #fcd34d; }
+        .p-desc { color: #FFA878; }
         .skills { margin-top: 28px; }
         .skills ul { list-style: none; padding: 0; }
         .skills li {
@@ -366,10 +366,10 @@ export default function MyRobotClient() {
           font-weight: 900; font-size: 16px;
           cursor: pointer; text-decoration: none;
           display: inline-flex; align-items: center; justify-content: center;
-          background: linear-gradient(135deg, #fbbf24, #f59e0b);
+          background: linear-gradient(135deg, #FF8A4C, #FC6818);
           color: #1a1040;
         }
-        .cta.secondary { background: #1a1040; color: #fde68a; border: 2px solid #4c1d95; }
+        .cta.secondary { background: #1a1040; color: #FFC9A8; border: 2px solid #4c1d95; }
       `}</style>
     </div>
   )
@@ -487,8 +487,8 @@ function RobotSilhouette({ primary, accent, eyes, earned }: {
         <>
           <path d="M30 158 L30 200 L42 210 L40 158 Z" fill="#ef4444" />
           <path d="M120 158 L120 200 L108 210 L110 158 Z" fill="#ef4444" />
-          <path d="M30 210 L36 225 L42 210 Z" fill="#fbbf24" />
-          <path d="M108 210 L114 225 L120 210 Z" fill="#fbbf24" />
+          <path d="M30 210 L36 225 L42 210 Z" fill="#FF8A4C" />
+          <path d="M108 210 L114 225 L120 210 Z" fill="#FF8A4C" />
         </>
       ) : null}
     </svg>

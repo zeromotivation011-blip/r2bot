@@ -179,7 +179,7 @@ export function MiniSimulate({
           font-size: 22px;
         }
         .ms-cell.is-start { background: linear-gradient(135deg, #1d4ed8, #1e3a8a); }
-        .ms-cell.is-goal { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .ms-cell.is-goal { background: linear-gradient(135deg, #FC6818, #E5550A); }
         .ms-cell.is-obstacle { background: linear-gradient(135deg, #57534e, #292524); }
         .ms-bot { transition: transform .25s; display: inline-block; }
         .ms-goal { animation: ms-bob 1.6s ease-in-out infinite; display: inline-block; }
@@ -201,7 +201,7 @@ export function MiniSimulate({
           border-radius: 12px;
           min-height: 72px;
           font-family: monospace; font-size: 13px;
-          color: #fde68a;
+          color: #FFC9A8;
           display: flex; flex-direction: column; gap: 3px;
         }
         .ms-empty { color: #6b21a8; font-style: italic; }
@@ -216,7 +216,7 @@ export function MiniSimulate({
           cursor: pointer;
         }
         .ms-run:disabled { opacity: 0.4; cursor: not-allowed; }
-        .ms-hint { color: #fcd34d; font-size: 13px; text-align: center; font-weight: 700; }
+        .ms-hint { color: #FFA878; font-size: 13px; text-align: center; font-weight: 700; }
       `}</style>
     </div>
   )
@@ -238,9 +238,9 @@ function PalBtn({ onClick, disabled, label, muted = false }: {
           min-height: 48px;
           padding: 0 10px;
           font-size: 13px; font-weight: 800;
-          background: linear-gradient(135deg, #fde047, #fbbf24);
+          background: linear-gradient(135deg, #fde047, #FF8A4C);
           color: #1a1040;
-          border: 2px solid #f59e0b;
+          border: 2px solid #FC6818;
           border-radius: 10px;
           cursor: pointer;
         }
@@ -248,7 +248,7 @@ function PalBtn({ onClick, disabled, label, muted = false }: {
         .ms-palbtn:disabled { opacity: 0.4; cursor: not-allowed; }
         .ms-palbtn.is-muted {
           background: #1a1040;
-          color: #fde68a;
+          color: #FFC9A8;
           border-color: #4c1d95;
         }
       `}</style>

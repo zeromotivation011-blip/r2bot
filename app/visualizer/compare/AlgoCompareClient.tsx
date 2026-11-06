@@ -299,7 +299,7 @@ function GridView({
             let bg = 'rgba(255,255,255,0.04)';
             if (c === 'wall') bg = 'rgba(255,255,255,0.55)';
             else if (isStart) bg = '#34d399';
-            else if (isGoal) bg = '#f59e0b';
+            else if (isGoal) bg = '#FC6818';
             else if (pathSet.has(k)) bg = color;
             else if (visitedSet.has(k)) bg = `${color}55`;
             return (

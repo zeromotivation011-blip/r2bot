@@ -46,7 +46,7 @@ function toCsv(rows: Lead[]): string {
 
 const SOURCE_COLOR: Record<string, string> = {
   'popup': '#38bdf8',
-  'academy-waitlist': '#fbbf24',
+  'academy-waitlist': '#FF8A4C',
   'schools-interest': '#a78bfa',
   'newsletter': '#34d399',
 }
@@ -94,7 +94,7 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
         <button
           onClick={download}
           style={{
-            padding: '10px 18px', background: '#fbbf24', color: '#0f0a1e',
+            padding: '10px 18px', background: '#FF8A4C', color: '#0f0a1e',
             fontWeight: 800, fontSize: 14, border: 'none', borderRadius: 10, cursor: 'pointer',
           }}
         >

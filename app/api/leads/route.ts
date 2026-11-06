@@ -89,8 +89,8 @@ async function sendWelcome(email: string, source: string): Promise<void> {
           <p style="font-size:15px;line-height:1.6;margin:0 0 20px">${intro}</p>
           <p style="font-size:15px;line-height:1.6;margin:0 0 24px">
             While you wait, the two best places to start:<br>
-            <a href="https://www.r2bot.in/atlas" style="color:#f59e0b">The Atlas</a> — every robotics concept, explained clearly.<br>
-            <a href="https://www.r2bot.in/visualizer" style="color:#f59e0b">The Simulators</a> — ten interactive tools, no setup.
+            <a href="https://www.r2bot.in/atlas" style="color:#FC6818">The Atlas</a> — every robotics concept, explained clearly.<br>
+            <a href="https://www.r2bot.in/visualizer" style="color:#FC6818">The Simulators</a> — ten interactive tools, no setup.
           </p>
           <p style="font-size:13px;color:#64748b;margin:0">
             You can <a href="https://www.r2bot.in/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}" style="color:#64748b">unsubscribe</a> any time.

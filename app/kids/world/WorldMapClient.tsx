@@ -279,7 +279,7 @@ function ZoneNode({
       {/* Stars chip */}
       {stars > 0 && (
         <g transform="translate(34 -34)">
-          <rect x="0" y="-12" width="44" height="22" rx="11" fill="#fbbf24" stroke="#a16207" strokeWidth="1.5" />
+          <rect x="0" y="-12" width="44" height="22" rx="11" fill="#FF8A4C" stroke="#a16207" strokeWidth="1.5" />
           <text x="22" y="3" fontWeight="900" fontSize="13" fill="#0f0a1e" textAnchor="middle" style={{ pointerEvents: 'none' }}>
             ⭐ {stars}
           </text>
@@ -327,9 +327,9 @@ function ZoneScene({ theme, color }: { theme: ZoneTheme; color: string }) {
         <ellipse cx="0" cy="46" rx="68" ry="10" fill="#0f0a1e" opacity=".5" />
         <rect x="-44" y="-4" width="88" height="46" rx="4" fill="#1e3a8a" />
         <path d="M-50 -4 L0 -48 L50 -4 Z" fill={color} stroke="#0f0a1e" strokeWidth="1.5" />
-        <rect x="-10" y="14" width="20" height="28" rx="2" fill="#fbbf24" />
+        <rect x="-10" y="14" width="20" height="28" rx="2" fill="#FF8A4C" />
         <rect x="22" y="6" width="14" height="14" rx="2" fill="#fde047">
-          <animate attributeName="fill" values="#fde047;#fbbf24;#fde047" dur="2s" repeatCount="indefinite" />
+          <animate attributeName="fill" values="#fde047;#FF8A4C;#fde047" dur="2s" repeatCount="indefinite" />
         </rect>
       </g>
     )
@@ -396,7 +396,7 @@ function ZoneScene({ theme, color }: { theme: ZoneTheme; color: string }) {
       <ellipse cx="0" cy="46" rx="76" ry="12" fill="#0f0a1e" opacity=".5" />
       <rect x="-48" y="20" width="96" height="20" fill="#475569" />
       <path d="M0 -52 L18 6 L-18 6 Z" fill={color} stroke="#0f0a1e" strokeWidth="1.6" />
-      <rect x="-8" y="6" width="16" height="22" fill="#fbbf24" />
+      <rect x="-8" y="6" width="16" height="22" fill="#FF8A4C" />
       <circle cx="0" cy="-14" r="6" fill="#0f0a1e" />
       <path d="M-6 28 L0 50 L6 28 Z" fill="#f97316">
         <animate attributeName="opacity" values="0.4;1;0.4" dur="0.6s" repeatCount="indefinite" />
@@ -506,13 +506,13 @@ function WorldMapStyles() {
       }
       .wm-back {
         min-height: 44px; padding: 0 14px;
-        background: #1a1040; color: #fde68a;
+        background: #1a1040; color: #FFC9A8;
         border-radius: 12px; border: 2px solid #4c1d95;
         text-decoration: none; font-weight: 800;
         display: inline-flex; align-items: center;
       }
       .wm-stars {
-        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        background: linear-gradient(135deg, #FF8A4C, #FC6818);
         color: #1a1040;
         padding: 8px 14px; border-radius: 999px;
         font-weight: 900;
@@ -556,9 +556,9 @@ function WorldMapStyles() {
         font-size: 18px;
       }
       .wm-part.is-owned {
-        border-color: #fbbf24;
-        background: radial-gradient(circle at 35% 30%, #fef3c7, #fbbf24);
-        box-shadow: 0 0 12px rgba(251,191,36,.4);
+        border-color: #FF8A4C;
+        background: radial-gradient(circle at 35% 30%, #fef3c7, #FF8A4C);
+        box-shadow: 0 0 12px rgba(255,138,76,.4);
       }
       .wm-myrobot {
         margin-left: auto;
@@ -582,11 +582,11 @@ function WorldMapStyles() {
         position: relative;
         width: 100%; max-width: 460px;
         background: #1a1040;
-        border: 4px solid var(--zone-color, #f59e0b);
+        border: 4px solid var(--zone-color, #FC6818);
         border-radius: 24px;
         padding: 24px 22px;
         max-height: 86vh; overflow-y: auto;
-        color: #fde68a;
+        color: #FFC9A8;
         animation: wm-zoom 0.25s ease-out;
       }
       @keyframes wm-zoom {
@@ -604,7 +604,7 @@ function WorldMapStyles() {
         font-size: 26px; font-weight: 900; color: #fde047; margin-top: 6px;
       }
       .wm-modal-banner p { font-size: 14px; color: #c4b5fd; margin-top: 2px; }
-      .wm-modal-age { font-size: 12px; color: #fbbf24; }
+      .wm-modal-age { font-size: 12px; color: #FF8A4C; }
       .wm-modal-levels-h { text-align: center; font-weight: 800; color: #fde047; margin-bottom: 8px; }
       .wm-modal-levels { display: grid; gap: 6px; margin-bottom: 14px; }
       .wm-modal-level {
@@ -615,12 +615,12 @@ function WorldMapStyles() {
         border: 1px solid #4c1d95;
       }
       .wm-modal-level-body { flex: 1; }
-      .wm-modal-level-body p { font-weight: 800; font-size: 14px; color: #fde68a; margin: 0; }
+      .wm-modal-level-body p { font-weight: 800; font-size: 14px; color: #FFC9A8; margin: 0; }
       .wm-modal-level-body small { font-size: 11px; color: #c4b5fd; }
-      .wm-modal-stars-earned { color: #fbbf24; font-weight: 900; }
+      .wm-modal-stars-earned { color: #FF8A4C; font-weight: 900; }
       .wm-modal-boss {
         padding: 14px;
-        background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
+        background: linear-gradient(135deg, #ef4444 0%, #FC6818 100%);
         border-radius: 14px;
         text-align: center; color: white;
         margin-bottom: 14px;
@@ -631,7 +631,7 @@ function WorldMapStyles() {
       .wm-modal-cta {
         display: grid; place-items: center;
         min-height: 56px;
-        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        background: linear-gradient(135deg, #FF8A4C, #FC6818);
         color: #1a1040;
         font-size: 18px; font-weight: 900;
         text-decoration: none;

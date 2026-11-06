@@ -58,8 +58,8 @@ export function NewsAdminClient({ rows }: { rows: NewsRow[] }) {
             key={r.url}
             style={{
               padding: 14, borderRadius: 12,
-              background: r.pinned ? 'rgba(245,158,11,0.08)' : 'rgba(255,255,255,0.03)',
-              border: `1px solid ${r.pinned ? 'rgba(245,158,11,0.3)' : 'rgba(255,255,255,0.08)'}`,
+              background: r.pinned ? 'rgba(252,104,24,0.08)' : 'rgba(255,255,255,0.03)',
+              border: `1px solid ${r.pinned ? 'rgba(252,104,24,0.3)' : 'rgba(255,255,255,0.08)'}`,
               opacity: r.hidden ? 0.5 : 1,
             }}
           >

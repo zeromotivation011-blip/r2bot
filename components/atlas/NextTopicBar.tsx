@@ -178,10 +178,10 @@ export function NextTopicBar({
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .ntb-surprise {
-          background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(124,58,237,0.18));
-          border-color: rgba(245,158,11,0.4);
+          background: linear-gradient(135deg, rgba(252,104,24,0.18), rgba(124,58,237,0.18));
+          border-color: rgba(252,104,24,0.4);
         }
-        .ntb-surprise .ntb-card-arrow { color: #fbbf24; }
+        .ntb-surprise .ntb-card-arrow { color: #FF8A4C; }
       `}</style>
     </aside>
   )

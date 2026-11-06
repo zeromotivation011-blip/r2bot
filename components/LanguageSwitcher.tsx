@@ -195,10 +195,10 @@ export function LanguageSwitcher() {
                   gap: 10,
                   width: '100%',
                   padding: '9px 10px',
-                  background: isActive ? 'rgba(245,158,11,0.14)' : 'transparent',
+                  background: isActive ? 'rgba(252,104,24,0.14)' : 'transparent',
                   border: 'none',
                   borderRadius: 9,
-                  color: isActive ? '#fbbf24' : '#e2e8f0',
+                  color: isActive ? '#FF8A4C' : '#e2e8f0',
                   fontSize: 13.5,
                   fontWeight: isActive ? 700 : 500,
                   cursor: 'pointer',
@@ -213,7 +213,7 @@ export function LanguageSwitcher() {
               >
                 <span aria-hidden style={{ fontSize: 16 }}>{l.flag}</span>
                 <span style={{ flex: 1 }}>{l.label}</span>
-                {isActive && <span aria-hidden style={{ color: '#f59e0b' }}>✓</span>}
+                {isActive && <span aria-hidden style={{ color: '#FC6818' }}>✓</span>}
               </button>
             );
           })}

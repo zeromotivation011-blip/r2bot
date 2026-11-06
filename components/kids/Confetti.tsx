@@ -22,7 +22,7 @@ const PALETTE = [
   '#10B981', // green
   '#3B82F6', // blue
   '#EF4444', // red
-  '#FBBF24', // amber
+  '#FF8A4C', // amber
   '#F472B6', // pink
 ] as const
 

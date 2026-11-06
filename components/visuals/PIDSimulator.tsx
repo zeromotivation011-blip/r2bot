@@ -183,14 +183,14 @@ export function PIDSimulator() {
             behaviour.tone === 'ok'
               ? 'rgba(34,197,94,.12)'
               : behaviour.tone === 'warn'
-              ? 'rgba(255,176,32,.12)'
+              ? 'rgba(252,104,24,.12)'
               : 'rgba(11,37,64,.5)',
           border:
             '1px solid ' +
             (behaviour.tone === 'ok'
               ? 'rgba(34,197,94,.4)'
               : behaviour.tone === 'warn'
-              ? 'rgba(255,176,32,.5)'
+              ? 'rgba(252,104,24,.5)'
               : 'var(--border)'),
           color:
             behaviour.tone === 'ok'

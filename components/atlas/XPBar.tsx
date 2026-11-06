@@ -36,11 +36,11 @@ export function XPBar({ refreshKey = 0 }: { refreshKey?: number }) {
       <style jsx>{`
         .xpbar {
           padding: 10px 14px;
-          background: linear-gradient(135deg, rgba(245,158,11,0.10), rgba(0,229,255,0.08));
-          border: 1px solid rgba(245,158,11,0.32);
+          background: linear-gradient(135deg, rgba(252,104,24,0.10), rgba(0,229,255,0.08));
+          border: 1px solid rgba(252,104,24,0.32);
           border-radius: 14px;
           min-width: 200px;
-          color: #fde68a;
+          color: #FFC9A8;
         }
         .xpbar-row { display: flex; align-items: center; gap: 10px; }
         .xpbar-emoji { font-size: 26px; }
@@ -57,7 +57,7 @@ export function XPBar({ refreshKey = 0 }: { refreshKey?: number }) {
         }
         .xpbar-fill {
           height: 100%;
-          background: linear-gradient(90deg, #fbbf24, #f97316);
+          background: linear-gradient(90deg, #FF8A4C, #f97316);
           transition: width 0.4s cubic-bezier(.22,.61,.36,1);
         }
       `}</style>

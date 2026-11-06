@@ -14,7 +14,7 @@ const SOURCES = [
 const SOURCE_COLOUR: Record<string, string> = {
   arxiv: '#A56BFF',
   reddit: '#FF4500',
-  hn: '#FFB020',
+  hn: '#FC6818',
   github: '#64748B',
 };
 
@@ -213,8 +213,8 @@ export function DiscoveryActions({ items, sourceCounts }: { items: DiscoveryItem
                         style={{
                           padding: '2px 8px',
                           borderRadius: 999,
-                          background: 'rgba(255,176,32,.18)',
-                          border: '1px solid rgba(255,176,32,.6)',
+                          background: 'rgba(252,104,24,.18)',
+                          border: '1px solid rgba(252,104,24,.6)',
                           color: 'var(--amber)',
                           fontSize: 11,
                         }}

@@ -83,7 +83,7 @@ export default function LevelClient() {
     return (
       <div style={{ padding: 40, textAlign: 'center' }}>
         <p style={{ fontSize: 22, fontWeight: 900 }}>Level not found.</p>
-        <Link href="/kids/world" style={{ marginTop: 16, display: 'inline-block', color: '#fde68a' }}>
+        <Link href="/kids/world" style={{ marginTop: 16, display: 'inline-block', color: '#FFC9A8' }}>
           ← World map
         </Link>
       </div>
@@ -215,7 +215,7 @@ function ConceptPanel({ level, zone, onAdvance }: { level: Level; zone: Zone; on
         <button
           type="button"
           className="panel-cta"
-          style={{ background: `linear-gradient(135deg, ${zone.color}, #f59e0b)` }}
+          style={{ background: `linear-gradient(135deg, ${zone.color}, #FC6818)` }}
           onClick={() => { playSound('click'); onAdvance() }}
         >
           Got it! →
@@ -445,7 +445,7 @@ function LevelStyles() {
       }
       .lvl-quit {
         min-height: 40px; padding: 0 14px;
-        background: #1a1040; color: #fde68a;
+        background: #1a1040; color: #FFC9A8;
         border-radius: 12px; border: 2px solid #4c1d95;
         text-decoration: none; font-weight: 800;
         display: inline-flex; align-items: center;
@@ -458,7 +458,7 @@ function LevelStyles() {
         transition: background .3s, width .3s;
       }
       .lvl-dot.done { background: #10b981; }
-      .lvl-dot.now  { background: #fbbf24; width: 40px; }
+      .lvl-dot.now  { background: #FF8A4C; width: 40px; }
       .lvl-name {
         font-size: 13px; color: #c4b5fd; font-weight: 700; max-width: 220px;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -493,11 +493,11 @@ function LevelStyles() {
       .panel-story-text {
         font-size: clamp(20px, 3.6vw, 28px);
         font-weight: 800;
-        color: #fde68a;
+        color: #FFC9A8;
         margin: 18px auto;
         line-height: 1.4;
       }
-      .panel-tap { color: #fbbf24; font-weight: 800; animation: panel-blink 1.4s ease-in-out infinite; }
+      .panel-tap { color: #FF8A4C; font-weight: 800; animation: panel-blink 1.4s ease-in-out infinite; }
       @keyframes panel-blink { 50% { opacity: 0.35 } }
 
       .panel-concept {
@@ -517,13 +517,13 @@ function LevelStyles() {
       }
       .panel-concept-explain {
         font-size: 18px;
-        color: #fde68a;
+        color: #FFC9A8;
         line-height: 1.45;
         margin-bottom: 14px;
       }
       .panel-concept-analogy {
-        background: rgba(251,191,36,0.14);
-        border: 2px solid #fbbf24;
+        background: rgba(255,138,76,0.14);
+        border: 2px solid #FF8A4C;
         border-radius: 16px;
         padding: 12px 14px;
         margin-bottom: 14px;
@@ -544,17 +544,17 @@ function LevelStyles() {
       .panel-cta {
         display: inline-flex; align-items: center; justify-content: center;
         min-height: 56px; padding: 0 28px;
-        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        background: linear-gradient(135deg, #FF8A4C, #FC6818);
         color: #1a1040; font-weight: 900; font-size: 17px;
         border: none; border-radius: 14px; cursor: pointer;
         text-decoration: none;
-        box-shadow: 0 10px 30px rgba(251,191,36,0.4);
+        box-shadow: 0 10px 30px rgba(255,138,76,0.4);
       }
       .panel-cta:hover { transform: translateY(-2px); }
       .panel-secondary {
         display: inline-flex; align-items: center; justify-content: center;
         min-height: 52px; padding: 0 22px;
-        background: transparent; color: #fde68a;
+        background: transparent; color: #FFC9A8;
         border: 2px solid #4c1d95; border-radius: 14px; cursor: pointer;
         font-weight: 800; text-decoration: none;
       }
@@ -575,16 +575,16 @@ function LevelStyles() {
       .panel-voicehelp {
         width: 48px; height: 48px;
         border-radius: 50%;
-        border: 2px solid #fbbf24;
-        background: #1a1040; color: #fbbf24;
+        border: 2px solid #FF8A4C;
+        background: #1a1040; color: #FF8A4C;
         font-size: 20px; cursor: pointer;
         display: grid; place-items: center;
       }
       .panel-activity-tagline { color: #c4b5fd; font-size: 14px; margin: 0; }
       .panel-activity-hint {
-        background: rgba(251,191,36,0.14);
-        border: 2px solid #fbbf24;
-        color: #fde68a;
+        background: rgba(255,138,76,0.14);
+        border: 2px solid #FF8A4C;
+        color: #FFC9A8;
         padding: 12px 14px;
         border-radius: 12px;
         font-weight: 700;
@@ -599,7 +599,7 @@ function LevelStyles() {
       .panel-funfact-body {
         font-size: clamp(18px, 3vw, 24px);
         font-weight: 800;
-        color: #fde68a;
+        color: #FFC9A8;
         max-width: 640px;
         line-height: 1.45;
       }
@@ -620,9 +620,9 @@ function LevelStyles() {
       }
       .panel-celebration-sub { color: #c4b5fd; font-weight: 700; }
       .panel-celebration-part, .panel-celebration-zone {
-        background: rgba(251,191,36,0.15);
-        border: 2px solid #fbbf24;
-        color: #fde68a;
+        background: rgba(255,138,76,0.15);
+        border: 2px solid #FF8A4C;
+        color: #FFC9A8;
         padding: 12px 18px; border-radius: 14px;
       }
       .panel-celebration-part a, .panel-celebration-zone a { color: #fde047; font-weight: 900; }

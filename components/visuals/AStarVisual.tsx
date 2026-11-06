@@ -16,7 +16,7 @@ const COLORS: Record<CellState, string> = {
   empty: '#0a1628',
   wall: '#334155',
   explored: '#0c3347',
-  frontier: '#78350f',
+  frontier: '#6B2A07',
   path: '#00B8D4',
 };
 
@@ -384,7 +384,7 @@ export function AStarVisual() {
               <span style={{ color: 'var(--cyan-bright)' }}>{stats.ms}ms</span>
             </>
           ) : (
-            <span style={{ color: '#f59e0b' }}>No path found — try clearing some walls</span>
+            <span style={{ color: '#FC6818' }}>No path found — try clearing some walls</span>
           )
         ) : (
           <span style={{ color: '#94A3B8' }}>Draw walls (or pick a preset), then press Find Path.</span>

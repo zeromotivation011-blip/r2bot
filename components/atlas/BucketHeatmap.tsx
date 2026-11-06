@@ -42,9 +42,9 @@ export function BucketHeatmap({
 
   const tier = (pct: number, total: number): { color: string; label?: string } => {
     if (total === 0) return { color: '#475569' }
-    if (pct >= 1) return { color: '#fbbf24', label: '⭐ Complete!' }
+    if (pct >= 1) return { color: '#FF8A4C', label: '⭐ Complete!' }
     if (pct >= 0.75) return { color: '#10b981' }
-    if (pct >= 0.25) return { color: '#f59e0b' }
+    if (pct >= 0.25) return { color: '#FC6818' }
     return { color: '#ef4444' }
   }
 
@@ -126,7 +126,7 @@ export function BucketHeatmap({
         .bh-tag {
           margin-left: 8px;
           font-size: 11px;
-          color: #fbbf24;
+          color: #FF8A4C;
         }
       `}</style>
     </section>

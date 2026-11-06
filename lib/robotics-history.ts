@@ -20,7 +20,7 @@ export interface Milestone {
 }
 
 export const CATEGORY_META: Record<HistoryCategory, { label: string; color: string; emoji: string }> = {
-  invention: { label: 'Invention', color: '#f59e0b', emoji: '🛠️' },
+  invention: { label: 'Invention', color: '#FC6818', emoji: '🛠️' },
   milestone: { label: 'Milestone', color: '#22d3ee', emoji: '🚩' },
   film: { label: 'Cinema', color: '#a78bfa', emoji: '🎬' },
   india: { label: 'India', color: '#fb923c', emoji: '🇮🇳' },

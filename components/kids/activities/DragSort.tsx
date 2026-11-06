@@ -116,9 +116,9 @@ export function DragSort({
         .ds-empty { color: #6ee7b7; font-weight: 800; }
         .ds-chip {
           min-height: 48px; padding: 8px 14px;
-          background: linear-gradient(135deg, #fde047, #fbbf24);
+          background: linear-gradient(135deg, #fde047, #FF8A4C);
           color: #1a1040;
-          border: 2px solid #f59e0b;
+          border: 2px solid #FC6818;
           border-radius: 12px;
           font-weight: 800;
           cursor: grab;
@@ -127,7 +127,7 @@ export function DragSort({
         .ds-chip:active { cursor: grabbing; }
         .ds-chip.is-picked {
           transform: scale(1.08);
-          box-shadow: 0 0 22px rgba(251,191,36,0.55);
+          box-shadow: 0 0 22px rgba(255,138,76,0.55);
         }
         .ds-chip.is-shake {
           animation: ds-shake .45s ease-in-out;
@@ -153,7 +153,7 @@ export function DragSort({
           cursor: pointer;
           transition: border-color .2s, background .2s, transform .15s;
         }
-        .ds-cat:hover { border-color: #fbbf24; transform: translateY(-2px); }
+        .ds-cat:hover { border-color: #FF8A4C; transform: translateY(-2px); }
         .ds-cat.is-hint {
           animation: ds-hint-pulse 1.4s ease-in-out infinite;
           border-color: #fde047;

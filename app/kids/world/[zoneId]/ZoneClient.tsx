@@ -124,7 +124,7 @@ export default function ZoneClient() {
           min-height: 48px;
           padding: 0 16px;
           line-height: 48px;
-          color: #fde68a;
+          color: #FFC9A8;
           background: rgba(26,16,64,.7);
           border: 2px solid #4c1d95;
           border-radius: 12px;
@@ -152,8 +152,8 @@ export default function ZoneClient() {
         .zone-progress {
           display: inline-block;
           margin-top: 14px;
-          background: rgba(251,191,36,.2);
-          border: 2px solid #fbbf24;
+          background: rgba(255,138,76,.2);
+          border: 2px solid #FF8A4C;
           color: #fde047;
           padding: 6px 16px;
           border-radius: 999px;
@@ -168,7 +168,7 @@ export default function ZoneClient() {
           border: 2px solid #4c1d95;
         }
         .level-card.done   { border-color: #10b981; }
-        .level-card.current { border-color: #fbbf24; box-shadow: 0 0 30px rgba(251,191,36,.3); }
+        .level-card.current { border-color: #FF8A4C; box-shadow: 0 0 30px rgba(255,138,76,.3); }
         .level-emoji { font-size: 40px; flex-shrink: 0; }
         .level-info { flex: 1; min-width: 0; }
         .level-info h3 { font-size: 18px; font-weight: 900; color: #fde047; }
@@ -177,7 +177,7 @@ export default function ZoneClient() {
         .chip {
           font-size: 11px; font-weight: 800;
           background: rgba(15,10,30,.65);
-          color: #fcd34d;
+          color: #FFA878;
           padding: 3px 9px;
           border-radius: 999px;
           border: 1px solid #4c1d95;
@@ -186,7 +186,7 @@ export default function ZoneClient() {
         .play-btn {
           min-height: 56px;
           padding: 0 18px;
-          background: linear-gradient(135deg, #fbbf24, #f59e0b);
+          background: linear-gradient(135deg, #FF8A4C, #FC6818);
           color: #1a1040;
           border-radius: 14px;
           text-decoration: none;
@@ -197,10 +197,10 @@ export default function ZoneClient() {
         .boss-card {
           margin-top: 28px;
           padding: 22px 20px;
-          background: linear-gradient(135deg, rgba(239,68,68,.2), rgba(245,158,11,.2));
+          background: linear-gradient(135deg, rgba(239,68,68,.2), rgba(252,104,24,.2));
           border: 3px solid #ef4444;
           border-radius: 22px;
-          color: #fde68a;
+          color: #FFC9A8;
         }
         .boss-card.locked { border-color: #4c1d95; filter: grayscale(.3); }
         .boss-badge {
@@ -212,15 +212,15 @@ export default function ZoneClient() {
           margin-bottom: 8px;
         }
         .boss-card h2 { font-size: 22px; font-weight: 900; color: #fde047; }
-        .story { font-size: 14px; margin-top: 6px; color: #fde68a; }
+        .story { font-size: 14px; margin-top: 6px; color: #FFC9A8; }
         .challenge { font-size: 13px; color: #c4b5fd; margin-top: 2px; }
-        .boss-bar { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-weight: 800; font-size: 13px; color: #fbbf24; }
+        .boss-bar { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-weight: 800; font-size: 13px; color: #FF8A4C; }
         .bar-track { flex: 1; height: 10px; background: #0f0a1e; border-radius: 999px; overflow: hidden; }
-        .bar-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); transition: width .4s; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #FC6818, #FF8A4C); transition: width .4s; }
         .boss-cta {
           margin-top: 14px;
           min-height: 56px; width: 100%;
-          background: linear-gradient(135deg, #ef4444, #f59e0b);
+          background: linear-gradient(135deg, #ef4444, #FC6818);
           color: white; font-size: 18px; font-weight: 900;
           border: none; border-radius: 14px; cursor: pointer;
         }

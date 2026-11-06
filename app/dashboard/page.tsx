@@ -159,8 +159,8 @@ export default async function DashboardPage() {
                 <span style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                   padding: '6px 12px', borderRadius: 999,
-                  background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.5)',
-                  color: '#fbbf24', fontSize: 12, fontWeight: 900, letterSpacing: '1.5px', textTransform: 'uppercase',
+                  background: 'rgba(255,138,76,0.12)', border: '1px solid rgba(255,138,76,0.5)',
+                  color: '#FF8A4C', fontSize: 12, fontWeight: 900, letterSpacing: '1.5px', textTransform: 'uppercase',
                 }}>
                   ★ Pro
                   {subscription.currentPeriodEnd && (

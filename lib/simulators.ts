@@ -154,7 +154,7 @@ export const SIMULATORS: Simulator[] = [
       { href: '/atlas/concept/forward-kinematics', label: 'Forward Kinematics' },
       { href: '/atlas/concept/degrees-of-freedom', label: 'Degrees of Freedom' },
     ],
-    accent: '#FFB020',
+    accent: '#FC6818',
   },
   {
     id: 'fusion',

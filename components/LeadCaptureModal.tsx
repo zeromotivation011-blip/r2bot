@@ -116,7 +116,7 @@ export function LeadCaptureModal() {
           </div>
         ) : (
           <>
-            <p style={{ fontSize: 11, letterSpacing: '2px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 10px' }}>
+            <p style={{ fontSize: 11, letterSpacing: '2px', textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 10px' }}>
               R2BOT · Free updates
             </p>
             <h3 style={{ color: '#fff', fontSize: 'clamp(20px,4vw,26px)', fontWeight: 900, margin: '0 0 8px', lineHeight: 1.2 }}>
@@ -140,7 +140,7 @@ export function LeadCaptureModal() {
               <button
                 type="submit" disabled={status === 'loading'}
                 style={{
-                  marginTop: 4, minHeight: 48, background: '#fbbf24', color: '#0f0a1e',
+                  marginTop: 4, minHeight: 48, background: '#FF8A4C', color: '#0f0a1e',
                   fontWeight: 900, fontSize: 15, border: 'none', borderRadius: 12,
                   cursor: 'pointer', opacity: status === 'loading' ? 0.6 : 1,
                 }}

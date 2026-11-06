@@ -164,13 +164,13 @@ export function VoiceAnswer({ question, accepted, onWin, onFail }: VoiceAnswerPr
           min-height: 44px;
           padding: 0 14px;
           background: #1a1040;
-          color: #fde68a;
+          color: #FFC9A8;
           border: 2px solid #4c1d95;
           border-radius: 999px;
           font-weight: 800;
           cursor: pointer;
         }
-        .va-opt:hover { border-color: #fbbf24; }
+        .va-opt:hover { border-color: #FF8A4C; }
       `}</style>
     </div>
   )

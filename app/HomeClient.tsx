@@ -79,18 +79,18 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
       <Hero personalization={personalization} atlasCount={atlasCount} projectCount={projectCount} />
       {showDiagnosticBanner && (
         <section style={{
-          padding: '20px 20px', background: 'rgba(245,158,11,0.08)',
-          borderBottom: '1px solid rgba(245,158,11,0.25)',
+          padding: '20px 20px', background: 'rgba(252,104,24,0.08)',
+          borderBottom: '1px solid rgba(252,104,24,0.25)',
         }}>
           <div style={{
             maxWidth: 1100, margin: '0 auto',
             display: 'flex', gap: 14, alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap',
           }}>
-            <span style={{ fontSize: 14, color: '#fde68a', fontWeight: 700 }}>
+            <span style={{ fontSize: 14, color: '#FFC9A8', fontWeight: 700 }}>
               🎯 Find your level — take the 5-minute test to get your personalized roadmap.
             </span>
             <Link href="/diagnostic" style={{
-              padding: '8px 18px', background: '#fbbf24', color: '#1a0f00',
+              padding: '8px 18px', background: '#FF8A4C', color: '#1a0f00',
               borderRadius: 999, fontSize: 13, fontWeight: 900, textDecoration: 'none',
             }}>
               Take the test →
@@ -132,7 +132,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
         overflow: 'hidden',
         padding: '120px 20px 60px',
         background:
-          'radial-gradient(ellipse at 20% 30%, rgba(245,165,36,.07), transparent 55%), #0A0E17',
+          'radial-gradient(ellipse at 20% 30%, rgba(252,104,24,.07), transparent 55%), #0A0E17',
       }}
     >
       {/* Grid background */}
@@ -156,10 +156,10 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
         <div>
           {personalization.signedIn && personalization.firstName && (
             <p style={{ fontSize: 13, color: '#cbd5e1', fontWeight: 700, margin: '0 0 8px' }}>
-              Welcome back, <span style={{ color: '#fbbf24' }}>{personalization.firstName}</span>.
+              Welcome back, <span style={{ color: '#FF8A4C' }}>{personalization.firstName}</span>.
             </p>
           )}
-          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 16px' }}>
+          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 16px' }}>
             R2BOT · ROBOT, decoded — for the world
           </p>
 
@@ -171,7 +171,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
             letterSpacing: '-1px',
           }}>
             The{' '}
-            <span style={{ color: '#F5A524' }}>
+            <span style={{ color: '#FC6818' }}>
               clearest way to learn robotics
             </span>
             {' '}on the internet.
@@ -188,7 +188,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 32 }}>
             <StatPill n={atlasCount} label="Atlas concepts" color="#00E5FF" />
             <StatPill n={9}           label="Simulators"     color="#A56BFF" />
-            <StatPill n={projectCount} label="Robot Projects" color="#fbbf24" />
+            <StatPill n={projectCount} label="Robot Projects" color="#FF8A4C" />
             <StatPill n={4}           label="Learning tracks" color="#10b981" displayValue="4" />
           </div>
 
@@ -301,7 +301,7 @@ function FloatingRobot() {
             <stop offset="100%" stopColor="#7c3aed" />
           </linearGradient>
         </defs>
-        <line x1="110" y1="14" x2="110" y2="36" stroke="#fbbf24" strokeWidth="3" />
+        <line x1="110" y1="14" x2="110" y2="36" stroke="#FF8A4C" strokeWidth="3" />
         <circle cx="110" cy="10" r="6" fill="#fde047" />
         <rect x="50" y="36" width="120" height="80" rx="16" fill="url(#rg1)" stroke="#00E5FF" strokeWidth="1.5" />
         <rect x="62" y="48" width="96" height="50" rx="8" fill="#0A0E17" />
@@ -409,7 +409,7 @@ function Features({ atlasCount }: { atlasCount: number }) {
     { icon: '🧠', name: 'Atlas',              sub: `${atlasCount.toLocaleString()} robotics concepts — sensors, motors, AI, SLAM — defined clearly and connected.`, badge: `${atlasCount.toLocaleString()} concepts`, cta: 'Open Atlas →', href: '/atlas', color: '#A56BFF' },
     { icon: '🤖', name: 'Simulators',         sub: '9 real-time robotics simulators. Line followers, PID, kinematics, sensor fusion — in your browser.', badge: '9 simulators', cta: 'Launch Simulator →', href: '/visualizer', color: '#FFB800' },
     { icon: '🌐', name: 'ROS2 Playground',    sub: 'A live Linux shell in your browser. Write real ROS2 commands, no setup required.', badge: 'Live shell', cta: 'Open Playground →', href: '/ros2', color: '#10b981' },
-    { icon: '🤖', name: 'R2 Co-pilot',            sub: 'Your AI mentor. Ask anything, get precise answers grounded in the Atlas. Available on every page.', badge: 'AI Mentor', cta: 'Meet R2 →', href: '/copilot', color: '#f59e0b' },
+    { icon: '🤖', name: 'R2 Co-pilot',            sub: 'Your AI mentor. Ask anything, get precise answers grounded in the Atlas. Available on every page.', badge: 'AI Mentor', cta: 'Meet R2 →', href: '/copilot', color: '#FC6818' },
     { icon: '🌍', name: 'Robotics in Daily Life', sub: 'From surgical robots to self-driving cars — see how robotics is changing the world right now.', badge: 'Real world', cta: 'Explore →', href: '/daily-life', color: '#ef4444' },
   ]
   return (
@@ -619,7 +619,7 @@ function GlobalReach() {
           <circle cx={n.cx} cy={n.cy} r={n.r} fill="#f97316" />
         </g>
       ))}
-      <text x="140" y="258" fontSize="12" fontWeight="800" fill="#fbbf24" textAnchor="middle" letterSpacing="1">
+      <text x="140" y="258" fontSize="12" fontWeight="800" fill="#FF8A4C" textAnchor="middle" letterSpacing="1">
         Learners in 50+ countries
       </text>
     </svg>
@@ -887,7 +887,7 @@ function NewsletterCTA() {
   return (
     <section style={{ padding: '72px 20px', background: '#08080d', borderTop: '1px solid #1f1f2a', borderBottom: '1px solid #1f1f2a' }}>
       <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
-        <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 12px' }}>
+        <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 12px' }}>
           R2BOT Weekly
         </p>
         <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, color: '#fff', margin: '0 0 12px' }}>
@@ -911,7 +911,7 @@ function NewsletterCTA() {
           <button
             type="submit" disabled={status === 'loading'}
             style={{
-              padding: '12px 20px', flex: '1 1 auto', background: '#fbbf24', color: '#0f0a1e',
+              padding: '12px 20px', flex: '1 1 auto', background: '#FF8A4C', color: '#0f0a1e',
               fontWeight: 900, fontSize: 14, border: 'none',
               borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap',
               opacity: status === 'loading' ? 0.6 : 1,
@@ -942,7 +942,7 @@ function Footer() {
         <div className="m-stack-2" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr', gap: 32, marginBottom: 40 }}>
           <div>
             <p style={{ fontWeight: 900, fontSize: 24, color: '#fff', margin: '0 0 8px' }}>
-              R<span style={{ color: '#fbbf24' }}>2</span>BOT
+              R<span style={{ color: '#FF8A4C' }}>2</span>BOT
             </p>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 16px', lineHeight: 1.5 }}>
               ROBOT, decoded — for the world. From your first concept to job-ready.

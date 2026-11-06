@@ -21,7 +21,7 @@ const CHARACTERS: CharacterCard[] = [
   { id: 'homemaker',       name: 'Anita',    role: 'Homemaker',      emoji: '🏠',  color: '#a855f7' },
   { id: 'driver',          name: 'Karan',    role: 'Driver',         emoji: '🚗',  color: '#ef4444' },
   { id: 'office-worker',   name: 'Deepa',    role: 'Office Worker',  emoji: '💼',  color: '#0ea5e9' },
-  { id: 'engineer',        name: 'Vikram',   role: 'Engineer',       emoji: '🏗️', color: '#fbbf24' },
+  { id: 'engineer',        name: 'Vikram',   role: 'Engineer',       emoji: '🏗️', color: '#FF8A4C' },
 ]
 
 export function CharacterSelector({
@@ -124,7 +124,7 @@ export function CharacterSelector({
         }
         .cs-callout {
           margin-top: 18px;
-          font-size: 15px; color: #fde68a;
+          font-size: 15px; color: #FFC9A8;
         }
         .cs-callout strong { color: #fde047; }
       `}</style>
