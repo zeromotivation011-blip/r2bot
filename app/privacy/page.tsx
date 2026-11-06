@@ -22,7 +22,7 @@ export default function PrivacyPage() {
         <li>If you don&apos;t sign up, we collect basically nothing about you personally.</li>
         <li>If you sign up, we store your email + a profile to track your course progress.</li>
         <li>R2 Co-pilot conversations are logged for 30 days to improve the Atlas, then deleted.</li>
-        <li>We use one analytics tool (Plausible) that doesn&apos;t use cookies or track you across sites.</li>
+        <li>We count page views with a simple first-party counter (no cookies, no IP address, no user ID) and use Google Analytics for anonymous usage statistics.</li>
         <li>We never sell, rent, or share your data with third parties for marketing.</li>
         <li>You can delete everything we have about you by emailing <strong>hello@r2bot.in</strong>.</li>
       </ul>
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
 
       <h3>If you just visit the site (no signup)</h3>
       <ul>
-        <li>Anonymous analytics (page views, country-level location, browser type) via Plausible. No cookies. No personal ID.</li>
+        <li>Anonymous page-view counts through our own counter (no cookies, no IP address, no user ID), plus anonymous usage statistics through Google Analytics, which may set cookies.</li>
         <li>Your IP address is processed by Vercel for serving the site, but not stored by us beyond the 30-day Vercel default.</li>
         <li>If you use R2 Co-pilot without signing up: the text of your conversation is sent to Anthropic to generate a response, then logged on our server with no user ID, then deleted after 30 days.</li>
       </ul>
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
         <li><strong>Vercel</strong> — for hosting. They see request logs.</li>
         <li><strong>Supabase</strong> — for database and authentication. They store the data you give us.</li>
         <li><strong>Resend</strong> — for sending newsletter and account emails. They see your email address.</li>
-        <li><strong>Plausible</strong> — for privacy-first analytics. They see anonymous page-view events.</li>
+        <li><strong>Google Analytics</strong> — for anonymous usage statistics (page views, country-level location, browser type).</li>
       </ul>
       <p>We do not share your data with anyone else. We do not sell it. We do not rent it.</p>
 

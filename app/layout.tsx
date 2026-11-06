@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { SiteViewCounter } from '@/components/SiteViewCounter';
 import Script from 'next/script';
 import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
@@ -106,6 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <AuthModal />
           </ToastProvider>
         </AuthProvider>
+        <SiteViewCounter />
         <OnboardingModal />
         <LeadCaptureModal />
         <LowDataMode />
