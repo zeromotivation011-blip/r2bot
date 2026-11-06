@@ -5,10 +5,11 @@ import { useState } from 'react'
 const T = {
   en: { h: 'Get one robotics email a week', p: 'Plain English. Free. Unsubscribe in one click.', ph: 'you@email.com', b: 'Subscribe', ok: 'Thanks. Check your inbox.', err: 'Something went wrong. Please try again.' },
   hi: { h: 'हर हफ़्ते एक रोबोटिक्स ईमेल', p: 'आसान भाषा में। मुफ़्त। एक क्लिक में सदस्यता रद्द।', ph: 'you@email.com', b: 'सदस्य बनें', ok: 'धन्यवाद। अपना इनबॉक्स देखिए।', err: 'कुछ गड़बड़ हो गई। फिर कोशिश कीजिए।' },
+  es: { h: 'Un correo de robótica a la semana', p: 'En lenguaje sencillo. Gratis. Date de baja con un clic.', ph: 'tu@correo.com', b: 'Suscribirme', ok: 'Gracias. Revisa tu bandeja de entrada.', err: 'Algo salió mal. Inténtalo de nuevo.' },
   zh: { h: '每周一封机器人邮件', p: '通俗易懂，免费，随时一键退订。', ph: 'you@email.com', b: '订阅', ok: '谢谢，请查收邮箱。', err: '出错了，请重试。' },
 } as const
 
-export default function InlineSignup({ lang = 'en' }: { lang?: 'en' | 'hi' | 'zh' }) {
+export default function InlineSignup({ lang = 'en' }: { lang?: 'en' | 'hi' | 'zh' | 'es' }) {
   const t = T[lang]
   const [email, setEmail] = useState('')
   const [s, setS] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle')
