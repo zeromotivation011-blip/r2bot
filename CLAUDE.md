@@ -84,8 +84,10 @@ Everything we ship is measured against the best products in the world, not "good
 | **Search Console** | verified for www.r2bot.in via HTML file |
 | **Local folder** | ~/Documents/Claude/Projects/r2bot |
 
-> Deploys are done via the Vercel CLI (`npx vercel --prod`) from the local repo. Pushing to GitHub
-> does NOT auto-deploy yet — connecting the GitHub repo to Vercel for auto-deploy is a P1 improvement.
+> **Deploys are automatic.** A merge to `main` triggers a Vercel build and goes live in ~5 minutes.
+> No `npx vercel --prod` step. Pages 404 until the build finishes.
+> Supabase migrations are NOT automatic: Ravi runs each new file in `supabase/migrations/`
+> in the Supabase SQL editor. Write migrations so the code degrades safely until then.
 
 ---
 
@@ -100,7 +102,8 @@ AI:          Anthropic SDK — powers R2 Co-pilot + news/lens summaries (Claude 
 3D:          Three.js + urdf-loader   IDE: Monaco   Terminal: xterm
 Analytics:   Google Analytics 4 (gtag) via NEXT_PUBLIC_GA_ID
 Email:       Resend (weekly digest + lead welcome)
-Payments:    Razorpay (India) + Stripe (international — to add)
+Payments:    NONE. Everything is free (Nov 2026 decision). The razorpay dep and
+             /api/payment routes are legacy; the endpoints return 410.
 Deployment:  Vercel (deploy via CLI today)
 Content:     MDX/JSON in /content + Supabase atlas table
 ```
@@ -115,43 +118,66 @@ Build these exceptionally; everything else is secondary.
   one-sentence answer → plain explanation → how it works → real-world example → related → sources.
   SSG/ISR, SEO-first. Powers R2 Co-pilot via RAG. Min 4 new entries/week. **Best-on-the-internet bar,
   beginner-to-advanced in every entry.**
-- **Academy** — Spark → Wire → Forge → Edge. Spark course 1 free in full; rest is Pro. Progress in Supabase.
+- **Quick Lessons** (`/shorts`) — THE top of the funnel. One page per one-minute YouTube Short:
+  video, interactive demo, "with it / without it", one quiz question, then the email ask. 47 lessons
+  in EN/ZH/HI/ES. Every new Short gets a lesson page, added to `lib/shorts.ts`.
+- **Course path** (`/courses`) — the five-course video journey, 50 lessons, 85%-watched gating,
+  server-graded quizzes, final activity, certificate. 23 videos live; a course with none is
+  noindex and shows a waitlist instead of ten "coming soon" rows.
+- **Academy** (`/academy/<track>/<lesson>`) — the WRITTEN lessons: Spark 6, Wire 6, Forge 4, Edge 3.
+  One system only. `/academy/c/*` (a second, JSON-driven Academy with three "Coming Soon"
+  waitlists) was retired on 8 Nov 2026 and 308s to the tracks; see `content/academy/RETIRED.md`.
+  Do not reintroduce a parallel lesson system.
 - **R2 Co-pilot** — the AI mentor and clearest differentiator. Grounded in Atlas (RAG), never hallucinates.
   Free 10 msgs/day, Pro unlimited. Available everywhere (⌘K).
 - **Robot Projects** — 10+ guided builds, full BOM, code (Monaco), simulator fallback.
 - **Simulators (Visualizer)** — 9 interactive tools; visually stunning, shareable/embeddable.
-- **Workspace IDE / 3D Simulation / ROS2 Playground** — serious-robotics showcases; lazy-load heavy libs.
+- **Workspace IDE / ROS2 Playground** — serious-robotics showcases; lazy-load heavy libs.
+  (3D Simulation is gone: webots.cloud refuses embedding, so `/simulate` 308s to `/visualizer`.)
 - **News** — automated, global. Live RSS from top robotics sources + AI summaries. See §9 — moving to a
   stored, browsable archive so it's manageable and SEO-indexable.
 - **Lens** — best robotics videos, auto-ingested from YouTube channel RSS + AI summaries, plus curated picks.
-- **Lab** — discussions. **Daily Life** — approachable "robots around you." **Blog** — long-form editorial.
+- **Daily Life** — approachable "robots around you." **Blog** — explainers and comparisons.
+- **Lab** / **Project Showcase** — discussions and community builds. Both are EMPTY (0 posts,
+  0 projects), so both are out of the main nav and Disallow'd until they have content. Do not
+  put an empty surface in the nav.
 - **Daily Challenge** — habit loop (streak on profile, no public leaderboard).
 - **Find My Level** — visual placement test routing to a track.
 - **Community Gallery / Career Paths / Dashboard + Certificates** — social proof, roadmaps, progress.
 
-**Parked (code kept, hidden from nav + noindex until scale):** kids, jobs, leaderboard, schools,
-hardware index, standalone world-map (absorbed into Atlas).
+**Parked (code kept, hidden from nav + noindex until scale):** jobs, leaderboard, schools,
+hardware index, history, standalone world-map (308s to Atlas), pulse (308s to /news),
+lab, community gallery. `/kids` and `/kids/parents|activities` are indexable and parent-facing.
+Nothing parked may be promoted from the homepage — it was advertising `/schools` behind a
+"bring R2BOT to my school" CTA while robots.txt blocked the page.
 
 ---
 
 ## 7. NAVIGATION (max 5 top-level)
 
-`Learn ▾  Build ▾  Explore ▾  Community ▾  [Sign In] [Start Free →]`
-- **Learn:** Academy · Atlas · Find My Level · R2 Co-pilot · Daily Challenge
-- **Build:** Robot Projects · Simulators · Workspace IDE · 3D Simulation · ROS2 Playground
-- **Explore:** Atlas · Lens · News · Robotics in Daily Life · Blog
-- **Community:** Lab · Project Showcase · Career Paths · About
+`Learn ▾  Reference ▾  Build ▾  Latest ▾  About ▾  [lang] [Sign In] [Start Free →] [Ask R2]`
+- **Learn:** Quick Lessons · Free course path · Academy (4 tracks) · Find My Level · Daily Challenge
+- **Reference:** Atlas · AI + Robotics · Robots · Robotics in Daily Life · R2 Co-pilot
+- **Build:** Robot Projects · Simulators · ROS 2 Playground · Workspace IDE
+- **Latest:** News · Lens · Blog
+- **About:** About R2BOT · Written by Ravi · Career Paths · Robotics in India · For teachers
+
+Rules: about four items per group, each listed ONCE (Atlas used to appear in two menus), no
+language links in a menu (the header has a switcher), and nothing that leads to an empty page.
+`/lab`, `/showcase` and the language links live in the footer.
 
 ---
 
 ## 8. MONETIZATION (global)
 
-- **Free (permanent):** Atlas (all), Academy Spark course 1, Co-pilot 10 msgs/day, Diagnostic,
-  Simulators, Daily Challenge, News/Lens/Daily Life/Blog.
-- **Pro:** full Academy, unlimited Co-pilot, project review, certificates, offline downloads.
-  Price by region — India ₹799/mo·₹5,999/yr; international USD (~$9/mo·$69/yr) via Stripe.
-- **B2B / Institution:** licenses for schools/universities/bootcamps (data model only for now).
-- **Payments:** Razorpay (India) + Stripe (rest of world). Never use "free forever" language.
+**Everything is free and there are no payments** (decided Nov 2026). `/pricing` says exactly that:
+no card, no trial, no locked lesson. Co-pilot has a daily message cap; an account is needed only
+to save progress and earn certificates.
+
+The asset being built is the **audience**: the email list and the YouTube channel. The metric that
+matters is engaged subscribers, not visitors. If monetisation returns later it will be sponsorship,
+a paid cohort or hardware kits — not a gate on the current content. Do not add prices, plan tables
+or "upgrade" copy, and do not write "free forever" either.
 
 ---
 
@@ -184,11 +210,19 @@ Ordered. Each is a real project; do them completely.
 
 ## 10. DATA & LEAD CAPTURE
 
-- **Leads:** site-wide dismissible popup captures email (required) + phone (optional), triggered once the
-  visitor has viewed ~3 pages (engagement signal) or after a long single-page read. Stored in `leads`
-  (migration 0031), auto-subscribed to the newsletter, admin-viewable at `/admin/leads` with CSV export.
-- **Newsletter:** `newsletter_subscribers` (0021/0030) → weekly digest (Friday cron), one-click
-  unsubscribe for registered users and anonymous subscribers.
+- **One capture path.** Every form goes through `captureLead()` in `lib/lead-capture.ts`:
+  `lead_events` → `leads` → `newsletter_subscribers` → a welcome email within seconds. There used
+  to be a second endpoint (`/api/news/subscribe`) used by the homepage that wrote a row and sent
+  nothing; it now delegates to the same function. NEVER add a third capture path.
+- **Email only.** No phone number, ever. Every form carries a honeypot field; disposable domains
+  are rejected; the capture is rate limited.
+- **No time-triggered modals.** The onboarding dialog (800ms) and the lead popup (3 pages) are
+  unmounted. Capture happens after someone has got something: a correct quiz answer, the end of a
+  lesson, a waitlist for an unrecorded course.
+- **Newsletter:** `newsletter_subscribers` → welcome (day 0, 2, 5), course nudges (day 2/5/10 of
+  inactivity), certificate congratulations, and "R2BOT Weekly" on Friday. Per-stream send budgets
+  in `lib/email-automation.ts`; the weekly digest resumes Sat–Mon so nobody is silently skipped.
+  Resend free plan is ~100/day — raise it before the list passes ~90.
 - **Privacy:** collect only what we use; RLS on all tables; never expose PII to non-admins; be
   GDPR-minded now that the audience is global (consent-friendly, EEA-aware).
 
@@ -200,6 +234,9 @@ Ordered. Each is a real project; do them completely.
 - Client components: `'use client'` + `Client.tsx` suffix. Server: no browser APIs.
   `lib/supabase/server.ts` server-only; `client.ts` client-only.
 - Public content pages → SSG or `revalidate` ISR; no spinner-first pages; heavy libs dynamic-imported with skeletons.
+- No full-screen loading overlay (`app/loading.tsx` is a 2px bar) and no motion wrapper in
+  `app/template.tsx` — it put framer-motion in the first-load bundle of every route.
+- No decoration behind body text. ParticleField and CursorTrail are deleted; do not reintroduce them.
 - Tailwind utilities only (no inline style except runtime-dynamic). Amber-500 `#f59e0b` accent. Dark-first. Mobile-first.
 - No new npm packages without flagging. No hardcoded secrets — env vars only.
 - Semantic commits (`feat:` `fix:` `content:` `perf:` `refactor:`). `npm run type-check` clean + build passes before done.
@@ -212,6 +249,20 @@ Every public page renders meaningful server HTML (ISR/SSG) with correct metadata
 `https://www.r2bot.in`, structured data (JSON-LD), and strong internal links. Target global intent:
 "[concept] explained", "how does [concept] work", "ROS2 [topic]", "[component] for robotics". Submit a
 comprehensive sitemap to Search Console; own the result for every robotics concept, beginner to expert.
+
+**Non-negotiables learned the hard way (8 Nov 2026 audit):**
+- `app/sitemap.ts` has `revalidate` and must never be allowed to freeze into the build. The live
+  sitemap had been serving a July view of the site, missing ~300 pages including all 188 Quick
+  Lesson URLs. Verify after any deploy: `curl -s https://www.r2bot.in/sitemap.xml | grep -c "<loc>"`.
+- **Honest `lastmod`.** Dates come from the content or from `lib/content-dates.ts`. Update that
+  file in the same commit as a page change. Never `new Date()` for a static page.
+- **One page per query**, recorded in `lib/canonical-map.ts`: Atlas owns "what is X", Quick Lessons
+  own "how does X work", `/robots/<slug>` owns a named robot, the blog owns "X vs Y". Anything else
+  redirects or is differentiated and cross-linked.
+- **Never advertise what you noindex.** A course or lesson with no video is both.
+- **A named human author** on everything, from `lib/author.ts`. Not the organisation.
+- A page with no inbound internal link is invisible. `getRelatedEntries` balances the link graph
+  and rescues orphans; keep it that way if you touch it.
 
 **Atlas entry template:** `# Name` → one-sentence answer → What it is → How it works → Where you'll
 see it → Why it matters → Related (3–5 internal links) → Sources (2–3). Each entry spans the ladder
@@ -248,10 +299,14 @@ Secrets live only in Vercel env + local `.env.local` (gitignored) — never comm
 ## 15. WHEN YOU FINISH A TASK
 
 1. `npm run type-check` — zero errors. 2. `npm run build` — passes (or flag). 3. Public pages render
-real HTML (verify with curl if SSR). 4. Mobile checked, tap targets 44px+. 5. No "free forever" language.
-6. New env vars documented. 7. Semantic commit. 8. If it needs deploying, note a `npx vercel --prod` is required.
+real HTML — start the build and curl the routes you touched, do not assume. 4. Mobile checked, tap
+targets 44px+. 5. No prices and no "free forever" language. 6. New env vars documented. 7. Semantic
+commit, pushed to `main` (Vercel deploys itself). 8. If you added a migration, say so plainly in the
+hand-off: Ravi has to run it, and the code must work before he does.
 
 ---
 
 *Supersedes the previous India-first brief. R2BOT is a global, world-class robotics platform.
-Update this file as the product evolves.*
+Updated 8 Nov 2026 after a full product/SEO/retention audit — see
+`claude/r2bot-360-audit-2026-11-08.md` in the claude.ai project for the findings this file now
+encodes. Update this file as the product evolves; a stale brief is worse than none.*

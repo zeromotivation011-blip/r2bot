@@ -48,7 +48,11 @@ export default function CoursesPage() {
         <>
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
             '@context': 'https://schema.org', '@type': 'ItemList', name: 'R2BOT free robotics course path',
-            itemListElement: courses.map((c, i) => ({ '@type': 'ListItem', position: i + 1, url: `${BASE}/courses/${c.slug}`, name: c.title })),
+            // Only courses with a video: the other two are noindex, and
+            // advertising a noindex URL in schema is a contradiction.
+            itemListElement: courses
+              .filter((c) => c.lessons.some(hasVideo))
+              .map((c, i) => ({ '@type': 'ListItem', position: i + 1, url: `${BASE}/courses/${c.slug}`, name: c.title })),
           }) }} />
           <JourneyClient courses={courses.map((c, i) => ({
             slug: c.slug, title: c.title, tagline: c.tagline ?? c.description, level: c.levelLabel ?? c.level, order: c.order ?? i + 1,
