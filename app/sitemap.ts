@@ -8,6 +8,9 @@ import { listProjectSlugs } from '@/lib/build/loader';
 import { SIMULATORS } from '@/lib/simulators';
 import { AI_TOPICS } from '@/lib/ai-robotics';
 import { SHORTS } from '@/lib/shorts';
+import { SHORTS_ZH } from '@/lib/shorts-zh';
+import { SHORTS_HI } from '@/lib/shorts-hi';
+import { SHORTS_ES } from '@/lib/shorts-es';
 import { ZH_TOPICS } from '@/lib/ai-robotics-zh';
 import { HI_TOPICS } from '@/lib/ai-robotics-hi';
 import { ES_TOPICS } from '@/lib/ai-robotics-es';
@@ -92,11 +95,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const aiPages = [
     { url: `${BASE}/shorts`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.9 },
     { url: `${BASE}/hi/shorts`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.8 },
-    ...SHORTS.map((t) => ({ url: `${BASE}/hi/shorts/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    ...SHORTS.filter((t) => SHORTS_HI[t.slug]).map((t) => ({ url: `${BASE}/hi/shorts/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 })),
     { url: `${BASE}/es/shorts`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.8 },
-    ...SHORTS.map((t) => ({ url: `${BASE}/es/shorts/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    ...SHORTS.filter((t) => SHORTS_ES[t.slug]).map((t) => ({ url: `${BASE}/es/shorts/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 })),
     { url: `${BASE}/zh/shorts`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.8 },
-    ...SHORTS.map((t) => ({ url: `${BASE}/zh/shorts/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    ...SHORTS.filter((t) => SHORTS_ZH[t.slug]).map((t) => ({ url: `${BASE}/zh/shorts/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.7 })),
     ...SHORTS.map((t) => ({ url: `${BASE}/shorts/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 })),
     { url: `${BASE}/ai-robotics`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.9 },
     { url: `${BASE}/kids`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },

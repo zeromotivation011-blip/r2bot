@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { lessonLanguages } from '@/lib/shorts-i18n'
 import { SHORTS, SHORT_COURSES, getShort, shortsInCourse } from '@/lib/shorts'
 import ShortDemo from '@/components/shorts/ShortsDemos'
 import { ShortEmbed, LessonQuiz, ProgressBar } from '@/components/shorts/ShortsClient'
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: s.title,
     description: s.summary.slice(0, 158),
-    alternates: { canonical: `${BASE}/shorts/${s.slug}`, languages: { en: `${BASE}/shorts/${s.slug}`, 'zh-CN': `${BASE}/zh/shorts/${s.slug}`, hi: `${BASE}/hi/shorts/${s.slug}`, es: `${BASE}/es/shorts/${s.slug}` } },
+    alternates: { canonical: `${BASE}/shorts/${s.slug}`, languages: lessonLanguages(s.slug) },
     openGraph: { title: s.title, description: s.summary, images: [`https://i.ytimg.com/vi/${s.ids[0]}/hqdefault.jpg`] },
   }
 }

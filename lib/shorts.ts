@@ -2,6 +2,8 @@
 // Each lesson: embedded Short(s), animated demo, plain-English explanation,
 // "with it / without it", 1 quiz question, and links into the Atlas.
 
+import { SHORTS_MORE } from '@/lib/shorts-more'
+
 export type DemoKind = 'echo' | 'feedback' | 'gears' | 'tilt' | 'loop'
 
 export interface ShortLesson {
@@ -31,7 +33,7 @@ export const SHORT_COURSES: ShortCourse[] = [
   { slug: 'work', title: 'Robots at Work', blurb: 'Vacuums, warehouses and the stairs problem.', icon: '🏭' },
 ]
 
-export const SHORTS: ShortLesson[] = [
+const BASE_SHORTS: ShortLesson[] = [
   {
     slug: 'ultrasonic-sensor', title: 'Ultrasonic Sensor: How Robots Measure Distance With Sound', course: 'senses',
     ids: ['wGC41VivXBw', 'co0tT68HQlo'],
@@ -337,6 +339,8 @@ export const SHORTS: ShortLesson[] = [
     next: 'ultrasonic-sensor',
   },
 ]
+
+export const SHORTS: ShortLesson[] = [...BASE_SHORTS, ...SHORTS_MORE]
 
 export const getShort = (slug: string) => SHORTS.find((s) => s.slug === slug)
 export const shortsInCourse = (c: string) => SHORTS.filter((s) => s.course === c)

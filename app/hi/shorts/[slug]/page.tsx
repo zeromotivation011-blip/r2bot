@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { lessonLanguages } from '@/lib/shorts-i18n'
 import { SHORTS, getShort } from '@/lib/shorts'
 import { SHORTS_HI } from '@/lib/shorts-hi'
 import ShortDemo from '@/components/shorts/ShortsDemos'
@@ -8,13 +9,13 @@ import { ShortEmbed, LessonQuiz } from '@/components/shorts/ShortsClient'
 
 const BASE = 'https://www.r2bot.in'
 export const revalidate = 86400
-export function generateStaticParams() { return SHORTS.map((s) => ({ slug: s.slug })) }
+export function generateStaticParams() { return SHORTS.filter((s) => SHORTS_HI[s.slug]).map((s) => ({ slug: s.slug })) }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const slug = (await params).slug
   const z = SHORTS_HI[slug]
   if (!z) return {}
-  return { title: z.title, description: z.summary.slice(0, 150), alternates: { canonical: `${BASE}/hi/shorts/${slug}`, languages: { en: `${BASE}/shorts/${slug}`, 'zh-CN': `${BASE}/zh/shorts/${slug}`, hi: `${BASE}/hi/shorts/${slug}`, es: `${BASE}/es/shorts/${slug}` } } }
+  return { title: z.title, description: z.summary.slice(0, 150), alternates: { canonical: `${BASE}/hi/shorts/${slug}`, languages: lessonLanguages(slug) } }
 }
 
 const box = { padding: 16, borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' } as const
@@ -24,7 +25,7 @@ export default async function ZhShort({ params }: { params: Promise<{ slug: stri
   const s = getShort(slug)
   const z = SHORTS_HI[slug]
   if (!s || !z) notFound()
-  const next = getShort(s.next ?? SHORTS[0].slug) ?? SHORTS[0]
+  const next = (s.next && SHORTS_HI[s.next] ? getShort(s.next) : undefined) ?? SHORTS.find((x) => SHORTS_HI[x.slug] && x.slug !== slug) ?? SHORTS[0]
   const ld = [
     { '@context': 'https://schema.org', '@type': 'Article', inLanguage: 'hi', headline: z.title, description: z.summary, author: { '@type': 'Organization', name: 'R2BOT' }, mainEntityOfPage: `${BASE}/hi/shorts/${slug}` },
     ...s.ids.map((id) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: z.title, description: z.summary, thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${id}`, uploadDate: '2026-10-01' })),
