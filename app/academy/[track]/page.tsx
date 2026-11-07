@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Nav } from '@/components/Nav';
-import { ParticleField } from '@/components/ParticleField';
-import { CursorTrail } from '@/components/CursorTrail';
 import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
@@ -70,8 +68,6 @@ export default async function TrackOverviewPage({ params }: { params: Params }) 
 
   return (
     <CopilotProvider>
-      <ParticleField />
-      <CursorTrail />
       <Nav />
       <script
         type="application/ld+json"

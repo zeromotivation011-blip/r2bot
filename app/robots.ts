@@ -24,8 +24,11 @@ export default function robots(): MetadataRoute.Robots {
           '/jobs',
           '/leaderboard',
           '/history',
-          '/world-map',
-          '/pulse',
+          // /world-map and /pulse now 308 to /atlas and /news. A redirect must
+          // not also be Disallow'd: blocking it stops crawlers from ever seeing
+          // where it points, so the old URLs' equity never transfers.
+          '/lab',
+          '/community/gallery',
         ],
       },
     ],

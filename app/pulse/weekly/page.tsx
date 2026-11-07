@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { getAllPulse, countryLabel, countryClass, formatPulseDate } from '@/lib/pulse';
 import { Nav } from '@/components/Nav';
-import { ParticleField } from '@/components/ParticleField';
-import { CursorTrail } from '@/components/CursorTrail';
 import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
@@ -22,8 +20,6 @@ export default function PulseWeekly() {
 
   return (
     <CopilotProvider>
-      <ParticleField />
-      <CursorTrail />
       <Nav />
 
       <main id="main-content" style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>

@@ -31,7 +31,7 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
   const siblings = shortsInCourse(s.course)
   const next = getShort(s.next ?? SHORTS[0].slug) ?? SHORTS[0]
   const ld = [
-    ...s.ids.map((id) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: s.title, description: s.summary, thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${id}`, contentUrl: `https://www.youtube.com/shorts/${id}`, uploadDate: '2026-10-01', publisher: { '@type': 'Organization', name: 'R2BOT' } })),
+    ...s.ids.map((id) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: s.title, description: s.summary, thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${id}`, contentUrl: `https://www.youtube.com/shorts/${id}`, uploadDate: s.videoPublished ?? '2026-11-06', publisher: { '@type': 'Organization', name: 'R2BOT' } })),
     { '@context': 'https://schema.org', '@type': 'Article', headline: s.title, description: s.summary, author: { '@type': 'Organization', name: 'R2BOT' }, mainEntityOfPage: `${BASE}/shorts/${s.slug}` },
     { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Quick Lessons', item: `${BASE}/shorts` }, { '@type': 'ListItem', position: 2, name: s.title, item: `${BASE}/shorts/${s.slug}` }] },
   ]

@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import { Nav } from '@/components/Nav';
-import { ParticleField } from '@/components/ParticleField';
-import { CursorTrail } from '@/components/CursorTrail';
 import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
@@ -17,8 +15,6 @@ export const metadata: Metadata = {
 export default function DiagnosticPage() {
   return (
     <CopilotProvider>
-      <ParticleField />
-      <CursorTrail />
       <Nav />
       <DiagnosticClient />
       <CopilotBubble />

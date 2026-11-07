@@ -10,8 +10,6 @@ import {
   formatPulseDate,
 } from '@/lib/pulse';
 import { Nav } from '@/components/Nav';
-import { ParticleField } from '@/components/ParticleField';
-import { CursorTrail } from '@/components/CursorTrail';
 import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider, CopilotContextBinder } from '@/components/CopilotProvider';
@@ -90,8 +88,6 @@ export default async function PulseArticlePage(
   return (
     <CopilotProvider>
       <ReadingProgress />
-      <ParticleField />
-      <CursorTrail />
       <Nav />
       <CopilotContextBinder context={{ title: article.title, summary: article.summary, kind: 'pulse' }} />
 

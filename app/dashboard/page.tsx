@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { Nav } from '@/components/Nav';
-import { ParticleField } from '@/components/ParticleField';
-import { CursorTrail } from '@/components/CursorTrail';
 import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
@@ -84,8 +82,6 @@ export default async function DashboardPage() {
 
   return (
     <CopilotProvider>
-      <ParticleField />
-      <CursorTrail />
       <Nav />
       <main id="main-content" style={{ paddingTop: 130, paddingBottom: 80, position: 'relative', zIndex: 2 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto 24px', padding: '0 20px' }}><ResumeStrip /></div>

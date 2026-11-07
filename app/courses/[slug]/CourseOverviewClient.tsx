@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import CourseWaitlist from '@/components/CourseWaitlist'
 
 interface L { id: string; title: string; summary: string; durationMin: number; videoReady: boolean }
 interface Nav { slug: string; title: string }
@@ -29,7 +30,13 @@ export default function CourseOverviewClient(p: Props) {
   const done = new Set(prog?.completed ?? [])
   const readyCount = p.lessons.filter((l) => l.videoReady).length
   const pct = Math.round((done.size / p.lessons.length) * 100)
-  const next = p.lessons.find((l) => !done.has(l.id)) ?? p.lessons[0]
+  // Never start someone on a lesson whose video does not exist. Course 2's
+  // first lesson is not recorded while lessons 2-10 are, so "Start the course"
+  // used to land on an empty player.
+  const next =
+    p.lessons.find((l) => l.videoReady && !done.has(l.id)) ??
+    p.lessons.find((l) => l.videoReady) ??
+    p.lessons[0]
   const allLessonsDone = done.size >= p.lessons.length
   const submitted = !!prog?.assignment
 
@@ -56,11 +63,15 @@ export default function CourseOverviewClient(p: Props) {
       {p.tagline && <p className="text-lg text-gray-300 mt-2">{p.tagline}</p>}
       <p className="text-gray-400 mt-3">{p.description}</p>
       <p className="text-gray-500 text-sm mt-3">{p.lessons.length} lessons · about {p.minutes} min · quiz after every lesson{p.finalActivity ? ' · final activity' : ''}{p.presenters?.length ? ` · with ${p.presenters.join(', ')}` : ''}</p>
-      {readyCount < p.lessons.length && (
+      {/* A course with no videos is a dead end. Turn it into the one useful
+          action on the page instead of ten rows that all say "Coming soon". */}
+      {readyCount === 0 ? (
+        <CourseWaitlist courseSlug={p.slug} courseTitle={p.title} />
+      ) : readyCount < p.lessons.length ? (
         <p className="mt-4 rounded-lg border border-sky-500/30 bg-sky-500/10 text-sky-300 text-sm px-3 py-2">
-          {readyCount === 0 ? 'Videos for this course are coming soon. You can read the plan below.' : `${readyCount} of ${p.lessons.length} lesson videos are live. The rest are coming soon.`}
+          {readyCount} of {p.lessons.length} lesson videos are live. The rest are being recorded, and each lesson below shows its own state.
         </p>
-      )}
+      ) : null}
 
       {prog?.signedIn && (
         <div className="mt-6 rounded-xl border border-white/10 p-4">
@@ -88,15 +99,28 @@ export default function CourseOverviewClient(p: Props) {
 
       <h2 className="text-xl font-bold text-white mt-10">Lessons</h2>
       <ol className="mt-3 space-y-2">
-        {p.lessons.map((l, i) => (
-          <li key={l.id}>
-            <Link href={`/courses/${p.slug}/${l.id}`} className="flex items-start gap-3 rounded-xl border border-white/10 p-4 hover:border-amber-500/60">
-              <span className={`mt-0.5 w-6 h-6 shrink-0 rounded-full text-xs flex items-center justify-center font-bold ${done.has(l.id) ? 'bg-green-500 text-black' : 'bg-white/10 text-gray-300'}`}>{done.has(l.id) ? '✓' : i + 1}</span>
-              <span className="flex-1"><span className="block text-white font-semibold">{l.title}</span><span className="block text-gray-400 text-sm">{l.summary} · {l.durationMin} min</span></span>
-              {!l.videoReady && <span className="text-[11px] shrink-0 rounded-full border border-sky-500/40 text-sky-300 px-2 py-0.5">Coming soon</span>}
-            </Link>
-          </li>
-        ))}
+        {p.lessons.map((l, i) => {
+          const num = (
+            <span className={`mt-0.5 w-6 h-6 shrink-0 rounded-full text-xs flex items-center justify-center font-bold ${done.has(l.id) ? 'bg-green-500 text-black' : 'bg-white/10 text-gray-300'}`}>{done.has(l.id) ? '✓' : i + 1}</span>
+          )
+          const body = (
+            <span className="flex-1"><span className="block text-white font-semibold">{l.title}</span><span className="block text-gray-400 text-sm">{l.summary} · {l.durationMin} min</span></span>
+          )
+          return (
+            <li key={l.id}>
+              {l.videoReady ? (
+                <Link href={`/courses/${p.slug}/${l.id}`} className="flex items-start gap-3 rounded-xl border border-white/10 p-4 hover:border-amber-500/60">
+                  {num}{body}
+                </Link>
+              ) : (
+                <div className="flex items-start gap-3 rounded-xl border border-dashed border-white/10 p-4 opacity-70">
+                  {num}{body}
+                  <span className="text-[11px] shrink-0 rounded-full border border-white/20 px-2 py-0.5 text-gray-400">Not recorded yet</span>
+                </div>
+              )}
+            </li>
+          )
+        })}
       </ol>
 
       {p.finalActivity && (

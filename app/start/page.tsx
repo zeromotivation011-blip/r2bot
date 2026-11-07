@@ -9,7 +9,26 @@ export const metadata: Metadata = {
   alternates: { canonical: `${BASE}/start` },
 }
 
-const PATHS = [
+// Ordered. The first card is the recommended default: one minute of value
+// before we ask for anything. Every href below must land on something that
+// exists today — three of these used to point at "Coming Soon · notify me at
+// launch" waitlists, so the recommended path for a beginner ended on an email
+// form for a course that had no lessons.
+const PATHS: {
+  emoji: string
+  title: string
+  time: string
+  primary?: boolean
+  steps: { t: string; href: string }[]
+}[] = [
+  {
+    emoji: '⚡', title: 'I have one minute', time: 'One minute each', primary: true,
+    steps: [
+      { t: 'Watch: how a robot measures distance', href: '/shorts/ultrasonic-sensor' },
+      { t: 'Watch: how a servo holds its angle', href: '/shorts/servo-motor' },
+      { t: 'All 47 one-minute lessons', href: '/shorts' },
+    ],
+  },
   {
     emoji: '🎬', title: 'I like short videos and a clear path', time: 'About 2 hours',
     steps: [
@@ -23,7 +42,7 @@ const PATHS = [
     emoji: '🌱', title: 'I am brand new to robotics', time: 'About 4 hours',
     steps: [
       { t: 'Read: how robots work', href: '/blog/how-do-robots-work' },
-      { t: 'Spark course, lesson 1', href: '/academy/c/spark-foundations' },
+      { t: 'Spark lesson 1: what a robot is', href: '/academy/spark/01' },
       { t: 'Try a simulator', href: '/visualizer' },
       { t: 'Look up any word in the Atlas', href: '/atlas' },
     ],
@@ -32,7 +51,7 @@ const PATHS = [
     emoji: '💻', title: 'I can code and want to build', time: 'About 8 hours',
     steps: [
       { t: 'Pick a board: Arduino, ESP32 or Pi', href: '/blog/arduino-vs-esp32-vs-raspberry-pi-for-robots' },
-      { t: 'Wire course (Arduino robotics)', href: '/academy/c/wire-arduino-robotics' },
+      { t: 'Wire track: build real ROS 2 robots', href: '/academy/wire/01' },
       { t: 'Learn PID control', href: '/blog/pid-controller-explained-simply' },
       { t: 'Build a guided project', href: '/build' },
     ],
@@ -41,7 +60,7 @@ const PATHS = [
     emoji: '🧩', title: 'I want to learn ROS 2', time: 'About 10 hours',
     steps: [
       { t: 'ROS vs ROS 2: what to learn', href: '/blog/ros-vs-ros2-which-to-learn' },
-      { t: 'Forge course (ROS 2)', href: '/academy/c/forge-ros2' },
+      { t: 'Forge track: Nav2 and MoveIt2', href: '/academy/forge/01' },
       { t: 'Understand SLAM', href: '/blog/what-is-slam-in-plain-words' },
       { t: 'Practise in the ROS 2 playground', href: '/ros2' },
     ],
@@ -69,8 +88,20 @@ export default function StartPage() {
 
       <div className="grid md:grid-cols-2 gap-5 mt-10">
         {PATHS.map((p) => (
-          <section key={p.title} className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+          <section
+            key={p.title}
+            className={
+              p.primary
+                ? 'rounded-2xl border border-amber-500/50 bg-amber-500/[0.07] p-6 md:col-span-2'
+                : 'rounded-2xl border border-white/10 bg-white/[0.02] p-6'
+            }
+          >
             <div className="text-3xl">{p.emoji}</div>
+            {p.primary && (
+              <p className="mt-2 text-xs font-bold uppercase tracking-widest text-amber-400">
+                Start here
+              </p>
+            )}
             <h2 className="text-xl font-extrabold text-white mt-2">{p.title}</h2>
             <p className="text-gray-500 text-xs mt-1">{p.time}</p>
             <ol className="mt-4 space-y-2">

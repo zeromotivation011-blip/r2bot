@@ -1,18 +1,16 @@
+/**
+ * Route-level loading UI.
+ *
+ * This used to be a full-screen overlay ("Loading R2BOT…") that covered the
+ * page on every single navigation. On a content site that is the worst possible
+ * trade: it hides content that is usually milliseconds away, and it is the
+ * first thing a visitor arriving from Google or a YouTube link sees. A 2px bar
+ * at the top says the same thing without blanking the screen.
+ */
 export default function Loading() {
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-[#0A0E17]/95 backdrop-blur"
-    >
-      <div className="relative h-20 w-20" aria-hidden>
-        <div className="absolute inset-0 rounded-full border-2 border-amber-500/20" />
-        <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-amber-400 border-r-amber-500" />
-        <span className="absolute inset-0 flex items-center justify-center text-3xl">🤖</span>
-      </div>
-      <p className="font-mono text-xs uppercase tracking-[0.35em] text-amber-300">
-        Loading R2BOT…
-      </p>
+    <div role="status" aria-live="polite" className="r2-route-bar">
+      <span aria-hidden className="r2-route-bar__fill" />
       <span className="sr-only">Loading</span>
     </div>
   );

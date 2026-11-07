@@ -20,7 +20,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: `${c.title} — Free Video Course`,
     description: c.description,
     alternates: { canonical: `${BASE}/courses/${c.slug}` },
-    robots: c.status === 'draft' ? { index: false } : undefined,
+    // A course with no recorded videos is a plan, not a course: keep it out of
+    // the index until it has something to watch, so we never rank for a page
+    // whose every lesson says "not recorded yet".
+    robots: c.status === 'draft' || !c.lessons.some(hasVideo) ? { index: false } : undefined,
   }
 }
 

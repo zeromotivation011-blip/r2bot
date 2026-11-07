@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
 import { Nav } from './Nav';
-import { ParticleField } from './ParticleField';
-import { CursorTrail } from './CursorTrail';
 import { CopilotBubble } from './CopilotBubble';
 import { CopilotDrawer } from './CopilotDrawer';
 import { CopilotProvider } from './CopilotProvider';
@@ -25,8 +23,6 @@ export function StaticPage({
 }) {
   return (
     <CopilotProvider>
-      <ParticleField />
-      <CursorTrail />
       <Nav />
 
       <main style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>

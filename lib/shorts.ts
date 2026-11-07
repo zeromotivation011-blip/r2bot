@@ -19,6 +19,15 @@ export interface ShortLesson {
   demo: DemoKind
   loop?: [string, string, string] // sense / think / act labels (for demo 'loop')
   quiz: { q: string; options: [string, string, string]; answer: 0 | 1 | 2; why: string }
+  /**
+   * Date the Short went up on the channel, as an ISO day. Used for
+   * VideoObject.uploadDate, which Google requires for video rich results.
+   * Every page used to declare the same hardcoded 2026-10-01, which is invalid
+   * structured data on 188 pages. These are the days each batch of lessons was
+   * published; swap in exact per-video dates from the YouTube API when we have
+   * them.
+   */
+  videoPublished?: string
   atlas: { label: string; href: string }[]
   next?: string // related lesson slug
 }
@@ -340,7 +349,11 @@ const BASE_SHORTS: ShortLesson[] = [
   },
 ]
 
-export const SHORTS: ShortLesson[] = [...BASE_SHORTS, ...SHORTS_MORE]
+// Default publish dates per batch; an individual lesson can override.
+export const SHORTS: ShortLesson[] = [
+  ...BASE_SHORTS.map((s) => ({ videoPublished: '2026-11-06', ...s })),
+  ...SHORTS_MORE.map((s) => ({ videoPublished: '2026-11-07', ...s })),
+]
 
 export const getShort = (slug: string) => SHORTS.find((s) => s.slug === slug)
 export const shortsInCourse = (c: string) => SHORTS.filter((s) => s.course === c)

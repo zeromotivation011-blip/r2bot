@@ -61,8 +61,44 @@ const nextConfig = {
       permanent: true,
     }));
 
+    // Nine Atlas robot entries were the same robot as a /robots page, so each
+    // one competed with itself for its own name. /robots/<slug> wins: specs,
+    // stats, comparisons and a deep dive, against ~200 words in the Atlas.
+    // Kept in sync with ATLAS_ROBOT_CANONICAL in lib/canonical-map.ts
+    // (duplicated because next.config.mjs cannot import TypeScript).
+    const atlasRobotCanonical = Object.entries({
+      asimo: 'asimo',
+      atlas: 'atlas',
+      optimus: 'optimus',
+      roomba: 'roomba',
+      spot: 'spot',
+      'curiosity-rover': 'curiosity',
+      'da-vinci-surgical-system': 'da-vinci',
+      'kiva-warehouse-robots': 'amazon-kiva',
+      'perseverance-rover': 'perseverance',
+    }).map(([from, to]) => ({
+      source: `/atlas/robot/${from}`,
+      destination: `/robots/${to}`,
+      permanent: true,
+    }));
+
     return [
       ...simulatorAliases,
+      ...atlasRobotCanonical,
+      // The /academy/c/* course system is retired. It was a second Academy
+      // whose only complete course duplicated the Spark MDX lessons, and whose
+      // other three were "Coming Soon · notify me" waitlists that /start sent
+      // beginners to. One Academy now: /academy/<track>/<lesson>.
+      { source: '/academy/c/spark-foundations/learn/:lesson', destination: '/academy/spark', permanent: true },
+      { source: '/academy/c/wire-arduino-robotics/learn/:lesson', destination: '/academy/wire', permanent: true },
+      { source: '/academy/c/forge-ros2/learn/:lesson', destination: '/academy/forge', permanent: true },
+      { source: '/academy/c/edge-ai-robotics/learn/:lesson', destination: '/academy/edge', permanent: true },
+      { source: '/academy/c/spark-foundations', destination: '/academy/spark', permanent: true },
+      { source: '/academy/c/wire-arduino-robotics', destination: '/academy/wire', permanent: true },
+      { source: '/academy/c/forge-ros2', destination: '/academy/forge', permanent: true },
+      { source: '/academy/c/edge-ai-robotics', destination: '/academy/edge', permanent: true },
+      { source: '/academy/c/:slug/learn/:lesson', destination: '/academy', permanent: true },
+      { source: '/academy/c/:slug', destination: '/academy', permanent: true },
       // webots.cloud blocks embedding (X-Frame-Options: DENY), so the 3D Simulation page cannot work.
       { source: '/simulate', destination: '/visualizer', permanent: true },
       { source: '/world-map', destination: '/atlas', permanent: true },

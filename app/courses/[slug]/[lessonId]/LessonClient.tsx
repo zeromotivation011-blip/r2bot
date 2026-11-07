@@ -4,7 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Q { q: string; options: string[] }
 interface Lesson { id: string; title: string; summary: string; youtubeId: string; videoNo?: number; durationMin: number; quiz: Q[] }
-interface Props { courseSlug: string; courseTitle: string; lesson: Lesson; index: number; total: number; nextId: string | null; prevId: string | null }
+interface Props {
+  courseSlug: string; courseTitle: string; lesson: Lesson; index: number; total: number
+  nextId: string | null; prevId: string | null
+  /** First lesson of this course that does have a video, so an unrecorded lesson is never a dead end. */
+  firstReadyId: string | null
+}
 interface Review { ok: boolean; why: string | null; answer: number }
 interface Result { needsAssignment?: boolean; passed: boolean; score: number; review: Review[]; courseComplete?: boolean; certificateId?: string | null; completed?: number; total?: number; error?: string }
 
@@ -14,7 +19,7 @@ declare global { interface Window { YT?: { Player: new (el: HTMLElement, o: unkn
 
 const NEED = 0.85
 
-export default function LessonClient({ courseSlug, courseTitle, lesson, index, total, nextId, prevId }: Props) {
+export default function LessonClient({ courseSlug, courseTitle, lesson, index, total, nextId, prevId, firstReadyId }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const player = useRef<YTPlayer | null>(null)
   const watchedS = useRef(0)
@@ -110,10 +115,20 @@ export default function LessonClient({ courseSlug, courseTitle, lesson, index, t
 
       <div className="mt-6 rounded-xl overflow-hidden border border-white/10 bg-black" style={{ aspectRatio: '16 / 9' }}>
         {placeholder
-          ? <div className="h-full flex flex-col items-center justify-center text-center p-6 gap-2">
+          ? <div className="h-full flex flex-col items-center justify-center text-center p-6 gap-3">
               <span className="text-4xl" aria-hidden>🎬</span>
-              <p className="text-white font-bold">This video is coming soon</p>
-              <p className="text-gray-400 text-sm max-w-sm">Lesson {lesson.videoNo ?? index + 1} is being finished. Come back soon, or read the summary above and try the earlier lessons.</p>
+              <p className="text-white font-bold">This lesson is not recorded yet</p>
+              <p className="text-gray-400 text-sm max-w-sm">You have read what it covers. Keep going with a lesson that is ready — nothing here needs to wait for this one.</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {firstReadyId && firstReadyId !== lesson.id && (
+                  <Link href={`/courses/${courseSlug}/${firstReadyId}`} className="min-h-[44px] inline-flex items-center rounded-xl bg-amber-500 px-4 font-bold text-black">
+                    Go to the first ready lesson →
+                  </Link>
+                )}
+                <Link href="/shorts" className="min-h-[44px] inline-flex items-center rounded-xl border border-white/20 px-4 font-bold text-white">
+                  Try a one-minute lesson
+                </Link>
+              </div>
             </div>
           : <div ref={box} className="w-full h-full" />}
       </div>

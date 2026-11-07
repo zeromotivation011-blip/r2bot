@@ -10,7 +10,16 @@ import { getAllAtlasEntries } from '@/lib/atlas'
 import { SHORTS } from '@/lib/shorts'
 
 const DAY = 86_400_000
-const MAX_PER_RUN = 80 // stay well inside Resend free limits (100/day)
+
+// Resend's free plan allows ~100 emails a day. One shared budget used to mean
+// that on a Friday the weekly digest competed with welcomes and nudges, and
+// anyone past the cap simply never received that week's issue — the run was not
+// resumed the next day. Each stream now has its own allowance, and the weekly
+// digest is resumable: it keeps the same `kind` for the whole week, so the next
+// daily run picks up exactly the subscribers who have not had it yet.
+const DAILY_BUDGET = 90
+const BUDGET = { welcome: 20, nudge: 20, cert: 10, weekly: 40 } as const
+type Stream = keyof typeof BUDGET
 
 type Result = { welcome: number; nudges: number; certs: number; weekly: number; errors: string[] }
 
@@ -24,19 +33,24 @@ export async function runEmailAutomation(): Promise<Result> {
   const { Resend } = await import('resend')
   const resend = new Resend(apiKey)
   const sb = createSupabaseAdminClient()
-  let budget = MAX_PER_RUN
+  const spent: Record<Stream, number> = { welcome: 0, nudge: 0, cert: 0, weekly: 0 }
+  const totalSpent = () => spent.welcome + spent.nudge + spent.cert + spent.weekly
 
-  async function sendOnce(email: string, kind: string, subject: string, html: string): Promise<boolean> {
-    if (budget <= 0) return false
+  async function sendOnce(
+    email: string, kind: string, subject: string, html: string, stream: Stream,
+  ): Promise<boolean> {
+    if (spent[stream] >= BUDGET[stream] || totalSpent() >= DAILY_BUDGET) return false
+    // email_log has a unique (email, kind) constraint, so this insert is the
+    // lock: if it fails, this person has already had this exact email.
     const { error: dup } = await sb.from('email_log').insert({ email: email.toLowerCase(), kind })
-    if (dup) return false // already sent (unique violation) or log table missing
+    if (dup) return false
     const { error } = await resend.emails.send({ from, to: email, subject, html })
     if (error) {
       out.errors.push(`${kind}: ${error.message}`)
       await sb.from('email_log').delete().eq('email', email.toLowerCase()).eq('kind', kind)
       return false
     }
-    budget -= 1
+    spent[stream] += 1
     return true
   }
 
@@ -56,7 +70,7 @@ export async function runEmailAutomation(): Promise<Result> {
           bodyHtml: `<p>Reading about robots is good. Driving one is better. Our free simulators run in your browser. Nothing to install.</p><p>Try one and change a setting. Watch what breaks. That is how engineers learn.</p>${button('Open the simulators', `${BASE_URL}/visualizer`)}`,
           unsubscribeUrl: unsub,
         })
-        if (await sendOnce(email, 'welcome-2', 'Try a robot simulator (5 minutes)', html)) out.welcome++
+        if (await sendOnce(email, 'welcome-2', 'Try a robot simulator (5 minutes)', html, 'welcome')) out.welcome++
       }
       if (age >= 5) {
         const html = renderEmail({
@@ -65,7 +79,7 @@ export async function runEmailAutomation(): Promise<Result> {
           bodyHtml: `<p>R2BOT has a free path of five courses, from "what is a robot" to robot vision and AI. Each lesson is about four minutes. Pass the quiz, finish the final activity, and get a certificate you can share.</p>${button('See the free course path', `${BASE_URL}/courses`)}`,
           unsubscribeUrl: unsub,
         })
-        if (await sendOnce(email, 'welcome-3', 'Your free robotics course path', html)) out.welcome++
+        if (await sendOnce(email, 'welcome-3', 'Your free robotics course path', html, 'welcome')) out.welcome++
       }
     }
   } catch (e) { out.errors.push(`welcome: ${(e as Error).message}`) }
@@ -121,7 +135,7 @@ export async function runEmailAutomation(): Promise<Result> {
           bodyHtml: `<p>${esc(copy[step].line)}</p>${button('Continue the course', `${BASE_URL}/courses/${c.slug}`)}`,
           unsubscribeUrl: unsub,
         })
-        if (await sendOnce(String(p.email), `nudge-${step}:${c.slug}`, copy[step].subj, html)) out.nudges++
+        if (await sendOnce(String(p.email), `nudge-${step}:${c.slug}`, copy[step].subj, html, 'nudge')) out.nudges++
       }
 
       for (const ct of certs ?? []) {
@@ -136,7 +150,7 @@ export async function runEmailAutomation(): Promise<Result> {
           bodyHtml: `<p>Your certificate is ready. Anyone can check it at this link:</p><p><a href="${verify}" style="color:#FC6818">${verify}</a></p>${button('View my certificate', verify)}${next ? `<p>Next in the path: <strong>${esc(next.title)}</strong>.</p>${button('Start the next course', `${BASE_URL}/courses/${next.slug}`)}` : ''}`,
           unsubscribeUrl: unsub,
         })
-        if (await sendOnce(String(p.email), `cert:${ct.certificate_id}`, `Your certificate: ${c.title}`, html)) out.certs++
+        if (await sendOnce(String(p.email), `cert:${ct.certificate_id}`, `Your certificate: ${c.title}`, html, 'cert')) out.certs++
       }
     }
   } catch (e) { out.errors.push(`nudges: ${(e as Error).message}`) }
@@ -144,7 +158,11 @@ export async function runEmailAutomation(): Promise<Result> {
   // ── 3. R2BOT Weekly for every newsletter subscriber (Fridays, UTC) ─────
   try {
     const now = new Date()
-    if (now.getUTCDay() === 5) {
+    // Send on Friday, then keep going on the following days until every
+    // subscriber has had this week's issue. The `kind` is the week number, so
+    // email_log guarantees nobody receives it twice however many runs it takes.
+    const day = now.getUTCDay()
+    if (day === 5 || day === 6 || day === 0 || day === 1) {
       const yearStart = Date.UTC(now.getUTCFullYear(), 0, 1)
       const week = Math.floor((Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - yearStart) / (7 * DAY))
       const kind = `weekly-${now.getUTCFullYear()}-${week}`
@@ -170,7 +188,7 @@ export async function runEmailAutomation(): Promise<Result> {
           bodyHtml: `<p>Three things worth knowing this week.</p>${storiesHtml}${lessonHtml}${termHtml}<h3 style="margin:18px 0 6px">Keep learning</h3><p style="margin:0 0 6px">Five free courses with quizzes and certificates.</p>${button('Open the courses', `${BASE_URL}/courses`)}`,
           unsubscribeUrl: unsub,
         })
-        if (await sendOnce(String(sub.email), kind, 'R2BOT Weekly: robotics in plain English', html)) out.weekly++
+        if (await sendOnce(String(sub.email), kind, 'R2BOT Weekly: robotics in plain English', html, 'weekly')) out.weekly++
       }
     }
   } catch (e) { out.errors.push(`weekly: ${e instanceof Error ? e.message : String(e)}`) }

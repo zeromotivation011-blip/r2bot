@@ -44,6 +44,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         courseSlug={c.slug} courseTitle={c.title} lesson={toPublicLesson(l)}
         index={idx} total={c.lessons.length}
         nextId={c.lessons[idx + 1]?.id ?? null} prevId={c.lessons[idx - 1]?.id ?? null}
+        firstReadyId={c.lessons.find(hasVideo)?.id ?? null}
       />
     </>
   )

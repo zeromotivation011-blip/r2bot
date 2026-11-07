@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import { Nav } from '@/components/Nav';
-import { ParticleField } from '@/components/ParticleField';
-import { CursorTrail } from '@/components/CursorTrail';
 import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
@@ -53,8 +51,6 @@ rclpy.spin(HelloNode())`,
 export default function ROS2Page() {
   return (
     <CopilotProvider>
-      <ParticleField />
-      <CursorTrail />
       <Nav />
       <main id="main-content" style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>
         <div className="container" style={{ maxWidth: 920 }}>

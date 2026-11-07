@@ -19,8 +19,6 @@ export const revalidate = 86400;
 import { getAcademyLessonForAtlasTerm, TRACK_EMOJI, TRACK_NAME } from '@/lib/atlas-academy-map';
 import { ROBOTS_BY_SLUG } from '@/lib/robots-data';
 import { Nav } from '@/components/Nav';
-import { ParticleField } from '@/components/ParticleField';
-import { CursorTrail } from '@/components/CursorTrail';
 import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider, CopilotContextBinder } from '@/components/CopilotProvider';
@@ -201,8 +199,6 @@ export default async function AtlasEntryPage(
   return (
     <CopilotProvider>
       <ReadingProgress />
-      <ParticleField />
-      <CursorTrail />
       <Nav />
       <KeyboardShortcuts />
       <PageViewTracker contentType="atlas" contentSlug={`${type}/${slug}`} />

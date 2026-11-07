@@ -4,11 +4,9 @@ import Script from 'next/script';
 import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { SkipToContent } from '@/components/SkipToContent';
-import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import { LowDataMode } from '@/components/LowDataMode';
 import { PWAPrompt } from '@/components/PWAPrompt';
 import { ToastProvider } from '@/components/Toast';
-import { OnboardingModal } from '@/components/OnboardingModal';
 import { ProgressBanner } from '@/components/ProgressBanner';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { AuthModal } from '@/components/auth/AuthModal';
@@ -111,8 +109,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </AuthProvider>
         <SiteViewCounter />
         <RefCapture />
-        <HideOnEmbed><OnboardingModal /></HideOnEmbed>
-        <HideOnEmbed><LeadCaptureModal /></HideOnEmbed>
+        {/* No time-triggered modals. An onboarding dialog at 800ms and a lead
+            popup after three pages both interrupt before we have given anyone
+            a reason to care; email capture now sits after a correct quiz
+            answer and at the end of a lesson, which is where intent is.
+            OnboardingModal / LeadCaptureModal are kept in the codebase but are
+            no longer mounted. */}
         <HideOnEmbed><LowDataMode /></HideOnEmbed>
         <HideOnEmbed><PWAPrompt /></HideOnEmbed>
         {GA_ID && (

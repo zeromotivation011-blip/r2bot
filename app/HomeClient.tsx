@@ -378,7 +378,7 @@ function CoursePath() {
         <div style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 28px' }}>
           <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 12px' }}>Free course path</p>
           <h2 style={{ fontSize: 'clamp(26px,4vw,42px)', fontWeight: 900, margin: 0, color: '#fff' }}>Five courses. From zero to your own robot design.</h2>
-          <p style={{ marginTop: 10, color: '#94a3b8', fontSize: 15 }}>50 short video lessons, a quiz after each one, a final activity and a certificate for every course. Free, in plain English.</p>
+          <p style={{ marginTop: 10, color: '#94a3b8', fontSize: 15 }}>Fifty short video lessons, a quiz after each one, a final activity and a certificate for every course. Free, in plain English — 23 videos are live and the rest are being recorded.</p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
           {steps.map((c) => (
@@ -807,7 +807,13 @@ function LensTeaser({ items }: { items: HomeVideoItem[] }) {
   )
 }
 
-// ─── SCHOOLS TEASER ───────────────────────────────────────────────────────
+// ─── TEACHERS TEASER ──────────────────────────────────────────────────────
+// This used to promote /schools: a parked section that robots.txt disallows,
+// behind a "Bring R2BOT to my school" CTA, advertising a teacher dashboard and
+// bulk certificates. Promising a product that is not ready, from the homepage,
+// is the fastest way to lose a teacher's trust. /teachers is real today — a
+// free 40-minute lesson plan, printable activities and embeddable demos — so
+// the section points there instead.
 function SchoolsTeaser() {
   return (
     <section style={{ padding: '80px 20px' }}>
@@ -819,16 +825,16 @@ function SchoolsTeaser() {
         }}>
           <div>
             <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 12px' }}>
-              For Schools
+              For teachers
             </p>
             <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, color: '#fff', margin: '0 0 14px', lineHeight: 1.2 }}>
-              Bring robotics to your classroom.
+              One free robotics class, ready to teach.
             </h2>
             <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.7, margin: '0 0 24px', maxWidth: 560 }}>
-              Auto-graded missions, teacher progress dashboard, curriculum alignment tables, and verifiable certificates — everything a school needs to run a robotics programme.
+              A 40-minute lesson plan in plain English, interactive demos you can embed in your own page, printable activities that need only paper, and short video lessons with quizzes. No sign-up needed for students to read or try anything.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
-              {['Browser-based simulators', 'Grade-wise curriculum', 'Teacher dashboard', 'Free for schools', 'Bulk certificates', 'CBSE/NEP alignment'].map(f => (
+              {['40-minute lesson plan', 'Browser demos, no install', 'Printable activities', 'Embeddable in your site', 'Free, no student accounts'].map(f => (
                 <span key={f} style={{
                   fontSize: 12, fontWeight: 700, color: '#FC6818',
                   background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)',
@@ -838,17 +844,17 @@ function SchoolsTeaser() {
                 </span>
               ))}
             </div>
-            <Link href="/schools" style={{
+            <Link href="/teachers" style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 48, padding: '0 22px',
               background: '#FC6818', color: '#0f0a1e', borderRadius: 12,
               fontWeight: 900, fontSize: 15, textDecoration: 'none',
             }}>
-              Bring R2BOT to my school →
+              Open the teacher guide →
             </Link>
           </div>
           <div style={{ textAlign: 'center', minWidth: 160 }}>
             <div style={{ fontSize: 56 }}>🏫</div>
-            <p style={{ fontSize: 13, color: '#64748b', margin: '8px 0 0', fontWeight: 700 }}>Grades 6–12</p>
+            <p style={{ fontSize: 13, color: '#64748b', margin: '8px 0 0', fontWeight: 700 }}>Ages 13+</p>
           </div>
         </div>
       </div>
@@ -859,6 +865,8 @@ function SchoolsTeaser() {
 // ─── NEWSLETTER ───────────────────────────────────────────────────────────
 function NewsletterCTA() {
   const [email, setEmail] = useState('')
+  // Honeypot: a real person never sees this field, so anything in it is a bot.
+  const [trap, setTrap] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle')
   const [errText, setErrText] = useState<string | null>(null)
 
@@ -867,9 +875,9 @@ function NewsletterCTA() {
     if (!email.trim()) return
     setStatus('loading'); setErrText(null)
     try {
-      const res = await fetch('/api/news/subscribe', {
+      const res = await fetch('/api/leads', {
         method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: email.trim(), source: 'home-digest', page: '/', honeypot: trap }),
       })
       const json = await res.json()
       if (json.ok) { setStatus('ok'); setEmail('') }
@@ -892,6 +900,11 @@ function NewsletterCTA() {
           IFR reports, new research, standout robotics startups, and R2BOT updates. Curated, not dumped.
         </p>
         <form onSubmit={submit} style={{ display: 'flex', gap: 10, maxWidth: 440, margin: '0 auto 12px', flexWrap: 'wrap' }}>
+          <input
+            type="text" tabIndex={-1} autoComplete="off" aria-hidden value={trap}
+            onChange={e => setTrap(e.target.value)} name="company"
+            style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+          />
           <input
             type="email" required value={email}
             onChange={e => setEmail(e.target.value)}
@@ -926,10 +939,13 @@ function NewsletterCTA() {
 // ─── FOOTER ───────────────────────────────────────────────────────────────
 function Footer() {
   const cols: { h: string; links: { label: string; href: string }[] }[] = [
-    { h: 'Academy',  links: [{ label: 'Free Course Path', href: '/courses' }, { label: 'Spark Track', href: '/academy' }, { label: 'Wire Track', href: '/academy' }, { label: 'Forge Track', href: '/academy' }, { label: 'Edge Track', href: '/academy' }] },
-    { h: 'Explore',  links: [{ label: 'Atlas', href: '/atlas' }, { label: 'Simulators', href: '/visualizer' }, { label: 'Lens', href: '/lens' }, { label: 'Blog', href: '/blog' }] },
-    { h: 'Discover', links: [{ label: 'Daily Life', href: '/daily-life' }, { label: 'Career Paths', href: '/careers' }, { label: 'Daily News', href: '/news' }, { label: 'Diagnostic Test', href: '/diagnostic' }] },
-    { h: 'Company',  links: [{ label: 'Mission', href: '/mission' }, { label: 'Contact', href: 'mailto:hello@r2bot.in' }, { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' }] },
+    // Four "Track" links all pointing at /academy was four ways to go to the
+    // same place. The surfaces removed from the main nav live here instead.
+    { h: 'Learn',    links: [{ label: 'Quick Lessons', href: '/shorts' }, { label: 'Free course path', href: '/courses' }, { label: 'Academy', href: '/academy' }, { label: 'Find my level', href: '/diagnostic' }, { label: 'Daily Challenge', href: '/challenge' }] },
+    { h: 'Reference',links: [{ label: 'Atlas', href: '/atlas' }, { label: 'AI + Robotics', href: '/ai-robotics' }, { label: 'Robots', href: '/robots' }, { label: 'Simulators', href: '/visualizer' }, { label: 'Robot projects', href: '/build' }] },
+    { h: 'Discover', links: [{ label: 'News', href: '/news' }, { label: 'Lens', href: '/lens' }, { label: 'Blog', href: '/blog' }, { label: 'Daily life', href: '/daily-life' }, { label: 'Career paths', href: '/careers' }] },
+    { h: 'Community',links: [{ label: 'The Lab', href: '/lab' }, { label: 'Project showcase', href: '/showcase' }, { label: 'Robotics in India', href: '/india' }, { label: 'For teachers', href: '/teachers' }] },
+    { h: 'Company',  links: [{ label: 'About', href: '/about' }, { label: 'Written by Ravi', href: '/author/ravi' }, { label: 'Mission', href: '/mission' }, { label: 'Contact', href: 'mailto:hello@r2bot.in' }, { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' }] },
   ]
   return (
     <footer style={{ padding: '56px 20px', background: '#08080d', borderTop: '1px solid #1f1f2a' }}>

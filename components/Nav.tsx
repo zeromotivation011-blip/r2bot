@@ -25,72 +25,76 @@ type TrackGrid = {
 type Item = Leaf | TrackGrid;
 type Group = { label: string; items: Item[]; matches: string[] };
 
+// Five groups, ~4 items each. This was five menus and about thirty
+// destinations, with Atlas listed twice, four language links buried inside
+// "Learn" (there is a language switcher in the header for that), and two
+// entries — Lab and Project Showcase — that lead to pages reading "0 questions"
+// and "0 projects submitted". A visitor cannot hold thirty options; they need
+// one obvious place to start.
+//
+// Removed from the nav, still reachable by URL and from the footer where they
+// belong: Lab and Showcase (until they have content), and the language links
+// (now only in the header switcher).
 const GROUPS: Group[] = [
   {
     label: 'Learn',
-    matches: ['/diagnostic', '/start', '/academy', '/courses', '/atlas', '/challenge', '/copilot'],
+    matches: ['/shorts', '/courses', '/academy', '/diagnostic', '/challenge', '/start'],
     items: [
+      { kind: 'link', icon: '⚡', label: 'Quick Lessons', sub: 'One minute each · video, demo, quiz', href: '/shorts', highlight: true },
+      { kind: 'link', icon: '🎬', label: 'Free course path', sub: 'Short videos · quizzes · certificates', href: '/courses' },
       {
         kind: 'track-grid',
-        parent: { icon: '🎓', label: 'Academy', sub: 'Structured tracks', href: '/academy' },
+        parent: { icon: '🎓', label: 'Academy', sub: 'Written lessons, beginner to research', href: '/academy' },
         tracks: [
           { icon: '⚡', label: 'Spark · Beginner', href: '/academy/spark', tone: 'spark' },
           { icon: '🔌', label: 'Wire · Intermediate', href: '/academy/wire', tone: 'wire' },
           { icon: '🔥', label: 'Forge · Advanced', href: '/academy/forge', tone: 'forge' },
-          { icon: '⚡️', label: 'Edge · Research', href: '/academy/edge', tone: 'edge' },
+          { icon: '🧠', label: 'Edge · Research', href: '/academy/edge', tone: 'edge' },
         ],
       },
-      { kind: 'link', icon: '🇨🇳', label: '中文 (简体)', sub: 'AI 与机器人,通俗讲解', href: '/zh' },
-      { kind: 'link', icon: '🇮🇳', label: 'हिंदी', sub: 'AI और रोबोटिक्स, आसान भाषा में', href: '/hi' },
-      { kind: 'link', icon: '🇪🇸', label: 'Español', sub: 'IA y robótica, en lenguaje sencillo', href: '/es' },
-      { kind: 'link', icon: '🍎', label: 'For teachers', sub: 'Free 40-minute lesson plan', href: '/teachers' },
-      { kind: 'link', icon: '🧭', label: 'Start here', sub: 'Pick your path · free', href: '/start' },
-      { kind: 'link', icon: '⚡', label: 'Quick Lessons', sub: '1-minute videos · demos · quiz', href: '/shorts', highlight: true },
-      { kind: 'link', icon: '🎬', label: 'Free course path', sub: '5 courses · quizzes · certificates', href: '/courses' },
-      { kind: 'link', icon: '📚', label: 'Atlas', sub: '480+ concepts explained', href: '/atlas' },
-      { kind: 'link', icon: '⚡', label: 'Daily Challenge', sub: 'Quick puzzle · streak', href: '/challenge' },
-      {
-        kind: 'link',
-        icon: '🎯',
-        label: 'Find My Level',
-        sub: 'Quick placement test',
-        href: '/diagnostic',
-        highlight: true,
-      },
-      { kind: 'link', icon: '🤖', label: 'R2 Co-pilot', sub: 'AI mentor · ask anything', href: '/copilot', highlight: true },
+      { kind: 'link', icon: '🎯', label: 'Find My Level', sub: 'Two-minute placement test', href: '/diagnostic' },
+      { kind: 'link', icon: '🔥', label: 'Daily Challenge', sub: 'One puzzle a day · streak', href: '/challenge' },
+    ],
+  },
+  {
+    label: 'Reference',
+    matches: ['/atlas', '/ai-robotics', '/robots', '/daily-life', '/copilot'],
+    items: [
+      { kind: 'link', icon: '📚', label: 'Atlas', sub: '500+ robotics ideas in plain English', href: '/atlas', highlight: true },
+      { kind: 'link', icon: '🧠', label: 'AI + Robotics', sub: 'Guides, model directory, glossary', href: '/ai-robotics' },
+      { kind: 'link', icon: '🦾', label: 'Robots', sub: 'The robots everyone should know', href: '/robots' },
+      { kind: 'link', icon: '🌍', label: 'Robotics in Daily Life', sub: 'The robots already around you', href: '/daily-life' },
+      { kind: 'link', icon: '🤖', label: 'R2 Co-pilot', sub: 'Ask anything, grounded in the Atlas', href: '/copilot' },
     ],
   },
   {
     label: 'Build',
-    matches: ['/build', '/visualizer', '/workspace', '/ros2'],
+    matches: ['/build', '/visualizer', '/ros2', '/workspace'],
     items: [
-      { kind: 'link', icon: '🤖', label: 'Robot Projects', sub: '10 guided builds · learn by doing', href: '/build', highlight: true },
-      { kind: 'link', icon: '🔬', label: 'Simulators', sub: '9 interactive tools', href: '/visualizer' },
-      { kind: 'link', icon: '💻', label: 'Workspace IDE', sub: 'Code & simulate', href: '/workspace' },
-      { kind: 'link', icon: '🌐', label: 'ROS2 Playground', sub: 'Live shell', href: '/ros2' },
+      { kind: 'link', icon: '🔧', label: 'Robot Projects', sub: 'Guided builds with full parts lists', href: '/build', highlight: true },
+      { kind: 'link', icon: '🔬', label: 'Simulators', sub: 'Nine tools, no hardware needed', href: '/visualizer' },
+      { kind: 'link', icon: '🌐', label: 'ROS 2 Playground', sub: 'A live shell in the browser', href: '/ros2' },
+      { kind: 'link', icon: '💻', label: 'Workspace IDE', sub: 'Write code and simulate it', href: '/workspace' },
     ],
   },
   {
-    label: 'Explore',
-    matches: ['/lens', '/news', '/daily-life', '/blog'],
+    label: 'Latest',
+    matches: ['/news', '/lens', '/blog'],
     items: [
-      { kind: 'link', icon: '🧠', label: 'AI + Robotics', sub: 'Plain-English guides', href: '/ai-robotics' },
-      { kind: 'link', icon: '📚', label: 'Atlas', sub: 'Full knowledge universe', href: '/atlas' },
-      { kind: 'link', icon: '🔭', label: 'Lens', sub: 'Best robotics videos, decoded', href: '/lens' },
-      { kind: 'link', icon: '📰', label: 'News', sub: 'Daily robotics updates', href: '/news' },
-      { kind: 'link', icon: '🌍', label: 'Robotics in Daily Life', sub: 'Robotics in everyday life', href: '/daily-life' },
-      { kind: 'link', icon: '📝', label: 'Blog', sub: 'Long-form editorial', href: '/blog' },
+      { kind: 'link', icon: '📰', label: 'News', sub: 'Robotics, updated daily', href: '/news' },
+      { kind: 'link', icon: '🔭', label: 'Lens', sub: 'The best robotics videos, decoded', href: '/lens' },
+      { kind: 'link', icon: '📝', label: 'Blog', sub: 'Explainers and comparisons', href: '/blog' },
     ],
   },
   {
-    label: 'Community',
-    matches: ['/lab', '/showcase', '/careers', '/about'],
+    label: 'About',
+    matches: ['/about', '/author', '/careers', '/india', '/teachers'],
     items: [
-      { kind: 'link', icon: '💬', label: 'Lab', sub: 'Ask & discuss', href: '/lab' },
-      { kind: 'link', icon: '🏆', label: 'Project Showcase', sub: 'Built by the community', href: '/showcase' },
-      { kind: 'link', icon: '🇮🇳', label: 'Robotics in India', sub: 'Milestones, companies, your path', href: '/india' },
-      { kind: 'link', icon: '🛣️', label: 'Career Paths', sub: 'Roadmaps to robotics jobs', href: '/careers' },
-      { kind: 'link', icon: '📢', label: 'About R2BOT', sub: 'Our mission', href: '/about' },
+      { kind: 'link', icon: '📢', label: 'About R2BOT', sub: 'Why this exists', href: '/about' },
+      { kind: 'link', icon: '✍️', label: 'Written by Ravi', sub: 'Who writes and builds this', href: '/author/ravi' },
+      { kind: 'link', icon: '🛣️', label: 'Career Paths', sub: 'Roadmaps into robotics jobs', href: '/careers' },
+      { kind: 'link', icon: '🇮🇳', label: 'Robotics in India', sub: 'Competitions, colleges, companies', href: '/india' },
+      { kind: 'link', icon: '🍎', label: 'For teachers', sub: 'A free 40-minute lesson plan', href: '/teachers' },
     ],
   },
 ];

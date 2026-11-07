@@ -28,7 +28,7 @@ export default async function EsShort({ params }: { params: Promise<{ slug: stri
   const next = (s.next && SHORTS_ES[s.next] ? getShort(s.next) : undefined) ?? SHORTS.find((x) => SHORTS_ES[x.slug] && x.slug !== slug) ?? SHORTS[0]
   const ld = [
     { '@context': 'https://schema.org', '@type': 'Article', inLanguage: 'es', headline: z.title, description: z.summary, author: { '@type': 'Organization', name: 'R2BOT' }, mainEntityOfPage: `${BASE}/es/shorts/${slug}` },
-    ...s.ids.map((id) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: z.title, description: z.summary, thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${id}`, uploadDate: '2026-10-01' })),
+    ...s.ids.map((id) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: z.title, description: z.summary, thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${id}`, uploadDate: s.videoPublished ?? '2026-11-06' })),
   ]
   return (
     <main style={{ maxWidth: 820, margin: '0 auto', padding: '110px 20px 80px' }}>

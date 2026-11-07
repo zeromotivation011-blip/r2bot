@@ -44,7 +44,13 @@ export default function JourneyClient({ courses }: { courses: JourneyCourse[] })
                 <p className="text-gray-500 mt-3 text-xs">{c.lessons} lessons · about {c.minutes} min · quizzes · final activity · certificate</p>
                 <p className="text-gray-500 mt-1 text-xs">Before you start: {c.prerequisites}</p>
                 <div className="flex items-center gap-3 mt-3 flex-wrap">
-                  {c.videosReady < c.lessons && <span className="text-[11px] rounded-full border border-sky-500/40 text-sky-300 px-2 py-0.5">{c.videosReady === 0 ? 'Videos coming soon' : `${c.videosReady}/${c.lessons} videos live`}</span>}
+                  {c.videosReady === 0 ? (
+                    <span className="text-[11px] rounded-full border border-white/20 text-gray-400 px-2 py-0.5">Recording now · read the plan</span>
+                  ) : c.videosReady < c.lessons ? (
+                    <span className="text-[11px] rounded-full border border-sky-500/40 text-sky-300 px-2 py-0.5">{c.videosReady} of {c.lessons} videos live</span>
+                  ) : (
+                    <span className="text-[11px] rounded-full border border-green-500/40 text-green-300 px-2 py-0.5">All {c.lessons} videos live</span>
+                  )}
                   {prog?.signedIn && done > 0 && <span className="text-[11px] text-green-400">{done}/{c.lessons} done ({pct}%)</span>}
                   {cert && <span className="text-[11px] text-green-400">🎓 Certificate earned</span>}
                 </div>

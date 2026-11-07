@@ -14,18 +14,27 @@ export const metadata: Metadata = {
 
 export default function CoursesPage() {
   const courses = listPublishedCourses()
+  // State the real numbers at the top. "Every lesson is a short video" read as
+  // though all fifty existed; a visitor only found out course by course.
+  const videosReady = courses.reduce((n, c) => n + c.lessons.filter(hasVideo).length, 0)
+  const lessonsTotal = courses.reduce((n, c) => n + c.lessons.length, 0)
+  const coursesReady = courses.filter((c) => c.lessons.every(hasVideo)).length
   return (
     <main className="max-w-5xl mx-auto px-5 py-14">
       <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-500">Your robotics journey</p>
       <h1 className="text-3xl md:text-5xl font-black text-white mt-2">Five free courses, from zero to your own robot design</h1>
-      <p className="text-gray-400 mt-4 max-w-2xl">Follow the path in order, or jump to the course you need. Every lesson is a short video of about 4 minutes with a quick quiz. Each course ends with a small final activity and a certificate you can verify and share. Everything is free.</p>
+      <p className="text-gray-400 mt-4 max-w-2xl">Follow the path in order, or jump to the course you need. Each lesson is a short video of about four minutes with a quick quiz, and each course ends with a small final activity and a certificate you can verify and share. Everything is free.</p>
+      <p className="mt-3 max-w-2xl rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-gray-300">
+        <strong className="text-white">{videosReady} of {lessonsTotal} videos are live right now</strong> ({coursesReady} course{coursesReady === 1 ? '' : 's'} complete). The rest are being recorded — every lesson page shows its own state, and you can get an email when a course opens.
+      </p>
       <ul className="mt-5 flex flex-wrap gap-2 text-xs text-gray-300">
-        {['50 short lessons', 'Quiz after every lesson', 'Final activity per course', 'Certificate for each course', 'English · plain language'].map((t) => <li key={t} className="rounded-full border border-white/10 px-3 py-1">{t}</li>)}
+        {[`${lessonsTotal} short lessons`, 'Quiz after every lesson', 'Final activity per course', 'Certificate for each course', 'English · plain language'].map((t) => <li key={t} className="rounded-full border border-white/10 px-3 py-1">{t}</li>)}
       </ul>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [
           { q: 'Are the R2BOT courses really free?', a: 'Yes. All five courses, quizzes and certificates are free.' },
           { q: 'How long is each lesson?', a: 'Each lesson is a short video of about 4 minutes followed by a quick quiz.' },
+          { q: 'Are all the videos available yet?', a: 'Not yet. The course path is being recorded in order, and every course and lesson page says whether its video is live. You can ask to be emailed when a course opens.' },
           { q: 'Do I get a certificate?', a: 'Yes. Finish all lessons, pass the quizzes and complete the final activity to earn a certificate you can verify and share.' },
           { q: 'Do I need experience?', a: 'No. The first course starts from zero and the path builds up to robot design.' },
         ].map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
