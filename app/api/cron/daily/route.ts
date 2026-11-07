@@ -11,6 +11,7 @@ import { getLiveLensVideos } from '@/lib/lens-live';
 import { runDiscovery } from '@/lib/discovery';
 import { runEmailAutomation } from '@/lib/email-automation';
 import { runWeeklyBackup } from '@/lib/backup';
+import { runWeeklyIndexNow } from '@/lib/indexnow';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -67,6 +68,15 @@ async function weeklyBackup(): Promise<StepResult> {
   return { ok: r.ok, detail: r, error: r.errors[0] };
 }
 
+// Thursdays only. Announces every sitemap URL to IndexNow, which is how Bing —
+// and so Copilot and ChatGPT's web results — hears about a page within minutes
+// instead of whenever it next crawls. A different day from the backup so the
+// two heavy steps never share a 300-second cron run.
+async function weeklyIndexNow(): Promise<StepResult> {
+  const r = await runWeeklyIndexNow();
+  return { ok: r.ok, detail: r, error: r.error };
+}
+
 async function handle(req: NextRequest): Promise<Response> {
   if (!authorized(req)) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -79,6 +89,7 @@ async function handle(req: NextRequest): Promise<Response> {
     ['discovery', refreshDiscovery],
     ['emails', sendAutomatedEmails],
     ['backup', weeklyBackup],
+    ['indexnow', weeklyIndexNow],
   ] as const) {
     try {
       steps[name] = await fn();

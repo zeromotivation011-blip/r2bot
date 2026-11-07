@@ -10,10 +10,13 @@
 // builds the robots the lessons are about is the strongest credibility signal
 // this site has, and it was going unused.
 //
-// TODO (Ravi, one-line changes): set `name` to your full name as you want it
-// published, add `image` once there is a photo at /public/ravi.jpg, and add
-// your YouTube/LinkedIn/GitHub URLs to `sameAs`. Everything below is already
-// wired to these values.
+// Everything on the site reads from here: by-lines, the author page, and the
+// Person node inside Article/Course schema. To change how the author appears
+// anywhere, change it once, here.
+//
+// No photo by design: a Person without an `image` is valid schema, and a
+// stock or placeholder face would be worse than none. If a real photo ever
+// goes into /public, set `image` and it appears everywhere at once.
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
@@ -36,7 +39,7 @@ export const AUTHOR = {
     'https://www.youtube.com/@R2BOTINDIA',
     'https://www.instagram.com/r2bot.in',
   ],
-  /** Path to a photo in /public, or null until there is one. */
+  /** Path to a photo in /public. Null is fine — see the note above. */
   image: null as string | null,
   email: 'hello@r2bot.in',
 } as const
