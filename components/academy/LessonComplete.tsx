@@ -231,7 +231,7 @@ export function LessonComplete({
           display: inline-block;
           padding: 8px 16px;
           background: linear-gradient(135deg, #FF8A4C, #f97316);
-          color: #0f0a1e;
+          color: var(--void);
           border-radius: 999px;
           font-weight: 900; font-size: 14px;
           text-decoration: none;
@@ -248,7 +248,7 @@ export function LessonComplete({
         }
         .lc-primary {
           background: linear-gradient(135deg, #00E5FF, #A56BFF);
-          color: #0f0a1e;
+          color: var(--void);
         }
         .lc-secondary {
           background: rgba(255,255,255,0.06);

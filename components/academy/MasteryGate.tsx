@@ -109,7 +109,7 @@ function Styles() {
         display: inline-flex; align-items: center; justify-content: center;
         min-height: 50px; padding: 0 24px;
         background: linear-gradient(135deg, #00E5FF, #A56BFF);
-        color: #0f0a1e;
+        color: var(--void);
         font-weight: 900; font-size: 15px;
         border: none; border-radius: 12px;
         text-decoration: none;

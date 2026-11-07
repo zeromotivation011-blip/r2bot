@@ -91,7 +91,7 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
         <button
           onClick={download}
           style={{
-            padding: '10px 18px', background: '#FF8A4C', color: '#0f0a1e',
+            padding: '10px 18px', background: '#FF8A4C', color: 'var(--void)',
             fontWeight: 800, fontSize: 14, border: 'none', borderRadius: 10, cursor: 'pointer',
           }}
         >

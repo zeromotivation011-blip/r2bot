@@ -73,14 +73,14 @@ export default function SettingsClient() {
 
   if (isLoading || !user) {
     return (
-      <main className="min-h-screen bg-[#0A0E17] grid place-items-center text-white">
+      <main className="min-h-screen bg-[var(--void)] grid place-items-center text-white">
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-[#0A0E17] text-white pt-24 pb-20 px-4">
+    <main className="min-h-screen bg-[var(--void)] text-white pt-24 pb-20 px-4">
       <div className="mx-auto max-w-2xl">
         <div className="mb-5">
           <Link href="/profile" className="text-sm text-blue-400 hover:text-blue-300">← My profile</Link>
@@ -89,7 +89,7 @@ export default function SettingsClient() {
         </div>
 
         {/* Profile form */}
-        <form onSubmit={saveProfile} className="rounded-2xl border border-white/10 bg-[#111118] p-5 space-y-3">
+        <form onSubmit={saveProfile} className="rounded-2xl border border-white/10 bg-[var(--surface-1)] p-5 space-y-3">
           <h2 className="text-lg font-bold text-white">Profile</h2>
           <Field label="Display name"  value={displayName} onChange={setDisplayName} maxLength={40} />
           <Field label="Bio"           value={bio}         onChange={setBio} multiline maxLength={200} />
@@ -115,7 +115,7 @@ export default function SettingsClient() {
                   type="button"
                   key={o.v}
                   onClick={() => setLanguage(o.v)}
-                  className={`px-3 py-1.5 text-sm rounded-full border ${language === o.v ? 'bg-blue-500 text-white border-blue-500' : 'border-white/15 bg-[#0A0E17] text-zinc-300'}`}
+                  className={`px-3 py-1.5 text-sm rounded-full border ${language === o.v ? 'bg-blue-500 text-white border-blue-500' : 'border-white/15 bg-[var(--void)] text-zinc-300'}`}
                 >{o.l}</button>
               ))}
             </div>
@@ -126,7 +126,7 @@ export default function SettingsClient() {
         </form>
 
         {/* Password */}
-        <form onSubmit={changePassword} className="mt-6 rounded-2xl border border-white/10 bg-[#111118] p-5 space-y-3">
+        <form onSubmit={changePassword} className="mt-6 rounded-2xl border border-white/10 bg-[var(--surface-1)] p-5 space-y-3">
           <h2 className="text-lg font-bold text-white">Change password</h2>
           <Field label="Current password (informational only)" value={pwOld} onChange={setPwOld} type="password" />
           <Field label="New password (8+ chars)" value={pwNew} onChange={setPwNew} type="password" />
@@ -146,7 +146,7 @@ export default function SettingsClient() {
               <p className="text-sm text-red-200">Are you sure? This signs you out — to finish deletion, email <a href="mailto:hello@r2bot.in" className="underline">hello@r2bot.in</a>.</p>
               <div className="flex gap-2">
                 <button onClick={async () => { await signOut(); router.replace('/') }} className="rounded-xl bg-red-500 text-white px-4 py-2 text-sm font-bold">Sign me out</button>
-                <button onClick={() => setConfirmDelete(false)} className="rounded-xl border border-white/15 bg-[#0A0E17] text-zinc-300 px-4 py-2 text-sm font-bold">Cancel</button>
+                <button onClick={() => setConfirmDelete(false)} className="rounded-xl border border-white/15 bg-[var(--void)] text-zinc-300 px-4 py-2 text-sm font-bold">Cancel</button>
               </div>
             </div>
           )}
@@ -156,8 +156,8 @@ export default function SettingsClient() {
       <style jsx>{`
         :global(.input) {
           width: 100%;
-          background: #0A0E17;
-          border: 1px solid #1f1f2a;
+          background: var(--void);
+          border: 1px solid var(--border);
           color: #fff; font-size: 15px;
           padding: 9px 12px; border-radius: 10px;
           outline: none;

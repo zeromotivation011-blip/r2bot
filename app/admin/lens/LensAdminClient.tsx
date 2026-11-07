@@ -135,6 +135,6 @@ const inputStyle: React.CSSProperties = {
 }
 const lbl: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 5, fontSize: 12, color: '#94a3b8', fontWeight: 700 }
 const btnPrimary: React.CSSProperties = {
-  padding: '9px 18px', background: '#FF8A4C', color: '#0f0a1e', fontWeight: 800,
+  padding: '9px 18px', background: '#FF8A4C', color: 'var(--void)', fontWeight: 800,
   fontSize: 14, border: 'none', borderRadius: 10, cursor: 'pointer',
 }

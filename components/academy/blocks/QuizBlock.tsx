@@ -205,7 +205,7 @@ export function QuizBlock({ block, isCompleted, onComplete }: Props) {
         .qb-submit {
           min-height: 48px; padding: 0 22px;
           background: linear-gradient(135deg, #00E5FF, #A56BFF);
-          color: #0f0a1e;
+          color: var(--void);
           border: none; border-radius: 12px;
           font-weight: 900; font-size: 15px;
           cursor: pointer;

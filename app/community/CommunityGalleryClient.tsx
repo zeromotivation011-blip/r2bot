@@ -262,7 +262,7 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
       {toast && (
         <div role="status" style={{
           position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
-          background: '#111118', border: '1px solid rgba(252,104,24,0.4)',
+          background: 'var(--surface-1)', border: '1px solid rgba(252,104,24,0.4)',
           color: '#FF8A4C', padding: '12px 22px', borderRadius: 12,
           fontSize: 13, fontWeight: 700, zIndex: 100,
           boxShadow: '0 8px 24px rgba(0,0,0,0.5)',

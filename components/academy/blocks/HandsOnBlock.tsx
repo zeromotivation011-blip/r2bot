@@ -201,7 +201,7 @@ export function HandsOnBlock({ block, isCompleted, onComplete }: Props) {
         .ho-finish {
           min-height: 52px; padding: 0 22px;
           background: linear-gradient(135deg, #00E5FF, #A56BFF);
-          color: #0f0a1e;
+          color: var(--void);
           border: none; border-radius: 12px;
           font-weight: 900; font-size: 15px;
           cursor: pointer;

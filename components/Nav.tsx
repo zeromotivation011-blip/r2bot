@@ -531,7 +531,7 @@ function AuthMenu() {
         style={{
           width: 36, height: 36, borderRadius: '50%',
           background: 'linear-gradient(135deg, #f97316, #FC6818)',
-          color: '#0A0E17', border: 'none',
+          color: 'var(--void)', border: 'none',
           fontWeight: 900, fontSize: 14, cursor: 'pointer',
           display: 'grid', placeItems: 'center',
         }}
@@ -543,12 +543,12 @@ function AuthMenu() {
           style={{
             position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 50,
             minWidth: 220,
-            background: '#111118', border: '1px solid #1f1f2a',
+            background: 'var(--surface-1)', border: '1px solid var(--border)',
             borderRadius: 12, padding: 6,
             boxShadow: '0 16px 40px rgba(0,0,0,.5)',
           }}
         >
-          <div style={{ padding: '10px 12px', borderBottom: '1px solid #1f1f2a' }}>
+          <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--border)' }}>
             <p style={{ color: '#fff', fontSize: 14, fontWeight: 700, margin: 0 }}>{name}</p>
             {user.email && <p style={{ color: '#9ca3af', fontSize: 11, margin: 0 }}>{user.email}</p>}
           </div>
@@ -568,7 +568,7 @@ function AuthMenu() {
               color: #e5e7eb; font-size: 13px; font-weight: 600;
               text-decoration: none; border-radius: 8px;
             }
-            .auth-menu-item:hover { background: #1f1f2a; color: #fff; }
+            .auth-menu-item:hover { background: var(--border-2); color: #fff; }
           `}</style>
         </div>
       )}

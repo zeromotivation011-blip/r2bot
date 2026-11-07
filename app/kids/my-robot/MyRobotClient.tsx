@@ -270,7 +270,7 @@ export default function MyRobotClient() {
         }
         .panel input {
           width: 100%;
-          background: #0f0a1e;
+          background: var(--void);
           border: 2px solid #4c1d95;
           color: #FFC9A8;
           padding: 12px 14px;
@@ -290,7 +290,7 @@ export default function MyRobotClient() {
         .eyes-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .eyes-btn {
           min-height: 48px;
-          background: #0f0a1e;
+          background: var(--void);
           border: 2px solid #4c1d95;
           color: #FFC9A8;
           border-radius: 12px;
@@ -407,7 +407,7 @@ function RobotSilhouette({ primary, accent, eyes, earned }: {
 }) {
   const has = (id: string) => earned.has(id)
   const eyeShape = eyes === 'happy'      ? <><circle cx="58" cy="80" r="6" fill="#fde047" /><circle cx="92" cy="80" r="6" fill="#fde047" /></>
-                  : eyes === 'cool'       ? <><rect x="50" y="74" width="20" height="10" rx="2" fill="#0f0a1e" /><rect x="80" y="74" width="20" height="10" rx="2" fill="#0f0a1e" /></>
+                  : eyes === 'cool'       ? <><rect x="50" y="74" width="20" height="10" rx="2" fill="var(--void)" /><rect x="80" y="74" width="20" height="10" rx="2" fill="var(--void)" /></>
                   : eyes === 'determined' ? <><path d="M50 86 L70 78" stroke="#fde047" strokeWidth="4" strokeLinecap="round" /><path d="M100 86 L80 78" stroke="#fde047" strokeWidth="4" strokeLinecap="round" /></>
                   : <><circle cx="58" cy="80" r="5" fill="#fde047" /><circle cx="92" cy="80" r="7" fill="#fde047" /></>
   const ghost = '#312e81'
@@ -420,7 +420,7 @@ function RobotSilhouette({ primary, accent, eyes, earned }: {
           <line x1="75" y1="14" x2="75" y2="28" stroke={accent} strokeWidth="3" />
           <circle cx="75" cy="12" r="5" fill="#fde047" />
           <rect x="30" y="28" width="90" height="62" rx="14" fill={primary} stroke={accent} strokeWidth="3" />
-          <rect x="40" y="40" width="70" height="40" rx="8" fill="#0f0a1e" />
+          <rect x="40" y="40" width="70" height="40" rx="8" fill="var(--void)" />
           {eyeShape}
           <path d="M55 96 Q75 105 95 96" stroke="#fde047" strokeWidth="3" fill="none" strokeLinecap="round" />
         </>
@@ -432,7 +432,7 @@ function RobotSilhouette({ primary, accent, eyes, earned }: {
       {has('robot-body') ? (
         <>
           <rect x="40" y="92" width="70" height="70" rx="10" fill={accent} />
-          <rect x="60" y="110" width="30" height="20" rx="3" fill="#0f0a1e" />
+          <rect x="60" y="110" width="30" height="20" rx="3" fill="var(--void)" />
           <circle cx="68" cy="120" r="2" fill="#fde047" />
           <circle cx="82" cy="120" r="2" fill="#fde047" />
           <circle cx="68" cy="140" r="1.5" fill="#10b981" />
@@ -472,8 +472,8 @@ function RobotSilhouette({ primary, accent, eyes, earned }: {
         <>
           <circle cx="55" cy="180" r="18" fill={accent} />
           <circle cx="95" cy="180" r="18" fill={accent} />
-          <circle cx="55" cy="180" r="6" fill="#0f0a1e" />
-          <circle cx="95" cy="180" r="6" fill="#0f0a1e" />
+          <circle cx="55" cy="180" r="6" fill="var(--void)" />
+          <circle cx="95" cy="180" r="6" fill="var(--void)" />
         </>
       ) : (
         <>

@@ -215,7 +215,7 @@ export default function ZoneClient() {
         .story { font-size: 14px; margin-top: 6px; color: #FFC9A8; }
         .challenge { font-size: 13px; color: #c4b5fd; margin-top: 2px; }
         .boss-bar { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-weight: 800; font-size: 13px; color: #FF8A4C; }
-        .bar-track { flex: 1; height: 10px; background: #0f0a1e; border-radius: 999px; overflow: hidden; }
+        .bar-track { flex: 1; height: 10px; background: var(--void); border-radius: 999px; overflow: hidden; }
         .bar-fill { height: 100%; background: linear-gradient(90deg, #FC6818, #FF8A4C); transition: width .4s; }
         .boss-cta {
           margin-top: 14px;

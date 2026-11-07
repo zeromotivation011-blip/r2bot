@@ -331,8 +331,8 @@ export function DiagnosticClient() {
                       width: '100%',
                       padding: '16px 20px',
                       display: 'flex', alignItems: 'center', gap: 14,
-                      background: isSelected ? 'rgba(252,104,24, 0.12)' : '#111118',
-                      border: `1.5px solid ${isSelected ? '#FC6818' : '#1f1f2a'}`,
+                      background: isSelected ? 'rgba(252,104,24, 0.12)' : 'var(--surface-1)',
+                      border: `1.5px solid ${isSelected ? '#FC6818' : 'var(--border-2)'}`,
                       borderRadius: 14,
                       color: '#fff',
                       fontSize: 17,
@@ -342,7 +342,7 @@ export function DiagnosticClient() {
                       transition: 'border-color .15s, background .15s, transform .15s',
                     }}
                     onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#FC6818' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = isSelected ? '#FC6818' : '#1f1f2a' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = isSelected ? '#FC6818' : 'var(--border-2)' }}
                   >
                     {opt.emoji && <span style={{ fontSize: 26, lineHeight: 1 }} aria-hidden>{opt.emoji}</span>}
                     <span style={{ flex: 1 }}>{opt.label}</span>

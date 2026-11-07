@@ -83,7 +83,7 @@ export default async function EmbedSectionPage({
   const Simulator = COMPONENTS[sim.id];
 
   return (
-    <main className="min-h-screen bg-[#0A0E17] p-4 text-zinc-200">
+    <main className="min-h-screen bg-[var(--void)] p-4 text-zinc-200">
       <div className="mx-auto max-w-4xl">
         <h1 className="text-lg font-extrabold text-white">{sim.title}</h1>
         <p className="mt-1 text-sm text-zinc-400">{sim.blurb}</p>

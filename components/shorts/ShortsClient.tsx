@@ -24,12 +24,12 @@ export function useDone(): string[] {
 export function ShortEmbed({ id, title }: { id: string; title: string }) {
   const [play, setPlay] = useState(false)
   return (
-    <div style={{ position: 'relative', width: 'min(100%, 270px)', aspectRatio: '9 / 16', borderRadius: 16, overflow: 'hidden', background: '#0A0E17', border: '1px solid rgba(255,255,255,0.14)' }}>
+    <div style={{ position: 'relative', width: 'min(100%, 270px)', aspectRatio: '9 / 16', borderRadius: 16, overflow: 'hidden', background: 'var(--void)', border: '1px solid rgba(255,255,255,0.14)' }}>
       {play ? (
         <iframe src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1`} title={title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }} />
       ) : (
         <button onClick={() => setPlay(true)} aria-label={`Play: ${title}`} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0, padding: 0, cursor: 'pointer', background: `url(https://i.ytimg.com/vi/${id}/hqdefault.jpg) center/cover` }}>
-          <span style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: 64, height: 64, borderRadius: 999, background: '#FC6818', color: '#0A0E17', fontSize: 28, display: 'grid', placeItems: 'center' }}>▶</span>
+          <span style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: 64, height: 64, borderRadius: 999, background: '#FC6818', color: 'var(--void)', fontSize: 28, display: 'grid', placeItems: 'center' }}>▶</span>
         </button>
       )}
     </div>
@@ -71,7 +71,7 @@ export function LessonQuiz({ slug, quiz, nextHref, nextTitle, lang = 'en' }: { s
           <p style={{ color: '#e2e8f0', margin: '4px 0 12px', lineHeight: 1.6 }}>{quiz.why}</p>
           {correct ? (
             <>
-              <Link href={nextHref} style={{ display: 'inline-block', padding: '12px 20px', borderRadius: 12, background: '#FC6818', color: '#0A0E17', fontWeight: 800, textDecoration: 'none' }}>{L.next} {nextTitle} →</Link>
+              <Link href={nextHref} style={{ display: 'inline-block', padding: '12px 20px', borderRadius: 12, background: '#FC6818', color: 'var(--void)', fontWeight: 800, textDecoration: 'none' }}>{L.next} {nextTitle} →</Link>
               <div style={{ marginTop: 18 }}><InlineSignup lang={lang} /></div>
             </>
           ) : (

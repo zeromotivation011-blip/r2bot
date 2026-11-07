@@ -54,14 +54,14 @@ export function BuildABot({ onComplete }: { onComplete?: () => void }) {
             </g>
           )}
           <rect x="58" y="60" width="104" height="86" rx="14" fill={placed.head || placed.antenna || placed.eyes || placed.mouth ? '#3b82f6' : 'none'} />
-          <rect x="68" y="76" width="84" height="50" rx="6" fill={placed.head || placed.antenna || placed.eyes || placed.mouth ? '#0f0a1e' : 'none'} />
+          <rect x="68" y="76" width="84" height="50" rx="6" fill={placed.head || placed.antenna || placed.eyes || placed.mouth ? 'var(--void)' : 'none'} />
 
           {placed.eyes && (
             <g>
               <circle cx="84" cy="100" r="9" fill="#fde047" />
               <circle cx="136" cy="100" r="9" fill="#fde047" />
-              <circle cx="88" cy="96" r="3" fill="#0f0a1e" />
-              <circle cx="140" cy="96" r="3" fill="#0f0a1e" />
+              <circle cx="88" cy="96" r="3" fill="var(--void)" />
+              <circle cx="140" cy="96" r="3" fill="var(--void)" />
             </g>
           )}
           {placed.mouth && (
@@ -72,7 +72,7 @@ export function BuildABot({ onComplete }: { onComplete?: () => void }) {
           {placed.chest && (
             <g>
               <rect x="68" y="156" width="84" height="60" rx="10" fill="#f97316" />
-              <rect x="86" y="170" width="48" height="28" rx="4" fill="#0f0a1e" />
+              <rect x="86" y="170" width="48" height="28" rx="4" fill="var(--void)" />
               <circle cx="98" cy="184" r="3" fill="#fde047" />
               <circle cx="110" cy="184" r="3" fill="#10b981" />
               <circle cx="122" cy="184" r="3" fill="#3b82f6" />
@@ -98,8 +98,8 @@ export function BuildABot({ onComplete }: { onComplete?: () => void }) {
             <g>
               <circle cx="86" cy="240" r="18" fill="#1a1040" stroke="#3b82f6" strokeWidth="2" />
               <circle cx="134" cy="240" r="18" fill="#1a1040" stroke="#3b82f6" strokeWidth="2" />
-              <circle cx="86" cy="240" r="6" fill="#0f0a1e" />
-              <circle cx="134" cy="240" r="6" fill="#0f0a1e" />
+              <circle cx="86" cy="240" r="6" fill="var(--void)" />
+              <circle cx="134" cy="240" r="6" fill="var(--void)" />
             </g>
           ) : (
             <text x="110" y="244" fontSize="12" textAnchor="middle" fill="#4c1d95">feet</text>

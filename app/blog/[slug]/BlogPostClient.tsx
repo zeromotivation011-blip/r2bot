@@ -83,7 +83,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
   const authorInitial = post.author.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
 
   return (
-    <main className="min-h-screen bg-[#0A0E17] text-white pt-24 pb-20 px-4">
+    <main className="min-h-screen bg-[var(--void)] text-white pt-24 pb-20 px-4">
       <div className="mx-auto max-w-6xl">
         <Link href="/blog" className="text-sm text-blue-400 hover:text-blue-300">← All articles</Link>
 
@@ -99,7 +99,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
             <h1 className="mt-4 text-3xl md:text-5xl font-black text-white leading-[1.05]">{post.title}</h1>
             <p className="mt-3 text-lg text-zinc-300">{post.description}</p>
             <div className="mt-5 flex items-center gap-3 text-xs text-zinc-400 border-y border-white/10 py-3">
-              <span className="w-9 h-9 rounded-full grid place-items-center font-black text-sm" style={{ background: 'linear-gradient(135deg,#3b82f6,#f97316)', color: '#0A0E17' }}>{authorInitial}</span>
+              <span className="w-9 h-9 rounded-full grid place-items-center font-black text-sm" style={{ background: 'linear-gradient(135deg,#3b82f6,#f97316)', color: 'var(--void)' }}>{authorInitial}</span>
               <span><a href="/author/ravi" className="font-bold text-white underline decoration-white/30 hover:decoration-amber-400">{post.author}</a> · {post.authorRole}</span>
               <span className="ml-auto text-zinc-500">{fmtDate(post.date)} · {post.readTime} min read</span>
             </div>
@@ -144,7 +144,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
             </div>
 
             {/* Was this helpful */}
-            <div className="mt-12 rounded-2xl border border-white/10 bg-[#111118] p-5 flex items-center justify-between flex-wrap gap-3">
+            <div className="mt-12 rounded-2xl border border-white/10 bg-[var(--surface-1)] p-5 flex items-center justify-between flex-wrap gap-3">
               <p className="text-sm font-bold text-white">Was this article helpful?</p>
               <div className="flex gap-2">
                 <button onClick={() => vote('up')}   className={`px-4 py-2 rounded-xl text-sm font-bold border ${helpfulVote === 'up'   ? 'bg-emerald-500 text-white border-emerald-500' : 'border-white/15 text-zinc-200 hover:border-emerald-500/50'}`}>👍 Yes</button>
@@ -166,7 +166,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
                 <h3 className="text-xl font-black text-white">More articles</h3>
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {related.map(r => (
-                    <Link key={r.slug} href={`/blog/${r.slug}`} className="block rounded-xl border border-white/10 bg-[#111118] p-4 hover:border-blue-500/40">
+                    <Link key={r.slug} href={`/blog/${r.slug}`} className="block rounded-xl border border-white/10 bg-[var(--surface-1)] p-4 hover:border-blue-500/40">
                       <div className="text-2xl">{r.coverEmoji}</div>
                       <p className="mt-2 text-sm font-bold text-white leading-snug line-clamp-2">{r.title}</p>
                       <p className="mt-1 text-xs text-zinc-500">{r.readTime} min · {fmtDate(r.date)}</p>
@@ -179,10 +179,10 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
 
           {/* Sidebar */}
           <aside className="md:sticky md:top-24 self-start space-y-5">
-            <div className="rounded-2xl border border-white/10 bg-[#111118] p-4">
+            <div className="rounded-2xl border border-white/10 bg-[var(--surface-1)] p-4">
               <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Author</p>
               <div className="mt-2 flex items-center gap-3">
-                <span className="w-10 h-10 rounded-full grid place-items-center font-black text-sm" style={{ background: 'linear-gradient(135deg,#3b82f6,#f97316)', color: '#0A0E17' }}>{authorInitial}</span>
+                <span className="w-10 h-10 rounded-full grid place-items-center font-black text-sm" style={{ background: 'linear-gradient(135deg,#3b82f6,#f97316)', color: 'var(--void)' }}>{authorInitial}</span>
                 <div>
                   <p className="text-sm font-bold text-white"><a href="/author/ravi" className="underline decoration-white/30 hover:decoration-amber-400">{post.author}</a></p>
                   <p className="text-xs text-zinc-400">{post.authorRole}</p>
@@ -191,7 +191,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
             </div>
 
             {toc.length > 0 && (
-              <div className="rounded-2xl border border-white/10 bg-[#111118] p-4">
+              <div className="rounded-2xl border border-white/10 bg-[var(--surface-1)] p-4">
                 <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">On this page</p>
                 <ol className="mt-2 space-y-1.5">
                   {toc.map(t => (
@@ -203,7 +203,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
               </div>
             )}
 
-            <div className="rounded-2xl border border-white/10 bg-[#111118] p-4">
+            <div className="rounded-2xl border border-white/10 bg-[var(--surface-1)] p-4">
               <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Share</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <button onClick={copy}     className="text-xs rounded-lg bg-white/[0.05] border border-white/15 text-zinc-200 px-3 py-1.5 hover:border-blue-500/40">{copied ? '✓ Copied' : '🔗 Copy link'}</button>
@@ -213,7 +213,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
             </div>
 
             {related.length > 0 && (
-              <div className="rounded-2xl border border-white/10 bg-[#111118] p-4">
+              <div className="rounded-2xl border border-white/10 bg-[var(--surface-1)] p-4">
                 <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Related</p>
                 <ul className="mt-2 space-y-2">
                   {related.map(r => (

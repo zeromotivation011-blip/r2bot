@@ -194,7 +194,7 @@ function SchoolContactForm() {
         </label>
         <label>
           <span style={labelStyle}>Grades you teach</span>
-          <select name="grade" value={formData.grade} onChange={handleChange} style={{ ...inputStyle, background: '#0A0E17' }}>
+          <select name="grade" value={formData.grade} onChange={handleChange} style={{ ...inputStyle, background: 'var(--void)' }}>
             <option value="">Select grades</option>
             <option value="6-7">Grade 6–7</option>
             <option value="8-9">Grade 8–9</option>

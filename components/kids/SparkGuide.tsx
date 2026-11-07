@@ -229,7 +229,7 @@ function SparkSvg({ state }: { state: SparkState }) {
       <line x1="22" y1="4" x2="22" y2="8" stroke="#7c3aed" strokeWidth="2" />
       <circle cx="22" cy="3" r="2" fill="#fde047" />
       {/* screen */}
-      <rect x="10" y="13" width="24" height="16" rx="3" fill="#0f0a1e" />
+      <rect x="10" y="13" width="24" height="16" rx="3" fill="var(--void)" />
       {/* eyes */}
       {state === 'sleeping' ? (
         <>

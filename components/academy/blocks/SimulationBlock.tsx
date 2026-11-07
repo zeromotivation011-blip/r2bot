@@ -101,7 +101,7 @@ export function SimulationBlock({ block, isCompleted, onComplete }: Props) {
         .sb { display: flex; flex-direction: column; gap: 10px; }
         .sb.is-expanded {
           position: fixed; inset: 16px; z-index: 100;
-          background: #0f0a1e;
+          background: var(--void);
           padding: 18px; border-radius: 18px;
           border: 1px solid rgba(255,255,255,0.15);
           box-shadow: 0 30px 80px rgba(0,0,0,0.6);

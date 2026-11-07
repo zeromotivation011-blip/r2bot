@@ -77,7 +77,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
   const personalization = usePersonalization()
   const showDiagnosticBanner = personalization.signedIn && !personalization.track
   return (
-    <main style={{ background: '#0A0E17', color: '#fff' }}>
+    <main style={{ background: 'var(--void)', color: '#fff' }}>
       <FeatureTour />
       <Hero personalization={personalization} atlasCount={atlasCount} projectCount={projectCount} />
       {showDiagnosticBanner && (
@@ -116,7 +116,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
       <Footer />
 
       <style jsx global>{`
-        :global(body) { background: #0A0E17; }
+        :global(body) { background: var(--void); }
       `}</style>
     </main>
   )
@@ -138,7 +138,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
         overflow: 'hidden',
         padding: '120px 20px 60px',
         background:
-          'radial-gradient(ellipse at 20% 30%, rgba(252,104,24,.07), transparent 55%), #0A0E17',
+          'radial-gradient(ellipse at 20% 30%, rgba(252,104,24,.05), transparent 55%), var(--void)',
       }}
     >
       {/* Grid background */}
@@ -202,7 +202,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
             <Link href={continueHref} style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 54, padding: '0 28px',
               background: 'linear-gradient(135deg, #FC6818, #FC6818)',
-              color: '#0f0a1e', borderRadius: 14,
+              color: 'var(--void)', borderRadius: 14,
               fontSize: 16, fontWeight: 900, textDecoration: 'none',
               boxShadow: '0 10px 36px rgba(0,229,255,0.28)',
               transition: 'transform .15s, box-shadow .15s',
@@ -280,7 +280,7 @@ function StatPill({ n, label, color, displayValue }: { n: number; label: string;
 
   return (
     <div ref={ref} style={{
-      background: '#111118', border: '1px solid #1f1f2a',
+      background: 'var(--surface-1)', border: '1px solid var(--border)',
       borderRadius: 16, padding: '12px 18px',
     }}>
       <p style={{
@@ -307,11 +307,11 @@ function Ticker({ atlasCount }: { atlasCount: number }) {
     '🔥 Spaced repetition built in',
   ]
   return (
-    <section style={{ background: '#08080d', borderTop: '1px solid #1f1f2a', borderBottom: '1px solid #1f1f2a', overflow: 'hidden', height: 44, display: 'flex', alignItems: 'center' }}>
+    <section style={{ background: 'var(--void)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', overflow: 'hidden', height: 44, display: 'flex', alignItems: 'center' }}>
       <div style={{ position: 'relative', width: '100%' }}>
         <div className="ticker-track" style={{ display: 'inline-flex', whiteSpace: 'nowrap' }}>
           {[...items, ...items].map((t, i) => (
-            <span key={i} style={{ padding: '0 28px', color: '#cbd5e1', fontSize: 13, fontWeight: 600, borderRight: '1px solid #1f1f2a' }}>{t}</span>
+            <span key={i} style={{ padding: '0 28px', color: '#cbd5e1', fontSize: 13, fontWeight: 600, borderRight: '1px solid var(--border)' }}>{t}</span>
           ))}
         </div>
       </div>
@@ -382,7 +382,7 @@ function CoursePath() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
           {steps.map((c) => (
-            <Link key={c.n} href="/courses" style={{ display: 'block', padding: 18, background: '#111118', border: '1px solid #1f1f2a', borderRadius: 16, textDecoration: 'none' }}>
+            <Link key={c.n} href="/courses" style={{ display: 'block', padding: 18, background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 16, textDecoration: 'none' }}>
               <span style={{ display: 'inline-flex', width: 32, height: 32, borderRadius: 999, background: '#FC6818', color: '#000', fontWeight: 900, alignItems: 'center', justifyContent: 'center' }}>{c.n}</span>
               <p style={{ color: '#fff', fontWeight: 800, margin: '10px 0 4px', fontSize: 15 }}>{c.name}</p>
               <p style={{ color: '#94a3b8', fontSize: 13, margin: 0 }}>{c.sub}</p>
@@ -428,7 +428,7 @@ function Features({ atlasCount }: { atlasCount: number }) {
               href={c.href}
               style={{
                 display: 'block', padding: 24,
-                background: '#111118', border: '1px solid #1f1f2a',
+                background: 'var(--surface-1)', border: '1px solid var(--border)',
                 borderRadius: 18, textDecoration: 'none',
                 transition: 'transform .2s, border-color .2s, box-shadow .2s',
                 '--accent': c.color,
@@ -470,7 +470,7 @@ function SimulatorShowcase() {
   return (
     <section style={{
       padding: '80px 20px',
-      background: 'linear-gradient(180deg, #0A0E17 0%, #0d0818 50%, #0A0E17 100%)',
+      background: 'linear-gradient(180deg, var(--void) 0%, var(--surface-1) 50%, var(--void) 100%)',
       borderTop: '1px solid rgba(255,255,255,0.06)',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -491,7 +491,7 @@ function SimulatorShowcase() {
             <Link href="/visualizer" style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 50, padding: '0 24px',
               background: 'linear-gradient(135deg, #FC6818, #FC6818)',
-              color: '#0f0a1e', borderRadius: 12, fontWeight: 900, fontSize: 15,
+              color: 'var(--void)', borderRadius: 12, fontWeight: 900, fontSize: 15,
               textDecoration: 'none', boxShadow: '0 8px 24px rgba(255,184,0,0.22)',
             }}>
               Open Simulator Lab →
@@ -531,7 +531,7 @@ function IndiaSpotlight() {
   return (
     <section style={{
       position: 'relative', padding: '80px 20px',
-      background: 'linear-gradient(180deg, rgba(249,115,22,.08) 0%, rgba(16,185,129,.06) 100%), #0A0E17',
+      background: 'linear-gradient(180deg, rgba(252,104,24,.06) 0%, rgba(143,216,255,.05) 100%), var(--void)',
       borderTop: '1px solid rgba(249,115,22,.18)', borderBottom: '1px solid rgba(16,185,129,.15)',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -553,7 +553,7 @@ function IndiaSpotlight() {
             </div>
             <Link href="/atlas" style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 48, padding: '0 20px',
-              background: '#FC6818', color: '#0f0a1e', borderRadius: 12,
+              background: '#FC6818', color: 'var(--void)', borderRadius: 12,
               fontWeight: 900, fontSize: 14, textDecoration: 'none',
             }}>
               Explore the Robotics Atlas →
@@ -572,7 +572,7 @@ function Pillar({ emoji, title, body }: { emoji: string; title: string; body: st
   return (
     <div style={{
       borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)',
-      background: '#111118', padding: 16,
+      background: 'var(--surface-1)', padding: 16,
     }}>
       <div style={{ fontSize: 22 }}>{emoji}</div>
       <p style={{ marginTop: 8, fontSize: 10, textTransform: 'uppercase', letterSpacing: '2px', color: '#FC6818', fontWeight: 900 }}>{title}</p>
@@ -651,7 +651,7 @@ function Testimonials() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
           {points.map(p => (
             <div key={p.label} className="r2-lift" style={{
-              background: '#111118', border: '1px solid #1f1f2a',
+              background: 'var(--surface-1)', border: '1px solid var(--border)',
               borderRadius: 18, padding: '22px 20px',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
@@ -681,7 +681,7 @@ function Testimonials() {
 // ─── NEWS TEASER (live, from the automated aggregator) ────────────────────
 function NewsTeaser({ items }: { items: HomeNewsItem[] }) {
   return (
-    <section style={{ padding: '72px 20px', background: '#0A0E17', borderTop: '1px solid #1f1f2a' }}>
+    <section style={{ padding: '72px 20px', background: 'var(--void)', borderTop: '1px solid var(--border)' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 26 }}>
           <div>
@@ -846,7 +846,7 @@ function SchoolsTeaser() {
             </div>
             <Link href="/teachers" style={{
               display: 'inline-flex', alignItems: 'center', minHeight: 48, padding: '0 22px',
-              background: '#FC6818', color: '#0f0a1e', borderRadius: 12,
+              background: '#FC6818', color: 'var(--void)', borderRadius: 12,
               fontWeight: 900, fontSize: 15, textDecoration: 'none',
             }}>
               Open the teacher guide →
@@ -888,7 +888,7 @@ function NewsletterCTA() {
   }
 
   return (
-    <section style={{ padding: '72px 20px', background: '#08080d', borderTop: '1px solid #1f1f2a', borderBottom: '1px solid #1f1f2a' }}>
+    <section style={{ padding: '72px 20px', background: 'var(--void)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
       <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
         <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 12px' }}>
           R2BOT Weekly
@@ -919,7 +919,7 @@ function NewsletterCTA() {
           <button
             type="submit" disabled={status === 'loading'}
             style={{
-              padding: '12px 20px', flex: '1 1 auto', background: '#FF8A4C', color: '#0f0a1e',
+              padding: '12px 20px', flex: '1 1 auto', background: '#FF8A4C', color: 'var(--void)',
               fontWeight: 900, fontSize: 14, border: 'none',
               borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap',
               opacity: status === 'loading' ? 0.6 : 1,
@@ -948,7 +948,7 @@ function Footer() {
     { h: 'Company',  links: [{ label: 'About', href: '/about' }, { label: 'Written by Ravi', href: '/author/ravi' }, { label: 'Mission', href: '/mission' }, { label: 'Contact', href: 'mailto:hello@r2bot.in' }, { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' }] },
   ]
   return (
-    <footer style={{ padding: '56px 20px', background: '#08080d', borderTop: '1px solid #1f1f2a' }}>
+    <footer style={{ padding: '56px 20px', background: 'var(--void)', borderTop: '1px solid var(--border)' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div className="m-stack-2" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr', gap: 32, marginBottom: 40 }}>
           <div>
@@ -975,7 +975,7 @@ function Footer() {
             </div>
           ))}
         </div>
-        <div style={{ paddingTop: 24, borderTop: '1px solid #1f1f2a', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ paddingTop: 24, borderTop: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <p style={{ fontSize: 12, color: '#374151' }}>Made with ❤️ for robotics learners worldwide · © 2026 R2BOT</p>
           <div style={{ display: 'flex', gap: 20 }}>
             <a href="https://www.instagram.com/r2bot.in" target="_blank" rel="noopener" style={{ fontSize: 13, color: '#e1306c', textDecoration: 'none', fontWeight: 700 }}>◉ Instagram</a>

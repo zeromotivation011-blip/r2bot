@@ -59,7 +59,7 @@ export default function BlogIndexClient({ posts, tags }: { posts: PostLite[]; ta
   const browsing = Boolean(activeTag || search.trim())
 
   return (
-    <main className="min-h-screen bg-[#0A0E17] text-white pt-24 pb-20 px-4">
+    <main className="min-h-screen bg-[var(--void)] text-white pt-24 pb-20 px-4">
       {/* Hero */}
       <section className="mx-auto max-w-5xl text-center">
         <p className="text-xs uppercase tracking-[3px] font-black text-blue-400">R2BOT Blog</p>
@@ -73,7 +73,7 @@ export default function BlogIndexClient({ posts, tags }: { posts: PostLite[]; ta
             onChange={e => setSearch(e.target.value)}
             type="text"
             placeholder="Search articles…"
-            className="w-full bg-[#111118] border border-white/15 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+            className="w-full bg-[var(--surface-1)] border border-white/15 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
           />
         </div>
       </section>
@@ -125,7 +125,7 @@ export default function BlogIndexClient({ posts, tags }: { posts: PostLite[]; ta
       <section className="mx-auto max-w-6xl mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map(p => (
           <Link key={p.slug} href={`/blog/${p.slug}`} className="block group">
-            <article className="h-full rounded-2xl border border-white/10 bg-[#111118] p-5 transition-all group-hover:-translate-y-1 group-hover:border-blue-500/40 group-hover:shadow-[0_18px_50px_rgba(59,130,246,.15)]">
+            <article className="h-full rounded-2xl border border-white/10 bg-[var(--surface-1)] p-5 transition-all group-hover:-translate-y-1 group-hover:border-blue-500/40 group-hover:shadow-[0_18px_50px_rgba(59,130,246,.15)]">
               <div className="text-4xl">{p.coverEmoji}</div>
               <div className="mt-3 flex flex-wrap gap-1">
                 {p.tags.slice(0, 3).map(t => (

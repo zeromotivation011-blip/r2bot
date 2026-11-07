@@ -134,7 +134,7 @@ export function LeadCaptureModal() {
               <button
                 type="submit" disabled={status === 'loading'}
                 style={{
-                  marginTop: 4, minHeight: 48, background: '#FF8A4C', color: '#0f0a1e',
+                  marginTop: 4, minHeight: 48, background: '#FF8A4C', color: 'var(--void)',
                   fontWeight: 900, fontSize: 15, border: 'none', borderRadius: 12,
                   cursor: 'pointer', opacity: status === 'loading' ? 0.6 : 1,
                 }}

@@ -181,8 +181,8 @@ export function AuthModal() {
         .auth-card {
           position: relative;
           width: 100%; max-width: 420px;
-          background: #111118;
-          border: 1px solid #1f1f2a;
+          background: var(--surface-1);
+          border: 1px solid var(--border);
           border-radius: 20px;
           padding: 28px 24px 22px;
           color: #e5e7eb;
@@ -198,14 +198,14 @@ export function AuthModal() {
         .auth-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #f97316; font-weight: 900; }
         .auth-head h2 { font-size: 24px; font-weight: 900; color: #fff; margin-top: 4px; }
         .auth-sub { font-size: 13px; color: #9ca3af; margin-top: 2px; }
-        .auth-tabs { display: flex; background: #0A0E17; border-radius: 10px; padding: 4px; margin-bottom: 16px; }
+        .auth-tabs { display: flex; background: var(--void); border-radius: 10px; padding: 4px; margin-bottom: 16px; }
         .auth-tab {
           flex: 1; min-height: 36px; padding: 8px;
           background: transparent; border: 0;
           color: #9ca3af; font-weight: 700; font-size: 14px;
           border-radius: 8px; cursor: pointer;
         }
-        .auth-tab.on { background: #1f1f2a; color: #fff; }
+        .auth-tab.on { background: var(--border-2); color: #fff; }
         .auth-form { display: flex; flex-direction: column; gap: 10px; }
         .auth-form label {
           display: block;
@@ -215,8 +215,8 @@ export function AuthModal() {
         .auth-form input, .auth-form select {
           width: 100%;
           margin-top: 4px;
-          background: #0A0E17;
-          border: 1px solid #1f1f2a;
+          background: var(--void);
+          border: 1px solid var(--border);
           color: #fff; font-size: 15px; font-weight: 500;
           padding: 10px 12px; border-radius: 10px;
           outline: none;
@@ -239,11 +239,11 @@ export function AuthModal() {
           display: flex; align-items: center; gap: 10px;
           font-size: 11px; color: #6b7280; letter-spacing: 1px; text-transform: uppercase;
         }
-        .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #1f1f2a; }
+        .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-2); }
         .auth-google {
           width: 100%; min-height: 44px;
-          background: #0A0E17; color: #e5e7eb;
-          border: 1px solid #1f1f2a; border-radius: 10px;
+          background: var(--void); color: #e5e7eb;
+          border: 1px solid var(--border); border-radius: 10px;
           font-weight: 700; cursor: pointer;
         }
         .auth-google:hover { border-color: #3b82f6; }

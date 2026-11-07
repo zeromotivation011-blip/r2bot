@@ -117,7 +117,7 @@ export function SubmitBuildModal({ open, onClose, projectSlug, projectTitle, def
         onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%', maxWidth: 640,
-          background: '#0f0f17', border: '1px solid #1f1f2a',
+          background: 'var(--surface-1)', border: '1px solid var(--border)',
           borderRadius: 18, padding: 26,
           boxShadow: '0 24px 64px rgba(0,0,0,0.55)',
         }}

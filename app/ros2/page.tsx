@@ -158,7 +158,7 @@ function ROS2LessonCard({ title, description, code }: { title: string; descripti
         style={{
           margin: 0,
           padding: 12,
-          background: '#0A0E17',
+          background: 'var(--void)',
           borderRadius: 8,
           border: '1px solid #1e293b',
           color: '#22c55e',

@@ -100,12 +100,12 @@ export default function WorldMapClient() {
           <defs>
             <radialGradient id="wm-sky" cx="50%" cy="0%" r="100%">
               <stop offset="0%"  stopColor="#1e1b4b" />
-              <stop offset="60%" stopColor="#0f0a1e" />
+              <stop offset="60%" stopColor="var(--void)" />
               <stop offset="100%" stopColor="#000" />
             </radialGradient>
             <linearGradient id="wm-ground" x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%"  stopColor="#2a1860" />
-              <stop offset="100%" stopColor="#0f0a1e" />
+              <stop offset="100%" stopColor="var(--void)" />
             </linearGradient>
             <linearGradient id="wm-hill" x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%"  stopColor="#10b981" />
@@ -128,7 +128,7 @@ export default function WorldMapClient() {
 
           {/* Rolling ground silhouettes */}
           <path d="M0 720 Q200 660 420 700 T800 700 T1200 690 L1200 800 L0 800 Z" fill="url(#wm-ground)" />
-          <path d="M0 760 Q300 700 600 750 T1200 740 L1200 800 L0 800 Z" fill="#0f0a1e" opacity=".7" />
+          <path d="M0 760 Q300 700 600 750 T1200 740 L1200 800 L0 800 Z" fill="var(--void)" opacity=".7" />
 
           {/* Path between zones */}
           {PATH_BETWEEN.map(([from, to]) => {
@@ -270,7 +270,7 @@ function ZoneNode({
 
       {/* Name plate */}
       <g transform="translate(0 64)">
-        <rect x="-72" y="-2" width="144" height="30" rx="6" fill="#0f0a1e" stroke={color} strokeWidth="1.5" />
+        <rect x="-72" y="-2" width="144" height="30" rx="6" fill="var(--void)" stroke={color} strokeWidth="1.5" />
         <text x="0" y="18" fill={color} fontWeight="900" fontSize="14" textAnchor="middle" style={{ pointerEvents: 'none' }}>
           {name}
         </text>
@@ -280,7 +280,7 @@ function ZoneNode({
       {stars > 0 && (
         <g transform="translate(34 -34)">
           <rect x="0" y="-12" width="44" height="22" rx="11" fill="#FF8A4C" stroke="#a16207" strokeWidth="1.5" />
-          <text x="22" y="3" fontWeight="900" fontSize="13" fill="#0f0a1e" textAnchor="middle" style={{ pointerEvents: 'none' }}>
+          <text x="22" y="3" fontWeight="900" fontSize="13" fill="var(--void)" textAnchor="middle" style={{ pointerEvents: 'none' }}>
             ⭐ {stars}
           </text>
         </g>
@@ -289,7 +289,7 @@ function ZoneNode({
       {/* Completion check */}
       {complete && (
         <g transform="translate(-30 -34)">
-          <circle r="14" fill="#10b981" stroke="#0f0a1e" strokeWidth="2.5" />
+          <circle r="14" fill="#10b981" stroke="var(--void)" strokeWidth="2.5" />
           <text x="0" y="5" textAnchor="middle" fontWeight="900" fontSize="16" fill="#fff" style={{ pointerEvents: 'none' }}>✓</text>
         </g>
       )}
@@ -310,7 +310,7 @@ function ZoneScene({ theme, color }: { theme: ZoneTheme; color: string }) {
   if (theme === 'garden') {
     return (
       <g>
-        <ellipse cx="0" cy="46" rx="80" ry="14" fill="#0f0a1e" opacity=".5" />
+        <ellipse cx="0" cy="46" rx="80" ry="14" fill="var(--void)" opacity=".5" />
         <path d="M-70 30 Q-30 -10 0 14 Q40 -8 80 26 Q60 50 -60 50 Z" fill="url(#wm-hill)" />
         <g>
           <circle cx="-40" cy="20" r="4" fill="#fb7185" />
@@ -324,9 +324,9 @@ function ZoneScene({ theme, color }: { theme: ZoneTheme; color: string }) {
   if (theme === 'house') {
     return (
       <g>
-        <ellipse cx="0" cy="46" rx="68" ry="10" fill="#0f0a1e" opacity=".5" />
+        <ellipse cx="0" cy="46" rx="68" ry="10" fill="var(--void)" opacity=".5" />
         <rect x="-44" y="-4" width="88" height="46" rx="4" fill="#1e3a8a" />
-        <path d="M-50 -4 L0 -48 L50 -4 Z" fill={color} stroke="#0f0a1e" strokeWidth="1.5" />
+        <path d="M-50 -4 L0 -48 L50 -4 Z" fill={color} stroke="var(--void)" strokeWidth="1.5" />
         <rect x="-10" y="14" width="20" height="28" rx="2" fill="#FF8A4C" />
         <rect x="22" y="6" width="14" height="14" rx="2" fill="#fde047">
           <animate attributeName="fill" values="#fde047;#FF8A4C;#fde047" dur="2s" repeatCount="indefinite" />
@@ -337,10 +337,10 @@ function ZoneScene({ theme, color }: { theme: ZoneTheme; color: string }) {
   if (theme === 'factory') {
     return (
       <g>
-        <ellipse cx="0" cy="46" rx="78" ry="12" fill="#0f0a1e" opacity=".5" />
+        <ellipse cx="0" cy="46" rx="78" ry="12" fill="var(--void)" opacity=".5" />
         <rect x="-56" y="-12" width="112" height="56" rx="4" fill="#475569" />
-        <rect x="-46" y="6" width="14" height="36" fill="#0f0a1e" />
-        <rect x="-26" y="6" width="14" height="36" fill="#0f0a1e" />
+        <rect x="-46" y="6" width="14" height="36" fill="var(--void)" />
+        <rect x="-26" y="6" width="14" height="36" fill="var(--void)" />
         <rect x="14" y="-32" width="20" height="42" fill="#7c2d12" />
         <circle cx="24" cy="-44" r="9" fill="#94a3b8" opacity=".6">
           <animate attributeName="cy" values="-44;-70;-44" dur="3s" repeatCount="indefinite" />
@@ -355,7 +355,7 @@ function ZoneScene({ theme, color }: { theme: ZoneTheme; color: string }) {
   if (theme === 'brain') {
     return (
       <g>
-        <ellipse cx="0" cy="46" rx="74" ry="12" fill="#0f0a1e" opacity=".5" />
+        <ellipse cx="0" cy="46" rx="74" ry="12" fill="var(--void)" opacity=".5" />
         <ellipse cx="-20" cy="14" rx="38" ry="30" fill="#a855f7" opacity=".4" />
         <ellipse cx="20"  cy="14" rx="38" ry="30" fill="#a855f7" opacity=".4" />
         <g stroke={color} strokeWidth="1.4" fill="none" opacity=".85">
@@ -379,7 +379,7 @@ function ZoneScene({ theme, color }: { theme: ZoneTheme; color: string }) {
   if (theme === 'cave') {
     return (
       <g>
-        <ellipse cx="0" cy="46" rx="76" ry="12" fill="#0f0a1e" opacity=".5" />
+        <ellipse cx="0" cy="46" rx="76" ry="12" fill="var(--void)" opacity=".5" />
         <path d="M-60 40 Q-60 -34 0 -36 Q60 -34 60 40 Z" fill="#1e293b" />
         <path d="M-50 40 Q-50 -22 0 -24 Q50 -22 50 40 Z" fill="#0f172a" />
         <g fontFamily="monospace" fontWeight="700" fill={color} fontSize="9">
@@ -393,11 +393,11 @@ function ZoneScene({ theme, color }: { theme: ZoneTheme; color: string }) {
   // rocket / launch-pad
   return (
     <g>
-      <ellipse cx="0" cy="46" rx="76" ry="12" fill="#0f0a1e" opacity=".5" />
+      <ellipse cx="0" cy="46" rx="76" ry="12" fill="var(--void)" opacity=".5" />
       <rect x="-48" y="20" width="96" height="20" fill="#475569" />
-      <path d="M0 -52 L18 6 L-18 6 Z" fill={color} stroke="#0f0a1e" strokeWidth="1.6" />
+      <path d="M0 -52 L18 6 L-18 6 Z" fill={color} stroke="var(--void)" strokeWidth="1.6" />
       <rect x="-8" y="6" width="16" height="22" fill="#FF8A4C" />
-      <circle cx="0" cy="-14" r="6" fill="#0f0a1e" />
+      <circle cx="0" cy="-14" r="6" fill="var(--void)" />
       <path d="M-6 28 L0 50 L6 28 Z" fill="#f97316">
         <animate attributeName="opacity" values="0.4;1;0.4" dur="0.6s" repeatCount="indefinite" />
       </path>
@@ -523,7 +523,7 @@ function WorldMapStyles() {
         aspect-ratio: 3 / 2;
         border-radius: 20px;
         overflow: hidden;
-        background: #0f0a1e;
+        background: var(--void);
         border: 2px solid rgba(124,58,237,0.35);
         box-shadow: 0 18px 60px rgba(0,0,0,0.55);
       }
@@ -550,7 +550,7 @@ function WorldMapStyles() {
       .wm-part {
         width: 32px; height: 32px;
         display: grid; place-items: center;
-        background: #0f0a1e;
+        background: var(--void);
         border: 1.5px solid #4c1d95;
         border-radius: 10px;
         font-size: 18px;
@@ -610,7 +610,7 @@ function WorldMapStyles() {
       .wm-modal-level {
         display: flex; align-items: center; gap: 10px;
         padding: 10px 12px;
-        background: #0f0a1e;
+        background: var(--void);
         border-radius: 12px;
         border: 1px solid #4c1d95;
       }

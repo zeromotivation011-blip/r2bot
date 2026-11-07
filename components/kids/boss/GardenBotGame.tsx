@@ -238,7 +238,7 @@ export function GardenBotGame({ onWin, onFail, onSpark }: {
         }
         .gb-pal-btn {
           min-height: 60px;
-          color: #0f0a1e;
+          color: var(--void);
           border: none; border-radius: 12px;
           font-weight: 900; font-size: 12px;
           cursor: pointer;

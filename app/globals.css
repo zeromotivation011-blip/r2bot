@@ -19,22 +19,38 @@
  *   4. Elevation is neutral shadow, never coloured glow.
  */
 :root {
-  /* Surfaces — #050810 was near-pure black and harsh over a 900-word read.
-     Lifted and warmed slightly; still unmistakably a dark theme. */
-  --void: #070F1D;
-  --surface-1: #0D1829;
-  --surface-2: #13213A;
+  /* Surfaces.
+   *
+   * Pages had drifted to their own near-blacks (#0A0E17, #0f0a1e, #08080d,
+   * #111118) while the tokens said navy, so the site had become black with a
+   * saturated orange on it — a combination that reads as a product launch
+   * page, not somewhere you settle in to read 900 words. Everything is mapped
+   * onto these five values now, so the palette can be retuned here rather than
+   * across sixty files.
+   *
+   * Navy, lifted: enough blue to feel considered, enough separation between
+   * the steps that cards read as raised rather than as grey fog on black. */
+  --void: #0A1120;        /* page background */
+  --surface-1: #111C32;   /* cards, rows */
+  --surface-2: #19263F;   /* raised / hovered */
   --ink: #0B2540;
   --ink-2: #0F2F52;
 
-  /* Text */
-  --mist: #F2F5F9;
-  --muted: #7B8494;
+  /* Text. Slightly warm white; pure white on navy vibrates at body size. */
+  --mist: #EEF2F8;
+  --muted: #8A94A6;
 
-  /* The one accent */
+  /* The one accent.
+   *
+   * Reserved for the primary action and the active state. Tailwind's
+   * `amber-500` is mapped to the same value in tailwind.config.ts, so the two
+   * never drift apart. --accent-wash is for large tinted areas: the full
+   * saturation is right on a button and far too loud on a panel. */
   --amber: #FC6818;
   --amber-bright: #FF8A4C;
   --amber-ink: #1A1103;   /* text on top of amber */
+  --accent-wash: rgba(252, 104, 24, 0.07);
+  --accent-line: rgba(252, 104, 24, 0.34);
 
   /* Supporting — links, code, data. Not brand colours. */
   --cyan: #00B8D4;

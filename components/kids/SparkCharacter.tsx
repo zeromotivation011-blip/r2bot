@@ -142,7 +142,7 @@ export function SparkCharacter({
           {/* Head */}
           <rect x="34" y="32" width="132" height="98" rx="22" fill="url(#spark-body)" stroke="#1e3a8a" strokeWidth="3" />
           {/* Face screen */}
-          <rect x="46" y="46" width="108" height="64" rx="14" fill="#0f0a1e" />
+          <rect x="46" y="46" width="108" height="64" rx="14" fill="var(--void)" />
 
           {/* Eyes — drawn as a group so we can swap shapes per mood */}
           {eyesClosed ? (
@@ -154,8 +154,8 @@ export function SparkCharacter({
             <g>
               <circle cx="74"  cy="78" r={eyesWide ? 14 : 11} fill="url(#spark-eye)" />
               <circle cx="126" cy="78" r={eyesWide ? 14 : 11} fill="url(#spark-eye)" />
-              <circle cx="78"  cy="74" r="3" fill="#0f0a1e" />
-              <circle cx="130" cy="74" r="3" fill="#0f0a1e" />
+              <circle cx="78"  cy="74" r="3" fill="var(--void)" />
+              <circle cx="130" cy="74" r="3" fill="var(--void)" />
               {/* Sparkle glints */}
               <circle cx="70" cy="74" r="1.6" fill="#ffffff" opacity="0.9" />
               <circle cx="122" cy="74" r="1.6" fill="#ffffff" opacity="0.9" />
@@ -176,9 +176,9 @@ export function SparkCharacter({
               {mood === 'oops' ? (
                 <path d="M-16 6 Q0 -4 16 6" stroke="#fde047" strokeWidth="4" fill="none" strokeLinecap="round" />
               ) : mood === 'surprised' ? (
-                <ellipse cx="0" cy="6" rx="9" ry="11" fill="#0f0a1e" stroke="#fde047" strokeWidth="3" />
+                <ellipse cx="0" cy="6" rx="9" ry="11" fill="var(--void)" stroke="#fde047" strokeWidth="3" />
               ) : speaking ? (
-                <ellipse cx="0" cy="4" rx="14" ry="9" fill="#0f0a1e" stroke="#fde047" strokeWidth="3" />
+                <ellipse cx="0" cy="4" rx="14" ry="9" fill="var(--void)" stroke="#fde047" strokeWidth="3" />
               ) : (
                 <path d="M-18 0 Q0 16 18 0" stroke="#fde047" strokeWidth="4" fill="none" strokeLinecap="round" />
               )}
@@ -188,7 +188,7 @@ export function SparkCharacter({
           {/* Body */}
           <rect x="46" y="134" width="108" height="62" rx="14" fill="url(#spark-body-orange)" stroke="#9a3412" strokeWidth="3" />
           {/* Chest panel */}
-          <rect x="70" y="148" width="60" height="32" rx="6" fill="#0f0a1e" />
+          <rect x="70" y="148" width="60" height="32" rx="6" fill="var(--void)" />
           {/* Status LEDs */}
           <circle cx="84" cy="164" r="3.5" fill="#fde047">
             <animate attributeName="opacity" values="0.4;1;0.4" dur="1.4s" repeatCount="indefinite" />

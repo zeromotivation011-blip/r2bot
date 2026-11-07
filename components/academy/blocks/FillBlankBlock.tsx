@@ -167,7 +167,7 @@ export function FillBlankBlock({ block, isCompleted, onComplete }: Props) {
           align-self: flex-start;
           min-height: 44px; padding: 0 22px;
           background: linear-gradient(135deg, #00E5FF, #A56BFF);
-          color: #0f0a1e;
+          color: var(--void);
           border: none; border-radius: 10px;
           font-weight: 900; cursor: pointer;
         }

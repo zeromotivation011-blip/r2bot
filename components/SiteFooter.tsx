@@ -75,7 +75,7 @@ const LANGUAGES = [
 
 export function SiteFooter() {
   return (
-    <footer className="mt-20 border-t border-white/10 bg-[#070B14]">
+    <footer className="mt-20 border-t border-white/10 bg-[var(--void)]">
       <div className="mx-auto max-w-6xl px-5 py-12">
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
           {COLUMNS.map((col) => (

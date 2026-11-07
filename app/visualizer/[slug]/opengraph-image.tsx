@@ -1,3 +1,5 @@
+// NOTE: literal colours on purpose — Satori resolves no CSS variables.
+// Keep these in step with the tokens in app/globals.css.
 // Dynamic social preview card for each simulator.
 //
 // The site previously had no OG images at all, so every link posted to Reddit,
@@ -33,7 +35,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: '#0A0E17',
+          background: '#0A1120',
           padding: '64px 72px',
           position: 'relative',
         }}
