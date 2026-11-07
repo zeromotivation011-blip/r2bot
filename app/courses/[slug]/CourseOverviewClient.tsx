@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import CourseWaitlist from '@/components/CourseWaitlist'
+import { CourseHero } from '@/components/courses/CourseHero'
 
 interface L { id: string; title: string; summary: string; durationMin: number; videoReady: boolean }
 interface Nav { slug: string; title: string }
@@ -9,6 +10,8 @@ interface Props {
   slug: string; title: string; description: string; tagline?: string; outcome?: string
   level: string; order?: number; totalCourses: number; whoFor?: string; prerequisites?: string; presenters?: string[]
   outcomes: string[]; minutes: number; draft: boolean; lessons: L[]
+  /** Trailer, or the first lesson video used as an honest preview. */
+  heroVideoId?: string | null; heroIsTrailer?: boolean; heroPreviewTitle?: string
   finalActivity?: { title: string; prompt: string }
   prev: Nav | null; next: Nav | null
 }
@@ -58,11 +61,31 @@ export default function CourseOverviewClient(p: Props) {
     <main className="max-w-3xl mx-auto px-5 py-14">
       <nav className="text-sm text-gray-500 mb-4"><Link href="/courses" className="hover:text-white">Courses</Link> / {p.title}</nav>
       {p.draft && <p className="mb-4 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-400 text-sm px-3 py-2">Draft preview — not visible to the public.</p>}
-      <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-500">{p.order ? `Course ${p.order} of ${p.totalCourses} · ` : ''}{p.level} · Free · Certificate</p>
-      <h1 className="text-3xl md:text-4xl font-black text-white mt-2">{p.title}</h1>
-      {p.tagline && <p className="text-lg text-gray-300 mt-2">{p.tagline}</p>}
-      <p className="text-gray-400 mt-3">{p.description}</p>
-      <p className="text-gray-500 text-sm mt-3">{p.lessons.length} lessons · about {p.minutes} min · quiz after every lesson{p.finalActivity ? ' · final activity' : ''}{p.presenters?.length ? ` · with ${p.presenters.join(', ')}` : ''}</p>
+      {/* Something to press play on, above the fold. A course that opens with
+          a paragraph and a lesson list reads as a syllabus, not a course. */}
+      <div className="mt-2 grid gap-6 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:items-start">
+        <CourseHero
+          slug={p.slug}
+          order={p.order ?? 1}
+          title={p.title}
+          videoId={p.heroVideoId ?? null}
+          isTrailer={Boolean(p.heroIsTrailer)}
+          previewLessonTitle={p.heroPreviewTitle}
+        />
+        <div>
+          <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-500">{p.order ? `Course ${p.order} of ${p.totalCourses} · ` : ''}{p.level} · Free</p>
+          <h1 className="text-3xl md:text-4xl font-black text-white mt-2">{p.title}</h1>
+          {p.tagline && <p className="text-lg text-gray-300 mt-2">{p.tagline}</p>}
+          <p className="text-gray-400 mt-3">{p.description}</p>
+          <ul className="mt-4 grid gap-2 text-sm text-gray-300">
+            <li>🎬 {p.lessons.length} video lessons · about {p.minutes} minutes</li>
+            <li>✅ A quick quiz after every lesson</li>
+            {p.finalActivity && <li>📝 A final activity you write yourself</li>}
+            <li>🎓 A certificate you can verify and share</li>
+            {p.presenters?.length ? <li>🎙️ With {p.presenters.join(', ')}</li> : null}
+          </ul>
+        </div>
+      </div>
       {/* A course with no videos is a dead end. Turn it into the one useful
           action on the page instead of ten rows that all say "Coming soon". */}
       {readyCount === 0 ? (

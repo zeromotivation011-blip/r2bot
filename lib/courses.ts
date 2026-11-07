@@ -35,6 +35,13 @@ export interface Course {
   presenters?: string[]
   /** 'ready' = videos available, 'soon' = still being produced (informational). */
   availability?: 'ready' | 'soon'
+  /**
+   * YouTube id of a course trailer, shown on the course landing page.
+   * Optional: with none set, the landing page previews the first lesson that
+   * has a video instead, so there is always something to press play on rather
+   * than a wall of text.
+   */
+  trailerYoutubeId?: string
   minutes?: number
   /** A written task done after the lessons; required for the certificate once its table exists. */
   finalActivity?: { lessonId: string; title: string; prompt: string }

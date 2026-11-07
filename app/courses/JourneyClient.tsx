@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { CourseArt } from '@/components/courses/CourseArt'
 
 export interface JourneyCourse {
   slug: string; title: string; tagline: string; level: string; order: number
@@ -37,7 +38,11 @@ export default function JourneyClient({ courses }: { courses: JourneyCourse[] })
             <li key={c.slug} className="relative pl-14">
               {i < courses.length - 1 && <span aria-hidden className="absolute left-[19px] top-11 bottom-[-20px] w-0.5 bg-amber-500/30" />}
               <span aria-hidden className={`absolute left-0 top-1 w-10 h-10 rounded-full flex items-center justify-center font-black ${cert ? 'bg-green-500 text-black' : 'bg-amber-500 text-black'}`}>{cert ? '✓' : c.order}</span>
-              <Link href={`/courses/${c.slug}`} className="block rounded-2xl border border-white/10 bg-white/[0.02] p-5 hover:border-amber-500/60 transition">
+              <Link href={`/courses/${c.slug}`} className="block overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] hover:border-amber-500/60 transition">
+                {/* Cover art: five text blocks in a row looked like a syllabus,
+                    not a catalogue. Inline SVG, so no extra requests. */}
+                <CourseArt slug={c.slug} order={c.order} title={c.title} className="aspect-[16/6] w-full" />
+                <div className="p-5">
                 <p className="text-xs text-amber-500 font-bold uppercase tracking-wider">Course {c.order} · {c.level} · Free</p>
                 <h2 className="text-xl font-extrabold text-white mt-1">{c.title}</h2>
                 <p className="text-gray-300 mt-1 text-sm">{c.tagline}</p>
@@ -53,6 +58,7 @@ export default function JourneyClient({ courses }: { courses: JourneyCourse[] })
                   )}
                   {prog?.signedIn && done > 0 && <span className="text-[11px] text-green-400">{done}/{c.lessons} done ({pct}%)</span>}
                   {cert && <span className="text-[11px] text-green-400">🎓 Certificate earned</span>}
+                </div>
                 </div>
               </Link>
             </li>

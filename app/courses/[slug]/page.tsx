@@ -32,6 +32,11 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
   const c = loadCourseBySlug(slug)
   if (!c) notFound()
   const url = `${BASE}/courses/${c.slug}`
+  // Trailer if one is set; otherwise the first lesson that actually has a
+  // video, shown as an honest "preview" rather than dressed up as a trailer.
+  const firstWithVideo = c.lessons.find(hasVideo) ?? null
+  const heroVideoId = c.trailerYoutubeId?.trim() || firstWithVideo?.youtubeId || null
+  const heroIsTrailer = Boolean(c.trailerYoutubeId?.trim())
   const all = listPublishedCourses()
   const at = all.findIndex((x) => x.slug === c.slug)
   const prev = at > 0 ? all[at - 1] : null
@@ -48,6 +53,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         level={c.levelLabel ?? c.level} order={c.order} totalCourses={all.length}
         whoFor={c.whoFor} prerequisites={c.prerequisites} presenters={c.presenters}
         outcomes={c.outcomes} minutes={totalMinutes(c)} draft={c.status === 'draft'}
+        heroVideoId={heroVideoId} heroIsTrailer={heroIsTrailer} heroPreviewTitle={firstWithVideo?.title}
         lessons={c.lessons.map((l) => ({ id: l.id, title: l.title, summary: l.summary, durationMin: l.durationMin, videoReady: hasVideo(l) }))}
         finalActivity={c.finalActivity ? { title: c.finalActivity.title, prompt: c.finalActivity.prompt } : undefined}
         prev={prev ? { slug: prev.slug, title: prev.title } : null} next={nxt ? { slug: nxt.slug, title: nxt.title } : null}
