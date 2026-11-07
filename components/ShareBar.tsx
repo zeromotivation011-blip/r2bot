@@ -20,6 +20,7 @@ export default function ShareBar({ url, title, embedSlug }: { url: string; title
         <button style={btn} onClick={() => copy('link', url)}>{copied === 'link' ? 'Copied' : 'Copy link'}</button>
         {embedSlug && <button style={btn} onClick={() => copy('embed', iframe)}>{copied === 'embed' ? 'Copied' : 'Copy embed code'}</button>}
       </div>
+      <p style={{ color: '#94a3b8', fontSize: 12, margin: '8px 0 0' }}><a href="/invite" style={{ color: '#FC6818' }}>Get your personal invite link</a> to share R2BOT with friends.</p>
       {embedSlug && <p style={{ color: '#94a3b8', fontSize: 12, margin: '8px 0 0' }}>Teachers and bloggers: paste the embed code into your page to show this demo for free.</p>}
     </div>
   )

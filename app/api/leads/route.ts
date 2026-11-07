@@ -124,6 +124,8 @@ export async function POST(req: NextRequest) {
     const page = body.page || null
     const userAgent = req.headers.get('user-agent') || null
     const meta = (body.meta && typeof body.meta === 'object' ? body.meta : {}) as Record<string, unknown>
+    const refMatch = (req.headers.get('cookie') || '').match(/(?:^|;\s*)r2ref=([A-Za-z0-9]{4,16})/)
+    if (refMatch) meta.ref = refMatch[1]
 
     // Prefer the service-role client so a returning lead can be enriched.
     // If the key is absent, fall back to the anon client rather than throwing:

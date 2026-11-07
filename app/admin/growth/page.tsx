@@ -58,6 +58,14 @@ export default async function GrowthPage() {
   const avgDaily = Math.round(views7 / 7)
 
   // Newsletter
+  const { data: evRows } = await admin.from('lead_events').select('meta').limit(20000)
+  const refCounts: Record<string, number> = {}
+  for (const r of (evRows ?? []) as { meta: Record<string, unknown> | null }[]) {
+    const ref = r.meta && typeof r.meta.ref === 'string' ? r.meta.ref : null
+    if (ref) refCounts[ref] = (refCounts[ref] ?? 0) + 1
+  }
+  const refTop = Object.entries(refCounts).sort((x, y) => y[1] - x[1]).slice(0, 8)
+  const refTotal = Object.values(refCounts).reduce((x, y) => x + y, 0)
   const { data: subsAll } = await admin.from('newsletter_subscribers').select('email, source, subscribed_at, active').limit(50000)
   const subs = (subsAll ?? []) as { source: string | null; subscribed_at: string; active: boolean | null }[]
   const activeSubs = subs.filter((s) => s.active !== false).length
@@ -135,6 +143,13 @@ export default async function GrowthPage() {
         <div style={card}>
           <h3 style={h3}>Where subscribers come from</h3>
           {sources.length === 0 ? <p style={muted}>No subscribers yet.</p> : sources.map(([k, v]) => <Bar key={k} pct={(v / (sources[0][1] || 1)) * 100} label={k} value={v} />)}
+        </div>
+        <div style={card}>
+          <h3 style={h3}>Sign-ups from friend invites</h3>
+          {refTop.length === 0 ? <p style={muted}>None yet. Learners get their link at /invite.</p> : (<>
+            <p style={muted}>{refTotal} sign-up{refTotal === 1 ? '' : 's'} came through invite links.</p>
+            {refTop.map(([k, v]) => <Bar key={k} pct={(v / (refTop[0][1] || 1)) * 100} label={k} value={v} />)}
+          </>)}
         </div>
         <div style={card}>
           <h3 style={h3}>Automatic emails sent (last 30 days)</h3>

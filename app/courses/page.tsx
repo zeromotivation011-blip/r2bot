@@ -22,6 +22,14 @@ export default function CoursesPage() {
       <ul className="mt-5 flex flex-wrap gap-2 text-xs text-gray-300">
         {['50 short lessons', 'Quiz after every lesson', 'Final activity per course', 'Certificate for each course', 'English · plain language'].map((t) => <li key={t} className="rounded-full border border-white/10 px-3 py-1">{t}</li>)}
       </ul>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [
+          { q: 'Are the R2BOT courses really free?', a: 'Yes. All five courses, quizzes and certificates are free.' },
+          { q: 'How long is each lesson?', a: 'Each lesson is a short video of about 4 minutes followed by a quick quiz.' },
+          { q: 'Do I get a certificate?', a: 'Yes. Finish all lessons, pass the quizzes and complete the final activity to earn a certificate you can verify and share.' },
+          { q: 'Do I need experience?', a: 'No. The first course starts from zero and the path builds up to robot design.' },
+        ].map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+      }) }} />
       {courses.length === 0 ? (
         <div className="mt-10 rounded-2xl border border-white/10 p-8 text-gray-300">
           <h2 className="text-xl font-bold text-white">First course is being recorded</h2>

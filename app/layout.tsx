@@ -12,6 +12,7 @@ import { OnboardingModal } from '@/components/OnboardingModal';
 import { ProgressBanner } from '@/components/ProgressBanner';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { AuthModal } from '@/components/auth/AuthModal';
+import { RefCapture } from '@/components/RefCapture';
 import { HideOnEmbed } from '@/components/HideOnEmbed';
 import { organizationJsonLD } from '@/lib/seo/jsonld';
 
@@ -109,6 +110,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ToastProvider>
         </AuthProvider>
         <SiteViewCounter />
+        <RefCapture />
         <HideOnEmbed><OnboardingModal /></HideOnEmbed>
         <HideOnEmbed><LeadCaptureModal /></HideOnEmbed>
         <HideOnEmbed><LowDataMode /></HideOnEmbed>
