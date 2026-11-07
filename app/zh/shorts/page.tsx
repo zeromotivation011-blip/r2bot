@@ -10,7 +10,7 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: '一分钟学机器人：快速课程',
   description: '免费的一分钟机器人课程：视频、动画互动演示和一道小测验。传感器、电机、控制、手和工作中的机器人，通俗易懂。',
-  alternates: { canonical: `${BASE}/zh/shorts`, languages: { en: `${BASE}/shorts`, 'zh-CN': `${BASE}/zh/shorts`, hi: `${BASE}/hi/shorts` } },
+  alternates: { canonical: `${BASE}/zh/shorts`, languages: { en: `${BASE}/shorts`, 'zh-CN': `${BASE}/zh/shorts`, hi: `${BASE}/hi/shorts`, es: `${BASE}/es/shorts` } },
 }
 const ZH_COURSE: Record<string, { t: string; b: string }> = {
   senses: { t: '机器人如何感知', b: '声音、视觉、听觉和平衡感知。' },

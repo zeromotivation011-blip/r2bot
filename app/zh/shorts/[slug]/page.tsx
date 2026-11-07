@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const slug = (await params).slug
   const z = SHORTS_ZH[slug]
   if (!z) return {}
-  return { title: z.title, description: z.summary.slice(0, 120), alternates: { canonical: `${BASE}/zh/shorts/${slug}`, languages: { en: `${BASE}/shorts/${slug}`, 'zh-CN': `${BASE}/zh/shorts/${slug}`, hi: `${BASE}/hi/shorts/${slug}` } } }
+  return { title: z.title, description: z.summary.slice(0, 120), alternates: { canonical: `${BASE}/zh/shorts/${slug}`, languages: { en: `${BASE}/shorts/${slug}`, 'zh-CN': `${BASE}/zh/shorts/${slug}`, hi: `${BASE}/hi/shorts/${slug}`, es: `${BASE}/es/shorts/${slug}` } } }
 }
 
 const box = { padding: 16, borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' } as const

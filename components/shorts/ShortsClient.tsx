@@ -37,10 +37,11 @@ export function ShortEmbed({ id, title }: { id: string; title: string }) {
 
 const L_EN = { check: 'QUICK CHECK', before: '· ✓ DONE BEFORE', ok: 'Correct.', no: 'Not quite.', retry: 'Try again', next: 'Next:' }
 const L_HI = { check: 'छोटी जाँच', before: '· ✓ पहले पूरा किया', ok: 'सही।', no: 'पूरी तरह नहीं।', retry: 'फिर कोशिश करें', next: 'अगला:' }
+const L_ES = { check: 'PREGUNTA RÁPIDA', before: '· ✓ COMPLETADA', ok: 'Correcto.', no: 'No exactamente.', retry: 'Intentar de nuevo', next: 'Siguiente:' }
 const L_ZH = { check: '小测验', before: '· ✓ 已完成', ok: '答对了。', no: '再想想。', retry: '再试一次', next: '下一课：' }
 
-export function LessonQuiz({ slug, quiz, nextHref, nextTitle, lang = 'en' }: { slug: string; quiz: { q: string; options: [string, string, string]; answer: number; why: string }; nextHref: string; nextTitle: string; lang?: 'en' | 'zh' | 'hi' }) {
-  const L = lang === 'zh' ? L_ZH : lang === 'hi' ? L_HI : L_EN
+export function LessonQuiz({ slug, quiz, nextHref, nextTitle, lang = 'en' }: { slug: string; quiz: { q: string; options: [string, string, string]; answer: number; why: string }; nextHref: string; nextTitle: string; lang?: 'en' | 'zh' | 'hi' | 'es' }) {
+  const L = lang === 'zh' ? L_ZH : lang === 'hi' ? L_HI : lang === 'es' ? L_ES : L_EN
   const [pick, setPick] = useState<number | null>(null)
   const done = useDone()
   const correct = pick === quiz.answer
@@ -74,15 +75,15 @@ export function LessonQuiz({ slug, quiz, nextHref, nextTitle, lang = 'en' }: { s
   )
 }
 
-export function ProgressBar({ slugs, lang = 'en' }: { slugs: string[]; lang?: 'en' | 'zh' | 'hi' }) {
+export function ProgressBar({ slugs, lang = 'en' }: { slugs: string[]; lang?: 'en' | 'zh' | 'hi' | 'es' }) {
   const done = useDone()
   const n = slugs.filter((s) => done.includes(s)).length
   return (
-    <div style={{ margin: '14px 0' }} aria-label={lang === 'zh' ? `已完成 ${n} / ${slugs.length}` : lang === 'hi' ? `${slugs.length} में से ${n} पूरे` : `${n} of ${slugs.length} quick lessons finished`}>
+    <div style={{ margin: '14px 0' }} aria-label={lang === 'zh' ? `已完成 ${n} / ${slugs.length}` : lang === 'hi' ? `${slugs.length} में से ${n} पूरे` : lang === 'es' ? `${n} de ${slugs.length} lecciones rápidas completadas` : `${n} of ${slugs.length} quick lessons finished`}>
       <div style={{ height: 8, borderRadius: 99, background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${(n / slugs.length) * 100}%`, background: '#FC6818', transition: 'width .6s' }} />
       </div>
-      <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>{lang === 'zh' ? `已完成 ${n} / ${slugs.length}（保存在本设备）` : lang === 'hi' ? `${slugs.length} में से ${n} पूरे (इसी डिवाइस पर सहेजे)` : `${n} of ${slugs.length} finished on this device`}</div>
+      <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>{lang === 'zh' ? `已完成 ${n} / ${slugs.length}（保存在本设备）` : lang === 'hi' ? `${slugs.length} में से ${n} पूरे (इसी डिवाइस पर सहेजे)` : lang === 'es' ? `${n} de ${slugs.length} completadas en este dispositivo` : `${n} of ${slugs.length} finished on this device`}</div>
     </div>
   )
 }
