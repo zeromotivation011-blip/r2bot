@@ -7,6 +7,7 @@ import { Reveal } from '@/components/Reveal'
 import { FeatureTour } from '@/components/FeatureTour'
 import LiveRobot from '@/components/landing/LiveRobot'
 import HomeShorts from '@/components/landing/HomeShorts'
+import ContinueStrip from '@/components/landing/ContinueStrip'
 
 type Track = 'spark' | 'wire' | 'forge' | 'edge'
 
@@ -101,6 +102,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
         </section>
       )}
       <Ticker atlasCount={atlasCount} />
+      <ContinueStrip />
       <Reveal><HomeShorts /></Reveal>
       <Reveal><MissionStrip /></Reveal>
       <Reveal><CoursePath /></Reveal>

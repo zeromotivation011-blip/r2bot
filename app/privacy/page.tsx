@@ -33,6 +33,7 @@ export default function PrivacyPage() {
       <h3>If you just visit the site (no signup)</h3>
       <ul>
         <li>Anonymous page-view counts through our own counter (no cookies, no IP address, no user ID), plus anonymous usage statistics through Google Analytics, which may set cookies.</li>
+        <li>If you arrive through an invite link, we keep a random invite code in a cookie for 30 days so we can count invites. It holds no personal data. Your Quick Lesson progress is saved only in your own browser (local storage), not on our servers.</li>
         <li>Your IP address is processed by Vercel for serving the site, but not stored by us beyond the 30-day Vercel default.</li>
         <li>If you use R2 Co-pilot without signing up: the text of your conversation is sent to Anthropic to generate a response, then logged on our server with no user ID, then deleted after 30 days.</li>
       </ul>
