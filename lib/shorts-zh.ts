@@ -1,4 +1,5 @@
 // Simplified Chinese text for Quick Lessons. Videos, demos and Atlas links come from lib/shorts.ts.
+import { SHORTS_ZH_MORE } from '@/lib/shorts-zh-more'
 export interface ShortZh {
   title: string
   summary: string
@@ -10,7 +11,7 @@ export interface ShortZh {
   loop?: [string, string, string]
 }
 
-export const SHORTS_ZH: Record<string, ShortZh> = {
+const SHORTS_ZH_BASE: Record<string, ShortZh> = {
   'ultrasonic-sensor': {
     title: '超声波传感器：机器人如何用声音测距',
     summary: '机器人发出一声人耳听不到的短促声波，等待回声，再把等待的时间换算成距离。',
@@ -194,3 +195,5 @@ export const SHORTS_ZH: Record<string, ShortZh> = {
     quiz: { q: '为什么楼梯需要的不只是轮子？', options: ['轮子无法越过垂直的台阶边缘', '楼梯太宽', '楼梯不需要感知'], why: '普通轮子翻不过台阶，需要腿或特殊机构。' },
   },
 }
+
+export const SHORTS_ZH: Record<string, ShortZh> = { ...SHORTS_ZH_BASE, ...SHORTS_ZH_MORE }

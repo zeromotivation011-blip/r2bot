@@ -1,8 +1,9 @@
 // Spanish text for Quick Lessons. Videos, demos and Atlas links come from lib/shorts.ts.
 // Quiz options keep the same order as the English version (answer index is shared).
 import type { ShortZh } from '@/lib/shorts-zh'
+import { SHORTS_ES_MORE } from '@/lib/shorts-es-more'
 
-export const SHORTS_ES: Record<string, ShortZh> = {
+const SHORTS_ES_BASE: Record<string, ShortZh> = {
   'ultrasonic-sensor': {
     title: 'Sensor ultrasónico: cómo mide un robot la distancia con sonido',
     summary: 'El robot lanza un pulso de sonido que no oímos, espera el eco y convierte el tiempo de espera en distancia.',
@@ -186,3 +187,5 @@ export const SHORTS_ES: Record<string, ShortZh> = {
     quiz: { q: '¿Por qué las escaleras necesitan algo más que ruedas?', options: ['Las ruedas normales no pueden subir un borde vertical', 'Las escaleras son demasiado anchas', 'Las escaleras no necesitan sensores'], why: 'Las ruedas normales no suben un escalón. Hacen falta patas o mecanismos especiales.' },
   },
 }
+
+export const SHORTS_ES: Record<string, ShortZh> = { ...SHORTS_ES_BASE, ...SHORTS_ES_MORE }

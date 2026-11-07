@@ -1,8 +1,9 @@
 // Hindi text for Quick Lessons. Videos, demos and Atlas links come from lib/shorts.ts.
 // Quiz options keep the same order as the English version (answer index is shared).
+import { SHORTS_HI_MORE } from '@/lib/shorts-hi-more'
 import type { ShortZh } from '@/lib/shorts-zh'
 
-export const SHORTS_HI: Record<string, ShortZh> = {
+const SHORTS_HI_BASE: Record<string, ShortZh> = {
   'ultrasonic-sensor': {
     title: 'अल्ट्रासोनिक सेंसर: रोबोट आवाज़ से दूरी कैसे नापता है',
     summary: 'रोबोट एक ऐसी छोटी आवाज़ भेजता है जो हमें सुनाई नहीं देती, गूँज लौटने का इंतज़ार करता है और उस समय को दूरी में बदल देता है।',
@@ -186,3 +187,5 @@ export const SHORTS_HI: Record<string, ShortZh> = {
     quiz: { q: 'सीढ़ियों के लिए सिर्फ़ पहिये काफ़ी क्यों नहीं?', options: ['साधारण पहिये खड़े किनारे पर नहीं चढ़ सकते', 'सीढ़ियाँ बहुत चौड़ी हैं', 'सीढ़ियों को सेंसर नहीं चाहिए'], why: 'साधारण पहिये सीढ़ी के किनारे पर नहीं चढ़ सकते, पैर या ख़ास तंत्र चाहिए।' },
   },
 }
+
+export const SHORTS_HI: Record<string, ShortZh> = { ...SHORTS_HI_BASE, ...SHORTS_HI_MORE }
