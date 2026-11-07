@@ -7,7 +7,7 @@ export const runtime = 'nodejs'
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const metadata: Metadata = {
-  title: 'Robot World for Kids | R2BOT — Learn Robotics Ages 5–14',
+  title: 'Robot World: Robotics Games and Activities for Kids 5–14',
   description:
     'Spark the robot takes kids on an adventure through 6 worlds of robotics. Ages 5–14. No experience needed. Free!',
   keywords: [
@@ -86,6 +86,7 @@ export default function KidsEntryPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <h1 style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}>Robot World: free robotics games and activities for kids aged 5 to 14</h1>
       <KidsEntryClient />
     </>
   )
