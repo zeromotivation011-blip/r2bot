@@ -39,7 +39,13 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
   return (
     <main style={{ maxWidth: 860, margin: '0 auto', padding: '110px 20px 80px' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
-      <Link href="/shorts" style={{ color: '#94a3b8', fontSize: 13 }}>← Quick Lessons · {course.icon} {course.title}</Link>
+      <nav style={{ fontSize: 13, color: '#94a3b8' }}>
+        <Link href="/shorts" style={{ color: '#94a3b8' }}>Quick Lessons</Link>
+        {' / '}
+        <Link href={`/shorts/course/${course.slug}`} style={{ color: '#94a3b8' }}>{course.icon} {course.title}</Link>
+        {' · '}
+        <span>Lesson {siblings.findIndex((x) => x.slug === s.slug) + 1} of {siblings.length}</span>
+      </nav>
       <h1 style={{ fontSize: 'clamp(26px,5vw,38px)', fontWeight: 900, color: '#fff', margin: '8px 0 10px' }}>{s.title}</h1>
       <p style={{ color: '#e2e8f0', fontSize: 19, lineHeight: 1.6, margin: '0 0 18px' }}>{s.summary}</p>
 
@@ -65,7 +71,9 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
         <li><Link href="/courses" style={{ color: '#FC6818' }}>Full video course path</Link></li>
       </ul>
 
-      <h2 style={{ color: '#fff', fontSize: 22, marginTop: 28 }}>{course.title}</h2>
+      <h2 style={{ color: '#fff', fontSize: 22, marginTop: 28 }}>
+        <Link href={`/shorts/course/${course.slug}`} style={{ color: '#fff' }}>{course.title}</Link>
+      </h2>
       <ProgressBar slugs={siblings.map((x) => x.slug)} />
       <ol style={{ color: '#cbd5e1', lineHeight: 2, paddingLeft: 20 }}>
         {siblings.map((x) => <li key={x.slug}>{x.slug === s.slug ? <b style={{ color: '#fff' }}>{x.title.split(':')[0]}</b> : <Link href={`/shorts/${x.slug}`} style={{ color: '#FC6818' }}>{x.title.split(':')[0]}</Link>}</li>)}

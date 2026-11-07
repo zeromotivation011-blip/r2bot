@@ -106,6 +106,9 @@ const nextConfig = {
       // Duplicate Atlas entries (same title) -> keep one indexable page each.
       { source: '/atlas/concept/drone-uav', destination: '/atlas/concept/drone', permanent: true },
       { source: '/atlas/concept/field-programmable-gate-array', destination: '/atlas/concept/fpga', permanent: true },
+      // Same entry written twice. The fuller version (585 words vs 331, and
+      // three inbound links vs one) keeps the URL.
+      { source: '/atlas/concept/ce-marking-robots', destination: '/atlas/concept/ce-marking', permanent: true },
       // Consolidation: Pulse is folded into the automated News feed.
       { source: '/pulse', destination: '/news', permanent: true },
       { source: '/pulse/weekly', destination: '/news', permanent: true },

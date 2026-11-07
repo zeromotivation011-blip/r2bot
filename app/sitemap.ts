@@ -7,7 +7,7 @@ import { getAllPostsMerged } from '@/lib/blog-db';
 import { listProjectSlugs } from '@/lib/build/loader';
 import { SIMULATORS } from '@/lib/simulators';
 import { AI_TOPICS } from '@/lib/ai-robotics';
-import { SHORTS } from '@/lib/shorts';
+import { SHORTS, SHORT_COURSES } from '@/lib/shorts';
 import { SHORTS_ZH } from '@/lib/shorts-zh';
 import { SHORTS_HI } from '@/lib/shorts-hi';
 import { SHORTS_ES } from '@/lib/shorts-es';
@@ -58,7 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // duplicate concepts, plus the robots that live canonically at /robots/<slug>
   // (five robots previously had two indexable URLs each and competed with
   // themselves — see lib/canonical-map.ts).
-  const REDIRECTED_ATLAS = new Set(['drone-uav', 'field-programmable-gate-array']);
+  const REDIRECTED_ATLAS = new Set(['drone-uav', 'field-programmable-gate-array', 'ce-marking-robots']);
   const atlas = atlasEntries
     .filter((e) => !REDIRECTED_ATLAS.has(e.slug))
     .filter((e) => !(e.type === 'robot' && ATLAS_ROBOTS_REDIRECTED.has(e.slug)))
@@ -126,6 +126,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // localised URL that falls back to English).
   const quickLessons = [
     { url: `${BASE}/shorts`, lastModified: GROUP_UPDATED.shorts, changeFrequency: 'weekly' as const, priority: 0.9 },
+    // One page per mini-course: five pages each written to answer a single
+    // real question, instead of one hub trying to answer all five.
+    ...SHORT_COURSES.map((c) => ({
+      url: `${BASE}/shorts/course/${c.slug}`,
+      lastModified: GROUP_UPDATED.shorts,
+      changeFrequency: 'monthly' as const,
+      priority: 0.85,
+    })),
     ...SHORTS.map((t) => ({ url: `${BASE}/shorts/${t.slug}`, lastModified: GROUP_UPDATED.shorts, changeFrequency: 'monthly' as const, priority: 0.8 })),
     { url: `${BASE}/hi/shorts`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'weekly' as const, priority: 0.8 },
     ...SHORTS.filter((t) => SHORTS_HI[t.slug]).map((t) => ({ url: `${BASE}/hi/shorts/${t.slug}`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'monthly' as const, priority: 0.7 })),

@@ -32,14 +32,48 @@ export interface ShortLesson {
   next?: string // related lesson slug
 }
 
-export interface ShortCourse { slug: string; title: string; blurb: string; icon: string }
+export interface ShortCourse {
+  slug: string
+  title: string
+  blurb: string
+  icon: string
+  /** One line on what you can do after finishing the course. */
+  outcome?: string
+  /** The query this mini-course page is written to answer. */
+  searchIntent?: string
+}
 
 export const SHORT_COURSES: ShortCourse[] = [
-  { slug: 'senses', title: 'How Robots Sense', blurb: 'Sound, sight, hearing and balance sensing.', icon: '👁️' },
-  { slug: 'motion', title: 'Motors and Mechanics', blurb: 'Gears, servos, arms and precise repeating.', icon: '⚙️' },
-  { slug: 'control', title: 'Control and Balance', blurb: 'Feedback, staying upright, following a line.', icon: '🎛️' },
-  { slug: 'hands', title: 'Hands and Touch', blurb: 'Gentle grips, prosthetics and surgical robots.', icon: '🖐️' },
-  { slug: 'work', title: 'Robots at Work', blurb: 'Vacuums, warehouses and the stairs problem.', icon: '🏭' },
+  {
+    slug: 'senses', title: 'How Robots Sense', icon: '👁️',
+    blurb: 'Sound, sight, hearing and balance — the six ways a robot takes in the world.',
+    outcome: 'Name the sensor a robot needs for a given job, and say what it gets wrong.',
+    searchIntent: 'how do robots sense the world',
+  },
+  {
+    slug: 'motion', title: 'Motors and Mechanics', icon: '⚙️',
+    blurb: 'Gears, servos, arms and the mechanics behind repeating a movement exactly.',
+    outcome: 'Explain how a robot turns electricity into precise, repeatable movement.',
+    searchIntent: 'how do robot motors and gears work',
+  },
+  {
+    slug: 'control', title: 'Control and Balance', icon: '🎛️',
+    blurb: 'Feedback, staying upright, following a line, and finding a way through.',
+    outcome: 'Describe a feedback loop and why a robot wobbles without one.',
+    searchIntent: 'how do robots balance and control themselves',
+  },
+  {
+    slug: 'hands', title: 'Hands and Touch', icon: '🖐️',
+    blurb: 'Gentle grips, prosthetics and the surgical robots that work inside people.',
+    outcome: 'Explain how a robot holds something without crushing it.',
+    searchIntent: 'how do robot hands grip things',
+  },
+  {
+    slug: 'work', title: 'Robots at Work', icon: '🏭',
+    blurb: 'Vacuums, warehouses, Mars rovers, and the stairs problem nobody has solved.',
+    outcome: 'Say where robots already earn their keep, and where they still fail.',
+    searchIntent: 'where are robots used in real life',
+  },
 ]
 
 const BASE_SHORTS: ShortLesson[] = [

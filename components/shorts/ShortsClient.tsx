@@ -83,9 +83,18 @@ export function LessonQuiz({ slug, quiz, nextHref, nextTitle, lang = 'en' }: { s
   )
 }
 
+/**
+ * Progress across a set of lessons.
+ *
+ * Renders nothing until at least one lesson is finished. A first-time visitor
+ * used to be greeted by "0 of 47 finished on this device" directly under the
+ * headline — an empty progress bar is the second thing they saw, and it reads
+ * as a measure of how far behind they already are.
+ */
 export function ProgressBar({ slugs, lang = 'en' }: { slugs: string[]; lang?: 'en' | 'zh' | 'hi' | 'es' }) {
   const done = useDone()
   const n = slugs.filter((s) => done.includes(s)).length
+  if (n === 0) return null
   return (
     <div style={{ margin: '14px 0' }} aria-label={lang === 'zh' ? `已完成 ${n} / ${slugs.length}` : lang === 'hi' ? `${slugs.length} में से ${n} पूरे` : lang === 'es' ? `${n} de ${slugs.length} lecciones rápidas completadas` : `${n} of ${slugs.length} quick lessons finished`}>
       <div style={{ height: 8, borderRadius: 99, background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
@@ -93,6 +102,95 @@ export function ProgressBar({ slugs, lang = 'en' }: { slugs: string[]; lang?: 'e
       </div>
       <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>{lang === 'zh' ? `已完成 ${n} / ${slugs.length}（保存在本设备）` : lang === 'hi' ? `${slugs.length} में से ${n} पूरे (इसी डिवाइस पर सहेजे)` : lang === 'es' ? `${n} de ${slugs.length} completadas en este dispositivo` : `${n} of ${slugs.length} finished on this device`}</div>
     </div>
+  )
+}
+
+/**
+ * The single entry point on the Quick Lessons hub.
+ *
+ * The hub listed 47 cards in five sections with no indication of where to
+ * begin, which is a lot to ask of someone who has just arrived from a
+ * sixty-second video. This is one button: "Start here" for a new visitor,
+ * "Continue" with the next unfinished lesson for someone coming back.
+ *
+ * Server-rendered as the first lesson, so the page is useful before JavaScript
+ * runs and a crawler always sees a real link.
+ */
+export function StartOrContinue({
+  lessons,
+  lang = 'en',
+}: {
+  lessons: { slug: string; title: string; summary: string }[]
+  lang?: 'en' | 'zh' | 'hi' | 'es'
+}) {
+  const done = useDone()
+  const [ready, setReady] = useState(false)
+  useEffect(() => setReady(true), [])
+
+  const finished = lessons.filter((l) => done.includes(l.slug)).length
+  const next = lessons.find((l) => !done.includes(l.slug)) ?? lessons[0]
+  const returning = ready && finished > 0
+  const allDone = ready && finished === lessons.length
+
+  const T = {
+    en: { start: 'Start here', cont: 'Pick up where you left off', done: 'You have finished every lesson',
+          go: 'Start the first lesson', goBack: 'Continue', goDone: 'Go to the course path',
+          sub: 'One minute. No account needed.' },
+    hi: { start: 'यहाँ से शुरू करें', cont: 'जहाँ छोड़ा था वहीं से', done: 'आपने सभी पाठ पूरे कर लिए',
+          go: 'पहला पाठ शुरू करें', goBack: 'जारी रखें', goDone: 'कोर्स पथ देखें',
+          sub: 'एक मिनट। खाता ज़रूरी नहीं।' },
+    es: { start: 'Empieza aquí', cont: 'Continúa donde lo dejaste', done: 'Has terminado todas las lecciones',
+          go: 'Empezar la primera lección', goBack: 'Continuar', goDone: 'Ver la ruta de cursos',
+          sub: 'Un minuto. Sin cuenta.' },
+    zh: { start: '从这里开始', cont: '继续上次的进度', done: '你已完成全部课程',
+          go: '开始第一课', goBack: '继续', goDone: '查看课程路径',
+          sub: '一分钟，无需注册。' },
+  }[lang]
+
+  if (allDone) {
+    return (
+      <div className="mt-6 rounded-2xl border border-green-500/40 bg-green-500/[0.07] p-5">
+        <p className="text-xs font-bold uppercase tracking-[0.25em] text-green-400">✓ {T.done}</p>
+        <Link
+          href="/courses"
+          className="mt-3 inline-flex min-h-[48px] items-center rounded-xl bg-green-500 px-5 font-bold text-black"
+        >
+          {T.goDone} →
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mt-6 rounded-2xl border border-amber-500/40 bg-amber-500/[0.07] p-5">
+      <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-400">
+        {returning ? T.cont : T.start}
+      </p>
+      <h2 className="mt-2 text-xl font-bold leading-snug text-white">{next.title.split(':')[0]}</h2>
+      <p className="mt-1 text-sm text-gray-300">{next.summary}</p>
+      <Link
+        href={`/shorts/${next.slug}`}
+        className="mt-4 inline-flex min-h-[48px] items-center rounded-xl bg-amber-500 px-5 font-bold text-black"
+      >
+        {returning ? T.goBack : T.go} →
+      </Link>
+      <p className="mt-2 text-xs text-gray-500">{T.sub}</p>
+    </div>
+  )
+}
+
+/**
+ * "3 of 8 done" for one mini-course. Silent until something is finished, for
+ * the same reason the hub progress bar is.
+ */
+export function CourseProgress({ slugs }: { slugs: string[] }) {
+  const done = useDone()
+  const n = slugs.filter((s) => done.includes(s)).length
+  if (n === 0) return null
+  return (
+    <span className="text-xs font-bold text-green-400">
+      {n === slugs.length ? '✓ finished' : `${n} of ${slugs.length} done`}
+    </span>
   )
 }
 
