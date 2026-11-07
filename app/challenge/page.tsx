@@ -7,8 +7,11 @@ import { DailyChallenge } from '@/components/DailyChallenge';
 import { getDailyChallenge, getRecentChallenges } from '@/lib/challenges';
 import { ChallengeArchive } from './ChallengeArchive';
 
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
+
 export const metadata: Metadata = {
   title: 'Daily Robot Challenge',
+  alternates: { canonical: `${BASE_URL}/challenge` },
   description:
     'One scenario. Every day. Build engineering intuition with daily robotics puzzles — from beginner Spark to advanced Edge.',
 };

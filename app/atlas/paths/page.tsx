@@ -4,7 +4,10 @@ import { Nav } from '@/components/Nav'
 import { CopilotProvider } from '@/components/CopilotProvider'
 import { READING_PATHS } from '@/lib/atlas-reading-paths'
 
+const PATHS_BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
+
 export const metadata: Metadata = {
+  alternates: { canonical: `${PATHS_BASE}/atlas/paths` },
   title: 'Reading Paths · R2BOT Atlas',
   description: 'Curated journeys through the Atlas. Each path is a sequence of concepts that builds toward a goal.',
 }

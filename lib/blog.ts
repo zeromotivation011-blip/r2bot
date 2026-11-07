@@ -17,6 +17,15 @@ export interface BlogPost {
   readTime: number       // minutes
   coverEmoji: string
   featured: boolean
+  /**
+   * 'news' marks a dated report rather than an evergreen explainer. Four posts
+   * about funding rounds, order volumes and product launches were sitting in
+   * the same listing as "How do robots work", which dilutes both: the listing
+   * looks like a news feed and the news looks like it should still be accurate
+   * a year from now. News is shown in its own section and excluded from the
+   * evergreen grid. Default is 'evergreen'.
+   */
+  kind: 'evergreen' | 'news'
   keywords: string[]
   content: string        // raw MDX/markdown body
 }
@@ -46,6 +55,7 @@ export function build(slug: string, data: Record<string, unknown>, content: stri
     readTime: typeof data.readTime === 'number' ? data.readTime : Math.max(2, Math.ceil(content.split(/\s+/).length / 220)),
     coverEmoji: typeof data.coverEmoji === 'string' ? data.coverEmoji : '📝',
     featured: data.featured === true,
+    kind: data.kind === 'news' ? 'news' : 'evergreen',
     keywords: asStringArray(data.keywords),
     content,
   }

@@ -8,6 +8,7 @@ import { CopilotProvider } from '@/components/CopilotProvider'
 import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
 import { SimulatorShare } from '@/components/visualizer/SimulatorShare'
+import { EmbedThis } from '@/components/visualizer/EmbedThis'
 import {
   SIMULATORS,
   getSimulator,
@@ -214,6 +215,11 @@ export default async function SimulatorPage({
               </Link>
             </section>
           )}
+
+          {/* The link-earning block. Deliberately above "Related concepts":
+              anyone still reading this far is the kind of person who might host
+              the tool, and the share row's small "Embed" button was invisible. */}
+          <EmbedThis id={sim.id} title={sim.heading} url={url} />
 
           <section style={{ marginTop: 36 }}>
             <h2 className="display" style={{ fontSize: 24, color: '#E8ECF1', margin: '0 0 12px' }}>

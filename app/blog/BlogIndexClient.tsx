@@ -14,6 +14,7 @@ interface PostLite {
   readTime: number
   coverEmoji: string
   featured: boolean
+  kind?: 'evergreen' | 'news'
   keywords: string[]
 }
 
@@ -35,16 +36,27 @@ export default function BlogIndexClient({ posts, tags }: { posts: PostLite[]; ta
   const [activeTag, setActiveTag] = useState<string | null>(null)
   const [search, setSearch]       = useState('')
 
-  const featured = posts.find(p => p.featured) ?? posts[0]
+  // Dated news reports are separated from evergreen explainers. Four posts
+  // about funding rounds and order volumes were sitting in the same grid as
+  // "How do robots work", which makes the guides look like a news feed and the
+  // news look like it should still be accurate next year.
+  const evergreen = useMemo(() => posts.filter(p => p.kind !== 'news'), [posts])
+  const news = useMemo(
+    () => posts.filter(p => p.kind === 'news').sort((a, b) => b.date.localeCompare(a.date)),
+    [posts],
+  )
+
+  const featured = evergreen.find(p => p.featured) ?? evergreen[0]
   const filtered = useMemo(() => {
-    let list = posts
+    let list = evergreen
     if (activeTag) list = list.filter(p => p.tags.includes(activeTag))
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(p => p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))
     }
     return list.filter(p => p.slug !== featured?.slug)
-  }, [posts, activeTag, search, featured])
+  }, [evergreen, activeTag, search, featured])
+  const browsing = Boolean(activeTag || search.trim())
 
   return (
     <main className="min-h-screen bg-[#0A0E17] text-white pt-24 pb-20 px-4">
@@ -131,6 +143,32 @@ export default function BlogIndexClient({ posts, tags }: { posts: PostLite[]; ta
           <p className="col-span-full text-center text-zinc-500 py-12">No articles match this filter.</p>
         )}
       </section>
+
+      {/* Dated reporting, kept visibly separate and clearly dated. Hidden while
+          the reader is filtering or searching the guides. */}
+      {!browsing && news.length > 0 && (
+        <section className="mx-auto mt-14 max-w-6xl">
+          <h2 className="text-xl font-black text-white">Robotics news, reported</h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            Dated pieces about what happened, not guides. For the daily feed see{' '}
+            <Link href="/news" className="text-amber-300 underline">News</Link>.
+          </p>
+          <ul className="mt-4 divide-y divide-white/5 rounded-2xl border border-white/10 bg-white/[0.02]">
+            {news.map(p => (
+              <li key={p.slug}>
+                <Link
+                  href={`/blog/${p.slug}`}
+                  className="flex min-h-[44px] flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-3 hover:bg-white/[0.03]"
+                >
+                  <span className="text-lg" aria-hidden>{p.coverEmoji}</span>
+                  <span className="flex-1 font-semibold text-zinc-100">{p.title}</span>
+                  <time dateTime={p.date} className="text-xs text-zinc-500">{fmtDate(p.date)}</time>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   )
 }
