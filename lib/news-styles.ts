@@ -11,4 +11,7 @@ export const SOURCE_STYLES: Record<string, { color: string; short: string }> = {
   'MIT News':         { color: '#A31F34', short: 'MIT' },
   'Analytics India':  { color: '#6C3483', short: 'AIM' },
   'Analytics Vidhya': { color: '#1F77B4', short: 'AV' },
+  'Pandaily':         { color: '#E11D48', short: 'PAN' },
+  'Synced':           { color: '#0EA5E9', short: 'SYN' },
+  'Interesting Engineering': { color: '#F59E0B', short: 'IE' },
 }

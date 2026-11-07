@@ -63,6 +63,8 @@ const nextConfig = {
 
     return [
       ...simulatorAliases,
+      // webots.cloud blocks embedding (X-Frame-Options: DENY), so the 3D Simulation page cannot work.
+      { source: '/simulate', destination: '/visualizer', permanent: true },
       { source: '/world-map', destination: '/atlas', permanent: true },
       { source: '/world-map/embed', destination: '/atlas', permanent: true },
       // Duplicate Atlas entries (same title) -> keep one indexable page each.

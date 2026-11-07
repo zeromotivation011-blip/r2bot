@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { Reveal } from '@/components/Reveal'
 import { FeatureTour } from '@/components/FeatureTour'
+import LiveRobot from '@/components/landing/LiveRobot'
+import HomeShorts from '@/components/landing/HomeShorts'
 
 type Track = 'spark' | 'wire' | 'forge' | 'edge'
 
@@ -99,6 +101,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
         </section>
       )}
       <Ticker atlasCount={atlasCount} />
+      <Reveal><HomeShorts /></Reveal>
       <Reveal><MissionStrip /></Reveal>
       <Reveal><CoursePath /></Reveal>
       <Reveal><Features atlasCount={atlasCount} /></Reveal>
@@ -218,7 +221,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
 
         {/* Right: Robot + floating cards */}
         <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }} className="hero-right-desktop">
-          <FloatingRobot />
+          <LiveRobot />
           {/* Floating feature cards */}
           <div style={{ position: 'absolute', top: 20, right: -20, background: 'rgba(15,10,30,0.92)', border: '1px solid rgba(0,229,255,0.3)', borderRadius: 14, padding: '10px 14px', minWidth: 150, backdropFilter: 'blur(12px)' }}>
             <p style={{ fontSize: 20, fontWeight: 900, color: '#FC6818', margin: 0 }}>{atlasCount.toLocaleString()}</p>
@@ -284,51 +287,6 @@ function StatPill({ n, label, color, displayValue }: { n: number; label: string;
         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
       } as React.CSSProperties}>{displayValue ?? count.toLocaleString()}</p>
       <p style={{ fontSize: 11, color: '#64748b', fontWeight: 700, margin: 0, textTransform: 'uppercase', letterSpacing: '1px', marginTop: 4 }}>{label}</p>
-    </div>
-  )
-}
-
-function FloatingRobot() {
-  return (
-    <div style={{ position: 'relative', width: 280, height: 340 }}>
-      <svg viewBox="0 0 220 260" width="280" height="340" aria-hidden style={{ animation: 'float 4s ease-in-out infinite' }}>
-        <defs>
-          <linearGradient id="rg1" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0%" stopColor="#FC6818" />
-            <stop offset="100%" stopColor="#0080A0" />
-          </linearGradient>
-          <linearGradient id="rg2" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0%" stopColor="#FC6818" />
-            <stop offset="100%" stopColor="#7c3aed" />
-          </linearGradient>
-        </defs>
-        <line x1="110" y1="14" x2="110" y2="36" stroke="#FF8A4C" strokeWidth="3" />
-        <circle cx="110" cy="10" r="6" fill="#fde047" />
-        <rect x="50" y="36" width="120" height="80" rx="16" fill="url(#rg1)" stroke="#FC6818" strokeWidth="1.5" />
-        <rect x="62" y="48" width="96" height="50" rx="8" fill="#0A0E17" />
-        <circle cx="88" cy="70" r="7" fill="#FC6818" />
-        <circle cx="132" cy="70" r="7" fill="#FC6818" />
-        <circle cx="90" cy="68" r="2.5" fill="#0A0E17" />
-        <circle cx="134" cy="68" r="2.5" fill="#0A0E17" />
-        <path d="M82 88 Q110 102 138 88" stroke="#fde047" strokeWidth="3" fill="none" strokeLinecap="round" />
-        <rect x="62" y="122" width="96" height="76" rx="10" fill="url(#rg2)" />
-        <rect x="84" y="138" width="52" height="32" rx="4" fill="#0A0E17" />
-        <circle cx="94" cy="154" r="3" fill="#fde047" />
-        <circle cx="106" cy="154" r="3" fill="#FC6818" />
-        <circle cx="118" cy="154" r="3" fill="#FC6818" />
-        <rect x="22" y="130" width="34" height="14" rx="6" fill="#FC6818" />
-        <rect x="164" y="130" width="34" height="14" rx="6" fill="#FC6818" />
-        <circle cx="82" cy="216" r="20" fill="#1f1f2a" stroke="#FC6818" strokeWidth="2" />
-        <circle cx="138" cy="216" r="20" fill="#1f1f2a" stroke="#FC6818" strokeWidth="2" />
-        <circle cx="82" cy="216" r="7" fill="#0A0E17" />
-        <circle cx="138" cy="216" r="7" fill="#0A0E17" />
-      </svg>
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50%       { transform: translateY(-14px); }
-        }
-      `}</style>
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { getAllPostsMerged } from '@/lib/blog-db';
 import { listProjectSlugs } from '@/lib/build/loader';
 import { SIMULATORS } from '@/lib/simulators';
 import { AI_TOPICS } from '@/lib/ai-robotics';
+import { SHORTS } from '@/lib/shorts';
 import { ZH_TOPICS } from '@/lib/ai-robotics-zh';
 import { HI_TOPICS } from '@/lib/ai-robotics-hi';
 import { ES_TOPICS } from '@/lib/ai-robotics-es';
@@ -89,6 +90,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const aiPages = [
+    { url: `${BASE}/shorts`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.9 },
+    ...SHORTS.map((t) => ({ url: `${BASE}/shorts/${t.slug}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 })),
     { url: `${BASE}/ai-robotics`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.9 },
     { url: `${BASE}/kids`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${BASE}/kids/parents`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
@@ -140,7 +143,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/community/gallery`,lastModified: now, changeFrequency: 'daily',   priority: 0.6 },
     { url: `${BASE}/workspace`,        lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE}/ros2`,             lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${BASE}/simulate`,         lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE}/challenges`,       lastModified: now, changeFrequency: 'weekly',  priority: 0.5 },
 
     // Boilerplate

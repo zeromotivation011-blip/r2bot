@@ -24,7 +24,7 @@ const PATHS = [
     steps: [
       { t: 'Read: how robots work', href: '/blog/how-do-robots-work' },
       { t: 'Spark course, lesson 1', href: '/academy/c/spark-foundations' },
-      { t: 'Try a simulator', href: '/simulate' },
+      { t: 'Try a simulator', href: '/visualizer' },
       { t: 'Look up any word in the Atlas', href: '/atlas' },
     ],
   },

@@ -44,7 +44,8 @@ async function applyCuration(articles: EnrichedArticle[]): Promise<EnrichedArtic
   }
 }
 
-interface RawFeed { name: string; url: string }
+interface RawFeed { name: string; url: string; onlyRobotics?: boolean }
+const ROBOT_RE = /robot|humanoid|automation|autonomous|drone|unitree|embodied|exoskeleton|self-driving/i
 
 const FEEDS: RawFeed[] = [
   { name: 'IEEE Spectrum',     url: 'https://spectrum.ieee.org/feeds/topic/robotics.rss' },
@@ -56,6 +57,10 @@ const FEEDS: RawFeed[] = [
   { name: 'Robohub',           url: 'https://robohub.org/feed/' },
   { name: 'Analytics India',   url: 'https://analyticsindiamag.com/feed/' },
   { name: 'Analytics Vidhya',  url: 'https://www.analyticsvidhya.com/feed/' },
+  // China and Asia coverage (general tech feeds, so only robotics-related items are kept)
+  { name: 'Pandaily',          url: 'https://pandaily.com/feed/', onlyRobotics: true },
+  { name: 'Synced',            url: 'https://syncedreview.com/feed/', onlyRobotics: true },
+  { name: 'Interesting Engineering', url: 'https://interestingengineering.com/feed', onlyRobotics: true },
 ]
 
 interface RSSItem {
@@ -215,7 +220,8 @@ async function fetchFeed(f: RawFeed): Promise<RSSItem[]> {
     })
     if (!res.ok) return []
     const xml = await res.text()
-    return parseFeed(f.name, xml)
+    const items = parseFeed(f.name, xml)
+    return f.onlyRobotics ? items.filter((i) => ROBOT_RE.test(i.title + ' ' + i.description)) : items
   } catch {
     return []
   }

@@ -45,6 +45,7 @@ const GROUPS: Group[] = [
       { kind: 'link', icon: '🇪🇸', label: 'Español', sub: 'IA y robótica, en lenguaje sencillo', href: '/es' },
       { kind: 'link', icon: '🍎', label: 'For teachers', sub: 'Free 40-minute lesson plan', href: '/teachers' },
       { kind: 'link', icon: '🧭', label: 'Start here', sub: 'Pick your path · free', href: '/start' },
+      { kind: 'link', icon: '⚡', label: 'Quick Lessons', sub: '1-minute videos · demos · quiz', href: '/shorts', highlight: true },
       { kind: 'link', icon: '🎬', label: 'Free course path', sub: '5 courses · quizzes · certificates', href: '/courses' },
       { kind: 'link', icon: '📚', label: 'Atlas', sub: '480+ concepts explained', href: '/atlas' },
       { kind: 'link', icon: '⚡', label: 'Daily Challenge', sub: 'Quick puzzle · streak', href: '/challenge' },
@@ -61,12 +62,11 @@ const GROUPS: Group[] = [
   },
   {
     label: 'Build',
-    matches: ['/build', '/visualizer', '/workspace', '/simulate', '/ros2'],
+    matches: ['/build', '/visualizer', '/workspace', '/ros2'],
     items: [
       { kind: 'link', icon: '🤖', label: 'Robot Projects', sub: '10 guided builds · learn by doing', href: '/build', highlight: true },
       { kind: 'link', icon: '🔬', label: 'Simulators', sub: '9 interactive tools', href: '/visualizer' },
       { kind: 'link', icon: '💻', label: 'Workspace IDE', sub: 'Code & simulate', href: '/workspace' },
-      { kind: 'link', icon: '🤖', label: '3D Simulation', sub: 'Webots robots', href: '/simulate' },
       { kind: 'link', icon: '🌐', label: 'ROS2 Playground', sub: 'Live shell', href: '/ros2' },
     ],
   },
