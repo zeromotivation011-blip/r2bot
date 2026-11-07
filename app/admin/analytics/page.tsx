@@ -76,6 +76,26 @@ export default async function AnalyticsPage() {
     return Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 10)
   }
 
+  // ── The four numbers to run the week on ─────────────────────────────
+  // Returning-visitor rate, and the Quick Lesson → course funnel. Both come
+  // from aggregate counters only (migration 0048); nothing is stored per
+  // person. See components/SiteViewCounter.tsx for why the browser decides.
+  const visitRows = metric('visit')
+  const visitNew = visitRows.find(([k]) => k === 'new')?.[1] ?? 0
+  const visitReturning = visitRows.find(([k]) => k === 'returning')?.[1] ?? 0
+  const visitTotal = visitNew + visitReturning
+  const returningPct = visitTotal > 0 ? Math.round((visitReturning / visitTotal) * 100) : null
+
+  const eventRows = metric('event')
+  const eventCount = (key: string) =>
+    eventRows.filter(([k]) => k === key).reduce((n, [, v]) => n + v, 0)
+  const leadEvents = eventRows.filter(([k]) => k.startsWith('lead:'))
+  const quizCorrect = eventCount('lesson_quiz_correct')
+  const courseOpens = eventCount('course_lesson_open')
+  const leadsCaptured = leadEvents.reduce((n, [, v]) => n + v, 0)
+  const lessonToCourse = quizCorrect > 0 ? Math.round((courseOpens / quizCorrect) * 100) : null
+  const quizToEmail = quizCorrect > 0 ? Math.round((leadsCaptured / quizCorrect) * 100) : null
+
   const retained = users.filter((u) => u.last_sign_in_at && new Date(u.last_sign_in_at).getTime() - new Date(u.created_at).getTime() > DAY).length
   const maskEmail = (e?: string | null) => { if (!e) return '(no email)'; const [a, b] = e.split('@'); return `${a.slice(0, 1)}***@${b ?? ''}` }
   const recent = [...users].sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 8)
@@ -167,11 +187,36 @@ export default async function AnalyticsPage() {
         </>
       )}
 
+      <h2 style={{ color: '#fff', fontSize: 18, margin: '32px 0 8px' }}>The four numbers (last 30 days)</h2>
+      <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 0 10px' }}>
+        Aggregate counters only — no cookies, no IPs, nothing stored per person.
+        {visitTotal === 0 && ' Run migration 0048_visit_and_funnel_metrics.sql, then these fill in within a day.'}
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
+        {[
+          { label: 'Returning visitors', value: returningPct === null ? '—' : `${returningPct}%`, sub: visitTotal ? `${visitReturning} of ${visitTotal} visits` : 'no data yet' },
+          { label: 'Lessons passed', value: quizCorrect || '—', sub: 'watched a lesson and got the question right' },
+          { label: 'Lesson → course', value: lessonToCourse === null ? '—' : `${lessonToCourse}%`, sub: `${courseOpens} course lessons opened` },
+          { label: 'Lesson → email', value: quizToEmail === null ? '—' : `${quizToEmail}%`, sub: `${leadsCaptured} emails captured` },
+        ].map((k) => (
+          <div key={k.label} style={{ padding: 18, borderRadius: 14, background: 'rgba(252,104,24,0.08)', border: '1px solid rgba(252,104,24,0.35)' }}>
+            <p style={{ color: '#94a3b8', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, margin: 0 }}>{k.label}</p>
+            <p style={{ color: '#fff', fontSize: 30, fontWeight: 900, margin: '6px 0 2px' }}>{k.value}</p>
+            <p style={{ color: '#64748b', fontSize: 12, margin: 0 }}>{k.sub}</p>
+          </div>
+        ))}
+      </div>
+      {leadEvents.length > 0 && (
+        <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
+          {topTable('Which form captured the email', leadEvents.map(([k, v]) => [k.replace('lead:', ''), v] as [string, number]))}
+        </div>
+      )}
+
       <h2 style={{ color: '#fff', fontSize: 18, margin: '32px 0 8px' }}>Traffic</h2>
       <p style={{ color: '#94a3b8', fontSize: 14, margin: '0 0 10px' }}>{viewsToday} views today</p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
         {topTable('Sections, 30 days', sectionRows)}
-        {metricsReady ? topTable('Where visitors come from', metric('ref')) : <div style={{ color: '#fbbf24', fontSize: 13 }}>Run migration 0045_site_metrics.sql to see sources, countries and devices.</div>}
+        {metricsReady ? topTable('Where visitors come from', metric('ref')) : <div style={{ color: '#fbbf24', fontSize: 13 }}>Run migration 0048_visit_and_funnel_metrics.sql to see sources, countries, devices and the funnel.</div>}
         {metricsReady && topTable('Countries', metric('country'))}
         {metricsReady && topTable('Devices', metric('device'))}
       </div>

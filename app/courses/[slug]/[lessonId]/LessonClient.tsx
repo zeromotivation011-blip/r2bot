@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { trackEvent } from '@/components/SiteViewCounter'
 
 interface Q { q: string; options: string[] }
 interface Lesson { id: string; title: string; summary: string; youtubeId: string; videoNo?: number; durationMin: number; quiz: Q[] }
@@ -31,6 +32,13 @@ export default function LessonClient({ courseSlug, courseTitle, lesson, index, t
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<Result | null>(null)
   const placeholder = !lesson.youtubeId.trim() || lesson.youtubeId.startsWith('REPLACE')
+
+  // Funnel: a course lesson with a real video was opened. Paired with
+  // lesson_quiz_correct this gives the Quick Lesson → course conversion that
+  // the whole top-of-funnel strategy rests on.
+  useEffect(() => {
+    if (!placeholder) trackEvent('course_lesson_open')
+  }, [placeholder, lesson.id])
 
   const saveWatch = useCallback(() => {
     const p = player.current

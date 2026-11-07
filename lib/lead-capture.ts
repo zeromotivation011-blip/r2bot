@@ -208,6 +208,12 @@ export async function captureLead(input: CaptureInput): Promise<CaptureResult> {
     }
   }
 
+  // Funnel counter: an email was captured, and from which form. Aggregate
+  // only — the counter records the source, never the address.
+  await supabase
+    .rpc('track_event', { p_event: `lead:${source}` })
+    .then(() => undefined, () => undefined)
+
   // Send list. A duplicate here is expected and fine.
   await supabase
     .from('newsletter_subscribers')

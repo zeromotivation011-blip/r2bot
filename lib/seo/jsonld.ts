@@ -1,3 +1,4 @@
+import { authorRef } from '@/lib/author';
 // lib/seo/jsonld.ts
 // Reusable schema.org JSON-LD builders.
 
@@ -63,7 +64,10 @@ export function articleJsonLD(
     datePublished,
     dateModified: dateModified ?? datePublished,
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-    author: { '@type': 'Organization', name: 'R2BOT', url: BASE_URL },
+    // A named person, not the organisation: every article on the site used to
+    // be credited to "R2BOT", which answers none of a reader's questions about
+    // who wrote it. See lib/author.ts.
+    author: authorRef(),
     publisher: {
       '@type': 'Organization',
       name: 'R2BOT',

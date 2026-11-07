@@ -6,6 +6,7 @@ import { SHORTS, SHORT_COURSES, getShort, shortsInCourse } from '@/lib/shorts'
 import ShortDemo from '@/components/shorts/ShortsDemos'
 import { ShortEmbed, LessonQuiz, ProgressBar } from '@/components/shorts/ShortsClient'
 import ShareBar from '@/components/ShareBar'
+import { authorRef } from '@/lib/author'
 
 const BASE = 'https://www.r2bot.in'
 export const revalidate = 86400
@@ -32,7 +33,7 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
   const next = getShort(s.next ?? SHORTS[0].slug) ?? SHORTS[0]
   const ld = [
     ...s.ids.map((id) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: s.title, description: s.summary, thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${id}`, contentUrl: `https://www.youtube.com/shorts/${id}`, uploadDate: s.videoPublished ?? '2026-11-06', publisher: { '@type': 'Organization', name: 'R2BOT' } })),
-    { '@context': 'https://schema.org', '@type': 'Article', headline: s.title, description: s.summary, author: { '@type': 'Organization', name: 'R2BOT' }, mainEntityOfPage: `${BASE}/shorts/${s.slug}` },
+    { '@context': 'https://schema.org', '@type': 'Article', headline: s.title, description: s.summary, author: authorRef(), mainEntityOfPage: `${BASE}/shorts/${s.slug}` },
     { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Quick Lessons', item: `${BASE}/shorts` }, { '@type': 'ListItem', position: 2, name: s.title, item: `${BASE}/shorts/${s.slug}` }] },
   ]
   return (

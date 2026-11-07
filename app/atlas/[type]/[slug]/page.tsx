@@ -22,7 +22,6 @@ import { Nav } from '@/components/Nav';
 import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider, CopilotContextBinder } from '@/components/CopilotProvider';
-import { AskAboutThisButton } from '@/components/AskAboutThisButton';
 import { Breadcrumbs, type Crumb } from '@/components/Breadcrumbs';
 import { ReadingProgress } from '@/components/ReadingProgress';
 import { BackToTop } from '@/components/BackToTop';
@@ -38,6 +37,9 @@ import { ConceptHero } from '@/components/atlas/ConceptHero';
 import { NextTopicBar } from '@/components/atlas/NextTopicBar';
 import { ConceptLayers } from '@/components/atlas/ConceptLayers';
 import { Reveal } from '@/components/Reveal';
+import { AtlasNextStep } from '@/components/atlas/AtlasNextStep';
+import { quickLessonForAtlas, ATLAS_ROBOT_CANONICAL } from '@/lib/canonical-map';
+import { authorRef } from '@/lib/author';
 
 const PROGRAMMING_BUCKETS = new Set([
   'programming-software',
@@ -149,6 +151,10 @@ export default async function AtlasEntryPage(
   const sourceCount = entry.sources?.length ?? 0;
   const faqItems = extractFAQItems(entry.body);
   const academyLesson = getAcademyLessonForAtlasTerm(slug);
+  // The 60-second video lesson on the same idea, if one exists. Twelve Quick
+  // Lessons share a slug with an Atlas concept; linking them makes two pages on
+  // one topic complementary (definition vs. demonstration) instead of rivals.
+  const quickLesson = quickLessonForAtlas(type, slug);
 
   // Trail label for breadcrumbs.
   const catLabel = entry.category ? entry.category.replace(/-/g, ' ') : typeLabel(type);
@@ -167,7 +173,7 @@ export default async function AtlasEntryPage(
     description: entry.summary,
     dateModified: entry.lastReviewed,
     url: canonical,
-    author: { '@type': 'Organization', name: 'R2BOT' },
+    author: authorRef(),
     publisher: { '@type': 'Organization', name: 'R2BOT' },
     ...(type === 'concept'
       ? {
@@ -457,33 +463,19 @@ export default async function AtlasEntryPage(
             <AskR2Inline topic={entry.title} />
           </div>
 
-          {/* Ask-this card (legacy — kept for the existing follow-up prompt UX) */}
-          <div
-            style={{
-              margin: '20px 0 40px',
-              padding: 26,
-              background: 'linear-gradient(135deg, rgba(0,184,212,.06), rgba(165,107,255,.04))',
-              border: '1px solid var(--border-2)',
-              borderRadius: 16,
-            }}
-          >
-            <div
-              style={{
-                fontFamily: 'var(--font-mono), monospace',
-                fontSize: 11,
-                letterSpacing: '.3em',
-                color: 'var(--cyan)',
-                textTransform: 'uppercase',
-                marginBottom: 10,
-              }}
-            >
-              Still curious?
-            </div>
-            <p style={{ fontSize: 17, color: '#C8D0DC', margin: '0 0 18px' }}>
-              Ask R2 Co-pilot anything you didn&apos;t understand about {entry.title}. It&apos;ll explain it plainly.
-            </p>
-            <AskAboutThisButton topic={entry.title} />
-          </div>
+          {/* The single next step. The page already offers the Co-pilot just
+              above (AskR2Inline); a second, larger Co-pilot card was the most
+              prominent action on the page and it led nowhere measurable. */}
+          <AtlasNextStep
+            topic={entry.title}
+            lesson={quickLesson ? { title: quickLesson.title, href: quickLesson.href } : null}
+            academy={academyLesson ? {
+              title: academyLesson.title,
+              href: `/academy/${academyLesson.track}/${academyLesson.slug}`,
+              track: TRACK_NAME[academyLesson.track],
+              emoji: TRACK_EMOJI[academyLesson.track],
+            } : null}
+          />
 
           {/* Interactive visualiser for select concepts */}
           {entry.slug === 'sense-think-act-loop' && (
@@ -505,8 +497,9 @@ export default async function AtlasEntryPage(
             </section>
           )}
 
-          {/* Learn this in the Academy */}
-          {academyLesson && (
+          {/* Learn this in the Academy — only when the next-step card above is
+              showing the Quick Lesson, so the same link never appears twice. */}
+          {academyLesson && quickLesson && (
             <div className="mt-8 mb-6 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
               <p className="text-xs text-amber-500/70 uppercase tracking-wider font-semibold mb-3">Learn this in the Academy</p>
               <Link href={`/academy/${academyLesson.track}/${academyLesson.slug}`} className="flex items-center gap-3 group">
@@ -530,7 +523,13 @@ export default async function AtlasEntryPage(
                 </h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
                   {related.slice(0, 3).map((r) => (
-                    <a key={r.slug} href={`/atlas/${r.type}/${r.slug}`} className="pulse-card">
+                    <a
+                      key={r.slug}
+                      href={r.type === 'robot' && ATLAS_ROBOT_CANONICAL[r.slug]
+                        ? `/robots/${ATLAS_ROBOT_CANONICAL[r.slug]}`
+                        : `/atlas/${r.type}/${r.slug}`}
+                      className="pulse-card"
+                    >
                       <span
                         className={`pulse-tag ${
                           r.type === 'concept'

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { authorRef } from '@/lib/author'
 import { notFound } from 'next/navigation'
 import { Nav } from '@/components/Nav'
 import { CopilotProvider } from '@/components/CopilotProvider'
@@ -65,7 +66,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     image: `${BASE}/og-default.png`,
     datePublished: post.date,
     dateModified: post.date,
-    author: { '@type': 'Organization', name: post.author, url: BASE },
+    author: authorRef(),
     publisher: {
       '@type': 'Organization',
       name: 'R2BOT',

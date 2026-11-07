@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import InlineSignup from '@/components/InlineSignup'
+import { trackEvent } from '@/components/SiteViewCounter'
 
 const KEY = 'r2bot_shorts_done'
 
@@ -45,7 +46,14 @@ export function LessonQuiz({ slug, quiz, nextHref, nextTitle, lang = 'en' }: { s
   const [pick, setPick] = useState<number | null>(null)
   const done = useDone()
   const correct = pick === quiz.answer
-  useEffect(() => { if (correct) markDone(slug) }, [correct, slug])
+  useEffect(() => {
+    if (!correct) return
+    markDone(slug)
+    // The funnel milestone that matters: someone watched a lesson and got the
+    // question right. This is also where the email ask appears, so the two
+    // numbers can be compared.
+    trackEvent('lesson_quiz_correct')
+  }, [correct, slug])
   return (
     <div style={{ padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', margin: '24px 0' }}>
       <div style={{ color: '#FC6818', fontWeight: 800, fontSize: 12 }}>{L.check} {done.includes(slug) && pick === null ? L.before : ''}</div>

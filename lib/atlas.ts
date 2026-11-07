@@ -281,13 +281,149 @@ export function getAtlasEntry(type: AtlasType, slug: string): AtlasEntry | null 
   return buildEntry(type, slug, data as Record<string, unknown>, content);
 }
 
+/**
+ * Internal link graph for the "Keep going" cards, built once per process.
+ *
+ * The old behaviour was: explicit `seeAlso` first, then *every other entry of
+ * the same type in alphabetical order*, sliced to three. In practice that meant
+ * the three alphabetically-first concepts collected an inbound link from
+ * hundreds of pages while 118 entries had no inbound link from anywhere on the
+ * site. Pages with no internal links rarely get crawled and never get
+ * discovered by a reader.
+ *
+ * Two changes:
+ *   1. The fallback is ranked by relevance (same category, shared tags, similar
+ *      difficulty) instead of by alphabet.
+ *   2. Among equally relevant candidates, the one with the fewest inbound links
+ *      so far wins. The graph is built in one deterministic pass over the
+ *      entries, so the result is stable between builds but spreads link equity
+ *      instead of piling it on four pages.
+ */
+type LinkGraph = Map<string, string[]>;
+let linkGraph: LinkGraph | null = null;
+
+const relatednessScore = (a: AtlasEntry, b: AtlasEntry): number => {
+  let score = 0;
+  if (a.type === b.type) score += 2;
+  if (a.category && b.category && a.category === b.category) score += 4;
+  if (a.bucket && b.bucket && a.bucket === b.bucket) score += 3;
+  const tagsB = new Set((b.tags ?? []).map((t) => t.toLowerCase()));
+  for (const tag of a.tags ?? []) if (tagsB.has(tag.toLowerCase())) score += 2;
+  if (a.difficulty && b.difficulty && a.difficulty === b.difficulty) score += 1;
+  if (a.difficultyLevel && b.difficultyLevel && Math.abs(a.difficultyLevel - b.difficultyLevel) <= 1) score += 1;
+  return score;
+};
+
+// Matches the number of "Keep going" cards the Atlas page renders. If the
+// graph builds more than the page shows, the extra picks are computed and then
+// thrown away — which is how entries end up with no inbound link despite the
+// balancing below.
+const RELATED_PER_ENTRY = 3;
+
+function buildLinkGraph(all: AtlasEntry[]): LinkGraph {
+  const key = (e: AtlasEntry) => `${e.type}/${e.slug}`;
+  const inbound = new Map<string, number>();
+  for (const e of all) inbound.set(key(e), 0);
+
+  // Explicit seeAlso links are authored, so they count as inbound first and are
+  // never displaced by the balancing below.
+  const bySlug = new Map<string, AtlasEntry>();
+  for (const e of all) bySlug.set(e.slug.toLowerCase(), e);
+  const explicitFor = new Map<string, AtlasEntry[]>();
+  for (const e of all) {
+    const picks: AtlasEntry[] = [];
+    for (const slug of e.seeAlso ?? []) {
+      const hit = bySlug.get(slug.toLowerCase());
+      if (hit && hit !== e && !picks.includes(hit)) picks.push(hit);
+    }
+    explicitFor.set(key(e), picks.slice(0, RELATED_PER_ENTRY));
+    for (const p of picks.slice(0, RELATED_PER_ENTRY)) {
+      inbound.set(key(p), (inbound.get(key(p)) ?? 0) + 1);
+    }
+  }
+
+  // Deterministic order: entries needing the most filling go first.
+  const ordered = [...all].sort((a, b) => {
+    const need = (explicitFor.get(key(b))?.length ?? 0) - (explicitFor.get(key(a))?.length ?? 0);
+    if (need !== 0) return need;
+    return key(a).localeCompare(key(b));
+  });
+
+  const graph: LinkGraph = new Map();
+  for (const entry of ordered) {
+    const picks = [...(explicitFor.get(key(entry)) ?? [])];
+    const taken = new Set(picks.map(key));
+    if (picks.length < RELATED_PER_ENTRY) {
+      const candidates = all
+        .filter((c) => c !== entry && !taken.has(key(c)))
+        .map((c) => ({ c, score: relatednessScore(entry, c), seen: inbound.get(key(c)) ?? 0 }))
+        .filter((x) => x.score > 0)
+        .sort((x, y) => {
+          // Relevance first, then whichever page needs links more, then slug.
+          if (y.score !== x.score) return y.score - x.score;
+          if (x.seen !== y.seen) return x.seen - y.seen;
+          return key(x.c).localeCompare(key(y.c));
+        });
+      for (const { c } of candidates) {
+        if (picks.length >= RELATED_PER_ENTRY) break;
+        picks.push(c);
+        taken.add(key(c));
+        inbound.set(key(c), (inbound.get(key(c)) ?? 0) + 1);
+      }
+    }
+    graph.set(key(entry), picks.map(key));
+  }
+
+  // Rescue pass: any entry still with no inbound link is placed on the page
+  // that is most related to it, replacing that page's weakest pick. Relevance
+  // ordering alone leaves a tail of entries that never make anyone's top three,
+  // and an unlinked page is one a reader can only reach from search.
+  const entryByKey = new Map(all.map((e) => [key(e), e]));
+  for (const orphan of all) {
+    const ok = key(orphan);
+    if ((inbound.get(ok) ?? 0) > 0) continue;
+    const hosts = all
+      .filter((h) => h !== orphan)
+      .map((h) => ({ h, score: relatednessScore(h, orphan) }))
+      .sort((x, y) => (y.score - x.score) || key(x.h).localeCompare(key(y.h)));
+    for (const { h } of hosts) {
+      const hk = key(h);
+      const picks = graph.get(hk);
+      if (!picks || picks.length === 0 || picks.includes(ok)) continue;
+      // Never displace an authored seeAlso link.
+      const authored = new Set((explicitFor.get(hk) ?? []).map(key));
+      const replaceable = [...picks]
+        .filter((k) => !authored.has(k))
+        .sort((a, b) => {
+          const ea = entryByKey.get(a);
+          const eb = entryByKey.get(b);
+          const sa = ea ? relatednessScore(h, ea) : 0;
+          const sb = eb ? relatednessScore(h, eb) : 0;
+          // Drop the least relevant pick that is not the only link to its page.
+          if (sa !== sb) return sa - sb;
+          return (inbound.get(b) ?? 0) - (inbound.get(a) ?? 0);
+        });
+      const victim = replaceable.find((k) => (inbound.get(k) ?? 0) > 1);
+      if (!victim) continue;
+      picks[picks.indexOf(victim)] = ok;
+      inbound.set(victim, (inbound.get(victim) ?? 1) - 1);
+      inbound.set(ok, 1);
+      break;
+    }
+  }
+  return graph;
+}
+
 export function getRelatedEntries(entry: AtlasEntry, limit = 4): AtlasEntry[] {
   const all = getAllAtlasEntries();
-  const seeAlso = (entry.seeAlso ?? []).map(s => s.toLowerCase());
-  // Prefer explicit seeAlso, then same-type others
-  const explicit = all.filter(e => e !== entry && seeAlso.includes(e.slug));
-  const sameType = all.filter(e => e !== entry && e.type === entry.type && !seeAlso.includes(e.slug));
-  return [...explicit, ...sameType].slice(0, limit);
+  if (!linkGraph || linkGraph.size !== all.length) linkGraph = buildLinkGraph(all);
+  const byKey = new Map(all.map((e) => [`${e.type}/${e.slug}`, e]));
+  const keys = linkGraph.get(`${entry.type}/${entry.slug}`) ?? [];
+  const picked = keys.map((k) => byKey.get(k)).filter((e): e is AtlasEntry => Boolean(e));
+  if (picked.length >= limit) return picked.slice(0, limit);
+  // Safety net: never render fewer cards than asked for.
+  const extra = all.filter((e) => e !== entry && !picked.includes(e)).slice(0, limit - picked.length);
+  return [...picked, ...extra];
 }
 
 export function typeLabel(t: AtlasType): string {

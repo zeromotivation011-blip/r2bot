@@ -34,8 +34,17 @@ function refSource(raw: string): string {
 export async function POST(req: NextRequest) {
   const ua = req.headers.get('user-agent') ?? ''
   if (BOT.test(ua)) return new Response(null, { status: 204 })
-  let path = '', referrer = ''
-  try { const b = await req.json(); path = String(b?.path ?? ''); referrer = String(b?.referrer ?? '') } catch { return new Response(null, { status: 400 }) }
+  let path = '', referrer = '', visit = '', event = ''
+  try {
+    const b = await req.json()
+    path = String(b?.path ?? '')
+    referrer = String(b?.referrer ?? '')
+    // 'new' | 'returning', decided by the browser from a first-party flag. No
+    // identifier is sent or stored — see migration 0048.
+    visit = b?.visit === 'new' || b?.visit === 'returning' ? String(b.visit) : ''
+    // A named funnel milestone, e.g. 'lesson_quiz_correct'.
+    event = typeof b?.event === 'string' ? b.event.slice(0, 60) : ''
+  } catch { return new Response(null, { status: 400 }) }
   path = path.split('?')[0].split('#')[0]
   if (path.length > 1) path = path.replace(/\/+$/, '')
   if (!OK_PATH.test(path) || path.startsWith('/admin') || path.startsWith('/api') || path.startsWith('/_next')) {
@@ -45,9 +54,18 @@ export async function POST(req: NextRequest) {
   const device = /ipad|tablet/i.test(ua) ? 'tablet' : /mobi|android|iphone/i.test(ua) ? 'mobile' : 'desktop'
   const admin = createSupabaseAdminClient()
   try {
-    const { error } = await admin.rpc('track_view', { p_path: path, p_country: country, p_device: device, p_ref: refSource(referrer) })
-    // Migration 0045 not applied yet: fall back to the plain page counter.
-    if (error) await admin.rpc('increment_page_view', { p_path: path })
+    const { error } = await admin.rpc('track_view', {
+      p_path: path, p_country: country, p_device: device, p_ref: refSource(referrer), p_visit: visit || null,
+    })
+    if (error) {
+      // Migration 0048 not applied yet: try the four-argument form from 0045,
+      // then the plain page counter. Tracking must never break a page.
+      const { error: legacy } = await admin.rpc('track_view', {
+        p_path: path, p_country: country, p_device: device, p_ref: refSource(referrer),
+      })
+      if (legacy) await admin.rpc('increment_page_view', { p_path: path })
+    }
+    if (event) await admin.rpc('track_event', { p_event: event }).then(() => undefined, () => undefined)
   } catch { /* never break the page */ }
   return new Response(null, { status: 204 })
 }
