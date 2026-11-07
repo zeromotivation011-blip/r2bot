@@ -35,14 +35,18 @@ export function ShortEmbed({ id, title }: { id: string; title: string }) {
   )
 }
 
-export function LessonQuiz({ slug, quiz, nextHref, nextTitle }: { slug: string; quiz: { q: string; options: [string, string, string]; answer: number; why: string }; nextHref: string; nextTitle: string }) {
+const L_EN = { check: 'QUICK CHECK', before: '· ✓ DONE BEFORE', ok: 'Correct.', no: 'Not quite.', retry: 'Try again', next: 'Next:' }
+const L_ZH = { check: '小测验', before: '· ✓ 已完成', ok: '答对了。', no: '再想想。', retry: '再试一次', next: '下一课：' }
+
+export function LessonQuiz({ slug, quiz, nextHref, nextTitle, lang = 'en' }: { slug: string; quiz: { q: string; options: [string, string, string]; answer: number; why: string }; nextHref: string; nextTitle: string; lang?: 'en' | 'zh' }) {
+  const L = lang === 'zh' ? L_ZH : L_EN
   const [pick, setPick] = useState<number | null>(null)
   const done = useDone()
   const correct = pick === quiz.answer
   useEffect(() => { if (correct) markDone(slug) }, [correct, slug])
   return (
     <div style={{ padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', margin: '24px 0' }}>
-      <div style={{ color: '#FC6818', fontWeight: 800, fontSize: 12 }}>QUICK CHECK {done.includes(slug) && pick === null ? '· ✓ DONE BEFORE' : ''}</div>
+      <div style={{ color: '#FC6818', fontWeight: 800, fontSize: 12 }}>{L.check} {done.includes(slug) && pick === null ? L.before : ''}</div>
       <p style={{ color: '#fff', fontSize: 18, fontWeight: 700, margin: '8px 0 12px' }}>{quiz.q}</p>
       <div style={{ display: 'grid', gap: 8 }}>
         {quiz.options.map((o, i) => {
@@ -53,15 +57,15 @@ export function LessonQuiz({ slug, quiz, nextHref, nextTitle }: { slug: string; 
       </div>
       {pick !== null && (
         <div style={{ marginTop: 14 }}>
-          <p style={{ color: correct ? '#4ade80' : '#fbbf24', fontWeight: 800, margin: 0 }}>{correct ? 'Correct.' : 'Not quite.'}</p>
+          <p style={{ color: correct ? '#4ade80' : '#fbbf24', fontWeight: 800, margin: 0 }}>{correct ? L.ok : L.no}</p>
           <p style={{ color: '#e2e8f0', margin: '4px 0 12px', lineHeight: 1.6 }}>{quiz.why}</p>
           {correct ? (
             <>
-              <Link href={nextHref} style={{ display: 'inline-block', padding: '12px 20px', borderRadius: 12, background: '#FC6818', color: '#0A0E17', fontWeight: 800, textDecoration: 'none' }}>Next: {nextTitle} →</Link>
-              <div style={{ marginTop: 18 }}><InlineSignup /></div>
+              <Link href={nextHref} style={{ display: 'inline-block', padding: '12px 20px', borderRadius: 12, background: '#FC6818', color: '#0A0E17', fontWeight: 800, textDecoration: 'none' }}>{L.next} {nextTitle} →</Link>
+              <div style={{ marginTop: 18 }}><InlineSignup lang={lang} /></div>
             </>
           ) : (
-            <button onClick={() => setPick(null)} style={{ padding: '10px 16px', borderRadius: 10, border: '1px solid #FC6818', background: 'transparent', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>Try again</button>
+            <button onClick={() => setPick(null)} style={{ padding: '10px 16px', borderRadius: 10, border: '1px solid #FC6818', background: 'transparent', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>{L.retry}</button>
           )}
         </div>
       )}
@@ -69,15 +73,15 @@ export function LessonQuiz({ slug, quiz, nextHref, nextTitle }: { slug: string; 
   )
 }
 
-export function ProgressBar({ slugs }: { slugs: string[] }) {
+export function ProgressBar({ slugs, lang = 'en' }: { slugs: string[]; lang?: 'en' | 'zh' }) {
   const done = useDone()
   const n = slugs.filter((s) => done.includes(s)).length
   return (
-    <div style={{ margin: '14px 0' }} aria-label={`${n} of ${slugs.length} quick lessons finished`}>
+    <div style={{ margin: '14px 0' }} aria-label={lang === 'zh' ? `已完成 ${n} / ${slugs.length}` : `${n} of ${slugs.length} quick lessons finished`}>
       <div style={{ height: 8, borderRadius: 99, background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${(n / slugs.length) * 100}%`, background: '#FC6818', transition: 'width .6s' }} />
       </div>
-      <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>{n} of {slugs.length} finished on this device</div>
+      <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>{lang === 'zh' ? `已完成 ${n} / ${slugs.length}（保存在本设备）` : `${n} of ${slugs.length} finished on this device`}</div>
     </div>
   )
 }

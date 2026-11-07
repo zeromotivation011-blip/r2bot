@@ -9,7 +9,7 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'Quick Lessons: How Robots Work in 60 Seconds',
   description: 'Free one-minute robotics lessons with video, animated demos and a quick check. Sensors, motors, control, hands and robots at work, in plain English.',
-  alternates: { canonical: `${BASE}/shorts` },
+  alternates: { canonical: `${BASE}/shorts`, languages: { en: `${BASE}/shorts`, 'zh-CN': `${BASE}/zh/shorts` } },
 }
 
 export default function ShortsHub() {
