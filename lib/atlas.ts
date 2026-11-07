@@ -201,7 +201,7 @@ export function buildEntry(type: AtlasType, slug: string, data: Record<string, u
   return {
     type,
     slug,
-    title: String(data.title ?? slug),
+    title: String(data.title ?? slug).replace(/\s*[|]\s*R2BOT\s*$/i, '').trim(),
     summary: String(data.summary ?? ''),
     seeAlso: normalizeStringArray(data.seeAlso),
     sources: normalizeSources(data.sources),
