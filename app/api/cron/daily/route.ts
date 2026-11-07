@@ -10,6 +10,7 @@ import { getNewsData } from '@/lib/news';
 import { getLiveLensVideos } from '@/lib/lens-live';
 import { runDiscovery } from '@/lib/discovery';
 import { runEmailAutomation } from '@/lib/email-automation';
+import { runWeeklyBackup } from '@/lib/backup';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -59,6 +60,13 @@ async function sendAutomatedEmails(): Promise<StepResult> {
   return { ok: r.errors.length === 0, detail: r, error: r.errors[0] };
 }
 
+// Mondays only; a no-op on the other six days. Folded in here because the Hobby
+// plan allows two cron jobs and both are taken.
+async function weeklyBackup(): Promise<StepResult> {
+  const r = await runWeeklyBackup();
+  return { ok: r.ok, detail: r, error: r.errors[0] };
+}
+
 async function handle(req: NextRequest): Promise<Response> {
   if (!authorized(req)) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -70,6 +78,7 @@ async function handle(req: NextRequest): Promise<Response> {
     ['lens', refreshLens],
     ['discovery', refreshDiscovery],
     ['emails', sendAutomatedEmails],
+    ['backup', weeklyBackup],
   ] as const) {
     try {
       steps[name] = await fn();

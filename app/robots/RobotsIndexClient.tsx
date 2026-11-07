@@ -160,7 +160,7 @@ function RobotCard({ robot }: { robot: Robot }) {
             {ROBOT_TYPE_LABELS[robot.type]}
           </span>
           <span className="absolute left-3 top-3 rounded-full border border-amber-400/40 bg-amber-500/15 px-2.5 py-0.5 font-mono text-[10px] font-bold text-amber-200 backdrop-blur">
-            #{robot.fameRank}
+            #{robot.displayRank ?? robot.fameRank}
           </span>
         </div>
 

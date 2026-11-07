@@ -31,6 +31,8 @@ export interface RobotSpec {
 export interface Robot {
   slug: string;
   fameRank: number;
+  /** Position in the fame ordering, derived in ROBOTS — never authored. */
+  displayRank?: number;
   name: string;
   emoji: string;
   maker: string;
@@ -428,7 +430,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'optimus',
-    fameRank: 7,
+    fameRank: 8,
     name: 'Optimus',
     emoji: '🦾',
     maker: 'Tesla',
@@ -489,7 +491,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'sophia',
-    fameRank: 8,
+    fameRank: 9,
     name: 'Sophia',
     emoji: '👩',
     maker: 'Hanson Robotics',
@@ -550,7 +552,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'perseverance',
-    fameRank: 9,
+    fameRank: 10,
     name: 'Perseverance',
     emoji: '🛰️',
     maker: 'NASA / JPL',
@@ -611,7 +613,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'figure-02',
-    fameRank: 10,
+    fameRank: 11,
     name: 'Figure 02',
     emoji: '🤖',
     maker: 'Figure AI',
@@ -672,7 +674,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'aibo',
-    fameRank: 11,
+    fameRank: 12,
     name: 'AIBO',
     emoji: '🐕‍🦺',
     maker: 'Sony',
@@ -733,7 +735,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'pepper',
-    fameRank: 12,
+    fameRank: 13,
     name: 'Pepper',
     emoji: '👋',
     maker: 'SoftBank Robotics',
@@ -794,7 +796,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'nao',
-    fameRank: 13,
+    fameRank: 14,
     name: 'NAO',
     emoji: '🤖',
     maker: 'Aldebaran Robotics / SoftBank',
@@ -855,7 +857,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'paro',
-    fameRank: 14,
+    fameRank: 15,
     name: 'PARO',
     emoji: '🦭',
     maker: 'AIST',
@@ -916,7 +918,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'vyommitra',
-    fameRank: 15,
+    fameRank: 16,
     name: 'Vyommitra',
     emoji: '🚀',
     maker: 'ISRO',
@@ -977,7 +979,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'grey-orange-butler',
-    fameRank: 16,
+    fameRank: 17,
     name: 'GreyOrange Butler',
     emoji: '📦',
     maker: 'GreyOrange',
@@ -1038,7 +1040,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'drdo-daksh',
-    fameRank: 17,
+    fameRank: 18,
     name: 'DRDO Daksh',
     emoji: '🛡️',
     maker: 'DRDO',
@@ -1099,7 +1101,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'spot-mini',
-    fameRank: 18,
+    fameRank: 19,
     name: 'SpotMini',
     emoji: '🐩',
     maker: 'Boston Dynamics',
@@ -1160,7 +1162,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'ur5',
-    fameRank: 19,
+    fameRank: 21,
     name: 'Universal Robots UR5',
     emoji: '🤝',
     maker: 'Universal Robots',
@@ -1221,7 +1223,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'kuka-kr',
-    fameRank: 20,
+    fameRank: 22,
     name: 'KUKA KR AGILUS',
     emoji: '🦾',
     maker: 'KUKA',
@@ -1283,7 +1285,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   // ── Additions for the Hall of Fame v2 ───────────────────────────────
   {
     slug: 'mitra',
-    fameRank: 18,
+    fameRank: 20,
     name: 'Mitra',
     emoji: '🇮🇳',
     maker: 'Invento Robotics',
@@ -1333,7 +1335,7 @@ const ROBOTS_UNSORTED: Robot[] = [
   },
   {
     slug: 'amazon-kiva',
-    fameRank: 6,
+    fameRank: 7,
     name: 'Amazon Kiva',
     emoji: '📦',
     maker: 'Amazon Robotics (originally Kiva Systems)',
@@ -1385,7 +1387,19 @@ const ROBOTS_UNSORTED: Robot[] = [
 ];
 
 // Final exported list: sorted by fameRank (most famous first).
-export const ROBOTS: Robot[] = [...ROBOTS_UNSORTED].sort((a, b) => a.fameRank - b.fameRank);
+/**
+ * Sorted by fame rank, with the displayed position derived from the sort rather
+ * than trusted from the data.
+ *
+ * Two robots shared rank 6 and two shared rank 18, so /robots rendered "#6" and
+ * "#18" twice and never showed #21 or #22 — a visible credibility bug on the
+ * page meant to be an authoritative list. The authored ranks are now 1..22 and
+ * unique, and `displayRank` is computed so a future duplicate shows a correct
+ * ordinal instead of repeating one.
+ */
+const BY_FAME = [...ROBOTS_UNSORTED].sort((a, b) => a.fameRank - b.fameRank || a.slug.localeCompare(b.slug));
+
+export const ROBOTS: Robot[] = BY_FAME.map((r, i) => ({ ...r, displayRank: i + 1 }));
 
 export const ROBOTS_BY_SLUG = new Map(ROBOTS.map((r) => [r.slug, r]));
 
