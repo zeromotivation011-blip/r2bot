@@ -101,17 +101,22 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
           </div>
         </section>
       )}
-      <Ticker atlasCount={atlasCount} />
+      {/* Eleven sections, all the same shape, all the same height. Cut to six
+          that each do a different job and look different doing it.
+          Removed: the emoji ticker (a marquee of facts the hero already
+          states); MissionStrip (a two-screen detour into why-we-exist in the
+          middle of the funnel — it is the whole of /mission); IndiaSpotlight
+          (India is a key region, not the identity, and it was a full section
+          of the global homepage); and Testimonials, which was a second
+          feature grid saying the same six things as Features, two screens
+          after it, and claimed "20+ guided robot projects" when there are
+          ten. */}
       <ContinueStrip />
       <Reveal><HomeShorts /></Reveal>
-      <Reveal><MissionStrip /></Reveal>
       <Reveal><CoursePath /></Reveal>
       <Reveal><Features atlasCount={atlasCount} /></Reveal>
       <Reveal><SimulatorShowcase /></Reveal>
-      <Reveal><IndiaSpotlight /></Reveal>
-      <Reveal><Testimonials /></Reveal>
-      <Reveal><NewsTeaser items={news} /></Reveal>
-      <Reveal><LensTeaser items={videos} /></Reveal>
+      <Reveal><Latest news={news} videos={videos} /></Reveal>
       <Reveal><NewsletterCTA /></Reveal>
 
       <style jsx global>{`
@@ -191,77 +196,16 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
   )
 }
 
-// ─── TICKER ───────────────────────────────────────────────────────────────
-function Ticker({ atlasCount }: { atlasCount: number }) {
-  const items = [
-    '⚡ Spark · Wire · Forge · Edge — four complete robotics tracks',
-    '🌐 In English — Hindi & Spanish coming',
-    '🔬 9 in-browser simulators — no install needed',
-    `📚 ${atlasCount.toLocaleString()} Atlas concepts`,
-    '🤖 R2 Co-pilot — your AI robotics mentor',
-    '🌍 50 countries on the robotics map',
-    '🛠️ 20+ guided robot builds',
-    '🎓 Certificates for every course',
-    '🔥 Spaced repetition built in',
-  ]
-  return (
-    <section style={{ background: 'var(--void)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', overflow: 'hidden', height: 44, display: 'flex', alignItems: 'center' }}>
-      <div style={{ position: 'relative', width: '100%' }}>
-        <div className="ticker-track" style={{ display: 'inline-flex', whiteSpace: 'nowrap' }}>
-          {[...items, ...items].map((t, i) => (
-            <span key={i} style={{ padding: '0 28px', color: '#cbd5e1', fontSize: 13, fontWeight: 600, borderRight: '1px solid var(--border)' }}>{t}</span>
-          ))}
-        </div>
-      </div>
-      <style jsx>{`
-        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .ticker-track { animation: ticker 55s linear infinite; }
-      `}</style>
-    </section>
-  )
-}
-
-// ─── MISSION STRIP ────────────────────────────────────────────────────────
-function MissionStrip() {
-  return (
-    <section style={{
-      padding: '72px 20px',
-      background: 'linear-gradient(135deg, rgba(0,229,255,0.07), rgba(165,107,255,0.07))',
-      borderBottom: '1px solid rgba(255,255,255,0.07)',
-    }}>
-      <div style={{ maxWidth: 960, margin: '0 auto', textAlign: 'center' }}>
-        <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 16px' }}>
-          Our Mission
-        </p>
-        <h2 style={{ fontSize: 'clamp(26px,4vw,48px)', fontWeight: 900, color: '#fff', margin: '0 0 18px', lineHeight: 1.2 }}>
-          Make robotics as learnable as a language.
-        </h2>
-        <p style={{ fontSize: 17, color: '#94a3b8', maxWidth: 720, margin: '0 auto 32px', lineHeight: 1.7 }}>
-          Robotics is about to reshape every industry on Earth. Yet most people who are curious about it have never seen a robot up close — let alone programmed one.
-          R2BOT exists to close that gap for everyone: structured courses, real simulators, an AI mentor, and the clearest robotics knowledge on the internet.
-        </p>
-        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 14 }}>
-          {[
-            { stat: '4 Tracks', sub: 'Spark → Wire → Forge → Edge' },
-            { stat: 'Multilingual', sub: 'English now — more languages coming' },
-            { stat: 'No hardware needed', sub: 'Simulators do the heavy lifting' },
-            { stat: 'AI Co-pilot', sub: 'Your 24/7 robotics mentor' },
-          ].map(({ stat, sub }) => (
-            <div key={stat} style={{
-              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 14, padding: '14px 20px', minWidth: 160, textAlign: 'center',
-            }}>
-              <p style={{ fontWeight: 900, fontSize: 15, color: '#FC6818', margin: '0 0 4px' }}>{stat}</p>
-              <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{sub}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
 
 // ─── COURSE PATH ──────────────────────────────────────────────────────────
+/**
+ * The course path was five identical cards in a row with filled orange number
+ * badges and a filled orange button under them — the same shape as every
+ * other section on the page. It is a *path*, so it is drawn as one: a rail
+ * with the five stops on it, left-aligned, with the copy beside it rather
+ * than centred above it. Different shape, same information, and it reads as
+ * a sequence instead of a menu.
+ */
 function CoursePath() {
   const steps = [
     { n: 1, name: 'Robotics Foundations', sub: 'How robots sense, think and act' },
@@ -271,88 +215,79 @@ function CoursePath() {
     { n: 5, name: 'Robot Intelligence', sub: 'Maps, planning, speech and safety' },
   ]
   return (
-    <section style={{ padding: '70px 20px 20px' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 28px' }}>
-          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 12px' }}>Free course path</p>
-          <h2 style={{ fontSize: 'clamp(26px,4vw,42px)', fontWeight: 900, margin: 0, color: '#fff' }}>Five courses. From zero to your own robot design.</h2>
-          <p style={{ marginTop: 10, color: '#94a3b8', fontSize: 15 }}>Fifty short video lessons, a quiz after each one, a final activity and a certificate for every course. Free, in plain English — 23 videos are live and the rest are being recorded.</p>
+    <section className="r2-section">
+      <div className="r2-wrap r2-split">
+        <div className="r2-split__copy">
+          <p className="r2-eyebrow">The free course path</p>
+          <h2 className="r2-h2">Five courses, zero to your own robot design</h2>
+          <p className="r2-body" style={{ marginTop: '1rem' }}>
+            Fifty short video lessons, a quiz after each one, a final activity and a certificate
+            for every course. 23 videos are live; the rest are being recorded.
+          </p>
+          <p style={{ marginTop: '1.5rem' }}>
+            <Link href="/courses" className="r2-link">See the full course path</Link>
+          </p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
+
+        <ol className="r2-rail">
           {steps.map((c) => (
-            <Link key={c.n} href="/courses" style={{ display: 'block', padding: 18, background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 16, textDecoration: 'none' }}>
-              <span style={{ display: 'inline-flex', width: 32, height: 32, borderRadius: 999, background: '#FC6818', color: '#000', fontWeight: 900, alignItems: 'center', justifyContent: 'center' }}>{c.n}</span>
-              <p style={{ color: '#fff', fontWeight: 800, margin: '10px 0 4px', fontSize: 15 }}>{c.name}</p>
-              <p style={{ color: '#94a3b8', fontSize: 13, margin: 0 }}>{c.sub}</p>
-            </Link>
+            <li key={c.n} className="r2-rail__item">
+              <Link href="/courses" className="r2-rail__link">
+                <span className="r2-rail__n" aria-hidden>{c.n}</span>
+                <span>
+                  <span className="r2-rail__name">{c.name}</span>
+                  <span className="r2-meta">{c.sub}</span>
+                </span>
+              </Link>
+            </li>
           ))}
-        </div>
-        <div style={{ textAlign: 'center', marginTop: 22 }}>
-          <Link href="/courses" style={{ display: 'inline-block', padding: '12px 24px', borderRadius: 12, background: '#FC6818', color: '#000', fontWeight: 800, textDecoration: 'none' }}>See the full course path →</Link>
-        </div>
+        </ol>
       </div>
     </section>
   )
 }
 
-// ─── FEATURES ─────────────────────────────────────────────────────────────
+/**
+ * "Six worlds. One platform." was six cards, each with a 36px emoji, an
+ * orange uppercase badge and an orange "Explore →". Eighteen orange elements
+ * in one section, and emoji at that size is the fastest way to look like a
+ * side project.
+ *
+ * It is the breadth claim, so it is drawn as an index: a dense two-column
+ * list with hairline rules. Breadth reads better as a list than as cards —
+ * cards make six things look like six things, a list makes them look like a
+ * table of contents.
+ */
 function Features({ atlasCount }: { atlasCount: number }) {
-  const cards = [
-    { icon: '🎓', name: 'Academy',            sub: '4 tracks from beginner to AI. Project-based. Certificates that mean something.', badge: 'Spark → Edge', cta: 'Explore Academy →', href: '/academy', color: '#FC6818' },
-    { icon: '🧠', name: 'Atlas',              sub: `${atlasCount.toLocaleString()} robotics concepts — sensors, motors, AI, SLAM — defined clearly and connected.`, badge: `${atlasCount.toLocaleString()} concepts`, cta: 'Open Atlas →', href: '/atlas', color: '#FC6818' },
-    { icon: '🤖', name: 'Simulators',         sub: '9 real-time robotics simulators. Line followers, PID, kinematics, sensor fusion — in your browser.', badge: '9 simulators', cta: 'Launch Simulator →', href: '/visualizer', color: '#FC6818' },
-    { icon: '🌐', name: 'ROS2 Playground',    sub: 'A live Linux shell in your browser. Write real ROS2 commands, no setup required.', badge: 'Live shell', cta: 'Open Playground →', href: '/ros2', color: '#FC6818' },
-    { icon: '🤖', name: 'R2 Co-pilot',            sub: 'Your AI mentor. Ask anything, get precise answers grounded in the Atlas. Available on every page.', badge: 'AI Mentor', cta: 'Meet R2 →', href: '/copilot', color: '#FC6818' },
-    { icon: '🌍', name: 'Robotics in Daily Life', sub: 'From surgical robots to self-driving cars — see how robotics is changing the world right now.', badge: 'Real world', cta: 'Explore →', href: '/daily-life', color: '#FC6818' },
+  const rows = [
+    { name: 'Atlas', sub: `${atlasCount.toLocaleString()} robotics concepts — sensors, motors, AI, SLAM — explained from first principles and linked to each other.`, href: '/atlas' },
+    { name: 'Academy', sub: 'Four written tracks, beginner to research. Project-based, with certificates.', href: '/academy' },
+    { name: 'Simulators', sub: 'Nine real-time simulators — PID, kinematics, sensor fusion, pathfinding — running in the browser.', href: '/visualizer' },
+    { name: 'ROS 2 Playground', sub: 'A live Linux shell. Write real ROS 2 commands with nothing to install.', href: '/ros2' },
+    { name: 'R2 Co-pilot', sub: 'An AI mentor on every page that answers only from what we have written, and cites it.', href: '/copilot' },
+    { name: 'Robotics in daily life', sub: 'Surgical robots, warehouses, self-driving cars — the machines already around you.', href: '/daily-life' },
   ]
   return (
-    <section style={{ padding: '80px 20px' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 40px' }}>
-          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 12px' }}>
-            Everything Inside
-          </p>
-          <h2 style={{ fontSize: 'clamp(28px,4vw,46px)', fontWeight: 900, margin: 0, color: '#fff' }}>
-            Six worlds. One platform.
-          </h2>
-          <p style={{ marginTop: 10, color: '#64748b', fontSize: 15 }}>
-            Each piece stands alone — and connects when you're ready to go deeper.
-          </p>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-          {cards.map(c => (
-            <Link
-              key={c.name}
-              href={c.href}
-              style={{
-                display: 'block', padding: 24,
-                background: 'var(--surface-1)', border: '1px solid var(--border)',
-                borderRadius: 18, textDecoration: 'none',
-                transition: 'transform .2s, border-color .2s, box-shadow .2s',
-                '--accent': c.color,
-              } as React.CSSProperties}
-              className="feat-card r2-lift"
-            >
-              <div style={{ fontSize: 36, marginBottom: 12 }}>{c.icon}</div>
-              <h3 style={{ fontSize: 20, fontWeight: 900, color: '#fff', margin: '0 0 8px' }}>{c.name}</h3>
-              <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6, margin: '0 0 14px' }}>{c.sub}</p>
-              <span style={{
-                display: 'inline-block', fontSize: 10, textTransform: 'uppercase', letterSpacing: '2px',
-                fontWeight: 900, padding: '4px 10px', borderRadius: 999,
-                background: c.color + '20', color: c.color,
-              }}>{c.badge}</span>
-              <p style={{ marginTop: 14, fontSize: 14, fontWeight: 800, color: c.color }}>{c.cta}</p>
-            </Link>
+    <section className="r2-section r2-section--band">
+      <div className="r2-wrap">
+        <p className="r2-eyebrow">Everything inside</p>
+        <h2 className="r2-h2">Six places to go, one way in</h2>
+        <p className="r2-body" style={{ marginTop: '0.75rem' }}>
+          Each one stands alone, and connects to the others when you want to go deeper.
+        </p>
+
+        <ul className="r2-index">
+          {rows.map((r) => (
+            <li key={r.href}>
+              <Link href={r.href} className="r2-index__row">
+                <span className="r2-h3">{r.name}</span>
+                <span className="r2-body r2-index__sub">{r.sub}</span>
+                <span className="r2-index__arrow" aria-hidden>&rarr;</span>
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
-      <style jsx>{`
-        .feat-card:hover {
-          transform: translateY(-4px);
-          border-color: var(--accent, #FC6818);
-          box-shadow: 0 18px 50px rgba(0,0,0,.4), 0 0 0 1px var(--accent, #FC6818);
-        }
-      `}</style>
     </section>
   )
 }
@@ -360,405 +295,116 @@ function Features({ atlasCount }: { atlasCount: number }) {
 // ─── SIMULATOR SHOWCASE ───────────────────────────────────────────────────
 function SimulatorShowcase() {
   const sims = [
-    { name: 'PID Controller',      slug: 'pid',    color: '#FC6818', desc: 'Tune P, I, and D gains and watch the robot reach its target' },
-    { name: 'Arm Kinematics',      slug: 'ik',     color: '#FC6818', desc: 'Forward + inverse kinematics for a robotic arm' },
-    { name: 'Sensor Fusion',       slug: 'fusion', color: '#FC6818', desc: 'Kalman filter combining GPS + IMU for accuracy' },
-    { name: 'A* Pathfinder',       slug: 'astar',  color: '#FC6818', desc: 'Draw a maze and watch A* find the shortest path' },
+    { name: 'PID Controller', slug: 'pid', desc: 'Tune P, I and D and watch the robot reach its target' },
+    { name: 'Arm Kinematics', slug: 'ik', desc: 'Forward and inverse kinematics for a robot arm' },
+    { name: 'Sensor Fusion', slug: 'fusion', desc: 'A Kalman filter combining GPS and IMU' },
+    { name: 'A* Pathfinder', slug: 'astar', desc: 'Draw a maze and watch A* find the shortest path' },
   ]
   return (
-    <section style={{
-      padding: '80px 20px',
-      background: 'linear-gradient(180deg, var(--void) 0%, var(--surface-1) 50%, var(--void) 100%)',
-      borderTop: '1px solid rgba(255,255,255,0.06)',
-    }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div className="m-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
-          <div>
-            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 14px' }}>
-              Interactive Simulators
-            </p>
-            <h2 style={{ fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: 900, color: '#fff', margin: '0 0 16px', lineHeight: 1.2 }}>
-              Learn by doing — no hardware required.
-            </h2>
-            <p style={{ fontSize: 16, color: '#94a3b8', lineHeight: 1.7, margin: '0 0 24px' }}>
-              9 real-time robotics simulators run entirely in your browser. Each one is linked to a lesson in the Academy — watch the theory, then run the simulation and see it come alive.
-            </p>
-            <p style={{ fontSize: 15, color: '#64748b', margin: '0 0 28px' }}>
-              Every simulator has share and embed links — like Desmos but for robots. Share your tuned controller with your class.
-            </p>
-            <Link href="/visualizer" style={{
-              display: 'inline-flex', alignItems: 'center', minHeight: 50, padding: '0 24px',
-              background: 'linear-gradient(135deg, #FC6818, #FC6818)',
-              color: 'var(--void)', borderRadius: 12, fontWeight: 900, fontSize: 15,
-              textDecoration: 'none', boxShadow: '0 8px 24px rgba(255,184,0,0.22)',
-            }}>
-              Open Simulator Lab →
-            </Link>
-          </div>
-          <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))' }}>
-            {sims.map(s => (
-              <Link
-                key={s.slug}
-                href={`/visualizer#${s.slug}`}
-                style={{
-                  display: 'block', padding: '18px 16px',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${s.color}33`,
-                  borderRadius: 14, textDecoration: 'none',
-                  transition: 'transform .15s, border-color .15s',
-                }}
-                className="sim-card r2-lift"
-              >
-                <p style={{ fontWeight: 900, color: s.color, fontSize: 13, margin: '0 0 6px' }}>{s.name}</p>
-                <p style={{ fontSize: 12, color: '#64748b', margin: 0, lineHeight: 1.5 }}>{s.desc}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-      <style jsx>{`
-        .sim-card:hover { transform: translateY(-2px); border-color: currentColor !important; }
-        @media (max-width: 768px) { .sim-card { grid-template-columns: 1fr !important; } }
-      `}</style>
-    </section>
-  )
-}
-
-// ─── INDIA SPOTLIGHT ──────────────────────────────────────────────────────
-function IndiaSpotlight() {
-  return (
-    <section style={{
-      position: 'relative', padding: '80px 20px',
-      background: 'linear-gradient(180deg, rgba(252,104,24,.06) 0%, rgba(143,216,255,.05) 100%), var(--void)',
-      borderTop: '1px solid rgba(249,115,22,.18)', borderBottom: '1px solid rgba(16,185,129,.15)',
-    }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div className="m-stack" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 48, alignItems: 'center' }}>
-          <div>
-            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 14px' }}>
-              Global · Built for the world
-            </p>
-            <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 900, color: '#fff', margin: '0 0 16px', lineHeight: 1.2 }}>
-              Built for the world. Priced for everyone.
-            </h2>
-            <p style={{ fontSize: 16, color: '#94a3b8', lineHeight: 1.7, margin: '0 0 24px', maxWidth: 560 }}>
-              Robotics is the fastest-growing field on Earth. R2BOT makes it learnable anywhere — free to explore and free to master, in plain English (with more languages coming).
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
-              <Pillar emoji="🌍" title="Learn anywhere" body="Runs in your browser — no hardware, no install, no borders." />
-              <Pillar emoji="🛠️" title="Learn by building" body="20+ guided robot projects, in sim or on real hardware." />
-              <Pillar emoji="🤖" title="AI mentor" body="R2 Co-pilot answers anything, grounded in the Atlas." />
-            </div>
-            <Link href="/atlas" style={{
-              display: 'inline-flex', alignItems: 'center', minHeight: 48, padding: '0 20px',
-              background: '#FC6818', color: 'var(--void)', borderRadius: 12,
-              fontWeight: 900, fontSize: 14, textDecoration: 'none',
-            }}>
-              Explore the Robotics Atlas →
-            </Link>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <GlobalReach />
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Pillar({ emoji, title, body }: { emoji: string; title: string; body: string }) {
-  return (
-    <div style={{
-      borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)',
-      background: 'var(--surface-1)', padding: 16,
-    }}>
-      <div style={{ fontSize: 22 }}>{emoji}</div>
-      <p style={{ marginTop: 8, fontSize: 10, textTransform: 'uppercase', letterSpacing: '2px', color: '#FC6818', fontWeight: 900 }}>{title}</p>
-      <p style={{ marginTop: 4, fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>{body}</p>
-    </div>
-  )
-}
-
-function GlobalReach() {
-  const nodes = [
-    { cx: 96,  cy: 96,  r: 4 },
-    { cx: 120, cy: 150, r: 4 },
-    { cx: 150, cy: 84,  r: 4 },
-    { cx: 168, cy: 150, r: 4 },
-    { cx: 196, cy: 108, r: 5 },
-    { cx: 212, cy: 150, r: 4 },
-  ]
-  return (
-    <svg viewBox="0 0 280 280" width="240" height="240" aria-hidden style={{ filter: 'drop-shadow(0 12px 30px rgba(249,115,22,0.22))' }}>
-      <defs>
-        <radialGradient id="globe-g" cx="40%" cy="35%" r="75%">
-          <stop offset="0%"  stopColor="#1b2540" />
-          <stop offset="70%" stopColor="#0d1526" />
-          <stop offset="100%" stopColor="#080b14" />
-        </radialGradient>
-      </defs>
-      <circle cx="140" cy="130" r="110" fill="url(#globe-g)" stroke="#FC6818" strokeWidth="1.5" strokeOpacity="0.5" />
-      {[70, 100, 130, 160, 190].map((cy, i) => (
-        <ellipse key={i} cx="140" cy={cy} rx={Math.max(18, 108 - Math.abs(130 - cy) * 0.9)} ry="10"
-          fill="none" stroke="#334155" strokeWidth="1" strokeOpacity="0.5" />
-      ))}
-      {[30, 62, 94].map((rx, i) => (
-        <ellipse key={i} cx="140" cy="130" rx={rx} ry="110"
-          fill="none" stroke="#334155" strokeWidth="1" strokeOpacity="0.5" />
-      ))}
-      {nodes.map((n, i) => (
-        <g key={i}>
-          <circle cx={n.cx} cy={n.cy} r={n.r + 4} fill="#FC6818" opacity="0.18" />
-          <circle cx={n.cx} cy={n.cy} r={n.r} fill="#FC6818" />
-        </g>
-      ))}
-      <text x="140" y="258" fontSize="12" fontWeight="800" fill="#FF8A4C" textAnchor="middle" letterSpacing="1">
-        Learners in 50+ countries
-      </text>
-    </svg>
-  )
-}
-
-// ─── WHY R2BOT — honest value props (no fabricated testimonials) ──────────
-function Testimonials() {
-  const points = [
-    { icon: '🎮', label: 'Interactive', color: '#FC6818',
-      body: 'Concepts link to live simulators you tune in the browser. Read the theory, then run it — PID, kinematics, sensor fusion, pathfinding.' },
-    { icon: '🪜', label: 'Beginner → Advanced', color: '#FC6818',
-      body: 'Every Atlas entry ladders from a plain-English analogy to the real math and code — so it answers your first question and your deepest one.' },
-    { icon: '🤖', label: 'AI Mentor', color: '#FC6818',
-      body: 'R2 Co-pilot is on every page. It answers grounded in the Atlas, cites its sources, and is built not to invent specs.' },
-    { icon: '🛠️', label: 'Learn by Building', color: '#FC6818',
-      body: '20+ guided robot projects with full parts lists and code — in simulation, or on real hardware when you\'re ready.' },
-    { icon: '📡', label: 'Always Current', color: '#FC6818',
-      body: 'The best robotics news and YouTube explainers are pulled in and summarized automatically, every single day.' },
-    { icon: '🎁', label: 'Free to Explore', color: '#FC6818',
-      body: 'The full Atlas, the Spark beginner track, and daily Co-pilot cost nothing. No card required to start learning.' },
-  ]
-  return (
-    <section style={{ padding: '80px 20px' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 40px' }}>
-          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 12px' }}>
-            Why R2BOT
+    <section className="r2-section">
+      <div className="r2-wrap r2-split">
+        <div className="r2-split__copy">
+          <p className="r2-eyebrow">Interactive simulators</p>
+          <h2 className="r2-h2">Learn by doing, with no hardware</h2>
+          <p className="r2-body" style={{ marginTop: '1rem' }}>
+            Nine simulators run entirely in your browser, each linked to the lesson that explains
+            it. Every one has a share and embed link — like Desmos, but for robots — so you can
+            send a tuned controller to your class.
           </p>
-          <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 900, margin: 0 }}>
-            Built to make robotics actually click.
-          </h2>
+          <p style={{ marginTop: '1.5rem' }}>
+            <Link href="/visualizer" className="r2-link">Open the simulator lab</Link>
+          </p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-          {points.map(p => (
-            <div key={p.label} className="r2-lift" style={{
-              background: 'var(--surface-1)', border: '1px solid var(--border)',
-              borderRadius: 18, padding: '22px 20px',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                <span style={{
-                  width: 42, height: 42, borderRadius: 12, display: 'grid', placeItems: 'center',
-                  background: p.color + '18', border: `1px solid ${p.color}33`, fontSize: 20,
-                }}>{p.icon}</span>
-                <span style={{
-                  fontSize: 10, fontWeight: 900, letterSpacing: '1.5px', textTransform: 'uppercase',
-                  color: p.color, background: p.color + '14', borderRadius: 999,
-                  padding: '4px 10px', border: `1px solid ${p.color}33`,
-                }}>{p.label}</span>
-              </div>
-              <p style={{ fontSize: 14, color: '#c8d0dc', lineHeight: 1.7, margin: 0 }}>{p.body}</p>
-            </div>
+
+        <div className="r2-sims">
+          {sims.map((s) => (
+            <Link key={s.slug} href={`/visualizer#${s.slug}`} className="r2-card">
+              <span className="r2-h3" style={{ fontSize: 'var(--t-body)' }}>{s.name}</span>
+              <span className="r2-meta" style={{ display: 'block', marginTop: '0.4rem', lineHeight: 1.5 }}>{s.desc}</span>
+            </Link>
           ))}
         </div>
-        <p style={{ marginTop: 24, textAlign: 'center', fontSize: 12, color: '#64748b' }}>
-          New here?{' '}
-          <Link href="/academy" style={{ color: '#FC6818', textDecoration: 'underline' }}>Start with the free Spark track →</Link>
-        </p>
       </div>
     </section>
   )
 }
+
 
 // ─── NEWS TEASER (live, from the automated aggregator) ────────────────────
-function NewsTeaser({ items }: { items: HomeNewsItem[] }) {
+/**
+ * News and Lens were two full-height sections in a row, each with its own
+ * eyebrow, its own 40px headline, its own "All x →" link and its own tinted
+ * background — the Lens one a red/orange gradient that appeared nowhere else
+ * on the site. Two sections saying "here is what is new" is one section.
+ *
+ * It is also the one place on the page where a two-column layout is right:
+ * headlines read as a list, videos read as a grid, and putting them side by
+ * side is the only section on the page with that shape.
+ */
+function Latest({ news, videos }: { news: HomeNewsItem[]; videos: HomeVideoItem[] }) {
   return (
-    <section style={{ padding: '72px 20px', background: 'var(--void)', borderTop: '1px solid var(--border)' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 26 }}>
+    <section className="r2-section r2-section--band">
+      <div className="r2-wrap">
+        <p className="r2-eyebrow">Updated every day, automatically</p>
+        <h2 className="r2-h2">What happened in robotics this week</h2>
+
+        <div className="r2-latest">
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#FC6818', display: 'inline-block', animation: 'r2pulse 1.6s infinite' }} />
-              <span style={{ fontSize: 11, fontWeight: 900, color: '#7dd3fc', letterSpacing: '2px', textTransform: 'uppercase' }}>Live · Auto-updated</span>
+            <div className="r2-latest__head">
+              <h3 className="r2-h3">Headlines</h3>
+              <Link href="/news" className="r2-link">All news</Link>
             </div>
-            <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, margin: 0, color: '#fff' }}>
-              Latest in robotics
-            </h2>
+            {news.length === 0 ? (
+              <Link href="/news" className="r2-card r2-empty">
+                Robotics headlines from IEEE, MIT and The Robot Report — open the feed
+              </Link>
+            ) : (
+              <ul className="r2-latest__list">
+                {news.slice(0, 5).map((n) => (
+                  <li key={n.url}>
+                    <a href={n.url} target="_blank" rel="noopener noreferrer" className="r2-latest__item">
+                      <span className="r2-latest__title">{n.title}</span>
+                      <span className="r2-meta">{n.source} · {n.topic}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          <Link href="/news" style={{ fontSize: 14, fontWeight: 800, color: '#FC6818', textDecoration: 'none' }}>
-            All news →
-          </Link>
-        </div>
 
-        {items.length === 0 ? (
-          <Link href="/news" style={{
-            display: 'block', padding: 28, textAlign: 'center', borderRadius: 16,
-            border: '1px dashed rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.03)',
-            color: '#94a3b8', textDecoration: 'none', fontWeight: 700,
-          }}>
-            Fresh robotics headlines from IEEE, MIT, The Robot Report and more — open the News feed →
-          </Link>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
-            {items.map((n) => (
-              <a
-                key={n.url}
-                href={n.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="r2-lift"
-                style={{
-                  display: 'flex', flexDirection: 'column', gap: 10, padding: 18,
-                  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 14, textDecoration: 'none', minHeight: 118,
-                }}
-              >
-                <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: '1px', textTransform: 'uppercase', color: '#7dd3fc' }}>
-                  {n.source} · {n.topic}
-                </span>
-                <span style={{ fontSize: 15, fontWeight: 800, color: '#f4f4f5', lineHeight: 1.35 }}>
-                  {n.title}
-                </span>
-              </a>
-            ))}
-          </div>
-        )}
-      </div>
-      <style jsx>{`@keyframes r2pulse { 0%,100% { opacity:1 } 50% { opacity:.35 } }`}</style>
-    </section>
-  )
-}
-
-// ─── LENS TEASER (live, auto-ingested YouTube videos) ─────────────────────
-function LensTeaser({ items }: { items: HomeVideoItem[] }) {
-  return (
-    <section style={{
-      padding: '72px 20px',
-      background: 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(249,115,22,0.06))',
-      borderTop: '1px solid rgba(239,68,68,0.15)', borderBottom: '1px solid rgba(239,68,68,0.10)',
-    }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 26 }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="#FC6818" aria-hidden><path d="M19.6 3H4.4A2.4 2.4 0 0 0 2 5.4v13.2A2.4 2.4 0 0 0 4.4 21h15.2A2.4 2.4 0 0 0 22 18.6V5.4A2.4 2.4 0 0 0 19.6 3zM10 15.5v-7l6 3.5-6 3.5z"/></svg>
-              <span style={{ fontSize: 11, fontWeight: 900, color: '#fca5a5', letterSpacing: '2px', textTransform: 'uppercase' }}>Lens · Best videos, decoded</span>
+            <div className="r2-latest__head">
+              <h3 className="r2-h3">Worth watching</h3>
+              <Link href="/lens" className="r2-link">All videos</Link>
             </div>
-            <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, margin: 0, color: '#fff' }}>
-              Don&apos;t watch 45 minutes to learn 4.
-            </h2>
-          </div>
-          <Link href="/lens" style={{ fontSize: 14, fontWeight: 800, color: '#fca5a5', textDecoration: 'none' }}>
-            All videos →
-          </Link>
-        </div>
-
-        {items.length === 0 ? (
-          <Link href="/lens" style={{
-            display: 'block', padding: 28, textAlign: 'center', borderRadius: 16,
-            border: '1px dashed rgba(239,68,68,0.25)', background: 'rgba(239,68,68,0.06)',
-            color: '#fca5a5', textDecoration: 'none', fontWeight: 700,
-          }}>
-            The best robotics videos on the internet, summarized — open Lens →
-          </Link>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-            {items.map((v) => (
-              <a
-                key={v.url}
-                href={v.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="r2-lift"
-                style={{
-                  display: 'block', borderRadius: 14, overflow: 'hidden',
-                  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                  textDecoration: 'none',
-                }}
-              >
-                <div style={{ position: 'relative', aspectRatio: '16 / 9', background: `#000 center/cover url(${v.thumbnailUrl})` }}>
-                  <span style={{
-                    position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(0,0,0,0.25)',
-                  }}>
-                    <span style={{ width: 46, height: 46, borderRadius: '50%', background: 'rgba(239,68,68,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z" /></svg>
+            {videos.length === 0 ? (
+              <Link href="/lens" className="r2-card r2-empty">
+                The best robotics videos on the internet, summarised — open Lens
+              </Link>
+            ) : (
+              <div className="r2-latest__videos">
+                {videos.slice(0, 4).map((v) => (
+                  <a key={v.url} href={v.url} target="_blank" rel="noopener noreferrer" className="r2-card r2-vid">
+                    <span
+                      className="r2-vid__thumb"
+                      style={{ backgroundImage: `url(${v.thumbnailUrl})` }}
+                      aria-hidden
+                    />
+                    <span className="r2-vid__meta">
+                      <span className="r2-vid__title">{v.title}</span>
+                      <span className="r2-meta">{v.channel}</span>
                     </span>
-                  </span>
-                </div>
-                <div style={{ padding: 14 }}>
-                  <p style={{ fontSize: 14, fontWeight: 800, color: '#f4f4f5', margin: '0 0 6px', lineHeight: 1.35 }}>{v.title}</p>
-                  <p style={{ fontSize: 12, color: '#94a3b8', margin: 0, fontWeight: 700 }}>{v.channel}</p>
-                </div>
-              </a>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
-  )
-}
-
-// ─── TEACHERS TEASER ──────────────────────────────────────────────────────
-// This used to promote /schools: a parked section that robots.txt disallows,
-// behind a "Bring R2BOT to my school" CTA, advertising a teacher dashboard and
-// bulk certificates. Promising a product that is not ready, from the homepage,
-// is the fastest way to lose a teacher's trust. /teachers is real today — a
-// free 40-minute lesson plan, printable activities and embeddable demos — so
-// the section points there instead.
-function SchoolsTeaser() {
-  return (
-    <section style={{ padding: '80px 20px' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div className="m-stack" style={{
-          background: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(0,229,255,0.08))',
-          border: '1px solid rgba(16,185,129,0.3)', borderRadius: 24, padding: '48px 40px',
-          display: 'grid', gridTemplateColumns: '1fr auto', gap: 32, alignItems: 'center',
-        }}>
-          <div>
-            <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FC6818', fontWeight: 900, margin: '0 0 12px' }}>
-              For teachers
-            </p>
-            <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, color: '#fff', margin: '0 0 14px', lineHeight: 1.2 }}>
-              One free robotics class, ready to teach.
-            </h2>
-            <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.7, margin: '0 0 24px', maxWidth: 560 }}>
-              A 40-minute lesson plan in plain English, interactive demos you can embed in your own page, printable activities that need only paper, and short video lessons with quizzes. No sign-up needed for students to read or try anything.
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
-              {['40-minute lesson plan', 'Browser demos, no install', 'Printable activities', 'Embeddable in your site', 'Free, no student accounts'].map(f => (
-                <span key={f} style={{
-                  fontSize: 12, fontWeight: 700, color: '#FC6818',
-                  background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)',
-                  padding: '4px 12px', borderRadius: 999,
-                }}>
-                  {f}
-                </span>
-              ))}
-            </div>
-            <Link href="/teachers" style={{
-              display: 'inline-flex', alignItems: 'center', minHeight: 48, padding: '0 22px',
-              background: '#FC6818', color: 'var(--void)', borderRadius: 12,
-              fontWeight: 900, fontSize: 15, textDecoration: 'none',
-            }}>
-              Open the teacher guide →
-            </Link>
-          </div>
-          <div style={{ textAlign: 'center', minWidth: 160 }}>
-            <div style={{ fontSize: 56 }}>🏫</div>
-            <p style={{ fontSize: 13, color: '#64748b', margin: '8px 0 0', fontWeight: 700 }}>Ages 13+</p>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
     </section>
   )
 }
+
 
 // ─── NEWSLETTER ───────────────────────────────────────────────────────────
 function NewsletterCTA() {
@@ -788,13 +434,11 @@ function NewsletterCTA() {
   return (
     <section style={{ padding: '72px 20px', background: 'var(--void)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
       <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
-        <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 12px' }}>
-          R2BOT Weekly
-        </p>
-        <h2 style={{ fontSize: 'clamp(24px,3.5vw,40px)', fontWeight: 900, color: '#fff', margin: '0 0 12px' }}>
-          This week in robotics, every Friday.
+        <p className="r2-eyebrow">R2BOT Weekly</p>
+        <h2 className="r2-h2" style={{ marginBottom: 12 }}>
+          This week in robotics, every Friday
         </h2>
-        <p style={{ color: '#64748b', fontSize: 14, marginBottom: 28 }}>
+        <p className="r2-body" style={{ marginInline: 'auto', marginBottom: 28 }}>
           IFR reports, new research, standout robotics startups, and R2BOT updates. Curated, not dumped.
         </p>
         <form onSubmit={submit} style={{ display: 'flex', gap: 10, maxWidth: 440, margin: '0 auto 12px', flexWrap: 'wrap' }}>
@@ -817,18 +461,18 @@ function NewsletterCTA() {
           <button
             type="submit" disabled={status === 'loading'}
             style={{
-              padding: '12px 20px', flex: '1 1 auto', background: '#FF8A4C', color: 'var(--void)',
-              fontWeight: 900, fontSize: 14, border: 'none',
-              borderRadius: 12, cursor: 'pointer', whiteSpace: 'nowrap',
+              padding: '12px 20px', flex: '1 1 auto', background: 'var(--amber)', color: 'var(--amber-ink)',
+              fontWeight: 650, fontSize: 14, border: 'none',
+              borderRadius: 999, cursor: 'pointer', whiteSpace: 'nowrap', minHeight: 44,
               opacity: status === 'loading' ? 0.6 : 1,
             }}
           >
             {status === 'loading' ? '…' : 'Subscribe'}
           </button>
         </form>
-        {status === 'ok'  && <p style={{ color: '#FC6818', fontSize: 13 }}>✓ Subscribed. Welcome to R2BOT Weekly.</p>}
-        {status === 'err' && <p style={{ color: '#FC6818', fontSize: 13 }}>{errText}</p>}
-        <p style={{ fontSize: 11, color: '#374151', marginTop: 8 }}>One email a week. Free. We never ask for your phone number or share your email. Unsubscribe anytime.</p>
+        {status === 'ok'  && <p style={{ color: 'var(--green)', fontSize: 13 }}>✓ Subscribed. Welcome to R2BOT Weekly.</p>}
+        {status === 'err' && <p style={{ color: '#F87171', fontSize: 13 }} role="alert">{errText}</p>}
+        <p className="r2-meta" style={{ marginTop: 8 }}>One email a week. Free. We never ask for your phone number or share your email. Unsubscribe anytime.</p>
       </div>
     </section>
   )

@@ -347,8 +347,6 @@ export function Nav() {
         </div>
 
         <div className="nav-right">
-          <span className="nav-lang-desktop"><LanguageSwitcher /></span>
-
           <StreakBadge />
 
           <AuthMenu />
@@ -369,6 +367,7 @@ export function Nav() {
               <circle cx="19" cy="5" r="1.4" fill="currentColor" />
             </svg>
             <span>Ask R2</span>
+            <kbd className="nav-ask__key">⌘K</kbd>
           </button>
 
           <button
@@ -498,22 +497,8 @@ function AuthMenu() {
         <a
           href="/signup"
           className="nav-cta"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            padding: '8px 14px',
-            background: '#FC6818',
-            color: '#1a0f00',
-            fontWeight: 700,
-            fontSize: 14,
-            borderRadius: 999,
-            textDecoration: 'none',
-            transition: 'background 0.15s, transform 0.15s, box-shadow 0.15s',
-            boxShadow: '0 4px 14px rgba(252,104,24, 0.30)',
-          }}
         >
-          Start Free <span aria-hidden>→</span>
+          Start free
         </a>
       </>
     );

@@ -243,9 +243,14 @@ nav.r2nav.scrolled { background: rgba(10, 14, 23, 0.92); backdrop-filter: blur(1
 .nav-avatar { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--amber); color: var(--amber-ink); font-weight: 700; font-size: 14px; transition: transform 0.15s, box-shadow 0.15s; }
 .nav-avatar:hover { transform: scale(1.05); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.14); }
 
-.nav-ask { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; background: #FC6818; color: #1a0f00; font-weight: 600; font-size: 14px; border-radius: 999px; transition: background 0.15s, transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 14px rgba(252,104,24, 0.30); }
-.nav-ask:hover { background: #FF8A4C; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(252,104,24, 0.45); }
-.nav-ask:active { transform: translateY(0); }
+/* Ask R2 and Start Free were both filled amber pills, side by side, with a
+   third amber-ish bubble floating over the page. Three competing primaries in
+   one corner, above a hero whose own primary is also amber. Both are quiet
+   controls now; the one filled amber button on the first screen is the hero's,
+   and once you scroll past it the header is the only action left. */
+.nav-ask { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border: 1px solid var(--border-2); color: var(--text-2); font-weight: 600; font-size: 14px; border-radius: 999px; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+.nav-ask:hover { color: var(--mist); border-color: var(--text-3); background: rgba(255, 255, 255, 0.04); }
+.nav-ask__key { font-size: 11px; color: var(--text-3); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; font-family: var(--font-mono), ui-monospace, monospace; }
 .nav-ask.wide { width: 100%; justify-content: center; padding: 12px 16px; }
 
 /* Hamburger (hidden on desktop) */
@@ -969,3 +974,194 @@ a.r2-card:hover, .r2-card--interactive:hover {
   line-height: 1.6;
 }
 .r2-hero__demo-cap { margin: 0.75rem 0 0; }
+
+/* Start free: an outline control. The filled amber button on the first screen
+   is the hero's, and there is only ever one. */
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border: 1px solid var(--accent-line);
+  color: var(--amber-bright);
+  font-weight: 650;
+  font-size: 14px;
+  border-radius: 999px;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.nav-cta:hover { background: var(--accent-wash); border-color: var(--amber); }
+
+/* ── Latest (news + videos, one section) ───────────────────────────────── */
+.r2-latest {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+  margin-top: 2.5rem;
+}
+@media (min-width: 900px) { .r2-latest { grid-template-columns: 1fr 1fr; } }
+.r2-latest__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.25rem;
+}
+.r2-latest__list { list-style: none; margin: 0; padding: 0; }
+.r2-latest__list > li + li { border-top: 1px solid var(--border); }
+/* A list, not five more cards. The page already has enough cards, and a
+   headline list is how people actually read headlines. */
+.r2-latest__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.9rem 0;
+  transition: color 160ms var(--ease);
+}
+.r2-latest__item:hover .r2-latest__title { color: var(--amber-bright); }
+.r2-latest__title { font-size: var(--t-body); font-weight: 600; line-height: 1.4; color: var(--text-1); }
+.r2-latest__videos { display: grid; gap: 0.75rem; margin-top: 1rem; }
+.r2-vid { display: flex; gap: 0.875rem; align-items: center; padding: 0.75rem; }
+.r2-vid__thumb {
+  flex: 0 0 104px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  background-color: #000;
+  background-size: cover;
+  background-position: center;
+}
+.r2-vid__meta { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+.r2-vid__title {
+  font-size: var(--t-small);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-1);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.r2-empty {
+  display: block;
+  margin-top: 1rem;
+  text-align: center;
+  color: var(--text-3);
+  font-size: var(--t-small);
+  border-style: dashed;
+}
+
+/* ── Split section (copy beside content) ───────────────────────────────── */
+.r2-split { display: grid; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+@media (min-width: 900px) { .r2-split { grid-template-columns: 0.95fr 1.05fr; } }
+.r2-split__copy > .r2-h2 { margin-top: 0; }
+
+/* ── The course rail ───────────────────────────────────────────────────── */
+.r2-rail {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+/* The line that makes it a path rather than a list. */
+.r2-rail::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 28px;
+  bottom: 28px;
+  width: 1px;
+  background: var(--border-2);
+}
+.r2-rail__link {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 0.75rem 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: background 160ms var(--ease);
+}
+.r2-rail__link:hover { background: var(--surface-1); }
+.r2-rail__link:hover .r2-rail__n { border-color: var(--amber); color: var(--amber-bright); }
+/* Outlined, not filled. Five filled amber circles in a column was five
+   primary actions stacked on top of each other. */
+.r2-rail__n {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--border-2);
+  background: var(--void);
+  color: var(--text-3);
+  font-size: var(--t-small);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  transition: border-color 160ms var(--ease), color 160ms var(--ease);
+}
+.r2-rail__name { display: block; font-size: var(--t-body); font-weight: 600; color: var(--text-1); }
+.r2-rail__name + .r2-meta { display: block; margin-top: 0.15rem; }
+
+/* ── Index rows (the breadth list) ─────────────────────────────────────── */
+.r2-index { list-style: none; margin: 2.5rem 0 0; padding: 0; border-top: 1px solid var(--border); }
+.r2-index > li { border-bottom: 1px solid var(--border); }
+.r2-index__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem 1.5rem;
+  align-items: baseline;
+  padding: 1.125rem 0.25rem;
+  transition: background 160ms var(--ease), padding-inline 200ms var(--ease);
+}
+@media (min-width: 820px) {
+  .r2-index__row { grid-template-columns: 15rem 1fr auto; gap: 1.5rem; align-items: baseline; }
+}
+.r2-index__row:hover { background: var(--surface-2); padding-inline: 0.75rem 0.75rem; }
+.r2-index__sub { max-width: none; font-size: var(--t-small); }
+.r2-index__arrow { color: var(--text-3); transition: transform 160ms var(--ease), color 160ms var(--ease); }
+.r2-index__row:hover .r2-index__arrow { color: var(--amber-bright); transform: translateX(3px); }
+
+/* ── Simulator cards ───────────────────────────────────────────────────── */
+.r2-sims { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); }
+
+/* ── Quick Lessons on the homepage ─────────────────────────────────────── */
+.r2-shorts-grid {
+  display: grid;
+  gap: 0.875rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  margin-top: 2rem;
+}
+.r2-shot {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  transition: transform 180ms var(--ease), border-color 180ms var(--ease);
+}
+.r2-shot:hover { transform: translateY(-2px); border-color: var(--border-2); }
+.r2-shot__img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+.r2-shot__title {
+  display: block;
+  padding: 0.7rem 0.75rem 0.85rem;
+  font-size: var(--t-small);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-1);
+}
+.r2-shorts-courses { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
+.r2-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 36px;
+  padding: 0 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: var(--t-small);
+  color: var(--text-2);
+  transition: border-color 160ms var(--ease), color 160ms var(--ease), background 160ms var(--ease);
+}
+.r2-chip:hover { color: var(--text-1); border-color: var(--border-2); background: var(--surface-1); }
