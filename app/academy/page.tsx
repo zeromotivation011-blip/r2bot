@@ -62,23 +62,23 @@ export default function AcademyPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <main id="main-content" className="mx-auto max-w-4xl px-5 pb-20 pt-28">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500">The Academy</p>
-        <h1 className="mt-2 text-3xl font-black text-white md:text-5xl">
+        <p className="r2-eyebrow">The Academy</p>
+        <h1 className="r2-display">
           {totalLessons} written lessons, in four tracks
         </h1>
         <p className="mt-4 max-w-2xl text-gray-400">
           Read-and-understand lessons with worked examples and sources on every page. If you would
           rather watch, the{' '}
-          <Link href="/courses" className="text-amber-500 underline">free course path</Link>{' '}
+          <Link href="/courses" className="r2-link">free course path</Link>{' '}
           covers the same ground as short videos with quizzes and certificates, and{' '}
-          <Link href="/shorts" className="text-amber-500 underline">Quick Lessons</Link>{' '}
+          <Link href="/shorts" className="r2-link">Quick Lessons</Link>{' '}
           explain one idea each in a minute.
         </p>
 
         {/* One recommended next step, not four competing ones. */}
         {first && (
           <div className="mt-8 rounded-2xl border border-amber-500/40 bg-amber-500/[0.07] p-5">
-            <p className="text-xs font-bold uppercase tracking-widest text-amber-400">Start here</p>
+            <p className="r2-eyebrow">Start here</p>
             <h2 className="mt-1 text-xl font-bold text-white">{first.title}</h2>
             {first.description && <p className="mt-1 text-sm text-gray-300">{first.description}</p>}
             <Link
@@ -127,9 +127,9 @@ export default function AcademyPage() {
 
         <p className="mt-10 text-sm text-gray-500">
           Not sure where you fit? The{' '}
-          <Link href="/diagnostic" className="text-amber-500 underline">two-minute placement test</Link>{' '}
+          <Link href="/diagnostic" className="r2-link">two-minute placement test</Link>{' '}
           puts you on a track. Every lesson links to{' '}
-          <Link href="/atlas" className="text-amber-500 underline">the Atlas</Link> for definitions.
+          <Link href="/atlas" className="r2-link">the Atlas</Link> for definitions.
         </p>
       </main>
 

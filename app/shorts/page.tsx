@@ -64,8 +64,8 @@ export default function ShortsHub() {
     <main className="mx-auto max-w-5xl px-5 pb-20 pt-28">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
 
-      <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500">Quick Lessons</p>
-      <h1 className="mt-2 max-w-3xl text-3xl font-black leading-tight text-white md:text-5xl">
+      <p className="r2-eyebrow">Quick Lessons</p>
+      <h1 className="r2-display">
         How robots work, one minute at a time
       </h1>
       <p className="mt-4 max-w-2xl text-lg text-gray-300">
@@ -171,9 +171,9 @@ export default function ShortsHub() {
 
       <p className="mt-14 text-gray-400">
         Finished these? The{' '}
-        <Link href="/courses" className="text-amber-500 underline">free course path</Link> covers the
+        <Link href="/courses" className="r2-link">free course path</Link> covers the
         same ground in longer videos, with quizzes and a certificate — start with{' '}
-        <Link href={`/shorts/course/${first.slug}`} className="text-amber-500 underline">
+        <Link href={`/shorts/course/${first.slug}`} className="r2-link">
           {first.title}
         </Link>{' '}
         if you are not sure yet.

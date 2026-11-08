@@ -21,9 +21,9 @@ export default function CoursesPage() {
   const coursesReady = courses.filter((c) => c.lessons.every(hasVideo)).length
   return (
     <main className="max-w-5xl mx-auto px-5 py-14">
-      <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-500">Your robotics journey</p>
-      <h1 className="text-3xl md:text-5xl font-black text-white mt-2">Five free courses, from zero to your own robot design</h1>
-      <p className="text-gray-400 mt-4 max-w-2xl">Follow the path in order, or jump to the course you need. Each lesson is a short video of about four minutes with a quick quiz, and each course ends with a small final activity and a certificate you can verify and share. Everything is free.</p>
+      <p className="r2-eyebrow">The free course path</p>
+      <h1 className="r2-display">Five free courses, from zero to your own robot design</h1>
+      <p className="r2-lede">Follow the path in order, or jump to the course you need. Each lesson is a short video of about four minutes with a quick quiz, and each course ends with a small final activity and a certificate you can verify and share. Everything is free.</p>
       <p className="mt-3 max-w-2xl rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-gray-300">
         <strong className="text-white">{videosReady} of {lessonsTotal} videos are live right now</strong> ({coursesReady} course{coursesReady === 1 ? '' : 's'} complete). The rest are being recorded — every lesson page shows its own state, and you can get an email when a course opens.
       </p>
@@ -42,7 +42,7 @@ export default function CoursesPage() {
       {courses.length === 0 ? (
         <div className="mt-10 rounded-2xl border border-white/10 p-8 text-gray-300">
           <h2 className="text-xl font-bold text-white">First course is being recorded</h2>
-          <p className="mt-2">Meanwhile, start with the free <Link href="/academy" className="text-amber-500 underline">Academy tracks</Link> or the <Link href="/atlas" className="text-amber-500 underline">Atlas</Link>.</p>
+          <p className="mt-2">Meanwhile, start with the free <Link href="/academy" className="r2-link">Academy tracks</Link> or the <Link href="/atlas" className="r2-link">Atlas</Link>.</p>
         </div>
       ) : (
         <>
@@ -61,7 +61,7 @@ export default function CoursesPage() {
           }))} />
         </>
       )}
-      <p className="mt-12 text-sm text-gray-500">Prefer to explore on your own? Try the <Link href="/atlas" className="text-amber-500 underline">Atlas</Link>, the <Link href="/academy" className="text-amber-500 underline">Academy tracks</Link> or the <Link href="/visualizer" className="text-amber-500 underline">simulators</Link>.</p>
+      <p className="r2-meta" style={{ marginTop: '3rem' }}>Prefer to explore on your own? Try the <Link href="/atlas" className="r2-link">Atlas</Link>, the <Link href="/academy" className="r2-link">Academy tracks</Link> or the <Link href="/visualizer" className="r2-link">simulators</Link>.</p>
     </main>
   )
 }

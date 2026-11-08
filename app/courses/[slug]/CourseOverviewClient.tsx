@@ -73,7 +73,7 @@ export default function CourseOverviewClient(p: Props) {
           previewLessonTitle={p.heroPreviewTitle}
         />
         <div>
-          <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-500">{p.order ? `Course ${p.order} of ${p.totalCourses} · ` : ''}{p.level} · Free</p>
+          <p className="r2-eyebrow">{p.order ? `Course ${p.order} of ${p.totalCourses} · ` : ''}{p.level} · Free</p>
           <h1 className="text-3xl md:text-4xl font-black text-white mt-2">{p.title}</h1>
           {p.tagline && <p className="text-lg text-gray-300 mt-2">{p.tagline}</p>}
           <p className="text-gray-400 mt-3">{p.description}</p>
@@ -100,7 +100,7 @@ export default function CourseOverviewClient(p: Props) {
         <div className="mt-6 rounded-xl border border-white/10 p-4">
           <div className="flex justify-between text-sm text-gray-300"><span>Your progress</span><span>{pct}%</span></div>
           <div className="h-2 rounded bg-white/10 mt-2 overflow-hidden"><div className="h-full bg-amber-500" style={{ width: `${pct}%` }} /></div>
-          {prog.certificateId && <Link href={`/verify/${prog.certificateId}`} className="inline-block mt-3 text-amber-500 underline text-sm">🎓 View your certificate →</Link>}
+          {prog.certificateId && <Link href={`/verify/${prog.certificateId}`} className="r2-link mt-3">🎓 View your certificate →</Link>}
         </div>
       )}
       {readyCount > 0 && (
@@ -108,7 +108,7 @@ export default function CourseOverviewClient(p: Props) {
           {done.size > 0 && done.size < p.lessons.length ? 'Continue learning →' : 'Start the course →'}
         </Link>
       )}
-      {prog && !prog.signedIn && <p className="text-gray-500 text-sm mt-3">You can watch without an account. <Link href="/login" className="text-amber-500 underline">Sign in</Link> to save progress and earn the certificate.</p>}
+      {prog && !prog.signedIn && <p className="text-gray-500 text-sm mt-3">You can watch without an account. <Link href="/login" className="r2-link">Sign in</Link> to save progress and earn the certificate.</p>}
 
       <h2 className="text-xl font-bold text-white mt-10">What you will be able to do</h2>
       {p.outcome && <p className="text-gray-300 mt-2">{p.outcome}</p>}
@@ -148,11 +148,11 @@ export default function CourseOverviewClient(p: Props) {
 
       {p.finalActivity && (
         <section id="final-activity" className="mt-10 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5">
-          <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-500">Final activity</p>
+          <p className="r2-eyebrow">Final activity</p>
           <h2 className="text-xl font-bold text-white mt-1">{p.finalActivity.title}</h2>
           <p className="text-gray-300 mt-2">{p.finalActivity.prompt}</p>
           {!prog?.signedIn ? (
-            <p className="text-gray-400 text-sm mt-3"><Link href="/login" className="text-amber-500 underline">Sign in</Link> to write and save your answer.</p>
+            <p className="text-gray-400 text-sm mt-3"><Link href="/login" className="r2-link">Sign in</Link> to write and save your answer.</p>
           ) : (
             <>
               <label htmlFor="fa" className="sr-only">Your answer</label>
