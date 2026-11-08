@@ -64,27 +64,34 @@ export function CuriousButton({ nodes }: { nodes: AtlasNodeLite[] }) {
       </span>
       <span className="cb-arrow" aria-hidden>→</span>
       <style jsx>{`
+        /* Was a purple-to-orange gradient with a violet border, a yellow
+           title and lilac subtext — four colours used nowhere else on the
+           site, sitting next to the search box. It is a button; it looks
+           like the other buttons now. */
         .cb {
           display: flex; align-items: center; gap: 16px;
           width: 100%;
           padding: 18px 22px;
-          background: linear-gradient(135deg, rgba(124,58,237,0.16), rgba(252,104,24,0.10));
-          border: 1px solid rgba(124,58,237,0.4);
-          border-radius: 16px;
-          color: #f4f4f5;
+          background: var(--surface-1);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          color: var(--text-1);
           cursor: pointer;
           text-align: left;
-          transition: transform .15s, border-color .15s;
+          transition: transform .15s var(--ease), border-color .15s var(--ease), background .15s var(--ease);
         }
-        .cb:hover:not(:disabled) { transform: translateY(-2px); border-color: #FF8A4C; }
+        .cb:hover:not(:disabled) {
+          transform: translateY(-2px);
+          border-color: var(--border-2);
+          background: var(--surface-2);
+        }
         .cb:disabled { opacity: 0.7; cursor: wait; }
-        .cb-icon { font-size: 32px; }
+        .cb-icon { font-size: 26px; }
         .cb-body { display: flex; flex-direction: column; flex: 1; gap: 4px; }
-        .cb-title { font-size: 17px; font-weight: 900; color: #fde047; }
-        .cb-sub { font-size: 13px; color: #c4b5fd; min-height: 18px; }
-        .cb-arrow {
-          font-size: 22px; color: #FF8A4C; font-weight: 900;
-        }
+        .cb-title { font-size: var(--t-body); font-weight: 650; color: var(--text-1); }
+        .cb-sub { font-size: var(--t-small); color: var(--text-3); min-height: 18px; }
+        .cb-arrow { font-size: 18px; color: var(--text-3); }
+        .cb:hover:not(:disabled) .cb-arrow { color: var(--amber-bright); }
       `}</style>
     </button>
   )

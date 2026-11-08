@@ -2,6 +2,12 @@
 
 // components/atlas/ReadingPathsStrip.tsx
 // Shows the curated reading paths on the Atlas home with per-path progress.
+//
+// Was five cards, each with a different border colour, a differently coloured
+// level pill and a 28px emoji — a rainbow in one row, on the page whose whole
+// job is to make 512 entries feel navigable. Level is the only thing that
+// meaningfully differs between the cards, so it is the only thing coloured
+// now, and it is coloured by level rather than by card.
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -15,85 +21,36 @@ export function ReadingPathsStrip() {
   }, [])
 
   return (
-    <section style={{ margin: '22px 0' }}>
-      <header style={{ marginBottom: 12 }}>
-        <p
-          style={{
-            fontSize: 11,
-            letterSpacing: 3,
-            textTransform: 'uppercase',
-            color: '#FF8A4C',
-            fontWeight: 900,
-            margin: 0,
-          }}
-        >
-          Reading paths
-        </p>
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: '6px 0 4px' }}>
-          Not sure where to start? Follow a path.
-        </h2>
-        <p style={{ color: '#94a3b8', fontSize: 13, margin: 0 }}>
+    <section style={{ margin: '2.5rem 0' }}>
+      <header style={{ marginBottom: '1rem' }}>
+        <p className="r2-eyebrow">Reading paths</p>
+        <h2 className="r2-h2">Not sure where to start? Follow a path.</h2>
+        <p className="r2-body" style={{ marginTop: '0.4rem', fontSize: 'var(--t-small)' }}>
           Linear journeys through the Atlas, curated by topic.
         </p>
       </header>
-      <div
-        style={{
-          display: 'grid',
-          gap: 12,
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
-        }}
-      >
-        {READING_PATHS.map(p => {
-          const masteredCount = p.concepts.filter(s => mastered.includes(s)).length
+
+      <div className="r2-paths">
+        {READING_PATHS.map((p) => {
+          const masteredCount = p.concepts.filter((s) => mastered.includes(s)).length
           const pct = p.concepts.length === 0 ? 0 : Math.round((masteredCount / p.concepts.length) * 100)
           return (
-            <Link
-              key={p.id}
-              href={`/atlas/paths/${p.id}`}
-              style={{
-                display: 'block',
-                padding: 16,
-                background: `linear-gradient(135deg, ${p.color}26, rgba(15,18,32,0.7))`,
-                border: `1.5px solid ${p.color}`,
-                borderRadius: 14,
-                textDecoration: 'none',
-                color: '#f4f4f5',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                <span style={{ fontSize: 28 }}>{p.emoji}</span>
-                <span
-                  style={{
-                    fontSize: 10,
-                    letterSpacing: 1.5,
-                    textTransform: 'uppercase',
-                    fontWeight: 900,
-                    color: '#0a0a16',
-                    background: p.color,
-                    padding: '2px 8px',
-                    borderRadius: 999,
-                  }}
-                >
-                  {p.level}
-                </span>
-              </div>
-              <p style={{ fontSize: 17, fontWeight: 900, color: '#fff', margin: '0 0 4px' }}>{p.title}</p>
-              <p style={{ fontSize: 12, color: '#c4b5fd', margin: '0 0 10px' }}>
+            <Link key={p.id} href={`/atlas/paths/${p.id}`} className="r2-card r2-path">
+              <span className={`r2-path__level r2-path__level--${p.level.toLowerCase()}`}>
+                {p.level}
+              </span>
+              <span className="r2-h3 r2-path__title">{p.title}</span>
+              <span className="r2-meta">
                 {p.concepts.length} concepts · ~{p.estimatedMinutes} min
-              </p>
-              <div style={{ height: 5, background: 'rgba(255,255,255,0.08)', borderRadius: 999, overflow: 'hidden' }}>
-                <div
-                  style={{
-                    width: `${pct}%`,
-                    height: '100%',
-                    background: `linear-gradient(90deg, ${p.color}, #FF8A4C)`,
-                    transition: 'width .4s',
-                  }}
-                />
-              </div>
-              <p style={{ fontSize: 11, color: '#94a3b8', margin: '6px 0 0', fontWeight: 700 }}>
-                {pct}% complete
-              </p>
+              </span>
+              {/* A progress bar reading 0% on every card, to someone who has
+                  just arrived, is a row of empty troughs saying "you have done
+                  nothing". It appears once there is something to show. */}
+              {pct > 0 && (
+                <span className="r2-path__bar" aria-label={`${pct}% complete`}>
+                  <span style={{ width: `${pct}%` }} />
+                </span>
+              )}
             </Link>
           )
         })}

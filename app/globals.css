@@ -1238,3 +1238,36 @@ a.r2-card:hover, .r2-card--interactive:hover {
 }
 .auth-panel__more:hover { color: var(--text-1); }
 .auth-panel__error { font-size: var(--t-small); color: #F87171; margin: 0; }
+
+/* ── Atlas reading paths ───────────────────────────────────────────────── */
+.r2-paths {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+}
+.r2-path { display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-start; }
+.r2-path__title { font-size: var(--t-body); }
+.r2-path__level {
+  font-size: var(--t-micro);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border-2);
+  color: var(--text-3);
+}
+/* Colour carries the one thing that actually differs between the cards. */
+.r2-path__level--beginner { color: #4ADE80; border-color: rgba(74, 222, 128, 0.35); }
+.r2-path__level--intermediate { color: #38BDF8; border-color: rgba(56, 189, 248, 0.35); }
+.r2-path__level--advanced { color: var(--amber-bright); border-color: var(--accent-line); }
+.r2-path__bar {
+  display: block;
+  width: 100%;
+  height: 4px;
+  margin-top: 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.r2-path__bar > span { display: block; height: 100%; background: var(--amber); }
