@@ -91,3 +91,11 @@ jobs:
           name: site-audit-report
           path: .unlighthouse/
           retention-days: 30
+          # `.unlighthouse/` is a DOT-directory, and upload-artifact@v4 skips
+          # hidden files by default. Both earlier runs warned "No files were
+          # found", uploaded nothing, and reported the step as successful — so
+          # the report this workflow promises to keep has never once existed.
+          # Third time in two days that a green step produced nothing (see
+          # CLAUDE.md §16); make the next one loud instead.
+          include-hidden-files: true
+          if-no-files-found: error
