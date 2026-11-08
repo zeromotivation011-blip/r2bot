@@ -278,7 +278,9 @@ export default async function AtlasEntryPage(
         />
       )}
 
-      <article id="main-content" style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>
+      {/* <main>, not <article>: the skip target was here but the page had no
+          main landmark, so `landmark-one-main` failed on all 512 Atlas entries. */}
+      <main id="main-content" style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>
         <div className="container" style={{ maxWidth: 800 }}>
           {/* Category hero */}
           {entry.category && (
@@ -656,7 +658,7 @@ export default async function AtlasEntryPage(
             </a>
           </p>
         </div>
-      </article>
+      </main>
 
       <NextTopicBar
         currentSlug={slug}

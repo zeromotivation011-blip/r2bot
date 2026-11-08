@@ -266,8 +266,11 @@ nav.r2nav.scrolled { background: rgba(10, 14, 23, 0.92); backdrop-filter: blur(1
 .hb-bars.x > span:nth-child(3) { top: 7px; transform: rotate(-45deg); }
 
 /* Mobile overlay */
-.nav-mobile { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(5, 8, 16, 0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 78px 20px 24px; overflow-y: auto; opacity: 0; pointer-events: none; transform: translateY(-8px); transition: opacity 0.2s var(--ease), transform 0.2s var(--ease); z-index: 40; }
-.nav-mobile.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+/* visibility (not just opacity) is what removes the closed menu from the tab
+   order; the 0s delay on close lets the 0.2s fade finish before it hides, so
+   the animation is unchanged. Paired with `inert` in Nav.tsx. */
+.nav-mobile { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(5, 8, 16, 0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 78px 20px 24px; overflow-y: auto; opacity: 0; pointer-events: none; visibility: hidden; transform: translateY(-8px); transition: opacity 0.2s var(--ease), transform 0.2s var(--ease), visibility 0s linear 0.2s; z-index: 40; }
+.nav-mobile.open { opacity: 1; transform: translateY(0); pointer-events: auto; visibility: visible; transition: opacity 0.2s var(--ease), transform 0.2s var(--ease), visibility 0s; }
 .nav-mobile-inner { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
 .nav-mob-section { border: 1px solid var(--border); border-radius: 12px; background: rgba(255, 255, 255, 0.02); overflow: hidden; }
 .nav-mob-section.active { border-color: rgba(252,104,24, 0.45); }

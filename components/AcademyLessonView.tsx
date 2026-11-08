@@ -48,7 +48,8 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLesson }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <article id="main-content" className="academy-lesson" style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>
+      {/* <main>, not <article>: see the Atlas template. Same fault, same fix. */}
+      <main id="main-content" className="academy-lesson" style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>
         <div className="container" style={{ maxWidth: 760 }}>
           <LessonHeader track={lesson.track as 'spark'} lessonSlug={lesson.slug} lessonTitle={lesson.title} />
 
@@ -225,7 +226,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLesson }) {
 
           <LessonFooter track={lesson.track as 'spark'} lessonSlug={lesson.slug} lessonTitle={lesson.title} xp={lesson.xp} />
         </div>
-      </article>
+      </main>
 
       <CopilotBubble />
       <CopilotDrawer />

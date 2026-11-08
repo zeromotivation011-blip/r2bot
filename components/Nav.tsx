@@ -394,7 +394,20 @@ export function Nav() {
       </div>
 
       {/* Mobile overlay */}
-      <div className={`nav-mobile ${mobileOpen ? 'open' : ''}`} aria-hidden={!mobileOpen}>
+      {/*
+        `inert` is what actually takes the closed menu out of the tab order.
+        `aria-hidden` alone was a lie the browser did not enforce: the panel is
+        hidden with opacity + pointer-events, so every link inside stayed
+        focusable and a keyboard user tabbed through invisible navigation on all
+        23 audited pages (Lighthouse `aria-hidden-focus`, weight 7). The CSS
+        adds `visibility: hidden` for the same reason, delayed so the fade-out
+        still plays.
+      */}
+      <div
+        className={`nav-mobile ${mobileOpen ? 'open' : ''}`}
+        aria-hidden={!mobileOpen}
+        inert={!mobileOpen}
+      >
         <div className="nav-mobile-inner">
           {GROUPS.map((g, i) => {
             const expanded = mobileExpanded === i;
