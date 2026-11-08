@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getAllAtlasEntriesMerged } from '@/lib/atlas-db';
 import { getAllLensMerged } from '@/lib/lens-cms';
+import { getArchivedNewsSlugs } from '@/lib/news';
 import { getAllAcademyLessons } from '@/lib/academy';
 import { ROBOTS } from '@/lib/robots-data';
 import { getAllPostsMerged } from '@/lib/blog-db';
@@ -48,11 +49,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Merged sources: MDX on disk PLUS anything published through the CMS.
   // Reading the filesystem alone meant browser-created content never entered
   // the sitemap, so Google never discovered it.
-  const [atlasEntries, blogPostsData, lensVideos] = await Promise.all([
+  const [atlasEntries, blogPostsData, lensVideos, newsSlugs] = await Promise.all([
     getAllAtlasEntriesMerged(),
     getAllPostsMerged(),
     getAllLensMerged(),
+    getArchivedNewsSlugs(1000),
   ]);
+
+  // Per-article news pages from the archive (0033 + 0050). These are
+  // summarised, self-canonical stories with NewsArticle JSON-LD — the
+  // indexable layer over a feed that is otherwise client-rendered and links
+  // straight out to the source. lastModified is the story's real publish date,
+  // never `now`. Empty until the archive cron has run and 0050 is applied, so
+  // this adds nothing to the sitemap until there is something real to list.
+  const newsArticles = newsSlugs.map((n) => ({
+    url: `${BASE}/news/${n.slug}`,
+    lastModified: new Date(n.publishedAt),
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }));
 
   // Slugs that 308 to another entry must not be listed in the sitemap:
   // duplicate concepts, plus the robots that live canonically at /robots/<slug>
@@ -213,6 +228,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...buildProjects,
     ...blogPosts,
     ...lens,
+    ...newsArticles,
     ...ROBOTS.map((r) => ({
       url: `${BASE}/robots/${r.slug}`,
       lastModified: GROUP_UPDATED.robots,
