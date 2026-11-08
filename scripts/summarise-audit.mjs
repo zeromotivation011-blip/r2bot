@@ -9,12 +9,52 @@
 // read something. A reporting step must never be the reason a workflow fails:
 // it exits 0 no matter what. The budget flag is what fails a run.
 //
-// Once a real run has happened, tighten this to the actual shape.
+// Shape confirmed by the first real run (8 Nov 2026): the reporter writes
+// .unlighthouse/ci-result.json and the probe below reads it correctly.
+//
+// That run also exposed a hole in THIS script. Unlighthouse crawled 1,756 URLs
+// fast enough to trip the site's rate limiting, which answered 403; it skipped
+// nearly every page and finished with 34. This script reported "34 pages
+// audited", good averages, and exit 0 — a scan that silently missed 98% of the
+// site went green. That is the exact failure this whole workflow was built to
+// catch, reproduced by the tool meant to catch it.
+//
+// So coverage is now assertable: pass --min <n> and the script exits non-zero
+// when fewer pages were audited than demanded. Without --min it stays a pure
+// reporter and always exits 0.
 
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const DIR = process.argv[2] || '.unlighthouse'
+const args = process.argv.slice(2)
+const minIdx = args.indexOf('--min')
+const MIN = minIdx === -1 ? null : Number(args[minIdx + 1])
+const DIR = args.find((a, i) => !a.startsWith('--') && i !== minIdx + 1) || '.unlighthouse'
+
+if (minIdx !== -1 && (!Number.isFinite(MIN) || MIN <= 0)) {
+  console.error('--min needs a positive number')
+  process.exit(2)
+}
+
+/**
+ * Exit the way the caller asked for. Reporting mode always succeeds; coverage
+ * mode fails loudly, because a scan that quietly audited a handful of pages is
+ * worse than no scan — it looks like evidence.
+ */
+function finish(auditedCount) {
+  if (MIN === null) process.exit(0)
+  if (auditedCount < MIN) {
+    console.error(
+      `\nCOVERAGE FAILURE: ${auditedCount} pages audited, ${MIN} required.\n` +
+        'The scan did not cover what it was asked to. Check the audit step log for\n' +
+        '"Skipping ... code: 403" — the site rate-limits a fast crawler, so the scan\n' +
+        'must use an explicit --urls list rather than crawling every route.',
+    )
+    process.exit(1)
+  }
+  console.log(`\nCoverage ok: ${auditedCount} pages audited, ${MIN} required.`)
+  process.exit(0)
+}
 
 function findJson(dir, depth = 0) {
   if (depth > 3) return []
@@ -43,7 +83,7 @@ const files = findJson(DIR).sort((a, b) => b.size - a.size)
 if (files.length === 0) {
   console.log(`No JSON report found under ${DIR}/.`)
   console.log('The scan may have failed before writing results — check the audit step above.')
-  process.exit(0)
+  finish(0)
 }
 
 console.log(`Found ${files.length} JSON file(s) under ${DIR}/. Reading the largest.`)
@@ -53,7 +93,7 @@ try {
   parsed = JSON.parse(readFileSync(files[0].path, 'utf8'))
 } catch (err) {
   console.log(`Could not parse ${files[0].path}: ${err.message}`)
-  process.exit(0)
+  finish(0)
 }
 
 // Pull out anything that looks like {url/path, score(s)}. Unlighthouse has used
@@ -89,7 +129,7 @@ if (rows.length === 0) {
   console.log('Report parsed, but no per-page scores recognised in it.')
   console.log('Top-level keys:', Object.keys(parsed).slice(0, 20).join(', '))
   console.log('The full report is attached to this run as an artifact.')
-  process.exit(0)
+  finish(0)
 }
 
 // Deduplicate by URL, keeping the first.
@@ -117,3 +157,5 @@ for (const cat of ['accessibility', 'seo', 'performance', 'best']) {
 }
 
 console.log('\nFull interactive report: the "site-audit-report" artifact on this run.')
+
+finish(unique.length)
