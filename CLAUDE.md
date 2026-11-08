@@ -244,6 +244,9 @@ Ordered. Each is a real project; do them completely.
 - No decoration behind body text. ParticleField and CursorTrail are deleted; do not reintroduce them.
 - Tailwind utilities only (no inline style except runtime-dynamic). Amber-500 `#f59e0b` accent. Dark-first. Mobile-first.
 - No new npm packages without flagging. No hardcoded secrets — env vars only.
+  CI-only tools are the exception and stay OUT of `package.json`: the site-wide auditor is a
+  pinned global install inside its workflow. Do not "tidy" it into dependencies (it would ship
+  weight to no purpose) and do not delete it as unused (nothing imports it by design).
 - Semantic commits (`feat:` `fix:` `content:` `perf:` `refactor:`). `npm run type-check` clean + build passes before done.
 
 ---
@@ -268,6 +271,14 @@ comprehensive sitemap to Search Console; own the result for every robotics conce
 - **A named human author** on everything, from `lib/author.ts`. Not the organisation.
 - A page with no inbound internal link is invisible. `getRelatedEntries` balances the link graph
   and rescues orphans; keep it that way if you touch it.
+- **One table, one schema.** `atlas_entries` is written by two things — `scripts/seed-atlas.ts`
+  fills the typed columns (`title`, `summary`, `body_md`, `last_reviewed_at`, `category`,
+  `see_also`, `sources`, `tags`), the admin CMS fills `data` + `body`. `lib/atlas-db.ts` read only
+  the second pair, so when the seeder filled 512 rows on 8 Nov every one looked empty to the
+  reader and blanked a rich MDX file. The reader now reads BOTH (`rowToEntry`). If you add a field
+  to either writer, add it to `rowToEntry` **in the same commit**, and never let a row that would
+  render blank outrank a file — `hasContent()` enforces that. See
+  `claude/r2bot-atlas-blank-pages-incident-2026-11-08.md`.
 
 **Verifying ROS 2 facts:** docs.ros.org now sits behind Anubis bot protection — WebFetch gets
 "Access Denied" and curl gets a JS challenge. The same content is readable at
@@ -321,7 +332,33 @@ hand-off: Ravi has to run it, and the code must work before he does.
 
 ---
 
+## 16. AUTOMATED GUARDS (what runs, and what each one can't see)
+
+Four workflows in `.github/workflows/`. Know which gap each one covers before trusting a green tick.
+
+| Workflow | Checks | When |
+|----------|--------|------|
+| `quality.yml` | `type-check` + lint. No build — secrets live in Vercel. | every PR |
+| `secret-scan.yml` | gitleaks over full history (`fetch-depth: 0`); also a pre-commit hook. | every PR |
+| `live-checks.yml` | sitemap honesty (`scripts/check-sitemap.mjs`), dead links (lychee), **Atlas pages have real content** (`scripts/check-atlas-content.mjs`). | daily 06:37 UTC |
+| `site-audit.yml` | full Lighthouse suite — performance, **accessibility**, **SEO**, best-practices — across every page template, mobile. Reports only; no budget asserted yet. | weekly Mon 04:23 UTC |
+
+**What a green tick does not mean.** Every one of these passed for hours on 8 Nov while all 512
+Atlas pages served a blank page: the pages returned 200, sat in the sitemap, resolved their links
+and carried correct canonicals. Checks that measure *existence* cannot see an empty page. That is
+why `check-atlas-content.mjs` exists, and why any new content surface needs a check that it SAYS
+something, not just that it responds.
+
+**On budgets.** `lighthouse-budget.json` is a ratchet set *above* measured reality (homepage script
+488 KB against a 350 KB target, TBT 1,245 ms against 300 ms), with the real numbers in its
+`_comment`. Never raise a budget to turn a build green — raise it only with a measurement and a
+note, or fix the page. The site-wide audit asserts no budget until a real run produces numbers; an
+honest 55 that holds is worth more than a decorative 90 that gets switched off.
+
+---
+
 *Supersedes the previous India-first brief. R2BOT is a global, world-class robotics platform.
 Updated 8 Nov 2026 after a full product/SEO/retention audit — see
 `claude/r2bot-360-audit-2026-11-08.md` in the claude.ai project for the findings this file now
-encodes. Update this file as the product evolves; a stale brief is worse than none.*
+encodes, and `claude/r2bot-atlas-blank-pages-incident-2026-11-08.md` for the blank-Atlas incident
+behind §12's "one table, one schema" and §16's warning about green ticks. Update this file as the product evolves; a stale brief is worse than none.*
