@@ -1,13 +1,18 @@
 ---
-title: Raspberry Pi for Robotics
+title: Raspberry Pi
 summary: >-
-  The Raspberry Pi is the most popular single-board computer for robotics. Runs
-  Linux, ROS2, OpenCV, and PyTorch — perfect for the brain of mobile robots.
+  The Raspberry Pi is a small, inexpensive computer that runs a full Linux
+  operating system and has a row of pins for wiring to sensors and motors — in
+  robotics it is the brain that sees, thinks and talks to the network.
 category: hardware
-lastReviewed: 2026-05-21T00:00:00.000Z
+lastReviewed: 2026-11-08T00:00:00.000Z
 sources:
-  - title: 'Raspberry Pi'
-    url: 'https://en.wikipedia.org/wiki/Raspberry_Pi'
+  - title: Raspberry Pi 5 — product page and specifications
+    url: 'https://www.raspberrypi.com/products/raspberry-pi-5/'
+  - title: Raspberry Pi Zero 2 W — product page and specifications
+    url: 'https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/'
+  - title: Raspberry Pi Pico 2 — product page and specifications
+    url: 'https://www.raspberrypi.com/products/raspberry-pi-pico-2/'
 tags:
   - raspberry-pi
   - sbc
@@ -17,53 +22,93 @@ seeAlso:
   - embedded-system
   - ros2
   - python-robotics
+  - arduino
 difficulty: 3
 laymanExplanation: >-
-  The Raspberry Pi is a credit-card-sized single-board computer running full
-  Linux. Originally designed for education, it has become the standard 'brain'
-  for thousands of robotics projects — students, hobbyists, and commercial
-  products alike.
+  A Raspberry Pi is a complete computer on one small board. It runs Linux like a
+  desktop machine does, so it can handle cameras, maps and networking — and it
+  has a row of pins along one edge so it can also be wired to robot hardware.
+  What it cannot do is keep perfect time on those pins, because Linux is always
+  deciding which program runs next.
 realRobotsThatUseThis: []
 indianExample: ''
 relatedTerms: []
 prerequisiteTerms: []
 unlocksTerms: []
 quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
+  q: >-
+    You are building a mobile robot that must run camera-based navigation and
+    also hold a set of servos at steady angles. What is the usual arrangement?
+  options:
+    - One Raspberry Pi doing both the vision and the servo pulses
+    - >-
+      A Raspberry Pi for the vision and navigation, with a microcontroller board
+      driving the servos
+    - One Arduino-class microcontroller board doing both
+  answer: 1
+  explanation: >-
+    A Pi has the processor, memory and software libraries for vision and ROS 2,
+    but Linux schedules many processes at once, so the exact moment a pin changes
+    can slip. A microcontroller has no operating system and hits microsecond
+    deadlines, but far too little memory for a camera frame. Splitting the work
+    gives you both properties.
+mindBlowingFact: >-
+  Raspberry Pi also makes a microcontroller: the RP2350 chip on the Pico 2 lets
+  you choose between two dual-core processors on the same piece of silicon — Arm
+  Cortex-M33 or Hazard3 RISC-V — both running at 150 MHz.
+industryApplications:
+  - education
+  - mobile robots
+  - computer vision
+  - ROS 2 development
+  - industrial prototyping
 difficultyLabel: Classroom
 technicalDefinition: >-
-  The Raspberry Pi is the most popular single-board computer for robotics. Runs
-  Linux, ROS2, OpenCV, and PyTorch — perfect for the brain of mobile robots.
+  The Raspberry Pi is a small, inexpensive computer that runs a full Linux
+  operating system and has a row of pins for wiring to sensors and motors — in
+  robotics it is the brain that sees, thinks and talks to the network.
 slug: raspberry-pi-robotics
 bucket: concept
 ---
 
-# Raspberry Pi for Robotics
+The **Raspberry Pi** is a small, inexpensive computer that runs a full Linux operating system and carries a row of pins along one edge for wiring to sensors and motors. In a robot it plays the part of the brain: the piece that reads a camera, works out where it is, decides what to do next, and talks to the network.
 
-## What is it?
+It is a [single-board computer](/atlas/concept/single-board-computer) — everything a desktop machine has, on one board the size of a playing card.
 
-The Raspberry Pi is a credit-card-sized single-board computer running full Linux. Originally designed for education, it has become the standard 'brain' for thousands of robotics projects — students, hobbyists, and commercial products alike.
+## What makes it a computer rather than a chip
 
-## How it works
+The flagship model, the Raspberry Pi 5, is built on a Broadcom BCM2712: four 64-bit Arm Cortex-A76 cores at 2.4 GHz, with 512 kB of L2 cache per core and 2 MB shared L3, paired with LPDDR4X memory sold in 1, 2, 4, 8 and 16 GB versions. Alongside it sits RP1, Raspberry Pi's own input/output controller, which drives two USB 3.0 ports at full 5 Gbps plus two USB 2.0 ports, Gigabit Ethernet, dual-band Wi-Fi and Bluetooth 5.0.
 
-A Raspberry Pi 5 has a quad-core ARM CPU, 4–8 GB RAM, USB ports, GPIO pins, Ethernet, Wi-Fi, and supports a camera module. Robotics builders run ROS2 on it, attach sensors via I2C/SPI/UART, and write code in Python or C++. For real-time motor control, the Pi is usually paired with an Arduino or microcontroller.
+For robotics the interesting connectors are the standard 40-pin header, two four-lane MIPI transceivers that can each take a camera or a display, and a single-lane PCIe 2.0 interface for fast storage or accelerators through an adapter board. With that much memory and a real operating system you can install [ROS 2](/atlas/concept/ros2), OpenCV and Python machine-learning libraries the ordinary way, and write your robot code in [Python](/atlas/concept/python-robotics) or C++.
 
-## Real-world example
+## The models worth knowing
 
-Boston Dynamics Spot's payload deck supports Raspberry Pis. Most Indian robotics startups prototype on Raspberry Pi before moving to NVIDIA Jetson. Educational robots like the GoPiGo are built around Pi.
+| Board | Processor | Clock | Memory | Runs |
+|---|---|---|---|---|
+| Raspberry Pi 5 | Quad-core Arm Cortex-A76 (BCM2712) | 2.4 GHz | 1–16 GB LPDDR4X | Linux |
+| Raspberry Pi Zero 2 W | Quad-core Arm Cortex-A53 (RP3A0) | 1 GHz | 512 MB | Linux |
+| Raspberry Pi Pico 2 | Dual Arm Cortex-M33 or dual Hazard3 RISC-V (RP2350) | 150 MHz | 520 kB SRAM, 4 MB flash | A single program, no OS |
 
-## Why it matters for robotics
+The Zero 2 W is the one for small, weight-sensitive robots: the same four-core idea at 1 GHz with 512 MB of memory, on a board 65 mm × 30 mm, with 2.4 GHz Wi-Fi and Bluetooth 4.2. Its 40-pin header footprint ships unpopulated, so either solder it or buy the version with headers already on.
 
-If you want to do real ROS2 on a portable robot, Raspberry Pi is the cheapest entry point. Every Indian robotics engineering student should own one.
+The Pico 2 is in the table for a reason: it is from the same company but it is not a computer. It is a microcontroller, and the contrast is the most useful thing on this page.
 
-## See also
+## What a Pi cannot do
 
-- [Single Board Computer](/atlas/concept/single-board-computer)
-- [Embedded System](/atlas/concept/embedded-system)
-- [Ros2](/atlas/concept/ros2)
-- [Python Robotics](/atlas/concept/python-robotics)
+Linux is a general-purpose operating system. It is always choosing which of many processes gets the processor next, which means the exact instant a pin changes state is not guaranteed. For most work that does not matter — a millisecond late is invisible in a navigation loop. It matters enormously when you are generating the pulse train that tells a servo its angle, or timing an echo in microseconds. Those jobs want a chip with nothing else to do, which is what an [Arduino](/atlas/concept/arduino) or a Pico is: one program, on bare metal, with hardware timers that keep their beat regardless of what the code is doing.
+
+So the standard robot architecture is two brains. The Pi handles vision, maps, planning and networking. A [microcontroller](/atlas/concept/microcontroller) sits between it and the motors, taking commands over serial or [I2C](/atlas/concept/i2c) and turning them into exact signals. Nothing is lost by splitting it that way, and a great deal of twitching is avoided.
+
+## Common questions
+
+### Can I run a whole robot on a Raspberry Pi alone?
+
+Yes, if nothing on it needs precise timing — a camera robot that drives through a motor controller board, for example. Add servos, encoders or stepper motors and you will want a microcontroller doing that layer.
+
+### Which model should a beginner buy for robotics?
+
+A current full-size Pi with at least 4 GB of memory if you intend to run ROS 2 or computer vision, because both are memory-hungry. A Zero 2 W is the better pick when size, weight or power budget rules the design.
+
+### Is the Raspberry Pi Pico a small Raspberry Pi?
+
+No. It shares the brand and the toolchain, but it is a microcontroller board with no operating system — closer in behaviour to an Arduino than to a Pi.

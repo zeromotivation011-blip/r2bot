@@ -1,85 +1,119 @@
 ---
-title: Finite State Machine in Robotics
+title: Finite State Machine
 summary: >-
-  A finite state machine (FSM) models a robot as a set of states and
-  transitions. It's a classic, easy-to-debug way to structure behaviour.
+  A finite state machine is a model in which a robot is always in exactly one
+  state out of a fixed list — charging, delivering, idle — and moves to another
+  state only when a named input or event triggers a transition.
 category: control
-lastReviewed: 2026-05-21T00:00:00.000Z
+lastReviewed: 2026-11-08T00:00:00.000Z
 sources:
-  - title: 'Finite-state machine'
+  - title: 'Finite-state machine — Wikipedia'
     url: 'https://en.wikipedia.org/wiki/Finite-state_machine'
+  - title: 'Nav2 Concepts — on behavior trees versus state machines'
+    url: 'https://docs.nav2.org/concepts/index.html'
 tags:
   - fsm
-  - state-machine
+  - finite-state-machine
   - behavior
 seeAlso:
-  - state-machine
+  - finite-state-machine
   - behavior-trees
-  - ros2
+  - nav2
 difficulty: 3
 laymanExplanation: >-
-  A finite state machine is a model where the robot is always in exactly one
-  state from a finite set, and transitions between states are triggered by
-  inputs or events. FSMs are easy to draw, easy to debug, and remain widely used
-  in robotics.
+  A finite state machine says a robot is always in exactly one state from a
+  fixed list, and only moves to another state when something specific happens.
+  You can draw the whole design on one page as boxes with labelled arrows
+  between them, which is why it is usually the first way anyone structures a
+  robot's decisions.
 realRobotsThatUseThis:
-  - Roomba (mode states)
   - Vending machines
-  - NPCs in games
-indianExample: >-
-  Indian robotics-club projects (line-follower + obstacle-avoider combinations)
-  are almost always implemented as 3-4 state FSMs.
+  - Elevators
+  - Traffic lights
+  - Turnstiles
+indianExample: ''
 relatedTerms: []
 prerequisiteTerms: []
 unlocksTerms: []
 quizQuestion:
-  q: 'In a finite state machine, how many states can the robot be in at once?'
+  q: 'In a finite state machine, how many states can a robot be in at once?'
   options:
-    - Many
-    - Exactly one
-    - Zero
-    - Depends on speed
+    - 'As many as its sensors allow'
+    - 'Exactly one'
+    - 'One per motor'
   answer: 1
   explanation: >-
-    By definition, an FSM is in exactly one state at any moment. Transitions
-    move it to a new state.
+    An FSM is by definition in exactly one of a finite number of states at any
+    given time. A transition, triggered by an input, is what moves it to a
+    different state.
 mindBlowingFact: >-
-  The vending machine that gives you Lays inside your Indian school cafeteria is
-  an FSM with 5–6 states — coin received, dispensing, complete, etc.
+  A finite state machine has strictly less computational power than a Turing
+  machine, because its only memory is which state it is in — so a machine with
+  five states can never count to a thousand.
 industryApplications:
   - robotics
-  - game development
-  - compilers
   - industrial automation
-  - web frameworks
+  - compilers
+  - hardware design
+  - network protocols
 difficultyLabel: Classroom
 technicalDefinition: >-
-  A finite state machine (FSM) models a robot as a set of states and
-  transitions. It's a classic, easy-to-debug way to structure behaviour.
+  A finite state machine is an abstract machine that is in exactly one of a
+  finite number of states at any given time, defined by its states, its initial
+  state, and the inputs that trigger each transition between states.
 slug: finite-state-machine
 bucket: concept
 ---
 
-# Finite State Machine in Robotics
+# Finite State Machine
 
-## What is it?
-
-A finite state machine is a model where the robot is always in exactly one state from a finite set, and transitions between states are triggered by inputs or events. FSMs are easy to draw, easy to debug, and remain widely used in robotics.
+A finite state machine (FSM) is a model in which a robot is always in exactly one state out of a fixed list — charging, delivering, idle — and moves to another state only when a named input or event triggers a transition. It is a model of computation from automata theory, and the usual first way anyone structures a robot's decisions.
 
 ## How it works
 
-Each state has on-entry, during, and on-exit code. Transitions specify the source state, the trigger condition, and the destination state. At each control tick, the FSM evaluates whether the current state's transitions can fire, and if so updates accordingly. FSMs can be implemented as switch statements, transition tables, or via libraries like SMACH.
+An FSM is fully defined by three things: its states, its initial state, and the inputs that trigger each transition between states.
 
-## Real-world example
+The textbook example is a turnstile: two states, Locked and Unlocked, and two inputs, *coin* and *push*. A coin unlocks it; a push through locks it again. Nothing else can happen — and that is the point, because the whole design fits in a small table.
 
-A robot vacuum's behaviour — Idle → Cleaning → Returning → Charging — is a classic FSM. Industrial robots use FSMs for safety modes (Normal, Estop, Manual, Auto).
+| Current state | Input | Next state |
+|---|---|---|
+| Locked | coin | Unlocked |
+| Locked | push | Locked |
+| Unlocked | coin | Unlocked |
+| Unlocked | push | Locked |
 
-## Why it matters for robotics
+That is a state-transition table. Drawn as a picture it becomes a state diagram: states are nodes, transitions are labelled arrows, and the starting state is marked by an arrow from a black dot. Seeing the whole design at a glance is most of why engineers reach for FSMs.
 
-FSMs remain the easiest way to model finite, well-bounded behaviour. Knowing when to choose an FSM versus a behaviour tree is an architectural skill expected in robotics engineering.
+A machine is **deterministic** when every state-and-input pair has exactly one transition, and **nondeterministic** when an input may lead to zero, one or several. Two conventions exist for output: a **Moore** machine's output depends only on its state, while a **Mealy** machine's depends on the state *and* the input — which often means fewer states.
 
-## See also
+## A worked example: the battery runs low mid-delivery
 
-- [State Machine](/atlas/concept/state-machine)
-- [Behavior Trees](/atlas/concept/behavior-trees)
-- [Ros2](/atlas/concept/ros2)
+A robot is carrying a parcel across a hospital when its battery drops below ten per cent.
+
+In an FSM you must say exactly where that can happen. Add a Charging state, then draw a *battery low* transition into it from every state the robot might be in when it notices — Delivering, Returning, Idle — each with its own answer to "what about the parcel?", plus a way back out again.
+
+That is the cost people run into: add a *lost the map* condition next week and you draw another fan of arrows across the same states. Nav2's documentation puts the end point plainly — a finite state machine can need dozens of states and hundreds of transitions, which gets hard to manage. Hence the navigation stack is built on [behaviour trees](/atlas/concept/behavior-trees), where a new condition is one branch rather than one arrow per state.
+
+## Where you'll see it
+
+Vending machines, elevators, traffic lights and combination locks are all FSMs, and so are compilers, network protocols and digital hardware. In robotics they are the standard shape for safety and operating modes — manual, automatic, emergency stop — where the states genuinely are few, fixed and mutually exclusive.
+
+They also scale up rather than being replaced outright: UML state machines extend the plain model with nested states and parallel regions, the idea behind hierarchical state machines. Nav2 notes that a hierarchical-FSM navigator could be added alongside its behaviour-tree one if there is demand.
+
+## Why it matters
+
+The FSM is how you learn to think about robot control at all: discrete modes, explicit triggers, one thing at a time. If you can draw your robot's behaviour on a napkin, an FSM will be clearer and easier to debug than anything else — including the mode logic wrapped around [path planning](/atlas/concept/path-planning) in [ROS 2](/atlas/concept/ros2). If the napkin is already full of arrows, look at a tree.
+
+## Common questions
+
+### Can a robot be in two states at once?
+
+Not in a plain FSM — it is in exactly one state at any given time. Hierarchical and UML-style state machines add parallel regions to get around this, which is one of the ways designs grow complicated.
+
+### Is an FSM obsolete now that behaviour trees exist?
+
+No. Trees earn their keep on long, failure-prone tasks; FSMs stay the clearest choice for small, fixed sets of modes, and are still everywhere in industrial automation and digital hardware.
+
+---
+
+*Next step: read [behaviour trees](/atlas/concept/behavior-trees) — how robotics structures decisions once a state machine's arrows get out of hand.*

@@ -1,13 +1,18 @@
 ---
 title: ROS2 Services
 summary: >-
-  ROS2 services are synchronous request/response calls between nodes — used for
-  short, infrequent commands like calibration or mode changes.
+  A ROS 2 service is a short question one piece of a robot's software asks
+  another and waits for a single answer to — "save the map", "spawn a turtle",
+  "what are your settings?" — rather than a continuous stream of data.
 category: control
-lastReviewed: 2026-05-21T00:00:00.000Z
+lastReviewed: 2026-11-08T00:00:00.000Z
 sources:
-  - title: 'ROS 2 documentation: Services'
+  - title: 'ROS 2 documentation: Understanding services'
     url: 'https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Services/Understanding-ROS2-Services.html'
+  - title: 'ROS 2 documentation: Services (concepts)'
+    url: 'https://docs.ros.org/en/jazzy/Concepts/Basic/About-Services.html'
+  - title: 'ROS 2 design: Actions'
+    url: 'https://design.ros2.org/articles/actions.html'
 tags:
   - ros2
   - service
@@ -17,53 +22,107 @@ seeAlso:
   - ros2-nodes
   - ros2-topics
   - ros2-actions
-  - docker-robotics
+  - ros2-parameters
 difficulty: 3
 laymanExplanation: >-
-  A ROS2 service is a synchronous remote procedure call between nodes. A client
-  sends a request with typed data; the server processes it and returns a
-  response. Unlike topics, services are 1-to-1 and wait for an answer.
+  A ROS 2 service is a call-and-response exchange between nodes. One node (the
+  service client) sends a request; another node (the service server) does a
+  small amount of work and sends back a response. Nothing is sent until a
+  client asks, and the client generally waits for the answer.
 realRobotsThatUseThis: []
 indianExample: ''
 relatedTerms: []
 prerequisiteTerms: []
 unlocksTerms: []
 quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
+  q: >-
+    A node needs to ask another node to clear the screen and tell it whether
+    that worked. The job finishes in a fraction of a second. Which ROS 2
+    communication pattern fits?
+  options:
+    - A topic, because the data should keep flowing
+    - A service, because it is one request with one reply that returns quickly
+    - An action, because the caller needs progress updates
+  answer: 1
+  explanation: >-
+    Services are the call-and-response pattern, meant for work that returns
+    quickly while the client waits. A topic sends no reply at all, and an action
+    carries setup overhead that only pays off for long-running jobs.
+mindBlowingFact: >-
+  ROS 2 lets any number of nodes call the same service, but only one node may
+  answer it. If two servers advertise the same service name, the documentation
+  says outright that which one receives a client's request is undefined.
 industryApplications: []
 difficultyLabel: Classroom
 technicalDefinition: >-
-  ROS2 services are synchronous request/response calls between nodes — used for
-  short, infrequent commands like calibration or mode changes.
+  A ROS 2 service is a remote procedure call between nodes: a client sends a
+  typed request to a single service server, which performs a computation and
+  returns a typed response. Services are expected to return quickly.
 slug: ros2-services
 bucket: concept
 ---
 
 # ROS2 Services
 
-## What is it?
+A ROS 2 service is a short question one piece of a robot's software asks another and waits for a single answer to. In the words of the ROS 2 documentation, "a service refers to a remote procedure call" — a [node](/atlas/concept/ros2-nodes) asks another node to do a computation and return a result.
 
-A ROS2 service is a synchronous remote procedure call between nodes. A client sends a request with typed data; the server processes it and returns a response. Unlike topics, services are 1-to-1 and wait for an answer.
+Services are based on a call-and-response model, unlike the publisher-subscriber model of [topics](/atlas/concept/ros2-topics). A topic is a tap left running: it streams data whether or not anyone is listening. A service is a doorbell: nothing happens until a client presses it, and the client expects somebody to answer.
 
-## How it works
+## When do you reach for a service?
 
-Each service has a name and a service type (defining request/response fields). The server node advertises the service; clients call it. The call blocks (or awaits, in async clients) until a response is received or the timeout fires. Internally, services also run on DDS but use a request/response pattern.
+[ROS 2](/atlas/concept/ros2) gives nodes three ways to talk. Picking the wrong one is the single most common beginner mistake in the framework, and the distinction is simple once you see it side by side.
 
-## Real-world example
+| | Reply? | Progress updates? | Reach for it when |
+|---|---|---|---|
+| [Topic](/atlas/concept/ros2-topics) | None | — | Data flows continuously and listeners come and go: sensor readings, velocity commands |
+| Service | Exactly one, and the caller waits | No | A one-off command or question that finishes fast: save the map, switch mode, read settings |
+| [Action](/atlas/concept/ros2-actions) | One result at the end | Yes, a steady stream, and it can be cancelled | A job that runs for seconds or minutes: navigate somewhere, grasp an object |
 
-A robot might expose `/save_map` as a service so an operator can save the current SLAM map. `/set_parameters` is a built-in service every ROS2 node provides. Calibration, mode switches, and teleop arming commonly use services.
+Two rules follow from that table, and both are in the official docs. Services are expected to return quickly, because the client is generally waiting on the result — so a long computation should be an action, not a service. And you generally should not use a service for continuous calls; a topic (or an action) fits better.
 
-## Why it matters for robotics
+## Request and response
 
-Services are perfect for short, infrequent commands where you need a yes/no answer. Misusing topics for what should be a service is a common ROS2 anti-pattern.
+A service has a name and a **service type**. Service types look like topic types with two halves: one message for the request and another for the response, separated by `---`. Here is turtlesim's `Spawn` service, as `ros2 interface show` prints it:
 
-## See also
+```text
+float32 x
+float32 y
+float32 theta
+string name # Optional.  A unique name will be created and returned if this is empty
+---
+string name
+```
 
-- [Ros2](/atlas/concept/ros2)
-- [Ros2 Nodes](/atlas/concept/ros2-nodes)
-- [Ros2 Topics](/atlas/concept/ros2-topics)
-- [Ros2 Actions](/atlas/concept/ros2-actions)
+Everything above the line is what you send; everything below is what comes back. You can call it from a terminal without writing any code:
+
+```console
+$ ros2 service call /spawn turtlesim/srv/Spawn "{x: 2, y: 2, theta: 0.2, name: ''}"
+```
+
+Some services carry no data in either direction. Turtlesim's `/clear` has the type `std_srvs/srv/Empty`, whose whole definition is a single `---` — you are sending a pure command and getting a bare acknowledgement.
+
+## One server, many callers
+
+A service has two sides: the service server, which accepts the request and does the work, and the service client, which asks. There can be arbitrary numbers of clients on the same service name, but there should only ever be one server — with two servers on one name, which one gets a request is undefined.
+
+## Where you will see services on a real robot
+
+Nearly every node in ROS 2 ships with six built-in services with `parameters` in their names — `get_parameters`, `set_parameters`, `list_parameters` and friends. The whole [parameter](/atlas/concept/ros2-parameters) system is built on top of them, which is why a bare turtlesim node already advertises a dozen services before you add any of your own.
+
+## Common questions
+
+### How do I find out what services a robot offers?
+
+`ros2 service list` prints every active service, `ros2 service list -t` adds each one's type in brackets, and `ros2 service info <name>` shows the type plus how many clients and servers it has.
+
+### Does calling a service freeze my program?
+
+The client waits for a response, so a naive blocking call will stall. That is exactly why the docs insist services return quickly: anything slow belongs in an [action](/atlas/concept/ros2-actions), which reports progress and can be cancelled.
+
+### Can I watch the traffic on a service the way I can echo a topic?
+
+Yes, with `ros2 service echo`, but not out of the box. It relies on service introspection, which is disabled by default — each client and server has to call `configure_introspection` first.
+
+---
+
+*Next step: [ROS 2 Actions](/atlas/concept/ros2-actions) — what to use when the job is too long for a service to wait on.*

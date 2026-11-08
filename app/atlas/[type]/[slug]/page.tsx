@@ -113,17 +113,61 @@ export async function generateMetadata(
   };
 }
 
-/** Pull out "Check your understanding" Q&A blocks for FAQ JSON-LD. */
+/**
+ * Pull Q&A out of an entry body for FAQPage JSON-LD.
+ *
+ * Two formats, because the Atlas has two.
+ *
+ * The original only understood a "Check your understanding" section with
+ * `**1.**`-numbered items, and then guessed where the question ended by
+ * splitting on the first full stop — which fired on 6 of 475 entries and
+ * produced a mangled pair when it did. Entries written to the current
+ * standard use a `## Common questions` (or `## FAQ`) section with `###`
+ * headings, which needs no guessing: the heading is the question and the
+ * prose under it is the answer.
+ *
+ * Both are supported so the older entries keep working and nothing has to be
+ * rewritten to earn the markup.
+ */
 function extractFAQItems(body: string): Array<{ q: string; a: string }> {
+  const out: Array<{ q: string; a: string }> = [];
+
+  // Preferred: a "## Common questions" / "## FAQ" section with ### questions.
+  //
+  // Done with indexes rather than one regex on purpose. The obvious pattern —
+  // /^## faq$([\s\S]*?)(?=^## |$)/im — looks right and silently captures
+  // nothing, because under the `m` flag the `$` in that lookahead matches at
+  // the end of the very first line, so the lazy body stops immediately. That
+  // bug shipped once already and was invisible: no error, just no schema.
+  const heading = body.match(/^##[ \t]+(?:common questions|frequently asked questions|faq)[ \t]*$/im);
+  if (heading?.index !== undefined) {
+    const after = body.slice(heading.index + heading[0].length);
+    const nextH2 = after.search(/\n##[ \t]+/);
+    const section = nextH2 === -1 ? after : after.slice(0, nextH2);
+
+    const parts = section.split(/^###[ \t]+/m).slice(1);
+    for (const part of parts) {
+      const nl = part.indexOf('\n');
+      const q = (nl === -1 ? part : part.slice(0, nl)).trim();
+      const a = (nl === -1 ? '' : part.slice(nl))
+        .replace(/^\s*[-*]\s+/gm, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (q.length > 5 && a.length > 10) out.push({ q, a });
+    }
+  }
+  if (out.length > 0) return out;
+
+  // Legacy: "Check your understanding" with **1.**-numbered items.
   const idx = body.toLowerCase().indexOf('check your understanding');
   if (idx === -1) return [];
   const section = body.slice(idx).split(/^---\s*$/m)[0] ?? '';
-  // Match lines like "**1.** Question…" up to the next bold-numbered or end.
-  const matches = [...section.matchAll(/\*\*\d+\.\*\*\s*([\s\S]+?)(?=\*\*\d+\.\*\*|\n---|\n$|$)/g)];
+  const matches = [
+    ...section.matchAll(/\*\*\d+\.\*\*\s*([\s\S]+?)(?=\*\*\d+\.\*\*|\n---|\n$|$)/g),
+  ];
   return matches
     .map((m) => {
       const text = m[1].trim();
-      // Split on the first sentence break — heuristic.
       const sentences = text.split(/(?<=[.?!])\s+/);
       const q = sentences.shift() ?? text;
       const a = sentences.join(' ').trim();

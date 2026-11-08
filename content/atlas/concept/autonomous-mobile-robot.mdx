@@ -1,13 +1,22 @@
 ---
 title: Autonomous Mobile Robot (AMR)
 summary: >-
-  An AMR navigates an environment on its own, without fixed paths or human
-  steering. The dominant class of warehouse and service robots in 2026.
+  An autonomous mobile robot (AMR) is a robot that drives itself around a
+  building or a street, working out its own route as it goes — with nobody
+  steering it and nothing laid into the floor for it to follow.
 category: robot-types
-lastReviewed: 2026-05-21T00:00:00.000Z
+lastReviewed: 2026-11-08T00:00:00.000Z
 sources:
-  - title: 'Autonomous robot'
-    url: 'https://en.wikipedia.org/wiki/Autonomous_robot'
+  - title: 'Automated guided vehicle (Wikipedia)'
+    url: 'https://en.wikipedia.org/wiki/Automated_guided_vehicle'
+  - title: 'Nav2 documentation — overview'
+    url: 'https://docs.nav2.org/rolling/'
+  - title: 'Amazon deploys its one millionth robot and releases DeepFleet (About Amazon, July 2025)'
+    url: 'https://www.aboutamazon.com/news/operations/amazon-million-robots-ai-foundation-model'
+  - title: 'MiR250 datasheet (Mobile Industrial Robots)'
+    url: 'https://www.mobile-industrial-robots.com/solutions/robots/mir250/'
+  - title: 'ANSI/RIA R15.08-1-2020 — industrial mobile robot safety standard (A3)'
+    url: 'https://www.automate.org/robotics/news/new-r15-08-industrial-mobile-robot-safety-standard-published'
 tags:
   - amr
   - mobile-robot
@@ -19,51 +28,102 @@ seeAlso:
   - path-planning
 difficulty: 3
 laymanExplanation: >-
-  An Autonomous Mobile Robot (AMR) is a wheeled or tracked robot that can
-  navigate its environment without external guides (unlike older AGVs that
-  follow fixed paths). AMRs sense, map, and decide independently — using SLAM,
-  sensors, and onboard planners.
+  An autonomous mobile robot drives itself. It builds or carries a map of the
+  building, works out where it is on that map, and chooses its own route —
+  rerouting around a person or a dropped pallet instead of stopping dead. The
+  older machines it is replacing, AGVs, just follow a line or a wire fixed into
+  the floor.
 realRobotsThatUseThis: []
 indianExample: ''
 relatedTerms: []
 prerequisiteTerms: []
 unlocksTerms: []
 quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
+  q: >-
+    What is the main difference between an autonomous mobile robot (AMR) and an
+    automated guided vehicle (AGV)?
+  options:
+    - An AMR is battery powered, while an AGV runs off mains electricity
+    - >-
+      An AGV follows a fixed guide fitted into the building, while an AMR
+      carries a map and plans its own route
+    - An AMR can carry heavier loads than an AGV
+  answer: 1
+  explanation: >-
+    An AGV follows infrastructure laid into the environment — a buried wire,
+    magnetic tape, embedded magnets or reflective markers — so changing its
+    route means changing the floor. An AMR carries a map instead and plans its
+    own path, which means it can be rerouted in software and can drive around an
+    obstacle rather than waiting for someone to move it. Payload and power
+    source are not the dividing line: both types span a huge range.
+mindBlowingFact: >-
+  Amazon has now delivered its one-millionth warehouse robot, and runs them
+  across more than 300 facilities — coordinated by a model the company
+  describes as an intelligent traffic management system for the fleet.
 industryApplications: []
 difficultyLabel: Classroom
 technicalDefinition: >-
-  An AMR navigates an environment on its own, without fixed paths or human
-  steering. The dominant class of warehouse and service robots in 2026.
+  An autonomous mobile robot is a wheeled or tracked robot that localises itself
+  against a map, plans a route and avoids obstacles using onboard sensing and
+  computation, without requiring fixed guidance infrastructure in the
+  environment.
 slug: autonomous-mobile-robot
 bucket: concept
 ---
 
 # Autonomous Mobile Robot (AMR)
 
-## What is it?
+An autonomous mobile robot, or AMR, is a robot that drives itself around a building or a street, working out its own route as it goes — with nobody steering it and nothing laid into the floor for it to follow. It senses the space around it, keeps track of where it is, picks a path, and picks a new one when a person or a dropped pallet gets in the way.
 
-An Autonomous Mobile Robot (AMR) is a wheeled or tracked robot that can navigate its environment without external guides (unlike older AGVs that follow fixed paths). AMRs sense, map, and decide independently — using SLAM, sensors, and onboard planners.
+## What makes it "autonomous"
 
-## How it works
+The comparison is with the AGV, the automated guided vehicle, which has moved material around factories for decades. An AGV is described as a vehicle that "follows along marked long lines or wires on the floor" — a buried wire whose magnetic field a sensor picks up, magnetic tape or magnets set into the floor, ultraviolet-reactive stripes, or reflective markers on walls read by a laser scanner. The route lives in the building.
 
-An AMR is equipped with LIDAR, depth cameras, IMU, and wheel encoders. Software stack typically includes a SLAM module for mapping, a localisation module to know where it is, a global planner (e.g., A*) for routing, and a local planner (e.g., DWA or TEB) for obstacle avoidance. Fleet manager software coordinates many AMRs in a warehouse.
+An AMR carries the route instead, so changing where it goes is a software change rather than a construction job, and it can leave its usual line to get around an obstacle and then rejoin it. AMRs are distinguished from AGVs on exactly this point: they do not depend on extra infrastructure such as magnetic strips or visual markers.
 
-## Real-world example
+| | AMR | AGV |
+|---|---|---|
+| Follows | A map it carries | A guide fitted into the building |
+| Guidance | Onboard sensors and planning | Wire, tape, magnets, floor stripes, reflective markers |
+| Meets an obstacle | Plans a way around it | Stops until the path clears |
+| Changing the route | Edit the map | Re-lay the floor |
+| Suits | Spaces that change | Fixed, high-volume routes |
 
-GreyOrange Butler (India), Locus Robotics, Fetch, MiR (Mobile Industrial Robots), and Amazon's drive units are all AMRs. AMRs dominate modern e-commerce warehouses.
+Neither is simply better: a route that never changes and runs all day suits an AGV, which is cheaper and has less to go wrong.
 
-## Why it matters for robotics
+## How it knows where it is
 
-AMRs are now the #1 growth segment in robotics globally. Every major logistics company in India is buying, building, or piloting AMRs. Skills in AMR development are in high demand.
+An AMR does three jobs at once. It **senses**, usually with a [LiDAR](/atlas/concept/lidar) scanner for distances, depth cameras for what is immediately ahead, an inertial sensor for tilt and turn, and wheel encoders feeding [odometry](/atlas/concept/odometry). It **localises**: a first pass of [SLAM](/atlas/concept/slam) builds the map, and after that the robot matches what it sees against that map to work out where it is standing. And it **plans** — a global [planner](/atlas/concept/path-planning) finds a route across the map while a local controller turns the next few metres into motor commands.
+
+The open-source reference implementation is [Nav2](/atlas/concept/nav2), which builds an environmental model from sensor and semantic data, routes a path through it dynamically, and computes feasible motor commands while avoiding obstacles. It supports "nearly any class of robot kinematics and dynamics."
+
+Sizes vary widely. One mainstream indoor unit, the MiR250, is specified at a 250 kg payload, a 2.0 m/s top speed with maximum payload on a flat surface, and an 800 by 580 mm footprint.
+
+## The fleet layer
+
+One AMR is a navigation problem. Fifty in the same aisles is a traffic problem, and that is different software. Fleet management sits above the robots and decides which machine takes which job, who waits at a junction, and when a robot peels off to charge. It also has to talk to the building itself: a robot that cannot call a lift is stuck on one floor.
+
+At scale, traffic becomes the main problem. Amazon's answer, announced with its one-millionth robot in July 2025, is DeepFleet: a generative AI model acting as a traffic management system for the fleet, cutting congestion and routing robots more efficiently, which Amazon says will improve the fleet’s travel time by 10%.
+
+## Where they are actually deployed
+
+[Warehouses and distribution centres](/atlas/concept/warehouse-robotics) are the big one, and the jobs are more varied than carrying boxes: Amazon's Hercules lifts up to 1,250 pounds of inventory, Pegasus handles individual packages on a conveyor deck, and Proteus is the company's first fully autonomous mobile robot — free to work in the open floor alongside people rather than inside a fence. Beyond logistics, AMRs run linens and medication between hospital floors, shuttle parts between factory cells, and deliver on pavements outdoors.
+
+That spread into shared human space is why a standard exists: ANSI/RIA R15.08-1-2020, the first American national safety standard for industrial mobile robots, sets technical requirements for designing them so people working nearby stay safe. It applies to industrial settings.
+
+## Common questions
+
+### Does an AMR need Wi-Fi to work?
+
+Navigation runs onboard, so a robot that loses the network can usually finish the move it is on. The network carries the layer above: job assignment, junction traffic, lift and door requests. Patchy coverage shows up as robots idling for instructions, not as robots driving into walls.
+
+### Can an AMR replace an AGV in any building?
+
+No. AMRs earn their keep where layouts change, task mixes vary, or robots share floor space with people. For one fixed, heavy, high-volume route an AGV is often cheaper, and plenty of sites run both.
 
 ## See also
 
 - [Mobile Robot](/atlas/concept/mobile-robot)
 - [Differential Drive](/atlas/concept/differential-drive)
-- [Slam](/atlas/concept/slam)
+- [SLAM](/atlas/concept/slam)
 - [Path Planning](/atlas/concept/path-planning)

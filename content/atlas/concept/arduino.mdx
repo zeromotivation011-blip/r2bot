@@ -1,89 +1,131 @@
 ---
 title: Arduino
 slug: arduino
-bucket: hardware
+bucket: concept
 summary: >-
-  The most popular open-source microcontroller platform for beginner robotics —
-  inexpensive and the on-ramp for millions of student projects.
+  Arduino is an open-source electronics platform whose boards each carry a
+  microcontroller — one chip that runs a single program on its own, with no
+  operating system, from the moment it gets power.
 seeAlso:
+  - microcontroller
   - pwm
   - servo-motor
-  - dc-motor
   - motor-driver
-  - raspberry-pi
+  - raspberry-pi-robotics
 tags:
   - hardware
   - beginner
   - education
-lastReviewed: 2025-01-15T00:00:00.000Z
+category: hardware
+lastReviewed: 2026-11-08T00:00:00.000Z
 sources:
-  - title: 'Arduino'
-    url: 'https://en.wikipedia.org/wiki/Arduino'
+  - title: Arduino UNO R3 user manual (A000066 datasheet)
+    url: 'https://docs.arduino.cc/resources/datasheets/A000066-datasheet.pdf'
+  - title: Arduino UNO R4 WiFi — hardware documentation
+    url: 'https://docs.arduino.cc/hardware/uno-r4-wifi/'
+  - title: Arduino Nano ESP32 — hardware documentation
+    url: 'https://docs.arduino.cc/hardware/nano-esp32/'
 difficulty: 1
-difficultyLabel: beginner
+difficultyLabel: Classroom
 oneLiner: >-
-  The most popular robotics brain for beginners — open-source, cheap, and
-  Indian-friendly.
+  The open-source microcontroller board that runs one program on bare metal —
+  the part of a robot that gets the timing right.
 laymanExplanation: >-
-  Arduino is like a tiny computer that you can program to control motors, LEDs,
-  and sensors. It's the heart of most beginner robot projects.
+  An Arduino is a small board with a single chip on it. You write a program on
+  your computer, send it over USB, and the board runs that program by itself
+  forever — switching pins on and off, reading sensors and driving motors. There
+  is no operating system in the way, which is why Arduino is so good at doing
+  things at an exact moment.
 analogy: >-
-  Arduino is like a translator between you and the machine — you write simple
-  instructions, it makes hardware obey.
+  An Arduino is a pocket watch, not a laptop: it does one job, and it does it on
+  the beat, every time.
 whyItMatters: >-
-  Arduino democratised robotics education globally. For the price of a pizza, a student anywhere
-  can build a line-following robot.
-indianExample: >-
-  Most school robotics clubs start with the Arduino Uno.
+  Arduino made embedded programming approachable — and it is still the right
+  tool for the timing-critical layer of a robot, even on builds where a bigger
+  Linux computer does the thinking.
+indianExample: ''
 realRobotsThatUseThis:
-  - DIY line-following robots
-  - Smart-home projects
-  - Automated irrigation systems
+  - Line-following and obstacle-avoiding classroom robots
+  - Hobby robot arms and pan-tilt camera mounts
+  - Sensor and motor-control boards paired with a Linux computer
 mindBlowingFact: >-
-  Arduino was invented in Italy in 2005 as a cheap alternative to proprietary
-  microcontrollers. Now 10 million+ boards are sold every year worldwide.
+  On the through-hole UNO R3 the ATmega328P sits in a socket rather than being
+  soldered down, so a chip destroyed by a wiring mistake can be pulled out with
+  your fingers and replaced. The surface-mount version of the same board does
+  not give you that second chance.
 industryApplications:
   - education
   - prototyping
-  - IoT
-  - agriculture
+  - motor control
+  - sensor interfacing
   - art installations
 quizQuestion:
-  q: What language do you use to program an Arduino?
+  q: >-
+    Your robot has to hold four servos at steady angles and time an ultrasonic
+    sensor's echo to the microsecond, while also running camera-based object
+    detection. How is that job usually split?
   options:
-    - Python
-    - Arduino C/C++
-    - JavaScript
-    - HTML
+    - An Arduino-class board does everything, including the vision
+    - >-
+      A Linux single-board computer does the vision, and an Arduino-class board
+      handles the servo and echo timing
+    - A Linux single-board computer does everything, including the servo timing
   answer: 1
   explanation: >-
-    Arduino uses a simplified C/C++ dialect inside its IDE — easy enough for
-    beginners, real enough to be useful.
+    A microcontroller has no operating system competing for the processor, so it
+    can meet microsecond deadlines — but 2 kB of SRAM cannot hold a camera
+    frame. A Linux board has the memory and libraries for vision but schedules
+    many processes at once, so its pin timing drifts. Real robots use both, and
+    give each the work it is suited to.
 relatedTerms: []
 prerequisiteTerms: []
 unlocksTerms: []
 technicalDefinition: >-
-  The most popular open-source microcontroller platform for beginner robotics —
-  inexpensive and the on-ramp for millions of student projects.
+  Arduino is an open-source electronics platform whose boards each carry a
+  microcontroller — one chip that runs a single program on its own, with no
+  operating system, from the moment it gets power.
 ---
 
-**Arduino** is an open-source microcontroller platform created in Italy in 2005. It is the default starting point for most school robotics clubs around the world. A genuine Arduino Uno costs more than the many compatible clones.
+**Arduino** is an open-source electronics platform whose boards each carry a [microcontroller](/atlas/concept/microcontroller) — one chip holding a processor, a small amount of memory, and pins that connect to the outside world. You write a program on a computer, send it to the board over USB, and the board then runs that one program by itself, from the moment it gets power until the moment it loses it.
 
-## Why Arduino changed everything
+There is no operating system in between. That single fact explains almost everything people love and complain about.
 
-Before Arduino, embedded programming meant proprietary chips, expensive programmers, and obscure toolchains. Arduino opened up three things:
+## What is actually on the board
 
-- A cheap board (Atmel ATmega328 + USB-serial)
-- A simple IDE in Java that flashes the board with one click
-- A C/C++ dialect with two functions — `setup()` and `loop()` — that fits most beginner mental models
+The classic board is the UNO R3. Its main chip is an ATmega328P: an 8-bit AVR processor running at up to 16 MHz, with 32 kB of flash memory for your program, 2 kB of SRAM for the variables it juggles while running, and 1 kB of EEPROM that keeps its contents after the power is cut. Around the edge sit 14 digital input/output pins — six of which can produce a [PWM](/atlas/concept/pwm) signal — and six analog inputs that read a voltage level rather than just on or off.
 
-## What you can build
+The chip's built-in peripherals do the talking to other components: one serial port (USART), one SPI controller, and one dual-mode I2C controller, which between them cover most sensors you will meet. A second chip, an ATmega16U2, handles the USB link to your computer. The board takes 6–20 V on its VIN pad or 5 V over USB, and Arduino rates the whole board from −40 °C to 85 °C.
 
-- Line-following robots
-- Obstacle-avoiding robots (with an HC-SR04 [ultrasonic sensor](/atlas/concept/ultrasonic-sensor))
-- Smart-irrigation systems with soil-moisture probes
-- IoT-connected bins, plant monitors, weather stations
+## Why it is good at timing
 
-Arduino's analog-write function uses [PWM](/atlas/concept/pwm) under the hood — the same trick that controls servo motors and dims LEDs. To drive real motors, you pair Arduino with a [motor driver](/atlas/concept/motor-driver) like the L298N.
+A microcontroller runs your program and nothing else. No operating system is deciding which process gets the processor next, so when your code says to flip a pin high, the pin goes high right then. The timer and PWM channels are hardware: once set up, they keep their beat whether your code is busy or idle.
 
-For more compute (computer vision, ROS), graduate to a [Raspberry Pi](/atlas/concept/raspberry-pi).
+That is why an Arduino belongs next to the moving parts. A [servo motor](/atlas/concept/servo-motor) wants a pulse of a precise width repeated at a precise interval; a wheel encoder throws out edges you must not miss; an [ultrasonic sensor](/atlas/concept/ultrasonic-sensor) is measured by the microseconds its echo takes to return. A board with no scheduler cannot be late.
+
+## The boards
+
+| Board | Processor | Clock | Program memory | Working memory | Notable |
+|---|---|---|---|---|---|
+| UNO R3 | ATmega328P (8-bit AVR) | up to 16 MHz | 32 kB flash | 2 kB SRAM | 14 digital I/O (6 PWM), 6 analog in, 1 kB EEPROM |
+| UNO R4 WiFi | Renesas RA4M1 (Arm Cortex-M4) | 48 MHz | 256 kB flash | 32 kB SRAM | 5 V board; Wi-Fi and Bluetooth via a separate ESP32-S3 module |
+| Nano ESP32 | ESP32-S3 in a u-blox NORA-W106 module | — | 16 MB flash | — | Wi-Fi, Bluetooth 5 and ESP-NOW; USB-C; MicroPython supported |
+
+## Where Arduino stops
+
+Two kilobytes of working memory will not hold a camera frame, and an 8-bit core will not run a neural network or a navigation stack. For vision, mapping, networking or ROS 2 you need a computer running Linux — which is what a [Raspberry Pi](/atlas/concept/raspberry-pi-robotics) is. The Pi can do all of that and cannot reliably bit-bang a servo, because Linux is always deciding what to run next; the Arduino is the opposite on both counts.
+
+So the usual answer is not either/or. The Pi sees and decides; the Arduino, wired to a [motor driver](/atlas/concept/motor-driver), moves things on time. They talk over serial, I2C or USB.
+
+## Common questions
+
+### Do I have to learn C++ to use an Arduino?
+
+You write C/C++ in Arduino's own editor, but the beginner surface is small: a block that runs once at start-up and a block that repeats forever. Several boards, including the Nano ESP32, also support MicroPython.
+
+### Are the cheap compatible boards real Arduinos?
+
+They are not made by Arduino, but because the hardware designs and the software are open source, clones generally take the same programs. What you give up is the manufacturer's testing, documentation and support — and the money no longer funds the platform you are learning on.
+
+### Can an Arduino run ROS 2?
+
+Not by itself; ROS 2 expects a full operating system. The normal pattern is to run ROS 2 on a Linux board and connect the Arduino to it as the node that touches the hardware.

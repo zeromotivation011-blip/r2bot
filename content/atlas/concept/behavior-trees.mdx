@@ -1,68 +1,114 @@
 ---
-title: Behaviour Trees in Robotics
+title: Behaviour Trees
 summary: >-
-  Behaviour trees are a hierarchical decision-making structure that lets robots
-  compose complex behaviour from reusable building blocks. Replacing state
-  machines in modern robotics.
+  A behaviour tree is a way of organising a robot's decisions as a tree of small
+  tasks, where a parent node repeatedly asks its children to run and each child
+  answers success, failure, or still running.
 category: control
-lastReviewed: 2026-05-21T00:00:00.000Z
+lastReviewed: 2026-11-08T00:00:00.000Z
 sources:
-  - title: 'Behavior tree'
-    url: 'https://en.wikipedia.org/wiki/Behavior_tree'
+  - title: 'Behavior tree (artificial intelligence, robotics and control) — Wikipedia'
+    url: 'https://en.wikipedia.org/wiki/Behavior_tree_(artificial_intelligence,_robotics_and_control)'
+  - title: 'Nav2 Concepts — Behavior Trees and the BT Navigator'
+    url: 'https://docs.nav2.org/concepts/index.html'
+  - title: 'BehaviorTree.CPP — Introduction to Behavior Trees'
+    url: 'https://www.behaviortree.dev/docs/learn-the-basics/BT_basics/'
 tags:
   - behavior-tree
   - decision
   - ai
 seeAlso:
-  - state-machine
+  - finite-state-machine
+  - nav2
   - ros2
-  - motion-planning
 difficulty: 3
 laymanExplanation: >-
-  A behaviour tree (BT) is a hierarchical tree of decision nodes that controls
-  what a robot should do moment to moment. Originally invented for video-game
-  AI, BTs are now standard in modern robotics — including Nav2 and MoveIt2.
+  A behaviour tree organises a robot's decisions as a tree of small tasks. A
+  signal called a tick travels down from the top, and every node answers one of
+  three things: success, failure, or still running. Parents use those answers to
+  decide what to try next, so complicated behaviour is built out of small,
+  reusable pieces instead of one tangled block of rules.
 realRobotsThatUseThis: []
 indianExample: ''
 relatedTerms: []
 prerequisiteTerms: []
 unlocksTerms: []
 quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
+  q: 'What are the three values a behaviour tree node can return when it is ticked?'
+  options:
+    - 'True, false, or unknown'
+    - 'Success, failure, or running'
+    - 'Start, stop, or pause'
+  answer: 1
+  explanation: >-
+    Every node returns SUCCESS, FAILURE, or RUNNING. RUNNING means the task has
+    not finished yet, which is what lets a tree supervise slow actions like
+    driving across a building.
+mindBlowingFact: >-
+  Behaviour trees spread through the games industry — Halo, BioShock and Spore
+  all used them to drive non-player characters — before robotics adopted them
+  as a standard way to organise a robot's decisions.
+industryApplications:
+  - robotics
+  - game development
+  - warehouse automation
+  - autonomous vehicles
 difficultyLabel: Classroom
 technicalDefinition: >-
-  Behaviour trees are a hierarchical decision-making structure that lets robots
-  compose complex behaviour from reusable building blocks. Replacing state
-  machines in modern robotics.
+  A behaviour tree is a hierarchical tree of nodes in which a tick signal
+  propagates from the root to the leaves and each node returns SUCCESS, FAILURE
+  or RUNNING. Control-flow nodes combine their children's results; leaf nodes
+  perform the work.
 slug: behavior-trees
 bucket: concept
 ---
 
-# Behaviour Trees in Robotics
+# Behaviour Trees
 
-## What is it?
-
-A behaviour tree (BT) is a hierarchical tree of decision nodes that controls what a robot should do moment to moment. Originally invented for video-game AI, BTs are now standard in modern robotics — including Nav2 and MoveIt2.
+A behaviour tree is a way of organising a robot's decisions as a tree of small tasks, where a parent node repeatedly asks its children to run and each child answers success, failure, or still running. The parent uses those answers to decide what to try next.
 
 ## How it works
 
-A BT is composed of control-flow nodes (Sequence, Selector, Parallel) and leaf nodes (Action, Condition). On each tick, the root ticks its children, and so on, evaluating until a SUCCESS, FAILURE, or RUNNING result returns. Sequences fail on first FAILURE; Selectors succeed on first SUCCESS. This composability lets engineers build complex behaviour from a few reusable primitives.
+Everything starts with a **tick** — a signal sent from the root that travels down the tree to a leaf. A node that receives a tick runs its callback, and parent nodes decide whether, when and how often to pass the tick on to their children. Every node answers with one of three values: SUCCESS, FAILURE, or RUNNING, where RUNNING means the task needs more time.
 
-## Real-world example
+That third answer is what makes the idea work for machines: driving across a building takes thirty seconds, so the node doing the driving keeps replying "running" while the rest of the tree stays ready to react. The leaves do the real work; the nodes above them only arrange it.
 
-Nav2's bt_navigator runs the entire navigation stack as a behaviour tree. Many warehouse robots use BTs to switch between picking, transporting, charging, and recovering from failures.
+| Node type | Children | What it does |
+|---|---|---|
+| Sequence | one or more | Ticks children left to right, stopping on failure. Succeeds only if all succeed. |
+| Fallback (or selector) | one or more | Ticks children in order until one succeeds. Fails only if all fail. |
+| Decorator | exactly one | Changes its child's result, or ticks it repeatedly. |
+| Condition | none | Asks a question about the world. Changes nothing, never returns RUNNING. |
+| Action | none | Does the actual work. May finish at once or return RUNNING while it works. |
 
-## Why it matters for robotics
+## A worked example: the battery runs low mid-delivery
 
-Behaviour trees are far more readable and maintainable than nested if-else logic or large state machines. Any robotics engineer working on Nav2 today is expected to know BTs.
+A robot is carrying a parcel across a hospital when its battery drops below ten per cent.
 
-## See also
+Write that as a fallback with two children. The first: *check the battery is healthy → drive to the delivery point → hand over the parcel*. The second: *drive to the dock → charge → resume*.
 
-- [State Machine](/atlas/concept/state-machine)
-- [Ros2](/atlas/concept/ros2)
-- [Motion Planning](/atlas/concept/motion-planning)
+Nothing in the tree has to be told about the battery. The fallback ticks its first child, the battery condition returns FAILURE, that whole branch fails, and the fallback moves on to charging. Add a third branch tomorrow — call a human if charging also fails — and nothing already written changes.
+
+## Where you'll see it
+
+[Nav2](/atlas/concept/nav2), the navigation stack for [ROS 2](/atlas/concept/ros2), is built on them. It uses the BehaviorTree.CPP V4 library, and its BT Navigator takes a "navigate to pose" request, walks the tree, and calls the lower-level servers that compute plans, control efforts and recoveries. Nav2's stated reasoning: a finite state machine can need dozens of states and hundreds of transitions to cover the same ground, which becomes hard to manage.
+
+Recovery is where that pays off. Nav2's recoveries handle failures and unknown conditions — clearing a [costmap](/atlas/concept/costmap) spoiled by phantom obstacles, backing up or spinning out of a stuck position, alerting an operator. Each is another branch.
+
+## Why it matters
+
+Real robots meet closed doors, dropped parcels and flat batteries, and the hard part is often not the [path planning](/atlas/concept/path-planning) but deciding what to do when the plan fails. Behaviour trees give that decision a shape you can read and extend. Most engineers first reach for a [finite state machine](/atlas/concept/finite-state-machine), which is fine for small problems; trees are what the field turned to when those problems grew.
+
+## Common questions
+
+### Are behaviour trees the same as state machines?
+
+No. They resemble hierarchical state machines, but the main building block of a behaviour tree is a task, not a state. A tree asks "what should I try next?" where a state machine asks "where am I now?"
+
+### Do I need Nav2 to use a behaviour tree?
+
+No. The idea belongs to no single library, and behaviour trees were widely adopted in games before robotics — Unity and Unreal both cover them as a standard feature. Nav2 is simply the best-known robotics example.
+
+---
+
+*Next step: read [finite state machines](/atlas/concept/finite-state-machine) — the structure most robots start with, and the one behaviour trees were built to outgrow.*

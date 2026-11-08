@@ -3,43 +3,54 @@ title: Sensor
 slug: sensor
 bucket: sensors
 summary: >-
-  A robot's eyes, ears, and skin — devices that turn the physical world into
-  electrical signals a robot brain can read.
+  A sensor is a device that detects something physical — light, sound, distance,
+  heat, motion, force — and turns it into an electrical signal a computer can
+  read. Sensors are a robot's only link to what is actually happening around it.
 seeAlso:
   - actuator
   - robot
   - lidar
   - ultrasonic-sensor
   - encoder
+  - imu
+  - sensor-fusion
 tags:
   - sensors
   - fundamentals
-lastReviewed: 2025-01-15T00:00:00.000Z
+lastReviewed: 2026-11-08T00:00:00.000Z
 sources:
-  - title: 'Sensor'
+  - title: 'Sensor — Wikipedia'
     url: 'https://en.wikipedia.org/wiki/Sensor'
+  - title: 'Ultrasonic Distance Sensor HC-SR04 — SparkFun (specifications)'
+    url: 'https://www.sparkfun.com/products/15569'
+  - title: 'Next Mars Rover Will Have 23 Eyes — NASA JPL'
+    url: 'https://www.jpl.nasa.gov/news/next-mars-rover-will-have-23-eyes'
 difficulty: 1
-difficultyLabel: beginner
-oneLiner: 'A robot''s eyes, ears, and skin — it turns the physical world into data.'
+difficultyLabel: Classroom
+oneLiner: >-
+  A device that turns something physical — light, distance, heat, motion, force
+  — into a signal a computer can read.
 laymanExplanation: >-
-  Just like you use your eyes to see and your fingers to feel, a robot uses
-  sensors to understand what's happening around it.
+  You use eyes to see, ears to hear and skin to feel. A robot uses sensors. Each
+  one measures a single physical thing and reports it as a number the robot's
+  software can act on.
 analogy: >-
-  A sensor is like a WhatsApp message from the real world — it tells the robot
-  what's actually going on.
+  A sensor is a messenger from the real world. It only ever carries one kind of
+  message — "this far", "this bright", "this hot" — and it is sometimes slightly
+  wrong, which is why robots listen to several messengers at once.
 whyItMatters: >-
-  Without sensors, a robot is blind and deaf. Sensors are what make robots aware
-  of their environment.
-indianExample: >-
-  Indian farmers are using soil-moisture sensors attached to drones to know
-  exactly when and where to water crops — saving 40% water.
+  Without sensors a robot can only replay stored instructions and cannot notice
+  that the world has moved. Every closed control loop, every map and every safe
+  stop begins with a sensor reading.
+indianExample: ''
 realRobotsThatUseThis:
   - Perseverance Rover
   - Pepper
   - Roomba
 mindBlowingFact: >-
-  The human body has 11 types of sensory receptors. Modern robots can have 50+
-  sensor types.
+  NASA's Perseverance rover carries 23 cameras — six more than Curiosity, and
+  more than seven times as many as Sojourner, the first Mars rover, which had
+  three.
 industryApplications:
   - agriculture
   - smart homes
@@ -47,38 +58,75 @@ industryApplications:
   - manufacturing
   - healthcare
 quizQuestion:
-  q: Name the sensor a Roomba uses to avoid falling down stairs.
+  q: >-
+    A robot's wheel encoders say it has driven three metres, but its camera says
+    the scenery has barely changed. What is the technique that combines several
+    imperfect sensor readings into one best estimate called?
   options:
-    - Camera
-    - GPS
-    - Cliff sensor (infrared down)
-    - Microphone
-  answer: 2
+    - Calibration
+    - Sensor fusion
+    - Actuation
+  answer: 1
   explanation: >-
-    Roombas use small infrared cliff sensors pointed at the floor — when the
-    reflection disappears, the robot knows there is an edge.
+    Sensor fusion blends readings from sensors with different failure modes —
+    here, wheel encoders that cannot detect a spinning wheel and a camera that
+    can — into a single estimate that is better than any one sensor alone.
 relatedTerms: []
 prerequisiteTerms: []
 unlocksTerms: []
 technicalDefinition: >-
-  A robot's eyes, ears, and skin — devices that turn the physical world into
-  electrical signals a robot brain can read.
+  A sensor is a device that responds to a physical stimulus — light, sound,
+  distance, temperature, motion, force — and converts it into an electrical
+  signal that a computer can read and act on.
 ---
 
-A **sensor** is any device that converts a physical phenomenon — light, sound, distance, temperature, force — into a signal that a computer can read. In robotics, sensors are the foundation: without them, a robot has no idea what is happening around it and is reduced to a deaf, blind machine that can only follow open-loop instructions.
+A **sensor** is a device that detects something physical — light, sound, distance, heat, motion, force — and turns it into an electrical signal a computer can read. In a robot, sensors are the only link between the machine and reality: without them a robot can only replay stored instructions, with no way of noticing that the world has moved.
 
-## The three properties every sensor has
+The textbook definition is wider than robotics: a sensor is a device that receives and responds to a signal or stimulus, which makes a thermometer a sensor too. What makes one a *robot* sensor is that software reads it many times a second and acts on it immediately.
 
-1. **Range** — the minimum and maximum values it can measure (e.g. an HC-SR04 ultrasonic sensor: 2 cm to 400 cm).
-2. **Accuracy** — how close the measurement is to the actual value.
-3. **Sampling rate** — how many times per second it can read.
+## What a sensor actually does
 
-## Common sensor families in robotics
+Every sensor performs the same trick: it finds a physical effect that changes predictably with the thing you want to measure, then measures that effect instead. A thermistor's resistance changes as it warms, so measuring resistance measures temperature. An ultrasonic rangefinder times an echo. A camera measures brightness at millions of points and lets [software](/atlas/concept/computer-vision) infer the rest.
 
-- **Distance**: ultrasonic, infrared, LiDAR
-- **Vision**: RGB camera, depth camera, thermal camera
-- **Orientation**: IMU (gyroscope + accelerometer), compass
-- **Force/touch**: load cell, force-torque sensor, capacitive touch
-- **Environment**: temperature, humidity, gas, light
+That indirection is why no sensor is perfect, and why three numbers on a datasheet matter far more than the product name:
 
-Sensors pair with [actuators](/atlas/concept/actuator) — the muscles — and a [controller](/atlas/concept/robot) — the brain — to form the classic SENSE → THINK → ACT loop that defines every [robot](/atlas/concept/robot).
+- **Sensitivity** — how much the output changes for a given change in the thing being measured.
+- **Resolution** — the smallest change the sensor can detect at all.
+- **Accuracy** — how close the reading is to the truth. It can be considerably worse than resolution, because of offset, non-linearity, drift and hysteresis.
+
+The HC-SR04, the cheap ultrasonic module on most beginner robots, is specified for a ranging distance of 2 cm to 4 m, a measuring angle of 15°, and accuracy reaching about 3 mm. Those figures say what it is for — stopping a small robot before it hits a wall — and what it cannot do: map a warehouse, or see anything narrower than its 15° cone.
+
+## The main sensor families
+
+| Family | What it measures | Typical robot use |
+|---|---|---|
+| Rangefinders — [ultrasonic](/atlas/concept/ultrasonic-sensor), infrared, [lidar](/atlas/concept/lidar) | Distance to the nearest surface | Obstacle avoidance, mapping, navigation |
+| Cameras — colour, [depth](/atlas/concept/depth-camera), thermal | Light arriving at a grid of pixels | Object recognition, inspection, visual navigation |
+| Inertial — [IMU](/atlas/concept/imu) | Rotation rate and acceleration of the robot's own body | Balancing, flight stabilisation, heading estimates |
+| Position — [encoders](/atlas/concept/encoder), potentiometers | How far a joint or wheel has turned | Closing the loop on every motor |
+| Force and touch — load cells, [force-torque sensors](/atlas/concept/force-torque-sensor) | Push, pull and twist at a point of contact | Delicate gripping, assembly, safe contact with people |
+| Environment — temperature, humidity, gas, light | Conditions around the robot | Monitoring, agriculture, safety shutdowns |
+
+## Looking outward and looking inward
+
+Sensors that look *outward* — cameras, lidar, rangefinders — report on a world the robot does not control. Sensors that look *inward* — encoders, IMUs, motor current, joint torque — report what the machine itself is doing. A useful robot needs both.
+
+Inward sensing is fast and dependable but accumulates error: encoders that say you have travelled three metres cannot know the wheels were spinning on a wet floor, which is why [odometry](/atlas/concept/odometry) drifts. Outward sensing corrects that drift, but is slower, noisier and easily fooled — glass defeats most rangefinders, and a camera is only as good as the light.
+
+## Why one sensor is never enough
+
+Because every sensor fails in its own specific way, serious robots carry several that overlap and combine their readings through [sensor fusion](/atlas/concept/sensor-fusion). The point is not redundancy for its own sake; it is that the failure modes do not coincide. The fused estimate is what the control software actually believes — and [actuators](/atlas/concept/actuator) act on it. That loop, running many times a second, is what separates a [robot](/atlas/concept/robot) from a machine following a script.
+
+## Common questions
+
+### Is a sensor the same thing as a transducer?
+
+Not quite. A transducer converts one form of energy into another in either direction — a loudspeaker is a transducer too. A sensor is the input case: it converts a physical quantity into a signal to be read. In everyday robotics talk the two words are used interchangeably.
+
+### How many sensors does a robot need?
+
+As many as it has things it cannot afford to get wrong. A line follower needs two. A self-balancing robot needs an IMU plus wheel encoders. At the far end, NASA's Perseverance rover carries 23 cameras alone, on top of its other instruments.
+
+### Can better software fix a bad sensor?
+
+Partly. Filtering and fusion reduce noise and cancel some drift — much of what a navigation stack does. What software cannot do is invent information the sensor never captured: if the resolution is too coarse, or the sensor cannot see the thing at all, no amount of processing recovers it. Choose the sensor for the job first, then filter.

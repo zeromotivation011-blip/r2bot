@@ -142,6 +142,14 @@ const nextConfig = {
       { source: '/world-map', destination: '/atlas', permanent: true },
       { source: '/world-map/embed', destination: '/atlas', permanent: true },
       // Duplicate Atlas entries (same title) -> keep one indexable page each.
+      // GreyOrange is a company, and was filed as a concept. Rewritten from
+      // primary sources in Nov 2026: the old entry called it 'India's Flagship
+      // Robotics Unicorn' and described a hardware business that has since
+      // moved its headquarters to Atlanta and pivoted to orchestration software.
+      // Two entries owned "what is a state machine": state-machine (461 words)
+      // and finite-state-machine (715, better sourced). One owner per query.
+      { source: '/atlas/concept/state-machine', destination: '/atlas/concept/finite-state-machine', permanent: true },
+      { source: '/atlas/concept/greyorange', destination: '/atlas/company/greyorange', permanent: true },
       { source: '/atlas/concept/drone-uav', destination: '/atlas/concept/drone', permanent: true },
       { source: '/atlas/concept/field-programmable-gate-array', destination: '/atlas/concept/fpga', permanent: true },
       // Same entry written twice. The fuller version (585 words vs 331, and

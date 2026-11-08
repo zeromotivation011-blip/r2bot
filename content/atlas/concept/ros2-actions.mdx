@@ -1,13 +1,18 @@
 ---
 title: ROS2 Actions
 summary: >-
-  ROS2 actions handle long-running, cancellable tasks like navigation or arm
-  trajectory execution — with progress feedback during the goal.
+  A ROS 2 action is how one piece of a robot's software asks another to carry
+  out a job that takes a while — drive across a room, rotate to face a
+  direction, lift an arm — while reporting progress and staying cancellable.
 category: control
-lastReviewed: 2026-05-21T00:00:00.000Z
+lastReviewed: 2026-11-08T00:00:00.000Z
 sources:
-  - title: 'ROS 2 documentation: Actions'
+  - title: 'ROS 2 documentation: Understanding actions'
     url: 'https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Actions/Understanding-ROS2-Actions.html'
+  - title: 'ROS 2 documentation: Actions (concepts)'
+    url: 'https://docs.ros.org/en/jazzy/Concepts/Basic/About-Actions.html'
+  - title: 'ROS 2 design: Actions'
+    url: 'https://design.ros2.org/articles/actions.html'
 tags:
   - ros2
   - action
@@ -15,52 +20,119 @@ tags:
 seeAlso:
   - ros2
   - ros2-nodes
+  - ros2-topics
   - ros2-services
+  - nav2
 difficulty: 3
 laymanExplanation: >-
-  A ROS2 action is a goal-oriented communication pattern for long-running tasks.
-  A client sends a goal, the server accepts it, sends periodic feedback, and
-  finally returns a result. The client can cancel at any time.
+  An action is a ROS 2 request for a job that takes time. One node (the action
+  client) sends a goal; another node (the action server) accepts it, sends
+  regular progress updates while it works, and finally returns a result. Either
+  side can stop the job early.
 realRobotsThatUseThis: []
 indianExample: ''
 relatedTerms: []
 prerequisiteTerms: []
 unlocksTerms: []
 quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
+  q: >-
+    Your robot has to drive across a building, which takes about two minutes.
+    The operator wants to see how far it has got and be able to stop it halfway.
+    Which ROS 2 communication pattern fits?
+  options:
+    - A topic, because the robot is moving continuously
+    - A service, because the operator wants an answer
+    - An action, because the job is long, reports progress and can be cancelled
+  answer: 2
+  explanation: >-
+    Actions are the pattern for long-running tasks. They consist of a goal,
+    steady feedback while the work happens, and a final result — and unlike a
+    service, an action goal can be cancelled before it finishes.
+mindBlowingFact: >-
+  An action is not really one thing. Under the hood ROS 2 builds every action
+  out of three services and two topics — and then hides them, because
+  `ros2 topic list` and `ros2 service list` do not show an action's internal
+  plumbing unless you ask for hidden entries.
 industryApplications: []
 difficultyLabel: Classroom
 technicalDefinition: >-
-  ROS2 actions handle long-running, cancellable tasks like navigation or arm
-  trajectory execution — with progress feedback during the goal.
+  A ROS 2 action is a long-running remote procedure call between nodes, made up
+  of a goal, a stream of feedback and a result, with the ability to cancel or
+  preempt the goal. It is implemented on top of three services and two topics.
 slug: ros2-actions
 bucket: concept
 ---
 
 # ROS2 Actions
 
-## What is it?
+A ROS 2 action is how one piece of a robot's software asks another to carry out a job that takes a while — drive across a room, rotate to face a direction, lift an arm — while watching it happen and keeping the option to stop it. The ROS 2 documentation calls an action "a long-running remote procedure call with feedback and the ability to cancel or preempt the goal."
 
-A ROS2 action is a goal-oriented communication pattern for long-running tasks. A client sends a goal, the server accepts it, sends periodic feedback, and finally returns a result. The client can cancel at any time.
+The useful picture is a courier booking: you place the order (the **goal**), you get tracking updates on the way (**feedback**), you get a delivery confirmation (the **result**), and you can cancel mid-journey.
 
-## How it works
+## The three parts
 
-An action has three sub-types: goal, feedback, and result. Under the hood, an action is built from several services and a topic — but `rclcpp_action` and `rclpy_action` give you a clean API. Common actions are `NavigateToPose` (move base) and `FollowJointTrajectory` (arm motion).
+Actions are intended for long-running tasks and consist of three parts: a goal, feedback, and a result. That feedback stream is what a plain request/reply call cannot give you — a [service](/atlas/concept/ros2-services) returns one answer and nothing in between.
 
-## Real-world example
+## When do you reach for an action?
 
-Nav2 uses `NavigateToPose` as its action. MoveIt2 uses `FollowJointTrajectory` for arm planning. A delivery robot might expose `Deliver(parcel_id)` as a custom action with feedback like 'percent complete'.
+[ROS 2](/atlas/concept/ros2) has three ways for [nodes](/atlas/concept/ros2-nodes) to talk. Choosing the wrong one is the most common beginner mistake in the whole framework.
 
-## Why it matters for robotics
+| Pattern | Shape of the conversation | Reach for it when | Can you cancel? |
+|---|---|---|---|
+| [Topic](/atlas/concept/ros2-topics) | Fire-and-forget broadcast, one-way, any number of listeners | A continuous stream of data: camera frames, wheel speeds, battery level | Nothing to cancel — there is no job |
+| [Service](/atlas/concept/ros2-services) | One request, one response, returns quickly | A short question or command that needs an answer: "save the map", "what are your parameters?" | No |
+| Action | Goal, then a stream of feedback, then a result | A job that takes seconds or minutes and whose progress matters: navigate, grasp, scan, dock | Yes — by the client, or aborted by the server |
 
-Actions are essential whenever a task is long, cancellable, or needs progress reporting. Building well-designed actions is the mark of a senior ROS2 engineer.
+Actions carry real setup and monitoring overhead, so the ROS 2 docs are blunt about the other direction too: if you need a short request, use a service instead.
 
-## See also
+## Client and server
 
-- [Ros2](/atlas/concept/ros2)
-- [Ros2 Nodes](/atlas/concept/ros2-nodes)
-- [Ros2 Services](/atlas/concept/ros2-services)
+Actions use a client-server model. An action client node sends a goal to an action server node, which acknowledges the goal and returns a stream of feedback and a result. Any number of clients may send goals to the same action name, but there should only ever be one action server per action name — if two servers claim the same name, which one receives a request is undefined.
+
+The server is in charge. It can accept a goal, reject it, or **abort** one it has already started. In the turtlesim tutorial, sending a second rotation goal before the first finishes makes the server abort the first one. A different server might have queued the goals or refused the new one instead — never assume.
+
+## What an action looks like
+
+An action's type is defined in a `.action` file with two `---` separators. Here is turtlesim's `RotateAbsolute`, exactly as `ros2 interface show` prints it:
+
+```text
+# The desired heading in radians
+float32 theta
+---
+# The angular displacement in radians to the starting position
+float32 delta
+---
+# The remaining rotation in radians
+float32 remaining
+```
+
+The part above the first `---` is the goal, the next is the result, and the last is the feedback. You can drive one from a terminal without writing any code:
+
+```console
+$ ros2 action send_goal /turtle1/rotate_absolute \
+    turtlesim/action/RotateAbsolute "{theta: 1.57}" --feedback
+```
+
+Every goal gets a unique ID, which the design uses to mitigate goal-ID collisions between clients, and the terminal prints `remaining` repeatedly until the goal finishes with `SUCCEEDED`.
+
+## A real robot example
+
+[Nav2](/atlas/concept/nav2), the standard ROS 2 navigation stack, exposes navigation as an action. Its `NavigateToPose` goal is a target pose; its feedback includes `distance_remaining`, `estimated_time_remaining` and `number_of_recoveries`; its result shape has changed between distributions, so check the version you are on. That is the whole argument for actions in one interface: you ask once, you watch, and you can change your mind.
+
+## Common questions
+
+### Is an action just a slow service?
+
+No. A service returns a single response and cannot be cancelled. An action adds steady feedback while the work happens and a cancel path, which is why ROS 2 reserves it for long-running procedures.
+
+### What happens if I cancel halfway?
+
+The client requests cancellation; the server decides whether to accept it. If it does, the goal moves to a `CANCELING` state and then finishes as `CANCELED` rather than `SUCCEEDED`. A goal the server stops on its own is `ABORTED` instead.
+
+### Can I see an action's internal topics?
+
+Not by default. ROS 2 deliberately hides the services and topics that make up an action from `ros2 topic list` and `ros2 service list`; you have to pass the option for hidden entries to see them.
+
+---
+
+*Next step: [ROS 2 Services](/atlas/concept/ros2-services) — the short, one-answer sibling of the action, and the pattern you should reach for far more often.*

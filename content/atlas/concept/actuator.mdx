@@ -3,8 +3,9 @@ title: Actuator
 slug: actuator
 bucket: actuators
 summary: >-
-  The muscles of a robot — devices that convert electrical or pneumatic energy
-  into mechanical motion.
+  An actuator is the part of a machine that turns a control signal into physical
+  movement — force, torque or displacement. If sensors are a robot's senses,
+  actuators are its muscles.
 seeAlso:
   - sensor
   - servo-motor
@@ -14,32 +15,38 @@ seeAlso:
 tags:
   - actuators
   - fundamentals
-lastReviewed: 2025-01-15T00:00:00.000Z
+lastReviewed: 2026-11-08T00:00:00.000Z
 sources:
-  - title: 'Actuator'
+  - title: 'Actuator — Wikipedia'
     url: 'https://en.wikipedia.org/wiki/Actuator'
+  - title: 'ROBOTIS e-Manual — Dynamixel XM430-W350 specifications'
+    url: 'https://emanual.robotis.com/docs/en/dxl/x/xm430-w350/'
+  - title: 'Physik Instrumente — P-820 preloaded piezo actuators'
+    url: >-
+      https://www.pi-usa.us/en/products/piezo-actuators-stacks-benders-tubes/p-820-preloaded-piezo-actuators-100500
 difficulty: 1
-difficultyLabel: beginner
-oneLiner: The muscles of a robot — converts energy into motion.
+difficultyLabel: Classroom
+oneLiner: The muscles of a robot — turns a control signal into movement.
 laymanExplanation: >-
-  If sensors are the robot's eyes, actuators are its hands and legs. They're
-  what actually moves the robot.
+  An actuator is the part that actually moves. A small signal goes in — a
+  voltage, a current, a puff of air pressure — and real motion comes out. If
+  sensors are the robot's eyes, actuators are its hands and legs.
 analogy: >-
-  An actuator is like your leg muscle — the brain (computer) sends a signal, the
-  muscle contracts, and you move.
+  An actuator is like your leg muscle — the brain sends a tiny nerve signal, the
+  muscle pulls with far more energy than that signal carried, and you move.
 whyItMatters: >-
-  Actuators turn decisions into action. Without them, a robot can think all it
-  wants but can't do anything.
-indianExample: >-
-  ISRO's Chandrayaan-3 lander used actuators to adjust its legs in real time
-  during the Moon landing.
+  Actuators turn decisions into action. Without them a robot can sense and think
+  all it likes, but nothing in the world changes.
+indianExample: ''
 realRobotsThatUseThis:
   - Atlas by Boston Dynamics
   - KUKA KR
   - Da Vinci Surgical
 mindBlowingFact: >-
-  The human body has over 600 muscles. A humanoid robot like Atlas has only
-  about 28 actuators — but each is roughly 10× stronger per kilogram.
+  Actuators span an enormous range. A stacked piezo actuator from Physik
+  Instrumente moves a total of only 15–45 micrometres — less than the width of a
+  human hair — but it positions to roughly 0.15 nanometres, while
+  electromechanical actuators push with forces on the order of 100 kilonewtons.
 industryApplications:
   - manufacturing
   - surgery
@@ -47,37 +54,75 @@ industryApplications:
   - automotive
   - prosthetics
 quizQuestion:
-  q: What are the three main types of actuators used in robots?
+  q: >-
+    Why can a hydraulic actuator exert very large forces compared with most
+    other families?
   options:
-    - 'Solid, liquid, gas'
-    - 'Electric, pneumatic, hydraulic'
-    - 'Big, medium, small'
-    - 'Manual, semi-auto, auto'
-  answer: 1
+    - 'Because oil is nearly impossible to compress, so pressure transfers almost entirely into force on the piston'
+    - 'Because oil is lighter than air and therefore moves faster'
+    - 'Because hydraulic actuators run at much higher voltages'
+  answer: 0
   explanation: >-
-    Electric (servo/DC motors), pneumatic (air-powered) and hydraulic
-    (fluid-powered) are the three workhorse families.
+    Liquids are practically incompressible, so the pressure applied to the fluid
+    is passed on to the piston instead of being absorbed by the fluid springing
+    back. That is why hydraulics dominate heavy machinery — though acceleration
+    is limited and the plumbing is bulky.
 relatedTerms: []
 prerequisiteTerms: []
 unlocksTerms: []
 technicalDefinition: >-
-  The muscles of a robot — devices that convert electrical or pneumatic energy
-  into mechanical motion.
+  An actuator is a machine component that produces force, torque or
+  displacement when supplied with an electrical, pneumatic or hydraulic input.
+  It takes a low-energy control signal plus a separate source of energy and
+  converts them into mechanical motion — a transducer in the direction opposite
+  to a sensor.
 ---
 
-An **actuator** is the part of a robot that physically moves. Sensors give the robot information; the controller decides what to do; the actuator is what actually does it.
+An **actuator** is the part of a machine that turns a control signal into physical movement — force, torque or displacement. If [sensors](/atlas/concept/sensor) are a robot's senses, actuators are its muscles.
 
-## The three actuator families
+Two separate things always go into an actuator: a **control signal**, which carries almost no energy (a voltage, a current, a pressure command), and a **source of energy**, which does the actual work. That split is the whole trick: a signal your controller produces for a fraction of a watt ends up commanding a motion that lifts a car door.
 
-- **Electric** — DC motors, brushless motors, servos, stepper motors. Quiet, precise, easy to control. Used in 90% of robots you see.
-- **Pneumatic** — air-powered cylinders and grippers. Fast, light, but messy: needs a compressor and tubes.
-- **Hydraulic** — fluid-powered. Massive force per kilo. Used in heavy excavators, the old hydraulic Atlas, and the most powerful industrial arms.
+## The actuator families
+
+| Family | Energy source | Strength | Main trade-off |
+|---|---|---|---|
+| Electric (rotary) | Electricity | Precise, quiet, easy to control and power | Needs gearing to turn fast rotation into useful force |
+| Electromechanical (linear) | Electricity | Good accuracy and long life; forces on the order of 100 kN | Limited by speed, size and weight |
+| Linear motor | Electricity | Very high speed and accuracy, no gears | Suited to light loads (around 30 kg); low force density; expensive |
+| Hydraulic | Pressurised liquid | Huge force; holds position with little energy; low inertia | Limited acceleration; pumps, hoses and leaks |
+| Pneumatic | Compressed gas | Simple, light, fast, no return pipes needed | Needs compressors, reservoirs, filters and air treatment |
+| Thermal / shape-memory | Heat | Tiny, no moving parts to wear | Slow, hard to control finely |
+| Piezoelectric | Electricity | Sub-nanometre positioning, microsecond response | Travel measured in tens of micrometres |
+
+Electric actuators cover almost everything a beginner will build: a [DC motor](/atlas/concept/dc-motor), a [stepper motor](/atlas/concept/stepper-motor), a [servo motor](/atlas/concept/servo-motor). Add gearing — a [harmonic drive](/atlas/concept/harmonic-drive), say — and the same motor becomes strong and slow instead of weak and fast. Add an [encoder](/atlas/concept/encoder) and the controller knows where the output actually is, which is the difference between "turn for 300 ms" and "go to 42 degrees and stay there."
+
+[Hydraulic actuators](/atlas/concept/hydraulic-actuator) win wherever brute force matters, because a liquid is nearly incompressible: the pressure you apply goes into the piston rather than being soaked up. [Pneumatic actuators](/atlas/concept/pneumatic-actuator) swap the oil for air, which makes them cheap, clean and quick — and much harder to stop in a precise place, because air springs back.
 
 ## Specs that matter
 
-- **Torque** — rotational force the actuator can produce.
-- **Speed** — how fast it can move (RPM for motors, mm/s for linear actuators).
-- **Backlash** — how much "play" exists when reversing direction.
-- **Repeatability** — how consistently the actuator returns to the same position.
+- **Torque** — the rotational force available. For scale, a Dynamixel XM430-W350 smart servo is rated at 4.1 N·m stall torque at 12 V and weighs 82 g.
+- **Speed** — revolutions per minute for a motor, millimetres per second for a linear actuator. The same XM430-W350 spins at 46 rev/min with no load; torque and speed always trade against each other.
+- **Resolution** — the smallest commanded step. That servo reports 4096 positions per revolution.
+- **Backlash** — the dead play when reversing direction, almost all of it from the gearbox rather than the motor.
+- **Repeatability** — whether commanding the same position twice lands the output in the same place twice. This, not top speed, is what makes an arm useful.
 
-[Servo motors](/atlas/concept/servo-motor) are the most common actuator in beginner robotics. [DC motors](/atlas/concept/dc-motor) are the cheapest, and combined with an [encoder](/atlas/concept/encoder) become almost as good as servos for many tasks.
+Software treats an actuator as a unit too. In `ros2_control`, an [Actuator](https://control.ros.org/humble/doc/getting_started/getting_started.html) is a single-degree-of-freedom hardware component bound to one joint, exposing a command interface such as `position` and, where the hardware can report it, state interfaces for position and velocity.
+
+
+## Common questions
+
+### Is a motor the same thing as an actuator?
+
+A motor is one kind of actuator — the most common kind. "Actuator" is the wider word, and it also covers hydraulic and pneumatic cylinders, shape-memory wires, piezo stacks and solenoids. In practice an actuator is often a motor plus a gearbox, a sensor and a driver, sold as one part.
+
+### How is an actuator different from a sensor?
+
+They run in opposite directions. A sensor converts something physical into a signal; an actuator converts a signal into something physical. Both are transducers, and a complete robot needs each: sense, decide, act.
+
+### Which type should a beginner start with?
+
+A hobby servo or a smart servo. It arrives with its own gearbox, position feedback and driver, so you command an angle instead of designing a control loop — then move on to bare DC motors, closed-loop control and a [gripper](/atlas/concept/gripper).
+
+---
+
+*Next step: watch the 60-second lesson [Servo Motor Explained](/shorts/servo-motor) and see one actuator hit an exact angle.*

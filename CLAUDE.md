@@ -269,6 +269,12 @@ comprehensive sitemap to Search Console; own the result for every robotics conce
 - A page with no inbound internal link is invisible. `getRelatedEntries` balances the link graph
   and rescues orphans; keep it that way if you touch it.
 
+**Verifying ROS 2 facts:** docs.ros.org now sits behind Anubis bot protection — WebFetch gets
+"Access Denied" and curl gets a JS challenge. The same content is readable at
+`raw.githubusercontent.com/ros2/ros2_documentation/<distro>/source/...`; read it there and cite the
+canonical docs.ros.org URL. docs.nav2.org currently 404s on every path and has no sitemap, so Nav2
+claims have to be verified against the message/action definitions in the nav2_msgs source instead.
+
 **Atlas entry template:** `# Name` → one-sentence answer → What it is → How it works → Where you'll
 see it → Why it matters → Related (3–5 internal links) → Sources (2–3). Each entry spans the ladder
 from a beginner's first question to advanced detail. Bar: better than the top result on the internet.
