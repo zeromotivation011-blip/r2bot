@@ -13,6 +13,7 @@ import { runDiscovery } from '@/lib/discovery';
 import { runEmailAutomation } from '@/lib/email-automation';
 import { runWeeklyBackup } from '@/lib/backup';
 import { runWeeklyIndexNow } from '@/lib/indexnow';
+import { runAtlasIndex } from '@/lib/atlas-index';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -79,6 +80,16 @@ async function weeklyIndexNow(): Promise<StepResult> {
   return { ok: r.ok, detail: r, error: r.error };
 }
 
+// Every day. The Co-pilot's whole promise is that it answers from the Atlas
+// and cites it, and the table it reads was empty in production for who knows
+// how long — nothing errored, answers still looked fine, the only symptom was
+// citations that never appeared. A failure nobody can see has to heal itself
+// rather than wait for someone to notice.
+async function indexAtlas(): Promise<StepResult> {
+  const r = await runAtlasIndex();
+  return { ok: r.ok, detail: r, error: r.errors[0] };
+}
+
 async function handle(req: NextRequest): Promise<Response> {
   if (!authorized(req)) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -92,6 +103,7 @@ async function handle(req: NextRequest): Promise<Response> {
     ['emails', sendAutomatedEmails],
     ['backup', weeklyBackup],
     ['indexnow', weeklyIndexNow],
+    ['atlas', indexAtlas],
   ] as const) {
     try {
       steps[name] = await fn();
