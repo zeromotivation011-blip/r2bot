@@ -2,9 +2,15 @@ import type { Metadata } from 'next';
 import { StaticPage } from '@/components/StaticPage';
 import { AuthPanel } from '@/components/auth/AuthPanel';
 
+const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
+
 export const metadata: Metadata = {
   title: 'Sign in',
   description: 'Sign in to R2BOT — track your courses, save Atlas entries, and pick up where you left off.',
+  alternates: { canonical: `${BASE}/login` },
+  // Nothing here to rank, and without an explicit canonical these
+  // inherited the root layout's, which points at the homepage.
+  robots: { index: false, follow: true },
 };
 
 export default function LoginPage() {
