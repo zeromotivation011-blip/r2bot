@@ -42,7 +42,7 @@ const nextConfig = {
     '/build/**': ['./content/build/**/*'],
     '/atlas/**': ['./content/atlas/**/*'],
     '/shorts/**': ['./content/atlas/**/*'],
-    '/api/**': ['./content/**/*'],
+    '/api/**': ['./content/**/*'],  // includes /api/admin/atlas/reindex, which reads every Atlas MDX
     '/admin/**': ['./content/**/*'],
   },
   // Allow images from external sources. Add domains here when wrapping

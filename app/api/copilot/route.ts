@@ -125,6 +125,49 @@ async function retrieveAtlas(
   return data as RetrievedEntry[];
 }
 
+/**
+ * Last resort when vector search comes back empty.
+ *
+ * The atlas_entries table was empty in production — no rows, no embeddings —
+ * so match_atlas_entries returned nothing on every question and the Co-pilot
+ * answered entirely from general knowledge, without a single citation, while
+ * the site promised answers grounded in the Atlas. POST
+ * /api/admin/atlas/reindex fixes the cause; this makes the symptom impossible
+ * to repeat silently, because an unindexed Atlas should degrade to "fewer
+ * sources", never to "no sources and no sign anything is wrong".
+ *
+ * Title-keyword matching, not semantics. It will miss things vector search
+ * would find; it will not invent a page that does not exist.
+ */
+async function retrieveAtlasByKeyword(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  question: string,
+): Promise<RetrievedEntry[]> {
+  const STOP = new Set([
+    'what', 'when', 'where', 'which', 'with', 'this', 'that', 'from', 'does', '做',
+    'your', 'about', 'have', 'between', 'difference', 'would', 'should', 'could',
+    'there', 'their', 'robot', 'robots', 'explain', 'tell', 'much', 'many', 'into',
+  ]);
+  const terms = Array.from(
+    new Set(
+      question
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, ' ')
+        .split(/\s+/)
+        .filter((w) => w.length > 3 && !STOP.has(w)),
+    ),
+  ).slice(0, 6);
+  if (terms.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from('atlas_entries')
+    .select('id, type, slug, title, summary, body_md')
+    .or(terms.map((t) => `title.ilike.%${t}%`).join(','))
+    .limit(4);
+  if (error || !data) return [];
+  return (data as Omit<RetrievedEntry, 'similarity'>[]).map((e) => ({ ...e, similarity: 0 }));
+}
+
 // ---- 3. Prompt assembly ----
 function buildGroundedPrompt(base: string, entries: RetrievedEntry[]): string {
   if (entries.length === 0) return base;
@@ -139,7 +182,7 @@ function buildGroundedPrompt(base: string, entries: RetrievedEntry[]): string {
   return `${base}
 
 GROUNDING — RELEVANT ATLAS ENTRIES
-When any of the sources below are on-topic, treat them as your primary truth and cite them inline as markdown links: [<title>](/atlas/<type>/<slug>). For example: "as covered in [SLAM](/atlas/concept/slam)". Use the exact path shown in each source header. If none of the sources are on-topic, answer from general knowledge and say so briefly.
+When any of the sources below are on-topic, treat them as your primary truth and cite them inline as markdown links: [<title>](/atlas/<type>/<slug>). For example: "as covered in [SLAM](/atlas/concept/slam)". Use the exact path shown in each source header. Cite at least one source whenever one is genuinely relevant — the links are how a reader goes deeper, and an answer with none is a dead end. If none of the sources are on-topic, answer from general knowledge and say so in one short line, and do not invent an /atlas/ path for a page that is not listed above.
 
 ${sources}
 `;
@@ -240,7 +283,8 @@ export async function POST(req: NextRequest) {
 
   // RAG: embed → retrieve → ground. All steps degrade silently if any piece fails.
   const embedding = await embedQuery(message);
-  const retrieved = await retrieveAtlas(supabase, embedding);
+  let retrieved = await retrieveAtlas(supabase, embedding);
+  if (retrieved.length === 0) retrieved = await retrieveAtlasByKeyword(supabase, message);
 
   // Mode-switch: in "teach" mode R2 becomes a Socratic tutor; default keeps existing behaviour.
   const mode = body.mode === 'teach' ? 'teach' : 'answer';
