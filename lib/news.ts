@@ -166,8 +166,30 @@ function extractBetweenTags(xml: string, tag: string): string {
 function decodeCdata(s: string): string {
   return s.replace(/^\s*<!\[CDATA\[/i, '').replace(/\]\]>\s*$/, '')
 }
+/**
+ * Named entities were handled one at a time, so anything outside that list of
+ * six came through raw: a headline on the homepage read
+ * "Here&#8217;s how its failsafes work". Feeds use the whole numeric range,
+ * and &amp; must be decoded last or "&amp;#8217;" turns into a literal
+ * "&#8217;" instead of an apostrophe.
+ */
+const NAMED_ENTITIES: Record<string, string> = {
+  nbsp: ' ', quot: '"', apos: "'", lt: '<', gt: '>',
+  lsquo: '\u2018', rsquo: '\u2019', ldquo: '\u201C', rdquo: '\u201D',
+  ndash: '\u2013', mdash: '\u2014', hellip: '\u2026', middot: '\u00B7',
+  eacute: '\u00E9', uuml: '\u00FC', deg: '\u00B0', euro: '\u20AC', pound: '\u00A3',
+}
+
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&#x([0-9a-f]+);/gi, (_, h: string) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d: string) => String.fromCodePoint(Number(d)))
+    .replace(/&([a-z]+);/gi, (m, name: string) => NAMED_ENTITIES[name.toLowerCase()] ?? m)
+    .replace(/&amp;/g, '&')
+}
+
 function stripHtml(s: string): string {
-  return s.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim()
+  return decodeEntities(s.replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim()
 }
 function safeISO(d: string): string {
   if (!d) return new Date(0).toISOString()

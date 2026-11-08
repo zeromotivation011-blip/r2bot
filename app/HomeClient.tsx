@@ -18,6 +18,8 @@ interface Personalization {
 }
 
 export interface HomeNewsItem { title: string; url: string; source: string; topic: string }
+/** thumbnailUrl is empty for the curated Lens write-ups, which have no
+ *  YouTube id — they are our own pages, not embeds. */
 export interface HomeVideoItem { title: string; url: string; thumbnailUrl: string; channel: string }
 
 interface HomeClientProps {
@@ -383,19 +385,33 @@ function Latest({ news, videos }: { news: HomeNewsItem[]; videos: HomeVideoItem[
               </Link>
             ) : (
               <div className="r2-latest__videos">
-                {videos.slice(0, 4).map((v) => (
-                  <a key={v.url} href={v.url} target="_blank" rel="noopener noreferrer" className="r2-card r2-vid">
-                    <span
-                      className="r2-vid__thumb"
-                      style={{ backgroundImage: `url(${v.thumbnailUrl})` }}
-                      aria-hidden
-                    />
-                    <span className="r2-vid__meta">
-                      <span className="r2-vid__title">{v.title}</span>
-                      <span className="r2-meta">{v.channel}</span>
-                    </span>
-                  </a>
-                ))}
+                {videos.slice(0, 4).map((v) => {
+                  const external = v.url.startsWith('http')
+                  const inner = (
+                    <>
+                      {v.thumbnailUrl ? (
+                        <span
+                          className="r2-vid__thumb"
+                          style={{ backgroundImage: `url(${v.thumbnailUrl})` }}
+                          aria-hidden
+                        />
+                      ) : (
+                        <span className="r2-vid__thumb r2-vid__thumb--none" aria-hidden />
+                      )}
+                      <span className="r2-vid__meta">
+                        <span className="r2-vid__title">{v.title}</span>
+                        <span className="r2-meta">{v.channel}</span>
+                      </span>
+                    </>
+                  )
+                  return external ? (
+                    <a key={v.url} href={v.url} target="_blank" rel="noopener noreferrer" className="r2-card r2-vid">
+                      {inner}
+                    </a>
+                  ) : (
+                    <Link key={v.url} href={v.url} className="r2-card r2-vid">{inner}</Link>
+                  )
+                })}
               </div>
             )}
           </div>

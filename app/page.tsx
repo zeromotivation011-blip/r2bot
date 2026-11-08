@@ -8,6 +8,7 @@ import { getAllAtlasEntries } from '@/lib/atlas'
 import { loadAllProjects } from '@/lib/build/loader'
 import { getNewsData } from '@/lib/news'
 import { getLiveLensVideos } from '@/lib/lens-live'
+import { getAllLens } from '@/lib/lens'
 
 export const runtime = 'nodejs'
 export const revalidate = 3600
@@ -125,16 +126,34 @@ export default async function HomePage() {
         })),
       )
       .catch(() => [] as { title: string; url: string; source: string; topic: string }[]),
+    // The live YouTube ingest returns nothing in production right now, which
+    // left a dashed "nothing here" box sitting beside a full list of
+    // headlines — an empty state advertising that a surface is empty. The ten
+    // curated Lens write-ups are real, they are ours, and they were otherwise
+    // reachable only from /lens itself.
     getLiveLensVideos()
       .then((v) =>
-        v.slice(0, 3).map((x) => ({
+        v.slice(0, 4).map((x) => ({
           title: x.title,
           url: x.url,
           thumbnailUrl: x.thumbnailUrl,
           channel: x.channel,
         })),
       )
-      .catch(() => [] as { title: string; url: string; thumbnailUrl: string; channel: string }[]),
+      .catch(() => [] as { title: string; url: string; thumbnailUrl: string; channel: string }[])
+      .then((live) =>
+        live.length > 0
+          ? live
+          : getAllLens()
+              .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
+              .slice(0, 4)
+              .map((x) => ({
+                title: x.title,
+                url: `/lens/${x.slug}`,
+                thumbnailUrl: '',
+                channel: x.topic,
+              })),
+      ),
   ])
 
   return (
