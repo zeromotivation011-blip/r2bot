@@ -6,6 +6,8 @@ name: Live checks
 #   - pages inherited the homepage canonical
 #   - Atlas links 404'd after slugs changed
 #   - first-load JS crept up until a phone on 3G bounced
+#   - all 512 Atlas pages served an empty husk for hours: 200 OK, in the
+#     sitemap, links fine, and not a word of content on any of them
 # Runs daily, and on demand after a deploy.
 on:
   schedule:
@@ -30,6 +32,18 @@ jobs:
           node-version: 22
       - name: Assert the sitemap is real and honest
         run: node scripts/check-sitemap.mjs "${{ inputs.base || 'https://www.r2bot.in' }}"
+
+  atlas-content:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Every other check here measures whether a page EXISTS. This one measures
+      # whether it says anything — the gap that let the Atlas go blank.
+      - name: Assert Atlas pages render their content
+        run: node scripts/check-atlas-content.mjs "${{ inputs.base || 'https://www.r2bot.in' }}"
 
   links:
     runs-on: ubuntu-latest
