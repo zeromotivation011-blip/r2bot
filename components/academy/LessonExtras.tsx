@@ -12,7 +12,7 @@ export function LessonPdfButton() {
       onClick={() => {
         if (typeof window !== 'undefined') window.print();
       }}
-      className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/20"
+      className="rounded-md border border-white/15 px-3 py-1.5 text-xs font-semibold text-gray-300 hover:border-white/30 hover:text-white"
       title="Print or save as PDF"
     >
       📄 Download PDF
@@ -99,8 +99,8 @@ export function LessonBookmarkButton({ track, slug, title }: { track: string; sl
       title={marked ? `Bookmarked: ${title}` : `Bookmark this lesson`}
       className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors ${
         marked
-          ? 'border-amber-400 bg-amber-500/20 text-amber-100'
-          : 'border-white/15 bg-white/[0.04] text-zinc-200 hover:border-amber-400/40'
+          ? 'border-[var(--accent-line)] bg-[var(--accent-wash)] text-[var(--amber-bright)]'
+          : 'border-white/15 bg-white/[0.04] text-zinc-200 hover:border-white/30'
       } disabled:cursor-not-allowed`}
     >
       {marked ? '🔖 Bookmarked' : '🔖 Bookmark'}
@@ -148,9 +148,9 @@ export function LessonScrollResume({ track, slug }: { track: string; slug: strin
   if (resumeY === null) return null;
 
   return (
-    <div className="not-prose sticky top-20 z-20 my-4 flex items-center gap-3 rounded-xl border border-amber-400/40 bg-amber-500/[0.08] px-4 py-2 backdrop-blur">
+    <div className="not-prose sticky top-20 z-20 my-4 flex items-center gap-3 rounded-xl border border-white/15 bg-[var(--surface-2)]/95 px-4 py-2 backdrop-blur">
       <span className="text-xl" aria-hidden>📍</span>
-      <span className="text-sm text-amber-100">
+      <span className="text-sm text-gray-200">
         You were reading here last time.{' '}
         <button type="button" onClick={resume} className="font-bold underline">
           Continue where you left off ↓
@@ -169,46 +169,37 @@ export function LessonScrollResume({ track, slug }: { track: string; slug: strin
 }
 
 /** Floating "Stuck? Ask R2" bubble. */
+/**
+ * "Stuck? Ask R2", with this lesson's title pre-filled into the question.
+ *
+ * Was a floating amber pill fixed over the bottom-right of every lesson —
+ * the same floating-action-button pattern the site-wide Co-pilot bubble was
+ * retired for, reintroduced on the longest-form reading pages, where a
+ * permanently glowing accent competes with the prose for the whole scroll.
+ *
+ * The pre-filled context is the part worth keeping, and it is worth most to
+ * someone who has read the lesson and is still stuck. So it sits at the end
+ * of the lesson instead of hovering over all of it, and looks like the rest
+ * of the page. The header's Ask R2 and ⌘K are still there the whole time for
+ * anyone who wants it sooner.
+ */
 export function LessonAskR2Bubble({ track, slug, lessonTitle }: { track: string; slug: string; lessonTitle: string }) {
-  const [open, setOpen] = useState(false);
   const prefill = `I'm reading the ${lessonTitle} lesson. I need help understanding: `;
   const copilotUrl = `/copilot?q=${encodeURIComponent(prefill)}`;
   return (
-    <div className="fixed bottom-6 right-6 z-30 print:hidden">
-      {open ? (
-        <div className="w-[280px] rounded-2xl border border-amber-400/40 bg-[#0a0f1e]/95 p-4 shadow-2xl backdrop-blur">
-          <div className="flex items-center justify-between">
-            <p className="m-0 text-sm font-bold text-amber-200">🤖 Stuck? Ask R2</p>
-            <button type="button" onClick={() => setOpen(false)} className="text-zinc-400 hover:text-white" aria-label="Close">
-              ✕
-            </button>
-          </div>
-          <p className="mt-2 text-xs text-zinc-400">
-            We&apos;ll pre-fill your question with this lesson&apos;s context.
-          </p>
-          <p className="mt-2 rounded-md border border-white/10 bg-white/[0.04] p-2 font-mono text-[10px] text-zinc-300">
-            {prefill}…
-          </p>
-          <Link
-            href={copilotUrl}
-            className="mt-3 block rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-4 py-2 text-center text-xs font-extrabold text-[#1a0f00] hover:scale-[1.02]"
-          >
-            Open full co-pilot →
-          </Link>
-          <p className="mt-2 text-[10px] text-zinc-500">
-            Track: {track} · Lesson: {slug}
-          </p>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="rounded-full border border-amber-400/50 bg-amber-500/30 px-5 py-3 text-sm font-bold text-amber-100 shadow-lg backdrop-blur transition-transform hover:scale-105"
-        >
-          🤖 Stuck? Ask R2 →
-        </button>
-      )}
-    </div>
+    <aside className="not-prose r2-card mt-10 print:hidden">
+      <p className="r2-note__label">Still stuck?</p>
+      <p className="r2-body mt-2 text-sm">
+        Ask R2 about this lesson — your question arrives with the lesson already attached, so you
+        do not have to explain the context first.
+      </p>
+      <Link href={copilotUrl} className="r2-btn r2-btn--ghost mt-4">
+        Ask about this lesson
+      </Link>
+      <p className="r2-meta mt-3 text-xs">
+        {track} · {slug}
+      </p>
+    </aside>
   );
 }
 
@@ -310,7 +301,7 @@ export function LessonDiscussion({ track, slug }: { track: string; slug: string 
       {userId ? (
         <form onSubmit={submit} className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
           {replyingTo ? (
-            <p className="mb-2 text-xs text-amber-300">
+            <p className="mb-2 text-xs text-gray-400">
               Replying to a comment.{' '}
               <button type="button" onClick={() => setReplyingTo(null)} className="underline">
                 cancel
@@ -322,13 +313,13 @@ export function LessonDiscussion({ track, slug }: { track: string; slug: string 
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Share your question or insight…"
             rows={3}
-            className="w-full rounded-xl border border-white/10 bg-white/[0.02] p-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-amber-400/40"
+            className="w-full rounded-xl border border-white/10 bg-white/[0.02] p-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-[var(--amber)]"
           />
           <div className="mt-2 flex justify-end">
             <button
               type="submit"
               disabled={busy || draft.trim().length === 0}
-              className="rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-5 py-2 text-sm font-extrabold text-[#1a0f00] hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-50"
+              className="r2-btn r2-btn--primary disabled:cursor-not-allowed disabled:opacity-50"
             >
               {busy ? 'Posting…' : 'Post comment'}
             </button>
@@ -336,7 +327,7 @@ export function LessonDiscussion({ track, slug }: { track: string; slug: string 
         </form>
       ) : (
         <p className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-zinc-300">
-          <Link href="/login" className="font-bold text-amber-300 hover:underline">
+          <Link href="/login" className="font-bold text-white hover:underline">
             Log in
           </Link>{' '}
           to join the discussion.
@@ -389,7 +380,7 @@ function CommentItem({
       <button
         type="button"
         onClick={() => onReply(comment.id)}
-        className="mt-2 text-xs font-semibold text-amber-300 hover:underline"
+        className="mt-2 text-xs font-semibold text-gray-300 hover:text-white hover:underline"
       >
         Reply
       </button>
