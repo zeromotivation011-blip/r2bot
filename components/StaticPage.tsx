@@ -25,7 +25,10 @@ export function StaticPage({
     <CopilotProvider>
       <Nav />
 
-      <main style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>
+      {/* The site-wide skip link targets #main-content (components/SkipToContent).
+          Without the id it jumped nowhere, which Lighthouse reports as
+          "Skip links are not focusable". */}
+      <main id="main-content" style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>
         <div className="container" style={{ maxWidth }}>
           <div className="section-eyebrow">{eyebrow}</div>
           <h1 className="display" style={{ fontSize: 'clamp(40px, 5.5vw, 60px)', lineHeight: 1.05, margin: '0 0 22px', color: 'var(--mist)' }}>
