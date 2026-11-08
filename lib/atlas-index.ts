@@ -120,7 +120,11 @@ export async function runAtlasIndex(
   for (let i = 0; i < entries.length; i += UPSERT_BATCH) {
     const chunk = entries.slice(i, i + UPSERT_BATCH).map((e) => ({
       ...e,
-      status: 'published',
+      // NOT 'published'. lib/atlas-db.ts serves published rows in preference
+      // to the MDX file, and these rows carry body_md (for retrieval) but no
+      // `body`/`data` — so writing 'published' here blanked all 512 entry
+      // pages the first time this ran.
+      status: 'indexed',
       origin: 'mdx',
     }))
     const { error } = await db.from('atlas_entries').upsert(chunk, { onConflict: 'type,slug' })
