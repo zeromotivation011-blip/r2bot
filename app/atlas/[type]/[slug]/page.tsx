@@ -171,7 +171,7 @@ export default async function AtlasEntryPage(
     name: entry.title,
     headline: entry.title,
     description: entry.summary,
-    dateModified: entry.lastReviewed,
+    ...(entry.lastReviewed ? { dateModified: entry.lastReviewed } : {}),
     url: canonical,
     author: authorRef(),
     publisher: { '@type': 'Organization', name: 'R2BOT' },
@@ -264,7 +264,9 @@ export default async function AtlasEntryPage(
           {/* Meta */}
           <div className="atlas-meta">
             <span className="tag">{typeLabel(type)}</span>
-            <span className="muted-tag">Last reviewed · {entry.lastReviewed}</span>
+            {entry.lastReviewed && (
+              <span className="muted-tag">Last reviewed · {entry.lastReviewed}</span>
+            )}
           </div>
 
           {/* Title */}
@@ -563,7 +565,7 @@ export default async function AtlasEntryPage(
               letterSpacing: '.05em',
             }}
           >
-            Last updated · {entry.lastReviewed}
+            {entry.lastReviewed ? `Last updated · ${entry.lastReviewed}` : null}
           </p>
 
           {/* Sources */}

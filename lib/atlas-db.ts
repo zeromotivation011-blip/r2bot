@@ -34,7 +34,15 @@ export async function getAtlasEntryMerged(type: AtlasType, slug: string): Promis
         const frontmatter = (data.data && typeof data.data === 'object')
           ? (data.data as Record<string, unknown>)
           : {}
-        return buildEntry(type, slug, frontmatter, String(data.body ?? ''))
+        const entry = buildEntry(type, slug, frontmatter, String(data.body ?? ''))
+        // Same as the list path: the DB row carries no `lastReviewed`, so fall
+        // back to the file's real date rather than showing none (or, as it
+        // used to, today's).
+        if (!entry.lastReviewed) {
+          const file = getAtlasEntry(type, slug)
+          if (file?.lastReviewed) entry.lastReviewed = file.lastReviewed
+        }
+        return entry
       }
     } catch {
       /* fall through to MDX */
@@ -95,7 +103,17 @@ export async function getAllAtlasEntriesMerged(): Promise<AtlasEntry[]> {
 
     const byKey = new Map<string, AtlasEntry>()
     for (const e of fileEntries) byKey.set(`${e.type}/${e.slug}`, e)
-    for (const e of dbEntries) byKey.set(`${e.type}/${e.slug}`, e) // DB wins
+    for (const e of dbEntries) {
+      const key = `${e.type}/${e.slug}`
+      const file = byKey.get(key)
+      // DB wins on content — that is the point of the admin editor. But it
+      // must not erase a field it never stored: the `data` JSON in
+      // atlas_entries carries no `lastReviewed`, so a straight replacement
+      // dropped the real review date of every entry that also exists as a
+      // file, and the date then defaulted forward to today. Carry the file's
+      // date over when the DB has none.
+      byKey.set(key, file && !e.lastReviewed ? { ...e, lastReviewed: file.lastReviewed } : e)
+    }
     return Array.from(byKey.values())
   } catch {
     // Never let a DB problem shrink the public Atlas.

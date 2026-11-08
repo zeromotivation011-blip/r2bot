@@ -37,13 +37,19 @@ const REQUIRED_SUBSTRINGS = [
   '/es/',
 ]
 
-// A static page claiming it changed today, every day, is the lastmod bug: the
-// sitemap once reported `now` for about forty URLs. This check cannot tell
-// "genuinely edited today" from "always says today" in a single run — pages
-// edited today legitimately carry today's date — so the threshold only catches
-// the pathological case. If this trips, diff the offending URLs against
-// lib/content-dates.ts: anything not edited today is the bug.
-const MAX_TODAY_LASTMOD = 25
+// A static page claiming it changed today, every day, is the lastmod bug.
+// This check cannot tell "genuinely edited today" from "always says today" in
+// a single run, so the threshold only catches the pathological case. If it
+// trips, diff the offending URLs against lib/content-dates.ts and the content
+// itself: anything not actually edited today is the bug.
+//
+// Calibration: it caught a real one on 8 Nov 2026 at 567 URLs. Every Atlas
+// entry was reporting today, every day, because the atlas_entries rows carry
+// no `lastReviewed` and the missing value defaulted forward to the current
+// date. A day when a large batch legitimately ships — 25 new Quick Lessons
+// plus their hubs and translations — reaches about 60, so the ceiling sits
+// above that and well below the broken case.
+const MAX_TODAY_LASTMOD = 120
 
 function fail(msg) {
   console.error(`FAIL  ${msg}`)
