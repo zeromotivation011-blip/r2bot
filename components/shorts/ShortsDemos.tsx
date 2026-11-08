@@ -1,6 +1,16 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
+
+// Each demo below is a small physics simulation, so a per-frame loop is the
+// right shape for it. What is not right is running that loop while nobody is
+// looking: the homepage embeds one of these, and it used to tick at 60fps —
+// each tick a React state update — whether the demo was on screen or scrolled
+// far above the fold, and whether or not the tab was even in front.
+//
+// ShortDemo now publishes its host element on this context and useFrame only
+// runs while that element intersects the viewport and the page is visible.
+const FrameHostContext = createContext<React.RefObject<HTMLDivElement | null> | null>(null)
 import type { DemoKind } from '@/lib/shorts'
 
 const card = { padding: 16, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', margin: '20px 0' } as const
@@ -10,18 +20,66 @@ const btn = (on = false) => ({ padding: '8px 14px', borderRadius: 999, border: '
 function useFrame(cb: (dt: number) => void) {
   const ref = useRef(cb)
   ref.current = cb
+  const host = useContext(FrameHostContext)
+
   useEffect(() => {
     let id = 0
     let last = performance.now()
+    let running = false
+
     const loop = (t: number) => {
+      // Clamp dt so a long pause (scrolled away, tab in the background) does
+      // not resume with one enormous step that throws the simulation.
       const dt = Math.min(0.05, (t - last) / 1000)
       last = t
       ref.current(dt)
       id = requestAnimationFrame(loop)
     }
-    id = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(id)
-  }, [])
+
+    const start = () => {
+      if (running) return
+      running = true
+      last = performance.now()
+      id = requestAnimationFrame(loop)
+    }
+
+    const stop = () => {
+      if (!running) return
+      running = false
+      cancelAnimationFrame(id)
+      id = 0
+    }
+
+    const el = host?.current
+    let onscreen = !el // no host element (shouldn't happen): behave as before
+    const sync = () => {
+      if (onscreen && !document.hidden) start()
+      else stop()
+    }
+
+    let io: IntersectionObserver | undefined
+    if (el && typeof IntersectionObserver !== 'undefined') {
+      io = new IntersectionObserver(
+        (entries) => {
+          onscreen = entries.some((e) => e.isIntersecting)
+          sync()
+        },
+        { rootMargin: '120px' },
+      )
+      io.observe(el)
+    } else {
+      onscreen = true
+    }
+
+    document.addEventListener('visibilitychange', sync)
+    sync()
+
+    return () => {
+      document.removeEventListener('visibilitychange', sync)
+      io?.disconnect()
+      stop()
+    }
+  }, [host])
 }
 
 // ── Echo: ultrasonic distance ────────────────────────────────────────────
@@ -181,9 +239,19 @@ function Loop({ steps }: { steps: [string, string, string] }) {
 }
 
 export default function ShortDemo({ kind, loop }: { kind: DemoKind; loop?: [string, string, string] }) {
-  if (kind === 'echo') return <Echo />
-  if (kind === 'feedback') return <Feedback />
-  if (kind === 'gears') return <Gears />
-  if (kind === 'tilt') return <Tilt />
-  return <Loop steps={loop ?? ['Sense the world', 'Think and decide', 'Act']} />
+  const host = useRef<HTMLDivElement>(null)
+  const demo =
+    kind === 'echo' ? <Echo /> :
+    kind === 'feedback' ? <Feedback /> :
+    kind === 'gears' ? <Gears /> :
+    kind === 'tilt' ? <Tilt /> :
+    <Loop steps={loop ?? ['Sense the world', 'Think and decide', 'Act']} />
+
+  // Unstyled wrapper: it exists only to give the IntersectionObserver a box to
+  // watch. The demos are block-level, so it changes no layout.
+  return (
+    <div ref={host}>
+      <FrameHostContext.Provider value={host}>{demo}</FrameHostContext.Provider>
+    </div>
+  )
 }
