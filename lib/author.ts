@@ -36,7 +36,7 @@ export const AUTHOR = {
   ],
   /** Public profiles. Added to Person.sameAs. */
   sameAs: [
-    'https://www.youtube.com/@R2BOTINDIA',
+    'https://www.youtube.com/channel/UCkqlyCeLtTpT_j6Q-3NFxww',
     'https://www.instagram.com/r2bot.in',
   ],
   /** Path to a photo in /public. Null is fine — see the note above. */

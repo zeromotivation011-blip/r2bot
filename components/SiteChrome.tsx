@@ -1,12 +1,11 @@
 import type { ReactNode } from 'react'
 import { Nav } from '@/components/Nav'
-import { SiteFooter } from '@/components/SiteFooter'
 import { CopilotProvider } from '@/components/CopilotProvider'
 import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
 
 /**
- * Header, footer and Co-pilot around a page.
+ * Header and Co-pilot around a page.
  *
  * About forty indexable pages had no navigation at all — the whole Quick
  * Lessons section, the whole course path, /start, /ai-robotics, /about, and
@@ -19,6 +18,11 @@ import { CopilotDrawer } from '@/components/CopilotDrawer'
  * already render their own <Nav /> are left alone — wrapping those would give
  * them two.
  *
+ * The footer is NOT here: it lives in the root layout, because the sections
+ * that render their own <Nav /> (Atlas, the visualizer, news, the blog, the
+ * ROS 2 playground) could never be given one this way, and every one of them
+ * was ending in a dead stop.
+ *
  * Nav is a client component that reads the Co-pilot context, so the provider
  * has to sit above it.
  */
@@ -27,7 +31,6 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     <CopilotProvider>
       <Nav />
       {children}
-      <SiteFooter />
       <CopilotBubble />
       <CopilotDrawer />
     </CopilotProvider>

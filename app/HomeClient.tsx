@@ -113,7 +113,6 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
       <Reveal><NewsTeaser items={news} /></Reveal>
       <Reveal><LensTeaser items={videos} /></Reveal>
       <Reveal><NewsletterCTA /></Reveal>
-      <Footer />
 
       <style jsx global>{`
         :global(body) { background: var(--void); }
@@ -936,53 +935,3 @@ function NewsletterCTA() {
   )
 }
 
-// ─── FOOTER ───────────────────────────────────────────────────────────────
-function Footer() {
-  const cols: { h: string; links: { label: string; href: string }[] }[] = [
-    // Four "Track" links all pointing at /academy was four ways to go to the
-    // same place. The surfaces removed from the main nav live here instead.
-    { h: 'Learn',    links: [{ label: 'Quick Lessons', href: '/shorts' }, { label: 'Free course path', href: '/courses' }, { label: 'Academy', href: '/academy' }, { label: 'Find my level', href: '/diagnostic' }, { label: 'Daily Challenge', href: '/challenge' }] },
-    { h: 'Reference',links: [{ label: 'Atlas', href: '/atlas' }, { label: 'AI + Robotics', href: '/ai-robotics' }, { label: 'Robots', href: '/robots' }, { label: 'Simulators', href: '/visualizer' }, { label: 'Robot projects', href: '/build' }] },
-    { h: 'Discover', links: [{ label: 'News', href: '/news' }, { label: 'Lens', href: '/lens' }, { label: 'Blog', href: '/blog' }, { label: 'Daily life', href: '/daily-life' }, { label: 'Career paths', href: '/careers' }] },
-    { h: 'Community',links: [{ label: 'The Lab', href: '/lab' }, { label: 'Project showcase', href: '/showcase' }, { label: 'Robotics in India', href: '/india' }, { label: 'For teachers', href: '/teachers' }] },
-    { h: 'Company',  links: [{ label: 'About', href: '/about' }, { label: 'Written by Ravi', href: '/author/ravi' }, { label: 'Mission', href: '/mission' }, { label: 'Contact', href: 'mailto:hello@r2bot.in' }, { label: 'Privacy', href: '/privacy' }, { label: 'Terms', href: '/terms' }] },
-  ]
-  return (
-    <footer style={{ padding: '56px 20px', background: 'var(--void)', borderTop: '1px solid var(--border)' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div className="m-stack-2" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr', gap: 32, marginBottom: 40 }}>
-          <div>
-            <p style={{ fontWeight: 900, fontSize: 24, color: '#fff', margin: '0 0 8px' }}>
-              R<span style={{ color: '#FF8A4C' }}>2</span>BOT
-            </p>
-            <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 16px', lineHeight: 1.5 }}>
-              ROBOT, decoded — for the world. From your first concept to job-ready.
-            </p>
-            <p style={{ fontSize: 14, color: '#FC6818', fontWeight: 700, margin: 0 }}>
-              Learn it. Build it. Ship it.
-            </p>
-          </div>
-          {cols.map(c => (
-            <div key={c.h}>
-              <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '2px', color: '#374151', fontWeight: 900, margin: '0 0 12px' }}>{c.h}</p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {c.links.map(l => (
-                  <li key={l.label}>
-                    <Link href={l.href} style={{ fontSize: 13, color: '#94a3b8', textDecoration: 'none' }}>{l.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <div style={{ paddingTop: 24, borderTop: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <p style={{ fontSize: 12, color: '#374151' }}>Made with ❤️ for robotics learners worldwide · © 2026 R2BOT</p>
-          <div style={{ display: 'flex', gap: 20 }}>
-            <a href="https://www.instagram.com/r2bot.in" target="_blank" rel="noopener" style={{ fontSize: 13, color: '#e1306c', textDecoration: 'none', fontWeight: 700 }}>◉ Instagram</a>
-            <a href="https://www.youtube.com/channel/UCkqlyCeLtTpT_j6Q-3NFxww" target="_blank" rel="noopener" style={{ fontSize: 13, color: '#FC6818', textDecoration: 'none', fontWeight: 700 }}>▶ YouTube</a>
-          </div>
-        </div>
-      </div>
-    </footer>
-  )
-}

@@ -12,6 +12,7 @@ import { AuthProvider } from '@/components/auth/AuthProvider';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { RefCapture } from '@/components/RefCapture';
 import { HideOnEmbed } from '@/components/HideOnEmbed';
+import { SiteFooter } from '@/components/SiteFooter';
 import { organizationJsonLD } from '@/lib/seo/jsonld';
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
@@ -104,6 +105,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ToastProvider>
             <HideOnEmbed><ProgressBanner /></HideOnEmbed>
             {children}
+            {/* One footer for the whole site. Section layouts can add a header
+                (see components/SiteChrome.tsx), but pages that render their own
+                <Nav /> could never be given a footer that way, so for most of
+                the site the page simply stopped at the last paragraph. */}
+            <HideOnEmbed><SiteFooter /></HideOnEmbed>
             <AuthModal />
           </ToastProvider>
         </AuthProvider>

@@ -11,6 +11,11 @@ import { AUTHOR } from '@/lib/author'
  *
  * Also where the surfaces that are real but not nav-worthy live — the Lab and
  * the Showcase while they are still empty, and the language versions.
+ *
+ * Mounted in app/layout.tsx, not in SiteChrome: pages that render their own
+ * <Nav /> (Atlas, news, the blog, the visualizer, the playground) could not be
+ * wrapped in SiteChrome without getting two headers, so they had no footer at
+ * all — the whole reference side of the site ended in a dead stop.
  */
 
 const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] = [
@@ -77,6 +82,15 @@ export function SiteFooter() {
   return (
     <footer className="mt-20 border-t border-white/10 bg-[var(--void)]">
       <div className="mx-auto max-w-6xl px-5 py-12">
+        <div className="mb-10 max-w-sm">
+          <p className="text-2xl font-black text-white">
+            R<span className="text-[#FF8A4C]">2</span>BOT
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-gray-500">
+            ROBOT, decoded — for the world. From your first concept to job-ready.
+          </p>
+        </div>
+
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
           {COLUMNS.map((col) => (
             <nav key={col.heading} aria-label={col.heading}>
@@ -112,7 +126,7 @@ export function SiteFooter() {
           </nav>
           <div className="ml-auto flex gap-4">
             <a
-              href="https://www.youtube.com/@R2BOTINDIA"
+              href="https://www.youtube.com/channel/UCkqlyCeLtTpT_j6Q-3NFxww"
               target="_blank"
               rel="noopener"
               className="text-sm text-gray-400 hover:text-amber-400"
@@ -134,8 +148,7 @@ export function SiteFooter() {
         </div>
 
         <p className="mt-6 text-xs text-gray-600">
-          © {new Date().getFullYear()} R2BOT. Everything here is free to read and free to use in a
-          classroom.
+          © R2BOT. Everything here is free to read and free to use in a classroom.
         </p>
       </div>
     </footer>
