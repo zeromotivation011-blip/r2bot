@@ -1,0 +1,86 @@
+name: Site-wide quality audit
+
+# Lighthouse across every page template — performance, ACCESSIBILITY, SEO and
+# best-practices — using Unlighthouse (github.com/harlan-zw/unlighthouse, MIT).
+#
+# This exists because every other check in this repo measures whether a page
+# exists, not whether it is any good. On 8 Nov 2026 all 512 Atlas pages served a
+# blank page for hours while the sitemap check, the link crawl, the homepage
+# Lighthouse budget and the build all stayed green.
+#
+# Division of labour with the existing checks:
+#   quality.yml      — type-check + lint on every PR (fast gate)
+#   lighthouse       — ONE page (homepage) with a hard budget, per PR
+#   live-checks.yml  — daily: sitemap honesty, dead links, Atlas has content
+#   this workflow    — weekly: full Lighthouse suite across all templates
+#
+# Weekly, not per-PR: a site-wide scan takes minutes, and per-PR performance
+# regressions are already caught by the homepage budget.
+on:
+  schedule:
+    - cron: '23 4 * * 1' # Monday 09:53 IST, after the weekend content crons
+  workflow_dispatch:
+    inputs:
+      site:
+        description: 'Origin to audit'
+        default: 'https://www.r2bot.in'
+        required: false
+      budget:
+        description: 'Minimum score to require (leave empty to report only)'
+        default: ''
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install the auditor
+        # CI-only, global, pinned. Never a dependency in package.json — nothing
+        # about this reaches the browser bundle.
+        run: npm install -g @unlighthouse/cli@0.19.1
+
+      - name: Audit every page template
+        # --mobile: the audience is phone-first, so desktop numbers would
+        #   flatter us. CLAUDE.md §11 is mobile-first; measure what they get.
+        # --exclude-urls: the parked, noindex surfaces (CLAUDE.md §6) plus admin
+        #   and API routes. Auditing a page we deliberately hide from Google
+        #   would spend minutes to produce a number nobody should act on.
+        # --samples 1: one pass per template. Enough to catch a page that is
+        #   broken or inaccessible; not enough for fine perf trending, which is
+        #   the homepage budget's job.
+        # No --budget on the scheduled run: see unlighthouse.config.js for why
+        #   an unmeasured budget is worse than none.
+        run: |
+          BUDGET_FLAG=""
+          if [ -n "${{ inputs.budget }}" ]; then
+            BUDGET_FLAG="--budget ${{ inputs.budget }}"
+          fi
+          unlighthouse-ci \
+            --site "${{ inputs.site || 'https://www.r2bot.in' }}" \
+            --mobile \
+            --samples 1 \
+            --build-static \
+            --reporter jsonExpanded \
+            --exclude-urls "/admin/**,/api/**,/jobs/**,/leaderboard/**,/schools/**,/hardware/**,/history/**,/lab/**,/showcase/**" \
+            $BUDGET_FLAG
+
+      - name: Summarise the worst pages
+        if: always()
+        run: node scripts/summarise-audit.mjs
+
+      - name: Keep the full report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-audit-report
+          path: .unlighthouse/
+          retention-days: 30

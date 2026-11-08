@@ -1,0 +1,119 @@
+#!/usr/bin/env node
+// Turn an Unlighthouse run into a short, readable summary in the Actions log.
+//
+// WHY THIS IS DEFENSIVE: the exact filename and JSON shape of the reporter
+// output were not verified against a real run when this was written (the audit
+// could not be executed in the authoring environment). So rather than assume a
+// path and crash the workflow on a guess, this discovers whatever JSON the run
+// produced, handles the shapes it may take, and says plainly when it cannot
+// read something. A reporting step must never be the reason a workflow fails:
+// it exits 0 no matter what. The budget flag is what fails a run.
+//
+// Once a real run has happened, tighten this to the actual shape.
+
+import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { join } from 'node:path'
+
+const DIR = process.argv[2] || '.unlighthouse'
+
+function findJson(dir, depth = 0) {
+  if (depth > 3) return []
+  let out = []
+  let entries
+  try {
+    entries = readdirSync(dir)
+  } catch {
+    return []
+  }
+  for (const name of entries) {
+    const p = join(dir, name)
+    let s
+    try {
+      s = statSync(p)
+    } catch {
+      continue
+    }
+    if (s.isDirectory()) out = out.concat(findJson(p, depth + 1))
+    else if (name.endsWith('.json')) out.push({ path: p, size: s.size })
+  }
+  return out
+}
+
+const files = findJson(DIR).sort((a, b) => b.size - a.size)
+if (files.length === 0) {
+  console.log(`No JSON report found under ${DIR}/.`)
+  console.log('The scan may have failed before writing results — check the audit step above.')
+  process.exit(0)
+}
+
+console.log(`Found ${files.length} JSON file(s) under ${DIR}/. Reading the largest.`)
+
+let parsed
+try {
+  parsed = JSON.parse(readFileSync(files[0].path, 'utf8'))
+} catch (err) {
+  console.log(`Could not parse ${files[0].path}: ${err.message}`)
+  process.exit(0)
+}
+
+// Pull out anything that looks like {url/path, score(s)}. Unlighthouse has used
+// a few shapes across versions, so probe rather than insist.
+const rows = []
+const visit = (node) => {
+  if (!node || typeof node !== 'object') return
+  if (Array.isArray(node)) {
+    node.forEach(visit)
+    return
+  }
+  const url = node.route?.path ?? node.path ?? node.url ?? node.finalUrl
+  const cats = node.categories ?? node.report?.categories ?? node.score
+  if (url && cats) {
+    const pick = (k) => {
+      const v = cats?.[k]?.score ?? cats?.[k]
+      return typeof v === 'number' ? Math.round(v <= 1 ? v * 100 : v) : null
+    }
+    rows.push({
+      url: String(url),
+      performance: pick('performance'),
+      accessibility: pick('accessibility'),
+      seo: pick('seo'),
+      best: pick('best-practices'),
+      overall: typeof cats === 'number' ? Math.round(cats <= 1 ? cats * 100 : cats) : null,
+    })
+  }
+  Object.values(node).forEach(visit)
+}
+visit(parsed)
+
+if (rows.length === 0) {
+  console.log('Report parsed, but no per-page scores recognised in it.')
+  console.log('Top-level keys:', Object.keys(parsed).slice(0, 20).join(', '))
+  console.log('The full report is attached to this run as an artifact.')
+  process.exit(0)
+}
+
+// Deduplicate by URL, keeping the first.
+const seen = new Set()
+const unique = rows.filter((r) => (seen.has(r.url) ? false : seen.add(r.url)))
+
+const avg = (k) => {
+  const vals = unique.map((r) => r[k]).filter((v) => typeof v === 'number')
+  return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : '—'
+}
+
+console.log(`\n${unique.length} pages audited.`)
+console.log(
+  `Averages — performance ${avg('performance')}, accessibility ${avg('accessibility')}, ` +
+    `SEO ${avg('seo')}, best-practices ${avg('best')}`,
+)
+
+// Accessibility first: it is the bar with no other coverage anywhere, and a
+// failure there is a person who cannot use the page, not a slow page.
+for (const cat of ['accessibility', 'seo', 'performance', 'best']) {
+  const scored = unique.filter((r) => typeof r[cat] === 'number').sort((a, b) => a[cat] - b[cat])
+  if (scored.length === 0) continue
+  console.log(`\nWorst ${cat}:`)
+  for (const r of scored.slice(0, 8)) console.log(`  ${String(r[cat]).padStart(3)}  ${r.url}`)
+}
+
+console.log('\nFull interactive report: the "site-audit-report" artifact on this run.')
