@@ -1,0 +1,65 @@
+name: Live checks
+
+# Everything here failed in production at least once and was found weeks later
+# by a human reading carefully:
+#   - the sitemap served a July view of the site for months, missing ~300 URLs
+#   - pages inherited the homepage canonical
+#   - Atlas links 404'd after slugs changed
+#   - first-load JS crept up until a phone on 3G bounced
+# Runs daily, and on demand after a deploy.
+on:
+  schedule:
+    - cron: '37 6 * * *' # 12:07 IST, after the daily content cron
+  workflow_dispatch:
+    inputs:
+      base:
+        description: 'Origin to check'
+        default: 'https://www.r2bot.in'
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  sitemap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Assert the sitemap is real and honest
+        run: node scripts/check-sitemap.mjs "${{ inputs.base || 'https://www.r2bot.in' }}"
+
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Crawl every URL in the sitemap for dead links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --max-concurrency 8
+            --timeout 20
+            --accept 200,206,999
+            --exclude-path .git
+            --sitemap "${{ inputs.base || 'https://www.r2bot.in' }}/sitemap.xml"
+          fail: true
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Core pages against a performance budget
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            ${{ inputs.base || 'https://www.r2bot.in' }}/
+            ${{ inputs.base || 'https://www.r2bot.in' }}/shorts
+            ${{ inputs.base || 'https://www.r2bot.in' }}/atlas/concept/slam
+            ${{ inputs.base || 'https://www.r2bot.in' }}/courses
+            ${{ inputs.base || 'https://www.r2bot.in' }}/news
+          budgetPath: ./lighthouse-budget.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true

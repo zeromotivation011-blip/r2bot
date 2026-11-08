@@ -7,6 +7,7 @@ import { useCopilot } from './CopilotProvider';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { StreakBadge } from './StreakBadge';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { SiteSearch } from './search/SiteSearch';
 import { useAuth } from './auth/AuthProvider';
 
 type Leaf = {
@@ -350,6 +351,12 @@ export function Nav() {
           <StreakBadge />
 
           <AuthMenu />
+
+          {/* Search finds a page that exists; Ask R2 answers a question. Two
+              different jobs, so two affordances: "/" opens search, ⌘K the
+              Co-pilot. Until now the site had 923 indexable URLs and no way
+              to search them. */}
+          <SiteSearch />
 
           <button type="button" className="nav-ask" onClick={openDrawer} aria-label="Ask R2 Co-pilot">
             <svg

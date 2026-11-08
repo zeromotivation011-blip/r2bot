@@ -1,0 +1,30 @@
+name: Quality
+
+# The cheap half of CLAUDE.md §15, enforced by a machine instead of memory.
+# Deliberately does NOT run `next build`: the build needs Supabase, Anthropic
+# and Resend keys, which live in Vercel and are not mirrored into GitHub
+# secrets. Vercel is the build gate; this is the type and lint gate, and
+# live-checks.yml covers what only a deployed site can show.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  types-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Type-check (strict, no any)
+        run: npm run type-check
+      - name: Lint
+        run: npm run lint
