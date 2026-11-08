@@ -7,7 +7,7 @@ import { listPublishedCourses } from '@/lib/courses'
 import { BASE_URL, button, esc, renderEmail } from '@/lib/email-layout'
 import { getNewsData } from '@/lib/news'
 import { getAllAtlasEntries } from '@/lib/atlas'
-import { SHORTS } from '@/lib/shorts'
+import { SHORTS, liveShorts } from '@/lib/shorts'
 
 const DAY = 86_400_000
 
@@ -177,7 +177,7 @@ export async function runEmailAutomation(): Promise<Result> {
         ? `<h3 style="margin:18px 0 6px">In the news</h3>` + stories.map((st) => `<p style="margin:0 0 12px"><a href="${esc(st.href)}" style="color:#0B2540;font-weight:700">${esc(st.title)}</a><br>${esc(st.summary.slice(0, 180))}</p>`).join('')
         : ''
       const termHtml = term ? `<h3 style="margin:18px 0 6px">Term of the week</h3><p style="margin:0 0 6px"><a href="${BASE_URL}/atlas/${esc(term.type)}/${esc(term.slug)}" style="color:#0B2540;font-weight:700">${esc(term.title)}</a> explained in plain English.</p>` : ''
-      const lesson = SHORTS[week % SHORTS.length]
+      const lesson = SHORTS[week % liveShorts().length]
       const lessonHtml = `<h3 style="margin:18px 0 6px">One-minute lesson</h3><p style="margin:0 0 6px"><a href="${BASE_URL}/shorts/${esc(lesson.slug)}" style="color:#0B2540;font-weight:700">${esc(lesson.title)}</a><br>${esc(lesson.summary)} Watch it, play with the demo, answer one question.</p>`
       const { data: subs } = await sb.from('newsletter_subscribers').select('email, unsubscribe_token').eq('active', true)
       for (const sub of subs ?? []) {

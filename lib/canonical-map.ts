@@ -12,7 +12,7 @@
 // Anything that breaks that rule is either redirected here or differentiated
 // and cross-linked, so the two pages feed each other instead of competing.
 
-import { SHORTS } from '@/lib/shorts'
+import { SHORTS, isLive } from '@/lib/shorts'
 
 /**
  * Atlas robot entries that are the same robot as a far richer /robots page.
@@ -50,28 +50,34 @@ export const ATLAS_ROBOTS_REDIRECTED: ReadonlySet<string> = new Set(
  * showing the video on the Atlas page is what makes two pages on one topic
  * useful rather than competing — different intent, mutually linked.
  */
-const LESSON_BY_ATLAS_PATH: Map<string, { slug: string; title: string }> = (() => {
-  const map = new Map<string, { slug: string; title: string }>()
+const LESSON_BY_ATLAS_PATH: Map<string, { slug: string; title: string }[]> = (() => {
+  const map = new Map<string, { slug: string; title: string }[]>()
+  const add = (path: string, lesson: { slug: string; title: string }) => {
+    const list = map.get(path) ?? []
+    if (!list.some((l) => l.slug === lesson.slug)) list.push({ slug: lesson.slug, title: lesson.title })
+    map.set(path, list)
+  }
   for (const lesson of SHORTS) {
-    for (const link of lesson.atlas) {
-      const path = link.href.split('?')[0].replace(/\/+$/, '')
-      // First lesson to claim a concept keeps it, so the mapping is stable
-      // regardless of how many lessons mention the same term in passing.
-      if (!map.has(path)) map.set(path, { slug: lesson.slug, title: lesson.title })
-    }
-    // An exact slug match is the strongest possible signal of the same topic.
-    const exact = `/atlas/concept/${lesson.slug}`
-    if (!map.has(exact)) map.set(exact, { slug: lesson.slug, title: lesson.title })
+    // An exact slug match is the strongest possible signal of the same topic,
+    // so it goes first; otherwise the first lesson to claim a concept keeps it.
+    add(`/atlas/concept/${lesson.slug}`, lesson)
+  }
+  for (const lesson of SHORTS) {
+    for (const link of lesson.atlas) add(link.href.split('?')[0].replace(/\/+$/, ''), lesson)
   }
   return map
 })()
 
-/** The Quick Lesson for an Atlas entry, if one teaches the same idea. */
+/** The Quick Lesson for an Atlas entry, if one teaches the same idea (and its Short is public). */
 export function quickLessonForAtlas(
   type: string,
   slug: string,
 ): { slug: string; title: string; href: string } | null {
-  const hit = LESSON_BY_ATLAS_PATH.get(`/atlas/${type}/${slug}`)
+  const list = LESSON_BY_ATLAS_PATH.get(`/atlas/${type}/${slug}`) ?? []
+  const hit = list.find((l) => {
+    const full = SHORTS.find((x) => x.slug === l.slug)
+    return full ? isLive(full) : false
+  })
   if (!hit) return null
   return { ...hit, href: `/shorts/${hit.slug}` }
 }

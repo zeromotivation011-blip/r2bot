@@ -2,14 +2,15 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { lessonLanguages } from '@/lib/shorts-i18n'
-import { SHORTS, SHORT_COURSES, getShort, shortsInCourse } from '@/lib/shorts'
+import { SHORTS, SHORT_COURSES, getShort, shortsInCourse, liveShorts, isLive, liveVideoIds } from '@/lib/shorts'
 import ShortDemo from '@/components/shorts/ShortsDemos'
 import { ShortEmbed, LessonQuiz, ProgressBar } from '@/components/shorts/ShortsClient'
 import ShareBar from '@/components/ShareBar'
 import { authorRef } from '@/lib/author'
 
 const BASE = 'https://www.r2bot.in'
-export const revalidate = 86400
+// Hourly, so a lesson switches itself on when its Short's release date passes.
+export const revalidate = 3600
 export function generateStaticParams() { return SHORTS.map((s) => ({ slug: s.slug })) }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -19,6 +20,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: s.title,
     description: s.summary.slice(0, 158),
     alternates: { canonical: `${BASE}/shorts/${s.slug}`, languages: lessonLanguages(s.slug) },
+    // Not public yet: reachable (the Short's description links here) but not indexed.
+    ...(isLive(s) ? {} : { robots: { index: false, follow: true } }),
     openGraph: { title: s.title, description: s.summary, images: [`https://i.ytimg.com/vi/${s.ids[0]}/hqdefault.jpg`] },
   }
 }
@@ -28,10 +31,13 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
   const s = getShort((await params).slug)
   if (!s) notFound()
   const course = SHORT_COURSES.find((c) => c.slug === s.course)!
-  const siblings = shortsInCourse(s.course)
-  const next = getShort(s.next ?? SHORTS[0].slug) ?? SHORTS[0]
+  const siblings = shortsInCourse(s.course, s.slug)
+  const live = isLive(s)
+  const videoIds = liveVideoIds(s)
+  const wanted = getShort(s.next ?? '')
+  const next = (wanted && isLive(wanted) ? wanted : undefined) ?? liveShorts().find((x) => x.slug !== s.slug) ?? SHORTS[0]
   const ld = [
-    ...s.ids.map((id) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: s.title, description: s.summary, thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${id}`, contentUrl: `https://www.youtube.com/shorts/${id}`, uploadDate: s.videoPublished ?? '2026-11-06', publisher: { '@type': 'Organization', name: 'R2BOT' } })),
+    ...videoIds.map((id) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: s.title, description: s.summary, thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${id}`, contentUrl: `https://www.youtube.com/shorts/${id}`, uploadDate: s.publishAt ? s.publishAt.slice(0, 10) : (s.videoPublished ?? '2026-11-06'), publisher: { '@type': 'Organization', name: 'R2BOT' } })),
     { '@context': 'https://schema.org', '@type': 'Article', headline: s.title, description: s.summary, author: authorRef(), mainEntityOfPage: `${BASE}/shorts/${s.slug}` },
     { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Quick Lessons', item: `${BASE}/shorts` }, { '@type': 'ListItem', position: 2, name: s.title, item: `${BASE}/shorts/${s.slug}` }] },
   ]
@@ -49,7 +55,15 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
       <p className="r2-lede">{s.summary}</p>
 
       <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', margin: '18px 0' }}>
-        {s.ids.map((id, i) => <ShortEmbed key={id} id={id} title={`${s.title} (video ${i + 1})`} />)}
+        {live
+          ? videoIds.map((id, i) => <ShortEmbed key={id} id={id} title={`${s.title} (video ${i + 1})`} />)
+          : <div className="r2-card r2-note" style={{ width: 'min(100%, 270px)', aspectRatio: '9 / 16', display: 'grid', placeItems: 'center', textAlign: 'center', padding: 20 }}>
+              <div>
+                <p className="r2-note__label">The Short goes public</p>
+                <p className="r2-body" style={{ fontWeight: 700 }}>{new Date(s.publishAt!).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' })}</p>
+                <p className="r2-body">The demo and quiz below work now.</p>
+              </div>
+            </div>}
       </div>
 
       <ShortDemo kind={s.demo} loop={s.loop} />

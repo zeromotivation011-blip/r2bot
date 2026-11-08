@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { SHORTS, SHORT_COURSES, shortsInCourse } from '@/lib/shorts'
+import { SHORTS, SHORT_COURSES, shortsInCourse, liveShorts } from '@/lib/shorts'
 import { CourseCover } from '@/components/shorts/CourseCover'
 import { StartOrContinue, Tick, CourseProgress } from '@/components/shorts/ShortsClient'
 import InlineSignup from '@/components/InlineSignup'

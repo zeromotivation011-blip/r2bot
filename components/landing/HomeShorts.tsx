@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { SHORTS, SHORT_COURSES, shortsInCourse } from '@/lib/shorts'
+import { SHORTS, SHORT_COURSES, shortsInCourse, liveShorts } from '@/lib/shorts'
 
 /**
  * Quick Lessons on the homepage.
@@ -19,13 +19,13 @@ import { SHORTS, SHORT_COURSES, shortsInCourse } from '@/lib/shorts'
 const PICK = ['ultrasonic-sensor', 'servo-motor', 'gears', 'gyroscope-imu', 'feedback-control', 'warehouse-robots']
 
 export default function HomeShorts() {
-  const picks = PICK.map((s) => SHORTS.find((x) => x.slug === s)).filter(Boolean) as typeof SHORTS
+  const picks = PICK.map((s) => liveShorts().find((x) => x.slug === s)).filter(Boolean) as typeof SHORTS
 
   return (
     <section className="r2-section">
       <div className="r2-wrap">
         <p className="r2-eyebrow">One minute each</p>
-        <h2 className="r2-h2">{SHORTS.length} quick lessons, grouped into five short courses</h2>
+        <h2 className="r2-h2">{liveShorts().length} quick lessons, grouped into five short courses</h2>
         <p className="r2-body" style={{ marginTop: '0.75rem' }}>
           A one-minute video, a demo you can play with, and one question to check it landed.
           Start anywhere.

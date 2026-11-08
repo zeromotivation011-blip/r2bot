@@ -8,7 +8,7 @@ import { getAllPostsMerged } from '@/lib/blog-db';
 import { listProjectSlugs } from '@/lib/build/loader';
 import { SIMULATORS } from '@/lib/simulators';
 import { AI_TOPICS } from '@/lib/ai-robotics';
-import { SHORTS, SHORT_COURSES } from '@/lib/shorts';
+import { SHORTS, SHORT_COURSES, liveShorts } from '@/lib/shorts';
 import { SHORTS_ZH } from '@/lib/shorts-zh';
 import { SHORTS_HI } from '@/lib/shorts-hi';
 import { SHORTS_ES } from '@/lib/shorts-es';
@@ -149,13 +149,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       priority: 0.85,
     })),
-    ...SHORTS.map((t) => ({ url: `${BASE}/shorts/${t.slug}`, lastModified: GROUP_UPDATED.shorts, changeFrequency: 'monthly' as const, priority: 0.8 })),
+    ...liveShorts().map((t) => ({ url: `${BASE}/shorts/${t.slug}`, lastModified: GROUP_UPDATED.shorts, changeFrequency: 'monthly' as const, priority: 0.8 })),
     { url: `${BASE}/hi/shorts`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'weekly' as const, priority: 0.8 },
-    ...SHORTS.filter((t) => SHORTS_HI[t.slug]).map((t) => ({ url: `${BASE}/hi/shorts/${t.slug}`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    ...liveShorts().filter((t) => SHORTS_HI[t.slug]).map((t) => ({ url: `${BASE}/hi/shorts/${t.slug}`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'monthly' as const, priority: 0.7 })),
     { url: `${BASE}/es/shorts`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'weekly' as const, priority: 0.8 },
-    ...SHORTS.filter((t) => SHORTS_ES[t.slug]).map((t) => ({ url: `${BASE}/es/shorts/${t.slug}`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    ...liveShorts().filter((t) => SHORTS_ES[t.slug]).map((t) => ({ url: `${BASE}/es/shorts/${t.slug}`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'monthly' as const, priority: 0.7 })),
     { url: `${BASE}/zh/shorts`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'weekly' as const, priority: 0.8 },
-    ...SHORTS.filter((t) => SHORTS_ZH[t.slug]).map((t) => ({ url: `${BASE}/zh/shorts/${t.slug}`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    ...liveShorts().filter((t) => SHORTS_ZH[t.slug]).map((t) => ({ url: `${BASE}/zh/shorts/${t.slug}`, lastModified: GROUP_UPDATED.shortsTranslations, changeFrequency: 'monthly' as const, priority: 0.7 })),
   ];
 
   const aiAndRegional = [

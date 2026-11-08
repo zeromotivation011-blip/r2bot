@@ -19,7 +19,7 @@ export const DEFAULT_PAGE_UPDATED = '2026-11-08T00:00:00.000Z'
 /** Path (no host, no trailing slash) → the day its content last really changed. */
 export const PAGE_UPDATED: Record<string, string> = {
   '/': '2026-11-08T00:00:00.000Z',
-  '/shorts': '2026-11-07T00:00:00.000Z',
+  '/shorts': '2026-11-08T00:00:00.000Z',
   '/courses': '2026-11-08T00:00:00.000Z',
   '/ai-robotics': '2026-11-06T00:00:00.000Z',
   '/ai-robotics/glossary': '2026-11-06T00:00:00.000Z',
@@ -67,7 +67,7 @@ export function pageUpdated(path: string): Date {
 
 /** Dates whole content groups were last extended, for their generated pages. */
 export const GROUP_UPDATED = {
-  shorts: new Date('2026-11-07T00:00:00.000Z'),
+  shorts: new Date('2026-11-08T00:00:00.000Z'),
   shortsTranslations: new Date('2026-11-07T00:00:00.000Z'),
   aiRobotics: new Date('2026-11-06T00:00:00.000Z'),
   simulators: new Date('2026-10-20T00:00:00.000Z'),

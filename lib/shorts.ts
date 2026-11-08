@@ -3,6 +3,7 @@
 // "with it / without it", 1 quiz question, and links into the Atlas.
 
 import { SHORTS_MORE } from '@/lib/shorts-more'
+import { SHORTS_SCHEDULED, SCHEDULED_EXTRA_VIDEOS } from '@/lib/shorts-scheduled'
 
 export type DemoKind = 'echo' | 'feedback' | 'gears' | 'tilt' | 'loop'
 
@@ -28,6 +29,20 @@ export interface ShortLesson {
    * them.
    */
   videoPublished?: string
+  /**
+   * ISO date the Short goes public on YouTube. A lesson with a future
+   * `publishAt` has its page built and reachable (so the link in the Short's
+   * description works the moment it publishes) but it is noindex, left out of
+   * the sitemap, hubs, search, mini-courses and "next" links, and the video
+   * slot shows a release notice instead of an embed. It switches itself on when
+   * the date passes (pages revalidate hourly). No deploy is needed on the day.
+   */
+  publishAt?: string
+  /**
+   * A second Short on a topic this lesson already teaches. It joins the lesson
+   * as an extra embed once its date passes. One topic keeps one URL.
+   */
+  extraVideos?: { id: string; publishAt: string }[]
   atlas: { label: string; href: string }[]
   next?: string // related lesson slug
 }
@@ -387,7 +402,27 @@ const BASE_SHORTS: ShortLesson[] = [
 export const SHORTS: ShortLesson[] = [
   ...BASE_SHORTS.map((s) => ({ videoPublished: '2026-11-06', ...s })),
   ...SHORTS_MORE.map((s) => ({ videoPublished: '2026-11-07', ...s })),
-]
+  ...SHORTS_SCHEDULED,
+].map((s) => (SCHEDULED_EXTRA_VIDEOS[s.slug] ? { ...s, extraVideos: SCHEDULED_EXTRA_VIDEOS[s.slug] } : s))
 
 export const getShort = (slug: string) => SHORTS.find((s) => s.slug === slug)
-export const shortsInCourse = (c: string) => SHORTS.filter((s) => s.course === c)
+
+/** Is this lesson's Short public yet? Evaluated at render time, never at import. */
+export function isLive(s: ShortLesson, now: number = Date.now()): boolean {
+  return !s.publishAt || Date.parse(s.publishAt) <= now
+}
+
+/** Lessons whose video is public. Hubs, sitemap, search and "next" links use this. */
+export function liveShorts(now: number = Date.now()): ShortLesson[] {
+  return SHORTS.filter((s) => isLive(s, now))
+}
+
+/** The YouTube IDs that can be embedded right now (extra videos once released). */
+export function liveVideoIds(s: ShortLesson, now: number = Date.now()): string[] {
+  if (!isLive(s, now)) return []
+  return [...s.ids, ...(s.extraVideos ?? []).filter((v) => Date.parse(v.publishAt) <= now).map((v) => v.id)]
+}
+
+/** Lessons in a mini-course, public ones only (plus `include`, so a page can list itself). */
+export const shortsInCourse = (c: string, include?: string) =>
+  SHORTS.filter((s) => s.course === c && (isLive(s) || s.slug === include))

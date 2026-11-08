@@ -121,6 +121,11 @@ Build these exceptionally; everything else is secondary.
 - **Quick Lessons** (`/shorts`) — THE top of the funnel. One page per one-minute YouTube Short:
   video, interactive demo, "with it / without it", one quiz question, then the email ask. 47 lessons
   in EN/ZH/HI/ES. Every new Short gets a lesson page, added to `lib/shorts.ts`.
+  A lesson with a future `publishAt` (see `lib/shorts-scheduled.ts`) is reachable but noindex and left out
+  of the sitemap, hubs, search, mini-courses and "next" links until that day; it switches on by itself
+  (pages revalidate hourly). A Short that repeats an existing topic is attached to that lesson as an
+  `extraVideos` entry instead of getting a second URL. Always go through `liveShorts()`, never `SHORTS`,
+  for anything a visitor or crawler sees.
 - **Course path** (`/courses`) — the five-course video journey, 50 lessons, 85%-watched gating,
   server-graded quizzes, final activity, certificate. 23 videos live; a course with none is
   noindex and shows a waitlist instead of ten "coming soon" rows.

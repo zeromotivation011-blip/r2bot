@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { SHORTS, SHORT_COURSES, shortsInCourse } from '@/lib/shorts'
+import { SHORTS, SHORT_COURSES, shortsInCourse, liveShorts } from '@/lib/shorts'
 import { ProgressBar, StartOrContinue, Tick, CourseProgress } from '@/components/shorts/ShortsClient'
 import { CourseCover } from '@/components/shorts/CourseCover'
 import InlineSignup from '@/components/InlineSignup'
@@ -54,7 +54,7 @@ export default function ShortsHub() {
       provider: { '@type': 'Organization', name: 'R2BOT', url: BASE },
       author: authorRef(),
       isAccessibleForFree: true,
-      hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', courseWorkload: `PT${SHORTS.length}M` },
+      hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', courseWorkload: `PT${liveShorts().length}M` },
     },
   ]
 
@@ -69,23 +69,23 @@ export default function ShortsHub() {
         How robots work, one minute at a time
       </h1>
       <p className="mt-4 max-w-2xl text-lg text-gray-300">
-        Watch a one-minute video, play with a live demo, answer one question. {SHORTS.length} lessons
+        Watch a one-minute video, play with a live demo, answer one question. {liveShorts().length} lessons
         in five short courses — free, no account, nothing to install.
       </p>
 
       <ul className="mt-5 flex flex-wrap gap-2 text-xs text-gray-300">
-        {[`${SHORTS.length} lessons`, '1 minute each', 'A demo in every lesson', 'Free · no sign-up'].map((t) => (
+        {[`${liveShorts().length} lessons`, '1 minute each', 'A demo in every lesson', 'Free · no sign-up'].map((t) => (
           <li key={t} className="rounded-full border border-white/10 px-3 py-1">
             {t}
           </li>
         ))}
       </ul>
 
-      <ProgressBar slugs={SHORTS.map((s) => s.slug)} />
+      <ProgressBar slugs={liveShorts().map((s) => s.slug)} />
 
       {/* One obvious action, which becomes "continue" once there is progress. */}
       <StartOrContinue
-        lessons={SHORTS.map((s) => ({ slug: s.slug, title: s.title, summary: s.summary }))}
+        lessons={liveShorts().map((s) => ({ slug: s.slug, title: s.title, summary: s.summary }))}
       />
 
       <h2 className="mt-14 text-2xl font-bold text-white">Five short courses</h2>
@@ -128,7 +128,7 @@ export default function ShortsHub() {
 
       {/* The full list, for people who would rather scan than be guided. */}
       <h2 className="mt-14 text-2xl font-bold text-white">Every lesson</h2>
-      <p className="mt-1 text-gray-400">All {SHORTS.length}, grouped by course.</p>
+      <p className="mt-1 text-gray-400">All {liveShorts().length}, grouped by course.</p>
 
       {SHORT_COURSES.map((c) => (
         <section key={c.slug} className="mt-8">
