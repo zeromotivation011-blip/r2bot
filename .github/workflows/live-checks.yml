@@ -35,16 +35,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Crawl every URL in the sitemap for dead links
+      # lychee has no --sitemap flag: it extracts links from the inputs it is
+      # given. So pull the <loc> list out of the sitemap into a plain text
+      # file and hand it that.
+      - name: Collect sitemap URLs
+        run: |
+          curl -sS "${{ inputs.base || 'https://www.r2bot.in' }}/sitemap.xml" \
+            | grep -o '<loc>[^<]*</loc>' \
+            | sed -e 's|<loc>||' -e 's|</loc>||' \
+            > sitemap-urls.txt
+          echo "$(wc -l < sitemap-urls.txt) URLs to check"
+          test -s sitemap-urls.txt
+      - name: Crawl them for dead links
         uses: lycheeverse/lychee-action@v2
         with:
           args: >-
             --no-progress
-            --max-concurrency 8
-            --timeout 20
+            --max-concurrency 6
+            --timeout 25
+            --max-retries 2
             --accept 200,206,999
-            --exclude-path .git
-            --sitemap "${{ inputs.base || 'https://www.r2bot.in' }}/sitemap.xml"
+            sitemap-urls.txt
           fail: true
 
   lighthouse:
