@@ -23,7 +23,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
-const box = { padding: 16, borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' } as const
 
 export default async function ShortPage({ params }: { params: Promise<{ slug: string }> }) {
   const s = getShort((await params).slug)
@@ -37,7 +36,7 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
     { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Quick Lessons', item: `${BASE}/shorts` }, { '@type': 'ListItem', position: 2, name: s.title, item: `${BASE}/shorts/${s.slug}` }] },
   ]
   return (
-    <main style={{ maxWidth: 860, margin: '0 auto', padding: '110px 20px 80px' }}>
+    <main className="r2-lesson">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <nav style={{ fontSize: 13, color: 'var(--text-2)' }}>
         <Link href="/shorts" style={{ color: 'var(--text-2)' }}>Quick Lessons</Link>
@@ -46,8 +45,8 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
         {' · '}
         <span>Lesson {siblings.findIndex((x) => x.slug === s.slug) + 1} of {siblings.length}</span>
       </nav>
-      <h1 style={{ fontSize: 'clamp(26px,5vw,38px)', fontWeight: 900, color: '#fff', margin: '8px 0 10px' }}>{s.title}</h1>
-      <p style={{ color: '#e2e8f0', fontSize: 19, lineHeight: 1.6, margin: '0 0 18px' }}>{s.summary}</p>
+      <h1 className="r2-h1">{s.title}</h1>
+      <p className="r2-lede">{s.summary}</p>
 
       <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', margin: '18px 0' }}>
         {s.ids.map((id, i) => <ShortEmbed key={id} id={id} title={`${s.title} (video ${i + 1})`} />)}
@@ -55,28 +54,38 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
 
       <ShortDemo kind={s.demo} loop={s.loop} />
 
-      {s.what.map((p, i) => <p key={i} style={{ color: 'var(--text-2)', fontSize: 17, lineHeight: 1.7 }}>{p}</p>)}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 12, margin: '20px 0' }}>
-        <div style={box}><div style={{ color: '#4ade80', fontWeight: 800, fontSize: 12 }}>WITH IT YOU CAN</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.6 }}>{s.withIt}</p></div>
-        <div style={box}><div style={{ color: '#f87171', fontWeight: 800, fontSize: 12 }}>WITHOUT IT</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.6 }}>{s.without}</p></div>
+      {s.what.map((p, i) => <p key={i} className="r2-body r2-lesson__p">{p}</p>)}
+      <div className="r2-lesson__pair">
+        <div className="r2-card r2-note r2-note--yes">
+          <span className="r2-note__label">With it you can</span>
+          <p className="r2-body">{s.withIt}</p>
+        </div>
+        <div className="r2-card r2-note r2-note--no">
+          <span className="r2-note__label">Without it</span>
+          <p className="r2-body">{s.without}</p>
+        </div>
       </div>
-      <div style={{ ...box, marginBottom: 12 }}><div style={{ color: '#fbbf24', fontWeight: 800, fontSize: 12 }}>WHERE IT GOES WRONG</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.6 }}>{s.limit}</p></div>
+      <div className="r2-card r2-note">
+        <span className="r2-note__label">Where it goes wrong</span>
+        <p className="r2-body">{s.limit}</p>
+      </div>
 
       <LessonQuiz slug={s.slug} quiz={s.quiz} nextHref={`/shorts/${next.slug}`} nextTitle={next.title.split(':')[0]} />
 
-      <h2 style={{ color: '#fff', fontSize: 22 }}>Go deeper in the Atlas</h2>
-      <ul style={{ color: 'var(--text-2)', lineHeight: 1.9, paddingLeft: 20 }}>
-        {s.atlas.map((a) => <li key={a.href}><Link href={a.href} style={{ color: '#FC6818' }}>{a.label}</Link></li>)}
-        <li><Link href="/ai-robotics" style={{ color: '#FC6818' }}>AI and robotics guides</Link></li>
-        <li><Link href="/courses" style={{ color: '#FC6818' }}>Full video course path</Link></li>
+      {/* Was a bulleted list of five orange links, on 188 pages. */}
+      <h2 className="r2-h2 r2-lesson__h2">Go deeper in the Atlas</h2>
+      <ul className="r2-linklist">
+        {s.atlas.map((a) => <li key={a.href}><Link href={a.href}>{a.label}</Link></li>)}
+        <li><Link href="/ai-robotics">AI and robotics guides</Link></li>
+        <li><Link href="/courses">The full video course path</Link></li>
       </ul>
 
-      <h2 style={{ color: '#fff', fontSize: 22, marginTop: 28 }}>
-        <Link href={`/shorts/course/${course.slug}`} style={{ color: '#fff' }}>{course.title}</Link>
+      <h2 className="r2-h2 r2-lesson__h2">
+        <Link href={`/shorts/course/${course.slug}`}>{course.title}</Link>
       </h2>
       <ProgressBar slugs={siblings.map((x) => x.slug)} />
-      <ol style={{ color: 'var(--text-2)', lineHeight: 2, paddingLeft: 20 }}>
-        {siblings.map((x) => <li key={x.slug}>{x.slug === s.slug ? <b style={{ color: '#fff' }}>{x.title.split(':')[0]}</b> : <Link href={`/shorts/${x.slug}`} style={{ color: '#FC6818' }}>{x.title.split(':')[0]}</Link>}</li>)}
+      <ol className="r2-linklist r2-linklist--ol">
+        {siblings.map((x) => <li key={x.slug}>{x.slug === s.slug ? <b>{x.title.split(':')[0]}</b> : <Link href={`/shorts/${x.slug}`}>{x.title.split(':')[0]}</Link>}</li>)}
       </ol>
       <ShareBar url={`${BASE}/shorts/${s.slug}`} title={s.title} />
     </main>
