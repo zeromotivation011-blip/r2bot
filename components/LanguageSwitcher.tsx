@@ -221,7 +221,7 @@ export function LanguageSwitcher() {
             style={{
               padding: '8px 10px 4px',
               fontSize: 11,
-              color: '#64748b',
+              color: 'var(--text-3)',
               borderTop: '1px solid rgba(255,255,255,0.08)',
               marginTop: 4,
             }}

@@ -18,9 +18,9 @@ export default function EdgeDemo() {
         <button style={btn(mode === 'edge')} onClick={() => setMode('edge')}>AI on the drone (edge)</button>
         <button style={btn(mode === 'cloud')} onClick={() => setMode('cloud')}>AI in the cloud</button>
       </div>
-      <label style={{ color: '#cbd5e1', fontSize: 14, display: 'block', margin: '8px 0' }}>Drone speed: <b>{speed} m/s</b>
+      <label style={{ color: 'var(--text-2)', fontSize: 14, display: 'block', margin: '8px 0' }}>Drone speed: <b>{speed} m/s</b>
         <input type="range" min={1} max={15} value={speed} onChange={(e) => setSpeed(+e.target.value)} style={{ width: '100%', maxWidth: 380, display: 'block' }} aria-label="Drone speed" /></label>
-      {mode === 'cloud' && <label style={{ color: '#cbd5e1', fontSize: 14, display: 'block', margin: '8px 0' }}>Network round trip: <b>{net} ms</b>
+      {mode === 'cloud' && <label style={{ color: 'var(--text-2)', fontSize: 14, display: 'block', margin: '8px 0' }}>Network round trip: <b>{net} ms</b>
         <input type="range" min={50} max={1000} step={10} value={net} onChange={(e) => setNet(+e.target.value)} style={{ width: '100%', maxWidth: 380, display: 'block' }} aria-label="Network delay" /></label>}
       <svg viewBox="0 0 300 50" style={{ width: '100%', maxWidth: 520, background: '#0b1220', borderRadius: 10 }} role="img" aria-label="Drone and tree">
         <text x={10} y={34} fontSize={22}>🚁</text>

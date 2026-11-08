@@ -91,7 +91,7 @@ export function BucketHeatmap({
           color: #fde047; margin: 0 0 4px;
           letter-spacing: 0.5px;
         }
-        .bh-sub { font-size: 12px; color: #94a3b8; margin: 0; }
+        .bh-sub { font-size: 12px; color: var(--text-2); margin: 0; }
         .bh-rows { display: flex; flex-direction: column; gap: 4px; }
         .bh-row {
           width: 100%;

@@ -14,13 +14,13 @@ export default function HiGlossary() {
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '110px 20px 80px' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
-      <Link href="/hi/ai-robotics" style={{ color: '#94a3b8', fontSize: 13 }}>← AI और रोबोटिक्स</Link>
+      <Link href="/hi/ai-robotics" style={{ color: 'var(--text-2)', fontSize: 13 }}>← AI और रोबोटिक्स</Link>
       <h1 style={{ fontSize: 'clamp(28px,5vw,38px)', fontWeight: 900, color: '#fff', margin: '8px 0 18px' }}>AI और रोबोटिक्स शब्दावली</h1>
       <dl style={{ margin: 0 }}>
         {HI_GLOSSARY.map((t) => (
           <div key={t.en} style={{ padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <dt style={{ color: '#fff', fontWeight: 800 }}>{t.term} <span style={{ color: '#94a3b8', fontWeight: 400, fontSize: 14 }}>{t.en}</span></dt>
-            <dd style={{ color: '#cbd5e1', margin: '4px 0 0', lineHeight: 1.9 }}>{t.plain}</dd>
+            <dt style={{ color: '#fff', fontWeight: 800 }}>{t.term} <span style={{ color: 'var(--text-2)', fontWeight: 400, fontSize: 14 }}>{t.en}</span></dt>
+            <dd style={{ color: 'var(--text-2)', margin: '4px 0 0', lineHeight: 1.9 }}>{t.plain}</dd>
           </div>
         ))}
       </dl>

@@ -14,14 +14,14 @@ const iso = (d: Date) => d.toISOString().slice(0, 10)
 
 const card = { padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' } as const
 const h3 = { color: '#fff', fontSize: 15, fontWeight: 800, margin: '0 0 10px' } as const
-const muted = { color: '#94a3b8', fontSize: 13 } as const
+const muted = { color: 'var(--text-2)', fontSize: 13 } as const
 
 function Stat({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
     <div style={card}>
-      <div style={{ color: '#94a3b8', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</div>
+      <div style={{ color: 'var(--text-2)', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</div>
       <div style={{ color: '#fff', fontSize: 30, fontWeight: 900, marginTop: 4 }}>{value}</div>
-      {sub && <div style={{ color: '#64748b', fontSize: 12, marginTop: 2 }}>{sub}</div>}
+      {sub && <div style={{ color: 'var(--text-3)', fontSize: 12, marginTop: 2 }}>{sub}</div>}
     </div>
   )
 }
@@ -29,7 +29,7 @@ function Stat({ label, value, sub }: { label: string; value: string | number; su
 function Bar({ pct, label, value }: { pct: number; label: string; value: string | number }) {
   return (
     <div style={{ margin: '8px 0' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#cbd5e1', marginBottom: 3 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--text-2)', marginBottom: 3 }}>
         <span>{label}</span><b style={{ color: '#fff' }}>{value}</b>
       </div>
       <div style={{ height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.08)' }}>
@@ -107,7 +107,7 @@ export default async function GrowthPage() {
 
   return (
     <main style={{ maxWidth: 1000, margin: '0 auto', padding: '100px 20px 80px' }}>
-      <Link href="/admin" style={{ color: '#94a3b8', fontSize: 13 }}>← Admin</Link>
+      <Link href="/admin" style={{ color: 'var(--text-2)', fontSize: 13 }}>← Admin</Link>
       <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: '8px 0 4px' }}>Growth</h1>
       <p style={{ ...muted, margin: '0 0 24px' }}>Are we on track? Goal: {GOAL.toLocaleString()} visitors a day by the end of December.</p>
 

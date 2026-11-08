@@ -32,7 +32,7 @@ export default async function AdminBlogPage() {
       <Nav />
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 20px 80px' }}>
         <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: '0 0 6px' }}>Content Manager · Blog</h1>
-        <p style={{ color: '#94a3b8', margin: '0 0 24px' }}>
+        <p style={{ color: 'var(--text-2)', margin: '0 0 24px' }}>
           {error ? 'The blog_posts table isn’t set up yet — run migration 0034.' : `${items.length} posts. Write new ones or edit any post.`}
         </p>
         <BlogAdminClient items={items} />

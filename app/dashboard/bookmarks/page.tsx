@@ -54,7 +54,7 @@ export default async function BookmarksPage() {
       </p>
 
       {items.length === 0 ? (
-        <p style={{ color: '#8893a4' }}>
+        <p style={{ color: 'var(--text-2)' }}>
           Nothing saved yet. Tap the ★ button on any Atlas entry, Pulse story, or
           Academy lesson to bookmark it.
         </p>

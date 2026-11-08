@@ -134,9 +134,9 @@ export function DiscussionBlock({ block, isCompleted, onComplete }: Props) {
           {data.peer_visible && (
             <section className="db-peers">
               <h4>What other learners said</h4>
-              {loadingPeers && <p style={{ color: '#94a3b8', fontSize: 13 }}>Loading…</p>}
+              {loadingPeers && <p style={{ color: 'var(--text-2)', fontSize: 13 }}>Loading…</p>}
               {!loadingPeers && peers.length === 0 && (
-                <p style={{ color: '#94a3b8', fontSize: 13 }}>
+                <p style={{ color: 'var(--text-2)', fontSize: 13 }}>
                   You&apos;re one of the first to answer. Check back later.
                 </p>
               )}
@@ -180,7 +180,7 @@ export function DiscussionBlock({ block, isCompleted, onComplete }: Props) {
         }
         .db-textarea:focus { outline: none; border-color: #00E5FF; }
         .db-footer { display: flex; justify-content: space-between; align-items: center; }
-        .db-count { font-size: 12px; color: #94a3b8; font-weight: 700; }
+        .db-count { font-size: 12px; color: var(--text-2); font-weight: 700; }
         .db-count.is-ok { color: #10b981; }
         .db-submit {
           min-height: 44px; padding: 0 18px;
@@ -204,7 +204,7 @@ export function DiscussionBlock({ block, isCompleted, onComplete }: Props) {
         .db-your-response strong { color: #fde047; }
         .db-peers h4 {
           font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-          color: #94a3b8; font-weight: 800; margin: 0 0 8px;
+          color: var(--text-2); font-weight: 800; margin: 0 0 8px;
         }
         .db-peers ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
         .db-peers li {
@@ -219,7 +219,7 @@ export function DiscussionBlock({ block, isCompleted, onComplete }: Props) {
           margin-bottom: 4px;
         }
         .db-peer-name { color: #fde047; }
-        .db-peer-up { color: #94a3b8; margin-left: auto; }
+        .db-peer-up { color: var(--text-2); margin-left: auto; }
         .db-peers p { margin: 0; color: #c8d0dc; font-size: 14px; line-height: 1.5; }
       `}</style>
     </div>

@@ -36,7 +36,7 @@ export default function CompareClient() {
         </div>
       )}
       {age !== null && ra && rb && (
-        <p style={{ color: '#cbd5e1', marginTop: 14, lineHeight: 1.7 }}>
+        <p style={{ color: 'var(--text-2)', marginTop: 14, lineHeight: 1.7 }}>
           {ra.year === rb.year ? 'Both appeared in the same year.' : `${ra.year < rb.year ? ra.name : rb.name} came first, ${age} year${age === 1 ? '' : 's'} earlier.`}
           {ra.type === rb.type ? ` Both are in the same group: ${typeLabel(ra.type).toLowerCase()}.` : ` They are different kinds of robot, so compare what each is built to do.`}
         </p>

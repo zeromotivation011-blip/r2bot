@@ -30,7 +30,7 @@ export default function PixelDemo() {
         {['circle', 'square', 'triangle'].map((s) => <button key={s} style={btn(shape === s)} onClick={() => setShape(s)}>{s}</button>)}
         <button style={btn(nums)} onClick={() => setNums(!nums)}>{nums ? 'Show picture' : 'Show numbers'}</button>
       </div>
-      <label style={{ color: '#cbd5e1', fontSize: 14 }}>Room brightness: <b>{light}%</b>
+      <label style={{ color: 'var(--text-2)', fontSize: 14 }}>Room brightness: <b>{light}%</b>
         <input type="range" min={20} max={130} value={light} onChange={(e) => setLight(+e.target.value)} style={{ width: '100%', maxWidth: 360, display: 'block', marginTop: 4 }} aria-label="Room brightness" />
       </label>
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${N},1fr)`, maxWidth: 360, marginTop: 12, border: '1px solid rgba(255,255,255,0.2)' }}>

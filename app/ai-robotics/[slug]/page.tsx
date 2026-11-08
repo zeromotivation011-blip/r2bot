@@ -28,11 +28,11 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '110px 20px 80px' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
-      <Link href="/ai-robotics" style={{ color: '#94a3b8', fontSize: 13 }}>← AI and Robotics</Link>
+      <Link href="/ai-robotics" style={{ color: 'var(--text-2)', fontSize: 13 }}>← AI and Robotics</Link>
       <h1 style={{ fontSize: 'clamp(28px,5vw,40px)', fontWeight: 900, color: '#fff', margin: '8px 0 6px' }}>{t.title}</h1>
       <p style={{ color: '#FC6818', fontSize: 13, fontWeight: 800, margin: '0 0 16px' }}>{t.level.toUpperCase()} · {t.minutes} MIN READ</p>
       <p style={{ color: '#e2e8f0', fontSize: 19, lineHeight: 1.6, margin: '0 0 18px' }}>{t.short}</p>
-      {t.what.map((p, i) => <p key={i} style={{ color: '#cbd5e1', fontSize: 17, lineHeight: 1.7 }}>{p}</p>)}
+      {t.what.map((p, i) => <p key={i} style={{ color: 'var(--text-2)', fontSize: 17, lineHeight: 1.7 }}>{p}</p>)}
 
       {Demo && <Demo />}
       <div style={{ ...box, margin: '20px 0' }}>
@@ -52,12 +52,12 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
       {t.faq.map((f) => (
         <div key={f.q} style={{ margin: '12px 0' }}>
           <h3 style={{ color: '#fff', fontSize: 16, margin: '0 0 4px' }}>{f.q}</h3>
-          <p style={{ color: '#cbd5e1', margin: 0, lineHeight: 1.6 }}>{f.a}</p>
+          <p style={{ color: 'var(--text-2)', margin: 0, lineHeight: 1.6 }}>{f.a}</p>
         </div>
       ))}
 
       <h2 style={{ color: '#fff', fontSize: 22, marginTop: 28 }}>Keep learning</h2>
-      <ul style={{ color: '#cbd5e1', lineHeight: 1.9, paddingLeft: 20 }}>
+      <ul style={{ color: 'var(--text-2)', lineHeight: 1.9, paddingLeft: 20 }}>
         {t.related.map((r) => <li key={r.href}><Link href={r.href} style={{ color: '#FC6818' }}>{r.label}</Link></li>)}
         <li><Link href="/ai-robotics/glossary" style={{ color: '#FC6818' }}>AI and robotics glossary</Link></li>
       </ul>

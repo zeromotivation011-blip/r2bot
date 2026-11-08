@@ -17,7 +17,7 @@ const GalaxyMap = dynamic(() => import('@/components/atlas/GalaxyMap').then(m =>
 const WorldMapView = dynamic(() => import('@/app/world-map/WorldMapDynamic'), {
   ssr: false,
   loading: () => (
-    <div style={{ minHeight: 480, display: 'grid', placeItems: 'center', color: '#94a3b8' }}>
+    <div style={{ minHeight: 480, display: 'grid', placeItems: 'center', color: 'var(--text-2)' }}>
       <div style={{ textAlign: 'center' }}>
         <div style={{ width: 40, height: 40, border: '2px solid #FC6818', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.9s linear infinite', margin: '0 auto 12px' }} />
         <p style={{ fontSize: 13 }}>Loading world robotics data…</p>
@@ -239,7 +239,7 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
       </div>
 
       <style jsx>{`
-        :global(body) { background: #0a0a16; }
+        :global(body) { background: var(--void); }
         .container { color: #e5e7eb; }
         .eyebrow { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #FF8A4C; font-weight: 800; }
         h1 { font-size: clamp(34px, 5.5vw, 56px); font-weight: 900; color: #fff; margin: 6px 0 8px; line-height: 1.05; }
@@ -257,7 +257,7 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
           font-weight: 800; font-size: 14px; cursor: pointer;
         }
         .mode-tab:hover { color: #FFC9A8; }
-        .mode-tab.on { background: #FC6818; color: #0a0a16; border-color: #FC6818; }
+        .mode-tab.on { background: #FC6818; color: var(--amber-ink); border-color: #FC6818; }
       `}</style>
     </main>
   )
@@ -893,7 +893,7 @@ function TermDrawer({
           .open-full {
             display: block; text-align: center; margin: 16px 22px 24px;
             min-height: 52px; line-height: 52px;
-            background: #FC6818; color: #0a0a16;
+            background: #FC6818; color: var(--amber-ink);
             font-weight: 900; border-radius: 12px;
             text-decoration: none;
           }

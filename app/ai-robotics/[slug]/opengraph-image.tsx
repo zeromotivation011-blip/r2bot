@@ -16,9 +16,9 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', fontSize: 26, color: '#FC6818', fontWeight: 700, marginBottom: 14 }}>AI AND ROBOTICS · PLAIN ENGLISH</div>
           <div style={{ display: 'flex', fontSize: 72, fontWeight: 800, lineHeight: 1.1 }}>{title}</div>
-          <div style={{ display: 'flex', fontSize: 30, color: '#cbd5e1', marginTop: 22, lineHeight: 1.4 }}>{short.length > 110 ? short.slice(0, 107) + '...' : short}</div>
+          <div style={{ display: 'flex', fontSize: 30, color: 'var(--text-2)', marginTop: 22, lineHeight: 1.4 }}>{short.length > 110 ? short.slice(0, 107) + '...' : short}</div>
         </div>
-        <div style={{ display: 'flex', fontSize: 28, color: '#94a3b8' }}>r2bot.in · free</div>
+        <div style={{ display: 'flex', fontSize: 28, color: 'var(--text-2)' }}>r2bot.in · free</div>
       </div>
     ),
     size,

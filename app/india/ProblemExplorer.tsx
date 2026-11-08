@@ -11,7 +11,7 @@ export default function ProblemExplorer() {
     <div>
       <div role="tablist" aria-label="Pick a problem" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
         {PROBLEMS.map((x, n) => <button key={x.id} role="tab" aria-selected={n === i} onClick={() => setI(n)}
-          style={{ padding: '8px 14px', borderRadius: 999, cursor: 'pointer', fontSize: 14, fontWeight: 600, border: '1px solid rgba(255,255,255,0.2)', background: n === i ? '#FC6818' : 'transparent', color: n === i ? '#fff' : '#cbd5e1' }}>{x.label}</button>)}
+          style={{ padding: '8px 14px', borderRadius: 999, cursor: 'pointer', fontSize: 14, fontWeight: 600, border: '1px solid rgba(255,255,255,0.2)', background: n === i ? '#FC6818' : 'transparent', color: n === i ? '#fff' : 'var(--text-2)' }}>{x.label}</button>)}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(230px,1fr))', gap: 12 }}>
         <div style={box}><div style={lab}>THE ROBOT</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.55 }}>{p.robot}</p></div>
@@ -19,7 +19,7 @@ export default function ProblemExplorer() {
         <div style={box}><div style={lab}>WHAT IS HARD</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.55 }}>{p.hard}</p></div>
         <div style={box}><div style={lab}>WHY IT MATTERS IN INDIA</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.55 }}>{p.india}</p></div>
       </div>
-      <p style={{ color: '#94a3b8', fontSize: 13, margin: '12px 0 0' }}>These are design ideas to think with, not products. Pick one and sketch your own version.</p>
+      <p style={{ color: 'var(--text-2)', fontSize: 13, margin: '12px 0 0' }}>These are design ideas to think with, not products. Pick one and sketch your own version.</p>
     </div>
   )
 }

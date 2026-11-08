@@ -86,7 +86,7 @@ export default function RobotsIndexPage() {
       <Nav />
       <main id="main-content">
         <RobotsIndexClient />
-        <p style={{ textAlign: 'center', margin: '10px 20px 60px', color: '#cbd5e1' }}>Looking for more? <a href="/robots/directory" style={{ color: '#FC6818', fontWeight: 700 }}>Browse the robot directory</a> with filters by type and country.</p>
+        <p style={{ textAlign: 'center', margin: '10px 20px 60px', color: 'var(--text-2)' }}>Looking for more? <a href="/robots/directory" style={{ color: '#FC6818', fontWeight: 700 }}>Browse the robot directory</a> with filters by type and country.</p>
       </main>
       <CopilotBubble />
       <CopilotDrawer />

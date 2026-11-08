@@ -259,7 +259,7 @@ export function SchoolsClient() {
             <a href="#contact" style={{ background: '#FC6818', color: '#000', padding: '12px 24px', borderRadius: 12, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
               Get Your School Started →
             </a>
-            <Link href="/schools/teacher" style={{ border: '1px solid #374151', background: 'rgba(255,255,255,0.03)', color: '#fff', padding: '12px 24px', borderRadius: 12, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+            <Link href="/schools/teacher" style={{ border: '1px solid var(--text-3)', background: 'rgba(255,255,255,0.03)', color: '#fff', padding: '12px 24px', borderRadius: 12, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
               Teacher Dashboard
             </Link>
             <Link href="/schools/simulate" style={{ border: '1px solid rgba(255,138,76,0.25)', background: 'rgba(255,138,76,0.08)', color: '#FF8A4C', padding: '12px 24px', borderRadius: 12, fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
@@ -355,7 +355,7 @@ export function SchoolsClient() {
                     <td style={{ padding: '11px 16px', color: '#d1d5db' }}>{r.cbse}</td>
                     <td style={{ padding: '11px 16px', color: '#00e5ff', fontWeight: 500 }}>{r.unit}</td>
                     <td style={{ padding: '11px 16px', color: '#9ca3af' }}>{r.mins} min</td>
-                    <td style={{ padding: '11px 16px' }}>{r.nep ? <span style={{ color: '#10b981', fontWeight: 600 }}>✓</span> : <span style={{ color: '#374151' }}>—</span>}</td>
+                    <td style={{ padding: '11px 16px' }}>{r.nep ? <span style={{ color: '#10b981', fontWeight: 600 }}>✓</span> : <span style={{ color: 'var(--text-3)' }}>—</span>}</td>
                   </tr>
                 ))}
               </tbody>

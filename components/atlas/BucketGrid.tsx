@@ -35,7 +35,7 @@ export function BucketGrid({
           fontSize: 11,
           letterSpacing: 3,
           textTransform: 'uppercase',
-          color: '#94a3b8',
+          color: 'var(--text-2)',
           fontWeight: 900,
           margin: '0 0 12px',
         }}
@@ -78,7 +78,7 @@ export function BucketGrid({
                   </span>
                 )}
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#94a3b8', fontWeight: 700, marginBottom: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-2)', fontWeight: 700, marginBottom: 6 }}>
                 <span>{b.count} concepts</span>
                 <span>{masteredCount}/{b.count}</span>
               </div>

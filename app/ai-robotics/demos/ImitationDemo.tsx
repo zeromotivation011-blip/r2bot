@@ -21,10 +21,10 @@ export default function ImitationDemo() {
     <div style={panel}>
       <div style={title}>Try it live: learning from demonstrations</div>
       <p style={note}>A person guides a robot arm along a path. No two demonstrations are the same. The robot averages them into one smooth move (orange). Add more demonstrations and watch it settle.</p>
-      <label style={{ color: '#cbd5e1', fontSize: 14, display: 'block', margin: '8px 0' }}>Demonstrations shown: <b>{n}</b>
+      <label style={{ color: 'var(--text-2)', fontSize: 14, display: 'block', margin: '8px 0' }}>Demonstrations shown: <b>{n}</b>
         <input type="range" min={1} max={30} value={n} onChange={(e) => setN(+e.target.value)} style={{ width: '100%', maxWidth: 380, display: 'block' }} aria-label="Number of demonstrations" /></label>
       <svg viewBox="0 0 300 200" style={{ width: '100%', maxWidth: 520, background: '#0b1220', borderRadius: 10 }} role="img" aria-label="Demonstrations and learned path">
-        {demos.slice(0, n).map((d, i) => <path key={i} d={line(d)} fill="none" stroke="#94a3b8" strokeWidth={1} opacity={0.5} />)}
+        {demos.slice(0, n).map((d, i) => <path key={i} d={line(d)} fill="none" stroke="var(--text-2)" strokeWidth={1} opacity={0.5} />)}
         <path d={line(avg)} fill="none" stroke={ORANGE} strokeWidth={3} />
       </svg>
       <p style={{ ...note, color: '#e2e8f0' }}>Learned path is off the ideal by about <b style={{ color: ORANGE }}>{err.toFixed(1)}</b> units.</p>

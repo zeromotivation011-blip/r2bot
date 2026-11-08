@@ -113,7 +113,7 @@ export function HeroCounter({ total = 47, onShowMe }: { total?: number; onShowMe
           display: inline-flex; align-items: center; gap: 8px;
           min-height: 54px; padding: 0 26px;
           background: linear-gradient(135deg, #FF8A4C, #f97316);
-          color: #0a0a16;
+          color: var(--amber-ink);
           border: none; border-radius: 14px;
           font-weight: 900; font-size: 16px;
           cursor: pointer;

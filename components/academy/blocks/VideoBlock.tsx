@@ -164,7 +164,7 @@ export function VideoBlock({ block, isCompleted, onComplete }: Props) {
         .vb-progress-label {
           position: absolute; right: 8px; top: -22px;
           font-size: 11px; font-weight: 800;
-          color: #94a3b8;
+          color: var(--text-2);
         }
         .vb-actions { display: flex; flex-wrap: wrap; gap: 8px; }
         .vb-transcript-btn, .vb-lang-btn, .vb-skip-btn {

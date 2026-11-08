@@ -26,7 +26,7 @@ export default function InlineSignup({ lang = 'en' }: { lang?: 'en' | 'hi' | 'zh
   return (
     <div style={{ margin: '28px 0', padding: 18, borderRadius: 14, background: 'rgba(252,104,24,0.08)', border: '1px solid rgba(252,104,24,0.35)' }}>
       <div style={{ color: '#fff', fontWeight: 800, fontSize: 17 }}>{t.h}</div>
-      <p style={{ color: '#cbd5e1', margin: '4px 0 12px', fontSize: 14 }}>{t.p}</p>
+      <p style={{ color: 'var(--text-2)', margin: '4px 0 12px', fontSize: 14 }}>{t.p}</p>
       {s === 'ok' ? <p style={{ color: '#4ade80', fontWeight: 700, margin: 0 }}>{t.ok}</p> : (
         <form onSubmit={submit} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t.ph} aria-label="Email"

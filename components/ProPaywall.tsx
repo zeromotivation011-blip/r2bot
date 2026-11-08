@@ -59,7 +59,7 @@ export function ProPaywall({ children }: ProPaywallProps) {
           <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', margin: '0 0 10px', lineHeight: 1.2 }}>
             This is a Pro lesson
           </h2>
-          <p style={{ fontSize: 14, color: '#cbd5e1', lineHeight: 1.65, margin: '0 0 22px' }}>
+          <p style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.65, margin: '0 0 22px' }}>
             You&apos;re on the free plan. Upgrade to access Wire, Forge, and Edge tracks,
             plus unlimited R2 Co-pilot.
           </p>

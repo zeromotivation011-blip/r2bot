@@ -11,9 +11,9 @@ export default function Image() {
         <div style={{ display: 'flex', fontSize: 44, fontWeight: 800 }}>R<span style={{ color: '#FC6818' }}>2</span>BOT</div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', fontSize: 80, fontWeight: 800, lineHeight: 1.1 }}>Robot directory</div>
-          <div style={{ display: 'flex', fontSize: 34, color: '#cbd5e1', marginTop: 22 }}>125 landmark robots to filter and compare</div>
+          <div style={{ display: 'flex', fontSize: 34, color: 'var(--text-2)', marginTop: 22 }}>125 landmark robots to filter and compare</div>
         </div>
-        <div style={{ display: 'flex', fontSize: 28, color: '#94a3b8' }}>r2bot.in · free · plain English</div>
+        <div style={{ display: 'flex', fontSize: 28, color: 'var(--text-2)' }}>r2bot.in · free · plain English</div>
       </div>
     ),
     size,

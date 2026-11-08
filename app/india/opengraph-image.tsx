@@ -11,9 +11,9 @@ export default function Image() {
         <div style={{ display: 'flex', fontSize: 44, fontWeight: 800 }}>R<span style={{ color: '#FC6818' }}>2</span>BOT</div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', fontSize: 80, fontWeight: 800, lineHeight: 1.1 }}>Robotics in India</div>
-          <div style={{ display: 'flex', fontSize: 34, color: '#cbd5e1', marginTop: 22 }}>ISRO, companies, programmes and careers</div>
+          <div style={{ display: 'flex', fontSize: 34, color: 'var(--text-2)', marginTop: 22 }}>ISRO, companies, programmes and careers</div>
         </div>
-        <div style={{ display: 'flex', fontSize: 28, color: '#94a3b8' }}>r2bot.in · free · plain English</div>
+        <div style={{ display: 'flex', fontSize: 28, color: 'var(--text-2)' }}>r2bot.in · free · plain English</div>
       </div>
     ),
     size,

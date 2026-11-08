@@ -116,10 +116,10 @@ export function MotorControlVisual() {
             <line x1={margin} y1={highY} x2={PWM_W - margin} y2={highY} stroke="#1e293b" strokeWidth={0.5} strokeDasharray="2 4" />
             <line x1={margin} y1={lowY} x2={PWM_W - margin} y2={lowY} stroke="#1e293b" strokeWidth={0.5} />
 
-            <text x={2} y={highY + 4} fill="#64748b" fontSize={9} fontFamily="JetBrains Mono, monospace">
+            <text x={2} y={highY + 4} fill="var(--text-3)" fontSize={9} fontFamily="JetBrains Mono, monospace">
               5V
             </text>
-            <text x={2} y={lowY + 4} fill="#64748b" fontSize={9} fontFamily="JetBrains Mono, monospace">
+            <text x={2} y={lowY + 4} fill="var(--text-3)" fontSize={9} fontFamily="JetBrains Mono, monospace">
               0V
             </text>
             <text x={PWM_W - margin - 18} y={lowY + 14} fill="#475569" fontSize={9} fontFamily="JetBrains Mono, monospace">
@@ -151,7 +151,7 @@ export function MotorControlVisual() {
             {[0, 1, 2, 3].map((i) => (
               <line key={i} x1={82 + i * 17} y1={65} x2={82 + i * 17} y2={115} stroke="#0f172a" strokeWidth={2} />
             ))}
-            <text x={110} y={95} textAnchor="middle" fill="#64748b" fontSize={9} fontFamily="JetBrains Mono, monospace">
+            <text x={110} y={95} textAnchor="middle" fill="var(--text-3)" fontSize={9} fontFamily="JetBrains Mono, monospace">
               M
             </text>
 
@@ -178,7 +178,7 @@ export function MotorControlVisual() {
             )}
 
             {/* Current bar */}
-            <text x={15} y={163} fill="#64748b" fontSize={9} fontFamily="JetBrains Mono, monospace">
+            <text x={15} y={163} fill="var(--text-3)" fontSize={9} fontFamily="JetBrains Mono, monospace">
               Current Draw
             </text>
             <rect x={15} y={166} width={MOTOR_W - 30} height={6} fill="#0f172a" stroke="#1e293b" strokeWidth={0.5} rx={2} />

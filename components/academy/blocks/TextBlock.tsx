@@ -77,7 +77,7 @@ export function TextBlock({ block, isCompleted, onComplete }: Props) {
         .tb { display: flex; flex-direction: column; gap: 14px; }
         .tb-meta {
           display: flex; justify-content: space-between; align-items: center;
-          font-size: 12px; color: #94a3b8; font-weight: 700;
+          font-size: 12px; color: var(--text-2); font-weight: 700;
         }
         .tb-lang {
           padding: 6px 12px; border-radius: 999px;
@@ -98,7 +98,7 @@ export function TextBlock({ block, isCompleted, onComplete }: Props) {
         .tb-done:disabled {
           opacity: 0.5; cursor: not-allowed;
           background: rgba(255,255,255,0.06);
-          color: #94a3b8;
+          color: var(--text-2);
         }
       `}</style>
       <style jsx global>{`

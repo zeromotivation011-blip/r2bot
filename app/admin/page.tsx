@@ -36,7 +36,7 @@ export default async function AdminHome() {
       <Nav />
       <main style={{ maxWidth: 1000, margin: '0 auto', padding: '120px 20px 80px' }}>
         <h1 style={{ fontSize: 32, fontWeight: 900, color: '#fff', margin: '0 0 6px' }}>Content Manager</h1>
-        <p style={{ color: '#94a3b8', margin: '0 0 28px' }}>Run R2BOT from the browser.</p>
+        <p style={{ color: 'var(--text-2)', margin: '0 0 28px' }}>Run R2BOT from the browser.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
           {TOOLS.map((t) => (
             <Link
@@ -48,7 +48,7 @@ export default async function AdminHome() {
             >
               <div style={{ fontSize: 28, marginBottom: 10 }}>{t.icon}</div>
               <div style={{ color: '#f4f4f5', fontWeight: 800, fontSize: 17, marginBottom: 4 }}>{t.title}</div>
-              <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.5 }}>{t.desc}</div>
+              <div style={{ color: 'var(--text-2)', fontSize: 13, lineHeight: 1.5 }}>{t.desc}</div>
             </Link>
           ))}
         </div>

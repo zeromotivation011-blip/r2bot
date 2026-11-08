@@ -133,7 +133,7 @@ export function SimulationBlock({ block, isCompleted, onComplete }: Props) {
           position: absolute; inset: 0;
           display: flex; align-items: center; justify-content: center;
           gap: 10px;
-          color: #94a3b8; font-weight: 700;
+          color: var(--text-2); font-weight: 700;
         }
         .sb-spinner {
           width: 18px; height: 18px;

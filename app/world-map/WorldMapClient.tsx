@@ -405,7 +405,7 @@ function MapTab(props: {
                           style={{
                             default: {
                               fill,
-                              stroke: '#374151',
+                              stroke: 'var(--text-3)',
                               strokeWidth: isSelected || isA || isB ? 1.5 : 0.4,
                               outline: 'none',
                               transition: 'all 0.2s',

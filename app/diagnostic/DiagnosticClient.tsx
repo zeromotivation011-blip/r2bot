@@ -294,7 +294,7 @@ export function DiagnosticClient() {
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 20px' }}>
         {/* Progress bar */}
         <div style={{ marginBottom: 18 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-2)', marginBottom: 8 }}>
             <span>{isDone ? 'Your result' : `Step ${stepLabel} of ${total}`}</span>
             <span>{Math.round(((isDone ? total : step) / total) * 100)}%</span>
           </div>
@@ -315,7 +315,7 @@ export function DiagnosticClient() {
               {current.prompt}
             </h1>
             {current.helper && (
-              <p style={{ fontSize: 14, color: '#94a3b8', margin: '0 0 22px' }}>{current.helper}</p>
+              <p style={{ fontSize: 14, color: 'var(--text-2)', margin: '0 0 22px' }}>{current.helper}</p>
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -366,7 +366,7 @@ export function DiagnosticClient() {
                 onClick={handleBack}
                 disabled={step === 0}
                 style={{
-                  background: 'transparent', color: '#94a3b8', border: 'none',
+                  background: 'transparent', color: 'var(--text-2)', border: 'none',
                   fontSize: 14, fontWeight: 700, cursor: step === 0 ? 'not-allowed' : 'pointer',
                   opacity: step === 0 ? 0.4 : 1, padding: '8px 12px',
                 }}
@@ -402,7 +402,7 @@ export function DiagnosticClient() {
             <h1 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 900, margin: '0 0 12px', color: '#fff', lineHeight: 1.15 }}>
               {TRACK_META[finalTrack].tagline}
             </h1>
-            <p style={{ fontSize: 16, color: '#cbd5e1', maxWidth: 560, margin: '0 auto 28px', lineHeight: 1.7 }}>
+            <p style={{ fontSize: 16, color: 'var(--text-2)', maxWidth: 560, margin: '0 auto 28px', lineHeight: 1.7 }}>
               {whyExplanation(finalTrack, finalScore, answers)}
             </p>
 
@@ -435,7 +435,7 @@ export function DiagnosticClient() {
               </Link>
             </div>
             {pending && (
-              <p style={{ marginTop: 14, fontSize: 12, color: '#64748b' }}>Saving your track…</p>
+              <p style={{ marginTop: 14, fontSize: 12, color: 'var(--text-3)' }}>Saving your track…</p>
             )}
             {error && (
               <p style={{ marginTop: 14, fontSize: 12, color: '#fca5a5' }}>{error}</p>

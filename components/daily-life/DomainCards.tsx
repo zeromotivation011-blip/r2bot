@@ -39,7 +39,7 @@ export function DomainCards({ selected, onSelect, countsByDomain = {}, totalCoun
         <span className="dc-count">{totalCount}</span>
       </button>
       {DOMAINS.map(d => {
-        const info = DOMAIN_LABELS[d.id] ?? { label: d.label, emoji: d.emoji, color: '#94a3b8' }
+        const info = DOMAIN_LABELS[d.id] ?? { label: d.label, emoji: d.emoji, color: 'var(--text-2)' }
         const isSel = selected === d.id
         return (
           <button

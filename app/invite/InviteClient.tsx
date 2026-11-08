@@ -20,7 +20,7 @@ export default function InviteClient() {
   const btn = { padding: '10px 16px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: '#e2e8f0', fontSize: 14, fontWeight: 600, cursor: 'pointer', textDecoration: 'none' } as const
   return (
     <div style={{ marginTop: 20, padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
-      <div style={{ color: '#94a3b8', fontSize: 12, fontWeight: 800, marginBottom: 6 }}>YOUR LINK</div>
+      <div style={{ color: 'var(--text-2)', fontSize: 12, fontWeight: 800, marginBottom: 6 }}>YOUR LINK</div>
       <input readOnly value={url} aria-label="Your invite link" onFocus={(e) => e.currentTarget.select()}
         style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.25)', color: '#fff', fontSize: 14 }} />
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>

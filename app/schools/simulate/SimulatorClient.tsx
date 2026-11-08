@@ -135,8 +135,8 @@ function arenaFor(m: SimMission): ArenaSpec {
         markers: [
           { x: 60, y: 60, r: 12, colour: '#10b981', label: 'Pharmacy' },
           { x: 520, y: 420, r: 12, colour: '#ef4444', label: 'Bed 3' },
-          { x: 100, y: 280, r: 8, colour: '#94a3b8', label: 'Bed 1' },
-          { x: 280, y: 280, r: 8, colour: '#94a3b8', label: 'Bed 2' },
+          { x: 100, y: 280, r: 8, colour: 'var(--text-2)', label: 'Bed 1' },
+          { x: 280, y: 280, r: 8, colour: 'var(--text-2)', label: 'Bed 2' },
         ],
       }
     }
@@ -406,7 +406,7 @@ export default function SimulatorClient() {
     }
 
     // Walls
-    ctx.fillStyle = '#374151'
+    ctx.fillStyle = 'var(--text-3)'
     arena.walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h))
 
     // Markers
@@ -416,7 +416,7 @@ export default function SimulatorClient() {
       ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2)
       ctx.fill()
       if (m.label) {
-        ctx.fillStyle = '#cbd5e1'
+        ctx.fillStyle = 'var(--text-2)'
         ctx.font = '10px monospace'
         ctx.textAlign = 'center'
         ctx.fillText(m.label, m.x, m.y + m.r + 12)

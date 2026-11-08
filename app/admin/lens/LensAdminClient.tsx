@@ -75,11 +75,11 @@ export function LensAdminClient({ items }: { items: LensListItem[] }) {
           <button onClick={newEntry} style={{ ...btnPrimary, whiteSpace: 'nowrap' }}>+ New</button>
         </div>
         <button onClick={importFiles} disabled={importing} style={{
-          width: '100%', marginBottom: 10, padding: '8px', background: 'transparent', color: '#94a3b8',
+          width: '100%', marginBottom: 10, padding: '8px', background: 'transparent', color: 'var(--text-2)',
           border: '1px dashed rgba(255,255,255,0.2)', borderRadius: 10, fontSize: 12, cursor: 'pointer', opacity: importing ? 0.6 : 1,
         }}>{importing ? 'Importing…' : '⤓ Import videos from files'}</button>
         <div style={{ maxHeight: 620, overflowY: 'auto', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12 }}>
-          {filtered.length === 0 ? <p style={{ padding: 16, color: '#64748b', fontSize: 13 }}>No entries.</p> :
+          {filtered.length === 0 ? <p style={{ padding: 16, color: 'var(--text-3)', fontSize: 13 }}>No entries.</p> :
             filtered.map((i) => (
               <button key={i.slug} onClick={() => edit(i.slug)} style={{
                 display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px',
@@ -87,15 +87,15 @@ export function LensAdminClient({ items }: { items: LensListItem[] }) {
                 border: 'none', borderTop: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer',
               }}>
                 <span style={{ color: '#f4f4f5', fontSize: 13, fontWeight: 700 }}>{i.title}</span>
-                <span style={{ display: 'block', color: '#64748b', fontSize: 11 }}>{i.topic} · {i.status}</span>
+                <span style={{ display: 'block', color: 'var(--text-3)', fontSize: 11 }}>{i.topic} · {i.status}</span>
               </button>
             ))}
         </div>
       </div>
 
       <div style={{ border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: 22, minHeight: 400 }}>
-        {!form ? <p style={{ color: '#64748b' }}>Select a video, or click <strong>+ New</strong>.</p> :
-          status === 'loading' ? <p style={{ color: '#94a3b8' }}>Loading…</p> : (
+        {!form ? <p style={{ color: 'var(--text-3)' }}>Select a video, or click <strong>+ New</strong>.</p> :
+          status === 'loading' ? <p style={{ color: 'var(--text-2)' }}>Loading…</p> : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <label style={lbl}>Slug<input value={form.slug} onChange={(e) => set('slug', e.target.value)} style={inputStyle} /></label>
@@ -133,7 +133,7 @@ const inputStyle: React.CSSProperties = {
   width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)',
   color: '#f4f4f5', padding: '9px 12px', borderRadius: 10, fontSize: 14, outline: 'none',
 }
-const lbl: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 5, fontSize: 12, color: '#94a3b8', fontWeight: 700 }
+const lbl: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 5, fontSize: 12, color: 'var(--text-2)', fontWeight: 700 }
 const btnPrimary: React.CSSProperties = {
   padding: '9px 18px', background: '#FF8A4C', color: 'var(--void)', fontWeight: 800,
   fontSize: 14, border: 'none', borderRadius: 10, cursor: 'pointer',

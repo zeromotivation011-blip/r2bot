@@ -52,7 +52,7 @@ export function NewsAdminClient({ rows }: { rows: NewsRow[] }) {
       />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {filtered.length === 0 ? (
-          <p style={{ color: '#64748b' }}>No archived stories yet.</p>
+          <p style={{ color: 'var(--text-3)' }}>No archived stories yet.</p>
         ) : filtered.map((r) => (
           <div
             key={r.url}
@@ -68,7 +68,7 @@ export function NewsAdminClient({ rows }: { rows: NewsRow[] }) {
                 <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: '#f4f4f5', fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
                   {r.title || r.url}
                 </a>
-                <div style={{ color: '#64748b', fontSize: 11, marginTop: 2 }}>
+                <div style={{ color: 'var(--text-3)', fontSize: 11, marginTop: 2 }}>
                   {r.source} · {r.topic}{r.pinned ? ' · 📌 pinned' : ''}{r.hidden ? ' · 🚫 hidden' : ''}
                 </div>
                 {editing === r.url ? (
@@ -84,7 +84,7 @@ export function NewsAdminClient({ rows }: { rows: NewsRow[] }) {
                     </div>
                   </div>
                 ) : r.curated_summary ? (
-                  <p style={{ color: '#94a3b8', fontSize: 12, margin: '6px 0 0' }}>✎ {r.curated_summary}</p>
+                  <p style={{ color: 'var(--text-2)', fontSize: 12, margin: '6px 0 0' }}>✎ {r.curated_summary}</p>
                 ) : null}
               </div>
               <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -109,6 +109,6 @@ const btn: React.CSSProperties = {
   border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer',
 }
 const btnGhost: React.CSSProperties = {
-  padding: '6px 12px', background: 'transparent', color: '#94a3b8',
+  padding: '6px 12px', background: 'transparent', color: 'var(--text-2)',
   border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12, cursor: 'pointer',
 }

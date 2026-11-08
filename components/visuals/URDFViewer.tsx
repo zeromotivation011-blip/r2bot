@@ -673,11 +673,11 @@ export function URDFViewer() {
                 <span style={{ color: 'var(--cyan-bright)', fontFamily: 'var(--font-mono), monospace' }}>{throttle}%</span>
               </div>
               <input type="range" min={0} max={100} value={throttle} onChange={(e) => setThrottle(parseInt(e.target.value))} style={{ width: '100%', accentColor: '#00B8D4' }} />
-              <div style={{ fontSize: 11, color: '#64748b', marginTop: 6 }}>Higher throttle spins all 4 propellers faster.</div>
+              <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 6 }}>Higher throttle spins all 4 propellers faster.</div>
             </label>
           )}
 
-          <p style={{ fontSize: 11.5, color: '#64748b', marginTop: 6, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 6, lineHeight: 1.5 }}>
             Drag to orbit · Scroll to zoom · Right-click to pan.
           </p>
         </div>

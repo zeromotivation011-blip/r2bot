@@ -174,7 +174,7 @@ export function NextTopicBar({
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .ntb-card-sub {
-          font-size: 11px; color: #94a3b8;
+          font-size: 11px; color: var(--text-2);
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .ntb-surprise {

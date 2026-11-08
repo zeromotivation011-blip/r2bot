@@ -108,7 +108,7 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
                 cursor: 'pointer', textTransform: 'capitalize',
                 background: trackFilter === t ? 'rgba(252,104,24,0.18)' : 'rgba(255,255,255,0.04)',
                 border: `1px solid ${trackFilter === t ? 'rgba(252,104,24,0.5)' : 'rgba(255,255,255,0.12)'}`,
-                color: trackFilter === t ? '#FF8A4C' : '#cbd5e1',
+                color: trackFilter === t ? '#FF8A4C' : 'var(--text-2)',
               }}
             >
               {t === 'all' ? 'All' : t}
@@ -125,7 +125,7 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
                   padding: '5px 12px', borderRadius: 999, fontSize: 12, fontWeight: 700,
                   border: 'none', cursor: 'pointer',
                   background: sortMode === m ? '#FF8A4C' : 'transparent',
-                  color: sortMode === m ? '#1a0f00' : '#94a3b8',
+                  color: sortMode === m ? '#1a0f00' : 'var(--text-2)',
                 }}
               >
                 {m === 'recent' ? 'Most recent' : 'Most liked'}
@@ -156,7 +156,7 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
           <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 8px', color: '#fff' }}>
             Be the first to share your build!
           </h2>
-          <p style={{ fontSize: 14, color: '#94a3b8', margin: '0 0 22px', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 14, color: 'var(--text-2)', margin: '0 0 22px', lineHeight: 1.6 }}>
             Complete a <Link href="/build" style={{ color: '#FF8A4C', textDecoration: 'underline' }}>Robot Project</Link> to submit here.
           </p>
           <button
@@ -209,7 +209,7 @@ export function CommunityGalleryClient({ initialBuilds }: Props) {
 
                 <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#fff', lineHeight: 1.3 }}>{b.title}</h3>
                 <p style={{
-                  margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.55,
+                  margin: 0, fontSize: 13, color: 'var(--text-2)', lineHeight: 1.55,
                   display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                 }}>
                   {b.description}

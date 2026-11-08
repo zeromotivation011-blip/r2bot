@@ -41,7 +41,7 @@ function Echo() {
       <svg viewBox="0 0 400 120" width="100%" role="img" aria-label="Ultrasonic pulse travelling to a wall and back">
         <rect x="20" y="40" width="40" height="40" rx="8" fill="#FC6818" />
         <circle cx="52" cy="60" r="5" fill="var(--void)" />
-        <rect x={wallX} y="20" width="10" height="80" rx="3" fill="#64748b" />
+        <rect x={wallX} y="20" width="10" height="80" rx="3" fill="var(--text-3)" />
         {show && [0, 1, 2].map((i) => <circle key={i} cx={pos - i * 8} cy="60" r={6 + i * 3} fill="none" stroke="#4ade80" strokeWidth="2" opacity={1 - i * 0.3} />)}
       </svg>
       <input aria-label="Distance to wall" type="range" min={0.2} max={3} step={0.1} value={d} onChange={(e) => setD(Number(e.target.value))} style={{ width: '100%' }} />
@@ -170,12 +170,12 @@ function Loop({ steps }: { steps: [string, string, string] }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 10, marginTop: 10 }}>
         {steps.map((s, k) => (
           <button key={k} onClick={() => setI(k)} style={{ textAlign: 'left', padding: 12, borderRadius: 12, cursor: 'pointer', color: '#fff', background: i === k ? 'rgba(252,104,24,0.2)' : 'rgba(255,255,255,0.03)', border: '1px solid ' + (i === k ? '#FC6818' : 'rgba(255,255,255,0.12)'), transition: 'all .3s', transform: i === k ? 'translateY(-3px)' : 'none' }}>
-            <div style={{ color: i === k ? '#FC6818' : '#94a3b8', fontWeight: 800, fontSize: 11 }}>{k + 1}. {names[k]}</div>
+            <div style={{ color: i === k ? '#FC6818' : 'var(--text-2)', fontWeight: 800, fontSize: 11 }}>{k + 1}. {names[k]}</div>
             <div style={{ fontSize: 14, marginTop: 4 }}>{s}</div>
           </button>
         ))}
       </div>
-      <p style={{ color: '#94a3b8', fontSize: 12, margin: '10px 0 0' }}>The robot repeats this loop many times a second. Tap a step to pause on it.</p>
+      <p style={{ color: 'var(--text-2)', fontSize: 12, margin: '10px 0 0' }}>The robot repeats this loop many times a second. Tap a step to pause on it.</p>
     </div>
   )
 }

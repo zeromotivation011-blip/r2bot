@@ -140,7 +140,7 @@ export function SwipeStoryMode({ cards, interstitialEvery = 3, onComplete }: Swi
         .ssm { max-width: 720px; margin: 0 auto; padding: 18px; color: #f4f4f5; }
         .ssm-count {
           font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-          color: #94a3b8; font-weight: 800; margin: 0 0 6px;
+          color: var(--text-2); font-weight: 800; margin: 0 0 6px;
           text-align: center;
         }
         .ssm-track {
@@ -163,7 +163,7 @@ export function SwipeStoryMode({ cards, interstitialEvery = 3, onComplete }: Swi
         .ssm-card-head {
           display: flex; justify-content: space-between; align-items: center;
           font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-          color: #94a3b8; font-weight: 800;
+          color: var(--text-2); font-weight: 800;
           margin-bottom: 10px;
         }
         .ssm-domain { color: #fde047; }
@@ -193,7 +193,7 @@ export function SwipeStoryMode({ cards, interstitialEvery = 3, onComplete }: Swi
         .ssm-section p { margin: 0; line-height: 1.5; color: #d6d6e0; font-size: 14px; }
         .ssm-section-label {
           font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
-          color: #94a3b8; font-weight: 800; margin: 0 0 4px !important;
+          color: var(--text-2); font-weight: 800; margin: 0 0 4px !important;
         }
         .ssm-section-analogy { background: rgba(255,138,76,0.08); border-color: rgba(255,138,76,0.3); }
         .ssm-section-analogy .ssm-section-label { color: #FF8A4C; }
@@ -218,7 +218,7 @@ export function SwipeStoryMode({ cards, interstitialEvery = 3, onComplete }: Swi
         .ssm-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .ssm-nav-primary {
           background: linear-gradient(135deg, #FF8A4C, #f97316);
-          color: #0a0a16; border: none;
+          color: var(--amber-ink); border: none;
         }
         .ssm-hint {
           font-size: 11px; color: #FF8A4C;

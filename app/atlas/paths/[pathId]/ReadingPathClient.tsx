@@ -71,7 +71,7 @@ export function ReadingPathClient({
                 letterSpacing: 2,
                 textTransform: 'uppercase',
                 fontWeight: 900,
-                color: '#0a0a16',
+                color: 'var(--amber-ink)',
                 background: path.color,
                 padding: '2px 10px',
                 borderRadius: 999,
@@ -83,14 +83,14 @@ export function ReadingPathClient({
               {path.title}
             </h1>
             <p style={{ color: '#c4b5fd', fontSize: 15, margin: 0 }}>{path.description}</p>
-            <p style={{ color: '#94a3b8', fontSize: 12, fontWeight: 700, marginTop: 8 }}>
+            <p style={{ color: 'var(--text-2)', fontSize: 12, fontWeight: 700, marginTop: 8 }}>
               📚 {total} concepts · ⏱ ~{path.estimatedMinutes} min
             </p>
           </div>
         </div>
 
         <div style={{ marginTop: 18 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#94a3b8', fontWeight: 700, marginBottom: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-2)', fontWeight: 700, marginBottom: 6 }}>
             <span>{hydrated ? `${masteredCount} of ${total} mastered` : 'Loading…'}</span>
             <span>{pct}%</span>
           </div>
@@ -114,7 +114,7 @@ export function ReadingPathClient({
               marginTop: 18,
               padding: '12px 22px',
               background: path.color,
-              color: '#0a0a16',
+              color: 'var(--amber-ink)',
               fontWeight: 900,
               borderRadius: 12,
               textDecoration: 'none',
@@ -189,7 +189,7 @@ export function ReadingPathClient({
                     display: 'grid',
                     placeItems: 'center',
                     background: isMastered ? '#10b981' : isLocked ? 'rgba(255,255,255,0.06)' : stepColor,
-                    color: isMastered ? '#fff' : '#0a0a16',
+                    color: isMastered ? '#fff' : 'var(--amber-ink)',
                     fontWeight: 900,
                     fontSize: 15,
                   }}
@@ -270,7 +270,7 @@ export function ReadingPathClient({
             style={{
               padding: '12px 22px',
               background: 'linear-gradient(135deg, #FF8A4C, #f97316)',
-              color: '#0a0a16',
+              color: 'var(--amber-ink)',
               fontWeight: 900,
               borderRadius: 12,
               border: 'none',

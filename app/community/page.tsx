@@ -73,7 +73,7 @@ export default async function CommunityPage() {
             <h1 style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 900, lineHeight: 1.1, margin: '0 0 12px' }}>
               Real robots, built by real learners.
             </h1>
-            <p style={{ fontSize: 16, color: '#94a3b8', maxWidth: 720, lineHeight: 1.6, margin: 0 }}>
+            <p style={{ fontSize: 16, color: 'var(--text-2)', maxWidth: 720, lineHeight: 1.6, margin: 0 }}>
               Browse builds shared by the R2BOT community. Like the ones that wow you. When you finish a Robot Project, share yours here.
             </p>
           </header>

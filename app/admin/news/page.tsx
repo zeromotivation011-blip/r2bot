@@ -42,7 +42,7 @@ export default async function AdminNewsPage() {
       <Nav />
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '120px 20px 80px' }}>
         <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: '0 0 6px' }}>Content Manager · News</h1>
-        <p style={{ color: '#94a3b8', margin: '0 0 24px' }}>
+        <p style={{ color: 'var(--text-2)', margin: '0 0 24px' }}>
           {tableMissing
             ? 'The news table isn’t set up yet — run migration 0033, then the news-refresh cron (or wait for it) to fill the archive.'
             : `${rows.length} archived stories. Pin to surface, hide to remove from the feed, or rewrite a summary.`}

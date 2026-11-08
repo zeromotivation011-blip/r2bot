@@ -122,7 +122,7 @@ export function AtlasAdminClient({ items }: { items: AtlasListItem[] }) {
         </div>
         <div style={{ marginBottom: 12 }}>
           <button onClick={importFromFiles} disabled={importing} style={{
-            width: '100%', padding: '8px 12px', background: 'transparent', color: '#94a3b8',
+            width: '100%', padding: '8px 12px', background: 'transparent', color: 'var(--text-2)',
             border: '1px dashed rgba(255,255,255,0.2)', borderRadius: 10, fontSize: 12, cursor: 'pointer',
             opacity: importing ? 0.6 : 1,
           }}>
@@ -132,7 +132,7 @@ export function AtlasAdminClient({ items }: { items: AtlasListItem[] }) {
         </div>
         <div style={{ maxHeight: 620, overflowY: 'auto', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12 }}>
           {filtered.length === 0 ? (
-            <p style={{ padding: 16, color: '#64748b', fontSize: 13 }}>No entries. Create one, or run the migration script.</p>
+            <p style={{ padding: 16, color: 'var(--text-3)', fontSize: 13 }}>No entries. Create one, or run the migration script.</p>
           ) : filtered.map((i) => (
             <button
               key={i.id} onClick={() => edit(i)}
@@ -143,7 +143,7 @@ export function AtlasAdminClient({ items }: { items: AtlasListItem[] }) {
               }}
             >
               <span style={{ color: '#f4f4f5', fontSize: 13, fontWeight: 700 }}>{i.title}</span>
-              <span style={{ display: 'block', color: '#64748b', fontSize: 11 }}>
+              <span style={{ display: 'block', color: 'var(--text-3)', fontSize: 11 }}>
                 {i.type}/{i.slug} · {i.status}
               </span>
             </button>
@@ -154,9 +154,9 @@ export function AtlasAdminClient({ items }: { items: AtlasListItem[] }) {
       {/* Editor */}
       <div style={{ border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: 22, minHeight: 400 }}>
         {!form ? (
-          <p style={{ color: '#64748b' }}>Select an entry to edit, or click <strong>+ New</strong>.</p>
+          <p style={{ color: 'var(--text-3)' }}>Select an entry to edit, or click <strong>+ New</strong>.</p>
         ) : status === 'loading' ? (
-          <p style={{ color: '#94a3b8' }}>Loading…</p>
+          <p style={{ color: 'var(--text-2)' }}>Loading…</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 12 }}>
@@ -209,7 +209,7 @@ const inputStyle: React.CSSProperties = {
   width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)',
   color: '#f4f4f5', padding: '9px 12px', borderRadius: 10, fontSize: 14, outline: 'none',
 }
-const lbl: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 5, fontSize: 12, color: '#94a3b8', fontWeight: 700 }
+const lbl: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 5, fontSize: 12, color: 'var(--text-2)', fontWeight: 700 }
 const btnPrimary: React.CSSProperties = {
   padding: '9px 18px', background: '#FF8A4C', color: 'var(--void)', fontWeight: 800,
   fontSize: 14, border: 'none', borderRadius: 10, cursor: 'pointer',

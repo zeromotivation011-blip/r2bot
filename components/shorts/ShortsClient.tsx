@@ -100,7 +100,7 @@ export function ProgressBar({ slugs, lang = 'en' }: { slugs: string[]; lang?: 'e
       <div style={{ height: 8, borderRadius: 99, background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${(n / slugs.length) * 100}%`, background: '#FC6818', transition: 'width .6s' }} />
       </div>
-      <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>{lang === 'zh' ? `已完成 ${n} / ${slugs.length}（保存在本设备）` : lang === 'hi' ? `${slugs.length} में से ${n} पूरे (इसी डिवाइस पर सहेजे)` : lang === 'es' ? `${n} de ${slugs.length} completadas en este dispositivo` : `${n} of ${slugs.length} finished on this device`}</div>
+      <div style={{ color: 'var(--text-2)', fontSize: 12, marginTop: 4 }}>{lang === 'zh' ? `已完成 ${n} / ${slugs.length}（保存在本设备）` : lang === 'hi' ? `${slugs.length} में से ${n} पूरे (इसी डिवाइस पर सहेजे)` : lang === 'es' ? `${n} de ${slugs.length} completadas en este dispositivo` : `${n} of ${slugs.length} finished on this device`}</div>
     </div>
   )
 }

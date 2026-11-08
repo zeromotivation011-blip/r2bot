@@ -188,7 +188,7 @@ export function LessonComplete({
         .lc-xp-label {
           font-size: 18px; font-weight: 800; color: #FF8A4C;
         }
-        .lc-xp-total { color: #94a3b8; font-size: 13px; margin: 0 0 18px; }
+        .lc-xp-total { color: var(--text-2); font-size: 13px; margin: 0 0 18px; }
         .lc-skills {
           background: rgba(16,185,129,0.08);
           border: 1px solid rgba(16,185,129,0.25);

@@ -155,7 +155,7 @@ export function TimelineScrubber({ chapters, birthYear }: { chapters: HistoryCha
           position: absolute;
           transform: translateX(-50%);
           font-size: 10px; font-weight: 800;
-          color: #94a3b8;
+          color: var(--text-2);
           letter-spacing: 1px;
         }
         .tls-rail {

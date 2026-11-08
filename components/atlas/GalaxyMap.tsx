@@ -231,7 +231,7 @@ export function GalaxyMap({
           position: relative;
           width: 100%;
           aspect-ratio: ${width} / ${height};
-          background: radial-gradient(ellipse at 50% 30%, #1a1040 0%, #0a0a16 70%);
+          background: radial-gradient(ellipse at 50% 30%, #16233c 0%, var(--void) 70%);
           border: 1px solid rgba(124,58,237,0.3);
           border-radius: 18px;
           overflow: hidden;

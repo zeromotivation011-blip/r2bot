@@ -95,7 +95,7 @@ export function DeepDive(props: {
         }}
       >
         <span>🔬 Deep dive — full technical story</span>
-        <span style={{ color: '#94a3b8' }}>{open ? '▲' : '▼'}</span>
+        <span style={{ color: 'var(--text-2)' }}>{open ? '▲' : '▼'}</span>
       </button>
       {open && (
         <div style={{ padding: 18, background: 'rgba(11,18,32,0.6)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
@@ -274,7 +274,7 @@ export function RealWorldStrip({
         </div>
       )}
       {companies && companies.length > 0 && (
-        <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>
+        <p style={{ fontSize: 12, color: 'var(--text-2)', margin: 0 }}>
           <span style={{ fontWeight: 700 }}>Used by:</span> {companies.join(' · ')}
         </p>
       )}
@@ -541,7 +541,7 @@ function ShareButton({ entry }: { entry: AtlasEntry }) {
         style={{
           padding: '11px 16px',
           background: '#25d366',
-          color: '#0a0a16',
+          color: 'var(--amber-ink)',
           border: 'none',
           borderRadius: 12,
           fontWeight: 800,

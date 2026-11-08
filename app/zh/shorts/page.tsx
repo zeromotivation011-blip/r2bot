@@ -24,18 +24,18 @@ export default function ZhShortsHub() {
   return (
     <main style={{ maxWidth: 980, margin: '0 auto', padding: '110px 20px 80px' }}>
       <h1 style={{ fontSize: 'clamp(30px,5vw,44px)', fontWeight: 900, color: '#fff', margin: 0 }}>一分钟学机器人：快速课程</h1>
-      <p style={{ color: '#cbd5e1', fontSize: 18, lineHeight: 1.7, maxWidth: 720 }}>看一分钟视频，玩一个实时演示，答一道题。五个小课程，共 {SHORTS.filter((s) => SHORTS_ZH[s.slug]).length} 节课，全部免费。</p>
+      <p style={{ color: 'var(--text-2)', fontSize: 18, lineHeight: 1.7, maxWidth: 720 }}>看一分钟视频，玩一个实时演示，答一道题。五个小课程，共 {SHORTS.filter((s) => SHORTS_ZH[s.slug]).length} 节课，全部免费。</p>
       <ProgressBar slugs={SHORTS.filter((s) => SHORTS_ZH[s.slug]).map((s) => s.slug)} lang="zh" />
       {SHORT_COURSES.map((c) => (
         <section key={c.slug} style={{ margin: '32px 0' }}>
           <h2 style={{ color: '#fff', fontSize: 24, margin: 0 }}>{c.icon} {ZH_COURSE[c.slug].t}</h2>
-          <p style={{ color: '#94a3b8', margin: '4px 0 14px' }}>{ZH_COURSE[c.slug].b}</p>
+          <p style={{ color: 'var(--text-2)', margin: '4px 0 14px' }}>{ZH_COURSE[c.slug].b}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 12 }}>
             {shortsInCourse(c.slug).filter((s) => SHORTS_ZH[s.slug]).map((s) => (
               <Link key={s.slug} href={`/zh/shorts/${s.slug}`} style={{ display: 'flex', gap: 12, padding: 12, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', textDecoration: 'none' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`https://i.ytimg.com/vi/${s.ids[0]}/mqdefault.jpg`} alt="" width={64} height={114} loading="lazy" style={{ borderRadius: 8, objectFit: 'cover', width: 64, height: 114 }} />
-                <span><span style={{ color: '#fff', fontWeight: 700, fontSize: 15, lineHeight: 1.4 }}>{SHORTS_ZH[s.slug].title.split('：')[0]} <Tick slug={s.slug} /></span><br /><span style={{ color: '#94a3b8', fontSize: 13 }}>{SHORTS_ZH[s.slug].summary.slice(0, 36)}…</span></span>
+                <span><span style={{ color: '#fff', fontWeight: 700, fontSize: 15, lineHeight: 1.4 }}>{SHORTS_ZH[s.slug].title.split('：')[0]} <Tick slug={s.slug} /></span><br /><span style={{ color: 'var(--text-2)', fontSize: 13 }}>{SHORTS_ZH[s.slug].summary.slice(0, 36)}…</span></span>
               </Link>
             ))}
           </div>

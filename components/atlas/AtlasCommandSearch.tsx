@@ -188,7 +188,7 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
             minHeight: 44, padding: '0 14px',
             background: 'rgba(255,255,255,0.04)',
             border: `1px solid ${triggerHover ? '#00E5FF' : 'rgba(255,255,255,0.1)'}`,
-            color: triggerHover ? '#fff' : '#c4b5fd',
+            color: triggerHover ? '#fff' : 'var(--text-2)',
             borderRadius: 12, cursor: 'pointer',
             fontWeight: 600, fontSize: 14,
             minWidth: 240, justifyContent: 'space-between',
@@ -196,9 +196,9 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
           }}
         >
           <span aria-hidden>🔍</span>
-          <span style={{ color: '#94a3b8', flex: 1, textAlign: 'left' }}>Search concepts…</span>
+          <span style={{ color: 'var(--text-2)', flex: 1, textAlign: 'left' }}>Search concepts…</span>
           <span style={{
-            fontSize: 11, fontWeight: 800, color: '#fde047',
+            fontSize: 11, fontWeight: 800, color: 'var(--amber-bright)',
             background: 'rgba(255,138,76,0.14)',
             padding: '2px 8px', borderRadius: 6,
             border: '1px solid rgba(255,138,76,0.3)',
@@ -247,7 +247,7 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
               padding: '14px 16px',
               borderBottom: '1px solid rgba(255,255,255,0.08)',
             }}>
-              <span aria-hidden style={{ fontSize: 18, color: '#94a3b8' }}>🔍</span>
+              <span aria-hidden style={{ fontSize: 18, color: 'var(--text-2)' }}>🔍</span>
               <input
                 ref={inputRef}
                 type="text"
@@ -270,7 +270,7 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
                 style={{
                   padding: '4px 10px', borderRadius: 6,
                   background: 'rgba(255,255,255,0.06)',
-                  color: '#94a3b8', fontSize: 11, fontWeight: 800, letterSpacing: 1,
+                  color: 'var(--text-2)', fontSize: 11, fontWeight: 800, letterSpacing: 1,
                   border: '1px solid rgba(255,255,255,0.1)',
                   cursor: 'pointer',
                 }}
@@ -303,7 +303,7 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
                 </div>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 700 }}>Up to difficulty:</span>
+                <span style={{ fontSize: 11, color: 'var(--text-2)', fontWeight: 700 }}>Up to difficulty:</span>
                 {[1, 2, 3, 4, 5].map(d => (
                   <button
                     key={d}
@@ -325,7 +325,7 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
               <div style={{ padding: '10px 8px 6px' }}>
                 <p style={{
                   padding: '0 12px', fontSize: 10, letterSpacing: 2,
-                  textTransform: 'uppercase', color: '#64748b', fontWeight: 800,
+                  textTransform: 'uppercase', color: 'var(--text-3)', fontWeight: 800,
                   margin: '0 0 4px',
                 }}>Recent</p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, maxHeight: 320, overflowY: 'auto' }}>
@@ -349,13 +349,13 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
             <div style={{ padding: '10px 8px 6px' }}>
               <p style={{
                 padding: '0 12px', fontSize: 10, letterSpacing: 2,
-                textTransform: 'uppercase', color: '#64748b', fontWeight: 800,
+                textTransform: 'uppercase', color: 'var(--text-3)', fontWeight: 800,
                 margin: '0 0 4px',
               }}>
                 {query.trim() ? `${visible.length} matches` : 'Browse'}
               </p>
               {visible.length === 0 ? (
-                <p style={{ padding: 22, textAlign: 'center', color: '#64748b', fontSize: 14 }}>
+                <p style={{ padding: 22, textAlign: 'center', color: 'var(--text-3)', fontSize: 14 }}>
                   No matches. Try a different word, or pick a bucket.
                 </p>
               ) : (
@@ -382,7 +382,7 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
               padding: '10px 16px',
               borderTop: '1px solid rgba(255,255,255,0.06)',
               background: 'rgba(0,0,0,0.2)',
-              fontSize: 11, color: '#64748b',
+              fontSize: 11, color: 'var(--text-3)',
             }}>
               {[['↑↓', 'move'], ['Enter', 'open'], ['ESC', 'close']].map(([k, label]) => (
                 <span key={k}>
@@ -390,7 +390,7 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
                     background: 'rgba(255,255,255,0.06)',
                     border: '1px solid rgba(255,255,255,0.12)',
                     padding: '1px 6px', borderRadius: 4,
-                    marginRight: 4, color: '#c4b5fd',
+                    marginRight: 4, color: 'var(--text-2)',
                   }}>{k}</span>
                   {label}
                 </span>
@@ -423,7 +423,7 @@ function ChipButton({ active, onClick, children }: {
           ? 'linear-gradient(135deg, #00E5FF, #A56BFF)'
           : 'rgba(255,255,255,0.04)',
         border: `1px solid ${active ? 'transparent' : hover ? '#FF8A4C' : 'rgba(255,255,255,0.1)'}`,
-        color: active ? '#0a0a16' : hover ? '#fde047' : '#c4b5fd',
+        color: active ? 'var(--amber-ink)' : hover ? 'var(--mist)' : 'var(--text-2)',
         fontSize: 12, fontWeight: 700, cursor: 'pointer',
         transition: 'border-color 0.12s, color 0.12s',
       }}
@@ -465,7 +465,7 @@ function ResultRow({ node, isActive, onPick, onHover, idx }: {
         }}>{node.title}</span>
         {(node.tagline || node.hookLine || node.oneLiner) && (
           <span style={{
-            fontSize: 12, color: '#94a3b8',
+            fontSize: 12, color: 'var(--text-2)',
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>{node.tagline ?? node.hookLine ?? node.oneLiner}</span>
         )}
@@ -477,7 +477,7 @@ function ResultRow({ node, isActive, onPick, onHover, idx }: {
       )}
       {node.bucketLabel && (
         <span style={{
-          fontSize: 11, color: '#c4b5fd',
+          fontSize: 11, color: 'var(--text-2)',
           background: 'rgba(124,58,237,0.18)',
           padding: '2px 8px', borderRadius: 999,
           fontWeight: 700, whiteSpace: 'nowrap',

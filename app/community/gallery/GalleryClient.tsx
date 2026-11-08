@@ -127,7 +127,7 @@ export function GalleryClient() {
 
       {/* Sort toggle */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 11, fontWeight: 800, color: '#64748b', letterSpacing: '1px', textTransform: 'uppercase' }}>Sort</span>
+        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-3)', letterSpacing: '1px', textTransform: 'uppercase' }}>Sort</span>
         {(['newest', 'liked'] as SortMode[]).map((m) => (
           <button
             key={m} type="button" onClick={() => setSortMode(m)}

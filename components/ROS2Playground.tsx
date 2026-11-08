@@ -142,7 +142,7 @@ export function ROS2Playground() {
                 {c}
               </pre>
             ))}
-            <p style={{ fontSize: 11, color: '#64748b', marginTop: 12, lineHeight: 1.55 }}>
+            <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 12, lineHeight: 1.55 }}>
               Click into the embedded shell to focus it, then type.
             </p>
           </aside>

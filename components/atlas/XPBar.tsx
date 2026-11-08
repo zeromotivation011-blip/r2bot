@@ -47,7 +47,7 @@ export function XPBar({ refreshKey = 0 }: { refreshKey?: number }) {
         .xpbar-text { display: flex; flex-direction: column; gap: 0; }
         .xpbar-level { margin: 0; font-weight: 900; color: #fde047; font-size: 14px; }
         .xpbar-xp { margin: 0; font-size: 12px; color: #c4b5fd; }
-        .xpbar-next { color: #94a3b8; }
+        .xpbar-next { color: var(--text-2); }
         .xpbar-track {
           height: 6px;
           background: rgba(255,255,255,0.08);

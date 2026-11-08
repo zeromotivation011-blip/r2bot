@@ -1342,7 +1342,7 @@ function primaryButtonStyle(accent: string): React.CSSProperties {
     padding: '12px 22px',
     borderRadius: 10,
     background: `linear-gradient(135deg, ${accent}, ${accent}cc)`,
-    color: '#0b0b14',
+    color: 'var(--amber-ink)',
     border: 'none',
     fontSize: 14,
     fontWeight: 800,

@@ -26,7 +26,7 @@ export default function FusionDemo() {
   const path = (a: number[]) => a.map((v, i) => `${i === 0 ? 'M' : 'L'}${(i / (T - 1)) * 300},${200 - ((Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo)) * 190}`).join(' ')
   const row = (label: string, c: string, e: number) => <span style={{ color: c, marginRight: 14, fontSize: 14 }}><b>{label}</b>: off by {e.toFixed(1)} m on average</span>
   const sl = (label: string, v: number, set: (n: number) => void, min: number, max: number, stepv: number, show: string) => (
-    <label style={{ color: '#cbd5e1', fontSize: 14, display: 'block', margin: '8px 0' }}>{label}: <b>{show}</b>
+    <label style={{ color: 'var(--text-2)', fontSize: 14, display: 'block', margin: '8px 0' }}>{label}: <b>{show}</b>
       <input type="range" min={min} max={max} step={stepv} value={v} onChange={(e) => set(+e.target.value)} style={{ width: '100%', maxWidth: 380, display: 'block' }} aria-label={label} /></label>)
   return (
     <div style={panel}>

@@ -16,9 +16,9 @@ export default function SafetyDemo() {
     <div style={panel}>
       <div style={title}>Try it live: the safety layer around the AI</div>
       <p style={note}>The AI asks for a speed. The safety layer has one simple rule: never go faster than you could stop in time. Move the person closer and push the speed up.</p>
-      <label style={{ color: '#cbd5e1', fontSize: 14, display: 'block', margin: '8px 0' }}>Person is <b>{dist.toFixed(1)} m</b> away
+      <label style={{ color: 'var(--text-2)', fontSize: 14, display: 'block', margin: '8px 0' }}>Person is <b>{dist.toFixed(1)} m</b> away
         <input type="range" min={0.5} max={5} step={0.1} value={dist} onChange={(e) => setDist(+e.target.value)} style={{ width: '100%', maxWidth: 380, display: 'block' }} aria-label="Distance to person" /></label>
-      <label style={{ color: '#cbd5e1', fontSize: 14, display: 'block', margin: '8px 0' }}>AI asks for <b>{want.toFixed(1)} m/s</b>
+      <label style={{ color: 'var(--text-2)', fontSize: 14, display: 'block', margin: '8px 0' }}>AI asks for <b>{want.toFixed(1)} m/s</b>
         <input type="range" min={0.2} max={4} step={0.1} value={want} onChange={(e) => setWant(+e.target.value)} style={{ width: '100%', maxWidth: 380, display: 'block' }} aria-label="Requested speed" /></label>
       <button style={btn(safe)} onClick={() => setSafe(!safe)}>Safety layer: {safe ? 'ON' : 'OFF'}</button>
       <svg viewBox="0 0 280 70" style={{ width: '100%', maxWidth: 520, marginTop: 10, background: '#0b1220', borderRadius: 10 }} role="img" aria-label="Robot, stopping distance and person">

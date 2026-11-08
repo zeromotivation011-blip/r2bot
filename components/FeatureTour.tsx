@@ -160,7 +160,7 @@ export function FeatureTour() {
             background: 'rgba(255,255,255,0.06)',
             border: '1px solid rgba(255,255,255,0.10)',
             borderRadius: 8,
-            color: '#94a3b8',
+            color: 'var(--text-2)',
             fontSize: 16,
             cursor: 'pointer',
           }}
@@ -205,7 +205,7 @@ export function FeatureTour() {
           <h2 style={{ margin: '0 0 10px', fontSize: 21, fontWeight: 800, color: '#fff', lineHeight: 1.25 }}>
             {step.title}
           </h2>
-          <p style={{ margin: '0 0 22px', fontSize: 15, lineHeight: 1.6, color: '#cbd5e1' }}>
+          <p style={{ margin: '0 0 22px', fontSize: 15, lineHeight: 1.6, color: 'var(--text-2)' }}>
             {step.body}
           </p>
 
@@ -255,7 +255,7 @@ export function FeatureTour() {
           <button
             type="button"
             onClick={dismiss}
-            style={{ background: 'none', border: 'none', color: '#64748b', fontSize: 13.5, cursor: 'pointer', fontWeight: 500 }}
+            style={{ background: 'none', border: 'none', color: 'var(--text-3)', fontSize: 13.5, cursor: 'pointer', fontWeight: 500 }}
           >
             Skip tour
           </button>

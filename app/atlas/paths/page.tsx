@@ -61,7 +61,7 @@ export default function PathsIndexPage() {
                   letterSpacing: 2,
                   textTransform: 'uppercase',
                   fontWeight: 900,
-                  color: '#0a0a16',
+                  color: 'var(--amber-ink)',
                   background: p.color,
                   padding: '2px 10px',
                   borderRadius: 999,
@@ -73,7 +73,7 @@ export default function PathsIndexPage() {
               <p style={{ color: '#c4b5fd', fontSize: 14, margin: '0 0 12px', lineHeight: 1.5 }}>
                 {p.description}
               </p>
-              <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#94a3b8', fontWeight: 700 }}>
+              <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--text-2)', fontWeight: 700 }}>
                 <span>📚 {p.concepts.length} concepts</span>
                 <span>⏱ ~{p.estimatedMinutes} min</span>
               </div>

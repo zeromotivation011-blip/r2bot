@@ -22,7 +22,7 @@ export default function AiRoboticsHub() {
     <main style={{ maxWidth: 1000, margin: '0 auto', padding: '110px 20px 80px' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <h1 style={{ fontSize: 'clamp(30px,5vw,44px)', fontWeight: 900, color: '#fff', margin: '0 0 10px' }}>AI and Robotics, in plain English</h1>
-      <p style={{ color: '#cbd5e1', fontSize: 18, lineHeight: 1.6, maxWidth: 720, margin: '0 0 28px' }}>
+      <p style={{ color: 'var(--text-2)', fontSize: 18, lineHeight: 1.6, maxWidth: 720, margin: '0 0 28px' }}>
         A robot senses, thinks and acts. AI is one way to do the thinking. Each guide below says what an idea is, what you can build with it, and what goes wrong without it. Free, no jargon.
       </p>
 
@@ -42,12 +42,12 @@ export default function AiRoboticsHub() {
           <Link key={t.slug} href={`/ai-robotics/${t.slug}`} style={{ ...card, textDecoration: 'none', display: 'block' }}>
             <div style={{ color: '#FC6818', fontSize: 12, fontWeight: 800 }}>{t.level.toUpperCase()} · {t.minutes} MIN</div>
             <div style={{ color: '#fff', fontWeight: 800, fontSize: 17, margin: '6px 0' }}>{t.title}</div>
-            <div style={{ color: '#94a3b8', fontSize: 14, lineHeight: 1.5 }}>{t.short}</div>
+            <div style={{ color: 'var(--text-2)', fontSize: 14, lineHeight: 1.5 }}>{t.short}</div>
           </Link>
         ))}
       </div>
 
-      <p style={{ color: '#cbd5e1', marginTop: 28 }}>
+      <p style={{ color: 'var(--text-2)', marginTop: 28 }}>
         Stuck on a word? <Link href="/ai-robotics/glossary" style={{ color: '#FC6818', fontWeight: 700 }}>Open the glossary</Link>. Want videos and quizzes? <Link href="/courses" style={{ color: '#FC6818', fontWeight: 700 }}>Start the free course path</Link>.
       </p>
     </main>

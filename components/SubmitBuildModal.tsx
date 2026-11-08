@@ -128,7 +128,7 @@ export function SubmitBuildModal({ open, onClose, projectSlug, projectTitle, def
           </p>
           <button
             type="button" onClick={onClose} aria-label="Close"
-            style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}
+            style={{ background: 'transparent', border: 'none', color: 'var(--text-2)', fontSize: 22, cursor: 'pointer', lineHeight: 1 }}
           >×</button>
         </div>
 
@@ -138,7 +138,7 @@ export function SubmitBuildModal({ open, onClose, projectSlug, projectTitle, def
             <h2 id="submit-build-title" style={{ fontSize: 22, fontWeight: 900, color: '#fff', margin: '0 0 8px' }}>
               Your build is live!
             </h2>
-            <p style={{ fontSize: 14, color: '#cbd5e1', margin: '0 0 22px' }}>
+            <p style={{ fontSize: 14, color: 'var(--text-2)', margin: '0 0 22px' }}>
               Thanks for sharing. Other learners can now see what you made.
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -257,7 +257,7 @@ export function SubmitBuildModal({ open, onClose, projectSlug, projectTitle, def
                 type="button" onClick={onClose}
                 style={{
                   padding: '11px 18px', background: 'transparent',
-                  color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)',
+                  color: 'var(--text-2)', border: '1px solid rgba(255,255,255,0.12)',
                   borderRadius: 12, fontWeight: 700, fontSize: 14, cursor: 'pointer',
                 }}
               >
@@ -286,8 +286,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   return (
     <div style={{ marginBottom: 14 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-        <label style={{ fontSize: 12, fontWeight: 800, color: '#cbd5e1' }}>{label}</label>
-        {hint && <span style={{ fontSize: 11, color: '#64748b' }}>{hint}</span>}
+        <label style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-2)' }}>{label}</label>
+        {hint && <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{hint}</span>}
       </div>
       {children}
     </div>

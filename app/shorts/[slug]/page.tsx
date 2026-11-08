@@ -39,10 +39,10 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
   return (
     <main style={{ maxWidth: 860, margin: '0 auto', padding: '110px 20px 80px' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
-      <nav style={{ fontSize: 13, color: '#94a3b8' }}>
-        <Link href="/shorts" style={{ color: '#94a3b8' }}>Quick Lessons</Link>
+      <nav style={{ fontSize: 13, color: 'var(--text-2)' }}>
+        <Link href="/shorts" style={{ color: 'var(--text-2)' }}>Quick Lessons</Link>
         {' / '}
-        <Link href={`/shorts/course/${course.slug}`} style={{ color: '#94a3b8' }}>{course.icon} {course.title}</Link>
+        <Link href={`/shorts/course/${course.slug}`} style={{ color: 'var(--text-2)' }}>{course.icon} {course.title}</Link>
         {' · '}
         <span>Lesson {siblings.findIndex((x) => x.slug === s.slug) + 1} of {siblings.length}</span>
       </nav>
@@ -55,7 +55,7 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
 
       <ShortDemo kind={s.demo} loop={s.loop} />
 
-      {s.what.map((p, i) => <p key={i} style={{ color: '#cbd5e1', fontSize: 17, lineHeight: 1.7 }}>{p}</p>)}
+      {s.what.map((p, i) => <p key={i} style={{ color: 'var(--text-2)', fontSize: 17, lineHeight: 1.7 }}>{p}</p>)}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 12, margin: '20px 0' }}>
         <div style={box}><div style={{ color: '#4ade80', fontWeight: 800, fontSize: 12 }}>WITH IT YOU CAN</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.6 }}>{s.withIt}</p></div>
         <div style={box}><div style={{ color: '#f87171', fontWeight: 800, fontSize: 12 }}>WITHOUT IT</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.6 }}>{s.without}</p></div>
@@ -65,7 +65,7 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
       <LessonQuiz slug={s.slug} quiz={s.quiz} nextHref={`/shorts/${next.slug}`} nextTitle={next.title.split(':')[0]} />
 
       <h2 style={{ color: '#fff', fontSize: 22 }}>Go deeper in the Atlas</h2>
-      <ul style={{ color: '#cbd5e1', lineHeight: 1.9, paddingLeft: 20 }}>
+      <ul style={{ color: 'var(--text-2)', lineHeight: 1.9, paddingLeft: 20 }}>
         {s.atlas.map((a) => <li key={a.href}><Link href={a.href} style={{ color: '#FC6818' }}>{a.label}</Link></li>)}
         <li><Link href="/ai-robotics" style={{ color: '#FC6818' }}>AI and robotics guides</Link></li>
         <li><Link href="/courses" style={{ color: '#FC6818' }}>Full video course path</Link></li>
@@ -75,7 +75,7 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
         <Link href={`/shorts/course/${course.slug}`} style={{ color: '#fff' }}>{course.title}</Link>
       </h2>
       <ProgressBar slugs={siblings.map((x) => x.slug)} />
-      <ol style={{ color: '#cbd5e1', lineHeight: 2, paddingLeft: 20 }}>
+      <ol style={{ color: 'var(--text-2)', lineHeight: 2, paddingLeft: 20 }}>
         {siblings.map((x) => <li key={x.slug}>{x.slug === s.slug ? <b style={{ color: '#fff' }}>{x.title.split(':')[0]}</b> : <Link href={`/shorts/${x.slug}`} style={{ color: '#FC6818' }}>{x.title.split(':')[0]}</Link>}</li>)}
       </ol>
       <ShareBar url={`${BASE}/shorts/${s.slug}`} title={s.title} />

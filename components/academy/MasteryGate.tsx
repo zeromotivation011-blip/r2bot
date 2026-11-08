@@ -116,8 +116,8 @@ function Styles() {
         cursor: pointer;
       }
       .mg-cta:hover { transform: translateY(-1px); }
-      .mg-fine { margin-top: 10px; color: #64748b; font-size: 11px; }
-      .mg-attempts { font-size: 12px; color: #94a3b8; margin: 0 0 14px; }
+      .mg-fine { margin-top: 10px; color: var(--text-3); font-size: 11px; }
+      .mg-attempts { font-size: 12px; color: var(--text-2); margin: 0 0 14px; }
     `}</style>
   )
 }

@@ -90,7 +90,7 @@ export function FlashcardBlock({ block, isCompleted, onComplete }: Props) {
 
       <style jsx>{`
         .fc { display: flex; flex-direction: column; gap: 12px; align-items: center; }
-        .fc-meta { font-size: 12px; color: #94a3b8; font-weight: 700; }
+        .fc-meta { font-size: 12px; color: var(--text-2); font-weight: 700; }
         .fc-card {
           position: relative;
           width: 100%; max-width: 480px;
@@ -127,7 +127,7 @@ export function FlashcardBlock({ block, isCompleted, onComplete }: Props) {
         .fc-text { font-size: clamp(18px, 3vw, 24px); line-height: 1.35; }
         .fc-hint {
           position: absolute; bottom: 14px;
-          font-size: 12px; color: #94a3b8; font-weight: 600;
+          font-size: 12px; color: var(--text-2); font-weight: 600;
         }
         .fc-face img { max-height: 60%; max-width: 80%; object-fit: contain; }
         .fc-rating {

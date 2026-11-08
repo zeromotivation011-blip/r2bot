@@ -88,7 +88,7 @@ export function DidYouKnow({
         .dyk-cta {
           min-height: 54px; padding: 0 26px;
           background: linear-gradient(135deg, #FF8A4C, #f97316);
-          color: #0a0a16;
+          color: var(--amber-ink);
           border: none; border-radius: 14px;
           font-weight: 900; font-size: 16px;
           cursor: pointer;

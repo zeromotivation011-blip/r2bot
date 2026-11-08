@@ -24,7 +24,7 @@ export default function SlamDemo() {
     <div style={panel}>
       <div style={title}>Try it live: why robots need a map to correct themselves</div>
       <p style={{ ...note }}>A robot drives once around a square (white). It estimates its position only by counting wheel turns (orange). Small errors pile up, so the end does not meet the start.</p>
-      <label style={{ color: '#cbd5e1', fontSize: 14, display: 'block', margin: '8px 0' }}>Wheel slip and drift: <b>{drift}</b>
+      <label style={{ color: 'var(--text-2)', fontSize: 14, display: 'block', margin: '8px 0' }}>Wheel slip and drift: <b>{drift}</b>
         <input type="range" min={0} max={10} value={drift} onChange={(e) => setDrift(+e.target.value)} style={{ width: '100%', maxWidth: 380, display: 'block' }} aria-label="Drift" /></label>
       <div style={{ display: 'flex', gap: 8, margin: '8px 0' }}>
         <button style={btn(!closed)} onClick={() => setClosed(false)}>Wheels only</button>

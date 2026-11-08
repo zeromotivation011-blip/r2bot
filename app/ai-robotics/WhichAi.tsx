@@ -23,14 +23,14 @@ export default function WhichAi() {
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {Q[0].o.map(([id, label]) => (
           <button key={id} onClick={() => setA(id)} style={{ padding: '10px 14px', borderRadius: 10, cursor: 'pointer', fontSize: 14, fontWeight: 600,
-            border: '1px solid rgba(255,255,255,0.2)', background: a === id ? '#FC6818' : 'transparent', color: a === id ? '#fff' : '#cbd5e1' }}>{label}</button>
+            border: '1px solid rgba(255,255,255,0.2)', background: a === id ? '#FC6818' : 'transparent', color: a === id ? '#fff' : 'var(--text-2)' }}>{label}</button>
         ))}
       </div>
       {r && (
         <div style={{ marginTop: 14, padding: 16, borderRadius: 12, background: 'rgba(252,104,24,0.08)', border: '1px solid rgba(252,104,24,0.35)' }}>
           <div style={{ color: '#fff', fontWeight: 800, fontSize: 17 }}>Use: {r.title}</div>
           <p style={{ color: '#e2e8f0', margin: '6px 0' }}>{r.why}</p>
-          <p style={{ color: '#94a3b8', margin: '0 0 8px', fontSize: 14 }}><b>Watch out:</b> {r.risk}</p>
+          <p style={{ color: 'var(--text-2)', margin: '0 0 8px', fontSize: 14 }}><b>Watch out:</b> {r.risk}</p>
           <Link href={r.href} style={{ color: '#FC6818', fontWeight: 700 }}>Learn how it works →</Link>
         </div>
       )}

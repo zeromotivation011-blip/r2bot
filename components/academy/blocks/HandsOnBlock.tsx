@@ -144,7 +144,7 @@ export function HandsOnBlock({ block, isCompleted, onComplete }: Props) {
         .ho-head { display: flex; align-items: center; gap: 12px; }
         .ho-title { font-size: 17px; font-weight: 800; color: #fde047; margin: 0; flex: 1; }
         .ho-meta {
-          font-size: 12px; color: #94a3b8;
+          font-size: 12px; color: var(--text-2);
           background: rgba(255,255,255,0.04);
           padding: 4px 10px; border-radius: 999px;
           margin: 0;
@@ -153,7 +153,7 @@ export function HandsOnBlock({ block, isCompleted, onComplete }: Props) {
           border-radius: 12px; padding: 12px 14px; }
         .ho-hardware h4 {
           font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-          color: #94a3b8; font-weight: 800; margin: 0 0 6px;
+          color: var(--text-2); font-weight: 800; margin: 0 0 6px;
         }
         .ho-hardware ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
         .ho-hardware a { color: #00E5FF; text-decoration: underline; }
@@ -193,7 +193,7 @@ export function HandsOnBlock({ block, isCompleted, onComplete }: Props) {
         }
         .ho-submit h4 {
           font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
-          color: #94a3b8; font-weight: 800; margin: 0 0 6px;
+          color: var(--text-2); font-weight: 800; margin: 0 0 6px;
         }
         .ho-submit-hint { font-size: 13px; color: #c4b5fd; margin: 0 0 10px; }
         .ho-uploading { color: #fde047; font-weight: 800; margin: 8px 0 0; font-size: 12px; }

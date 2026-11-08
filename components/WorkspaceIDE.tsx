@@ -443,7 +443,7 @@ export function WorkspaceIDE() {
               Connected robot
             </div>
             <div style={{ fontSize: 12, color: '#C8D0DC', marginTop: 4 }}>Simulated TurtleBot3</div>
-            <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>ROS2 Humble · Python 3.10</div>
+            <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 4 }}>ROS2 Humble · Python 3.10</div>
           </div>
         </aside>
 
@@ -473,7 +473,7 @@ export function WorkspaceIDE() {
                   📄 {f.name}
                   <span
                     onClick={(e) => closeTab(p, e)}
-                    style={{ color: '#64748b', cursor: 'pointer', fontSize: 14, lineHeight: 1 }}
+                    style={{ color: 'var(--text-3)', cursor: 'pointer', fontSize: 14, lineHeight: 1 }}
                     aria-label={`Close ${f.name}`}
                   >
                     ×

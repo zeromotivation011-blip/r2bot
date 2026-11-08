@@ -88,7 +88,7 @@ export function LeadCaptureModal() {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: '100%', maxWidth: 440, background: '#0b0b14',
+          width: '100%', maxWidth: 440, background: 'var(--surface-1)',
           border: '1px solid rgba(255,255,255,0.12)', borderRadius: 20,
           padding: '30px 26px', position: 'relative',
           boxShadow: '0 30px 80px rgba(0,0,0,0.6)',
@@ -99,7 +99,7 @@ export function LeadCaptureModal() {
           aria-label="Close"
           style={{
             position: 'absolute', top: 14, right: 16, background: 'transparent',
-            border: 'none', color: '#64748b', fontSize: 22, cursor: 'pointer', lineHeight: 1,
+            border: 'none', color: 'var(--text-3)', fontSize: 22, cursor: 'pointer', lineHeight: 1,
           }}
         >
           ×
@@ -109,7 +109,7 @@ export function LeadCaptureModal() {
           <div style={{ textAlign: 'center', padding: '18px 0' }}>
             <div style={{ fontSize: 40, marginBottom: 10 }}>🎉</div>
             <h3 style={{ color: '#fff', fontSize: 20, fontWeight: 900, margin: '0 0 6px' }}>You&apos;re in!</h3>
-            <p style={{ color: '#94a3b8', fontSize: 14, margin: 0 }}>
+            <p style={{ color: 'var(--text-2)', fontSize: 14, margin: 0 }}>
               We&apos;ll send you the best of robotics. Welcome to R2BOT.
             </p>
           </div>
@@ -121,7 +121,7 @@ export function LeadCaptureModal() {
             <h3 style={{ color: '#fff', fontSize: 'clamp(20px,4vw,26px)', fontWeight: 900, margin: '0 0 8px', lineHeight: 1.2 }}>
               Get robotics news, projects &amp; job alerts.
             </h3>
-            <p style={{ color: '#94a3b8', fontSize: 14, lineHeight: 1.6, margin: '0 0 20px' }}>
+            <p style={{ color: 'var(--text-2)', fontSize: 14, lineHeight: 1.6, margin: '0 0 20px' }}>
               Join learners worldwide getting one useful robotics email a week. Curated, and free.
             </p>
 
@@ -141,7 +141,7 @@ export function LeadCaptureModal() {
               >
                 {status === 'loading' ? 'Joining…' : 'Get free updates →'}
               </button>
-              <p style={{ color: '#64748b', fontSize: 12, margin: 0, lineHeight: 1.5 }}>One email a week. Free. Unsubscribe any time. We never ask for your phone number and never share your email.</p>
+              <p style={{ color: 'var(--text-3)', fontSize: 12, margin: 0, lineHeight: 1.5 }}>One email a week. Free. Unsubscribe any time. We never ask for your phone number and never share your email.</p>
               {status === 'err' && <p style={{ color: '#ef4444', fontSize: 13, margin: 0 }}>{err}</p>}
               <button
                 type="button" onClick={dismiss}
@@ -150,7 +150,7 @@ export function LeadCaptureModal() {
                 Maybe later
               </button>
             </form>
-            <p style={{ fontSize: 10, color: '#374151', marginTop: 12, textAlign: 'center' }}>
+            <p style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 12, textAlign: 'center' }}>
               No spam. Unsubscribe anytime. We never share your details.
             </p>
           </>

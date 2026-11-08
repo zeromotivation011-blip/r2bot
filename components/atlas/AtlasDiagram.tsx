@@ -19,7 +19,7 @@ export type DiagramSpec = {
 
 const AMBER = '#FC6818';
 const INK = '#e2e8f0';
-const MUTED = '#94a3b8';
+const MUTED = 'var(--text-2)';
 const BOX = '#0f172a';
 const BORDER = 'rgba(252,104,24,0.45)';
 

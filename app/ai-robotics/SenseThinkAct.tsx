@@ -19,7 +19,7 @@ export default function SenseThinkAct() {
         {TASKS.map((x, n) => (
           <button key={x.id} role="tab" aria-selected={n === i} onClick={() => setI(n)}
             style={{ padding: '8px 14px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', fontSize: 14, fontWeight: 600,
-              background: n === i ? '#FC6818' : 'transparent', color: n === i ? '#fff' : '#cbd5e1' }}>{x.label}</button>
+              background: n === i ? '#FC6818' : 'transparent', color: n === i ? '#fff' : 'var(--text-2)' }}>{x.label}</button>
         ))}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 12 }}>
@@ -27,7 +27,7 @@ export default function SenseThinkAct() {
         <div style={box}><div style={lab}>2 · Think (AI)</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.55 }}>{t.think}</p></div>
         <div style={box}><div style={lab}>3 · Act</div><p style={{ color: '#e2e8f0', margin: '6px 0 0', lineHeight: 1.55 }}>{t.act}</p></div>
       </div>
-      <p style={{ color: '#94a3b8', margin: '12px 0 0', fontSize: 14 }}><b style={{ color: '#e2e8f0' }}>What goes wrong without the AI step:</b> {t.without}</p>
+      <p style={{ color: 'var(--text-2)', margin: '12px 0 0', fontSize: 14 }}><b style={{ color: '#e2e8f0' }}>What goes wrong without the AI step:</b> {t.without}</p>
     </div>
   )
 }

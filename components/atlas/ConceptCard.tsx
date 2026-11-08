@@ -136,7 +136,7 @@ export function ConceptCard({
         }
         .cc-bucket {
           font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
-          color: #94a3b8; font-weight: 800;
+          color: var(--text-2); font-weight: 800;
         }
         .cc-image {
           width: 100%;

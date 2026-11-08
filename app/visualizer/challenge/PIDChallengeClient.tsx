@@ -214,8 +214,8 @@ function PlotSVG({ samples }: { samples: Sample[] }) {
       <line x1={padX} y1={setpointY} x2={w - padX} y2={setpointY} stroke="#34d399" strokeDasharray="4 4" strokeWidth={1} />
       <text x={padX + 4} y={setpointY - 4} fill="#34d399" fontSize="10">Setpoint {SETPOINT}</text>
       <polyline fill="none" stroke="#FC6818" strokeWidth={2} points={points} />
-      <line x1={padX} y1={h - padY} x2={w - padX} y2={h - padY} stroke="#374151" strokeWidth={1} />
-      <line x1={padX} y1={padY} x2={padX} y2={h - padY} stroke="#374151" strokeWidth={1} />
+      <line x1={padX} y1={h - padY} x2={w - padX} y2={h - padY} stroke="var(--text-3)" strokeWidth={1} />
+      <line x1={padX} y1={padY} x2={padX} y2={h - padY} stroke="var(--text-3)" strokeWidth={1} />
     </svg>
   );
 }

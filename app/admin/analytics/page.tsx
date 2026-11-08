@@ -132,9 +132,9 @@ export default async function AnalyticsPage() {
 
   const card = (label: string, value: number | string, sub?: string) => (
     <div style={{ padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
-      <div style={{ color: '#94a3b8', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</div>
+      <div style={{ color: 'var(--text-2)', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</div>
       <div style={{ color: '#fff', fontSize: 30, fontWeight: 900, marginTop: 4 }}>{value}</div>
-      {sub && <div style={{ color: '#64748b', fontSize: 12, marginTop: 2 }}>{sub}</div>}
+      {sub && <div style={{ color: 'var(--text-3)', fontSize: 12, marginTop: 2 }}>{sub}</div>}
     </div>
   )
   const bars = (vals: number[], max: number) => (
@@ -145,8 +145,8 @@ export default async function AnalyticsPage() {
   const topTable = (title: string, rows: [string, number][]) => (
     <div style={{ padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
       <h3 style={{ color: '#fff', fontSize: 15, fontWeight: 800, margin: '0 0 10px' }}>{title}</h3>
-      {rows.length === 0 ? <p style={{ color: '#64748b', fontSize: 13 }}>No data yet.</p> : rows.map(([p, v]) => (
-        <div key={p} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 13, padding: '4px 0', color: '#cbd5e1' }}>
+      {rows.length === 0 ? <p style={{ color: 'var(--text-3)', fontSize: 13 }}>No data yet.</p> : rows.map(([p, v]) => (
+        <div key={p} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 13, padding: '4px 0', color: 'var(--text-2)' }}>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p}</span><b style={{ color: '#fff' }}>{v}</b>
         </div>
       ))}
@@ -155,9 +155,9 @@ export default async function AnalyticsPage() {
 
   return (
     <main style={{ maxWidth: 1000, margin: '0 auto', padding: '100px 20px 80px' }}>
-      <Link href="/admin" style={{ color: '#94a3b8', fontSize: 13 }}>← Admin</Link>
+      <Link href="/admin" style={{ color: 'var(--text-2)', fontSize: 13 }}>← Admin</Link>
       <h1 style={{ fontSize: 30, fontWeight: 900, color: '#fff', margin: '8px 0 4px' }}>Analytics</h1>
-      <p style={{ color: '#94a3b8', margin: '0 0 24px' }}>Anonymous and aggregate. No cookies, no IPs.</p>
+      <p style={{ color: 'var(--text-2)', margin: '0 0 24px' }}>Anonymous and aggregate. No cookies, no IPs.</p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12 }}>
         {card('Accounts', users.length, 'total sign-ups')}
@@ -178,7 +178,7 @@ export default async function AnalyticsPage() {
         <p style={{ color: '#fbbf24', fontSize: 14 }}>Page-view tracking is not switched on yet: run migration 0044_page_views.sql in the Supabase SQL editor. Counting starts right after.</p>
       ) : (
         <>
-          <p style={{ color: '#94a3b8', fontSize: 14, margin: '0 0 8px' }}>{total7} in the last 7 days · {total30} in the last 30 days</p>
+          <p style={{ color: 'var(--text-2)', fontSize: 14, margin: '0 0 8px' }}>{total7} in the last 7 days · {total30} in the last 30 days</p>
           {bars(days30.map((d) => viewsByDay[d] ?? 0), maxViews)}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12, marginTop: 20 }}>
             {topTable('Most viewed, 7 days', byPath(since7))}
@@ -188,7 +188,7 @@ export default async function AnalyticsPage() {
       )}
 
       <h2 style={{ color: '#fff', fontSize: 18, margin: '32px 0 8px' }}>The four numbers (last 30 days)</h2>
-      <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 0 10px' }}>
+      <p style={{ color: 'var(--text-2)', fontSize: 13, margin: '0 0 10px' }}>
         Aggregate counters only — no cookies, no IPs, nothing stored per person.
         {visitTotal === 0 && ' Run migration 0048_visit_and_funnel_metrics.sql, then these fill in within a day.'}
       </p>
@@ -200,9 +200,9 @@ export default async function AnalyticsPage() {
           { label: 'Lesson → email', value: quizToEmail === null ? '—' : `${quizToEmail}%`, sub: `${leadsCaptured} emails captured` },
         ].map((k) => (
           <div key={k.label} style={{ padding: 18, borderRadius: 14, background: 'rgba(252,104,24,0.08)', border: '1px solid rgba(252,104,24,0.35)' }}>
-            <p style={{ color: '#94a3b8', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, margin: 0 }}>{k.label}</p>
+            <p style={{ color: 'var(--text-2)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, margin: 0 }}>{k.label}</p>
             <p style={{ color: '#fff', fontSize: 30, fontWeight: 900, margin: '6px 0 2px' }}>{k.value}</p>
-            <p style={{ color: '#64748b', fontSize: 12, margin: 0 }}>{k.sub}</p>
+            <p style={{ color: 'var(--text-3)', fontSize: 12, margin: 0 }}>{k.sub}</p>
           </div>
         ))}
       </div>
@@ -213,7 +213,7 @@ export default async function AnalyticsPage() {
       )}
 
       <h2 style={{ color: '#fff', fontSize: 18, margin: '32px 0 8px' }}>Traffic</h2>
-      <p style={{ color: '#94a3b8', fontSize: 14, margin: '0 0 10px' }}>{viewsToday} views today</p>
+      <p style={{ color: 'var(--text-2)', fontSize: 14, margin: '0 0 10px' }}>{viewsToday} views today</p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
         {topTable('Sections, 30 days', sectionRows)}
         {metricsReady ? topTable('Where visitors come from', metric('ref')) : <div style={{ color: '#fbbf24', fontSize: 13 }}>Run migration 0048_visit_and_funnel_metrics.sql to see sources, countries, devices and the funnel.</div>}
@@ -230,10 +230,10 @@ export default async function AnalyticsPage() {
         {card('Leads, 30 days', sum(leadDays))}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16, marginTop: 16 }}>
-        <div><div style={{ color: '#94a3b8', fontSize: 13, marginBottom: 4 }}>Lessons completed per day</div>{bars(doneDays, Math.max(1, ...doneDays))}</div>
-        <div><div style={{ color: '#94a3b8', fontSize: 13, marginBottom: 4 }}>Co-pilot chats per day</div>{bars(chatDays, Math.max(1, ...chatDays))}</div>
-        <div><div style={{ color: '#94a3b8', fontSize: 13, marginBottom: 4 }}>Newsletter sign-ups per day</div>{bars(newsDays, Math.max(1, ...newsDays))}</div>
-        <div><div style={{ color: '#94a3b8', fontSize: 13, marginBottom: 4 }}>Leads per day</div>{bars(leadDays, Math.max(1, ...leadDays))}</div>
+        <div><div style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 4 }}>Lessons completed per day</div>{bars(doneDays, Math.max(1, ...doneDays))}</div>
+        <div><div style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 4 }}>Co-pilot chats per day</div>{bars(chatDays, Math.max(1, ...chatDays))}</div>
+        <div><div style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 4 }}>Newsletter sign-ups per day</div>{bars(newsDays, Math.max(1, ...newsDays))}</div>
+        <div><div style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 4 }}>Leads per day</div>{bars(leadDays, Math.max(1, ...leadDays))}</div>
       </div>
 
       <h2 style={{ color: '#fff', fontSize: 18, margin: '32px 0 8px' }}>Courses</h2>
@@ -245,7 +245,7 @@ export default async function AnalyticsPage() {
 
       <h2 style={{ color: '#fff', fontSize: 18, margin: '32px 0 8px' }}>Content ideas: questions the Atlas could not answer</h2>
       {(gaps.data ?? []).length === 0
-        ? <p style={{ color: '#64748b', fontSize: 13 }}>No open gaps recorded yet.</p>
+        ? <p style={{ color: 'var(--text-3)', fontSize: 13 }}>No open gaps recorded yet.</p>
         : topTable('Most asked, still open', ((gaps.data ?? []) as { question_text: string; frequency: number }[]).map((g) => [g.question_text.slice(0, 90), g.frequency] as [string, number]))}
 
       <h2 style={{ color: '#fff', fontSize: 18, margin: '32px 0 8px' }}>Accounts</h2>
@@ -254,9 +254,9 @@ export default async function AnalyticsPage() {
         <div style={{ padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
           <h3 style={{ color: '#fff', fontSize: 15, fontWeight: 800, margin: '0 0 10px' }}>Latest sign-ups</h3>
           {recent.map((u, i) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 13, padding: '4px 0', color: '#cbd5e1' }}>
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 13, padding: '4px 0', color: 'var(--text-2)' }}>
               <span>{maskEmail(u.email)}</span>
-              <span style={{ color: '#64748b' }}>{u.created_at.slice(0, 10)}{u.last_sign_in_at ? ` · last ${u.last_sign_in_at.slice(0, 10)}` : ''}</span>
+              <span style={{ color: 'var(--text-3)' }}>{u.created_at.slice(0, 10)}{u.last_sign_in_at ? ` · last ${u.last_sign_in_at.slice(0, 10)}` : ''}</span>
             </div>
           ))}
         </div>

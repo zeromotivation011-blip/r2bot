@@ -119,7 +119,7 @@ export function ScormBlock({ block, isCompleted, onComplete }: Props) {
           background: #fff;
         }
         .sc-status {
-          font-size: 12px; color: #94a3b8; font-weight: 700; margin: 0;
+          font-size: 12px; color: var(--text-2); font-weight: 700; margin: 0;
         }
       `}</style>
     </div>

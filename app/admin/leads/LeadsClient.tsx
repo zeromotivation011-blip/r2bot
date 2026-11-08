@@ -102,7 +102,7 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
       <div style={{ overflowX: 'auto', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr style={{ background: 'rgba(255,255,255,0.04)', textAlign: 'left', color: '#94a3b8' }}>
+            <tr style={{ background: 'rgba(255,255,255,0.04)', textAlign: 'left', color: 'var(--text-2)' }}>
               <th style={th}>Email</th>
               <th style={th}>Name</th>
               <th style={th}>Source</th>
@@ -113,11 +113,11 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={6} style={{ ...td, textAlign: 'center', color: '#64748b' }}>No leads yet.</td></tr>
+              <tr><td colSpan={6} style={{ ...td, textAlign: 'center', color: 'var(--text-3)' }}>No leads yet.</td></tr>
             ) : (
               filtered.map((l) => {
                 const context = describeMeta(l.meta)
-                const color = SOURCE_COLOR[l.source ?? ''] ?? '#94a3b8'
+                const color = SOURCE_COLOR[l.source ?? ''] ?? 'var(--text-2)'
                 return (
                   <tr key={l.id} style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                     <td style={{ ...td, color: '#f4f4f5' }}>{l.email}</td>
@@ -134,8 +134,8 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
                     <td style={{ ...td, maxWidth: 260 }} title={context}>
                       {context || <span style={{ color: '#475569' }}>—</span>}
                     </td>
-                    <td style={{ ...td, color: '#64748b' }}>{l.page}</td>
-                    <td style={{ ...td, color: '#64748b', whiteSpace: 'nowrap' }}>
+                    <td style={{ ...td, color: 'var(--text-3)' }}>{l.page}</td>
+                    <td style={{ ...td, color: 'var(--text-3)', whiteSpace: 'nowrap' }}>
                       {new Date(l.created_at).toLocaleString()}
                     </td>
                   </tr>
@@ -150,4 +150,4 @@ export function LeadsClient({ leads }: { leads: Lead[] }) {
 }
 
 const th: React.CSSProperties = { padding: '10px 14px', fontWeight: 800, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px' }
-const td: React.CSSProperties = { padding: '10px 14px', color: '#cbd5e1' }
+const td: React.CSSProperties = { padding: '10px 14px', color: 'var(--text-2)' }
