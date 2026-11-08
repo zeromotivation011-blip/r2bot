@@ -1,0 +1,13 @@
+# Local pre-commit hooks. Install once:
+#
+#   pip install pre-commit && pre-commit install
+#
+# gitleaks also runs in CI (.github/workflows/secret-scan.yml), but a scanner
+# that only runs after a push is doing a third of the job — by then the secret
+# is in a public repository's history. This catches it on `git commit`, in well
+# under a second, before it ever leaves the machine.
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
