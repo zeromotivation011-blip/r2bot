@@ -147,6 +147,10 @@ const nextConfig = {
       // Same entry written twice. The fuller version (585 words vs 331, and
       // three inbound links vs one) keeps the URL.
       { source: '/atlas/concept/ce-marking-robots', destination: '/atlas/concept/ce-marking', permanent: true },
+      // The by-line is an editorial identity now, at the owner's request, so
+      // the author page moved off a URL that carried a personal name.
+      { source: '/author/ravi', destination: '/about/how-this-is-written', permanent: true },
+      { source: '/author/:slug', destination: '/about/how-this-is-written', permanent: true },
       // Consolidation: Pulse is folded into the automated News feed.
       { source: '/pulse', destination: '/news', permanent: true },
       { source: '/pulse/weekly', destination: '/news', permanent: true },

@@ -63,7 +63,7 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
     heading: 'R2BOT',
     links: [
       { label: 'About', href: '/about' },
-      { label: `Written by ${AUTHOR.name}`, href: '/author/ravi' },
+      { label: 'How this is written', href: '/about/how-this-is-written' },
       { label: 'Mission', href: '/mission' },
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },

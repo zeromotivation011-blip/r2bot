@@ -193,7 +193,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Who we are. A named author is worth more than any amount of schema.
     { url: `${BASE}/about`,            lastModified: at('/about'),       changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE}/author/ravi`,      lastModified: at('/author/ravi'), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${BASE}/about/how-this-is-written`, lastModified: at('/about/how-this-is-written'), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE}/mission`,          lastModified: at('/mission'),     changeFrequency: 'yearly',  priority: 0.4 },
     { url: `${BASE}/pricing`,          lastModified: at('/pricing'),     changeFrequency: 'yearly',  priority: 0.4 },
 

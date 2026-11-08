@@ -5,8 +5,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
  * at insert time so the public feed can read it without violating the
  * "Read own profile" RLS on the profiles table.
  *
- *   "Ravi Bohra"           → "Ravi B."
- *   "Ravi"                 → "Ravi"
+ *   "Asha Patel"           → "Asha P."
+ *   "Asha"                 → "Asha"
  *   no display_name        → email prefix, e.g. "asha.patel@example.com" → "Asha.patel"
  */
 export async function deriveAuthorDisplay(

@@ -100,7 +100,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
             <p className="mt-3 text-lg text-zinc-300">{post.description}</p>
             <div className="mt-5 flex items-center gap-3 text-xs text-zinc-400 border-y border-white/10 py-3">
               <span className="w-9 h-9 rounded-full grid place-items-center font-black text-sm" style={{ background: 'linear-gradient(135deg,#3b82f6,#f97316)', color: 'var(--void)' }}>{authorInitial}</span>
-              <span><a href="/author/ravi" className="font-bold text-white underline decoration-white/30 hover:decoration-amber-400">{post.author}</a> · {post.authorRole}</span>
+              <span><a href="/about/how-this-is-written" className="font-bold text-white underline decoration-white/30 hover:decoration-amber-400">{post.author}</a> · {post.authorRole}</span>
               <span className="ml-auto text-zinc-500">{fmtDate(post.date)} · {post.readTime} min read</span>
             </div>
 
@@ -184,7 +184,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
               <div className="mt-2 flex items-center gap-3">
                 <span className="w-10 h-10 rounded-full grid place-items-center font-black text-sm" style={{ background: 'linear-gradient(135deg,#3b82f6,#f97316)', color: 'var(--void)' }}>{authorInitial}</span>
                 <div>
-                  <p className="text-sm font-bold text-white"><a href="/author/ravi" className="underline decoration-white/30 hover:decoration-amber-400">{post.author}</a></p>
+                  <p className="text-sm font-bold text-white"><a href="/about/how-this-is-written" className="underline decoration-white/30 hover:decoration-amber-400">{post.author}</a></p>
                   <p className="text-xs text-zinc-400">{post.authorRole}</p>
                 </div>
               </div>

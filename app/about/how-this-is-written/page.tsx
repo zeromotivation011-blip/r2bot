@@ -7,14 +7,14 @@ import { AUTHOR, authorPersonJsonLd } from '@/lib/author'
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const metadata: Metadata = {
-  title: `${AUTHOR.name} — who writes and builds R2BOT`,
+  title: 'How R2BOT is written',
   description:
-    'R2BOT is written and built by one person: a science teacher who moved into robotics. Who I am, how I write, and how to tell me something is wrong.',
-  alternates: { canonical: `${BASE}/author/${AUTHOR.slug}` },
+    'R2BOT is written and built by one person, who taught science before moving into robotics. The rules every page follows, and how to tell us something is wrong.',
+  alternates: { canonical: `${BASE}/about/how-this-is-written` },
   openGraph: {
-    type: 'profile',
-    url: `${BASE}/author/${AUTHOR.slug}`,
-    title: `${AUTHOR.name} — who writes and builds R2BOT`,
+    type: 'article',
+    url: `${BASE}/about/how-this-is-written`,
+    title: 'How R2BOT is written',
     description: AUTHOR.tagline,
   },
 }
@@ -36,7 +36,7 @@ const PRINCIPLES = [
   },
   {
     t: 'Built, not just described',
-    d: 'The build courses follow robots I assembled myself, which is why they spend time on wiring mistakes, calibration and the things that only fail on a real floor.',
+    d: 'The build courses follow robots that were actually assembled, which is why they spend time on wiring mistakes, calibration and the things that only fail on a real floor.',
   },
   {
     t: 'Free, and no dark patterns',
@@ -44,7 +44,7 @@ const PRINCIPLES = [
   },
 ]
 
-export default function AuthorPage() {
+export default function HowThisIsWrittenPage() {
   return (
     <CopilotProvider>
       <Nav />
@@ -53,9 +53,9 @@ export default function AuthorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(authorPersonJsonLd()) }}
       />
       <main id="main-content" className="mx-auto max-w-3xl px-5 pb-20 pt-28">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500">Who writes this</p>
-        <h1 className="mt-2 text-3xl font-black text-white md:text-5xl">{AUTHOR.name}</h1>
-        <p className="mt-3 text-lg text-gray-300">{AUTHOR.jobTitle} · {AUTHOR.tagline}</p>
+        <p className="r2-eyebrow">Who writes this</p>
+        <h1 className="r2-display">How R2BOT is written</h1>
+        <p className="r2-lede">{AUTHOR.tagline}</p>
 
         <div className="mt-6 space-y-4 text-[17px] leading-relaxed text-gray-300">
           {AUTHOR.bio.map((para) => (
@@ -63,7 +63,7 @@ export default function AuthorPage() {
           ))}
         </div>
 
-        <h2 className="mt-12 text-2xl font-bold text-white">How I write these pages</h2>
+        <h2 className="r2-h2" style={{ marginTop: '3rem' }}>The rules every page follows</h2>
         <dl className="mt-4 space-y-5">
           {PRINCIPLES.map((p) => (
             <div key={p.t}>
@@ -73,7 +73,7 @@ export default function AuthorPage() {
           ))}
         </dl>
 
-        <h2 className="mt-12 text-2xl font-bold text-white">Tell me when something is wrong</h2>
+        <h2 className="r2-h2" style={{ marginTop: '3rem' }}>Tell us when something is wrong</h2>
         <p className="mt-3 text-gray-300">
           Robotics moves, and a page that was right last year can be wrong now. If you find an error
           — a wrong number, a dead link, an explanation that does not hold up — email{' '}
@@ -83,7 +83,7 @@ export default function AuthorPage() {
           and say which page. Corrections get made and the page&apos;s review date moves.
         </p>
 
-        <h2 className="mt-12 text-2xl font-bold text-white">Where to find the work</h2>
+        <h2 className="r2-h2" style={{ marginTop: '3rem' }}>Where to find the work</h2>
         <ul className="mt-3 space-y-2 text-gray-300">
           <li>
             <Link href="/shorts" className="text-amber-500 underline">Quick Lessons</Link> — one

@@ -2,95 +2,29 @@
 
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useRouter } from 'next/navigation'
-import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { useAuth } from './AuthProvider'
-import { trackEvent } from '@/lib/analytics'
+import { AuthPanel } from './AuthPanel'
 
-type Tab = 'in' | 'up'
-
+/**
+ * The header's sign-in dialog.
+ *
+ * It used to carry its own copy of the auth logic — email + password and
+ * Google, but no magic link — while /login and /signup carried a different
+ * copy offering only a magic link. Two sign-in surfaces that disagreed about
+ * what a person could sign in with. Both render components/auth/AuthPanel now.
+ */
 export function AuthModal() {
   const { isAuthModalOpen, closeAuthModal } = useAuth()
-  const router = useRouter()
-  const [tab, setTab] = useState<Tab>('in')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [displayName, setDisplayName] = useState('')
-  const [grade, setGrade] = useState('enthusiast')
-  const [err, setErr] = useState<string | null>(null)
-  const [info, setInfo] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
 
-  // Close on Escape
   useEffect(() => {
     if (!isAuthModalOpen) return
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeAuthModal() }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [isAuthModalOpen, closeAuthModal])
-
-  const reset = () => { setErr(null); setInfo(null) }
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault(); reset(); setLoading(true)
-    try {
-      const supabase = createSupabaseBrowserClient()
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) { setErr(error.message); return }
-      closeAuthModal()
-      router.refresh()
-    } finally { setLoading(false) }
-  }
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault(); reset(); setLoading(true)
-    try {
-      const supabase = createSupabaseBrowserClient()
-      const { data, error } = await supabase.auth.signUp({ email, password })
-      if (error) { setErr(error.message); return }
-      // Upsert profile (display_name + grade)
-      const userId = data.user?.id
-      if (userId) {
-        await supabase.from('profiles').upsert({
-          id: userId,
-          display_name: displayName || email.split('@')[0],
-          grade,
-        })
-      }
-      trackEvent('sign_up', { method: 'email' })
-      setInfo("Account created. Check your email if confirmation is required, then sign in.")
-      setTab('in')
-    } finally { setLoading(false) }
-  }
-
-  const handleGoogle = async () => {
-    reset(); setLoading(true)
-    try {
-      const supabase = createSupabaseBrowserClient()
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined },
-      })
-      if (error) setErr(error.message)
-    } finally { setLoading(false) }
-  }
-
-  const handleForgot = async () => {
-    reset()
-    if (!email) { setErr('Enter your email above first.'); return }
-    setLoading(true)
-    try {
-      const supabase = createSupabaseBrowserClient()
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/profile/settings` : undefined,
-      })
-      if (error) { setErr(error.message); return }
-      setInfo('📧 Check your email for the reset link.')
-    } finally { setLoading(false) }
-  }
 
   if (!mounted || !isAuthModalOpen) return null
 
@@ -100,72 +34,15 @@ export function AuthModal() {
         <button className="auth-close" onClick={closeAuthModal} aria-label="Close">×</button>
 
         <div className="auth-head">
-          <p className="auth-eyebrow">R2BOT</p>
-          <h2>{tab === 'in' ? 'Sign in' : 'Create your account'}</h2>
-          <p className="auth-sub">Save your progress, sync across devices.</p>
+          <p className="r2-eyebrow">R2BOT</p>
+          <h2 className="r2-h3">Sign in or create an account</h2>
+          <p className="r2-meta">
+            An account only saves your progress and your certificates. Everything is free to read
+            without one.
+          </p>
         </div>
 
-        <div className="auth-tabs">
-          {(['in', 'up'] as Tab[]).map(t => (
-            <button key={t} type="button" onClick={() => { setTab(t); reset() }} className={`auth-tab ${tab === t ? 'on' : ''}`}>
-              {t === 'in' ? 'Sign In' : 'Sign Up'}
-            </button>
-          ))}
-        </div>
-
-        {tab === 'in' ? (
-          <form onSubmit={handleSignIn} className="auth-form">
-            <label>Email
-              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" />
-            </label>
-            <label>Password
-              <input type="password" required value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
-            </label>
-            <button type="submit" className="auth-cta" disabled={loading}>
-              {loading ? <Spinner /> : 'Sign in →'}
-            </button>
-            <button type="button" onClick={handleForgot} className="auth-link">Forgot password?</button>
-          </form>
-        ) : (
-          <form onSubmit={handleSignUp} className="auth-form">
-            <label>Display name
-              <input type="text" required value={displayName} onChange={e => setDisplayName(e.target.value)} maxLength={40} />
-            </label>
-            <label>Email
-              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" />
-            </label>
-            <label>Password (8+ chars)
-              <input type="password" required minLength={8} value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" />
-            </label>
-            <label>I am a…
-              <select value={grade} onChange={e => setGrade(e.target.value)}>
-                <option value="6">Class 6</option>
-                <option value="7">Class 7</option>
-                <option value="8">Class 8</option>
-                <option value="9">Class 9</option>
-                <option value="10">Class 10</option>
-                <option value="11">Class 11</option>
-                <option value="12">Class 12</option>
-                <option value="teacher">Teacher</option>
-                <option value="parent">Parent</option>
-                <option value="enthusiast">Robotics enthusiast</option>
-              </select>
-            </label>
-            <button type="submit" className="auth-cta" disabled={loading}>
-              {loading ? <Spinner /> : 'Create account →'}
-            </button>
-          </form>
-        )}
-
-        <div className="auth-divider"><span>or</span></div>
-        <button type="button" onClick={handleGoogle} className="auth-google" disabled={loading}>
-          Continue with Google
-        </button>
-
-        {err  && <p className="auth-err">{err}</p>}
-        {info && <p className="auth-info">{info}</p>}
-
-        <p className="auth-foot">By signing up you agree to our terms. We don\'t sell your data.</p>
+        <AuthPanel mode="signin" next="/dashboard" onDone={closeAuthModal} />
       </div>
 
       <style jsx>{`
@@ -255,18 +132,4 @@ export function AuthModal() {
   )
 
   return createPortal(modal, document.body)
-}
-
-function Spinner() {
-  return (
-    <span aria-hidden style={{
-      width: 18, height: 18, borderRadius: '50%',
-      border: '2px solid rgba(255,255,255,.4)',
-      borderTopColor: '#fff',
-      animation: 'spin 0.7s linear infinite',
-      display: 'inline-block',
-    }}>
-      <style jsx>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-    </span>
-  )
 }

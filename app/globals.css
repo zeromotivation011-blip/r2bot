@@ -1195,3 +1195,46 @@ a.r2-card:hover, .r2-card--interactive:hover {
   border-top: 7px solid transparent;
   border-bottom: 7px solid transparent;
 }
+
+/* ── Auth panel (header modal, /login, /signup) ────────────────────────── */
+.auth-panel { display: flex; flex-direction: column; gap: 0.875rem; text-align: left; }
+.auth-panel__form { display: flex; flex-direction: column; gap: 0.5rem; }
+.auth-panel__form--pw { margin-top: 0.25rem; }
+.auth-panel__label { font-size: var(--t-small); font-weight: 600; color: var(--text-2); }
+.auth-panel__input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 0.875rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  color: var(--text-1);
+  font: inherit;
+  font-size: var(--t-body);
+  outline: none;
+  transition: border-color 160ms var(--ease);
+}
+.auth-panel__input:focus { border-color: var(--amber); }
+.auth-panel__wide { width: 100%; justify-content: center; }
+.auth-panel__or {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-3);
+  font-size: var(--t-small);
+}
+.auth-panel__or::before, .auth-panel__or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.auth-panel__more {
+  align-self: flex-start;
+  font-size: var(--t-small);
+  color: var(--text-3);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.auth-panel__more:hover { color: var(--text-1); }
+.auth-panel__error { font-size: var(--t-small); color: #F87171; margin: 0; }

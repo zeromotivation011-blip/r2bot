@@ -91,7 +91,7 @@ const GROUPS: Group[] = [
     matches: ['/about', '/author', '/careers', '/india', '/teachers'],
     items: [
       { kind: 'link', icon: '📢', label: 'About R2BOT', sub: 'Why this exists', href: '/about' },
-      { kind: 'link', icon: '✍️', label: 'Written by Ravi', sub: 'Who writes and builds this', href: '/author/ravi' },
+      { kind: 'link', icon: '✍️', label: 'How this is written', sub: 'The rules every page follows', href: '/about/how-this-is-written' },
       { kind: 'link', icon: '🛣️', label: 'Career Paths', sub: 'Roadmaps into robotics jobs', href: '/careers' },
       { kind: 'link', icon: '🇮🇳', label: 'Robotics in India', sub: 'Competitions, colleges, companies', href: '/india' },
       { kind: 'link', icon: '🍎', label: 'For teachers', sub: 'A free 40-minute lesson plan', href: '/teachers' },

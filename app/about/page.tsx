@@ -49,11 +49,13 @@ export default function AboutPage() {
         <li><strong>Cited, never invented</strong> — R2 Co-pilot grounds every answer in the Atlas. If we don&apos;t know, we say so. No hallucinations dressed as facts.</li>
       </ul>
 
-      <h2>The founder</h2>
+      <h2>Who builds it</h2>
       <p>
-        R2BOT is built by <strong>Ravi Bohra</strong>, a solo founder based in India. The plan,
-        the brand, the platform, the early Atlas entries — all written by one person who cares more
-        about the next generation understanding robotics than they care about reaching unicorn status.
+        R2BOT is built by one person. The plan, the brand, the platform, the Atlas entries, the
+        lessons and the simulators — all of it written by someone who taught science before moving
+        into robotics, and who cares more about the next generation understanding this subject than
+        about building a large company. More on{' '}
+        <a href="/about/how-this-is-written">how the pages get written</a>.
       </p>
 
       <h2>The roadmap</h2>

@@ -37,7 +37,7 @@ export default function SourcesPage() {
       <h2>How to cite R2BOT</h2>
       <p>If you&apos;re writing something that uses an R2BOT entry, please cite us as:</p>
       <p style={{ background: 'rgba(11,37,64,.5)', padding: '14px 18px', borderRadius: 10, fontFamily: 'var(--font-mono), monospace', fontSize: 14 }}>
-        Bohra, R. (2026). [Entry title]. R2BOT. https://r2bot.com/atlas/...
+        R2BOT. (2026). [Entry title]. https://www.r2bot.in/atlas/...
       </p>
       <p>
         For academic citation, use the &quot;Last reviewed&quot; date at the top of each Atlas entry

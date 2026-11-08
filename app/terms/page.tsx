@@ -18,8 +18,8 @@ export default function TermsPage() {
 
       <h2>1. What R2BOT is</h2>
       <p>
-        R2BOT is a free educational platform about robotics, operated by Ravi Bohra as a sole
-        proprietor based in India. By using R2BOT (the website at r2bot.com or any subdomain,
+        R2BOT is a free educational platform about robotics, operated as a sole proprietorship.
+        By using R2BOT (the website at www.r2bot.in or any subdomain,
         the API, R2 Co-pilot, and any associated services), you agree to these Terms.
       </p>
 

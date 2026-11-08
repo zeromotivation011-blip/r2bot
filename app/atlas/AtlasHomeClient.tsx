@@ -8,9 +8,7 @@ import {
   touchStreak, getTermOfDay, pushRecentSearch, getRecentSearches,
   getPathState, markPathStep,
 } from '@/lib/atlas-progress'
-import { XPBar } from '@/components/atlas/XPBar'
 import { CuriousButton } from '@/components/atlas/CuriousButton'
-import { BucketHeatmap } from '@/components/atlas/BucketHeatmap'
 import { BucketGrid } from '@/components/atlas/BucketGrid'
 import { ReadingPathsStrip } from '@/components/atlas/ReadingPathsStrip'
 import { AtlasCommandSearch } from '@/components/atlas/AtlasCommandSearch'
@@ -62,7 +60,15 @@ interface BucketSummary {
   count: number
 }
 
-type Mode = 'explore' | 'galaxy' | 'learn' | 'search' | 'world-map'
+/**
+ * Five tabs — Grid, Galaxy, Learn, Search, World Map — were five views of the
+ * same 512 concepts, and three of them were already on the page: Learn
+ * rendered the same reading paths as ReadingPathsStrip above it, Search was a
+ * second search box under the ⌘K command bar at the top, and World Map is a
+ * parked surface that /world-map itself 308s away from. Offering every view
+ * ever built is how a product reads as unfinished.
+ */
+type Mode = 'explore' | 'galaxy'
 
 // Stable bucket → color map
 const BUCKET_COLORS = [
@@ -111,23 +117,24 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
   const selected = selectedSlug ? nodes.find(n => n.slug === selectedSlug) ?? null : null
 
   return (
-    <main style={{ paddingTop: 100, paddingBottom: 80, minHeight: '100vh', background: '#0a0a16' }}>
+    <main style={{ paddingTop: 100, paddingBottom: 80, minHeight: '100vh', background: 'var(--void)' }}>
       <div className="container" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
         {/* Header */}
         <div className="atlas-header">
           <div>
-            <p className="eyebrow">Atlas · Knowledge Universe</p>
-            <h1>Every concept. <span style={{ color: '#FC6818' }}>One map.</span></h1>
-            <p className="sub">
-              <strong style={{ color: '#fff' }}>{nodes.length}</strong> robotics concepts across {buckets.length} buckets.
-              No jargon. Sources at the bottom of every page.
+            <p className="r2-eyebrow">The Atlas</p>
+            <h1 className="r2-display">Every concept, explained once and properly.</h1>
+            <p className="r2-lede">
+              {nodes.length} robotics concepts across {buckets.length} areas, each starting from a
+              plain-English answer and going as deep as you want to follow it. Every page cites
+              its sources.
             </p>
           </div>
-          <div className="atlas-meta">
-            <XPBar refreshKey={mastered.length} />
-            <Stat label="✅ Mastered" value={`${mastered.length}`} />
-            <Stat label="🔥 Streak" value={`${streak} day${streak === 1 ? '' : 's'}`} />
-          </div>
+          {/* The header carried an XP bar, "✅ Mastered 0" and "🔥 Streak 1 day".
+              A reference work should not open with a scoreboard — and for
+              anyone arriving from a search result, which is almost everyone,
+              it opened by telling them they had mastered nothing. Progress
+              lives on the dashboard; the streak lives on the profile. */}
         </div>
 
         {/* Search + curious */}
@@ -168,26 +175,17 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
           onSelect={(slug) => setBucketFilter(prev => prev === slug ? null : slug)}
         />
 
-        {/* Bucket heatmap (compact mastery overview) */}
-        <BucketHeatmap
-          buckets={buckets}
-          nodes={nodes}
-          onBucketSelect={(slug) => setBucketFilter(prev => prev === slug ? null : slug)}
-          refreshKey={mastered.length}
-        />
+        {/* BucketHeatmap was here: the same twenty buckets as BucketGrid
+            directly above it, drawn a second way. */}
 
         {/* Mode tabs */}
         <div className="mode-bar">
-          {(['explore', 'galaxy', 'learn', 'search', 'world-map'] as Mode[]).map(m => (
+          {(['explore', 'galaxy'] as Mode[]).map(m => (
             <button key={m}
               onClick={() => setMode(m)}
               className={`mode-tab ${mode === m ? 'on' : ''}`}
             >
-              {m === 'explore' ? '📚 Grid'
-                : m === 'galaxy' ? '🌌 Galaxy'
-                : m === 'learn' ? '🎓 Learn'
-                : m === 'search' ? '🔍 Search'
-                : '🌍 World Map'}
+              {m === 'explore' ? 'Browse all' : 'Galaxy view'}
             </button>
           ))}
         </div>
@@ -208,8 +206,6 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
           />
         )}
 
-        {mode === 'world-map' && <WorldMapView />}
-
         {mode === 'explore' && (
           <ExploreMode
             nodes={filteredNodes}
@@ -224,8 +220,6 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
             termOfDay={termOfDay}
           />
         )}
-        {mode === 'learn'  && <LearnMode nodes={nodes} />}
-        {mode === 'search' && <SearchMode nodes={nodes} onSelect={setSelectedSlug} />}
 
         {/* Term drawer */}
         {selected && (
@@ -269,18 +263,6 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
   )
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{
-      background: 'rgba(252,104,24,.1)', border: '1px solid rgba(252,104,24,.3)',
-      padding: '8px 14px', borderRadius: 12, color: '#fde047', fontWeight: 800, fontSize: 13,
-      display: 'inline-flex', alignItems: 'center', gap: 6,
-    }}>
-      <span style={{ opacity: 0.8 }}>{label}</span>
-      <span style={{ color: '#fff' }}>{value}</span>
-    </div>
-  )
-}
 
 // ────────────────────────────────────────────────────────────────────────────
 // EXPLORE MODE — bucket pills + canvas force graph (desktop) / grid (mobile)
@@ -675,177 +657,6 @@ function MobileBucketGrid({ nodes, buckets, onSelect }: {
   )
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// LEARN MODE — Curated paths
-// ────────────────────────────────────────────────────────────────────────────
-function LearnMode({ nodes }: { nodes: AtlasNode[] }) {
-  return (
-    <div className="learn-grid">
-      {LEARNING_PATHS.map(path => {
-        const state = (typeof window !== 'undefined') ? getPathState(path.id) : { completed: [], startedAt: '' }
-        const done = state.completed.length
-        const total = path.termSlugs.length
-        return (
-          <div key={path.id} className={`path-card bg-gradient-to-br ${path.gradient}`}>
-            <div style={{ fontSize: 36 }}>{path.emoji}</div>
-            <h3 style={{ fontSize: 22, fontWeight: 900, color: '#fff', marginTop: 8 }}>{path.title}</h3>
-            <p style={{ fontSize: 14, color: '#FFC9A8', marginTop: 4 }}>{path.description}</p>
-            <div style={{ marginTop: 10, fontSize: 12, color: '#fde047' }}>
-              {path.duration} · {path.targetAudience} · ⭐ {done}/{total} mastered
-            </div>
-            <div style={{ marginTop: 10, height: 6, background: 'rgba(0,0,0,.3)', borderRadius: 999, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${(done / total) * 100}%`, background: '#fde047', transition: 'width .4s' }} />
-            </div>
-            <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-              {path.termSlugs.slice(0, 4).map(s => (
-                <span key={s} style={{
-                  fontSize: 10, background: 'rgba(0,0,0,.4)', color: '#FFC9A8',
-                  padding: '3px 7px', borderRadius: 999,
-                }}>{nodes.find(n => n.slug === s)?.title ?? s}</span>
-              ))}
-              {path.termSlugs.length > 4 && (
-                <span style={{ fontSize: 10, color: '#FFC9A8' }}>+{path.termSlugs.length - 4}</span>
-              )}
-            </div>
-            <Link
-              href={`/atlas/path/${path.id}`}
-              onClick={(e) => {
-                e.preventDefault()
-                // Linear walk through path: open the first incomplete term
-                const next = path.termSlugs.find(s => !state.completed.includes(s)) ?? path.termSlugs[0]
-                const target = nodes.find(n => n.slug === next)
-                if (target) {
-                  markPathStep(path.id, target.slug)
-                  window.location.href = `/atlas/${target.type}/${target.slug}`
-                }
-              }}
-              style={{
-                marginTop: 14, display: 'inline-block',
-                background: '#fde047', color: '#0a0a16',
-                padding: '8px 14px', borderRadius: 12,
-                textDecoration: 'none', fontWeight: 900, fontSize: 14,
-              }}
-            >Start path →</Link>
-          </div>
-        )
-      })}
-      <style jsx>{`
-        .learn-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 10px; }
-        @media (min-width: 720px) { .learn-grid { grid-template-columns: 1fr 1fr; } }
-        @media (min-width: 1100px) { .learn-grid { grid-template-columns: repeat(3, 1fr); } }
-        .path-card {
-          padding: 22px; border-radius: 22px;
-          border: 2px solid rgba(255,255,255,.1);
-          box-shadow: 0 10px 30px rgba(0,0,0,.4);
-        }
-      `}</style>
-    </div>
-  )
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// SEARCH MODE — fuzzy substring search with keyboard nav
-// ────────────────────────────────────────────────────────────────────────────
-function SearchMode({ nodes, onSelect }: { nodes: AtlasNode[]; onSelect: (s: string) => void }) {
-  const [q, setQ] = useState('')
-  const [idx, setIdx] = useState(0)
-  const inputRef = useRef<HTMLInputElement | null>(null)
-  const [recent, setRecent] = useState<string[]>([])
-  useEffect(() => { inputRef.current?.focus(); setRecent(getRecentSearches()) }, [])
-
-  const results = useMemo(() => {
-    if (!q.trim()) return nodes.slice(0, 30)
-    const Q = q.toLowerCase()
-    return nodes
-      .filter(n => n.title.toLowerCase().includes(Q) ||
-                   n.summary.toLowerCase().includes(Q) ||
-                   n.bucket.includes(Q))
-      .slice(0, 50)
-  }, [q, nodes])
-
-  useEffect(() => { setIdx(0) }, [q])
-
-  const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown') { e.preventDefault(); setIdx(i => Math.min(results.length - 1, i + 1)) }
-    if (e.key === 'ArrowUp')   { e.preventDefault(); setIdx(i => Math.max(0, i - 1)) }
-    if (e.key === 'Enter')     { e.preventDefault(); if (results[idx]) { pushRecentSearch(q); onSelect(results[idx].slug) } }
-  }
-
-  return (
-    <div className="search-shell">
-      <input
-        ref={inputRef}
-        value={q}
-        onChange={e => setQ(e.target.value)}
-        onKeyDown={handleKey}
-        placeholder="Search 249+ concepts… (try 'lidar', 'pid', 'cobot')"
-        className="search-input"
-      />
-      {!q && recent.length > 0 && (
-        <div className="recent">
-          <span className="recent-h">Recent:</span>
-          {recent.map(r => (
-            <button key={r} onClick={() => setQ(r)} className="recent-pill">{r}</button>
-          ))}
-        </div>
-      )}
-
-      <ul className="results">
-        {results.map((n, i) => (
-          <li key={n.slug}
-              className={i === idx ? 'on' : ''}
-              onMouseEnter={() => setIdx(i)}
-              onClick={() => { pushRecentSearch(q); onSelect(n.slug) }}
-          >
-            <span style={{ fontSize: 18 }}>{n.bucketEmoji}</span>
-            <div style={{ flex: 1 }}>
-              <strong>{n.title}</strong>
-              <p>{n.oneLiner || n.summary.slice(0, 100)}</p>
-            </div>
-            <span style={{ fontSize: 10, color: '#6b7280' }}>{n.bucketLabel}</span>
-            <span style={{
-              fontSize: 10, color: '#fde047',
-              background: 'rgba(252,104,24,.15)', border: '1px solid rgba(252,104,24,.3)',
-              padding: '2px 6px', borderRadius: 6,
-            }}>D{n.difficultyLevel}</span>
-          </li>
-        ))}
-        {results.length === 0 && (
-          <li style={{ color: '#6b7280', justifyContent: 'center' }}>No matches. Try a different word.</li>
-        )}
-      </ul>
-
-      <style jsx>{`
-        .search-shell { background: #11112a; border: 1px solid #2a2a45; border-radius: 18px; padding: 16px; }
-        .search-input {
-          width: 100%; min-height: 56px;
-          background: #060611; color: #fff;
-          border: 2px solid #2a2a45; border-radius: 12px;
-          padding: 0 18px; font-size: 17px; font-weight: 700;
-          outline: none;
-        }
-        .search-input:focus { border-color: #FC6818; }
-        .recent { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-        .recent-h { font-size: 11px; color: #6b7280; }
-        .recent-pill {
-          background: #181830; color: #FFC9A8; border: 1px solid #2a2a45;
-          border-radius: 999px; padding: 4px 10px; font-size: 11px; cursor: pointer;
-        }
-        .recent-pill:hover { border-color: #FC6818; }
-        .results { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-direction: column; gap: 4px; max-height: 480px; overflow-y: auto; }
-        .results li {
-          display: flex; align-items: center; gap: 10px;
-          padding: 10px 12px; min-height: 56px;
-          background: #060611; border: 1px solid transparent;
-          border-radius: 10px; cursor: pointer;
-        }
-        .results li.on { border-color: #FC6818; background: rgba(252,104,24,.06); }
-        .results li strong { color: #FFC9A8; font-size: 15px; }
-        .results li p { color: #9ca3af; font-size: 12px; margin-top: 2px; line-height: 1.3; }
-      `}</style>
-    </div>
-  )
-}
 
 // ────────────────────────────────────────────────────────────────────────────
 // TERM DRAWER
