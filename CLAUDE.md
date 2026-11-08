@@ -310,7 +310,11 @@ Secrets live only in Vercel env + local `.env.local` (gitignored) — never comm
 ## 15. WHEN YOU FINISH A TASK
 
 1. `npm run type-check` — zero errors. 2. `npm run build` — passes (or flag). 3. Public pages render
-real HTML — start the build and curl the routes you touched, do not assume. 4. Mobile checked, tap
+real HTML — start the build and curl the routes you touched, do not assume. **Count the words,
+don't eyeball the status code**: on 8 Nov an Atlas table change left all 512 entry pages serving an
+empty body behind an HTTP 200 and a green build — 197 words live against 869 in the build, no error
+anywhere. After any change touching a content reader, a table a page reads, or a merge precedence,
+compare a known page's `<article>` word count live against `.next/server/app/.../<slug>.html`. 4. Mobile checked, tap
 targets 44px+. 5. No prices and no "free forever" language. 6. New env vars documented. 7. Semantic
 commit, pushed to `main` (Vercel deploys itself). 8. If you added a migration, say so plainly in the
 hand-off: Ravi has to run it, and the code must work before he does.
