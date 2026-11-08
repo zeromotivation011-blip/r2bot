@@ -48,17 +48,22 @@ jobs:
         # about this reaches the browser bundle.
         run: npm install -g @unlighthouse/cli@0.19.1
 
-      - name: Audit every page template
-        # --mobile: the audience is phone-first, so desktop numbers would
-        #   flatter us. CLAUDE.md §11 is mobile-first; measure what they get.
-        # --exclude-urls: the parked, noindex surfaces (CLAUDE.md §6) plus admin
-        #   and API routes. Auditing a page we deliberately hide from Google
-        #   would spend minutes to produce a number nobody should act on.
-        # --samples 1: one pass per template. Enough to catch a page that is
-        #   broken or inaccessible; not enough for fine perf trending, which is
-        #   the homepage budget's job.
-        # No --budget on the scheduled run: see unlighthouse.config.js for why
-        #   an unmeasured budget is worse than none.
+      - name: Audit one page per template
+        # EXPLICIT URL LIST, NOT A CRAWL — and that is the whole lesson of the
+        # first real run (8 Nov 2026). Left to crawl, Unlighthouse discovered
+        # 1,756 routes and requested them fast enough to trip the site's own rate
+        # limiting, which answered 403. It skipped /shorts, every /robots/* page,
+        # /ros2 and most of the Atlas, finished with 34 alphabetically-early
+        # pages, and reported healthy averages. The numbers were real but the
+        # sample was an accident of which pages replied before the limiter woke.
+        #
+        # One verified page per template is better evidence than an accidental
+        # slice of a thousand: it is deterministic, it is genuinely
+        # representative, it finishes in a couple of minutes, and it cannot be
+        # throttled into looking fine. Every URL below was confirmed 200.
+        #
+        # Adding a new page TEMPLATE? Add one of its URLs here and bump --min.
+        # --mobile: the audience is phone-first; desktop numbers would flatter us.
         run: |
           BUDGET_FLAG=""
           if [ -n "${{ inputs.budget }}" ]; then
@@ -70,12 +75,14 @@ jobs:
             --samples 1 \
             --build-static \
             --reporter jsonExpanded \
-            --exclude-urls "/admin/**,/api/**,/jobs/**,/leaderboard/**,/schools/**,/hardware/**,/history/**,/lab/**,/showcase/**" \
+            --urls "/,/atlas,/atlas/concept/slam,/atlas/robot/shakey,/atlas/person/rodney-brooks,/atlas/company/boston-dynamics,/shorts,/shorts/line-follower,/courses,/academy,/academy/spark,/academy/spark/01,/robots,/robots/nao,/news,/blog,/blog/ai-and-robotics-complete-guide,/build,/visualizer,/ai-robotics,/daily-life,/about,/pricing" \
             $BUDGET_FLAG
 
-      - name: Summarise the worst pages
+      - name: Summarise, and assert the scan actually covered the site
         if: always()
-        run: node scripts/summarise-audit.mjs
+        # --min is what stops a throttled or half-finished scan from passing as
+        # evidence. 23 URLs requested, 23 demanded. Keep these in step.
+        run: node scripts/summarise-audit.mjs --min 23
 
       - name: Keep the full report
         if: always()

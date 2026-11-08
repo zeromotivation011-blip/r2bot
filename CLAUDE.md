@@ -341,7 +341,7 @@ Four workflows in `.github/workflows/`. Know which gap each one covers before tr
 | `quality.yml` | `type-check` + lint. No build — secrets live in Vercel. | every PR |
 | `secret-scan.yml` | gitleaks over full history (`fetch-depth: 0`); also a pre-commit hook. | every PR |
 | `live-checks.yml` | sitemap honesty (`scripts/check-sitemap.mjs`), dead links (lychee), **Atlas pages have real content** (`scripts/check-atlas-content.mjs`). | daily 06:37 UTC |
-| `site-audit.yml` | full Lighthouse suite — performance, **accessibility**, **SEO**, best-practices — across every page template, mobile. Reports only; no budget asserted yet. | weekly Mon 04:23 UTC |
+| `site-audit.yml` | full Lighthouse suite — performance, **accessibility**, **SEO**, best-practices — on one verified URL per template, mobile. Regression floors in `unlighthouse.config.js`. | weekly Mon 04:23 UTC |
 
 **What a green tick does not mean.** Every one of these passed for hours on 8 Nov while all 512
 Atlas pages served a blank page: the pages returned 200, sat in the sitemap, resolved their links
@@ -349,11 +349,26 @@ and carried correct canonicals. Checks that measure *existence* cannot see an em
 why `check-atlas-content.mjs` exists, and why any new content surface needs a check that it SAYS
 something, not just that it responds.
 
+**Never audit by crawling this site.** The first site-wide run discovered 1,756 routes and
+requested them fast enough to trip our own rate limiting, which answered 403. It skipped `/shorts`,
+every `/robots/*`, `/ros2` and most of the Atlas, finished with 34 alphabetically-early pages, and
+reported healthy averages — real numbers from an accidental sample. `site-audit.yml` therefore
+audits an explicit list of verified URLs, one per template, and asserts the count
+(`summarise-audit.mjs --min`). Add a URL there when you add a page template, and keep `--min` in
+step. A throttled scan that reports anyway is worse than no scan: it looks like evidence.
+
 **On budgets.** `lighthouse-budget.json` is a ratchet set *above* measured reality (homepage script
 488 KB against a 350 KB target, TBT 1,245 ms against 300 ms), with the real numbers in its
 `_comment`. Never raise a budget to turn a build green — raise it only with a measurement and a
-note, or fix the page. The site-wide audit asserts no budget until a real run produces numbers; an
-honest 55 that holds is worth more than a decorative 90 that gets switched off.
+note, or fix the page. The site-wide audit's floors in `unlighthouse.config.js` were set the same way,
+from a measured run, with the numbers written beside them. An honest 60 that holds is worth more
+than a decorative 90 that gets switched off.
+
+**Known gaps against §3, measured 8 Nov 2026.** Performance bottoms out at 66 (`/atlas/person/*`),
+71 (`/daily-life`), 75 (`/robots/*`); accessibility sits at 85–89 everywhere. Every Atlas entry
+template scores an identical 87, which points at one shared component rather than 512 separate
+problems. Neither the Lighthouse > 90 nor the WCAG AA bar is met yet; the floors stop it getting
+worse, they do not claim it is good.
 
 ---
 

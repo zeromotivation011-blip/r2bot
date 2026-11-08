@@ -24,26 +24,39 @@
 module.exports = {
   site: 'https://www.r2bot.in',
 
-  // BUDGETS ARE DELIBERATELY NOT SET YET.
+  // MEASURED, then set. Run 42510930736 (8 Nov 2026), 23 URLs, one per
+  // template, mobile, zero pages skipped:
   //
-  // The last budget added to this repo (lighthouse-budget.json) had to be a
-  // ratchet above measured reality — homepage script 488 KB against a 350 KB
-  // target, TBT 1,245 ms against 300 ms — because a budget invented from
-  // aspiration either fails every build or gets quietly raised until it means
-  // nothing. The same discipline applies here, and the numbers for 1,700 pages
-  // are not known yet.
+  //   category        average   worst page
+  //   performance        91     66  /atlas/person/rodney-brooks
+  //                             71  /daily-life
+  //                             75  /robots/nao
+  //   accessibility      89     85  /atlas
+  //                             86  /visualizer
+  //                             87  every Atlas entry template
+  //   seo               100     91  /academy/spark
+  //   best-practices     99     96  /academy/spark/01
   //
-  // So: the first scheduled run reports and does not fail. Read its summary,
-  // then uncomment this with each category set just above what the site truly
-  // scores, and tighten it from there. An honest 55 that holds is worth more
-  // than a decorative 90 that gets switched off.
+  // These are REGRESSION FLOORS, set just under the worst real page — not the
+  // §3 target. They exist to catch a page getting worse, and they are the
+  // honest version: the earlier lighthouse-budget.json had to be a ratchet
+  // above measured reality for the same reason. Raise them only with a fresh
+  // measurement and a note, never to turn a build green.
   //
-  // ci: {
-  //   budget: {
-  //     'performance': 0,
-  //     'accessibility': 0,
-  //     'best-practices': 0,
-  //     'seo': 0,
-  //   },
-  // },
+  // Performance gets wider clearance than the rest because Lighthouse
+  // performance is genuinely noisy run to run; accessibility is rule-based and
+  // barely moves, so its floor sits at the measured worst.
+  //
+  // §3 wants Lighthouse > 90 and WCAG AA. Neither is met yet: performance
+  // reaches 66 at worst and accessibility sits at 85–89 site-wide. Note that
+  // every Atlas entry template scores the same 87, which points at one shared
+  // component rather than 512 separate problems — one fix, broad payoff.
+  ci: {
+    budget: {
+      'performance': 60,
+      'accessibility': 85,
+      'best-practices': 95,
+      'seo': 90,
+    },
+  },
 }
