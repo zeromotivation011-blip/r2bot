@@ -2,13 +2,21 @@
 
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { WhenVisible } from './WhenVisible';
 
-const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
-  ssr: false,
-  loading: () => (
+const EDITOR_HEIGHT = 480;
+
+/**
+ * One skeleton, two users: `dynamic()`'s loading state and the WhenVisible
+ * placeholder below. They must be identical and exactly EDITOR_HEIGHT tall, or
+ * swapping the real editor in causes the layout shift this change is meant to
+ * avoid.
+ */
+function EditorSkeleton() {
+  return (
     <div
       style={{
-        height: 480,
+        height: EDITOR_HEIGHT,
         background: '#1e1e1e',
         borderRadius: 8,
         display: 'flex',
@@ -21,7 +29,12 @@ const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
     >
       Loading editor…
     </div>
-  ),
+  );
+}
+
+const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
+  ssr: false,
+  loading: () => <EditorSkeleton />,
 });
 
 const SIM_W = 380;
@@ -449,8 +462,12 @@ export function RobotPlayground() {
         {/* LEFT: Monaco editor */}
         <div style={{ minWidth: 0 }}>
           <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border-2)' }}>
+            {/* Monaco is ~897 KB from a third-party CDN and `dynamic()` fetches it
+                the moment this mounts. The Visualizer hub mounts every simulator
+                on arrival, so it was downloading before anyone scrolled here. */}
+            <WhenVisible height={EDITOR_HEIGHT} placeholder={<EditorSkeleton />}>
             <MonacoEditor
-              height="480px"
+              height={`${EDITOR_HEIGHT}px`}
               language="python"
               theme="vs-dark"
               value={code}
@@ -464,6 +481,7 @@ export function RobotPlayground() {
                 automaticLayout: true,
               }}
             />
+            </WhenVisible>
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
             <button
