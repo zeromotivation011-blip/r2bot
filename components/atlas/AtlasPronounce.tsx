@@ -33,7 +33,7 @@ export function AtlasPronounce({ term }: { term: string }) {
       title={`Pronounce "${term}"`}
       className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${
         speaking
-          ? 'border-amber-400 bg-amber-500/30 text-amber-100'
+          ? 'border-[var(--accent-line)] bg-[var(--accent-wash)] text-[var(--amber-bright)]'
           : 'border-white/15 bg-white/[0.04] text-zinc-200 hover:border-amber-400/40 hover:bg-amber-500/10'
       }`}
     >

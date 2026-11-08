@@ -40,7 +40,7 @@ function MasterThisLink({ lessonKey }: { lessonKey?: string }) {
   return (
     <Link
       href={lesson.href}
-      className="inline-flex items-center gap-1.5 text-xs text-amber-500/70 hover:text-amber-400 transition-colors mt-2"
+      className="inline-flex items-center gap-1.5 text-xs text-amber-500/70 hover:text-gray-300 transition-colors mt-2"
       style={{ marginBottom: 18 }}
     >
       <span>📚</span> Master this in {lesson.title} →

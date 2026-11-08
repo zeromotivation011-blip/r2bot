@@ -100,7 +100,7 @@ export default async function EmbedSectionPage({
             href={`${BASE}/visualizer/${sim.id}`}
             target="_blank"
             rel="noopener"
-            className="font-bold text-amber-400 hover:underline"
+            className="font-bold text-gray-300 hover:underline"
           >
             R2BOT
           </a>

@@ -24,7 +24,7 @@ export function RobotTagFilter({
             onClick={() => onToggle(tag)}
             className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
               active
-                ? 'border-amber-400 bg-amber-500/20 text-amber-200'
+                ? 'border-amber-400 bg-amber-500/20 text-gray-200'
                 : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/30'
             }`}
           >

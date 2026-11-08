@@ -30,7 +30,7 @@ export function RobotSpecs({ robot }: { robot: Robot }) {
           See full specs{' '}
           <span className="ml-1 text-xs font-normal text-zinc-400">({entries.length} entries)</span>
         </span>
-        <span className="text-amber-300" aria-hidden>
+        <span className="text-gray-300" aria-hidden>
           {open ? '▴' : '▾'}
         </span>
       </button>

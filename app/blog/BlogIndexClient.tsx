@@ -22,7 +22,7 @@ const TAG_COLOR: Record<string, string> = {
   Beginner:    'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
   Career:      'bg-purple-500/15 text-purple-300 border-purple-500/30',
   Arduino:     'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
-  Schools:     'bg-amber-500/15 text-amber-300 border-amber-500/30',
+  Schools:     'bg-amber-500/15 text-gray-300 border-white/15',
   India:       'bg-orange-500/15 text-orange-300 border-orange-500/30',
   Hindi:       'bg-rose-500/15 text-rose-300 border-rose-500/30',
   'AI & ML':   'bg-pink-500/15 text-pink-300 border-pink-500/30',
@@ -82,8 +82,8 @@ export default function BlogIndexClient({ posts, tags }: { posts: PostLite[]; ta
       {featured && (
         <section className="mx-auto max-w-5xl mt-12">
           <Link href={`/blog/${featured.slug}`} className="block">
-            <article className="relative rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-transparent to-blue-500/10 p-7 md:p-10 hover:border-amber-400/60 transition-colors">
-              <span className="text-xs font-black uppercase tracking-widest text-amber-300">Featured</span>
+            <article className="relative rounded-3xl border border-white/15 bg-gradient-to-br from-amber-500/10 via-transparent to-blue-500/10 p-7 md:p-10 hover:border-amber-400/60 transition-colors">
+              <span className="text-xs font-black uppercase tracking-widest text-gray-300">Featured</span>
               <div className="mt-3 flex items-start gap-5">
                 <span className="text-6xl md:text-7xl">{featured.coverEmoji}</span>
                 <div className="min-w-0">
@@ -94,7 +94,7 @@ export default function BlogIndexClient({ posts, tags }: { posts: PostLite[]; ta
                       <span key={t} className={`text-[10px] font-bold uppercase tracking-wider border rounded-full px-2 py-0.5 ${tagClass(t)}`}>{t}</span>
                     ))}
                   </div>
-                  <p className="mt-3 text-xs text-zinc-400">{featured.readTime} min read · {fmtDate(featured.date)} · <span className="text-amber-300 font-bold">Read article →</span></p>
+                  <p className="mt-3 text-xs text-zinc-400">{featured.readTime} min read · {fmtDate(featured.date)} · <span className="text-gray-300 font-bold">Read article →</span></p>
                 </div>
               </div>
             </article>
@@ -151,7 +151,7 @@ export default function BlogIndexClient({ posts, tags }: { posts: PostLite[]; ta
           <h2 className="text-xl font-black text-white">Robotics news, reported</h2>
           <p className="mt-1 text-sm text-zinc-400">
             Dated pieces about what happened, not guides. For the daily feed see{' '}
-            <Link href="/news" className="text-amber-300 underline">News</Link>.
+            <Link href="/news" className="text-gray-300 underline">News</Link>.
           </p>
           <ul className="mt-4 divide-y divide-white/5 rounded-2xl border border-white/10 bg-white/[0.02]">
             {news.map(p => (

@@ -264,7 +264,7 @@ export function CopilotPageClient() {
     <div className="mx-auto max-w-4xl px-4">
       {/* Header */}
       <header className="mb-6 text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-1.5 text-sm font-semibold text-amber-300">
           🤖 R2 Co-pilot · v2
         </span>
         <h1 className="mt-3 text-4xl font-black text-white sm:text-5xl">
@@ -294,7 +294,7 @@ export function CopilotPageClient() {
               onClick={() => onModeChange(m.id)}
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors ${
                 active
-                  ? 'border-amber-400 bg-amber-500/20 text-amber-200'
+                  ? 'border-[var(--accent-line)] bg-[var(--accent-wash)] text-[var(--amber-bright)]'
                   : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/30'
               }`}
             >
@@ -385,7 +385,7 @@ export function CopilotPageClient() {
 function UserBubble({ content }: { content: string }) {
   return (
     <div className="flex justify-end">
-      <div className="max-w-[80%] rounded-2xl rounded-tr-md bg-amber-500/15 px-4 py-2.5 text-sm text-amber-100">
+      <div className="max-w-[80%] rounded-2xl rounded-tr-md bg-[var(--surface-2)] px-4 py-2.5 text-sm text-[var(--text-1)]">
         {content}
       </div>
     </div>
@@ -426,7 +426,7 @@ function AssistantBubble({ msg, onRate }: { msg: Message; onRate: (m: Message, r
                       {...props}
                       target={(props.href || '').startsWith('/') ? undefined : '_blank'}
                       rel="noopener noreferrer"
-                      className="text-amber-300 underline decoration-amber-400/40 hover:decoration-amber-400"
+                      className="text-white underline decoration-white/30 hover:decoration-[var(--amber)]"
                     />
                   );
                 },
@@ -473,7 +473,7 @@ function AssistantBubble({ msg, onRate }: { msg: Message; onRate: (m: Message, r
             {related ? (
               <a
                 href={related.href}
-                className="ml-auto rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-1 text-amber-200 hover:bg-amber-500/20"
+                className="ml-auto rounded-md border border-white/15 bg-white/[0.04] px-2 py-1 text-gray-300 hover:bg-amber-500/20"
               >
                 📚 Want to go deeper? → {related.label}
               </a>

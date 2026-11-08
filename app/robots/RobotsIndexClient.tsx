@@ -59,7 +59,7 @@ function RobotsIndexInner() {
 
       <section className="relative overflow-hidden bg-[var(--void)] px-4 pb-8 pt-24">
         <div className="mx-auto max-w-5xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-1.5 text-sm font-semibold text-gray-300">
             🏆 Hall of Fame · documentary deep dives
           </span>
           <h1 className="mt-6 font-black leading-[1.05] tracking-tight text-white text-[clamp(36px,6vw,64px)]">
@@ -92,7 +92,7 @@ function RobotsIndexInner() {
                 onClick={() => setFilter(f.key)}
                 className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
                   active
-                    ? 'border-amber-400 bg-amber-500/20 text-amber-200'
+                    ? 'border-amber-400 bg-amber-500/20 text-gray-200'
                     : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/30'
                 }`}
               >
@@ -150,7 +150,7 @@ function RobotCard({ robot }: { robot: Robot }) {
       <CompareButton slug={robot.slug} />
       <Link
         href={`/robots/${robot.slug}`}
-        className="group flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.01] transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/50 hover:shadow-[0_18px_60px_rgba(252,104,24,0.18)]"
+        className="group flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.01] transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_18px_60px_rgba(252,104,24,0.18)]"
       >
         <div className="relative flex h-32 items-center justify-center bg-gradient-to-br from-amber-500/[0.08] via-white/[0.02] to-purple-500/[0.06]">
           <span className="text-6xl" aria-hidden>
@@ -159,7 +159,7 @@ function RobotCard({ robot }: { robot: Robot }) {
           <span className="absolute right-3 bottom-3 rounded-full border border-white/15 bg-black/40 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-zinc-200 backdrop-blur">
             {ROBOT_TYPE_LABELS[robot.type]}
           </span>
-          <span className="absolute left-3 top-3 rounded-full border border-amber-400/40 bg-amber-500/15 px-2.5 py-0.5 font-mono text-[10px] font-bold text-amber-200 backdrop-blur">
+          <span className="absolute left-3 top-3 rounded-full border border-white/15 bg-white/[0.05] px-2.5 py-0.5 font-mono text-[10px] font-bold text-gray-200 backdrop-blur">
             #{robot.displayRank ?? robot.fameRank}
           </span>
         </div>
@@ -169,7 +169,7 @@ function RobotCard({ robot }: { robot: Robot }) {
             {robot.name}
             <span className="ml-2 text-sm font-normal text-zinc-500">{robot.countryFlag}</span>
           </h2>
-          <p className="mt-3 text-base font-bold leading-snug text-amber-300 transition-all duration-300 group-hover:text-amber-200 group-hover:[font-size:17px]">
+          <p className="mt-3 text-base font-bold leading-snug text-gray-300 transition-all duration-300 group-hover:text-gray-200 group-hover:[font-size:17px]">
             {robot.hookLine}
           </p>
 
@@ -196,7 +196,7 @@ function RobotCard({ robot }: { robot: Robot }) {
           ) : null}
 
           <div className="mt-auto pt-5">
-            <span className="inline-flex items-center gap-1 text-sm font-bold text-amber-300 group-hover:text-amber-200">
+            <span className="inline-flex items-center gap-1 text-sm font-bold text-gray-300 group-hover:text-gray-200">
               Discover →
             </span>
           </div>
@@ -220,14 +220,14 @@ function HallOfFameTicker() {
     `🐕 Spot has been deployed in 64 countries`,
   ].filter(Boolean) as string[];
   return (
-    <div className="bg-gray-900 border-y border-amber-500/15 overflow-hidden h-9 flex items-center">
+    <div className="bg-gray-900 border-y border-white/10 overflow-hidden h-9 flex items-center">
       <style jsx>{`
         @keyframes hof-ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
         .hof-track { animation: hof-ticker 35s linear infinite; }
         .hof-wrap:hover .hof-track { animation-play-state: paused; }
       `}</style>
       <div className="hof-wrap relative w-full">
-        <div className="hof-track inline-flex whitespace-nowrap text-xs md:text-sm text-amber-300">
+        <div className="hof-track inline-flex whitespace-nowrap text-xs md:text-sm text-gray-300">
           {[...items, ...items].map((t, i) => (
             <span key={i} className="px-6 py-2 border-r border-gray-800/40">{t}</span>
           ))}
@@ -253,10 +253,10 @@ function RobotVsRobotFeatured() {
   return (
     <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-orange-500/5 p-5">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-xs font-bold uppercase tracking-widest text-amber-300">⚔️ Robot vs Robot</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-gray-300">⚔️ Robot vs Robot</p>
         <button
           onClick={() => setSeed(s => s + 1)}
-          className="text-xs rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1 text-amber-200 hover:bg-amber-500/20"
+          className="text-xs rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-gray-200 hover:bg-amber-500/20"
         >🔀 Shuffle</button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -265,7 +265,7 @@ function RobotVsRobotFeatured() {
             <div className="text-3xl">{r.emoji}</div>
             <h3 className="mt-1 font-black text-white text-lg">{r.name}</h3>
             <p className="text-xs text-zinc-400">{r.maker} · {r.year} · {r.countryFlag}</p>
-            <p className="mt-2 text-sm text-amber-300 line-clamp-2">{r.hookLine}</p>
+            <p className="mt-2 text-sm text-gray-300 line-clamp-2">{r.hookLine}</p>
           </Link>
         ))}
       </div>
@@ -275,10 +275,10 @@ function RobotVsRobotFeatured() {
           ? `Both are ${ROBOT_TYPE_LABELS[a.type as RobotType]?.toLowerCase() ?? a.type} robots.`
           : `${a.name} targets ${ROBOT_TYPE_LABELS[a.type as RobotType]?.toLowerCase() ?? a.type} use, while ${b.name} targets ${ROBOT_TYPE_LABELS[b.type as RobotType]?.toLowerCase() ?? b.type}.`}
         {' '}
-        <span className="text-amber-300">{older.name} is {ageDiff} years older than {newer.name}.</span>
+        <span className="text-gray-300">{older.name} is {ageDiff} years older than {newer.name}.</span>
       </p>
       <div className="mt-3 text-right">
-        <Link href={`/robots/compare?a=${a.slug}&b=${b.slug}`} className="text-sm font-bold text-amber-300 hover:text-amber-200">
+        <Link href={`/robots/compare?a=${a.slug}&b=${b.slug}`} className="text-sm font-bold text-gray-300 hover:text-gray-200">
           See full comparison →
         </Link>
       </div>

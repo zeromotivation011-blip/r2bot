@@ -121,7 +121,7 @@ export default async function ShortCoursePage({
           className="w-full rounded-2xl border border-white/10"
         />
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500">
+          <p className="r2-eyebrow">
             Course {index + 1} of {SHORT_COURSES.length} · Free
           </p>
           <h1 className="mt-2 text-3xl font-black text-white md:text-4xl">{course.title}</h1>
@@ -181,18 +181,18 @@ export default async function ShortCoursePage({
 
       <nav className="mt-10 flex flex-wrap justify-between gap-4 border-t border-white/10 pt-6 text-sm">
         {prev ? (
-          <Link href={`/shorts/course/${prev.slug}`} className="text-amber-500 hover:underline">
+          <Link href={`/shorts/course/${prev.slug}`} className="r2-link">
             ← {prev.title}
           </Link>
         ) : (
           <span />
         )}
         {next ? (
-          <Link href={`/shorts/course/${next.slug}`} className="text-amber-500 hover:underline">
+          <Link href={`/shorts/course/${next.slug}`} className="r2-link">
             Next course: {next.title} →
           </Link>
         ) : (
-          <Link href="/courses" className="text-amber-500 hover:underline">
+          <Link href="/courses" className="r2-link">
             Ready for the full video course path? →
           </Link>
         )}
@@ -204,8 +204,8 @@ export default async function ShortCoursePage({
 
       <p className="mt-8 text-sm text-gray-500">
         Going deeper: every lesson links into{' '}
-        <Link href="/atlas" className="text-amber-500 underline">the Atlas</Link>, and the{' '}
-        <Link href="/courses" className="text-amber-500 underline">free course path</Link> covers the
+        <Link href="/atlas" className="r2-link">the Atlas</Link>, and the{' '}
+        <Link href="/courses" className="r2-link">free course path</Link> covers the
         same ground in longer videos with quizzes and certificates.
       </p>
     </main>

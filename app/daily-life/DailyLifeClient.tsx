@@ -31,7 +31,7 @@ export default function DailyLifeClient() {
       <FunFactsTicker />
       <div ref={modeRef} className="px-4 mt-6">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="text-xs tracking-[3px] uppercase font-bold text-amber-300">Robots already running your life</p>
+          <p className="text-xs tracking-[3px] uppercase font-bold text-gray-300">Robots already running your life</p>
           <h1 className="mt-2 text-3xl md:text-5xl font-black">
             Your <span className="bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">Robot Day</span>
           </h1>
@@ -82,7 +82,7 @@ function ArticlesMode() {
     <section className="px-4 mt-10">
       <div className="mx-auto max-w-5xl">
         <header className="text-center mb-6">
-          <p className="text-[11px] tracking-[3px] uppercase font-bold text-amber-300">Articles</p>
+          <p className="text-[11px] tracking-[3px] uppercase font-bold text-gray-300">Articles</p>
           <h2 className="mt-2 text-2xl md:text-3xl font-black">Real-world robotics, one story at a time.</h2>
           <p className="mt-2 text-zinc-400 text-sm">
             Ten dispatches from where robots already live and work — manufacturing floors, hospitals, farms, kitchens, warehouses.
@@ -118,7 +118,7 @@ function ArticleCard({ article: a }: { article: DailyLifeArticle }) {
   return (
     <article className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-200">
+        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full bg-amber-500/10 border border-white/15 text-gray-200">
           {CATEGORY_EMOJI[a.category]} {CATEGORY_LABEL[a.category]}
         </span>
         {!published && (
@@ -134,7 +134,7 @@ function ArticleCard({ article: a }: { article: DailyLifeArticle }) {
           {a.atlasLinks.map((l) => (
             <Link
               key={l.slug} href={`/atlas/concept/${l.slug}`}
-              className="text-[11px] font-semibold rounded-full bg-white/[0.04] border border-white/10 px-2 py-0.5 text-zinc-300 hover:border-amber-400/40 hover:text-amber-200"
+              className="text-[11px] font-semibold rounded-full bg-white/[0.04] border border-white/10 px-2 py-0.5 text-zinc-300 hover:border-amber-400/40 hover:text-gray-200"
             >
               📚 {l.label}
             </Link>
@@ -202,14 +202,14 @@ function StoryMode() {
       <div className={`sticky top-0 z-10 ${bgClass} border-b border-white/10 px-4 py-3 mt-6 transition-colors`}>
         <div className="mx-auto max-w-4xl flex items-center justify-between gap-3">
           <p className="text-base md:text-lg font-bold">
-            🤖 Robots used so far: <span className="text-3xl md:text-4xl font-black text-amber-300 inline-block tabular-nums transition-all" style={{ transition: 'all 0.3s ease' }}>{revealedCount}</span> / {TOTAL_ROBOTS_PER_DAY}
+            🤖 Robots used so far: <span className="text-3xl md:text-4xl font-black text-gray-300 inline-block tabular-nums transition-all" style={{ transition: 'all 0.3s ease' }}>{revealedCount}</span> / {TOTAL_ROBOTS_PER_DAY}
           </p>
           <div className="h-2 w-32 sm:w-48 bg-black/40 rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all" style={{ width: `${(revealedCount / TOTAL_ROBOTS_PER_DAY) * 100}%` }} />
           </div>
         </div>
         {milestone && (
-          <p className="mt-1 text-center text-xs text-amber-200 max-w-3xl mx-auto">💡 {milestone.message}</p>
+          <p className="mt-1 text-center text-xs text-gray-200 max-w-3xl mx-auto">💡 {milestone.message}</p>
         )}
       </div>
 
@@ -231,17 +231,17 @@ function StoryMode() {
 
       {/* Bottom CTA */}
       <section className="mt-12 mx-auto max-w-3xl px-4">
-        <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/5 p-6 text-center">
+        <div className="rounded-2xl border border-white/15 bg-gradient-to-br from-amber-500/10 to-orange-500/5 p-6 text-center">
           <p className="text-2xl md:text-3xl font-black text-white">India has 4 robots per 10,000 workers.</p>
-          <p className="mt-2 text-lg text-amber-300 font-bold">South Korea has 1,012.</p>
+          <p className="mt-2 text-lg text-gray-300 font-bold">South Korea has 1,012.</p>
           <div className="mt-4 h-3 bg-black/40 rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-red-500" style={{ width: '0.4%' }} />
           </div>
           <p className="mt-2 text-xs text-zinc-400">India: 0.4% of Korea\'s density</p>
-          <p className="mt-4 text-base text-zinc-200">The robots are already there. The question is: will you <strong className="text-amber-300">build</strong> them, or just <em>use</em> them?</p>
+          <p className="mt-4 text-base text-zinc-200">The robots are already there. The question is: will you <strong className="text-gray-300">build</strong> them, or just <em>use</em> them?</p>
           <div className="mt-5 flex flex-wrap justify-center gap-2">
             <Link href="/academy" className="rounded-xl bg-amber-500 text-black px-5 py-2.5 font-bold">Start Learning Robotics →</Link>
-            <Link href="/atlas" className="rounded-xl border border-amber-400/40 bg-amber-500/10 text-amber-200 px-5 py-2.5 font-bold">Explore the World Map →</Link>
+            <Link href="/atlas" className="rounded-xl border border-white/15 bg-white/[0.04] text-gray-200 px-5 py-2.5 font-bold">Explore the World Map →</Link>
           </div>
         </div>
       </section>
@@ -263,7 +263,7 @@ function MomentCard({ moment: m, index, open, onToggle }: {
     >
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <span className="text-xs uppercase tracking-widest text-amber-300 font-bold">{m.time}</span>
+          <span className="text-xs uppercase tracking-widest text-gray-300 font-bold">{m.time}</span>
           <h3 className="mt-1 text-lg md:text-xl font-black text-white">{m.activity}</h3>
         </div>
         <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${m.isVisible ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-purple-500/15 text-purple-300 border border-purple-500/30'}`}>
@@ -273,7 +273,7 @@ function MomentCard({ moment: m, index, open, onToggle }: {
 
       <button
         onClick={() => { onToggle(); if (!open) playRevealSound() }}
-        className="mt-3 w-full text-left rounded-xl bg-black/30 border border-amber-500/30 px-4 py-2 text-sm font-bold text-amber-200 hover:bg-amber-500/10"
+        className="mt-3 w-full text-left rounded-xl bg-black/30 border border-white/15 px-4 py-2 text-sm font-bold text-gray-200 hover:bg-amber-500/10"
       >
         {open ? '✕ Hide robot' : '👉 Tap to reveal the robot'}
       </button>
@@ -283,8 +283,8 @@ function MomentCard({ moment: m, index, open, onToggle }: {
         style={{ maxHeight: open ? 800 : 0, opacity: open ? 1 : 0 }}
       >
         <div className="mt-3 grid grid-cols-1 gap-2">
-          <div className="rounded-lg bg-amber-500/5 border border-amber-500/30 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-amber-300 font-bold">{m.robotInvolved}</p>
+          <div className="rounded-lg bg-amber-500/5 border border-white/15 p-3">
+            <p className="text-[10px] uppercase tracking-wider text-gray-300 font-bold">{m.robotInvolved}</p>
             <p className="mt-1 text-sm text-zinc-100">{m.howRobotHelps}</p>
           </div>
           <div className="rounded-lg bg-white/[0.04] border border-white/10 p-3">
@@ -299,10 +299,10 @@ function MomentCard({ moment: m, index, open, onToggle }: {
             <span className="text-[11px] text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-2 py-0.5">💰 {m.economicValue}</span>
             <span className="text-[11px] text-zinc-300 bg-white/[0.04] border border-white/15 rounded-full px-2 py-0.5">{m.category}</span>
             {m.atlasLink && (
-              <Link href={`/atlas/concept/${m.atlasLink}`} className="text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-2 py-0.5">📚 {m.atlasLink}</Link>
+              <Link href={`/atlas/concept/${m.atlasLink}`} className="text-[11px] text-gray-300 bg-amber-500/10 border border-white/15 rounded-full px-2 py-0.5">📚 {m.atlasLink}</Link>
             )}
             {m.robotLink && (
-              <Link href={`/robots/${m.robotLink}`} className="text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-2 py-0.5">🤖 {m.robotLink}</Link>
+              <Link href={`/robots/${m.robotLink}`} className="text-[11px] text-gray-300 bg-amber-500/10 border border-white/15 rounded-full px-2 py-0.5">🤖 {m.robotLink}</Link>
             )}
           </div>
         </div>
@@ -357,7 +357,7 @@ function CheckMode() {
   return (
     <div className="mx-auto max-w-3xl px-4 mt-8">
       <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 mb-4 sticky top-0 z-10 backdrop-blur">
-        <p className="text-sm font-bold">You\'ve used <span className="text-3xl text-amber-300">{count}</span> / {TOTAL_ROBOTS_PER_DAY} robots today.</p>
+        <p className="text-sm font-bold">You\'ve used <span className="text-3xl text-gray-300">{count}</span> / {TOTAL_ROBOTS_PER_DAY} robots today.</p>
         <button onClick={shareCard} className="mt-2 rounded-xl bg-amber-500 text-black px-4 py-2 text-sm font-bold">📤 Share my robot score</button>
       </div>
       <ul className="space-y-2">
@@ -395,7 +395,7 @@ function CategoryMode() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {items.map(m => (
           <div key={m.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-            <span className="text-[10px] uppercase tracking-wider text-amber-300 font-bold">{m.time}</span>
+            <span className="text-[10px] uppercase tracking-wider text-gray-300 font-bold">{m.time}</span>
             <h4 className="mt-1 font-bold text-white">{m.activity}</h4>
             <p className="text-xs text-zinc-400 mt-1">{m.robotInvolved}</p>
             <p className="mt-3 text-sm text-zinc-200 italic">🤯 {m.mindBlowingFact}</p>
@@ -417,16 +417,16 @@ function ClimaxOverlay({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center px-4" onClick={onClose}>
       <div className="text-center max-w-2xl">
-        <p className="text-[120px] md:text-[200px] font-black text-amber-400 leading-none climax-47" style={{ textShadow: '0 0 80px rgba(255,138,76,.4)' }}>
+        <p className="text-[120px] md:text-[200px] font-black text-gray-300 leading-none climax-47" style={{ textShadow: '0 0 80px rgba(255,138,76,.4)' }}>
           47
         </p>
         <p className="mt-2 text-2xl md:text-3xl font-black text-white climax-line climax-line-1">ROBOTS.</p>
         <p className="mt-1 text-2xl md:text-3xl font-black text-white climax-line climax-line-2">ONE DAY.</p>
-        <p className="mt-6 text-base md:text-lg text-amber-300 climax-line climax-line-3">India has only <strong className="text-white">4</strong> robots per 10,000 workers. South Korea has <strong className="text-white">1,012</strong>.</p>
+        <p className="mt-6 text-base md:text-lg text-gray-300 climax-line climax-line-3">India has only <strong className="text-white">4</strong> robots per 10,000 workers. South Korea has <strong className="text-white">1,012</strong>.</p>
         <p className="mt-3 text-sm text-zinc-300 climax-line climax-line-3">The robots are already there. The question is — will you build them?</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2 climax-line climax-line-4">
           <Link href="/academy" className="rounded-xl bg-amber-500 text-black px-5 py-3 font-bold">Start Learning Robotics →</Link>
-          <Link href="/atlas" className="rounded-xl border border-amber-400/40 bg-amber-500/10 text-amber-200 px-5 py-3 font-bold">Explore the World Map →</Link>
+          <Link href="/atlas" className="rounded-xl border border-white/15 bg-white/[0.04] text-gray-200 px-5 py-3 font-bold">Explore the World Map →</Link>
         </div>
       </div>
       <style jsx>{`

@@ -123,7 +123,7 @@ export function PIDChallengeClient() {
           🎯 Try
         </button>
         {bestScore !== null ? (
-          <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-200">
+          <span className="rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-bold text-gray-200">
             Best score: {bestScore}/100
           </span>
         ) : null}
@@ -134,7 +134,7 @@ export function PIDChallengeClient() {
           className={`mt-5 rounded-2xl border p-5 ${
             result.passes
               ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-100'
-              : 'border-amber-400/40 bg-amber-500/10 text-amber-100'
+              : 'border-white/15 bg-white/[0.04] text-gray-100'
           }`}
         >
           <p className="font-bold text-base">
@@ -188,7 +188,7 @@ function NumInput({
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="mt-2 w-full accent-amber-400"
       />
-      <span className="mt-1 block font-mono text-sm font-bold text-amber-200">{value.toFixed(2)}</span>
+      <span className="mt-1 block font-mono text-sm font-bold text-gray-200">{value.toFixed(2)}</span>
     </label>
   );
 }

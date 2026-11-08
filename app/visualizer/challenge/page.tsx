@@ -18,7 +18,7 @@ export default function PIDChallengePage() {
       <main id="main-content" className="bg-[var(--void)] min-h-screen pt-32 pb-16">
         <div className="mx-auto max-w-3xl px-4">
           <header className="text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-1.5 text-sm font-semibold text-gray-300">
               🎯 PID Challenge
             </span>
             <h1 className="mt-4 text-4xl font-black text-white sm:text-5xl">

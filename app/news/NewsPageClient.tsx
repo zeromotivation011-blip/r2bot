@@ -138,7 +138,7 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
     <main className="min-h-screen bg-[var(--void)] text-white pt-24 pb-16">
       <div className="px-4 max-w-7xl mx-auto">
         <div className="text-center mb-6">
-          <p className="text-xs tracking-[3px] uppercase font-bold text-amber-300">Pulse</p>
+          <p className="text-xs tracking-[3px] uppercase font-bold text-gray-300">Pulse</p>
           <h1 className="mt-2 text-3xl md:text-5xl font-black">Robotics Intelligence Briefing</h1>
           <p className="mt-2 text-zinc-300">What happened in robotics this week, and why it matters — in plain English.</p>
           {data?.lastUpdated && (
@@ -175,7 +175,7 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
             {/* India Spotlight */}
             {data && data.indiaHighlights.length > 0 && (
               <section className="mb-7">
-                <h2 className="text-xs uppercase tracking-widest font-black text-amber-300 mb-3">🇮🇳 India Spotlight</h2>
+                <h2 className="text-xs uppercase tracking-widest font-black text-gray-300 mb-3">🇮🇳 India Spotlight</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {data.indiaHighlights.slice(0, 2).map(a => (
                     <FeaturedCard key={a.id} article={a} styles={data.sourceStyles} onSave={toggleSave} saved={savedIds.includes(a.id)} />
@@ -233,7 +233,7 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
             </div>
 
             {/* Saved toggle */}
-            <button onClick={() => setShowSaved(s => !s)} className="text-xs font-bold underline text-amber-300 mb-3">
+            <button onClick={() => setShowSaved(s => !s)} className="text-xs font-bold underline text-gray-300 mb-3">
               {showSaved ? 'Hide saved' : `Show saved (${savedIds.length})`}
             </button>
 
@@ -264,23 +264,23 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
           <aside className="space-y-4">
             {data && (
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                <p className="text-xs uppercase tracking-widest text-amber-300 font-bold">This Week</p>
+                <p className="text-xs uppercase tracking-widest text-gray-300 font-bold">This Week</p>
                 <p className="text-2xl font-black mt-2">{data.weeklyStats.totalArticles}</p>
                 <p className="text-xs text-zinc-400">articles aggregated</p>
-                <p className="mt-3 text-sm text-amber-200">
+                <p className="mt-3 text-sm text-gray-200">
                   <strong>{data.weeklyStats.indiaStories}</strong> with an India angle ·{' '}
-                  <a href="/india" className="underline hover:text-amber-100">India hub</a>
+                  <a href="/india" className="underline hover:text-gray-100">India hub</a>
                 </p>
                 <div className="mt-3 flex flex-wrap gap-1">
                   {data.weeklyStats.topTopics.slice(0, 5).map(t => (
-                    <span key={t} className="text-[10px] bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-full px-2 py-0.5">{TOPIC_LABELS[t] || t}</span>
+                    <span key={t} className="text-[10px] bg-amber-500/10 border border-white/15 text-gray-200 rounded-full px-2 py-0.5">{TOPIC_LABELS[t] || t}</span>
                   ))}
                 </div>
               </div>
             )}
 
             <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p className="text-xs uppercase tracking-widest text-amber-300 font-bold mb-2">Watchlist</p>
+              <p className="text-xs uppercase tracking-widest text-gray-300 font-bold mb-2">Watchlist</p>
               <p className="text-xs text-zinc-400 mb-2">Topics you follow bubble to the top.</p>
               <div className="space-y-1.5">
                 {WATCHLIST_TOPICS.map(t => (
@@ -295,8 +295,8 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
         </div>
 
         {/* Subscribe banner */}
-        <section className="mt-10 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/5 p-6 text-center">
-          <p className="text-xs uppercase tracking-widest text-amber-300 font-bold">Weekly Digest</p>
+        <section className="mt-10 rounded-2xl border border-white/15 bg-gradient-to-br from-amber-500/10 to-orange-500/5 p-6 text-center">
+          <p className="text-xs uppercase tracking-widest text-gray-300 font-bold">Weekly Digest</p>
           <h3 className="mt-2 text-2xl font-black">R2BOT Weekly — every Friday</h3>
           <p className="text-zinc-300 mt-1">The week in robotics, condensed. One email, no noise, unsubscribe in one click.</p>
           <div className="mt-4 flex justify-center gap-2 flex-wrap max-w-md mx-auto">
@@ -329,25 +329,25 @@ function FeaturedCard({ article: a, styles, onSave, saved }: {
 }) {
   const s = styles[a.source] || { color: '#888', short: a.source.slice(0, 4).toUpperCase() }
   return (
-    <article className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/8 to-orange-500/4 p-4">
+    <article className="rounded-2xl border border-white/15 bg-gradient-to-br from-amber-500/8 to-orange-500/4 p-4">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-[9px] font-bold uppercase tracking-widest rounded px-1.5 py-0.5 text-white" style={{ background: s.color }}>{s.short}</span>
-        <span className="text-[9px] font-bold uppercase tracking-widest text-amber-300 bg-amber-500/15 border border-amber-500/40 rounded-full px-2 py-0.5">
+        <span className="text-[9px] font-bold uppercase tracking-widest text-gray-300 bg-amber-500/15 border border-amber-500/40 rounded-full px-2 py-0.5">
           🇮🇳 HIGH IMPACT · {a.indiaImpactScore}/10
         </span>
         <span className="text-[10px] text-zinc-500 ml-auto">{timeAgo(a.publishedAt)}</span>
       </div>
-      <a href={a.url} target="_blank" rel="noopener" className="block hover:text-amber-200">
+      <a href={a.url} target="_blank" rel="noopener" className="block hover:text-gray-200">
         <h3 className="text-lg font-black text-white leading-snug">{a.title}</h3>
       </a>
       <p className="mt-2 text-sm text-zinc-300 line-clamp-3">{a.aiSummary || a.description}</p>
-      <div className="mt-3 rounded-lg bg-black/30 border border-amber-500/30 p-3">
-        <p className="text-[10px] uppercase tracking-widest text-amber-300 font-bold">R2BOT context</p>
+      <div className="mt-3 rounded-lg bg-black/30 border border-white/15 p-3">
+        <p className="text-[10px] uppercase tracking-widest text-gray-300 font-bold">R2BOT context</p>
         <p className="mt-1 text-xs text-zinc-200">{a.whyItMatters}</p>
       </div>
       <div className="mt-2 flex items-center gap-2">
-        <button onClick={() => onSave(a)} className="inline-flex min-h-[44px] items-center text-xs text-zinc-300 hover:text-amber-300">{saved ? '🔖 Saved' : '🔖 Save'}</button>
-        <a href={a.url} target="_blank" rel="noopener" className="ml-auto inline-flex min-h-[44px] items-center text-xs font-bold text-amber-300 hover:text-amber-200">Open →</a>
+        <button onClick={() => onSave(a)} className="inline-flex min-h-[44px] items-center text-xs text-zinc-300 hover:text-gray-300">{saved ? '🔖 Saved' : '🔖 Save'}</button>
+        <a href={a.url} target="_blank" rel="noopener" className="ml-auto inline-flex min-h-[44px] items-center text-xs font-bold text-gray-300 hover:text-gray-200">Open →</a>
       </div>
     </article>
   )
@@ -364,12 +364,12 @@ function ArticleRow({ article: a, styles, expanded, onToggle, onSave, saved }: {
   const s = styles[a.source] || { color: '#888', short: a.source.slice(0, 4).toUpperCase() }
 
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 hover:border-amber-400/30 transition-colors">
+    <article className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 hover:border-white/15 transition-colors">
       <div className="flex flex-wrap items-center gap-2 mb-2 text-xs">
         <span className="text-[9px] font-bold uppercase tracking-widest rounded px-1.5 py-0.5 text-white" style={{ background: s.color }}>{s.short}</span>
         <span className="text-zinc-400">{a.source}</span>
         <span className="text-[10px] text-zinc-500">·</span>
-        <span className="text-[10px] text-amber-300 font-bold">{TOPIC_LABELS[a.topic] || a.topic}</span>
+        <span className="text-[10px] text-gray-300 font-bold">{TOPIC_LABELS[a.topic] || a.topic}</span>
         <span title="sentiment" className="text-base">{SENTIMENT_EMOJI[a.sentiment]}</span>
         {a.isBreaking  && <span className="text-[9px] font-bold uppercase tracking-widest bg-red-500 text-white rounded px-1.5 py-0.5">BREAKING</span>}
         {a.isTrending  && <span className="text-[9px] font-bold uppercase tracking-widest bg-orange-500 text-black rounded px-1.5 py-0.5">TRENDING</span>}
@@ -377,23 +377,23 @@ function ArticleRow({ article: a, styles, expanded, onToggle, onSave, saved }: {
       </div>
 
       <a href={a.url} target="_blank" rel="noopener" className="block">
-        <h3 className="text-base font-bold text-white hover:text-amber-200">{a.title}</h3>
+        <h3 className="text-base font-bold text-white hover:text-gray-200">{a.title}</h3>
       </a>
       <p className="mt-1.5 text-sm text-zinc-400 line-clamp-3">{a.aiSummary || a.description}</p>
 
       {/* Actions */}
       <div className="mt-3 flex items-center gap-3 text-xs">
-        <button onClick={onToggle} className="inline-flex min-h-[44px] items-center text-amber-300 hover:text-amber-200 font-bold">
+        <button onClick={onToggle} className="inline-flex min-h-[44px] items-center text-gray-300 hover:text-gray-200 font-bold">
           {expanded ? '✕ Hide context' : 'R2BOT context →'}
         </button>
-        <button onClick={() => onSave(a)} className="inline-flex min-h-[44px] items-center text-zinc-300 hover:text-amber-300">{saved ? '🔖 Saved' : '🔖 Save'}</button>
-        <a href={a.url} target="_blank" rel="noopener" className="ml-auto inline-flex min-h-[44px] items-center text-zinc-200 hover:text-amber-300">Open →</a>
+        <button onClick={() => onSave(a)} className="inline-flex min-h-[44px] items-center text-zinc-300 hover:text-gray-300">{saved ? '🔖 Saved' : '🔖 Save'}</button>
+        <a href={a.url} target="_blank" rel="noopener" className="ml-auto inline-flex min-h-[44px] items-center text-zinc-200 hover:text-gray-300">Open →</a>
       </div>
 
       {expanded && (
         <div className="mt-3 rounded-lg bg-black/30 border border-amber-500/20 p-3 space-y-2">
           <div>
-            <p className="text-[10px] uppercase tracking-widest font-bold text-amber-300">Why it matters</p>
+            <p className="text-[10px] uppercase tracking-widest font-bold text-gray-300">Why it matters</p>
             <p className="mt-1 text-sm text-zinc-200">{a.whyItMatters}</p>
           </div>
           {a.relatedAtlasTerms.length > 0 && (
@@ -401,7 +401,7 @@ function ArticleRow({ article: a, styles, expanded, onToggle, onSave, saved }: {
               <p className="text-[10px] uppercase tracking-widest font-bold text-zinc-400">Learn more</p>
               <div className="mt-1 flex flex-wrap gap-1">
                 {a.relatedAtlasTerms.map(t => (
-                  <Link key={t} href={`/atlas/concept/${t}`} className="text-xs bg-amber-500/15 border border-amber-500/30 text-amber-200 rounded-full px-2 py-0.5">📚 {t}</Link>
+                  <Link key={t} href={`/atlas/concept/${t}`} className="text-xs bg-amber-500/15 border border-white/15 text-gray-200 rounded-full px-2 py-0.5">📚 {t}</Link>
                 ))}
               </div>
             </div>

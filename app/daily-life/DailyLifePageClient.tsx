@@ -110,7 +110,7 @@ function ProfileStep({ onPick }: { onPick: (p: ProfileId) => void }) {
   return (
     <div className="mx-auto max-w-4xl px-4">
       <header className="mb-10 text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-1.5 text-sm font-semibold text-gray-300">
           🤖 Step 1 of 2
         </span>
         <h1 className="mt-4 text-4xl font-black text-white sm:text-5xl">Who are you?</h1>
@@ -125,7 +125,7 @@ function ProfileStep({ onPick }: { onPick: (p: ProfileId) => void }) {
             key={p.id}
             type="button"
             onClick={() => onPick(p.id)}
-            className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-white/10 bg-white/[0.03] px-5 py-8 text-center transition-all duration-200 hover:-translate-y-1 hover:border-amber-400/50 hover:bg-amber-500/5"
+            className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-white/10 bg-white/[0.03] px-5 py-8 text-center transition-all duration-200 hover:-translate-y-1 hover:border-white/20 hover:bg-amber-500/5"
           >
             <span className="text-5xl" aria-hidden>
               {p.emoji}
@@ -176,7 +176,7 @@ function DomainsStep({
               onClick={() => onToggle(d.id)}
               className={`flex flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-4 text-center transition-all ${
                 active
-                  ? 'border-amber-400 bg-amber-500/15 text-amber-200'
+                  ? 'border-amber-400 bg-amber-500/15 text-gray-200'
                   : 'border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/30'
               }`}
               aria-pressed={active}
@@ -228,7 +228,7 @@ function ResultsStep({
   return (
     <div className="mx-auto max-w-6xl px-4">
       <header className="mb-8 text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-1.5 text-sm font-semibold text-gray-300">
           🤖 Found in your life
         </span>
         <h1 className="mt-4 text-4xl font-black text-white sm:text-5xl">
@@ -313,10 +313,10 @@ function UseCaseCard({ useCase }: { useCase: UseCase }) {
               ))}
             </div>
             <h3 className="mt-2 text-lg font-extrabold text-white">{useCase.title}</h3>
-            <p className="mt-2 text-sm font-bold leading-snug text-amber-300">
+            <p className="mt-2 text-sm font-bold leading-snug text-gray-300">
               {useCase.hookLine}
             </p>
-            <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-amber-300">
+            <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-gray-300">
               {open ? 'Hide details ▴' : 'Show how it works →'}
             </span>
           </div>
@@ -338,8 +338,8 @@ function UseCaseCard({ useCase }: { useCase: UseCase }) {
             </p>
           </div>
 
-          <div className="mt-3 rounded-xl border border-amber-400/30 bg-amber-500/[0.06] p-3">
-            <p className="text-sm text-amber-100">
+          <div className="mt-3 rounded-xl border border-white/15 bg-amber-500/[0.06] p-3">
+            <p className="text-sm text-gray-100">
               <span className="font-bold">🤯 Mind-blowing:</span> {useCase.mindBlowingFact}
             </p>
           </div>
@@ -364,7 +364,7 @@ function UseCaseCard({ useCase }: { useCase: UseCase }) {
             {useCase.atlasLink ? (
               <Link
                 href={useCase.atlasLink}
-                className="rounded-xl border border-amber-400/40 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/20"
+                className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-gray-200 hover:bg-amber-500/20"
               >
                 Learn more in Atlas →
               </Link>

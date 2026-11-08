@@ -226,7 +226,7 @@ export function SiteSearch() {
               {loadFailed ? (
                 <p className="px-4 py-8 text-center text-sm text-white/50">
                   Search could not load. Try the{' '}
-                  <a href="/atlas" className="text-amber-500 underline">
+                  <a href="/atlas" className="r2-link">
                     Atlas
                   </a>
                   .
@@ -238,7 +238,7 @@ export function SiteSearch() {
                   {query ? (
                     <>
                       Nothing for “{query}”. Try a simpler word, or{' '}
-                      <a href="/atlas" className="text-amber-500 underline">
+                      <a href="/atlas" className="r2-link">
                         browse the Atlas
                       </a>
                       .

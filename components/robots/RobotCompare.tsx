@@ -141,7 +141,7 @@ export function CompareDrawer() {
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[var(--void)]/97 shadow-[0_-20px_60px_rgba(0,0,0,0.7)] backdrop-blur">
       <div className="mx-auto max-w-6xl px-4 py-4">
         <div className="mb-3 flex flex-wrap items-center gap-3">
-          <span className="font-mono text-xs uppercase tracking-wider text-amber-300">
+          <span className="font-mono text-xs uppercase tracking-wider text-gray-300">
             ⚖ Compare
           </span>
           <span className="text-sm text-zinc-300">
@@ -216,7 +216,7 @@ export function CompareDrawer() {
           </div>
         ) : (
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-zinc-300">
-            <span className="font-bold text-amber-300">{robots[0].name}</span> is in your comparison.
+            <span className="font-bold text-gray-300">{robots[0].name}</span> is in your comparison.
             Add one more robot to see them side-by-side.
             <button
               type="button"

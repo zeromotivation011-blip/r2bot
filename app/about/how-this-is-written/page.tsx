@@ -77,7 +77,7 @@ export default function HowThisIsWrittenPage() {
         <p className="mt-3 text-gray-300">
           Robotics moves, and a page that was right last year can be wrong now. If you find an error
           — a wrong number, a dead link, an explanation that does not hold up — email{' '}
-          <a href={`mailto:${AUTHOR.email}`} className="text-amber-500 underline">
+          <a href={`mailto:${AUTHOR.email}`} className="r2-link">
             {AUTHOR.email}
           </a>{' '}
           and say which page. Corrections get made and the page&apos;s review date moves.
@@ -86,23 +86,23 @@ export default function HowThisIsWrittenPage() {
         <h2 className="r2-h2" style={{ marginTop: '3rem' }}>Where to find the work</h2>
         <ul className="mt-3 space-y-2 text-gray-300">
           <li>
-            <Link href="/shorts" className="text-amber-500 underline">Quick Lessons</Link> — one
+            <Link href="/shorts" className="r2-link">Quick Lessons</Link> — one
             robotics idea a minute, with a demo you can play with.
           </li>
           <li>
-            <Link href="/courses" className="text-amber-500 underline">The free course path</Link> —
+            <Link href="/courses" className="r2-link">The free course path</Link> —
             five courses from &quot;what is a robot&quot; to designing your own.
           </li>
           <li>
-            <Link href="/atlas" className="text-amber-500 underline">The Atlas</Link> — the
+            <Link href="/atlas" className="r2-link">The Atlas</Link> — the
             reference everything else links back into.
           </li>
           <li>
-            <a href={AUTHOR.sameAs[0]} rel="me noopener" target="_blank" className="text-amber-500 underline">
+            <a href={AUTHOR.sameAs[0]} rel="me noopener" target="_blank" className="r2-link">
               YouTube
             </a>{' '}
             and{' '}
-            <a href={AUTHOR.sameAs[1]} rel="me noopener" target="_blank" className="text-amber-500 underline">
+            <a href={AUTHOR.sameAs[1]} rel="me noopener" target="_blank" className="r2-link">
               Instagram
             </a>{' '}
             — the short videos the lessons are built from.
@@ -111,7 +111,7 @@ export default function HowThisIsWrittenPage() {
 
         <p className="mt-12 text-sm text-gray-500">
           More about the project itself on the{' '}
-          <Link href="/about" className="text-amber-500 underline">about page</Link>.
+          <Link href="/about" className="r2-link">about page</Link>.
         </p>
       </main>
     </CopilotProvider>

@@ -16,13 +16,13 @@ export default function RoboticsInDailyLife() {
     <section id="daily-life" className="bg-gray-950 px-4 py-20">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-4 py-1.5 text-sm font-medium text-amber-400">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-1.5 text-sm font-medium text-gray-300">
             🤖 Robots Are Already Running Your Life
           </div>
           <h2 className="mb-4 text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl">
             You Use Robots
             <br />
-            <span className="text-amber-400">Every Single Day</span>
+            <span>Every Single Day</span>
           </h2>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-gray-400">
             From the ATM to your UPI payment to the rice on your plate — robots are everywhere.
@@ -43,7 +43,7 @@ export default function RoboticsInDailyLife() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-base font-bold text-white">{u.title}</h3>
-                  <p className="mt-2 text-sm font-semibold leading-snug text-amber-300 group-hover:text-amber-200">
+                  <p className="mt-2 text-sm font-semibold leading-snug text-gray-300 group-hover:text-white">
                     {u.hookLine}
                   </p>
                 </div>

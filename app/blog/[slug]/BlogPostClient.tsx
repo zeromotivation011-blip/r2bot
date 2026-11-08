@@ -27,7 +27,7 @@ const TAG_COLOR: Record<string, string> = {
   Beginner:    'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
   Career:      'bg-purple-500/15 text-purple-300 border-purple-500/30',
   Arduino:     'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
-  Schools:     'bg-amber-500/15 text-amber-300 border-amber-500/30',
+  Schools:     'bg-amber-500/15 text-gray-300 border-white/15',
   India:       'bg-orange-500/15 text-orange-300 border-orange-500/30',
   Hindi:       'bg-rose-500/15 text-rose-300 border-rose-500/30',
   'AI & ML':   'bg-pink-500/15 text-pink-300 border-pink-500/30',
@@ -125,7 +125,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
                   ol: ({ children }) => <ol className="mt-4 ml-5 list-decimal space-y-2 text-zinc-200">{children}</ol>,
                   li: ({ children }) => <li className="leading-relaxed">{children}</li>,
                   strong: ({ children }) => <strong className="text-white font-bold">{children}</strong>,
-                  code: ({ children }) => <code className="text-amber-300 bg-amber-500/10 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>,
+                  code: ({ children }) => <code className="text-gray-300 bg-amber-500/10 px-1.5 py-0.5 rounded text-sm font-mono">{children}</code>,
                   blockquote: ({ children }) => (
                     <blockquote className="mt-5 pl-4 border-l-4 border-amber-500 text-zinc-300 italic">{children}</blockquote>
                   ),

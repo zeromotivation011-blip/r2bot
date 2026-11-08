@@ -120,7 +120,7 @@ export default async function RobotProfilePage({
           <div className="mx-auto max-w-4xl">
             <Link
               href="/robots"
-              className="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-amber-300"
+              className="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-gray-300"
             >
               ← All famous robots
             </Link>
@@ -131,7 +131,7 @@ export default async function RobotProfilePage({
               </span>
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-amber-400/40 bg-amber-500/15 px-2.5 py-0.5 font-mono text-[10px] font-bold text-amber-200">
+                  <span className="rounded-full border border-white/15 bg-white/[0.05] px-2.5 py-0.5 font-mono text-[10px] font-bold text-gray-200">
                     Fame rank #{robot.fameRank}
                   </span>
                   <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-zinc-300">
@@ -186,9 +186,9 @@ export default async function RobotProfilePage({
               {robot.wowFactors.map((wf, i) => (
                 <div
                   key={i}
-                  className="rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-500/[0.07] to-orange-500/[0.03] p-4"
+                  className="rounded-2xl border border-white/15 bg-gradient-to-br from-amber-500/[0.07] to-orange-500/[0.03] p-4"
                 >
-                  <span className="font-mono text-[11px] uppercase tracking-wider text-amber-300">
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-gray-300">
                     #{i + 1}
                   </span>
                   <p className="mt-2 text-sm leading-relaxed text-zinc-100">{wf}</p>
@@ -216,7 +216,7 @@ export default async function RobotProfilePage({
                   key={i}
                   className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4"
                 >
-                  <span className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-full bg-amber-500/20 font-mono text-xs font-bold text-amber-200">
+                  <span className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-full bg-amber-500/20 font-mono text-xs font-bold text-gray-200">
                     {i + 1}
                   </span>
                   <span className="text-sm leading-relaxed text-zinc-200">{step}</span>
@@ -318,9 +318,9 @@ export default async function RobotProfilePage({
               {robot.funFacts.map((fact, i) => (
                 <div
                   key={i}
-                  className="rounded-2xl border border-amber-400/30 bg-amber-500/[0.06] p-4 text-zinc-100"
+                  className="rounded-2xl border border-white/15 bg-amber-500/[0.06] p-4 text-zinc-100"
                 >
-                  <span className="font-mono text-xs uppercase tracking-wider text-amber-300">
+                  <span className="font-mono text-xs uppercase tracking-wider text-gray-300">
                     Fact #{i + 1}
                   </span>
                   <p className="mt-1 text-sm leading-relaxed">{fact}</p>
@@ -348,10 +348,10 @@ export default async function RobotProfilePage({
                         #{r.fameRank}
                       </span>
                     </div>
-                    <h3 className="mt-3 text-lg font-extrabold text-white group-hover:text-amber-200">
+                    <h3 className="mt-3 text-lg font-extrabold text-white group-hover:text-gray-200">
                       {r.name}
                     </h3>
-                    <p className="mt-2 text-sm font-bold leading-snug text-amber-300">
+                    <p className="mt-2 text-sm font-bold leading-snug text-gray-300">
                       {r.hookLine}
                     </p>
                   </Link>
@@ -378,9 +378,9 @@ function DocumentaryNarrative({ slug, robotName }: { slug: string; robotName: st
   return (
     <>
       {/* Why you should care */}
-      <section className="px-4 py-10 bg-gradient-to-b from-amber-500/5 to-transparent border-y border-amber-500/15">
+      <section className="px-4 py-10 bg-gradient-to-b from-amber-500/5 to-transparent border-y border-white/10">
         <div className="mx-auto max-w-3xl">
-          <p className="text-xs font-black uppercase tracking-widest text-amber-300">Why you should care</p>
+          <p className="text-xs font-black uppercase tracking-widest text-gray-300">Why you should care</p>
           <p className="mt-3 text-xl leading-relaxed text-white">{d.whyYouShouldCare}</p>
         </div>
       </section>
@@ -390,8 +390,8 @@ function DocumentaryNarrative({ slug, robotName }: { slug: string; robotName: st
         <div className="mx-auto max-w-3xl">
           <h2 className="text-2xl font-black text-white">The origin story</h2>
           <p className="mt-3 text-base leading-relaxed text-zinc-300">{d.origin}</p>
-          <div className="mt-5 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5">
-            <p className="text-xs font-bold uppercase tracking-wider text-amber-300">The problem it solved</p>
+          <div className="mt-5 rounded-2xl border border-white/15 bg-amber-500/5 p-5">
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-300">The problem it solved</p>
             <p className="mt-2 text-base leading-relaxed text-zinc-200">{d.theProblemItSolved}</p>
           </div>
         </div>
@@ -429,11 +429,11 @@ function DocumentaryNarrative({ slug, robotName }: { slug: string; robotName: st
       </section>
 
       {/* India angle */}
-      <section className="px-4 py-10 bg-gradient-to-br from-amber-500/8 via-orange-500/4 to-emerald-500/6 border-y border-amber-500/15">
+      <section className="px-4 py-10 bg-gradient-to-br from-amber-500/8 via-orange-500/4 to-emerald-500/6 border-y border-white/10">
         <div className="mx-auto max-w-3xl">
-          <p className="text-xs font-black uppercase tracking-widest text-amber-300">🇮🇳 India angle</p>
+          <p className="text-xs font-black uppercase tracking-widest text-gray-300">🇮🇳 India angle</p>
           <p className="mt-3 text-base leading-relaxed text-zinc-200"><strong className="text-white">India today: </strong>{d.indiaRelevance}</p>
-          <p className="mt-4 text-base leading-relaxed text-zinc-200"><strong className="text-amber-300">What India should learn: </strong>{d.indiaLearning}</p>
+          <p className="mt-4 text-base leading-relaxed text-zinc-200"><strong className="text-gray-300">What India should learn: </strong>{d.indiaLearning}</p>
         </div>
       </section>
 
@@ -444,7 +444,7 @@ function DocumentaryNarrative({ slug, robotName }: { slug: string; robotName: st
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
             {d.wowFacts.map((f, i) => (
               <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-                <p className="text-3xl font-black text-amber-300">{i + 1}</p>
+                <p className="text-3xl font-black text-gray-300">{i + 1}</p>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-200">{f}</p>
               </div>
             ))}
@@ -476,7 +476,7 @@ function DocumentaryNarrative({ slug, robotName }: { slug: string; robotName: st
           <h2 className="text-2xl font-black text-white">Connected concepts</h2>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {d.atlasLinks.map(a => (
-              <a key={a} href={`/atlas/concept/${a}`} className="rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/20">
+              <a key={a} href={`/atlas/concept/${a}`} className="rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-xs font-semibold text-gray-200 hover:bg-amber-500/20">
                 📚 {a}
               </a>
             ))}
@@ -492,7 +492,7 @@ function DocumentaryNarrative({ slug, robotName }: { slug: string; robotName: st
             ))}
           </div>
           <div className="mt-5">
-            <a href={`/robots/compare?a=${slug}`} className="inline-block rounded-xl border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm font-bold text-amber-200 hover:bg-amber-500/20">
+            <a href={`/robots/compare?a=${slug}`} className="inline-block rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2 text-sm font-bold text-gray-200 hover:bg-amber-500/20">
               ⚖️ Compare {robotName} with another robot →
             </a>
           </div>
