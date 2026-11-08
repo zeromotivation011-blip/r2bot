@@ -1,12 +1,14 @@
 // Daily news archive. Invoked by Vercel Cron.
 // Fetches the live aggregated feed and upserts each story into the `news` table
-// (0033) so news becomes a browsable, SEO-indexable, curatable archive.
+// (0033) so news becomes a browsable, SEO-indexable archive. A URL-safe `slug`
+// (0037) is written on every upsert to power the /news/<slug> pages.
 // Only ingest columns are written — pinned/hidden/curated_summary are preserved.
 // Authenticates via Authorization: Bearer <CRON_SECRET>.
 
 import type { NextRequest } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/server';
 import { getNewsData } from '@/lib/news';
+import { newsSlug } from '@/lib/news-slug';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -28,6 +30,7 @@ async function handle(req: NextRequest): Promise<Response> {
   const supabase = createSupabaseAdminClient();
   const rows = articles.map((a) => ({
     url: a.url,
+    slug: newsSlug(a.title, a.url),
     title: a.title,
     source: a.source,
     topic: a.topic,

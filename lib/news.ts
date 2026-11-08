@@ -1,12 +1,16 @@
 // lib/news.ts — News aggregation + enrichment
-// Aggregates robotics news from 8 RSS feeds AND enriches each article with:
-//   - India Impact Score (0-10)
+// Aggregates robotics news from 9 RSS feeds AND enriches each article with:
+//   - India Impact Score (0-10)  [computed, no longer surfaced as a hero]
 //   - Topic classification
 //   - R2BOT editorial "Why it matters"
 //   - Sentiment
 //   - Reading time
 //   - Atlas + lesson links
 //   - Breaking / trending flags
+//
+// It also exposes the archive (public.news, migrations 0033 + 0050) as
+// per-article, SEO-indexable data via getArchivedNewsBySlug / getArchivedNewsSlugs
+// / getRecentArchivedNews, consumed by app/news/[slug].
 
 import { SOURCE_STYLES } from '@/lib/news-styles'
 import { createClient } from '@supabase/supabase-js'
@@ -309,18 +313,22 @@ function classifySentiment(title: string, description: string): EnrichedArticle[
   return 'neutral'
 }
 
+// Globalised editorial context. These strings render on the public per-article
+// pages, so they must read for a worldwide audience (the site's positioning was
+// globalised in July 2026). India-specific angle now lives only in the optional
+// "india" topic, not in every blurb.
 const WHY_IT_MATTERS: Record<string, string> = {
-  ai: 'AI is the key unlock for robots moving from fixed-task machines to adaptable workers — directly relevant as India scales automation.',
-  medical: 'Medical robotics reduces human error and expands access to precision care — India needs 1 robot surgeon for every 10,000 patients by 2030.',
-  space: 'Space robotics pushes the limits of autonomy and durability — technologies that filter down to industrial and consumer robots within five years.',
-  industrial: "Industrial robots are where India's 4 robots/10K gap is most acute. Every development here is a lesson for Indian manufacturing.",
-  consumer: "Consumer robotics drives volume that cuts costs for all robots — what's expensive today becomes affordable for Indian homes in 3-5 years.",
-  military: 'Defence robotics shapes dual-use technology that filters into civilian inspection, surveillance and logistics within a decade.',
-  business: 'Investment signals where robotics is heading. Where capital goes, talent and technology follow — and India watches.',
-  research: "Today's research paper is tomorrow's product. India's IITs are increasingly contributing to this pipeline.",
-  india: "Direct relevance to India's robotics opportunity — the kind of story Indian engineers and policymakers should track.",
-  policy: 'Policy precedents set in one country quickly become reference points for Indian regulators — especially around AI safety and automation.',
-  general: "Robotics is reshaping every industry — India's 59% growth rate makes every global development locally relevant.",
+  ai: 'AI is what turns robots from fixed-task machines into adaptable workers — the fastest-moving frontier in the field right now.',
+  medical: 'Medical robotics reduces human error and widens access to precision care, making it one of the highest-stakes proving grounds for autonomy.',
+  space: 'Space robotics pushes autonomy and durability to their limits — and those advances filter down into industrial and consumer robots within a few years.',
+  industrial: 'Factories and warehouses are where robotics economics get decided. Every advance here reshapes how things are built and moved worldwide.',
+  consumer: 'Consumer robotics drives the volume that pulls costs down for everyone — what is expensive today becomes mainstream in a few years.',
+  military: 'Defence robotics shapes dual-use technology that filters into civilian inspection, surveillance and logistics over the following decade.',
+  business: 'Investment signals where robotics is heading. Where capital flows, talent and technology follow.',
+  research: "Today's research paper is tomorrow's product — this is the earliest look at where the field is going.",
+  india: 'A story with direct relevance to the robotics ecosystem in India and other fast-growing markets.',
+  policy: 'Policy set in one country quickly becomes a reference point elsewhere — especially around AI safety and automation.',
+  general: 'Robotics is reshaping nearly every industry, which makes each major development worth understanding.',
 }
 
 const ATLAS_TERM_KEYWORDS: { keyword: RegExp; slug: string }[] = [
@@ -480,5 +488,120 @@ export async function getNewsData(): Promise<NewsPayload> {
     weeklyStats: { totalArticles: enriched.length, topTopics, topSources, indiaStories },
     sourceStyles: SOURCE_STYLES,
     lastUpdated: new Date().toISOString(),
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Archive reads (public.news, 0033 + 0050) — power the per-article /news/<slug>
+// pages, their OG images, and the sitemap. All are defensive: if the table or
+// the slug column is missing (e.g. migration not yet applied), or the anon
+// client is unavailable, they return empty rather than throwing, so the build
+// and the live feed keep working.
+// ────────────────────────────────────────────────────────────────────────────
+export interface ArchivedArticle extends EnrichedArticle {
+  slug: string
+  shownSummary: string
+}
+
+interface NewsRow {
+  url: string
+  title: string | null
+  source: string | null
+  topic: string | null
+  published_at: string | null
+  image_url: string | null
+  summary: string | null
+  article: EnrichedArticle | null
+  slug: string | null
+  curated_summary: string | null
+}
+
+const ARCHIVE_COLS =
+  'url, title, source, topic, published_at, image_url, summary, article, slug, curated_summary'
+
+function rowToArticle(r: NewsRow): ArchivedArticle | null {
+  if (!r.slug) return null
+  const base: Partial<EnrichedArticle> =
+    r.article && typeof r.article === 'object' ? r.article : {}
+  const shownSummary =
+    r.curated_summary || base.aiSummary || base.description || r.summary || ''
+  return {
+    id: base.id || r.slug,
+    title: r.title || base.title || 'Untitled',
+    url: r.url,
+    source: r.source || base.source || '',
+    publishedAt: r.published_at || base.publishedAt || new Date(0).toISOString(),
+    description: base.description || r.summary || '',
+    aiSummary: r.curated_summary || base.aiSummary,
+    imageUrl: r.image_url || base.imageUrl,
+    indiaImpactScore: base.indiaImpactScore ?? 0,
+    indiaImpactLabel: base.indiaImpactLabel ?? 'Distant',
+    whyItMatters: base.whyItMatters || WHY_IT_MATTERS[r.topic || 'general'] || WHY_IT_MATTERS.general,
+    topic: r.topic || base.topic || 'general',
+    sentiment: base.sentiment ?? 'neutral',
+    readingTime: base.readingTime ?? 1,
+    relatedAtlasTerms: base.relatedAtlasTerms ?? [],
+    relatedLessons: base.relatedLessons ?? [],
+    isBreaking: base.isBreaking ?? false,
+    isTrending: base.isTrending ?? false,
+    slug: r.slug,
+    shownSummary,
+  }
+}
+
+export async function getArchivedNewsBySlug(slug: string): Promise<ArchivedArticle | null> {
+  if (!_cvSb || !slug) return null
+  try {
+    const { data } = await _cvSb
+      .from('news')
+      .select(ARCHIVE_COLS)
+      .eq('slug', slug)
+      .eq('hidden', false)
+      .limit(1)
+      .abortSignal(AbortSignal.timeout(4000))
+    const row = (data as NewsRow[] | null)?.[0]
+    return row ? rowToArticle(row) : null
+  } catch {
+    return null
+  }
+}
+
+export async function getArchivedNewsSlugs(
+  limit = 500,
+): Promise<{ slug: string; publishedAt: string }[]> {
+  if (!_cvSb) return []
+  try {
+    const { data } = await _cvSb
+      .from('news')
+      .select('slug, published_at')
+      .eq('hidden', false)
+      .not('slug', 'is', null)
+      .order('published_at', { ascending: false })
+      .limit(limit)
+      .abortSignal(AbortSignal.timeout(6000))
+    return ((data as { slug: string | null; published_at: string | null }[] | null) ?? [])
+      .filter((r) => !!r.slug)
+      .map((r) => ({ slug: r.slug as string, publishedAt: r.published_at || new Date(0).toISOString() }))
+  } catch {
+    return []
+  }
+}
+
+export async function getRecentArchivedNews(limit = 12): Promise<ArchivedArticle[]> {
+  if (!_cvSb) return []
+  try {
+    const { data } = await _cvSb
+      .from('news')
+      .select(ARCHIVE_COLS)
+      .eq('hidden', false)
+      .not('slug', 'is', null)
+      .order('published_at', { ascending: false })
+      .limit(limit)
+      .abortSignal(AbortSignal.timeout(6000))
+    return ((data as NewsRow[] | null) ?? [])
+      .map(rowToArticle)
+      .filter((a): a is ArchivedArticle => a !== null)
+  } catch {
+    return []
   }
 }
