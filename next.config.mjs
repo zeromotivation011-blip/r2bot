@@ -7,6 +7,44 @@ const bundleAnalyzer = withBundleAnalyzer({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // The sitemap is an ISR route, so it runs in a serverless function rather
+  // than at build time. lib/build/loader.ts, lib/courses.ts and lib/lens.ts
+  // read their content with fs.readdirSync(path.join(process.cwd(), ...)),
+  // which Next cannot trace, so those directories were not shipped with the
+  // function and every one of those readers returned an empty array at
+  // runtime. The live sitemap was silently missing 46 real pages — all ten
+  // robot projects, all 26 recorded course lessons and all ten Lens videos —
+  // while the build output listed them correctly, which is exactly the kind
+  // of drift the July sitemap freeze taught us to check for. Atlas survived
+  // only because its entries also come from Supabase.
+  outputFileTracingIncludes: {
+    // Content read with fs at request time, per route group.
+    //
+    // lib/atlas.ts, lib/courses.ts, lib/lens.ts, lib/blog.ts, lib/academy.ts
+    // and lib/build/loader.ts all read their content with
+    // fs.readdirSync(path.join(process.cwd(), 'content', ...)). Next cannot
+    // trace a runtime directory read, so whether the files ship with a
+    // serverless function is luck: /academy/[track] had content/academy and
+    // rendered its six lessons, while /sitemap.xml and /llms.txt silently had
+    // nothing. The sitemap was missing 46 real pages (every robot project,
+    // every recorded course lesson, every Lens video) and llms.txt listed no
+    // courses at all, while the build output listed them correctly — the same
+    // build-vs-runtime drift as the July sitemap freeze, and just as invisible.
+    //
+    // Any new route that reads from content/ at request time needs an entry.
+    '/sitemap.xml': ['./content/**/*'],
+    '/llms.txt': ['./content/**/*'],
+    '/': ['./content/**/*'],
+    '/courses/**': ['./content/courses/**/*'],
+    '/academy/**': ['./content/academy/**/*'],
+    '/lens/**': ['./content/lens/**/*', './content/lens-channels.json'],
+    '/blog/**': ['./content/blog/**/*'],
+    '/build/**': ['./content/build/**/*'],
+    '/atlas/**': ['./content/atlas/**/*'],
+    '/shorts/**': ['./content/atlas/**/*'],
+    '/api/**': ['./content/**/*'],
+    '/admin/**': ['./content/**/*'],
+  },
   // Allow images from external sources. Add domains here when wrapping
   // dynamic <img> tags with <Image unoptimized> would still hit the
   // optimizer (which it shouldn't, but keep the allowlist current).
