@@ -54,9 +54,9 @@ export const PAGE_UPDATED: Record<string, string> = {
   '/sources': '2026-11-08T00:00:00.000Z',
   '/privacy': '2026-11-06T00:00:00.000Z',
   '/terms': '2026-11-08T00:00:00.000Z',
-  '/zh': '2026-11-07T00:00:00.000Z',
-  '/hi': '2026-11-07T00:00:00.000Z',
-  '/es': '2026-11-07T00:00:00.000Z',
+  '/zh': '2026-11-08T00:00:00.000Z',
+  '/hi': '2026-11-08T00:00:00.000Z',
+  '/es': '2026-11-08T00:00:00.000Z',
 }
 
 /** The honest lastmod for a path, as a Date the sitemap can use. */
@@ -68,7 +68,7 @@ export function pageUpdated(path: string): Date {
 /** Dates whole content groups were last extended, for their generated pages. */
 export const GROUP_UPDATED = {
   shorts: new Date('2026-11-08T00:00:00.000Z'),
-  shortsTranslations: new Date('2026-11-07T00:00:00.000Z'),
+  shortsTranslations: new Date('2026-11-08T00:00:00.000Z'),
   aiRobotics: new Date('2026-11-06T00:00:00.000Z'),
   simulators: new Date('2026-10-20T00:00:00.000Z'),
   builds: new Date('2026-10-20T00:00:00.000Z'),

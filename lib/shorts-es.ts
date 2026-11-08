@@ -2,6 +2,7 @@
 // Quiz options keep the same order as the English version (answer index is shared).
 import type { ShortZh } from '@/lib/shorts-zh'
 import { SHORTS_ES_MORE } from '@/lib/shorts-es-more'
+import { SHORTS_ES_SCHEDULED } from '@/lib/shorts-es-scheduled'
 
 const SHORTS_ES_BASE: Record<string, ShortZh> = {
   'ultrasonic-sensor': {
@@ -188,4 +189,4 @@ const SHORTS_ES_BASE: Record<string, ShortZh> = {
   },
 }
 
-export const SHORTS_ES: Record<string, ShortZh> = { ...SHORTS_ES_BASE, ...SHORTS_ES_MORE }
+export const SHORTS_ES: Record<string, ShortZh> = { ...SHORTS_ES_BASE, ...SHORTS_ES_MORE, ...SHORTS_ES_SCHEDULED }

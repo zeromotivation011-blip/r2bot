@@ -1,6 +1,7 @@
 // Hindi text for Quick Lessons. Videos, demos and Atlas links come from lib/shorts.ts.
 // Quiz options keep the same order as the English version (answer index is shared).
 import { SHORTS_HI_MORE } from '@/lib/shorts-hi-more'
+import { SHORTS_HI_SCHEDULED } from '@/lib/shorts-hi-scheduled'
 import type { ShortZh } from '@/lib/shorts-zh'
 
 const SHORTS_HI_BASE: Record<string, ShortZh> = {
@@ -188,4 +189,4 @@ const SHORTS_HI_BASE: Record<string, ShortZh> = {
   },
 }
 
-export const SHORTS_HI: Record<string, ShortZh> = { ...SHORTS_HI_BASE, ...SHORTS_HI_MORE }
+export const SHORTS_HI: Record<string, ShortZh> = { ...SHORTS_HI_BASE, ...SHORTS_HI_MORE, ...SHORTS_HI_SCHEDULED }

@@ -1,5 +1,6 @@
 // Simplified Chinese text for Quick Lessons. Videos, demos and Atlas links come from lib/shorts.ts.
 import { SHORTS_ZH_MORE } from '@/lib/shorts-zh-more'
+import { SHORTS_ZH_SCHEDULED } from '@/lib/shorts-zh-scheduled'
 export interface ShortZh {
   title: string
   summary: string
@@ -196,4 +197,4 @@ const SHORTS_ZH_BASE: Record<string, ShortZh> = {
   },
 }
 
-export const SHORTS_ZH: Record<string, ShortZh> = { ...SHORTS_ZH_BASE, ...SHORTS_ZH_MORE }
+export const SHORTS_ZH: Record<string, ShortZh> = { ...SHORTS_ZH_BASE, ...SHORTS_ZH_MORE, ...SHORTS_ZH_SCHEDULED }
