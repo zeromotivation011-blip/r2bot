@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { Reveal } from '@/components/Reveal'
 import { FeatureTour } from '@/components/FeatureTour'
-import LiveRobot from '@/components/landing/LiveRobot'
+import ShortDemo from '@/components/shorts/ShortsDemos'
 import HomeShorts from '@/components/landing/HomeShorts'
 import ContinueStrip from '@/components/landing/ContinueStrip'
 
@@ -125,170 +125,69 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
 function Hero({ personalization, atlasCount, projectCount }: { personalization: Personalization; atlasCount: number; projectCount: number }) {
   const continueHref = personalization.track ? `/academy/${personalization.track}` : '/start'
   const primaryLabel = personalization.track
-    ? `Continue ${TRACK_LABEL[personalization.track]} →`
-    : 'Start Learning →'
+    ? `Continue ${TRACK_LABEL[personalization.track]}`
+    : 'Start learning'
   return (
-    <section
-      style={{
-        position: 'relative',
-        minHeight: 'calc(100vh - 80px)',
-        display: 'flex',
-        alignItems: 'center',
-        overflow: 'hidden',
-        padding: '120px 20px 60px',
-        background:
-          'radial-gradient(ellipse at 20% 30%, rgba(252,104,24,.05), transparent 55%), var(--void)',
-      }}
-    >
-      {/* Grid background */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute', inset: 0,
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-          maskImage: 'radial-gradient(ellipse at center, black 0%, transparent 70%)',
-          WebkitMaskImage: 'radial-gradient(ellipse at center, black 0%, transparent 70%)',
-        }}
-      />
+    <section className="r2-hero">
+      {/* A grid, faint, fading out. Was competing with the headline at 0.035;
+          the background should be felt rather than seen. */}
+      <div aria-hidden className="r2-hero__grid" />
 
-      {/* Glow orbs */}
-      
-      
-
-      <div className="m-stack" style={{ position: 'relative', maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: 48, alignItems: 'center' }}>
-        <div>
+      <div className="r2-wrap r2-hero__inner">
+        <div className="r2-hero__copy">
           {personalization.signedIn && personalization.firstName && (
-            <p style={{ fontSize: 13, color: '#cbd5e1', fontWeight: 700, margin: '0 0 8px' }}>
-              Welcome back, <span style={{ color: '#FF8A4C' }}>{personalization.firstName}</span>.
+            <p className="r2-meta" style={{ marginBottom: 10 }}>
+              Welcome back, {personalization.firstName}.
             </p>
           )}
-          <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#FF8A4C', fontWeight: 900, margin: '0 0 16px' }}>
-            R2BOT · ROBOT, decoded — for the world
+
+          <p className="r2-eyebrow">Robot, decoded</p>
+
+          {/* No orange mid-sentence. A headline that needs a colour change to
+              hold attention is a headline that is too long. */}
+          <h1 className="r2-display">The clearest way to learn robotics on the internet.</h1>
+
+          <p className="r2-lede">
+            {atlasCount.toLocaleString()} concepts explained from first principles, nine simulators
+            that run in your browser, {projectCount} robots you build yourself, and an AI mentor that
+            only answers from what we have actually written down.
           </p>
 
-          <h1 style={{
-            fontSize: 'clamp(38px, 5.5vw, 70px)',
-            fontWeight: 900,
-            lineHeight: 1.04,
-            margin: '0 0 20px',
-            letterSpacing: '-1px',
-          }}>
-            The{' '}
-            <span style={{ color: '#FC6818' }}>
-              clearest way to learn robotics
-            </span>
-            {' '}on the internet.
-          </h1>
-
-          <p style={{ fontSize: 18, color: '#AEB7C4', maxWidth: 560, lineHeight: 1.65, margin: '0 0 10px' }}>
-            Project-based robotics learning from first principles to AI — with an AI mentor, real simulators, and hands-on builds. For students, career-switchers, and the curious, everywhere.
-          </p>
-          <p style={{ fontSize: 16, color: '#FC6818', fontWeight: 700, margin: '0 0 28px' }}>
-            Learn it. Build it. Ship it.
-          </p>
-
-          {/* Stats pills */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 32 }}>
-            <StatPill n={atlasCount} label="Atlas concepts" color="#FC6818" />
-            <StatPill n={9}           label="Simulators"     color="#FC6818" />
-            <StatPill n={projectCount} label="Robot Projects" color="#FF8A4C" />
-            <StatPill n={4}           label="Learning tracks" color="#FC6818" displayValue="4" />
-          </div>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-            <Link href={continueHref} style={{
-              display: 'inline-flex', alignItems: 'center', minHeight: 54, padding: '0 28px',
-              background: 'linear-gradient(135deg, #FC6818, #FC6818)',
-              color: 'var(--void)', borderRadius: 14,
-              fontSize: 16, fontWeight: 900, textDecoration: 'none',
-              boxShadow: '0 10px 36px rgba(0,229,255,0.28)',
-              transition: 'transform .15s, box-shadow .15s',
-            }}>
+          <div className="r2-hero__actions">
+            <Link href={continueHref} className="r2-btn r2-btn--primary">
               {primaryLabel}
             </Link>
-            <Link href="/visualizer" style={{
-              display: 'inline-flex', alignItems: 'center', minHeight: 54, padding: '0 24px',
-              background: 'rgba(255,255,255,0.06)', color: '#fff',
-              border: '1px solid rgba(255,255,255,0.18)',
-              borderRadius: 14, fontSize: 16, fontWeight: 800,
-              textDecoration: 'none', transition: 'border-color .15s',
-            }}>
-              🤖 Try Simulator
+            <Link href="/shorts" className="r2-btn r2-btn--ghost">
+              Watch a one-minute lesson
             </Link>
           </div>
+
+          {/* The four stat boxes counted themselves up in a row of identical
+              cards, which turned "7 simulators" into a claim that looked like
+              it was trying too hard. One quiet line states the same facts and
+              gets read. */}
+          <p className="r2-hero__proof">
+            Free, with no account needed to read any of it · 47 one-minute lessons ·
+            5 video courses · 4 learning tracks
+          </p>
         </div>
 
-        {/* Right: Robot + floating cards */}
-        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }} className="hero-right-desktop">
-          <LiveRobot />
-          {/* Floating feature cards */}
-          <div style={{ position: 'absolute', top: 20, right: -20, background: 'rgba(15,10,30,0.92)', border: '1px solid rgba(0,229,255,0.3)', borderRadius: 14, padding: '10px 14px', minWidth: 150, backdropFilter: 'blur(12px)' }}>
-            <p style={{ fontSize: 20, fontWeight: 900, color: '#FC6818', margin: 0 }}>{atlasCount.toLocaleString()}</p>
-            <p style={{ fontSize: 11, color: '#94a3b8', margin: 0, fontWeight: 700 }}>Robotics concepts in Atlas</p>
-          </div>
-          <div style={{ position: 'absolute', bottom: 60, left: -28, background: 'rgba(15,10,30,0.92)', border: '1px solid rgba(165,107,255,0.3)', borderRadius: 14, padding: '10px 14px', minWidth: 160, backdropFilter: 'blur(12px)' }}>
-            <p style={{ fontSize: 20, fontWeight: 900, color: '#FC6818', margin: 0 }}>AI Co-pilot</p>
-            <p style={{ fontSize: 11, color: '#94a3b8', margin: 0, fontWeight: 700 }}>Your 24/7 robotics mentor</p>
-          </div>
+        {/* Right: the real thing, not a drawing of it.
+         *
+         * This was a cartoon robot with a smiley face and four differently
+         * coloured floating labels — the single element that set "kids' site"
+         * for every visitor in the first second. The echo demo is a real
+         * lesson from /shorts, it is interactive on first paint, and it makes
+         * the argument the headline is making. */}
+        <div className="r2-hero__demo">
+          <ShortDemo kind="echo" />
+          <p className="r2-meta r2-hero__demo-cap">
+            Drag the slider. This is a real lesson, not a screenshot —{' '}
+            <Link href="/shorts/ultrasonic-sensor" className="r2-link">see the full one</Link>
+          </p>
         </div>
       </div>
-
-      <style jsx>{`
-        @media (max-width: 900px) { .hero-right-desktop { display: none !important; } }
-      `}</style>
     </section>
-  )
-}
-
-function StatPill({ n, label, color, displayValue }: { n: number; label: string; color: string; displayValue?: string }) {
-  const ref = useRef<HTMLDivElement | null>(null)
-  const startedRef = useRef(false)
-  const rafRef = useRef(0)
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    if (displayValue != null) return
-    const el = ref.current
-    if (!el) return
-    const run = () => {
-      if (startedRef.current) return
-      startedRef.current = true
-      const reduceMotion =
-        typeof window !== 'undefined' &&
-        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-      if (reduceMotion || n <= 0) { setCount(Math.max(0, n)); return }
-      const start = performance.now()
-      const dur = 900
-      const step = (now: number) => {
-        const t = Math.min(1, (now - start) / dur)
-        setCount(Math.round(n * (1 - Math.pow(1 - t, 3))))
-        if (t < 1) rafRef.current = requestAnimationFrame(step)
-      }
-      rafRef.current = requestAnimationFrame(step)
-    }
-    const obs = new IntersectionObserver(
-      entries => { if (entries.some(e => e.isIntersecting)) run() },
-      { threshold: 0.25 },
-    )
-    obs.observe(el)
-    const timer = window.setTimeout(run, 500)
-    return () => { obs.disconnect(); window.clearTimeout(timer); cancelAnimationFrame(rafRef.current) }
-  }, [n, displayValue])
-
-  return (
-    <div ref={ref} style={{
-      background: 'var(--surface-1)', border: '1px solid var(--border)',
-      borderRadius: 16, padding: '12px 18px',
-    }}>
-      <p style={{
-        fontSize: 28, fontWeight: 900, margin: 0, tabularNums: 'true',
-        background: `linear-gradient(90deg, ${color}, #fff)`,
-        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-      } as React.CSSProperties}>{displayValue ?? count.toLocaleString()}</p>
-      <p style={{ fontSize: 11, color: '#64748b', fontWeight: 700, margin: 0, textTransform: 'uppercase', letterSpacing: '1px', marginTop: 4 }}>{label}</p>
-    </div>
   )
 }
 
