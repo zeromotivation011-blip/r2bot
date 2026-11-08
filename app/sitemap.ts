@@ -6,6 +6,7 @@ import { ROBOTS } from '@/lib/robots-data';
 import { getAllPostsMerged } from '@/lib/blog-db';
 import { listProjectSlugs } from '@/lib/build/loader';
 import { SIMULATORS } from '@/lib/simulators';
+import { getArchivedNewsSlugs } from '@/lib/news';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -25,10 +26,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Merged sources: MDX on disk PLUS anything published through the CMS.
   // Reading the filesystem alone meant browser-created content never entered
   // the sitemap, so Google never discovered it.
-  const [atlasEntries, blogPostsData, lensVideos] = await Promise.all([
+  const [atlasEntries, blogPostsData, lensVideos, newsSlugs] = await Promise.all([
     getAllAtlasEntriesMerged(),
     getAllPostsMerged(),
     getAllLensMerged(),
+    getArchivedNewsSlugs(1000),
   ]);
 
   const atlas = atlasEntries.map((e) => ({
@@ -43,6 +45,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(v.publishedAt),
     changeFrequency: 'monthly' as const,
     priority: 0.6,
+  }));
+
+  // Per-article news pages from the archive (0033 + 0037). These are summarised,
+  // self-canonical stories with NewsArticle JSON-LD — the SEO-indexable layer on
+  // top of the live aggregator feed.
+  const newsArticles = newsSlugs.map((n) => ({
+    url: `${BASE}/news/${n.slug}`,
+    lastModified: new Date(n.publishedAt),
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
   }));
 
   const academyLessons = getAllAcademyLessons().map((l) => ({
@@ -114,6 +126,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...buildProjects,
     ...blogPosts,
     ...lens,
+    ...newsArticles,
     ...ROBOTS.map((r) => ({
       url: `${BASE}/robots/${r.slug}`,
       lastModified: now,

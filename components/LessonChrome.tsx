@@ -11,7 +11,8 @@ import { LessonComplete } from './LessonComplete';
 import { LessonCertificate } from './LessonCertificate';
 import { LabThread } from './lab/LabThread';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+// Guarded so lesson share URLs never point at the *.vercel.app preview domain.
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 const KEY_CONCEPTS: Record<string, string[]> = {
   '01': ['sense-think-act-loop', 'robot', 'autonomy'],

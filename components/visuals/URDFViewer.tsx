@@ -593,7 +593,7 @@ export function URDFViewer() {
             width: '100%',
             height: 480,
             minHeight: 400,
-            background: '#050810',
+            background: '#0A0E17',
             borderRadius: 12,
             border: '1px solid var(--border-2)',
             overflow: 'hidden',

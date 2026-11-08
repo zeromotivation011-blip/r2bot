@@ -390,7 +390,7 @@ function SubmitForm({ onDone }: { onDone: () => void }) {
         <label style={{ display: 'block' }}>
           <span style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#6b7280', display: 'block', marginBottom: 4 }}>Track</span>
           <select name="track" defaultValue=""
-            style={{ width: '100%', background: '#0a0a12', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '9px 12px', fontSize: 13, color: '#fff', outline: 'none', boxSizing: 'border-box' }}>
+            style={{ width: '100%', background: '#0A0E17', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '9px 12px', fontSize: 13, color: '#fff', outline: 'none', boxSizing: 'border-box' }}>
             <option value="">— pick one —</option>
             {TRACKS.map(t => <option key={t} value={t}>{t}</option>)}
           </select>

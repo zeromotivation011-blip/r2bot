@@ -518,7 +518,7 @@ function AuthMenu() {
         style={{
           width: 36, height: 36, borderRadius: '50%',
           background: 'linear-gradient(135deg, #f97316, #f59e0b)',
-          color: '#0a0a0f', border: 'none',
+          color: '#0A0E17', border: 'none',
           fontWeight: 900, fontSize: 14, cursor: 'pointer',
           display: 'grid', placeItems: 'center',
         }}

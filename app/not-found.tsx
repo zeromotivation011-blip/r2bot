@@ -25,7 +25,7 @@ export default function NotFound() {
       <Nav />
       <main
         id="main-content"
-        className="relative flex min-h-[calc(100vh-90px)] items-center justify-center overflow-hidden bg-[#050810] px-4 pb-16 pt-32"
+        className="relative flex min-h-[calc(100vh-90px)] items-center justify-center overflow-hidden bg-[#0A0E17] px-4 pb-16 pt-32"
       >
         <div className="relative z-10 mx-auto max-w-2xl text-center">
           <div className="text-7xl sm:text-8xl" aria-hidden>🤖</div>

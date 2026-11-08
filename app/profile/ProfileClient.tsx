@@ -76,20 +76,20 @@ export default function ProfileClient() {
 
   if (isLoading || !user) {
     return (
-      <main className="min-h-screen bg-[#0a0a0f] grid place-items-center text-white">
+      <main className="min-h-screen bg-[#0A0E17] grid place-items-center text-white">
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white pt-24 pb-20 px-4">
+    <main className="min-h-screen bg-[#0A0E17] text-white pt-24 pb-20 px-4">
       <div className="mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6">
         {/* Sidebar */}
         <aside className="rounded-2xl border border-white/10 bg-[#111118] p-5 h-fit">
           <div
             className="w-20 h-20 rounded-full grid place-items-center text-3xl font-black mx-auto"
-            style={{ background: 'linear-gradient(135deg, #f97316, #f59e0b)', color: '#0a0a0f' }}
+            style={{ background: 'linear-gradient(135deg, #f97316, #f59e0b)', color: '#0A0E17' }}
           >
             {profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -102,7 +102,7 @@ export default function ProfileClient() {
               <input
                 value={nameDraft}
                 onChange={e => setNameDraft(e.target.value)}
-                className="w-full bg-[#0a0a0f] border border-white/15 rounded-lg px-3 py-1.5 text-center text-white"
+                className="w-full bg-[#0A0E17] border border-white/15 rounded-lg px-3 py-1.5 text-center text-white"
               />
               <div className="flex gap-1 mt-2 justify-center">
                 <button onClick={saveName} className="text-xs px-3 py-1 rounded-full bg-blue-500 text-white">Save</button>
@@ -217,7 +217,7 @@ function OverviewTab({ progress, mastered, kids }: {
           onChange={e => setGoal(e.target.value)}
           rows={3}
           placeholder="e.g. By December, master 50 Atlas terms and build my first robot arm."
-          className="mt-2 w-full bg-[#0a0a0f] border border-white/15 text-white rounded-lg p-3 focus:outline-none focus:border-blue-500"
+          className="mt-2 w-full bg-[#0A0E17] border border-white/15 text-white rounded-lg p-3 focus:outline-none focus:border-blue-500"
         />
         <button onClick={saveGoal} className="mt-2 rounded-lg bg-blue-500 text-white px-4 py-2 text-sm font-bold">Save</button>
       </div>
@@ -248,7 +248,7 @@ function AtlasTab({ mastered }: { mastered: string[] }) {
         {mastered.length === 0 ? (
           <p className="text-sm text-zinc-500">You haven\'t mastered any terms yet. Open the Atlas and tap "Mark mastered" on any term.</p>
         ) : mastered.map(slug => (
-          <Link key={slug} href={`/atlas/concept/${slug}`} className="text-xs bg-[#0a0a0f] border border-white/10 text-zinc-200 px-2.5 py-1 rounded-full hover:border-amber-400/40">📚 {slug}</Link>
+          <Link key={slug} href={`/atlas/concept/${slug}`} className="text-xs bg-[#0A0E17] border border-white/10 text-zinc-200 px-2.5 py-1 rounded-full hover:border-amber-400/40">📚 {slug}</Link>
         ))}
       </div>
       <Link href="/atlas" className="mt-5 inline-block rounded-xl bg-blue-500 text-white px-4 py-2 text-sm font-bold">Keep learning →</Link>
@@ -271,7 +271,7 @@ function RobotTab({ kids }: {
         {ROBOT_PARTS.map(p => {
           const owned = earned.has(p.id)
           return (
-            <div key={p.id} className={`rounded-xl border p-3 text-center ${owned ? 'border-amber-500/40 bg-amber-500/10' : 'border-white/10 bg-[#0a0a0f]'}`}>
+            <div key={p.id} className={`rounded-xl border p-3 text-center ${owned ? 'border-amber-500/40 bg-amber-500/10' : 'border-white/10 bg-[#0A0E17]'}`}>
               <span className={`text-2xl ${owned ? '' : 'opacity-40 grayscale'}`}>{p.emoji}</span>
               <p className="mt-1 text-xs font-bold text-white">{p.name}</p>
               {!owned && <p className="text-[10px] text-zinc-500 mt-0.5">Locked</p>}

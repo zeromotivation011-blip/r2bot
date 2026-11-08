@@ -7,6 +7,10 @@
     "ros2",
     "reinforcement_learning",
     "degrees_of_freedom",
-    "computer_vision"
+    "computer_vision",
+    "path_planning",
+    "torque_vs_speed",
+    "sensor_fusion",
+    "end_effector"
   ]
 }

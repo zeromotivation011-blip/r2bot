@@ -31,14 +31,14 @@ export default async function EmbedSectionPage({ params }: { params: Promise<{ s
 
   if (!meta) {
     return (
-      <main className="min-h-screen bg-[#050810] p-6 text-zinc-200">
+      <main className="min-h-screen bg-[#0A0E17] p-6 text-zinc-200">
         <p className="text-sm">Unknown simulator. <Link href="/visualizer" className="text-amber-300 underline">Open the full visualizer</Link>.</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#050810] p-6 text-zinc-200">
+    <main className="min-h-screen bg-[#0A0E17] p-6 text-zinc-200">
       <div className="mx-auto max-w-3xl">
         <p className="font-mono text-[10px] uppercase tracking-wider text-amber-300">R2BOT · embed</p>
         <h1 className="mt-2 text-2xl font-extrabold text-white">{meta.title}</h1>

@@ -45,9 +45,9 @@ const LS_SAVED = 'r2bot_pulse_saved'
 
 export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
   const [data, setData] = useState<ApiResponse | null>(initialData ?? null)
-  const [filter, setFilter] = useState<string>('all')   // 'all' | topic | 'india'
+  const [filter, setFilter] = useState<string>('all')   // 'all' | topic
   const [sourceFilter, setSourceFilter] = useState<string>('all') // 'all' | source name
-  const [sort, setSort] = useState<'latest' | 'india' | 'trending'>('latest')
+  const [sort, setSort] = useState<'latest' | 'trending'>('latest')
   const [watch, setWatch] = useState<string[]>([])
   const [savedIds, setSavedIds] = useState<string[]>([])
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
@@ -102,7 +102,6 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
     let list = data.articles
     if (filter !== 'all') list = list.filter(a => a.topic === filter)
     if (sourceFilter !== 'all') list = list.filter(a => a.source === sourceFilter)
-    if (sort === 'india') list = [...list].sort((a, b) => b.indiaImpactScore - a.indiaImpactScore)
     if (sort === 'trending') list = [...list].filter(a => a.isTrending || a.isBreaking)
     // Watch list bubbles to top
     if (watch.length > 0) {
@@ -134,12 +133,12 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
   }
 
   return (
-    <main className="min-h-screen bg-[#050810] text-white pt-24 pb-16">
+    <main className="min-h-screen bg-[#0A0E17] text-white pt-24 pb-16">
       <div className="px-4 max-w-7xl mx-auto">
         <div className="text-center mb-6">
           <p className="text-xs tracking-[3px] uppercase font-bold text-amber-300">Pulse</p>
           <h1 className="mt-2 text-3xl md:text-5xl font-black">Robotics Intelligence Briefing</h1>
-          <p className="mt-2 text-zinc-300">What happened in robotics — and why it matters for India.</p>
+          <p className="mt-2 text-zinc-300">What happened in robotics — and why it matters.</p>
           {data?.lastUpdated && (
             <p className="mt-1 text-xs text-zinc-500">
               Updated {timeAgo(data.lastUpdated)}.
@@ -171,18 +170,6 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
           {/* Main feed */}
           <div>
-            {/* India Spotlight */}
-            {data && data.indiaHighlights.length > 0 && (
-              <section className="mb-7">
-                <h2 className="text-xs uppercase tracking-widest font-black text-amber-300 mb-3">🇮🇳 India Spotlight</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {data.indiaHighlights.slice(0, 2).map(a => (
-                    <FeaturedCard key={a.id} article={a} styles={data.sourceStyles} onSave={toggleSave} saved={savedIds.includes(a.id)} />
-                  ))}
-                </div>
-              </section>
-            )}
-
             {/* Breaking / Trending */}
             {breakingOrTrending.length > 0 && (
               <section className="mb-7">
@@ -224,9 +211,8 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
               ))}
               <div className="ml-auto flex items-center gap-2 text-xs">
                 <span className="text-zinc-400">Sort:</span>
-                <select value={sort} onChange={e => setSort(e.target.value as 'latest' | 'india' | 'trending')} className="bg-black/40 border border-white/15 rounded-lg px-2 py-1 text-zinc-200">
+                <select value={sort} onChange={e => setSort(e.target.value as 'latest' | 'trending')} className="bg-black/40 border border-white/15 rounded-lg px-2 py-1 text-zinc-200">
                   <option value="latest">Latest</option>
-                  <option value="india">India Impact</option>
                   <option value="trending">Trending only</option>
                 </select>
               </div>
@@ -267,9 +253,6 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
                 <p className="text-xs uppercase tracking-widest text-amber-300 font-bold">This Week</p>
                 <p className="text-2xl font-black mt-2">{data.weeklyStats.totalArticles}</p>
                 <p className="text-xs text-zinc-400">articles aggregated</p>
-                <p className="mt-3 text-sm text-amber-200">
-                  🇮🇳 <strong>{data.weeklyStats.indiaStories}</strong> stories matter for India this week
-                </p>
                 <div className="mt-3 flex flex-wrap gap-1">
                   {data.weeklyStats.topTopics.slice(0, 5).map(t => (
                     <span key={t} className="text-[10px] bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-full px-2 py-0.5">{TOPIC_LABELS[t] || t}</span>
@@ -297,7 +280,7 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
         <section className="mt-10 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-orange-500/5 p-6 text-center">
           <p className="text-xs uppercase tracking-widest text-amber-300 font-bold">Weekly Digest</p>
           <h3 className="mt-2 text-2xl font-black">Robotics Intelligence — every Monday</h3>
-          <p className="text-zinc-300 mt-1">The week, condensed. India-relevant first. Sent honestly.</p>
+          <p className="text-zinc-300 mt-1">The week in robotics, condensed. The signal, not the noise.</p>
           <div className="mt-4 flex justify-center gap-2 flex-wrap max-w-md mx-auto">
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)}
@@ -308,42 +291,10 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
           </div>
           {subStatus === 'ok'  && <p className="mt-2 text-sm text-emerald-300">✓ Subscribed. Welcome.</p>}
           {subStatus === 'err' && <p className="mt-2 text-sm text-red-300">Something went wrong. Try again.</p>}
-          <p className="mt-3 text-xs text-zinc-500">Join the readers building India\'s robotics future.</p>
+          <p className="mt-3 text-xs text-zinc-500">Join learners building the future of robotics.</p>
         </section>
       </div>
     </main>
-  )
-}
-
-function FeaturedCard({ article: a, styles, onSave, saved }: {
-  article: EnrichedArticle
-  styles: Record<string, { color: string; short: string }>
-  onSave: (a: EnrichedArticle) => void
-  saved: boolean
-}) {
-  const s = styles[a.source] || { color: '#888', short: a.source.slice(0, 4).toUpperCase() }
-  return (
-    <article className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/8 to-orange-500/4 p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-[9px] font-bold uppercase tracking-widest rounded px-1.5 py-0.5 text-white" style={{ background: s.color }}>{s.short}</span>
-        <span className="text-[9px] font-bold uppercase tracking-widest text-amber-300 bg-amber-500/15 border border-amber-500/40 rounded-full px-2 py-0.5">
-          🇮🇳 HIGH IMPACT · {a.indiaImpactScore}/10
-        </span>
-        <span className="text-[10px] text-zinc-500 ml-auto">{timeAgo(a.publishedAt)}</span>
-      </div>
-      <a href={a.url} target="_blank" rel="noopener" className="block hover:text-amber-200">
-        <h3 className="text-lg font-black text-white leading-snug">{a.title}</h3>
-      </a>
-      <p className="mt-2 text-sm text-zinc-300 line-clamp-3">{a.aiSummary || a.description}</p>
-      <div className="mt-3 rounded-lg bg-black/30 border border-amber-500/30 p-3">
-        <p className="text-[10px] uppercase tracking-widest text-amber-300 font-bold">R2BOT context</p>
-        <p className="mt-1 text-xs text-zinc-200">{a.whyItMatters}</p>
-      </div>
-      <div className="mt-2 flex items-center gap-2">
-        <button onClick={() => onSave(a)} className="text-xs text-zinc-300 hover:text-amber-300">{saved ? '🔖 Saved' : '🔖 Save'}</button>
-        <a href={a.url} target="_blank" rel="noopener" className="ml-auto text-xs font-bold text-amber-300 hover:text-amber-200">Open →</a>
-      </div>
-    </article>
   )
 }
 
@@ -356,7 +307,6 @@ function ArticleRow({ article: a, styles, expanded, onToggle, onSave, saved }: {
   saved: boolean
 }) {
   const s = styles[a.source] || { color: '#888', short: a.source.slice(0, 4).toUpperCase() }
-  const impactColor = a.indiaImpactScore >= 7 ? '#10b981' : a.indiaImpactScore >= 4 ? '#f59e0b' : a.indiaImpactScore >= 1 ? '#a3a3a3' : '#525252'
 
   return (
     <article className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 hover:border-amber-400/30 transition-colors">
@@ -375,15 +325,6 @@ function ArticleRow({ article: a, styles, expanded, onToggle, onSave, saved }: {
         <h3 className="text-base font-bold text-white hover:text-amber-200">{a.title}</h3>
       </a>
       <p className="mt-1.5 text-sm text-zinc-400 line-clamp-3">{a.aiSummary || a.description}</p>
-
-      {/* India impact bar */}
-      <div className="mt-3 flex items-center gap-2 text-xs">
-        <span className="text-zinc-500 w-16">India ↗</span>
-        <div className="flex-1 h-2 bg-black/40 rounded-full overflow-hidden">
-          <div className="h-full transition-all" style={{ width: `${a.indiaImpactScore * 10}%`, background: impactColor }} />
-        </div>
-        <span className="text-zinc-300 font-bold w-12 text-right" style={{ color: impactColor }}>{a.indiaImpactScore}/10</span>
-      </div>
 
       {/* Actions */}
       <div className="mt-3 flex items-center gap-3 text-xs">

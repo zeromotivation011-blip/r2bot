@@ -111,7 +111,7 @@ export function ROS2Playground() {
             style={{
               padding: 14,
               borderRadius: 10,
-              background: '#050810',
+              background: '#0A0E17',
               border: '1px solid var(--border-2)',
               fontFamily: 'var(--font-mono), monospace',
               fontSize: 12.5,
@@ -162,7 +162,7 @@ function FallbackUI() {
       style={{
         padding: 30,
         borderRadius: 10,
-        background: 'linear-gradient(135deg, #050810, #0a0f1e)',
+        background: 'linear-gradient(135deg, #0A0E17, #0a0f1e)',
         border: '1px solid var(--border-2)',
         textAlign: 'center',
       }}

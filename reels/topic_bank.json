@@ -7,7 +7,32 @@
       "curiosity_angle": "The secret math behind every factory arm, surgical robot, and Mars rover",
       "script": "Every robot arm you've ever seen runs on ONE equation. It's called Inverse Kinematics. You point to a spot — it figures out every joint angle automatically. Your brain solves this instantly. But a robot needs six simultaneous equations — recalculated every millisecond. This is the math inside every factory arm, every surgical robot, and every Mars rover. Follow R2BOT — and learn robotics from zero to engineer.",
       "visuals": "robot_arm",
-      "tags": ["#robotics", "#inversekinematics", "#engineering", "#robots", "#STEM"]
+      "theme": "amber",
+      "voice": "adam",
+      "yt_title": "Inverse Kinematics Explained: The Math Behind Every Robot Arm",
+      "ig_tags": [
+        "#robotics",
+        "#mechatronics",
+        "#robotarm",
+        "#inversekinematics",
+        "#engineeringstudent"
+      ],
+      "companion_page": true,
+      "yt_hashtags": [
+        "#Shorts",
+        "#mechatronics",
+        "#robotarm",
+        "#inversekinematics"
+      ],
+      "yt_keywords": [
+        "robotics explained",
+        "mechatronics",
+        "robot arm",
+        "inverse kinematics",
+        "engineering student",
+        "how robots work",
+        "robotics for beginners"
+      ]
     },
     {
       "id": "lidar",
@@ -16,7 +41,33 @@
       "curiosity_angle": "LiDAR — the laser that maps the world 10 million times per second",
       "script": "Self-driving cars don't use cameras to see. They fire 10 million laser pulses every second and listen for the echo. That's LiDAR. Each pulse hits an object and bounces back in nanoseconds. The car builds a 3D map of the world — in real time — faster than your eye can blink. Rain, fog, and darkness don't matter. Lasers don't care. This is how robots see. Follow R2BOT to learn the tech shaping the future.",
       "visuals": "lidar_scan",
-      "tags": ["#LiDAR", "#selfdriving", "#autonomousvehicles", "#robotics", "#technology"]
+      "theme": "ice",
+      "voice": "bella",
+      "yt_title": "How LiDAR Works: Why Self-Driving Cars Don't Use Cameras",
+      "ig_tags": [
+        "#selfdrivingcars",
+        "#autonomousvehicles",
+        "#lidar",
+        "#robotics",
+        "#techexplained"
+      ],
+      "companion_page": true,
+      "yt_hashtags": [
+        "#Shorts",
+        "#selfdrivingcars",
+        "#autonomousvehicles",
+        "#lidar"
+      ],
+      "yt_keywords": [
+        "self driving cars",
+        "autonomous vehicles",
+        "lidar explained",
+        "robotics explained",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "how robots see in the dark"
+      ]
     },
     {
       "id": "pid_controller",
@@ -25,7 +76,32 @@
       "curiosity_angle": "The 80-year-old algorithm still running your thermostat, drone, and Tesla",
       "script": "Three letters control almost every machine on Earth. P. I. D. Proportional. Integral. Derivative. Your thermostat uses it. Your drone uses it. Your Tesla uses it. A PID controller asks three questions every millisecond: How wrong am I right now? How long have I been wrong? How fast am I getting more wrong? The answers become a correction signal. It's 80 years old — and nothing better has replaced it. Follow R2BOT. Learn the classics.",
       "visuals": "pid_graph",
-      "tags": ["#PIDcontroller", "#controlsystems", "#robotics", "#engineering", "#automation"]
+      "theme": "amber",
+      "voice": "antoni",
+      "yt_title": "PID Controller Explained in 60 Seconds",
+      "ig_tags": [
+        "#robotics",
+        "#controlsystems",
+        "#pidcontroller",
+        "#mechatronics",
+        "#engineeringstudent"
+      ],
+      "companion_page": true,
+      "yt_hashtags": [
+        "#Shorts",
+        "#controlsystems",
+        "#pidcontroller",
+        "#mechatronics"
+      ],
+      "yt_keywords": [
+        "robotics explained",
+        "control systems",
+        "pid controller",
+        "mechatronics",
+        "engineering student",
+        "how robots work",
+        "robotics for beginners"
+      ]
     },
     {
       "id": "slam",
@@ -34,79 +110,1986 @@
       "curiosity_angle": "SLAM solves a chicken-and-egg problem that stumped engineers for decades",
       "script": "Drop a robot in a room it's never seen. How does it know where it is? This is the SLAM problem. Simultaneous Localization and Mapping. The robot must build a map while using that same map to navigate. It's a chicken-and-egg problem that stumped roboticists for decades. Today, your robot vacuum solves it. So does every autonomous drone and self-driving car. Follow R2BOT — and learn how robots find their way.",
       "visuals": "slam_map",
-      "tags": ["#SLAM", "#robotics", "#autonomousrobots", "#AI", "#engineering"]
+      "theme": "ice",
+      "voice": "bella",
+      "yt_title": "What is SLAM? How Robots Map a Room They've Never Seen",
+      "ig_tags": [
+        "#robotics",
+        "#autonomousrobots",
+        "#slam",
+        "#navigation",
+        "#computervision"
+      ],
+      "companion_page": true,
+      "yt_hashtags": [
+        "#Shorts",
+        "#autonomousrobots",
+        "#slam",
+        "#navigation"
+      ],
+      "yt_keywords": [
+        "robotics explained",
+        "autonomous robots",
+        "slam robotics",
+        "robot navigation",
+        "computer vision",
+        "how robots work",
+        "robotics for beginners",
+        "slam — how robots map unfamiliar places"
+      ]
     },
     {
       "id": "ros2",
       "title": "What is ROS2?",
-      "hook": "There's one operating system that almost every serious robot runs on. You've never heard of it.",
-      "curiosity_angle": "ROS2 — the invisible OS powering Boston Dynamics, NASA, and every robotics startup",
-      "script": "There's one operating system that almost every serious robot runs on — and you've probably never heard of it. It's called ROS2. Robot Operating System 2. It's what Boston Dynamics uses. What NASA uses. What every robotics startup uses. It lets a robot's brain, eyes, arms, and wheels all talk to each other in real time. Without ROS2, modern robotics would collapse. Follow R2BOT — we'll teach you ROS2 from zero.",
+      "hook": "Every serious robot on Earth runs the same operating system. You've never heard of it.",
+      "curiosity_angle": "ROS2 — the invisible plumbing behind Boston Dynamics, NASA, and every robotics startup",
+      "script": "Every serious robot on Earth runs the same operating system. You've never heard of it. It's called ROS2. Not Windows for robots — it's the plumbing that lets a robot's parts talk to each other. Quick one. A robot's camera, brain and wheels — one big program, or separate programs? Separate. Each part is a node. The camera is one, the motors another. Independent programs. Nodes never call each other. One publishes to a topic, others subscribe. The camera shouts; whoever cares listens. So you can unplug the camera node, drop in a better one, and nothing else changes. So if one node crashes mid-mission, what happens to the robot? It keeps running. That isolation is why ROS2 is trusted on hardware that can't fail. Free, open source, and the most employable robotics skill there is. Follow R2BOT.",
       "visuals": "ros2_nodes",
-      "tags": ["#ROS2", "#robotics", "#robotprogramming", "#engineering", "#BostonDynamics"]
+      "theme": "lime",
+      "voice": "adam",
+      "yt_title": "What is ROS2? The Operating System Behind Modern Robots",
+      "ig_tags": [
+        "#robotics",
+        "#robotprogramming",
+        "#ros2",
+        "#coding",
+        "#roboticsengineering"
+      ],
+      "companion_page": true,
+      "vo": {
+        "hook": "Every serious robot on Earth runs the same operating system. You've never heard of it.",
+        "concept": "It's called ROS2. Not Windows for robots — it's the plumbing that lets a robot's parts talk to each other.",
+        "predict": "Quick one. A robot's camera, brain and wheels — one big program, or separate programs?",
+        "beat1": "Separate. Each part is a node. The camera is one, the motors another. Independent programs.",
+        "beat2": "Nodes never call each other. One publishes to a topic, others subscribe. The camera shouts; whoever cares listens.",
+        "beat3": "So you can unplug the camera node, drop in a better one, and nothing else changes.",
+        "quiz": "So if one node crashes mid-mission, what happens to the robot?",
+        "reveal": "It keeps running. That isolation is why ROS2 is trusted on hardware that can't fail.",
+        "cta": "Free, open source, and the most employable robotics skill there is. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Nodes",
+          "text": "Every part is its own independent program.",
+          "detail": "Camera, motors, planner — separate processes, not one giant script."
+        },
+        {
+          "label": "Messages",
+          "text": "Nobody calls anybody. They publish and subscribe.",
+          "detail": "The camera shouts what it sees. Whoever cares is listening."
+        },
+        {
+          "label": "Why it wins",
+          "text": "Swap any part without rewriting the robot.",
+          "detail": "Unplug a node, plug in a better one. Nothing else has to change."
+        }
+      ],
+      "predict": {
+        "q": "Camera, brain and wheels — one program, or many?",
+        "options": [
+          "One big program",
+          "Separate programs"
+        ]
+      },
+      "quiz": {
+        "q": "A node crashes mid-mission. What happens?",
+        "options": [
+          "The whole robot halts",
+          "The rest keeps running",
+          "It reboots itself"
+        ],
+        "answer": 1,
+        "why": "Nodes are isolated processes, so one failure doesn't take the system down — that's why ROS2 is trusted on real hardware."
+      },
+      "yt_hashtags": [
+        "#Shorts",
+        "#robotprogramming",
+        "#ros2",
+        "#coding"
+      ],
+      "yt_keywords": [
+        "robotics explained",
+        "robot programming",
+        "ros2 tutorial",
+        "programming",
+        "robotics engineering",
+        "how robots work",
+        "robotics for beginners",
+        "what is ros2"
+      ]
     },
     {
       "id": "reinforcement_learning",
       "title": "How Robots Learn to Walk",
-      "hook": "Nobody programmed this robot to walk. It figured it out by failing 10 million times.",
-      "curiosity_angle": "Reinforcement learning — teaching robots through pain and reward",
-      "script": "Nobody programmed this robot how to walk. It figured it out by failing — ten million times — in a simulation. That's reinforcement learning. The robot tries a movement. Falls over. Gets penalized. Tries again. After millions of attempts, it discovers walking on its own. The same technique taught AlphaGo to beat world champions. And it's teaching robots to run, jump, and survive terrain humans can't. Follow R2BOT — the future of robotics is stranger than you think.",
+      "hook": "Nobody taught this robot to walk. It fell over ten million times and worked it out.",
+      "curiosity_angle": "Reinforcement learning — the same technique that beat world champions, now teaching machines to move",
+      "script": "Nobody taught this robot to walk. It fell over ten million times and worked it out. That's reinforcement learning. You don't write instructions. You write a reward, and let the machine discover what earns it. Before I explain — ten million falls. On a real robot, or somewhere else? Somewhere else. In simulation, where a robot falls a million times an hour and never breaks a joint. Each attempt gets a score. Moved forward? Points. Face-planted? Penalty. It keeps whatever nudged the score up. Nobody ever defined walking. Walking is just the strategy that scored highest. So what's the hardest part of reinforcement learning? Writing the reward. Reward speed alone and it learns to fall forward — fast, and useless. Teach a machine what to want, and it works out how. Follow R2BOT.",
       "visuals": "rl_learning",
-      "tags": ["#reinforcementlearning", "#AI", "#robotics", "#machinelearning", "#deeplearning"]
+      "theme": "violet",
+      "voice": "bella",
+      "yt_title": "How Robots Learn to Walk: Reinforcement Learning Explained",
+      "ig_tags": [
+        "#ai",
+        "#machinelearning",
+        "#reinforcementlearning",
+        "#robotics",
+        "#deeplearning"
+      ],
+      "companion_page": true,
+      "vo": {
+        "hook": "Nobody taught this robot to walk. It fell over ten million times and worked it out.",
+        "concept": "That's reinforcement learning. You don't write instructions. You write a reward, and let the machine discover what earns it.",
+        "predict": "Before I explain — ten million falls. On a real robot, or somewhere else?",
+        "beat1": "Somewhere else. In simulation, where a robot falls a million times an hour and never breaks a joint.",
+        "beat2": "Each attempt gets a score. Moved forward? Points. Face-planted? Penalty. It keeps whatever nudged the score up.",
+        "beat3": "Nobody ever defined walking. Walking is just the strategy that scored highest.",
+        "quiz": "So what's the hardest part of reinforcement learning?",
+        "reveal": "Writing the reward. Reward speed alone and it learns to fall forward — fast, and useless.",
+        "cta": "Teach a machine what to want, and it works out how. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Not real robots",
+          "text": "It falls a million times an hour — in simulation.",
+          "detail": "Real hardware would shatter. Simulated hardware costs nothing."
+        },
+        {
+          "label": "Score, not steps",
+          "text": "Moved forward? Points. Face-planted? Penalty.",
+          "detail": "No instructions. Just a number going up or down."
+        },
+        {
+          "label": "Nobody defined walking",
+          "text": "Walking is simply whatever scored highest.",
+          "detail": "Which is why these robots move in ways no human would design."
+        }
+      ],
+      "predict": {
+        "q": "Ten million falls — where did they happen?",
+        "options": [
+          "On a real robot",
+          "In simulation"
+        ]
+      },
+      "quiz": {
+        "q": "What's the hardest part of reinforcement learning?",
+        "options": [
+          "Building the robot",
+          "Writing the reward",
+          "Buying the GPUs"
+        ],
+        "answer": 1,
+        "why": "Reward speed alone and it learns to fall forward — technically fast, completely useless. Bad rewards teach bad behaviour."
+      },
+      "yt_hashtags": [
+        "#Shorts",
+        "#machinelearning",
+        "#reinforcementlearning",
+        "#deeplearning"
+      ],
+      "yt_keywords": [
+        "artificial intelligence",
+        "machine learning",
+        "reinforcement learning",
+        "robotics explained",
+        "deep learning",
+        "how robots work",
+        "robotics for beginners",
+        "how robots learn to walk"
+      ]
     },
     {
       "id": "degrees_of_freedom",
       "title": "Degrees of Freedom",
-      "hook": "Your shoulder has 3 degrees of freedom. Most robots have 6. Here's why that matters.",
-      "curiosity_angle": "The hidden number that determines what a robot can and cannot do",
-      "script": "Your shoulder has 3 degrees of freedom. Your wrist adds 3 more. Together, your arm can reach almost any point in space at any angle. That's why industrial robot arms have exactly 6 joints. Add fewer and the robot can't reach everywhere. Add more and the math becomes nightmarish. 6 is the magic number — and it comes from pure geometry. Follow R2BOT to understand the hidden math behind every robot.",
+      "hook": "Your arm can reach the same cup a hundred different ways. Most robots can't.",
+      "curiosity_angle": "Degrees of freedom — why six joints is the magic number, and seven is the luxury one",
+      "script": "Your arm can reach the same cup a hundred different ways. Most robots can't. That's degrees of freedom — how many independent ways a thing can move. A standard robot arm has six. Quick call. To put an object anywhere, at any angle — do you need three, or six? Six. Three to get there: left-right, forward-back, up-down. Three more to aim it: roll, pitch, yaw. With fewer, there are poses it simply cannot reach. A four-joint arm touches the point, but not from your angle. Your arm has seven. That spare one is why you can hold your hand still and swing your elbow around it. So why do surgical robots often use seven joints, not six? To dodge obstacles. The extra freedom reroutes the arm around your ribs without moving the instrument. More freedom, more cost, more control. Follow R2BOT.",
       "visuals": "dof_diagram",
-      "tags": ["#robotics", "#degreesoffreedom", "#robotiArm", "#engineering", "#STEM"]
+      "theme": "amber",
+      "voice": "antoni",
+      "yt_title": "Degrees of Freedom Explained: Why Robot Arms Have 6 Joints",
+      "ig_tags": [
+        "#robotics",
+        "#mechatronics",
+        "#kinematics",
+        "#robotarm",
+        "#engineeringstudent"
+      ],
+      "companion_page": true,
+      "vo": {
+        "hook": "Your arm can reach the same cup a hundred different ways. Most robots can't.",
+        "concept": "That's degrees of freedom — how many independent ways a thing can move. A standard robot arm has six.",
+        "predict": "Quick call. To put an object anywhere, at any angle — do you need three, or six?",
+        "beat1": "Six. Three to get there: left-right, forward-back, up-down. Three more to aim it: roll, pitch, yaw.",
+        "beat2": "With fewer, there are poses it simply cannot reach. A four-joint arm touches the point, but not from your angle.",
+        "beat3": "Your arm has seven. That spare one is why you can hold your hand still and swing your elbow around it.",
+        "quiz": "So why do surgical robots often use seven joints, not six?",
+        "reveal": "To dodge obstacles. The extra freedom reroutes the arm around your ribs without moving the instrument.",
+        "cta": "More freedom, more cost, more control. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Three plus three",
+          "text": "Three to get there. Three to aim it.",
+          "detail": "Left-right, forward-back, up-down — then roll, pitch and yaw."
+        },
+        {
+          "label": "Too few",
+          "text": "Fewer than six and some poses are simply unreachable.",
+          "detail": "A four-joint arm touches the point, but never from the angle you need."
+        },
+        {
+          "label": "The spare one",
+          "text": "Your arm has seven. That extra joint is the luxury.",
+          "detail": "It's why you can hold your hand still and swing your elbow around it."
+        }
+      ],
+      "predict": {
+        "q": "Place an object anywhere, at any angle. How many?",
+        "options": [
+          "Three is enough",
+          "You need six"
+        ]
+      },
+      "quiz": {
+        "q": "Why do surgical robots often use seven joints?",
+        "options": [
+          "To move faster",
+          "To dodge obstacles",
+          "To lift more"
+        ],
+        "answer": 1,
+        "why": "The spare joint lets the arm reroute around obstacles while the instrument tip stays exactly where it is."
+      },
+      "yt_hashtags": [
+        "#Shorts",
+        "#mechatronics",
+        "#kinematics",
+        "#robotarm"
+      ],
+      "yt_keywords": [
+        "robotics explained",
+        "mechatronics",
+        "robot kinematics",
+        "robot arm",
+        "engineering student",
+        "how robots work",
+        "robotics for beginners",
+        "degrees of freedom"
+      ]
     },
     {
       "id": "computer_vision",
       "title": "How Robots Recognize Your Face",
-      "hook": "Your phone recognizes your face in 0.1 seconds. Here's the math it's doing.",
-      "curiosity_angle": "Convolutional neural networks — the trick that made computers see",
-      "script": "Your phone recognizes your face in under a tenth of a second. Here's what it's actually doing. It breaks your face into thousands of tiny patches. Runs each patch through 50 layers of math. Each layer detects something — edges, curves, eyes, nose. By layer 50, it knows it's you. This is a Convolutional Neural Network — and it's the same technology inside every robot with eyes. Follow R2BOT. We'll teach you to build one.",
+      "hook": "Your phone recognises you in twenty milliseconds. It has never once seen a face.",
+      "curiosity_angle": "Computer vision — how a grid of numbers becomes recognition, one layer at a time",
+      "script": "Your phone recognises you in about twenty milliseconds. And it has never once seen a face. To a machine, an image isn't a picture. It's a grid of millions of numbers — just brightness values. So does it hunt for eyes and a nose, or for something far stranger? Stranger. The very first layer looks for one thing only: edges. Light meeting dark. That's it. The next layer glues edges into corners and curves. The next builds those into eyes and noses. Nobody ever programmed the idea of an eye. The network invented it, by seeing millions of faces and keeping whatever helped. So what does the very first layer of a vision network actually detect? Edges. Only light meeting dark. Every recognisable thing is built on top of that. It learned to see the way you did — from examples. Follow R2BOT.",
       "visuals": "cnn_layers",
-      "tags": ["#computervision", "#AI", "#neuralnetworks", "#robotics", "#deeplearning"]
+      "theme": "ice",
+      "voice": "bella",
+      "yt_title": "How Computer Vision Works: Teaching Robots to Recognise Faces",
+      "ig_tags": [
+        "#ai",
+        "#computervision",
+        "#machinelearning",
+        "#robotics",
+        "#deeplearning"
+      ],
+      "companion_page": true,
+      "vo": {
+        "hook": "Your phone recognises you in about twenty milliseconds. And it has never once seen a face.",
+        "concept": "To a machine, an image isn't a picture. It's a grid of millions of numbers — just brightness values.",
+        "predict": "So does it hunt for eyes and a nose, or for something far stranger?",
+        "beat1": "Stranger. The very first layer looks for one thing only: edges. Light meeting dark. That's it.",
+        "beat2": "The next layer glues edges into corners and curves. The next builds those into eyes and noses.",
+        "beat3": "Nobody ever programmed the idea of an eye. The network invented it, by seeing millions of faces and keeping whatever helped.",
+        "quiz": "So what does the very first layer of a vision network actually detect?",
+        "reveal": "Edges. Only light meeting dark. Every recognisable thing is built on top of that.",
+        "cta": "It learned to see the way you did — from examples. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Just numbers",
+          "text": "An image is a grid of brightness values. Nothing more.",
+          "detail": "No pictures, no faces — millions of numbers in a rectangle."
+        },
+        {
+          "label": "Edges first",
+          "text": "Layer one finds only edges. Light meeting dark.",
+          "detail": "Then corners, then curves, then eyes — each layer built on the last."
+        },
+        {
+          "label": "Nobody taught it",
+          "text": "No one programmed the idea of an eye.",
+          "detail": "The network invented it from millions of examples, keeping whatever helped."
+        }
+      ],
+      "predict": {
+        "q": "Does it look for eyes and noses first?",
+        "options": [
+          "Yes, facial features",
+          "No, something else"
+        ]
+      },
+      "quiz": {
+        "q": "What does the FIRST layer actually detect?",
+        "options": [
+          "Edges",
+          "Faces",
+          "Colours"
+        ],
+        "answer": 0,
+        "why": "Layer one only finds light meeting dark. Everything recognisable is assembled from those edges upward."
+      },
+      "yt_hashtags": [
+        "#Shorts",
+        "#computervision",
+        "#machinelearning",
+        "#deeplearning"
+      ],
+      "yt_keywords": [
+        "artificial intelligence",
+        "computer vision",
+        "machine learning",
+        "robotics explained",
+        "deep learning",
+        "how robots work",
+        "robotics for beginners",
+        "how robots recognize your face"
+      ]
     },
     {
       "id": "path_planning",
       "title": "How Robots Navigate Obstacles",
-      "hook": "Getting from A to B sounds simple. For a robot, it's one of the hardest problems in math.",
-      "curiosity_angle": "A* algorithm — the 50-year-old trick that every game, robot, and GPS still uses",
-      "script": "Getting from A to B sounds simple. For a robot surrounded by obstacles, it's one of the hardest problems in mathematics. The solution? A star algorithm. A*. Invented in 1968 by NASA researchers. It searches for the shortest path by always moving toward the destination — but smart enough to go around walls. Every GPS. Every video game. Every autonomous robot. All using the same 56-year-old trick. Follow R2BOT — learn the classics.",
+      "hook": "Your maps app finds the best route in milliseconds. It doesn't check every road.",
+      "curiosity_angle": "A* — the 1968 algorithm still routing every robot, every game character, and your commute",
+      "script": "Your maps app finds the best route in milliseconds. And it never checks every road. The trick is A star. An algorithm from 1968 that still routes robots, game characters, and your drive home. So how does it choose? Does it explore every direction equally, or lean toward the goal? It leans. Every option gets scored twice: how far you've already come, plus a guess at how far is left. That guess is the whole idea. Explore the cheapest total first, and you skip huge regions that were never going to win. Checking everything would be perfect but slow. Guessing alone is fast but wrong. A star takes both and stays optimal. What happens if the guess is too optimistic? You lose the guarantee. Overestimate the distance left and A star can confidently return the wrong route. One equation, fifty-eight years, still unbeaten. Follow R2BOT.",
       "visuals": "astar_grid",
-      "tags": ["#robotics", "#pathplanning", "#Astar", "#algorithms", "#autonomousrobots"]
+      "theme": "lime",
+      "voice": "arnold",
+      "yt_title": "A* Pathfinding Explained: How Robots Navigate Obstacles",
+      "ig_tags": [
+        "#algorithms",
+        "#coding",
+        "#astar",
+        "#robotics",
+        "#computerscience"
+      ],
+      "companion_page": true,
+      "vo": {
+        "hook": "Your maps app finds the best route in milliseconds. And it never checks every road.",
+        "concept": "The trick is A star. An algorithm from 1968 that still routes robots, game characters, and your drive home.",
+        "predict": "So how does it choose? Does it explore every direction equally, or lean toward the goal?",
+        "beat1": "It leans. Every option gets scored twice: how far you've already come, plus a guess at how far is left.",
+        "beat2": "That guess is the whole idea. Explore the cheapest total first, and you skip huge regions that were never going to win.",
+        "beat3": "Checking everything would be perfect but slow. Guessing alone is fast but wrong. A star takes both and stays optimal.",
+        "quiz": "What happens if the guess is too optimistic?",
+        "reveal": "You lose the guarantee. Overestimate the distance left and A star can confidently return the wrong route.",
+        "cta": "One equation, fifty-eight years, still unbeaten. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Two numbers",
+          "text": "Score every option twice: distance done, distance guessed.",
+          "detail": "Cost so far, plus an estimate of the cost remaining."
+        },
+        {
+          "label": "Follow the cheapest",
+          "text": "Explore the lowest total first — skip everything else.",
+          "detail": "Whole regions get ruled out without ever being visited."
+        },
+        {
+          "label": "The balance",
+          "text": "Check everything: slow. Guess only: wrong. A* does both.",
+          "detail": "Fast like a guess, correct like an exhaustive search."
+        }
+      ],
+      "predict": {
+        "q": "Does it explore every direction equally?",
+        "options": [
+          "Yes, all directions",
+          "No, it leans"
+        ]
+      },
+      "quiz": {
+        "q": "What if the distance guess is too optimistic?",
+        "options": [
+          "It runs slower",
+          "It returns a wrong route",
+          "Nothing changes"
+        ],
+        "answer": 1,
+        "why": "Overestimating the remaining distance breaks A*'s guarantee — it can confidently hand back a route that isn't shortest."
+      },
+      "yt_hashtags": [
+        "#Shorts",
+        "#algorithms",
+        "#coding",
+        "#astar"
+      ],
+      "yt_keywords": [
+        "algorithms explained",
+        "programming",
+        "a star algorithm",
+        "robotics explained",
+        "computer science",
+        "how robots work",
+        "robotics for beginners",
+        "how robots navigate obstacles"
+      ]
     },
     {
       "id": "torque_vs_speed",
       "title": "Why Robots Are Strong But Slow",
-      "hook": "Why can a robot lift 500kg but struggle to open a door?",
-      "curiosity_angle": "The torque-speed tradeoff that every robotics engineer fights every day",
-      "script": "Why can an industrial robot lift 500 kilograms but struggle to open a delicate door? Torque and speed are opposites. High torque means low speed. High speed means low torque. A robot arm optimized for strength moves slowly and crushes things it touches. Optimized for speed — and it can't lift anything. Nature solved this with muscles and tendons over 500 million years. We've been trying to copy it for 50. Follow R2BOT. The problem is harder than it looks.",
+      "hook": "A robot that lifts a car can't move fast. That's not engineering — it's physics.",
+      "curiosity_angle": "The torque-speed trade-off that decides what every motor on Earth can and cannot do",
+      "script": "A robot that can lift a car cannot move quickly. That isn't bad engineering. It's physics. Every motor faces the same trade-off: torque, or speed. Turning force, or turning fast. You don't get both. So if you want more force from the same motor — do you make it bigger, or add gears? Gears. A gearbox trades one for the other. Ten times the force out, one tenth the speed. Because power is torque times speed, and the motor's power is fixed. Push one up, the other must come down. That's why a factory arm lifting an engine crawls, and why a drone propeller spins fast but couldn't lift a brick. A gearbox gives you ten times the torque. What's the cost? A tenth of the speed. The energy was never free — you only ever rearranged it. Every robot is a bet on which one mattered more. Follow R2BOT.",
       "visuals": "torque_graph",
-      "tags": ["#robotics", "#motors", "#engineering", "#mechatronics", "#robots"]
+      "theme": "amber",
+      "voice": "bella",
+      "yt_title": "Torque vs Speed: Why Robots Are Strong But Slow",
+      "ig_tags": [
+        "#mechanicalengineering",
+        "#robotics",
+        "#torque",
+        "#gears",
+        "#engineeringstudent"
+      ],
+      "companion_page": true,
+      "vo": {
+        "hook": "A robot that can lift a car cannot move quickly. That isn't bad engineering. It's physics.",
+        "concept": "Every motor faces the same trade-off: torque, or speed. Turning force, or turning fast. You don't get both.",
+        "predict": "So if you want more force from the same motor — do you make it bigger, or add gears?",
+        "beat1": "Gears. A gearbox trades one for the other. Ten times the force out, one tenth the speed.",
+        "beat2": "Because power is torque times speed, and the motor's power is fixed. Push one up, the other must come down.",
+        "beat3": "That's why a factory arm lifting an engine crawls, and why a drone propeller spins fast but couldn't lift a brick.",
+        "quiz": "A gearbox gives you ten times the torque. What's the cost?",
+        "reveal": "A tenth of the speed. The energy was never free — you only ever rearranged it.",
+        "cta": "Every robot is a bet on which one mattered more. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Pick one",
+          "text": "Turning force, or turning fast. Never both.",
+          "detail": "Every motor on Earth sits somewhere on that line."
+        },
+        {
+          "label": "Gears trade",
+          "text": "Ten times the force out, one tenth the speed.",
+          "detail": "A gearbox doesn't create anything. It swaps one for the other."
+        },
+        {
+          "label": "Why",
+          "text": "Power is torque times speed — and power is fixed.",
+          "detail": "Push one up and the other has to come down."
+        }
+      ],
+      "predict": {
+        "q": "More force from the same motor — how?",
+        "options": [
+          "Build it bigger",
+          "Add gears"
+        ]
+      },
+      "quiz": {
+        "q": "A gearbox gives 10x torque. The cost?",
+        "options": [
+          "A tenth of the speed",
+          "More electricity",
+          "Nothing"
+        ],
+        "answer": 0,
+        "why": "Power is torque times speed and stays fixed — multiply force by ten and speed divides by ten."
+      },
+      "yt_hashtags": [
+        "#Shorts",
+        "#mechanicalengineering",
+        "#torque",
+        "#gears"
+      ],
+      "yt_keywords": [
+        "mechanical engineering",
+        "robotics explained",
+        "torque and speed",
+        "gears and motors",
+        "engineering student",
+        "how robots work",
+        "robotics for beginners",
+        "why robots are strong but slow"
+      ]
     },
     {
       "id": "sensor_fusion",
-      "title": "Why Self-Driving Cars Use 5 Different Sensors",
-      "hook": "One sensor is never enough. Here's why self-driving cars have five.",
-      "curiosity_angle": "Sensor fusion — combining imperfect data into perfect awareness",
-      "script": "One sensor is never enough. LiDAR is blind to color. Cameras fail in the dark. Radar misses pedestrians. GPS drifts by 3 meters. Ultrasonic sensors have a 10cm range. But combine all five — and they cover each other's blind spots perfectly. This is sensor fusion — using imperfect data to create perfect situational awareness. Your brain does this with your eyes, ears, and balance system simultaneously. Self-driving cars are learning to do the same. Follow R2BOT.",
+      "title": "Why Self-Driving Cars Use 5 Sensors",
+      "hook": "Every sensor on a self-driving car lies. The trick is that they lie differently.",
+      "curiosity_angle": "Sensor fusion — how several unreliable sensors become one reliable answer",
+      "script": "Every sensor on a self-driving car lies to it. The trick is that they all lie differently. Cameras miss depth. LiDAR hates fog. Radar is coarse. GPS drifts. Not one of them is trustworthy alone. So which does the car believe? The most accurate one, or all of them at once? All of them — weighted by how much each deserves belief right now. That's sensor fusion. In clear daylight the camera gets a loud vote. In thick fog its vote quietly collapses and radar takes over. The maths behind it is a Kalman filter, and it's older than the Moon landing. Apollo used it to navigate. In heavy fog, which sensor should the car trust most? Radar. Its wavelength sails straight through water droplets that blind both the camera and the LiDAR. No perfect sensor. Just good disagreement. Follow R2BOT.",
       "visuals": "sensor_fusion",
-      "tags": ["#selfdriving", "#sensorfusion", "#autonomousvehicles", "#robotics", "#AI"]
+      "theme": "ice",
+      "voice": "antoni",
+      "yt_title": "Sensor Fusion Explained: Why Self-Driving Cars Use 5 Sensors",
+      "ig_tags": [
+        "#selfdrivingcars",
+        "#autonomousvehicles",
+        "#sensorfusion",
+        "#robotics",
+        "#ai"
+      ],
+      "companion_page": true,
+      "vo": {
+        "hook": "Every sensor on a self-driving car lies to it. The trick is that they all lie differently.",
+        "concept": "Cameras miss depth. LiDAR hates fog. Radar is coarse. GPS drifts. Not one of them is trustworthy alone.",
+        "predict": "So which does the car believe? The most accurate one, or all of them at once?",
+        "beat1": "All of them — weighted by how much each deserves belief right now. That's sensor fusion.",
+        "beat2": "In clear daylight the camera gets a loud vote. In thick fog its vote quietly collapses and radar takes over.",
+        "beat3": "The maths behind it is a Kalman filter, and it's older than the Moon landing. Apollo used it to navigate.",
+        "quiz": "In heavy fog, which sensor should the car trust most?",
+        "reveal": "Radar. Its wavelength sails straight through water droplets that blind both the camera and the LiDAR.",
+        "cta": "No perfect sensor. Just good disagreement. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "All of them lie",
+          "text": "Cameras miss depth. LiDAR hates fog. GPS drifts.",
+          "detail": "Not one sensor on the car is trustworthy by itself."
+        },
+        {
+          "label": "Weighted belief",
+          "text": "Each sensor's vote scales with how much it deserves right now.",
+          "detail": "Clear day: the camera leads. Thick fog: it quietly stands down."
+        },
+        {
+          "label": "Older than Apollo",
+          "text": "The maths is a Kalman filter — it navigated us to the Moon.",
+          "detail": "Sixty years old, and still running in every autonomous vehicle."
+        }
+      ],
+      "predict": {
+        "q": "Which sensor does the car believe?",
+        "options": [
+          "The most accurate one",
+          "All of them at once"
+        ]
+      },
+      "quiz": {
+        "q": "In heavy fog, trust which sensor most?",
+        "options": [
+          "The camera",
+          "The LiDAR",
+          "The radar"
+        ],
+        "answer": 2,
+        "why": "Radar's wavelength passes straight through water droplets that scatter light — blinding both camera and LiDAR."
+      },
+      "yt_hashtags": [
+        "#Shorts",
+        "#selfdrivingcars",
+        "#autonomousvehicles",
+        "#sensorfusion"
+      ],
+      "yt_keywords": [
+        "self driving cars",
+        "autonomous vehicles",
+        "sensor fusion",
+        "robotics explained",
+        "artificial intelligence",
+        "how robots work",
+        "robotics for beginners",
+        "why self-driving cars use 5 sensors"
+      ]
     },
     {
       "id": "end_effector",
       "title": "The Hardest Part of a Robot",
-      "hook": "The most advanced part of any robot isn't its brain. It's its hand.",
-      "curiosity_angle": "End effectors — why gripping a grape is harder than landing on Mars",
-      "script": "The most advanced part of any robot isn't its brain — it's its hand. Called an end effector. Gripping a fresh grape without crushing it requires sensing pressure to within 0.1 grams. Picking up a raw egg without breaking it requires knowing exactly how hard is too hard. Your fingers have 17,000 nerve endings per square centimeter. No robot comes close. This is why Amazon still has humans in its warehouses. The hand remains unsolved. Follow R2BOT.",
+      "hook": "We can build a robot that runs. We still can't build a hand that picks up a strawberry.",
+      "curiosity_angle": "The end effector — why the last ten centimetres of a robot are the hardest to engineer",
+      "script": "We can build a robot that runs and backflips. We still can't build a hand that reliably picks a strawberry. The gripper is called the end effector, and it's where most robotics projects quietly fall apart. So what makes gripping hard — is it the strength, or something else entirely? Something else. It's knowing how hard to squeeze. Too little and it drops. Too much and it's jam. A human hand has thousands of touch receptors correcting grip constantly. Most robot grippers have none at all. So industry cheats. Vacuum cups for boxes, magnets for steel, custom jaws per part. Specialised, not general. Why don't factories just use human-shaped robot hands? Too complex, too fragile, too expensive. A two-hundred-dollar suction cup beats a fifty-thousand-dollar hand. The last ten centimetres are still unsolved. Follow R2BOT.",
       "visuals": "end_effector",
-      "tags": ["#robotics", "#robothand", "#grippers", "#engineering", "#hardproblem"]
+      "theme": "amber",
+      "voice": "bella",
+      "yt_title": "End Effectors: Why the Gripper Is the Hardest Part of a Robot",
+      "ig_tags": [
+        "#robotics",
+        "#automation",
+        "#robotgripper",
+        "#industrialrobots",
+        "#mechatronics"
+      ],
+      "companion_page": true,
+      "vo": {
+        "hook": "We can build a robot that runs and backflips. We still can't build a hand that reliably picks a strawberry.",
+        "concept": "The gripper is called the end effector, and it's where most robotics projects quietly fall apart.",
+        "predict": "So what makes gripping hard — is it the strength, or something else entirely?",
+        "beat1": "Something else. It's knowing how hard to squeeze. Too little and it drops. Too much and it's jam.",
+        "beat2": "A human hand has thousands of touch receptors correcting grip constantly. Most robot grippers have none at all.",
+        "beat3": "So industry cheats. Vacuum cups for boxes, magnets for steel, custom jaws per part. Specialised, not general.",
+        "quiz": "Why don't factories just use human-shaped robot hands?",
+        "reveal": "Too complex, too fragile, too expensive. A two-hundred-dollar suction cup beats a fifty-thousand-dollar hand.",
+        "cta": "The last ten centimetres are still unsolved. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Not strength",
+          "text": "The hard part is knowing how hard to squeeze.",
+          "detail": "Too little and it drops. Too much and the strawberry is jam."
+        },
+        {
+          "label": "No feeling",
+          "text": "Your hand has thousands of touch receptors. Most grippers have zero.",
+          "detail": "You correct your grip constantly without ever noticing."
+        },
+        {
+          "label": "So industry cheats",
+          "text": "Vacuum cups. Magnets. Custom jaws per part.",
+          "detail": "Specialised tools beat general hands — every single time."
+        }
+      ],
+      "predict": {
+        "q": "What makes gripping hard?",
+        "options": [
+          "Not enough strength",
+          "Something else"
+        ]
+      },
+      "quiz": {
+        "q": "Why not use human-shaped robot hands?",
+        "options": [
+          "They're too slow",
+          "Too complex and costly",
+          "They can't grip"
+        ],
+        "answer": 1,
+        "why": "A $200 suction cup outperforms a $50,000 five-fingered hand on the job it was built for."
+      },
+      "yt_hashtags": [
+        "#Shorts",
+        "#automation",
+        "#robotgripper",
+        "#industrialrobots"
+      ],
+      "yt_keywords": [
+        "robotics explained",
+        "industrial automation",
+        "robot gripper",
+        "industrial robots",
+        "mechatronics",
+        "how robots work",
+        "robotics for beginners",
+        "the hardest part of a robot"
+      ]
+    },
+    {
+      "id": "robot_vacuum_corners",
+      "title": "Why Vacuums Miss Corners",
+      "hook": "Your robot vacuum has mapped your whole house. It still misses the same corner every week.",
+      "emphasis": [
+        "mapped",
+        "misses",
+        "corner"
+      ],
+      "curiosity_angle": "Why the cheapest shape for a robot is also the one that can't clean a corner",
+      "visuals": "slam_map",
+      "theme": "ice",
+      "voice": "bella",
+      "yt_title": "Why Robot Vacuums Always Miss Corners",
+      "ig_tags": [
+        "#robotvacuum",
+        "#robotics",
+        "#smarthome",
+        "#roomba",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "Your robot vacuum has mapped your entire house. And it still misses the same corner every single week.",
+        "concept": "It isn't lost. It knows exactly where that corner is. It just physically cannot get into it.",
+        "predict": "So is that a brain problem, or a body problem?",
+        "beat1": "A body problem. Almost every robot vacuum is round — and a circle can never fill a square corner.",
+        "beat2": "Round is chosen on purpose. A circle can spin on the spot and never wedge itself against a wall.",
+        "stat": "Its map is also rough. Most vacuums map your floor to about five centimetres. A tape measure does one millimetre.",
+        "quiz": "So why is your vacuum round instead of square?",
+        "reveal": "So it can turn anywhere without jamming. Square corners are the price you pay for never getting stuck.",
+        "cta": "Every robot is a visible compromise. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Round can't fit square",
+          "text": "A circle can never fill a square corner.",
+          "detail": "The geometry rules it out before the software even runs."
+        },
+        {
+          "label": "But round can spin",
+          "text": "A circle turns on the spot and never wedges.",
+          "detail": "Chosen deliberately — escaping beats reaching."
+        }
+      ],
+      "stat": {
+        "eyebrow": "HOW ROUGH IS THE MAP",
+        "value": 5,
+        "unit": "centimetre accuracy",
+        "label": "Good enough to avoid your sofa. Nowhere near good enough to find a crumb.",
+        "compare": {
+          "a_label": "Tape measure",
+          "a_frac": 0.02,
+          "a_value": "1 mm",
+          "b_label": "Robot vacuum",
+          "b_frac": 1.0,
+          "b_value": "50 mm"
+        }
+      },
+      "predict": {
+        "q": "Corner problem — brain or body?",
+        "options": [
+          "The brain",
+          "The body"
+        ]
+      },
+      "quiz": {
+        "q": "Why is your vacuum round, not square?",
+        "options": [
+          "It's cheaper",
+          "So it can spin freely",
+          "It looks better"
+        ],
+        "answer": 1,
+        "why": "A circle can rotate anywhere without jamming — never getting stuck beats reaching every corner."
+      },
+      "companion_page": true,
+      "script": "Your robot vacuum has mapped your entire house. And it still misses the same corner every single week. It isn't lost. It knows exactly where that corner is. It just physically cannot get into it. So is that a brain problem, or a body problem? A body problem. Almost every robot vacuum is round — and a circle can never fill a square corner. Round is chosen on purpose. A circle can spin on the spot and never wedge itself against a wall. Its map is also rough. Most vacuums map your floor to about five centimetres. A tape measure does one millimetre. So why is your vacuum round instead of square? So it can turn anywhere without jamming. Square corners are the price you pay for never getting stuck. Every robot is a visible compromise. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#robotvacuum",
+        "#smarthome",
+        "#roomba"
+      ],
+      "yt_keywords": [
+        "robot vacuum",
+        "robotics explained",
+        "smart speaker",
+        "roomba",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "why vacuums miss corners"
+      ]
+    },
+    {
+      "id": "warehouse_robots",
+      "title": "How Warehouse Robots Don't Crash",
+      "hook": "Amazon runs 750,000 robots in one building. They almost never crash into each other.",
+      "emphasis": [
+        "750,000",
+        "never",
+        "crash"
+      ],
+      "curiosity_angle": "How hundreds of robots share a floor without a single traffic controller watching them",
+      "visuals": "astar_grid",
+      "theme": "lime",
+      "voice": "adam",
+      "yt_title": "How Warehouse Robots Avoid Crashing Into Each Other",
+      "ig_tags": [
+        "#warehouse",
+        "#automation",
+        "#amazon",
+        "#logistics",
+        "#robotics"
+      ],
+      "vo": {
+        "hook": "Amazon runs hundreds of thousands of robots. They almost never crash into each other.",
+        "concept": "There's no control room watching them. No human steering. So how does nobody collide?",
+        "predict": "Do you think each robot decides for itself, or does one computer direct all of them?",
+        "beat1": "Mostly one system. It hands out reservations — not just a route, but a time slot for each square of floor.",
+        "beat2": "If your path needs a square someone already booked, you wait. Traffic becomes a booking problem, not a driving one.",
+        "stat": "It works because the floor is boring on purpose. Every tile is identical, marked, and mapped in advance.",
+        "quiz": "What's the real trick that stops warehouse robots colliding?",
+        "reveal": "Booking the floor in advance. They reserve space and time, so two robots are never sent to the same tile.",
+        "cta": "Predictable world, simple robot. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Reserve, don't react",
+          "text": "Each robot books a tile for a moment in time.",
+          "detail": "Not just where it's going — when it will be there."
+        },
+        {
+          "label": "Waiting beats swerving",
+          "text": "If your tile is booked, you stop and wait.",
+          "detail": "Collision avoidance becomes a scheduling problem."
+        }
+      ],
+      "stat": {
+        "eyebrow": "WHY IT WORKS",
+        "value": 100,
+        "unit": "% identical floor tiles",
+        "label": "The warehouse is deliberately boring. Every tile is the same size, marked and mapped before a robot moves.",
+        "compare": {
+          "a_label": "Your kitchen",
+          "a_frac": 0.08,
+          "a_value": "chaos",
+          "b_label": "Warehouse floor",
+          "b_frac": 1.0,
+          "b_value": "fully mapped"
+        }
+      },
+      "predict": {
+        "q": "Who decides where each robot goes?",
+        "options": [
+          "Each robot alone",
+          "One central system"
+        ]
+      },
+      "quiz": {
+        "q": "What actually stops the collisions?",
+        "options": [
+          "Bumper sensors",
+          "Booking floor space ahead",
+          "Driving slowly"
+        ],
+        "answer": 1,
+        "why": "Robots reserve a tile for a specific moment, so two are never routed onto the same square at once."
+      },
+      "companion_page": true,
+      "script": "Amazon runs hundreds of thousands of robots. They almost never crash into each other. There's no control room watching them. No human steering. So how does nobody collide? Do you think each robot decides for itself, or does one computer direct all of them? Mostly one system. It hands out reservations — not just a route, but a time slot for each square of floor. If your path needs a square someone already booked, you wait. Traffic becomes a booking problem, not a driving one. It works because the floor is boring on purpose. Every tile is identical, marked, and mapped in advance. What's the real trick that stops warehouse robots colliding? Booking the floor in advance. They reserve space and time, so two robots are never sent to the same tile. Predictable world, simple robot. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#warehouse",
+        "#automation",
+        "#amazon"
+      ],
+      "yt_keywords": [
+        "warehouse robots",
+        "industrial automation",
+        "amazon warehouse",
+        "warehouse logistics",
+        "robotics explained",
+        "how robots work",
+        "robotics for beginners",
+        "how warehouse robots dont crash"
+      ]
+    },
+    {
+      "id": "robot_stairs",
+      "title": "Why Robots Can't Climb Stairs",
+      "hook": "We built robots that backflip. Stairs still defeat most of them.",
+      "emphasis": [
+        "backflip",
+        "Stairs",
+        "defeat"
+      ],
+      "curiosity_angle": "Why the staircase — an object toddlers master — is still a serious robotics problem",
+      "visuals": "dof_diagram",
+      "theme": "amber",
+      "voice": "antoni",
+      "yt_title": "Why Robots Still Struggle to Climb Stairs",
+      "ig_tags": [
+        "#robotics",
+        "#bostondynamics",
+        "#engineering",
+        "#mechatronics",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "We have built robots that can backflip. A normal staircase still defeats most of them.",
+        "concept": "Wheels are brilliant on flat ground and useless the moment the ground stops being flat.",
+        "predict": "So what's the harder part of a stair — lifting your weight up, or staying upright?",
+        "beat1": "Staying upright. Climbing is just energy. Balance is a problem you must re-solve every fraction of a second.",
+        "beat2": "On a stair the robot's support shrinks to a single edge, and it has to shift its weight before it tips.",
+        "stat": "That's why legs cost so much. A wheeled robot needs about two motors. A walking robot needs twelve or more.",
+        "quiz": "What makes a staircase so hard for a robot?",
+        "reveal": "Balance. Lifting weight is easy; staying stable on a shrinking edge of support is the real problem.",
+        "cta": "Toddlers solve this in a week. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Not the lifting",
+          "text": "Climbing is just energy. Balance is the hard part.",
+          "detail": "It has to be re-solved every fraction of a second."
+        },
+        {
+          "label": "A shrinking edge",
+          "text": "On a step, your support shrinks to one line.",
+          "detail": "Weight must move before the robot tips past it."
+        }
+      ],
+      "stat": {
+        "eyebrow": "THE COST OF LEGS",
+        "value": 12,
+        "unit": "motors to walk",
+        "label": "A wheeled robot needs about two motors. Legs multiply the cost, weight and everything that can fail.",
+        "compare": {
+          "a_label": "Wheeled robot",
+          "a_frac": 0.17,
+          "a_value": "2 motors",
+          "b_label": "Legged robot",
+          "b_frac": 1.0,
+          "b_value": "12+ motors"
+        }
+      },
+      "predict": {
+        "q": "Harder on a stair?",
+        "options": [
+          "Lifting the weight",
+          "Staying upright"
+        ]
+      },
+      "quiz": {
+        "q": "What makes stairs so hard?",
+        "options": [
+          "Not enough power",
+          "Keeping balance",
+          "Poor grip"
+        ],
+        "answer": 1,
+        "why": "Support shrinks to a single edge and the robot must shift its weight before gravity wins."
+      },
+      "companion_page": true,
+      "script": "We have built robots that can backflip. A normal staircase still defeats most of them. Wheels are brilliant on flat ground and useless the moment the ground stops being flat. So what's the harder part of a stair — lifting your weight up, or staying upright? Staying upright. Climbing is just energy. Balance is a problem you must re-solve every fraction of a second. On a stair the robot's support shrinks to a single edge, and it has to shift its weight before it tips. That's why legs cost so much. A wheeled robot needs about two motors. A walking robot needs twelve or more. What makes a staircase so hard for a robot? Balance. Lifting weight is easy; staying stable on a shrinking edge of support is the real problem. Toddlers solve this in a week. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#bostondynamics",
+        "#mechatronics",
+        "#robotics"
+      ],
+      "yt_keywords": [
+        "robotics explained",
+        "boston dynamics",
+        "engineering explained",
+        "mechatronics",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "why robots cant climb stairs"
+      ]
+    },
+    {
+      "id": "drone_stability",
+      "title": "How Drones Stay Level in Wind",
+      "hook": "A drone corrects itself 400 times a second. You'd need a full second to notice it moved.",
+      "emphasis": [
+        "400",
+        "times",
+        "second"
+      ],
+      "curiosity_angle": "The invisible argument between four motors that keeps a drone still in moving air",
+      "visuals": "pid_graph",
+      "theme": "crimson",
+      "voice": "bella",
+      "yt_title": "How Drones Stay Perfectly Level in Strong Wind",
+      "ig_tags": [
+        "#drone",
+        "#dronetech",
+        "#quadcopter",
+        "#engineering",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "A drone corrects itself hundreds of times a second. You'd need a full second just to notice it moved.",
+        "concept": "A quadcopter is not naturally stable. Left alone for one second, it would flip and fall.",
+        "predict": "So when wind pushes it sideways — does it fight back, or lean into it?",
+        "beat1": "It leans. To resist wind a drone tilts into it, then adds thrust so the tilt doesn't turn into a slide.",
+        "beat2": "Four motors, constantly disagreeing. Speed two up, two down, and the whole aircraft rotates. Nothing else moves.",
+        "stat": "It runs that correction loop about four hundred times a second — far faster than any human could react.",
+        "quiz": "What is a drone actually doing when it hovers perfectly still?",
+        "reveal": "Constantly falling and catching itself. Stillness is hundreds of tiny corrections a second, not balance.",
+        "cta": "Stability you can see is control you can't. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "It leans in",
+          "text": "To fight wind, a drone tilts into it.",
+          "detail": "Then adds thrust so the tilt doesn't become a slide."
+        },
+        {
+          "label": "Four disagreeing motors",
+          "text": "Two speed up, two slow down — the aircraft rotates.",
+          "detail": "No flaps, no rudder. Just differences in thrust."
+        }
+      ],
+      "stat": {
+        "eyebrow": "CORRECTIONS PER SECOND",
+        "value": 400,
+        "unit": "corrections every second",
+        "label": "Human reaction time is about a quarter of a second. The drone has already corrected a hundred times.",
+        "compare": {
+          "a_label": "Human reaction",
+          "a_frac": 0.01,
+          "a_value": "4 /s",
+          "b_label": "Drone controller",
+          "b_frac": 1.0,
+          "b_value": "400 /s"
+        }
+      },
+      "predict": {
+        "q": "Wind hits the drone. It...",
+        "options": [
+          "Fights back flat",
+          "Leans into it"
+        ]
+      },
+      "quiz": {
+        "q": "A hovering drone is really doing what?",
+        "options": [
+          "Balancing perfectly",
+          "Falling and catching itself",
+          "Locking its motors"
+        ],
+        "answer": 1,
+        "why": "Hovering is hundreds of micro-corrections a second — the stillness is an illusion of fast control."
+      },
+      "companion_page": true,
+      "script": "A drone corrects itself hundreds of times a second. You'd need a full second just to notice it moved. A quadcopter is not naturally stable. Left alone for one second, it would flip and fall. So when wind pushes it sideways — does it fight back, or lean into it? It leans. To resist wind a drone tilts into it, then adds thrust so the tilt doesn't turn into a slide. Four motors, constantly disagreeing. Speed two up, two down, and the whole aircraft rotates. Nothing else moves. It runs that correction loop about four hundred times a second — far faster than any human could react. What is a drone actually doing when it hovers perfectly still? Constantly falling and catching itself. Stillness is hundreds of tiny corrections a second, not balance. Stability you can see is control you can't. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#drone",
+        "#dronetech",
+        "#quadcopter"
+      ],
+      "yt_keywords": [
+        "drone technology",
+        "how drones work",
+        "quadcopter",
+        "engineering explained",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "how drones stay level in wind"
+      ]
+    },
+    {
+      "id": "surgical_tremor",
+      "title": "Why Surgical Robots Don't Shake",
+      "hook": "Every surgeon's hand shakes. The robot's hand does not.",
+      "emphasis": [
+        "shakes",
+        "does",
+        "not"
+      ],
+      "curiosity_angle": "How a machine filters out the tremor every human hand has, in real time",
+      "visuals": "robot_arm",
+      "theme": "amber",
+      "voice": "arnold",
+      "yt_title": "Why Surgical Robots Never Shake",
+      "ig_tags": [
+        "#surgicalrobot",
+        "#medtech",
+        "#robotics",
+        "#healthcare",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "Every surgeon's hand shakes a little. It's called physiological tremor, and nobody is immune.",
+        "concept": "A surgical robot doesn't replace the surgeon. It listens to their hands — and quietly edits what it hears.",
+        "predict": "So does the robot move exactly like the hand, or something different?",
+        "beat1": "Different. Tremor is fast and small. Real intent is slower and larger. The robot can tell them apart by speed.",
+        "beat2": "It filters out the fast wobble and passes through the slow, deliberate motion. The surgeon feels nothing change.",
+        "stat": "It also scales you down. Move your hand one centimetre and the instrument moves one fifth of that.",
+        "quiz": "How does the robot know which movements to ignore?",
+        "reveal": "By speed. Tremor is fast and tiny; intention is slower and bigger. It filters by frequency, not force.",
+        "cta": "The surgeon still operates. The robot just removes the shake. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Tremor is fast",
+          "text": "Shake is quick and small. Intent is slow and large.",
+          "detail": "That difference is enough for a machine to separate them."
+        },
+        {
+          "label": "Filter, don't replace",
+          "text": "It passes the slow motion, drops the fast wobble.",
+          "detail": "The surgeon never feels the correction happen."
+        }
+      ],
+      "stat": {
+        "eyebrow": "MOTION SCALING",
+        "value": 5,
+        "unit": "x smaller movement",
+        "label": "Your hand moves a centimetre. The instrument inside the patient moves two millimetres.",
+        "compare": {
+          "a_label": "Surgeon's hand",
+          "a_frac": 1.0,
+          "a_value": "10 mm",
+          "b_label": "Instrument tip",
+          "b_frac": 0.2,
+          "b_value": "2 mm"
+        }
+      },
+      "predict": {
+        "q": "Does the robot copy the hand exactly?",
+        "options": [
+          "Yes, exactly",
+          "No, it edits"
+        ]
+      },
+      "quiz": {
+        "q": "How does it spot tremor?",
+        "options": [
+          "By how hard you push",
+          "By how fast it moves",
+          "By a hand sensor"
+        ],
+        "answer": 1,
+        "why": "Tremor is high-frequency and small; deliberate motion is slower and larger. It filters by frequency."
+      },
+      "companion_page": true,
+      "script": "Every surgeon's hand shakes a little. It's called physiological tremor, and nobody is immune. A surgical robot doesn't replace the surgeon. It listens to their hands — and quietly edits what it hears. So does the robot move exactly like the hand, or something different? Different. Tremor is fast and small. Real intent is slower and larger. The robot can tell them apart by speed. It filters out the fast wobble and passes through the slow, deliberate motion. The surgeon feels nothing change. It also scales you down. Move your hand one centimetre and the instrument moves one fifth of that. How does the robot know which movements to ignore? By speed. Tremor is fast and tiny; intention is slower and bigger. It filters by frequency, not force. The surgeon still operates. The robot just removes the shake. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#surgicalrobot",
+        "#medtech",
+        "#healthcare"
+      ],
+      "yt_keywords": [
+        "surgical robot",
+        "medical robotics",
+        "robotics explained",
+        "medical technology",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "why surgical robots dont shake"
+      ]
+    },
+    {
+      "id": "robot_balance",
+      "title": "How Robots Stay Standing",
+      "hook": "Push a Boston Dynamics robot and it stumbles, then recovers. That stumble is the whole point.",
+      "emphasis": [
+        "stumbles",
+        "recovers"
+      ],
+      "curiosity_angle": "Why the best robots don't try to stay upright — they get very good at falling and catching themselves",
+      "visuals": "pid_graph",
+      "theme": "crimson",
+      "voice": "adam",
+      "yt_title": "How Boston Dynamics Robots Keep Their Balance",
+      "ig_tags": [
+        "#bostondynamics",
+        "#robotics",
+        "#engineering",
+        "#automation",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "Push a walking robot and it stumbles, then recovers. That stumble isn't a failure. It's the design.",
+        "concept": "Standing still looks passive. It isn't. Balance is an argument with gravity you have to win continuously.",
+        "predict": "So when it gets shoved — is it trying to stay still, or trying to move?",
+        "beat1": "Trying to move. The only way to not fall is to put a foot where you're about to land.",
+        "beat2": "It predicts where its weight is heading a moment from now, then steps to meet it. Walking is controlled falling.",
+        "stat": "It rechecks that prediction about a thousand times a second. You'd blink roughly once in that same window.",
+        "quiz": "What is a balancing robot actually trying to do?",
+        "reveal": "Fall in a direction it chooses. Stability isn't resisting the fall — it's steering it and catching up.",
+        "cta": "You do this every step. You just never notice. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Step, don't stiffen",
+          "text": "The only way not to fall is to move a foot.",
+          "detail": "Rigidity loses. Repositioning wins."
+        },
+        {
+          "label": "Predict, then catch",
+          "text": "It works out where its weight is heading, and steps there.",
+          "detail": "Walking is falling forward and catching yourself, on purpose."
+        }
+      ],
+      "stat": {
+        "eyebrow": "BALANCE LOOP",
+        "value": 1000,
+        "unit": "checks per second",
+        "label": "A thousand corrections in the time it takes you to blink once.",
+        "compare": {
+          "a_label": "Human blink",
+          "a_frac": 0.005,
+          "a_value": "~1 /s",
+          "b_label": "Balance loop",
+          "b_frac": 1.0,
+          "b_value": "1000 /s"
+        }
+      },
+      "predict": {
+        "q": "When shoved, the robot tries to...",
+        "options": [
+          "Stay perfectly still",
+          "Move its feet"
+        ]
+      },
+      "quiz": {
+        "q": "What is balancing really?",
+        "options": [
+          "Resisting the fall",
+          "Choosing where to fall",
+          "Locking the joints"
+        ],
+        "answer": 1,
+        "why": "It can't stop falling — it steers the fall and steps to catch itself. Controlled falling is walking."
+      },
+      "companion_page": true,
+      "script": "Push a walking robot and it stumbles, then recovers. That stumble isn't a failure. It's the design. Standing still looks passive. It isn't. Balance is an argument with gravity you have to win continuously. So when it gets shoved — is it trying to stay still, or trying to move? Trying to move. The only way to not fall is to put a foot where you're about to land. It predicts where its weight is heading a moment from now, then steps to meet it. Walking is controlled falling. It rechecks that prediction about a thousand times a second. You'd blink roughly once in that same window. What is a balancing robot actually trying to do? Fall in a direction it chooses. Stability isn't resisting the fall — it's steering it and catching up. You do this every step. You just never notice. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#bostondynamics",
+        "#automation",
+        "#robotics"
+      ],
+      "yt_keywords": [
+        "boston dynamics",
+        "robotics explained",
+        "engineering explained",
+        "industrial automation",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "how robots stay standing"
+      ]
+    },
+    {
+      "id": "prosthetic_hands",
+      "title": "Why Robot Hands Are So Hard",
+      "hook": "A robot can lift a car. It still can't reliably pick up an egg.",
+      "emphasis": [
+        "car",
+        "egg"
+      ],
+      "curiosity_angle": "Why the hand — not the brain — is still the hardest part of a robot to build",
+      "visuals": "end_effector",
+      "theme": "violet",
+      "voice": "bella",
+      "yt_title": "Why Robotic and Prosthetic Hands Are So Hard to Build",
+      "ig_tags": [
+        "#prosthetics",
+        "#robotics",
+        "#biomedical",
+        "#engineering",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "A robot can lift a car. It still can't reliably pick up an egg without crushing it.",
+        "concept": "The problem isn't strength. It's feedback — knowing exactly how hard you are already squeezing.",
+        "predict": "So what's missing — better motors, or better sensing?",
+        "beat1": "Sensing. Your fingertips carry thousands of touch receptors, firing constantly as you adjust your grip.",
+        "beat2": "You've never thought about holding a paper cup. Your hand corrects hundreds of times without telling you.",
+        "stat": "A typical robotic gripper has fewer than ten force sensors. Your hand has around seventeen thousand receptors.",
+        "quiz": "What do most robot hands actually lack?",
+        "reveal": "Touch. Plenty of strength, almost no feeling — so they can't tell 'holding' from 'crushing' until it's too late.",
+        "cta": "The hardest robot to build is the one you were born with. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Not strength",
+          "text": "Strength was never the problem. Feeling is.",
+          "detail": "Knowing how hard you're already squeezing is the hard part."
+        },
+        {
+          "label": "You do it unconsciously",
+          "text": "Your hand corrects a paper cup hundreds of times.",
+          "detail": "You have never once had to think about it."
+        }
+      ],
+      "stat": {
+        "eyebrow": "SENSE OF TOUCH",
+        "value": 17000,
+        "unit": "touch receptors in your hand",
+        "label": "A good robotic gripper has fewer than ten force sensors. That gap is the whole problem.",
+        "compare": {
+          "a_label": "Robot gripper",
+          "a_frac": 0.01,
+          "a_value": "<10",
+          "b_label": "Human hand",
+          "b_frac": 1.0,
+          "b_value": "17,000"
+        }
+      },
+      "predict": {
+        "q": "What's actually missing?",
+        "options": [
+          "Stronger motors",
+          "Better sensing"
+        ]
+      },
+      "quiz": {
+        "q": "What do robot hands lack most?",
+        "options": [
+          "Strength",
+          "A sense of touch",
+          "Speed"
+        ],
+        "answer": 1,
+        "why": "Without dense touch feedback a gripper can't tell holding from crushing until the object has already failed."
+      },
+      "companion_page": true,
+      "script": "A robot can lift a car. It still can't reliably pick up an egg without crushing it. The problem isn't strength. It's feedback — knowing exactly how hard you are already squeezing. So what's missing — better motors, or better sensing? Sensing. Your fingertips carry thousands of touch receptors, firing constantly as you adjust your grip. You've never thought about holding a paper cup. Your hand corrects hundreds of times without telling you. A typical robotic gripper has fewer than ten force sensors. Your hand has around seventeen thousand receptors. What do most robot hands actually lack? Touch. Plenty of strength, almost no feeling — so they can't tell 'holding' from 'crushing' until it's too late. The hardest robot to build is the one you were born with. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#prosthetics",
+        "#biomedical",
+        "#robotics"
+      ],
+      "yt_keywords": [
+        "prosthetic hand",
+        "robotics explained",
+        "biomedical engineering",
+        "engineering explained",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "why robot hands are so hard"
+      ]
+    },
+    {
+      "id": "produce_recognition",
+      "title": "How Self-Checkout Knows a Banana",
+      "hook": "Self-checkout can spot a banana in 40 milliseconds. It has no idea what fruit is.",
+      "emphasis": [
+        "40",
+        "milliseconds",
+        "no",
+        "idea"
+      ],
+      "curiosity_angle": "How a camera that understands nothing still identifies your groceries faster than you can",
+      "visuals": "cnn_layers",
+      "theme": "ice",
+      "voice": "antoni",
+      "yt_title": "How Self-Checkout Cameras Recognise Fruit",
+      "ig_tags": [
+        "#computervision",
+        "#ai",
+        "#retailtech",
+        "#machinelearning",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "A self-checkout can identify a banana in about forty milliseconds. It has no idea what fruit is.",
+        "concept": "It never learned what a banana means. It learned what banana-shaped patterns of light look like.",
+        "predict": "So is it matching your banana against stored photos, or doing something else?",
+        "beat1": "Something else. It reduces the image to features — curve, colour, texture — and compares those, not pictures.",
+        "beat2": "Which is why a bruised, oddly bent banana still works. The features survive even when the picture changes.",
+        "stat": "Trained on millions of labelled images, it beats a human on speed while understanding precisely nothing.",
+        "quiz": "Why can it still recognise a squashed, discoloured banana?",
+        "reveal": "Because it matches features, not photographs. Curve and colour survive damage that would break a pixel comparison.",
+        "cta": "Recognition without understanding. That's most AI. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Not photo matching",
+          "text": "It compares features — curve, colour, texture.",
+          "detail": "Never the raw picture. That's why lighting doesn't break it."
+        },
+        {
+          "label": "Damage-proof",
+          "text": "A bruised, bent banana still matches.",
+          "detail": "Features survive changes that would defeat a pixel-by-pixel check."
+        }
+      ],
+      "stat": {
+        "eyebrow": "SPEED VS UNDERSTANDING",
+        "value": 40,
+        "unit": "milliseconds to decide",
+        "label": "Faster than you can name it out loud — with zero comprehension of what a banana actually is.",
+        "compare": {
+          "a_label": "You naming it",
+          "a_frac": 1.0,
+          "a_value": "~500 ms",
+          "b_label": "The camera",
+          "b_frac": 0.08,
+          "b_value": "40 ms"
+        }
+      },
+      "predict": {
+        "q": "Is it matching stored photos?",
+        "options": [
+          "Yes, photo matching",
+          "No, something else"
+        ]
+      },
+      "quiz": {
+        "q": "Why does a squashed banana still work?",
+        "options": [
+          "It stores many photos",
+          "It matches features, not pictures",
+          "It reads the barcode"
+        ],
+        "answer": 1,
+        "why": "Features like curve and colour survive bruising and lighting changes that would break a pixel comparison."
+      },
+      "companion_page": true,
+      "script": "A self-checkout can identify a banana in about forty milliseconds. It has no idea what fruit is. It never learned what a banana means. It learned what banana-shaped patterns of light look like. So is it matching your banana against stored photos, or doing something else? Something else. It reduces the image to features — curve, colour, texture — and compares those, not pictures. Which is why a bruised, oddly bent banana still works. The features survive even when the picture changes. Trained on millions of labelled images, it beats a human on speed while understanding precisely nothing. Why can it still recognise a squashed, discoloured banana? Because it matches features, not photographs. Curve and colour survive damage that would break a pixel comparison. Recognition without understanding. That's most AI. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#computervision",
+        "#retailtech",
+        "#machinelearning"
+      ],
+      "yt_keywords": [
+        "computer vision",
+        "artificial intelligence",
+        "retail technology",
+        "machine learning",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "how self-checkout knows a banana"
+      ]
+    },
+    {
+      "id": "robot_laundry",
+      "title": "Why Robots Can't Fold Laundry",
+      "hook": "Robots build cars all day. A pile of towels defeats them completely.",
+      "emphasis": [
+        "cars",
+        "towels",
+        "defeats"
+      ],
+      "curiosity_angle": "Why soft, shapeless objects are the unsolved frontier of robotics",
+      "visuals": "end_effector",
+      "theme": "violet",
+      "voice": "arnold",
+      "yt_title": "Why Robots Still Can't Fold Your Laundry",
+      "ig_tags": [
+        "#robotics",
+        "#automation",
+        "#ai",
+        "#engineering",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "Robots build entire cars without help. A basket of towels defeats them completely.",
+        "concept": "A car door is rigid. It has one shape. A towel has infinite shapes, and changes shape when you touch it.",
+        "predict": "So is the hard part seeing the towel, or gripping it?",
+        "beat1": "Seeing it. A crumpled towel hides its own corners, so the robot can't tell where the cloth even ends.",
+        "beat2": "And the moment it grabs, everything shifts. Every action changes the problem it was trying to solve.",
+        "stat": "Factory robots assume a part sits within a fraction of a millimetre. Cloth offers no fixed point at all.",
+        "quiz": "What makes laundry harder than building a car?",
+        "reveal": "Cloth has no fixed shape. Rigid parts stay put; fabric rearranges itself the instant you touch it.",
+        "cta": "Soft things are the real frontier. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "It can't see corners",
+          "text": "A crumpled towel hides its own edges.",
+          "detail": "The robot can't find where the cloth begins or ends."
+        },
+        {
+          "label": "Touching changes it",
+          "text": "Grab it and the whole shape rearranges.",
+          "detail": "Every action invalidates the plan that produced it."
+        }
+      ],
+      "stat": {
+        "eyebrow": "WHY FACTORIES WORK",
+        "value": 1,
+        "unit": "tenth of a millimetre",
+        "label": "Factory robots assume every part sits in the same place every time. Cloth offers no fixed point at all.",
+        "compare": {
+          "a_label": "Car part position",
+          "a_frac": 1.0,
+          "a_value": "0.1 mm",
+          "b_label": "Towel position",
+          "b_frac": 0.02,
+          "b_value": "unknown"
+        }
+      },
+      "predict": {
+        "q": "Harder part of laundry?",
+        "options": [
+          "Seeing the cloth",
+          "Gripping the cloth"
+        ]
+      },
+      "quiz": {
+        "q": "Why is laundry harder than a car?",
+        "options": [
+          "Towels are heavier",
+          "Cloth has no fixed shape",
+          "Factories have better robots"
+        ],
+        "answer": 1,
+        "why": "Rigid parts stay where you put them. Fabric rearranges itself the instant it's touched."
+      },
+      "companion_page": true,
+      "script": "Robots build entire cars without help. A basket of towels defeats them completely. A car door is rigid. It has one shape. A towel has infinite shapes, and changes shape when you touch it. So is the hard part seeing the towel, or gripping it? Seeing it. A crumpled towel hides its own corners, so the robot can't tell where the cloth even ends. And the moment it grabs, everything shifts. Every action changes the problem it was trying to solve. Factory robots assume a part sits within a fraction of a millimetre. Cloth offers no fixed point at all. What makes laundry harder than building a car? Cloth has no fixed shape. Rigid parts stay put; fabric rearranges itself the instant you touch it. Soft things are the real frontier. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#automation",
+        "#robotics",
+        "#ai"
+      ],
+      "yt_keywords": [
+        "robotics explained",
+        "industrial automation",
+        "artificial intelligence",
+        "engineering explained",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "why robots cant fold laundry"
+      ]
+    },
+    {
+      "id": "mars_delay",
+      "title": "How Mars Rovers Drive Alone",
+      "hook": "By the time NASA sees a rock, the rover has already driven past it.",
+      "emphasis": [
+        "already",
+        "driven",
+        "past"
+      ],
+      "curiosity_angle": "Why a 20-minute delay forces a robot 220 million kilometres away to think for itself",
+      "visuals": "astar_grid",
+      "theme": "lime",
+      "voice": "bella",
+      "yt_title": "How Mars Rovers Drive With a 20-Minute Delay",
+      "ig_tags": [
+        "#mars",
+        "#nasa",
+        "#space",
+        "#rover",
+        "#robotics"
+      ],
+      "vo": {
+        "hook": "By the time NASA sees a rock on Mars, the rover has already driven past it.",
+        "concept": "A signal takes up to twenty minutes each way. Joysticking a rover from Earth is simply impossible.",
+        "predict": "So does NASA send each move in advance, or does the rover decide for itself?",
+        "beat1": "It decides. Engineers send a destination, not a route. The rover works out how to get there alone.",
+        "beat2": "It photographs the ground, builds a 3D map, marks what it can't cross, and picks its own path.",
+        "stat": "All of that runs on a processor slower than the phone in your pocket, hardened to survive radiation.",
+        "quiz": "What does NASA actually send to the rover?",
+        "reveal": "A destination, not directions. The rover plans the route itself — anything else would arrive far too late.",
+        "cta": "The loneliest autonomy in the solar system. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "A goal, not a route",
+          "text": "Engineers send a destination. The rover finds the way.",
+          "detail": "Steering it live would mean crashing twenty minutes ago."
+        },
+        {
+          "label": "It maps as it goes",
+          "text": "Photographs the ground, builds 3D, marks the danger.",
+          "detail": "Then picks a path across what it decided is safe."
+        }
+      ],
+      "stat": {
+        "eyebrow": "THE DELAY",
+        "value": 20,
+        "unit": "minutes each way",
+        "label": "Forty minutes for a round trip. Any instruction you send has already expired on arrival.",
+        "compare": {
+          "a_label": "Earth wifi ping",
+          "a_frac": 0.001,
+          "a_value": "0.02 s",
+          "b_label": "Earth to Mars",
+          "b_frac": 1.0,
+          "b_value": "1200 s"
+        }
+      },
+      "predict": {
+        "q": "Who decides the rover's route?",
+        "options": [
+          "NASA, move by move",
+          "The rover itself"
+        ]
+      },
+      "quiz": {
+        "q": "What does NASA send up?",
+        "options": [
+          "Every steering command",
+          "A destination only",
+          "A live video feed"
+        ],
+        "answer": 1,
+        "why": "With a 20-minute delay each way, live steering is impossible — so the rover plans its own route."
+      },
+      "companion_page": true,
+      "script": "By the time NASA sees a rock on Mars, the rover has already driven past it. A signal takes up to twenty minutes each way. Joysticking a rover from Earth is simply impossible. So does NASA send each move in advance, or does the rover decide for itself? It decides. Engineers send a destination, not a route. The rover works out how to get there alone. It photographs the ground, builds a 3D map, marks what it can't cross, and picks its own path. All of that runs on a processor slower than the phone in your pocket, hardened to survive radiation. What does NASA actually send to the rover? A destination, not directions. The rover plans the route itself — anything else would arrive far too late. The loneliest autonomy in the solar system. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#mars",
+        "#nasa",
+        "#space"
+      ],
+      "yt_keywords": [
+        "mars rover",
+        "nasa rover",
+        "space robotics",
+        "mars rover navigation",
+        "robotics explained",
+        "how robots work",
+        "robotics for beginners",
+        "how mars rovers drive alone"
+      ]
+    },
+    {
+      "id": "delivery_robots",
+      "title": "Why Delivery Robots Fear Kerbs",
+      "hook": "A delivery robot can cross a city. A ten-centimetre kerb can end its whole trip.",
+      "emphasis": [
+        "city",
+        "kerb",
+        "end"
+      ],
+      "curiosity_angle": "Why the last six inches of a pavement is harder than the six kilometres before it",
+      "visuals": "astar_grid",
+      "theme": "lime",
+      "voice": "adam",
+      "yt_title": "Why Sidewalk Delivery Robots Struggle With Kerbs",
+      "ig_tags": [
+        "#deliveryrobot",
+        "#robotics",
+        "#automation",
+        "#lastmile",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "A delivery robot can navigate an entire city. A ten-centimetre kerb can end the whole trip.",
+        "concept": "Its map knows the route. What the map doesn't reliably contain is the exact height of every edge.",
+        "predict": "So is the problem seeing the kerb, or climbing it?",
+        "beat1": "Both, but seeing is worse. From a low camera, a kerb and a painted line can look almost identical.",
+        "beat2": "Guess wrong and you either stop for a stripe of paint, or drive off a step and tip over.",
+        "stat": "So most stay small and slow. A typical pavement robot tops out around six kilometres an hour — walking pace.",
+        "quiz": "Why is a kerb harder than a whole city route?",
+        "reveal": "Because routes are mapped in advance and kerbs are not. Centimetre-scale detail rarely survives into a city map.",
+        "cta": "The last six inches are the hardest. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Paint or step?",
+          "text": "From a low camera, a kerb and a painted line look the same.",
+          "detail": "One is harmless. The other tips the robot over."
+        },
+        {
+          "label": "Both errors hurt",
+          "text": "Stop for paint, or drive off a step.",
+          "detail": "Being cautious wastes the delivery. Being bold ends it."
+        }
+      ],
+      "stat": {
+        "eyebrow": "WHY THEY'RE SLOW",
+        "value": 6,
+        "unit": "km/h top speed",
+        "label": "Roughly walking pace. Slow enough that misreading an edge is survivable rather than terminal.",
+        "compare": {
+          "a_label": "Delivery robot",
+          "a_frac": 0.12,
+          "a_value": "6 km/h",
+          "b_label": "City car",
+          "b_frac": 1.0,
+          "b_value": "50 km/h"
+        }
+      },
+      "predict": {
+        "q": "Harder for the robot?",
+        "options": [
+          "Seeing the kerb",
+          "Climbing the kerb"
+        ]
+      },
+      "quiz": {
+        "q": "Why is a kerb harder than the route?",
+        "options": [
+          "Kerbs are too tall",
+          "Maps lack centimetre detail",
+          "Batteries run low"
+        ],
+        "answer": 1,
+        "why": "City maps are built for roads, not centimetres. The route is known; the exact edge height is not."
+      },
+      "companion_page": true,
+      "script": "A delivery robot can navigate an entire city. A ten-centimetre kerb can end the whole trip. Its map knows the route. What the map doesn't reliably contain is the exact height of every edge. So is the problem seeing the kerb, or climbing it? Both, but seeing is worse. From a low camera, a kerb and a painted line can look almost identical. Guess wrong and you either stop for a stripe of paint, or drive off a step and tip over. So most stay small and slow. A typical pavement robot tops out around six kilometres an hour — walking pace. Why is a kerb harder than a whole city route? Because routes are mapped in advance and kerbs are not. Centimetre-scale detail rarely survives into a city map. The last six inches are the hardest. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#deliveryrobot",
+        "#automation",
+        "#lastmile"
+      ],
+      "yt_keywords": [
+        "delivery robot",
+        "robotics explained",
+        "industrial automation",
+        "last mile delivery",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "why delivery robots fear kerbs"
+      ]
+    },
+    {
+      "id": "robot_cages",
+      "title": "Why Factory Robots Live in Cages",
+      "hook": "The strongest robot in a factory is kept in a cage. Not because it's angry — because it's blind.",
+      "emphasis": [
+        "cage",
+        "blind"
+      ],
+      "curiosity_angle": "Why industrial robots are fenced off, and what changed to let some of them out",
+      "visuals": "robot_arm",
+      "theme": "amber",
+      "voice": "bella",
+      "yt_title": "Why Industrial Robots Are Kept Behind Safety Cages",
+      "ig_tags": [
+        "#industrialrobot",
+        "#manufacturing",
+        "#automation",
+        "#safety",
+        "#robotics"
+      ],
+      "vo": {
+        "hook": "The strongest robot in a factory is kept inside a cage. Not because it's dangerous by nature — because it's blind.",
+        "concept": "A classic industrial arm has no idea you exist. It repeats a path, at full speed, whatever is standing there.",
+        "predict": "So does it stop if something blocks it, or push straight through?",
+        "beat1": "It pushes through. Traditional arms have no force sensing. They follow the path and assume the world is empty.",
+        "beat2": "So safety is the cage, not the robot. Open the door and an interlock cuts the power instantly.",
+        "stat": "Newer collaborative arms sense contact and stop in milliseconds — but they trade away most of their speed to do it.",
+        "quiz": "Why can collaborative robots work without a cage?",
+        "reveal": "They feel contact and stop. The cost is speed and payload, which is why fast robots are still fenced.",
+        "cta": "Safety is a trade, not a feature. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "It can't see you",
+          "text": "A classic arm assumes the world is empty.",
+          "detail": "It repeats its path at full speed, regardless of what's there."
+        },
+        {
+          "label": "The cage is the sensor",
+          "text": "Open the door, an interlock kills the power.",
+          "detail": "Safety lives in the fence, not in the robot."
+        }
+      ],
+      "stat": {
+        "eyebrow": "THE TRADE",
+        "value": 250,
+        "unit": "kg a caged arm can lift",
+        "label": "A collaborative arm that's safe to stand beside typically handles about ten. Safety costs payload.",
+        "compare": {
+          "a_label": "Collaborative arm",
+          "a_frac": 0.04,
+          "a_value": "~10 kg",
+          "b_label": "Caged arm",
+          "b_frac": 1.0,
+          "b_value": "250 kg"
+        }
+      },
+      "predict": {
+        "q": "Something blocks its path. It...",
+        "options": [
+          "Stops safely",
+          "Pushes through"
+        ]
+      },
+      "quiz": {
+        "q": "Why can cobots skip the cage?",
+        "options": [
+          "They're slower and sense contact",
+          "They have cameras",
+          "They're smaller"
+        ],
+        "answer": 0,
+        "why": "They detect contact and stop in milliseconds — paid for with far lower speed and payload."
+      },
+      "companion_page": true,
+      "script": "The strongest robot in a factory is kept inside a cage. Not because it's dangerous by nature — because it's blind. A classic industrial arm has no idea you exist. It repeats a path, at full speed, whatever is standing there. So does it stop if something blocks it, or push straight through? It pushes through. Traditional arms have no force sensing. They follow the path and assume the world is empty. So safety is the cage, not the robot. Open the door and an interlock cuts the power instantly. Newer collaborative arms sense contact and stop in milliseconds — but they trade away most of their speed to do it. Why can collaborative robots work without a cage? They feel contact and stop. The cost is speed and payload, which is why fast robots are still fenced. Safety is a trade, not a feature. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#industrialrobot",
+        "#manufacturing",
+        "#automation"
+      ],
+      "yt_keywords": [
+        "industrial robot",
+        "manufacturing automation",
+        "industrial automation",
+        "robot safety",
+        "robotics explained",
+        "how robots work",
+        "robotics for beginners",
+        "why factory robots live in cages"
+      ]
+    },
+    {
+      "id": "robot_battery",
+      "title": "Why Robots Die So Fast",
+      "hook": "A robot dog runs for 90 minutes. Then it needs an hour on the charger.",
+      "emphasis": [
+        "90",
+        "minutes",
+        "hour"
+      ],
+      "curiosity_angle": "Why battery — not intelligence — is the ceiling on almost every mobile robot",
+      "visuals": "torque_graph",
+      "theme": "crimson",
+      "voice": "antoni",
+      "yt_title": "Why Robots Run Out of Battery So Quickly",
+      "ig_tags": [
+        "#robotics",
+        "#batterytech",
+        "#engineering",
+        "#energy",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "A robot dog runs for about ninety minutes. Then it needs an hour sitting on a charger.",
+        "concept": "The intelligence is basically free. It's the moving that drains everything.",
+        "predict": "So what eats the most power — the thinking, or the walking?",
+        "beat1": "The walking, by a wide margin. Motors holding a body upright burn hundreds of watts. The computer sips a few.",
+        "beat2": "And legs never rest. Even standing still, a legged robot spends energy just not falling over.",
+        "stat": "Petrol carries roughly fifty times more energy per kilogram than a lithium battery. That gap is the whole ceiling.",
+        "quiz": "What actually drains a mobile robot's battery?",
+        "reveal": "Movement. Motors dominate; the brain is a rounding error. Better AI doesn't buy you a single extra minute.",
+        "cta": "Robotics is waiting on batteries, not brains. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Not the thinking",
+          "text": "Motors burn hundreds of watts. The computer sips a few.",
+          "detail": "Intelligence is nearly free. Motion is not."
+        },
+        {
+          "label": "Standing costs too",
+          "text": "A legged robot spends energy just not falling over.",
+          "detail": "There's no idle state when gravity never stops."
+        }
+      ],
+      "stat": {
+        "eyebrow": "ENERGY PER KILOGRAM",
+        "value": 50,
+        "unit": "x more energy in petrol",
+        "label": "Per kilogram, petrol carries around fifty times what a lithium battery does. That's the real ceiling.",
+        "compare": {
+          "a_label": "Lithium battery",
+          "a_frac": 0.02,
+          "a_value": "1x",
+          "b_label": "Petrol",
+          "b_frac": 1.0,
+          "b_value": "50x"
+        }
+      },
+      "predict": {
+        "q": "What drains the battery most?",
+        "options": [
+          "The thinking",
+          "The moving"
+        ]
+      },
+      "quiz": {
+        "q": "What limits robot runtime most?",
+        "options": [
+          "Processor power",
+          "Motors and movement",
+          "Sensor count"
+        ],
+        "answer": 1,
+        "why": "Motors dominate the power budget. Compute is a rounding error — smarter software buys no extra runtime."
+      },
+      "companion_page": true,
+      "script": "A robot dog runs for about ninety minutes. Then it needs an hour sitting on a charger. The intelligence is basically free. It's the moving that drains everything. So what eats the most power — the thinking, or the walking? The walking, by a wide margin. Motors holding a body upright burn hundreds of watts. The computer sips a few. And legs never rest. Even standing still, a legged robot spends energy just not falling over. Petrol carries roughly fifty times more energy per kilogram than a lithium battery. That gap is the whole ceiling. What actually drains a mobile robot's battery? Movement. Motors dominate; the brain is a rounding error. Better AI doesn't buy you a single extra minute. Robotics is waiting on batteries, not brains. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#batterytech",
+        "#energy",
+        "#robotics"
+      ],
+      "yt_keywords": [
+        "robotics explained",
+        "battery technology",
+        "engineering explained",
+        "energy density",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "why robots die so fast"
+      ]
+    },
+    {
+      "id": "wake_word",
+      "title": "How Speakers Hear Their Name",
+      "hook": "Your smart speaker hears every word you say. It only wakes for one of them.",
+      "emphasis": [
+        "every",
+        "one"
+      ],
+      "curiosity_angle": "How a device listening constantly still isn't sending your conversation anywhere",
+      "visuals": "cnn_layers",
+      "theme": "ice",
+      "voice": "arnold",
+      "yt_title": "How Smart Speakers Detect Their Wake Word",
+      "ig_tags": [
+        "#smarthome",
+        "#ai",
+        "#voiceassistant",
+        "#machinelearning",
+        "#techexplained"
+      ],
+      "vo": {
+        "hook": "Your smart speaker hears every word you say. It only wakes up for one of them.",
+        "concept": "There are two systems inside. A tiny one that always listens, and a big one that almost never runs.",
+        "predict": "So is the always-on part sending your audio away, or handling it on the device?",
+        "beat1": "On the device. The small model runs locally and is trained to spot one sound pattern. Nothing else.",
+        "beat2": "Only when that pattern matches does the recording start and the real speech system get involved.",
+        "stat": "That tiny listener is around a hundred kilobytes — small enough to run on a chip costing less than a coffee.",
+        "quiz": "Why doesn't your speaker stream everything to the cloud?",
+        "reveal": "It can't afford to. Constant uploading would flood the network — so the cheap local model gates everything.",
+        "cta": "The smallest model in the room does the most work. Follow R2BOT."
+      },
+      "beats": [
+        {
+          "label": "Two systems",
+          "text": "A tiny always-on listener. A big one that rarely runs.",
+          "detail": "One waits for a sound. The other understands language."
+        },
+        {
+          "label": "It runs locally",
+          "text": "The listener never leaves the device.",
+          "detail": "Recording only starts once the pattern matches."
+        }
+      ],
+      "stat": {
+        "eyebrow": "THE TINY LISTENER",
+        "value": 100,
+        "unit": "kilobytes of model",
+        "label": "Small enough for a chip cheaper than a coffee. The speech model behind it is millions of times larger.",
+        "compare": {
+          "a_label": "Wake-word model",
+          "a_frac": 0.01,
+          "a_value": "100 KB",
+          "b_label": "Speech model",
+          "b_frac": 1.0,
+          "b_value": "GBs"
+        }
+      },
+      "predict": {
+        "q": "The always-on part is...",
+        "options": [
+          "Sending audio away",
+          "Running on the device"
+        ]
+      },
+      "quiz": {
+        "q": "Why not stream everything to the cloud?",
+        "options": [
+          "Privacy laws forbid it",
+          "Bandwidth and cost make it impossible",
+          "Microphones are too weak"
+        ],
+        "answer": 1,
+        "why": "Constant upload from every device would swamp networks and cost enormously — the local model gates it."
+      },
+      "companion_page": true,
+      "script": "Your smart speaker hears every word you say. It only wakes up for one of them. There are two systems inside. A tiny one that always listens, and a big one that almost never runs. So is the always-on part sending your audio away, or handling it on the device? On the device. The small model runs locally and is trained to spot one sound pattern. Nothing else. Only when that pattern matches does the recording start and the real speech system get involved. That tiny listener is around a hundred kilobytes — small enough to run on a chip costing less than a coffee. Why doesn't your speaker stream everything to the cloud? It can't afford to. Constant uploading would flood the network — so the cheap local model gates everything. The smallest model in the room does the most work. Follow R2BOT.",
+      "yt_hashtags": [
+        "#Shorts",
+        "#smarthome",
+        "#voiceassistant",
+        "#machinelearning"
+      ],
+      "yt_keywords": [
+        "smart speaker",
+        "artificial intelligence",
+        "voice assistant",
+        "machine learning",
+        "technology explained",
+        "how robots work",
+        "robotics for beginners",
+        "how speakers hear their name"
+      ]
     }
   ]
 }

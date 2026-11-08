@@ -2,7 +2,11 @@
 
 import { useState } from 'react';
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.r2bot.in';
+// Guarded so shared links never point at the *.vercel.app preview domain.
+const SITE =
+  process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app')
+    ? process.env.NEXT_PUBLIC_SITE_URL
+    : 'https://www.r2bot.in';
 
 export function VisualizerActions({ sectionId, title }: { sectionId: string; title: string }) {
   const [shared, setShared] = useState(false);

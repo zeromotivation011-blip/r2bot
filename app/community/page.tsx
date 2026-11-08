@@ -64,7 +64,7 @@ export default async function CommunityPage() {
   return (
     <CopilotProvider>
       <Nav />
-      <main id="main-content" style={{ minHeight: '100vh', background: '#0a0a0f', color: '#fff', paddingTop: 110, paddingBottom: 80 }}>
+      <main id="main-content" style={{ minHeight: '100vh', background: '#0A0E17', color: '#fff', paddingTop: 110, paddingBottom: 80 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
           <header style={{ marginBottom: 28 }}>
             <p style={{ fontSize: 11, letterSpacing: '3px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 900, margin: '0 0 10px' }}>

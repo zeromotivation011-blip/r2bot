@@ -1,0 +1,13 @@
+Getting from A to B sounds simple. For a robot, it's one of the hardest problems in math.
+
+A* algorithm — the 50-year-old trick that every game, robot, and GPS still uses
+
+✅ Follow @r2bot.in to learn robotics from zero to job-ready.
+🔗 Free courses + AI mentor at r2bot.in
+
+#robotics
+#pathplanning
+#Astar
+#algorithms
+#autonomousrobots
+#robotics #engineering #STEM #learnrobotics #r2bot

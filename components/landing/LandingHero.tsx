@@ -8,7 +8,7 @@ export function LandingHero() {
     <section
       style={{
         position: 'relative',
-        background: 'radial-gradient(circle at 30% 20%, rgba(0,184,212,.08) 0%, transparent 60%), #050810',
+        background: 'radial-gradient(circle at 30% 20%, rgba(0,184,212,.08) 0%, transparent 60%), #0A0E17',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

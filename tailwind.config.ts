@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        void: '#050810',
+        void: '#0A0E17',
         ink: '#0B2540',
         'ink-2': '#0F2F52',
         mist: '#E8ECF1',

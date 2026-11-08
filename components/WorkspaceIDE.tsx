@@ -359,7 +359,7 @@ export function WorkspaceIDE() {
           display: 'flex',
           alignItems: 'center',
           gap: 14,
-          background: '#050810',
+          background: '#0A0E17',
         }}
       >
         <a href="/" style={{ color: 'var(--cyan-bright)', fontWeight: 700, fontFamily: 'var(--font-display), sans-serif', fontSize: 17, textDecoration: 'none' }}>
@@ -414,7 +414,7 @@ export function WorkspaceIDE() {
         {/* LEFT sidebar */}
         <aside
           style={{
-            background: '#050810',
+            background: '#0A0E17',
             borderRight: '1px solid var(--border-2)',
             padding: 14,
             overflowY: 'auto',
@@ -511,7 +511,7 @@ export function WorkspaceIDE() {
             <svg
               viewBox={`0 0 ${SIM_W} ${SIM_H}`}
               width="100%"
-              style={{ maxWidth: SIM_W, background: '#050810', borderRadius: 8, border: '1px solid var(--border-2)' }}
+              style={{ maxWidth: SIM_W, background: '#0A0E17', borderRadius: 8, border: '1px solid var(--border-2)' }}
             >
               <rect x={30} y={30} width={SIM_W - 60} height={SIM_H - 60} fill="none" stroke="#334155" strokeWidth={2} rx={4} />
               {trail.length > 1 && (

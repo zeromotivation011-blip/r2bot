@@ -114,7 +114,7 @@ export default async function RobotProfilePage({
       />
       <Nav />
 
-      <main id="main-content" className="bg-[#050810]">
+      <main id="main-content" className="bg-[#0A0E17]">
         {/* Hero */}
         <section className="relative overflow-hidden border-b border-white/5 px-4 pb-16 pt-32">
           <div className="mx-auto max-w-4xl">

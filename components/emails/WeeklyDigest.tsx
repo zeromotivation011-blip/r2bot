@@ -3,7 +3,7 @@
 // element straight through.
 import type { ReactNode } from 'react';
 
-const BG = '#050810';
+const BG = '#0A0E17';
 const PANEL = '#0B2540';
 const BORDER = 'rgba(255,255,255,0.08)';
 const BORDER_ACCENT = 'rgba(0,184,212,.35)';

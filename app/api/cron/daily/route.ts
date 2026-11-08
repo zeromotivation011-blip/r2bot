@@ -7,6 +7,7 @@ import type { NextRequest } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { createSupabaseAdminClient } from '@/lib/supabase/server';
 import { getNewsData } from '@/lib/news';
+import { newsSlug } from '@/lib/news-slug';
 import { getLiveLensVideos } from '@/lib/lens-live';
 import { runDiscovery } from '@/lib/discovery';
 
@@ -28,6 +29,7 @@ async function archiveNews(): Promise<StepResult> {
   const supabase = createSupabaseAdminClient();
   const rows = articles.map((a) => ({
     url: a.url,
+    slug: newsSlug(a.title, a.url),
     title: a.title,
     source: a.source,
     topic: a.topic,

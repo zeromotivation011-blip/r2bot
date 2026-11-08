@@ -3,7 +3,7 @@ export default function Loading() {
     <div
       role="status"
       aria-live="polite"
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-[#050810]/95 backdrop-blur"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-[#0A0E17]/95 backdrop-blur"
     >
       <div className="relative h-20 w-20" aria-hidden>
         <div className="absolute inset-0 rounded-full border-2 border-amber-500/20" />

@@ -83,7 +83,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
   const authorInitial = post.author.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white pt-24 pb-20 px-4">
+    <main className="min-h-screen bg-[#0A0E17] text-white pt-24 pb-20 px-4">
       <div className="mx-auto max-w-6xl">
         <Link href="/blog" className="text-sm text-blue-400 hover:text-blue-300">← All articles</Link>
 
@@ -99,7 +99,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
             <h1 className="mt-4 text-3xl md:text-5xl font-black text-white leading-[1.05]">{post.title}</h1>
             <p className="mt-3 text-lg text-zinc-300">{post.description}</p>
             <div className="mt-5 flex items-center gap-3 text-xs text-zinc-400 border-y border-white/10 py-3">
-              <span className="w-9 h-9 rounded-full grid place-items-center font-black text-sm" style={{ background: 'linear-gradient(135deg,#3b82f6,#f97316)', color: '#0a0a0f' }}>{authorInitial}</span>
+              <span className="w-9 h-9 rounded-full grid place-items-center font-black text-sm" style={{ background: 'linear-gradient(135deg,#3b82f6,#f97316)', color: '#0A0E17' }}>{authorInitial}</span>
               <span><strong className="text-white">{post.author}</strong> · {post.authorRole}</span>
               <span className="ml-auto text-zinc-500">{fmtDate(post.date)} · {post.readTime} min read</span>
             </div>
@@ -182,7 +182,7 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
             <div className="rounded-2xl border border-white/10 bg-[#111118] p-4">
               <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Author</p>
               <div className="mt-2 flex items-center gap-3">
-                <span className="w-10 h-10 rounded-full grid place-items-center font-black text-sm" style={{ background: 'linear-gradient(135deg,#3b82f6,#f97316)', color: '#0a0a0f' }}>{authorInitial}</span>
+                <span className="w-10 h-10 rounded-full grid place-items-center font-black text-sm" style={{ background: 'linear-gradient(135deg,#3b82f6,#f97316)', color: '#0A0E17' }}>{authorInitial}</span>
                 <div>
                   <p className="text-sm font-bold text-white">{post.author}</p>
                   <p className="text-xs text-zinc-400">{post.authorRole}</p>

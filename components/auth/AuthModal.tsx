@@ -198,7 +198,7 @@ export function AuthModal() {
         .auth-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #f97316; font-weight: 900; }
         .auth-head h2 { font-size: 24px; font-weight: 900; color: #fff; margin-top: 4px; }
         .auth-sub { font-size: 13px; color: #9ca3af; margin-top: 2px; }
-        .auth-tabs { display: flex; background: #0a0a0f; border-radius: 10px; padding: 4px; margin-bottom: 16px; }
+        .auth-tabs { display: flex; background: #0A0E17; border-radius: 10px; padding: 4px; margin-bottom: 16px; }
         .auth-tab {
           flex: 1; min-height: 36px; padding: 8px;
           background: transparent; border: 0;
@@ -215,7 +215,7 @@ export function AuthModal() {
         .auth-form input, .auth-form select {
           width: 100%;
           margin-top: 4px;
-          background: #0a0a0f;
+          background: #0A0E17;
           border: 1px solid #1f1f2a;
           color: #fff; font-size: 15px; font-weight: 500;
           padding: 10px 12px; border-radius: 10px;
@@ -242,7 +242,7 @@ export function AuthModal() {
         .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #1f1f2a; }
         .auth-google {
           width: 100%; min-height: 44px;
-          background: #0a0a0f; color: #e5e7eb;
+          background: #0A0E17; color: #e5e7eb;
           border: 1px solid #1f1f2a; border-radius: 10px;
           font-weight: 700; cursor: pointer;
         }

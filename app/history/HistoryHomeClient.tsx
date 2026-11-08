@@ -48,7 +48,7 @@ export default function HistoryHomeClient({ chapters }: { chapters: HistoryChapt
   }, [chapters, birthYear])
 
   return (
-    <main className="min-h-screen bg-[#050810] text-white">
+    <main className="min-h-screen bg-[#0A0E17] text-white">
       {/* Hero */}
       <section className="relative px-4 pt-28 pb-12 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(245,158,11,0.15),transparent_40%),radial-gradient(circle_at_80%_50%,rgba(124,58,237,0.12),transparent_40%)]" />
@@ -72,7 +72,7 @@ export default function HistoryHomeClient({ chapters }: { chapters: HistoryChapt
       </section>
 
       {/* Chapter selector */}
-      <nav className="sticky top-0 z-20 bg-[#050810]/95 backdrop-blur border-y border-white/10 px-4 py-3">
+      <nav className="sticky top-0 z-20 bg-[#0A0E17]/95 backdrop-blur border-y border-white/10 px-4 py-3">
         <div className="mx-auto max-w-6xl flex gap-2 overflow-x-auto">
           {chapters.map(c => (
             <a

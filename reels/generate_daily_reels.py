@@ -17,10 +17,33 @@ SCRIPT_DIR       = os.path.dirname(os.path.abspath(__file__))
 TOPIC_BANK_PATH  = os.path.join(SCRIPT_DIR, "topic_bank.json")
 OUTPUT_DIR       = SCRIPT_DIR
 FRAMES_TEMP_DIR  = "/tmp/r2bot_frames"
-ELEVENLABS_KEY   = os.getenv("ELEVENLABS_API_KEY", "sk_7b8f5ea80a2eb8cd518d9824229e4c052f1390828c0673f0")
-VOICE_ID         = "pNInz6obpgDQGcFmaJgB"   # Adam — clear & authoritative
+def _load_key():
+    """Key from env, else reels/.env (gitignored). Never hardcode it here."""
+    k = os.getenv("ELEVENLABS_API_KEY")
+    if k: return k.strip()
+    envf = os.path.join(SCRIPT_DIR, ".env")
+    if os.path.exists(envf):
+        for line in open(envf):
+            line = line.strip()
+            if line.startswith("ELEVENLABS_API_KEY="):
+                return line.split("=",1)[1].strip().strip('"').strip("'")
+    return ""
+ELEVENLABS_KEY   = _load_key()
+# Voice roster. Alternate male/female across consecutive reels so the feed
+# doesn't sound like one narrator on repeat. Per-topic override via topic["voice"].
+# VERIFIED USABLE on the current (free) plan — probed 19 Jul 2026.
+# rachel / josh / sam / elli / domi return 402 paid_plan_required: they are
+# "library" voices and need a paid subscription. Re-probe after any upgrade.
+VOICES = {
+    "adam":   "pNInz6obpgDQGcFmaJgB",   # male,   clear & authoritative
+    "antoni": "ErXwobaYiN019PkySvjV",   # male,   measured & friendly
+    "arnold": "VR6AewLTigWG4xSOukaG",   # male,   punchy & direct
+    "bella":  "EXAVITQu4vr4xnSDxMaL",   # female, bright & energetic
+}
+DEFAULT_VOICE    = "adam"
+VOICE_ID         = VOICES[DEFAULT_VOICE]
 FPS, W, H        = 30, 1080, 1920
-DURATION         = 20
+DURATION         = 60                       # long-form Reel (must match hq_render)
 FRAMES           = FPS * DURATION
 
 # ── Brand Colors ─────────────────────────────────────────────────────────────
@@ -189,10 +212,11 @@ def render_frame(frame_num, topic):
     return img.convert("RGB")
 
 # ── Generate Audio ────────────────────────────────────────────────────────────
-def generate_audio(script, output_path):
-    print("  🎙  Generating voiceover...")
+def generate_audio(script, output_path, voice=None):
+    vid = VOICES.get(voice or DEFAULT_VOICE, VOICE_ID)
+    print(f"  🎙  Generating voiceover ({voice or DEFAULT_VOICE})...")
     r = requests.post(
-        f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}",
+        f"https://api.elevenlabs.io/v1/text-to-speech/{vid}",
         headers={"xi-api-key": ELEVENLABS_KEY, "Content-Type":"application/json"},
         json={
             "text": script,
@@ -209,6 +233,159 @@ def generate_audio(script, output_path):
         return True
     print(f"  ✗ ElevenLabs {r.status_code}: {r.text[:200]}")
     return False
+
+
+def timeline_path(tid):
+    return os.path.join(OUTPUT_DIR, f"_timeline_{tid}.json")
+
+def attach_timeline(topic):
+    """Load the measured VO timeline before rendering. `voice` MUST run first."""
+    p = timeline_path(topic["id"])
+    if os.path.exists(p):
+        topic["_timeline"] = json.load(open(p))
+    return topic
+
+def audio_duration(path):
+    out = subprocess.run(["ffprobe","-v","error","-show_entries","format=duration",
+                          "-of","default=nw=1:nk=1",path], capture_output=True, text=True)
+    try:    return float(out.stdout.strip())
+    except: return 0.0
+
+def fit_audio(audio_path, target_sec, max_tempo=1.16):
+    """Time-compress VO to fit the video. Word-count estimates are unreliable
+    (~2.3-2.6 w/s and pauses vary), so measure and nudge tempo instead."""
+    dur = audio_duration(audio_path)
+    if dur <= target_sec or dur == 0: return dur
+    tempo = min(dur/target_sec, max_tempo)
+    tmp = audio_path.replace(".mp3","_fit.mp3")
+    subprocess.run(["ffmpeg","-y","-i",audio_path,"-filter:a",f"atempo={tempo:.4f}",
+                    "-c:a","libmp3lame","-q:a","2",tmp], check=True, capture_output=True)
+    os.replace(tmp, audio_path)
+    new = audio_duration(audio_path)
+    print(f"  \u23f1  Fitted VO {dur:.1f}s -> {new:.1f}s (atempo {tempo:.3f})")
+    return new
+
+# Scene order. `predict` is an optional early engagement beat.
+VO_SECTIONS = ["hook","concept","predict","beat1","beat2","stat","beat3","quiz","reveal","cta"]
+VO_GAPS = {"hook":0.30,"concept":0.35,"predict":1.30,"beat1":0.25,"beat2":0.25,
+           "stat":0.45,"beat3":0.35,"quiz":2.10,"reveal":0.40,"cta":0.0}
+
+def build_voiceover(topic, audio_path, timeline_path_):
+    """Generate VO section by section, measure each, and derive the scene
+    timeline from the REAL audio so visuals can never drift from narration."""
+    vo = topic.get("vo")
+    if not vo: return None
+    voice = topic.get("voice")
+    tmp = os.path.join(OUTPUT_DIR, f"_vo_{topic['id']}")
+    os.makedirs(tmp, exist_ok=True)
+    parts, spans, t = [], {}, 0.0
+    for name in VO_SECTIONS:
+        text = (vo.get(name) or "").strip()
+        if not text: continue
+        seg = os.path.join(tmp, f"{name}.mp3")
+        # Reuse cached section audio. Re-running `voice` to retune timing should
+        # never re-bill TTS -- delete the _vo_<topic>/ folder to force a redo.
+        if os.path.exists(seg) and os.path.getsize(seg) > 2000:
+            print(f"  \u21bb cached {name}")
+        elif not generate_audio(text, seg, voice=voice):
+            return None
+        d = audio_duration(seg); gap = VO_GAPS.get(name, 0.3)
+        parts.append((seg, gap)); spans[name] = [t, t + d + gap]; t += d + gap
+    # If the narration finishes early, the final scene would hold for the whole
+    # remainder -- a 14s static CTA. Spread the slack across the inter-section
+    # gaps instead so pacing stays even and every scene gets room to breathe.
+    CTA_HOLD = 8.0
+    desired = DURATION - CTA_HOLD
+    gap_total = sum(g for _, g in parts)
+    if t < desired and gap_total > 0:
+        k = 1.0 + (desired - t) / gap_total
+        parts = [(seg, g * k) for seg, g in parts]
+        spans, t = {}, 0.0
+        for (seg, gap), name in zip(parts, [n for n in VO_SECTIONS if (vo.get(n) or "").strip()]):
+            d = audio_duration(seg)
+            spans[name] = [t, t + d + gap]
+            t += d + gap
+    total, limit, tempo = t, DURATION - 0.6, 1.0
+    if total > limit:
+        tempo = min(total/limit, 1.18)
+        spans = {k:[v[0]/tempo, v[1]/tempo] for k,v in spans.items()}
+        total /= tempo
+    inputs, filt, n = [], [], 0
+    for seg, gap in parts:
+        inputs += ["-i", seg]; filt.append(f"[{n}:a]"); n += 1
+        if gap > 0:
+            inputs += ["-f","lavfi","-t",f"{gap}","-i","anullsrc=r=44100:cl=mono"]
+            filt.append(f"[{n}:a]"); n += 1
+    chain = "".join(filt) + f"concat=n={n}:v=0:a=1[c]"
+    out_label = "[c]"
+    if tempo > 1.0:
+        chain += f";[c]atempo={tempo:.4f}[a]"; out_label = "[a]"
+    subprocess.run(["ffmpeg","-y",*inputs,"-filter_complex",chain,"-map",out_label,
+                    "-c:a","libmp3lame","-q:a","2",audio_path], check=True, capture_output=True)
+    ordered = [x for x in VO_SECTIONS if x in spans]
+    spans[ordered[-1]][1] = DURATION
+    frames = {k:[int(round(v[0]*FPS)), int(round(v[1]*FPS))] for k,v in spans.items()}
+    for i,k in enumerate(ordered[:-1]):
+        frames[k][1] = frames[ordered[i+1]][0]
+    frames[ordered[0]][0] = 0; frames[ordered[-1]][1] = FRAMES
+    tl = {"frames":frames,"seconds":spans,"vo_total":round(total,2),
+          "tempo":round(tempo,4),"voice":voice or DEFAULT_VOICE}
+    json.dump(tl, open(timeline_path_,"w"), indent=2)
+    print(f"  \U0001f3af Timeline locked to narration (VO {total:.1f}s, tempo {tempo:.3f}, voice {voice or DEFAULT_VOICE})")
+    for k in ordered: print(f"     {k:8s} {spans[k][0]:5.1f}s -> {spans[k][1]:5.1f}s")
+    return tl
+
+IG_HASHTAG_LIMIT = 5
+
+def build_caption(topic):
+    """Instagram caps hashtags at 5 (enforced since 19 Dec 2025); more than that
+    suppresses distribution. Emit exactly 5 from ig_tags, never a generic set."""
+    quiz = topic.get("quiz") or {}
+    q, opts, ans = quiz.get("q"), quiz.get("options") or [], quiz.get("answer",0)
+    if q and opts:
+        prompt = (f"\u2753 {q}\n   A) {opts[0]}   B) {opts[1] if len(opts)>1 else ''}   "
+                  f"C) {opts[2] if len(opts)>2 else ''}\n"
+                  f"\U0001f447 Comment A, B or C BEFORE you watch to the end.")
+        sticker = (f"POLL/QUIZ STICKER (~0:40, over the option cards)\n"
+                   f"  Q: {q}\n  Options: {' | '.join(opts)}\n"
+                   f"  Correct: {'ABC'[ans] if ans < len(opts) else '?'}")
+    else:
+        prompt = "\U0001f447 Drop a \U0001f916 if you want the full breakdown."
+        sticker = "POLL/QUIZ STICKER: none defined."
+    seen, tags = set(), []
+    for tag in topic.get("ig_tags", []):
+        if tag.lower() not in seen:
+            seen.add(tag.lower()); tags.append(tag)
+    tags = tags[:IG_HASHTAG_LIMIT]
+    link = "r2bot.in" + (f"/atlas/{topic['id'].replace('_','-')}" if topic.get("companion_page") else "")
+    return f"""{topic['hook']}
+
+{topic['curiosity_angle']}
+
+{prompt}
+
+\u2705 Follow @r2bot.in to learn robotics from zero to job-ready.
+\U0001f517 Full breakdown + free AI mentor at {link}
+
+{' '.join(tags)}
+
+--- NOT PART OF THE CAPTION -------------------------------
+IG CAPTION TITLE : {topic['hook']}
+ON-SCREEN TITLE  : {topic.get('title','')}
+IG HASHTAGS ({len(tags)})  : {' '.join(tags)}   <- IG hard-caps at 5
+THEME / VOICE    : {topic.get('theme','amber')} / {topic.get('voice', DEFAULT_VOICE)}
+
+YOUTUBE SHORTS
+  Title       : {topic.get('yt_title','(not set)')}  ({len(topic.get('yt_title',''))} chars, feed truncates ~40)
+  Description : {topic.get('curiosity_angle','')}
+                {' '.join(topic.get('yt_hashtags', []))}
+                ^ 3-5 hashtags in the DESCRIPTION, #Shorts first. Over 15 and
+                  YouTube ignores every one of them. Keep the title clean.
+  Tags field  : {', '.join(topic.get('yt_keywords', []))}
+
+{sticker}
+-----------------------------------------------------------
+"""
 
 # ── Render + Encode ───────────────────────────────────────────────────────────
 def render_and_encode(topic, silent_path):
