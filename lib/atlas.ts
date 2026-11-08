@@ -172,10 +172,23 @@ function isAtlasType(s: string): s is AtlasType {
 }
 
 /** YAML auto-parses ISO dates to JS Date. Coerce to YYYY-MM-DD string for safe rendering. */
-function normalizeDate(v: unknown): string {
+/**
+ * YAML auto-parses ISO dates to JS Date. Coerce to YYYY-MM-DD for safe
+ * rendering. Returns undefined when there is no date: it used to return
+ * today's, which is a lie with consequences. Entries that reach us without a
+ * `lastReviewed` — every row in the atlas_entries table, whose `data` JSON
+ * does not carry the field — were claiming they had been reviewed today, on
+ * every single regeneration. That put "Last reviewed · <today>" on 501 pages,
+ * set JSON-LD dateModified to today, and reported lastmod=today for 501 URLs
+ * in the sitemap every day, which is the fastest way to teach Google to
+ * ignore lastmod entirely (CLAUDE.md §12).
+ *
+ * Absent is absent. Callers decide what to show instead.
+ */
+function normalizeDate(v: unknown): string | undefined {
   if (v instanceof Date) return v.toISOString().slice(0, 10);
   if (typeof v === 'string' && v.length > 0) return v.slice(0, 10);
-  return new Date().toISOString().slice(0, 10);
+  return undefined;
 }
 
 function normalizeSources(v: unknown): AtlasSource[] {
