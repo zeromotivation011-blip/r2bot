@@ -37,7 +37,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       siteName: 'R2BOT',
       title: post.title,
       description: post.description,
-      images: [{ url: '/og-default.png', width: 1200, height: 630, alt: post.title }],
       publishedTime: post.date,
       authors: [post.author],
       tags: post.tags,
@@ -46,7 +45,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
-      images: ['/og-default.png'],
     },
   }
 }
@@ -64,7 +62,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     '@type': 'Article',
     headline: post.title,
     description: post.description,
-    image: `${BASE}/og-default.png`,
+    image: `${BASE}/blog/${post.slug}/opengraph-image`,
     datePublished: post.date,
     dateModified: post.date,
     author: authorRef(),

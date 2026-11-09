@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { HREFLANG_HOME } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'R2BOT: aprende robótica gratis y en lenguaje sencillo',
   description: 'R2BOT explica los robots y la IA en español sencillo. Guías gratis, glosario y cinco cursos para empezar.',
-  alternates: { canonical: `${BASE}/es`, languages: { en: `${BASE}/`, 'zh-CN': `${BASE}/zh`, hi: `${BASE}/hi`, es: `${BASE}/es` } },
+  alternates: { canonical: `${BASE}/es`, languages: HREFLANG_HOME },
 }
 
 export default function EsHome() {

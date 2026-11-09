@@ -6,6 +6,7 @@ import { CourseCover } from '@/components/shorts/CourseCover'
 import InlineSignup from '@/components/InlineSignup'
 import { authorRef } from '@/lib/author'
 import { jsonldScript } from '@/lib/seo/jsonld'
+import { HREFLANG_SHORTS } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const revalidate = 86400
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
     'Free one-minute robotics lessons with video, animated demos and a quick check. Five short courses on sensors, motors, control, hands and robots at work.',
   alternates: {
     canonical: `${BASE}/shorts`,
-    languages: { en: `${BASE}/shorts`, 'zh-CN': `${BASE}/zh/shorts`, hi: `${BASE}/hi/shorts`, es: `${BASE}/es/shorts` },
+    languages: HREFLANG_SHORTS,
   },
 }
 

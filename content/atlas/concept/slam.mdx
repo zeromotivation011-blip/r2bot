@@ -33,8 +33,11 @@ realRobotsThatUseThis:
   - Boston Dynamics Spot
   - Most warehouse AMRs
 indianExample: >-
-  Indoor robot vacuums sold in India (Mi, Eufy, Roborock) all use vSLAM (visual
-  SLAM) — a single camera plus IMU.
+  Robot vacuums show the two families of SLAM side by side. Roborock and most
+  Dreame and Xiaomi models spin a small lidar in the turret on top (laser SLAM);
+  iRobot's Roomba j-series uses a front camera instead (visual SLAM). Same
+  problem, different sensor — and the lidar ones map a dark room, the camera
+  ones don't.
 relatedTerms: []
 prerequisiteTerms: []
 unlocksTerms: []
@@ -42,12 +45,12 @@ quizQuestion:
   q: What does SLAM stand for?
   options:
     - Smart Land And Mapping
-    - Simultaneous Localisation And Mapping
+    - Simultaneous Localization And Mapping
     - Sensor Linked Aerial Mapping
     - Single Level Autonomous Motion
   answer: 1
   explanation: >-
-    SLAM = Simultaneous Localisation And Mapping. The robot maps its environment
+    SLAM = Simultaneous Localization And Mapping. The robot maps its environment
     WHILE working out where it is.
 mindBlowingFact: >-
   A robot vacuum can build a complete 3D map of your home in 10 minutes — and

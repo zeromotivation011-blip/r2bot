@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import InlineSignup from '@/components/InlineSignup'
 import { ZH_TOPICS } from '@/lib/ai-robotics-zh'
+import { HREFLANG_AI_HUB } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'AI 与机器人：通俗易懂的指南',
   description: '用简单的中文讲解人工智能如何在机器人里工作：视觉、学习、SLAM、路径规划、大语言模型和安全，每篇都有真实例子。免费。',
-  alternates: { canonical: `${BASE}/zh/ai-robotics`, languages: { en: `${BASE}/ai-robotics`, 'zh-CN': `${BASE}/zh/ai-robotics` } },
+  alternates: { canonical: `${BASE}/zh/ai-robotics`, languages: HREFLANG_AI_HUB },
 }
 const card = { display: 'block', padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none' } as const
 

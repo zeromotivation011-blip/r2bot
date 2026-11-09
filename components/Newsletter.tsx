@@ -5,6 +5,8 @@ import { useState } from 'react';
 export function Newsletter() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle');
   const [email, setEmail] = useState('');
+  const [trap, setTrap] = useState('');
+  const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -19,9 +21,11 @@ export function Newsletter() {
           email,
           source: 'newsletter',
           page: typeof window !== 'undefined' ? window.location.pathname : null,
+          honeypot: trap,
         }),
       });
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; pending?: boolean };
+      setPending(data.pending === true);
       if (!res.ok || !data.ok) {
         setError(data.error || 'Something went wrong. Please try again.');
         setStatus('err');
@@ -50,6 +54,11 @@ export function Newsletter() {
           </p>
           <form className="newsletter-form" onSubmit={handleSubmit}>
             <input
+              type="text" tabIndex={-1} autoComplete="off" aria-hidden name="company"
+              value={trap} onChange={(e) => setTrap(e.target.value)}
+              className="absolute -left-[9999px] h-px w-px opacity-0"
+            />
+            <input
               type="email"
               placeholder="you@email.com"
               required
@@ -64,7 +73,7 @@ export function Newsletter() {
           </form>
           {status === 'ok' && (
             <p style={{ marginTop: 18, color: 'var(--green)', fontSize: 14 }}>
-              Thanks! You&apos;ll get the next Pulse in your inbox.
+              {pending ? 'Almost there — check your inbox and click the confirmation link.' : 'Thanks! You\u2019ll get the next Pulse in your inbox.'}
             </p>
           )}
           {status === 'err' && error && (

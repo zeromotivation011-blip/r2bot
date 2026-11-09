@@ -209,15 +209,13 @@ function RobotCard({ robot }: { robot: Robot }) {
 // ─── Hall-of-Fame marquee ticker ────────────────────────────────────────────
 function HallOfFameTicker() {
   const top = ROBOTS[0];
-  const indianTop = ROBOTS.find(r => r.country === 'India');
   const persy = ROBOTS.find(r => r.slug === 'perseverance');
   const items = [
     top  ? `🏆 #1 Most Famous: ${top.maker} ${top.name}` : null,
-    indianTop ? `🇮🇳 Indian Robot Spotlight: ${indianTop.name}` : null,
     persy ? `🚀 Furthest Robot: ${persy.name} — 300M km away on Mars` : null,
     `📦 Largest Fleet: Amazon Robotics — 750,000+ Kiva units`,
     `🦾 KUKA: the orange arm in every car factory`,
-    `🐕 Spot has been deployed in 64 countries`,
+    `🐕 Spot: more than 1,500 units working on sites worldwide`,
   ].filter(Boolean) as string[];
   return (
     <div className="bg-gray-900 border-y border-white/10 overflow-hidden h-9 flex items-center">

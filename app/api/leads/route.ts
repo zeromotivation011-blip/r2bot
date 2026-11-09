@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       ip: clientIpFrom(req.headers),
     })
     return Response.json(
-      result.ok ? { ok: true } : { ok: false, error: result.error },
+      result.ok ? { ok: true, pending: result.pendingConfirmation === true } : { ok: false, error: result.error },
       { status: result.status },
     )
   } catch (e: unknown) {

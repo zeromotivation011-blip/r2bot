@@ -63,6 +63,9 @@ export async function generateMetadata({
     title: `${a.title} | Robotics News · R2BOT`,
     description: desc,
     alternates: { canonical: url },
+    // Summaries of other outlets' reporting: readable, linked from /news, but
+    // not offered for indexing (see app/sitemap.ts, 9 Nov 2026).
+    robots: { index: false, follow: true },
     openGraph: {
       type: 'article',
       url,

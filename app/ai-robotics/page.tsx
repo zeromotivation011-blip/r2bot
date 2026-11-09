@@ -4,12 +4,13 @@ import { AI_TOPICS } from '@/lib/ai-robotics'
 import SenseThinkAct from './SenseThinkAct'
 import WhichAi from './WhichAi'
 import { jsonldScript } from '@/lib/seo/jsonld'
+import { HREFLANG_AI_HUB } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'AI and Robotics: Plain-English Guides',
   description: 'How AI works inside robots, explained simply. Vision, learning, SLAM, planning and language models, each with real examples, free.',
-  alternates: { canonical: `${BASE}/ai-robotics`, languages: { en: `${BASE}/ai-robotics`, 'zh-CN': `${BASE}/zh/ai-robotics`, hi: `${BASE}/hi/ai-robotics`, es: `${BASE}/es/ai-robotics` } },
+  alternates: { canonical: `${BASE}/ai-robotics`, languages: HREFLANG_AI_HUB },
 }
 
 const card = { padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' } as const

@@ -6,7 +6,13 @@ export const dynamic = 'force-dynamic'
 
 const OWNER_EMAILS = ['ravi6703@gmail.com']
 const DAY = 86400000
-const cell = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
+// A cell starting with = + - @ TAB or CR is a formula to Excel/Sheets; a leading
+// apostrophe makes it text. Email addresses and sources are user-supplied.
+const cell = (v: unknown) => {
+  let s = String(v ?? '')
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
+  return `"${s.replace(/"/g, '""')}"`
+}
 
 export async function GET(req: NextRequest) {
   const supabase = await createSupabaseServerClient()

@@ -7,6 +7,7 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getVisitedSlugs, pickCuriousSlug } from '@/lib/atlas-xp'
+import { loadAtlasIndex } from '@/components/atlas/useAtlasIndex'
 
 interface AtlasNodeLite {
   slug: string
@@ -17,6 +18,12 @@ interface AtlasNodeLite {
   oneLiner?: string
 }
 
+/**
+ * `allNodes` is the candidate pool for the recommendations: the concepts this
+ * one unlocks plus the rest of its bucket, in Atlas order. It used to be every
+ * entry in the Atlas (~50 KB of props per page); "Surprise me" — the only
+ * feature that genuinely needs the whole list — now fetches the index on click.
+ */
 export function NextTopicBar({
   currentSlug,
   unlocksTerms = [],
@@ -106,11 +113,14 @@ export function NextTopicBar({
             type="button"
             className="ntb-card ntb-surprise"
             onClick={() => {
-              const slug = pickCuriousSlug(allNodes.map(n => n.slug))
-              if (!slug) return
-              const node = allNodes.find(n => n.slug === slug)
-              if (node) window.location.href = `/atlas/${node.type}/${node.slug}`
-              setRefreshKey(k => k + 1)
+              void loadAtlasIndex().then((index) => {
+                const pool = index.length > 0 ? index : allNodes
+                const slug = pickCuriousSlug(pool.map(n => n.slug))
+                if (!slug) return
+                const node = pool.find(n => n.slug === slug)
+                if (node) window.location.href = `/atlas/${node.type}/${node.slug}`
+                setRefreshKey(k => k + 1)
+              })
             }}
             aria-label="Surprise me with a random concept"
           >

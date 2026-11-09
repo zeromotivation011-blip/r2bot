@@ -4,6 +4,7 @@ import InlineSignup from '@/components/InlineSignup'
 import { notFound } from 'next/navigation'
 import { HI_TOPICS, getHiTopic } from '@/lib/ai-robotics-hi'
 import { jsonldScript } from '@/lib/seo/jsonld'
+import { aiTopicHreflang } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export function generateStaticParams() { return HI_TOPICS.map((t) => ({ slug: t.slug })) }
@@ -12,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const t = getHiTopic(slug)
   if (!t) return {}
   return { title: t.title, description: t.short.slice(0, 150),
-    alternates: { canonical: `${BASE}/hi/ai-robotics/${slug}`, languages: { en: `${BASE}/ai-robotics/${slug}`, hi: `${BASE}/hi/ai-robotics/${slug}` } } }
+    alternates: { canonical: `${BASE}/hi/ai-robotics/${slug}`, languages: aiTopicHreflang(slug) } }
 }
 const box = { padding: 16, borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' } as const
 

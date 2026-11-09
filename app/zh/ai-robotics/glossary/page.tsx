@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ZH_GLOSSARY } from '@/lib/ai-robotics-zh'
 import { jsonldScript } from '@/lib/seo/jsonld'
+import { HREFLANG_AI_GLOSSARY } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'AI 与机器人词汇表：通俗释义',
   description: '用一句话讲清机器人和人工智能的常用词：SLAM、激光雷达、强化学习、传感器融合等，附英文原词。',
-  alternates: { canonical: `${BASE}/zh/ai-robotics/glossary`, languages: { en: `${BASE}/ai-robotics/glossary`, 'zh-CN': `${BASE}/zh/ai-robotics/glossary` } },
+  alternates: { canonical: `${BASE}/zh/ai-robotics/glossary`, languages: HREFLANG_AI_GLOSSARY },
 }
 export default function ZhGlossary() {
   const ld = { '@context': 'https://schema.org', '@type': 'DefinedTermSet', inLanguage: 'zh-CN', name: 'AI 与机器人词汇表',

@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ES_GLOSSARY } from '@/lib/ai-robotics-es'
 import { jsonldScript } from '@/lib/seo/jsonld'
+import { HREFLANG_AI_GLOSSARY } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'Glosario de IA y robótica: definiciones sencillas',
   description: 'Términos comunes de robótica e IA en una frase: SLAM, lidar, aprendizaje por refuerzo, fusión de sensores y más, con el nombre en inglés.',
-  alternates: { canonical: `${BASE}/es/ai-robotics/glossary`, languages: { en: `${BASE}/ai-robotics/glossary`, 'zh-CN': `${BASE}/zh/ai-robotics/glossary`, hi: `${BASE}/hi/ai-robotics/glossary`, es: `${BASE}/es/ai-robotics/glossary` } },
+  alternates: { canonical: `${BASE}/es/ai-robotics/glossary`, languages: HREFLANG_AI_GLOSSARY },
 }
 export default function EsGlossary() {
   const ld = { '@context': 'https://schema.org', '@type': 'DefinedTermSet', inLanguage: 'es', name: 'Glosario de IA y robótica',

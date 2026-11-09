@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import InlineSignup from '@/components/InlineSignup'
 import { HI_TOPICS } from '@/lib/ai-robotics-hi'
+import { HREFLANG_AI_HUB } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'AI और रोबोटिक्स: सरल हिंदी गाइड',
   description: 'रोबोट में AI कैसे काम करता है, सरल हिंदी में: विज़न, सीखना, SLAM, पाथ प्लानिंग, भाषा मॉडल और सुरक्षा, असली उदाहरणों के साथ। मुफ़्त।',
-  alternates: { canonical: `${BASE}/hi/ai-robotics`, languages: { en: `${BASE}/ai-robotics`, 'zh-CN': `${BASE}/zh/ai-robotics`, hi: `${BASE}/hi/ai-robotics` } },
+  alternates: { canonical: `${BASE}/hi/ai-robotics`, languages: HREFLANG_AI_HUB },
 }
 const card = { display: 'block', padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none' } as const
 

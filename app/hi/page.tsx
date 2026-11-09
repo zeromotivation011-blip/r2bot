@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { HREFLANG_HOME } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'R2BOT: रोबोटिक्स सीखिए, मुफ़्त और आसान हिंदी में',
   description: 'R2BOT रोबोट और AI को सरल हिंदी में समझाता है। मुफ़्त गाइड, शब्दावली और पाँच शुरुआती कोर्स।',
-  alternates: { canonical: `${BASE}/hi`, languages: { en: `${BASE}/`, 'zh-CN': `${BASE}/zh`, hi: `${BASE}/hi` } },
+  alternates: { canonical: `${BASE}/hi`, languages: HREFLANG_HOME },
 }
 
 export default function HiHome() {

@@ -1,4 +1,4 @@
-import { breadcrumbJsonLD, jsonldScript } from '@/lib/seo/jsonld';
+import { jsonldScript } from '@/lib/seo/jsonld';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -11,6 +11,7 @@ import {
   type AtlasType,
 } from '@/lib/atlas';
 import { getAtlasEntryMerged, getAllAtlasEntriesMerged } from '@/lib/atlas-db';
+import { resolveBucket } from '@/lib/atlas-buckets';
 
 // Content-Manager edits refresh their page on demand (revalidatePath in /api/admin/atlas).
 // The daily timer is only a safety net: a 5-minute timer across ~490 pages burned the
@@ -57,7 +58,8 @@ import { PageViewTracker } from '@/components/PageViewTracker';
 import { PronounceButton } from '@/components/PronounceButton';
 import { SenseThinkActVisual } from '@/components/visuals/SenseThinkActVisual';
 import { PIDSimulator } from '@/components/visuals/PIDSimulator';
-import { LabThread } from '@/components/lab/LabThread';
+import { AtlasDiscussion } from '@/components/atlas/AtlasDiscussion';
+import InlineSignup from '@/components/InlineSignup';
 import { readTime, plainTextFromMd } from '@/lib/reading';
 
 type Params = { type: AtlasType; slug: string };
@@ -185,9 +187,44 @@ export default async function AtlasEntryPage(
 
   const related = getRelatedEntries(entry, 3);
   const allEntries = getAllAtlasEntries();
-  // Build slug→summary map for hover tooltips.
+  const bySlug = new Map(allEntries.map((e) => [e.slug, e]));
+
+  // slug→summary for the hover tooltips on /atlas/* links inside the body.
+  // Only the entries this page actually links to: the body's markdown links,
+  // plus related / seeAlso / prerequisites. The map used to hold all 500+
+  // summaries (~106 KB) on every page, for links that were never there.
+  const linkedSlugs = new Set<string>();
+  for (const m of entry.body.matchAll(/\/atlas\/[a-z-]+\/([a-z0-9-]+)/g)) linkedSlugs.add(m[1]);
+  for (const r of related) linkedSlugs.add(r.slug);
+  for (const s of entry.seeAlso ?? []) linkedSlugs.add(s);
+  for (const s of entry.relatedTerms ?? []) linkedSlugs.add(s);
+  for (const s of entry.prerequisites ?? []) linkedSlugs.add(s);
   const summaries: Record<string, string> = {};
-  for (const e of allEntries) summaries[e.slug] = e.summary;
+  for (const s of linkedSlugs) {
+    const e = bySlug.get(s);
+    if (e?.summary) summaries[s] = e.summary;
+  }
+
+  // Candidate pool for the sticky "Ready for more?" bar: what this concept
+  // unlocks, then the first 30 of its bucket in Atlas order (the bar shows two
+  // unvisited ones). Buckets are resolved through the 20-bucket taxonomy: the
+  // raw `bucket` field is the legacy value "concept" on 382 entries, which made
+  // the "same bucket" fallback mean "any concept". "Surprise me" fetches the
+  // full index on click, so the whole Atlas no longer travels as props.
+  const ownBucket = resolveBucket(entry) ?? undefined;
+  const nextTopicNodes = [
+    ...(entry.unlocksTerms ?? []).map((s) => bySlug.get(s)).filter((e): e is NonNullable<typeof e> => Boolean(e)),
+    ...(ownBucket ? allEntries.filter((e) => e.slug !== slug && resolveBucket(e) === ownBucket).slice(0, 30) : []),
+  ]
+    .filter((e, i, arr) => arr.findIndex((x) => x.slug === e.slug) === i)
+    .map((e) => ({
+      slug: e.slug,
+      type: e.type,
+      title: e.title,
+      bucket: resolveBucket(e) ?? undefined,
+      hookLine: e.hookLine,
+      oneLiner: e.oneLiner,
+    }));
 
   const canonical = `${BASE_URL}/atlas/${type}/${slug}`;
   const plain = plainTextFromMd(entry.body);
@@ -208,26 +245,35 @@ export default async function AtlasEntryPage(
     { label: entry.title },
   ];
 
-  // Schema.org JSON-LD
-  const schema: Record<string, unknown> = {
-    '@context': 'https://schema.org',
-    '@type': type === 'concept' ? 'DefinedTerm' : 'Article',
-    name: entry.title,
-    headline: entry.title,
-    description: entry.summary,
-    ...(entry.lastReviewed ? { dateModified: entry.lastReviewed } : {}),
-    url: canonical,
-    author: authorRef(),
-    publisher: { '@type': 'Organization', name: 'R2BOT' },
-    ...(type === 'concept'
+  // Schema.org JSON-LD. Concepts are a DefinedTerm in the Atlas term set;
+  // every entry is also a TechArticle so the page carries headline, author,
+  // publisher and dateModified where search engines look for them.
+  const schema: Record<string, unknown> | null =
+    type === 'concept'
       ? {
+          '@context': 'https://schema.org',
+          '@type': 'DefinedTerm',
+          name: entry.title,
+          description: entry.summary,
+          url: canonical,
           inDefinedTermSet: {
             '@type': 'DefinedTermSet',
             name: 'R2BOT Robotics Atlas',
             url: `${BASE_URL}/atlas`,
           },
         }
-      : {}),
+      : null;
+
+  const articleSchema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: entry.title,
+    description: entry.summary,
+    ...(entry.lastReviewed ? { dateModified: entry.lastReviewed } : {}),
+    author: authorRef(),
+    publisher: { '@type': 'Organization', name: 'R2BOT', url: BASE_URL },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+    url: canonical,
   };
 
   const faqSchema =
@@ -257,19 +303,16 @@ export default async function AtlasEntryPage(
       <AtlasLinkTooltips targetSelector="#atlas-body" summaries={summaries} />
       <CopyHeadingPlugin targetSelector="#atlas-body" />
 
+      {/* BreadcrumbList JSON-LD comes from <Breadcrumbs> below — one node per page. */}
+      {schema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonldScript(schema) }}
+        />
+      )}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonldScript(schema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: jsonldScript(breadcrumbJsonLD([
-            { name: 'Home', path: '/' },
-            { name: 'Atlas', path: '/atlas' },
-            { name: entry.title, path: `/atlas/${type}/${slug}` },
-          ])),
-        }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(articleSchema) }}
       />
       {faqSchema && (
         <script
@@ -383,7 +426,7 @@ export default async function AtlasEntryPage(
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {entry.prerequisites.map((pSlug) => {
-                  const p = allEntries.find((x) => x.slug === pSlug);
+                  const p = bySlug.get(pSlug);
                   if (!p) return null;
                   return (
                     <a
@@ -459,7 +502,6 @@ export default async function AtlasEntryPage(
           <div style={{ marginBottom: 28 }}>
             <AtlasCompare
               current={{ slug, type, title: entry.title, summary: entry.summary } as AtlasCompareEntry}
-              all={allEntries.map((e) => ({ slug: e.slug, type: e.type, title: e.title, summary: e.summary }))}
               currentBody={entry.body}
             />
           </div>
@@ -524,6 +566,11 @@ export default async function AtlasEntryPage(
               emoji: TRACK_EMOJI[academyLesson.track],
             } : null}
           />
+
+          {/* Email ask after the next step, on the pages search sends people to.
+              Until 9 Nov 2026 the Atlas — the surface most likely to rank — had
+              no capture at all. */}
+          <InlineSignup />
 
           {/* Interactive visualiser for select concepts */}
           {entry.slug === 'sense-think-act-loop' && (
@@ -637,8 +684,8 @@ export default async function AtlasEntryPage(
             </Reveal>
           )}
 
-          {/* Community Lab thread for this entry */}
-          <LabThread contentType="atlas" contentSlug={`${type}/${slug}`} />
+          {/* Community Lab thread — rendered only once it has a post */}
+          <AtlasDiscussion contentSlug={`${type}/${slug}`} />
 
           {/* Report an error */}
           <p style={{ marginTop: 50, fontSize: 13, color: 'var(--muted)', textAlign: 'center' }}>
@@ -663,15 +710,8 @@ export default async function AtlasEntryPage(
       <NextTopicBar
         currentSlug={slug}
         unlocksTerms={entry.unlocksTerms}
-        bucket={entry.bucket}
-        allNodes={allEntries.map((e) => ({
-          slug: e.slug,
-          type: e.type,
-          title: e.title,
-          bucket: e.bucket,
-          hookLine: e.hookLine,
-          oneLiner: e.oneLiner,
-        }))}
+        bucket={ownBucket}
+        allNodes={nextTopicNodes}
       />
 
       <BackToTop />
@@ -754,7 +794,7 @@ function AtlasEnrichmentHero({ entry }: { entry: import('@/lib/atlas').AtlasEntr
           borderRadius: 12, padding: 12,
         }}>
           <p style={{ fontSize: 11, color: '#FF8A4C', fontWeight: 900, letterSpacing: 1, textTransform: 'uppercase' }}>
-            🌍 An example from India
+            🌍 In the real world
           </p>
           <p style={{ fontSize: 14, color: '#FFC9A8', marginTop: 4, lineHeight: 1.5 }}>{indianExample}</p>
         </div>

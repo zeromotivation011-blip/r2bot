@@ -5,6 +5,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import matter from 'gray-matter'
+import { AUTHOR } from '@/lib/author'
 
 export interface BlogPost {
   slug: string
@@ -49,8 +50,12 @@ export function build(slug: string, data: Record<string, unknown>, content: stri
     title: String(data.title ?? slug),
     description: String(data.description ?? ''),
     date: safeISODate(data.date),
-    author: String(data.author ?? 'R2BOT Team'),
-    authorRole: String(data.authorRole ?? "India's Robotics Education Platform"),
+    // One by-line for the whole site (lib/author.ts). Front-matter used to carry
+    // "Founder, R2BOT — science teacher turned robotics builder" next to an
+    // "Editorial" name, which read as a dodge, and a default of "India's
+    // Robotics Education Platform" on a worldwide site.
+    author: AUTHOR.name,
+    authorRole: 'How every page here is written →',
     tags: asStringArray(data.tags),
     readTime: typeof data.readTime === 'number' ? data.readTime : Math.max(2, Math.ceil(content.split(/\s+/).length / 220)),
     coverEmoji: typeof data.coverEmoji === 'string' ? data.coverEmoji : '📝',

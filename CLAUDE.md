@@ -136,11 +136,14 @@ Build these exceptionally; everything else is secondary.
 - **R2 Co-pilot** — the AI mentor and clearest differentiator. Grounded in Atlas (RAG), never hallucinates.
   10 msgs/day signed in, 5/day anonymous (per IP, counted on the service-role client). There is no Pro tier — never add upgrade copy. Context modes are sent as an id from `app/copilot/copilot-modes.ts`; the server never accepts free-text system prompts. Available everywhere (⌘K).
 - **Robot Projects** — 10+ guided builds, full BOM, code (Monaco), simulator fallback.
-- **Simulators (Visualizer)** — 9 interactive tools; visually stunning, shareable/embeddable.
+- **Simulators (Visualizer)** — 10 interactive tools (count them from `SIMULATORS`, never type the number); visually stunning, shareable/embeddable.
 - **Workspace IDE / ROS2 Playground** — serious-robotics showcases; lazy-load heavy libs.
   (3D Simulation is gone: webots.cloud refuses embedding, so `/simulate` 308s to `/visualizer`.)
-- **News** — automated, global. Live RSS from top robotics sources + AI summaries. See §9 — moving to a
-  stored, browsable archive so it's manageable and SEO-indexable.
+- **News** — automated, global. Live RSS from top robotics sources + AI summaries, archived to the
+  `news` table (URLs normalised, tracking params stripped). The per-story pages `/news/<slug>` are
+  **noindex and out of the sitemap** (9 Nov 2026): 835 machine summaries were 47% of the sitemap and
+  the exact footprint of Google's scaled-content policy. `/news` itself is indexable. General-tech
+  feeds are `onlyRobotics`. A story page earns indexing only when it carries original analysis.
 - **Lens** — best robotics videos, auto-ingested from YouTube channel RSS + AI summaries, plus curated picks.
 - **Daily Life** — approachable "robots around you." **Blog** — explainers and comparisons.
 - **Lab** / **Project Showcase** — discussions and community builds. Both are EMPTY (0 posts,
@@ -165,7 +168,7 @@ Nothing parked may be promoted from the homepage — it was advertising `/school
 - **Reference:** Atlas · AI + Robotics · Robots · Robotics in Daily Life · R2 Co-pilot
 - **Build:** Robot Projects · Simulators · ROS 2 Playground · Workspace IDE
 - **Latest:** News · Lens · Blog
-- **About:** About R2BOT · Written by Ravi · Career Paths · Robotics in India · For teachers
+- **About:** About R2BOT · How this is written · Career Paths · Robotics in India · For teachers
 
 Rules: about four items per group, each listed ONCE (Atlas used to appear in two menus), no
 language links in a menu (the header has a switcher), and nothing that leads to an empty page.
@@ -216,7 +219,10 @@ Ordered. Each is a real project; do them completely.
 ## 10. DATA & LEAD CAPTURE
 
 - **One capture path.** Every form goes through `captureLead()` in `lib/lead-capture.ts`:
-  `lead_events` → `leads` → `newsletter_subscribers` → a welcome email within seconds. There used
+  `lead_events` → `leads` → `newsletter_subscribers` → a confirmation email (double opt-in,
+  migration 0052) → on click, the welcome within seconds. Unconfirmed addresses never receive the
+  series or the digest. Rate limits are DB-backed (`lib/rate-limit.ts`, `rate_limit_hit` RPC) with
+  an in-memory fallback until 0052 runs. There used
   to be a second endpoint (`/api/news/subscribe`) used by the homepage that wrote a row and sent
   nothing; it now delegates to the same function. NEVER add a third capture path.
 - **Email only.** No phone number, ever. Every form carries a honeypot field; disposable domains
@@ -270,13 +276,19 @@ comprehensive sitemap to Search Console; own the result for every robotics conce
 - `app/sitemap.ts` has `revalidate` and must never be allowed to freeze into the build. The live
   sitemap had been serving a July view of the site, missing ~300 pages including all 188 Quick
   Lesson URLs. Verify after any deploy: `curl -s https://www.r2bot.in/sitemap.xml | grep -c "<loc>"`.
+- **hreflang is reciprocal or it is nothing.** Every localised route builds its `languages` from
+  `lib/hreflang.ts` (`HREFLANG_*` constants, `aiTopicHreflang`, `lessonLanguages`), which always
+  includes every sibling and `x-default`. Never hand-write a `languages:` map.
+- **Reference hubs that exist:** `/glossary` (A–Z, every concept, plain `<a>` links by design),
+  `/learn/ros2-cheatsheet`, `/compare` + `/compare/<slug>` (data in `lib/compare/index.ts`).
 - **Honest `lastmod`.** Dates come from the content or from `lib/content-dates.ts`. Update that
   file in the same commit as a page change. Never `new Date()` for a static page.
 - **One page per query**, recorded in `lib/canonical-map.ts`: Atlas owns "what is X", Quick Lessons
   own "how does X work", `/robots/<slug>` owns a named robot, the blog owns "X vs Y". Anything else
   redirects or is differentiated and cross-linked.
 - **Never advertise what you noindex.** A course or lesson with no video is both.
-- **A named human author** on everything, from `lib/author.ts`. Not the organisation.
+- **One by-line** on everything, from `lib/author.ts` (currently the editorial identity; the
+  owner's personal name must not appear anywhere public, including Co-pilot prompts).
 - A page with no inbound internal link is invisible. `getRelatedEntries` balances the link graph
   and rescues orphans; keep it that way if you touch it.
 - **One table, one schema.** `atlas_entries` is written by two things — `scripts/seed-atlas.ts`

@@ -23,6 +23,34 @@ type Stream = keyof typeof BUDGET
 
 type Result = { welcome: number; nudges: number; certs: number; weekly: number; errors: string[] }
 
+type SubscriberRow = { email: string; subscribed_at: string; unsubscribe_token: string | null }
+
+/**
+ * Active subscribers who have confirmed their address (double opt-in, migration
+ * 0052). Before that migration the `confirmed_at` column does not exist; the
+ * query is retried without it and everyone active counts as confirmed, which
+ * is exactly the old behaviour.
+ */
+async function confirmedSubscribers(
+  sb: ReturnType<typeof createSupabaseAdminClient>, sinceIso?: string,
+): Promise<SubscriberRow[]> {
+  let q = sb.from('newsletter_subscribers')
+    .select('email, subscribed_at, unsubscribe_token, confirmed_at').eq('active', true)
+  if (sinceIso) q = q.gte('subscribed_at', sinceIso)
+  const { data, error } = await q
+  if (!error) {
+    return (data ?? [])
+      .filter((r) => r.confirmed_at != null)
+      .map((r) => ({ email: String(r.email), subscribed_at: String(r.subscribed_at), unsubscribe_token: r.unsubscribe_token == null ? null : String(r.unsubscribe_token) }))
+  }
+  if (error.code !== '42703') throw new Error(error.message)
+  let legacy = sb.from('newsletter_subscribers').select('email, subscribed_at, unsubscribe_token').eq('active', true)
+  if (sinceIso) legacy = legacy.gte('subscribed_at', sinceIso)
+  const { data: rows, error: legacyErr } = await legacy
+  if (legacyErr) throw new Error(legacyErr.message)
+  return (rows ?? []).map((r) => ({ email: String(r.email), subscribed_at: String(r.subscribed_at), unsubscribe_token: r.unsubscribe_token == null ? null : String(r.unsubscribe_token) }))
+}
+
 export async function runEmailAutomation(): Promise<Result> {
   const out: Result = { welcome: 0, nudges: 0, certs: 0, weekly: 0, errors: [] }
   const apiKey = process.env.RESEND_API_KEY
@@ -56,11 +84,9 @@ export async function runEmailAutomation(): Promise<Result> {
 
   // ── 1. Welcome series for newsletter subscribers ───────────────────────
   try {
-    const { data: subs } = await sb.from('newsletter_subscribers')
-      .select('email, subscribed_at, unsubscribe_token').eq('active', true)
-      .gte('subscribed_at', new Date(Date.now() - 8 * DAY).toISOString())
-    for (const s of subs ?? []) {
-      const age = (Date.now() - new Date(s.subscribed_at as string).getTime()) / DAY
+    const subs = await confirmedSubscribers(sb, new Date(Date.now() - 8 * DAY).toISOString())
+    for (const s of subs) {
+      const age = (Date.now() - new Date(s.subscribed_at).getTime()) / DAY
       const unsub = `${BASE_URL}/api/unsubscribe?token=${encodeURIComponent(String(s.unsubscribe_token ?? ''))}`
       const email = String(s.email)
       if (age >= 2) {
@@ -179,8 +205,8 @@ export async function runEmailAutomation(): Promise<Result> {
       const termHtml = term ? `<h3 style="margin:18px 0 6px">Term of the week</h3><p style="margin:0 0 6px"><a href="${BASE_URL}/atlas/${esc(term.type)}/${esc(term.slug)}" style="color:#0B2540;font-weight:700">${esc(term.title)}</a> explained in plain English.</p>` : ''
       const lesson = SHORTS[week % liveShorts().length]
       const lessonHtml = `<h3 style="margin:18px 0 6px">One-minute lesson</h3><p style="margin:0 0 6px"><a href="${BASE_URL}/shorts/${esc(lesson.slug)}" style="color:#0B2540;font-weight:700">${esc(lesson.title)}</a><br>${esc(lesson.summary)} Watch it, play with the demo, answer one question.</p>`
-      const { data: subs } = await sb.from('newsletter_subscribers').select('email, unsubscribe_token').eq('active', true)
-      for (const sub of subs ?? []) {
+      const subs = await confirmedSubscribers(sb)
+      for (const sub of subs) {
         const unsub = `${BASE_URL}/api/unsubscribe?token=${encodeURIComponent(String(sub.unsubscribe_token ?? ''))}`
         const html = renderEmail({
           preheader: 'Robotics this week, in plain English.',

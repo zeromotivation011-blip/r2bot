@@ -33,6 +33,9 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
     heading: 'Reference',
     links: [
       { label: 'Atlas', href: '/atlas' },
+      { label: 'Glossary A–Z', href: '/glossary' },
+      { label: 'ROS 2 cheat sheet', href: '/learn/ros2-cheatsheet' },
+      { label: 'Compare', href: '/compare' },
       { label: 'AI + Robotics', href: '/ai-robotics' },
       { label: 'Robots', href: '/robots' },
       { label: 'Simulators', href: '/visualizer' },
@@ -54,7 +57,6 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
     links: [
       { label: 'The Lab', href: '/lab' },
       { label: 'Project showcase', href: '/showcase' },
-      { label: 'Robotics in India', href: '/india' },
       { label: 'For teachers', href: '/teachers' },
       { label: 'Sources we cite', href: '/sources' },
     ],

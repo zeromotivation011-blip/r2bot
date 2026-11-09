@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import InlineSignup from '@/components/InlineSignup'
 
 interface BlogPostLite {
   slug: string
@@ -156,9 +157,12 @@ export default function BlogPostClient({ post, related, url }: { post: BlogPostF
             <div className="mt-6 rounded-2xl border border-blue-500/30 bg-blue-500/5 p-5">
               <p className="text-xs uppercase tracking-widest font-black text-blue-300">Learn deeper</p>
               <p className="mt-2 text-lg font-bold text-white">Master every concept mentioned in this article — for free.</p>
-              <p className="mt-1 text-sm text-zinc-300">R2BOT's Atlas has 480+ robotics concepts explained in simple language, with sources.</p>
+              <p className="mt-1 text-sm text-zinc-300">R2BOT's Atlas has 500+ robotics concepts explained in simple language, with sources.</p>
               <Link href="/atlas" className="mt-3 inline-block rounded-xl bg-blue-500 text-white px-4 py-2 text-sm font-bold">Explore R2BOT Atlas →</Link>
             </div>
+
+            {/* The ask comes after the reading, not before it. */}
+            <InlineSignup />
 
             {/* Related */}
             {related.length > 0 && (

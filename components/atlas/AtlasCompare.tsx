@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useAtlasIndex } from '@/components/atlas/useAtlasIndex';
 
 export type AtlasCompareEntry = {
   slug: string;
@@ -12,16 +13,23 @@ export type AtlasCompareEntry = {
 
 export function AtlasCompare({
   current,
-  all,
+  all: allProp,
   currentBody,
 }: {
   current: AtlasCompareEntry;
-  all: AtlasCompareEntry[];
+  /** Optional preloaded list. When omitted the full index is fetched on open. */
+  all?: AtlasCompareEntry[];
   currentBody: string;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [pickedSlug, setPickedSlug] = useState<string | null>(null);
+
+  // The picker used to receive all 500+ entries as a prop on every Atlas page
+  // (~140 KB of HTML for a button almost nobody presses). Now the index loads
+  // the first time the panel opens.
+  const { items: fetched, loading } = useAtlasIndex(open && !allProp);
+  const all: AtlasCompareEntry[] = useMemo(() => allProp ?? fetched ?? [], [allProp, fetched]);
 
   const candidates = useMemo(() => {
     const q = query.toLowerCase().trim();
@@ -74,7 +82,7 @@ export function AtlasCompare({
           />
           <ul className="mt-3 max-h-72 overflow-y-auto rounded-xl border border-white/10 bg-[#0a0f1e]">
             {candidates.length === 0 ? (
-              <li className="px-4 py-3 text-sm text-zinc-400">No matches.</li>
+              <li className="px-4 py-3 text-sm text-zinc-400">{loading ? 'Loading terms…' : 'No matches.'}</li>
             ) : (
               candidates.map((c) => (
                 <li key={`${c.type}/${c.slug}`}>

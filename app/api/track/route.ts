@@ -2,12 +2,19 @@
 // Also tallies referrer source (first page of a visit), country and device class.
 import type { NextRequest } from 'next/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/server'
+import { clientIp, isRateLimited } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const BOT = /bot|crawl|spider|slurp|preview|headless|lighthouse|facebookexternalhit|monitor|curl|wget/i
-const OK_PATH = /^\/[A-Za-z0-9\-_/.]{0,180}$/
+// Lower-case internal route only: every public route on the site is lower-case,
+// and anything else is either noise or an attempt to fill the metrics table.
+const OK_PATH = /^\/[a-z0-9\-/_.]*$/
+const PATH_MAX = 180
+// The only funnel milestones the client may count. Everything else is dropped
+// silently; server-side events (lead:*) never pass through this route.
+const EVENTS = new Set(['lesson_quiz_correct', 'course_lesson_open'])
 const OWN = /(^|\.)r2bot\.in$/i
 
 function refSource(raw: string): string {
@@ -34,6 +41,9 @@ function refSource(raw: string): string {
 export async function POST(req: NextRequest) {
   const ua = req.headers.get('user-agent') ?? ''
   if (BOT.test(ua)) return new Response(null, { status: 204 })
+  if (await isRateLimited({ scope: 'track:ip', subject: clientIp(req.headers), windowSeconds: 60, max: 120 })) {
+    return new Response(null, { status: 204 })
+  }
   let path = '', referrer = '', visit = '', event = ''
   try {
     const b = await req.json()
@@ -43,11 +53,14 @@ export async function POST(req: NextRequest) {
     // identifier is sent or stored — see migration 0048.
     visit = b?.visit === 'new' || b?.visit === 'returning' ? String(b.visit) : ''
     // A named funnel milestone, e.g. 'lesson_quiz_correct'.
-    event = typeof b?.event === 'string' ? b.event.slice(0, 60) : ''
+    event = typeof b?.event === 'string' && EVENTS.has(b.event) ? b.event : ''
   } catch { return new Response(null, { status: 400 }) }
   path = path.split('?')[0].split('#')[0]
   if (path.length > 1) path = path.replace(/\/+$/, '')
-  if (!OK_PATH.test(path) || path.startsWith('/admin') || path.startsWith('/api') || path.startsWith('/_next')) {
+  if (
+    path.length > PATH_MAX || !OK_PATH.test(path) || path.includes('//') ||
+    path.startsWith('/admin') || path.startsWith('/api') || path.startsWith('/_next')
+  ) {
     return new Response(null, { status: 204 })
   }
   const country = (req.headers.get('x-vercel-ip-country') ?? '').toUpperCase().slice(0, 2)

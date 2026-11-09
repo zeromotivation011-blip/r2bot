@@ -65,7 +65,7 @@ export default function BlogIndexClient({ posts, tags }: { posts: PostLite[]; ta
         <p className="text-xs uppercase tracking-[3px] font-black text-blue-400">R2BOT Blog</p>
         <h1 className="mt-3 text-4xl md:text-6xl font-black">Guides, tutorials &amp; <span style={{ background: 'linear-gradient(90deg,#3b82f6,#f97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>insights</span>.</h1>
         <p className="mt-4 text-lg text-zinc-300 max-w-2xl mx-auto">
-          For India's next generation of robotics engineers. Free, ad-free, and as practical as we can make it.
+          Explainers and comparisons for anyone getting into robotics, anywhere. Free, ad-free, and as practical as we can make it.
         </p>
         <div className="mt-7 max-w-md mx-auto">
           <input

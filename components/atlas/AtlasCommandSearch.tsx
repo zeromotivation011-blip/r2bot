@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Fuse from 'fuse.js'
+import { useAtlasIndex } from '@/components/atlas/useAtlasIndex'
 
 export interface CommandSearchNode {
   slug: string
@@ -30,6 +31,12 @@ interface AtlasCommandSearchProps {
   nodes: CommandSearchNode[]
   buckets?: { id: string; label: string; emoji?: string }[]
   showTrigger?: boolean
+  /**
+   * Fetch /api/atlas/index when the palette opens and merge each entry's
+   * one-line summary into `nodes` for full-text matching. Lets the caller
+   * ship titles only and still search the summaries.
+   */
+  lazyIndex?: boolean
 }
 
 const STORAGE_KEY = 'r2bot_atlas_command_recent'
@@ -57,9 +64,15 @@ export function openAtlasCommandSearch() {
   }
 }
 
-export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: AtlasCommandSearchProps) {
+export function AtlasCommandSearch({ nodes: baseNodes, buckets = [], showTrigger = true, lazyIndex = false }: AtlasCommandSearchProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const { items: index } = useAtlasIndex(lazyIndex && open)
+  const nodes = useMemo<CommandSearchNode[]>(() => {
+    if (!index || index.length === 0) return baseNodes
+    const summaries = new Map(index.map(i => [i.slug, i.summary]))
+    return baseNodes.map(n => (n.summary || !summaries.has(n.slug) ? n : { ...n, summary: summaries.get(n.slug) }))
+  }, [baseNodes, index])
   const [query, setQuery] = useState('')
   const [bucketFilter, setBucketFilter] = useState<string | null>(null)
   const [difficultyMax, setDifficultyMax] = useState(5)
@@ -110,6 +123,7 @@ export function AtlasCommandSearch({ nodes, buckets = [], showTrigger = true }: 
           { name: 'tagline', weight: 3 },
           { name: 'hookLine', weight: 3 },
           { name: 'oneLiner', weight: 2 },
+          { name: 'summary', weight: 1 },
           { name: 'laymanExplanation', weight: 1 },
           { name: 'indianExample', weight: 1 },
           { name: 'tags', weight: 1 },

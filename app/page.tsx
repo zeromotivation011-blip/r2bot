@@ -12,6 +12,7 @@ import { getNewsData } from '@/lib/news'
 import { getLiveLensVideos } from '@/lib/lens-live'
 import { getAllLens } from '@/lib/lens'
 import { jsonldScript } from '@/lib/seo/jsonld'
+import { HREFLANG_HOME } from '@/lib/hreflang'
 
 export const runtime = 'nodejs'
 export const revalidate = 3600
@@ -19,9 +20,9 @@ export const revalidate = 3600
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
 export const metadata: Metadata = {
-  title: "R2BOT — From Zero to Robotics Engineer | Learn, Build, Explore",
+  title: 'R2BOT — The clearest way to learn robotics, free',
   description:
-    'From zero to robotics engineer. Learn ROS2, build real robots, and explore 500+ concepts with an AI mentor. Free, in plain English, with interactive demos and five video courses.',
+    'Robotics in plain English: 500+ concepts explained from first principles, one-minute video lessons, five free courses and simulators in your browser.',
   keywords: [
     'learn robotics',
     'ROS2 tutorial beginner',
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
     'learn robotics online free',
     'robotics explained',
   ],
-  alternates: { canonical: SITE_URL, languages: { en: SITE_URL, 'zh-CN': `${SITE_URL}/zh`, hi: `${SITE_URL}/hi`, es: `${SITE_URL}/es` } },
+  alternates: { canonical: SITE_URL, languages: HREFLANG_HOME },
   openGraph: {
     type: 'website',
     url: SITE_URL,

@@ -13,6 +13,7 @@ export default function CourseWaitlist({ courseSlug, courseTitle }: { courseSlug
   const [email, setEmail] = useState('')
   const [trap, setTrap] = useState('')
   const [state, setState] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle')
+  const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function submit(e: React.FormEvent) {
@@ -31,12 +32,13 @@ export default function CourseWaitlist({ courseSlug, courseTitle }: { courseSlug
           honeypot: trap,
         }),
       })
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; pending?: boolean }
       if (!res.ok || !data.ok) {
         setError(data.error || 'Something went wrong. Please try again.')
         setState('err')
         return
       }
+      setPending(data.pending === true)
       setState('ok')
     } catch {
       setError('Network error. Please try again.')
@@ -55,7 +57,9 @@ export default function CourseWaitlist({ courseSlug, courseTitle }: { courseSlug
 
       {state === 'ok' ? (
         <p className="mt-4 font-bold text-green-400">
-          Done. You will get one email the day this course opens.
+          {pending
+            ? 'Almost done. Check your inbox and click the confirmation link — then you will hear from me the day this course opens.'
+            : 'Done. You will get one email the day this course opens.'}
         </p>
       ) : (
         <form onSubmit={submit} className="mt-4 flex flex-wrap gap-2">

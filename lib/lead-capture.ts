@@ -17,9 +17,13 @@
 //   2. public.leads — one row per person (unique on lower(email)). A returning
 //      person is enriched, never discarded.
 //   3. public.newsletter_subscribers — the send list.
-// Then, and only for a person we have never seen: a welcome email, immediately.
+// Then an email, immediately: a short "confirm your address" message for a
+// new subscriber (double opt-in, migration 0052), or the welcome once they have
+// confirmed. Nobody is put on the send list by a third party typing their
+// address into a form.
 
 import { BASE_URL, button, renderEmail } from '@/lib/email-layout'
+import { isRateLimited } from '@/lib/rate-limit'
 import { createSupabaseAdminClient, createSupabaseServerClient } from '@/lib/supabase/server'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -52,23 +56,31 @@ const DISPOSABLE = new Set([
 ])
 
 // ── Rate limiting ──────────────────────────────────────────────────────────
-// In-memory, therefore per-instance: a speed bump against casual form spam,
-// not a WAF. Combined with the honeypot below it stops scripted submissions.
-const RATE_LIMIT = 5
-const RATE_WINDOW_MS = 60_000
-const hits = new Map<string, number[]>()
+// Shared Postgres counter (lib/rate-limit.ts), falling back to in-memory until
+// migration 0052 has run. Per IP and per address, so a script cannot sign one
+// victim up over and over from many addresses either.
+const IP_RULE = { scope: 'leads:ip', windowSeconds: 3600, max: 5 }
+const EMAIL_RULE = { scope: 'leads:email', windowSeconds: 86_400, max: 3 }
 
-function rateLimited(ip: string): boolean {
-  const now = Date.now()
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < RATE_WINDOW_MS)
-  recent.push(now)
-  hits.set(ip, recent)
-  if (hits.size > 5_000) {
-    for (const [key, times] of hits) {
-      if (times.every((t) => now - t >= RATE_WINDOW_MS)) hits.delete(key)
-    }
+/** Keep `meta` small: at most 10 keys and 2 KB serialised. */
+const META_MAX_KEYS = 10
+const META_MAX_BYTES = 2048
+
+function capMeta(input: unknown): Record<string, unknown> {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return {}
+  const out: Record<string, unknown> = {}
+  let size = 2
+  for (const [k, v] of Object.entries(input as Record<string, unknown>).slice(0, META_MAX_KEYS)) {
+    if (k.length > 40) continue
+    let val: unknown = v
+    if (typeof val === 'string' && val.length > 500) val = val.slice(0, 500)
+    let piece = ''
+    try { piece = JSON.stringify({ [k]: val }) ?? '' } catch { continue }
+    if (size + piece.length > META_MAX_BYTES) break
+    size += piece.length
+    out[k] = val
   }
-  return recent.length > RATE_LIMIT
+  return out
 }
 
 export interface CaptureInput {
@@ -91,6 +103,8 @@ export interface CaptureResult {
   error?: string
   /** True when this address had never been captured before. */
   isNew?: boolean
+  /** True when a confirmation email was sent instead of the welcome. */
+  pendingConfirmation?: boolean
 }
 
 /** First name only, for the greeting. Empty string when we have no name. */
@@ -99,7 +113,7 @@ function firstName(name: string): string {
 }
 
 // ── Welcome email — sent within seconds, never blocks the capture ──────────
-async function sendWelcome(email: string, source: string, name: string): Promise<void> {
+export async function sendWelcome(email: string, source: string, name: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.RESEND_FROM_EMAIL
   if (!apiKey || !from) return
@@ -148,27 +162,83 @@ async function sendWelcome(email: string, source: string, name: string): Promise
   }
 }
 
+// ── Confirmation email — double opt-in ─────────────────────────────────────
+// Deliberately plain and short: one sentence, one button. It carries no
+// user-supplied text, so there is nothing for a third party to make us say.
+async function sendConfirmation(email: string, token: string): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY
+  const from = process.env.RESEND_FROM_EMAIL
+  if (!apiKey || !from || !token) return false
+  const confirmUrl = `${BASE_URL}/api/confirm?token=${encodeURIComponent(token)}`
+  try {
+    const html = renderEmail({
+      preheader: 'One click and you are in.',
+      heading: 'Confirm your email',
+      bodyHtml: `<p>Someone — hopefully you — asked for R2BOT's free robotics emails at this address. Click once to confirm; if it was not you, ignore this and nothing more will be sent.</p>
+        ${button('Confirm my email', confirmUrl)}
+        <p style="font-size:13px;color:#64748b">The button not working? Copy this link: <a href="${confirmUrl}" style="color:#64748b">${confirmUrl}</a></p>`,
+      unsubscribeUrl: `${BASE_URL}/api/unsubscribe?token=${encodeURIComponent(token)}`,
+    })
+    const { Resend } = await import('resend')
+    const { error } = await new Resend(apiKey).emails.send({
+      from, to: email, html, subject: 'Confirm your email | R2BOT',
+    })
+    return !error
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Subscriber state after the insert. `confirmed` is true pre-migration (no
+ * column), when we cannot read the row (anon client), and when confirmed_at is
+ * set — in every one of those cases the old behaviour (welcome at once) is right.
+ */
+async function subscriberState(
+  sb: ReturnType<typeof createSupabaseAdminClient>, email: string,
+): Promise<{ confirmed: boolean; token: string }> {
+  try {
+    const { data, error } = await sb
+      .from('newsletter_subscribers')
+      .select('confirmed_at, unsubscribe_token')
+      .eq('email', email)
+      .maybeSingle()
+    if (error) {
+      // 42703: column does not exist — migration 0052 not applied yet.
+      return { confirmed: true, token: '' }
+    }
+    if (!data) return { confirmed: true, token: '' }
+    const row = data as { confirmed_at?: string | null; unsubscribe_token?: string | null }
+    return { confirmed: row.confirmed_at != null, token: String(row.unsubscribe_token ?? '') }
+  } catch {
+    return { confirmed: true, token: '' }
+  }
+}
+
 export async function captureLead(input: CaptureInput): Promise<CaptureResult> {
   // A filled honeypot is a bot. Answer 200 so it learns nothing, write nothing.
   if ((input.honeypot ?? '').trim() !== '') return { ok: true, status: 200, isNew: false }
 
-  if (rateLimited(input.ip || 'unknown')) {
-    return { ok: false, status: 429, error: 'Too many requests. Please try again in a minute.' }
+  if (await isRateLimited({ ...IP_RULE, subject: input.ip || 'unknown' })) {
+    return { ok: false, status: 429, error: 'Too many requests. Please try again later.' }
   }
 
   const email = (input.email || '').trim().toLowerCase()
-  const name = (input.name || '').trim()
+  const name = (input.name || '').trim().slice(0, 80)
   if (!email || email.length > 254 || !EMAIL_RE.test(email)) {
     return { ok: false, status: 400, error: 'Please enter a valid email.' }
   }
   if (DISPOSABLE.has(email.split('@')[1] ?? '')) {
     return { ok: false, status: 400, error: 'Please use an email address you actually read.' }
   }
+  if (await isRateLimited({ ...EMAIL_RULE, subject: email })) {
+    return { ok: false, status: 429, error: 'This address has been submitted too often today. Check your inbox.' }
+  }
 
   const source = KNOWN.has(input.source || '') ? (input.source as string) : 'popup'
   const page = input.page || null
   const userAgent = input.userAgent || null
-  const meta = (input.meta && typeof input.meta === 'object' ? { ...input.meta } : {}) as Record<string, unknown>
+  const meta = capMeta(input.meta)
   const refMatch = (input.cookie || '').match(/(?:^|;\s*)r2ref=([A-Za-z0-9]{4,16})/)
   if (refMatch) meta.ref = refMatch[1]
 
@@ -220,6 +290,22 @@ export async function captureLead(input: CaptureInput): Promise<CaptureResult> {
     .insert({ email, source })
     .then(() => undefined, () => undefined)
 
+  // Double opt-in (migration 0052). A subscriber who has not clicked the
+  // confirmation link gets that link — never the welcome, never the digest.
+  // Before the migration, or without the service role, `confirmed` is true and
+  // the welcome goes out as before.
+  const state = hasServiceRole
+    ? await subscriberState(supabase as ReturnType<typeof createSupabaseAdminClient>, email)
+    : { confirmed: true, token: '' }
+
+  if (!state.confirmed) {
+    // At most one confirmation email per address per day, however many forms
+    // are submitted — a stranger cannot use us to pester someone.
+    const throttled = await isRateLimited({ scope: 'leads:confirm', subject: email, windowSeconds: 86_400, max: 1 })
+    if (!throttled) await sendConfirmation(email, state.token)
+    return { ok: true, status: 200, isNew, pendingConfirmation: true }
+  }
+
   // Record that the welcome has gone out, so the daily automation never sends a
   // second one. Best-effort: if email_log is missing we would rather send twice
   // than not at all.
@@ -232,6 +318,42 @@ export async function captureLead(input: CaptureInput): Promise<CaptureResult> {
   }
 
   return { ok: true, status: 200, isNew }
+}
+
+/**
+ * Called by /api/confirm when the link is clicked. Marks the subscriber
+ * confirmed (and active again, if they had unsubscribed), then sends the
+ * welcome once. Returns what happened so the page can say the right thing.
+ */
+export async function confirmSubscriber(
+  token: string,
+): Promise<'confirmed' | 'already' | 'unknown' | 'unavailable'> {
+  if (!token || token.length > 80 || !process.env.SUPABASE_SERVICE_ROLE_KEY) return 'unavailable'
+  const sb = createSupabaseAdminClient()
+  const { data, error } = await sb
+    .from('newsletter_subscribers')
+    .update({ confirmed_at: new Date().toISOString(), active: true, unsubscribed_at: null })
+    .eq('unsubscribe_token', token)
+    .is('confirmed_at', null)
+    .select('email, source')
+    .maybeSingle()
+  if (error) {
+    // 42703: migration not applied; everyone is implicitly confirmed.
+    return error.code === '42703' ? 'already' : 'unavailable'
+  }
+  if (!data) {
+    const { data: existing } = await sb
+      .from('newsletter_subscribers').select('email').eq('unsubscribe_token', token).maybeSingle()
+    return existing ? 'already' : 'unknown'
+  }
+  const email = String(data.email)
+  const source = String(data.source ?? 'newsletter')
+  const { data: lead } = await sb.from('leads').select('name').eq('email', email).maybeSingle()
+  const { error: logErr } = await sb.from('email_log').insert({ email, kind: 'welcome-0' })
+  // email_log (email, kind) is unique: if the insert fails the welcome has
+  // already gone out, so do not send it twice.
+  if (!logErr) await sendWelcome(email, source, String(lead?.name ?? ''))
+  return 'confirmed'
 }
 
 /** Best-effort client IP, for the rate limiter only. Never stored. */

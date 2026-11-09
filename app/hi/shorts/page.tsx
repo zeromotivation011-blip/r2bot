@@ -4,13 +4,14 @@ import { SHORTS, SHORT_COURSES, shortsInCourse, liveShorts } from '@/lib/shorts'
 import { SHORTS_HI } from '@/lib/shorts-hi'
 import { ProgressBar, Tick } from '@/components/shorts/ShortsClient'
 import InlineSignup from '@/components/InlineSignup'
+import { HREFLANG_SHORTS } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'एक मिनट में रोबोटिक्स: क्विक लेसन',
   description: 'मुफ़्त एक-मिनट के रोबोटिक्स पाठ: वीडियो, एनिमेटेड डेमो और एक छोटा सवाल। सेंसर, मोटर, कंट्रोल, हाथ और काम करते रोबोट, आसान हिंदी में।',
-  alternates: { canonical: `${BASE}/hi/shorts`, languages: { en: `${BASE}/shorts`, 'zh-CN': `${BASE}/zh/shorts`, hi: `${BASE}/hi/shorts`, es: `${BASE}/es/shorts` } },
+  alternates: { canonical: `${BASE}/hi/shorts`, languages: HREFLANG_SHORTS },
 }
 const ZH_COURSE: Record<string, { t: string; b: string }> = {
   senses: { t: 'रोबोट कैसे महसूस करते हैं', b: 'आवाज़, दृष्टि, सुनना और संतुलन का एहसास।' },

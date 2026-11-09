@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import InlineSignup from '@/components/InlineSignup'
 import { ES_TOPICS } from '@/lib/ai-robotics-es'
+import { HREFLANG_AI_HUB } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'IA y robótica: guías en español sencillo',
   description: 'Cómo funciona la IA en los robots, en español sencillo: visión, aprendizaje, SLAM, planificación de rutas, modelos de lenguaje y seguridad, con ejemplos reales. Gratis.',
-  alternates: { canonical: `${BASE}/es/ai-robotics`, languages: { en: `${BASE}/ai-robotics`, 'zh-CN': `${BASE}/zh/ai-robotics`, hi: `${BASE}/hi/ai-robotics`, es: `${BASE}/es/ai-robotics` } },
+  alternates: { canonical: `${BASE}/es/ai-robotics`, languages: HREFLANG_AI_HUB },
 }
 const card = { display: 'block', padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none' } as const
 

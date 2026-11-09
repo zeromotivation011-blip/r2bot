@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { breadcrumbJsonLD, jsonldScript } from '@/lib/seo/jsonld';
 import { getAcademyLesson, getLessonsForTrack } from '@/lib/academy';
 import { AcademyLessonView } from '@/components/AcademyLessonView';
 
@@ -45,20 +44,7 @@ export default async function DynamicAcademyLessonPage({ params }: { params: Par
   if (!VALID_TRACKS.includes(track as ValidTrack)) notFound();
   const lesson = getAcademyLesson(track as ValidTrack, slug);
   if (!lesson) notFound();
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: jsonldScript(breadcrumbJsonLD([
-            { name: 'Home', path: '/' },
-            { name: 'Academy', path: '/academy' },
-            { name: track.charAt(0).toUpperCase() + track.slice(1), path: `/academy/${track}` },
-            { name: lesson.title, path: `/academy/${track}/${slug}` },
-          ])),
-        }}
-      />
-      <AcademyLessonView lesson={lesson} />
-    </>
-  );
+  // BreadcrumbList JSON-LD is emitted once, by <Breadcrumbs> inside the
+  // lesson header; an inline copy here doubled it on every lesson.
+  return <AcademyLessonView lesson={lesson} />;
 }

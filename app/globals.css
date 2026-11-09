@@ -1339,3 +1339,30 @@ a.r2-card:hover, .r2-card--interactive:hover {
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
+
+/* Reveal-on-scroll (components/Reveal.tsx). Content is visible as served;
+   only a JS-capable browser (html.js, set inline in the root layout before
+   paint) hides it until the observer marks it shown. */
+.r2-reveal {
+  transition:
+    opacity 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--r2-reveal-delay, 0ms),
+    transform 800ms cubic-bezier(0.16, 1, 0.3, 1) var(--r2-reveal-delay, 0ms);
+}
+html.js .r2-reveal:not(.is-shown) {
+  opacity: 0;
+  transform: var(--r2-reveal-from, translate3d(0, 16px, 0));
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .r2-reveal:not(.is-shown) { opacity: 1; transform: none; }
+  .r2-reveal { transition: none; }
+}
+
+/* /glossary — styles for the server-rendered A–Z list (app/glossary/page.tsx). */
+.r2-glossary section { margin-bottom: 2.5rem; scroll-margin-top: 8rem; }
+.r2-glossary h2 { margin: 0 0 .75rem; padding-bottom: .5rem; border-bottom: 1px solid rgba(255,255,255,.1); font-size: 1.5rem; font-weight: 900; color: #fff; }
+.r2-glossary dl { display: grid; gap: .75rem 2rem; }
+@media (min-width: 768px) { .r2-glossary dl { grid-template-columns: 1fr 1fr; } }
+.r2-glossary dt { font-weight: 600; }
+.r2-glossary dt a { color: #fcd34d; }
+.r2-glossary dt a:hover { text-decoration: underline; }
+.r2-glossary dd { margin: .125rem 0 0; font-size: .875rem; line-height: 1.35; color: #9ca3af; }

@@ -40,34 +40,6 @@ const appJsonLd = {
   isAccessibleForFree: true,
 }
 
-const faqJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
-    { '@type': 'Question', name: 'What is a sensor in robotics?',
-      acceptedAnswer: { '@type': 'Answer',
-        text: 'A sensor is a robot\'s sense organ — it converts a physical signal (light, sound, distance) into an electrical signal a robot brain can read. Cameras, ultrasonics and LIDAR are common sensor types.' } },
-    { '@type': 'Question', name: 'What is an actuator?',
-      acceptedAnswer: { '@type': 'Answer',
-        text: 'An actuator is what makes a robot move. Motors, servos and pistons are all actuators — they convert electricity (or fluid pressure) into mechanical motion.' } },
-    { '@type': 'Question', name: 'What does SLAM mean in robotics?',
-      acceptedAnswer: { '@type': 'Answer',
-        text: 'SLAM stands for Simultaneous Localization and Mapping. It is how a robot builds a map of its environment while figuring out where it is on that map at the same time — essential for self-driving cars and household robots.' } },
-    { '@type': 'Question', name: 'What is PID control?',
-      acceptedAnswer: { '@type': 'Answer',
-        text: 'PID — Proportional, Integral, Derivative — is a feedback control algorithm. It tells a motor exactly how much to push toward a target, smoothly, without overshooting. It is in almost every drone, balancing robot and temperature controller.' } },
-    { '@type': 'Question', name: 'Why is Python so popular in robotics?',
-      acceptedAnswer: { '@type': 'Answer',
-        text: 'Python reads almost like English, has massive libraries for computer vision and AI, and is the default scripting layer of ROS (Robot Operating System) — the framework most modern robots run on.' } },
-    { '@type': 'Question', name: 'Which country has the most robots per worker?',
-      acceptedAnswer: { '@type': 'Answer',
-        text: 'South Korea leads with 1,012 robots per 10,000 workers (IFR 2023), followed by Singapore (770), China (470), Germany (429) and Japan (419). Explore the full World Map tab inside the Atlas for all 50 countries.' } },
-    { '@type': 'Question', name: "What is India's robot density?",
-      acceptedAnswer: { '@type': 'Answer',
-        text: 'India has 4 robots per 10,000 workers as of IFR 2023 — but is growing at +59% per year, the fastest rate among major economies.' } },
-  ],
-}
-
 const datasetJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Dataset',
@@ -105,35 +77,33 @@ const datasetJsonLd = {
 export default async function AtlasIndex() {
   const all = await getAllAtlasEntriesMerged()
 
+  // Only what the hub renders before anyone clicks: identity, bucket,
+  // difficulty, the prerequisite graph (Galaxy view) and the few one-liners
+  // that exist. The full enrichment (plain explanation, analogy, quiz…) was
+  // inlined for all 500+ entries — a ~780 KB script on an 880 KB page — and
+  // now loads per entry from /api/atlas/entry when a drawer opens; search and
+  // summaries come from /api/atlas/index on first interaction.
   const nodes: AtlasNode[] = all.map(e => {
     const b = resolveBucket(e)
     const bucket = ATLAS_BUCKETS.find(x => x.slug === b) || ATLAS_BUCKETS[0]
-    return {
+    const node: AtlasNode = {
       slug: e.slug,
       type: e.type,
       title: e.title,
       bucket: bucket.slug,
-      bucketLabel: bucket.label,
-      bucketEmoji: bucket.emoji,
-      summary: e.summary || '',
-      oneLiner: e.oneLiner || '',
       difficultyLevel: e.difficultyLevel ?? 3,
-      difficultyLabel: e.difficultyLabel ?? 'Classroom',
-      laymanExplanation: e.laymanExplanation || '',
-      analogy: e.analogy || '',
-      indianExample: e.indianExample || '',
-      realRobotsThatUseThis: e.realRobotsThatUseThis ?? [],
-      relatedTerms: [...(e.relatedTerms ?? []), ...(e.seeAlso ?? [])],
-      prerequisiteTerms: e.prerequisiteTerms ?? [],
-      unlocksTerms: e.unlocksTerms ?? [],
-      mindBlowingFact: e.mindBlowingFact || '',
-      youtubeId: e.youtubeId || '',
-      industryApplications: e.industryApplications ?? [],
-      whyItMatters: e.whyItMatters || '',
-      technicalDefinition: e.technicalDefinition || e.summary || '',
-      quizQuestion: e.quizQuestion,
     }
+    if (e.oneLiner) node.oneLiner = e.oneLiner
+    if (e.prerequisiteTerms && e.prerequisiteTerms.length > 0) node.prerequisiteTerms = e.prerequisiteTerms
+    return node
   })
+
+  // Today's pick is chosen by day-index on the client (lib/atlas-progress);
+  // pre-compute the same pick here so its one-line summary ships without the
+  // whole index. The client falls back to the index if its cached pick differs.
+  const todIdx = Math.floor(Date.now() / 86_400_000) % Math.max(1, all.length)
+  const tod = all[todIdx]
+  const termOfDayHint = tod ? { slug: tod.slug, hint: tod.oneLiner || (tod.summary || '').slice(0, 100) } : null
 
   const buckets = ATLAS_BUCKETS.map(b => ({
     slug: b.slug,
@@ -146,10 +116,9 @@ export default async function AtlasIndex() {
   return (
     <CopilotProvider>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(appJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(datasetJsonLd) }} />
       <Nav />
-      <AtlasHomeClient nodes={nodes} buckets={buckets} />
+      <AtlasHomeClient nodes={nodes} buckets={buckets} termOfDayHint={termOfDayHint} />
       <CopilotBubble />
       <CopilotDrawer />
     </CopilotProvider>

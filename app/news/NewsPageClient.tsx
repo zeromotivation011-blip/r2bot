@@ -172,17 +172,8 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
           {/* Main feed */}
           <div>
-            {/* India Spotlight */}
-            {data && data.indiaHighlights.length > 0 && (
-              <section className="mb-7">
-                <h2 className="text-xs uppercase tracking-widest font-black text-gray-300 mb-3">🇮🇳 India Spotlight</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {data.indiaHighlights.slice(0, 2).map(a => (
-                    <FeaturedCard key={a.id} article={a} styles={data.sourceStyles} onSave={toggleSave} saved={savedIds.includes(a.id)} />
-                  ))}
-                </div>
-              </section>
-            )}
+            {/* The India spotlight that used to open this page lives on /india now;
+                a worldwide news page leads with what matters worldwide. */}
 
             {/* Breaking / Trending */}
             {breakingOrTrending.length > 0 && (
@@ -433,5 +424,5 @@ function timeAgo(iso: string): string {
   if (diff < 3_600_000) return `${Math.floor(diff / 60_000)} min ago`
   if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)} hr ago`
   if (diff < 7 * 86_400_000) return `${Math.floor(diff / 86_400_000)} day ago`
-  return new Date(iso).toLocaleDateString()
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }

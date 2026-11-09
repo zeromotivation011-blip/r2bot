@@ -10,5 +10,6 @@ export function lessonLanguages(slug: string): Record<string, string> {
   if (SHORTS_ZH[slug]) l['zh-CN'] = `${BASE}/zh/shorts/${slug}`
   if (SHORTS_HI[slug]) l.hi = `${BASE}/hi/shorts/${slug}`
   if (SHORTS_ES[slug]) l.es = `${BASE}/es/shorts/${slug}`
+  l['x-default'] = l.en
   return l
 }

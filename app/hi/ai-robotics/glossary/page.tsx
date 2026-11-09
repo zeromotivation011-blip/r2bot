@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { HI_GLOSSARY } from '@/lib/ai-robotics-hi'
 import { jsonldScript } from '@/lib/seo/jsonld'
+import { HREFLANG_AI_GLOSSARY } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'AI और रोबोटिक्स शब्दावली: आसान परिभाषाएँ',
   description: 'रोबोट और AI के आम शब्द एक वाक्य में: SLAM, लिडार, रीइन्फ़ोर्समेंट लर्निंग, सेंसर फ़्यूज़न और बहुत कुछ, अंग्रेज़ी नाम के साथ।',
-  alternates: { canonical: `${BASE}/hi/ai-robotics/glossary`, languages: { en: `${BASE}/ai-robotics/glossary`, 'zh-CN': `${BASE}/zh/ai-robotics/glossary`, hi: `${BASE}/hi/ai-robotics/glossary` } },
+  alternates: { canonical: `${BASE}/hi/ai-robotics/glossary`, languages: HREFLANG_AI_GLOSSARY },
 }
 export default function HiGlossary() {
   const ld = { '@context': 'https://schema.org', '@type': 'DefinedTermSet', inLanguage: 'hi', name: 'AI और रोबोटिक्स शब्दावली',

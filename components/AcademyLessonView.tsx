@@ -5,6 +5,7 @@ import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
 import { LessonHeader, LessonFooter } from '@/components/LessonChrome';
+import InlineSignup from '@/components/InlineSignup';
 import {
   LessonPdfButton,
   LessonBookmarkButton,
@@ -156,6 +157,9 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLesson }) {
           </div>
           <LessonDiscussion track={lesson.track} slug={lesson.slug} />
           <LessonAskR2Bubble track={lesson.track} slug={lesson.slug} lessonTitle={lesson.title} />
+
+          {/* The ask comes after the lesson has been read, not before. */}
+          <InlineSignup />
 
           {lesson.sources.length > 0 && (
             <section style={{ margin: '50px 0', paddingTop: 30, borderTop: '1px solid var(--border)' }}>

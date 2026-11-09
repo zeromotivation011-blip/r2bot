@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ZH_COURSES } from '@/lib/ai-robotics-zh'
+import { HREFLANG_COURSES } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: '免费机器人课程：五门入门课程',
   description: '五门免费的机器人入门课程，每课约四分钟，有测验、最终任务和可验证的证书。视频为英文讲解。',
-  alternates: { canonical: `${BASE}/zh/courses`, languages: { en: `${BASE}/courses`, 'zh-CN': `${BASE}/zh/courses` } },
+  alternates: { canonical: `${BASE}/zh/courses`, languages: HREFLANG_COURSES },
 }
 export default function ZhCourses() {
   return (

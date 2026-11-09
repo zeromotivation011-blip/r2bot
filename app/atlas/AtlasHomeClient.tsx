@@ -12,6 +12,7 @@ import { CuriousButton } from '@/components/atlas/CuriousButton'
 import { BucketGrid } from '@/components/atlas/BucketGrid'
 import { ReadingPathsStrip } from '@/components/atlas/ReadingPathsStrip'
 import { AtlasCommandSearch } from '@/components/atlas/AtlasCommandSearch'
+import { useAtlasIndex } from '@/components/atlas/useAtlasIndex'
 import dynamic from 'next/dynamic'
 const GalaxyMap = dynamic(() => import('@/components/atlas/GalaxyMap').then(m => m.GalaxyMap), { ssr: false })
 const WorldMapView = dynamic(() => import('@/app/world-map/WorldMapDynamic'), {
@@ -26,13 +27,26 @@ const WorldMapView = dynamic(() => import('@/app/world-map/WorldMapDynamic'), {
   ),
 })
 
+/**
+ * What the server ships for every entry: enough to draw the hub. Bucket label
+ * and emoji are looked up from `buckets`; everything richer is fetched per
+ * entry (`AtlasNodeDetail`) when a drawer opens.
+ */
 export interface AtlasNode {
   slug: string
   type: string
   title: string
   bucket: string
-  bucketLabel: string
-  bucketEmoji: string
+  difficultyLevel: number
+  oneLiner?: string
+  prerequisiteTerms?: string[]
+}
+
+/** The enrichment of one entry, from /api/atlas/entry/[type]/[slug]. */
+interface AtlasNodeDetail {
+  slug: string
+  type: string
+  title: string
   summary: string
   oneLiner: string
   difficultyLevel: number
@@ -49,7 +63,30 @@ export interface AtlasNode {
   industryApplications: string[]
   whyItMatters: string
   technicalDefinition: string
-  quizQuestion?: { q: string; options: string[]; answer: number; explanation: string }
+  quizQuestion: { q: string; options: string[]; answer: number; explanation: string } | null
+}
+
+const detailCache = new Map<string, AtlasNodeDetail>()
+
+function useAtlasDetail(type: string, slug: string): AtlasNodeDetail | null {
+  const key = `${type}/${slug}`
+  const [detail, setDetail] = useState<AtlasNodeDetail | null>(detailCache.get(key) ?? null)
+  useEffect(() => {
+    const hit = detailCache.get(key)
+    if (hit) { setDetail(hit); return }
+    let alive = true
+    setDetail(null)
+    fetch(`/api/atlas/entry/${type}/${slug}`)
+      .then(r => (r.ok ? (r.json() as Promise<AtlasNodeDetail>) : null))
+      .then(d => {
+        if (!alive || !d) return
+        detailCache.set(key, d)
+        setDetail(d)
+      })
+      .catch(() => { /* drawer keeps the lite view */ })
+    return () => { alive = false }
+  }, [key, type, slug])
+  return detail
 }
 
 interface BucketSummary {
@@ -81,8 +118,23 @@ function colorFor(bucket: string, buckets: BucketSummary[]): string {
   const idx = buckets.findIndex(b => b.slug === bucket)
   return BUCKET_COLORS[idx % BUCKET_COLORS.length] || '#888'
 }
+function bucketLabelFor(bucket: string, buckets: BucketSummary[]): string {
+  return buckets.find(b => b.slug === bucket)?.label ?? ''
+}
+function bucketEmojiFor(bucket: string, buckets: BucketSummary[]): string {
+  return buckets.find(b => b.slug === bucket)?.emoji ?? ''
+}
 
-export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]; buckets: BucketSummary[] }) {
+export default function AtlasHomeClient({
+  nodes,
+  buckets,
+  termOfDayHint = null,
+}: {
+  nodes: AtlasNode[]
+  buckets: BucketSummary[]
+  /** Server-side pick for today, so its summary ships without the whole index. */
+  termOfDayHint?: { slug: string; hint: string } | null
+}) {
   const [mode, setMode] = useState<Mode>('explore')
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null)
   const [bucketFilter, setBucketFilter] = useState<string | null>(null)
@@ -106,6 +158,14 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
 
   const todSlug = useMemo(() => getTermOfDay(allSlugs).slug, [allSlugs])
   const termOfDay = useMemo(() => nodes.find(n => n.slug === todSlug) ?? nodes[0], [nodes, todSlug])
+  // Only reach for the index when this browser's cached pick differs from the server's.
+  const needIndexForTod = Boolean(termOfDay) && !termOfDay?.oneLiner && termOfDayHint?.slug !== termOfDay?.slug
+  const { items: index } = useAtlasIndex(needIndexForTod)
+  const termOfDayHintText = termOfDay
+    ? termOfDay.oneLiner
+      || (termOfDayHint?.slug === termOfDay.slug ? termOfDayHint.hint : '')
+      || (index?.find(i => i.slug === termOfDay.slug)?.summary ?? '').slice(0, 100)
+    : ''
 
   const filteredNodes = useMemo(() => {
     return nodes.filter(n =>
@@ -145,16 +205,13 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
               type: n.type,
               title: n.title,
               bucket: n.bucket,
-              bucketLabel: n.bucketLabel,
-              bucketEmoji: n.bucketEmoji,
-              hookLine: (n as unknown as { hookLine?: string }).hookLine,
+              bucketLabel: bucketLabelFor(n.bucket, buckets),
+              bucketEmoji: bucketEmojiFor(n.bucket, buckets),
               oneLiner: n.oneLiner,
-              summary: n.summary,
-              laymanExplanation: n.laymanExplanation,
-              indianExample: n.indianExample,
               difficultyLevel: n.difficultyLevel,
             }))}
             buckets={buckets.map(b => ({ id: b.slug, label: b.label, emoji: b.emoji }))}
+            lazyIndex
           />
           <CuriousButton nodes={nodes} />
         </div>
@@ -199,7 +256,6 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
               bucket: n.bucket,
               difficultyLevel: n.difficultyLevel,
               prerequisiteTerms: n.prerequisiteTerms,
-              hookLine: (n as unknown as { hookLine?: string }).hookLine,
               oneLiner: n.oneLiner,
             }))}
             bucketColors={Object.fromEntries(buckets.map(b => [b.slug, colorFor(b.slug, buckets)]))}
@@ -218,6 +274,7 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
             onSelect={setSelectedSlug}
             isMobile={isMobile}
             termOfDay={termOfDay}
+            termOfDayHint={termOfDayHintText}
           />
         )}
 
@@ -269,7 +326,7 @@ export default function AtlasHomeClient({ nodes, buckets }: { nodes: AtlasNode[]
 // ────────────────────────────────────────────────────────────────────────────
 function ExploreMode({
   nodes, allNodes, buckets, bucketFilter, setBucketFilter, difficultyMax, setDifficultyMax,
-  onSelect, isMobile, termOfDay,
+  onSelect, isMobile, termOfDay, termOfDayHint,
 }: {
   nodes: AtlasNode[]
   allNodes: AtlasNode[]
@@ -281,6 +338,7 @@ function ExploreMode({
   onSelect: (slug: string) => void
   isMobile: boolean
   termOfDay: AtlasNode | undefined
+  termOfDayHint: string
 }) {
   return (
     <div className="explore-grid">
@@ -291,7 +349,7 @@ function ExploreMode({
           <div className="tod-card" onClick={() => onSelect(termOfDay.slug)}>
             <p className="tod-eyebrow">⭐ Term of the day</p>
             <p className="tod-title">{termOfDay.title}</p>
-            <p className="tod-sub">{termOfDay.oneLiner || termOfDay.summary.slice(0, 100)}…</p>
+            {termOfDayHint && <p className="tod-sub">{termOfDayHint}…</p>}
           </div>
         )}
 
@@ -581,8 +639,8 @@ function ConceptCanvas({ nodes, buckets, onSelect, bucketFilter }: {
           padding: '6px 10px', fontSize: 12, color: '#FFC9A8',
           pointerEvents: 'none', whiteSpace: 'nowrap', zIndex: 5,
         }}>
-          <strong>{hover.bucketEmoji} {hover.title}</strong>
-          <div style={{ color: '#9ca3af', fontSize: 11, marginTop: 2 }}>{hover.oneLiner || hover.bucketLabel}</div>
+          <strong>{bucketEmojiFor(hover.bucket, buckets)} {hover.title}</strong>
+          <div style={{ color: '#9ca3af', fontSize: 11, marginTop: 2 }}>{hover.oneLiner || bucketLabelFor(hover.bucket, buckets)}</div>
         </div>
       )}
       <div style={{ position: 'absolute', bottom: 12, left: 12, fontSize: 11, color: '#6b7280' }}>
@@ -602,6 +660,10 @@ function MobileBucketGrid({ nodes, buckets, onSelect }: {
   const visible = openBucket
     ? nodes.filter(n => n.bucket === openBucket).sort((a, b) => a.title.localeCompare(b.title))
     : []
+  // One-line summaries for the open bucket's list come from the index, loaded
+  // the first time a bucket is opened.
+  const { items: index } = useAtlasIndex(openBucket !== null)
+  const summaryOf = (slug: string) => index?.find(i => i.slug === slug)?.summary ?? ''
 
   return (
     <div style={{ padding: 14 }}>
@@ -627,7 +689,9 @@ function MobileBucketGrid({ nodes, buckets, onSelect }: {
                   }}
                 >
                   <strong style={{ color: '#fff', fontSize: 15 }}>{n.title}</strong>
-                  <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>{n.oneLiner || n.summary.slice(0, 80)}…</div>
+                  {(n.oneLiner || summaryOf(n.slug)) && (
+                    <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>{n.oneLiner || summaryOf(n.slug).slice(0, 80)}…</div>
+                  )}
                 </button>
               </li>
             ))}
@@ -674,12 +738,17 @@ function TermDrawer({
 }) {
   const [tab, setTab] = useState<'simple' | 'detailed' | 'quiz'>('simple')
   const [picked, setPicked] = useState<number | null>(null)
+  // The lite node draws the header at once; the enrichment arrives a moment later.
+  const detail = useAtlasDetail(term.type, term.slug)
 
   const findNode = (slug: string) => allNodes.find(n => n.slug === slug)
-  const relatedNodes = term.relatedTerms.map(findNode).filter(Boolean) as AtlasNode[]
-  const prereqNodes  = term.prerequisiteTerms.map(findNode).filter(Boolean) as AtlasNode[]
-  const unlockNodes  = term.unlocksTerms.map(findNode).filter(Boolean) as AtlasNode[]
+  const relatedNodes = (detail?.relatedTerms ?? []).map(findNode).filter(Boolean) as AtlasNode[]
+  const prereqNodes  = (detail?.prerequisiteTerms ?? term.prerequisiteTerms ?? []).map(findNode).filter(Boolean) as AtlasNode[]
+  const unlockNodes  = (detail?.unlocksTerms ?? []).map(findNode).filter(Boolean) as AtlasNode[]
   const c = colorFor(term.bucket, buckets)
+  const oneLiner = detail?.oneLiner || term.oneLiner || ''
+  const difficultyLabel = detail?.difficultyLabel ?? 'Classroom'
+  const quizQuestion = detail?.quizQuestion ?? null
 
   return (
     <div className="drawer-back" onClick={onClose}>
@@ -688,12 +757,12 @@ function TermDrawer({
 
         <div className="dr-head" style={{ background: c + '20', borderLeft: `4px solid ${c}` }}>
           <p style={{ fontSize: 11, color: c, fontWeight: 900, letterSpacing: 1.5, textTransform: 'uppercase' }}>
-            {term.bucketEmoji} {term.bucketLabel}
+            {bucketEmojiFor(term.bucket, buckets)} {bucketLabelFor(term.bucket, buckets)}
           </p>
           <h2>{term.title}</h2>
-          {term.oneLiner && <p className="one-liner">{term.oneLiner}</p>}
+          {oneLiner && <p className="one-liner">{oneLiner}</p>}
           <div className="head-meta">
-            <span className="badge">D{term.difficultyLevel} · {term.difficultyLabel}</span>
+            <span className="badge">D{term.difficultyLevel} · {difficultyLabel}</span>
             <button onClick={onMaster} className={`master ${isMastered ? 'on' : ''}`}>
               {isMastered ? '✅ Mastered' : '○ Mark mastered'}
             </button>
@@ -709,25 +778,29 @@ function TermDrawer({
         </div>
 
         <div className="tab-body">
-          {tab === 'simple' && (
+          {!detail ? (
+            <p className="prose" aria-busy="true" style={{ opacity: 0.6 }}>…</p>
+          ) : null}
+
+          {detail && tab === 'simple' && (
             <>
-              <p className="prose">{term.laymanExplanation || term.summary || 'No simple explanation yet — open the full page for the full text.'}</p>
-              {term.analogy && (
+              <p className="prose">{detail.laymanExplanation || detail.summary || 'No simple explanation yet — open the full page for the full text.'}</p>
+              {detail.analogy && (
                 <div className="amber-box">
                   <p className="amber-h">💡 Think of it like…</p>
-                  <p>{term.analogy}</p>
+                  <p>{detail.analogy}</p>
                 </div>
               )}
-              {term.indianExample && (
+              {detail.indianExample && (
                 <div className="india-box">
-                  <p className="amber-h">🌍 An example from India</p>
-                  <p>{term.indianExample}</p>
+                  <p className="amber-h">🌍 In the real world</p>
+                  <p>{detail.indianExample}</p>
                 </div>
               )}
-              {term.realRobotsThatUseThis.length > 0 && (
+              {detail.realRobotsThatUseThis.length > 0 && (
                 <div className="row">
                   <span className="row-h">Real robots:</span>
-                  {term.realRobotsThatUseThis.map(r => (
+                  {detail.realRobotsThatUseThis.map(r => (
                     <Link key={r} href={`/robots/${r}`} className="chip">{r}</Link>
                   ))}
                 </div>
@@ -735,22 +808,22 @@ function TermDrawer({
             </>
           )}
 
-          {tab === 'detailed' && (
+          {detail && tab === 'detailed' && (
             <>
-              {term.technicalDefinition && <p className="prose">{term.technicalDefinition}</p>}
-              {term.whyItMatters && (
-                <div className="amber-box"><p className="amber-h">Why it matters</p><p>{term.whyItMatters}</p></div>
+              {detail.technicalDefinition && <p className="prose">{detail.technicalDefinition}</p>}
+              {detail.whyItMatters && (
+                <div className="amber-box"><p className="amber-h">Why it matters</p><p>{detail.whyItMatters}</p></div>
               )}
-              {term.industryApplications.length > 0 && (
+              {detail.industryApplications.length > 0 && (
                 <div className="row">
                   <span className="row-h">Used in:</span>
-                  {term.industryApplications.map(i => <span key={i} className="chip">{i}</span>)}
+                  {detail.industryApplications.map(i => <span key={i} className="chip">{i}</span>)}
                 </div>
               )}
-              {term.youtubeId && (
+              {detail.youtubeId && (
                 <div className="aspect">
                   <iframe
-                    src={`https://www.youtube.com/embed/${term.youtubeId}`}
+                    src={`https://www.youtube.com/embed/${detail.youtubeId}`}
                     title={term.title} loading="lazy"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -760,26 +833,26 @@ function TermDrawer({
             </>
           )}
 
-          {tab === 'quiz' && term.quizQuestion && term.quizQuestion.q ? (
+          {detail && tab === 'quiz' && quizQuestion && quizQuestion.q ? (
             <>
-              <p className="quiz-q">{term.quizQuestion.q}</p>
+              <p className="quiz-q">{quizQuestion.q}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {term.quizQuestion.options.map((opt, i) => (
+                {quizQuestion.options.map((opt, i) => (
                   <button
                     key={i}
                     onClick={() => setPicked(i)}
-                    className={`quiz-opt ${picked === i ? (i === term.quizQuestion!.answer ? 'ok' : 'bad') : ''}`}
-                    disabled={picked !== null && picked === term.quizQuestion!.answer}
+                    className={`quiz-opt ${picked === i ? (i === quizQuestion.answer ? 'ok' : 'bad') : ''}`}
+                    disabled={picked !== null && picked === quizQuestion.answer}
                   >{opt}</button>
                 ))}
               </div>
               {picked !== null && (
-                <p style={{ marginTop: 12, color: picked === term.quizQuestion.answer ? '#6ee7b7' : '#fda4af', fontWeight: 700 }}>
-                  {picked === term.quizQuestion.answer ? '✅ ' : '❌ '}{term.quizQuestion.explanation}
+                <p style={{ marginTop: 12, color: picked === quizQuestion.answer ? '#6ee7b7' : '#fda4af', fontWeight: 700 }}>
+                  {picked === quizQuestion.answer ? '✅ ' : '❌ '}{quizQuestion.explanation}
                 </p>
               )}
             </>
-          ) : tab === 'quiz' ? (
+          ) : detail && tab === 'quiz' ? (
             <p style={{ color: '#6b7280', textAlign: 'center', padding: 20 }}>No quiz yet for this term.</p>
           ) : null}
         </div>
@@ -787,19 +860,19 @@ function TermDrawer({
         {/* Connections + facts */}
         <div className="connections">
           {prereqNodes.length > 0 && (
-            <ConnRow label="Learn this first" nodes={prereqNodes} onSelect={onSelectAnother} />
+            <ConnRow label="Learn this first" nodes={prereqNodes} buckets={buckets} onSelect={onSelectAnother} />
           )}
           {relatedNodes.length > 0 && (
-            <ConnRow label="Related concepts" nodes={relatedNodes} onSelect={onSelectAnother} />
+            <ConnRow label="Related concepts" nodes={relatedNodes} buckets={buckets} onSelect={onSelectAnother} />
           )}
           {unlockNodes.length > 0 && (
-            <ConnRow label="This unlocks" nodes={unlockNodes} onSelect={onSelectAnother} />
+            <ConnRow label="This unlocks" nodes={unlockNodes} buckets={buckets} onSelect={onSelectAnother} />
           )}
         </div>
 
-        {term.mindBlowingFact && (
+        {detail?.mindBlowingFact && (
           <div className="fact-box">
-            <p>🤯 {term.mindBlowingFact}</p>
+            <p>🤯 {detail.mindBlowingFact}</p>
           </div>
         )}
 
@@ -906,8 +979,8 @@ function TermDrawer({
   )
 }
 
-function ConnRow({ label, nodes, onSelect }: {
-  label: string; nodes: AtlasNode[]; onSelect: (slug: string) => void
+function ConnRow({ label, nodes, buckets, onSelect }: {
+  label: string; nodes: AtlasNode[]; buckets: BucketSummary[]; onSelect: (slug: string) => void
 }) {
   return (
     <div>
@@ -922,7 +995,7 @@ function ConnRow({ label, nodes, onSelect }: {
               border: '1px solid #2a2a45', borderRadius: 999, padding: '4px 10px',
               cursor: 'pointer', fontWeight: 700,
             }}
-          >{n.bucketEmoji} {n.title}</button>
+          >{bucketEmojiFor(n.bucket, buckets)} {n.title}</button>
         ))}
       </div>
     </div>

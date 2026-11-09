@@ -16,6 +16,7 @@ import { RobotSpecs } from './RobotSpecs';
 import { RobotVote } from '@/components/robots/RobotVote';
 import { RobotFamilyTree } from '@/components/robots/RobotFamilyTree';
 import { getRobotExtra } from '@/lib/robots-extra';
+import InlineSignup from '@/components/InlineSignup';
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -50,13 +51,11 @@ export async function generateMetadata({
       siteName: 'R2BOT',
       title: robot.metaTitle,
       description: robot.metaDescription,
-      images: [{ url: '/og-default.png', width: 1200, height: 630, alt: robot.imageAlt }],
     },
     twitter: {
       card: 'summary_large_image',
       title: robot.metaTitle,
       description: robot.metaDescription,
-      images: ['/og-default.png'],
     },
     robots: {
       index: true,
@@ -88,7 +87,7 @@ function thingJsonLd(robot: Robot) {
       .filter(([, v]) => v)
       .map(([k, v]) => ({ '@type': 'PropertyValue', name: k, value: v })),
     url: `${BASE_URL}/robots/${robot.slug}`,
-    image: `${BASE_URL}/og-default.png`,
+    image: `${BASE_URL}/robots/${robot.slug}/opengraph-image`,
   };
 }
 
@@ -329,6 +328,8 @@ export default async function RobotProfilePage({
             </div>
           </div>
         </section>
+
+        <section className="px-4"><div className="mx-auto max-w-3xl"><InlineSignup /></div></section>
 
         {/* Related robots */}
         {related.length > 0 ? (

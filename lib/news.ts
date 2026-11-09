@@ -57,15 +57,36 @@ const FEEDS: RawFeed[] = [
   { name: 'TechCrunch',        url: 'https://techcrunch.com/tag/robots/feed/' },
   { name: 'The Robot Report',  url: 'https://www.therobotreport.com/feed/' },
   { name: 'Wired',             url: 'https://www.wired.com/feed/tag/robots/rss' },
-  { name: 'Hacker News',       url: 'https://hnrss.org/newest?q=robotics+robot+ROS' },
+  { name: 'Hacker News',       url: 'https://hnrss.org/newest?q=robotics+robot+ROS', onlyRobotics: true },
   { name: 'Robohub',           url: 'https://robohub.org/feed/' },
-  { name: 'Analytics India',   url: 'https://analyticsindiamag.com/feed/' },
-  { name: 'Analytics Vidhya',  url: 'https://www.analyticsvidhya.com/feed/' },
+  { name: 'Analytics India',   url: 'https://analyticsindiamag.com/feed/', onlyRobotics: true },
+  { name: 'Analytics Vidhya',  url: 'https://www.analyticsvidhya.com/feed/', onlyRobotics: true },
   // China and Asia coverage (general tech feeds, so only robotics-related items are kept)
   { name: 'Pandaily',          url: 'https://pandaily.com/feed/', onlyRobotics: true },
   { name: 'Synced',            url: 'https://syncedreview.com/feed/', onlyRobotics: true },
   { name: 'Interesting Engineering', url: 'https://interestingengineering.com/feed', onlyRobotics: true },
 ]
+
+/**
+ * Strip tracking noise so the same story is one row. The archive is keyed on
+ * URL, and feeds re-emit items with fresh `utm_*` / `?ref=` suffixes, which
+ * produced duplicate /news pages with different hash suffixes.
+ */
+export function canonicalNewsUrl(raw: string): string {
+  try {
+    const u = new URL(raw.trim())
+    u.hash = ''
+    for (const k of [...u.searchParams.keys()]) {
+      if (/^(utm_|ref$|source$|fbclid|gclid|mc_cid|mc_eid|rss|feed)/i.test(k)) u.searchParams.delete(k)
+    }
+    u.hostname = u.hostname.toLowerCase()
+    let s = u.toString()
+    if (u.pathname !== '/' && s.endsWith('/')) s = s.slice(0, -1)
+    return s
+  } catch {
+    return raw.trim()
+  }
+}
 
 interface RSSItem {
   source: string
@@ -232,6 +253,7 @@ function parseFeed(name: string, xml: string): RSSItem[] {
     const description = stripHtml(descRaw).slice(0, 320)
     const imageUrl = extractImage(it)
     if (!title || !link) continue
+    link = canonicalNewsUrl(link)
     out.push({ source: name, title, link, publishedAt: safeISO(pubDateRaw), description, imageUrl })
   }
   return out

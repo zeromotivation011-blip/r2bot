@@ -1,13 +1,20 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 type Direction = 'up' | 'down' | 'left' | 'right' | 'scale'
 
 /**
- * Premium scroll-reveal wrapper. Fades + slides content in as it enters the
- * viewport, using a soft "expo-out" easing for a high-end feel. Respects
- * prefers-reduced-motion (shows instantly). One-shot (won't re-hide on scroll).
+ * Fade-in-on-scroll that is visible by default.
+ *
+ * The previous version rendered `opacity: 0` into the server HTML and relied
+ * on an IntersectionObserver to show the content. Six homepage sections were
+ * therefore invisible to anyone without JavaScript, to slow connections until
+ * hydration, to reduced-motion users for 1.2 s, and to any crawler that does
+ * not run scripts. Now the markup is visible as served; a tiny inline script in
+ * the root layout adds `html.js` before first paint, and only then does the
+ * stylesheet hide `.r2-reveal` until it is marked `is-shown`. No JS → no hide.
+ * `prefers-reduced-motion` is handled in CSS, so there is no flash either way.
  */
 export function Reveal({
   children,
@@ -28,13 +35,6 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    ) {
-      setShown(true)
-      return
-    }
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
@@ -59,15 +59,12 @@ export function Reveal({
     direction === 'right' ? `translate3d(-${distance}px, 0, 0)` :
     'scale(0.96)'
 
-  const style: CSSProperties = {
-    opacity: shown ? 1 : 0,
-    transform: shown ? 'none' : hidden,
-    transition: `opacity 800ms cubic-bezier(.16,1,.3,1) ${delay}ms, transform 800ms cubic-bezier(.16,1,.3,1) ${delay}ms`,
-    willChange: 'opacity, transform',
-  }
-
   return (
-    <div ref={ref} className={className} style={style}>
+    <div
+      ref={ref}
+      className={`r2-reveal${shown ? ' is-shown' : ''}${className ? ` ${className}` : ''}`}
+      style={{ '--r2-reveal-from': hidden, '--r2-reveal-delay': `${delay}ms` } as React.CSSProperties}
+    >
       {children}
     </div>
   )

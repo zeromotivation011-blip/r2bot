@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { listPublishedCourses, totalMinutes, hasVideo } from '@/lib/courses'
 import JourneyClient from './JourneyClient'
 import { jsonldScript } from '@/lib/seo/jsonld'
+import { HREFLANG_COURSES } from '@/lib/hreflang'
 
 export const revalidate = 86400
 const BASE = 'https://www.r2bot.in'
@@ -10,7 +11,7 @@ const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
   title: 'Free Robotics Course Path: 5 Courses, Quizzes and Certificates',
   description: 'Five free robotics courses in order: foundations, build a robot, robot arms, vision and intelligence. Short videos, quizzes and certificates.',
-  alternates: { canonical: `${BASE}/courses`, languages: { en: `${BASE}/courses`, 'zh-CN': `${BASE}/zh/courses` } },
+  alternates: { canonical: `${BASE}/courses`, languages: HREFLANG_COURSES },
 }
 
 export default function CoursesPage() {
@@ -31,15 +32,6 @@ export default function CoursesPage() {
       <ul className="mt-5 flex flex-wrap gap-2 text-xs text-gray-300">
         {[`${lessonsTotal} short lessons`, 'Quiz after every lesson', 'Final activity per course', 'Certificate for each course', 'English · plain language'].map((t) => <li key={t} className="rounded-full border border-white/10 px-3 py-1">{t}</li>)}
       </ul>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript({
-        '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [
-          { q: 'Are the R2BOT courses really free?', a: 'Yes. All five courses, quizzes and certificates are free.' },
-          { q: 'How long is each lesson?', a: 'Each lesson is a short video of about 4 minutes followed by a quick quiz.' },
-          { q: 'Are all the videos available yet?', a: 'Not yet. The course path is being recorded in order, and every course and lesson page says whether its video is live. You can ask to be emailed when a course opens.' },
-          { q: 'Do I get a certificate?', a: 'Yes. Finish all lessons, pass the quizzes and complete the final activity to earn a certificate you can verify and share.' },
-          { q: 'Do I need experience?', a: 'No. The first course starts from zero and the path builds up to robot design.' },
-        ].map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
-      }) }} />
       {courses.length === 0 ? (
         <div className="mt-10 rounded-2xl border border-white/10 p-8 text-gray-300">
           <h2 className="text-xl font-bold text-white">First course is being recorded</h2>

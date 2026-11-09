@@ -1,7 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getAllAtlasEntriesMerged } from '@/lib/atlas-db';
 import { getAllLensMerged } from '@/lib/lens-cms';
-import { getArchivedNewsSlugs } from '@/lib/news';
 import { getAllAcademyLessons } from '@/lib/academy';
 import { ROBOTS } from '@/lib/robots-data';
 import { getAllPostsMerged } from '@/lib/blog-db';
@@ -49,25 +48,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Merged sources: MDX on disk PLUS anything published through the CMS.
   // Reading the filesystem alone meant browser-created content never entered
   // the sitemap, so Google never discovered it.
-  const [atlasEntries, blogPostsData, lensVideos, newsSlugs] = await Promise.all([
+  const [atlasEntries, blogPostsData, lensVideos] = await Promise.all([
     getAllAtlasEntriesMerged(),
     getAllPostsMerged(),
     getAllLensMerged(),
-    getArchivedNewsSlugs(1000),
   ]);
 
-  // Per-article news pages from the archive (0033 + 0050). These are
-  // summarised, self-canonical stories with NewsArticle JSON-LD — the
-  // indexable layer over a feed that is otherwise client-rendered and links
-  // straight out to the source. lastModified is the story's real publish date,
-  // never `now`. Empty until the archive cron has run and 0050 is applied, so
-  // this adds nothing to the sitemap until there is something real to list.
-  const newsArticles = newsSlugs.map((n) => ({
-    url: `${BASE}/news/${n.slug}`,
-    lastModified: new Date(n.publishedAt),
-    changeFrequency: 'monthly' as const,
-    priority: 0.5,
-  }));
+  // Per-story news pages (/news/<slug>) are NOT listed. 9 Nov 2026: the per-story pages are machine summaries of other outlets'
+  // reporting — 835 of them, 47% of the sitemap, with duplicates and
+  // off-topic items. That is the footprint Google's scaled-content policy
+  // targets, and it starved the 500 Atlas pages of crawl budget. The story
+  // pages still exist for readers (noindex, follow) but are not offered to
+  // search engines; /news itself is. Re-enable per story only when a story
+  // carries original analysis.
+  const newsArticles: MetadataRoute.Sitemap = [];
 
   // Slugs that 308 to another entry must not be listed in the sitemap:
   // duplicate concepts, plus the robots that live canonically at /robots/<slug>
@@ -161,6 +155,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const aiAndRegional = [
     { url: `${BASE}/ai-robotics`, lastModified: at('/ai-robotics'), changeFrequency: 'weekly' as const, priority: 0.9 },
     { url: `${BASE}/ai-robotics/glossary`, lastModified: at('/ai-robotics/glossary'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${BASE}/glossary`, lastModified: at('/glossary'), changeFrequency: 'weekly' as const, priority: 0.8 },
+    { url: `${BASE}/learn/ros2-cheatsheet`, lastModified: at('/learn/ros2-cheatsheet'), changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${BASE}/compare`, lastModified: at('/compare'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${BASE}/compare/lidar-vs-camera-slam`, lastModified: at('/compare/lidar-vs-camera-slam'), changeFrequency: 'monthly' as const, priority: 0.8 },
     ...AI_TOPICS.map((t) => ({ url: `${BASE}/ai-robotics/${t.slug}`, lastModified: GROUP_UPDATED.aiRobotics, changeFrequency: 'monthly' as const, priority: 0.8 })),
     { url: `${BASE}/kids`, lastModified: at('/kids'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/parents`, lastModified: at('/kids/parents'), changeFrequency: 'monthly' as const, priority: 0.6 },

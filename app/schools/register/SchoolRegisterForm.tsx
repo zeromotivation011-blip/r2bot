@@ -70,6 +70,8 @@ export function SchoolRegisterForm() {
 
   return (
     <form onSubmit={submit} className="mt-10 grid gap-4 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+      {/* Honeypot: hidden from people, filled by bots; the server rejects a filled one. */}
+      <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-px w-px opacity-0" />
       <Field name="school_name" label="School Name" required />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field name="city" label="City" required />

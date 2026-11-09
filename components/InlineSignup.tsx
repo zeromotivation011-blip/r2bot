@@ -12,13 +12,14 @@ const T = {
 export default function InlineSignup({ lang = 'en' }: { lang?: 'en' | 'hi' | 'zh' | 'es' }) {
   const t = T[lang]
   const [email, setEmail] = useState('')
+  const [trap, setTrap] = useState('')
   const [s, setS] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle')
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setS('sending')
     try {
       const r = await fetch('/api/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'newsletter', page: window.location.pathname }) })
+        body: JSON.stringify({ email, source: 'newsletter', page: window.location.pathname, honeypot: trap }) })
       const d = (await r.json().catch(() => ({}))) as { ok?: boolean }
       setS(r.ok && d.ok ? 'ok' : 'err')
     } catch { setS('err') }
@@ -29,6 +30,8 @@ export default function InlineSignup({ lang = 'en' }: { lang?: 'en' | 'hi' | 'zh
       <p style={{ color: 'var(--text-2)', margin: '4px 0 12px', fontSize: 14 }}>{t.p}</p>
       {s === 'ok' ? <p style={{ color: '#4ade80', fontWeight: 700, margin: 0 }}>{t.ok}</p> : (
         <form onSubmit={submit} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <input type="text" tabIndex={-1} autoComplete="off" aria-hidden name="company" value={trap} onChange={(e) => setTrap(e.target.value)}
+            className="absolute -left-[9999px] h-px w-px opacity-0" />
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t.ph} aria-label="Email"
             style={{ flex: '1 1 220px', padding: '10px 12px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(0,0,0,0.25)', color: '#fff', fontSize: 15 }} />
           <button type="submit" disabled={s === 'sending'} style={{ padding: '10px 18px', borderRadius: 10, border: 0, background: '#FC6818', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>{t.b}</button>

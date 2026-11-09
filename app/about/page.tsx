@@ -4,7 +4,7 @@ import { StaticPage } from '@/components/StaticPage';
 export const metadata: Metadata = {
   alternates: { canonical: '/about' },
   title: 'About R2BOT',
-  description: "Why R2BOT exists — the brand promise, the founder, and what we're building.",
+  description: 'Why R2BOT exists: free, plain-English robotics for the whole world — the promise, the rules every page follows, and who builds it.',
 };
 
 export default function AboutPage() {
@@ -17,9 +17,9 @@ export default function AboutPage() {
         The middle layer — clear, accurate, accessible explanations for any curious human — is missing.
       </p>
       <p>
-        R2BOT is that middle layer. A 14-year-old in Patna and a 45-year-old engineer in
-        Bengaluru should both be able to land on the same page, understand it, and leave knowing
-        something they didn&apos;t know before.
+        R2BOT is that middle layer. A 14-year-old in Lagos, a student in Berlin and a working
+        engineer in Bengaluru should all be able to land on the same page, understand it, and
+        leave knowing something they didn&apos;t know before.
       </p>
 
       <h2>The brand mark</h2>
@@ -35,16 +35,16 @@ export default function AboutPage() {
 
       <h2>What you&apos;ll find here</h2>
       <ul>
-        <li><strong><a href="/news">News</a></strong> — daily robotics stories from IEEE, MIT, The Robot Report and more, scored for India relevance — decoded.</li>
+        <li><strong><a href="/news">News</a></strong> — daily robotics stories from IEEE Spectrum, MIT News, The Robot Report and more, summarized in plain English.</li>
         <li><strong><a href="/atlas">Atlas</a></strong> — the encyclopedia. Every concept, robot, person, company — in plain English.</li>
         <li><strong><a href="/lens">Lens</a></strong> — the best robotics videos on the internet, summarized so you don&apos;t have to watch 45 minutes to learn 4.</li>
-        <li><strong><a href="/diagnostic">Academy</a></strong> — structured courses from Spark (beginner) to Edge (frontier research).</li>
+        <li><strong><a href="/academy">Academy</a></strong> — structured courses from Spark (beginner) to Edge (frontier research).</li>
         <li><strong>R2 Co-pilot</strong> — the AI brain. Press ⌘K anywhere. Ask anything.</li>
       </ul>
 
       <h2>The promise</h2>
       <ul>
-        <li><strong>Open to every learner</strong> — every Atlas entry, every course, R2 Co-pilot. Paid for by affiliate links and ethical sponsorships. Never your data.</li>
+        <li><strong>Open to every learner</strong> — every Atlas entry, every course, every simulator and R2 Co-pilot, with no card, no trial and no locked lesson. We never sell your data and never ask for a phone number.</li>
         <li><strong>Plain English, always</strong> — every page begins with the answer in one sentence. Jargon is defined the moment we use it.</li>
         <li><strong>Cited, never invented</strong> — R2 Co-pilot grounds every answer in the Atlas. If we don&apos;t know, we say so. No hallucinations dressed as facts.</li>
       </ul>

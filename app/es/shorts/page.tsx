@@ -4,13 +4,14 @@ import { SHORTS, SHORT_COURSES, shortsInCourse, liveShorts } from '@/lib/shorts'
 import { SHORTS_ES } from '@/lib/shorts-es'
 import { ProgressBar, Tick } from '@/components/shorts/ShortsClient'
 import InlineSignup from '@/components/InlineSignup'
+import { HREFLANG_SHORTS } from '@/lib/hreflang'
 
 const BASE = 'https://www.r2bot.in'
 export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'Robótica en un minuto: lecciones rápidas',
   description: 'Lecciones gratis de robótica de un minuto: vídeo, demos animadas y una pregunta corta. Sensores, motores, control, manos y robots en el trabajo, en español sencillo.',
-  alternates: { canonical: `${BASE}/es/shorts`, languages: { en: `${BASE}/shorts`, 'zh-CN': `${BASE}/zh/shorts`, hi: `${BASE}/hi/shorts`, es: `${BASE}/es/shorts` } },
+  alternates: { canonical: `${BASE}/es/shorts`, languages: HREFLANG_SHORTS },
 }
 const ZH_COURSE: Record<string, { t: string; b: string }> = {
   senses: { t: 'Cómo sienten los robots', b: 'Sonido, visión, oído y sentido del equilibrio.' },
