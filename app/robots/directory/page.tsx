@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { DIRECTORY } from '@/lib/robots-directory'
 import DirectoryClient from './DirectoryClient'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export default function DirectoryPage() {
     itemListElement: DIRECTORY.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: `${r.name} (${r.maker}, ${r.year})` })) }
   return (
     <main style={{ maxWidth: 1000, margin: '0 auto', padding: '110px 20px 80px' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
       <Link href="/robots" style={{ color: 'var(--text-2)', fontSize: 13 }}>← Famous robots</Link>
       <h1 style={{ fontSize: 'clamp(28px,5vw,40px)', fontWeight: 900, color: '#fff', margin: '8px 0 8px' }}>Robot directory</h1>
       <p style={{ color: 'var(--text-2)', fontSize: 17, lineHeight: 1.6, maxWidth: 720, margin: '0 0 22px' }}>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
@@ -25,7 +26,7 @@ export default function TeachersPage() {
   const ld = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }
   return (
     <main style={{ maxWidth: 780, margin: '0 auto', padding: '110px 20px 80px' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
       <h1 style={{ fontSize: 'clamp(28px,5vw,40px)', fontWeight: 900, color: '#fff', margin: '0 0 10px' }}>Teach robotics with R2BOT</h1>
       <p style={{ color: 'var(--text-2)', fontSize: 18, lineHeight: 1.8 }}>A free, plain-English toolkit for one 40-minute class. No sign-up needed to read, try demos or print activities.</p>
       <h2 style={{ color: '#fff', fontSize: 22, marginTop: 28 }}>A 40-minute lesson plan</h2>

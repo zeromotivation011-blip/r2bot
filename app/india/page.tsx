@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { COMPANIES, MARKETS, MILESTONES, PROGRAMMES, STAGES } from '@/lib/india'
 import ProblemExplorer from './ProblemExplorer'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default function IndiaHub() {
   const ld = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }
   return (
     <main style={{ maxWidth: 1000, margin: '0 auto', padding: '110px 20px 80px' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
       <h1 style={{ fontSize: 'clamp(30px,5vw,44px)', fontWeight: 900, color: '#fff', margin: '0 0 10px' }}>Robotics in India</h1>
       <p style={{ color: 'var(--text-2)', fontSize: 18, lineHeight: 1.6, maxWidth: 740 }}>
         From a Mars orbiter to robots that clean sewers, India is building real robots. This page shows what is happening, who is building it, and how you can start from wherever you are. Free, in plain English.

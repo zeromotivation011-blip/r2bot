@@ -1,6 +1,7 @@
 // app/kids/page.tsx — Robot World entry (server component)
 import type { Metadata } from 'next'
 import KidsEntryClient from './KidsEntryClient'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 export const runtime = 'nodejs'
 
@@ -84,8 +85,8 @@ const faqJsonLd = {
 export default function KidsEntryPage() {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(faqJsonLd) }} />
       <h1 style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}>Robot World: free robotics games and activities for kids aged 5 to 14</h1>
       <KidsEntryClient />
     </>

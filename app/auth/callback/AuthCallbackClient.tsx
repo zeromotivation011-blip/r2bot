@@ -7,7 +7,8 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
 /** Only ever redirect to a path on this site. */
 function safeNext(raw: string | null): string {
-  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/dashboard'
+  // A leading `/\\` parses as a protocol-relative URL too, so reject both.
+  if (!raw || !/^\/(?![\/\\])/.test(raw)) return '/dashboard'
   return raw
 }
 

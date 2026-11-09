@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { listPublishedCourses, loadCourseBySlug, toPublicLesson, hasVideo } from '@/lib/courses'
 import LessonClient from './LessonClient'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 export const revalidate = 86400
 export const dynamicParams = true
@@ -39,7 +40,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   }
   return (
     <>
-      {c.status === 'published' && hasVideo(l) && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(video) }} />}
+      {c.status === 'published' && hasVideo(l) && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(video) }} />}
       <LessonClient
         courseSlug={c.slug} courseTitle={c.title} lesson={toPublicLesson(l)}
         index={idx} total={c.lessons.length}

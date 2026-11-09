@@ -25,6 +25,8 @@ export interface HomeVideoItem { title: string; url: string; thumbnailUrl: strin
 interface HomeClientProps {
   atlasCount: number
   projectCount: number
+  shortsCount: number
+  simCount: number
   news?: HomeNewsItem[]
   videos?: HomeVideoItem[]
 }
@@ -75,13 +77,13 @@ const TRACK_LABEL: Record<Track, string> = {
   spark: 'Spark', wire: 'Wire', forge: 'Forge', edge: 'Edge',
 }
 
-export default function HomeClient({ atlasCount, projectCount, news = [], videos = [] }: HomeClientProps) {
+export default function HomeClient({ atlasCount, projectCount, shortsCount, simCount, news = [], videos = [] }: HomeClientProps) {
   const personalization = usePersonalization()
   const showDiagnosticBanner = personalization.signedIn && !personalization.track
   return (
     <main style={{ background: 'var(--void)', color: '#fff' }}>
       <FeatureTour />
-      <Hero personalization={personalization} atlasCount={atlasCount} projectCount={projectCount} />
+      <Hero personalization={personalization} atlasCount={atlasCount} projectCount={projectCount} shortsCount={shortsCount} simCount={simCount} />
       {showDiagnosticBanner && (
         <section style={{
           padding: '20px 20px', background: 'rgba(252,104,24,0.08)',
@@ -117,7 +119,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
       <Reveal><HomeShorts /></Reveal>
       <Reveal><CoursePath /></Reveal>
       <Reveal><Features atlasCount={atlasCount} /></Reveal>
-      <Reveal><SimulatorShowcase /></Reveal>
+      <Reveal><SimulatorShowcase simCount={simCount} /></Reveal>
       <Reveal><Latest news={news} videos={videos} /></Reveal>
       <Reveal><NewsletterCTA /></Reveal>
 
@@ -129,7 +131,7 @@ export default function HomeClient({ atlasCount, projectCount, news = [], videos
 }
 
 // ─── HERO ─────────────────────────────────────────────────────────────────
-function Hero({ personalization, atlasCount, projectCount }: { personalization: Personalization; atlasCount: number; projectCount: number }) {
+function Hero({ personalization, atlasCount, projectCount, shortsCount, simCount }: { personalization: Personalization; atlasCount: number; projectCount: number; shortsCount: number; simCount: number }) {
   const continueHref = personalization.track ? `/academy/${personalization.track}` : '/start'
   const primaryLabel = personalization.track
     ? `Continue ${TRACK_LABEL[personalization.track]}`
@@ -155,7 +157,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
           <h1 className="r2-display">The clearest way to learn robotics on the internet.</h1>
 
           <p className="r2-lede">
-            {atlasCount.toLocaleString()} concepts explained from first principles, nine simulators
+            {atlasCount.toLocaleString()} concepts explained from first principles, {simCount} simulators
             that run in your browser, {projectCount} robots you build yourself, and an AI mentor that
             only answers from what we have actually written down.
           </p>
@@ -174,7 +176,7 @@ function Hero({ personalization, atlasCount, projectCount }: { personalization: 
               it was trying too hard. One quiet line states the same facts and
               gets read. */}
           <p className="r2-hero__proof">
-            Free, with no account needed to read any of it · 47 one-minute lessons ·
+            Free, with no account needed to read any of it · {shortsCount} one-minute lessons ·
             5 video courses · 4 learning tracks
           </p>
         </div>
@@ -295,7 +297,7 @@ function Features({ atlasCount }: { atlasCount: number }) {
 }
 
 // ─── SIMULATOR SHOWCASE ───────────────────────────────────────────────────
-function SimulatorShowcase() {
+function SimulatorShowcase({ simCount }: { simCount: number }) {
   const sims = [
     { name: 'PID Controller', slug: 'pid', desc: 'Tune P, I and D and watch the robot reach its target' },
     { name: 'Arm Kinematics', slug: 'ik', desc: 'Forward and inverse kinematics for a robot arm' },
@@ -309,7 +311,7 @@ function SimulatorShowcase() {
           <p className="r2-eyebrow">Interactive simulators</p>
           <h2 className="r2-h2">Learn by doing, with no hardware</h2>
           <p className="r2-body" style={{ marginTop: '1rem' }}>
-            Nine simulators run entirely in your browser, each linked to the lesson that explains
+            {simCount === 10 ? 'Ten' : simCount} simulators run entirely in your browser, each linked to the lesson that explains
             it. Every one has a share and embed link — like Desmos, but for robots — so you can
             send a tuned controller to your class.
           </p>

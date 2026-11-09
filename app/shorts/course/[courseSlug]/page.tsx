@@ -7,6 +7,7 @@ import { StartOrContinue, Tick, CourseProgress } from '@/components/shorts/Short
 import InlineSignup from '@/components/InlineSignup'
 import ShareBar from '@/components/ShareBar'
 import { authorRef } from '@/lib/author'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 /**
  * A mini-course landing page.
@@ -106,7 +107,7 @@ export default async function ShortCoursePage({
 
   return (
     <main className="mx-auto max-w-4xl px-5 pb-20 pt-28">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
 
       <Link href="/shorts" className="text-sm text-gray-400 hover:text-white">
         ← Quick Lessons

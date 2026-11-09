@@ -5,6 +5,7 @@ import { ProgressBar, StartOrContinue, Tick, CourseProgress } from '@/components
 import { CourseCover } from '@/components/shorts/CourseCover'
 import InlineSignup from '@/components/InlineSignup'
 import { authorRef } from '@/lib/author'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 export const revalidate = 86400
@@ -62,7 +63,7 @@ export default function ShortsHub() {
 
   return (
     <main className="mx-auto max-w-5xl px-5 pb-20 pt-28">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
 
       <p className="r2-eyebrow">Quick Lessons</p>
       <h1 className="r2-display">

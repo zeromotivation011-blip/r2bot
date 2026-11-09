@@ -5,6 +5,7 @@ import { CopilotProvider } from '@/components/CopilotProvider'
 import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
 import { SchoolsClient } from './SchoolsClient'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 export const runtime = 'nodejs'
 
@@ -41,7 +42,7 @@ export default function SchoolsPage() {
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(orgJsonLd) }}
       />
       <Nav />
       <CopilotBubble />

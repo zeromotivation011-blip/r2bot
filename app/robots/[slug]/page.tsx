@@ -110,7 +110,7 @@ export default async function RobotProfilePage({
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(thingJsonLd(robot)) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(thingJsonLd(robot)) }}
       />
       <Nav />
 
@@ -370,6 +370,7 @@ export default async function RobotProfilePage({
 
 // ─── Documentary narrative — pulls from lib/famous-robots.ts ────────────────
 import { getRobotDetail } from '@/lib/famous-robots';
+import { jsonldScript } from '@/lib/seo/jsonld';
 
 function DocumentaryNarrative({ slug, robotName }: { slug: string; robotName: string }) {
   const d = getRobotDetail(slug);

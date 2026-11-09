@@ -11,6 +11,7 @@ import {
   getArchivedNewsSlugs,
   getRecentArchivedNews,
 } from '@/lib/news'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 // Guard against NEXT_PUBLIC_SITE_URL being set to the *.vercel.app preview
 // domain — emitting that as canonical/JSON-LD tells Google the content lives on
@@ -121,8 +122,8 @@ export default async function NewsArticlePage({
   return (
     <CopilotProvider>
       <Nav />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(breadcrumbLd) }} />
 
       <main id="main-content" style={{ paddingTop: 120, paddingBottom: 90 }}>
         <div className="container" style={{ maxWidth: 760 }}>

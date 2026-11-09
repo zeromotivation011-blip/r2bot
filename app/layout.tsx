@@ -13,7 +13,7 @@ import { AuthModal } from '@/components/auth/AuthModal';
 import { RefCapture } from '@/components/RefCapture';
 import { HideOnEmbed } from '@/components/HideOnEmbed';
 import { SiteFooter } from '@/components/SiteFooter';
-import { organizationJsonLD } from '@/lib/seo/jsonld';
+import { organizationJsonLD, jsonldScript } from '@/lib/seo/jsonld';
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 // Google Analytics 4 — set NEXT_PUBLIC_GA_ID (e.g. "G-XXXXXXX") in Vercel to turn on.
@@ -96,7 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLD()) }}
+          dangerouslySetInnerHTML={{ __html: jsonldScript(organizationJsonLD()) }}
         />
       </head>
       <body>

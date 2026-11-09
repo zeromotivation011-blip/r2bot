@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { HI_GLOSSARY } from '@/lib/ai-robotics-hi'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export default function HiGlossary() {
     hasDefinedTerm: HI_GLOSSARY.map((t) => ({ '@type': 'DefinedTerm', name: `${t.term} (${t.en})`, description: t.plain })) }
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '110px 20px 80px' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
       <Link href="/hi/ai-robotics" style={{ color: 'var(--text-2)', fontSize: 13 }}>← AI और रोबोटिक्स</Link>
       <h1 style={{ fontSize: 'clamp(28px,5vw,38px)', fontWeight: 900, color: '#fff', margin: '8px 0 18px' }}>AI और रोबोटिक्स शब्दावली</h1>
       <dl style={{ margin: 0 }}>

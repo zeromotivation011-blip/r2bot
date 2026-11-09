@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { breadcrumbJsonLD } from '@/lib/seo/jsonld';
+import { breadcrumbJsonLD, jsonldScript } from '@/lib/seo/jsonld';
 import { getAcademyLesson, getLessonsForTrack } from '@/lib/academy';
 import { AcademyLessonView } from '@/components/AcademyLessonView';
 
@@ -50,7 +50,7 @@ export default async function DynamicAcademyLessonPage({ params }: { params: Par
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbJsonLD([
+          __html: jsonldScript(breadcrumbJsonLD([
             { name: 'Home', path: '/' },
             { name: 'Academy', path: '/academy' },
             { name: track.charAt(0).toUpperCase() + track.slice(1), path: `/academy/${track}` },

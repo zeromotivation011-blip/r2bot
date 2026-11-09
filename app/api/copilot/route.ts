@@ -2,6 +2,13 @@ import Anthropic from '@anthropic-ai/sdk';
 import type { NextRequest } from 'next/server';
 import { createSupabaseServerClient, createSupabaseAdminClient } from '@/lib/supabase/server';
 import { getUserSubscription } from '@/lib/subscription';
+import { MODE_BY_ID } from '@/app/copilot/copilot-modes';
+
+// Hard caps on what a single request may send to the model. Without these a
+// 200 kB body goes straight to Claude at the caller's expense.
+const MAX_MESSAGE_CHARS = 4_000;
+const MAX_HISTORY_ITEM_CHARS = 4_000;
+const MAX_HISTORY_TOTAL_CHARS = 24_000;
 
 const FREE_DAILY_LIMIT_AUTH = 10;
 const FREE_DAILY_LIMIT_ANON = 5;
@@ -43,7 +50,7 @@ RULES
 - If the user is a beginner, recommend the Spark track. If intermediate, Wire. If advanced, Forge or Edge.
 
 ABOUT R2BOT (for context only)
-R2BOT is a free robotics encyclopedia + course platform + AI co-pilot, built by Ravi Bohra. The brand promise is "ROBOT, decoded." — every concept explained plainly, every claim cited.
+R2BOT is a free robotics encyclopedia, course platform and AI co-pilot, written and built by R2BOT Editorial — one person who taught science before building robots. The brand promise is "ROBOT, decoded." — every concept explained plainly, every claim cited. If asked who made R2BOT, say it is written by one person who prefers to stay unnamed, and point to /about/how-this-is-written. Never state or guess a personal name.
 `;
 
 type ChatMsg = { role: 'user' | 'assistant'; content: string };
@@ -205,7 +212,8 @@ export async function POST(req: NextRequest) {
     mode?: 'answer' | 'teach';
     currentTrack?: 'spark' | 'wire' | 'forge' | 'edge' | null;
     suggestions?: boolean;
-    modeSystemPrompt?: string;
+    /** One of the ids in app/copilot/copilot-modes.ts. Free-text system prompts are not accepted. */
+    modeId?: string;
   };
   try {
     body = await req.json();
@@ -215,6 +223,7 @@ export async function POST(req: NextRequest) {
 
   const message = (body.message || '').trim();
   if (!message) return new Response('Empty message.', { status: 400 });
+  if (message.length > MAX_MESSAGE_CHARS) return new Response('Message too long.', { status: 413 });
 
   const history: ChatMsg[] = Array.isArray(body.history)
     ? body.history
@@ -225,7 +234,11 @@ export async function POST(req: NextRequest) {
           m.content.trim().length > 0,
         )
         .slice(-8)
+        .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_HISTORY_ITEM_CHARS) }))
     : [];
+  if (history.reduce((n, m) => n + m.content.length, 0) > MAX_HISTORY_TOTAL_CHARS) {
+    return new Response('Conversation history too long.', { status: 413 });
+  }
 
   // Strip any prior SUGGESTIONS lines from history so they don't pollute context.
   const cleanHistory = history.map((m) =>
@@ -240,9 +253,10 @@ export async function POST(req: NextRequest) {
   const clientIp = getClientIp(req);
 
   // Rate limiting — 10/day for free auth users, 5/day per IP for anon.
-  // Pro users skip the limit entirely. RLS allows the counts: authenticated
-  // users see their own rows; anon sessions match the `auth.uid() is null`
-  // policy. Failures here degrade open (we never block on a count error).
+  // Authenticated users can count their own rows under RLS. The anonymous
+  // count runs on the service-role client: the old RLS policy let any anon
+  // session read EVERY conversation (and IP) so that this count would work,
+  // which was a data leak. Migration 0051 closed it.
   const since24h = new Date(Date.now() - 86_400_000).toISOString();
   if (user) {
     const sub = await getUserSubscription(user.id);
@@ -255,16 +269,14 @@ export async function POST(req: NextRequest) {
       if ((count ?? 0) >= FREE_DAILY_LIMIT_AUTH) {
         return Response.json(
           {
-            error: "You've used your 10 free R2 messages today.",
-            upgradeUrl: '/pricing',
-            message: 'Upgrade to Pro for unlimited R2 Co-pilot.',
+            error: "You've used your 10 R2 messages for today. It resets in 24 hours — the Atlas and every lesson stay open meanwhile.",
           },
           { status: 429 },
         );
       }
     }
   } else if (clientIp) {
-    const { count } = await supabase
+    const { count } = await createSupabaseAdminClient()
       .from('copilot_conversations')
       .select('id', { count: 'exact', head: true })
       .eq('ip_address', clientIp)
@@ -272,9 +284,8 @@ export async function POST(req: NextRequest) {
     if ((count ?? 0) >= FREE_DAILY_LIMIT_ANON) {
       return Response.json(
         {
-          error: 'Sign in to get 10 free messages daily, or upgrade to Pro for unlimited.',
+          error: 'Sign in (free) to get 10 R2 messages a day.',
           loginUrl: '/login',
-          upgradeUrl: '/pricing',
         },
         { status: 429 },
       );
@@ -299,7 +310,7 @@ NEVER give direct answers. Instead:
 Keep responses short (2-4 sentences max). End every response with a question.
 
 ABOUT R2BOT (for context only)
-R2BOT is a free robotics encyclopedia + course platform + AI co-pilot, built by Ravi Bohra. The brand promise is "ROBOT, decoded." — every concept explained plainly, every claim cited.
+R2BOT is a free robotics encyclopedia, course platform and AI co-pilot, written and built by R2BOT Editorial — one person who taught science before building robots. The brand promise is "ROBOT, decoded." — every concept explained plainly, every claim cited. If asked who made R2BOT, say it is written by one person who prefers to stay unnamed, and point to /about/how-this-is-written. Never state or guess a personal name.
 `
       : SYSTEM_PROMPT_BASE;
 
@@ -309,9 +320,12 @@ R2BOT is a free robotics encyclopedia + course platform + AI co-pilot, built by 
     systemPrompt = `${systemPrompt}\n\nLEARNER LEVEL\n${trackHint}`;
   }
 
-  // Append context-mode system prompt from /copilot v2 page (Debug ROS2, Quiz Me, etc.).
-  if (typeof body.modeSystemPrompt === 'string' && body.modeSystemPrompt.trim().length > 0) {
-    systemPrompt = `${systemPrompt}\n\nCONTEXT MODE\n${body.modeSystemPrompt.trim().slice(0, 1500)}`;
+  // Context mode from the /copilot page (Debug ROS 2, Quiz Me, etc.). The
+  // client sends an id and the prompt text comes from our own table — a
+  // user-supplied system prompt was a sanctioned way to make R2 say anything.
+  const modeDef = typeof body.modeId === 'string' ? MODE_BY_ID.get(body.modeId as never) : undefined;
+  if (modeDef?.systemPrompt) {
+    systemPrompt = `${systemPrompt}\n\nCONTEXT MODE\n${modeDef.systemPrompt}`;
   }
 
   if (body.suggestions) {
@@ -367,8 +381,8 @@ The three questions must be short, natural next things this learner would ask gi
         }
         controller.close();
       } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        controller.enqueue(encoder.encode(`\n\n[Error: ${msg}]`));
+        console.error('[copilot] model call failed:', err);
+        controller.enqueue(encoder.encode('\n\n[R2 could not finish that answer. Please try again in a moment.]'));
         controller.close();
         return;
       }

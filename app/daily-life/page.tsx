@@ -4,6 +4,7 @@ import { CopilotProvider } from '@/components/CopilotProvider'
 import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
 import DailyLifeClient from './DailyLifeClient'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 export const runtime = 'nodejs'
 export const revalidate = 3600
@@ -51,8 +52,8 @@ const faqJsonLd = {
 export default function DailyLifePage() {
   return (
     <CopilotProvider>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(faqJsonLd) }} />
       <Nav />
       <DailyLifeClient />
       <CopilotBubble />

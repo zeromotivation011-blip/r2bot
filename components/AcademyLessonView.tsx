@@ -14,6 +14,7 @@ import {
 } from '@/components/academy/LessonExtras';
 import type { AcademyLesson, AcademyTrack } from '@/lib/academy';
 import { getLessonsForTrack, TRACK_ACCENT, trackLabel, isoDuration } from '@/lib/academy';
+import { jsonldScript } from '@/lib/seo/jsonld';
 
 // Guarded so Course JSON-LD never advertises the *.vercel.app preview domain.
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
@@ -45,7 +46,7 @@ export function AcademyLessonView({ lesson }: { lesson: AcademyLesson }) {
       <Nav />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(jsonLd) }}
       />
 
       {/* <main>, not <article>: see the Atlas template. Same fault, same fix. */}

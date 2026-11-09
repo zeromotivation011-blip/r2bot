@@ -15,6 +15,7 @@ import { getAllAtlasEntries } from '@/lib/atlas';
 import { getAcademyLesson } from '@/lib/academy';
 import { getNewsData } from '@/lib/news';
 import { WeeklyDigest, buildSubject, type DigestProps } from '@/components/emails/WeeklyDigest';
+import { isCronAuthorized } from '@/lib/cron-auth';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -23,9 +24,7 @@ export const dynamic = 'force-dynamic';
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
 function authorized(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-  return req.headers.get('authorization') === `Bearer ${secret}`;
+  return isCronAuthorized(req.headers.get('authorization'));
 }
 
 function weekNumberUTC(d: Date): number {

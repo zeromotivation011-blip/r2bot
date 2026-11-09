@@ -1,6 +1,7 @@
 // app/world-map/page.tsx
 import type { Metadata } from 'next';
 import WorldMapDynamic from './WorldMapDynamic';
+import { jsonldScript } from '@/lib/seo/jsonld';
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 const PAGE_URL = `${BASE_URL}/world-map`;
@@ -157,12 +158,12 @@ export default function WorldMapPage() {
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(datasetJsonLd) }}
       />
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(faqJsonLd) }}
       />
       <WorldMapDynamic />
     </>

@@ -6,6 +6,7 @@ import { SHORTS, getShort, liveShorts, isLive, liveVideoIds } from '@/lib/shorts
 import { SHORTS_ES } from '@/lib/shorts-es'
 import ShortDemo from '@/components/shorts/ShortsDemos'
 import { ShortEmbed, LessonQuiz } from '@/components/shorts/ShortsClient'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 export const revalidate = 3600
@@ -31,7 +32,7 @@ export default async function EsShort({ params }: { params: Promise<{ slug: stri
   ]
   return (
     <main style={{ maxWidth: 820, margin: '0 auto', padding: '110px 20px 80px' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
       <Link href="/es/shorts" style={{ color: 'var(--text-2)', fontSize: 13 }}>← Lecciones rápidas</Link>
       <h1 className="r2-h1">{z.title}</h1>
       <p className="r2-lede">{z.summary}</p>

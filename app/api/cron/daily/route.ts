@@ -14,15 +14,14 @@ import { runEmailAutomation } from '@/lib/email-automation';
 import { runWeeklyBackup } from '@/lib/backup';
 import { runWeeklyIndexNow } from '@/lib/indexnow';
 import { runAtlasIndex } from '@/lib/atlas-index';
+import { isCronAuthorized } from '@/lib/cron-auth';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
 
 function authorized(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-  return (req.headers.get('authorization') ?? '') === `Bearer ${secret}`;
+  return isCronAuthorized(req.headers.get('authorization'));
 }
 
 type StepResult = { ok: boolean; detail?: unknown; error?: string };

@@ -11,6 +11,7 @@ import {
   trackLabel,
   type AcademyLesson,
 } from '@/lib/academy';
+import { jsonldScript } from '@/lib/seo/jsonld';
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -59,7 +60,7 @@ export default function AcademyPage() {
   return (
     <CopilotProvider>
       <Nav />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(jsonLd) }} />
 
       <main id="main-content" className="mx-auto max-w-4xl px-5 pb-20 pt-28">
         <p className="r2-eyebrow">The Academy</p>

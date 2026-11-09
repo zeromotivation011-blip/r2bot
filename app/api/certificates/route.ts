@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient, createSupabaseAdminClient } from '@/lib/supabase/server';
+import { getAcademyLesson, type AcademyTrack } from '@/lib/academy';
 
 type Body = {
   track?: string;
@@ -19,14 +20,18 @@ export async function POST(request: Request) {
 
   const track = String(body.track ?? '');
   const lessonSlug = String(body.lessonSlug ?? '');
-  const lessonTitle = String(body.lessonTitle ?? '');
 
   if (!VALID_TRACKS.has(track)) {
     return NextResponse.json({ error: 'Invalid track' }, { status: 400 });
   }
-  if (!lessonSlug || !lessonTitle) {
-    return NextResponse.json({ error: 'Missing lessonSlug or lessonTitle' }, { status: 400 });
+  // lessonSlug is "<track>/<nn>". The title comes from our own content, never
+  // from the request: it is printed on a public /verify page.
+  const slugPart = lessonSlug.startsWith(`${track}/`) ? lessonSlug.slice(track.length + 1) : '';
+  const lesson = slugPart ? getAcademyLesson(track as AcademyTrack, slugPart) : null;
+  if (!lesson) {
+    return NextResponse.json({ error: 'Unknown lesson' }, { status: 400 });
   }
+  const lessonTitle = lesson.title;
 
   const supabase = await createSupabaseServerClient();
   const {
@@ -36,8 +41,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  // Writes go through the service-role client: users have no INSERT policy on
+  // certificates since migration 0051 (they could mint their own before).
+  const admin = createSupabaseAdminClient();
+
   // Check if a certificate already exists for this lesson — return existing.
-  const { data: existing } = await supabase
+  const { data: existing } = await admin
     .from('certificates')
     .select('certificate_id, issued_at, lesson_title, track')
     .eq('user_id', user.id)
@@ -54,7 +63,7 @@ export async function POST(request: Request) {
     });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from('certificates')
     .insert({
       user_id: user.id,

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { AI_TOPICS } from '@/lib/ai-robotics'
 import SenseThinkAct from './SenseThinkAct'
 import WhichAi from './WhichAi'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export default function AiRoboticsHub() {
   }
   return (
     <main style={{ maxWidth: 1000, margin: '0 auto', padding: '110px 20px 80px' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
       <h1 style={{ fontSize: 'clamp(30px,5vw,44px)', fontWeight: 900, color: '#fff', margin: '0 0 10px' }}>AI and Robotics, in plain English</h1>
       <p style={{ color: 'var(--text-2)', fontSize: 18, lineHeight: 1.6, maxWidth: 720, margin: '0 0 28px' }}>
         A robot senses, thinks and acts. AI is one way to do the thinking. Each guide below says what an idea is, what you can build with it, and what goes wrong without it. Free, no jargon.

@@ -5,6 +5,7 @@ import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
 import HistoryHomeClient from './HistoryHomeClient'
 import { CHAPTERS, getAllMilestones } from '@/lib/history-chapters'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 export const runtime = 'nodejs'
 export const revalidate = 3600
@@ -39,8 +40,8 @@ const eventsJsonLd = getAllMilestones().slice(0, 30).map(m => ({
 export default function HistoryPage() {
   return (
     <CopilotProvider>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(eventsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(eventsJsonLd) }} />
       <Nav />
       <HistoryHomeClient chapters={CHAPTERS} />
       <CopilotBubble />

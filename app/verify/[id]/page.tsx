@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Nav } from '@/components/Nav';
 import { CopilotProvider } from '@/components/CopilotProvider';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseAdminClient } from '@/lib/supabase/server';
 import ShareCert from './ShareCert';
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
@@ -29,7 +29,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 export default async function VerifyPage({ params }: { params: Params }) {
   const { id } = await params;
-  const supabase = await createSupabaseServerClient();
+  // Service-role read: the anon "verify" policy that exposed every row to the
+  // public was dropped in 0051. Only the columns shown below are selected.
+  const supabase = createSupabaseAdminClient();
 
   const { data, error } = await supabase
     .from('certificates')

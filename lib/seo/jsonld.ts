@@ -102,7 +102,18 @@ export function breadcrumbJsonLD(items: { name: string; path: string }[]) {
   };
 }
 
-/** Helper to render any JSON-LD object as a <script> string. */
+/**
+ * Serialise JSON-LD for a <script type="application/ld+json"> body.
+ *
+ * JSON.stringify does not escape `<`, so a title from an RSS feed or the CMS
+ * containing `</script><script>…` would end the JSON block and run as script.
+ * Escaping `<`, `>` and `&` as \uXXXX keeps the output valid JSON (parsers
+ * decode the escapes) while making a breakout impossible. Every
+ * dangerouslySetInnerHTML for structured data on the site goes through here.
+ */
 export function jsonldScript(data: unknown): string {
-  return JSON.stringify(data);
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
 }

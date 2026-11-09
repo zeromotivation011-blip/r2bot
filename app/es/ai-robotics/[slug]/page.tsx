@@ -3,6 +3,7 @@ import Link from 'next/link'
 import InlineSignup from '@/components/InlineSignup'
 import { notFound } from 'next/navigation'
 import { ES_TOPICS, getEsTopic } from '@/lib/ai-robotics-es'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 export function generateStaticParams() { return ES_TOPICS.map((t) => ({ slug: t.slug })) }
@@ -25,7 +26,7 @@ export default async function EsTopic({ params }: { params: Promise<{ slug: stri
   ]
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '110px 20px 80px' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
       <Link href="/es/ai-robotics" style={{ color: 'var(--text-2)', fontSize: 13 }}>← IA y robótica</Link>
       <h1 style={{ fontSize: 'clamp(28px,5vw,38px)', fontWeight: 900, color: '#fff', margin: '8px 0 6px', lineHeight: 1.4 }}>{t.title}</h1>
       <p style={{ color: '#FC6818', fontSize: 13, fontWeight: 800, margin: '0 0 16px' }}>{t.level} · unos {t.minutes} min de lectura</p>

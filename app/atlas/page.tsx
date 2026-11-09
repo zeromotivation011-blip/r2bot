@@ -7,6 +7,7 @@ import { CopilotDrawer } from '@/components/CopilotDrawer'
 import { getAllAtlasEntriesMerged } from '@/lib/atlas-db'
 import { ATLAS_BUCKETS, resolveBucket } from '@/lib/atlas-buckets'
 import AtlasHomeClient, { type AtlasNode } from './AtlasHomeClient'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 export const runtime = 'nodejs'
 export const revalidate = 3600
@@ -16,7 +17,7 @@ const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_
 export const metadata: Metadata = {
   title: 'Robotics Atlas — Every Concept Explained Simply',
   description:
-    "480+ robotics concepts explained in plain English. From servo motors to neural networks — the clearest robotics knowledge base on the internet.",
+    "500+ robotics concepts explained in plain English. From servo motors to neural networks — the clearest robotics knowledge base on the internet.",
   alternates: { canonical: `${BASE}/atlas` },
   openGraph: {
     type: 'website',
@@ -34,7 +35,7 @@ const appJsonLd = {
   name: 'R2BOT Atlas',
   applicationCategory: 'EducationalApplication',
   operatingSystem: 'Any (browser)',
-  description: 'Interactive robotics knowledge universe with 480+ concepts, learning paths and a force-directed concept map.',
+  description: 'Interactive robotics knowledge universe with 500+ concepts, learning paths and a force-directed concept map.',
   url: `${BASE}/atlas`,
   isAccessibleForFree: true,
 }
@@ -144,9 +145,9 @@ export default async function AtlasIndex() {
 
   return (
     <CopilotProvider>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(appJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(datasetJsonLd) }} />
       <Nav />
       <AtlasHomeClient nodes={nodes} buckets={buckets} />
       <CopilotBubble />

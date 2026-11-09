@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { listPublishedCourses, totalMinutes, hasVideo } from '@/lib/courses'
 import JourneyClient from './JourneyClient'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 export const revalidate = 86400
 const BASE = 'https://www.r2bot.in'
@@ -30,7 +31,7 @@ export default function CoursesPage() {
       <ul className="mt-5 flex flex-wrap gap-2 text-xs text-gray-300">
         {[`${lessonsTotal} short lessons`, 'Quiz after every lesson', 'Final activity per course', 'Certificate for each course', 'English · plain language'].map((t) => <li key={t} className="rounded-full border border-white/10 px-3 py-1">{t}</li>)}
       </ul>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript({
         '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [
           { q: 'Are the R2BOT courses really free?', a: 'Yes. All five courses, quizzes and certificates are free.' },
           { q: 'How long is each lesson?', a: 'Each lesson is a short video of about 4 minutes followed by a quick quiz.' },
@@ -46,7 +47,7 @@ export default function CoursesPage() {
         </div>
       ) : (
         <>
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript({
             '@context': 'https://schema.org', '@type': 'ItemList', name: 'R2BOT free robotics course path',
             // Only courses with a video: the other two are noindex, and
             // advertising a noindex URL in schema is a contradiction.

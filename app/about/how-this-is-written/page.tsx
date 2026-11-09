@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Nav } from '@/components/Nav'
 import { CopilotProvider } from '@/components/CopilotProvider'
 import { AUTHOR, authorPersonJsonLd } from '@/lib/author'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
@@ -50,7 +51,7 @@ export default function HowThisIsWrittenPage() {
       <Nav />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(authorPersonJsonLd()) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(authorPersonJsonLd()) }}
       />
       <main id="main-content" className="mx-auto max-w-3xl px-5 pb-20 pt-28">
         <p className="r2-eyebrow">Who writes this</p>

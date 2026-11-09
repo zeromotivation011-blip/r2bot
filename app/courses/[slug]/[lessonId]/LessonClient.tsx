@@ -11,7 +11,7 @@ interface Props {
   /** First lesson of this course that does have a video, so an unrecorded lesson is never a dead end. */
   firstReadyId: string | null
 }
-interface Review { ok: boolean; why: string | null; answer: number }
+interface Review { ok: boolean; why: string | null; answer: number | null }
 interface Result { needsAssignment?: boolean; passed: boolean; score: number; review: Review[]; courseComplete?: boolean; certificateId?: string | null; completed?: number; total?: number; error?: string }
 
 // Minimal typing for the YouTube IFrame API.

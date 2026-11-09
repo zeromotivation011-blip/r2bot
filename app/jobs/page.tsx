@@ -6,6 +6,7 @@ import { CopilotProvider } from '@/components/CopilotProvider';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { type Job, timeAgo, formatExperience } from '@/lib/jobs';
 import { JobsClient } from './JobsClient';
+import { jsonldScript } from '@/lib/seo/jsonld';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/jobs' },
@@ -175,7 +176,7 @@ function JobPostingSchema({ job }: { job: Job }) {
     <script
       type="application/ld+json"
       // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(base) }}
+      dangerouslySetInnerHTML={{ __html: jsonldScript(base) }}
     />
   );
 }

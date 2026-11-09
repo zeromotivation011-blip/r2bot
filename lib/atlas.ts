@@ -209,13 +209,28 @@ function normalizeCategory(v: unknown): AtlasCategory | undefined {
   return ATLAS_CATEGORIES.includes(v as AtlasCategory) ? (v as AtlasCategory) : undefined;
 }
 
+/**
+ * Summaries are rendered as plain text (lede, meta description, tooltips,
+ * JSON-LD), so inline markdown written in frontmatter — `**bold**`, `code`,
+ * [links](...) — showed up literally on the page. Strip it here, once.
+ */
+export function plainSummary(v: unknown): string {
+  return String(v ?? '')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1$2')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /** Build an AtlasEntry from raw frontmatter, coercing every field to a render-safe value. */
 export function buildEntry(type: AtlasType, slug: string, data: Record<string, unknown>, body: string): AtlasEntry {
   return {
     type,
     slug,
     title: String(data.title ?? slug).replace(/\s*[|]\s*R2BOT\s*$/i, '').trim(),
-    summary: String(data.summary ?? ''),
+    summary: plainSummary(data.summary),
     seeAlso: normalizeStringArray(data.seeAlso),
     sources: normalizeSources(data.sources),
     lastReviewed: normalizeDate(data.lastReviewed),
@@ -239,13 +254,13 @@ export function buildEntry(type: AtlasType, slug: string, data: Record<string, u
         ? (data.difficulty as 1 | 2 | 3 | 4 | 5)
         : undefined,
     difficultyLabel: typeof data.difficultyLabel === 'string' ? data.difficultyLabel : undefined,
-    oneLiner: typeof data.oneLiner === 'string' ? data.oneLiner : undefined,
-    laymanExplanation: typeof data.laymanExplanation === 'string' ? data.laymanExplanation : undefined,
-    analogy: typeof data.analogy === 'string' ? data.analogy : undefined,
+    oneLiner: typeof data.oneLiner === 'string' ? plainSummary(data.oneLiner) : undefined,
+    laymanExplanation: typeof data.laymanExplanation === 'string' ? plainSummary(data.laymanExplanation) : undefined,
+    analogy: typeof data.analogy === 'string' ? plainSummary(data.analogy) : undefined,
     technicalDefinition: typeof data.technicalDefinition === 'string' ? data.technicalDefinition : undefined,
-    whyItMatters: typeof data.whyItMatters === 'string' ? data.whyItMatters : undefined,
+    whyItMatters: typeof data.whyItMatters === 'string' ? plainSummary(data.whyItMatters) : undefined,
     realRobotsThatUseThis: normalizeStringArray(data.realRobotsThatUseThis),
-    indianExample: typeof data.indianExample === 'string' ? data.indianExample : undefined,
+    indianExample: typeof data.indianExample === 'string' ? plainSummary(data.indianExample) : undefined,
     prerequisiteTerms: normalizeStringArray(data.prerequisiteTerms),
     unlocksTerms: normalizeStringArray(data.unlocksTerms),
     youtubeId: typeof data.youtubeId === 'string' ? data.youtubeId : undefined,
@@ -258,7 +273,7 @@ export function buildEntry(type: AtlasType, slug: string, data: Record<string, u
             explanation: String((data.quizQuestion as Record<string, unknown>).explanation ?? ''),
           }
         : undefined,
-    mindBlowingFact: typeof data.mindBlowingFact === 'string' ? data.mindBlowingFact : undefined,
+    mindBlowingFact: typeof data.mindBlowingFact === 'string' ? plainSummary(data.mindBlowingFact) : undefined,
     industryApplications: normalizeStringArray(data.industryApplications),
     body,
   };

@@ -259,13 +259,13 @@ export function CopilotDrawer() {
         });
         if (res.status === 429) {
           const data = (await res.json().catch(() => ({}))) as {
-            error?: string; message?: string; upgradeUrl?: string; loginUrl?: string;
+            error?: string; message?: string; loginUrl?: string;
           };
           if (data.loginUrl) {
             // Anonymous user — inline CTA, no modal.
             const text =
-              (data.error || "You've hit the free message limit.") +
-              '\n\n[Sign in →](/login) · [Upgrade to Pro →](/pricing)';
+              (data.error || 'Sign in (free) to get 10 R2 messages a day.') +
+              '\n\n[Sign in →](/login)';
             setMessages((curr) => {
               const updated = [...curr];
               updated[updated.length - 1] = { role: 'assistant', content: text };
@@ -275,7 +275,7 @@ export function CopilotDrawer() {
             // Authenticated free user — open upgrade modal + brief inline notice.
             setUpgradeReason(data.error || "You've used your 10 free R2 messages today.");
             setUpgradeOpen(true);
-            const text = data.message || data.error || 'Upgrade to Pro for unlimited R2.';
+            const text = data.message || data.error || "You've used your 10 R2 messages for today. It resets in 24 hours.";
             setMessages((curr) => {
               const updated = [...curr];
               updated[updated.length - 1] = { role: 'assistant', content: text };

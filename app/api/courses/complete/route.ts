@@ -2,7 +2,7 @@
 // enough watch time, record completion, and issue a certificate when the whole
 // course is done. Answers are never sent to the browser.
 import type { NextRequest } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { createSupabaseServerClient, createSupabaseAdminClient } from '@/lib/supabase/server'
 import { loadCourseBySlug, PASS_MARK, WATCH_REQUIRED, hasVideo } from '@/lib/courses'
 import { issueCertificateIfEarned } from '@/lib/course-certificate'
 
@@ -38,10 +38,14 @@ export async function POST(req: NextRequest) {
   })
   const score = lesson.quiz.length ? correct / lesson.quiz.length : 1
   if (score < PASS_MARK) {
-    return Response.json({ passed: false, score, review }, { status: 200 })
+    // Failed attempt: say which were wrong, never which option was right,
+    // otherwise one failed submit reveals the whole key.
+    return Response.json({ passed: false, score, review: review.map((r) => ({ ok: r.ok, why: r.ok ? r.why : null, answer: null })) }, { status: 200 })
   }
 
-  const { error } = await supabase.from('lesson_completions').upsert(
+  // Service-role write: owners can only read lesson_completions since 0051,
+  // so a fake completion cannot be inserted around the grading above.
+  const { error } = await createSupabaseAdminClient().from('lesson_completions').upsert(
     { user_id: user.id, course_slug: courseSlug, lesson_slug: lessonId, xp_earned: 0 },
     { onConflict: 'user_id,course_slug,lesson_slug' },
   )

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { listPublishedCourses, loadCourseBySlug, totalMinutes, hasVideo } from '@/lib/courses'
-import { courseJsonLD, breadcrumbJsonLD } from '@/lib/seo/jsonld'
+import { courseJsonLD, breadcrumbJsonLD, jsonldScript } from '@/lib/seo/jsonld'
 import CourseOverviewClient from './CourseOverviewClient'
 
 export const revalidate = 86400
@@ -47,7 +47,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
   ]
   return (
     <>
-      {ld.map((j, i) => <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(j) }} />)}
+      {ld.map((j, i) => <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(j) }} />)}
       <CourseOverviewClient
         slug={c.slug} title={c.title} description={c.description} tagline={c.tagline} outcome={c.outcome}
         level={c.levelLabel ?? c.level} order={c.order} totalCourses={all.length}

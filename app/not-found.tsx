@@ -10,13 +10,16 @@ export const metadata: Metadata = {
   description:
     "Looks like this robot got lost. The page you're looking for doesn't exist — but the rest of R2BOT does.",
   robots: { index: false, follow: true },
+  // The root layout sets canonical=homepage; inheriting that on a 404 told
+  // Google every missing URL was a copy of the homepage.
+  alternates: { canonical: null },
 };
 
 const DESTINATIONS: { emoji: string; label: string; href: string; description: string }[] = [
   { emoji: '🎓', label: 'Academy', href: '/academy', description: 'Start learning robotics with hands-on lessons.' },
   { emoji: '📚', label: 'Atlas', href: '/atlas', description: 'Robotics encyclopedia in plain English.' },
   { emoji: '🤖', label: 'R2 Co-pilot', href: '/copilot', description: 'AI mentor — ask anything, grounded in the Atlas.' },
-  { emoji: '🏆', label: 'Community Builds', href: '/community', description: 'Real robots built by R2BOT learners.' },
+  { emoji: '⚡', label: 'Quick Lessons', href: '/shorts', description: 'One-minute video lessons with a demo and a quiz.' },
 ];
 
 export default function NotFound() {

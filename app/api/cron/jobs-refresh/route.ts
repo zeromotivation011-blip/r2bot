@@ -25,6 +25,7 @@
 
 import type { NextRequest } from 'next/server';
 import { createSupabaseAdminClient } from '@/lib/supabase/server';
+import { isCronAuthorized } from '@/lib/cron-auth';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -69,10 +70,7 @@ type NormalisedJob = {
 
 // ---------- auth ----------
 function authorized(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-  const header = req.headers.get('authorization') ?? '';
-  return header === `Bearer ${secret}`;
+  return isCronAuthorized(req.headers.get('authorization'));
 }
 
 // ---------- normalisation helpers ----------

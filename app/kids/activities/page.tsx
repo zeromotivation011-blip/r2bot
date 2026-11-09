@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { KID_ACTS } from '@/lib/kids-activities'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
@@ -16,7 +17,7 @@ export default function KidsActivities() {
   return (
     <main style={{ maxWidth: 800, margin: '0 auto', padding: '110px 20px 80px' }}>
       <style>{`@media print { nav, header, footer, .no-print { display:none !important } body { background:#fff !important } main, main * { color:#000 !important; background:transparent !important; border-color:#999 !important } main { padding-top: 0 !important } }`}</style>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
       <Link href="/kids/parents" className="no-print" style={{ color: '#94a3b8', fontSize: 13 }}>← For parents</Link>
       <h1 style={{ fontSize: 'clamp(28px,5vw,40px)', fontWeight: 900, color: '#fff', margin: '8px 0 8px' }}>Screen-free robotics activities</h1>
       <p style={{ color: '#cbd5e1', fontSize: 17, lineHeight: 1.6 }}>Seven activities with things you already have at home. No account, no sign-up, nothing collected. Use your browser's Print button to make a copy to keep.</p>

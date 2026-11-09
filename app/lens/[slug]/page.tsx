@@ -8,6 +8,7 @@ import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
 import { AskAboutThisButton } from '@/components/AskAboutThisButton';
+import { jsonldScript } from '@/lib/seo/jsonld';
 
 type Params = { slug: string };
 
@@ -62,7 +63,7 @@ export default async function LensVideoPage(
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(schema) }}
       />
 
       <article style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>

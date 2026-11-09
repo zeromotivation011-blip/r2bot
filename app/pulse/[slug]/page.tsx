@@ -19,6 +19,7 @@ import { ReadingProgress } from '@/components/ReadingProgress';
 import { BackToTop } from '@/components/BackToTop';
 import { ShareRow } from '@/components/ShareRow';
 import { getAllAtlasEntries } from '@/lib/atlas';
+import { jsonldScript } from '@/lib/seo/jsonld';
 
 type Params = { slug: string };
 
@@ -93,7 +94,7 @@ export default async function PulseArticlePage(
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(schema) }}
       />
 
       <article id="main-content" style={{ paddingTop: 140, paddingBottom: 100, position: 'relative', zIndex: 2 }}>

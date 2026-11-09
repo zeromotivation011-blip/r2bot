@@ -8,6 +8,7 @@ import { CopilotDrawer } from '@/components/CopilotDrawer'
 import { getAllPosts, getRelatedPosts } from '@/lib/blog'
 import { getPostBySlugMerged } from '@/lib/blog-db'
 import BlogPostClient from './BlogPostClient'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 export const runtime = 'nodejs'
 // Regenerate periodically so Content-Manager edits appear on the live post.
@@ -82,7 +83,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <CopilotProvider>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(articleJsonLd) }} />
       <Nav />
       <BlogPostClient post={post} related={relatedLite} url={url} />
       <CopilotBubble />

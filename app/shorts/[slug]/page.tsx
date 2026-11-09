@@ -7,6 +7,7 @@ import ShortDemo from '@/components/shorts/ShortsDemos'
 import { ShortEmbed, LessonQuiz, ProgressBar } from '@/components/shorts/ShortsClient'
 import ShareBar from '@/components/ShareBar'
 import { authorRef } from '@/lib/author'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 // Hourly, so a lesson switches itself on when its Short's release date passes.
@@ -43,7 +44,7 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
   ]
   return (
     <main className="r2-lesson">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
       <nav style={{ fontSize: 13, color: 'var(--text-2)' }}>
         <Link href="/shorts" style={{ color: 'var(--text-2)' }}>Quick Lessons</Link>
         {' / '}

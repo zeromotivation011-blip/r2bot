@@ -134,7 +134,7 @@ Build these exceptionally; everything else is secondary.
   waitlists) was retired on 8 Nov 2026 and 308s to the tracks; see `content/academy/RETIRED.md`.
   Do not reintroduce a parallel lesson system.
 - **R2 Co-pilot** — the AI mentor and clearest differentiator. Grounded in Atlas (RAG), never hallucinates.
-  Free 10 msgs/day, Pro unlimited. Available everywhere (⌘K).
+  10 msgs/day signed in, 5/day anonymous (per IP, counted on the service-role client). There is no Pro tier — never add upgrade copy. Context modes are sent as an id from `app/copilot/copilot-modes.ts`; the server never accepts free-text system prompts. Available everywhere (⌘K).
 - **Robot Projects** — 10+ guided builds, full BOM, code (Monaco), simulator fallback.
 - **Simulators (Visualizer)** — 9 interactive tools; visually stunning, shareable/embeddable.
 - **Workspace IDE / ROS2 Playground** — serious-robotics showcases; lazy-load heavy libs.
@@ -230,6 +230,14 @@ Ordered. Each is a real project; do them completely.
   Resend free plan is ~100/day — raise it before the list passes ~90.
 - **Privacy:** collect only what we use; RLS on all tables; never expose PII to non-admins; be
   GDPR-minded now that the audience is global (consent-friendly, EEA-aware).
+- **Security rules learned on 9 Nov 2026 (migration 0051):** no RLS policy may contain
+  `auth.uid() is null` (it made every Co-pilot transcript world-readable); `profiles.role` and
+  `profiles.email` are trigger-protected — only the service role changes them; certificates and
+  lesson_completions are written ONLY by the server with the admin client, users may read their
+  own; every JSON-LD block goes through `jsonldScript()` (escapes `<`); every cron/maintenance
+  route uses `isCronAuthorized()` from `lib/cron-auth.ts`; security headers live in
+  `next.config.mjs` `headers()` — the CSP is Report-Only until a week of reports is clean, and
+  `/visualizer/embed/*` must stay framable by anyone.
 
 ---
 

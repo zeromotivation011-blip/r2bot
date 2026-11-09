@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { jsonldScript } from '@/lib/seo/jsonld';
 
 export type Crumb = { label: string; href?: string };
 
@@ -51,7 +52,7 @@ export function Breadcrumbs({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: jsonldScript({
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: trail.map((c, i) => ({

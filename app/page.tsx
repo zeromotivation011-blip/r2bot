@@ -4,11 +4,14 @@ import { CopilotProvider } from '@/components/CopilotProvider'
 import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
 import HomeClient from './HomeClient'
+import { liveShorts } from '@/lib/shorts'
+import { SIMULATORS } from '@/lib/simulators'
 import { getAllAtlasEntries } from '@/lib/atlas'
 import { loadAllProjects } from '@/lib/build/loader'
 import { getNewsData } from '@/lib/news'
 import { getLiveLensVideos } from '@/lib/lens-live'
 import { getAllLens } from '@/lib/lens'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 export const runtime = 'nodejs'
 export const revalidate = 3600
@@ -18,7 +21,7 @@ const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_S
 export const metadata: Metadata = {
   title: "R2BOT — From Zero to Robotics Engineer | Learn, Build, Explore",
   description:
-    'From zero to robotics engineer. Learn ROS2, build real robots, and explore 480+ concepts with an AI mentor. Free, in plain English, with interactive demos and five video courses.',
+    'From zero to robotics engineer. Learn ROS2, build real robots, and explore 500+ concepts with an AI mentor. Free, in plain English, with interactive demos and five video courses.',
   keywords: [
     'learn robotics',
     'ROS2 tutorial beginner',
@@ -37,13 +40,13 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: 'R2BOT',
     title: "R2BOT — The World's Clearest Robotics Learning Platform",
-    description: '480+ concepts. Real simulators. AI mentor. Free to explore and learn.',
+    description: '500+ concepts. Real simulators. AI mentor. Free to explore and learn.',
     images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT — the clearest way to learn robotics' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'R2BOT — From Zero to Robotics Engineer',
-    description: "Learn ROS2, build real robots, explore 480+ concepts. AI mentor included. Free to start.",
+    description: "Learn ROS2, build real robots, explore 500+ concepts. AI mentor included. Free to start.",
     images: ['/og-default.png'],
   },
   robots: {
@@ -111,6 +114,10 @@ const faqJsonLd = {
 
 export default async function HomePage() {
   const atlasCount = getAllAtlasEntries().length
+  // Counted from the data, not typed: the hero said "47 lessons" while the
+  // section below it said 48, and "nine simulators" when there are ten.
+  const shortsCount = liveShorts().length
+  const simCount = SIMULATORS.length
   const projectCount = loadAllProjects().length
 
   // Live homepage teasers — sourced from the automated News + Lens pipelines.
@@ -158,9 +165,9 @@ export default async function HomePage() {
 
   return (
     <CopilotProvider>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteJsonLd, organizationJsonLd, faqJsonLd]) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript([websiteJsonLd, organizationJsonLd, faqJsonLd]) }} />
       <Nav />
-      <HomeClient atlasCount={atlasCount} projectCount={projectCount} news={news} videos={videos} />
+      <HomeClient atlasCount={atlasCount} projectCount={projectCount} shortsCount={shortsCount} simCount={simCount} news={news} videos={videos} />
       <CopilotBubble />
       <CopilotDrawer />
     </CopilotProvider>

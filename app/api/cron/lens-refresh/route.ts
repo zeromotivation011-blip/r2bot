@@ -6,15 +6,14 @@
 import type { NextRequest } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { getLiveLensVideos } from '@/lib/lens-live';
+import { isCronAuthorized } from '@/lib/cron-auth';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
 export const dynamic = 'force-dynamic';
 
 function authorized(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
-  return (req.headers.get('authorization') ?? '') === `Bearer ${secret}`;
+  return isCronAuthorized(req.headers.get('authorization'));
 }
 
 async function handle(req: NextRequest): Promise<Response> {

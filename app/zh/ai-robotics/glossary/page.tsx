@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ZH_GLOSSARY } from '@/lib/ai-robotics-zh'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export default function ZhGlossary() {
     hasDefinedTerm: ZH_GLOSSARY.map((t) => ({ '@type': 'DefinedTerm', name: `${t.term} (${t.en})`, description: t.plain })) }
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '110px 20px 80px' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(ld) }} />
       <Link href="/zh/ai-robotics" style={{ color: 'var(--text-2)', fontSize: 13 }}>← AI 与机器人</Link>
       <h1 style={{ fontSize: 'clamp(28px,5vw,38px)', fontWeight: 900, color: '#fff', margin: '8px 0 18px' }}>AI 与机器人词汇表</h1>
       <dl style={{ margin: 0 }}>

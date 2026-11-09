@@ -5,6 +5,7 @@ import { CopilotBubble } from '@/components/CopilotBubble';
 import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { RobotsIndexClient } from './RobotsIndexClient';
 import { ROBOTS } from '@/lib/robots-data';
+import { jsonldScript } from '@/lib/seo/jsonld';
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 const PAGE_URL = `${BASE_URL}/robots`;
@@ -81,7 +82,7 @@ export default function RobotsIndexPage() {
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(collectionJsonLd) }}
       />
       <Nav />
       <main id="main-content">

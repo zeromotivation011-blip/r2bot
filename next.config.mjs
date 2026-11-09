@@ -53,10 +53,64 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
-      { protocol: 'https', hostname: 'acrdjpmvdscngldxilgm.supabase.co' },
       { protocol: 'https', hostname: '*.supabase.co' },
       { protocol: 'https', hostname: 'i.ytimg.com' },
     ],
+  },
+  // Security headers. Before 9 Nov 2026 the site sent only HSTS: no
+  // frame-ancestors (clickjacking of /admin and /dashboard), no nosniff, no
+  // Referrer-Policy (full URLs, including one-click unsubscribe tokens, were
+  // sent as Referer to YouTube/GA), no Permissions-Policy.
+  //
+  // The CSP ships in Report-Only first. The ROS 2 Playground and Workspace
+  // load Pyodide/wasm from jsDelivr and cdnjs, Monaco spawns blob: workers,
+  // and Next hydration plus the gtag snippet need inline script, so an
+  // enforced policy written without a week of reports would break pages.
+  // Watch the console / a report endpoint, then rename the key to
+  // Content-Security-Policy. frame-ancestors IS enforced now (a separate
+  // header), because it cannot break anything on our own pages.
+  async headers() {
+    const supabase = 'https://bxgtocghjypbomszwvfr.supabase.co';
+    const cspReportOnly = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://www.googletagmanager.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://pyodide.org https://ros2wasm.dev",
+      "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
+      "img-src 'self' data: blob: https:",
+      "font-src 'self' data:",
+      `connect-src 'self' ${supabase} ${supabase.replace('https', 'wss')} https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://pyodide.org https://ros2wasm.dev`,
+      "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://ros2wasm.dev",
+      "media-src 'self' blob: https:",
+      "worker-src 'self' blob:",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ].join('; ');
+    const common = [
+      { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=(), payment=(), usb=(), serial=(self), bluetooth=(self), interest-cohort=()' },
+      { key: 'X-DNS-Prefetch-Control', value: 'on' },
+      { key: 'Content-Security-Policy-Report-Only', value: cspReportOnly },
+    ];
+    return [
+      // Simulator embeds are meant to be framed by other sites (that is how
+      // they earn links), so they get frame-ancestors * and no X-Frame-Options.
+      {
+        source: '/visualizer/embed/:path*',
+        headers: [...common, { key: 'Content-Security-Policy', value: 'frame-ancestors *' }],
+      },
+      {
+        source: '/((?!visualizer/embed).*)',
+        headers: [
+          ...common,
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
+        ],
+      },
+      { source: '/admin/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }, { key: 'Cache-Control', value: 'private, no-store' }] },
+      { source: '/dashboard/:path*', headers: [{ key: 'Cache-Control', value: 'private, no-store' }] },
+    ];
   },
   async redirects() {
     // Legacy / descriptive simulator slugs -> the canonical page.

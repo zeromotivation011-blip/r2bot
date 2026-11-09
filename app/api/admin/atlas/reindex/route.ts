@@ -14,6 +14,7 @@
 import type { NextRequest } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { readAtlasEntries, runAtlasIndex } from '@/lib/atlas-index'
+import { isCronAuthorized } from '@/lib/cron-auth'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -28,9 +29,7 @@ async function isAdmin(): Promise<boolean> {
 }
 
 function hasCronSecret(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET
-  if (!secret) return false
-  return (req.headers.get('authorization') ?? '') === `Bearer ${secret}`
+  return isCronAuthorized(req.headers.get('authorization'))
 }
 
 export async function POST(req: NextRequest) {

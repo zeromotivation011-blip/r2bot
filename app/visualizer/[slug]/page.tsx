@@ -15,6 +15,7 @@ import {
   resolveSimulatorId,
   type SimulatorId,
 } from '@/lib/simulators'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 // NEXT_PUBLIC_SITE_URL is set to the *.vercel.app deployment URL in some
 // environments. Emitting that as the canonical tells Google the content lives
@@ -149,11 +150,11 @@ export default async function SimulatorPage({
       <Nav />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(jsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonldScript(breadcrumbLd) }}
       />
 
       <main id="main-content" style={{ paddingTop: 120, paddingBottom: 90 }}>

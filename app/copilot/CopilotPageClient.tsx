@@ -150,24 +150,24 @@ export function CopilotPageClient() {
           body: JSON.stringify({
             message: trimmed,
             history: messages.map((m) => ({ role: m.role, content: m.content })),
-            modeSystemPrompt: modeDef.systemPrompt,
+            modeId: modeDef.id,
           }),
         });
         if (res.status === 429) {
           const data = (await res.json().catch(() => ({}))) as {
-            error?: string; message?: string; upgradeUrl?: string; loginUrl?: string;
+            error?: string; message?: string; loginUrl?: string;
           };
           if (data.loginUrl) {
             const text =
-              (data.error || "You've hit the free message limit.") +
-              '\n\n[Sign in →](/login) · [Upgrade to Pro →](/pricing)';
+              (data.error || 'Sign in (free) to get 10 R2 messages a day.') +
+              '\n\n[Sign in →](/login)';
             setMessages((prev) =>
               prev.map((m) => (m.id === assistantId ? { ...m, content: text } : m)),
             );
           } else {
             setUpgradeReason(data.error || "You've used your 10 free R2 messages today.");
             setUpgradeOpen(true);
-            const text = data.message || data.error || 'Upgrade to Pro for unlimited R2.';
+            const text = data.message || data.error || "You've used your 10 R2 messages for today. It resets in 24 hours.";
             setMessages((prev) =>
               prev.map((m) => (m.id === assistantId ? { ...m, content: text } : m)),
             );
@@ -202,7 +202,7 @@ export function CopilotPageClient() {
         setLoading(false);
       }
     },
-    [messages, loading, modeDef.systemPrompt],
+    [messages, loading, modeDef.id],
   );
 
   const onSubmit = (e: React.FormEvent) => {

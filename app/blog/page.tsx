@@ -6,6 +6,7 @@ import { CopilotDrawer } from '@/components/CopilotDrawer'
 import { getAllTags } from '@/lib/blog'
 import { getAllPostsMerged } from '@/lib/blog-db'
 import BlogIndexClient from './BlogIndexClient'
+import { jsonldScript } from '@/lib/seo/jsonld'
 
 export const runtime = 'nodejs'
 
@@ -64,7 +65,7 @@ export default async function BlogIndexPage() {
 
   return (
     <CopilotProvider>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([blogJsonLd, itemListJsonLd]) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript([blogJsonLd, itemListJsonLd]) }} />
       <Nav />
       <BlogIndexClient posts={lite} tags={tags} />
       <CopilotBubble />

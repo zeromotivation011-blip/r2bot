@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 const items = [
-  { t: 'The Atlas', d: '480+ robotics concepts, robots, companies and people in plain English, with sources.', href: '/atlas' },
+  { t: 'The Atlas', d: '500+ robotics concepts, robots, companies and people in plain English, with sources.', href: '/atlas' },
   { t: 'Academy', d: 'Structured lessons from your first robot to ROS2, navigation and SLAM.', href: '/academy' },
   { t: 'Simulators', d: 'Try PID control, kinematics and more in your browser. Nothing to install.', href: '/visualizer' },
   { t: 'Robot builds', d: 'Guided projects from a line follower to a ROS2 navigation robot.', href: '/build' },
