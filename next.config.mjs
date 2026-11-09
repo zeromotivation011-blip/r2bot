@@ -168,6 +168,13 @@ const nextConfig = {
       'da-vinci-surgical-system': 'da-vinci',
       'kiva-warehouse-robots': 'amazon-kiva',
       'perseverance-rover': 'perseverance',
+      // 9 Nov 2026: six more robots got full /robots profiles.
+      digit: 'digit',
+      stretch: 'stretch',
+      shakey: 'shakey',
+      sojourner: 'sojourner',
+      unimate: 'unimate',
+      'ingenuity-helicopter': 'ingenuity',
     }).map(([from, to]) => ({
       source: `/atlas/robot/${from}`,
       destination: `/robots/${to}`,

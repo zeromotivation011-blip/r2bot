@@ -15,7 +15,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: 'Famous Robots | Encyclopedia of Real Robots',
   description:
-    "Explore 20+ famous real robots — ASIMO, Boston Dynamics Atlas, NASA Curiosity, da Vinci Surgical System and more. Detailed specs, videos, and fun facts.",
+    "Explore 60+ famous real robots, from Unimate and Shakey to Spot, Atlas, Digit and Unitree G1. Sourced specs, plain-English explanations, videos and fun facts.",
   keywords: [
     'famous robots',
     'real robots',
@@ -57,7 +57,7 @@ const collectionJsonLd = {
   '@type': 'CollectionPage',
   name: 'Famous Robots — Encyclopedia of Real Robots',
   description:
-    "20+ profiles of famous real robots including humanoids, space rovers, surgical, industrial, and Indian robots.",
+    "60+ sourced profiles of famous real robots: humanoids, quadrupeds, space rovers, surgical, industrial, warehouse and home robots from around the world.",
   url: PAGE_URL,
   isPartOf: {
     '@type': 'WebSite',

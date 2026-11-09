@@ -45,6 +45,27 @@ export async function POST(request: Request) {
   // certificates since migration 0051 (they could mint their own before).
   const admin = createSupabaseAdminClient();
 
+  // A certificate needs a server-recorded completion (migration 0053, written
+  // only by /api/academy/complete). Until that table exists we degrade OPEN so
+  // nothing breaks before Ravi runs the migration; once it exists, no row means
+  // no certificate.
+  const { data: completion, error: completionErr } = await admin
+    .from('academy_completions')
+    .select('completed_at')
+    .eq('user_id', user.id)
+    .eq('track', track)
+    .eq('lesson_slug', slugPart)
+    .maybeSingle();
+  if (completionErr) {
+    if (completionErr.code === '42P01') {
+      console.warn('[certificates] academy_completions missing — issuing without a completion check; run migration 0053');
+    } else {
+      return NextResponse.json({ error: 'Could not verify completion' }, { status: 500 });
+    }
+  } else if (!completion) {
+    return NextResponse.json({ error: 'Complete the lesson first' }, { status: 403 });
+  }
+
   // Check if a certificate already exists for this lesson — return existing.
   const { data: existing } = await admin
     .from('certificates')

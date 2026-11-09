@@ -159,6 +159,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/learn/ros2-cheatsheet`, lastModified: at('/learn/ros2-cheatsheet'), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${BASE}/compare`, lastModified: at('/compare'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/compare/lidar-vs-camera-slam`, lastModified: at('/compare/lidar-vs-camera-slam'), changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${BASE}/compare/arduino-vs-esp32-vs-raspberry-pi`, lastModified: at('/compare/arduino-vs-esp32-vs-raspberry-pi'), changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${BASE}/compare/spot-vs-unitree-go2-vs-anymal`, lastModified: at('/compare/spot-vs-unitree-go2-vs-anymal'), changeFrequency: 'monthly' as const, priority: 0.8 },
     ...AI_TOPICS.map((t) => ({ url: `${BASE}/ai-robotics/${t.slug}`, lastModified: GROUP_UPDATED.aiRobotics, changeFrequency: 'monthly' as const, priority: 0.8 })),
     { url: `${BASE}/kids`, lastModified: at('/kids'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/parents`, lastModified: at('/kids/parents'), changeFrequency: 'monthly' as const, priority: 0.6 },

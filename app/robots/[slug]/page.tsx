@@ -88,6 +88,11 @@ function thingJsonLd(robot: Robot) {
       .map(([k, v]) => ({ '@type': 'PropertyValue', name: k, value: v })),
     url: `${BASE_URL}/robots/${robot.slug}`,
     image: `${BASE_URL}/robots/${robot.slug}/opengraph-image`,
+    citation: robot.sources.map((s) => ({
+      '@type': 'CreativeWork',
+      name: s.name,
+      url: s.url,
+    })),
   };
 }
 
@@ -330,6 +335,44 @@ export default async function RobotProfilePage({
         </section>
 
         <section className="px-4"><div className="mx-auto max-w-3xl"><InlineSignup /></div></section>
+
+        {/* Sources and verification date */}
+        <section className="px-4 py-8" aria-labelledby="robot-sources">
+          <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <h2 id="robot-sources" className="m-0 text-xs font-bold uppercase tracking-wider text-zinc-400">
+              Sources
+            </h2>
+            <p className="mt-1 text-xs text-zinc-500">
+              Every number on this page comes from one of these. If a spec is missing, no source stated it.
+            </p>
+            <ul className="mt-3 space-y-1.5">
+              {robot.sources.map((s) => (
+                <li key={s.url} className="text-sm leading-relaxed">
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="inline-flex min-h-[44px] items-center text-cyan-200 underline decoration-cyan-400/40 underline-offset-2 hover:text-cyan-100 sm:min-h-0"
+                  >
+                    {s.name}
+                  </a>
+                  <span className="ml-2 break-all font-mono text-[11px] text-zinc-500">{new URL(s.url).hostname}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+              Facts checked{' '}
+              <time dateTime={robot.lastVerified}>
+                {new Date(`${robot.lastVerified}T00:00:00Z`).toLocaleDateString('en-US', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                  timeZone: 'UTC',
+                })}
+              </time>
+            </p>
+          </div>
+        </section>
 
         {/* Related robots */}
         {related.length > 0 ? (

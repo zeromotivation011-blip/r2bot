@@ -19,7 +19,7 @@ export default function ComparePage() {
     <StaticPage
       eyebrow="Reference"
       title="Compare"
-      lede="Two options, one table, a clear answer. Every comparison states what each side is better at and when you should pick it, with sources."
+      lede="Two or three options, one table, a clear answer. Every comparison states what each side is better at and when you should pick it, with sources."
       maxWidth={900}
     >
       <section className="not-prose grid gap-4 sm:grid-cols-2">
@@ -28,7 +28,7 @@ export default function ComparePage() {
             <p className="text-[11px] font-bold uppercase tracking-widest text-amber-300">Side by side</p>
             <h2 className="mt-1 text-lg font-black text-white">{c.title}</h2>
             <p className="mt-2 text-sm text-gray-400">{c.question}</p>
-            <p className="mt-3 text-xs text-gray-500">{c.rows.length} aspects compared · updated {c.updated}</p>
+            <p className="mt-3 text-xs text-gray-500">{c.rows.length} aspects · {c.c ? 'three options' : 'two options'} · updated {c.updated}</p>
           </Link>
         ))}
         {BLOG_COMPARISONS.map((b) => (

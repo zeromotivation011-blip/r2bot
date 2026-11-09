@@ -7,7 +7,12 @@
 //   • Atlas owns the definition query     — "what is SLAM"
 //   • Quick Lessons own the video query   — "how does SLAM work" (60s + demo)
 //   • /robots/<slug> owns a named robot   — "Boston Dynamics Spot"
-//   • Blog owns comparison and decisions  — "X vs Y", "which board should I buy"
+//   • /compare/<slug> owns the structured head-to-head — "X vs Y" with a spec
+//     table, verdict per aspect and "choose X when" (data: lib/compare/index.ts)
+//   • Blog owns the narrative decision guide — "which board should I buy",
+//     "how I chose". Where both exist for one pair (Arduino / ESP32 / Pi), the
+//     compare page is the table and the post is the story; they cross-link and
+//     carry different titles so they answer different intents.
 //
 // Anything that breaks that rule is either redirected here or differentiated
 // and cross-linked, so the two pages feed each other instead of competing.
@@ -33,6 +38,13 @@ export const ATLAS_ROBOT_CANONICAL: Record<string, string> = {
   'da-vinci-surgical-system': 'da-vinci',
   'kiva-warehouse-robots': 'amazon-kiva',
   'perseverance-rover': 'perseverance',
+  // 9 Nov 2026: six more robots got full /robots profiles.
+  digit: 'digit',
+  stretch: 'stretch',
+  shakey: 'shakey',
+  sojourner: 'sojourner',
+  unimate: 'unimate',
+  'ingenuity-helicopter': 'ingenuity',
 }
 
 export const ATLAS_ROBOTS_REDIRECTED: ReadonlySet<string> = new Set(

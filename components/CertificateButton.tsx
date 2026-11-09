@@ -51,7 +51,9 @@ export function CertificateButton({
         }),
       });
       if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
+        const j = (await res.json().catch(() => ({}))) as { error?: string };
+        // 403: the server has no completion record for this lesson (see /api/academy/complete).
+        if (res.status === 403) throw new Error('Mark the lesson complete first, then download your certificate.');
         throw new Error(j.error ?? 'Failed to register certificate');
       }
       const data = (await res.json()) as { certificateId: string; issuedAt: string };

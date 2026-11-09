@@ -5,11 +5,17 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useToast } from './Toast';
 import { LessonCompleteModal } from './LessonCompleteModal';
 
+/** Fired on window after the server records a completion, so sibling widgets (the certificate button) can update. */
+export const ACADEMY_COMPLETED_EVENT = 'r2bot:academy-completed';
+export type AcademyCompletedDetail = { track: string; lessonSlug: string; recorded: boolean };
+
 /**
  * "Mark complete" CTA on every Academy lesson page.
  *  - On mount: check whether already completed. If so, render a green indicator.
- *  - On click: UPSERT user_progress with completed=true, show checkmark, and
- *    navigate to `nextHref` after 1.5s if provided.
+ *  - On click (signed in): POST /api/academy/complete — the server validates the
+ *    lesson, grades any quiz and writes academy_completions (the record the
+ *    certificate route requires). Then UPSERT user_progress for the progress UI,
+ *    award XP, and announce ACADEMY_COMPLETED_EVENT.
  *  - Anonymous users get localStorage-only state.
  */
 export function LessonComplete({
@@ -78,6 +84,19 @@ export function LessonComplete({
         const supabase = createSupabaseBrowserClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('unauth');
+
+        // The authoritative record. Answers 200 {recorded:false} before
+        // migration 0053 — still a completion as far as this page is concerned.
+        const completeRes = await fetch('/api/academy/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ track, lessonSlug }),
+        });
+        if (!completeRes.ok) throw new Error('complete-failed');
+        const completeOut = (await completeRes.json().catch(() => null)) as { passed?: boolean; recorded?: boolean } | null;
+        if (completeOut && completeOut.passed === false) throw new Error('not-passed');
+        const recorded = Boolean(completeOut?.recorded);
+
         const { error } = await supabase
           .from('user_progress')
           .upsert(
@@ -109,6 +128,10 @@ export function LessonComplete({
             /* XP is best-effort */
           }
         }
+
+        window.dispatchEvent(
+          new CustomEvent<AcademyCompletedDetail>(ACADEMY_COMPLETED_EVENT, { detail: { track, lessonSlug, recorded } }),
+        );
       } catch {
         setCompleted(false);
         setAnimating(false);

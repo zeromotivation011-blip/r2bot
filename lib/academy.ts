@@ -12,6 +12,22 @@ import type { AcademyTrack } from './academy/courses';
 
 export type AcademySource = { name: string; url: string };
 
+/**
+ * Optional end-of-lesson quiz, declared in frontmatter as
+ *   quiz:
+ *     - q: "…"
+ *       options: ["…", "…"]
+ *       answer: 1        # index into options
+ *       why: "…"         # optional, shown after a correct answer
+ * `answer` and `why` must never reach the browser — send `publicQuiz()` instead
+ * and grade in POST /api/academy/complete. No MDX lesson carries a quiz today.
+ */
+export type AcademyQuizQuestion = { q: string; options: string[]; answer: number; why?: string };
+export type PublicAcademyQuizQuestion = Pick<AcademyQuizQuestion, 'q' | 'options'>;
+
+/** Share of questions that must be right to record a completion. Same bar as the video courses. */
+export const ACADEMY_PASS_MARK = 0.7;
+
 export type AcademyLesson = {
   track: AcademyTrack;
   lesson: number;
@@ -28,6 +44,7 @@ export type AcademyLesson = {
   atlas_links?: string[]; // slugs of related Atlas concept entries
   url_slug?: string; // descriptive slug, e.g. "w-01-ros2-fundamentals"
   prerequisites?: string[]; // lesson slugs in same/earlier track
+  quiz?: AcademyQuizQuestion[]; // server-only; strip with publicQuiz() before rendering
 };
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'academy');
@@ -71,6 +88,26 @@ function normalizeOptNumber(v: unknown): number | undefined {
   return undefined;
 }
 
+function normalizeQuiz(v: unknown): AcademyQuizQuestion[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const out: AcademyQuizQuestion[] = [];
+  for (const item of v) {
+    if (typeof item !== 'object' || item === null) continue;
+    const o = item as Record<string, unknown>;
+    const q = typeof o.q === 'string' ? o.q.trim() : '';
+    const options = normalizeStringArray(o.options);
+    const answer = normalizeOptNumber(o.answer);
+    if (!q || options.length < 2 || answer === undefined || !Number.isInteger(answer) || answer < 0 || answer >= options.length) continue;
+    out.push({ q, options, answer, why: normalizeOptString(o.why) });
+  }
+  return out.length > 0 ? out : undefined;
+}
+
+/** The quiz with the answer key removed — the only shape allowed in a client component. */
+export function publicQuiz(lesson: AcademyLesson): PublicAcademyQuizQuestion[] {
+  return (lesson.quiz ?? []).map(({ q, options }) => ({ q, options }));
+}
+
 function buildLesson(
   track: AcademyTrack,
   slug: string,
@@ -92,6 +129,7 @@ function buildLesson(
     atlas_links: normalizeStringArray(data.atlas_links),
     url_slug: normalizeOptString(data.url_slug),
     prerequisites: normalizeStringArray(data.prerequisites),
+    quiz: normalizeQuiz(data.quiz),
   };
 }
 
