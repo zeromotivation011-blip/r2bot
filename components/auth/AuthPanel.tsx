@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { trackEvent } from '@/lib/analytics'
+import { OAUTH_PROVIDERS, enabledOAuthProviders, type OAuthProviderId } from './oauth-providers'
+import { ProviderIcon } from './ProviderIcon'
 
 /**
  * The one sign-in surface. Used by the header modal, /login and /signup.
@@ -14,11 +16,11 @@ import { trackEvent } from '@/lib/analytics'
  * happened to click, and neither place offered all of them.
  *
  * Order is deliberate. The magic link is first and is the default because it
- * is the only one with nothing to forget; Google is second because it is one
- * tap for the people who use it; the password form is last, behind a
- * disclosure, because asking someone to invent a password for a free reading
- * site is the highest-friction option and should not be the first thing they
- * see.
+ * is the only one with nothing to forget and works in every country; social
+ * sign-ins come second, one tap for the people who use them — and only the
+ * providers actually enabled in Supabase are shown (see oauth-providers.ts);
+ * the password form is last, behind a disclosure, because asking someone to
+ * invent a password for a free reading site is the highest-friction option.
  */
 type Mode = 'signin' | 'signup'
 
@@ -35,7 +37,14 @@ export function AuthPanel({
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [busy, setBusy] = useState<null | 'link' | 'google' | 'password'>(null)
+  const [busy, setBusy] = useState<null | 'link' | 'password' | OAuthProviderId>(null)
+  const [providers, setProviders] = useState<OAuthProviderId[]>([])
+
+  useEffect(() => {
+    let alive = true
+    void enabledOAuthProviders().then((list) => { if (alive) setProviders(list) })
+    return () => { alive = false }
+  }, [])
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
 
@@ -63,16 +72,21 @@ export function AuthPanel({
     } finally { setBusy(null) }
   }
 
-  const withGoogle = async () => {
+  const withProvider = async (provider: OAuthProviderId) => {
     reset()
-    setBusy('google')
+    setBusy(provider)
     try {
       const supabase = createSupabaseBrowserClient()
       const { error: err } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider,
         options: { redirectTo: `${origin()}/auth/callback?next=${encodeURIComponent(next)}` },
       })
-      if (err) { setError(err.message); setBusy(null) }
+      if (err) {
+        setError(/not enabled/i.test(err.message)
+          ? 'That sign-in method is not available right now. Use the email link above instead.'
+          : err.message)
+        setBusy(null)
+      }
     } catch { setBusy(null) }
   }
 
@@ -143,17 +157,23 @@ export function AuthPanel({
         <p className="r2-meta">No password to remember. The link works on any device.</p>
       </form>
 
-      <div className="auth-panel__or"><span>or</span></div>
-
-      <button type="button" onClick={withGoogle} className="r2-btn r2-btn--ghost auth-panel__wide" disabled={busy !== null}>
-        <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden>
-          <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.0 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
-          <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.0 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
-          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
-          <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.6l6.2 5.2C39.3 36.6 44 31 44 24c0-1.3-.1-2.6-.4-3.9z"/>
-        </svg>
-        Continue with Google
-      </button>
+      {providers.length > 0 && (
+        <>
+          <div className="auth-panel__or"><span>or</span></div>
+          {OAUTH_PROVIDERS.filter((p) => providers.includes(p.id)).map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => withProvider(p.id)}
+              className="r2-btn r2-btn--ghost auth-panel__wide"
+              disabled={busy !== null}
+            >
+              <ProviderIcon id={p.id} />
+              {busy === p.id ? 'Opening…' : p.label}
+            </button>
+          ))}
+        </>
+      )}
 
       {!showPassword ? (
         <button type="button" className="auth-panel__more" onClick={() => setShowPassword(true)}>
