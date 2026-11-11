@@ -256,6 +256,12 @@ Ordered. Each is a real project; do them completely.
 - No full-screen loading overlay (`app/loading.tsx` is a 2px bar) and no motion wrapper in
   `app/template.tsx` — it put framer-motion in the first-load bundle of every route.
 - No decoration behind body text. ParticleField and CursorTrail are deleted; do not reintroduce them.
+- **Supabase in the browser is lazy.** Never import `lib/supabase/client.ts` at the top of a component
+  that renders on a public page. Go through `lib/supabase/lazy.ts`: check `hasSupabaseSessionCookie()`
+  first and `await loadSupabaseBrowser()` only when there is a session (or after `AUTH_CHANGED_EVENT`).
+  An eager client put ~240 KB of auth code in every first load; the homepage went from 1,086 KB to
+  593 KB of JS when it was removed (11 Nov 2026). The Co-pilot drawer and the auth panel are
+  `dynamic()` for the same reason — keep react-markdown out of the shared bundle.
 - Tailwind utilities only (no inline style except runtime-dynamic). Amber-500 `#f59e0b` accent. Dark-first. Mobile-first.
 - No new npm packages without flagging. No hardcoded secrets — env vars only.
   CI-only tools are the exception and stay OUT of `package.json`: the site-wide auditor is a
