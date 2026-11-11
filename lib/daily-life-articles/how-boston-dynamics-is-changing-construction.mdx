@@ -1,0 +1,53 @@
+---
+title: 'How Boston Dynamics Is Changing Construction'
+excerpt: 'Spot walks a building site on a schedule, scans the same spots every week, and lets managers compare the real building with the 3D model.'
+category: manufacturing
+readTime: '5 min read'
+publishedAt: '2026-11-11'
+updatedAt: '2026-11-11'
+atlasLinks:
+  - { slug: quadruped-robot, label: 'Quadruped Robots' }
+  - { slug: slam, label: 'SLAM' }
+  - { slug: construction-robot, label: 'Construction Robots' }
+  - { slug: digital-twin, label: 'Digital Twins' }
+sources:
+  - { name: 'Boston Dynamics — Spot product page and specifications', url: 'https://bostondynamics.com/products/spot/' }
+  - { name: 'Boston Dynamics — Pomerleau case study', url: 'https://bostondynamics.com/case-studies/pomerleau/' }
+  - { name: 'Foster + Partners — On site with Spot (Dec 2021)', url: 'https://www.fosterandpartners.com/plus-journal/on-site-with-spot' }
+---
+
+If a new building is going up near you, there is a growing chance that a yellow four-legged robot walks through it after the crews go home, taking the same photographs from the same spots it took last week. The office block you work in next year may have been checked against its own blueprint by a robot dog.
+
+## What it is
+
+Spot is Boston Dynamics' quadruped: a battery-powered walking robot about the size of a large dog that can carry 20.43 kg of payload, walk at up to 1.6 m/s, climb steps up to 300 mm high, and run for around 90 minutes on a 564 Wh battery before recharging in 60 minutes. It is rated IP54 against dust and water and works from -20°C to 55°C. On a construction site its payload is usually a 360° camera or a laser scanner, and its job is progress capture: recording what has actually been built, repeatedly and consistently.
+
+## How it works
+
+**Sensing.** Spot carries stereo cameras around its body that give it a 360° view and sense terrain out to about 4 m. It uses them to build a local map, to localise itself inside a route it has walked before, and to avoid obstacles. The scanning payload on its back is separate and far more precise; Foster + Partners notes that laser scanners can reach accuracy "down to almost two millimetres."
+
+**Compute.** The useful trick is the recorded mission. An operator walks Spot through the site once, marking where to stop and capture. From then on Spot can replay that route autonomously, localising against the geometry it remembers, replanning around a pallet that was not there last week, and pausing for an operator if the path is fully blocked. The captured images and scans are uploaded to a platform such as HoloBuilder and aligned to the building information model (BIM), so a manager can see where reality has drifted from the design.
+
+**Actuation.** Electric motors at the joints of each leg move the body. Walking rather than rolling is the point: a construction site has stairs, rubble, cables and temporary ramps, and a wheeled robot stalls at the first one. If Spot falls, it can right itself; when its battery runs low it can return to its dock.
+
+## Where you'll see it
+
+- **Canada.** Pomerleau, one of Canada's largest contractors, put Spot on a 500,000 sq ft site that needed nearly 5,000 progress images a week. Collecting them used to take up to 20 hours of one employee's time per week. Spot now walks a trained route and photographs predefined locations outside working hours, with staff stepping in only to swap batteries, and the company expects to free about 20 hours a week. Pomerleau was also adding a Trimble laser scanner for installation monitoring.
+- **London, United Kingdom.** Foster + Partners used Spot at Battersea Roof Gardens, part of the third phase of the Battersea Power Station redevelopment, returning weekly to rerun the same scanning missions. The repeated scans build what the practice calls "construction twins", a four-dimensional record of the site that can be compared against the BIM as work progresses.
+- **Elsewhere.** Boston Dynamics sells Spot with pre-configured packages for inspection, research and hazardous response, and the same autonomous-rounds idea is used on energy sites as well as construction.
+
+## What it can't do yet
+
+Spot does not build anything. It carries sensors; it does not lay bricks, tie rebar or fit a window. Its 90-minute runtime and 20 kg payload rule out heavy tools, and a site that changes faster than the robot's remembered route can confuse its localisation, which is why operators remain on call. Pomerleau's own one-month verdict was "a modest reduction" in project time, not a transformation. The robot is also expensive relative to a person with a camera, so the maths only works on large sites with many repeated captures. What Spot changes is the quality and regularity of the record, and a better record is how construction finds errors while they are still cheap.
+
+## Try it / learn more
+
+- Quick lesson: [How Boston Dynamics robots balance](/shorts/boston-dynamics-balance), [Why stairs are hard](/shorts/stairs)
+- Atlas: [Quadruped robots](/atlas/concept/quadruped-robot), [SLAM](/atlas/concept/slam), [Construction robots](/atlas/concept/construction-robot), [Digital twins](/atlas/concept/digital-twin)
+- Robot profile: [Spot](/robots/spot)
+
+## Sources
+
+1. Boston Dynamics, "Spot" product page and specifications. https://bostondynamics.com/products/spot/
+2. Boston Dynamics, "Pomerleau" case study. https://bostondynamics.com/case-studies/pomerleau/
+3. Foster + Partners, "On site with Spot" (20 December 2021). https://www.fosterandpartners.com/plus-journal/on-site-with-spot

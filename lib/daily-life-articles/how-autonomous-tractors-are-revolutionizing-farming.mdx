@@ -1,0 +1,56 @@
+---
+title: 'How Autonomous Tractors Are Revolutionizing Farming'
+excerpt: "John Deere's first autonomous tractor watched the field with six pairs of stereo cameras; the newer kit uses 16. The perception software is the hard part."
+category: agriculture
+readTime: '5 min read'
+publishedAt: '2026-11-11'
+updatedAt: '2026-11-11'
+atlasLinks:
+  - { slug: gps-gnss, label: 'GPS / GNSS' }
+  - { slug: rtk-gps, label: 'RTK GPS' }
+  - { slug: stereo-vision, label: 'Stereo Vision' }
+  - { slug: agricultural-robot, label: 'Agricultural Robots' }
+sources:
+  - { name: 'John Deere — Autonomous tractor reveal at CES 2022', url: 'https://www.deere.com/en/news/all-news/autonomous-tractor-reveal/' }
+  - { name: 'DTN Progressive Farmer — Deere reveals newest autonomous tech at CES 2025', url: 'https://www.dtnpf.com/agriculture/web/ag/equipment/article/2025/01/07/deere-reveals-newest-autonomous-ces' }
+  - { name: 'AgXeed — AgBot T2 7-series launch', url: 'https://www.agxeed.com/agxeed-unveils-the-new-agbot-t2-7-series-230-hp-of-autonomous-power-forsmarter-soil-friendly-farming/' }
+  - { name: 'Pleinchamp — AgXeed announces around a hundred robots in service (Feb 2025)', url: 'https://www.pleinchamp.com/actualite/agxeed-annonce-une-centaine-de-robots-en-service' }
+---
+
+Somewhere in the grain that becomes your bread, a field was tilled overnight by a tractor with nobody in the cab, while the farmer watched a live video feed on a phone. The tractor itself is an ordinary tractor. What is new is the box of cameras and the software that decides when to stop.
+
+## What it is
+
+An autonomous tractor is a conventional machine fitted with a perception kit and a controller that can steer, throttle and brake it along a pre-planned route without a driver. John Deere showed the first version in January 2022: an 8R tractor with six pairs of stereo cameras giving 360-degree obstacle detection. At CES 2025 the company revealed a second-generation kit on the larger 9RX with 16 individual cameras, able to judge depth at longer range, which Deere said lets the machine drive 40% faster and pull implements twice as wide. For orchards, where tree canopies block GPS, a separate kit on the 5ML tractor adds lidar.
+
+Deere is not alone. AgXeed, based in Grubbenvorst in the Netherlands, builds the AgBot from scratch as a driverless tracked vehicle rather than converting a cab tractor; its T2 7-series has a 230 hp diesel-electric drivetrain, weighs just over 8 tonnes, and spreads that weight on tracks adjustable from 1.5 m to 3.2 m wide so ground pressure stays below 30 kPa.
+
+## How it works
+
+**Sensing.** Two things need to be sensed: where the tractor is, and what is in front of it. Position comes from satellite navigation corrected to high precision; Deere says its tractor checks its location against a geofence "within less than an inch of accuracy." Obstacles come from the cameras. Stereo pairs see depth the way two eyes do, by comparing the small shift between left and right images, and the ring of them covers the whole machine.
+
+**Compute.** A deep neural network takes each camera frame and classifies every pixel, in Deere's case in approximately 100 milliseconds. The output answers one question continuously: is there something in the path that should not be there? If so, the machine stops and the farmer is notified. The route itself is planned in advance. Deere's farmer uses the Operations Center app to start the job, watch live video, see data and metrics, and make changes from elsewhere; AgXeed's TraXwise platform offers "route pre-planning, live monitoring down to the implement, and automatic documentation of every task."
+
+**Actuation.** This is the easy part, because tractors have had electronically controlled steering, transmission and hydraulics for years. The autonomy kit sends commands to the same systems a driver's hands and feet would, and the implement behind the tractor, a tillage tool or a sprayer, is raised and lowered on the same hydraulics.
+
+## Where you'll see it
+
+- **United States.** Deere's first autonomous 8R was paired with a tillage tool for the autumn tillage season, a job that is long, repetitive and runs late into the night, which made it the sensible first task. The 2025 generation extends to the 9RX and the orchard tractor.
+- **Netherlands and Germany.** By February 2025, two years after its first sale, AgXeed had around a hundred robots in operation, mostly in the Netherlands and Germany, with 12 in France, bought mainly by family farms of 200 to 400 hectares.
+- **A growing list.** AgXeed signed a distribution and service partner in the north of the Netherlands in July 2025, and Deere's second-generation kits are built to be "passively cooled and ruggedized" for harsh environments.
+
+## What it can't do yet
+
+An autonomous tractor does one planned job in one fenced field. It does not decide what to plant, drive on public roads between fields, or fix itself; the farmer still moves it, fuels it and handles the breakdowns. Perception is only as good as what the model has seen: dust, fog and low sun degrade cameras, and dense tree canopies defeat GPS, which is exactly why Deere added lidar for orchards. The machines are also large and expensive, which is why the early customers are big arable farms in the US and 200-to-400-hectare operations in northern Europe rather than the smallholdings that grow most of the world's food. Deere frames its case in big numbers, a global population growing from about 8 billion to nearly 10 billion by 2050 and food demand rising 50%, but the technology today is reaching the farms that already had the most machinery.
+
+## Try it / learn more
+
+- Quick lesson: [How robots sense the world](/shorts/senses), [Computer vision in one minute](/shorts/computer-vision)
+- Atlas: [GPS and GNSS](/atlas/concept/gps-gnss), [RTK GPS](/atlas/concept/rtk-gps), [Stereo vision](/atlas/concept/stereo-vision), [Agricultural robots](/atlas/concept/agricultural-robot)
+
+## Sources
+
+1. John Deere, "John Deere reveals fully autonomous tractor at CES 2022" (4 January 2022). https://www.deere.com/en/news/all-news/autonomous-tractor-reveal/
+2. DTN Progressive Farmer, "Deere reveals new autonomous tech" (7 January 2025). https://www.dtnpf.com/agriculture/web/ag/equipment/article/2025/01/07/deere-reveals-newest-autonomous-ces
+3. AgXeed, "AgXeed unveils the new AgBot T2 7-series". https://www.agxeed.com/agxeed-unveils-the-new-agbot-t2-7-series-230-hp-of-autonomous-power-forsmarter-soil-friendly-farming/
+4. Pleinchamp, "AgXeed annonce une centaine de robots en service" (7 February 2025). https://www.pleinchamp.com/actualite/agxeed-annonce-une-centaine-de-robots-en-service

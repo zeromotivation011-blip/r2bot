@@ -1,65 +1,82 @@
 ---
 title: "Robotics vs Automation vs AI: What Is the Difference?"
-description: "People mix up robots, automation and artificial intelligence. Here is what each term means, how they overlap, and simple examples of each."
+description: "Three words used interchangeably, with the formal definitions, eight examples sorted into the overlaps, the 2024 numbers, and a test for reading product claims."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["Beginner", "Explainer", "AI"]
-readTime: 5
+readTime: 7
 coverEmoji: "🧠"
 featured: false
-keywords: ["robotics vs automation", "robotics vs ai", "difference between robot and ai", "what is automation", "is ai a robot"]
+keywords: ["robotics vs automation", "robotics vs ai", "difference between robot and ai", "what is automation", "is ai a robot", "physical ai meaning"]
 ---
 
 # Robotics vs Automation vs AI: What Is the Difference?
 
-These three words are often used as if they mean the same thing. They do not.
+**Short answer:** **automation** is a goal (a task happens without a person doing each step). **Robotics** is one way to reach it (a physical machine that senses and acts). **AI** is a tool (software that learns from data or reasons) that can make a robot, or anything else, more flexible. A thermostat automates without a robot or AI; a welding arm is a robot without AI; a chatbot is AI without a body; a warehouse picker is all three.
 
-## The one-line versions
+## The formal versions
 
-- **Automation:** making a task happen without a person doing each step.
-- **Robotics:** building physical machines that sense and act in the world.
-- **AI (artificial intelligence):** software that learns patterns or makes decisions in ways that look intelligent.
+The industry definition of an industrial robot comes from ISO 8373, as used by the International Federation of Robotics: an "automatically controlled, reprogrammable multipurpose manipulator, programmable in three or more axes," fixed in place or on a mobile platform, for use in automation applications. Three words carry the weight. *Automatically controlled*: it runs without a person on the controls. *Reprogrammable*: you can give it a new job without rebuilding it. *Multipurpose*: it was not built for one task only. A dishwasher is automatic but neither reprogrammable nor multipurpose, so it is an appliance, not a robot.
 
-## Examples
+**Automation** has no single standards body because it is older and broader than robots: a Jacquard loom in 1804 automated weaving with punched cards. The working definition is a process that runs without a human performing each step. Software automation (a script that files invoices) and physical automation (a conveyor that sorts parcels) are both automation; only the second might involve a robot.
 
-**Automation without a robot:** a thermostat that turns heating on and off, or a spreadsheet macro that sends emails. No machine moves around and nothing is "intelligent".
+**AI** is the broadest and fuzziest. In practice, in 2026, it means software whose behavior was learned from data ([machine learning](/atlas/concept/machine-learning), especially [neural networks](/atlas/concept/neural-network)) or that reasons over symbols (planning, search, language models). The term **physical AI**, which chip and robot companies now use, means AI that perceives and acts in the physical world, as in robots and autonomous vehicles, rather than on a screen.
 
-**Robotics without AI:** a factory arm that repeats the same weld in the same place all day. It has sensors and motors but follows fixed rules.
+## Eight examples, sorted
 
-**AI without a robot:** a chatbot or an image classifier. It runs on a computer and has no body.
+| Example | Automation? | Robot? | AI? |
+|---|---|---|---|
+| A thermostat | Yes | No | No |
+| A spreadsheet macro that emails a report | Yes | No | No |
+| A welding arm repeating one path on a car line | Yes | Yes | No |
+| A robot vacuum that bumps and turns at random | Yes | Yes | No |
+| A spam filter | Yes | No | Yes |
+| A chatbot | No (it is a tool, not a process) | No | Yes |
+| A robot vacuum that builds a map with a camera | Yes | Yes | Yes (visual SLAM) |
+| A warehouse picker that recognizes items in any pose | Yes | Yes | Yes |
 
-**All three together:** a warehouse robot that uses a camera and a learned model to recognise parcels, and is part of an automated fulfilment process.
+The two robot vacuums are the instructive pair. Early models bounced off walls using bumpers and a random walk: a robot, automating a chore, with no AI. The 2015 Roomba 980 added a camera, an optical floor sensor and visual SLAM, recognizing landmarks to correct its map. Same chore, same category of machine; the camera and mapping software are where AI entered.
 
-## How they overlap
+## How the three relate
 
 ```
-Automation  = the goal (less manual work)
-Robotics    = one way to reach it (physical machines)
-AI          = one tool that makes robots more flexible
+Automation  = the goal      (less manual work)
+Robotics    = one means     (physical machines that sense and act)
+AI          = one tool      (software that learns or reasons)
 ```
 
-AI makes robots better at messy, changing situations, such as seeing different objects. See [AI and Robotics: The Complete Guide](/blog/ai-and-robotics-complete-guide) and [AI vs Traditional Robot Programming](/blog/ai-vs-traditional-robot-programming).
+Most automation is not robotic: it is software, conveyors, valves and timers. Most robots are not AI-driven: the IFR counted 542,000 industrial robots installed in 2024, and the great majority run fixed, programmed paths, which is exactly why they are reliable. Most AI has no body: it recommends, translates, classifies and writes on servers.
 
-## Why the difference matters
+The overlap is small, growing fast, and where the interesting problems live. AI is what lets a robot cope with a world that changes: a different object each time, a person in the way, an instruction in plain English. [AI and robotics: the complete guide](/blog/ai-and-robotics-complete-guide) covers that overlap, and [AI vs traditional robot programming](/blog/ai-vs-traditional-robot-programming) covers when to use which inside one machine.
 
-If you are choosing what to learn, know what you are aiming at. Robotics needs electronics and mechanics. AI needs maths and data. Automation can start with scripts and process thinking.
+## Why the distinction matters
 
-If you are reading news, the difference helps you judge claims. "AI-powered" does not mean a machine is smart, and "robot" does not mean something is autonomous.
+**If you are choosing what to learn.** Robotics needs electronics, mechanics and control; the daily work is wiring, debugging and tuning a [PID loop](/atlas/concept/pid-controller). AI needs linear algebra, probability and data; the daily work is datasets and training runs. Automation engineering can start from scripting and process thinking, and in a factory means PLCs, sensors and safety standards. The three overlap in a career but they do not start in the same place. See [career paths](/careers).
 
-## What goes wrong when people mix them up
+**If you are reading the news.** "AI-powered" on a product page may mean a learned vision model or may mean an `if` statement. "Robot" may mean an autonomous machine or a remote-controlled one with a person on a joystick. "Automated" may mean a robot or may mean a spreadsheet. The claim tells you which word the marketing team liked.
 
-Companies sometimes say "AI robot" for a machine that follows a fixed script. Buyers then expect flexibility the machine does not have. Ask: what does it sense, what does it decide, and who programmed those decisions?
+**If you are buying.** A company that calls a fixed-program arm an "AI robot" has sold flexibility it does not have. The buyer expects it to handle a new part; it handles the part it was programmed for.
 
-## Frequently asked questions
+## A three-question test for any claim
 
-**Is a robot always intelligent?**
-No. Many robots follow simple rules.
+1. **What does it sense?** No sensors, no robot: it is an appliance or an automated process. Bumpers and a cliff sensor: a simple robot. A camera, lidar or microphone: now perception matters, and AI may be involved.
+2. **What does it decide?** Nothing beyond a fixed sequence: automation. Choices from sensor data by written rules: a robot with classical control. Choices from a model trained on data: AI.
+3. **Who wrote the decisions?** An engineer, in code you could read: traditional. A training process, in weights nobody can read: learned. The second is not better; it is different, and it needs a safety layer around it.
 
-**Is AI always a robot?**
-No. Most AI is software only.
+## FAQ
 
-**What is physical AI?**
-A recent term for AI that controls machines in the real world, such as robots and vehicles. See [LLMs and robots](/blog/large-language-models-and-robots).
+**Is a robot always intelligent?** No. The welding arm is a robot by every definition and makes no decisions at all beyond following its program.
 
-[Start learning →](/start) · [Browse the Atlas →](/atlas)
+**Is AI always a robot?** No. Almost all AI runs on servers with no body. Physical AI is the small fraction that controls machines.
+
+**Is a self-driving car a robot?** By the sense-decide-act definition, yes: it senses with cameras, lidar and radar, decides with learned perception and classical planning, and acts through steering and brakes. By the ISO 8373 wording it is not an *industrial* robot, because it is not a manipulator; it falls under the service-robot side of the standards.
+
+**What is "physical AI"?** The current industry term for AI that perceives, understands and acts in the physical world, from factory robots to robotaxis. It is a rebranding of the overlap in the table above, not a new technology.
+
+## Sources
+
+- International Federation of Robotics, "Industrial Robots" (ISO 8373 definition): https://www.ifr.org/industrial-robots
+- International Federation of Robotics, World Robotics 2025 press release (542,000 installations in 2024): https://ifr.org/ifr-press-releases/news/global-robot-demand-in-factories-doubles-over-10-years
+- NVIDIA glossary, "What Is Physical AI?": https://www.nvidia.com/en-us/glossary/physical-ai/
+- IEEE Spectrum, "Review: iRobot Roomba 980" (camera, floor-tracking sensor, VSLAM): https://spectrum.ieee.org/review-irobot-roomba-980

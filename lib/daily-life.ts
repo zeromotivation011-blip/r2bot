@@ -1,6 +1,11 @@
 // lib/daily-life.ts — Article catalogue for the "Robotics in Daily Life" surface.
-// Content stubs ship now; full article bodies are written by the editorial team.
-// A stub renders a "Coming soon" badge until `content` becomes non-empty.
+//
+// This file is the catalogue only (imported by the client hub). Article bodies
+// are MDX files in lib/daily-life-articles/<slug>.mdx, read on the server by
+// lib/daily-life-articles/loader.ts. A slug is "published" when it is listed in
+// PUBLISHED_SLUGS below (and so has a file and a /daily-life/<slug> page);
+// anything else renders a "Coming soon" badge and stays out of the sitemap.
+// scripts/check-daily-life.mjs asserts the list and the files agree.
 
 export type DailyLifeCategory =
   | 'manufacturing'
@@ -39,7 +44,8 @@ export interface DailyLifeArticle {
   readTime: string
   publishedAt: string
   atlasLinks: DailyLifeAtlasLink[]
-  content: string // empty until written — UI shows a "Coming soon" badge in that case
+  /** Legacy inline body. Kept empty; real bodies live in lib/daily-life-articles/. */
+  content: string
 }
 
 export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
@@ -48,13 +54,15 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
     slug: 'the-robot-that-packs-your-amazon-order',
     title: 'The Robot That Packs Your Amazon Order',
     excerpt:
-      'Every time you click "Buy Now," a coordinated dance of 750,000+ machines begins. Most of them never touch your package, but they all matter.',
+      'Every time you click "Buy Now," a fleet of more than a million machines starts moving. Most of them never touch your package, but they all matter.',
     category: 'logistics',
-    readTime: '6 min read',
-    publishedAt: '2026-05-22',
+    readTime: '5 min read',
+    publishedAt: '2026-11-11',
     atlasLinks: [
-      { slug: 'amr', label: 'AMRs' },
-      { slug: 'collaborative-robot', label: 'Collaborative Robots' },
+      { slug: 'autonomous-mobile-robot', label: 'Autonomous Mobile Robots' },
+      { slug: 'warehouse-robot', label: 'Warehouse Robots' },
+      { slug: 'suction-gripper', label: 'Suction Grippers' },
+      { slug: 'force-torque-sensor', label: 'Force-Torque Sensors' },
     ],
     content: '',
   },
@@ -63,13 +71,15 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
     slug: 'how-surgical-robots-are-changing-medicine',
     title: 'How Surgical Robots Are Changing Medicine',
     excerpt:
-      'The da Vinci system has done over 14 million procedures. Here is what it actually does — and what it does not do — inside an operating room.',
+      'About 3.15 million operations used a da Vinci system in 2025. Here is what the robot actually does in the operating room — and what it does not.',
     category: 'healthcare',
     readTime: '5 min read',
-    publishedAt: '2026-05-19',
+    publishedAt: '2026-11-11',
     atlasLinks: [
+      { slug: 'surgical-robot', label: 'Surgical Robots' },
+      { slug: 'teleoperation', label: 'Teleoperation' },
       { slug: 'haptic-feedback', label: 'Haptic Feedback' },
-      { slug: 'computer-vision', label: 'Computer Vision' },
+      { slug: 'da-vinci-system', label: 'da Vinci System' },
     ],
     content: '',
   },
@@ -78,13 +88,15 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
     slug: 'why-your-car-was-built-by-a-robot',
     title: 'Why Your Car Was Built by a Robot',
     excerpt:
-      'Auto manufacturing was the first industry to industrialise robotics. The reason has nothing to do with cost — it is about repeatability.',
+      'Car plants were the first factories to fill with robots and still buy more than any other industry. The reason is less about cost than repeatability.',
     category: 'manufacturing',
-    readTime: '7 min read',
-    publishedAt: '2026-05-15',
+    readTime: '5 min read',
+    publishedAt: '2026-11-11',
     atlasLinks: [
       { slug: 'industrial-robot', label: 'Industrial Robots' },
-      { slug: 'pid-control', label: 'PID Control' },
+      { slug: 'pid-controller', label: 'PID Control' },
+      { slug: 'automated-guided-vehicle', label: 'Automated Guided Vehicles' },
+      { slug: 'humanoid-robot', label: 'Humanoid Robots' },
     ],
     content: '',
   },
@@ -93,28 +105,33 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
     slug: 'the-ai-farming-robots-feeding-the-world',
     title: 'The AI Farming Robots Feeding the World',
     excerpt:
-      'A weeding robot now distinguishes lettuce from weed with 99% accuracy. Here is the computer-vision and articulation work behind that number.',
+      'Weeding robots now tell crop from weed plant by plant and kill the weed with a laser or one targeted squirt. The vision and mechanics behind the field.',
     category: 'agriculture',
-    readTime: '6 min read',
-    publishedAt: '2026-05-12',
+    readTime: '5 min read',
+    publishedAt: '2026-11-11',
     atlasLinks: [
+      { slug: 'weeding-robot', label: 'Weeding Robots' },
       { slug: 'computer-vision', label: 'Computer Vision' },
-      { slug: 'autonomous-navigation', label: 'Autonomous Navigation' },
+      { slug: 'image-segmentation', label: 'Image Segmentation' },
+      { slug: 'precision-agriculture', label: 'Precision Agriculture' },
     ],
     content: '',
   },
   {
     id: 'dark-warehouse',
     slug: 'inside-the-warehouse-where-no-humans-work',
-    title: 'Inside the Warehouse Where No Humans Work',
+    // Retitled 11 Nov 2026: "Where No Humans Work" was not true of any site.
+    title: 'Inside the Warehouse Where Robots Do the Picking',
     excerpt:
-      'Ocado runs a fulfilment centre in the UK with zero humans on the floor. The trade-off: completely flat, climate-controlled, single-product-per-bin.',
+      'Ocado’s grid picks a 50-item grocery order in five minutes with almost no human touch. The trade-off is a building designed around robots, not people.',
     category: 'logistics',
-    readTime: '8 min read',
-    publishedAt: '2026-05-09',
+    readTime: '5 min read',
+    publishedAt: '2026-11-11',
     atlasLinks: [
-      { slug: 'amr', label: 'AMRs' },
-      { slug: 'slam', label: 'SLAM' },
+      { slug: 'warehouse-robotics', label: 'Warehouse Robotics' },
+      { slug: 'swarm-robotics', label: 'Swarm Robotics' },
+      { slug: 'path-planning', label: 'Path Planning' },
+      { slug: 'bin-picking', label: 'Bin Picking' },
     ],
     content: '',
   },
@@ -123,13 +140,15 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
     slug: 'how-your-dishwasher-uses-robotics-principles',
     title: 'How Your Dishwasher Uses Robotics Principles',
     excerpt:
-      'It is not technically a robot — but the way your dishwasher decides spray angle, water temperature, and cycle length is pure control theory.',
+      'It is not a robot, but the way a dishwasher decides how long to wash and how much water to use is the same sense-think-act loop that runs every robot.',
     category: 'home',
     readTime: '4 min read',
-    publishedAt: '2026-05-06',
+    publishedAt: '2026-11-11',
     atlasLinks: [
+      { slug: 'sense-think-act-loop', label: 'Sense-Think-Act Loop' },
       { slug: 'feedback-loop', label: 'Feedback Loops' },
       { slug: 'sensor', label: 'Sensors' },
+      { slug: 'closed-loop-control', label: 'Closed-Loop Control' },
     ],
     content: '',
   },
@@ -138,13 +157,15 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
     slug: 'the-robots-delivering-pizza-in-2026',
     title: 'The Robots Delivering Pizza in 2026',
     excerpt:
-      'Sidewalk delivery bots and aerial drones are converging on the same problem from opposite directions. Here is where each one actually wins.',
+      'Sidewalk robots and delivery drones attack the same problem from opposite directions. How each works, where each is running, and where each one wins.',
     category: 'logistics',
     readTime: '5 min read',
-    publishedAt: '2026-05-03',
+    publishedAt: '2026-11-11',
     atlasLinks: [
-      { slug: 'autonomous-navigation', label: 'Autonomous Navigation' },
-      { slug: 'lidar', label: 'LIDAR' },
+      { slug: 'last-mile-delivery-robot', label: 'Last-Mile Delivery Robots' },
+      { slug: 'delivery-robot', label: 'Delivery Robots' },
+      { slug: 'drone', label: 'Drones' },
+      { slug: 'levels-of-autonomy', label: 'Levels of Autonomy' },
     ],
     content: '',
   },
@@ -153,13 +174,15 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
     slug: 'how-boston-dynamics-is-changing-construction',
     title: 'How Boston Dynamics Is Changing Construction',
     excerpt:
-      'Spot patrols construction sites comparing the as-built reality to the BIM model. A scan that used to take a survey team a day now takes an hour.',
+      'Spot walks a building site on a schedule, scans the same spots every week, and lets managers compare the real building with the 3D model.',
     category: 'manufacturing',
-    readTime: '6 min read',
-    publishedAt: '2026-04-29',
+    readTime: '5 min read',
+    publishedAt: '2026-11-11',
     atlasLinks: [
       { slug: 'quadruped-robot', label: 'Quadruped Robots' },
       { slug: 'slam', label: 'SLAM' },
+      { slug: 'construction-robot', label: 'Construction Robots' },
+      { slug: 'digital-twin', label: 'Digital Twins' },
     ],
     content: '',
   },
@@ -168,13 +191,15 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
     slug: 'robot-doctors-the-future-of-hospital-care',
     title: 'Robot Doctors: The Future of Hospital Care',
     excerpt:
-      'Triage robots, pharmacy robots, robot phlebotomists. Most are not autonomous in the sci-fi sense — they are specialised tools that free up clinician time.',
+      'Hospital robots do not diagnose anyone. They fetch medication, ride lifts, dispense pills and guide visitors — giving nurses back hours of walking.',
     category: 'healthcare',
-    readTime: '6 min read',
-    publishedAt: '2026-04-26',
+    readTime: '5 min read',
+    publishedAt: '2026-11-11',
     atlasLinks: [
-      { slug: 'collaborative-robot', label: 'Collaborative Robots' },
-      { slug: 'computer-vision', label: 'Computer Vision' },
+      { slug: 'service-robot', label: 'Service Robots' },
+      { slug: 'autonomous-mobile-robot', label: 'Autonomous Mobile Robots' },
+      { slug: 'medical-robotics', label: 'Medical Robotics' },
+      { slug: 'human-robot-interaction', label: 'Human-Robot Interaction' },
     ],
     content: '',
   },
@@ -183,18 +208,46 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
     slug: 'how-autonomous-tractors-are-revolutionizing-farming',
     title: 'How Autonomous Tractors Are Revolutionizing Farming',
     excerpt:
-      "John Deere's autonomous tractor uses six pairs of stereo cameras to drive itself across a field. The mechanics matter less than the perception software.",
+      "John Deere's first autonomous tractor watched the field with six pairs of stereo cameras; the newer kit uses 16. The perception software is the hard part.",
     category: 'agriculture',
-    readTime: '7 min read',
-    publishedAt: '2026-04-23',
+    readTime: '5 min read',
+    publishedAt: '2026-11-11',
     atlasLinks: [
-      { slug: 'autonomous-navigation', label: 'Autonomous Navigation' },
-      { slug: 'gps', label: 'GPS' },
+      { slug: 'gps-gnss', label: 'GPS / GNSS' },
+      { slug: 'rtk-gps', label: 'RTK GPS' },
+      { slug: 'stereo-vision', label: 'Stereo Vision' },
+      { slug: 'agricultural-robot', label: 'Agricultural Robots' },
     ],
     content: '',
   },
 ]
 
+/**
+ * Slugs with a written, sourced body in lib/daily-life-articles/<slug>.mdx.
+ * Add a slug here in the same commit as its file; the check script fails if
+ * either side is missing. Kept as a plain list so the client hub can show the
+ * right badge without shipping the article text.
+ */
+export const PUBLISHED_SLUGS: ReadonlySet<string> = new Set([
+  'the-robot-that-packs-your-amazon-order',
+  'how-surgical-robots-are-changing-medicine',
+  'why-your-car-was-built-by-a-robot',
+  'the-ai-farming-robots-feeding-the-world',
+  'inside-the-warehouse-where-no-humans-work',
+  'how-your-dishwasher-uses-robotics-principles',
+  'the-robots-delivering-pizza-in-2026',
+  'how-boston-dynamics-is-changing-construction',
+  'robot-doctors-the-future-of-hospital-care',
+  'how-autonomous-tractors-are-revolutionizing-farming',
+])
+
 export function isPublished(article: DailyLifeArticle): boolean {
-  return article.content.trim().length > 0
+  return PUBLISHED_SLUGS.has(article.slug) || article.content.trim().length > 0
 }
+
+/** Catalogue entries that have a real page, newest first. */
+export function publishedDailyLifeArticles(): DailyLifeArticle[] {
+  return DAILY_LIFE_ARTICLES.filter(isPublished)
+}
+
+export const getDailyLifeStub = (slug: string) => DAILY_LIFE_ARTICLES.find((a) => a.slug === slug)

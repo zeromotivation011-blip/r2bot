@@ -17,6 +17,7 @@ import { ES_TOPICS } from '@/lib/ai-robotics-es';
 import { listPublishedCourses, hasVideo } from '@/lib/courses';
 import { GROUP_UPDATED, pageUpdated as at } from '@/lib/content-dates';
 import { ATLAS_ROBOTS_REDIRECTED } from '@/lib/canonical-map';
+import { getAllDailyLifeArticles } from '@/lib/daily-life-articles/loader';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -125,7 +126,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const blogPosts = blogPostsData.map((p) => ({
     url: `${BASE}/blog/${p.slug}`,
-    lastModified: new Date(p.date ?? GROUP_UPDATED.academy),
+    lastModified: new Date(p.updated ?? p.date ?? GROUP_UPDATED.academy),
     changeFrequency: 'monthly' as const,
     priority: 0.7,
   }));
@@ -161,6 +162,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/compare/lidar-vs-camera-slam`, lastModified: at('/compare/lidar-vs-camera-slam'), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${BASE}/compare/arduino-vs-esp32-vs-raspberry-pi`, lastModified: at('/compare/arduino-vs-esp32-vs-raspberry-pi'), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${BASE}/compare/spot-vs-unitree-go2-vs-anymal`, lastModified: at('/compare/spot-vs-unitree-go2-vs-anymal'), changeFrequency: 'monthly' as const, priority: 0.8 },
+    // Long-form "Robotics in Daily Life" articles: only slugs with a written,
+    // sourced body on disk; unwritten stubs have no page and are not listed.
+    ...getAllDailyLifeArticles().map((a) => ({ url: `${BASE}/daily-life/${a.slug}`, lastModified: new Date(`${a.updatedAt}T00:00:00.000Z`), changeFrequency: 'monthly' as const, priority: 0.7 })),
     ...AI_TOPICS.map((t) => ({ url: `${BASE}/ai-robotics/${t.slug}`, lastModified: GROUP_UPDATED.aiRobotics, changeFrequency: 'monthly' as const, priority: 0.8 })),
     { url: `${BASE}/kids`, lastModified: at('/kids'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/parents`, lastModified: at('/kids/parents'), changeFrequency: 'monthly' as const, priority: 0.6 },

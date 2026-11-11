@@ -1,53 +1,91 @@
 ---
 title: "AI and Robotics: The Complete Beginner Guide"
-description: "How artificial intelligence fits into robots: perception, learning, planning and language. A map of the field with links to deeper guides."
+description: "Where AI sits inside a robot: perception, learning, planning and language. What stays classic engineering, the results that define 2026, and where to start."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["AI","Guide"]
-readTime: 8
+readTime: 9
 coverEmoji: "🧠"
 featured: false
-keywords: ["ai and robotics","artificial intelligence in robots","how ai is used in robotics","ai robotics for beginners"]
+keywords: ["ai and robotics","artificial intelligence in robots","how ai is used in robotics","ai robotics for beginners","physical ai"]
 ---
 
 # AI and Robotics: The Complete Beginner Guide
 
-**Short answer:** AI gives robots the parts of the job that are hard to write as rules: **seeing** (perception), **learning** from experience or demonstration, **planning** in messy places, and increasingly **understanding language**. The rest of a robot, its motors, sensors and control loops, is classic engineering, and the two work together.
+**Short answer:** AI does the parts of a robot's job that nobody can write down as rules: **seeing** what is in front of it, **learning** a skill from data or practice, **planning** in a cluttered world, and now **understanding plain-language instructions**. The rest of the robot, its motors, sensors, control loops and safety limits, is classic engineering, and it is not going away. This guide is the map: what each part does, the result that proved it, and where to go next on this site.
+
+## First, the numbers that frame everything
+
+Most robots in the world contain no learning at all. The International Federation of Robotics counted 542,000 industrial robots installed in 2024, the second-highest year on record; China alone took 295,000 of them. The overwhelming majority weld, paint and move parts along fixed, programmed paths and have done so since the 1960s. They are superb at it precisely because nothing about the task changes.
+
+AI enters when the task *does* change: a different object every time, a person walking through the workspace, an instruction spoken rather than programmed. That is a smaller share of robots and the fastest-growing one, and it is where the hard, interesting problems are.
 
 ## The four jobs AI does in a robot
 
-1. **Perception.** Turning camera and sensor data into meaning: "that is a cup, 40 cm away." See [computer vision for robots](/blog/computer-vision-for-robots-explained) and [object detection](/atlas/concept/object-detection).
-2. **Learning.** Improving from data instead of hand-written rules. See [how robots learn](/blog/how-robots-learn-machine-learning-and-reinforcement-learning).
-3. **Planning.** Choosing a path or sequence of moves, using methods like [motion planning](/atlas/concept/motion-planning).
-4. **Language and reasoning.** Using [large language models](/atlas/concept/large-language-model-robotics) to turn "tidy the table" into steps. See [LLMs and robots](/blog/large-language-models-and-robots).
+### 1. Perception: turning pixels into meaning
 
-## What stays non-AI
+A camera delivers millions of numbers per frame. [Computer vision](/atlas/concept/computer-vision) turns them into "a cup, 40 cm away, handle facing left." This is the oldest and most settled use of AI in robotics: [object detection](/atlas/concept/object-detection) and segmentation networks trained on labeled images have been the standard since the early 2010s. Every warehouse picker, every delivery robot and every self-driving stack starts here.
 
-Motor control, balance loops and safety limits are usually classic control such as a [PID controller](/atlas/concept/pid-controller). They are predictable and checkable, which matters when a robot can hurt someone. Most good robots mix both. Read [AI vs traditional robot programming](/blog/ai-vs-traditional-robot-programming).
+Perception is also where sensors meet AI. A [depth camera](/atlas/concept/depth-camera) or [lidar](/atlas/concept/lidar) gives distance directly; a neural network can estimate it from a single image. [Sensor fusion](/atlas/concept/sensor-fusion) combines both. See the sensor comparison in [lidar vs radar vs camera](/blog/lidar-vs-radar-vs-camera-for-robots).
 
-## Example: a warehouse picking robot
+### 2. Learning: acquiring a skill without writing it
 
-- **Without AI:** it can only pick items that arrive in exactly the same position, so a tilted box stops it.
-- **With AI vision:** it recognises items in any pose and adapts its grip, so it handles variety.
-- **Still classic:** the arm's joint control and emergency stops.
+Three routes, covered in depth in [how robots learn](/blog/how-robots-learn-machine-learning-and-reinforcement-learning):
+
+- **Supervised** learning from labeled data, which is perception above.
+- **[Imitation](/atlas/concept/imitation-learning)** from human demonstrations. The 2023 ALOHA result learned fine tasks like slotting a battery at 80 to 90 percent success from about ten minutes of demonstrations, on low-cost arms.
+- **[Reinforcement learning](/atlas/concept/reinforcement-learning)** from trial, error and a reward, almost always in simulation. OpenAI's 2019 Rubik's cube hand was trained entirely in simulation and transferred to real hardware through automatic domain randomization. Legged robots learn to walk the same way today.
+
+### 3. Planning: deciding what to do in a messy world
+
+Planning is where AI and classical methods overlap most. [Motion planning](/atlas/concept/motion-planning) and [path planning](/atlas/concept/path-planning) are mostly classical search ([A*](/atlas/concept/a-star-algorithm), sampling-based planners), and [Nav2](/atlas/concept/nav2) in ROS 2 is a classical planner fed by learned perception. Learned planners are arriving for the cases search handles badly, such as choosing a grasp on an unfamiliar object, but a classical [behavior tree](/atlas/concept/behavior-trees) still usually decides what happens next.
+
+### 4. Language and reasoning: from "tidy the table" to actions
+
+The newest layer. A [large language model](/atlas/concept/large-language-model-robotics) can break "tidy the table" into "pick up the cup, put it in the sink, wipe the surface." A vision-language-action model goes further and outputs robot actions directly. RT-2 (2023) showed such a model following instructions about objects it had only ever read about; OpenVLA (2024) released an open 7-billion-parameter version trained on 970,000 robot demonstrations. See [foundation models in robotics](/atlas/concept/foundation-model-robotics). These are promising and not yet reliable enough to run without a classic safety layer underneath, which is the subject of the next section.
+
+## What stays classic, and why
+
+Motor control, balance loops, force limits and emergency stops are written as rules and classic [control](/atlas/concept/pid-controller), not learned. A commercial collaborative arm like the UR5e ships with 23 configurable safety functions certified to ISO 13849-1; none of them is a neural network, because a certification body can audit a rule and cannot audit a weight matrix. The pattern in every serious system is: learned components *propose*, classic components *dispose*, and the safety layer sits outside both. [AI vs traditional robot programming](/blog/ai-vs-traditional-robot-programming) is the decision guide for which to use where.
+
+## Example: a warehouse picking robot, with and without
+
+- **Without AI:** it picks items that arrive in exactly the expected position. A tilted box stops the line until a person straightens it. This is most of the 542,000 robots installed last year, and for a car body on a fixed jig it is the right design.
+- **With learned perception:** it recognizes each item in any pose and chooses a grip, so it handles variety. The arm's joint control, the collision checking and the gripper's force limit are still classic.
+- **With a language layer:** a supervisor can say "prioritize the pharmacy orders" instead of editing a config file. The language model never touches a motor.
 
 ## Where it gets difficult
 
-- **Real world is messy.** Models trained in simulation can fail on real hardware. See [the sim-to-real gap](/blog/sim-to-real-gap-explained).
-- **Compute limits.** Robots have limited power, so models often run on small boards. See [edge AI](/atlas/concept/edge-ai).
-- **Safety.** A wrong guess from a model needs a safe fallback.
+- **The real world is messy.** A policy that scores perfectly in simulation can fall over on hardware. The [sim-to-real gap](/atlas/concept/sim-to-real) is the central practical problem of robot learning, and [domain randomization](/atlas/concept/domain-randomization) is the standard answer.
+- **Compute is limited.** A robot runs on a battery, often on a Raspberry Pi or Jetson. Models that need a data-center GPU have to be shrunk, quantized or run at the [edge](/atlas/concept/edge-ai) at a few frames per second.
+- **Data is scarce.** Internet text has trillions of words; robot demonstrations number in the hundreds of thousands across the whole field. OpenVLA's 970,000 episodes is one of the largest sets that exists.
+- **Failures are quiet.** A rule fails at a boundary you wrote. A model fails on an input it never saw, with full confidence. Everything above about safety layers follows from this.
+
+## The vocabulary you will meet
+
+**Physical AI** and **embodied AI** are the industry's current terms for the whole area: AI that perceives and acts in the physical world rather than on a screen. **Foundation model** means a large model pretrained on broad data and adapted to many tasks. **Policy** means the learned function from observations to actions. **Sim-to-real** is the transfer from simulator to hardware. The [AI and robotics hub](/ai-robotics) collects the Atlas entries for all of them.
 
 ## Where to start
 
-1. Learn the [sense-think-act loop](/blog/how-do-robots-work).
-2. Understand [machine learning](/atlas/concept/machine-learning) basics.
-3. Try the free [Academy](/academy) and ask the R2 Co-pilot questions as you go.
+1. Understand the [sense-think-act loop](/blog/how-do-robots-work); everything in this guide is one of the three steps.
+2. Read [machine learning](/atlas/concept/machine-learning) and [neural network](/atlas/concept/neural-network) in the Atlas, then [how robots learn](/blog/how-robots-learn-machine-learning-and-reinforcement-learning).
+3. Train an image classifier on your own photos and run it on a Pi camera. That is perception, end to end, in a weekend.
+4. Follow the Edge track in the free [Academy](/academy) and ask the R2 Co-pilot whenever a term is unfamiliar.
 
 ## FAQ
 
-**Do all robots use AI?** No. Many industrial robots run fixed programs and work very well.
+**Do all robots use AI?** No. Most industrial robots run fixed programs and work extremely well. AI is for the tasks that change.
 
-**Is AI the same as machine learning?** Machine learning is the main part of AI used in robots today, but AI is the wider field.
+**Is AI the same as machine learning?** Machine learning is the part of AI used in robots today. AI is the wider field, including classical planning and search, which robots have used since the 1960s.
 
-**Do I need a maths degree?** Not to begin. Basic algebra and curiosity are enough for the first projects.
+**Do I need a math degree?** Not to begin. Algebra and curiosity cover the first projects. Linear algebra and probability start to matter when you want to understand why a model behaves as it does, which is the point at which you will want to learn them anyway.
+
+## Sources
+
+- International Federation of Robotics, "Global Robot Demand in Factories Doubles Over 10 Years" (World Robotics 2025 figures): https://ifr.org/ifr-press-releases/news/global-robot-demand-in-factories-doubles-over-10-years
+- Brohan et al., "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control": https://arxiv.org/abs/2307.15818
+- Kim et al., "OpenVLA: An Open-Source Vision-Language-Action Model": https://arxiv.org/abs/2406.09246
+- Zhao et al., "Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware" (ALOHA): https://arxiv.org/abs/2304.13705
+- OpenAI, "Solving Rubik's Cube with a Robot Hand": https://arxiv.org/abs/1910.07113
+- Universal Robots, UR5e datasheet (safety functions and certification): https://www.universal-robots.com/manuals/latest/en/datasheets/ur5e/

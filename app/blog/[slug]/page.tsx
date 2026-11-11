@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: post.title,
       description: post.description,
       publishedTime: post.date,
+      modifiedTime: post.updated,
       authors: [post.author],
       tags: post.tags,
     },
@@ -64,7 +65,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     description: post.description,
     image: `${BASE}/blog/${post.slug}/opengraph-image`,
     datePublished: post.date,
-    dateModified: post.date,
+    dateModified: post.updated,
     author: authorRef(),
     publisher: {
       '@type': 'Organization',

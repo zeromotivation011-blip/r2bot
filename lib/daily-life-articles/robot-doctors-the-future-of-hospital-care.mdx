@@ -1,0 +1,56 @@
+---
+title: 'Robot Doctors: The Future of Hospital Care'
+excerpt: 'Hospital robots do not diagnose anyone. They fetch medication, ride lifts, dispense pills and guide visitors — giving nurses back hours of walking.'
+category: healthcare
+readTime: '5 min read'
+publishedAt: '2026-11-11'
+updatedAt: '2026-11-11'
+atlasLinks:
+  - { slug: service-robot, label: 'Service Robots' }
+  - { slug: autonomous-mobile-robot, label: 'Autonomous Mobile Robots' }
+  - { slug: medical-robotics, label: 'Medical Robotics' }
+  - { slug: human-robot-interaction, label: 'Human-Robot Interaction' }
+sources:
+  - { name: 'Robotics 24/7 — Diligent Robotics’ Moxi performs one million deliveries (Feb 2025)', url: 'https://www.robotics247.com/article/diligent_robotics_humanoid_mmr_performs_one_million_deliveries' }
+  - { name: 'BD Rowa — About BD Rowa', url: 'https://rowa.de/en/about-bd-rowa' }
+  - { name: 'Changi General Hospital — Three robots augment the emergency department care team (July 2023)', url: 'https://www.cgh.com.sg/news/patient-care/changi-general-hospital-introduces-three-robots-to-augment-its-care-team-at-the-emergency-department' }
+---
+
+The next time you are in a hospital, the medication that reaches the ward may have been picked by a robot arm in the pharmacy, carried upstairs by a wheeled robot that called the lift itself, and handed to a nurse who did not have to leave the floor. No robot examined you. Several robots made sure the people who did had more time.
+
+## What it is
+
+"Robot doctor" is a headline, not a product. The robots actually working in hospitals are logistics and dispensing machines, and they divide into three kinds:
+
+- **Delivery robots** such as Diligent Robotics' Moxi, a wheeled robot with an arm that fetches supplies, lab specimens and medication and brings them to patient rooms. Diligent reported in February 2025 that its fleet had passed one million deliveries across 23 health systems and 31 hospital-level partnerships in the United States.
+- **Pharmacy robots** such as BD Rowa's systems, built in Kelberg, Germany, which store medicine packs and pick them on demand. BD Rowa says it has 15,000 dispensing robots installed in 60 countries.
+- **Patient-facing helpers** such as the three autonomous mobile robots Singapore's Changi General Hospital introduced in its emergency department in 2023: one carries medication, one guides patients to their destination, one roams the waiting area with blankets.
+
+## How it works
+
+**Sensing.** A hospital delivery robot uses lidar and depth cameras to map the corridors and to see people, trolleys and wheelchairs moving around it. Changi's robots are described as "capable of moving through crowds independently without bumping into other moving objects and people." A pharmacy robot's sensing is simpler and sharper: each pack is identified as it is loaded, so the system knows exactly what is where.
+
+**Compute.** The delivery robot runs a navigation stack: localise on the map, plan a route to the ward, replan when a corridor is blocked. The part that is specific to hospitals is the building interface. Moxi had completed more than 125,000 autonomous elevator rides by early 2025, which means talking to the lift controller, waiting for a car, and riding it with people. The pharmacy robot's compute is inventory logic: where to put each pack so the most-requested ones are quickest to reach, and which to pick first for an order.
+
+**Actuation.** Moxi's arm handles the items it carries. Changi's MEDi carries up to four medication baskets in four compartments, serving four areas per trip, and is sent on its way from a tablet. A Rowa picker is a gantry that slides along the shelving and grips a pack. None of these touch a patient.
+
+## Where you'll see it
+
+- **United States.** Diligent says Moxi has saved nurses and other clinical staff over 1.5 billion steps and more than 575,000 hours of labour, with an average task taking 20 to 26 minutes.
+- **Germany and 60 countries.** BD Rowa's dispensing robots run in community and hospital pharmacies across 60 countries, which is probably the most widespread hospital robot nobody notices.
+- **Singapore.** At Changi General Hospital, MEDi makes up to 16 pick-up and delivery rounds a day between the ED pharmacy and the wards, saving almost two hours of staff time daily and sparing nurses more than four kilometres of walking. The wayfinding robot EDi, which speaks four languages, saves about four minutes per round trip, or close to 1.5 hours a day. The blanket robot halved the retrieval workload for service staff.
+
+## What it can't do yet
+
+Nothing here diagnoses, treats or decides. A delivery robot cannot open a sealed medication, administer it, or notice a patient looking unwell. It needs lifts that can talk to it, corridors wide enough to pass a bed, and Wi-Fi that reaches every floor; retrofitting an old hospital is often harder than buying the robot. Moxi's 20-to-26-minute average task time is slower than a nurse walking the same route, which is fine only because the nurse is doing something else. The gains are measured in steps and hours, not outcomes, and they go to staff rather than patients directly. The honest promise of a hospital robot is a nurse who is at the bedside more often, which is worth having and is not the same as a robot doctor.
+
+## Try it / learn more
+
+- Atlas: [Service robots](/atlas/concept/service-robot), [Autonomous mobile robots](/atlas/concept/autonomous-mobile-robot), [Medical robotics](/atlas/concept/medical-robotics), [Human-robot interaction](/atlas/concept/human-robot-interaction)
+- Robot profiles: [Moxi](/robots/moxi), [Aethon TUG](/robots/aethon-tug)
+
+## Sources
+
+1. Robotics 24/7, "Diligent Robotics humanoid MMR performs one million deliveries" (19 February 2025). https://www.robotics247.com/article/diligent_robotics_humanoid_mmr_performs_one_million_deliveries
+2. BD Rowa, "About BD Rowa". https://rowa.de/en/about-bd-rowa
+3. Changi General Hospital, "Changi General Hospital introduces three robots to augment its care team at the emergency department" (14 July 2023). https://www.cgh.com.sg/news/patient-care/changi-general-hospital-introduces-three-robots-to-augment-its-care-team-at-the-emergency-department

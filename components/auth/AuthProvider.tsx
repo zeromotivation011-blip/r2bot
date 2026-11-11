@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { loadSupabaseBrowser, hasSupabaseSessionCookie, AUTH_CHANGED_EVENT } from '@/lib/supabase/lazy'
 import type { User } from '@supabase/supabase-js'
 
 export interface Profile {
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
   const fetchProfile = useCallback(async (userId: string): Promise<Profile | null> => {
-    const supabase = createSupabaseBrowserClient()
+    const supabase = await loadSupabaseBrowser()
     const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
     if (error) return null
     return data as Profile | null
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const syncLocalToCloud = useCallback(async (userId: string) => {
     try {
-      const supabase = createSupabaseBrowserClient()
+      const supabase = await loadSupabaseBrowser()
       const rows: { user_id: string; progress_key: string; progress_data: unknown }[] = []
       for (const key of SYNC_KEYS) {
         const v = readLocal(key)
@@ -99,41 +99,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(p)
   }, [user, fetchProfile])
 
-  // Auth state listener
+  // Auth state listener. The Supabase client is only downloaded when this
+  // browser has a session cookie, or after an in-page sign-in announces
+  // itself (AUTH_CHANGED_EVENT). Signed-out visitors — nearly everyone —
+  // never pay for it. Magic-link and OAuth sign-ins land on /auth/callback,
+  // which sets the cookie before the next page renders.
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient()
     let mounted = true
+    let unsubscribe: (() => void) | null = null
+    let booted = false
 
-    supabase.auth.getUser().then(async ({ data: { user: u } }) => {
+    const boot = async () => {
+      if (booted) return
+      booted = true
+      const supabase = await loadSupabaseBrowser()
+      if (!mounted) return
+      const { data: { user: u } } = await supabase.auth.getUser()
       if (!mounted) return
       setUser(u ?? null)
-      if (u) {
-        const p = await fetchProfile(u.id)
-        setProfile(p)
-      }
+      if (u) setProfile(await fetchProfile(u.id))
       setIsLoading(false)
-    })
-
-    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
-      const u = session?.user ?? null
-      setUser(u)
-      if (u) {
-        const p = await fetchProfile(u.id)
-        setProfile(p)
-        if (event === 'SIGNED_IN') {
-          // Fire-and-forget — the user can navigate while we sync.
-          syncLocalToCloud(u.id)
+      const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const nu = session?.user ?? null
+        setUser(nu)
+        if (nu) {
+          setProfile(await fetchProfile(nu.id))
+          if (event === 'SIGNED_IN') syncLocalToCloud(nu.id) // fire-and-forget
+        } else {
+          setProfile(null)
         }
-      } else {
-        setProfile(null)
-      }
-    })
+      })
+      unsubscribe = () => sub.subscription.unsubscribe()
+    }
 
-    return () => { mounted = false; sub.subscription.unsubscribe() }
+    if (hasSupabaseSessionCookie()) {
+      void boot()
+    } else {
+      setIsLoading(false)
+    }
+    const onChanged = () => { void boot() }
+    window.addEventListener(AUTH_CHANGED_EVENT, onChanged)
+    return () => { mounted = false; unsubscribe?.(); window.removeEventListener(AUTH_CHANGED_EVENT, onChanged) }
   }, [fetchProfile, syncLocalToCloud])
 
   const signOut = useCallback(async () => {
-    const supabase = createSupabaseBrowserClient()
+    const supabase = await loadSupabaseBrowser()
     await supabase.auth.signOut()
     setUser(null); setProfile(null)
   }, [])

@@ -1,12 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
-import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { loadSupabaseBrowser, hasSupabaseSessionCookie } from '@/lib/supabase/lazy'
 import { Reveal } from '@/components/Reveal'
 import { FeatureTour } from '@/components/FeatureTour'
 import ShortDemo from '@/components/shorts/ShortsDemos'
-import HomeShorts from '@/components/landing/HomeShorts'
 import ContinueStrip from '@/components/landing/ContinueStrip'
 
 type Track = 'spark' | 'wire' | 'forge' | 'edge'
@@ -29,6 +28,9 @@ interface HomeClientProps {
   simCount: number
   news?: HomeNewsItem[]
   videos?: HomeVideoItem[]
+  /** Server-rendered Quick Lessons section (keeps the lesson catalogue out of this bundle). */
+  shortsSection: ReactNode
+  liveLessons: { slug: string; title: string }[]
 }
 
 function usePersonalization(): Personalization {
@@ -44,9 +46,12 @@ function usePersonalization(): Personalization {
       }
     } catch { /* ignore */ }
 
+    // Only signed-in browsers have a session cookie; everyone else skips the
+    // Supabase download entirely (it was ~240 KB on every homepage load).
+    if (!hasSupabaseSessionCookie()) return () => { cancelled = true }
     ;(async () => {
       try {
-        const supabase = createSupabaseBrowserClient()
+        const supabase = await loadSupabaseBrowser()
         const { data: { user } } = await supabase.auth.getUser()
         if (cancelled) return
         if (!user) return
@@ -77,7 +82,7 @@ const TRACK_LABEL: Record<Track, string> = {
   spark: 'Spark', wire: 'Wire', forge: 'Forge', edge: 'Edge',
 }
 
-export default function HomeClient({ atlasCount, projectCount, shortsCount, simCount, news = [], videos = [] }: HomeClientProps) {
+export default function HomeClient({ atlasCount, projectCount, shortsCount, simCount, news = [], videos = [], shortsSection, liveLessons }: HomeClientProps) {
   const personalization = usePersonalization()
   const showDiagnosticBanner = personalization.signedIn && !personalization.track
   return (
@@ -115,8 +120,8 @@ export default function HomeClient({ atlasCount, projectCount, shortsCount, simC
           feature grid saying the same six things as Features, two screens
           after it, and claimed "20+ guided robot projects" when there are
           ten. */}
-      <ContinueStrip />
-      <Reveal><HomeShorts /></Reveal>
+      <ContinueStrip lessons={liveLessons} />
+      <Reveal>{shortsSection}</Reveal>
       <Reveal><CoursePath /></Reveal>
       <Reveal><Features atlasCount={atlasCount} /></Reveal>
       <Reveal><SimulatorShowcase simCount={simCount} /></Reveal>

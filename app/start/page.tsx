@@ -52,7 +52,7 @@ const PATHS: {
     steps: [
       { t: 'Pick a board: Arduino, ESP32 or Pi', href: '/blog/arduino-vs-esp32-vs-raspberry-pi-for-robots' },
       { t: 'Wire track: build real ROS 2 robots', href: '/academy/wire/01' },
-      { t: 'Learn PID control', href: '/blog/pid-controller-explained-simply' },
+      { t: 'Learn PID control', href: '/atlas/concept/pid-controller' },
       { t: 'Build a guided project', href: '/build' },
     ],
   },
@@ -61,7 +61,7 @@ const PATHS: {
     steps: [
       { t: 'ROS vs ROS 2: what to learn', href: '/blog/ros-vs-ros2-which-to-learn' },
       { t: 'Forge track: Nav2 and MoveIt2', href: '/academy/forge/01' },
-      { t: 'Understand SLAM', href: '/blog/what-is-slam-in-plain-words' },
+      { t: 'Understand SLAM', href: '/atlas/concept/slam' },
       { t: 'Practise in the ROS 2 playground', href: '/ros2' },
     ],
   },
@@ -71,7 +71,7 @@ const PATHS: {
       { t: 'AI and Robotics hub: plain-English guides', href: '/ai-robotics' },
       { t: 'AI and robotics: the complete guide', href: '/blog/ai-and-robotics-complete-guide' },
       { t: 'How robots learn', href: '/blog/how-robots-learn-machine-learning-and-reinforcement-learning' },
-      { t: 'LLMs and robots', href: '/blog/large-language-models-and-robots' },
+      { t: 'LLMs and robots', href: '/atlas/concept/large-language-model-robotics' },
       { t: 'Ask the R2 Co-pilot anything', href: '/copilot' },
     ],
   },

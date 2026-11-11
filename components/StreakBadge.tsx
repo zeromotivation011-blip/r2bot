@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
+import { loadSupabaseBrowser, hasSupabaseSessionCookie } from '@/lib/supabase/lazy';
 import { updateStreak } from '@/lib/streak';
 
 const SESSION_KEY = 'r2bot_streak_updated';
@@ -18,7 +18,9 @@ export function StreakBadge() {
     let cancelled = false;
     (async () => {
       try {
-        const supabase = createSupabaseBrowserClient();
+        // Signed-out browsers (no session cookie) skip the Supabase download.
+        if (!hasSupabaseSessionCookie()) return;
+        const supabase = await loadSupabaseBrowser();
         const { data: { user } } = await supabase.auth.getUser();
         if (!user || cancelled) return;
 

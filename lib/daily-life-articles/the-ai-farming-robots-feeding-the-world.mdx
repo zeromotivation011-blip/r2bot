@@ -1,0 +1,54 @@
+---
+title: 'The AI Farming Robots Feeding the World'
+excerpt: 'Weeding robots now tell crop from weed plant by plant and kill the weed with a laser or one targeted squirt. The vision and mechanics behind the field.'
+category: agriculture
+readTime: '5 min read'
+publishedAt: '2026-11-11'
+updatedAt: '2026-11-11'
+atlasLinks:
+  - { slug: weeding-robot, label: 'Weeding Robots' }
+  - { slug: computer-vision, label: 'Computer Vision' }
+  - { slug: image-segmentation, label: 'Image Segmentation' }
+  - { slug: precision-agriculture, label: 'Precision Agriculture' }
+sources:
+  - { name: 'Business Wire — Carbon Robotics introduces the LaserWeeder G2 line (Feb 2025)', url: 'https://www.businesswire.com/news/home/20250210556114/en' }
+  - { name: 'Ecorobotix — 1,000 ARA ultra-high precision sprayers deployed (Mar 2026)', url: 'https://ecorobotix.com/?p=18377' }
+  - { name: 'AgNavigator — How Naïo Technologies plots its comeback (Nov 2025)', url: 'https://agnavigator.com/Article/2025/11/11/how-naio-technologies-plots-its-comeback/' }
+---
+
+The lettuce in your sandwich may have been weeded by a machine that looked at every seedling in the field, decided which ones were crop, and burned the rest with a laser. The salad is the same; what changed is how little herbicide it took to grow it.
+
+## What it is
+
+A weeding robot is a vehicle, towed or self-driving, that carries cameras pointed at the soil, a computer that classifies each plant it sees, and a tool that acts on the weeds only. The tool is the part that differs between makers. Carbon Robotics in the United States uses lasers: its LaserWeeder G2 line carries 240-watt lasers and runs up to twice as fast as the original model. Ecorobotix in Switzerland sprays instead, with its ARA treating a 6 × 6 cm patch around each weed rather than the whole bed. Naïo Technologies in France builds small electric robots such as Oz that pull a mechanical hoe between rows.
+
+## How it works
+
+**Sensing.** High-resolution cameras under a shroud, with their own lighting so sunlight and shadow do not change what the computer sees, photograph the ground as the machine moves. The image has to be sharp enough to tell a lettuce seedling from a pigweed seedling when both have only just sprouted.
+
+**Compute.** A neural network segments each image: every pixel is labelled crop, weed or soil. This is the same family of model that drives self-driving-car perception, trained on a different dataset. Carbon Robotics says its model has been trained on more than 40 million labelled plants from three continents, which is the real asset of the company; the lasers are off-the-shelf by comparison. Because the machine is moving, the computer must also predict where a weed will be by the time the tool reaches it, which is why GPUs ride on the implement.
+
+**Actuation.** For a laser weeder, a mirror steers the beam onto the weed's growing point for a fraction of a second. For a spot sprayer, one nozzle out of a row opens for a moment. For a mechanical weeder, a blade sweeps between plants. All three are doing something a tractor-pulled sprayer cannot: treating a plant rather than a field.
+
+## Where you'll see it
+
+- **United States, Canada, Europe and Australia.** Carbon Robotics says its LaserWeeders have worked over 250,000 acres, eliminated more than 15 billion weeds and been used on more than 100 crops. Units are built in eastern Washington State.
+- **Switzerland and more than 30 countries.** Ecorobotix reported in March 2026 that 1,000 ARA sprayers had been deployed over five years, across Europe, the United States, Canada and Australia. The company claims up to 95% less herbicide than broadcast spraying because only the weed gets sprayed.
+- **France and Europe.** Naïo has deployed over 350 autonomous electric robots across five continents, with a claimed herbicide reduction of up to 70%. Its focus markets are France, Spain, Italy and Central Europe, with Oz being promoted to vegetable growers in Poland, the Netherlands, Germany and Italy.
+
+## What it can't do yet
+
+Start with the business reality: Naïo was placed under court supervision in June 2025 to find a buyer, after revenue fell from €3.96 million in 2021 to €2.4 million in 2024, and is relaunching with €6.4 million in new financing and a target of 100 robots a year by 2028. Farm robots are expensive, seasonal and sold to customers with thin margins, and even good engineering does not guarantee a company survives.
+
+On the technical side, the vision models are trained per crop; a new crop or an unusual weed needs new labelled data. Laser weeders work best on small weeds in flat, well-prepared beds, and they are heavy machines: the largest G2 weighs 14,000 lb. None of these robots plant, irrigate or harvest; they do one job. And "millimetre accuracy" is a maker's claim for the targeting, not a measured field-wide kill rate, which is why we do not quote one.
+
+## Try it / learn more
+
+- Quick lesson: [How computer vision works](/shorts/computer-vision)
+- Atlas: [Weeding robots](/atlas/concept/weeding-robot), [Computer vision](/atlas/concept/computer-vision), [Image segmentation](/atlas/concept/image-segmentation), [Precision agriculture](/atlas/concept/precision-agriculture)
+
+## Sources
+
+1. Business Wire, "Carbon Robotics introduces faster, lighter and modular LaserWeeder G2 product line" (10 February 2025). https://www.businesswire.com/news/home/20250210556114/en
+2. Ecorobotix, "Ecorobotix reaches milestone: 1,000 ARA ultra-high precision sprayers sold worldwide" (17 March 2026). https://ecorobotix.com/?p=18377
+3. AgNavigator, "'We want a progressive relaunch': how Naïo Technologies plots its comeback" (11 November 2025). https://agnavigator.com/Article/2025/11/11/how-naio-technologies-plots-its-comeback/

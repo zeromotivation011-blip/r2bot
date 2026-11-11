@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
+import { loadSupabaseBrowser, hasSupabaseSessionCookie } from '@/lib/supabase/lazy';
 
 type Track = 'spark' | 'wire' | 'forge' | 'edge';
 
@@ -45,7 +45,9 @@ export function ProgressBanner() {
         /* ignore */
       }
       try {
-        const supabase = createSupabaseBrowserClient();
+        // Signed-out browsers (no session cookie) skip the Supabase download.
+        if (!hasSupabaseSessionCookie()) return;
+        const supabase = await loadSupabaseBrowser();
         const { data: { user } } = await supabase.auth.getUser();
         if (!user || cancelled) return;
 

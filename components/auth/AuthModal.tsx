@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from './AuthProvider'
-import { AuthPanel } from './AuthPanel'
+import dynamic from 'next/dynamic'
+
+// The panel pulls the Supabase client in; load it only once the modal opens.
+const AuthPanel = dynamic(() => import('./AuthPanel').then((m) => m.AuthPanel), { ssr: false })
 
 /**
  * The header's sign-in dialog.

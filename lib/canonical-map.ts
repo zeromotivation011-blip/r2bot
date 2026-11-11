@@ -52,6 +52,27 @@ export const ATLAS_ROBOTS_REDIRECTED: ReadonlySet<string> = new Set(
 )
 
 /**
+ * Blog posts that were a thinner copy of an Atlas concept.
+ *
+ * 11 Nov 2026: five posts of 282–337 words restated a concept the Atlas
+ * already explains at 414–1,118 words, so each pair was competing for one
+ * "what is X" query with the weaker page carrying the friendlier title. The
+ * Atlas entry owns the query. The MDX files are deleted (lib/blog.ts simply
+ * no longer finds them, so they leave the index and the sitemap) and
+ * next.config.mjs 308s the old URL. Duplicated there because next.config.mjs
+ * cannot import TypeScript; keep the two lists identical.
+ *
+ * Blog slug → Atlas concept slug.
+ */
+export const BLOG_TO_ATLAS: Record<string, string> = {
+  'what-is-slam-in-plain-words': 'slam',
+  'pid-controller-explained-simply': 'pid-controller',
+  'computer-vision-for-robots-explained': 'computer-vision',
+  'sim-to-real-gap-explained': 'sim-to-real',
+  'large-language-models-and-robots': 'large-language-model-robotics',
+}
+
+/**
  * Atlas path → the Quick Lesson that teaches the same idea as a 60-second
  * video with an interactive demo.
  *

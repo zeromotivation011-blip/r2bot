@@ -1,0 +1,63 @@
+---
+title: 'The Robot That Packs Your Amazon Order'
+excerpt: 'Every time you click "Buy Now," a fleet of more than a million machines starts moving. Most of them never touch your package, but they all matter.'
+category: logistics
+readTime: '5 min read'
+publishedAt: '2026-11-11'
+updatedAt: '2026-11-11'
+atlasLinks:
+  - { slug: autonomous-mobile-robot, label: 'Autonomous Mobile Robots' }
+  - { slug: warehouse-robot, label: 'Warehouse Robots' }
+  - { slug: suction-gripper, label: 'Suction Grippers' }
+  - { slug: force-torque-sensor, label: 'Force-Torque Sensors' }
+sources:
+  - { name: 'GeekWire — Amazon’s robot workforce hits 1 million (2025)', url: 'https://www.geekwire.com/2025/amazons-robot-workforce-hits-1-million-heres-what-they-all-do/' }
+  - { name: 'eWeek — Amazon’s robot fleet hits 1-million milestone', url: 'https://www.eweek.com/news/amazon-robots-automation-jobs/' }
+  - { name: 'The Register — Amazon touts Vulcan, its first robot with a sense of touch', url: 'https://www.theregister.com/2025/05/08/amazon_vulcan_robot/' }
+---
+
+When you order a phone charger online and it arrives the next morning, the thing that found it on a shelf was probably not a person. In an Amazon fulfilment centre, a wheeled robot carries the whole shelf to a picking station, an arm or a human lifts your item out, and another machine routes the box to the right truck.
+
+## What it is
+
+Amazon runs the largest fleet of warehouse robots in the world. In mid-2025 the company said it had deployed its one millionth robot, operating across a global network of more than 300 facilities, and the milestone machine was delivered to a site in Japan. That fleet is not one kind of robot. It is a family of specialised machines, each doing one job well:
+
+- **Hercules** lifts entire shelving units and drives them to a workstation, so the person or arm doing the picking never walks.
+- **Pegasus** is a wheeled unit with a small conveyor on top that moves individual packages across the building.
+- **Proteus** is Amazon's first fully autonomous mobile robot, built to move safely alongside people rather than inside a fenced-off zone.
+- **Sparrow**, **Robin** and **Cardinal** are robot arms: Sparrow picks individual items out of totes with suction cups and computer vision, Robin sorts packages, and Cardinal lifts heavy parcels into delivery carts.
+- **Sequoia** is a storage system that fetches totes and presents them at a workstation set at a comfortable height.
+
+## How it works
+
+Strip away the branding and every one of these machines runs the same loop: sense, decide, act.
+
+**Sensing.** The shelf-carrying drive units read fiducial markers (printed 2D codes) on the floor to know exactly where they are, and use bump and proximity sensors to avoid one another. Proteus adds cameras and depth sensing so it can pick its way around a person's feet. The picking arms use cameras above the tote to find the outline of each item.
+
+**Deciding.** The hard part is not one robot; it is coordinating hundreds of them in the same aisle. Amazon's answer is a model it calls DeepFleet, trained on its own logistics data, which plans the traffic of the whole fleet. The company says it improves robot travel efficiency by about 10% and cuts delivery cost. Think of it as air-traffic control for things that never leave the ground.
+
+**Acting.** Drive units sit under a shelf, lift it a few centimetres, and roll it away. Arms close a suction gripper, or in the case of Vulcan, a pair of pincers with built-in conveyor belts plus a pointed probe to nudge items aside. Vulcan is the interesting one because it adds a sense that earlier arms lacked: touch. Force sensors in the gripper let it judge how hard to squeeze a given object. Amazon's director of applied science put it bluntly: "It's not just seeing the world, it's feeling it."
+
+## Where you'll see it
+
+- **Japan.** Amazon's millionth robot was delivered to a fulfilment centre in Japan in 2025, which says something about where the fleet is growing fastest.
+- **Spokane, United States and Hamburg, Germany.** The first Vulcan arms with touch sensing went into fulfilment centres in these two cities in 2025. Amazon claims the robot can handle around 75% of the kinds of items it stows.
+- **Across the network.** More than 700,000 Amazon employees have been trained for robot-related maintenance and technical roles since 2019. Packages shipped per employee each year rose from about 175 to nearly 3,870 over the past decade, a number that captures what the robots changed.
+
+## What it can't do yet
+
+The arms are not general-purpose. Vulcan's 75% figure means one item in four still needs a person, and the machine is designed to hand those over rather than struggle. Soft, floppy, transparent and oddly shaped objects remain hard for suction and vision. The drive units only work because the floor is flat, gridded and clean; the same robot would be lost in an ordinary shop. And the whole system is tuned to one company's buildings. There is no "Amazon robot" you can buy and drop into a different warehouse.
+
+There is a human cost worth stating plainly. Amazon's facilities averaged about 670 employees each in 2024, the lowest level in at least 16 years, even as output per employee rose. The robots have not removed people from the building, but they have changed what the remaining people do.
+
+## Try it / learn more
+
+- Quick lesson: [How warehouse robots move](/shorts/warehouse-robots)
+- Atlas: [Autonomous mobile robots](/atlas/concept/autonomous-mobile-robot), [Warehouse robots](/atlas/concept/warehouse-robot), [Suction grippers](/atlas/concept/suction-gripper), [Force-torque sensors](/atlas/concept/force-torque-sensor)
+- Robot profiles: [Amazon Kiva drive unit](/robots/amazon-kiva), [Proteus](/robots/proteus-amazon)
+
+## Sources
+
+1. GeekWire, "Amazon's robot workforce hits 1 million — here's what they all do" (2025). https://www.geekwire.com/2025/amazons-robot-workforce-hits-1-million-heres-what-they-all-do/
+2. eWeek, "Amazon's robot fleet hits 1-million milestone, boosts efficiency by 10%". https://www.eweek.com/news/amazon-robots-automation-jobs/
+3. The Register, "Amazon touts Vulcan — its first robot with a sense of 'touch'" (8 May 2025). https://www.theregister.com/2025/05/08/amazon_vulcan_robot/

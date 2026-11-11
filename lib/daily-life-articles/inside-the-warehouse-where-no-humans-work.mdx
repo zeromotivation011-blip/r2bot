@@ -1,0 +1,57 @@
+---
+title: 'Inside the Warehouse Where Robots Do the Picking'
+excerpt: 'Ocado’s grid picks a 50-item grocery order in five minutes with almost no human touch. The trade-off is a building designed around robots, not people.'
+category: logistics
+readTime: '5 min read'
+publishedAt: '2026-11-11'
+updatedAt: '2026-11-11'
+atlasLinks:
+  - { slug: warehouse-robotics, label: 'Warehouse Robotics' }
+  - { slug: swarm-robotics, label: 'Swarm Robotics' }
+  - { slug: path-planning, label: 'Path Planning' }
+  - { slug: bin-picking, label: 'Bin Picking' }
+sources:
+  - { name: 'Ocado Group — Our technology', url: 'https://www.ocadogroup.com/osp/our-technology' }
+  - { name: 'Ocado Group — Ocado launches first CFC in Asia with AEON (July 2023)', url: 'https://www.ocadogroup.com/newsroom/news/ocado-launches-first-cfc-in-asia-with-aeon' }
+  - { name: 'The Spokesman-Review / AP — Kroger to close three automated fulfilment centres (Nov 2025)', url: 'https://www.spokesman.com/stories/2025/nov/18/kroger-to-close-three-automated-delivery-fulfillme' }
+---
+
+If you order groceries online in parts of the United Kingdom, Japan or the United States, the bag that arrives was assembled inside a building where the shelves have been replaced by a grid and the aisles by robots running on top of it. The humans, where there are any, stand at the edge.
+
+## What it is
+
+The best-known version is Ocado's. Instead of rows of shelves, a customer fulfilment centre has a three-dimensional storage grid holding thousands of products in stacked crates. Hundreds of identical wheeled bots run across the top of the grid at speeds of up to 4 m/s, lift crates out, and carry them to pick stations where a person or a robotic arm transfers items into a customer's bag. Ocado says the system lets its partners pick a 50-item order in five minutes, and that orders "can be fulfilled without human touch" once its robotic arms are integrated.
+
+"Without human touch" is a claim about the picking, not the building: engineers, maintenance staff and, at most sites, human packers remain. A warehouse with nobody in it does not exist yet.
+
+## How it works
+
+**Sensing.** Each bot knows its position on the grid by counting cells; the grid itself is the map. The bots carry sensors to confirm they have gripped a crate and to detect faults, and the pick arms use cameras to find each item in a crate.
+
+**Compute.** The hard problem is traffic. Ocado describes an AI "air traffic control" system that talks to every bot ten times a second, assigning routes so that hundreds of bots crossing the same grid never collide and crates arrive at pick stations in the order the packing software wants them. This is a swarm-control problem, and the simplicity of each bot is what makes it tractable: the intelligence lives in the central system.
+
+**Actuation.** A bot has wheels that run along both axes of the grid so it can change direction without turning, a winch to raise and lower crates, and a battery it recharges at the grid's edge. The robotic pick arms, where installed, use suction or fingers to lift an item and place it in a bag, deciding on the fly how to grasp each one.
+
+## Where you'll see it
+
+- **United Kingdom.** Ocado's home market, where Ocado Retail, a joint venture in which Ocado holds a 50% share with Marks & Spencer, runs on the grid system.
+- **Chiba, Japan.** In July 2023 Ocado and AEON opened the first grid-based fulfilment centre in Asia, in Honda-cho, Midori-ku, Chiba, serving the Kanto region under the Green Beans brand with a 50,000-product range. A second centre was planned for Hachioji, Tokyo.
+- **United States.** Kroger, which partnered with Ocado in 2018, announced in November 2025 that it would close three of its automated fulfilment centres, in Wisconsin, Maryland and Florida, and record an impairment charge of about $2.6 billion, while keeping sites in Ohio, Texas, Georgia, Colorado and Michigan. Ocado expected more than $250 million in compensation and about a $50 million hit to its fiscal 2026 fee revenue.
+
+## What it can't do yet
+
+The Kroger closures are the honest limit. A grid warehouse is enormously productive only when it is kept busy; when demand softens, as it did after the pandemic bump faded and shoppers went back to stores, the fixed cost does not shrink. Kroger's stated path is to lean on third-party delivery partners such as Instacart and DoorDash instead, and it expects e-commerce profitability to improve by about $400 million in fiscal 2026 as a result.
+
+Technically, the grid needs a flat, purpose-built floor and a product range that fits in standard crates. The pick arms still share the work with people, because soft bread, loose produce and odd shapes defeat a suction cup more often than a human hand. And a system that is this centralised is only as resilient as its control software and its building: a grid cannot be moved, and a fire or a software fault stops every bot at once.
+
+## Try it / learn more
+
+- Quick lesson: [How warehouse robots move](/shorts/warehouse-robots)
+- Atlas: [Warehouse robotics](/atlas/concept/warehouse-robotics), [Swarm robotics](/atlas/concept/swarm-robotics), [Path planning](/atlas/concept/path-planning), [Bin picking](/atlas/concept/bin-picking)
+- Robot profiles: [Amazon Kiva](/robots/amazon-kiva), [GreyOrange Butler](/robots/grey-orange-butler)
+
+## Sources
+
+1. Ocado Group, "Our technology". https://www.ocadogroup.com/osp/our-technology
+2. Ocado Group, "Ocado launches first CFC in Asia with AEON" (10 July 2023). https://www.ocadogroup.com/newsroom/news/ocado-launches-first-cfc-in-asia-with-aeon
+3. The Spokesman-Review, "Kroger to close three automated delivery fulfillment centers" (18 November 2025). https://www.spokesman.com/stories/2025/nov/18/kroger-to-close-three-automated-delivery-fulfillme

@@ -1,0 +1,53 @@
+---
+title: 'How Your Dishwasher Uses Robotics Principles'
+excerpt: 'It is not a robot, but the way a dishwasher decides how long to wash and how much water to use is the same sense-think-act loop that runs every robot.'
+category: home
+readTime: '4 min read'
+publishedAt: '2026-11-11'
+updatedAt: '2026-11-11'
+atlasLinks:
+  - { slug: sense-think-act-loop, label: 'Sense-Think-Act Loop' }
+  - { slug: feedback-loop, label: 'Feedback Loops' }
+  - { slug: sensor, label: 'Sensors' }
+  - { slug: closed-loop-control, label: 'Closed-Loop Control' }
+sources:
+  - { name: 'BSH Group wiki — AquaSensor', url: 'https://wiki.bsh-group.com/en/wiki/AquaSensor' }
+  - { name: 'Whirlpool product help — Information on dishwasher cycle time', url: 'https://producthelp.whirlpool.com/Dishwashers/Product_Info/Dishwasher_Product_Assistance/Information_on_Dishwasher_Cycle_Time' }
+---
+
+Press "Auto" on a dishwasher made in the last couple of decades and it will run a different programme tonight than it did last night, because it looked at the water, judged how dirty the dishes were, and chose. That is a robot's decision loop, hidden inside a kitchen appliance.
+
+## What it is
+
+A dishwasher is not a robot by any sensible definition: it has no arm, does not move, and does not perceive the world beyond its own tub. But the control electronics inside it do exactly what a robot's controller does. They read sensors, compare the readings with a goal, and change what the actuators do. On this site we call that the sense-think-act loop, and a dishwasher is one of the cheapest places to watch it work.
+
+The key component is a turbidity sensor, which the German maker BSH (Bosch and Siemens) branded AquaSensor when it launched a machine built around it in 1996. BSH says the sensor helped save around 20 percent of the washing water, and in 2000 the team behind it received the Bavarian Innovation Prize.
+
+## How it works
+
+**Sensing.** The AquaSensor is almost comically simple. An infrared LED and a phototransistor sit opposite each other on a U-shaped board, with the wash water flowing through the gap. The LED shines through the water to the phototransistor. When the water is cloudy with food, less light gets across, and the signal drops. That is the whole sensor: a light, a detector, and the dirty water between them. Alongside it sit a temperature sensor and, in many machines, a flow meter and a water-hardness setting.
+
+**Thinking.** A microcontroller compares the turbidity reading with a threshold. BSH's original implementation used it to decide one thing: whether the pre-rinse water was clean enough to reuse or dirty enough to drain and replace. Modern machines go further. Whirlpool's product guidance explains that on models with a sensor cycle, "the dishwasher automatically measures soil levels and water temperature, then adjusts wash time and water use," so a lightly soiled load runs shorter and a heavy one runs longer. Separate logic starts the water-softener's salt regeneration only when the hardness setting and the programmes used say it is needed.
+
+**Acting.** The actuators are a circulation pump, a drain pump, an inlet valve, a heater and a detergent dispenser. The controller decides how long the pump runs, when the heater switches on and off to hold the target temperature (a classic feedback loop), and whether to add a rinse. Nothing here is exotic; the interest is in the decision, not the hardware.
+
+That is why the appliance is a useful teacher. A robot vacuum deciding whether a room is clean, a weeding robot deciding whether a plant is a weed, and a dishwasher deciding whether the water is dirty are all the same shape: measure, compare, act, measure again.
+
+## Where you'll see it
+
+- **Germany.** BSH's AquaSensor dishwashers were the first to pick a programme from the state of the water with no user input; at the 2000 prize ceremony a speaker described the machine as the only one in the world that did so.
+- **United States.** Whirlpool's sensor-cycle models measure soil and temperature and "automatically add or reduce time." The company's own guidance says cycle time can run anywhere from 1.5 to 4 hours depending on soil level, load size, incoming water temperature and pressure, with a Normal cycle usually taking roughly 2 to 3 hours.
+
+## What it can't do yet
+
+A dishwasher senses one number about the water and nothing about the dishes. It cannot see a dried-on egg yolk, does not know whether the rack is half empty, and cannot tell that a glass is upside down in the wrong place. Its "decision" is a threshold on one sensor, which is exactly why it sometimes runs for three hours to wash four mugs. There is no map, no camera, no learning, and no actuator that can move a plate. It is a control loop, not a robot, and the difference is instructive: a controller becomes a robot when it can sense and act on the world outside itself.
+
+## Try it / learn more
+
+- Quick lesson: [Feedback control in one minute](/shorts/feedback-control), [How robots sense](/shorts/senses)
+- Atlas: [The sense-think-act loop](/atlas/concept/sense-think-act-loop), [Feedback loops](/atlas/concept/feedback-loop), [Sensors](/atlas/concept/sensor), [Closed-loop control](/atlas/concept/closed-loop-control)
+
+## Sources
+
+1. BSH Group corporate wiki, "AquaSensor". https://wiki.bsh-group.com/en/wiki/AquaSensor
+2. Whirlpool product help, "Information on dishwasher cycle time". https://producthelp.whirlpool.com/Dishwashers/Product_Info/Dishwasher_Product_Assistance/Information_on_Dishwasher_Cycle_Time

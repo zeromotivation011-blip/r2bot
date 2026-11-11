@@ -52,8 +52,10 @@ export const PAGE_UPDATED: Record<string, string> = {
   '/diagnostic': '2026-10-12T00:00:00.000Z',
   '/copilot': '2026-10-12T00:00:00.000Z',
   '/careers': '2026-10-12T00:00:00.000Z',
-  '/daily-life': '2026-10-20T00:00:00.000Z',
-  '/blog': '2026-11-06T00:00:00.000Z',
+  '/daily-life': '2026-11-11T00:00:00.000Z',
+  // Per-article dates for /daily-life/<slug> come from each article's frontmatter
+  // (publishedAt / updatedAt), not from here — see app/sitemap.ts.
+  '/blog': '2026-11-11T00:00:00.000Z',
   '/news': '2026-11-08T00:00:00.000Z',
   '/lens': '2026-10-20T00:00:00.000Z',
   '/india': '2026-11-06T00:00:00.000Z',

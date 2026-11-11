@@ -1,73 +1,96 @@
 ---
-title: "Robot Sensors Explained: How Robots See, Feel and Measure the World"
-description: "A plain guide to the main robot sensors: distance, vision, motion, touch and position. What each one measures, what it is good for, and where it fails."
+title: "Robot Sensors Explained: How Robots See, Feel and Measure"
+description: "A buying guide to robot sensors: distance, vision, motion, position and touch. Real part numbers, ranges and prices, and which to put on a first robot."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["Beginner", "Sensors", "Explainer"]
-readTime: 6
+readTime: 8
 coverEmoji: "👁️"
 featured: false
-keywords: ["robot sensors", "types of sensors in robotics", "how do robots sense", "ultrasonic vs infrared sensor", "imu encoder lidar explained"]
+keywords: ["robot sensors", "types of sensors in robotics", "how do robots sense", "ultrasonic vs infrared sensor", "imu encoder lidar explained", "sensors for first robot"]
 ---
 
-# Robot Sensors Explained
+# Robot Sensors Explained: How Robots See, Feel and Measure
 
-A robot cannot act sensibly if it cannot sense. Sensors turn the real world into numbers a program can use. Here are the main kinds, in plain language.
+A robot cannot act sensibly if it cannot sense. A [sensor](/atlas/concept/sensor) turns some piece of the physical world (distance, light, rotation, pressure) into a number a program can use. This guide covers the five families you will meet on almost every robot, with the specific parts beginners actually buy, what they cost, and the failure each one hides.
 
-## Distance sensors
+For the definitions, the Atlas has an entry per sensor. This post is about choosing and wiring.
 
-**Ultrasonic sensors** send out a burst of sound above human hearing and time the echo. Longer echo means farther object. The common HC-SR04 is cheap and perfect for beginners. It struggles with soft surfaces that absorb sound and with angled surfaces that bounce it away. See [ultrasonic sensor](/atlas/concept/ultrasonic-sensor).
+## 1. Distance sensors: "how far is that?"
 
-**Infrared (IR) sensors** use light. They work well at short range and as line sensors, but bright sunlight can confuse them.
+**Ultrasonic.** The HC-SR04 sends a burst of sound above hearing and times the echo. It measures 2 cm to 4 m with accuracy down to 3 mm and costs about $5. Trigger a pin, wait for the echo pin, multiply the time by the speed of sound. It is the first sensor most people wire to an Arduino and it teaches the whole idea of ranging in ten minutes.
 
-**[Lidar](/atlas/concept/lidar)** spins a laser to measure distance in many directions, producing a map-like scan. It is accurate but costs more.
+Where it fails: soft surfaces (a curtain, a fluffy carpet) absorb sound and return nothing; a surface at a steep angle bounces the echo away so the robot sees empty space where there is a wall; and the beam is wide, so it cannot tell you *which* of two nearby objects it heard. See [ultrasonic sensor](/atlas/concept/ultrasonic-sensor).
 
-## Vision sensors
+**Infrared (IR) ranging.** The Sharp GP2Y0A21YK is the classic: an analog voltage that falls as distance grows, over roughly 10 cm to 80 cm, about $15. It is faster and narrower than ultrasonic and fine with soft surfaces, but direct sunlight swamps it and very dark objects reflect little. See [infrared sensor](/atlas/concept/infrared-sensor).
 
-**Cameras** give rich information: colour, shape, text. Software must interpret the image, which is harder. **[Depth cameras](/atlas/concept/depth-camera)** also give distance for each pixel. See [Computer Vision for Robots](/blog/computer-vision-for-robots-explained).
+**IR reflectance for lines.** For line following you do not want range at all, just "is the floor under me dark or light?". A reflectance array such as the Pololu QTR-HD-09A puts nine IR emitter and phototransistor pairs in a row at 4 mm pitch for about $11, so the robot can read where the line sits under it and feed that error into a [PID controller](/atlas/concept/pid-controller).
 
-## Motion and orientation sensors
+**Lidar.** A spinning laser rangefinder. The entry-level Slamtec RPLIDAR A1 covers 0.15 m to 12 m, 360 degrees, at 8,000 samples per second and 2 to 10 Hz. It is the sensor that makes [SLAM](/atlas/concept/slam) practical on a small robot: one `/scan` topic in ROS 2 and you have a floor plan. It costs more than every sensor above combined, struggles with glass and mirrors, and is the right purchase only once you want a map. See [lidar](/atlas/concept/lidar).
 
-An **[IMU](/atlas/concept/imu)** (inertial measurement unit) measures acceleration and rotation. It tells a robot if it is tilting or turning. Balancing robots and drones depend on it. Its weakness is drift: small errors add up over time.
+## 2. Vision sensors: "what is that?"
 
-## Position sensors
+**Cameras** give the richest information of any sensor: color, shape, text, faces. The Raspberry Pi Camera Module 3 is $25 for a 12-megapixel Sony IMX708 with autofocus, on a ribbon cable straight into a Pi. The catch is that an image is just millions of numbers; software has to turn them into "a cup, slightly left." Color thresholding on an Arduino-class board can follow a red ball; anything more needs a Pi or better and [computer vision](/atlas/concept/computer-vision) software.
 
-An **[encoder](/atlas/concept/encoder)** counts how much a wheel or joint has turned. With it, a robot can drive a set distance or hold a joint angle. Wheels can slip, so encoders alone can drift from the truth.
+**Depth cameras** add a distance for each pixel. The RealSense D435 ($375) uses two infrared cameras and a projector to compute stereo depth, plus a color camera, in one USB unit. That is the standard sensor on research arms, because an arm needs *what* and *where* in the same frame. See [depth camera](/atlas/concept/depth-camera).
 
-## Touch and force sensors
+Where vision fails: darkness, glare, lighting that changed since training, and anything that moves faster than the processing pipeline. A model that takes 300 ms per frame on a Pi is reporting where the object *was*.
 
-Bump switches tell a robot it has hit something. [Force sensors](/atlas/concept/force-sensor) measure how hard a gripper squeezes, which lets a robot hold an egg without crushing it.
+## 3. Motion and orientation: "am I tilting or turning?"
 
-## Why robots use several sensors together
+An **[IMU](/atlas/concept/imu)** combines an accelerometer (which way is down, how hard am I being shoved) and a [gyroscope](/atlas/concept/gyroscope) (how fast am I rotating). The MPU-6050 is the hobby default; SparkFun's breakout is about $33, bare modules far less. Balancing robots, drones and anything that needs a heading use one.
 
-Each sensor has weak spots. Combining them, called **sensor fusion**, gives a more reliable picture. A self-driving car mixes cameras, lidar and radar for this reason. See [LiDAR vs Radar vs Camera](/blog/lidar-vs-radar-vs-camera-for-robots).
+Where it fails: drift. Integrating a gyro's rate to get an angle accumulates tiny errors every millisecond, so after a minute the "heading" is wrong by degrees. Fusing the gyro with the accelerometer (a complementary or [Kalman filter](/atlas/concept/kalman-filter)) fixes tilt; fixing yaw needs a magnetometer or an external reference such as a lidar scan.
 
-## What goes wrong with the wrong sensor
+## 4. Position: "how far has the wheel turned?"
 
-- An ultrasonic sensor on a robot driving over a fluffy carpet may read nothing at all.
-- A camera-only robot struggles in the dark.
-- A robot that relies only on wheel encoders will slowly lose track of where it is.
+An **[encoder](/atlas/concept/encoder)** counts pulses as a shaft rotates. Cheap gearmotors come with a magnetic encoder on the back; a few hundred counts per wheel revolution is typical. With wheel diameter known, counts become distance, and two wheels' counts become a heading estimate. That is [odometry](/atlas/concept/odometry), and every mobile robot's position estimate starts from it.
 
-## Quick picker for beginners
+Where it fails: wheels slip. On a rug, over a bump, or during a hard turn, the wheel turns more than the robot moves, and odometry silently drifts. This is the reason robots carry a lidar or camera: something that sees the world has to correct what the wheels believe.
 
-| I want my robot to... | Use |
-|---|---|
-| Avoid walls | Ultrasonic or IR distance sensor |
-| Follow a line | Two or more IR line sensors |
-| Know how far it drove | Wheel encoders |
-| Stay balanced | IMU |
-| Recognise objects | Camera + Raspberry Pi |
+## 5. Touch and force: "am I pushing on something?"
 
-## Frequently asked questions
+A **bump switch** is a microswitch behind a bumper: the simplest sensor that exists and still fitted to robot vacuums, because a 1-cent switch never misreads a chair leg. A **[force sensor](/atlas/concept/force-sensor)** or [force-torque sensor](/atlas/concept/force-torque-sensor) in a gripper lets an arm hold an egg without crushing it and detect contact before the motors stall. **[Tactile sensors](/atlas/concept/tactile-sensor)** spread that over a fingertip.
 
-**What is the best sensor for a beginner?**
-The ultrasonic sensor: cheap, easy, and teaches distance sensing.
+## Why robots carry several
 
-**Can a robot work with just one sensor?**
-Yes, for simple tasks. Complex tasks need several.
+No sensor above is good in every condition. An ultrasonic sensor misses the curtain the IR sensor sees; the IR sensor is blinded by the window the camera handles; the camera cannot see in the dark where the lidar is fine; the lidar cannot see the glass door the bump switch finds. Combining them is [sensor fusion](/atlas/concept/sensor-fusion), and it is why a self-driving car fuses cameras, lidar and radar ([compared here](/blog/lidar-vs-radar-vs-camera-for-robots)).
 
-**What is sensor noise?**
-Random error in a reading. Good code averages or filters readings to reduce its effect.
+## Quick picker for a first robot
 
-[Explore all sensors in the Atlas →](/atlas) · [Build a robot with sensors →](/blog/first-robot-project-india-step-by-step)
+| I want my robot to... | Use | Rough cost |
+|---|---|---|
+| Stop before a wall | HC-SR04 ultrasonic | $5 |
+| Follow a line | IR reflectance array (QTR) | $11 |
+| Avoid soft obstacles | Sharp IR ranger | $15 |
+| Drive a known distance | Motors with encoders | included on many gearmotors |
+| Stay balanced | MPU-6050 IMU | $33 as a SparkFun breakout; bare modules less |
+| Recognize a colored ball | Pi Camera Module 3 + Raspberry Pi | $25 + the Pi |
+| Build a map of a room | RPLIDAR A1 | far above all the rest |
+| Pick objects with an arm | RealSense D435 depth camera | $375 |
+
+## Wiring and reading them well
+
+- **Match voltages.** The HC-SR04 and Sharp IR are 5 V parts; an ESP32 or Pi is 3.3 V on its pins. A 5 V echo into a 3.3 V pin needs a divider.
+- **Filter.** Every reading is noisy. A median of five ultrasonic readings removes the occasional 0 cm glitch; an exponential moving average smooths an IR voltage.
+- **Time it.** Note how long each read takes. An ultrasonic ping to 4 m and back is about 24 ms; call it in a 1 kHz loop and the loop is no longer 1 kHz.
+- **Mount it right.** Ultrasonic sensors want a clear cone ahead; IR rangers want to be level; lidars want nothing from the robot's own body in the scan.
+
+## FAQ
+
+**What is the best sensor for a beginner?** The HC-SR04: cheap, instant results, and it teaches timing, voltage and noise in one afternoon.
+
+**Can a robot work with just one sensor?** A line follower works with just a reflectance array. Anything that must navigate a room needs at least distance plus odometry.
+
+**What is sensor noise?** Random error in a reading. Good code averages or filters it; good design picks a sensor whose noise is small compared with what you need to decide.
+
+## Sources
+
+- SparkFun, Ultrasonic Distance Sensor HC-SR04 (2 cm to 4 m, 3 mm, price): https://www.sparkfun.com/products/15569
+- SparkFun, Infrared Proximity Sensor Sharp GP2Y0A21YK: https://www.sparkfun.com/products/242
+- Pololu, QTR-HD-09A Reflectance Sensor Array: https://www.pololu.com/product/4209
+- Slamtec, RPLIDAR A1 specifications: https://www.slamtec.com/en/Lidar/A1Spec
+- Raspberry Pi, Camera Module 3 launch (price, sensor): https://www.raspberrypi.com/news/new-autofocus-camera-modules/
+- RealSense store, Depth Camera D435: https://store.realsenseai.com/buy-intel-realsense-depth-camera-d435.html
+- SparkFun, Triple Axis Accelerometer and Gyro Breakout MPU-6050: https://www.sparkfun.com/products/11028

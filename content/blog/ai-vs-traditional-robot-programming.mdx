@@ -1,49 +1,88 @@
 ---
 title: "AI vs Traditional Robot Programming: When to Use Which"
-description: "Rule-based control is predictable and checkable; AI handles messy perception. How to choose, with examples of each and of the common hybrid."
+description: "Rules are predictable and certifiable; learned models handle mess. The layered architecture real robots use, three worked cases, and the mistakes to avoid."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["AI","Programming"]
-readTime: 5
+readTime: 7
 coverEmoji: "⚖️"
 featured: false
-keywords: ["ai vs traditional robot programming","rule based vs machine learning robot","when to use ai in robots"]
+keywords: ["ai vs traditional robot programming","rule based vs machine learning robot","when to use ai in robots","robot software architecture learned vs classical"]
 ---
 
 # AI vs Traditional Robot Programming: When to Use Which
 
-**Short answer:** use **traditional programming** when the situation is predictable and safety matters, use **AI** when the input is messy (images, speech, clutter), and combine them when you can: AI to perceive, rules to act.
+**Short answer:** write **rules and classic control** for anything predictable, fast or safety-critical. Use a **learned model** for anything whose input is an image, a sound, free text or a cluttered scene. Almost every working robot does both, in layers: a learned model perceives, classic code plans and checks, a classic controller moves, and a hard-coded safety layer can override all of it.
+
+This is a decision guide. The two approaches are described in the Atlas under [closed-loop control](/atlas/concept/closed-loop-control) and [machine learning](/atlas/concept/machine-learning).
+
+## What "traditional" means here
+
+Traditional robot programming is everything you can write down and reason about: `if distance < 10 cm then stop`, a [PID controller](/atlas/concept/pid-controller) holding a motor at 100 rpm, a [finite state machine](/atlas/concept/finite-state-machine) stepping through "approach, grasp, lift, retreat," an [A* search](/atlas/concept/a-star-algorithm) over a grid map, a [behavior tree](/atlas/concept/behavior-trees) deciding what to do next. The behavior is specified by a person. Given the same input it does the same thing every time, and you can test, prove and certify it.
+
+AI, in this context, means a model whose behavior was fitted to data rather than written: a [neural network](/atlas/concept/neural-network) that finds objects in a camera frame, a policy trained by [imitation](/atlas/concept/imitation-learning) or [reinforcement learning](/atlas/concept/reinforcement-learning), a vision-language-action model that turns "put the cup on the shelf" into joint motions. Nobody wrote the behavior; it emerged from training. It handles inputs no rule could cover, and it can be confidently wrong.
 
 ## Side by side
 
 | | Traditional (rules, control) | AI (learned) |
 |---|---|---|
-| Behaviour | Predictable | Can surprise you |
+| Behavior | Deterministic; same input, same output | Statistical; can surprise you |
 | Needs data | No | Yes, often a lot |
-| Handles messy input | Poorly | Well |
-| Easy to verify | Yes | Harder |
-| Example | Motor speed with a [PID controller](/atlas/concept/pid-controller) | Recognising objects with a [neural network](/atlas/concept/neural-network) |
+| Handles messy input (images, speech, clutter) | Poorly, or not at all | Well |
+| Can be verified and certified | Yes; this is how safety standards work | Only statistically, by testing |
+| Speed | Microseconds | Milliseconds to seconds |
+| Fails | Loudly, at a boundary you defined | Quietly, on an input it never saw |
+| Example | A PID loop at 1 kHz; 23 configurable safety functions on a UR5e certified to ISO 13849-1 PLd | A policy that learned battery insertion from ten minutes of demonstrations |
 
-## Choose by question
+## Three questions that decide it
 
-- **Can I write the rule in a few lines?** Then do that. Example: stop when the distance sensor reads under 10 cm.
-- **Is the input a photo, sound or free text?** AI is probably needed.
-- **Could a wrong answer hurt someone?** Keep the final safety check as plain code.
+**1. Can you write the rule in a few lines?** Then write it. A sensor threshold, a speed limit, a sequence of known positions: rules are cheaper, faster, testable and need no data. Reaching for a model here adds a GPU, a dataset and unpredictability for nothing.
 
-## The hybrid most robots use
+**2. Is the input a photo, a sound, text, or a scene that changes?** Then a rule will not survive contact with reality. A hand-written "red pixels mean the ball" rule breaks when the sun comes out. A detector trained on a few thousand varied images does not. Perception is the one place where learned models won decisively, more than a decade ago.
 
-A vision model finds the object, normal code plans the reach, a classic controller drives the joints, and a rule stops everything if a force limit is exceeded.
+**3. Could a wrong answer hurt someone or break something?** Then the *final* decision must be classic code, whatever produced the suggestion. A learned grasp planner may propose a grip; a force limit written in plain C stops the gripper. A language model may propose "pour the kettle"; a geofence and a speed cap decide whether the arm can move there at all.
 
-## Mistakes to avoid
+## The layered architecture most robots actually use
 
-- **Using AI where a rule works.** It adds data needs, cost and unpredictability for no gain.
-- **Using only rules for a vision task.** A hand-written colour rule breaks when the lighting changes.
+Real systems do not choose. They stack:
+
+1. **Perception: learned.** A detector finds the parcel, the person, the weed. Output: labels and positions with confidence scores.
+2. **Planning: mostly classic.** A behavior tree or state machine sequences the task; a motion planner finds a collision-free path; [Nav2](/atlas/concept/nav2) uses exactly this split, with learned perception feeding a classical costmap and planner.
+3. **Control: classic.** PID, model-predictive or impedance control turns a path into motor commands, thousands of times a second. Learned controllers exist (legged locomotion policies are the big success) but they still run inside a classic safety envelope.
+4. **Safety: classic, outside everything.** Force limits, speed limits, emergency stop, workspace limits. Certified, auditable, and never routed through a model.
+
+A learned model that proposes and a classic layer that disposes is the pattern. If you remember nothing else, remember that the model never gets the last word.
+
+## Three worked cases
+
+**A line follower.** Five reflectance sensors, two motors. Rules and a PID loop, full stop. There is no perception problem; the sensors already give you the error. Anyone who puts a neural network on a line follower has built a slower line follower.
+
+**A warehouse picker.** Items arrive in random poses in random bins. Vision is learned (what is it, where is it, how is it oriented). Grasp selection is increasingly learned. Arm motion, collision avoidance and the force limit that prevents crushing are classic. The system logs every learned decision so a human can review the failures.
+
+**A home robot following "tidy the table."** A vision-language-action model is the only thing that can map that instruction to actions across objects it has never seen. The open model OpenVLA beats the far larger RT-2-X by 16.5 percentage points of task success across 29 benchmark tasks, which is remarkable and still leaves a failure rate no household would accept unsupervised. So it proposes a sequence of skills; a classic executive checks each against what the robot is allowed to do; classic controllers execute; a bump sensor and a force limit can halt any of it.
+
+## Mistakes in each direction
+
+**Using AI where a rule works.** Symptoms: a dataset nobody wants to maintain, a model that drifts, behavior nobody can explain in a review. Fix: delete the model, write the rule, keep the test.
+
+**Using only rules for a perception task.** Symptoms: an ever-growing pile of special cases, a demo that works in one room, a robot that stops working when the lighting changes. Fix: a detector trained on varied data; keep the rules downstream of it.
+
+**Letting the model have the last word.** Symptoms: a wrong detection becomes a wrong motion with nothing in between. Fix: a classic safety layer that does not know or care where the command came from.
+
+**Training when you should simulate.** Reinforcement learning on real hardware is slow and expensive. The OpenAI Rubik's cube hand was trained entirely in simulation with automatic domain randomization and transferred; that is the pattern for control policies.
 
 ## FAQ
 
-**Is AI always better?** No, it is a tool for specific problems.
+**Is AI always better?** No. It is better at perception and at tasks nobody can write down. It is worse at everything that can be written down.
 
-**Which should a beginner learn first?** Traditional control and the [sense-think-act loop](/blog/how-do-robots-work), then add AI.
+**Which should a beginner learn first?** Traditional control and the [sense-think-act loop](/blog/how-do-robots-work). You cannot judge whether a model is misbehaving until you know what correct behavior looks like, and the classic layer is where most of the engineering jobs are.
 
-Overview: [AI and robotics, the complete guide](/blog/ai-and-robotics-complete-guide).
+**Will learned models replace controllers?** For locomotion they already share the job. For safety they will not, because a certification body cannot audit a weight matrix. Expect models to keep moving up the stack and classic code to keep owning the floor.
+
+## Sources
+
+- Universal Robots, UR5e datasheet (23 configurable safety functions; EN ISO 13849-1 PLd Cat 3, EN ISO 10218-1): https://www.universal-robots.com/manuals/latest/en/datasheets/ur5e/
+- Zhao et al., "Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware" (ALOHA, ten-minute demonstrations): https://arxiv.org/abs/2304.13705
+- Kim et al., "OpenVLA: An Open-Source Vision-Language-Action Model" (task success rates across 29 tasks): https://arxiv.org/abs/2406.09246
+- OpenAI, "Solving Rubik's Cube with a Robot Hand" (simulation-only training with automatic domain randomization): https://arxiv.org/abs/1910.07113

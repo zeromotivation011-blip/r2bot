@@ -4,7 +4,8 @@ import { CopilotProvider } from '@/components/CopilotProvider'
 import { CopilotBubble } from '@/components/CopilotBubble'
 import { CopilotDrawer } from '@/components/CopilotDrawer'
 import HomeClient from './HomeClient'
-import { liveShorts } from '@/lib/shorts'
+import { liveShorts, SHORT_COURSES, shortsInCourse } from '@/lib/shorts'
+import HomeShorts, { HOME_SHORT_PICKS } from '@/components/landing/HomeShorts'
 import { SIMULATORS } from '@/lib/simulators'
 import { getAllAtlasEntries } from '@/lib/atlas'
 import { loadAllProjects } from '@/lib/build/loader'
@@ -117,7 +118,16 @@ export default async function HomePage() {
   const atlasCount = getAllAtlasEntries().length
   // Counted from the data, not typed: the hero said "47 lessons" while the
   // section below it said 48, and "nine simulators" when there are ten.
-  const shortsCount = liveShorts().length
+  const live = liveShorts()
+  const shortsCount = live.length
+  const shortsSection = (
+    <HomeShorts
+      total={shortsCount}
+      picks={HOME_SHORT_PICKS.map((slug) => live.find((x) => x.slug === slug)).filter((x): x is NonNullable<typeof x> => !!x).map((x) => ({ slug: x.slug, title: x.title, videoId: x.ids[0] }))}
+      courses={SHORT_COURSES.map((c) => ({ slug: c.slug, title: c.title, count: shortsInCourse(c.slug).length }))}
+    />
+  )
+  const liveLessons = live.map((x) => ({ slug: x.slug, title: x.title }))
   const simCount = SIMULATORS.length
   const projectCount = loadAllProjects().length
 
@@ -168,7 +178,7 @@ export default async function HomePage() {
     <CopilotProvider>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript([websiteJsonLd, organizationJsonLd, faqJsonLd]) }} />
       <Nav />
-      <HomeClient atlasCount={atlasCount} projectCount={projectCount} shortsCount={shortsCount} simCount={simCount} news={news} videos={videos} />
+      <HomeClient atlasCount={atlasCount} projectCount={projectCount} shortsCount={shortsCount} simCount={simCount} shortsSection={shortsSection} liveLessons={liveLessons} news={news} videos={videos} />
       <CopilotBubble />
       <CopilotDrawer />
     </CopilotProvider>

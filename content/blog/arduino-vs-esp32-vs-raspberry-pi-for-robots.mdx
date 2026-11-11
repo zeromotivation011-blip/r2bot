@@ -1,50 +1,82 @@
 ---
-title: "Arduino vs ESP32 vs Raspberry Pi: Which Board for Your Robot?"
-description: "Three popular boards compared for robotics: what each is good at, how they differ, and which one a beginner should start with."
+title: "Choosing a Board for Your First Robot: Arduino, ESP32 or Pi"
+description: "The story behind the spec table: how three real robot builds choose between an Arduino, an ESP32 and a Raspberry Pi, and the order to buy them in."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["Hardware","Comparison"]
-readTime: 7
+readTime: 8
 coverEmoji: "🔌"
 featured: false
-keywords: ["arduino vs esp32 vs raspberry pi","best board for robot","microcontroller vs single board computer","which board for robotics"]
+keywords: ["which board for first robot","arduino or esp32 or raspberry pi for robot","best board for robot beginner","microcontroller vs single board computer robot"]
 ---
 
-# Arduino vs ESP32 vs Raspberry Pi: Which Board for Your Robot?
+# Choosing a Board for Your First Robot: Arduino, ESP32 or Pi
 
-**Short answer:** use an **Arduino** to learn and to drive motors and sensors reliably, an **ESP32** when you also want Wi-Fi or Bluetooth for a small price, and a **Raspberry Pi** when the robot needs a camera, AI, or ROS 2. Many robots use a Pi as the brain and an Arduino or ESP32 as the nervous system.
+**Short answer:** buy an **Arduino Uno** first, add an **ESP32** the week your robot needs Wi-Fi, and buy a **Raspberry Pi** only when it needs a camera, a map or ROS 2. Most robots that do anything interesting end up with two of them: a Pi for thinking and a microcontroller underneath for the motors.
 
-## The key difference
+The spec-by-spec table, with memory, GPIO voltage, ADC counts and a verdict per row, lives on the [Arduino vs ESP32 vs Raspberry Pi comparison page](/compare/arduino-vs-esp32-vs-raspberry-pi). This post is the narrative: three robots, the board each one needs, and the mistakes people make choosing.
 
-Arduino and ESP32 are [microcontrollers](/atlas/concept/microcontroller): tiny computers that run one program, start instantly and react in real time. A Raspberry Pi is a [single-board computer](/atlas/concept/single-board-computer): it runs a full operating system like Linux, which is powerful but not strictly real time.
+## The one distinction that decides everything
 
-## Comparison
+An [Arduino](/atlas/concept/arduino) and an [ESP32](/atlas/concept/esp32-robotics) are [microcontrollers](/atlas/concept/microcontroller). They run one program, start the instant power arrives, and execute each loop with microsecond-predictable timing. That predictability is what a motor needs. A PWM signal that stutters because the operating system got busy makes a wheel twitch; an encoder count that misses pulses makes the robot drift.
 
-| | [Arduino](/atlas/concept/arduino) (Uno) | [ESP32](/atlas/concept/esp32-robotics) | [Raspberry Pi](/atlas/concept/raspberry-pi-robotics) |
-|---|---|---|---|
-| Type | Microcontroller | Microcontroller with Wi-Fi and Bluetooth | Single-board computer |
-| Software | Arduino C/C++ | Arduino C/C++, MicroPython | Python, C++, ROS 2 on Linux |
-| Strength | Simple, forgiving, huge community | Fast, wireless, low price | Cameras, AI, networking |
-| Weakness | No built-in wireless, little memory | Easier to damage pins; more to learn | Needs an SD card and boot time; more power |
-| Best for | First robot, motor control | Connected sensor robots | Vision, mapping, ROS 2 |
+A [Raspberry Pi](/atlas/concept/raspberry-pi-robotics) is a [single-board computer](/atlas/concept/single-board-computer). It runs Linux, so it can run a camera pipeline, a neural network, a web server and the whole ROS 2 graph. It also means the operating system decides when your code runs, with millisecond jitter you cannot remove. A Pi is a computer that happens to have GPIO pins, not a motor controller.
 
-Prices vary by country and by model, so check a local shop before you buy.
+Everything below follows from that split. Robots that must *react* want a microcontroller. Robots that must *perceive* want a computer. Robots that must do both want both.
 
-## What to buy first
+## Robot 1: a line follower (Arduino)
 
-- **Complete beginner:** an Arduino Uno kit with motors and a distance sensor.
-- **Want wireless control from a phone:** an ESP32.
-- **Want a camera robot or to learn ROS 2:** a Raspberry Pi, ideally after you have done one Arduino project.
+Two motors, a reflectance sensor array, a battery. The whole program is a loop: read five IR sensors, compute how far off the line the robot is, feed that into a [PID controller](/atlas/concept/pid-controller), set two PWM duties. It runs a thousand times a second and must never pause.
 
-## Why combine them?
+This is the Arduino's home turf. The Uno R4 Minima sells for $20 at the official US store (the Wi-Fi variant is $27.50), runs on 5 V logic so every hobby sensor and motor driver plugs in without a level shifter, and has the largest pile of beginner tutorials in electronics. When the PID oscillates at 2 a.m., somebody has already posted the fix.
 
-A Pi is poor at precise timing for motors, and an Arduino cannot run vision software. Putting a Pi on top for thinking and an Arduino underneath for motor control gives the best of both. Our Wire track in the [Academy](/academy) walks through that setup.
+An ESP32 would work here too, but it adds things the robot does not need (a radio, 3.3 V logic, a FreeRTOS scheduler) and a slightly fussier toolchain. A Pi would be the wrong tool: it cannot close a 1 kHz control loop reliably and it needs a bigger battery just to boot.
+
+## Robot 2: a phone-controlled rover with telemetry (ESP32)
+
+Same chassis, but now you want to drive it from a phone over Wi-Fi, stream battery voltage and sensor readings to a web page, and update the firmware without unplugging it. The moment "connect to a network" appears in the spec, the Arduino Uno is out: the Minima has no radio at all.
+
+The ESP32 has Wi-Fi and Bluetooth on the chip, runs at up to 240 MHz on two cores, and a bare DevKitC costs less than most sensors. It can serve the control web page itself, hold a WebSocket to the phone and still run the motor loop on the other core. It can also be a [micro-ROS](/atlas/concept/micro-ros) client, publishing `/odom` and `/battery` as real ROS 2 topics to a laptop, which is the cheapest possible way to put a microcontroller into a ROS 2 graph.
+
+The two things to learn before you solder: its pins are 3.3 V, so a 5 V sensor output can damage it without a divider or level shifter, and two of its ADC channels stop working while Wi-Fi is transmitting. Both are documented and both catch beginners.
+
+## Robot 3: a camera robot that maps the room (Pi plus microcontroller)
+
+Now the robot carries a camera and a 2D lidar, builds a map with [SLAM](/atlas/concept/slam), navigates with [Nav2](/atlas/concept/nav2) and recognizes objects with a small neural network. None of that fits on a microcontroller. Ubuntu 24.04 on arm64 is a Tier 1 platform for ROS 2 Jazzy, so a Raspberry Pi 5 runs the whole stack from binary packages.
+
+Prices moved in December 2025: the Pi 5 now starts at $45 for a 1 GB model and the other memory sizes went up by $5 to $10 each. For ROS 2 with SLAM, get 4 GB or more, and budget for the official 5 V 5 A power supply and an active cooler on top. A Pi 5 under load draws real power; plan the battery accordingly.
+
+And here is the part the spec tables skip: the Pi still does not drive the motors. Every well-built Pi robot has a microcontroller underneath (an Arduino, an ESP32 or a Pico) that owns the PWM, reads the encoders and closes the velocity loop. The Pi sends it a target speed over USB serial or micro-ROS and gets odometry back. The Wire track in the [Academy](/academy) builds exactly this two-board layout, and it is the architecture most commercial research robots use at larger scale: a real-time controller next to a Linux computer.
+
+## The order to buy them in
+
+1. **Arduino Uno kit** with two motors, a driver and a distance sensor. Three or four weekends. You learn PWM, sensors, wiring, debugging and the [sense-think-act loop](/atlas/concept/sense-think-act-loop) with instant feedback and almost nothing that can be damaged.
+2. **ESP32 DevKitC**, as soon as a project wants a network. Port a finished Arduino sketch to it: same IDE, same libraries, plus Wi-Fi. This is also where you learn 3.3 V discipline.
+3. **Raspberry Pi 5**, when you want a camera or ROS 2. Keep the microcontroller from step 1 or 2 on the robot; the Pi talks to it.
+
+People who skip to step 3 spend their first month fighting Linux, power supplies and SD cards instead of building a robot. People who never leave step 1 hit a ceiling the day they want vision.
+
+## Regional notes
+
+- **US and EU:** the official Arduino and Raspberry Pi stores ship directly; the ESP32 DevKitC is on Mouser, DigiKey and Amazon. Watch for ESP32 clones with a different flash size or a missing USB-serial chip.
+- **India:** official Arduino boards attract import duty and resellers charge accordingly, which is why Uno clones dominate; they work. Raspberry Pi has approved resellers in India at near-official pricing. ESP32 boards are plentiful and cheap.
+- **China:** the ESP32 is an Espressif (Shanghai) product and is cheapest at home; Pi availability through official resellers is good, and Arduino-compatible boards are everywhere.
 
 ## FAQ
 
-**Can an ESP32 replace an Arduino?** For most projects, yes. Arduino is simpler for a first week.
+**Can an ESP32 replace an Arduino entirely?** For most robots, yes, and many people now start there. The Uno is still the gentler first week because of 5 V logic and the volume of tutorials written for it.
 
-**Can a Raspberry Pi drive motors directly?** Only with extra driver boards, and its timing is less reliable than a microcontroller.
+**Can a Raspberry Pi drive motors directly?** Only through a driver board, and its timing jitter makes smooth PID control hard. Put a microcontroller between the Pi and the motors.
 
-**Which has the most tutorials?** Arduino, followed closely by Raspberry Pi.
+**What about a Pico?** The Raspberry Pi Pico is a microcontroller, not a Pi. It sits in the Arduino and ESP32 category (the Pico W adds Wi-Fi) and is a fine choice for step 1 or 2 if you prefer MicroPython.
+
+**Jetson or Pi for the brain?** A Jetson is a Pi with a GPU, for when the neural network is the point. Start with a Pi; move to a Jetson when a model is too slow on it.
+
+## Sources
+
+- Arduino Store (USA), UNO R4 Minima ($20) and UNO R4 WiFi ($27.50): https://store-usa.arduino.cc/products/uno-r4-minima and https://store-usa.arduino.cc/products/uno-r4-wifi
+- Raspberry Pi, "Introducing Raspberry Pi 5" (launch specs and accessories): https://www.raspberrypi.com/news/introducing-raspberry-pi-5/
+- CNX Software, "Raspberry Pi 5 1GB launched for $45, most other Pi 4/5 models get a price increase" (Dec 1, 2025): https://www.cnx-software.com/2025/12/01/raspberry-pi-5-1gb-launched-for-45-most-other-pi-4-5-models-get-a-price-increase/
+- Espressif, ESP32-DevKitC overview: https://www.espressif.com/en/products/devkits/esp32-devkitc/overview
+- REP 2000, ROS 2 releases and target platforms (Jazzy: Ubuntu 24.04 arm64 Tier 1): https://reps.openrobotics.org/rep-2000/

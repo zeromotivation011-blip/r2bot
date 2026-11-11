@@ -11,7 +11,15 @@ export interface BlogPost {
   slug: string
   title: string
   description: string
-  date: string           // ISO date string (YYYY-MM-DD)
+  date: string           // ISO date string (YYYY-MM-DD) — when the post was published. Never re-dated.
+  /**
+   * The day the body last materially changed (front-matter `updated:`).
+   * Falls back to `date`, so a post that has never been revised reports the
+   * same value for both. This is what Article JSON-LD should use as
+   * dateModified and what the sitemap should use as lastmod — an honest
+   * revision date, not a republish.
+   */
+  updated: string
   author: string
   authorRole: string
   tags: string[]
@@ -50,6 +58,7 @@ export function build(slug: string, data: Record<string, unknown>, content: stri
     title: String(data.title ?? slug),
     description: String(data.description ?? ''),
     date: safeISODate(data.date),
+    updated: data.updated != null ? safeISODate(data.updated) : safeISODate(data.date),
     // One by-line for the whole site (lib/author.ts). Front-matter used to carry
     // "Founder, R2BOT — science teacher turned robotics builder" next to an
     // "Editorial" name, which read as a dodge, and a default of "India's

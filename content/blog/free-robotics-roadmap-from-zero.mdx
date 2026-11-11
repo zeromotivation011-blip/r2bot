@@ -1,72 +1,105 @@
 ---
 title: "Free Robotics Roadmap: How to Learn Robotics from Zero"
-description: "A step-by-step plan to learn robotics from zero using free resources: electronics, programming, a first robot, then specialisation. Includes what to skip."
+description: "A six-stage plan from zero to a mapping robot with free material: what to build at each stage, how long it takes, what it costs, and the four lanes at the end."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["Beginner", "Roadmap", "Learning"]
-readTime: 7
+readTime: 8
 coverEmoji: "🗺️"
 featured: false
-keywords: ["how to learn robotics", "robotics roadmap", "learn robotics for free", "robotics for beginners roadmap", "robotics learning path"]
+keywords: ["how to learn robotics", "robotics roadmap", "learn robotics for free", "robotics for beginners roadmap", "robotics learning path", "robotics self study plan"]
 ---
 
 # Free Robotics Roadmap: How to Learn Robotics from Zero
 
-Robotics mixes electronics, mechanics and software. That sounds scary, but you can learn it in layers. This roadmap shows an order that works, using mostly free material.
+Robotics mixes electronics, mechanics and software, which is why it looks impossible from outside. It is learnable in layers, and each layer produces a robot you can watch move. This roadmap is the order that works, using free material throughout, with the one piece of hardware per stage that is worth paying for. Budget: a four-month path to a mapping robot for well under $200, or $0 if you stay in simulators until stage 4.
 
-## Stage 0: Understand what a robot is (1 week)
+## Stage 0: Know what a robot is (1 week, $0)
 
-Read [How Do Robots Work?](/blog/how-do-robots-work). A robot senses, decides and acts. If you remember that loop, everything else is detail.
+Read [How do robots work?](/blog/how-do-robots-work). A robot senses, decides and acts, in a loop, and everything else is detail on one of the three. Read [robotics vs automation vs AI](/blog/robotics-vs-automation-vs-ai) so the words stop being interchangeable. Then read one Atlas entry a day; [sensor](/atlas/concept/sensor), [actuator](/atlas/concept/actuator) and [feedback](/atlas/concept/feedback) first.
 
-## Stage 1: Electronics basics (2 to 3 weeks)
+**Skip:** history, philosophy of mind, and anything about humanoids. You will come back to them with better questions.
 
-Learn voltage, current, resistance, and how a breadboard works. Build an LED circuit. Use free simulators if you have no kit yet; try the [R2BOT simulator](/schools/simulate).
+## Stage 1: Electronics basics (2 to 3 weeks, $0 to $30)
 
-**Skip:** deep circuit theory for now.
+Learn voltage, current and resistance (Ohm's law is one equation), how a breadboard connects things, and what a resistor, LED, switch and capacitor do. Build an LED circuit, then a button that lights the LED. The Arduino built-in examples start exactly here and are free.
 
-## Stage 2: Programming a microcontroller (3 to 4 weeks)
+**Hardware:** a breadboard, jumper wires, a handful of resistors and LEDs. Or nothing: a browser circuit simulator is enough for this stage, and the [R2BOT simulators](/visualizer) cover the control ideas.
 
-Get an Arduino. Learn to read a button, blink an LED, and read a distance sensor. Not sure which board? See [Arduino vs Raspberry Pi](/blog/arduino-vs-raspberry-pi-india-students).
+**Skip:** AC circuit theory, transistor physics, anything with an integral sign.
 
-## Stage 3: Your first moving robot (3 to 4 weeks)
+## Stage 2: Program a microcontroller (3 to 4 weeks, $20)
 
-Build the [obstacle-avoiding robot](/blog/first-robot-project-india-step-by-step). Understanding comes from wiring, debugging and seeing it fail.
+Get an [Arduino](/atlas/concept/arduino) Uno. The R4 Minima is $20 at the official store; a clone works too. Blink an LED, read a button, read a potentiometer, drive a servo, and read an ultrasonic distance sensor (the HC-SR04, about $5, measures 2 cm to 4 m). Every one of those is a built-in example in the free Arduino IDE.
 
-## Stage 4: Control and feedback (3 to 4 weeks)
+The goal is not Arduino skill. It is the habit of reading a sensor, making a decision and driving an output, which is the robot loop on a desk. Not sure which board? [Choosing a board for your first robot](/blog/arduino-vs-esp32-vs-raspberry-pi-for-robots) explains why it is the Uno and when it stops being.
 
-Learn why robots need feedback and what [PID control](/blog/pid-controller-explained-simply) does. Build a line follower.
+**Skip:** registers, interrupts, custom PCBs. Later.
 
-## Stage 5: Pick a direction
+## Stage 3: Your first moving robot (3 to 4 weeks, $40 to $80)
 
-- **Software and AI:** Python, OpenCV, [ROS 2](/blog/ros-vs-ros2-which-to-learn), [machine learning for robots](/blog/how-robots-learn-machine-learning-and-reinforcement-learning).
-- **Embedded:** C/C++, microcontroller peripherals, motor control.
-- **Mechanical:** CAD, 3D printing, robot arms.
-- **Perception and navigation:** [cameras, lidar and radar](/blog/lidar-vs-radar-vs-camera-for-robots), [SLAM](/blog/what-is-slam-in-plain-words).
+Build an obstacle-avoiding robot: a two-wheel chassis, a motor driver, two gearmotors, the ultrasonic sensor from stage 2, a battery pack. Drive forward; if something is closer than 20 cm, back up and turn. [The first-robot tutorial](/blog/first-robot-project-india-step-by-step) walks through it step by step; the part list is the same in every country, only the shop differs.
 
-## Stage 6: Show your work
+This stage teaches more than any course can: motors that need more current than a pin can give, a battery that sags and resets the board, a sensor that reads 0 cm when it is confused, wiring that works on the bench and fails in the chassis. Understanding comes from debugging it. Keep a log of every bug and its fix.
 
-Put code on GitHub with a clear README and a short video. Join a club or competition. See [how to join a robotics club](/blog/iit-robotics-clubs-guide) and [robotics careers](/blog/robotics-career-india-salary-jobs-2025).
+**Skip:** 3D printing a custom chassis. A $10 acrylic kit chassis is fine.
+
+## Stage 4: Control and feedback (3 to 4 weeks, $15)
+
+Add a reflectance sensor array (about $11) and build a line follower. First with simple rules (left sensor dark, turn left), then with a [PID controller](/atlas/concept/pid-controller). Tune it by hand: raise P until it oscillates, add D to calm it, add a little I if it drifts. Watch the difference between a loop at 50 Hz and one at 1,000 Hz. This is the single most important idea in robotics, and a line follower is the cheapest way to feel it. The [PID simulator](/visualizer/pid) lets you tune without hardware first.
+
+If you want to go further here, add wheel encoders and make the robot drive a measured 1 m. You will discover [odometry](/atlas/concept/odometry) drift, which is the reason stage 5's robots carry a lidar.
+
+**Skip:** state-space control, transfer functions. Not yet.
+
+## Stage 5: Pick a direction (ongoing)
+
+By now you can build a robot that senses and moves. The field splits here, and you should pick one lane for six months rather than sampling all four.
+
+- **Software and navigation.** Learn [ROS 2](/blog/ros-vs-ros2-which-to-learn) (Jazzy, on Ubuntu 24.04). The official tutorials are free and start with a turtle in a window. Then Gazebo simulation, then [SLAM](/atlas/concept/slam) and [Nav2](/atlas/concept/nav2). A Raspberry Pi 5 (from $45) and a 2D lidar make it real. The Forge track in the [Academy](/academy) is this lane.
+- **AI and learning.** Python, a camera, an image classifier on your own photos, then imitation learning with a cheap arm: the open-source SO-101 has a published $122 bill of materials and the LeRobot library trains policies on it for free. Read [how robots learn](/blog/how-robots-learn-machine-learning-and-reinforcement-learning) first.
+- **Embedded and control.** C, timers and interrupts, motor drivers, [brushless motors](/atlas/concept/brushless-motor), a self-balancing robot. This lane is where most robotics hardware jobs are.
+- **Mechanical.** CAD, 3D printing, gears and linkages, a [robot arm](/blog/how-robot-arms-work). Robotics companies always need people who can make a part that does not flex.
+
+Whichever lane: sensors are shared ground. [Robot sensors explained](/blog/robot-sensors-explained) and [lidar vs radar vs camera](/blog/lidar-vs-radar-vs-camera-for-robots) cover what every lane needs to know.
+
+## Stage 6: Show your work (ongoing, $0)
+
+Put each project on GitHub with a README that has a photo, a part list, a wiring diagram and a 30-second video. Write down what went wrong, not just what worked; it is what an interviewer wants to read. Join a club or a competition, local or online. Follow the [career paths](/careers) page to see which lane leads where.
 
 ## A study habit that works
 
-- Build something small every week.
-- Write down every bug you fix. You will meet it again.
-- Read one Atlas concept each day.
+- Build something small every week. A sensor on a breadboard counts.
+- Write down every bug you fix. You will meet it again in six months.
+- Read one Atlas entry a day, and ask the R2 Co-pilot when it does not make sense.
+- Finish projects. A finished line follower teaches more than a half-built humanoid.
 
 ## What goes wrong
 
-Learners often jump to advanced topics such as AI or humanoids before they have built a basic robot. Without hands-on experience, you cannot tell whether a tutorial is correct or why your code fails.
+The common failure is skipping to the exciting part: humanoids, vision-language models, a robot dog. Without a hand-built line follower behind you, you cannot tell whether a tutorial is wrong, whether your code is wrong or whether the hardware is wrong, and every project stalls at the first bug. The roadmap is slow at the start so it can be fast later.
 
-## Frequently asked questions
+The second failure is buying a kit with twenty sensors and using two. Buy for the stage you are on.
 
-**How long does it take?**
-About three months to build a useful first robot at a few hours a week. Real depth takes years.
+## FAQ
 
-**Do I need to be good at math?**
-Not at first. Math matters later for control, geometry and machine learning.
+**How long does it take?** About four months of a few hours a week to a robot that follows a line with a tuned PID loop. Another six months in one lane to something you could show an employer. Depth takes years and is the fun part.
 
-**Is it free?**
-Learning material is free. A small kit costs money, but a simulator lets you start with nothing.
+**Do I need to be good at math?** Not for stages 0 to 4: arithmetic and one equation. Trigonometry arrives with robot arms, linear algebra with ROS 2 transforms, probability with learning. Each arrives with a reason to learn it.
+
+**Is it really free?** The learning material is. Hardware for the whole path is under $200 if you buy one stage at a time, and stages 0, 1 and most of 4 can be done in a simulator for nothing.
+
+**I am 14 / 40 / not an engineer. Can I do this?** Yes. The path above assumes nothing beyond reading and patience. The [Find My Level](/diagnostic) test will place you at the right stage.
 
 [Start here →](/start) · [Explore the Atlas →](/atlas)
+
+## Sources
+
+- Arduino, built-in examples (free, stage 1 and 2 material): https://docs.arduino.cc/built-in-examples/
+- Arduino Store (USA), UNO R4 Minima ($20): https://store-usa.arduino.cc/products/uno-r4-minima
+- SparkFun, HC-SR04 ultrasonic sensor (range and price): https://www.sparkfun.com/products/15569
+- Pololu, QTR-HD-09A reflectance sensor array: https://www.pololu.com/product/4209
+- ROS 2 documentation, Tutorials (Jazzy): https://docs.ros.org/en/jazzy/Tutorials.html
+- Gazebo documentation: https://gazebosim.org/docs
+- Hugging Face, LeRobot SO-101 guide: https://huggingface.co/docs/lerobot/so101
+- CNX Software, Raspberry Pi 5 1 GB at $45 (Dec 2025 price list): https://www.cnx-software.com/2025/12/01/raspberry-pi-5-1gb-launched-for-45-most-other-pi-4-5-models-get-a-price-increase/

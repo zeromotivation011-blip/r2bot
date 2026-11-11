@@ -1,71 +1,91 @@
 ---
-title: "How Robot Arms Work: Joints, Kinematics and Grippers in Plain Words"
-description: "What a robot arm is made of, what degrees of freedom mean, how forward and inverse kinematics work, and why grasping is hard."
+title: "How Robot Arms Work: Joints, Kinematics and Grippers"
+description: "Links, joints and six degrees of freedom; forward and inverse kinematics with a worked example; why grasping is hard; and what a $122 open-source arm teaches."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["Beginner", "Robot Arms", "Explainer"]
-readTime: 6
+readTime: 8
 coverEmoji: "🦾"
 featured: false
-keywords: ["how robot arms work", "robot arm joints", "degrees of freedom robot", "inverse kinematics explained", "robot gripper types"]
+keywords: ["how robot arms work", "robot arm joints", "degrees of freedom robot", "inverse kinematics explained", "robot gripper types", "build a robot arm"]
 ---
 
-# How Robot Arms Work
+# How Robot Arms Work: Joints, Kinematics and Grippers
 
-A robot arm is a chain of rigid links connected by joints, with a tool at the end. Your own arm is a good model: shoulder, elbow, wrist, hand.
+A [robot arm](/atlas/concept/robot-arm) is a chain of rigid links joined by motorized joints, with a tool at the end. Your own arm is the model: shoulder, elbow, wrist, hand. Everything else in this guide is detail on three questions: how the joints are arranged, how the software turns "put the tool here" into joint angles, and why the last ten centimeters, the grasp, are the hard part.
 
 ## The parts
 
-- **Links:** the rigid sections.
-- **Joints:** where links turn or slide. Each joint is driven by a motor, often with gears. See [motors for robots](/blog/motors-for-robots-dc-servo-stepper).
-- **End effector:** the tool at the tip, usually a [gripper](/atlas/concept/gripper) but sometimes a welder, a paint gun or a suction cup.
-- **Sensors:** encoders at each joint tell the controller its angle.
+- **Links:** the rigid sections, usually aluminum castings or, on hobby arms, 3D-printed plastic.
+- **Joints:** where links turn (revolute) or slide (prismatic). Each is driven by a motor through a gearbox; a [harmonic drive](/atlas/concept/harmonic-drive) is the common zero-backlash choice on industrial arms, a hobby servo's plastic gear train the cheap one. See [motors for robots](/blog/motors-for-robots-dc-servo-stepper).
+- **End effector:** the tool at the tip. Usually a [gripper](/atlas/concept/gripper), but a welding torch, a suction cup, a paint gun or a screwdriver are all end effectors.
+- **Sensors:** an [encoder](/atlas/concept/encoder) at each joint reports its angle, thousands of times a second. Without it the controller is guessing.
+- **Controller:** the computer that reads every encoder, runs the kinematics and commands every motor, typically at 1 kHz.
 
 ## Degrees of freedom
 
-A [degree of freedom](/atlas/concept/degrees-of-freedom) (DOF) is one independent way the arm can move. To place a tool anywhere in space and point it in any direction you need six: three for position and three for orientation. That is why many industrial arms have six joints. Simple hobby arms have three or four and are more limited.
+A [degree of freedom](/atlas/concept/degrees-of-freedom) (DOF) is one independent motion. To put a tool at any point in space you need three (x, y, z). To also point it in any direction you need three more (roll, pitch, yaw). That is why the standard industrial arm has **six** rotating joints: a Universal Robots UR5e has six, reaches 850 mm, carries 5 kg and repeats a position to within ±0.03 mm.
 
-## Forward kinematics
+A five-DOF arm, which is what most hobby arms are, can reach any point in its workspace but cannot always approach it from the orientation you want: it may be able to pick a cup from above but not from the side. A seven-DOF arm has a spare joint, which lets it reach around obstacles or keep its elbow away from a person while the tool stays still. Humans have seven in the arm alone, which is why you can hold a glass steady while moving your elbow.
 
-If you know every joint angle, you can calculate where the tip is. This is [forward kinematics](/atlas/concept/forward-kinematics), and it is basic geometry (sines and cosines of the angles).
+## Forward kinematics: angles in, position out
 
-## Inverse kinematics
+If you know every joint angle and every link length, you can compute where the tip is. This is [forward kinematics](/atlas/concept/forward-kinematics), and for a two-link planar arm it is one line of trigonometry:
 
-The harder, more useful question: I want the tip at this point, so what angles should each joint take? That is [inverse kinematics](/atlas/concept/inverse-kinematics). There may be several answers, or none if the point is out of reach. Software solves this many times per second.
+```
+x = L1·cos(θ1) + L2·cos(θ1 + θ2)
+y = L1·sin(θ1) + L2·sin(θ1 + θ2)
+```
 
-## Why grasping is hard
+With L1 = L2 = 100 mm, θ1 = 30° and θ2 = 60°, the tip sits at x = 100·cos30° + 100·cos90° = 86.6 mm and y = 100·sin30° + 100·sin90° = 150 mm. Six joints in three dimensions is the same idea with 4×4 transformation matrices chained together, which is exactly what ROS 2's `tf` tree does for you. The [kinematics](/atlas/concept/kinematics) entry has the general form.
 
-Picking up a known box in a fixed position is easy. Picking up different objects from a messy bin is hard, because the robot must see the object, decide how to hold it, and judge force. Vision and [force sensing](/atlas/concept/force-sensor) help. This is why many warehouses still use humans for picking.
+## Inverse kinematics: position in, angles out
 
-## Types of arms
+The useful question runs the other way: I want the tip at (x, y, z), so what should each joint be? That is [inverse kinematics](/atlas/concept/inverse-kinematics) (IK), and it is harder for three reasons:
 
-- **Articulated arms:** rotating joints like a human arm; the most common industrial type.
-- **SCARA arms:** fast, flat-moving arms used for assembly.
-- **Cartesian (gantry) robots:** move along straight axes like a 3D printer.
-- **Parallel robots:** several arms linked to one platform, very fast for light parts.
+1. **There may be several answers.** The two-link arm can reach most points "elbow up" or "elbow down." A six-DOF arm often has eight ways to reach one pose.
+2. **There may be none.** Ask for a point 900 mm from a UR5e's base and there is no solution; the arm's reach is 850 mm.
+3. **Some answers pass through singularities,** poses where two joints line up and a small tool motion needs an enormous joint motion. The arm appears to "flip" or freeze.
 
-See [industrial robot](/atlas/concept/industrial-robot) and [robot arm](/atlas/concept/robot-arm).
+For two links there is a closed-form answer using the law of cosines. For six, software solves it numerically, hundreds of times a second, picking the solution closest to the current pose so the arm moves smoothly. MoveIt 2 in ROS 2 wraps all of this, including collision checking against the arm's own body and the table. Try the interactive [inverse kinematics simulator](/visualizer/ik) to see the elbow-up and elbow-down solutions switch.
+
+## Types of arm
+
+- **Articulated (serial) arms:** all revolute joints, like a human arm. The most common industrial type; the UR5e and every welding robot in a car plant are this.
+- **SCARA arms:** two horizontal rotating joints plus a vertical slide. Fast and stiff in the plane, which is why they place electronics on circuit boards.
+- **Cartesian (gantry) robots:** three sliding axes at right angles. A 3D printer is one; so are the big pick-and-place systems over warehouse shelves.
+- **Parallel (delta) robots:** three arms meeting at one platform. Light and very fast; the ones picking chocolates off a conveyor at several picks a second.
+- **[Collaborative robots](/atlas/concept/collaborative-robot):** an articulated arm with force sensing and speed limits so it can work next to people without a cage. The UR5e is the reference example; see [collaborative robot safety](/atlas/concept/collaborative-robot-safety).
+
+## Why grasping is the hard part
+
+Moving a tool to a known point in free space is solved. Picking an unknown object out of a bin is not. The arm must see the object (vision), decide where to grip it and from which side (grasp planning), reach it without hitting the bin (motion planning), and close the fingers with enough force to hold and not enough to crush (force control), on an object it has never seen. Humans do that without thinking; robots do it with a [depth camera](/atlas/concept/depth-camera), a [force-torque sensor](/atlas/concept/force-torque-sensor) and, increasingly, a learned policy.
+
+The learned route is moving fast. ALOHA, a Stanford system built from low-cost arms, learned six fine tasks such as slotting a battery and opening a translucent condiment cup at 80 to 90 percent success from only ten minutes of human demonstration per task, using an algorithm called Action Chunking with Transformers. That result is why so many labs now put cheap arms in front of a camera and record humans driving them. See [how robots learn](/blog/how-robots-learn-machine-learning-and-reinforcement-learning).
+
+## What a $122 arm teaches versus an industrial one
+
+The open-source SO-101 arm, used by Hugging Face's LeRobot project, has a published bill of materials of $121.94 for the follower arm in the US (€124 in the EU, ¥682 in China) and $229.88 for a leader-follower pair you can teleoperate. Six Feetech STS3215 serial servos, a 3D-printed body, one control board. It will not lift a kilogram and it drifts a little under load. It will teach you forward and inverse kinematics, servo control, teleoperation, imitation learning and camera calibration, which is most of what an industrial arm would teach you, for the price of a textbook. Build it after your first wheeled robot.
 
 ## What goes wrong
 
-- If the arm is asked to reach beyond its limits, the maths has no solution and it stops or jams.
-- Gears can have backlash, small loose play that makes precise positioning harder.
-- Without enough torque, a joint sags under load.
+- **Out of reach:** IK has no solution, and a bad controller jumps to a wild pose. Check reachability before commanding.
+- **Backlash:** play in cheap gears means the tip settles a millimeter or two off where the encoder says. Harmonic drives exist to remove it.
+- **Sagging:** a joint without enough torque droops under load; gravity compensation in the controller adds the holding torque back.
+- **Singularities:** plan paths that avoid them, or accept a brief slowdown near a fully stretched pose.
 
-## Build one
+## FAQ
 
-A three-joint hobby arm with servos is a great project once you have finished a wheeled robot. Start with [our first robot tutorial](/blog/first-robot-project-india-step-by-step).
+**How many joints should a beginner arm have?** Four or five servos is enough to learn the ideas; the SO-101 has five plus a gripper.
 
-## Frequently asked questions
+**Is inverse kinematics hard?** For two or three links it is trigonometry you can do by hand. For six, use a library; understanding why there are multiple solutions matters more than solving it yourself.
 
-**How many joints should a beginner arm have?**
-Three or four servos is enough to learn the idea.
+**What is a cobot?** An arm designed and certified to work beside people: force limits, speed limits, rounded surfaces. It is still a robot arm and it still needs a risk assessment.
 
-**Is inverse kinematics hard?**
-For simple arms it is a small amount of trigonometry. Libraries handle harder cases.
+## Sources
 
-**What is a cobot arm?**
-An arm built to work safely next to people. See [collaborative robot safety](/atlas/concept/collaborative-robot-safety).
-
-[Explore the Atlas →](/atlas) · [Types of robots →](/blog/types-of-robots-explained)
+- Universal Robots, UR5e datasheet (payload 5 kg, reach 850 mm, repeatability ±0.03 mm, six joints): https://www.universal-robots.com/manuals/latest/en/datasheets/ur5e/
+- TheRobotStudio, SO-ARM100 / SO-101 repository with bill of materials: https://github.com/TheRobotStudio/SO-ARM100
+- Hugging Face, LeRobot SO-101 assembly guide: https://huggingface.co/docs/lerobot/so101
+- Zhao et al., "Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware" (ALOHA / ACT): https://arxiv.org/abs/2304.13705

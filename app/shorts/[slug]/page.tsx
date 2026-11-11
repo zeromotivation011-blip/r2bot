@@ -38,7 +38,7 @@ export default async function ShortPage({ params }: { params: Promise<{ slug: st
   const wanted = getShort(s.next ?? '')
   const next = (wanted && isLive(wanted) ? wanted : undefined) ?? liveShorts().find((x) => x.slug !== s.slug) ?? SHORTS[0]
   const ld = [
-    ...videoIds.map((id) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: s.title, description: s.summary, thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${id}`, contentUrl: `https://www.youtube.com/shorts/${id}`, uploadDate: s.publishAt ? s.publishAt.slice(0, 10) : (s.videoPublished ?? '2026-11-06'), publisher: { '@type': 'Organization', name: 'R2BOT' } })),
+    ...videoIds.map((id) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: s.title, description: s.summary, thumbnailUrl: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${id}`, contentUrl: `https://www.youtube.com/shorts/${id}`, uploadDate: s.publishAt ? s.publishAt.slice(0, 10) : s.videoPublished, publisher: { '@type': 'Organization', name: 'R2BOT' } })),
     { '@context': 'https://schema.org', '@type': 'Article', headline: s.title, description: s.summary, author: authorRef(), mainEntityOfPage: `${BASE}/shorts/${s.slug}` },
     { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Quick Lessons', item: `${BASE}/shorts` }, { '@type': 'ListItem', position: 2, name: s.title, item: `${BASE}/shorts/${s.slug}` }] },
   ]

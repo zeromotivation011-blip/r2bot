@@ -67,7 +67,7 @@ export default function DailyLifeClient() {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// MODE 4 — Long-form article grid (10 stubs; "Coming soon" until content lands)
+// MODE 4 — Long-form article grid (links to /daily-life/<slug>; "Coming soon" only for unwritten stubs)
 // ────────────────────────────────────────────────────────────────────────────
 function ArticlesMode() {
   const [catFilter, setCatFilter] = useState<'all' | DailyLifeCategory>('all')
@@ -127,7 +127,15 @@ function ArticleCard({ article: a }: { article: DailyLifeArticle }) {
           </span>
         )}
       </div>
-      <h3 className="text-base font-bold text-white leading-snug">{a.title}</h3>
+      <h3 className="text-base font-bold text-white leading-snug">
+        {published ? (
+          <Link href={`/daily-life/${a.slug}`} className="hover:text-amber-300 focus-visible:text-amber-300">
+            {a.title}
+          </Link>
+        ) : (
+          a.title
+        )}
+      </h3>
       <p className="text-sm text-zinc-400 leading-relaxed line-clamp-3">{a.excerpt}</p>
       {a.atlasLinks.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
@@ -143,7 +151,13 @@ function ArticleCard({ article: a }: { article: DailyLifeArticle }) {
       )}
       <div className="mt-auto flex items-center justify-between text-xs text-zinc-500">
         <span>{a.readTime}</span>
-        <span>{new Date(a.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+        {published ? (
+          <Link href={`/daily-life/${a.slug}`} className="inline-flex min-h-[44px] items-center font-bold text-amber-300 hover:underline">
+            Read the article →
+          </Link>
+        ) : (
+          <span>{new Date(a.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+        )}
       </div>
     </article>
   )

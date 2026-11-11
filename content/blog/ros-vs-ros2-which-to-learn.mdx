@@ -1,50 +1,94 @@
 ---
 title: "ROS vs ROS 2: Which Should You Learn First?"
-description: "ROS 1 is end-of-life and ROS 2 is the current standard. Here is the difference in plain terms and what a beginner should do."
+description: "ROS 1 reached end of life in May 2025 and ROS 2 is the standard. What changed, which ROS 2 release to install, and a four-week plan for a beginner."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["ROS2","Software"]
-readTime: 6
+readTime: 7
 coverEmoji: "🧩"
 featured: false
-keywords: ["ros vs ros2","should i learn ros or ros2","ros2 for beginners","robot operating system"]
+keywords: ["ros vs ros2","should i learn ros or ros2","ros2 for beginners","robot operating system","which ros2 version to install"]
 ---
 
 # ROS vs ROS 2: Which Should You Learn First?
 
-**Short answer:** learn **ROS 2**. ROS 1 stopped receiving updates in May 2025, and new robotics work, tutorials and jobs have moved to ROS 2. Despite the name, [ROS](/atlas/concept/ros) is not an operating system. It is a set of tools and conventions that let the parts of a robot talk to each other.
+**Short answer:** learn **ROS 2**, and install **Jazzy Jalisco** on Ubuntu 24.04 unless a job or a course tells you otherwise. ROS 1 ended on May 31, 2025 with its final release, Noetic, and its wiki became a read-only archive on the same day. New packages, tutorials, hardware drivers and job listings have moved to ROS 2. Despite the name, [ROS](/atlas/concept/ros) is not an operating system. It is a set of libraries, tools and conventions that let the many small programs inside a robot talk to each other.
 
 ## What both of them do
 
-A robot is many small programs: one reads the camera, one plans a path, one drives the motors. ROS lets them run separately and exchange messages through named channels called [topics](/atlas/concept/ros2-topics). Each program is a [node](/atlas/concept/ros2-nodes).
+A robot is many programs running at once: one reads the camera, one plans a path, one drives the motors, one watches the battery. ROS lets each of those run as a separate [node](/atlas/concept/ros2-nodes) and exchange messages over named channels called [topics](/atlas/concept/ros2-topics). A node that publishes `/scan` does not know or care which nodes subscribe to it. That decoupling is why you can swap a simulated lidar for a real one without touching the navigation code, and why a package written by a lab in Zurich runs on a robot in Bengaluru.
 
-## The main differences
+Both generations share the same vocabulary: nodes, topics, [services](/atlas/concept/ros2-services), [actions](/atlas/concept/ros2-actions), [parameters](/atlas/concept/ros2-parameters), launch files, and the `tf` tree that tracks where every sensor sits on the robot. If you learn those ideas once, they carry over. What changed is the plumbing underneath.
+
+## What actually changed
 
 | | ROS 1 | ROS 2 |
 |---|---|---|
-| Status | End-of-life (final release, Noetic, ended May 2025) | Actively developed |
-| Central server | Needs a master process; if it dies, everything stops | No master; nodes find each other |
-| Real-time and reliability | Limited | Configurable quality-of-service settings |
-| Platforms | Mainly Linux | Linux, Windows, macOS |
-| Security | Little built in | Built-in options |
+| Status | End of life. Noetic, the last release, ended May 31, 2025 | Actively developed; a new distribution every May 23 |
+| Finding other nodes | A central `roscore` master. If it dies, nothing can connect | No master. Nodes discover each other automatically through the DDS middleware and keep advertising their presence, so a late-starting node still joins |
+| Transport | Primarily TCP | DDS with configurable Quality of Service: as reliable as TCP or as best-effort as UDP, which suits lossy Wi-Fi and real-time loops |
+| Platforms (Jazzy) | Linux in practice | Ubuntu 24.04 and Windows 10 are Tier 1; macOS is Tier 3, from source |
+| Multiple robots | Awkward: one master per network | Built in: a `ROS_DOMAIN_ID` separates robots sharing a Wi-Fi network |
+| Security | None built in | SROS2: authentication and encryption between nodes |
+| Microcontrollers | rosserial over a serial cable | [micro-ROS](/atlas/concept/micro-ros): an ESP32 or STM32 appears as a real node in the graph |
 
-## Why this matters to you
+The one that bites beginners first is discovery. In ROS 1 you learned to run `roscore` before anything else, and a dead master was the classic "why does nothing work" bug. In ROS 2 you just start nodes; they find each other within a second or two, and a node you launch five minutes later joins the same graph.
 
-If you learn ROS 1 today, you will study material that is no longer maintained and many modern packages will not work. If you learn ROS 2 you can follow current tutorials, use [Nav2](/atlas/concept/nav2) for navigation, and your skills match what companies now ask for.
+The one that matters most on real hardware is Quality of Service. A camera stream over flaky Wi-Fi should drop frames rather than stall, while a command to the motor controller must arrive. ROS 1 could not express that difference. ROS 2 sets it per topic.
 
-## What to learn first
+## Which ROS 2 release to install
 
-1. Understand nodes and topics with a small example.
-2. Install a current LTS release such as [ROS 2 Humble](/atlas/concept/ros2-humble) or a newer long-term release.
-3. Try navigation in simulation before touching hardware.
+ROS 2 distributions are named alphabetically and released each year on May 23. Long-term support releases get five years; the others get about eighteen months. The current table, from the official release page:
 
-The Forge track in the [Academy](/academy) is built around ROS 2.
+| Distribution | Released | End of life | Type |
+|---|---|---|---|
+| Lyrical Luth | May 22, 2026 | May 2031 | LTS (newest) |
+| Kilted Kaiju | May 23, 2025 | December 2026 | Short-term |
+| Jazzy Jalisco | May 23, 2024 | May 2029 | LTS |
+| [Humble Hawksbill](/atlas/concept/ros2-humble) | May 23, 2022 | May 2027 | LTS |
+
+**Pick Jazzy** if you are starting now. It is the LTS most tutorials, textbooks and company stacks have settled on, its packages are mature, and it is supported until 2029. Choose Lyrical if you are starting a brand-new project you will maintain for years and do not depend on packages that have not been released for it yet. Avoid Kilted: it leaves support in December 2026. Humble is still common in industry on Ubuntu 22.04 machines, so do not be surprised to meet it in a job.
+
+Each distribution pairs with one Ubuntu release (Humble with 22.04, Jazzy with 24.04), and nodes built against different distributions are not guaranteed to talk to each other. Pick one and stick to it for the whole project.
+
+## Why this matters for you specifically
+
+If you learn ROS 1 today you are learning a system whose documentation is frozen, whose packages no longer receive security fixes, and whose tutorials reference Ubuntu versions that are themselves out of support. Every modern navigation stack ([Nav2](/atlas/concept/nav2)), manipulation stack (MoveIt 2), simulator bridge (Gazebo) and robot vendor SDK targets ROS 2. Hiring managers write "ROS 2" in the listing.
+
+There is one honest exception. If you join a lab or company with a large ROS 1 codebase that has not migrated, you will need to read ROS 1. Read it, do not study it. The concepts are the same and the differences fit on the table above.
+
+## A four-week plan for a beginner
+
+**Week 1: the graph.** Install Jazzy on Ubuntu 24.04 (a virtual machine or dual boot both work; Windows Subsystem for Linux works for everything except GUI tools, with some setup). Run `turtlesim` from the official beginner CLI tutorials. Use `ros2 topic list`, `ros2 topic echo` and `rqt_graph` until nodes and topics feel obvious.
+
+**Week 2: write nodes.** Write a publisher and a subscriber in Python with `rclpy`, then a service. Put them in a package with `colcon build`. Learn what a launch file does and write one that starts both nodes.
+
+**Week 3: simulate.** Bring up a TurtleBot-style robot in Gazebo, drive it with a keyboard node, and watch `/scan` and `/odom`. Run SLAM to build a map, save it, then run Nav2 against the saved map and send a goal from RViz.
+
+**Week 4: hardware.** Flash micro-ROS onto an ESP32 and publish a sensor reading as a topic, or connect a USB lidar and run the same SLAM pipeline on a Raspberry Pi 5. The Forge track in the [Academy](/academy) is built around exactly this path, and the [ROS 2 cheat sheet](/learn/ros2-cheatsheet) is the reference to keep open.
+
+## Mistakes that cost beginners weeks
+
+- **Mixing distributions.** A package built for Humble will not build on Jazzy without changes. Match the Ubuntu version, the distribution and the tutorial branch.
+- **Skipping the simulator.** Debugging a navigation stack on a real robot with a dying battery is misery. Get it working in Gazebo first.
+- **Running everything as one node.** The point of ROS is small nodes with clear topics. A 2,000-line "main node" throws away the benefit.
+- **Ignoring QoS until something drops.** When a subscriber gets nothing from a publisher that is clearly running, check that their reliability and durability settings are compatible. It is the most common silent failure in ROS 2.
 
 ## FAQ
 
-**Do I need Linux?** Ubuntu is the easiest path, though ROS 2 also runs on Windows and macOS.
+**Do I need Linux?** Ubuntu is the smooth path and the one every tutorial assumes. Windows 10 is a Tier 1 platform for Jazzy, so it works, but you will spend more time on setup than on robots.
 
-**Is ROS 2 hard for beginners?** The ideas are simple. The tooling takes some patience. Learn the concepts in a simulator first.
+**Is ROS 2 hard for beginners?** The ideas (nodes, topics, services) take an afternoon. The tooling (colcon, launch files, package.xml) takes a week of patience. Hardware takes as long as hardware takes.
 
-**Can I skip ROS completely?** For small hobby robots, yes. It starts to pay off when a robot has several sensors and software parts.
+**Can I skip ROS completely?** For a line follower or a servo arm on an Arduino, yes, and you should. ROS pays off the moment a robot has a camera, a map and three or more programs that must share data.
+
+**Is ROS 2 "finished"?** No, and it never will be in the sense of frozen. A new distribution ships every May, and LTS releases get five years of fixes. That is the release model, not a sign of instability.
+
+## Sources
+
+- ROS 2 documentation, Distributions (release and EOL table): https://docs.ros.org/en/rolling/Releases.html
+- ROS blog, "Upcoming ROS 1 End of Life" (Noetic EOL 2025-05-31): https://www.ros.org/blog/noetic-eol/
+- ROS 2 documentation, About Quality of Service settings: https://docs.ros.org/en/jazzy/Concepts/Intermediate/About-Quality-of-Service-Settings.html
+- ROS 2 documentation, About discovery: https://docs.ros.org/en/jazzy/Concepts/Basic/About-Discovery.html
+- REP 2000, ROS 2 releases and target platforms: https://reps.openrobotics.org/rep-2000/

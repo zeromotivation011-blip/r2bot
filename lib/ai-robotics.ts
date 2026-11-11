@@ -100,7 +100,7 @@ export const AI_TOPICS: AiTopic[] = [
       { q: 'Can an LLM control a robot by itself?', a: 'Not safely. LLMs can make mistakes and invent things, so real robots keep fast, simple safety systems separate from the language model.' },
       { q: 'Does the robot understand like a person?', a: 'No. It predicts useful responses. Treat its plans as suggestions to be checked.' },
     ],
-    related: [{ label: 'LLMs and robots (guide)', href: '/blog/large-language-models-and-robots' }, { label: 'Ask the R2 Co-pilot', href: '/copilot' }],
+    related: [{ label: 'LLMs and robots (guide)', href: '/atlas/concept/large-language-model-robotics' }, { label: 'Ask the R2 Co-pilot', href: '/copilot' }],
   },
   {
     slug: 'sensor-fusion', title: 'Sensor fusion: trusting more than one sensor', level: 'Intermediate', minutes: 6,
@@ -134,7 +134,7 @@ export const AI_TOPICS: AiTopic[] = [
       { q: 'Does SLAM need a lidar?', a: 'No. It can use cameras, lidar or other sensors. Lidar is common because it measures distance directly.' },
       { q: 'Why is SLAM hard?', a: 'Small errors pile up over time, and moving objects like people confuse the map.' },
     ],
-    related: [{ label: 'SLAM in plain words', href: '/blog/what-is-slam-in-plain-words' }, { label: 'ROS 2 playground', href: '/ros2' }],
+    related: [{ label: 'SLAM in plain words', href: '/atlas/concept/slam' }, { label: 'ROS 2 playground', href: '/ros2' }],
   },
   {
     slug: 'path-planning', title: 'Path planning: choosing the route', level: 'Intermediate', minutes: 6,

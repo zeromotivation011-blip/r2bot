@@ -1,0 +1,59 @@
+---
+title: 'Why Your Car Was Built by a Robot'
+excerpt: 'Car plants were the first factories to fill with robots and still buy more than any other industry. The reason is less about cost than repeatability.'
+category: manufacturing
+readTime: '5 min read'
+publishedAt: '2026-11-11'
+updatedAt: '2026-11-11'
+atlasLinks:
+  - { slug: industrial-robot, label: 'Industrial Robots' }
+  - { slug: pid-controller, label: 'PID Control' }
+  - { slug: automated-guided-vehicle, label: 'Automated Guided Vehicles' }
+  - { slug: humanoid-robot, label: 'Humanoid Robots' }
+sources:
+  - { name: 'IFR — World Robotics 2025 press release', url: 'https://ifr.org/ifr-press-releases/news/global-robot-demand-in-factories-doubles-over-10-years' }
+  - { name: 'BMW Group Plant Spartanburg — Successful test of humanoid robots', url: 'https://bmwgroup-werke.com/spartanburg/en/news/2024/successful-test-of-humanoid-robots.html' }
+  - { name: 'Mercedes-Benz — Humanoid robots at the Digital Factory Campus Berlin', url: 'https://group.mercedes-benz.com/company/production/production-network/mbdfc-humanoid-robots.html' }
+  - { name: 'Atlanta Journal-Constitution — Robots are everywhere in Hyundai’s Georgia plant', url: 'https://www.ajc.com/business/2026/07/robots-are-everywhere-in-hyundais-georgia-plant-but-they-cant-do-everything/' }
+---
+
+The body of the car you drove today was welded, sealed and painted almost entirely by machines, and the human who signed off on it probably never touched a weld gun. The seats, carpets and wiring, though, were most likely fitted by hand. Where that line falls tells you what robots are good at.
+
+## What it is
+
+An industrial robot is a programmable arm, bolted to the floor and fenced off, repeating one motion thousands of times a day. According to the International Federation of Robotics, 542,000 industrial robots were installed worldwide in 2024, more than double the number a decade earlier, and the global working stock reached 4,664,000 units. China alone installed 295,000. The car industry has been the anchor customer since the first Unimate went onto a General Motors line: in India it was the strongest driver of demand with a 45% share of 2024 installations, and in Mexico it accounted for 63%.
+
+## How it works
+
+Take a spot-welding robot in a body shop, the job that started it all.
+
+**Sensing.** Each joint has an encoder that reports its angle continuously. The robot does not need to see the car; it needs to know, very precisely, where its own wrist is. Newer cells add vision cameras and force sensors, but the core instrument is still the encoder.
+
+**Compute.** The controller stores a taught path, a list of poses in space and the speed between them, and runs a feedback loop at each joint: compare the commanded angle with the measured one, correct the difference. That loop is what makes a robot repeatable. A skilled welder is accurate; a robot is repeatable, placing the weld on the ten-thousandth car exactly where it placed it on the first.
+
+**Actuation.** Servo motors drive each joint through a gearbox. At the wrist, the weld gun closes on two sheets of steel and passes a current pulse to fuse them. The heavy, repetitive, slightly dangerous motion is the part humans were never good at and the part robots never tire of.
+
+That repeatability, not wages, is the real reason car plants automated first. A car body is held together by a great many welds, every one of which has to land in the same place on every vehicle, and a paint coat has to be the same thickness across a whole panel. Variation is the enemy, and a robot's main talent is not varying.
+
+## Where you'll see it
+
+- **Ellabell, United States.** Hyundai's Metaplant America in Georgia runs more than 300 robots where a typical assembly plant might have 30, with automated guided vehicles carrying bodies and parts and Boston Dynamics Spot quadrupeds patrolling the welding line to detect defects. Even so, around 500 people are on site, and the plant's leaders are candid that soft parts — hoses, wires, carpets, trim — still need hands. The company ended 2025 with more than 3,800 workers and aims for 8,100 by 2031.
+- **Spartanburg, United States.** BMW ran a trial lasting several weeks in 2024 in which a Figure 02 humanoid inserted sheet-metal parts into fixtures in the body shop. The trial was declared a success. The plant also stated afterwards that it currently has no Figure robots on site and no fixed timetable for bringing them back.
+- **Berlin, Germany.** At its Digital Factory Campus in Berlin-Marienfelde, Mercedes-Benz is using Apptronik's Apollo humanoid to carry components to the line and do initial quality checks. Production staff taught it the tasks through teleoperation and augmented reality, and Mercedes has committed a low double-digit-million-euro investment in Apptronik.
+
+## What it can't do yet
+
+A large part of final assembly is still done by people, and not because manufacturers have not tried. Routing a wiring harness, snapping in a trim panel, laying a carpet: each needs a sense of feel and a tolerance for parts that bend. As one Hyundai assembly executive told the Atlanta Journal-Constitution, "That sense of feel is very hard to teach automation." Humanoids are the industry's current bet on closing that gap, and the honest status is "trial": a few weeks at BMW, a teleoperation-trained pilot at Mercedes, and a Hyundai plan to integrate Atlas in 2028. The welding arm behind the fence, meanwhile, has been doing the same job reliably for decades.
+
+## Try it / learn more
+
+- Quick lesson: [Why repeatability matters more than accuracy](/shorts/repeatability), [A robot arm's six motors](/shorts/robot-arm-six-motors)
+- Atlas: [Industrial robots](/atlas/concept/industrial-robot), [PID control](/atlas/concept/pid-controller), [Automated guided vehicles](/atlas/concept/automated-guided-vehicle), [Humanoid robots](/atlas/concept/humanoid-robot)
+- Robot profiles: [Figure 02](/robots/figure-02), [Unimate](/robots/unimate), [KUKA KR](/robots/kuka-kr)
+
+## Sources
+
+1. International Federation of Robotics, "World Robotics 2025 report — industrial robots" (2025). https://ifr.org/ifr-press-releases/news/global-robot-demand-in-factories-doubles-over-10-years
+2. BMW Group Plant Spartanburg, "Successful test of humanoid robots" (2024). https://bmwgroup-werke.com/spartanburg/en/news/2024/successful-test-of-humanoid-robots.html
+3. Mercedes-Benz Group, "Humanoid robots at the Mercedes-Benz Digital Factory Campus" (18 March 2025). https://group.mercedes-benz.com/company/production/production-network/mbdfc-humanoid-robots.html
+4. Atlanta Journal-Constitution, "Robots are everywhere in Hyundai's Georgia plant, but they can't do everything" (July 2026). https://www.ajc.com/business/2026/07/robots-are-everywhere-in-hyundais-georgia-plant-but-they-cant-do-everything/

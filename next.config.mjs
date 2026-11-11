@@ -220,6 +220,16 @@ const nextConfig = {
       // the author page moved off a URL that carried a personal name.
       { source: '/author/ravi', destination: '/about/how-this-is-written', permanent: true },
       { source: '/author/:slug', destination: '/about/how-this-is-written', permanent: true },
+      // 11 Nov 2026: five blog posts were sub-350-word restatements of an Atlas
+      // concept that is two to four times deeper and already owns the
+      // "what is X" query (lib/canonical-map.ts, BLOG_TO_ATLAS). The MDX files
+      // are deleted; the Atlas entry keeps the URL. Kept in sync with the
+      // comment block in lib/canonical-map.ts.
+      { source: '/blog/what-is-slam-in-plain-words', destination: '/atlas/concept/slam', permanent: true },
+      { source: '/blog/pid-controller-explained-simply', destination: '/atlas/concept/pid-controller', permanent: true },
+      { source: '/blog/computer-vision-for-robots-explained', destination: '/atlas/concept/computer-vision', permanent: true },
+      { source: '/blog/sim-to-real-gap-explained', destination: '/atlas/concept/sim-to-real', permanent: true },
+      { source: '/blog/large-language-models-and-robots', destination: '/atlas/concept/large-language-model-robotics', permanent: true },
       // Consolidation: Pulse is folded into the automated News feed.
       { source: '/pulse', destination: '/news', permanent: true },
       { source: '/pulse/weekly', destination: '/news', permanent: true },

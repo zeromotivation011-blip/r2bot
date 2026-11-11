@@ -1,51 +1,96 @@
 ---
-title: "How Robots Learn: Machine Learning, Imitation and Reinforcement Learning"
-description: "Three ways robots learn skills: from labelled data, from watching a person, and from trial and reward. Plain-language examples of each."
+title: "How Robots Learn: Supervised, Imitation and Reinforcement"
+description: "The three ways robots learn, with the landmark result behind each: labeled data, ten-minute demonstrations, and simulated trial-and-error. Which to use when."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["AI","Learning"]
-readTime: 7
+readTime: 8
 coverEmoji: "📈"
 featured: false
-keywords: ["how robots learn","reinforcement learning robots","imitation learning robot","machine learning robotics"]
+keywords: ["how robots learn","reinforcement learning robots","imitation learning robot","machine learning robotics","vision language action model"]
 ---
 
-# How Robots Learn: Machine Learning, Imitation and Reinforcement Learning
+# How Robots Learn: Supervised, Imitation and Reinforcement
 
-**Short answer:** robots learn in three main ways: from **examples** (supervised [machine learning](/atlas/concept/machine-learning)), by **copying a demonstration** ([imitation learning](/atlas/concept/imitation-learning)), or by **trial and error with a score** ([reinforcement learning](/atlas/concept/reinforcement-learning)).
+**Short answer:** robots learn in three ways. **Supervised learning** from labeled examples, which is how they see. **Imitation learning** from human demonstrations, which is now the fastest route to a new manipulation skill. **Reinforcement learning** from trial, error and a reward, usually in simulation, which is how they learn to walk and balance. A fourth approach, the vision-language-action model, stacks all three on top of an internet-scale language model. This guide walks through each with the result that proved it works, and ends with a decision table.
 
-## 1. Learning from labelled examples
+Most of a robot still does not learn at all. Motor control, balance loops and safety limits are classic engineering ([AI vs traditional programming](/blog/ai-vs-traditional-robot-programming) explains the split). Learning is used for the parts that are too messy to write as rules.
 
-Show the system thousands of photos labelled "cup" or "not a cup" and it learns to spot cups. This powers [object detection](/atlas/concept/object-detection). **Good for:** perception. **Weak spot:** it needs lots of labelled data.
+## 1. Supervised learning: show it labeled examples
 
-## 2. Learning by imitation
+Give a neural network a hundred thousand photos, each labeled "cup" or "not a cup," and it learns to find cups in photos it has never seen. This is [machine learning](/atlas/concept/machine-learning) in its most basic form, and it powers nearly all robot perception: [object detection](/atlas/concept/object-detection), segmentation, depth estimation from a single image, reading a barcode in a cluttered bin.
 
-A person guides the robot arm through a task, and the robot learns to repeat it. **Good for:** manipulation tasks that are easy to demonstrate. **Weak spot:** it can struggle when the situation differs from the demos.
+**Where it is used:** every warehouse picking system, every robot that recognizes a person, every self-driving perception stack.
 
-## 3. Learning by trial and reward
+**The cost:** labels. Somebody has to draw the boxes. Datasets with millions of labeled images exist for common objects, which is why "find the person" works out of the box and "find the specific bracket we machine" needs a week of labeling.
 
-The robot tries actions, gets a **reward** when it does well, and gradually prefers actions that earn more. A simulated walking robot might get points for staying upright and moving forward. The reward design matters a lot: see [reward shaping](/atlas/concept/reward-shaping).
+**The failure:** it learns the data, not the world. A detector trained in a bright lab fails under warehouse sodium lights. A robot that learned on a white table fails on a wooden one. The fix is more varied data, or the simulation trick in section 3.
 
-- **Without a well-designed reward:** the robot may find a shortcut, like falling forward to "move forward" quickly.
-- **With good shaping:** it learns the behaviour you actually wanted.
+## 2. Imitation learning: copy a human
 
-## Why simulation is used
+A person drives the robot through a task, by hand, with a joystick, or with a second "leader" arm, while the robot records what its camera saw and what its joints did. A network then learns to map camera images to joint commands. See [imitation learning](/atlas/concept/imitation-learning).
 
-Trial and error on real hardware is slow and breaks things. So robots often practise millions of times in simulation first. The catch is the [sim-to-real gap](/blog/sim-to-real-gap-explained).
+For years this struggled with compounding error: a tiny mistake takes the robot somewhere the demonstrations never went, and it has no idea what to do there. Two 2023 results changed the field.
+
+**ALOHA (Stanford, 2023)** built a bimanual teleoperation rig from low-cost arms and introduced Action Chunking with Transformers (ACT), which predicts a whole sequence of upcoming actions instead of one at a time. With about ten minutes of demonstrations per task, the robot learned six fine tasks (slotting a battery, opening a translucent condiment cup, threading a cable tie) at 80 to 90 percent success, on hardware that is neither precise nor expensive.
+
+**Diffusion Policy (Columbia and Toyota Research, 2023)** borrowed the generative model behind image generators to produce robot actions. Across twelve tasks on four benchmarks it beat the previous best imitation methods by an average of 46.9 percent, and it handles the case that broke earlier methods: when there are two equally good ways to do something (go left or right around the cup), it commits to one instead of averaging into the cup.
+
+**Where it is used:** manipulation research almost everywhere now; the open-source SO-101 arm and the LeRobot library exist so that students can collect demonstrations and train these exact policies at home.
+
+**The cost:** a human has to demonstrate, and a policy trained on one robot does not transfer to a different one. The failure is still the unfamiliar situation; the difference is that it now takes a hundred demonstrations to cover a task, not ten thousand.
+
+## 3. Reinforcement learning: trial, error and a score
+
+The robot tries actions, receives a **reward** when it does well, and shifts toward actions that earn more. A simulated walking robot gets points for moving forward and staying upright; after millions of attempts it walks. See [reinforcement learning](/atlas/concept/reinforcement-learning) and its [robotics-specific entry](/atlas/concept/reinforcement-learning-robotics).
+
+Nobody runs millions of attempts on a physical robot. Training happens in a physics simulator, which creates the [sim-to-real gap](/atlas/concept/sim-to-real): the policy learns the simulator's friction and motor response, which are never exactly the real ones.
+
+**OpenAI's Rubik's cube (2019)** is the result that showed the gap can be crossed. A five-fingered hand trained entirely in simulation solved a physical Rubik's cube. The key was automatic domain randomization: the simulator kept widening the range of friction, mass, lighting and cube size the policy had to cope with, until a policy that worked across all of them also worked on the one real hand. [Domain randomization](/atlas/concept/domain-randomization) is now standard practice.
+
+**Where it is used:** legged locomotion is the clearest win. Every quadruped that walks over rubble, and most humanoid walking controllers, were trained this way in simulation and transferred. It is also used for dexterous in-hand manipulation and for tuning controllers too complex to tune by hand.
+
+**The cost:** designing the reward. Give points for forward motion alone and the robot learns to fall forward fast. Give points for height and it learns to stand on a wall. [Reward shaping](/atlas/concept/reward-shaping) is a craft, and a badly shaped reward wastes a week of GPU time before anyone notices.
+
+## 4. Vision-language-action models: all three, on top of a language model
+
+The newest approach starts from a large model pretrained on internet images and text, then fine-tunes it on robot demonstration data so that its output is a robot action rather than a sentence. The robot inherits the model's knowledge of what things are and roughly how the world works.
+
+**RT-2 (Google DeepMind, 2023)** showed that such a model could follow instructions involving objects and concepts that never appeared in its robot training data, because it had read about them. **OpenVLA (2024)** released an open 7-billion-parameter version trained on 970,000 real robot demonstrations across many robot types; it outperformed the 55-billion-parameter RT-2-X by 16.5 percentage points across 29 tasks and can be fine-tuned on a consumer GPU. See [large language models in robotics](/atlas/concept/large-language-model-robotics) and [foundation models](/atlas/concept/foundation-model-robotics).
+
+**The cost:** these models are slow (a few actions per second), heavy, and their failures are hard to predict. Nobody runs a balance loop through one. They sit on top of classic controllers and learned low-level skills.
 
 ## Choosing a method
 
-| If you have | Consider |
-|---|---|
-| Lots of labelled images | Supervised learning |
-| A human who can demonstrate | Imitation learning |
-| A good simulator and a clear score | Reinforcement learning |
+| Your situation | Use | Because |
+|---|---|---|
+| The robot must recognize or locate things | Supervised learning | Perception is a labeled-data problem; detectors are mature |
+| A human can do the task and you have a leader arm or joystick | Imitation learning (ACT or Diffusion Policy) | Tens of demonstrations, no reward design, works on cheap hardware |
+| The task is walking, balancing or anything with a clear score and a good simulator | Reinforcement learning with domain randomization | Millions of safe attempts; proven transfer for locomotion |
+| You want one model that follows plain-language instructions across tasks | Vision-language-action model | Inherits world knowledge; fine-tunable on your data |
+| The rule fits in ten lines and a wrong answer could hurt someone | None of them | Write the rule; see [AI vs traditional programming](/blog/ai-vs-traditional-robot-programming) |
+
+## How to start, as a learner
+
+1. Train an image classifier on your own photos and run it on a Raspberry Pi camera. That is supervised learning, end to end, in a weekend.
+2. Build or buy a cheap arm, record twenty demonstrations of a pick-and-place with LeRobot, and train ACT. Expect it to half-work, then learn why.
+3. Train a simulated cart-pole or a simple legged robot with a reinforcement learning library, then try to transfer a policy to real hardware. The gap you hit is the one every lab hits.
+
+The Edge track in the [Academy](/academy) covers the first two.
 
 ## FAQ
 
-**Can a robot learn on its own in the real world?** Yes, but slowly and with safety limits, so most training happens in simulation first.
+**Can a robot learn on its own in the real world?** Slowly, with safety limits, for small tasks. Most learning happens in simulation or from demonstrations, with real-world fine-tuning at the end.
 
-**Is deep learning the same thing?** [Deep learning](/atlas/concept/deep-learning) is a technique that can be used inside all three approaches.
+**Is deep learning the same thing?** [Deep learning](/atlas/concept/deep-learning) is the neural-network technique used inside all four approaches. The approaches differ in where the training signal comes from: labels, a human, a reward, or the internet.
 
-Back to the overview: [AI and robotics, the complete guide](/blog/ai-and-robotics-complete-guide).
+**Will one model do everything eventually?** The vision-language-action models are the bet that it will. They are promising and not yet reliable enough to ship without a classic controller and a safety layer underneath.
+
+## Sources
+
+- Zhao et al., "Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware" (ALOHA, ACT): https://arxiv.org/abs/2304.13705
+- Chi et al., "Diffusion Policy: Visuomotor Policy Learning via Action Diffusion": https://arxiv.org/abs/2303.04137
+- OpenAI, "Solving Rubik's Cube with a Robot Hand" (automatic domain randomization): https://arxiv.org/abs/1910.07113
+- Brohan et al., "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control": https://arxiv.org/abs/2307.15818
+- Kim et al., "OpenVLA: An Open-Source Vision-Language-Action Model": https://arxiv.org/abs/2406.09246

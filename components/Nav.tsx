@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { MiniLogo } from './MorphingLogo';
 import { useCopilot } from './CopilotProvider';
-import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { StreakBadge } from './StreakBadge';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { SiteSearch } from './search/SiteSearch';
@@ -105,6 +104,7 @@ function isActive(group: Group, pathname: string): boolean {
 }
 
 export function Nav() {
+  const { user: authUser, isLoading: authLoading } = useAuth();
   const pathname = usePathname() ?? '/';
   const [scrolled, setScrolled] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
@@ -123,18 +123,13 @@ export function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Signed-in state comes from AuthProvider (which only loads the Supabase
+  // client when a session cookie exists) instead of a second client here.
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setSignedIn(!!user);
-      if (user?.email) setEmailInitial(user.email[0].toUpperCase());
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSignedIn(!!session?.user);
-      if (session?.user?.email) setEmailInitial(session.user.email[0].toUpperCase());
-    });
-    return () => sub.subscription.unsubscribe();
-  }, []);
+    if (authLoading) return;
+    setSignedIn(!!authUser);
+    if (authUser?.email) setEmailInitial(authUser.email[0].toUpperCase());
+  }, [authUser, authLoading]);
 
   // Close dropdowns on outside click + Escape.
   useEffect(() => {

@@ -1,45 +1,81 @@
 ---
 title: "LiDAR vs Radar vs Camera: Which Sensor Does a Robot Need?"
-description: "Three common robot sensors compared in plain language: what each sees well, where each fails, and why many robots use more than one."
+description: "Camera, lidar and radar compared for real robot jobs: what each measures, where each fails, what they cost at hobby and pro level, and which to buy first."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["Sensors","Comparison"]
-readTime: 7
+readTime: 8
 coverEmoji: "👁️"
 featured: false
-keywords: ["lidar vs radar vs camera","robot sensors compared","best sensor for robot","sensor fusion"]
+keywords: ["lidar vs radar vs camera","robot sensors compared","best sensor for robot","sensor fusion","lidar vs camera for robot"]
 ---
 
 # LiDAR vs Radar vs Camera: Which Sensor Does a Robot Need?
 
-**Short answer:** a **camera** is cheap and tells you *what* something is, a **lidar** tells you precisely *where* things are in 3D, and **radar** works in rain, fog and dark and measures speed directly. Most serious robots combine them, which is called [sensor fusion](/atlas/concept/sensor-fusion).
+**Short answer:** a **camera** is cheap and tells you *what* something is, a **lidar** tells you precisely *where* things are in 3D, and **radar** keeps working in rain, fog and darkness and measures speed directly. For a first robot, buy a camera and a $5 ultrasonic sensor. For an indoor mapping robot, add a 2D lidar. Add radar only when the robot drives outdoors at speed. Anything serious combines two or three, which is [sensor fusion](/atlas/concept/sensor-fusion).
 
-## At a glance
+This is the decision guide. For the spec-by-spec table on the mapping question specifically, see [lidar vs camera for SLAM](/compare/lidar-vs-camera-slam).
+
+## What each one actually measures
+
+**A camera** records light as a grid of color values, 12 million of them on a Raspberry Pi Camera Module 3. It has no idea how far away anything is. Everything a camera "knows" about distance comes from software: a second camera (stereo), a projected infrared pattern, or a neural network guessing from the image. What a camera does better than anything else is identify: a stop sign, a person, a QR code, the difference between a red apple and a green one. See [camera vision](/atlas/concept/camera-vision).
+
+**A lidar** fires laser pulses and times their return. Each pulse gives one distance, and a spinning or scanning head turns thousands of them into a 2D ring or a 3D [point cloud](/atlas/concept/point-cloud). An entry-level 2D unit like the Slamtec RPLIDAR A1 measures 0.15 m to 12 m, takes 8,000 samples a second, and sweeps a full 360 degrees at a configurable 2 to 10 Hz. Lidar knows *where* things are to the centimeter but has no idea what they are. See [lidar](/atlas/concept/lidar).
+
+**A radar** sends radio waves and reads the echo. Automotive and industrial units run at 60 and 77 GHz and are built to work through weather that defeats optical sensors. Because of the Doppler shift, radar reads the relative speed of each echo directly, without comparing two frames. The cost is resolution: a radar return is a blob with a distance and a velocity, not an outline. See [radar sensor](/atlas/concept/radar-sensor).
+
+## Side by side
 
 | | Camera | Lidar | Radar |
 |---|---|---|---|
-| Measures | Light (colour images) | Laser pulse timing (distance) | Radio wave echoes (distance and speed) |
-| Strength | Recognises objects, signs, people; low cost | Accurate shape and distance | Works in bad weather; measures speed |
-| Weakness | Poor in dark or glare; no direct distance | Costs more; can struggle with rain, fog and glass | Coarse detail |
-| Typical use | Object detection, lane finding | Mapping, obstacle avoidance | Collision warning, long range detection |
+| Measures | Color image | Distance per laser pulse, in 2D or 3D | Distance and speed per radio echo |
+| Best at | Recognizing and reading things | Shape and precise position | Weather, darkness, speed of moving things |
+| Blind to | Distance (without stereo or depth tricks), darkness, glare | Glass, mirrors, heavy rain and fog, black matte surfaces | Fine detail; cannot read a sign or tell a box from a person |
+| Hobby entry point | Pi Camera Module 3, $25 (12 MP) | RPLIDAR A1 (2D, 12 m range) | Short-range presence modules; little hobby ecosystem |
+| Step up | Intel RealSense D435 stereo depth camera, $375 | 3D units for outdoor and vehicle use | Automotive 77 GHz modules via development kits |
+| Compute needed | High for neural networks, low for color thresholding | Low for 2D SLAM, high for 3D | Low |
+| Typical robot role | Object detection, lane following, reading labels | Mapping, obstacle avoidance, localization | Collision warning, long-range detection, speed |
 
-Read more: [camera vision](/atlas/concept/camera-vision), [lidar](/atlas/concept/lidar), [radar](/atlas/concept/radar-sensor).
+## Which one to choose, by robot
 
-## Which one to choose
+**A first robot (budget under $100).** Camera plus an ultrasonic distance sensor. The HC-SR04 measures 2 cm to 4 m with accuracy down to 3 mm for about $5 at SparkFun. You will learn more from making color tracking work under a lamp than from any lidar.
 
-- **Learning or a hobby robot:** start with a camera and a cheap distance sensor.
-- **Indoor mapping robot:** a 2D lidar is the classic choice and pairs with [SLAM](/atlas/concept/slam).
-- **Outdoor robot or vehicle:** add radar because it keeps working when cameras and lidar are degraded.
+**An indoor robot that must map a room.** A 2D lidar is the standard answer and pairs directly with [SLAM](/atlas/concept/slam) in ROS 2: the `slam_toolbox` and [Nav2](/atlas/concept/nav2) stacks expect a `/scan` topic from exactly this kind of sensor. Robot vacuums from every major brand use a small spinning lidar for the same reason: a floor plan from a lidar is accurate and cheap to compute. Keep the camera for recognizing the charging dock or a pet.
+
+**A robot arm picking objects.** Camera first, then a depth camera. An arm needs to know *what* and *where* within a meter or two, in a lit workspace. A stereo depth camera like the RealSense D435 gives a color image and a depth map from the same unit, which is why it sits on so many research arms. Lidar is overkill at this range; radar is useless.
+
+**A drone indoors.** A downward camera for optical flow, a forward depth camera or small lidar for obstacles, and an [IMU](/atlas/concept/imu). Weight rules out most 3D lidars.
+
+**An outdoor vehicle, delivery robot or anything over walking pace.** All three. Rain and fog degrade cameras and lidar at the same time; radar is what keeps the emergency stop working. The speed reading from radar also lets the planner react to a moving car before a camera pipeline has tracked it across several frames.
 
 ## Why not just one?
 
-Each sensor has blind spots in different conditions. A camera can be blinded by sun glare, and radar cannot read a road sign. Fusing them lets the strengths cover the weaknesses. Some companies deliberately use fewer sensor types to cut cost, and the right mix depends on the job and budget.
+Each sensor fails in a condition the others handle. Sun glare blinds a camera; radar does not notice. A glass door is invisible to lidar; a camera sees the frame and the reflection. Radar sees a stopped car ahead but cannot tell whether it is a car or an overpass sign; the camera can. Fusing them, typically with a [Kalman filter](/atlas/concept/kalman-filter) or a learned fusion network, lets the strengths cover the holes.
+
+The cost argument runs the other way. Some carmakers have chosen camera-only stacks to save money and complexity, betting that neural networks can infer depth well enough. Whether that is a good bet is still argued in the industry; what is not argued is that it needs a lot of compute and a lot of data. For a student or a startup robot, a $5 ultrasonic sensor next to the camera buys a lot of safety for very little.
+
+## Regional notes
+
+- **US and EU:** every sensor above is stocked by SparkFun, Adafruit, Mouser, DigiKey and the maker's own store; RealSense ships from the RealSense store directly.
+- **India:** Robu.in and Robocraze carry the HC-SR04, Pi cameras and RPLIDAR units; depth cameras are usually imported and attract customs duty on top of the US price.
+- **China:** Slamtec and most lidar makers are domestic, so lidar is the cheapest it gets anywhere; Taobao prices for the RPLIDAR A1 sit well below the export price.
+- **Everywhere:** check the lidar's laser class (Class 1 is eye-safe) and the camera's connector (CSI ribbon for Pi, USB for everything else) before you buy.
 
 ## FAQ
 
-**Which is cheapest?** Cameras, by a wide margin.
+**Which is cheapest?** Cameras, by a wide margin. A usable camera is $25; a usable lidar starts around four times that; a usable radar module for robotics is rarer and pricier again.
 
-**Can a camera measure distance?** Yes, using two cameras (stereo) or software estimates, but it is less direct than lidar or radar.
+**Can a camera measure distance?** Yes: two cameras (stereo), a projected pattern (structured light), or time-of-flight pixels. The RealSense D435 does stereo with an infrared projector to help on blank walls. It is less direct and less accurate than lidar, and it fails on featureless surfaces, but for a tabletop arm it is plenty.
 
-**What is the best sensor for a beginner robot?** A camera plus an ultrasonic or infrared distance sensor.
+**What does lidar struggle with?** Glass and mirrors (the pulse goes through or bounces away), very dark matte surfaces (little light returns), and heavy rain or fog (pulses scatter). Indoors in normal light it is close to ideal.
+
+**What is the best sensor for a beginner robot?** A camera plus an ultrasonic or IR distance sensor. Add a 2D lidar when you start on SLAM.
+
+## Sources
+
+- Slamtec, RPLIDAR A1 specifications: https://www.slamtec.com/en/Lidar/A1Spec
+- Raspberry Pi, "New autofocus camera modules" (Camera Module 3, $25, IMX708 12 MP): https://www.raspberrypi.com/news/new-autofocus-camera-modules/
+- SparkFun, Ultrasonic Distance Sensor HC-SR04 (range, accuracy, price): https://www.sparkfun.com/products/15569
+- RealSense store, Depth Camera D435 ($375): https://store.realsenseai.com/buy-intel-realsense-depth-camera-d435.html
+- Texas Instruments, mmWave radar sensors overview (60 and 77 GHz): https://www.ti.com/sensors/mmwave-radar/overview.html

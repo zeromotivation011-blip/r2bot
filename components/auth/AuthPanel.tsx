@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { announceAuthChanged } from '@/lib/supabase/lazy'
 import { trackEvent } from '@/lib/analytics'
 import { OAUTH_PROVIDERS, enabledOAuthProviders, type OAuthProviderId } from './oauth-providers'
 import { ProviderIcon } from './ProviderIcon'
@@ -102,6 +103,7 @@ export function AuthPanel({
       })
       if (err) { setError(err.message); return }
       trackEvent('login', { method: 'password' })
+      announceAuthChanged()
       onDone?.()
       router.refresh()
     } finally { setBusy(null) }

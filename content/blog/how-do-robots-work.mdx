@@ -1,53 +1,102 @@
 ---
 title: "How Do Robots Work? The Sense-Think-Act Loop in Plain English"
-description: "Every robot, from a vacuum cleaner to a factory arm, runs the same three-step loop. Here is how it works, with everyday examples."
+description: "Every robot runs the same three-step loop. How it works in a vacuum, a line follower and an industrial arm, how fast each layer runs, and what to build first."
 date: "2026-11-06"
+updated: "2026-11-11"
 author: "R2BOT Editorial"
-authorRole: "Founder, R2BOT — science teacher turned robotics builder"
 tags: ["Basics","Beginner"]
-readTime: 6
+readTime: 7
 coverEmoji: "🤖"
 featured: false
-keywords: ["how do robots work","what is a robot","sense think act","robot basics for beginners"]
+keywords: ["how do robots work","what is a robot","sense think act","robot basics for beginners","how does a robot vacuum work"]
 ---
 
 # How Do Robots Work? The Sense-Think-Act Loop in Plain English
 
-**Short answer:** a robot repeats a loop thousands of times a second: it **senses** the world, **thinks** about what to do, then **acts**. Sensors are the eyes and ears, a computer is the brain, and motors are the muscles. See the [Sense-Think-Act loop](/atlas/concept/sense-think-act-loop) in the Atlas for the formal version.
+**Short answer:** a robot runs a loop, over and over, often a thousand times a second: it **senses** the world, **thinks** about what to do, then **acts**. Sensors are the eyes and ears, a computer is the brain, motors are the muscles, and the loop closing back on itself is what separates a robot from a wind-up toy. The formal version is in the Atlas under the [sense-think-act loop](/atlas/concept/sense-think-act-loop); this is the walkthrough.
 
 ## The three steps
 
-**1. Sense.** Sensors turn the world into numbers. A [lidar](/atlas/concept/lidar) measures distance with laser pulses, a camera captures images, an [encoder](/atlas/concept/encoder) counts wheel turns.
+**1. Sense.** A [sensor](/atlas/concept/sensor) turns some piece of the physical world into a number. An ultrasonic sensor reports "37 cm to the nearest thing ahead." An [encoder](/atlas/concept/encoder) reports "the left wheel has turned 1,240 counts." A camera reports twelve million color values. A [lidar](/atlas/concept/lidar) reports 8,000 distances a second around a full circle.
 
-**2. Think.** Software decides what to do with those numbers. It might be a few lines ("if the wall is closer than 20 cm, turn") or a large [neural network](/atlas/concept/neural-network).
+**2. Think.** Software decides what to do with those numbers. It can be one line ("if the wall is closer than 20 cm, turn left"), a [PID controller](/atlas/concept/pid-controller) nudging a motor toward a target speed, a [path planner](/atlas/concept/path-planning) searching a map, or a [neural network](/atlas/concept/neural-network) deciding that the blob in the image is a cup.
 
-**3. Act.** The computer commands [actuators](/atlas/concept/actuator), such as a [DC motor](/atlas/concept/dc-motor), to move. The movement changes the world, and the loop starts again.
+**3. Act.** The computer commands an [actuator](/atlas/concept/actuator): a [DC motor](/atlas/concept/dc-motor) spins a wheel, a servo turns a joint, a gripper closes. The action changes the world, the sensors measure the new world, and the loop starts again.
 
-## A robot vacuum, step by step
+The loop is the point. A toy that drives forward for exactly three seconds hits the wall on a slippery floor because it never looks. A robot that senses distance every few milliseconds stops in time whatever the floor is. That ability to notice and correct is called [feedback](/atlas/concept/feedback), and it is the single idea underneath everything in robotics.
 
-- **Sense:** bump sensors and a distance sensor notice a chair leg.
-- **Think:** the software marks the spot on its map and picks a path around it.
-- **Act:** the wheel motors steer left.
+## Three robots, one loop
 
-Half a second later it senses the new position, and the loop repeats.
+### A robot vacuum
 
-## Why the loop matters
+A 2015-era Roomba 980 carries bumpers, cliff sensors (so it does not fall down stairs), an infrared floor-tracking sensor that works like an optical mouse, wheel encoders, a gyro, and a camera looking at the ceiling.
 
-Reality is messy: wheels slip, sensors are noisy, people walk in the way. Because the robot keeps sensing, it can correct itself. This idea is called [feedback](/atlas/concept/feedback). A robot without it is just a machine replaying a recording, which works only until something changes.
+- **Sense:** the bumper closes on a chair leg; the floor sensor and encoders say the robot has moved 40 cm since the last update; the camera spots a distinctive corner of a picture frame it has seen before.
+- **Think:** the software marks an obstacle on its map, uses the recognized landmark to correct the small drift the encoders have accumulated, and picks a path around the chair.
+- **Act:** the wheel motors turn the robot left and drive on.
 
-## What goes wrong without it
+That camera-landmark correction is a form of [SLAM](/atlas/concept/slam) (simultaneous localization and mapping), and it is why a mapping vacuum covers a floor in neat rows while a bumper-only one wanders. The earlier Roombas ran the same three-step loop with less in the "think" step.
 
-A toy that drives forward for exactly 3 seconds will hit the wall if the floor is slippery. A robot that senses distance will stop in time. That difference is the whole point of sensing.
+### A line follower
+
+The simplest robot worth building. Five infrared reflectance sensors look at the floor; two motors drive the wheels.
+
+- **Sense:** sensors 1 and 2 see dark, 3 to 5 see light: the line is under the left side.
+- **Think:** compute an error ("the line is 1.5 sensor-widths left of center"), feed it to a PID controller, get a steering correction.
+- **Act:** slow the left motor slightly, speed up the right.
+
+This loop runs about a thousand times a second on an [Arduino](/atlas/concept/arduino), and if you slow it to ten times a second the robot weaves off the line. Loop speed is not a detail.
+
+### An industrial arm
+
+A Universal Robots UR5e has six joints, each with an encoder and a motor, plus a force-torque sensor in the wrist that reads up to ±50 N.
+
+- **Sense:** six joint angles, six joint speeds, the force at the tool.
+- **Think:** compare each joint to the planned trajectory; if the wrist force exceeds a limit (one of 23 configurable safety functions), stop.
+- **Act:** six motor currents, updated hundreds of times a second.
+
+Same three steps, more of them, with a safety rule that can override the plan at any point in the loop.
+
+## How fast the loop runs
+
+Robots run several loops at once, nested, at different speeds:
+
+| Loop | Typical rate | Example |
+|---|---|---|
+| Motor control | 1,000 Hz and up | Holding a wheel at a target speed |
+| Balance and stabilization | 200 to 1,000 Hz | Keeping a drone or a two-wheeled robot upright |
+| Obstacle avoidance | 10 to 50 Hz | Steering around a chair from lidar data |
+| Mapping and planning | 1 to 10 Hz | Updating the map, replanning a path |
+| Task decisions | Seconds | "Finished the kitchen, go to the hallway" |
+
+The fast loops need predictable timing, which is why they live on a [microcontroller](/atlas/concept/microcontroller). The slow loops need memory and compute, which is why they live on a Linux computer. Most real robots carry both: a Raspberry Pi thinking slowly on top of an Arduino reacting quickly underneath. [Choosing a board](/blog/arduino-vs-esp32-vs-raspberry-pi-for-robots) walks through that split.
+
+## What goes wrong without each step
+
+- **No sensing:** the three-second toy. It replays a recording and is right only while the world matches the recording.
+- **No thinking:** a sensor wired straight to a motor. It reacts, but it cannot plan, remember or prioritize; it will chase the nearest wall forever.
+- **No acting:** a sensor that logs the world and changes nothing. Useful, but a weather station, not a robot.
+- **Slow loop:** the line follower that weaves, the drone that oscillates, the arm that overshoots. Usually the first bug a beginner meets, and usually fixed by moving the fast loop to a microcontroller.
+
+## Feel it yourself
+
+Build the loop with your hands before reading more theory:
+
+1. Wire an ultrasonic sensor and one motor to an Arduino. Write a loop: read distance, stop if under 20 cm, else drive. That is the whole idea in twelve lines.
+2. Put the robot on a rug, then on a tile floor. Watch it stop in time on both. Now comment out the sensor read and watch it hit the wall on the tile. You have just seen feedback.
+3. Try the interactive [sense-think-act simulator](/visualizer/sense-think-act) to change the loop rate and watch what happens, or Lesson 1 of the free Spark track in the [Academy](/academy).
 
 ## FAQ
 
-**Is a thermostat a robot?** It senses and acts, but most definitions also want a physical body that does work in the world and some decision-making. It is a simple control system, not usually called a robot.
+**Is a thermostat a robot?** It senses (temperature), thinks (above or below the setpoint) and acts (switches the heater). Most definitions also want a body that moves or manipulates the world and a decision beyond one threshold, so a thermostat is usually called a control system, not a robot. The loop, though, is identical.
 
-**Do robots need AI?** No. Many industrial robots follow fixed programs. AI helps when the world is unpredictable, for example recognising objects.
+**Do robots need AI?** No. The welding arms that make up most of the world's robots run fixed programs through the same loop. AI enters the "think" step when the world is unpredictable: recognizing an object, understanding an instruction. See [AI and robotics](/blog/ai-and-robotics-complete-guide).
 
-**What is the best way to start learning?** Build the loop yourself in a simulator, then on a small board such as an [Arduino](/atlas/concept/arduino). Try Lesson 1 of the free Spark track in the [Academy](/academy).
+**What is the best way to start learning?** Build the loop above on an Arduino, then read [robot sensors explained](/blog/robot-sensors-explained) to understand what the sensing step can and cannot tell you.
 
+## Sources
 
-## Keep learning
-
-See how AI fits in: [AI and robotics, the complete guide](/blog/ai-and-robotics-complete-guide).
+- IEEE Spectrum, "Review: iRobot Roomba 980" (sensors, camera landmarks, drift correction): https://spectrum.ieee.org/review-irobot-roomba-980
+- Universal Robots, UR5e datasheet (six joints, force-torque range, 23 safety functions): https://www.universal-robots.com/manuals/latest/en/datasheets/ur5e/
+- Slamtec, RPLIDAR A1 specifications (8,000 samples per second): https://www.slamtec.com/en/Lidar/A1Spec
+- Raspberry Pi, Camera Module 3 launch (12-megapixel sensor): https://www.raspberrypi.com/news/new-autofocus-camera-modules/

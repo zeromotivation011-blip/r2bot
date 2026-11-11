@@ -1,0 +1,56 @@
+---
+title: 'The Robots Delivering Pizza in 2026'
+excerpt: 'Sidewalk robots and delivery drones attack the same problem from opposite directions. How each works, where each is running, and where each one wins.'
+category: logistics
+readTime: '5 min read'
+publishedAt: '2026-11-11'
+updatedAt: '2026-11-11'
+atlasLinks:
+  - { slug: last-mile-delivery-robot, label: 'Last-Mile Delivery Robots' }
+  - { slug: delivery-robot, label: 'Delivery Robots' }
+  - { slug: drone, label: 'Drones' }
+  - { slug: levels-of-autonomy, label: 'Levels of Autonomy' }
+sources:
+  - { name: 'Business Wire — Starship Technologies press release (June 2026)', url: 'https://www.businesswire.com/news/home/20260605921793/en/' }
+  - { name: 'The Robot Report — Serve Robotics has deployed 2,000 delivery robots across the U.S. (Dec 2025)', url: 'https://www.therobotreport.com/serve-robotics-has-deployed-2000-delivery-robots-across-u-s/' }
+  - { name: 'Transport Topics — Zipline eclipses $7.6B valuation (Jan 2026)', url: 'https://www.ttnews.com/articles/drone-delivery-zipline-76b' }
+---
+
+In a growing number of cities, the pizza you order on an app arrives in a wheeled cooler that stops at kerbs and waits for the lights, or drops from the sky on a tether. Both are solving the "last mile", the most expensive part of any delivery, and they have made opposite bets about how to do it.
+
+## What it is
+
+A **sidewalk delivery robot** is a small electric vehicle, roughly the size of a large cool-box, that drives on footpaths at walking pace and carries one order in a locked compartment. Starship Technologies, founded in Estonia, reports more than 10 million deliveries with over 3,000 robots across 300-plus locations in eight countries. Serve Robotics, spun out of Uber in 2021, had more than 2,000 robots on United States sidewalks by December 2025, each able to carry up to four large pizzas plus drinks.
+
+A **delivery drone** does the same job from the air. Zipline, which started by flying blood to clinics in Rwanda, has completed more than 2 million commercial deliveries across seven countries, flying 125 million miles in the process.
+
+## How it works
+
+**Sensing.** A sidewalk robot carries cameras around its body, usually with ultrasonic or radar sensors for close-range obstacles, plus GPS and wheel odometry. It must spot a kerb edge, a dog lead, a child and a parked e-scooter, all at pavement height. A drone's problem is different: it needs to know its own position very precisely, detect other aircraft, and find a clear spot to lower a package.
+
+**Compute.** On the ground, the robot runs a perception stack that classifies what it sees, predicts where pedestrians will move, and plans a path along the pavement and across road crossings. Serve says its fleet is designed to operate at SAE Level 4 autonomy and reports a 99.8% delivery completion rate. Both Starship and Serve keep remote human supervisors who can take over when the robot is unsure, which is what makes Level 4 on a busy pavement commercially possible. In the air, the planner's main inputs are a pre-mapped route, weather and air-traffic constraints.
+
+**Actuation.** Small wheels with independent suspension let a sidewalk robot mount a kerb and keep its cargo level. Zipline's newer aircraft for home delivery hovers above the house and lowers the package on a tether for a precise, contactless drop, rather than landing; its original fixed-wing aircraft drops a parachuted package from 60 to 80 feet.
+
+## Where you'll see it
+
+- **Finland and Europe.** Starship says roughly one in five grocery deliveries in Finland is now completed by one of its robots, and that its robots deliver groceries at a cost $3–4 lower per delivery than a human courier. In 2026 it announced an Uber Eats partnership starting in the United Kingdom.
+- **United States.** Serve operates in Los Angeles, Atlanta, Dallas–Fort Worth, Miami, Chicago and Fort Lauderdale, with Alexandria, Virginia, added in December 2025, delivering for Uber Eats, DoorDash and 7-Eleven. Its fleet grew twentyfold in 2025.
+- **Rwanda, the United States and five more countries.** Zipline's home-delivery partners in the US include Walmart and Chipotle, which launched a limited drone burrito service in the Dallas area in 2025. The company raised $600 million in January 2026 at a $7.6 billion valuation.
+
+## What it can't do yet
+
+Sidewalk robots are slow, carry one order, and cannot climb stairs or open a door; the customer still has to come outside. They depend on good pavements, which is why early deployments clustered on university campuses and in cities with wide, flat footpaths — Starship is now redeploying over 1,200 robots from US campuses to grocery retailers, a sign that campus demand had limits. Drones carry light payloads, are grounded by strong wind and rain, and need airspace permission for every new area; a drone will not deliver a family-size order in a storm. Neither technology has solved dense city centres, where crowds, traffic and tall buildings make both the pavement and the sky difficult.
+
+The two approaches therefore split the market rather than compete. Robots win short, flat, frequent trips in neighbourhoods with pavements; drones win longer trips over obstacles where the payload is small, which is why Zipline's first customers were hospitals rather than pizzerias.
+
+## Try it / learn more
+
+- Atlas: [Last-mile delivery robots](/atlas/concept/last-mile-delivery-robot), [Delivery robots](/atlas/concept/delivery-robot), [Drones](/atlas/concept/drone), [Levels of autonomy](/atlas/concept/levels-of-autonomy)
+- Robot profiles: [Starship delivery robot](/robots/starship-delivery-robot), [Zipline P2](/robots/zipline-p2)
+
+## Sources
+
+1. Starship Technologies via Business Wire, press release (5 June 2026). https://www.businesswire.com/news/home/20260605921793/en/
+2. The Robot Report, "Serve Robotics has deployed 2,000 delivery robots across the U.S." (16 December 2025). https://www.therobotreport.com/serve-robotics-has-deployed-2000-delivery-robots-across-u-s/
+3. Transport Topics, "Drone delivery startup Zipline eclipses $7.6B valuation" (21 January 2026). https://www.ttnews.com/articles/drone-delivery-zipline-76b

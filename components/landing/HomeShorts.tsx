@@ -1,7 +1,7 @@
-'use client'
-
 import Link from 'next/link'
-import { SHORTS, SHORT_COURSES, shortsInCourse, liveShorts } from '@/lib/shorts'
+
+export interface HomeShortPick { slug: string; title: string; videoId: string }
+export interface HomeShortCourse { slug: string; title: string; count: number }
 
 /**
  * Quick Lessons on the homepage.
@@ -16,16 +16,20 @@ import { SHORTS, SHORT_COURSES, shortsInCourse, liveShorts } from '@/lib/shorts'
  * thumbnails are real and good, and because every other section on this page
  * is type-led.
  */
-const PICK = ['ultrasonic-sensor', 'servo-motor', 'gears', 'gyroscope-imu', 'feedback-control', 'warehouse-robots']
+export const HOME_SHORT_PICKS = ['ultrasonic-sensor', 'servo-motor', 'gears', 'gyroscope-imu', 'feedback-control', 'warehouse-robots']
 
-export default function HomeShorts() {
-  const picks = PICK.map((s) => liveShorts().find((x) => x.slug === s)).filter(Boolean) as typeof SHORTS
+/**
+ * Server component. It used to be a client component that imported the whole
+ * lesson catalogue (every lesson's text, in the browser bundle) just to show
+ * six thumbnails and five counts. The page now passes exactly those.
+ */
+export default function HomeShorts({ picks, courses, total }: { picks: HomeShortPick[]; courses: HomeShortCourse[]; total: number }) {
 
   return (
     <section className="r2-section">
       <div className="r2-wrap">
         <p className="r2-eyebrow">One minute each</p>
-        <h2 className="r2-h2">{liveShorts().length} quick lessons, grouped into five short courses</h2>
+        <h2 className="r2-h2">{total} quick lessons, grouped into five short courses</h2>
         <p className="r2-body" style={{ marginTop: '0.75rem' }}>
           A one-minute video, a demo you can play with, and one question to check it landed.
           Start anywhere.
@@ -36,7 +40,7 @@ export default function HomeShorts() {
             <Link key={s.slug} href={`/shorts/${s.slug}`} className="r2-shot">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={`https://i.ytimg.com/vi/${s.ids[0]}/mqdefault.jpg`}
+                src={`https://i.ytimg.com/vi/${s.videoId}/mqdefault.jpg`}
                 alt=""
                 loading="lazy"
                 width={320}
@@ -49,10 +53,10 @@ export default function HomeShorts() {
         </div>
 
         <div className="r2-shorts-courses">
-          {SHORT_COURSES.map((c) => (
+          {courses.map((c) => (
             <Link key={c.slug} href={`/shorts/course/${c.slug}`} className="r2-chip">
               {c.title}
-              <span className="r2-meta">{shortsInCourse(c.slug).length}</span>
+              <span className="r2-meta">{c.count}</span>
             </Link>
           ))}
         </div>

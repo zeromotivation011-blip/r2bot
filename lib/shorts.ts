@@ -399,9 +399,21 @@ const BASE_SHORTS: ShortLesson[] = [
 ]
 
 // Default publish dates per batch; an individual lesson can override.
+import VIDEO_DATES from './video-dates.json'
+
+function withVideoDate(s: ShortLesson): ShortLesson {
+  const dates = VIDEO_DATES as Record<string, string>
+  const d = s.videoPublished ?? dates[s.ids[0]]
+  return d ? { ...s, videoPublished: d } : s
+}
+
 export const SHORTS: ShortLesson[] = [
-  ...BASE_SHORTS.map((s) => ({ videoPublished: '2026-11-06', ...s })),
-  ...SHORTS_MORE.map((s) => ({ videoPublished: '2026-11-07', ...s })),
+  // videoPublished comes from lib/video-dates.json — the real upload date of
+  // the embedded Short, read from YouTube Studio on 11 Nov 2026 (the two
+  // per-file batch dates it replaces were placeholders). A lesson whose id is
+  // not in the file keeps no date rather than a guessed one.
+  ...BASE_SHORTS.map((s) => withVideoDate(s)),
+  ...SHORTS_MORE.map((s) => withVideoDate(s)),
   ...SHORTS_SCHEDULED,
 ].map((s) => (SCHEDULED_EXTRA_VIDEOS[s.slug] ? { ...s, extraVideos: SCHEDULED_EXTRA_VIDEOS[s.slug] } : s))
 
