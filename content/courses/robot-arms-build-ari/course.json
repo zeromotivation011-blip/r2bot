@@ -236,7 +236,7 @@
       "id": "05-the-gripper",
       "title": "The gripper",
       "summary": "Design a gripper that holds a cup without crushing it.",
-      "youtubeId": "",
+      "youtubeId": "Xsi8va0fny4",
       "videoNo": 25,
       "durationMin": 4,
       "quiz": [
@@ -286,7 +286,7 @@
       "id": "06-reach-and-geometry",
       "title": "Reach and geometry",
       "summary": "Use two links and angles to reach a point.",
-      "youtubeId": "",
+      "youtubeId": "1Q_M_5YwGC4",
       "videoNo": 26,
       "durationMin": 4,
       "quiz": [
@@ -336,7 +336,7 @@
       "id": "07-calibration",
       "title": "Calibration",
       "summary": "Fix small errors so the arm goes where it should.",
-      "youtubeId": "",
+      "youtubeId": "W-wfuYUM7kU",
       "videoNo": 27,
       "durationMin": 4,
       "quiz": [
@@ -386,7 +386,7 @@
       "id": "08-pick-and-place",
       "title": "Pick and place",
       "summary": "Break a job into steps using a simple state machine.",
-      "youtubeId": "",
+      "youtubeId": "bn_FipaSzfs",
       "videoNo": 28,
       "durationMin": 4,
       "quiz": [
@@ -436,7 +436,7 @@
       "id": "09-mounting-ari-on-pip",
       "title": "Mounting Ari on Pip",
       "summary": "Join two robots and keep them stable.",
-      "youtubeId": "",
+      "youtubeId": "VcgBGQfSy9g",
       "videoNo": 29,
       "durationMin": 4,
       "quiz": [
@@ -486,7 +486,7 @@
       "id": "10-the-first-job-together",
       "title": "The first job together",
       "summary": "Combine driving and picking into one job.",
-      "youtubeId": "",
+      "youtubeId": "A_N1dG3L5V0",
       "videoNo": 30,
       "durationMin": 4,
       "quiz": [
