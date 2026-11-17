@@ -36,7 +36,7 @@
       "id": "01-maps-how-a-robot-remembers-a-place",
       "title": "Maps: how a robot remembers a place",
       "summary": "Explain what a map is to a robot.",
-      "youtubeId": "",
+      "youtubeId": "eY5RHl0jdDs",
       "videoNo": 41,
       "durationMin": 4,
       "quiz": [
@@ -86,7 +86,7 @@
       "id": "02-where-am-i",
       "title": "Where am I?",
       "summary": "Explain localisation: working out where the robot is on a map.",
-      "youtubeId": "",
+      "youtubeId": "YEqqEg2EDFI",
       "videoNo": 42,
       "durationMin": 4,
       "quiz": [
@@ -136,7 +136,7 @@
       "id": "03-planning-a-route",
       "title": "Planning a route",
       "summary": "Describe how a robot finds a path from A to B.",
-      "youtubeId": "",
+      "youtubeId": "rW_e9JMDAf0",
       "videoNo": 43,
       "durationMin": 4,
       "quiz": [
@@ -186,7 +186,7 @@
       "id": "04-dodging-the-unexpected",
       "title": "Dodging the unexpected",
       "summary": "Handle moving obstacles while following a plan.",
-      "youtubeId": "",
+      "youtubeId": "XNv-gfaS4lg",
       "videoNo": 44,
       "durationMin": 4,
       "quiz": [
@@ -236,7 +236,7 @@
       "id": "05-talking-to-robots",
       "title": "Talking to robots",
       "summary": "Explain how a robot can understand spoken instructions.",
-      "youtubeId": "",
+      "youtubeId": "fwFB3z0RieM",
       "videoNo": 45,
       "durationMin": 4,
       "quiz": [
@@ -286,7 +286,7 @@
       "id": "06-learning-from-experience",
       "title": "Learning from experience",
       "summary": "Explain trial, reward and improvement.",
-      "youtubeId": "",
+      "youtubeId": "Q9SyuLinocc",
       "videoNo": 46,
       "durationMin": 4,
       "quiz": [
@@ -336,7 +336,7 @@
       "id": "07-safe-robots",
       "title": "Safe robots",
       "summary": "List safety ideas for robots near people.",
-      "youtubeId": "",
+      "youtubeId": "05gKFelBZN8",
       "videoNo": 47,
       "durationMin": 4,
       "quiz": [
@@ -386,7 +386,7 @@
       "id": "08-robots-in-teams",
       "title": "Robots in teams",
       "summary": "Describe how several robots can share a job.",
-      "youtubeId": "",
+      "youtubeId": "0hLYOgIjdJ8",
       "videoNo": 48,
       "durationMin": 4,
       "quiz": [
@@ -436,7 +436,7 @@
       "id": "09-design-your-own-robot",
       "title": "Design your own robot",
       "summary": "Use a simple process to plan a robot for a real need.",
-      "youtubeId": "",
+      "youtubeId": "n-WyEC6YRRk",
       "videoNo": 49,
       "durationMin": 4,
       "quiz": [
@@ -486,7 +486,7 @@
       "id": "10-your-robotics-future",
       "title": "Your robotics future",
       "summary": "Plan next steps for learning and careers in robotics.",
-      "youtubeId": "",
+      "youtubeId": "AjSovT1xXmI",
       "videoNo": 50,
       "durationMin": 4,
       "quiz": [
