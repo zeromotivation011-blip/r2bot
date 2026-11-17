@@ -36,7 +36,7 @@
       "id": "01-a-camera-is-a-grid-of-numbers",
       "title": "A camera is a grid of numbers",
       "summary": "Explain that a picture is made of pixels with numbers.",
-      "youtubeId": "",
+      "youtubeId": "h6PW7DSs5XY",
       "videoNo": 31,
       "durationMin": 4,
       "quiz": [
@@ -86,7 +86,7 @@
       "id": "02-finding-colour",
       "title": "Finding colour",
       "summary": "Find an orange cup using a colour rule and a mask.",
-      "youtubeId": "",
+      "youtubeId": "5BxjE2om8cw",
       "videoNo": 32,
       "durationMin": 4,
       "quiz": [
@@ -136,7 +136,7 @@
       "id": "03-where-is-it",
       "title": "Where is it?",
       "summary": "Work out an object position and rough distance from a picture.",
-      "youtubeId": "",
+      "youtubeId": "7oipwnTJA_0",
       "videoNo": 33,
       "durationMin": 4,
       "quiz": [
@@ -186,7 +186,7 @@
       "id": "04-light-and-noise",
       "title": "Light and noise",
       "summary": "Handle changing light and speckles in a picture.",
-      "youtubeId": "",
+      "youtubeId": "05ZNUg5rtZk",
       "videoNo": 34,
       "durationMin": 4,
       "quiz": [
@@ -236,7 +236,7 @@
       "id": "05-edges-and-shapes",
       "title": "Edges and shapes",
       "summary": "Tell similar objects apart by their edges and shape.",
-      "youtubeId": "",
+      "youtubeId": "9lZw4R1kFA4",
       "videoNo": 35,
       "durationMin": 4,
       "quiz": [
@@ -286,7 +286,7 @@
       "id": "06-from-camera-to-arm",
       "title": "From camera to arm",
       "summary": "Turn a position in the picture into a position on the table.",
-      "youtubeId": "",
+      "youtubeId": "jrDorJiWNE0",
       "videoNo": 36,
       "durationMin": 4,
       "quiz": [
@@ -336,7 +336,7 @@
       "id": "07-tracking-a-moving-object",
       "title": "Tracking a moving object",
       "summary": "Follow something that moves with look, compare, correct.",
-      "youtubeId": "",
+      "youtubeId": "zW0BEl56gXo",
       "videoNo": 37,
       "durationMin": 4,
       "quiz": [
@@ -386,7 +386,7 @@
       "id": "08-learning-to-recognise",
       "title": "Learning to recognise",
       "summary": "Teach a robot to name objects from examples.",
-      "youtubeId": "",
+      "youtubeId": "V-qeNqZVc7Y",
       "videoNo": 38,
       "durationMin": 4,
       "quiz": [
@@ -436,7 +436,7 @@
       "id": "09-see-decide-grab",
       "title": "See, decide, grab",
       "summary": "Join seeing, deciding and acting into one loop.",
-      "youtubeId": "",
+      "youtubeId": "ek4KG0ELAcw",
       "videoNo": 39,
       "durationMin": 4,
       "quiz": [
@@ -486,7 +486,7 @@
       "id": "10-the-big-fair",
       "title": "The big fair",
       "summary": "Prepare a robot for a real crowd, glare and surprises.",
-      "youtubeId": "",
+      "youtubeId": "N4rGE_4DXYQ",
       "videoNo": 40,
       "durationMin": 4,
       "quiz": [
