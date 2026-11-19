@@ -76,4 +76,4 @@ Everything after the render is a database call, so no key ever appears in a shel
 
 ## Posting slots (IST, in `autopilot.publish_slots`)
 
-R2BOT 08:30 and 20:30 · Raj Study 07:00 and 19:00 · Raj Chaupal 07:15 and 19:15.
+R2BOT 20:30 and 23:30 (global: India evening, Europe afternoon/evening, US morning/lunch) · Raj Study 07:00 and 19:00 · Raj Chaupal 07:15 and 19:15.
