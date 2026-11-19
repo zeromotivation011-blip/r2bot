@@ -63,9 +63,9 @@ Everything after the render is a database call, so no key ever appears in a shel
 
 8. **Instagram.** `insert into autopilot.ig_queue (brand, video_url, caption, publish_at, queue_item_id)`
    with the public URL, a caption (title, hook, "link in bio", 5-8 hashtags, `#reels` not `#shorts`)
-   and the same slot. The `autopilot-ig-publish` cron posts it when due. Raj Study's Instagram is
-   not connected yet (its account needs a re-login in Meta Business Suite); skip it until
-   `autopilot.ig_accounts` has a `rajstudy` row.
+   and the same slot. The `autopilot-ig-publish` cron posts it when due. All three accounts are
+   connected (Raj Study since 19 Nov 2026, through its Facebook Page "Rajstudy RAS"). A brand with
+   no row in `autopilot.ig_accounts` is skipped.
 
 9. **Mark it.** `update autopilot.queue_items set status='scheduled', published_at=<slot>,
    payload = payload || {youtube_id, video_url, render:{voice, seconds}}`. That is what counts as
