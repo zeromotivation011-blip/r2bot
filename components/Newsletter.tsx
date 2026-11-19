@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { trackLead } from '@/lib/analytics';
 
 export function Newsletter() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle');
@@ -37,6 +38,7 @@ export function Newsletter() {
         );
       } catch { /* ignore */ }
       setStatus('ok');
+      trackLead('newsletter');
     } catch {
       setError('Network error. Please try again.');
       setStatus('err');

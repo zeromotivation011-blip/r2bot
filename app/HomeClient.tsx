@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
+import { trackLead } from '@/lib/analytics'
 import { loadSupabaseBrowser, hasSupabaseSessionCookie } from '@/lib/supabase/lazy'
 import { Reveal } from '@/components/Reveal'
 import { FeatureTour } from '@/components/FeatureTour'
@@ -447,7 +448,7 @@ function NewsletterCTA() {
         body: JSON.stringify({ email: email.trim(), source: 'home-digest', page: '/', honeypot: trap }),
       })
       const json = await res.json()
-      if (json.ok) { setStatus('ok'); setEmail('') }
+      if (json.ok) { setStatus('ok'); setEmail(''); trackLead('home-digest') }
       else { setStatus('err'); setErrText(json.error || 'Something went wrong.') }
     } catch {
       setStatus('err'); setErrText('Network error. Try again.')

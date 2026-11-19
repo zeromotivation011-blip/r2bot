@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { trackLead } from '@/lib/analytics'
 
 const STORAGE_KEY = 'r2bot_lead_captured'
 const PV_KEY = 'r2bot_pageviews'
@@ -56,6 +57,7 @@ export function LeadCaptureModal() {
       })
       const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; pending?: boolean }
       if (json.ok) {
+        trackLead('lead-modal')
         setPending(json.pending === true)
         setStatus('ok')
         try { window.localStorage.setItem(STORAGE_KEY, 'captured') } catch { /* ignore */ }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { trackLead } from '@/lib/analytics'
 
 const T = {
   en: { h: 'Get one robotics email a week', p: 'Plain English. Free. Unsubscribe in one click.', ph: 'you@email.com', b: 'Subscribe', ok: 'Thanks. Check your inbox.', err: 'Something went wrong. Please try again.' },
@@ -22,6 +23,7 @@ export default function InlineSignup({ lang = 'en' }: { lang?: 'en' | 'hi' | 'zh
         body: JSON.stringify({ email, source: 'newsletter', page: window.location.pathname, honeypot: trap }) })
       const d = (await r.json().catch(() => ({}))) as { ok?: boolean }
       setS(r.ok && d.ok ? 'ok' : 'err')
+      if (r.ok && d.ok) trackLead('inline-signup')
     } catch { setS('err') }
   }
   return (

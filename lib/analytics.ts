@@ -7,6 +7,15 @@
 
 type GtagFn = (command: 'event', name: string, params?: Record<string, unknown>) => void;
 
+/**
+ * An email signup that the server accepted (before double opt-in confirmation).
+ * GA4's recommended event name, so the control room can count signups per day
+ * from the Analytics API without reading the subscriber table.
+ */
+export function trackLead(source: string): void {
+  trackEvent('generate_lead', { source, page: typeof window === 'undefined' ? '' : window.location.pathname })
+}
+
 export function trackEvent(name: string, params?: Record<string, unknown>): void {
   if (typeof window === 'undefined') return;
   const gtag = (window as unknown as { gtag?: GtagFn }).gtag;

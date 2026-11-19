@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { trackLead } from '@/lib/analytics'
 
 /**
  * Shown on a course whose videos are not recorded yet, in place of ten rows
@@ -40,6 +41,7 @@ export default function CourseWaitlist({ courseSlug, courseTitle }: { courseSlug
       }
       setPending(data.pending === true)
       setState('ok')
+      trackLead('course-waitlist')
     } catch {
       setError('Network error. Please try again.')
       setState('err')
