@@ -40,8 +40,11 @@ Everything after the render is a database call, so no key ever appears in a shel
 4. **Look at it before it goes anywhere.** Pull 4 frames
    (`ffmpeg -ss <t> -i x.mp4 -frames:v 1 -vf scale=270:-1 f<t>.jpg`, stack with `hstack=4`) and read
    the image. Reject and re-render (change that scene's `broll`) if a clip contradicts the script,
-   shows a recognisable person doing something off-topic, or text is unreadable. Duration must be
-   20-90 s.
+   shows a recognisable person doing something off-topic, shows a *different* named place than the
+   caption (a Delhi stepwell under "Chand Baori"), or text is unreadable. Duration must be 20-90 s.
+   To fix one scene, search Pexels yourself, look at the candidates, and pin the one you want with
+   `"broll_id": <pexels video id>` on that scene; it overrides the keyword search. If no footage of the
+   real place exists, use honest generic footage (region, landscape, carving) rather than a look-alike.
 
 5. **Store.** `select autopilot.google_sync('signed_upload', '{"path":"<brand>/shorts/<slug>.mp4"}')`,
    read `upload_url` from `net._http_response` (wait ~3 s), then
