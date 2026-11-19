@@ -7,7 +7,7 @@ Content Autopilot system that runs across R2BOT, Raj Study and Raj Chaupal.
 |---|---|
 | `RULEBOOK.md` | Brand rules every run reads first. Adds to `CLAUDE.md`, never contradicts it. |
 | `NIGHTLY_RUN.md` | The exact steps of the nightly run. The scheduled task just says "follow this file", so changing the run means editing this file, not the task. |
-| `agents/*.md` | One file per agent role: what it does, what it must check, what it hands on. |
+| `agents/*.md` | One file per agent role: what it does, what it must check, what it hands on. `growth-roles.md` covers SEO, market signals, YouTube/Instagram growth and website freshness. |
 
 **Where the state lives:** the shared control room is the `autopilot` schema in the
 Raj Study Supabase project (`rbvoelnmckmibncatpyu`): `queue_items`, `runs`,

@@ -58,6 +58,16 @@ step and say "Producer: waiting for render pipeline" in the summary.
    "Approve = goes to video. Redo = new angle tomorrow. Reject = dropped."
    `insert into autopilot.outbox (brand, text, item_ids) values ('r2bot', <text>, array[<ids>]::uuid[]);`
 
+## 6b. Growth roles (see `agents/growth-roles.md`)
+
+Every night, briefly: Freshness Keeper (log problems in `autopilot.freshness`) and the Signal
+Strategist's daily scan (log findings in `autopilot.signals`). Record any new channel numbers in
+`autopilot.metrics_daily`.
+
+**Mondays only:** SEO Strategist and Signal Strategist each propose initiatives
+(`autopilot.initiatives`, status `proposed`), and one outbox message lists them for Ravi with the
+week's numbers: what grew, the top and bottom item, and the proposals. Keep it to one screen.
+
 ## 7. Finish
 
 1. `update autopilot.runs set status='done', finished_at=now(), summary=<3 lines> where id=<run id>;`
