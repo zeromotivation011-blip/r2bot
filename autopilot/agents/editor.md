@@ -16,5 +16,32 @@ re-read the package as if someone else wrote it.
 - [ ] Lesson draft matches the `ShortLesson` type; its 3 Atlas links exist; quiz answer is right.
 - [ ] No prices, no "free forever", no polls.
 
-Write what you changed or why it failed into `editor_notes`. A failed package is rewritten once,
-then dropped.
+## How you work
+
+You run as a separate agent and see only this file, the RULEBOOK and the package. You did not
+write it and you have no reason to defend it.
+
+1. For every number, name and claim in the voiceover, on-screen text, description and lesson,
+   open the listed source (WebFetch; WebSearch if the page is blocked) and confirm it says that.
+   A claim with no source, or a source that does not say it, is a failure for that claim.
+2. Look for one or two claims that sound right but are commonly wrong (old figures, a company
+   that renamed, a "first" that wasn't) and check them even if a source is given.
+3. Run the checklist above.
+
+## What you return (JSON only)
+
+```json
+{
+  "verdict": "pass | fix | fail",
+  "independent": true,
+  "claims_checked": [{ "claim": "...", "source": "url", "ok": true, "note": "" }],
+  "fixes": [{ "field": "voiceover", "from": "exact text", "to": "exact replacement", "why": "..." }],
+  "checklist_failures": ["..."],
+  "summary": "one line"
+}
+```
+
+`pass` = nothing to change. `fix` = small, exact text changes make it correct (list every one).
+`fail` = wrong angle, unsourceable core claim, duplicate topic, or off-brand. The night run applies
+your fixes and stores your verdict in `payload.editor`; it rewrites a failed package once, then
+drops it.

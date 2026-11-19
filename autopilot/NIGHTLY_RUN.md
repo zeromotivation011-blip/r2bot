@@ -45,8 +45,20 @@ lesson-page draft and sources.
 
 ## 4. Editor — check before Ravi sees it
 
-Follow `agents/editor.md`. A package that fails is rewritten once; if it fails again it is
-dropped and named in the run summary. Never send Ravi something the Editor failed.
+The Editor must not be the same mind that wrote the package. For each package, start a
+**fresh subagent** (Agent tool, `general-purpose`) and give it only three things: the text of
+`agents/editor.md`, `autopilot/RULEBOOK.md`, and the package JSON. Do not pass your notes,
+reasoning or search results — it re-checks every fact itself from the package's `sources`
+(WebFetch/WebSearch). It returns the verdict JSON described in `agents/editor.md`.
+
+- `pass` → queue it, and store the verdict in `payload.editor`.
+- `fix` → apply exactly the fixes it listed, then send the fixed package to a **new** fresh
+  Editor once. Second `fix` or `fail` → drop it.
+- `fail` → rewrite once from a new angle, then a new fresh Editor. Fails again → drop it.
+
+Dropped packages are named in the run summary. Never send Ravi something an Editor did not pass.
+If the Agent tool is unavailable, do the check yourself, set `payload.editor.independent=false`,
+and add "(self-checked)" after the title in the Telegram message.
 
 ## 5. Producer — videos for approved scripts
 
