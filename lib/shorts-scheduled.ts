@@ -361,6 +361,20 @@ export const SHORTS_SCHEDULED: ShortLesson[] = [
     demo: 'loop', loop: ['Camera sees the plant', 'Model: crop or weed?', 'Treat only the weed'],
     quiz: { q: 'What does a weeding robot do when it finds a weed?', options: ['Treats just that plant', 'Sprays the entire field', 'Stops and waits for a person'], answer: 0, why: 'Targeting individual weeds saves chemicals and protects the crop.' },
     atlas: [{ label: 'Weeding robot', href: '/atlas/concept/weeding-robot' }, { label: 'Agricultural robot', href: '/atlas/concept/agricultural-robot' }, { label: 'Computer vision', href: '/atlas/concept/computer-vision' }], next: 'fruit-recognition',
+  },  // Batch 4: made by the content autopilot's video factory (stock footage + neural voice), 19 Nov 2026.
+  {
+    slug: 'delivery-robot-road-crossing', title: 'How a Delivery Robot Crosses the Road Safely', course: 'work', ids: ['qpMnZ6_TTVA'], publishAt: '2026-11-20T15:00:00Z', videoPublished: '2026-11-20',
+    summary: 'A sidewalk delivery robot crosses the road the careful way: it stops, tracks every moving thing around it, and goes only when the gap is safe.',
+    what: [
+      'Sidewalk delivery robots travel at walking pace, up to about 6 km/h. Cameras around the body, plus radar and ultrasonic sensors, let the robot see pedestrians, bikes, cars and kerbs in every direction.',
+      'At a crossing the robot stops at the kerb, tracks each moving object, estimates its speed and waits for a safe gap. When a situation is unclear, a remote human operator can step in and guide it.',
+    ],
+    withIt: 'Small robots can deliver food and parcels over the last few blocks, crossing many roads a day without a driver.',
+    without: 'A robot that only reacted to what was directly in front of it could roll out in front of a car it had seen but not judged.',
+    limit: 'Busy junctions, unusual traffic and bad weather still confuse them, which is why they move slowly and human operators stay on call.',
+    demo: 'loop', loop: ['Watch every moving thing', 'Estimate speeds and gaps', 'Wait or cross'],
+    quiz: { q: 'What does a delivery robot do at a busy crossing?', options: ['Speeds up to get across first', 'Stops, tracks the traffic and waits for a safe gap', 'Asks a pedestrian to carry it across'], answer: 1, why: 'It judges how fast each car, bike and person is moving and crosses only when the gap is safe.' },
+    atlas: [{ label: 'Computer vision', href: '/atlas/concept/computer-vision' }, { label: 'Sensor fusion', href: '/atlas/concept/sensor-fusion' }, { label: 'Teleoperation', href: '/atlas/concept/teleoperation' }], next: 'warehouse-robots',
   },
 ]
 
@@ -373,4 +387,6 @@ export const SCHEDULED_EXTRA_VIDEOS: Record<string, { id: string; publishAt: str
   'a-star': [{ id: '6DqtYRYNMgk', publishAt: '2026-11-09T00:00:00Z' }],
   'robot-battery-life': [{ id: 'S6uXEE3MKBY', publishAt: '2026-11-15T00:00:00Z' }],
   'mars-rover-delay': [{ id: 'htGizeHrvz0', publishAt: '2026-11-21T00:00:00Z' }],
+  // RTK / wire-free version of the topic, made by the autopilot video factory (19 Nov).
+  'robot-lawn-mower': [{ id: '_lZ0noG8Tg4', publishAt: '2026-11-20T03:00:00Z' }],
 }

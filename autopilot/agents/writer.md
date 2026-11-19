@@ -49,3 +49,11 @@ Check `autopilot.video_stats` (brand r2bot) before picking a topic, so a new Sho
 The `lesson` follows the `r2bot-short-to-lesson` skill: summary, `what` (2 short paragraphs),
 `withIt`, `without`, `limit`, `demo` (one of echo / feedback / gears / tilt / loop), a 3-option quiz
 with `why`, 3 Atlas links that exist, and `next`.
+
+## B-roll keywords (required since 19 Nov 2026)
+
+Every scene in `scenes` carries `broll`: 2-4 plain English words a stock-video library would have for
+that moment ("robot lawn mower", "satellite orbit earth", "golf course"). The video factory searches
+Pexels with them. Concrete nouns beat ideas: "pedestrian crossing traffic", not "judging the gap".
+Avoid words that pull in people doing something unrelated ("camera" returned someone taping over
+CCTV; "operator" returned a music studio).

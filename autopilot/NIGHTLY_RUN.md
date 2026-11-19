@@ -73,8 +73,12 @@ and add "(self-checked)" after the title in the Telegram message.
 
 ## 5. Producer — videos for approved scripts
 
-Follow `agents/producer.md`. Until the render pipeline is connected (see that file), skip this
-step and say "Producer: waiting for render pipeline" in the summary.
+Follow `agents/producer.md` for every `approved` Short (up to 4 a night): render with
+`autopilot/factory/render_short.py`, look at four frames, upload to YouTube at
+`autopilot.next_slot('r2bot')`, queue the same file in `autopilot.ig_queue` for Instagram, add or
+attach the lesson page, and mark the item `scheduled`. Commit lesson-page changes to `main` in the
+same run, after `npm run type-check` passes, so each page is live hours before its video.
+If rendering fails twice for an item, leave it `approved`, say why in the summary, and move on.
 
 ## 6. Queue + Telegram
 

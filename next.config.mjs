@@ -184,6 +184,10 @@ const nextConfig = {
     return [
       ...simulatorAliases,
       ...atlasRobotCanonical,
+      // 19 Nov 2026: the Short _lZ0noG8Tg4 repeats the robot-lawn-mower lesson. Its YouTube
+      // description links here, so the slug it was written for points at the one lesson
+      // that owns the topic (the video is attached there via SCHEDULED_EXTRA_VIDEOS).
+      { source: '/shorts/robot-lawn-mower-boundary', destination: '/shorts/robot-lawn-mower', permanent: true },
       // The /academy/c/* course system is retired. It was a second Academy
       // whose only complete course duplicated the Spark MDX lessons, and whose
       // other three were "Coming Soon · notify me" waitlists that /start sent
