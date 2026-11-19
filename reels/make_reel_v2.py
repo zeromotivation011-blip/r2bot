@@ -15,7 +15,7 @@ FRAMES    = FPS * DURATION
 OUT_DIR   = "/sessions/upbeat-pensive-euler/mnt/r2bot/reels"
 FRAMES_DIR= "/tmp/r2bot_v2_frames"
 
-ELEVENLABS_KEY = "sk_7b8f5ea80a2eb8cd518d9824229e4c052f1390828c0673f0"
+ELEVENLABS_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 VOICE_ID       = "omLr0bN17lYIC1JWLSYV"
 
 # ── Brand Palette v2 ──────────────────────────────────────────────────────────

@@ -23,7 +23,7 @@ CYAN   = ( 60, 200, 240)
 GREEN  = ( 60, 220, 120)
 RED    = (220,  60,  60)
 
-KEY  = "sk_7b8f5ea80a2eb8cd518d9824229e4c052f1390828c0673f0"
+KEY  = os.getenv("ELEVENLABS_API_KEY", "")
 VID  = "omLr0bN17lYIC1JWLSYV"
 VS   = {"stability":0.48,"similarity_boost":0.82,"style":0.45,"use_speaker_boost":True}
 
