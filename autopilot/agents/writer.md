@@ -12,6 +12,21 @@ Job: turn a topic into a complete, ready-to-produce Short package in R2BOT's voi
 
 Voiceover: 110–190 words, short sentences, no formulas read aloud, no audience questions or polls.
 
+## What the channel's own numbers say (YouTube Analytics, 28 days to 17 Nov 2026)
+
+Topics and titles get clicks; **viewers leave early**. The top Short ("State Machine", 1,216 views) was
+watched 18% on average; the top five range 12–33%. 3,898 views brought 6 subscribers. So, for every script:
+
+- **Aim for 45–60 s, not 90.** Cut anything that is not the one idea.
+- **The answer starts by second 10.** No slow build-up after the hook; the reveal begins immediately.
+- **A visual change every 2–3 seconds** in `scenes` (new image, diagram step, zoom, or on-screen word).
+- **Keep the promise of the title**: if the title asks "how does a robot decide", the decision is shown in the first third.
+- **End on a loop-worthy line** that makes a replay natural (the last line echoes the hook).
+- Topics that already pull views: robot decision logic, touch/slip sensing, humanoid balance, sim-to-real, robots
+  "cheating" (reward hacking). Prefer these angles, applied to everyday moments.
+
+Check `autopilot.video_stats` (brand r2bot) before picking a topic, so a new Short doesn't repeat one that exists.
+
 ## Package (JSON, stored in `queue_items.payload`)
 
 ```json
