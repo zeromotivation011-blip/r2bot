@@ -44,8 +44,11 @@ Control room = Supabase project `rbvoelnmckmibncatpyu`, schema `autopilot` (use 
 
 ## 2. Scout — choose topics
 
-Follow `agents/scout.md`. Output: 2 topics, each with a topic_key (kebab-case), the everyday
-moment, the real use case and why it should get views. Never a topic already in
+First read `agents/topic-picker.md` and run its query on `autopilot.topic_performance`: it says
+what actually got views, how to score candidates (keep 7+ only, write `topic_score` into the
+payload) and the verification/decency gate every script must pass. Then follow `agents/scout.md`.
+Output: 2 topics, each with a topic_key (kebab-case), the everyday moment, the real use case and
+why it should get views. Never a topic already in
 `lib/shorts.ts`, `lib/shorts-scheduled.ts` or `autopilot.queue_items` for r2bot.
 
 ## 3. Writer — the package
