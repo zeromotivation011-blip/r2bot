@@ -23,6 +23,13 @@ Control room = Supabase project `rbvoelnmckmibncatpyu`, schema `autopilot` (use 
 3. New scripts: aim for **2 new Short scripts** per night, so there are always about 3 days of
    approved scripts ahead of the posting slots. If 6 or more are already approved and waiting,
    write none and say so.
+4. **Text quota (weekly plan: 20 text pieces).** Every Short already carries its lesson page.
+   On top of that, by night of the week:
+   - Mon–Thu: one new Atlas entry each night (`r2bot-atlas-entry` skill), queued as kind `page`.
+   - Wed: one buying-guide or Humanoid Tracker update (kind `page`).
+   - Fri: "Robot of the Week" (Short script + page + newsletter paragraph) and the weekly
+     "3 robotics stories that mattered" roundup (kind `post`).
+   Check `autopilot.content_progress` for the week so far and catch up on whatever is behind.
 
 ## 2. Scout — choose topics
 
