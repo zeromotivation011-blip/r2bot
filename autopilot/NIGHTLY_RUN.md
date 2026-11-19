@@ -25,7 +25,18 @@ Control room = Supabase project `rbvoelnmckmibncatpyu`, schema `autopilot` (use 
    write none and say so.
 4. **Text quota (weekly plan: 20 text pieces).** Every Short already carries its lesson page.
    On top of that, by night of the week:
-   - Mon–Thu: one new Atlas entry each night (`r2bot-atlas-entry` skill), queued as kind `page`.
+   - Mon–Thu: one Atlas page each night (`r2bot-atlas-entry` skill), queued as kind `page`.
+     **Improve before you add.** First read
+     `select * from autopilot.seo_opportunities where brand='r2bot' limit 15` (Search Console,
+     refreshed daily 06:37 IST). If an Atlas page there has 100+ impressions at position 5–15 and no
+     `page` queue item with topic_key `seo-<slug>` in the last 30 days, tonight's Atlas work is
+     that page: make its title and first sentence answer the exact queries it is shown for, and
+     bring the entry up to the house standard (beginner → advanced ladder, sources, related links).
+     19 Nov baseline: screw-theory (1,111 impressions, position 10.4, 0 clicks), bipedal-robot
+     (920, 8.2, 0), lqr-controller (265, 9.2), moveit (108, 10.5). Only when nothing qualifies,
+     write a new entry, chosen from `autopilot.web_snapshot` queries (kind `query`) we have no page for.
+     Do not judge R2BOT traffic by GA4 total users: most of it is automated direct traffic from
+     Singapore. Use Google clicks and organic sessions.
    - Wed: one buying-guide or Humanoid Tracker update (kind `page`).
    - Fri: "Robot of the Week" (Short script + page + newsletter paragraph) and the weekly
      "3 robotics stories that mattered" roundup (kind `post`).
