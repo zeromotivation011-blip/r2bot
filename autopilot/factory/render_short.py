@@ -104,6 +104,22 @@ def keywords(scene, fallback):
     return ' '.join(words[:4]) or fallback
 
 
+def pexels_by_id(vid, key, used):
+    """A scene can pin an exact clip with `broll_id` (a Pexels video id) once someone has looked at it."""
+    req = urllib.request.Request(f'https://api.pexels.com/videos/videos/{int(vid)}', headers={'Authorization': key, 'User-Agent': 'autopilot-factory'})
+    try:
+        v = json.load(urllib.request.urlopen(req, timeout=30))
+    except Exception as e:  # noqa: BLE001 - fall back to the keyword search
+        print('pexels id failed:', vid, e, file=sys.stderr)
+        return None
+    files = [f for f in v.get('video_files', []) if f.get('height') and f.get('width') and f['height'] >= f['width'] and 720 <= f['height'] <= 2160]
+    if not files:
+        return None
+    f = sorted(files, key=lambda f: abs(f['height'] - 1920))[0]
+    used.add(v['id'])
+    return {'id': v['id'], 'link': f['link'], 'url': v['url'], 'by': (v.get('user') or {}).get('name')}
+
+
 def pexels(query, key, used, min_dur):
     url = 'https://api.pexels.com/videos/search?' + urllib.parse.urlencode({'query': query, 'orientation': 'portrait', 'per_page': 15, 'size': 'medium'})
     req = urllib.request.Request(url, headers={'Authorization': key, 'User-Agent': 'autopilot-factory'})
@@ -218,7 +234,8 @@ def render(pkg, brand, out):
     used, credits, segs = set(), [], []
     for i, s in enumerate(scenes):
         d = s['end'] - s['start']
-        clip = pexels(keywords(s, b['fallback']), key, used, d) or pexels(b['fallback'], key, used, d)
+        clip = ((s.get('broll_id') and pexels_by_id(s['broll_id'], key, used))
+                or pexels(keywords(s, b['fallback']), key, used, d) or pexels(b['fallback'], key, used, d))
         seg = tmp / f'seg{i:02d}.mp4'
         vf = (f'scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1,fps={FPS},'
               f'eq=brightness=-0.06:saturation=1.05,format=yuv420p')
