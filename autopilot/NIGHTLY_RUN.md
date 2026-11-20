@@ -1,7 +1,13 @@
 # R2BOT nightly run
 
-Runs at 1:30 AM IST from a scheduled task. Goal: by 6:30 AM Ravi has a pack on Telegram he can
-approve in two minutes. Follow the steps in order. Keep the whole run frugal: no exploration
+Runs at 1:04 AM IST from a scheduled task. Goal: by 6:30 AM Ravi has tonight's reel briefs on
+Telegram and the website got its share of work.
+
+**Since 20 Nov 2026 Ravi makes the reels himself** and uploads them at www.r2bot.in/studio/upload;
+the Reel desk (`agents/reel-desk.md`, every 3 hours) posts them. This run no longer writes scripts
+for the video factory: it writes **reel briefs** he can film from.
+
+Follow the steps in order. Keep the whole run frugal: no exploration
 beyond what a step needs.
 
 Control room = Supabase project `rbvoelnmckmibncatpyu`, schema `autopilot` (use the Supabase
@@ -18,11 +24,10 @@ Control room = Supabase project `rbvoelnmckmibncatpyu`, schema `autopilot` (use 
 
 1. Redo first: `select * from autopilot.queue_items where brand='r2bot' and status='redo';`
    Each one gets a fresh angle (different hook, different everyday moment). Same topic_key.
-2. Approved scripts waiting for a video: `status='approved' and kind='short'`. These go to the
-   Producer (step 5).
-3. New scripts: aim for **2 new Short scripts** per night, so there are always about 3 days of
-   approved scripts ahead of the posting slots. If 6 or more are already approved and waiting,
-   write none and say so.
+2. Legacy only: Shorts Ravi approved before 20 Nov (`status='approved' and kind='short'` with no
+   `payload->>'inbox_id'`) still go to the Producer (step 5). Do not create new ones.
+3. Reel briefs: **3 per night**, so Ravi can pick 2 a day. If 9 or more briefs from the last 3
+   days are still unused (`status='idea'`, `payload->>'type'='brief'`), write 1 and say so.
 4. **Text quota (weekly plan: 20 text pieces).** Every Short already carries its lesson page.
    On top of that, by night of the week:
    - Mon–Thu: one Atlas page each night (`r2bot-atlas-entry` skill), queued as kind `page`.
@@ -38,7 +43,7 @@ Control room = Supabase project `rbvoelnmckmibncatpyu`, schema `autopilot` (use 
      Do not judge R2BOT traffic by GA4 total users: most of it is automated direct traffic from
      Singapore. Use Google clicks and organic sessions.
    - Wed: one buying-guide or Humanoid Tracker update (kind `page`).
-   - Fri: "Robot of the Week" (Short script + page + newsletter paragraph) and the weekly
+   - Fri: "Robot of the Week" (reel brief + page + newsletter paragraph) and the weekly
      "3 robotics stories that mattered" roundup (kind `post`).
    Check `autopilot.content_progress` for the week so far and catch up on whatever is behind.
 
@@ -47,15 +52,21 @@ Control room = Supabase project `rbvoelnmckmibncatpyu`, schema `autopilot` (use 
 First read `agents/topic-picker.md` and run its query on `autopilot.topic_performance`: it says
 what actually got views, how to score candidates (keep 7+ only, write `topic_score` into the
 payload) and the verification/decency gate every script must pass. Then follow `agents/scout.md`.
-Output: 2 topics, each with a topic_key (kebab-case), the everyday moment, the real use case and
+Output: 3 topics, each with a topic_key (kebab-case), the everyday moment, the real use case and
 why it should get views. Never a topic already in
 `lib/shorts.ts`, `lib/shorts-scheduled.ts` or `autopilot.queue_items` for r2bot.
 
-## 3. Writer — the package
+## 3. Writer — the brief
 
-Follow `agents/writer.md`. For each topic produce one JSON package (see that file) with:
-hook, voiceover, on-screen text, scene list, title, description, tags, pinned comment,
-lesson-page draft and sources.
+For each topic, one JSON brief (`"type":"brief"`) that Ravi can film from without researching:
+- `why`: the pattern it fits and its evidence (vs_avg from `topic_performance`, search demand).
+- `hook`: on-screen line (at most 8 words) + first spoken sentence. It must be paid off in the video.
+- `facts`: 5-7 short, checked facts in the order they'd be said, **each with its source URL**.
+  Mark anything that is a legend or disputed.
+- `shots`: 4-6 visual ideas, honest (no look-alike places).
+- `title` (YouTube, named concept), `ig_caption_seed`, `lesson_page` (does a lesson already exist?
+  `grep -rn "title:" lib/shorts*.ts`).
+`agents/writer.md` still applies for voice and style.
 
 ## 4. Editor — check before Ravi sees it
 
@@ -74,9 +85,10 @@ Dropped packages are named in the run summary. Never send Ravi something an Edit
 If the Agent tool is unavailable, do the check yourself, set `payload.editor.independent=false`,
 and add "(self-checked)" after the title in the Telegram message.
 
-## 5. Producer — videos for approved scripts
+## 5. Producer — legacy only
 
-Follow `agents/producer.md` for every `approved` Short (up to 4 a night): render with
+Ravi's own reels are posted by the Reel desk, not here. Only for Shorts approved before 20 Nov:
+follow `agents/producer.md` (up to 4 a night): render with
 `autopilot/factory/render_short.py`, look at four frames, upload to YouTube at
 `autopilot.next_slot('r2bot')`, queue the same file in `autopilot.ig_queue` for Instagram, add or
 attach the lesson page, and mark the item `scheduled`. Commit lesson-page changes to `main` in the
@@ -85,15 +97,14 @@ If rendering fails twice for an item, leave it `approved`, say why in the summar
 
 ## 6. Queue + Telegram
 
-1. For each package that passed:
+1. For each brief that passed:
    `insert into autopilot.queue_items (brand, kind, title, topic_key, status, payload, created_by)
-    values ('r2bot','short', <title>, <topic_key>, 'awaiting_approval', <package jsonb>, 'nightly')
-    on conflict (brand, kind, topic_key) do update set status='awaiting_approval', payload=excluded.payload
-    returning id;`
-2. One outbox message for the whole pack. Text = for each item: the title, the hook line, and
-   the voiceover (shortened to fit; Telegram allows ~4,000 characters in total). End with one line:
-   "Approve = goes to video. Redo = new angle tomorrow. Reject = dropped."
-   `insert into autopilot.outbox (brand, text, item_ids) values ('r2bot', <text>, array[<ids>]::uuid[]);`
+    values ('r2bot','short', <title>, <topic_key>, 'idea', <brief jsonb>, 'nightly')
+    on conflict (brand, kind, topic_key) do nothing returning id;`
+2. One outbox message for all briefs, **no buttons** (`item_ids '{}'`). For each brief: the title,
+   the hook, the facts as short lines with a source domain after each, and the shot ideas. Keep it
+   under ~3,500 characters. End with: "Film any of these and upload at www.r2bot.in/studio/upload."
+   Text pages queued as kind `page` still go in their own message with Approve buttons, as before.
 
 ## 6b. Growth roles (see `agents/growth-roles.md`)
 
