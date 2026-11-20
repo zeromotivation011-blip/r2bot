@@ -17,6 +17,7 @@ export default function robots(): MetadataRoute.Robots {
           '/signup',
           '/auth/',
           '/verify/',
+          '/studio/', // private reel upload tool
           // Parked features — kept in the codebase but hidden from nav and search
           // until we hit scale (see CLAUDE.md §6). Not linked anywhere public.
           '/schools',
