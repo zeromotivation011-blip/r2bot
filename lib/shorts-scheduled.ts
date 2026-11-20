@@ -376,6 +376,20 @@ export const SHORTS_SCHEDULED: ShortLesson[] = [
     quiz: { q: 'What does a delivery robot do at a busy crossing?', options: ['Speeds up to get across first', 'Stops, tracks the traffic and waits for a safe gap', 'Asks a pedestrian to carry it across'], answer: 1, why: 'It judges how fast each car, bike and person is moving and crosses only when the gap is safe.' },
     atlas: [{ label: 'Computer vision', href: '/atlas/concept/computer-vision' }, { label: 'Sensor fusion', href: '/atlas/concept/sensor-fusion' }, { label: 'Teleoperation', href: '/atlas/concept/teleoperation' }], next: 'warehouse-robots',
   },
+  {
+    slug: 'behavior-tree', title: 'Behavior Tree: How a Robot Picks a Plan B', course: 'control', ids: ['3dANObBK5x0'], publishAt: '2026-11-20T18:00:00Z', videoPublished: '2026-11-20',
+    summary: "A behavior tree organises a robot's choices as branches of small tasks. When one option fails, the tree simply tries the next, so a Plan B is built in.",
+    what: [
+      'A behavior tree is a set of small tasks arranged like branches. A signal called a tick is sent through the tree again and again, and every task it reaches answers with one of three words: success, failure, or running (still working on it).',
+      'Parent nodes decide what to do with those answers. A fallback node tries its children one by one until one succeeds, which is how a robot gets a Plan B. The idea was developed in the video game industry and later spread to robotics.',
+    ],
+    withIt: 'Complicated behaviour is built from small, reusable pieces, and a robot that hits a problem has a clear list of things to try next.',
+    without: 'Every possible situation would need its own hand-written rule, and a robot that met something unexpected would simply stop or loop.',
+    limit: 'A big tree can still be hard to read and tune, and a tree only knows the fixes someone gave it. If every branch fails, the robot gives up.',
+    demo: 'loop', loop: ['Tick the tree', 'Each task: success, failure or running', 'On failure, try the next branch'],
+    quiz: { q: 'In a behavior tree, what does a fallback node do when its first option fails?', options: ['It shuts the robot down', 'It tries its next option', 'It repeats the same option forever'], answer: 1, why: 'A fallback node works through its options in order until one succeeds. That is the built-in Plan B.' },
+    atlas: [{ label: 'Behaviour trees', href: '/atlas/concept/behavior-trees' }, { label: 'Finite state machine', href: '/atlas/concept/finite-state-machine' }, { label: 'Nav2', href: '/atlas/concept/nav2' }], next: 'state-machine',
+  },
 ]
 
 /**

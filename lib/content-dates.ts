@@ -86,7 +86,7 @@ export function pageUpdated(path: string): Date {
 
 /** Dates whole content groups were last extended, for their generated pages. */
 export const GROUP_UPDATED = {
-  shorts: new Date('2026-11-19T00:00:00.000Z'),
+  shorts: new Date('2026-11-20T00:00:00.000Z'),
   shortsTranslations: new Date('2026-11-08T00:00:00.000Z'),
   aiRobotics: new Date('2026-11-06T00:00:00.000Z'),
   simulators: new Date('2026-10-20T00:00:00.000Z'),
