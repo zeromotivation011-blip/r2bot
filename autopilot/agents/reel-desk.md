@@ -119,7 +119,8 @@ is, Reject drops it.
   - Raj Chaupal: Hindi hook + year.
   - Add `#shorts` at the end.
 - **Description:** 2-3 lines saying what the viewer learns, then the page link:
-  - R2BOT: `https://www.r2bot.in/shorts/<slug>`.
+  - R2BOT: put `Full 1-minute lesson + quiz: https://www.r2bot.in/shorts/<slug>` as the **first line**
+    (only the first lines show without tapping "more"; the website is a goal of its own).
   - Raj Study: the most relevant existing rajstudy.com page; check it returns 200.
   - Raj Chaupal: the story page if one exists; otherwise rajchaupal.com.
 

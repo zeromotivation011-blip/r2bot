@@ -40,6 +40,8 @@ Control room = Supabase project `rbvoelnmckmibncatpyu`, schema `autopilot` (use 
      19 Nov baseline: screw-theory (1,111 impressions, position 10.4, 0 clicks), bipedal-robot
      (920, 8.2, 0), lqr-controller (265, 9.2), moveit (108, 10.5). Only when nothing qualifies,
      write a new entry, chosen from `autopilot.web_snapshot` queries (kind `query`) we have no page for.
+     A page rewrite the Editor dropped (screw-theory was dropped on 20 Nov) is retried first the next
+     night with the Editor's notes; the biggest search pages must not wait behind new entries.
      Do not judge R2BOT traffic by GA4 total users: most of it is automated direct traffic from
      Singapore. Use Google clicks and organic sessions.
    - Wed: one buying-guide or Humanoid Tracker update (kind `page`).
