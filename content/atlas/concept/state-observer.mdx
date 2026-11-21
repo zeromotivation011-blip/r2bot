@@ -14,7 +14,7 @@ tags:
   - state-space
 seeAlso:
   - kalman-filter
-  - linear-quadratic-regulator
+  - lqr-controller
   - closed-loop-control
   - sensor-fusion
   - finite-state-machine
@@ -44,7 +44,7 @@ quizQuestion:
     some of it — an observer estimates the rest from a model plus available measurements.
 ---
 
-Modern controllers like [LQR](/atlas/concept/linear-quadratic-regulator) want the robot's *full state* — position, velocity, and more. But sensors rarely give you everything: an encoder measures angle, not velocity; a joint feels position, not the external load. A **state observer** fills the gap.
+Modern controllers like [LQR](/atlas/concept/lqr-controller) want the robot's *full state* — position, velocity, and more. But sensors rarely give you everything: an encoder measures angle, not velocity; a joint feels position, not the external load. A **state observer** fills the gap.
 
 ## The idea
 
@@ -75,4 +75,4 @@ You can't control what you can't see. Observers are how robots act on states no 
 
 ## Related
 
-[Kalman filter](/atlas/concept/kalman-filter) · [Linear quadratic regulator](/atlas/concept/linear-quadratic-regulator) · [Sensor fusion](/atlas/concept/sensor-fusion) · [Closed-loop control](/atlas/concept/closed-loop-control)
+[Kalman filter](/atlas/concept/kalman-filter) · [Linear quadratic regulator](/atlas/concept/lqr-controller) · [Sensor fusion](/atlas/concept/sensor-fusion) · [Closed-loop control](/atlas/concept/closed-loop-control)

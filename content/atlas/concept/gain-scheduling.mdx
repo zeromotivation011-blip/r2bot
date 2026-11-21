@@ -16,7 +16,7 @@ seeAlso:
   - pid-controller
   - feedback-linearization
   - adaptive-control
-  - linear-quadratic-regulator
+  - lqr-controller
 lastReviewed: 2026-07-10T00:00:00.000Z
 sources:
   - title: 'Gain scheduling (control theory)'
@@ -47,7 +47,7 @@ A controller tuned perfectly for a drone hovering may be sluggish at high speed;
 
 ## The idea
 
-Divide the robot's operating range into regions, design a good linear controller (a [PID](/atlas/concept/pid-controller) or [LQR](/atlas/concept/linear-quadratic-regulator)) for each, and switch or smoothly interpolate between them based on a measured **scheduling variable** — airspeed, joint angle, payload mass, rotor RPM.
+Divide the robot's operating range into regions, design a good linear controller (a [PID](/atlas/concept/pid-controller) or [LQR](/atlas/concept/lqr-controller)) for each, and switch or smoothly interpolate between them based on a measured **scheduling variable** — airspeed, joint angle, payload mass, rotor RPM.
 
 ```diagram
 { "type": "flow", "title": "Pick the controller that fits the moment", "nodes": ["Measure condition", "Look up / blend gains", "Apply controller", "Robot"], "caption": "As the scheduling variable changes, the effective controller changes with it — approximating one nonlinear controller with a family of linear ones." }
@@ -71,4 +71,4 @@ Gain scheduling is how theory-clean linear control survives contact with nonline
 
 ## Related
 
-[PID controller](/atlas/concept/pid-controller) · [Adaptive control](/atlas/concept/adaptive-control) · [Feedback linearization](/atlas/concept/feedback-linearization) · [LQR](/atlas/concept/linear-quadratic-regulator)
+[PID controller](/atlas/concept/pid-controller) · [Adaptive control](/atlas/concept/adaptive-control) · [Feedback linearization](/atlas/concept/feedback-linearization) · [LQR](/atlas/concept/lqr-controller)

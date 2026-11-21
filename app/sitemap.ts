@@ -69,7 +69,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // duplicate concepts, plus the robots that live canonically at /robots/<slug>
   // (five robots previously had two indexable URLs each and competed with
   // themselves — see lib/canonical-map.ts).
-  const REDIRECTED_ATLAS = new Set(['drone-uav', 'field-programmable-gate-array', 'ce-marking-robots']);
+  const REDIRECTED_ATLAS = new Set([
+    'drone-uav',
+    'field-programmable-gate-array',
+    'ce-marking-robots',
+    'state-machine',
+    'linear-quadratic-regulator',
+  ]);
   const atlas = atlasEntries
     .filter((e) => !REDIRECTED_ATLAS.has(e.slug))
     .filter((e) => !(e.type === 'robot' && ATLAS_ROBOTS_REDIRECTED.has(e.slug)))

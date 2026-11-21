@@ -227,6 +227,10 @@ const nextConfig = {
       // Same entry written twice. The fuller version (585 words vs 331, and
       // three inbound links vs one) keeps the URL.
       { source: '/atlas/concept/ce-marking-robots', destination: '/atlas/concept/ce-marking', permanent: true },
+      // 22 Nov 2026: two entries owned "what is LQR". lqr-controller is the one
+      // Google ranks (~900 impressions, pos 9); it was rewritten from sources and
+      // absorbs linear-quadratic-regulator. One owner per query.
+      { source: '/atlas/concept/linear-quadratic-regulator', destination: '/atlas/concept/lqr-controller', permanent: true },
       // The by-line is an editorial identity now, at the owner's request, so
       // the author page moved off a URL that carried a personal name.
       { source: '/author/ravi', destination: '/about/how-this-is-written', permanent: true },
