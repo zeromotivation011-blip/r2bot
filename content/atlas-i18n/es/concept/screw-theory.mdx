@@ -1,0 +1,88 @@
+---
+title: Teoría de tornillos
+summary: >-
+  La teoría de tornillos describe cada movimiento de un objeto rígido como un único movimiento de
+  tornillo (girar alrededor de un eje mientras se desliza a lo largo de él) y cada fuerza sobre ese
+  objeto como un tornillo correspondiente de fuerza y par. La robótica la usa para escribir el
+  movimiento, la velocidad y las fuerzas de un brazo robótico en un solo lenguaje compacto.
+laymanExplanation: >-
+  Piensa en un tornillo que entra en la madera: gira y avanza al mismo tiempo. La teoría de tornillos
+  dice que cualquier forma en que se mueva un objeto sólido, por complicada que sea, se puede
+  describir como un solo movimiento de ese tipo alrededor de una línea. Una bisagra es un tornillo
+  que solo gira; un cajón es un tornillo que solo se desliza. Con las fuerzas pasa lo mismo: un
+  empuje más un giro a lo largo de una línea. Los brazos robóticos están hechos de bisagras y
+  correderas, así que esta única idea describe el brazo entero.
+sourceLastReviewed: 2026-11-21
+reviewed: 2026-11-21
+---
+
+La **teoría de tornillos** es una forma de describir el movimiento y la fuerza en la que cada movimiento de un objeto sólido es un único **movimiento de tornillo**: un giro alrededor de un eje combinado con un deslizamiento a lo largo de ese mismo eje. Toda fuerza sobre el objeto, incluido cualquier efecto de giro, se describe del mismo modo. La robótica la usa porque permite que un conjunto compacto de números describa qué hacen las articulaciones de un brazo robótico, a qué velocidad se mueve la mano y con qué fuerza puede empujar.
+
+## Empieza aquí: el tornillo en tu mano
+
+Enrosca un tornillo en un trozo de madera. Gira y avanza a la vez, a lo largo de una sola línea. Ahora fíjate en dos extremos cotidianos:
+
+- Una **puerta en su bisagra** gira, pero nunca se desliza a lo largo de la línea de la bisagra. Es un tornillo sin avance.
+- Un **cajón** se desliza, pero nunca gira. Es un tornillo que solo avanza.
+
+Lo sorprendente es que *cualquier* forma en que se mueva un objeto rígido, por retorcida que parezca la trayectoria, se puede describir como un solo movimiento de tornillo alrededor de una línea en el espacio. Este resultado se conoce como **teorema de Chasles–Mozzi** ([Lynch & Park, cap. 3](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)). Así, en lugar de seguir un enredo de rotaciones y traslaciones, solo necesitas el eje del tornillo, cuánto giró y cuánto se deslizó.
+
+## Cómo funciona: torsores de velocidad, torsores de fuerza y paso
+
+La teoría de tornillos ofrece dos objetos que se corresponden, cada uno una lista de seis números ([Lynch & Park, cap. 3](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)):
+
+| Objeto | Describe | Seis números formados por | Imagen cotidiana |
+|---|---|---|---|
+| **Torsor de velocidad** (*twist*) | Cómo se mueve un cuerpo en este instante | velocidad angular (3) + velocidad lineal (3) | un tornillo que gira y avanza |
+| **Torsor de fuerza** (*wrench*) | La fuerza que actúa sobre un cuerpo | momento, es decir, efecto de giro (3) + fuerza (3) | girar un destornillador mientras empujas |
+
+El **paso** de un tornillo es cuánto se desliza a lo largo de su eje por cada unidad de rotación. Las articulaciones de un robot encajan perfectamente en esta idea:
+
+| Articulación | Qué hace | Paso |
+|---|---|---|
+| De revolución (bisagra) | solo gira | cero |
+| Prismática (corredera) | solo se traslada | infinito (traslación pura) |
+| Helicoidal (husillo) | gira y se traslada a la vez | un valor fijo y finito |
+
+Los torsores de velocidad y de fuerza encajan entre sí: el producto escalar de un torsor de velocidad y un torsor de fuerza (multiplica las entradas correspondientes y súmalas) da la **potencia**, el ritmo al que la fuerza realiza trabajo sobre el cuerpo en movimiento ([Lynch & Park, cap. 3](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)). Por eso un mismo marco sirve tanto para «¿adónde va la mano?» como para «¿con cuánta fuerza puede empujar?».
+
+```diagram
+{ "type": "flow", "title": "De un eje a un brazo robótico completo", "nodes": ["Cada articulación = un eje de tornillo", "La articulación se mueve → torsor de velocidad", "Encadenar las articulaciones (producto de exponenciales)", "Pose de la mano + jacobiano"], "caption": "Una bisagra es un tornillo de paso cero; una corredera, uno de paso infinito. Encadenar el movimiento de tornillo de cada articulación da la posición de la mano del robot, y los ejes de tornillo de las articulaciones forman las columnas de su jacobiano." }
+```
+
+## Dónde la verás
+
+- **Cinemática de brazos robóticos.** En la formulación del *producto de exponenciales*, la [cinemática directa](/atlas/concept/forward-kinematics) se escribe tomando la pose de la mano con todas las articulaciones en cero y aplicando después, una a una, el movimiento de tornillo de cada articulación. Solo necesitas los ejes de las articulaciones y esa pose «de inicio», no un sistema de referencia en cada eslabón ([Lynch & Park, cap. 4](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)).
+- **El jacobiano.** El [jacobiano](/atlas/concept/jacobian), que convierte las velocidades de las articulaciones en la velocidad de la mano, tiene como columnas los ejes de tornillo de las articulaciones (en la pose actual) ([Lynch & Park, cap. 5](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)).
+- **Agarre y contacto.** Cuando unos dedos sujetan un objeto, cada contacto solo puede empujar en ciertas direcciones; describir esas fuerzas como torsores de fuerza permite comprobar si un agarre resiste cualquier empuje ([Murray, Li & Sastry, cap. 5](https://pages.github.berkeley.edu/EECS-106/fa24-site/assets/MLS.pdf)).
+- **Enseñanza.** El libro de texto *Modern Robotics* (Lynch & Park, 2017), cuya versión preliminar se puede leer gratis en línea, construye todo su tratamiento de la cinemática sobre los tornillos.
+
+## Para profundizar
+
+Para quien maneje el álgebra lineal: el conjunto de poses de un cuerpo rígido forma el grupo **SE(3)**, y los torsores de velocidad viven en su álgebra de Lie **se(3)**. Un movimiento de tornillo de ángulo θ alrededor del eje S es la exponencial matricial e^[S]θ, así que una cadena de articulaciones es un producto de exponenciales: T(θ) = e^[S₁]θ₁ · e^[S₂]θ₂ ⋯ e^[Sₙ]θₙ · M, donde M es la pose de inicio ([Lynch & Park, caps. 3–4](https://hades.mech.northwestern.edu/index.php/Modern_Robotics); [Murray, Li & Sastry, caps. 2–3](https://pages.github.berkeley.edu/EECS-106/fa24-site/assets/MLS.pdf)).
+
+Frente a los [parámetros de Denavit-Hartenberg](/atlas/concept/denavit-hartenberg), este enfoque evita las reglas para colocar un sistema de referencia en cada eslabón, y los ejes de las articulaciones se leen directamente en un dibujo del robot. El precio es más matemáticas al principio.
+
+La teoría es mucho más antigua que los robots: *A Treatise on the Theory of Screws* (Cambridge, 1900), de Robert Stawell Ball, expuso los tornillos, los torsores de velocidad y los de fuerza para la mecánica mucho antes de que nadie los aplicara a brazos robóticos ([Ball, 1900](https://archive.org/download/theoryscrews00ballrich/theoryscrews00ballrich.pdf)).
+
+## Por qué importa
+
+La teoría de tornillos convierte el movimiento de un robot en geometría que se puede ver: cada articulación es una línea en el espacio, y cada movimiento y cada fuerza se miden a lo largo de esas líneas. Así, cinemática, velocidad y fuerza pasan a ser un solo tema en lugar de tres, y por eso los cursos modernos de robótica la enseñan.
+
+## Preguntas frecuentes
+
+### ¿Qué es la teoría de tornillos en palabras sencillas?
+
+Es la idea de que cualquier movimiento de un objeto sólido se puede describir como un solo movimiento parecido al de un tornillo, girando alrededor de una línea mientras se desliza a lo largo de ella, y de que cualquier fuerza sobre el objeto se puede describir igual. Los brazos robóticos son cadenas de bisagras y correderas, así que esto da un solo lenguaje para todo el brazo.
+
+### ¿Qué diferencia hay entre un torsor de velocidad y un torsor de fuerza?
+
+Un torsor de velocidad (*twist*) describe el movimiento: lo rápido que el cuerpo gira y se desplaza. Un torsor de fuerza (*wrench*) describe la fuerza: con cuánta intensidad se le empuja y se le retuerce. Ambos son seis números construidos alrededor de un eje de tornillo, y su producto escalar da la potencia.
+
+### ¿Es mejor la teoría de tornillos que Denavit-Hartenberg?
+
+Ninguna está mal; las dos dan la misma pose del robot. La teoría de tornillos (producto de exponenciales) no necesita un sistema de referencia en cada eslabón y sus ejes se leen fácilmente en un dibujo. Denavit-Hartenberg usa solo cuatro números por articulación, pero cada eslabón necesita un sistema de referencia colocado según reglas estrictas ([Lynch & Park, apéndice C](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)).
+
+## Relacionado
+
+[Cinemática directa](/atlas/concept/forward-kinematics) · [Jacobiano](/atlas/concept/jacobian) · [Denavit-Hartenberg](/atlas/concept/denavit-hartenberg) · [Transformación homogénea](/atlas/concept/homogeneous-transformation) · [Velocidad angular](/atlas/concept/angular-velocity)

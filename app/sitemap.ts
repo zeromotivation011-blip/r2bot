@@ -18,6 +18,7 @@ import { listPublishedCourses, hasVideo } from '@/lib/courses';
 import { GROUP_UPDATED, pageUpdated as at } from '@/lib/content-dates';
 import { ATLAS_ROBOTS_REDIRECTED } from '@/lib/canonical-map';
 import { getAllDailyLifeArticles } from '@/lib/daily-life-articles/loader';
+import { listTranslations, atlasPath } from '@/lib/atlas-i18n';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -78,6 +79,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     }));
+
+  // Reviewed Atlas translations only (lib/atlas-i18n.ts). lastmod is the date
+  // of the review pass, the last time that page's content really changed.
+  const atlasTranslations = listTranslations().map((t) => ({
+    url: `${BASE}${atlasPath(t.type, t.slug, t.lang)}`,
+    lastModified: new Date(t.reviewed),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
 
   const lens = lensVideos.map((v) => ({
     url: `${BASE}/lens/${v.slug}`,
@@ -229,6 +239,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...aiAndRegional,
     ...simulators,
     ...atlas,
+    ...atlasTranslations,
     ...buildProjects,
     ...blogPosts,
     ...lens,

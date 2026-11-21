@@ -312,6 +312,15 @@ comprehensive sitemap to Search Console; own the result for every robotics conce
 canonical docs.ros.org URL. docs.nav2.org currently 404s on every path and has no sitemap, so Nav2
 claims have to be verified against the message/action definitions in the nav2_msgs source instead.
 
+**Translated Atlas (21 Nov 2026).** `/es|pt|hi|zh|de|ja/atlas/<type>/<slug>` render reviewed
+translations from `content/atlas-i18n/<lang>/<type>/<slug>.mdx` (own tree: anything under
+`content/atlas` becomes an English entry and is seeded). A file without `reviewed:` is ignored, so
+nothing ships before the independent native review; untranslated slugs 404 (`dynamicParams = false`).
+hreflang comes from `atlasHreflang()` in `lib/hreflang.ts` for both the English page and each
+translation; the English page links its translations ("Also in"); the sitemap lists them. The FAQ
+heading is the language's own ("## Preguntas frecuentes" etc., see `T` in
+`components/atlas/AtlasTranslatedEntry.tsx`).
+
 **Atlas entry template:** `# Name` → one-sentence answer → What it is → How it works → Where you'll
 see it → Why it matters → Related (3–5 internal links) → Sources (2–3). Each entry spans the ladder
 from a beginner's first question to advanced detail. Bar: better than the top result on the internet.

@@ -9,11 +9,12 @@
 import { getZhTopic } from '@/lib/ai-robotics-zh'
 import { getHiTopic } from '@/lib/ai-robotics-hi'
 import { getEsTopic } from '@/lib/ai-robotics-es'
+import { ATLAS_LANG_META, translationLangs } from '@/lib/atlas-i18n'
 
 const BASE = 'https://www.r2bot.in'
 
-type Locale = 'en' | 'zh-CN' | 'hi' | 'es'
-const PREFIX: Record<Locale, string> = { en: '', 'zh-CN': '/zh', hi: '/hi', es: '/es' }
+type Locale = 'en' | 'zh-CN' | 'hi' | 'es' | 'pt-BR' | 'de' | 'ja'
+const PREFIX: Record<Locale, string> = { en: '', 'zh-CN': '/zh', hi: '/hi', es: '/es', 'pt-BR': '/pt', de: '/de', ja: '/ja' }
 
 /** Build a reciprocal map for `path` across the given locales; always adds x-default → en. */
 export function hreflangFor(path: string, locales: Locale[] = ['en', 'zh-CN', 'hi', 'es']): Record<string, string> {
@@ -38,4 +39,17 @@ export function aiTopicHreflang(slug: string): Record<string, string> {
   if (getHiTopic(slug)) locales.push('hi')
   if (getEsTopic(slug)) locales.push('es')
   return hreflangFor(`/ai-robotics/${slug}`, locales)
+}
+
+/**
+ * Atlas entries exist per language only where a reviewed translation exists
+ * (lib/atlas-i18n.ts). Used by the English page AND every translation, so the
+ * cluster is always reciprocal. Returns undefined when there is no translation,
+ * so an English-only entry carries no hreflang at all (same as before).
+ */
+export function atlasHreflang(type: string, slug: string): Record<string, string> | undefined {
+  const langs = translationLangs(type, slug)
+  if (langs.length === 0) return undefined
+  const locales: Locale[] = ['en', ...langs.map((l) => ATLAS_LANG_META[l].hreflang as Locale)]
+  return hreflangFor(`/atlas/${type}/${slug}`, locales)
 }
