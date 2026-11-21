@@ -160,6 +160,10 @@ def ass_escape(s):
 def build_ass(words, scenes, total, brand):
     b = BRANDS[brand]
     font = b['font']
+    # Letter spacing breaks Devanagari shaping (matras drew as dotted circles on 22 Nov 2026), and
+    # Inter has no Devanagari: a Hindi brand name uses the brand's own font with no extra spacing.
+    hindi_name = any('\u0900' <= ch <= '\u097f' for ch in b['name'])
+    brand_font, brand_spacing = (font, 0) if hindi_name else ('Inter', 1)
     head = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {W}
@@ -170,7 +174,7 @@ WrapStyle: 0
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Cap,{font},84,&H00FFFFFF,&H00FFFFFF,&H00101010,&H64000000,1,0,0,0,100,100,0,0,1,6,2,2,80,80,560,1
 Style: Head,{font},64,&H00FFFFFF,&H00FFFFFF,&H00000000,{b['accent'].replace('&H00', '&H30')},1,0,0,0,100,100,0,0,3,18,0,8,90,90,230,1
-Style: Brand,Inter,40,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,1,0,0,0,100,100,1,0,3,10,0,8,60,60,90,1
+Style: Brand,{brand_font},40,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,1,0,0,0,100,100,{brand_spacing},0,3,10,0,8,60,60,90,1
 Style: Handle,Inter,46,&H00FFFFFF,&H00FFFFFF,&H00000000,&H78000000,1,0,0,0,100,100,1,0,3,12,0,2,60,60,150,1
 
 [Events]
