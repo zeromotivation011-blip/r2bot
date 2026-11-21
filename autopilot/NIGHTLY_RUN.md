@@ -7,6 +7,11 @@ Telegram and the website got its share of work.
 the Reel desk (`agents/reel-desk.md`, every 3 hours) posts them. This run no longer writes scripts
 for the video factory: it writes **reel briefs** he can film from.
 
+> **Change on 21 Nov 2026 (late):** Atlas entries, rewrites, translations, ROS 2 pages and all other website
+> content now come from the CONTENT RUNS (control-room playbook `r2bot` / `content`, every 6 hours, shared task list
+> `autopilot.content_tasks`). This night run does only: 3 reel briefs (section 3), the Producer for legacy approved
+> Shorts, and a health check that content runs ran today. Skip the Atlas/text quota steps below.
+
 Follow the steps in order. Keep the whole run frugal: no exploration
 beyond what a step needs.
 
