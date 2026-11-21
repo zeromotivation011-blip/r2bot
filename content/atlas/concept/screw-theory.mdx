@@ -4,9 +4,9 @@ slug: screw-theory
 bucket: concept
 category: fundamentals
 summary: >-
-  Screw theory is the elegant idea that any rigid-body motion is a screw — a rotation about an
-  axis combined with a translation along it — giving modern robotics a clean, unified language
-  for velocity, force, and kinematics.
+  Screw theory describes every movement of a rigid object as one screw motion (turning about a
+  single axis while sliding along it) and every force on it as a matching screw of force and
+  torque. Robotics uses it to write a robot arm's motion, speed and forces in one compact language.
 difficulty: 4
 tags:
   - math
@@ -16,67 +16,109 @@ seeAlso:
   - homogeneous-transformation
   - forward-kinematics
   - jacobian
+  - denavit-hartenberg
   - angular-velocity
-lastReviewed: 2026-07-10T00:00:00.000Z
+lastReviewed: 2026-11-21T00:00:00.000Z
 sources:
-  - title: 'Modern Robotics — Lynch & Park'
+  - title: 'Modern Robotics: Mechanics, Planning, and Control — Lynch & Park (Cambridge University Press, 2017; free preprint)'
     url: 'https://hades.mech.northwestern.edu/index.php/Modern_Robotics'
-  - title: 'Screw theory (Wikipedia)'
-    url: 'https://en.wikipedia.org/wiki/Screw_theory'
+  - title: 'A Mathematical Introduction to Robotic Manipulation — Murray, Li & Sastry (CRC Press, 1994; free PDF)'
+    url: 'https://pages.github.berkeley.edu/EECS-106/fa24-site/assets/MLS.pdf'
+  - title: 'A Treatise on the Theory of Screws — Robert Stawell Ball (Cambridge, 1900; scanned original)'
+    url: 'https://archive.org/download/theoryscrews00ballrich/theoryscrews00ballrich.pdf'
 laymanExplanation: >-
-  Screw theory says every way a rigid body can move is like a screw turning: spin around an axis
-  while sliding along it. This one idea describes all motion, and a matching idea describes all
-  forces — a tidy unified language for robot mechanics.
+  Think of a screw going into wood: it turns and moves forward at the same time. Screw theory says
+  any way a solid object can move, however complicated, can be described as one movement like that
+  around a single line. A hinge is a screw that only turns; a drawer is a screw that only slides.
+  Forces work the same way: a push plus a twist along one line. Robot arms are built from hinges
+  and sliders, so this one idea describes the whole arm.
 technicalDefinition: >-
-  Screw theory represents rigid-body velocities as twists and forces as wrenches, using the fact
-  that any rigid motion is a rotation about plus translation along a single screw axis (Chasles'
-  theorem).
+  Screw theory represents a rigid body's velocity as a twist (a 6-vector of angular and linear
+  velocity) and a force as a wrench (a 6-vector of moment and force), both expressed about a screw
+  axis with a pitch. By the Chasles–Mozzi theorem every rigid-body displacement is a rotation about
+  and translation along one screw axis; in robotics this gives the product-of-exponentials form of
+  forward kinematics and a Jacobian whose columns are the joints' screw axes.
 quizQuestion:
-  q: Screw theory says any rigid-body motion can be described as…
+  q: In screw theory, what is the pitch of an ordinary hinge (revolute) joint?
   options:
-    - A pure translation only
-    - A rotation about an axis combined with translation along it
-    - A random jump
-    - A color change
-  answer: 1
+    - Zero, because it only rotates and never slides along its axis
+    - Infinite, because it only slides
+    - One, because it turns and slides equally
+    - It has no screw axis
+  answer: 0
   explanation: >-
-    Chasles' theorem: every rigid-body displacement is a screw motion — rotation about some axis
-    plus translation along that same axis.
+    Pitch is how far the motion slides along the axis per unit of rotation. A revolute joint only
+    rotates, so its pitch is zero. A prismatic (sliding) joint is the opposite case: pure
+    translation, treated as infinite pitch.
 ---
 
-Underneath the matrices and angles of robot kinematics is one beautifully simple idea: **every rigid-body motion is a screw**. Screw theory builds a whole clean framework on that fact.
+**Screw theory** is a way of describing motion and force in which every movement of a solid object is a single **screw motion**: a turn about one axis combined with a slide along that same axis. Every force on the object, including any twisting effect, is described the same way. Robotics uses it because it lets one compact set of numbers describe what a robot arm's joints do, how fast the hand moves, and what forces it can push with.
 
-## The central insight
+## Start here: the screw in your hand
 
-**Chasles' theorem** says any motion of a rigid body — however complicated it looks — is equivalent to a **rotation about some axis combined with a translation along that same axis**: exactly what a screw does as it turns. There's always one screw axis that captures the whole motion.
+Drive a screw into wood. It turns and moves forward at the same time, along one line. Now look at two everyday extremes:
 
-From this, screw theory names two dual objects:
+- A **door on its hinge** turns but never slides along the hinge line. That is a screw with no forward motion.
+- A **drawer** slides but never turns. That is a screw that is all forward motion.
 
-- A **twist** describes a body's *velocity* — its [angular velocity](/atlas/concept/angular-velocity) and linear velocity packaged together as motion about/along a screw axis.
-- A **wrench** describes a *force* — a force and a torque packaged the same way.
+The surprising part is that *every* way a rigid object can move, however twisted the path looks, can be described as one screw motion about one line in space. This result is known as the **Chasles–Mozzi theorem** ([Lynch & Park, ch. 3](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)). So instead of tracking a jumble of rotations and translations, you only need the screw's axis, how much it turned, and how far it slid.
+
+## How it works: twists, wrenches and pitch
+
+Screw theory gives two matching objects, each a list of six numbers ([Lynch & Park, ch. 3](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)):
+
+| Object | Describes | Six numbers made of | Everyday picture |
+|---|---|---|---|
+| **Twist** | How a body is moving right now | angular velocity (3) + linear velocity (3) | a spinning, advancing screw |
+| **Wrench** | The force acting on a body | moment, i.e. twisting effect (3) + force (3) | turning a screwdriver while pushing |
+
+The **pitch** of a screw is how far it slides along its axis for each unit of rotation. Robot joints fall neatly into this picture:
+
+| Joint | What it does | Pitch |
+|---|---|---|
+| Revolute (hinge) | rotates only | zero |
+| Prismatic (slider) | translates only | infinite (pure translation) |
+| Helical (lead screw) | rotates and translates together | a fixed, finite value |
+
+Twists and wrenches fit together: the dot product of a twist and a wrench (multiply matching entries and add them up) gives **power**, the rate at which the force does work on the moving body ([Lynch & Park, ch. 3](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)). This is why one framework can handle both "where is the hand going?" and "how hard can it push?".
 
 ```diagram
-{ "type": "flow", "title": "One axis captures the whole motion", "nodes": ["Any rigid motion", "= rotate about an axis", "+ translate along it", "= a screw (twist)"], "caption": "Motion becomes a twist, force becomes a wrench — both organized around a single screw axis. One language for velocity and force alike." }
+{ "type": "flow", "title": "From one axis to a whole robot arm", "nodes": ["Each joint = a screw axis", "Joint moves → twist", "Chain the joints (product of exponentials)", "Hand pose + Jacobian"], "caption": "A hinge is a zero-pitch screw, a slider an infinite-pitch one. Chaining each joint's screw motion gives the position of the robot's hand, and the joints' screw axes form the columns of its Jacobian." }
 ```
 
-## Why modern robotics uses it
+## Where you'll see it
 
-Screw theory (via the "product of exponentials" formulation) gives a **cleaner, more geometric** alternative to the older [Denavit-Hartenberg](/atlas/concept/denavit-hartenberg) tables:
+- **Robot arm kinematics.** In the *product of exponentials* formulation, [forward kinematics](/atlas/concept/forward-kinematics) is written by taking the hand's pose with every joint at zero, then applying each joint's screw motion in turn. You need only the joint axes and that one "home" pose, not a coordinate frame on every link ([Lynch & Park, ch. 4](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)).
+- **The Jacobian.** The [Jacobian](/atlas/concept/jacobian), which turns joint speeds into hand speed, has the joints' screw axes (in the current pose) as its columns ([Lynch & Park, ch. 5](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)).
+- **Grasping and contact.** When fingers hold an object, each contact can push only in certain directions; describing those forces as wrenches lets you check whether a grasp can resist any push ([Murray, Li & Sastry, ch. 5](https://pages.github.berkeley.edu/EECS-106/fa24-site/assets/MLS.pdf)).
+- **Teaching.** The textbook *Modern Robotics* (Lynch & Park, 2017), whose preprint is free to read online, builds its whole treatment of kinematics on screws.
 
-- **[Forward kinematics](/atlas/concept/forward-kinematics)** becomes a product of matrix exponentials, one per joint, each built directly from that joint's screw axis — fewer arbitrary conventions, less bookkeeping.
-- The **[Jacobian](/atlas/concept/jacobian)** falls out naturally as a matrix of the joint twists.
-- Forces and motions share one framework, which makes force control and constraint analysis elegant.
+## Going deeper
 
-It's the backbone of the widely used *Modern Robotics* curriculum for exactly this reason.
+For readers comfortable with linear algebra: the set of rigid-body poses forms the group **SE(3)**, and twists live in its Lie algebra **se(3)**. A screw motion of angle θ about axis S is the matrix exponential e^[S]θ, so a chain of joints is a product of exponentials: T(θ) = e^[S₁]θ₁ · e^[S₂]θ₂ ⋯ e^[Sₙ]θₙ · M, where M is the home pose ([Lynch & Park, ch. 3–4](https://hades.mech.northwestern.edu/index.php/Modern_Robotics); [Murray, Li & Sastry, ch. 2–3](https://pages.github.berkeley.edu/EECS-106/fa24-site/assets/MLS.pdf)).
 
-## The trade-off
+Compared with [Denavit-Hartenberg parameters](/atlas/concept/denavit-hartenberg), this avoids the rules for placing a frame on every link, and the joint axes can be read straight off a drawing of the robot. The cost is more mathematics up front.
 
-Screw theory demands more mathematical maturity up front — twists, wrenches, and Lie-group ideas (SE(3), the matrix exponential). But once learned, it unifies kinematics, velocity, and force under one geometric picture, and avoids the fiddly frame-assignment rules that trip people up in the classical approach.
+The theory itself is much older than robots: Robert Stawell Ball's *A Treatise on the Theory of Screws* (Cambridge, 1900) set out screws, twists and wrenches for mechanics long before anyone applied them to robot arms ([Ball, 1900](https://archive.org/download/theoryscrews00ballrich/theoryscrews00ballrich.pdf)).
 
 ## Why it matters
 
-Screw theory is the modern language of rigid-body motion in robotics. It reveals that the geometry of every robot arm, twist, and force is variations on a single idea — the screw — which is why it underpins today's cleanest treatments of manipulator kinematics.
+Screw theory turns robot motion into geometry you can see: every joint is a line in space, and every motion and force is measured along those lines. That makes kinematics, velocity and force one subject instead of three, which is why modern robotics courses teach it.
+
+## Common questions
+
+### What is screw theory in simple words?
+
+It is the idea that any movement of a solid object can be described as one screw-like motion, turning about a line while sliding along it, and that any force on the object can be described the same way. Robot arms are chains of hinges and sliders, so this gives one language for the whole arm.
+
+### What is the difference between a twist and a wrench?
+
+A twist describes motion: how fast the body is turning and moving. A wrench describes force: how hard it is being pushed and twisted. Both are six numbers built around a screw axis, and their dot product gives power.
+
+### Is screw theory better than Denavit-Hartenberg?
+
+Neither is wrong; both give the same robot pose. Screw theory (product of exponentials) needs no frame on each link and its joint axes are easy to read from a drawing. Denavit-Hartenberg uses only four numbers per joint, but each link needs a frame placed by strict rules ([Lynch & Park, appendix C](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)).
 
 ## Related
 
-[Homogeneous transformation](/atlas/concept/homogeneous-transformation) · [Forward kinematics](/atlas/concept/forward-kinematics) · [Jacobian](/atlas/concept/jacobian) · [Angular velocity](/atlas/concept/angular-velocity)
+[Forward kinematics](/atlas/concept/forward-kinematics) · [Jacobian](/atlas/concept/jacobian) · [Denavit-Hartenberg](/atlas/concept/denavit-hartenberg) · [Homogeneous transformation](/atlas/concept/homogeneous-transformation) · [Angular velocity](/atlas/concept/angular-velocity)
