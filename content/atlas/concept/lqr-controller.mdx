@@ -1,124 +1,175 @@
 ---
-title: LQR Controller in Robotics
-summary: >-
-  The Linear Quadratic Regulator (LQR) computes optimal feedback gains for
-  linear systems. Used for inverted pendulums, drones, and gimbal stabilisation.
+title: LQR Controller (Linear Quadratic Regulator)
+slug: lqr-controller
+bucket: concept
 category: control
-bucket: control-systems
-difficulty: advanced
-lastReviewed: 2026-05-21T00:00:00.000Z
-sources:
-  - title: 'Linear–quadratic regulator'
-    url: 'https://en.wikipedia.org/wiki/Linear%E2%80%93quadratic_regulator'
+summary: >-
+  An LQR controller (linear quadratic regulator) is a feedback controller that computes the optimal
+  gains for the weights you choose: you say how much you care about errors (the Q matrix) and how
+  much you care about effort (the R matrix), and it returns the gains that balance the two. Drones,
+  balancing robots and cart-poles use it.
+difficulty: 4
 tags:
-  - lqr
+  - control
   - optimal-control
   - state-space
-  - gain
-  - stabilisation
-relatedTerms:
-  - model-predictive-control
-  - pid-controller
-  - state-space-control
-  - feedback-loop
+  - lqr
 seeAlso:
-  - model-predictive-control
   - pid-controller
+  - model-predictive-control
   - state-space-control
+  - state-observer
+  - pole-placement
   - feedback-loop
-youtubeSearchQuery: LQR linear quadratic regulator robotics
+lastReviewed: 2026-11-22T00:00:00.000Z
+sources:
+  - title: 'Underactuated Robotics, ch. 8 "Linear Quadratic Regulators" — Russ Tedrake (MIT course notes)'
+    url: 'https://underactuated.mit.edu/lqr.html'
+  - title: 'lqr — Linear-Quadratic Regulator design (MathWorks Control System Toolbox reference)'
+    url: 'https://www.mathworks.com/help/control/ref/lti.lqr.html'
+  - title: 'Feedback Systems, ch. 6 "State Feedback" — Åström & Murray (free chapter PDF)'
+    url: 'https://www.cds.caltech.edu/~murray/books/AM08/pdf/am08-statefbk_28Sep12.pdf'
+  - title: 'Development, Implementation, and Experimental Outdoor Evaluation of Quadcopter Controllers for Computationally Limited Embedded Systems — Paredes et al. (arXiv 2105.14231)'
+    url: 'https://arxiv.org/abs/2105.14231'
 laymanExplanation: >-
-  The Linear Quadratic Regulator (LQR) is an optimal control technique that
-  computes the best feedback gains to balance state error against control
-  effort. Given a linear system and a quadratic cost function, LQR solves a
-  Riccati equation and gives you the optimal full-state feedback matrix.
-realRobotsThatUseThis: []
-indianExample: ''
-prerequisiteTerms: []
-unlocksTerms: []
-quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
-difficultyLabel: Classroom
+  Imagine balancing a broom on your hand. You want the broom to stay upright (small error), but you
+  do not want to fling your arm around wildly (small effort). An LQR controller turns that trade-off
+  into numbers: one set of weights for "how bad is each kind of error" and one for "how costly is
+  each kind of effort". A short calculation then gives the gains that strike the best balance, and
+  the robot uses them every instant to correct itself.
 technicalDefinition: >-
-  The Linear Quadratic Regulator (LQR) computes optimal feedback gains for
-  linear systems. Used for inverted pendulums, drones, and gimbal stabilisation.
-slug: lqr-controller
+  For a linear system ẋ = Ax + Bu, the linear quadratic regulator is the state-feedback law
+  u = −Kx that minimises J = ∫₀^∞ (xᵀQx + uᵀRu) dt, with Q positive semi-definite and R positive
+  definite. The gain is K = R⁻¹BᵀS, where S is the stabilizing, positive semi-definite solution of the
+  algebraic Riccati equation SA + AᵀS − SBR⁻¹BᵀS + Q = 0. It exists when (A, B) is stabilizable and
+  (Q, A) has no unobservable mode on the imaginary axis.
+quizQuestion:
+  q: In an LQR controller for a drone, what happens if you make the R matrix much larger?
+  options:
+    - The drone corrects errors more gently, using less thrust and torque
+    - The drone corrects errors more aggressively
+    - The drone no longer needs a model
+    - Nothing, because only Q affects the gains
+  answer: 0
+  explanation: >-
+    R is the price of control effort. Raising it tells LQR that thrust and torque are expensive, so
+    the computed gains get smaller and the response becomes slower and gentler. Raising Q does the
+    opposite: errors become expensive, so the gains grow.
 ---
 
-# LQR Controller in Robotics
+An **LQR controller** (short for **linear quadratic regulator**) is a feedback controller that works out its own gains. You describe the robot with a model, then state two preferences: how much you dislike each kind of **error** (the **Q** matrix) and how much you dislike using **effort** such as motor torque or thrust (the **R** matrix). LQR returns the one set of gains that best balances the two, and the robot applies them continuously: *control = −K × state*.
 
-## What is LQR Controller in Robotics?
+## Start here: balancing a broom
 
-The Linear Quadratic Regulator (LQR) is an optimal control technique that computes the best feedback gains to balance state error against control effort. Given a linear system and a quadratic cost function, LQR solves a Riccati equation and gives you the optimal full-state feedback matrix.
+Balance a broom upright on your palm. Two things matter at once:
 
-## How It Works
+- **Error**: how far the broom is leaning, and how fast it is falling.
+- **Effort**: how hard and fast you have to move your hand to catch it.
 
-You start with a linear state-space model dx/dt = Ax + Bu. You pick two weighting matrices: Q penalises state error and R penalises control effort. The solution to the algebraic Riccati equation gives a matrix P from which the optimal gain K = R⁻¹BᵀP. The controller is then u = −Kx — every state variable is fed back with the right weight to minimise the cost. Tuning Q and R is the practical art: bigger Q means tighter tracking, bigger R means lower control effort.
+React too gently and the broom falls. React too violently and you waste energy and overshoot. [PID controller](/atlas/concept/pid-controller) gains are usually tuned by hand or with rules of thumb, one loop at a time. LQR asks a different question: *how much does each error cost you, and how much does each unit of effort cost you?* Write those costs down as numbers, and the gains follow from a calculation instead of guesswork.
 
-## Real-World Example
+That is why LQR is the classic controller for "balancing" problems: Tedrake's MIT course notes apply it to the double integrator, the acrobot, the cart-pole and a balancing Segway ([Underactuated Robotics, ch. 8](https://underactuated.mit.edu/lqr.html)).
 
-Boston Dynamics Atlas and Spot use LQR-family controllers for whole-body balance. Quadcopter autopilots often use LQR for attitude stabilisation. Camera gimbal stabilisation (DJI, Insta360) uses LQR or LQR+MPC. ISRO uses LQR-derived controllers for satellite attitude control.
+## How it works
 
-## Why It Matters for Robotics
+LQR needs three ingredients ([Tedrake, ch. 8](https://underactuated.mit.edu/lqr.html); [MathWorks `lqr`](https://www.mathworks.com/help/control/ref/lti.lqr.html)):
 
-LQR is the gateway from PID to modern multivariable optimal control. Any robotics graduate programme and many senior roles ask about LQR design. Mastering LQR — its assumptions, limitations, and tuning — opens the door to MPC, robust control, and model-based RL.
+1. **A linear model** of the robot, written in [state-space form](/atlas/concept/state-space-control): ẋ = Ax + Bu. Here *x* is the state (angles, positions, velocities) and *u* is the input (torques, thrust).
+2. **A cost** that adds up error and effort over all future time: J = ∫ (xᵀQx + uᵀRu) dt. The term xᵀQx is the price of being away from the target; uᵀRu is the price of the effort used to get back.
+3. **The weights**: Q must be positive semi-definite and R positive definite (in practice, usually diagonal matrices of non-negative and positive numbers).
 
-## Try It Yourself
+Solving the **algebraic Riccati equation**, SA + AᵀS − SBR⁻¹BᵀS + Q = 0, gives a matrix S, and from it the gain **K = R⁻¹BᵀS**. The controller is then simply **u = −Kx**: multiply the measured state by K, and that is the command. The expensive part (solving the Riccati equation) happens once, offline; running the controller is one matrix multiplication per time step.
 
-Simulate an inverted pendulum in Python using SciPy. Compute the LQR gain using `scipy.linalg.solve_continuous_are`. Plot the pendulum stabilising with Q = diag(10,1,10,1), then try doubling each weight and watch how the response changes.
+A solution exists when two conditions hold: the system is *stabilizable* (the inputs can influence every unstable part of the motion), and Q does not leave any unstable or marginally stable motion completely unpenalised (formally, (Q, A) has no unobservable mode on the imaginary axis) ([MathWorks `lqr`, Limitations](https://www.mathworks.com/help/control/ref/lti.lqr.html)). With Q = 0, for example, LQR has no reason to stabilise anything.
 
-## Quick Quiz
+## What Q and R mean on a drone
 
-```quiz
-[
-  {
-    "q": "LQR finds the optimal feedback gain that minimises:",
-    "options": [
-      "Time to charge a battery",
-      "A quadratic cost on state error and control effort",
-      "Camera brightness",
-      "Wi-Fi latency"
-    ],
-    "answer": 1,
-    "explain": "LQR minimises ∫(xᵀQx + uᵀRu)dt — a quadratic cost trading tracking against effort."
-  },
-  {
-    "q": "LQR assumes the system is:",
-    "options": [
-      "Highly nonlinear",
-      "Linear with Gaussian disturbances (for LQG)",
-      "Stochastic only",
-      "Quantum mechanical"
-    ],
-    "answer": 1,
-    "explain": "LQR is designed around linear state-space dynamics; LQG adds Gaussian-noise estimation."
-  },
-  {
-    "q": "Increasing the matrix Q in LQR generally:",
-    "options": [
-      "Cools the motor",
-      "Penalises state error more — tighter tracking, higher control effort",
-      "Lowers battery use",
-      "Has no effect"
-    ],
-    "answer": 1,
-    "explain": "Larger Q values tell LQR you care more about tracking error than about control effort."
-  }
-]
+A quadcopter is a good example because it has many coupled states. One published outdoor flight study models a quadcopter with **12 states** and **4 inputs**, linearised around hover ([Paredes et al., 2021](https://arxiv.org/abs/2105.14231)):
+
+| Part of the problem | What it contains | What its weight means |
+|---|---|---|
+| **State x** (12 numbers) | position x, y, z · velocities · roll, pitch, yaw angles · body angular rates | — |
+| **Q** (one weight per state) | big weight on position → hold position tightly; big weight on angles → keep the drone level | "How bad is this error?" |
+| **Input u** (4 numbers) | total thrust and the three body torques (later mapped to the four motor commands) | — |
+| **R** (one weight per input) | big weight on thrust or torque → smoother, gentler flying, less battery and motor stress | "How expensive is this effort?" |
+
+So, in the case of a drone, **Q defines which flight errors matter most** (drifting from the setpoint, tilting, spinning) and **R defines how much the controller is allowed to work the motors** to fix them. Raising Q makes the drone snappier and more precise; raising R makes it calmer and less aggressive. Only the *ratio* matters: multiplying Q and R by the same number gives the same gains.
+
+### Choosing the first Q and R: Bryson's rule
+
+A common starting point is **Bryson's rule**: set each diagonal entry of Q to 1 divided by the square of the largest error you can accept in that state, and each entry of R to 1 divided by the square of the largest input you can accept. MathWorks notes that this usually gives a reasonable first design but is "often just the starting point of a trial-and-error iterative design procedure" ([MathWorks `lqr`](https://www.mathworks.com/help/control/ref/lti.lqr.html)). Åström and Murray credit the rule to Bryson and Ho ([Feedback Systems, ch. 6](https://www.cds.caltech.edu/~murray/books/AM08/pdf/am08-statefbk_28Sep12.pdf)).
+
+## Try it: the gains change with Q and R
+
+The simplest system with a position and a velocity is the *double integrator*: a block on a frictionless track pushed by a force (ẋ₁ = x₂, ẋ₂ = u). This Python snippet computes its LQR gain with SciPy:
+
+```python
+import numpy as np
+from scipy.linalg import solve_continuous_are
+
+A = np.array([[0, 1], [0, 0]])   # position, velocity
+B = np.array([[0], [1]])         # force changes velocity
+Q = np.diag([1.0, 1.0])          # price of position and velocity error
+R = np.array([[1.0]])            # price of force
+
+S = solve_continuous_are(A, B, Q, R)
+K = np.linalg.solve(R, B.T @ S)  # K = R^-1 B^T S
+print(K)                          # [[1.  1.73205081]]  i.e. K = [1, √3]
 ```
 
-## Further Reading
+Change the weights and watch the gains move (values computed with the code above):
 
-- [Model Predictive Control](/atlas/concept/model-predictive-control)
-- [Pid Controller](/atlas/concept/pid-controller)
-- [State Space Control](/atlas/concept/state-space-control)
-- [Feedback Loop](/atlas/concept/feedback-loop)
+| Weights | Gain K (position, velocity) | Result |
+|---|---|---|
+| Q = diag(1, 1), R = 1 | 1.00, 1.73 | Baseline |
+| Q = diag(10, 1), R = 1 | 3.16, 2.71 | Position error is now expensive → stiffer, faster correction |
+| Q = diag(1, 1), R = 10 | 0.32, 0.86 | Force is now expensive → softer, slower correction |
 
-## Ask R2 About This
+## LQR vs PID
 
-Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain LQR Controller in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.
+| | [PID](/atlas/concept/pid-controller) | LQR |
+|---|---|---|
+| Needs a model? | No | Yes, a linear state-space model |
+| Inputs and outputs | Best for one input, one output per loop | Handles many coupled inputs and states at once |
+| How you tune it | Three gains per loop, by hand or rules of thumb | Choose Q and R; gains are computed |
+| Needs every state measured? | No, only the error signal | Yes, the full state (or an estimate of it) |
+| Typical use | Motor speed, joint position, temperature | Balancing, hovering, attitude control |
+
+Neither is universally better. LQR is only as good as its model and its weights; the quadcopter study above flew PD, PID, LQR, LQR with integrators and explicit MPC controllers on the same airframe precisely to compare them in practice ([Paredes et al., 2021](https://arxiv.org/abs/2105.14231)).
+
+## Limits, and what comes next
+
+- **It is linear.** Real robots are nonlinear, so LQR is designed around one operating point (upright, hovering). Tedrake describes it as "a local approximation of the optimal control solution for the nonlinear system": excellent near that point, not guaranteed far from it ([ch. 8](https://underactuated.mit.edu/lqr.html)).
+- **It needs the full state.** If some states are not measured (velocities often are not), pair LQR with a [state observer](/atlas/concept/state-observer) or a [Kalman filter](/atlas/concept/kalman-filter). LQR plus a Kalman filter is called **LQG** (linear quadratic Gaussian) control.
+- **It ignores limits.** Basic LQR does not know that a motor saturates or a joint has an end stop. [Model predictive control](/atlas/concept/model-predictive-control) keeps the same "cost of error plus cost of effort" idea but re-solves it every step with constraints.
+
+## Going deeper
+
+For readers comfortable with linear algebra, Tedrake's chapter covers the extensions used on real robots ([Underactuated Robotics, ch. 8](https://underactuated.mit.edu/lqr.html)):
+
+- **Finite-horizon and time-varying LQR.** Instead of one constant K, the Riccati equation is integrated backwards in time to give a gain K(t). This is how a robot follows a planned trajectory (a flip, a jump, a swing-up) rather than holding one pose.
+- **Discrete-time LQR.** Digital controllers run at a fixed rate, so the discrete Riccati equation is solved instead; its infinite-horizon solution is the fixed point of the discrete recursion.
+- **Cross terms.** The general cost adds 2xᵀNu, giving K = R⁻¹(BᵀS + Nᵀ) ([MathWorks `lqr`](https://www.mathworks.com/help/control/ref/lti.lqr.html)).
+- **Pole placement vs LQR.** [Pole placement](/atlas/concept/pole-placement) picks where the closed-loop poles go directly; LQR lets them land wherever the optimal trade-off puts them, which scales better to many inputs.
+
+## Why it matters
+
+LQR is the step from tuning single loops by hand to designing a controller for the whole robot at once. Its central idea, *write down what you care about as a cost and let mathematics find the controller*, runs through model predictive control, trajectory optimisation and much of modern robot control.
+
+## Common questions
+
+### What is an LQR controller in simple words?
+
+It is a controller that calculates the best feedback gains for you. You give it a model of the robot and two sets of weights, one saying how much each error matters (Q) and one saying how costly each kind of effort is (R). It returns gains that balance fast correction against wasted effort.
+
+### In LQR, what do the Q and R matrices define for a drone?
+
+Q sets how strongly the drone should fight each error: drifting from its position, tilting, or spinning. R sets how costly it is to use thrust and torque. A larger Q gives tighter, faster flight; a larger R gives smoother flight with less motor effort. Bryson's rule (1 over the square of the largest acceptable error or input) is a common starting point.
+
+### Is LQR better than PID?
+
+Not always. LQR handles many coupled states at once and computes its gains from a model, which makes it a strong choice for balancing and hovering. PID needs no model and is simpler to run on one loop. In practice LQR is limited by how good the model is, and it needs the full state measured or estimated.
+
+## Related
+
+[PID controller](/atlas/concept/pid-controller) · [Model predictive control](/atlas/concept/model-predictive-control) · [State-space control](/atlas/concept/state-space-control) · [State observer](/atlas/concept/state-observer) · [Pole placement](/atlas/concept/pole-placement)

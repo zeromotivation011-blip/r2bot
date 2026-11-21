@@ -73,6 +73,28 @@ export const BLOG_TO_ATLAS: Record<string, string> = {
 }
 
 /**
+ * Atlas entries that could compete for the same query, and which one owns it.
+ *
+ * 22 Nov 2026 (Search Console): "moveit" ranked /atlas/concept/moveit (pos 9.7)
+ * and "moveit2" ranked /atlas/concept/moveit2-stack (pos 7.9). They are kept
+ * apart on purpose: moveit is the beginner overview ("what is MoveIt", MoveIt vs
+ * MoveIt 2); moveit2-stack is the ROS 2 practitioner page (move_group,
+ * planners, setup). Each links to the other in its first paragraph.
+ * "lqr" / "lqr controller" is owned by lqr-controller; the duplicate
+ * linear-quadratic-regulator entry was merged into it and 308s there
+ * (next.config.mjs, app/sitemap.ts REDIRECTED_ATLAS).
+ *
+ * Query → owning path.
+ */
+export const ATLAS_QUERY_OWNER: Record<string, string> = {
+  lqr: '/atlas/concept/lqr-controller',
+  'lqr controller': '/atlas/concept/lqr-controller',
+  'linear quadratic regulator': '/atlas/concept/lqr-controller',
+  moveit: '/atlas/concept/moveit',
+  moveit2: '/atlas/concept/moveit2-stack',
+}
+
+/**
  * Atlas path → the Quick Lesson that teaches the same idea as a 60-second
  * video with an interactive demo.
  *

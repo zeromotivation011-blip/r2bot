@@ -13,7 +13,7 @@ tags:
   - state-space
   - stability
 seeAlso:
-  - linear-quadratic-regulator
+  - lqr-controller
   - state-observer
   - closed-loop-control
   - pid-controller
@@ -59,7 +59,7 @@ Poles further left (more negative real part) mean a **faster** response. Poles n
 
 ## Pole placement vs LQR
 
-Pole placement gives you *direct* control over the response but leaves you guessing at good pole locations for complex, multi-input systems — push a pole too far left and you demand huge, actuator-saturating gains. [LQR](/atlas/concept/linear-quadratic-regulator) instead lets you specify *what you value* (error vs effort) and computes well-behaved gains automatically; its poles land wherever the optimal trade-off puts them. Many engineers use pole placement for intuition and simple systems, LQR for serious multivariable ones. Both need the full state, so both pair with a [state observer](/atlas/concept/state-observer).
+Pole placement gives you *direct* control over the response but leaves you guessing at good pole locations for complex, multi-input systems — push a pole too far left and you demand huge, actuator-saturating gains. [LQR](/atlas/concept/lqr-controller) instead lets you specify *what you value* (error vs effort) and computes well-behaved gains automatically; its poles land wherever the optimal trade-off puts them. Many engineers use pole placement for intuition and simple systems, LQR for serious multivariable ones. Both need the full state, so both pair with a [state observer](/atlas/concept/state-observer).
 
 ## Why it matters
 
@@ -67,4 +67,4 @@ Pole placement is the clearest illustration of the core idea of state feedback: 
 
 ## Related
 
-[LQR](/atlas/concept/linear-quadratic-regulator) · [State observer](/atlas/concept/state-observer) · [Closed-loop control](/atlas/concept/closed-loop-control) · [PID controller](/atlas/concept/pid-controller)
+[LQR](/atlas/concept/lqr-controller) · [State observer](/atlas/concept/state-observer) · [Closed-loop control](/atlas/concept/closed-loop-control) · [PID controller](/atlas/concept/pid-controller)
