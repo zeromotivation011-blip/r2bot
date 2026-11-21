@@ -1,0 +1,11 @@
+import type { ReactNode } from 'react'
+import { SiteChrome } from '@/components/SiteChrome'
+
+/** Language wrapper plus the site header, as for /es, /hi and /zh. */
+export default function DELayout({ children }: { children: ReactNode }) {
+  return (
+    <div lang="de" style={{ fontFamily: 'system-ui,-apple-system,"Segoe UI",sans-serif' }}>
+      <SiteChrome>{children}</SiteChrome>
+    </div>
+  )
+}

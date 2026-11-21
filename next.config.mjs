@@ -40,7 +40,14 @@ const nextConfig = {
     '/lens/**': ['./content/lens/**/*', './content/lens-channels.json'],
     '/blog/**': ['./content/blog/**/*'],
     '/build/**': ['./content/build/**/*'],
-    '/atlas/**': ['./content/atlas/**/*'],
+    // Atlas pages read their translations too (hreflang + "Also in" links).
+    '/atlas/**': ['./content/atlas/**/*', './content/atlas-i18n/**/*'],
+    '/es/atlas/**': ['./content/atlas/**/*', './content/atlas-i18n/**/*'],
+    '/pt/atlas/**': ['./content/atlas/**/*', './content/atlas-i18n/**/*'],
+    '/hi/atlas/**': ['./content/atlas/**/*', './content/atlas-i18n/**/*'],
+    '/zh/atlas/**': ['./content/atlas/**/*', './content/atlas-i18n/**/*'],
+    '/de/atlas/**': ['./content/atlas/**/*', './content/atlas-i18n/**/*'],
+    '/ja/atlas/**': ['./content/atlas/**/*', './content/atlas-i18n/**/*'],
     '/shorts/**': ['./content/atlas/**/*'],
     '/api/**': ['./content/**/*'],  // includes /api/admin/atlas/reindex, which reads every Atlas MDX
     '/admin/**': ['./content/**/*'],

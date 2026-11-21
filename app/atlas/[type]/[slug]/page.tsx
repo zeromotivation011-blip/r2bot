@@ -41,6 +41,8 @@ import { Reveal } from '@/components/Reveal';
 import { AtlasNextStep } from '@/components/atlas/AtlasNextStep';
 import { quickLessonForAtlas, ATLAS_ROBOT_CANONICAL } from '@/lib/canonical-map';
 import { authorRef } from '@/lib/author';
+import { atlasHreflang } from '@/lib/hreflang';
+import { ATLAS_LANG_META, atlasPath, translationLangs } from '@/lib/atlas-i18n';
 
 const PROGRAMMING_BUCKETS = new Set([
   'programming-software',
@@ -105,7 +107,8 @@ export async function generateMetadata(
   return {
     title: seoTitle,
     description: clampDescription(entry.summary),
-    alternates: { canonical },
+    // hreflang only when a reviewed translation exists (lib/atlas-i18n.ts).
+    alternates: { canonical, languages: atlasHreflang(type, slug) },
     openGraph: {
       title: `${seoTitle} | R2BOT`,
       description: entry.summary,
@@ -227,6 +230,9 @@ export default async function AtlasEntryPage(
     }));
 
   const canonical = `${BASE_URL}/atlas/${type}/${slug}`;
+  // Reviewed translations of this entry: shown as visible links, so each
+  // translated page has an inbound link and readers can find it.
+  const translations = translationLangs(type, slug);
   const plain = plainTextFromMd(entry.body);
   const rt = readTime(plain);
   const sourceCount = entry.sources?.length ?? 0;
@@ -462,6 +468,23 @@ export default async function AtlasEntryPage(
           >
             {entry.summary}
           </p>
+
+          {translations.length > 0 && (
+            <p className="mb-6 flex flex-wrap items-center gap-2 text-sm text-zinc-400">
+              <span>Also in:</span>
+              {translations.map((l) => (
+                <a
+                  key={l}
+                  href={atlasPath(type, slug, l)}
+                  hrefLang={ATLAS_LANG_META[l].hreflang}
+                  lang={ATLAS_LANG_META[l].hreflang}
+                  className="inline-flex min-h-[44px] items-center rounded-full border border-zinc-700 px-3 text-zinc-200 hover:border-amber-500 hover:text-amber-400"
+                >
+                  {ATLAS_LANG_META[l].name}
+                </a>
+              ))}
+            </p>
+          )}
 
           {/* Share + bookmark + understood */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginBottom: 16 }}>

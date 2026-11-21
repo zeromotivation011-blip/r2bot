@@ -25,6 +25,8 @@ const SAMPLES = [
   { path: '/atlas/concept/slam', expectTitle: 'SLAM' },
   { path: '/atlas/concept/pid-controller', expectTitle: 'PID' },
   { path: '/atlas/concept/lidar', expectTitle: 'LiDAR' },
+  // Translated Atlas (content/atlas-i18n). Same failure mode, separate reader.
+  { path: '/es/atlas/concept/bipedal-robot', expectTitle: 'Robot bípedo' },
 ]
 
 // A real entry renders well over this much prose. A husk renders the shared

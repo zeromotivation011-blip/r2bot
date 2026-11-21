@@ -1,0 +1,79 @@
+---
+title: Robot bípedo
+summary: >-
+  Un robot bípedo es un robot que camina sobre dos piernas, como una persona. La robótica bípeda es
+  el campo que diseña, construye y controla estas máquinas, y su problema central es el equilibrio:
+  mantener erguido un cuerpo alto sobre una base de apoyo pequeña que cambia constantemente.
+laymanExplanation: >-
+  Mantente de pie sobre una sola pierna y notarás que el tobillo, la rodilla y la cadera hacen pequeñas correcciones
+  sin parar para mantenerte de pie. Un robot de dos piernas tiene que hacer lo mismo con motores y
+  sensores. Casi nunca está quieto del todo: caminar es una caída hacia adelante controlada, que el
+  siguiente paso detiene. Dos piernas son difíciles de dominar, pero permiten a un robot usar
+  escaleras, bordes de acera y espacios estrechos pensados para personas.
+sourceLastReviewed: 2026-11-21
+reviewed: 2026-11-21
+---
+
+Un **robot bípedo** es un robot que camina sobre dos piernas, como una persona. La **robótica bípeda** es el campo que diseña, construye y controla estas máquinas, y casi toda su dificultad se reduce a un problema: mantener en equilibrio un cuerpo alto sobre una zona de apoyo no más grande que uno o dos pies, mientras ese apoyo cambia con cada paso.
+
+## Empieza aquí: por qué dos piernas son difíciles
+
+Mantente de pie sobre una sola pierna. El tobillo, la rodilla, la cadera y el tronco empiezan a hacer pequeñas correcciones en las que nunca piensas. Ahora imagina una máquina que pesa lo mismo que un adulto, lleva sus piezas más pesadas en lo alto y toca el suelo con un pie cada vez. Tiene que notar cuándo se está inclinando y reaccionar en una fracción de segundo, en cada paso y sobre cualquier superficie.
+
+Las ruedas evitan todo esto, y por eso la mayoría de los robots las usan. Aun así, los ingenieros construyen bípedos porque el mundo está hecho para dos piernas: escaleras, bordes de acera, escaleras de mano, pasillos estrechos, suelos llenos de obstáculos. Una máquina que camina como una persona puede, en principio, ir adonde va una persona sin que haya que adaptar el edificio. Por eso también la mayoría de los [robots humanoides](/atlas/concept/humanoid-robot) son bípedos.
+
+## Cómo funciona: de la marcha estática a la dinámica
+
+| Enfoque | Regla de equilibrio | Cómo se ve | Ventajas e inconvenientes |
+|---|---|---|---|
+| **Marcha estática** | El [centro de masa](/atlas/concept/center-of-mass), proyectado sobre el suelo, siempre queda dentro del polígono de apoyo (la zona bajo los pies que tocan el suelo y entre ellos) | Pasos lentos y cuidadosos; el robot podría detenerse a mitad de paso sin caerse | Fácil de controlar, muy lenta |
+| **Marcha dinámica** | El centro de masa puede salir de la zona de apoyo; los robots de pie plano mantienen dentro de ella el [punto de momento cero](/atlas/concept/zero-moment-point), mientras que los que corren o tienen pies puntuales se equilibran eligiendo dónde poner el siguiente pie | Pasos fluidos, parecidos a los humanos; cada paso frena una pequeña caída hacia adelante | Más rápida y eficiente; exige sensores y control rápidos |
+| **Control aprendido y de cuerpo completo** | Un controlador (optimizado o entrenado) planifica muchos pasos por adelantado y usa todo el cuerpo, brazos incluidos | Correr, recuperarse de empujones, terreno irregular | Requiere mucho cálculo o simulación a gran escala |
+
+El **punto de momento cero** (ZMP, por sus siglas en inglés) es el punto del suelo en el que las fuerzas de contacto bajo los pies no producen ningún momento de vuelco. Mientras ese punto quede dentro de la zona que cubren los pies, los pies siguen apoyados en plano en lugar de girar sobre un borde, y esa es la condición en torno a la cual planifican los controladores de marcha basados en el ZMP. La idea la presentaron Miomir Vukobratović y Davor Juričić en 1968 y se convirtió en la herramienta estándar para planificar la marcha de los humanoides ([Zero moment point](https://en.wikipedia.org/wiki/Zero_moment_point); [Kajita et al.](https://link.springer.com/book/10.1007/978-3-642-54536-8)).
+
+```diagram
+{ "type": "flow", "title": "Un paso, tal como lo ve el controlador", "nodes": ["Medir: IMU, encoders de las articulaciones, fuerza en los pies", "Estimar el centro de masa y el ZMP", "Planificar el siguiente paso", "Mover las articulaciones con el ZMP dentro del apoyo", "El pie toca el suelo y se repite"], "caption": "La marcha dinámica es un bucle que se ejecuta muchas veces por segundo: medir el estado del cuerpo, decidir dónde debe caer el siguiente pie y mover las articulaciones para que el robot frene su caída en cada paso." }
+```
+
+Para planificar los pasos rápido, los controladores usan modelos sencillos que sustituyen al robot. El más conocido es el **péndulo invertido lineal**: se trata todo el robot como una sola masa sobre una pierna sin masa, mantenida a altura constante, de modo que las ecuaciones se vuelven lineales y se pueden resolver en tiempo real ([Kajita et al., IROS 2001](https://dblp.uni-trier.de/rec/conf/iros/KajitaKKYH01.html)). Una idea relacionada, el [punto de captura](/atlas/concept/capture-point), responde a una pregunta práctica: ¿dónde debe pisar el robot ahora mismo para detenerse por completo? Es la base de muchos controladores de [recuperación ante empujones](/atlas/concept/push-recovery) ([Pratt et al., 2006](https://cs.utexas.edu/~shivaram/readings/b2hd-PrattCDG2006.html)).
+
+## Dónde lo verás
+
+| Robot | Fabricante | Por qué importa | Fuente |
+|---|---|---|---|
+| [WABOT-1](https://www.humanoid.waseda.ac.jp/booklet/kato_2.html) (1973) | Universidad de Waseda, Japón | Uno de los primeros robots humanoides que caminaron sobre sus propias dos piernas | [Universidad de Waseda](https://www.humanoid.waseda.ac.jp/booklet/kato_2.html) |
+| [Cassie](/robots/cassie) | Agility Robotics / Universidad Estatal de Oregón | Corrió 100 m en 24,73 s el 11 de mayo de 2022, el récord Guinness para un robot bípedo | [Guinness World Records](https://www.guinnessworldrecords.com/world-records/629600-fastest-100-m-by-a-bipedal-robot) |
+| [Digit](/robots/digit) | Agility Robotics | Un bípedo diseñado para trabajar en almacenes, que mueve contenedores en operaciones comerciales | [Ficha del robot en R2BOT](/robots/digit) |
+| [Atlas](/robots/atlas) | Boston Dynamics | Presentado en 2013 con financiación de DARPA; la versión hidráulica se retiró en abril de 2024 y el 17 de abril de 2024 se anunció un Atlas totalmente eléctrico | [Atlas (robot)](https://en.wikipedia.org/wiki/Atlas_(robot)) |
+
+Entre otros humanoides bípedos están [ASIMO](/robots/asimo), [Unitree H1](/robots/unitree-h1), [Optimus](/robots/optimus) y [Figure 02](/robots/figure-02); cada uno tiene su propia ficha con fuentes en la [base de datos de robots](/robots).
+
+## Para profundizar
+
+- **Dinámica pasiva.** En un artículo de 1990, Tad McGeer demostró que una máquina caminante bien diseñada, sin ningún motor, puede bajar caminando por una pendiente suave impulsada solo por la gravedad ([McGeer, 1990](https://dblp.org/rec/journals/ijrr/McGeer90)). La lección para los bípedos posteriores: dejar que las piernas oscilen de forma natural siempre que se pueda, en lugar de forzar cada articulación, y caminar gasta menos energía.
+- **Elasticidad.** Las piernas con resortes y los [actuadores elásticos en serie](/atlas/concept/series-elastic-actuator) almacenan y devuelven energía y absorben impactos, lo que importa sobre todo al correr.
+- **Optimización y aprendizaje.** Los controladores modernos usan [control predictivo basado en modelo](/atlas/concept/model-predictive-control) para planificar las fuerzas del siguiente segundo, o políticas de [aprendizaje por refuerzo](/atlas/concept/reinforcement-learning-robotics) entrenadas en simulación y transferidas al robot real. La carrera récord de Cassie usó un controlador de red neuronal entrenado así ([ficha del robot](/robots/cassie)).
+- **Sensores.** Una [IMU](/atlas/concept/imu) en el torso mide la inclinación y la aceleración, los encoders de las articulaciones dan la forma de la pierna y los sensores de fuerza de los pies indican dónde está el [centro de presión](/atlas/concept/center-of-pressure).
+
+## Por qué importa
+
+Dos piernas son la forma más difícil de moverse para un robot, y la más compatible con los lugares donde la gente vive y trabaja. Cada avance en el equilibrio bípedo, desde el ZMP hasta los controladores aprendidos, amplía el número de edificios en los que un robot puede trabajar sin que nadie tenga que reformarlos.
+
+## Preguntas frecuentes
+
+### ¿Qué es la robótica bípeda?
+
+Es la rama de la robótica que construye y controla robots que caminan sobre dos piernas. Sus problemas centrales son el equilibrio, la planificación de los pasos y el manejo del terreno irregular, los empujones y los resbalones.
+
+### ¿Por qué la mayoría de los robots no camina sobre dos piernas?
+
+Las ruedas y las cuatro patas son más estables y más baratas de controlar. Las dos piernas se eligen cuando un robot tiene que trabajar en espacios hechos para personas, como escaleras y pasillos estrechos.
+
+### ¿Qué diferencia hay entre un robot bípedo y un robot humanoide?
+
+«Bípedo» describe cómo se mueve un robot: sobre dos piernas. «Humanoide» describe su forma general: un cuerpo parecido al humano, normalmente con brazos y cabeza. La mayoría de los humanoides son bípedos, pero un bípedo como [Cassie](/robots/cassie) no tiene torso en absoluto, y algunos humanoides, como [Pepper](/robots/pepper), se desplazan sobre ruedas.
+
+## Relacionado
+
+[Robot humanoide](/atlas/concept/humanoid-robot) · [Punto de momento cero](/atlas/concept/zero-moment-point) · [Punto de captura](/atlas/concept/capture-point) · [Marcha](/atlas/concept/gait) · [Recuperación ante empujones](/atlas/concept/push-recovery) · [Robot cuadrúpedo](/atlas/concept/quadruped-robot)
