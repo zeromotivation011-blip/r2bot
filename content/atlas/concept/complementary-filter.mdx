@@ -1,0 +1,167 @@
+---
+title: Complementary Filter
+slug: complementary-filter
+bucket: concept
+category: sensors
+summary: >-
+  A complementary filter blends two sensors that fail in opposite ways: it trusts a gyroscope for
+  fast changes and an accelerometer for the long-term average, giving a steady tilt angle that
+  neither sensor can give alone. It is the simplest way to turn raw IMU readings into an angle.
+difficulty: 3
+tags:
+  - sensor-fusion
+  - imu
+  - orientation
+  - filtering
+  - balancing-robot
+seeAlso:
+  - sensor-fusion
+  - imu
+  - gyroscope
+  - accelerometer
+  - kalman-filter
+  - quaternion
+lastReviewed: 2026-11-22T00:00:00.000Z
+sources:
+  - title: 'Park & How, "Examples of Estimation Filters from Recent Aircraft Projects at MIT", 16.333 Aircraft Stability and Control, MIT OpenCourseWare (2004)'
+    url: 'https://ocw.mit.edu/courses/16-333-aircraft-stability-and-control-fall-2004/fb8395efd40e5f4a79b98fda10c85de3_l15_filter_examp.pdf'
+  - title: 'V. Hunter Adams, "Complementary Filters" (reaction-wheel balancing lab)'
+    url: 'https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html'
+  - title: 'Valenti, Dryanovski & Xiao, "Keeping a Good Attitude: A Quaternion-Based Orientation Filter for IMUs and MARGs", Sensors 15(8):19302–19330 (2015)'
+    url: 'https://www.mdpi.com/1424-8220/15/8/19302'
+  - title: 'Mahony, Hamel & Pflimlin, "Nonlinear Complementary Filters on the Special Orthogonal Group", IEEE Transactions on Automatic Control 53(5):1203–1218 (2008)'
+    url: 'https://doi.org/10.1109/TAC.2008.923738'
+  - title: 'imu_complementary_filter — ROS package index (imu_tools)'
+    url: 'https://index.ros.org/p/imu_complementary_filter/github-CCNYRoboticsLab-imu_tools'
+laymanExplanation: >-
+  A gyroscope is like counting your steps with your eyes shut: very smooth, but every small mistake
+  adds up until you are lost. An accelerometer is like glancing at a landmark: it always knows
+  roughly where "down" is, but the glance is shaky. A complementary filter keeps counting steps and
+  takes a quick glance now and then to correct itself, so you get both the smoothness and the
+  sense of direction.
+technicalDefinition: >-
+  A complementary filter estimates one quantity from two measurements with complementary noise
+  spectra by passing one through a high-pass filter and the other through a low-pass filter whose
+  transfer functions sum to one, so the true signal passes through unchanged. For IMU tilt, the
+  integrated gyro rate is high-passed and the accelerometer's gravity-based angle is low-passed. In
+  discrete form, θ_k = α(θ_{k−1} + ω_k Δt) + (1 − α) θ_acc,k, with time constant τ = αΔt / (1 − α).
+quizQuestion:
+  q: In a complementary filter for tilt, why does the gyroscope get the large weight (such as 0.98) and the accelerometer the small one?
+  options:
+    - The gyro is accurate over short times, and the small accelerometer weight is enough to slowly remove the gyro's drift
+    - The accelerometer is less accurate than the gyro at every time scale
+    - The gyro directly measures the angle, while the accelerometer only measures rotation speed
+    - The weights are arbitrary and only affect how fast the code runs
+  answer: 0
+  explanation: >-
+    Integrating the gyro gives a smooth angle that drifts slowly; the accelerometer gives a noisy
+    angle that does not drift. A large gyro weight keeps the output smooth, and the small
+    accelerometer weight, applied at every step, pulls the drift back towards the true angle.
+---
+
+A **complementary filter** is a way to combine two sensors that are wrong in opposite ways. In robotics it almost always means mixing a **gyroscope** and an **accelerometer** to get a tilt angle: the gyroscope is trusted for quick movements, the accelerometer for the long-term average. The result is a steady, responsive angle that a balancing robot, drone or ROS robot can use, from a few lines of code.
+
+It is the simplest form of [sensor fusion](/atlas/concept/sensor-fusion), and usually the first one people build when an [IMU](/atlas/concept/imu) gives them raw numbers but no angle.
+
+## Start here: two sensors, two opposite problems
+
+Put an IMU on a robot and ask "how far am I tilted?". Each sensor can answer on its own, badly:
+
+- **The [gyroscope](/atlas/concept/gyroscope)** measures how fast the robot is rotating. Add that rate up over time and you get the angle. The trouble is that every reading carries a small error, and adding up errors makes them grow. Hunter Adams' reaction-wheel pendulum lab calls this what it is: integrating the gyro is "dead reckoning", and its bias "may wander in any direction" ([Adams](https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html)). The angle is smooth but **drifts**.
+- **The [accelerometer](/atlas/concept/accelerometer)** feels gravity, which points down, so the direction of the measured acceleration gives the tilt directly, with no adding up. The trouble is that it also feels every bump, vibration and push: "it becomes especially noisy in the presence of any sort of mechanical noise" ([Adams](https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html)). The angle is right on average but **jittery**.
+
+One sensor is good at high frequencies (fast changes), the other at low frequencies (the slow average). That is exactly the situation MIT's aircraft-estimation lecture describes: when "one source gives good information only in low frequency region while the other is good only in high frequency region", you "can use a complementary filter" ([Park & How, MIT](https://ocw.mit.edu/courses/16-333-aircraft-stability-and-control-fall-2004/fb8395efd40e5f4a79b98fda10c85de3_l15_filter_examp.pdf)).
+
+## How it works
+
+Each time new readings arrive (every Δt seconds):
+
+1. **Predict with the gyro.** Take the previous angle and add the rotation the gyro measured: θ_previous + ω·Δt.
+2. **Measure with the accelerometer.** Compute the tilt from the direction of gravity. For a robot that tips forward and back about one axis, θ_acc = atan2(a_x, a_z). Which axes and signs you use depends on how the IMU is mounted: check that tilting forward gives the same sign from the accelerometer angle as from the gyro.
+3. **Blend.** Take a weighted average, with most of the weight on the gyro prediction:
+
+**θ = α · (θ_previous + ω·Δt) + (1 − α) · θ_acc**
+
+That is the whole filter. Adams describes it as "a weighted average of the accelerometer angle and the sum of the previous complementary angle estimate and the change in angle measured by the gyro", and suggests starting with "an accelerometer weight of ~0.01 and a gyro weight of ~0.99" ([Adams](https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html)).
+
+Why does such a small accelerometer weight work? Because it is applied at **every** step. A 1–2% pull towards the accelerometer angle, a hundred times a second, is enough to steadily cancel a slow drift, while any single noisy accelerometer reading only moves the result by 1–2%.
+
+```c
+// Runs every dt seconds. gyro_rate in rad/s, ax and az from the accelerometer.
+const float alpha = 0.98f;
+float accel_angle = atan2f(ax, az);
+angle = alpha * (angle + gyro_rate * dt) + (1.0f - alpha) * accel_angle;
+```
+
+### Why it is called "complementary"
+
+Look at it in terms of frequencies. The gyro path behaves like a **high-pass filter** (it passes fast changes and blocks the slow drift); the accelerometer path behaves like a **low-pass filter** (it passes the slow average and blocks the jitter). For a first-order filter with time constant τ these are τs / (τs + 1) and 1 / (τs + 1), and they add up to exactly 1. So the true angle passes through unchanged, and each sensor's noise is cut where that sensor is weak. The two filters *complete* each other, hence the name. MIT's slides use the same structure for an aircraft's pitch angle: the pitch-rate gyro supplies the high frequencies and the accelerometers' "sensitivity... to gravity direction" supplies the low ones ([Park & How](https://ocw.mit.edu/courses/16-333-aircraft-stability-and-control-fall-2004/fb8395efd40e5f4a79b98fda10c85de3_l15_filter_examp.pdf)).
+
+### Choosing α
+
+α and the loop period Δt together set the filter's **time constant**, roughly the time scale on which you stop trusting the gyro and start trusting the accelerometer:
+
+**τ = α · Δt / (1 − α)**
+
+| α | Loop rate | Time constant τ | Behaviour |
+|---|---|---|---|
+| 0.90 | 100 Hz (Δt = 0.01 s) | 0.09 s | Follows the accelerometer quickly; more jitter |
+| 0.98 | 100 Hz | 0.49 s | Balanced: smooth, corrects drift within about a second |
+| 0.99 | 100 Hz | 0.99 s | Very smooth; slower to correct drift |
+| 0.98 | 500 Hz (Δt = 0.002 s) | 0.10 s | Same α, faster loop, much shorter τ |
+
+The last row is the usual surprise: if you speed up your loop and keep α, the filter behaves differently. Pick the time constant you want first, then compute α from it. The trade-off is the one Adams states: "the greater the weight on the accelerometer, the less bias and more noise you see" ([Adams](https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html)).
+
+## Where you'll see it
+
+- **Self-balancing robots.** Two-wheeled balancing robots and reaction-wheel pendulums need an accurate tilt angle hundreds of times a second on a small microcontroller. Adams' reaction-wheel lab uses exactly this filter in fixed-point arithmetic on a Raspberry Pi Pico ([Adams](https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html)).
+- **Aircraft and drones.** MIT's aircraft projects used complementary filters for roll and pitch, and also for altitude, combining GPS (good at low frequency) with a pressure sensor (good at high frequency) ([Park & How](https://ocw.mit.edu/courses/16-333-aircraft-stability-and-control-fall-2004/fb8395efd40e5f4a79b98fda10c85de3_l15_filter_examp.pdf)). The idea is not limited to IMUs: any two sensors with opposite strengths can be paired this way.
+- **ROS robots.** The `imu_complementary_filter` package (part of `imu_tools`, released for ROS 2 Humble, Jazzy and Rolling) is a "filter which fuses angular velocities, accelerations, and (optionally) magnetic readings from a generic IMU device into a quaternion to represent the orientation of the device" ([ROS index](https://index.ros.org/p/imu_complementary_filter/github-CCNYRoboticsLab-imu_tools)). It is based on the Valenti et al. paper below.
+
+## Limits
+
+- **Acceleration fools it.** The accelerometer cannot tell gravity from the robot's own acceleration. While a robot speeds up, brakes or vibrates, the "down" direction it reports is wrong, and the filter slowly leans towards that wrong angle. Better filters reduce the accelerometer's weight while the measured acceleration is far from 1 g (see below).
+- **No heading from gravity.** Gravity tells you roll and pitch, but nothing about which way you face (yaw). Correcting yaw drift needs another reference, usually a magnetometer, which is why IMUs with one (sometimes called MARG sensors) are used for full 3D orientation.
+- **One axis at a time is a simplification.** The two-line version treats each axis separately and works well for small tilts. For large, combined rotations, angles must be handled properly, with rotation matrices or a [quaternion](/atlas/concept/quaternion).
+- **Fixed weights (in the basic version).** α is chosen by hand and does not adapt to how noisy the sensors really are at the moment. A [Kalman filter](/atlas/concept/kalman-filter) computes that weighting from noise models instead. (For this simple one-axis tilt problem, a Kalman filter that has settled to its steady state ends up with a fixed gain too, and behaves much like a well-tuned complementary filter; the difference shows when the noise changes or more sensors and states are added.)
+
+## Going deeper: 3D complementary filters
+
+The one-line filter has grown into a family of serious 3D estimators:
+
+- **Nonlinear complementary filters on SO(3).** Mahony, Hamel and Pflimlin (2008) formulated the complementary filter directly on the group of 3D rotations, with a proportional-integral correction whose integral term also estimates the gyroscope bias. It is one of the most widely cited references for 3D complementary filtering ([IEEE TAC](https://doi.org/10.1109/TAC.2008.923738)).
+- **Quaternion-based filter with adaptive gain.** Valenti, Dryanovski and Xiao (2015) built a quaternion complementary filter for IMUs and MARGs that corrects roll and pitch from the accelerometer and heading from the magnetometer separately, lowers the accelerometer gain when the measured acceleration magnitude departs from gravity, and estimates gyro bias while the sensor is still. The authors designed it for small aerial vehicles "because of its low computational burden" ([Sensors 2015](https://www.mdpi.com/1424-8220/15/8/19302)). This is the algorithm behind the ROS package above.
+
+### Complementary filter or Kalman filter?
+
+| | Complementary filter | [Kalman filter](/atlas/concept/kalman-filter) / [EKF](/atlas/concept/extended-kalman-filter) |
+|---|---|---|
+| How weights are set | By hand (α, or gains) | Computed from noise models every step |
+| Maths | A few multiplications per step | Matrix operations, covariance updates |
+| Tuning | One intuitive knob: the time constant | Process and measurement noise matrices |
+| Uncertainty output | None | An estimate of its own error |
+| Typical use | Tilt on microcontrollers, balancing robots, IMU orientation | Fusing many sensors (GPS, wheel odometry, IMU) into a full robot state |
+
+A good rule: start with a complementary filter for orientation from one IMU. Move to a Kalman filter when you are fusing several different sensors, need an uncertainty estimate, or the vehicle's motion model matters.
+
+## Why it matters
+
+Almost every robot that stands, flies or balances needs to know which way is down, fast and reliably. The complementary filter turns two cheap, flawed sensors into a usable angle with a few lines of code, and its core idea (trust each sensor only where it is good) runs through all of sensor fusion, from hobby balancing robots to Kalman filters on autonomous vehicles.
+
+## Common questions
+
+### What is a complementary filter in simple terms?
+
+It is a way to combine a gyroscope and an accelerometer. The gyroscope is smooth but slowly drifts; the accelerometer does not drift but is noisy. The filter mostly follows the gyroscope and nudges the result towards the accelerometer a little at every step, so you get a smooth angle that does not drift.
+
+### What is the difference between a complementary filter and a Kalman filter?
+
+Both blend sensors. A complementary filter uses fixed weights you choose (usually one number, α), so it is tiny and easy to tune. A Kalman filter calculates the best weights at every step from models of each sensor's noise and of the system's motion, and also reports how uncertain its estimate is. It is more capable but needs more maths and tuning.
+
+### What value of alpha should I use?
+
+Choose a time constant first, then compute α = τ / (τ + Δt). Around half a second to a second is a reasonable start for a small balancing robot (Adams suggests a gyro weight of about 0.99), which at a 100 Hz loop means α between about 0.98 and 0.99. If the angle jitters, raise α; if it drifts, or takes too long to settle after start-up, lower it. (Real tilt passes through the gyro path at full speed whatever α is; α only sets how fast drift is corrected.) Re-check α whenever you change the loop rate.
+
+## Related
+
+[Sensor fusion](/atlas/concept/sensor-fusion) · [IMU](/atlas/concept/imu) · [Gyroscope](/atlas/concept/gyroscope) · [Accelerometer](/atlas/concept/accelerometer) · [Kalman filter](/atlas/concept/kalman-filter) · [Quaternion](/atlas/concept/quaternion)

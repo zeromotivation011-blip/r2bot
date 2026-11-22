@@ -153,7 +153,7 @@ const BASE_SHORTS: ShortLesson[] = [
     limit: 'A gyroscope slowly drifts over time, and an accelerometer is noisy when the robot is moving. That is why we fuse them.',
     demo: 'tilt',
     quiz: { q: 'What is the main problem with using a gyroscope alone?', options: ['It drifts over time', 'It cannot sense rotation', 'It only works outdoors'], answer: 0, why: 'Small errors add up as the gyro adds up rotation, so the angle slowly wanders.' },
-    atlas: [{ label: 'Gyroscope', href: '/atlas/concept/gyroscope' }, { label: 'IMU', href: '/atlas/concept/imu' }, { label: 'Kalman filter', href: '/atlas/concept/kalman-filter' }],
+    atlas: [{ label: 'Gyroscope', href: '/atlas/concept/gyroscope' }, { label: 'IMU', href: '/atlas/concept/imu' }, { label: 'Complementary filter', href: '/atlas/concept/complementary-filter' }, { label: 'Kalman filter', href: '/atlas/concept/kalman-filter' }],
     next: 'gears',
   },
   {
