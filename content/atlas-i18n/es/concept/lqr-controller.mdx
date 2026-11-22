@@ -1,0 +1,133 @@
+---
+title: Controlador LQR (regulador cuadrático lineal)
+summary: >-
+  Un controlador LQR (regulador cuadrático lineal) es un controlador de realimentación que calcula las
+  ganancias óptimas para los pesos que tú eliges: indicas cuánto te importan los errores (la matriz Q) y
+  cuánto te importa el esfuerzo (la matriz R), y te devuelve las ganancias que equilibran ambas cosas.
+  Lo usan drones, robots que se mantienen en equilibrio y sistemas de péndulo invertido sobre carro.
+laymanExplanation: >-
+  Imagina que sostienes una escoba en equilibrio sobre la mano. Quieres que la escoba siga vertical
+  (poco error), pero no quieres agitar el brazo como loco (poco esfuerzo). Un controlador LQR convierte
+  ese compromiso en números: un conjunto de pesos para «qué gravedad tiene cada tipo de error» y otro para
+  «cuánto cuesta cada tipo de esfuerzo». Un cálculo breve da entonces las ganancias que logran el
+  mejor equilibrio, y el robot las usa en cada instante para corregirse.
+sourceLastReviewed: 2026-11-22
+reviewed: 2026-11-22
+---
+
+Un **controlador LQR** (por las siglas en inglés de *linear quadratic regulator*, **regulador cuadrático lineal**) es un controlador de realimentación que calcula sus propias ganancias. Describes el robot con un modelo y después expresas dos preferencias: cuánto te disgusta cada tipo de **error** (la matriz **Q**) y cuánto te disgusta usar **esfuerzo**, como par motor (torque) o empuje (la matriz **R**). El LQR devuelve el único conjunto de ganancias que mejor equilibra ambas cosas, y el robot lo aplica de forma continua: *control = −K × estado*.
+
+## Empieza aquí: equilibrar una escoba
+
+Mantén una escoba vertical sobre la palma de la mano. Importan dos cosas a la vez:
+
+- **Error**: cuánto se inclina la escoba y a qué velocidad se cae.
+- **Esfuerzo**: con qué fuerza y rapidez tienes que mover la mano para atraparla.
+
+Si reaccionas con demasiada suavidad, la escoba se cae. Si reaccionas con demasiada violencia, desperdicias energía y te pasas de largo. Las ganancias de un [controlador PID](/atlas/concept/pid-controller) se suelen ajustar a mano o con reglas empíricas, lazo por lazo. El LQR plantea otra pregunta: *¿cuánto te cuesta cada error y cuánto te cuesta cada unidad de esfuerzo?* Escribe esos costos como números y las ganancias salen de un cálculo, no de conjeturas.
+
+Por eso el LQR es el controlador clásico para los problemas de «equilibrio»: los apuntes del curso del MIT de Tedrake lo aplican al doble integrador, al acrobot, al péndulo invertido sobre carro y a un Segway que se mantiene en equilibrio ([Underactuated Robotics, cap. 8](https://underactuated.mit.edu/lqr.html)).
+
+## Cómo funciona
+
+El LQR necesita tres ingredientes ([Tedrake, cap. 8](https://underactuated.mit.edu/lqr.html); [MathWorks `lqr`](https://www.mathworks.com/help/control/ref/lti.lqr.html)):
+
+1. **Un modelo lineal** del robot, escrito en [forma de espacio de estados](/atlas/concept/state-space-control): ẋ = Ax + Bu. Aquí *x* es el estado (ángulos, posiciones, velocidades) y *u* es la entrada (pares, empuje).
+2. **Un costo** que suma el error y el esfuerzo a lo largo de todo el tiempo futuro: J = ∫ (xᵀQx + uᵀRu) dt. El término xᵀQx es el precio de estar lejos del objetivo; uᵀRu es el precio del esfuerzo empleado para volver.
+3. **Los pesos**: Q debe ser semidefinida positiva y R definida positiva (en la práctica, suelen ser matrices diagonales de números no negativos y positivos, respectivamente).
+
+Al resolver la **ecuación algebraica de Riccati**, SA + AᵀS − SBR⁻¹BᵀS + Q = 0, se obtiene una matriz S y, a partir de ella, la ganancia **K = R⁻¹BᵀS**. El controlador es entonces simplemente **u = −Kx**: multiplicas el estado medido por K, y ese es el comando. La parte costosa (resolver la ecuación de Riccati) se hace una sola vez, fuera de línea; ejecutar el controlador es una multiplicación de matrices por paso de tiempo.
+
+Existe solución cuando se cumplen dos condiciones: el sistema es *estabilizable* (las entradas pueden influir en cada parte inestable del movimiento) y Q no deja ningún movimiento inestable o marginalmente estable completamente sin penalizar (formalmente, (Q, A) no tiene ningún modo no observable sobre el eje imaginario) ([MathWorks `lqr`, Limitations](https://www.mathworks.com/help/control/ref/lti.lqr.html)). Con Q = 0, por ejemplo, el LQR no tiene ningún motivo para estabilizar nada.
+
+## Qué significan Q y R en un dron
+
+Un cuadricóptero es un buen ejemplo porque tiene muchos estados acoplados. Un estudio publicado de vuelo en exteriores modela un cuadricóptero con **12 estados** y **4 entradas**, linealizado en torno al vuelo estacionario ([Paredes et al., 2021](https://arxiv.org/abs/2105.14231)):
+
+| Parte del problema | Qué contiene | Qué significa su peso |
+|---|---|---|
+| **Estado x** (12 números) | posición x, y, z · velocidades · ángulos de alabeo, cabeceo y guiñada · velocidades angulares del cuerpo | — |
+| **Q** (un peso por estado) | peso grande en la posición → mantener la posición con firmeza; peso grande en los ángulos → mantener el dron nivelado | «¿Qué gravedad tiene este error?» |
+| **Entrada u** (4 números) | empuje total y los tres pares sobre los ejes del cuerpo (que luego se traducen en los cuatro comandos de los motores) | — |
+| **R** (un peso por entrada) | peso grande en el empuje o el par → vuelo más suave y delicado, menos exigencia para la batería y los motores | «¿Cuánto cuesta este esfuerzo?» |
+
+Así, en el caso de un dron, **Q define qué errores de vuelo importan más** (alejarse de la referencia, inclinarse, girar sobre sí mismo) y **R define cuánto se le permite al controlador exigir a los motores** para corregirlos. Aumentar Q hace que el dron sea más reactivo y preciso; aumentar R lo vuelve más tranquilo y menos agresivo. Solo importa la *proporción*: multiplicar Q y R por el mismo número da las mismas ganancias.
+
+### Elegir los primeros Q y R: la regla de Bryson
+
+Un punto de partida habitual es la **regla de Bryson**: a cada elemento diagonal de Q se le asigna 1 dividido entre el cuadrado del mayor error que puedes aceptar en ese estado, y a cada elemento de R, 1 dividido entre el cuadrado de la mayor entrada que puedes aceptar. MathWorks señala que esto suele dar un primer diseño razonable, pero que «a menudo es solo el punto de partida de un procedimiento de diseño iterativo de prueba y error» ([MathWorks `lqr`](https://www.mathworks.com/help/control/ref/lti.lqr.html)). Åström y Murray atribuyen la regla a Bryson y Ho ([Feedback Systems, cap. 6](https://www.cds.caltech.edu/~murray/books/AM08/pdf/am08-statefbk_28Sep12.pdf)).
+
+## Pruébalo: las ganancias cambian con Q y R
+
+El sistema más sencillo con una posición y una velocidad es el *doble integrador*: un bloque sobre un riel sin fricción empujado por una fuerza (ẋ₁ = x₂, ẋ₂ = u). Este fragmento de Python calcula su ganancia LQR con SciPy:
+
+```python
+import numpy as np
+from scipy.linalg import solve_continuous_are
+
+A = np.array([[0, 1], [0, 0]])   # posición, velocidad
+B = np.array([[0], [1]])         # la fuerza cambia la velocidad
+Q = np.diag([1.0, 1.0])          # precio del error de posición y de velocidad
+R = np.array([[1.0]])            # precio de la fuerza
+
+S = solve_continuous_are(A, B, Q, R)
+K = np.linalg.solve(R, B.T @ S)  # K = R^-1 B^T S
+print(K)                          # [[1.  1.73205081]]  es decir, K = [1, √3]
+```
+
+Cambia los pesos y observa cómo se mueven las ganancias (valores calculados con el código anterior):
+
+| Pesos | Ganancia K (posición, velocidad) | Resultado |
+|---|---|---|
+| Q = diag(1, 1), R = 1 | 1.00, 1.73 | Caso base |
+| Q = diag(10, 1), R = 1 | 3.16, 2.71 | Ahora el error de posición es caro → corrección más rígida y rápida |
+| Q = diag(1, 1), R = 10 | 0.32, 0.86 | Ahora la fuerza es cara → corrección más suave y lenta |
+
+## LQR frente a PID
+
+| | [PID](/atlas/concept/pid-controller) | LQR |
+|---|---|---|
+| ¿Necesita un modelo? | No | Sí, un modelo lineal en espacio de estados |
+| Entradas y salidas | Ideal para una entrada y una salida por lazo | Maneja a la vez muchas entradas y estados acoplados |
+| Cómo se ajusta | Tres ganancias por lazo, a mano o con reglas empíricas | Eliges Q y R; las ganancias se calculan |
+| ¿Hay que medir todos los estados? | No, solo la señal de error | Sí, el estado completo (o una estimación de él) |
+| Uso típico | Velocidad de un motor, posición de una articulación, temperatura | Equilibrio, vuelo estacionario, control de actitud |
+
+Ninguno es mejor en todos los casos. Un LQR solo es tan bueno como su modelo y sus pesos; el estudio del cuadricóptero mencionado arriba hizo volar controladores PD, PID, LQR, LQR con integradores y MPC explícito en la misma aeronave precisamente para compararlos en la práctica ([Paredes et al., 2021](https://arxiv.org/abs/2105.14231)).
+
+## Límites y qué viene después
+
+- **Es lineal.** Los robots reales son no lineales, así que el LQR se diseña en torno a un único punto de operación (en posición vertical, en vuelo estacionario). Tedrake lo describe como «una aproximación local de la solución de control óptimo para el sistema no lineal»: excelente cerca de ese punto, sin garantías lejos de él ([cap. 8](https://underactuated.mit.edu/lqr.html)).
+- **Necesita el estado completo.** Si algunos estados no se miden (a menudo las velocidades no se miden), combina el LQR con un [observador de estado](/atlas/concept/state-observer) o un [filtro de Kalman](/atlas/concept/kalman-filter). Un LQR más un filtro de Kalman se llama control **LQG** (lineal cuadrático gaussiano).
+- **Ignora los límites.** El LQR básico no sabe que un motor se satura ni que una articulación tiene un tope mecánico. El [control predictivo basado en modelo](/atlas/concept/model-predictive-control) conserva la misma idea de «costo del error más costo del esfuerzo», pero la vuelve a resolver en cada paso con restricciones.
+
+## Para profundizar
+
+Para quienes se manejan con soltura en álgebra lineal, el capítulo de Tedrake trata las extensiones que se usan en robots reales ([Underactuated Robotics, cap. 8](https://underactuated.mit.edu/lqr.html)):
+
+- **LQR de horizonte finito y variante en el tiempo.** En lugar de una K constante, la ecuación de Riccati se integra hacia atrás en el tiempo para obtener una ganancia K(t). Así es como un robot sigue una trayectoria planificada (una voltereta, un salto, un levantamiento por balanceo) en lugar de mantener una sola postura.
+- **LQR en tiempo discreto.** Los controladores digitales funcionan a una frecuencia fija, así que se resuelve la ecuación de Riccati discreta; su solución de horizonte infinito es el punto fijo de la recursión discreta.
+- **Términos cruzados.** El costo general añade 2xᵀNu, lo que da K = R⁻¹(BᵀS + Nᵀ) ([MathWorks `lqr`](https://www.mathworks.com/help/control/ref/lti.lqr.html)).
+- **Asignación de polos frente a LQR.** La [asignación de polos](/atlas/concept/pole-placement) elige directamente dónde van los polos en lazo cerrado; el LQR deja que caigan donde los sitúe el compromiso óptimo, lo que escala mejor cuando hay muchas entradas.
+
+## Por qué importa
+
+El LQR es el paso de ajustar lazos individuales a mano a diseñar un controlador para todo el robot a la vez. Su idea central, *escribir como un costo lo que te importa y dejar que las matemáticas encuentren el controlador*, recorre el control predictivo basado en modelo, la optimización de trayectorias y buena parte del control moderno de robots.
+
+## Preguntas frecuentes
+
+### ¿Qué es un controlador LQR, en palabras sencillas?
+
+Es un controlador que calcula por ti las mejores ganancias de realimentación. Le das un modelo del robot y dos conjuntos de pesos: uno que dice cuánto importa cada error (Q) y otro que dice cuánto cuesta cada tipo de esfuerzo (R). Te devuelve unas ganancias que buscan el equilibrio entre una corrección rápida y el esfuerzo desperdiciado.
+
+### En un LQR, ¿qué definen las matrices Q y R para un dron?
+
+Q fija con cuánta fuerza debe combatir el dron cada error: alejarse de su posición, inclinarse o girar sobre sí mismo. R fija cuánto cuesta usar empuje y par. Una Q mayor da un vuelo más ajustado y rápido; una R mayor da un vuelo más suave con menos esfuerzo de los motores. La regla de Bryson (1 entre el cuadrado del mayor error o entrada aceptable) es un punto de partida habitual.
+
+### ¿Es mejor el LQR que el PID?
+
+No siempre. El LQR maneja a la vez muchos estados acoplados y calcula sus ganancias a partir de un modelo, lo que lo convierte en una opción sólida para el equilibrio y el vuelo estacionario. El PID no necesita modelo y es más sencillo de ejecutar en un solo lazo. En la práctica, el LQR está limitado por la calidad del modelo, y necesita que el estado completo se mida o se estime.
+
+## Relacionado
+
+[Controlador PID](/atlas/concept/pid-controller) · [Control predictivo basado en modelo](/atlas/concept/model-predictive-control) · [Control en espacio de estados](/atlas/concept/state-space-control) · [Observador de estado](/atlas/concept/state-observer) · [Asignación de polos](/atlas/concept/pole-placement)

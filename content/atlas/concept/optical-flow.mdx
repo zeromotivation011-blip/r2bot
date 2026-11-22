@@ -17,6 +17,7 @@ seeAlso:
   - visual-odometry
   - stereo-vision
   - visual-servoing
+  - optical-flow-sensor
 lastReviewed: 2026-07-10T00:00:00.000Z
 sources:
   - title: 'Lucas-Kanade & Horn-Schunck (classic methods)'
@@ -60,7 +61,7 @@ Optical flow is the field of **apparent motion** between two consecutive frames 
 
 ## What robots do with it
 
-- **Ego-motion / speed sensing.** A downward camera on a drone reads flow to estimate sideways drift and hold position indoors where there's no GPS — the trick behind consumer drones' rock-steady hover.
+- **Ego-motion / speed sensing.** A downward camera on a drone reads flow to estimate sideways drift and hold position indoors where there's no GPS. Dedicated [optical flow sensors](/atlas/concept/optical-flow-sensor) package this into a small module that pairs with a rangefinder.
 - **Moving-object detection.** Subtract the flow caused by the robot's own motion and whatever's left is something *else* moving — a pedestrian, another vehicle.
 - **Tracking and [visual servoing](/atlas/concept/visual-servoing).** Following features frame-to-frame.
 
@@ -74,4 +75,4 @@ Optical flow is one of the oldest and most useful motion cues in vision — the 
 
 ## Related
 
-[Computer vision](/atlas/concept/computer-vision) · [Visual odometry](/atlas/concept/visual-odometry) · [Stereo vision](/atlas/concept/stereo-vision) · [Visual servoing](/atlas/concept/visual-servoing)
+[Computer vision](/atlas/concept/computer-vision) · [Visual odometry](/atlas/concept/visual-odometry) · [Stereo vision](/atlas/concept/stereo-vision) · [Visual servoing](/atlas/concept/visual-servoing) · [Optical flow sensor](/atlas/concept/optical-flow-sensor)

@@ -1,129 +1,151 @@
 ---
-title: Optical Flow Sensor in Robotics
-summary: >-
-  Optical flow sensors estimate motion by tracking how pixels shift between
-  frames. Used by drones, mice, and self-balancing robots to hold position.
-category: sensors
+title: Optical Flow Sensor
+slug: optical-flow-sensor
 bucket: sensors
-difficulty: intermediate
-lastReviewed: 2026-05-21T00:00:00.000Z
-sources:
-  - title: 'Optical flow'
-    url: 'https://en.wikipedia.org/wiki/Optical_flow'
+category: sensors
+summary: >-
+  An optical flow sensor is a small downward-facing camera that measures how fast the ground slides
+  past it. Combined with a height reading from a rangefinder, that tells a drone or robot its own
+  sideways speed, so it can hold position indoors or anywhere GPS is unavailable.
+difficulty: 3
 tags:
   - optical-flow
-  - vision
-  - motion
+  - sensors
   - drone
   - velocity
-relatedTerms:
-  - camera-vision
-  - imu
-  - visual-odometry
-  - sensor-fusion
-  - slam
+  - px4
+  - ardupilot
 seeAlso:
-  - camera-vision
-  - imu
+  - optical-flow
   - visual-odometry
+  - imu
+  - time-of-flight-sensor
   - sensor-fusion
-  - slam
-  - radar-sensor
-youtubeSearchQuery: optical flow sensor drone explained
+  - drone
+lastReviewed: 2026-11-22T00:00:00.000Z
+sources:
+  - title: 'Optical Flow — PX4 User Guide (main)'
+    url: 'https://docs.px4.io/main/en/sensor/optical_flow'
+  - title: 'PMW3901-Based Flow Sensors — PX4 User Guide'
+    url: 'https://docs.px4.io/main/en/sensor/pmw3901'
+  - title: 'PX4FLOW Smart Camera — PX4 User Guide (v1.13), citing Honegger, Meier, Tanskanen & Pollefeys, ICRA 2013'
+    url: 'https://docs.px4.io/v1.13/en/sensor/px4flow'
+  - title: 'Optical Flow Sensor Testing and Setup — ArduPilot Copter documentation'
+    url: 'https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html'
+  - title: 'ARCHIVED: Mouse-based Optical Flow Sensor (ADNS3080) — ArduPilot documentation'
+    url: 'https://ardupilot.org/plane/docs/common-mouse-based-optical-flow-sensor-adns3080.html'
 laymanExplanation: >-
-  An optical flow sensor measures how the world moves across a camera between
-  successive frames. By tracking the apparent shift of pixels, it estimates
-  velocity in two axes without needing GPS. The same principle is used in every
-  modern computer mouse — translated to fly-above-the-floor at thousands of feet
-  for drones.
-realRobotsThatUseThis: []
-indianExample: ''
-prerequisiteTerms: []
-unlocksTerms: []
-quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
-difficultyLabel: Classroom
+  Look down from a moving train and the ground streams past: the faster the train, the faster the
+  stream. Now climb higher and the same speed looks slower. An optical flow sensor does exactly this
+  with a tiny camera pointed at the floor. It measures how fast the picture is sliding, a second
+  sensor measures the height, and together they give the robot its real speed over the ground.
 technicalDefinition: >-
-  Optical flow sensors estimate motion by tracking how pixels shift between
-  frames. Used by drones, mice, and self-balancing robots to hold position.
-slug: optical-flow-sensor
+  An optical flow sensor is an imaging sensor plus on-board processing that outputs the apparent
+  motion of the scene between frames (pixels per frame, or angular flow in radians once the lens is
+  calibrated). For a
+  downward-looking sensor at height h above flat ground, translational velocity is approximately
+  v ≈ (ω_flow − ω_body) · h, where ω_body is the vehicle's rotation rate from a gyroscope. A state
+  estimator (e.g. PX4 EKF2, ArduPilot EKF3) fuses this velocity with IMU and rangefinder data.
+quizQuestion:
+  q: A drone's optical flow sensor reports the same flow rate at 1 m and at 4 m above the ground. Which is true?
+  options:
+    - The drone is moving about four times faster at 4 m
+    - The drone is moving at the same speed at both heights
+    - The drone is moving four times slower at 4 m
+    - The reading is meaningless without GPS
+  answer: 0
+  explanation: >-
+    Flow is an angle per second, and ground speed is roughly flow rate × height. The same angular
+    rate seen from four times higher means about four times the ground speed. This is why every
+    optical flow setup needs a height measurement.
 ---
 
-# Optical Flow Sensor in Robotics
+An **optical flow sensor** is a small downward-facing camera that measures how fast the ground slides past it. On its own that only gives an angle per second; add a **height reading** from a rangefinder and the robot knows its real sideways speed in metres per second. Drones use it to **hover in place without GPS** (indoors, underground, under bridges), and the same idea is what lets an optical computer mouse track its movement across the desk.
 
-## What is Optical Flow Sensor in Robotics?
+This page is about the sensor *hardware* and how robots use it. For the underlying computer-vision idea (Lucas–Kanade, dense vs sparse flow), see [optical flow](/atlas/concept/optical-flow).
 
-An optical flow sensor measures how the world moves across a camera between successive frames. By tracking the apparent shift of pixels, it estimates velocity in two axes without needing GPS. The same principle is used in every modern computer mouse — translated to fly-above-the-floor at thousands of feet for drones.
+## Start here: the view from a train window
 
-## How It Works
+Look down from a moving train and the ground rushes past. Two things change how fast it seems to move:
 
-A small image sensor captures frames at 100–4000 Hz. A built-in DSP compares each frame with the previous one and finds the average pixel shift using block-matching or Lucas–Kanade flow. Combined with the camera height (from a ToF or barometer), the sensor outputs metres-per-second velocity over a serial bus. The PX4FLOW module pairs a CMOS camera, sonar altimeter, and gyroscope; it spits out clean XY velocity at 250 Hz — exactly what a drone autopilot needs.
+- **Speed.** A faster train makes the ground stream faster.
+- **Height.** Climb higher and the same speed looks slower: from a plane window, the ground seems to crawl.
 
-## Real-World Example
+An optical flow sensor sees only the first part, the *apparent* motion, measured as an angle per second. It cannot tell "fast and high" from "slow and low". That is why every flight-controller guide pairs it with a **distance sensor**: PX4's setup calls for "a downward facing camera and a downward facing distance sensor (preferably a LiDAR)" ([PX4: Optical Flow](https://docs.px4.io/main/en/sensor/optical_flow)).
 
-DJI Mini and Mavic drones use optical-flow downward-facing cameras to hold position indoors where GPS is unavailable. Roomba J7 uses optical flow to detect when it has been picked up. Every modern computer mouse is an optical-flow sensor with a tiny CMOS imager that tracks the surface beneath it.
+## How it works
 
-## Why It Matters for Robotics
+1. **Take pictures, very fast.** A small image sensor photographs the ground many times a second. The original open-hardware PX4FLOW camera, for example, has a 752×480 sensor and computes flow "on a 4x binned and cropped area at 400 Hz" ([PX4FLOW docs](https://docs.px4.io/v1.13/en/sensor/px4flow)).
+2. **Compare each frame with the last.** On-board processing finds how far the texture shifted between frames. Chips such as the PixArt PMW3901 do this internally: PX4 describes it as "an optical flow ASIC that computes the flow internally and provides a difference in pixels between each frame", a tracking sensor "similar to what you would find in a computer mouse" ([PX4: PMW3901](https://docs.px4.io/main/en/sensor/pmw3901)).
+3. **Turn pixels into angles.** Knowing the lens, the pixel shift becomes an angular rate. PX4 treats the integrated flow values as "angular measurements (radians)", not distances ([PX4: Optical Flow](https://docs.px4.io/main/en/sensor/optical_flow)).
+4. **Remove the robot's own rotation.** If the drone tilts, the ground appears to move even when the drone stays put. A gyroscope measures that rotation so it can be subtracted. ArduPilot's calibration checks exactly this: you roll and pitch the vehicle by about ±15° and check that the flow reading follows the rotation measured by the gyro ([ArduPilot: setup](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+5. **Multiply by height.** What is left is translational flow. Multiply by the height from the rangefinder and you have ground speed.
+6. **Fuse it.** The flight controller's estimator (EKF2 in PX4, EKF3 in ArduPilot) blends that velocity with the [IMU](/atlas/concept/imu) and other sensors into one estimate of the vehicle's motion ([PX4](https://docs.px4.io/main/en/sensor/optical_flow); [ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
 
-Optical flow gives a robot a sense of motion using just a camera — no expensive IMUs, no GPS. For Indian drone startups (Ideaforge, Garuda) and indoor delivery robots, optical-flow is a cost-saving must. It is also one of the easiest CV topics for students to implement and visualise.
+### The one equation
 
-## Try It Yourself
+For a sensor looking straight down at flat ground from height *h*:
 
-Open `/visualizer` on R2BOT, scroll to the optical-flow demo, and drag the mouse — watch the live arrows showing pixel velocity. Then read about Lucas–Kanade and try writing it yourself in OpenCV (10 lines of Python).
+**ground speed ≈ (flow rate − rotation rate) × height**
 
-## Quick Quiz
+with the rates in radians per second and the height in metres. A residual flow of 0.5 rad/s at 2 m means about 1 m/s; the same 0.5 rad/s at 6 m means about 3 m/s.
 
-```quiz
-[
-  {
-    "q": "Optical flow estimates:",
-    "options": [
-      "Battery state of charge",
-      "Pixel-level motion between camera frames",
-      "Surface temperature",
-      "Wireless signal strength"
-    ],
-    "answer": 1,
-    "explain": "Optical flow tracks how pixels shift between frames to infer the camera (or world) motion."
-  },
-  {
-    "q": "A common everyday device that uses optical flow is the:",
-    "options": [
-      "Microwave oven",
-      "Computer mouse",
-      "Refrigerator",
-      "Headphone"
-    ],
-    "answer": 1,
-    "explain": "Modern computer mice are tiny optical-flow imaging systems sampling the surface they ride over."
-  },
-  {
-    "q": "For a drone, optical flow is most useful when:",
-    "options": [
-      "Flying through clouds",
-      "GPS is weak or unavailable indoors",
-      "The drone is sleeping",
-      "Battery is full"
-    ],
-    "answer": 1,
-    "explain": "Indoors and in urban canyons, GPS is unreliable — optical flow holds position visually."
-  }
-]
-```
+The same relationship sets the sensor's speed limit. Because the sensor can only track a limited angular rate, the fastest measurable speed grows with height: the PX4FLOW documentation gives **2.4 m/s at 1 m** and **7.2 m/s at 3 m** with its 16 mm lens ([PX4FLOW docs](https://docs.px4.io/v1.13/en/sensor/px4flow)).
 
-## Further Reading
+## Common optical flow sensors
 
-- [Camera Vision](/atlas/concept/camera-vision)
-- [Imu](/atlas/concept/imu)
-- [Visual Odometry](/atlas/concept/visual-odometry)
-- [Sensor Fusion](/atlas/concept/sensor-fusion)
-- [Slam](/atlas/concept/slam)
+| Sensor | What it is | Height reading | Source |
+|---|---|---|---|
+| **PX4FLOW** | Open-hardware smart camera (2013), documented in older PX4 releases: 752×480 MT9V034 sensor, 168 MHz Cortex-M4F, on-board gyro, input for a sonar | Sonar input on board | [PX4 docs](https://docs.px4.io/v1.13/en/sensor/px4flow) |
+| **PMW3901 boards** | Mouse-style flow chip "adapted to work between 80 mm and infinity"; sold on breakouts from Bitcraze, CubePilot (HereFlow), Holybro, Thone and others | Some boards include a distance sensor, some need an external one | [PX4 docs](https://docs.px4.io/main/en/sensor/pmw3901) |
+| **CAN flow modules** | PX4 lists ARK Flow, ARK Flow MR, Holybro H-Flow and Agam FloRange, connected over DroneCAN | Built-in lidar distance sensor | [PX4 docs](https://docs.px4.io/main/en/sensor/optical_flow) |
+| **ADNS3080** (archived) | An optical-mouse sensor with a lens, once used on early ArduPilot copters; now "no longer supported" | Not on the sensor itself | [ArduPilot docs](https://ardupilot.org/plane/docs/common-mouse-based-optical-flow-sensor-adns3080.html) |
 
-## Ask R2 About This
+For PMW3901 boards without their own rangefinder, PX4 says an external one is required, and recommends one for the others because their built-in range is "quite limited"; it suggests about 4 m of range for indoor flight and 10 m or more outdoors ([PX4: PMW3901](https://docs.px4.io/main/en/sensor/pmw3901)).
 
-Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Optical Flow Sensor in Robotics for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.
+## Where you'll see it
+
+- **Small drones flying indoors.** Position hold where there is no GPS signal. In ArduPilot you can set the EKF to take horizontal velocity from optical flow (`EK3_SRC1_VELXY = 5`) with no position source at all ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+- **Anywhere GPS is denied.** PX4 frames the use case as flying "in buildings, underground, or in any other GNSS-denied environment" ([PX4](https://docs.px4.io/main/en/sensor/optical_flow)).
+- **Your desk.** An optical mouse uses the same principle, pointed at the desk. The archived ArduPilot ADNS3080 sensor was literally a mouse sensor fitted with a lens ([ArduPilot](https://ardupilot.org/plane/docs/common-mouse-based-optical-flow-sensor-adns3080.html)).
+
+## Limits
+
+- **It needs texture and light.** A plain white floor, still water or darkness gives the camera nothing to track. ArduPilot's calibration procedure asks for "a textured surface and good lighting" ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)), and its archived mouse-sensor page notes that sensor "only works in well lit environments" ([ArduPilot ADNS3080](https://ardupilot.org/plane/docs/common-mouse-based-optical-flow-sensor-adns3080.html)).
+- **It is only as good as the height.** A wrong rangefinder reading gives a wrong speed. A copter flying on flow alone in Loiter or PosHold will not climb above the rangefinder's maximum (`RNGFNDx_MAX`) in ArduPilot ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+- **High altitude gets wobbly.** PX4 warns that the low resolution of common flow sensors "can cause slow oscillations when hovering at a high altitude above ground (> 20m)" ([PX4](https://docs.px4.io/main/en/sensor/optical_flow)).
+- **It measures velocity, not position.** Position is velocity added up over time, so small errors accumulate into drift. For position over long runs, robots add [visual odometry](/atlas/concept/visual-odometry), [SLAM](/atlas/concept/slam) or GPS.
+- **It assumes flat ground.** The "× height" step treats the ground as a flat plane under the sensor; slopes, steps and tall grass break that assumption.
+
+## Going deeper: setting one up
+
+The details differ by flight stack, but the same four things always matter:
+
+1. **Mounting and orientation.** Flow modules are usually mounted near the centre of the vehicle, looking straight down; PX4 sets the orientation with `SENS_FLOW0_ROT` ([PX4: PMW3901](https://docs.px4.io/main/en/sensor/pmw3901)) and an off-centre lens position with `SENS_FLOW0_POS_X/Y/Z` ([PX4: Optical Flow](https://docs.px4.io/main/en/sensor/optical_flow)).
+2. **Enable fusion.** PX4 enables optical flow fusion in EKF2 with `EKF2_OF0_CTRL` ([PX4](https://docs.px4.io/main/en/sensor/optical_flow)); ArduPilot selects flow as a velocity source with the `EK3_SRC` parameters ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+3. **Calibrate the scale.** Rock the vehicle in roll and pitch and compare flow with gyro. If they disagree, adjust the scale: `FLOW_FXSCALER` / `FLOW_FYSCALER` in ArduPilot (which also offers an in-flight calibration switch), `SENS_FLOW0_SCALE` in PX4 ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html); [PX4](https://docs.px4.io/main/en/sensor/optical_flow)).
+4. **Check the rangefinder too.** A wrong height gives a wrong speed even when the flow itself is fine, so ArduPilot's troubleshooting list starts with checking that the rangefinder works ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+
+For the research origin of low-cost metric flow cameras, the PX4FLOW paper is Honegger, Meier, Tanskanen and Pollefeys, *An Open Source and Open Hardware Embedded Metric Optical Flow CMOS Camera for Indoor and Outdoor Applications*, ICRA 2013 (cited in the [PX4FLOW docs](https://docs.px4.io/v1.13/en/sensor/px4flow)).
+
+## Why it matters
+
+GPS is unavailable indoors and unreliable under bridges and close to buildings, and an IMU on its own drifts because small errors add up over time. A cheap flow sensor plus a rangefinder gives a small robot a direct measurement of its own speed, which is often the difference between a drone that hovers calmly in a room and one that slowly slides into the wall.
+
+## Common questions
+
+### What does an optical flow sensor do on a drone?
+
+It looks at the ground and measures how fast the image moves. With the drone's height from a rangefinder and its rotation from a gyroscope, the flight controller turns that into ground speed, which lets the drone hold its position without GPS.
+
+### Why does an optical flow sensor need a rangefinder?
+
+Because the sensor only measures an angle per second. The same image motion can mean slow flight close to the ground or fast flight high up. Multiplying by the measured height gives the real speed in metres per second.
+
+### Does an optical flow sensor work in the dark or over water?
+
+Usually not well. It needs visible texture to track, so dark rooms, glossy or plain floors and calm water make the reading unreliable. ArduPilot's guide asks for a textured surface and good lighting when calibrating.
+
+## Related
+
+[Optical flow](/atlas/concept/optical-flow) · [Visual odometry](/atlas/concept/visual-odometry) · [IMU](/atlas/concept/imu) · [Time-of-flight sensor](/atlas/concept/time-of-flight-sensor) · [Sensor fusion](/atlas/concept/sensor-fusion) · [Drone](/atlas/concept/drone)

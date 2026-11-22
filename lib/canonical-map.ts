@@ -90,6 +90,8 @@ export const ATLAS_QUERY_OWNER: Record<string, string> = {
   lqr: '/atlas/concept/lqr-controller',
   'lqr controller': '/atlas/concept/lqr-controller',
   'linear quadratic regulator': '/atlas/concept/lqr-controller',
+  'optical flow sensor': '/atlas/concept/optical-flow-sensor',
+  'optical flow': '/atlas/concept/optical-flow',
   moveit: '/atlas/concept/moveit',
   moveit2: '/atlas/concept/moveit2-stack',
 }

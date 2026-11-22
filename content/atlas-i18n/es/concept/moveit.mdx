@@ -1,0 +1,81 @@
+---
+title: MoveIt (planificación de movimiento para brazos robóticos)
+summary: >-
+  MoveIt es un software libre y de código abierto para ROS que mueve brazos robóticos: le das un
+  objetivo para la pinza y calcula los ángulos de las articulaciones, planifica un camino que
+  evita los obstáculos y el propio brazo, y envía el movimiento al robot. MoveIt 2 es la versión
+  actual, para ROS 2.
+laymanExplanation: >-
+  MoveIt es un «cerebro de planificación» ya hecho para brazos robóticos. Le dices adónde quieres que
+  vaya la mano y calcula cómo debe girar cada articulación, encuentra un camino que no choque con
+  nada y le entrega al robot un movimiento suave para que lo siga. Sin él, cada equipo tendría que
+  escribir todo eso desde cero para cada brazo.
+sourceLastReviewed: 2026-11-22
+reviewed: 2026-11-22
+---
+
+**MoveIt** es un software libre y de código abierto para [ROS](/atlas/concept/ros2) que mueve brazos robóticos. Le dices adónde debe ir la pinza; calcula los ángulos de las articulaciones, planifica un camino que evita los obstáculos y el propio cuerpo del brazo, y envía el movimiento al robot. Si [Nav2](/atlas/concept/nav2) es la forma en que un robot con ROS 2 se *desplaza* hasta un sitio, MoveIt es la forma en que un brazo robótico *alcanza* un sitio. La versión actual, **MoveIt 2**, funciona sobre ROS 2 y su documentación la describe como «la plataforma de manipulación robótica para ROS 2» ([documentación de MoveIt 2](https://moveit.picknik.ai/main/index.html)).
+
+## Empieza aquí: «toma esa taza»
+
+Pedirle a un brazo que tome una taza parece una sola instrucción. En realidad son cuatro problemas difíciles:
+
+1. **¿Dónde debe estar cada articulación?** El objetivo de la pinza es una posición y una orientación en el espacio; los motores solo entienden ángulos de articulación. Convertir lo uno en lo otro es la [cinemática inversa](/atlas/concept/inverse-kinematics).
+2. **¿Cómo llego sin chocar con nada?** La mesa, la taza, la mano de una persona y los propios eslabones del brazo se interponen. Encontrar una ruta segura es la [planificación de movimiento](/atlas/concept/motion-planning).
+3. **¿Es segura esta postura?** Cada postura candidata a lo largo del camino tiene que comprobarse para ver si entra en contacto con el entorno o consigo misma: la [detección de colisiones](/atlas/concept/collision-checking).
+4. **¿A qué velocidad puede moverse cada articulación?** Un camino geométrico todavía no es un movimiento. Necesita una temporización que respete los límites de velocidad y aceleración de cada articulación antes de poder enviarse a los motores.
+
+MoveIt reúne los cuatro, de modo que «ve aquí» se convierte en una sola petición.
+
+```diagram
+{ "type": "flow", "title": "Del objetivo al movimiento del brazo", "nodes": ["Postura objetivo", "Cinemática inversa", "Camino sin colisiones", "Añadir temporización", "Controladores del brazo"], "caption": "MoveIt encadena cinemática, planificación, detección de colisiones y parametrización temporal, y después envía la trayectoria a los controladores del brazo." }
+```
+
+## Cómo funciona (en resumen)
+
+- **Conoce tu robot a partir de archivos de descripción.** El brazo físico sale de su [URDF](/atlas/concept/urdf); un segundo archivo, el SRDF, añade qué articulaciones forman los grupos «brazo» y «pinza» y qué pares de eslabones no necesitan comprobación de colisiones (contiguos, siempre en contacto o que nunca pueden chocar). El MoveIt Setup Assistant genera esta configuración ([apuntes de ROS de Northwestern](https://nu-msr.github.io/ros_notes/ros2/moveit.html)).
+- **Mantiene un modelo del mundo.** La *escena de planificación* (planning scene) contiene el estado actual del robot más los obstáculos (de una cámara de profundidad o añadidos por código) y los objetos sujetos a la pinza.
+- **Planifica con planificadores intercambiables.** Por defecto, MoveIt usa la Open Motion Planning Library (OMPL), una colección de planificadores basados en muestreo como [RRT](/atlas/concept/rrt); el planificador de movimiento industrial Pilz y CHOMP también vienen incluidos ([conceptos de MoveIt: planificación de movimiento](https://moveit.picknik.ai/main/doc/concepts/motion_planning.html)).
+- **Resuelve la cinemática inversa con plugins.** El predeterminado es KDL, un solucionador numérico basado en el jacobiano ([conceptos de MoveIt: cinemática](https://moveit.picknik.ai/main/doc/concepts/kinematics.html)).
+- **Ejecuta a través de controladores.** El nodo central `move_group` envía la trayectoria temporizada a los controladores del robot mediante la acción `FollowJointTrajectory` ([conceptos de MoveIt: move_group](https://moveit.picknik.ai/main/doc/concepts/move_group.html)).
+
+La arquitectura de ROS 2 en detalle (nodos, plugins, los pasos de configuración y la primera demo que ejecutar) está en la [página de MoveIt 2](/atlas/concept/moveit2-stack).
+
+## MoveIt frente a MoveIt 2
+
+| | MoveIt (MoveIt 1) | MoveIt 2 |
+|---|---|---|
+| Funciona sobre | ROS 1 | [ROS 2](/atlas/concept/ros2) |
+| Código fuente | [moveit/moveit](https://github.com/moveit/moveit) | Repositorio moveit2 ([ROS Index](https://index.ros.org/r/moveit/)) |
+| Úsalo para | Mantener sistemas ROS 1 existentes | Cualquier proyecto nuevo |
+
+Las ideas (grupos de planificación, escena de planificación, planificadores como plugins, `move_group`) pasaron de MoveIt 1 a MoveIt 2, así que la mayoría de los tutoriales sobre conceptos sirven para ambos; los comandos, los archivos de lanzamiento y las API son distintos. Los paquetes de MoveIt 2 se publican en ROS Index para las distribuciones actuales de ROS 2, como Humble y Jazzy ([ROS Index](https://index.ros.org/r/moveit/)). Según el README del proyecto, el desarrollo lo lidera PickNik Robotics ([ROS Index](https://index.ros.org/r/moveit/)).
+
+## Dónde lo verás
+
+- **[Pick and place](/atlas/concept/pick-and-place)** (tomar y colocar) y extracción de piezas de contenedores: alcanzar una pieza, agarrarla, llevarla esquivando obstáculos y dejarla.
+- **Docencia e investigación**: los cursos universitarios de robótica usan MoveIt para poner un brazo simulado o real en manos de los estudiantes sin tener que escribir antes un planificador (por ejemplo, [los apuntes de ROS 2 de Northwestern](https://nu-msr.github.io/ros_notes/ros2/moveit.html)).
+- **Prototipos de celdas industriales**: inspección, carga y descarga de máquinas y ensamblaje, donde un brazo tiene que alcanzar muchos objetivos sin chocar con los dispositivos de sujeción.
+- **Planificación interactiva en [RViz](/atlas/concept/rviz2)**: arrastra el marcador del objetivo de la pinza, haz clic en *Plan*, mira la vista previa y después haz clic en *Execute*.
+
+## Por qué importa
+
+Escribir la cinemática inversa, un planificador de movimiento, un detector de colisiones y la integración con los controladores para un solo brazo es un trabajo grande y especializado. MoveIt lo convierte en configuración: describe tu robot, elige tus planificadores y dedica el tiempo a la tarea real. Por eso es un punto de partida habitual para los brazos robóticos en ROS.
+
+## Preguntas frecuentes
+
+### ¿Para qué se usa MoveIt?
+
+Para mover brazos robóticos de forma segura. Si le das a MoveIt un objetivo para la pinza (o un conjunto de ángulos de articulación), planifica un movimiento sin colisiones y lo envía al brazo. Se usa para pick and place, agarre, inspección e investigación con manipuladores que funcionan con ROS.
+
+### ¿MoveIt es lo mismo que MoveIt 2?
+
+Son dos generaciones del mismo proyecto. MoveIt (MoveIt 1) funciona sobre ROS 1; MoveIt 2 funciona sobre ROS 2 y se publicó por primera vez en 2019. Los proyectos nuevos deberían usar MoveIt 2, porque el desarrollo continúa en ROS 2.
+
+### ¿MoveIt funciona con cualquier brazo robótico?
+
+Funciona con cualquier brazo que tenga una descripción URDF y controladores de articulaciones con los que ROS pueda comunicarse. Generas una configuración de MoveIt para el brazo (el SRDF y los ajustes de planificadores y controladores) con el MoveIt Setup Assistant y después lanzas `move_group` con ella.
+
+## Relacionado
+
+[MoveIt 2 en ROS 2](/atlas/concept/moveit2-stack) · [Cinemática inversa](/atlas/concept/inverse-kinematics) · [Planificación de movimiento](/atlas/concept/motion-planning) · [Detección de colisiones](/atlas/concept/collision-checking) · [URDF](/atlas/concept/urdf)
