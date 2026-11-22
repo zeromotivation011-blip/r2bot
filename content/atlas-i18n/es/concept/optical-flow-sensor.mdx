@@ -1,0 +1,106 @@
+---
+title: Sensor de flujo óptico
+summary: >-
+  Un sensor de flujo óptico es una pequeña cámara orientada hacia abajo que mide a qué velocidad se
+  desliza el suelo bajo ella. Junto con la medida de altura de un telémetro, le indica a un dron o a
+  un robot su propia velocidad lateral, para que pueda mantener la posición en interiores o en
+  cualquier lugar donde no haya GPS.
+laymanExplanation: >-
+  Mira hacia abajo desde un tren en marcha y verás el suelo pasar como un río: cuanto más rápido va
+  el tren, más rápido corre ese río. Ahora sube más alto y la misma velocidad parece más lenta. Un
+  sensor de flujo óptico hace exactamente esto con una cámara diminuta apuntada al suelo. Mide a qué
+  velocidad se desliza la imagen, un segundo sensor mide la altura y, juntos, le dan al robot su
+  velocidad real respecto al suelo.
+sourceLastReviewed: 2026-11-22
+reviewed: 2026-11-22
+---
+
+Un **sensor de flujo óptico** (optical flow sensor) es una pequeña cámara orientada hacia abajo que mide a qué velocidad se desliza el suelo bajo ella. Por sí solo, únicamente da un ángulo por segundo; si le añades una **medida de altura** de un telémetro (rangefinder), el robot conoce su velocidad lateral real en metros por segundo. Los drones lo usan para **mantenerse en vuelo estacionario sin GPS** (en interiores, bajo tierra, debajo de puentes), y la misma idea es la que permite que un ratón óptico siga su movimiento sobre la mesa.
+
+Esta página trata del *hardware* del sensor y de cómo lo usan los robots. Para la idea de visión artificial en la que se basa (Lucas–Kanade, flujo denso frente a disperso), consulta [flujo óptico](/atlas/concept/optical-flow).
+
+## Empieza aquí: la vista desde la ventanilla de un tren
+
+Mira hacia abajo desde un tren en marcha y verás el suelo pasar a toda velocidad. Dos cosas influyen en lo rápido que parece moverse:
+
+- **La velocidad.** Un tren más rápido hace que el suelo pase más deprisa.
+- **La altura.** Sube más alto y la misma velocidad parece más lenta: desde la ventanilla de un avión, el suelo parece moverse a paso de tortuga.
+
+Un sensor de flujo óptico solo ve la primera parte, el movimiento *aparente*, medido como un ángulo por segundo. No puede distinguir «rápido y alto» de «lento y bajo». Por eso todas las guías de controladoras de vuelo lo combinan con un **sensor de distancia**: la configuración de PX4 pide «una cámara orientada hacia abajo y un sensor de distancia orientado hacia abajo (preferiblemente un LiDAR)» ([PX4: flujo óptico](https://docs.px4.io/main/en/sensor/optical_flow)).
+
+## Cómo funciona
+
+1. **Toma imágenes, muy rápido.** Un pequeño sensor de imagen fotografía el suelo muchas veces por segundo. Por ejemplo, la cámara PX4FLOW original, de hardware abierto, tiene un sensor de 752×480 y calcula el flujo «en un área recortada y con agrupamiento de píxeles (binning) 4x, a 400 Hz» ([documentación de PX4FLOW](https://docs.px4.io/v1.13/en/sensor/px4flow)).
+2. **Compara cada fotograma con el anterior.** El procesamiento integrado calcula cuánto se ha desplazado la textura entre fotogramas. Chips como el PixArt PMW3901 lo hacen internamente: PX4 lo describe como «un ASIC de flujo óptico que calcula el flujo internamente y proporciona una diferencia en píxeles entre cada fotograma», un sensor de seguimiento «similar al que encontrarías en un ratón de computadora» ([PX4: PMW3901](https://docs.px4.io/main/en/sensor/pmw3901)).
+3. **Convierte píxeles en ángulos.** Conociendo la lente, el desplazamiento en píxeles se convierte en una velocidad angular. PX4 trata los valores de flujo integrados como «medidas angulares (radianes)», no como distancias ([PX4: flujo óptico](https://docs.px4.io/main/en/sensor/optical_flow)).
+4. **Elimina la rotación del propio robot.** Si el dron se inclina, el suelo parece moverse aunque el dron no se desplace. Un giroscopio mide esa rotación para poder restarla. La calibración de ArduPilot comprueba exactamente esto: inclinas el vehículo en alabeo y cabeceo (roll y pitch) unos ±15° y verificas que la lectura de flujo sigue la rotación medida por el giroscopio ([ArduPilot: configuración](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+5. **Multiplica por la altura.** Lo que queda es el flujo de traslación. Multiplícalo por la altura que da el telémetro y tendrás la velocidad respecto al suelo.
+6. **Fusiónalo.** El estimador de la controladora de vuelo (EKF2 en PX4, EKF3 en ArduPilot) combina esa velocidad con la [IMU](/atlas/concept/imu) y otros sensores en una única estimación del movimiento del vehículo ([PX4](https://docs.px4.io/main/en/sensor/optical_flow); [ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+
+### La única ecuación que necesitas
+
+Para un sensor que mira en vertical hacia un suelo plano desde una altura *h*:
+
+**velocidad respecto al suelo ≈ (tasa de flujo − tasa de rotación) × altura**
+
+con las tasas en radianes por segundo y la altura en metros. Un flujo residual de 0.5 rad/s a 2 m equivale a aproximadamente 1 m/s; los mismos 0.5 rad/s a 6 m equivalen a unos 3 m/s.
+
+La misma relación fija el límite de velocidad del sensor. Como el sensor solo puede seguir una velocidad angular limitada, la velocidad máxima medible crece con la altura: la documentación de PX4FLOW da **2.4 m/s a 1 m** y **7.2 m/s a 3 m** con su lente de 16 mm ([documentación de PX4FLOW](https://docs.px4.io/v1.13/en/sensor/px4flow)).
+
+## Sensores de flujo óptico habituales
+
+| Sensor | Qué es | Medida de altura | Fuente |
+|---|---|---|---|
+| **PX4FLOW** | Cámara inteligente de hardware abierto (2013), documentada en versiones antiguas de PX4: sensor MT9V034 de 752×480, Cortex-M4F a 168 MHz, giroscopio integrado, entrada para un sonar | Entrada de sonar integrada | [documentación de PX4](https://docs.px4.io/v1.13/en/sensor/px4flow) |
+| **Placas PMW3901** | Chip de flujo de tipo ratón «adaptado para funcionar entre 80 mm e infinito»; se vende en placas de conexión (breakouts) de Bitcraze, CubePilot (HereFlow), Holybro, Thone y otros | Algunas placas incluyen un sensor de distancia; otras necesitan uno externo | [documentación de PX4](https://docs.px4.io/main/en/sensor/pmw3901) |
+| **Módulos de flujo CAN** | PX4 enumera ARK Flow, ARK Flow MR, Holybro H-Flow y Agam FloRange, conectados por DroneCAN | Sensor de distancia lidar integrado | [documentación de PX4](https://docs.px4.io/main/en/sensor/optical_flow) |
+| **ADNS3080** (archivado) | Un sensor de ratón óptico con lente, que se usó en los primeros multicópteros con ArduPilot; ahora «ya no cuenta con soporte» | El propio sensor no la incluye | [documentación de ArduPilot](https://ardupilot.org/plane/docs/common-mouse-based-optical-flow-sensor-adns3080.html) |
+
+Para las placas PMW3901 sin telémetro propio, PX4 indica que hace falta uno externo, y lo recomienda para las demás porque su alcance integrado es «bastante limitado»; sugiere unos 4 m de alcance para vuelo en interiores y 10 m o más en exteriores ([PX4: PMW3901](https://docs.px4.io/main/en/sensor/pmw3901)).
+
+## Dónde lo verás
+
+- **Drones pequeños que vuelan en interiores.** Mantener la posición donde no hay señal GPS. En ArduPilot puedes configurar el EKF para que tome la velocidad horizontal del flujo óptico (`EK3_SRC1_VELXY = 5`) sin ninguna fuente de posición ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+- **Cualquier lugar sin GPS.** PX4 plantea el caso de uso como volar «en edificios, bajo tierra o en cualquier otro entorno sin GNSS» ([PX4](https://docs.px4.io/main/en/sensor/optical_flow)).
+- **Tu mesa.** Un ratón óptico usa el mismo principio, apuntando a la mesa. El ADNS3080 de ArduPilot, hoy archivado, era literalmente un sensor de ratón con una lente ([ArduPilot](https://ardupilot.org/plane/docs/common-mouse-based-optical-flow-sensor-adns3080.html)).
+
+## Límites
+
+- **Necesita textura y luz.** Un suelo blanco liso, el agua quieta o la oscuridad no le dan a la cámara nada que seguir. El procedimiento de calibración de ArduPilot pide «una superficie con textura y buena iluminación» ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)), y su página archivada del sensor de ratón señala que ese sensor «solo funciona en entornos bien iluminados» ([ArduPilot ADNS3080](https://ardupilot.org/plane/docs/common-mouse-based-optical-flow-sensor-adns3080.html)).
+- **Solo es tan fiable como la medida de altura.** Una lectura errónea del telémetro da una velocidad errónea. En ArduPilot, un multicóptero que vuela solo con flujo óptico en Loiter o PosHold no subirá por encima del alcance máximo del telémetro (`RNGFNDx_MAX`) ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+- **A gran altura empiezan los vaivenes.** PX4 advierte que la baja resolución de los sensores de flujo habituales «puede causar oscilaciones lentas al mantenerse en vuelo estacionario a gran altura sobre el suelo (> 20m)» ([PX4](https://docs.px4.io/main/en/sensor/optical_flow)).
+- **Mide velocidad, no posición.** La posición es la velocidad sumada a lo largo del tiempo, así que los pequeños errores se acumulan y producen deriva. Para conocer la posición en recorridos largos, los robots añaden [odometría visual](/atlas/concept/visual-odometry), [SLAM](/atlas/concept/slam) o GPS.
+- **Supone que el suelo es plano.** El paso «× altura» trata el suelo como un plano bajo el sensor; las pendientes, los escalones y la hierba alta invalidan esa suposición.
+
+## Para profundizar: cómo configurar uno
+
+Los detalles cambian según el software de vuelo (flight stack), pero siempre importan las mismas cuatro cosas:
+
+1. **Montaje y orientación.** Los módulos de flujo suelen montarse cerca del centro del vehículo, mirando en vertical hacia abajo; PX4 fija la orientación con `SENS_FLOW0_ROT` ([PX4: PMW3901](https://docs.px4.io/main/en/sensor/pmw3901)) y la posición de una lente descentrada con `SENS_FLOW0_POS_X/Y/Z` ([PX4: flujo óptico](https://docs.px4.io/main/en/sensor/optical_flow)).
+2. **Activa la fusión.** PX4 activa la fusión del flujo óptico en EKF2 con `EKF2_OF0_CTRL` ([PX4](https://docs.px4.io/main/en/sensor/optical_flow)); ArduPilot selecciona el flujo como fuente de velocidad con los parámetros `EK3_SRC` ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+3. **Calibra la escala.** Balancea el vehículo en alabeo y cabeceo y compara el flujo con el giroscopio. Si no coinciden, ajusta la escala: `FLOW_FXSCALER` / `FLOW_FYSCALER` en ArduPilot (que también ofrece un interruptor de calibración en vuelo), `SENS_FLOW0_SCALE` en PX4 ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html); [PX4](https://docs.px4.io/main/en/sensor/optical_flow)).
+4. **Comprueba también el telémetro.** Una altura errónea da una velocidad errónea aunque el flujo en sí esté bien, así que la lista de resolución de problemas de ArduPilot empieza por comprobar que el telémetro funciona ([ArduPilot](https://ardupilot.org/copter/docs/common-optical-flow-sensor-setup.html)).
+
+Si te interesa el origen en la investigación de las cámaras de flujo métrico de bajo costo, el artículo de PX4FLOW es Honegger, Meier, Tanskanen y Pollefeys, *An Open Source and Open Hardware Embedded Metric Optical Flow CMOS Camera for Indoor and Outdoor Applications*, ICRA 2013 (citado en la [documentación de PX4FLOW](https://docs.px4.io/v1.13/en/sensor/px4flow)).
+
+## Por qué importa
+
+El GPS no está disponible en interiores y es poco fiable debajo de puentes y cerca de edificios, y una IMU por sí sola deriva porque los pequeños errores se acumulan con el tiempo. Un sensor de flujo barato más un telémetro le dan a un robot pequeño una medida directa de su propia velocidad, y eso suele marcar la diferencia entre un dron que se mantiene tranquilo en vuelo estacionario dentro de una habitación y otro que se desliza poco a poco hasta chocar con la pared.
+
+## Preguntas frecuentes
+
+### ¿Qué hace un sensor de flujo óptico en un dron?
+
+Mira el suelo y mide a qué velocidad se mueve la imagen. Con la altura del dron (medida por un telémetro) y su rotación (medida por un giroscopio), la controladora de vuelo lo convierte en velocidad respecto al suelo, lo que permite al dron mantener la posición sin GPS.
+
+### ¿Por qué un sensor de flujo óptico necesita un telémetro?
+
+Porque el sensor solo mide un ángulo por segundo. El mismo movimiento de la imagen puede significar un vuelo lento cerca del suelo o un vuelo rápido a gran altura. Al multiplicar por la altura medida se obtiene la velocidad real en metros por segundo.
+
+### ¿Funciona un sensor de flujo óptico en la oscuridad o sobre el agua?
+
+Por lo general, no muy bien. Necesita una textura visible que seguir, así que las habitaciones oscuras, los suelos brillantes o de color uniforme y el agua en calma hacen que la lectura sea poco fiable. La guía de ArduPilot pide una superficie con textura y buena iluminación al calibrar.
+
+## Relacionado
+
+[Flujo óptico](/atlas/concept/optical-flow) · [Odometría visual](/atlas/concept/visual-odometry) · [IMU](/atlas/concept/imu) · [Sensor de tiempo de vuelo](/atlas/concept/time-of-flight-sensor) · [Fusión de sensores](/atlas/concept/sensor-fusion) · [Dron](/atlas/concept/drone)

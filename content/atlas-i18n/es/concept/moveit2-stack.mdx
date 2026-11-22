@@ -1,0 +1,77 @@
+---
+title: 'MoveIt 2 en ROS 2: arquitectura, planificadores y configuración'
+summary: >-
+  MoveIt 2 es la versión para ROS 2 de MoveIt, el framework de planificación de movimiento para
+  brazos robóticos. Un nodo central, move_group, combina el URDF y el SRDF de tu robot, una escena de
+  planificación, un planificador (OMPL por defecto), un plugin de cinemática inversa (KDL por
+  defecto) y los controladores de tus articulaciones para convertir un objetivo en un movimiento del
+  brazo sin colisiones.
+laymanExplanation: >-
+  MoveIt 2 es el planificador de brazos robóticos de ROS 2. Un programa ocupa el centro: sabe cómo es
+  tu brazo, qué hay a su alrededor y cómo calcular los ángulos de las articulaciones para llegar a un
+  objetivo. Pídele que lleve la pinza a algún sitio y planifica un camino seguro, calcula la
+  temporización y entrega el movimiento a los controladores de los motores del brazo.
+sourceLastReviewed: 2026-11-22
+reviewed: 2026-11-22
+---
+
+**MoveIt 2** es la versión para [ROS 2](/atlas/concept/ros2) de [MoveIt](/atlas/concept/moveit), el framework de planificación de movimiento para brazos robóticos. Su documentación lo describe como «la plataforma de manipulación robótica para ROS 2»; se publicó por primera vez en 2019 ([documentación de MoveIt 2](https://moveit.picknik.ai/main/index.html)). Esta página es la visión práctica: qué se ejecuta dentro de MoveIt 2, qué planificadores y solucionadores usa por defecto y cómo conseguir que tu primer brazo se mueva. Si buscas la introducción para principiantes sobre qué es MoveIt y por qué existe, empieza por la entrada de [MoveIt](/atlas/concept/moveit).
+
+## La arquitectura: un nodo en el centro
+
+Todo pasa por un único nodo, **`move_group`**. La documentación de MoveIt lo describe como un integrador: reúne las piezas y las ofrece a tu código como acciones y servicios de ROS ([conceptos de MoveIt: move_group](https://moveit.picknik.ai/main/doc/concepts/move_group.html)).
+
+```diagram
+{ "type": "flow", "title": "Dentro de MoveIt 2", "nodes": ["Tu código / RViz", "move_group", "Planificador + IK + colisiones", "Parametrización temporal", "FollowJointTrajectory", "ros2_control → brazo"], "caption": "Tu programa envía un objetivo a move_group; este planifica teniendo en cuenta la escena de planificación, añade la temporización y envía la trayectoria a los controladores del brazo." }
+```
+
+| Pieza | Qué hace | Opción predeterminada en MoveIt 2 |
+|---|---|---|
+| **Modelo del robot** | Eslabones, articulaciones y mallas del [URDF](/atlas/concept/urdf); grupos de planificación, posturas con nombre y pares de colisión desactivados del SRDF | Los archivos de tu robot; el SRDF lo genera el Setup Assistant |
+| **Escena de planificación** (planning scene) | El estado actual del robot más el mundo: obstáculos, datos de sensores, objetos sujetos a la pinza | La mantiene actualizada el monitor de la escena de planificación (planning scene monitor) |
+| **Planificador de movimiento** | Encuentra un camino sin colisiones para un grupo de planificación | OMPL; el planificador de movimiento industrial Pilz y CHOMP también están disponibles ([documentación](https://moveit.picknik.ai/main/doc/concepts/motion_planning.html)) |
+| **Cinemática** | Cinemática inversa: postura de la pinza → ángulos de las articulaciones | KDL, un solucionador numérico basado en el jacobiano ([documentación](https://moveit.picknik.ai/main/doc/concepts/kinematics.html)) |
+| **Parametrización temporal** (time parameterization) | Convierte un camino geométrico en una [trayectoria](/atlas/concept/trajectory) temporizada dentro de los límites de velocidad y aceleración | TOTG (Time-Optimal Trajectory Generation), el algoritmo recomendado en la documentación a fecha de enero de 2023 ([documentación](https://moveit.picknik.ai/main/doc/concepts/trajectory_processing.html)) |
+| **Ejecución** | Envía la trayectoria al brazo y la supervisa | Acción `FollowJointTrajectory` ([documentación](https://moveit.picknik.ai/main/doc/concepts/move_group.html)), normalmente atendida por controladores de ros2_control |
+
+Cada planificador y cada solucionador es un **plugin**, así que puedes cambiar OMPL por otro planificador, o KDL por un solucionador analítico más rápido para tu brazo, modificando la configuración en lugar del código.
+
+## Cómo elegir un planificador
+
+- **OMPL** (Open Motion Planning Library) es una colección de planificadores basados en muestreo, entre ellos la familia [RRT](/atlas/concept/rrt). Es la biblioteca de planificación predeterminada de `move_group` ([documentación](https://moveit.picknik.ai/main/doc/concepts/motion_planning.html)). Los caminos basados en muestreo son aleatorios por naturaleza, así que dos planes hacia el mismo objetivo pueden ser distintos.
+- El **planificador de movimiento industrial Pilz** produce los movimientos predecibles que esperan los usuarios industriales: movimientos punto a punto en el espacio articular (PTP), además de movimientos rectilíneos (LIN) y en arco circular (CIRC) de la herramienta en el espacio cartesiano ([guía de Pilz](https://moveit.picknik.ai/main/doc/how_to_guides/pilz_industrial_motion_planner/pilz_industrial_motion_planner.html)).
+- **CHOMP** trata la planificación como una [optimización de trayectorias](/atlas/concept/trajectory-optimization): curva un camino inicial para alejarlo de los obstáculos sin que pierda suavidad.
+
+Junto con MoveIt 2 también se publica un paquete con el planificador STOMP (`moveit_planners_stomp`) ([ROS Index](https://index.ros.org/r/moveit/)).
+
+## De cero a un brazo en movimiento
+
+1. **Describe el robot.** Necesitas un URDF que funcione; compruébalo en [RViz](/atlas/concept/rviz2).
+2. **Ejecuta el MoveIt Setup Assistant.** Genera el SRDF (grupos de planificación como `arm` y `gripper`, posturas con nombre, pares de colisión que se pueden ignorar) y un paquete de configuración con los ajustes de planificadores, cinemática y controladores ([apuntes de ROS de Northwestern](https://nu-msr.github.io/ros_notes/ros2/moveit.html)).
+3. **Conecta los controladores.** MoveIt ejecuta las trayectorias a través de controladores de bajo nivel, normalmente proporcionados por ros2_control ([apuntes de ROS de Northwestern](https://nu-msr.github.io/ros_notes/ros2/moveit.html)). En simulación, el hardware simulado (mock hardware) de ros2_control o [Gazebo](/atlas/concept/gazebo-simulator) (gz_ros2_control) ocupa el lugar de los motores reales.
+4. **Planifica de forma interactiva.** Lanza la demo, arrastra el marcador del objetivo en el panel MotionPlanning de RViz, pulsa *Plan*, revisa la vista previa y después pulsa *Execute*.
+5. **Pasa al código.** Envía objetivos desde C++ o Python a través de las interfaces de `move_group`, añade obstáculos a la escena de planificación y adjunta a la pinza los objetos agarrados para que el planificador evite colisiones con lo que llevas.
+
+Los tutoriales oficiales recorren los pasos 1 a 5 con un brazo de demostración ([documentación de MoveIt 2](https://moveit.picknik.ai/main/index.html)).
+
+## Versiones y distribuciones
+
+MoveIt 2 se publica para las distribuciones de ROS 2 que figuran en ROS Index, entre ellas Humble y Jazzy, y la rama *main* de la documentación sigue a Rolling ([ROS Index](https://index.ros.org/r/moveit/); [documentación](https://moveit.picknik.ai/main/index.html)). La documentación de Humble está marcada como una versión estable que ya no se sigue desarrollando y remite a los lectores a *main* ([documentación de Humble](https://moveit.picknik.ai/humble/)). Usa la rama de los tutoriales que corresponda a tu distribución de ROS 2: los archivos de lanzamiento y las API cambian de una versión a otra. MoveIt 1, para ROS 1, está en un repositorio aparte.
+
+## Preguntas frecuentes
+
+### ¿Qué diferencia hay entre MoveIt y MoveIt 2?
+
+MoveIt 2 es la generación de MoveIt para ROS 2. Los conceptos (move_group, escena de planificación, grupos de planificación, planificadores como plugins) son los mismos; el código, los archivos de lanzamiento y las API son de ROS 2. MoveIt 1 está pensado para ROS 1. Usa MoveIt 2 para los proyectos nuevos.
+
+### ¿Qué planificador usa MoveIt 2 por defecto?
+
+OMPL, la Open Motion Planning Library, que ofrece planificadores basados en muestreo como RRT. El planificador de movimiento industrial Pilz y CHOMP también están disponibles por defecto, y los planificadores son plugins que puedes cambiar en la configuración.
+
+### ¿MoveIt 2 necesita ros2_control?
+
+MoveIt 2 necesita algo que acepte una acción `FollowJointTrajectory` para cada brazo. En la práctica suele ser un controlador de trayectoria de articulaciones (joint trajectory controller) de ros2_control, en el robot real o en simulación.
+
+## Relacionado
+
+[MoveIt (visión general)](/atlas/concept/moveit) · [ROS 2](/atlas/concept/ros2) · [URDF](/atlas/concept/urdf) · [RViz 2](/atlas/concept/rviz2) · [Cinemática inversa](/atlas/concept/inverse-kinematics)

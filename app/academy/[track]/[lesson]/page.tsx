@@ -10,6 +10,12 @@ type ValidTrack = (typeof VALID_TRACKS)[number];
 
 type Params = Promise<{ track: string; lesson: string }>;
 
+// Unknown slugs must be a real 404. notFound() alone answered 200 live (22 Nov
+// 2026): the response had already started streaming, so the not-found UI arrived
+// inside a 200 with noindex, a soft 404 that Search Console reports.
+// Every lesson is a file in content/academy, so nothing outside generateStaticParams is valid.
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const all: { track: string; lesson: string }[] = [];
   for (const t of VALID_TRACKS) {
