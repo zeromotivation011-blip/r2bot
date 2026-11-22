@@ -17,12 +17,14 @@ seeAlso:
   - factor-graph
   - loop-closure
   - ekf-slam
-lastReviewed: 2026-07-10T00:00:00.000Z
+lastReviewed: 2026-11-22T00:00:00.000Z
 sources:
-  - title: 'Grisetti et al. — A tutorial on graph-based SLAM'
+  - title: 'Simultaneous localization and mapping — Wikipedia'
     url: 'https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping'
-  - title: 'g2o — General graph optimization'
+  - title: 'Kümmerle, Grisetti, Strasdat, Konolige & Burgard, "g2o: A General Framework for Graph Optimization", ICRA 2011 (g2o repository)'
     url: 'https://github.com/RainerKuemmerle/g2o'
+  - title: 'slam_toolbox — pose-graph SLAM for ROS 2 (GitHub)'
+    url: 'https://github.com/SteveMacenski/slam_toolbox'
 laymanExplanation: >-
   Pose-graph optimization treats each place the robot was as a dot and each movement or
   recognition as a rubber band between dots. It then relaxes all the rubber bands at once
@@ -63,7 +65,7 @@ X* = argmin  Σ ‖ predict(xᵢ, xⱼ) ⊖ measurementᵢⱼ ‖²
 
 ## Why it scales
 
-The trick is **sparsity**: each pose only connects to a few others, so the matrix the solver handles is mostly zeros. Gauss-Newton or Levenberg-Marquardt exploit that, letting graphs with **hundreds of thousands of poses** be optimized in real time — impossible for EKF-SLAM's dense O(N²) covariance. Libraries like **g2o**, **GTSAM**, and **Ceres** do the heavy lifting.
+The trick is **sparsity**: each pose only connects to a few others, so the matrix the solver handles is mostly zeros. Gauss-Newton or Levenberg-Marquardt exploit that, letting large graphs be re-solved fast enough for online mapping, where EKF-SLAM must update a dense covariance that grows with the square of the map size. Libraries like **g2o** ("an open-source C++ framework for optimizing graph-based nonlinear error functions", [g2o](https://github.com/RainerKuemmerle/g2o)), **GTSAM** and **Ceres** do the heavy lifting; slam_toolbox, for example, ships solver plugins for Ceres, g2o, SPA and GTSAM ([slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)).
 
 ## The loop-closure payoff
 
@@ -71,7 +73,7 @@ The dramatic moment in any SLAM run is a [loop closure](/atlas/concept/loop-clos
 
 ## Why it matters
 
-Pose-graph optimization is the backbone of essentially every production SLAM system today — Cartographer, ORB-SLAM, slam_toolbox. It reframes mapping as a clean optimization problem, which is why it scales and why it corrects globally.
+Pose-graph optimization is the back-end of most modern SLAM systems. In ROS 2, slam_toolbox (described by its author as "the currently supported ROS2-SLAM library") is "pose-graph optimization based SLAM": "If a loop closure is found, the pose graph is optimized, and pose estimates are updated" ([slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)). Reframing mapping as one optimization problem is why the approach scales and why it can correct the whole map at once.
 
 ## Related
 

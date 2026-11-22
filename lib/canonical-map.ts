@@ -94,6 +94,7 @@ export const ATLAS_QUERY_OWNER: Record<string, string> = {
   'optical flow': '/atlas/concept/optical-flow',
   moveit: '/atlas/concept/moveit',
   moveit2: '/atlas/concept/moveit2-stack',
+  'complementary filter': '/atlas/concept/complementary-filter',
 }
 
 /**
