@@ -1,0 +1,166 @@
+---
+title: Optimización de grafos de poses
+summary: >-
+  La optimización de grafos de poses (pose-graph optimization) es la forma en que un robot con SLAM
+  corrige su mapa a posteriori: cada lugar por el que ha pasado el robot se convierte en un nodo,
+  cada movimiento medido entre dos lugares en una arista, y un solucionador de mínimos cuadrados
+  mueve todos los nodos a la vez hasta que las aristas concuerdan lo mejor posible. Es lo que
+  permite que un solo cierre de bucle corrija la deriva de toda una trayectoria.
+laymanExplanation: >-
+  Imagina que clavas en un tablero de corcho un alfiler por cada punto que visitó el robot y unes
+  los alfileres vecinos con bandas elásticas, cada una cortada a la distancia que el robot cree haber
+  recorrido. Cuando el robot reconoce un lugar que vio hace tiempo, añades una banda más entre el
+  alfiler nuevo y el antiguo. Esa banda queda demasiado corta o demasiado larga para los alfileres
+  tal como están, así que los sueltas: cada alfiler se desplaza un poco hasta que todas las bandas
+  quedan lo más relajadas posible. Donde se asientan los alfileres está la trayectoria corregida, y
+  el mapa se vuelve a dibujar a partir de ellos.
+sourceLastReviewed: 2026-11-23
+reviewed: 2026-11-23
+---
+
+La **optimización de grafos de poses** (*pose-graph optimization*) es el paso del [SLAM](/atlas/concept/slam) (construir un mapa mientras el robot averigua dónde está dentro de él) que convierte una trayectoria con deriva y ligeramente errónea en una trayectoria coherente. Las posiciones pasadas del robot se convierten en **nodos** de un grafo, cada movimiento medido entre dos posiciones se convierte en una **arista**, y un solucionador ajusta todas las posiciones a la vez para que las medidas concuerden lo mejor posible. Cuando el robot reconoce un lugar que ya ha visto (un [cierre de bucle](/atlas/concept/loop-closure), o *loop closure*), basta una arista nueva para que el solucionador corrija toda la trayectoria.
+
+Es la parte de un sistema SLAM que hace la corrección (lo que se suele llamar el *back-end*), presente en sistemas muy utilizados como slam_toolbox en ROS 2, Cartographer y ORB-SLAM2.
+
+## Empieza aquí: por qué hay que corregir la trayectoria de un robot
+
+Un robot que sigue su propio movimiento con odometría de ruedas (estimar el desplazamiento a partir de cuánto han girado las ruedas) o con [emparejamiento de escaneos](/atlas/concept/scan-matching) (*scan matching*) comete un pequeño error en cada paso. Cada error es diminuto, pero se acumulan: después de un pasillo largo y unos cuantos giros, la idea que tiene el robot de dónde está puede desviarse un metro o más, y un mapa dibujado a partir de esa trayectoria se curva y se repliega sobre sí mismo.
+
+Dos hechos hacen posible la corrección:
+
+1. **El robot puede recordar todas las poses, no solo la actual.** Si guardas toda la trayectoria, todavía puedes corregir el pasado.
+2. **Algunas medidas relacionan poses muy alejadas en el tiempo.** Cuando el robot vuelve a su punto de partida y lo reconoce, sabe que «la pose 400 está en el mismo lugar que la pose 1». Ese único dato contradice todos los pequeños errores acumulados entre una y otra.
+
+La optimización de grafos de poses es la aritmética que usa el segundo hecho para reparar el primero: encuentra la trayectoria que menos discrepa con *todas* las medidas a la vez.
+
+## Qué es: nodos, aristas y confianza
+
+El tutorial, muy citado, de Grisetti, Kümmerle, Stachniss y Burgard resume toda la idea en una frase: el SLAM basado en grafos usa «un grafo cuyos nodos corresponden a las poses del robot en distintos instantes de tiempo y cuyas aristas representan restricciones entre las poses» ([Grisetti et al., 2010](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)).
+
+- **Nodos (poses).** Cada nodo es donde estaba el robot en un momento dado: x, y y orientación para un robot terrestre (una pose en SE(2)), o una posición y una orientación 3D completas para un dron o una cámara de mano (SE(3)).
+- **Aristas (restricciones).** Cada arista es una transformación *relativa* medida entre dos poses: «desde la pose 4, la pose 5 está 1.2 m más adelante y girada 3° a la izquierda». Las aristas proceden de la odometría entre poses consecutivas o se obtienen «alineando las observaciones tomadas en las dos posiciones del robot» ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)), por ejemplo al hacer coincidir dos escaneos láser.
+- **Confianza (matriz de información).** Cada arista lleva una matriz Ω que indica cuánto fiarse de ella. Un emparejamiento de escaneos preciso recibe una Ω grande y tira con fuerza; la odometría de ruedas, más ruidosa, recibe una pequeña y cede con facilidad.
+
+La documentación de Cartographer usa la misma imagen de las bandas elásticas: las restricciones «pueden imaginarse intuitivamente como pequeñas cuerdas que atan todos los nodos entre sí», el optimizador «ata todas esas cuerdas a la vez» y «la red resultante se llama “grafo de poses”» ([Cartographer ROS](https://google-cartographer-ros.readthedocs.io/en/latest/algo_walkthrough.html)).
+
+```diagram
+{ "type": "flow", "title": "De los datos de los sensores a una trayectoria corregida", "nodes": ["Sensores (odometría, lidar, cámara)", "Front-end: crea aristas, detecta cierres de bucle", "Grafo de poses (nodos + aristas + confianza)", "Back-end: resolución por mínimos cuadrados", "Poses corregidas → se redibuja el mapa"], "caption": "El front-end depende del sensor; el back-end solo ve un grafo abstracto. Un cierre de bucle es una arista más, pero al resolver el grafo se mueven todas las poses del bucle." }
+```
+
+## Cómo funciona
+
+### 1. Front-end y back-end
+
+El SLAM basado en grafos se divide en dos tareas. Construir el grafo a partir de las medidas en bruto «se suele llamar front-end y depende mucho del sensor», mientras que encontrar las mejores poses para ese grafo «se llama back-end y se basa en una representación abstracta de los datos, independiente del sensor» ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). La optimización de grafos de poses es el back-end. Por eso las mismas bibliotecas de solucionadores sirven para sistemas con láser, con cámaras y con varios sensores.
+
+### 2. Escribe cuánto se equivoca cada arista
+
+Para una arista entre las poses i y j, la estimación actual de las poses predice una transformación relativa ẑ_ij. La medida dice z_ij. La diferencia es el error (en las rotaciones, la diferencia se calcula sobre la variedad, véase el paso 5):
+
+```
+e_ij = z_ij − ẑ_ij(x_i, x_j)
+```
+
+El coste total suma el error de todas las aristas, ponderado por su confianza:
+
+```
+F(x) = Σ  e_ijᵀ · Ω_ij · e_ij        x* = argmin F(x)
+     aristas                               x
+```
+
+Minimizar F da una estimación de máxima verosimilitud cuando el ruido de las medidas es gaussiano: la trayectoria más probable dado todo lo que ha medido el robot.
+
+### 3. Linealiza, resuelve, repite
+
+La relación entre poses incluye rotaciones, así que F no es una función cuadrática sencilla. Los solucionadores parten de una estimación inicial (normalmente la trayectoria de la odometría en bruto) e iteran:
+
+1. **Linealizan** cada error alrededor de la estimación actual usando su jacobiano (cómo cambia el error cuando una pose se mueve un poco).
+2. **Construyen** un único sistema lineal H·Δx = −b sumando unos pocos bloques pequeños por cada arista.
+3. **Calculan** la corrección Δx.
+4. **Actualizan** las poses y repiten hasta que las correcciones son diminutas.
+
+Este es el método de Gauss–Newton; Levenberg–Marquardt es una variante amortiguada del mismo bucle, y Grisetti et al. citan ambos como los solucionadores habituales ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). El tutorial de GTSAM muestra el bucle en acción: tres poses parten de una «estimación inicial deliberadamente inexacta» de (0.5, 0, 0.2), (2.3, 0.1, −0.2) y (4.1, 0.1, 0.1), y Levenberg–Marquardt las devuelve a (0, 0, 0), (2, 0, 0) y (4, 0, 0) con una tolerancia minúscula ([tutorial de GTSAM](https://gtsam.org/tutorials/intro.html)).
+
+### 4. Por qué es rápido: matrices dispersas
+
+Cada pose está unida solo a unas pocas más, así que H es casi todo ceros (una matriz dispersa). Grisetti et al. señalan que H «es dispersa por construcción, con elementos no nulos entre las poses conectadas por una restricción», con un número de bloques no nulos igual al doble del número de restricciones más el número de nodos, lo que permite resolver el sistema «mediante factorización de Cholesky dispersa» (un método rápido para resolver sistemas lineales que son casi todo ceros) ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). El número de elementos no nulos de H crece con el número de aristas, no con el cuadrado del número de poses.
+
+### 5. Dos detalles que suelen causar problemas
+
+- **Fija una pose.** Cada error depende solo de posiciones *relativas*, así que desplazar o girar el grafo entero no cambia nada y el sistema no tiene una solución única (esto se llama libertad de gauge). La solución habitual es mantener quieta una pose, normalmente la primera ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). En GTSAM, un factor *a priori* (*prior*) sobre la primera pose la ancla de la misma manera.
+- **Trata bien las rotaciones.** Las rotaciones no son vectores corrientes. Los ángulos de Euler tienen singularidades, y las matrices de rotación o los cuaterniones tienen números de más que una actualización ingenua rompe. Grisetti et al. lo resuelven optimizando «sobre una variedad» (*manifold*): calculan pequeñas correcciones en un espacio local plano y las aplican a la pose con un operador especial ⊞. En su prueba 3D con un robot simulado que recorre la superficie de una esfera, Gauss–Newton con ángulos de Euler divergía, mientras que la versión sobre la variedad «converge a la solución correcta» ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)).
+
+## Un ejemplo resuelto que puedes comprobar a mano
+
+Toma un robot en un pasillo recto, con las posiciones sobre un solo eje. La pose x₀ está fija en 0 m.
+
+| Arista | Medida | Confianza |
+|---|---|---|
+| Odometría x₀ → x₁ | avanzó 1.0 m | 1 |
+| Odometría x₁ → x₂ | avanzó 1.0 m | 1 |
+| Emparejamiento de escaneos / cierre de bucle x₀ → x₂ | x₂ está a 1.8 m de x₀ | 1 |
+
+La odometría sola dice que x₂ = 2.0 m; la medida directa dice 1.8 m. Minimiza (x₁ − 1)² + (x₂ − x₁ − 1)² + (x₂ − 1.8)². Al igualar a cero las dos derivadas se obtiene x₁ = 0.933 m y x₂ = 1.867 m. La discrepancia de 0.2 m se ha **repartido**: ahora cada arista se desvía 0.067 m, en lugar de que una sola cargue con todo.
+
+Ahora confía cuatro veces más en la medida directa (confianza 4 en vez de 1). La respuesta pasa a x₁ = 0.911 m y x₂ = 1.822 m: la arista de mayor confianza se desvía solo 0.022 m, y cada una de las dos aristas de odometría absorbe 0.089 m. Eso es todo lo que hace Ω: decide quién cede.
+
+Un grafo de poses real hace lo mismo con miles de poses 2D o 3D y con rotaciones, y por eso necesita el solucionador iterativo descrito arriba. El ejemplo PoseSLAM de GTSAM es el siguiente paso: cinco poses 2D que recorren un cuadrado, con aristas de odometría de 2 m (la mayoría con un giro de 90°) y una arista de cierre de bucle de la pose 5 a la pose 2 ([tutorial de GTSAM](https://gtsam.org/tutorials/intro.html)).
+
+## Dónde lo verás
+
+| Sistema | Sensores | Cómo usa un grafo de poses | Fuente |
+|---|---|---|---|
+| **slam_toolbox** (ROS 2) | Lidar 2D | Construye un grafo de poses a partir de escaneos láser emparejados; «si se encuentra un cierre de bucle, se optimiza el grafo de poses»; entre sus plugins de solucionador está Ceres; los grafos de poses guardados se pueden recargar para seguir mapeando | [slam_toolbox](https://github.com/SteveMacenski/slam_toolbox) |
+| **Cartographer** | Lidar 2D/3D, IMU, odometría | El SLAM local construye submapas; el SLAM global busca restricciones de cierre de bucle y ejecuta «una optimización de grafo de poses» (que también llama *sparse pose adjustment*) en hilos en segundo plano | [Cartographer ROS](https://google-cartographer-ros.readthedocs.io/en/latest/algo_walkthrough.html) |
+| **ORB-SLAM2** | Cámaras monoculares, estéreo y RGB-D | Al cerrar un bucle corrige la deriva «realizando una optimización de grafo de poses» y después ejecuta un [ajuste de haces](/atlas/concept/bundle-adjustment) (*bundle adjustment*) completo en un hilo aparte | [Mur-Artal y Tardós](https://arxiv.org/abs/1610.06475) |
+| **g2o** | Biblioteca | «Un framework de código abierto en C++ para optimizar funciones de error no lineales basadas en grafos» | [g2o](https://github.com/RainerKuemmerle/g2o) |
+| **GTSAM** | Biblioteca | Biblioteca de grafos de factores; PoseSLAM es su caso de grafo de poses, que se resuelve con Levenberg–Marquardt o de forma incremental con iSAM | [tutorial de GTSAM](https://gtsam.org/tutorials/intro.html) |
+
+Si has usado [SLAM con lidar](/atlas/concept/lidar-slam) en ROS 2 y has visto cómo el mapa se endereza de golpe cuando el robot vuelve a su punto de partida, has visto cómo se resuelve de nuevo un grafo de poses.
+
+## Límites y problemas habituales
+
+- **Un solo cierre de bucle erróneo puede arruinar el mapa.** El solucionador se fía de todas las aristas que recibe. Si el front-end decide que dos pasillos distintos son el mismo lugar, el optimizador deformará el mapa para que coincidan. La asociación de datos, es decir, decidir qué medidas corresponden entre sí, es tarea del front-end, y Grisetti et al. indican que su back-end simplemente supone que «el front-end utilizado proporciona estimaciones coherentes» ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). Los sistemas reales añaden comprobaciones antes de aceptar un cierre de bucle: Cartographer usa un emparejador de escaneos por ramificación y poda (*branch and bound*) con una puntuación mínima de coincidencia, y después trata los valores atípicos que quedan con una función de pérdida de Huber, de modo que una arista errónea tira con menos fuerza de lo que indicaría su error al cuadrado ([Cartographer ROS](https://google-cartographer-ros.readthedocs.io/en/latest/algo_walkthrough.html)).
+- **Necesita una estimación inicial razonable.** Gauss–Newton y Levenberg–Marquardt refinan una estimación mediante linealizaciones locales sucesivas, y por eso Grisetti et al. presentan el método para el caso en que «se conoce una buena estimación inicial … de las poses del robot» ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). En la práctica, la estimación inicial es la trayectoria de la odometría, así que una odometría muy mala complica el trabajo del optimizador.
+- **Olvida los puntos de referencia (*landmarks*).** Un grafo de poses puro solo guarda poses; las medidas en bruto se sustituyen por aristas que Grisetti et al. llaman «medidas virtuales» ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). Así se mantiene pequeño, pero es una aproximación; los sistemas que necesitan el resultado más preciso vuelven a optimizar juntas las poses y los puntos con un ajuste de haces, como hace ORB-SLAM2 tras un cierre de bucle.
+- **Crece sin parar si no se poda.** Cada pose nueva añade un nodo. El modo experimental de mapeo «verdaderamente permanente» (*true lifelong*) de slam_toolbox elimina nodos con el tiempo para que el cálculo quede acotado ([slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)).
+
+## Grafo de poses frente a ideas cercanas
+
+| Enfoque | Qué estima | Cuándo se usa |
+|---|---|---|
+| [EKF-SLAM](/atlas/concept/ekf-slam) | La pose actual + los puntos de referencia, actualizados a medida que llega cada medida | Filtrado en línea; las poses pasadas no se guardan, así que no se pueden corregir |
+| **Optimización de grafos de poses** | Toda la trayectoria (solo poses) | Back-end de sistemas SLAM muy utilizados, tanto con lidar como visuales (slam_toolbox, Cartographer, ORB-SLAM2) |
+| [Grafo de factores](/atlas/concept/factor-graph) | Cualquier conjunto de variables: poses, puntos de referencia, velocidades, sesgos de la IMU | El marco general; un grafo de poses es el caso particular con solo factores entre poses |
+| [Ajuste de haces](/atlas/concept/bundle-adjustment) | Las poses de la cámara y los puntos 3D a la vez | Reconstrucción visual de máxima precisión; más costoso que un grafo de poses |
+
+Grisetti et al. hacen la misma distinción entre los métodos de *filtrado*, que estiman el estado actual en línea, y los métodos de *suavizado* (*smoothing*), que «estiman la trayectoria completa del robot a partir del conjunto completo de medidas» ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). La optimización de grafos de poses es un método de suavizado.
+
+## Para profundizar
+
+- **Solucionadores incrementales.** Volver a resolver todo el grafo con cada pose nueva es un desperdicio. iSAM, que Grisetti et al. citan como «una versión en línea que aprovecha reordenaciones parciales para calcular la factorización dispersa» ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)), actualiza la solución a medida que llegan las poses; GTSAM lo incluye ([tutorial de GTSAM](https://gtsam.org/tutorials/intro.html)).
+- **De dónde viene.** Grisetti et al. atribuyen a Lu y Milios (1997) la formulación basada en grafos y señalan que tardó años en popularizarse por «la complejidad comparativamente alta de resolver el problema de minimización del error», hasta que los avances en álgebra lineal dispersa permitieron resolverla con rapidez ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)).
+- **La incertidumbre sale gratis.** En la solución, H aproxima la matriz de información de toda la trayectoria, así que su inversa da la incertidumbre de cada pose. Los ejemplos de GTSAM la dibujan como elipses de covarianza después de optimizar ([tutorial de GTSAM](https://gtsam.org/tutorials/intro.html)).
+- **Varios robots y varias sesiones.** El mismo grafo puede unir trayectorias de distintas ejecuciones o de distintos robots. Cartographer indica que las restricciones globales «también pueden alinear trayectorias distintas grabadas por varios robots» ([Cartographer ROS](https://google-cartographer-ros.readthedocs.io/en/latest/algo_walkthrough.html)), y slam_toolbox puede fusionar grafos de poses serializados de sesiones distintas ([slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)).
+
+## Por qué importa
+
+Cualquier robot que mapee un edificio, un almacén o una ciudad tiene que lidiar con la deriva. La optimización de grafos de poses es la respuesta habitual porque conserva todo el historial, pondera cada medida según la confianza que merece y corrige el pasado cuando llegan pruebas nuevas. Entenderla explica por qué un mapa de SLAM encaja de golpe tras un cierre de bucle, por qué un solo cierre de bucle erróneo hace tanto daño y qué hacen en realidad los solucionadores de slam_toolbox, Cartographer, g2o y GTSAM.
+
+## Preguntas frecuentes
+
+### ¿Qué es la optimización de grafos de poses, en palabras sencillas?
+
+El robot guarda una lista de todos los lugares por los que ha pasado y del movimiento medido entre ellos. Como cada medida de movimiento tiene un pequeño error, los lugares no terminan de encajar. La optimización de grafos de poses mueve todos los lugares a la vez, un poco cada uno, hasta que las medidas concuerdan lo mejor posible. Cuando el robot reconoce un sitio en el que ya estuvo, esa medida extra le permite corregir toda la trayectoria.
+
+### ¿Qué diferencia hay entre un grafo de poses y un grafo de factores?
+
+Un grafo de poses solo contiene poses del robot y las medidas relativas entre ellas. Un grafo de factores es la versión general: sus variables pueden ser poses, puntos de referencia, velocidades o sesgos de los sensores, y sus factores pueden unir cualquier número de ellas. Una lectura de GPS, por ejemplo, es un factor sobre una sola pose. El tutorial de GTSAM llama al caso con solo poses PoseSLAM, «la instancia más sencilla de un problema de SLAM» ([tutorial de GTSAM](https://gtsam.org/tutorials/intro.html)).
+
+### ¿Por qué mi mapa de SLAM salta o se deforma de repente tras un cierre de bucle?
+
+Ese salto es la optimización de grafos de poses haciendo su trabajo. Antes del cierre de bucle, la deriva se había ido acumulando sin que se notara; la arista del cierre de bucle la pone al descubierto, y al resolver de nuevo el grafo la corrección se reparte entre todas las poses del bucle, así que el mapa se redibuja con otra forma. Si, en cambio, el mapa se deforma en algo claramente erróneo, la causa habitual es un falso cierre de bucle: dos lugares parecidos emparejados como si fueran uno. Endurece el umbral de emparejamiento del front-end antes de ajustar el optimizador.
+
+## Relacionado
+
+[SLAM](/atlas/concept/slam) · [Cierre de bucle](/atlas/concept/loop-closure) · [Grafo de factores](/atlas/concept/factor-graph) · [Ajuste de haces](/atlas/concept/bundle-adjustment) · [Emparejamiento de escaneos](/atlas/concept/scan-matching) · [SLAM con lidar](/atlas/concept/lidar-slam) · [EKF-SLAM](/atlas/concept/ekf-slam)

@@ -95,6 +95,8 @@ export const ATLAS_QUERY_OWNER: Record<string, string> = {
   moveit: '/atlas/concept/moveit',
   moveit2: '/atlas/concept/moveit2-stack',
   'complementary filter': '/atlas/concept/complementary-filter',
+  'pose graph optimization': '/atlas/concept/pose-graph-optimization',
+  'pose graph': '/atlas/concept/pose-graph-optimization',
 }
 
 /**

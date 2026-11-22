@@ -4,77 +4,210 @@ slug: pose-graph-optimization
 bucket: concept
 category: ai-and-perception
 summary: >-
-  Pose-graph optimization is how modern SLAM builds a consistent map: treat every robot
-  pose as a node and every measurement as a constraint, then solve one big least-squares
-  problem that best satisfies them all — including loop closures.
+  Pose-graph optimization is how a SLAM robot fixes its map after the fact: every place the robot
+  has been becomes a node, every measured motion between two places becomes an edge, and a
+  least-squares solver moves all the nodes at once until the edges agree as well as possible. It
+  is what lets a single loop closure correct the drift in an entire trajectory.
 difficulty: 4
 tags:
   - slam
   - optimization
   - mapping
+  - least-squares
+  - loop-closure
 seeAlso:
   - slam
   - factor-graph
   - loop-closure
   - ekf-slam
-lastReviewed: 2026-11-22T00:00:00.000Z
+  - bundle-adjustment
+  - scan-matching
+  - lidar-slam
+lastReviewed: 2026-11-23T00:00:00.000Z
 sources:
-  - title: 'Simultaneous localization and mapping — Wikipedia'
-    url: 'https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping'
-  - title: 'Kümmerle, Grisetti, Strasdat, Konolige & Burgard, "g2o: A General Framework for Graph Optimization", ICRA 2011 (g2o repository)'
-    url: 'https://github.com/RainerKuemmerle/g2o'
+  - title: 'Grisetti, Kümmerle, Stachniss & Burgard, "A Tutorial on Graph-Based SLAM", IEEE Intelligent Transportation Systems Magazine 2(4):31–43 (2010)'
+    url: 'http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf'
+  - title: 'Dellaert, "Factor Graphs and GTSAM: A Hands-on Introduction" (GTSAM tutorial, PoseSLAM chapter)'
+    url: 'https://gtsam.org/tutorials/intro.html'
+  - title: 'Cartographer ROS — Algorithm walkthrough for tuning (local and global SLAM)'
+    url: 'https://google-cartographer-ros.readthedocs.io/en/latest/algo_walkthrough.html'
+  - title: 'Mur-Artal & Tardós, "ORB-SLAM2: an Open-Source SLAM System for Monocular, Stereo and RGB-D Cameras", IEEE Transactions on Robotics (2017), arXiv:1610.06475'
+    url: 'https://arxiv.org/abs/1610.06475'
   - title: 'slam_toolbox — pose-graph SLAM for ROS 2 (GitHub)'
     url: 'https://github.com/SteveMacenski/slam_toolbox'
+  - title: 'Kümmerle, Grisetti, Strasdat, Konolige & Burgard, "g2o: A General Framework for Graph Optimization", ICRA 2011 (g2o repository)'
+    url: 'https://github.com/RainerKuemmerle/g2o'
 laymanExplanation: >-
-  Pose-graph optimization treats each place the robot was as a dot and each movement or
-  recognition as a rubber band between dots. It then relaxes all the rubber bands at once
-  so every constraint is satisfied as well as possible — snapping the map into shape.
+  Imagine pinning every spot the robot visited to a corkboard and tying neighbouring pins together
+  with rubber bands, each band cut to the distance the robot thinks it travelled. When the robot
+  recognises a place it saw long ago, you add one more band between the new pin and the old one.
+  That band is too short or too long for the pins as they stand, so you let go: every pin shifts a
+  little until all the bands are as relaxed as they can be. The pins where they settle are the
+  corrected path, and the map is redrawn from them.
 technicalDefinition: >-
-  Pose-graph optimization minimizes the total weighted error of relative-pose constraints
-  over a graph of poses, solving a sparse nonlinear least-squares problem.
+  Pose-graph optimization estimates a robot trajectory x = (x₁ … x_T) from a graph whose nodes are
+  poses in SE(2) or SE(3) and whose edges are relative-pose measurements z_ij with information
+  matrices Ω_ij. It finds x* = argmin Σ e_ijᵀ Ω_ij e_ij, where e_ij = z_ij − ẑ_ij(x_i, x_j) (taken on the manifold for rotations), by
+  iterative linearisation (Gauss–Newton or Levenberg–Marquardt), solving the sparse normal
+  equations H Δx = −b with sparse Cholesky factorisation, fixing one pose to remove the gauge
+  freedom and applying increments on the pose manifold.
 quizQuestion:
-  q: In a pose graph, edges represent…
+  q: A robot drives a long loop and then recognises its starting point. What does pose-graph optimization do with that recognition?
   options:
-    - Battery levels
-    - Constraints between poses (motion or loop closures)
-    - Camera pixels
-    - Motor torques
+    - It deletes the poses recorded during the loop and keeps only the start
+    - It adds one edge between the newest pose and the old one, then moves every pose in the loop a little so all the edges agree as well as possible
+    - It replaces the odometry measurements with GPS readings
+    - It moves only the newest pose back onto the starting point
   answer: 1
   explanation: >-
-    Nodes are poses; edges are measured relative-pose constraints (from odometry or loop
-    closure) that the optimizer tries to satisfy together.
+    A loop closure is just one more edge. Because the solver adjusts all poses together to
+    minimise the total weighted error, the accumulated drift is spread back across the whole loop
+    instead of being dumped on the last pose.
 ---
 
-Instead of tracking one running estimate like [EKF-SLAM](/atlas/concept/ekf-slam), modern [SLAM](/atlas/concept/slam) keeps the *whole trajectory* and solves for it all at once. The tool is **pose-graph optimization**.
+**Pose-graph optimization** is the step in [SLAM](/atlas/concept/slam) (building a map while working out where the robot is in it) that turns a drifting, slightly wrong path into a consistent one. The robot's past positions become **nodes** in a graph, each measured movement between two positions becomes an **edge**, and a solver adjusts every position at once so the measurements agree as closely as possible. When the robot recognises a place it has seen before (a [loop closure](/atlas/concept/loop-closure)), one new edge is enough for the solver to correct the whole path.
 
-## The graph
+It is the part of a SLAM system that does the correcting (often called the back-end), inside widely used systems such as slam_toolbox in ROS 2, Cartographer and ORB-SLAM2.
 
-- **Nodes** are the robot's poses over time (and sometimes landmarks).
-- **Edges** are **constraints**: "odometry says pose 5 was 1.2 m ahead of pose 4," or a [loop closure](/atlas/concept/loop-closure) saying "pose 40 is actually the same place as pose 2."
+## Start here: why a robot's path needs fixing
 
-Every edge carries an uncertainty. The optimizer finds the set of poses that best satisfies *all* constraints simultaneously — minimizing the total weighted disagreement:
+A robot that tracks its own motion with wheel odometry (estimating movement from how far the wheels turned) or [scan matching](/atlas/concept/scan-matching) makes a small error on every step. Each error is tiny, but they add up: after a long corridor and a few turns, the robot's idea of where it is can be a metre or more out, and a map drawn from that path bends and doubles back on itself.
 
-```
-X* = argmin  Σ ‖ predict(xᵢ, xⱼ) ⊖ measurementᵢⱼ ‖²
-        X    edges
-```
+Two facts make the fix possible:
+
+1. **The robot can remember every pose, not just the current one.** Keep the whole path, and you can still correct the past.
+2. **Some measurements link poses that are far apart in time.** When the robot returns to its start and recognises it, it learns "pose 400 is in the same place as pose 1". That single fact contradicts all the small errors accumulated in between.
+
+Pose-graph optimization is the arithmetic that uses the second fact to repair the first: it finds the path that disagrees least with *all* the measurements together.
+
+## What it is: nodes, edges and confidence
+
+Grisetti, Kümmerle, Stachniss and Burgard's widely cited tutorial puts the whole idea in one sentence: graph-based SLAM uses "a graph whose nodes correspond to the poses of the robot at different points in time and whose edges represent constraints between the poses" ([Grisetti et al., 2010](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)).
+
+- **Nodes (poses).** Each node is where the robot was at one moment: x, y and heading for a ground robot (a pose in SE(2)), or a full 3D position and orientation for a drone or handheld camera (SE(3)).
+- **Edges (constraints).** Each edge is a measured *relative* transformation between two poses: "from pose 4, pose 5 is 1.2 m ahead and turned 3° left". Edges come either from odometry between consecutive poses or "by aligning the observations acquired at the two robot locations" ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)), such as matching two laser scans.
+- **Confidence (information matrix).** Every edge carries a matrix Ω that says how much to trust it. A precise scan match gets a large Ω and pulls hard; noisy wheel odometry gets a small one and gives way easily.
+
+Cartographer's documentation uses the same rubber-band picture: constraints "can intuitively be thought of as little ropes tying all nodes together", the optimizer "fastens those ropes altogether", and "the resulting net is called the 'pose graph'" ([Cartographer ROS](https://google-cartographer-ros.readthedocs.io/en/latest/algo_walkthrough.html)).
 
 ```diagram
-{ "type": "flow", "title": "Poses and constraints become a solvable graph", "nodes": ["Poses = nodes", "Constraints = edges", "Least-squares solve", "Consistent trajectory"], "caption": "Odometry links consecutive poses; a loop closure links a pose to a much earlier one. Solving the graph distributes the accumulated drift across the whole loop." }
+{ "type": "flow", "title": "From sensor data to a corrected trajectory", "nodes": ["Sensors (odometry, lidar, camera)", "Front-end: build edges, detect loop closures", "Pose graph (nodes + edges + confidence)", "Back-end: least-squares solve", "Corrected poses → redraw the map"], "caption": "The front-end depends on the sensor; the back-end only sees an abstract graph. A loop closure is one more edge, but solving the graph moves every pose in the loop." }
 ```
 
-## Why it scales
+## How it works
 
-The trick is **sparsity**: each pose only connects to a few others, so the matrix the solver handles is mostly zeros. Gauss-Newton or Levenberg-Marquardt exploit that, letting large graphs be re-solved fast enough for online mapping, where EKF-SLAM must update a dense covariance that grows with the square of the map size. Libraries like **g2o** ("an open-source C++ framework for optimizing graph-based nonlinear error functions", [g2o](https://github.com/RainerKuemmerle/g2o)), **GTSAM** and **Ceres** do the heavy lifting; slam_toolbox, for example, ships solver plugins for Ceres, g2o, SPA and GTSAM ([slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)).
+### 1. Front-end and back-end
 
-## The loop-closure payoff
+Graph-based SLAM splits into two jobs. Building the graph from raw measurements "is usually called front-end and it is heavily sensor dependent", while finding the best poses for that graph "is called back-end and relies on an abstract representation of the data which is sensor agnostic" ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). Pose-graph optimization is the back-end. That is why the same solver libraries serve laser, camera and multi-sensor systems.
 
-The dramatic moment in any SLAM run is a [loop closure](/atlas/concept/loop-closure): recognizing a previously-visited spot adds one edge linking now to long ago. Re-solving the graph then spreads the accumulated drift backward across every pose in the loop — the map visibly snaps into alignment. This global correction is exactly what a filter can't do cleanly and what makes graph SLAM the standard.
+### 2. Write down how wrong each edge is
+
+For an edge between poses i and j, the current guess of the poses predicts a relative transformation ẑ_ij. The measurement says z_ij. The difference is the error (for rotations, the difference is taken on the manifold, see step 5):
+
+```
+e_ij = z_ij − ẑ_ij(x_i, x_j)
+```
+
+The total cost adds up every edge's error, weighted by its confidence:
+
+```
+F(x) = Σ  e_ijᵀ · Ω_ij · e_ij        x* = argmin F(x)
+      edges                                x
+```
+
+Minimising F is a maximum-likelihood estimate when the measurement noise is Gaussian: the most probable trajectory given everything the robot measured.
+
+### 3. Linearise, solve, repeat
+
+The relationship between poses involves rotations, so F is not a simple quadratic. Solvers start from an initial guess (usually the raw odometry path) and iterate:
+
+1. **Linearise** each error around the current guess using its Jacobian (how the error changes when a pose moves slightly).
+2. **Build** one linear system H·Δx = −b by adding a few small blocks per edge.
+3. **Solve** for the correction Δx.
+4. **Update** the poses and repeat until the corrections are tiny.
+
+This is the Gauss–Newton method; Levenberg–Marquardt is a damped variant of the same loop, and Grisetti et al. name both as the standard solvers ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). GTSAM's tutorial shows the loop in action: three poses start from a "deliberately inaccurate initial estimate" of (0.5, 0, 0.2), (2.3, 0.1, −0.2) and (4.1, 0.1, 0.1), and Levenberg–Marquardt returns them to (0, 0, 0), (2, 0, 0) and (4, 0, 0) within a tiny tolerance ([GTSAM tutorial](https://gtsam.org/tutorials/intro.html)).
+
+### 4. Why it is fast: sparsity
+
+Each pose is linked to only a few others, so H is almost all zeros. Grisetti et al. note that H "is sparse by construction, having non-zeros between poses connected by a constraint", with a number of non-zero blocks equal to twice the number of constraints plus the number of nodes, which allows the system to be solved "by sparse Cholesky factorization" (a fast method for solving linear systems that are mostly zeros) ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). The number of non-zero entries in H grows with the number of edges, not with the square of the number of poses.
+
+### 5. Two details that trip people up
+
+- **Fix one pose.** Every error depends only on *relative* positions, so sliding or rotating the whole graph changes nothing and the system has no unique answer (this is called gauge freedom). The standard fix is to hold one pose (usually the first) still ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). In GTSAM a prior factor on the first pose anchors it in the same way.
+- **Treat rotations properly.** Rotations are not ordinary vectors. Euler angles have singularities, and rotation matrices or quaternions have extra numbers that a naive update breaks. Grisetti et al. solve this by optimising "on a manifold": compute small corrections in a local flat space and apply them to the pose with a special ⊞ operator. In their 3D test on a simulated robot travelling over a sphere, Gauss–Newton with Euler angles diverged while the manifold version "converges to the right solution" ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)).
+
+## A worked example you can check by hand
+
+Take a robot in a straight corridor, with positions along one axis. Pose x₀ is fixed at 0 m.
+
+| Edge | Measurement | Confidence |
+|---|---|---|
+| Odometry x₀ → x₁ | moved 1.0 m | 1 |
+| Odometry x₁ → x₂ | moved 1.0 m | 1 |
+| Scan match / loop closure x₀ → x₂ | x₂ is 1.8 m from x₀ | 1 |
+
+Odometry alone says x₂ = 2.0 m; the direct measurement says 1.8 m. Minimise (x₁ − 1)² + (x₂ − x₁ − 1)² + (x₂ − 1.8)². Setting both derivatives to zero gives x₁ = 0.933 m and x₂ = 1.867 m. The 0.2 m disagreement has been **shared out**: every edge is now off by 0.067 m, rather than one edge carrying all of it.
+
+Now trust the direct measurement four times as much (confidence 4 instead of 1). The answer moves to x₁ = 0.911 m and x₂ = 1.822 m: the confident edge is off by only 0.022 m, and the two odometry edges each absorb 0.089 m. That is all Ω does: it decides who gives way.
+
+A real pose graph does the same thing with thousands of 2D or 3D poses and rotations, which is why it needs the iterative solver above. GTSAM's PoseSLAM example is the next step up: five 2D poses driving round a square, with 2 m odometry edges (most with a 90° turn) plus one loop-closure edge from pose 5 back to pose 2 ([GTSAM tutorial](https://gtsam.org/tutorials/intro.html)).
+
+## Where you'll see it
+
+| System | Sensors | How it uses a pose graph | Source |
+|---|---|---|---|
+| **slam_toolbox** (ROS 2) | 2D lidar | Builds a pose graph from scan-matched laser scans; "If a loop closure is found, the pose graph is optimized"; solver plugins include Ceres; saved pose graphs can be reloaded to keep mapping | [slam_toolbox](https://github.com/SteveMacenski/slam_toolbox) |
+| **Cartographer** | 2D/3D lidar, IMU, odometry | Local SLAM builds submaps; global SLAM finds loop-closure constraints and runs "a pose graph optimization" (which it also calls sparse pose adjustment) in background threads | [Cartographer ROS](https://google-cartographer-ros.readthedocs.io/en/latest/algo_walkthrough.html) |
+| **ORB-SLAM2** | Monocular, stereo, RGB-D cameras | On a loop closure, corrects drift "by performing a pose-graph optimization", then runs a full [bundle adjustment](/atlas/concept/bundle-adjustment) in a separate thread | [Mur-Artal & Tardós](https://arxiv.org/abs/1610.06475) |
+| **g2o** | Library | "An open-source C++ framework for optimizing graph-based nonlinear error functions" | [g2o](https://github.com/RainerKuemmerle/g2o) |
+| **GTSAM** | Library | Factor-graph library; PoseSLAM is its pose-graph case, solved with Levenberg–Marquardt or incrementally with iSAM | [GTSAM tutorial](https://gtsam.org/tutorials/intro.html) |
+
+If you have run [lidar SLAM](/atlas/concept/lidar-slam) in ROS 2 and watched the map suddenly straighten after the robot returned to its start, you have watched a pose graph being re-solved.
+
+## Limits and common problems
+
+- **One wrong loop closure can ruin the map.** The solver trusts every edge it is given. If the front-end decides two different corridors are the same place, the optimizer will bend the map to make them meet. Data association, deciding which measurements belong together, is the front-end's job, and Grisetti et al. state that their back-end simply assumes "the given front-end provides consistent estimates" ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). Real systems add checks before accepting a loop closure: Cartographer uses a branch-and-bound scan matcher with a minimum match score, and then handles remaining outliers with a Huber loss, so a bad edge pulls less hard than its squared error would suggest ([Cartographer ROS](https://google-cartographer-ros.readthedocs.io/en/latest/algo_walkthrough.html)).
+- **It needs a reasonable starting guess.** Gauss–Newton and Levenberg–Marquardt refine a guess by repeated local linearisation, which is why Grisetti et al. present the method for the case where "a good initial guess … of the robot's poses is known" ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). In practice the starting guess is the odometry path, so very poor odometry makes the optimizer's job harder.
+- **It forgets the landmarks.** A pure pose graph keeps poses only; the raw measurements are replaced by edges that Grisetti et al. call "virtual measurements" ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). That keeps it small, but it is an approximation; systems that need the most accurate result re-optimise poses and points together with bundle adjustment, as ORB-SLAM2 does after a loop closure.
+- **It grows forever unless you prune it.** Every new pose adds a node. slam_toolbox's experimental "true lifelong" mode removes nodes over time so that computation stays bounded ([slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)).
+
+## Pose graph vs related ideas
+
+| Approach | What it estimates | When it is used |
+|---|---|---|
+| [EKF-SLAM](/atlas/concept/ekf-slam) | Current pose + landmarks, updated as each measurement arrives | Online filtering; past poses are not kept, so they cannot be revised |
+| **Pose-graph optimization** | The whole trajectory (poses only) | Back-end of widely used lidar and visual SLAM systems (slam_toolbox, Cartographer, ORB-SLAM2) |
+| [Factor graph](/atlas/concept/factor-graph) | Any set of variables: poses, landmarks, velocities, IMU biases | The general framework; a pose graph is the special case with only pose-to-pose factors |
+| [Bundle adjustment](/atlas/concept/bundle-adjustment) | Camera poses and 3D points together | Highest-accuracy visual reconstruction; costlier than a pose graph |
+
+Grisetti et al. draw the same line between *filtering* methods, which estimate the current state online, and *smoothing* methods, which "estimate the full trajectory of the robot from the full set of measurements" ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)). Pose-graph optimization is smoothing.
+
+## Going deeper
+
+- **Incremental solvers.** Re-solving the whole graph after every new pose is wasteful. iSAM, cited by Grisetti et al. as "an on-line version that exploits partial reorderings to compute the sparse factorization" ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)), updates the solution as poses arrive; GTSAM includes it ([GTSAM tutorial](https://gtsam.org/tutorials/intro.html)).
+- **Where it came from.** Grisetti et al. credit Lu and Milios (1997) with the graph-based formulation and note that it took years to catch on because of "the comparably high complexity of solving the error minimization problem", until advances in sparse linear algebra made it fast ([Grisetti et al.](http://www2.informatik.uni-freiburg.de/~stachnis/pdf/grisetti10titsmag.pdf)).
+- **Uncertainty comes for free.** At the solution, H approximates the information matrix of the whole trajectory, so its inverse gives the uncertainty of each pose. GTSAM's examples draw these as covariance ellipses after optimizing ([GTSAM tutorial](https://gtsam.org/tutorials/intro.html)).
+- **Multiple robots and sessions.** The same graph can join trajectories from different runs or robots. Cartographer notes that global constraints "can also align different trajectories recorded by multiple robots" ([Cartographer ROS](https://google-cartographer-ros.readthedocs.io/en/latest/algo_walkthrough.html)), and slam_toolbox can merge serialized pose graphs from separate sessions ([slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)).
 
 ## Why it matters
 
-Pose-graph optimization is the back-end of most modern SLAM systems. In ROS 2, slam_toolbox (described by its author as "the currently supported ROS2-SLAM library") is "pose-graph optimization based SLAM": "If a loop closure is found, the pose graph is optimized, and pose estimates are updated" ([slam_toolbox](https://github.com/SteveMacenski/slam_toolbox)). Reframing mapping as one optimization problem is why the approach scales and why it can correct the whole map at once.
+Any robot that maps a building, a warehouse or a city has to cope with drift. Pose-graph optimization is the standard answer because it keeps the whole history, weighs every measurement by how much it deserves to be trusted, and fixes the past when new evidence arrives. Understanding it explains why a SLAM map jumps into place after a loop closure, why one bad loop closure is so damaging, and what the solvers inside slam_toolbox, Cartographer, g2o and GTSAM are actually doing.
+
+## Common questions
+
+### What is pose-graph optimization in simple terms?
+
+The robot keeps a list of every place it has been and the measured movement between them. Because each movement measurement is slightly wrong, the places do not quite fit together. Pose-graph optimization moves all the places at once, by small amounts, until the measurements agree as well as possible. When the robot recognises somewhere it has been before, that extra measurement lets it correct the whole path.
+
+### What is the difference between a pose graph and a factor graph?
+
+A pose graph only contains robot poses and the relative measurements between them. A factor graph is the general version: its variables can be poses, landmarks, velocities or sensor biases, and its factors can link any number of them. A GPS reading, for example, is a factor on a single pose. GTSAM's tutorial calls the pose-only case "the simplest instantiation of a SLAM problem", PoseSLAM ([GTSAM tutorial](https://gtsam.org/tutorials/intro.html)).
+
+### Why does my SLAM map suddenly jump or bend after a loop closure?
+
+That jump is pose-graph optimization working. Before the loop closure, drift had accumulated unnoticed; the loop-closure edge exposes it, and re-solving the graph spreads the correction over every pose in the loop, so the map redraws in a new shape. If the map bends into something clearly wrong instead, the usual cause is a false loop closure: two similar-looking places matched as one. Tighten the front-end's match threshold before tuning the optimizer.
 
 ## Related
 
-[SLAM](/atlas/concept/slam) · [Factor graph](/atlas/concept/factor-graph) · [Loop closure](/atlas/concept/loop-closure) · [EKF-SLAM](/atlas/concept/ekf-slam)
+[SLAM](/atlas/concept/slam) · [Loop closure](/atlas/concept/loop-closure) · [Factor graph](/atlas/concept/factor-graph) · [Bundle adjustment](/atlas/concept/bundle-adjustment) · [Scan matching](/atlas/concept/scan-matching) · [Lidar SLAM](/atlas/concept/lidar-slam) · [EKF-SLAM](/atlas/concept/ekf-slam)
