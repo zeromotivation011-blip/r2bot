@@ -11,6 +11,11 @@ import { jsonldScript } from '@/lib/seo/jsonld'
 const BASE = 'https://www.r2bot.in'
 export const revalidate = 3600
 export function generateStaticParams() { return SHORTS.filter((s) => SHORTS_HI[s.slug]).map((s) => ({ slug: s.slug })) }
+// Unknown slugs must be a real 404. notFound() alone answered 200 live (22 Nov
+// 2026): the response had already started streaming, so the not-found UI arrived
+// inside a 200 with noindex, a soft 404 that Search Console reports.
+// Every lesson is in code, so nothing outside generateStaticParams is valid.
+export const dynamicParams = false
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const slug = (await params).slug

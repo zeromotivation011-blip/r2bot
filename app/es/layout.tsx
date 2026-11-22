@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { SiteChrome } from '@/components/SiteChrome'
+import { DocumentLang } from '@/components/DocumentLang'
 
 /**
  * Language wrapper plus the site header and footer.
@@ -11,6 +12,7 @@ import { SiteChrome } from '@/components/SiteChrome'
 export default function ESLayout({ children }: { children: ReactNode }) {
   return (
     <div lang="es" style={{ fontFamily: 'system-ui,-apple-system,"Segoe UI",sans-serif' }}>
+      <DocumentLang lang="es" />
       <SiteChrome>{children}</SiteChrome>
     </div>
   )

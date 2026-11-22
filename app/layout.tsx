@@ -80,7 +80,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${display.variable} ${mono.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${display.variable} ${mono.variable}`}>
       <head>
         {/* Marks JS as available before first paint so scroll-reveal can hide
             content without ever hiding it from no-JS readers or crawlers. */}

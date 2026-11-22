@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { SiteChrome } from '@/components/SiteChrome'
+import { DocumentLang } from '@/components/DocumentLang'
 
 /**
  * Language wrapper plus the site header and footer.
@@ -11,6 +12,7 @@ import { SiteChrome } from '@/components/SiteChrome'
 export default function HILayout({ children }: { children: ReactNode }) {
   return (
     <div lang="hi" style={{ fontFamily: '"Noto Sans Devanagari","Mangal","Nirmala UI",system-ui,sans-serif' }}>
+      <DocumentLang lang="hi" />
       <SiteChrome>{children}</SiteChrome>
     </div>
   )

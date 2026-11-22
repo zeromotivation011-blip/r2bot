@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { SiteChrome } from '@/components/SiteChrome'
+import { DocumentLang } from '@/components/DocumentLang'
 
 /**
  * Language wrapper plus the site header and footer.
@@ -11,6 +12,7 @@ import { SiteChrome } from '@/components/SiteChrome'
 export default function ZHLayout({ children }: { children: ReactNode }) {
   return (
     <div lang="zh-CN" style={{ fontFamily: '"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif' }}>
+      <DocumentLang lang="zh-CN" />
       <SiteChrome>{children}</SiteChrome>
     </div>
   )
