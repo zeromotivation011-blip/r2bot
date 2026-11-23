@@ -119,7 +119,7 @@ export default function ROS2Page() {
           </h2>
           <p className="mb-5 text-[15px] text-[#B0B8C5]">
             The errors beginners hit first, with the causes in order and a check before every fix.{' '}
-            <Link href="/ros2/fix" className="text-amber-300 underline">All ROS 2 fixes</Link>
+            <Link href="/ros2/fix" className="inline-flex min-h-[44px] items-center text-amber-300 underline">All ROS 2 fixes</Link>
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             {ROS2_FIXES.map((f) => (

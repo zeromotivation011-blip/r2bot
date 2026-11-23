@@ -64,8 +64,8 @@ export default function Ros2FixHub() {
       </p>
       <p className="not-prose mt-6 text-sm text-gray-400">
         Looking for commands rather than errors? See the{' '}
-        <Link href="/learn/ros2-cheatsheet" className="text-amber-300 underline">ROS 2 cheatsheet</Link>, or{' '}
-        <Link href="/ros2" className="text-amber-300 underline">run ROS 2 in your browser</Link> with nothing to install.
+        <Link href="/learn/ros2-cheatsheet" className="inline-flex min-h-[44px] items-center text-amber-300 underline">ROS 2 cheatsheet</Link>, or{' '}
+        <Link href="/ros2" className="inline-flex min-h-[44px] items-center text-amber-300 underline">run ROS 2 in your browser</Link> with nothing to install.
       </p>
     </StaticPage>
   );

@@ -107,10 +107,10 @@ export default async function Ros2FixPage({ params }: { params: Promise<Params> 
     <StaticPage eyebrow="ROS 2 · Fix" title={f.title} lede={f.lede} maxWidth={880}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(jsonLd) }} />
 
-      <nav aria-label="Breadcrumb" className="not-prose -mt-4 mb-6 text-xs text-gray-500">
-        <Link href="/ros2" className="hover:text-white hover:underline">ROS 2</Link>
+      <nav aria-label="Breadcrumb" className="not-prose -mt-6 mb-4 text-xs text-gray-500">
+        <Link href="/ros2" className="inline-flex min-h-[44px] items-center hover:text-white hover:underline">ROS 2</Link>
         <span aria-hidden> / </span>
-        <Link href="/ros2/fix" className="hover:text-white hover:underline">Fixes</Link>
+        <Link href="/ros2/fix" className="inline-flex min-h-[44px] items-center hover:text-white hover:underline">Fixes</Link>
         <span aria-hidden> / </span>
         <span className="text-gray-400">{f.title}</span>
       </nav>
@@ -135,10 +135,10 @@ export default async function Ros2FixPage({ params }: { params: Promise<Params> 
 
         <h2 id="causes">Find your cause</h2>
         <p>Most likely first. Run the check before you change anything; stop at the first one that matches.</p>
-        <ol className="not-prose mt-3 space-y-1 text-sm">
+        <ol className="not-prose mt-3 text-sm">
           {f.causes.map((c, i) => (
             <li key={c.id}>
-              <a href={`#${c.id}`} className="text-amber-300 hover:underline">
+              <a href={`#${c.id}`} className="inline-flex min-h-[44px] items-center text-amber-300 hover:underline">
                 {i + 1}. <Rich text={c.title} />
               </a>
             </li>
@@ -201,26 +201,26 @@ export default async function Ros2FixPage({ params }: { params: Promise<Params> 
       <section className="not-prose mt-8 grid gap-6 md:grid-cols-2">
         <div>
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">Read next</h2>
-          <ul className="mt-2 space-y-2 text-sm">
+          <ul className="mt-2 text-sm">
             {f.related.map((r) => (
-              <li key={r.href}><Link href={r.href} className="inline-block py-1 text-amber-300 hover:underline">{r.label}</Link></li>
+              <li key={r.href}><Link href={r.href} className="inline-flex min-h-[44px] items-center text-amber-300 hover:underline">{r.label}</Link></li>
             ))}
             {others
               .filter((o) => !f.related.some((r) => r.href === `/ros2/fix/${o.slug}`))
               .map((o) => (
-                <li key={o.slug}><Link href={`/ros2/fix/${o.slug}`} className="inline-block py-1 text-amber-300 hover:underline">{o.title}</Link></li>
+                <li key={o.slug}><Link href={`/ros2/fix/${o.slug}`} className="inline-flex min-h-[44px] items-center text-amber-300 hover:underline">{o.title}</Link></li>
               ))}
           </ul>
         </div>
         <div>
           <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">Sources</h2>
-          <ol className="mt-2 space-y-2 text-sm text-gray-400">
+          <ol className="mt-2 text-sm text-gray-400">
             {f.sources.map((s) => (
-              <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline">{s.name}</a></li>
+              <li key={s.url}><a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center hover:text-white hover:underline">{s.name}</a></li>
             ))}
           </ol>
           <p className="mt-3 text-xs text-gray-500">
-            Checked against: {f.verifiedOn}. Updated {f.updated} · <Link href="/ros2/fix" className="underline">All ROS 2 fixes</Link>
+            Checked against: {f.verifiedOn}. Updated {f.updated} · <Link href="/ros2/fix" className="inline-flex min-h-[44px] items-center underline">All ROS 2 fixes</Link>
           </p>
         </div>
       </section>
