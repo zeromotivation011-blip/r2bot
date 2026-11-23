@@ -263,6 +263,8 @@ export default function Ros2CheatsheetPage() {
           <li><Link href="/atlas/concept/quality-of-service" className="text-amber-300 hover:underline">Quality of Service (QoS) — why two nodes cannot see each other</Link></li>
           <li><Link href="/ros2" className="text-amber-300 hover:underline">ROS 2 Playground — try these commands in your browser</Link></li>
           <li><Link href="/academy/wire" className="text-amber-300 hover:underline">Wire track — Arduino to ROS 2, six written lessons</Link></li>
+          <li><Link href="/ros2/fix/ros2-command-not-found" className="text-amber-300 hover:underline">Fix: “ros2: command not found”</Link></li>
+          <li><Link href="/ros2/fix/nodes-cannot-see-each-other" className="text-amber-300 hover:underline">Fix: ROS 2 nodes can’t see each other</Link></li>
         </ul>
         <p className="mt-4 text-xs text-gray-500">
           Source of truth for every command: the ROS 2 documentation at docs.ros.org (Humble and Jazzy CLI tools pages) and the ros2cli package. Found a flag that changed? <a className="underline" href="mailto:hello@r2bot.in">Tell us</a>.

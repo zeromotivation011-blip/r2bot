@@ -5,6 +5,8 @@ import { CopilotDrawer } from '@/components/CopilotDrawer';
 import { CopilotProvider } from '@/components/CopilotProvider';
 import { ROS2Playground } from '@/components/ROS2Playground';
 import { CopyButtonClient } from '@/components/CopyButtonClient';
+import Link from 'next/link';
+import { ROS2_FIXES } from '@/lib/ros2-fixes';
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -106,6 +108,29 @@ export default function ROS2Page() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
             {LESSONS.map((l) => (
               <ROS2LessonCard key={l.title} {...l} />
+            ))}
+          </div>
+        </div>
+
+        {/* Fixes for the errors people hit on a real install */}
+        <div className="container" style={{ maxWidth: 1200, marginTop: 56 }}>
+          <h2 className="display" style={{ fontSize: 'clamp(24px, 3vw, 32px)', margin: '0 0 10px', color: 'var(--mist)' }}>
+            Stuck on a real install?
+          </h2>
+          <p className="mb-5 text-[15px] text-[#B0B8C5]">
+            The errors beginners hit first, with the causes in order and a check before every fix.{' '}
+            <Link href="/ros2/fix" className="text-amber-300 underline">All ROS 2 fixes</Link>
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {ROS2_FIXES.map((f) => (
+              <Link
+                key={f.slug}
+                href={`/ros2/fix/${f.slug}`}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-amber-400/40"
+              >
+                <span className="block text-lg font-bold text-white">{f.title}</span>
+                <span className="mt-1 block text-sm text-gray-400">{f.causes.length} causes, most likely first</span>
+              </Link>
             ))}
           </div>
         </div>
