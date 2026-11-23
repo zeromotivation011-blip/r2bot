@@ -1,69 +1,218 @@
 ---
-title: Differential Drive in Robotics
-summary: >-
-  Differential drive uses two independently driven wheels and a passive caster
-  to steer a mobile robot. Simple, cheap, and the foundation of most beginner
-  robotics.
+title: Differential Drive
+slug: differential-drive
+bucket: concept
 category: fundamentals
-lastReviewed: 2026-05-21T00:00:00.000Z
-sources:
-  - title: 'Differential (mechanical device)'
-    url: 'https://en.wikipedia.org/wiki/Differential_(mechanical_device)'
+summary: >-
+  Differential drive steers a robot with two independently driven wheels: equal speeds go
+  straight, unequal speeds curve, and opposite speeds spin it in place.
+difficulty: 3
+difficultyLabel: Classroom
 tags:
   - locomotion
   - drive
   - mobile-robot
+  - kinematics
+  - odometry
 seeAlso:
   - mobile-robot
-  - wheels-vs-tracks
   - odometry
-difficulty: 3
+  - nonholonomic-constraint
+  - skid-steer
+  - ackermann-steering
+  - mecanum-wheel
+  - encoder
+lastReviewed: 2026-11-23T00:00:00.000Z
+sources:
+  - title: 'P. Allen, "Differential Drive Robots", CS W4733 course notes, Columbia University (compiled from Dudek & Jenkin, Computational Principles of Mobile Robotics)'
+    url: 'https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf'
+  - title: 'ros2_control: "Wheeled Mobile Robot Kinematics" (ros2_controllers documentation)'
+    url: 'https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html'
+  - title: 'ros2_control: diff_drive_controller user documentation and parameter definitions'
+    url: 'https://control.ros.org/master/doc/ros2_controllers/diff_drive_controller/doc/userdoc.html'
+  - title: 'ROBOTIS e-Manual: TurtleBot3 features and specifications'
+    url: 'https://emanual.robotis.com/docs/en/platform/turtlebot3/features/'
+  - title: 'ROBOTIS-GIT/turtlebot3: burger.yaml (wheel separation and radius used by the TurtleBot3 node)'
+    url: 'https://github.com/ROBOTIS-GIT/turtlebot3/blob/main/turtlebot3_bringup/param/burger.yaml'
+  - title: 'iRobot Create 3 documentation: Hardware Overview'
+    url: 'https://iroboteducation.github.io/create3_docs/hw/overview/'
+  - title: 'TurtleBot 4 User Manual: Features'
+    url: 'https://turtlebot.github.io/turtlebot4-user-manual/overview/features.html'
 laymanExplanation: >-
-  Differential drive is a mobile-robot locomotion scheme where two wheels on
-  either side of the chassis are driven independently. By varying the relative
-  speed of the two wheels, the robot moves forward, turns in place, or arcs
-  along a curved path. A passive caster wheel keeps the chassis level.
-realRobotsThatUseThis: []
-indianExample: ''
-relatedTerms: []
-prerequisiteTerms: []
-unlocksTerms: []
-quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
-difficultyLabel: Classroom
+  Think of a wheelchair. Push both wheels equally and it rolls straight. Push the right wheel
+  harder and it curves to the left. Push one forward and pull the other back and it spins on the
+  spot. A differential-drive robot works the same way: it has no steering wheel, only two motors,
+  and it steers by giving the two wheels different speeds.
 technicalDefinition: >-
-  Differential drive uses two independently driven wheels and a passive caster
-  to steer a mobile robot. Simple, cheap, and the foundation of most beginner
-  robotics.
-slug: differential-drive
-bucket: concept
+  A differential-drive robot has two coaxial drive wheels separated by a track width w, each driven
+  independently, usually plus one or more passive casters for support. With left and right wheel ground
+  speeds v_L and v_R, the body moves with forward speed v = (v_R + v_L)/2 and yaw rate
+  ω = (v_R − v_L)/w, rotating about an instantaneous centre of curvature on the axle line at
+  distance R = v/ω from the axle midpoint. It is kinematically equivalent to a unicycle and is
+  nonholonomic: it cannot move sideways along its axle.
+quizQuestion:
+  q: A differential-drive robot's left wheel moves at 0.1 m/s and its right wheel at 0.3 m/s. What does it do?
+  options:
+    - Drives forward at 0.2 m/s while curving to the left
+    - Drives forward at 0.2 m/s while curving to the right
+    - Spins in place to the left without moving forward
+    - Slides sideways to the left
+  answer: 0
+  explanation: >-
+    Forward speed is the average of the two wheels, (0.1 + 0.3)/2 = 0.2 m/s. The right wheel is
+    faster, so the robot turns towards the slower left side. It can never slide sideways: a
+    differential-drive robot cannot move along its own axle.
 ---
 
-# Differential Drive in Robotics
+**Differential drive** is the simplest way to steer a wheeled robot: two wheels on the same axle, each with its own motor, and no steering mechanism at all. Drive both wheels at the same speed and the robot goes straight. Drive them at different speeds and it curves towards the slower wheel. Drive them in opposite directions and it spins on the spot.
 
-## What is it?
+It is how many small [mobile robots](/atlas/concept/mobile-robot) move: the TurtleBot3 is "a two-wheeled differential drive platform" ([ROBOTIS](https://emanual.robotis.com/docs/en/platform/turtlebot3/features/)), and iRobot's Create 3, which is "based on the Roomba", has two drive wheels and a front caster ([iRobot](https://iroboteducation.github.io/create3_docs/hw/overview/)).
 
-Differential drive is a mobile-robot locomotion scheme where two wheels on either side of the chassis are driven independently. By varying the relative speed of the two wheels, the robot moves forward, turns in place, or arcs along a curved path. A passive caster wheel keeps the chassis level.
+![Top view of a differential-drive robot turning left: the right wheel is faster, and the robot rotates about the instantaneous centre of curvature on the axle line](/images/atlas/diagrams/differential-drive.svg)
+
+## Start here: steering by speed
+
+Picture a wheelchair. There is no steering wheel. You steer by pushing one wheel harder than the other. A differential-drive robot is a wheelchair with two motors instead of two arms.
+
+A typical robot has:
+
+- **Two drive wheels** on a common axle, one on each side, each turned by its own motor.
+- **One or more casters** (small free-swivelling wheels or ball rollers) that only hold the chassis level. The TurtleBot3 Burger uses one ball caster; the Create 3's caster is at the front because its "center of gravity is forward of the center axis" ([ROBOTIS](https://emanual.robotis.com/docs/en/platform/turtlebot3/features/), [iRobot](https://iroboteducation.github.io/create3_docs/hw/overview/)).
+- **[Encoders](/atlas/concept/encoder)** on the wheels, so the robot can count how far each wheel has turned.
+
+Columbia's course notes on these robots (compiled from Dudek and Jenkin's textbook) describe three special cases; every other combination gives an arc ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)):
+
+| Wheel speeds | What the robot does |
+|---|---|
+| Left = right | Drives in a straight line |
+| Left = −right | Spins in place about the midpoint of the axle |
+| One wheel stopped | Pivots about the stopped wheel |
+| Anything else | Drives along a circular arc, curving towards the slower wheel |
 
 ## How it works
 
-If both wheels turn at the same speed, the robot moves straight. If only the right wheel turns, the robot rotates around the stationary left wheel. If wheels turn in opposite directions at the same speed, the robot spins in place. The forward kinematics give linear velocity v = (v_left + v_right)/2 and angular velocity ω = (v_right − v_left) / wheelbase.
+Both wheels are bolted to the same rigid body, so whenever the robot rolls without slipping it must be rotating about some point on the line through its axle. That point is the **instantaneous centre of curvature (ICC)** ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)); ros2_control's documentation calls the same idea the instantaneous center of rotation, or ICR ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)). Each wheel moves at a speed proportional to its distance from the ICC, so the faster wheel is on the outside of the turn.
 
-## Real-world example
+Write v_L and v_R for the speed of each wheel along the ground, and w for the **track width** (the distance between the two wheels). Then the robot's forward speed and turning rate are ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)):
 
-Roomba, Pepper, GreyOrange Butler, and the typical Arduino line-follower all use differential drive. It is the default locomotion for educational robotics in India.
+**v = (v_R + v_L) / 2**
 
-## Why it matters for robotics
+**ω = (v_R − v_L) / w**
 
-Differential drive is simple enough for first-time builders but powerful enough to teach kinematics, odometry, and PID. Almost every robotics curriculum starts here.
+and the radius of the turn, measured from the middle of the axle to the ICC, is **R = v / ω**. Forward speed is the average of the wheels; turning rate is their difference, divided by how far apart they are. That is the whole of the forward kinematics.
 
-## See also
+### Commanding a robot: inverse kinematics
 
-- [Mobile Robot](/atlas/concept/mobile-robot)
-- [Wheels Vs Tracks](/atlas/concept/wheels-vs-tracks)
-- [Odometry](/atlas/concept/odometry)
+Navigation software does not think in wheel speeds. It asks for a forward speed v and a turning rate ω, and the drive works out the wheel speeds by turning the two equations around ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)):
+
+**v_L = v − ω · w / 2**
+
+**v_R = v + ω · w / 2**
+
+Divide each by the wheel radius r to get how fast each wheel must turn (in radians per second).
+
+### A worked example you can check
+
+The TurtleBot3 Burger's software uses a wheel separation of 0.160 m and a wheel radius of 0.033 m ([burger.yaml](https://github.com/ROBOTIS-GIT/turtlebot3/blob/main/turtlebot3_bringup/param/burger.yaml)). Ask it for v = 0.10 m/s and ω = 0.5 rad/s (a gentle left turn):
+
+| Step | Calculation | Result |
+|---|---|---|
+| Left wheel ground speed | 0.10 − 0.5 × 0.160 / 2 | 0.06 m/s |
+| Right wheel ground speed | 0.10 + 0.5 × 0.160 / 2 | 0.14 m/s |
+| Left wheel speed | 0.06 / 0.033 | 1.82 rad/s (about 17 rpm) |
+| Right wheel speed | 0.14 / 0.033 | 4.24 rad/s (about 41 rpm) |
+| Turn radius | 0.10 / 0.5 | 0.20 m |
+
+Check it the other way: (0.14 + 0.06) / 2 = 0.10 m/s and (0.14 − 0.06) / 0.160 = 0.5 rad/s.
+
+ROBOTIS lists the Burger's maximum translational velocity as 0.22 m/s and its maximum rotational velocity as 2.84 rad/s ([ROBOTIS](https://emanual.robotis.com/docs/en/platform/turtlebot3/features/)). Spinning in place at 2.84 rad/s needs each wheel at 2.84 × 0.080 ≈ 0.23 m/s, about the same wheel speed as driving straight at 0.22 m/s, so the two ratings are consistent with a single wheel-speed ceiling. That is a general property of differential drive: forward speed and turning draw on the same two wheel speeds, so a robot whose wheels are already at their limit can only turn by slowing one of them.
+
+### Odometry: where am I now?
+
+Run the equations forwards on the encoder counts and the robot can estimate its own position. Every short time step, measure how far each wheel rolled (Δs_L and Δs_R), then:
+
+- distance travelled: **Δs = (Δs_R + Δs_L) / 2**
+- change in heading: **Δθ = (Δs_R − Δs_L) / w**
+- new position: **x ← x + Δs · cos θ**, **y ← y + Δs · sin θ**, **θ ← θ + Δθ**
+
+This is [odometry](/atlas/concept/odometry), also called dead reckoning. The Columbia notes give the same model as integrals over time ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)), and the ros2_control documentation notes that the same forward kinematics give a robot's odometry "directly from the encoder readings" ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)).
+
+```python
+import math
+
+def update_pose(x, y, theta, ds_left, ds_right, track_width):
+    ds = (ds_right + ds_left) / 2
+    dtheta = (ds_right - ds_left) / track_width
+    x += ds * math.cos(theta)
+    y += ds * math.sin(theta)
+    theta += dtheta
+    return x, y, theta
+```
+
+Odometry drifts, because every small error is added up and never removed. That is why real robots correct it with other sensors, as below.
+
+## Where you'll see it
+
+- **Teaching and research robots.** TurtleBot3 (two DYNAMIXEL-driven wheels, plus one ball caster on the Burger and two on the Waffle Pi) and TurtleBot 4, which "uses a Create 3 as the base platform" ([TurtleBot 4 manual](https://turtlebot.github.io/turtlebot4-user-manual/overview/features.html)), are both differential drive.
+- **Robot vacuum cleaners.** The Create 3 is based on the [Roomba](/robots/roomba), a robot vacuum cleaner, and has two wheels with encoders and current sensors, a caster, cliff sensors, an optical odometry sensor and an IMU fused into its odometry ([iRobot](https://iroboteducation.github.io/create3_docs/hw/overview/)).
+- **Hobby and classroom kits.** Two motors, two wheels and a caster is one of the simplest chassis that can reach any point on a flat floor, which makes it a common choice for first robots such as a [line follower](/shorts/line-follower).
+
+## Differential drive in ROS 2
+
+In ROS 2 the standard implementation is **`diff_drive_controller`** from ros2_control. It "takes velocity commands for the robot body, which are translated to wheel commands", and publishes odometry computed from hardware feedback ([diff_drive_controller](https://control.ros.org/master/doc/ros2_controllers/diff_drive_controller/doc/userdoc.html)). In practice:
+
+- It listens on **`~/cmd_vel`** (a `geometry_msgs/msg/TwistStamped`) and uses only `linear.x` (v) and `angular.z` (ω); every other component is ignored. This is the same v and ω as above.
+- It publishes **`~/odom`** (`nav_msgs/msg/Odometry`) and, if `enable_odom_tf` is true, the odom → base transform.
+- You give it the geometry: `wheel_separation` and `wheel_radius`, and lists of joints in `left_wheel_names` and `right_wheel_names`.
+- Commands older than `cmd_vel_timeout` (0.5 s by default) are treated as stale, so the robot stops if the commander goes quiet.
+
+The parameter descriptions say exactly what goes wrong when the geometry is off: with a wrong wheel separation "the robot will not behave correctly in curves", and with a wrong wheel radius "the robot will move faster or slower than expected" ([parameters](https://github.com/ros-controls/ros2_controllers/blob/master/diff_drive_controller/src/diff_drive_controller_parameter.yaml)). There are correction factors for both: `wheel_separation_multiplier`, `left_wheel_radius_multiplier` and `right_wheel_radius_multiplier`.
+
+To see why this matters, suppose the configured separation is 0.152 m but the real one is 0.160 m (5% short). Every heading change is then computed as 0.160 / 0.152 ≈ 1.053 times too large, so after the robot really turns once around, its odometry believes it has turned about 379°.
+
+## Limits
+
+- **It cannot move sideways.** A differential-drive robot "cannot move laterally along its axle", a similar restriction to the one that makes parallel parking a car awkward ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)). This is a [nonholonomic constraint](/atlas/concept/nonholonomic-constraint): the robot can reach any position and heading, but not by any path. To shift sideways it has to turn, drive and turn back.
+- **Small speed mismatches matter.** The notes warn that these robots are "very sensitive to slight changes in velocity in each of the wheels" and to "small variations in the ground plane", and that they "may need extra wheels (castor wheels) for support" ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)). No two motors are exactly identical, which is why each wheel's speed is normally closed-loop controlled from its encoder, often with a [PID controller](/atlas/concept/pid-controller) per wheel.
+- **Encoders measure the wheel, not the floor.** When a wheel slips, on a rug, a wet tile or a bump, the encoders still count and the odometry goes wrong. Robots fuse other sensors to catch this: the Create 3 combines wheel encoders with an optical floor sensor and an [IMU](/atlas/concept/imu) ([iRobot](https://iroboteducation.github.io/create3_docs/hw/overview/)); see [sensor fusion](/atlas/concept/sensor-fusion).
+
+## How it compares with other drives
+
+ros2_control sorts wheeled robots into two groups: **omnidirectional** robots, which "can move instantaneously in any direction in the plane", and **nonholonomic** robots, which cannot ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)). Differential drive belongs to the second group.
+
+| Drive | How it steers | Spin in place? | Move sideways? |
+|---|---|---|---|
+| **Differential drive** | Two wheel speeds on one axle | Yes | No |
+| [Skid-steer](/atlas/concept/skid-steer) | Wheel or track speeds per side; the wheels scrub sideways to turn | Yes (with scrubbing) | No |
+| [Car-like (Ackermann)](/atlas/concept/ackermann-steering) | Steered front wheels | No (minimum turning radius) | No |
+| [Mecanum](/atlas/concept/mecanum-wheel), omni wheels, [swerve](/atlas/concept/swerve-drive) | Wheel speeds (and steering, for swerve) | Yes | Yes |
+
+The trade-off is simplicity against freedom. Differential drive needs only two motors and no steering mechanism, and its maths fits on an index card. Omnidirectional drives can slide sideways but need more motors, more complex wheels and more careful control. Skid-steer suits rough ground and tracks, but its turns scrub the wheels across the ground (see [skid-steer](/atlas/concept/skid-steer)).
+
+## Going deeper
+
+- **It is a unicycle.** The ros2_control documentation, citing Siciliano et al., notes that a differential-drive robot is "kinematically equivalent to a unicycle but more stable from a mechanical viewpoint" ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)). So planners and controllers can work with the simple unicycle model (ẋ = v cos θ, ẏ = v sin θ, θ̇ = ω) and leave the wheel speeds to the last step.
+- **Exact arcs, not straight steps.** The odometry update above assumes straight-line motion within each step. Over a step the robot really moves along an arc about the ICC, and the Columbia notes give the exact update as a rotation of the robot's pose about the ICC by ω·δt ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)). With short time steps the difference is small, but it grows with long steps or tight turns.
+- **Motion planning with a constraint.** Because the robot cannot slide sideways, the software that turns a planned path into motion has to respect it: whatever the planner draws, the robot can only be sent a forward speed v and a turning rate ω. See [nonholonomic constraint](/atlas/concept/nonholonomic-constraint) and [Nav2](/atlas/concept/nav2).
+
+## Why it matters
+
+Differential drive is where many people first meet robot kinematics, and it stays useful well past that point: the same two equations drive a classroom robot, a robot vacuum and a ROS 2 research platform. Learn them once and you can command any of these robots, estimate where they are from their wheel encoders, and understand why they drift.
+
+## Common questions
+
+### What is differential drive in simple terms?
+
+It is steering by wheel speed. A robot has two wheels on one axle, each with its own motor, and no steering wheel. Same speed on both wheels: it drives straight. Different speeds: it turns towards the slower wheel. Opposite speeds: it spins on the spot.
+
+### What is the formula for a differential-drive robot?
+
+Forward speed v = (v_R + v_L) / 2 and turning rate ω = (v_R − v_L) / w, where v_L and v_R are the wheel speeds along the ground and w is the distance between the wheels. To command it, reverse them: v_L = v − ω·w/2 and v_R = v + ω·w/2.
+
+### What is the difference between differential drive and skid steer?
+
+A differential-drive robot has two drive wheels on one axle and casters that swivel or roll freely, so it can turn without its wheels sliding. A skid-steer robot drives several fixed wheels or tracks on each side and turns by making them scrub sideways across the ground. Both steer by speed difference, but skid-steer turns involve friction and slip, so its odometry is less reliable when turning.
+
+## Related
+
+[Mobile robot](/atlas/concept/mobile-robot) · [Odometry](/atlas/concept/odometry) · [Nonholonomic constraint](/atlas/concept/nonholonomic-constraint) · [Skid-steer](/atlas/concept/skid-steer) · [Ackermann steering](/atlas/concept/ackermann-steering) · [Encoder](/atlas/concept/encoder)

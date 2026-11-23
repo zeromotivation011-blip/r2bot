@@ -249,7 +249,7 @@ const BASE_SHORTS: ShortLesson[] = [
     limit: 'Shiny floors, sharp corners and high speed can cause it to lose the line.',
     demo: 'loop', loop: ['Sensors read dark or light', 'Decide which side is off', 'Steer wheels to correct'],
     quiz: { q: 'The left sensor sees the line. What should the robot do?', options: ['Turn left', 'Turn right', 'Stop forever'], answer: 0, why: 'The line has drifted to the left, so steering left puts it back over the line.' },
-    atlas: [{ label: 'PID controller', href: '/atlas/concept/pid-controller' }, { label: 'DC motor', href: '/atlas/concept/dc-motor' }, { label: 'Motor driver', href: '/atlas/concept/motor-driver' }],
+    atlas: [{ label: 'PID controller', href: '/atlas/concept/pid-controller' }, { label: 'Differential drive', href: '/atlas/concept/differential-drive' }, { label: 'DC motor', href: '/atlas/concept/dc-motor' }, { label: 'Motor driver', href: '/atlas/concept/motor-driver' }],
     next: 'balance-moving-bus',
   },
   {

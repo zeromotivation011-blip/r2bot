@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">Cinemática de la tracción diferencial, vista desde arriba</title>
+  <desc id="d">Un robot de dos ruedas que avanza hacia arriba. La rueda derecha va más rápido que la izquierda, así que el robot gira a la izquierda alrededor del centro instantáneo de rotación (CIR), que está sobre la recta del eje de las ruedas. Las puntas de las flechas de velocidad de la rueda izquierda, del centro y de la rueda derecha están en una misma recta que pasa por el CIR.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#FC6818"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#38bdf8"/></marker>
+    <marker id="m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
+  </defs>
+  <rect width="640" height="380" rx="16" fill="#0f172a"/>
+  <!-- axle line extended to the ICC -->
+  <line x1="60" y1="200" x2="400" y2="200" stroke="#64748b" stroke-dasharray="5 5"/>
+  <!-- path of the robot centre around the ICC -->
+  <path d="M260 200 A180 180 0 0 0 195.7 62.1" fill="none" stroke="#FC6818" stroke-opacity=".55" stroke-width="2" stroke-dasharray="3 6"/>
+  <!-- line through the arrow tips -->
+  <line x1="80" y1="200" x2="380" y2="66.7" stroke="#38bdf8" stroke-opacity=".45" stroke-width="1.5"/>
+  <!-- body -->
+  <circle cx="260" cy="200" r="98" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/>
+  <circle cx="260" cy="278" r="9" fill="#334155" stroke="#94a3b8"/>
+  <text x="276" y="283" font-size="13" fill="#94a3b8">rueda loca</text>
+  <!-- wheels -->
+  <rect x="161" y="168" width="18" height="64" rx="4" fill="#e2e8f0"/>
+  <rect x="341" y="168" width="18" height="64" rx="4" fill="#e2e8f0"/>
+  <!-- wheel velocities -->
+  <line x1="170" y1="200" x2="170" y2="162" stroke="#38bdf8" stroke-width="3" marker-end="url(#g)"/>
+  <text x="122" y="158" font-size="15" fill="#38bdf8" font-weight="700">v_I</text>
+  <line x1="350" y1="200" x2="350" y2="82" stroke="#38bdf8" stroke-width="3" marker-end="url(#g)"/>
+  <text x="362" y="96" font-size="15" fill="#38bdf8" font-weight="700">v_D</text>
+  <!-- body velocity -->
+  <circle cx="260" cy="200" r="4" fill="#FC6818"/>
+  <line x1="260" y1="200" x2="260" y2="122" stroke="#FC6818" stroke-width="3" marker-end="url(#a)"/>
+  <text x="270" y="140" font-size="15" fill="#FC6818" font-weight="700">v</text>
+  <!-- rotation -->
+  <path d="M232 232 A40 40 0 0 0 288 232" fill="none" stroke="#FC6818" stroke-width="2" marker-end="url(#a)"/>
+  <text x="252" y="258" font-size="15" fill="#FC6818" font-weight="700">ω</text>
+  <!-- ICC -->
+  <circle cx="80" cy="200" r="6" fill="#FC6818"/>
+  <text x="58" y="226" font-size="14" fill="#e2e8f0" font-weight="700">CIR</text>
+  <!-- R -->
+  <line x1="84" y1="186" x2="256" y2="186" stroke="#94a3b8" marker-start="url(#m)" marker-end="url(#m)"/>
+  <text x="208" y="180" font-size="14" fill="#cbd5e1" font-weight="700">R</text>
+  <!-- track width w -->
+  <line x1="174" y1="312" x2="346" y2="312" stroke="#94a3b8" marker-start="url(#m)" marker-end="url(#m)"/>
+  <line x1="170" y1="236" x2="170" y2="318" stroke="#475569" stroke-dasharray="2 4"/>
+  <line x1="350" y1="236" x2="350" y2="318" stroke="#475569" stroke-dasharray="2 4"/>
+  <text x="254" y="332" font-size="14" fill="#cbd5e1">w</text>
+  <!-- equations -->
+  <text x="430" y="150" font-size="15" fill="#e2e8f0">v = (v_D + v_I) / 2</text>
+  <text x="430" y="178" font-size="15" fill="#e2e8f0">ω = (v_D − v_I) / w</text>
+  <text x="430" y="206" font-size="15" fill="#e2e8f0">R = v / ω</text>
+  <text x="430" y="246" font-size="12.5" fill="#94a3b8">Rueda derecha más rápida:</text>
+  <text x="430" y="264" font-size="12.5" fill="#94a3b8">el robot gira a la izquierda</text>
+  <text x="430" y="282" font-size="12.5" fill="#94a3b8">alrededor del CIR, en el eje.</text>
+  <text x="430" y="76" font-size="12" fill="#64748b" letter-spacing="1.5">VISTA SUPERIOR · AVANCE ↑</text>
+</svg>
