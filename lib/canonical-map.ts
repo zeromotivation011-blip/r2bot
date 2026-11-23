@@ -97,6 +97,8 @@ export const ATLAS_QUERY_OWNER: Record<string, string> = {
   'complementary filter': '/atlas/concept/complementary-filter',
   'pose graph optimization': '/atlas/concept/pose-graph-optimization',
   'pose graph': '/atlas/concept/pose-graph-optimization',
+  'differential drive': '/atlas/concept/differential-drive',
+  'differential drive robot': '/atlas/concept/differential-drive',
 }
 
 /**

@@ -1,0 +1,166 @@
+---
+title: Tracción diferencial
+summary: >-
+  La tracción diferencial dirige un robot con dos ruedas motrices: a igual velocidad va recto, a
+  distinta traza una curva y en sentidos opuestos gira en el sitio.
+laymanExplanation: >-
+  Piensa en una silla de ruedas. Si empujas las dos ruedas por igual, va recta. Si empujas más la
+  derecha, se curva hacia la izquierda. Si empujas una hacia delante y tiras de la otra hacia
+  atrás, gira sobre sí misma. Un robot de tracción diferencial funciona igual: no tiene volante,
+  solo dos motores, y se dirige dando a cada rueda una velocidad distinta.
+sourceLastReviewed: 2026-11-23
+reviewed: 2026-11-23
+---
+
+La **tracción diferencial** (en inglés, *differential drive*) es la forma más sencilla de dirigir un robot con ruedas: dos ruedas en el mismo eje, cada una con su propio motor, y ningún mecanismo de dirección. Si las dos ruedas giran a la misma velocidad, el robot avanza recto. Si giran a velocidades distintas, describe una curva hacia el lado de la rueda más lenta. Si giran en sentidos opuestos, gira sobre sí mismo.
+
+Así se mueven muchos [robots móviles](/atlas/concept/mobile-robot) pequeños: el TurtleBot3 es «una plataforma de tracción diferencial de dos ruedas» ([ROBOTIS](https://emanual.robotis.com/docs/en/platform/turtlebot3/features/)), y el Create 3 de iRobot, que está «basado en el Roomba», tiene dos ruedas motrices y una rueda loca delantera ([iRobot](https://iroboteducation.github.io/create3_docs/hw/overview/)).
+
+![Vista superior de un robot de tracción diferencial que gira a la izquierda: la rueda derecha va más rápido y el robot rota alrededor del centro instantáneo de rotación, situado sobre la recta del eje](/images/atlas/diagrams/differential-drive.es.svg)
+
+## Empieza aquí: dirigir con la velocidad
+
+Imagina una silla de ruedas. No tiene volante. La diriges empujando una rueda más que la otra. Un robot de tracción diferencial es una silla de ruedas con dos motores en lugar de dos brazos.
+
+Un robot típico tiene:
+
+- **Dos ruedas motrices** en un eje común, una a cada lado, cada una movida por su propio motor.
+- **Una o más ruedas locas** (ruedas pequeñas que pivotan libremente, o bolas que ruedan en cualquier dirección) que solo mantienen el chasis nivelado. El TurtleBot3 Burger usa una rueda loca de bola; la del Create 3 está delante porque su «centro de gravedad está por delante del eje central» ([ROBOTIS](https://emanual.robotis.com/docs/en/platform/turtlebot3/features/), [iRobot](https://iroboteducation.github.io/create3_docs/hw/overview/)).
+- **[Encóderes](/atlas/concept/encoder)** en las ruedas, para que el robot pueda contar cuánto ha girado cada una.
+
+Los apuntes de la Universidad de Columbia sobre estos robots (recopilados del libro de Dudek y Jenkin) describen tres casos especiales; cualquier otra combinación produce un arco ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)):
+
+| Velocidades de las ruedas | Qué hace el robot |
+|---|---|
+| Izquierda = derecha | Avanza en línea recta |
+| Izquierda = −derecha | Gira sobre sí mismo alrededor del punto medio del eje |
+| Una rueda parada | Pivota sobre la rueda parada |
+| Cualquier otra | Avanza describiendo un arco de circunferencia, curvándose hacia la rueda más lenta |
+
+## Cómo funciona
+
+Las dos ruedas van fijadas al mismo cuerpo rígido, así que, siempre que el robot ruede sin deslizar, tiene que estar girando alrededor de algún punto de la recta que pasa por su eje. Ese punto es el **centro instantáneo de curvatura** (ICC, por sus siglas en inglés) ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)); la documentación de ros2_control llama a la misma idea centro instantáneo de rotación (ICR en inglés, **CIR** en español), que es el nombre que usamos aquí ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)). Cada rueda se mueve a una velocidad proporcional a su distancia al CIR, así que la rueda más rápida queda por el lado exterior de la curva.
+
+Llamemos v_I y v_D a la velocidad de cada rueda sobre el suelo (izquierda y derecha), y w a la **vía** (la distancia entre las dos ruedas). Entonces la velocidad de avance del robot y su velocidad de giro son ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)):
+
+**v = (v_D + v_I) / 2**
+
+**ω = (v_D − v_I) / w**
+
+y el radio de la curva, medido desde el centro del eje hasta el CIR, es **R = v / ω**. La velocidad de avance es la media de las dos ruedas; la velocidad de giro es su diferencia dividida por la distancia que las separa. Esa es toda la cinemática directa.
+
+### Cómo se le dan órdenes: cinemática inversa
+
+El software de navegación no piensa en velocidades de rueda. Pide una velocidad de avance v y una velocidad de giro ω, y el sistema de tracción calcula las velocidades de las ruedas despejándolas de las dos ecuaciones ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)):
+
+**v_I = v − ω · w / 2**
+
+**v_D = v + ω · w / 2**
+
+Divide cada una por el radio de la rueda r y obtendrás a qué velocidad debe girar cada rueda (en radianes por segundo).
+
+### Un ejemplo resuelto que puedes comprobar
+
+El software del TurtleBot3 Burger usa una separación entre ruedas de 0.160 m y un radio de rueda de 0.033 m ([burger.yaml](https://github.com/ROBOTIS-GIT/turtlebot3/blob/main/turtlebot3_bringup/param/burger.yaml)). Pídele v = 0.10 m/s y ω = 0.5 rad/s (un giro suave a la izquierda):
+
+| Paso | Cálculo | Resultado |
+|---|---|---|
+| Velocidad de la rueda izquierda sobre el suelo | 0.10 − 0.5 × 0.160 / 2 | 0.06 m/s |
+| Velocidad de la rueda derecha sobre el suelo | 0.10 + 0.5 × 0.160 / 2 | 0.14 m/s |
+| Velocidad de giro de la rueda izquierda | 0.06 / 0.033 | 1.82 rad/s (unas 17 rpm) |
+| Velocidad de giro de la rueda derecha | 0.14 / 0.033 | 4.24 rad/s (unas 41 rpm) |
+| Radio de giro | 0.10 / 0.5 | 0.20 m |
+
+Compruébalo al revés: (0.14 + 0.06) / 2 = 0.10 m/s y (0.14 − 0.06) / 0.160 = 0.5 rad/s.
+
+ROBOTIS indica para el Burger una velocidad máxima de traslación de 0.22 m/s y una velocidad máxima de rotación de 2.84 rad/s ([ROBOTIS](https://emanual.robotis.com/docs/en/platform/turtlebot3/features/)). Girar sobre sí mismo a 2.84 rad/s exige que cada rueda vaya a 2.84 × 0.080 ≈ 0.23 m/s, más o menos la misma velocidad de rueda que avanzar recto a 0.22 m/s, así que las dos cifras son coherentes con un único límite de velocidad de rueda. Es una propiedad general de la tracción diferencial: el avance y el giro salen de las mismas dos velocidades de rueda, de modo que un robot cuyas ruedas ya están al límite solo puede girar frenando una de ellas.
+
+### Odometría: ¿dónde estoy ahora?
+
+Si aplicas las ecuaciones en sentido directo a las cuentas de los encóderes, el robot puede estimar su propia posición. En cada intervalo corto de tiempo, mide cuánto ha rodado cada rueda (Δs_I y Δs_D) y calcula:
+
+- distancia recorrida: **Δs = (Δs_D + Δs_I) / 2**
+- cambio de orientación: **Δθ = (Δs_D − Δs_I) / w**
+- nueva posición: **x ← x + Δs · cos θ**, **y ← y + Δs · sin θ**, **θ ← θ + Δθ**
+
+Esto es la [odometría](/atlas/concept/odometry), también llamada navegación por estima (*dead reckoning*). Los apuntes de Columbia dan el mismo modelo en forma de integrales en el tiempo ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)), y la documentación de ros2_control señala que esta misma cinemática directa da la odometría de un robot «directamente a partir de las lecturas de los encóderes» ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)).
+
+```python
+import math
+
+def update_pose(x, y, theta, ds_left, ds_right, track_width):
+    ds = (ds_right + ds_left) / 2
+    dtheta = (ds_right - ds_left) / track_width
+    x += ds * math.cos(theta)
+    y += ds * math.sin(theta)
+    theta += dtheta
+    return x, y, theta
+```
+
+La odometría acumula deriva, porque cada pequeño error se va sumando y nunca se elimina. Por eso los robots reales la corrigen con otros sensores, como se explica más abajo.
+
+## Dónde lo verás
+
+- **Robots de enseñanza e investigación.** El TurtleBot3 (dos ruedas movidas por servomotores DYNAMIXEL, más una rueda loca de bola en el Burger y dos en el Waffle Pi) y el TurtleBot 4, que «usa un Create 3 como plataforma base» ([manual del TurtleBot 4](https://turtlebot.github.io/turtlebot4-user-manual/overview/features.html)), son ambos de tracción diferencial.
+- **Robots aspiradores.** El Create 3 está basado en el [Roomba](/robots/roomba), un robot aspirador, y tiene dos ruedas con encóderes y sensores de corriente, una rueda loca, sensores de desnivel, un sensor óptico de odometría y una IMU, que se fusionan en su odometría ([iRobot](https://iroboteducation.github.io/create3_docs/hw/overview/)).
+- **Kits de aficionados y de aula.** Dos motores, dos ruedas y una rueda loca forman uno de los chasis más sencillos capaces de llegar a cualquier punto de un suelo plano, lo que lo convierte en una elección habitual para los primeros robots, como un [seguidor de línea](/shorts/line-follower).
+
+## La tracción diferencial en ROS 2
+
+En ROS 2 la implementación estándar es **`diff_drive_controller`**, de ros2_control. «Recibe órdenes de velocidad para el cuerpo del robot, que se traducen en órdenes para las ruedas», y publica la odometría calculada a partir de la realimentación del hardware ([diff_drive_controller](https://control.ros.org/master/doc/ros2_controllers/diff_drive_controller/doc/userdoc.html)). En la práctica:
+
+- Escucha en **`~/cmd_vel`** (un `geometry_msgs/msg/TwistStamped`) y solo usa `linear.x` (v) y `angular.z` (ω); el resto de componentes se ignoran. Son la misma v y la misma ω de antes.
+- Publica **`~/odom`** (`nav_msgs/msg/Odometry`) y, si `enable_odom_tf` es true, la transformada de odom a la base del robot.
+- Tú le das la geometría: `wheel_separation` y `wheel_radius`, y las listas de articulaciones en `left_wheel_names` y `right_wheel_names`.
+- Las órdenes más antiguas que `cmd_vel_timeout` (0.5 s por defecto) se consideran caducadas, así que el robot se detiene si quien le da órdenes deja de enviarlas.
+
+Las descripciones de los parámetros dicen exactamente qué falla cuando la geometría está mal: con una separación entre ruedas incorrecta, «el robot no se comportará correctamente en las curvas», y con un radio de rueda incorrecto, «el robot se moverá más rápido o más despacio de lo esperado» ([parámetros](https://github.com/ros-controls/ros2_controllers/blob/master/diff_drive_controller/src/diff_drive_controller_parameter.yaml)). Hay factores de corrección para ambos: `wheel_separation_multiplier`, `left_wheel_radius_multiplier` y `right_wheel_radius_multiplier`.
+
+Para ver por qué importa, supón que la separación configurada es 0.152 m pero la real es 0.160 m (un 5 % menos). Cada cambio de orientación se calcula entonces 0.160 / 0.152 ≈ 1.053 veces mayor de lo real, así que, cuando el robot da de verdad una vuelta completa, su odometría cree que ha girado unos 379°.
+
+## Límites
+
+- **No puede moverse de lado.** Un robot de tracción diferencial «no puede desplazarse lateralmente a lo largo de su eje», una restricción parecida a la que complica estacionar en paralelo ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)). Es una [restricción no holonómica](/atlas/concept/nonholonomic-constraint): el robot puede alcanzar cualquier posición y orientación, pero no por cualquier camino. Para desplazarse de lado tiene que girar, avanzar y volver a girar.
+- **Las pequeñas diferencias de velocidad importan.** Los apuntes advierten que estos robots son «muy sensibles a ligeros cambios de velocidad en cada una de las ruedas» y a «pequeñas variaciones en el plano del suelo», y que «pueden necesitar ruedas adicionales (ruedas locas) como apoyo» ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)). No hay dos motores exactamente iguales, y por eso la velocidad de cada rueda se controla normalmente en lazo cerrado a partir de su encóder, a menudo con un [controlador PID](/atlas/concept/pid-controller) por rueda.
+- **Los encóderes miden la rueda, no el suelo.** Cuando una rueda patina (sobre una alfombra, una baldosa mojada o un bache), los encóderes siguen contando y la odometría se equivoca. Los robots fusionan datos de otros sensores para detectarlo: el Create 3 combina los encóderes de las ruedas con un sensor óptico que mira al suelo y una [IMU](/atlas/concept/imu) ([iRobot](https://iroboteducation.github.io/create3_docs/hw/overview/)); consulta [fusión de sensores](/atlas/concept/sensor-fusion).
+
+## Comparación con otros tipos de tracción
+
+ros2_control divide los robots con ruedas en dos grupos: los robots **omnidireccionales**, que «pueden moverse instantáneamente en cualquier dirección del plano», y los robots **no holonómicos**, que no pueden ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)). La tracción diferencial pertenece al segundo grupo.
+
+| Tracción | Cómo se dirige | ¿Gira sobre sí mismo? | ¿Se mueve de lado? |
+|---|---|---|---|
+| **Tracción diferencial** | Dos velocidades de rueda en un mismo eje | Sí | No |
+| [Skid-steer (dirección por deslizamiento)](/atlas/concept/skid-steer) | Velocidades de ruedas u orugas por lado; las ruedas se arrastran de lado para girar | Sí (con arrastre) | No |
+| [Tipo coche (Ackermann)](/atlas/concept/ackermann-steering) | Ruedas delanteras orientables | No (radio de giro mínimo) | No |
+| Ruedas [mecanum](/atlas/concept/mecanum-wheel), omnidireccionales o [swerve](/atlas/concept/swerve-drive) | Velocidades de rueda (y orientación de cada rueda, en swerve) | Sí | Sí |
+
+El compromiso es sencillez frente a libertad de movimiento. La tracción diferencial solo necesita dos motores y ningún mecanismo de dirección, y sus matemáticas caben en una ficha. Las tracciones omnidireccionales pueden desplazarse de lado, pero necesitan más motores, ruedas más complejas y un control más cuidadoso. El skid-steer va bien en terreno irregular y con orugas, pero en sus giros las ruedas se arrastran sobre el suelo (consulta [skid-steer](/atlas/concept/skid-steer)).
+
+## Para profundizar
+
+- **Es un uniciclo.** La documentación de ros2_control, citando a Siciliano et al., señala que un robot de tracción diferencial es «cinemáticamente equivalente a un uniciclo, pero más estable desde el punto de vista mecánico» ([ros2_control](https://control.ros.org/master/doc/ros2_controllers/doc/mobile_robot_kinematics.html)). Así, los planificadores y controladores pueden trabajar con el modelo sencillo del uniciclo (ẋ = v cos θ, ẏ = v sin θ, θ̇ = ω) y dejar las velocidades de las ruedas para el último paso.
+- **Arcos exactos, no pasos rectos.** La actualización de odometría anterior supone movimiento en línea recta dentro de cada intervalo. En realidad, durante un intervalo el robot recorre un arco alrededor del CIR, y los apuntes de Columbia dan la actualización exacta como una rotación de la pose del robot alrededor de ese centro un ángulo ω·δt ([Columbia](https://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf)). Con intervalos cortos la diferencia es pequeña, pero crece con intervalos largos o giros cerrados.
+- **Planificar con una restricción.** Como el robot no puede deslizarse de lado, el software que convierte una trayectoria planificada en movimiento tiene que respetar esa restricción: dibuje lo que dibuje el planificador, al robot solo se le puede enviar una velocidad de avance v y una velocidad de giro ω. Consulta [restricción no holonómica](/atlas/concept/nonholonomic-constraint) y [Nav2](/atlas/concept/nav2).
+
+## Por qué importa
+
+La tracción diferencial es donde mucha gente se encuentra por primera vez con la cinemática de robots, y sigue siendo útil mucho después: las mismas dos ecuaciones mueven un robot de aula, un robot aspirador y una plataforma de investigación con ROS 2. Apréndelas una vez y podrás dar órdenes a cualquiera de estos robots, estimar dónde están a partir de los encóderes de sus ruedas y entender por qué acumulan deriva.
+
+## Preguntas frecuentes
+
+### ¿Qué es la tracción diferencial, en palabras sencillas?
+
+Es dirigir con la velocidad de las ruedas. El robot tiene dos ruedas en un eje, cada una con su motor, y ningún volante. Misma velocidad en las dos ruedas: avanza recto. Velocidades distintas: gira hacia la rueda más lenta. Velocidades opuestas: gira sobre sí mismo.
+
+### ¿Cuál es la fórmula de un robot de tracción diferencial?
+
+Velocidad de avance v = (v_D + v_I) / 2 y velocidad de giro ω = (v_D − v_I) / w, donde v_I y v_D son las velocidades de las ruedas sobre el suelo y w es la distancia entre las ruedas. Para darle órdenes, se invierten: v_I = v − ω·w/2 y v_D = v + ω·w/2.
+
+### ¿Qué diferencia hay entre la tracción diferencial y el skid-steer?
+
+Un robot de tracción diferencial tiene dos ruedas motrices en un eje y ruedas locas que pivotan o ruedan libremente, así que puede girar sin que sus ruedas deslicen. Un robot skid-steer mueve varias ruedas fijas u orugas a cada lado y gira obligándolas a arrastrarse de lado sobre el suelo. Los dos se dirigen por diferencia de velocidad, pero en los giros del skid-steer hay rozamiento y deslizamiento, así que su odometría es menos fiable al girar.
+
+## Relacionado
+
+[Robot móvil](/atlas/concept/mobile-robot) · [Odometría](/atlas/concept/odometry) · [Restricción no holonómica](/atlas/concept/nonholonomic-constraint) · [Skid-steer](/atlas/concept/skid-steer) · [Dirección Ackermann](/atlas/concept/ackermann-steering) · [Encóder](/atlas/concept/encoder)
