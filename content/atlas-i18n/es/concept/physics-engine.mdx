@@ -1,0 +1,170 @@
+---
+title: Motor de física
+summary: >-
+  Un motor de física calcula cómo se mueven y chocan los objetos. Cómo lo usan los simuladores de
+  robots: paso de tiempo, contacto y MuJoCo, PhysX o Bullet.
+laymanExplanation: >-
+  Piensa en una libreta de dibujos que, al pasar las páginas rápido con el pulgar, parece una
+  película. Cada página muestra el mundo un instante después de la anterior. Un motor de física
+  dibuja la página siguiente por ti: mira dónde está cada cosa y a qué velocidad se mueve, calcula
+  los empujones y tirones (la gravedad, los motores, las cosas que chocan entre sí) y lo mueve todo
+  un poco. Repite eso cientos de veces por cada segundo simulado y un robot virtual camina, agarra
+  objetos y se cae casi como lo haría uno real.
+sourceLastReviewed: 2026-11-23
+reviewed: 2026-11-23
+---
+
+Un **motor de física** (en inglés, *physics engine*) es el software que calcula cómo se mueven, chocan y se empujan los objetos, un pequeño intervalo de tiempo tras otro. Los videojuegos los usan, normalmente como componentes ya hechos (*middleware*), para simular el movimiento en tiempo real ([Wikipedia](https://en.wikipedia.org/wiki/Physics_engine)). La robótica los usa para poder probar un robot, o enseñarle por ensayo y error, en un mundo virtual antes de que toque hardware real.
+
+Esta página trata de los motores con los que se simulan robots. Cuando ejecutas un robot en [Gazebo](/atlas/concept/gazebo-simulator), la física viene de DART por defecto ([Gazebo](https://gazebosim.org/api/sim/9/physics.html)); en Webots viene de ODE ([Webots](https://cyberbotics.com/doc/reference/worldinfo)); y en [Isaac Sim](/atlas/concept/isaac-sim), el motor por defecto es NVIDIA PhysX ([Isaac Sim](https://docs.isaacsim.omniverse.nvidia.com/latest/physics/index.html)). [MuJoCo](/atlas/concept/mujoco) y [PyBullet](/atlas/concept/pybullet) son motores de física a los que puedes llamar directamente desde Python.
+
+![El ciclo que repite un motor de física en cada paso de tiempo: leer el estado, sumar las fuerzas, detectar colisiones, resolver las fuerzas de contacto y de fricción, integrar para obtener nuevas velocidades y posiciones, y avanzar el tiempo un paso](/images/atlas/diagrams/physics-engine.es.svg)
+
+## Empieza aquí: el mundo, página a página
+
+Un motor de física no resuelve todo el movimiento de una vez. Divide el tiempo en pasos diminutos y, en cada paso, se hace cuatro preguntas:
+
+1. **¿Qué fuerzas actúan ahora mismo?** La gravedad, los pares de los motores, los resortes, la amortiguación.
+2. **¿Qué está tocando qué?** Un pie sobre el suelo, un dedo de la pinza sobre una taza.
+3. **¿Con cuánta fuerza se empujan y se rozan las cosas que se tocan?** Lo justo para que no se atraviesen, con la fricción oponiéndose al deslizamiento.
+4. **Entonces, ¿dónde está todo un instante después?** Primero, nuevas velocidades; después, nuevas posiciones.
+
+La guía de PyBullet resume un paso como «detección de colisiones, resolución de restricciones e integración» ([PyBullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)). La duración de cada paso, el **paso de tiempo** (*time step*, Δt), es lo que más importa. La documentación de MuJoCo lo llama «el parámetro que más influye, con diferencia, en el compromiso entre velocidad y precisión» y señala que «los valores más pequeños dan mayor precisión y estabilidad» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)). Estos son los valores por defecto, tal como los documenta cada proyecto:
+
+| Motor o simulador | Paso de tiempo por defecto | Pasos por segundo simulado |
+|---|---|---|
+| MuJoCo (`timestep`) | 0.002 s ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)) | 500 |
+| PyBullet (`setTimeStep`) | 1/240 s ([PyBullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)) | 240 |
+| SDFormat, el formato de mundos de Gazebo (`max_step_size`) | 0.001 s ([SDFormat](https://github.com/gazebosim/sdformat/blob/main/sdf/1.12/physics.sdf)) | 1000 |
+| DART (`World`) | 1 ms ([DART](https://github.com/dartsim/dart)) | 1000 |
+| Webots (`basicTimeStep`) | 32 ms ([Webots](https://cyberbotics.com/doc/reference/worldinfo)) | 31.25 |
+
+Webots advierte de que un paso mayor acelera la simulación, pero «reducirá la precisión y la estabilidad, sobre todo en los cálculos de física y en la detección de colisiones» ([Webots](https://cyberbotics.com/doc/reference/worldinfo)).
+
+## Cómo funciona
+
+### La ecuación de fondo
+
+Cada paso se reduce a la segunda ley de Newton escrita para todo el robot a la vez. La documentación de MuJoCo la da como **M v̇ + c = τ + Jᵀf** ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)). En palabras:
+
+- **M** es la matriz de inercia (de masas) del robot; **v̇** es la aceleración que el motor de física busca.
+- **c** reúne la gravedad y los efectos de Coriolis y centrífugos; **τ** es la fuerza aplicada por los motores y los resortes.
+- **Jᵀf** es la fuerza de contacto y de restricción **f**, llevada a las articulaciones mediante el jacobiano **J**.
+
+Una vez conocida **f**, la aceleración sale directamente: v̇ = M⁻¹(τ + Jᵀf − c). MuJoCo calcula **c** con el algoritmo recursivo de Newton-Euler y **M** con el algoritmo del cuerpo rígido compuesto (*Composite Rigid-Body*), y es tajante sobre dónde está la dificultad: «El cálculo de la fuerza de restricción es la parte difícil» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)). Consulta [ecuaciones de movimiento](/atlas/concept/equations-of-motion) y [dinámica](/atlas/concept/dynamics) para ver de dónde sale esta ecuación.
+
+### Coordenadas articulares frente a cuerpos libres
+
+Hay dos maneras de describirle un brazo robótico a un motor de física.
+
+- **Coordenadas maximales (cartesianas).** Cada eslabón es un cuerpo libre con seis grados de libertad, y cada articulación es una restricción que elimina los movimientos que prohíbe. MuJoCo lo describe como el enfoque de los motores de videojuegos, «donde las articulaciones quitan grados de libertad en lugar de añadirlos», y dice que puede causar «imprecisiones e inestabilidades cuando intervienen estructuras cinemáticas complejas» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/overview.html)).
+- **Coordenadas generalizadas, articulares o reducidas** (*generalized coordinates*). El estado son los ángulos de las articulaciones (más la pose de la base, si el robot no está anclado al suelo). Las articulaciones no pueden separarse porque, para empezar, nunca son piezas independientes. PhysX afirma que sus cadenas articuladas de coordenadas reducidas (*reduced-coordinate articulations*) tienen «cero error en las articulaciones por diseño» y admiten mayores relaciones de masa entre los cuerpos unidos, y que su coste es «en general proporcional al número de grados de libertad, no al número de eslabones» ([PhysX](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/Articulations.html)).
+
+DART calcula el movimiento «con el algoritmo del cuerpo articulado de Featherstone» (*Articulated Body Algorithm*) ([DART](https://github.com/dartsim/dart)), y PyBullet carga por defecto las articulaciones de un URDF de la misma forma, usando el algoritmo del cuerpo articulado «para obtener la dinámica directa en tiempo lineal» ([PyBullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)). Tiempo lineal significa que duplicar el número de articulaciones duplica, más o menos, el trabajo. Para objetos sueltos sin articulaciones, la opción de coordenadas maximales de PyBullet «puede mejorar mucho el rendimiento».
+
+### Averiguar qué toca qué
+
+Con n formas de colisión hay n(n − 1)/2 pares que podrían estar en contacto ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)): 4950 pares para 100 formas. Comprobar cada par con exactitud es demasiado lento, así que los motores filtran por etapas. MuJoCo usa una **fase amplia** (*broad phase*: una pasada de barrido y poda, *sweep and prune*, que descarta con poco coste los cuerpos alejados entre sí), después una fase intermedia con un árbol de cajas envolventes alineadas con los ejes (*axis-aligned bounding boxes*) y solo entonces la **fase estrecha** (*narrow phase*), exacta, cuyo método depende de los dos tipos de forma. El resultado es una lista de contactos activos ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)). Para la comprobación de colisiones que se usa en planificación de movimiento y no en simulación, consulta [comprobación de colisiones](/atlas/concept/collision-checking).
+
+### Contacto y fricción: la parte difícil
+
+Cuando un pie toca el suelo, los materiales reales se aplastan un poco y devuelven el empuje. Los motores lo aproximan de maneras muy distintas, que se agrupan en cuatro familias principales:
+
+| Enfoque | La idea | Quién lo usa y qué dice la documentación |
+|---|---|---|
+| **Penalización (resorte-amortiguador)** | Dejar que los cuerpos se solapen un poco y separarlos con un resorte rígido y un amortiguador | MuJoCo dice que estos modelos son «blandos, pero están plagados de inestabilidades» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)) y necesitan «pasos de tiempo muy pequeños» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/overview.html)) |
+| **Complementariedad (LCP/NCP)** | Contacto rígido: un contacto o empuja o se separa, nunca las dos cosas a la vez; se resuelve como un problema de complementariedad lineal (LCP, *linear complementarity problem*) o no lineal (NCP) | MuJoCo llama a la familia LCP «el estándar de facto» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)); DART usa «contacto basado en LCP con solucionadores Dantzig y PGS» ([DART](https://github.com/dartsim/dart)); PyBullet usa «un solucionador de restricciones LCP unificado» ([PyBullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)) |
+| **Contacto blando convexo** | Renunciar a la complementariedad estricta, permitir algo de blandura y resolver una optimización convexa con solución única | MuJoCo ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)) |
+| **Hidroelástico** | Dar a los objetos un campo de presión interno y calcular toda una zona de contacto, no puntos sueltos | Drake ([Drake](https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html)) |
+
+¿Por qué es tan difícil? La documentación de MuJoCo da tres razones ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)). Los LCP con fricción «corresponden a problemas de optimización NP-difíciles», lo que «ha dado lugar a toda una industria de solucionadores aproximados». El modelo de fricción de Coulomb «no está bien definido en tiempo continuo» (la paradoja de Painlevé), y eso ha hecho «muy populares» los esquemas de tiempo discreto «de paso de velocidad» (*velocity-stepping*). Y la hipótesis de contacto rígido nunca es del todo cierta: «todos los materiales físicos admiten cierta deformación».
+
+Así lo resuelven los principales motores:
+
+- **MuJoCo** trata la blandura como una virtud: un objeto empujado de lado sobre una superficie blanda debería «subir un poco al empezar a deslizar», y MuJoCo sostiene que eso hace el contacto blando más realista que el contacto rígido estricto. El precio es que la fuerza y la velocidad de separación «pueden ser positivas a la vez», efectos que califica de «numéricamente pequeños, pero indeseables» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)).
+- **Drake** deja que los cuerpos «penetren ligeramente, como si el cuerpo rígido tuviera una capa ligeramente deformable». Su modelo hidroelástico «intenta aproximar la zona de contacto y la distribución de presiones» en lugar del «contacto en un único punto o en un conjunto de puntos» habitual en robótica, y por defecto recurre al contacto puntual en los casos que el contacto hidroelástico no puede manejar ([Drake](https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html)).
+- **ODE**, tal como lo usa Webots, ablanda las restricciones rígidas con dos parámetros: ERP, la proporción del error de contacto que se corrige en el paso siguiente, y CFM, con el que «la blandura aumenta a medida que aumenta CFM» ([Webots](https://cyberbotics.com/doc/reference/worldinfo)).
+- **PhysX** recomienda su solucionador Temporal Gauss-Seidel (TGS), que «divide el paso de tiempo en varios subpasos de igual tamaño», frente al antiguo Projected Gauss-Seidel (PGS) ([PhysX](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/RigidBodyDynamics.html)).
+
+La fricción también se aproxima. En MuJoCo eliges entre un cono de fricción (*friction cone*) piramidal, el predeterminado, y uno elíptico; la documentación dice que «los conos elípticos son un mejor modelo de la realidad física, pero los conos piramidales a veces hacen que el solucionador sea más rápido y más robusto» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)). Consulta [modelo de fricción](/atlas/concept/friction-model) y [mecánica de contacto](/atlas/concept/contact-mechanics) para ver la física que se está aproximando.
+
+### Integradores, y un ejemplo resuelto que puedes comprobar
+
+El integrador convierte las aceleraciones en nuevas velocidades y posiciones. La documentación de MuJoCo expone los dos más sencillos ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)):
+
+- **Euler explícito:** v ← v + Δt·a y x ← x + Δt·v, usando la velocidad *anterior*.
+- **Euler semiimplícito** (*semi-implicit Euler*): primero v ← v + Δt·a y después x ← x + Δt·v con la velocidad *nueva*.
+
+**Una pelota que cae.** Suelta una pelota desde el reposo con g = 9.81 m/s² y Δt = 0.1 s. Los dos métodos aciertan con la velocidad (0.981 m/s tras un paso, 1.962 tras dos), pero no coinciden en la distancia:
+
+| Tiempo | Exacto (½gt²) | Euler explícito | Euler semiimplícito |
+|---|---|---|---|
+| 0.1 s | 0.04905 m | 0 m | 0.0981 m |
+| 0.2 s | 0.1962 m | 0.0981 m | 0.2943 m |
+| 0.3 s | 0.44145 m | 0.2943 m | 0.5886 m |
+| 1.0 s | 4.905 m | 4.4145 m | 5.3955 m |
+
+Al cabo de un segundo, los dos se equivocan en 0.4905 m, en sentidos opuestos. Reduce el paso a 0.01 s y el error baja a 0.04905 m; con el valor por defecto de MuJoCo, 0.002 s, es de 0.00981 m, alrededor de un centímetro. En estos métodos de primer orden, pasos diez veces más pequeños dan un error diez veces menor.
+
+**Un resorte.** Ahora toma una masa de 1 kg sujeta a un resorte de 100 N/m, estirada 1 m y soltada, con Δt = 0.01 s. El movimiento real oscila entre −1 m y +1 m para siempre. Con Euler explícito, cada paso multiplica la energía exactamente por 1 + (Δt·ω)² = 1.01, donde ω = 10 rad/s, así que al cabo de 10 segundos (1000 pasos) la energía ha crecido un factor 1.01¹⁰⁰⁰ y la amplitud de la oscilación, su raíz cuadrada: unas **145 veces** más de lo que debería. Con Euler semiimplícito, durante esos mismos 10 segundos, cada oscilación alcanza un máximo de entre 1.0000 m y 1.0013 m. Un resorte de contacto muy rígido se comporta exactamente así, y por eso la estabilidad importa tanto como la precisión.
+
+Por eso MuJoCo ni siquiera implementa Euler explícito: Euler semiimplícito es «estrictamente mejor, y el estándar en simulación física» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)). También se le llama Euler simpléctico (*symplectic Euler*) ([Wikipedia](https://en.wikipedia.org/wiki/Semi-implicit_Euler_method)). El integrador por defecto de MuJoCo es Euler semiimplícito; entre las alternativas están Runge-Kutta de cuarto orden y variantes implícitas en la velocidad ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)), que son especialmente eficaces «cuando las inestabilidades se deben a fuerzas que dependen de la velocidad» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)).
+
+## Dónde lo verás
+
+- **Simuladores de robots.** Gazebo, Webots e Isaac Sim envuelven cada uno un motor de física con modelos de robots, sensores y renderizado. Los modelos de robots se cargan como archivos URDF, SDF o MJCF; PyBullet carga los tres ([PyBullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)). Consulta [URDF](/atlas/concept/urdf).
+- **Entrenar robots con aprendizaje por refuerzo.** Una política de [aprendizaje por refuerzo](/atlas/concept/reinforcement-learning) aprende por ensayo y error, así que practica en simulación, donde una caída no rompe nada y, como señala MuJoCo, la mayoría de los sistemas robóticos pueden simularse «mucho más rápido que en tiempo real» ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)). Isaac Lab, creado para esto, combina «física paralela en GPU», renderizado y herramientas de aleatorización de dominio (*domain randomization*), y se ha aplicado al control de cuerpo completo y a la «manipulación diestra y con abundante contacto» ([Isaac Lab](https://arxiv.org/abs/2511.04831)).
+- **Diseño, control y verificación.** Drake es «una colección de herramientas para analizar la dinámica de nuestros robots y construir sus sistemas de control» ([Drake](https://drake.mit.edu/)).
+- **Videojuegos y efectos visuales.** Bullet está hecho para «RV, videojuegos, efectos visuales, robótica, aprendizaje automático» ([Bullet](https://github.com/bulletphysics/bullet3)); ODE se «usa en muchos videojuegos» ([ODE](https://www.ode.org/)).
+
+## Límites
+
+- **Todo modelo de contacto es una aproximación.** Cada una de las familias anteriores sacrifica realismo, velocidad o estabilidad en favor de las otras. La capa de física de Gazebo parte de la premisa de «que no existe un único motor de física que sea universalmente el mejor para todos los contextos de simulación» ([gz-physics](https://github.com/gazebosim/gz-physics)), así que la misma escena puede comportarse de forma distinta en motores distintos.
+- **La velocidad y la precisión tiran en sentidos opuestos.** Para funcionar en tiempo real, señala MuJoCo, el paso de tiempo «debe ser mayor que el tiempo de CPU por paso», y los modelos con muchos objetos flotantes, y por tanto con muchos contactos, son más exigentes ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)).
+- **Los números que le das son estimaciones.** Los coeficientes de fricción, las masas, la amortiguación de las articulaciones y el comportamiento de los motores se miden o se suponen; nunca son exactos. Los comportamientos aprendidos en simulación «suelen ser específicos de las características del simulador», y «debido a los errores de modelado, las estrategias que tienen éxito en simulación pueden no trasladarse a sus equivalentes en el mundo real» ([Peng et al.](https://arxiv.org/abs/1710.06537)). Es la brecha [de la simulación a la realidad](/atlas/concept/sim-to-real) (*sim-to-real gap*).
+- **Lo rígido es una idealización.** Los eslabones de un robot se suelen modelar como perfectamente rígidos. Algunos motores van más allá: MuJoCo modela de forma nativa varillas, tela y cuerpos blandos en 3D ([MuJoCo](https://mujoco.readthedocs.io/en/latest/overview.html)), y PhysX en la GPU admite cuerpos blandos por elementos finitos (FEM) y partículas ([PhysX](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/GPURigidBodies.html)).
+
+## Los motores que usa la gente de robótica
+
+Cada celda de esta tabla procede del repositorio, la licencia o la documentación del propio proyecto; la compatibilidad con Gazebo sale de la [documentación de Gazebo](https://gazebosim.org/api/sim/9/physics.html).
+
+| Motor | Quién lo mantiene | Licencia | Cómo modela los robots y el contacto | Dónde te lo encontrarás |
+|---|---|---|---|---|
+| **MuJoCo** | Google DeepMind ([repositorio](https://github.com/google-deepmind/mujoco)) | [Apache 2.0](https://github.com/google-deepmind/mujoco/blob/main/LICENSE) | Coordenadas generalizadas; contacto blando convexo resuelto como una optimización | Investigación y desarrollo en robótica, biomecánica, aprendizaje automático y otros campos, que es su objetivo declarado; MJX lo ejecuta en GPU y TPU |
+| **Bullet / PyBullet** | Proyecto Bullet Physics SDK ([repositorio](https://github.com/bulletphysics/bullet3)) | [zlib](https://github.com/bulletphysics/bullet3/blob/master/LICENSE.txt) | Coordenadas articulares de Featherstone por defecto en PyBullet, coordenadas maximales opcionales; solucionador de restricciones LCP | PyBullet; Gazebo (plugins Bullet y Bullet Featherstone, en fase preliminar) |
+| **ODE** | Proyecto Open Dynamics Engine ([sitio web](https://www.ode.org/)) | A elegir entre una licencia de tipo BSD o LGPL 2.1+ | Cuerpos rígidos y articulaciones con detección de colisiones y fricción integradas; ablandamiento de restricciones con ERP/CFM | Webots |
+| **DART** | Proyecto de código abierto; entre los titulares de los derechos de autor hay laboratorios de Georgia Tech, Carnegie Mellon, la Universidad de Washington y Stanford, y la Open Source Robotics Foundation | [BSD 2-Clause](https://github.com/dartsim/dart/blob/main/LICENSE) | Coordenadas generalizadas, algoritmo del cuerpo articulado de Featherstone; contacto LCP | Motor por defecto de Gazebo |
+| **PhysX** | NVIDIA | [Apache 2.0](https://github.com/NVIDIA-Omniverse/PhysX/tree/main/physx) (código fuente del SDK) | Cadenas articuladas de coordenadas reducidas; solucionadores iterativos PGS y TGS; CPU o GPU con CUDA | Isaac Sim (motor por defecto), Isaac Lab, videojuegos |
+| **Drake** | Desarrollo principal liderado por Toyota Research Institute; nació en el CSAIL del MIT ([Drake](https://drake.mit.edu/)) | [BSD 3-Clause](https://github.com/RobotLocomotion/drake/blob/master/LICENSE.TXT) | Contacto puntual deformable (*compliant point contact*) y contacto hidroelástico | Diseño, control y verificación basados en modelos |
+| **Newton** | Proyecto de la Linux Foundation, impulsado por Disney Research, Google DeepMind y NVIDIA ([repositorio](https://github.com/newton-physics/newton)) | Apache 2.0 | Acelerado por GPU, construido sobre NVIDIA Warp, con MuJoCo Warp como motor principal (*backend*); da prioridad a la diferenciabilidad | Motor experimental en Isaac Sim ([Isaac Sim](https://docs.isaacsim.omniverse.nvidia.com/latest/physics/index.html)); Isaac Lab ([Isaac Lab](https://github.com/isaac-sim/IsaacLab)) |
+
+En la práctica, normalmente eliges un simulador y el motor viene con él: un robot en Gazebo funciona con DART a menos que lo cambies, y uno en Isaac Sim funciona con PhysX a menos que elijas Newton.
+
+## Para profundizar
+
+- **Simulación paralela en GPU.** El aprendizaje por refuerzo necesita muchísima práctica, así que los motores ejecutan ahora muchas copias de un robot en paralelo en una GPU. PhysX ejecuta todo su conjunto de funciones de cuerpos rígidos, cadenas articuladas incluidas, en GPU con CUDA a través de la misma API que en la CPU ([PhysX](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/GPURigidBodies.html)). MuJoCo XLA (MJX) ejecuta MuJoCo mediante JAX; su implementación en JAX funciona en GPU de NVIDIA y AMD, Apple Silicon y TPU de Google Cloud, y su implementación en Warp está optimizada para GPU de NVIDIA ([MJX](https://mujoco.readthedocs.io/en/latest/mjx.html)).
+- **Física diferenciable.** Si el motor puede devolver los gradientes del estado siguiente respecto al actual, puedes optimizar un controlador con descenso de gradiente en lugar de por ensayo y error. La implementación en JAX de MJX admite diferenciación automática; MJX-Warp, no ([MJX](https://mujoco.readthedocs.io/en/latest/mjx.html)). Newton incluye la diferenciabilidad entre sus objetivos de diseño ([Newton](https://github.com/newton-physics/newton)).
+- **Reducir la brecha.** En lugar de perseguir un motor perfecto, muchos equipos aleatorizan lo que no pueden medir. Peng et al. entrenaron una política de empuje para un brazo robótico con la dinámica del simulador aleatorizada e informan de «un nivel de rendimiento similar al desplegarla en un robot real» ([Peng et al.](https://arxiv.org/abs/1710.06537)); Tobin et al. aleatorizaron en cambio el renderizado ([Tobin et al.](https://arxiv.org/abs/1703.06907)). Consulta [aleatorización de dominio](/atlas/concept/domain-randomization).
+- **Dinámica inversa con contacto.** Dado un movimiento grabado, ¿qué fuerzas lo produjeron? Con contacto rígido, esa pregunta no tiene respuesta: si empujas contra una pared sin moverte, la fuerza «no puede recuperarse a partir de la cinemática». El modelo blando de MuJoCo tiene una inversa única, así que con él sí se puede ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)).
+
+## Por qué importa
+
+El motor de física decide lo que un robot simulado puede enseñarte. Su paso de tiempo, su modelo de contacto y sus coordenadas determinan si un agarre que aguanta en simulación aguanta también en el banco de pruebas, y si una política para caminar entrenada en simulación sobrevive a su primer suelo real. Conocer las etapas de un paso, los principales modelos de contacto y el motor que lleva dentro tu simulador te dice en qué resultados confiar, qué parámetros ajustar y dónde esperar la brecha [de la simulación a la realidad](/atlas/concept/sim-to-real).
+
+## Preguntas frecuentes
+
+### ¿Qué es un motor de física, en palabras sencillas?
+
+Es la parte de una simulación que hace que las cosas obedezcan a la física. En cada pequeño paso de tiempo calcula las fuerzas sobre cada objeto, comprueba qué está tocando qué, calcula las fuerzas de contacto y de fricción, y hace avanzar todo un poco. Los videojuegos usan uno para que los objetos caigan y reboten; los simuladores de robots, para que un robot virtual se mueva como uno real.
+
+### ¿Cuál es el mejor motor de física para simular robots?
+
+Ningún motor es el mejor para todo, y por eso Gazebo te deja cambiar de motor. MuJoCo se creó para la investigación en robótica y aprendizaje automático; PhysX es el motor por defecto de Isaac Sim y funciona en GPU para Isaac Lab; DART es el motor por defecto de Gazebo; ODE funciona dentro de Webots, y Drake se centra en el diseño basado en modelos, con un modelo de contacto hidroelástico detallado. Elige el simulador que necesita tu tarea y luego ajusta su paso de tiempo y sus parámetros de contacto.
+
+### ¿Puede un motor de física de videojuegos simular un robot?
+
+Sí: Bullet, ODE y PhysX sirven tanto para videojuegos como para robótica. La diferencia está en cómo se configura el modelo. Los modelos al estilo de los videojuegos tratan cada eslabón como un cuerpo libre sujeto por restricciones articulares, lo que, según MuJoCo, puede causar «imprecisiones e inestabilidades» en mecanismos complejos. Para robots, usa coordenadas articulares: PhysX las llama *articulations* (cadenas articuladas), y PyBullet las usa por defecto con los robots URDF.
+
+## Relacionado
+
+[MuJoCo](/atlas/concept/mujoco) · [Simulador Gazebo](/atlas/concept/gazebo-simulator) · [Isaac Sim](/atlas/concept/isaac-sim) · [Mecánica de contacto](/atlas/concept/contact-mechanics) · [De la simulación a la realidad](/atlas/concept/sim-to-real) · [Ecuaciones de movimiento](/atlas/concept/equations-of-motion)

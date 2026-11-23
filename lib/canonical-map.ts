@@ -99,6 +99,13 @@ export const ATLAS_QUERY_OWNER: Record<string, string> = {
   'pose graph': '/atlas/concept/pose-graph-optimization',
   'differential drive': '/atlas/concept/differential-drive',
   'differential drive robot': '/atlas/concept/differential-drive',
+  'physics engine': '/atlas/concept/physics-engine',
+  'what is a physics engine': '/atlas/concept/physics-engine',
+  'physics engine for robotics': '/atlas/concept/physics-engine',
+  'vision language action model': '/atlas/concept/vision-language-action-model',
+  'vision-language-action model': '/atlas/concept/vision-language-action-model',
+  'vla model': '/atlas/concept/vision-language-action-model',
+  'what is a vla model': '/atlas/concept/vision-language-action-model',
 }
 
 /**

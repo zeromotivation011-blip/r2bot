@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">One time step inside a physics engine</title>
+  <desc id="d">A loop of five stages that a robotics physics engine repeats every time step. 1, the state at time t: positions and velocities. 2, forces: gravity, motor torques and springs. 3, detect collisions: find which shapes touch, using a fast broad phase and then an exact narrow phase. 4, resolve contacts: compute contact and friction forces so bodies do not pass through each other; this is the hard part. 5, integrate: turn accelerations into new velocities and then new positions. Time then advances from t to t plus delta t and the loop starts again.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#FC6818"/></marker>
+  </defs>
+  <rect width="640" height="380" rx="16" fill="#0f172a"/>
+  <text x="30" y="46" font-size="16" font-weight="700" fill="#e2e8f0">Inside one physics-engine time step</text>
+  <text x="610" y="46" font-size="12" fill="#64748b" letter-spacing="1.5" text-anchor="end">REPEATS EVERY Δt</text>
+
+  <!-- top row -->
+  <rect x="30" y="90" width="170" height="80" rx="10" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="115" y="118" font-size="14" font-weight="700" fill="#e2e8f0" text-anchor="middle"><tspan fill="#FC6818">1</tspan>  State at t</text>
+  <text x="115" y="140" font-size="13" fill="#94a3b8" text-anchor="middle">positions and</text>
+  <text x="115" y="157" font-size="13" fill="#94a3b8" text-anchor="middle">velocities</text>
+
+  <rect x="235" y="90" width="170" height="80" rx="10" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="320" y="118" font-size="14" font-weight="700" fill="#e2e8f0" text-anchor="middle"><tspan fill="#FC6818">2</tspan>  Forces</text>
+  <text x="320" y="140" font-size="13" fill="#94a3b8" text-anchor="middle">gravity, motor</text>
+  <text x="320" y="157" font-size="13" fill="#94a3b8" text-anchor="middle">torques, springs</text>
+
+  <rect x="440" y="90" width="170" height="80" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="525" y="118" font-size="14" font-weight="700" fill="#e2e8f0" text-anchor="middle"><tspan fill="#FC6818">3</tspan>  Detect collisions</text>
+  <text x="525" y="140" font-size="13" fill="#94a3b8" text-anchor="middle">which shapes touch?</text>
+  <text x="525" y="157" font-size="13" fill="#94a3b8" text-anchor="middle">broad, then narrow</text>
+
+  <!-- bottom row -->
+  <rect x="440" y="240" width="170" height="80" rx="10" fill="#1e293b" stroke="#FC6818" stroke-width="2"/>
+  <text x="525" y="268" font-size="14" font-weight="700" fill="#e2e8f0" text-anchor="middle"><tspan fill="#FC6818">4</tspan>  Resolve contacts</text>
+  <text x="525" y="290" font-size="13" fill="#94a3b8" text-anchor="middle">contact + friction</text>
+  <text x="525" y="307" font-size="13" fill="#94a3b8" text-anchor="middle">forces: no overlap</text>
+  <text x="525" y="340" font-size="13" font-weight="700" fill="#FC6818" text-anchor="middle">the hard part</text>
+
+  <rect x="235" y="240" width="170" height="80" rx="10" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="320" y="268" font-size="14" font-weight="700" fill="#e2e8f0" text-anchor="middle"><tspan fill="#FC6818">5</tspan>  Integrate</text>
+  <text x="320" y="290" font-size="13" fill="#94a3b8" text-anchor="middle">acceleration → new</text>
+  <text x="320" y="307" font-size="13" fill="#94a3b8" text-anchor="middle">velocity → position</text>
+
+  <!-- arrows -->
+  <line x1="202" y1="130" x2="231" y2="130" stroke="#FC6818" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="407" y1="130" x2="436" y2="130" stroke="#FC6818" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="525" y1="172" x2="525" y2="236" stroke="#FC6818" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="438" y1="280" x2="409" y2="280" stroke="#FC6818" stroke-width="2.5" marker-end="url(#a)"/>
+  <path d="M233 280 H115 V174" fill="none" stroke="#FC6818" stroke-width="2.5" marker-end="url(#a)"/>
+
+  <!-- loop label -->
+  <text x="127" y="222" font-size="13" fill="#94a3b8">advance time</text>
+  <text x="127" y="242" font-size="14" font-weight="700" fill="#FC6818">t → t + Δt</text>
+  <text x="320" y="210" font-size="13" fill="#64748b" text-anchor="middle">then repeat</text>
+
+  <text x="30" y="360" font-size="13" fill="#94a3b8">Δt is small: MuJoCo's default is 0.002 s, or 500 steps per simulated second.</text>
+</svg>

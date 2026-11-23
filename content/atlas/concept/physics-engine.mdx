@@ -4,77 +4,224 @@ slug: physics-engine
 bucket: concept
 category: control
 summary: >-
-  A physics engine is the software that simulates how objects move, collide, and respond to forces — the
-  core of every robot simulator, and the difference between a realistic virtual test and a useless one.
+  A physics engine is software that calculates how objects move and collide. How robot simulators
+  use them: time steps, contact, and MuJoCo vs PhysX vs Bullet.
 difficulty: 3
+difficultyLabel: Classroom
 tags:
   - simulation
   - software
   - dynamics
+  - contact
+  - reinforcement-learning
 seeAlso:
   - gazebo-simulator
   - mujoco
   - sim-to-real
   - equations-of-motion
-lastReviewed: 2026-07-10T00:00:00.000Z
+  - isaac-sim
+  - pybullet
+  - contact-mechanics
+  - friction-model
+  - domain-randomization
+  - dynamics
+lastReviewed: 2026-11-23T00:00:00.000Z
 sources:
-  - title: 'Physics engine (Wikipedia)'
-    url: 'https://en.wikipedia.org/wiki/Physics_engine'
-  - title: 'Rigid body dynamics simulation'
-    url: 'https://en.wikipedia.org/wiki/Rigid_body_dynamics'
+  - title: 'MuJoCo documentation: Computation (equations of motion, contact model, integrators, collision detection)'
+    url: 'https://mujoco.readthedocs.io/en/latest/computation/index.html'
+  - title: 'MuJoCo documentation: Overview (generalized coordinates, convex contact)'
+    url: 'https://mujoco.readthedocs.io/en/latest/overview.html'
+  - title: 'PyBullet Quickstart Guide (Bullet Physics SDK)'
+    url: 'https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit'
+  - title: 'NVIDIA PhysX SDK 5 documentation: Articulations'
+    url: 'https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/Articulations.html'
+  - title: 'Drake documentation: Hydroelastic Contact User Guide'
+    url: 'https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html'
+  - title: 'Gazebo Sim documentation: Physics engines'
+    url: 'https://gazebosim.org/api/sim/9/physics.html'
+  - title: 'DART: Dynamic Animation and Robotics Toolkit (README)'
+    url: 'https://github.com/dartsim/dart'
+  - title: 'NVIDIA et al., "Isaac Lab: A GPU-Accelerated Simulation Framework for Multi-Modal Robot Learning", arXiv:2511.04831 (2025)'
+    url: 'https://arxiv.org/abs/2511.04831'
 laymanExplanation: >-
-  A physics engine is the part of a simulator that calculates how things move — gravity pulling, objects
-  bumping, joints bending. It's what makes a virtual robot behave like a real one, so you can test in
-  software before touching hardware.
+  Think of a flip-book. Each page shows the world a tiny moment after the last one. A physics engine
+  draws the next page for you: it looks at where everything is and how fast it is moving, works out
+  the pushes and pulls (gravity, motors, things bumping into each other), and moves everything a
+  little. Do that hundreds of times per simulated second and a virtual robot walks, grasps and falls
+  over much like a real one would.
 technicalDefinition: >-
-  A physics engine numerically simulates rigid-body (and sometimes soft-body) dynamics — integrating
-  equations of motion and resolving collisions and contacts over discrete time steps.
+  A physics engine numerically integrates the equations of motion of a set of bodies over discrete
+  time steps. Each step it computes applied forces, detects which collision shapes touch, solves for
+  contact and other constraint forces (with a penalty, complementarity, convex-optimization or
+  hydroelastic model), and integrates accelerations into new velocities and positions. Robotics
+  engines usually represent articulated robots in generalized (joint) coordinates, often with
+  Featherstone-style recursive algorithms, rather than as free bodies held together by constraints.
 quizQuestion:
-  q: The hardest part for most robotics physics engines to simulate accurately is…
+  q: A simulated mass on a spring keeps swinging higher and higher until the simulation blows up. Which change is most likely to fix it?
   options:
-    - Gravity
-    - Contact and friction between objects
-    - The color of objects
-    - Straight-line motion
-  answer: 1
+    - Switch from explicit Euler to semi-implicit Euler, or use a smaller time step
+    - Make the 3D rendering higher resolution
+    - Increase the time step so the simulation runs faster
+    - Turn off collision detection
+  answer: 0
   explanation: >-
-    Contact and friction — how objects touch, grip, and slip — are notoriously hard to model accurately,
-    and they dominate manipulation and locomotion.
+    Explicit Euler adds a little energy to an oscillating system at every step, so the swing grows
+    until it explodes. Semi-implicit Euler updates the position with the new velocity and keeps the
+    swing bounded, and a smaller time step shrinks the error of any integrator. A larger step makes
+    it worse; rendering and collisions have nothing to do with it.
 ---
 
-Every robot simulator — [Gazebo](/atlas/concept/gazebo-simulator), Isaac Sim, MuJoCo — has a beating heart that computes how the virtual world behaves. That heart is the **physics engine**.
+A **physics engine** is software that calculates how objects move, collide and push on each other, one small slice of time after another. Video games use them, usually as ready-made middleware, to simulate motion in real time ([Wikipedia](https://en.wikipedia.org/wiki/Physics_engine)). Robotics uses them so a robot can be tested, or taught by trial and error, in a virtual world before it touches real hardware.
 
-## What it does
+This page is about the engines robots are simulated with. When you run a robot in [Gazebo](/atlas/concept/gazebo-simulator), the physics comes from DART by default ([Gazebo](https://gazebosim.org/api/sim/9/physics.html)); in Webots it comes from ODE ([Webots](https://cyberbotics.com/doc/reference/worldinfo)); and in [Isaac Sim](/atlas/concept/isaac-sim) the default backend is NVIDIA PhysX ([Isaac Sim](https://docs.isaacsim.omniverse.nvidia.com/latest/physics/index.html)). [MuJoCo](/atlas/concept/mujoco) and [PyBullet](/atlas/concept/pybullet) are physics engines you can call directly from Python.
 
-A physics engine numerically **simulates dynamics**: it takes the forces acting on objects (gravity, motor torques, contacts) and computes how everything moves, step by tiny time step. It integrates the [equations of motion](/atlas/concept/equations-of-motion), detects when objects **collide**, and resolves the **contact forces** that stop them from passing through each other or make a foot grip the ground. For a robot, it turns "the motor applied this torque" into "the arm moved like this."
+![The loop a physics engine repeats every time step: read the state, add forces, detect collisions, resolve contact and friction forces, integrate to get new velocities and positions, then advance time by one step](/images/atlas/diagrams/physics-engine.svg)
 
-```diagram
-{ "type": "flow", "title": "Forces to motion, step by step", "nodes": ["Apply forces + torques", "Integrate equations of motion", "Detect + resolve contacts", "Advance one time step"], "caption": "Each tiny time step, the engine computes new positions and velocities and handles collisions — repeat thousands of times a second to simulate the world." }
-```
+## Start here: a flip-book of the world
 
-## Why it's the make-or-break part
+A physics engine does not solve the whole motion at once. It chops time into tiny steps and, at each step, asks four questions:
 
-The realism of a robot simulation lives or dies by its physics engine — and the hardest thing to get right is **contact and friction**:
+1. **What forces act right now?** Gravity, motor torques, springs, damping.
+2. **What is touching what?** A foot on the floor, a gripper finger on a cup.
+3. **How hard do the touching things push and rub on each other?** Enough to stop them passing through one another, with friction resisting sliding.
+4. **So where is everything a moment later?** New velocities, then new positions.
 
-- **Manipulation** is all about contact: grasping, pushing, inserting. If the engine models friction and contact poorly, grasps that work in sim fail on the real robot.
-- **Locomotion** is all about foot-ground contact: a walking policy trained on unrealistic contact won't transfer.
+PyBullet's guide sums up a step as "collision detection, constraint solving and integration" ([PyBullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)). The length of each step, the **time step** (Δt), matters most. MuJoCo's documentation calls it "the single most important parameter affecting the speed-accuracy trade-off" and notes that "smaller values result in better accuracy and stability" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)). Here are the defaults, as each project documents them:
 
-This is the crux of the **[sim-to-real](/atlas/concept/sim-to-real) gap**: real friction, deformation, and contact are fiendishly complex, and engines approximate them. Better contact modeling means better transfer to hardware.
+| Engine or simulator | Default time step | Steps per simulated second |
+|---|---|---|
+| MuJoCo (`timestep`) | 0.002 s ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)) | 500 |
+| PyBullet (`setTimeStep`) | 1/240 s ([PyBullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)) | 240 |
+| SDFormat, Gazebo's world format (`max_step_size`) | 0.001 s ([SDFormat](https://github.com/gazebosim/sdformat/blob/main/sdf/1.12/physics.sdf)) | 1,000 |
+| DART (`World`) | 1 ms ([DART](https://github.com/dartsim/dart)) | 1,000 |
+| Webots (`basicTimeStep`) | 32 ms ([Webots](https://cyberbotics.com/doc/reference/worldinfo)) | 31.25 |
 
-## The trade-off: speed vs accuracy
+Webots warns that a larger step speeds the simulation up but "will decrease the accuracy and the stability, especially for physics computations and collision detection" ([Webots](https://cyberbotics.com/doc/reference/worldinfo)).
 
-Physics engines constantly balance **fidelity against speed**:
+## How it works
 
-- **[MuJoCo](/atlas/concept/mujoco)** — prized for accurate, stable contact and fast simulation, a favorite for robot learning.
-- **PhysX / Isaac** — GPU-accelerated to run *thousands* of robots in parallel for reinforcement learning.
-- **Bullet / ODE / DART** — general-purpose engines behind many simulators.
+### The equation underneath
 
-For training via [reinforcement learning](/atlas/concept/reinforcement-learning), raw speed (millions of simulated steps) can matter as much as per-step accuracy — hence GPU-parallel engines.
+Every step comes down to Newton's second law written for a whole robot at once. MuJoCo's documentation gives it as **M v̇ + c = τ + Jᵀf** ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)). In words:
+
+- **M** is the robot's inertia (mass) matrix; **v̇** is the acceleration the engine wants.
+- **c** collects gravity plus Coriolis and centrifugal effects; **τ** is applied force from motors and springs.
+- **Jᵀf** is the contact and constraint force **f**, mapped into the joints by the Jacobian **J**.
+
+Once **f** is known, the acceleration follows directly: v̇ = M⁻¹(τ + Jᵀf − c). MuJoCo computes **c** with the Recursive Newton-Euler algorithm and **M** with the Composite Rigid-Body algorithm, and is blunt about where the difficulty lies: "The computation of the constraint force is the hard part" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)). See [equations of motion](/atlas/concept/equations-of-motion) and [dynamics](/atlas/concept/dynamics) for where this equation comes from.
+
+### Joint coordinates versus free bodies
+
+There are two ways to describe a robot arm to a physics engine.
+
+- **Maximal (Cartesian) coordinates.** Every link is a free body with six degrees of freedom, and each joint is a constraint that removes the motions it forbids. MuJoCo describes this as the approach of gaming engines, "where joints remove DOFs instead of adding them", and says it can cause "inaccuracies and instabilities when elaborate kinematic structures are involved" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/overview.html)).
+- **Generalized, joint or reduced coordinates.** The state is the joint angles (plus the base's pose for a robot that is not bolted down). Joints cannot drift apart because they are never separate in the first place. PhysX says its reduced-coordinate articulations have "zero joint error by design" and can handle larger mass ratios between jointed bodies, and that their cost is "generally proportional to the number of degrees of freedom, rather than the number of links" ([PhysX](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/Articulations.html)).
+
+DART computes motion "with Featherstone's Articulated Body Algorithm" ([DART](https://github.com/dartsim/dart)), and PyBullet loads URDF joints the same way by default, using the Articulated Body Algorithm "for linear time forward dynamics" ([PyBullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)). Linear time means doubling the number of joints roughly doubles the work. For loose objects with no joints, PyBullet's maximal-coordinate option "can improve performance a lot".
+
+### Finding what touches what
+
+With n collision shapes there are n(n − 1)/2 pairs that could be touching ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)): 4,950 pairs for 100 shapes. Checking each pair exactly is too slow, so engines filter in stages. MuJoCo uses a **broad phase** (a sweep-and-prune pass that cheaply discards bodies that are far apart), then a mid-phase tree of axis-aligned bounding boxes, and only then the exact **narrow phase**, whose method depends on the two shape types. The output is a list of active contacts ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)). For collision checks used in motion planning rather than simulation, see [collision checking](/atlas/concept/collision-checking).
+
+### Contact and friction: the hard part
+
+When a foot meets the floor, real materials squash a little and push back. Engines approximate that in quite different ways, which fall into four main families:
+
+| Approach | The idea | Who uses it, and what the documentation says |
+|---|---|---|
+| **Penalty (spring-damper)** | Let bodies overlap slightly and push them apart with a stiff spring and damper | MuJoCo says these models are "soft but are plagued by instabilities" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)) and need "very small time-steps" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/overview.html)) |
+| **Complementarity (LCP/NCP)** | Hard contact: a contact either pushes or separates, never both, solved as a linear or nonlinear complementarity problem | MuJoCo calls the LCP family "the de facto standard" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)); DART uses "LCP-based contact with Dantzig and PGS solvers" ([DART](https://github.com/dartsim/dart)); PyBullet uses "a unified LCP constraint solver" ([PyBullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)) |
+| **Convex soft contact** | Drop strict complementarity, allow a little softness, and solve a convex optimization with a unique answer | MuJoCo ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)) |
+| **Hydroelastic** | Give objects an internal pressure field and compute a whole contact patch, not single points | Drake ([Drake](https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html)) |
+
+Why is it so hard? MuJoCo's documentation gives three reasons ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)). Frictional LCPs "correspond to NP-hard optimization problems", which "has given rise to an industry of approximate solvers". The Coulomb friction model "is not well-defined in continuous time" (Painlevé's paradox), which has made discrete-time, "velocity-stepping schemes very popular". And the hard-contact assumption is never quite true: "all physical materials allow some deformation".
+
+How the main engines handle it:
+
+- **MuJoCo** treats softness as a feature: an object pushed sideways on a soft surface should "move up a bit as it starts sliding", which MuJoCo argues makes soft contact more realistic than strict hard contact. The cost is that force and separating velocity "can be simultaneously positive", effects it calls "numerically small yet undesirable" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)).
+- **Drake** lets bodies "penetrate slightly, as if the rigid body had a slightly deformable layer". Its hydroelastic model "attempts to approximate the patch and pressure distribution" instead of the "single point contact or a set of point contacts" common in robotics, and by default falls back to point contact in cases hydroelastic contact cannot handle ([Drake](https://drake.mit.edu/doxygen_cxx/group__hydroelastic__user__guide.html)).
+- **ODE**, as used in Webots, softens hard constraints with two parameters: ERP, the proportion of contact error fixed in the next step, and CFM, where "the softness will increase as CFM increases" ([Webots](https://cyberbotics.com/doc/reference/worldinfo)).
+- **PhysX** recommends its Temporal Gauss-Seidel (TGS) solver, which "subdivides the time step into multiple equally-sized substeps", over the older Projected Gauss-Seidel (PGS) ([PhysX](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/RigidBodyDynamics.html)).
+
+Friction gets approximated too. In MuJoCo you choose between a pyramidal friction cone, the default, and an elliptic one; the documentation says "elliptic cones are a better model of the physical reality, but pyramidal cones sometimes make the solver faster and more robust" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)). See [friction model](/atlas/concept/friction-model) and [contact mechanics](/atlas/concept/contact-mechanics) for the physics being approximated.
+
+### Integrators, and a worked example you can check
+
+The integrator turns accelerations into new velocities and positions. MuJoCo's documentation sets out the two simplest ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)):
+
+- **Explicit Euler:** v ← v + Δt·a and x ← x + Δt·v, using the *old* velocity.
+- **Semi-implicit Euler:** v ← v + Δt·a first, then x ← x + Δt·v with the *new* velocity.
+
+**A falling ball.** Drop a ball from rest with g = 9.81 m/s² and Δt = 0.1 s. Both methods get the velocity right (0.981 m/s after one step, 1.962 after two), but they disagree about distance:
+
+| Time | Exact (½gt²) | Explicit Euler | Semi-implicit Euler |
+|---|---|---|---|
+| 0.1 s | 0.04905 m | 0 m | 0.0981 m |
+| 0.2 s | 0.1962 m | 0.0981 m | 0.2943 m |
+| 0.3 s | 0.44145 m | 0.2943 m | 0.5886 m |
+| 1.0 s | 4.905 m | 4.4145 m | 5.3955 m |
+
+After one second both are off by 0.4905 m, in opposite directions. Cut the step to 0.01 s and the error falls to 0.04905 m; at MuJoCo's default of 0.002 s it is 0.00981 m, about a centimetre. For these first-order methods, ten times smaller steps give ten times smaller error.
+
+**A spring.** Now take a 1 kg mass on a 100 N/m spring, pulled 1 m and released, stepped at Δt = 0.01 s. The true motion swings between −1 m and +1 m forever. With explicit Euler, every step multiplies the energy by exactly 1 + (Δt·ω)² = 1.01, where ω = 10 rad/s, so after 10 seconds (1,000 steps) the energy has grown by 1.01¹⁰⁰⁰ and the amplitude of the swing by its square root: about **145 times** too large. With semi-implicit Euler, every swing over the same 10 seconds peaks between 1.0000 m and 1.0013 m. A stiff contact spring behaves just like this, which is why stability matters as much as accuracy.
+
+This is why MuJoCo does not implement explicit Euler at all: semi-implicit Euler is "strictly better, and standard in physics simulation" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)). It is also called symplectic Euler ([Wikipedia](https://en.wikipedia.org/wiki/Semi-implicit_Euler_method)). MuJoCo's default integrator is semi-implicit Euler; the alternatives include fourth-order Runge-Kutta and implicit-in-velocity variants ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)), which are particularly effective "where instabilities are caused by velocity-dependent forces" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)).
+
+## Where you'll see it
+
+- **Robot simulators.** Gazebo, Webots and Isaac Sim each wrap a physics engine with robot models, sensors and rendering. Robot models come in as URDF, SDF or MJCF files; PyBullet loads all three ([PyBullet](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit)). See [URDF](/atlas/concept/urdf).
+- **Training robots with reinforcement learning.** A [reinforcement learning](/atlas/concept/reinforcement-learning) policy learns by trial and error, so it practises in simulation, where a fall breaks nothing and, as MuJoCo notes, most robotic systems can be simulated "a lot faster than real-time" ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)). Isaac Lab, built for this, combines "GPU parallel physics", rendering and domain randomization tools, and has been applied to whole-body control and "contact-rich and dexterous manipulation" ([Isaac Lab](https://arxiv.org/abs/2511.04831)).
+- **Design, control and verification.** Drake is "a collection of tools for analyzing the dynamics of our robots and building control systems for them" ([Drake](https://drake.mit.edu/)).
+- **Games and visual effects.** Bullet is built for "VR, games, visual effects, robotics, machine learning" ([Bullet](https://github.com/bulletphysics/bullet3)); ODE is "used in many computer games" ([ODE](https://www.ode.org/)).
+
+## Limits
+
+- **Every contact model is an approximation.** Each family above trades realism, speed or stability against the others. Gazebo's physics layer is built on the premise "that there is not a single physics engine that is universally best for all simulation contexts" ([gz-physics](https://github.com/gazebosim/gz-physics)), so the same scene can behave differently in different engines.
+- **Speed and accuracy pull against each other.** To run in real time, MuJoCo notes, the time step "must be larger than the CPU time per step", and models with many floating objects, and so many contacts, are more demanding ([MuJoCo](https://mujoco.readthedocs.io/en/latest/XMLreference.html#option)).
+- **The numbers you feed it are estimates.** Friction coefficients, masses, joint damping and motor behaviour are measured or guessed, never exact. Behaviours learned in simulation "are often specific to the characteristics of the simulator", and "due to modeling error, strategies that are successful in simulation may not transfer to their real world counterparts" ([Peng et al.](https://arxiv.org/abs/1710.06537)). This is the [sim-to-real](/atlas/concept/sim-to-real) gap.
+- **Rigid is an idealisation.** Robot links are usually modelled as perfectly rigid. Some engines go further: MuJoCo natively models rods, cloth and 3D soft bodies ([MuJoCo](https://mujoco.readthedocs.io/en/latest/overview.html)), and PhysX on the GPU supports FEM soft bodies and particles ([PhysX](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/GPURigidBodies.html)).
+
+## The engines robotics people use
+
+Every cell below comes from the project's own repository, licence or documentation; Gazebo support is from the [Gazebo documentation](https://gazebosim.org/api/sim/9/physics.html).
+
+| Engine | Maintained by | Licence | How it models robots and contact | Where you'll meet it |
+|---|---|---|---|---|
+| **MuJoCo** | Google DeepMind ([repo](https://github.com/google-deepmind/mujoco)) | [Apache 2.0](https://github.com/google-deepmind/mujoco/blob/main/LICENSE) | Generalized coordinates; convex, soft contact solved as an optimization | Research and development in robotics, biomechanics, machine learning and other fields, its stated aim; MJX runs it on GPUs and TPUs |
+| **Bullet / PyBullet** | Bullet Physics SDK project ([repo](https://github.com/bulletphysics/bullet3)) | [zlib](https://github.com/bulletphysics/bullet3/blob/master/LICENSE.txt) | Featherstone joint coordinates by default in PyBullet, maximal coordinates optional; LCP constraint solver | PyBullet; Gazebo (Bullet and Bullet Featherstone plugins, preliminary) |
+| **ODE** | Open Dynamics Engine project ([site](https://www.ode.org/)) | Your choice of BSD-style or LGPL 2.1+ | Rigid bodies and joints with integrated collision detection and friction; ERP/CFM constraint softening | Webots |
+| **DART** | Open-source project; copyright holders include labs at Georgia Tech, Carnegie Mellon, the University of Washington and Stanford, and the Open Source Robotics Foundation | [BSD 2-Clause](https://github.com/dartsim/dart/blob/main/LICENSE) | Generalized coordinates, Featherstone's Articulated Body Algorithm; LCP contact | Gazebo's default engine |
+| **PhysX** | NVIDIA | [Apache 2.0](https://github.com/NVIDIA-Omniverse/PhysX/tree/main/physx) (SDK source) | Reduced-coordinate articulations; PGS and TGS iterative solvers; CPU or CUDA GPU | Isaac Sim (default backend), Isaac Lab, games |
+| **Drake** | Core development led by Toyota Research Institute; started at MIT CSAIL ([Drake](https://drake.mit.edu/)) | [BSD 3-Clause](https://github.com/RobotLocomotion/drake/blob/master/LICENSE.TXT) | Compliant point contact and hydroelastic contact | Model-based design, control and verification |
+| **Newton** | Linux Foundation project, initiated by Disney Research, Google DeepMind and NVIDIA ([repo](https://github.com/newton-physics/newton)) | Apache 2.0 | GPU-accelerated, built on NVIDIA Warp, with MuJoCo Warp as its primary backend; emphasizes differentiability | Experimental backend in Isaac Sim ([Isaac Sim](https://docs.isaacsim.omniverse.nvidia.com/latest/physics/index.html)); Isaac Lab ([Isaac Lab](https://github.com/isaac-sim/IsaacLab)) |
+
+In practice you usually choose a simulator and the engine comes with it: a robot in Gazebo runs on DART unless you switch, and one in Isaac Sim runs on PhysX unless you choose Newton.
+
+## Going deeper
+
+- **GPU-parallel simulation.** Reinforcement learning needs a great deal of practice, so engines now run many copies of a robot side by side on a GPU. PhysX runs its whole rigid-body feature set, articulations included, on CUDA GPUs through the same API as on the CPU ([PhysX](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/GPURigidBodies.html)). MuJoCo XLA (MJX) runs MuJoCo through JAX; its JAX implementation runs on NVIDIA and AMD GPUs, Apple Silicon and Google Cloud TPUs, and its Warp implementation is optimized for NVIDIA GPUs ([MJX](https://mujoco.readthedocs.io/en/latest/mjx.html)).
+- **Differentiable physics.** If the engine can return gradients of the next state with respect to the current one, you can optimize a controller with gradient descent instead of trial and error. MJX's JAX implementation supports automatic differentiation; MJX-Warp does not ([MJX](https://mujoco.readthedocs.io/en/latest/mjx.html)). Newton lists differentiability among its design goals ([Newton](https://github.com/newton-physics/newton)).
+- **Narrowing the gap.** Rather than chasing a perfect engine, many teams randomize what they cannot measure. Peng et al. trained a robot-arm pushing policy with randomized simulator dynamics and report "a similar level of performance when deployed on a real robot" ([Peng et al.](https://arxiv.org/abs/1710.06537)); Tobin et al. randomized rendering instead ([Tobin et al.](https://arxiv.org/abs/1703.06907)). See [domain randomization](/atlas/concept/domain-randomization).
+- **Inverse dynamics with contact.** Given a recorded motion, which forces caused it? With hard contact that question has no answer: if you push against a wall without moving, the force "cannot be recovered from the kinematics". MuJoCo's soft model has a unique inverse, so it can ([MuJoCo](https://mujoco.readthedocs.io/en/latest/computation/index.html)).
 
 ## Why it matters
 
-The physics engine is the foundation of all robot simulation — and therefore of modern robot *learning*, testing, and design. Its accuracy (especially at contact) determines whether what you learn or verify in simulation actually works on the real robot. Understanding it explains both the power and the limits of simulating robots.
+The physics engine decides what a simulated robot can teach you. Its time step, contact model and coordinates determine whether a grasp that holds in simulation holds on the bench, and whether a walking policy trained in simulation survives its first real floor. Knowing the stages of a step, the main contact models and the engine inside your simulator tells you which results to trust, which settings to tune, and where to expect the [sim-to-real](/atlas/concept/sim-to-real) gap.
+
+## Common questions
+
+### What is a physics engine in simple terms?
+
+It is the part of a simulation that makes things obey physics. At every tiny time step it works out the forces on each object, checks what is touching what, computes the contact and friction forces, and moves everything forward a little. Games use one to make objects fall and bounce; robot simulators use one so a virtual robot moves like a real one.
+
+### Which physics engine is best for robot simulation?
+
+No single engine is best for everything, which is why Gazebo lets you swap engines. MuJoCo was built for robotics and machine-learning research, PhysX is Isaac Sim's default and runs on GPUs for Isaac Lab, DART is Gazebo's default, ODE runs inside Webots, and Drake focuses on model-based design with a detailed hydroelastic contact model. Pick the simulator your task needs, then tune its time step and contact settings.
+
+### Can a game physics engine simulate a robot?
+
+Yes: Bullet, ODE and PhysX serve both games and robotics. The difference is in the setup. Game-style models treat each link as a free body held by joint constraints, which MuJoCo says can cause "inaccuracies and instabilities" in elaborate mechanisms. For robots, use joint coordinates instead: PhysX calls these articulations, and PyBullet uses them by default for URDF robots.
 
 ## Related
 
-[Gazebo simulator](/atlas/concept/gazebo-simulator) · [MuJoCo](/atlas/concept/mujoco) · [Sim-to-real](/atlas/concept/sim-to-real) · [Equations of motion](/atlas/concept/equations-of-motion)
+[MuJoCo](/atlas/concept/mujoco) · [Gazebo simulator](/atlas/concept/gazebo-simulator) · [Isaac Sim](/atlas/concept/isaac-sim) · [Contact mechanics](/atlas/concept/contact-mechanics) · [Sim-to-real](/atlas/concept/sim-to-real) · [Equations of motion](/atlas/concept/equations-of-motion)
