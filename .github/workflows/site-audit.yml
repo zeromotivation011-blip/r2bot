@@ -75,14 +75,14 @@ jobs:
             --samples 1 \
             --build-static \
             --reporter jsonExpanded \
-            --urls "/,/atlas,/atlas/concept/slam,/atlas/robot/shakey,/atlas/person/rodney-brooks,/atlas/company/boston-dynamics,/shorts,/shorts/line-follower,/courses,/academy,/academy/spark,/academy/spark/01,/robots,/robots/nao,/news,/blog,/blog/ai-and-robotics-complete-guide,/build,/visualizer,/ai-robotics,/daily-life,/about,/pricing" \
+            --urls "/,/atlas,/atlas/concept/slam,/atlas/robot/shakey,/atlas/person/rodney-brooks,/atlas/company/boston-dynamics,/shorts,/shorts/line-follower,/courses,/academy,/academy/spark,/academy/spark/01,/robots,/robots/nao,/news,/blog,/blog/ai-and-robotics-complete-guide,/build,/visualizer,/ai-robotics,/daily-life,/about,/pricing,/ros2/fix/ros2-command-not-found" \
             $BUDGET_FLAG
 
       - name: Summarise, and assert the scan actually covered the site
         if: always()
         # --min is what stops a throttled or half-finished scan from passing as
         # evidence. 23 URLs requested, 23 demanded. Keep these in step.
-        run: node scripts/summarise-audit.mjs --min 23
+        run: node scripts/summarise-audit.mjs --min 24
 
       - name: Keep the full report
         if: always()

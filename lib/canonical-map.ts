@@ -13,6 +13,10 @@
 //     "how I chose". Where both exist for one pair (Arduino / ESP32 / Pi), the
 //     compare page is the table and the post is the story; they cross-link and
 //     carry different titles so they answer different intents.
+//   • /ros2/fix/<slug> owns an exact ROS 2 error — "ros2: command not found",
+//     "ros2 nodes not communicating". Atlas explains the concept (DDS, QoS),
+//     the cheatsheet lists commands, the fix page gets a broken terminal working;
+//     they cross-link (data: lib/ros2-fixes.ts).
 //
 // Anything that breaks that rule is either redirected here or differentiated
 // and cross-linked, so the two pages feed each other instead of competing.

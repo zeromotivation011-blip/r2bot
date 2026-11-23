@@ -19,6 +19,7 @@ import { GROUP_UPDATED, pageUpdated as at } from '@/lib/content-dates';
 import { ATLAS_ROBOTS_REDIRECTED } from '@/lib/canonical-map';
 import { getAllDailyLifeArticles } from '@/lib/daily-life-articles/loader';
 import { listTranslations, atlasPath } from '@/lib/atlas-i18n';
+import { ROS2_FIXES } from '@/lib/ros2-fixes';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -178,6 +179,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/compare/lidar-vs-camera-slam`, lastModified: at('/compare/lidar-vs-camera-slam'), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${BASE}/compare/arduino-vs-esp32-vs-raspberry-pi`, lastModified: at('/compare/arduino-vs-esp32-vs-raspberry-pi'), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${BASE}/compare/spot-vs-unitree-go2-vs-anymal`, lastModified: at('/compare/spot-vs-unitree-go2-vs-anymal'), changeFrequency: 'monthly' as const, priority: 0.8 },
+    // ROS 2 error fixes: dated by each fix's own `updated` (lib/ros2-fixes.ts).
+    { url: `${BASE}/ros2/fix`, lastModified: at('/ros2/fix'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    ...ROS2_FIXES.map((f) => ({ url: `${BASE}/ros2/fix/${f.slug}`, lastModified: new Date(`${f.updated}T00:00:00.000Z`), changeFrequency: 'monthly' as const, priority: 0.8 })),
     // Long-form "Robotics in Daily Life" articles: only slugs with a written,
     // sourced body on disk; unwritten stubs have no page and are not listed.
     ...getAllDailyLifeArticles().map((a) => ({ url: `${BASE}/daily-life/${a.slug}`, lastModified: new Date(`${a.updatedAt}T00:00:00.000Z`), changeFrequency: 'monthly' as const, priority: 0.7 })),
