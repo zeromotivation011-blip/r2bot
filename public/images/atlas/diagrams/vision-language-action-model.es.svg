@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">Cómo controla un robot un modelo de visión-lenguaje-acción</title>
+  <desc id="d">Una imagen de la cámara pasa por un codificador visual y una instrucción escrita pasa por un tokenizador de texto. Los dos flujos de tokens entran en un backbone (red troncal) de modelo de visión-lenguaje preentrenado. La salida del backbone se convierte en acciones del robot, ya sea como tokens de acción discretos que corresponden a intervalos, o como un bloque continuo de acciones generado por un cabezal de acciones de flow matching o de difusión. El robot ejecuta las órdenes, se toma un nuevo fotograma de la cámara y el ciclo se repite hasta que la tarea termina.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#FC6818"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#38bdf8"/></marker>
+    <marker id="m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
+  </defs>
+  <rect width="640" height="380" rx="16" fill="#0f172a"/>
+  <text x="30" y="34" font-size="13" fill="#64748b" letter-spacing="1.5">UN PASO DE CONTROL · SE REPITE HASTA TERMINAR LA TAREA</text>
+
+  <!-- camera image -->
+  <rect x="30" y="52" width="120" height="84" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <rect x="42" y="64" width="96" height="44" rx="4" fill="#0f172a" stroke="#334155"/>
+  <rect x="58" y="86" width="16" height="18" rx="3" fill="#94a3b8"/>
+  <rect x="96" y="92" width="32" height="12" rx="3" fill="#475569"/>
+  <circle cx="122" cy="74" r="5" fill="#FC6818" fill-opacity=".8"/>
+  <text x="90" y="127" font-size="12" fill="#e2e8f0" text-anchor="middle" font-weight="700">Imagen de cámara</text>
+
+  <!-- instruction -->
+  <rect x="30" y="152" width="120" height="58" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <text x="90" y="174" font-size="12" fill="#e2e8f0" text-anchor="middle" font-weight="700">Instrucción</text>
+  <text x="90" y="196" font-size="12" fill="#38bdf8" text-anchor="middle">«apila los vasos»</text>
+
+  <!-- encoders -->
+  <rect x="184" y="64" width="118" height="60" rx="10" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="243" y="90" font-size="12" fill="#e2e8f0" text-anchor="middle" font-weight="700">Codificador visual</text>
+  <text x="243" y="109" font-size="12" fill="#94a3b8" text-anchor="middle">imagen → tokens</text>
+  <rect x="184" y="152" width="118" height="58" rx="10" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="243" y="177" font-size="12" fill="#e2e8f0" text-anchor="middle" font-weight="700">Tokenizador</text>
+  <text x="243" y="196" font-size="12" fill="#94a3b8" text-anchor="middle">palabras → tokens</text>
+  <line x1="150" y1="94" x2="180" y2="94" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#g)"/>
+  <line x1="150" y1="181" x2="180" y2="181" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#g)"/>
+
+  <!-- backbone -->
+  <rect x="336" y="52" width="122" height="158" rx="12" fill="#1e293b" stroke="#FC6818" stroke-width="2.5"/>
+  <text x="397" y="88" font-size="14" fill="#FC6818" text-anchor="middle" font-weight="700">Backbone del</text>
+  <text x="397" y="106" font-size="14" fill="#FC6818" text-anchor="middle" font-weight="700">modelo de</text>
+  <text x="397" y="124" font-size="14" fill="#FC6818" text-anchor="middle" font-weight="700">lenguaje</text>
+  <text x="397" y="154" font-size="12" fill="#94a3b8" text-anchor="middle">preentrenado con</text>
+  <text x="397" y="171" font-size="12" fill="#94a3b8" text-anchor="middle">imágenes y</text>
+  <text x="397" y="188" font-size="12" fill="#94a3b8" text-anchor="middle">textos de la web</text>
+  <line x1="302" y1="94" x2="332" y2="108" stroke="#94a3b8" stroke-width="2" marker-end="url(#m)"/>
+  <line x1="302" y1="181" x2="332" y2="160" stroke="#94a3b8" stroke-width="2" marker-end="url(#m)"/>
+
+  <!-- action output -->
+  <rect x="492" y="52" width="122" height="84" rx="10" fill="#1e293b" stroke="#FC6818" stroke-width="2"/>
+  <text x="553" y="78" font-size="12" fill="#e2e8f0" text-anchor="middle" font-weight="700">Salida de acciones</text>
+  <text x="553" y="99" font-size="12" fill="#94a3b8" text-anchor="middle">tokens de acción</text>
+  <text x="553" y="118" font-size="12" fill="#94a3b8" text-anchor="middle">o flujo / difusión</text>
+  <line x1="458" y1="94" x2="488" y2="94" stroke="#FC6818" stroke-width="2.5" marker-end="url(#a)"/>
+
+  <!-- robot -->
+  <rect x="492" y="152" width="122" height="58" rx="10" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="553" y="176" font-size="12" fill="#e2e8f0" text-anchor="middle" font-weight="700">Robot</text>
+  <text x="553" y="196" font-size="12" fill="#94a3b8" text-anchor="middle">órdenes a motores</text>
+  <line x1="553" y1="136" x2="553" y2="148" stroke="#FC6818" stroke-width="2.5" marker-end="url(#a)"/>
+
+  <!-- closed loop -->
+  <path d="M553 210 V246 H16 V94 H26" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#g)"/>
+  <text x="300" y="238" font-size="13" fill="#38bdf8" text-anchor="middle">el robot se mueve → nuevo fotograma → paso siguiente</text>
+
+  <!-- legend: how actions come out -->
+  <line x1="30" y1="266" x2="610" y2="266" stroke="#334155"/>
+  <text x="30" y="290" font-size="13" fill="#FC6818" font-weight="700">Tokens de acción</text>
+  <text x="166" y="290" font-size="13" fill="#cbd5e1">cada valor de acción pasa a ser 1 de 256 intervalos (RT-2, OpenVLA)</text>
+  <text x="30" y="316" font-size="13" fill="#FC6818" font-weight="700">Cabezal continuo</text>
+  <text x="166" y="316" font-size="13" fill="#cbd5e1">flow matching o difusión (π0, GR00T N1, SmolVLA)</text>
+  <text x="30" y="342" font-size="13" fill="#FC6818" font-weight="700">Bloque de acciones</text>
+  <text x="166" y="342" font-size="13" fill="#cbd5e1">una predicción da varias órdenes futuras, así que el</text>
+  <text x="166" y="360" font-size="13" fill="#cbd5e1">robot actúa más rápido de lo que responde el modelo</text>
+</svg>

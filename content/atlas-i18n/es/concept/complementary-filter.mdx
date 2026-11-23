@@ -1,0 +1,121 @@
+---
+title: Filtro complementario
+summary: >-
+  Un filtro complementario fusiona giroscopio y acelerómetro en un ángulo de inclinación estable y
+  sin deriva. Cómo funciona, cómo elegir α y código en C.
+laymanExplanation: >-
+  Un giroscopio es como contar tus pasos con los ojos cerrados: muy suave, pero cada pequeño error
+  se va sumando hasta que te pierdes. Un acelerómetro es como echar un vistazo a un punto de
+  referencia: siempre te dice más o menos dónde está «abajo», pero ese vistazo es tembloroso. Un
+  filtro complementario sigue contando pasos y, de vez en cuando, echa un vistazo rápido para
+  corregirse, así que obtienes a la vez la suavidad y el sentido de la orientación.
+sourceLastReviewed: 2026-11-22
+reviewed: 2026-11-23
+---
+
+Un **filtro complementario** (en inglés, *complementary filter*) es una forma de combinar dos sensores que se equivocan de maneras opuestas. En robótica casi siempre significa mezclar un **giroscopio** y un **acelerómetro** para obtener un ángulo de inclinación: del giroscopio te fías para los movimientos rápidos, y del acelerómetro, para el promedio a largo plazo. El resultado, con unas pocas líneas de código, es un ángulo estable y de respuesta rápida que puede usar un robot autoequilibrado, un dron o un robot con ROS.
+
+Es la forma más sencilla de [fusión de sensores](/atlas/concept/sensor-fusion), y suele ser la primera que se construye cuando una [IMU](/atlas/concept/imu) (unidad de medición inercial) te da números en bruto, pero ningún ángulo.
+
+## Empieza aquí: dos sensores, dos problemas opuestos
+
+Pon una IMU en un robot y pregúntale «¿cuánto estoy inclinado?». Cada sensor puede responder por sí solo, pero mal:
+
+- **El [giroscopio](/atlas/concept/gyroscope)** mide a qué velocidad gira el robot. Suma esa velocidad a lo largo del tiempo y obtienes el ángulo. El problema es que cada lectura arrastra un pequeño error, y al sumar errores, estos crecen. La práctica del péndulo de rueda de reacción de Hunter Adams lo llama por su nombre: integrar el giroscopio es «navegación por estima» (*dead reckoning*), y su sesgo (*bias*) «puede desviarse en cualquier dirección» ([Adams](https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html)). El ángulo es suave, pero **deriva**.
+- **El [acelerómetro](/atlas/concept/accelerometer)** siente la gravedad, que apunta hacia abajo, así que la dirección de la aceleración medida da la inclinación directamente, sin sumar nada. El problema es que también siente cada golpe, vibración y empujón: «se vuelve especialmente ruidoso en presencia de cualquier tipo de ruido mecánico» ([Adams](https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html)). El ángulo es correcto en promedio, pero **tiembla**.
+
+Uno de los sensores es bueno en las altas frecuencias (los cambios rápidos), y el otro, en las bajas (el promedio lento). Es exactamente la situación que describe la clase del MIT sobre estimación en aeronaves: cuando «una fuente da buena información solo en la región de baja frecuencia, mientras que la otra solo es buena en la región de alta frecuencia», «puedes usar un filtro complementario» ([Park & How, MIT](https://ocw.mit.edu/courses/16-333-aircraft-stability-and-control-fall-2004/fb8395efd40e5f4a79b98fda10c85de3_l15_filter_examp.pdf)).
+
+## Cómo funciona
+
+Cada vez que llegan lecturas nuevas (cada Δt segundos):
+
+1. **Predice con el giroscopio.** Toma el ángulo anterior (θ_previous) y súmale la rotación que midió el giroscopio: θ_previous + ω·Δt.
+2. **Mide con el acelerómetro.** Calcula la inclinación a partir de la dirección de la gravedad. Para un robot que se inclina hacia delante y hacia atrás alrededor de un solo eje, θ_acc = atan2(a_x, a_z). Qué ejes y qué signos uses depende de cómo esté montada la IMU: comprueba que, al inclinarlo hacia delante, el ángulo del acelerómetro tenga el mismo signo que el del giroscopio.
+3. **Mezcla.** Haz una media ponderada, con la mayor parte del peso en la predicción del giroscopio:
+
+**θ = α · (θ_previous + ω·Δt) + (1 − α) · θ_acc**
+
+Ese es todo el filtro. Adams lo describe como «una media ponderada del ángulo del acelerómetro y de la suma de la estimación complementaria anterior del ángulo y el cambio de ángulo medido por el giroscopio», y sugiere empezar con «un peso de ~0.01 para el acelerómetro y de ~0.99 para el giroscopio» ([Adams](https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html)).
+
+¿Por qué funciona un peso tan pequeño para el acelerómetro? Porque se aplica en **cada** paso. Un tirón del 1–2 % hacia el ángulo del acelerómetro, cien veces por segundo, basta para ir anulando una deriva lenta, mientras que una sola lectura ruidosa del acelerómetro solo mueve el resultado un 1–2 %.
+
+```c
+// Se ejecuta cada dt segundos. gyro_rate en rad/s; ax y az, del acelerómetro.
+const float alpha = 0.98f;
+float accel_angle = atan2f(ax, az);
+angle = alpha * (angle + gyro_rate * dt) + (1.0f - alpha) * accel_angle;
+```
+
+### Por qué se llama «complementario»
+
+Míralo desde el punto de vista de las frecuencias. La rama del giroscopio se comporta como un **filtro paso alto** (deja pasar los cambios rápidos y bloquea la deriva lenta); la del acelerómetro, como un **filtro paso bajo** (deja pasar el promedio lento y bloquea el temblor). Para un filtro de primer orden con constante de tiempo τ, estos filtros son τs / (τs + 1) y 1 / (τs + 1), y suman exactamente 1. Así, el ángulo real pasa sin cambios y el ruido de cada sensor se recorta justo donde ese sensor es débil. Los dos filtros se *complementan*, y de ahí el nombre. Las diapositivas del MIT usan la misma estructura para el ángulo de cabeceo (*pitch*) de una aeronave: el giroscopio de velocidad de cabeceo aporta las altas frecuencias, y la «sensibilidad... a la dirección de la gravedad» de los acelerómetros, las bajas ([Park & How](https://ocw.mit.edu/courses/16-333-aircraft-stability-and-control-fall-2004/fb8395efd40e5f4a79b98fda10c85de3_l15_filter_examp.pdf)).
+
+### Cómo elegir α
+
+α y el periodo del bucle Δt fijan juntos la **constante de tiempo** del filtro, que es, a grandes rasgos, la escala de tiempo a partir de la cual dejas de fiarte del giroscopio y empiezas a fiarte del acelerómetro:
+
+**τ = α · Δt / (1 − α)**
+
+| α | Frecuencia del bucle | Constante de tiempo τ | Comportamiento |
+|---|---|---|---|
+| 0.90 | 100 Hz (Δt = 0.01 s) | 0.09 s | Sigue rápido al acelerómetro; más temblor |
+| 0.98 | 100 Hz | 0.49 s | Equilibrado: suave, corrige la deriva en más o menos un segundo |
+| 0.99 | 100 Hz | 0.99 s | Muy suave; tarda más en corregir la deriva |
+| 0.98 | 500 Hz (Δt = 0.002 s) | 0.10 s | Mismo α, bucle más rápido, τ mucho más corta |
+
+La última fila suele sorprender: si aceleras el bucle y mantienes α, el filtro se comporta de otra manera. Elige primero la constante de tiempo que quieres y luego calcula α a partir de ella. El compromiso es el que enuncia Adams: «cuanto mayor es el peso del acelerómetro, menos sesgo y más ruido ves» ([Adams](https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html)).
+
+## Dónde lo verás
+
+- **Robots autoequilibrados.** Los robots de dos ruedas que se mantienen en equilibrio y los péndulos de rueda de reacción necesitan un ángulo de inclinación preciso cientos de veces por segundo en un microcontrolador pequeño. La práctica de la rueda de reacción de Adams usa exactamente este filtro, con aritmética de punto fijo, en una Raspberry Pi Pico ([Adams](https://vanhunteradams.com/Pico/ReactionWheel/Complementary_Filters.html)).
+- **Aviones y drones.** Los proyectos de aeronaves del MIT usaron filtros complementarios para el alabeo (*roll*) y el cabeceo, y también para la altitud, combinando el GPS (bueno en baja frecuencia) con un sensor de presión (bueno en alta frecuencia) ([Park & How](https://ocw.mit.edu/courses/16-333-aircraft-stability-and-control-fall-2004/fb8395efd40e5f4a79b98fda10c85de3_l15_filter_examp.pdf)). La idea no se limita a las IMU: cualquier par de sensores con puntos fuertes opuestos puede combinarse así.
+- **Robots con ROS.** El paquete `imu_complementary_filter` (parte de `imu_tools`, publicado para ROS 2 Humble, Jazzy y Rolling) es un «filtro que fusiona velocidades angulares, aceleraciones y (opcionalmente) lecturas magnéticas de un dispositivo IMU genérico en un cuaternión que representa la orientación del dispositivo» ([ROS index](https://index.ros.org/p/imu_complementary_filter/github-CCNYRoboticsLab-imu_tools)). Se basa en el artículo de Valenti et al. que se cita más abajo.
+
+## Límites
+
+- **La aceleración lo engaña.** El acelerómetro no distingue la gravedad de la aceleración propia del robot. Mientras un robot acelera, frena o vibra, la dirección «abajo» que indica es errónea, y el filtro se va desviando poco a poco hacia ese ángulo erróneo. Los filtros más avanzados reducen el peso del acelerómetro mientras la aceleración medida se aleja mucho de 1 g (más abajo lo verás).
+- **La gravedad no da el rumbo.** La gravedad te dice el alabeo y el cabeceo, pero nada sobre hacia dónde miras (la guiñada, *yaw*). Corregir la deriva de la guiñada requiere otra referencia, normalmente un magnetómetro, y por eso para la orientación 3D completa se usan IMU que lo incluyen (a veces llamadas sensores MARG).
+- **Tratar los ejes de uno en uno es una simplificación.** La versión de dos líneas trata cada eje por separado y funciona bien con inclinaciones pequeñas. Con rotaciones grandes y combinadas, los ángulos hay que manejarlos como es debido, con matrices de rotación o con un [cuaternión](/atlas/concept/quaternion).
+- **Pesos fijos (en la versión básica).** α se elige a mano y no se adapta a lo ruidosos que sean realmente los sensores en cada momento. Un [filtro de Kalman](/atlas/concept/kalman-filter), en cambio, calcula esa ponderación a partir de modelos del ruido. (Para este problema sencillo de inclinación en un solo eje, un filtro de Kalman que ha llegado a su régimen estacionario acaba también con una ganancia fija y se comporta de forma muy parecida a un filtro complementario bien ajustado; la diferencia aparece cuando el ruido cambia o se añaden más sensores y estados.)
+
+## Para profundizar: filtros complementarios en 3D
+
+El filtro de una línea ha dado lugar a toda una familia de estimadores 3D sólidos:
+
+- **Filtros complementarios no lineales en SO(3).** Mahony, Hamel y Pflimlin (2008) formularon el filtro complementario directamente sobre el grupo de las rotaciones 3D, con una corrección proporcional-integral cuyo término integral estima además el sesgo del giroscopio. Es una de las referencias más citadas sobre filtrado complementario en 3D ([IEEE TAC](https://doi.org/10.1109/TAC.2008.923738)).
+- **Filtro basado en cuaterniones con ganancia adaptativa.** Valenti, Dryanovski y Xiao (2015) construyeron un filtro complementario con cuaterniones para IMU y MARG que corrige por separado el alabeo y el cabeceo a partir del acelerómetro y el rumbo a partir del magnetómetro, reduce la ganancia del acelerómetro cuando la magnitud de la aceleración medida se aleja de la gravedad, y estima el sesgo del giroscopio mientras el sensor está quieto. Los autores lo diseñaron para vehículos aéreos pequeños «por su baja carga computacional» ([Sensors 2015](https://www.mdpi.com/1424-8220/15/8/19302)). Es el algoritmo en el que se basa el paquete de ROS mencionado antes.
+
+### ¿Filtro complementario o filtro de Kalman?
+
+| | Filtro complementario | [Filtro de Kalman](/atlas/concept/kalman-filter) / [EKF](/atlas/concept/extended-kalman-filter) |
+|---|---|---|
+| Cómo se fijan los pesos | A mano (α, o ganancias) | Se calculan en cada paso a partir de modelos del ruido |
+| Matemáticas | Unas pocas multiplicaciones por paso | Operaciones con matrices, actualizaciones de la covarianza |
+| Ajuste | Un único parámetro intuitivo: la constante de tiempo | Matrices de ruido del proceso y de la medida |
+| Estimación de la incertidumbre | Ninguna | Una estimación de su propio error |
+| Uso típico | Inclinación en microcontroladores, robots autoequilibrados, orientación con una IMU | Fusionar muchos sensores (GPS, odometría de ruedas, IMU) en el estado completo del robot |
+
+Una buena regla práctica: empieza con un filtro complementario para la orientación a partir de una sola IMU. Pasa a un filtro de Kalman cuando estés fusionando varios sensores distintos, necesites una estimación de la incertidumbre o importe el modelo de movimiento del vehículo.
+
+## Por qué importa
+
+Casi cualquier robot que se mantenga en pie, vuele o se equilibre necesita saber dónde está abajo, rápido y de forma fiable. El filtro complementario convierte dos sensores baratos e imperfectos en un ángulo utilizable con unas pocas líneas de código, y su idea central (fiarse de cada sensor solo donde es bueno) recorre toda la fusión de sensores, desde los robots autoequilibrados de aficionado hasta los filtros de Kalman de los vehículos autónomos.
+
+## Preguntas frecuentes
+
+### ¿Qué es un filtro complementario, en palabras sencillas?
+
+Es una forma de combinar un giroscopio y un acelerómetro. El giroscopio es suave, pero deriva poco a poco; el acelerómetro no deriva, pero es ruidoso. El filtro sigue sobre todo al giroscopio y, en cada paso, empuja un poco el resultado hacia el acelerómetro, así que obtienes un ángulo suave que no deriva.
+
+### ¿Qué diferencia hay entre un filtro complementario y un filtro de Kalman?
+
+Los dos combinan sensores. Un filtro complementario usa pesos fijos que eliges tú (normalmente un solo número, α), así que es diminuto y fácil de ajustar. Un filtro de Kalman calcula los mejores pesos en cada paso a partir de modelos del ruido de cada sensor y del movimiento del sistema, y además indica cuánta incertidumbre tiene su estimación. Es más potente, pero exige más matemáticas y más ajuste.
+
+### ¿Qué valor de alfa debo usar?
+
+Elige primero una constante de tiempo y luego calcula α = τ / (τ + Δt). Entre medio segundo y un segundo es un punto de partida razonable para un robot autoequilibrado pequeño (Adams sugiere un peso del giroscopio de unos 0.99), lo que, con un bucle a 100 Hz, significa un α de entre 0.98 y 0.99, aproximadamente. Si el ángulo tiembla, sube α; si deriva, o tarda demasiado en estabilizarse tras el arranque, bájalo. (La inclinación real pasa por la rama del giroscopio sin retraso, sea cual sea α; α solo fija lo rápido que se corrige la deriva.) Vuelve a comprobar α cada vez que cambies la frecuencia del bucle.
+
+## Relacionado
+
+[Fusión de sensores](/atlas/concept/sensor-fusion) · [IMU](/atlas/concept/imu) · [Giroscopio](/atlas/concept/gyroscope) · [Acelerómetro](/atlas/concept/accelerometer) · [Filtro de Kalman](/atlas/concept/kalman-filter) · [Cuaternión](/atlas/concept/quaternion)

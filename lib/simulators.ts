@@ -53,11 +53,15 @@ export const SIMULATORS: Simulator[] = [
   {
     id: 'pid',
     title: 'PID Tuner',
-    heading: 'Interactive PID Controller Simulator',
+    // "pid visualizer" had 46 impressions at position 7 and no clicks (Search
+    // Console, Nov 2026): the old title never said "visualizer". Lead with the
+    // query, keep the simulator wording after it. Measure CTR from 7 Dec.
+    heading: 'PID Visualizer: Interactive PID Controller Simulator',
     blurb: 'Drag P, I and D and watch the system settle, overshoot or oscillate in real time.',
     description:
-      'A free interactive PID tuner. Adjust proportional, integral and derivative gains and watch the response curve change instantly. No install, no signup.',
+      'A free PID visualizer: drag the P, I and D gains and watch the response curve overshoot, oscillate or settle on target in real time. Runs in your browser.',
     keywords: [
+      'pid visualizer',
       'interactive pid simulator',
       'pid tuner online',
       'pid controller visualizer',
