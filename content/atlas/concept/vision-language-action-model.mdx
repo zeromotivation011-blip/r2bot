@@ -1,0 +1,220 @@
+---
+title: Vision-Language-Action Model
+slug: vision-language-action-model
+bucket: concept
+category: ai-and-perception
+summary: >-
+  A vision-language-action (VLA) model is one AI model that looks at camera images, reads an
+  instruction and outputs robot actions directly.
+difficulty: 4
+difficultyLabel: Advanced
+tags:
+  - vla
+  - robot-learning
+  - foundation-models
+  - manipulation
+  - imitation-learning
+  - transformers
+seeAlso:
+  - foundation-model-robotics
+  - imitation-learning
+  - behavior-cloning
+  - diffusion-policy
+  - embodied-ai
+  - large-language-model-robotics
+  - transformer-architecture
+lastReviewed: 2026-11-23T00:00:00.000Z
+sources:
+  - title: 'Brohan et al., "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control", Google DeepMind (2023)'
+    url: 'https://arxiv.org/abs/2307.15818'
+  - title: 'Open X-Embodiment Collaboration, "Open X-Embodiment: Robotic Learning Datasets and RT-X Models" (2023)'
+    url: 'https://arxiv.org/abs/2310.08864'
+  - title: 'Kim, Pertsch, Karamcheti et al., "OpenVLA: An Open-Source Vision-Language-Action Model" (2024)'
+    url: 'https://arxiv.org/abs/2406.09246'
+  - title: 'Black et al., "π0: A Vision-Language-Action Flow Model for General Robot Control", Physical Intelligence (2024)'
+    url: 'https://arxiv.org/abs/2410.24164'
+  - title: 'NVIDIA, "GR00T N1: An Open Foundation Model for Generalist Humanoid Robots" (2025)'
+    url: 'https://arxiv.org/abs/2503.14734'
+  - title: 'Gemini Robotics Team, "Gemini Robotics: Bringing AI into the Physical World", Google DeepMind (2025)'
+    url: 'https://arxiv.org/abs/2503.20020'
+  - title: 'Shukor et al., "SmolVLA: A Vision-Language-Action Model for Affordable and Efficient Robotics", Hugging Face (2025)'
+    url: 'https://arxiv.org/abs/2506.01844'
+  - title: 'Google DeepMind, "Gemini Robotics On-Device 2" model card (July 2026)'
+    url: 'https://deepmind.google/models/model-cards/gemini-robotics-on-device-2/'
+laymanExplanation: >-
+  Chatbots that can look at a photo answer you in words. A vision-language-action model answers
+  in movements instead. Show it what the robot's camera sees, type "stack the cups", and it
+  replies with the next few motor commands for the arm. The robot moves, the camera takes a new
+  picture, and the model answers again, over and over, until the job is done. Because it
+  started life as a model trained on huge amounts of web images and text, it already knows what
+  a cup or a rock is before it ever drives a robot.
+technicalDefinition: >-
+  A vision-language-action (VLA) model is a robot policy built by fine-tuning a pretrained
+  vision-language model (a vision encoder feeding a transformer language model) to map camera
+  observations, a natural-language instruction and usually the robot's proprioceptive state to
+  low-level actions. Actions are emitted either as discrete tokens (each action dimension
+  quantised into bins, as in RT-2 and OpenVLA) or by a continuous action head trained with flow
+  matching or diffusion (as in π0, GR00T N1 and SmolVLA), often as a chunk of several future
+  actions per inference. Training is imitation learning on robot demonstrations, frequently
+  co-trained with web vision-language data.
+quizQuestion:
+  q: Why do many VLA models predict a chunk of several future actions from one camera image, instead of one action at a time?
+  options:
+    - The model runs more slowly than the robot's control loop, so one prediction has to supply several motor commands
+    - A single action cannot be represented as numbers
+    - Chunks let the model skip the camera image entirely
+    - The language model can only output text in groups of fifty words
+  answer: 0
+  explanation: >-
+    A large model may take tens or hundreds of milliseconds to think, but a dexterous robot wants a
+    new command every 20 milliseconds (50 Hz) or faster. Predicting a chunk of future actions per
+    inference lets the robot keep receiving commands at its own rate between model predictions. Gemini
+    Robotics, for example, has about 250 ms of end-to-end latency but an effective control rate of
+    50 Hz because of action chunks.
+---
+
+A **vision-language-action model (VLA)** is a single AI model that takes in what a robot's camera sees and an instruction in plain language, and puts out the robot's next movements. It is built by taking a vision-language model, the kind of AI that can describe a photo or answer questions about it, and training it to answer with motor commands instead of words.
+
+The name comes from Google DeepMind's RT-2 paper (2023), which fitted "both natural language responses and robotic actions into the same format" by expressing actions as text tokens, and called this category of models "vision-language-action models (VLA)" ([RT-2](https://arxiv.org/abs/2307.15818)). It is one kind of [foundation model for robotics](/atlas/concept/foundation-model-robotics).
+
+![Diagram of a vision-language-action model: a camera image and an instruction are turned into tokens, a pretrained language-model backbone processes them, the model's output is turned into motor commands, and the loop repeats with a new camera frame](/images/atlas/diagrams/vision-language-action-model.svg)
+
+## Start here: a chatbot that answers with movements
+
+Ask a vision-language model "what is on this table?" and it answers in words. RT-2 kept that exact question-and-answer format but changed the question to "what action should the robot take to [task instruction]?" and trained the model to reply with a short string of numbers that encode an arm movement ([RT-2](https://arxiv.org/abs/2307.15818)).
+
+One control step looks like this:
+
+1. The robot's camera takes a picture. The instruction ("stack the cups") stays the same for the whole task.
+2. The VLA reads both and outputs an action: how far to move the gripper, how to rotate it, whether to open or close it.
+3. The robot carries out the action, the camera takes a new picture, and the loop repeats until the task is done.
+
+What a VLA adds to earlier learned controllers is the knowledge the underlying model picked up from web images and text. In RT-2's tests that showed up as following commands "not present in the robot training data", such as placing an object onto a particular number or icon; simple reasoning, such as picking up "the smallest or largest object"; and, with chain-of-thought prompting, choosing a rock as an improvised hammer ([RT-2](https://arxiv.org/abs/2307.15818)).
+
+## How it works
+
+### 1. Start from a vision-language model
+
+The base is a pretrained vision-language model (VLM): a **vision encoder** that turns the image into a sequence of tokens, and a [transformer](/atlas/concept/transformer-architecture) **language model** that reads those image tokens alongside the text tokens of the instruction. The published VLAs make this concrete:
+
+- **OpenVLA** builds on the Prismatic-7B VLM: a 600M-parameter visual encoder that combines pretrained SigLIP and DINOv2 features, a small 2-layer MLP projector, and a 7B-parameter Llama 2 language model ([OpenVLA](https://arxiv.org/abs/2406.09246)).
+- **π0** starts from PaliGemma, an open 3-billion-parameter VLM ([π0](https://arxiv.org/abs/2410.24164)).
+- **GR00T N1** uses NVIDIA's Eagle-2 VLM, which is fine-tuned from the SmolLM2 language model ([GR00T N1](https://arxiv.org/abs/2503.14734)).
+- **SmolVLA** uses SmolVLM-2 (SigLIP for vision, SmolLM2 for language) and, to run faster, uses only the first 16 layers of its language model ([SmolVLA](https://arxiv.org/abs/2506.01844)).
+
+Many VLAs, including π0.5, GR00T N1 and SmolVLA, also feed in the robot's own state (joint angles, gripper opening), and some take several camera views ([π0.5](https://arxiv.org/abs/2504.16054), [GR00T N1](https://arxiv.org/abs/2503.14734), [SmolVLA](https://arxiv.org/abs/2506.01844)).
+
+### 2. Turn actions into something the model can output
+
+A language model outputs tokens; a robot needs numbers. There are two main ways to bridge that gap.
+
+**Option A: actions as tokens.** RT-2's action is the 6-DoF change in position and rotation of the robot's [end effector](/atlas/concept/end-effector), how far the gripper is open, and a "terminate" flag that ends the episode. Each continuous dimension is "discretized into 256 bins uniformly", so a whole action becomes 8 integers, written as a string such as "1 128 124 136 121 158 111 255". For PaLI-X, which already has a token for every integer up to 1000, the bins reuse those tokens; for PaLM-E, the 256 least-used tokens are overwritten as action tokens. At run time the output is constrained to valid action tokens so the robot is never handed a word it cannot execute ([RT-2](https://arxiv.org/abs/2307.15818)).
+
+OpenVLA uses the same idea with one change: the 256 bins evenly divide the range between the 1st and 99th percentile of the training actions, rather than the minimum and maximum, so outliers do not stretch the bins. It overwrites the last 256 tokens of the Llama tokenizer and trains with ordinary next-token prediction ([OpenVLA](https://arxiv.org/abs/2406.09246)).
+
+Simple per-step binning has a known weakness. The FAST paper, from Physical Intelligence, UC Berkeley and Stanford, found that per-dimension, per-timestep binning "typically perform[s] poorly when learning dexterous skills from high-frequency robot data", and replaced it with a compression-based tokenizer built on the discrete cosine transform; combined with π0 it matched diffusion-style VLAs while cutting training time by up to 5× ([FAST](https://arxiv.org/abs/2501.09747)).
+
+**Option B: a continuous action head.** Instead of picking bins, a separate network generates real-valued actions. π0 adds a 300M-parameter "action expert" to its 3B backbone (3.3B in total) and trains it with **flow matching**, a variant of diffusion: at run time it starts from random noise and integrates a learned vector field, step by step, into a clean set of actions ([π0](https://arxiv.org/abs/2410.24164)). GR00T N1 uses a diffusion transformer trained with flow matching that cross-attends to the VLM's output tokens ([GR00T N1](https://arxiv.org/abs/2503.14734)). SmolVLA's action expert, about 100M of its 450M parameters, is also trained with flow matching and uses 10 integration steps at inference ([SmolVLA](https://arxiv.org/abs/2506.01844)). This is the same family of technique as a [diffusion policy](/atlas/concept/diffusion-policy), attached to a pretrained VLM.
+
+### 3. Predict a chunk of actions, fast enough for the robot
+
+Control rate is the hard engineering problem: a dexterous arm wants fresh commands many times a second, and a model with billions of parameters is slow.
+
+| Model | What the paper reports |
+|---|---|
+| RT-2 | 55B version runs at 1–3 Hz, 5B version at about 5 Hz, served from a multi-TPU cloud service ([RT-2](https://arxiv.org/abs/2307.15818)) |
+| OpenVLA | About 6 Hz on one RTX 4090 GPU, 15 GB of GPU memory in bfloat16 ([OpenVLA](https://arxiv.org/abs/2406.09246)) |
+| π0 | Chunks of 50 future actions; controls robots at up to 50 Hz ([π0](https://arxiv.org/abs/2410.24164)) |
+| GR00T N1 | VLM runs at 10 Hz; action module produces motor actions at 120 Hz; a chunk of 16 actions takes 63.9 ms on an L40 GPU ([GR00T N1](https://arxiv.org/abs/2503.14734)) |
+| Gemini Robotics | Cloud backbone answers in under 160 ms; about 250 ms end-to-end, but an effective control rate of 50 Hz thanks to action chunks ([Gemini Robotics](https://arxiv.org/abs/2503.20020)) |
+
+The trick that closes the gap is **action chunking**: predict several future actions from one observation and execute them one after another, so the robot gets commands at its own rate even though the model runs less often. At 50 Hz, π0's chunk of 50 actions covers one second of motion; in practice π0 executes 25 of them and predicts again every 0.5 seconds ([π0](https://arxiv.org/abs/2410.24164)). SmolVLA goes a step further with **asynchronous inference**, which overlaps predicting the next chunk with executing the current one; on a real pick-and-place task this finished in 9.7 s instead of 13.75 s (about 30% faster), and completed 19 cycles instead of 9 in a fixed time ([SmolVLA](https://arxiv.org/abs/2506.01844)).
+
+### 4. Train on robot demonstrations, plus web data
+
+A VLA learns its actions by [imitation learning](/atlas/concept/imitation-learning): people drive the robot through a task (usually by [teleoperation](/atlas/concept/teleoperation)), and the model is trained to reproduce the recorded actions from the recorded images, which is [behavior cloning](/atlas/concept/behavior-cloning) at very large scale. The datasets are big by robotics standards:
+
+- **Open X-Embodiment** pooled data from 22 different robots, collected by 21 institutions and covering 527 skills (160,266 tasks), and showed that a model trained on this data (RT-X) improved several robots by learning from the others' experience ([Open X-Embodiment](https://arxiv.org/abs/2310.08864)).
+- **OpenVLA** was trained on 970k robot episodes from Open X-Embodiment, on 64 A100 GPUs for 14 days (21,500 A100-hours) ([OpenVLA](https://arxiv.org/abs/2406.09246)).
+- **π0** was pre-trained on about 10,000 hours of demonstrations from 7 robot configurations and 68 tasks, plus a subset of Open X-Embodiment ([π0](https://arxiv.org/abs/2410.24164)).
+- **Gemini Robotics** used thousands of hours of teleoperated demonstrations collected on a fleet of ALOHA 2 robots over 12 months ([Gemini Robotics](https://arxiv.org/abs/2503.20020)).
+- **SmolVLA** went the other way: fewer than 30k episodes, all from public, community-contributed datasets ([SmolVLA](https://arxiv.org/abs/2506.01844)).
+
+The web knowledge is kept by **co-training**. RT-2 found that fine-tuning on robot data mixed with the original web vision-language data, rather than on robot data alone, "leads to more generalizable policies" ([RT-2](https://arxiv.org/abs/2307.15818)). π0.5 leans on it heavily: 97.6% of its first-phase training examples did not come from mobile robots doing household tasks, but from other robots, web data and high-level task labels ([π0.5](https://arxiv.org/abs/2504.16054)). GR00T N1 adds human videos and synthetic "neural trajectories" generated with video models, which multiplied its in-house teleoperation data about tenfold, from 88 to 827 hours ([GR00T N1](https://arxiv.org/abs/2503.14734)).
+
+### 5. Fine-tune for your robot and task
+
+A pretrained VLA is a starting point, not a finished controller. OpenVLA showed that LoRA (low-rank adaptation) fine-tuning, which trains only 1.4% of the parameters, matched full fine-tuning and adapted the model to a new task in 10–15 hours on a single A100 ([OpenVLA](https://arxiv.org/abs/2406.09246)). Gemini Robotics learned new short-horizon tasks "from as few as 100 demonstrations" and was adapted to a bi-arm Franka robot and to Apptronik's Apollo humanoid ([Gemini Robotics](https://arxiv.org/abs/2503.20020)). Physical Intelligence is candid about how far this goes: π0 "was developed for our own robots", and on other platforms it "may or may not work for you" ([openpi](https://github.com/Physical-Intelligence/openpi)).
+
+## Notable VLA models, 2023–2025
+
+| Model | Organisation | First paper | Size | How actions come out | Open weights |
+|---|---|---|---|---|---|
+| RT-2 | Google DeepMind | Jul 2023 | 5B and 55B (PaLI-X), 12B (PaLM-E) | Tokens, 256 bins per dimension | No ([OpenVLA](https://arxiv.org/abs/2406.09246) lists it as closed) |
+| OpenVLA | Stanford, UC Berkeley, Toyota Research Institute, Google DeepMind, Physical Intelligence, MIT | Jun 2024 | 7B | Tokens, 256 bins per dimension | Yes |
+| π0 | Physical Intelligence | Oct 2024 | 3.3B | Flow matching, chunks of 50 | Yes ([openpi](https://github.com/Physical-Intelligence/openpi)) |
+| GR00T N1 | [NVIDIA](/atlas/company/nvidia) | Mar 2025 | 2.2B (released GR00T-N1-2B) | Flow-matching diffusion transformer, chunks of 16 | Yes |
+| Gemini Robotics | Google DeepMind | Mar 2025 | Not published | Cloud backbone plus on-robot action decoder, action chunks | No; the On-Device version is offered to trusted testers ([Google DeepMind](https://deepmind.google/models/model-cards/gemini-robotics-on-device-2/)) |
+| π0.5 | Physical Intelligence | Apr 2025 | No total stated (PaliGemma backbone plus a 300M action expert, as in π0) | Discrete FAST tokens in pre-training, flow-matching action expert in post-training | Yes ([openpi](https://github.com/Physical-Intelligence/openpi)) |
+| SmolVLA | Hugging Face | Jun 2025 | 450M | Flow matching, chunks of 50 | Yes |
+
+Sources for each row: [RT-2](https://arxiv.org/abs/2307.15818), [OpenVLA](https://arxiv.org/abs/2406.09246), [π0](https://arxiv.org/abs/2410.24164), [GR00T N1](https://arxiv.org/abs/2503.14734), [Gemini Robotics](https://arxiv.org/abs/2503.20020), [π0.5](https://arxiv.org/abs/2504.16054), [SmolVLA](https://arxiv.org/abs/2506.01844). Dates are the first arXiv version. Open-weights status checked in November 2026.
+
+**What about Octo?** Octo (UC Berkeley, Stanford, Carnegie Mellon and Google DeepMind, 2024) is often listed alongside VLAs, but its paper calls it a "generalist robot policy": 27M or 93M parameters, a t5-base text encoder and a lightweight CNN instead of a pretrained VLM, and a diffusion action head ([Octo](https://arxiv.org/abs/2405.12213)). It is a close relative, not a VLA.
+
+## Where you'll see it
+
+These are research and developer releases, reported by the developers themselves.
+
+- **Robot-learning labs and hobby arms.** OpenVLA, π0 and π0.5 (through the openpi repository) and SmolVLA are downloadable, so labs can fine-tune instead of training from scratch; SmolVLA was evaluated on the low-cost SO-100 and SO-101 arms with datasets shared on Hugging Face ([OpenVLA](https://arxiv.org/abs/2406.09246), [openpi](https://github.com/Physical-Intelligence/openpi), [SmolVLA](https://arxiv.org/abs/2506.01844)).
+- **Humanoid robots.** NVIDIA deployed GR00T N1 on the Fourier GR-1 [humanoid](/atlas/concept/humanoid-robot) for language-conditioned two-handed manipulation ([GR00T N1](https://arxiv.org/abs/2503.14734)); Google DeepMind adapted Gemini Robotics to Apptronik's Apollo in preliminary experiments ([Gemini Robotics](https://arxiv.org/abs/2503.20020)).
+- **Homes and household chores.** π0.5 cleaned kitchens and bedrooms in homes that were not in its training data, in tasks lasting 10 to 15 minutes ([π0.5](https://arxiv.org/abs/2504.16054)); π0's demonstrations include laundry folding, table cleaning and box assembly ([π0](https://arxiv.org/abs/2410.24164)).
+
+## Limits
+
+- **Speed.** RT-2's authors warn that in "settings that demand high-frequency control, real-time inference may become a major bottleneck" ([RT-2](https://arxiv.org/abs/2307.15818)). OpenVLA runs at about 6 Hz, while the ALOHA setup it names as a target runs at 50 Hz ([OpenVLA](https://arxiv.org/abs/2406.09246)). Chunking helps, but in the simplest synchronous setup the robot does not look again until the whole chunk has been executed ([SmolVLA](https://arxiv.org/abs/2506.01844)).
+- **No new motions from web data.** Web pretraining teaches what things are, not how to move. RT-2 "does not acquire any ability to perform new motions"; its physical skills stay "limited to the distribution of skills seen in the robot data" ([RT-2](https://arxiv.org/abs/2307.15818)).
+- **Reliability.** OpenVLA does "not yet offer very high reliability", "typically achieving <90% success rate" on its tested tasks ([OpenVLA](https://arxiv.org/abs/2406.09246)). π0.5 "still makes mistakes": unfamiliar drawer handles, an arm hiding the spill it should wipe, and opening and closing a drawer repeatedly ([π0.5](https://arxiv.org/abs/2504.16054)).
+- **Data hunger.** π0 (about 10,000 hours) and Gemini Robotics were each trained on thousands of hours of demonstrations, and π0's authors say "it remains unclear how to predict how much and what kind of data is needed to attain near-perfect performance" ([π0](https://arxiv.org/abs/2410.24164)).
+- **Narrow generalisation.** Google DeepMind's model card for Gemini Robotics On-Device states that it is "limited in its ability to generalise to out of distribution tasks as well as controlling high-degree-of-freedom robots", and GR00T N1 "focuses primarily on short-horizon tabletop manipulation tasks" ([model card](https://deepmind.google/models/model-cards/gemini-robotics-on-device-2/), [GR00T N1](https://arxiv.org/abs/2503.14734)).
+- **Safety and wrong actions.** Constraining the output to valid action tokens stops a token-based VLA such as RT-2 from emitting something the robot cannot execute ([RT-2](https://arxiv.org/abs/2307.15818)), but a valid action can still be the wrong one. Google DeepMind's answer is layers: VLA models such as Gemini Robotics need to be "interfaced with" safety-critical lower-level controllers for collision avoidance and force limits ([Gemini Robotics](https://arxiv.org/abs/2503.20020)), and the model card recommends reasoning models for high-level semantic safety, low-level controllers for "collision-free motion planning, balance and force control", plus hardware safety mechanisms ([model card](https://deepmind.google/models/model-cards/gemini-robotics-on-device-2/)).
+
+## VLA vs modular pipeline vs diffusion policy
+
+| | Classic modular pipeline | Imitation-learned policy (e.g. [diffusion policy](/atlas/concept/diffusion-policy)) | Vision-language-action model |
+|---|---|---|---|
+| How it is built | Separate perception, planning and control modules, each engineered and tested | One network trained from scratch on demonstrations of the target tasks | A pretrained VLM fine-tuned on robot demonstrations |
+| Understands language? | Only if a language module is added on top | Only if trained on language-labelled demonstrations | Yes, inherited from the VLM |
+| Knowledge of unseen objects | Only what its perception module was trained to detect | Only what was in the demonstrations | Draws on web pretraining |
+| Size and speed | No large model in the control loop | Small: the from-scratch diffusion baseline in Octo's paper has 28M parameters ([Octo](https://arxiv.org/abs/2405.12213)) | From 450M (SmolVLA) to 55B (largest RT-2); needs chunking or a split design to keep up with the robot |
+| Safety and debugging | Each module can be checked separately | Black box | Black box; paired with classical safety controllers |
+
+The two learned approaches overlap: π0, GR00T N1 and SmolVLA all use a diffusion-style action head. When fine-tuned to new settings, OpenVLA outperformed from-scratch imitation-learning methods such as Diffusion Policy by 20.4% ([OpenVLA](https://arxiv.org/abs/2406.09246)). Adapted to a new robot, Gemini Robotics was on par with or slightly better than a single-task diffusion policy on in-distribution tasks, and consistently better when the visual scene or required actions changed ([Gemini Robotics](https://arxiv.org/abs/2503.20020)).
+
+## Going deeper
+
+- **Two systems: think slowly, act quickly.** GR00T N1 calls its VLM "System 2" and its fast action module "System 1", after Kahneman's model of human thinking, and trains both end-to-end ([GR00T N1](https://arxiv.org/abs/2503.14734)). Gemini Robotics splits along hardware lines instead: a distilled backbone in the cloud and an action decoder on the robot's own computer ([Gemini Robotics](https://arxiv.org/abs/2503.20020)).
+- **Say the plan, then act.** π0.5 first predicts a high-level subtask in words ("pick up the plate") and then the low-level action chunk for it, using the same model for both ([π0.5](https://arxiv.org/abs/2504.16054)). RT-2 showed an earlier version, generating a short plan before its action tokens ([RT-2](https://arxiv.org/abs/2307.15818)).
+- **Open questions the papers list.** OpenVLA's authors ask how the size of the base VLM affects performance, whether co-training with web data substantially helps, and which visual features suit VLAs best ([OpenVLA](https://arxiv.org/abs/2406.09246)). π0's authors ask how pre-training data should be mixed and whether the approach extends to "autonomous driving, navigation, and legged locomotion" ([π0](https://arxiv.org/abs/2410.24164)).
+
+## Why it matters
+
+Conventionally, robot learning has trained "a separate model for every application, every robot, and even every environment" ([Open X-Embodiment](https://arxiv.org/abs/2310.08864)). VLAs aim to replace that with one pretrained model that understands open-ended instructions and can be adapted to a new robot or task with a modest amount of extra data. They are not yet reliable enough to work unsupervised, and they sit on top of, not in place of, classical safety control. But open models such as OpenVLA, π0 and SmolVLA mean anyone with a single capable GPU can now study and fine-tune one, which puts a central question of [embodied AI](/atlas/concept/embodied-ai), whether one model can learn to act across many robots and tasks, within reach of many more labs.
+
+## Common questions
+
+### What is a VLA model in simple terms?
+
+It is an AI model that looks at a robot's camera image, reads an instruction such as "stack the cups", and outputs the robot's next movements. It is built from a vision-language model, the kind that can describe pictures, retrained to answer with motor commands instead of words, and it runs in a loop: move, look again, decide again.
+
+### What is the difference between a VLM and a VLA?
+
+A vision-language model (VLM) takes images and text and outputs text. A vision-language-action model (VLA) starts from a VLM and adds actions as an output, either as special action tokens (RT-2, OpenVLA) or through an extra action head trained with flow matching or diffusion (π0, GR00T N1, SmolVLA). The VLA is then trained on robot demonstrations so its outputs become movements a real robot can carry out.
+
+### Can I run a VLA model on my own computer?
+
+Some of them. OpenVLA needs about 15 GB of GPU memory and runs at about 6 Hz on an RTX 4090 ([OpenVLA](https://arxiv.org/abs/2406.09246)); the openpi repository, which hosts π0 and π0.5, lists more than 8 GB of GPU memory for inference and more than 22.5 GB for LoRA fine-tuning ([openpi](https://github.com/Physical-Intelligence/openpi)); SmolVLA was designed to be trained on a single GPU and deployed on consumer-grade GPUs "or even CPUs" ([SmolVLA](https://arxiv.org/abs/2506.01844)). Getting good results on your own robot still means collecting demonstrations and fine-tuning.
+
+## Related
+
+[Foundation models in robotics](/atlas/concept/foundation-model-robotics) · [Imitation learning](/atlas/concept/imitation-learning) · [Behavior cloning](/atlas/concept/behavior-cloning) · [Diffusion policy](/atlas/concept/diffusion-policy) · [Embodied AI](/atlas/concept/embodied-ai) · [Reinforcement learning](/atlas/concept/reinforcement-learning)

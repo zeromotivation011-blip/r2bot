@@ -6,7 +6,8 @@ summary: >-
   can be adapted to many tasks — and researchers are now applying them to
   robotics so that a single model can control arms, interpret instructions, and
   reason about novel situations.
-seeAlso: []
+seeAlso:
+  - vision-language-action-model
 sources:
   - title: >-
       Bommasani et al. — On the Opportunities and Risks of Foundation Models
@@ -61,7 +62,7 @@ Traditional robot learning trains one model per task, in one environment. A mode
 
 ## RT-2: a concrete example
 
-In 2023, Google DeepMind published RT-2 (Robotics Transformer 2), a vision-language-action model. It was built by taking a large vision-language model already trained on billions of internet images and text, and fine-tuning it to output robot arm commands. The result: the robot could follow instructions like "move the extinct animal to the left" — identifying that a toy dinosaur was the extinct animal, a concept it had inferred from its internet-scale pretraining, not from robot-specific data.
+In 2023, Google DeepMind published RT-2 (Robotics Transformer 2), a [vision-language-action model](/atlas/concept/vision-language-action-model). It was built by taking a large vision-language model already trained on billions of internet images and text, and fine-tuning it to output robot arm commands. The result: the robot could follow instructions like "move the extinct animal to the left" — identifying that a toy dinosaur was the extinct animal, a concept it had inferred from its internet-scale pretraining, not from robot-specific data.
 
 ## The honest state of play
 
