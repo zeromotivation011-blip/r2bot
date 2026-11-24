@@ -340,6 +340,14 @@ const EXTRAS: Record<string, Omit<RobotExtra, 'videoId'>> = {
   'aethon-tug': { tags: ['service', 'hospital', 'usa', 'amr', 'historic'], familyTree: null },
   rewalk: { tags: ['medical', 'exoskeleton', 'israel', 'wearable'], familyTree: null },
   temi: { tags: ['service', 'companion', 'israel', 'telepresence'], familyTree: null },
+  // Years: turtlebot.com/about (TurtleBot 1 Nov 2010, TurtleBot 2 Oct 2012, TurtleBot 3 May 2017);
+  // TurtleBot 4 launched 4 May 2022 (Clearpath Robotics release).
+  'turtlebot-4': { tags: ['educational', 'ros2', 'mobile-robot', 'research', 'canada'], familyTree: [
+      { name: 'TurtleBot', year: 2010 },
+      { name: 'TurtleBot 2', year: 2012 },
+      { name: 'TurtleBot 3', year: 2017 },
+      { name: 'TurtleBot 4', slug: 'turtlebot-4', year: 2022, isCurrent: true },
+    ] },
 };
 
 /** Get extra (tags, videoId, familyTree) for a given robot. */

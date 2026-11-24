@@ -1,5 +1,5 @@
 // lib/robots-data.ts
-// Profile data for 61 famous robots — powers /robots and /robots/[slug]
+// Profile data for 62 famous robots — powers /robots and /robots/[slug]
 // Every entry carries `sources` (2+ fetched URLs) and `lastVerified`; scripts/check-robots.mjs enforces the invariants.
 // 2026 redesign: curiosity-first (hook line, stat chips, "in one sentence", wow factors, popCulture, teamBehind, fameRank).
 
@@ -4094,6 +4094,80 @@ const ROBOTS_UNSORTED: Robot[] = [
       { name: 'TIME — Best Inventions 2019: temi', url: 'https://time.com/collection/best-inventions-2019/5733106/temi' },
     ],
     lastVerified: '2026-11-09',
+  },
+  {
+    slug: 'turtlebot-4',
+    fameRank: 62,
+    name: 'TurtleBot 4',
+    emoji: '🐢',
+    maker: 'Clearpath Robotics and Open Robotics (iRobot Create 3 base)',
+    country: 'Canada',
+    countryFlag: '🇨🇦',
+    year: 2022,
+    type: 'educational',
+    status: 'active',
+    oneLiner: 'The small round robot many students meet first when they learn ROS 2: a lidar, a depth camera and a Raspberry Pi on an iRobot Create 3 base.',
+    hookLine: 'It maps a room, plans a path across it and drives home to charge, and every step runs on open ROS 2 code you can read and change.',
+    statChips: [
+      { icon: '📅', text: 'Launched 2022' },
+      { icon: '⚖️', text: '3.9 kg, 9 kg payload' },
+      { icon: '🔋', text: '2.5 to 4 h runtime' },
+      { icon: '💵', text: 'From US$1,195 at launch (2022)' },
+    ],
+    inOneSentence: 'TurtleBot 4 is a low-cost mobile robot for learning ROS 2 that maps rooms with a spinning laser scanner, sees depth with a stereo camera and drives itself back to its dock to charge.',
+    wowFactors: [
+      'It can carry up to 9 kg, more than twice its own 3.9 kg weight, which leaves room to add your own sensors and payloads.',
+      'It arrives fully assembled with ROS 2 pre-installed, plus a Gazebo simulation model, so you can practise on a virtual copy before driving the real one.',
+      'Every sensor reading is published as a ROS 2 topic over the network, so code on your laptop can see what the robot sees.',
+    ],
+    howItWorksSteps: [
+      'The iRobot Create 3 base drives the wheels and fuses its IMU, optical floor tracking sensor and wheel encoders into an estimate of how far the robot has moved.',
+      'An RPLIDAR A1M8 on top spins a laser through 360 degrees and measures distances up to 12 m, giving a 2D scan of the room.',
+      'A front-facing OAK-D stereo camera, which Clearpath describes as a spatial AI camera, adds depth and colour images.',
+      'A Raspberry Pi 4B runs ROS 2, turning the scans and odometry into a map (SLAM) and planning paths through it with the navigation tools covered in the user manual.',
+      'When the 26 Wh battery runs low, the robot finds its charging dock and parks itself to recharge in about 2.5 hours.',
+    ],
+    popCulture: 'TurtleBot is one of the best-known robots in the ROS community: at the 2022 launch TurtleBot co-creator Tully Foote of Open Robotics said more than 16,000 TurtleBots were already out in the world. The line runs from the 2010 Willow Garage original through TurtleBot 2 (2012) and TurtleBot 3 (2017) to this fourth generation.',
+    teamBehind: 'Built by Clearpath Robotics, a Canadian maker of research robots, with Open Robotics, the maintainers of ROS and Gazebo. The base is the iRobot Create 3 educational robot. The original TurtleBot was created at Willow Garage in 2010 by Melonee Wise and Tully Foote.',
+    description:
+      'TurtleBot 4 is a small, round mobile robot made for learning and research with ROS 2, the open-source Robot Operating System. It is the fourth generation of a line that began at Willow Garage in 2010. Clearpath Robotics and Open Robotics launched it on 4 May 2022, built on the iRobot Create 3 educational base, in two versions. The Standard is 351 mm tall, weighs 3.9 kg and adds a sensor tower, a small display, user buttons and an OAK-D Pro depth camera; the Lite is 192 mm tall, weighs 3.3 kg and carries an OAK-D Lite. Both share a 342 by 339 mm footprint, a Raspberry Pi 4B with 4 GB of memory, an RPLIDAR A1M8 laser scanner with a 12 m range, and a 26 Wh battery that lasts 2.5 to 4 hours. They carry up to 9 kg, drive at 0.31 m/s in safe mode and dock themselves to charge. Launch prices from Clearpath started at US$1,850 for the Standard and US$1,195 for the Lite, with shipping from July 2022. Current software targets ROS 2 Humble and Jazzy.',
+    specs: {
+      height: '351 mm (Lite 192 mm); footprint 342 × 339 mm',
+      weight: '3.9 kg (Lite 3.3 kg)',
+      speed: '0.31 m/s in safe mode, 0.46 m/s without',
+      payload: '9 kg max',
+      battery: '26 Wh Li-ion, 2.5 to 4 h, 2.5 h to charge',
+    },
+    capabilities: [
+      '2D mapping and localization (SLAM) with a 360-degree lidar',
+      'Autonomous navigation with ROS 2',
+      'Depth and colour vision from an OAK-D camera',
+      'Automatic docking and charging',
+      'Sensor data published as ROS 2 topics',
+      'Expansion with extra sensors and payloads up to 9 kg',
+    ],
+    funFacts: [
+      'The first TurtleBot, in 2010, was also built on an iRobot Create base, so the fourth generation went back to the same family of base.',
+      'The Standard model has a 128 × 64 pixel screen and four buttons you can program from your own ROS 2 code.',
+      'The OAK-D Pro on the Standard model has an infrared dot projector and illumination LED, which help it judge depth in low light.',
+    ],
+    imageAlt: 'TurtleBot 4 mobile robot with a lidar and depth camera on a round iRobot Create 3 base',
+    metaTitle: 'TurtleBot 4 — Specs, Price & How It Works',
+    metaDescription:
+      'TurtleBot 4 ROS 2 robot: iRobot Create 3 base, RPLIDAR A1M8, OAK-D camera, Raspberry Pi 4B, 9 kg payload, from US$1,195 at launch. Sourced specs.',
+    atlasSlug: 'ros2',
+    atlasLearnLinks: [
+      { label: 'ROS 2 — Atlas', href: '/atlas/concept/ros2' },
+      { label: 'SLAM — Atlas', href: '/atlas/concept/slam' },
+      { label: 'LiDAR — Atlas', href: '/atlas/concept/lidar' },
+    ],
+    sources: [
+      { name: 'TurtleBot 4 User Manual — Features and specifications', url: 'https://turtlebot.github.io/turtlebot4-user-manual/overview/features.html' },
+      { name: 'TurtleBot 4 User Manual — Basic setup (ROS 2 distributions)', url: 'https://turtlebot.github.io/turtlebot4-user-manual/setup/basic.html' },
+      { name: 'Clearpath Robotics — Clearpath Robotics launches TurtleBot 4 (4 May 2022)', url: 'https://store.clearpathrobotics.com/blogs/blog/clearpath-robotics-launches-turtlebot-4' },
+      { name: 'TurtleBot.com — About TurtleBot (history)', url: 'https://www.turtlebot.com/about' },
+    ],
+    lastVerified: '2026-11-24',
   },
 ];
 
