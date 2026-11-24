@@ -1,0 +1,88 @@
+---
+title: Teoria de helicoides
+summary: >-
+  A teoria de helicoides descreve todo movimento de um objeto rígido como um único movimento
+  helicoidal (girar em torno de um único eixo enquanto desliza ao longo dele) e toda força sobre esse
+  objeto como um helicoide correspondente de força e torque. A robótica a usa para escrever o
+  movimento, a velocidade e as forças de um braço robótico em uma única linguagem compacta.
+laymanExplanation: >-
+  Pense em um parafuso entrando na madeira: ele gira e avança ao mesmo tempo. A teoria de helicoides
+  diz que qualquer jeito de um objeto sólido se mover, por mais complicado que seja, pode ser
+  descrito como um único movimento desse tipo em torno de uma única linha. Uma dobradiça é um parafuso que
+  só gira; uma gaveta é um parafuso que só desliza. Com as forças acontece o mesmo: um empurrão mais
+  uma torção ao longo de uma mesma linha. Braços robóticos são feitos de dobradiças e corrediças, então
+  essa única ideia descreve o braço inteiro.
+sourceLastReviewed: 2026-11-21
+reviewed: 2026-11-24
+---
+
+A **teoria de helicoides** (*screw theory*) é uma forma de descrever movimento e força em que todo movimento de um objeto sólido é um único **movimento helicoidal**, como o de um parafuso: um giro em torno de um eixo combinado com um deslizamento ao longo desse mesmo eixo. Toda força sobre o objeto, incluindo qualquer efeito de torção, é descrita da mesma maneira. A robótica a usa porque ela permite que um conjunto compacto de números descreva o que as juntas de um braço robótico fazem, a que velocidade a mão se move e com que força ela consegue empurrar.
+
+## Comece aqui: o parafuso na sua mão
+
+Aperte um parafuso em um pedaço de madeira. Ele gira e avança ao mesmo tempo, ao longo de uma única linha. Agora observe dois extremos do dia a dia:
+
+- Uma **porta na dobradiça** gira, mas nunca desliza ao longo da linha da dobradiça. É um helicoide sem nenhum avanço.
+- Uma **gaveta** desliza, mas nunca gira. É um helicoide que é só avanço.
+
+A parte surpreendente é que *qualquer* jeito de um objeto rígido se mover, por mais retorcida que pareça a trajetória, pode ser descrito como um único movimento helicoidal em torno de uma linha no espaço. Esse resultado é conhecido como **teorema de Chasles–Mozzi** ([Lynch & Park, cap. 3](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)). Assim, em vez de acompanhar um emaranhado de rotações e translações, você só precisa do eixo do helicoide, de quanto ele girou e de quanto deslizou.
+
+## Como funciona: heligiros, heliforças e passo
+
+A teoria de helicoides oferece dois objetos que se correspondem, cada um uma lista de seis números ([Lynch & Park, cap. 3](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)):
+
+| Objeto | Descreve | Seis números formados por | Imagem do dia a dia |
+|---|---|---|---|
+| **Heligiro** (*twist*) | Como um corpo está se movendo neste instante | velocidade angular (3) + velocidade linear (3) | um parafuso que gira e avança |
+| **Heliforça** (*wrench*) | A força que atua sobre um corpo | momento, ou seja, efeito de torção (3) + força (3) | girar uma chave de fenda enquanto empurra |
+
+O **passo** de um helicoide é quanto ele desliza ao longo do seu eixo para cada unidade de rotação. As juntas de um robô se encaixam direitinho nessa ideia:
+
+| Junta | O que faz | Passo |
+|---|---|---|
+| Rotativa (dobradiça) | só gira | zero |
+| Prismática (corrediça) | só translada | infinito (translação pura) |
+| Helicoidal (fuso) | gira e translada ao mesmo tempo | um valor fixo e finito |
+
+Heligiros e heliforças se encaixam: o produto escalar de um heligiro e uma heliforça (multiplique os componentes correspondentes e some tudo) dá a **potência**, a taxa com que a força realiza trabalho sobre o corpo em movimento ([Lynch & Park, cap. 3](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)). É por isso que um mesmo arcabouço serve tanto para “para onde a mão está indo?” quanto para “com quanta força ela consegue empurrar?”.
+
+```diagram
+{ "type": "flow", "title": "De um eixo a um braço robótico inteiro", "nodes": ["Cada junta = um eixo helicoidal", "A junta se move → heligiro", "Encadear as juntas (produto de exponenciais)", "Pose da mão + jacobiano"], "caption": "Uma dobradiça é um helicoide de passo zero; uma corrediça, um de passo infinito. Encadear o movimento helicoidal de cada junta dá a posição da mão do robô, e os eixos helicoidais das juntas formam as colunas do seu jacobiano." }
+```
+
+## Onde você vai encontrá-la
+
+- **Cinemática de braços robóticos.** Na formulação do *produto de exponenciais*, a [cinemática direta](/atlas/concept/forward-kinematics) é escrita tomando a pose da mão com todas as juntas em zero e aplicando, em seguida, o movimento helicoidal de cada junta, uma por vez. Você só precisa dos eixos das juntas e dessa única pose “inicial”, e não de um referencial em cada elo ([Lynch & Park, cap. 4](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)).
+- **O jacobiano.** O [jacobiano](/atlas/concept/jacobian), que converte as velocidades das juntas na velocidade da mão, tem como colunas os eixos helicoidais das juntas (na pose atual) ([Lynch & Park, cap. 5](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)).
+- **Preensão e contato.** Quando dedos seguram um objeto, cada contato só consegue empurrar em certas direções; descrever essas forças como heliforças permite verificar se uma preensão resiste a qualquer empurrão ([Murray, Li & Sastry, cap. 5](https://pages.github.berkeley.edu/EECS-106/fa24-site/assets/MLS.pdf)).
+- **Ensino.** O livro-texto *Modern Robotics* (Lynch & Park, 2017), cuja versão preliminar pode ser lida gratuitamente on-line, constrói todo o seu tratamento da cinemática sobre helicoides.
+
+## Para se aprofundar
+
+Para quem já tem familiaridade com álgebra linear: o conjunto de poses de um corpo rígido forma o grupo **SE(3)**, e os heligiros vivem na sua álgebra de Lie **se(3)**. Um movimento helicoidal de ângulo θ em torno do eixo S é a exponencial de matriz e^[S]θ, então uma cadeia de juntas é um produto de exponenciais: T(θ) = e^[S₁]θ₁ · e^[S₂]θ₂ ⋯ e^[Sₙ]θₙ · M, em que M é a pose inicial ([Lynch & Park, caps. 3–4](https://hades.mech.northwestern.edu/index.php/Modern_Robotics); [Murray, Li & Sastry, caps. 2–3](https://pages.github.berkeley.edu/EECS-106/fa24-site/assets/MLS.pdf)).
+
+Em comparação com os [parâmetros de Denavit-Hartenberg](/atlas/concept/denavit-hartenberg), essa abordagem dispensa as regras para posicionar um referencial em cada elo, e os eixos das juntas podem ser lidos diretamente em um desenho do robô. O preço é mais matemática logo de início.
+
+A teoria em si é bem mais antiga que os robôs: *A Treatise on the Theory of Screws* (Cambridge, 1900), de Robert Stawell Ball, apresentou helicoides, heligiros e heliforças para a mecânica muito antes de alguém aplicá-los a braços robóticos ([Ball, 1900](https://archive.org/download/theoryscrews00ballrich/theoryscrews00ballrich.pdf)).
+
+## Por que isso importa
+
+A teoria de helicoides transforma o movimento de um robô em geometria que dá para enxergar: cada junta é uma linha no espaço, e cada movimento e cada força são medidos ao longo dessas linhas. Com isso, cinemática, velocidade e força viram um único assunto em vez de três, e é por isso que os cursos modernos de robótica a ensinam.
+
+## Perguntas frequentes
+
+### O que é a teoria de helicoides, em palavras simples?
+
+É a ideia de que qualquer movimento de um objeto sólido pode ser descrito como um único movimento parecido com o de um parafuso, girando em torno de uma linha enquanto desliza ao longo dela, e de que qualquer força sobre o objeto pode ser descrita do mesmo jeito. Braços robóticos são cadeias de dobradiças e corrediças, então isso dá uma única linguagem para o braço inteiro.
+
+### Qual é a diferença entre um heligiro e uma heliforça?
+
+Um heligiro (*twist*) descreve movimento: com que rapidez o corpo está girando e se deslocando. Uma heliforça (*wrench*) descreve força: com que intensidade ele está sendo empurrado e torcido. Os dois são seis números construídos em torno de um eixo helicoidal, e o produto escalar entre eles dá a potência.
+
+### A teoria de helicoides é melhor que Denavit-Hartenberg?
+
+Nenhuma das duas está errada; ambas dão a mesma pose do robô. A teoria de helicoides (produto de exponenciais) não precisa de um referencial em cada elo, e os eixos das juntas são fáceis de ler em um desenho. Denavit-Hartenberg usa apenas quatro números por junta, mas cada elo precisa de um referencial posicionado segundo regras rígidas ([Lynch & Park, apêndice C](https://hades.mech.northwestern.edu/index.php/Modern_Robotics)).
+
+## Relacionados
+
+[Cinemática direta](/atlas/concept/forward-kinematics) · [Jacobiano](/atlas/concept/jacobian) · [Denavit-Hartenberg](/atlas/concept/denavit-hartenberg) · [Transformação homogênea](/atlas/concept/homogeneous-transformation) · [Velocidade angular](/atlas/concept/angular-velocity)
