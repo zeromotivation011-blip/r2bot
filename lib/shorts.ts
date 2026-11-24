@@ -4,6 +4,7 @@
 
 import { SHORTS_MORE } from '@/lib/shorts-more'
 import { SHORTS_SCHEDULED, SCHEDULED_EXTRA_VIDEOS } from '@/lib/shorts-scheduled'
+import { SHORTS_SCHEDULED_DEC, DEC_EXTRA_VIDEOS } from '@/lib/shorts-scheduled-dec'
 
 export type DemoKind = 'echo' | 'feedback' | 'gears' | 'tilt' | 'loop'
 
@@ -415,7 +416,11 @@ export const SHORTS: ShortLesson[] = [
   ...BASE_SHORTS.map((s) => withVideoDate(s)),
   ...SHORTS_MORE.map((s) => withVideoDate(s)),
   ...SHORTS_SCHEDULED,
-].map((s) => (SCHEDULED_EXTRA_VIDEOS[s.slug] ? { ...s, extraVideos: SCHEDULED_EXTRA_VIDEOS[s.slug] } : s))
+  ...SHORTS_SCHEDULED_DEC,
+].map((s) => {
+  const extra = [...(SCHEDULED_EXTRA_VIDEOS[s.slug] ?? []), ...(DEC_EXTRA_VIDEOS[s.slug] ?? [])]
+  return extra.length ? { ...s, extraVideos: extra } : s
+})
 
 export const getShort = (slug: string) => SHORTS.find((s) => s.slug === slug)
 
