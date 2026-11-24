@@ -1,0 +1,179 @@
+---
+title: Force Control
+slug: force-control
+bucket: concept
+category: control
+summary: >-
+  Force control is the family of methods that let a robot regulate how hard it pushes on the world,
+  not just where it moves. It is what lets an arm polish a curved surface with steady pressure, slide
+  a part into a tight hole, or stop the moment it touches a person.
+difficulty: 4
+tags:
+  - control
+  - force-control
+  - manipulation
+  - contact
+  - interaction
+seeAlso:
+  - impedance-control
+  - admittance-control
+  - force-torque-sensor
+  - peg-in-hole
+  - remote-center-of-compliance
+  - collaborative-robot
+lastReviewed: 2026-11-24T00:00:00.000Z
+sources:
+  - title: 'Modern Robotics, Chapter 11.5 Force Control and 11.6 Hybrid Motion-Force Control — Lynch & Park (Cambridge University Press, 2017)'
+    url: 'https://modernrobotics.northwestern.edu/?p=128'
+  - title: 'Hybrid Position/Force Control of Manipulators — Raibert & Craig (ASME J. Dynamic Systems, Measurement, and Control 103(2):126–133, 1981)'
+    url: 'https://doi.org/10.1115/1.3139652'
+  - title: 'Compliance and Force Control for Computer Controlled Manipulators — Mason (IEEE Trans. Systems, Man, and Cybernetics 11(6):418–432, 1981)'
+    url: 'https://doi.org/10.1109/TSMC.1981.4308708'
+  - title: 'Impedance Control: An Approach to Manipulation: Part I—Theory — Hogan (ASME J. Dynamic Systems, Measurement, and Control 107(1):1–7, 1985)'
+    url: 'https://doi.org/10.1115/1.3140702'
+  - title: 'Unified Impedance and Admittance Control — Ott, Mukherjee & Nakamura (2010 IEEE International Conference on Robotics and Automation, pp. 554–561)'
+    url: 'https://doi.org/10.1109/ROBOT.2010.5509861'
+  - title: 'Quasi-Static Assembly of Compliantly Supported Rigid Parts — Whitney (ASME J. Dynamic Systems, Measurement, and Control 104(1):65–77, 1982)'
+    url: 'https://doi.org/10.1115/1.3149634'
+  - title: 'Force Feedback Control of Manipulator Fine Motions — Whitney (ASME J. Dynamic Systems, Measurement, and Control 99(2):91–97, 1977)'
+    url: 'https://doi.org/10.1115/1.3427095'
+  - title: 'Historical Perspective and State of the Art in Robot Force Control — Whitney (International Journal of Robotics Research 6(1):3–14, 1987)'
+    url: 'https://doi.org/10.1177/027836498700600101'
+  - title: 'Force Control — Villani & De Schutter, Springer Handbook of Robotics, 2nd ed., ch. 9 (2016)'
+    url: 'https://doi.org/10.1007/978-3-319-32552-1_9'
+  - title: 'force_mode(task_frame, selection_vector, wrench, type, limits) — Universal Robots script manual'
+    url: 'https://www.universal-robots.com/manuals/EN/HTML/SW10_7/Content/prod-scriptmanual/G5/force_mode_task_frame_selection_vector.htm'
+  - title: 'LBR iiwa — KUKA (joint torque sensors in all seven axes)'
+    url: 'https://www.kuka.com/en-ch/products/robotics-systems/industrial-robots/lbr-iiwa'
+laymanExplanation: >-
+  Most robot arms are built to go to a position and stay there, whatever is in the way. That is
+  fine in empty air and a problem the moment the robot touches something: a tool held a hair too
+  low presses far too hard, and one held a hair too high misses the surface. Force control adds a
+  sense of touch. The robot measures how hard it is pushing and adjusts its motion to keep that
+  push where it should be, the way your hand keeps steady pressure on a sponge while you wipe a
+  table you cannot see perfectly.
+technicalDefinition: >-
+  Force control regulates the interaction wrench between a manipulator and its environment. Direct
+  (explicit) force control closes a loop on a measured or estimated wrench, typically
+  tau = g(theta) + J^T(theta) [F_d + K_p (F_d - F) + K_i ∫(F_d - F) dt]. Indirect methods
+  (impedance and admittance control) regulate the dynamic relation between motion and force instead
+  of the force itself. Hybrid position/force control splits the task space, using the natural and
+  artificial constraints of the contact, into directions that are force-controlled and directions
+  that are position-controlled.
+quizQuestion:
+  q: A robot is polishing a flat table top. In hybrid position/force control, which direction is usually force-controlled?
+  options:
+    - The direction pressing into the table (normal to the surface)
+    - The direction the tool slides along the table
+    - Every direction at once
+    - None — polishing only needs position control
+  answer: 0
+  explanation: >-
+    The table stops the tool moving into it, so that direction cannot be position-controlled
+    usefully; the robot controls the pressing force there instead. Along the surface the tool is
+    free to move, so those directions follow a position or velocity path.
+---
+
+**Force control** is the set of methods that let a robot regulate how hard it pushes on the world, not just where it moves. Instead of only commanding "go to this point," a force-controlled robot can be told "press down with 10 newtons while you slide along here," and it uses sensing to keep that force where it should be. It is behind robots that polish surfaces, fit tight parts together, can be guided by hand and work safely next to people.
+
+![Diagram of hybrid position/force control on a polishing robot: the tool slides along the surface under position control while the direction pressing into the surface is under force control, with a force sensor feeding the measured push back to the controller](/images/atlas/diagrams/force-control.svg)
+
+## Start here: why "go to this point" fails on contact
+
+Picture a robot arm holding a sanding pad over a table. In free air, position control is perfect: the arm reaches the commanded spot to a fraction of a millimetre and holds it.
+
+Now let the pad touch the table. If the table is a little higher than the robot's program thinks, a stiff arm keeps driving toward the point it was told to reach, and the force builds very quickly because neither the arm nor the table gives much: small errors in position produce large contact forces ([Raibert & Craig, 1981](https://doi.org/10.1115/1.3139652)). If the table is a little lower, the pad floats above it and sands nothing. Real parts are never exactly where the program says, so a robot that can only control position is either crushing or missing.
+
+People solve this without thinking. When you wipe a table, you do not plan the exact height of your hand; you keep a comfortable pressure and let your hand follow the surface. Force control gives a robot the same habit: **measure the push, compare it with the push you want, and move to correct the difference.**
+
+## How it works
+
+### 1. Measure (or estimate) the force
+
+A controller can only regulate what it can sense. Robots get force information in three common ways:
+
+| Sensing method | Where it sits | Notes |
+|---|---|---|
+| Six-axis [force-torque sensor](/atlas/concept/force-torque-sensor) | Between the wrist and the tool | Measures the full push and twist (the *wrench*) at the tool ([Lynch & Park, 11.5](https://modernrobotics.northwestern.edu/?p=127)); Raibert and Craig chose a wrist sensor because it needs only small corrections for the tool's own dynamics ([Raibert & Craig, 1981](https://doi.org/10.1115/1.3139652)) |
+| Joint torque sensors | Inside each joint | KUKA's LBR iiwa has them in all seven axes, which is how it detects contact and works next to people ([KUKA](https://www.kuka.com/en-ch/products/robotics-systems/industrial-robots/lbr-iiwa)) |
+| No force sensor | Software only | The controller commands torques from the robot's model using only joint angles, or infers force from motor currents; it works, but accuracy is limited by how well the model captures gravity, friction and inertia ([Lynch & Park, 11.5](https://modernrobotics.northwestern.edu/?p=127); [Raibert & Craig, 1981](https://doi.org/10.1115/1.3139652)) |
+
+### 2. Turn a desired force into joint torques
+
+For a robot that is still or moving slowly, the torques needed to push with a wrench **F** at the tool are set by the arm's [Jacobian](/atlas/concept/jacobian): torque = gravity compensation + **Jᵀ F**. *Jᵀ* (the Jacobian transposed) is the bridge from "force at the hand" to "torque at each joint." Commanding that torque with no force measurement at all is already a simple force controller, because the only feedback it needs is the joint angles ([Lynch & Park, 11.5](https://modernrobotics.northwestern.edu/?p=127)).
+
+Adding a force sensor closes the loop. The law Lynch and Park give adds a proportional term and an integral term on the force error (desired minus measured):
+
+```
+τ = g(θ) + Jᵀ(θ) · [ F_d + K_p·(F_d − F) + K_i·∫(F_d − F) dt ]
+```
+
+In theory the integral term removes a constant force error, such as one caused by an imperfect gravity model. A derivative term is usually left out, for two reasons: in a simple rigid-body model there are no dynamics between the joint torques and the force at the tool for it to act on, and force-torque sensors are noisy, so differentiating their signal amplifies the noise (in practice the readings are low-pass filtered) ([Lynch & Park, 11.5](https://modernrobotics.northwestern.edu/?p=127)). This is called **direct** or **explicit** force control, because the controller works on the force itself.
+
+### 3. Decide which directions get force and which get motion
+
+A robot almost never needs to control force in every direction. A polishing pad has to press *into* the surface but slide freely *along* it. Matt Mason formalised this (an MIT memo in 1979, the journal paper in 1981): the contact itself imposes **natural constraints** (the table stops motion into it, and a frictionless surface cannot push sideways), and the task adds **artificial constraints**, the force or motion you want in the directions left over ([Mason, 1981](https://doi.org/10.1109/TSMC.1981.4308708); summarised in [Raibert & Craig, 1981](https://doi.org/10.1115/1.3139652)).
+
+Marc Raibert and John Craig built a controller on it, published in 1981: **hybrid position/force control**. A *selection matrix* marks each direction of a chosen task frame as force-controlled or position-controlled, and two loops run side by side, each acting only on its own directions ([Raibert & Craig, 1981](https://doi.org/10.1115/1.3139652)). Lynch and Park's textbook example is opening a door: once the gripper holds the handle, it can only move one way (rotating about the hinges), so that one direction is motion-controlled and the other five are force-controlled ([Lynch & Park, 11.6](https://modernrobotics.northwestern.edu/?p=128)).
+
+### 4. Or control the relationship instead of the force
+
+The second big family is **indirect** force control. Rather than chase a force number, the robot is made to behave like a spring and damper around its planned path, so contact force follows from how far the world pushes it off that path. Neville Hogan's 1985 three-part paper framed this as [impedance control](/atlas/concept/impedance-control), arguing that controlling position or force alone is not enough once a robot is coupled to what it handles; its dynamic behaviour has to be controlled too ([Hogan, 1985](https://doi.org/10.1115/1.3140702)). The same goal is implemented in two ways. In impedance control the controller turns motion error into commanded force, which needs torque-controlled joints. Its mirror image, [admittance control](/atlas/concept/admittance-control), turns measured force into a motion command for an accurate position controller, which suits highly geared industrial arms. Their strengths are complementary: impedance control stays stable against stiff surfaces but is less accurate in free motion, and admittance control is the reverse ([Ott, Mukherjee & Nakamura, 2010](https://doi.org/10.1109/ROBOT.2010.5509861)).
+
+## The approaches side by side
+
+| Approach | What it controls | Needs | Best at | Watch out for |
+|---|---|---|---|---|
+| **Passive compliance** (e.g. a [remote centre of compliance](/atlas/concept/remote-center-of-compliance)) | Nothing actively: a mechanical spring lets the part self-align | A compliant wrist device, no software | Inserting pegs and shafts | Fixed behaviour; its stiffness and centre are chosen for the parts |
+| **Direct force control** | The contact force itself | Force sensing in the controlled directions | Steady pressing force: polishing, grinding, testing | Can accelerate away if contact is lost; can oscillate on very stiff surfaces |
+| **Hybrid position/force** | Force in some directions, position in the rest | A task frame that matches the contact geometry | Surface following, door opening, [peg-in-hole](/atlas/concept/peg-in-hole) | Misaligned task frame makes the two loops fight |
+| **Impedance control** | The motion-to-force relationship (virtual stiffness and damping) | Torque control: joint torque sensing, or low-friction, [back-drivable](/atlas/concept/backdrivability) drives | Stable contact, even with stiff surfaces | Force is only indirectly set; friction hurts accuracy in free motion |
+| **Admittance control** | The force-to-motion relationship | A force sensor plus an accurate position controller | Accurate free motion; giving highly geared industrial arms a soft touch | Can become unstable against very stiff surfaces |
+
+*Table sources: [Whitney, 1982](https://doi.org/10.1115/1.3149634) (passive compliance); [Lynch & Park, 11.5–11.6](https://modernrobotics.northwestern.edu/?p=128) and [Raibert & Craig, 1981](https://doi.org/10.1115/1.3139652) (direct and hybrid); [Ott, Mukherjee & Nakamura, 2010](https://doi.org/10.1109/ROBOT.2010.5509861) (impedance and admittance).*
+
+## A real example: force mode on a Universal Robots arm
+
+Universal Robots' scripting language exposes the same split Raibert and Craig used: a task frame plus a selection vector. The `force_mode` command takes a **task frame**, a six-entry **selection vector** of 0s and 1s (1 means "be compliant along, or about, this axis and control force or torque there"), a target **wrench**, a frame **type**, and **limits**. Along compliant axes the robot adjusts its position to reach the requested force, with the limit capping its speed; along the other axes it follows the program, with the limit capping how far it may drift from it ([Universal Robots script manual](https://www.universal-robots.com/manuals/EN/HTML/SW10_7/Content/prod-scriptmanual/G5/force_mode_task_frame_selection_vector.htm)).
+
+For a sanding job you would align the task frame with the work surface, set the selection vector to 1 only for the axis pointing into the surface, ask for a modest force there (say 10 N), and let a normal move command carry the pad along the surface. The manual also notes that the force actually applied may be lower than requested because of joint safety limits, and that high accelerations in force mode reduce force accuracy.
+
+## Where you'll see it
+
+- **Surface finishing:** sanding, polishing, grinding and deburring, where a steady contact force matters more than an exact path.
+- **Assembly:** inserting pegs, shafts and connectors with tight clearances, where the part has to be allowed to find the hole. See [peg-in-hole](/atlas/concept/peg-in-hole) and [compliant assembly](/atlas/concept/compliant-assembly).
+- **Collaborative robots:** hand-guiding a [cobot](/atlas/concept/collaborative-robot) to teach it a path, and limiting force on accidental contact, as in [power and force limiting](/atlas/concept/power-and-force-limiting).
+- **Teleoperation and haptics:** sending contact forces back to a human operator. See [haptic feedback](/atlas/concept/haptic-feedback).
+- **Product testing:** pressing buttons, touchscreens or hinges with a specified force, over and over.
+
+## Going deeper
+
+**Stability is the hard part.** Against a stiff surface, tiny motions produce large force changes, so a force loop there behaves like a very high-gain system, and delays and flexibility between the motor and the sensor can make it oscillate. Whitney derived stability bounds for force feedback in 1977, and his 1987 review of the field still discusses the stability problem and its remedies ([Whitney, 1977](https://doi.org/10.1115/1.3427095); [Whitney, 1987](https://doi.org/10.1177/027836498700600101)). Raibert and Craig saw it in their own experiments: the hand, held between the springy wrist sensor and the surface, vibrated at about 280 Hz, too fast for their controller to remove ([Raibert & Craig, 1981](https://doi.org/10.1115/1.3139652)). For admittance control, adding deliberate softness, such as [series elastic actuators](/atlas/concept/series-elastic-actuator) or a compliant end-effector, removes the contact instability at some cost in performance ([Ott, Mukherjee & Nakamura, 2010](https://doi.org/10.1109/ROBOT.2010.5509861)).
+
+**Making and breaking contact.** A pure force controller with no surface to push on has nothing to balance its command, so it accelerates in the direction it is pushing. One safeguard is to cap speed along force-controlled axes, which is what the `limits` argument in UR's force mode does.
+
+**Choosing the task frame.** Hybrid control is only as good as its split. If the frame is tilted relative to the real surface, part of the force loop pushes along the surface and part of the motion loop pushes into it, and the two fight; a real implementation has to estimate the constraints the robot is actually under ([Lynch & Park, 11.6](https://modernrobotics.northwestern.edu/?p=128)). Mason's natural constraints are what decide the split ([Mason, 1981](https://doi.org/10.1109/TSMC.1981.4308708); [Raibert & Craig, 1981](https://doi.org/10.1115/1.3139652)).
+
+**Where the field came from.** Whitney's 1977 paper on force feedback for fine motions ([Whitney, 1977](https://doi.org/10.1115/1.3427095)), Mason's and Raibert and Craig's 1981 papers, and Hogan's 1985 impedance papers are among the field's foundational papers; Whitney's 1987 review traces how the hybrid and impedance methods developed ([Whitney, 1987](https://doi.org/10.1177/027836498700600101)). For a modern overview, see the Springer Handbook of Robotics chapter by Villani and De Schutter ([Villani & De Schutter, 2016](https://doi.org/10.1007/978-3-319-32552-1_9)).
+
+## Why it matters
+
+Position control made robots superb at repeating motions in free air. Almost every useful physical task, though, involves touching something: a part, a surface, a tool or a person. Force control is the bridge between the two, and it is a large part of why modern arms can finish surfaces, assemble tight-fitting parts and share a workspace with people safely.
+
+## Common questions
+
+### What is the difference between force control and impedance control?
+
+Direct force control tries to hold the contact force at a target value. Impedance control does not chase a force number; it makes the robot act like a spring and damper around its planned path, so the force depends on how far the world pushes it. Impedance control is usually counted as one kind of force control, the indirect kind.
+
+### Do you need a force sensor for force control?
+
+Not always. A Jacobian-transpose controller can command a force with only joint-angle feedback and a model of the robot, and force can also be inferred from motor currents. Both are limited by how well the model captures gravity, friction and inertia, so adding a wrist force-torque sensor or joint torque sensors improves force control ([Lynch & Park, 11.5](https://modernrobotics.northwestern.edu/?p=127); [Raibert & Craig, 1981](https://doi.org/10.1115/1.3139652)).
+
+### What is hybrid position/force control?
+
+It splits the task into directions: in some the robot controls force, in the others it controls position. A polishing robot controls force into the surface and position along it. The controller was introduced in Raibert and Craig's 1981 paper, building on Mason's analysis of the constraints a contact imposes.
+
+## Related
+
+[Impedance control](/atlas/concept/impedance-control) · [Admittance control](/atlas/concept/admittance-control) · [Force-torque sensor](/atlas/concept/force-torque-sensor) · [Peg-in-hole](/atlas/concept/peg-in-hole) · [Remote centre of compliance](/atlas/concept/remote-center-of-compliance) · [Jacobian](/atlas/concept/jacobian)

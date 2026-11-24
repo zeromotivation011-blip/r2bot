@@ -110,6 +110,9 @@ export const ATLAS_QUERY_OWNER: Record<string, string> = {
   'vision-language-action model': '/atlas/concept/vision-language-action-model',
   'vla model': '/atlas/concept/vision-language-action-model',
   'what is a vla model': '/atlas/concept/vision-language-action-model',
+  'force control': '/atlas/concept/force-control',
+  'force control robotics': '/atlas/concept/force-control',
+  'hybrid position force control': '/atlas/concept/force-control',
 }
 
 /**

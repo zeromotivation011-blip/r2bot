@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">Hybrid position/force control on a polishing robot</title>
+  <desc id="d">A robot wrist holds a polishing pad on a surface. A force-torque sensor sits between the wrist and the pad. Along the surface, the pad follows a planned path under position control. Into the surface, the pad presses with a desired force under force control. The sensor measures the actual push and sends it back to the force loop, which compares it with the desired force and corrects the motion into the surface.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#FC6818"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#38bdf8"/></marker>
+    <marker id="c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
+  </defs>
+  <rect width="640" height="400" rx="16" fill="#0f172a"/>
+  <text x="30" y="46" font-size="16" font-weight="700" fill="#e2e8f0">Hybrid position/force control</text>
+  <text x="610" y="46" font-size="12" fill="#64748b" letter-spacing="1.5" text-anchor="end">ONE TASK, TWO LOOPS</text>
+
+  <!-- surface -->
+  <rect x="30" y="300" width="580" height="22" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+  <text x="40" y="346" font-size="13" fill="#64748b">work surface (its exact height is never perfectly known)</text>
+
+  <!-- arm / wrist -->
+  <path d="M210 70 L250 150" stroke="#94a3b8" stroke-width="14" stroke-linecap="round"/>
+  <rect x="226" y="150" width="48" height="40" rx="6" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="250" y="175" font-size="11" fill="#94a3b8" text-anchor="middle">wrist</text>
+  <!-- F/T sensor -->
+  <rect x="222" y="196" width="56" height="26" rx="5" fill="#1e293b" stroke="#FC6818" stroke-width="2"/>
+  <text x="250" y="214" font-size="11" font-weight="700" fill="#FC6818" text-anchor="middle">F/T</text>
+  <!-- tool / pad -->
+  <rect x="242" y="222" width="16" height="50" fill="#334155"/>
+  <rect x="206" y="272" width="88" height="28" rx="6" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="250" y="291" font-size="11" fill="#e2e8f0" text-anchor="middle">pad</text>
+
+  <!-- position-controlled direction: along the surface -->
+  <line x1="304" y1="286" x2="420" y2="286" stroke="#38bdf8" stroke-width="3" marker-end="url(#b)"/>
+  <text x="430" y="236" font-size="14" font-weight="700" fill="#38bdf8">Along the surface</text>
+  <text x="430" y="256" font-size="13" fill="#94a3b8">position control:</text>
+  <text x="430" y="274" font-size="13" fill="#94a3b8">follow the planned path</text>
+
+  <!-- force-controlled direction: into the surface -->
+  <line x1="160" y1="196" x2="160" y2="290" stroke="#FC6818" stroke-width="3" marker-end="url(#a)"/>
+  <text x="40" y="138" font-size="14" font-weight="700" fill="#FC6818">Into the surface</text>
+  <text x="40" y="158" font-size="13" fill="#94a3b8">force control:</text>
+  <text x="40" y="176" font-size="13" fill="#94a3b8">hold the desired push</text>
+
+  <!-- feedback loop box -->
+  <rect x="370" y="90" width="240" height="120" rx="10" fill="#1e293b" stroke="#FC6818" stroke-width="1.5"/>
+  <text x="490" y="116" font-size="14" font-weight="700" fill="#e2e8f0" text-anchor="middle">Force loop</text>
+  <text x="490" y="140" font-size="13" fill="#94a3b8" text-anchor="middle">error = desired − measured</text>
+  <text x="490" y="162" font-size="13" fill="#94a3b8" text-anchor="middle">too little push → move in</text>
+  <text x="490" y="184" font-size="13" fill="#94a3b8" text-anchor="middle">too much push → back off</text>
+
+  <!-- sensor to loop -->
+  <path d="M280 209 H330 V150 H366" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#c)"/>
+  <text x="288" y="236" font-size="12" fill="#94a3b8">measured force</text>
+
+  <text x="30" y="380" font-size="13" fill="#94a3b8">A selection matrix decides which directions belong to which loop (Raibert &amp; Craig, 1981).</text>
+</svg>
