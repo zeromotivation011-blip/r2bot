@@ -1,128 +1,229 @@
 ---
-title: Costmap in ROS2 Navigation
+title: Costmap in ROS 2 and Nav2
+slug: costmap
 summary: >-
-  A costmap is a 2D grid where each cell holds a cost reflecting how desirable
-  it is to traverse. Backbone of Nav2 local and global planners.
+  A costmap is a grid that scores how risky each patch of floor is for a robot. How ROS 2 Nav2
+  builds one: layers, the 0–255 cost scale, inflation and tuning.
 category: ai-and-perception
 bucket: navigation-localization
-difficulty: intermediate
-lastReviewed: 2026-05-21T00:00:00.000Z
-sources:
-  - title: 'Occupancy grid mapping'
-    url: 'https://en.wikipedia.org/wiki/Occupancy_grid_mapping'
+difficulty: 3
+difficultyLabel: Classroom
+lastReviewed: 2026-11-24T00:00:00.000Z
 tags:
   - costmap
   - nav2
   - ros2
   - navigation
   - inflation
-relatedTerms:
-  - nav2-stack
   - path-planning
-  - occupancy-grid
-  - a-star-algorithm
-  - ros2
 seeAlso:
+  - costmap-layers
+  - occupancy-grid
+  - nav2
   - nav2-stack
   - path-planning
-  - occupancy-grid
   - a-star-algorithm
-  - ros2
-youtubeSearchQuery: ROS2 Nav2 costmap layers tutorial
+  - dynamic-window-approach
+  - lidar
+  - slam
+  - amcl
+relatedTerms:
+  - costmap-layers
+  - occupancy-grid
+  - nav2
+  - path-planning
+  - lidar
+sources:
+  - title: 'Nav2 source, nav2_costmap_2d (Jazzy): cost_values.hpp (the 0, 252, 253, 254, 255 constants and layer combination methods)'
+    url: 'https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_costmap_2d/include/nav2_costmap_2d/cost_values.hpp'
+  - title: 'Nav2 source, nav2_costmap_2d (Jazzy): inflation_layer.hpp (computeCost, the inflation formula)'
+    url: 'https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_costmap_2d/include/nav2_costmap_2d/inflation_layer.hpp'
+  - title: 'Nav2 source, nav2_costmap_2d (Jazzy): costmap_2d_publisher.cpp (how costs are translated to 0–100 on the costmap topic)'
+    url: 'https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_costmap_2d/src/costmap_2d_publisher.cpp'
+  - title: 'Nav2 source (Jazzy): nav2_bringup/params/nav2_params.yaml (default global and local costmap configuration)'
+    url: 'https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_bringup/params/nav2_params.yaml'
+  - title: 'D. V. Lu, D. Hershberger, W. D. Smart, "Layered costmaps for context-sensitive navigation," IEEE/RSJ IROS 2014, pp. 709–715'
+    url: 'https://doi.org/10.1109/IROS.2014.6942636'
+  - title: 'S. Macenski, F. Martín, R. White, J. Ginés Clavero, "The Marathon 2: A Navigation System," IEEE/RSJ IROS 2020, pp. 2718–2725 (doi 10.1109/IROS45743.2020.9341207)'
+    url: 'https://arxiv.org/abs/2003.00368'
+  - title: 'A. Elfes, "Using occupancy grids for mobile robot perception and navigation," Computer 22(6), 1989, pp. 46–57'
+    url: 'https://doi.org/10.1109/2.30720'
+youtubeSearchQuery: ROS 2 Nav2 costmap inflation tutorial
 laymanExplanation: >-
-  A costmap is a 2D grid representation of the world where each cell holds a
-  numeric cost indicating how undesirable it is for the robot to be there.
-  Obstacles get high cost, free space gets zero, and areas near obstacles get
-  inflated cost. Planners like A* and Dijkstra navigate by minimising total path
-  cost.
-realRobotsThatUseThis: []
-indianExample: ''
-prerequisiteTerms: []
-unlocksTerms: []
-quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
-difficultyLabel: Classroom
+  Imagine laying a sheet of graph paper over the floor and colouring every square by how risky it
+  would be for the robot to drive there: walls in the darkest colour, the strip right next to a wall
+  almost as dark, a fading glow further out, and open floor left blank. That coloured sheet is a costmap. The robot's
+  route planner then looks for the path across the sheet that adds up to the least total risk.
 technicalDefinition: >-
-  A costmap is a 2D grid where each cell holds a cost reflecting how desirable
-  it is to traverse. Backbone of Nav2 local and global planners.
-slug: costmap
+  A costmap is a 2D grid in which every cell stores a cost for the robot occupying it. In ROS 2 Nav2
+  (nav2_costmap_2d) costs are unsigned 8-bit values: 0 free, 1–252 increasing preference to avoid,
+  253 inscribed (the robot's centre there means a collision), 254 lethal (an obstacle in the cell) and
+  255 unknown. The grid is built by a stack of plugin layers (static map, sensor obstacles, voxel,
+  inflation and others) merged into one master grid that planners and controllers query.
+quizQuestion:
+  q: A cell in a message on the /local_costmap/costmap topic has the value 99. What does that mean?
+  options:
+    - The cell is unknown space the robot has never seen
+    - If the robot's centre were in this cell, part of the robot would be touching an obstacle
+    - The cell holds an obstacle
+    - The cell is 99 cm from the nearest wall
+  answer: 1
+  explanation: >-
+    Nav2 publishes its internal 0–255 costs as 0–100 on the costmap topic: 253 (inscribed) becomes 99,
+    254 (lethal) becomes 100 and 255 (unknown) becomes −1. An inscribed cell is closer to an obstacle
+    than the robot's inscribed radius, so a robot centred there would collide.
 ---
 
-# Costmap in ROS2 Navigation
+A **costmap** is a grid laid over the world in which every square holds a number saying how bad it would be for the robot to be there. Walls and obstacles get the highest cost, open floor gets zero, and the cells near obstacles get a cost in between, so a route planner can find a path that is both short and safely clear of things. In ROS 2 this is the job of Nav2's `nav2_costmap_2d` package, and by default Nav2 runs two costmaps: a **global costmap** for planning the whole route and a **local costmap** for dodging what is right in front of it ([Nav2 bringup parameters](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_bringup/params/nav2_params.yaml)).
 
-## What is Costmap in ROS2 Navigation?
+This page explains what a costmap is, how Nav2 fills one in and how to tune it. For a deeper look at each individual layer, see [costmap layers](/atlas/concept/costmap-layers); for the plain "occupied or free" map a costmap is built from, see [occupancy grid](/atlas/concept/occupancy-grid).
 
-A costmap is a 2D grid representation of the world where each cell holds a numeric cost indicating how undesirable it is for the robot to be there. Obstacles get high cost, free space gets zero, and areas near obstacles get inflated cost. Planners like A* and Dijkstra navigate by minimising total path cost.
+![A costmap around a wall: lethal wall cells, an inscribed strip as wide as the robot's radius, then an inflation cost that fades with distance. The chart shows the Nav2 inflation curve for a 0.22 m robot with scaling factors 3.0 and 10.0](/images/atlas/diagrams/costmap.svg)
 
-## How It Works
+## Start here: a heat map of the floor
 
-Nav2 builds costmaps in layers. The static layer reads a known map. The obstacle layer adds dynamic obstacles from LIDAR/depth sensors. The inflation layer adds a halo of decreasing cost around every obstacle to keep the robot at a safe distance. The voxel layer extends to 3D. Each layer can be enabled or disabled per planner. The global costmap covers the entire environment for long-range planning; the local costmap is a small, fast-updating window around the robot for reactive avoidance.
+Picture graph paper laid over a room, each square 5 cm across. You colour every square by how much you would mind the robot being there. A square with a wall in it is forbidden. A square so close to the wall that the robot's body would scrape it is also forbidden, even though the square itself is empty. A little further out you are nervous but it is allowed, and in the middle of the room you do not care at all.
 
-## Real-World Example
+That coloured sheet is a costmap. A planner such as [A\*](/atlas/concept/a-star-algorithm) or Dijkstra's algorithm then searches for the route whose squares add up to the lowest total, which naturally keeps the robot in the middle of corridors instead of grazing walls.
 
-Every Nav2-based warehouse robot uses costmaps with inflation tuned to its physical width. Hospital delivery robots inflate human-sized buffers around detected legs. Outdoor mowing robots add custom layers for grass-height and slope.
+A costmap differs from an [occupancy grid](/atlas/concept/occupancy-grid) in one way that matters: an occupancy grid records what the sensors believe is *there* (occupied, free or unknown), while a costmap records what that means *for this particular robot*, taking its size and a safety margin into account. Occupancy grids go back to Alberto Elfes's work in the 1980s ([Elfes 1989](https://doi.org/10.1109/2.30720)); the costmap is the navigation layer built on top of that idea.
 
-## Why It Matters for Robotics
+## How it works
 
-Costmap tuning is the single most impactful factor in whether a Nav2 robot behaves well or terribly. Inflation radius too low → robot scrapes walls. Too high → robot refuses to enter narrow doorways. Every Nav2 engineer must master costmap layers and parameters.
+### The cost scale
 
-## Try It Yourself
+Nav2 stores one byte per cell, so every cost is a whole number from 0 to 255. Four values have fixed meanings, and 1–252 is a graded range whose top, 252, is called `MAX_NON_OBSTACLE` ([cost_values.hpp](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_costmap_2d/include/nav2_costmap_2d/cost_values.hpp)):
 
-Launch the Nav2 TurtleBot3 demo in Gazebo + RViz2. Visualise the global and local costmaps in RViz. Change the inflation radius parameter live with `ros2 param set` and watch the robot's path change in real time.
+| Internal cost | Name | Meaning | Shown on the `costmap` topic as |
+|---|---|---|---|
+| 0 | `FREE_SPACE` | Nothing nearby; no penalty | 0 |
+| 1–252 | (inflated) | Near an obstacle; higher means closer | 1–98 |
+| 253 | `INSCRIBED_INFLATED_OBSTACLE` | Robot's centre here means part of it touches an obstacle | 99 |
+| 254 | `LETHAL_OBSTACLE` | An obstacle is in this cell | 100 |
+| 255 | `NO_INFORMATION` | Unknown; never observed | −1 |
 
-## Quick Quiz
+The last column matters when you look at a costmap in [RViz](/atlas/concept/rviz). Nav2 publishes the grid as a standard `nav_msgs/OccupancyGrid`, whose convention is 0–100 with −1 for unknown, so the publisher translates each value with a lookup table: 0 stays 0, 253 becomes 99, 254 becomes 100, 255 becomes −1, and 1–252 are squeezed into 1–98 ([costmap_2d_publisher.cpp](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_costmap_2d/src/costmap_2d_publisher.cpp)). It also publishes the untranslated bytes on a `costmap_raw` topic as `nav2_msgs/Costmap`.
 
-```quiz
-[
-  {
-    "q": "A costmap cell encodes:",
-    "options": [
-      "Battery level",
-      "How costly it is for the robot to traverse that cell",
-      "GPS time",
-      "Audio sample"
-    ],
-    "answer": 1,
-    "explain": "Higher cost = more undesirable; obstacles are highest, free space is lowest."
-  },
-  {
-    "q": "The inflation layer in Nav2 adds:",
-    "options": [
-      "Random noise",
-      "A decaying cost halo around obstacles",
-      "Audio comments",
-      "Sensor calibration"
-    ],
-    "answer": 1,
-    "explain": "Inflation keeps the planned path away from walls by extending cost outward from obstacles."
-  },
-  {
-    "q": "Local vs global costmaps differ in:",
-    "options": [
-      "Material",
-      "Range and update frequency",
-      "Manufacturer",
-      "Programming language"
-    ],
-    "answer": 1,
-    "explain": "Global covers the whole map slowly; local covers a window around the robot quickly."
-  }
-]
+### Layers stacked into one grid
+
+A costmap is not drawn in one go. It is assembled from **layers**, each a plugin that knows about one source of information. This "layered costmap" design was described by Lu, Hershberger and Smart in 2014 so that new kinds of information could be added without rewriting the planner ([Lu et al. 2014](https://doi.org/10.1109/IROS.2014.6942636)), and Nav2 kept it ([Macenski et al. 2020](https://arxiv.org/abs/2003.00368)). The layer plugins shipped in `nav2_costmap_2d` include:
+
+- **Static layer.** Copies the saved map from the map server. A map cell at or above `lethal_cost_threshold` (default 100) becomes lethal; with the default `trinary_costmap: true`, every other known cell becomes free.
+- **Obstacle layer.** Marks obstacles seen by a [lidar](/atlas/concept/lidar) or [depth camera](/atlas/concept/depth-sensor) and clears them again when the sensor sees through the space (below).
+- **Voxel layer.** The same idea in 3D: it tracks a column of voxels above each cell, then flattens it into the 2D grid, which, when it is fed a depth camera or 3D lidar, catches table tops and overhangs that a single 2D scan would miss.
+- **Inflation layer.** Spreads cost outward from every lethal cell (below).
+- Others: a range-sensor layer for sonar and infrared, a denoise layer that removes isolated speckles, and **costmap filters**: keepout zones, speed-limit zones, and a binary filter that switches an output on or off when the robot enters a marked area. Filters read extra "mask" maps that you draw.
+
+Each update, Nav2 asks every layer which area changed, then lets the layers write into one master grid **in the order they are listed** in the `plugins` parameter, followed by any `filters`. That is why the static layer usually goes first: by default (`use_maximum: false`) it overwrites every cell it covers, which would wipe out any layer listed before it. The inflation layer goes last, because it must see every obstacle the earlier layers wrote. The obstacle layer and the inflation layer keep the larger of their own value and the value already in the grid, so they can make a cell worse but cannot erase an obstacle another layer wrote ([cost_values.hpp](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_costmap_2d/include/nav2_costmap_2d/cost_values.hpp), [inflation_layer.cpp](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_costmap_2d/plugins/inflation_layer.cpp)).
+
+### Marking and clearing
+
+The obstacle layer does two things with every sensor reading. **Marking** sets the cell where a beam hit something to lethal. **Clearing** traces the beam from the sensor to that hit point and sets every cell it passed through back to free, because the beam could not have passed through an obstacle. In the default Nav2 configuration, obstacles are marked out to 2.5 m (`obstacle_max_range`) and cleared out to 3.0 m (`raytrace_max_range`) ([nav2_params.yaml](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_bringup/params/nav2_params.yaml)).
+
+Clearing is what removes a person who has walked away. If a sensor source has `clearing` off (the layer's own default; Nav2's example configuration turns it on), if an obstacle sits beyond the clearing range, or if the lidar reports open space as `inf` without `inf_is_valid: true`, its mark stays in the costmap after the object has gone, and the robot keeps steering around a ghost.
+
+### Inflation, with numbers you can check
+
+Inflation is the part that turns an obstacle map into a safe-driving map. For each cell, the inflation layer finds the distance *d* to the nearest lethal cell and sets the cost ([inflation_layer.hpp](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_costmap_2d/include/nav2_costmap_2d/inflation_layer.hpp)):
+
+- *d* = 0: lethal, 254.
+- *d* ≤ the robot's inscribed radius: 253.
+- otherwise: cost = 252 × e<sup>−k (d − r)</sup>, where *r* is the inscribed radius and *k* is `cost_scaling_factor`, rounded down to a whole number.
+- beyond `inflation_radius`, no inflation cost at all.
+
+The **inscribed radius** is the radius of the largest circle, centred on the robot's origin, that fits inside its footprint; for a round robot it is the robot's radius (plus a small `footprint_padding`, 0.01 m by default). Take Nav2's default example robot, radius 0.22 m with `inflation_radius` 0.70 m, and compare its bringup value *k* = 3.0 with the layer's built-in default of 10.0:
+
+| Distance from obstacle | Cost with k = 3.0 | Cost with k = 10.0 |
+|---|---|---|
+| 0.25 m | 230 | 186 |
+| 0.32 m | 186 | 92 |
+| 0.42 m | 138 | 34 |
+| 0.52 m | 102 | 12 |
+| 0.62 m | 75 | 4 |
+| 0.70 m | 59 | 2 |
+
+These are the formula's values for *r* = 0.22 m. A live Nav2 costmap reads a few units higher, because the default 0.01 m `footprint_padding` makes the effective inscribed radius about 0.226 m, and distances are measured between the centres of 5 cm cells.
+
+Lower *k* means the cost fades more slowly, so a wide band of floor stays expensive and the planner prefers the middle of a corridor. With *k* = 10 the cost has almost vanished 30 cm out from the robot's edge, so paths are allowed to run close to walls. The chart at the top of this page draws both curves.
+
+### Global and local costmaps
+
+Nav2 runs two independent costmaps with different jobs. The defaults below are from the Jazzy bringup parameters ([nav2_params.yaml](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_bringup/params/nav2_params.yaml)):
+
+| | Global costmap | Local costmap |
+|---|---|---|
+| Used by | The planner (whole route) | The controller (next few seconds) |
+| Frame | `map` | `odom` |
+| Size | The whole saved map | A 3 m × 3 m window that moves with the robot (`rolling_window: true`) |
+| Updates | 1 Hz | 5 Hz |
+| Layers | static, obstacle, inflation | voxel, inflation |
+| Unknown space | Tracked (`track_unknown_space: true`) | Treated as free |
+
+The local costmap lives in the `odom` frame because [odometry](/atlas/concept/odometry) is smooth over short distances, while the `map` frame can jump when [AMCL](/atlas/concept/amcl) corrects the robot's position. A jump would smear freshly seen obstacles across the small, fast window the controller depends on.
+
+## Where you'll see it
+
+- **Every Nav2 robot.** Warehouse and hospital delivery robots built on ROS 2 navigate with these two costmaps; the planner reads the global one and the controller (DWB, MPPI, Regulated Pure Pursuit and others) checks or scores its motions against the local one. See the [Nav2 stack](/atlas/concept/nav2-stack).
+- **In RViz.** Add a Map display on `/global_costmap/costmap` or `/local_costmap/costmap` and choose the "costmap" colour scheme to see lethal, inscribed and inflated cells.
+- **Outside ROS.** Grid costmaps are a general planning tool. The same idea appears in self-driving research and games: score the terrain, then search for the cheapest route.
+
+### Try it
+
+Launch the Nav2 TurtleBot simulation (`ros2 launch nav2_bringup tb3_simulation_launch.py`), and watch the global costmap in the RViz window it opens. Then change the inflation radius while it runs; the inflation layer accepts the new value without a restart:
+
+```bash
+ros2 param set /global_costmap/global_costmap inflation_layer.inflation_radius 0.35
 ```
 
-## Further Reading
+Send a goal through a gap between two pillars before and after, and compare the two paths.
 
-- [Nav2 Stack](/atlas/concept/nav2-stack)
-- [Path Planning](/atlas/concept/path-planning)
-- [Occupancy Grid](/atlas/concept/occupancy-grid)
-- [A Star Algorithm](/atlas/concept/a-star-algorithm)
-- [Ros2](/atlas/concept/ros2)
+## Tuning: symptoms and the setting behind them
 
-## Ask R2 About This
+Each row follows from how the layers above work.
 
-Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Costmap in ROS2 Navigation for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.
+| Symptom | Likely cause | What to change |
+|---|---|---|
+| Robot will not plan through a doorway it fits through | The gap is narrower than about twice the inscribed radius once cells are rounded: footprint, `robot_radius` or `footprint_padding` too large, or resolution too coarse | Measure the footprint; use a finer resolution |
+| Robot takes a long detour instead of a doorway | Inflation keeps the doorway expensive (it never makes it lethal: inflation stops at 252) | Lower `inflation_radius` or raise `cost_scaling_factor` |
+| Planned paths hug walls | Cost fades too fast, so the planner sees no reason to stay central | Lower `cost_scaling_factor` (for example 10 → 3); if the robot still cuts corners while following a good path, look at the controller instead |
+| Robot swerves around an obstacle that is no longer there | Mark not cleared: `clearing: false` on that source, obstacle beyond `raytrace_max_range`, or the lidar reports open space as `inf` | Enable clearing; make the clearing range larger than the marking range; set `inf_is_valid: true` |
+| Robot ignores a table it then hits | A 2D lidar scans below the table top | Add a depth camera with the voxel layer, or a keepout filter |
+| Planner refuses all goals in a half-explored map | Unknown space treated as impassable | Check `allow_unknown` on the planner and `track_unknown_space` on the costmap |
+
+## Limits
+
+- **It is flat.** Even the voxel layer ends as a 2D grid. Ramps, stairs and rough outdoor ground need elevation maps or 3D planners.
+- **Resolution is a trade.** At 5 cm resolution a 100 m × 100 m building is 2000 × 2000 = 4 million cells, one byte each, per grid; each layer keeps its own copy, so the real total is several times that. Halving the cell size quadruples memory and update work.
+- **Costs are hand-tuned.** The exponential inflation curve is a convenient rule, not a measurement of risk; the right numbers depend on the robot, its speed and how accurate its localisation is.
+
+## Going deeper
+
+- **Footprint versus radius.** A circular `robot_radius` is cheap to check: a centre cell at 253 or 254 means a collision, anything lower means clear. Rectangular robots set a `footprint` polygon instead. A centre cell at 253 still proves a collision, but a lower value no longer proves the robot is clear: an obstacle between the inscribed and circumscribed radius may or may not touch it, depending on which way it faces. So a full check tests the polygon's outline against the grid.
+- **Combination methods.** The obstacle and voxel layers have a `combination_method`: overwrite (0), maximum (1, the default) or maximum without overwriting unknown cells (2) ([cost_values.hpp](https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_costmap_2d/include/nav2_costmap_2d/cost_values.hpp)). Costmap filters run afterwards on a copy of the combined grid, and the keepout filter only ever raises a cell's cost, so it cannot erase what the sensors marked.
+- **Context-sensitive layers.** The original layered-costmap paper's point was that people, hallways and social conventions could each be a layer, for example a layer that adds cost around detected people ([Lu et al. 2014](https://doi.org/10.1109/IROS.2014.6942636)).
+
+## Why it matters
+
+Most navigation problems a robotics engineer actually debugs are costmap problems: a robot that will not pass a doorway, cuts corners, or swerves around nothing. Knowing what each cost value means, which layer wrote it and how inflation is calculated turns those from mysteries into a parameter change.
+
+## Common questions
+
+### What is a costmap in simple terms?
+
+A map of the floor divided into small squares, where each square has a score for how risky it is for the robot to be there. Obstacles score highest, open space scores zero, and squares near obstacles score in between, so the robot's planner chooses routes that stay clear of things.
+
+### What is the difference between a global and a local costmap?
+
+The global costmap covers the whole known map and is used to plan the full route; in Nav2's defaults it updates once a second. The local costmap is a small window (3 m × 3 m by default) that moves with the robot and updates five times a second, and the controller uses it to react to obstacles that the saved map does not contain.
+
+### What is the difference between a costmap and an occupancy grid?
+
+An occupancy grid says whether each cell is occupied, free or unknown. A costmap takes that and adds what it means for one particular robot: cells too close to an obstacle for the robot's body are marked as dangerous, and a fading safety margin is added around everything.
+
+## Related
+
+- [Costmap layers](/atlas/concept/costmap-layers): each layer in more depth
+- [Occupancy grid](/atlas/concept/occupancy-grid): the map a costmap is built from
+- [Nav2](/atlas/concept/nav2): the ROS 2 navigation system that uses costmaps
+- [Path planning](/atlas/concept/path-planning): how a route is searched across the grid
+- [Dynamic window approach](/atlas/concept/dynamic-window-approach): a controller that scores motions against the local costmap

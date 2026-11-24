@@ -13,6 +13,7 @@ tags:
   - navigation
   - mapping
 seeAlso:
+  - costmap
   - occupancy-grid
   - nav2
   - dynamic-window-approach
@@ -21,8 +22,10 @@ lastReviewed: 2026-07-10T00:00:00.000Z
 sources:
   - title: 'costmap_2d (ROS)'
     url: 'http://wiki.ros.org/costmap_2d'
-  - title: 'Layered costmaps (Lu et al.)'
-    url: 'https://docs.nav2.org/'
+  - title: 'D. V. Lu, D. Hershberger, W. D. Smart, "Layered costmaps for context-sensitive navigation," IEEE/RSJ IROS 2014, pp. 709–715'
+    url: 'https://doi.org/10.1109/IROS.2014.6942636'
+  - title: 'Nav2 source, nav2_costmap_2d (Jazzy): costmap_plugins.xml (the layer and filter plugins Nav2 ships)'
+    url: 'https://github.com/ros-navigation/navigation2/blob/jazzy/nav2_costmap_2d/costmap_plugins.xml'
 laymanExplanation: >-
   A costmap is a grid that scores how risky each spot near the robot is to drive on. It's built in layers —
   the known map, live sensor obstacles, and a safety buffer around obstacles — stacked together into one map
@@ -43,7 +46,7 @@ quizQuestion:
     rather than skimming obstacle edges.
 ---
 
-Before a robot can plan a safe route, it needs a map of **how risky each nearby spot is** to drive on — not just occupied vs free, but with safety margins and live obstacles. That map is a **costmap**, and it's built in **layers**.
+Before a robot can plan a safe route, it needs a map of **how risky each nearby spot is** to drive on — not just occupied vs free, but with safety margins and live obstacles. That map is a [**costmap**](/atlas/concept/costmap), and it's built in **layers**. This page goes layer by layer; for the cost values, inflation formula and global versus local costmaps, start with the [costmap](/atlas/concept/costmap) entry.
 
 ## From occupancy grid to costmap
 
