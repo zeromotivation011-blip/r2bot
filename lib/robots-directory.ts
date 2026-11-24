@@ -146,6 +146,7 @@ export const DIRECTORY: DirRobot[] = [
   R('Canadarm2', 'MDA and Canadian Space Agency', 'Canada', '🇨🇦', 2001, 'space', 'The 17 m robotic arm of the International Space Station, able to move 116,000 kg.'),
   R('Knightscope K5', 'Knightscope', 'USA', '🇺🇸', 2014, 'service', 'A 5 ft security robot that patrols car parks with 360-degree cameras.'),
   R('temi', 'Robotemi', 'Israel', '🇮🇱', 2019, 'service', 'A metre-tall tablet on wheels that follows people for video calls.'),
+  R('TurtleBot 4', 'Clearpath Robotics and Open Robotics', 'Canada', '🇨🇦', 2022, 'educational', 'A ROS 2 learning robot with a lidar and depth camera on an iRobot Create 3 base.'),
   R('MIT Mini Cheetah', 'MIT', 'USA', '🇺🇸', 2019, 'quadruped', 'A 9 kg research quadruped and the first four-legged robot to backflip.'),
   R('GreyOrange Butler', 'GreyOrange', 'India', '🇮🇳', 2011, 'warehouse', 'A goods-to-person robot that carries whole shelves to warehouse pickers.'),
   R('DRDO Daksh', 'DRDO', 'India', '🇮🇳', 2011, 'agri-infra', 'A remotely operated bomb-disposal robot used by the Indian Army.'),

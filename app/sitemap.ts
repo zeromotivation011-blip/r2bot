@@ -256,7 +256,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...newsArticles,
     ...ROBOTS.map((r) => ({
       url: `${BASE}/robots/${r.slug}`,
-      lastModified: GROUP_UPDATED.robots,
+      // Each profile's own verification date, so adding a robot does not re-date the other 61.
+      lastModified: r.lastVerified ? new Date(`${r.lastVerified}T00:00:00.000Z`) : GROUP_UPDATED.robots,
       changeFrequency: 'monthly' as const,
       priority: 0.75,
     })),
