@@ -1,74 +1,198 @@
 ---
-title: Link (robot mechanism)
+title: Robot Link
+slug: link-robot
+bucket: concept
 category: hardware
 summary: >-
-  A link is the rigid segment between two joints in a robot — the structural
-  member that transmits forces and defines the geometry of the kinematic chain,
-  the way a bone connects two joints in a limb.
-seeAlso:
-  - degrees-of-freedom-joint
-sources:
-  - title: 'Craig, J.J. — Introduction to Robotics: Mechanics and Control (3rd ed.)'
-    url: >-
-      https://www.pearson.com/en-us/subject-catalog/p/introduction-to-robotics-mechanics-and-control/P200000003486
-  - title: 'Siciliano et al. — Robotics: Modelling, Planning and Control'
-    url: 'https://link.springer.com/book/10.1007/978-1-84628-642-1'
-lastReviewed: 2026-05-19T00:00:00.000Z
+  A robot link is a rigid part of a robot, joined to the others by joints, like a bone between
+  shoulder and elbow. Links in arms, D–H link length and URDF.
+difficulty: 3
+difficultyLabel: Classroom
+lastReviewed: 2026-11-24T00:00:00.000Z
 tags:
   - hardware
   - mechanical
   - kinematics
-difficulty: 3
+  - urdf
+  - robot-arm
+seeAlso:
+  - joint
+  - degrees-of-freedom
+  - denavit-hartenberg
+  - forward-kinematics
+  - urdf
+  - robot-arm
+  - end-effector
+  - parallel-robot
+  - robot-state-publisher
+relatedTerms:
+  - joint
+  - denavit-hartenberg
+  - forward-kinematics
+  - urdf
+  - robot-arm
+sources:
+  - title: 'K. M. Lynch, F. C. Park, Modern Robotics: Mechanics, Planning, and Control, Cambridge University Press, 2017 (ch. 2, links, joints and Grübler''s formula; appendix C, D–H parameters)'
+    url: 'http://hades.mech.northwestern.edu/images/7/7f/MR.pdf'
+  - title: 'J. Denavit, R. S. Hartenberg, "A kinematic notation for lower-pair mechanisms based on matrices," Journal of Applied Mechanics 22(2), 1955, pp. 215–221'
+    url: 'https://doi.org/10.1115/1.4011045'
+  - title: 'ROS wiki: URDF XML specification, <link> element'
+    url: 'http://wiki.ros.org/urdf/XML/link'
+  - title: 'ROS wiki: URDF XML specification, <joint> element and model (tree structures only)'
+    url: 'http://wiki.ros.org/urdf/XML/joint'
+  - title: 'ROS REP 105: Coordinate Frames for Mobile Platforms (base_link)'
+    url: 'https://www.ros.org/reps/rep-0105.html'
+  - title: 'robot_state_publisher (ROS 2 Jazzy) README'
+    url: 'https://github.com/ros/robot_state_publisher/blob/jazzy/README.md'
+  - title: 'Universal Robots: DH parameters for calculations of kinematics and dynamics (UR5e table)'
+    url: 'https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/'
 laymanExplanation: >-
-  Your upper arm is a rigid rod of bone. It does not bend in the middle. At one
-  end, your shoulder joint connects it to your torso; at the other end, your
-  elbow joint connects it to your forearm. The bone itself is not where the
-  motion happens — it just carries force from one end to the other. In robotics,
-  that bone is called a link.
-whyItMatters: >-
-  Without link (robot mechanism), many concept systems in robotics simply
-  couldn't work.
-realRobotsThatUseThis: []
-indianExample: ''
-relatedTerms: []
-prerequisiteTerms: []
-unlocksTerms: []
-quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
-difficultyLabel: Classroom
+  Your upper arm is a bone that does not bend in the middle. Your shoulder joint connects it to your
+  body and your elbow joint connects it to your forearm. The bone does not create any movement; it
+  holds the two joints a fixed distance apart and carries the load between them. In a robot, that
+  rigid piece is called a link, and the places where it moves are the joints.
 technicalDefinition: >-
-  A link is the rigid segment between two joints in a robot — the structural
-  member that transmits forces and defines the geometry of the kinematic chain,
-  the way a bone connects two joints in a limb.
-slug: link-robot
-bucket: concept
+  A link is a body of a robot mechanism, normally modelled as rigid, that is connected to other links
+  by joints so that relative motion between adjacent links becomes possible. Links and joints together
+  form a kinematic chain, open (serial) or closed (parallel). The fixed ground or base also counts as
+  a link. In the Denavit–Hartenberg convention each link gets a reference frame, and the geometry
+  between consecutive frames is captured by a link length, link twist, link offset and joint angle.
+quizQuestion:
+  q: A six-joint robot arm on a fixed base is analysed with Grübler's formula. How many links (N) do you count?
+  options:
+    - Five, because the last joint holds the tool
+    - Six, one per joint
+    - Seven, because the fixed ground counts as a link
+    - Twelve, one on each side of every joint
+  answer: 2
+  explanation: >-
+    In Grübler's formula the ground is regarded as a link, so a six-joint open chain has six moving
+    links plus the base: N = 7. With m = 6, J = 6 and one freedom per joint, dof = 6(7 − 1 − 6) + 6 = 6.
 ---
 
-Your upper arm is a rigid rod of bone. It does not bend in the middle. At one end, your shoulder [joint](/atlas/concept/joint) connects it to your torso; at the other end, your elbow joint connects it to your forearm. The bone itself is not where the motion happens — it just carries force from one end to the other. In [robotics](/atlas/concept/robotics), that bone is called a link.
+A **robot link** is one of the rigid parts of a robot, connected to the others by joints. In an arm, most links sit between two joints, the way the bone of your upper arm connects your shoulder to your elbow. The joints are where motion happens; the links hold the joints a fixed distance apart and carry forces between them. A robot is built by connecting a set of bodies, called links, to each other with joints, and motors at the joints make the links move ([Lynch & Park, *Modern Robotics*, ch. 2](http://hades.mech.northwestern.edu/images/7/7f/MR.pdf)).
 
-A **link** is any rigid structural segment in a [robot](/atlas/concept/robot) that connects two joints. It does not move on its own; it transmits the effect of movement from one joint to the next. Together, a sequence of links and joints forms a **kinematic chain** — the formal term for an arm, a leg, or any serially connected mechanism.
+The word means slightly different things in three places you will meet it: the physical metal part, the **link length** in the Denavit–Hartenberg (D–H) convention, and the `<link>` element in a ROS robot description (URDF). This page covers all three. For the other half of the pair, see [joint](/atlas/concept/joint).
 
-## What a link actually does
+![A two-joint robot arm. The base link is bolted to the floor; joint 1 connects it to link 1, the upper arm; joint 2 connects link 1 to link 2, the forearm, which carries the end-effector. On the right, the same arm as a URDF tree: base_link, joint_1, link_1, joint_2, link_2, a fixed joint and tool0](/images/atlas/diagrams/link-robot.svg)
 
-A link has two main jobs. First, it maintains a fixed geometric relationship between the joint at each of its ends — if link two is 300 mm long, joint three will always be exactly 300 mm from joint two regardless of how the arm moves. That geometric rigidity is what makes robot [kinematics](/atlas/concept/kinematics) predictable and mathematically tractable. Second, it carries loads: when a robot arm picks up an object, the weight travels back through each link and joint to the base, and each link must be stiff and strong enough not to deform under that load.
+## Start here: bones and hinges
 
-## Describing a link: the Denavit-Hartenberg convention
+Hold your arm out and bend only your elbow. Your upper arm stays perfectly still and your forearm swings as one rigid piece. Nothing in the middle of the forearm bends. That is the whole idea of a link: a part that moves as one solid object, so knowing where its two ends are tells you where every point on it is.
 
-Robotics engineers need a standard way to describe the geometry of a link — its length, its twist, and how it connects to the joints at each end. The most widely used convention was proposed by Jacques Denavit and Richard Hartenberg in 1955. Each link is characterised by four parameters: two distances and two angles. Feed those parameters into a transformation matrix and you can calculate exactly where the end of a robot arm is in space given any set of joint angles. This is the foundation of **[forward kinematics](/atlas/concept/forward-kinematics)**.
+A robot arm is a row of these: a **base link** fixed to the floor or a table, then a joint, then a link, then a joint, and so on, ending in a last link that carries the gripper or tool, the [end-effector](/atlas/concept/end-effector). A chain of links and joints like this is called a **kinematic chain**. When the links form one row from base to tool, as in most industrial arms, it is an **open chain** or serial robot. When links close into loops, as in a [parallel robot](/atlas/concept/parallel-robot) such as a Stewart–Gough platform, it is a **closed chain** ([Lynch & Park, ch. 1](http://hades.mech.northwestern.edu/images/7/7f/MR.pdf)).
 
-## Physical design
+## How it works
 
-Links are typically hollow tubes, machined plates, or cast structures in aluminium or carbon fibre. The goal is maximum stiffness with minimum mass. A link that flexes under load will cause the end-effector (the hand or tool at the tip of the arm) to be in the wrong position, introducing positioning errors. Long links also amplify angular errors at earlier joints — a 0.1° error at the shoulder of a 1-metre arm produces a 1.7 mm positional error at the tip.
+### What a link does
 
-## The base link and the end link
+A link has two jobs:
 
-The first link in a serial chain, attached to the stationary base of the robot, is called the **base link**. The last link, at the free end where a [gripper](/atlas/concept/gripper) or tool is mounted, is sometimes called the end link or the terminal link. The **end-effector** (gripper, welding torch, [camera](/atlas/concept/camera-vision)) attaches to that last link.
+1. **Fix the geometry.** Because the link does not bend, the distance and angle between the joint at one end and the joint at the other never change. That is what makes it possible to compute where the tool is from the joint angles alone: [forward kinematics](/atlas/concept/forward-kinematics).
+2. **Carry the load.** The weight of the tool and whatever it is holding travels back through every link and joint to the base. Each link must be stiff enough not to sag noticeably under that load.
 
----
+### Counting links: Grübler's formula
 
-*The mathematical framework for describing links and joints — Denavit-Hartenberg parameters — was published in a mechanical engineering journal in 1955, a decade before anyone had built a robot arm sophisticated enough to need it.*
+How many independent ways a mechanism can move, its [degrees of freedom](/atlas/concept/degrees-of-freedom), depends on how many links and joints it has. Grübler's formula counts it:
+
+dof = m (N − 1 − J) + Σ f<sub>i</sub>
+
+where *N* is the number of links **including the ground**, *J* the number of joints, *f*<sub>i</sub> the freedoms each joint allows, and *m* = 3 for a mechanism that moves in a plane or 6 for one that moves in space ([Lynch & Park, §2.2.2](http://hades.mech.northwestern.edu/images/7/7f/MR.pdf)). The formula is exact only when the joint constraints are independent of each other; in some special-geometry linkages they are not, and it then gives a lower bound. Two worked examples:
+
+| Mechanism | N (links incl. ground) | J | Σ f<sub>i</sub> | m | dof |
+|---|---|---|---|---|---|
+| Six-joint industrial arm, all revolute | 7 | 6 | 6 | 6 | 6(7 − 1 − 6) + 6 = **6** |
+| Planar four-bar linkage | 4 | 4 | 4 | 3 | 3(4 − 1 − 4) + 4 = **1** |
+
+The four-bar result is why a single motor can drive a closed loop of three moving links: closing the loop removes freedom.
+
+### Link frames and D–H link length
+
+To do the maths, engineers attach a coordinate frame to every link. Denavit and Hartenberg's 1955 convention describes the relationship between two neighbouring link frames with just four numbers ([Denavit & Hartenberg 1955](https://doi.org/10.1115/1.4011045)). In the form used in *Modern Robotics*, appendix C:
+
+| D–H parameter | What it measures | For an all-revolute arm |
+|---|---|---|
+| Link length *a* | Length of the common perpendicular between two neighbouring joint axes | Constant |
+| Link twist *α* | Angle between those two joint axes, measured about the common perpendicular | Constant |
+| Link offset *d* | Distance along a joint axis between two common perpendiculars | Constant |
+| Joint angle *θ* | Rotation about the joint axis | The joint variable |
+
+One warning from the textbook itself: the D–H **link length does not necessarily match the physical length of the metal part** ([Lynch & Park, appendix C](http://hades.mech.northwestern.edu/images/7/7f/MR.pdf)). It is a distance between two geometric lines, the joint axes. A link can be long and curved yet have a D–H length of zero, if the two joint axes it connects intersect.
+
+A real example: Universal Robots publishes the D–H table for the UR5e arm. Its two long links have link lengths of 0.425 m (upper arm) and 0.3922 m (forearm), listed as −0.425 and −0.3922 because of the direction UR chose for its x-axes, while the wrist links have *a* = 0 and are described by their offsets *d* instead. The same table lists each link's mass, from 8.058 kg for the upper arm, the heaviest, to 0.365 kg for the last wrist link ([Universal Robots](https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/)). See [Denavit–Hartenberg parameters](/atlas/concept/denavit-hartenberg) for how such a table becomes a transformation matrix.
+
+### Links in a ROS robot description (URDF)
+
+In ROS, a robot's shape is written in [URDF](/atlas/concept/urdf), and there "link" has a precise software meaning. A `<link>` element describes a rigid body with three optional parts ([URDF `<link>` spec](http://wiki.ros.org/urdf/XML/link)):
+
+- `<inertial>`: mass, centre of mass and inertia, used by physics simulators;
+- `<visual>`: the shape drawn on screen (box, cylinder, sphere or a mesh file);
+- `<collision>`: a shape, often simpler than the visual one, used for collision checking.
+
+A `<joint>` then names a parent link and a child link, and its `<origin>` is the transform from the parent link's frame to the child link's frame; the joint sits at the origin of the child link ([URDF `<joint>` spec](http://wiki.ros.org/urdf/XML/joint)). A minimal description with a base and one moving link looks like this:
+
+```xml
+<robot name="one_joint_arm">
+  <link name="base_link"/>
+  <link name="link_1">
+    <visual>
+      <origin xyz="0 0 0.2"/>
+      <geometry><cylinder radius="0.03" length="0.4"/></geometry>
+    </visual>
+  </link>
+  <joint name="joint_1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link_1"/>
+    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10" velocity="1.0"/>
+  </joint>
+</robot>
+```
+
+A URDF cylinder is centred on its origin, which is why the visual is shifted 0.2 m so the 0.4 m bar starts at the joint. This link has no `<inertial>` block, so it defaults to zero mass; physics simulators such as Gazebo need one on every moving link. Two consequences of the design are worth knowing:
+
+- **URDF is a tree.** Every link except the root has exactly one parent joint, so URDF cannot describe closed chains such as parallel robots directly ([URDF model spec](http://wiki.ros.org/urdf/XML/model)).
+- **Every link becomes a TF frame.** `robot_state_publisher` reads the URDF and the `joint_states` topic and publishes, for every joint, the transform from its parent link to its child link: fixed joints once on `/tf_static`, moving joints on `/tf` whenever `joint_states` reports them ([robot_state_publisher](https://github.com/ros/robot_state_publisher/blob/jazzy/README.md)). That is why `link_1` or `tool0` appear as frames in RViz, and why, if nothing publishes `joint_states`, the frames behind moving joints never appear. See [robot_state_publisher](/atlas/concept/robot-state-publisher).
+
+On mobile robots the main body link is conventionally named **`base_link`**: ROS's REP 105 defines it as the frame rigidly attached to the robot's base, at whatever point on the base is a natural reference for that hardware ([REP 105](https://www.ros.org/reps/rep-0105.html)). Many robots put a `base_footprint` link above it as the root of the tree.
+
+## Where you'll see it
+
+- **Industrial and collaborative arms.** A six-axis arm such as the UR5e has seven links counting the base; its maker publishes the link lengths and masses so customers can compute kinematics and dynamics.
+- **Legs and humanoids.** A leg is a kinematic chain too: thigh and shin are links, hip, knee and ankle are joints.
+- **ROS and simulators.** Every URDF, the robot's part of every TF tree in RViz, and every [MoveIt](/atlas/concept/moveit) planning model are built from named links.
+
+## Designing a link: stiffness, mass and error
+
+A link should be as stiff as possible and as light as possible, and those pull against each other. Lighter links let smaller motors move the arm faster; stiffer links keep the tool where the maths says it is.
+
+Length also magnifies small errors. An angle error at a joint moves the tool by roughly that angle (in radians) times the distance to the tool. A 0.1° error at the shoulder of an arm that reaches 1 m puts the tool about 1000 mm × 0.1 × π/180 ≈ **1.7 mm** off target. That is one reason long-reach arms need more precise joints than short ones.
+
+## Going deeper
+
+- **Rigid is a model, not a fact.** Real links bend slightly. Textbook kinematics treats them as rigid bodies ([Lynch & Park, ch. 2](http://hades.mech.northwestern.edu/images/7/7f/MR.pdf)); URDF likewise does not support flexible elements ([URDF model spec](http://wiki.ros.org/urdf/XML/model)). Lightweight or very long arms may need flexible-link models.
+- **Standard versus modified D–H.** Two conventions exist. In standard (distal) D–H, the frame for link *i* sits at the far end of the link, on the next joint's axis; in modified (proximal, Craig) D–H, it sits on the link's own joint axis. Universal Robots' table follows the standard form ([Universal Robots](https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/)); *Modern Robotics* appendix C uses the modified form, though the book does not use that name ([Lynch & Park](http://hades.mech.northwestern.edu/images/7/7f/MR.pdf)). Mixing the two silently gives wrong answers, so check which convention a published table uses.
+- **Link inertia drives dynamics.** The `<inertial>` block in URDF, or the mass and centre-of-mass columns in a manufacturer's table, are what a simulator or a torque controller needs to compute how hard each motor must push.
+
+## Common questions
+
+### What is a link in robotics?
+
+One of the rigid parts of a robot, connected to the others by joints. In an arm most links sit between two joints. The joints let neighbouring parts move relative to each other; the link itself does not bend, so it keeps its joints a fixed distance apart and carries forces between them.
+
+### What is the difference between a link and a joint?
+
+A link is a solid piece; a joint is the connection between two links that allows motion, such as a hinge (revolute joint) or a slider (prismatic joint). An arm alternates them: base link, joint, link, joint, and so on to the tool.
+
+### What is a link in URDF?
+
+A `<link>` element describes one rigid body of the robot: its name, and optionally its mass and inertia, its visual shape and its collision shape. Joints connect links into a tree, and each link becomes a coordinate frame in ROS's TF system.
+
+## Related
+
+- [Joint](/atlas/concept/joint): where the motion happens
+- [Degrees of freedom](/atlas/concept/degrees-of-freedom): how links and joints set what a robot can do
+- [Denavit–Hartenberg parameters](/atlas/concept/denavit-hartenberg): describing link geometry with four numbers
+- [Forward kinematics](/atlas/concept/forward-kinematics): from joint angles to tool position
+- [URDF](/atlas/concept/urdf): links and joints in a ROS robot description

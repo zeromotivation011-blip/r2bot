@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">How a costmap scores the floor around an obstacle</title>
+  <desc id="d">Left: a top-down grid around a wall. Wall cells are lethal (cost 254). Cells closer to the wall than the robot's inscribed radius are inscribed (253): if the robot's centre were there, it would touch the wall. Beyond that the inflation layer adds a cost that fades with distance, and far away cells are free (0). Right: cost against distance from the nearest obstacle for a robot of radius 0.22 metres and an inflation radius of 0.70 metres, using the Nav2 formula 252 times e to the minus cost_scaling_factor times (distance minus inscribed radius). With a scaling factor of 10 the cost falls to about 34 by 0.42 metres; with 3.0 it is still about 138 there, so the planner keeps the robot further from the wall.</desc>
+  <rect width="640" height="400" rx="16" fill="#0f172a"/>
+  <text x="30" y="44" font-size="16" font-weight="700" fill="#e2e8f0">How a costmap scores the floor</text>
+  <text x="610" y="44" font-size="12" fill="#64748b" letter-spacing="1.5" text-anchor="end">NAV2 COST VALUES</text>
+  <rect x="30" y="80" width="24" height="24" rx="3" fill="#ef4444"/>
+  <rect x="56" y="80" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="82" y="80" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="108" y="80" width="24" height="24" rx="3" fill="#b67b19"/>
+  <rect x="134" y="80" width="24" height="24" rx="3" fill="#8e6621"/>
+  <rect x="160" y="80" width="24" height="24" rx="3" fill="#705628"/>
+  <rect x="186" y="80" width="24" height="24" rx="3" fill="#5b4a2d"/>
+  <rect x="212" y="80" width="24" height="24" rx="3" fill="#4b4130"/>
+  <rect x="238" y="80" width="24" height="24" rx="3" fill="#1e293b"/>
+  <rect x="30" y="106" width="24" height="24" rx="3" fill="#ef4444"/>
+  <rect x="56" y="106" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="82" y="106" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="108" y="106" width="24" height="24" rx="3" fill="#b67b19"/>
+  <rect x="134" y="106" width="24" height="24" rx="3" fill="#8e6621"/>
+  <rect x="160" y="106" width="24" height="24" rx="3" fill="#705628"/>
+  <rect x="186" y="106" width="24" height="24" rx="3" fill="#5b4a2d"/>
+  <rect x="212" y="106" width="24" height="24" rx="3" fill="#4b4130"/>
+  <rect x="238" y="106" width="24" height="24" rx="3" fill="#1e293b"/>
+  <rect x="30" y="132" width="24" height="24" rx="3" fill="#ef4444"/>
+  <rect x="56" y="132" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="82" y="132" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="108" y="132" width="24" height="24" rx="3" fill="#b67b19"/>
+  <rect x="134" y="132" width="24" height="24" rx="3" fill="#8e6621"/>
+  <rect x="160" y="132" width="24" height="24" rx="3" fill="#705628"/>
+  <rect x="186" y="132" width="24" height="24" rx="3" fill="#5b4a2d"/>
+  <rect x="212" y="132" width="24" height="24" rx="3" fill="#4b4130"/>
+  <rect x="238" y="132" width="24" height="24" rx="3" fill="#1e293b"/>
+  <rect x="30" y="158" width="24" height="24" rx="3" fill="#ef4444"/>
+  <rect x="56" y="158" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="82" y="158" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="108" y="158" width="24" height="24" rx="3" fill="#b67b19"/>
+  <rect x="134" y="158" width="24" height="24" rx="3" fill="#8e6621"/>
+  <rect x="160" y="158" width="24" height="24" rx="3" fill="#705628"/>
+  <rect x="186" y="158" width="24" height="24" rx="3" fill="#5b4a2d"/>
+  <rect x="212" y="158" width="24" height="24" rx="3" fill="#4b4130"/>
+  <rect x="238" y="158" width="24" height="24" rx="3" fill="#1e293b"/>
+  <rect x="30" y="184" width="24" height="24" rx="3" fill="#ef4444"/>
+  <rect x="56" y="184" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="82" y="184" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="108" y="184" width="24" height="24" rx="3" fill="#b67b19"/>
+  <rect x="134" y="184" width="24" height="24" rx="3" fill="#8e6621"/>
+  <rect x="160" y="184" width="24" height="24" rx="3" fill="#705628"/>
+  <rect x="186" y="184" width="24" height="24" rx="3" fill="#5b4a2d"/>
+  <rect x="212" y="184" width="24" height="24" rx="3" fill="#4b4130"/>
+  <rect x="238" y="184" width="24" height="24" rx="3" fill="#1e293b"/>
+  <rect x="30" y="210" width="24" height="24" rx="3" fill="#ef4444"/>
+  <rect x="56" y="210" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="82" y="210" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="108" y="210" width="24" height="24" rx="3" fill="#b67b19"/>
+  <rect x="134" y="210" width="24" height="24" rx="3" fill="#8e6621"/>
+  <rect x="160" y="210" width="24" height="24" rx="3" fill="#705628"/>
+  <rect x="186" y="210" width="24" height="24" rx="3" fill="#5b4a2d"/>
+  <rect x="212" y="210" width="24" height="24" rx="3" fill="#4b4130"/>
+  <rect x="238" y="210" width="24" height="24" rx="3" fill="#1e293b"/>
+  <rect x="30" y="236" width="24" height="24" rx="3" fill="#ef4444"/>
+  <rect x="56" y="236" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="82" y="236" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="108" y="236" width="24" height="24" rx="3" fill="#b67b19"/>
+  <rect x="134" y="236" width="24" height="24" rx="3" fill="#8e6621"/>
+  <rect x="160" y="236" width="24" height="24" rx="3" fill="#705628"/>
+  <rect x="186" y="236" width="24" height="24" rx="3" fill="#5b4a2d"/>
+  <rect x="212" y="236" width="24" height="24" rx="3" fill="#4b4130"/>
+  <rect x="238" y="236" width="24" height="24" rx="3" fill="#1e293b"/>
+  <rect x="30" y="262" width="24" height="24" rx="3" fill="#ef4444"/>
+  <rect x="56" y="262" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="82" y="262" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="108" y="262" width="24" height="24" rx="3" fill="#b67b19"/>
+  <rect x="134" y="262" width="24" height="24" rx="3" fill="#8e6621"/>
+  <rect x="160" y="262" width="24" height="24" rx="3" fill="#705628"/>
+  <rect x="186" y="262" width="24" height="24" rx="3" fill="#5b4a2d"/>
+  <rect x="212" y="262" width="24" height="24" rx="3" fill="#4b4130"/>
+  <rect x="238" y="262" width="24" height="24" rx="3" fill="#1e293b"/>
+  <rect x="30" y="288" width="24" height="24" rx="3" fill="#ef4444"/>
+  <rect x="56" y="288" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="82" y="288" width="24" height="24" rx="3" fill="#c2410c"/>
+  <rect x="108" y="288" width="24" height="24" rx="3" fill="#b67b19"/>
+  <rect x="134" y="288" width="24" height="24" rx="3" fill="#8e6621"/>
+  <rect x="160" y="288" width="24" height="24" rx="3" fill="#705628"/>
+  <rect x="186" y="288" width="24" height="24" rx="3" fill="#5b4a2d"/>
+  <rect x="212" y="288" width="24" height="24" rx="3" fill="#4b4130"/>
+  <rect x="238" y="288" width="24" height="24" rx="3" fill="#1e293b"/>
+  <circle cx="172" cy="196" r="57" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="4 3"/>
+  <circle cx="172" cy="196" r="3" fill="#e2e8f0"/>
+  <text x="172" y="216" font-size="11" fill="#e2e8f0" text-anchor="middle">robot</text>
+  <rect x="30" y="320" width="12" height="12" rx="2" fill="#ef4444" stroke="#475569"/>
+  <text x="48" y="330" font-size="12" fill="#cbd5e1">254 lethal (wall)</text>
+  <rect x="160" y="320" width="12" height="12" rx="2" fill="#c2410c" stroke="#475569"/>
+  <text x="178" y="330" font-size="12" fill="#cbd5e1">253 inscribed</text>
+  <rect x="30" y="340" width="12" height="12" rx="2" fill="#d98a12" stroke="#475569"/>
+  <text x="48" y="350" font-size="12" fill="#cbd5e1">1–252 inflation</text>
+  <rect x="160" y="340" width="12" height="12" rx="2" fill="#1e293b" stroke="#475569"/>
+  <text x="178" y="350" font-size="12" fill="#cbd5e1">0 free</text>
+  <line x1="330" y1="310" x2="610" y2="310" stroke="#475569"/>
+  <line x1="330" y1="90" x2="330" y2="310" stroke="#475569"/>
+  <text x="324" y="314.0" font-size="11" fill="#94a3b8" text-anchor="end">0</text>
+  <text x="324" y="229.7" font-size="11" fill="#94a3b8" text-anchor="end">100</text>
+  <text x="324" y="145.4" font-size="11" fill="#94a3b8" text-anchor="end">200</text>
+  <text x="324" y="99.8" font-size="11" fill="#94a3b8" text-anchor="end">254</text>
+  <text x="330.0" y="326" font-size="11" fill="#94a3b8" text-anchor="middle">0.0</text>
+  <text x="400.0" y="326" font-size="11" fill="#94a3b8" text-anchor="middle">0.2</text>
+  <text x="470.0" y="326" font-size="11" fill="#94a3b8" text-anchor="middle">0.4</text>
+  <text x="540.0" y="326" font-size="11" fill="#94a3b8" text-anchor="middle">0.6</text>
+  <text x="610.0" y="326" font-size="11" fill="#94a3b8" text-anchor="middle">0.8</text>
+  <text x="470.0" y="344" font-size="12" fill="#94a3b8" text-anchor="middle">distance from nearest obstacle (m)</text>
+  <text x="330" y="81" font-size="12" fill="#94a3b8">cost</text>
+  <line x1="407.0" y1="95" x2="407.0" y2="310" stroke="#c2410c" stroke-dasharray="3 3"/>
+  <text x="401.0" y="177" font-size="11" fill="#fdba74" text-anchor="end">robot radius 0.22</text>
+  <line x1="575.0" y1="125" x2="575.0" y2="310" stroke="#64748b" stroke-dasharray="3 3"/>
+  <text x="571.0" y="151" font-size="11" fill="#94a3b8" text-anchor="end">inflation radius 0.70</text>
+  <path d="M330.0 96.7 L407.0 96.7 L407.0 98.4 L408.8 100.9 L410.5 104.3 L412.3 107.6 L414.0 110.2 L415.8 113.5 L417.5 116.1 L419.3 119.5 L421.0 122.0 L422.8 124.5 L424.5 127.9 L426.3 130.4 L428.0 132.9 L429.8 135.5 L431.5 138.0 L433.3 140.5 L435.0 143.1 L436.8 145.6 L438.5 148.1 L440.3 150.6 L442.0 153.2 L443.8 155.7 L445.5 157.4 L447.3 159.9 L449.0 162.5 L450.8 164.1 L452.5 166.7 L454.3 168.4 L456.0 170.9 L457.8 172.6 L459.5 175.1 L461.3 176.8 L463.0 179.3 L464.8 181.0 L466.5 182.7 L468.3 184.4 L470.0 186.9 L471.8 188.6 L473.5 190.3 L475.3 192.0 L477.0 193.6 L478.8 195.3 L480.5 197.0 L482.3 198.7 L484.0 200.4 L485.8 202.1 L487.5 203.8 L489.3 205.5 L491.0 207.1 L492.8 208.8 L494.5 209.7 L496.3 211.4 L498.0 213.0 L499.8 214.7 L501.5 215.6 L503.3 217.3 L505.0 218.9 L506.8 219.8 L508.5 221.5 L510.3 223.2 L512.0 224.0 L513.8 225.7 L515.5 226.5 L517.3 228.2 L519.0 229.1 L520.8 229.9 L522.5 231.6 L524.3 232.4 L526.0 234.1 L527.8 235.0 L529.5 235.8 L531.3 237.5 L533.0 238.3 L534.8 239.2 L536.5 240.0 L538.3 241.7 L540.0 242.5 L541.8 243.4 L543.5 244.2 L545.3 245.1 L547.0 246.8 L548.8 247.6 L550.5 248.5 L552.3 249.3 L554.0 250.1 L555.8 251.0 L557.5 251.8 L559.3 252.7 L561.0 253.5 L562.8 254.4 L564.5 255.2 L566.3 256.0 L568.0 256.9 L569.8 257.7 L571.5 258.6 L573.3 259.4 L575.0 310.0 L610.0 310.0" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+  <path d="M330.0 96.7 L407.0 96.7 L407.0 98.4 L408.8 108.5 L410.5 118.6 L412.3 127.9 L414.0 136.3 L415.8 144.7 L417.5 153.2 L419.3 160.8 L421.0 168.4 L422.8 175.1 L424.5 181.8 L426.3 187.7 L428.0 193.6 L429.8 199.5 L431.5 204.6 L433.3 210.5 L435.0 214.7 L436.8 219.8 L438.5 224.0 L440.3 228.2 L442.0 232.4 L443.8 235.8 L445.5 240.0 L447.3 243.4 L449.0 246.8 L450.8 249.3 L452.5 252.7 L454.3 255.2 L456.0 257.7 L457.8 260.3 L459.5 262.8 L461.3 265.3 L463.0 267.8 L464.8 269.5 L466.5 272.1 L468.3 273.7 L470.0 275.4 L471.8 277.1 L473.5 278.8 L475.3 280.5 L477.0 281.3 L478.8 283.0 L480.5 284.7 L482.3 285.5 L484.0 287.2 L485.8 288.1 L487.5 288.9 L489.3 289.8 L491.0 291.5 L492.8 292.3 L494.5 293.1 L496.3 294.0 L498.0 294.8 L499.8 295.7 L501.5 296.5 L503.3 296.5 L505.0 297.4 L506.8 298.2 L508.5 299.0 L510.3 299.0 L512.0 299.9 L513.8 300.7 L515.5 300.7 L517.3 301.6 L519.0 301.6 L520.8 302.4 L522.5 302.4 L524.3 303.3 L526.0 303.3 L527.8 304.1 L529.5 304.1 L531.3 304.1 L533.0 304.9 L534.8 304.9 L536.5 304.9 L538.3 305.8 L540.0 305.8 L541.8 305.8 L543.5 305.8 L545.3 306.6 L547.0 306.6 L548.8 306.6 L550.5 306.6 L552.3 307.5 L554.0 307.5 L555.8 307.5 L557.5 307.5 L559.3 307.5 L561.0 307.5 L562.8 308.3 L564.5 308.3 L566.3 308.3 L568.0 308.3 L569.8 308.3 L571.5 308.3 L573.3 308.3 L575.0 310.0 L610.0 310.0" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 4"/>
+  <text x="494.5" y="201.7" font-size="12" fill="#f59e0b">scaling 3.0</text>
+  <text x="456.0" y="277.7" font-size="12" fill="#38bdf8">scaling 10.0</text>
+  <text x="30" y="370" font-size="11" fill="#64748b">Grid: one cell = 0.1 m, wall on the left, scaling 3.0. Curve: cost = 252 × e^(−scaling × (distance − radius))</text>
+  <text x="30" y="386" font-size="11" fill="#64748b">between the robot radius and the inflation radius, and 0 beyond it (nav2_costmap_2d, Jazzy).</text>
+</svg>

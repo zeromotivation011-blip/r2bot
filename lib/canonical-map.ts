@@ -87,6 +87,10 @@ export const BLOG_TO_ATLAS: Record<string, string> = {
  * "lqr" / "lqr controller" is owned by lqr-controller; the duplicate
  * linear-quadratic-regulator entry was merged into it and 308s there
  * (next.config.mjs, app/sitemap.ts REDIRECTED_ATLAS).
+ * 24 Nov 2026: "costmap" / "costmap ros2" / "what is a costmap" ranked
+ * /atlas/concept/costmap (pos 4-9, 0 clicks). costmap owns the general and
+ * Nav2 queries (cost scale, inflation, global vs local); costmap-layers goes
+ * layer by layer and links back from its first paragraph.
  *
  * Query → owning path.
  */
@@ -113,6 +117,16 @@ export const ATLAS_QUERY_OWNER: Record<string, string> = {
   'force control': '/atlas/concept/force-control',
   'force control robotics': '/atlas/concept/force-control',
   'hybrid position force control': '/atlas/concept/force-control',
+  costmap: '/atlas/concept/costmap',
+  'what is a costmap': '/atlas/concept/costmap',
+  'costmap ros2': '/atlas/concept/costmap',
+  'nav2 costmap': '/atlas/concept/costmap',
+  'cost map robotics': '/atlas/concept/costmap',
+  'costmap layers': '/atlas/concept/costmap-layers',
+  'layered costmap': '/atlas/concept/costmap-layers',
+  'robot link': '/atlas/concept/link-robot',
+  'robot arm link': '/atlas/concept/link-robot',
+  'link in robotics': '/atlas/concept/link-robot',
 }
 
 /**

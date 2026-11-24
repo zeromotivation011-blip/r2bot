@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">Links and joints in a robot arm, and the same arm as a URDF tree</title>
+  <desc id="d">Left: a two-joint arm seen from the side. The base link is bolted to the floor. Joint 1 connects it to link 1, the upper arm. Joint 2 connects link 1 to link 2, the forearm, which carries the end-effector. Each link is rigid; motion happens only at the joints. Right: the same arm written as a URDF kinematic tree: base_link, joint_1, link_1, joint_2, link_2, a fixed joint, tool0. In URDF every link except the root has exactly one parent joint.</desc>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker></defs>
+  <rect width="640" height="380" rx="16" fill="#0f172a"/>
+  <text x="30" y="44" font-size="16" font-weight="700" fill="#e2e8f0">Links are the rigid parts; joints are where it moves</text>
+  <line x1="30" y1="320" x2="340" y2="320" stroke="#475569" stroke-width="2"/>
+  <rect x="60" y="270" width="80" height="50" rx="6" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="100" y="342" font-size="12" fill="#cbd5e1" text-anchor="middle">base link</text>
+  <line x1="100.0" y1="262.0" x2="186.0" y2="139.1" stroke="#f59e0b" stroke-width="18" stroke-linecap="round"/>
+  <line x1="186.0" y1="139.1" x2="303.5" y2="181.9" stroke="#f59e0b" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="100.0" cy="262.0" r="13" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+  <circle cx="100.0" cy="262.0" r="3" fill="#38bdf8"/>
+  <circle cx="186.0" cy="139.1" r="13" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+  <circle cx="186.0" cy="139.1" r="3" fill="#38bdf8"/>
+  <path d="M303.5 169.9 l22 0 M303.5 193.9 l22 0 M303.5 169.9 l0 24" stroke="#e2e8f0" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <text x="307.5" y="217.9" font-size="12" fill="#cbd5e1" text-anchor="middle">end-effector</text>
+  <text x="161.0" y="230.6" font-size="13" font-weight="700" fill="#f59e0b">link 1</text>
+  <text x="161.0" y="246.6" font-size="12" fill="#94a3b8">upper arm</text>
+  <text x="234.8" y="138.5" font-size="13" font-weight="700" fill="#f59e0b">link 2</text>
+  <text x="234.8" y="152.5" font-size="12" fill="#94a3b8" dx="0">forearm</text>
+  <text x="80.0" y="248.0" font-size="12" fill="#38bdf8" text-anchor="end">joint 1</text>
+  <text x="168.0" y="133.1" font-size="12" fill="#38bdf8" text-anchor="end">joint 2</text>
+  <text x="420" y="84" font-size="12" fill="#64748b" letter-spacing="1.5">SAME ARM IN URDF</text>
+  <rect x="420" y="104" width="170" height="26" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="505" y="121" font-size="12.5" fill="#e2e8f0" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace">&lt;link&gt; base_link</text>
+  <line x1="505" y1="130" x2="505" y2="154" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="515" y="146" font-size="11.5" fill="#38bdf8">joint_1 (revolute)</text>
+  <rect x="420" y="156" width="170" height="26" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="505" y="173" font-size="12.5" fill="#e2e8f0" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace">&lt;link&gt; link_1</text>
+  <line x1="505" y1="182" x2="505" y2="206" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="515" y="198" font-size="11.5" fill="#38bdf8">joint_2 (revolute)</text>
+  <rect x="420" y="208" width="170" height="26" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="505" y="225" font-size="12.5" fill="#e2e8f0" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace">&lt;link&gt; link_2</text>
+  <line x1="505" y1="234" x2="505" y2="258" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="515" y="250" font-size="11.5" fill="#38bdf8">tool0_joint (fixed)</text>
+  <rect x="420" y="260" width="170" height="26" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="505" y="277" font-size="12.5" fill="#e2e8f0" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace">&lt;link&gt; tool0</text>
+  <text x="420" y="308" font-size="11.5" fill="#94a3b8">Each link has one parent joint;</text>
+  <text x="420" y="324" font-size="11.5" fill="#94a3b8">the root (base_link) has none.</text>
+</svg>
