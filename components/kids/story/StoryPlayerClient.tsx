@@ -17,7 +17,7 @@ import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import './story.css'
 import type { Action, Beat, CastMember, CharacterId, ChoiceOption, Emotion, Episode, Lighting, Motion, PropId, Scene, SpeakerId } from '@/lib/kids/stories/types'
 import { CAST } from '@/lib/kids/stories/cast'
-import { lineMs } from '@/lib/kids/stories'
+import { lineMs } from '@/lib/kids/stories/timing'
 import { isVoiceMuted, speakLine, speechAvailable, stopSpeech, warmVoices, type SpeakHandle } from '@/lib/kids/stories/speech'
 import { playSfx, primeSfx } from '@/lib/kids/stories/sfx'
 import { playSound, primeAudio } from '@/lib/kids-audio'
@@ -410,8 +410,14 @@ export default function StoryPlayerClient({ episode, next }: Props) {
     if (status !== 'choice' && status !== 'quiz' && status !== 'done') return
     const el = panelRef.current
     if (!el) return
+    // On phones the kids shell pins a tab bar to the bottom of the screen;
+    // keep the panel's last button clear of it, or a tap lands on a tab.
+    const bar = document.querySelector<HTMLElement>('.kids-tabbar')
+    const barH = bar && getComputedStyle(bar).position === 'fixed' ? bar.getBoundingClientRect().height : 0
+    const inset = barH > 0 ? Math.ceil(barH) + 12 : 0
+    el.style.scrollMarginBottom = `${inset}px`
     const r = el.getBoundingClientRect()
-    if (r.bottom > window.innerHeight || r.top < 0) el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' })
+    if (r.bottom > window.innerHeight - inset || r.top < 0) el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' })
   }, [status, qi, reduced])
 
   // ── controls ───────────────────────────────────────────────────────────
@@ -627,7 +633,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
               type="button"
               onClick={start}
               aria-label={`Play ${episode.title}`}
-              className="st-pulse-ring flex h-20 w-20 items-center justify-center rounded-full bg-orange-500 text-white shadow-xl transition hover:scale-105 hover:bg-orange-400 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-amber-300 sm:h-28 sm:w-28"
+              className="st-pulse-ring flex h-20 w-20 items-center justify-center rounded-full bg-orange-700 text-white shadow-xl transition hover:scale-105 hover:bg-orange-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-amber-300 sm:h-28 sm:w-28"
             >
               <svg viewBox="0 0 24 24" className="ml-1 h-10 w-10 sm:h-14 sm:w-14" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor" /></svg>
             </button>
@@ -915,7 +921,7 @@ function QuizPanel(props: { n: number; total: number; q: string; options: string
           <button
             type="button"
             onClick={onNext}
-            className="min-h-11 rounded-xl bg-orange-500 px-5 font-black text-white hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300"
+            className="min-h-11 rounded-xl bg-orange-700 px-5 font-black text-white hover:bg-orange-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300"
           >
             {n + 1 < total ? 'Next question →' : 'See my stars ★'}
           </button>
@@ -938,7 +944,7 @@ function DonePanel({ stars, added, episode, next, onReplay }: { stars: number; a
         {added > 0 ? `+${added} ${added === 1 ? 'star' : 'stars'} for your collection!` : 'You already had these stars. Can you beat your best?'}
       </p>
       <div className="mt-3 grid gap-2 sm:grid-cols-3">
-        <Link href={`/kids/stories/${next.slug}`} className="flex min-h-12 items-center justify-center rounded-xl bg-orange-500 px-3 py-2 font-black text-white hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300">
+        <Link href={`/kids/stories/${next.slug}`} className="flex min-h-12 items-center justify-center rounded-xl bg-orange-700 px-3 py-2 font-black text-white hover:bg-orange-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300">
           Next episode: {next.title} →
         </Link>
         <Link href={episode.handsOn.href} className="flex min-h-12 items-center justify-center rounded-xl bg-emerald-600 px-3 py-2 font-black text-white hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300">

@@ -49,7 +49,7 @@ export function classTotals(members: KidsMemberRow[], now: number = Date.now()):
     t.episodes += s.episodes
     t.missions += s.missions
     t.levels += s.levels
-    if (m.snapshot.robot) t.robotsBuilt += 1
+    if (m.snapshot.robotsBuilt > 0) t.robotsBuilt += 1
     if (now - Date.parse(m.lastActiveAt) < WEEK_MS && (s.stars > 0 || s.minutes > 0)) t.activeThisWeek += 1
   }
   return t

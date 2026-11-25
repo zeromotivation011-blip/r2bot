@@ -1,10 +1,13 @@
 // components/kids/classroom/LessonPlanPanel.tsx
 // The suggested six-week plan for a band. Native <details>, no hooks, so it
 // renders on the server (schools page) and in the teacher dashboard alike.
+// Each week links the exact episode and missions it names.
 
 import Link from 'next/link'
 import { getBand, type BandId } from '@/lib/kids/bands'
-import { CLASS_PLANS, LESSON_SHAPE, PLAN_LINKS } from '@/lib/kids/classroom-plan'
+import { CLASS_PLANS, LESSON_SHAPE, PLAN_LINKS, episodeHref, missionHref } from '@/lib/kids/classroom-plan'
+
+const CHIP = 'inline-flex min-h-[44px] items-center rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 text-sm font-semibold text-amber-100 underline-offset-2 hover:bg-amber-500/20 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400'
 
 export function LessonPlanPanel({ band, headingLevel = 2 }: { band: BandId; headingLevel?: 2 | 3 }) {
   const weeks = CLASS_PLANS[band]
@@ -37,7 +40,10 @@ export function LessonPlanPanel({ band, headingLevel = 2 }: { band: BandId; head
               <dl className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <dt className="font-semibold text-amber-200">🎬 <Link href={PLAN_LINKS.story} className="underline-offset-2 hover:underline">Story Theatre</Link></dt>
-                  <dd className="mt-0.5">{w.story}</dd>
+                  <dd className="mt-0.5">
+                    <Link href={episodeHref(w.episode.slug)} className={CHIP}>▶ {w.episode.title}</Link>
+                    <p className="mt-1.5">{w.story}</p>
+                  </dd>
                 </div>
                 <div>
                   <dt className="font-semibold text-amber-200">✋ Unplugged (no screens)</dt>
@@ -49,7 +55,16 @@ export function LessonPlanPanel({ band, headingLevel = 2 }: { band: BandId; head
                 </div>
                 <div>
                   <dt className="font-semibold text-amber-200">🧩 <Link href={PLAN_LINKS.codeLab} className="underline-offset-2 hover:underline">Code Lab</Link></dt>
-                  <dd className="mt-0.5">{w.codeLab}</dd>
+                  <dd className="mt-0.5">
+                    {w.missions.length > 0 && (
+                      <ul className="mb-1.5 flex flex-wrap gap-2" aria-label={`Code Lab missions for week ${w.week}`}>
+                        {w.missions.map((m) => (
+                          <li key={m.id}><Link href={missionHref(m.id)} className={CHIP}>{m.title}</Link></li>
+                        ))}
+                      </ul>
+                    )}
+                    <p>{w.codeLab}</p>
+                  </dd>
                 </div>
               </dl>
             </div>

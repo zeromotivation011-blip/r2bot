@@ -9,7 +9,7 @@
 // details, and the snapshot parser accepts only a fixed set of counters.
 
 import { BAND_ORDER, type BandId } from './bands'
-import { decodeDesign, getPart, type Slot } from './robot-design'
+import { DEFAULT_DESIGN, decodeDesign, encodeDesign, getPart, type Slot } from './robot-design'
 
 // ── Join codes ───────────────────────────────────────────────────────────────
 /** No I, L, O, 0 or 1 — a code read off a classroom wall cannot be misread. */
@@ -93,7 +93,7 @@ export function cleanText(raw: unknown, max: number): string {
 }
 
 // ── Snapshot ─────────────────────────────────────────────────────────────────
-/** What a child's browser sends to the class. Counters only — no free text except the robot code. */
+/** What a child's browser sends to the class. Counters only — no free text except the robot code, whose name is checked like a nickname. */
 export interface ClassSnapshot {
   v: 1
   totalStars: number
@@ -150,9 +150,15 @@ export function parseSnapshot(x: unknown): ClassSnapshot | null {
   const zones = Array.isArray(o.completedZones)
     ? o.completedZones.filter((z): z is string => typeof z === 'string' && KEY_RE.test(z)).slice(0, 20)
     : []
+  const robotsBuilt = int(o.robotsBuilt, 100_000)
+  // Only a child who has actually built a robot has one to show. The robot
+  // name is free text a child typed, so it goes through the nickname rules and
+  // is replaced with the default name if it fails; the stored code is
+  // re-encoded from the parsed design, never the raw client string.
   let robot: string | null = null
-  if (typeof o.robot === 'string' && o.robot.length <= 160) {
-    robot = decodeDesign(o.robot) ? o.robot : null
+  if (robotsBuilt > 0 && typeof o.robot === 'string' && o.robot.length <= 160) {
+    const d = decodeDesign(o.robot)
+    if (d) robot = encodeDesign({ ...d, name: safeRobotName(d.name) })
   }
   return {
     v: 1,
@@ -161,7 +167,7 @@ export function parseSnapshot(x: unknown): ClassSnapshot | null {
     completedZones: Array.from(new Set(zones)),
     episodesDone: starMap(o.episodesDone, 120, 3),
     codeMissions: starMap(o.codeMissions, 200, 3),
-    robotsBuilt: int(o.robotsBuilt, 100_000),
+    robotsBuilt,
     totalMinutesPlayed: int(o.totalMinutesPlayed, 1_000_000),
     band: isBandId(o.band) ? o.band : null,
     robot,
@@ -170,6 +176,12 @@ export function parseSnapshot(x: unknown): ClassSnapshot | null {
 }
 
 // ── Robot card ───────────────────────────────────────────────────────────────
+/** A robot name a teacher may see: passes the nickname rules, else the default name. */
+export function safeRobotName(name: string): string {
+  const c = checkNickname(name)
+  return c.ok ? c.nickname : DEFAULT_DESIGN.name
+}
+
 export interface RobotSummary {
   name: string
   primary: string
@@ -188,7 +200,7 @@ export function robotSummary(code: string | null): RobotSummary | null {
     const p = getPart(slot, d[slot])
     if (p && p.id !== 'none') parts.push({ slot, name: p.name, emoji: p.emoji })
   }
-  return { name: d.name, primary: d.primary, accent: d.accent, parts }
+  return { name: safeRobotName(d.name), primary: d.primary, accent: d.accent, parts }
 }
 
 // ── API shapes (shared by routes and clients) ───────────────────────────────

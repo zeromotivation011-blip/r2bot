@@ -121,7 +121,7 @@ export default function StoriesPage() {
                     <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm text-white/75">
                       {e.learns.slice(0, 3).map((l) => <li key={l}>{l}</li>)}
                     </ul>
-                    <p className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-4 font-black text-white group-hover:bg-orange-400" aria-hidden>
+                    <p className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-orange-700 px-4 font-black text-white group-hover:bg-orange-800" aria-hidden>
                       ▶ Watch
                     </p>
                   </article>

@@ -20,7 +20,7 @@ export const lineFollowerRace: Episode = {
   ],
   factNote:
     'Many factory and warehouse vehicles (automated guided vehicles, AGVs) follow lines, magnetic tape or markers on the floor. PID control — proportional, integral, derivative — is used in drones, ovens, cruise control and industrial machines. The episode simplifies the error to “how far from the centre of the line”, which is how most hobby line followers compute it from an array of reflectance sensors.',
-  handsOn: { href: '/kids/code-lab', label: 'Tune a line follower in the Code Lab', why: 'Change the gain and watch the path smooth out.' },
+  handsOn: { href: '/kids/code-lab', label: 'Program a line follower in the Code Lab', why: 'Use IF/ELSE blocks to keep a robot on a twisty line.' },
   updated: '2026-11-25',
   scenes: [
     {

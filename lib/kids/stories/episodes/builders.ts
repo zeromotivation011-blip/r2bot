@@ -20,7 +20,7 @@ export const robotThatCouldntSee: Episode = {
   ],
   factNote:
     'Hobby ultrasonic sensors (such as the common HC-SR04) send a burst at about 40 kHz, above human hearing (roughly 20 kHz), and time the echo. Sound travels about 343 metres per second in air at room temperature, so the distance is half the echo time multiplied by that speed. Robot vacuums and cars combine several sensor types for the same reason Spark does.',
-  handsOn: { href: '/kids/workshop', label: 'Choose sensors in the Workshop', why: 'Give your robot ultrasonic “ears”, bump sensors and a camera.' },
+  handsOn: { href: '/kids/workshop', label: 'Choose sensors in the Workshop', why: 'Give your robot two kinds of sensor: Distance Eyes (or a camera) up top, plus a Bumper Switch underneath.' },
   updated: '2026-11-25',
   scenes: [
     {

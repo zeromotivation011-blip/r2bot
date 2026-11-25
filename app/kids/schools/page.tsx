@@ -245,10 +245,10 @@ export default function KidsSchoolsPage() {
             <div className={CARD}>
               <h3 className="text-lg font-extrabold text-white">CSTA K-12 Computer Science Standards</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-slate-300">
-                The Code Lab and plans cover the Algorithms &amp; Programming strand: sequences and simple loops for the
-                youngest (for example 1A-AP-10), then sequences, events, loops and conditionals (1B-AP-10), then nested
-                control structures and debugging for middle school. Unplugged activities support the Computing Systems
-                strand — what sensors and actuators are and how they work together.
+                The Code Lab and plans cover the Algorithms &amp; Programming strand: sequences for the youngest, with
+                loops acted out unplugged (for example 1A-AP-10), then loops and debugging, with a first step into
+                conditionals (1B-AP-10), then nested loops and decisions for middle school. Unplugged activities support
+                the Computing Systems strand — what sensors and actuators are and how they work together.
               </p>
             </div>
             <div className={CARD}>

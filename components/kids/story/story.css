@@ -124,5 +124,7 @@
 /* Reduced motion: keep the story, drop the movement. */
 @media (prefers-reduced-motion: reduce) {
   .st-stage *, .st-stage { animation: none !important; transition: none !important; }
+  /* These animate outside the <svg> (overlays, progress bar, result stars). */
+  .st-pulse-ring, .st-glow, .st-curtain, .st-title-in, .st-star-pop { animation: none !important; }
   .st-mouth-live { transform: scaleY(var(--talk, .25)); }
 }

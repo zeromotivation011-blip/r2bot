@@ -217,7 +217,7 @@ export default function WorkshopClient() {
                 setDriving((v) => !v)
               }}
               aria-pressed={driving}
-              className="min-h-[48px] rounded-2xl bg-sky-500 px-4 font-black text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
+              className="min-h-[48px] rounded-2xl bg-sky-700 px-4 font-black text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
             >
               {driving ? '🔧 Back to building' : '🏁 Test drive'}
             </button>
@@ -238,7 +238,7 @@ export default function WorkshopClient() {
                 setDriving(false)
                 setArOpen(true)
               }}
-              className="min-h-[48px] rounded-2xl bg-fuchsia-500 px-4 font-black text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
+              className="min-h-[48px] rounded-2xl bg-fuchsia-700 px-4 font-black text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
             >
               📱 See it in your room
             </button>

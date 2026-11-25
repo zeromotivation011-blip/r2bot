@@ -22,7 +22,7 @@ export type Capability =
   | 'see-wall' // distance sensor or camera: "wall ahead?" block
   | 'see-color' // colour sensor or camera: "on colour?" block
   | 'follow-line' // line sensor: "on the line?" block
-  | 'feel-bump' // bumper: "bumped?" block
+  | 'feel-bump' // bumper (no Code Lab block uses it yet; the part still teaches touch sensing)
   | 'grab' // gripper or scoop: pick up / drop
   | 'draw' // pen: leaves a trail
   | 'light' // light: lights up dark tiles
@@ -83,7 +83,7 @@ export const ROBOT_PARTS_3D: RobotPart[] = [
   {
     id: 'wheels2', slot: 'drive', name: 'Two Wheels + Caster', emoji: '🛞',
     what: 'Two motor wheels and a little ball that rolls along at the back.',
-    withIt: 'Spin one wheel faster than the other and the robot turns on the spot.',
+    withIt: 'Spin one wheel faster and the robot curves. Spin the wheels opposite ways and it turns on the spot.',
     withoutIt: 'With no wheels or legs, a robot is a statue — it cannot go anywhere.',
     realWorld: 'Most robot vacuums and school robot kits drive this way.',
     gives: ['move'],
@@ -326,6 +326,16 @@ export function encodeDesign(d: RobotDesign): string {
 export function decodeDesign(s: string): RobotDesign | null {
   const p = s.split('.')
   if (p.length < 8) return null
+  // The name is percent-encoded; a truncated or edited link can leave a broken
+  // escape ("Robo%2"), and decodeURIComponent throws on that. Treat it as not a
+  // design, and keep only the characters encodeDesign() itself allows.
+  let name: string
+  try {
+    name = decodeURIComponent(p.slice(7).join('.'))
+  } catch {
+    return null
+  }
+  name = name.replace(/[^A-Za-z0-9 ]/g, '').slice(0, 20)
   const d: RobotDesign = {
     v: 1,
     body: p[0] as BodyId,
@@ -335,7 +345,7 @@ export function decodeDesign(s: string): RobotDesign | null {
     sensor: p[4] as SensorId,
     primary: /^[0-9A-Fa-f]{6}$/.test(p[5]) ? `#${p[5]}` : DEFAULT_DESIGN.primary,
     accent: /^[0-9A-Fa-f]{6}$/.test(p[6]) ? `#${p[6]}` : DEFAULT_DESIGN.accent,
-    name: decodeURIComponent(p.slice(7).join('.')).slice(0, 20) || DEFAULT_DESIGN.name,
+    name: name || DEFAULT_DESIGN.name,
   }
   for (const slot of ['body', 'drive', 'head', 'tool', 'sensor'] as Slot[]) {
     if (!getPart(slot, d[slot])) return null

@@ -177,13 +177,13 @@ export const wobblyBot: Episode = {
     'Spark wants to zoom down the long corridors of a children’s hospital in Nairobi on two wheels, but he keeps tipping over. Balancing a broom on her hand, Amara discovers feedback: measure, correct, measure again. With a gyroscope sensor and a feedback program, Spark balances smoothly and makes his first delivery.',
   learns: [
     'Feedback means measuring, correcting, then measuring again, over and over.',
-    'A gyroscope sensor tells a robot how it is tilting and turning.',
+    'A gyroscope senses how fast a robot is turning or tipping; with an accelerometer it can work out the tilt.',
     'A two-wheeled robot that tips forward rolls forward to get back underneath itself.',
     'Fridges, drones and bike riders all use feedback.',
   ],
   factNote:
     'Two-wheeled balancing robots behave like an upside-down pendulum. Real ones usually combine a gyroscope with an accelerometer (together called an IMU) to estimate tilt, and run their control loop hundreds of times a second. Many hospitals already use wheeled robots to carry medicines and supplies, though most of those have four wheels.',
-  handsOn: { href: '/kids/workshop', label: 'Add a gyroscope in the Workshop', why: 'See which sensors keep a robot steady.' },
+  handsOn: { href: '/kids/workshop', label: 'Build a steady robot in the Workshop', why: 'Spark needed feedback to balance on two wheels. A caster wheel or four wheels keep a robot standing without it. Pick a base for your own delivery robot.' },
   updated: '2026-11-25',
   scenes: [
     {
@@ -251,7 +251,7 @@ export const wobblyBot: Episode = {
             say('spark', 'Now I can shout I’M FALLING really loudly. But I still fall.', 'sad'),
             say('lucia', 'Shouting doesn’t help with balance! He needs to measure the tilt. Try again.', 'happy'),
           ]),
-          right('A tilt sensor called a gyroscope', [
+          right('A gyroscope that feels how fast he is tipping', [
             say('lucia', 'Yes! A gyroscope sensor feels the robot turning and tipping, so it knows which way it’s falling, and how fast.', 'excited'),
           ]),
           wrong('Heavier wheels', [
@@ -261,7 +261,7 @@ export const wobblyBot: Episode = {
             say('lucia', 'Weight alone won’t do it. He has to know which way he’s tipping. Try again.'),
           ]),
         ]),
-        prop('gyro', 'Gyroscope sensor: measures tipping and turning', 'center'),
+        prop('gyro', 'Gyroscope: senses how fast it is tipping or turning', 'center'),
         say('lucia', 'Here’s the trick. If Spark starts tipping forward, his wheels roll forward, to get back underneath him. Tipping backward? Roll backward.'),
         say('amara', 'Just like moving my hand under the broom!', 'excited'),
         say('lucia', 'And the robot does it many, many times every second. Measure, correct, measure again. So fast you can hardly see it.', 'happy'),

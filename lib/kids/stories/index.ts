@@ -9,6 +9,7 @@ import { loopDeLoopGarden, robotThatCouldntSee } from './episodes/builders'
 import { trafficLightRobot, wobblyBot } from './episodes/inventors'
 import { lineFollowerRace, roverOnMars } from './episodes/engineers'
 import type { Beat, Episode, TranscriptLine } from './types'
+import { lineMs } from './timing'
 
 export type { Episode } from './types'
 
@@ -39,14 +40,10 @@ export function nextEpisode(slug: string): Episode {
 }
 
 // ─── Timing ────────────────────────────────────────────────────────────────
-// Speech runs at roughly 2.4 words a second at the rates we use. The player
-// uses lineMs() when there is no voice, so the estimate and the silent
-// playback agree.
+// lineMs lives in ./timing so the player can use it without importing the
+// whole catalogue; re-exported here for everyone else.
 
-export function lineMs(text: string): number {
-  const words = text.trim().split(/\s+/).length
-  return Math.max(1600, Math.round(words * 420 + 700))
-}
+export { lineMs }
 
 function beatMs(b: Beat): number {
   switch (b.kind) {

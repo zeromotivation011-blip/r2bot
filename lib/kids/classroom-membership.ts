@@ -63,11 +63,15 @@ export function buildSnapshot(): ClassSnapshot {
     if (attempts >= 2 && (p.starsByLevel?.[k] ?? 0) < 2) stuck[k] = attempts
   }
   const stuckTop = Object.fromEntries(Object.entries(stuck).sort((a, b) => b[1] - a[1]).slice(0, 20))
+  // loadDesign() falls back to the default robot when nothing was saved, so
+  // only send a robot once the child has actually built one.
   let robot: string | null = null
-  try {
-    robot = encodeDesign(loadDesign())
-  } catch {
-    robot = null
+  if ((p.robotsBuilt ?? 0) > 0) {
+    try {
+      robot = encodeDesign(loadDesign())
+    } catch {
+      robot = null
+    }
   }
   return {
     v: 1,

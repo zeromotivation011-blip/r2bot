@@ -40,14 +40,18 @@ export async function GET(): Promise<Response> {
   if (error) return isMissingTable(error) ? notReadyResponse() : jsonError(500, 'Could not load classes.')
   const rows = (data ?? []) as ClassDbRow[]
 
+  // One head-only count per class (at most MAX_CLASSES_PER_TEACHER). Fetching
+  // every member row would hit PostgREST's 1,000-row cap and undercount.
   const counts = new Map<string, number>()
-  if (rows.length) {
-    const { data: members } = await admin
-      .from('kids_class_members')
-      .select('class_id')
-      .in('class_id', rows.map((r) => r.id))
-    for (const m of (members ?? []) as { class_id: string }[]) counts.set(m.class_id, (counts.get(m.class_id) ?? 0) + 1)
-  }
+  await Promise.all(
+    rows.map(async (r) => {
+      const { count } = await admin
+        .from('kids_class_members')
+        .select('id', { count: 'exact', head: true })
+        .eq('class_id', r.id)
+      counts.set(r.id, count ?? 0)
+    }),
+  )
 
   // A friendly default for "what children see": the profile's display name.
   let suggestedTeacherName = ''
