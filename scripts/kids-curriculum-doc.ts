@@ -9,7 +9,10 @@
 
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { BLOCK_NEEDS, type BlockId, type CodeChallenge, type Level, type Session } from '../lib/kids/curriculum/types'
+import { BLOCK_NEEDS, type BlockId, type CodeChallenge, type Level, type PartRef, type QuizQuestion, type RobotSpec, type Session } from '../lib/kids/curriculum/types'
+import { DEFAULT_DESIGN, getPart, type Capability, type RobotDesign } from '../lib/kids/robot-design'
+import { robotSpec } from '../lib/kids/sim/robot-spec'
+import { L1_GEOMETRY, L1_ROBOT_GEOMETRY, PART_MASS_KG, TILE_CM, checkL1Geometry } from '../lib/kids/curriculum/level1/shared'
 import {
   ASSESSMENT, BLOCK_STYLE, BLOCKS_INTRODUCED, CONCEPT_SPIRAL, LEVELS, OPEN_QUESTIONS, PRINCIPLES, SCHOOL_USE,
 } from '../lib/kids/curriculum/levels'
@@ -24,7 +27,48 @@ import type { ConceptId, LevelNumber } from '../lib/kids/curriculum/types'
 const problems: string[] = []
 const fail = (msg: string) => problems.push(msg)
 
-function checkChallenge(sess: Session, c: CodeChallenge, known: Set<BlockId>, where: string) {
+const ALL_BLOCKS = (Object.keys(BLOCK_NEEDS) as BlockId[]).sort((a, b) => b.length - a.length)
+const BLOCK_RE = new RegExp(`\\b(${ALL_BLOCKS.join('|')})\\b`, 'g')
+
+/** Block ids a pseudo-code program uses (comments after ← and quoted words removed). */
+function blocksIn(lines: string[]): Set<BlockId> {
+  const out = new Set<BlockId>()
+  for (const raw of lines) {
+    const line = raw.replace(/←.*$/, '').replace(/"[^"]*"/g, '').replace(/“[^”]*”/g, '')
+    for (const m of line.matchAll(BLOCK_RE)) out.add(m[1] as BlockId)
+  }
+  return out
+}
+
+/** Capabilities of the robot as it stands; null = the child chose the tool (any tool capability may be present). */
+function capabilities(r: RobotSpec): Set<Capability> {
+  const caps = new Set<Capability>()
+  const add = (slot: PartRef['slot'], id: string) => getPart(slot, id)?.gives.forEach((c) => caps.add(c))
+  if (r.drive !== 'none' && r.drive !== 'child-choice') add('drive', r.drive)
+  if (r.head !== 'none') add('head', r.head)
+  if (r.tool !== 'child-choice') add('tool', r.tool)
+  add('sensor', r.sensor)
+  return caps
+}
+
+function checkChallenge(sess: Session, c: CodeChallenge, known: Set<BlockId>, where: string, robot?: RobotSpec) {
+  // Every block the example or starter uses must be offered (directly or inside a fixed condition) and already introduced.
+  const offered = new Set<string>(c.allowedBlocks.map((b) => b.id))
+  const conds = c.allowedBlocks.map((b) => String(b.fixed?.cond ?? '')).join(' ')
+  for (const id of blocksIn([...c.exampleSolution, ...(c.starter ?? [])])) {
+    if (!offered.has(id) && !conds.includes(id)) fail(`${sess.id} ${where}: example/starter uses "${id}", which this challenge does not offer`)
+    if (!known.has(id)) fail(`${sess.id} ${where}: example/starter uses "${id}" before it is introduced`)
+  }
+  // The arena's required parts must be on the robot by now (a child-chosen tool satisfies any tool need).
+  if (robot) {
+    const caps = capabilities(robot)
+    const toolCaps: Capability[] = ['grab', 'draw', 'light']
+    for (const need of c.arena.requires) {
+      if (caps.has(need)) continue
+      if (robot.tool === 'child-choice' && toolCaps.includes(need)) continue
+      fail(`${sess.id} ${where}: arena requires "${need}" but the robot at this point has no part that gives it`)
+    }
+  }
   for (const b of c.allowedBlocks) {
     if (!known.has(b.id)) fail(`${sess.id} ${where}: block "${b.id}" offered before it is introduced`)
     // A Level 1 picture block can hide a sensor inside its fixed condition.
@@ -56,6 +100,8 @@ function check(): void {
   const known = new Set<BlockId>()
   const ids = new Set<string>()
   const badges = new Set<string>()
+  const robot: RobotSpec = { ...l1.startRobot, toolbox: [...l1.startRobot.toolbox] }
+  const answers: number[] = []
   LEVEL1_SESSIONS.forEach((sess, i) => {
     if (sess.number !== i + 1) fail(`Level 1 session order broken at ${sess.id}`)
     if (sess.id !== `L1-S${String(sess.number).padStart(2, '0')}`) fail(`Bad id ${sess.id}`)
@@ -72,8 +118,21 @@ function check(): void {
       fail(`${sess.id}: project mismatch with levels.ts`)
     }
     for (const b of sess.newBlocks) known.add(b)
-    checkChallenge(sess, sess.code, known, 'code')
-    checkChallenge(sess, sess.challenge, known, 'challenge')
+    // Fit the build step's part (the build comes before the code and the challenge).
+    const p = sess.build.part
+    if (sess.build.action !== 'inspect') {
+      if (p.slot === 'body') robot.body = p.id
+      else if (p.slot === 'drive') robot.drive = p.id
+      else if (p.slot === 'head') robot.head = p.id
+      else if (p.slot === 'tool') robot.tool = p.id
+      else robot.sensor = p.id
+    }
+    checkChallenge(sess, sess.code, known, 'code', robot)
+    checkChallenge(sess, sess.challenge, known, 'challenge', robot)
+    if (!sess.objectives.some((ob) => !ob.discussionOnly)) fail(`${sess.id}: every objective is discussion-only; one must be assessed by the challenge`)
+    if (sess.kind === 'lesson' && sess.teacher.unpluggedWarmup.minutes !== sess.teacher.timing[0].minutes) {
+      fail(`${sess.id}: warm-up is ${sess.teacher.unpluggedWarmup.minutes} min but the class plan gives it ${sess.teacher.timing[0].minutes}`)
+    }
 
     const minutes = sess.teacher.timing.reduce((a, t) => a + t.minutes, 0)
     if (minutes !== 40) fail(`${sess.id}: class plan is ${minutes} min, not 40`)
@@ -81,14 +140,43 @@ function check(): void {
     const [lo, hi] = sess.kind === 'project' ? [120, 240] : [180, 300]
     if (rt < lo || rt > hi) fail(`${sess.id}: episode runtime ${rt}s outside ${lo}–${hi}s`)
     if (sess.number > 1 && !sess.episode.previously) fail(`${sess.id}: missing "previously"`)
-    sess.quiz.forEach((q, qi) => {
+    sess.quiz.forEach((q: QuizQuestion, qi) => {
       if (q.answer < 0 || q.answer >= q.options.length) fail(`${sess.id} quiz ${qi + 1}: answer out of range`)
+      answers.push(q.answer)
     })
     sess.objectives.forEach((ob) => {
       if (!ob.id.startsWith(sess.id)) fail(`${ob.id} is not under ${sess.id}`)
       alignObjective(1, ob) // throws on an unknown standard id
     })
   })
+
+  // The right answer must not sit in a learnable place: no position over half the level, no run longer than 3.
+  const byIndex = new Map<number, number>()
+  answers.forEach((a) => byIndex.set(a, (byIndex.get(a) ?? 0) + 1))
+  for (const [idx, n] of byIndex) if (n / answers.length > 0.5) fail(`Level 1 quiz: answer position ${idx} is right in ${n} of ${answers.length} questions (over half)`)
+  let run = 1
+  for (let k = 1; k < answers.length; k++) {
+    run = answers[k] === answers[k - 1] ? run + 1 : 1
+    if (run > 3) fail(`Level 1 quiz: ${run} answers in a row at position ${answers[k]} (question ${k + 1} of the level)`)
+  }
+
+  // Level 1 sensor and corridor maths, for every body.
+  for (const p of checkL1Geometry()) fail(`Level 1 geometry: ${p}`)
+
+  // Part masses quoted in the curriculum must match the simulator.
+  const base: RobotDesign = { ...DEFAULT_DESIGN, body: 'box', drive: 'wheels2', head: 'antenna', tool: 'none', sensor: 'none' }
+  const tableMass = (d: RobotDesign) => PART_MASS_KG.body[d.body] + PART_MASS_KG.drive[d.drive] + PART_MASS_KG.head[d.head] + PART_MASS_KG.tool[d.tool] + PART_MASS_KG.sensor[d.sensor]
+  const variants: RobotDesign[] = [base]
+  for (const [slot, table] of Object.entries(PART_MASS_KG) as [keyof typeof PART_MASS_KG, Record<string, number>][]) {
+    for (const id of Object.keys(table)) variants.push({ ...base, [slot]: id })
+  }
+  for (const d of variants) {
+    const simKg = robotSpec(d).mass
+    if (Math.abs(simKg - tableMass(d)) > 1e-6) fail(`PART_MASS_KG differs from sim/robot-spec.ts for ${d.body}/${d.drive}/${d.head}/${d.tool}/${d.sensor}: ${tableMass(d)} vs ${simKg}`)
+  }
+
+  // Every level above 1 needs a bridge for children who start there.
+  for (const lvl of LEVELS) if (lvl.number > 1 && !lvl.bridge?.missions.length) fail(`Level ${lvl.number} has no bridge missions`)
 
   const introduced = new Set(BLOCKS_INTRODUCED[1])
   for (const b of known) if (!introduced.has(b)) fail(`Block ${b} is used in Level 1 but not listed in BLOCKS_INTRODUCED[1]`)
@@ -109,7 +197,8 @@ const mmss = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padSta
 function renderChallenge(label: string, c: CodeChallenge) {
   const a = c.arena
   w(`**${label}: ${c.title}.** ${c.mission}`, '')
-  w(`- Arena — *${a.name}*: ${a.description}${a.gridTiles ? ` Grid ${a.gridTiles.cols}×${a.gridTiles.rows} tiles of ${a.tileCm} cm.` : ''} Floor: ${a.floor}. Start (${a.start.col},${a.start.row}) facing ${a.start.heading}.`)
+  const extra = a.extraStarts?.length ? ` Also run from ${a.extraStarts.map((x) => `(${x.col},${x.row}) facing ${x.heading}`).join(' and ')}.` : ''
+  w(`- Arena — *${a.name}*: ${a.description}${a.gridTiles ? ` Grid ${a.gridTiles.cols}×${a.gridTiles.rows} tiles of ${a.tileCm} cm.` : ''} Floor: ${a.floor}. Start (${a.start.col},${a.start.row}) facing ${a.start.heading}.${extra}`)
   w(`- Goal: ${a.goal}`)
   if (a.features.length) w(`- Features: ${a.features.join('; ')}.`)
   w(`- Needs: ${a.requires.length ? a.requires.join(', ') : 'nothing special'}. Physics: ${a.physics}`)
@@ -124,7 +213,7 @@ function renderChallenge(label: string, c: CodeChallenge) {
 function renderSession(sess: Session) {
   w(`### ${sess.number}. ${sess.title}${sess.kind === 'project' ? ' — project' : ''}`, '')
   w(`*${sess.objective}*`, '')
-  w(`- Objectives: ${sess.objectives.map((o) => `**${o.id}** ${o.text} (“${o.kidText}”)`).join(' ')}`)
+  w(`- Objectives: ${sess.objectives.map((o) => `**${o.id}** ${o.text} (“${o.kidText}”)${o.discussionOnly ? ' *[discussion and check — not assessed by the challenge]*' : ''}`).join(' ')}`)
   w(`- Concepts: ${sess.concepts.join(', ')}${sess.newBlocks.length ? ` · New blocks: ${sess.newBlocks.map((b) => `\`${b}\``).join(', ')}` : ''}`, '')
 
   const e = sess.episode
@@ -182,6 +271,11 @@ function renderLevelOverview(l: Level) {
   for (const a of l.season.arc) w(`| ${esc(a.title)} | ${a.sessions[0]}–${a.sessions[1]} | ${esc(a.summary)} | ${esc(a.actEnd)} |`)
   w('', `*Finale:* ${l.season.finale}`, '')
   w(`**The robot.** Starts: ${l.startRobot.description} Ends: ${l.endRobot.description}`, '')
+  if (l.bridge) {
+    w(`**Bridge for newcomers.** ${l.bridge.forWho}`, '')
+    for (const m of l.bridge.missions) w(`- *${m.title}* — ${m.recaps} Blocks: ${m.blocks.map((b) => `\`${b}\``).join(' ')}`)
+    w('')
+  }
   w('| # | Session | Objective | New blocks / part |', '|---|---|---|---|')
   for (const o of l.sessions) {
     const extra = [o.newBlocks?.map((b) => `\`${b}\``).join(' '), o.part ? `${o.part.slot}: ${o.part.id}` : ''].filter(Boolean).join(' · ')
@@ -218,7 +312,11 @@ function render(): string {
   for (const l of LEVELS) renderLevelOverview(l)
 
   w('## 4. Level 1 · Explorers — session by session', '')
-  w('Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{robot}` in a line is the name the child gave their robot. Grid co-ordinates are (column, row) from the top-left; turn_degrees +90 is a left turn.', '')
+  w(`Everything a 5–7-year-old meets is spoken aloud, captioned and shown with pictures. \`{robot}\` in a line is the name the child gave their robot. Grid co-ordinates are (column, row) from the top-left on ${TILE_CM} cm tiles; turn_degrees +90 is a left turn.`, '')
+  w('**Level 1 robot geometry** (from `lib/kids/sim/robot-spec.ts`, two-wheel drive, Distance Eyes and bumper; checked against the arena maths by this script):', '')
+  w('| Body | Width with wheels | Turning radius | Distance Eyes ahead of centre / height | Mass before a tool |', '|---|---|---|---|---|')
+  for (const [body, g] of Object.entries(L1_GEOMETRY)) w(`| ${body} | ${g.widthCm} cm | ${g.turnRadiusCm} cm | ${g.eyeAheadCm} cm / ${g.eyeHeightCm} cm | ${g.massKg} kg |`)
+  w('', L1_ROBOT_GEOMETRY, '')
   for (const sess of LEVEL1_SESSIONS) renderSession(sess)
 
   w('## 5. Assessment and certificates', '')

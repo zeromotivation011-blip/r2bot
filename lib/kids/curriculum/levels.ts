@@ -11,7 +11,7 @@
 // ./level1 exactly (titles, kinds, projects).
 
 import type {
-  BlockId, Certificate, ConceptId, Level, LevelNumber, PartRef, Project, RobotSpec, SessionOutline,
+  BlockId, Bridge, Certificate, ConceptId, Level, LevelNumber, PartRef, Project, RobotSpec, SessionOutline,
 } from './types'
 import { L1_PROJECTS } from './level1/projects'
 
@@ -128,7 +128,7 @@ export const CONCEPT_SPIRAL: Record<ConceptId, [string, string, string, string]>
   ],
   'feedback-control': [
     'Sensors let the robot stop where the world really is (not where counting says).',
-    'Bang-bang control: line-following with if / else; encoders make distance exact.',
+    'Bang-bang control: line-following with if / else; encoders make wheel distance exact whatever the load or slope (wheels can still slip on ice or sand).',
     'Proportional control: correction = gain × error; tuning the gain.',
     'PID intuition: P reacts, I removes the leftover error, D calms overshoot.',
   ],
@@ -194,7 +194,7 @@ const L1_SESSIONS: SessionOutline[] = [
   s(19, 'Feel Your Way', 'Add a bumper — a touch sensor — and make the robot keep going until it feels a bump.', ['sensors', 'sense-think-act', 'loops'], { newBlocks: ['repeat_until', 'bumped'], part: { slot: 'sensor', id: 'bumper' } }),
   s(20, 'Bump, Then Think', 'Use “if” so the robot makes a choice: if it feels a bump, it backs off and turns.', ['conditions', 'sense-think-act', 'autonomy', 'loops'], { newBlocks: ['if'] }),
   s(21, 'Ears Like a Bat', 'Swap in Distance Eyes and make the robot stop before it touches something, using echoes.', ['sensors', 'loops', 'safety-ethics'], { newBlocks: ['distance_cm', 'compare'], part: { slot: 'head', id: 'distance' } }),
-  s(22, 'Stop for Friends', 'Make the robot wait until the path is clear before each move, and talk about who keeps robots safe.', ['safety-ethics', 'sensors', 'loops']),
+  s(22, 'Stop for Friends', 'Make the robot wait until the path is clear before each move, and talk about who keeps robots safe.', ['safety-ethics', 'sensors', 'loops'], { part: { slot: 'tool', id: 'scoop' } }),
   s(23, 'Up the Clock Tower', 'Climb a winding ramp by repeating a sensor rule, and meet the people whose job is robots.', ['loops', 'sensors', 'physics', 'careers']),
   s(24, 'Make It Yours: The Night of a Hundred Lights', 'Design, test and share a festival show that uses a loop, a sensor, a tool and kind words.', ['design-process', 'sense-think-act', 'loops', 'sensors', 'sequences', 'debugging']),
 ]
@@ -214,9 +214,9 @@ const L1_CERT: Certificate = {
   title: 'R2BOT Kids · Explorer',
   wording: '{name} built {robotName}, taught it to move, draw, carry, feel and listen, and brought the twelve lights home to Lantern Hill. {name} can give a robot step-by-step instructions, repeat them with a loop, find and fix bugs, and use a sensor to keep people safe.',
   criteria: [
-    'Completed the four “Make it yours” projects (sessions 6, 12, 18, 24) with every self-check ticked.',
+    'Ran all four “Make it yours” projects (sessions 6, 12, 18, 24) in the simulator; the final show ran with a loop, a sensor block, a tool and a Say block (recorded by the simulator).',
     'Earned the core skill badges: Roller, Turner, Bug Detective, Loop Star, Touch Sensor and Choice Maker (any missing badge can be earned in a catch-up session).',
-    'Explained one bug they fixed, in their own words, to an adult or the class.',
+    'Explained one bug they fixed, in their own words, to an adult or the class (observed by the teacher or a parent).',
   ],
 }
 
@@ -225,8 +225,8 @@ const L1_CERT: Certificate = {
 const L2_SESSIONS: SessionOutline[] = [
   // Act 1 — Measuring the Islands
   s(1, 'Welcome to Windward', 'Rebuild your robot for the islands and explain each part as sense, think or act.', ['sense-think-act', 'design-process'], { newBlocks: ['stop', 'number'] }),
-  s(2, 'Wheels That Count', 'Use wheel encoders to drive an exact distance in centimetres, on any floor.', ['feedback-control', 'physics'], { newBlocks: ['drive_distance'] }),
-  s(3, 'Any Angle', 'Turn any number of degrees and draw triangles and hexagons (exterior angles add up to 360°).', ['sequences', 'loops'] ),
+  s(2, 'Wheels That Count', 'Use wheel encoders to drive an exact wheel distance in centimetres, whatever the load or slope — and see that on ice or loose sand the wheels can still slip (measured properly in Level 3).', ['feedback-control', 'physics'], { newBlocks: ['drive_distance'] }),
+  s(3, 'Any Angle', 'Turn any number of degrees and draw triangles and hexagons: to get back where you started, the robot turns all the way round once (360°).', ['sequences', 'loops'] ),
   s(4, 'Four Wheels for Heavy Mail', 'Swap to four wheels and test stability: wider and lower is harder to tip.', ['physics', 'design-process'], { part: { slot: 'drive', id: 'wheels4' } }),
   s(5, 'Curves with Two Motors', 'Steer with different left and right motor power to drive smooth curves.', ['physics', 'sequences'], { newBlocks: ['set_motors'] }),
   s(6, 'Make It Yours: Map of My Island', 'Design an island map and draw it with the pen using measured distances and angles.', ['design-process', 'loops']),
@@ -259,7 +259,7 @@ const L2_PROJECTS: Project[] = [
     brief: 'Invent an island and draw its map with your robot’s pen: the coastline, a path and a landmark. Every line is a measured distance and every corner a chosen angle.',
     designSteps: DESIGN_STEPS_8_PLUS,
     constraints: ['Use drive_distance and turn_degrees only for movement.', 'At least one repeated shape made with a loop.', 'The map fits on the 2 m × 2 m paper.'],
-    selfCheck: ['I planned distances and angles on squared paper first.', 'My shapes close up (the ends meet).', 'I used a loop for a repeated shape.', 'I can explain why exterior angles add to 360°.'],
+    selfCheck: ['I planned distances and angles on squared paper first.', 'My shapes close up (the ends meet).', 'I used a loop for a repeated shape.', 'My robot turns all the way round once to close my shape.'],
     share: SHARE_RULE,
   }),
   project({
@@ -293,13 +293,13 @@ const L2_PROJECTS: Project[] = [
 const L3_SESSIONS: SessionOutline[] = [
   // Act 1 — Arrival at the Ridge
   s(1, 'The Robot’s Memory', 'Use variables to count and remember (deliveries made, distance travelled).', ['variables', 'sense-think-act'], { newBlocks: ['variable_set', 'variable_change', 'variable_get'] }),
-  s(2, 'Maths in Motion', 'Calculate distance from speed and time, and check the calculation against the encoders.', ['variables', 'physics', 'data'], { newBlocks: ['math'] }),
+  s(2, 'Maths in Motion', 'Calculate distance from speed and time, and check the calculation against a measured distance (distance_cm to a wall before and after the move).', ['variables', 'physics', 'data'], { newBlocks: ['math'] }),
   s(3, 'Keep Your Heading', 'Read the gyro and correct a drifting heading on a slippery snowfield.', ['sensors', 'feedback-control'], { newBlocks: ['heading_deg'] }),
   s(4, 'Calibrate Your Sensors', 'Measure light and dark readings, store them, and set the threshold from your own data.', ['sensors', 'variables', 'data']),
   s(5, 'Smooth Line Following', 'Steer by how far off the line you are (correction = gain × offset) and compare with if / else.', ['feedback-control', 'variables'], { newBlocks: ['line_offset'] }),
   s(6, 'Make It Yours: The Station Mail Rover', 'Design a rover that delivers to several huts and reports how many deliveries it made.', ['design-process', 'variables']),
   // Act 2 — The Weather Mast
-  s(7, 'Following a Wall', 'Keep a steady distance from a wall using proportional steering on distance error.', ['feedback-control', 'sensors']),
+  s(7, 'Keep Your Distance', 'Follow the moving supply sled at a steady 30 cm gap using proportional speed control on distance error (Distance Eyes look straight ahead).', ['feedback-control', 'sensors']),
   s(8, 'Too Much, Too Little', 'Tune the gain: see wobble when it is too high and slow drift when it is too low.', ['feedback-control', 'debugging', 'data']),
   s(9, 'States: Search, Follow, Done', 'Use a state variable to switch behaviour (find the line, follow it, stop at the end).', ['autonomy', 'variables', 'decomposition']),
   s(10, 'Logging the Weather', 'Record readings into variables and report the minimum, maximum and average.', ['data', 'variables']),
@@ -308,13 +308,13 @@ const L3_SESSIONS: SessionOutline[] = [
   // Act 3 — The Boulder Field
   s(13, 'Legs or Tracks?', 'Compare legs and tracks on boulders and snow, and choose from measured trade-offs.', ['physics', 'design-process', 'data'], { part: { slot: 'drive', id: 'legs' } }),
   s(14, 'Centre of Mass', 'Find where a robot tips on a slope and move its load to make it stable.', ['physics']),
-  s(15, 'Where Am I? Odometry', 'Estimate position from wheel distance and heading, and watch the error grow.', ['variables', 'sensors', 'autonomy']),
+  s(15, 'Where Am I? Odometry', 'Keep x and y variables up to date from your own drive_distance moves and 90° turns on a grid, and watch the estimate drift from the truth when wheels slip on snow.', ['variables', 'sensors', 'autonomy']),
   s(16, 'Landmarks Fix Drift', 'Use coloured markers to reset the position estimate.', ['sensors', 'variables', 'autonomy']),
   s(17, 'Fragile Samples', 'Approach an ice-core sample slowly, slowing down in proportion to the distance left, then grip gently.', ['feedback-control', 'sequences'], { part: { slot: 'tool', id: 'gripper' } }),
   s(18, 'Make It Yours: Sample Return Mission', 'Design a mission that collects two samples from the boulder field and brings them back without dropping them.', ['design-process', 'autonomy', 'feedback-control']),
   // Act 4 — Whiteout
   s(19, 'Who Is in Charge?', 'Compare remote control, shared control and full autonomy, and decide when a human should take over.', ['autonomy', 'safety-ethics']),
-  s(20, 'Fail Safe', 'Add timeouts and safe defaults: if a reading is lost or a task takes too long, stop safely.', ['events-timing', 'safety-ethics', 'conditions']),
+  s(20, 'Fail Safe', 'Add timeouts and safe defaults: if a reading is lost (no echo: distance_cm reads 200; or the line is not seen) or a task takes too long, stop safely.', ['events-timing', 'safety-ethics', 'conditions']),
   s(21, 'Many Sensors, One Decision', 'Combine line, distance and colour readings with priorities to make one decision.', ['sensors', 'conditions', 'autonomy']),
   s(22, 'Honest Data, Wild Places', 'Discuss honest reporting of data and how field robots should treat wildlife and fragile places.', ['safety-ethics', 'data']),
   s(23, 'Field Robotics Careers', 'Meet the roles in field robotics and rehearse the whiteout rescue with a team.', ['careers', 'decomposition']),
@@ -368,7 +368,7 @@ const L4_SESSIONS: SessionOutline[] = [
   s(6, 'Make It Yours: Precision Docking', 'Design a controller that docks the rover to the charging pad within 2 cm and 3°.', ['design-process', 'feedback-control']),
   // Act 2 — Mapping the Valley
   s(7, 'Scanning with Distance', 'Turn on the spot taking distance readings and sketch the surroundings from the data.', ['sensors', 'data']),
-  s(8, 'Maps on a Grid', 'Turn readings into a grid map of free and blocked cells (on paper and in the sim overlay).', ['data', 'autonomy']),
+  s(8, 'Maps on a Grid', 'Have the rover drive survey lanes and say each reading, then turn those readings into a grid map of free and blocked cells (on paper and in the sim overlay — there are no list blocks).', ['data', 'autonomy']),
   s(9, 'Planning a Path', 'Find a shortest path on a grid by the wavefront (flood-fill) method, by hand, then drive it.', ['autonomy', 'decomposition']),
   s(10, 'Behaviours and Priorities', 'Layer behaviours: avoid beats follow, follow beats explore.', ['autonomy', 'conditions']),
   s(11, 'Twenty Minutes Away', 'Explain why Mars rovers cannot be joysticked (light takes about 3–22 minutes each way) and design for delay.', ['autonomy', 'events-timing']),
@@ -376,7 +376,7 @@ const L4_SESSIONS: SessionOutline[] = [
   // Act 3 — Sample Science
   s(13, 'Reach and Grasp', 'Align with a target by camera colour and distance, then grasp reliably.', ['feedback-control', 'sensors']),
   s(14, 'Test Plans and Edge Cases', 'Write a test plan with normal, edge and failure cases, and run it.', ['debugging', 'data']),
-  s(15, 'Detecting Faults', 'Detect a stalled wheel by comparing commanded and measured motion, and recover.', ['debugging', 'safety-ethics', 'conditions']),
+  s(15, 'Detecting Faults', 'Detect a stalled or slipping wheel by comparing what you commanded with what the sensors see (distance_cm should shrink while driving at a wall; heading_deg should hold when driving straight), and recover.', ['debugging', 'safety-ethics', 'conditions']),
   s(16, 'Mass, Energy, Trade-offs', 'Run a design review: every gram and every watt must earn its place.', ['physics', 'design-process']),
   s(17, 'Working with People', 'Make robot intent readable to people (say, lights, motion) and design safe handovers.', ['safety-ethics', 'design-process']),
   s(18, 'Make It Yours: Sample Fetch Under Faults', 'Design a sample-fetch mission that still succeeds when one injected fault occurs.', ['design-process', 'debugging', 'autonomy']),
@@ -402,8 +402,8 @@ const L4_PROJECTS: Project[] = [
     id: 'l4-p2', session: 12, title: 'Autonomous Survey',
     brief: 'Survey an unknown crater floor and come back with a grid map good enough for the next rover to plan a route.',
     designSteps: DESIGN_STEPS_8_PLUS,
-    constraints: ['No pre-loaded map.', 'Return to base within the time limit.', 'The map is checked against the real crater cell by cell.'],
-    selfCheck: ['My map matches at least 80 % of cells.', 'My rover returned in time.', 'My behaviour priorities are documented.', 'I explained why autonomy is needed here.'],
+    constraints: ['No pre-loaded map.', 'Return to base within the time limit.', 'For each of the five survey lanes the rover itself says the distance to the first obstacle (or 200 for none); the simulator checks each against the real crater within 10 cm. The student then draws the grid map from the rover’s readings.'],
+    selfCheck: ['My rover’s reported readings were within 10 cm in at least four lanes.', 'My rover returned in time.', 'My map follows from the readings, not from what I saw.', 'I explained why autonomy is needed here.'],
     share: SHARE_RULE,
   }),
   project({
@@ -423,6 +423,48 @@ const L4_PROJECTS: Project[] = [
     share: `${SHARE_RULE} The write-up is designed to sit in a portfolio (no personal data in it).`,
   }),
 ]
+
+// ── Robots carried between levels ─────────────────────────────────────────
+
+const L2_END: RobotSpec = {
+  body: 'child-choice', drive: 'child-choice', head: 'camera', tool: 'gripper', sensor: 'line',
+  toolbox: [{ slot: 'tool', id: 'pen' }, { slot: 'tool', id: 'scoop' }, { slot: 'tool', id: 'light' }, { slot: 'sensor', id: 'bumper' }, { slot: 'sensor', id: 'color' }, { slot: 'head', id: 'distance' }, { slot: 'head', id: 'screen' }, { slot: 'drive', id: 'wheels2' }, { slot: 'drive', id: 'wheels4' }, { slot: 'drive', id: 'tracks' }],
+  description: 'A rover with the drive the child chose from their own fair test (four wheels or tracks), a camera, a gripper and a line sensor, with a full toolbox of swap-in parts.',
+}
+
+const L3_END: RobotSpec = {
+  body: 'child-choice', drive: 'child-choice', head: 'distance', tool: 'gripper', sensor: 'line',
+  toolbox: [{ slot: 'head', id: 'camera' }, { slot: 'head', id: 'screen' }, { slot: 'sensor', id: 'color' }, { slot: 'sensor', id: 'bumper' }, { slot: 'tool', id: 'scoop' }, { slot: 'tool', id: 'pen' }, { slot: 'tool', id: 'light' }, { slot: 'drive', id: 'wheels2' }, { slot: 'drive', id: 'wheels4' }, { slot: 'drive', id: 'tracks' }, { slot: 'drive', id: 'legs' }],
+  description: 'A field rover whose drive (legs or tracks) and head were chosen from measured trade-offs, running proportional control, a state machine and fail-safes.',
+}
+
+// ── Bridges for children who join above Level 1 ───────────────────────────
+
+const L2_BRIDGE: Bridge = {
+  forWho: 'An 8–10-year-old starting at Level 2 with no Explorer badges. Offered automatically before Session 1 (about 3 × 15 minutes, at home or while the class builds); never required, and a child can skip any mission they find easy.',
+  missions: [
+    { title: 'Bridge 1 · Steps and Loops', recaps: 'Sequences, Wait, turns and Repeat (Level 1 sessions 1–12) in one delivery round the harbour.', blocks: ['say', 'wait', 'drive_for', 'turn_degrees', 'repeat'] },
+    { title: 'Bridge 2 · Bugs and Tools', recaps: 'Watch, find and fix a bug; pen and scoop actions (Level 1 sessions 8–18).', blocks: ['pen_down', 'pen_up', 'grip_close', 'grip_open', 'light_on', 'light_off'] },
+    { title: 'Bridge 3 · Sense, Think, Act', recaps: 'Repeat until a bump, “if I feel a bump”, and “until something is close” (Level 1 sessions 19–23).', blocks: ['repeat_until', 'bumped', 'if', 'distance_cm', 'compare'] },
+  ],
+}
+
+const L3_BRIDGE: Bridge = {
+  forWho: 'An 11–13-year-old starting at Level 3 with no Builder badges. Offered automatically before Session 1; self-paced, about 3 × 20 minutes.',
+  missions: [
+    { title: 'Bridge 1 · Measured Moves', recaps: 'drive_distance, any-angle turns and set_motors curves (Level 2 Act 1).', blocks: ['drive_distance', 'turn_degrees', 'set_motors', 'stop', 'number'] },
+    { title: 'Bridge 2 · Lines and Choices', recaps: 'Line following with if / else, forever with a way to stop, and / or / not (Level 2 Act 2).', blocks: ['line_seen', 'if_else', 'forever', 'and', 'or', 'not', 'timer_s'] },
+    { title: 'Bridge 3 · Sensors and Fair Tests', recaps: 'Colour and distance sensors, and a two-run fair test of wheels against tracks (Level 2 Acts 3–4).', blocks: ['floor_color', 'distance_cm', 'compare'] },
+  ],
+}
+
+const L4_BRIDGE: Bridge = {
+  forWho: 'A 14–17-year-old starting at Level 4 with no Inventor badges. Offered automatically; self-paced, about 2 × 30 minutes, with the Level 3 session notes linked for anything new.',
+  missions: [
+    { title: 'Bridge 1 · Variables and Maths', recaps: 'Counters, calibration values and a state variable (Level 3 Acts 1–2).', blocks: ['variable_set', 'variable_change', 'variable_get', 'math'] },
+    { title: 'Bridge 2 · Proportional Control', recaps: 'Steer by line_offset × gain, then hold a heading with heading_deg; tune the gain (Level 3 sessions 3, 5, 7–8).', blocks: ['line_offset', 'heading_deg', 'math'] },
+  ],
+}
 
 // ── The four levels ───────────────────────────────────────────────────────
 
@@ -449,8 +491,9 @@ export const LEVELS: Level[] = [
     blocks: cumulative(1),
     developmentalFit: [
       'Pre-readers and early readers: every block, hint and question is spoken; icons carry meaning; screens use very few words.',
-      'Short attention spans: a 40-minute class changes activity every 4–9 minutes and starts unplugged, with the body.',
+      'Short attention spans: a 40-minute class changes activity every 2–8 minutes and starts unplugged, with the body.',
       'Concrete before abstract: one hop = one tile on the mat; quarter turns only; the sensor condition is hidden inside one picture block.',
+      'Every child: captions and a visual twin for every sound, shape and icon as well as colour, tap or switch access instead of dragging, and a reduced-motion setting (see “Access for every child”).',
       'Left and right are still being learned at 5–7: turns are taught from the robot’s point of view with body games first.',
       'Fine motor control varies: big tap targets, no dragging required, pairs share one device (driver and navigator).',
       'Gentle stories: problems are puzzles, never danger; cliffhangers are curiosity, not fear.',
@@ -470,20 +513,17 @@ export const LEVELS: Level[] = [
       ],
       finale: 'The Island Post Grand Route: each child’s rover runs a three-stop delivery designed by them, cheered by every islander.',
     },
-    startRobot: { ...L1_END, description: 'The Explorer robot from Lantern Hill (children starting at Level 2 build an equivalent one in Session 1).' },
-    endRobot: {
-      body: 'child-choice', drive: 'child-choice', head: 'camera', tool: 'gripper', sensor: 'line',
-      toolbox: [{ slot: 'tool', id: 'pen' }, { slot: 'tool', id: 'scoop' }, { slot: 'tool', id: 'light' }, { slot: 'sensor', id: 'bumper' }, { slot: 'sensor', id: 'color' }, { slot: 'head', id: 'distance' }, { slot: 'drive', id: 'wheels4' }, { slot: 'drive', id: 'tracks' }],
-      description: 'A rover with the drive the child chose from their own fair test (four wheels or tracks), a camera, a gripper and a line sensor, with a full toolbox of swap-in parts.',
-    },
+    startRobot: { ...L1_END, description: 'The Explorer robot from Lantern Hill (children starting at Level 2 build an equivalent one in Session 1, after the bridge missions).' },
+    endRobot: L2_END,
     sessions: L2_SESSIONS,
     projects: L2_PROJECTS,
     certificate: {
       title: 'R2BOT Kids · Builder',
       wording: '{name} rebuilt {robotName} as the Island Post rover. {name} can measure and steer precisely, follow lines with if / else, choose parts from a fair test, sort with sensors, test a program until it is reliable, and design for the people who will use it.',
-      criteria: ['Completed the four projects with every self-check ticked.', 'Recorded and used a fair-test results table (Session 13).', 'A final route that succeeded in ten runs in a row (Session 22 method).'],
+      criteria: ['Ran the four projects in the simulator, each meeting its constraints (recorded by the simulator).', 'Recorded and used a fair-test results table (Session 13).', 'A final route that succeeded in ten runs in a row (Session 22 method, recorded by the simulator).'],
     },
     blocks: cumulative(2),
+    bridge: L2_BRIDGE,
     developmentalFit: [
       'Confident readers: text appears alongside voice; children type numbers with units.',
       'Concrete operational thinking: measurement, angles and fair tests suit 8–10; abstraction stays tied to things they can see.',
@@ -499,26 +539,23 @@ export const LEVELS: Level[] = [
       setting: 'Ridgeback Station: huts on a ridge, a snowfield, a weather mast, a boulder field and a remote weather station.',
       arc: [
         { sessions: [1, 6], title: 'Arrival at the Ridge', summary: 'Variables, maths, the gyro, calibration and smooth proportional line following; the mail rover.', actEnd: 'The weather mast has gone silent: something is wrong with its cables.' },
-        { sessions: [7, 12], title: 'The Weather Mast', summary: 'Wall following, tuning gain, state machines, logging data, the energy budget; the mast inspection.', actEnd: 'The mast readings show the ice is moving fast — the scientists need ice cores from the boulder field, now.' },
+        { sessions: [7, 12], title: 'The Weather Mast', summary: 'Keeping a gap behind the supply sled, tuning gain, state machines, logging data, the energy budget; the mast inspection.', actEnd: 'The mast readings show the ice is moving fast — the scientists need ice cores from the boulder field, now.' },
         { sessions: [13, 18], title: 'The Boulder Field', summary: 'Legs against tracks, centre of mass, odometry and landmarks, gentle gripping; the sample return.', actEnd: 'A whiteout rolls in while the remote station’s data is still out there.' },
         { sessions: [19, 24], title: 'Whiteout', summary: 'Levels of autonomy, fail-safes, combining sensors, honest data and wild places, field-robotics careers; the rescue rover.', actEnd: 'The data comes home. A message arrives from a desert research base preparing a Mars rehearsal.' },
       ],
       finale: 'Whiteout Rescue: each child’s autonomous rover finds the remote station in a simulated whiteout and brings its data home.',
     },
-    startRobot: { body: 'child-choice', drive: 'child-choice', head: 'camera', tool: 'gripper', sensor: 'line', toolbox: [{ slot: 'sensor', id: 'color' }, { slot: 'head', id: 'distance' }], description: 'The Builder rover (children starting at Level 3 assemble an equivalent rover in Session 1).' },
-    endRobot: {
-      body: 'child-choice', drive: 'child-choice', head: 'distance', tool: 'gripper', sensor: 'line',
-      toolbox: [{ slot: 'head', id: 'camera' }, { slot: 'sensor', id: 'color' }, { slot: 'drive', id: 'legs' }, { slot: 'drive', id: 'tracks' }],
-      description: 'A field rover whose drive (legs or tracks) and head were chosen from measured trade-offs, running proportional control, a state machine and fail-safes.',
-    },
+    startRobot: { ...L2_END, description: 'The Builder rover, with its whole toolbox (children starting at Level 3 assemble an equivalent rover in Session 1, after the bridge missions).' },
+    endRobot: L3_END,
     sessions: L3_SESSIONS,
     projects: L3_PROJECTS,
     certificate: {
       title: 'R2BOT Kids · Inventor',
       wording: '{name} made {robotName} a field rover for Ridgeback Station. {name} can use variables and maths in programs, calibrate sensors, tune a proportional controller, structure behaviour as states, log and summarise data, and decide when a human should be in charge.',
-      criteria: ['Completed the four projects with every self-check ticked.', 'A gain-tuning log showing at least three tested values (Session 8).', 'A state diagram that matches the final program (Session 24).'],
+      criteria: ['Ran the four projects in the simulator, each meeting its constraints (recorded by the simulator).', 'A gain-tuning log showing at least three tested values (Session 8).', 'A state diagram that matches the final program, checked by the teacher (Session 24).'],
     },
     blocks: cumulative(3),
+    bridge: L3_BRIDGE,
     developmentalFit: [
       'Abstract reasoning is emerging: variables, ratios and proportional control are within reach with visual feedback (graphs of error).',
       'Identity and purpose matter: real science settings and real careers motivate.',
@@ -540,10 +577,10 @@ export const LEVELS: Level[] = [
       ],
       finale: 'Mission Red Valley: each teen presents and runs their own autonomous mission with evidence, a safety case and an honest account of what failed.',
     },
-    startRobot: { body: 'child-choice', drive: 'child-choice', head: 'distance', tool: 'gripper', sensor: 'line', toolbox: [{ slot: 'head', id: 'camera' }, { slot: 'sensor', id: 'color' }], description: 'The Inventor field rover (students starting at Level 4 assemble an equivalent rover in Session 1).' },
+    startRobot: { ...L3_END, description: 'The Inventor field rover, with its whole toolbox (students starting at Level 4 assemble an equivalent rover in Session 1, after the bridge missions).' },
     endRobot: {
       body: 'child-choice', drive: 'child-choice', head: 'camera', tool: 'gripper', sensor: 'line',
-      toolbox: [{ slot: 'head', id: 'distance' }, { slot: 'sensor', id: 'line' }, { slot: 'sensor', id: 'color' }, { slot: 'sensor', id: 'bumper' }],
+      toolbox: [{ slot: 'head', id: 'distance' }, { slot: 'sensor', id: 'color' }, { slot: 'sensor', id: 'bumper' }, { slot: 'tool', id: 'scoop' }, { slot: 'tool', id: 'pen' }, { slot: 'tool', id: 'light' }, { slot: 'drive', id: 'wheels2' }, { slot: 'drive', id: 'wheels4' }, { slot: 'drive', id: 'tracks' }, { slot: 'drive', id: 'legs' }],
       description: 'An autonomous rover (floor sensor and drive chosen by the student) configured for their capstone mission and justified in a design review: tuned PID-style control, mapping, behaviour priorities, fault detection and a safety case.',
     },
     sessions: L4_SESSIONS,
@@ -551,9 +588,10 @@ export const LEVELS: Level[] = [
     certificate: {
       title: 'R2BOT Kids · Engineer',
       wording: '{name} engineered {robotName} for Mission Red Valley. {name} can measure and model a robot, tune feedback control (P, I and D), build maps and plan paths, layer behaviours, test systematically, detect faults, and argue for a design’s safety and ethics with evidence.',
-      criteria: ['Completed the four projects with every self-check ticked.', 'A capstone write-up with a test log and a safety case, reviewed by peers.', 'A design-review presentation.'],
+      criteria: ['Ran the four projects in the simulator, each meeting its constraints (recorded by the simulator).', 'A capstone write-up with a test log and a safety case, reviewed by peers.', 'A design-review presentation.'],
     },
     blocks: cumulative(4),
+    bridge: L4_BRIDGE,
     developmentalFit: [
       'Formal reasoning: modelling, data and trade-offs; students can hold several variables in mind.',
       'Autonomy and real stakes motivate: open capstones, real engineering artefacts (test logs, safety cases).',
@@ -572,6 +610,7 @@ export const PRINCIPLES: { title: string; body: string }[] = [
   { title: 'Story seasons', body: 'Each level is one season of an original story with an original cast (Spark, Amara, Nana Lucía, Bolt). Each session opens with a short animated episode and ends on a cliffhanger, so children come back because they want to know what happens.' },
   { title: 'Make it yours', body: 'Every sixth session is an open design project. Children ask, imagine, plan, build, test, improve and share their own idea within fair limits. Projects are where learning becomes theirs.' },
   { title: 'No ranking, ever', body: 'No leaderboards, no comparing children, no streak pressure. Stars reward care (planning first, fixing a bug, explaining why), never speed against others. Every child who learns the skills earns the same certificate.' },
+  { title: 'Built for every child', body: 'Deaf and hard-of-hearing, low-vision and colour-blind children, and children with motor or attention needs take the same course, not a cut-down one. Nothing depends on one sense alone: every spoken line is captioned, every sound has a visual twin, colour never carries meaning without a shape or icon, and every tap target works by switch or keyboard.' },
   { title: 'Accurate and global', body: 'No wrong physics or sensor claims, even for five-year-olds: simplified, never false. Characters, places and everyday examples come from many countries; India appears as one setting among many, never the default.' },
 ]
 
@@ -579,14 +618,17 @@ export const ASSESSMENT: { title: string; body: string }[] = [
   { title: 'Every session', body: 'Three spoken check questions, each followed by a “why” whatever the child answers. They are for learning, not grading: the result is never shown as a score.' },
   { title: 'Stars', body: 'Up to three per challenge: one for completing it, two and three for craft (planning, fixing, explaining). Never for speed and never compared between children.' },
   { title: 'Skill badges', body: 'One per session, named for a skill (“Bug Detective”, “Choice Maker”). A badge says what the child can now do.' },
-  { title: 'Projects', body: 'Four per level, assessed by the child’s own “I can” self-checks and the teacher’s observation. Sharing uses “a star and a wish” from classmates.' },
-  { title: 'Certificates', body: 'One per level, earned by learning (projects, core badges, an explained bug or design decision), not by attendance. Missing pieces can be earned in catch-up sessions. Certificates make no claim of external accreditation.' },
+  { title: 'Projects', body: 'Four per level, assessed by what the simulator records (the program met the brief’s constraints) and the teacher’s observation of the share (the child explained a fix or a design decision). The child’s “I can” self-checks are reflection only: an unticked box means “my next step”, never “no badge” or “no certificate”. Sharing uses “a star and a wish”, pair to pair.' },
+  { title: 'Certificates', body: 'One per level, earned by learning — projects that ran, core badges, a bug or design decision explained to an adult — never by attendance and never by self-check ticks. Missing pieces can be earned in catch-up sessions. Certificates make no claim of external accreditation.' },
+  { title: 'One objective the challenge checks', body: 'Every session has one headline objective that its challenge assesses. Where a session also has a second objective met through discussion (careers, safety responsibility), it is marked “discussion” and is never graded.' },
 ]
 
 export const SCHOOL_USE: { title: string; body: string }[] = [
-  { title: 'Timetable', body: '24 sessions of 40 minutes = one session a week for about two school terms, or two a week for one term. Each session has a minute-by-minute plan that adds up to 40.' },
-  { title: 'Devices', body: 'One device per pair (driver and navigator, swapping halfway). Runs in a browser on school laptops, tablets and phones; headphones per pair help in Level 1.' },
-  { title: 'Unplugged first', body: 'Every session opens with a five-minute unplugged warm-up using things every classroom has, so the idea is in the body before it is on the screen.' },
+  { title: 'Timetable', body: '24 sessions of 40 minutes = one session a week for about two school terms, or two a week for one term. Each session has a minute-by-minute plan that adds up to 40, including handing out devices and moving between the rug and the screens. A 45-minute period gives the extra time to coding. Session 24 can run over two periods for a class of 30 or more, with the certificate moment in its own short slot.' },
+  { title: 'Devices', body: 'One device per pair (driver and navigator, swapping halfway). Runs in a browser on school laptops, tablets and phones. In Level 1 the teacher plays each episode once for everyone on the big screen, so devices are silent during it; after that keep device volume low with captions on, or use a headphone splitter so both children in a pair can listen.' },
+  { title: 'Unplugged first', body: 'Every lesson opens with a four-minute unplugged warm-up using things every classroom has, so the idea is in the body before it is on the screen.' },
+  { title: 'Access for every child', body: 'Captions on every spoken line and every episode (on by default in class). A visual twin for every sound: a beep flashes a ring, Say shows a speech bubble, an echo pulses rings and a number. Shape and icon as well as colour everywhere (colour-blind safe); large text and high-contrast modes. Every block is tapped, never dragged, and every tap target works with a switch or keyboard. A reduced-motion setting slows and steadies the episode camera. Unplugged games have a silent version (e.g. Session 21’s echo game with taps or a flashed card) and never require a blindfold. Teachers can extend any challenge’s time limit; no challenge is timed against other children.' },
+  { title: 'Mixed entry', body: 'Children join by age, so a Level 2–4 class will include children who never did the level below. Each of those levels starts with 2–3 self-paced bridge missions recapping the core blocks below, offered automatically to any child with none of the previous level’s badges. In class, pair a newcomer with a child who did the earlier level for the first two sessions, and let newcomers do the bridge missions at home or during the first build.' },
   { title: 'Teacher support', body: 'Every session has discussion questions, the common misconceptions with a correction, and ideas for faster and slower learners. No prior robotics or coding knowledge is assumed.' },
   { title: 'Privacy', body: 'Children join a class with a code and a nickname; they never give an email, phone number, password or birthday. Work is shared with the class and family only, unless the teacher and a parent choose otherwise.' },
   { title: 'Home use', body: 'Every session ends with a parent note: what happened today, a five-minute activity with household things, and one open question to ask the child.' },
@@ -595,16 +637,24 @@ export const SCHOOL_USE: { title: string; body: string }[] = [
 /** Decisions the simulator and product teams must make or confirm. */
 export const OPEN_QUESTIONS: string[] = [
   'Turn sign convention: the curriculum uses positive turn_degrees = turn LEFT (counter-clockwise, the ROS and maths convention). Confirm the simulator matches.',
-  'Level 1 calibration: the robot is tuned so drive_for(50 %, 1 s) ≈ one 25 cm tile on the flat mat with no load (±5 %). Sessions 14, 15 and 23 depend on load, slope and floor changing that distance.',
+  'Level 1 calibration: tiles are 35 cm, because the sim’s Level 1 robots are 21–27 cm wide with wheels and turn on the spot inside a 25–33 cm circle (sim/robot-spec.ts; L1_GEOMETRY in level1/shared.ts). One hop is drive_for(80 %, N s): two-wheel drive tops out at 0.42 m/s, so 1 s ≈ 34 cm ≈ one tile on the flat mat with no load. Sessions 14, 15 and 23 depend on load, slope and floor changing that distance; S14 states its own calibration target. If the sim’s geometry or top speed changes, the doc script’s geometry check (checkL1Geometry) says which Level 1 numbers break.',
+  'Level 1 sand (Session 15): two tiles of sand must slow two-wheel drive to roughly half speed, not stop it — the challenge pushes through with one extra hop. The current sim tuning makes two-wheel drive crawl at a few cm/s in sand (right for the Level 2 wheels-against-tracks fair test). Either add a shallower Level 1 “soft sand” surface or re-tune; until then S15 cannot be completed with Hop blocks.',
+  'Pen position (Level 1 sessions 9–12): the drawings assume the pen draws under the robot’s centre, so a turn on the spot leaves a dot. sim/robot-spec.ts puts the pen tip at the back edge of the body, which draws a small arc at every turn and shifts every line. Move the pen to the centre, or the Level 1 drawing targets must be re-drawn.',
+  'Dome body width: the dome with two-wheel drive is about 27 cm wide, leaving 4 cm a side in a 35 cm corridor (the tightest of the four bodies). It passes the geometry check, but any wider wheel track would not.',
+  'Arenas with lanes (S14, S15 code tasks) list extraStarts: the sim resets the robot to each start in turn and runs the same program again.',
+  'Success kind “uses-blocks” (S24): the simulator checks that the program contains, and actually runs, the named kinds of block (a loop, a sensor block, a tool block, a Say block).',
+  'Quiz rendering: options should be shuffled per child per attempt (remapping the answer) unless a question sets keepOrder. The stored order is already balanced across Level 1 (checked by the doc script).',
+  'distance_cm with no echo: the sim reports 200 (its maximum). Level 3 Session 20 (“a reading is lost”) relies on that value; keep it in the block contract.',
   'Sensor conditions in Level 1 are single picture blocks (e.g. repeat_until with cond fixed to "bumped" or "distance_cm < 20"). The simulator needs a fixed-parameter way to render these without exposing the compare block.',
   'Is an empty repeat_until body (Level 1 “Wait until the path is clear”) acceptable to the block engine, or should it be a dedicated wait_until block? The curriculum assumes the former to keep the shared block set unchanged.',
   'Level 1 checks sensors only between blocks (e.g. before each hop). Should a motion block be interrupted the moment a repeat_until condition becomes true? The curriculum assumes NO at Level 1 (simpler, honest about the limitation) and teaches continuous checking with set_motors + forever in Level 2.',
-  'The shared block set has no procedures/functions or lists. CSTA 2-AP-14 (procedures with parameters) is therefore not addressed; Level 3–4 would benefit from a “make a block” feature.',
+  'The shared block set has no procedures/functions or lists. CSTA 2-AP-14 (procedures with parameters) and 3A-AP-14 (lists) are therefore not addressed; Level 3–4 would benefit from a “make a block” feature and a list block.',
+  'Contract requests for Levels 3–4, if the outlines are to go further: a wheel_distance_cm reporter (encoder distance, for odometry and for comparing commanded with measured motion) and sin / cos in math (odometry at any angle). Until then L3 S15 odometry is grid-aligned (90° turns only) and L4 S15 fault detection compares commands with distance_cm and heading_deg.',
   'say() must accept a number reporter as well as text: from Level 2 children report sensor readings and variables aloud (“say distance_cm”).',
   'Level 4 text view: a read-only Python-style view of each block program would bridge to the main R2BOT Academy and ROS 2. Not in the current block contract.',
   'Battery/energy model: Levels 1 (light), 3 (energy budget) and 4 (trade-offs) assume the simulator shows a battery meter that drops with motor power, mass and lights.',
   'Legs drive (Level 3): the curriculum assumes legs are slower on flat ground but can step over obstacles up to about half their leg height, where wheels stop. Confirm the physics model.',
-  'Level 4 mapping (sessions 7–9) assumes a simulator overlay that can show a grid map the student fills in; there is no list/array block to store a map in code.',
+  'Level 4 mapping (sessions 7–9) assumes a simulator overlay that can show a grid map the student fills in from readings the rover says aloud; there is no list/array block to store a map in code. The l4-p2 survey is therefore judged on the readings the rover reports, not on the student’s map.',
   'Certificate language and any school-facing alignment claims should be reviewed by an education adviser before publication (see mapping.ts: alignment notes, not certification).',
   'Episodes are scripts with beats and lines for 3D animation; voice casting and localisation (the season is written for translation) are not yet planned.',
 ]

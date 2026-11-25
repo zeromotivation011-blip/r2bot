@@ -186,7 +186,7 @@ export const L1_ROBOT_GEOMETRY =
   `Every wall, post or person a sensor must find is at least ${OBSTACLE_MIN_CM} cm tall.`
 
 export const FLAT_MAT_PHYSICS =
-  `Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. ${L1_ROBOT_GEOMETRY}`
+  `Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least ${OBSTACLE_MIN_CM} cm tall.`
 
 /**
  * Static check of the Level 1 sensor maths, for every body. Returns problems

@@ -20,6 +20,8 @@ Every session (30–40 minutes) has the same shape: **Episode** (a 3–5 minute 
 
 **No ranking, ever.** No leaderboards, no comparing children, no streak pressure. Stars reward care (planning first, fixing a bug, explaining why), never speed against others. Every child who learns the skills earns the same certificate.
 
+**Built for every child.** Deaf and hard-of-hearing, low-vision and colour-blind children, and children with motor or attention needs take the same course, not a cut-down one. Nothing depends on one sense alone: every spoken line is captioned, every sound has a visual twin, colour never carries meaning without a shape or icon, and every tap target works by switch or keyboard.
+
 **Accurate and global.** No wrong physics or sensor claims, even for five-year-olds: simplified, never false. Characters, places and everyday examples come from many countries; India appears as one setting among many, never the default.
 
 ## 2. The four levels at a glance
@@ -44,7 +46,7 @@ Every session (30–40 minutes) has the same shape: **Episode** (a 3–5 minute 
 | sensors | Touch (bumper) and echo distance, one at a time, inside a single picture block. | Line, colour and camera; choosing a sensor for a job; sensors can be wrong. | Calibration, thresholds and noise; recording readings. | Sensor limits, fusion by rules, averaging to reduce noise. |
 | conditions | “If I feel a bump, I turn.” | If / else, compare, and / or / not. | Conditions on variables and ranges; state transitions. | Priorities between behaviours; fault conditions. |
 | variables | — | Numbers on blocks change behaviour (preparing for variables). | Variables as the robot’s memory: counters, calibration, state, gain. | Variables for controller terms (error, sum, change) and logged data. |
-| feedback-control | Sensors let the robot stop where the world really is (not where counting says). | Bang-bang control: line-following with if / else; encoders make distance exact. | Proportional control: correction = gain × error; tuning the gain. | PID intuition: P reacts, I removes the leftover error, D calms overshoot. |
+| feedback-control | Sensors let the robot stop where the world really is (not where counting says). | Bang-bang control: line-following with if / else; encoders make wheel distance exact whatever the load or slope (wheels can still slip on ice or sand). | Proportional control: correction = gain × error; tuning the gain. | PID intuition: P reacts, I removes the leftover error, D calms overshoot. |
 | physics | Load, slopes, ice and sand change how far the same program goes. | Friction, traction, stability and tipping; wheels vs tracks by fair test. | Centre of mass, energy and battery budget; legs vs tracks trade-offs. | Kinematics of differential drive; measuring motor response; energy and mass trade-offs. |
 | autonomy | One sensor rule solves a maze without a map. | Robots that react to lines, colours and obstacles on their own. | Levels of autonomy; when a human should decide. | Why far-away robots (Mars) must be autonomous; behaviours, planning, recovery. |
 | data | — | Fair tests recorded in a table (wheels vs tracks). | Logging readings; min, max, average. | Measuring a system and fitting a simple rule from data. |
@@ -101,7 +103,7 @@ A storm blows the twelve lights off the Lantern Clock on the night before the to
 | 19 | Feel Your Way | Add a bumper — a touch sensor — and make the robot keep going until it feels a bump. | `repeat_until` `bumped` · sensor: bumper |
 | 20 | Bump, Then Think | Use “if” so the robot makes a choice: if it feels a bump, it backs off and turns. | `if` |
 | 21 | Ears Like a Bat | Swap in Distance Eyes and make the robot stop before it touches something, using echoes. | `distance_cm` `compare` · head: distance |
-| 22 | Stop for Friends | Make the robot wait until the path is clear before each move, and talk about who keeps robots safe. |  |
+| 22 | Stop for Friends | Make the robot wait until the path is clear before each move, and talk about who keeps robots safe. | tool: scoop |
 | 23 | Up the Clock Tower | Climb a winding ramp by repeating a sensor rule, and meet the people whose job is robots. |  |
 | 24 | 🛠 Make It Yours: The Night of a Hundred Lights | Design, test and share a festival show that uses a loop, a sensor, a tool and kind words. |  |
 
@@ -110,11 +112,11 @@ A storm blows the twelve lights off the Lantern Clock on the night before the to
 - **S6 · My Robot, My Dance.** Give your robot a name, colours and a face. Then make up a dance that cheers up the whole town. *Constraints:* At least 5 steps. Stay on the 3×3 dance floor. Use at least one turn and one sound.
 - **S12 · The Festival Banner.** Draw a picture for the festival banner that shows something you love. Your drawing must use Repeat at least once. *Constraints:* At least one Repeat. Stay on the banner (7 × 5 squares). Lift the pen at the end.
 - **S18 · A Helper for My Home.** Think of someone at home who could use a little help. Choose a job, choose the right tool, and program your robot to help — kindly and safely. *Constraints:* One tool only (choose it!). At least one kind word (a Say block). No bumping furniture.
-- **S24 · The Night of a Hundred Lights.** The lights are home! Design a festival show for your robot. It can dance, draw, carry a lantern or light up the dark corner — you decide. Keep the audience safe and make them smile. *Constraints:* Use at least one loop. Use at least one sensor block, to stay safe. Use your tool at least once. Say something kind to the audience. Stay on the stage; touch nothing.
+- **S24 · The Night of a Hundred Lights.** The lights are home! Design a festival show for your robot. It can dance, draw, carry a lantern or light up the dark corner — you decide. Keep the audience safe and make them smile. *Constraints:* Use at least one loop. Use at least one sensor block, to stay safe. Use your tool at least once. Say something kind to the audience. Stay on the stage. Touch nothing — except a gentle bumper touch on the stage fence, if your sensor is the bumper.
 
 **Certificate — R2BOT Kids · Explorer.** “{name} built {robotName}, taught it to move, draw, carry, feel and listen, and brought the twelve lights home to Lantern Hill. {name} can give a robot step-by-step instructions, repeat them with a loop, find and fix bugs, and use a sensor to keep people safe.”
 
-Earned by: Completed the four “Make it yours” projects (sessions 6, 12, 18, 24) with every self-check ticked. Earned the core skill badges: Roller, Turner, Bug Detective, Loop Star, Touch Sensor and Choice Maker (any missing badge can be earned in a catch-up session). Explained one bug they fixed, in their own words, to an adult or the class.
+Earned by: Ran all four “Make it yours” projects (sessions 6, 12, 18, 24) in the simulator; the final show ran with a loop, a sensor block, a tool and a Say block (recorded by the simulator). Earned the core skill badges: Roller, Turner, Bug Detective, Loop Star, Touch Sensor and Choice Maker (any missing badge can be earned in a catch-up session). Explained one bug they fixed, in their own words, to an adult or the class (observed by the teacher or a parent).
 
 **Blocks by the end of the level:** `say` `beep` `wait` `drive_for` `turn_degrees` `repeat` `pen_down` `pen_up` `grip_close` `grip_open` `light_on` `light_off` `repeat_until` `bumped` `if` `distance_cm` `compare`
 
@@ -123,8 +125,9 @@ Earned by: Completed the four “Make it yours” projects (sessions 6, 12, 18, 
 **Developmental fit:**
 
 - Pre-readers and early readers: every block, hint and question is spoken; icons carry meaning; screens use very few words.
-- Short attention spans: a 40-minute class changes activity every 4–9 minutes and starts unplugged, with the body.
+- Short attention spans: a 40-minute class changes activity every 2–8 minutes and starts unplugged, with the body.
 - Concrete before abstract: one hop = one tile on the mat; quarter turns only; the sensor condition is hidden inside one picture block.
+- Every child: captions and a visual twin for every sound, shape and icon as well as colour, tap or switch access instead of dragging, and a reduced-motion setting (see “Access for every child”).
 - Left and right are still being learned at 5–7: turns are taught from the robot’s point of view with body games first.
 - Fine motor control varies: big tap targets, no dragging required, pairs share one device (driver and navigator).
 - Gentle stories: problems are puzzles, never danger; cliffhangers are curiosity, not fear.
@@ -144,13 +147,19 @@ The bottle came from the Windward Isles, five small islands whose only ferry was
 
 *Finale:* The Island Post Grand Route: each child’s rover runs a three-stop delivery designed by them, cheered by every islander.
 
-**The robot.** Starts: The Explorer robot from Lantern Hill (children starting at Level 2 build an equivalent one in Session 1). Ends: A rover with the drive the child chose from their own fair test (four wheels or tracks), a camera, a gripper and a line sensor, with a full toolbox of swap-in parts.
+**The robot.** Starts: The Explorer robot from Lantern Hill (children starting at Level 2 build an equivalent one in Session 1, after the bridge missions). Ends: A rover with the drive the child chose from their own fair test (four wheels or tracks), a camera, a gripper and a line sensor, with a full toolbox of swap-in parts.
+
+**Bridge for newcomers.** An 8–10-year-old starting at Level 2 with no Explorer badges. Offered automatically before Session 1 (about 3 × 15 minutes, at home or while the class builds); never required, and a child can skip any mission they find easy.
+
+- *Bridge 1 · Steps and Loops* — Sequences, Wait, turns and Repeat (Level 1 sessions 1–12) in one delivery round the harbour. Blocks: `say` `wait` `drive_for` `turn_degrees` `repeat`
+- *Bridge 2 · Bugs and Tools* — Watch, find and fix a bug; pen and scoop actions (Level 1 sessions 8–18). Blocks: `pen_down` `pen_up` `grip_close` `grip_open` `light_on` `light_off`
+- *Bridge 3 · Sense, Think, Act* — Repeat until a bump, “if I feel a bump”, and “until something is close” (Level 1 sessions 19–23). Blocks: `repeat_until` `bumped` `if` `distance_cm` `compare`
 
 | # | Session | Objective | New blocks / part |
 |---|---|---|---|
 | 1 | Welcome to Windward | Rebuild your robot for the islands and explain each part as sense, think or act. | `stop` `number` |
-| 2 | Wheels That Count | Use wheel encoders to drive an exact distance in centimetres, on any floor. | `drive_distance` |
-| 3 | Any Angle | Turn any number of degrees and draw triangles and hexagons (exterior angles add up to 360°). |  |
+| 2 | Wheels That Count | Use wheel encoders to drive an exact wheel distance in centimetres, whatever the load or slope — and see that on ice or loose sand the wheels can still slip (measured properly in Level 3). | `drive_distance` |
+| 3 | Any Angle | Turn any number of degrees and draw triangles and hexagons: to get back where you started, the robot turns all the way round once (360°). |  |
 | 4 | Four Wheels for Heavy Mail | Swap to four wheels and test stability: wider and lower is harder to tip. | drive: wheels4 |
 | 5 | Curves with Two Motors | Steer with different left and right motor power to drive smooth curves. | `set_motors` |
 | 6 | 🛠 Make It Yours: Map of My Island | Design an island map and draw it with the pen using measured distances and angles. |  |
@@ -182,7 +191,7 @@ The bottle came from the Windward Isles, five small islands whose only ferry was
 
 **Certificate — R2BOT Kids · Builder.** “{name} rebuilt {robotName} as the Island Post rover. {name} can measure and steer precisely, follow lines with if / else, choose parts from a fair test, sort with sensors, test a program until it is reliable, and design for the people who will use it.”
 
-Earned by: Completed the four projects with every self-check ticked. Recorded and used a fair-test results table (Session 13). A final route that succeeded in ten runs in a row (Session 22 method).
+Earned by: Ran the four projects in the simulator, each meeting its constraints (recorded by the simulator). Recorded and used a fair-test results table (Session 13). A final route that succeeded in ten runs in a row (Session 22 method, recorded by the simulator).
 
 **Blocks by the end of the level:** `say` `beep` `wait` `drive_for` `turn_degrees` `repeat` `pen_down` `pen_up` `grip_close` `grip_open` `light_on` `light_off` `repeat_until` `bumped` `if` `distance_cm` `compare` `drive_distance` `set_motors` `stop` `number` `line_seen` `if_else` `forever` `and` `or` `not` `timer_s` `floor_color`
 
@@ -204,23 +213,29 @@ A mountain research station on a glacier ridge measures snow, ice and weather. A
 | Act | Sessions | Summary | Act ends with |
 |---|---|---|---|
 | Arrival at the Ridge | 1–6 | Variables, maths, the gyro, calibration and smooth proportional line following; the mail rover. | The weather mast has gone silent: something is wrong with its cables. |
-| The Weather Mast | 7–12 | Wall following, tuning gain, state machines, logging data, the energy budget; the mast inspection. | The mast readings show the ice is moving fast — the scientists need ice cores from the boulder field, now. |
+| The Weather Mast | 7–12 | Keeping a gap behind the supply sled, tuning gain, state machines, logging data, the energy budget; the mast inspection. | The mast readings show the ice is moving fast — the scientists need ice cores from the boulder field, now. |
 | The Boulder Field | 13–18 | Legs against tracks, centre of mass, odometry and landmarks, gentle gripping; the sample return. | A whiteout rolls in while the remote station’s data is still out there. |
 | Whiteout | 19–24 | Levels of autonomy, fail-safes, combining sensors, honest data and wild places, field-robotics careers; the rescue rover. | The data comes home. A message arrives from a desert research base preparing a Mars rehearsal. |
 
 *Finale:* Whiteout Rescue: each child’s autonomous rover finds the remote station in a simulated whiteout and brings its data home.
 
-**The robot.** Starts: The Builder rover (children starting at Level 3 assemble an equivalent rover in Session 1). Ends: A field rover whose drive (legs or tracks) and head were chosen from measured trade-offs, running proportional control, a state machine and fail-safes.
+**The robot.** Starts: The Builder rover, with its whole toolbox (children starting at Level 3 assemble an equivalent rover in Session 1, after the bridge missions). Ends: A field rover whose drive (legs or tracks) and head were chosen from measured trade-offs, running proportional control, a state machine and fail-safes.
+
+**Bridge for newcomers.** An 11–13-year-old starting at Level 3 with no Builder badges. Offered automatically before Session 1; self-paced, about 3 × 20 minutes.
+
+- *Bridge 1 · Measured Moves* — drive_distance, any-angle turns and set_motors curves (Level 2 Act 1). Blocks: `drive_distance` `turn_degrees` `set_motors` `stop` `number`
+- *Bridge 2 · Lines and Choices* — Line following with if / else, forever with a way to stop, and / or / not (Level 2 Act 2). Blocks: `line_seen` `if_else` `forever` `and` `or` `not` `timer_s`
+- *Bridge 3 · Sensors and Fair Tests* — Colour and distance sensors, and a two-run fair test of wheels against tracks (Level 2 Acts 3–4). Blocks: `floor_color` `distance_cm` `compare`
 
 | # | Session | Objective | New blocks / part |
 |---|---|---|---|
 | 1 | The Robot’s Memory | Use variables to count and remember (deliveries made, distance travelled). | `variable_set` `variable_change` `variable_get` |
-| 2 | Maths in Motion | Calculate distance from speed and time, and check the calculation against the encoders. | `math` |
+| 2 | Maths in Motion | Calculate distance from speed and time, and check the calculation against a measured distance (distance_cm to a wall before and after the move). | `math` |
 | 3 | Keep Your Heading | Read the gyro and correct a drifting heading on a slippery snowfield. | `heading_deg` |
 | 4 | Calibrate Your Sensors | Measure light and dark readings, store them, and set the threshold from your own data. |  |
 | 5 | Smooth Line Following | Steer by how far off the line you are (correction = gain × offset) and compare with if / else. | `line_offset` |
 | 6 | 🛠 Make It Yours: The Station Mail Rover | Design a rover that delivers to several huts and reports how many deliveries it made. |  |
-| 7 | Following a Wall | Keep a steady distance from a wall using proportional steering on distance error. |  |
+| 7 | Keep Your Distance | Follow the moving supply sled at a steady 30 cm gap using proportional speed control on distance error (Distance Eyes look straight ahead). |  |
 | 8 | Too Much, Too Little | Tune the gain: see wobble when it is too high and slow drift when it is too low. |  |
 | 9 | States: Search, Follow, Done | Use a state variable to switch behaviour (find the line, follow it, stop at the end). |  |
 | 10 | Logging the Weather | Record readings into variables and report the minimum, maximum and average. |  |
@@ -228,12 +243,12 @@ A mountain research station on a glacier ridge measures snow, ice and weather. A
 | 12 | 🛠 Make It Yours: Weather Mast Inspector | Design an inspection run that follows the mast cables, logs readings and returns before the battery runs low. |  |
 | 13 | Legs or Tracks? | Compare legs and tracks on boulders and snow, and choose from measured trade-offs. | drive: legs |
 | 14 | Centre of Mass | Find where a robot tips on a slope and move its load to make it stable. |  |
-| 15 | Where Am I? Odometry | Estimate position from wheel distance and heading, and watch the error grow. |  |
+| 15 | Where Am I? Odometry | Keep x and y variables up to date from your own drive_distance moves and 90° turns on a grid, and watch the estimate drift from the truth when wheels slip on snow. |  |
 | 16 | Landmarks Fix Drift | Use coloured markers to reset the position estimate. |  |
 | 17 | Fragile Samples | Approach an ice-core sample slowly, slowing down in proportion to the distance left, then grip gently. | tool: gripper |
 | 18 | 🛠 Make It Yours: Sample Return Mission | Design a mission that collects two samples from the boulder field and brings them back without dropping them. |  |
 | 19 | Who Is in Charge? | Compare remote control, shared control and full autonomy, and decide when a human should take over. |  |
-| 20 | Fail Safe | Add timeouts and safe defaults: if a reading is lost or a task takes too long, stop safely. |  |
+| 20 | Fail Safe | Add timeouts and safe defaults: if a reading is lost (no echo: distance_cm reads 200; or the line is not seen) or a task takes too long, stop safely. |  |
 | 21 | Many Sensors, One Decision | Combine line, distance and colour readings with priorities to make one decision. |  |
 | 22 | Honest Data, Wild Places | Discuss honest reporting of data and how field robots should treat wildlife and fragile places. |  |
 | 23 | Field Robotics Careers | Meet the roles in field robotics and rehearse the whiteout rescue with a team. |  |
@@ -248,7 +263,7 @@ A mountain research station on a glacier ridge measures snow, ice and weather. A
 
 **Certificate — R2BOT Kids · Inventor.** “{name} made {robotName} a field rover for Ridgeback Station. {name} can use variables and maths in programs, calibrate sensors, tune a proportional controller, structure behaviour as states, log and summarise data, and decide when a human should be in charge.”
 
-Earned by: Completed the four projects with every self-check ticked. A gain-tuning log showing at least three tested values (Session 8). A state diagram that matches the final program (Session 24).
+Earned by: Ran the four projects in the simulator, each meeting its constraints (recorded by the simulator). A gain-tuning log showing at least three tested values (Session 8). A state diagram that matches the final program, checked by the teacher (Session 24).
 
 **Blocks by the end of the level:** `say` `beep` `wait` `drive_for` `turn_degrees` `repeat` `pen_down` `pen_up` `grip_close` `grip_open` `light_on` `light_off` `repeat_until` `bumped` `if` `distance_cm` `compare` `drive_distance` `set_motors` `stop` `number` `line_seen` `if_else` `forever` `and` `or` `not` `timer_s` `floor_color` `variable_set` `variable_change` `variable_get` `math` `heading_deg` `line_offset`
 
@@ -276,7 +291,12 @@ A desert research base runs a Mars rehearsal: a crew lives as if on Mars for 24 
 
 *Finale:* Mission Red Valley: each teen presents and runs their own autonomous mission with evidence, a safety case and an honest account of what failed.
 
-**The robot.** Starts: The Inventor field rover (students starting at Level 4 assemble an equivalent rover in Session 1). Ends: An autonomous rover (floor sensor and drive chosen by the student) configured for their capstone mission and justified in a design review: tuned PID-style control, mapping, behaviour priorities, fault detection and a safety case.
+**The robot.** Starts: The Inventor field rover, with its whole toolbox (students starting at Level 4 assemble an equivalent rover in Session 1, after the bridge missions). Ends: An autonomous rover (floor sensor and drive chosen by the student) configured for their capstone mission and justified in a design review: tuned PID-style control, mapping, behaviour priorities, fault detection and a safety case.
+
+**Bridge for newcomers.** A 14–17-year-old starting at Level 4 with no Inventor badges. Offered automatically; self-paced, about 2 × 30 minutes, with the Level 3 session notes linked for anything new.
+
+- *Bridge 1 · Variables and Maths* — Counters, calibration values and a state variable (Level 3 Acts 1–2). Blocks: `variable_set` `variable_change` `variable_get` `math`
+- *Bridge 2 · Proportional Control* — Steer by line_offset × gain, then hold a heading with heading_deg; tune the gain (Level 3 sessions 3, 5, 7–8). Blocks: `line_offset` `heading_deg` `math`
 
 | # | Session | Objective | New blocks / part |
 |---|---|---|---|
@@ -287,14 +307,14 @@ A desert research base runs a Mars rehearsal: a crew lives as if on Mars for 24 
 | 5 | P, I and D | See P leave a steady error, I remove it, and D calm overshoot — and tune all three. |  |
 | 6 | 🛠 Make It Yours: Precision Docking | Design a controller that docks the rover to the charging pad within 2 cm and 3°. |  |
 | 7 | Scanning with Distance | Turn on the spot taking distance readings and sketch the surroundings from the data. |  |
-| 8 | Maps on a Grid | Turn readings into a grid map of free and blocked cells (on paper and in the sim overlay). |  |
+| 8 | Maps on a Grid | Have the rover drive survey lanes and say each reading, then turn those readings into a grid map of free and blocked cells (on paper and in the sim overlay — there are no list blocks). |  |
 | 9 | Planning a Path | Find a shortest path on a grid by the wavefront (flood-fill) method, by hand, then drive it. |  |
 | 10 | Behaviours and Priorities | Layer behaviours: avoid beats follow, follow beats explore. |  |
 | 11 | Twenty Minutes Away | Explain why Mars rovers cannot be joysticked (light takes about 3–22 minutes each way) and design for delay. |  |
 | 12 | 🛠 Make It Yours: Autonomous Survey | Design a rover that surveys an unknown crater floor and returns a map. |  |
 | 13 | Reach and Grasp | Align with a target by camera colour and distance, then grasp reliably. |  |
 | 14 | Test Plans and Edge Cases | Write a test plan with normal, edge and failure cases, and run it. |  |
-| 15 | Detecting Faults | Detect a stalled wheel by comparing commanded and measured motion, and recover. |  |
+| 15 | Detecting Faults | Detect a stalled or slipping wheel by comparing what you commanded with what the sensors see (distance_cm should shrink while driving at a wall; heading_deg should hold when driving straight), and recover. |  |
 | 16 | Mass, Energy, Trade-offs | Run a design review: every gram and every watt must earn its place. |  |
 | 17 | Working with People | Make robot intent readable to people (say, lights, motion) and design safe handovers. |  |
 | 18 | 🛠 Make It Yours: Sample Fetch Under Faults | Design a sample-fetch mission that still succeeds when one injected fault occurs. |  |
@@ -308,13 +328,13 @@ A desert research base runs a Mars rehearsal: a crew lives as if on Mars for 24 
 **Make it yours projects**
 
 - **S6 · Precision Docking.** The rover must dock to its charging pad by itself — within 2 cm and 3° — from anywhere in the bay. *Constraints:* Closed-loop control on distance and heading. Ten docking runs from random starts, with results logged. No contact faster than 5 cm/s.
-- **S12 · Autonomous Survey.** Survey an unknown crater floor and come back with a grid map good enough for the next rover to plan a route. *Constraints:* No pre-loaded map. Return to base within the time limit. The map is checked against the real crater cell by cell.
+- **S12 · Autonomous Survey.** Survey an unknown crater floor and come back with a grid map good enough for the next rover to plan a route. *Constraints:* No pre-loaded map. Return to base within the time limit. For each of the five survey lanes the rover itself says the distance to the first obstacle (or 200 for none); the simulator checks each against the real crater within 10 cm. The student then draws the grid map from the rover’s readings.
 - **S18 · Sample Fetch Under Faults.** Fetch a sample — and keep going when something breaks. The simulator injects one unknown fault (a slipping wheel, a blinded sensor or a dead zone) per run. *Constraints:* Detect at least two kinds of fault. Recover or stop safely — never continue blindly. Written test plan with results.
 - **S24 · Mission Red Valley (capstone).** Plan, build, test and present a full autonomous mission of your choosing in the Red Valley arena: a real need, a rover design, control, autonomy, a safety case and evidence it works. *Constraints:* A stated user need and success measure. At least one feedback controller and one behaviour layer. A safety case and a test log. A two-minute presentation and a one-page write-up.
 
 **Certificate — R2BOT Kids · Engineer.** “{name} engineered {robotName} for Mission Red Valley. {name} can measure and model a robot, tune feedback control (P, I and D), build maps and plan paths, layer behaviours, test systematically, detect faults, and argue for a design’s safety and ethics with evidence.”
 
-Earned by: Completed the four projects with every self-check ticked. A capstone write-up with a test log and a safety case, reviewed by peers. A design-review presentation.
+Earned by: Ran the four projects in the simulator, each meeting its constraints (recorded by the simulator). A capstone write-up with a test log and a safety case, reviewed by peers. A design-review presentation.
 
 **Blocks by the end of the level:** `say` `beep` `wait` `drive_for` `turn_degrees` `repeat` `pen_down` `pen_up` `grip_close` `grip_open` `light_on` `light_off` `repeat_until` `bumped` `if` `distance_cm` `compare` `drive_distance` `set_motors` `stop` `number` `line_seen` `if_else` `forever` `and` `or` `not` `timer_s` `floor_color` `variable_set` `variable_change` `variable_get` `math` `heading_deg` `line_offset`
 
@@ -329,13 +349,24 @@ Earned by: Completed the four projects with every self-check ticked. A capstone 
 
 ## 4. Level 1 · Explorers — session by session
 
-Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{robot}` in a line is the name the child gave their robot. Grid co-ordinates are (column, row) from the top-left; turn_degrees +90 is a left turn.
+Everything a 5–7-year-old meets is spoken aloud, captioned and shown with pictures. `{robot}` in a line is the name the child gave their robot. Grid co-ordinates are (column, row) from the top-left on 35 cm tiles; turn_degrees +90 is a left turn.
+
+**Level 1 robot geometry** (from `lib/kids/sim/robot-spec.ts`, two-wheel drive, Distance Eyes and bumper; checked against the arena maths by this script):
+
+| Body | Width with wheels | Turning radius | Distance Eyes ahead of centre / height | Mass before a tool |
+|---|---|---|---|---|
+| box | 24 cm | 14.3 cm | 4.7 cm / 21 cm | 1.28 kg |
+| dome | 27 cm | 16.5 cm | 5.7 cm / 17.5 cm | 1.08 kg |
+| tall | 20.6 cm | 12.3 cm | 4.1 cm / 29 cm | 1.48 kg |
+| bug | 23 cm | 15.6 cm | 6.3 cm / 19.5 cm | 0.83 kg |
+
+Robot (from sim/robot-spec.ts): 20.6–27 cm wide with wheels, turns on the spot inside a circle of radius 12.3–16.5 cm; Distance Eyes 4.1–6.3 cm ahead of the centre and 17.5–29 cm above the floor; mass 0.83–1.48 kg with Distance Eyes and bumper, before a tool. Every wall, post or person a sensor must find is at least 35 cm tall.
 
 ### 1. Hello, Robot!
 
 *Say what makes a robot a robot — it senses, thinks and acts — and give it its first instructions.*
 
-- Objectives: **L1-S01-O1** Distinguishes a robot from a toy or simple machine using sense–think–act. (“I can tell if something is a robot: it senses, thinks and acts.”) **L1-S01-O2** Understands that a robot follows a program: steps carried out in order. (“I can give my robot steps to do, one after another.”)
+- Objectives: **L1-S01-O1** Distinguishes a robot from a toy or simple machine using sense–think–act. (“I can tell if something is a robot: it senses, thinks and acts.”) *[discussion and check — not assessed by the challenge]* **L1-S01-O2** Understands that a robot follows a program: steps carried out in order. (“I can give my robot steps to do, one after another.”)
 - Concepts: sense-think-act, sequences · New blocks: `say`, `beep`, `wait`
 
 **Episode: “The Night the Lights Blew Away”** (3:45)
@@ -378,50 +409,50 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 - Why: The body holds the battery (the robot’s energy) and the brain (a tiny computer) and keeps them safe.
 - Try it without: Without a body the battery and brain fall on the floor — nothing works.
-- Physics: Body mass in the simulator: Bug 0.6 kg, Dome 0.9 kg, Box 1.1 kg, Tall Tower 1.3 kg. Heavier bodies start and stop a little more slowly (felt in session 14).
+- Physics: Body mass in the simulator: Bug 0.45 kg, Dome 0.7 kg, Box 0.9 kg, Tall Tower 1.1 kg. Heavier bodies start and stop a little more slowly (felt in session 14).
 - Real world: Robot vacuum cleaners are round and flat so they fit under sofas; warehouse robots are big boxes so they can carry shelves.
 
 **Code: First Words.** Make your robot say hello, then beep.
 
-- Arena — *Workshop table*: Your robot sits on Nana Lucía’s table. Spark and Bolt are watching. Grid 3×3 tiles of 25 cm. Floor: wood. Start (1,1) facing down.
+- Arena — *Workshop table*: Your robot sits on Nana Lucía’s table. Spark and Bolt are watching. Grid 3×3 tiles of 35 cm. Floor: wood. Start (1,1) facing down.
 - Goal: No moving today — the robot has no wheels yet. It just has to talk.
 - Features: Spark and Bolt react to each sound the robot makes.
-- Needs: nothing special. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: nothing special. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Say (`say`) · Beep (`beep`)
 - Example solution: `say("Hello!") beep`
 - Success: Program runs say then beep, in that order. *(action-at-zone)*
 - Stars: ★ done · ★★ Your robot said hello first, then beeped — in the right order. · ★★★ You pressed Go and listened, then told Spark what the robot did first.
-- Hints (Spark): 1. What should your robot do first? Find the talking block. 2. Put the "Say" block at the top. Then the "Beep" block under it. 3. Drag "Say Hello!" to the top, then "Beep" under it, and press the green Go button.
+- Hints (Spark): 1. What should your robot do first? Find the talking block. 2. Put the "Say" block at the top. Then the "Beep" block under it. 3. Tap "Say Hello!", then tap "Beep" — they line up in that order — and press the green Go button.
 
 **Challenge: Good Morning Song.** Make a wake-up song: beep, wait, beep, then say "Good morning!"
 
-- Arena — *Workshop table*: The sun is coming up. Wake up the whole workshop! Grid 3×3 tiles of 25 cm. Floor: wood. Start (1,1) facing down.
-- Goal: Spark and Bolt wake up when they hear: beep … beep … "Good morning!"
-- Features: Sleeping Spark and Bolt with "Zzz" bubbles.
-- Needs: nothing special. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Arena — *Workshop table*: The sun is coming up. Wake up the whole workshop! Grid 3×3 tiles of 35 cm. Floor: wood. Start (1,1) facing down.
+- Goal: Spark and Bolt wake up on screen when they get: beep … beep … "Good morning!"
+- Features: Sleeping Spark and Bolt with "Zzz" bubbles; Every sound is also shown: each beep flashes a ring around the robot and Say shows a speech bubble with the words, so a child who cannot hear it can still see the song.
+- Needs: nothing special. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Beep (`beep`) · Wait (`wait`) · Say (`say`)
 - Example solution: `beep wait(1) beep say("Good morning!")`
-- Success: The sounds happen in this order: beep, a pause of at least 1 s, beep, say "Good morning!". *(action-at-zone)*
+- Success: The sounds (and their visual rings and bubble) happen in this order: beep, a pause of at least 1 s, beep, say "Good morning!". Then Spark and Bolt visibly wake up: eyes open, "Zzz" bubbles pop, Bolt wags. *(action-at-zone)*
 - Stars: ★ done · ★★ You used a Wait so the beeps are not squashed together. · ★★★ You added your own extra step at the end and said what it does.
 - Hints (Spark): 1. Listen to the song: beep … beep … good morning. What comes first? 2. Between the two beeps there is a little rest. Which block makes the robot rest? 3. Beep, then Wait 1, then Beep, then Say "Good morning!"
 
 **Check (3 questions)**
 
-1. Which one is a robot? — 🥄 A spoon · **🤖 A robot vacuum that turns when it bumps a chair** ✓ · 🧸 A teddy bear. *Why:* The robot vacuum senses the chair, thinks "turn!", and acts by turning. Sense, think, act!
-2. What does the battery give a robot? — **⚡ Energy** ✓ · 👀 Eyes · 🏷️ A name. *Why:* A battery stores energy. The robot uses that energy to think and to move.
+1. Which one is a robot? — **🤖 A robot vacuum that turns when it bumps a chair** ✓ · 🥄 A spoon · 🔦 A torch with a battery. *Why:* The robot vacuum senses the chair, thinks "turn!", and acts by turning. Sense, think, act! A torch has a battery, but it cannot sense or decide.
+2. What does the battery give a robot? — 👀 Eyes · **⚡ Energy** ✓ · 🏷️ A name. *Why:* A battery stores energy. The robot uses that energy to think and to move.
 3. Your robot does what…? — 💭 It wants to · **📋 Its program says, step by step** ✓. *Why:* A robot follows its program, one step after another. It does not guess what you want.
 
 **Badge:** 👋 Robot Waker — You know a robot senses, thinks and acts — and you gave yours its first steps. · **Reward:** Your robot body is yours to keep and colour.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: "Sense, think, act" freeze game · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Sense, Think, Act freeze game* (5 min): Children walk around. When you clap (sense!), they freeze and think where to go (think!), then hop to a new spot (act!). Say the three words with an action each: hand to ear (sense), finger to head (think), jump (act). Ask: "What did you use to sense the clap?" (ears). Materials: None.
+- 40-minute plan: 4′ Unplugged warm-up: "Sense, think, act" freeze game · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Sense, Think, Act freeze game* (4 min): Children walk around. When you clap (sense!), they freeze and think where to go (think!), then hop to a new spot (act!). Say the three words with an action each: hand to ear (sense), finger to head (think), jump (act). Ask: "What did you use to sense the clap?" (ears). Materials: None.
 - Discuss: Is a fan a robot? Why or why not? · What senses do you have? What could a robot use instead of ears or eyes? · What does "follow the steps in order" mean when you brush your teeth?
 - Misconceptions: “Robots are alive and have feelings.” → Robots are machines. They can look friendly and show faces, but they follow programs people write. · “Anything with a battery is a robot.” → A torch has a battery but cannot sense or decide. A robot senses, thinks and acts. · “Robots must look like people.” → Most robots look nothing like people: vacuums, arms in factories, rovers.
 - Faster: Make a longer song (four steps or more) and teach it to a friend. · Sort pictures of machines into "robot" and "not a robot" and explain one.
 - Slower: Do the code task with two blocks only, with a teacher pointing to the top of the screen. · Act out sense–think–act with Bolt before touching the screen.
-- Notes: Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -464,50 +495,50 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 - Why: Motors use battery energy to spin the wheels. Spinning wheels push on the floor and the robot rolls.
 - Try it without: Without wheels, pressing Go does nothing — the robot sits still like a statue.
-- Physics: Two driven wheels plus a free-rolling caster ball (differential drive). Adds 0.3 kg.
+- Physics: Two driven wheels plus a free-rolling caster ball (differential drive). Adds 0.25 kg.
 - Real world: Most robot vacuum cleaners move on two wheels and a small free wheel.
 
 **Code: Out of the Door.** Drive out of the door to the doormat. Count the squares first!
 
-- Arena — *Workshop doorstep*: A straight path of squares from the workshop door to the doormat. Grid 1×5 tiles of 25 cm. Floor: mat. Start (0,4) facing up.
+- Arena — *Workshop doorstep*: A straight path of squares from the workshop door to the doormat. Grid 1×5 tiles of 35 cm. Floor: mat. Start (0,4) facing up.
 - Goal: Stop on the doormat at tile (0,1) — 3 squares ahead.
 - Features: Wall at row 0 (the garden fence).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`)
-- Example solution: `drive_for(50, 3)`
+- Example solution: `drive_for(80, 3)`
 - Success: Robot centre ends inside tile (0,1). *(stop-in-zone)* Robot does not touch the fence at row 0. *(no-collision)*
 - Stars: ★ done · ★★ You counted the squares before pressing Go. · ★★★ You used just one block.
 - Hints (Spark): 1. Count the squares from your robot to the doormat. 2. There are 3 squares. Which number goes in the Hop block? 3. Use "Hop forward 3".
 
 **Challenge: The First Light.** Drive down the garden path and stop right on the light. Don’t knock the flowerpot!
 
-- Arena — *Garden path*: A path of six squares. The clock light glows on square four. A flowerpot sits right after it. Grid 1×6 tiles of 25 cm. Floor: mat. Start (0,5) facing up.
+- Arena — *Garden path*: A path of six squares. The clock light glows on square four. A flowerpot sits right after it. Grid 1×6 tiles of 35 cm. Floor: mat. Start (0,5) facing up.
 - Goal: Stop on the light at tile (0,1) — 4 squares ahead.
 - Features: Clock light on tile (0,1); Flowerpot on tile (0,0) (knocks over if touched).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`)
-- Example solution: `drive_for(50, 2) drive_for(50, 2)`
+- Example solution: `drive_for(80, 2) drive_for(80, 2)`
 - Success: Robot centre ends inside tile (0,1). *(stop-in-zone)* The flowerpot is not touched. *(no-collision)*
 - Stars: ★ done · ★★ You stopped on the light without touching the flowerpot. · ★★★ You found a way using only 2 blocks (the biggest hop is 3).
 - Hints (Spark): 1. Count the squares to the light. Is it more than 3? 2. It is 4 squares. The biggest hop is 3. Can you use two hop blocks? 3. Try "Hop forward 2" and then "Hop forward 2" — or 3 and then 1.
 
 **Check (3 questions)**
 
-1. What makes the wheels turn? — **⚙️ A motor** ✓ · 🌬️ Wind · ⭐ A sticker. *Why:* A motor spins when it gets energy from the battery, and the spin turns the wheel.
+1. What makes the wheels turn? — 🌬️ Wind · 💭 The robot knows where to go, so they turn by themselves · **⚙️ A motor** ✓. *Why:* A motor spins when it gets energy from the battery, and the spin turns the wheel.
 2. The light is 2 squares away. Which block? — **2️⃣ Hop forward 2** ✓ · 3️⃣ Hop forward 3. *Why:* Count the squares: one, two. Hop 2 lands right on it. Hop 3 goes too far.
-3. Why does the robot have a little ball at the back? — **⚪ To hold it up and roll any way** ✓ · ⚽ To play football. *Why:* The ball is called a caster. It balances the robot and rolls in any direction.
+3. Why does the robot have a little ball at the back? — 💨 To make it go faster · **⚪ To hold it up and roll any way** ✓. *Why:* The ball is called a caster. It balances the robot and rolls in any direction.
 
 **Badge:** 🛞 Roller — You gave your robot wheels and drove it to the right spot by counting. · **Reward:** Light 1 of 12 found!
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Human wheels · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Human wheels* (5 min): Tape a line of 5 squares on the floor (or use floor tiles). A child is the robot. The class calls out "Forward 2!" and the robot takes exactly 2 steps, one per square. Ask: "What happens if the robot takes giant steps?" (it goes too far — steps must be the same size). Materials: Masking tape or floor tiles.
+- 40-minute plan: 4′ Unplugged warm-up: Human wheels · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Human wheels* (4 min): Tape a line of 5 squares on the floor (or use floor tiles). A child is the robot. The class calls out "Forward 2!" and the robot takes exactly 2 steps, one per square. Ask: "What happens if the robot takes giant steps?" (it goes too far — steps must be the same size). Materials: Masking tape or floor tiles.
 - Discuss: What else has motors that spin? (fan, blender, toy car) · Why did the robot go too far the first time in the story? · Why do we count before we press Go?
 - Misconceptions: “The robot knows where the light is.” → It doesn’t. It has no eyes yet. It only goes as far as we tell it. · “Bigger number = faster.” → In the hop block the number is how many squares (how long it drives), not how fast.
 - Faster: Find two different block plans that reach the light (2+2, 3+1, 1+3). · Predict out loud where the robot will stop before pressing Go.
 - Slower: Point to each square with a finger while counting. · Start with the 3-square doorstep twice before the challenge.
-- Notes: Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -554,45 +585,45 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: Let the Cart Pass.** Hop to the kerb, wait for the bread cart to pass, then hop to the bakery door.
 
-- Arena — *Bakery Lane*: A street with the bread cart rolling across the middle. The bakery door is at the far end. Grid 1×6 tiles of 25 cm. Floor: mat. Start (0,5) facing up.
+- Arena — *Bakery Lane*: A street with the bread cart rolling across the middle. The bakery door is at the far end. Grid 1×6 tiles of 35 cm. Floor: mat. Start (0,5) facing up.
 - Goal: Reach the bakery door at tile (0,2).
 - Features: Bread cart crosses row 3 from left to right, between 1 s and 3.5 s after Go (once).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Wait (`wait`)
-- Example solution: `drive_for(50, 1) wait(3) drive_for(50, 2)`
+- Example solution: `drive_for(80, 1) wait(3) drive_for(80, 2)`
 - Success: Robot centre ends inside tile (0,2). *(stop-in-zone)* Robot never touches the cart. *(no-collision)*
 - Stars: ★ done · ★★ You waited long enough for the cart. · ★★★ You explained out loud why Wait goes in the middle.
 - Hints (Spark): 1. Watch the cart first. When does it cross? 2. Hop 1 to the kerb, then wait before you cross. 3. Hop 1, Wait 3, Hop 2.
 
 **Challenge: Morning Delivery.** Get past the cart to the bakery door, ring the bell with a beep, and say good morning.
 
-- Arena — *Bakery Lane (long)*: The same street, but the door is one square further. Grid 1×6 tiles of 25 cm. Floor: mat. Start (0,5) facing up.
+- Arena — *Bakery Lane (long)*: The same street, but the door is one square further. Grid 1×6 tiles of 35 cm. Floor: mat. Start (0,5) facing up.
 - Goal: Stop at the door, tile (0,1), then beep, then say "Good morning!".
 - Features: Bread cart crosses row 3 between 1 s and 3.5 s after Go; Door bell at tile (0,0).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Wait (`wait`) · Beep (`beep`) · Say (`say`)
-- Example solution: `drive_for(50, 1) wait(3) drive_for(50, 3) beep say("Good morning!")`
+- Example solution: `drive_for(80, 1) wait(3) drive_for(80, 3) beep say("Good morning!")`
 - Success: Robot centre ends inside tile (0,1). *(stop-in-zone)* Robot never touches the cart. *(no-collision)* beep then say happen after the robot has stopped at the door. *(action-at-zone)*
 - Stars: ★ done · ★★ You beeped and spoke only after you arrived. · ★★★ You tried a different Wait number and explained what changed.
 - Hints (Spark): 1. This is like last time, but the door is further and you must ring the bell. 2. Hop, Wait, Hop… then what do you do at a door? 3. Hop 1, Wait 3, Hop 3, Beep, Say "Good morning!".
 
 **Check (3 questions)**
 
-1. A cart is crossing. What should the robot do? — **✋ Wait** ✓ · 💨 Go fast. *Why:* Wait until the way is clear, then go. That is how robots — and people — stay safe.
+1. A cart is crossing. What should the robot do? — 👀 Keep going — the robot will see the cart and stop · **✋ Wait** ✓. *Why:* Wait until the way is clear, then go. That is how robots — and people — stay safe.
 2. Go, Go, Wait. Or Go, Wait, Go. Which lets the cart pass? — **🟢✋🟢 Go, Wait, Go** ✓ · 🟢🟢✋ Go, Go, Wait. *Why:* The wait must come before the crossing. The same steps in a different order do something different.
-3. Does a robot wait by itself if we forget the Wait block? — 👍 Yes · **👎 No** ✓. *Why:* No. The robot only does what the program says. If there is no Wait, it does not wait.
+3. Does a robot wait by itself if we forget the Wait block? — **👎 No** ✓ · 👍 Yes. *Why:* No. The robot only does what the program says. If there is no Wait, it does not wait.
 
 **Badge:** ✋ Patient Driver — You used Wait at the right moment and put your steps in the right order. · **Reward:** The bakery is open to your robot.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Red light, green light with cards · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Go and Wait cards* (5 min): Make three big cards: GO, GO, WAIT. A child holds them in a line; the class does each card (step forward, step forward, freeze for 3 counts). Swap the card order and do it again. Ask: "Did we do the same thing?" Materials: Three paper cards: GO, GO, WAIT.
+- 40-minute plan: 4′ Unplugged warm-up: Red light, green light with cards · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Go and Wait cards* (4 min): Make three big cards: GO, GO, WAIT. A child holds them in a line; the class does each card (step forward, step forward, freeze for 3 counts). Swap the card order and do it again. Ask: "Did we do the same thing?" Materials: Three paper cards: GO, GO, WAIT.
 - Discuss: Where do you wait in real life before you go? (crossing a road, queue, lift door) · Why did the order of the cards matter?
 - Misconceptions: “The robot can see the cart and will stop.” → This robot has no eyes yet. It cannot see the cart. That is why we tell it to wait. · “Wait makes the robot slower everywhere.” → Wait only pauses at the place it is in the program.
 - Faster: Find the shortest Wait that still works and explain why. · Add a second wait and see what changes.
 - Slower: Do the cards activity again with the screen program side by side. · Use only the code task; the challenge is optional.
-- Notes: Road safety link: tell children the robot waits at the kerb just like they do — stop, look, wait. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Road safety link: tell children the robot waits at the kerb just like they do — stop, look, wait. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -640,45 +671,45 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: Hello Before Moving.** Tell Noor what you will do, then drive forward and say hello.
 
-- Arena — *Bakery floor*: A short aisle inside the bakery. Noor stands at the side. Grid 1×4 tiles of 25 cm. Floor: wood. Start (0,3) facing up.
+- Arena — *Bakery floor*: A short aisle inside the bakery. Noor stands at the side. Grid 1×4 tiles of 35 cm. Floor: wood. Start (0,3) facing up.
 - Goal: Say what you will do BEFORE moving, then stop at tile (0,1) and say hello.
 - Features: Noor beside tile (0,2) — smiles if the robot spoke before moving, hides if not.
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a wooden floor: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a wooden floor: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Say (`say`)
-- Example solution: `say("I am going forward!") drive_for(50, 2) say("Hello!")`
+- Example solution: `say("I am going forward!") drive_for(80, 2) say("Hello!")`
 - Success: A say block runs before the first movement block. *(action-at-zone)* Robot centre ends inside tile (0,1). *(stop-in-zone)*
 - Stars: ★ done · ★★ Noor smiled because your robot spoke first. · ★★★ Your robot said hello at the end too.
 - Hints (Spark): 1. Before your robot moves, what should it tell Noor? 2. Put a Say block at the very top. 3. Say "I am going forward!", Hop 2, Say "Hello!".
 
 **Challenge: The Bread Basket Light.** Say "Excuse me!", drive to the bread baskets, beep, and say you found the light.
 
-- Arena — *Bakery baskets*: A longer aisle with customers on both sides. The light glows in the baskets at the end. Grid 1×5 tiles of 25 cm. Floor: wood. Start (0,4) facing up.
+- Arena — *Bakery baskets*: A longer aisle with customers on both sides. The light glows in the baskets at the end. Grid 1×5 tiles of 35 cm. Floor: wood. Start (0,4) facing up.
 - Goal: Stop at tile (0,1) in front of the baskets (tile (0,0)), beep, say "Found a light!".
 - Features: Bread baskets on tile (0,0) (topple if touched); Customers beside rows 2 and 3.
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a wooden floor: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a wooden floor: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Beep (`beep`) · Say (`say`)
-- Example solution: `say("Excuse me!") drive_for(50, 3) beep say("Found a light!")`
+- Example solution: `say("Excuse me!") drive_for(80, 3) beep say("Found a light!")`
 - Success: say("Excuse me!") runs before the first movement. *(action-at-zone)* Robot centre ends inside tile (0,1). *(stop-in-zone)* Baskets not touched. *(no-collision)*
 - Stars: ★ done · ★★ You were polite first and stopped before the baskets. · ★★★ You said "Thank you!" to the baker at the end.
 - Hints (Spark): 1. What does a polite robot say before it goes through a crowd? 2. Excuse me, then hop. How many squares to the baskets? 3. Say "Excuse me!", Hop 3, Beep, Say "Found a light!".
 
 **Check (3 questions)**
 
-1. Why does a robot show a face or say what it will do? — **🙂 So people know what it will do** ✓ · 👻 To look scary. *Why:* When people know what a robot will do next, they feel safe and are not surprised.
-2. When should the robot say "I am going forward"? — **⏮️ Before it moves** ✓ · ⏭️ After it moves. *Why:* Telling people before you move gives them time to get out of the way.
+1. Why does a robot show a face or say what it will do? — 🗣️ Because talking makes it move · **🙂 So people know what it will do** ✓. *Why:* When people know what a robot will do next, they feel safe and are not surprised.
+2. When should the robot say "I am going forward"? — ⏭️ After it moves · **⏮️ Before it moves** ✓. *Why:* Telling people before you move gives them time to get out of the way.
 3. Is the robot’s face really feeling happy? — 💗 Yes, robots feel like us · **🖼️ No, it is a picture to help people** ✓. *Why:* The face is a picture on a screen. It helps people understand the robot. Robots do not feel like we do.
 
 **Badge:** 🙂 Friendly Robot — You made your robot tell people what it will do, so they feel safe. · **Reward:** Light 2 of 12 found!
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Announce your move · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Announce your move* (5 min): In pairs: one child is a robot and must SAY what they will do before doing it ("I will take two steps forward"). Then try without announcing — the partner says how it felt not to know. Materials: None.
+- 40-minute plan: 4′ Unplugged warm-up: Announce your move · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Announce your move* (4 min): In pairs: one child is a robot and must SAY what they will do before doing it ("I will take two steps forward"). Then try without announcing — the partner says how it felt not to know. Materials: None.
 - Discuss: How do you know a car is about to turn? (indicator lights) · What would you want a robot in your school to tell you? · Are robot faces real feelings?
 - Misconceptions: “If a robot smiles, it is happy.” → The screen shows a picture chosen by people to communicate. The robot does not feel. · “Talking makes the robot move.” → Say only speaks. It is the Hop block that moves the robot.
 - Faster: Write a short "robot manners" list of three things a polite robot does. · Add a goodbye at the end and a back hop.
 - Slower: Pick the Say phrase together; focus on putting it at the top. · Act out the code with a toy before building it.
-- Notes: Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -724,45 +755,45 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: Round the Corner.** Drive up to the top of the square, turn right, and drive to the fruit stall.
 
-- Arena — *Town square (corner)*: A 3×3 square of stones. The fountain fills the middle square. The fruit stall is in the top-right corner. Grid 3×3 tiles of 25 cm. Floor: mat. Start (0,2) facing up.
+- Arena — *Town square (corner)*: A 3×3 square of stones. The fountain fills the middle square. The fruit stall is in the top-right corner. Grid 3×3 tiles of 35 cm. Floor: mat. Start (0,2) facing up.
 - Goal: Stop at the fruit stall, tile (2,0).
 - Features: Fountain on tile (1,1) (solid); Fruit stall at tile (2,0).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`)
-- Example solution: `drive_for(50, 2) turn_degrees(-90, 40) drive_for(50, 2)`
+- Example solution: `drive_for(80, 2) turn_degrees(-90, 40) drive_for(80, 2)`
 - Success: Robot centre ends inside tile (2,0). *(stop-in-zone)* Robot does not touch the fountain. *(no-collision)*
 - Stars: ★ done · ★★ You turned the right way the first time. · ★★★ You stood up and turned like your robot before choosing the turn.
 - Hints (Spark): 1. Drive to the top first. Then which way is the stall — your robot’s left or right? 2. Pretend you sit inside the robot looking up. The stall is on your right. 3. Hop 2, Turn right, Hop 2.
 
 **Challenge: Over the Top.** Go all the way around the top of the fountain to the bench in the bottom-left corner.
 
-- Arena — *Town square (bench)*: The same square. Now you start in the bottom-right corner and the bench is in the bottom-left. A flower bed blocks the bottom row in the middle. Grid 3×3 tiles of 25 cm. Floor: mat. Start (2,2) facing up.
+- Arena — *Town square (bench)*: The same square. Now you start in the bottom-right corner and the bench is in the bottom-left. A flower bed blocks the bottom row in the middle. Grid 3×3 tiles of 35 cm. Floor: mat. Start (2,2) facing up.
 - Goal: Stop at the bench, tile (0,2).
 - Features: Fountain on tile (1,1); Flower bed on tile (1,2) (no shortcut); Bench at tile (0,2).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`)
-- Example solution: `drive_for(50, 2) turn_degrees(90, 40) drive_for(50, 2) turn_degrees(90, 40) drive_for(50, 2)`
+- Example solution: `drive_for(80, 2) turn_degrees(90, 40) drive_for(80, 2) turn_degrees(90, 40) drive_for(80, 2)`
 - Success: Robot centre ends inside tile (0,2). *(stop-in-zone)* Robot touches neither the fountain nor the flower bed. *(no-collision)*
 - Stars: ★ done · ★★ You made both turns the right way. · ★★★ You planned the path with your finger on the screen before building it.
 - Hints (Spark): 1. Trace the path with your finger: up, along the top, then down. 2. At the top corner your robot faces up and must go left. At the next corner it faces left and must go down — that is another left! 3. Hop 2, Turn left, Hop 2, Turn left, Hop 2.
 
 **Check (3 questions)**
 
-1. How does your robot turn on the spot? — **🔄 One wheel forward, one wheel back** ✓ · 🦘 It jumps. *Why:* When the wheels go opposite ways, the robot spins on the spot.
-2. The robot faces you. It turns to ITS right. Which way does it go for you? — **👈 To my left** ✓ · 👉 To my right. *Why:* When something faces you, its right is on your left. Pretend you are inside the robot!
+1. How does your robot turn on the spot? — **🔄 One wheel forward, one wheel back** ✓ · ⭕ It drives forward round a big circle. *Why:* When the wheels go opposite ways, the robot spins on the spot.
+2. Look at the picture: you are standing behind the robot, looking the same way it looks. It turns right. Which way does it go? — 👈 To my left · **👉 To my right** ✓. *Why:* When you look the same way as the robot, its right is your right. Pretend you are inside the robot!
 3. Turn right, then turn right again. Which way is the robot facing now? — **↩️ Backwards — the other way** ✓ · ⬆️ The same way. *Why:* Two quarter turns make a half turn. The robot now faces back the way it came.
 
 **Badge:** 🔄 Turner — You can turn your robot left and right from its own point of view. · **Reward:** The square is open. The third light is waiting in the fountain.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Robot says turn · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Robot says turn* (5 min): Put a sticker on every child’s right hand. Call "Turn right!", "Turn left!", "Forward 2!" — everyone moves. Then a child faces the class and the class calls "Turn right!" — notice their right is the class’s left. Materials: Stickers or a ribbon for the right wrist.
+- 40-minute plan: 4′ Unplugged warm-up: Robot says turn · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Robot says turn* (4 min): Put a sticker on every child’s right hand. Call "Turn right!", "Turn left!", "Forward 2!" — everyone moves. Then a child faces the class and the class calls "Turn right!" — notice their right is the class’s left. Materials: Stickers or a ribbon for the right wrist.
 - Discuss: Why did Amara think the robot turned the wrong way? · How do people in a car know which way to turn? (they sit inside, facing forward)
 - Misconceptions: “Left and right are the same for everyone.” → Left and right depend on which way you face. A robot turns to its own left and right. · “A turn also moves the robot forward.” → A turn spins on the spot. You still need a hop to move after turning.
-- Faster: Find a second path to the bench and compare which is shorter. · Predict the facing direction after three right turns.
+- Faster: Find a second path to the bench and compare which is shorter. · Predict the facing direction after three right turns. · Mirror puzzle: the robot faces YOU and turns to ITS right. Which way does it go for you? (To your left — stand back-to-front with a partner to check.)
 - Slower: Rotate the tablet so the robot faces "up" from the child’s view. · Keep the right-hand sticker on during the code task.
-- Notes: Left/right is genuinely hard at 5–7 (still developing). Accept body turning and pointing; do not drill. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Left/right is genuinely hard at 5–7 (still developing). Accept body turning and pointing; do not drill. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -804,10 +835,10 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: Plan the Dance.** Draw your dance on the planning sheet with arrows. Then build the first three steps and test them.
 
-- Arena — *Square stage*: The open middle of the square, with a 3×3 dance floor and the crowd around it. Grid 3×3 tiles of 25 cm. Floor: mat. Start (1,1) facing up.
+- Arena — *Square stage*: The open middle of the square, with a 3×3 dance floor and the crowd around it. Grid 3×3 tiles of 35 cm. Floor: mat. Start (1,1) facing up.
 - Goal: Stay on the dance floor.
 - Features: Dance floor edges glow red if the robot is about to leave.
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Wait (`wait`) · Beep (`beep`) · Say (`say`)
 - Example solution: `say("Let’s dance!") turn_degrees(90, 40) turn_degrees(90, 40)`
 - Success: At least three blocks run; the robot stays inside the 3×3 floor. *(within-blocks)*
@@ -816,12 +847,12 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Challenge: Show Time!.** Finish your dance — at least five steps — and show it to the crowd. Can it end where it started?
 
-- Arena — *Square stage*: The crowd is waiting. The fountain wobbles when they clap. Grid 3×3 tiles of 25 cm. Floor: mat. Start (1,1) facing up.
+- Arena — *Square stage*: The crowd is waiting. The fountain wobbles when they clap. Grid 3×3 tiles of 35 cm. Floor: mat. Start (1,1) facing up.
 - Goal: A dance of 5 or more steps that stays on the floor. Bonus: end on the start square.
 - Features: Crowd claps along with beeps; Start square marked with a star.
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Wait (`wait`) · Beep (`beep`) · Say (`say`)
-- Example solution: `say("Let’s dance!") drive_for(50, 1) beep turn_degrees(90, 40) turn_degrees(90, 40) drive_for(50, 1) turn_degrees(90, 40) turn_degrees(90, 40) say("Ta-da!")`
+- Example solution: `say("Let’s dance!") drive_for(80, 1) beep turn_degrees(90, 40) turn_degrees(90, 40) drive_for(80, 1) turn_degrees(90, 40) turn_degrees(90, 40) say("Ta-da!")`
 - Success: At least 5 blocks run. *(within-blocks)* Robot never leaves the 3×3 dance floor. *(no-collision)*
 - Stars: ★ done · ★★ Your dance ends back on the star square, facing up. · ★★★ You told the class one thing you changed after testing.
 - Hints (Spark): 1. Mix moving, turning and sounds. Any order is fine — it’s your dance! 2. To come back to the start, undo your moves: a hop forward needs a hop back. 3. Two turns left and two turns left again bring the robot back to facing up.
@@ -835,21 +866,21 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Check (3 questions)**
 
-1. What do engineers do first? — **✏️ Plan and draw** ✓ · 🤞 Press Go and hope. *Why:* Planning first helps you build the right thing. Then you test it.
-2. Your dance bumped the edge. What do you do? — 😞 Give up · **🔧 Change a step and try again** ✓. *Why:* Try, look, fix, try again. Every engineer does this — mistakes help us learn.
-3. Hop forward, then hop back. Where is the robot? — **⭐ Back where it started** ✓ · ➡️ Two squares away. *Why:* Going back undoes going forward, so the robot ends where it began.
+1. What do engineers do first? — 🤞 Press Go and hope · **✏️ Plan and draw** ✓. *Why:* Planning first helps you build the right thing. Then you test it.
+2. Your dance bumped the edge. What do you do? — **🔧 Change a step and try again** ✓ · 🗑️ Throw the plan away — it was a bad plan. *Why:* Try, look, fix, try again. Every engineer does this — mistakes help us learn.
+3. Hop forward, then hop back. Where is the robot? — ➡️ Two squares away · **⭐ Back where it started** ✓. *Why:* Going back undoes going forward, so the robot ends where it began.
 
 **Badge:** 🎨 Robot Designer I — You designed your robot and planned, tested and shared your own dance. · **Reward:** Light 3 of 12 found! New colours unlocked for your robot.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 3′ Watch the short episode that sets the project. · 6′ IMAGINE + PLAN: draw the idea on the paper planning sheet (pictures, arrows, no words needed). · 16′ BUILD + CODE + TEST: make it in the simulator; test, fix, test again. Teacher visits each pair. · 9′ SHARE: each pair shows their project and says one thing they fixed. Classmates give a "star and a wish". · 3′ CHECK: three spoken questions. · 3′ Badge, light count on the class Lantern Clock poster, tidy up.
+- 40-minute plan: 3′ The teacher plays the short episode that sets the project (captions on). · 5′ IMAGINE + PLAN: draw the idea on the paper planning sheet (pictures, arrows, no words needed). · 2′ Hand out devices; pairs join with the class code. · 15′ BUILD + CODE + TEST: make it in the simulator; test, fix, test again. Teacher visits each pair. · 5′ PAIR SHARE: each pair turns to the neighbouring pair, shows its run and says one thing it fixed; the other pair gives a "star and a wish". Then swap. The teacher listens in and notes who explained a fix. · 4′ BIG-SCREEN SHARE: two volunteer pairs show their project to the class. · 3′ CHECK: three spoken questions. · 3′ Badge, light count on the class Lantern Clock poster, devices away.
 - Unplugged warm-up — *Mirror dance* (3 min): Pairs face each other. One makes three slow moves; the other copies. Swap. (Use during the first minutes of IMAGINE.) Materials: Planning sheet per pair: a 3×3 grid with arrow and note stickers.
 - Discuss: What did you change after testing, and why? · What is one thing you liked about your friend’s dance? (star) What is one idea for it? (wish)
 - Misconceptions: “A plan that needs changing was a bad plan.” → Every plan changes when you test it. That is the point of testing.
 - Faster: Make the dance end on the star square facing up. · Make a dance with a repeating part (preview of loops).
 - Slower: Five steps can include sounds — a beep counts. · Use the arrow stickers to build the plan, then copy it block by block with an adult.
-- Notes: Share circle: every child shows; no "best dance" vote. Use "a star and a wish" for feedback. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Share circle: every child shows; no "best dance" vote. Use "a star and a wish" for feedback. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -895,45 +926,45 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: Find Bolt.** Put arrows on the map first. Then build the same plan with blocks to reach Bolt at the fruit stall.
 
-- Arena — *Market lanes*: A 4×4 market. Bolt is at the fruit stall in the top-right. A row of stalls runs down the middle. Grid 4×4 tiles of 25 cm. Floor: mat. Start (0,3) facing up.
+- Arena — *Market lanes*: A 4×4 market. Bolt is at the fruit stall in the top-right. A row of stalls runs down the middle. Grid 4×4 tiles of 35 cm. Floor: mat. Start (0,3) facing up.
 - Goal: Reach Bolt at tile (3,0).
 - Features: Cloth stall on tiles (1,1), (2,1), (1,2), (2,2); Bolt at tile (3,0).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`)
-- Example solution: `drive_for(50, 3) turn_degrees(-90, 40) drive_for(50, 3)`
+- Example solution: `drive_for(80, 3) turn_degrees(-90, 40) drive_for(80, 3)`
 - Success: Robot centre ends inside tile (3,0). *(stop-in-zone)* No stall touched. *(no-collision)*
 - Stars: ★ done · ★★ You put arrow stickers on the map before building. · ★★★ Your blocks match your arrows exactly.
 - Hints (Spark): 1. Go up first or go along first? Look for the open lane. 2. Up the left side, then turn right along the top. 3. Hop 3, Turn right, Hop 3.
 
 **Challenge: The Back Way.** Ms Mei moved to the back. Plan a path with two turns, then drive there.
 
-- Arena — *Market back lane*: The same market, but a long pot stall blocks the left lane. Ms Mei waits at the top of the third lane. Grid 4×4 tiles of 25 cm. Floor: mat. Start (0,3) facing up.
+- Arena — *Market back lane*: The same market, but a long pot stall blocks the left lane. Ms Mei waits at the top of the third lane. Grid 4×4 tiles of 35 cm. Floor: mat. Start (0,3) facing up.
 - Goal: Reach Ms Mei at tile (2,0).
 - Features: Pot stall on tiles (0,0), (0,1), (0,2) — the left lane is blocked; Cloth stall on tiles (1,0), (1,1), (1,2); Ms Mei at tile (2,0).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`)
-- Example solution: `turn_degrees(-90, 40) drive_for(50, 2) turn_degrees(90, 40) drive_for(50, 3)`
+- Example solution: `turn_degrees(-90, 40) drive_for(80, 2) turn_degrees(90, 40) drive_for(80, 3)`
 - Success: Robot centre ends inside tile (2,0). *(stop-in-zone)* No stall touched. *(no-collision)*
 - Stars: ★ done · ★★ Your plan worked on the first or second Go. · ★★★ You split the path into "go" parts and "turn" parts out loud.
 - Hints (Spark): 1. The left lane is blocked. Which way do you need to go first? 2. Turn right first, go along the bottom, then turn left to go up. 3. Turn right, Hop 2, Turn left, Hop 3.
 
 **Check (3 questions)**
 
-1. What is an algorithm? — **📋 Steps in order to do a job** ✓ · 🐶 A kind of robot dog. *Why:* An algorithm is a plan of steps in order — like a recipe or the way to school.
-2. Why plan the path before pressing Go? — **🗺️ So the robot does not get lost or bump** ✓ · 📄 Robots like paper. *Why:* A plan helps us find the right path first. Then the robot follows it exactly.
-3. A path goes straight, turns, then goes straight. How many turn blocks? — **1️⃣ One** ✓ · 3️⃣ Three. *Why:* Straight, turn, straight has only one turn. Count the corners on the path.
+1. What is an algorithm? — 🔩 A special robot part · **📋 Steps in order to do a job** ✓. *Why:* An algorithm is a plan of steps in order — like a recipe or the way to school.
+2. Why plan the path before pressing Go? — **🗺️ So the robot does not get lost or bump** ✓ · 📄 So the robot can read our drawing. *Why:* A plan helps us find the right path first. Then the robot follows it exactly.
+3. A path goes straight, turns, then goes straight. How many turn blocks? — 3️⃣ Three · **1️⃣ One** ✓. *Why:* Straight, turn, straight has only one turn. Count the corners on the path.
 
 **Badge:** 🗺️ Map Planner — You planned a route as steps in order — an algorithm — before coding it. · **Reward:** Nana’s map is back. The market is open to explore.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Program your teacher · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Program your teacher* (5 min): Make a 4×4 grid with tape. Place a teddy in one square. The class gives the teacher-robot arrow cards to reach the teddy. The teacher follows them exactly — even wrong ones. Count the corners together: one turn card per corner. Materials: Tape grid on the floor, Arrow cards (forward, turn left, turn right), A teddy.
+- 40-minute plan: 4′ Unplugged warm-up: Program your teacher · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Program your teacher* (4 min): Make a 4×4 grid with tape. Place a teddy in one square. The class gives the teacher-robot arrow cards to reach the teddy. The teacher follows them exactly — even wrong ones. Count the corners together: one turn card per corner. Materials: Tape grid on the floor, Arrow cards (forward, turn left, turn right), A teddy.
 - Discuss: What algorithms do you follow every day? (getting dressed, washing hands) · Could there be two different good paths? How do we choose?
 - Misconceptions: “A plan only counts if it is written in words.” → Arrows and pictures are a plan too. Engineers draw plans all the time. · “There is only one right answer.” → Many paths can work. Some are shorter or safer.
 - Faster: Find two paths and count which uses fewer blocks. · Write the plan for a friend to follow without showing the map.
 - Slower: Place a physical toy on a printed grid and move it with your hand for each arrow before coding.
-- Notes: Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -955,8 +986,8 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
    - **Amara:** “Stop! It’s going the wrong way!”
    - **My robot:** “Oops!” *[Face screen shows a wobbly mouth.]*
 2. **Nana Lucía sits on a crate with a cup of tea.** — She tells a story. A little picture shows an old room-sized computer and a small moth. *(40s)*
-   - **Nana Lucía:** “Long ago, engineers found a real moth stuck inside a giant computer. They wrote it down as a "bug".”
-   - **Nana Lucía:** “Now any mistake in a program is called a bug. Every engineer makes them. Me too!”
+   - **Nana Lucía:** “Engineers have called mistakes "bugs" for a very long time. Once, they found a REAL moth stuck in a giant computer!”
+   - **Nana Lucía:** “They taped it in their notebook as "the first real bug" — a joke! Any mistake in a program is a bug. Every engineer makes them. Me too!”
    - **Spark:** “So a bug is not bad. It’s a puzzle!”
 3. **The cards laid out next to the map.** — Spark becomes a detective with a magnifying glass. The robot replays its run in slow motion; at the wrong turn, a big question mark pops up. *(45s)*
    - **Spark:** “Watch the robot. Where did it stop doing what we planned?”
@@ -981,47 +1012,47 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: The Wrong Turn.** Here is Spark’s program. It has one bug. Press Go, watch, find the bug and fix it.
 
-- Arena — *Market back lane*: The back-lane market from last time. Ms Mei waits at the top of the third lane. Grid 4×4 tiles of 25 cm. Floor: mat. Start (0,3) facing up.
+- Arena — *Market back lane*: The back-lane market from last time. Ms Mei waits at the top of the third lane. Grid 4×4 tiles of 35 cm. Floor: mat. Start (0,3) facing up.
 - Goal: Reach Ms Mei at tile (2,0).
 - Features: Pot stall on (0,0), (0,1), (0,2); Cloth stall on (1,0), (1,1), (1,2); Ms Mei at (2,0).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`)
-- Starter program: `turn_degrees(-90, 40) drive_for(50, 2) turn_degrees(-90, 40)  ← bug: should be a LEFT turn drive_for(50, 3)`
-- Example solution: `turn_degrees(-90, 40) drive_for(50, 2) turn_degrees(90, 40) drive_for(50, 3)`
+- Starter program: `turn_degrees(-90, 40) drive_for(80, 2) turn_degrees(-90, 40)  ← bug: should be a LEFT turn drive_for(80, 3)`
+- Example solution: `turn_degrees(-90, 40) drive_for(80, 2) turn_degrees(90, 40) drive_for(80, 3)`
 - Success: Robot centre ends inside tile (2,0). *(stop-in-zone)* Program still has 4 blocks (fix, do not rebuild). *(within-blocks)*
 - Stars: ★ done · ★★ You changed only the one wrong block. · ★★★ You said where it went wrong before you fixed it.
 - Hints (Spark): 1. Press Go and watch. When does the robot stop following the path? 2. Look at the second turn. Does it turn towards Ms Mei? 3. Change the second "Turn right" to "Turn left".
 
 **Challenge: The Marigold Light.** Spark’s program to the flower stall has a bug. The robot bumps the buckets. Fix it!
 
-- Arena — *Flower stall*: A 4×4 corner of the market. The light glows on the flower stall mat. Flower buckets line the top row. Grid 4×4 tiles of 25 cm. Floor: mat. Start (0,3) facing up.
+- Arena — *Flower stall*: A 4×4 corner of the market. The light glows on the flower stall mat. Flower buckets line the top row. Grid 4×4 tiles of 35 cm. Floor: mat. Start (0,3) facing up.
 - Goal: Stop on the light at tile (3,1).
 - Features: Flower buckets on tiles (1,0), (2,0), (3,0) (tip over if touched); Crates on (1,2), (2,2).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Say (`say`)
-- Starter program: `drive_for(50, 3)  ← bug: one hop too many turn_degrees(-90, 40) drive_for(50, 3)`
-- Example solution: `drive_for(50, 2) turn_degrees(-90, 40) drive_for(50, 3) say("Found a light!")`
+- Starter program: `drive_for(80, 3)  ← bug: one hop too many turn_degrees(-90, 40) drive_for(80, 3)`
+- Example solution: `drive_for(80, 2) turn_degrees(-90, 40) drive_for(80, 3) say("Found a light!")`
 - Success: Robot centre ends inside tile (3,1). *(stop-in-zone)* No flower bucket touched. *(no-collision)*
 - Stars: ★ done · ★★ You found that the bug was a number, not a turn. · ★★★ You added "Found a light!" at the end.
 - Hints (Spark): 1. Watch closely. Is the turn wrong, or does it turn at the wrong place? 2. It goes up one square too far before turning. Which number is too big? 3. Change the first Hop from 3 to 2.
 
 **Check (3 questions)**
 
-1. What is a bug in a program? — **🐞 A mistake in the steps** ✓ · 🦗 An insect living in the tablet. *Why:* A bug is a mistake in the program. The name comes from a real moth found in an old computer.
-2. How do you find a bug? — **🔍 Watch where the robot stops doing the plan** ✓ · 🗑️ Delete everything. *Why:* Watch the robot and find the first moment it does something different from the plan.
+1. What is a bug in a program? — 💔 A broken robot · **🐞 A mistake in the steps** ✓. *Why:* A bug is a mistake in the program — the robot is fine, the steps are wrong. Engineers called mistakes bugs long ago; once they even found a real moth in a computer and joked it was a real bug.
+2. How do you find a bug? — **🔍 Watch where the robot stops doing the plan** ✓ · 🔄 Start again from the top. *Why:* Watch the robot and find the first moment it does something different from the plan. Starting again throws away all the steps that were right.
 3. Do good engineers make bugs? — **🙋 Yes, everyone does** ✓ · 🙅 Never. *Why:* Everyone makes bugs. Good engineers are good at finding and fixing them.
 
 **Badge:** 🔍 Bug Detective — You found and fixed bugs by watching where your robot went wrong. · **Reward:** Light 4 of 12 found!
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Spot the silly step · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Spot the silly step* (5 min): Read out a "getting dressed" algorithm with one bug: "Put on shoes. Put on socks." Children shout "Bug!" when they hear it and say how to fix it. Do two more (washing hands, planting a seed). Materials: None.
+- 40-minute plan: 4′ Unplugged warm-up: Spot the silly step · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Spot the silly step* (4 min): Read out a "getting dressed" algorithm with one bug: "Put on shoes. Put on socks." Children shout "Bug!" when they hear it and say how to fix it. Do two more (washing hands, planting a seed). Materials: None.
 - Discuss: How did it feel when the robot went wrong? How did it feel when you fixed it? · Why is it better to change one block than to start again?
 - Misconceptions: “If the program is wrong, the robot is broken.” → The robot did exactly what the program said. The program needs fixing, not the robot. · “Making a bug means I am bad at this.” → Bugs are normal. Finding them is a skill — like a detective.
 - Faster: Write a buggy program for a partner to fix. · Find a program with two bugs (teacher-made).
 - Slower: Use slow-motion replay and pause on the moment it goes wrong. · Teacher points to the two blocks that might be wrong; the child chooses.
-- Notes: Model it yourself: make a bug in front of the class on purpose and fix it calmly. Children copy how adults react to mistakes. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Model it yourself: make a bug in front of the class on purpose and fix it calmly. Children copy how adults react to mistakes. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1069,24 +1100,24 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: A Straight Line.** Put the pen down, draw a line to the dot, then lift the pen.
 
-- Arena — *Paper road*: A long sheet of paper on the street with a dot at the end. Grid 1×5 tiles of 25 cm. Floor: mat. Start (0,4) facing up.
+- Arena — *Paper road*: A long sheet of paper on the street with a dot at the end. Grid 1×5 tiles of 35 cm. Floor: mat. Start (0,4) facing up.
 - Goal: Draw a line from the start to the dot at tile (0,1), then lift the pen.
 - Features: Dotted guide line from (0,4) to (0,1).
-- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. The pen draws a 1 cm line under the robot’s centre while it is down.
+- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. The pen draws a 1 cm line under the robot’s centre while it is down.
 - Blocks: Hop forward (`drive_for`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`)
-- Example solution: `pen_down drive_for(50, 3) pen_up`
+- Example solution: `pen_down drive_for(80, 3) pen_up`
 - Success: The drawn line covers at least 90 % of the dotted guide and nothing else. *(draw-path)* pen_up runs at the end of the program. *(action-at-zone)*
 - Stars: ★ done · ★★ You lifted the pen at the end. · ★★★ You said what would happen without "pen up".
 - Hints (Spark): 1. What must happen before the robot can draw? 2. Pen down first, then hop. 3. Pen down, Hop 3, Pen up.
 
 **Challenge: The Way to School.** Draw the path to the school gate: up, then turn right, then along. Lift the pen at the gate.
 
-- Arena — *Road to school*: A big sheet of paper. A faint dotted path goes up two squares, then right two squares to the school gate. Grid 3×3 tiles of 25 cm. Floor: mat. Start (0,2) facing up.
+- Arena — *Road to school*: A big sheet of paper. A faint dotted path goes up two squares, then right two squares to the school gate. Grid 3×3 tiles of 35 cm. Floor: mat. Start (0,2) facing up.
 - Goal: Draw along the dotted path and stop at the gate, tile (2,0).
 - Features: Dotted guide: (0,2)→(0,0)→(2,0); Puddle on tile (1,1) (the pen smudges if driven through).
-- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. The pen draws a 1 cm line under the robot’s centre while it is down.
+- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. The pen draws a 1 cm line under the robot’s centre while it is down.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`)
-- Example solution: `pen_down drive_for(50, 2) turn_degrees(-90, 40) drive_for(50, 2) pen_up`
+- Example solution: `pen_down drive_for(80, 2) turn_degrees(-90, 40) drive_for(80, 2) pen_up`
 - Success: Drawn line covers at least 90 % of the dotted guide; no line through the puddle tile. *(draw-path)* Robot centre ends inside tile (2,0). *(stop-in-zone)*
 - Stars: ★ done · ★★ Your line follows the dotted path all the way. · ★★★ You planned it with arrows first.
 - Hints (Spark): 1. This is like the corner in the town square — but with the pen down. 2. Pen down, go up 2, turn right, go along 2. 3. Pen down, Hop 2, Turn right, Hop 2, Pen up.
@@ -1094,20 +1125,20 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 **Check (3 questions)**
 
 1. Which block makes the robot start drawing? — **🖊️⬇️ Pen down** ✓ · 🖊️⬆️ Pen up. *Why:* Pen down touches the paper, so the robot draws as it moves.
-2. You forgot "pen up". What happens next time the robot moves? — **〰️ It keeps drawing** ✓ · 🚫 It stops drawing. *Why:* The pen stays down until a block lifts it. So it keeps drawing!
-3. Why is a pen useful for checking a program? — **👀 You can see the path it took** ✓ · 💨 It makes the robot faster. *Why:* The line shows exactly where the robot went — great for finding bugs.
+2. You forgot "pen up". What happens next time the robot moves? — 🚫 It stops drawing · **〰️ It keeps drawing** ✓. *Why:* The pen stays down until a block lifts it. So it keeps drawing!
+3. Why is a pen useful for checking a program? — 🖊️ Pen down steers the robot for you · **👀 You can see the path it took** ✓. *Why:* The line shows exactly where the robot went — great for finding bugs.
 
 **Badge:** 🖊️ Robot Artist — You added a pen and drew your robot’s path with pen down and pen up. · **Reward:** The pen goes in your toolbox.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Finger trails · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Finger trails* (5 min): Each child has paper with a start dot. Teacher calls: "Pen down! Forward! Turn right! Forward! Pen up!" Children draw with a finger or crayon. Then call a move with the pen up — nothing is drawn. Materials: Paper and crayons.
+- 40-minute plan: 4′ Unplugged warm-up: Finger trails · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Finger trails* (4 min): Each child has paper with a start dot. Teacher calls: "Pen down! Forward! Turn right! Forward! Pen up!" Children draw with a finger or crayon. Then call a move with the pen up — nothing is drawn. Materials: Paper and crayons.
 - Discuss: What other jobs need a robot to hold a tool? · Why might you want to lift the pen in the middle of a drawing?
 - Misconceptions: “Pen down moves the robot.” → Pen down only puts the pen on the paper. Hop moves the robot. · “The pen lifts by itself at the end.” → Only the pen up block lifts it.
 - Faster: Draw a letter of your name (L, T or I). · Draw two lines with a gap (pen up in the middle).
 - Slower: Start with the straight line twice; skip the turn. · Use the dotted path overlay to check after each run.
-- Notes: Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1152,45 +1183,45 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: One Small Square.** Draw a small square. First build it the long way. Then build it again with Repeat.
 
-- Arena — *Playground (small square)*: A paper square on the playground with a dotted square of side one. Grid 3×3 tiles of 25 cm. Floor: mat. Start (1,2) facing up.
+- Arena — *Playground (small square)*: A paper square on the playground with a dotted square of side one. Grid 3×3 tiles of 35 cm. Floor: mat. Start (1,2) facing up.
 - Goal: Draw the dotted square (1,2)→(1,1)→(2,1)→(2,2)→(1,2) and end where you started.
 - Features: Dotted square guide.
-- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. The pen draws a 1 cm line under the robot’s centre while it is down.
+- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. The pen draws a 1 cm line under the robot’s centre while it is down.
 - Blocks: Hop forward (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`) · Repeat (`repeat`)
-- Example solution: `pen_down repeat(4) { drive_for(50, 1); turn_degrees(-90, 40) } pen_up`
+- Example solution: `pen_down repeat(4) { drive_for(80, 1); turn_degrees(-90, 40) } pen_up`
 - Success: Drawn line covers at least 90 % of the dotted square. *(draw-path)* Second version uses a repeat block (5 blocks or fewer in total). *(within-blocks)*
 - Stars: ★ done · ★★ You built it the long way AND with Repeat. · ★★★ You counted the blocks you saved.
 - Hints (Spark): 1. A square has 4 sides. After each side, the robot turns. 2. Put "Hop 1" and "Turn right" inside Repeat. 3. Pen down, Repeat 4 { Hop 1, Turn right }, Pen up.
 
 **Challenge: The Big Game Square.** Draw a big square with sides of 2 squares, using Repeat. Use 4 blocks or fewer.
 
-- Arena — *Playground (big square)*: A bigger dotted square for the hopping game, with the slide nearby. Grid 5×5 tiles of 25 cm. Floor: mat. Start (1,3) facing up.
+- Arena — *Playground (big square)*: A bigger dotted square for the hopping game, with the slide nearby. Grid 5×5 tiles of 35 cm. Floor: mat. Start (1,3) facing up.
 - Goal: Draw the square (1,3)→(1,1)→(3,1)→(3,3)→(1,3).
 - Features: Dotted big square; Slide on tile (4,4) — the fifth light glows underneath when the square is finished.
-- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. The pen draws a 1 cm line under the robot’s centre while it is down.
+- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. The pen draws a 1 cm line under the robot’s centre while it is down.
 - Blocks: Hop forward (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`) · Repeat (`repeat`)
-- Example solution: `pen_down repeat(4) { drive_for(50, 2); turn_degrees(-90, 40) }`
+- Example solution: `pen_down repeat(4) { drive_for(80, 2); turn_degrees(-90, 40) }`
 - Success: Drawn line covers at least 90 % of the dotted square. *(draw-path)* 4 blocks or fewer, counting the blocks inside Repeat. *(within-blocks)*
 - Stars: ★ done · ★★ You used Repeat and 4 blocks or fewer. · ★★★ You said which number changed from the small square (the hop) and which did not (the 4).
 - Hints (Spark): 1. It is like the small square, but each side is longer. 2. Change the Hop inside the Repeat from 1 to 2. 3. Pen down, Repeat 4 { Hop 2, Turn right }.
 
 **Check (3 questions)**
 
-1. When do we use a Repeat block? — **🔁 When steps happen again and again** ✓ · 😢 When the robot is sad. *Why:* Repeat does the steps inside it again, as many times as you say.
+1. When do we use a Repeat block? — **🔁 When steps happen again and again** ✓ · 1️⃣ When a step happens only once. *Why:* Repeat does the steps inside it again, as many times as you say.
 2. How many turns does a square need? — **4️⃣ 4** ✓ · 2️⃣ 2 · 8️⃣ 8. *Why:* A square has 4 corners, so the robot turns 4 times — once at each corner.
-3. Repeat 3 { clap }. How many claps? — **👏👏👏 3** ✓ · 👏 1. *Why:* Repeat 3 means do it three times: clap, clap, clap!
+3. Repeat 3 { clap }. How many claps? — 👏👏👏👏 4 — once, then 3 more · **👏👏👏 3** ✓. *Why:* Repeat 3 means do it three times: clap, clap, clap!
 
 **Badge:** 🔁 Loop Star — You used Repeat to do steps again and again, and drew a square with fewer blocks. · **Reward:** Light 5 of 12 found!
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Clap loops · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Clap loops* (5 min): Clap a pattern: clap-clap-stomp. Write it on the board inside a big loop drawn with "× 3". Children perform it. Change the number to 2, then 4. Walk a square in the room together: "forward, turn" × 4. Materials: Whiteboard.
+- 40-minute plan: 4′ Unplugged warm-up: Clap loops · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Clap loops* (4 min): Clap a pattern: clap-clap-stomp. Write it on the board inside a big loop drawn with "× 3". Children perform it. Change the number to 2, then 4. Walk a square in the room together: "forward, turn" × 4. Materials: Whiteboard.
 - Discuss: What repeats in your day? (days of the week, steps when walking, a song chorus) · Why is a shorter program easier to fix?
 - Misconceptions: “Repeat 4 means do it 4 extra times.” → Repeat 4 means do it 4 times in total. · “Blocks after the Repeat also repeat.” → Only the blocks inside the Repeat repeat.
 - Faster: Draw a rectangle (2 long, 1 short). Can Repeat 2 help? · Draw two squares side by side.
 - Slower: Build the long way first, colour-match the pairs, then wrap them in Repeat.
-- Notes: Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1236,24 +1267,24 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: One Step, Then Repeat.** Draw one step. Then put it inside Repeat 3 to draw the whole staircase.
 
-- Arena — *Library step plan*: A 4×4 plan with a dotted staircase of three steps going up to the right. Grid 4×4 tiles of 25 cm. Floor: mat. Start (0,3) facing up.
+- Arena — *Library step plan*: A 4×4 plan with a dotted staircase of three steps going up to the right. Grid 4×4 tiles of 35 cm. Floor: mat. Start (0,3) facing up.
 - Goal: Draw the staircase (0,3)→(0,2)→(1,2)→(1,1)→(2,1)→(2,0)→(3,0).
 - Features: Dotted staircase guide.
-- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. The pen draws a 1 cm line under the robot’s centre while it is down.
+- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. The pen draws a 1 cm line under the robot’s centre while it is down.
 - Blocks: Hop forward (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`) · Repeat (`repeat`)
-- Example solution: `pen_down repeat(3) { drive_for(50, 1); turn_degrees(-90, 40); drive_for(50, 1); turn_degrees(90, 40) } pen_up`
+- Example solution: `pen_down repeat(3) { drive_for(80, 1); turn_degrees(-90, 40); drive_for(80, 1); turn_degrees(90, 40) } pen_up`
 - Success: Drawn line covers at least 90 % of the dotted staircase. *(draw-path)*
 - Stars: ★ done · ★★ You used Repeat for the steps. · ★★★ You said which four blocks make "one step".
 - Hints (Spark): 1. Draw just one step first: up, then along. 2. One step = Hop 1, Turn right, Hop 1, Turn left. 3. Pen down, Repeat 3 { Hop 1, Turn right, Hop 1, Turn left }.
 
 **Challenge: The Tall Staircase.** The big library stairs have four steps. Draw them all with 6 blocks or fewer.
 
-- Arena — *Tall staircase plan*: A 5×5 plan with four dotted steps going up to the library door. Grid 5×5 tiles of 25 cm. Floor: mat. Start (0,4) facing up.
+- Arena — *Tall staircase plan*: A 5×5 plan with four dotted steps going up to the library door. Grid 5×5 tiles of 35 cm. Floor: mat. Start (0,4) facing up.
 - Goal: Draw four steps and stop at the door, tile (4,0).
 - Features: Dotted four-step staircase; Library door at (4,0).
-- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. The pen draws a 1 cm line under the robot’s centre while it is down.
+- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. The pen draws a 1 cm line under the robot’s centre while it is down.
 - Blocks: Hop forward (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`) · Repeat (`repeat`)
-- Example solution: `pen_down repeat(4) { drive_for(50, 1); turn_degrees(-90, 40); drive_for(50, 1); turn_degrees(90, 40) }`
+- Example solution: `pen_down repeat(4) { drive_for(80, 1); turn_degrees(-90, 40); drive_for(80, 1); turn_degrees(90, 40) }`
 - Success: Drawn line covers at least 90 % of the dotted staircase. *(draw-path)* Robot centre ends inside tile (4,0). *(stop-in-zone)* 6 blocks or fewer, counting the blocks inside Repeat. *(within-blocks)*
 - Stars: ★ done · ★★ You changed only one number from the code task. · ★★★ You told a friend which part of the pattern repeats.
 - Hints (Spark): 1. It’s the same step as before. What is different? 2. There are 4 steps now, not 3. 3. Pen down, Repeat 4 { Hop 1, Turn right, Hop 1, Turn left }.
@@ -1262,19 +1293,19 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 1. Red, blue, red, blue, red, … What comes next? — **🔵 Blue** ✓ · 🟢 Green. *Why:* The part that repeats is "red, blue". After red comes blue.
 2. One step is: up, turn, along, turn. How do we draw 3 steps? — **🔁 Repeat 3 around one step** ✓ · 1️⃣ Draw one step only. *Why:* Put the steps for one stair inside Repeat 3, and the robot draws all three.
-3. Where can you find patterns? — **🧶 Cloth, tiles, songs and floors** ✓ · 🚫 Nowhere. *Why:* Patterns are everywhere: woven cloth, floor tiles, rangoli, music and more.
+3. Where can you find patterns? — **🧶 Cloth, tiles, songs and floors** ✓ · 📘 Only in maths books. *Why:* Patterns are everywhere: woven cloth, floor tiles, rangoli, music and more.
 
 **Badge:** 🧩 Pattern Finder — You found the part of a pattern that repeats and looped it. · **Reward:** The library is open again. The banner is waiting.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Bead patterns · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Body patterns* (5 min): Make a body pattern: hands up, hands down, turn. Repeat it 3 times. Show pictures of patterns from several cultures (a rangoli, a kente strip, mosaic tiles, a woven mat). Children point to the part that repeats. Materials: Pattern pictures (printable sheet), Optional: beads or blocks in two colours.
+- 40-minute plan: 4′ Unplugged warm-up: Bead patterns · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Body patterns* (4 min): Make a body pattern: hands up, hands down, turn. Repeat it 3 times. Show pictures of patterns from several cultures (a rangoli, a kente strip, mosaic tiles, a woven mat). Children point to the part that repeats. Materials: Pattern pictures (printable sheet), Optional: beads or blocks in two colours.
 - Discuss: Which pattern did you like best? What part repeats? · Is there a pattern on your clothes or in this room?
 - Misconceptions: “A pattern is anything pretty.” → A pattern has a part that repeats in the same way. · “The last turn in each step is not needed.” → Without the last turn, the next step starts facing the wrong way. Try it and watch!
 - Faster: Draw a staircase going down instead of up. · Make a bead pattern with a 3-part repeat.
 - Slower: Draw one step and run it 3 times by pressing Go 3 times; then show how Repeat does that for you.
-- Notes: Present cultural patterns respectfully and accurately; name where each comes from. Invite children to bring patterns from their own homes. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Present cultural patterns respectfully and accurately; name where each comes from. Invite children to bring patterns from their own homes. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1314,24 +1345,24 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: Plan Your Picture.** Draw your picture on the grid sheet. Find the part that repeats. Build that part first and test it.
 
-- Arena — *Festival banner*: A wide paper banner with a light grid. Grid 7×5 tiles of 25 cm. Floor: mat. Start (0,4) facing up.
+- Arena — *Festival banner*: A wide paper banner with a light grid. Grid 7×5 tiles of 35 cm. Floor: mat. Start (0,4) facing up.
 - Goal: Your picture. Stay on the banner.
 - Features: Banner edges glow if the robot is about to leave.
-- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. The pen draws a 1 cm line under the robot’s centre while it is down.
+- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. The pen draws a 1 cm line under the robot’s centre while it is down.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`) · Repeat (`repeat`)
-- Example solution: `pen_down repeat(4) { drive_for(50, 1); turn_degrees(-90, 40) } pen_up`
+- Example solution: `pen_down repeat(4) { drive_for(80, 1); turn_degrees(-90, 40) } pen_up`
 - Success: The program contains at least one repeat and the robot stays on the banner. *(within-blocks)*
 - Stars: ★ done · ★★ Your repeating part draws what you planned. · ★★★ You found and fixed a bug while testing.
 - Hints (Spark): 1. Look at your drawing. Which part is the same again and again? 2. Build that part, test it, then put it in Repeat. 3. Use pen up to move to a new spot without drawing.
 
 **Challenge: My Banner Picture.** Finish your picture. Use at least one Repeat. Then show it to the town!
 
-- Arena — *Festival banner*: The banner, with the town waiting. Grid 7×5 tiles of 25 cm. Floor: mat. Start (0,4) facing up.
+- Arena — *Festival banner*: The banner, with the town waiting. Grid 7×5 tiles of 35 cm. Floor: mat. Start (0,4) facing up.
 - Goal: A finished picture with at least one Repeat, on the banner.
 - Features: Townspeople cheer when the robot lifts the pen at the end.
-- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. The pen draws a 1 cm line under the robot’s centre while it is down.
+- Needs: move, draw. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. The pen draws a 1 cm line under the robot’s centre while it is down.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`) · Repeat (`repeat`) · Beep (`beep`) · Say (`say`)
-- Example solution: `drive_for(50, 2) turn_degrees(-90, 40) drive_for(50, 3) turn_degrees(90, 40) pen_down repeat(4) { repeat(4) { drive_for(50, 1); turn_degrees(-90, 40) } turn_degrees(-90, 40) } pen_up say("Ta-da!")`
+- Example solution: `drive_for(80, 2) turn_degrees(-90, 40) drive_for(80, 3) turn_degrees(90, 40) pen_down repeat(4) { repeat(4) { drive_for(80, 1); turn_degrees(-90, 40) } turn_degrees(-90, 40) } pen_up say("Ta-da!")`
 - Success: At least one repeat; at least 5 blocks in total. *(within-blocks)* Robot stays on the banner. *(no-collision)*
 - Stars: ★ done · ★★ Your picture matches your plan. · ★★★ You explained the repeating part to the class.
 - Hints (Spark): 1. A square inside a Repeat with a turn makes a flower of squares! 2. Use Pen up and Hop to start a second part somewhere else. 3. End with Pen up and a "Ta-da!"
@@ -1345,21 +1376,21 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Check (3 questions)**
 
-1. What does Repeat 4 around "draw a square, turn" make? — **🌸 Four squares around a point, like a flower** ✓ · ➖ One line. *Why:* Each time round it draws a square, then turns. Four squares make a flower shape.
-2. How do you move to a new spot without drawing? — **🖊️⬆️ Pen up, then hop** ✓ · 🖊️⬇️ Pen down, then hop. *Why:* With the pen up the robot moves without drawing a line.
+1. What does Repeat 4 around "draw a square, turn" make? — ⬜ One big square · **🌸 Four squares around a point, like a flower** ✓. *Why:* Each time round it draws a square, then turns. Four squares make a flower shape.
+2. How do you move to a new spot without drawing? — 🖊️⬇️ Pen down, then hop · **🖊️⬆️ Pen up, then hop** ✓. *Why:* With the pen up the robot moves without drawing a line.
 3. Your picture came out wrong. What is a good first step? — **🔍 Watch where it went wrong** ✓ · 🗑️ Throw it away. *Why:* Watch the robot draw and find the first wrong line — then fix that block.
 
 **Badge:** 🖼️ Robot Designer II — You designed and drew your own picture using a loop. · **Reward:** Light 6 of 12 — halfway! The harbour is unlocked.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 3′ Watch the short episode that sets the project. · 6′ IMAGINE + PLAN: draw the idea on the paper planning sheet (pictures, arrows, no words needed). · 16′ BUILD + CODE + TEST: make it in the simulator; test, fix, test again. Teacher visits each pair. · 9′ SHARE: each pair shows their project and says one thing they fixed. Classmates give a "star and a wish". · 3′ CHECK: three spoken questions. · 3′ Badge, light count on the class Lantern Clock poster, tidy up.
+- 40-minute plan: 3′ The teacher plays the short episode that sets the project (captions on). · 5′ IMAGINE + PLAN: draw the idea on the paper planning sheet (pictures, arrows, no words needed). · 2′ Hand out devices; pairs join with the class code. · 15′ BUILD + CODE + TEST: make it in the simulator; test, fix, test again. Teacher visits each pair. · 5′ PAIR SHARE: each pair turns to the neighbouring pair, shows its run and says one thing it fixed; the other pair gives a "star and a wish". Then swap. The teacher listens in and notes who explained a fix. · 4′ BIG-SCREEN SHARE: two volunteer pairs show their project to the class. · 3′ CHECK: three spoken questions. · 3′ Badge, light count on the class Lantern Clock poster, devices away.
 - Unplugged warm-up — *Grid drawing* (3 min): On squared paper, children colour a shape square by square, then trace its outline with a finger as "robot moves". Materials: Squared planning sheet (7 × 5), Coloured pencils.
 - Discuss: Which part of your picture repeats? · What was the hardest bug? How did you find it?
 - Misconceptions: “Repeat only works for squares.” → Any steps can go inside Repeat — dance moves, sounds, stairs.
 - Faster: Try a Repeat inside a Repeat (a flower of squares). · Make two separate pictures on one banner.
 - Slower: Choose from three starter ideas (square house, staircase, line of windows). · Five blocks with one Repeat is a complete project.
-- Notes: Print or screenshot the banners for a class wall — every banner goes up. No "best banner". · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Print or screenshot the banners for a class wall — every banner goes up. No "best banner". · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1398,50 +1429,50 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 - Why: A scoop can lift and carry things. Robots change tools for different jobs, like you change from a spoon to a fork.
 - Try it without: With the pen, the robot only pushes the float, and it rolls away.
-- Physics: Scoop adds 0.2 kg at the front of the robot. A carried float adds 0.1 kg.
+- Physics: Scoop adds 0.18 kg at the front of the robot. A carried float adds 0.1 kg.
 - Real world: Mars rovers have scoops to collect soil; factory robot arms swap tools automatically.
 
 **Code: One Float to the Basket.** Drive to the float, scoop it up, carry it to the basket and tip it out.
 
-- Arena — *Harbour dock*: A 3×4 dock. A glass float sits in front of you. Captain Ingrid’s basket is to the right. Grid 3×4 tiles of 25 cm. Floor: wood. Start (0,3) facing up.
+- Arena — *Harbour dock*: A 3×4 dock. A glass float sits in front of you. Captain Ingrid’s basket is to the right. Grid 3×4 tiles of 35 cm. Floor: wood. Start (0,3) facing up.
 - Goal: Float in the basket at tile (2,1).
 - Features: Glass float on tile (0,1); Basket on tile (2,1).
-- Needs: move, grab. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Glass float: 0.1 kg. The scoop reaches an object on the tile directly in front of the robot.
+- Needs: move, grab. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Glass float: 0.1 kg. The scoop reaches an object on the tile directly in front of the robot.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Scoop up (`grip_close`) · Tip out (`grip_open`)
-- Example solution: `drive_for(50, 1) grip_close turn_degrees(-90, 40) drive_for(50, 2) turn_degrees(90, 40) grip_open`
+- Example solution: `drive_for(80, 1) grip_close turn_degrees(-90, 40) drive_for(80, 2) turn_degrees(90, 40) grip_open`
 - Success: The float ends inside the basket on tile (2,1). *(deliver-object)*
 - Stars: ★ done · ★★ You scooped and tipped at the right moments. · ★★★ You planned the path on the map first.
 - Hints (Spark): 1. Get close to the float first — stop on the square just before it. 2. Scoop up, then go to the square just below the basket and face it. 3. Hop 1, Scoop up, Turn right, Hop 2, Turn left, Tip out.
 
 **Challenge: Float to the Boat.** This float is further away. Bring it to the boat at the bottom of the dock.
 
-- Arena — *Long dock*: A 3×5 dock with crates. The float waits at the top. A little boat is moored at the bottom. Grid 3×5 tiles of 25 cm. Floor: wood. Start (0,4) facing up.
+- Arena — *Long dock*: A 3×5 dock with crates. The float waits at the top. A little boat is moored at the bottom. Grid 3×5 tiles of 35 cm. Floor: wood. Start (0,4) facing up.
 - Goal: Float tipped into the boat at tile (1,4).
 - Features: Glass float on tile (2,1); Crates on tiles (2,2) and (2,3); Boat on tile (1,4).
-- Needs: move, grab. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Glass float: 0.1 kg. The scoop reaches an object on the tile directly in front of the robot.
+- Needs: move, grab. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Glass float: 0.1 kg. The scoop reaches an object on the tile directly in front of the robot.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Scoop up (`grip_close`) · Tip out (`grip_open`) · Say (`say`)
-- Example solution: `drive_for(50, 3) turn_degrees(-90, 40) drive_for(50, 1) grip_close turn_degrees(-90, 40) drive_for(50, 2) grip_open`
+- Example solution: `drive_for(80, 3) turn_degrees(-90, 40) drive_for(80, 1) grip_close turn_degrees(-90, 40) drive_for(80, 2) grip_open`
 - Success: The float ends in the boat on tile (1,4). *(deliver-object)* No crate touched. *(no-collision)*
 - Stars: ★ done · ★★ The float arrived without touching a crate. · ★★★ You said "Here you go!" to the captain.
 - Hints (Spark): 1. Trace the path: up to the top, right towards the float, then down to the boat. 2. Stop next to the float, facing it. Then scoop. Then turn to face the boat. 3. Hop 3, Turn right, Hop 1, Scoop up, Turn right, Hop 2, Tip out.
 
 **Check (3 questions)**
 
-1. Which tool carries a ball? — **🥄 Scoop** ✓ · 🖊️ Pen. *Why:* A scoop can hold things. A pen draws — it can only push a ball away.
+1. Which tool carries a ball? — 🖊️ Pen · **🥄 Scoop** ✓. *Why:* A scoop can hold things. A pen draws — it can only push a ball away.
 2. Your robot has the float. Which block lets it go? — **⤵️ Tip out** ✓ · ⤴️ Scoop up. *Why:* Tip out lets go of what the scoop holds.
-3. Why do robots change tools? — **🧰 Different jobs need different tools** ✓ · 💅 To look nice. *Why:* Just like you use a spoon for soup and a pencil for drawing, robots use the tool that fits the job.
+3. Why do robots change tools? — **🧰 Different jobs need different tools** ✓ · 🤹 They don’t — a robot wears every tool at once. *Why:* Just like you use a spoon for soup and a pencil for drawing, robots use the tool that fits the job.
 
 **Badge:** 🥄 Careful Carrier — You chose a scoop for the job and moved an object from place to place. · **Reward:** The scoop joins your toolbox.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Spoon relay · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Spoon relay* (5 min): Children move a small ball from one bowl to another three ways: pushing with a pencil, with a spoon, with a fork. Ask: which tool worked best, and why? Materials: Spoons, pencils, forks, small balls or pom-poms, two bowls per group.
+- 40-minute plan: 4′ Unplugged warm-up: Spoon relay · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Spoon relay* (4 min): Children move a small ball from one bowl to another three ways: pushing with a pencil, with a spoon, with a fork. Ask: which tool worked best, and why? Materials: Spoons, pencils, forks, small balls or pom-poms, two bowls per group.
 - Discuss: What tools do people at home use for different jobs? · What tool would a robot need to water plants? To paint a wall?
 - Misconceptions: “A robot can have every tool at once.” → Our robot has one tool place. Engineers choose — more tools mean more weight and more cost. · “The scoop picks things up from far away.” → The scoop only reaches things right in front of it. The robot must drive close first.
 - Faster: Move two floats, one after the other. · Find a path with fewer turns.
 - Slower: Do the code task with the scoop-up and tip-out blocks already placed; add the moves.
-- Notes: Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1487,25 +1518,25 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: Test the Ramp.** Run "Hop 3" three times: on the flat, up the ramp, and up the ramp with the lantern. Watch where it stops each time.
 
-- Arena — *Slipway test track*: Three lanes side by side: flat, ramp, ramp with the lantern already in the scoop. A mark shows 3 squares. Grid 3×5 tiles of 25 cm. Floor: ramp. Start (0,4) facing up.
+- Arena — *Slipway test track*: Three lanes side by side: flat, ramp, ramp with the lantern already in the scoop. A mark shows 3 squares. Grid 3×5 tiles of 35 cm. Floor: ramp. Start (0,4) facing up. Also run from (1,4) facing up and (2,4) facing up.
 - Goal: Run the same program in all three lanes and compare where the robot stops.
-- Features: Lane 1 flat; Lane 2: 10° ramp; Lane 3: 10° ramp, iron lantern (0.8 kg) pre-loaded; Chalk marks appear where the robot stops.
+- Features: Lane 1 flat, lane 2 a 10° ramp, lane 3 a 10° ramp with the iron lantern (0.8 kg) pre-loaded in the scoop; Press Go once: the robot runs in lane 1, is reset to the start of lane 2, then lane 3 (one start per lane); Chalk marks appear where the robot stops.
 - Needs: move, grab. Physics: Gravity 9.81 m/s². Wood ramp at 10°. Motors at fixed % power slow down as load rises (DC motor torque–speed behaviour). No wheel slip.
 - Blocks: Hop forward (`drive_for`)
-- Example solution: `drive_for(50, 3)  (run in each lane)`
+- Example solution: `drive_for(80, 3)  (run in each lane)`
 - Success: Program has run in all three lanes; the child taps the lane that went least far. *(action-at-zone)*
 - Stars: ★ done · ★★ You guessed before testing. · ★★★ You said why the heavy lane went least far.
 - Hints (Spark): 1. Same program, three places. Press Go in each lane. 2. Look at the chalk marks. Which is lowest? 3. Tap lane 3 — heavy AND uphill.
 
 **Challenge: Up to the Lighthouse.** Scoop the iron lantern and carry it to the top of the ramp. Test, look, and fix your hops.
 
-- Arena — *Slipway*: The iron lantern at the bottom of the slipway; the lighthouse platform at the top. Grid 1×6 tiles of 25 cm. Floor: ramp. Start (0,5) facing up.
+- Arena — *Slipway*: The iron lantern at the bottom of the slipway; the lighthouse platform at the top. Grid 1×6 tiles of 35 cm. Floor: ramp. Start (0,5) facing up.
 - Goal: Tip the lantern out on the platform (tiles (0,0)–(0,1)).
 - Features: Iron lantern on tile (0,4); Ramp from row 4 to row 2 (10°); Flat platform on rows 0–1 with a railing at the top.
-- Needs: move, grab. Physics: Gravity 9.81 m/s². 10° wood ramp. Iron lantern 0.8 kg. Fixed-power motors slow under load.
+- Needs: move, grab. Physics: Gravity 9.81 m/s². 10° wood ramp. Iron lantern 0.8 kg. Fixed-power motors slow under load. Calibration target (with the lantern, from the start tile): Hop 3 ends with the robot centre in row 3 or row 2 — short of where it would reach on the flat — and Hop 3 + Hop 1 ends with the centre in row 2 or row 1, so Tip out lands the lantern on the platform without the robot reaching the railing. With no load on the flat, Hop 4 reaches row 1.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Scoop up (`grip_close`) · Tip out (`grip_open`) · Say (`say`)
 - Starter program: `grip_close  ← the robot starts right behind the lantern`
-- Example solution: `grip_close drive_for(50, 3) drive_for(50, 1)  ← the extra hop found by testing grip_open say("Found a light!")`
+- Example solution: `grip_close drive_for(80, 3) drive_for(80, 1)  ← the extra hop found by testing grip_open say("Found a light!")`
 - Success: Lantern tipped out on rows 0–1. *(deliver-object)* Robot does not hit the railing at the top. *(no-collision)*
 - Stars: ★ done · ★★ You tested first, then added the hop that was missing. · ★★★ You said "heavy and uphill means less far".
 - Hints (Spark): 1. Try your plan from the flat ground first. Where does it stop? 2. It stops short because of the heavy load and the hill. Add one more hop. 3. Scoop up, Hop 3, Hop 1, Tip out.
@@ -1513,20 +1544,20 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 **Check (3 questions)**
 
 1. Same Hop block. Which goes less far? — **⛰️🧱 Uphill with a heavy load** ✓ · ➖ On the flat, empty. *Why:* Heavy loads and hills make the motors work harder, so the robot goes slower — and less far in the same time.
-2. Your robot stopped short. What do you do? — **🧪 Test, then add a hop** ✓ · 💔 Say the robot is broken. *Why:* Nothing is broken! Test, see where it stops, and change the program.
-3. Why is pushing a full pram uphill harder? — **⬇️ The hill pulls heavy things back down** ✓ · 😠 Prams don’t like hills. *Why:* Gravity pulls everything down. Going uphill, you push against it — more weight, more push.
+2. Your robot stopped short. What do you do? — 😴 Wait for tomorrow — the robot is weaker today · **🧪 Test, then add a hop** ✓. *Why:* Nothing is broken! Test, see where it stops, and change the program.
+3. Why is pushing a full pram uphill harder? — 😠 Prams don’t like hills · **⬇️ The hill pulls heavy things back down** ✓. *Why:* Gravity pulls everything down. Going uphill, you push against it — more weight, more push.
 
 **Badge:** ⛰️ Hill Climber — You discovered that load and slope change how far a robot goes — and fixed it by testing. · **Reward:** Light 7 of 12 found!
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Ramp race (cars, not children) · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Push it uphill* (5 min): Make a ramp with a book and a board. Children push a toy car up it with one finger: empty, then with a few coins taped on. Ask: which needed a harder push? Which went less far with the same push? Materials: A board or tray, Books, A toy car, Coins or washers and tape.
+- 40-minute plan: 4′ Unplugged warm-up: Ramp race (cars, not children) · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Push it uphill* (4 min): Make a ramp with a book and a board. Children push a toy car up it with one finger: empty, then with a few coins taped on. Ask: which needed a harder push? Which went less far with the same push? Materials: A board or tray, Books, A toy car, Coins or washers and tape.
 - Discuss: When is it harder to ride a bicycle? (uphill, with a heavy bag) · Why did Hop 3 work yesterday but not today?
 - Misconceptions: “The robot is weaker today.” → The robot is the same. The load and the hill changed. Testing tells us how much. · “Heavy things always go faster downhill so they always go further.” → Today we went uphill. Uphill, heavy means slower. (Downhill is a different story — and needs care!)
 - Faster: Predict what happens with a lighter body (Bug Body) and test it. · Try the ramp going down: what happens?
 - Slower: Do the three-lane test together as a class, one child per lane.
-- Notes: This is the first "same program, different result" lesson. Keep the language simple: heavy + uphill = slower = less far. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: This is the first "same program, different result" lesson. Keep the language simple: heavy + uphill = slower = less far. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1566,50 +1597,50 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 - Why: Grip lets the wheels push the robot forward and stop it. Less grip means slipping and sliding.
 - Try it without: On ice there is hardly any grip — the robot slides past where it stopped.
-- Physics: Friction: mat high, ice very low (about a tenth of the mat), sand adds rolling resistance (wheels sink 1 cm).
+- Physics: Friction: mat high, ice very low (friction 0.05 against 0.8 on the mat), sand adds rolling resistance (wheels sink 1 cm).
 - Real world: Rescue robots use tank tracks to cross sand and rubble — you will meet tracks in Level 2.
 
 **Code: Three Floors.** Run "Hop 2" on the mat, on ice and on sand. Guess first. Where does it stop each time?
 
-- Arena — *Floor test lanes*: Three lanes: mat, ice, sand. A flag marks 2 squares. Grid 3×5 tiles of 25 cm. Floor: mixed. Start (0,4) facing up.
+- Arena — *Floor test lanes*: Three lanes: mat, ice, sand. A flag marks 2 squares. Grid 3×5 tiles of 35 cm. Floor: mixed. Start (0,4) facing up. Also run from (1,4) facing up and (2,4) facing up.
 - Goal: Run the same program in all three lanes and compare.
-- Features: Lane 1 mat; Lane 2 ice; Lane 3 sand; Flag at 2 squares in each lane; Chalk marks show where the robot ends.
+- Features: Lane 1 mat; Lane 2 ice; Lane 3 sand; Press Go once: the robot is reset to the start of each lane in turn; Flag at 2 squares in each lane; Chalk marks show where the robot ends.
 - Needs: move. Physics: Mat: tyre friction high. Ice: friction very low — after the motors stop, the robot keeps sliding. Sand: wheels sink and lose speed (rolling resistance).
 - Blocks: Hop forward (`drive_for`)
-- Example solution: `drive_for(50, 2)  (run in each lane)`
+- Example solution: `drive_for(80, 2)  (run in each lane)`
 - Success: Program has run in all three lanes; the child taps "too far" (ice) and "too short" (sand). *(action-at-zone)*
 - Stars: ★ done · ★★ You guessed before each run. · ★★★ You explained "slippy" and "sticky" with your hands.
 - Hints (Spark): 1. Press Go in each lane and watch the chalk mark. 2. Which one went past the flag? Which one did not reach it? 3. Ice went too far. Sand fell short.
 
 **Challenge: Across the Fish Market.** Cross the mat, the ice and the sand to the bridge. Go slowly on the ice!
 
-- Arena — *Fish market to the beach*: A straight path: one square of mat, two squares of ice, two squares of sand, then the bridge stop line. Empty fish boxes stand beside the ice. Grid 1×7 tiles of 25 cm. Floor: mixed. Start (0,6) facing up.
+- Arena — *Fish market to the beach*: A straight path: one square of mat, two squares of ice, two squares of sand, then the bridge stop line. Empty fish boxes stand beside the ice. Grid 1×7 tiles of 35 cm. Floor: mixed. Start (0,6) facing up.
 - Goal: Stop in the stop zone at tile (0,0) — not past the bridge line.
 - Features: Row 5 mat; Rows 3–4 ice; Rows 1–2 sand; Row 0 stop zone with the bridge line just beyond it; Fish boxes beside the ice lane (topple if touched).
-- Needs: move. Physics: As in the floor test. Creep (30 % power) slides much less on ice than Hop (50 %).
+- Needs: move. Physics: As in the floor test. Creep (30 % power) slides much less on ice than Hop (80 %). Sand here is Level 1 “soft sand”: it slows two-wheel drive to about half speed, it does not stop it (see OPEN_QUESTIONS).
 - Blocks: Hop forward (`drive_for`) · Creep forward (`drive_for`) · Hop back (`drive_for`) · Repeat (`repeat`)
-- Example solution: `drive_for(50, 1) repeat(5) { drive_for(30, 0.5) }  ← slow over the ice (count tuned in playtesting) drive_for(50, 3)  ← extra push through the sand stop`
+- Example solution: `drive_for(80, 1) repeat(5) { drive_for(30, 0.5) }  ← slow over the ice (count tuned in playtesting) drive_for(80, 3)  ← extra push through the sand`
 - Success: Robot centre ends inside tile (0,0) and never crosses the bridge line. *(stop-in-zone)* No fish box touched. *(no-collision)*
 - Stars: ★ done · ★★ You used Creep on the ice. · ★★★ You tested, looked and changed a number at least once.
 - Hints (Spark): 1. Plan it in three parts: mat, ice, sand. 2. On ice use Creep — inside a Repeat. In sand, give an extra hop. 3. Hop 1, Repeat 5 { Creep }, Hop 3. Then test and change the numbers.
 
 **Check (3 questions)**
 
-1. On ice, the robot stops its wheels. What happens? — **⛸️ It keeps sliding** ✓ · 🛑 It stops at once. *Why:* Ice is slippery, so the wheels cannot grip to stop the robot. It slides on.
+1. On ice, the robot stops its wheels. What happens? — 🛑 It stops at once · **⛸️ It keeps sliding** ✓. *Why:* Ice is slippery, so the wheels cannot grip to stop the robot. It slides on.
 2. How should a robot drive on ice? — **🐢 Slowly** ✓ · 🐇 Fast. *Why:* Going slowly means less sliding when you stop — the same is true for people and cars!
-3. Why does the robot go less far in sand? — **🏖️ The wheels sink and it is hard to roll** ✓ · 😴 Sand is sleepy. *Why:* Soft sand lets the wheels sink in, so rolling takes more push.
+3. Why does the robot go less far in sand? — 🧊 Sand is slippery, like ice · **🏖️ The wheels sink and it is hard to roll** ✓. *Why:* Soft sand lets the wheels sink in, so rolling takes more push.
 
 **Badge:** ⛸️ Floor Explorer — You found out how ice and sand change a robot’s movement, and planned for both. · **Reward:** You crossed the fish market. The bridge is next.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Slide test · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Slide test* (5 min): Slide the same block across three surfaces: a table, a tray with a few drops of oil or water, a towel. Children guess first, then watch. Which slid furthest? Which stopped soonest? Materials: A wooden block or eraser, A tray, a little water or oil, a towel.
+- 40-minute plan: 4′ Unplugged warm-up: Slide test · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Slide test* (4 min): Slide the same block across three surfaces: a table, a tray with a few drops of oil or water, a towel. Children guess first, then watch. Which slid furthest? Which stopped soonest? Materials: A wooden block or eraser, A tray, a little water or oil, a towel.
 - Discuss: Have you ever slipped on a wet floor? What did you do next time? · Why do cars drive slowly when roads are icy or muddy?
 - Misconceptions: “When the wheels stop, the robot stops.” → Only if the wheels can grip. On ice the robot keeps sliding after the wheels stop. · “Sand is slippery like ice.” → Sand is the opposite: soft and draggy. The robot slows down instead of sliding.
 - Faster: Find the fewest Creep blocks that still stop safely. · Explain why a heavier robot might slide further on ice.
 - Slower: Do the three-lane test only and talk about it; the challenge with Repeat is optional.
-- Notes: Water/oil in the warm-up: wipe up at once, keep it on a tray, and keep children seated — never ask them to slide on a wet floor. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Water/oil in the warm-up: wipe up at once, keep it on a tray, and keep children seated — never ask them to slide on a wet floor. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1654,31 +1685,31 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: Cross When It’s Down.** Go to the stop line, wait for the bridge to come down, then cross.
 
-- Arena — *Lift bridge*: A stop line, then a two-square lift bridge, then the lighthouse rocks. Grid 1×6 tiles of 25 cm. Floor: wood. Start (0,5) facing up.
+- Arena — *Lift bridge*: A stop line, then a two-square lift bridge, then the lighthouse rocks. Grid 1×6 tiles of 35 cm. Floor: wood. Start (0,5) facing up.
 - Goal: Reach the lighthouse foot at tile (0,1).
-- Features: Stop line at row 4; Lift bridge on rows 2–3: UP until 4 s after Go, then DOWN until 14 s, then up again; If the bridge is up, the robot stops at a barrier (no fall).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on wooden planks: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Features: Stop line at row 4; Lift bridge on rows 2–3: UP until 3.7 s after Go, then DOWN until 14 s, then up again; Timing check: Hop 1 ends at about 1 s with the robot’s front about 10 cm from the bridge, which it reaches about 0.35 s after it moves off. Wait 3 → reaches the bridge at about 4.35 s (down: passes, 0.65 s to spare). Wait 2 → about 3.35 s (still up: stops at the barrier, 0.35 s early). So the “too short” wait fails and the right one passes with slack; If the bridge is up, the robot stops at a barrier (no fall).
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on wooden planks: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Wait (`wait`)
-- Example solution: `drive_for(50, 1) wait(3) drive_for(50, 3)`
+- Example solution: `drive_for(80, 1) wait(3) drive_for(80, 3)`
 - Success: Robot centre ends inside tile (0,1). *(stop-in-zone)* Robot never touches the barrier. *(no-collision)*
 - Stars: ★ done · ★★ You crossed while the bridge was down. · ★★★ You counted the bridge timing before building.
 - Hints (Spark): 1. Watch the bridge once without your robot. When does it come down? 2. Hop 1 to the stop line takes about 1 second. Then wait until the bridge is down. 3. Hop 1, Wait 3, Hop 3.
 
 **Challenge: Two Bridges.** A second, slower bridge is round the corner. Wait for both!
 
-- Arena — *Two bridges*: The first bridge, a corner on the lighthouse rocks, then a second little footbridge to the light. Grid 4×6 tiles of 25 cm. Floor: wood. Start (0,5) facing up.
+- Arena — *Two bridges*: The first bridge, a corner on the lighthouse rocks, then a second little footbridge to the light. Grid 4×6 tiles of 35 cm. Floor: wood. Start (0,5) facing up.
 - Goal: Reach the light at tile (3,1).
-- Features: Bridge A on (0,3)–(0,2): down from 4 s to 14 s; Rocks at (0,1) with a turn to the right; Bridge B on (1,1)–(2,1): down from 13 s to 25 s; Light at (3,1).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on wooden planks: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Features: Bridge A on (0,3)–(0,2): down from 3.7 s to 14 s; Rocks at (0,1) with a turn to the right; Bridge B on (1,1)–(2,1): down from 12.8 s to 25 s; Timing check: Hop 1 (0–1 s), Wait 3, Hop 3 (4–7 s), Turn right (7–8 s). Bridge B’s edge is about 10 cm ahead of the robot’s front, about 0.35 s of driving. Waits 3 + 2 → reaches bridge B at about 13.35 s (down: passes, 0.55 s to spare). Waits 3 + 1 → about 12.35 s (still up: stops at the barrier, 0.45 s early); Light at (3,1).
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on wooden planks: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. A quarter turn at 40 % takes 1 s; the bridge times assume it (re-time the bridges if the sim’s turn changes).
 - Blocks: Hop forward (`drive_for`) · Wait (`wait`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Say (`say`)
-- Example solution: `drive_for(50, 1) wait(3) drive_for(50, 3) turn_degrees(-90, 40) wait(3) wait(2) drive_for(50, 3) say("Found a light!")`
+- Example solution: `drive_for(80, 1) wait(3) drive_for(80, 3) turn_degrees(-90, 40) wait(3) wait(2) drive_for(80, 3) say("Found a light!")`
 - Success: Robot centre ends inside tile (3,1). *(stop-in-zone)* Robot never touches a barrier. *(no-collision)*
 - Stars: ★ done · ★★ You waited for both bridges. · ★★★ You explained why the second wait is longer.
 - Hints (Spark): 1. Do the first bridge like before. Then turn right and look at bridge B. 2. Bridge B comes down later. You may need two Wait blocks. 3. Hop 1, Wait 3, Hop 3, Turn right, Wait 3, Wait 2, Hop 3.
 
 **Check (3 questions)**
 
-1. Can our robot see when the bridge is down? — **🙈 No — we plan the wait for it** ✓ · 👀 Yes, it sees everything. *Why:* Our robot has no sensor that can see the bridge. So we count the time and plan a wait.
+1. Can our robot see when the bridge is down? — ⏳ Yes — the Wait block watches the bridge · **🙈 No — we plan the wait for it** ✓. *Why:* Our robot has no sensor that can see the bridge. So we count the time and plan a wait.
 2. The bridge changes its timing. What happens to our plan? — **⚠️ It might not work any more** ✓ · ✅ It still works. *Why:* A plan with fixed waits only works if the world keeps the same timing. Sensors can help — soon!
 3. What should a robot do while it waits? — **⏳ Show people it is waiting** ✓ · 🫣 Hide. *Why:* Showing a waiting sign tells people it is not stuck or broken.
 
@@ -1686,13 +1717,13 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Bridge up, bridge down · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Bridge up, bridge down* (5 min): Two children make a bridge with their arms, raising and lowering it on a slow count the teacher calls. The others line up and must cross only when the arms are down. First they watch and count; then they cross. Materials: None.
+- 40-minute plan: 4′ Unplugged warm-up: Bridge up, bridge down · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Bridge up, bridge down* (4 min): Two children make a bridge with their arms, raising and lowering it on a slow count the teacher calls. The others line up and must cross only when the arms are down. First they watch and count; then they cross. Materials: None.
 - Discuss: What else goes up and down or on and off on a timer? (traffic lights, a bus, a lift) · How could a robot know the bridge is down without counting?
 - Misconceptions: “Wait makes the robot wait until the bridge is down.” → Wait only waits for a time. The robot does not know about the bridge. We chose the time.
 - Faster: Find the smallest total wait that still works for both bridges. · Predict what happens if the bridge comes down 2 seconds later.
 - Slower: Watch the bridge cycle twice and count aloud with Spark before building.
-- Notes: This sets up sensing: end by asking "what would help the robot know for itself?" Collect answers on a poster for session 19. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: This sets up sensing: end by asking "what would help the robot know for itself?" Collect answers on a poster for session 19. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1732,50 +1763,50 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 - Why: A headlight lets cameras (and people) see in the dark, and lets everyone see the robot coming.
 - Try it without: In the dark tunnel without a light, Spark’s camera sees nothing and people cannot see your robot.
-- Physics: Adds 0.1 kg. While on, the battery meter goes down a little faster.
+- Physics: Adds 0.08 kg. While on, the battery meter goes down a little faster.
 - Real world: Underwater and cave robots carry bright lights; delivery robots show lights at night so people see them.
 
 **Code: Through the Tunnel.** Switch the light on before the tunnel, drive through, and switch it off when you come out.
 
-- Arena — *Straight tunnel*: Daylight, then a dark tunnel 3 squares long, then daylight again. Grid 1×6 tiles of 25 cm. Floor: mat. Start (0,5) facing up.
+- Arena — *Straight tunnel*: Daylight, then a dark tunnel 3 squares long, then daylight again. Grid 1×6 tiles of 35 cm. Floor: mat. Start (0,5) facing up.
 - Goal: Reach tile (0,0). Light on in the dark (rows 1–3), off in the daylight at the end.
 - Features: Dark zone on rows 1–3; Spark follows the robot and can only see while it is lit.
-- Needs: move, light. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move, light. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Light on (`light_on`) · Light off (`light_off`)
-- Example solution: `light_on drive_for(50, 3) drive_for(50, 2) light_off`
+- Example solution: `light_on drive_for(80, 3) drive_for(80, 2) light_off`
 - Success: The light is on whenever the robot is inside rows 1–3. *(action-at-zone)* The light is off at the end of the program. *(action-at-zone)* Robot centre ends in tile (0,0). *(stop-in-zone)*
 - Stars: ★ done · ★★ Light on before the dark, off after. · ★★★ You said why we switch it off.
 - Hints (Spark): 1. Switch the light on before you go into the dark. 2. Light on, then hops through the tunnel, then light off. 3. Light on, Hop 3, Hop 2, Light off.
 
 **Challenge: The Winding Tunnel.** This tunnel turns. Keep the light on in the dark part only, and don’t bump the walls.
 
-- Arena — *Winding tunnel*: Into the dark, up 2 squares, a right turn, along 2 squares, out into the fog. Grid 3×4 tiles of 25 cm. Floor: mat. Start (0,3) facing up.
+- Arena — *Winding tunnel*: Into the dark, up 2 squares, a right turn, along 2 squares, out into the fog. Grid 3×4 tiles of 35 cm. Floor: mat. Start (0,3) facing up.
 - Goal: Exit at tile (2,1); light off at the end.
 - Features: Dark zone on (0,2), (0,1), (1,1); Tunnel walls everywhere else; Glow-worms on the ceiling sparkle when lit.
-- Needs: move, light. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move, light. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Light on (`light_on`) · Light off (`light_off`) · Say (`say`)
-- Example solution: `light_on drive_for(50, 2) turn_degrees(-90, 40) drive_for(50, 2) light_off`
+- Example solution: `light_on drive_for(80, 2) turn_degrees(-90, 40) drive_for(80, 2) light_off`
 - Success: Light on in every dark tile the robot visits. *(action-at-zone)* Robot centre ends in tile (2,1) with the light off. *(stop-in-zone)* No tunnel wall touched. *(no-collision)*
 - Stars: ★ done · ★★ Light on in the dark, off at the end, no bumps. · ★★★ You said hello to the glow-worms on the way.
 - Hints (Spark): 1. Light first. Then plan the path: up, turn, along. 2. Up 2, turn right, along 2 — then light off. 3. Light on, Hop 2, Turn right, Hop 2, Light off.
 
 **Check (3 questions)**
 
-1. Can a camera see in total darkness? — **🌑 No, it needs light** ✓ · ☀️ Yes. *Why:* Cameras, like eyes, see light that bounces off things. No light, nothing to see.
-2. Why switch the light off when you leave the tunnel? — **🔋 To save battery energy** ✓ · 😱 Lights are scary. *Why:* A light uses energy from the battery. Switching it off when it’s not needed saves energy.
-3. Why is a light good for safety at night? — **🚶 People can see the robot coming** ✓ · 🏎️ It makes the robot faster. *Why:* A light helps people notice the robot, so nobody gets surprised or bumped.
+1. Spark’s camera is an ordinary camera, like your eyes. Can it see in total darkness? — 🔦 Yes — it sends out its own beam to see · **🌑 No, it needs light** ✓. *Why:* Ordinary cameras, like eyes, catch light that bounces off things. They do not send out a beam. No light, nothing to see.
+2. Why switch the light off when you leave the tunnel? — **🔋 To save battery energy** ✓ · 🚫 The robot cannot drive with its light on. *Why:* A light uses energy from the battery. Switching it off when it’s not needed saves energy.
+3. Why is a light good for safety at night? — **🚶 People can see the robot coming** ✓ · 🗺️ The robot needs it to follow its plan. *Why:* A light helps people notice the robot, so nobody gets surprised or bumped.
 
 **Badge:** 🔦 Light Bringer — You used a light in the dark and switched it off to save energy. · **Reward:** The headlight joins your toolbox.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Shoebox dark · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *What’s in the box?* (5 min): Put a toy inside a closed shoebox with a small peephole. Children look: they see nothing. Open a second hole and shine a torch in: now they see the toy. Light in, light bounces, light to your eye. Materials: A shoebox with two holes, A small torch, A toy.
+- 40-minute plan: 4′ Unplugged warm-up: Shoebox dark · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *What’s in the box?* (4 min): Put a toy inside a closed shoebox with a small peephole. Children look: they see nothing. Open a second hole and shine a torch in: now they see the toy. Light in, light bounces, light to your eye. Materials: A shoebox with two holes, A small torch, A toy.
 - Discuss: What things at home have lights that turn on and off by themselves? · Why do bicycles have lights?
-- Misconceptions: “Eyes and cameras send out a beam to see.” → They catch light that comes in. That is why they need light around. · “Our robot needs the light to follow its plan.” → Our robot follows its plan without seeing. The light is for Spark’s camera and for people to see the robot.
+- Misconceptions: “Eyes and cameras send out a beam to see.” → They catch light that comes in. That is why they need light around. (For curious children: some special cameras see heat instead of light, so they work in total darkness — rescue teams use them. Spark’s camera is an ordinary one.) · “Our robot needs the light to follow its plan.” → Our robot follows its plan without seeing. The light is for Spark’s camera and for people to see the robot.
 - Faster: Make the light flash three times at the tunnel exit with Repeat. · Explain why cars dip their headlights.
 - Slower: Do the straight tunnel twice: once without the light (watch Spark bump), once with.
-- Notes: Torches: no shining into eyes. Make "beam at the floor" the class rule. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Torches: no shining into eyes. Make "beam at the floor" the class rule. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1806,33 +1837,33 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 *Cliffhanger:* Nine lights! But the fog is so thick that seeing is no help. How can a robot find its way by touch?
 
-**Build** — choose `tool: scoop`. Open your toolbox. Choose the tool your home helper needs: pen, scoop or headlight.
+**Build** — choose `tool: child-choice`. Open your toolbox. Choose the tool your home helper needs: pen, scoop or headlight.
 
 - Why: Engineers start with the person’s need, then choose the part.
 - Try it without: The wrong tool for the job makes the job impossible — try it and see!
-- Physics: The chosen tool’s mass is applied (pen 0.05 kg, scoop 0.2 kg, light 0.1 kg).
+- Physics: The chosen tool’s mass is applied (pen 0.05 kg, scoop 0.18 kg, headlight 0.08 kg).
 - Real world: Home robots today vacuum, mop and mow; researchers are building robots that help older people fetch and carry.
 
 **Code: Plan My Helper.** Choose a job and a tool. Draw the path on the house plan. Build the first part and test it.
 
-- Arena — *Nana’s house*: A 5×5 house plan: kitchen top-left, living room with the armchair top-right, hallway along the bottom, bedroom door bottom-right. Furniture is solid. Grid 5×5 tiles of 25 cm. Floor: wood. Start (0,4) facing up.
+- Arena — *Nana’s house*: A 5×5 house plan: kitchen top-left, living room with the armchair top-right, hallway along the bottom, bedroom door bottom-right. Furniture is solid. Grid 5×5 tiles of 35 cm. Floor: wood. Start (0,4) facing up.
 - Goal: Depends on the job the child chooses (see project brief).
 - Features: Kitchen table on (1,1); Biscuit tin on (0,0) (scoop job); Armchair on (4,0) with Nana; Sofa on (3,2); Dark hallway on row 4 (light job); Paper runner in the hallway (pen job); Bedroom door at (4,4).
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a wooden floor: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a wooden floor: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Wait (`wait`) · Repeat (`repeat`) · Scoop up (`grip_close`) · Tip out (`grip_open`) · Light on (`light_on`) · Light off (`light_off`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`) · Beep (`beep`) · Say (`say`)
-- Example solution: `drive_for(50, 3) grip_close  (biscuit tin is in front at (0,0))`
+- Example solution: `drive_for(80, 3) grip_close  (biscuit tin is in front at (0,0))`
 - Success: The first part of the chosen job runs without bumping furniture. *(within-blocks)*
 - Stars: ★ done · ★★ Your tool matches your job. · ★★★ You can say who your helper helps and how.
 - Hints (Spark): 1. Who needs help? Nana in her chair? Someone going to bed in the dark? 2. Scoop for carrying, light for the dark hallway, pen for drawing a welcome path. 3. Draw the path with your finger on the plan, then build the first part.
 
 **Challenge: My Helper at Work.** Finish your helper routine. It must use your tool, be polite, and not bump anything.
 
-- Arena — *Nana’s house*: The same house. Nana is waiting in her armchair. Grid 5×5 tiles of 25 cm. Floor: wood. Start (0,4) facing up.
+- Arena — *Nana’s house*: The same house. Nana is waiting in her armchair. Grid 5×5 tiles of 35 cm. Floor: wood. Start (0,4) facing up.
 - Goal: Example jobs: deliver the biscuit tin to the armchair (tip out at (4,1) facing the chair); or light the hallway from (0,4) to the bedroom door (4,4) and switch off there; or draw a welcome path along the hallway.
 - Features: As in the code task.
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a wooden floor: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a wooden floor: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Wait (`wait`) · Repeat (`repeat`) · Scoop up (`grip_close`) · Tip out (`grip_open`) · Light on (`light_on`) · Light off (`light_off`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`) · Beep (`beep`) · Say (`say`)
-- Example solution: `drive_for(50, 3)  ← to (0,1), the tin is in front grip_close drive_for(-50, 1) drive_for(-50, 1)  ← back to (0,3), clear of the table and sofa turn_degrees(-90, 40) drive_for(50, 3) drive_for(50, 1)  ← along row 3 to (4,3) turn_degrees(90, 40) drive_for(50, 2)  ← up to (4,1), facing the armchair grip_open say("Here you go!")`
+- Example solution: `drive_for(80, 3)  ← to (0,1), the tin is in front grip_close drive_for(-80, 1) drive_for(-80, 1)  ← back to (0,3), clear of the table and sofa turn_degrees(-90, 40) drive_for(80, 3) drive_for(80, 1)  ← along row 3 to (4,3) turn_degrees(90, 40) drive_for(80, 2)  ← up to (4,1), facing the armchair grip_open say("Here you go!")`
 - Success: The chosen tool is used at the right place for the chosen job. *(action-at-zone)* No furniture touched. *(no-collision)* The routine includes at least one say block. *(within-blocks)*
 - Stars: ★ done · ★★ Your helper does its job without bumps. · ★★★ Your helper tells people what it is doing.
 - Hints (Spark): 1. Split your job into parts: go there, do the job, say something kind. 2. Use your tool’s blocks at the right place: scoop up/tip out, light on/off, or pen down/up. 3. Test one part at a time. Fix, then add the next part.
@@ -1846,7 +1877,7 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Check (3 questions)**
 
-1. What do engineers ask first? — **🙋 What does the person need?** ✓ · 🌈 What colour is cool?. *Why:* Good design starts with the person and what they need. Then you choose the parts.
+1. What do engineers ask first? — 🌈 What colour is cool? · **🙋 What does the person need?** ✓. *Why:* Good design starts with the person and what they need. Then you choose the parts.
 2. Someone walks down a dark hallway at night. Which tool helps? — **🔦 Headlight** ✓ · 🥄 Scoop · 🖊️ Pen. *Why:* A light helps people see in the dark — and see the robot too.
 3. A home robot should be… — **💛 Kind and safe** ✓ · 💨 As fast as possible. *Why:* At home there are people, pets and things that can break. Safe and kind comes first.
 
@@ -1854,13 +1885,13 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 3′ Watch the short episode that sets the project. · 6′ IMAGINE + PLAN: draw the idea on the paper planning sheet (pictures, arrows, no words needed). · 16′ BUILD + CODE + TEST: make it in the simulator; test, fix, test again. Teacher visits each pair. · 9′ SHARE: each pair shows their project and says one thing they fixed. Classmates give a "star and a wish". · 3′ CHECK: three spoken questions. · 3′ Badge, light count on the class Lantern Clock poster, tidy up.
+- 40-minute plan: 3′ The teacher plays the short episode that sets the project (captions on). · 5′ IMAGINE + PLAN: draw the idea on the paper planning sheet (pictures, arrows, no words needed). · 2′ Hand out devices; pairs join with the class code. · 15′ BUILD + CODE + TEST: make it in the simulator; test, fix, test again. Teacher visits each pair. · 5′ PAIR SHARE: each pair turns to the neighbouring pair, shows its run and says one thing it fixed; the other pair gives a "star and a wish". Then swap. The teacher listens in and notes who explained a fix. · 4′ BIG-SCREEN SHARE: two volunteer pairs show their project to the class. · 3′ CHECK: three spoken questions. · 3′ Badge, light count on the class Lantern Clock poster, devices away.
 - Unplugged warm-up — *Helper interviews* (3 min): Pairs ask each other: "What job at home is hard or boring for someone in your family?" Draw it in one picture. Materials: House-plan planning sheet, Tool picture cards (pen, scoop, headlight).
 - Discuss: Who did your helper help? Why did you choose that tool? · What should a robot NEVER do at home? (bump people or pets, go near stairs, take things that aren’t its own)
 - Misconceptions: “A bigger, faster robot is a better helper.” → At home, small, slow and careful is often best.
 - Faster: Make a helper that does two jobs with a tool swap explained in words (and pick the one tool for the sim). · Add a return trip to the start.
 - Slower: Choose the light-the-hallway job: one straight line with light on/off.
-- Notes: Children’s home situations differ. Keep the "who needs help" question open — a pet, a sibling, themselves are all fine. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Children’s home situations differ. Keep the "who needs help" question open — a pet, a sibling, themselves are all fine. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1906,12 +1937,12 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: Find the Wall.** The garden wall is somewhere ahead in the fog. Keep going until you feel a bump, then say “Found the wall!”.
 
-- Arena — *Foggy garden path*: A straight garden path in thick fog. The wall at the end is hidden. Each time you press Go, the wall is a different distance away (3, 4 or 5 squares). Grid 1×6 tiles of 25 cm. Floor: grass. Start (0,5) facing up.
+- Arena — *Foggy garden path*: A straight garden path in thick fog. The wall at the end is hidden. Each time you press Go, the wall is a different distance away (3, 4 or 5 squares). Grid 1×6 tiles of 35 cm. Floor: grass. Start (0,5) facing up.
 - Goal: Touch the garden wall with the bumper, then say the words.
 - Features: Garden wall placed at random 3, 4 or 5 tiles ahead on each run; Fog: the child sees about one tile ahead; The bumper flashes when it clicks.
-- Needs: move, feel-bump. Physics: Gravity 9.81 m/s². Rubber tyres on short grass: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.
+- Needs: move, feel-bump. Physics: Gravity 9.81 m/s². Rubber tyres on short grass: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.
 - Blocks: Hop forward (`drive_for`) · Creep forward (`drive_for`) · Keep going until I feel a bump (`repeat_until`) · Say (`say`)
-- Starter program: `drive_for(50, 3)  ← counting does not work when the wall moves!`
+- Starter program: `drive_for(80, 3)  ← counting does not work when the wall moves!`
 - Example solution: `repeat_until(bumped) {   drive_for(30, 0.5) } say("Found the wall!")`
 - Success: The bumper clicks against the wall and the say block runs after the click, on three runs in a row with different wall distances. *(touch-and-react)*
 - Stars: ★ done · ★★ It works when the wall moves. · ★★★ You can say why counting hops did not work.
@@ -1919,10 +1950,10 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Challenge: Feel Along to the Gate.** Light number ten is in the corner by the gate. Feel your way to the wall, back off a little, turn right, and feel your way to the corner.
 
-- Arena — *Foggy garden*: A small walled garden in fog. You start somewhere on the left side. The gate is in the top-right corner. Grid 4×4 tiles of 25 cm. Floor: grass. Start (0,3) facing up.
+- Arena — *Foggy garden*: A small walled garden in fog. You start somewhere on the left side. The gate is in the top-right corner. Grid 4×4 tiles of 35 cm. Floor: grass. Start (0,3) facing up.
 - Goal: Bumper touches the right-hand wall in tile (3,0), where light 10 glows in the ivy.
 - Features: Walls on all four sides; Start row is random (row 2 or 3) on each run; Light 10 in the ivy at (3,0).
-- Needs: move, feel-bump. Physics: Gravity 9.81 m/s². Rubber tyres on short grass: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.
+- Needs: move, feel-bump. Physics: Gravity 9.81 m/s². Rubber tyres on short grass: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.
 - Blocks: Creep forward (`drive_for`) · Back off a little (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Keep going until I feel a bump (`repeat_until`) · Say (`say`)
 - Example solution: `repeat_until(bumped) { drive_for(30, 0.5) } drive_for(-30, 0.5) turn_degrees(-90, 40) repeat_until(bumped) { drive_for(30, 0.5) } say("Found it!")`
 - Success: The bumper touches the top wall, the robot backs off and turns right, then touches the right wall in tile (3,0). *(touch-and-react)* Robot centre ends in tile (3,0), on two runs with different start rows. *(stop-in-zone)*
@@ -1931,7 +1962,7 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Check (3 questions)**
 
-1. What does a bumper help a robot do? — 🎨 See colours · **✋ Feel a touch** ✓ · 💨 Go faster. *Why:* A bumper is a touch sensor. When it touches something, a switch clicks and the robot knows.
+1. What does a bumper help a robot do? — 👀 See the wall before it gets there · **✋ Feel a touch** ✓ · 💨 Go faster. *Why:* A bumper is a touch sensor. When it touches something, a switch clicks and the robot knows. Before the touch, it knows nothing.
 2. The wall is a different distance every time. What works? — 3️⃣ Hop 3, always · **🛡️ Keep going until I feel a bump** ✓. *Why:* Counting only works if you know the distance. The sensor finds the wall wherever it is.
 3. Why back off a little before turning? — **↩️ So the robot has room to turn** ✓ · 🙇 To say sorry to the wall. *Why:* Right up against a wall, the robot’s corners scrape when it turns. A little space lets it turn freely.
 
@@ -1939,13 +1970,13 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Feel your way · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Feel your way* (5 min): Pairs: one child is the “robot” with eyes closed (or a soft blindfold if they are happy to), one hand out in front like a bumper. The partner says only “step” until the robot’s hand touches a wall or the teacher’s held-up book, then the robot says “Bump!” and stops. Move the book closer or further each time. Ask: did counting steps help? What did? Materials: A big book or cushion as the “wall”, Optional soft blindfolds (never force; eyes closed is fine).
+- 40-minute plan: 4′ Unplugged warm-up: Feel your way · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Feel your way* (4 min): Pairs: one child is the “robot” with eyes closed (or a soft blindfold if they are happy to), one hand out in front like a bumper. The partner says only “step” until the robot’s hand touches a wall or the teacher’s held-up book, then the robot says “Bump!” and stops. Move the book closer or further each time. Ask: did counting steps help? What did? Materials: A big book or cushion as the “wall”, Optional soft blindfolds (never force; eyes closed is fine).
 - Discuss: How do you find your way in the dark at home? · What other machines know when they touch something? (lift doors that open again, robot vacuums)
 - Misconceptions: “The bumper lets the robot see the wall.” → It only feels the wall when it touches it. It knows nothing before the touch. · “Bumping is always bad.” → A soft bumper is made for touching gently. Hard, fast crashes are bad — that is why we creep slowly.
 - Faster: Feel your way all the way round the garden: four walls, four turns (use Repeat 4 around the whole thing). · Explain why we creep instead of hop when feeling our way.
 - Slower: Only the code task, run three times; celebrate that the same program works every time.
-- Notes: Blindfold games: always optional, eyes-closed is fine, walls must be soft. Clear the floor first. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Blindfold games: always optional, eyes-closed is fine, walls must be soft. Clear the floor first. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -1990,10 +2021,10 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Code: One Corner.** Bolt’s ball is round the corner. Creep again and again. If you feel a bump, back off and turn right.
 
-- Arena — *Hedge corner*: A hedge path going up, then turning right. The ball is at the end. Grid 3×3 tiles of 25 cm. Floor: grass. Start (0,2) facing up.
+- Arena — *Hedge corner*: A hedge path going up, then turning right. The ball is at the end. Every other tile is solid hedge. Grid 3×3 tiles of 35 cm. Floor: grass. Start (0,2) facing up.
 - Goal: Reach the ball in tile (2,0).
 - Features: Hedges around the L-shaped path (0,2)→(0,0)→(2,0); Ball at (2,0); Fog.
-- Needs: move, feel-bump. Physics: Gravity 9.81 m/s². Rubber tyres on short grass: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.
+- Needs: move, feel-bump. Physics: Gravity 9.81 m/s². Rubber tyres on short grass: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.
 - Blocks: Creep forward (`drive_for`) · Back off a little (`drive_for`) · Turn right (`turn_degrees`) · Turn left (`turn_degrees`) · If I feel a bump… (`if`) · Repeat lots of times (`repeat`)
 - Starter program: `repeat(20) {   drive_for(30, 0.5)   (put the “if” here) }`
 - Example solution: `repeat(20) {   drive_for(30, 0.5)   if (bumped) {     drive_for(-30, 0.5)     turn_degrees(-90, 40)   } }`
@@ -2003,10 +2034,10 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Challenge: Find Bolt in the Maze.** Bolt is in the middle of the maze. You have no map. Use your one rule to find him.
 
-- Arena — *Hedge maze*: A small maze that winds inward. Every corner turns right. Bolt waits in the middle. Grid 3×3 tiles of 25 cm. Floor: grass. Start (0,2) facing up.
+- Arena — *Hedge maze*: A small maze that winds inward. Every corner turns right. Bolt waits in the middle. Grid 3×3 tiles of 35 cm. Floor: grass. Start (0,2) facing up.
 - Goal: Reach Bolt in tile (1,1).
-- Features: Corridor (0,2)→(0,0)→(2,0)→(2,2)→(1,2)→(1,1); hedges everywhere else; Bolt at (1,1); Fog.
-- Needs: move, feel-bump. Physics: Gravity 9.81 m/s². Rubber tyres on short grass: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.
+- Features: Corridor (0,2)→(0,0)→(2,0)→(2,2)→(1,2)→(1,1). It uses all nine tiles, so its inner walls are thin hedges (1 cm, 35 cm tall) on these tile edges: (0,2)|(1,2), (0,1)|(1,1), (1,0)|(1,1), (2,1)|(1,1); plus hedges round the outside; Clear corridor width 34 cm: wider than every Level 1 robot’s turning circle (see the robot geometry in Physics); Bolt at (1,1); Fog.
+- Needs: move, feel-bump. Physics: Gravity 9.81 m/s². Rubber tyres on short grass: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.
 - Blocks: Creep forward (`drive_for`) · Back off a little (`drive_for`) · Turn right (`turn_degrees`) · Turn left (`turn_degrees`) · If I feel a bump… (`if`) · Repeat lots of times (`repeat`)
 - Example solution: `repeat(40) {   drive_for(30, 0.5)   if (bumped) {     drive_for(-30, 0.5)     turn_degrees(-90, 40)   } }`
 - Success: Robot centre enters tile (1,1); the run ends with Bolt’s happy dance. *(reach-zone)* No more than 6 blocks — the same rule as the corner, with a bigger repeat. *(within-blocks)*
@@ -2015,21 +2046,21 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Check (3 questions)**
 
-1. “If I feel a bump, I turn.” When does the robot turn? — 🔁 Every time · **🛡️ Only when it feels a bump** ✓. *Why:* “If” means only sometimes: only when the bumper clicks.
+1. “If I feel a bump, I turn.” When does the robot turn? — **🛡️ Only when it feels a bump** ✓ · 🔁 Every time. *Why:* “If” means only sometimes: only when the bumper clicks.
 2. Sense, think, act. Which part is the “if”? — 👂 Sense · **💭 Think** ✓ · 🏃 Act. *Why:* The bumper senses. The “if” thinks — it decides what to do. Turning is the act.
-3. Can the same rule work in a different maze? — **✅ Yes, if every corner is the same kind** ✓ · ❌ No, never. *Why:* A sensor rule does not need the map. In any maze where every turn is a right turn, it works.
+3. Look at this new maze picture. Every corner turns right, like ours. Will your bump-and-turn-right rule find Bolt? — ❌ No — it only works in our maze · **✅ Yes — the same rule works** ✓. *Why:* The rule does not need the map. In any maze where every corner turns right, bump-and-turn-right works.
 
 **Badge:** 🔀 Choice Maker — You used “if” so your robot made its own choice when it felt a bump. · **Reward:** Bolt is safe! A new paint pattern (hedge leaves) for your robot.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: “If” game · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *The “if” game* (5 min): Teacher says rules: “IF I clap, you jump. IF I don’t clap, stand still.” Then clap or don’t, at random. Next rule: “IF I touch my head, turn around.” Children notice they only act when the thing happens. Ask: what is the “sense” (watching the teacher), the “think” (the if), and the “act” (jump)? Materials: None.
+- 40-minute plan: 4′ Unplugged warm-up: “If” game · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *The “if” game* (4 min): Teacher says rules: “IF I clap, you jump. IF I don’t clap, stand still.” Then clap or don’t, at random. Next rule: “IF I touch my head, turn around.” Children notice they only act when the thing happens. Ask: what is the “sense” (watching the teacher), the “think” (the if), and the “act” (jump)? Materials: None.
 - Discuss: What “if” rules do you follow? (If it rains, I take an umbrella. If the light is red, we wait.) · Why did our rule work without a map?
 - Misconceptions: “The “if” blocks run every time.” → The blocks inside “if” run only when the bumper is pressed. Show it: watch the bumper light and the turn together. · “The robot knows the maze.” → It knows nothing about the maze. It only follows the rule each time it bumps.
 - Faster: Design a maze (on squared paper) where the right-turn rule FAILS (needs a left turn). Then explain why. · Change the rule to turn left: which maze does that solve?
 - Slower: Do the corner first with the “if” already in place; the child only chooses the repeat number.
-- Notes: This is many children’s first condition. Keep the language fixed: “If I feel a bump, I…”. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: This is many children’s first condition. Keep the language fixed: “If I feel a bump, I…”. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -2069,50 +2100,50 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 - Why: Distance Eyes measure how far away things are, so the robot can stop before it touches them.
 - Try it without: With only the bumper, the robot finds the bandstand by bumping into it — not kind to steps, flowers or people.
-- Physics: Head mass about the same as the screen (0.05 kg). Measures 3–200 cm straight ahead; fog does not change it.
+- Physics: Distance Eyes 0.08 kg, a little lighter than the Face Screen (0.15 kg). Measures 3–200 cm straight ahead; fog does not change it.
 - Real world: Car parking sensors use the same echo trick; some underwater robots use sonar to measure distance in murky water.
 
 **Code: Stop Before the Steps.** Roll toward the bandstand. Keep going until something is close, then stop and say “Hello, bandstand!”. No bumping!
 
-- Arena — *Foggy square*: A straight path across the square in fog. The bandstand steps are somewhere ahead (a different distance each run). Grid 1×6 tiles of 25 cm. Floor: mat. Start (0,5) facing up.
+- Arena — *Foggy square*: A straight path across the square in fog. The bandstand is somewhere ahead (a different distance each run). Grid 1×6 tiles of 35 cm. Floor: mat. Start (0,5) facing up.
 - Goal: Stop within one tile of the steps without touching them.
-- Features: Bandstand steps 3–5 tiles ahead, random each run; A live number shows the distance reading; Both sensor blocks are offered on purpose: try “until bump” once and see the steps get bumped.
-- Needs: move, see-wall, feel-bump. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (about 30°), about ±1 cm on hard flat surfaces. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
+- Features: Bandstand 3–5 tiles ahead, random each run. Its front is a railing 35 cm tall with the steps behind it, so every body’s Distance Eyes find it; A live number shows the distance reading; Both sensor blocks are offered on purpose: try “until bump” once and see the railing get bumped (the foam bumper makes that harmless).
+- Needs: move, see-wall, feel-bump. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (±12° to the sides, tilting down to 30° so low things ahead are found too), about ±1 cm on hard flat surfaces; reads 200 when nothing echoes. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
 - Blocks: Creep forward (`drive_for`) · Keep going until something is close (`repeat_until`) · Keep going until I feel a bump (`repeat_until`) · Say (`say`)
 - Example solution: `repeat_until(distance_cm < 20) {   drive_for(30, 0.5) } say("Hello, bandstand!")`
-- Success: The robot never touches the steps. *(no-collision)* Front of the robot ends 10–25 cm from the steps, on three runs in a row. *(stop-in-zone)*
+- Success: The robot never touches the railing. *(no-collision)* Front of the robot ends 5–20 cm from the railing, on three runs in a row. *(stop-in-zone)*
 - Stars: ★ done · ★★ You stopped before touching, every time. · ★★★ You can say why “until close” is kinder than “until bump”.
 - Hints (Spark): 1. The bumper only knows after a touch. Which block knows before? 2. Use “Keep going until something is close” with Creep inside. 3. Until close → Creep. Then Say.
 
-**Challenge: Round the Bandstand.** Light eleven is on the far side of the bandstand. Go until close, turn left, and go until close again — twice — without touching anything.
+**Challenge: Round the Bandstand.** Light eleven is on the far side of the bandstand. Go until something is close, then turn left. Do that two times. Then ring the bell!
 
-- Arena — *The bandstand*: The bandstand in the middle of the square, with flower boxes around the edge. You go up one side, along the top, and down to the bell. Grid 4×4 tiles of 25 cm. Floor: mat. Start (3,3) facing up.
+- Arena — *The bandstand*: The bandstand in the middle of the square, with tall flower stands around the edge. You go up one side, along the top, and stop by the bell. Grid 4×4 tiles of 35 cm. Floor: mat. Start (3,3) facing up.
 - Goal: End in tile (0,0) facing down, with the bell at (0,1) just in front, without touching anything.
-- Features: Bandstand fills (1,1)–(2,2); Flower boxes along the top edge (row 0 wall) and the left edge (col 0 wall); Bell with light 11 at (0,1), against the left wall.
-- Needs: move, see-wall. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (about 30°), about ±1 cm on hard flat surfaces. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
+- Features: Bandstand fills (1,1)–(2,2), railing 35 cm tall; Flower stands (35 cm tall) form the walls along the top edge and the left edge; Bell with light 11 at (0,1), against the left wall; Geometry: “until close” stops every body with its centre inside the end tile and room to turn (checked by the doc script, checkL1Geometry), so after each left turn the robot faces along the next side, never into the bandstand.
+- Needs: move, see-wall. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (±12° to the sides, tilting down to 30° so low things ahead are found too), about ±1 cm on hard flat surfaces; reads 200 when nothing echoes. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
 - Blocks: Creep forward (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Keep going until something is close (`repeat_until`) · Repeat (`repeat`) · Say (`say`)
 - Example solution: `repeat(2) {   repeat_until(distance_cm < 20) { drive_for(30, 0.5) }   turn_degrees(90, 40) } say("Ding!")`
-- Success: No flower box, bandstand or bell touched. *(no-collision)* Robot centre ends in tile (0,0) facing down, with the bell less than 25 cm in front. *(stop-in-zone)*
+- Success: No flower stand, bandstand or bell touched. *(no-collision)* Robot centre within 35 cm of the top wall and of the left wall (tile (0,0)), facing down, with the bell less than 35 cm in front. *(stop-in-zone)*
 - Stars: ★ done · ★★ No touches at all. · ★★★ You used Repeat 2 because the two parts are the same.
-- Hints (Spark): 1. Up the side until close. Turn left. Along the top until close. Turn left. Look: the bell! 2. The two parts are the same: until close, then turn left. 3. Repeat 2 → (Until close → Creep), Turn left. Then Say.
+- Hints (Spark): 1. Up the side until close. Turn left. Along the top until close. Turn left. Look: the bell! 2. The two parts are the same: until close, then turn left. 3. Repeat 2 → (Until close → Creep), Turn left. Then Say “Ding!”.
 
 **Check (3 questions)**
 
-1. How do Distance Eyes know something is close? — **🦇 They listen for an echo** ✓ · ✋ They touch it · 👃 They smell it. *Why:* They send a sound and listen for the echo. A quick echo means something is close.
+1. How do Distance Eyes know something is close? — ✋ They touch it · 👁️ They see it, like our eyes · **🦇 They listen for an echo** ✓. *Why:* They send a sound and listen for the echo. A quick echo means something is close. They do not see pictures at all.
 2. In thick fog, which still works? — 📷 A camera · **👀 Distance Eyes** ✓. *Why:* Fog hides light, so cameras struggle. Sound travels through fog, so echoes still work.
-3. To never bump into a friend, use… — 🛡️ Until I feel a bump · **👀 Until something is close** ✓. *Why:* A bumper only knows after the touch. Distance Eyes stop the robot before it touches.
+3. To never bump into a friend, use… — **👀 Until something is close** ✓ · 🛡️ Until I feel a bump. *Why:* A bumper only knows after the touch. Distance Eyes stop the robot before it touches.
 
 **Badge:** 🦇 Bat Ears — You used echoes to stop your robot before it touched anything. · **Reward:** Light 11 of 12 found!
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Echo clap · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Echo clap* (5 min): In a big room or corridor, clap once and listen. Is there an echo? Bat game: one child is the “bat” with eyes closed; a partner stands somewhere ahead. The bat says “squeak!”; the partner answers “echo!” quickly if close, slowly if far. The bat walks and stops when the echo is quick. Materials: A big room or a corridor.
+- 40-minute plan: 4′ Unplugged warm-up: Echo clap · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Echo clap* (4 min): In a big room or corridor, clap once and listen. Is there an echo? Bat game: one child is the “bat” with eyes closed; a partner stands somewhere ahead. The bat says “squeak!”; the partner answers “echo!” quickly if close, slowly if far. The bat walks and stops when the echo is quick. Same game without sound (for deaf or hard-of-hearing children, or a noisy room): the bat holds out a hand; the partner taps it quickly when close and slowly when far, or holds up an “echo card” — the closer they are, the faster they flash it. Materials: A big room or a corridor, Optional: a bright card per pair for the silent version.
 - Discuss: Which animals find their way with sound? (bats, dolphins, some whales) · Where have you heard a car beeping faster as it backs up to something?
 - Misconceptions: “Distance Eyes are real eyes that see.” → They do not see pictures at all. They only measure how far away the nearest thing in front is. · “Distance Eyes see everything around the robot.” → Only straight ahead, in a narrow cone. Things to the side are not noticed.
 - Faster: Try a soft hay bale instead of the steps: the echo ring is fainter. Why might soft things be harder to hear? · Change the stop distance: is closer or further safer near people?
 - Slower: Code task only. Watch the distance number go down as the robot creeps.
-- Notes: Accuracy note for teachers: real ultrasonic sensors struggle with very soft or steeply angled surfaces, which absorb or deflect the echo. The simulator models a fainter echo, not a miss, at Level 1. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Access: the echo is also shown — rings pulse out from the Distance Eyes and the number shrinks — so the session works fully without sound. · Accuracy note for teachers: real ultrasonic sensors struggle with very soft or steeply angled surfaces, which absorb or deflect the echo. The simulator models a fainter echo, not a miss, at Level 1. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -2122,7 +2153,7 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 *Make the robot wait until the path is clear before each move, and talk about who keeps robots safe.*
 
-- Objectives: **L1-S22-O1** Uses a sensor check before each move so the robot waits for people, and explains why safety comes before speed. (“I can make my robot wait until the path is clear.”) **L1-S22-O2** Recognises that the people who design and program robots are responsible for making them safe. (“I know robot makers must keep people safe.”)
+- Objectives: **L1-S22-O1** Uses a sensor check before each move so the robot waits for people, and explains why safety comes before speed. (“I can make my robot wait until the path is clear.”) **L1-S22-O2** Recognises that the people who design and program robots are responsible for making them safe. (“I know robot makers must keep people safe.”) *[discussion and check — not assessed by the challenge]*
 - Concepts: safety-ethics, sensors, loops
 
 **Episode: “The Busy Square”** (3:40)
@@ -2148,33 +2179,33 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 *Cliffhanger:* The twelfth light is at the top of the clock tower, up a winding ramp. Counting hops on a hill went wrong before. What will work?
 
-**Build** — inspect `head: distance`. Look at your Distance Eyes. Wave your hand in front of them and watch the number.
+**Build** — swap `tool: scoop`. Light eleven has to go to the tower door. Put your tool in the toolbox and click the scoop on to carry it. Then wave your hand in front of your Distance Eyes and watch the number.
 
-- Why: The same sensor that finds walls also notices people, so the robot can wait for them.
+- Why: The scoop carries the light. The Distance Eyes that found walls also notice people, so the robot can wait for them.
 - Try it without: Without checking, a robot hops on a timer — right into someone who has just stepped in front.
-- Physics: No change. People in the simulator are detected like any object in the sensor cone.
+- Physics: Scoop 0.18 kg at the front. People in the simulator are detected like any object in the sensor cone (they are taller than 35 cm).
 - Real world: Delivery robots on footpaths and robot carts in hospitals slow down and stop for people in their way.
 
 **Code: Cross the Square.** Hop to the tower door. Before every hop, wait until the path is clear.
 
-- Arena — *Festival square*: A straight path across the square. Festival visitors walk across your path now and then and stop to look at the stalls. Grid 1×6 tiles of 25 cm. Floor: mat. Start (0,5) facing up.
+- Arena — *Festival square*: A straight path across the square. Festival visitors walk across your path now and then and stop to look at the stalls. Grid 1×6 tiles of 35 cm. Floor: mat. Start (0,5) facing up.
 - Goal: Reach the tower door at tile (0,0).
-- Features: Visitors step into the path at random times and stand 2–4 s before moving on; Visitors never step into the tile the robot is already hopping into (Level 1 checks only between hops); The tower door beyond (0,0) is open, so the sensor sees through it.
-- Needs: move, see-wall. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (about 30°), about ±1 cm on hard flat surfaces. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
+- Features: Visitors step into the path at random times and stand 2–4 s before moving on; Visitors never step into the tile the robot is already hopping into (Level 1 checks only between hops); The tower door beyond (0,0) is open and the tower is far away, so nothing static is within 50 cm at any waiting place.
+- Needs: move, see-wall. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (±12° to the sides, tilting down to 30° so low things ahead are found too), about ±1 cm on hard flat surfaces; reads 200 when nothing echoes. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
 - Blocks: Hop forward (`drive_for`) · Wait until the path is clear (`repeat_until`) · Repeat (`repeat`) · Wait (`wait`) · Say (`say`)
-- Example solution: `repeat(5) {   repeat_until(distance_cm > 30) { }  ← wait until clear   drive_for(50, 1) }`
+- Example solution: `repeat(5) {   repeat_until(distance_cm > 50) { }  ← wait until clear   drive_for(80, 1) }`
 - Success: No visitor is touched. *(no-collision)* Robot centre ends in tile (0,0). *(reach-zone)*
 - Stars: ★ done · ★★ You checked before every hop. · ★★★ Your robot said “Excuse me!” or “Thank you!”.
 - Hints (Spark): 1. Stop, look, wait — then go. Your robot can do that before every hop. 2. Inside Repeat: first “Wait until the path is clear”, then Hop 1. 3. Repeat 5 → Wait until clear → Hop 1.
 
-**Challenge: The Lantern Delivery.** Carry light eleven in your scoop through the busy square to the tower door. Wait for people, turn at the fountain, and tip it out at the door.
+**Challenge: The Lantern Delivery.** Carry light eleven in your scoop through the busy square to the tower door. Wait for people, turn right at the corner, and tip it out at the door.
 
-- Arena — *Festival square*: Up the square, a right turn at the fountain, then along to the tower door. Visitors cross at both parts. Grid 4×4 tiles of 25 cm. Floor: mat. Start (0,3) facing up.
+- Arena — *Festival square*: Up the square, a right turn at the top corner, then along to the tower door. Visitors cross at both parts. Grid 4×4 tiles of 35 cm. Floor: mat. Start (0,3) facing up.
 - Goal: Tip light 11 out in the open doorway tile (3,0), with the robot at (2,0) facing right.
-- Features: Light 11 already in the scoop; Fountain at (1,1); Visitors cross column 0 and row 0 at random times, never into the tile the robot is hopping into; Open tower doorway at (3,0); the tower beyond is far away to the sensor.
-- Needs: move, see-wall, grab. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (about 30°), about ±1 cm on hard flat surfaces. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
+- Features: Light 11 already in the scoop (the scoop was clicked on in this session’s build; if another tool is fitted, the arena asks for the scoop with one tap before it loads); Fountain at (1,1); Visitors cross column 0 and row 0 at random times, never into the tile the robot is hopping into; Nothing static within 50 cm of the Distance Eyes at any waiting place: the square carries on past the top edge above column 0 (open, no wall), and the tower doorway at (3,0) is open with the tower far beyond.
+- Needs: move, see-wall, grab. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (±12° to the sides, tilting down to 30° so low things ahead are found too), about ±1 cm on hard flat surfaces; reads 200 when nothing echoes. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
 - Blocks: Hop forward (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Wait until the path is clear (`repeat_until`) · Repeat (`repeat`) · Tip out (`grip_open`) · Say (`say`)
-- Example solution: `repeat(3) { repeat_until(distance_cm > 30) { }  drive_for(50, 1) } turn_degrees(-90, 40) repeat(2) { repeat_until(distance_cm > 30) { }  drive_for(50, 1) } grip_open say("Thank you!")`
+- Example solution: `repeat(3) { repeat_until(distance_cm > 50) { }  drive_for(80, 1) } turn_degrees(-90, 40) repeat(2) { repeat_until(distance_cm > 50) { }  drive_for(80, 1) } grip_open say("Thank you!")`
 - Success: No visitor, fountain or stall touched. *(no-collision)* Light 11 ends in the doorway tile (3,0). *(deliver-object)*
 - Stars: ★ done · ★★ You waited for people the whole way. · ★★★ You used Repeat for both parts.
 - Hints (Spark): 1. Two parts: up, then along. Each part is “wait until clear, hop”, again and again. 2. Up is 3 hops, along is 2 hops. Turn right in between. Tip out at the end. 3. Repeat 3 (Wait until clear, Hop 1) → Turn right → Repeat 2 (Wait until clear, Hop 1) → Tip out.
@@ -2182,20 +2213,20 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 **Check (3 questions)**
 
 1. Someone steps in front of the robot. What should it do? — 💨 Go around fast · **✋ Wait until the path is clear** ✓. *Why:* Safety comes first. Waiting is always safe; rushing past people is not.
-2. Who must make sure a robot is safe? — 🤖 The robot, on its own · **🧑‍🔧 The people who build and program it** ✓. *Why:* A robot only follows its program. The people who build and program it decide how careful it is.
-3. Why check before EVERY hop, not just once? — **🚶 People keep moving** ✓ · 🤔 The robot forgets. *Why:* The square changes all the time. A path that was clear a moment ago may not be clear now.
+2. Who must make sure a robot is safe? — **🧑‍🔧 The people who build and program it** ✓ · 🤖 The robot, on its own. *Why:* A robot only follows its program. The people who build and program it decide how careful it is.
+3. Why check before EVERY hop, not just once? — **🚶 People keep moving** ✓ · 1️⃣ It doesn’t matter — checking once at the start is enough. *Why:* The square changes all the time. A path that was clear a moment ago may not be clear now.
 
 **Badge:** 🦺 Safe Robot Maker — You made your robot wait for people, and you know robot makers keep people safe. · **Reward:** The tower door is open.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Stop, look, wait · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Stop, look, wait* (5 min): Half the class are “robots” crossing the room in single hops; the other half are “people” who walk across their path. Rule: before each hop, a robot looks; if a person is within arm’s reach in front, it waits. Swap roles. Ask: what made it safe? Materials: Masking tape lines on the floor (optional).
+- 40-minute plan: 4′ Unplugged warm-up: Stop, look, wait · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Stop, look, wait* (4 min): Half the class are “robots” crossing the room in single hops; the other half are “people” who walk across their path. Rule: before each hop, a robot looks; if a person is within arm’s reach in front, it waits. Swap roles. Ask: what made it safe? Materials: Masking tape lines on the floor (optional).
 - Discuss: Where have you seen machines that stop for people? (automatic doors, lifts, escalators with sensors) · If a robot bumps someone, whose job was it to stop that from happening?
 - Misconceptions: “Robots are careful because they want to be.” → Robots have no feelings or wishes. They are careful only if people program them to be. · “Checking once at the start is enough.” → Things move. Our robot checks before every hop; real robots check many times every second.
 - Faster: Add “Excuse me!” while waiting and “Thank you!” after. Where in the loop does each go? · Draw a safety poster for a robot in a school corridor.
 - Slower: Do the code task with Repeat already placed; the child adds the wait block in the right place.
-- Notes: Honest note: our Level 1 robot checks only before each hop. Say so if a child asks “what if someone steps in during the hop?” — that is exactly what Level 2 fixes with continuous checking. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Honest note: our Level 1 robot checks only before each hop. Say so if a child asks “what if someone steps in during the hop?” — that is exactly what Level 2 fixes with continuous checking. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -2205,7 +2236,7 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 *Climb a winding ramp by repeating a sensor rule, and meet the people whose job is robots.*
 
-- Objectives: **L1-S23-O1** Repeats a sensor-based step (go until close, turn) inside a loop to solve a longer task, and explains why it works on a slope where counted hops do not. (“I can repeat a sensor rule to climb the tower.”) **L1-S23-O2** Names some jobs people do with robots (design, build, program, test, repair) and robots that help people. (“I can name jobs people do with robots.”)
+- Objectives: **L1-S23-O1** Repeats a sensor-based step (go until close, turn) inside a loop to solve a longer task, and explains why it works on a slope where counted hops do not. (“I can repeat a sensor rule to climb the tower.”) **L1-S23-O2** Names some jobs people do with robots (design, build, program, test, repair) and robots that help people. (“I can name jobs people do with robots.”) *[discussion and check — not assessed by the challenge]*
 - Concepts: loops, sensors, physics, careers
 
 **Episode: “The Top of the Tower”** (3:45)
@@ -2232,55 +2263,55 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 *Cliffhanger:* All twelve lights are found! Tonight is the Night of a Hundred Lights — and the town wants a show from your robot.
 
-**Build** — swap `tool: scoop`. Your robot has lots of parts now. Look at them all: wheels, bumper, Distance Eyes. Click the scoop back on for the last light.
+**Build** — inspect `tool: scoop`. Your robot has lots of parts now. Look at them all: wheels, bumper, Distance Eyes — and the scoop, still on from the square, ready for the last light. Tap each part to hear what it does.
 
 - Why: Each part does a job: wheels move, the bumper feels, Distance Eyes hear echoes, the scoop carries.
 - Try it without: Take off the Distance Eyes and try counted hops on the ramp: the robot stops short on the hill.
-- Physics: Scoop 0.2 kg. On the 8° ramp, gravity pulls back on the robot, so each creep covers about 15 % less.
+- Physics: Scoop 0.18 kg. On the 10° ramp, gravity pulls back on the robot, so each creep covers less ground than on the flat.
 - Real world: Climbing and inspection robots use sensors to know where they are, because wheels slip and slopes change distances.
 
 **Code: One Ramp, One Turn.** Go up the first ramp until the wall is close, then turn left. Do it twice.
 
-- Arena — *Clock tower (lower half)*: Two ramps winding up inside the tower. Each ends at a wall. They slope upward. Grid 4×4 tiles of 25 cm. Floor: ramp. Start (3,3) facing up.
+- Arena — *Clock tower (lower half)*: Two ramps winding up inside the tower. Each ends at a flat corner landing with a wall. They slope upward. Grid 4×4 tiles of 35 cm. Floor: ramp. Start (3,3) facing up.
 - Goal: Stop near the wall at the end of the second ramp, at tile (0,0), without touching.
-- Features: Ramp 1: column 3 up to row 0; Ramp 2: row 0 left to column 0; Central gear shaft fills (1,1)–(2,2); All ramps slope up at 8°.
-- Needs: move, see-wall. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (about 30°), about ±1 cm on hard flat surfaces. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring. Tower ramps rise at 8°: the same creep covers about 15 % less ground uphill (more of the motor’s push goes into lifting the robot).
+- Features: Corner tiles (3,3), (3,0) and (0,0) are flat landings; the two tiles between landings slope up at 10° (70 cm of ramp rises about 12 cm); Ramp 1: column 3 up to the landing at (3,0); Ramp 2: row 0 left to the landing at (0,0); Central gear shaft fills (1,1)–(2,2); outer and shaft walls are 35 cm tall or more.
+- Needs: move, see-wall. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (±12° to the sides, tilting down to 30° so low things ahead are found too), about ±1 cm on hard flat surfaces; reads 200 when nothing echoes. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring. Tower ramps rise at 10°: the same creep covers less ground uphill (part of the motor’s push goes into lifting the robot). Ramp surfaces are not seen as obstacles; the walls at the end of each ramp are 35 cm tall or more.
 - Blocks: Hop forward (`drive_for`) · Creep forward (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Keep going until something is close (`repeat_until`) · Repeat (`repeat`)
-- Starter program: `drive_for(50, 3)  ← stops short on the hill. Try it, then fix it!`
+- Starter program: `drive_for(80, 3)  ← stops short on the hill. Try it, then fix it!`
 - Example solution: `repeat(2) {   repeat_until(distance_cm < 20) { drive_for(30, 0.5) }   turn_degrees(90, 40) }`
-- Success: No wall touched. *(no-collision)* Robot centre ends in tile (0,0). *(stop-in-zone)*
+- Success: No wall touched. *(no-collision)* Robot centre within 35 cm of the top wall and of the left wall (the landing at (0,0)). *(stop-in-zone)*
 - Stars: ★ done · ★★ You used the sensor instead of counting. · ★★★ You can say why counting failed on the ramp.
 - Hints (Spark): 1. Hop 3 stopped short on the hill. What does not care about hills? 2. Until close (with Creep inside), then Turn left. Two times. 3. Repeat 2 → (Until close → Creep), Turn left.
 
 **Challenge: To the Top!.** Climb all four ramps to the clock face. Then scoop up the twelfth light.
 
-- Arena — *Clock tower*: Four ramps winding up inside the tower, then the clock room with the light in the gears. Grid 4×4 tiles of 25 cm. Floor: ramp. Start (3,3) facing up.
-- Goal: After four ramps, stop facing the gear at (3,2) on the top floor and scoop up light 12.
-- Features: Four ramps around the gear shaft, each ending at a wall: up column 3, left along row 0, down column 0, right along row 3 — each one floor higher (drawn as a spiral); Light 12 sits in a cog on the top floor, in the tile in front of the last wall.
-- Needs: move, see-wall, grab. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (about 30°), about ±1 cm on hard flat surfaces. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring. Tower ramps rise at 8°: the same creep covers about 15 % less ground uphill (more of the motor’s push goes into lifting the robot).
+- Arena — *Clock tower*: One ramp that winds up four sides of the tower, like a helix, to the clock room landing. Grid 4×4 tiles of 35 cm. Floor: ramp. Start (3,3) facing up.
+- Goal: After the 4th ramp the robot is on the clock-room landing above (3,3). After the 4th left turn it faces north; light 12 is in the cog on the clock-face wall right in front of it. Scoop it up.
+- Features: One continuous helix around the gear shaft: up column 3, left along row 0, down column 0, right along row 3. Corner tiles are flat landings; the two tiles between landings slope up at 10° (about 12 cm per side, about 50 cm in all).; Total rise about 50 cm. The clock-room landing over (3,3) is a deck 2 cm thick, so there is about 48 cm of headroom over the start tile — more than the tallest Level 1 robot (under 35 cm). It overlaps nothing else.; The clock-room landing has a wall on its east side (the 4th “until close” stops at it) and the clock-face wall on its north side, about half a tile (17.5 cm) from the robot’s centre after the last turn. Light 12 sits in a cog that sticks out about 6 cm from that wall, inside the scoop’s reach for every body.; Every wall is 35 cm tall or more; each landing has a guard rail on its open edge..
+- Needs: move, see-wall, grab. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Visual fog: the 3D view and any camera see about one tile. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (±12° to the sides, tilting down to 30° so low things ahead are found too), about ±1 cm on hard flat surfaces; reads 200 when nothing echoes. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring. Tower ramps rise at 10°: the same creep covers less ground uphill (part of the motor’s push goes into lifting the robot). Ramp surfaces are not seen as obstacles; the walls at the end of each ramp are 35 cm tall or more.
 - Blocks: Creep forward (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Keep going until something is close (`repeat_until`) · Repeat (`repeat`) · Scoop up (`grip_close`) · Say (`say`)
 - Example solution: `repeat(4) {   repeat_until(distance_cm < 20) { drive_for(30, 0.5) }   turn_degrees(90, 40) } grip_close say("Twelve!")`
-- Success: No wall touched on any floor. *(no-collision)* Light 12 is in the scoop at the end of the run. *(deliver-object)* No more than 7 blocks (a loop is needed). *(within-blocks)*
+- Success: No wall touched on any floor (gentle contact of the scoop with the cog at the end is allowed). *(no-collision)* Light 12 is in the scoop at the end of the run. *(deliver-object)* No more than 7 blocks (a loop is needed). *(within-blocks)*
 - Stars: ★ done · ★★ You climbed all four ramps without a bump. · ★★★ You used one loop for all four ramps.
 - Hints (Spark): 1. Every ramp is the same: until close, then turn left. 2. How many ramps? Four. Put your ramp program inside Repeat 4. 3. Repeat 4 → (Until close → Creep), Turn left. Then Scoop up.
 
 **Check (3 questions)**
 
-1. On a hill, “Hop 3” goes… — **⛰️ Less far** ✓ · 🏃 Further · 🟰 Just the same. *Why:* Going uphill, part of the motor’s push lifts the robot, so each hop is shorter.
-2. Why did “until close” work on every ramp? — **👀 It measures the real wall, wherever it is** ✓ · ✨ It is magic. *Why:* The sensor measures the world as it really is, so hills and slips don’t fool it.
-3. Which is a real job with robots? — **🔧 Robot fixer (technician)** ✓ · 🐉 Robot dragon tamer. *Why:* Technicians fix and look after robots. Others design them, build them, program them and test them.
+1. On a hill, “Hop 3” goes… — 🏃 Further · **⛰️ Less far** ✓ · 🟰 Just the same. *Why:* Going uphill, part of the motor’s push lifts the robot, so each hop is shorter.
+2. Why did “until close” work on every ramp? — 📏 Every ramp is the same length, so it was counted for us · **👀 It measures the real wall, wherever it is** ✓. *Why:* The sensor measures the world as it really is, so hills and slips don’t fool it.
+3. Who can work with robots when they grow up? — **🧑‍🔧 Anyone who learns — fixers, testers, designers, builders** ✓ · 🥼 Only grown-up scientists. *Why:* Many kinds of people work with robots: technicians fix them, others design, build, program and test them. You have done all of those this year!
 
 **Badge:** 🗼 Tower Climber — You repeated a sensor rule to climb the tower, and you can name jobs people do with robots. · **Reward:** Light 12 of 12 found! All the lights are home.
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 5′ Unplugged warm-up: Robot jobs charades · 4′ Watch the episode together on the big screen. Pause at the question Spark asks and let children answer out loud. · 5′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. · 9′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 8′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 4′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 5′ Share circle: two children show their robot run. Ask the discussion questions. Tidy up.
-- Unplugged warm-up — *Robot jobs charades* (5 min): Show picture cards: designer (drawing), builder (screwing parts), programmer (typing), tester (pressing go and watching), technician (fixing). Children act one out; the class guesses the job. Ask: which of these jobs have YOU done with your robot this term? Materials: Five job picture cards.
+- 40-minute plan: 4′ Unplugged warm-up: Robot jobs charades · 5′ The teacher plays the episode once for everyone on the big screen (captions on). Pause at the question Spark asks and let children answer out loud. · 3′ Hand out devices; pairs join with the class code and their picture password. · 4′ BUILD: children snap on or look at the part, then press "Try without it" and say what went wrong. (Short on time? Skip "Try without it" and show it once on the big screen.) · 8′ CODE: guided program in the simulator, in pairs (one taps, one checks; swap halfway). · 7′ CHALLENGE: the mission. Hints are spoken by Spark; a teacher nudge is fine after hint 2. · 3′ CHECK: three spoken questions, answered by tapping pictures. Badge. · 2′ Devices down (screens face-down), back to the rug. · 4′ Share circle: two children show their run on the big screen. Ask the discussion questions.
+- Unplugged warm-up — *Robot jobs charades* (4 min): Show picture cards: designer (drawing), builder (screwing parts), programmer (typing), tester (pressing go and watching), technician (fixing). Children act one out; the class guesses the job. Ask: which of these jobs have YOU done with your robot this term? Materials: Five job picture cards.
 - Discuss: Which robot job would you like to try? Why? · Why did counting go wrong on the ramp, but the sensor didn’t?
 - Misconceptions: “Only grown-up scientists work with robots.” → Many kinds of people do: designers, builders, programmers, testers, technicians, farmers, doctors… and children learning, like us. · “Hills don’t change anything for robots.” → Uphill, part of the push lifts the robot, so it goes less far for the same time.
 - Faster: Write the tower program with the fewest blocks possible, then explain each block to a partner. · Design a tower with five ramps: what changes in the program?
 - Slower: Do only the two-ramp code task; then press Go on the full tower with Repeat 4 already placed and watch it climb.
-- Notes: Show a diverse range of people in the robot jobs pictures (gender, age, background, disability). · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Show a diverse range of people in the robot jobs pictures (gender, age, background, disability). · The careers objective (O2) is met in the warm-up, the episode and the share circle, not the challenge: in the share circle each pair says which robot job they did most today (“We were the testers!”). · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -2304,9 +2335,9 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
    - **Spark:** “And now — a robot show! Designed by YOU.”
    - **Amara:** “Plan it first. Then build it, test it, fix it — and show everyone!”
    - **Nana Lucía:** “Use what you have learned: a loop, a sensor, a tool, and kind words.”
-3. **The same square, after the children’s shows (plays after sharing).** — Fireworks of light from the clock. Nana Lucía hands the child a scroll tied with ribbon: the certificate. Bolt wears a tiny lantern on his collar. *(45s)*
+3. **The same square, after the children’s shows. This scene and the next play at the certificate moment — straight after sharing, or in a separate short slot (see the teacher notes).** — Fireworks of light from the clock. Nana Lucía holds up a scroll tied with ribbon: the certificate. Bolt wears a tiny lantern on his collar. *(45s)*
    - **Nana Lucía:** “You built a robot. You taught it to move, to draw, to carry, to feel and to listen. And you kept everyone safe.”
-   - **Nana Lucía:** “You are a real Robot Explorer.”
+   - **Nana Lucía:** “When your Explorer badges are all done, this scroll has your name on it. You are a real Robot Explorer.”
    - **Spark:** “Thank you for bringing the lights home!”
 4. **Late night. Everyone has gone home. A paper boat drifts into the harbour carrying a sealed glass bottle.** — Amara pulls out a map of islands across the sea, and a message: “Our island needs a robot builder. Come soon.” *(30s)*
    - **Amara:** “A map of islands! And a message for us!”
@@ -2314,61 +2345,61 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 *Cliffhanger:* A bottle washes into the harbour with a map of islands across the sea: “Our island needs a robot builder.” (Level 2 begins here.)
 
-**Build** — choose `tool: light`. Your robot is all yours. Choose its colours, and choose one tool for your show: pen, scoop or headlight.
+**Build** — choose `tool: child-choice`. Your robot is all yours. Choose its colours, and choose one tool for your show: pen, scoop or headlight.
 
 - Why: Designers choose the parts that fit their idea. Every part should have a reason.
 - Try it without: Try your show without your sensor: what could go wrong when people walk onto the stage?
-- Physics: The chosen tool’s mass is applied (pen 0.05 kg, scoop 0.2 kg, light 0.1 kg). The bumper and Distance Eyes stay fitted.
+- Physics: The chosen tool’s mass is applied (pen 0.05 kg, scoop 0.18 kg, headlight 0.08 kg). The bumper and Distance Eyes stay fitted.
 - Real world: Engineers choose parts by what the robot must do: a drawing robot gets a pen, a delivery robot gets a box, a night robot gets lights.
 
 **Code: Plan My Show.** Draw your show on the planning sheet. Then build the first part and test it.
 
-- Arena — *Festival stage*: A 5×5 festival mat in the square at night, edged with lanterns. Paper lies on the stage for drawing; little lantern baskets sit on two tiles; one corner is dark. Grid 5×5 tiles of 25 cm. Floor: mat. Start (2,4) facing up.
+- Arena — *Festival stage*: A 5×5 festival mat in the square at night, edged with a lantern fence. Paper lies on the stage for drawing; lantern baskets sit on two tiles; one corner is dark. Grid 5×5 tiles of 35 cm. Floor: mat. Start (2,4) facing up.
 - Goal: The child’s own plan.
-- Features: Lantern edge (solid low wall) around the stage; Paper for pen drawings; Lantern baskets at (0,1) and (4,1) for scoop shows; Dark corner at (4,0)–(4,1) for light shows; Visitors sometimes step onto the stage edge.
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (about 30°), about ±1 cm on hard flat surfaces. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
+- Features: Lantern fence around the stage, 35 cm tall, so Distance Eyes and the bumper both find it; Paper for pen drawings; Lantern baskets at (0,1) and (4,1) for scoop shows: small, light pick-ups (the scoop takes them from the tile in front), not obstacles; Dark corner at (4,0)–(4,1) for light shows; Visitors sometimes step onto the stage edge.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (±12° to the sides, tilting down to 30° so low things ahead are found too), about ±1 cm on hard flat surfaces; reads 200 when nothing echoes. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Creep forward (`drive_for`) · Back off a little (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Wait (`wait`) · Repeat (`repeat`) · Keep going until I feel a bump (`repeat_until`) · Keep going until something is close (`repeat_until`) · Wait until the path is clear (`repeat_until`) · If I feel a bump… (`if`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`) · Scoop up (`grip_close`) · Tip out (`grip_open`) · Light on (`light_on`) · Light off (`light_off`) · Beep (`beep`) · Say (`say`)
-- Example solution: `say("Welcome!") repeat_until(distance_cm > 30) { } drive_for(50, 2)`
-- Success: The first part of the child’s plan runs without touching a lantern or visitor. *(within-blocks)*
+- Example solution: `say("Welcome!") repeat_until(distance_cm > 50) { } drive_for(80, 2)`
+- Success: The first part of the child’s plan runs without touching the fence, a basket or a visitor (a gentle bumper touch on the fence is allowed). *(no-collision)*
 - Stars: ★ done · ★★ Your plan has a beginning, a middle and an end. · ★★★ You tested the first part before adding more.
 - Hints (Spark): 1. What will your robot do first? Say hello? Draw? Light up? 2. Build just the first part. Press Go. Does it do what your plan says? 3. If something goes wrong, that’s a bug — find the block where it went wrong.
 
 **Challenge: Showtime!.** Finish your show. It must have a loop, a sensor block, your tool, and kind words. Then show everyone!
 
-- Arena — *Festival stage*: The festival stage, with the audience around the edge. Grid 5×5 tiles of 25 cm. Floor: mat. Start (2,4) facing up.
+- Arena — *Festival stage*: The festival stage, with the audience around the edge. Grid 5×5 tiles of 35 cm. Floor: mat. Start (2,4) facing up.
 - Goal: Run the whole show from start to end without touching anything.
 - Features: As in the code task.
-- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot mass about 1 kg with the default body. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (about 30°), about ±1 cm on hard flat surfaces. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
+- Needs: move. Physics: Gravity 9.81 m/s². Rubber tyres on a printed mat: high friction, no slip at Level 1 speeds. Robot size, sensor position and mass: the Level 1 robot geometry table (L1_GEOMETRY). Anything a sensor must find is at least 35 cm tall. Fog does not change touch (bumper) or sound (echo distance sensor) readings. Creep = drive_for(30 %, 0.5 s) ≈ 6.3 cm. Back off = drive_for(−30 %, 1 s) ≈ 12.6 cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep. Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (±12° to the sides, tilting down to 30° so low things ahead are found too), about ±1 cm on hard flat surfaces; reads 200 when nothing echoes. Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.
 - Blocks: Hop forward (`drive_for`) · Hop back (`drive_for`) · Creep forward (`drive_for`) · Back off a little (`drive_for`) · Turn left (`turn_degrees`) · Turn right (`turn_degrees`) · Wait (`wait`) · Repeat (`repeat`) · Keep going until I feel a bump (`repeat_until`) · Keep going until something is close (`repeat_until`) · Wait until the path is clear (`repeat_until`) · If I feel a bump… (`if`) · Pen down (draw) (`pen_down`) · Pen up (stop drawing) (`pen_up`) · Scoop up (`grip_close`) · Tip out (`grip_open`) · Light on (`light_on`) · Light off (`light_off`) · Beep (`beep`) · Say (`say`)
 - Example solution: `say("Welcome!") light_on repeat(4) {   repeat_until(distance_cm < 20) { drive_for(30, 0.5) }   turn_degrees(90, 40)   beep } light_off say("Happy festival!")`
-- Success: The program contains at least one loop, one sensor block (until bump, until close, wait until clear or if bump), one tool block and one say block. *(within-blocks)* No lantern, basket or visitor touched (a bumper touch on purpose against the lantern edge is allowed). *(no-collision)*
+- Success: The program contains at least one loop, one sensor block (until bump, until close, wait until clear or if bump), one tool block and one say block — and each of them runs during the show. *(uses-blocks)* No basket or visitor touched; the fence is touched only by the bumper, gently (a bumper touch on purpose against the fence is allowed). *(no-collision)*
 - Stars: ★ done · ★★ Your show has all four ingredients. · ★★★ You fixed at least one bug and can say what it was.
 - Hints (Spark): 1. Check your four ingredients: a loop, a sensor, your tool, kind words. 2. A sensor keeps your show safe: “Wait until the path is clear” or “Until something is close”. 3. Test, watch, fix, test again. Every engineer does it many times.
 
 **Make it yours: The Night of a Hundred Lights.** The lights are home! Design a festival show for your robot. It can dance, draw, carry a lantern or light up the dark corner — you decide. Keep the audience safe and make them smile.
 
 - Design steps: Ask: what will make people at the festival smile? → Imagine: dance, drawing, lantern delivery, or light show? → Plan: draw the path and the actions on the planning sheet. → Build: one part at a time, in the simulator. → Test and improve: watch, find the bug, fix it. → Share: show your run and say one bug you fixed.
-- Constraints: Use at least one loop. Use at least one sensor block, to stay safe. Use your tool at least once. Say something kind to the audience. Stay on the stage; touch nothing.
-- Self-check: ☐ My show has a loop. ☐ My robot uses a sensor to stay safe. ☐ My robot uses its tool. ☐ My robot says something kind. ☐ I found a bug and fixed it.
+- Constraints: Use at least one loop. Use at least one sensor block, to stay safe. Use your tool at least once. Say something kind to the audience. Stay on the stage. Touch nothing — except a gentle bumper touch on the stage fence, if your sensor is the bumper.
+- Self-check: ☐ My show has a loop. ☐ My robot checks with a sensor before it moves or bumps. ☐ My robot uses its tool. ☐ My robot says something kind. ☐ I found a bug and fixed it.
 - Sharing: Shown at a class “festival” and in the child’s family gallery. Never public by default; teachers may choose a class showcase with family consent.
 
 **Check (3 questions)**
 
-1. What do engineers do after testing finds a bug? — 😞 Give up · **🔧 Fix it and test again** ✓. *Why:* Bugs are normal. Find where it went wrong, fix it, and test again.
-2. Your robot feels, hears echoes, and moves. Which is “act”? — **🛞 Moving its wheels** ✓ · 🦇 Hearing an echo · 🛡️ Feeling a bump. *Why:* Feeling and hearing are sensing. Moving is acting. The program in between is thinking.
-3. Why use a loop in your show? — **🔁 To repeat steps with fewer blocks** ✓ · 🐢 To make it slower. *Why:* A loop repeats steps, so you don’t have to put the same blocks in again and again.
+1. What do engineers do after testing finds a bug? — **🔧 Fix it and test again** ✓ · 🙈 Hide it, because a good show has no bugs. *Why:* Bugs are normal. Find where it went wrong, fix it, and test again.
+2. Your robot feels, hears echoes, and moves. Which is “act”? — 🦇 Hearing an echo · 🛡️ Feeling a bump · **🛞 Moving its wheels** ✓. *Why:* Feeling and hearing are sensing. Moving is acting. The program in between is thinking.
+3. Why use a loop in your show? — 📜 To make the program longer, because longer is better · **🔁 To repeat steps with fewer blocks** ✓. *Why:* A loop repeats steps, so you don’t have to put the same blocks in again and again.
 
 **Badge:** 🏮 Robot Explorer — You designed and shared your own robot show and finished the Explorers season. · **Reward:** The Lantern Clock shines again! Explorers certificate unlocked. A treasure map of islands appears in your robot’s toolbox…
 
 <details><summary>Teacher notes</summary>
 
-- 40-minute plan: 3′ Watch the short episode that sets the project. · 6′ IMAGINE + PLAN: draw the idea on the paper planning sheet (pictures, arrows, no words needed). · 16′ BUILD + CODE + TEST: make it in the simulator; test, fix, test again. Teacher visits each pair. · 9′ SHARE: each pair shows their project and says one thing they fixed. Classmates give a "star and a wish". · 3′ CHECK: three spoken questions. · 3′ Badge, light count on the class Lantern Clock poster, tidy up.
+- 40-minute plan: 3′ The teacher plays the short episode that sets the project (captions on). · 5′ IMAGINE + PLAN: draw the idea on the paper planning sheet (pictures, arrows, no words needed). · 2′ Hand out devices; pairs join with the class code. · 15′ BUILD + CODE + TEST: make it in the simulator; test, fix, test again. Teacher visits each pair. · 5′ PAIR SHARE: each pair turns to the neighbouring pair, shows its run and says one thing it fixed; the other pair gives a "star and a wish". Then swap. The teacher listens in and notes who explained a fix. · 4′ BIG-SCREEN SHARE: two volunteer pairs show their project to the class. · 3′ CHECK: three spoken questions. · 3′ Badge, light count on the class Lantern Clock poster, devices away.
 - Unplugged warm-up — *Show storyboard* (3 min): Pairs fold a paper into three boxes: beginning, middle, end. Draw what the robot does in each box. Materials: Planning sheet (stage grid + three boxes), Crayons.
 - Discuss: What part of your robot was the most useful this season? Why? · What bug did you fix today? How did you find it? · What would you like your robot to learn next?
 - Misconceptions: “A good show has no bugs.” → Every show had bugs. A good engineer finds and fixes them — that is what we celebrate. · “A longer program is a better program.” → A clear program that works and keeps people safe is best. Loops make it shorter.
 - Faster: Add a second part with a different tool (swap explained in words; one tool in the sim). · Teach your show to a younger child or a family member, step by step.
 - Slower: Start from a template show (say → repeat with sensor → say) and change the numbers, the tool and the words to make it yours.
-- Notes: Celebrate every show equally: same applause, same certificate. No “best show”. · Certificates are earned by learning (see the Level 1 certificate criteria), not by attendance; check each child has the season’s core badges or offer a catch-up session. · Everything is spoken: every block, hint and question has a voice. Turn sound on; headphones per pair work best. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.
+- Notes: Celebrate every show equally: same applause, same certificate. No “best show”. · Big class (30+)? Run S24 over two periods: period 1 = episode, plan, build and test; period 2 = finish, pair share, big-screen share and check. Either way, hold the certificate moment (the last two episode scenes, about 1:15, plus handing out) in its own short slot — it is not inside the 40 minutes. · Certificates are earned by learning (see the Level 1 certificate criteria: what the simulator recorded and what you observed), not by attendance and never by the child’s own self-check ticks. A child still missing a core badge gets it in a catch-up session and receives the certificate then; on the night, every child is celebrated for their show. · Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen. · Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time. · Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed. · Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.
 
 </details>
 
@@ -2382,17 +2413,23 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 
 **Skill badges.** One per session, named for a skill (“Bug Detective”, “Choice Maker”). A badge says what the child can now do.
 
-**Projects.** Four per level, assessed by the child’s own “I can” self-checks and the teacher’s observation. Sharing uses “a star and a wish” from classmates.
+**Projects.** Four per level, assessed by what the simulator records (the program met the brief’s constraints) and the teacher’s observation of the share (the child explained a fix or a design decision). The child’s “I can” self-checks are reflection only: an unticked box means “my next step”, never “no badge” or “no certificate”. Sharing uses “a star and a wish”, pair to pair.
 
-**Certificates.** One per level, earned by learning (projects, core badges, an explained bug or design decision), not by attendance. Missing pieces can be earned in catch-up sessions. Certificates make no claim of external accreditation.
+**Certificates.** One per level, earned by learning — projects that ran, core badges, a bug or design decision explained to an adult — never by attendance and never by self-check ticks. Missing pieces can be earned in catch-up sessions. Certificates make no claim of external accreditation.
+
+**One objective the challenge checks.** Every session has one headline objective that its challenge assesses. Where a session also has a second objective met through discussion (careers, safety responsibility), it is marked “discussion” and is never graded.
 
 ## 6. Using R2BOT Kids in a school
 
-**Timetable.** 24 sessions of 40 minutes = one session a week for about two school terms, or two a week for one term. Each session has a minute-by-minute plan that adds up to 40.
+**Timetable.** 24 sessions of 40 minutes = one session a week for about two school terms, or two a week for one term. Each session has a minute-by-minute plan that adds up to 40, including handing out devices and moving between the rug and the screens. A 45-minute period gives the extra time to coding. Session 24 can run over two periods for a class of 30 or more, with the certificate moment in its own short slot.
 
-**Devices.** One device per pair (driver and navigator, swapping halfway). Runs in a browser on school laptops, tablets and phones; headphones per pair help in Level 1.
+**Devices.** One device per pair (driver and navigator, swapping halfway). Runs in a browser on school laptops, tablets and phones. In Level 1 the teacher plays each episode once for everyone on the big screen, so devices are silent during it; after that keep device volume low with captions on, or use a headphone splitter so both children in a pair can listen.
 
-**Unplugged first.** Every session opens with a five-minute unplugged warm-up using things every classroom has, so the idea is in the body before it is on the screen.
+**Unplugged first.** Every lesson opens with a four-minute unplugged warm-up using things every classroom has, so the idea is in the body before it is on the screen.
+
+**Access for every child.** Captions on every spoken line and every episode (on by default in class). A visual twin for every sound: a beep flashes a ring, Say shows a speech bubble, an echo pulses rings and a number. Shape and icon as well as colour everywhere (colour-blind safe); large text and high-contrast modes. Every block is tapped, never dragged, and every tap target works with a switch or keyboard. A reduced-motion setting slows and steadies the episode camera. Unplugged games have a silent version (e.g. Session 21’s echo game with taps or a flashed card) and never require a blindfold. Teachers can extend any challenge’s time limit; no challenge is timed against other children.
+
+**Mixed entry.** Children join by age, so a Level 2–4 class will include children who never did the level below. Each of those levels starts with 2–3 self-paced bridge missions recapping the core blocks below, offered automatically to any child with none of the previous level’s badges. In class, pair a newcomer with a child who did the earlier level for the first two sessions, and let newcomers do the bridge missions at home or during the first build.
 
 **Teacher support.** Every session has discussion questions, the common misconceptions with a correction, and ideas for faster and slower learners. No prior robotics or coding knowledge is assumed.
 
@@ -2409,7 +2446,7 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 | 1 | 1A, ages 5–7 (Grades K–2) | 1A-AP-08, 1A-AP-10, 1A-AP-11, 1A-AP-12, 1A-AP-14, 1A-AP-15, 1A-CS-02 | 1A-NI-04 and 1A-IC-18 (passwords and logging in): out of scope — children never create accounts. 1A-DA-05 to 1A-DA-07 (storing and charting data): only touched informally. | NEP 2020 Foundational Stage (ages 3–8; Level 1 covers Grades 1–2). Play-, activity- and story-based learning, which NEP 2020 and the National Curriculum Framework for the Foundational Stage put at the centre of these years. Early numeracy and spatial sense: counting steps, comparing distances, left and right, quarter turns. Voice-first and translatable, so it can be offered in a child’s home language, in the spirit of NEP’s emphasis on learning in the mother tongue in the early years. Toy- and game-based pedagogy using everyday materials in the unplugged warm-ups. |
 | 2 | 1B, ages 8–11 (Grades 3–5) | 1B-AP-08, 1B-AP-10, 1B-AP-11, 1B-AP-13, 1B-AP-15, 1B-AP-16, 1B-CS-01, 1B-CS-02, 1B-DA-06, 1B-DA-07, 1B-IC-19 | 1B-NI-04 and 1B-NI-05 (networks and cybersecurity). 1B-AP-09 (variables) is only prepared for; variables start at Level 3. | NEP 2020 Preparatory Stage (Grades 3–5). Experiential, discovery-based learning that connects mathematics (measurement, angles) and science (forces, friction) through a project. Fair tests and simple data tables, building the scientific temper NEP calls for. Environmental awareness (the turtle beach) and design for everyone (inclusion). |
 | 3 | 2, ages 11–14 (Grades 6–8) | 2-AP-10, 2-AP-11, 2-AP-12, 2-AP-13, 2-AP-17, 2-CS-02, 2-CS-03, 2-DA-08, 2-DA-09, 2-IC-20 | 2-AP-14 (procedures with parameters): the shared block set has no “make a block” yet (see OPEN_QUESTIONS). Networks and cybersecurity (2-NI). | NEP 2020 Middle Stage (Grades 6–8). NEP 2020 recommends introducing coding from Grade 6; Level 3 brings variables, maths in code and control in that window. Computational thinking and hands-on, project-based work, in line with NEP’s push for experiential and vocational exposure in the middle stage. Fits alongside CBSE skill modules in coding and AI offered at the middle stage, as enrichment rather than a replacement. |
-| 4 | 3A, ages 14–16 (Grades 9–10); Grades 11–12 (3B) are only partly covered | 3A-AP-13, 3A-AP-15, 3A-AP-16, 3A-AP-21, 3A-AP-22, 3A-AP-23, 3A-CS-01, 3A-CS-03, 3A-DA-12, 3A-IC-24, 3A-IC-26 | 3A-AP-17 only partly (no procedures in the block set). Networks, cybersecurity and most of 3B (Grades 11–12). | NEP 2020 Secondary Stage (Grades 9–12). Multidisciplinary, inquiry-led capstone work and critical thinking, as NEP intends for the secondary stage. Relevant to CBSE skill subjects in AI and information technology as practical enrichment (no claim of syllabus coverage). Ethics, safety and responsible technology, connecting to NEP’s emphasis on ethical reasoning and values. Career awareness and portfolios that support NEP’s goal of flexible pathways into higher education and vocational routes. |
+| 4 | 3A, ages 14–16 (Grades 9–10); Grades 11–12 (3B) are only partly covered | 3A-AP-13, 3A-AP-15, 3A-AP-16, 3A-AP-21, 3A-AP-22, 3A-AP-23, 3A-CS-01, 3A-CS-03, 3A-DA-12, 3A-IC-24, 3A-IC-26 | 3A-AP-14 (use lists to simplify solutions): the shared block set has no lists, so maps and logs are kept in a few named variables or on paper (see OPEN_QUESTIONS). 3A-AP-17 only partly (no procedures in the block set). Networks, cybersecurity and most of 3B (Grades 11–12). | NEP 2020 Secondary Stage (Grades 9–12). Multidisciplinary, inquiry-led capstone work and critical thinking, as NEP intends for the secondary stage. Relevant to CBSE skill subjects in AI and information technology as practical enrichment (no claim of syllabus coverage). Ethics, safety and responsible technology, connecting to NEP’s emphasis on ethical reasoning and values. Career awareness and portfolios that support NEP’s goal of flexible pathways into higher education and vocational routes. |
 
 ### Level 1 objectives, one by one
 
@@ -2523,15 +2560,23 @@ Everything a 5–7-year-old meets is spoken aloud and shown with pictures. `{rob
 ## 8. Open questions for the simulator and product teams
 
 1. Turn sign convention: the curriculum uses positive turn_degrees = turn LEFT (counter-clockwise, the ROS and maths convention). Confirm the simulator matches.
-2. Level 1 calibration: the robot is tuned so drive_for(50 %, 1 s) ≈ one 25 cm tile on the flat mat with no load (±5 %). Sessions 14, 15 and 23 depend on load, slope and floor changing that distance.
-3. Sensor conditions in Level 1 are single picture blocks (e.g. repeat_until with cond fixed to "bumped" or "distance_cm < 20"). The simulator needs a fixed-parameter way to render these without exposing the compare block.
-4. Is an empty repeat_until body (Level 1 “Wait until the path is clear”) acceptable to the block engine, or should it be a dedicated wait_until block? The curriculum assumes the former to keep the shared block set unchanged.
-5. Level 1 checks sensors only between blocks (e.g. before each hop). Should a motion block be interrupted the moment a repeat_until condition becomes true? The curriculum assumes NO at Level 1 (simpler, honest about the limitation) and teaches continuous checking with set_motors + forever in Level 2.
-6. The shared block set has no procedures/functions or lists. CSTA 2-AP-14 (procedures with parameters) is therefore not addressed; Level 3–4 would benefit from a “make a block” feature.
-7. say() must accept a number reporter as well as text: from Level 2 children report sensor readings and variables aloud (“say distance_cm”).
-8. Level 4 text view: a read-only Python-style view of each block program would bridge to the main R2BOT Academy and ROS 2. Not in the current block contract.
-9. Battery/energy model: Levels 1 (light), 3 (energy budget) and 4 (trade-offs) assume the simulator shows a battery meter that drops with motor power, mass and lights.
-10. Legs drive (Level 3): the curriculum assumes legs are slower on flat ground but can step over obstacles up to about half their leg height, where wheels stop. Confirm the physics model.
-11. Level 4 mapping (sessions 7–9) assumes a simulator overlay that can show a grid map the student fills in; there is no list/array block to store a map in code.
-12. Certificate language and any school-facing alignment claims should be reviewed by an education adviser before publication (see mapping.ts: alignment notes, not certification).
-13. Episodes are scripts with beats and lines for 3D animation; voice casting and localisation (the season is written for translation) are not yet planned.
+2. Level 1 calibration: tiles are 35 cm, because the sim’s Level 1 robots are 21–27 cm wide with wheels and turn on the spot inside a 25–33 cm circle (sim/robot-spec.ts; L1_GEOMETRY in level1/shared.ts). One hop is drive_for(80 %, N s): two-wheel drive tops out at 0.42 m/s, so 1 s ≈ 34 cm ≈ one tile on the flat mat with no load. Sessions 14, 15 and 23 depend on load, slope and floor changing that distance; S14 states its own calibration target. If the sim’s geometry or top speed changes, the doc script’s geometry check (checkL1Geometry) says which Level 1 numbers break.
+3. Level 1 sand (Session 15): two tiles of sand must slow two-wheel drive to roughly half speed, not stop it — the challenge pushes through with one extra hop. The current sim tuning makes two-wheel drive crawl at a few cm/s in sand (right for the Level 2 wheels-against-tracks fair test). Either add a shallower Level 1 “soft sand” surface or re-tune; until then S15 cannot be completed with Hop blocks.
+4. Pen position (Level 1 sessions 9–12): the drawings assume the pen draws under the robot’s centre, so a turn on the spot leaves a dot. sim/robot-spec.ts puts the pen tip at the back edge of the body, which draws a small arc at every turn and shifts every line. Move the pen to the centre, or the Level 1 drawing targets must be re-drawn.
+5. Dome body width: the dome with two-wheel drive is about 27 cm wide, leaving 4 cm a side in a 35 cm corridor (the tightest of the four bodies). It passes the geometry check, but any wider wheel track would not.
+6. Arenas with lanes (S14, S15 code tasks) list extraStarts: the sim resets the robot to each start in turn and runs the same program again.
+7. Success kind “uses-blocks” (S24): the simulator checks that the program contains, and actually runs, the named kinds of block (a loop, a sensor block, a tool block, a Say block).
+8. Quiz rendering: options should be shuffled per child per attempt (remapping the answer) unless a question sets keepOrder. The stored order is already balanced across Level 1 (checked by the doc script).
+9. distance_cm with no echo: the sim reports 200 (its maximum). Level 3 Session 20 (“a reading is lost”) relies on that value; keep it in the block contract.
+10. Sensor conditions in Level 1 are single picture blocks (e.g. repeat_until with cond fixed to "bumped" or "distance_cm < 20"). The simulator needs a fixed-parameter way to render these without exposing the compare block.
+11. Is an empty repeat_until body (Level 1 “Wait until the path is clear”) acceptable to the block engine, or should it be a dedicated wait_until block? The curriculum assumes the former to keep the shared block set unchanged.
+12. Level 1 checks sensors only between blocks (e.g. before each hop). Should a motion block be interrupted the moment a repeat_until condition becomes true? The curriculum assumes NO at Level 1 (simpler, honest about the limitation) and teaches continuous checking with set_motors + forever in Level 2.
+13. The shared block set has no procedures/functions or lists. CSTA 2-AP-14 (procedures with parameters) and 3A-AP-14 (lists) are therefore not addressed; Level 3–4 would benefit from a “make a block” feature and a list block.
+14. Contract requests for Levels 3–4, if the outlines are to go further: a wheel_distance_cm reporter (encoder distance, for odometry and for comparing commanded with measured motion) and sin / cos in math (odometry at any angle). Until then L3 S15 odometry is grid-aligned (90° turns only) and L4 S15 fault detection compares commands with distance_cm and heading_deg.
+15. say() must accept a number reporter as well as text: from Level 2 children report sensor readings and variables aloud (“say distance_cm”).
+16. Level 4 text view: a read-only Python-style view of each block program would bridge to the main R2BOT Academy and ROS 2. Not in the current block contract.
+17. Battery/energy model: Levels 1 (light), 3 (energy budget) and 4 (trade-offs) assume the simulator shows a battery meter that drops with motor power, mass and lights.
+18. Legs drive (Level 3): the curriculum assumes legs are slower on flat ground but can step over obstacles up to about half their leg height, where wheels stop. Confirm the physics model.
+19. Level 4 mapping (sessions 7–9) assumes a simulator overlay that can show a grid map the student fills in from readings the rover says aloud; there is no list/array block to store a map in code. The l4-p2 survey is therefore judged on the readings the rover reports, not on the student’s map.
+20. Certificate language and any school-facing alignment claims should be reviewed by an education adviser before publication (see mapping.ts: alignment notes, not certification).
+21. Episodes are scripts with beats and lines for 3D animation; voice casting and localisation (the season is written for translation) are not yet planned.

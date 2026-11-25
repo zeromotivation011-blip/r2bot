@@ -29,7 +29,7 @@ const REPEAT_LOTS: AllowedBlock = { id: 'repeat', label: 'Repeat lots of times',
 const FOG_PHYSICS =
   `${FLAT_MAT_PHYSICS} Visual fog: the 3D view and any camera see about one tile. ` +
   'Fog does not change touch (bumper) or sound (echo distance sensor) readings. ' +
-  `Creep = drive_for(30 %, 0.5 s) ≈ ${CREEP_CM} cm. Back off = drive_for(−30 %, 1 s) ≈ ${2 * CREEP_CM} cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.'
+  `Creep = drive_for(30 %, 0.5 s) ≈ ${CREEP_CM} cm. Back off = drive_for(−30 %, 1 s) ≈ ${2 * CREEP_CM} cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.`
 
 const ECHO_PHYSICS =
   `${FOG_PHYSICS} Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (±12° to the sides, tilting down to 30° so low things ahead are found too), about ±1 cm on hard flat surfaces; reads 200 when nothing echoes. ` +
@@ -166,9 +166,9 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: 'What does a bumper help a robot do?',
-        options: [{ text: 'See colours', icon: '🎨' }, { text: 'Feel a touch', icon: '✋' }, { text: 'Go faster', icon: '💨' }],
+        options: [{ text: 'See the wall before it gets there', icon: '👀' }, { text: 'Feel a touch', icon: '✋' }, { text: 'Go faster', icon: '💨' }],
         answer: 1,
-        why: 'A bumper is a touch sensor. When it touches something, a switch clicks and the robot knows.',
+        why: 'A bumper is a touch sensor. When it touches something, a switch clicks and the robot knows. Before the touch, it knows nothing.',
       },
       {
         prompt: 'The wall is a different distance every time. What works?',
@@ -340,20 +340,21 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: '“If I feel a bump, I turn.” When does the robot turn?',
-        options: [{ text: 'Every time', icon: '🔁' }, { text: 'Only when it feels a bump', icon: '🛡️' }],
-        answer: 1,
+        options: [{ text: 'Only when it feels a bump', icon: '🛡️' }, { text: 'Every time', icon: '🔁' }],
+        answer: 0,
         why: '“If” means only sometimes: only when the bumper clicks.',
       },
       {
         prompt: 'Sense, think, act. Which part is the “if”?',
         options: [{ text: 'Sense', icon: '👂' }, { text: 'Think', icon: '💭' }, { text: 'Act', icon: '🏃' }],
         answer: 1,
+        keepOrder: true,
         why: 'The bumper senses. The “if” thinks — it decides what to do. Turning is the act.',
       },
       {
         prompt: 'Look at this new maze picture. Every corner turns right, like ours. Will your bump-and-turn-right rule find Bolt?',
-        options: [{ text: 'Yes — the same rule works', icon: '✅' }, { text: 'No — it only works in our maze', icon: '❌' }],
-        answer: 0,
+        options: [{ text: 'No — it only works in our maze', icon: '❌' }, { text: 'Yes — the same rule works', icon: '✅' }],
+        answer: 1,
         why: 'The rule does not need the map. In any maze where every corner turns right, bump-and-turn-right works.',
       },
     ],
@@ -517,8 +518,8 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: 'How do Distance Eyes know something is close?',
-        options: [{ text: 'They listen for an echo', icon: '🦇' }, { text: 'They touch it', icon: '✋' }, { text: 'They see it, like our eyes', icon: '👁️' }],
-        answer: 0,
+        options: [{ text: 'They touch it', icon: '✋' }, { text: 'They see it, like our eyes', icon: '👁️' }, { text: 'They listen for an echo', icon: '🦇' }],
+        answer: 2,
         why: 'They send a sound and listen for the echo. A quick echo means something is close. They do not see pictures at all.',
       },
       {
@@ -529,8 +530,8 @@ export const ACT4: Session[] = [
       },
       {
         prompt: 'To never bump into a friend, use…',
-        options: [{ text: 'Until I feel a bump', icon: '🛡️' }, { text: 'Until something is close', icon: '👀' }],
-        answer: 1,
+        options: [{ text: 'Until something is close', icon: '👀' }, { text: 'Until I feel a bump', icon: '🛡️' }],
+        answer: 0,
         why: 'A bumper only knows after the touch. Distance Eyes stop the robot before it touches.',
       },
     ],
@@ -703,8 +704,8 @@ export const ACT4: Session[] = [
       },
       {
         prompt: 'Who must make sure a robot is safe?',
-        options: [{ text: 'The robot, on its own', icon: '🤖' }, { text: 'The people who build and program it', icon: '🧑‍🔧' }],
-        answer: 1,
+        options: [{ text: 'The people who build and program it', icon: '🧑‍🔧' }, { text: 'The robot, on its own', icon: '🤖' }],
+        answer: 0,
         why: 'A robot only follows its program. The people who build and program it decide how careful it is.',
       },
       {
@@ -859,7 +860,7 @@ export const ACT4: Session[] = [
         features: [
           'One continuous helix around the gear shaft: up column 3, left along row 0, down column 0, right along row 3. Corner tiles are flat landings; the two tiles between landings slope up at 10° (about 12 cm per side, about 50 cm in all).',
           `Total rise about 50 cm. The clock-room landing over (3,3) is a deck 2 cm thick, so there is about 48 cm of headroom over the start tile — more than the tallest Level 1 robot (under ${OBSTACLE_MIN_CM} cm). It overlaps nothing else.`,
-          'The clock-room landing has a wall on its east side (the 4th “until close” stops at it) and the clock-face wall on its north side, about half a tile from the robot’s centre after the last turn — within reach of the scoop. Light 12 sits in a cog on that clock-face wall.',
+          'The clock-room landing has a wall on its east side (the 4th “until close” stops at it) and the clock-face wall on its north side, about half a tile (17.5 cm) from the robot’s centre after the last turn. Light 12 sits in a cog that sticks out about 6 cm from that wall, inside the scoop’s reach for every body.',
           `Every wall is ${OBSTACLE_MIN_CM} cm tall or more; each landing has a guard rail on its open edge.`,
         ],
         physics: RAMP_PHYSICS, requires: ['move', 'see-wall', 'grab'],
@@ -881,14 +882,14 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: 'On a hill, “Hop 3” goes…',
-        options: [{ text: 'Less far', icon: '⛰️' }, { text: 'Further', icon: '🏃' }, { text: 'Just the same', icon: '🟰' }],
-        answer: 0,
+        options: [{ text: 'Further', icon: '🏃' }, { text: 'Less far', icon: '⛰️' }, { text: 'Just the same', icon: '🟰' }],
+        answer: 1,
         why: 'Going uphill, part of the motor’s push lifts the robot, so each hop is shorter.',
       },
       {
         prompt: 'Why did “until close” work on every ramp?',
-        options: [{ text: 'It measures the real wall, wherever it is', icon: '👀' }, { text: 'Every ramp is the same length, so it was counted for us', icon: '📏' }],
-        answer: 0,
+        options: [{ text: 'Every ramp is the same length, so it was counted for us', icon: '📏' }, { text: 'It measures the real wall, wherever it is', icon: '👀' }],
+        answer: 1,
         why: 'The sensor measures the world as it really is, so hills and slips don’t fool it.',
       },
       {
@@ -1049,20 +1050,20 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: 'What do engineers do after testing finds a bug?',
-        options: [{ text: 'Hide it, because a good show has no bugs', icon: '🙈' }, { text: 'Fix it and test again', icon: '🔧' }],
-        answer: 1,
+        options: [{ text: 'Fix it and test again', icon: '🔧' }, { text: 'Hide it, because a good show has no bugs', icon: '🙈' }],
+        answer: 0,
         why: 'Bugs are normal. Find where it went wrong, fix it, and test again.',
       },
       {
         prompt: 'Your robot feels, hears echoes, and moves. Which is “act”?',
-        options: [{ text: 'Moving its wheels', icon: '🛞' }, { text: 'Hearing an echo', icon: '🦇' }, { text: 'Feeling a bump', icon: '🛡️' }],
-        answer: 0,
+        options: [{ text: 'Hearing an echo', icon: '🦇' }, { text: 'Feeling a bump', icon: '🛡️' }, { text: 'Moving its wheels', icon: '🛞' }],
+        answer: 2,
         why: 'Feeling and hearing are sensing. Moving is acting. The program in between is thinking.',
       },
       {
         prompt: 'Why use a loop in your show?',
-        options: [{ text: 'To repeat steps with fewer blocks', icon: '🔁' }, { text: 'To make the program longer, because longer is better', icon: '📜' }],
-        answer: 0,
+        options: [{ text: 'To make the program longer, because longer is better', icon: '📜' }, { text: 'To repeat steps with fewer blocks', icon: '🔁' }],
+        answer: 1,
         why: 'A loop repeats steps, so you don’t have to put the same blocks in again and again.',
       },
     ],

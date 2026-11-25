@@ -262,7 +262,7 @@ export const LEVEL_CSTA: Record<LevelNumber, { focus: string[]; notCovered: stri
   },
   4: {
     focus: ['3A-AP-13', '3A-AP-15', '3A-AP-16', '3A-AP-21', '3A-AP-22', '3A-AP-23', '3A-CS-01', '3A-CS-03', '3A-DA-12', '3A-IC-24', '3A-IC-26'],
-    notCovered: ['3A-AP-17 only partly (no procedures in the block set).', 'Networks, cybersecurity and most of 3B (Grades 11–12).'],
+    notCovered: ['3A-AP-14 (use lists to simplify solutions): the shared block set has no lists, so maps and logs are kept in a few named variables or on paper (see OPEN_QUESTIONS).', '3A-AP-17 only partly (no procedures in the block set).', 'Networks, cybersecurity and most of 3B (Grades 11–12).'],
   },
 }
 

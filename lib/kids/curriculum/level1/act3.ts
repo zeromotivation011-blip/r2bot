@@ -135,8 +135,8 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'Which tool carries a ball?',
-        options: [{ text: 'Scoop', icon: '🥄' }, { text: 'Pen', icon: '🖊️' }],
-        answer: 0,
+        options: [{ text: 'Pen', icon: '🖊️' }, { text: 'Scoop', icon: '🥄' }],
+        answer: 1,
         why: 'A scoop can hold things. A pen draws — it can only push a ball away.',
       },
       {
@@ -313,14 +313,14 @@ export const ACT3: Session[] = [
       },
       {
         prompt: 'Your robot stopped short. What do you do?',
-        options: [{ text: 'Test, then add a hop', icon: '🧪' }, { text: 'Wait for tomorrow — the robot is weaker today', icon: '😴' }],
-        answer: 0,
+        options: [{ text: 'Wait for tomorrow — the robot is weaker today', icon: '😴' }, { text: 'Test, then add a hop', icon: '🧪' }],
+        answer: 1,
         why: 'Nothing is broken! Test, see where it stops, and change the program.',
       },
       {
         prompt: 'Why is pushing a full pram uphill harder?',
-        options: [{ text: 'The hill pulls heavy things back down', icon: '⬇️' }, { text: 'Prams don’t like hills', icon: '😠' }],
-        answer: 0,
+        options: [{ text: 'Prams don’t like hills', icon: '😠' }, { text: 'The hill pulls heavy things back down', icon: '⬇️' }],
+        answer: 1,
         why: 'Gravity pulls everything down. Going uphill, you push against it — more weight, more push.',
       },
     ],
@@ -422,7 +422,7 @@ export const ACT3: Session[] = [
       narration: 'Look at your robot’s tyres. They are rubber, with little bumps, to grip the floor.',
       why: 'Grip lets the wheels push the robot forward and stop it. Less grip means slipping and sliding.',
       tryWithout: 'On ice there is hardly any grip — the robot slides past where it stopped.',
-      physicsEffect: 'Friction: mat high, ice very low (about a tenth of the mat), sand adds rolling resistance (wheels sink 1 cm).',
+      physicsEffect: 'Friction: mat high, ice very low (friction 0.05 against 0.8 on the mat), sand adds rolling resistance (wheels sink 1 cm).',
       realWorld: 'Rescue robots use tank tracks to cross sand and rubble — you will meet tracks in Level 2.',
     },
     code: {
@@ -478,8 +478,8 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'On ice, the robot stops its wheels. What happens?',
-        options: [{ text: 'It keeps sliding', icon: '⛸️' }, { text: 'It stops at once', icon: '🛑' }],
-        answer: 0,
+        options: [{ text: 'It stops at once', icon: '🛑' }, { text: 'It keeps sliding', icon: '⛸️' }],
+        answer: 1,
         why: 'Ice is slippery, so the wheels cannot grip to stop the robot. It slides on.',
       },
       {
@@ -490,8 +490,8 @@ export const ACT3: Session[] = [
       },
       {
         prompt: 'Why does the robot go less far in sand?',
-        options: [{ text: 'The wheels sink and it is hard to roll', icon: '🏖️' }, { text: 'Sand is slippery, like ice', icon: '🧊' }],
-        answer: 0,
+        options: [{ text: 'Sand is slippery, like ice', icon: '🧊' }, { text: 'The wheels sink and it is hard to roll', icon: '🏖️' }],
+        answer: 1,
         why: 'Soft sand lets the wheels sink in, so rolling takes more push.',
       },
     ],
@@ -661,8 +661,8 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'Can our robot see when the bridge is down?',
-        options: [{ text: 'No — we plan the wait for it', icon: '🙈' }, { text: 'Yes — the Wait block watches the bridge', icon: '⏳' }],
-        answer: 0,
+        options: [{ text: 'Yes — the Wait block watches the bridge', icon: '⏳' }, { text: 'No — we plan the wait for it', icon: '🙈' }],
+        answer: 1,
         why: 'Our robot has no sensor that can see the bridge. So we count the time and plan a wait.',
       },
       {
@@ -833,8 +833,8 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'Spark’s camera is an ordinary camera, like your eyes. Can it see in total darkness?',
-        options: [{ text: 'No, it needs light', icon: '🌑' }, { text: 'Yes — it sends out its own beam to see', icon: '🔦' }],
-        answer: 0,
+        options: [{ text: 'Yes — it sends out its own beam to see', icon: '🔦' }, { text: 'No, it needs light', icon: '🌑' }],
+        answer: 1,
         why: 'Ordinary cameras, like eyes, catch light that bounces off things. They do not send out a beam. No light, nothing to see.',
       },
       {
@@ -991,8 +991,8 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'What do engineers ask first?',
-        options: [{ text: 'What does the person need?', icon: '🙋' }, { text: 'What colour is cool?', icon: '🌈' }],
-        answer: 0,
+        options: [{ text: 'What colour is cool?', icon: '🌈' }, { text: 'What does the person need?', icon: '🙋' }],
+        answer: 1,
         why: 'Good design starts with the person and what they need. Then you choose the parts.',
       },
       {

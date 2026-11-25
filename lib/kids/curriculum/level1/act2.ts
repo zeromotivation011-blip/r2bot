@@ -135,8 +135,8 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'What is an algorithm?',
-        options: [{ text: 'Steps in order to do a job', icon: '📋' }, { text: 'A special robot part', icon: '🔩' }],
-        answer: 0,
+        options: [{ text: 'A special robot part', icon: '🔩' }, { text: 'Steps in order to do a job', icon: '📋' }],
+        answer: 1,
         why: 'An algorithm is a plan of steps in order — like a recipe or the way to school.',
       },
       {
@@ -147,8 +147,8 @@ export const ACT2: Session[] = [
       },
       {
         prompt: 'A path goes straight, turns, then goes straight. How many turn blocks?',
-        options: [{ text: 'One', icon: '1️⃣' }, { text: 'Three', icon: '3️⃣' }],
-        answer: 0,
+        options: [{ text: 'Three', icon: '3️⃣' }, { text: 'One', icon: '1️⃣' }],
+        answer: 1,
         why: 'Straight, turn, straight has only one turn. Count the corners on the path.',
       },
     ],
@@ -311,8 +311,8 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'What is a bug in a program?',
-        options: [{ text: 'A mistake in the steps', icon: '🐞' }, { text: 'A broken robot', icon: '💔' }],
-        answer: 0,
+        options: [{ text: 'A broken robot', icon: '💔' }, { text: 'A mistake in the steps', icon: '🐞' }],
+        answer: 1,
         why: 'A bug is a mistake in the program — the robot is fine, the steps are wrong. Engineers called mistakes bugs long ago; once they even found a real moth in a computer and joked it was a real bug.',
       },
       {
@@ -492,14 +492,14 @@ export const ACT2: Session[] = [
       },
       {
         prompt: 'You forgot "pen up". What happens next time the robot moves?',
-        options: [{ text: 'It keeps drawing', icon: '〰️' }, { text: 'It stops drawing', icon: '🚫' }],
-        answer: 0,
+        options: [{ text: 'It stops drawing', icon: '🚫' }, { text: 'It keeps drawing', icon: '〰️' }],
+        answer: 1,
         why: 'The pen stays down until a block lifts it. So it keeps drawing!',
       },
       {
         prompt: 'Why is a pen useful for checking a program?',
-        options: [{ text: 'You can see the path it took', icon: '👀' }, { text: 'Pen down steers the robot for you', icon: '🖊️' }],
-        answer: 0,
+        options: [{ text: 'Pen down steers the robot for you', icon: '🖊️' }, { text: 'You can see the path it took', icon: '👀' }],
+        answer: 1,
         why: 'The line shows exactly where the robot went — great for finding bugs.',
       },
     ],
@@ -668,8 +668,8 @@ export const ACT2: Session[] = [
       },
       {
         prompt: 'Repeat 3 { clap }. How many claps?',
-        options: [{ text: '3', icon: '👏👏👏' }, { text: '4 — once, then 3 more', icon: '👏👏👏👏' }],
-        answer: 0,
+        options: [{ text: '4 — once, then 3 more', icon: '👏👏👏👏' }, { text: '3', icon: '👏👏👏' }],
+        answer: 1,
         why: 'Repeat 3 means do it three times: clap, clap, clap!',
       },
     ],
@@ -978,14 +978,14 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'What does Repeat 4 around "draw a square, turn" make?',
-        options: [{ text: 'Four squares around a point, like a flower', icon: '🌸' }, { text: 'One big square', icon: '⬜' }],
-        answer: 0,
+        options: [{ text: 'One big square', icon: '⬜' }, { text: 'Four squares around a point, like a flower', icon: '🌸' }],
+        answer: 1,
         why: 'Each time round it draws a square, then turns. Four squares make a flower shape.',
       },
       {
         prompt: 'How do you move to a new spot without drawing?',
-        options: [{ text: 'Pen up, then hop', icon: '🖊️⬆️' }, { text: 'Pen down, then hop', icon: '🖊️⬇️' }],
-        answer: 0,
+        options: [{ text: 'Pen down, then hop', icon: '🖊️⬇️' }, { text: 'Pen up, then hop', icon: '🖊️⬆️' }],
+        answer: 1,
         why: 'With the pen up the robot moves without drawing a line.',
       },
       {

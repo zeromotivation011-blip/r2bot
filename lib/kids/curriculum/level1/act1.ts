@@ -154,14 +154,14 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'Which one is a robot?',
-        options: [{ text: 'A spoon', icon: '🥄' }, { text: 'A robot vacuum that turns when it bumps a chair', icon: '🤖' }, { text: 'A torch with a battery', icon: '🔦' }],
-        answer: 1,
+        options: [{ text: 'A robot vacuum that turns when it bumps a chair', icon: '🤖' }, { text: 'A spoon', icon: '🥄' }, { text: 'A torch with a battery', icon: '🔦' }],
+        answer: 0,
         why: 'The robot vacuum senses the chair, thinks "turn!", and acts by turning. Sense, think, act! A torch has a battery, but it cannot sense or decide.',
       },
       {
         prompt: 'What does the battery give a robot?',
-        options: [{ text: 'Energy', icon: '⚡' }, { text: 'Eyes', icon: '👀' }, { text: 'A name', icon: '🏷️' }],
-        answer: 0,
+        options: [{ text: 'Eyes', icon: '👀' }, { text: 'Energy', icon: '⚡' }, { text: 'A name', icon: '🏷️' }],
+        answer: 1,
         why: 'A battery stores energy. The robot uses that energy to think and to move.',
       },
       {
@@ -330,8 +330,8 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'What makes the wheels turn?',
-        options: [{ text: 'A motor', icon: '⚙️' }, { text: 'Wind', icon: '🌬️' }, { text: 'The robot knows where to go, so they turn by themselves', icon: '💭' }],
-        answer: 0,
+        options: [{ text: 'Wind', icon: '🌬️' }, { text: 'The robot knows where to go, so they turn by themselves', icon: '💭' }, { text: 'A motor', icon: '⚙️' }],
+        answer: 2,
         why: 'A motor spins when it gets energy from the battery, and the spin turns the wheel.',
       },
       {
@@ -342,8 +342,8 @@ export const ACT1: Session[] = [
       },
       {
         prompt: 'Why does the robot have a little ball at the back?',
-        options: [{ text: 'To hold it up and roll any way', icon: '⚪' }, { text: 'To make it go faster', icon: '💨' }],
-        answer: 0,
+        options: [{ text: 'To make it go faster', icon: '💨' }, { text: 'To hold it up and roll any way', icon: '⚪' }],
+        answer: 1,
         why: 'The ball is called a caster. It balances the robot and rolls in any direction.',
       },
     ],
@@ -505,8 +505,8 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'A cart is crossing. What should the robot do?',
-        options: [{ text: 'Wait', icon: '✋' }, { text: 'Keep going — the robot will see the cart and stop', icon: '👀' }],
-        answer: 0,
+        options: [{ text: 'Keep going — the robot will see the cart and stop', icon: '👀' }, { text: 'Wait', icon: '✋' }],
+        answer: 1,
         why: 'Wait until the way is clear, then go. That is how robots — and people — stay safe.',
       },
       {
@@ -517,8 +517,8 @@ export const ACT1: Session[] = [
       },
       {
         prompt: 'Does a robot wait by itself if we forget the Wait block?',
-        options: [{ text: 'Yes', icon: '👍' }, { text: 'No', icon: '👎' }],
-        answer: 1,
+        options: [{ text: 'No', icon: '👎' }, { text: 'Yes', icon: '👍' }],
+        answer: 0,
         why: 'No. The robot only does what the program says. If there is no Wait, it does not wait.',
       },
     ],
@@ -680,14 +680,14 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'Why does a robot show a face or say what it will do?',
-        options: [{ text: 'So people know what it will do', icon: '🙂' }, { text: 'Because talking makes it move', icon: '🗣️' }],
-        answer: 0,
+        options: [{ text: 'Because talking makes it move', icon: '🗣️' }, { text: 'So people know what it will do', icon: '🙂' }],
+        answer: 1,
         why: 'When people know what a robot will do next, they feel safe and are not surprised.',
       },
       {
         prompt: 'When should the robot say "I am going forward"?',
-        options: [{ text: 'Before it moves', icon: '⏮️' }, { text: 'After it moves', icon: '⏭️' }],
-        answer: 0,
+        options: [{ text: 'After it moves', icon: '⏭️' }, { text: 'Before it moves', icon: '⏮️' }],
+        answer: 1,
         why: 'Telling people before you move gives them time to get out of the way.',
       },
       {
@@ -858,8 +858,8 @@ export const ACT1: Session[] = [
       },
       {
         prompt: 'Look at the picture: you are standing behind the robot, looking the same way it looks. It turns right. Which way does it go?',
-        options: [{ text: 'To my right', icon: '👉' }, { text: 'To my left', icon: '👈' }],
-        answer: 0,
+        options: [{ text: 'To my left', icon: '👈' }, { text: 'To my right', icon: '👉' }],
+        answer: 1,
         why: 'When you look the same way as the robot, its right is your right. Pretend you are inside the robot!',
       },
       {
@@ -1012,20 +1012,20 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'What do engineers do first?',
-        options: [{ text: 'Plan and draw', icon: '✏️' }, { text: 'Press Go and hope', icon: '🤞' }],
-        answer: 0,
+        options: [{ text: 'Press Go and hope', icon: '🤞' }, { text: 'Plan and draw', icon: '✏️' }],
+        answer: 1,
         why: 'Planning first helps you build the right thing. Then you test it.',
       },
       {
         prompt: 'Your dance bumped the edge. What do you do?',
-        options: [{ text: 'Throw the plan away — it was a bad plan', icon: '🗑️' }, { text: 'Change a step and try again', icon: '🔧' }],
-        answer: 1,
+        options: [{ text: 'Change a step and try again', icon: '🔧' }, { text: 'Throw the plan away — it was a bad plan', icon: '🗑️' }],
+        answer: 0,
         why: 'Try, look, fix, try again. Every engineer does this — mistakes help us learn.',
       },
       {
         prompt: 'Hop forward, then hop back. Where is the robot?',
-        options: [{ text: 'Back where it started', icon: '⭐' }, { text: 'Two squares away', icon: '➡️' }],
-        answer: 0,
+        options: [{ text: 'Two squares away', icon: '➡️' }, { text: 'Back where it started', icon: '⭐' }],
+        answer: 1,
         why: 'Going back undoes going forward, so the robot ends where it began.',
       },
     ],
