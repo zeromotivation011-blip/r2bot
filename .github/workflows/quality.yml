@@ -28,3 +28,5 @@ jobs:
         run: npm run type-check
       - name: Lint
         run: npm run lint
+      - name: Every Code Lab mission is solvable by its reference program
+        run: npx tsx lib/kids/code-lab/verify.ts

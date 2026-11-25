@@ -64,6 +64,8 @@ export const PAGE_UPDATED: Record<string, string> = {
   '/kids/parents': '2026-11-25T00:00:00.000Z',
   '/kids/activities': '2026-11-06T00:00:00.000Z',
   '/kids/schools': '2026-11-25T00:00:00.000Z',
+  '/kids/workshop': '2026-11-25T00:00:00.000Z',
+  '/kids/code-lab': '2026-11-25T00:00:00.000Z',
   '/teachers': '2026-11-06T00:00:00.000Z',
   '/about': '2026-11-08T00:00:00.000Z',
   '/about/how-this-is-written': '2026-11-08T00:00:00.000Z',

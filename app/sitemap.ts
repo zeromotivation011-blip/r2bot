@@ -21,6 +21,7 @@ import { ATLAS_ROBOTS_REDIRECTED } from '@/lib/canonical-map';
 import { getAllDailyLifeArticles } from '@/lib/daily-life-articles/loader';
 import { listTranslations, atlasPath } from '@/lib/atlas-i18n';
 import { ROS2_FIXES } from '@/lib/ros2-fixes';
+import { MISSIONS as KIDS_MISSIONS } from '@/lib/kids/code-lab/missions';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -185,6 +186,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/kids/parents`, lastModified: at('/kids/parents'), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE}/kids/activities`, lastModified: at('/kids/activities'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/schools`, lastModified: at('/kids/schools'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${BASE}/kids/workshop`, lastModified: at('/kids/workshop'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${BASE}/kids/code-lab`, lastModified: at('/kids/code-lab'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    ...KIDS_MISSIONS.map((m) => ({ url: `${BASE}/kids/code-lab/${m.id}`, lastModified: at('/kids/code-lab'), changeFrequency: 'monthly' as const, priority: 0.5 })),
     { url: `${BASE}/india`, lastModified: at('/india'), changeFrequency: 'monthly' as const, priority: 0.75 },
     { url: `${BASE}/teachers`, lastModified: at('/teachers'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/robots/compare`, lastModified: at('/robots/compare'), changeFrequency: 'monthly' as const, priority: 0.7 },

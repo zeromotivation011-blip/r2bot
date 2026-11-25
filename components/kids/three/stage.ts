@@ -40,7 +40,7 @@ export function createStage(container: HTMLElement, opts: StageOptions = {}): St
   renderer.toneMappingExposure = 1.05
   if (opts.shadows !== false) {
     renderer.shadowMap.enabled = true
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    renderer.shadowMap.type = THREE.PCFShadowMap
   }
   renderer.xr.enabled = opts.xr === true
   const canvas = renderer.domElement
@@ -86,17 +86,19 @@ export function createStage(container: HTMLElement, opts: StageOptions = {}): St
   ro.observe(container)
 
   let frameFn: ((t: number, dt: number, frame?: XRFrame) => void) | null = null
-  const clock = new THREE.Clock()
-  const loop = (_time: number, frame?: XRFrame) => {
-    const dt = Math.min(0.05, clock.getDelta())
-    frameFn?.(clock.elapsedTime, dt, frame)
+  const timer = new THREE.Timer()
+  const loop = (time: number, frame?: XRFrame) => {
+    timer.update(time)
+    const dt = Math.min(0.05, timer.getDelta())
+    frameFn?.(timer.getElapsed(), dt, frame)
     renderer.render(scene, camera)
   }
   let running = false
+  let disposed = false
   const start = () => {
     if (running) return
     running = true
-    clock.getDelta()
+    timer.reset()
     renderer.setAnimationLoop(loop)
   }
   const stop = () => {
@@ -117,6 +119,8 @@ export function createStage(container: HTMLElement, opts: StageOptions = {}): St
     },
     renderNow: () => renderer.render(scene, camera),
     dispose: () => {
+      if (disposed) return
+      disposed = true
       document.removeEventListener('visibilitychange', onVis)
       ro.disconnect()
       renderer.setAnimationLoop(null)
