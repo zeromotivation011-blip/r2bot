@@ -113,7 +113,7 @@ function spawn(ts: TrailSystem, kind: string | null, at: THREE.Vector3, t: numbe
       vx = (rand() - 0.5) * 0.12
       vy = 0.05 + rand() * 0.1
       vz = (rand() - 0.5) * 0.12
-      life = 1.1
+      life = 1.6
       break
     default:
       // No trail chosen: a little grey floor dust, so the test drive still reads.
@@ -243,6 +243,8 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
   const turntableRef = useRef<THREE.Group | null>(null)
   const trailKindRef = useRef<string | null>(look.trail)
   const driveRef = useRef<{ start: number; token: number } | null>(null)
+  /** Wake the render loop for a moment (needed when it sleeps: reduced motion, still scene). */
+  const wakeRef = useRef<() => void>(() => undefined)
   const cb = useRef({ onDriveEnd, onReady, onError })
   cb.current = { onDriveEnd, onReady, onError }
 
@@ -415,9 +417,12 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
 
     // Camera + orbit.
     camera.fov = 36
-    // Portrait phones see less width: step back so the test-drive loop stays in view.
+    // Portrait phones see less width: step back and drive a tighter loop so the
+    // whole test drive stays in view.
     const aspect = host.clientWidth / Math.max(1, host.clientHeight)
-    const back = aspect < 1.2 ? 1.3 : 1
+    const portrait = aspect < 1.2
+    const back = portrait ? 1.45 : 1
+    const loopR = portrait ? 1.05 : LOOP_R
     camera.position.set(2.5 * back, 1.55 * back, 3.3 * back)
     camera.updateProjectionMatrix()
     const controls = new OrbitControls(camera, renderer.domElement)
@@ -434,6 +439,32 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
     controls.addEventListener('start', () => {
       spin = false
     })
+
+    // Only draw while someone can see it. Off-screen (scrolled down to the badge
+    // wall) the loop sleeps. With reduced motion nothing moves on its own, so the
+    // loop also sleeps once the scene is drawn, and wakes for drives, drags,
+    // look changes and resizes.
+    let visible = true
+    let awakeUntil = performance.now() + 1500
+    const needsFrames = () => !reduced || driveRef.current !== null || performance.now() < awakeUntil
+    const sync = () => stage.setActive(visible && needsFrames())
+    const wake = () => {
+      awakeUntil = performance.now() + 1200
+      sync()
+    }
+    wakeRef.current = wake
+    controls.addEventListener('change', wake)
+    const io = new IntersectionObserver(
+      ([e]) => {
+        visible = e.isIntersecting
+        if (visible) wake()
+        else sync()
+      },
+      { threshold: 0.01 },
+    )
+    io.observe(host)
+    const ro = new ResizeObserver(() => wake())
+    ro.observe(host)
 
     const at = new THREE.Vector3()
     let spawnAcc = 0
@@ -465,17 +496,18 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
           } else {
             // A figure-eight through the turntable (lemniscate of Gerono).
             const th = p * Math.PI * 2
-            const x = LOOP_R * Math.sin(th)
-            const z = LOOP_R * Math.sin(th) * Math.cos(th)
-            const dx = LOOP_R * Math.cos(th)
-            const dz = LOOP_R * Math.cos(2 * th)
+            const x = loopR * Math.sin(th)
+            const z = loopR * Math.sin(th) * Math.cos(th)
+            const dx = loopR * Math.cos(th)
+            const dz = loopR * Math.cos(2 * th)
             const r = Math.hypot(x, z)
             const lift = r < PLATFORM_R - 0.05 ? PLATFORM_H : r < PLATFORM_R + 0.15 ? PLATFORM_H * (1 - (r - PLATFORM_R + 0.05) / 0.2) : 0
             robot.position.set(x, lift, z)
             robot.rotation.y = Math.atan2(dx, dz)
             moving = true
             // Emit behind the robot.
-            spawnAcc += dt * (trailKindRef.current === 'trail-rainbow' ? 140 : trailKindRef.current ? 90 : 40)
+            const kind = trailKindRef.current
+            spawnAcc += dt * (kind === 'trail-rainbow' || kind === 'trail-plasma' ? 140 : kind ? 90 : 40)
             const fx = Math.sin(robot.rotation.y)
             const fz = Math.cos(robot.rotation.y)
             while (spawnAcc >= 1) {
@@ -490,11 +522,18 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
       ;(trail.points.material as THREE.PointsMaterial).size = trailKindRef.current === 'trail-plasma' ? 0.2 : trailKindRef.current === 'trail-rainbow' ? 0.13 : 0.09
       stepTrail(trail, dt, trailKindRef.current, t)
       controls.update()
+      // Let trail particles fade out before a reduced-motion scene goes to sleep.
+      if (moving) awakeUntil = Math.max(awakeUntil, performance.now() + 1800)
+      if (!needsFrames()) stage.setActive(false)
     })
 
     cb.current.onReady()
 
     return () => {
+      io.disconnect()
+      ro.disconnect()
+      wakeRef.current = () => undefined
+      controls.removeEventListener('change', wake)
       controls.dispose()
       robotRef.current = null
       turntableRef.current = null
@@ -523,6 +562,7 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
     }
     ;(driveRef.current ? stage.scene : turntable).add(robot)
     robotRef.current = robot
+    wakeRef.current()
   }, [design, look.skin, look.decal])
 
   useEffect(() => {
@@ -542,6 +582,7 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
     robot.position.set(0, PLATFORM_H, 0)
     stage.scene.add(robot)
     driveRef.current = { start: -1, token: driveToken }
+    wakeRef.current()
   }, [driveToken])
 
   return <div ref={hostRef} role="img" aria-label={label} className="absolute inset-0" />

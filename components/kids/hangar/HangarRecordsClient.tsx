@@ -7,11 +7,20 @@
 // is read (server render, first paint) the lists render with neutral states so
 // the HTML is meaningful and the layout does not move.
 
+import Link from 'next/link'
 import { useId, useState } from 'react'
-import { TIER_NAMES } from '@/components/kids/ui/GameShellClient'
+import { SparkCharacter } from '@/components/kids/SparkCharacter'
 import { UNIVERSE_BADGES, type BadgeTrack, type UniverseBadge } from '@/lib/kids/universe/rewards'
+import { TIER_NAMES } from '@/lib/kids/universe/tiers'
 import { GAMES, PLANETS } from '@/lib/kids/universe/worlds'
 import { useHangarState } from './useHangarState'
+
+/** A course (curriculum) badge as the server passes it in: real names from the curriculum. */
+export interface CourseBadgeInfo {
+  name: string
+  icon: string
+  earnedFor: string
+}
 
 /** Every planet's season has 24 sessions (docs/kids-universe.md → The map). */
 export const SESSIONS_PER_PLANET = 24
@@ -36,7 +45,7 @@ function formatDay(iso: string): string {
   return Number.isNaN(d.getTime()) ? iso : dateFmt.format(d)
 }
 
-/** "l1-hello" → "Level 1 · Hello". Curriculum badges are named by their session; we only have the id here. */
+/** Fallback only, for a course badge the server did not describe: "l1-hello" → "Level 1 · Hello". */
 function courseBadgeName(id: string): string {
   const m = /^l(\d)-(.+)$/i.exec(id)
   const words = (m ? m[2] : id).replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
@@ -49,8 +58,12 @@ function formatScore(n: number): string {
 
 const card = 'rounded-[28px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4 shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:p-5'
 
-export function HangarRecordsClient() {
+export function HangarRecordsClient({ courseBadges = {} }: { courseBadges?: Record<string, CourseBadgeInfo> }) {
   const { ready, progress } = useHangarState()
+  const [showAll, setShowAll] = useState(false)
+  const [openCourse, setOpenCourse] = useState<string | null>(null)
+  const wallId = useId()
+  const courseInfoId = useId()
   const earned = progress.badges
   const earnedCount = UNIVERSE_BADGES.filter((b) => earned[b.id]).length
   const known = new Set(UNIVERSE_BADGES.map((b) => b.id))
@@ -65,6 +78,10 @@ export function HangarRecordsClient() {
     return { planet: p, done: done.length, stars }
   })
   const closest = [...planetStats].filter((s) => s.done > 0).sort((a, b) => b.done - a.done)[0]
+  // A child with no badges yet sees one friendly next step, not 25 grey tiles.
+  const empty = ready && earnedCount === 0 && other.length === 0
+  const wallOpen = !empty || showAll
+  const openInfo = openCourse ? courseBadges[openCourse] : undefined
 
   return (
     <div className="mx-auto max-w-6xl space-y-4 px-4 pt-4">
@@ -78,7 +95,35 @@ export function HangarRecordsClient() {
             {ready ? `${earnedCount} of ${UNIVERSE_BADGES.length} Universe badges` : `${UNIVERSE_BADGES.length} Universe badges`}
           </p>
         </div>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        {empty && (
+          <div className="mt-4 flex flex-col items-center gap-4 rounded-[20px] border border-amber-400/25 bg-amber-500/[0.06] p-4 text-center sm:flex-row sm:text-left">
+            <div inert aria-hidden className="shrink-0">
+              <SparkCharacter mood="happy" size={84} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-display text-xl font-bold text-white">Your first badge is one drive away</p>
+              <p className="mt-1 text-base text-[#A7B0C0]">Make your robot move with your own program in the Code Lab and the First Drive badge lands here.</p>
+              <div className="mt-3 flex flex-wrap justify-center gap-3 sm:justify-start">
+                <Link
+                  href="/kids/code-lab"
+                  className="inline-flex min-h-[48px] items-center justify-center rounded-2xl bg-amber-500 px-5 font-display text-base font-bold text-[#1A1103] transition hover:-translate-y-0.5 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.97]"
+                >
+                  Try the Code Lab
+                </Link>
+                <button
+                  type="button"
+                  aria-expanded={showAll}
+                  aria-controls={wallId}
+                  onClick={() => setShowAll((v) => !v)}
+                  className="inline-flex min-h-[48px] items-center justify-center rounded-2xl border border-white/15 bg-white/[0.06] px-5 font-display text-base font-bold text-white transition hover:border-white/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.97]"
+                >
+                  {showAll ? 'Hide the badges' : `See all ${UNIVERSE_BADGES.length} badges`}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        <div id={wallId} className={wallOpen ? 'mt-4 grid gap-4 md:grid-cols-2' : 'hidden'}>
           {TRACKS.map((t) => {
             const list = UNIVERSE_BADGES.filter((b) => b.track === t.id)
             if (!list.length) return null
@@ -91,20 +136,42 @@ export function HangarRecordsClient() {
         {ready && other.length > 0 && (
           <div className="mt-4 rounded-[20px] border border-white/[0.08] bg-[#0A1120]/50 p-3">
             <h3 className="font-display text-lg font-bold text-white">Course badges</h3>
-            <p className="text-sm text-[#6E7888]">Earned by finishing sessions on a planet.</p>
+            <p className="text-sm text-[#A7B0C0]">Earned by finishing sessions on a planet. Tap one to see why.</p>
             <ul className="mt-2 grid gap-2 sm:grid-cols-2">
-              {other.map(([id, day]) => (
-                <li key={id} className="flex items-center gap-3 rounded-2xl border border-amber-400/30 bg-amber-500/[0.07] p-2.5">
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber-500/20 text-2xl" aria-hidden>
-                    🏅
-                  </span>
-                  <span>
-                    <span className="block font-display font-bold text-white">{courseBadgeName(id)}</span>
-                    <span className="block text-xs text-[#A7B0C0]">Earned {formatDay(day)}</span>
-                  </span>
-                </li>
-              ))}
+              {other.map(([id, day]) => {
+                const info = courseBadges[id]
+                const on = openCourse === id
+                return (
+                  <li key={id}>
+                    <button
+                      type="button"
+                      aria-expanded={on}
+                      aria-controls={courseInfoId}
+                      onClick={() => setOpenCourse(on ? null : id)}
+                      className={`flex min-h-[64px] w-full items-center gap-3 rounded-2xl border-2 bg-amber-500/[0.07] p-2.5 text-left transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.97] ${
+                        on ? 'border-amber-400' : 'border-amber-400/30'
+                      }`}
+                    >
+                      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber-500/20 text-2xl" aria-hidden>
+                        {info?.icon ?? '🏅'}
+                      </span>
+                      <span>
+                        <span className="block font-display font-bold text-white">{info?.name ?? courseBadgeName(id)}</span>
+                        <span className="block text-sm text-[#A7B0C0]">Earned {formatDay(day)}</span>
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
             </ul>
+            <div id={courseInfoId} aria-live="polite" className={openCourse ? 'mt-2 rounded-2xl bg-white/[0.04] p-3 text-sm text-[#A7B0C0]' : 'sr-only'}>
+              {openCourse && (
+                <p>
+                  <span className="font-display font-bold text-white">{openInfo?.name ?? courseBadgeName(openCourse)}: </span>
+                  {openInfo ? openInfo.earnedFor : 'Earned by finishing a session on a planet.'}
+                </p>
+              )}
+            </div>
           </div>
         )}
       </section>
@@ -120,24 +187,35 @@ export function HangarRecordsClient() {
             const bests = TIER_NAMES.slice(0, g.tiers).map((tier, i) => ({ tier, v: progress.personalBests[`${g.id}:t${i}`] }))
             const any = bests.some((b) => b.v !== undefined)
             return (
-              <li key={g.id} className="overflow-hidden rounded-[20px] border border-white/[0.08] bg-[#0A1120]/50">
-                <div className={`flex items-center gap-3 bg-gradient-to-r ${g.gradient} px-3 py-2`}>
-                  <span className="text-2xl" aria-hidden>
-                    {g.emoji}
-                  </span>
-                  <h3 className="font-display text-base font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,.5)]">{g.name}</h3>
-                </div>
-                <dl className="grid grid-cols-4 gap-1 p-2">
-                  {bests.map((b) => (
-                    <div key={b.tier} className="rounded-xl bg-white/[0.04] px-1 py-2 text-center">
-                      <dt className="text-[11px] font-semibold uppercase tracking-wide text-[#A7B0C0]">{b.tier}</dt>
-                      <dd className={`font-display text-base font-bold ${b.v !== undefined ? 'text-white' : 'text-[#6E7888]'}`}>
-                        {ready && b.v !== undefined ? formatScore(b.v) : '—'}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-                {ready && !any && <p className="px-3 pb-3 text-xs text-[#6E7888]">Not played yet.</p>}
+              <li key={g.id}>
+                <Link
+                  href={`/kids/play/${g.id}`}
+                  className="group block h-full overflow-hidden rounded-[20px] border border-white/[0.08] bg-[#0A1120]/50 transition hover:-translate-y-0.5 hover:border-white/25 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.98]"
+                >
+                  <div className={`flex min-h-[48px] items-center gap-3 bg-gradient-to-r ${g.gradient} px-3 py-2`}>
+                    <span className="text-2xl" aria-hidden>
+                      {g.emoji}
+                    </span>
+                    <h3 className="flex-1 font-display text-base font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,.5)]">{g.name}</h3>
+                    <span className="font-display text-sm font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,.5)]" aria-hidden>
+                      Play →
+                    </span>
+                  </div>
+                  {ready && !any ? (
+                    <p className="flex min-h-[64px] items-center px-3 text-sm text-[#A7B0C0]">Not played yet. Play a round and your best score lands here.</p>
+                  ) : (
+                    <dl className="grid min-h-[64px] grid-cols-4 gap-1 p-2">
+                      {bests.map((b) => (
+                        <div key={b.tier} className="rounded-xl bg-white/[0.04] px-1 py-2 text-center">
+                          <dt className="text-xs font-semibold uppercase tracking-wide text-[#A7B0C0]">{b.tier}</dt>
+                          <dd className={`font-display text-base font-bold ${b.v !== undefined ? 'text-white' : 'text-[#A7B0C0]'}`}>
+                            {ready && b.v !== undefined ? formatScore(b.v) : '—'}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                </Link>
               </li>
             )
           })}
@@ -178,7 +256,7 @@ export function HangarRecordsClient() {
                 >
                   <div className={`h-full rounded-full bg-gradient-to-r ${planet.gradient}`} style={{ width: `${ready ? pct : 0}%` }} />
                 </div>
-                <p className="mt-2 text-xs text-[#6E7888]">{planet.tagline}</p>
+                <p className="mt-2 text-sm text-[#A7B0C0]">{planet.tagline}</p>
               </li>
             )
           })}
@@ -234,13 +312,13 @@ function TrackCard({
   const sel = list.find((b) => b.id === open) ?? null
   const selDate = sel ? earned[sel.id] : undefined
   return (
-    <div className="rounded-[20px] border border-white/[0.08] bg-[#0A1120]/50 p-3">
+    <div className="rounded-[20px] border border-white/[0.08] bg-[#0A1120]/50 p-2.5 sm:p-3">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="font-display text-lg font-bold text-white">{label}</h3>
         <span className="text-xs font-semibold text-[#A7B0C0]">{ready ? `${got}/${list.length}` : `${list.length} badges`}</span>
       </div>
-      <p className="text-sm text-[#6E7888]">{line}</p>
-      <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+      <p className="text-sm text-[#A7B0C0]">{line}</p>
+      <ul className="mt-3 grid grid-cols-4 gap-1.5 sm:gap-2">
         {list.map((b) => {
           const have = ready && Boolean(earned[b.id])
           const on = open === b.id
@@ -251,7 +329,7 @@ function TrackCard({
                 aria-expanded={on}
                 aria-controls={panelId}
                 onClick={() => setOpen(on ? null : b.id)}
-                className={`flex min-h-[112px] w-full flex-col items-center gap-1.5 rounded-2xl border-2 px-1.5 py-2.5 text-center transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.97] ${
+                className={`flex h-full min-h-[112px] w-full flex-col items-center gap-1.5 rounded-2xl border-2 px-1 py-2.5 text-center transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.97] ${
                   on ? 'border-amber-400' : have ? 'border-amber-400/30' : 'border-white/[0.06]'
                 } ${have ? 'bg-amber-500/[0.08]' : 'bg-white/[0.02]'}`}
               >
@@ -263,8 +341,10 @@ function TrackCard({
                 >
                   {b.icon}
                 </span>
-                <span className="font-display text-[13px] font-bold leading-tight text-white">{b.name}</span>
-                <span className={`text-[11px] font-semibold leading-tight ${have ? 'text-amber-300' : 'text-[#6E7888]'}`}>
+                <span className="hyphens-auto font-display text-sm font-bold leading-tight text-white [overflow-wrap:anywhere]" lang="en">
+                  {b.name}
+                </span>
+                <span className={`mt-auto text-xs font-semibold leading-tight ${have ? 'text-amber-300' : 'text-[#A7B0C0]'}`}>
                   {!ready ? '\u00A0' : have ? formatDay(earned[b.id]) : 'Not yet'}
                 </span>
               </button>

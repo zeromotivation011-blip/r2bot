@@ -22,25 +22,26 @@ import './universe.css'
 /** [phone x%, phone y%, wide x%, wide y%] — centre of each body. */
 type Pos = [number, number, number, number]
 
+// Phone y stays at or below 88% so the bottom row (moon + label) ends inside the map.
 const PLANET_POS: Record<string, Pos> = {
-  spark: [24.6, 16.5, 20, 21],
-  gearon: [78, 31, 79, 19],
-  nova: [75, 80.5, 79, 73],
-  apex: [25, 74, 21, 71],
+  spark: [24.6, 15, 20, 21],
+  gearon: [78, 28.5, 79, 19],
+  nova: [75, 75.5, 79, 73],
+  apex: [25, 69.5, 21, 71],
 }
 
 const GAME_POS: Record<string, Pos> = {
-  'sumo-arena': [60, 9, 50, 9],
-  'drone-hover': [88, 9, 93, 44],
-  'arm-factory': [16, 42.2, 7, 45],
-  'circuit-city': [85, 53, 50, 88],
-  'mars-rover': [50, 73, 93, 88],
-  'robot-brain': [50, 93.3, 7, 88],
-  'maze-mapper': [16.8, 93.3, 34, 48],
-  'swarm-reef': [48, 33, 66, 48],
+  'sumo-arena': [60, 8, 50, 9],
+  'drone-hover': [88, 8, 91, 44],
+  'arm-factory': [16, 39.5, 9, 45],
+  'circuit-city': [85, 50, 50, 88],
+  'mars-rover': [50, 68.5, 91, 88],
+  'robot-brain': [50, 88, 9, 88],
+  'maze-mapper': [16.8, 88, 34, 48],
+  'swarm-reef': [48, 30.5, 66, 48],
 }
 
-const HANGAR_POS: Pos = [50, 53, 50, 48]
+const HANGAR_POS: Pos = [50, 50, 50, 48]
 
 function posStyle(p: Pos): CSSProperties {
   return { '--mx': `${p[0]}%`, '--my': `${p[1]}%`, '--dx': `${p[2]}%`, '--dy': `${p[3]}%` } as CSSProperties
@@ -228,7 +229,12 @@ function MoonNode({ game, index, childBand, played }: { game: UniverseGame; inde
           )}
         </span>
       </span>
-      <span className="mt-1 whitespace-nowrap rounded-lg bg-[#0A1120]/70 px-1.5 text-[12px] font-bold leading-5 text-[#EEF2F8] sm:text-[13px]">{game.zone}</span>
+      {/* Phone: the short zone name. Wider screens: the game's own name, as in the game list below. */}
+      <span className="mt-1 whitespace-nowrap rounded-lg bg-[#0A1120]/70 px-1.5 text-[12px] font-bold leading-5 text-[#EEF2F8] sm:hidden">{game.zone}</span>
+      <span className="mt-1 hidden max-w-[8.5rem] rounded-lg bg-[#0A1120]/70 px-1.5 text-center text-[13px] font-bold leading-[1.15rem] text-[#EEF2F8] sm:block">
+        <span aria-hidden className="mr-1">{game.emoji}</span>
+        {game.name}
+      </span>
     </Link>
   )
 }

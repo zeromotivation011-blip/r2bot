@@ -161,9 +161,10 @@ export function liveGoals(def: TierDef, parts: Part[], sol: Solution, lux: numbe
       const h = findLoad(parts, 'H')
       const hasSwitch = parts.some((p) => p.kind === 'switch')
       const offSol = solve(applyMod(parts, { switches: 'off' }), lux)
+      const onSol = solve(applyMod(parts, { switches: 'on' }), lux)
       return [
         { label: 'House light is on', ok: lit(sol, h), detail: h ? formatAmps(partCurrent(sol, h.id)) : undefined },
-        { label: 'A switch can turn it off', ok: hasSwitch && !lit(offSol, h, 0.0005) },
+        { label: 'A switch can turn it off', ok: hasSwitch && lit(onSol, h) && !lit(offSol, h, 0.0005) },
         { label: 'No short circuit', ok: !sol.shorted },
       ]
     }

@@ -15,8 +15,9 @@ Contracts: `docs/kids-universe.md`, `docs/kids-design.md`.
 ## Status
 - [x] Rewards engine, worlds/game registry, GameShell, reward toasts
 - [x] Brand pass on the shell (navy + R2BOT orange, helmet logo)
-- [~] Curriculum: 4 levels, Level 1 in full (workflow wf_e8ba846c-4e4)
-- [~] Physics lab: Rapier + Blockly, /kids/lab/sim (same workflow)
+- [x] Curriculum: 4 levels, Level 1 in full — committed 68ad024 (docs/kids-curriculum.md)
+- [x] Physics lab: Rapier + Blockly, /kids/lab/sim — committed 68ad024
+- [~] Level 1 playable (24 verified arenas + course player) and 3D episode engine + Piper voices (workflow wf_e343e5bb-6dd) — steps 3–4
 - [~] 7 games: drone-hover, arm-factory, circuit-city, mars-rover, robot-brain,
       maze-mapper, swarm-reef (workflow wf_e021636c-616)
 - [~] Universe home + Hangar (workflow wf_e5a3ddba-357) — steps 1-2 below

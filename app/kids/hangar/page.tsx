@@ -11,7 +11,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { jsonldScript } from '@/lib/seo/jsonld'
 import { HangarClient } from '@/components/kids/hangar/HangarClient'
-import { HangarRecordsClient } from '@/components/kids/hangar/HangarRecordsClient'
+import { HangarRecordsClient, type CourseBadgeInfo } from '@/components/kids/hangar/HangarRecordsClient'
+// Read-only, server-side: the real names of the course badges. Only the small
+// map below reaches the client, never the (large) curriculum itself.
+import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
 
 export const runtime = 'nodejs'
 
@@ -46,6 +49,10 @@ const jsonLd = {
   inLanguage: 'en',
 }
 
+const courseBadges: Record<string, CourseBadgeInfo> = Object.fromEntries(
+  LEVEL1_SESSIONS.map((s) => [s.badge.id, { name: s.badge.name, icon: s.badge.icon, earnedFor: s.badge.earnedFor }]),
+)
+
 export default function HangarPage() {
   return (
     <>
@@ -59,7 +66,7 @@ export default function HangarPage() {
       </header>
 
       <HangarClient />
-      <HangarRecordsClient />
+      <HangarRecordsClient courseBadges={courseBadges} />
 
       {/* Server-rendered explanation for parents, teachers and search engines. */}
       <section aria-labelledby="about-hangar" className="mx-auto max-w-3xl px-4 pb-16 pt-10 text-[#A7B0C0]">
@@ -68,11 +75,11 @@ export default function HangarPage() {
         </h2>
         <p className="mt-3">
           The hangar is where a child&rsquo;s robot lives between missions. It is the same robot they designed in the{' '}
-          <Link href="/kids/workshop" className="font-semibold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids/workshop" className="-my-3 inline-block py-3 font-semibold text-amber-300 underline-offset-4 hover:underline">
             3D Robot Workshop
           </Link>{' '}
           and drive in the{' '}
-          <Link href="/kids/code-lab" className="font-semibold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids/code-lab" className="-my-3 inline-block py-3 font-semibold text-amber-300 underline-offset-4 hover:underline">
             Code Lab
           </Link>
           : one body, one set of parts, one name. Here they can turn it around under the lights, take it for a short test drive and change how

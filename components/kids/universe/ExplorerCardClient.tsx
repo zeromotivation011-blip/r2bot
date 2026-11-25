@@ -10,6 +10,7 @@
 import type { KidsProgress } from '@/lib/kids-progress'
 import { getBand } from '@/lib/kids/bands'
 import { daysExploredThisWeek, levelInfo, questStatus } from '@/lib/kids/universe/rewards'
+import { Spark } from '@/components/kids/story/characters'
 import { Avatar } from './avatars'
 import { hasStarted, weekDots } from './universe-state'
 
@@ -126,7 +127,16 @@ function Filled({ p, onboarded, onStart, onEdit }: { p: KidsProgress; onboarded:
 
       {fresh && (
         <div className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4">
-          <p className="text-[15px] text-[#EEF2F8]">Pick your age group, name your explorer and choose an avatar. Three quick steps.</p>
+          <div className="flex items-end gap-3">
+            {/* Spark, the R2BOT Kids guide (the same puppet as Story Theatre). */}
+            <svg viewBox="-112 -246 224 254" width="64" height="73" className="shrink-0" aria-hidden>
+              <Spark emotion="happy" talking={false} />
+            </svg>
+            <div className="relative mb-2 min-w-0 flex-1 rounded-2xl rounded-bl-md bg-[#0A1120]/70 px-3 py-2">
+              <p className="font-display text-[16px] font-bold leading-snug text-[#EEF2F8]">Hi! I&rsquo;m Spark. Let&rsquo;s set up your explorer!</p>
+            </div>
+          </div>
+          <p className="mt-2 text-[15px] text-[#A7B0C0]">Pick your age group, a name and an avatar. Three quick steps.</p>
           <button
             type="button"
             onClick={onStart}
@@ -147,21 +157,30 @@ function Filled({ p, onboarded, onStart, onEdit }: { p: KidsProgress; onboarded:
             {days}
             <span className="text-sm text-[#6E7888]">/7 days</span>
           </dd>
-          <dd className="mt-1 flex justify-center gap-[3px]" aria-label={`Explored on ${dots.map((d, i) => (d ? DAY_NAMES[i] : null)).filter(Boolean).join(', ') || 'no days yet'} this week`}>
-            {dots.map((on, i) => (
-              <span
-                key={i}
-                className={`grid h-[14px] w-[14px] place-items-center rounded-full text-[8px] font-black ${
-                  on ? 'bg-amber-500 text-[#1A1103]' : i === todayIdx ? 'bg-white/5 text-[#A7B0C0] ring-1 ring-amber-400/60' : 'bg-white/10 text-[#6E7888]'
-                }`}
-                aria-hidden
-              >
-                {DAY_LETTERS[i]}
-              </span>
-            ))}
-          </dd>
         </div>
       </dl>
+
+      {/* Days explored this week, Monday to Sunday */}
+      <div className="mt-2 flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-[#0A1120]/60 px-3 py-2">
+        <p className="text-[13px] font-semibold text-[#A7B0C0]">Days</p>
+        <div
+          className="flex gap-1.5"
+          role="img"
+          aria-label={`Explored on ${dots.map((d, i) => (d ? DAY_NAMES[i] : null)).filter(Boolean).join(', ') || 'no days yet'} this week`}
+        >
+          {dots.map((on, i) => (
+            <span
+              key={i}
+              title={`${DAY_NAMES[i]}${on ? ': explored' : ''}`}
+              className={`grid h-7 w-7 place-items-center rounded-full text-[12px] font-bold ${
+                on ? 'bg-amber-500 text-[#1A1103]' : i === todayIdx ? 'bg-white/5 text-[#EEF2F8] ring-2 ring-amber-400/70' : 'bg-white/10 text-[#A7B0C0]'
+              }`}
+            >
+              {DAY_LETTERS[i]}
+            </span>
+          ))}
+        </div>
+      </div>
 
       {/* Quests */}
       <div className="mt-5">

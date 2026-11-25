@@ -15,10 +15,7 @@ import { SESSIONS_PER_LEVEL, planetForBand, sessionsDoneOn, suggestGame } from '
 /** Level number -> session titles in order (index 0 = session 1). */
 export type SessionTitles = Record<number, string[]>
 
-/** Levels whose sessions are playable today. Others show their season map. */
-const PLAYABLE_LEVELS = new Set([1])
-
-interface Mission {
+export interface Mission {
   eyebrow: string
   title: string
   detail: string
@@ -29,7 +26,12 @@ interface Mission {
   alt?: { href: string; label: string }
 }
 
-function pickMission(p: KidsProgress, titles: SessionTitles): Mission {
+/**
+ * The child's next step. `playable` lists the levels whose sessions are written
+ * in full (computed on the server from the curriculum), so a level starts to
+ * offer its sessions the day its content ships.
+ */
+export function pickMission(p: KidsProgress, titles: SessionTitles, playable: readonly number[]): Mission {
   const planet = planetForBand(p.band)
   const done = new Set(sessionsDoneOn(p, planet.level))
   const band = getBand(p.band)
@@ -50,13 +52,24 @@ function pickMission(p: KidsProgress, titles: SessionTitles): Mission {
         alt: gameAlt,
       }
     }
+    // The last planet's season is finished: nothing left to "continue".
+    return {
+      eyebrow: `${planet.name} complete!`,
+      title: 'Season finished. Replay a game or visit the Hangar',
+      detail: `All ${SESSIONS_PER_LEVEL} sessions done. Your badges and robot are waiting in the Hangar.`,
+      href: '/kids/hangar',
+      cta: 'Open the Hangar',
+      icon: '🏆',
+      gradient: planet.gradient,
+      alt: gameAlt,
+    }
   }
 
   let next = 1
   while (done.has(next) && next < SESSIONS_PER_LEVEL) next++
   const title = titles[planet.level]?.[next - 1]
 
-  if (PLAYABLE_LEVELS.has(planet.level) || done.size > 0) {
+  if (playable.includes(planet.level) || done.size > 0) {
     return {
       eyebrow: done.size ? 'Continue your mission' : 'Your first mission',
       title: title ? `Session ${next}: ${title}` : `Session ${next}`,
@@ -81,12 +94,18 @@ function pickMission(p: KidsProgress, titles: SessionTitles): Mission {
   }
 }
 
-export function ContinueCardClient({ progress, titles }: { progress: KidsProgress | null; titles: SessionTitles }) {
-  const m = progress ? pickMission(progress, titles) : null
+export interface ContinueCardProps {
+  progress: KidsProgress | null
+  titles: SessionTitles
+  playable: readonly number[]
+}
+
+export function ContinueCardClient({ progress, titles, playable }: ContinueCardProps) {
+  const m = progress ? pickMission(progress, titles, playable) : null
   return (
     <section
       aria-labelledby="continue-h"
-      className="relative min-h-[168px] overflow-hidden rounded-[28px] border border-white/10 bg-[#111C32] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]"
+      className="relative min-h-[240px] overflow-hidden sm:min-h-[183px] rounded-[28px] border border-white/10 bg-[#111C32] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]"
     >
       {m ? (
         <div className="uv-pop flex h-full flex-col">

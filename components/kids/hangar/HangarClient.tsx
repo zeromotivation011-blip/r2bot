@@ -10,8 +10,8 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import type React from 'react'
 import { useCallback, useId, useRef, useState } from 'react'
-import { saveDesign } from '@/lib/kids/robot-design'
-import { daysExploredThisWeek, levelInfo, type Unlock } from '@/lib/kids/universe/rewards'
+import { DEFAULT_DESIGN, saveDesign } from '@/lib/kids/robot-design'
+import { daysExploredThisWeek, levelInfo, MAX_LEVEL, xpForLevel, type Unlock } from '@/lib/kids/universe/rewards'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { howToEarn, LOOK_NOTES, owns, saveCosmetics, unlocksOf, type CosmeticKind } from './cosmetics'
 import { HangarPoster } from './HangarPoster'
@@ -76,7 +76,15 @@ export function HangarClient() {
   const allLooks = (['paint', 'decal', 'trail', 'skin'] as CosmeticKind[]).flatMap(unlocksOf)
   const ownedCount = allLooks.filter((u) => owns(u, progress)).length
   const paintNow = paints.find((p) => p.value && p.value.toLowerCase() === design.primary.toLowerCase())
-  const workshopColour = paintNow ? cosmetics.workshopColour : design.primary
+  // When an earned paint is on but the Workshop colour was never remembered (a
+  // robot card imported in that colour, a new device), fall back to the
+  // Workshop's own default so "Workshop colour" always does something.
+  const workshopColour = paintNow ? (cosmetics.workshopColour ?? DEFAULT_DESIGN.primary) : design.primary
+  // The closest look still to earn by levelling up: a real goal, from real XP.
+  const nextUnlock = allLooks
+    .filter((u) => !owns(u, progress) && u.atLevel !== undefined)
+    .sort((a, b) => (a.atLevel ?? 0) - (b.atLevel ?? 0))[0]
+  const xpToNextUnlock = nextUnlock?.atLevel !== undefined ? Math.max(0, xpForLevel(nextUnlock.atLevel) - progress.xp) : 0
 
   const announce = useCallback((text: string) => {
     setSay('')
@@ -90,23 +98,29 @@ export function HangarClient() {
       announce(`${u.name} is locked. ${howToEarn(u)} to unlock it.`)
       return
     }
-    playSound('correct')
     if (kind === 'paint') {
-      if (u?.value) {
-        // Remember the Workshop colour the first time an earned paint replaces it.
-        // A skin covers the paint, so choosing a paint takes the skin off.
-        const next = { ...cosmetics, skin: null, workshopColour: paintNow ? cosmetics.workshopColour : design.primary }
-        if (next.skin !== cosmetics.skin || next.workshopColour !== cosmetics.workshopColour) saveCosmetics(next)
-        saveDesign({ ...design, primary: u.value })
-        announce(`${design.name} is now painted ${u.name}.`)
-      } else if (workshopColour) {
-        if (cosmetics.skin) saveCosmetics({ ...cosmetics, skin: null })
-        saveDesign({ ...design, primary: workshopColour })
-        announce(`${design.name} is back in its Workshop colour.`)
+      const colour = u?.value ?? workshopColour
+      const same = colour.toLowerCase() === design.primary.toLowerCase()
+      if (same && !cosmetics.skin) {
+        announce(u ? `${design.name} is already painted ${u.name}.` : `${design.name} is already in its Workshop colour.`)
+        return
       }
+      playSound('correct')
+      // Remember the Workshop colour the first time an earned paint replaces it.
+      // A skin covers the paint, so choosing a paint takes the skin off.
+      const next = { ...cosmetics, skin: null, workshopColour: u?.value ? workshopColour : cosmetics.workshopColour }
+      if (next.skin !== cosmetics.skin || next.workshopColour !== cosmetics.workshopColour) saveCosmetics(next)
+      if (!same) saveDesign({ ...design, primary: colour })
+      announce(u ? `${design.name} is now painted ${u.name}.` : `${design.name} is back in its Workshop colour.`)
       return
     }
-    saveCosmetics({ ...cosmetics, [kind]: u ? u.id : null })
+    const id = u ? u.id : null
+    if (cosmetics[kind] === id) {
+      announce(u ? `${u.name} is already on.` : `No ${kind} on ${design.name}.`)
+      return
+    }
+    playSound('correct')
+    saveCosmetics({ ...cosmetics, [kind]: id })
     announce(u ? `${u.name} on. ${LOOK_NOTES[u.id] ?? ''}` : `No ${kind} on ${design.name}.`)
   }
 
@@ -180,8 +194,9 @@ export function HangarClient() {
             <p className="font-display text-lg font-bold leading-tight text-white">{ready ? design.name : ' '}</p>
           </div>
           {sceneReady && (
-            <p className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#0A1120]/70 px-3 py-1 text-xs font-semibold text-[#A7B0C0]">
-              Drag to spin · pinch to zoom
+            <p className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#0A1120]/80 px-3 py-1 text-sm font-semibold text-[#A7B0C0]">
+              <span className="[@media(pointer:fine)]:hidden">Drag to spin · pinch to zoom</span>
+              <span className="hidden [@media(pointer:fine)]:inline">Drag to spin · scroll to zoom</span>
             </p>
           )}
         </div>
@@ -202,12 +217,15 @@ export function HangarClient() {
               <p className="text-sm font-semibold text-[#A7B0C0]">{ready ? name : ' '}</p>
               <p className="font-display text-2xl font-bold leading-tight text-white">{ready ? lvl.title : ' '}</p>
               <p className="text-sm text-[#A7B0C0]">
-                {ready ? (
-                  <>
-                    Level {lvl.level} · {lvl.xpIntoLevel} / {lvl.xpForNext} XP to level {lvl.level + 1}
-                  </>
+                {!ready ? (
+                  '\u00A0'
+                ) : lvl.level >= MAX_LEVEL ? (
+                  <>Level {lvl.level} · Top level reached</>
                 ) : (
-                  ' '
+                  <>
+                    Level {lvl.level} · {lvl.xpIntoLevel.toLocaleString('en-GB')} / {lvl.xpForNext.toLocaleString('en-GB')} XP to level{' '}
+                    {lvl.level + 1}
+                  </>
                 )}
               </p>
             </div>
@@ -224,7 +242,7 @@ export function HangarClient() {
           </div>
           <dl className="grid grid-cols-3 gap-2 text-center">
             {[
-              { k: 'Total XP', v: progress.xp },
+              { k: 'Total XP', v: progress.xp.toLocaleString('en-GB') },
               { k: 'Badges', v: Object.keys(progress.badges).length },
               { k: 'Looks owned', v: `${ownedCount}/${allLooks.length}` },
             ].map((s) => (
@@ -240,7 +258,7 @@ export function HangarClient() {
               {wearing.map((w) => (
                 <li key={w.k} className="flex min-w-0 items-center gap-2">
                   <span className="h-3 w-3 shrink-0 rounded-full border border-white/20" style={{ background: w.dot }} aria-hidden />
-                  <span className="text-[#6E7888]">{w.k}</span>
+                  <span className="text-[#A7B0C0]">{w.k}</span>
                   <span className="truncate font-semibold text-white">{ready ? w.v : '\u00A0'}</span>
                 </li>
               ))}
@@ -254,6 +272,27 @@ export function HangarClient() {
                 '\u00A0'
               )}
             </p>
+          </div>
+          {/* Next unlock: the nearest look earned by levelling up. */}
+          <div className="rounded-2xl border border-amber-400/25 bg-amber-500/[0.06] p-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-amber-300">Next unlock</p>
+            {!ready ? (
+              <p className="mt-2 flex min-h-[44px] items-center text-sm text-[#A7B0C0]">{'\u00A0'}</p>
+            ) : nextUnlock ? (
+              <div className="mt-2 flex min-h-[44px] items-center gap-3">
+                <span className="block h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-white/15" aria-hidden>
+                  <Swatch u={nextUnlock} />
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate font-display text-base font-bold leading-tight text-white">{nextUnlock.name}</p>
+                  <p className="text-sm text-[#A7B0C0]">
+                    Reach level {nextUnlock.atLevel} · <span className="font-semibold text-white">{xpToNextUnlock.toLocaleString('en-GB')} XP</span> to go
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-2 flex min-h-[44px] items-center text-sm text-[#A7B0C0]">Every level look is yours. Badges unlock the rest.</p>
+            )}
           </div>
           <div className="mt-auto grid grid-cols-2 gap-3">
             <button
@@ -347,7 +386,7 @@ export function HangarClient() {
                     onClick={() => choose(u, tab)}
                     swatch={<Swatch u={u} />}
                     title={u.name}
-                    sub={!ready ? howToEarn(u) : own ? (LOOK_NOTES[u.id] ?? 'Yours to use.') : `Earn by: ${howToEarn(u).toLowerCase()}`}
+                    sub={!ready || !own ? howToEarn(u) : (LOOK_NOTES[u.id] ?? 'Yours to use.')}
                   />
                 </li>
               )
@@ -412,7 +451,7 @@ function LookButton({
         )}
         {title}
       </span>
-      <span className={`text-xs leading-snug ${locked ? 'text-amber-300' : 'text-[#A7B0C0]'}`}>{sub}</span>
+      <span className={`text-sm leading-snug ${locked ? 'text-amber-300' : 'text-[#A7B0C0]'}`}>{sub}</span>
       {selected && (
         <span className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-amber-500 text-[#1A1103]">
           <CheckIcon />

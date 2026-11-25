@@ -14,6 +14,8 @@ import { jsonldScript } from '@/lib/seo/jsonld'
 import { KIDS_BANDS } from '@/lib/kids/bands'
 import { GAMES, PLANETS } from '@/lib/kids/universe/worlds'
 import { LEVELS } from '@/lib/kids/curriculum/levels'
+import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
+import type { LevelNumber } from '@/lib/kids/curriculum/types'
 import { InstallAppClient } from '@/components/kids/InstallAppClient'
 import type { SessionTitles } from '@/components/kids/universe/ContinueCardClient'
 import { KidsHubClient } from './KidsHubClient'
@@ -115,6 +117,19 @@ const faqJsonLd = {
 
 const SESSION_TITLES: SessionTitles = Object.fromEntries(LEVELS.map((l) => [l.number, l.sessions.map((s) => s.title)]))
 
+/**
+ * Sessions written in full, per level. Levels 2–4 are outlines today; when a
+ * level's sessions are written (lib/kids/curriculum/level<N>), add them here.
+ * Server-only: none of this reaches the client bundle, only the level numbers.
+ */
+const WRITTEN_SESSIONS: Partial<Record<LevelNumber, readonly { number: number }[]>> = { 1: LEVEL1_SESSIONS }
+
+/** A level is playable when every session in its outline has been written. */
+const PLAYABLE_LEVELS: number[] = LEVELS.filter((l) => {
+  const written = new Set((WRITTEN_SESSIONS[l.number] ?? []).map((s) => s.number))
+  return l.sessions.length > 0 && l.sessions.every((s) => written.has(s.number))
+}).map((l) => l.number)
+
 export default function KidsHubPage() {
   return (
     <>
@@ -130,11 +145,11 @@ export default function KidsHubPage() {
               Explore the <span className="text-amber-500">Robot Universe</span>
             </h1>
           </div>
-          <p className="max-w-md text-[16px] text-[#A7B0C0] sm:text-[17px]">
+          <p className="hidden max-w-md text-[17px] text-[#A7B0C0] sm:block">
             Fly to a planet to start your course, or land on a moon to play a real robotics game.
           </p>
         </div>
-        <KidsHubClient sessionTitles={SESSION_TITLES} />
+        <KidsHubClient sessionTitles={SESSION_TITLES} playableLevels={PLAYABLE_LEVELS} />
       </section>
 
       {/* ── What it is ─────────────────────────────────────────────────────── */}

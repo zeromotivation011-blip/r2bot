@@ -12,8 +12,10 @@ import type { UniverseGame } from '@/lib/kids/universe/worlds'
 import { reportActivity, type RewardResult } from '@/lib/kids/universe/rewards'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { fireConfetti } from '@/components/kids/Confetti'
+import { TIER_NAMES } from '@/lib/kids/universe/tiers'
 
-export const TIER_NAMES = ['Cadet', 'Pilot', 'Ace', 'Legend'] as const
+// Re-exported so existing game imports keep working; the list lives in a plain module.
+export { TIER_NAMES }
 
 export interface RoundResult {
   /** 0 = failed round, 1–3 stars otherwise. */
