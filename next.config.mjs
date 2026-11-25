@@ -32,7 +32,11 @@ const nextConfig = {
     // build-vs-runtime drift as the July sitemap freeze, and just as invisible.
     //
     // Any new route that reads from content/ at request time needs an entry.
-    '/sitemap.xml': ['./content/**/*'],
+    // 25 Nov 2026: the Daily Life articles are read from lib/daily-life-articles,
+    // which no entry covered. The build listed all ten; every hourly regeneration
+    // of the live sitemap dropped them (1,119 URLs on 24 Nov, 1,109 on 25 Nov).
+    '/sitemap.xml': ['./content/**/*', './lib/daily-life-articles/**/*'],
+    '/daily-life/**': ['./lib/daily-life-articles/**/*'],
     '/llms.txt': ['./content/**/*'],
     '/': ['./content/**/*'],
     '/courses/**': ['./content/courses/**/*'],
@@ -241,6 +245,23 @@ const nextConfig = {
       // Google ranks (~900 impressions, pos 9); it was rewritten from sources and
       // absorbs linear-quadratic-regulator. One owner per query.
       { source: '/atlas/concept/linear-quadratic-regulator', destination: '/atlas/concept/lqr-controller', permanent: true },
+      // 25 Nov 2026 indexing audit: ten more pairs of entries answered the same
+      // query (same title once spelling, plurals and "for robotics" are set
+      // aside). Google crawls ~170 R2BOT pages a week, so a duplicate spends
+      // crawl on a page that competes with its twin. The one with more sources,
+      // more inbound links or existing Search Console impressions keeps the
+      // URL; the other file is deleted and every internal link was repointed.
+      // Kept in sync with app/sitemap.ts REDIRECTED_ATLAS.
+      { source: '/atlas/concept/behaviour-cloning', destination: '/atlas/concept/behavior-cloning', permanent: true },
+      { source: '/atlas/concept/neural-networks-robotics', destination: '/atlas/concept/neural-network', permanent: true },
+      { source: '/atlas/concept/reinforcement-learning-robotics', destination: '/atlas/concept/reinforcement-learning', permanent: true },
+      { source: '/atlas/concept/embedded-systems', destination: '/atlas/concept/embedded-system', permanent: true },
+      { source: '/atlas/concept/risk-assessment', destination: '/atlas/concept/risk-assessment-robotics', permanent: true },
+      { source: '/atlas/concept/nav2-stack', destination: '/atlas/concept/nav2', permanent: true },
+      { source: '/atlas/concept/warehouse-robot', destination: '/atlas/concept/warehouse-robotics', permanent: true },
+      { source: '/atlas/concept/light-curtain', destination: '/atlas/concept/safety-light-curtain', permanent: true },
+      { source: '/atlas/concept/tof-sensor', destination: '/atlas/concept/time-of-flight-sensor', permanent: true },
+      { source: '/atlas/concept/last-mile-delivery', destination: '/atlas/concept/last-mile-delivery-robot', permanent: true },
       // The by-line is an editorial identity now, at the owner's request, so
       // the author page moved off a URL that carried a personal name.
       { source: '/author/ravi', destination: '/about/how-this-is-written', permanent: true },

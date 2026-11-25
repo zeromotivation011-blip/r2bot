@@ -60,7 +60,7 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
     publishedAt: '2026-11-11',
     atlasLinks: [
       { slug: 'autonomous-mobile-robot', label: 'Autonomous Mobile Robots' },
-      { slug: 'warehouse-robot', label: 'Warehouse Robots' },
+      { slug: 'warehouse-robotics', label: 'Warehouse Robots' },
       { slug: 'suction-gripper', label: 'Suction Grippers' },
       { slug: 'force-torque-sensor', label: 'Force-Torque Sensors' },
     ],

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
+import { isRedirectedAtlas } from './atlas-redirects';
 
 export type AtlasType =
   | 'concept'
@@ -291,6 +292,9 @@ export function getAllAtlasEntries(): AtlasEntry[] {
     for (const file of fs.readdirSync(dir)) {
       if (!file.endsWith('.mdx') && !file.endsWith('.md')) continue;
       const slug = file.replace(/\.(mdx|md)$/, '');
+      // Duplicates that 308 to another entry (lib/atlas-redirects.ts) must not
+      // collect "Keep going" links or appear in any list.
+      if (isRedirectedAtlas(type, slug)) continue;
       const raw = fs.readFileSync(path.join(dir, file), 'utf8');
       const { data, content } = matter(raw);
       entries.push(buildEntry(type, slug, data as Record<string, unknown>, content));

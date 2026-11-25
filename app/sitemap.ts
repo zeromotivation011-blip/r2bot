@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { REDIRECTED_ATLAS_CONCEPTS } from '@/lib/atlas-redirects';
 import { getAllAtlasEntriesMerged } from '@/lib/atlas-db';
 import { getAllLensMerged } from '@/lib/lens-cms';
 import { getAllAcademyLessons } from '@/lib/academy';
@@ -70,13 +71,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // duplicate concepts, plus the robots that live canonically at /robots/<slug>
   // (five robots previously had two indexable URLs each and competed with
   // themselves — see lib/canonical-map.ts).
-  const REDIRECTED_ATLAS = new Set([
-    'drone-uav',
-    'field-programmable-gate-array',
-    'ce-marking-robots',
-    'state-machine',
-    'linear-quadratic-regulator',
-  ]);
+  const REDIRECTED_ATLAS = REDIRECTED_ATLAS_CONCEPTS; // lib/atlas-redirects.ts
   const atlas = atlasEntries
     .filter((e) => !REDIRECTED_ATLAS.has(e.slug))
     .filter((e) => !(e.type === 'robot' && ATLAS_ROBOTS_REDIRECTED.has(e.slug)))
