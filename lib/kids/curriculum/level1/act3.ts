@@ -773,7 +773,7 @@ export const ACT3: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move', 'light'],
       }),
       allowedBlocks: [HOP, LIGHT_ON, LIGHT_OFF],
-      exampleSolution: ['light_on', 'drive_for(50, 5)  ← two hops: 3 + 2', 'light_off'],
+      exampleSolution: ['light_on', 'drive_for(50, 3)', 'drive_for(50, 2)', 'light_off'],
       success: [
         { kind: 'action-at-zone', detail: 'The light is on whenever the robot is inside rows 1–3.' },
         { kind: 'action-at-zone', detail: 'The light is off at the end of the program.' },
@@ -952,8 +952,10 @@ export const ACT3: Session[] = [
       }),
       allowedBlocks: [HOP, HOP_BACK, LEFT, RIGHT, WAIT, REPEAT, SCOOP_UP, TIP_OUT, LIGHT_ON, LIGHT_OFF, PEN_DOWN, PEN_UP, BEEP, say('Here you go!', 'Good night!', 'Welcome home!', 'Excuse me!')],
       exampleSolution: [
-        'drive_for(50, 3)', 'grip_close', 'turn_degrees(-90, 40)', 'drive_for(50, 2)  ← along row 1 to (2,1)',
-        'drive_for(50, 2)  ← to (4,1), in front of the armchair', 'turn_degrees(90, 40)', 'grip_open', 'say("Here you go!")',
+        'drive_for(50, 3)  ← to (0,1), the tin is in front', 'grip_close',
+        'drive_for(-50, 1)', 'drive_for(-50, 1)  ← back to (0,3), clear of the table and sofa',
+        'turn_degrees(-90, 40)', 'drive_for(50, 3)', 'drive_for(50, 1)  ← along row 3 to (4,3)',
+        'turn_degrees(90, 40)', 'drive_for(50, 2)  ← up to (4,1), facing the armchair', 'grip_open', 'say("Here you go!")',
       ],
       success: [
         { kind: 'action-at-zone', detail: 'The chosen tool is used at the right place for the chosen job.' },
