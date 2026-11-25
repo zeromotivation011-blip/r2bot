@@ -20,9 +20,11 @@ Contracts: `docs/kids-universe.md`, `docs/kids-design.md`.
 - [~] 7 games: drone-hover, arm-factory, circuit-city, mars-rover, robot-brain,
       maze-mapper, swarm-reef (workflow wf_e021636c-616)
 - [~] Universe home + Hangar (workflow wf_e5a3ddba-357) — steps 1-2 below
+- [~] **SKILL GALAXY — the backbone (founder, 20:40 UTC: "a full gamified system with 100s of different activities… understand my vision")**: 26 interactive templates, activity player, galaxy map, 400 verified activities (10 tracks × 4 bands × 10). Workflow wf_f9984ffd-0ef. Contract: lib/kids/activities/types.ts.
 - Hourly self check-in: scheduled task trig_01JjzPC4SVkb4GiS7ax68hkk (delete when done)
 
 ## Remaining, in order
+0. Skill Galaxy finished and integrated into the Universe home, the course sessions (each session links its galaxy activities), the hangar (mastery), classroom (teachers assign activities) and the sitemap. Target after tonight: 400 activities; keep growing toward 1,000.
 1. **Universe home** (`/kids`): animated planet map (4 course planets + game
    zones from `worlds.ts`), explorer profile (avatar, explorer name, level,
    XP bar, weekly quests, days explored this week), "continue" card, hangar

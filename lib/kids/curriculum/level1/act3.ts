@@ -6,11 +6,14 @@
 
 import type { Session } from '../types'
 import {
-  BEEP, CREEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, LEFT, LIGHT_OFF, LIGHT_ON, MOVE_SET, PEN_DOWN, PEN_UP,
+  BEEP, CREEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, HOP_PCT, LEFT, LIGHT_OFF, LIGHT_ON, MOVE_SET, PART_MASS_KG, PEN_DOWN, PEN_UP,
   REPEAT, RIGHT, SCOOP_UP, TIP_OUT, WAIT,
-  arena, episode, lessonTiming, obj, projectTiming, say, teacher,
+  arena, episode, kg, lessonTiming, obj, projectTiming, say, teacher,
 } from './shared'
 import { L1_PROJECTS } from './projects'
+
+/** A quarter turn at 40 % in the simulator (timing arenas are set from it). */
+const QUARTER_TURN_S = 1.0
 
 const DOCK_PHYSICS = `${FLAT_MAT_PHYSICS} Glass float: 0.1 kg. The scoop reaches an object on the tile directly in front of the robot.`
 
@@ -79,7 +82,7 @@ export const ACT3: Session[] = [
       narration: 'Take off the pen and put it in your toolbox. Click on the scoop.',
       why: 'A scoop can lift and carry things. Robots change tools for different jobs, like you change from a spoon to a fork.',
       tryWithout: 'With the pen, the robot only pushes the float, and it rolls away.',
-      physicsEffect: 'Scoop adds 0.2 kg at the front of the robot. A carried float adds 0.1 kg.',
+      physicsEffect: `Scoop adds ${kg(PART_MASS_KG.tool.scoop)} at the front of the robot. A carried float adds 0.1 kg.`,
       realWorld: 'Mars rovers have scoops to collect soil; factory robot arms swap tools automatically.',
     },
     code: {
@@ -144,7 +147,7 @@ export const ACT3: Session[] = [
       },
       {
         prompt: 'Why do robots change tools?',
-        options: [{ text: 'Different jobs need different tools', icon: '🧰' }, { text: 'To look nice', icon: '💅' }],
+        options: [{ text: 'Different jobs need different tools', icon: '🧰' }, { text: 'They don’t — a robot wears every tool at once', icon: '🤹' }],
         answer: 0,
         why: 'Just like you use a spoon for soup and a pencil for drawing, robots use the tool that fits the job.',
       },
@@ -258,8 +261,9 @@ export const ACT3: Session[] = [
         description: 'Three lanes side by side: flat, ramp, ramp with the lantern already in the scoop. A mark shows 3 squares.',
         gridTiles: { cols: 3, rows: 5 }, floor: 'ramp',
         start: { col: 0, row: 4, heading: 'up' },
+        extraStarts: [{ col: 1, row: 4, heading: 'up' }, { col: 2, row: 4, heading: 'up' }],
         goal: 'Run the same program in all three lanes and compare where the robot stops.',
-        features: ['Lane 1 flat', 'Lane 2: 10° ramp', 'Lane 3: 10° ramp, iron lantern (0.8 kg) pre-loaded', 'Chalk marks appear where the robot stops'],
+        features: ['Lane 1 flat, lane 2 a 10° ramp, lane 3 a 10° ramp with the iron lantern (0.8 kg) pre-loaded in the scoop', 'Press Go once: the robot runs in lane 1, is reset to the start of lane 2, then lane 3 (one start per lane)', 'Chalk marks appear where the robot stops'],
         physics: 'Gravity 9.81 m/s². Wood ramp at 10°. Motors at fixed % power slow down as load rises (DC motor torque–speed behaviour). No wheel slip.',
         requires: ['move', 'grab'],
       }),
@@ -283,7 +287,7 @@ export const ACT3: Session[] = [
         start: { col: 0, row: 5, heading: 'up' },
         goal: 'Tip the lantern out on the platform (tiles (0,0)–(0,1)).',
         features: ['Iron lantern on tile (0,4)', 'Ramp from row 4 to row 2 (10°)', 'Flat platform on rows 0–1 with a railing at the top'],
-        physics: 'Gravity 9.81 m/s². 10° wood ramp. Iron lantern 0.8 kg. Fixed-power motors slow under load.',
+        physics: `Gravity 9.81 m/s². 10° wood ramp. Iron lantern 0.8 kg. Fixed-power motors slow under load. Calibration target (with the lantern, from the start tile): Hop 3 ends with the robot centre in row 3 or row 2 — short of where it would reach on the flat — and Hop 3 + Hop 1 ends with the centre in row 2 or row 1, so Tip out lands the lantern on the platform without the robot reaching the railing. With no load on the flat, Hop 4 reaches row 1.`,
         requires: ['move', 'grab'],
       }),
       allowedBlocks: [HOP, HOP_BACK, SCOOP_UP, TIP_OUT, say('Found a light!')],
@@ -309,7 +313,7 @@ export const ACT3: Session[] = [
       },
       {
         prompt: 'Your robot stopped short. What do you do?',
-        options: [{ text: 'Test, then add a hop', icon: '🧪' }, { text: 'Say the robot is broken', icon: '💔' }],
+        options: [{ text: 'Test, then add a hop', icon: '🧪' }, { text: 'Wait for tomorrow — the robot is weaker today', icon: '😴' }],
         answer: 0,
         why: 'Nothing is broken! Test, see where it stops, and change the program.',
       },
@@ -429,8 +433,9 @@ export const ACT3: Session[] = [
         description: 'Three lanes: mat, ice, sand. A flag marks 2 squares.',
         gridTiles: { cols: 3, rows: 5 }, floor: 'mixed',
         start: { col: 0, row: 4, heading: 'up' },
+        extraStarts: [{ col: 1, row: 4, heading: 'up' }, { col: 2, row: 4, heading: 'up' }],
         goal: 'Run the same program in all three lanes and compare.',
-        features: ['Lane 1 mat', 'Lane 2 ice', 'Lane 3 sand', 'Flag at 2 squares in each lane', 'Chalk marks show where the robot ends'],
+        features: ['Lane 1 mat', 'Lane 2 ice', 'Lane 3 sand', 'Press Go once: the robot is reset to the start of each lane in turn', 'Flag at 2 squares in each lane', 'Chalk marks show where the robot ends'],
         physics: 'Mat: tyre friction high. Ice: friction very low — after the motors stop, the robot keeps sliding. Sand: wheels sink and lose speed (rolling resistance).',
         requires: ['move'],
       }),
@@ -454,11 +459,11 @@ export const ACT3: Session[] = [
         start: { col: 0, row: 6, heading: 'up' },
         goal: 'Stop in the stop zone at tile (0,0) — not past the bridge line.',
         features: ['Row 5 mat', 'Rows 3–4 ice', 'Rows 1–2 sand', 'Row 0 stop zone with the bridge line just beyond it', 'Fish boxes beside the ice lane (topple if touched)'],
-        physics: 'As in the floor test. Creep (30 % power) slides much less on ice than Hop (50 %).',
+        physics: `As in the floor test. Creep (30 % power) slides much less on ice than Hop (${HOP_PCT} %). Sand here is Level 1 “soft sand”: it slows two-wheel drive to about half speed, it does not stop it (see OPEN_QUESTIONS).`,
         requires: ['move'],
       }),
       allowedBlocks: [HOP, CREEP, HOP_BACK, REPEAT],
-      exampleSolution: ['drive_for(50, 1)', 'repeat(5) { drive_for(30, 0.5) }  ← slow over the ice (count tuned in playtesting)', 'drive_for(50, 3)  ← extra push through the sand', 'stop'],
+      exampleSolution: ['drive_for(50, 1)', 'repeat(5) { drive_for(30, 0.5) }  ← slow over the ice (count tuned in playtesting)', 'drive_for(50, 3)  ← extra push through the sand'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (0,0) and never crosses the bridge line.' },
         { kind: 'no-collision', detail: 'No fish box touched.' },
@@ -485,7 +490,7 @@ export const ACT3: Session[] = [
       },
       {
         prompt: 'Why does the robot go less far in sand?',
-        options: [{ text: 'The wheels sink and it is hard to roll', icon: '🏖️' }, { text: 'Sand is sleepy', icon: '😴' }],
+        options: [{ text: 'The wheels sink and it is hard to roll', icon: '🏖️' }, { text: 'Sand is slippery, like ice', icon: '🧊' }],
         answer: 0,
         why: 'Soft sand lets the wheels sink in, so rolling takes more push.',
       },
@@ -600,7 +605,12 @@ export const ACT3: Session[] = [
         gridTiles: { cols: 1, rows: 6 }, floor: 'wood',
         start: { col: 0, row: 5, heading: 'up' },
         goal: 'Reach the lighthouse foot at tile (0,1).',
-        features: ['Stop line at row 4', 'Lift bridge on rows 2–3: UP until 4 s after Go, then DOWN until 14 s, then up again', 'If the bridge is up, the robot stops at a barrier (no fall)'],
+        features: [
+          'Stop line at row 4',
+          'Lift bridge on rows 2–3: UP until 3.7 s after Go, then DOWN until 14 s, then up again',
+          'Timing check: Hop 1 ends at about 1 s with the robot’s front about 10 cm from the bridge, which it reaches about 0.35 s after it moves off. Wait 3 → reaches the bridge at about 4.35 s (down: passes, 0.65 s to spare). Wait 2 → about 3.35 s (still up: stops at the barrier, 0.35 s early). So the “too short” wait fails and the right one passes with slack',
+          'If the bridge is up, the robot stops at a barrier (no fall)',
+        ],
         physics: FLAT_MAT_PHYSICS.replace('a printed mat', 'wooden planks'), requires: ['move'],
       }),
       allowedBlocks: [HOP, WAIT],
@@ -625,8 +635,15 @@ export const ACT3: Session[] = [
         gridTiles: { cols: 4, rows: 6 }, floor: 'wood',
         start: { col: 0, row: 5, heading: 'up' },
         goal: 'Reach the light at tile (3,1).',
-        features: ['Bridge A on (0,3)–(0,2): down from 4 s to 14 s', 'Rocks at (0,1) with a turn to the right', 'Bridge B on (1,1)–(2,1): down from 13 s to 25 s', 'Light at (3,1)'],
-        physics: FLAT_MAT_PHYSICS.replace('a printed mat', 'wooden planks'), requires: ['move'],
+        features: [
+          'Bridge A on (0,3)–(0,2): down from 3.7 s to 14 s',
+          'Rocks at (0,1) with a turn to the right',
+          'Bridge B on (1,1)–(2,1): down from 12.8 s to 25 s',
+          `Timing check: Hop 1 (0–1 s), Wait 3, Hop 3 (4–7 s), Turn right (7–${7 + QUARTER_TURN_S} s). Bridge B’s edge is about 10 cm ahead of the robot’s front, about 0.35 s of driving. Waits 3 + 2 → reaches bridge B at about 13.35 s (down: passes, 0.55 s to spare). Waits 3 + 1 → about 12.35 s (still up: stops at the barrier, 0.45 s early)`,
+          'Light at (3,1)',
+        ],
+        physics: `${FLAT_MAT_PHYSICS.replace('a printed mat', 'wooden planks')} A quarter turn at 40 % takes ${QUARTER_TURN_S} s; the bridge times assume it (re-time the bridges if the sim’s turn changes).`,
+        requires: ['move'],
       }),
       allowedBlocks: [HOP, WAIT, LEFT, RIGHT, say('Found a light!')],
       exampleSolution: ['drive_for(50, 1)', 'wait(3)', 'drive_for(50, 3)', 'turn_degrees(-90, 40)', 'wait(3)', 'wait(2)', 'drive_for(50, 3)', 'say("Found a light!")'],
@@ -644,7 +661,7 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'Can our robot see when the bridge is down?',
-        options: [{ text: 'No — we plan the wait for it', icon: '🙈' }, { text: 'Yes, it sees everything', icon: '👀' }],
+        options: [{ text: 'No — we plan the wait for it', icon: '🙈' }, { text: 'Yes — the Wait block watches the bridge', icon: '⏳' }],
         answer: 0,
         why: 'Our robot has no sensor that can see the bridge. So we count the time and plan a wait.',
       },
@@ -758,7 +775,7 @@ export const ACT3: Session[] = [
       narration: 'Put the scoop in your toolbox. Click on the headlight.',
       why: 'A headlight lets cameras (and people) see in the dark, and lets everyone see the robot coming.',
       tryWithout: 'In the dark tunnel without a light, Spark’s camera sees nothing and people cannot see your robot.',
-      physicsEffect: 'Adds 0.1 kg. While on, the battery meter goes down a little faster.',
+      physicsEffect: `Adds ${kg(PART_MASS_KG.tool.light)}. While on, the battery meter goes down a little faster.`,
       realWorld: 'Underwater and cave robots carry bright lights; delivery robots show lights at night so people see them.',
     },
     code: {
@@ -815,20 +832,20 @@ export const ACT3: Session[] = [
     },
     quiz: [
       {
-        prompt: 'Can a camera see in total darkness?',
-        options: [{ text: 'No, it needs light', icon: '🌑' }, { text: 'Yes', icon: '☀️' }],
+        prompt: 'Spark’s camera is an ordinary camera, like your eyes. Can it see in total darkness?',
+        options: [{ text: 'No, it needs light', icon: '🌑' }, { text: 'Yes — it sends out its own beam to see', icon: '🔦' }],
         answer: 0,
-        why: 'Cameras, like eyes, see light that bounces off things. No light, nothing to see.',
+        why: 'Ordinary cameras, like eyes, catch light that bounces off things. They do not send out a beam. No light, nothing to see.',
       },
       {
         prompt: 'Why switch the light off when you leave the tunnel?',
-        options: [{ text: 'To save battery energy', icon: '🔋' }, { text: 'Lights are scary', icon: '😱' }],
+        options: [{ text: 'To save battery energy', icon: '🔋' }, { text: 'The robot cannot drive with its light on', icon: '🚫' }],
         answer: 0,
         why: 'A light uses energy from the battery. Switching it off when it’s not needed saves energy.',
       },
       {
         prompt: 'Why is a light good for safety at night?',
-        options: [{ text: 'People can see the robot coming', icon: '🚶' }, { text: 'It makes the robot faster', icon: '🏎️' }],
+        options: [{ text: 'People can see the robot coming', icon: '🚶' }, { text: 'The robot needs it to follow its plan', icon: '🗺️' }],
         answer: 0,
         why: 'A light helps people notice the robot, so nobody gets surprised or bumped.',
       },
@@ -850,7 +867,7 @@ export const ACT3: Session[] = [
         'Why do bicycles have lights?',
       ],
       misconceptions: [
-        { idea: 'Eyes and cameras send out a beam to see.', correction: 'They catch light that comes in. That is why they need light around.' },
+        { idea: 'Eyes and cameras send out a beam to see.', correction: 'They catch light that comes in. That is why they need light around. (For curious children: some special cameras see heat instead of light, so they work in total darkness — rescue teams use them. Spark’s camera is an ordinary one.)' },
         { idea: 'Our robot needs the light to follow its plan.', correction: 'Our robot follows its plan without seeing. The light is for Spark’s camera and for people to see the robot.' },
       ],
       differentiation: {
@@ -909,12 +926,12 @@ export const ACT3: Session[] = [
       },
     ], 'Nine lights! But the fog is so thick that seeing is no help. How can a robot find its way by touch?', 'The robot lit up the dark tunnel. Fog covered the hill, and they sheltered at Nana’s house…'),
     build: {
-      part: { slot: 'tool', id: 'scoop' },
+      part: { slot: 'tool', id: 'child-choice' },
       action: 'choose',
       narration: 'Open your toolbox. Choose the tool your home helper needs: pen, scoop or headlight.',
       why: 'Engineers start with the person’s need, then choose the part.',
       tryWithout: 'The wrong tool for the job makes the job impossible — try it and see!',
-      physicsEffect: 'The chosen tool’s mass is applied (pen 0.05 kg, scoop 0.2 kg, light 0.1 kg).',
+      physicsEffect: `The chosen tool’s mass is applied (pen ${kg(PART_MASS_KG.tool.pen)}, scoop ${kg(PART_MASS_KG.tool.scoop)}, headlight ${kg(PART_MASS_KG.tool.light)}).`,
       realWorld: 'Home robots today vacuum, mop and mow; researchers are building robots that help older people fetch and carry.',
     },
     code: {

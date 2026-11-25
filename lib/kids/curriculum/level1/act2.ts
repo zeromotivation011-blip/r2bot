@@ -135,13 +135,13 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'What is an algorithm?',
-        options: [{ text: 'Steps in order to do a job', icon: '📋' }, { text: 'A kind of robot dog', icon: '🐶' }],
+        options: [{ text: 'Steps in order to do a job', icon: '📋' }, { text: 'A special robot part', icon: '🔩' }],
         answer: 0,
         why: 'An algorithm is a plan of steps in order — like a recipe or the way to school.',
       },
       {
         prompt: 'Why plan the path before pressing Go?',
-        options: [{ text: 'So the robot does not get lost or bump', icon: '🗺️' }, { text: 'Robots like paper', icon: '📄' }],
+        options: [{ text: 'So the robot does not get lost or bump', icon: '🗺️' }, { text: 'So the robot can read our drawing', icon: '📄' }],
         answer: 0,
         why: 'A plan helps us find the right path first. Then the robot follows it exactly.',
       },
@@ -211,8 +211,8 @@ export const ACT2: Session[] = [
         setting: 'Nana Lucía sits on a crate with a cup of tea.',
         action: 'She tells a story. A little picture shows an old room-sized computer and a small moth.',
         lines: [
-          { who: 'lucia', line: 'Long ago, engineers found a real moth stuck inside a giant computer. They wrote it down as a "bug".' },
-          { who: 'lucia', line: 'Now any mistake in a program is called a bug. Every engineer makes them. Me too!' },
+          { who: 'lucia', line: 'Engineers have called mistakes "bugs" for a very long time. Once, they found a REAL moth stuck in a giant computer!' },
+          { who: 'lucia', line: 'They taped it in their notebook as "the first real bug" — a joke! Any mistake in a program is a bug. Every engineer makes them. Me too!' },
           { who: 'spark', line: 'So a bug is not bad. It’s a puzzle!' },
         ],
         seconds: 40,
@@ -311,15 +311,15 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'What is a bug in a program?',
-        options: [{ text: 'A mistake in the steps', icon: '🐞' }, { text: 'An insect living in the tablet', icon: '🦗' }],
+        options: [{ text: 'A mistake in the steps', icon: '🐞' }, { text: 'A broken robot', icon: '💔' }],
         answer: 0,
-        why: 'A bug is a mistake in the program. The name comes from a real moth found in an old computer.',
+        why: 'A bug is a mistake in the program — the robot is fine, the steps are wrong. Engineers called mistakes bugs long ago; once they even found a real moth in a computer and joked it was a real bug.',
       },
       {
         prompt: 'How do you find a bug?',
-        options: [{ text: 'Watch where the robot stops doing the plan', icon: '🔍' }, { text: 'Delete everything', icon: '🗑️' }],
+        options: [{ text: 'Watch where the robot stops doing the plan', icon: '🔍' }, { text: 'Start again from the top', icon: '🔄' }],
         answer: 0,
-        why: 'Watch the robot and find the first moment it does something different from the plan.',
+        why: 'Watch the robot and find the first moment it does something different from the plan. Starting again throws away all the steps that were right.',
       },
       {
         prompt: 'Do good engineers make bugs?',
@@ -430,7 +430,7 @@ export const ACT2: Session[] = [
       narration: 'Clip the drawing pen under your robot.',
       why: 'The pen draws a line wherever the robot goes, so you can see the path your program made.',
       tryWithout: 'Without the pen, you only see where the robot ended — not the path it took.',
-      physicsEffect: 'Adds 0.05 kg. A pen touching the floor adds a tiny drag the sim includes; no visible change in distance.',
+      physicsEffect: `Adds ${kg(PART_MASS_KG.tool.pen)}. A pen touching the floor adds a tiny drag the sim includes; no visible change in distance.`,
       realWorld: 'Line-marking robots paint lines on sports fields from a plan.',
     },
     code: {
@@ -498,7 +498,7 @@ export const ACT2: Session[] = [
       },
       {
         prompt: 'Why is a pen useful for checking a program?',
-        options: [{ text: 'You can see the path it took', icon: '👀' }, { text: 'It makes the robot faster', icon: '💨' }],
+        options: [{ text: 'You can see the path it took', icon: '👀' }, { text: 'Pen down steers the robot for you', icon: '🖊️' }],
         answer: 0,
         why: 'The line shows exactly where the robot went — great for finding bugs.',
       },
@@ -656,7 +656,7 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'When do we use a Repeat block?',
-        options: [{ text: 'When steps happen again and again', icon: '🔁' }, { text: 'When the robot is sad', icon: '😢' }],
+        options: [{ text: 'When steps happen again and again', icon: '🔁' }, { text: 'When a step happens only once', icon: '1️⃣' }],
         answer: 0,
         why: 'Repeat does the steps inside it again, as many times as you say.',
       },
@@ -668,7 +668,7 @@ export const ACT2: Session[] = [
       },
       {
         prompt: 'Repeat 3 { clap }. How many claps?',
-        options: [{ text: '3', icon: '👏👏👏' }, { text: '1', icon: '👏' }],
+        options: [{ text: '3', icon: '👏👏👏' }, { text: '4 — once, then 3 more', icon: '👏👏👏👏' }],
         answer: 0,
         why: 'Repeat 3 means do it three times: clap, clap, clap!',
       },
@@ -838,7 +838,7 @@ export const ACT2: Session[] = [
       },
       {
         prompt: 'Where can you find patterns?',
-        options: [{ text: 'Cloth, tiles, songs and floors', icon: '🧶' }, { text: 'Nowhere', icon: '🚫' }],
+        options: [{ text: 'Cloth, tiles, songs and floors', icon: '🧶' }, { text: 'Only in maths books', icon: '📘' }],
         answer: 0,
         why: 'Patterns are everywhere: woven cloth, floor tiles, rangoli, music and more.',
       },
@@ -978,7 +978,7 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'What does Repeat 4 around "draw a square, turn" make?',
-        options: [{ text: 'Four squares around a point, like a flower', icon: '🌸' }, { text: 'One line', icon: '➖' }],
+        options: [{ text: 'Four squares around a point, like a flower', icon: '🌸' }, { text: 'One big square', icon: '⬜' }],
         answer: 0,
         why: 'Each time round it draws a square, then turns. Four squares make a flower shape.',
       },

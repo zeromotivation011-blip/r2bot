@@ -69,6 +69,9 @@ export const LIGHT_ON: AllowedBlock = { id: 'light_on', label: 'Light on' }
 export const LIGHT_OFF: AllowedBlock = { id: 'light_off', label: 'Light off' }
 export const UNTIL_BUMP: AllowedBlock = { id: 'repeat_until', label: 'Keep going until I feel a bump', fixed: { cond: 'bumped' } }
 
+/** Reverse after a bump (about 13 cm), so even the widest body can turn without scraping the wall. */
+export const BACK_OFF: AllowedBlock = { id: 'drive_for', label: 'Back off a little', fixed: { speedPct: -30, seconds: 1 } }
+
 /** The Level 1 "close" threshold, in cm from the Distance Eyes. */
 export const CLOSE_CM = 20
 /** The Level 1 "clear" threshold: nothing in the next tile (eye to the far edge of the next tile, ≈ 1.5 tiles). */
@@ -202,6 +205,9 @@ export function checkL1Geometry(): string[] {
     if (centreMax + coastCm > TILE_CM) out.push(`${body}: "until close" can stop with the centre ${centreMax} cm from the wall — outside the end tile`)
     if (centreMin < g.turnRadiusCm + 1) out.push(`${body}: "until close" can stop too near the wall to turn (centre ${centreMin} cm, turn radius ${g.turnRadiusCm} cm)`)
     if (gapMin < 3) out.push(`${body}: "until close" can stop only ${gapMin} cm from the wall`)
+    // "Back off" after a bump: the front touches the wall, then backs off 2 creeps.
+    const afterBackOff = g.frontCm + 2 * CREEP_CM
+    if (afterBackOff < g.turnRadiusCm + 1) out.push(`${body}: after "back off" the centre is ${afterBackOff} cm from the wall — too near to turn (r ${g.turnRadiusCm} cm)`)
     // "Clear": a person anywhere in the next tile must read below CLEAR_CM.
     const farEdge = 1.5 * TILE_CM - g.eyeAheadCm
     if (farEdge > CLEAR_CM) out.push(`${body}: "wait until clear" misses a person at the far side of the next tile (${farEdge} cm)`)

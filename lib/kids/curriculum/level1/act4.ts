@@ -13,50 +13,30 @@
 
 import type { AllowedBlock, Session } from '../types'
 import {
-  BEEP, CREEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, IF_BUMP, LEFT, LIGHT_OFF, LIGHT_ON, PEN_DOWN, PEN_UP,
-  REPEAT, RIGHT, SCOOP_UP, TIP_OUT, UNTIL_BUMP, WAIT,
-  arena, episode, lessonTiming, obj, projectTiming, say, teacher,
+  BACK_OFF, BEEP, CLEAR_CM, CLOSE_CM, CREEP, CREEP_CM, FLAT_MAT_PHYSICS, HOP, HOP_BACK, HOP_PCT, IF_BUMP, LEFT, LIGHT_OFF, LIGHT_ON,
+  OBSTACLE_MIN_CM, PART_MASS_KG, PEN_DOWN, PEN_UP, REPEAT, RIGHT, SCOOP_UP, TILE_CM, TIP_OUT, UNTIL_BUMP, UNTIL_CLOSE, WAIT, WAIT_CLEAR,
+  arena, episode, kg, lessonTiming, obj, projectTiming, say, teacher,
 } from './shared'
 import { L1_PROJECTS } from './projects'
 
 // ── Act 4 picture blocks ──────────────────────────────────────────────────
 
-/** Small reverse after a bump, so the body can turn without scraping the wall. */
-const BACK_OFF: AllowedBlock = { id: 'drive_for', label: 'Back off a little', fixed: { speedPct: -30, seconds: 0.5 } }
-
 /** A loop with a big count, for sensor programs where the child does not know the map. */
 const REPEAT_LOTS: AllowedBlock = { id: 'repeat', label: 'Repeat lots of times', choices: { n: [10, 20, 40] } }
-
-/** repeat_until(distance_cm < 20) — the body is usually CREEP. */
-const UNTIL_CLOSE: AllowedBlock = {
-  id: 'repeat_until',
-  label: 'Keep going until something is close',
-  fixed: { cond: 'distance_cm < 20' },
-}
-
-/**
- * repeat_until(distance_cm > 30) with nothing inside: the program waits here
- * until nothing is within about one tile in front.
- */
-const WAIT_CLEAR: AllowedBlock = {
-  id: 'repeat_until',
-  label: 'Wait until the path is clear',
-  fixed: { cond: 'distance_cm > 30' },
-}
 
 // ── Act 4 physics ─────────────────────────────────────────────────────────
 
 const FOG_PHYSICS =
   `${FLAT_MAT_PHYSICS} Visual fog: the 3D view and any camera see about one tile. ` +
   'Fog does not change touch (bumper) or sound (echo distance sensor) readings. ' +
-  'Creep = drive_for(30 %, 0.5 s) ≈ 7.5 cm ≈ 0.3 tile. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.'
+  `Creep = drive_for(30 %, 0.5 s) ≈ ${CREEP_CM} cm. Back off = drive_for(−30 %, 1 s) ≈ ${2 * CREEP_CM} cm. The bumper is a soft foam strip on a switch: it clicks at a light touch (about 1 N) and absorbs the small push of the rest of a creep.'
 
 const ECHO_PHYSICS =
-  `${FOG_PHYSICS} Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (about 30°), about ±1 cm on hard flat surfaces. ` +
+  `${FOG_PHYSICS} Distance Eyes: ultrasonic, measures 3–200 cm straight ahead in a narrow cone (±12° to the sides, tilting down to 30° so low things ahead are found too), about ±1 cm on hard flat surfaces; reads 200 when nothing echoes. ` +
   'Soft surfaces (hay bales, curtains, fur costumes) return a weaker echo; the simulator still detects them at this range but shows a fainter echo ring.'
 
 const RAMP_PHYSICS =
-  `${ECHO_PHYSICS} Tower ramps rise at 8°: the same creep covers about 15 % less ground uphill (more of the motor’s push goes into lifting the robot).`
+  `${ECHO_PHYSICS} Tower ramps rise at 10°: the same creep covers less ground uphill (part of the motor’s push goes into lifting the robot). Ramp surfaces are not seen as obstacles; the walls at the end of each ramp are ${OBSTACLE_MIN_CM} cm tall or more.`
 
 // ── Sessions ──────────────────────────────────────────────────────────────
 
@@ -127,7 +107,7 @@ export const ACT4: Session[] = [
       narration: 'Click the soft bumper onto the front of your robot. Press it with your finger. Click!',
       why: 'A bumper is a touch sensor. It tells the robot “I touched something”, even in fog or in the dark.',
       tryWithout: 'Without a bumper, the robot cannot tell it reached the wall. It keeps pushing, its wheels spin, and it wastes battery.',
-      physicsEffect: 'Adds 0.05 kg at the front. The switch closes at a light touch (about 1 newton) and the foam softens the bump.',
+      physicsEffect: `Adds ${kg(PART_MASS_KG.sensor.bumper)} at the front. The switch closes at a light touch (about 1 newton) and the foam softens the bump.`,
       realWorld: 'Robot vacuum cleaners have a bumper that clicks when they touch a sofa leg; then they back up and turn.',
     },
     code: {
@@ -310,7 +290,7 @@ export const ACT4: Session[] = [
       mission: 'Bolt’s ball is round the corner. Creep again and again. If you feel a bump, back off and turn right.',
       arena: arena({
         id: 'l1-hedge-corner', name: 'Hedge corner',
-        description: 'A hedge path going up, then turning right. The ball is at the end.',
+        description: 'A hedge path going up, then turning right. The ball is at the end. Every other tile is solid hedge.',
         gridTiles: { cols: 3, rows: 3 }, floor: 'grass',
         start: { col: 0, row: 2, heading: 'up' },
         goal: 'Reach the ball in tile (2,0).',
@@ -337,7 +317,11 @@ export const ACT4: Session[] = [
         gridTiles: { cols: 3, rows: 3 }, floor: 'grass',
         start: { col: 0, row: 2, heading: 'up' },
         goal: 'Reach Bolt in tile (1,1).',
-        features: ['Corridor (0,2)→(0,0)→(2,0)→(2,2)→(1,2)→(1,1); hedges everywhere else', 'Bolt at (1,1)', 'Fog'],
+        features: [
+          'Corridor (0,2)→(0,0)→(2,0)→(2,2)→(1,2)→(1,1). It uses all nine tiles, so its inner walls are thin hedges (1 cm, ' + OBSTACLE_MIN_CM + ' cm tall) on these tile edges: (0,2)|(1,2), (0,1)|(1,1), (1,0)|(1,1), (2,1)|(1,1); plus hedges round the outside',
+          'Clear corridor width ' + (TILE_CM - 1) + ' cm: wider than every Level 1 robot’s turning circle (see the robot geometry in Physics)',
+          'Bolt at (1,1)', 'Fog',
+        ],
         physics: FOG_PHYSICS.replace('a printed mat', 'short grass'), requires: ['move', 'feel-bump'],
       }),
       allowedBlocks: [CREEP, BACK_OFF, RIGHT, LEFT, IF_BUMP, REPEAT_LOTS],
@@ -367,10 +351,10 @@ export const ACT4: Session[] = [
         why: 'The bumper senses. The “if” thinks — it decides what to do. Turning is the act.',
       },
       {
-        prompt: 'Can the same rule work in a different maze?',
-        options: [{ text: 'Yes, if every corner is the same kind', icon: '✅' }, { text: 'No, never', icon: '❌' }],
+        prompt: 'Look at this new maze picture. Every corner turns right, like ours. Will your bump-and-turn-right rule find Bolt?',
+        options: [{ text: 'Yes — the same rule works', icon: '✅' }, { text: 'No — it only works in our maze', icon: '❌' }],
         answer: 0,
-        why: 'A sensor rule does not need the map. In any maze where every turn is a right turn, it works.',
+        why: 'The rule does not need the map. In any maze where every corner turns right, bump-and-turn-right works.',
       },
     ],
     badge: { id: 'l1-thinker', name: 'Choice Maker', icon: '🔀', earnedFor: 'You used “if” so your robot made its own choice when it felt a bump.' },
@@ -440,7 +424,7 @@ export const ACT4: Session[] = [
       },
       {
         setting: 'Amara stands in front of the robot and slowly steps closer.',
-        action: 'A number above the robot shrinks: 80… 50… 20. At 20, the robot’s eyes glow amber.',
+        action: `A number above the robot shrinks: 80… 50… ${CLOSE_CM}. At ${CLOSE_CM}, the robot’s eyes glow amber.`,
         lines: [
           { who: 'spark', line: 'The bumper feels a touch. Distance Eyes know BEFORE the touch.' },
           { who: 'spark', line: 'Which is better for not bumping into a friend?', direction: 'Pause for answers: Distance Eyes!' },
@@ -472,7 +456,7 @@ export const ACT4: Session[] = [
       narration: 'Put the Face Screen in your toolbox. Click the Distance Eyes onto the head.',
       why: 'Distance Eyes measure how far away things are, so the robot can stop before it touches them.',
       tryWithout: 'With only the bumper, the robot finds the bandstand by bumping into it — not kind to steps, flowers or people.',
-      physicsEffect: 'Head mass about the same as the screen (0.05 kg). Measures 3–200 cm straight ahead; fog does not change it.',
+      physicsEffect: `Distance Eyes ${kg(PART_MASS_KG.head.distance)}, a little lighter than the Face Screen (${kg(PART_MASS_KG.head.screen)}). Measures 3–200 cm straight ahead; fog does not change it.`,
       realWorld: 'Car parking sensors use the same echo trick; some underwater robots use sonar to measure distance in murky water.',
     },
     code: {
@@ -480,18 +464,18 @@ export const ACT4: Session[] = [
       mission: 'Roll toward the bandstand. Keep going until something is close, then stop and say “Hello, bandstand!”. No bumping!',
       arena: arena({
         id: 'l1-square-lane', name: 'Foggy square',
-        description: 'A straight path across the square in fog. The bandstand steps are somewhere ahead (a different distance each run).',
+        description: 'A straight path across the square in fog. The bandstand is somewhere ahead (a different distance each run).',
         gridTiles: { cols: 1, rows: 6 }, floor: 'mat',
         start: { col: 0, row: 5, heading: 'up' },
         goal: 'Stop within one tile of the steps without touching them.',
-        features: ['Bandstand steps 3–5 tiles ahead, random each run', 'A live number shows the distance reading', 'Both sensor blocks are offered on purpose: try “until bump” once and see the steps get bumped'],
+        features: ['Bandstand 3–5 tiles ahead, random each run. Its front is a railing ' + OBSTACLE_MIN_CM + ' cm tall with the steps behind it, so every body’s Distance Eyes find it', 'A live number shows the distance reading', 'Both sensor blocks are offered on purpose: try “until bump” once and see the railing get bumped (the foam bumper makes that harmless)'],
         physics: ECHO_PHYSICS, requires: ['move', 'see-wall', 'feel-bump'],
       }),
       allowedBlocks: [CREEP, UNTIL_CLOSE, UNTIL_BUMP, say('Hello, bandstand!')],
-      exampleSolution: ['repeat_until(distance_cm < 20) {', '  drive_for(30, 0.5)', '}', 'say("Hello, bandstand!")'],
+      exampleSolution: [`repeat_until(distance_cm < ${CLOSE_CM}) {`, '  drive_for(30, 0.5)', '}', 'say("Hello, bandstand!")'],
       success: [
-        { kind: 'no-collision', detail: 'The robot never touches the steps.' },
-        { kind: 'stop-in-zone', detail: 'Front of the robot ends 10–25 cm from the steps, on three runs in a row.' },
+        { kind: 'no-collision', detail: 'The robot never touches the railing.' },
+        { kind: 'stop-in-zone', detail: `Front of the robot ends 5–${CLOSE_CM} cm from the railing, on three runs in a row.` },
       ],
       stars: { two: 'You stopped before touching, every time.', three: 'You can say why “until close” is kinder than “until bump”.' },
       hints: [
@@ -502,35 +486,40 @@ export const ACT4: Session[] = [
     },
     challenge: {
       title: 'Round the Bandstand',
-      mission: 'Light eleven is on the far side of the bandstand. Go until close, turn left, and go until close again — twice — without touching anything.',
+      mission: 'Light eleven is on the far side of the bandstand. Go until something is close, then turn left. Do that two times. Then ring the bell!',
       arena: arena({
         id: 'l1-bandstand', name: 'The bandstand',
-        description: 'The bandstand in the middle of the square, with flower boxes around the edge. You go up one side, along the top, and down to the bell.',
+        description: 'The bandstand in the middle of the square, with tall flower stands around the edge. You go up one side, along the top, and stop by the bell.',
         gridTiles: { cols: 4, rows: 4 }, floor: 'mat',
         start: { col: 3, row: 3, heading: 'up' },
         goal: 'End in tile (0,0) facing down, with the bell at (0,1) just in front, without touching anything.',
-        features: ['Bandstand fills (1,1)–(2,2)', 'Flower boxes along the top edge (row 0 wall) and the left edge (col 0 wall)', 'Bell with light 11 at (0,1), against the left wall'],
+        features: [
+          'Bandstand fills (1,1)–(2,2), railing ' + OBSTACLE_MIN_CM + ' cm tall',
+          'Flower stands (' + OBSTACLE_MIN_CM + ' cm tall) form the walls along the top edge and the left edge',
+          'Bell with light 11 at (0,1), against the left wall',
+          'Geometry: “until close” stops every body with its centre inside the end tile and room to turn (checked by the doc script, checkL1Geometry), so after each left turn the robot faces along the next side, never into the bandstand',
+        ],
         physics: ECHO_PHYSICS, requires: ['move', 'see-wall'],
       }),
       allowedBlocks: [CREEP, LEFT, RIGHT, UNTIL_CLOSE, REPEAT, say('Ding!')],
-      exampleSolution: ['repeat(2) {', '  repeat_until(distance_cm < 20) { drive_for(30, 0.5) }', '  turn_degrees(90, 40)', '}', 'say("Ding!")'],
+      exampleSolution: ['repeat(2) {', `  repeat_until(distance_cm < ${CLOSE_CM}) { drive_for(30, 0.5) }`, '  turn_degrees(90, 40)', '}', 'say("Ding!")'],
       success: [
-        { kind: 'no-collision', detail: 'No flower box, bandstand or bell touched.' },
-        { kind: 'stop-in-zone', detail: 'Robot centre ends in tile (0,0) facing down, with the bell less than 25 cm in front.' },
+        { kind: 'no-collision', detail: 'No flower stand, bandstand or bell touched.' },
+        { kind: 'stop-in-zone', detail: `Robot centre within ${TILE_CM} cm of the top wall and of the left wall (tile (0,0)), facing down, with the bell less than ${TILE_CM} cm in front.` },
       ],
       stars: { two: 'No touches at all.', three: 'You used Repeat 2 because the two parts are the same.' },
       hints: [
         'Up the side until close. Turn left. Along the top until close. Turn left. Look: the bell!',
         'The two parts are the same: until close, then turn left.',
-        'Repeat 2 → (Until close → Creep), Turn left. Then Say.',
+        'Repeat 2 → (Until close → Creep), Turn left. Then Say “Ding!”.',
       ],
     },
     quiz: [
       {
         prompt: 'How do Distance Eyes know something is close?',
-        options: [{ text: 'They listen for an echo', icon: '🦇' }, { text: 'They touch it', icon: '✋' }, { text: 'They smell it', icon: '👃' }],
+        options: [{ text: 'They listen for an echo', icon: '🦇' }, { text: 'They touch it', icon: '✋' }, { text: 'They see it, like our eyes', icon: '👁️' }],
         answer: 0,
-        why: 'They send a sound and listen for the echo. A quick echo means something is close.',
+        why: 'They send a sound and listen for the echo. A quick echo means something is close. They do not see pictures at all.',
       },
       {
         prompt: 'In thick fog, which still works?',
@@ -550,12 +539,13 @@ export const ACT4: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Echo clap'),
       unpluggedWarmup: {
-        title: 'Echo clap', minutes: 5,
+        title: 'Echo clap', minutes: 4,
         steps: [
           'In a big room or corridor, clap once and listen. Is there an echo?',
           'Bat game: one child is the “bat” with eyes closed; a partner stands somewhere ahead. The bat says “squeak!”; the partner answers “echo!” quickly if close, slowly if far. The bat walks and stops when the echo is quick.',
+          'Same game without sound (for deaf or hard-of-hearing children, or a noisy room): the bat holds out a hand; the partner taps it quickly when close and slowly when far, or holds up an “echo card” — the closer they are, the faster they flash it.',
         ],
-        materials: ['A big room or a corridor'],
+        materials: ['A big room or a corridor', 'Optional: a bright card per pair for the silent version'],
       },
       discussion: [
         'Which animals find their way with sound? (bats, dolphins, some whales)',
@@ -569,7 +559,7 @@ export const ACT4: Session[] = [
         faster: ['Try a soft hay bale instead of the steps: the echo ring is fainter. Why might soft things be harder to hear?', 'Change the stop distance: is closer or further safer near people?'],
         slower: ['Code task only. Watch the distance number go down as the robot creeps.'],
       },
-      notes: ['Accuracy note for teachers: real ultrasonic sensors struggle with very soft or steeply angled surfaces, which absorb or deflect the echo. The simulator models a fainter echo, not a miss, at Level 1.'],
+      notes: ['Access: the echo is also shown — rings pulse out from the Distance Eyes and the number shrinks — so the session works fully without sound.', 'Accuracy note for teachers: real ultrasonic sensors struggle with very soft or steeply angled surfaces, which absorb or deflect the echo. The simulator models a fainter echo, not a miss, at Level 1.'],
     }),
     parent: {
       today: 'Your child swapped in a distance sensor that works like a bat’s echo, and programmed the robot to stop before touching things — even in fog.',
@@ -585,7 +575,7 @@ export const ACT4: Session[] = [
     objective: 'Make the robot wait until the path is clear before each move, and talk about who keeps robots safe.',
     objectives: [
       obj('L1-S22-O1', 'Uses a sensor check before each move so the robot waits for people, and explains why safety comes before speed.', 'I can make my robot wait until the path is clear.', ['sensors', 'safety-ethics', 'loops'], ['programming', 'impacts-of-computing']),
-      obj('L1-S22-O2', 'Recognises that the people who design and program robots are responsible for making them safe.', 'I know robot makers must keep people safe.', ['safety-ethics'], ['impacts-of-computing', 'communication']),
+      { ...obj('L1-S22-O2', 'Recognises that the people who design and program robots are responsible for making them safe.', 'I know robot makers must keep people safe.', ['safety-ethics'], ['impacts-of-computing', 'communication']), discussionOnly: true },
     ],
     concepts: ['safety-ethics', 'sensors', 'loops'],
     newBlocks: [],
@@ -638,12 +628,12 @@ export const ACT4: Session[] = [
       },
     ], 'The twelfth light is at the top of the clock tower, up a winding ramp. Counting hops on a hill went wrong before. What will work?', 'Distance Eyes found light eleven by its echo. The square filled with people for the festival…'),
     build: {
-      part: { slot: 'head', id: 'distance' },
-      action: 'inspect',
-      narration: 'Look at your Distance Eyes. Wave your hand in front of them and watch the number.',
-      why: 'The same sensor that finds walls also notices people, so the robot can wait for them.',
+      part: { slot: 'tool', id: 'scoop' },
+      action: 'swap',
+      narration: 'Light eleven has to go to the tower door. Put your tool in the toolbox and click the scoop on to carry it. Then wave your hand in front of your Distance Eyes and watch the number.',
+      why: 'The scoop carries the light. The Distance Eyes that found walls also notice people, so the robot can wait for them.',
       tryWithout: 'Without checking, a robot hops on a timer — right into someone who has just stepped in front.',
-      physicsEffect: 'No change. People in the simulator are detected like any object in the sensor cone.',
+      physicsEffect: `Scoop ${kg(PART_MASS_KG.tool.scoop)} at the front. People in the simulator are detected like any object in the sensor cone (they are taller than ${OBSTACLE_MIN_CM} cm).`,
       realWorld: 'Delivery robots on footpaths and robot carts in hospitals slow down and stop for people in their way.',
     },
     code: {
@@ -655,11 +645,11 @@ export const ACT4: Session[] = [
         gridTiles: { cols: 1, rows: 6 }, floor: 'mat',
         start: { col: 0, row: 5, heading: 'up' },
         goal: 'Reach the tower door at tile (0,0).',
-        features: ['Visitors step into the path at random times and stand 2–4 s before moving on', 'Visitors never step into the tile the robot is already hopping into (Level 1 checks only between hops)', 'The tower door beyond (0,0) is open, so the sensor sees through it'],
+        features: ['Visitors step into the path at random times and stand 2–4 s before moving on', 'Visitors never step into the tile the robot is already hopping into (Level 1 checks only between hops)', `The tower door beyond (0,0) is open and the tower is far away, so nothing static is within ${CLEAR_CM} cm at any waiting place`],
         physics: ECHO_PHYSICS.replace(/Visual fog[^.]*\. /, ''), requires: ['move', 'see-wall'],
       }),
       allowedBlocks: [HOP, WAIT_CLEAR, REPEAT, WAIT, say('Excuse me!', 'Thank you!')],
-      exampleSolution: ['repeat(5) {', '  repeat_until(distance_cm > 30) { }  ← wait until clear', '  drive_for(50, 1)', '}'],
+      exampleSolution: ['repeat(5) {', `  repeat_until(distance_cm > ${CLEAR_CM}) { }  ← wait until clear`, `  drive_for(${HOP_PCT}, 1)`, '}'],
       success: [
         { kind: 'no-collision', detail: 'No visitor is touched.' },
         { kind: 'reach-zone', detail: 'Robot centre ends in tile (0,0).' },
@@ -673,20 +663,25 @@ export const ACT4: Session[] = [
     },
     challenge: {
       title: 'The Lantern Delivery',
-      mission: 'Carry light eleven in your scoop through the busy square to the tower door. Wait for people, turn at the fountain, and tip it out at the door.',
+      mission: 'Carry light eleven in your scoop through the busy square to the tower door. Wait for people, turn right at the corner, and tip it out at the door.',
       arena: arena({
         id: 'l1-square-delivery', name: 'Festival square',
-        description: 'Up the square, a right turn at the fountain, then along to the tower door. Visitors cross at both parts.',
+        description: 'Up the square, a right turn at the top corner, then along to the tower door. Visitors cross at both parts.',
         gridTiles: { cols: 4, rows: 4 }, floor: 'mat',
         start: { col: 0, row: 3, heading: 'up' },
         goal: 'Tip light 11 out in the open doorway tile (3,0), with the robot at (2,0) facing right.',
-        features: ['Light 11 already in the scoop', 'Fountain at (1,1)', 'Visitors cross column 0 and row 0 at random times, never into the tile the robot is hopping into', 'Open tower doorway at (3,0); the tower beyond is far away to the sensor'],
+        features: [
+          'Light 11 already in the scoop (the scoop was clicked on in this session’s build; if another tool is fitted, the arena asks for the scoop with one tap before it loads)',
+          'Fountain at (1,1)',
+          'Visitors cross column 0 and row 0 at random times, never into the tile the robot is hopping into',
+          `Nothing static within ${CLEAR_CM} cm of the Distance Eyes at any waiting place: the square carries on past the top edge above column 0 (open, no wall), and the tower doorway at (3,0) is open with the tower far beyond`,
+        ],
         physics: ECHO_PHYSICS.replace(/Visual fog[^.]*\. /, ''), requires: ['move', 'see-wall', 'grab'],
       }),
       allowedBlocks: [HOP, LEFT, RIGHT, WAIT_CLEAR, REPEAT, TIP_OUT, say('Excuse me!', 'Thank you!')],
       exampleSolution: [
-        'repeat(3) { repeat_until(distance_cm > 30) { }  drive_for(50, 1) }', 'turn_degrees(-90, 40)',
-        'repeat(2) { repeat_until(distance_cm > 30) { }  drive_for(50, 1) }', 'grip_open', 'say("Thank you!")',
+        `repeat(3) { repeat_until(distance_cm > ${CLEAR_CM}) { }  drive_for(${HOP_PCT}, 1) }`, 'turn_degrees(-90, 40)',
+        `repeat(2) { repeat_until(distance_cm > ${CLEAR_CM}) { }  drive_for(${HOP_PCT}, 1) }`, 'grip_open', 'say("Thank you!")',
       ],
       success: [
         { kind: 'no-collision', detail: 'No visitor, fountain or stall touched.' },
@@ -714,7 +709,7 @@ export const ACT4: Session[] = [
       },
       {
         prompt: 'Why check before EVERY hop, not just once?',
-        options: [{ text: 'People keep moving', icon: '🚶' }, { text: 'The robot forgets', icon: '🤔' }],
+        options: [{ text: 'People keep moving', icon: '🚶' }, { text: 'It doesn’t matter — checking once at the start is enough', icon: '1️⃣' }],
         answer: 0,
         why: 'The square changes all the time. A path that was clear a moment ago may not be clear now.',
       },
@@ -760,7 +755,7 @@ export const ACT4: Session[] = [
     objective: 'Climb a winding ramp by repeating a sensor rule, and meet the people whose job is robots.',
     objectives: [
       obj('L1-S23-O1', 'Repeats a sensor-based step (go until close, turn) inside a loop to solve a longer task, and explains why it works on a slope where counted hops do not.', 'I can repeat a sensor rule to climb the tower.', ['loops', 'sensors', 'physics'], ['programming', 'algorithms', 'science-forces']),
-      obj('L1-S23-O2', 'Names some jobs people do with robots (design, build, program, test, repair) and robots that help people.', 'I can name jobs people do with robots.', ['careers'], ['impacts-of-computing', 'communication']),
+      { ...obj('L1-S23-O2', 'Names some jobs people do with robots (design, build, program, test, repair) and robots that help people.', 'I can name jobs people do with robots.', ['careers'], ['impacts-of-computing', 'communication']), discussionOnly: true },
     ],
     concepts: ['loops', 'sensors', 'physics', 'careers'],
     newBlocks: [],
@@ -815,11 +810,11 @@ export const ACT4: Session[] = [
     ], 'All twelve lights are found! Tonight is the Night of a Hundred Lights — and the town wants a show from your robot.', 'The robot waited for people in the busy square. The last light was at the top of the clock tower…'),
     build: {
       part: { slot: 'tool', id: 'scoop' },
-      action: 'swap',
-      narration: 'Your robot has lots of parts now. Look at them all: wheels, bumper, Distance Eyes. Click the scoop back on for the last light.',
+      action: 'inspect',
+      narration: 'Your robot has lots of parts now. Look at them all: wheels, bumper, Distance Eyes — and the scoop, still on from the square, ready for the last light. Tap each part to hear what it does.',
       why: 'Each part does a job: wheels move, the bumper feels, Distance Eyes hear echoes, the scoop carries.',
       tryWithout: 'Take off the Distance Eyes and try counted hops on the ramp: the robot stops short on the hill.',
-      physicsEffect: 'Scoop 0.2 kg. On the 8° ramp, gravity pulls back on the robot, so each creep covers about 15 % less.',
+      physicsEffect: `Scoop ${kg(PART_MASS_KG.tool.scoop)}. On the 10° ramp, gravity pulls back on the robot, so each creep covers less ground than on the flat.`,
       realWorld: 'Climbing and inspection robots use sensors to know where they are, because wheels slip and slopes change distances.',
     },
     code: {
@@ -827,19 +822,23 @@ export const ACT4: Session[] = [
       mission: 'Go up the first ramp until the wall is close, then turn left. Do it twice.',
       arena: arena({
         id: 'l1-tower-half', name: 'Clock tower (lower half)',
-        description: 'Two ramps winding up inside the tower. Each ends at a wall. They slope upward.',
+        description: 'Two ramps winding up inside the tower. Each ends at a flat corner landing with a wall. They slope upward.',
         gridTiles: { cols: 4, rows: 4 }, floor: 'ramp',
         start: { col: 3, row: 3, heading: 'up' },
         goal: 'Stop near the wall at the end of the second ramp, at tile (0,0), without touching.',
-        features: ['Ramp 1: column 3 up to row 0', 'Ramp 2: row 0 left to column 0', 'Central gear shaft fills (1,1)–(2,2)', 'All ramps slope up at 8°'],
+        features: [
+          'Corner tiles (3,3), (3,0) and (0,0) are flat landings; the two tiles between landings slope up at 10° (70 cm of ramp rises about 12 cm)',
+          'Ramp 1: column 3 up to the landing at (3,0)', 'Ramp 2: row 0 left to the landing at (0,0)',
+          `Central gear shaft fills (1,1)–(2,2); outer and shaft walls are ${OBSTACLE_MIN_CM} cm tall or more`,
+        ],
         physics: RAMP_PHYSICS, requires: ['move', 'see-wall'],
       }),
       allowedBlocks: [HOP, CREEP, LEFT, RIGHT, UNTIL_CLOSE, REPEAT],
       starter: ['drive_for(50, 3)  ← stops short on the hill. Try it, then fix it!'],
-      exampleSolution: ['repeat(2) {', '  repeat_until(distance_cm < 20) { drive_for(30, 0.5) }', '  turn_degrees(90, 40)', '}'],
+      exampleSolution: ['repeat(2) {', `  repeat_until(distance_cm < ${CLOSE_CM}) { drive_for(30, 0.5) }`, '  turn_degrees(90, 40)', '}'],
       success: [
         { kind: 'no-collision', detail: 'No wall touched.' },
-        { kind: 'stop-in-zone', detail: 'Robot centre ends in tile (0,0).' },
+        { kind: 'stop-in-zone', detail: `Robot centre within ${TILE_CM} cm of the top wall and of the left wall (the landing at (0,0)).` },
       ],
       stars: { two: 'You used the sensor instead of counting.', three: 'You can say why counting failed on the ramp.' },
       hints: [
@@ -853,20 +852,22 @@ export const ACT4: Session[] = [
       mission: 'Climb all four ramps to the clock face. Then scoop up the twelfth light.',
       arena: arena({
         id: 'l1-tower-full', name: 'Clock tower',
-        description: 'Four ramps winding up inside the tower, then the clock room with the light in the gears.',
+        description: 'One ramp that winds up four sides of the tower, like a helix, to the clock room landing.',
         gridTiles: { cols: 4, rows: 4 }, floor: 'ramp',
         start: { col: 3, row: 3, heading: 'up' },
-        goal: 'After four ramps, stop facing the gear at (3,2) on the top floor and scoop up light 12.',
+        goal: 'After the 4th ramp the robot is on the clock-room landing above (3,3). After the 4th left turn it faces north; light 12 is in the cog on the clock-face wall right in front of it. Scoop it up.',
         features: [
-          'Four ramps around the gear shaft, each ending at a wall: up column 3, left along row 0, down column 0, right along row 3 — each one floor higher (drawn as a spiral)',
-          'Light 12 sits in a cog on the top floor, in the tile in front of the last wall',
+          'One continuous helix around the gear shaft: up column 3, left along row 0, down column 0, right along row 3. Corner tiles are flat landings; the two tiles between landings slope up at 10° (about 12 cm per side, about 50 cm in all).',
+          `Total rise about 50 cm. The clock-room landing over (3,3) is a deck 2 cm thick, so there is about 48 cm of headroom over the start tile — more than the tallest Level 1 robot (under ${OBSTACLE_MIN_CM} cm). It overlaps nothing else.`,
+          'The clock-room landing has a wall on its east side (the 4th “until close” stops at it) and the clock-face wall on its north side, about half a tile from the robot’s centre after the last turn — within reach of the scoop. Light 12 sits in a cog on that clock-face wall.',
+          `Every wall is ${OBSTACLE_MIN_CM} cm tall or more; each landing has a guard rail on its open edge.`,
         ],
         physics: RAMP_PHYSICS, requires: ['move', 'see-wall', 'grab'],
       }),
       allowedBlocks: [CREEP, LEFT, RIGHT, UNTIL_CLOSE, REPEAT, SCOOP_UP, say('Twelve!')],
-      exampleSolution: ['repeat(4) {', '  repeat_until(distance_cm < 20) { drive_for(30, 0.5) }', '  turn_degrees(90, 40)', '}', 'grip_close', 'say("Twelve!")'],
+      exampleSolution: ['repeat(4) {', `  repeat_until(distance_cm < ${CLOSE_CM}) { drive_for(30, 0.5) }`, '  turn_degrees(90, 40)', '}', 'grip_close', 'say("Twelve!")'],
       success: [
-        { kind: 'no-collision', detail: 'No wall touched on any floor.' },
+        { kind: 'no-collision', detail: 'No wall touched on any floor (gentle contact of the scoop with the cog at the end is allowed).' },
         { kind: 'deliver-object', detail: 'Light 12 is in the scoop at the end of the run.' },
         { kind: 'within-blocks', detail: 'No more than 7 blocks (a loop is needed).' },
       ],
@@ -886,15 +887,15 @@ export const ACT4: Session[] = [
       },
       {
         prompt: 'Why did “until close” work on every ramp?',
-        options: [{ text: 'It measures the real wall, wherever it is', icon: '👀' }, { text: 'It is magic', icon: '✨' }],
+        options: [{ text: 'It measures the real wall, wherever it is', icon: '👀' }, { text: 'Every ramp is the same length, so it was counted for us', icon: '📏' }],
         answer: 0,
         why: 'The sensor measures the world as it really is, so hills and slips don’t fool it.',
       },
       {
-        prompt: 'Which is a real job with robots?',
-        options: [{ text: 'Robot fixer (technician)', icon: '🔧' }, { text: 'Robot dragon tamer', icon: '🐉' }],
+        prompt: 'Who can work with robots when they grow up?',
+        options: [{ text: 'Anyone who learns — fixers, testers, designers, builders', icon: '🧑‍🔧' }, { text: 'Only grown-up scientists', icon: '🥼' }],
         answer: 0,
-        why: 'Technicians fix and look after robots. Others design them, build them, program them and test them.',
+        why: 'Many kinds of people work with robots: technicians fix them, others design, build, program and test them. You have done all of those this year!',
       },
     ],
     badge: { id: 'l1-climber', name: 'Tower Climber', icon: '🗼', earnedFor: 'You repeated a sensor rule to climb the tower, and you can name jobs people do with robots.' },
@@ -922,7 +923,10 @@ export const ACT4: Session[] = [
         faster: ['Write the tower program with the fewest blocks possible, then explain each block to a partner.', 'Design a tower with five ramps: what changes in the program?'],
         slower: ['Do only the two-ramp code task; then press Go on the full tower with Repeat 4 already placed and watch it climb.'],
       },
-      notes: ['Show a diverse range of people in the robot jobs pictures (gender, age, background, disability).'],
+      notes: [
+        'Show a diverse range of people in the robot jobs pictures (gender, age, background, disability).',
+        'The careers objective (O2) is met in the warm-up, the episode and the share circle, not the challenge: in the share circle each pair says which robot job they did most today (“We were the testers!”).',
+      ],
     }),
     parent: {
       today: 'Your child used a distance sensor inside a loop to climb a winding ramp — and learned why counting fails on hills. They also met the many jobs people do with robots.',
@@ -963,11 +967,11 @@ export const ACT4: Session[] = [
         seconds: 40,
       },
       {
-        setting: 'The same square, after the children’s shows (plays after sharing).',
-        action: 'Fireworks of light from the clock. Nana Lucía hands the child a scroll tied with ribbon: the certificate. Bolt wears a tiny lantern on his collar.',
+        setting: 'The same square, after the children’s shows. This scene and the next play at the certificate moment — straight after sharing, or in a separate short slot (see the teacher notes).',
+        action: 'Fireworks of light from the clock. Nana Lucía holds up a scroll tied with ribbon: the certificate. Bolt wears a tiny lantern on his collar.',
         lines: [
           { who: 'lucia', line: 'You built a robot. You taught it to move, to draw, to carry, to feel and to listen. And you kept everyone safe.' },
-          { who: 'lucia', line: 'You are a real Robot Explorer.' },
+          { who: 'lucia', line: 'When your Explorer badges are all done, this scroll has your name on it. You are a real Robot Explorer.' },
           { who: 'spark', line: 'Thank you for bringing the lights home!' },
         ],
         seconds: 45,
@@ -983,12 +987,12 @@ export const ACT4: Session[] = [
       },
     ], 'A bottle washes into the harbour with a map of islands across the sea: “Our island needs a robot builder.” (Level 2 begins here.)', 'All twelve lights were found at the top of the clock tower. Tonight is the festival…'),
     build: {
-      part: { slot: 'tool', id: 'light' },
+      part: { slot: 'tool', id: 'child-choice' },
       action: 'choose',
       narration: 'Your robot is all yours. Choose its colours, and choose one tool for your show: pen, scoop or headlight.',
       why: 'Designers choose the parts that fit their idea. Every part should have a reason.',
       tryWithout: 'Try your show without your sensor: what could go wrong when people walk onto the stage?',
-      physicsEffect: 'The chosen tool’s mass is applied (pen 0.05 kg, scoop 0.2 kg, light 0.1 kg). The bumper and Distance Eyes stay fitted.',
+      physicsEffect: `The chosen tool’s mass is applied (pen ${kg(PART_MASS_KG.tool.pen)}, scoop ${kg(PART_MASS_KG.tool.scoop)}, headlight ${kg(PART_MASS_KG.tool.light)}). The bumper and Distance Eyes stay fitted.`,
       realWorld: 'Engineers choose parts by what the robot must do: a drawing robot gets a pen, a delivery robot gets a box, a night robot gets lights.',
     },
     code: {
@@ -996,16 +1000,16 @@ export const ACT4: Session[] = [
       mission: 'Draw your show on the planning sheet. Then build the first part and test it.',
       arena: arena({
         id: 'l1-festival-stage', name: 'Festival stage',
-        description: 'A 5×5 festival mat in the square at night, edged with lanterns. Paper lies on the stage for drawing; little lantern baskets sit on two tiles; one corner is dark.',
+        description: 'A 5×5 festival mat in the square at night, edged with a lantern fence. Paper lies on the stage for drawing; lantern baskets sit on two tiles; one corner is dark.',
         gridTiles: { cols: 5, rows: 5 }, floor: 'mat',
         start: { col: 2, row: 4, heading: 'up' },
         goal: 'The child’s own plan.',
-        features: ['Lantern edge (solid low wall) around the stage', 'Paper for pen drawings', 'Lantern baskets at (0,1) and (4,1) for scoop shows', 'Dark corner at (4,0)–(4,1) for light shows', 'Visitors sometimes step onto the stage edge'],
+        features: [`Lantern fence around the stage, ${OBSTACLE_MIN_CM} cm tall, so Distance Eyes and the bumper both find it`, 'Paper for pen drawings', 'Lantern baskets at (0,1) and (4,1) for scoop shows: small, light pick-ups (the scoop takes them from the tile in front), not obstacles', 'Dark corner at (4,0)–(4,1) for light shows', 'Visitors sometimes step onto the stage edge'],
         physics: ECHO_PHYSICS.replace(/Visual fog[^.]*\. /, ''), requires: ['move'],
       }),
       allowedBlocks: [HOP, HOP_BACK, CREEP, BACK_OFF, LEFT, RIGHT, WAIT, REPEAT, UNTIL_BUMP, UNTIL_CLOSE, WAIT_CLEAR, IF_BUMP, PEN_DOWN, PEN_UP, SCOOP_UP, TIP_OUT, LIGHT_ON, LIGHT_OFF, BEEP, say('Welcome!', 'Thank you!', 'Happy festival!', 'Excuse me!')],
-      exampleSolution: ['say("Welcome!")', 'repeat_until(distance_cm > 30) { }', 'drive_for(50, 2)'],
-      success: [{ kind: 'within-blocks', detail: 'The first part of the child’s plan runs without touching a lantern or visitor.' }],
+      exampleSolution: ['say("Welcome!")', `repeat_until(distance_cm > ${CLEAR_CM}) { }`, `drive_for(${HOP_PCT}, 2)`],
+      success: [{ kind: 'no-collision', detail: 'The first part of the child’s plan runs without touching the fence, a basket or a visitor (a gentle bumper touch on the fence is allowed).' }],
       stars: { two: 'Your plan has a beginning, a middle and an end.', three: 'You tested the first part before adding more.' },
       hints: [
         'What will your robot do first? Say hello? Draw? Light up?',
@@ -1027,12 +1031,12 @@ export const ACT4: Session[] = [
       }),
       allowedBlocks: [HOP, HOP_BACK, CREEP, BACK_OFF, LEFT, RIGHT, WAIT, REPEAT, UNTIL_BUMP, UNTIL_CLOSE, WAIT_CLEAR, IF_BUMP, PEN_DOWN, PEN_UP, SCOOP_UP, TIP_OUT, LIGHT_ON, LIGHT_OFF, BEEP, say('Welcome!', 'Thank you!', 'Happy festival!', 'Excuse me!')],
       exampleSolution: [
-        'say("Welcome!")', 'light_on', 'repeat(4) {', '  repeat_until(distance_cm < 20) { drive_for(30, 0.5) }', '  turn_degrees(90, 40)', '  beep', '}',
+        'say("Welcome!")', 'light_on', 'repeat(4) {', `  repeat_until(distance_cm < ${CLOSE_CM}) { drive_for(30, 0.5) }`, '  turn_degrees(90, 40)', '  beep', '}',
         'light_off', 'say("Happy festival!")',
       ],
       success: [
-        { kind: 'within-blocks', detail: 'The program contains at least one loop, one sensor block (until bump, until close, wait until clear or if bump), one tool block and one say block.' },
-        { kind: 'no-collision', detail: 'No lantern, basket or visitor touched (a bumper touch on purpose against the lantern edge is allowed).' },
+        { kind: 'uses-blocks', detail: 'The program contains at least one loop, one sensor block (until bump, until close, wait until clear or if bump), one tool block and one say block — and each of them runs during the show.' },
+        { kind: 'no-collision', detail: 'No basket or visitor touched; the fence is touched only by the bumper, gently (a bumper touch on purpose against the fence is allowed).' },
       ],
       stars: { two: 'Your show has all four ingredients.', three: 'You fixed at least one bug and can say what it was.' },
       hints: [
@@ -1045,7 +1049,7 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: 'What do engineers do after testing finds a bug?',
-        options: [{ text: 'Give up', icon: '😞' }, { text: 'Fix it and test again', icon: '🔧' }],
+        options: [{ text: 'Hide it, because a good show has no bugs', icon: '🙈' }, { text: 'Fix it and test again', icon: '🔧' }],
         answer: 1,
         why: 'Bugs are normal. Find where it went wrong, fix it, and test again.',
       },
@@ -1057,7 +1061,7 @@ export const ACT4: Session[] = [
       },
       {
         prompt: 'Why use a loop in your show?',
-        options: [{ text: 'To repeat steps with fewer blocks', icon: '🔁' }, { text: 'To make it slower', icon: '🐢' }],
+        options: [{ text: 'To repeat steps with fewer blocks', icon: '🔁' }, { text: 'To make the program longer, because longer is better', icon: '📜' }],
         answer: 0,
         why: 'A loop repeats steps, so you don’t have to put the same blocks in again and again.',
       },
@@ -1086,7 +1090,8 @@ export const ACT4: Session[] = [
       },
       notes: [
         'Celebrate every show equally: same applause, same certificate. No “best show”.',
-        'Certificates are earned by learning (see the Level 1 certificate criteria), not by attendance; check each child has the season’s core badges or offer a catch-up session.',
+        'Big class (30+)? Run S24 over two periods: period 1 = episode, plan, build and test; period 2 = finish, pair share, big-screen share and check. Either way, hold the certificate moment (the last two episode scenes, about 1:15, plus handing out) in its own short slot — it is not inside the 40 minutes.',
+        'Certificates are earned by learning (see the Level 1 certificate criteria: what the simulator recorded and what you observed), not by attendance and never by the child’s own self-check ticks. A child still missing a core badge gets it in a catch-up session and receives the certificate then; on the night, every child is celebrated for their show.',
       ],
     }),
     parent: {

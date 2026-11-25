@@ -6,7 +6,7 @@
 
 import type { Session } from '../types'
 import {
-  BEEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, LEFT, MOVE_SET, RIGHT, WAIT,
+  BEEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, LEFT, MOVE_SET, PART_MASS_KG, RIGHT, WAIT, kg,
   arena, episode, lessonTiming, obj, projectTiming, say, teacher,
 } from './shared'
 import { L1_PROJECTS } from './projects'
@@ -18,7 +18,7 @@ export const ACT1: Session[] = [
     title: 'Hello, Robot!',
     objective: 'Say what makes a robot a robot — it senses, thinks and acts — and give it its first instructions.',
     objectives: [
-      obj('L1-S01-O1', 'Distinguishes a robot from a toy or simple machine using sense–think–act.', 'I can tell if something is a robot: it senses, thinks and acts.', ['sense-think-act'], ['computing-systems']),
+      { ...obj('L1-S01-O1', 'Distinguishes a robot from a toy or simple machine using sense–think–act.', 'I can tell if something is a robot: it senses, thinks and acts.', ['sense-think-act'], ['computing-systems']), discussionOnly: true },
       obj('L1-S01-O2', 'Understands that a robot follows a program: steps carried out in order.', 'I can give my robot steps to do, one after another.', ['sequences'], ['algorithms', 'programming']),
     ],
     concepts: ['sense-think-act', 'sequences'],
@@ -104,7 +104,7 @@ export const ACT1: Session[] = [
       narration: 'Pick a body for your robot. Every body is good — they are just good at different things.',
       why: 'The body holds the battery (the robot’s energy) and the brain (a tiny computer) and keeps them safe.',
       tryWithout: 'Without a body the battery and brain fall on the floor — nothing works.',
-      physicsEffect: 'Body mass in the simulator: Bug 0.6 kg, Dome 0.9 kg, Box 1.1 kg, Tall Tower 1.3 kg. Heavier bodies start and stop a little more slowly (felt in session 14).',
+      physicsEffect: `Body mass in the simulator: Bug ${kg(PART_MASS_KG.body.bug)}, Dome ${kg(PART_MASS_KG.body.dome)}, Box ${kg(PART_MASS_KG.body.box)}, Tall Tower ${kg(PART_MASS_KG.body.tall)}. Heavier bodies start and stop a little more slowly (felt in session 14).`,
       realWorld: 'Robot vacuum cleaners are round and flat so they fit under sofas; warehouse robots are big boxes so they can carry shelves.',
     },
     code: {
@@ -126,7 +126,7 @@ export const ACT1: Session[] = [
       hints: [
         'What should your robot do first? Find the talking block.',
         'Put the "Say" block at the top. Then the "Beep" block under it.',
-        'Drag "Say Hello!" to the top, then "Beep" under it, and press the green Go button.',
+        'Tap "Say Hello!", then tap "Beep" — they line up in that order — and press the green Go button.',
       ],
     },
     challenge: {
@@ -137,13 +137,13 @@ export const ACT1: Session[] = [
         description: 'The sun is coming up. Wake up the whole workshop!',
         gridTiles: { cols: 3, rows: 3 }, floor: 'wood',
         start: { col: 1, row: 1, heading: 'down' },
-        goal: 'Spark and Bolt wake up when they hear: beep … beep … "Good morning!"',
-        features: ['Sleeping Spark and Bolt with "Zzz" bubbles'],
+        goal: 'Spark and Bolt wake up on screen when they get: beep … beep … "Good morning!"',
+        features: ['Sleeping Spark and Bolt with "Zzz" bubbles', 'Every sound is also shown: each beep flashes a ring around the robot and Say shows a speech bubble with the words, so a child who cannot hear it can still see the song'],
         physics: FLAT_MAT_PHYSICS, requires: [],
       }),
       allowedBlocks: [BEEP, WAIT, say('Good morning!', 'Hello!')],
       exampleSolution: ['beep', 'wait(1)', 'beep', 'say("Good morning!")'],
-      success: [{ kind: 'action-at-zone', detail: 'The sounds happen in this order: beep, a pause of at least 1 s, beep, say "Good morning!".' }],
+      success: [{ kind: 'action-at-zone', detail: 'The sounds (and their visual rings and bubble) happen in this order: beep, a pause of at least 1 s, beep, say "Good morning!". Then Spark and Bolt visibly wake up: eyes open, "Zzz" bubbles pop, Bolt wags.' }],
       stars: { two: 'You used a Wait so the beeps are not squashed together.', three: 'You added your own extra step at the end and said what it does.' },
       hints: [
         'Listen to the song: beep … beep … good morning. What comes first?',
@@ -154,9 +154,9 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'Which one is a robot?',
-        options: [{ text: 'A spoon', icon: '🥄' }, { text: 'A robot vacuum that turns when it bumps a chair', icon: '🤖' }, { text: 'A teddy bear', icon: '🧸' }],
+        options: [{ text: 'A spoon', icon: '🥄' }, { text: 'A robot vacuum that turns when it bumps a chair', icon: '🤖' }, { text: 'A torch with a battery', icon: '🔦' }],
         answer: 1,
-        why: 'The robot vacuum senses the chair, thinks "turn!", and acts by turning. Sense, think, act!',
+        why: 'The robot vacuum senses the chair, thinks "turn!", and acts by turning. Sense, think, act! A torch has a battery, but it cannot sense or decide.',
       },
       {
         prompt: 'What does the battery give a robot?',
@@ -274,7 +274,7 @@ export const ACT1: Session[] = [
       narration: 'Snap on two wheels with motors, and the little ball at the back.',
       why: 'Motors use battery energy to spin the wheels. Spinning wheels push on the floor and the robot rolls.',
       tryWithout: 'Without wheels, pressing Go does nothing — the robot sits still like a statue.',
-      physicsEffect: 'Two driven wheels plus a free-rolling caster ball (differential drive). Adds 0.3 kg.',
+      physicsEffect: `Two driven wheels plus a free-rolling caster ball (differential drive). Adds ${kg(PART_MASS_KG.drive.wheels2)}.`,
       realWorld: 'Most robot vacuum cleaners move on two wheels and a small free wheel.',
     },
     code: {
@@ -330,7 +330,7 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'What makes the wheels turn?',
-        options: [{ text: 'A motor', icon: '⚙️' }, { text: 'Wind', icon: '🌬️' }, { text: 'A sticker', icon: '⭐' }],
+        options: [{ text: 'A motor', icon: '⚙️' }, { text: 'Wind', icon: '🌬️' }, { text: 'The robot knows where to go, so they turn by themselves', icon: '💭' }],
         answer: 0,
         why: 'A motor spins when it gets energy from the battery, and the spin turns the wheel.',
       },
@@ -342,7 +342,7 @@ export const ACT1: Session[] = [
       },
       {
         prompt: 'Why does the robot have a little ball at the back?',
-        options: [{ text: 'To hold it up and roll any way', icon: '⚪' }, { text: 'To play football', icon: '⚽' }],
+        options: [{ text: 'To hold it up and roll any way', icon: '⚪' }, { text: 'To make it go faster', icon: '💨' }],
         answer: 0,
         why: 'The ball is called a caster. It balances the robot and rolls in any direction.',
       },
@@ -505,7 +505,7 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'A cart is crossing. What should the robot do?',
-        options: [{ text: 'Wait', icon: '✋' }, { text: 'Go fast', icon: '💨' }],
+        options: [{ text: 'Wait', icon: '✋' }, { text: 'Keep going — the robot will see the cart and stop', icon: '👀' }],
         answer: 0,
         why: 'Wait until the way is clear, then go. That is how robots — and people — stay safe.',
       },
@@ -623,7 +623,7 @@ export const ACT1: Session[] = [
       narration: 'Click on the face screen. Choose your robot’s eyes and smile.',
       why: 'The face screen shows people how the robot is "feeling" and what it is about to do, so nobody is surprised.',
       tryWithout: 'Without it, people in the bakery step away — they cannot tell what the robot will do.',
-      physicsEffect: 'Adds 0.15 kg to the top of the robot. Say blocks now also show the words on the screen.',
+      physicsEffect: `Adds ${kg(PART_MASS_KG.head.screen)} to the top of the robot. Say blocks now also show the words on the screen.`,
       realWorld: 'Delivery robots on footpaths and helper robots in airports show faces or lights so people know what they will do.',
     },
     code: {
@@ -680,7 +680,7 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'Why does a robot show a face or say what it will do?',
-        options: [{ text: 'So people know what it will do', icon: '🙂' }, { text: 'To look scary', icon: '👻' }],
+        options: [{ text: 'So people know what it will do', icon: '🙂' }, { text: 'Because talking makes it move', icon: '🗣️' }],
         answer: 0,
         why: 'When people know what a robot will do next, they feel safe and are not surprised.',
       },
@@ -852,15 +852,15 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'How does your robot turn on the spot?',
-        options: [{ text: 'One wheel forward, one wheel back', icon: '🔄' }, { text: 'It jumps', icon: '🦘' }],
+        options: [{ text: 'One wheel forward, one wheel back', icon: '🔄' }, { text: 'It drives forward round a big circle', icon: '⭕' }],
         answer: 0,
         why: 'When the wheels go opposite ways, the robot spins on the spot.',
       },
       {
-        prompt: 'The robot faces you. It turns to ITS right. Which way does it go for you?',
-        options: [{ text: 'To my left', icon: '👈' }, { text: 'To my right', icon: '👉' }],
+        prompt: 'Look at the picture: you are standing behind the robot, looking the same way it looks. It turns right. Which way does it go?',
+        options: [{ text: 'To my right', icon: '👉' }, { text: 'To my left', icon: '👈' }],
         answer: 0,
-        why: 'When something faces you, its right is on your left. Pretend you are inside the robot!',
+        why: 'When you look the same way as the robot, its right is your right. Pretend you are inside the robot!',
       },
       {
         prompt: 'Turn right, then turn right again. Which way is the robot facing now?',
@@ -890,7 +890,7 @@ export const ACT1: Session[] = [
         { idea: 'A turn also moves the robot forward.', correction: 'A turn spins on the spot. You still need a hop to move after turning.' },
       ],
       differentiation: {
-        faster: ['Find a second path to the bench and compare which is shorter.', 'Predict the facing direction after three right turns.'],
+        faster: ['Find a second path to the bench and compare which is shorter.', 'Predict the facing direction after three right turns.', 'Mirror puzzle: the robot faces YOU and turns to ITS right. Which way does it go for you? (To your left — stand back-to-front with a partner to check.)'],
         slower: ['Rotate the tablet so the robot faces "up" from the child’s view.', 'Keep the right-hand sticker on during the code task.'],
       },
       notes: ['Left/right is genuinely hard at 5–7 (still developing). Accept body turning and pointing; do not drill.'],
@@ -1018,7 +1018,7 @@ export const ACT1: Session[] = [
       },
       {
         prompt: 'Your dance bumped the edge. What do you do?',
-        options: [{ text: 'Give up', icon: '😞' }, { text: 'Change a step and try again', icon: '🔧' }],
+        options: [{ text: 'Throw the plan away — it was a bad plan', icon: '🗑️' }, { text: 'Change a step and try again', icon: '🔧' }],
         answer: 1,
         why: 'Try, look, fix, try again. Every engineer does this — mistakes help us learn.',
       },
