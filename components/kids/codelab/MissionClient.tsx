@@ -183,6 +183,11 @@ export default function MissionClient({ mission, next, previous }: Props) {
     const outcome = finishArena(t)
     if (outcome === 'continue') {
       timer.current = window.setTimeout(() => {
+        // The program was edited (or reset) during the pause between maps.
+        if (trace.current !== t) {
+          timer.current = null
+          return
+        }
         showArena(t.arena)
         setStatus({ kind: 'running' })
         timer.current = window.setTimeout(tick, 600)
@@ -207,6 +212,12 @@ export default function MissionClient({ mission, next, previous }: Props) {
       return
     }
     const t = trace.current
+    // Step pressed in the pause after a map passed: show the next map first,
+    // so its frames never play over the previous map's layout.
+    if (t.arena !== arenaIdx) {
+      showArena(t.arena)
+      return
+    }
     const frames = t.results[t.arena].frames
     if (t.frame + 1 < frames.length) {
       t.frame += 1
@@ -319,7 +330,7 @@ export default function MissionClient({ mission, next, previous }: Props) {
             >
               ▶ Run
             </button>
-            <button type="button" onClick={step} disabled={running || program.length === 0} className="min-h-[52px] rounded-2xl bg-sky-500 px-4 font-black text-white disabled:opacity-50">
+            <button type="button" onClick={step} disabled={running || program.length === 0} className="min-h-[52px] rounded-2xl bg-sky-700 px-4 font-black text-white disabled:opacity-50">
               ⏭ Step
             </button>
             <button type="button" onClick={reset} className="min-h-[52px] rounded-2xl bg-white/10 px-4 font-bold">
@@ -398,8 +409,12 @@ export default function MissionClient({ mission, next, previous }: Props) {
             onChange={(p) => {
               setProgram(p)
               if (trace.current && !running) {
+                // Cancel a queued "next map" timer too, or it would set the
+                // status to running with no trace and lock the editor.
+                stopTimer()
                 trace.current = null
                 showArena(arenaIdx)
+                if (status.kind === 'progress') setStatus({ kind: 'idle' })
               }
             }}
             palette={mission.palette}

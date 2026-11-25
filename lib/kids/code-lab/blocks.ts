@@ -15,20 +15,20 @@ export interface BlockInfo {
 }
 
 export const BLOCK_INFO: Record<BlockType, BlockInfo> = {
-  forward: { type: 'forward', label: 'Move forward', emoji: '⬆️', tone: 'bg-sky-500 text-white', group: 'move' },
-  left: { type: 'left', label: 'Turn left', emoji: '↺', tone: 'bg-sky-500 text-white', group: 'move' },
-  right: { type: 'right', label: 'Turn right', emoji: '↻', tone: 'bg-sky-500 text-white', group: 'move' },
+  forward: { type: 'forward', label: 'Move forward', emoji: '⬆️', tone: 'bg-sky-700 text-white', group: 'move' },
+  left: { type: 'left', label: 'Turn left', emoji: '↺', tone: 'bg-sky-700 text-white', group: 'move' },
+  right: { type: 'right', label: 'Turn right', emoji: '↻', tone: 'bg-sky-700 text-white', group: 'move' },
   repeat: { type: 'repeat', label: 'Repeat', emoji: '🔁', tone: 'bg-amber-500 text-black', group: 'loop' },
   repeatUntil: { type: 'repeatUntil', label: 'Repeat until at 🏁', emoji: '🔂', tone: 'bg-amber-500 text-black', group: 'loop' },
-  ifWall: { type: 'ifWall', label: 'If wall ahead', emoji: '🧱', tone: 'bg-violet-500 text-white', group: 'sense' },
-  ifColor: { type: 'ifColor', label: 'If on colour', emoji: '🎨', tone: 'bg-violet-500 text-white', group: 'sense' },
-  ifLine: { type: 'ifLine', label: 'If line ahead', emoji: '〰️', tone: 'bg-violet-500 text-white', group: 'sense' },
+  ifWall: { type: 'ifWall', label: 'If wall ahead', emoji: '🧱', tone: 'bg-violet-600 text-white', group: 'sense' },
+  ifColor: { type: 'ifColor', label: 'If on colour', emoji: '🎨', tone: 'bg-violet-600 text-white', group: 'sense' },
+  ifLine: { type: 'ifLine', label: 'If line ahead', emoji: '〰️', tone: 'bg-violet-600 text-white', group: 'sense' },
   pickup: { type: 'pickup', label: 'Pick up', emoji: '🦾', tone: 'bg-emerald-500 text-black', group: 'tool' },
   drop: { type: 'drop', label: 'Drop', emoji: '📥', tone: 'bg-emerald-500 text-black', group: 'tool' },
   penDown: { type: 'penDown', label: 'Pen down', emoji: '🖊️', tone: 'bg-emerald-500 text-black', group: 'tool' },
   penUp: { type: 'penUp', label: 'Pen up', emoji: '✋', tone: 'bg-emerald-500 text-black', group: 'tool' },
   lightOn: { type: 'lightOn', label: 'Light on', emoji: '🔦', tone: 'bg-emerald-500 text-black', group: 'tool' },
-  say: { type: 'say', label: 'Say', emoji: '💬', tone: 'bg-pink-500 text-white', group: 'tool' },
+  say: { type: 'say', label: 'Say', emoji: '💬', tone: 'bg-pink-700 text-white', group: 'tool' },
 }
 
 /** The capability a block needs. Blocks not listed work on every robot that can move. */

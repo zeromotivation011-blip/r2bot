@@ -39,6 +39,25 @@ export default function ARViewClient({ design, onClose }: Props) {
   const streamRef = useRef<MediaStream | null>(null)
   const scaleRef = useRef(1)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  // False once the dialog is closing or unmounted. Async camera/XR requests
+  // check it after they resolve so a late "Allow" never leaves the camera on.
+  const aliveRef = useRef(true)
+
+  useEffect(() => {
+    aliveRef.current = true
+    return () => {
+      aliveRef.current = false
+    }
+  }, [])
+
+  // Remember what opened the dialog and give focus back to it on close.
+  useEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    return () => {
+      if (opener && opener.isConnected) opener.focus()
+    }
+  }, [])
 
   useEffect(() => {
     closeBtnRef.current?.focus()
@@ -63,12 +82,39 @@ export default function ARViewClient({ design, onClose }: Props) {
 
   useEffect(() => teardown, [teardown])
 
-  // Escape closes.
+  // Escape closes; Tab and Shift+Tab stay inside the dialog.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        aliveRef.current = false
         teardown()
         onClose()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const root = dialogRef.current
+      if (!root) return
+      const focusables = Array.from(
+        root.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el.getClientRects().length > 0)
+      if (focusables.length === 0) {
+        e.preventDefault()
+        return
+      }
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement
+      const inside = active instanceof Node && root.contains(active)
+      if (e.shiftKey) {
+        if (!inside || active === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else if (!inside || active === last) {
+        e.preventDefault()
+        first.focus()
       }
     }
     window.addEventListener('keydown', onKey)
@@ -107,12 +153,24 @@ export default function ARViewClient({ design, onClose }: Props) {
       if (overlayRef.current) init.domOverlay = { root: overlayRef.current }
       session = await xr.requestSession('immersive-ar', init)
     } catch {
+      if (!aliveRef.current) return
       teardown()
       setPhase('error')
       return
     }
+    // The dialog closed while the browser was asking: end the session at once.
+    if (!aliveRef.current) {
+      void session.end().catch(() => undefined)
+      stage.dispose()
+      return
+    }
     stage.renderer.xr.setReferenceSpaceType('local')
     await stage.renderer.xr.setSession(session)
+    if (!aliveRef.current) {
+      void session.end().catch(() => undefined)
+      stage.dispose()
+      return
+    }
     setPhase('xr')
 
     let hitSource: XRHitTestSource | undefined
@@ -170,8 +228,14 @@ export default function ARViewClient({ design, onClose }: Props) {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
     } catch (e) {
+      if (!aliveRef.current) return
       const name = e instanceof DOMException ? e.name : ''
       setPhase(name === 'NotFoundError' || name === 'OverconstrainedError' ? 'nocamera' : name === 'NotAllowedError' || name === 'SecurityError' ? 'denied' : 'error')
+      return
+    }
+    // The dialog closed while the permission prompt was open: stop the camera.
+    if (!aliveRef.current) {
+      stream.getTracks().forEach((t) => t.stop())
       return
     }
     streamRef.current = stream
@@ -302,6 +366,7 @@ export default function ARViewClient({ design, onClose }: Props) {
   const close = () => {
     const session = stageRef.current?.renderer.xr.getSession()
     if (session) void session.end().catch(() => undefined)
+    aliveRef.current = false
     teardown()
     onClose()
   }
@@ -314,7 +379,7 @@ export default function ARViewClient({ design, onClose }: Props) {
   const liveView = phase === 'camera' || phase === 'xr'
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="See your robot in your room" className="fixed inset-0 z-[70] bg-[#0F0A1E] text-white">
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="See your robot in your room" className="fixed inset-0 z-[70] bg-[#0F0A1E] text-white">
       {/* Camera feed + transparent 3D layer */}
       <video ref={videoRef} playsInline muted autoPlay className={`absolute inset-0 h-full w-full object-cover ${phase === 'camera' ? '' : 'hidden'}`} />
       <div ref={hostRef} className={`absolute inset-0 ${liveView ? '' : 'pointer-events-none'}`} />

@@ -262,7 +262,7 @@ export default function BlockEditorClient({ program, onChange, palette, caps, bu
                 ))}
               </div>
             )}
-            <button type="button" onClick={() => del(selected.id)} className="min-h-[44px] rounded-xl bg-rose-500 px-3 text-sm font-black text-white">
+            <button type="button" onClick={() => del(selected.id)} className="min-h-[44px] rounded-xl bg-rose-700 px-3 text-sm font-black text-white">
               🗑 Delete
             </button>
             <button type="button" onClick={() => setSel(null)} className="min-h-[44px] rounded-xl bg-white/15 px-3 text-sm font-black">
