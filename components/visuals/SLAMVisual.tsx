@@ -347,7 +347,7 @@ export function SLAMVisual() {
       </div>
 
       <p style={{ marginTop: 18, fontSize: 14, color: '#A8B0BC', lineHeight: 1.55 }}>
-        <strong style={{ color: 'var(--mist)' }}>SLAM</strong> — Simultaneous Localization and Mapping. The robot explores an unknown environment, building a map while tracking its own position within that map. Used in warehouse robots, drones, and self-driving cars.
+        <strong style={{ color: 'var(--mist)' }}>SLAM</strong> — Simultaneous Localization and Mapping. A real robot has to build the map and work out where it is in that map at the same time. This demo shows the mapping half: the robot&apos;s position is known, and each range-sensor hit marks a wall.
       </p>
       <a
         href="/atlas/concept/slam"

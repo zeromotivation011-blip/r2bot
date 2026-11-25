@@ -202,7 +202,7 @@ export function SensorFusionVisual() {
           { label: 'True path', color: '#ffffff' },
           { label: 'GPS only', color: '#ef4444' },
           { label: 'IMU only', color: '#FC6818' },
-          { label: 'Fused (Kalman)', color: '#00B8D4' },
+          { label: 'Fused (complementary filter)', color: '#00B8D4' },
         ].map((l) => (
           <span key={l.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#C8D0DC' }}>
             <span style={{ width: 10, height: 10, borderRadius: '50%', background: l.color, display: 'inline-block' }} />
@@ -286,7 +286,7 @@ export function SensorFusionVisual() {
 
       <p style={{ marginTop: 18, fontSize: 14, color: '#A8B0BC', lineHeight: 1.55 }}>
         GPS is accurate but noisy. IMU is smooth but drifts.{' '}
-        <strong style={{ color: 'var(--mist)' }}>Sensor fusion (Kalman Filter)</strong> combines both — getting smooth, accurate positioning. Every autonomous vehicle and drone does this 100+ times per second.
+        <strong style={{ color: 'var(--mist)' }}>Sensor fusion</strong> combines both. This demo uses a simple complementary filter: follow the IMU between GPS fixes, then pull towards each new fix. A Kalman filter does the same job but weighs each sensor by how uncertain it is.
       </p>
       <a
         href="/atlas/concept/sensor-fusion"

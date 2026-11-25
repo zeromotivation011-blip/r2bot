@@ -217,6 +217,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/build`,            lastModified: at('/build'),      changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/robots`,           lastModified: at('/robots'),     changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/visualizer`,       lastModified: at('/visualizer'), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/tools/motor-torque-calculator`, lastModified: at('/tools/motor-torque-calculator'), changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/diagnostic`,       lastModified: at('/diagnostic'), changeFrequency: 'monthly', priority: 0.75 },
     { url: `${BASE}/copilot`,          lastModified: at('/copilot'),    changeFrequency: 'monthly', priority: 0.7 },
     { url: `${BASE}/careers`,          lastModified: at('/careers'),    changeFrequency: 'monthly', priority: 0.7 },

@@ -81,6 +81,7 @@ const STATIC_PAGES: SearchNode[] = [
   { href: '/robots', title: 'Robots', sub: 'The robots worth knowing', kind: 'Page' },
   { href: '/ai-robotics', title: 'AI + Robotics', sub: 'How modern robots learn', kind: 'Page' },
   { href: '/visualizer', title: 'Simulators', sub: 'Interactive tools you can play with', kind: 'Page' },
+  { href: '/tools/motor-torque-calculator', title: 'Motor torque calculator', sub: 'Size drive motors and arm joints', kind: 'Page' },
   { href: '/build', title: 'Robot projects', sub: 'Guided builds with a full parts list', kind: 'Page' },
   { href: '/blog', title: 'Blog', sub: 'Explainers and comparisons', kind: 'Page' },
   { href: '/daily-life', title: 'Robotics in daily life', sub: 'The robots already around you', kind: 'Page' },

@@ -17,6 +17,8 @@
 //     "ros2 nodes not communicating". Atlas explains the concept (DDS, QoS),
 //     the cheatsheet lists commands, the fix page gets a broken terminal working;
 //     they cross-link (data: lib/ros2-fixes.ts).
+//   • /tools/<name>-calculator owns the tool query — "motor torque calculator".
+//     Atlas owns the concept ("what is torque"); they cross-link.
 //
 // Anything that breaks that rule is either redirected here or differentiated
 // and cross-linked, so the two pages feed each other instead of competing.
