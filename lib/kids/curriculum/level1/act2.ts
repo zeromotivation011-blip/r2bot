@@ -405,6 +405,16 @@ export const ACT2: Session[] = [
         seconds: 50,
       },
       {
+        setting: 'A zebra crossing on the way to school. Cars wait; the lollipop lady holds up her sign.',
+        action: 'The robot reaches the crossing. Spark holds up a paw-like hand: stop! The robot lifts its pen, crosses with everyone, and puts the pen down again on the far side.',
+        lines: [
+          { who: 'spark', line: 'We don’t draw on the road! Pen up to cross.' },
+          { who: 'myrobot', line: 'Pen up… crossing… pen down!' },
+          { who: 'amara', line: 'Now there’s a gap in the line, right where the road is!' },
+        ],
+        seconds: 30,
+      },
+      {
         setting: 'The school gate: a cheerful building with a playground.',
         action: 'The drawn path leads right to the gate. Teacher Ms Adaeze waves. Behind her the playground is half-ready for the festival games.',
         lines: [

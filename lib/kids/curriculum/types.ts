@@ -230,7 +230,11 @@ export interface Episode {
   scenes: EpisodeScene[]
   /** How the episode ends — a hook into next time (Level 1: gentle, never scary). */
   cliffhanger: string
-  /** Sum of scene seconds; kept honest by a check in the doc script. */
+  /**
+   * Total length: the title card (10 s, or 15 s with "Previously…"), the
+   * scenes, and the 15 s "Next time…" card. Checked by the doc script:
+   * lessons 3–5 min; project episodes may be shorter (part plays after sharing).
+   */
   runtimeSec: number
 }
 

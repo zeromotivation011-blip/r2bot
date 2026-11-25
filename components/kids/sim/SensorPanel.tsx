@@ -35,13 +35,13 @@ export default function SensorPanel({ live, caps }: { live: WorkbenchLiveState; 
   const wheel = snap ? (Math.abs(snap.wheelSpeed[0]) + Math.abs(snap.wheelSpeed[1])) / 2 : 0
   const ground = snap?.groundSpeed ?? 0
   const slipping = wheel > 0.05 && ground < wheel * 0.5
-  const heading = s?.headingDeg ?? 0
+  const heading = Math.round(s?.headingDeg ?? 0) % 360
   const distOk = caps.has('see-wall')
   const dist = s?.distanceCm ?? 200
   const near = dist < 20
 
   return (
-    <section aria-label="Robot sensors" className="grid grid-cols-2 gap-2 sm:grid-cols-3" data-testid="sensor-panel">
+    <div role="group" aria-label="Robot sensors" className="grid grid-cols-2 gap-2 sm:grid-cols-3" data-testid="sensor-panel">
       <Card title="👀 Distance" off={!distOk} need="see-wall">
         <p className={`text-2xl font-black tabular-nums ${near ? 'text-rose-300' : 'text-emerald-300'}`} data-testid="sensor-distance">
           {dist >= 200 ? '200+' : dist.toFixed(0)} <span className="text-sm">cm</span>
@@ -94,6 +94,6 @@ export default function SensorPanel({ live, caps }: { live: WorkbenchLiveState; 
         </p>
         <p className="text-[11px] tabular-nums text-purple-200">⏱ {(s?.timerS ?? 0).toFixed(1)} s</p>
       </Card>
-    </section>
+    </div>
   )
 }

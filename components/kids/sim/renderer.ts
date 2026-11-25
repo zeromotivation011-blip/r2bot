@@ -35,7 +35,8 @@ function drawShape(ctx: CanvasRenderingContext2D, s: Shape2D, toPx: (x: number, 
     const [px, py] = toPx(s.center[0], s.center[1])
     ctx.arc(px, py, s.radius * PX_PER_M, 0, Math.PI * 2)
   } else {
-    const [px, py] = toPx(s.center[0] - s.size[0] / 2, s.center[1] + s.size[1] / 2)
+    // toPx mirrors x (canvas x grows toward -x), so the rect's canvas top-left is the shape's (+x, +z) corner.
+    const [px, py] = toPx(s.center[0] + s.size[0] / 2, s.center[1] + s.size[1] / 2)
     ctx.rect(px, py, s.size[0] * PX_PER_M, s.size[1] * PX_PER_M)
   }
 }

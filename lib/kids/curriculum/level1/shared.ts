@@ -78,13 +78,19 @@ export function arena(a: Omit<ArenaSpec, 'tileCm'> & { tileCm?: number }): Arena
 
 // ── Episodes ──────────────────────────────────────────────────────────────
 
+/** Title card (10 s), extended to 15 s when a "Previously…" line is voiced over it. */
+export const OPENING_SEC = 10
+export const PREVIOUSLY_SEC = 15
+/** Closing "Next time…" card that voices the cliffhanger. */
+export const CLOSING_SEC = 15
+
 export function episode(title: string, scenes: EpisodeScene[], cliffhanger: string, previously?: string): Episode {
   return {
     title,
     previously,
     scenes,
     cliffhanger,
-    runtimeSec: scenes.reduce((s, sc) => s + sc.seconds, 0),
+    runtimeSec: (previously ? PREVIOUSLY_SEC : OPENING_SEC) + scenes.reduce((s, sc) => s + sc.seconds, 0) + CLOSING_SEC,
   }
 }
 
