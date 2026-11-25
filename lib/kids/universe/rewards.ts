@@ -155,6 +155,7 @@ export type ActivityKind =
   | 'build' // the robot design changed and saved
   | 'project' // a "make it yours" project shared
   | 'bugfix' // a failing program fixed by the child
+  | 'activity' // a Skill Galaxy activity completed
 
 export interface Quest {
   id: string
@@ -166,6 +167,8 @@ export interface Quest {
 }
 
 const QUEST_POOL: Quest[] = [
+  { id: 'q-activities-5', title: 'Complete 5 Skill Galaxy activities', icon: '✨', kind: 'activity', target: 5, xp: 60 },
+  { id: 'q-activities-10', title: 'Complete 10 Skill Galaxy activities', icon: '🌌', kind: 'activity', target: 10, xp: 120 },
   { id: 'q-challenges-3', title: 'Solve 3 robot challenges', icon: '🏁', kind: 'challenge', target: 3, xp: 60 },
   { id: 'q-games-2', title: 'Play 2 Universe games', icon: '🎮', kind: 'game', target: 2, xp: 40 },
   { id: 'q-episode-1', title: 'Watch an episode to the end', icon: '🎬', kind: 'episode', target: 1, xp: 30 },
@@ -257,6 +260,7 @@ const DEFAULT_XP: Record<ActivityKind, number> = {
   build: 15,
   project: 120,
   bugfix: 20,
+  activity: 15,
 }
 
 export const REWARD_EVENT = 'r2bot:kids-reward'
