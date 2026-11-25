@@ -1,0 +1,151 @@
+// lib/kids/classroom-server.ts
+//
+// Server-only helpers for the Kids Classroom route handlers (app/api/kids/**).
+// Never import this from a client component: it uses node:crypto and the
+// service-role Supabase client.
+
+import { createHash, randomBytes, randomInt } from 'node:crypto'
+import type { PostgrestError, SupabaseClient, User } from '@supabase/supabase-js'
+import { createSupabaseAdminClient, createSupabaseServerClient } from '@/lib/supabase/server'
+import {
+  CLASSROOM_NOT_READY,
+  CLASSROOM_NOT_READY_MESSAGE,
+  EMPTY_SNAPSHOT,
+  JOIN_CODE_ALPHABET,
+  JOIN_CODE_LENGTH,
+  isBandId,
+  parseSnapshot,
+  type KidsClassSummary,
+  type KidsMemberRow,
+} from './classroom'
+
+export function newJoinCode(): string {
+  let s = ''
+  for (let i = 0; i < JOIN_CODE_LENGTH; i++) s += JOIN_CODE_ALPHABET[randomInt(JOIN_CODE_ALPHABET.length)]
+  return s
+}
+
+/** 32 random bytes, URL-safe. Lives only in the child's browser. */
+export function newMemberToken(): string {
+  return randomBytes(32).toString('base64url')
+}
+
+export function hashToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex')
+}
+
+/** A plausible member token: 43 base64url characters. Anything else is refused before a lookup. */
+export function isTokenShape(x: unknown): x is string {
+  return typeof x === 'string' && /^[A-Za-z0-9_-]{43}$/.test(x)
+}
+
+export function isUuid(x: unknown): x is string {
+  return typeof x === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x)
+}
+
+/** True when the error means migration 0054 has not been run (table missing). */
+export function isMissingTable(err: PostgrestError | null | undefined): boolean {
+  if (!err) return false
+  if (err.code === '42P01' || err.code === 'PGRST205' || err.code === 'PGRST204') return true
+  return /kids_class(es|_members)/.test(err.message ?? '') && /(does not exist|could not find|schema cache)/i.test(err.message ?? '')
+}
+
+export function notReadyResponse(): Response {
+  return Response.json({ ok: false, error: CLASSROOM_NOT_READY_MESSAGE, code: CLASSROOM_NOT_READY }, { status: 503 })
+}
+
+export function jsonError(status: number, error: string): Response {
+  return Response.json({ ok: false, error }, { status })
+}
+
+/** The service-role client, or null when the key is not configured (then everything answers 503). */
+export function adminOrNull(): SupabaseClient | null {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL) return null
+  return createSupabaseAdminClient()
+}
+
+/** The signed-in teacher from the request cookies, or null. */
+export async function currentTeacher(): Promise<User | null> {
+  try {
+    const sb = await createSupabaseServerClient()
+    const { data } = await sb.auth.getUser()
+    return data.user ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Read a JSON body with a hard byte cap. Returns undefined when too large or not JSON. */
+export async function readJsonCapped(req: Request, maxBytes: number): Promise<unknown> {
+  const text = await req.text().catch(() => '')
+  if (!text || new TextEncoder().encode(text).length > maxBytes) return undefined
+  try {
+    return JSON.parse(text) as unknown
+  } catch {
+    return undefined
+  }
+}
+
+// ── Row mapping ──────────────────────────────────────────────────────────────
+export interface ClassDbRow {
+  id: string
+  teacher_id: string
+  class_name: string
+  teacher_name: string | null
+  school_name: string | null
+  band: string
+  join_code: string
+  created_at: string
+}
+
+export interface MemberDbRow {
+  id: string
+  class_id: string
+  nickname: string
+  snapshot: unknown
+  created_at: string
+  last_active_at: string
+}
+
+export const CLASS_COLUMNS = 'id, teacher_id, class_name, teacher_name, school_name, band, join_code, created_at'
+export const MEMBER_COLUMNS = 'id, class_id, nickname, snapshot, created_at, last_active_at'
+
+export function toClassSummary(r: ClassDbRow, memberCount: number): KidsClassSummary {
+  return {
+    id: r.id,
+    className: r.class_name,
+    teacherName: r.teacher_name,
+    schoolName: r.school_name,
+    band: isBandId(r.band) ? r.band : 'builders',
+    joinCode: r.join_code,
+    createdAt: r.created_at,
+    memberCount,
+  }
+}
+
+export function toMemberRow(r: MemberDbRow): KidsMemberRow {
+  return {
+    id: r.id,
+    nickname: r.nickname,
+    snapshot: parseSnapshot(r.snapshot) ?? EMPTY_SNAPSHOT,
+    createdAt: r.created_at,
+    lastActiveAt: r.last_active_at,
+  }
+}
+
+/**
+ * Load a class only if `teacherId` owns it. Returns 'missing-table' before the
+ * migration, null when not found / not theirs (same answer, so ids cannot be probed).
+ */
+export async function loadOwnedClass(
+  admin: SupabaseClient, classId: string, teacherId: string,
+): Promise<ClassDbRow | null | 'missing-table'> {
+  const { data, error } = await admin
+    .from('kids_classes')
+    .select(CLASS_COLUMNS)
+    .eq('id', classId)
+    .eq('teacher_id', teacherId)
+    .maybeSingle()
+  if (error) return isMissingTable(error) ? 'missing-table' : null
+  return (data as ClassDbRow | null) ?? null
+}

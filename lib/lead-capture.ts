@@ -38,6 +38,7 @@ export const LEAD_SOURCES = [
   'course-waitlist', // a course whose videos are not recorded yet
   'academy-waitlist',
   'schools-interest',
+  'kids-schools', // /kids/schools "Request a school pilot"
   'footer',
 ] as const
 

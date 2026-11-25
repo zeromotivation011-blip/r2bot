@@ -1,0 +1,119 @@
+// app/api/kids/classroom/classes/route.ts
+//
+// Teacher: list my Kids classes (GET) and create one (POST).
+// Auth: the signed-in R2BOT user from the request cookies. Every query is
+// scoped to teacher_id = that user. Service-role client, so this works the
+// same whatever RLS says; RLS (migration 0054) is the second lock.
+
+import type { NextRequest } from 'next/server'
+import { isRateLimited } from '@/lib/rate-limit'
+import { MAX_CLASSES_PER_TEACHER, cleanText, isBandId, type KidsClassSummary } from '@/lib/kids/classroom'
+import {
+  CLASS_COLUMNS,
+  adminOrNull,
+  currentTeacher,
+  isMissingTable,
+  jsonError,
+  newJoinCode,
+  notReadyResponse,
+  readJsonCapped,
+  toClassSummary,
+  type ClassDbRow,
+} from '@/lib/kids/classroom-server'
+
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
+const NO_STORE = { 'Cache-Control': 'no-store' }
+
+export async function GET(): Promise<Response> {
+  const user = await currentTeacher()
+  if (!user) return jsonError(401, 'Sign in to see your classes.')
+  const admin = adminOrNull()
+  if (!admin) return notReadyResponse()
+
+  const { data, error } = await admin
+    .from('kids_classes')
+    .select(CLASS_COLUMNS)
+    .eq('teacher_id', user.id)
+    .order('created_at', { ascending: false })
+  if (error) return isMissingTable(error) ? notReadyResponse() : jsonError(500, 'Could not load classes.')
+  const rows = (data ?? []) as ClassDbRow[]
+
+  const counts = new Map<string, number>()
+  if (rows.length) {
+    const { data: members } = await admin
+      .from('kids_class_members')
+      .select('class_id')
+      .in('class_id', rows.map((r) => r.id))
+    for (const m of (members ?? []) as { class_id: string }[]) counts.set(m.class_id, (counts.get(m.class_id) ?? 0) + 1)
+  }
+
+  // A friendly default for "what children see": the profile's display name.
+  let suggestedTeacherName = ''
+  const { data: profile } = await admin.from('profiles').select('display_name').eq('id', user.id).maybeSingle()
+  if (profile && typeof (profile as { display_name?: unknown }).display_name === 'string') {
+    suggestedTeacherName = cleanText((profile as { display_name: string }).display_name, 40)
+  }
+
+  const classes: KidsClassSummary[] = rows.map((r) => toClassSummary(r, counts.get(r.id) ?? 0))
+  return Response.json({ ok: true, classes, suggestedTeacherName }, { headers: NO_STORE })
+}
+
+interface CreateBody {
+  className?: unknown
+  teacherName?: unknown
+  schoolName?: unknown
+  band?: unknown
+}
+
+export async function POST(req: NextRequest): Promise<Response> {
+  const user = await currentTeacher()
+  if (!user) return jsonError(401, 'Sign in to create a class.')
+  if (await isRateLimited({ scope: 'kids-class:create', subject: user.id, windowSeconds: 3600, max: 20 })) {
+    return jsonError(429, 'You have created a lot of classes in the last hour. Try again later.')
+  }
+  const raw = await readJsonCapped(req, 2048)
+  if (!raw || typeof raw !== 'object') return jsonError(400, 'Malformed request.')
+  const body = raw as CreateBody
+
+  const className = cleanText(body.className, 60)
+  const teacherName = cleanText(body.teacherName, 40)
+  const schoolName = cleanText(body.schoolName, 100)
+  if (!className) return jsonError(400, 'Give the class a name, like “7B” or “Robotics Club”.')
+  if (!isBandId(body.band)) return jsonError(400, 'Choose a grade band.')
+
+  const admin = adminOrNull()
+  if (!admin) return notReadyResponse()
+
+  const { count, error: countErr } = await admin
+    .from('kids_classes')
+    .select('id', { count: 'exact', head: true })
+    .eq('teacher_id', user.id)
+  if (countErr) return isMissingTable(countErr) ? notReadyResponse() : jsonError(500, 'Could not create the class.')
+  if ((count ?? 0) >= MAX_CLASSES_PER_TEACHER) {
+    return jsonError(409, `You can have up to ${MAX_CLASSES_PER_TEACHER} classes. Delete an old one first.`)
+  }
+
+  // Join codes are unique; retry on the rare collision.
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const { data, error } = await admin
+      .from('kids_classes')
+      .insert({
+        teacher_id: user.id,
+        class_name: className,
+        teacher_name: teacherName || null,
+        school_name: schoolName || null,
+        band: body.band,
+        join_code: newJoinCode(),
+      })
+      .select(CLASS_COLUMNS)
+      .single()
+    if (!error && data) {
+      return Response.json({ ok: true, class: toClassSummary(data as ClassDbRow, 0) }, { status: 201, headers: NO_STORE })
+    }
+    if (error && isMissingTable(error)) return notReadyResponse()
+    if (error?.code !== '23505') return jsonError(500, 'Could not create the class.')
+  }
+  return jsonError(500, 'Could not create the class. Try again.')
+}
