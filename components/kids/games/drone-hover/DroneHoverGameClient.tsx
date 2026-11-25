@@ -315,7 +315,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
     playSound('click')
     attemptsRef.current += 1
     simRef.current = createSim(mission, gains)
-    fxRef.current && (fxRef.current.box = null)
+    if (fxRef.current) fxRef.current.box = null
     phaseRef.current = 'flying'
     setPhase('flying')
   }, [mission, gains])
