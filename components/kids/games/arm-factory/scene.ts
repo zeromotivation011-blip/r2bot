@@ -798,5 +798,6 @@ export class FactoryScene {
     this.partGeo.dispose()
     this.bandGeo.dispose()
     this.renderer.dispose()
+    this.renderer.forceContextLoss()
   }
 }

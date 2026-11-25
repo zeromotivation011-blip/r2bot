@@ -19,6 +19,8 @@ Contracts: `docs/kids-universe.md`, `docs/kids-design.md`.
 - [~] Physics lab: Rapier + Blockly, /kids/lab/sim (same workflow)
 - [~] 7 games: drone-hover, arm-factory, circuit-city, mars-rover, robot-brain,
       maze-mapper, swarm-reef (workflow wf_e021636c-616)
+- [~] Universe home + Hangar (workflow wf_e5a3ddba-357) — steps 1-2 below
+- Hourly self check-in: scheduled task trig_01JjzPC4SVkb4GiS7ax68hkk (delete when done)
 
 ## Remaining, in order
 1. **Universe home** (`/kids`): animated planet map (4 course planets + game
