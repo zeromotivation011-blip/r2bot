@@ -7,9 +7,10 @@
 //   - Everything else (APIs, analytics, video): untouched.
 // Bump VERSION to drop old caches.
 
-const VERSION = 'r2bot-kids-v1'
+const VERSION = 'r2bot-kids-v2'
 const PAGES = `${VERSION}-pages`
 const STATIC = `${VERSION}-static`
+const STATIC_MAX = 80 // hashed chunks; every deploy adds new ones, so keep only the most recent
 const PRECACHE = ['/kids', '/kids/workshop', '/kids/code-lab', '/kids/stories', '/kids/world']
 
 self.addEventListener('install', (event) => {
@@ -59,7 +60,7 @@ self.addEventListener('fetch', (event) => {
           fetch(req).then((res) => {
             if (res.ok) {
               const copy = res.clone()
-              caches.open(STATIC).then((c) => c.put(req, copy))
+              caches.open(STATIC).then((c) => c.put(req, copy).then(() => trim(c)))
             }
             return res
           }),
@@ -67,3 +68,8 @@ self.addEventListener('fetch', (event) => {
     )
   }
 })
+
+// Cache keys come back in insertion order, so dropping from the front evicts the oldest chunks.
+function trim(cache) {
+  return cache.keys().then((keys) => Promise.all(keys.slice(0, Math.max(0, keys.length - STATIC_MAX)).map((k) => cache.delete(k))))
+}

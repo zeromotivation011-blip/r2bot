@@ -6,6 +6,7 @@
 // shift; after hydration it reads local progress and highlights the child's band.
 
 import Link from 'next/link'
+import type React from 'react'
 import { useEffect, useState } from 'react'
 import { KIDS_BANDS, getBand, type BandId } from '@/lib/kids/bands'
 import { getProgress, saveProgress, KIDS_PROGRESS_EVENT, type KidsProgress } from '@/lib/kids-progress'
@@ -40,6 +41,25 @@ export function KidsHubClient() {
   const band = getBand(progress?.band)
   const step = progress ? nextStepFor(progress) : null
 
+  const focusBand = (i: number) => {
+    const el = document.querySelectorAll<HTMLButtonElement>('[data-band-radio]')[i]
+    el?.focus()
+  }
+
+  // Radio-group keyboard pattern: arrows move between bands and select.
+  const onKey = (e: React.KeyboardEvent<HTMLButtonElement>, i: number) => {
+    const n = KIDS_BANDS.length
+    let next = -1
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % n
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + n) % n
+    else if (e.key === 'Home') next = 0
+    else if (e.key === 'End') next = n - 1
+    if (next < 0) return
+    e.preventDefault()
+    choose(KIDS_BANDS[next].id)
+    focusBand(next)
+  }
+
   const choose = (id: BandId) => {
     primeAudio()
     playSound('correct')
@@ -49,8 +69,8 @@ export function KidsHubClient() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6" aria-labelledby="who-h">
-      {/* Personal strip: fixed height so nothing jumps after hydration. */}
-      <div className="flex min-h-[88px] flex-col justify-center gap-3 rounded-3xl border border-white/10 bg-white/[0.05] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Personal strip: reserved height (taller when stacked on phones) so nothing jumps after hydration. */}
+      <div className="flex min-h-[160px] flex-col sm:min-h-[88px] justify-center gap-3 rounded-3xl border border-white/10 bg-white/[0.05] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         {progress && band && step ? (
           <>
             <div>
@@ -79,14 +99,19 @@ export function KidsHubClient() {
         Choose an age group
       </h2>
       <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4" role="radiogroup" aria-label="Age group">
-        {KIDS_BANDS.map((b) => {
+        {KIDS_BANDS.map((b, i) => {
           const on = band?.id === b.id
+          // Roving tabindex: one tab stop for the group (the chosen band, else the first).
+          const tabbable = band ? on : i === 0
           return (
             <button
               key={b.id}
               type="button"
               role="radio"
               aria-checked={on}
+              tabIndex={tabbable ? 0 : -1}
+              data-band-radio
+              onKeyDown={(e) => onKey(e, i)}
               onClick={() => choose(b.id)}
               className={`relative min-h-[112px] overflow-hidden rounded-3xl border-2 p-4 text-left transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-4 focus-visible:outline-amber-300 ${
                 on ? 'border-amber-300 bg-white/[0.12] shadow-lg shadow-amber-500/20' : 'border-white/10 bg-white/[0.04]'

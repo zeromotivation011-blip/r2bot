@@ -185,6 +185,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/kids`, lastModified: at('/kids'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/parents`, lastModified: at('/kids/parents'), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE}/kids/activities`, lastModified: at('/kids/activities'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${BASE}/kids/world`, lastModified: at('/kids/world'), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE}/kids/schools`, lastModified: at('/kids/schools'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/stories`, lastModified: at('/kids/stories'), changeFrequency: 'monthly' as const, priority: 0.7 },
     ...KIDS_EPISODES.map((e) => ({ url: `${BASE}/kids/stories/${e.slug}`, lastModified: new Date(e.updated), changeFrequency: 'monthly' as const, priority: 0.6 })),

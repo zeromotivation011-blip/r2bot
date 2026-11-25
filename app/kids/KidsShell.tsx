@@ -169,7 +169,10 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
         .kids-nav {
           position: sticky; top: 0; z-index: 30;
           display: flex; align-items: center; justify-content: space-between;
-          gap: 12px; padding: 12px 20px;
+          gap: 12px;
+          /* The installed app is viewport-fit=cover with a translucent status bar:
+             keep the header clear of the notch, clock and landscape side insets. */
+          padding: calc(12px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 12px calc(20px + env(safe-area-inset-left));
           background: rgba(15, 10, 30, 0.85);
           backdrop-filter: blur(8px);
           border-bottom: 2px solid rgba(124, 58, 237, 0.3);
@@ -268,7 +271,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           .kids-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
         }
         @media (max-width: 640px) {
-          .kids-nav { padding: 10px 12px; }
+          .kids-nav { padding: calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 10px calc(12px + env(safe-area-inset-left)); }
           .kids-nav-stars { padding: 8px 10px; font-size: 14px; }
           .kids-voice-toggle { width: 44px; height: 44px; }
         }

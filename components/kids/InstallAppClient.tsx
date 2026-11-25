@@ -16,6 +16,28 @@ interface BeforeInstallPromptEvent extends Event {
 
 type Mode = 'unknown' | 'prompt' | 'ios' | 'installed' | 'manual'
 
+// One captured install event shared by every button on the page (the hub shows
+// two). The browser allows prompt() once per event, so whoever uses it clears it
+// for everyone; without this the second button held a spent event and did nothing.
+let sharedEvt: BeforeInstallPromptEvent | null = null
+let captured = false
+const subscribers = new Set<() => void>()
+const publish = () => subscribers.forEach((fn) => fn())
+
+function ensureCapture() {
+  if (captured || typeof window === 'undefined') return
+  captured = true
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault()
+    sharedEvt = e as BeforeInstallPromptEvent
+    publish()
+  })
+  window.addEventListener('appinstalled', () => {
+    sharedEvt = null
+    publish()
+  })
+}
+
 export function InstallAppClient({ compact = false }: { compact?: boolean }) {
   const [mode, setMode] = useState<Mode>('unknown')
   const [evt, setEvt] = useState<BeforeInstallPromptEvent | null>(null)
@@ -31,21 +53,36 @@ export function InstallAppClient({ compact = false }: { compact?: boolean }) {
     }
     const ua = navigator.userAgent
     const isIos = /iPad|iPhone|iPod/.test(ua) || (ua.includes('Macintosh') && navigator.maxTouchPoints > 1)
-    setMode(isIos ? 'ios' : 'manual')
+    const fallback: Mode = isIos ? 'ios' : 'manual'
 
-    const onPrompt = (e: Event) => {
-      e.preventDefault()
-      setEvt(e as BeforeInstallPromptEvent)
-      setMode('prompt')
+    ensureCapture()
+    const sync = () => {
+      setEvt(sharedEvt)
+      setMode((m) => (m === 'installed' ? m : sharedEvt ? 'prompt' : fallback))
     }
     const onInstalled = () => setMode('installed')
-    window.addEventListener('beforeinstallprompt', onPrompt)
+    sync()
+    subscribers.add(sync)
     window.addEventListener('appinstalled', onInstalled)
     return () => {
-      window.removeEventListener('beforeinstallprompt', onPrompt)
+      subscribers.delete(sync)
       window.removeEventListener('appinstalled', onInstalled)
     }
   }, [])
+
+  const install = async () => {
+    const e = sharedEvt
+    sharedEvt = null
+    publish()
+    if (!e) return
+    try {
+      await e.prompt()
+      const choice = await e.userChoice
+      if (choice.outcome === 'accepted') setMode('installed')
+    } catch {
+      /* event already used or browser refused — the manual instructions remain */
+    }
+  }
 
   const base =
     'inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl px-5 font-black transition hover:scale-[1.03] focus-visible:outline focus-visible:outline-4 focus-visible:outline-amber-300'
@@ -59,12 +96,7 @@ export function InstallAppClient({ compact = false }: { compact?: boolean }) {
       <button
         type="button"
         className={`${base} bg-amber-400 text-slate-900 ${compact ? 'min-h-[44px] px-3 text-sm' : ''}`}
-        onClick={async () => {
-          await evt.prompt()
-          const choice = await evt.userChoice
-          if (choice.outcome === 'accepted') setMode('installed')
-          setEvt(null)
-        }}
+        onClick={install}
       >
         📲 {compact ? 'Install' : 'Install the app'}
       </button>
