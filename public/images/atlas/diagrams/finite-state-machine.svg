@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">A robot vacuum cleaner drawn as a finite state machine</title>
+  <desc id="d">State diagram with five states. The robot starts in Charging, marked by an arrow from a dot. Start, if the battery is at least 80 per cent, moves it to Cleaning. In Cleaning, a bumper hit moves it to Avoiding, and turn done brings it back. Battery below 15 per cent moves Cleaning to Returning, and dock reached moves Returning to Charging. Wheels stalled for 3 seconds moves Cleaning to Stuck, and a button press moves Stuck back to Cleaning. Each state lists its entry action. A note says battery low must also leave Avoiding, and wheel stall must also leave Avoiding and Returning, which is not drawn: every new condition adds arrows from many states.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <rect width="640" height="400" rx="16" fill="#0f172a"/>
+  <text x="30" y="44" font-size="16" font-weight="700" fill="#e2e8f0">A robot vacuum as a state machine</text>
+  <text x="610" y="44" font-size="12" fill="#64748b" letter-spacing="1.5" text-anchor="end">STATE DIAGRAM</text>
+  <g fill="#1e293b" stroke="#475569" stroke-width="1.5">
+    <rect x="55" y="167" width="140" height="50" rx="12" stroke="#f59e0b" stroke-width="2.5"/>
+    <rect x="250" y="87" width="140" height="50" rx="12"/>
+    <rect x="465" y="87" width="140" height="50" rx="12"/>
+    <rect x="250" y="247" width="140" height="50" rx="12"/>
+    <rect x="465" y="247" width="140" height="50" rx="12" stroke="#ef4444"/>
+  </g>
+  <g font-size="13" font-weight="700" fill="#e2e8f0" text-anchor="middle" letter-spacing="0.5">
+    <text x="125" y="189">CHARGING</text>
+    <text x="320" y="109">CLEANING</text>
+    <text x="535" y="109">AVOIDING</text>
+    <text x="320" y="269">RETURNING</text>
+    <text x="535" y="269">STUCK</text>
+  </g>
+  <g font-size="11" fill="#94a3b8" text-anchor="middle">
+    <text x="125" y="206">entry: charge</text>
+    <text x="320" y="126">entry: brush on, drive</text>
+    <text x="535" y="126">entry: reverse, turn</text>
+    <text x="320" y="286">entry: seek dock</text>
+    <text x="535" y="286">entry: stop, beep</text>
+  </g>
+  <circle cx="24" cy="192" r="6" fill="#e2e8f0"/>
+  <g stroke="#94a3b8" stroke-width="1.6" fill="none" marker-end="url(#a)">
+    <line x1="30" y1="192" x2="53" y2="192"/>
+    <line x1="170" y1="167" x2="248" y2="121"/>
+    <line x1="390" y1="104" x2="463" y2="104"/>
+    <line x1="465" y1="121" x2="392" y2="121"/>
+    <line x1="320" y1="137" x2="320" y2="245"/>
+    <line x1="380" y1="137" x2="494" y2="246"/>
+    <line x1="480" y1="247" x2="366" y2="138"/>
+    <line x1="250" y1="280" x2="172" y2="218"/>
+  </g>
+  <g font-size="11.5" fill="#cbd5e1">
+    <text x="200" y="118" text-anchor="end">start</text>
+    <text x="200" y="132" text-anchor="end" fill="#fbbf24">[battery ≥ 80%]</text>
+    <text x="427" y="97" text-anchor="middle">bumper hit</text>
+    <text x="427" y="140" text-anchor="middle">turn done</text>
+    <text x="312" y="196" text-anchor="end">battery &lt; 15%</text>
+    <text x="448" y="186">wheels stalled 3 s</text>
+    <text x="446" y="230" text-anchor="end">button pressed</text>
+    <text x="196" y="270" text-anchor="end">dock reached</text>
+  </g>
+  <text x="30" y="340" font-size="11" fill="#64748b">Amber outline: initial state (arrow from the dot). Label: event, with a guard condition in [brackets].</text>
+  <text x="30" y="358" font-size="11" fill="#64748b">Not drawn: battery low also leaves AVOIDING; wheel stall also leaves AVOIDING and RETURNING.</text>
+  <text x="30" y="374" font-size="11" fill="#64748b">Every new condition adds arrows from many states: the state-explosion problem in miniature.</text>
+</svg>

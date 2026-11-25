@@ -1,119 +1,319 @@
 ---
-title: Finite State Machine
+title: Finite State Machine (FSM) in Robotics
+slug: finite-state-machine
 summary: >-
-  A finite state machine is a model in which a robot is always in exactly one
-  state out of a fixed list — charging, delivering, idle — and moves to another
-  state only when a named input or event triggers a transition.
+  A finite state machine (FSM) keeps a robot in exactly one of a fixed set of states. How FSMs
+  work, a robot example in Python, hierarchical FSMs, and FSM vs behaviour tree.
 category: control
-lastReviewed: 2026-11-08T00:00:00.000Z
-sources:
-  - title: 'Finite-state machine — Wikipedia'
-    url: 'https://en.wikipedia.org/wiki/Finite-state_machine'
-  - title: 'Nav2 Concepts — on behavior trees versus state machines'
-    url: 'https://docs.nav2.org/concepts/index.html'
+bucket: concept
+difficulty: 3
+difficultyLabel: Classroom
+lastReviewed: 2026-11-25T00:00:00.000Z
 tags:
   - fsm
   - finite-state-machine
-  - behavior
+  - state-machine
+  - hierarchical-state-machine
+  - robot-behaviour
+  - ros2
 seeAlso:
-  - finite-state-machine
   - behavior-trees
+  - sense-think-act-loop
+  - feedback-loop
   - nav2
-difficulty: 3
+  - ros2
+  - pid-controller
+relatedTerms:
+  - behavior-trees
+  - sense-think-act-loop
+  - nav2
+  - ros2
+sources:
+  - title: 'Finite-state machine, Wikipedia (definition, turnstile example, entry and exit actions, Moore and Mealy models)'
+    url: 'https://en.wikipedia.org/wiki/Finite-state_machine'
+  - title: 'M. Colledanchise, P. Ögren, "Behavior Trees in Robotics and AI: An Introduction," CRC Press, 2018 (ch. 1.2 and 2.1–2.2 on FSMs and hierarchical FSMs; doi 10.1201/9780429489105)'
+    url: 'https://arxiv.org/abs/1709.00084'
+  - title: 'D. Harel, "Statecharts: a visual formalism for complex systems," Science of Computer Programming 8(3), 1987, pp. 231–274'
+    url: 'https://doi.org/10.1016/0167-6423(87)90035-9'
+  - title: 'S. Macenski, F. Martín, R. White, J. Ginés Clavero, "The Marathon 2: A Navigation System," IEEE/RSJ IROS 2020 (why Nav2 uses a behaviour tree instead of an FSM)'
+    url: 'https://arxiv.org/abs/2003.00368'
+  - title: 'YASMIN (Yet Another State MachINe): state machines for ROS 2, Python and C++, README'
+    url: 'https://github.com/uleroboticsgroup/yasmin'
+  - title: 'FlexBE Behavior Engine: hierarchical state machines for ROS 2, README'
+    url: 'https://github.com/FlexBE/flexbe_behavior_engine'
+youtubeSearchQuery: finite state machine robotics tutorial
 laymanExplanation: >-
-  A finite state machine says a robot is always in exactly one state from a
-  fixed list, and only moves to another state when something specific happens.
-  You can draw the whole design on one page as boxes with labelled arrows
-  between them, which is why it is usually the first way anyone structures a
-  robot's decisions.
-realRobotsThatUseThis:
-  - Vending machines
-  - Elevators
-  - Traffic lights
-  - Turnstiles
-indianExample: ''
-relatedTerms: []
-prerequisiteTerms: []
-unlocksTerms: []
+  Picture a row of cards, one for each thing a robot can be doing: charging, cleaning, avoiding an
+  obstacle, heading home. Exactly one card is face up at a time, and the back of each card lists
+  the few events that flip it to another card, such as "bumper hit: flip to avoiding". That set of
+  cards and rules is a finite state machine. Because the whole design fits on one page as boxes and
+  arrows, it is usually the first way anyone organises a robot's behaviour.
+technicalDefinition: >-
+  A finite state machine is an abstract machine that is in exactly one of a finite number of states
+  at any time and changes state (a transition) in response to inputs. It is defined by its states,
+  its initial state and the inputs that trigger each transition. If outputs depend only on the
+  current state it is a Moore machine; if they depend on the state and the input it is a Mealy
+  machine. Hierarchical state machines (statecharts) add nested states and parallel regions.
 quizQuestion:
-  q: 'In a finite state machine, how many states can a robot be in at once?'
+  q: >-
+    A robot vacuum's FSM has five states. You add a new "lid opened" state that the robot must be
+    able to enter directly from any of four of them. In a flat (non-hierarchical) FSM, how many new
+    arrows into the new state do you need?
   options:
-    - 'As many as its sensors allow'
-    - 'Exactly one'
-    - 'One per motor'
+    - One
+    - Four
+    - Five
+    - Sixteen
   answer: 1
   explanation: >-
-    An FSM is by definition in exactly one of a finite number of states at any
-    given time. A transition, triggered by an input, is what moves it to a
-    different state.
+    In a flat FSM every transition starts from one specific state, so each of the four states needs
+    its own arrow. A hierarchical FSM can group the four inside a superstate and draw a single arrow
+    from it. This growth in arrows is one face of the state-explosion problem.
 mindBlowingFact: >-
-  A finite state machine has strictly less computational power than a Turing
-  machine, because its only memory is which state it is in — so a machine with
-  five states can never count to a thousand.
+  A finite state machine's only memory is which state it is in, so it has less computational power
+  than a Turing machine: there are tasks a Turing machine can do that no FSM can.
 industryApplications:
   - robotics
   - industrial automation
+  - digital hardware
   - compilers
-  - hardware design
   - network protocols
-difficultyLabel: Classroom
-technicalDefinition: >-
-  A finite state machine is an abstract machine that is in exactly one of a
-  finite number of states at any given time, defined by its states, its initial
-  state, and the inputs that trigger each transition between states.
-slug: finite-state-machine
-bucket: concept
 ---
 
-# Finite State Machine
+A **finite state machine (FSM)** is a way of describing behaviour in which a robot is always in exactly one of a fixed list of **states**, such as charging, cleaning or returning to its dock, and moves to a different state only when a specific event triggers a **transition**. It is one of the most basic models of computation, fully defined by its states, its starting state and the inputs that trigger each transition ([Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine)). In robotics it is the usual first way to organise what a robot is doing, and it also runs inside ROS 2 itself: every managed node moves through a small, fixed set of states ([ROS 2 design: managed nodes](https://design.ros2.org/articles/node_lifecycle.html)).
 
-A finite state machine (FSM) is a model in which a robot is always in exactly one state out of a fixed list — charging, delivering, idle — and moves to another state only when a named input or event triggers a transition. It is a model of computation from automata theory, and the usual first way anyone structures a robot's decisions.
+This page explains how an FSM works, walks through a robot vacuum example with a state table and Python code, then covers hierarchical state machines, how FSMs compare with [behaviour trees](/atlas/concept/behavior-trees), and the ROS tools that implement them.
+
+![State diagram of a robot vacuum as a finite state machine: five states (Charging, Cleaning, Avoiding, Returning, Stuck), with labelled arrows for the events start with a battery guard, bumper hit, turn done, battery below 15 per cent, dock reached, wheels stalled and button pressed. Charging is the initial state.](/images/atlas/diagrams/finite-state-machine.svg)
+
+## Start here: a robot that can only be doing one thing
+
+Imagine a row of cards on a table, one for each thing a robot vacuum can be doing: CHARGING, CLEANING, AVOIDING, RETURNING, STUCK. Exactly one card is face up. On the back of each card is a short list of rules: "if the bumper hits, flip to AVOIDING"; "if the battery drops below 15%, flip to RETURNING". Nothing else is allowed to change which card is up.
+
+That is a finite state machine. "Finite" because the list of cards is fixed in advance. "State" because each card describes a situation the robot is in while it waits for something to happen.
+
+It matters for robots because the same input means different things in different situations. A bumper hit while cleaning means "back off and turn"; a bumper hit while driving onto the dock may simply mean "arrived". In an FSM, what the robot does with an event depends on the state it is in. Vending machines, lifts, traffic lights and combination locks work the same way ([Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine)).
 
 ## How it works
 
-An FSM is fully defined by three things: its states, its initial state, and the inputs that trigger each transition between states.
+### States, events, guards and actions
 
-The textbook example is a turnstile: two states, Locked and Unlocked, and two inputs, *coin* and *push*. A coin unlocks it; a push through locks it again. Nothing else can happen — and that is the point, because the whole design fits in a small table.
+An FSM in a robot is built from five pieces:
 
-| Current state | Input | Next state |
+- **States.** The situations the robot can be in. Exactly one is active at a time.
+- **Initial state.** Where the machine starts. On a diagram it is marked by an arrow from a black dot.
+- **Events (or inputs).** Things that happen: a sensor crossing a threshold, a timer running out, a button press, an action finishing.
+- **Guards.** A true-or-false condition checked when an event arrives. If it is false, the transition does not fire. In the diagram above, "start" only leaves CHARGING if the battery is at least 80%.
+- **Actions.** Work done along the way. An **entry action** runs whenever a state is entered and an **exit action** whenever it is left, no matter which arrow was taken; a **transition action** runs only on one particular arrow ([Boost.MSM UML guide](https://www.boost.org/latest/doc/antora/msm/uml-short-guide.html), [Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine)).
+
+A transition is fully described by five things: source state, event, guard, target state and action. Write one row per transition and you have a **state-transition table**, which is the whole design in a form you can check line by line. In the designs on this page, an event that has no row for the current state is simply ignored, much as a turnstile that is already unlocked ignores another coin.
+
+### Moore and Mealy machines
+
+There are two classic ways for an FSM to produce output ([Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine)):
+
+- In a **Moore machine**, the output depends only on the current state. In practice that means the work lives in entry actions: entering OPENING starts a door motor, entering OPENED stops it.
+- In a **Mealy machine**, the output depends on the state *and* the input, so the work lives on the transitions: "if `close` arrives while open, start the motor". Mealy designs often need fewer states, because the in-between states can disappear.
+
+Real robot code usually mixes the two, and UML state machines support both: entry and exit actions belong to states, as in Moore, while transition actions depend on the triggering event, as in Mealy ([Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine)).
+
+Robot task logic is normally **deterministic**: every state-and-event pair leads to exactly one next state, so you always know what the robot will do next. (Theory also has non-deterministic FSMs, but any of them can be converted into an equivalent deterministic one; [Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine).)
+
+## Worked example: a robot vacuum
+
+Here is the machine from the diagram as a state table. It is a simplified teaching design, not any manufacturer's firmware.
+
+| State | Event [guard] | Next state | Action |
+|---|---|---|---|
+| CHARGING | start [battery ≥ 80%] | CLEANING | entry: brush on, drive forward |
+| CLEANING | bumper hit | AVOIDING | exit: brush off; entry: reverse a little, turn |
+| AVOIDING | turn done | CLEANING | entry: brush on, drive forward |
+| CLEANING | battery < 15% | RETURNING | exit: brush off; entry: follow dock beacon |
+| AVOIDING | battery < 15% | RETURNING | entry: follow dock beacon |
+| RETURNING | dock reached | CHARGING | entry: stop, start charging |
+| CLEANING, AVOIDING, RETURNING | wheels stalled for 3 s | STUCK | entry: stop, beep (from CLEANING, exit: brush off first) |
+| STUCK | button pressed | CLEANING | entry: brush on, drive forward |
+
+Three things are worth noticing.
+
+1. **The table finds gaps for you.** What should a bumper hit do while RETURNING? There is no row, so the robot ignores it and keeps pushing against whatever it hit. Writing the table is how you discover that question at a desk instead of in someone's living room.
+2. **Some events have to be repeated.** "Battery low" needs its own row from CLEANING and from AVOIDING; "wheels stalled" needs one from three states. Every condition that can interrupt several states multiplies rows. That is the start of the state-explosion problem, covered below.
+3. **Entry actions keep it tidy.** Because CLEANING's entry action turns the brush on, it does not matter whether the robot arrived from CHARGING, AVOIDING or STUCK. That is the Moore style at work.
+
+## FSM in code: a Python example
+
+The cleanest way to code a small FSM is an `enum` for the states and a table for the transitions, with entry and exit actions in one place. The `robot` object stands for whatever drives the motors and reads the sensors.
+
+```python
+from enum import Enum, auto
+
+
+class S(Enum):
+    CHARGING = auto()
+    CLEANING = auto()
+    AVOIDING = auto()
+    RETURNING = auto()
+    STUCK = auto()
+
+
+# (current state, event) -> next state. A pair that is not listed is ignored.
+TRANSITIONS = {
+    (S.CHARGING, "start"): S.CLEANING,
+    (S.CLEANING, "bumper_hit"): S.AVOIDING,
+    (S.AVOIDING, "turn_done"): S.CLEANING,
+    (S.CLEANING, "battery_low"): S.RETURNING,
+    (S.AVOIDING, "battery_low"): S.RETURNING,
+    (S.RETURNING, "dock_reached"): S.CHARGING,
+    (S.CLEANING, "stalled"): S.STUCK,
+    (S.AVOIDING, "stalled"): S.STUCK,
+    (S.RETURNING, "stalled"): S.STUCK,
+    (S.STUCK, "button"): S.CLEANING,
+}
+
+
+class VacuumFSM:
+    def __init__(self, robot):
+        self.robot = robot
+        self.state = S.CHARGING  # initial state
+
+    def guard(self, event):
+        if self.state is S.CHARGING and event == "start":
+            return self.robot.battery() >= 0.80
+        return True
+
+    def handle(self, event):
+        nxt = TRANSITIONS.get((self.state, event))
+        if nxt is None or not self.guard(event):
+            return  # this event means nothing in this state
+        self.on_exit(self.state)
+        self.state = nxt
+        self.on_entry(nxt)
+
+    def on_entry(self, state):
+        r = self.robot
+        if state is S.CLEANING:
+            r.brush_on()
+            r.drive_forward()
+        elif state is S.AVOIDING:
+            r.reverse_then_turn()
+        elif state is S.RETURNING:
+            r.follow_dock_beacon()
+        elif state is S.CHARGING:
+            r.stop()
+            r.start_charging()
+        elif state is S.STUCK:
+            r.stop()
+            r.beep()
+
+    def on_exit(self, state):
+        if state is S.CLEANING:
+            self.robot.brush_off()
+
+    def tick(self):
+        """Run every control cycle. Sensor checks are in priority order,
+        because two of them can become true in the same cycle."""
+        r = self.robot
+        for event, happened in (
+            ("stalled", r.wheels_stalled_for(3.0)),
+            ("battery_low", r.battery() < 0.15),
+            ("bumper_hit", r.bumper_pressed()),
+            ("turn_done", r.turn_finished()),
+            ("dock_reached", r.on_dock()),
+        ):
+            if happened and (self.state, event) in TRANSITIONS:
+                self.handle(event)
+                return
+```
+
+User commands such as `start` and `button` arrive by calling `handle()` directly; sensor conditions are turned into events by `tick()`, which the robot's [control loop](/atlas/concept/sense-think-act-loop) calls many times a second. The priority order in `tick()` is not a detail. When conditions are checked regularly in discrete time, two can be true in the same cycle, and a plain FSM does not say which wins, so the code has to ([Colledanchise & Ögren](https://arxiv.org/abs/1709.00084), ch. 2.2).
+
+The same pattern works as a `switch` or `match` statement in C, C++ or Python. Keeping transitions in a table has one advantage: the design is data, so you can print it, test that every state has a way out, or draw the diagram from it.
+
+## Hierarchical state machines and state explosion
+
+A flat FSM grows badly. Each condition that can interrupt *N* states needs *N* arrows. Combine two independent concerns and the states multiply: a mobile manipulator with 5 navigation states and 4 gripper states needs 5 × 4 = 20 combined states in one flat machine. Colledanchise and Ögren list the consequences: adding or removing a state means re-checking a potentially large number of transitions, large machines are hard to modify, and sub-machines are hard to reuse because their transitions depend on internal variables ([Colledanchise & Ögren](https://arxiv.org/abs/1709.00084), ch. 2.1).
+
+The standard fix is **hierarchy**. In 1987 David Harel introduced **statecharts**, which extend ordinary state diagrams with hierarchy, concurrency and communication so that small diagrams can describe complex behaviour ([Harel 1987](https://doi.org/10.1016/0167-6423(87)90035-9)). In a **hierarchical FSM (HFSM)**:
+
+- A **superstate** contains substates, and one of them is marked as the starting substate.
+- A transition drawn from a superstate applies to every substate inside it. Wrap CLEANING, AVOIDING and RETURNING in a MOVING superstate and one "wheels stalled" arrow from MOVING to STUCK replaces three.
+- Substates **inherit** behaviour from the superstate, so a property set once on MOVING does not have to be repeated in each substate ([Colledanchise & Ögren](https://arxiv.org/abs/1709.00084), ch. 2.2).
+- **Orthogonal regions** run independent machines side by side inside one state, so the navigation and gripper machines above can stay separate instead of being multiplied together ([Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine), [Boost.MSM UML guide](https://www.boost.org/latest/doc/antora/msm/uml-short-guide.html)).
+
+Hierarchy helps a lot but does not remove the problem. The hierarchy is designed by hand, and a task that must be able to jump back and redo any earlier step still needs many arrows inside its superstate ([Colledanchise & Ögren](https://arxiv.org/abs/1709.00084), ch. 2.2).
+
+## FSM vs behaviour tree
+
+A [behaviour tree](/atlas/concept/behavior-trees) is the main alternative for organising robot behaviour, and ROS 2's [Nav2](/atlas/concept/nav2) is built on one. The difference is how control moves. An FSM transition is a **one-way** jump, like a `goto` statement: control leaves one state and lands in another. A behaviour tree uses **two-way** control: a parent node calls a child, and the child reports back success, failure or still running, like a function call ([Colledanchise & Ögren](https://arxiv.org/abs/1709.00084), ch. 1.2).
+
+| | Finite state machine | Behaviour tree |
 |---|---|---|
-| Locked | coin | Unlocked |
-| Locked | push | Locked |
-| Unlocked | coin | Unlocked |
-| Unlocked | push | Locked |
+| Control flow | One-way transitions between states | Parent ticks child, child returns a status |
+| Adding a behaviour | Re-check existing transitions in and out | Add a subtree; the rest is unchanged |
+| Reacting to a new condition | An arrow from every state it can interrupt (or a superstate) | A condition node checked high in the tree |
+| Reading a small design | Very clear: boxes and arrows | More machinery for the same result |
+| Expressive power | Same: any behaviour tree execution can be described by an FSM, and vice versa | Same |
 
-That is a state-transition table. Drawn as a picture it becomes a state diagram: states are nodes, transitions are labelled arrows, and the starting state is marked by an arrow from a black dot. Seeing the whole design at a glance is most of why engineers reach for FSMs.
-
-A machine is **deterministic** when every state-and-input pair has exactly one transition, and **nondeterministic** when an input may lead to zero, one or several. Two conventions exist for output: a **Moore** machine's output depends only on its state, while a **Mealy** machine's depends on the state *and* the input — which often means fewer states.
-
-## A worked example: the battery runs low mid-delivery
-
-A robot is carrying a parcel across a hospital when its battery drops below ten per cent.
-
-In an FSM you must say exactly where that can happen. Add a Charging state, then draw a *battery low* transition into it from every state the robot might be in when it notices — Delivering, Returning, Idle — each with its own answer to "what about the parcel?", plus a way back out again.
-
-That is the cost people run into: add a *lost the map* condition next week and you draw another fan of arrows across the same states. Nav2's documentation puts the end point plainly — a finite state machine can need dozens of states and hundreds of transitions, which gets hard to manage. Hence the navigation stack is built on [behaviour trees](/atlas/concept/behavior-trees), where a new condition is one branch rather than one arrow per state.
+Behaviour trees came from video games, where character AI had often been written as FSMs, to make behaviour more modular ([Colledanchise & Ögren](https://arxiv.org/abs/1709.00084), ch. 1.1). They are not more powerful, only easier to grow. A reasonable rule of thumb: if the behaviour fits on one page and the states really are separate modes, use an FSM; if you keep adding interrupts and recoveries, consider a tree. The [behaviour trees entry](/atlas/concept/behavior-trees) covers how trees work in detail.
 
 ## Where you'll see it
 
-Vending machines, elevators, traffic lights and combination locks are all FSMs, and so are compilers, network protocols and digital hardware. In robotics they are the standard shape for safety and operating modes — manual, automatic, emergency stop — where the states genuinely are few, fixed and mutually exclusive.
+- **Inside ROS 2.** A managed (lifecycle) node has four primary states, `Unconfigured`, `Inactive`, `Active` and `Finalized`, and an external supervisor moves it between them with transitions such as `configure` and `shutdown` ([ROS 2 design: managed nodes](https://design.ros2.org/articles/node_lifecycle.html)). Nav2's servers all use this lifecycle for a predictable start-up and shut-down ([Macenski et al. 2020](https://arxiv.org/abs/2003.00368)).
+- **SMACH.** A task-level library from ROS 1 for composing robot behaviour. At its core it is a ROS-independent Python library for building hierarchical state machines ([SMACH package description](https://github.com/ros/executive_smach/blob/noetic-devel/smach/package.xml)).
+- **FlexBE.** A behaviour engine for ROS 2 in which behaviours are hierarchical state machines: states are active actions and transitions are the reaction to their outcomes. An operator can restrict transitions or trigger them by hand, and a graphical editor builds the machines ([FlexBE](https://github.com/FlexBE/flexbe_behavior_engine)).
+- **YASMIN.** A state machine library for ROS 2, Python and C++, with ready-made states that call ROS 2 actions, services and topics, a shared "blackboard" for data, concurrent and orthogonal states, nesting (its Nav2 demo is a hierarchical FSM) and a web viewer ([YASMIN](https://github.com/uleroboticsgroup/yasmin)).
+- **Nav2, which chose not to.** Nav2's authors wrote that as states and transitions grow, modelling complex multi-step tasks as FSMs "can become intractably complex", so its navigator is a behaviour tree loaded from an XML file at run time ([Macenski et al. 2020](https://arxiv.org/abs/2003.00368), [nav2_bt_navigator](https://github.com/ros-navigation/navigation2/tree/main/nav2_bt_navigator)).
+- **Factory automation.** An FSM can be built in hardware from logic gates and flip-flops, relays or a programmable logic controller (PLC) ([Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine)). PLC programmers also have a graphical language of their own, the sequential function chart, which is based on GRAFCET and is one of the five languages in the IEC 61131-3 standard ([Wikipedia: sequential function chart](https://en.wikipedia.org/wiki/Sequential_function_chart)).
 
-They also scale up rather than being replaced outright: UML state machines extend the plain model with nested states and parallel regions, the idea behind hierarchical state machines. Nav2 notes that a hierarchical-FSM navigator could be added alongside its behaviour-tree one if there is demand.
+### Try it
+
+YASMIN installs from the ROS 2 package repositories and ships demos plus a browser viewer ([YASMIN README](https://github.com/uleroboticsgroup/yasmin)):
+
+```bash
+sudo apt install ros-$ROS_DISTRO-yasmin ros-$ROS_DISTRO-yasmin-*
+ros2 run yasmin_viewer yasmin_viewer_node      # then open http://localhost:5000/
+ros2 run yasmin_demos yasmin_demo.py           # in a second terminal
+```
+
+Watch the active state change in the viewer, then add a state of your own to the demo.
+
+## Limits
+
+- **State explosion.** Interrupts and independent concerns multiply arrows and states. Hierarchy slows this down; it does not stop it.
+- **Poor reuse.** A sub-machine's transitions often depend on the machine around it, so lifting it into another project takes rework ([Colledanchise & Ögren](https://arxiv.org/abs/1709.00084)).
+- **Memory is only the state.** An FSM cannot count or remember without limit; its memory is bounded by its number of states ([Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine)). Real robot code keeps counters, maps and goals in ordinary variables alongside the machine, which is why libraries such as YASMIN add a shared blackboard.
+- **It decides what to do, not how.** Steering, balancing and holding a speed belong to continuous controllers such as a [PID controller](/atlas/concept/pid-controller) running inside a state.
+
+## Going deeper
+
+- **Formal roots.** In theory a deterministic FSM is a 5-tuple: input alphabet, set of states, initial state, transition function and set of final (accepting) states. The output models are named after Edward Moore (1956) and George Mealy (1955); Hopcroft's algorithm finds the smallest machine that behaves the same ([Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine), [Colledanchise & Ögren](https://arxiv.org/abs/1709.00084), references).
+- **Outcome-based machines.** ROS libraries such as FlexBE and YASMIN turn the textbook model around slightly: each state runs some work and returns an outcome (YASMIN's ROS states use basic outcomes such as `SUCCEED`, `ABORT`, `CANCEL` and `TIMEOUT`), and the transitions map each outcome to the next state ([FlexBE](https://github.com/FlexBE/flexbe_behavior_engine), [YASMIN](https://github.com/uleroboticsgroup/yasmin)). The "event" is the result of the state's own work.
+- **Trees and machines are equivalent.** Every execution a behaviour tree describes can be described by an FSM and the other way round, so choosing between them is about which is easier to build, read and change, not about what is possible ([Colledanchise & Ögren](https://arxiv.org/abs/1709.00084), ch. 2.2).
 
 ## Why it matters
 
-The FSM is how you learn to think about robot control at all: discrete modes, explicit triggers, one thing at a time. If you can draw your robot's behaviour on a napkin, an FSM will be clearer and easier to debug than anything else — including the mode logic wrapped around [path planning](/atlas/concept/path-planning) in [ROS 2](/atlas/concept/ros2). If the napkin is already full of arrows, look at a tree.
+Many robots spend their lives switching between a handful of modes, and a lot of strange robot behaviour is a mode problem: the robot did not know it was supposed to stop, or two rules fired at once. Drawing the robot as states and arrows forces every one of those decisions into the open, before the robot finds them. The FSM is also the baseline that every alternative, from statecharts to behaviour trees, is explained against, and anyone who uses ROS 2 managed (lifecycle) nodes, as Nav2 does, is already working with one.
 
 ## Common questions
 
-### Can a robot be in two states at once?
+### What is an FSM in robotics?
 
-Not in a plain FSM — it is in exactly one state at any given time. Hierarchical and UML-style state machines add parallel regions to get around this, which is one of the ways designs grow complicated.
+A finite state machine is a way of organising a robot's behaviour as a fixed list of modes, such as charging, cleaning and returning to the dock, where the robot is in exactly one mode at a time and switches only when a named event happens, such as a bumper hit or a low battery. Libraries such as SMACH, FlexBE and YASMIN implement it for ROS.
 
-### Is an FSM obsolete now that behaviour trees exist?
+### What is the difference between a state machine and a behaviour tree?
 
-No. Trees earn their keep on long, failure-prone tasks; FSMs stay the clearest choice for small, fixed sets of modes, and are still everywhere in industrial automation and digital hardware.
+In a state machine, control jumps one way from state to state along arrows, so every new interruption needs arrows from each state it can interrupt. In a behaviour tree, a parent asks its children to run and they report back success, failure or running, so new behaviour is added as a new branch. Both can express the same behaviours; trees are easier to extend, FSMs are clearer for a few modes.
 
----
+### What is the difference between a Moore and a Mealy machine?
 
-*Next step: read [behaviour trees](/atlas/concept/behavior-trees) — how robotics structures decisions once a state machine's arrows get out of hand.*
+In a Moore machine the output depends only on the current state, so the work is done when a state is entered. In a Mealy machine the output depends on the state and the input, so the work is done on the transition, which often needs fewer states. Most robot code mixes both.
+
+## Related
+
+- [Behaviour trees](/atlas/concept/behavior-trees): the main alternative, and what Nav2 uses
+- [Sense-think-act loop](/atlas/concept/sense-think-act-loop): the loop in which a state machine makes its decisions
+- [Nav2](/atlas/concept/nav2): the ROS 2 navigation stack built on a behaviour tree and lifecycle nodes
+- [ROS 2](/atlas/concept/ros2): the framework FlexBE and YASMIN run on, and home of the lifecycle state machine
+- [PID controller](/atlas/concept/pid-controller): the continuous controller that runs inside a state
+
+*Next step: see a mission state machine in a full ROS 2 robot in the Academy's [Forge capstone](/academy/forge/04).*
