@@ -110,10 +110,14 @@ export const SIMULATORS: Simulator[] = [
   {
     id: 'slam',
     title: 'SLAM Simulator',
-    heading: 'Interactive SLAM Simulator',
-    blurb: 'Drive a robot through an unknown world and watch it build a map while locating itself.',
+    // 25 Nov 2026: the copy promised driving, drift and loop closure. The demo
+    // is a wall-following robot building a map from 16 range rays with its
+    // position known (components/visuals/SLAMVisual.tsx). Copy now says that;
+    // adding pose drift + loop closure is the upgrade that would earn "SLAM".
+    heading: 'SLAM Mapping Demo: Watch a Robot Map an Unknown Room',
+    blurb: 'A robot follows the walls of an unknown room and builds a map from its range-sensor hits.',
     description:
-      'A free interactive SLAM simulator. Drive a robot through unknown space and watch simultaneous localisation and mapping build the map in real time.',
+      'A free interactive mapping demo: a robot explores an unknown room with a 16-ray range sensor and builds the map in real time. The mapping half of SLAM, shown simply.',
     keywords: [
       'slam simulator online',
       'interactive slam visualization',
@@ -121,9 +125,9 @@ export const SIMULATORS: Simulator[] = [
       'slam robotics simulator free',
     ],
     whatYouCanDo: [
-      'Drive the robot and watch the occupancy grid fill in from sensor hits',
-      'See drift accumulate, then watch a loop closure snap the map back into place',
-      'Understand why mapping and localising at the same time is a chicken-and-egg problem',
+      'Watch the map fill in from the range-sensor hits as the robot follows the walls',
+      'Change the speed, pause, and see how much of the room each lap uncovers',
+      'See the mapping half of SLAM; the demo knows the robot\'s position, which real SLAM must estimate at the same time',
     ],
     lesson: { href: '/academy/forge/f-01-ros2-nav2', title: 'F-01: ROS2 Navigation Stack' },
     related: [
@@ -169,7 +173,7 @@ export const SIMULATORS: Simulator[] = [
       'A free interactive sensor fusion demo. Watch noisy GPS and drifting IMU data combine into a single smooth position estimate, in real time.',
     keywords: [
       'sensor fusion simulator',
-      'kalman filter visualizer',
+      'complementary filter demo',
       'gps imu fusion demo',
       'interactive sensor fusion robotics',
     ],
@@ -209,16 +213,20 @@ export const SIMULATORS: Simulator[] = [
       { href: '/atlas/concept/pwm', label: 'PWM' },
       { href: '/atlas/concept/dc-motor', label: 'DC Motor' },
       { href: '/atlas/concept/motor-driver', label: 'Motor Driver' },
+      { href: '/tools/motor-torque-calculator', label: 'Motor torque calculator' },
     ],
     accent: '#F97316',
   },
   {
     id: 'playground',
     title: 'Code Playground',
-    heading: 'Robot Code Playground — Write Python, Watch It Move',
-    blurb: 'Write real Python in the browser and drive a simulated robot with it.',
+    // 25 Nov 2026: this used to promise "real Python". The playground runs a
+    // fixed set of Python-style commands line by line (no loops or if), so the
+    // copy now says exactly that — it is the page we send Hacker News to.
+    heading: 'Robot Code Playground: Drive a Robot with Python-Style Commands',
+    blurb: 'Type Python-style commands in the browser and watch a simulated robot drive, turn and read its distance sensor.',
     description:
-      'Write Python in your browser and watch a simulated robot execute it. A free robotics code playground — no install, no setup, no signup.',
+      'Type Python-style robot commands in your browser and watch a simulated robot run them line by line. A free robot code playground: no install, no signup.',
     keywords: [
       'robot programming playground online',
       'python robot simulator browser',
@@ -226,9 +234,9 @@ export const SIMULATORS: Simulator[] = [
       'robotics code sandbox',
     ],
     whatYouCanDo: [
-      'Write real Python and watch the robot execute it line by line',
+      'Write Python-style commands (forward, turn, wait, set_speed, sensor.distance) and watch the robot run them line by line',
       'Break it, fix it, re-run it — nothing to install and nothing to damage',
-      'Go from "move forward" to a working obstacle-avoider in one sitting',
+      'Plan a route around the obstacles one command at a time, then compare it with the built-in examples',
     ],
     lesson: { href: '/academy/wire/w-06-capstone-navigator', title: 'W-06: Capstone Navigator' },
     related: [
@@ -241,18 +249,21 @@ export const SIMULATORS: Simulator[] = [
   {
     id: 'robots',
     title: '3D Robot Explorer',
-    heading: '3D Robot Explorer — Inspect Real Robot Models',
-    blurb: 'Rotate, zoom and move the joints of real robots rendered from their URDF files.',
+    // 25 Nov 2026: the copy said these were "rendered from their URDF files".
+    // They are simplified Three.js models built in code (components/visuals/
+    // URDFViewer.tsx), with joints you can move. The copy now says so, and no
+    // longer targets "urdf viewer" queries this page cannot answer.
+    heading: '3D Robot Explorer: Move the Joints of Four Robot Types',
+    blurb: 'Rotate, zoom and move the joints of simplified 3D models of an arm, a quadruped, a mobile base and a drone.',
     description:
-      'Explore real robot models in 3D. Rotate, zoom and articulate joints from actual URDF files, right in your browser. Free, no install.',
+      'Rotate, zoom and move the joints of simplified 3D models of a six-axis arm, a quadruped, a TurtleBot-style base and a quadrotor, right in your browser.',
     keywords: [
-      'urdf viewer online',
       '3d robot model viewer',
-      'robot urdf visualizer browser',
       'interactive 3d robot explorer',
+      'robot joints 3d browser',
     ],
     whatYouCanDo: [
-      'Rotate and zoom real robot models rendered straight from URDF',
+      'Rotate and zoom simplified models of four common robot types',
       'Move individual joints and see the kinematic chain respond',
       'Compare how an arm, a quadruped and a mobile base are actually built',
     ],

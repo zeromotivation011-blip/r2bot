@@ -201,6 +201,12 @@ export default function VisualizerPage() {
                 </Link>
               ))}
             </div>
+            <p className="mt-4 text-sm text-gray-400">
+              Sizing a real build?{' '}
+              <Link href="/tools/motor-torque-calculator" className="inline-flex min-h-[44px] items-center text-amber-300 hover:underline">
+                Motor torque calculator →
+              </Link>
+            </p>
           </div>
         </div>
 
@@ -230,7 +236,7 @@ export default function VisualizerPage() {
               3D Robot Explorer
             </h2>
             <p style={{ fontSize: 16, color: '#B0B8C5', margin: '0 0 22px', maxWidth: 720 }}>
-              Rotate, zoom, and move the joints of 4 real robot types — TurtleBot3, UR5 arm, quadruped, drone. All rendered live with Three.js.
+              Rotate, zoom, and move the joints of simplified models of 4 robot types — a TurtleBot3-style base, a UR5-style arm, a quadruped and a drone. Built and rendered live with Three.js.
             </p>
             <URDFViewerWrapper />
           </section>

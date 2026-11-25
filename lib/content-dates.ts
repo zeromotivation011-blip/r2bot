@@ -26,6 +26,7 @@ export const PAGE_UPDATED: Record<string, string> = {
   '/glossary': '2026-11-09T00:00:00.000Z',
   '/learn/ros2-cheatsheet': '2026-11-24T00:00:00.000Z',
   '/ros2/fix': '2026-11-24T00:00:00.000Z',
+  '/tools/motor-torque-calculator': '2026-11-25T00:00:00.000Z',
   '/compare': '2026-11-09T00:00:00.000Z',
   '/compare/lidar-vs-camera-slam': '2026-11-09T00:00:00.000Z',
   '/compare/arduino-vs-esp32-vs-raspberry-pi': '2026-11-09T00:00:00.000Z',
