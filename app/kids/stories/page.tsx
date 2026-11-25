@@ -49,7 +49,7 @@ export default function StoriesPage() {
     })),
   }
   const crumbs = breadcrumbJsonLD([
-    { name: 'Robot World', path: '/kids' },
+    { name: 'R2BOT Kids', path: '/kids' },
     { name: 'Story Theatre', path: '/kids/stories' },
   ])
 
@@ -59,7 +59,7 @@ export default function StoriesPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(crumbs) }} />
 
       <nav aria-label="Breadcrumb" className="text-sm text-white/60">
-        <Link href="/kids" className="hover:text-white hover:underline">Robot World</Link>
+        <Link href="/kids" className="hover:text-white hover:underline">R2BOT Kids</Link>
         <span aria-hidden className="mx-1.5">›</span>
         <span className="text-white/90">Story Theatre</span>
       </nav>

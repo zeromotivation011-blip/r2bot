@@ -82,7 +82,7 @@ export default async function EpisodePage({ params }: Params) {
     isPartOf: { '@type': 'CreativeWorkSeries', name: 'R2BOT Story Theatre', url: `${BASE}/kids/stories` },
   }
   const crumbs = breadcrumbJsonLD([
-    { name: 'Robot World', path: '/kids' },
+    { name: 'R2BOT Kids', path: '/kids' },
     { name: 'Story Theatre', path: '/kids/stories' },
     { name: ep.title, path: `/kids/stories/${ep.slug}` },
   ])
@@ -93,7 +93,7 @@ export default async function EpisodePage({ params }: Params) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(crumbs) }} />
 
       <nav aria-label="Breadcrumb" className="text-sm text-white/60">
-        <Link href="/kids" className="hover:text-white hover:underline">Robot World</Link>
+        <Link href="/kids" className="hover:text-white hover:underline">R2BOT Kids</Link>
         <span aria-hidden className="mx-1.5">›</span>
         <Link href="/kids/stories" className="hover:text-white hover:underline">Story Theatre</Link>
         <span aria-hidden className="mx-1.5">›</span>

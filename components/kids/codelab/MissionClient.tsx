@@ -353,7 +353,7 @@ export default function MissionClient({ mission, next, previous }: Props) {
                   {status.stars === 3
                     ? `Perfect — you solved it in ${blockCount} ${blockCount === 1 ? "block" : "blocks"}.`
                     : status.stars === 2
-                      ? `Solved! Can you do it in ${mission.budget} blocks or fewer for three stars?`
+                      ? `Solved! Can you do it in ${mission.budget} ${mission.budget === 1 ? 'block' : 'blocks'} or fewer for three stars?`
                       : 'Solved with a hint! Try again without hints to earn more stars.'}
                   {status.added > 0 ? ` +${status.added} ⭐ added.` : ''}
                 </p>

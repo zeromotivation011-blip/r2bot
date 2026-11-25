@@ -117,7 +117,9 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
         </footer>
       )}
 
-      {!bare && <SparkGuide />}
+      {/* Spark's floating helper belongs to the Robot World games; on the story player,
+          the 3D workshop and the code editor it would sit on top of the controls. */}
+      {(pathname.startsWith('/kids/world') || pathname.startsWith('/kids/challenge') || pathname.startsWith('/kids/my-robot')) && <SparkGuide />}
 
       {/* Pushes a progress snapshot to the teacher, only if this child joined a class. */}
       <KidsClassSync />

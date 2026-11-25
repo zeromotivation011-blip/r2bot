@@ -33,6 +33,10 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     title,
     description,
     alternates: { canonical: url },
+    // A mission is a playable puzzle with ~100 words of text: valuable to a child,
+    // thin to a search engine. 24 of them would be the scaled-thin-pages footprint
+    // CLAUDE.md §6 warns about, so /kids/code-lab (the full list) is the indexed page.
+    robots: { index: false, follow: true },
     openGraph: { type: 'website', url, siteName: 'R2BOT', title, description, images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT Code Lab' }] },
   }
 }
@@ -98,7 +102,7 @@ export default async function MissionPage({ params }: { params: Params }) {
             <strong className="block text-sky-300">🔧 Your robot needs</strong>
             {special.length ? special.map((c) => CAPABILITY_NEEDS[c]).join(' + ') : 'Just something to move with.'}
             <span className="mt-1 block text-purple-200">
-              Blocks: {m.palette.map((t) => BLOCK_INFO[t].label).join(', ')}. ⭐⭐⭐ in {m.budget} blocks or fewer.
+              Blocks: {m.palette.map((t) => BLOCK_INFO[t].label).join(', ')}. ⭐⭐⭐ in {m.budget} {m.budget === 1 ? 'block' : 'blocks'} or fewer.
             </span>
           </p>
         </div>

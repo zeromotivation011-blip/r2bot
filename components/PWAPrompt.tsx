@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 const DISMISS_KEY = 'r2bot_pwa_dismiss';
 const VISIT_KEY = 'r2bot_visit_count';
@@ -8,6 +9,9 @@ const MIN_VISITS = 3;
 
 export function PWAPrompt() {
   const [show, setShow] = useState(false);
+  // R2BOT Kids is its own installable app with its own install button and a
+  // bottom tab bar this banner would cover.
+  const inKids = (usePathname() ?? '').startsWith('/kids');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -21,7 +25,7 @@ export function PWAPrompt() {
     }
   }, []);
 
-  if (!show) return null;
+  if (!show || inKids) return null;
   return (
     <div
       role="region"
