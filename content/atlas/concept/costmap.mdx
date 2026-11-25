@@ -20,7 +20,6 @@ seeAlso:
   - costmap-layers
   - occupancy-grid
   - nav2
-  - nav2-stack
   - path-planning
   - a-star-algorithm
   - dynamic-window-approach
@@ -163,7 +162,7 @@ The local costmap lives in the `odom` frame because [odometry](/atlas/concept/od
 
 ## Where you'll see it
 
-- **Every Nav2 robot.** Warehouse and hospital delivery robots built on ROS 2 navigate with these two costmaps; the planner reads the global one and the controller (DWB, MPPI, Regulated Pure Pursuit and others) checks or scores its motions against the local one. See the [Nav2 stack](/atlas/concept/nav2-stack).
+- **Every Nav2 robot.** Warehouse and hospital delivery robots built on ROS 2 navigate with these two costmaps; the planner reads the global one and the controller (DWB, MPPI, Regulated Pure Pursuit and others) checks or scores its motions against the local one. See the [Nav2 stack](/atlas/concept/nav2).
 - **In RViz.** Add a Map display on `/global_costmap/costmap` or `/local_costmap/costmap` and choose the "costmap" colour scheme to see lethal, inscribed and inflated cells.
 - **Outside ROS.** Grid costmaps are a general planning tool. The same idea appears in self-driving research and games: score the terrain, then search for the cheapest route.
 

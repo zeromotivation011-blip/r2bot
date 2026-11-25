@@ -6,6 +6,7 @@
 // public Atlas never breaks whether or not the DB is populated.
 
 import { createClient } from '@supabase/supabase-js'
+import { isRedirectedAtlas } from '@/lib/atlas-redirects'
 import {
   buildEntry,
   getAtlasEntry,
@@ -207,7 +208,8 @@ export async function getAllAtlasEntriesMerged(): Promise<AtlasEntry[]> {
       if (file && !hasContent(e)) continue
       byKey.set(key, file && !e.lastReviewed ? { ...e, lastReviewed: file.lastReviewed } : e)
     }
-    return Array.from(byKey.values())
+    // A slug that 308s to another entry is not a page of its own.
+    return Array.from(byKey.values()).filter((e) => !isRedirectedAtlas(e.type, e.slug))
   } catch {
     // Never let a DB problem shrink the public Atlas.
     return fileEntries

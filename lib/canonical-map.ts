@@ -88,7 +88,13 @@ export const BLOG_TO_ATLAS: Record<string, string> = {
  * planners, setup). Each links to the other in its first paragraph.
  * "lqr" / "lqr controller" is owned by lqr-controller; the duplicate
  * linear-quadratic-regulator entry was merged into it and 308s there
- * (next.config.mjs, app/sitemap.ts REDIRECTED_ATLAS).
+ * (next.config.mjs, lib/atlas-redirects.ts).
+ * 25 Nov 2026: ten more duplicate pairs merged the same way — nav2-stack → nav2,
+ * neural-networks-robotics → neural-network, reinforcement-learning-robotics →
+ * reinforcement-learning, embedded-systems → embedded-system, behaviour-cloning
+ * → behavior-cloning, tof-sensor → time-of-flight-sensor, light-curtain →
+ * safety-light-curtain, warehouse-robot → warehouse-robotics, risk-assessment →
+ * risk-assessment-robotics, last-mile-delivery → last-mile-delivery-robot.
  * 24 Nov 2026: "costmap" / "costmap ros2" / "what is a costmap" ranked
  * /atlas/concept/costmap (pos 4-9, 0 clicks). costmap owns the general and
  * Nav2 queries (cost scale, inflation, global vs local); costmap-layers goes

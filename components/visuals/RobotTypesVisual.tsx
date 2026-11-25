@@ -34,7 +34,7 @@ const CARDS: Card[] = [
     use: 'Aerial survey, delivery, inspection',
     examples: 'DJI, Zipline',
     tech: 'IMU, GPS fusion, PID altitude control',
-    href: '/atlas/concept/drone-uav',
+    href: '/atlas/concept/drone',
   },
   {
     emoji: '🤝',

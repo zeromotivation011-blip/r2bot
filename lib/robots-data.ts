@@ -1568,7 +1568,7 @@ const ROBOTS_UNSORTED: Robot[] = [
     atlasLearnLinks: [
       { label: 'Humanoid Robot — Atlas', href: '/atlas/concept/humanoid-robot' },
       { label: 'Bipedal Robot — Atlas', href: '/atlas/concept/bipedal-robot' },
-      { label: 'Reinforcement Learning in Robotics — Atlas', href: '/atlas/concept/reinforcement-learning-robotics' },
+      { label: 'Reinforcement Learning in Robotics — Atlas', href: '/atlas/concept/reinforcement-learning' },
     ],
     sources: [
       { name: 'Unitree — G1 product page and specifications', url: 'https://www.unitree.com/g1/' },
@@ -2161,9 +2161,9 @@ const ROBOTS_UNSORTED: Robot[] = [
     metaTitle: 'Stretch by Boston Dynamics — Specs, Price & How It Works',
     metaDescription:
       'Boston Dynamics Stretch: 800 cases an hour, 23 kg per case, 3.2 m reach, 16-hour battery, 1,300 kg. Sourced specs and how the truck-unloading robot works.',
-    atlasSlug: 'warehouse-robot',
+    atlasSlug: 'warehouse-robotics',
     atlasLearnLinks: [
-      { label: 'Warehouse Robot — Atlas', href: '/atlas/concept/warehouse-robot' },
+      { label: 'Warehouse Robot — Atlas', href: '/atlas/concept/warehouse-robotics' },
       { label: 'Vacuum Gripper — Atlas', href: '/atlas/concept/vacuum-gripper' },
       { label: 'Object Detection — Atlas', href: '/atlas/concept/object-detection' },
     ],
@@ -2296,7 +2296,7 @@ const ROBOTS_UNSORTED: Robot[] = [
     atlasSlug: 'delivery-robot',
     atlasLearnLinks: [
       { label: 'Delivery Robot — Atlas', href: '/atlas/concept/delivery-robot' },
-      { label: 'Last-Mile Delivery — Atlas', href: '/atlas/concept/last-mile-delivery' },
+      { label: 'Last-Mile Delivery — Atlas', href: '/atlas/concept/last-mile-delivery-robot' },
       { label: 'Levels of Autonomy — Atlas', href: '/atlas/concept/levels-of-autonomy' },
     ],
     sources: [
@@ -2495,7 +2495,7 @@ const ROBOTS_UNSORTED: Robot[] = [
     atlasLearnLinks: [
       { label: 'Service Robot — Atlas', href: '/atlas/concept/service-robot' },
       { label: 'Medical Robotics — Atlas', href: '/atlas/concept/medical-robotics' },
-      { label: 'Nav2 Stack — Atlas', href: '/atlas/concept/nav2-stack' },
+      { label: 'Nav2 Stack — Atlas', href: '/atlas/concept/nav2' },
     ],
     sources: [
       { name: 'The Robot Report — Diligent Robotics raises seed funding, launches Moxi (1 Oct 2019)', url: 'https://www.therobotreport.com/diligent-robotics-raises-seed-funding-launches-moxi-robot/' },
@@ -3621,7 +3621,7 @@ const ROBOTS_UNSORTED: Robot[] = [
     atlasLearnLinks: [
       { label: 'Bipedal Robot — Atlas', href: '/atlas/concept/bipedal-robot' },
       { label: 'Sim-to-Real Transfer — Atlas', href: '/atlas/concept/sim-to-real-transfer' },
-      { label: 'Reinforcement Learning in Robotics — Atlas', href: '/atlas/concept/reinforcement-learning-robotics' },
+      { label: 'Reinforcement Learning in Robotics — Atlas', href: '/atlas/concept/reinforcement-learning' },
     ],
     sources: [
       { name: 'Guinness World Records — Fastest 100 m by a bipedal robot', url: 'https://www.guinnessworldrecords.com/world-records/629600-fastest-100-m-by-a-bipedal-robot' },

@@ -378,7 +378,7 @@ const BASE_SHORTS: ShortLesson[] = [
     limit: 'If communication fails or plans change fast, robots may wait or need re-planning.',
     demo: 'loop', loop: ['Fleet planner assigns routes', 'Reserve crossing times', 'Robots move and stop if blocked'],
     quiz: { q: 'What is the central planner like?', options: ['Air traffic control', 'A vacuum cleaner', 'A camera'], answer: 0, why: 'It schedules paths in space and time so robots do not meet.' },
-    atlas: [{ label: 'Warehouse robot', href: '/atlas/concept/warehouse-robot' }, { label: 'Kiva warehouse robots', href: '/atlas/robot/kiva-warehouse-robots' }, { label: 'Path planning', href: '/atlas/concept/path-planning' }],
+    atlas: [{ label: 'Warehouse robot', href: '/atlas/concept/warehouse-robotics' }, { label: 'Kiva warehouse robots', href: '/atlas/robot/kiva-warehouse-robots' }, { label: 'Path planning', href: '/atlas/concept/path-planning' }],
     next: 'stairs',
   },
   {
