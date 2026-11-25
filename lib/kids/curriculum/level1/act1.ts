@@ -176,7 +176,7 @@ export const ACT1: Session[] = [
     teacher: teacher({
       timing: lessonTiming('"Sense, think, act" freeze game'),
       unpluggedWarmup: {
-        title: 'Sense, Think, Act freeze game', minutes: 5,
+        title: 'Sense, Think, Act freeze game', minutes: 4,
         steps: [
           'Children walk around. When you clap (sense!), they freeze and think where to go (think!), then hop to a new spot (act!).',
           'Say the three words with an action each: hand to ear (sense), finger to head (think), jump (act).',
@@ -290,7 +290,7 @@ export const ACT1: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: [HOP],
-      exampleSolution: ['drive_for(50, 3)'],
+      exampleSolution: ['drive_for(80, 3)'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (0,1).' },
         { kind: 'no-collision', detail: 'Robot does not touch the fence at row 0.' },
@@ -315,7 +315,7 @@ export const ACT1: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: [HOP, HOP_BACK],
-      exampleSolution: ['drive_for(50, 2)', 'drive_for(50, 2)'],
+      exampleSolution: ['drive_for(80, 2)', 'drive_for(80, 2)'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (0,1).' },
         { kind: 'no-collision', detail: 'The flowerpot is not touched.' },
@@ -352,7 +352,7 @@ export const ACT1: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Human wheels'),
       unpluggedWarmup: {
-        title: 'Human wheels', minutes: 5,
+        title: 'Human wheels', minutes: 4,
         steps: [
           'Tape a line of 5 squares on the floor (or use floor tiles).',
           'A child is the robot. The class calls out "Forward 2!" and the robot takes exactly 2 steps, one per square.',
@@ -464,7 +464,7 @@ export const ACT1: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: [HOP, WAIT],
-      exampleSolution: ['drive_for(50, 1)', 'wait(3)', 'drive_for(50, 2)'],
+      exampleSolution: ['drive_for(80, 1)', 'wait(3)', 'drive_for(80, 2)'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (0,2).' },
         { kind: 'no-collision', detail: 'Robot never touches the cart.' },
@@ -489,7 +489,7 @@ export const ACT1: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: [HOP, WAIT, BEEP, say('Good morning!', 'Bread, please!')],
-      exampleSolution: ['drive_for(50, 1)', 'wait(3)', 'drive_for(50, 3)', 'beep', 'say("Good morning!")'],
+      exampleSolution: ['drive_for(80, 1)', 'wait(3)', 'drive_for(80, 3)', 'beep', 'say("Good morning!")'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (0,1).' },
         { kind: 'no-collision', detail: 'Robot never touches the cart.' },
@@ -527,7 +527,7 @@ export const ACT1: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Red light, green light with cards'),
       unpluggedWarmup: {
-        title: 'Go and Wait cards', minutes: 5,
+        title: 'Go and Wait cards', minutes: 4,
         steps: [
           'Make three big cards: GO, GO, WAIT. A child holds them in a line; the class does each card (step forward, step forward, freeze for 3 counts).',
           'Swap the card order and do it again. Ask: "Did we do the same thing?"',
@@ -639,7 +639,7 @@ export const ACT1: Session[] = [
         physics: FLAT_MAT_PHYSICS.replace('a printed mat', 'a wooden floor'), requires: ['move'],
       }),
       allowedBlocks: [HOP, say('I am going forward!', 'Hello!', 'Excuse me!')],
-      exampleSolution: ['say("I am going forward!")', 'drive_for(50, 2)', 'say("Hello!")'],
+      exampleSolution: ['say("I am going forward!")', 'drive_for(80, 2)', 'say("Hello!")'],
       success: [
         { kind: 'action-at-zone', detail: 'A say block runs before the first movement block.' },
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (0,1).' },
@@ -664,7 +664,7 @@ export const ACT1: Session[] = [
         physics: FLAT_MAT_PHYSICS.replace('a printed mat', 'a wooden floor'), requires: ['move'],
       }),
       allowedBlocks: [HOP, HOP_BACK, BEEP, say('Excuse me!', 'Found a light!', 'Thank you!')],
-      exampleSolution: ['say("Excuse me!")', 'drive_for(50, 3)', 'beep', 'say("Found a light!")'],
+      exampleSolution: ['say("Excuse me!")', 'drive_for(80, 3)', 'beep', 'say("Found a light!")'],
       success: [
         { kind: 'action-at-zone', detail: 'say("Excuse me!") runs before the first movement.' },
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (0,1).' },
@@ -702,7 +702,7 @@ export const ACT1: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Announce your move'),
       unpluggedWarmup: {
-        title: 'Announce your move', minutes: 5,
+        title: 'Announce your move', minutes: 4,
         steps: [
           'In pairs: one child is a robot and must SAY what they will do before doing it ("I will take two steps forward").',
           'Then try without announcing — the partner says how it felt not to know.',
@@ -812,7 +812,7 @@ export const ACT1: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: MOVE_SET,
-      exampleSolution: ['drive_for(50, 2)', 'turn_degrees(-90, 40)', 'drive_for(50, 2)'],
+      exampleSolution: ['drive_for(80, 2)', 'turn_degrees(-90, 40)', 'drive_for(80, 2)'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (2,0).' },
         { kind: 'no-collision', detail: 'Robot does not touch the fountain.' },
@@ -837,7 +837,7 @@ export const ACT1: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: MOVE_SET,
-      exampleSolution: ['drive_for(50, 2)', 'turn_degrees(90, 40)', 'drive_for(50, 2)', 'turn_degrees(90, 40)', 'drive_for(50, 2)'],
+      exampleSolution: ['drive_for(80, 2)', 'turn_degrees(90, 40)', 'drive_for(80, 2)', 'turn_degrees(90, 40)', 'drive_for(80, 2)'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (0,2).' },
         { kind: 'no-collision', detail: 'Robot touches neither the fountain nor the flower bed.' },
@@ -874,7 +874,7 @@ export const ACT1: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Robot says turn'),
       unpluggedWarmup: {
-        title: 'Robot says turn', minutes: 5,
+        title: 'Robot says turn', minutes: 4,
         steps: [
           'Put a sticker on every child’s right hand. Call "Turn right!", "Turn left!", "Forward 2!" — everyone moves.',
           'Then a child faces the class and the class calls "Turn right!" — notice their right is the class’s left.',
@@ -996,7 +996,7 @@ export const ACT1: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: [HOP, HOP_BACK, LEFT, RIGHT, WAIT, BEEP, say('Hello, Lantern Hill!', 'Let’s dance!', 'Ta-da!')],
-      exampleSolution: ['say("Let’s dance!")', 'drive_for(50, 1)', 'beep', 'turn_degrees(90, 40)', 'turn_degrees(90, 40)', 'drive_for(50, 1)', 'turn_degrees(90, 40)', 'turn_degrees(90, 40)', 'say("Ta-da!")'],
+      exampleSolution: ['say("Let’s dance!")', 'drive_for(80, 1)', 'beep', 'turn_degrees(90, 40)', 'turn_degrees(90, 40)', 'drive_for(80, 1)', 'turn_degrees(90, 40)', 'turn_degrees(90, 40)', 'say("Ta-da!")'],
       success: [
         { kind: 'within-blocks', detail: 'At least 5 blocks run.' },
         { kind: 'no-collision', detail: 'Robot never leaves the 3×3 dance floor.' },

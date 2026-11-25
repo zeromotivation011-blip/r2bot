@@ -5,7 +5,7 @@
 
 import type { Session } from '../types'
 import {
-  BEEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, LEFT, MOVE_SET, PEN_DOWN, PEN_UP, REPEAT, RIGHT,
+  BEEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, LEFT, MOVE_SET, PART_MASS_KG, PEN_DOWN, PEN_UP, REPEAT, RIGHT, kg,
   arena, episode, lessonTiming, obj, projectTiming, say, teacher,
 } from './shared'
 import { L1_PROJECTS } from './projects'
@@ -95,7 +95,7 @@ export const ACT2: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: MOVE_SET,
-      exampleSolution: ['drive_for(50, 3)', 'turn_degrees(-90, 40)', 'drive_for(50, 3)'],
+      exampleSolution: ['drive_for(80, 3)', 'turn_degrees(-90, 40)', 'drive_for(80, 3)'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (3,0).' },
         { kind: 'no-collision', detail: 'No stall touched.' },
@@ -120,7 +120,7 @@ export const ACT2: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: MOVE_SET,
-      exampleSolution: ['turn_degrees(-90, 40)', 'drive_for(50, 2)', 'turn_degrees(90, 40)', 'drive_for(50, 3)'],
+      exampleSolution: ['turn_degrees(-90, 40)', 'drive_for(80, 2)', 'turn_degrees(90, 40)', 'drive_for(80, 3)'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (2,0).' },
         { kind: 'no-collision', detail: 'No stall touched.' },
@@ -157,7 +157,7 @@ export const ACT2: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Program your teacher'),
       unpluggedWarmup: {
-        title: 'Program your teacher', minutes: 5,
+        title: 'Program your teacher', minutes: 4,
         steps: [
           'Make a 4×4 grid with tape. Place a teddy in one square.',
           'The class gives the teacher-robot arrow cards to reach the teddy. The teacher follows them exactly — even wrong ones.',
@@ -269,8 +269,8 @@ export const ACT2: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: MOVE_SET,
-      starter: ['turn_degrees(-90, 40)', 'drive_for(50, 2)', 'turn_degrees(-90, 40)  ← bug: should be a LEFT turn', 'drive_for(50, 3)'],
-      exampleSolution: ['turn_degrees(-90, 40)', 'drive_for(50, 2)', 'turn_degrees(90, 40)', 'drive_for(50, 3)'],
+      starter: ['turn_degrees(-90, 40)', 'drive_for(80, 2)', 'turn_degrees(-90, 40)  ← bug: should be a LEFT turn', 'drive_for(80, 3)'],
+      exampleSolution: ['turn_degrees(-90, 40)', 'drive_for(80, 2)', 'turn_degrees(90, 40)', 'drive_for(80, 3)'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (2,0).' },
         { kind: 'within-blocks', detail: 'Program still has 4 blocks (fix, do not rebuild).' },
@@ -295,8 +295,8 @@ export const ACT2: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move'],
       }),
       allowedBlocks: [...MOVE_SET, say('Found a light!')],
-      starter: ['drive_for(50, 3)  ← bug: one hop too many', 'turn_degrees(-90, 40)', 'drive_for(50, 3)'],
-      exampleSolution: ['drive_for(50, 2)', 'turn_degrees(-90, 40)', 'drive_for(50, 3)', 'say("Found a light!")'],
+      starter: ['drive_for(80, 3)  ← bug: one hop too many', 'turn_degrees(-90, 40)', 'drive_for(80, 3)'],
+      exampleSolution: ['drive_for(80, 2)', 'turn_degrees(-90, 40)', 'drive_for(80, 3)', 'say("Found a light!")'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (3,1).' },
         { kind: 'no-collision', detail: 'No flower bucket touched.' },
@@ -333,7 +333,7 @@ export const ACT2: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Spot the silly step'),
       unpluggedWarmup: {
-        title: 'Spot the silly step', minutes: 5,
+        title: 'Spot the silly step', minutes: 4,
         steps: [
           'Read out a "getting dressed" algorithm with one bug: "Put on shoes. Put on socks."',
           'Children shout "Bug!" when they hear it and say how to fix it.',
@@ -446,7 +446,7 @@ export const ACT2: Session[] = [
         physics: PAPER_PHYSICS, requires: ['move', 'draw'],
       }),
       allowedBlocks: [HOP, PEN_DOWN, PEN_UP],
-      exampleSolution: ['pen_down', 'drive_for(50, 3)', 'pen_up'],
+      exampleSolution: ['pen_down', 'drive_for(80, 3)', 'pen_up'],
       success: [
         { kind: 'draw-path', detail: 'The drawn line covers at least 90 % of the dotted guide and nothing else.' },
         { kind: 'action-at-zone', detail: 'pen_up runs at the end of the program.' },
@@ -471,7 +471,7 @@ export const ACT2: Session[] = [
         physics: PAPER_PHYSICS, requires: ['move', 'draw'],
       }),
       allowedBlocks: [...MOVE_SET, PEN_DOWN, PEN_UP],
-      exampleSolution: ['pen_down', 'drive_for(50, 2)', 'turn_degrees(-90, 40)', 'drive_for(50, 2)', 'pen_up'],
+      exampleSolution: ['pen_down', 'drive_for(80, 2)', 'turn_degrees(-90, 40)', 'drive_for(80, 2)', 'pen_up'],
       success: [
         { kind: 'draw-path', detail: 'Drawn line covers at least 90 % of the dotted guide; no line through the puddle tile.' },
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (2,0).' },
@@ -508,7 +508,7 @@ export const ACT2: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Finger trails'),
       unpluggedWarmup: {
-        title: 'Finger trails', minutes: 5,
+        title: 'Finger trails', minutes: 4,
         steps: [
           'Each child has paper with a start dot. Teacher calls: "Pen down! Forward! Turn right! Forward! Pen up!"',
           'Children draw with a finger or crayon. Then call a move with the pen up — nothing is drawn.',
@@ -616,7 +616,7 @@ export const ACT2: Session[] = [
         physics: PAPER_PHYSICS, requires: ['move', 'draw'],
       }),
       allowedBlocks: [HOP, LEFT, RIGHT, PEN_DOWN, PEN_UP, REPEAT],
-      exampleSolution: ['pen_down', 'repeat(4) { drive_for(50, 1); turn_degrees(-90, 40) }', 'pen_up'],
+      exampleSolution: ['pen_down', 'repeat(4) { drive_for(80, 1); turn_degrees(-90, 40) }', 'pen_up'],
       success: [
         { kind: 'draw-path', detail: 'Drawn line covers at least 90 % of the dotted square.' },
         { kind: 'within-blocks', detail: 'Second version uses a repeat block (5 blocks or fewer in total).' },
@@ -641,7 +641,7 @@ export const ACT2: Session[] = [
         physics: PAPER_PHYSICS, requires: ['move', 'draw'],
       }),
       allowedBlocks: [HOP, LEFT, RIGHT, PEN_DOWN, PEN_UP, REPEAT],
-      exampleSolution: ['pen_down', 'repeat(4) { drive_for(50, 2); turn_degrees(-90, 40) }'],
+      exampleSolution: ['pen_down', 'repeat(4) { drive_for(80, 2); turn_degrees(-90, 40) }'],
       success: [
         { kind: 'draw-path', detail: 'Drawn line covers at least 90 % of the dotted square.' },
         { kind: 'within-blocks', detail: '4 blocks or fewer, counting the blocks inside Repeat.' },
@@ -678,7 +678,7 @@ export const ACT2: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Clap loops'),
       unpluggedWarmup: {
-        title: 'Clap loops', minutes: 5,
+        title: 'Clap loops', minutes: 4,
         steps: [
           'Clap a pattern: clap-clap-stomp. Write it on the board inside a big loop drawn with "× 3".',
           'Children perform it. Change the number to 2, then 4.',
@@ -788,7 +788,7 @@ export const ACT2: Session[] = [
         physics: PAPER_PHYSICS, requires: ['move', 'draw'],
       }),
       allowedBlocks: [HOP, LEFT, RIGHT, PEN_DOWN, PEN_UP, REPEAT],
-      exampleSolution: ['pen_down', 'repeat(3) { drive_for(50, 1); turn_degrees(-90, 40); drive_for(50, 1); turn_degrees(90, 40) }', 'pen_up'],
+      exampleSolution: ['pen_down', 'repeat(3) { drive_for(80, 1); turn_degrees(-90, 40); drive_for(80, 1); turn_degrees(90, 40) }', 'pen_up'],
       success: [{ kind: 'draw-path', detail: 'Drawn line covers at least 90 % of the dotted staircase.' }],
       stars: { two: 'You used Repeat for the steps.', three: 'You said which four blocks make "one step".' },
       hints: [
@@ -810,7 +810,7 @@ export const ACT2: Session[] = [
         physics: PAPER_PHYSICS, requires: ['move', 'draw'],
       }),
       allowedBlocks: [HOP, LEFT, RIGHT, PEN_DOWN, PEN_UP, REPEAT],
-      exampleSolution: ['pen_down', 'repeat(4) { drive_for(50, 1); turn_degrees(-90, 40); drive_for(50, 1); turn_degrees(90, 40) }'],
+      exampleSolution: ['pen_down', 'repeat(4) { drive_for(80, 1); turn_degrees(-90, 40); drive_for(80, 1); turn_degrees(90, 40) }'],
       success: [
         { kind: 'draw-path', detail: 'Drawn line covers at least 90 % of the dotted staircase.' },
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (4,0).' },
@@ -848,7 +848,7 @@ export const ACT2: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Bead patterns'),
       unpluggedWarmup: {
-        title: 'Body patterns', minutes: 5,
+        title: 'Body patterns', minutes: 4,
         steps: [
           'Make a body pattern: hands up, hands down, turn. Repeat it 3 times.',
           'Show pictures of patterns from several cultures (a rangoli, a kente strip, mosaic tiles, a woven mat). Children point to the part that repeats.',
@@ -940,7 +940,7 @@ export const ACT2: Session[] = [
         physics: PAPER_PHYSICS, requires: ['move', 'draw'],
       }),
       allowedBlocks: [HOP, HOP_BACK, LEFT, RIGHT, PEN_DOWN, PEN_UP, REPEAT],
-      exampleSolution: ['pen_down', 'repeat(4) { drive_for(50, 1); turn_degrees(-90, 40) }', 'pen_up'],
+      exampleSolution: ['pen_down', 'repeat(4) { drive_for(80, 1); turn_degrees(-90, 40) }', 'pen_up'],
       success: [{ kind: 'within-blocks', detail: 'The program contains at least one repeat and the robot stays on the banner.' }],
       stars: { two: 'Your repeating part draws what you planned.', three: 'You found and fixed a bug while testing.' },
       hints: [
@@ -962,7 +962,7 @@ export const ACT2: Session[] = [
         physics: PAPER_PHYSICS, requires: ['move', 'draw'],
       }),
       allowedBlocks: [HOP, HOP_BACK, LEFT, RIGHT, PEN_DOWN, PEN_UP, REPEAT, BEEP, say('Ta-da!', 'For Lantern Hill!')],
-      exampleSolution: ['drive_for(50, 2)', 'turn_degrees(-90, 40)', 'drive_for(50, 3)', 'turn_degrees(90, 40)', 'pen_down', 'repeat(4) { repeat(4) { drive_for(50, 1); turn_degrees(-90, 40) } turn_degrees(-90, 40) }', 'pen_up', 'say("Ta-da!")'],
+      exampleSolution: ['drive_for(80, 2)', 'turn_degrees(-90, 40)', 'drive_for(80, 3)', 'turn_degrees(90, 40)', 'pen_down', 'repeat(4) { repeat(4) { drive_for(80, 1); turn_degrees(-90, 40) } turn_degrees(-90, 40) }', 'pen_up', 'say("Ta-da!")'],
       success: [
         { kind: 'within-blocks', detail: 'At least one repeat; at least 5 blocks in total.' },
         { kind: 'no-collision', detail: 'Robot stays on the banner.' },

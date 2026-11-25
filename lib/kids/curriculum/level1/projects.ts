@@ -71,11 +71,11 @@ export const L1_PROJECTS: [Project, Project, Project, Project] = [
       'Use at least one sensor block, to stay safe.',
       'Use your tool at least once.',
       'Say something kind to the audience.',
-      'Stay on the stage; touch nothing.',
+      'Stay on the stage. Touch nothing — except a gentle bumper touch on the stage fence, if your sensor is the bumper.',
     ],
     selfCheck: [
       'My show has a loop.',
-      'My robot uses a sensor to stay safe.',
+      'My robot checks with a sensor before it moves or bumps.',
       'My robot uses its tool.',
       'My robot says something kind.',
       'I found a bug and fixed it.',

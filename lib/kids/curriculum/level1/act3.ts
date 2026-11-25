@@ -98,7 +98,7 @@ export const ACT3: Session[] = [
         physics: DOCK_PHYSICS, requires: ['move', 'grab'],
       }),
       allowedBlocks: [...MOVE_SET, SCOOP_UP, TIP_OUT],
-      exampleSolution: ['drive_for(50, 1)', 'grip_close', 'turn_degrees(-90, 40)', 'drive_for(50, 2)', 'turn_degrees(90, 40)', 'grip_open'],
+      exampleSolution: ['drive_for(80, 1)', 'grip_close', 'turn_degrees(-90, 40)', 'drive_for(80, 2)', 'turn_degrees(90, 40)', 'grip_open'],
       success: [{ kind: 'deliver-object', detail: 'The float ends inside the basket on tile (2,1).' }],
       stars: { two: 'You scooped and tipped at the right moments.', three: 'You planned the path on the map first.' },
       hints: [
@@ -120,7 +120,7 @@ export const ACT3: Session[] = [
         physics: DOCK_PHYSICS, requires: ['move', 'grab'],
       }),
       allowedBlocks: [...MOVE_SET, SCOOP_UP, TIP_OUT, say('Here you go!')],
-      exampleSolution: ['drive_for(50, 3)', 'turn_degrees(-90, 40)', 'drive_for(50, 1)', 'grip_close', 'turn_degrees(-90, 40)', 'drive_for(50, 2)', 'grip_open'],
+      exampleSolution: ['drive_for(80, 3)', 'turn_degrees(-90, 40)', 'drive_for(80, 1)', 'grip_close', 'turn_degrees(-90, 40)', 'drive_for(80, 2)', 'grip_open'],
       success: [
         { kind: 'deliver-object', detail: 'The float ends in the boat on tile (1,4).' },
         { kind: 'no-collision', detail: 'No crate touched.' },
@@ -157,7 +157,7 @@ export const ACT3: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Spoon relay'),
       unpluggedWarmup: {
-        title: 'Spoon relay', minutes: 5,
+        title: 'Spoon relay', minutes: 4,
         steps: [
           'Children move a small ball from one bowl to another three ways: pushing with a pencil, with a spoon, with a fork.',
           'Ask: which tool worked best, and why?',
@@ -268,7 +268,7 @@ export const ACT3: Session[] = [
         requires: ['move', 'grab'],
       }),
       allowedBlocks: [HOP],
-      exampleSolution: ['drive_for(50, 3)  (run in each lane)'],
+      exampleSolution: ['drive_for(80, 3)  (run in each lane)'],
       success: [{ kind: 'action-at-zone', detail: 'Program has run in all three lanes; the child taps the lane that went least far.' }],
       stars: { two: 'You guessed before testing.', three: 'You said why the heavy lane went least far.' },
       hints: [
@@ -292,7 +292,7 @@ export const ACT3: Session[] = [
       }),
       allowedBlocks: [HOP, HOP_BACK, SCOOP_UP, TIP_OUT, say('Found a light!')],
       starter: ['grip_close  ← the robot starts right behind the lantern'],
-      exampleSolution: ['grip_close', 'drive_for(50, 3)', 'drive_for(50, 1)  ← the extra hop found by testing', 'grip_open', 'say("Found a light!")'],
+      exampleSolution: ['grip_close', 'drive_for(80, 3)', 'drive_for(80, 1)  ← the extra hop found by testing', 'grip_open', 'say("Found a light!")'],
       success: [
         { kind: 'deliver-object', detail: 'Lantern tipped out on rows 0–1.' },
         { kind: 'no-collision', detail: 'Robot does not hit the railing at the top.' },
@@ -329,7 +329,7 @@ export const ACT3: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Ramp race (cars, not children)'),
       unpluggedWarmup: {
-        title: 'Push it uphill', minutes: 5,
+        title: 'Push it uphill', minutes: 4,
         steps: [
           'Make a ramp with a book and a board. Children push a toy car up it with one finger: empty, then with a few coins taped on.',
           'Ask: which needed a harder push? Which went less far with the same push?',
@@ -440,7 +440,7 @@ export const ACT3: Session[] = [
         requires: ['move'],
       }),
       allowedBlocks: [HOP],
-      exampleSolution: ['drive_for(50, 2)  (run in each lane)'],
+      exampleSolution: ['drive_for(80, 2)  (run in each lane)'],
       success: [{ kind: 'action-at-zone', detail: 'Program has run in all three lanes; the child taps "too far" (ice) and "too short" (sand).' }],
       stars: { two: 'You guessed before each run.', three: 'You explained "slippy" and "sticky" with your hands.' },
       hints: [
@@ -463,7 +463,7 @@ export const ACT3: Session[] = [
         requires: ['move'],
       }),
       allowedBlocks: [HOP, CREEP, HOP_BACK, REPEAT],
-      exampleSolution: ['drive_for(50, 1)', 'repeat(5) { drive_for(30, 0.5) }  ← slow over the ice (count tuned in playtesting)', 'drive_for(50, 3)  ← extra push through the sand'],
+      exampleSolution: ['drive_for(80, 1)', 'repeat(5) { drive_for(30, 0.5) }  ← slow over the ice (count tuned in playtesting)', 'drive_for(80, 3)  ← extra push through the sand'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (0,0) and never crosses the bridge line.' },
         { kind: 'no-collision', detail: 'No fish box touched.' },
@@ -500,7 +500,7 @@ export const ACT3: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Slide test'),
       unpluggedWarmup: {
-        title: 'Slide test', minutes: 5,
+        title: 'Slide test', minutes: 4,
         steps: [
           'Slide the same block across three surfaces: a table, a tray with a few drops of oil or water, a towel.',
           'Children guess first, then watch. Which slid furthest? Which stopped soonest?',
@@ -614,7 +614,7 @@ export const ACT3: Session[] = [
         physics: FLAT_MAT_PHYSICS.replace('a printed mat', 'wooden planks'), requires: ['move'],
       }),
       allowedBlocks: [HOP, WAIT],
-      exampleSolution: ['drive_for(50, 1)', 'wait(3)', 'drive_for(50, 3)'],
+      exampleSolution: ['drive_for(80, 1)', 'wait(3)', 'drive_for(80, 3)'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (0,1).' },
         { kind: 'no-collision', detail: 'Robot never touches the barrier.' },
@@ -646,7 +646,7 @@ export const ACT3: Session[] = [
         requires: ['move'],
       }),
       allowedBlocks: [HOP, WAIT, LEFT, RIGHT, say('Found a light!')],
-      exampleSolution: ['drive_for(50, 1)', 'wait(3)', 'drive_for(50, 3)', 'turn_degrees(-90, 40)', 'wait(3)', 'wait(2)', 'drive_for(50, 3)', 'say("Found a light!")'],
+      exampleSolution: ['drive_for(80, 1)', 'wait(3)', 'drive_for(80, 3)', 'turn_degrees(-90, 40)', 'wait(3)', 'wait(2)', 'drive_for(80, 3)', 'say("Found a light!")'],
       success: [
         { kind: 'stop-in-zone', detail: 'Robot centre ends inside tile (3,1).' },
         { kind: 'no-collision', detail: 'Robot never touches a barrier.' },
@@ -683,7 +683,7 @@ export const ACT3: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Bridge up, bridge down'),
       unpluggedWarmup: {
-        title: 'Bridge up, bridge down', minutes: 5,
+        title: 'Bridge up, bridge down', minutes: 4,
         steps: [
           'Two children make a bridge with their arms, raising and lowering it on a slow count the teacher calls.',
           'The others line up and must cross only when the arms are down. First they watch and count; then they cross.',
@@ -791,7 +791,7 @@ export const ACT3: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move', 'light'],
       }),
       allowedBlocks: [HOP, LIGHT_ON, LIGHT_OFF],
-      exampleSolution: ['light_on', 'drive_for(50, 3)', 'drive_for(50, 2)', 'light_off'],
+      exampleSolution: ['light_on', 'drive_for(80, 3)', 'drive_for(80, 2)', 'light_off'],
       success: [
         { kind: 'action-at-zone', detail: 'The light is on whenever the robot is inside rows 1–3.' },
         { kind: 'action-at-zone', detail: 'The light is off at the end of the program.' },
@@ -817,7 +817,7 @@ export const ACT3: Session[] = [
         physics: FLAT_MAT_PHYSICS, requires: ['move', 'light'],
       }),
       allowedBlocks: [HOP, LEFT, RIGHT, LIGHT_ON, LIGHT_OFF, say('Hello, glow-worms!')],
-      exampleSolution: ['light_on', 'drive_for(50, 2)', 'turn_degrees(-90, 40)', 'drive_for(50, 2)', 'light_off'],
+      exampleSolution: ['light_on', 'drive_for(80, 2)', 'turn_degrees(-90, 40)', 'drive_for(80, 2)', 'light_off'],
       success: [
         { kind: 'action-at-zone', detail: 'Light on in every dark tile the robot visits.' },
         { kind: 'stop-in-zone', detail: 'Robot centre ends in tile (2,1) with the light off.' },
@@ -855,7 +855,7 @@ export const ACT3: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Shoebox dark'),
       unpluggedWarmup: {
-        title: 'What’s in the box?', minutes: 5,
+        title: 'What’s in the box?', minutes: 4,
         steps: [
           'Put a toy inside a closed shoebox with a small peephole. Children look: they see nothing.',
           'Open a second hole and shine a torch in: now they see the toy. Light in, light bounces, light to your eye.',
@@ -947,7 +947,7 @@ export const ACT3: Session[] = [
         physics: FLAT_MAT_PHYSICS.replace('a printed mat', 'a wooden floor'), requires: ['move'],
       }),
       allowedBlocks: [HOP, HOP_BACK, LEFT, RIGHT, WAIT, REPEAT, SCOOP_UP, TIP_OUT, LIGHT_ON, LIGHT_OFF, PEN_DOWN, PEN_UP, BEEP, say('Here you go!', 'Good night!', 'Welcome home!', 'Excuse me!')],
-      exampleSolution: ['drive_for(50, 3)', 'grip_close  (biscuit tin is in front at (0,0))'],
+      exampleSolution: ['drive_for(80, 3)', 'grip_close  (biscuit tin is in front at (0,0))'],
       success: [{ kind: 'within-blocks', detail: 'The first part of the chosen job runs without bumping furniture.' }],
       stars: { two: 'Your tool matches your job.', three: 'You can say who your helper helps and how.' },
       hints: [
@@ -970,10 +970,10 @@ export const ACT3: Session[] = [
       }),
       allowedBlocks: [HOP, HOP_BACK, LEFT, RIGHT, WAIT, REPEAT, SCOOP_UP, TIP_OUT, LIGHT_ON, LIGHT_OFF, PEN_DOWN, PEN_UP, BEEP, say('Here you go!', 'Good night!', 'Welcome home!', 'Excuse me!')],
       exampleSolution: [
-        'drive_for(50, 3)  ← to (0,1), the tin is in front', 'grip_close',
-        'drive_for(-50, 1)', 'drive_for(-50, 1)  ← back to (0,3), clear of the table and sofa',
-        'turn_degrees(-90, 40)', 'drive_for(50, 3)', 'drive_for(50, 1)  ← along row 3 to (4,3)',
-        'turn_degrees(90, 40)', 'drive_for(50, 2)  ← up to (4,1), facing the armchair', 'grip_open', 'say("Here you go!")',
+        'drive_for(80, 3)  ← to (0,1), the tin is in front', 'grip_close',
+        'drive_for(-80, 1)', 'drive_for(-80, 1)  ← back to (0,3), clear of the table and sofa',
+        'turn_degrees(-90, 40)', 'drive_for(80, 3)', 'drive_for(80, 1)  ← along row 3 to (4,3)',
+        'turn_degrees(90, 40)', 'drive_for(80, 2)  ← up to (4,1), facing the armchair', 'grip_open', 'say("Here you go!")',
       ],
       success: [
         { kind: 'action-at-zone', detail: 'The chosen tool is used at the right place for the chosen job.' },

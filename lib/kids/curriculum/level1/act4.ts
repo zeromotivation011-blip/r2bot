@@ -123,7 +123,7 @@ export const ACT4: Session[] = [
         physics: FOG_PHYSICS.replace('a printed mat', 'short grass'), requires: ['move', 'feel-bump'],
       }),
       allowedBlocks: [HOP, CREEP, UNTIL_BUMP, say('Found the wall!')],
-      starter: ['drive_for(50, 3)  ← counting does not work when the wall moves!'],
+      starter: ['drive_for(80, 3)  ← counting does not work when the wall moves!'],
       exampleSolution: ['repeat_until(bumped) {', '  drive_for(30, 0.5)', '}', 'say("Found the wall!")'],
       success: [
         { kind: 'touch-and-react', detail: 'The bumper clicks against the wall and the say block runs after the click, on three runs in a row with different wall distances.' },
@@ -188,7 +188,7 @@ export const ACT4: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Feel your way'),
       unpluggedWarmup: {
-        title: 'Feel your way', minutes: 5,
+        title: 'Feel your way', minutes: 4,
         steps: [
           'Pairs: one child is the “robot” with eyes closed (or a soft blindfold if they are happy to), one hand out in front like a bumper.',
           'The partner says only “step” until the robot’s hand touches a wall or the teacher’s held-up book, then the robot says “Bump!” and stops.',
@@ -362,7 +362,7 @@ export const ACT4: Session[] = [
     teacher: teacher({
       timing: lessonTiming('“If” game'),
       unpluggedWarmup: {
-        title: 'The “if” game', minutes: 5,
+        title: 'The “if” game', minutes: 4,
         steps: [
           'Teacher says rules: “IF I clap, you jump. IF I don’t clap, stand still.” Then clap or don’t, at random.',
           'Next rule: “IF I touch my head, turn around.” Children notice they only act when the thing happens.',
@@ -719,7 +719,7 @@ export const ACT4: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Stop, look, wait'),
       unpluggedWarmup: {
-        title: 'Stop, look, wait', minutes: 5,
+        title: 'Stop, look, wait', minutes: 4,
         steps: [
           'Half the class are “robots” crossing the room in single hops; the other half are “people” who walk across their path.',
           'Rule: before each hop, a robot looks; if a person is within arm’s reach in front, it waits.',
@@ -834,7 +834,7 @@ export const ACT4: Session[] = [
         physics: RAMP_PHYSICS, requires: ['move', 'see-wall'],
       }),
       allowedBlocks: [HOP, CREEP, LEFT, RIGHT, UNTIL_CLOSE, REPEAT],
-      starter: ['drive_for(50, 3)  ← stops short on the hill. Try it, then fix it!'],
+      starter: ['drive_for(80, 3)  ← stops short on the hill. Try it, then fix it!'],
       exampleSolution: ['repeat(2) {', `  repeat_until(distance_cm < ${CLOSE_CM}) { drive_for(30, 0.5) }`, '  turn_degrees(90, 40)', '}'],
       success: [
         { kind: 'no-collision', detail: 'No wall touched.' },
@@ -903,7 +903,7 @@ export const ACT4: Session[] = [
     teacher: teacher({
       timing: lessonTiming('Robot jobs charades'),
       unpluggedWarmup: {
-        title: 'Robot jobs charades', minutes: 5,
+        title: 'Robot jobs charades', minutes: 4,
         steps: [
           'Show picture cards: designer (drawing), builder (screwing parts), programmer (typing), tester (pressing go and watching), technician (fixing).',
           'Children act one out; the class guesses the job.',
