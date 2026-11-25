@@ -14,8 +14,8 @@ export function GET() {
     scope: '/kids',
     display: 'standalone',
     orientation: 'any',
-    background_color: '#0F0A1E',
-    theme_color: '#1A1040',
+    background_color: '#0A1120',
+    theme_color: '#0A1120',
     categories: ['education', 'kids', 'games'],
     icons: [
       { src: '/kids-icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
