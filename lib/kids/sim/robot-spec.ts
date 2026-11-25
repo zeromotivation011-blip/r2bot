@@ -32,8 +32,11 @@ export interface DriveSpec {
 }
 
 export const DRIVES: Record<RobotDesign['drive'], DriveSpec> = {
-  // Light and nimble: turns on the spot, but narrow tyres dig into sand.
-  wheels2: { maxSpeed: 0.42, maxForcePerSide: 3.2, wheelAccel: 3, grip: 1, sinkage: 2.1, scrub: 0.05, wheelRadius: 0.05, mass: 0.25 },
+  // Light and nimble: turns on the spot, but narrow tyres dig into sand. Sinkage is
+  // tuned so sand drag (0.24 × 1.45 ≈ 0.35 × load) sits just under sand grip (0.38 × load),
+  // and wheels plough harder the faster they go (SURFACES.sand.wheelSpeedDrag): in sand a
+  // two-wheeler crawls a couple of cm a second with its wheels spinning hard.
+  wheels2: { maxSpeed: 0.42, maxForcePerSide: 3.2, wheelAccel: 3, grip: 1, sinkage: 1.45, scrub: 0.05, wheelRadius: 0.05, mass: 0.25 },
   // Fast and stable; four tyres share the load a bit better but must skid to turn.
   wheels4: { maxSpeed: 0.46, maxForcePerSide: 3.6, wheelAccel: 3, grip: 1.05, sinkage: 1.6, scrub: 0.55, wheelRadius: 0.0425, mass: 0.4 },
   // Slower, heavier, grips everything; turning scrubs a lot.
@@ -49,16 +52,18 @@ export interface SurfaceSpec {
   crr: number
   /** Extra drag on wheels only (rocks catch wheels; legs and tracks step over them). */
   wheelOnlyDrag: number
+  /** Wheels only: extra drag per m/s of speed (a wheel ploughing through soft ground). Gives a slow crawl, not a dead stop. */
+  wheelSpeedDrag: number
 }
 
 export const SURFACES: Record<Surface, SurfaceSpec> = {
-  tile: { mu: 0.8, crr: 0.03, wheelOnlyDrag: 0 },
-  carpet: { mu: 0.9, crr: 0.08, wheelOnlyDrag: 0 },
+  tile: { mu: 0.8, crr: 0.03, wheelOnlyDrag: 0, wheelSpeedDrag: 0 },
+  carpet: { mu: 0.9, crr: 0.08, wheelOnlyDrag: 0, wheelSpeedDrag: 0 },
   // Soft: low grip, lots of drag for anything that sinks.
-  sand: { mu: 0.38, crr: 0.24, wheelOnlyDrag: 0 },
+  sand: { mu: 0.38, crr: 0.24, wheelOnlyDrag: 0, wheelSpeedDrag: 1.6 },
   // Almost no grip: you cannot speed up or stop quickly.
-  ice: { mu: 0.05, crr: 0.01, wheelOnlyDrag: 0 },
-  rocks: { mu: 0.75, crr: 0.06, wheelOnlyDrag: 0.45 },
+  ice: { mu: 0.05, crr: 0.01, wheelOnlyDrag: 0, wheelSpeedDrag: 0 },
+  rocks: { mu: 0.75, crr: 0.06, wheelOnlyDrag: 0.45, wheelSpeedDrag: 0 },
 }
 
 export interface BodySpec {

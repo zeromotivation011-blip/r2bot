@@ -8,25 +8,29 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
-import { capabilitiesOf, getPart, loadDesign, partsForSlot, DEFAULT_DESIGN, type RobotDesign, type Slot } from '@/lib/kids/robot-design'
+import { capabilitiesOf, DEFAULT_DESIGN, getPart, loadDesign, partsForSlot, saveDesign, type RobotDesign, type Slot } from '@/lib/kids/robot-design'
 import { SLOT_LABEL } from '@/lib/kids/code-lab/labels'
 import { DEMOS, designFor, type Demo } from '@/lib/kids/sim/demos'
 import { missingParts, type Program } from '@/lib/kids/sim/program'
 
+/** Same boxes, same order and same sizes as SimWorkbenchClient, so nothing shifts when it arrives. */
 function WorkbenchSkeleton() {
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]" aria-busy="true">
-      <div className="flex flex-col gap-3">
-        <div className="flex h-[52vh] min-h-[320px] items-center justify-center rounded-3xl border border-white/10 bg-[#120A2E] lg:h-[540px]">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:grid-rows-[auto_1fr]" aria-busy="true">
+      <div className="flex flex-col gap-3 lg:col-start-1 lg:row-start-1">
+        <div className="flex h-[42vh] min-h-[280px] items-center justify-center rounded-3xl border border-white/10 bg-[#120A2E] sm:h-[52vh] sm:min-h-[320px] lg:h-[540px]">
           <div className="h-16 w-16 animate-pulse rounded-2xl bg-white/10" aria-hidden />
           <span className="sr-only">Loading the robot simulator…</span>
         </div>
         <div className="h-[48px] rounded-2xl bg-white/5" />
-        <div className="h-[196px] rounded-2xl bg-white/5 sm:h-[132px]" />
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-1">
         <div className="h-[44px]" />
         <div className="h-[460px] animate-pulse rounded-3xl border border-white/10 bg-[#140C33] lg:h-[540px]" />
+      </div>
+      <div className="lg:col-start-1 lg:row-start-2">
+        <div className="h-[44px] rounded-2xl bg-white/5 lg:hidden" />
+        <div className="hidden h-[132px] rounded-2xl bg-white/5 lg:block" />
       </div>
     </div>
   )
@@ -44,27 +48,46 @@ const STARTERS: Record<string, Program> = {
 
 const SWITCH_SLOTS: Slot[] = ['drive', 'head', 'sensor']
 
+/** The parts a challenge needs that this robot does not have yet, in words. */
+function suggestion(design: RobotDesign, demo: Demo): string | null {
+  const names: string[] = []
+  for (const [slot, id] of Object.entries(demo.goodParts) as [Slot, string][]) {
+    if (design[slot] !== id) names.push(getPart(slot, id)?.name ?? id)
+  }
+  return names.length > 0 ? names.join(' + ') : null
+}
+
 export default function SimLabClient() {
   const [demo, setDemo] = useState<Demo>(DEMOS[0])
-  const [base, setBase] = useState<RobotDesign>(DEFAULT_DESIGN)
-  const [design, setDesign] = useState<RobotDesign>(() => designFor(DEFAULT_DESIGN, DEMOS[0].goodParts))
+  /** The child's own robot from the Workshop. null until read (it lives in this browser's storage). */
+  const [mine, setMine] = useState<RobotDesign | null>(null)
+  /** What the child fitted in each challenge (kept when they switch tabs and come back). */
+  const [fitted, setFitted] = useState<Record<string, RobotDesign>>({})
+  const [saved, setSaved] = useState(false)
 
-  // The child's own robot (colours, name, body) from the Workshop, if they built one.
+  // Read the saved robot once, BEFORE the simulator mounts, so the 3D scene and the physics are built once.
   useEffect(() => {
-    const mine = loadDesign()
-    setBase(mine)
-    setDesign(designFor(mine, DEMOS[0].goodParts))
+    setMine(loadDesign())
   }, [])
 
-  const pickDemo = (d: Demo) => {
-    setDemo(d)
-    setDesign(designFor(base, d.goodParts))
+  // Every challenge starts with the child's own robot; parts they swap here are remembered per challenge.
+  const design: RobotDesign = fitted[demo.id] ?? mine ?? DEFAULT_DESIGN
+  const setDesign = (d: RobotDesign) => {
+    setFitted((f) => ({ ...f, [demo.id]: d }))
+    setSaved(false)
+  }
+  const saveToMyRobot = () => {
+    saveDesign(design)
+    setMine(design)
+    setSaved(true)
   }
 
   const caps = useMemo(() => capabilitiesOf(design), [design])
   const locked = useMemo(() => missingParts(demo.reference, design), [demo, design])
   const starter = STARTERS[demo.id] ?? { body: [] }
+  const tip = suggestion(design, demo)
   const usingWrong = Object.entries(demo.wrongParts).every(([k, v]) => design[k as keyof RobotDesign] === v)
+  const differsFromMine = mine !== null && SWITCH_SLOTS.some((slot) => design[slot] !== mine[slot])
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-16">
@@ -74,7 +97,7 @@ export default function SimLabClient() {
           <button
             key={d.id}
             type="button"
-            onClick={() => pickDemo(d)}
+            onClick={() => setDemo(d)}
             aria-pressed={demo.id === d.id}
             data-testid={`demo-${d.id}`}
             className={`min-h-[56px] shrink-0 rounded-2xl border px-4 py-2 text-left ${
@@ -89,12 +112,18 @@ export default function SimLabClient() {
         ))}
       </nav>
 
-      <div className="mt-3 grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      {/* Phone order: the task, then the robot and the editor, then the parts. Desktop: task + parts above the simulator. */}
+      <div className="mt-3 flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+        <div className="order-1 rounded-2xl border border-white/10 bg-white/[0.03] p-4 lg:order-none">
           <p className="text-lg font-black text-white">🎯 {demo.task}</p>
-          <p className="mt-1 text-sm text-purple-100">
+          <p className="mt-1 hidden text-sm text-purple-100 sm:block">
             <strong className="text-amber-200">Why parts matter:</strong> {demo.lesson}
           </p>
+          {tip && (
+            <p className="mt-2 rounded-xl bg-amber-300/10 px-3 py-2 text-sm font-bold text-amber-100" role="note" data-testid="part-tip">
+              💡 Tip: this challenge was made for <strong>{tip}</strong>. Try it with {design.name} first — then fit {tip.includes('+') ? 'them' : 'it'} and see what changes.
+            </p>
+          )}
           {locked.length > 0 && (
             <p className="mt-2 rounded-xl bg-rose-400/15 px-3 py-2 text-sm font-bold text-rose-100" role="note">
               🔒 {locked[0].message}
@@ -103,16 +132,16 @@ export default function SimLabClient() {
         </div>
 
         {/* Part switcher: swap a part and run again to SEE the difference. */}
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3" aria-label="Swap parts">
-          <div className="flex items-center justify-between gap-2">
+        <div className="order-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 lg:order-none" aria-label="Swap parts">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-black text-white">🔧 {design.name}&rsquo;s parts</p>
             <button
               type="button"
-              onClick={() => setDesign(designFor(design, usingWrong ? demo.goodParts : demo.wrongParts))}
+              onClick={() => setDesign(designFor(design, usingWrong || tip ? demo.goodParts : demo.wrongParts))}
               data-testid="swap-wrong"
               className="min-h-[44px] rounded-xl border border-white/20 px-3 text-xs font-black text-purple-100 hover:bg-white/10"
             >
-              {usingWrong ? '✅ Use the right part' : '🤔 Try a different part'}
+              {usingWrong || tip ? '✅ Fit the suggested part' : '🤔 Try a different part'}
             </button>
           </div>
           <div className="mt-2 space-y-2">
@@ -146,11 +175,23 @@ export default function SimLabClient() {
             {design.sensor !== 'none' ? ` · ${getPart('sensor', design.sensor)?.name}` : ''}
             {caps.has('rough-ground') ? ' · grips rough ground' : ''}
           </p>
+          {(differsFromMine || saved) && (
+            <button
+              type="button"
+              onClick={saveToMyRobot}
+              disabled={saved}
+              data-testid="save-robot"
+              className="mt-2 min-h-[44px] w-full rounded-xl bg-white/10 px-3 text-xs font-black text-white hover:bg-white/20 disabled:opacity-70"
+            >
+              {saved ? `✓ Saved — this is ${design.name} now` : `💾 Keep these parts on ${design.name}`}
+            </button>
+          )}
         </div>
-      </div>
 
-      <div className="mt-4">
-        <SimWorkbench demo={demo} design={design} starter={starter} />
+        <div className="order-2 lg:order-none lg:col-span-2">
+          {/* Wait for the saved robot so the simulator builds the right one, once. */}
+          {mine ? <SimWorkbench demo={demo} design={design} starter={starter} /> : <WorkbenchSkeleton />}
+        </div>
       </div>
     </div>
   )

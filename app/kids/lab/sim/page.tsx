@@ -17,10 +17,11 @@ export const metadata: Metadata = {
 export default function SimLabPage() {
   return (
     <>
-      <header className="mx-auto max-w-7xl px-4 pb-4 pt-6">
+      <header className="mx-auto max-w-7xl px-4 pb-3 pt-4 sm:pb-4 sm:pt-6">
         <p className="text-sm font-black uppercase tracking-wider text-amber-300">Robot Physics Lab · prototype</p>
-        <h1 className="mt-1 text-3xl font-black text-white sm:text-4xl">Program your robot. Watch real physics happen.</h1>
-        <p className="mt-2 max-w-3xl text-purple-100">
+        <h1 className="mt-1 text-2xl font-black text-white sm:text-4xl">Program your robot. Watch real physics happen.</h1>
+        {/* Hidden on phones so the robot is in the first screen. */}
+        <p className="mt-2 hidden max-w-3xl text-purple-100 sm:block">
           Your robot is not moving on squares here. It has weight, its motors have a limit, its wheels can slip, and it keeps rolling after
           you say stop. Pick a challenge, build a program with blocks, press Run — then swap a part and see what changes.
         </p>

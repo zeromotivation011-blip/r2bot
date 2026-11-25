@@ -15,6 +15,12 @@ export interface Stage {
   onFrame: (fn: (t: number, dt: number, frame?: XRFrame) => void) => void
   /** Render now (for screenshots). */
   renderNow: () => void
+  /**
+   * Opt-in: pause the animation loop while the view has nothing to animate or is
+   * scrolled off-screen (saves battery on phones). Defaults to active; the loop
+   * still also pauses while the tab is hidden. Ignored while an XR session runs.
+   */
+  setActive: (active: boolean) => void
   dispose: () => void
 }
 
@@ -106,7 +112,8 @@ export function createStage(container: HTMLElement, opts: StageOptions = {}): St
     running = false
     renderer.setAnimationLoop(null)
   }
-  const onVis = () => (document.hidden ? stop() : start())
+  let active = true
+  const onVis = () => (document.hidden || !active ? stop() : start())
   document.addEventListener('visibilitychange', onVis)
   if (!document.hidden) start()
 
@@ -118,6 +125,11 @@ export function createStage(container: HTMLElement, opts: StageOptions = {}): St
       frameFn = fn
     },
     renderNow: () => renderer.render(scene, camera),
+    setActive: (a) => {
+      if (disposed || a === active) return
+      active = a
+      onVis()
+    },
     dispose: () => {
       if (disposed) return
       disposed = true

@@ -185,7 +185,7 @@ export function kidsTheme(): Blockly.Theme {
       insertionMarkerOpacity: 0.3,
       cursorColour: '#F59E0B',
     },
-    fontStyle: { family: 'ui-rounded, system-ui, sans-serif', weight: '700', size: 12 },
+    fontStyle: { family: 'ui-rounded, system-ui, sans-serif', weight: '700', size: 14 },
     startHats: true,
   })
   return theme
@@ -211,11 +211,11 @@ const DEFAULT_INPUTS: Record<string, Record<string, Shadow>> = {
 }
 
 const GROUPS: { name: string; colour: string; ids: string[] }[] = [
-  { name: 'Move', colour: STYLE_COLOURS.motion_blocks, ids: ['drive_for', 'drive_distance', 'turn_degrees', 'set_motors', 'stop', 'wait'] },
-  { name: 'Sense', colour: STYLE_COLOURS.sensor_blocks, ids: ['distance_cm', 'line_seen', 'line_offset', 'floor_color', 'bumped', 'heading_deg', 'timer_s'] },
-  { name: 'Control', colour: STYLE_COLOURS.control_blocks, ids: ['repeat', 'repeat_until', 'forever', 'if', 'if_else', 'compare', 'and', 'or', 'not'] },
-  { name: 'Maths', colour: STYLE_COLOURS.math_blocks, ids: ['number', 'text', 'math', 'set_var', 'change_var', 'get_var'] },
-  { name: 'Do', colour: STYLE_COLOURS.action_blocks, ids: ['grip_open', 'grip_close', 'pen_down', 'pen_up', 'light_on', 'light_off', 'say', 'beep'] },
+  { name: '🚗 Move', colour: STYLE_COLOURS.motion_blocks, ids: ['drive_for', 'drive_distance', 'turn_degrees', 'set_motors', 'stop', 'wait'] },
+  { name: '👀 Sense', colour: STYLE_COLOURS.sensor_blocks, ids: ['distance_cm', 'line_seen', 'line_offset', 'floor_color', 'bumped', 'heading_deg', 'timer_s'] },
+  { name: '🔁 Control', colour: STYLE_COLOURS.control_blocks, ids: ['repeat', 'repeat_until', 'forever', 'if', 'if_else', 'compare', 'and', 'or', 'not'] },
+  { name: '🔢 Maths', colour: STYLE_COLOURS.math_blocks, ids: ['number', 'text', 'math', 'set_var', 'change_var', 'get_var'] },
+  { name: '✋ Do', colour: STYLE_COLOURS.action_blocks, ids: ['grip_open', 'grip_close', 'pen_down', 'pen_up', 'light_on', 'light_off', 'say', 'beep'] },
 ]
 
 export interface LockedBlock {

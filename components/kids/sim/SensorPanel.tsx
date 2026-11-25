@@ -35,7 +35,8 @@ export default function SensorPanel({ live, caps }: { live: WorkbenchLiveState; 
   const wheel = snap ? (Math.abs(snap.wheelSpeed[0]) + Math.abs(snap.wheelSpeed[1])) / 2 : 0
   const ground = snap?.groundSpeed ?? 0
   const slipping = wheel > 0.05 && ground < wheel * 0.5
-  const heading = Math.round(s?.headingDeg ?? 0) % 360
+  // Always 0–359, the compass a child is taught (never "-90°").
+  const heading = ((Math.round(s?.headingDeg ?? 0) % 360) + 360) % 360
   const distOk = caps.has('see-wall')
   const dist = s?.distanceCm ?? 200
   const near = dist < 20

@@ -318,6 +318,14 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
     if (fxRef.current) fxRef.current.box = null
     phaseRef.current = 'flying'
     setPhase('flying')
+    const el = worldRef.current
+    if (el) {
+      const r = el.getBoundingClientRect()
+      if (r.top < 0 || r.bottom > window.innerHeight) {
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        el.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' })
+      }
+    }
   }, [mission, gains])
 
   const abort = useCallback(() => {
@@ -567,7 +575,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
 
   return (
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex min-w-0 flex-col gap-2 lg:sticky lg:top-3 lg:self-start">
         <div className="relative h-[330px] overflow-hidden rounded-3xl border border-white/10 bg-slate-950 sm:h-[420px] lg:h-[470px]">
           <canvas ref={worldRef} className="block h-full w-full" role="img" aria-label={`Drone flight view. Height ${hud.z.toFixed(1)} metres, target ${hud.tz.toFixed(1)} metres.`} />
 
@@ -600,7 +608,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
           {/* Cadet: thrust vs weight gauge + hold meter */}
           {tier === 0 && (
             <>
-              <div className="pointer-events-none absolute bottom-12 right-3 top-12 flex w-14 flex-col items-center" aria-hidden>
+              <div className="pointer-events-none absolute bottom-16 right-3 top-[132px] flex w-14 sm:top-14 flex-col items-center" aria-hidden>
                 <div className="relative w-6 flex-1 overflow-hidden rounded-full border border-white/25 bg-slate-900/70">
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-sky-600 to-cyan-300" style={{ height: `${thrustPct * 100}%` }} />
                   <div className="absolute left-[-4px] right-[-4px] h-1 bg-rose-400 shadow-[0_0_8px_#fb7185]" style={{ bottom: `${weightPct * 100}%` }} />
@@ -621,7 +629,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
           )}
 
           {toast && (
-            <div key={toast.id} className="pointer-events-none absolute left-1/2 top-12 -translate-x-1/2 animate-[pulse_1s_ease-in-out_1] whitespace-nowrap rounded-2xl border border-amber-300/50 bg-slate-950/85 px-4 py-2 text-sm font-black text-amber-100 shadow-xl" role="status">
+            <div key={toast.id} className="pointer-events-none absolute left-1/2 top-[84px] -translate-x-1/2 sm:top-12 animate-[pulse_1s_ease-in-out_1] whitespace-nowrap rounded-2xl border border-amber-300/50 bg-slate-950/85 px-4 py-2 text-sm font-black text-amber-100 shadow-xl" role="status">
               {toast.text}
             </div>
           )}
@@ -773,7 +781,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
           )}
           {phase === 'flying' && (
             <button type="button" onClick={abort} className="min-h-[52px] flex-1 rounded-2xl border-2 border-rose-300/60 px-5 font-black text-rose-100 hover:bg-rose-500/20">
-              ✋ Abort &amp; re-tune
+              {tier === 0 ? '↺ Restart' : '✋ Abort'}
             </button>
           )}
           {tier > 0 && (

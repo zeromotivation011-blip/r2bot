@@ -15,7 +15,7 @@ export const PLOT_COLORS = {
   p: '#fb7185',
   i: '#a3e635',
   d: '#a78bfa',
-  tilt: '#f472b6',
+  tilt: '#fb923c',
   wind: 'rgba(255,255,255,0.55)',
   predicted: 'rgba(34,211,238,0.35)',
 }

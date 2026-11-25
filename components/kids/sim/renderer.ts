@@ -184,7 +184,12 @@ export class SimRenderer {
   private robotModel: THREE.Group | null = null
   private bodies = new Map<string, THREE.Object3D>()
   private trailMesh: THREE.Mesh
-  private trailCount = -1
+  private trailGeo: THREE.BufferGeometry
+  private trailAttr: THREE.BufferAttribute
+  /** Trail points already turned into ribbon segments, and ribbon vertices written so far. */
+  private trailDone = 0
+  private trailVerts = 0
+  private trailOf: number[] | null = null
   private beam: THREE.Mesh
   private beamDot: THREE.Mesh
   private goalRing: THREE.Mesh | null = null
@@ -197,6 +202,22 @@ export class SimRenderer {
   private frameFn: ((dt: number) => FramePoses | null) | null = null
   private arena: Arena | null = null
   private elapsed = 0
+  // Scratch objects reused every frame (no per-frame garbage for the phone's GC).
+  private qa = new THREE.Quaternion()
+  private qb = new THREE.Quaternion()
+  private v1 = new THREE.Vector3()
+  private v2 = new THREE.Vector3()
+  private v3 = new THREE.Vector3()
+  private wantPos = new THREE.Vector3()
+  private wantTarget = new THREE.Vector3()
+  private static readonly DOWN = new THREE.Vector3(0, -1, 0)
+  private prevBodies: SimSnapshot['bodies'] | null = null
+  private prevBodyIndex = new Map<string, SimSnapshot['bodies'][number]>()
+  // Render on demand: the loop runs only while something moves and the view is on screen.
+  private live = false
+  private awakeUntil = 0
+  private onScreen = true
+  private io: IntersectionObserver | null = null
 
   constructor(container: HTMLElement) {
     this.stage = createStage(container, { background: '#120A2E', shadows: true, fov: 45 })
@@ -209,8 +230,12 @@ export class SimRenderer {
     this.controls.maxDistance = 6
     this.controls.enabled = false
 
-    const trailGeo = new THREE.BufferGeometry()
-    this.trailMesh = new THREE.Mesh(trailGeo, new THREE.MeshBasicMaterial({ color: '#7C3AED', side: THREE.DoubleSide }))
+    this.trailGeo = new THREE.BufferGeometry()
+    this.trailAttr = new THREE.BufferAttribute(new Float32Array(18 * 512), 3)
+    this.trailAttr.setUsage(THREE.DynamicDrawUsage)
+    this.trailGeo.setAttribute('position', this.trailAttr)
+    this.trailGeo.setDrawRange(0, 0)
+    this.trailMesh = new THREE.Mesh(this.trailGeo, new THREE.MeshBasicMaterial({ color: '#7C3AED', side: THREE.DoubleSide }))
     this.trailMesh.frustumCulled = false
     this.stage.scene.add(this.trailMesh)
 
@@ -228,7 +253,37 @@ export class SimRenderer {
       const poses = this.frameFn?.(dt) ?? null
       if (poses) this.draw(poses, dt)
       this.controls.update()
+      // Nothing moving and no camera settling: stop drawing until something changes.
+      if (!this.live && performance.now() > this.awakeUntil) this.stage.setActive(false)
     })
+    // Orbiting by hand keeps the view awake (and through the damping afterwards).
+    this.controls.addEventListener('change', () => this.wake(0.6))
+    this.controls.addEventListener('start', () => this.wake(0.6))
+    if (typeof IntersectionObserver !== 'undefined') {
+      this.io = new IntersectionObserver((entries) => {
+        this.onScreen = entries.some((e) => e.isIntersecting)
+        this.updateActive()
+      })
+      this.io.observe(container)
+    }
+    this.wake()
+  }
+
+  private updateActive(): void {
+    this.stage.setActive(this.onScreen && (this.live || performance.now() <= this.awakeUntil))
+  }
+
+  /** The sim is running (draw every frame) or not (draw only when woken). */
+  setLive(live: boolean): void {
+    this.live = live
+    if (!live) this.awakeUntil = Math.max(this.awakeUntil, performance.now() + 1500) // let the camera settle
+    this.updateActive()
+  }
+
+  /** Something changed while idle (a reset, a new part, a camera change): draw for a moment. */
+  wake(seconds = 1.5): void {
+    this.awakeUntil = Math.max(this.awakeUntil, performance.now() + seconds * 1000)
+    this.updateActive()
   }
 
   /** Called every animation frame; return the poses to draw (and advance the sim there). */
@@ -244,6 +299,7 @@ export class SimRenderer {
     this.mode = mode
     this.controls.enabled = mode === 'orbit'
     this.firstFrame = true
+    this.wake()
   }
 
   setArena(arena: Arena): void {
@@ -380,6 +436,7 @@ export class SimRenderer {
     this.arenaGroup.add(start)
 
     this.firstFrame = true
+    this.wake()
   }
 
   setRobot(design: RobotDesign): void {
@@ -395,21 +452,27 @@ export class SimRenderer {
     })
     this.robotModel = model
     this.robotRoot.add(model)
+    this.wake()
   }
 
   private lerpPose(obj: THREE.Object3D, a: { p: { x: number; y: number; z: number }; q: { x: number; y: number; z: number; w: number } }, b: typeof a, t: number): void {
     obj.position.set(a.p.x + (b.p.x - a.p.x) * t, a.p.y + (b.p.y - a.p.y) * t, a.p.z + (b.p.z - a.p.z) * t)
-    const qa = new THREE.Quaternion(a.q.x, a.q.y, a.q.z, a.q.w)
-    const qb = new THREE.Quaternion(b.q.x, b.q.y, b.q.z, b.q.w)
-    obj.quaternion.copy(qa.slerp(qb, t))
+    this.qa.set(a.q.x, a.q.y, a.q.z, a.q.w)
+    this.qb.set(b.q.x, b.q.y, b.q.z, b.q.w)
+    obj.quaternion.copy(this.qa.slerp(this.qb, t))
   }
 
   private draw(f: FramePoses, dt: number): void {
     const { prev, cur, alpha } = f
     this.lerpPose(this.robotRoot, prev.robot, cur.robot, alpha)
+    if (this.prevBodies !== prev.bodies) {
+      this.prevBodies = prev.bodies
+      this.prevBodyIndex.clear()
+      for (const x of prev.bodies) this.prevBodyIndex.set(x.id, x)
+    }
     for (const b of cur.bodies) {
       const obj = this.bodies.get(b.id)
-      const pb = prev.bodies.find((x) => x.id === b.id) ?? b
+      const pb = this.prevBodyIndex.get(b.id) ?? b
       if (obj) this.lerpPose(obj, pb, b, alpha)
     }
     // Robot animation: blink/legs/light from robot3d, wheels from the real motor speed.
@@ -435,13 +498,13 @@ export class SimRenderer {
     // Distance sensor beam.
     const s = f.sensors
     if (s && s.beam) {
-      const from = new THREE.Vector3(s.beam.from.x, s.beam.from.y, s.beam.from.z)
-      const to = new THREE.Vector3(s.beam.to.x, s.beam.to.y, s.beam.to.z)
+      const from = this.v1.set(s.beam.from.x, s.beam.from.y, s.beam.from.z)
+      const to = this.v2.set(s.beam.to.x, s.beam.to.y, s.beam.to.z)
       const len = from.distanceTo(to)
       this.beam.visible = len > 0.01
       this.beam.scale.set(Math.max(0.005, len * Math.tan((12 * Math.PI) / 180)), len, Math.max(0.005, len * 0.06))
       this.beam.position.copy(from).lerp(to, 0.5)
-      this.beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), to.clone().sub(from).normalize())
+      this.beam.quaternion.setFromUnitVectors(SimRenderer.DOWN, this.v3.subVectors(to, from).normalize())
       const near = s.distanceCm < 20
       ;(this.beam.material as THREE.MeshBasicMaterial).color.set(near ? '#F87171' : '#34D399')
       ;(this.beamDot.material as THREE.MeshBasicMaterial).color.set(near ? '#F87171' : '#34D399')
@@ -451,30 +514,7 @@ export class SimRenderer {
       this.beam.visible = false
       this.beamDot.visible = false
     }
-    // Pen trail as a flat ribbon (WebGL lines are 1 px).
-    if (f.trail.length !== this.trailCount) {
-      this.trailCount = f.trail.length
-      const pos: number[] = []
-      const W = 0.007
-      for (let i = 0; i + 3 < f.trail.length; i += 2) {
-        const ax = f.trail[i]
-        const az = f.trail[i + 1]
-        const bx = f.trail[i + 2]
-        const bz = f.trail[i + 3]
-        if (Number.isNaN(ax) || Number.isNaN(bx)) continue
-        const dx = bx - ax
-        const dz = bz - az
-        const l = Math.hypot(dx, dz) || 1
-        const nx = (-dz / l) * W
-        const nz = (dx / l) * W
-        const y = 0.004
-        pos.push(ax + nx, y, az + nz, bx + nx, y, bz + nz, ax - nx, y, az - nz, bx + nx, y, bz + nz, bx - nx, y, bz - nz, ax - nx, y, az - nz)
-      }
-      this.trailMesh.geometry.dispose()
-      const g = new THREE.BufferGeometry()
-      g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
-      this.trailMesh.geometry = g
-    }
+    this.drawTrail(f.trail)
     if (this.goalRing && !this.reduced) {
       const m = this.goalRing.material as THREE.MeshBasicMaterial
       m.opacity = 0.6 + Math.sin(this.elapsed * 3) * 0.3
@@ -482,10 +522,74 @@ export class SimRenderer {
     this.updateCamera(dt)
   }
 
+  /**
+   * Pen trail as a flat ribbon (WebGL lines are 1 px). Only NEW segments are written into a
+   * preallocated buffer (grown by doubling), so a long drawing costs the same per frame as a short one.
+   */
+  private drawTrail(trail: number[]): void {
+    if (trail !== this.trailOf || trail.length < this.trailDone) {
+      this.trailOf = trail
+      // A new run: start the ribbon again.
+      this.trailDone = 0
+      this.trailVerts = 0
+    }
+    if (trail.length === this.trailDone) {
+      this.trailGeo.setDrawRange(0, this.trailVerts)
+      return
+    }
+    const W = 0.007
+    const y = 0.004
+    const first = this.trailVerts
+    let i = Math.max(0, this.trailDone - 2)
+    for (; i + 3 < trail.length; i += 2) {
+      const ax = trail[i]
+      const az = trail[i + 1]
+      const bx = trail[i + 2]
+      const bz = trail[i + 3]
+      if (Number.isNaN(ax) || Number.isNaN(bx)) continue
+      if (this.trailAttr.array.length < (this.trailVerts + 6) * 3) this.growTrail()
+      const dx = bx - ax
+      const dz = bz - az
+      const l = Math.hypot(dx, dz) || 1
+      const nx = (-dz / l) * W
+      const nz = (dx / l) * W
+      const a = this.trailAttr.array as Float32Array
+      let o = this.trailVerts * 3
+      const put = (px: number, pz: number) => {
+        a[o++] = px
+        a[o++] = y
+        a[o++] = pz
+      }
+      put(ax + nx, az + nz)
+      put(bx + nx, bz + nz)
+      put(ax - nx, az - nz)
+      put(bx + nx, bz + nz)
+      put(bx - nx, bz - nz)
+      put(ax - nx, az - nz)
+      this.trailVerts += 6
+    }
+    this.trailDone = trail.length
+    if (this.trailVerts > first) {
+      this.trailAttr.clearUpdateRanges()
+      this.trailAttr.addUpdateRange(first * 3, (this.trailVerts - first) * 3)
+      this.trailAttr.needsUpdate = true
+    }
+    this.trailGeo.setDrawRange(0, this.trailVerts)
+  }
+
+  private growTrail(): void {
+    const old = this.trailAttr.array as Float32Array
+    const next = new Float32Array(old.length * 2)
+    next.set(old)
+    this.trailAttr = new THREE.BufferAttribute(next, 3)
+    this.trailAttr.setUsage(THREE.DynamicDrawUsage)
+    this.trailGeo.setAttribute('position', this.trailAttr) // a new, bigger GPU buffer (uploaded whole once)
+  }
+
   private updateCamera(dt: number): void {
     const cam = this.stage.camera
     const p = this.robotRoot.position
-    const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(this.robotRoot.quaternion)
+    const fwd = this.v1.set(0, 0, 1).applyQuaternion(this.robotRoot.quaternion)
     fwd.y = 0
     fwd.normalize()
     if (this.mode === 'orbit') {
@@ -496,16 +600,17 @@ export class SimRenderer {
       this.controls.target.lerp(p, 1 - Math.exp(-dt * 4))
       return
     }
-    let wantPos: THREE.Vector3
-    let wantTarget: THREE.Vector3
+    const wantPos = this.wantPos
+    const wantTarget = this.wantTarget
     if (this.mode === 'top' && this.arena) {
       const [w, d] = this.arena.size
-      wantTarget = new THREE.Vector3(this.arena.center[0], 0, this.arena.center[1])
-      wantPos = new THREE.Vector3(this.arena.center[0], Math.max(w, d) * 1.25, this.arena.center[1] - 0.35)
+      wantTarget.set(this.arena.center[0], 0, this.arena.center[1])
+      wantPos.set(this.arena.center[0], Math.max(w, d) * 1.25, this.arena.center[1] - 0.35)
     } else {
       // Chase cam: behind and above, looking a little ahead of the robot.
-      wantPos = p.clone().addScaledVector(fwd, -1.05).add(new THREE.Vector3(0, 0.75, 0))
-      wantTarget = p.clone().addScaledVector(fwd, 0.35)
+      wantPos.copy(p).addScaledVector(fwd, -1.05)
+      wantPos.y += 0.75
+      wantTarget.copy(p).addScaledVector(fwd, 0.35)
     }
     if (this.firstFrame) {
       this.camPos.copy(wantPos)
@@ -522,6 +627,7 @@ export class SimRenderer {
 
   dispose(): void {
     this.frameFn = null
+    this.io?.disconnect()
     this.controls.dispose()
     if (this.robotModel) disposeObject(this.robotModel)
     this.stage.dispose()

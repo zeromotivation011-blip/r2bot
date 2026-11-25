@@ -29,7 +29,11 @@ import type { BodyId, Capability, DriveId, HeadId, SensorId, ToolId } from '../r
  *   convention); negative = turn right. Uses wheel encoders + the gyro.
  * - drive_for is time-based (open loop): the same block goes a different
  *   distance on sand, ice, a slope or with a heavy load. That is deliberate —
- *   Level 1 feels it, Level 2 fixes it with drive_distance (encoders).
+ *   Level 1 feels it. Level 2's drive_distance (wheel encoders) fixes load,
+ *   slope and battery, but NOT wheel slip: encoders count wheel turns, not
+ *   ground covered, so on ice or loose sand it still comes up short (Level 3
+ *   measures that).
+ * - distance_cm reads 200 (the sensor's maximum) when no echo comes back.
  * - forever and repeat_until are capped by the simulator's run-time limit.
  */
 export type BlockId =
@@ -132,7 +136,8 @@ export type PartRef =
   | { slot: 'body'; id: BodyId }
   | { slot: 'drive'; id: DriveId }
   | { slot: 'head'; id: HeadId }
-  | { slot: 'tool'; id: ToolId }
+  /** 'child-choice': the child picks the tool (project sessions). */
+  | { slot: 'tool'; id: ToolId | 'child-choice' }
   | { slot: 'sensor'; id: SensorId }
 
 /** A robot as the curriculum describes it (colours and name are the child's own). */
@@ -196,6 +201,12 @@ export interface LearningObjective {
   kidText: string
   concepts: ConceptId[]
   tags: MappingTag[]
+  /**
+   * true when the objective is met through discussion (warm-up, share circle,
+   * episode) and is NOT assessed by the session's challenge or check. Every
+   * session has at least one assessed objective (checked by the doc script).
+   */
+  discussionOnly?: boolean
 }
 
 // ── Episode (story) ───────────────────────────────────────────────────────
@@ -265,12 +276,17 @@ export interface ArenaSpec {
   name: string
   /** What the child sees. */
   description: string
-  /** Grid size in tiles (Level 1 uses a 25 cm tile grid). */
+  /** Grid size in tiles (Level 1 uses a 30 cm tile grid, see TILE_CM in level1/shared.ts). */
   gridTiles?: { cols: number; rows: number }
   tileCm?: number
   floor: FloorType
   /** Start tile (col,row from top-left, 0-based) and heading (0 = facing "up" the map). */
   start: { col: number; row: number; heading: 'up' | 'down' | 'left' | 'right' }
+  /**
+   * Further start poses for arenas with several lanes: the simulator resets
+   * the robot to each one in turn and runs the same program again.
+   */
+  extraStarts?: { col: number; row: number; heading: 'up' | 'down' | 'left' | 'right' }[]
   /** Goal zone(s) in words, with tiles when on the grid. */
   goal: string
   /** Walls, objects, slopes, things to collect. */
@@ -290,7 +306,10 @@ export type SuccessKind =
   | 'action-at-zone'
   | 'touch-and-react'
   | 'within-time'
+  /** A limit on the number of blocks. */
   | 'within-blocks'
+  /** The program contains the named kinds of block (loop, sensor, tool, say…). */
+  | 'uses-blocks'
 
 export interface SuccessCriterion {
   kind: SuccessKind
@@ -326,9 +345,18 @@ export interface QuizOption {
 export interface QuizQuestion {
   /** Read aloud. */
   prompt: string
+  /**
+   * Distractors are real misconceptions (from teacher.misconceptions), not
+   * jokes, so a wrong answer tells the teacher something. The stored order is
+   * balanced across a level (checked by the doc script); renderers should
+   * still shuffle options per child per attempt and remap `answer`, unless
+   * `keepOrder` is set.
+   */
   options: QuizOption[]
   /** Index into options. */
   answer: number
+  /** The options have a natural order (e.g. sense → think → act): do not shuffle. */
+  keepOrder?: boolean
   /** Why — spoken after either answer. Never "wrong!": "Let's see why…". */
   why: string
 }
@@ -354,7 +382,10 @@ export interface Project {
   designSteps: string[]
   /** Fair limits that make it a design problem, not a free-for-all. */
   constraints: string[]
-  /** "I can" self-checks (no scores, no ranking). */
+  /**
+   * "I can" self-checks — reflection only (no scores, no ranking). They never
+   * gate a badge or certificate: an unticked box means "my next step".
+   */
   selfCheck: string[]
   /** How it is shared: to family, class gallery (teacher-moderated), never public by default. */
   share: string
@@ -368,7 +399,7 @@ export interface TimingBlock {
 }
 
 export interface TeacherNotes {
-  /** A 40-minute class plan. Minutes must add up to 40. */
+  /** A 40-minute class plan, transitions included. Minutes must add up to 40. */
   timing: TimingBlock[]
   unpluggedWarmup: { title: string; minutes: number; steps: string[]; materials: string[] }
   discussion: string[]
@@ -452,8 +483,24 @@ export interface Certificate {
   title: string
   /** The wording printed on the certificate ({name} and {robotName} are filled in). */
   wording: string
-  /** What the child must have done — learning, not attendance. */
+  /**
+   * What the child must have done — learning, not attendance. Evidence the
+   * simulator records or a teacher/parent observes; never the child's own
+   * self-check ticks.
+   */
   criteria: string[]
+}
+
+/**
+ * A short self-paced catch-up for a child who joins at this level without
+ * the previous one (children join by age). Offered automatically when the
+ * child has none of the previous level's badges; never required.
+ */
+export interface Bridge {
+  /** Who it is for, in one line. */
+  forWho: string
+  /** 2–3 missions, each recapping core blocks from the level below. */
+  missions: { title: string; recaps: string; blocks: BlockId[] }[]
 }
 
 export interface Level {
@@ -471,4 +518,6 @@ export interface Level {
   blocks: BlockId[]
   /** How children of this age are supported (reading, motor skills, attention). */
   developmentalFit: string[]
+  /** Catch-up pathway for children who start here without the level below (Levels 2–4). */
+  bridge?: Bridge
 }

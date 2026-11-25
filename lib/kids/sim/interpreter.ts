@@ -14,6 +14,16 @@ type Value = number | string | boolean
 /** Most instant blocks allowed in one tick before the interpreter forces a pause (stops a zero-time loop from freezing the page). */
 const OPS_PER_TICK = 2000
 const GRIP_TIME = 0.4
+/** Watchdog for blocks that wait for the robot to get somewhere: check progress once per this many ticks. */
+const STALL_WINDOW = Math.round(1 / DT)
+/** Less progress than this in one window means the motors are not getting anywhere. */
+const STALL_MIN_CM = 1
+const STALL_MIN_DEG = 1
+
+function stalled(ctx: InterpreterCtx): void {
+  ctx.sim.setMotors(0, 0)
+  ctx.sim.emit({ kind: 'stalled', text: 'My motors can’t move me — too slow, or something is in the way!' })
+}
 
 export interface InterpreterCtx {
   sim: Sim
@@ -144,7 +154,16 @@ function* runStmt(s: Stmt, ctx: InterpreterCtx): Gen {
       if (sp === 0) return
       sim.setMotors(dir * sp, dir * sp)
       // The encoders count wheel turns: if the wheels slip, they believe they went further than the robot did.
-      while (travelled() < goal) yield
+      let ticks = 0
+      let mark = 0
+      while (travelled() < goal) {
+        yield
+        if (++ticks % STALL_WINDOW === 0) {
+          const now = travelled()
+          if ((now - mark) * 100 < STALL_MIN_CM) return stalled(ctx)
+          mark = now
+        }
+      }
       sim.setMotors(0, 0)
       return
     }
@@ -156,6 +175,8 @@ function* runStmt(s: Stmt, ctx: InterpreterCtx): Gen {
       const goal = sim.headingUnwrapped() + deg
       // Simple gyro controller: full speed, easing off over the last 20°, never below half speed.
       // It stops the motors once the gyro says "there" — a fast robot's momentum carries it past.
+      let ticks = 0
+      let mark = sim.headingUnwrapped()
       for (;;) {
         const rem = (goal - sim.headingUnwrapped()) * dir
         if (rem <= 0.5) break
@@ -163,6 +184,11 @@ function* runStmt(s: Stmt, ctx: InterpreterCtx): Gen {
         const v = sp * k
         sim.setMotors(dir * v, -dir * v)
         yield
+        if (++ticks % STALL_WINDOW === 0) {
+          const now = sim.headingUnwrapped()
+          if ((now - mark) * dir < STALL_MIN_DEG) return stalled(ctx)
+          mark = now
+        }
       }
       sim.setMotors(0, 0)
       yield* waitTicks(6)
@@ -232,11 +258,15 @@ export function createInterpreter(program: Program, sim: Sim): Interpreter {
   const ctx: InterpreterCtx = { sim, vars: new Map(), active: null, tick: 0, ops: 0 }
   const gen = runList(program.body, ctx)
   let done = false
+  let started = false
   return {
     ctx,
     advance() {
       if (done) return false
       ctx.ops = 0
+      // A new tick has begun (the first call is tick 0). loopPass compares this to see if a pass took time.
+      if (started) ctx.tick++
+      started = true
       const r = gen.next()
       if (r.done) {
         done = true

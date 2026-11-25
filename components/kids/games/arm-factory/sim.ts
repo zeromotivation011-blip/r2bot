@@ -240,7 +240,7 @@ export const POSE_LABEL: Record<PoseId, string> = {
 }
 
 export type ProgStep =
-  | { kind: 'move'; pose: PoseId; speed: number; when: When }
+  | { kind: 'move'; pose: PoseId; /** percent, 10–100 */ speed: number; when: When }
   | { kind: 'grip' | 'release' | 'wait'; when: When }
 
 export type PlanStep =
@@ -344,6 +344,10 @@ export class ArmSim {
     return fk(this.j).tip
   }
 
+  tipOf(j: Joints): V3 {
+    return fk(j).tip
+  }
+
   heldHalf(): number | null {
     return this.held ? PART_HALF : null
   }
@@ -429,7 +433,7 @@ export class ArmSim {
   runProgram(steps: ProgStep[]): void {
     this.prog = steps.map((s) =>
       s.kind === 'move'
-        ? { kind: 'move', when: s.when, speed: s.speed, label: POSE_LABEL[s.pose], resolve: () => this.resolvePose(s.pose) }
+        ? { kind: 'move', when: s.when, speed: s.speed / 100, label: POSE_LABEL[s.pose], resolve: () => this.resolvePose(s.pose) }
         : { kind: s.kind, when: s.when, speed: 1, label: s.kind },
     )
     this.startRun(true)

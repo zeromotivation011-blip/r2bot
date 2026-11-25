@@ -134,6 +134,15 @@ export function programToBlockly(p: Program): BWorkspace {
 }
 
 // ── Blockly → Program ─────────────────────────────────────────────────────
+/**
+ * A block the child switched off (right-click → Disable) does not run.
+ * Blockly 12 saves that as `disabledReasons: [...]`; older saves used `enabled: false` / `disabled: true`.
+ */
+export function isDisabled(b: BBlock): boolean {
+  if (Array.isArray(b.disabledReasons) && b.disabledReasons.length > 0) return true
+  return b.enabled === false || b.disabled === true
+}
+
 function val(input: { block?: BBlock; shadow?: BBlock } | undefined, fallback: Expr): Expr {
   const b = input?.block ?? input?.shadow
   return b ? toExpr(b, fallback) : fallback
@@ -178,7 +187,7 @@ function toStmts(first: BBlock | undefined): Stmt[] {
   const out: Stmt[] = []
   const N0: Expr = { k: 'number', v: 0 }
   for (let b = first; b; b = b.next?.block) {
-    if (b.enabled === false || b.disabled === true) continue
+    if (isDisabled(b)) continue
     const id = b.id ?? `${b.type}-${out.length}`
     const inp = b.inputs ?? {}
     switch (b.type) {

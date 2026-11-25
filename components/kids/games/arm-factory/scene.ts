@@ -55,7 +55,7 @@ interface Rig {
 }
 
 const CAMS: Record<CamPreset, { pos: THREE.Vector3; look: THREE.Vector3 }> = {
-  front: { pos: new THREE.Vector3(0.25, 1.45, 1.95), look: new THREE.Vector3(0, 0.12, -0.05) },
+  front: { pos: new THREE.Vector3(0.75, 1.9, 1.55), look: new THREE.Vector3(0, 0.05, -0.12) },
   top: { pos: new THREE.Vector3(0, 2.75, 0.02), look: new THREE.Vector3(0, 0, -0.02) },
   side: { pos: new THREE.Vector3(2.1, 0.95, 0.35), look: new THREE.Vector3(0, 0.2, -0.05) },
 }
@@ -797,7 +797,8 @@ export class FactoryScene {
     })
     this.partGeo.dispose()
     this.bandGeo.dispose()
+    // No forceContextLoss(): React may remount on the same <canvas>, and a lost
+    // context cannot be recovered from that element.
     this.renderer.dispose()
-    this.renderer.forceContextLoss()
   }
 }

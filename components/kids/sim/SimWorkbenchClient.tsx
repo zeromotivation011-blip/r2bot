@@ -70,6 +70,12 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
   const [result, setResult] = useState<RunResult | null>(null)
   const [bubble, setBubble] = useState<string | null>(null)
   const [live, setLive] = useState<WorkbenchLiveState>({ sensors: null, snap: null, wheelTravel: 0, travelled: 0 })
+  /** The running block in words, shown over the 3D view (on a phone the editor's highlight is off-screen). */
+  const [nowDoing, setNowDoing] = useState<string | null>(null)
+  const [showSensors, setShowSensors] = useState(false)
+  const resultRef = useRef<RunResult | null>(null)
+  const designDemoRef = useRef(demo.id)
+  resultRef.current = result
 
   const caps = useMemo(() => capabilitiesOf(design), [design])
   const capsRef = useRef(caps)
@@ -78,6 +84,8 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
   const setPhase = useCallback((p: Phase) => {
     phaseRef.current = p
     setPhaseState(p)
+    // Draw every frame only while the robot runs; otherwise the view sleeps until something changes.
+    rendererRef.current?.setLive(p === 'running')
   }, [])
 
   const publishLive = useCallback(() => {
@@ -108,7 +116,9 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       editorRef.current?.highlight(null)
       setBubble(null)
       setResult(null)
+      setNowDoing(null)
       publishLive()
+      rendererRef.current?.wake()
       return run
     },
     [publishLive],
@@ -149,14 +159,14 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
     if (!run || !curRef.current || !prevRef.current) return null
     if (phaseRef.current === 'running') {
       accRef.current += dt * speedRef.current
-      let n = 0
-      while (accRef.current >= DT && n < MAX_TICKS_PER_FRAME && run.status !== 'done') {
-        prevRef.current = curRef.current
+      const n = Math.min(MAX_TICKS_PER_FRAME, Math.floor(accRef.current / DT))
+      // Only two snapshots per frame: just before the last tick and after it (what the renderer interpolates).
+      for (let i = 0; i < n && run.status !== 'done'; i++) {
+        if (i === n - 1) prevRef.current = run.sim.snapshot()
         run.tick()
-        curRef.current = run.sim.snapshot()
         accRef.current -= DT
-        n++
       }
+      if (n > 0) curRef.current = run.sim.snapshot()
       // Too slow to keep up: let the sim run slower rather than pile up work.
       if (n === MAX_TICKS_PER_FRAME) accRef.current = Math.min(accRef.current, DT)
       afterTicks(run)
@@ -180,6 +190,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
     if (active !== activeRef.current) {
       activeRef.current = active
       editorRef.current?.highlight(active)
+      setNowDoing(active ? editorRef.current?.describe(active) || null : null)
     }
     const ev = run.sim.events
     for (let i = eventsSeenRef.current; i < ev.length; i++) {
@@ -188,6 +199,8 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       else if (e.kind === 'beep') playSound('click')
       else if (e.kind === 'crash') setBubble('Bonk!')
       else if (e.kind === 'grab') setBubble('Got it!')
+      else if (e.kind === 'miss') setBubble('Missed — nothing in my claw’s reach.')
+      else if (e.kind === 'stalled' && e.text) setBubble(e.text)
     }
     eventsSeenRef.current = ev.length
     if (run.status === 'done') {
@@ -195,6 +208,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       editorRef.current?.highlight(null)
       activeRef.current = null
       setResult(run.result)
+      setNowDoing(null)
       publishLive()
       if (run.result?.success) playSound('correct')
       else if (run.result) playSound('wrong')
@@ -213,9 +227,19 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
   useEffect(() => {
     const r = rendererRef.current
     if (!r) return
+    // A new challenge can bring its own remembered parts: that is not "a part was swapped".
+    const sameDemo = designDemoRef.current === demoRef.current.id
+    designDemoRef.current = demoRef.current.id
+    const wasRunning = sameDemo && (phaseRef.current === 'running' || phaseRef.current === 'paused')
+    const last = sameDemo ? resultRef.current : null
     r.setRobot(design)
     setPhase('ready')
     resetRun()
+    // Swapping a part ends the run; say so, and keep the last result the child may have been reading.
+    if (wasRunning || last) {
+      if (last) setResult(last)
+      setBubble('New part fitted! Press ▶ Run to try it.')
+    }
   }, [design, resetRun, setPhase])
 
   useEffect(() => {
@@ -289,11 +313,20 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
 
   const running = phase === 'running'
 
+  /** The phone's Run button under the editor: bring the robot into view, then go. */
+  const onRunFromEditor = () => {
+    const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    viewRef.current?.parentElement?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+    onRun()
+  }
+
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+    // Phone order: 3D view + Run bar, then the editor right under it, then the sensors (folded).
+    // Desktop: view and sensors on the left, editor on the right.
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:grid-rows-[auto_1fr]">
       {/* ── 3D view ─────────────────────────────────────────────────────── */}
-      <div className="flex min-w-0 flex-col gap-3">
-        <div className="relative h-[52vh] min-h-[320px] overflow-hidden rounded-3xl border border-white/10 bg-[#120A2E] lg:h-[540px]">
+      <div className="flex min-w-0 scroll-mt-2 flex-col gap-3 lg:col-start-1 lg:row-start-1">
+        <div className="relative h-[42vh] min-h-[280px] sm:h-[52vh] sm:min-h-[320px] overflow-hidden rounded-3xl border border-white/10 bg-[#120A2E] lg:h-[540px]">
           <div ref={viewRef} className="absolute inset-0" data-testid="sim-view" />
           {!ready && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#120A2E] text-purple-100">
@@ -325,6 +358,11 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
               </button>
             ))}
           </div>
+          {nowDoing && (running || phase === 'paused') && (
+            <div className="pointer-events-none absolute bottom-3 left-3 max-w-[85%] truncate rounded-xl bg-black/55 px-3 py-1.5 text-xs font-black text-amber-200 backdrop-blur" aria-hidden>
+              ▶ {nowDoing}
+            </div>
+          )}
           {result && (
             <div
               role="status"
@@ -359,7 +397,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
             disabled={!ready || (phase !== 'running' && phase !== 'paused')}
             className="min-h-[48px] rounded-2xl bg-white/10 px-4 font-black text-white hover:bg-white/20 disabled:opacity-40"
           >
-            {running ? '⏸ Pause' : '⏵ Resume'}
+            {phase === 'paused' ? '⏵ Resume' : '⏸ Pause'}
           </button>
           <button
             type="button"
@@ -391,12 +429,10 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
             ))}
           </div>
         </div>
-
-        <SensorPanel live={live} caps={caps} />
       </div>
 
       {/* ── Block editor ────────────────────────────────────────────────── */}
-      <div className="flex min-w-0 flex-col gap-3">
+      <div className="flex min-w-0 flex-col gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-1">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="mr-auto text-lg font-black text-white">Your program</h2>
           <button
@@ -415,12 +451,37 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
             🧹 Start over
           </button>
         </div>
-        <div className="h-[460px] overflow-hidden rounded-3xl border border-white/10 lg:h-[540px]" data-testid="sim-editor">
+        <div className="relative h-[460px] overflow-hidden rounded-3xl border border-white/10 lg:h-[540px]" data-testid="sim-editor">
           <BlocklyEditor ref={editorRef} toolbox={demo.toolbox} caps={caps} initial={starter} resetKey={demo.id} />
+          {/* Phones: Run from where the child is editing; it scrolls the robot into view first. */}
+          <button
+            type="button"
+            onClick={onRunFromEditor}
+            disabled={!ready}
+            data-testid="sim-run-editor"
+            className="absolute bottom-3 right-16 z-10 min-h-[48px] rounded-2xl bg-amber-400 px-4 text-base font-black text-[#1A1040] shadow-xl hover:bg-amber-300 disabled:opacity-50 lg:hidden"
+          >
+            ▶ Run
+          </button>
         </div>
         <p className="text-xs text-purple-200">
           Drag blocks under <strong>▶ when Run is pressed</strong>. Greyed blocks with a 🔒 need a part your robot does not have yet.
         </p>
+      </div>
+
+      {/* ── Sensors (folded on a phone so the editor sits right under the robot) ── */}
+      <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+        <button
+          type="button"
+          onClick={() => setShowSensors((v) => !v)}
+          aria-expanded={showSensors}
+          className="mb-2 min-h-[44px] w-full rounded-2xl bg-white/5 px-4 text-left text-sm font-black text-purple-100 hover:bg-white/10 lg:hidden"
+        >
+          {showSensors ? '▾' : '▸'} What my robot senses
+        </button>
+        <div className={`${showSensors ? '' : 'hidden'} lg:block`}>
+          <SensorPanel live={live} caps={caps} />
+        </div>
       </div>
     </div>
   )

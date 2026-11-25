@@ -216,9 +216,9 @@ function drawSky(ctx: CanvasRenderingContext2D, v: View, fx: Fx, time: number): 
     ctx.fill()
   }
   // A ringed planet on the horizon — this is the R2BOT Universe after all.
-  const prx = v.w * 0.82
-  const pry = v.h * 0.2
-  const pr = Math.min(v.w, v.h) * 0.07
+  const prx = v.w * 0.86
+  const pry = v.h * 0.3
+  const pr = Math.min(v.w, v.h) * 0.05
   const pg = ctx.createRadialGradient(prx - pr * 0.4, pry - pr * 0.4, pr * 0.1, prx, pry, pr)
   pg.addColorStop(0, '#fde68a')
   pg.addColorStop(1, '#c2410c')
@@ -316,8 +316,8 @@ function drawTargetBand(ctx: CanvasRenderingContext2D, v: View, s: SimState, tim
   ctx.restore()
   ctx.fillStyle = s.inBand ? '#6ee7b7' : '#fbbf24'
   ctx.font = 'bold 12px ui-sans-serif, system-ui'
-  ctx.textAlign = 'right'
-  ctx.fillText(`TARGET ${s.target.z.toFixed(1)} m`, v.w - 8, y - 6)
+  ctx.textAlign = 'left'
+  ctx.fillText(`TARGET ${s.target.z.toFixed(1)} m`, 52, y - 6)
 }
 
 function drawWaypoints(ctx: CanvasRenderingContext2D, v: View, s: SimState, time: number): void {
@@ -388,7 +388,7 @@ function drawBox(ctx: CanvasRenderingContext2D, x: number, y: number, size: numb
 function drawDrone(ctx: CanvasRenderingContext2D, v: View, s: SimState, fx: Fx): void {
   const cx = px(v, droneX(s))
   const cy = pz(v, s.z) - 6
-  const span = Math.max(46, 0.55 * v.scale)
+  const span = Math.max(v.w < 500 ? 44 : 60, 0.95 * v.scale)
   const k = span / 60
 
   // payload on a short cable, swinging a little with motion

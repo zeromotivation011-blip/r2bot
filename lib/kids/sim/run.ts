@@ -9,7 +9,7 @@ import type { RobotDesign } from '../robot-design'
 import { distToSegment, inShape, type Arena } from './arena'
 import { createSim, DT, type Sim } from './engine'
 import { createInterpreter, type Interpreter } from './interpreter'
-import { missingParts, type MissingPart, type Program } from './program'
+import { missingParts, type MissingPart, type Program, type Stmt } from './program'
 import type { Rapier } from './rapier'
 
 export type RunStatus = 'running' | 'settling' | 'done'
@@ -56,11 +56,25 @@ function distToLines(arena: Arena, x: number, z: number): number {
   return best
 }
 
-export function judge(arena: Arena, sim: Sim, onLineFraction: number, timedOut: boolean): RunResult {
+/** Does the program contain a `forever` loop (so it never ends by itself)? */
+export function hasForever(list: Stmt[]): boolean {
+  for (const s of list) {
+    if (s.op === 'forever') return true
+    if ((s.op === 'repeat' || s.op === 'repeat_until') && hasForever(s.body)) return true
+    if (s.op === 'if' && (hasForever(s.then) || (s.else ? hasForever(s.else) : false))) return true
+  }
+  return false
+}
+
+/**
+ * @param reached  set when an endless program already met the goal mid-run (the run was ended there),
+ *                 so coasting a little past the zone edge while stopping does not undo it.
+ */
+export function judge(arena: Arena, sim: Sim, onLineFraction: number, timedOut: boolean, reached = false): RunResult {
   const snap = sim.snapshot()
   const { x, z } = snap.robot.p
   const g = arena.goal
-  const inZone = inShape(g.zone, x, z)
+  const inZone = reached || inShape(g.zone, x, z)
   const [gx, gz] = goalCenter(arena)
   const base = {
     missing: [],
@@ -75,8 +89,11 @@ export function judge(arena: Arena, sim: Sim, onLineFraction: number, timedOut: 
   const noCrash = g.kind === 'stop-in-zone' || (g.kind === 'reach' && g.noCrash === true)
   if (noCrash && sim.crashed) return fail('crashed', 'Bonk! Your robot crashed into the wall. Stop it before it touches.')
   if (!inZone) {
-    // Wheels turned a lot but the robot hardly moved: that is slipping.
-    if (sim.wheelTravel > 0.25 && sim.travelled < sim.wheelTravel * 0.4)
+    // Touching a wall comes first: pushing against it is not a grip problem.
+    if (sim.crashed) return fail('crashed', 'Your robot pushed into a wall and could not get to the goal. Steer or stop before the wall.')
+    // The wheels slid over the floor more than the robot moved: that is slipping.
+    // (Measured per wheel against the ground, so turning on the spot is not counted.)
+    if (sim.slipTravel > 0.25 && sim.slipTravel > sim.travelled)
       return fail('stuck', `Your robot got stuck — the wheels spun ${Math.round(sim.wheelTravel * 100)} cm but it only moved ${Math.round(sim.travelled * 100)} cm. Try a drive that grips better.`)
     if (timedOut) return fail('timeout', 'Time ran out before your robot reached the goal.')
     return fail('short', `So close! Your robot finished ${Math.round(base.goalDistance * 100)} cm from the middle of the goal.`)
@@ -87,12 +104,24 @@ export function judge(arena: Arena, sim: Sim, onLineFraction: number, timedOut: 
   return { ...base, success: true, reason: null, message: 'You did it! Your robot reached the goal. ⭐' }
 }
 
+/** Goal check while an endless program runs. stop-in-zone needs the robot at rest in the zone for half a second. */
+function goalMet(arena: Arena, sim: Sim, onLineFraction: number, restTicks: number): boolean {
+  const g = arena.goal
+  if (g.kind === 'stop-in-zone') return restTicks >= Math.round(0.5 / DT)
+  const p = sim.snapshot().robot.p
+  if (!inShape(g.zone, p.x, p.z)) return false
+  return g.kind !== 'follow-line' || onLineFraction >= g.minOnLine
+}
+
 export function createRun(R: Rapier, arena: Arena, design: RobotDesign, program: Program): Run {
   const sim = createSim(R, arena, design)
   const missing = missingParts(program, design)
+  const endless = hasForever(program.body)
+  let reached = false
   let onLineTicks = 0
   let ticks = 0
   let settle = 0
+  let restTicks = 0
   const run: Run = {
     sim,
     interp: null,
@@ -106,9 +135,17 @@ export function createRun(R: Rapier, arena: Arena, design: RobotDesign, program:
       }
       sim.step()
       ticks++
+      const snap = sim.snapshot()
+      restTicks = snap.groundSpeed < REST_SPEED && inShape(arena.goal.zone, snap.robot.p.x, snap.robot.p.z) ? restTicks + 1 : 0
       if (arena.lines.length > 0) {
-        const p = sim.snapshot().robot.p
+        const p = snap.robot.p
         if (distToLines(arena, p.x, p.z) < 0.06) onLineTicks++
+      }
+      // A `forever` program never ends, so its goal is checked as it runs: reaching it ends the run.
+      if (run.status === 'running' && endless && goalMet(arena, sim, onLineTicks / ticks, restTicks)) {
+        reached = true
+        run.status = 'settling'
+        sim.setMotors(0, 0)
       }
       if (run.status === 'running' && sim.time >= arena.timeLimit) {
         run.status = 'done'
@@ -120,7 +157,7 @@ export function createRun(R: Rapier, arena: Arena, design: RobotDesign, program:
         settle += DT
         if (settle >= SETTLE_MAX || (settle > 0.2 && sim.snapshot().groundSpeed < REST_SPEED)) {
           run.status = 'done'
-          run.result = judge(arena, sim, onLineTicks / Math.max(1, ticks), false)
+          run.result = judge(arena, sim, onLineTicks / Math.max(1, ticks), false, reached && arena.goal.kind !== 'stop-in-zone')
         }
       }
     },

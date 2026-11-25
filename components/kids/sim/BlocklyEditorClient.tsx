@@ -17,6 +17,8 @@ export interface BlocklyEditorHandle {
   getProgram(): Program
   setProgram(p: Program): void
   highlight(id: string | null): void
+  /** Plain words for a block ("drive 50 % for 2 s"), for the "now running" line over the 3D view. */
+  describe(id: string): string
 }
 
 interface Props {
@@ -47,6 +49,7 @@ const BlocklyEditorClient = forwardRef<BlocklyEditorHandle, Props>(function Bloc
     defineBlocks()
     Blockly.setLocale(En as unknown as Record<string, string>)
     const { toolbox: tb } = buildToolbox(toolbox, caps)
+    const coarse = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches
     const w = Blockly.inject(host.current, {
       toolbox: tb,
       theme: kidsTheme(),
@@ -54,7 +57,8 @@ const BlocklyEditorClient = forwardRef<BlocklyEditorHandle, Props>(function Bloc
       media: '/kids/lab/blockly-media/',
       sounds: false,
       trashcan: false,
-      zoom: { controls: false, wheel: true, pinch: true, startScale: 0.8, maxScale: 1.6, minScale: 0.4 },
+      // Wheel/trackpad scrolling scrolls the PAGE (no scroll trap); zoom with pinch or the +/− buttons.
+      zoom: { controls: true, wheel: false, pinch: true, startScale: coarse ? 0.9 : 0.8, maxScale: 1.6, minScale: 0.4 },
       move: { scrollbars: true, drag: true, wheel: false },
       grid: { spacing: 24, length: 2, colour: '#2A2060', snap: true },
     })
@@ -120,11 +124,22 @@ const BlocklyEditorClient = forwardRef<BlocklyEditorHandle, Props>(function Bloc
       highlight(id) {
         ws.current?.highlightBlock(id)
       },
+      describe(id) {
+        const b = ws.current?.getBlockById(id)
+        return b ? b.toString(60).replace(/\s+/g, ' ').trim() : ''
+      },
     }),
     [],
   )
 
-  return <div ref={host} className="h-full w-full" aria-label="Block editor: drag blocks under “when Run is pressed”" />
+  // Category rows are the main navigation for a 5-year-old on a touch screen: 44 px tall, bigger text.
+  return (
+    <div
+      ref={host}
+      className="h-full w-full [&_.blocklyToolboxCategory]:flex [&_.blocklyToolboxCategory]:h-11 [&_.blocklyToolboxCategory]:items-center [&_.blocklyToolboxCategory]:leading-[44px] [&_.blocklyToolboxCategoryLabel]:pr-2 [&_.blocklyToolboxCategoryLabel]:text-[15px]"
+      aria-label="Block editor: drag blocks under “when Run is pressed”"
+    />
+  )
 })
 
 export default BlocklyEditorClient

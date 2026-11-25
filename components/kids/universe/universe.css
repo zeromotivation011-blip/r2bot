@@ -1,0 +1,45 @@
+/* components/kids/universe/universe.css
+   Motion for the Universe map. Everything is transform/opacity only (no layout),
+   and everything stops under prefers-reduced-motion. */
+
+@keyframes uv-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -7px, 0); }
+}
+@keyframes uv-orbit {
+  from { transform: rotate(0deg) translateX(5px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(5px) rotate(-360deg); }
+}
+@keyframes uv-spin { to { transform: rotate(360deg); } }
+@keyframes uv-twinkle {
+  0%, 100% { opacity: .25; }
+  50% { opacity: 1; }
+}
+@keyframes uv-dash { to { stroke-dashoffset: -60; } }
+@keyframes uv-pulse {
+  0%, 100% { transform: scale(1); opacity: .55; }
+  50% { transform: scale(1.18); opacity: 0; }
+}
+@keyframes uv-pop {
+  from { transform: translateY(8px) scale(.98); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.uv-float { animation: uv-float 7s ease-in-out infinite; }
+.uv-orbit { animation: uv-orbit 9s linear infinite; }
+.uv-spin { animation: uv-spin 14s linear infinite; }
+.uv-spin-slow { animation: uv-spin 60s linear infinite; }
+.uv-twinkle { animation: uv-twinkle 3.2s ease-in-out infinite; }
+.uv-dash { animation: uv-dash 6s linear infinite; }
+.uv-pulse { animation: uv-pulse 2.6s ease-out infinite; }
+.uv-pop { animation: uv-pop .28s cubic-bezier(.22,.61,.36,1) both; }
+
+/* Positions: data-driven per item, phone layout first, then tablet/desktop. */
+.uv-pos { left: var(--mx); top: var(--my); }
+@media (min-width: 640px) {
+  .uv-pos { left: var(--dx); top: var(--dy); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uv-float, .uv-orbit, .uv-spin, .uv-spin-slow, .uv-twinkle, .uv-dash, .uv-pulse, .uv-pop { animation: none !important; }
+}
