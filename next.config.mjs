@@ -32,7 +32,11 @@ const nextConfig = {
     // build-vs-runtime drift as the July sitemap freeze, and just as invisible.
     //
     // Any new route that reads from content/ at request time needs an entry.
-    '/sitemap.xml': ['./content/**/*'],
+    // 25 Nov 2026: the Daily Life articles are read from lib/daily-life-articles,
+    // which no entry covered. The build listed all ten; every hourly regeneration
+    // of the live sitemap dropped them (1,119 URLs on 24 Nov, 1,109 on 25 Nov).
+    '/sitemap.xml': ['./content/**/*', './lib/daily-life-articles/**/*'],
+    '/daily-life/**': ['./lib/daily-life-articles/**/*'],
     '/llms.txt': ['./content/**/*'],
     '/': ['./content/**/*'],
     '/courses/**': ['./content/courses/**/*'],
