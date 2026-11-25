@@ -142,6 +142,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
   const curtainTimers = useRef<ReturnType<typeof setTimeout>[]>([])
   const propKey = useRef(0)
   const speechRef = useRef<SpeakHandle | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
 
   const scene = scenes[cursor.scene]
   const choiceBeat = status === 'choice' ? scene.beats[cursor.beat] : undefined
@@ -283,7 +284,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
           setCaption({ who, text: beat.text })
           if (beat.kind === 'say') {
             setSpeaker(beat.who)
-            if (beat.emotion) patchActor(beat.who, { emotion: beat.emotion })
+            patchActor(beat.who, { emotion: beat.emotion ?? 'neutral' })
           } else setSpeaker(null)
           say(who, beat.text, () => {
             setSpeaker(null)
@@ -403,6 +404,16 @@ export default function StoryPlayerClient({ episode, next }: Props) {
     return () => hush()
   }, [status, qi, picked, question, say, hush])
 
+  // When the child has to act (choice, quiz, result), make sure the buttons
+  // are on screen — on a phone held sideways they sit below the stage.
+  useEffect(() => {
+    if (status !== 'choice' && status !== 'quiz' && status !== 'done') return
+    const el = panelRef.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    if (r.bottom > window.innerHeight || r.top < 0) el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' })
+  }, [status, qi, reduced])
+
   // ── controls ───────────────────────────────────────────────────────────
   const start = () => {
     primeAudio()
@@ -465,6 +476,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
   const pick = (i: number, opt: ChoiceOption) => {
     if (!activeChoice || tried.includes(i)) return
     hush()
+    patchActor(activeChoice.who, { emotion: 'neutral' })
     if (opt.correct) {
       playSound('correct')
     } else {
@@ -569,12 +581,12 @@ export default function StoryPlayerClient({ episode, next }: Props) {
       role="region"
       aria-label={`Story player: ${episode.title}`}
       aria-describedby="st-keys"
-      className={`${FRAME.root} outline-none ${fullscreen ? 'flex h-full max-w-none flex-col justify-center bg-[#0b0820] p-3' : ''}`}
+      className={`${FRAME.root} outline-none ${fullscreen ? 'flex h-full max-w-none flex-col justify-center overflow-y-auto bg-[#0b0820] p-3' : ''}`}
     >
       <p id="st-keys" className="sr-only">
         Keyboard: Space or K to play and pause, R to replay the line, N or right arrow to skip the scene, C for captions{canFullscreen ? ', F for full screen' : ''}.
       </p>
-      <div className={`${FRAME.stage} ${fullscreen ? 'mx-auto max-w-[calc((100svh_-_14rem)*16/9)]' : ''}`}>
+      <div className={`${FRAME.stage} ${fullscreen ? 'mx-auto max-w-[calc((100svh_-_10rem)*16/9)]' : ''}`}>
         <svg
           ref={svgRef}
           viewBox="0 0 1600 900"
@@ -591,6 +603,14 @@ export default function StoryPlayerClient({ episode, next }: Props) {
           <Lights level={stage.lighting} />
           {stage.prop && <PropCard key={stage.prop.key} id={stage.prop.id} label={stage.prop.label} at={stage.prop.at} />}
         </svg>
+
+        {/* Phones held sideways: the panel is below the fold, so captions sit on the stage. */}
+        {captionsOn && caption && (status === 'playing' || status === 'paused') && (
+          <p aria-hidden="true" className="pointer-events-none absolute inset-x-2 bottom-2 hidden rounded-xl bg-black/70 px-3 py-1.5 text-center text-sm leading-snug text-white [@media(orientation:landscape)_and_(max-height:520px)]:block">
+            {caption.who !== 'narrator' && <span className={`mr-1 font-black ${CAST[caption.who].captionClass}`}>{CAST[caption.who].name}:</span>}
+            <span className={caption.who === 'narrator' ? 'italic' : ''}>{caption.text}</span>
+          </p>
+        )}
 
         {curtain && (
           <div className="st-curtain pointer-events-none absolute inset-0 flex items-center justify-center bg-[#0b0820] [container-type:inline-size]">
@@ -675,7 +695,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
       </nav>
 
       {/* Caption / choice / quiz panel */}
-      <div className={FRAME.panel}>
+      <div ref={panelRef} className={FRAME.panel}>
         {status === 'choice' && activeChoice ? (
           <ChoicePanel prompt={activeChoice.prompt} asker={activeChoice.who} options={activeChoice.options} tried={tried} onPick={pick} />
         ) : status === 'quiz' ? (

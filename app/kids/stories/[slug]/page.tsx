@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!ep) return {}
   const band = getBand(ep.band)
   const url = `${BASE}/kids/stories/${ep.slug}`
-  const title = `${ep.title} — Animated Robotics Story for Kids (${ep.concept})`
-  const description = `${ep.logline} A ${episodeMinutes(ep)}-minute animated episode for ages ${band?.ages ?? '5–17'} that teaches ${ep.concept.toLowerCase()}, with choices and a quiz.`
+  const title = `${ep.title}: a Robotics Cartoon for Kids`
+  const description = `${ep.logline} Animated story, ages ${band?.ages ?? '5–17'}.`
   return {
     title,
     description,
