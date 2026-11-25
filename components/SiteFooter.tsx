@@ -27,6 +27,7 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
       { label: 'Academy', href: '/academy' },
       { label: 'Find my level', href: '/diagnostic' },
       { label: 'Daily Challenge', href: '/challenge' },
+      { label: 'R2BOT Kids (ages 5–17)', href: '/kids' },
     ],
   },
   {
@@ -58,6 +59,7 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
       { label: 'The Lab', href: '/lab' },
       { label: 'Project showcase', href: '/showcase' },
       { label: 'For teachers', href: '/teachers' },
+      { label: 'Kids robotics for schools', href: '/kids/schools' },
       { label: 'Sources we cite', href: '/sources' },
     ],
   },

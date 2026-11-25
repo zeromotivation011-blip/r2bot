@@ -2,6 +2,10 @@
 // Local-first progress store for Robot World. Optionally syncable to Supabase later.
 
 import { KIDS_ZONES, ZONE_UNLOCK_STARS, partForZone } from './kids-world-data'
+import type { BandId } from './kids/bands'
+
+/** Fired on window after every save, so the classroom sync can push a snapshot. */
+export const KIDS_PROGRESS_EVENT = 'r2bot:kids-progress'
 
 export interface KidsProgress {
   age: number | null
@@ -19,6 +23,14 @@ export interface KidsProgress {
   currentLevel: string
   starsByLevel: Record<string, number>   // "zoneId/levelId" -> stars
   attemptsByLevel: Record<string, number>
+  // ── Added Nov 2026 (R2BOT Kids platform) ──
+  band: BandId | null
+  /** Story Theatre: episode slug -> best stars (1–3). */
+  episodesDone: Record<string, number>
+  /** Code Lab: mission id -> best stars (1–3). */
+  codeMissions: Record<string, number>
+  /** Workshop: number of times the child saved a robot design. */
+  robotsBuilt: number
 }
 
 const KEY = 'r2bot_kids_v2'
@@ -39,6 +51,10 @@ const DEFAULT_PROGRESS: KidsProgress = {
   currentLevel: 'what-is-spark',
   starsByLevel: {},
   attemptsByLevel: {},
+  band: null,
+  episodesDone: {},
+  codeMissions: {},
+  robotsBuilt: 0,
 }
 
 function isBrowser() {
@@ -62,8 +78,35 @@ export function saveProgress(patch: Partial<KidsProgress>): KidsProgress {
   const next: KidsProgress = { ...cur, ...patch, lastPlayed: new Date().toISOString() }
   if (isBrowser()) {
     try { window.localStorage.setItem(KEY, JSON.stringify(next)) } catch {}
+    try { window.dispatchEvent(new CustomEvent(KIDS_PROGRESS_EVENT)) } catch {}
   }
   return next
+}
+
+/** Record a finished Story Theatre episode. Only a better score adds stars. */
+export function completeEpisode(slug: string, stars: number): { progress: KidsProgress; starsAdded: number } {
+  const cur = getProgress()
+  const prev = cur.episodesDone[slug] || 0
+  const best = Math.max(prev, Math.min(3, Math.max(1, Math.floor(stars))))
+  const starsAdded = best - prev
+  const progress = saveProgress({
+    episodesDone: { ...cur.episodesDone, [slug]: best },
+    totalStars: cur.totalStars + starsAdded,
+  })
+  return { progress, starsAdded }
+}
+
+/** Record a solved Code Lab mission. Only a better score adds stars. */
+export function completeCodeMission(id: string, stars: number): { progress: KidsProgress; starsAdded: number } {
+  const cur = getProgress()
+  const prev = cur.codeMissions[id] || 0
+  const best = Math.max(prev, Math.min(3, Math.max(1, Math.floor(stars))))
+  const starsAdded = best - prev
+  const progress = saveProgress({
+    codeMissions: { ...cur.codeMissions, [id]: best },
+    totalStars: cur.totalStars + starsAdded,
+  })
+  return { progress, starsAdded }
 }
 
 export function addStars(n: number): KidsProgress {

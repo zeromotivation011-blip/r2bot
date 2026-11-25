@@ -153,9 +153,25 @@ Build these exceptionally; everything else is secondary.
 - **Find My Level** — visual placement test routing to a track.
 - **Community Gallery / Career Paths / Dashboard + Certificates** — social proof, roadmaps, progress.
 
+- **R2BOT Kids** (`/kids`, 25 Nov 2026) — the kids product, ages 5–17, B2B2C (homes and schools).
+  Four age bands by school grade in `lib/kids/bands.ts` (Explorers 5–7, Builders 8–10, Inventors 11–13,
+  Engineers 14–17); every kids content item is tagged with one. Surfaces: hub `/kids` (server-rendered),
+  **Story Theatre** `/kids/stories/<slug>` (in-browser animated, voiced episodes with choices + quiz —
+  not MP4s), **Workshop** `/kids/workshop` (3D robot builder, camera "magic window" AR on every phone,
+  WebXR AR/VR where supported), **Code Lab** `/kids/code-lab/<mission>` (block coding that drives the
+  child's own robot; blocks need the matching part — capabilities come from `lib/kids/robot-design.ts`),
+  Robot World `/kids/world` (the original six zones), **Classroom** `/kids/classroom` (teacher, noindex),
+  `/kids/join` (child joins with code + nickname, noindex) and `/kids/schools` (indexable pitch + pilot form
+  through `captureLead()`). One robot shape (`RobotDesign`) and one progress store (`lib/kids-progress.ts`,
+  fires `KIDS_PROGRESS_EVENT`) for all of it. **Children never give an email, password, phone or birthday**;
+  classroom identity is a random token whose SHA-256 is stored server-side. R2BOT Kids installs as its own
+  PWA (`/kids/manifest.webmanifest`, `public/kids-sw.js`, scope `/kids`). The camera is allowed site-wide
+  (`camera=(self)`) only for Workshop AR; frames never leave the device.
+
 **Parked (code kept, hidden from nav + noindex until scale):** jobs, leaderboard, schools,
 hardware index, history, standalone world-map (308s to Atlas), pulse (308s to /news),
-lab, community gallery. `/kids` and `/kids/parents|activities` are indexable and parent-facing.
+lab, community gallery. `/kids/*` is NOT parked any more (see R2BOT Kids above); the old `/schools`
+portal stays parked — school work for kids lives under `/kids/schools` and `/kids/classroom`.
 Nothing parked may be promoted from the homepage — it was advertising `/schools` behind a
 "bring R2BOT to my school" CTA while robots.txt blocked the page.
 
@@ -164,7 +180,7 @@ Nothing parked may be promoted from the homepage — it was advertising `/school
 ## 7. NAVIGATION (max 5 top-level)
 
 `Learn ▾  Reference ▾  Build ▾  Latest ▾  About ▾  [lang] [Sign In] [Start Free →] [Ask R2]`
-- **Learn:** Quick Lessons · Free course path · Academy (4 tracks) · Find My Level · Daily Challenge
+- **Learn:** Quick Lessons · Free course path · Academy (4 tracks) · Find My Level · Daily Challenge · R2BOT Kids
 - **Reference:** Atlas · AI + Robotics · Robots · Robotics in Daily Life · R2 Co-pilot
 - **Build:** Robot Projects · Simulators · ROS 2 Playground · Workspace IDE
 - **Latest:** News · Lens · Blog
@@ -329,7 +345,7 @@ from a beginner's first question to advanced detail. Bar: better than the top re
 
 ## 13. WHAT NOT TO DO
 
-- Don't add nav items or revive parked features (kids/jobs/leaderboard/schools/hardware/standalone-map) without approval.
+- Don't add nav items or revive parked features (jobs/leaderboard/schools/hardware/standalone-map) without approval.
 - Don't use "free forever" language. Don't leave TypeScript errors. Don't install packages without flagging.
 - Don't hardcode API keys. Don't ship spinner-first pages. Don't build B2B UI before it's prioritized.
 - Don't reintroduce India-exclusive framing as the platform's identity — India is a key region, the product is global.

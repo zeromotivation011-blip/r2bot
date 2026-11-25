@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getProgress, resetProgress, type KidsProgress } from '@/lib/kids-progress'
+import { getBand } from '@/lib/kids/bands'
 import { KIDS_ZONES } from '@/lib/kids-world-data'
 
 const OFFLINE_ACTIVITIES = [
@@ -64,7 +65,7 @@ export default function ParentsClient() {
   return (
     <div className="parents">
       <header className="head">
-        <Link href="/kids" className="back">← Robot World</Link>
+        <Link href="/kids" className="back">← R2BOT Kids</Link>
         <h1>👪 For Parents</h1>
         <Link href="/kids/activities" className="back">Screen-free activities →</Link>
         <button onClick={() => window.print()} className="print">🖨 Print this page</button>
@@ -73,13 +74,16 @@ export default function ParentsClient() {
       {/* Section 1 — what they learned today */}
       <section className="card">
         <h2>What your child learned today</h2>
-        {!progress?.age ? (
-          <p className="muted">No data yet. Have your child pick their age in Robot World to start the journey.</p>
+        {!progress || (!progress.age && !progress.band && progress.totalStars === 0) ? (
+          <p className="muted">No data yet on this device. Have your child choose their age group on the R2BOT Kids home page to start.</p>
         ) : (
           <>
             <div className="stat-grid">
-              <Stat label="Age set" value={`${progress.age} yrs`} />
-              <Stat label="Stars earned" value={`⭐ ${progress.totalStars} / 50`} />
+              <Stat label="Age group" value={getBand(progress.band)?.name ?? (progress.age ? `${progress.age} yrs` : '—')} />
+              <Stat label="Stars earned" value={`⭐ ${progress.totalStars}`} />
+              <Stat label="Story episodes" value={`${Object.keys(progress.episodesDone).length}`} />
+              <Stat label="Code Lab missions" value={`${Object.keys(progress.codeMissions).length}`} />
+              <Stat label="Robots built" value={`${progress.robotsBuilt}`} />
               <Stat label="Levels completed" value={`${progress.completedLevels.length}`} />
               <Stat label="Zones completed" value={`${progress.completedZones.length} / 6`} />
               <Stat label="Robot parts earned" value={`${progress.earnedParts.length} / 6`} />
@@ -101,7 +105,8 @@ export default function ParentsClient() {
           <li><strong>Story-first learning</strong> — every concept arrives wrapped in a tiny story. Stories activate memory networks faster than abstract definitions.</li>
           <li><strong>No "wrong" answers</strong> — mistakes get warm, funny "try-again" messages. Shame inhibits learning; gentle correction accelerates it.</li>
           <li><strong>Bite-sized lessons</strong> — 4–8 minutes each. Designed to fit healthy screen-time windows recommended by the AAP.</li>
-          <li><strong>India-first analogies</strong> — pressure cookers, ATMs, washing machines, UPI. Concepts stick when they connect to lived experience.</li>
+          <li><strong>Everyday analogies</strong> — robot vacuums, parking sensors, washing machines, lifts. Concepts stick when they connect to things a child has already seen.</li>
+          <li><strong>Build, then test</strong> — in the Workshop and Code Lab a child chooses parts and finds out what goes wrong without them. A robot with no distance sensor really does drive into the wall.</li>
         </ul>
         <p className="muted">
           Your child is building: <strong>computational thinking</strong> (decomposing problems), <strong>logical sequencing</strong>
@@ -128,7 +133,7 @@ export default function ParentsClient() {
       {/* Section 4 — for teachers */}
       <section className="card">
         <h2>For teachers</h2>
-        <p>Use Robot World as a homework or in-class assignment. Every zone maps to CBSE / ICSE topics:</p>
+        <p>Run a whole class with a join code, a progress dashboard and a six-week plan per age group — see <Link href="/kids/schools" className="inline">R2BOT Kids for schools</Link>. For schools in India, Robot World zones map to these topics:</p>
         <div className="align-table">
           <div className="th"><span>Zone</span><span>Grade</span><span>Topic</span></div>
           {CBSE_ALIGNMENT.map(r => (
@@ -150,8 +155,9 @@ export default function ParentsClient() {
         <ul className="bul">
           <li>Each lesson is 4–8 minutes — designed for healthy screen-time windows.</li>
           <li>Every zone encourages offline application through paired activities.</li>
-          <li>No social features. No ads. No tracking pixels. No data collection beyond what stays on this device.</li>
-          <li>Progress saves in your browser only — clearing browser data resets it.</li>
+          <li>No social features, no chat, no ads. Children are never asked for an email, phone number or birthday.</li>
+          <li>Progress saves on this device. If your child joins a teacher’s class, only their nickname and progress are shared with that teacher — and they can leave the class at any time.</li>
+          <li>The camera is only used if your child taps “See it in my room”; the picture stays on the device and is never uploaded.</li>
         </ul>
       </section>
 
@@ -172,6 +178,7 @@ export default function ParentsClient() {
           padding: 20px;
           margin-bottom: 16px;
         }
+        .inline { color: #fde047; text-decoration: underline; }
         .card h2 { font-size: 20px; font-weight: 900; color: #fde047; margin-bottom: 8px; }
         .card p { color: #FFC9A8; font-weight: 700; font-size: 15px; line-height: 1.5; }
         .muted { color: #c4b5fd !important; font-weight: 600 !important; font-size: 14px !important; margin-top: 6px; }
@@ -203,7 +210,8 @@ export default function ParentsClient() {
           .head .back, .head .print, .reset { display: none !important; }
           body { background: white !important; }
           .card { background: white !important; border-color: #ccc !important; color: black !important; }
-          .card h2 { color: #B8420A !important; }
+          .inline { color: #fde047; text-decoration: underline; }
+        .card h2 { color: #B8420A !important; }
           .card p, .bul li, .offline, .o-body { color: #1a1040 !important; }
         }
       `}</style>

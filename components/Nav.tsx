@@ -38,7 +38,7 @@ type Group = { label: string; items: Item[]; matches: string[] };
 const GROUPS: Group[] = [
   {
     label: 'Learn',
-    matches: ['/shorts', '/courses', '/academy', '/diagnostic', '/challenge', '/start'],
+    matches: ['/shorts', '/courses', '/academy', '/diagnostic', '/challenge', '/start', '/kids'],
     items: [
       { kind: 'link', icon: '⚡', label: 'Quick Lessons', sub: 'One minute each · video, demo, quiz', href: '/shorts', highlight: true },
       { kind: 'link', icon: '🎬', label: 'Free course path', sub: 'Short videos · quizzes · certificates', href: '/courses' },
@@ -54,6 +54,7 @@ const GROUPS: Group[] = [
       },
       { kind: 'link', icon: '🎯', label: 'Find My Level', sub: 'Two-minute placement test', href: '/diagnostic' },
       { kind: 'link', icon: '🔥', label: 'Daily Challenge', sub: 'One puzzle a day · streak', href: '/challenge' },
+      { kind: 'link', icon: '🧒', label: 'R2BOT Kids', sub: 'Ages 5–17 · build, code, stories · schools', href: '/kids' },
     ],
   },
   {
