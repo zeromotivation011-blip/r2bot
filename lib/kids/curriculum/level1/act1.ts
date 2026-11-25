@@ -9,6 +9,7 @@ import {
   BEEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, LEFT, MOVE_SET, RIGHT, WAIT,
   arena, episode, lessonTiming, obj, projectTiming, say, teacher,
 } from './shared'
+import { L1_PROJECTS } from './projects'
 
 export const ACT1: Session[] = [
   // ── 1 ────────────────────────────────────────────────────────────────────
@@ -1007,22 +1008,7 @@ export const ACT1: Session[] = [
         'Two turns left and two turns left again bring the robot back to facing up.',
       ],
     },
-    project: {
-      id: 'l1-p1', session: 6,
-      title: 'My Robot, My Dance',
-      brief: 'Give your robot a name, colours and a face. Then make up a dance that cheers up the whole town.',
-      designSteps: [
-        'Imagine: what kind of robot is yours — silly, calm, fast?',
-        'Plan: draw the dance as arrows and sound notes on the planning sheet.',
-        'Build: one block for each arrow.',
-        'Test: press Go and watch — is it what you drew?',
-        'Improve: change one thing that did not work.',
-        'Share: show the dance and say what you changed.',
-      ],
-      constraints: ['At least 5 steps.', 'Stay on the 3×3 dance floor.', 'Use at least one turn and one sound.'],
-      selfCheck: ['I drew my plan first.', 'My program has at least 5 steps.', 'I changed something after testing.', 'I can tell someone what my robot does.'],
-      share: 'Shown to the class (or family at home). Saved in the child’s own gallery; never public.',
-    },
+    project: L1_PROJECTS[0],
     quiz: [
       {
         prompt: 'What do engineers do first?',

@@ -10,6 +10,7 @@ import {
   REPEAT, RIGHT, SCOOP_UP, TIP_OUT, WAIT,
   arena, episode, lessonTiming, obj, projectTiming, say, teacher,
 } from './shared'
+import { L1_PROJECTS } from './projects'
 
 const DOCK_PHYSICS = `${FLAT_MAT_PHYSICS} Glass float: 0.1 kg. The scoop reaches an object on the tile directly in front of the robot.`
 
@@ -969,22 +970,7 @@ export const ACT3: Session[] = [
         'Test one part at a time. Fix, then add the next part.',
       ],
     },
-    project: {
-      id: 'l1-p3', session: 18,
-      title: 'A Helper for My Home',
-      brief: 'Think of someone at home who could use a little help. Choose a job, choose the right tool, and program your robot to help — kindly and safely.',
-      designSteps: [
-        'Ask: who needs help, and with what?',
-        'Imagine: which tool fits the job — pen, scoop or headlight?',
-        'Plan: draw the path on the house plan.',
-        'Build: one part at a time.',
-        'Test and improve.',
-        'Share: say who your helper helps and why you chose that tool.',
-      ],
-      constraints: ['One tool only (choose it!).', 'At least one kind word (a Say block).', 'No bumping furniture.'],
-      selfCheck: ['I chose a job that helps someone.', 'I picked the tool that fits the job.', 'My robot is polite and safe.', 'I tested and fixed my program.'],
-      share: 'Shown in class. Families see it in the child’s gallery. Never public.',
-    },
+    project: L1_PROJECTS[2],
     quiz: [
       {
         prompt: 'What do engineers ask first?',

@@ -215,7 +215,7 @@ export class SimRenderer {
 
     this.beam = new THREE.Mesh(
       new THREE.ConeGeometry(1, 1, 24, 1, true),
-      new THREE.MeshBasicMaterial({ color: '#34D399', transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({ color: '#34D399', transparent: true, opacity: 0.1, depthWrite: false, side: THREE.DoubleSide }),
     )
     this.beam.visible = false
     this.beamDot = new THREE.Mesh(new THREE.SphereGeometry(0.012, 12, 8), new THREE.MeshBasicMaterial({ color: '#34D399' }))
@@ -503,7 +503,7 @@ export class SimRenderer {
       wantPos = new THREE.Vector3(this.arena.center[0], Math.max(w, d) * 1.25, this.arena.center[1] - 0.35)
     } else {
       // Chase cam: behind and above, looking a little ahead of the robot.
-      wantPos = p.clone().addScaledVector(fwd, -0.75).add(new THREE.Vector3(0, 0.55, 0))
+      wantPos = p.clone().addScaledVector(fwd, -1.05).add(new THREE.Vector3(0, 0.75, 0))
       wantTarget = p.clone().addScaledVector(fwd, 0.35)
     }
     if (this.firstFrame) {

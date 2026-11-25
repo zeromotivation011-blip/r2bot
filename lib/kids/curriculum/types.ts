@@ -139,9 +139,10 @@ export type PartRef =
 export interface RobotSpec {
   /** Body is the child's choice unless set. */
   body: BodyId | 'child-choice'
-  drive: DriveId | 'child-choice'
-  head: HeadId
-  tool: ToolId
+  /** 'none' only for the empty kit at the very start of Level 1. */
+  drive: DriveId | 'child-choice' | 'none'
+  head: HeadId | 'none'
+  tool: ToolId | 'child-choice'
   sensor: SensorId
   /** Parts the child owns but is not wearing right now (tools are swapped for the job). */
   toolbox: PartRef[]

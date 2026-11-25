@@ -8,6 +8,7 @@ import {
   BEEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, LEFT, MOVE_SET, PEN_DOWN, PEN_UP, REPEAT, RIGHT,
   arena, episode, lessonTiming, obj, projectTiming, say, teacher,
 } from './shared'
+import { L1_PROJECTS } from './projects'
 
 const PAPER_PHYSICS = `${FLAT_MAT_PHYSICS} The pen draws a 1 cm line under the robot’s centre while it is down.`
 
@@ -963,22 +964,7 @@ export const ACT2: Session[] = [
         'End with Pen up and a "Ta-da!"',
       ],
     },
-    project: {
-      id: 'l1-p2', session: 12,
-      title: 'The Festival Banner',
-      brief: 'Draw a picture for the festival banner that shows something you love. Your drawing must use Repeat at least once.',
-      designSteps: [
-        'Imagine: what do you love about your town or home?',
-        'Plan: draw it on the grid sheet; circle the part that repeats.',
-        'Build: the repeating part first, inside Repeat.',
-        'Test: does the drawing match your plan?',
-        'Improve: fix one thing.',
-        'Share: show it and say which part repeats.',
-      ],
-      constraints: ['At least one Repeat.', 'Stay on the banner (7 × 5 squares).', 'Lift the pen at the end.'],
-      selfCheck: ['My picture has a part that repeats.', 'I used Repeat for it.', 'I tested and fixed something.', 'I can explain my picture.'],
-      share: 'Shown in class; the drawing is saved as a picture the family can download. Never public.',
-    },
+    project: L1_PROJECTS[1],
     quiz: [
       {
         prompt: 'What does Repeat 4 around "draw a square, turn" make?',

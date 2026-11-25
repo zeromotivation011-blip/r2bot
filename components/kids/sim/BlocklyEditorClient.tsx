@@ -28,6 +28,11 @@ interface Props {
   onChange?: () => void
 }
 
+/** Put the "when Run is pressed" block near the top-left, where a program starts reading. */
+function scrollToStart(w: Blockly.WorkspaceSvg): void {
+  w.scroll(8, 8)
+}
+
 const BlocklyEditorClient = forwardRef<BlocklyEditorHandle, Props>(function BlocklyEditorClient({ toolbox, caps, initial, resetKey, onChange }, ref) {
   const host = useRef<HTMLDivElement>(null)
   const ws = useRef<Blockly.WorkspaceSvg | null>(null)
@@ -46,6 +51,7 @@ const BlocklyEditorClient = forwardRef<BlocklyEditorHandle, Props>(function Bloc
       toolbox: tb,
       theme: kidsTheme(),
       renderer: 'zelos',
+      media: '/kids/lab/blockly-media/',
       sounds: false,
       trashcan: false,
       zoom: { controls: false, wheel: true, pinch: true, startScale: 0.8, maxScale: 1.6, minScale: 0.4 },
@@ -92,7 +98,7 @@ const BlocklyEditorClient = forwardRef<BlocklyEditorHandle, Props>(function Bloc
     } finally {
       Blockly.Events.enable()
     }
-    w.scrollCenter()
+    scrollToStart(w)
     onChangeRef.current?.()
   }, [resetKey])
 
@@ -109,7 +115,7 @@ const BlocklyEditorClient = forwardRef<BlocklyEditorHandle, Props>(function Bloc
         if (!w) return
         w.clear()
         Blockly.serialization.workspaces.load(programToBlockly(p), w)
-        w.scrollCenter()
+        scrollToStart(w)
       },
       highlight(id) {
         ws.current?.highlightBlock(id)

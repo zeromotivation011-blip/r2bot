@@ -89,7 +89,7 @@ export default function SimLabClient() {
         ))}
       </nav>
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="mt-3 grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-lg font-black text-white">🎯 {demo.task}</p>
           <p className="mt-1 text-sm text-purple-100">
