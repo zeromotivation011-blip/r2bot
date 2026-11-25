@@ -8,6 +8,7 @@ import { ConfettiProvider, useConfettiEventBridge } from '@/components/kids/Conf
 import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
 import { InstallAppClient } from '@/components/kids/InstallAppClient'
 import { KidsClassSync } from '@/components/kids/classroom/KidsClassSyncClient'
+import { RewardToast } from '@/components/kids/ui/RewardToastClient'
 import { useKidsVoice } from '@/lib/kids-voice'
 import './kids-animations.css'
 
@@ -123,6 +124,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
 
       {/* Pushes a progress snapshot to the teacher, only if this child joined a class. */}
       <KidsClassSync />
+      <RewardToast />
 
       {/* App-style tab bar on phones */}
       {!bare && (

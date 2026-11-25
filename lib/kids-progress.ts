@@ -31,6 +31,25 @@ export interface KidsProgress {
   codeMissions: Record<string, number>
   /** Workshop: number of times the child saved a robot design. */
   robotsBuilt: number
+  // ── Added Nov 2026 (R2BOT Universe: rewards — see lib/kids/universe/rewards.ts) ──
+  /** Experience points. Level is derived from xp, never stored. */
+  xp: number
+  /** Badge id -> ISO date earned. */
+  badges: Record<string, string>
+  /** Cosmetic and part unlock ids the child owns (paints, decals, trails, skins). */
+  unlocks: string[]
+  /** Game/challenge id -> best result (higher is better unless the game says otherwise). */
+  personalBests: Record<string, number>
+  /** Curriculum session id -> stars (1–3) when finished. */
+  sessionsDone: Record<string, number>
+  /** Quest id -> progress count, for the current quest window. */
+  questProgress: Record<string, number>
+  /** ISO dates (YYYY-MM-DD) the child played; trimmed to the last 60. */
+  playDays: string[]
+  /** Avatar: chosen character id + colour. */
+  avatar: { id: string; color: string }
+  /** Explorer name shown in the Universe (nickname only — never a real full name). */
+  explorerName: string
 }
 
 const KEY = 'r2bot_kids_v2'
@@ -55,6 +74,15 @@ const DEFAULT_PROGRESS: KidsProgress = {
   episodesDone: {},
   codeMissions: {},
   robotsBuilt: 0,
+  xp: 0,
+  badges: {},
+  unlocks: [],
+  personalBests: {},
+  sessionsDone: {},
+  questProgress: {},
+  playDays: [],
+  avatar: { id: 'astro', color: '#F59E0B' },
+  explorerName: '',
 }
 
 function isBrowser() {
