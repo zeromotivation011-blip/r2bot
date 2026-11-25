@@ -100,6 +100,11 @@ export const BLOG_TO_ATLAS: Record<string, string> = {
  * Nav2 queries (cost scale, inflation, global vs local); costmap-layers goes
  * layer by layer and links back from its first paragraph.
  *
+ * 25 Nov 2026 (Search Console, task 51): "fsm robotics" ranked
+ * /atlas/concept/finite-state-machine at pos 3.3 with 0 clicks; it owns the FSM
+ * queries and links to behavior-trees for the comparison. motor-driver owns
+ * "motor driver"; h-bridge keeps the circuit-level explanation.
+ *
  * Query → owning path.
  */
 export const ATLAS_QUERY_OWNER: Record<string, string> = {
@@ -125,6 +130,12 @@ export const ATLAS_QUERY_OWNER: Record<string, string> = {
   'force control': '/atlas/concept/force-control',
   'force control robotics': '/atlas/concept/force-control',
   'hybrid position force control': '/atlas/concept/force-control',
+  'finite state machine': '/atlas/concept/finite-state-machine',
+  'fsm robotics': '/atlas/concept/finite-state-machine',
+  'state machine robotics': '/atlas/concept/finite-state-machine',
+  'motor driver': '/atlas/concept/motor-driver',
+  'what is a motor driver': '/atlas/concept/motor-driver',
+  'motor driver for robots': '/atlas/concept/motor-driver',
   costmap: '/atlas/concept/costmap',
   'what is a costmap': '/atlas/concept/costmap',
   'costmap ros2': '/atlas/concept/costmap',

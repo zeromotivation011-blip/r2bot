@@ -1,90 +1,231 @@
 ---
-title: Motor Driver in Robotics
+title: Motor Driver
+slug: motor-driver
 summary: >-
-  A motor driver is an electronic circuit that lets a low-power microcontroller
-  control a high-power motor. The bridge between brain (Arduino) and muscle
-  (motor).
+  A motor driver is the circuit that lets a microcontroller run a motor: it turns weak logic
+  signals into the large, switched current the motor needs. How it works, the main types,
+  common chips compared, and how to choose one.
 category: hardware
-lastReviewed: 2026-05-21T00:00:00.000Z
-sources:
-  - title: 'Motor controller'
-    url: 'https://en.wikipedia.org/wiki/Motor_controller'
+bucket: power-electronics
+difficulty: 3
+difficultyLabel: Classroom
+lastReviewed: 2026-11-25T00:00:00.000Z
 tags:
-  - motor
-  - driver
-  - h-bridge
-  - pwm
-seeAlso:
+  - motor-driver
   - h-bridge
   - pwm
   - dc-motor
-  - brushless-motor
+  - stepper-motor
+  - electronics
+seeAlso:
+  - h-bridge
   - pwm-signal
-difficulty: 3
+  - dc-motor
+  - stepper-motor
+  - electronic-speed-controller
+  - servo-motor
+  - brushless-motor
+  - field-oriented-control
+  - arduino-control
+  - esp32-robotics
+relatedTerms:
+  - h-bridge
+  - pwm-signal
+  - dc-motor
+  - stepper-motor
+  - electronic-speed-controller
+sources:
+  - title: 'Microchip, ATmega48A/PA/88A/PA/168A/PA/328/P datasheet (DS40002061A), §29.1 Absolute Maximum Ratings'
+    url: 'https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf'
+  - title: 'STMicroelectronics, L298 Dual Full-Bridge Driver datasheet'
+    url: 'https://www.st.com/resource/en/datasheet/l298.pdf'
+  - title: 'Toshiba, TB6612FNG Driver IC for Dual DC Motor datasheet'
+    url: 'https://toshiba.semicon-storage.com/info/docget.jsp?did=10660'
+  - title: 'Texas Instruments, DRV8833 Dual H-Bridge Motor Driver datasheet (SLVSAR1E)'
+    url: 'https://www.ti.com/lit/ds/symlink/drv8833.pdf'
+  - title: 'Texas Instruments, DRV8871 3.6-A Brushed DC Motor Driver datasheet (SLVSCY9B)'
+    url: 'https://www.ti.com/lit/ds/symlink/drv8871.pdf'
+  - title: 'Allegro MicroSystems, A4988 DMOS Microstepping Driver with Translator datasheet'
+    url: 'https://www.allegromicro.com/-/media/files/datasheets/a4988-datasheet.pdf'
+youtubeSearchQuery: motor driver explained H-bridge PWM Arduino
 laymanExplanation: >-
-  A motor driver (sometimes called motor controller) is an electronic circuit
-  that takes low-power control signals from a microcontroller (e.g., 5 V PWM
-  from Arduino) and switches a much higher-power supply to drive a motor.
-realRobotsThatUseThis:
-  - Every motor-controlled robot
-  - CNC machines
-  - Printers
-indianExample: >-
-  L293D, L298N, TB6612 — all motor-driver ICs widely sold in Indian electronics
-  electronics shops at low prices.
-relatedTerms: []
-prerequisiteTerms: []
-unlocksTerms: []
+  A microcontroller can think but it cannot lift anything: each of its pins can only supply a tiny
+  current. A motor driver is the muscle in between. The microcontroller tells it "this direction,
+  this fast" with small signals, and the driver opens and closes heavy-duty electronic switches that
+  let current flow from a battery through the motor. Change the signals and the motor speeds up,
+  slows down, reverses or brakes.
+technicalDefinition: >-
+  A motor driver is a power stage that converts logic-level control inputs (typically PWM plus
+  direction, or STEP/DIR for steppers) into switched current through a motor's windings. For a
+  brushed DC motor it is an H-bridge of four transistors with gate drive, dead time and protection
+  (thermal shutdown, overcurrent, undervoltage lockout); stepper drivers add per-winding current
+  regulation and microstepping, and brushless drivers (ESCs) switch three half-bridges in sequence
+  with the rotor position.
 quizQuestion:
-  q: Why is a motor driver needed between a microcontroller and a motor?
+  q: >-
+    Your robot's motors are rated 6 V and run from a 6 V battery pack. With an L298 driving them
+    at 1 A, roughly what voltage actually reaches each motor?
   options:
-    - To translate code
-    - To handle the higher voltage and current the motor needs
-    - For Wi-Fi
-    - For balance
+    - All 6 V, because the driver only switches the current
+    - About 2.8 V to 4.2 V, because the L298 drops 1.8 V to 3.2 V at 1 A
+    - About 12 V, because the driver boosts the voltage
+    - About 5.6 V, the same as a modern MOSFET driver
   answer: 1
   explanation: >-
-    Motors draw far more current than a microcontroller pin can supply. The
-    driver isolates and amplifies.
-mindBlowingFact: >-
-  Modern motor drivers can shut themselves down in 1 microsecond if they detect
-  over-current — faster than you can blink.
-industryApplications:
-  - robotics
-  - industrial
-  - automotive
-  - appliances
-  - 3D printers
-difficultyLabel: Classroom
-technicalDefinition: >-
-  A motor driver is an electronic circuit that lets a low-power microcontroller
-  control a high-power motor. The bridge between brain (Arduino) and muscle
-  (motor).
-slug: motor-driver
-bucket: concept
+    The L298 uses bipolar transistors, and ST's datasheet gives a total drop of 1.8 V (min) to
+    3.2 V (max) across the bridge at 1 A. From a 6 V supply that leaves about 2.8–4.2 V for the
+    motor. A MOSFET driver such as the DRV8833 (360 mΩ typical, high side plus low side) would drop
+    about 0.36 V at the same current.
 ---
 
-# Motor Driver in Robotics
+A **motor driver** is the circuit between a microcontroller and a motor: it takes the microcontroller's weak logic signals and uses them to switch a much larger current from a separate power supply through the motor. It exists because a microcontroller pin cannot power a motor. The ATmega328P, the chip on the Arduino Uno, has an absolute maximum rating of 40 mA per I/O pin and 200 mA through its VCC and GND pins combined ([Microchip datasheet, §29.1](https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf)), and that is a damage limit, not a working value. Even a small hobby gearmotor needs far more, especially at start-up, and it needs to run in both directions.
 
-## What is it?
+This page covers how a motor driver works, the main types, how common chips compare on their datasheet numbers, and how to choose one. For the switching circuit inside, see [H-bridge](/atlas/concept/h-bridge).
 
-A motor driver (sometimes called motor controller) is an electronic circuit that takes low-power control signals from a microcontroller (e.g., 5 V PWM from Arduino) and switches a much higher-power supply to drive a motor.
+![Block diagram: a microcontroller sends PWM and DIR logic signals to a motor driver containing an H-bridge and protection circuits. A separate motor power supply feeds the driver through a bulk capacitor, the driver's two outputs connect to the motor, and the microcontroller ground, driver ground and supply negative are joined by one shared ground line](/images/atlas/diagrams/motor-driver.svg)
+
+## Start here: a hand on a valve
+
+Think of a large water main feeding a water wheel. You could never push that much water yourself, but you can turn a valve, and the valve controls the flow. The microcontroller is your hand. The motor driver is the valve. The battery is the water main, and the motor is the wheel.
+
+A good driver does four things. It opens and closes very fast, which sets an average flow (speed). It sends the flow either way through the wheel (direction). It can lock the wheel or let it spin freely (braking or coasting). And it shuts itself off when something goes wrong (protection).
+
+The names overlap. "Motor driver" usually means the power stage alone; "motor controller" often means a driver with its own brain, for example one that reads an [encoder](/atlas/concept/encoder) and holds a speed.
 
 ## How it works
 
-Most DC-motor drivers use an H-bridge of four power transistors (MOSFETs or BJTs). Closing diagonal pairs of transistors lets current flow through the motor in either direction. The microcontroller sends a PWM signal that the driver translates into motor voltage, controlling both direction (which diagonal is active) and speed (PWM duty cycle).
+### The H-bridge, briefly
 
-## Real-world example
+Most drivers for brushed DC motors are built around an **H-bridge**: four switches arranged like the letter H, with the motor as the crossbar. Close the top-left and bottom-right switches and current flows through the motor one way; close the other diagonal pair and it flows the other way ([Wikipedia, H-bridge](https://en.wikipedia.org/wiki/H-bridge)). If both switches on one side are ever on together, they short the supply, a fault called shoot-through. Driver chips prevent it with a short built-in **dead time** between switching one off and the other on: 450 ns in the DRV8833, for example ([DRV8833 datasheet, §6.5](https://www.ti.com/lit/ds/symlink/drv8833.pdf)).
 
-L298N (the classic, cheap driver) is the standard for beginner Arduino projects. TB6612FNG is more efficient. For BLDC motors, dedicated ESCs (Electronic Speed Controllers) act as motor drivers. Every robot's motors are connected to a motor driver.
+### Speed: PWM
 
-## Why it matters for robotics
+A driver does not make a smaller voltage for a slower speed. It switches the full supply on and off thousands of times a second, and the fraction of time it is on, the **duty cycle**, sets the average voltage: at 50% duty on a 12 V supply the motor behaves roughly as if it had 6 V. This is [pulse-width modulation (PWM)](/atlas/concept/pwm-signal). Each driver lists the highest PWM frequency it accepts: 100 kHz for the TB6612FNG, 200 kHz for the DRV8871 ([TB6612FNG datasheet](https://toshiba.semicon-storage.com/info/docget.jsp?did=10660), [DRV8871 datasheet, §6.3](https://www.ti.com/lit/ds/symlink/drv8871.pdf)).
 
-Without motor drivers, microcontrollers literally cannot move motors. Choosing the right motor driver — matched to current, voltage, and motor type — is one of the most common entry-level mistakes.
+### Direction, braking and coasting
 
-## See also
+Two logic inputs per motor are enough to choose any state. This is the DRV8833's truth table, and most two-input drivers behave the same way ([DRV8833 datasheet, Table 1](https://www.ti.com/lit/ds/symlink/drv8833.pdf)):
 
-- [H Bridge](/atlas/concept/h-bridge)
-- [Pwm](/atlas/concept/pwm)
-- [Dc Motor](/atlas/concept/dc-motor)
-- [Brushless Motor](/atlas/concept/brushless-motor)
+| IN1 | IN2 | What the motor does |
+|---|---|---|
+| 0 | 0 | **Coast**: outputs off, motor spins down freely |
+| 1 | 0 | Forward |
+| 0 | 1 | Reverse |
+| 1 | 1 | **Brake**: both motor terminals tied low, motor stops quickly |
+
+Other chips use a separate PWM pin plus two direction pins. The TB6612FNG has IN1, IN2 and PWM for each channel, plus a standby pin ([TB6612FNG datasheet, H-SW control function](https://toshiba.semicon-storage.com/info/docget.jsp?did=10660)).
+
+Brake and coast matter during PWM too. A motor winding is an inductor, so when the driver switches off, the current has to keep flowing somewhere. In **fast decay** the bridge turns off and the current flows back through the transistors' built-in diodes, so it dies away quickly. In **slow decay** the driver shorts the winding, so the current circulates and fades slowly ([DRV8833 datasheet, §7.3.2](https://www.ti.com/lit/ds/symlink/drv8833.pdf)). On the DRV8833 you choose by which pin you pulse: PWM on one input with the other held low gives fast decay; holding one input high and pulsing the other gives slow decay.
+
+### Protection
+
+Modern driver chips protect themselves. The DRV8833 shuts down if its die reaches 150–180 °C, trips its overcurrent protection at 2 A or more (3.3 A typical), and locks out if the motor supply falls below about 2.6 V ([DRV8833 datasheet, §6.5](https://www.ti.com/lit/ds/symlink/drv8833.pdf)). The old L298 has overtemperature protection but no built-in diodes for the motor's current, so ST says external diodes are required when driving inductive loads ([L298 datasheet](https://www.st.com/resource/en/datasheet/l298.pdf)).
+
+## Types of motor driver
+
+Each kind of motor needs its own kind of driver.
+
+| Motor | Driver | What the driver does | Inputs from the microcontroller |
+|---|---|---|---|
+| [Brushed DC motor](/atlas/concept/dc-motor) | H-bridge driver | Switches one winding forward, reverse, brake or coast | PWM plus direction, or two PWM inputs |
+| [Stepper motor](/atlas/concept/stepper-motor) (bipolar) | Stepper driver: two H-bridges plus current regulation | Sets the current in each winding in sequence, including microsteps | STEP and DIR pulses |
+| [Brushless motor](/atlas/concept/brushless-motor) | [ESC](/atlas/concept/electronic-speed-controller) or BLDC controller | Switches three phases in step with the rotor, sensed by back EMF or Hall sensors ([Wikipedia, ESC](https://en.wikipedia.org/wiki/Electronic_speed_control)) | A speed command |
+| [Hobby servo](/atlas/concept/servo-motor) | Built into the servo | Compares the commanded position with a potentiometer on the output and drives its own motor ([Wikipedia, Servo (radio control)](https://en.wikipedia.org/wiki/Servo_(radio_control))) | One pulse every 20 ms, 1.0–2.0 ms wide |
+
+A dual H-bridge such as the DRV8833 can drive two brushed motors or one bipolar stepper, which is two windings ([DRV8833 datasheet, §1](https://www.ti.com/lit/ds/symlink/drv8833.pdf)). A dedicated stepper driver is simpler to use: on the A4988, one pulse on the STEP input moves the motor one microstep, and the chip handles the sequence and current ([A4988 datasheet](https://www.allegromicro.com/-/media/files/datasheets/a4988-datasheet.pdf)).
+
+## Common driver chips compared
+
+Numbers below are from each manufacturer's datasheet. "Current" means the continuous figure unless marked peak; always read the conditions, because ratings fall as the chip gets hotter.
+
+| Chip (maker) | Drives | Motor supply | Current per channel | Switch loss | Logic input | Built-in protection |
+|---|---|---|---|---|---|---|
+| **L298** (ST) | 2 DC motors or 1 stepper | Input-high voltage + 2.5 V, up to 46 V | 2 A DC (4 A total); 3 A non-repetitive peak | Bipolar: 1.8–3.2 V total drop at 1 A, up to 4.9 V at 2 A | High ≥ 2.3 V; needs a separate 4.5–7 V logic supply | Overtemperature; external diodes required |
+| **TB6612FNG** (Toshiba) | 2 DC motors | 2.5–13.5 V (15 V absolute max) | 1.0 A operating (1.2 A absolute max); 3.2 A peak for a 10 ms pulse | MOSFET: 0.5 Ω typical, upper + lower | Logic supply 2.7–5.5 V; high ≥ 0.7 × logic supply | Thermal shutdown, low-voltage detection |
+| **DRV8833** (TI) | 2 DC motors or 1 stepper | 2.7–10.8 V | 1.5 A RMS, 2 A peak (HTSSOP/WQFN packages, at 5 V, 25 °C; 0.5 A RMS in the plain TSSOP) | MOSFET: 360 mΩ typical, high + low side | High ≥ 2 V | Overcurrent, undervoltage lockout, thermal shutdown |
+| **DRV8871** (TI) | 1 DC motor | 6.5–45 V | 3.6 A peak | MOSFET: 565 mΩ typical, high + low side | High ≥ 1.5 V | Adjustable current limit, overcurrent, undervoltage lockout, thermal shutdown |
+| **A4988** (Allegro) | 1 bipolar stepper | 8–35 V | ±2 A absolute max | DMOS: 320 mΩ typical per switch at 1.5 A | Logic supply 3–5.5 V | Thermal shutdown, undervoltage lockout, crossover-current and short-circuit protection |
+
+Sources: [L298](https://www.st.com/resource/en/datasheet/l298.pdf) (absolute maximum ratings and electrical characteristics), [TB6612FNG](https://toshiba.semicon-storage.com/info/docget.jsp?did=10660) (features, absolute maximum ratings, operating range), [DRV8833](https://www.ti.com/lit/ds/symlink/drv8833.pdf) (§1, §6.3, §6.5), [DRV8871](https://www.ti.com/lit/ds/symlink/drv8871.pdf) (§1, §6.3, §6.5), [A4988](https://www.allegromicro.com/-/media/files/datasheets/a4988-datasheet.pdf) (absolute maximum ratings, electrical characteristics).
+
+What the table tells you:
+
+- **The L298 is an older design.** Its bipolar transistors drop up to 3.2 V at 1 A, which is up to 3.2 W of heat per bridge; the DRV8833 drops about 0.36 V. The L298's strengths are its 46 V range and a power package with a metal tab for a heatsink. ("L298N" is just the ordering code for one package.)
+- **The TB6612FNG and DRV8833 suit small battery robots**: two motors, low voltage, 3.3 V logic.
+- **The DRV8871 covers higher voltages** for one larger motor, and sets its own current limit with one resistor.
+- **The A4988 is a stepper specialist**: STEP/DIR inputs and five microstep modes, full step to 1/16.
+
+## How to choose a motor driver
+
+Choose the motor first, then the driver: the motor sets the voltage and current, and the driver has to survive them. To size the motor, start with R2BOT's [motor torque calculator](/tools/motor-torque-calculator).
+
+1. **Match the motor type**: brushed DC, stepper or brushless (table above).
+2. **Check the supply voltage** sits inside the driver's operating range, including a fully charged battery, which reads above its nominal voltage.
+3. **Find the stall current.** A motor draws the most when stalled or starting: roughly supply voltage ÷ winding resistance. It is usually in the motor's datasheet.
+4. **Compare with the driver's ratings.** Ideally the continuous rating covers the stall current; at minimum the peak rating should, with continuous well above the running current and current limiting as a backstop.
+5. **Check the logic level.** A 3.3 V board needs an input-high threshold below 3.3 V.
+6. **Check the PWM frequency** your code uses is within the driver's limit.
+7. **Prefer built-in protection**: thermal shutdown, overcurrent and undervoltage lockout.
+8. **Plan for heat.** A MOSFET driver loses about current² × on-resistance. Read the datasheet's thermal notes.
+
+### Worked example
+
+A small two-wheeled robot uses two brushed gearmotors. Say the motor's datasheet gives 6 V nominal, about 0.3 A while driving and 1.1 A at stall, and the brain is a 3.3 V [ESP32](/atlas/concept/esp32-robotics) running from a 6 V battery pack.
+
+- **DRV8871**: needs at least 6.5 V, so it is out on a 6 V supply.
+- **L298**: handles the current easily, but at 1 A it drops 1.8–3.2 V, leaving the motor 2.8–4.2 V. The robot would be sluggish, 6 V is barely above the chip's minimum motor supply (input-high voltage + 2.5 V, so 5.8 V with 3.3 V logic), and it also needs a 4.5–7 V logic supply.
+- **TB6612FNG**: voltage is fine, and so is 3.3 V logic if its logic supply is also 3.3 V. Its 1.0 A operating limit is just below the 1.1 A stall current; its 3.2 A single-pulse (10 ms) rating covers start-up, but a sustained stall is outside Toshiba's operating range, and Toshiba warns its thermal shutdown does not protect the chip in every case. Usable only if the wheels rarely stall.
+- **DRV8833**: 2.7–10.8 V covers the battery, the 1.5 A RMS rating (HTSSOP or WQFN package) covers the 1.1 A stall current with margin, and the 2 V input threshold accepts 3.3 V logic. **This is the best fit.** One chip drives both motors.
+
+TI states the DRV8833's 1.5 A at 5 V and 25 °C; its on-resistance rises below 5 V and as it heats ([§6.3](https://www.ti.com/lit/ds/symlink/drv8833.pdf)), so give it copper to cool on.
+
+## Common mistakes
+
+- **No shared ground.** The microcontroller ground, driver ground and motor supply negative must be joined. A logic "high" only means something relative to ground.
+- **Powering motors from the microcontroller.** The ATmega328P allows 200 mA through its supply pins in total ([§29.1](https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf)). Motors belong on their own supply.
+- **No capacitors.** TI recommends at least a 10 µF ceramic on the DRV8833's motor supply pin plus bulk capacitance, because supply wiring has inductance and cannot deliver sudden current ([DRV8833 datasheet, §5 and §9.1](https://www.ti.com/lit/ds/symlink/drv8833.pdf)). ST asks for 100 nF on each L298 supply pin ([L298 datasheet](https://www.st.com/resource/en/datasheet/l298.pdf)).
+- **No flyback path.** Driver chips such as the DRV8833 recirculate the motor's current through their transistors' built-in diodes; the bare L298 needs external fast diodes. If you use an L298 board, check it has them.
+- **An L298 on a low-voltage battery.** A 1.8–3.2 V drop is small against 24 V and large against 6 V.
+- **Ignoring heat.** A driver that works on the bench may hit thermal shutdown inside a closed robot: the motor stops, then restarts.
+- **Setting a stepper driver's current wrongly.** On the A4988 the current limit is set by a voltage on the REF pin: I<sub>TripMAX</sub> = V<sub>REF</sub> / (8 × R<sub>S</sub>), where R<sub>S</sub> is the sense resistor ([A4988 datasheet](https://www.allegromicro.com/-/media/files/datasheets/a4988-datasheet.pdf)). Set it to the motor's rated current before the first run.
+
+## Where you'll see it
+
+- **Every wheeled hobby robot.** A [differential-drive](/atlas/concept/differential-drive) robot needs a dual driver, one channel per wheel, controlled through [Arduino-style motor control code](/atlas/concept/arduino-control).
+- **3D printers and CNC machines.** Each stepper axis has its own stepper driver taking STEP and DIR pulses.
+- **Drones.** On most drones each propeller motor is brushless and has its own [ESC](/atlas/concept/electronic-speed-controller).
+- **Robot arms and legged robots.** Every joint motor has its own driver.
+- **Printers and appliances**, which TI lists among the DRV8871's applications ([DRV8871 datasheet, §2](https://www.ti.com/lit/ds/symlink/drv8871.pdf)).
+
+## Limits and going deeper
+
+- **Current sensing and control.** A motor's torque follows its current, so controlling current is controlling torque. The L298 has a sense pin for an external resistor; the DRV8871 regulates current without one, using a resistor on its ILIM pin ([DRV8871 datasheet](https://www.ti.com/lit/ds/symlink/drv8871.pdf)); stepper drivers regulate the current in every winding.
+- **Closed loop.** A plain driver is open loop: it sets voltage, not speed. Add an [encoder](/atlas/concept/encoder) and a control loop (often a PID) in the microcontroller to hold speed under changing load.
+- **Brushless and FOC.** High-performance brushless drives use [field-oriented control](/atlas/concept/field-oriented-control), which measures the phase currents and steers them in step with the rotor's angle for smooth, directly controlled torque. Many robot joint actuators use it.
+- **Gearing changes the current.** A higher [gear ratio](/atlas/concept/gear-ratio) means less motor torque, and so less current, for the same load at the wheel.
+
+## Why it matters
+
+The motor driver is where code meets physics. It decides whether your robot gets the full battery voltage or loses part of it as heat, whether a stalled wheel trips a safe shutdown or burns a chip, and whether a 3.3 V board can control the motor at all. Choosing one from the datasheet numbers, rather than from habit, takes a few minutes and avoids all three problems.
+
+## Common questions
+
+### Why can't I connect a motor straight to an Arduino?
+
+Because the pin cannot supply the current. The Arduino Uno's ATmega328P is rated at 40 mA absolute maximum per I/O pin, and a motor needs far more, especially when starting. When the motor switches off, its inductance pushes current on with nowhere safe to go. And one pin can only drive the motor one way, so it could never reverse it. A motor driver solves all three problems.
+
+### L298N vs TB6612FNG: which is better?
+
+For a small battery-powered robot, the TB6612FNG. It is a MOSFET driver with about 0.5 Ω total on-resistance, so at 1 A it loses about 0.5 V, against 1.8–3.2 V for the L298, and it accepts 3.3 V logic directly when its logic supply is 3.3 V (its input-high threshold is 0.7 × that supply). The L298 wins on voltage (up to 46 V against 13.5 V) and continuous current (2 A per channel against 1.0 A). For higher-voltage motors, a MOSFET driver such as the DRV8871 (6.5–45 V) avoids the L298's losses.
+
+### Do servo motors need a motor driver?
+
+Not a separate one. A hobby servo contains its own motor, gearbox, position sensor and driver electronics. The microcontroller sends a single control signal, a pulse 1.0–2.0 ms wide every 20 ms, and the servo drives itself to that position. It does still need a power supply that can deliver its current; take only the signal wire from the microcontroller, and connect the grounds.
+
+## Related
+
+- [H-bridge](/atlas/concept/h-bridge): the four-switch circuit inside most brushed DC motor drivers
+- [PWM signal](/atlas/concept/pwm-signal): how duty cycle sets a motor's speed
+- [DC motor](/atlas/concept/dc-motor): the motor most drivers are built for
+- [Stepper motor](/atlas/concept/stepper-motor): the motor behind 3D printers and CNC machines
+- [Electronic speed controller](/atlas/concept/electronic-speed-controller): the driver for brushless motors
