@@ -4,6 +4,10 @@ The kids product is ONE universe, not a set of pages. Everything below is a
 contract: every screen, game and lesson uses these pieces, so the product feels
 like one thing.
 
+## Look and feel
+World-class, and unmistakably R2BOT: follow `docs/kids-design.md` (navy + R2BOT orange,
+Space Grotesk/Inter, the helmet logo, vivid colour only inside content). No purple backgrounds.
+
 ## Who it is for
 Ages 5–17 in four bands (`lib/kids/bands.ts`): Explorers 5–7, Builders 8–10,
 Inventors 11–13, Engineers 14–17. Today's children are advanced: nothing is

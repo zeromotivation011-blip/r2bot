@@ -130,14 +130,14 @@ export default function KidsHubPage() {
             <p className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-sm font-bold text-amber-300">
               <span aria-hidden>🤖</span> Robotics for ages 5–17
             </p>
-            <h1 className="mt-4 text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-6xl">
+            <h1 className="mt-4 font-display text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-6xl">
               Build a robot.
               <br />
               <span className="bg-gradient-to-r from-amber-300 via-orange-400 to-pink-400 bg-clip-text text-transparent">
                 Code it. Watch it come alive.
               </span>
             </h1>
-            <p className="mt-4 max-w-xl text-lg text-violet-100/80">
+            <p className="mt-4 max-w-xl text-lg text-[#A7B0C0]">
               Design your own robot in 3D, see it standing in your room, then teach it to drive, sort, draw and
               explore — with Spark and friends cheering you on.
             </p>
@@ -150,7 +150,7 @@ export default function KidsHubPage() {
               </Link>
               <Link
                 href="/kids/stories"
-                className="inline-flex min-h-[52px] items-center rounded-2xl border-2 border-violet-400/50 bg-violet-950/40 px-6 text-lg font-bold text-violet-100 transition hover:border-violet-300"
+                className="inline-flex min-h-[52px] items-center rounded-2xl border-2 border-white/15 bg-white/[0.04] px-6 text-lg font-bold text-[#EEF2F8] transition hover:border-white/30"
               >
                 ▶ Watch a story
               </Link>
@@ -168,7 +168,7 @@ export default function KidsHubPage() {
         <h2 id="modes-h" className="text-2xl font-black text-white sm:text-3xl">
           Five ways to learn robotics
         </h2>
-        <p className="mt-1 text-violet-200/70">Watch it, build it, code it, play it, make it.</p>
+        <p className="mt-1 text-[#A7B0C0]">Watch it, build it, code it, play it, make it.</p>
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {MODES.map((m) => (
             <li key={m.href}>
@@ -194,7 +194,7 @@ export default function KidsHubPage() {
         <h2 id="journey-h" className="text-2xl font-black text-white sm:text-3xl">
           One robot, from first steps to real engineering
         </h2>
-        <p className="mt-1 max-w-2xl text-violet-200/70">
+        <p className="mt-1 max-w-2xl text-[#A7B0C0]">
           Each band builds on the last. The ideas are the same ones real robotics engineers use — sense, think,
           act — explained with things children already know.
         </p>
@@ -244,10 +244,10 @@ export default function KidsHubPage() {
 
       {/* ── App install ──────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-6">
-        <div className="flex flex-col items-start gap-4 rounded-3xl border border-violet-400/30 bg-violet-900/30 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col items-start gap-4 rounded-3xl border border-white/10 bg-[#111C32] p-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-black text-white">📱 Put R2BOT Kids on your home screen</h2>
-            <p className="mt-1 text-sm text-violet-100/70">
+            <p className="mt-1 text-sm text-[#A7B0C0]">
               It opens full-screen like an app, remembers your robot, and keeps working on a weak connection.
             </p>
           </div>
@@ -262,7 +262,7 @@ export default function KidsHubPage() {
           {FAQ.map((f) => (
             <div key={f.q} className="py-4">
               <dt className="font-bold text-white">{f.q}</dt>
-              <dd className="mt-1 text-violet-100/70">{f.a}</dd>
+              <dd className="mt-1 text-[#A7B0C0]">{f.a}</dd>
             </div>
           ))}
         </dl>
@@ -275,7 +275,7 @@ export default function KidsHubPage() {
 function KidsHeroArt() {
   return (
     <div className="relative mx-auto aspect-square w-full max-w-[420px]" aria-hidden>
-      <div className="absolute inset-6 rounded-full bg-gradient-to-br from-violet-500/30 via-fuchsia-500/20 to-amber-400/20 blur-2xl" />
+      <div className="absolute inset-6 rounded-full bg-gradient-to-br from-amber-500/25 via-cyan-500/10 to-transparent blur-2xl" />
       <svg viewBox="0 0 400 400" className="relative h-full w-full">
         <defs>
           <linearGradient id="kh-body" x1="0" x2="0" y1="0" y2="1">

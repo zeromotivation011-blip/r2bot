@@ -64,16 +64,16 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
     <div
       className="min-h-screen text-white"
       style={{
-        background: 'var(--spark-bg, #0F0A1E)',
+        background: 'var(--void, #0A1120)',
         fontSize: '18px',
       }}
     >
       {/* Twinkling stars backdrop — applied to all kids pages */}
-      <div className="kids-bg-stars" aria-hidden="true" />
 
       <header className="kids-nav">
         <Link href="/kids" className="kids-nav-brand" aria-label="R2BOT Kids home">
-          <span className="kids-nav-brand-emoji" aria-hidden>🤖</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/kids-icon.svg" alt="" width={36} height={36} className="kids-nav-logo" />
           <span className="kids-nav-brand-text">R2BOT <span className="kids-nav-brand-kids">Kids</span></span>
         </Link>
         {!bare && (
@@ -149,24 +149,8 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           --spark-green: #10B981;
           --spark-blue: #3B82F6;
           --spark-red: #EF4444;
-          --spark-bg: #0F0A1E;
-          --spark-card: #1A1040;
-        }
-        .kids-bg-stars {
-          position: fixed; inset: 0; z-index: 0; pointer-events: none;
-          background-image:
-            radial-gradient(2px 2px at 12% 14%, #ffffff66 50%, transparent 60%),
-            radial-gradient(1.5px 1.5px at 30% 80%, #ffffff66 50%, transparent 60%),
-            radial-gradient(2px 2px at 70% 22%, #ffffff66 50%, transparent 60%),
-            radial-gradient(1px 1px at 85% 65%, #ffffff66 50%, transparent 60%),
-            radial-gradient(2px 2px at 50% 50%, #ffffff44 50%, transparent 60%),
-            radial-gradient(1.5px 1.5px at 92% 9%, #ffffff66 50%, transparent 60%),
-            radial-gradient(1px 1px at 20% 60%, #ffffff44 50%, transparent 60%);
-          animation: kids-twinkle 6s linear infinite alternate;
-        }
-        @keyframes kids-twinkle {
-          0%   { opacity: .55 }
-          100% { opacity: .95 }
+          --spark-bg: #0A1120;
+          --spark-card: #111C32;
         }
         .kids-nav {
           position: sticky; top: 0; z-index: 30;
@@ -175,18 +159,19 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           /* The installed app is viewport-fit=cover with a translucent status bar:
              keep the header clear of the notch, clock and landscape side insets. */
           padding: calc(12px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 12px calc(20px + env(safe-area-inset-left));
-          background: rgba(15, 10, 30, 0.85);
+          background: rgba(10, 17, 32, 0.88);
           backdrop-filter: blur(8px);
-          border-bottom: 2px solid rgba(124, 58, 237, 0.3);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .kids-nav-brand {
           display: inline-flex; align-items: center; gap: 8px;
           font-weight: 900; font-size: 18px;
-          color: var(--spark-yellow);
+          color: #EEF2F8;
+          font-family: var(--font-display), sans-serif;
           text-decoration: none;
           letter-spacing: 0.5px;
         }
-        .kids-nav-brand-emoji { font-size: 22px; }
+        .kids-nav-logo { width: 36px; height: 36px; border-radius: 10px; }
         .kids-nav-links {
           display: flex; gap: 6px; flex-wrap: wrap;
         }
@@ -195,20 +180,20 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           display: inline-flex; align-items: center;
           padding: 0 14px;
           border-radius: 14px;
-          background: #1a1040;
-          color: #FFC9A8;
+          background: transparent;
+          color: #A7B0C0;
           font-weight: 800;
           text-decoration: none;
-          border: 2px solid #312e81;
+          border: 1px solid transparent;
           transition: transform .15s, background .15s;
         }
-        .kids-nav-link:hover { transform: scale(1.05); background: #2a1860; }
-        .kids-nav-link-on { background: #3b1d8a; color: #fff; border-color: #a78bfa; }
-        .kids-nav-brand-kids { color: #fff; }
+        .kids-nav-link:hover { background: #19263F; color: #EEF2F8; }
+        .kids-nav-link-on { background: rgba(252,104,24,0.12); color: #FFA878; border-color: rgba(252,104,24,0.34); }
+        .kids-nav-brand-kids { color: #FC6818; }
         .kids-nav-right { display: flex; align-items: center; gap: 8px; }
         .kids-nav-stars {
           background: linear-gradient(135deg, #FC6818, #FF8A4C);
-          color: #1a1040;
+          color: #1A1103;
           padding: 10px 14px;
           border-radius: 999px;
           font-weight: 900;
@@ -224,17 +209,17 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           position: relative; z-index: 1;
           display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px;
           padding: 24px 16px 32px;
-          border-top: 1px solid rgba(124, 58, 237, 0.25);
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
           font-size: 14px;
         }
-        .kids-footer a { color: #c4b5fd; text-decoration: none; padding: 10px 2px; font-weight: 700; }
+        .kids-footer a { color: #A7B0C0; text-decoration: none; padding: 10px 2px; font-weight: 700; }
         .kids-footer a:hover { color: #fff; text-decoration: underline; }
         .kids-voice-toggle {
           width: 48px;
           height: 48px;
           border-radius: 50%;
-          border: 2px solid rgba(124, 58, 237, 0.55);
-          background: linear-gradient(135deg, #2a1860, #1a1040);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          background: #111C32;
           color: #fff;
           font-size: 20px;
           cursor: pointer;
@@ -256,18 +241,18 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
             position: fixed; left: 0; right: 0; bottom: 0; z-index: 35;
             display: grid; grid-template-columns: repeat(5, 1fr);
             padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
-            background: rgba(15, 10, 30, 0.94);
+            background: rgba(10, 17, 32, 0.96);
             backdrop-filter: blur(10px);
-            border-top: 2px solid rgba(124, 58, 237, 0.35);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
           }
           .kids-tab {
             min-height: 56px;
             display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
             border-radius: 14px;
-            color: #c4b5fd; text-decoration: none; font-weight: 800; font-size: 12px;
+            color: #8A94A6; text-decoration: none; font-weight: 800; font-size: 12px;
           }
           .kids-tab-emoji { font-size: 22px; line-height: 1; transition: transform .15s; }
-          .kids-tab-on { background: #2a1860; color: #fff; }
+          .kids-tab-on { background: rgba(252,104,24,0.14); color: #FFA878; }
           .kids-tab-on .kids-tab-emoji { transform: scale(1.15); }
           .kids-main { padding-bottom: 24px; }
           .kids-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
