@@ -5,6 +5,7 @@
 
 import {
   MOTOR_START_A,
+  batteryEmf,
   formatAmps,
   formatOhms,
   formatVolts,
@@ -117,11 +118,12 @@ export const TIERS: TierDef[] = [
     tier: 3,
     name: 'Legend',
     title: 'The automatic night-light',
-    story: 'Build a night-light that turns itself on when it gets dark and off in daylight — and sips almost no power while it waits.',
+    story:
+      'Build a bedroom night-light that turns itself on when it gets dark and off in daylight — and sips almost no power while it waits. Its light sensor sits indoors by the window, where daytime light is about 1,000 lux (outside in sunshine it is 10,000–100,000 lux).',
     steps: [
       'Make a voltage divider: the light sensor (LDR) and a resistor in series across the battery. The middle point’s voltage changes with light.',
       'Connect the comparator’s sense lead to that middle point and set its threshold. Its switch drives the white LED (Vf ≈ 3 V) through a resistor.',
-      'Test sweeps from noon to midnight. Daylight: LED off, under 10 mW. Night: LED 10–20 mA, under 100 mW.',
+      'Test sweeps the room from noon to midnight. Daylight: LED off, under 10 mW. Night: LED 10–20 mA, under 100 mW.',
     ],
     initial: [
       { id: 'bat', kind: 'battery', a: nodeId(1, 2), b: nodeId(1, 3), cells: 3, charge: 1, locked: true },
@@ -134,8 +136,8 @@ export const TIERS: TierDef[] = [
     minParts: 14,
     hints: [
       'An LDR’s resistance is low in bright light (a few hundred Ω) and huge in the dark (tens of kΩ). Put it in series with a resistor across the battery: that is a voltage divider.',
-      'With the LDR on top and 10 kΩ below, the middle point is about 3.8 V at dusk-bright (100 lux) and about 2.3 V at night (10 lux). A threshold of 3 V with “ON when BELOW” splits them.',
-      'LED branch: + → resistor → LED (+ leg up) → comparator switch → −. R = (4.5 V − 3 V) ÷ 0.015 A = 100 Ω. A big divider resistor keeps daytime power tiny: P = V² ÷ R.',
+      'Build your divider, then be a scientist: set the sky slider to dusk (100 lux) and measure the middle point with the Multimeter, then do the same at 10 lux. Your threshold must sit between those two readings — and the mode decides which side means ON.',
+      'The LED branch is a loop of its own: + → a resistor → the LED (+ leg towards +) → the comparator’s switch → −. Work the resistor out with Ohm’s law from the battery’s real voltage and the white LED’s 3 V. Daytime power is mostly the divider: P = V² ÷ R, so bigger divider resistors waste less.',
     ],
     defaultOhms: 1000,
   },
@@ -231,18 +233,37 @@ export interface TestReport {
   quality: number
   /** Short metric for the score label, e.g. "LED 16.2 mA". */
   metric: string
+  /** The battery was too drained for the test to judge the wiring. */
+  flat?: boolean
 }
 
+// Light at the sensor, which sits indoors by a bedroom window. A daylit room
+// is a few hundred to ~1,000 lux; outdoors it would be 10,000–100,000 lux.
 export const LEGEND_SWEEP = [
-  { lux: 1000, label: 'Noon' },
-  { lux: 300, label: 'Cloudy' },
+  { lux: 1000, label: 'Noon in the room' },
+  { lux: 300, label: 'Cloudy afternoon' },
   { lux: 100, label: 'Dusk' },
-  { lux: 10, label: 'Night falls' },
+  { lux: 10, label: 'Lights low' },
   { lux: 3, label: 'Night' },
   { lux: 1, label: 'Midnight' },
 ]
 
-export function runTest(def: TierDef, parts: Part[]): TestReport {
+/** Below this charge the battery is "flat": too weak to judge the wiring. */
+export const FLAT_CHARGE = 0.25
+
+export function batteryCharge(parts: Part[]): number {
+  const b = parts.find((p) => p.kind === 'battery')
+  return b ? b.charge ?? 1 : 1
+}
+
+export function flatBatteryText(parts: Part[]): string {
+  const b = parts.find((p) => p.kind === 'battery')
+  const c = batteryCharge(parts)
+  const emf = b ? batteryEmf(b) : 0
+  return `The battery is flat — only ${Math.round(c * 100)}% left, so it pushes just ${formatVolts(emf)} instead of ${formatVolts(b ? (b.cells ?? 2) * 1.5 : 0)}. The short circuit drained it. A flat battery can’t push enough current, so this test can’t judge your wiring yet. Tap “Fit fresh batteries” and test again.`
+}
+
+function runTierTest(def: TierDef, parts: Part[]): TestReport {
   switch (def.tier) {
     case 0:
       return testCadet(def, parts)
@@ -253,6 +274,14 @@ export function runTest(def: TierDef, parts: Part[]): TestReport {
     default:
       return testLegend(parts)
   }
+}
+
+export function runTest(def: TierDef, parts: Part[]): TestReport {
+  const report = runTierTest(def, parts)
+  // A drained battery makes good wiring look broken. Say so before any
+  // wiring diagnosis, so a child is never told a correct circuit is wrong.
+  if (!report.pass && batteryCharge(parts) < FLAT_CHARGE) return { ...report, why: flatBatteryText(parts), flat: true }
+  return report
 }
 
 function testCadet(def: TierDef, parts: Part[]): TestReport {
@@ -372,7 +401,8 @@ function testLegend(parts: Part[]): TestReport {
       nightCurrent = Math.max(nightCurrent, i)
       ok = i >= 0.01 && i <= 0.02 && sol.power <= 0.1
       if (i < 0.001) reason = `At ${s.label.toLowerCase()} (${s.lux} lux) the night-light stayed OFF. ${senseText(parts, sol)} Make sure the dark voltage is on the ON side of the threshold.`
-      else if (i < 0.01 || i > 0.02) reason = `At night the LED got ${formatAmps(i)} (want 10–20 mA). With a white LED, R = (4.5 V − 3 V) ÷ 0.015 A = 100 Ω.`
+      else if (i < 0.01 || i > 0.02)
+        reason = `At night the LED got ${formatAmps(i)} (want 10–20 mA). ${i < 0.01 ? 'Its resistor is too big.' : 'Its resistor is too small.'} Use Ohm’s law, R = (V − Vf) ÷ I, with the battery’s real voltage and the white LED’s 3 V.`
       else if (sol.power > 0.1) reason = `At night the circuit used ${formatWatts(sol.power)}, over the 100 mW budget.`
     }
     if (!ok && !firstFail) firstFail = { step: s.label, reason }

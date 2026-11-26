@@ -90,3 +90,8 @@ To resume later: games → resume run wf_e021636c-616; schools + app → relaunc
 - [~] Games QA/fix — run wf_e021636c-616 resumed.
 - [~] Schools + mobile app — run wf_fe308336-2e2 resumed.
 - Check-in trig_01JjzPC4SVkb4GiS7ax68hkk re-enabled (hourly at :11); it launches the final lean pass when both finish, then reports and deletes itself.
+
+## 13:50 UTC
+- [x] Schools + mobile app — a9d492d. Debug APK built (in.r2bot.kids, 5.3 MB; Android SDK at /opt/android-sdk via dl.google.com, now allowed in the r2bot environment). APK not committed (build output); sent to the founder.
+- [~] Games QA/fix — run wf_e021636c-616.
+- NEXT: the lean final pass once games finish.
