@@ -33,7 +33,7 @@ import {
   type Part,
   type PartKind,
 } from './circuit'
-import { TIERS, applyMod, findLoad, liveGoals, nearestResistor, runTest, type TestReport } from './levels'
+import { FLAT_CHARGE, TIERS, applyMod, batteryCharge, findLoad, liveGoals, nearestResistor, runTest, type TestReport } from './levels'
 import { burst, draw, makeView, nodePx, pickEdge, pickNode, smokePuff, stepParticles, type Edge, type Particle, type View } from './render'
 import CitySceneClient, { type SceneLoads } from './CitySceneClient'
 import PartIcon, { type ToolKind } from './PartIcon'
@@ -52,7 +52,7 @@ const PART_INFO: Record<PartKind, { name: string; plain: string }> = {
   switch: { name: 'Switch', plain: 'Open = a gap in the loop. Closed = a path. Tap it to flip.' },
   button: { name: 'Push button', plain: 'Closed only while you hold it down.' },
   led: { name: 'LED', plain: 'Light-emitting diode. Current flows only from its + leg to its − leg, and it needs a resistor.' },
-  lamp: { name: 'Streetlight', plain: 'An LED lamp with its own 220 Ω resistor inside. Still one-way: + to +.' },
+  lamp: { name: 'Streetlight', plain: 'An LED lamp with a protecting resistor built in (its value is shown below). Still one-way: + to +.' },
   resistor: { name: 'Resistor', plain: 'Slows the current down. Bigger Ω = less current. The bands are its colour code.' },
   motor: { name: 'Motor', plain: 'Turns electricity into spinning. Needs a lot of current (150 mA+) to start.' },
   buzzer: { name: 'Buzzer', plain: 'Beeps when it gets about 2 V or more.' },
@@ -62,15 +62,52 @@ const PART_INFO: Record<PartKind, { name: string; plain: string }> = {
 
 const TOOL_ORDER: PartKind[] = ['wire', 'switch', 'button', 'lamp', 'led', 'resistor', 'motor', 'buzzer', 'ldr', 'comparator']
 
+// The board survives an accidental tap on the phone tab bar (or a reload):
+// it is kept in sessionStorage per tier until the mission is passed.
+const boardKey = (tier: number) => `circuit-city:board:v1:${tier}`
+
+function isPart(x: unknown): x is Part {
+  if (!x || typeof x !== 'object') return false
+  const o = x as Record<string, unknown>
+  return typeof o.id === 'string' && typeof o.kind === 'string' && typeof o.a === 'number' && typeof o.b === 'number'
+}
+
+function loadBoard(tier: number, initial: Part[]): Part[] {
+  const fresh = initial.map((p) => ({ ...p }))
+  try {
+    const raw = window.sessionStorage.getItem(boardKey(tier))
+    if (!raw) return fresh
+    const data: unknown = JSON.parse(raw)
+    if (!Array.isArray(data) || !data.every(isPart)) return fresh
+    // The mission's fixed parts must still be there, unchanged in place.
+    const ok = initial.every((f) => data.some((p) => p.id === f.id && p.a === f.a && p.b === f.b))
+    return ok ? data : fresh
+  } catch {
+    return fresh
+  }
+}
+
 export default function CircuitCityGameClient({ tier, onFinish }: Props) {
   const def = TIERS[Math.max(0, Math.min(3, tier))]
 
-  const [parts, setPartsState] = useState<Part[]>(() => def.initial.map((p) => ({ ...p })))
+  const [parts, setPartsState] = useState<Part[]>(() => loadBoard(def.tier, def.initial))
   const partsRef = useRef(parts)
-  const commit = useCallback((next: Part[]) => {
-    partsRef.current = next
-    setPartsState(next)
-  }, [])
+  const saveTimer = useRef(0)
+  const commit = useCallback(
+    (next: Part[]) => {
+      partsRef.current = next
+      setPartsState(next)
+      window.clearTimeout(saveTimer.current)
+      saveTimer.current = window.setTimeout(() => {
+        try {
+          window.sessionStorage.setItem(boardKey(def.tier), JSON.stringify(partsRef.current))
+        } catch {
+          /* storage full or blocked: the board just isn't kept */
+        }
+      }, 250)
+    },
+    [def.tier],
+  )
 
   const [tool, setTool] = useState<ToolKind>(def.tier === 0 ? 'wire' : 'select')
   const [selected, setSelected] = useState<string | null>(null)
@@ -88,7 +125,8 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
   const [kbd, setKbd] = useState(false)
   const [drag, setDrag] = useState<{ kind: PartKind; x: number; y: number } | null>(null)
 
-  const idCounter = useRef(0)
+  // Restored boards already use ids p1…pN; new parts must not collide.
+  const idCounter = useRef(parts.reduce((m, p) => Math.max(m, /^p\d+$/.test(p.id) ? Number(p.id.slice(1)) : 0), 0))
   const timers = useRef<number[]>([])
   const finished = useRef(false)
 
@@ -102,7 +140,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
   // ── Canvas + loop ────────────────────────────────────────────────────────
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
-  const viewRef = useRef<View>(makeView(600))
+  const viewRef = useRef<View>(makeView(600, 600))
   const hoverRef = useRef<{ edge: Edge; ok: boolean } | null>(null)
   const particlesRef = useRef<Particle[]>([])
   const phaseRef = useRef(new Map<string, number>())
@@ -117,9 +155,10 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
     live.current = { parts: displayParts, sol, selected, tool, probe, sensePick, cursor, kbd, testing: !!testRun }
   })
 
-  const events = useRef<{ burn: (p: Part, amps: number) => void; shortStart: (amps: number) => void; drain: (amount: number) => void }>({
+  const events = useRef<{ burn: (p: Part, amps: number) => void; shortStart: (amps: number) => void; shortEnd: () => void; drain: (amount: number) => void }>({
     burn: () => {},
     shortStart: () => {},
+    shortEnd: () => {},
     drain: () => {},
   })
   useEffect(() => {
@@ -135,7 +174,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
         setSelected(p.id)
         setSpark({
           tone: 'warn',
-          text: `Pop! That LED got ${formatAmps(amps)}. An LED is made for about 20 mA — much more and its tiny chip overheats and breaks. A resistor in its path limits the current. Select it and press “Replace LED” to try again.`,
+          text: `Pop! That LED got ${formatAmps(amps)}. An LED is made for about 20 mA. In Circuit City an LED pops above 35 mA; a real one pushed that hard runs hot and wears out fast, and straight across a battery (hundreds of mA) it really does burn out in a flash. A resistor in its path limits the current. Select it and press “Replace LED” to try again.`,
         })
       },
       shortStart: (amps) => {
@@ -145,6 +184,17 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
           tone: 'warn',
           text: `Short circuit! A path joins + straight to − with nothing to slow the current, so ${formatAmps(amps)} rushes through. The battery heats up and drains fast. Find that wire and remove it.`,
         })
+      },
+      shortEnd: () => {
+        const c = batteryCharge(partsRef.current)
+        if (c < FLAT_CHARGE) {
+          setSpark({
+            tone: 'warn',
+            text: `The short is gone — but it drained the battery to ${Math.round(c * 100)}%. A flat battery can’t light anything, even with perfect wiring. Tap “Fit fresh batteries”.`,
+          })
+        } else {
+          setSpark({ tone: 'info', text: `Short fixed. The battery lost some charge (${Math.round(c * 100)}% left) but still has plenty to work with.` })
+        }
       },
       drain: (amount) => {
         commit(partsRef.current.map((q) => (q.kind === 'battery' ? { ...q, charge: Math.max(0, (q.charge ?? 1) - amount) } : q)))
@@ -162,7 +212,11 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
     let dpr = Math.min(2, window.devicePixelRatio || 1)
     const resize = () => {
       dpr = Math.min(2, window.devicePixelRatio || 1)
-      const view = makeView(wrap.clientWidth)
+      // Fit the board in the visible height too (phone held sideways), and
+      // leave room for the kids tab bar pinned to the bottom on phones.
+      const bar = document.querySelector<HTMLElement>('.kids-tabbar')
+      const barH = bar && getComputedStyle(bar).position === 'fixed' ? bar.getBoundingClientRect().height : 0
+      const view = makeView(wrap.clientWidth, Math.max(240, window.innerHeight - barH - 24))
       viewRef.current = view
       canvas.width = Math.round(view.w * dpr)
       canvas.height = Math.round(view.h * dpr)
@@ -172,6 +226,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
     resize()
     const ro = new ResizeObserver(resize)
     ro.observe(wrap)
+    window.addEventListener('resize', resize)
 
     let raf = 0
     let last = performance.now()
@@ -228,6 +283,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
             burst(particlesRef.current, a.x, a.y, 8, ['#fde68a', '#fb923c', '#ffffff'], 140)
           }
         } else {
+          if (sh.active) events.current.shortEnd()
           sh.active = false
           sh.acc = 0
         }
@@ -262,13 +318,16 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
+      window.removeEventListener('resize', resize)
     }
   }, [])
 
   useEffect(() => {
     const t = timers.current
+    const save = saveTimer
     return () => {
       for (const id of t) window.clearTimeout(id)
+      window.clearTimeout(save.current)
     }
   }, [])
 
@@ -547,6 +606,13 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
     playSound('click')
   }
 
+  const freshBatteries = () => {
+    commit(partsRef.current.map((p) => (p.kind === 'battery' ? { ...p, charge: 1 } : p)))
+    playSound('click')
+    setDebrief(null)
+    setSpark({ tone: 'good', text: 'Fresh batteries fitted — full power again. Test your circuit!' })
+  }
+
   const clearBoard = () => {
     const bat = partsRef.current.find((p) => p.kind === 'battery')
     commit(def.initial.map((p) => (p.kind === 'battery' && bat ? { ...p, charge: bat.charge } : { ...p })))
@@ -564,8 +630,9 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
     setSelected(null)
     setSpark({ tone: 'info', text: 'Testing your circuit one situation at a time — watch the city and the moving dots.' })
     const report = runTest(def, partsRef.current)
-    const attempts = tests + 1
-    setTests(attempts)
+    // A test on a flat battery says nothing about the wiring, so it is free.
+    const attempts = report.flat ? Math.max(1, tests) : tests + 1
+    setTests(report.flat ? tests : attempts)
     setTestRun({ report, idx: 0 })
     const STEP_MS = 1300
     report.steps.forEach((s, k) => {
@@ -590,11 +657,24 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
         // Quality (how close to the ideal design) caps the stars: ±3 mA of 15 mA, or a frugal night-light, keeps 3.
         if (report.quality < 0.7) stars = Math.min(stars, 2)
         if (report.quality < 0.35) stars = Math.min(stars, 1)
+        // Ace and Legend are design challenges: big hints and guess-and-test cost stars.
+        const paidHints = hintsCost ? Math.max(0, hintLevel - 1) : 0
+        if (paidHints > 0) stars = Math.min(stars, 3 - paidHints)
+        if (hintsCost && attempts > 3) stars = Math.min(stars, 2)
+        stars = Math.max(1, stars)
         const placed = partsRef.current.filter((p) => !p.locked).length
         const score = Math.max(
           100,
-          Math.min(1000, Math.round(1000 * (0.5 + 0.5 * report.quality) - 120 * m - 40 * (attempts - 1) - 10 * Math.max(0, placed - def.minParts))),
+          Math.min(
+            1000,
+            Math.round(1000 * (0.5 + 0.5 * report.quality) - 120 * m - 40 * (attempts - 1) - 150 * paidHints - 10 * Math.max(0, placed - def.minParts)),
+          ),
         )
+        try {
+          window.sessionStorage.removeItem(boardKey(def.tier))
+        } catch {
+          /* ignore */
+        }
         onFinish({
           stars,
           score,
@@ -625,9 +705,13 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
     return { glow, burnt, motor, buzzer: buzz }
   }, [displayParts, sol])
 
+  const hintsCost = def.tier >= 2
+  const charge = batteryCharge(parts)
+  const flat = charge < FLAT_CHARGE
   const tools: ToolKind[] = ['select', ...TOOL_ORDER.filter((k) => def.inventory[k] !== undefined), 'probe']
   const signLed = findLoad(parts, def.tier === 3 ? 'N' : 'S')
   const stormOn = !!step?.mod.knockOut
+  const shortNow = sol.shorted
 
   return (
     <div className="grid select-none gap-3 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -645,6 +729,16 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
         </div>
 
         <SparkBar tone={spark.tone} text={sensePick ? 'Tap a dot on the board for the comparator’s sense lead.' : spark.text} />
+        {flat && !testRun && !shortNow && (
+          <button
+            type="button"
+            onClick={freshBatteries}
+            className="flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-amber-300/70 bg-amber-400/15 px-4 text-sm font-black text-amber-100 transition-transform active:scale-[0.97]"
+          >
+            <PartIcon kind="battery" className="h-6 w-6" />
+            Battery flat ({Math.round(charge * 100)}%) — fit fresh batteries
+          </button>
+        )}
 
         <div ref={wrapRef} className="relative w-full">
           <canvas
@@ -752,6 +846,11 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
                 ))}
               </ul>
               <p className="mt-2 text-white/85">{debrief.why}</p>
+              {debrief.flat && flat && (
+                <button type="button" onClick={freshBatteries} className="mt-2 min-h-[44px] w-full rounded-xl border border-amber-300/60 bg-amber-400/15 px-3 font-bold text-amber-100">
+                  Fit fresh batteries
+                </button>
+              )}
             </div>
           )}
         </section>
@@ -779,7 +878,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
             <div className="flex justify-between text-xs text-white/50">
               <span>midnight 1</span>
               <span>dusk 100</span>
-              <span>day 1000</span>
+              <span>room by day 1000</span>
             </div>
             <p className="mt-1 text-xs text-white/70">
               The LDR is now <b className="text-white">{formatOhms(Math.round(ldrOhms(displayLux)))}</b>. Circuit power: <b className="text-white">{formatWatts(sol.power)}</b>
@@ -787,7 +886,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
           </section>
         )}
 
-        {(def.tier === 2 || def.tier === 3) && signLed && <OhmHelper v={sol.battV} vf={ledVf(signLed)} name={def.tier === 3 ? 'white night-light LED' : 'red sign LED'} />}
+        {def.tier === 2 && signLed && <OhmHelper v={sol.battV} vf={ledVf(signLed)} name={def.tier === 3 ? 'white night-light LED' : 'red sign LED'} />}
 
         <section className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">
           <div className="flex items-center justify-between gap-2">
@@ -798,9 +897,14 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
               onClick={() => setHintLevel((h) => Math.min(def.hints.length, h + 1))}
               className="min-h-[44px] rounded-xl border border-amber-300/50 px-3 font-bold text-amber-200 disabled:opacity-40"
             >
-              {hintLevel === 0 ? 'Show hint' : 'Next hint'}
+              {hintLevel === 0 ? 'Show hint' : `Next hint${hintsCost ? ' (−1 ★)' : ''}`}
             </button>
           </div>
+          {hintsCost && (
+            <p className="mt-1 text-xs text-white/60">
+              The first hint is free. Each hint after it costs a star{def.tier === 3 ? ', and there is no Ohm’s-law helper here — you are the engineer' : ''}. More than three tests also caps you at 2 stars.
+            </p>
+          )}
           {hintLevel > 0 && (
             <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-white/80">
               {def.hints.slice(0, hintLevel).map((h) => (

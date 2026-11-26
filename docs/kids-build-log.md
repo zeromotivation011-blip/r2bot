@@ -95,3 +95,8 @@ To resume later: games → resume run wf_e021636c-616; schools + app → relaunc
 - [x] Schools + mobile app — a9d492d. Debug APK built (in.r2bot.kids, 5.3 MB; Android SDK at /opt/android-sdk via dl.google.com, now allowed in the r2bot environment). APK not committed (build output); sent to the founder.
 - [~] Games QA/fix — run wf_e021636c-616.
 - NEXT: the lean final pass once games finish.
+
+## 14:00 UTC — WEEKLY usage limit reached (resets Nov 30, 11:00 UTC)
+- Games: all 7 built and independently tested; the fix step failed on the weekly limit. 77 findings saved in docs/kids-games-qa-todo.md.
+- Hourly check-in DISABLED (it would only fail). One-shot reminder scheduled for Nov 30 11:15 UTC to resume (games fixes → lean final pass → final report).
+- No paid extra usage is used (founder's instruction).
