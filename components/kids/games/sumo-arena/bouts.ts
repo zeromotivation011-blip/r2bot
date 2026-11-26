@@ -5,7 +5,8 @@
 
 import type { RobotDesign } from '@/lib/kids/robot-design'
 import { RIVAL_BUMBLES, RIVAL_DODGER, RIVAL_TWISTER, SENSEI_TACTICS, fsmController, type FsmProgram, type SenseiTactic } from './brain'
-import { seeded, type BotSetup, type Controller } from './sim'
+import { RING_R, botStats, seeded, type BotSetup, type Controller } from './sim'
+import { robotSpec } from '@/lib/kids/sim/robot-spec'
 
 export interface Rival {
   name: string
@@ -41,20 +42,44 @@ export function boutSeed(tier: number, round = 0): number {
 }
 
 /** Start poses on the shikiri lines: you at the south line facing north; the rival's facing comes from the seed. */
-export function startPoses(tier: number, seed: number): { you: { x: number; z: number; yaw: number }; rival: { x: number; z: number; yaw: number } } {
+export function startPoses(tier: number, seed: number, youDesign?: RobotDesign): { you: { x: number; z: number; yaw: number }; rival: { x: number; z: number; yaw: number } } {
   const rnd = seeded(seed)
   const jitter = () => (rnd() - 0.5) * 0.3 // ±8.6°
   // Cadet starts face to face; higher tiers may start turned away, so the robot must search.
   // Pilot starts back to back: both robots must search.
-  const facings = tier === 0 ? [Math.PI] : tier === 1 ? [0] : [Math.PI, Math.PI / 2, -Math.PI / 2, Math.PI * 0.75, -Math.PI * 0.75]
+  const facings = tier === 0 || tier === 2 ? [Math.PI] : tier === 1 ? [0] : [Math.PI, Math.PI / 2, -Math.PI / 2, Math.PI * 0.75, -Math.PI * 0.75]
   const rivalYaw = facings[Math.floor(rnd() * facings.length)] + jitter()
   // Cadet faces the rival; Pilot starts facing AWAY (it must search, and must not drive off);
   // Ace and Legend start half-turned.
   const youYaw = tier === 0 ? jitter() : tier === 1 ? Math.PI + jitter() : (rnd() < 0.5 ? 1 : -1) * (Math.PI / 4) + jitter()
+  if (tier === 2) {
+    // Ace: Dodger starts BEHIND you, facing your back, and shoves you toward the edge at the bell.
+    // Your edge sensors are the only warning you get; backing up is the only defence.
+    // You start facing the edge with your edge sensors just over the white line (2.5 cm inside the rim).
+    const front = youDesign ? robotSpec(youDesign).body.front : 0.078
+    const zY = -(RING_R - front - Number(process.env.RIM ?? 0.03))
+    const gap = Number(process.env.GAP ?? 0.2)
+    return { you: { x: 0, z: zY, yaw: Math.PI + jitter() }, rival: { x: 0, z: zY + gap, yaw: Math.PI + jitter() * 0.5 } }
+  }
   return {
     you: { x: 0, z: -0.3, yaw: youYaw },
     rival: { x: 0, z: 0.3, yaw: rivalYaw },
   }
+}
+
+/**
+ * Weight-class matching for Ace. Dodger's motors are set so its push is DODGER_PUSH_SHARE of yours,
+ * whatever robot you built: the bout tests your program, not your parts (parts are Legend's job).
+ */
+export const DODGER_PUSH_SHARE = Number(process.env.RATIO ?? 0.85)
+export function rivalMotorMul(tier: number, youDesign: RobotDesign, youBallast: number): number {
+  if (tier !== 2) return 1
+  const you = botStats(youDesign, youBallast)
+  const r = RIVALS[2]
+  const rs = botStats(r.design, r.ballastKg)
+  const target = DODGER_PUSH_SHARE * you.pushN
+  if (rs.gripN <= target) return 1
+  return Math.max(0.25, Math.min(1, target / rs.motorN))
 }
 
 export function buildSetups(opts: {
@@ -68,9 +93,10 @@ export function buildSetups(opts: {
 }): [BotSetup, BotSetup] {
   const rival = RIVALS[opts.tier]
   const fsm = opts.tier === 3 && opts.tactic ? SENSEI_TACTICS[opts.tactic].fsm : RIVAL_FSM[opts.tier]
-  const poses = startPoses(opts.tier, opts.seed)
+  const poses = startPoses(opts.tier, opts.seed, opts.youDesign)
+  const motorMul = rivalMotorMul(opts.tier, opts.youDesign, opts.youBallast)
   return [
     { id: 'you', name: opts.youDesign.name || 'You', design: opts.youDesign, ballastKg: opts.youBallast, ...poses.you, edgeThreshold: opts.youThreshold, controller: opts.youController },
-    { id: 'rival', name: rival.name, design: rival.design, ballastKg: rival.ballastKg, ...poses.rival, edgeThreshold: fsm.edgeThreshold, controller: fsmController(fsm) },
+    { id: 'rival', name: rival.name, design: rival.design, ballastKg: rival.ballastKg, ...poses.rival, edgeThreshold: fsm.edgeThreshold, controller: fsmController(fsm), motorMul },
   ]
 }

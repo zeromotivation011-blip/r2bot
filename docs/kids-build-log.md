@@ -104,3 +104,8 @@ To resume later: games → resume run wf_e021636c-616; schools + app → relaunc
 ## 14:50 UTC
 - [x] 7 games tested and fixed — ae632df.
 - [~] LAST workflow (run wf_883ec17f-c66): Robo Sumo Arena → final integration pass (one navigation, brand, store-policy web changes, SEO, CLAUDE.md, npm run build, phone click-through) → independent check → fixes.
+
+## 15:20 UTC — founder: comprehensive universe, worlds, AI everywhere
+- [~] Worlds workflow wf_b6431468-d62: Robot Guardians (Harm Check: body, data, fairness, control, people, planet) first, then Ocean Lab, Robo Zoo, Robot Hospital, Smart Farm, Robot City, Space Station; each = flagship game + 24 activities + world page; then integration.
+- [~] Product review wf_12dd6b07-421 → docs/kids-product-review.md (roadmap).
+- AI integration to add to the roadmap: Ask Spark (kid-safe mentor via existing Co-pilot, capped, switchable cost), talk-to-your-robot (language → editable blocks), on-device Vision Lab, "how the robot thinks" visualisations, AI Academy world, AI inside every world, teacher AI insights.

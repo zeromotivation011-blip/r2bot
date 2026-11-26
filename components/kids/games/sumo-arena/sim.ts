@@ -101,6 +101,8 @@ export interface SumoSensors {
   /** Edge sensors (front-left, front-right): reflected light 0–100. Black ring ≈ 8, white line ≈ 92. */
   edgeL: number
   edgeR: number
+  /** Rear edge sensor, centre back (the rivals' programs use it to feel the line behind them). */
+  edgeBack: number
 }
 
 export interface DriveCmd {
@@ -131,10 +133,10 @@ export interface BotStats {
   wedge: boolean
 }
 
-export function botStats(design: RobotDesign, ballastKg = 0): BotStats {
+export function botStats(design: RobotDesign, ballastKg = 0, motorMul = 1): BotStats {
   const spec = robotSpec(design)
   const massKg = spec.mass + ballastKg
-  const motorN = spec.drive.maxForcePerSide * SUMO_FORCE * 2
+  const motorN = spec.drive.maxForcePerSide * SUMO_FORCE * 2 * motorMul
   const gripN = MU * spec.drive.grip * massKg * G
   const pushN = Math.min(motorN, gripN)
   return {
@@ -164,6 +166,8 @@ export interface BotSetup {
   /** Edge reading at or above which this robot's brain counts "line seen" (for the debrief). */
   edgeThreshold: number
   controller: Controller
+  /** Motor strength multiplier (a weaker or stronger gearbox: less push, same top speed). Default 1. */
+  motorMul?: number
 }
 
 export interface BotLog {
@@ -339,13 +343,13 @@ export function createMatch(R: Rapier, setups: [BotSetup, BotSetup]): Match {
       iy,
       mEffSide: 1 / (1 / mass + (spec.track * spec.track) / iy),
       vmax: spec.drive.maxSpeed * SUMO_SPEED,
-      fStall: spec.drive.maxForcePerSide * SUMO_FORCE,
+      fStall: spec.drive.maxForcePerSide * SUMO_FORCE * (s.motorMul ?? 1),
       grip: MU * spec.drive.grip,
       wedge: s.design.tool === 'scoop',
       loadMul: 1,
       extraLoad: 0,
       cmd: { l: 0, r: 0, state: 'READY' },
-      sensors: { tMs: 0, distCm: null, bearingDeg: 0, edgeL: 8, edgeR: 8 },
+      sensors: { tMs: 0, distCm: null, bearingDeg: 0, edgeL: 8, edgeR: 8, edgeBack: 8 },
       wheel: [0, 0],
       out: false,
       log: emptyLog(),
@@ -394,12 +398,14 @@ export function createMatch(R: Rapier, setups: [BotSetup, BotSetup]): Match {
     }
     const sl = local(b, b.halfX * 0.75, 0, b.spec.body.front + 0.005)
     const sr = local(b, -b.halfX * 0.75, 0, b.spec.body.front + 0.005)
+    const sb = local(b, 0, 0, b.spec.body.back - 0.005)
     return {
       tMs: Math.round(t * 1000),
       distCm: nA > 0 ? Math.round(best * 1000) / 10 : null,
       bearingDeg: nA > 0 ? sumA / nA : 0,
       edgeL: Math.round(edgeReading(sl.x, sl.z)),
       edgeR: Math.round(edgeReading(sr.x, sr.z)),
+      edgeBack: Math.round(edgeReading(sb.x, sb.z)),
     }
   }
 
@@ -591,7 +597,7 @@ export function createMatch(R: Rapier, setups: [BotSetup, BotSetup]): Match {
       return result
     },
     setups,
-    stats: { you: botStats(setups[0].design, setups[0].ballastKg), rival: botStats(setups[1].design, setups[1].ballastKg) },
+    stats: { you: botStats(setups[0].design, setups[0].ballastKg, setups[0].motorMul), rival: botStats(setups[1].design, setups[1].ballastKg, setups[1].motorMul) },
     step,
     runToEnd() {
       while (!result) step()
