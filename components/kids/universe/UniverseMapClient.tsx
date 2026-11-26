@@ -26,19 +26,19 @@ type Pos = [number, number, number, number]
 const PLANET_POS: Record<string, Pos> = {
   spark: [24.6, 15, 20, 21],
   gearon: [78, 28.5, 79, 19],
-  nova: [75, 75.5, 79, 73],
-  apex: [25, 69.5, 21, 71],
+  nova: [75, 75.5, 71, 66],
+  apex: [25, 69.5, 29, 66],
 }
 
 const GAME_POS: Record<string, Pos> = {
   'sumo-arena': [60, 8, 50, 9],
   'drone-hover': [88, 8, 91, 44],
   'arm-factory': [16, 39.5, 9, 45],
-  'circuit-city': [85, 50, 50, 88],
-  'mars-rover': [50, 68.5, 91, 88],
-  'robot-brain': [50, 88, 9, 88],
-  'maze-mapper': [16.8, 88, 34, 48],
-  'swarm-reef': [48, 30.5, 66, 48],
+  'circuit-city': [85, 50, 50, 86],
+  'mars-rover': [50, 68.5, 91, 77],
+  'robot-brain': [50, 88, 9, 77],
+  'maze-mapper': [16.8, 88, 32, 43],
+  'swarm-reef': [48, 30.5, 68, 43],
 }
 
 const HANGAR_POS: Pos = [50, 50, 50, 48]
@@ -154,7 +154,7 @@ function PlanetNode({ planet, index, progress, childBand }: { planet: Planet; in
             Your planet
           </span>
         )}
-        <span className="relative grid h-[88px] w-[88px] place-items-center sm:h-[104px] sm:w-[104px] lg:h-[118px] lg:w-[118px]">
+        <span className="relative grid h-[88px] w-[88px] place-items-center sm:h-[104px] sm:w-[104px] xl:h-[118px] xl:w-[118px]">
           {/* progress ring */}
           <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full -rotate-90" aria-hidden>
             <circle cx="50" cy="50" r={R} fill="none" stroke="rgba(255,255,255,.12)" strokeWidth="4" />
@@ -231,7 +231,7 @@ function MoonNode({ game, index, childBand, played }: { game: UniverseGame; inde
       </span>
       {/* Phone: the short zone name. Wider screens: the game's own name, as in the game list below. */}
       <span className="mt-1 whitespace-nowrap rounded-lg bg-[#0A1120]/70 px-1.5 text-[12px] font-bold leading-5 text-[#EEF2F8] sm:hidden">{game.zone}</span>
-      <span className="mt-1 hidden max-w-[8.5rem] rounded-lg bg-[#0A1120]/70 px-1.5 text-center text-[13px] font-bold leading-[1.15rem] text-[#EEF2F8] sm:block">
+      <span className="mt-1 hidden w-max max-w-[7.5rem] rounded-lg bg-[#0A1120]/70 px-1.5 text-center text-[13px] font-bold leading-[1.15rem] text-[#EEF2F8] sm:block">
         <span aria-hidden className="mr-1">{game.emoji}</span>
         {game.name}
       </span>

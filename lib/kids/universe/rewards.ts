@@ -34,7 +34,7 @@ export interface LevelInfo {
 }
 
 const RANK_TITLES: { from: number; title: string }[] = [
-  { from: 1, title: 'Spark Cadet' },
+  { from: 1, title: 'Star Cadet' },
   { from: 5, title: 'Bolt Tinkerer' },
   { from: 10, title: 'Circuit Ranger' },
   { from: 15, title: 'Sensor Scout' },

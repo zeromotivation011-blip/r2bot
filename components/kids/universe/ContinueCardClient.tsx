@@ -56,7 +56,7 @@ export function pickMission(p: KidsProgress, titles: SessionTitles, playable: re
     return {
       eyebrow: `${planet.name} complete!`,
       title: 'Season finished!',
-      detail: `All ${SESSIONS_PER_LEVEL} sessions done. Replay a game or visit your robot in the Hangar.`,
+      detail: `All ${SESSIONS_PER_LEVEL} sessions done. Replay a game or visit the Hangar.`,
       href: '/kids/hangar',
       cta: 'Open the Hangar',
       icon: '🏆',
@@ -105,7 +105,7 @@ export function ContinueCardClient({ progress, titles, playable }: ContinueCardP
   return (
     <section
       aria-labelledby="continue-h"
-      className="relative min-h-[240px] overflow-hidden sm:min-h-[183px] rounded-[28px] border border-white/10 bg-[#111C32] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]"
+      className="relative min-h-[262px] overflow-hidden sm:min-h-[183px] rounded-[28px] border border-white/10 bg-[#111C32] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]"
     >
       {m ? (
         <div className="uv-pop flex h-full flex-col">

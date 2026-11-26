@@ -1,0 +1,124 @@
+/* app/kids/kids-shell.css — the kids shell (header, tab bar, footer).
+   A real stylesheet, not styled-jsx: it must be in the first paint or the
+   header renders unstyled and then shrinks (CLS ~0.09 measured 26 Nov 2026). */
+
+:root {
+  --spark-yellow: #FFD700;
+  --spark-orange: #FF6B35;
+  --spark-purple: #7C3AED;
+  --spark-green: #10B981;
+  --spark-blue: #3B82F6;
+  --spark-red: #EF4444;
+  --spark-bg: #0A1120;
+  --spark-card: #111C32;
+}
+.kids-nav {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  /* The installed app is viewport-fit=cover with a translucent status bar:
+     keep the header clear of the notch, clock and landscape side insets. */
+  padding: calc(12px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 12px calc(20px + env(safe-area-inset-left));
+  background: rgba(10, 17, 32, 0.88);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.kids-nav-brand {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: 900; font-size: 18px;
+  color: #EEF2F8;
+  font-family: var(--font-display), sans-serif;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+.kids-nav-logo { width: 36px; height: 36px; border-radius: 10px; }
+.kids-nav-links {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.kids-nav-link {
+  min-height: 48px;
+  display: inline-flex; align-items: center;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: transparent;
+  color: #A7B0C0;
+  font-weight: 800;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform .15s, background .15s;
+}
+.kids-nav-link:hover { background: #19263F; color: #EEF2F8; }
+.kids-nav-link-on { background: rgba(252,104,24,0.12); color: #FFA878; border-color: rgba(252,104,24,0.34); }
+.kids-nav-brand-kids { color: #FC6818; }
+.kids-nav-right { display: flex; align-items: center; gap: 8px; }
+.kids-nav-stars {
+  background: linear-gradient(135deg, #FC6818, #FF8A4C);
+  color: #1A1103;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 16px;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(255,138,76, 0.35);
+}
+.kids-main {
+  position: relative; z-index: 1;
+  padding-bottom: 40px;
+}
+.kids-footer {
+  position: relative; z-index: 1;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px;
+  padding: 24px 16px 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+}
+.kids-footer a { color: #A7B0C0; text-decoration: none; padding: 10px 2px; font-weight: 700; }
+.kids-footer a:hover { color: #fff; text-decoration: underline; }
+.kids-voice-toggle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #111C32;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform .15s;
+}
+.kids-voice-toggle:hover { transform: scale(1.07); }
+.kids-voice-toggle:focus-visible, .kids-tab:focus-visible, .kids-nav-link:focus-visible {
+  outline: 3px solid #FF8A4C;
+  outline-offset: 3px;
+}
+.kids-tabbar { display: none; }
+@media (max-width: 900px) {
+  .kids-nav-links { display: none; }
+}
+@media (max-width: 900px) {
+  .kids-tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 35;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    background: rgba(10, 17, 32, 0.96);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .kids-tab {
+    min-height: 56px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    border-radius: 14px;
+    color: #8A94A6; text-decoration: none; font-weight: 800; font-size: 12px;
+  }
+  .kids-tab-emoji { font-size: 22px; line-height: 1; transition: transform .15s; }
+  .kids-tab-on { background: rgba(252,104,24,0.14); color: #FFA878; }
+  .kids-tab-on .kids-tab-emoji { transform: scale(1.15); }
+  .kids-main { padding-bottom: 24px; }
+  .kids-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 640px) {
+  .kids-nav { padding: calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 10px calc(12px + env(safe-area-inset-left)); }
+  .kids-nav-stars { padding: 8px 10px; font-size: 14px; }
+  .kids-voice-toggle { width: 44px; height: 44px; }
+}

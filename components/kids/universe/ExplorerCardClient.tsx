@@ -4,9 +4,11 @@
 // The child's explorer card: avatar, explorer name, level + title + XP bar,
 // stars, badges, days explored this week and this week's three quests. Every
 // number comes from the progress store via levelInfo()/questStatus()/
-// daysExploredThisWeek() — nothing is invented. Before hydration it reserves
-// the height of a new explorer's card (742px, measured at 390px and 1280px),
-// the first view most visitors and every crawler get, so that case never jumps.
+// daysExploredThisWeek() — nothing is invented. On phones and tablets the card
+// always reserves 654px: the measured height of both a new explorer's card
+// (Spark's welcome) and a returning one's (stats + days), at 390px. So the
+// skeleton, the fresh card and the filled card are one size and nothing below
+// jumps. On desktop it fills the grid row beside the map.
 
 import type { KidsProgress } from '@/lib/kids-progress'
 import { getBand } from '@/lib/kids/bands'
@@ -29,7 +31,7 @@ export function ExplorerCardClient({ progress, onboarded, onStart, onEdit }: Exp
   return (
     <section
       aria-labelledby="explorer-h"
-      className={`relative h-full overflow-hidden ${progress ? '' : 'min-h-[742px]'} rounded-[28px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]`}
+      className={`relative h-full min-h-[654px] overflow-hidden lg:min-h-0 rounded-[28px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]`}
     >
       <h2 id="explorer-h" className="sr-only">
         Your explorer
@@ -103,41 +105,43 @@ function Filled({ p, onboarded, onStart, onEdit }: { p: KidsProgress; onboarded:
         </div>
       </div>
 
-      {/* XP bar */}
-      <div className="mt-4">
-        <div className="flex items-baseline justify-between text-[13px] font-semibold text-[#A7B0C0]">
-          <span>XP</span>
-          <span>
-            <span className="font-display text-[#EEF2F8]">{li.xpIntoLevel}</span> / {li.xpForNext} to level {li.level + 1}
-          </span>
-        </div>
-        <div
-          className="mt-1 h-3 overflow-hidden rounded-full bg-white/10"
-          role="progressbar"
-          aria-label={`Experience towards level ${li.level + 1}`}
-          aria-valuemin={0}
-          aria-valuemax={li.xpForNext}
-          aria-valuenow={li.xpIntoLevel}
-        >
+      {/* XP bar (a brand-new explorer has 0 XP; Spark's welcome says what to do instead) */}
+      {!fresh && (
+        <div className="mt-4">
+          <div className="flex items-baseline justify-between text-[13px] font-semibold text-[#A7B0C0]">
+            <span>XP</span>
+            <span>
+              <span className="font-display text-[#EEF2F8]">{li.xpIntoLevel}</span> / {li.xpForNext} to level {li.level + 1}
+            </span>
+          </div>
           <div
-            className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 shadow-[0_0_12px_rgba(252,104,24,.6)] transition-[width] duration-700"
-            style={{ width: `${Math.max(li.progress > 0 ? 4 : 0, Math.round(li.progress * 100))}%` }}
-          />
+            className="mt-1 h-3 overflow-hidden rounded-full bg-white/10"
+            role="progressbar"
+            aria-label={`Experience towards level ${li.level + 1}`}
+            aria-valuemin={0}
+            aria-valuemax={li.xpForNext}
+            aria-valuenow={li.xpIntoLevel}
+          >
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 shadow-[0_0_12px_rgba(252,104,24,.6)] transition-[width] duration-700"
+              style={{ width: `${Math.max(li.progress > 0 ? 4 : 0, Math.round(li.progress * 100))}%` }}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {fresh && (
-        <div className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4">
-          <div className="flex items-end gap-3">
+        <div className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-3">
+          <div className="flex items-end gap-2">
             {/* Spark, the R2BOT Kids guide (the same puppet as Story Theatre). */}
-            <svg viewBox="-112 -246 224 254" width="64" height="73" className="shrink-0" aria-hidden>
+            <svg viewBox="-112 -246 224 254" width="60" height="68" className="shrink-0" aria-hidden>
               <Spark emotion="happy" talking={false} />
             </svg>
-            <div className="relative mb-2 min-w-0 flex-1 rounded-2xl rounded-bl-md bg-[#0A1120]/70 px-3 py-2">
+            <div className="mb-1 min-w-0 flex-1 rounded-2xl rounded-bl-md bg-[#0A1120]/70 px-3 py-2">
               <p className="font-display text-[16px] font-bold leading-snug text-[#EEF2F8]">Hi! I&rsquo;m Spark. Let&rsquo;s set up your explorer!</p>
+              <p className="text-[14px] leading-snug text-[#A7B0C0]">Age group, name, avatar: three quick steps.</p>
             </div>
           </div>
-          <p className="mt-2 text-[15px] text-[#A7B0C0]">Pick your age group, a name and an avatar. Three quick steps.</p>
           <button
             type="button"
             onClick={onStart}
