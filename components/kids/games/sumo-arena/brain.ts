@@ -39,11 +39,11 @@ export interface FsmProgram {
   /** While searching, turn to keep facing the rival whenever the sensor has it (or had it in the last 1.2 s). */
   track?: boolean
   /** Opening move at the bell: curve right (1), left (−1) or drive straight (0) for `ms`. */
-  opening?: { ms: number; dir: 1 | -1 | 0; speed: number }
+  opening?: { ms: number; dir: 1 | -1 | 0; speed: number; /** then reverse away for this long before searching */ backOffMs?: number }
   dodge?: { cm: number; ms: number; dir: 1 | -1; speed: number; /** ms of hard pivot before the dash */ turnMs: number; /** only side-step a rival closing faster than this, cm/s */ minClosing: number }
 }
 
-type FsmState = 'OPEN' | 'SEARCH' | 'CHARGE' | 'RECOVER' | 'RETREAT' | 'HOLD' | 'DODGE'
+type FsmState = 'OPEN' | 'BACKOFF' | 'SEARCH' | 'CHARGE' | 'RECOVER' | 'RETREAT' | 'HOLD' | 'DODGE'
 
 const steer = (speed: number, bearing: number): [number, number] => {
   // Turn toward the echo: a target to the right speeds up the left wheel.
@@ -92,7 +92,10 @@ export function fsmController(p: FsmProgram): Controller {
       switch (state) {
         case 'OPEN':
           if (edge) go('RECOVER')
-          else if (p.opening && tIn >= p.opening.ms) go('SEARCH')
+          else if (p.opening && tIn >= p.opening.ms) go(p.opening.backOffMs ? 'BACKOFF' : 'SEARCH')
+          break
+        case 'BACKOFF':
+          if (tIn >= (p.opening?.backOffMs ?? 0)) go('SEARCH')
           break
         case 'SEARCH':
           if (edge) go('RECOVER')
@@ -136,6 +139,8 @@ export function fsmController(p: FsmProgram): Controller {
           const turn = o.dir === 0 ? steer(o.speed, s.distCm !== null ? s.bearingDeg : 0) : o.dir === 1 ? [o.speed, o.speed * 0.3] : [o.speed * 0.3, o.speed]
           return { l: turn[0], r: turn[1], state: 'OPENING' }
         }
+        case 'BACKOFF':
+          return { l: -70, r: -70, state: 'BACK OFF' }
         case 'SEARCH': {
           const { mode, dir, speed } = p.search
           if (p.track && sinceAny < 1200) {
