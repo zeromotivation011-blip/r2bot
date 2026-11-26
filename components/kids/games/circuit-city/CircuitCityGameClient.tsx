@@ -562,6 +562,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
     primeAudio()
     setDebrief(null)
     setSelected(null)
+    setSpark({ tone: 'info', text: 'Testing your circuit one situation at a time — watch the city and the moving dots.' })
     const report = runTest(def, partsRef.current)
     const attempts = tests + 1
     setTests(attempts)
