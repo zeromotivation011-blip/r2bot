@@ -278,7 +278,7 @@ export function PlanEditor(props: {
               return (
                 <div
                   key={v.sol.elbow}
-                  className={`rounded-xl border p-2 ${ok ? (v.sol.elbow === 'up' ? 'border-cyan-400/60 bg-cyan-400/10' : 'border-violet-400/60 bg-violet-400/10') : 'border-red-400/50 bg-red-500/10'}`}
+                  className={`rounded-xl border p-2 ${ok ? (v.sol.elbow === 'up' ? 'border-cyan-400/60 bg-cyan-400/10' : 'border-amber-400/60 bg-amber-400/10') : 'border-red-400/50 bg-red-500/10'}`}
                 >
                   <p className="text-sm font-black text-white">Elbow {v.sol.elbow}</p>
                   <p className="font-mono text-xs text-white/70">

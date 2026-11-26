@@ -27,7 +27,7 @@ const MAX_BLOCKS = 10
 const BLOCK_INFO: Record<Block, { label: string; color: string; icon: string }> = {
   forward: { label: 'Forward', color: '#10b981', icon: '↑' },
   left:    { label: 'Left',    color: '#3b82f6', icon: '↶' },
-  right:   { label: 'Right',   color: '#a855f7', icon: '↷' },
+  right:   { label: 'Right',   color: '#0891b2', icon: '↷' },
   sense:   { label: 'Sense',   color: '#FF8A4C', icon: '👀' },
   wait:    { label: 'Wait',    color: '#94a3b8', icon: '⏸' },
 }

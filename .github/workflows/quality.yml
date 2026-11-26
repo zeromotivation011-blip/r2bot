@@ -32,3 +32,5 @@ jobs:
         run: npx tsx lib/kids/code-lab/verify.ts
       - name: Every Skill Galaxy activity is valid and its solution passes its template
         run: npx tsx lib/kids/activities/verify.ts
+      - name: Kids progress backup code round-trips, merges without losing progress, and refuses bad codes
+        run: npx tsx lib/kids/progress-backup.verify.ts

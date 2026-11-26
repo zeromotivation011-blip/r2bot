@@ -6,6 +6,7 @@
 
 import * as THREE from 'three'
 import { disposeObject } from '@/lib/kids/robot3d'
+import { kidsReducedMotion, kidsRenderHints } from '@/lib/kids/settings'
 
 export interface Stage {
   scene: THREE.Scene
@@ -34,17 +35,20 @@ export interface StageOptions {
   lights?: boolean
 }
 
+/** Device prefers-reduced-motion OR the kids "Less motion" setting (lib/kids/settings.ts). */
 export function prefersReducedMotion(): boolean {
-  return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  return kidsReducedMotion()
 }
 
 export function createStage(container: HTMLElement, opts: StageOptions = {}): Stage {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: opts.alpha ?? false, preserveDrawingBuffer: false })
-  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1))
+  // Lite graphics (kids Settings, for older phones): pixel ratio 1, no antialias, no shadows.
+  const hints = kidsRenderHints(2)
+  const renderer = new THREE.WebGLRenderer({ antialias: hints.antialias, alpha: opts.alpha ?? false, preserveDrawingBuffer: false })
+  renderer.setPixelRatio(hints.dpr)
   renderer.outputColorSpace = THREE.SRGBColorSpace
   renderer.toneMapping = THREE.ACESFilmicToneMapping
   renderer.toneMappingExposure = 1.05
-  if (opts.shadows !== false) {
+  if (opts.shadows !== false && hints.shadows) {
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFShadowMap
   }

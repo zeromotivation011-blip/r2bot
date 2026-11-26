@@ -10,7 +10,7 @@
 // skeleton, the fresh card and the filled card are one size and nothing below
 // jumps. On desktop it fills the grid row beside the map.
 
-import type { KidsProgress } from '@/lib/kids-progress'
+import { collectedStars, type KidsProgress } from '@/lib/kids-progress'
 import { getBand } from '@/lib/kids/bands'
 import { daysExploredThisWeek, levelInfo, questStatus } from '@/lib/kids/universe/rewards'
 import { Spark } from '@/components/kids/story/characters'
@@ -157,7 +157,7 @@ function Filled({ p, onboarded, onStart, onEdit }: { p: KidsProgress; onboarded:
         <>
           {/* Stats */}
           <dl className="mt-4 grid grid-cols-3 gap-2">
-            <Stat label="Stars" value={p.totalStars} icon="⭐" />
+            <Stat label="Stars" value={collectedStars(p)} icon="⭐" />
             <Stat label="Badges" value={badgeCount} icon="🏅" />
             <div className="rounded-2xl border border-white/10 bg-[#0A1120]/60 px-2 py-2.5 text-center">
               <dt className="text-[12px] font-semibold text-[#A7B0C0]">This week</dt>

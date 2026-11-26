@@ -12,15 +12,20 @@ import { blockNeeds } from '@/lib/kids/sim/program'
 
 type Style = 'hat_blocks' | 'motion_blocks' | 'sensor_blocks' | 'control_blocks' | 'logic_blocks' | 'math_blocks' | 'action_blocks' | 'var_blocks'
 
+// Block colours are CONTENT colour (vivid, one hue family per toolbox group) but
+// never purple, and each one keeps the white block label at >= 3:1 — the label is
+// 14pt bold (see fontStyle below), which is WCAG "large text", so 3:1 is AA.
+// Contrast of #FFFFFF on each: hat 3.6, motion 5.2, sensor 3.8, control 3.2,
+// logic 5.0, math 3.7, var 5.4, action 4.8.
 const STYLE_COLOURS: Record<Style, string> = {
-  hat_blocks: '#F59E0B',
-  motion_blocks: '#3B82F6',
-  sensor_blocks: '#10B981',
-  control_blocks: '#F59E0B',
-  logic_blocks: '#F97316',
-  math_blocks: '#8B5CF6',
-  action_blocks: '#EC4899',
-  var_blocks: '#A855F7',
+  hat_blocks: '#EA580C', // R2BOT orange family — "when run" starts every program
+  motion_blocks: '#2563EB', // blue
+  sensor_blocks: '#059669', // green
+  control_blocks: '#D97706', // amber
+  logic_blocks: '#B45309', // deep amber, same Control group
+  math_blocks: '#0891B2', // cyan (brand secondary)
+  var_blocks: '#0E7490', // deep cyan, same Maths group
+  action_blocks: '#DB2777', // pink
 }
 
 let defined = false
@@ -164,8 +169,32 @@ export function defineBlocks(): void {
   ])
 }
 
+// Brand chrome that Blockly's theme object cannot express (docs/kids-design.md):
+// the selected toolbox row is R2BOT orange with dark ink (Blockly paints it the
+// category colour with white text, which fails contrast on amber), flyout labels
+// ("🔒 needs …") are text-2 grey instead of Blockly's #575E75 (2.2:1 on navy),
+// scrollbars brighten on hover, and the injection area is navy, not white.
+const KIDS_BLOCKLY_CSS = `
+.r2kids-theme .blocklyToolboxSelected { background-color: #FC6818 !important; }
+.r2kids-theme .blocklyToolboxSelected .blocklyToolboxCategoryLabel { color: #1A1103 !important; }
+.r2kids-theme .blocklyToolboxCategory:not(.blocklyToolboxSelected):hover { background-color: rgba(255,255,255,.08); }
+.r2kids-theme .blocklyToolboxCategory:focus-visible { outline: 3px solid rgba(255,138,76,.8); outline-offset: -3px; }
+.r2kids-theme .blocklyFlyoutLabelText { fill: #A7B0C0 !important; }
+.r2kids-theme .blocklyScrollbarHandle:hover { fill: #5A6B8C; }
+.r2kids-theme.blocklySvg, .r2kids-theme .blocklySvg { background-color: #111C32; }
+.r2kids-theme .blocklyMainBackground { stroke: rgba(255,255,255,.08); }
+.r2kids-theme .blocklyZoom > image { opacity: .55; }
+.r2kids-theme .blocklyZoom > image:hover { opacity: .9; }
+`
+
 export function kidsTheme(): Blockly.Theme {
   if (theme) return theme
+  try {
+    // Must run before the first Blockly.inject(); it throws once Blockly's CSS is in the page.
+    Blockly.Css.register(KIDS_BLOCKLY_CSS)
+  } catch {
+    // CSS already injected (e.g. a hot reload) — the rules from the first load are still in the page.
+  }
   const blockStyles: Record<string, Partial<Blockly.Theme.BlockStyle>> = {}
   for (const [k, c] of Object.entries(STYLE_COLOURS)) blockStyles[k] = { colourPrimary: c, hat: k === 'hat_blocks' ? 'cap' : '' }
   theme = Blockly.Theme.defineTheme('r2kids', {
@@ -174,16 +203,23 @@ export function kidsTheme(): Blockly.Theme {
     blockStyles,
     categoryStyles: {},
     componentStyles: {
-      workspaceBackgroundColour: '#111C32',
-      toolboxBackgroundColour: '#19263F',
-      toolboxForegroundColour: '#F5F3FF',
-      flyoutBackgroundColour: '#19263F',
+      workspaceBackgroundColour: '#111C32', // --surface-1
+      toolboxBackgroundColour: '#0A1120', // --void
+      toolboxForegroundColour: '#EEF2F8', // --text-1
+      flyoutBackgroundColour: '#19263F', // --surface-2
       flyoutForegroundColour: '#EEF2F8',
-      flyoutOpacity: 0.96,
+      flyoutOpacity: 0.97,
       scrollbarColour: '#3A4A66',
+      scrollbarOpacity: 0.9,
       insertionMarkerColour: '#FFFFFF',
       insertionMarkerOpacity: 0.3,
-      cursorColour: '#F59E0B',
+      // Selection, drop-target and keyboard cursor are R2BOT orange.
+      selectedGlowColour: '#FF8A4C', // amber-400
+      selectedGlowOpacity: 0.9,
+      replacementGlowColour: '#FFA878', // amber-300
+      replacementGlowOpacity: 0.9,
+      markerColour: '#00E5FF', // cyan
+      cursorColour: '#FC6818', // amber-500
     },
     fontStyle: { family: 'ui-rounded, system-ui, sans-serif', weight: '700', size: 14 },
     startHats: true,

@@ -8,7 +8,7 @@
 // everywhere.
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import { reportActivity } from '@/lib/kids/universe/rewards'
+import { reportBestRun } from '@/lib/kids/universe/rewards'
 import { playSound } from '@/lib/kids-audio'
 import { fireConfetti } from '@/components/kids/Confetti'
 import { getProgress } from '@/lib/kids-progress'
@@ -165,7 +165,13 @@ export function useThinkMissions<M extends ThinkMission>(lab: LabId): MissionSta
   const [justDone, setJustDone] = useState<M | null>(null)
   const doneRef = useRef<string[]>([])
   useEffect(() => {
-    doneRef.current = loadDone(lab)
+    // The local list, plus missions the progress store already paid for (a restored
+    // backup carries personalBests but not this device-only list).
+    const prefix = `think-${lab}-`
+    const paid = Object.keys(getProgress().personalBests)
+      .filter((k) => k.startsWith(prefix))
+      .map((k) => k.slice(prefix.length))
+    doneRef.current = Array.from(new Set([...loadDone(lab), ...paid]))
     setDone(doneRef.current)
   }, [lab])
   const complete = useCallback(
@@ -175,7 +181,8 @@ export function useThinkMissions<M extends ThinkMission>(lab: LabId): MissionSta
       saveDone(lab, doneRef.current)
       setDone(doneRef.current)
       setJustDone(m)
-      reportActivity({ kind: 'activity', id: `think-${lab}-${m.id}`, xp: m.xp, badges: m.badges })
+      // score 1 = 'finished once': reportBestRun pays the first finish only, on any device.
+      reportBestRun({ kind: 'activity', id: `think-${lab}-${m.id}`, xp: m.xp, badges: m.badges, score: 1 })
       playSound('star')
       fireConfetti()
     },

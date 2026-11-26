@@ -37,7 +37,7 @@ import {
   type RobotAction,
 } from '@/lib/kids/ai/vision/missions'
 import { getProgress } from '@/lib/kids-progress'
-import { reportActivity } from '@/lib/kids/universe/rewards'
+import { reportBestRun } from '@/lib/kids/universe/rewards'
 import { playSound } from '@/lib/kids-audio'
 import type { TierName } from '@/lib/kids/universe/tiers'
 import { ConfidenceBars, FeatureView, LossChart, ScoreView, ThumbCanvas, type ClassView } from './VisionWidgetsClient'
@@ -190,7 +190,11 @@ export default function VisionLabClient() {
   // Start at the child's band, if they picked one.
   useEffect(() => {
     const t = tierForBand(getProgress().band)
-    setDone(loadDoneMissions())
+    // Local list plus missions the progress store already paid for (a restored backup).
+    const paid = Object.keys(getProgress().personalBests)
+      .filter((k) => k.startsWith('vision-lab:'))
+      .map((k) => k.slice('vision-lab:'.length))
+    setDone(Array.from(new Set([...loadDoneMissions(), ...paid])))
     if (t !== 'Cadet') {
       setTier(t)
       setClasses(presetClasses(t))
@@ -548,7 +552,8 @@ export default function VisionLabClient() {
     setDone(next)
     saveDoneMissions(next)
     for (const m of newly) {
-      reportActivity({
+      reportBestRun({
+        score: 1, // first finish only, on any device
         kind: 'activity',
         id: `vision-lab:${m.id}`,
         xp: 30,

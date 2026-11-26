@@ -1,6 +1,12 @@
 // lib/kids-audio.ts
 // Web Audio API helpers — no files, no npm packages.
-// Master volume 0.3, respects document.hidden.
+// Respects document.hidden and the kids Settings (lib/kids/settings.ts):
+// sound effects off → playSound is silent; master gain = MAX_MASTER × volume
+// (default volume 0.6 → 0.3, the original level); voice off → sparkSays is silent.
+
+import { readKidsSettings } from './kids/settings'
+
+const MAX_MASTER = 0.5
 
 export type SoundType =
   | 'click'
@@ -22,7 +28,7 @@ function ensureCtx(): { ctx: AudioContext; master: GainNode } | null {
       if (!Ctor) return null
       ctx = new Ctor()
       masterGain = ctx.createGain()
-      masterGain.gain.value = 0.3
+      masterGain.gain.value = MAX_MASTER * readKidsSettings().volume
       masterGain.connect(ctx.destination)
     } catch {
       return null
@@ -97,8 +103,14 @@ const NOTES = {
 
 export function playSound(type: SoundType) {
   if (typeof document !== 'undefined' && document.hidden) return
+  const settings = readKidsSettings()
+  if (!settings.sound || settings.volume <= 0) return
   const got = ensureCtx()
   if (!got) return
+  // Follow the volume slider (cheap; the setting is cached).
+  got.master.gain.setValueAtTime(MAX_MASTER * settings.volume, got.ctx.currentTime)
+  // Browsers start a context suspended until a user gesture; resume when we can.
+  if (got.ctx.state === 'suspended') void got.ctx.resume().catch(() => undefined)
 
   switch (type) {
     case 'click':
@@ -160,7 +172,8 @@ export function primeAudio() {
 let lastUtterance: string | null = null
 
 export function sparkSays(text: string, onDone?: () => void): void {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+  // Voice off (Settings, or the header's voice button — the same stored key) → silent.
+  if (typeof window === 'undefined' || !('speechSynthesis' in window) || !readKidsSettings().voice) {
     onDone?.()
     return
   }

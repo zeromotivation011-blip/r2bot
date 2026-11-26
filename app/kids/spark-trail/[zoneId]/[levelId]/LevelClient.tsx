@@ -1,6 +1,6 @@
 'use client'
 
-// app/kids/world/[zoneId]/[levelId]/LevelClient.tsx
+// app/kids/spark-trail/[zoneId]/[levelId]/LevelClient.tsx
 // Storybook-style level: full-screen panels, no in-level scrolling.
 // Panel sequence: STORY → CONCEPT → ACTIVITY 1 → FUN FACT → ACTIVITY 2 → CELEBRATION
 // Voice is on by default; every panel auto-speaks its primary text when shown.
@@ -16,6 +16,7 @@ import {
   type KidsZone as Zone,
 } from '@/lib/kids-world-data'
 import { completeLevel, bumpAttempt } from '@/lib/kids-progress'
+import { reportBestRun } from '@/lib/kids/universe/rewards'
 import { playSound, primeAudio, randomPraise } from '@/lib/kids-audio'
 import { useKidsVoice } from '@/lib/kids-voice'
 import { useConfetti } from '@/components/kids/Confetti'
@@ -69,6 +70,7 @@ export default function LevelClient() {
       Math.min(level.starReward, Math.round(level.starReward * Math.max(0.4, ratio))),
     )
     const result = completeLevel(zoneId, levelId, stars)
+    reportBestRun({ kind: 'challenge', id: `spark-trail-${zoneId}-${levelId}`, xp: 20, stars: Math.min(3, stars), score: stars })
     setEarnedStars(stars)
     setPartAwarded(result.partAwarded)
     setZoneJustDone(!!result.newlyCompletedZone)
@@ -83,8 +85,8 @@ export default function LevelClient() {
     return (
       <div style={{ padding: 40, textAlign: 'center' }}>
         <p style={{ fontSize: 22, fontWeight: 900 }}>Level not found.</p>
-        <Link href="/kids/world" style={{ marginTop: 16, display: 'inline-block', color: '#FFC9A8' }}>
-          ← World map
+        <Link href="/kids/spark-trail" style={{ marginTop: 16, display: 'inline-block', color: '#FFC9A8' }}>
+          ← Spark Trail
         </Link>
       </div>
     )
@@ -96,7 +98,7 @@ export default function LevelClient() {
   return (
     <div className="lvl-root">
       <header className="lvl-progress">
-        <Link href={`/kids/world/${zone.id}`} className="lvl-quit" aria-label="Back to zone">← Zone</Link>
+        <Link href={`/kids/spark-trail/${zone.id}`} className="lvl-quit" aria-label="Back to zone">← Zone</Link>
         <div className="lvl-dots" aria-label={`Panel ${idx + 1} of ${panels.length}`}>
           {panels.map((p, i) => (
             <span key={p + i} className={`lvl-dot ${i < idx ? 'done' : i === idx ? 'now' : ''}`} />
@@ -151,7 +153,7 @@ export default function LevelClient() {
             onNext={() => {
               const i = zone.levels.findIndex(l => l.id === level.id)
               const next = zone.levels[i + 1]
-              router.push(next ? `/kids/world/${zone.id}/${next.id}` : `/kids/world/${zone.id}`)
+              router.push(next ? `/kids/spark-trail/${zone.id}/${next.id}` : `/kids/spark-trail/${zone.id}`)
             }}
           />
         )}
@@ -418,7 +420,7 @@ function CelebrationPanel({
       <div className="panel-celebration-actions">
         <button type="button" onClick={onReplay} className="panel-secondary">↻ Play again</button>
         <button type="button" onClick={onNext} className="panel-cta">Next Level →</button>
-        <Link href={`/kids/world/${zone.id}`} className="panel-secondary">Back to Zone</Link>
+        <Link href={`/kids/spark-trail/${zone.id}`} className="panel-secondary">Back to Zone</Link>
       </div>
     </div>
   )

@@ -194,6 +194,11 @@ const nextConfig = {
 
     return [
       ...simulatorAliases,
+      // 26 Nov 2026: the 2025 "Robot World" (six zones, 14 levels, boss challenges) moved to
+      // /kids/spark-trail so /kids/world and /kids/worlds (the seven Universe worlds) never both
+      // exist. Its games are unique, so they were kept and renamed rather than dropped.
+      { source: '/kids/world', destination: '/kids/spark-trail', permanent: true },
+      { source: '/kids/world/:path*', destination: '/kids/spark-trail/:path*', permanent: true },
       ...atlasRobotCanonical,
       // 19 Nov 2026: the Short _lZ0noG8Tg4 repeats the robot-lawn-mower lesson. Its YouTube
       // description links here, so the slug it was written for points at the one lesson

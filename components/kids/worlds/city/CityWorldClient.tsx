@@ -197,7 +197,7 @@ export function CityProgressCard({ ids, gameId }: { ids: string[]; gameId: strin
       </section>
 
       {complete ? (
-        <section aria-labelledby="city-cert" className="relative overflow-hidden rounded-[28px] border-2 border-amber-300/70 bg-gradient-to-br from-sky-500 via-indigo-800 to-[#0A1120] p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,.45)]">
+        <section aria-labelledby="city-cert" className="relative overflow-hidden rounded-[28px] border-2 border-amber-300/70 bg-gradient-to-br from-sky-500 via-[#19263F] to-[#0A1120] p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,.45)]">
           <p aria-hidden className="text-5xl motion-safe:animate-bounce">
             🏙️
           </p>

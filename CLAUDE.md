@@ -160,15 +160,26 @@ Build these exceptionally; everything else is secondary.
   not MP4s), **Workshop** `/kids/workshop` (3D robot builder, camera "magic window" AR on every phone,
   WebXR AR/VR where supported), **Code Lab** `/kids/code-lab/<mission>` (block coding that drives the
   child's own robot; blocks need the matching part — capabilities come from `lib/kids/robot-design.ts`),
-  Robot World `/kids/world` (the original six zones), **Worlds** `/kids/worlds` + `/kids/worlds/<id>` (26 Nov 2026: seven
-  themed worlds — Robot Guardians, Ocean Lab, Robo Zoo, Robot Hospital, Smart Farm, Robot City, Space Station — each with a
-  flagship game in `GAMES` and activities tagged `world: <id>`; `WORLDS` in `lib/kids/universe/worlds.ts`; on the Universe
-  map they sit on the Worlds belt, not as moons), **Games** `/kids/play/<id>` (count them from `GAMES`, never type the
+  **Spark Trail** `/kids/spark-trail` (the original six zones, formerly Robot World; `/kids/world/*` 308s there so
+  `/kids/world` and `/kids/worlds` never both exist), **Worlds** `/kids/worlds` + `/kids/worlds/<id>` (themed worlds —
+  count them from `WORLDS` in `lib/kids/universe/worlds.ts`, never type the number — each with a flagship game in `GAMES`
+  and activities tagged `world: <id>`; on the Universe map they sit on the Worlds belt, not as moons),
+  **How Robots Think** `/kids/ai` (indexable hub: neural playground, learning robot, robot senses, Vision Lab, Talk to your
+  robot), **Ask Spark** (the kid-safe mentor, mounted once in `KidsShell` via `next/dynamic`; a floating button on
+  ordinary pages, a header button on game/full-screen pages, hidden on grown-up pages; answers from the offline FAQ in
+  `lib/kids/ai/spark/faq.ts` unless `KIDS_AI_ENABLED=true`), **Settings** `/kids/settings` (noindex; one device-only store
+  `lib/kids/settings.ts` — sound, volume, voice, less motion, larger text, Lite 3D; hooks `useKidsSettings`,
+  `useKidsReducedMotion`, `useKidsLite3D`, `liteDpr()`, `kidsRenderHints()`; `<html>` classes `kids-large-text`,
+  `kids-reduce-motion`, `kids-lite-3d`), and the **progress backup code** (`exportProgressCode`/`importProgressCode` in
+  `lib/kids-progress.ts`, UI `components/kids/hangar/BackupCodeClient.tsx` in the Hangar and Settings: no personal data,
+  a restore merges and never lowers progress), **Games** `/kids/play/<id>` (count them from `GAMES`, never type the
   number; only games with a built page go in `GAMES`; the phone tab bar is five: Home · Course · Worlds · Games · Hangar),
   **Classroom** `/kids/classroom` (teacher, noindex),
   `/kids/join` (child joins with code + nickname, noindex) and `/kids/schools` (indexable pitch + pilot form
   through `captureLead()`). One robot shape (`RobotDesign`) and one progress store (`lib/kids-progress.ts`,
-  fires `KIDS_PROGRESS_EVENT`) for all of it. **Children never give an email, password, phone or birthday**;
+  fires `KIDS_PROGRESS_EVENT`) for all of it. XP, badges and quests come ONLY from `reportActivity` in
+  `lib/kids/universe/rewards.ts` (older per-item-star surfaces use `reportBestRun`, which pays a first finish or a
+  better score, never a replay); the one star total shown anywhere is `collectedStars()`. **Children never give an email, password, phone or birthday**;
   classroom identity is a random token whose SHA-256 is stored server-side. R2BOT Kids installs as its own
   PWA (`/kids/manifest.webmanifest`, `public/kids-sw.js`, scope `/kids`). The camera is allowed site-wide
   (`camera=(self)`) only for Workshop AR; frames never leave the device.
@@ -363,6 +374,9 @@ from a beginner's first question to advanced detail. Bar: better than the top re
 ```
 NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 ANTHROPIC_API_KEY, OPENAI_API_KEY
+KIDS_AI_ENABLED      # 'true' turns on paid AI for Ask Spark / Talk to your robot; default OFF (offline FAQ + on-device parser)
+KIDS_AI_MODEL        # optional; another Haiku only (anything else falls back to the default Haiku)
+KIDS_AI_DAILY_CAP    # site-wide AI calls/day for Talk to your robot; default 300, 0 = off (Ask Spark: 20/IP/day)
 NEXT_PUBLIC_SITE_URL = https://www.r2bot.in
 NEXT_PUBLIC_GA_ID = G-MGD2GR40MY
 RESEND_API_KEY, RESEND_FROM_EMAIL, CRON_SECRET       # weekly digest + crons

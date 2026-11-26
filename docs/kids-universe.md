@@ -39,19 +39,54 @@ learning) and four difficulty tiers — **Cadet, Pilot, Ace, Legend** — so a
 `app/kids/KidsShell.tsx`. Phone tab bar, exactly five: **Home · Course · Worlds · Games ·
 Hangar**. Desktop header (logo = Home): Course · Worlds · Galaxy · Games · Hangar. On
 phones the Skill Galaxy is the first item of "More" (hidden there on desktop, where it is
-a header link). Secondary surfaces: `KIDS_MORE` in `lib/kids/nav.ts`.
+a header link). Secondary surfaces: `KIDS_MORE` in `lib/kids/nav.ts` — More lists Galaxy
+(phones only), How Robots Think `/kids/ai`, Stories, Workshop, Code Lab, Spark Trail
+`/kids/spark-trail` (the old Robot World; `/kids/world/*` 308s there), Physics Lab, Make at
+Home, then Settings (`KIDS_SETTINGS`). Schools and teacher pages live in the kids footer.
+The More menu is pinned to the screen and scrolls when taller than it.
+
+**Ask Spark** is mounted once in the shell (`AskSparkClient`, `next/dynamic`, `ssr:false`).
+Ordinary pages: a floating button above the tab bar. Game and full-screen pages (`play/*`,
+`code-lab/*`, `workshop`, `lab/*`, `stories/*`, course sessions, Galaxy activities, `ai/*`,
+`spark-trail/*`, `challenge/*`): no floating button — a 44–48px Spark button in the header
+calls `openSpark()`. Hidden on grown-up pages. Offline FAQ unless `KIDS_AI_ENABLED=true`.
+
+## Settings — one device-only store
+`lib/kids/settings.ts` (localStorage only; no account). Page `/kids/settings` (noindex),
+which also mounts the progress backup code. Fields: `sound`, `volume`, `voice` (same key as
+`lib/kids-voice.ts`, `r2bot_kids_voice`), `reduceMotion`, `largeText`, `lite3d`.
+- Every change fires `KIDS_SETTINGS_EVENT` (`r2bot:kids-settings`); other tabs follow via `storage`.
+- React: `useKidsSettings()`, `useKidsReducedMotion()` (device preference OR the setting),
+  `useKidsLite3D()`. Non-React: `readKidsSettings()`, `kidsReducedMotion()`, `kidsLite3D()`.
+- three.js: `kidsRenderHints()` → `{ dpr, antialias, shadows }`, `liteDpr()`. `createStage()`
+  in `components/kids/three/stage.ts` already applies them, and its `prefersReducedMotion()`
+  returns `kidsReducedMotion()`. A view that makes its own renderer must use these too.
+- `<html>` classes, set before first paint by `KIDS_SETTINGS_BOOT_SCRIPT` (in
+  `app/kids/layout.tsx`) and kept in step by `RewardToastClient` (removed on leaving /kids):
+  `kids-large-text` (kids text ~112%), `kids-reduce-motion` (animations cut),
+  `kids-lite-3d` (informational). CSS: `components/kids/settings/kids-settings.css`.
+- `playSound` (lib/kids-audio.ts) is silent when sound is off and follows the volume;
+  `sparkSays` is silent when voice is off.
 
 ## Data — one store
 `lib/kids-progress.ts` is the only progress store (localStorage, synced to a
 teacher's class by `components/kids/classroom/KidsClassSyncClient.tsx`).
 Fields added for the Universe: `xp, badges, unlocks, personalBests,
 sessionsDone, questProgress, playDays, avatar, explorerName`.
+Star total shown to children and grown-ups: `collectedStars()` (never `totalStars` alone).
+Backup without personal data: `exportProgressCode()` → `R2K1.<z|j>.<base64url>.<fnv1a>`
+and `importProgressCode()` (never throws, caps every field, merges with max/union, never
+lowers progress). UI: `components/kids/hangar/BackupCodeClient.tsx` (Hangar and Settings).
+Checks: `lib/kids/progress-backup.verify.ts` (CI).
 
 ## Rewards — one function
 `lib/kids/universe/rewards.ts` → `reportActivity({ kind, id, stars, score, badges, attempts })`.
 It alone decides XP, level (`levelInfo`), badges, unlocks, weekly quests and
 personal bests, and fires `REWARD_EVENT`; `components/kids/ui/RewardToastClient.tsx`
 (mounted in the shell) celebrates. **Never** write those fields directly.
+Surfaces that keep their own per-item stars (Story Theatre, Code Lab missions, Spark Trail
+levels, `/kids/challenge`) call `reportBestRun(...)`, which reports only a first finish or a
+better score, so replays never farm XP.
 Rules: reward learning and effort, not time; personal bests, never rankings or
 leaderboards; no streak that punishes a missed day.
 

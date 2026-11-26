@@ -3,6 +3,7 @@
 // Browser-only. Quiet by design: master volume 0.22.
 
 import type { Sfx } from './types'
+import { readKidsSettings } from '@/lib/kids/settings'
 
 let ctx: AudioContext | null = null
 let master: GainNode | null = null
@@ -69,6 +70,7 @@ function noise(dur: number, at = 0, peak = 0.5, lowpass = 1200) {
 
 export function playSfx(s: Sfx): void {
   if (typeof document !== 'undefined' && document.hidden) return
+  if (!readKidsSettings().sound) return
   switch (s) {
     case 'boing': osc('sine', 180, 520, 0.18); osc('sine', 520, 220, 0.25, 0.16); break
     case 'whoosh': noise(0.45, 0, 0.5, 2600); break

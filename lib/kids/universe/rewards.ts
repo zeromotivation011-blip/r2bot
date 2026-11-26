@@ -270,6 +270,18 @@ function today(): string {
 }
 
 /**
+ * For the older surfaces that keep their own per-item stars (Story Theatre, Code
+ * Lab missions, Spark Trail levels, boss challenges): report only the first
+ * finish and runs that beat the child's own best `score`, so replaying the same
+ * thing never farms XP. Returns null when nothing was reported.
+ */
+export function reportBestRun(r: ActivityReport & { score: number }): RewardResult | null {
+  const prev = getProgress().personalBests[r.id]
+  if (prev !== undefined && !(r.lowerIsBetter ? r.score < prev : r.score > prev)) return null
+  return reportActivity(r)
+}
+
+/**
  * Report something the child did. Returns everything they earned so the caller
  * can celebrate it, and fires REWARD_EVENT on window with the RewardResult as
  * `detail` so the global reward toast can show it without the caller's help.

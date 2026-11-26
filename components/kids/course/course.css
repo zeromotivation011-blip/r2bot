@@ -22,7 +22,3 @@
   75% { transform: translateX(5px); }
 }
 
-/* app/globals.css gives every <section> 120px of vertical padding (a marketing-page
-   rule). Inside the course runner, a section without its own padding has none.
-   :where() keeps this at element specificity, so any Tailwind p-/py- class wins. */
-:where(.course-runner) section { padding-top: 0; padding-bottom: 0; }

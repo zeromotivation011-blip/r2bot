@@ -20,7 +20,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Session } from '@/lib/kids/curriculum/types'
 import { getLevel1Arena, sessionDesign } from '@/lib/kids/sim/arenas/level1'
 import { loadDesign, ROBOT_CHANGED_EVENT, saveDesign, DEFAULT_DESIGN, type RobotDesign } from '@/lib/kids/robot-design'
-import { reportActivity, type RewardResult } from '@/lib/kids/universe/rewards'
+import { reportActivity, reportBestRun, type RewardResult } from '@/lib/kids/universe/rewards'
 import { getProgress } from '@/lib/kids-progress'
 import { cancelSparkSpeech, playSound, sparkSays } from '@/lib/kids-audio'
 import type { SimChallengeOutcome } from '@/components/kids/sim/SimChallengeClient'
@@ -153,7 +153,8 @@ export default function SessionRunnerClient({ session, level, levelTitle, actTit
   const onApply = (d: RobotDesign) => {
     saveDesign(d)
     setDesign(d)
-    if (!st.built) reportActivity({ kind: 'build', id: `${id}-build` })
+    // score 1 = 'done once': the progress store (and so a restored backup) remembers it.
+    if (!st.built) reportBestRun({ kind: 'build', id: `${id}-build`, score: 1 })
     patch({ built: true })
   }
 
@@ -164,7 +165,7 @@ export default function SessionRunnerClient({ session, level, levelTitle, actTit
       const best = Math.max(prev.challengeStars ?? 0, o.success ? o.stars : 0)
       const first = o.success && !prev.challengeReported
       // The weekly quest "Solve 3 robot challenges" counts the course's challenge, once per session.
-      if (first) reportActivity({ kind: 'challenge', id: `${id}-challenge`, stars: o.stars, attempts: o.attempts })
+      if (first) reportBestRun({ kind: 'challenge', id: `${id}-challenge`, stars: o.stars, attempts: o.attempts, score: 1 })
       setSt(writeSessionState(id, { challengeStars: best, challengeAttempts: o.attempts, ...(first ? { challengeReported: true } : {}) }))
     },
     [id],

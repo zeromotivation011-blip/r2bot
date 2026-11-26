@@ -329,7 +329,15 @@ h1.hero-title .accent { background: linear-gradient(120deg, var(--cyan-bright), 
 @keyframes pulseDown { 0%,100% { opacity: 0.3; transform: scaleY(0.6); } 50% { opacity: 1; transform: scaleY(1); } }
 
 /* Sections */
-section { position: relative; padding: 120px 0; z-index: 2; }
+/* Marketing-page rhythm for the main site. R2BOT Kids (everything inside the
+ * kids shell's <main class="kids-main">) is excluded: its sections are cards,
+ * steps and panels that set their own spacing, and 120px of surprise padding
+ * plus a z-index stacking context on every one of them fought every layout.
+ * :where() keeps the specificity at a bare `section` (0,0,1), exactly as before,
+ * so Tailwind padding utilities still win on main-site sections. Kids sections
+ * keep position: relative so absolutely positioned children do not move. */
+section { position: relative; }
+section:where(:not(.kids-main section)) { padding: 120px 0; z-index: 2; }
 .section-eyebrow { font-family: var(--font-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.35em; color: var(--cyan); text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
 .section-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--amber); }
 h2.section-title { font-size: clamp(36px, 4vw, 52px); margin: 0 0 14px; color: var(--mist); }

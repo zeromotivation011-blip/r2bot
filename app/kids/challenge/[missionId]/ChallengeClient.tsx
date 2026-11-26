@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { getMission, ROBOT_PARTS } from '@/lib/kids-world-data'
 import { completeLevel, getProgress, saveProgress } from '@/lib/kids-progress'
+import { reportBestRun } from '@/lib/kids/universe/rewards'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { GardenBotGame } from '@/components/kids/boss/GardenBotGame'
 import { ConveyorBugGame } from '@/components/kids/boss/ConveyorBugGame'
@@ -139,7 +140,7 @@ export default function ChallengeClient() {
     return (
       <div className="p-10 text-center">
         <p className="text-2xl font-black">Challenge not found.</p>
-        <Link href="/kids/world" className="mt-4 inline-block text-amber-300">← World map</Link>
+        <Link href="/kids/spark-trail" className="mt-4 inline-block text-amber-300">← Spark Trail</Link>
       </div>
     )
   }
@@ -175,16 +176,19 @@ export default function ChallengeClient() {
     const lastLevel = zone.levels[zone.levels.length - 1]
     const res = completeLevel(zone.id, lastLevel.id, lastLevel.starReward)
     setPartAwarded(res.partAwarded)
-    // Add the boss stars themselves
-    saveProgress({ totalStars: getProgress().totalStars + earned })
+    // Add the boss stars themselves — only the improvement on this boss's best
+    // (kept in personalBests by reportBestRun below), so replays never farm stars.
+    const bestBefore = getProgress().personalBests[`boss-${zone.id}`] ?? 0
+    const gained = Math.max(0, earned - bestBefore)
+    if (gained > 0) saveProgress({ totalStars: getProgress().totalStars + gained })
+    reportBestRun({ kind: 'challenge', id: `boss-${zone.id}`, xp: 60, stars: Math.min(3, earned), score: earned })
     playSound('zonecomplete')
-    if (typeof window !== 'undefined') window.sparkGuide?.celebrate()
   }
 
   return (
     <div className={`ch-root bg-gradient-to-br ${zone.bgGradient}`}>
       <div className="ch-shell">
-        <Link href={`/kids/world/${zone.id}`} className="back">← {zone.name}</Link>
+        <Link href={`/kids/spark-trail/${zone.id}`} className="back">← {zone.name}</Link>
 
         <header className="ch-head">
           <p className="badge">⚡ BOSS CHALLENGE ⚡</p>
@@ -247,7 +251,7 @@ export default function ChallengeClient() {
         )}
 
         {phase === 'result' && stars !== null && (
-          <Result stars={stars} partAwarded={partAwarded} zone={zone} onBack={() => router.push('/kids/world')} />
+          <Result stars={stars} partAwarded={partAwarded} zone={zone} onBack={() => router.push('/kids/spark-trail')} />
         )}
       </div>
 

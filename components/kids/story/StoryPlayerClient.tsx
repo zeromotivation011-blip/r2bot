@@ -22,6 +22,7 @@ import { isVoiceMuted, speakLine, speechAvailable, stopSpeech, warmVoices, type 
 import { playSfx, primeSfx } from '@/lib/kids/stories/sfx'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { completeEpisode } from '@/lib/kids-progress'
+import { reportBestRun } from '@/lib/kids/universe/rewards'
 import { fireConfetti } from '@/components/kids/Confetti'
 import { Background, FLOOR_Y } from './backgrounds'
 import { PUPPETS, PUPPET_HEIGHT } from './characters'
@@ -515,6 +516,8 @@ export default function StoryPlayerClient({ episode, next }: Props) {
     }
     const stars = Math.max(1, score)
     const { starsAdded } = completeEpisode(episode.slug, stars)
+    // XP + badges go through the one rewards engine (first finish or a better score only).
+    reportBestRun({ kind: 'episode', id: `story-${episode.slug}`, stars, score: stars })
     setResult({ stars, added: starsAdded })
     setStatus('done')
     playSound('levelup')

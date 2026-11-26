@@ -78,6 +78,9 @@ export function ShowAllToggle({ on, onChange }: { on: boolean; onChange: (v: boo
   )
 }
 
+/** Stars per constellation on the hub (the track page shows every one). */
+const HUB_WINDOW = 16
+
 export default function GalaxyClient({ summaries }: { summaries: ActivitySummary[] }) {
   const { ready, done, band, setBand } = useGalaxyState()
   const [showAll, setShowAll] = useState(false)
@@ -183,9 +186,15 @@ export default function GalaxyClient({ summaries }: { summaries: ActivitySummary
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           {TRACKS.map((t) => {
             const all = byTrack.get(t.id) ?? []
-            const shown = all.filter((a) => bands.has(a.band))
+            const inBand = all.filter((a) => bands.has(a.band))
+            // The hub shows a window of HUB_WINDOW stars per track (from just before the
+            // child's next one); the track page has them all. Drawing all ~650 stars here
+            // made a 1 MB page and a big layout shift.
+            const firstOpen = ready ? Math.max(0, inBand.findIndex((a) => !done[a.id])) : 0
+            const start = Math.max(0, Math.min(firstOpen - 3, inBand.length - HUB_WINDOW))
+            const shown = inBand.slice(start, start + HUB_WINDOW)
             const m = trackMastery(summaries, ready ? done : {}, t.id, band ?? undefined)
-            const hidden = all.length - shown.length
+            const hidden = all.length - inBand.length
             return (
               <article key={t.id} aria-labelledby={`track-${t.id}`} className="rounded-[28px] border border-white/[0.08] bg-[#111C32] p-4 shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:p-5">
                 <header className="flex items-center gap-3">
@@ -205,7 +214,14 @@ export default function GalaxyClient({ summaries }: { summaries: ActivitySummary
                 </header>
                 <div className="mt-3">
                   {shown.length ? (
-                    <Constellation track={t} activities={shown} allOfTrack={all} done={done} ready={ready} />
+                    <>
+                      <Constellation track={t} activities={shown} allOfTrack={all} done={done} ready={ready} />
+                      {inBand.length > shown.length && (
+                        <Link href={`/kids/galaxy/${t.id}`} className={`mt-1 flex min-h-[44px] items-center justify-center rounded-xl text-[15px] font-semibold text-amber-300 hover:text-amber-200 ${focusRing}`}>
+                          All {inBand.length} {t.name} missions →
+                        </Link>
+                      )}
+                    </>
                   ) : (
                     <p className="rounded-2xl border border-dashed border-white/[0.16] p-4 text-center text-[15px] text-[#A7B0C0]">
                       New missions for your age are landing here soon.

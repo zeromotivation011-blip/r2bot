@@ -114,7 +114,7 @@ export default function MyRobotClient() {
   return (
     <div className="mr">
       <header className="mr-head">
-        <Link href="/kids/world" className="back">← World map</Link>
+        <Link href="/kids/spark-trail" className="back">← Spark Trail</Link>
         <h1>🤖 My Robot</h1>
         <div className="stars">⭐ {progress.totalStars}</div>
       </header>
@@ -226,7 +226,8 @@ export default function MyRobotClient() {
 
       <div className="cta-row">
         <button onClick={downloadCard} className="cta">📤 Share My Robot (PNG)</button>
-        <Link href="/kids/world" className="cta secondary">🗺️ Keep exploring →</Link>
+        <Link href="/kids/spark-trail" className="cta secondary">🗺️ Keep exploring →</Link>
+        <Link href="/kids/hangar" className="cta secondary">🛠️ Robot Hangar →</Link>
       </div>
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />

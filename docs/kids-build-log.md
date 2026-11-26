@@ -134,3 +134,13 @@ NEXT after the running workflows (final pass, worlds, AI): Wave 1 of the roadmap
 - [x] /kids: Worlds section, counts; /kids/play: counts.
 - [x] Sitemap: /kids/worlds, /kids/worlds/<id>, /kids/play/<game> for the seven games; dates in `lib/content-dates.ts`.
 
+## 26 Nov 2026 — Wave 1 integration (nav, brand, settings, progress)
+- [x] Ask Spark mounted in the shell (dynamic, floating button or header button on full-screen pages); old SparkGuide deleted (and its tips file out of the shell bundle).
+- [x] One navigation: More = Galaxy (phones), How Robots Think `/kids/ai`, Stories, Workshop, Code Lab, Spark Trail, Physics Lab, Make at Home, Settings; More menu pinned and scrollable on phones.
+- [x] Robot World → Spark Trail `/kids/spark-trail`; `/kids/world/*` 308s; sitemap + `lib/content-dates.ts` updated (`/kids/ai` added).
+- [x] Brand: Blockly theme navy/orange/cyan (no purple blocks), Code Lab arena navy, remaining indigo/violet chrome swept; `globals.css` section padding no longer applies inside `.kids-main` (course.css reset removed).
+- [x] Settings `/kids/settings` + `lib/kids/settings.ts`: sound/volume, voice (synced with the header button), less motion (also in `stage.ts`), larger text (boot script before first paint), Lite 3D (DPR 1, no AA, no shadows; Hangar mirror too).
+- [x] Progress backup code (no personal data) in the Hangar and Settings; 51-check verify in CI.
+- [x] One currency, step 1: Story Theatre, Code Lab, Spark Trail levels and boss challenges now report through `reportBestRun` (first finish or better score only); parents page and Explorer card show `collectedStars()`.
+- [ ] Still open from Wave 1: parental gate, kids privacy section, `/kids/my-robot` merged into the Hangar (Spark Trail parts not yet shown there, so the route stays and links to the Hangar), quests/XP engine fixes, unlocks to 60, teacher stats, parent hub, offline precache, content hygiene, one block language.
+

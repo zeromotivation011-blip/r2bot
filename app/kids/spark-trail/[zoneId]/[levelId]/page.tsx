@@ -3,9 +3,9 @@ import LevelWrapper from './LevelWrapper'
 export const runtime = 'nodejs'
 
 export const metadata = {
-  title: 'Lesson — Robot World',
+  title: 'Lesson — Spark Trail',
   description: 'A robotics lesson designed for kids.',
-  // Client-rendered game screens: playable, not reference pages. /kids/world is the indexed entry.
+  // Client-rendered game screens: playable, not reference pages. /kids/spark-trail is the indexed entry.
   robots: { index: false, follow: true },
 }
 

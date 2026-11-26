@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { getProgress, resetProgress, type KidsProgress } from '@/lib/kids-progress'
+import { collectedStars, getProgress, resetProgress, type KidsProgress } from '@/lib/kids-progress'
 import { getBand } from '@/lib/kids/bands'
 import { KIDS_ZONES } from '@/lib/kids-world-data'
 
@@ -74,13 +74,13 @@ export default function ParentsClient() {
       {/* Section 1 — what they learned today */}
       <section className="card">
         <h2>What your child learned today</h2>
-        {!progress || (!progress.age && !progress.band && progress.totalStars === 0) ? (
+        {!progress || (!progress.age && !progress.band && collectedStars(progress) === 0 && progress.xp === 0) ? (
           <p className="muted">No data yet on this device. Have your child choose their age group on the R2BOT Kids home page to start.</p>
         ) : (
           <>
             <div className="stat-grid">
               <Stat label="Age group" value={getBand(progress.band)?.name ?? (progress.age ? `${progress.age} yrs` : '—')} />
-              <Stat label="Stars earned" value={`⭐ ${progress.totalStars}`} />
+              <Stat label="Stars earned" value={`⭐ ${collectedStars(progress)}`} />
               <Stat label="Story episodes" value={`${Object.keys(progress.episodesDone).length}`} />
               <Stat label="Code Lab missions" value={`${Object.keys(progress.codeMissions).length}`} />
               <Stat label="Robots built" value={`${progress.robotsBuilt}`} />

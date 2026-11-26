@@ -24,6 +24,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SparkCharacter } from '@/components/kids/SparkCharacter'
 import { playSound } from '@/lib/kids-audio'
+import { readKidsSettings } from '@/lib/kids/settings'
+import { KIDS_SETTINGS_EVENT } from '@/lib/kids/settings-boot'
 import { DEFAULT_DESIGN, loadDesign } from '@/lib/kids/robot-design'
 import { reportActivity } from '@/lib/kids/universe/rewards'
 import { VOICE_CREDIT } from '@/lib/kids/episodes/credits'
@@ -138,6 +140,28 @@ export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }
   const [captions, setCaptions] = useState(true)
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1)
   const [muted, setMuted] = useState(false)
+  // Kids Settings: 'Sound effects' gates the music bed, 'Spark talks' the voice clips.
+  const [soundSetting, setSoundSetting] = useState(true)
+  const [voiceSetting, setVoiceSetting] = useState(true)
+  useEffect(() => {
+    const sync = () => {
+      const st = readKidsSettings()
+      setSoundSetting(st.sound)
+      setVoiceSetting(st.voice)
+    }
+    sync()
+    window.addEventListener(KIDS_SETTINGS_EVENT, sync)
+    window.addEventListener('storage', sync)
+    return () => {
+      window.removeEventListener(KIDS_SETTINGS_EVENT, sync)
+      window.removeEventListener('storage', sync)
+    }
+  }, [])
+  const voiceOut = !muted && voiceSetting
+  const musicOut = !muted && soundSetting
+  useEffect(() => {
+    directorRef.current?.setChannels(voiceOut, musicOut)
+  }, [voiceOut, musicOut])
   const [choice, setChoice] = useState<ChoiceBeat | null>(null)
   const [reply, setReply] = useState<ChoiceOption | null>(null)
   const [unavailable, setUnavailable] = useState<Unavailable | null>(null)
@@ -250,7 +274,7 @@ export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }
       directorRef.current = d
       d.unlockAudio()
       d.setSpeed(speed)
-      d.setMuted(muted)
+      d.setChannels(voiceOut, musicOut)
       await d.preload((done, total) => aliveRef.current && setProgress(0.1 + 0.9 * (done / Math.max(1, total))))
     } catch {
       // No WebGL context after all, a lost context, or the engine chunk failed.
@@ -267,7 +291,7 @@ export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }
     if (record) (window as EpisodeWindow).__episode = { director: d, duration: plan.duration, startedAt: Date.now() }
     setPhase('ready')
     d.play()
-  }, [data, plan, record, finish, speed, muted, giveUp])
+  }, [data, plan, record, finish, speed, voiceOut, musicOut, giveUp])
 
   // Record mode: start by itself.
   useEffect(() => {
@@ -359,10 +383,7 @@ export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }
   }, [])
 
   const toggleMute = useCallback(() => {
-    setMuted((m) => {
-      directorRef.current?.setMuted(!m)
-      return !m
-    })
+    setMuted((m) => !m)
   }, [])
 
   const toggleFullscreen = useCallback(() => {

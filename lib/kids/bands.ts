@@ -63,8 +63,8 @@ export const KIDS_BANDS: KidsBand[] = [
     grades: 'Grades 6–8 · Class 6–8',
     promise: 'Give your robot sensors and make it decide for itself!',
     outcome: 'Uses sensors and IF/ELSE logic, debugs programs, and explains feedback in plain words.',
-    gradient: 'from-violet-500 to-purple-700',
-    accent: '#8B5CF6',
+    gradient: 'from-cyan-500 to-cyan-800',
+    accent: '#06B6D4',
   },
   {
     id: 'engineers',

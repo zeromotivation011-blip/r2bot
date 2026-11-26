@@ -4,6 +4,7 @@
 // canvas textures — original, no external assets.
 
 import * as THREE from 'three'
+import { kidsRenderHints } from '@/lib/kids/settings'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import { L1, L2, SHOULDER_H, TOOL, reachRing, type Joints, type V3 } from './kinematics'
 import {
@@ -120,9 +121,11 @@ export class FactoryScene {
 
   constructor(canvas: HTMLCanvasElement, opts: { pillar: boolean; reducedMotion: boolean }) {
     this.reduced = opts.reducedMotion
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' })
-    this.renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1))
-    this.renderer.shadowMap.enabled = true
+    // Settings → Lite graphics: lower pixel ratio, no antialias, no shadows.
+    const hints = kidsRenderHints(2)
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: hints.antialias, powerPreference: 'high-performance' })
+    this.renderer.setPixelRatio(hints.dpr)
+    this.renderer.shadowMap.enabled = hints.shadows
     this.renderer.shadowMap.type = THREE.PCFShadowMap
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     this.renderer.toneMappingExposure = 1.05

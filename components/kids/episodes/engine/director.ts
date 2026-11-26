@@ -148,6 +148,7 @@ export class Director {
   private voices = new Voices()
   private audioCtx: AudioContext | null = null
   private music: MusicBed | null = null
+  private musicOn = true
   private sky: THREE.Mesh
   private skyMat: THREE.ShaderMaterial
   private hemi: THREE.HemisphereLight
@@ -302,6 +303,7 @@ export class Director {
       if (Ctx) {
         this.audioCtx = new Ctx()
         this.music = new MusicBed(this.audioCtx)
+        this.music.setVolume(this.musicOn ? 1 : 0)
       }
     }
     void this.audioCtx?.resume().catch(() => undefined)
@@ -312,7 +314,7 @@ export class Director {
     if (this.ended) this.seek(0)
     this.playing = true
     this.opts.onPlayState(true)
-    this.music?.start()
+    if (this.musicOn) this.music?.start()
     this.syncAudio()
   }
 
@@ -334,8 +336,16 @@ export class Director {
   }
 
   setMuted(m: boolean): void {
-    this.voices.setMuted(m)
-    this.music?.setVolume(m ? 0 : 1)
+    this.setChannels(!m, !m)
+  }
+
+  /** Voice clips and the music bed separately (the kids Settings switch each). */
+  setChannels(voiceOn: boolean, musicOn: boolean): void {
+    this.voices.setMuted(!voiceOn)
+    this.musicOn = musicOn
+    this.music?.setVolume(musicOn ? 1 : 0)
+    if (!musicOn) this.music?.stop()
+    else if (this.playing) this.music?.start()
   }
 
   seek(t: number): void {

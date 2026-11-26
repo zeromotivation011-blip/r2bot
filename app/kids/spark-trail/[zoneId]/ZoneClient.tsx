@@ -23,7 +23,7 @@ export default function ZoneClient() {
     return (
       <div className="p-10 text-center">
         <p className="text-2xl font-black">Zone not found.</p>
-        <Link href="/kids/world" className="mt-4 inline-block text-amber-300 hover:underline">← Back to world map</Link>
+        <Link href="/kids/spark-trail" className="mt-4 inline-block text-amber-300 hover:underline">← Back to Spark Trail</Link>
       </div>
     )
   }
@@ -34,7 +34,7 @@ export default function ZoneClient() {
       <div className="p-10 text-center">
         <h1 className="text-3xl font-black text-amber-300">🔒 Locked</h1>
         <p className="mt-3 text-slate-300">You need ⭐ {ZONE_UNLOCK_STARS[zoneId]} to unlock {zone.name}.</p>
-        <Link href="/kids/world" className="mt-6 inline-block px-5 py-3 rounded-2xl bg-amber-500 text-black font-black">← Back to world</Link>
+        <Link href="/kids/spark-trail" className="mt-6 inline-block px-5 py-3 rounded-2xl bg-amber-500 text-black font-black">← Back to Spark Trail</Link>
       </div>
     )
   }
@@ -47,8 +47,8 @@ export default function ZoneClient() {
   return (
     <div className={`zone-root bg-gradient-to-br ${zone.bgGradient}`}>
       <div className="zone-shell">
-        <Link href="/kids/world" className="back-btn" onClick={() => playSound('click')}>
-          ← World Map
+        <Link href="/kids/spark-trail" className="back-btn" onClick={() => playSound('click')}>
+          ← Spark Trail
         </Link>
 
         <header className="zone-header">
@@ -80,7 +80,7 @@ export default function ZoneClient() {
                   </div>
                 </div>
                 <Link
-                  href={`/kids/world/${zone.id}/${l.id}`}
+                  href={`/kids/spark-trail/${zone.id}/${l.id}`}
                   className="play-btn"
                   onClick={() => playSound('click')}
                 >

@@ -452,7 +452,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
     if (ikView && ikView.reach === 'ok') {
       for (const v of ikView.sols) {
         const ok = v.sol.violated.length === 0 && !v.hit
-        ghosts.push({ joints: v.sol.joints, color: !ok ? 0xef4444 : v.sol.elbow === 'up' ? 0x22d3ee : 0xa78bfa })
+        ghosts.push({ joints: v.sol.joints, color: !ok ? 0xef4444 : v.sol.elbow === 'up' ? 0x22d3ee : 0xffa878 })
       }
     }
     if (hint && cfg.mode === 'jog') {

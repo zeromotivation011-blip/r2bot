@@ -1,0 +1,22 @@
+/* components/kids/settings/kids-settings.css — classes set on <html> by
+   lib/kids/settings.ts while inside /kids. Imported by RewardToastClient, which
+   the kids shell mounts on every kids page, so it is in the kids first load. */
+
+/* Larger text (~112%). The root size scales every rem-based size (Tailwind
+   text-*); .kids-main scales text that inherits the shell's 18px base. */
+html.kids-large-text { font-size: 112%; }
+html.kids-large-text .kids-main { font-size: 1.12em; }
+
+/* Reduce motion, on top of prefers-reduced-motion: no animations, no transitions,
+   no smooth scrolling. Canvas views read useKidsReducedMotion()/kidsReducedMotion(). */
+html.kids-reduce-motion { scroll-behavior: auto !important; }
+html.kids-reduce-motion *,
+html.kids-reduce-motion *::before,
+html.kids-reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  animation-delay: 0ms !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}

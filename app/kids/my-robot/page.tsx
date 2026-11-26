@@ -5,7 +5,7 @@ export const runtime = 'nodejs'
 export const metadata = {
   title: 'My Robot — Robot World',
   description: 'Customize your very own robot built from parts you earn.',
-  // Client-rendered Robot World screens: /kids/world is the indexed entry.
+  // Client-rendered Robot World screens: /kids/spark-trail is the indexed entry.
   robots: { index: false, follow: true },
 }
 

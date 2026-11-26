@@ -11,6 +11,7 @@ export class Voices {
   private currentFile: string | null = null
   private rate = 1
   private disposed = false
+  private wantMuted = false
 
   constructor() {
     this.el = new Audio()
@@ -54,10 +55,10 @@ export class Voices {
     void this.el.play().then(
       () => {
         this.el.pause()
-        this.el.muted = false
+        this.el.muted = this.wantMuted
       },
       () => {
-        this.el.muted = false
+        this.el.muted = this.wantMuted
       },
     )
   }
@@ -102,6 +103,7 @@ export class Voices {
   }
 
   setMuted(m: boolean): void {
+    this.wantMuted = m
     this.el.muted = m
   }
 

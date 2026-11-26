@@ -13,6 +13,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Reflector } from 'three/examples/jsm/objects/Reflector.js'
 import { animateRobot, buildRobot, disposeObject, getRobotHandles } from '@/lib/kids/robot3d'
 import type { RobotDesign } from '@/lib/kids/robot-design'
+import { liteDpr } from '@/lib/kids/settings'
 import { createStage, prefersReducedMotion, type Stage } from '@/components/kids/three/stage'
 import { beamTexture, decalTexture, dotTexture, floorTexture, skinLook, wallTexture } from './looks'
 
@@ -288,7 +289,7 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
     scene.add(front)
 
     // Reflective floor: a real mirror under a tinted, gridded glaze.
-    const w = Math.max(256, Math.round(host.clientWidth * Math.min(2, window.devicePixelRatio || 1) * 0.5))
+    const w = Math.max(256, Math.round(host.clientWidth * liteDpr(2) * 0.5))
     const mirror = new Reflector(new THREE.CircleGeometry(9, 64), {
       textureWidth: w,
       textureHeight: w,

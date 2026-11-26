@@ -201,7 +201,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Universe worlds: the index and one indexable page per world (lib/kids/universe/worlds.ts WORLDS).
     { url: `${BASE}/kids/worlds`, lastModified: at('/kids/worlds'), changeFrequency: 'monthly' as const, priority: 0.7 },
     ...KIDS_WORLDS.map((w) => ({ url: `${BASE}/kids/worlds/${w.id}`, lastModified: at(`/kids/worlds/${w.id}`), changeFrequency: 'monthly' as const, priority: 0.7 })),
-    { url: `${BASE}/kids/world`, lastModified: at('/kids/world'), changeFrequency: 'monthly' as const, priority: 0.6 },
+    // Spark Trail: the old Robot World (/kids/world 308s here, next.config.mjs).
+    { url: `${BASE}/kids/spark-trail`, lastModified: at('/kids/spark-trail'), changeFrequency: 'monthly' as const, priority: 0.6 },
+    { url: `${BASE}/kids/ai`, lastModified: at('/kids/ai'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/schools`, lastModified: at('/kids/schools'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/stories`, lastModified: at('/kids/stories'), changeFrequency: 'monthly' as const, priority: 0.7 },
     ...KIDS_EPISODES.map((e) => ({ url: `${BASE}/kids/stories/${e.slug}`, lastModified: new Date(e.updated), changeFrequency: 'monthly' as const, priority: 0.6 })),

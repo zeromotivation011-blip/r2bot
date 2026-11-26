@@ -10,6 +10,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { jsonldScript } from '@/lib/seo/jsonld'
+import { BackupCodeClient } from '@/components/kids/hangar/BackupCodeClient'
 import { HangarClient } from '@/components/kids/hangar/HangarClient'
 import { HangarRecordsClient, type CourseBadgeInfo } from '@/components/kids/hangar/HangarRecordsClient'
 // Read-only, server-side: the real names of the course badges. Only the small
@@ -64,10 +65,11 @@ export default function HangarPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(jsonLd) }} />
       <header className="mx-auto max-w-6xl px-4 pb-4 pt-6">
-        <p className="font-display text-sm font-bold uppercase tracking-wider text-amber-300">Robot Hangar</p>
+        <p className="font-display text-sm font-bold uppercase tracking-wider text-amber-300">Robot Hangar · My robot</p>
         <h1 className="mt-1 font-display text-3xl font-bold text-white sm:text-4xl">Your robot’s home base</h1>
         <p className="mt-2 max-w-3xl text-[#A7B0C0]">
-          Spin your robot around, try on the looks you have earned, and see every badge and best score in one place.
+          Your one robot lives here. Spin it around, try on the looks you have earned, and see your XP, stars, badges and best scores in one
+          place. Build new parts in the Workshop, then come back.
         </p>
       </header>
 
@@ -77,6 +79,10 @@ export default function HangarPage() {
       <section aria-label="Level 1 certificate" className="mx-auto max-w-6xl px-4 pt-6">
         <CertificateButtonClient level={1} />
       </section>
+
+      <div id="backup" className="mx-auto max-w-6xl scroll-mt-24 px-4 pt-6">
+        <BackupCodeClient />
+      </div>
 
       {/* Server-rendered explanation for parents, teachers and search engines. */}
       <section aria-labelledby="about-hangar" className="mx-auto max-w-3xl px-4 pb-16 pt-10 text-[#A7B0C0]">
@@ -110,10 +116,23 @@ export default function HangarPage() {
           are no leaderboards and no comparing children: the only person to beat is yourself. Course progress counts finished sessions on each
           of the four planets, and a certificate appears at the end of each level.
         </p>
+        <h3 className="mt-6 font-display text-xl font-bold text-white">XP and stars: one way to measure progress</h3>
+        <p className="mt-2">
+          XP is the only thing a child collects. Course sessions, games, Skill Galaxy activities and the AI labs earn it, and it grows their
+          level. Stars (one to three) say how well something went, and the hangar adds up the best stars from everything they have
+          finished. There are no coins, gems or shop: looks unlock with levels and badges.
+        </p>
         <h3 className="mt-6 font-display text-xl font-bold text-white">Private by design</h3>
         <p className="mt-2">
           Everything in the hangar is saved on the device. Children never give an email address, phone number or birthday. If they join a
           teacher&rsquo;s class with a code and a nickname, their progress is shared with that teacher only.
+        </p>
+        <h3 className="mt-6 font-display text-xl font-bold text-white">A backup code instead of an account</h3>
+        <p className="mt-2">
+          Because there is no account, a lost or reset device would lose a child&rsquo;s robot and progress. &ldquo;Save code&rdquo; makes a
+          backup code (copy it, or download it as a text file) that a grown-up keeps somewhere safe. &ldquo;Restore from a code&rdquo; brings
+          everything back on any device. Restoring only ever adds: the highest XP and stars are kept, and badges and finished lessons from both
+          devices are combined. The code contains robot progress only, never a name, email or anything else personal.
         </p>
       </section>
     </>

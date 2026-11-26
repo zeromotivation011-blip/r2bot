@@ -690,7 +690,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
 
         <div
           className={`z-20 flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/90 p-2 backdrop-blur ${
-            barFixed ? 'max-lg:fixed max-lg:inset-x-2 max-lg:bottom-[calc(75px+env(safe-area-inset-bottom))] min-[901px]:max-lg:bottom-3 max-lg:shadow-2xl max-lg:shadow-black/60' : ''
+            barFixed ? 'max-lg:fixed max-lg:inset-x-2 max-lg:bottom-[calc(12px+env(safe-area-inset-bottom))] max-lg:shadow-2xl max-lg:shadow-black/60' : ''
           }`}
           role="toolbar"
           aria-label="Flight controls"

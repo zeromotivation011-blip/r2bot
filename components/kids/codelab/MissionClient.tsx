@@ -17,6 +17,7 @@ import { changedParts, designWith, missingCaps } from '@/lib/kids/code-lab/parts
 import { isValidProgram } from '@/lib/kids/code-lab/tree'
 import type { Block, MissionPublic } from '@/lib/kids/code-lab/types'
 import { completeCodeMission, getProgress } from '@/lib/kids-progress'
+import { reportBestRun } from '@/lib/kids/universe/rewards'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { fireConfetti } from '@/components/kids/Confetti'
 import BlockEditorClient from './BlockEditorClient'
@@ -149,6 +150,7 @@ export default function MissionClient({ mission, next, previous }: Props) {
     const hinted = hintsShown > 0
     const stars = starsFor(blockCount, mission.budget, hinted)
     const { starsAdded, progress } = completeCodeMission(mission.id, stars)
+    reportBestRun({ kind: 'challenge', id: `codelab-${mission.id}`, stars, score: stars })
     setBestStars(progress.codeMissions[mission.id] ?? stars)
     setStatus({ kind: 'win', stars, added: starsAdded })
     playSound('levelup')

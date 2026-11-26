@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import type React from 'react'
 import { useCallback, useId, useRef, useState } from 'react'
+import { collectedStars } from '@/lib/kids-progress'
 import { DEFAULT_DESIGN, saveDesign } from '@/lib/kids/robot-design'
 import { daysExploredThisWeek, levelInfo, MAX_LEVEL, xpForLevel, type Unlock } from '@/lib/kids/universe/rewards'
 import { playSound, primeAudio } from '@/lib/kids-audio'
@@ -242,11 +243,12 @@ export function HangarClient() {
           </div>
           <dl className="grid grid-cols-3 gap-2 text-center">
             {[
-              { k: 'Total XP', v: progress.xp.toLocaleString('en-GB') },
-              { k: 'Badges', v: Object.keys(progress.badges).length },
-              { k: 'Looks owned', v: `${ownedCount}/${allLooks.length}` },
+              // The one currency (XP) and the one quality mark (stars), the same everywhere.
+              { k: 'XP', v: progress.xp.toLocaleString('en-GB'), hint: 'XP grows your level. Lessons, games and activities earn it.' },
+              { k: 'Stars', v: ready ? collectedStars(progress).toLocaleString('en-GB') : '0', hint: 'Your best stars from every lesson, story, mission and activity.' },
+              { k: 'Badges', v: Object.keys(progress.badges).length, hint: 'Skill badges you have earned.' },
             ].map((s) => (
-              <div key={s.k} className="rounded-2xl border border-white/10 bg-[#0A1120]/60 px-2 py-3">
+              <div key={s.k} className="rounded-2xl border border-white/10 bg-[#0A1120]/60 px-2 py-3" title={s.hint}>
                 <dt className="text-xs font-semibold text-[#A7B0C0]">{s.k}</dt>
                 <dd className="font-display text-xl font-bold text-white">{ready ? s.v : '–'}</dd>
               </div>
@@ -316,7 +318,7 @@ export function HangarClient() {
                   d="M12.9 2.2a4.5 4.5 0 0 0-5.6 5.7L2.6 12.6a2 2 0 1 0 2.8 2.8l4.7-4.7a4.5 4.5 0 0 0 5.7-5.6l-2.6 2.6-2.3-.5-.5-2.3 2.5-2.7Z"
                 />
               </svg>
-              Change parts
+              Build in Workshop
             </Link>
           </div>
         </div>
@@ -326,7 +328,17 @@ export function HangarClient() {
       <div className="mt-4 rounded-[28px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4 shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:p-5">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <h3 className="font-display text-2xl font-bold text-white">Customise</h3>
-          <p className="text-sm text-[#A7B0C0]">Every look is earned by learning, never bought.</p>
+          <p className="text-sm text-[#A7B0C0]">
+            {ready && (
+              <>
+                <span className="font-display font-bold text-white">
+                  {ownedCount} of {allLooks.length}
+                </span>{' '}
+                looks earned ·{' '}
+              </>
+            )}
+            Earned with XP and badges, never bought.
+          </p>
         </div>
         <div role="tablist" aria-label="Kinds of looks" className="mt-3 grid grid-cols-4 gap-1 rounded-2xl bg-[#0A1120]/70 p-1">
           {TABS.map((t, i) => {

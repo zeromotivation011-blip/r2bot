@@ -123,11 +123,29 @@ export default function PrivacyPage() {
       </ul>
       <h3>Camera, microphone and voices</h3>
       <ul>
-        <li>The camera is used only for the Workshop&apos;s &quot;see your robot in your room&quot; view,
-          and only after the device asks permission. Camera frames are drawn on the device and
-          never leave it: nothing is recorded or uploaded.</li>
+        <li>The camera is used only in two places: the Workshop&apos;s &quot;see your robot in your
+          room&quot; view and the Vision Lab (where a child teaches a robot to spot things), and only
+          after the device asks permission. Camera frames are processed on the device and never
+          leave it: nothing is recorded or uploaded.</li>
         <li>Spoken voices are pre-recorded audio files or the device&apos;s own text-to-speech. R2BOT
-          Kids does not record audio.</li>
+          Kids never records or stores audio itself.</li>
+      </ul>
+      <h3>Ask Spark and the AI labs</h3>
+      <ul>
+        <li>When a child types a question to Ask Spark, or presses &quot;Ask the AI helper&quot; in
+          Talk to your robot, the text is sent to our server. Anything that looks personal (an
+          email, a long number, a web address, &quot;my name is&nbsp;&hellip;&quot;) is removed or
+          the request is refused before anything else happens. Questions are not stored or logged;
+          we keep only hashed counters for daily limits.</li>
+        <li>Many questions are answered from Spark&apos;s own notebook on our server. Only when the
+          AI helper is switched on, the cleaned question is sent to our AI model provider,
+          Anthropic (Claude), to write the answer. Under Anthropic&apos;s commercial terms, what is
+          sent through its API is not used to train its models.</li>
+        <li>The microphone buttons (in Ask Spark and some activities) use the browser&apos;s own
+          speech recognition. In some browsers, for example Chrome, the browser sends that audio to
+          its maker (such as Google) to turn it into text. R2BOT never receives the audio, only the
+          text, and typing always works instead.</li>
+        <li>Vision Lab frames stay on the device, as above.</li>
       </ul>
       <h3>Analytics</h3>
       <ul>

@@ -50,10 +50,10 @@ function buildWorld(def: ArenaDef, accent: string): World {
   root.position.set(ox, 0, oz)
 
   const tileGeo = new THREE.BoxGeometry(0.96, 0.14, 0.96)
-  const floorMat = new THREE.MeshStandardMaterial({ color: '#C7B8F5', roughness: 0.8 })
-  const floorAlt = new THREE.MeshStandardMaterial({ color: '#B9A7EE', roughness: 0.8 })
-  const wallMat = new THREE.MeshStandardMaterial({ color: '#5B3FA8', roughness: 0.55 })
-  const wallTop = new THREE.MeshStandardMaterial({ color: '#7C5CD6', roughness: 0.5 })
+  const floorMat = new THREE.MeshStandardMaterial({ color: '#CBD5E4', roughness: 0.8 })
+  const floorAlt = new THREE.MeshStandardMaterial({ color: '#B6C3D8', roughness: 0.8 })
+  const wallMat = new THREE.MeshStandardMaterial({ color: '#2A3D60', roughness: 0.55 })
+  const wallTop = new THREE.MeshStandardMaterial({ color: '#FF8A4C', roughness: 0.5 })
   const sandMat = new THREE.MeshStandardMaterial({ color: '#E2C07D', roughness: 1 })
   const rockMat = new THREE.MeshStandardMaterial({ color: '#8B8FA3', roughness: 0.9 })
   const lineMat = new THREE.MeshStandardMaterial({ color: '#111827', roughness: 0.7 })
@@ -77,7 +77,7 @@ function buildWorld(def: ArenaDef, accent: string): World {
       else if (c === 's') mat = sandMat
       else if (c === 'k') mat = rockMat
       else if (isDark(c)) {
-        mat = new THREE.MeshStandardMaterial({ color: '#141026', roughness: 0.9 })
+        mat = new THREE.MeshStandardMaterial({ color: '#0B1222', roughness: 0.9 })
         darkMats.push(mat)
       }
       const tile = new THREE.Mesh(tileGeo, mat)
@@ -177,7 +177,7 @@ export default function ArenaClient({ arena, design, state, event, durationMs, l
   useEffect(() => {
     const host = hostRef.current
     if (!host) return
-    const stage = createStage(host, { background: '#1B1035', fov: 35 })
+    const stage = createStage(host, { background: '#0A1120', fov: 35 })
     stage.renderer.domElement.style.touchAction = 'auto'
     stageRef.current = stage
     const reduced = prefersReducedMotion()
@@ -300,7 +300,7 @@ export default function ArenaClient({ arena, design, state, event, durationMs, l
         world.trail.add(seg)
       }
     }
-    for (const m of world.darkMats) m.color.set(state.lightOn ? '#3B3363' : '#141026')
+    for (const m of world.darkMats) m.color.set(state.lightOn ? '#2E3E5E' : '#0B1222')
   }, [state, event, durationMs])
 
   return <div ref={hostRef} role="img" aria-label={label} className="absolute inset-0" />

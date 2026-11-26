@@ -59,6 +59,9 @@
   font-size: 16px;
   white-space: nowrap;
   box-shadow: 0 4px 14px rgba(255,138,76, 0.35);
+  /* A tap target: at least 44px tall at every width. */
+  min-height: 44px;
+  display: inline-flex; align-items: center;
 }
 .kids-main {
   position: relative; z-index: 1;
@@ -126,6 +129,7 @@
   .kids-tab-on .kids-tab-emoji { transform: scale(1.15); }
   .kids-main { padding-bottom: 24px; }
   .kids-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+  .kids-in-game .kids-footer { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
 }
 @media (max-width: 640px) {
   .kids-nav { padding: calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 10px calc(12px + env(safe-area-inset-left)); }
@@ -187,3 +191,34 @@
 
 /* Inside the store app (lib/kids/app-context.ts): the adult site's footer is not shown. */
 html.kids-app [data-site-footer] { display: none; }
+/* On the web too: kids pages carry their own footer (KidsShell). The adult site
+   footer (small tap targets, adult links) is hidden whenever the kids shell is in
+   the page — CSS only, so it holds before hydration and with JavaScript off. */
+body:has(.kids-main) [data-site-footer] { display: none; }
+
+/* Ask Spark in the header: only on game screens, where the floating button
+   would cover the controls. Same size as the voice toggle beside it. */
+.kids-spark-btn {
+  width: 48px; height: 48px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(252, 104, 24, 0.5);
+  background: rgba(252, 104, 24, 0.14);
+  cursor: pointer;
+}
+.kids-spark-btn:hover { background: rgba(252, 104, 24, 0.24); }
+.kids-spark-btn:focus-visible { outline: 3px solid #FF8A4C; outline-offset: 3px; }
+@media (max-width: 640px) {
+  .kids-spark-btn { width: 44px; height: 44px; }
+}
+/* The More menu never runs off a short (landscape) screen. */
+.kids-more-menu { max-height: calc(100dvh - 96px); overflow-y: auto; overscroll-behavior: contain; }
+/* Phones: the More button sits mid-header, so a right-anchored 320px panel ran
+   off the left edge. Pin it to the viewport under the header instead. */
+@media (max-width: 640px) {
+  .kids-more-menu {
+    position: fixed; left: 12px; right: 12px; width: auto;
+    top: calc(env(safe-area-inset-top) + 70px);
+    max-height: calc(100dvh - 160px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+}

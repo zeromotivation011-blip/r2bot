@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { sparkSays, cancelSparkSpeech } from './kids-audio'
+import { KIDS_SETTINGS_EVENT } from './kids/settings-boot'
 
 const STORAGE_KEY = 'r2bot_kids_voice'
 
@@ -23,11 +24,22 @@ export interface KidsVoiceApi {
 }
 
 export function useKidsVoice(): KidsVoiceApi {
-  const [voiceOn, setVoiceOn] = useState<boolean>(() => readInitial())
+  const [voiceOn, setVoiceOn] = useState<boolean>(true)
 
-  // Re-read on mount in case state was set before hydration finished.
+  // Re-read on mount in case state was set before hydration finished, and stay in
+  // step with the Settings page (same tab: KIDS_SETTINGS_EVENT; other tabs: storage).
   useEffect(() => {
     setVoiceOn(readInitial())
+    const sync = () => setVoiceOn(readInitial())
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key === STORAGE_KEY) sync()
+    }
+    window.addEventListener(KIDS_SETTINGS_EVENT, sync)
+    window.addEventListener('storage', onStorage)
+    return () => {
+      window.removeEventListener(KIDS_SETTINGS_EVENT, sync)
+      window.removeEventListener('storage', onStorage)
+    }
   }, [])
 
   // Stop pending speech if user navigates away.

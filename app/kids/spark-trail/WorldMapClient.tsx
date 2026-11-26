@@ -1,6 +1,6 @@
 'use client'
 
-// app/kids/world/WorldMapClient.tsx
+// app/kids/spark-trail/WorldMapClient.tsx
 // Illustrated SVG storybook map. Each zone is a place on a fantasy island.
 // Pure SVG + CSS animations. Responsive; pan/zoom on mobile via touch.
 
@@ -61,7 +61,7 @@ export default function WorldMapClient() {
     if (greeted.current) return
     const t = setTimeout(() => {
       greeted.current = true
-      speak('Welcome to Robot World! Tap a place to start exploring.')
+      speak('Welcome to Spark Trail! Tap a zone to start exploring.')
     }, 600)
     return () => clearTimeout(t)
   }, [speak])
@@ -85,7 +85,7 @@ export default function WorldMapClient() {
     <div className="wm-root">
       <header className="wm-header">
         <Link href="/kids" className="wm-back" aria-label="Back to home">‹ Back</Link>
-        <h1 className="wm-title">Robot World</h1>
+        <h1 className="wm-title">Spark Trail</h1>
         <div className="wm-stars" aria-label={`${stars} stars`}>⭐ {stars} / 50</div>
       </header>
 
@@ -95,11 +95,11 @@ export default function WorldMapClient() {
           viewBox="0 0 1200 800"
           preserveAspectRatio="xMidYMid meet"
           role="img"
-          aria-label="Map of Robot World"
+          aria-label="Map of Spark Trail"
         >
           <defs>
             <radialGradient id="wm-sky" cx="50%" cy="0%" r="100%">
-              <stop offset="0%"  stopColor="#1e1b4b" />
+              <stop offset="0%"  stopColor="#0A1120" />
               <stop offset="60%" stopColor="var(--void)" />
               <stop offset="100%" stopColor="#000" />
             </radialGradient>
@@ -188,7 +188,6 @@ export default function WorldMapClient() {
             left: `${(sparkPos.x / 1200) * 100}%`,
             top:  `${(sparkPos.y / 800)  * 100}%`,
           }}
-          aria-hidden="true"
         >
           <SparkCharacter mood="happy" size={64} />
         </div>
@@ -249,6 +248,9 @@ function ZoneNode({
       role="button"
       aria-label={name}
     >
+      {/* Invisible hit area: at least 44px across even on a 360px-wide phone */}
+      <circle r="85" fill="transparent" />
+
       {/* Glow halo for current zone */}
       {current && (
         <circle r="70" fill="none" stroke={color} strokeWidth="3" opacity=".4">
@@ -466,7 +468,7 @@ function ZoneModal({ zoneId, onClose }: { zoneId: string; onClose: () => void })
 
         {unlocked ? (
           <Link
-            href={`/kids/world/${zone.id}`}
+            href={`/kids/spark-trail/${zone.id}`}
             className="wm-modal-cta"
             onClick={() => playSound('unlock')}
           >
@@ -534,6 +536,9 @@ function WorldMapStyles() {
         pointer-events: none;
         filter: drop-shadow(0 8px 14px rgba(0,0,0,0.45));
       }
+      /* The wrapper lets taps through to the map; Spark himself stays tappable. */
+      .wm-spark-overlay > button { pointer-events: auto; min-width: 44px; min-height: 44px; }
+      .wm-canvas > rect, .wm-canvas > path { pointer-events: none; }
 
       .wm-parts {
         display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
