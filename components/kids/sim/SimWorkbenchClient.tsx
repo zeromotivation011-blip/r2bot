@@ -326,16 +326,16 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:grid-rows-[auto_1fr]">
       {/* ── 3D view ─────────────────────────────────────────────────────── */}
       <div className="flex min-w-0 scroll-mt-2 flex-col gap-3 lg:col-start-1 lg:row-start-1">
-        <div className="relative h-[42vh] min-h-[280px] sm:h-[52vh] sm:min-h-[320px] overflow-hidden rounded-3xl border border-white/10 bg-[#120A2E] lg:h-[540px]">
+        <div className="relative h-[42vh] min-h-[280px] sm:h-[52vh] sm:min-h-[320px] overflow-hidden rounded-3xl border border-white/10 bg-[#111C32] lg:h-[540px]">
           <div ref={viewRef} className="absolute inset-0" data-testid="sim-view" />
           {!ready && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#120A2E] text-purple-100">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#111C32] text-slate-200">
               <div className="h-16 w-16 animate-pulse rounded-2xl bg-white/10" aria-hidden />
               <p className="text-sm font-bold">{loadError ?? 'Starting the physics engine…'}</p>
             </div>
           )}
           {bubble && (
-            <div className="pointer-events-none absolute left-1/2 top-4 max-w-[80%] -translate-x-1/2 rounded-2xl bg-white px-4 py-2 text-center text-sm font-black text-[#1A1040] shadow-lg">
+            <div className="pointer-events-none absolute left-1/2 top-4 max-w-[80%] -translate-x-1/2 rounded-2xl bg-white px-4 py-2 text-center text-sm font-black text-[#111C32] shadow-lg">
               💬 {bubble}
             </div>
           )}
@@ -352,7 +352,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
                 type="button"
                 onClick={() => setCamera(m)}
                 aria-pressed={camera === m}
-                className={`min-h-[44px] min-w-[44px] rounded-xl px-2 text-xs font-black ${camera === m ? 'bg-amber-400 text-[#1A1040]' : 'text-white hover:bg-white/10'}`}
+                className={`min-h-[44px] min-w-[44px] rounded-xl px-2 text-xs font-black ${camera === m ? 'bg-amber-400 text-[#111C32]' : 'text-white hover:bg-white/10'}`}
               >
                 <span aria-hidden>{icon}</span> <span className="hidden sm:inline">{label}</span>
               </button>
@@ -387,7 +387,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
             onClick={onRun}
             disabled={!ready}
             data-testid="sim-run"
-            className="min-h-[48px] rounded-2xl bg-amber-400 px-5 text-base font-black text-[#1A1040] shadow hover:bg-amber-300 disabled:opacity-50"
+            className="min-h-[48px] rounded-2xl bg-amber-400 px-5 text-base font-black text-[#111C32] shadow hover:bg-amber-300 disabled:opacity-50"
           >
             ▶ Run
           </button>
@@ -422,7 +422,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
                 type="button"
                 onClick={() => setSpeed(s)}
                 aria-pressed={speed === s}
-                className={`min-h-[44px] min-w-[44px] rounded-xl text-sm font-black ${speed === s ? 'bg-purple-400 text-[#1A1040]' : 'text-purple-100 hover:bg-white/10'}`}
+                className={`min-h-[44px] min-w-[44px] rounded-xl text-sm font-black ${speed === s ? 'bg-amber-400 text-[#1A1103]' : 'text-slate-200 hover:bg-white/10'}`}
               >
                 {s === 0.5 ? '½×' : `${s}×`}
               </button>
@@ -446,7 +446,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
           <button
             type="button"
             onClick={() => loadProgram(starter)}
-            className="min-h-[44px] rounded-2xl border border-white/20 px-3 text-sm font-black text-purple-100 hover:bg-white/10"
+            className="min-h-[44px] rounded-2xl border border-white/20 px-3 text-sm font-black text-slate-200 hover:bg-white/10"
           >
             🧹 Start over
           </button>
@@ -459,12 +459,12 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
             onClick={onRunFromEditor}
             disabled={!ready}
             data-testid="sim-run-editor"
-            className="absolute bottom-3 right-16 z-10 min-h-[48px] rounded-2xl bg-amber-400 px-4 text-base font-black text-[#1A1040] shadow-xl hover:bg-amber-300 disabled:opacity-50 lg:hidden"
+            className="absolute bottom-3 right-16 z-10 min-h-[48px] rounded-2xl bg-amber-400 px-4 text-base font-black text-[#111C32] shadow-xl hover:bg-amber-300 disabled:opacity-50 lg:hidden"
           >
             ▶ Run
           </button>
         </div>
-        <p className="text-xs text-purple-200">
+        <p className="text-xs text-slate-300">
           Drag blocks under <strong>▶ when Run is pressed</strong>. Greyed blocks with a 🔒 need a part your robot does not have yet.
         </p>
       </div>
@@ -475,7 +475,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
           type="button"
           onClick={() => setShowSensors((v) => !v)}
           aria-expanded={showSensors}
-          className="mb-2 min-h-[44px] w-full rounded-2xl bg-white/5 px-4 text-left text-sm font-black text-purple-100 hover:bg-white/10 lg:hidden"
+          className="mb-2 min-h-[44px] w-full rounded-2xl bg-white/5 px-4 text-left text-sm font-black text-slate-200 hover:bg-white/10 lg:hidden"
         >
           {showSensors ? '▾' : '▸'} What my robot senses
         </button>

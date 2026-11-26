@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import KidsShell from './KidsShell'
+import { KIDS_APP_BOOT_SCRIPT } from '@/lib/kids/app-context'
 
 export const runtime = 'nodejs'
 
@@ -16,5 +17,11 @@ export const viewport: Viewport = {
 }
 
 export default function KidsLayout({ children }: { children: React.ReactNode }) {
-  return <KidsShell>{children}</KidsShell>
+  return (
+    <>
+      {/* Marks <html class="kids-app"> before first paint inside the store app (lib/kids/app-context.ts). */}
+      <script dangerouslySetInnerHTML={{ __html: KIDS_APP_BOOT_SCRIPT }} />
+      <KidsShell>{children}</KidsShell>
+    </>
+  )
 }

@@ -23,7 +23,7 @@ import BlockEditorClient from './BlockEditorClient'
 
 function ArenaSkeleton() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-[#1B1035]">
+    <div className="absolute inset-0 flex items-center justify-center bg-[#111C32]">
       <div className="h-20 w-20 animate-pulse rounded-2xl bg-white/10" aria-hidden />
       <span className="sr-only">Loading the 3D arena…</span>
     </div>
@@ -246,7 +246,7 @@ export default function MissionClient({ mission, next, previous }: Props) {
   return (
     <div className="mx-auto max-w-6xl px-4 pb-10">
       {locked && (
-        <p className="mb-3 rounded-2xl bg-white/5 p-3 text-sm text-purple-100">
+        <p className="mb-3 rounded-2xl bg-white/5 p-3 text-sm text-slate-200">
           🔒 This mission unlocks after{' '}
           <Link className="font-bold text-amber-300 underline" href={`/kids/code-lab/${previous?.id ?? ''}`}>
             {previous?.title}
@@ -301,10 +301,10 @@ export default function MissionClient({ mission, next, previous }: Props) {
                   Map {i + 1}
                 </button>
               ))}
-              <span className="self-center text-xs text-purple-200">One program must solve every map.</span>
+              <span className="self-center text-xs text-slate-300">One program must solve every map.</span>
             </div>
           )}
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-[#1B1035]">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-[#111C32]">
             <Arena
               arena={mission.arenas[arenaIdx]}
               design={design}
@@ -354,7 +354,7 @@ export default function MissionClient({ mission, next, previous }: Props) {
           <div aria-live="polite" className="mt-3 min-h-[56px]">
             {status.kind === 'fail' && <p className="rounded-2xl bg-rose-500/15 p-3 font-bold text-rose-100">🤖 {status.message}</p>}
             {status.kind === 'progress' && <p className="rounded-2xl bg-sky-500/15 p-3 font-bold text-sky-100">{status.message}</p>}
-            {status.kind === 'running' && <p className="rounded-2xl bg-white/5 p-3 text-purple-100">Watch the glowing block — that is the instruction your robot is doing now.</p>}
+            {status.kind === 'running' && <p className="rounded-2xl bg-white/5 p-3 text-slate-200">Watch the glowing block — that is the instruction your robot is doing now.</p>}
             {status.kind === 'win' && (
               <div className="rounded-2xl bg-emerald-400/15 p-4">
                 <p className="text-2xl font-black">
@@ -399,7 +399,7 @@ export default function MissionClient({ mission, next, previous }: Props) {
               </ul>
             )}
           </div>
-          {bestStars > 0 && status.kind !== 'win' && <p className="mt-2 text-sm text-purple-200">Your best: {'⭐'.repeat(bestStars)}</p>}
+          {bestStars > 0 && status.kind !== 'win' && <p className="mt-2 text-sm text-slate-300">Your best: {'⭐'.repeat(bestStars)}</p>}
         </section>
 
         {/* ── Editor ── */}
@@ -434,7 +434,7 @@ export default function MissionClient({ mission, next, previous }: Props) {
               🐍 {showPython ? 'Hide' : 'Show'} the Python version
             </button>
             {showPython && (
-              <pre className="mt-2 overflow-x-auto rounded-xl bg-[#0B0820] p-3 text-sm leading-relaxed text-emerald-200">
+              <pre className="mt-2 overflow-x-auto rounded-xl bg-[#0A1120] p-3 text-sm leading-relaxed text-emerald-200">
                 <code>{python}</code>
               </pre>
             )}

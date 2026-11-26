@@ -13,7 +13,7 @@ function Skeleton() {
   return (
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]" aria-busy="true" aria-label="Loading Sky Port">
       <div className="flex flex-col gap-2">
-        <div className="h-[330px] animate-pulse rounded-3xl border border-white/10 bg-gradient-to-b from-slate-900 via-violet-950 to-orange-900/60 sm:h-[420px] lg:h-[470px]" />
+        <div className="h-[330px] animate-pulse rounded-3xl border border-white/10 bg-gradient-to-b from-slate-900 via-[#111C32] to-orange-900/60 sm:h-[420px] lg:h-[470px]" />
         <div className="h-[170px] animate-pulse rounded-2xl border border-white/10 bg-slate-950/70 sm:h-[190px]" />
       </div>
       <div className="flex flex-col gap-3">

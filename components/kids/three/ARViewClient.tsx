@@ -350,7 +350,7 @@ export default function ARViewClient({ design, onClose }: Props) {
     g.drawImage(video, (w - vw * s) / 2, (h - vh * s) / 2, vw * s, vh * s)
     stage.renderNow()
     g.drawImage(stage.renderer.domElement, 0, 0, w, h)
-    g.fillStyle = 'rgba(15,10,30,0.55)'
+    g.fillStyle = 'rgba(10,17,32,0.55)'
     g.fillRect(0, h - 44 * dpr, w, 44 * dpr)
     g.fillStyle = '#FDE68A'
     g.font = `bold ${16 * dpr}px system-ui, sans-serif`
@@ -379,7 +379,7 @@ export default function ARViewClient({ design, onClose }: Props) {
   const liveView = phase === 'camera' || phase === 'xr'
 
   return (
-    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="See your robot in your room" className="fixed inset-0 z-[70] bg-[#0F0A1E] text-white">
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="See your robot in your room" className="fixed inset-0 z-[70] bg-[#0A1120] text-white">
       {/* Camera feed + transparent 3D layer */}
       <video ref={videoRef} playsInline muted autoPlay className={`absolute inset-0 h-full w-full object-cover ${phase === 'camera' ? '' : 'hidden'}`} />
       <div ref={hostRef} className={`absolute inset-0 ${liveView ? '' : 'pointer-events-none'}`} />
@@ -398,11 +398,11 @@ export default function ARViewClient({ design, onClose }: Props) {
         </div>
 
         {phase === 'intro' && (
-          <div className="pointer-events-auto m-auto w-[min(92vw,30rem)] rounded-3xl border border-white/10 bg-[#1B1035] p-6 shadow-2xl">
+          <div className="pointer-events-auto m-auto w-[min(92vw,30rem)] rounded-3xl border border-white/10 bg-[#111C32] p-6 shadow-2xl">
             <h2 className="text-2xl font-black">See your robot in your room</h2>
             {arSupported && (
               <div className="mt-4">
-                <p className="text-base text-purple-100">Your device can do real AR. Your robot will appear about one big step in front of you{'—'}tap the floor to move it.</p>
+                <p className="text-base text-slate-200">Your device can do real AR. Your robot will appear about one big step in front of you{'—'}tap the floor to move it.</p>
                 <button
                   type="button"
                   onClick={() => void startXR()}
@@ -414,7 +414,7 @@ export default function ARViewClient({ design, onClose }: Props) {
             )}
             <div className="mt-5 rounded-2xl bg-white/5 p-4">
               <p className="font-bold">{arSupported ? 'Or use the magic window' : 'Use the magic window'}</p>
-              <p className="mt-1 text-sm text-purple-100">
+              <p className="mt-1 text-sm text-slate-200">
                 To put your robot in the picture, R2BOT needs to use your camera. The video stays on this device{'—'}nothing is recorded or sent anywhere.
                 Ask a grown-up before you say yes!
               </p>
@@ -430,14 +430,14 @@ export default function ARViewClient({ design, onClose }: Props) {
         )}
 
         {(phase === 'denied' || phase === 'nocamera' || phase === 'error') && (
-          <div className="pointer-events-auto m-auto w-[min(92vw,30rem)] rounded-3xl border border-white/10 bg-[#1B1035] p-6 text-center">
+          <div className="pointer-events-auto m-auto w-[min(92vw,30rem)] rounded-3xl border border-white/10 bg-[#111C32] p-6 text-center">
             <p className="text-5xl" aria-hidden>
               {phase === 'denied' ? '🙈' : '🤖'}
             </p>
             <h2 className="mt-2 text-xl font-black">
               {phase === 'denied' ? 'No problem — the camera stays off.' : phase === 'nocamera' ? "We couldn't find a camera." : 'That did not work this time.'}
             </h2>
-            <p className="mt-2 text-sm text-purple-100">
+            <p className="mt-2 text-sm text-slate-200">
               {phase === 'denied'
                 ? 'If you change your mind, a grown-up can allow the camera for this site in the browser settings, then try again.'
                 : 'You can still spin, zoom and test-drive your robot in the Workshop.'}

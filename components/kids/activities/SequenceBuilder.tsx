@@ -111,8 +111,8 @@ export function SequenceBuilder({
       <style jsx>{`
         .seq { display: flex; flex-direction: column; gap: 14px; }
         .seq-situation {
-          background: rgba(124,58,237,0.18);
-          border: 2px solid #7c3aed;
+          background: rgba(252,104,24,0.18);
+          border: 2px solid #FC6818;
           color: #FFC9A8;
           padding: 12px;
           border-radius: 12px;
@@ -123,8 +123,8 @@ export function SequenceBuilder({
         .seq-slot {
           display: flex; align-items: center; gap: 12px;
           padding: 12px;
-          background: #1a1040;
-          border: 2px dashed #4c1d95;
+          background: #111C32;
+          border: 2px dashed #19263F;
           border-radius: 12px;
           cursor: pointer;
           color: #FFC9A8; font-weight: 700;
@@ -143,25 +143,25 @@ export function SequenceBuilder({
         .seq-num {
           width: 30px; height: 30px;
           display: grid; place-items: center;
-          background: #FF8A4C; color: #1a1040;
+          background: #FF8A4C; color: #111C32;
           border-radius: 50%; font-weight: 900;
           flex-shrink: 0;
         }
-        .seq-slot em { color: #6b21a8; font-style: italic; }
+        .seq-slot em { color: #8A94A6; font-style: italic; }
         .seq-content { flex: 1; font-size: 14px; }
         .seq-pool { display: flex; flex-direction: column; gap: 6px; }
         .seq-item {
           min-height: 52px;
           padding: 10px 14px;
           background: linear-gradient(135deg, #fde047, #FF8A4C);
-          color: #1a1040;
+          color: #111C32;
           border: none; border-radius: 12px;
           font-weight: 800;
           cursor: pointer;
           text-align: left;
         }
         .seq-item:disabled { opacity: 0.5; cursor: not-allowed; }
-        .seq-empty { color: #c4b5fd; font-weight: 700; text-align: center; }
+        .seq-empty { color: #A7B0C0; font-weight: 700; text-align: center; }
         .seq-check {
           min-height: 56px;
           background: linear-gradient(135deg, #10b981, #059669);

@@ -57,10 +57,10 @@ export function FillBlank({
       <style jsx>{`
         .fb { display: flex; flex-direction: column; gap: 12px; }
         .fb-prompt {
-          background: #1a1040;
+          background: #111C32;
           color: #FFC9A8;
           padding: 18px;
-          border: 2px solid #4c1d95;
+          border: 2px solid #19263F;
           border-radius: 14px;
           font-family: monospace;
           font-size: 16px;
@@ -78,7 +78,7 @@ export function FillBlank({
         .fb-opt {
           min-height: 56px;
           background: linear-gradient(135deg, #fde047, #FF8A4C);
-          color: #1a1040;
+          color: #111C32;
           border: 2px solid #FC6818;
           border-radius: 14px;
           font-weight: 900; font-size: 15px;

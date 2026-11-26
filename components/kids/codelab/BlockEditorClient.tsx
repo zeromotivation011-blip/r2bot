@@ -107,7 +107,7 @@ export default function BlockEditorClient({ program, onChange, palette, caps, bu
             disabled={disabled}
             onClick={() => setSel({ id: parentId, branch })}
             className={`min-h-[44px] w-full rounded-xl border-2 border-dashed px-3 text-left text-sm font-bold ${
-              sel?.id === parentId && sel.branch === branch ? 'border-amber-400 bg-amber-400/10 text-amber-200' : 'border-white/20 text-purple-200'
+              sel?.id === parentId && sel.branch === branch ? 'border-amber-400 bg-amber-400/10 text-amber-200' : 'border-white/20 text-slate-300'
             }`}
           >
             + Tap here, then tap a block to put it inside
@@ -146,7 +146,7 @@ export default function BlockEditorClient({ program, onChange, palette, caps, bu
             {renderList(b.body, b.id, 'body', depth + 1)}
             {hasElse(b) && (
               <>
-                <p className="mt-2 text-sm font-black text-violet-200">else (otherwise):</p>
+                <p className="mt-2 text-sm font-black text-cyan-200">else (otherwise):</p>
                 <div className="mt-1">{renderList(b.elseBody, b.id, 'else', depth + 1)}</div>
               </>
             )}
@@ -174,7 +174,7 @@ export default function BlockEditorClient({ program, onChange, palette, caps, bu
     <div className="flex flex-col gap-3">
       {/* Palette */}
       <div>
-        <h3 className="mb-2 text-sm font-black uppercase tracking-wider text-purple-200">Blocks · tap to add</h3>
+        <h3 className="mb-2 text-sm font-black uppercase tracking-wider text-slate-300">Blocks · tap to add</h3>
         <div className="flex flex-wrap gap-2">
           {palette.map((t) => {
             const info = BLOCK_INFO[t]
@@ -270,7 +270,7 @@ export default function BlockEditorClient({ program, onChange, palette, caps, bu
             </button>
           </>
         ) : (
-          <p className="px-1 text-sm text-purple-200">
+          <p className="px-1 text-sm text-slate-300">
             {disabled ? 'Running your program…' : 'Tap a block in your program to move it, change it or delete it.'}
           </p>
         )}
@@ -279,13 +279,13 @@ export default function BlockEditorClient({ program, onChange, palette, caps, bu
       {/* Program */}
       <div className="min-h-[220px] rounded-2xl border-2 border-white/10 bg-black/20 p-3">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-sm font-black uppercase tracking-wider text-purple-200">Your program</h3>
+          <h3 className="text-sm font-black uppercase tracking-wider text-slate-300">Your program</h3>
           <span className={`rounded-full px-2 py-0.5 text-xs font-black ${count <= budget ? 'bg-emerald-400/20 text-emerald-200' : 'bg-amber-400/20 text-amber-200'}`}>
             {count} / {budget} blocks for ⭐⭐⭐
           </span>
         </div>
         {program.length === 0 ? (
-          <p className="rounded-xl border-2 border-dashed border-white/20 p-4 text-center text-purple-200">Tap a block above to start.</p>
+          <p className="rounded-xl border-2 border-dashed border-white/20 p-4 text-center text-slate-300">Tap a block above to start.</p>
         ) : (
           renderList(program, null, 'body', 0)
         )}
@@ -296,7 +296,7 @@ export default function BlockEditorClient({ program, onChange, palette, caps, bu
               onChange([])
               setSel(null)
             }}
-            className="mt-3 min-h-[44px] rounded-xl px-3 text-sm font-bold text-purple-200 underline-offset-4 hover:underline"
+            className="mt-3 min-h-[44px] rounded-xl px-3 text-sm font-bold text-slate-300 underline-offset-4 hover:underline"
           >
             Clear all
           </button>

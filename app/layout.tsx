@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { SiteViewCounter } from '@/components/SiteViewCounter';
-import Script from 'next/script';
+import { GoogleAnalytics } from '@/components/GoogleAnalyticsClient';
 import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { SkipToContent } from '@/components/SkipToContent';
@@ -126,20 +126,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             no longer mounted. */}
         <HideOnEmbed><LowDataMode /></HideOnEmbed>
         <HideOnEmbed><PWAPrompt /></HideOnEmbed>
-        {GA_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-              strategy="lazyOnload"
-            />
-            <Script id="ga4-init" strategy="lazyOnload">
-              {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GA_ID}');`}
-            </Script>
-          </>
-        )}
+        {/* GA4 — never on R2BOT Kids or inside the kids store app (see the component). */}
+        {GA_ID && <GoogleAnalytics id={GA_ID} />}
       </body>
     </html>
   );

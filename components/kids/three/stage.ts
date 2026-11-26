@@ -62,7 +62,7 @@ export function createStage(container: HTMLElement, opts: StageOptions = {}): St
   const camera = new THREE.PerspectiveCamera(opts.fov ?? 40, 1, 0.05, 100)
 
   if (opts.lights !== false) {
-    scene.add(new THREE.HemisphereLight('#E0E7FF', '#3B2A5A', 1.4))
+    scene.add(new THREE.HemisphereLight('#E0E7FF', '#1E2A44', 1.4))
     const key = new THREE.DirectionalLight('#FFF7ED', 2.2)
     key.position.set(3, 6, 4)
     key.castShadow = opts.shadows !== false
@@ -74,7 +74,7 @@ export function createStage(container: HTMLElement, opts: StageOptions = {}): St
     key.shadow.radius = 4
     key.shadow.bias = -0.0005
     scene.add(key)
-    const rim = new THREE.DirectionalLight('#A78BFA', 0.8)
+    const rim = new THREE.DirectionalLight('#00B8D4', 0.8)
     rim.position.set(-4, 3, -4)
     scene.add(rim)
   }

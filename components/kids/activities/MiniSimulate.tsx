@@ -196,17 +196,17 @@ export function MiniSimulate({
         }
         .ms-program {
           list-style: none; padding: 10px; margin: 0;
-          background: #1a1040;
-          border: 2px dashed #4c1d95;
+          background: #111C32;
+          border: 2px dashed #19263F;
           border-radius: 12px;
           min-height: 72px;
           font-family: monospace; font-size: 13px;
           color: #FFC9A8;
           display: flex; flex-direction: column; gap: 3px;
         }
-        .ms-empty { color: #6b21a8; font-style: italic; }
+        .ms-empty { color: #8A94A6; font-style: italic; }
         .ms-forward { color: #fde047; }
-        .ms-turn-left, .ms-turn-right { color: #c4b5fd; }
+        .ms-turn-left, .ms-turn-right { color: #A7B0C0; }
         .ms-run {
           min-height: 56px;
           background: linear-gradient(135deg, #10b981, #059669);
@@ -239,7 +239,7 @@ function PalBtn({ onClick, disabled, label, muted = false }: {
           padding: 0 10px;
           font-size: 13px; font-weight: 800;
           background: linear-gradient(135deg, #fde047, #FF8A4C);
-          color: #1a1040;
+          color: #111C32;
           border: 2px solid #FC6818;
           border-radius: 10px;
           cursor: pointer;
@@ -247,9 +247,9 @@ function PalBtn({ onClick, disabled, label, muted = false }: {
         .ms-palbtn:active { transform: scale(.95); }
         .ms-palbtn:disabled { opacity: 0.4; cursor: not-allowed; }
         .ms-palbtn.is-muted {
-          background: #1a1040;
+          background: #111C32;
           color: #FFC9A8;
-          border-color: #4c1d95;
+          border-color: #19263F;
         }
       `}</style>
     </button>

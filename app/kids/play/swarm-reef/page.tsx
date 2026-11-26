@@ -5,6 +5,8 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GameTeacherStrip } from '@/components/kids/games/GameTeacherStrip'
+import { getGame } from '@/lib/kids/universe/worlds'
 import { jsonldScript, breadcrumbJsonLD } from '@/lib/seo/jsonld'
 import SwarmReefClient from '@/components/kids/games/swarm-reef/SwarmReefClient'
 
@@ -169,6 +171,7 @@ export default function SwarmReefPage() {
             ← Back to the R2BOT Universe
           </Link>
         </p>
+        <GameTeacherStrip game={{ id: 'swarm-reef', name: getGame('swarm-reef')?.name ?? 'R2BOT Kids game' }} />
       </article>
     </>
   )

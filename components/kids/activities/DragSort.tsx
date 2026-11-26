@@ -109,15 +109,15 @@ export function DragSort({
           display: flex; flex-wrap: wrap; gap: 8px;
           min-height: 72px;
           padding: 12px;
-          background: rgba(15,10,30,0.5);
-          border: 2px dashed #4c1d95;
+          background: rgba(10,17,32,0.5);
+          border: 2px dashed #19263F;
           border-radius: 14px;
         }
         .ds-empty { color: #6ee7b7; font-weight: 800; }
         .ds-chip {
           min-height: 48px; padding: 8px 14px;
           background: linear-gradient(135deg, #fde047, #FF8A4C);
-          color: #1a1040;
+          color: #111C32;
           border: 2px solid #FC6818;
           border-radius: 12px;
           font-weight: 800;
@@ -146,8 +146,8 @@ export function DragSort({
         }
         .ds-cat {
           min-height: 120px;
-          background: rgba(124,58,237,0.15);
-          border: 2px dashed #4c1d95;
+          background: rgba(252,104,24,0.15);
+          border: 2px dashed #19263F;
           border-radius: 14px;
           padding: 10px;
           cursor: pointer;

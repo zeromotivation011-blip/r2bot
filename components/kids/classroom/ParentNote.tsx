@@ -14,7 +14,7 @@ export interface ParentNoteProps {
 export function ParentNote({ variant = 'kids', children }: ParentNoteProps) {
   const box =
     variant === 'kids'
-      ? 'rounded-3xl border border-indigo-700/70 bg-[#140d33] p-5 text-indigo-100 sm:p-6'
+      ? 'rounded-3xl border border-white/10 bg-[#111C32] p-5 text-slate-200 sm:p-6'
       : 'rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-slate-300'
   return (
     <section className={box} aria-labelledby="parent-note-h">

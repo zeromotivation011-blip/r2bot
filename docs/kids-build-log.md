@@ -44,7 +44,7 @@ Contracts: `docs/kids-universe.md`, `docs/kids-design.md`.
    from huggingface via the r2bot environment) → `public/kids/audio/<ep>/*.ogg`
    + a timing manifest; captions; plus a script that records an episode to
    MP4 (Playwright + ffmpeg) for YouTube/classrooms. Level 1's 24 episodes.
-5. **Robo Sumo Arena** game on the Rapier sim (`lib/kids/sim`).
+5. **Robo Sumo Arena** game on the Rapier sim (`lib/kids/sim`). [x] Built, QA'd and fixed (26 Nov): fair Pilot/Ace/Legend, in the sitemap.
 6. **Schools**: school admin + teachers, assign sessions to a class with due
    dates, printable teacher guide per session (from curriculum teacherNotes),
    teacher training mini-course, "Share to Google Classroom" button,

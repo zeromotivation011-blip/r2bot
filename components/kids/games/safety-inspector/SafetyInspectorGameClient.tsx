@@ -118,10 +118,17 @@ export default function SafetyInspectorGameClient({ tier: rawTier, onFinish }: P
   const readyToRun = hs.every((h) => resolved[h.id] && stepOf(h) === 'fix' && fixes[h.id])
 
   // Scroll the panel into view on small screens when something is selected.
+  // Going back to the scene scrolls the scene back into view.
+  const hadSel = useRef(false)
   useEffect(() => {
-    if (!sel || !panelRef.current) return
-    if (window.innerWidth >= 1024) return
-    panelRef.current.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' })
+    if (!panelRef.current || window.innerWidth >= 1024) {
+      hadSel.current = !!sel
+      return
+    }
+    const behavior = reduced ? 'auto' : 'smooth'
+    if (sel) panelRef.current.scrollIntoView({ behavior, block: 'nearest' })
+    else if (hadSel.current) panelRef.current.parentElement?.scrollIntoView({ behavior, block: 'start' })
+    hadSel.current = !!sel
   }, [sel, reduced])
 
   const select = useCallback(
@@ -556,7 +563,7 @@ function SceneView({ tier, phase, resolved, cls, sel, focusId, hint, fixes, runT
 
 function HarmLegend() {
   return (
-    <ol className="grid grid-cols-2 gap-1.5 sm:grid-cols-3" aria-label="The Robot Harm Check">
+    <ol className="hidden grid-cols-2 gap-1.5 sm:grid sm:grid-cols-3" aria-label="The Robot Harm Check">
       {HARM_CHECK.map((q) => (
         <li key={q.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#111C32] px-2 py-1.5 text-[13px] leading-tight text-[#A7B0C0]">
           <span aria-hidden className="text-lg">{q.icon}</span>

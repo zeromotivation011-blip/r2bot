@@ -445,22 +445,22 @@ function LevelStyles() {
       }
       .lvl-quit {
         min-height: 40px; padding: 0 14px;
-        background: #1a1040; color: #FFC9A8;
-        border-radius: 12px; border: 2px solid #4c1d95;
+        background: #111C32; color: #FFC9A8;
+        border-radius: 12px; border: 2px solid #19263F;
         text-decoration: none; font-weight: 800;
         display: inline-flex; align-items: center;
       }
       .lvl-dots { display: flex; gap: 6px; justify-content: center; }
       .lvl-dot {
         height: 6px; width: 28px;
-        background: rgba(124,58,237,0.45);
+        background: rgba(252,104,24,0.45);
         border-radius: 999px;
         transition: background .3s, width .3s;
       }
       .lvl-dot.done { background: #10b981; }
       .lvl-dot.now  { background: #FF8A4C; width: 40px; }
       .lvl-name {
-        font-size: 13px; color: #c4b5fd; font-weight: 700; max-width: 220px;
+        font-size: 13px; color: #A7B0C0; font-weight: 700; max-width: 220px;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       }
 
@@ -472,8 +472,8 @@ function LevelStyles() {
         position: relative;
         min-height: 60vh;
         animation: panel-in .35s ease-out;
-        background: rgba(15,10,30,0.6);
-        border: 2px solid rgba(124,58,237,0.35);
+        background: rgba(10,17,32,0.6);
+        border: 2px solid rgba(252,104,24,0.35);
         border-radius: 22px;
         padding: clamp(18px, 3vw, 36px);
         color: #f4f4f5;
@@ -545,7 +545,7 @@ function LevelStyles() {
         display: inline-flex; align-items: center; justify-content: center;
         min-height: 56px; padding: 0 28px;
         background: linear-gradient(135deg, #FF8A4C, #FC6818);
-        color: #1a1040; font-weight: 900; font-size: 17px;
+        color: #111C32; font-weight: 900; font-size: 17px;
         border: none; border-radius: 14px; cursor: pointer;
         text-decoration: none;
         box-shadow: 0 10px 30px rgba(255,138,76,0.4);
@@ -555,7 +555,7 @@ function LevelStyles() {
         display: inline-flex; align-items: center; justify-content: center;
         min-height: 52px; padding: 0 22px;
         background: transparent; color: #FFC9A8;
-        border: 2px solid #4c1d95; border-radius: 14px; cursor: pointer;
+        border: 2px solid #19263F; border-radius: 14px; cursor: pointer;
         font-weight: 800; text-decoration: none;
       }
 
@@ -576,11 +576,11 @@ function LevelStyles() {
         width: 48px; height: 48px;
         border-radius: 50%;
         border: 2px solid #FF8A4C;
-        background: #1a1040; color: #FF8A4C;
+        background: #111C32; color: #FF8A4C;
         font-size: 20px; cursor: pointer;
         display: grid; place-items: center;
       }
-      .panel-activity-tagline { color: #c4b5fd; font-size: 14px; margin: 0; }
+      .panel-activity-tagline { color: #A7B0C0; font-size: 14px; margin: 0; }
       .panel-activity-hint {
         background: rgba(255,138,76,0.14);
         border: 2px solid #FF8A4C;
@@ -618,7 +618,7 @@ function LevelStyles() {
         display: inline-block;
         transition: opacity .3s;
       }
-      .panel-celebration-sub { color: #c4b5fd; font-weight: 700; }
+      .panel-celebration-sub { color: #A7B0C0; font-weight: 700; }
       .panel-celebration-part, .panel-celebration-zone {
         background: rgba(255,138,76,0.15);
         border: 2px solid #FF8A4C;

@@ -5,6 +5,8 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GameTeacherStrip } from '@/components/kids/games/GameTeacherStrip'
+import { getGame } from '@/lib/kids/universe/worlds'
 import { jsonldScript, breadcrumbJsonLD } from '@/lib/seo/jsonld'
 import CircuitCityClient from '@/components/kids/games/circuit-city/CircuitCityClient'
 
@@ -162,6 +164,7 @@ export default function CircuitCityPage() {
             ← Back to the R2BOT Universe
           </Link>
         </p>
+        <GameTeacherStrip game={{ id: 'circuit-city', name: getGame('circuit-city')?.name ?? 'R2BOT Kids game' }} />
       </article>
     </>
   )

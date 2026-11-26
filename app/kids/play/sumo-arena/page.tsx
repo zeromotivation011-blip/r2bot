@@ -5,6 +5,8 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GameTeacherStrip } from '@/components/kids/games/GameTeacherStrip'
+import { getGame } from '@/lib/kids/universe/worlds'
 import { jsonldScript, breadcrumbJsonLD } from '@/lib/seo/jsonld'
 import SumoArenaClient from '@/components/kids/games/sumo-arena/SumoArenaClient'
 
@@ -67,14 +69,14 @@ const TIERS = [
   {
     name: 'Pilot',
     who: 'about 10 and up',
-    what: 'The robots start back to back. Your robot follows three rule cards, checked from the top many times a second: one for the edge sensor, one for the distance sensor, and one for “otherwise”. The starting cards have a bug.',
+    what: 'The robots start back to back, and your robot starts right at the white line, facing out. Your robot follows three rule cards, checked from the top many times a second: one for the edge sensor, one for the distance sensor, and one for “otherwise”. The starting cards have a bug.',
     tip: 'Read the cards out loud as the robot would: “If I see the white line, keep driving forward…” — that is the bug. When nothing is in sight, the robot should turn to look rather than drive.',
   },
   {
     name: 'Ace',
     who: 'about 12 and up',
-    what: 'Program the full state machine. Choose how SEARCH moves, the distance that starts a CHARGE, how long to chase a rival that slipped out of the beam, the edge-sensor threshold, and the timings of RECOVER. Dodger side-steps any robot that comes at it fast.',
-    tip: 'Change one number at a time — the bout is the same every time, so you can see exactly what each change did. A robot that gives up a chase the instant the beam loses the rival never finishes a push.',
+    what: 'Program the full state machine: how SEARCH moves, the distance that starts a CHARGE, how long to chase a rival that slipped out of the beam, the edge-sensor threshold, and the timings of RECOVER. Dodger starts behind you at the edge of the ring and shoves you at the bell. Its motors are matched to yours, so the bout tests your program, not your parts.',
+    tip: 'Your edge sensors are the only warning you get that you are being shoved out, so the threshold has to sit between black (about 8) and white (about 92). Then the timings decide it: back up long enough to push Dodger away, and turn for only as long as you must. Change one number at a time — the bout is the same every time.',
   },
   {
     name: 'Legend',
@@ -178,10 +180,11 @@ export default function SumoArenaPage() {
           their sensor readings. Program a sumo robot, and you have used the toolkit real robot engineers use every day.
         </p>
         <p className="mt-6">
-          <Link href="/kids" className="font-bold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
             ← Back to the R2BOT Universe
           </Link>
         </p>
+        <GameTeacherStrip game={{ id: 'sumo-arena', name: getGame('sumo-arena')?.name ?? 'R2BOT Kids game' }} />
       </article>
     </>
   )

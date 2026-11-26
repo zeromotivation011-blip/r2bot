@@ -235,8 +235,32 @@ export function drawDive(ctx: CanvasRenderingContext2D, v: DiveView, s: DiveStat
   bedPath.lineTo(X(xb), h + 10)
   bedPath.closePath()
   const bedZ = seabedAt(L, v.camX)
-  ctx.fillStyle = lit(SAND, bedZ, 0, 0.05)
+  ctx.fillStyle = lit(SAND, bedZ, 0, 0.16)
   ctx.fill(bedPath)
+  // Sand ripples and pebbles, so the seabed reads as seabed even in green water
+  ctx.save()
+  ctx.clip(bedPath)
+  ctx.strokeStyle = 'rgba(0,0,0,0.16)'
+  ctx.lineWidth = 1.5
+  for (let x = Math.floor(xa); x <= xb; x += 1.2) {
+    const z0 = seabedAt(L, x)
+    for (let k = 0; k < 3; k++) {
+      const zz = z0 + 0.6 + k * 1.1 + ((x * 7.3) % 1) * 0.4
+      ctx.beginPath()
+      ctx.moveTo(X(x - 0.35), Z(zz))
+      ctx.quadraticCurveTo(X(x), Z(zz - 0.18), X(x + 0.35), Z(zz))
+      ctx.stroke()
+    }
+  }
+  ctx.restore()
+  ctx.strokeStyle = lit({ r: 1, g: 0.92, b: 0.7 }, bedZ, 0, 0.3)
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  for (let x = xa; x <= xb; x += 0.5) {
+    if (x === xa) ctx.moveTo(X(x), Z(seabedAt(L, x)))
+    else ctx.lineTo(X(x), Z(seabedAt(L, x)))
+  }
+  ctx.stroke()
   for (const r of L.rocks) {
     const d = Math.hypot(r.x - s.x, r.z - s.z) - r.r
     ctx.fillStyle = lit(ROCK, r.z, lampAt(Math.max(0, d)), 0.05)

@@ -124,7 +124,7 @@ export function Debrief({ won, title, why, onContinue }: { won: boolean; title: 
   }, [])
   return (
     <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#0A1120]/75 p-3 backdrop-blur-[2px]" role="dialog" aria-modal="false" aria-label="Why it happened">
-      <div className="max-h-full w-full max-w-lg overflow-y-auto rounded-[20px] border border-white/15 bg-gradient-to-b from-[#19263F] to-[#111C32] p-4 shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:p-5">
+      <div className="max-h-full w-full max-w-lg overflow-y-auto rounded-[20px] border border-white/15 bg-gradient-to-b from-[#19263F] to-[#111C32] p-4 pb-3 shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:p-5 sm:pb-4">
         <p className={`font-display text-xl font-bold ${won ? 'text-emerald-300' : 'text-amber-300'}`}>{won ? 'Mission complete!' : 'Not this time — here is why'}</p>
         <p className="mt-1 text-[#EEF2F8]">{title}</p>
         <h3 className="mt-3 text-sm font-bold uppercase tracking-wide text-cyan-300">Why it happened</h3>
@@ -138,14 +138,16 @@ export function Debrief({ won, title, why, onContinue }: { won: boolean; title: 
             </li>
           ))}
         </ul>
-        <button
-          ref={btn}
-          type="button"
-          onClick={onContinue}
-          className="mt-4 min-h-[48px] w-full rounded-2xl bg-amber-500 font-display font-bold text-[#1A1103] hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
-        >
-          See my result →
-        </button>
+        <div className="sticky bottom-0 -mx-1 mt-3 bg-gradient-to-t from-[#111C32] via-[#111C32] to-transparent px-1 pt-3">
+          <button
+            ref={btn}
+            type="button"
+            onClick={onContinue}
+            className="min-h-[48px] w-full rounded-2xl bg-amber-500 font-display font-bold text-[#1A1103] hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+          >
+            See my result →
+          </button>
+        </div>
       </div>
     </div>
   )

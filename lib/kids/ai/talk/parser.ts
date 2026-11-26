@@ -845,7 +845,8 @@ function pushStep(ctx: Ctx, words: string, intent: string, stmts: Stmt[], notes:
 }
 
 /** Make sure the robot drives until `cond` before the next action: reuse an open-ended "drive forward" if there is one. */
-function ensureDriveUntil(ctx: Ctx, cond: Cond, list: Stmt[], word: string, depth: number, words: string): void {
+/** Returns true when it added a step of its own (false when it reused an earlier open-ended drive). */
+function ensureDriveUntil(ctx: Ctx, cond: Cond, list: Stmt[], word: string, depth: number, words: string): boolean {
   const u = ctx.unbounded
   const lastIsUnbounded = u && u.list === list && list[list.length - 1] === u.stmt
   if (u && lastIsUnbounded) {
@@ -857,12 +858,13 @@ function ensureDriveUntil(ctx: Ctx, cond: Cond, list: Stmt[], word: string, dept
     st.blocks = repl.map(stmtText)
     st.notes = [`You said “${word} …” later, so instead of guessing how far, the robot drives until ${cond.text}.`, ...cond.notes]
     ctx.unbounded = null
-    return
+    return false
   }
   const repl = driveUntil(ctx, cond, DEFAULT_SPEED, 1)
   list.push(...repl)
   pushStep(ctx, words, `MOVE forward · until ${cond.text}`, repl, [`“${word} …” means the robot has to get there first, so I added: drive until ${cond.text}.`, ...cond.notes], depth)
   ctx.unbounded = null
+  return true
 }
 
 function parseClause(ctx: Ctx, raw: string, quotes: string[], list: Stmt[], depth: number, pendingCond: { cond: Cond; word: string; words?: string } | null): void {
@@ -893,7 +895,6 @@ function parseClause(ctx: Ctx, raw: string, quotes: string[], list: Stmt[], dept
     if (p && p.rest && ACTION_START.test(p.rest)) {
       prefix = { cond: p.cond, word: p.word, words: p.words }
       clause = stripFillers(p.rest)
-      words = clause
     }
   }
 
@@ -903,7 +904,7 @@ function parseClause(ctx: Ctx, raw: string, quotes: string[], list: Stmt[], dept
     if (mi && mi[1] && ACTION_START.test(mi[1])) {
       const cond = parseCond(mi[2])
       if (cond) {
-        if (prefix) ensureDriveUntil(ctx, prefix.cond, list, prefix.word, depth, prefix.words ?? prefix.word)
+        if (prefix && ensureDriveUntil(ctx, prefix.cond, list, prefix.word, depth, prefix.words ?? prefix.word)) words = clause
         const then: Stmt[] = []
         const ifStmt: Stmt = { op: 'if', id: ctx.id(), cond: cond.expr, then }
         list.push(ifStmt)
@@ -935,7 +936,7 @@ function parseClause(ctx: Ctx, raw: string, quotes: string[], list: Stmt[], dept
       // "when you see red, drive" is really "drive until red" — handled as a move with that condition.
       until = prefix.cond
     } else {
-      ensureDriveUntil(ctx, prefix.cond, list, prefix.word, depth, prefix.words ?? prefix.word)
+      if (ensureDriveUntil(ctx, prefix.cond, list, prefix.word, depth, prefix.words ?? prefix.word)) words = clause
       // "stop at the wall": drive-until already stops.
       if (/^(?:stop|halt|brake|freeze|park)$/.test(clause)) return
     }

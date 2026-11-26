@@ -5,6 +5,8 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GameTeacherStrip } from '@/components/kids/games/GameTeacherStrip'
+import { getGame } from '@/lib/kids/universe/worlds'
 import { jsonldScript, breadcrumbJsonLD } from '@/lib/seo/jsonld'
 import RobotBrainClient from '@/components/kids/games/robot-brain/RobotBrainClient'
 
@@ -176,6 +178,7 @@ export default function RobotBrainPage() {
             ← Back to the R2BOT Universe
           </Link>
         </p>
+        <GameTeacherStrip game={{ id: 'robot-brain', name: getGame('robot-brain')?.name ?? 'R2BOT Kids game' }} />
       </article>
     </>
   )

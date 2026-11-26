@@ -29,7 +29,7 @@ import type { DriveInput, WorkshopSceneApi } from './WorkshopSceneClient'
 
 function SceneSkeleton() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-[#1B1035]">
+    <div className="absolute inset-0 flex items-center justify-center bg-[#111C32]">
       <div className="h-24 w-24 animate-pulse rounded-3xl bg-white/10" aria-hidden />
       <span className="sr-only">Loading the 3D workshop…</span>
     </div>
@@ -186,7 +186,7 @@ export default function WorkshopClient() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         {/* ── 3D view ── */}
         <section aria-label="Your robot in 3D" className="py-0">
-          <div ref={viewRef} className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-[#1B1035] shadow-2xl">
+          <div ref={viewRef} className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-[#111C32] shadow-2xl">
             <WorkshopScene
               design={design}
               snap={snap}
@@ -199,7 +199,7 @@ export default function WorkshopClient() {
               label={`3D model of ${design.name}. Drag to spin, pinch or scroll to zoom.`}
             />
             <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/50 px-3 py-1 text-sm font-black">🤖 {design.name}</div>
-            {!driving && <p className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/45 px-3 py-1 text-xs font-bold text-purple-100">Drag to spin · pinch to zoom</p>}
+            {!driving && <p className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/45 px-3 py-1 text-xs font-bold text-slate-200">Drag to spin · pinch to zoom</p>}
             {driving && inSand && !caps.has('rough-ground') && (
               <p role="status" className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-full bg-amber-500 px-3 py-1 text-sm font-black text-black">
                 🏜️ Wheels slipping in the sand! Tracks or legs would cross it.
@@ -238,12 +238,12 @@ export default function WorkshopClient() {
                 setDriving(false)
                 setArOpen(true)
               }}
-              className="min-h-[48px] rounded-2xl bg-fuchsia-700 px-4 font-black text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
+              className="min-h-[48px] rounded-2xl bg-amber-500 px-4 font-black text-[#1A1103] focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
             >
               📱 See it in your room
             </button>
             {vrSupported && !inVR && (
-              <button type="button" onClick={() => void enterVR()} className="min-h-[48px] rounded-2xl bg-indigo-500 px-4 font-black text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-white">
+              <button type="button" onClick={() => void enterVR()} className="min-h-[48px] rounded-2xl bg-cyan-400 px-4 font-black text-[#0A1120] focus:outline-none focus-visible:ring-4 focus-visible:ring-white">
                 🥽 Stand next to it (VR)
               </button>
             )}
@@ -254,12 +254,12 @@ export default function WorkshopClient() {
               <input readOnly value={shareUrl} onFocus={(e) => e.currentTarget.select()} className="mt-1 min-h-[44px] w-full rounded-xl bg-black/40 px-3 font-mono text-xs" />
             </label>
           )}
-          {driving && <p className="mt-2 text-sm text-purple-200">Drive with the arrow buttons or your keyboard arrows. Try the sandy patch — which parts get across?</p>}
+          {driving && <p className="mt-2 text-sm text-slate-300">Drive with the arrow buttons or your keyboard arrows. Try the sandy patch — which parts get across?</p>}
 
           <div className="mt-4 rounded-2xl bg-white/5 p-4">
             <h2 className="text-lg font-black">{design.name} can…</h2>
             <ul className="mt-2 flex flex-wrap gap-2">
-              {capList.length === 0 && <li className="text-sm text-purple-200">Nothing yet — give it something to move with!</li>}
+              {capList.length === 0 && <li className="text-sm text-slate-300">Nothing yet — give it something to move with!</li>}
               {capList.map((c) => (
                 <li key={c} className="rounded-full bg-emerald-400/15 px-3 py-1 text-sm font-bold text-emerald-200">
                   ✓ {CAPABILITY_LABEL[c]}
@@ -282,7 +282,7 @@ export default function WorkshopClient() {
                 type="button"
                 aria-selected={slot === s}
                 onClick={() => setSlot(s)}
-                className={`min-h-[44px] shrink-0 rounded-xl px-3 text-sm font-black focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400 ${slot === s ? 'bg-amber-500 text-black' : 'text-purple-100 hover:bg-white/10'}`}
+                className={`min-h-[44px] shrink-0 rounded-xl px-3 text-sm font-black focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400 ${slot === s ? 'bg-amber-500 text-black' : 'text-slate-200 hover:bg-white/10'}`}
               >
                 {getPart(s, design[s])?.emoji} {SLOT_LABEL[s]}
               </button>
@@ -314,11 +314,11 @@ export default function WorkshopClient() {
             </div>
 
             {current && (
-              <article className="mt-3 rounded-2xl border border-white/10 bg-[#1B1035] p-4" aria-live="polite">
+              <article className="mt-3 rounded-2xl border border-white/10 bg-[#111C32] p-4" aria-live="polite">
                 <h3 className="text-xl font-black">
                   {current.emoji} {current.name}
                 </h3>
-                <p className="mt-1 text-purple-100">{current.what}</p>
+                <p className="mt-1 text-slate-200">{current.what}</p>
                 <dl className="mt-3 space-y-2 text-sm">
                   <div className="rounded-xl bg-emerald-400/10 p-2">
                     <dt className="font-black text-emerald-300">✅ With it</dt>
@@ -363,7 +363,7 @@ export default function WorkshopClient() {
 
           <label className="mt-4 block rounded-2xl bg-white/5 p-4">
             <span className="text-sm font-black">Robot name</span>
-            <span className="block text-xs text-purple-200">A name for your robot — not your own name.</span>
+            <span className="block text-xs text-slate-300">A name for your robot — not your own name.</span>
             <input
               value={design.name}
               readOnly={readOnly}
@@ -447,8 +447,8 @@ async function drawRobotCard(design: RobotDesign, shot: string | null): Promise<
   const g = c.getContext('2d')
   if (!g) return null
   const bg = g.createLinearGradient(0, 0, 0, H)
-  bg.addColorStop(0, '#2E1065')
-  bg.addColorStop(1, '#0F0A1E')
+  bg.addColorStop(0, '#19263F')
+  bg.addColorStop(1, '#0A1120')
   g.fillStyle = bg
   g.fillRect(0, 0, W, H)
   g.fillStyle = design.primary
@@ -470,7 +470,7 @@ async function drawRobotCard(design: RobotDesign, shot: string | null): Promise<
   g.beginPath()
   g.roundRect(fx, fy, fw, fh, 36)
   g.clip()
-  g.fillStyle = '#1B1035'
+  g.fillStyle = '#111C32'
   g.fillRect(fx, fy, fw, fh)
   if (shot) {
     const img = new Image()
@@ -492,7 +492,7 @@ async function drawRobotCard(design: RobotDesign, shot: string | null): Promise<
   for (const s of SLOT_ORDER) {
     const p = getPart(s, design[s])
     if (!p) continue
-    g.fillStyle = '#C4B5FD'
+    g.fillStyle = '#A7B0C0'
     g.fillText(`${SLOT_LABEL[s]}:`, 60, y)
     g.fillStyle = '#FFFFFF'
     g.fillText(`${p.emoji} ${p.name}`, 380, y)
@@ -504,7 +504,7 @@ async function drawRobotCard(design: RobotDesign, shot: string | null): Promise<
   const canText = `Can ${caps.length ? caps.join(', ') : 'think about moving'}.`
   wrapText(g, canText, 60, y + 14, W - 120, 40)
 
-  g.fillStyle = '#A78BFA'
+  g.fillStyle = '#FFA878'
   g.font = 'bold 28px system-ui, sans-serif'
   g.fillText('Built in the R2BOT Robot Workshop · r2bot.in/kids/workshop', 60, H - 50)
   return c.toDataURL('image/png')

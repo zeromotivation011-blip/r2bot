@@ -42,11 +42,11 @@ export function BuildABot({ onComplete }: { onComplete?: () => void }) {
       <div className="bb-canvas">
         <svg viewBox="0 0 220 280" width="100%" height="280" aria-label="Build a robot">
           {/* Body outline (ghost) */}
-          <rect x="58" y="60" width="104" height="86" rx="14" fill="none" stroke="#4c1d95" strokeWidth="3" strokeDasharray="5 5" />
-          <rect x="68" y="156" width="84" height="60" rx="10" fill="none" stroke="#4c1d95" strokeWidth="3" strokeDasharray="5 5" />
+          <rect x="58" y="60" width="104" height="86" rx="14" fill="none" stroke="#19263F" strokeWidth="3" strokeDasharray="5 5" />
+          <rect x="68" y="156" width="84" height="60" rx="10" fill="none" stroke="#19263F" strokeWidth="3" strokeDasharray="5 5" />
 
           {/* Head */}
-          {placed.head ? null : <text x="110" y="106" fontSize="12" textAnchor="middle" fill="#4c1d95">head</text>}
+          {placed.head ? null : <text x="110" y="106" fontSize="12" textAnchor="middle" fill="#19263F">head</text>}
           {placed.antenna && (
             <g>
               <line x1="110" y1="36" x2="110" y2="58" stroke="#FF8A4C" strokeWidth="3" />
@@ -78,7 +78,7 @@ export function BuildABot({ onComplete }: { onComplete?: () => void }) {
               <circle cx="122" cy="184" r="3" fill="#3b82f6" />
             </g>
           )}
-          {!placed.chest && <text x="110" y="190" fontSize="12" textAnchor="middle" fill="#4c1d95">chest</text>}
+          {!placed.chest && <text x="110" y="190" fontSize="12" textAnchor="middle" fill="#19263F">chest</text>}
 
           {/* Arms */}
           {placed.arms ? (
@@ -88,21 +88,21 @@ export function BuildABot({ onComplete }: { onComplete?: () => void }) {
             </g>
           ) : (
             <>
-              <text x="46" y="186" fontSize="11" textAnchor="middle" fill="#4c1d95">arms</text>
-              <text x="174" y="186" fontSize="11" textAnchor="middle" fill="#4c1d95">arms</text>
+              <text x="46" y="186" fontSize="11" textAnchor="middle" fill="#19263F">arms</text>
+              <text x="174" y="186" fontSize="11" textAnchor="middle" fill="#19263F">arms</text>
             </>
           )}
 
           {/* Feet */}
           {placed.feet ? (
             <g>
-              <circle cx="86" cy="240" r="18" fill="#1a1040" stroke="#3b82f6" strokeWidth="2" />
-              <circle cx="134" cy="240" r="18" fill="#1a1040" stroke="#3b82f6" strokeWidth="2" />
+              <circle cx="86" cy="240" r="18" fill="#111C32" stroke="#3b82f6" strokeWidth="2" />
+              <circle cx="134" cy="240" r="18" fill="#111C32" stroke="#3b82f6" strokeWidth="2" />
               <circle cx="86" cy="240" r="6" fill="var(--void)" />
               <circle cx="134" cy="240" r="6" fill="var(--void)" />
             </g>
           ) : (
-            <text x="110" y="244" fontSize="12" textAnchor="middle" fill="#4c1d95">feet</text>
+            <text x="110" y="244" fontSize="12" textAnchor="middle" fill="#19263F">feet</text>
           )}
 
           {/* Alive sparkle */}
@@ -150,8 +150,8 @@ export function BuildABot({ onComplete }: { onComplete?: () => void }) {
       <style jsx>{`
         .bb { display: flex; flex-direction: column; gap: 12px; }
         .bb-canvas {
-          background: linear-gradient(180deg, rgba(26,16,64,0.6), rgba(15,10,30,0.6));
-          border: 2px solid #4c1d95;
+          background: linear-gradient(180deg, rgba(17,28,50,0.6), rgba(10,17,32,0.6));
+          border: 2px solid #19263F;
           border-radius: 18px;
           padding: 14px;
         }
@@ -169,7 +169,7 @@ export function BuildABot({ onComplete }: { onComplete?: () => void }) {
         .bb-part {
           min-height: 64px;
           background: linear-gradient(135deg, #fde047, #FF8A4C);
-          color: #1a1040;
+          color: #111C32;
           border: 2px solid #FC6818;
           border-radius: 14px;
           padding: 8px;

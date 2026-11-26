@@ -151,7 +151,7 @@ export function VoiceAnswer({ question, accepted, onWin, onFail }: VoiceAnswerPr
           0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.55); }
           50%      { box-shadow: 0 0 0 18px rgba(239,68,68,0); }
         }
-        .va-fallback { color: #c4b5fd; font-weight: 700; }
+        .va-fallback { color: #A7B0C0; font-weight: 700; }
         .va-heard {
           font-size: 15px; font-weight: 700;
         }
@@ -163,9 +163,9 @@ export function VoiceAnswer({ question, accepted, onWin, onFail }: VoiceAnswerPr
         .va-opt {
           min-height: 44px;
           padding: 0 14px;
-          background: #1a1040;
+          background: #111C32;
           color: #FFC9A8;
-          border: 2px solid #4c1d95;
+          border: 2px solid #19263F;
           border-radius: 999px;
           font-weight: 800;
           cursor: pointer;

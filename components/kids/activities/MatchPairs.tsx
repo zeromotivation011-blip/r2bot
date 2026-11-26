@@ -88,8 +88,8 @@ export function MatchPairs({
         .mp-col { display: flex; flex-direction: column; gap: 8px; }
         .mp-btn {
           min-height: 56px;
-          background: #1a1040;
-          border: 2px solid #4c1d95;
+          background: #111C32;
+          border: 2px solid #19263F;
           color: #FFC9A8;
           border-radius: 12px;
           font-weight: 800;

@@ -4,6 +4,8 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GameTeacherStrip } from '@/components/kids/games/GameTeacherStrip'
+import { getGame } from '@/lib/kids/universe/worlds'
 import { jsonldScript } from '@/lib/seo/jsonld'
 import ArmFactoryGameClient from '@/components/kids/games/arm-factory/ArmFactoryGameClient'
 
@@ -179,6 +181,7 @@ export default function ArmFactoryPage() {
             </Link>
           </p>
         </section>
+        <GameTeacherStrip game={{ id: 'arm-factory', name: getGame('arm-factory')?.name ?? 'R2BOT Kids game' }} />
       </article>
     </>
   )

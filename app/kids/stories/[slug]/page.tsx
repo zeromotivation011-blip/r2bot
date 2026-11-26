@@ -148,7 +148,7 @@ export default async function EpisodePage({ params }: Params) {
                 l.type === 'scene' ? (
                   <h3 key={i} className="mt-5 text-xs font-black uppercase tracking-widest text-orange-300">{l.text}</h3>
                 ) : l.type === 'choice' ? (
-                  <p key={i} className="mt-3 rounded-lg bg-indigo-500/15 px-3 py-2"><strong className="text-white">{l.speaker} asks you:</strong> {l.text}</p>
+                  <p key={i} className="mt-3 rounded-lg bg-cyan-500/10 px-3 py-2"><strong className="text-white">{l.speaker} asks you:</strong> {l.text}</p>
                 ) : l.type === 'option' ? (
                   <p key={i} className="ml-4 mt-1">{l.correct ? '✓' : '·'} {l.text}{l.correct ? ' (the answer that moves the story on)' : ''}</p>
                 ) : (

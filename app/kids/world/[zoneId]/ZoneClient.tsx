@@ -33,7 +33,7 @@ export default function ZoneClient() {
     return (
       <div className="p-10 text-center">
         <h1 className="text-3xl font-black text-amber-300">🔒 Locked</h1>
-        <p className="mt-3 text-purple-200">You need ⭐ {ZONE_UNLOCK_STARS[zoneId]} to unlock {zone.name}.</p>
+        <p className="mt-3 text-slate-300">You need ⭐ {ZONE_UNLOCK_STARS[zoneId]} to unlock {zone.name}.</p>
         <Link href="/kids/world" className="mt-6 inline-block px-5 py-3 rounded-2xl bg-amber-500 text-black font-black">← Back to world</Link>
       </div>
     )
@@ -125,8 +125,8 @@ export default function ZoneClient() {
           padding: 0 16px;
           line-height: 48px;
           color: #FFC9A8;
-          background: rgba(26,16,64,.7);
-          border: 2px solid #4c1d95;
+          background: rgba(17,28,50,.7);
+          border: 2px solid #19263F;
           border-radius: 12px;
           font-weight: 800;
           text-decoration: none;
@@ -134,7 +134,7 @@ export default function ZoneClient() {
         }
         .zone-header {
           text-align: center; padding: 28px 16px;
-          background: rgba(15,10,30,.4);
+          background: rgba(10,17,32,.4);
           border-radius: 24px;
           border: 2px solid rgba(255,255,255,.08);
           margin-bottom: 24px;
@@ -147,7 +147,7 @@ export default function ZoneClient() {
           letter-spacing: 1px;
           text-shadow: 0 0 30px rgba(253,224,71,.4);
         }
-        .tagline { font-size: 18px; color: #c4b5fd; margin-top: 4px; font-weight: 700; }
+        .tagline { font-size: 18px; color: #A7B0C0; margin-top: 4px; font-weight: 700; }
         .zone-meta { font-size: 12px; color: #a5b4fc; margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; }
         .zone-progress {
           display: inline-block;
@@ -163,31 +163,31 @@ export default function ZoneClient() {
         .level-card {
           display: flex; align-items: center; gap: 14px;
           padding: 14px 16px;
-          background: rgba(26,16,64,.7);
+          background: rgba(17,28,50,.7);
           border-radius: 18px;
-          border: 2px solid #4c1d95;
+          border: 2px solid #19263F;
         }
         .level-card.done   { border-color: #10b981; }
         .level-card.current { border-color: #FF8A4C; box-shadow: 0 0 30px rgba(255,138,76,.3); }
         .level-emoji { font-size: 40px; flex-shrink: 0; }
         .level-info { flex: 1; min-width: 0; }
         .level-info h3 { font-size: 18px; font-weight: 900; color: #fde047; }
-        .level-info p { font-size: 13px; color: #c4b5fd; margin-top: 2px; }
+        .level-info p { font-size: 13px; color: #A7B0C0; margin-top: 2px; }
         .meta { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
         .chip {
           font-size: 11px; font-weight: 800;
-          background: rgba(15,10,30,.65);
+          background: rgba(10,17,32,.65);
           color: #FFA878;
           padding: 3px 9px;
           border-radius: 999px;
-          border: 1px solid #4c1d95;
+          border: 1px solid #19263F;
         }
         .chip-done { background: #10b981; color: #022c22; border-color: #065f46; }
         .play-btn {
           min-height: 56px;
           padding: 0 18px;
           background: linear-gradient(135deg, #FF8A4C, #FC6818);
-          color: #1a1040;
+          color: #111C32;
           border-radius: 14px;
           text-decoration: none;
           font-weight: 900;
@@ -202,10 +202,10 @@ export default function ZoneClient() {
           border-radius: 22px;
           color: #FFC9A8;
         }
-        .boss-card.locked { border-color: #4c1d95; filter: grayscale(.3); }
+        .boss-card.locked { border-color: #19263F; filter: grayscale(.3); }
         .boss-badge {
           display: inline-block;
-          background: #fde047; color: #1a1040;
+          background: #fde047; color: #111C32;
           font-size: 11px; font-weight: 900;
           letter-spacing: 1.5px; padding: 4px 10px;
           border-radius: 999px;
@@ -213,7 +213,7 @@ export default function ZoneClient() {
         }
         .boss-card h2 { font-size: 22px; font-weight: 900; color: #fde047; }
         .story { font-size: 14px; margin-top: 6px; color: #FFC9A8; }
-        .challenge { font-size: 13px; color: #c4b5fd; margin-top: 2px; }
+        .challenge { font-size: 13px; color: #A7B0C0; margin-top: 2px; }
         .boss-bar { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-weight: 800; font-size: 13px; color: #FF8A4C; }
         .bar-track { flex: 1; height: 10px; background: var(--void); border-radius: 999px; overflow: hidden; }
         .bar-fill { height: 100%; background: linear-gradient(90deg, #FC6818, #FF8A4C); transition: width .4s; }
@@ -224,7 +224,7 @@ export default function ZoneClient() {
           color: white; font-size: 18px; font-weight: 900;
           border: none; border-radius: 14px; cursor: pointer;
         }
-        .boss-lock { margin-top: 12px; text-align: center; color: #c4b5fd; font-weight: 700; }
+        .boss-lock { margin-top: 12px; text-align: center; color: #A7B0C0; font-weight: 700; }
         @media (max-width: 640px) {
           .level-card { gap: 10px; padding: 12px; }
           .level-emoji { font-size: 32px; }

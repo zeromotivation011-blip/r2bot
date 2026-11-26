@@ -53,7 +53,7 @@ export default function JoinCardClient({ classId }: { classId: string }) {
         <button type="button" onClick={() => window.print()} className="min-h-[48px] rounded-xl bg-amber-500 px-6 font-bold text-black hover:bg-amber-400">🖨️ Print</button>
       </div>
 
-      <article id="r2-join-card" className="rounded-[28px] border-4 border-[#1a1040] bg-white p-8 text-[#1a1040] shadow-2xl sm:p-12">
+      <article id="r2-join-card" className="rounded-[28px] border-4 border-[#111C32] bg-white p-8 text-[#111C32] shadow-2xl sm:p-12">
         <header className="text-center">
           <p className="text-lg font-extrabold uppercase tracking-[0.2em] text-orange-600">R2BOT Kids · Robot Class</p>
           <h1 className="mt-2 text-4xl font-black sm:text-5xl">Join {who}!</h1>
@@ -69,15 +69,15 @@ export default function JoinCardClient({ classId }: { classId: string }) {
 
         <ol className="mt-8 space-y-4 text-2xl font-bold">
           <li className="flex items-start gap-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#1a1040] text-white">1</span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#111C32] text-white">1</span>
             <span>Go to <span className="whitespace-nowrap rounded-lg bg-slate-100 px-2 font-mono text-orange-700">{JOIN_URL_DISPLAY}</span></span>
           </li>
           <li className="flex items-start gap-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#1a1040] text-white">2</span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#111C32] text-white">2</span>
             <span>Type the class code</span>
           </li>
           <li className="flex items-start gap-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#1a1040] text-white">3</span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#111C32] text-white">3</span>
             <span>Type your first name or a robot name — that’s it! 🚀</span>
           </li>
         </ol>

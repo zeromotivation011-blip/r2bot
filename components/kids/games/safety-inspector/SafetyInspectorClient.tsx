@@ -14,7 +14,7 @@ function Skeleton() {
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_380px]" aria-busy="true" aria-label="Loading Robot Safety Inspector">
       <div className="flex flex-col gap-2">
         <div className="aspect-[10/7] w-full animate-pulse rounded-[20px] border border-white/10 bg-gradient-to-br from-emerald-900/50 via-[#111C32] to-teal-950" />
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+        <div className="hidden grid-cols-2 gap-1.5 sm:grid sm:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-[46px] animate-pulse rounded-xl bg-white/5" />
           ))}

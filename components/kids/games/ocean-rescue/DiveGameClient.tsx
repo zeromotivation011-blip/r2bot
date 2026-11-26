@@ -384,7 +384,7 @@ export default function DiveGameClient({ tier, onFinish }: Props) {
           {paused && phase === 'diving' && (
             <div className="absolute inset-0 flex items-center justify-center bg-[#0A1120]/60 font-display text-xl font-bold text-white">Paused</div>
           )}
-          {report && phase === 'done' && <Debrief won={report.won} title={report.message} why={report.why} onContinue={finishRound} />}
+          {report && phase === 'done' && <Debrief won={report.won} title={report.headline} why={report.why} onContinue={finishRound} />}
         </div>
 
         {/* Pilot controls */}
@@ -426,6 +426,29 @@ export default function DiveGameClient({ tier, onFinish }: Props) {
               Time ×2 {fast ? 'on' : 'off'}
             </button>
           </div>
+          {tier === 1 && phase === 'diving' && (
+            <div className="flex w-full flex-col gap-1.5 sm:w-auto" aria-label="Ballast pump">
+              <span className="text-center text-xs font-bold uppercase tracking-wide text-[#6E7888]">
+                Ballast {hud.ballast.toFixed(2)} L → {hud.target.toFixed(2)} L
+              </span>
+              <div className="flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setPump(simRef.current.ballastTargetL - 0.1)}
+                  className="min-h-[48px] flex-1 rounded-xl border border-cyan-300/40 bg-cyan-400/10 px-3 text-sm font-bold text-cyan-100 hover:bg-cyan-400/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+                >
+                  Pump out ↑
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPump(simRef.current.ballastTargetL + 0.1)}
+                  className="min-h-[48px] flex-1 rounded-xl border border-amber-300/40 bg-amber-400/10 px-3 text-sm font-bold text-amber-100 hover:bg-amber-400/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+                >
+                  Pump in ↓
+                </button>
+              </div>
+            </div>
+          )}
         </div>
         <p className="px-1 text-sm text-[#6E7888]">Keys: arrows or WASD to steer · Space or P to ping{tier === 1 ? ' · [ and ] to pump ballast in / out' : ''}</p>
       </div>
@@ -441,7 +464,7 @@ export default function DiveGameClient({ tier, onFinish }: Props) {
         </section>
 
         {tier === 1 && (
-          <section className="flex flex-col gap-2">
+          <section className="flex flex-col gap-2 p-0">
             <PlanSlider
               id="ocean-ballast"
               label={phase === 'ready' ? 'Ballast water' : 'Ballast pump target'}
@@ -471,7 +494,7 @@ export default function DiveGameClient({ tier, onFinish }: Props) {
                 <li key={`${p.t}-${i}`} className={i === 0 ? 'text-[#EEF2F8]' : ''}>
                   {p.range !== null && p.echo !== null ? (
                     <>
-                      Echo after <b className="text-cyan-200">{p.echo.toFixed(3)} s</b> → {p.echo.toFixed(3)} × {SOUND_SPEED} ÷ 2 = <b className="text-amber-300">{p.range.toFixed(1)} m</b>
+                      Echo after <b className="text-cyan-200">{p.echo.toFixed(4)} s</b> → {p.echo.toFixed(4)} × {SOUND_SPEED.toLocaleString('en')} ÷ 2 = <b className="text-amber-300">{((p.echo * SOUND_SPEED) / 2).toFixed(1)} m</b>
                     </>
                   ) : (
                     <>No echo — nothing within {level.sonarRange} m</>
@@ -484,7 +507,7 @@ export default function DiveGameClient({ tier, onFinish }: Props) {
           )}
         </section>
 
-        <section className="grid grid-cols-2 gap-2 text-sm">
+        <section className="grid grid-cols-2 gap-2 p-0 text-sm">
           <Stat label="Tether out" value={`${hud.tether.toFixed(0)} / ${level.tetherLen} m`} warn={hud.taut} />
           <Stat label="Tether drag" value={`${hud.tetherDrag.toFixed(1)} N`} warn={hud.tetherDrag > 8} />
           <Stat label="Speed" value={`${hud.speed.toFixed(2)} m/s`} />

@@ -54,7 +54,7 @@ export default function CodeLabIndexClient({ bands }: { bands: IndexBand[] }) {
   return (
     <div className="space-y-10">
       {robotName && (
-        <p className="rounded-2xl bg-white/5 p-4 text-purple-100">
+        <p className="rounded-2xl bg-white/5 p-4 text-slate-200">
           🤖 You are coding <strong className="text-white">{robotName}</strong>, the robot from your{' '}
           <Link href="/kids/workshop" className="font-bold text-amber-300 underline-offset-4 hover:underline">
             Workshop
@@ -94,14 +94,14 @@ export default function CodeLabIndexClient({ bands }: { bands: IndexBand[] }) {
                         <span className="opacity-30">{'☆'.repeat(3 - best)}</span>
                       </span>
                     </div>
-                    <p className="mt-1 text-sm text-purple-100">{m.task}</p>
-                    <p className="mt-1 text-xs text-purple-300">Learn: {m.learningGoal}</p>
+                    <p className="mt-1 text-sm text-slate-200">{m.task}</p>
+                    <p className="mt-1 text-xs text-slate-400">Learn: {m.learningGoal}</p>
                     {m.needs.filter((c) => c !== 'move').length > 0 && (
                       <p className="mt-2 text-xs font-bold text-amber-200">
                         {needsPart ? '🔧 ' : '✓ '}Robot must {m.needs.filter((c) => c !== 'move').map((c) => CAPABILITY_LABEL[c]).join(' and ')}
                       </p>
                     )}
-                    {isLocked && <p className="mt-2 text-xs font-bold text-purple-200">Finish “{prev.title}” to unlock</p>}
+                    {isLocked && <p className="mt-2 text-xs font-bold text-slate-300">Finish “{prev.title}” to unlock</p>}
                   </>
                 )
                 return (

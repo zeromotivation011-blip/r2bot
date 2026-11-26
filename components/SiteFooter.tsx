@@ -84,7 +84,7 @@ const LANGUAGES = [
 
 export function SiteFooter() {
   return (
-    <footer className="mt-20 border-t border-white/10 bg-[var(--void)]">
+    <footer data-site-footer className="mt-20 border-t border-white/10 bg-[var(--void)]">
       <div className="mx-auto max-w-6xl px-5 py-12">
         <div className="mb-10 max-w-sm">
           <p className="text-2xl font-black text-white">

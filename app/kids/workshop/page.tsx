@@ -54,7 +54,7 @@ export default function WorkshopPage() {
       <header className="mx-auto max-w-6xl px-4 pb-4 pt-6">
         <p className="text-sm font-black uppercase tracking-wider text-amber-300">Robot Workshop</p>
         <h1 className="mt-1 text-3xl font-black text-white sm:text-4xl">Build your own robot in 3D</h1>
-        <p className="mt-2 max-w-3xl text-purple-100">
+        <p className="mt-2 max-w-3xl text-slate-200">
           Choose a body, something to move with, a head, a tool and a floor sensor. Every part snaps on and tells you what it does — and what
           would go wrong without it. Spin your robot around, take it for a test drive, and put it in your room with your phone&rsquo;s camera.
         </p>
@@ -67,7 +67,7 @@ export default function WorkshopPage() {
         <h2 id="parts-guide" className="text-2xl font-black text-white">
           Every robot part, and why it matters
         </h2>
-        <p className="mt-2 max-w-3xl text-purple-100">
+        <p className="mt-2 max-w-3xl text-slate-200">
           Real engineers pick parts for the job the robot has to do. Here is every part in the Workshop. In the{' '}
           <Link href="/kids/code-lab" className="font-bold text-amber-300 underline-offset-4 hover:underline">
             Code Lab
@@ -92,7 +92,7 @@ export default function WorkshopPage() {
                     <p className="mt-1 text-sm">
                       <strong className="text-rose-300">Without it:</strong> {p.withoutIt}
                     </p>
-                    <p className="mt-1 text-sm text-purple-200">
+                    <p className="mt-1 text-sm text-slate-300">
                       <strong>Real robots:</strong> {p.realWorld}
                     </p>
                   </li>
@@ -100,7 +100,7 @@ export default function WorkshopPage() {
             </ul>
           </div>
         ))}
-        <p className="mt-10 max-w-3xl text-sm text-purple-200">
+        <p className="mt-10 max-w-3xl text-sm text-slate-300">
           For grown-ups: the Workshop runs entirely in the browser. The robot design is saved on this device only; nothing is sent to a server
           and no account is needed. The camera is used only if your child presses &ldquo;Turn on camera&rdquo;, and the video never leaves the
           device.

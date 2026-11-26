@@ -79,7 +79,7 @@ export function TapToReveal({
         }
         .ttr-front {
           background: linear-gradient(135deg, #fde047, #FF8A4C);
-          color: #1a1040;
+          color: #111C32;
           border: 3px solid #FC6818;
         }
         .ttr-front-text {
@@ -87,7 +87,7 @@ export function TapToReveal({
           text-align: center;
         }
         .ttr-back {
-          background: #1a1040;
+          background: #111C32;
           color: #FFC9A8;
           border: 3px solid #FF8A4C;
           transform: rotateY(180deg);
@@ -98,7 +98,7 @@ export function TapToReveal({
           color: #fde047;
         }
         .ttr-back-fact {
-          font-size: 12px; color: #c4b5fd; font-weight: 700;
+          font-size: 12px; color: #A7B0C0; font-weight: 700;
           margin-top: 8px; line-height: 1.35;
         }
         .ttr-card.is-flipped .ttr-front { transform: rotateY(180deg); }

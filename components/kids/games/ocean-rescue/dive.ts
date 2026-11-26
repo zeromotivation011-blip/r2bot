@@ -462,6 +462,8 @@ export function buoyPos(s: DiveState): { x: number; z: number } {
 
 export interface DiveReport {
   won: boolean
+  /** One short sentence for the debrief card. */
+  headline: string
   stars: number
   score: number
   scoreLabel: string
@@ -509,7 +511,7 @@ export function scoreDive(s: DiveState): DiveReport {
     const msg = !s.attached
       ? 'Time ran out before the buoy was found.'
       : 'Time ran out before the buoy reached the ship.'
-    return { won, stars: 0, score: 0, scoreLabel: 'points', lowerIsBetter: false, message: `${msg} ${why[1] ?? ''}`.trim(), why }
+    return { won, headline: msg, stars: 0, score: 0, scoreLabel: 'points', lowerIsBetter: false, message: `${msg} ${why[1] ?? ''}`.trim(), why }
   }
 
   const time = s.t
@@ -525,6 +527,8 @@ export function scoreDive(s: DiveState): DiveReport {
   const message =
     L.tier === 0
       ? `Buoy rescued in ${time.toFixed(0)} s! The sonar ping told you which way to go, and the lights showed its true colour up close.`
-      : `Buoy rescued in ${time.toFixed(0)} s! You trimmed the robot near neutral, pumped ballast out for the extra weight, and found the buoy by its sonar circles.`
-  return { won, stars, score, scoreLabel: 'points', lowerIsBetter: false, message, why }
+      : s.vSatS > 3
+        ? `Buoy rescued in ${time.toFixed(0)} s — but for ${s.vSatS.toFixed(0)} s the robot was too heavy for its up-thrusters. Trim closer to neutral and pump ballast out sooner to go faster.`
+        : `Buoy rescued in ${time.toFixed(0)} s! You kept the robot near neutral, pumped ballast out for the buoy’s weight, and found it where the sonar circles crossed.`
+  return { won, headline: message, stars, score, scoreLabel: 'points', lowerIsBetter: false, message, why }
 }

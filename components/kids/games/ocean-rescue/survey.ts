@@ -625,6 +625,8 @@ export function runSurvey(L: SurveyLevel, p: { ace?: AcePlan; legend?: LegendPla
 
 export interface SurveyReport {
   won: boolean
+  /** One short sentence for the debrief card. */
+  headline: string
   stars: number
   score: number
   scoreLabel: string
@@ -690,7 +692,8 @@ export function scoreSurvey(s: SurveyState): SurveyReport {
       coverage: 'The map has too many holes or blurry patches (needs 90 % sharp).',
       far: `The AUV surfaced ${s.surfacedDist.toFixed(0)} m from the ship.`,
     }
-    return { won: false, stars: 0, score: 0, scoreLabel: 'points', message: `${msg[s.failReason] ?? 'Mission failed.'} ${why[0]}`, why }
+    const headline = msg[s.failReason] ?? 'Mission failed.'
+    return { won: false, headline, stars: 0, score: 0, scoreLabel: 'points', message: `${headline} ${why[0]}`, why }
   }
 
   let stars = 1
@@ -709,5 +712,5 @@ export function scoreSurvey(s: SurveyState): SurveyReport {
     score = Math.round(c.good * 1000 + batt * 3)
     message = `Reef mapped: ${(c.good * 100).toFixed(0)} % sharp coverage in ${fmtMin(s.t)}, ${batt.toFixed(0)} % battery left.`
   }
-  return { won: true, stars, score, scoreLabel: 'points', message, why }
+  return { won: true, headline: message, stars, score, scoreLabel: 'points', message, why }
 }

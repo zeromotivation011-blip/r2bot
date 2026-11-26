@@ -56,8 +56,8 @@ export default function MyRobotClient() {
 
     // background gradient
     const grad = ctx.createLinearGradient(0, 0, 1200, 630)
-    grad.addColorStop(0, '#1A1040')
-    grad.addColorStop(1, '#0F0A1E')
+    grad.addColorStop(0, '#111C32')
+    grad.addColorStop(1, '#0A1120')
     ctx.fillStyle = grad
     ctx.fillRect(0, 0, 1200, 630)
 
@@ -94,7 +94,7 @@ export default function MyRobotClient() {
 
     // skills
     ctx.font = '22px system-ui, sans-serif'
-    ctx.fillStyle = '#C4B5FD'
+    ctx.fillStyle = '#A7B0C0'
     skills.slice(0, 5).forEach((s, i) => {
       ctx.fillText(s, 60, 340 + i * 36)
     })
@@ -240,38 +240,38 @@ export default function MyRobotClient() {
         .mr-head h1 { font-size: clamp(22px, 5vw, 32px); font-weight: 900; color: #fde047; }
         .back {
           min-height: 48px; padding: 0 14px; line-height: 48px;
-          background: #1a1040; color: #FFC9A8;
-          border: 2px solid #4c1d95; border-radius: 12px;
+          background: #111C32; color: #FFC9A8;
+          border: 2px solid #19263F; border-radius: 12px;
           text-decoration: none; font-weight: 800;
         }
-        .stars { background: linear-gradient(135deg, #FF8A4C, #FC6818); color: #1a1040;
+        .stars { background: linear-gradient(135deg, #FF8A4C, #FC6818); color: #111C32;
                  padding: 8px 14px; border-radius: 999px; font-weight: 900; }
         .mr-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
         @media (min-width: 780px) { .mr-grid { grid-template-columns: 1fr 1fr; } }
         .robot-stage {
-          background: radial-gradient(circle at 50% 30%, #2a1860, #1a1040 70%, #0f0a1e);
-          border: 2px solid #4c1d95;
+          background: radial-gradient(circle at 50% 30%, #19263F, #111C32 70%, #0A1120);
+          border: 2px solid #19263F;
           border-radius: 22px;
           padding: 20px;
           text-align: center;
         }
         .robot-name { font-size: 22px; font-weight: 900; color: #fde047; margin-top: 12px; }
-        .parts-count { font-size: 13px; color: #c4b5fd; margin-top: 2px; }
+        .parts-count { font-size: 13px; color: #A7B0C0; margin-top: 2px; }
         .panel {
-          background: rgba(26,16,64,.7);
-          border: 2px solid #4c1d95;
+          background: rgba(17,28,50,.7);
+          border: 2px solid #19263F;
           border-radius: 22px;
           padding: 18px;
           display: flex; flex-direction: column; gap: 14px;
         }
         .panel label > span, .swatch-row > span, .eyes-row > span {
           display: block; font-size: 11px; font-weight: 900; letter-spacing: 1.5px;
-          color: #c4b5fd; text-transform: uppercase; margin-bottom: 6px;
+          color: #A7B0C0; text-transform: uppercase; margin-bottom: 6px;
         }
         .panel input {
           width: 100%;
           background: var(--void);
-          border: 2px solid #4c1d95;
+          border: 2px solid #19263F;
           color: #FFC9A8;
           padding: 12px 14px;
           border-radius: 12px;
@@ -281,7 +281,7 @@ export default function MyRobotClient() {
         .sw {
           width: 36px; height: 36px;
           border-radius: 50%;
-          border: 3px solid #0f0a1e;
+          border: 3px solid #0A1120;
           cursor: pointer;
           transition: transform .15s;
         }
@@ -291,7 +291,7 @@ export default function MyRobotClient() {
         .eyes-btn {
           min-height: 48px;
           background: var(--void);
-          border: 2px solid #4c1d95;
+          border: 2px solid #19263F;
           color: #FFC9A8;
           border-radius: 12px;
           font-weight: 800;
@@ -323,12 +323,12 @@ export default function MyRobotClient() {
         }
         @media (min-width: 640px) { .parts-grid { grid-template-columns: repeat(3, 1fr); } }
         .part {
-          background: rgba(26,16,64,.7);
-          border: 2px solid #4c1d95;
+          background: rgba(17,28,50,.7);
+          border: 2px solid #19263F;
           border-radius: 16px;
           padding: 12px;
           text-align: center;
-          color: #c4b5fd;
+          color: #A7B0C0;
         }
         .part.owned {
           border-color: #FF8A4C;
@@ -339,7 +339,7 @@ export default function MyRobotClient() {
         .part.locked { filter: grayscale(.5); opacity: .65; }
         .p-emoji { font-size: 36px; display: block; }
         .p-name { font-size: 14px; font-weight: 900; margin-top: 4px; color: #fde047; }
-        .part.locked .p-name { color: #c4b5fd; }
+        .part.locked .p-name { color: #A7B0C0; }
         .p-zone, .p-desc { font-size: 11px; margin-top: 4px; }
         .p-desc { color: #FFA878; }
         .skills { margin-top: 28px; }
@@ -353,7 +353,7 @@ export default function MyRobotClient() {
           margin-bottom: 6px;
           font-weight: 700;
         }
-        .skills .empty { color: #c4b5fd; }
+        .skills .empty { color: #A7B0C0; }
         .cta-row {
           margin-top: 26px;
           display: grid; grid-template-columns: 1fr; gap: 10px;
@@ -367,9 +367,9 @@ export default function MyRobotClient() {
           cursor: pointer; text-decoration: none;
           display: inline-flex; align-items: center; justify-content: center;
           background: linear-gradient(135deg, #FF8A4C, #FC6818);
-          color: #1a1040;
+          color: #111C32;
         }
-        .cta.secondary { background: #1a1040; color: #FFC9A8; border: 2px solid #4c1d95; }
+        .cta.secondary { background: #111C32; color: #FFC9A8; border: 2px solid #19263F; }
       `}</style>
     </div>
   )
@@ -383,7 +383,7 @@ function Stat({ label, value, icon }: { label: string; value: string; icon: stri
     <div
       style={{
         background: 'rgba(45,30,110,0.5)',
-        border: '1px solid #4c1d95',
+        border: '1px solid #19263F',
         borderRadius: 14,
         padding: '12px 14px',
         textAlign: 'center',
@@ -391,7 +391,7 @@ function Stat({ label, value, icon }: { label: string; value: string; icon: stri
     >
       <div style={{ fontSize: 22 }}>{icon}</div>
       <div style={{ fontSize: 18, fontWeight: 900, color: '#fde047', marginTop: 4 }}>{value}</div>
-      <div style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#c4b5fd', fontWeight: 800 }}>
+      <div style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: '#A7B0C0', fontWeight: 800 }}>
         {label}
       </div>
     </div>
@@ -502,7 +502,7 @@ function drawRobotFace(ctx: CanvasRenderingContext2D, cx: number, cy: number, pr
   roundRect(ctx, cx - 90, cy - 80, 180, 180, 22)
   ctx.fill()
   // Screen
-  ctx.fillStyle = '#0F0A1E'
+  ctx.fillStyle = '#0A1120'
   roundRect(ctx, cx - 60, cy - 50, 120, 80, 12)
   ctx.fill()
   // Eyes

@@ -587,7 +587,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
       role="region"
       aria-label={`Story player: ${episode.title}`}
       aria-describedby="st-keys"
-      className={`${FRAME.root} outline-none ${fullscreen ? 'flex h-full max-w-none flex-col justify-center overflow-y-auto bg-[#0b0820] p-3' : ''}`}
+      className={`${FRAME.root} outline-none ${fullscreen ? 'flex h-full max-w-none flex-col justify-center overflow-y-auto bg-[#0A1120] p-3' : ''}`}
     >
       <p id="st-keys" className="sr-only">
         Keyboard: Space or K to play and pause, R to replay the line, N or right arrow to skip the scene, C for captions{canFullscreen ? ', F for full screen' : ''}.
@@ -619,7 +619,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
         )}
 
         {curtain && (
-          <div className="st-curtain pointer-events-none absolute inset-0 flex items-center justify-center bg-[#0b0820] [container-type:inline-size]">
+          <div className="st-curtain pointer-events-none absolute inset-0 flex items-center justify-center bg-[#0A1120] [container-type:inline-size]">
             <p className="st-title-in px-6 text-center font-black text-white [font-size:clamp(1rem,4cqw,2.6rem)]">
               <span className="block text-[0.6em] font-bold uppercase tracking-widest text-orange-300">Scene {curtain.n + 1}</span>
               {curtain.title}
@@ -670,7 +670,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
           type="button"
           onClick={() => setCaptionsOn((c) => !c)}
           aria-pressed={captionsOn}
-          className={`flex h-11 min-w-11 items-center justify-center rounded-xl px-2.5 text-xs font-black ring-1 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 ${captionsOn ? 'bg-white text-indigo-950 ring-white' : 'bg-white/10 text-white ring-white/20 hover:bg-white/20'}`}
+          className={`flex h-11 min-w-11 items-center justify-center rounded-xl px-2.5 text-xs font-black ring-1 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 ${captionsOn ? 'bg-white text-[#0A1120] ring-white' : 'bg-white/10 text-white ring-white/20 hover:bg-white/20'}`}
         >
           CC<span className="sr-only"> captions {captionsOn ? 'on' : 'off'}</span>
         </button>
@@ -820,9 +820,9 @@ function Lights({ level }: { level: Lighting }) {
     <g pointerEvents="none">
       <defs>
         <radialGradient id="st-torch" cx="50%" cy="62%" r="60%">
-          <stop offset="0" stopColor="#0b0820" stopOpacity="0" />
-          <stop offset="0.55" stopColor="#0b0820" stopOpacity="0.35" />
-          <stop offset="1" stopColor="#0b0820" stopOpacity="0.85" />
+          <stop offset="0" stopColor="#0A1120" stopOpacity="0" />
+          <stop offset="0.55" stopColor="#0A1120" stopOpacity="0.35" />
+          <stop offset="1" stopColor="#0A1120" stopOpacity="0.85" />
         </radialGradient>
       </defs>
       <rect className="st-lights" width="1600" height="900" fill="#0a0a2a" opacity={level === 'dark' ? 0.72 : 0} />
@@ -873,7 +873,7 @@ function ChoicePanel({ prompt, asker, options, tried, onPick }: { prompt: string
               type="button"
               onClick={() => onPick(i, o)}
               disabled={no}
-              className={`min-h-12 rounded-xl px-3 py-2 text-left text-sm font-bold ring-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 sm:text-base ${no ? 'bg-white/5 text-white/40 line-through ring-white/10' : 'bg-indigo-600 text-white ring-indigo-300/50 hover:-translate-y-0.5 hover:bg-indigo-500'}`}
+              className={`min-h-12 rounded-xl px-3 py-2 text-left text-sm font-bold ring-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 sm:text-base ${no ? 'bg-white/5 text-white/40 line-through ring-white/10' : 'bg-[#19263F] text-white ring-amber-400/50 hover:-translate-y-0.5 hover:bg-[#223252]'}`}
             >
               <span aria-hidden className="mr-1.5 text-amber-300">{String.fromCharCode(65 + i)}.</span>
               {o.label}
@@ -903,7 +903,7 @@ function QuizPanel(props: { n: number; total: number; q: string; options: string
               onClick={() => onPick(i)}
               disabled={picked !== null}
               aria-pressed={picked === i}
-              className={`min-h-12 rounded-xl px-3 py-2 text-left text-sm font-bold ring-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 sm:text-base ${isRight ? 'bg-emerald-600 text-white ring-emerald-300' : isWrong ? 'bg-rose-700/80 text-white ring-rose-300' : picked !== null ? 'bg-white/5 text-white/50 ring-white/10' : 'bg-indigo-600 text-white ring-indigo-300/50 hover:bg-indigo-500'}`}
+              className={`min-h-12 rounded-xl px-3 py-2 text-left text-sm font-bold ring-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300 sm:text-base ${isRight ? 'bg-emerald-600 text-white ring-emerald-300' : isWrong ? 'bg-rose-700/80 text-white ring-rose-300' : picked !== null ? 'bg-white/5 text-white/50 ring-white/10' : 'bg-[#19263F] text-white ring-amber-400/50 hover:bg-[#223252]'}`}
             >
               <span aria-hidden className="mr-1.5 text-amber-300">{String.fromCharCode(65 + i)}.</span>
               {o}

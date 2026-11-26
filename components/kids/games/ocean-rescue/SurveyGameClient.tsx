@@ -130,6 +130,16 @@ export default function SurveyGameClient({ tier, onFinish }: Props) {
     timers.current.push(setTimeout(() => setToast((t) => (t && t.id === id ? null : t)), 2600))
   }, [])
 
+  const showMap = useCallback(() => {
+    const el = mapRef.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    if (r.top < 64 || r.bottom > window.innerHeight - 60) {
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      el.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' })
+    }
+  }, [])
+
   const launch = useCallback(() => {
     if (phaseRef.current !== 'plan') return
     if (tier === 2 && ace.waypoints.length === 0) {
@@ -144,7 +154,8 @@ export default function SurveyGameClient({ tier, onFinish }: Props) {
     setPhase('running')
     setCursor(null)
     showToast('Diving… radio contact lost. The robot is on its own now.')
-  }, [tier, ace, leg, L, showToast])
+    showMap()
+  }, [tier, ace, leg, L, showToast, showMap])
 
   const end = useCallback((s: SurveyState) => {
     if (phaseRef.current === 'done') return
@@ -153,7 +164,8 @@ export default function SurveyGameClient({ tier, onFinish }: Props) {
     const r = scoreSurvey(s)
     setReport(r)
     playSound(r.won ? 'star' : 'wrong')
-  }, [])
+    showMap()
+  }, [showMap])
 
   const replan = useCallback(() => {
     simRef.current = null
@@ -333,8 +345,8 @@ export default function SurveyGameClient({ tier, onFinish }: Props) {
 
   return (
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="flex min-w-0 flex-col gap-2">
-        <div className="relative h-[360px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0A1120] sm:h-[440px] lg:h-[480px]">
+      <div className="flex min-w-0 flex-col gap-2 lg:sticky lg:top-20 lg:self-start">
+        <div className="relative h-[360px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0A1120] sm:h-[440px] lg:h-[440px]">
           <canvas
             ref={mapRef}
             tabIndex={tier === 2 && phase === 'plan' ? 0 : -1}
@@ -368,7 +380,7 @@ export default function SurveyGameClient({ tier, onFinish }: Props) {
             </div>
           )}
           {paused && phase === 'running' && <div className="absolute inset-0 flex items-center justify-center bg-[#0A1120]/60 font-display text-xl font-bold text-white">Paused</div>}
-          {report && phase === 'done' && <Debrief won={report.won} title={report.message} why={report.why} onContinue={finishRound} />}
+          {report && phase === 'done' && <Debrief won={report.won} title={report.headline} why={report.why} onContinue={finishRound} />}
         </div>
         <canvas ref={profRef} className="block h-[96px] w-full rounded-2xl border border-white/10 sm:h-[110px]" role="img" aria-label="Side view of the dive: seabed and robot depth." />
         <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -386,6 +398,46 @@ export default function SurveyGameClient({ tier, onFinish }: Props) {
             </span>
           )}
         </div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+          {phase === 'plan' && (
+            <button
+              type="button"
+              onClick={launch}
+              className="min-h-[52px] rounded-2xl bg-amber-500 px-6 font-display text-lg font-bold text-[#1A1103] hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+            >
+              🚀 Launch the AUV
+            </button>
+          )}
+          {phase !== 'plan' && !report?.won && (
+            <button
+              type="button"
+              onClick={replan}
+              className="min-h-[48px] rounded-2xl border-2 border-amber-300/60 px-5 font-display font-bold text-amber-200 hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+            >
+              ↺ Change the plan
+            </button>
+          )}
+          <div className="flex flex-1 items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1" role="radiogroup" aria-label="Simulation speed">
+            <span className="px-2 text-xs font-bold uppercase text-[#6E7888]">Speed</span>
+            {[10, tier === 2 ? 20 : 50, 100].map((k) => (
+              <button
+                key={k}
+                type="button"
+                role="radio"
+                aria-checked={warp === k}
+                onClick={() => setWarp(k)}
+                className={`min-h-[44px] flex-1 rounded-xl text-sm font-bold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 ${warp === k ? 'bg-white/15 text-white' : 'text-white/60 hover:text-white'}`}
+              >
+                ×{k}
+              </button>
+            ))}
+          </div>
+        </div>
+        {hud && phase !== 'plan' && (
+          <p className="text-sm text-[#A7B0C0]">
+            Position error (only you can see this): <b className={hud.err > 8 ? 'text-red-300' : 'text-white'}>{hud.err.toFixed(1)} m</b>
+          </p>
+        )}
       </div>
 
       <aside className="flex flex-col gap-3">
@@ -506,45 +558,14 @@ export default function SurveyGameClient({ tier, onFinish }: Props) {
           <p className="mt-1 text-[#6E7888]">The real sea has a current, so leave a margin.</p>
         </section>
 
-        <div className="flex flex-col gap-2">
-          {phase === 'plan' && (
-            <button
-              type="button"
-              onClick={launch}
-              className="min-h-[52px] rounded-2xl bg-amber-500 font-display text-lg font-bold text-[#1A1103] hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
-            >
-              🚀 Launch the AUV
-            </button>
-          )}
-          {phase !== 'plan' && !report?.won && (
-            <button
-              type="button"
-              onClick={replan}
-              className="min-h-[48px] rounded-2xl border-2 border-amber-300/60 font-display font-bold text-amber-200 hover:bg-amber-400/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
-            >
-              ↺ Change the plan
-            </button>
-          )}
-          <div className="flex items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1" role="radiogroup" aria-label="Simulation speed">
-            <span className="px-2 text-xs font-bold uppercase text-[#6E7888]">Speed</span>
-            {[10, tier === 2 ? 20 : 50, 100].map((k) => (
-              <button
-                key={k}
-                type="button"
-                role="radio"
-                aria-checked={warp === k}
-                onClick={() => setWarp(k)}
-                className={`min-h-[44px] flex-1 rounded-xl text-sm font-bold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 ${warp === k ? 'bg-white/15 text-white' : 'text-white/60 hover:text-white'}`}
-              >
-                ×{k}
-              </button>
-            ))}
-          </div>
-        </div>
-        {hud && phase !== 'plan' && (
-          <p className="text-sm text-[#A7B0C0]">
-            Position error (only you can see this): <b className={hud.err > 8 ? 'text-red-300' : 'text-white'}>{hud.err.toFixed(1)} m</b>
-          </p>
+        {phase === 'plan' && (
+          <button
+            type="button"
+            onClick={launch}
+            className="min-h-[52px] rounded-2xl bg-amber-500 font-display text-lg font-bold text-[#1A1103] hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 lg:hidden"
+          >
+            🚀 Launch the AUV
+          </button>
         )}
       </aside>
     </div>

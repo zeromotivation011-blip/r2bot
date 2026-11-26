@@ -347,9 +347,10 @@ export const SENSEI_TACTICS: Record<SenseiTactic, { name: string; what: string; 
   },
   counter: {
     name: 'Counter-punch',
-    what: 'waits for your charge, side-steps it and pushes you from behind',
+    what: 'turns to face you, side-steps your charge and pushes you from behind',
     fsm: {
-      search: { mode: 'wait', dir: 1, speed: 0 },
+      search: { mode: 'spin', dir: 1, speed: 45 },
+      track: true,
       seeCm: 80,
       charge: { speed: 90 },
       lostMs: 600,

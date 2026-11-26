@@ -30,7 +30,7 @@ const rivalDesign = (name: string, body: RobotDesign['body'], drive: RobotDesign
 export const RIVALS: Rival[] = [
   { name: 'Bumbles', blurb: 'A light dome bot. Slow, gentle and a bit sleepy.', design: rivalDesign('Bumbles', 'dome', 'wheels2', 'none', '#14B8A6', '#FACC15'), ballastKg: 0 },
   { name: 'Twister', blurb: 'Four-wheel spinner. Finds you fast and charges hard.', design: rivalDesign('Twister', 'box', 'wheels4', 'none', '#3B82F6', '#F8FAFC'), ballastKg: 0 },
-  { name: 'Dodger', blurb: 'Circles the ring and side-steps a charge, then hits your side.', design: rivalDesign('Dodger', 'box', 'wheels4', 'none', '#EC4899', '#22D3EE'), ballastKg: 0.5 },
+  { name: 'Dodger', blurb: 'Starts behind you at the edge and shoves at the bell, then side-steps a fast charge. Its motors are matched to yours.', design: rivalDesign('Dodger', 'box', 'wheels4', 'none', '#EC4899', '#22D3EE'), ballastKg: 0.5 },
   { name: 'Sensei', blurb: 'Heavy four-wheeler with a steel wedge. It learns from every round.', design: rivalDesign('Sensei', 'box', 'wheels4', 'scoop', '#DC2626', '#0F172A'), ballastKg: 0.15 },
 ]
 
@@ -45,12 +45,10 @@ export function boutSeed(tier: number, round = 0): number {
 export function startPoses(tier: number, seed: number, youDesign?: RobotDesign): { you: { x: number; z: number; yaw: number }; rival: { x: number; z: number; yaw: number } } {
   const rnd = seeded(seed)
   const jitter = () => (rnd() - 0.5) * 0.3 // ±8.6°
-  // Cadet starts face to face; higher tiers may start turned away, so the robot must search.
-  // Pilot starts back to back: both robots must search.
-  const facings = tier === 0 || tier === 2 ? [Math.PI] : tier === 1 ? [0] : [Math.PI, Math.PI / 2, -Math.PI / 2, Math.PI * 0.75, -Math.PI * 0.75]
+  // Every rival starts facing you, except Twister (Pilot), which starts back to back and must search.
+  const facings = tier === 1 ? [0] : [Math.PI]
   const rivalYaw = facings[Math.floor(rnd() * facings.length)] + jitter()
-  // Cadet faces the rival; Pilot starts facing AWAY (it must search, and must not drive off);
-  // Ace and Legend start half-turned.
+  // You: Cadet faces the rival; Legend starts half-turned (Pilot and Ace are placed below).
   const youYaw = tier === 0 ? jitter() : tier === 1 ? Math.PI + jitter() : (rnd() < 0.5 ? 1 : -1) * (Math.PI / 4) + jitter()
   if (tier === 1) {
     // Pilot: back to back, and you start near the edge facing it. Twister spins round, finds you

@@ -79,7 +79,7 @@ export default async function MissionPage({ params }: { params: Params }) {
             ← Code Lab
           </Link>
           {band && (
-            <span className="text-purple-200">
+            <span className="text-slate-300">
               {' '}
               · {band.emoji} {band.name} · mission {m.order}
             </span>
@@ -88,7 +88,7 @@ export default async function MissionPage({ params }: { params: Params }) {
         <h1 className="mt-2 text-3xl font-black text-white sm:text-4xl">
           <span aria-hidden>{m.emoji}</span> {m.title}
         </h1>
-        <p className="mt-2 max-w-3xl text-lg text-purple-100">{m.story}</p>
+        <p className="mt-2 max-w-3xl text-lg text-slate-200">{m.story}</p>
         <div className="mt-3 grid max-w-4xl gap-2 text-sm sm:grid-cols-3">
           <p className="rounded-2xl bg-white/5 p-3">
             <strong className="block text-amber-300">🎯 Your mission</strong>
@@ -101,7 +101,7 @@ export default async function MissionPage({ params }: { params: Params }) {
           <p className="rounded-2xl bg-white/5 p-3">
             <strong className="block text-sky-300">🔧 Your robot needs</strong>
             {special.length ? special.map((c) => CAPABILITY_NEEDS[c]).join(' + ') : 'Just something to move with.'}
-            <span className="mt-1 block text-purple-200">
+            <span className="mt-1 block text-slate-300">
               Blocks: {m.palette.map((t) => BLOCK_INFO[t].label).join(', ')}. ⭐⭐⭐ in {m.budget} {m.budget === 1 ? 'block' : 'blocks'} or fewer.
             </span>
           </p>

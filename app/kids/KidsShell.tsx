@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SparkGuide } from '@/components/kids/SparkGuide'
 import { ConfettiProvider, useConfettiEventBridge } from '@/components/kids/Confetti'
 import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
@@ -10,7 +10,9 @@ import { levelInfo } from '@/lib/kids/universe/rewards'
 import { InstallAppClient } from '@/components/kids/InstallAppClient'
 import { KidsClassSync } from '@/components/kids/classroom/KidsClassSyncClient'
 import { RewardToast } from '@/components/kids/ui/RewardToastClient'
+import { KidsAppLinkGuard } from '@/components/kids/app/KidsAppLinkGuardClient'
 import { useKidsVoice } from '@/lib/kids-voice'
+import { KIDS_MORE } from '@/lib/kids/nav'
 import './kids-animations.css'
 import './kids-shell.css'
 
@@ -22,13 +24,79 @@ export default function KidsShell({ children }: { children: React.ReactNode }) {
   )
 }
 
+// ONE navigation for the whole kids product (docs/kids-universe.md).
+// Primary — the phone tab bar and the desktop header, five places at most:
 const TABS: { href: string; emoji: string; label: string; match: (p: string) => boolean }[] = [
   { href: '/kids', emoji: '🏠', label: 'Home', match: (p) => p === '/kids' },
-  { href: '/kids/stories', emoji: '🎬', label: 'Stories', match: (p) => p.startsWith('/kids/stories') },
-  { href: '/kids/workshop', emoji: '🛠️', label: 'Build', match: (p) => p.startsWith('/kids/workshop') || p.startsWith('/kids/my-robot') },
-  { href: '/kids/code-lab', emoji: '🧩', label: 'Code', match: (p) => p.startsWith('/kids/code-lab') },
-  { href: '/kids/world', emoji: '🗺️', label: 'World', match: (p) => p.startsWith('/kids/world') || p.startsWith('/kids/challenge') },
+  { href: '/kids/course', emoji: '🚀', label: 'Course', match: (p) => p.startsWith('/kids/course') || p.startsWith('/kids/lab/episodes') },
+  { href: '/kids/galaxy', emoji: '🌌', label: 'Galaxy', match: (p) => p.startsWith('/kids/galaxy') },
+  { href: '/kids/play', emoji: '🎮', label: 'Games', match: (p) => p.startsWith('/kids/play') },
+  { href: '/kids/hangar', emoji: '🛸', label: 'Hangar', match: (p) => p.startsWith('/kids/hangar') },
 ]
+
+// Secondary — the "More" menu (header, every width) and the "More ways to play" grid on Home.
+const MORE = KIDS_MORE
+
+const MORE_MATCH = (p: string) =>
+  MORE.some((m) => p.startsWith(m.href)) || p.startsWith('/kids/challenge') || p.startsWith('/kids/my-robot')
+
+/** The More menu: a disclosure button + list. Closes on Escape, outside click and navigation. */
+function MoreMenu({ pathname }: { pathname: string }) {
+  const [open, setOpen] = useState(false)
+  const wrap = useRef<HTMLDivElement>(null)
+  const btn = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => setOpen(false), [pathname])
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: PointerEvent) => {
+      if (wrap.current && !wrap.current.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setOpen(false); btn.current?.focus() }
+    }
+    document.addEventListener('pointerdown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const on = MORE_MATCH(pathname)
+  return (
+    <div className="kids-more" ref={wrap}>
+      <button
+        ref={btn}
+        type="button"
+        className={`kids-more-btn${on ? ' kids-nav-link-on' : ''}`}
+        aria-expanded={open}
+        aria-controls="kids-more-menu"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span aria-hidden className="kids-more-dots">⋯</span>
+        <span className="kids-more-label">More</span>
+      </button>
+      {open && (
+        <div id="kids-more-menu" className="kids-more-menu" role="region" aria-label="More places to explore">
+          <ul>
+            {MORE.map((m) => (
+              <li key={m.href}>
+                <Link href={m.href} className="kids-more-item" aria-current={pathname.startsWith(m.href) ? 'page' : undefined}>
+                  <span aria-hidden className="kids-more-emoji">{m.emoji}</span>
+                  <span>
+                    <span className="kids-more-title">{m.label}</span>
+                    <span className="kids-more-line">{m.line}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function KidsShellInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? ''
@@ -90,12 +158,13 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
                 className={`kids-nav-link${t.match(pathname) ? ' kids-nav-link-on' : ''}`}
                 aria-current={t.match(pathname) ? 'page' : undefined}
               >
-                <span aria-hidden>{t.emoji}</span> {t.label === 'Build' ? 'Workshop' : t.label === 'Code' ? 'Code Lab' : t.label}
+                <span aria-hidden>{t.emoji}</span> {t.label}
               </Link>
             ))}
           </nav>
         )}
         <div className="kids-nav-right">
+          {!bare && <MoreMenu pathname={pathname} />}
           <InstallAppClient compact />
           <button
             type="button"
@@ -117,12 +186,14 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
 
       {!bare && (
         <footer className="kids-footer">
+          <span className="kids-footer-label">For grown-ups:</span>
           <Link href="/kids/parents">Parents</Link>
+          <Link href="/kids/teach">Teachers</Link>
           <Link href="/kids/schools">Schools</Link>
           <Link href="/kids/join">Join a class</Link>
-          <Link href="/kids/my-robot">Robot card</Link>
-          <Link href="/kids/activities">Printables</Link>
-          <Link href="/">R2BOT for grown-ups</Link>
+          <Link href="/kids/classroom">Teacher classroom</Link>
+          <Link href="/privacy#kids">Privacy</Link>
+          <Link href="/">R2BOT.in</Link>
         </footer>
       )}
 
@@ -133,6 +204,8 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
       {/* Pushes a progress snapshot to the teacher, only if this child joined a class. */}
       <KidsClassSync />
       <RewardToast />
+      {/* Inside the store app: links that leave /kids go through a parental gate. */}
+      <KidsAppLinkGuard />
 
       {/* App-style tab bar on phones */}
       {!bare && (

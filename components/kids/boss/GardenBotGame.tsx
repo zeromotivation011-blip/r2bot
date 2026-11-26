@@ -250,8 +250,8 @@ export function GardenBotGame({ onWin, onFail, onSpark }: {
         .gb-pal-icon { font-size: 22px; }
         .gb-program {
           list-style: none; padding: 10px; margin: 0;
-          background: #1a1040;
-          border: 2px dashed #4c1d95;
+          background: #111C32;
+          border: 2px dashed #19263F;
           border-radius: 12px;
           min-height: 60px;
           display: flex; flex-wrap: wrap; gap: 6px;
@@ -265,7 +265,7 @@ export function GardenBotGame({ onWin, onFail, onSpark }: {
           font-size: 12px;
           cursor: pointer;
         }
-        .gb-empty { color: #6b21a8; font-style: italic; }
+        .gb-empty { color: #8A94A6; font-style: italic; }
         .gb-actions { display: flex; gap: 8px; }
         .gb-run {
           flex: 1; min-height: 52px;
@@ -278,11 +278,11 @@ export function GardenBotGame({ onWin, onFail, onSpark }: {
         .gb-run:disabled { opacity: 0.4; cursor: not-allowed; }
         .gb-clear {
           min-height: 52px; padding: 0 18px;
-          background: #1a1040; color: #FFC9A8;
-          border: 2px solid #4c1d95;
+          background: #111C32; color: #FFC9A8;
+          border: 2px solid #19263F;
           border-radius: 14px; font-weight: 800; cursor: pointer;
         }
-        .gb-attempts { text-align: center; color: #c4b5fd; font-weight: 700; font-size: 13px; }
+        .gb-attempts { text-align: center; color: #A7B0C0; font-weight: 700; font-size: 13px; }
       `}</style>
     </div>
   )

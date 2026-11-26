@@ -15,7 +15,7 @@ export default function PrivacyPage() {
       lede="We collect the minimum we need to make R2BOT work. We never sell your data. Every section below has the short version on top."
     >
       <p style={{ fontSize: 13, color: 'var(--muted)' }}>
-        Last updated: 19 May 2026. Effective immediately.
+        Last updated: 26 November 2026 (R2BOT Kids section added). Effective immediately.
       </p>
 
       <h2>Short version</h2>
@@ -23,8 +23,9 @@ export default function PrivacyPage() {
         <li>If you don&apos;t sign up, we collect basically nothing about you personally.</li>
         <li>If you sign up, we store your email + a profile to track your course progress.</li>
         <li>R2 Co-pilot conversations are logged for 30 days to improve the Atlas, then deleted.</li>
-        <li>We count page views with a simple first-party counter (no cookies, no IP address, no user ID) and use Google Analytics for anonymous usage statistics.</li>
+        <li>We count page views with a simple first-party counter (no cookies, no IP address, no user ID) and use Google Analytics for anonymous usage statistics — but never on R2BOT Kids.</li>
         <li>We never sell, rent, or share your data with third parties for marketing.</li>
+        <li>R2BOT Kids asks children for nothing: progress stays on the device. <a href="#kids">Details for parents</a>.</li>
         <li>You can delete everything we have about you by emailing <strong>hello@r2bot.in</strong>.</li>
       </ul>
 
@@ -78,10 +79,70 @@ export default function PrivacyPage() {
 
       <h2>Children</h2>
       <p>
-        R2BOT is intended for everyone, including children, but if you&apos;re under 18 and want
-        to create an account, please have a parent or guardian set it up with you. We do not
-        knowingly collect data from children under 13.
+        The main R2BOT site is for teenagers and adults. If you&apos;re under 18 and want to create
+        an account, please have a parent or guardian set it up with you. We do not knowingly
+        collect personal data from children under 13 on the main site.
       </p>
+
+      <h2 id="kids">R2BOT Kids (ages 5–17) and the R2BOT Kids app</h2>
+      <p>
+        R2BOT Kids (www.r2bot.in/kids and the R2BOT Kids app for Android and iOS) is built so that a
+        child never has to give us anything about themselves. This section describes exactly what it
+        stores and where, and it applies under COPPA (United States), GDPR and UK GDPR, including
+        Article 8 (children), and India&apos;s DPDP Act 2023.
+      </p>
+      <h3>What a child never gives us</h3>
+      <ul>
+        <li>No email address, password, phone number, birthday, real name, photo or location.
+          There are no accounts for children, no chat between children, no ads, no in-app
+          purchases and no leaderboards.</li>
+      </ul>
+      <h3>Progress stays on the device</h3>
+      <ul>
+        <li>Stars, XP, badges, course and activity progress, game personal bests, the explorer
+          name and avatar, and the robot a child designs are saved in the browser&apos;s own
+          storage (local storage) on that device. They are not sent to us. Clearing the
+          browser&apos;s site data, or uninstalling the app, deletes them.</li>
+      </ul>
+      <h3>Joining a teacher&apos;s class (optional)</h3>
+      <ul>
+        <li>Only if a child types a class code from their teacher, we store: the <strong>class
+          nickname</strong> they pick (2–20 characters; the form asks for a first name or a made-up
+          robot name, and rejects anything that looks like an email, phone number or link), and a
+          <strong> progress snapshot</strong> the teacher sees: star totals, Robot World levels and
+          zones finished, story episodes, Code Lab missions, course sessions and Skill Galaxy
+          activities finished, games played, minutes played, which levels the child keeps
+          retrying, the age band, and the Workshop robot design including the robot&apos;s name.</li>
+        <li>The child&apos;s device is identified to the class by a random token. We store only a
+          SHA-256 hash of it, never anything that identifies the device or the child.</li>
+        <li>Only that teacher can see the nickname and snapshot; if the class belongs to a school,
+          the school&apos;s admin teacher sees a school-wide summary. Nothing is shared with anyone else.</li>
+        <li>Deletion: a child can tap &quot;Leave class&quot; on the Join page, which deletes the
+          nickname and snapshot at once; a teacher can remove a member or delete the class; or a
+          parent can email <strong>hello@r2bot.in</strong>.</li>
+      </ul>
+      <h3>Camera, microphone and voices</h3>
+      <ul>
+        <li>The camera is used only for the Workshop&apos;s &quot;see your robot in your room&quot; view,
+          and only after the device asks permission. Camera frames are drawn on the device and
+          never leave it: nothing is recorded or uploaded.</li>
+        <li>Spoken voices are pre-recorded audio files or the device&apos;s own text-to-speech. R2BOT
+          Kids does not record audio.</li>
+      </ul>
+      <h3>Analytics</h3>
+      <ul>
+        <li>Google Analytics is not loaded on R2BOT Kids pages, and never inside the R2BOT Kids
+          app. We count page views with our own first-party counter, which sends the page address
+          and nothing else: no cookie, no identifier, no IP address stored.</li>
+        <li>Inside the app, any link that leaves R2BOT Kids (to the main site or anywhere else)
+          sits behind a parental gate: a grown-up has to answer a question first.</li>
+      </ul>
+      <h3>Teachers and parents</h3>
+      <ul>
+        <li>Teachers sign in with their own adult account to create a class; the &quot;What we
+          collect&quot; section above applies to them. The schools pilot form is for adults and
+          asks for a work email.</li>
+      </ul>
 
       <h2>Security</h2>
       <p>

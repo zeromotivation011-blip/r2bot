@@ -18,7 +18,7 @@ function WorkbenchSkeleton() {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:grid-rows-[auto_1fr]" aria-busy="true">
       <div className="flex flex-col gap-3 lg:col-start-1 lg:row-start-1">
-        <div className="flex h-[42vh] min-h-[280px] items-center justify-center rounded-3xl border border-white/10 bg-[#120A2E] sm:h-[52vh] sm:min-h-[320px] lg:h-[540px]">
+        <div className="flex h-[42vh] min-h-[280px] items-center justify-center rounded-3xl border border-white/10 bg-[#111C32] sm:h-[52vh] sm:min-h-[320px] lg:h-[540px]">
           <div className="h-16 w-16 animate-pulse rounded-2xl bg-white/10" aria-hidden />
           <span className="sr-only">Loading the robot simulator…</span>
         </div>
@@ -26,7 +26,7 @@ function WorkbenchSkeleton() {
       </div>
       <div className="flex flex-col gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-1">
         <div className="h-[44px]" />
-        <div className="h-[460px] animate-pulse rounded-3xl border border-white/10 bg-[#140C33] lg:h-[540px]" />
+        <div className="h-[460px] animate-pulse rounded-3xl border border-white/10 bg-[#111C32] lg:h-[540px]" />
       </div>
       <div className="lg:col-start-1 lg:row-start-2">
         <div className="h-[44px] rounded-2xl bg-white/5 lg:hidden" />
@@ -101,13 +101,13 @@ export default function SimLabClient() {
             aria-pressed={demo.id === d.id}
             data-testid={`demo-${d.id}`}
             className={`min-h-[56px] shrink-0 rounded-2xl border px-4 py-2 text-left ${
-              demo.id === d.id ? 'border-amber-300 bg-amber-300/15 text-white' : 'border-white/10 bg-white/[0.03] text-purple-100 hover:bg-white/10'
+              demo.id === d.id ? 'border-amber-300 bg-amber-300/15 text-white' : 'border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/10'
             }`}
           >
             <span className="block text-sm font-black">
               {i + 1}. {d.title}
             </span>
-            <span className="block text-xs text-purple-200">{d.ageHint}</span>
+            <span className="block text-xs text-slate-300">{d.ageHint}</span>
           </button>
         ))}
       </nav>
@@ -116,7 +116,7 @@ export default function SimLabClient() {
       <div className="mt-3 flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
         <div className="order-1 rounded-2xl border border-white/10 bg-white/[0.03] p-4 lg:order-none">
           <p className="text-lg font-black text-white">🎯 {demo.task}</p>
-          <p className="mt-1 hidden text-sm text-purple-100 sm:block">
+          <p className="mt-1 hidden text-sm text-slate-200 sm:block">
             <strong className="text-amber-200">Why parts matter:</strong> {demo.lesson}
           </p>
           {tip && (
@@ -139,7 +139,7 @@ export default function SimLabClient() {
               type="button"
               onClick={() => setDesign(designFor(design, usingWrong || tip ? demo.goodParts : demo.wrongParts))}
               data-testid="swap-wrong"
-              className="min-h-[44px] rounded-xl border border-white/20 px-3 text-xs font-black text-purple-100 hover:bg-white/10"
+              className="min-h-[44px] rounded-xl border border-white/20 px-3 text-xs font-black text-slate-200 hover:bg-white/10"
             >
               {usingWrong || tip ? '✅ Fit the suggested part' : '🤔 Try a different part'}
             </button>
@@ -147,7 +147,7 @@ export default function SimLabClient() {
           <div className="mt-2 space-y-2">
             {SWITCH_SLOTS.map((slot) => (
               <div key={slot} className="flex flex-wrap items-center gap-1" role="group" aria-label={SLOT_LABEL[slot]}>
-                <span className="w-24 text-xs font-bold text-purple-200">{SLOT_LABEL[slot]}</span>
+                <span className="w-24 text-xs font-bold text-slate-300">{SLOT_LABEL[slot]}</span>
                 {partsForSlot(slot).map((p) => {
                   const on = design[slot] === p.id
                   return (
@@ -170,7 +170,7 @@ export default function SimLabClient() {
               </div>
             ))}
           </div>
-          <p className="mt-2 text-xs text-purple-200" aria-live="polite">
+          <p className="mt-2 text-xs text-slate-300" aria-live="polite">
             {getPart('drive', design.drive)?.name} · {getPart('head', design.head)?.name}
             {design.sensor !== 'none' ? ` · ${getPart('sensor', design.sensor)?.name}` : ''}
             {caps.has('rough-ground') ? ' · grips rough ground' : ''}

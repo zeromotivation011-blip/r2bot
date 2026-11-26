@@ -7,7 +7,7 @@ export function StoryPlayerSkeleton({ title }: { title: string }) {
   return (
     <div className={FRAME.root} aria-busy="true" aria-label={`Loading the story player for ${title}`}>
       <div className={FRAME.stage}>
-        <div className="absolute inset-0 animate-pulse bg-gradient-to-b from-indigo-900/60 to-purple-950/80" />
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-b from-[#111C32] to-[#0A1120]" />
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
           <div className="h-20 w-20 rounded-full bg-orange-500/70 sm:h-24 sm:w-24" />
           <p className="px-4 text-center text-sm font-bold text-white/80 sm:text-base">{title}</p>

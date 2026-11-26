@@ -45,6 +45,7 @@ const STATE_WORDS: Record<string, string> = {
   CHARGE: 'charging',
   RECOVER: 'backing away from the edge',
   'BACK UP': 'backing up',
+  'BACK OFF': 'backing off',
   DODGE: 'side-stepping',
   OPENING: 'swerving',
   SPIN: 'spinning to look',
@@ -116,8 +117,22 @@ export function debrief(d: DebriefInput): Debrief {
           ? `You hit ${d.rivalName} ${where}, where it could not see you or push back.`
           : `${d.rivalName} hit your robot ${where}, where its sensor could not see it coming.`,
       )
-      if (!youWon && (yl.stateAtOut === 'RECOVER' || yl.stateAtOut === 'BACK UP')) reasons.push('Your robot was busy backing away from the edge — the moment a sumo robot is weakest.')
-      if (!youWon) tip = 'Keep the rival in front of you: search toward it, and charge as soon as you see it.'
+      if (!youWon && !yl.sawEdgeBeforeOut && d.edgeThreshold !== undefined && d.edgeThreshold > 88) {
+        // Shoved out front-first with the edge sensors "off".
+        reasons.push(`Your edge threshold is ${d.edgeThreshold}, but the white line only reflects about 92: your robot never knew it was at the edge, so it never backed up against the shove.`)
+        tip = 'Set the edge threshold to about 50, halfway between black (8) and white (92).'
+      } else if (!youWon && d.lineAction && d.lineAction !== 'backturn' && yl.sawEdgeBeforeOut) {
+        reasons.push(`Your edge sensor DID see the line — but your line card says “${ACTION_TEXT[d.lineAction]}”, so your robot did not push back.`)
+        tip = 'Change the line card to “back up and turn”: backing up pushes against the robot behind you.'
+      } else if (!youWon && d.tier === 2 && yl.sawEdgeBeforeOut) {
+        reasons.push(
+          yl.stateAtOut === 'RECOVER'
+            ? `Your robot felt the line and started to recover, but it was still being pushed when it turned${d.backMs !== undefined ? ` (it backed up for only ${d.backMs} ms)` : ''}.`
+            : 'Your robot felt the line and backed up, but it came straight back to the edge before it had escaped.',
+        )
+        tip = 'Back up for longer, so you push the rival well away from the edge, and turn for less time: a turning robot cannot push back.'
+      } else if (!youWon && (yl.stateAtOut === 'RECOVER' || yl.stateAtOut === 'BACK UP')) reasons.push('Your robot was busy backing away from the edge — the moment a sumo robot is weakest.')
+      if (!youWon && !tip) tip = 'Keep the rival in front of you: search toward it, and charge as soon as you see it.'
     } else {
       // A head-on shove.
       const lifted = youWon ? rl.liftedS : yl.liftedS
@@ -143,6 +158,10 @@ export function debrief(d: DebriefInput): Debrief {
               : 'Your motors were at full strength: more weight will not help. Use more power, or attack its side.'
       }
     }
+  }
+  if (youWon && d.lineAction && d.lineAction !== 'backturn') {
+    reasons.push(`You won, but your line card still says “${ACTION_TEXT[d.lineAction]}”: this time ${d.rivalName} did not catch you at the edge. That robot is still not safe.`)
+    tip = 'Change the line card to “back up and turn”, then win again.'
   }
   if (youWon && winnerLog.topSpeedSeen > 0.3 && r.t < 6) reasons.push(`A fast start helps: you reached ${n(winnerLog.topSpeedSeen)} m/s, and that momentum did the first push.`)
   if (!tip) tip = youWon ? 'Can you win faster? Try a different search or more power.' : 'Change one thing, then fight again — the bout is the same every time, so you will see exactly what it did.'

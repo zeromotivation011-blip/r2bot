@@ -5,6 +5,8 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GameTeacherStrip } from '@/components/kids/games/GameTeacherStrip'
+import { getGame } from '@/lib/kids/universe/worlds'
 import { jsonldScript, breadcrumbJsonLD } from '@/lib/seo/jsonld'
 import DroneHoverClient from '@/components/kids/games/drone-hover/DroneHoverClient'
 
@@ -87,20 +89,20 @@ export default function DroneHoverPage() {
 
       <article className="mx-auto max-w-4xl px-4 pb-16 pt-8 text-gray-200">
         <h2 className="text-3xl font-black text-white">How a drone holds still in the air</h2>
-        <p className="mt-3 text-purple-100">
+        <p className="mt-3 text-slate-200">
           A hovering drone looks calm, but its computer is working hundreds of times a second. Gravity pulls the drone down with a force called its{' '}
           <strong>weight</strong> (mass × 9.81 m/s²). The spinning propellers push air down, and the air pushes the drone up: that push is{' '}
           <strong>thrust</strong>. When thrust is exactly equal to weight, the forces cancel and the drone neither climbs nor falls. That is what
           hovering means. More thrust than weight and it speeds up upward; less and it speeds up downward.
         </p>
-        <p className="mt-3 text-purple-100">
+        <p className="mt-3 text-slate-200">
           The hard part is that nothing stays the same. A gust of wind pushes the drone, a parcel makes it heavier, and the battery slowly gets weaker.
           No fixed throttle can cope with all that. So real drones use <strong>feedback control</strong>: they measure their height, compare it with
           the height they want, and change the thrust based on the difference. That difference is called the <strong>error</strong>.
         </p>
 
         <h2 className="mt-10 text-2xl font-black text-white">P, I and D: three ways to fix an error</h2>
-        <ul className="mt-3 list-disc space-y-2 pl-6 text-purple-100">
+        <ul className="mt-3 list-disc space-y-2 pl-6 text-slate-200">
           <li>
             <strong>P (proportional)</strong> pushes in proportion to the error right now: twice as far from the target, twice the push. P alone has a
             weakness: to hold up a heavier parcel it needs extra thrust, and the only way P makes extra thrust is by keeping some error. The drone
@@ -115,7 +117,7 @@ export default function DroneHoverPage() {
             drone from overshooting the target and wobbling. Too much D makes the drone jittery, because it also reacts to sensor noise.
           </li>
         </ul>
-        <p className="mt-3 text-purple-100">
+        <p className="mt-3 text-slate-200">
           Written as engineers write it: <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-amber-200">u = Kp·e + Ki·∫e dt + Kd·de/dt</code>
           . The three numbers Kp, Ki and Kd are the <em>gains</em>, and choosing them is called <strong>tuning</strong>. The same controller, the PID
           controller, steers cars, holds the temperature in ovens and keeps robot arms on their path. Most hobby and professional drone flight
@@ -123,7 +125,7 @@ export default function DroneHoverPage() {
         </p>
 
         <h2 className="mt-10 text-2xl font-black text-white">What the game simulates</h2>
-        <p className="mt-3 text-purple-100">
+        <p className="mt-3 text-slate-200">
           Sky Port is a real physics simulation, stepped 200 times a second. The drone has mass and feels gravity. Each motor takes a moment to
           change speed (motor lag), which is the reason too much P makes it overshoot and ring. Air resists motion, and gusts follow the smooth
           &ldquo;1 − cosine&rdquo; shape aircraft engineers use. Power is worked out from rotor momentum theory, so a twitchy controller really does
@@ -133,7 +135,7 @@ export default function DroneHoverPage() {
           slightly noisy at Ace and Legend, just like a real barometer. The gusts are the same every time you fly a tier, so your score depends only
           on your design.
         </p>
-        <p className="mt-3 text-purple-100">
+        <p className="mt-3 text-slate-200">
           Flights are scored on what control engineers measure: the <strong>error area</strong> (how far off, for how long), the{' '}
           <strong>overshoot</strong> past a new target, the <strong>settle time</strong>, and the <strong>energy</strong> used. After every flight the
           debrief explains why it happened, so you can see the cause in the graph and change one thing at a time.
@@ -145,7 +147,7 @@ export default function DroneHoverPage() {
             <section key={t.name} className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <h3 className="text-xl font-black text-amber-300">{t.name}</h3>
               <p className="text-xs font-bold uppercase tracking-wide text-white/50">For {t.who}</p>
-              <p className="mt-2 text-purple-100">{t.what}</p>
+              <p className="mt-2 text-slate-200">{t.what}</p>
               <p className="mt-2 text-sm text-white/75">
                 <span className="font-black text-white">Tip: </span>
                 {t.tip}
@@ -155,7 +157,7 @@ export default function DroneHoverPage() {
         </div>
 
         <h2 className="mt-10 text-2xl font-black text-white">Where you will see this in real life</h2>
-        <p className="mt-3 text-purple-100">
+        <p className="mt-3 text-slate-200">
           Delivery drones carry parcels of different weights and must hold height when they let go. Camera drones hold position in the wind so the
           video stays steady. Rockets that land themselves use the same ideas of feedback and cascaded loops, only much faster. Next time you see a
           drone hang perfectly still, you will know there is a loop inside it measuring, comparing and correcting — the same loop you designed here.
@@ -165,6 +167,7 @@ export default function DroneHoverPage() {
             ← Back to the R2BOT Universe
           </Link>
         </p>
+        <GameTeacherStrip game={{ id: 'drone-hover', name: getGame('drone-hover')?.name ?? 'R2BOT Kids game' }} />
       </article>
     </>
   )

@@ -300,7 +300,7 @@ const street: Scene = {
   ],
   objects: [
     {
-      kind: 'hazard', id: 's-speed', cat: 'body', x: 22, y: 61, size: 10, icon: 'svg:pod', label: 'Delivery robot on the pavement',
+      kind: 'hazard', id: 's-speed', cat: 'body', x: 20, y: 61, size: 10, icon: 'svg:amr', label: 'Delivery robot on the pavement',
       observe: 'Delivery robots zip along the crowded pavement at 15 km/h — about as fast as a bicycle.',
       harm: 'A 40 kg robot at bike speed among walkers, toddlers and older people can knock someone over.',
       l: 4, s: 3,
@@ -384,7 +384,7 @@ const street: Scene = {
       run: { actor: '🤖', from: [80, 22], to: [92, 15], bad: 'Another 200 robots go into the skip.', good: 'Worn batteries swapped; old cells recycled.' },
     },
     { kind: 'safe', id: 's-crossing', x: 50, y: 30, size: 8, icon: '🚦', label: 'Crossing lights', observe: 'A zebra crossing with traffic lights. The robots and the car stop for red, every time.', why: 'Robots that follow the same rules as everyone else are predictable — and predictable is safe.' },
-    { kind: 'safe', id: 's-flag', x: 31, y: 56, size: 7, icon: '🚩', label: 'Robot waiting at the kerb', observe: 'A second delivery robot waits at the kerb. It has a tall orange flag so drivers and cyclists can see it.', why: 'A small, low robot is easy to miss. The flag makes it visible above parked cars.' },
+    { kind: 'safe', id: 's-flag', x: 35, y: 58, size: 7, icon: '🚩', label: 'Robot waiting at the kerb', observe: 'A second delivery robot waits at the kerb. It has a tall orange flag so drivers and cyclists can see it.', why: 'A small, low robot is easy to miss. The flag makes it visible above parked cars.' },
     { kind: 'safe', id: 's-lightbar', x: 69, y: 59, size: 7, icon: '💡', label: 'Light bar on the car', observe: 'A light bar on the car’s front glows a pattern that means “I see you — I am waiting”.', why: 'Showing people what a robot is about to do builds trust and avoids confusion at crossings.' },
   ],
 }
@@ -480,7 +480,7 @@ const hospital: Scene = {
       run: { actor: '🔋', from: [64, 28], to: [74, 34], bad: 'Year 3: the battery dies — the whole robot is replaced.', good: 'Year 3: a new battery clicks in. The old cells go to recycling.' },
     },
     { kind: 'safe', id: 'm-tablet', x: 30, y: 22, size: 8, icon: '💻', label: 'Nurses’ station screen', observe: 'A screen at the nurses’ station shows where MediRun is and what it carries.', why: 'Staff can always see what the robot is doing. Being open about what a robot does is part of keeping control.' },
-    { kind: 'safe', id: 'm-lock', x: 16, y: 49, size: 7, icon: '🔐', label: 'Medicine drawers', observe: 'MediRun’s drawers open only with a nurse’s badge, and every opening is logged.', why: 'Controlled medicines must be kept secure — and the log shows who took what.' },
+    { kind: 'safe', id: 'm-lock', x: 9, y: 48, size: 7, icon: '🔐', label: 'Medicine drawers', observe: 'MediRun’s drawers open only with a nurse’s badge, and every opening is logged.', why: 'Controlled medicines must be kept secure — and the log shows who took what.' },
     { kind: 'safe', id: 'm-lane', x: 46, y: 64, size: 7, icon: '🟨', label: 'Floor markings', observe: 'Yellow lines mark where MediRun drives, and it keeps to the right of the corridor.', why: 'Predictable paths let people know where the robot will go.' },
   ],
   speed: { reactS: 0.25, decel: 0.8, fieldM: 1.0, routeM: 300, maxRouteS: 480, min: 0.3, max: 2.0, step: 0.1 },

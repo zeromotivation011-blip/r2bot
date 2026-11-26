@@ -33,7 +33,7 @@ import {
   type RuleAction,
   type SenseiTactic,
 } from './brain'
-import { RIVALS, RIVAL_FSM, boutSeed, buildSetups } from './bouts'
+import { RIVALS, RIVAL_FSM, boutSeed, buildSetups, rivalMotorMul } from './bouts'
 import { debrief, pushAt, type Debrief } from './debrief'
 import { DT, EYE_RANGE_CM, MATCH_S, WEIGHT_LIMIT_KG, botStats, createMatch, type BotStats, type Controller, type Match, type MatchResult } from './sim'
 import type { SumoScene } from './render'
@@ -65,6 +65,9 @@ interface SeriesRound {
   winner: MatchResult['winner']
   t: number
   memory: RoundMemory
+  /** The program that fought this round (to check afterwards whether the design change mattered). */
+  program: FsmProgram
+  round: number
 }
 
 const FAST_WIN_S = [10, 12, 15, 15]
@@ -147,6 +150,18 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
   const speedRef = useRef<1 | 2>(1)
   const phaseRef = useRef<Phase>('ready')
   const endRef = useRef<(r: MatchResult) => void>(() => undefined)
+  /** Pending result-card timers: cleared on unmount so a card never opens over another tier. */
+  const timersRef = useRef<number[]>([])
+  const later = useCallback((fn: () => void, ms: number) => {
+    timersRef.current.push(window.setTimeout(fn, ms))
+  }, [])
+  useEffect(
+    () => () => {
+      for (const id of timersRef.current) window.clearTimeout(id)
+      timersRef.current = []
+    },
+    [],
+  )
   const chipYou = useRef<HTMLDivElement>(null)
   const chipRival = useRef<HTMLDivElement>(null)
   const clockRef = useRef<HTMLSpanElement>(null)
@@ -176,7 +191,8 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
   }, [base, loadout, tier])
   const ballast = tier === 3 ? loadout.ballastKg : 0
   const youStats = useMemo(() => botStats(youDesign, ballast), [youDesign, ballast])
-  const rivalStats = useMemo(() => botStats(rival.design, rival.ballastKg), [rival])
+  // Ace's Dodger is weight-class matched: its motors are scaled to your robot (see rivalMotorMul).
+  const rivalStats = useMemo(() => botStats(rival.design, rival.ballastKg, rivalMotorMul(tier, youDesign, ballast)), [rival, tier, youDesign, ballast])
   const overWeight = youStats.massKg > WEIGHT_LIMIT_KG + 1e-6
 
   const youWins = series.filter((s) => s.winner === 'you').length
@@ -297,9 +313,9 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
   const finishAndShow = useCallback(
     (r: RoundResult) => {
       onFinish(r)
-      window.setTimeout(() => document.querySelector('[role="dialog"][aria-label="Round results"]')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60)
+      later(() => document.querySelector('[role="dialog"][aria-label="Round results"]')?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60)
     },
-    [onFinish],
+    [onFinish, later],
   )
 
   const finishRound = useCallback(
@@ -337,20 +353,25 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
         const yl = result.logs.you
         const fast = result.t <= FAST_WIN_S[tier]
         const clean = yl.pushedBackM < 0.05 && yl.liftedS < 0.3
-        const stars = 1 + (fast ? 1 : 0) + (clean ? 1 : 0)
+        // Pilot: a win with an unsafe line card is a lucky win. It counts, but earns one star and no badge.
+        const unsafeLine = tier === 1 && !pilot.rules.some((r) => r.cond === 'line' && r.action === 'backturn')
+        const stars = unsafeLine ? 1 : 1 + (fast ? 1 : 0) + (clean ? 1 : 0)
         const badges: string[] = []
-        if (tier === 1 && pilot.rules.some((r) => r.cond === 'line' && r.action === 'backturn')) badges.push('decision-maker')
+        if (tier === 1 && !unsafeLine) badges.push('decision-maker')
         if (tier === 2) badges.push('decision-maker')
         const attempts = saved.attempts[tier]
         saved.attempts[tier] = 0
-        window.setTimeout(
+        const message = unsafeLine
+          ? 'A lucky win: your line card still does not back away from the edge. Change it to “back up and turn” for the full three stars.'
+          : `${rep.reasons[0] ?? ''}${fast ? '' : ` Win in under ${FAST_WIN_S[tier]} s for another star.`}${clean ? '' : ' Win without being shoved back for another star.'}`
+        later(
           () =>
             finishAndShow({
               stars,
               score: Math.round(result.t * 10) / 10,
               scoreLabel: 's to win',
               lowerIsBetter: true,
-              message: `${rep.reasons[0] ?? ''}${fast ? '' : ` Win in under ${FAST_WIN_S[tier]} s for another star.`}${clean ? '' : ' Win without being shoved back for another star.'}`,
+              message,
               badges,
               attempts,
             }),
@@ -359,26 +380,41 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
         return
       }
       // Legend: best of three against the adaptive bot.
-      const round: SeriesRound = { tactic: tactic ?? 'wedge-rush', winner: result.winner, t: result.t, memory: roundMemory(result) }
+      const round: SeriesRound = { tactic: tactic ?? 'wedge-rush', winner: result.winner, t: result.t, memory: roundMemory(result), program: ace, round: roundIdx }
       const next = [...series, round]
       setSeries(next)
       const yw = next.filter((s) => s.winner === 'you').length
       const rw = next.filter((s) => s.winner === 'rival').length
       if (yw >= 2) {
+        // "The right tool" only when the design change actually won it: re-fight each round you won,
+        // same program and same bout, with your original robot. If it loses any of them, the change mattered.
         const changed = loadout.drive !== base.drive || loadout.wedge !== (base.tool === 'scoop') || loadout.ballastKg > 0
-        const badges = ['decision-maker', ...(changed ? ['right-tool'] : [])]
+        const designMattered =
+          changed &&
+          !!R &&
+          next.some((s) => {
+            if (s.winner !== 'you') return false
+            const m = createMatch(
+              R,
+              buildSetups({ tier: 3, seed: boutSeed(3, s.round), youDesign: base, youBallast: 0, youController: fsmController(s.program), youThreshold: s.program.edgeThreshold, tactic: s.tactic }),
+            )
+            const w = m.runToEnd().winner
+            m.dispose()
+            return w !== 'you'
+          })
+        const badges = ['decision-maker', ...(designMattered ? ['right-tool'] : [])]
         // Series points: 100 per round won, −30 per round lost, minus the seconds your wins took.
         const winSeconds = next.reduce((a, s) => a + (s.winner === 'you' ? s.t : 0), 0)
         saved.attempts[3] += 1
         const attempts = saved.attempts[3]
         saved.attempts[3] = 0
-        window.setTimeout(
+        later(
           () =>
             finishAndShow({
               stars: rw === 0 ? 3 : 2,
               score: yw * 100 - rw * 30 - Math.round(winSeconds),
               scoreLabel: 'series points',
-              message: `You beat ${rival.name} ${yw}–${rw}. ${changed ? 'Your design changes paid off. ' : ''}${rw === 0 ? '' : 'Win 2–0 for the third star.'}`,
+              message: `You beat ${rival.name} ${yw}–${rw}. ${designMattered ? 'Your design changes paid off: your original robot would have lost with the same program. ' : changed ? 'Your program won it; your original robot would have won too. ' : ''}${rw === 0 ? '' : 'Win 2–0 for the third star.'}`,
               badges,
               attempts,
             }),
@@ -386,7 +422,7 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
         )
       } else if (rw >= 2 || next.length >= 5) saved.attempts[3] += 1
     },
-    [ace, base, buildController, finishAndShow, loadout, nextTactic, pilot, rival.name, rivalStats, series, tier, youStats],
+    [R, ace, base, buildController, finishAndShow, later, loadout, nextTactic, pilot, rival.name, rivalStats, roundIdx, series, tier, youStats],
   )
   useEffect(() => {
     endRef.current = finishRound
@@ -618,8 +654,8 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
 
   const goal = [
     'Push Bumbles out of the ring. Pick a behaviour and enough power.',
-    'You start back to back with Twister. Fix the rule cards so your robot searches, charges, and never drives off the edge.',
-    'Dodger side-steps charges. Tune your state machine’s thresholds and timings to catch it.',
+    'You start at the white line, back to back with Twister. Fix the rule cards so your robot never drives off the edge, and backs away when it is pushed there.',
+    'Dodger starts behind you and shoves you toward the edge at the bell. Set the edge threshold so your robot feels the line, and tune the RECOVER timings to escape and win.',
     `Best of three against Sensei. It learns from every round. Tune your machine and your robot’s design.`,
   ][tier]
 

@@ -19,13 +19,16 @@ import type { LevelNumber } from '@/lib/kids/curriculum/types'
 import { InstallAppClient } from '@/components/kids/InstallAppClient'
 import type { SessionTitles } from '@/components/kids/universe/ContinueCardClient'
 import { KidsHubClient } from './KidsHubClient'
+import { KIDS_MORE } from '@/lib/kids/nav'
+import { ALL_ACTIVITIES } from '@/lib/kids/activities/content'
+import { TRACKS } from '@/lib/kids/activities/types'
 import { ClassMissionsClient } from '@/components/kids/classroom/ClassMissionsClient'
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in'
 
 const TITLE = 'R2BOT Kids: Explore the Robot Universe (Ages 5–17)'
 const DESCRIPTION =
-  'A robotics universe for ages 5–17: a story-led course on four planets, eight real-physics robot games, a 3D robot to build and code, and a Hangar of badges. For homes and schools, in any browser.'
+  'A robotics universe for ages 5–17: a story-led course, eight real-physics robot games, 400+ hands-on activities in the Skill Galaxy, a 3D robot to build and code, and a Hangar of badges. For homes and schools.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -51,13 +54,8 @@ export const metadata: Metadata = {
   },
 }
 
-const MORE_WAYS: { href: string; emoji: string; title: string; line: string }[] = [
-  { href: '/kids/stories', emoji: '🎬', title: 'Story Theatre', line: 'Animated robot episodes where you choose what happens next.' },
-  { href: '/kids/workshop', emoji: '🛠️', title: 'Robot Workshop', line: 'Build your robot in 3D and see it in your room.' },
-  { href: '/kids/code-lab', emoji: '🧩', title: 'Code Lab', line: 'Snap blocks together to drive your own robot.' },
-  { href: '/kids/world', emoji: '🗺️', title: 'Robot World', line: 'Quick games with Spark for the youngest explorers.' },
-  { href: '/kids/activities', emoji: '✂️', title: 'Make at Home', line: 'Printable paper robots and unplugged games.' },
-]
+// The secondary surfaces, from the same list as the shell's More menu.
+const MORE_WAYS = KIDS_MORE
 
 const FAQ: { q: string; a: string }[] = [
   {
@@ -115,6 +113,9 @@ const faqJsonLd = {
   '@type': 'FAQPage',
   mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
 }
+
+/** "400+": rounded down to the hundred so the copy never overclaims as activities are added. */
+const ACTIVITY_COUNT_LABEL = `${Math.floor(ALL_ACTIVITIES.length / 100) * 100}+`
 
 const SESSION_TITLES: SessionTitles = Object.fromEntries(LEVELS.map((l) => [l.number, l.sessions.map((s) => s.title)]))
 
@@ -178,6 +179,8 @@ export default function KidsHubPage() {
             {[
               { icon: '🪐', t: 'Four course planets', d: 'A 24-session story season for each age band, every session ending in a build, a coding challenge and a short check.' },
               { icon: '🎮', t: 'Eight real games', d: 'Drones, robot arms, circuits, rovers, robot brains, mazes, swarms and sumo — each with Cadet to Legend tiers.' },
+              { icon: '🌌', t: `${ACTIVITY_COUNT_LABEL} activities`, d: 'The Skill Galaxy: ten tracks of short, hands-on missions — tune, wire, sort, program — at four age levels.' },
+              { icon: '🏫', t: 'Ready for classrooms', d: 'Teachers assign sessions and activities to a class; children join with a code and a nickname, nothing more.' },
               { icon: '🤖', t: 'One robot, always yours', d: 'Built part by part in 3D. A robot without a distance sensor really cannot see the wall.' },
               { icon: '🏅', t: 'Rewards for learning', d: 'Badges say what the child can now do. No leaderboards, no punishing streaks.' },
             ].map((f) => (
@@ -242,6 +245,38 @@ export default function KidsHubPage() {
         </ol>
       </section>
 
+      {/* ── The Skill Galaxy ───────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-12" aria-labelledby="galaxy-h">
+        <h2 id="galaxy-h" className="font-display text-2xl font-bold text-[#EEF2F8] sm:text-3xl">
+          The Skill Galaxy: {ACTIVITY_COUNT_LABEL} hands-on robotics activities
+        </h2>
+        <p className="mt-2 max-w-3xl text-[17px] text-[#A7B0C0]">
+          Short missions, each a few minutes long, grouped into ten tracks. Every one is something to do — balance a
+          lever, tune a controller, wire a circuit, sort data for a robot brain, plan a rover&apos;s path — written for
+          one of the four age bands, with a hint and an explanation of the real robotics afterwards. Course sessions
+          point to the activities that practise them, and teachers can assign them to a class.
+        </p>
+        <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {TRACKS.map((t) => (
+            <li key={t.id}>
+              <Link
+                href={`/kids/galaxy/${t.id}`}
+                className="flex h-full min-h-[48px] flex-col rounded-[20px] border border-white/10 bg-white/[0.03] p-4 transition hover:border-white/20 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+              >
+                <span className="text-2xl" aria-hidden>{t.icon}</span>
+                <span className="mt-1 font-display font-bold text-[#EEF2F8]">{t.name}</span>
+                <span className="text-[14px] text-[#A7B0C0]">{t.blurb}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4">
+          <Link href="/kids/galaxy" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
+            Open the Skill Galaxy →
+          </Link>
+        </p>
+      </section>
+
       {/* ── The games ──────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-12" aria-labelledby="games-h">
         <h2 id="games-h" className="font-display text-2xl font-bold text-[#EEF2F8] sm:text-3xl">
@@ -290,7 +325,7 @@ export default function KidsHubPage() {
         <h2 id="more-h" className="font-display text-xl font-bold text-[#EEF2F8] sm:text-2xl">
           More ways to play
         </h2>
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {MORE_WAYS.map((m) => (
             <li key={m.href}>
               <Link
@@ -301,7 +336,7 @@ export default function KidsHubPage() {
                   {m.emoji}
                 </span>
                 <span>
-                  <span className="block font-display font-bold text-[#EEF2F8]">{m.title}</span>
+                  <span className="block font-display font-bold text-[#EEF2F8]">{m.label}</span>
                   <span className="block text-[14px] text-[#A7B0C0]">{m.line}</span>
                 </span>
               </Link>

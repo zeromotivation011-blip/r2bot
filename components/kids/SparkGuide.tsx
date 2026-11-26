@@ -115,12 +115,11 @@ export function SparkGuide() {
         :global(:root) {
           --spark-yellow: #FFD700;
           --spark-orange: #FF6B35;
-          --spark-purple: #7C3AED;
           --spark-green: #10B981;
           --spark-blue: #3B82F6;
           --spark-red: #EF4444;
-          --spark-bg: #0F0A1E;
-          --spark-card: #1A1040;
+          --spark-bg: #0A1120;
+          --spark-card: #111C32;
         }
         .spark-btn {
           position: relative;
@@ -143,7 +142,7 @@ export function SparkGuide() {
           position: absolute;
           top: -10px;
           left: -10px;
-          background: #1a1040;
+          background: #111C32;
           border: 2px solid #FC6818;
           color: #fde047;
           font-size: 10px;
@@ -168,7 +167,7 @@ export function SparkGuide() {
           bottom: 8px;
           width: 240px;
           padding: 10px 30px 10px 12px;
-          background: #1a1040;
+          background: #111C32;
           border: 2px solid #FC6818;
           color: #FFC9A8;
           border-radius: 14px;
@@ -224,9 +223,9 @@ function SparkSvg({ state }: { state: SparkState }) {
   return (
     <svg viewBox="0 0 44 44" width="56" height="56" aria-hidden="true">
       {/* head */}
-      <rect x="6" y="8" width="32" height="28" rx="6" fill="#1a1040" stroke="#7c3aed" strokeWidth="1.5" />
+      <rect x="6" y="8" width="32" height="28" rx="6" fill="#111C32" stroke="#FC6818" strokeWidth="1.5" />
       {/* antenna */}
-      <line x1="22" y1="4" x2="22" y2="8" stroke="#7c3aed" strokeWidth="2" />
+      <line x1="22" y1="4" x2="22" y2="8" stroke="#FC6818" strokeWidth="2" />
       <circle cx="22" cy="3" r="2" fill="#fde047" />
       {/* screen */}
       <rect x="10" y="13" width="24" height="16" rx="3" fill="var(--void)" />

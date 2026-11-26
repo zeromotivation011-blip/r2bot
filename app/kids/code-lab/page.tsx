@@ -66,7 +66,7 @@ export default function CodeLabPage() {
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 text-gray-200">
         <p className="text-sm font-black uppercase tracking-wider text-amber-300">Code Lab</p>
         <h1 className="mt-1 text-3xl font-black text-white sm:text-4xl">Program your own robot</h1>
-        <p className="mt-2 max-w-3xl text-purple-100">
+        <p className="mt-2 max-w-3xl text-slate-200">
           Snap code blocks together and watch the robot you built in the{' '}
           <Link href="/kids/workshop" className="font-bold text-amber-300 underline-offset-4 hover:underline">
             Workshop
@@ -75,7 +75,7 @@ export default function CodeLabPage() {
           cannot check for walls, without a pen it cannot draw. Older coders can switch on the Python view to see the real code behind every
           program.
         </p>
-        <ul className="mt-4 grid max-w-3xl gap-2 text-sm text-purple-100 sm:grid-cols-2">
+        <ul className="mt-4 grid max-w-3xl gap-2 text-sm text-slate-200 sm:grid-cols-2">
           <li>🧩 Tap a block to add it — works great on phones and tablets.</li>
           <li>🔁 Loops, if/else, sensors, and mazes as you level up.</li>
           <li>⭐ Three stars for solving it within the block budget.</li>
@@ -86,7 +86,7 @@ export default function CodeLabPage() {
           <CodeLabIndexClient bands={bands} />
         </div>
 
-        <p className="mt-12 max-w-3xl text-sm text-purple-200">
+        <p className="mt-12 max-w-3xl text-sm text-slate-300">
           For grown-ups: everything runs in the browser and progress is saved on this device only. No account, no personal information, and
           nothing is sent to a server.
         </p>

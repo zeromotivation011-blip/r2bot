@@ -124,7 +124,7 @@ export default function JoinClient() {
   }
 
   if (view === 'loading') {
-    return <div className="h-72 rounded-3xl border-2 border-indigo-900 bg-[#1A1040]/70" aria-hidden />
+    return <div className="h-72 rounded-3xl border-2 border-white/10 bg-[#111C32]/70" aria-hidden />
   }
 
   if (view === 'joined' && membership) {
@@ -132,20 +132,20 @@ export default function JoinClient() {
     const who = membership.teacherName ? `${membership.teacherName}’s class` : `class ${membership.className}`
     return (
       <div className="space-y-6">
-        <section className="rounded-3xl border-2 border-emerald-400/40 bg-[#1A1040] p-6 text-center shadow-xl sm:p-8" aria-live="polite">
+        <section className="rounded-3xl border-2 border-emerald-400/40 bg-[#111C32] p-6 text-center shadow-xl sm:p-8" aria-live="polite">
           <div className="text-6xl" aria-hidden>{justJoined ? '🎉' : '🏫'}</div>
           <h1 className="mt-3 text-3xl font-black text-yellow-300 sm:text-4xl">
             {justJoined ? `You joined ${who}!` : `You are in ${who}`}
           </h1>
-          <p className="mt-2 text-lg text-indigo-100">
+          <p className="mt-2 text-lg text-slate-200">
             Hi <strong className="text-white">{membership.nickname}</strong>! Class: <strong className="text-white">{membership.className}</strong>
             {band ? <> · {band.emoji} {band.name}</> : null}
           </p>
-          <p className="mt-3 text-base text-indigo-200">Every star you earn now shows up for your teacher.</p>
+          <p className="mt-3 text-base text-slate-300">Every star you earn now shows up for your teacher.</p>
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            <Link href="/kids/stories" className="flex min-h-[52px] items-center justify-center rounded-2xl bg-orange-500 px-4 font-extrabold text-[#1a1040] hover:bg-orange-400">🎬 Stories</Link>
-            <Link href="/kids/workshop" className="flex min-h-[52px] items-center justify-center rounded-2xl bg-sky-500 px-4 font-extrabold text-[#0b1530] hover:bg-sky-400">🔧 Workshop</Link>
-            <Link href="/kids/code-lab" className="flex min-h-[52px] items-center justify-center rounded-2xl bg-violet-500 px-4 font-extrabold text-white hover:bg-violet-400">🧩 Code Lab</Link>
+            <Link href="/kids/course" className="flex min-h-[52px] items-center justify-center rounded-2xl bg-amber-500 px-4 font-extrabold text-[#1A1103] hover:bg-amber-400">🚀 Course</Link>
+            <Link href="/kids/galaxy" className="flex min-h-[52px] items-center justify-center rounded-2xl border border-cyan-400/40 bg-cyan-400/10 px-4 font-extrabold text-cyan-100 hover:bg-cyan-400/20">🌌 Skill Galaxy</Link>
+            <Link href="/kids/play" className="flex min-h-[52px] items-center justify-center rounded-2xl border border-white/15 bg-white/[0.06] px-4 font-extrabold text-white hover:bg-white/10">🎮 Games</Link>
           </div>
         </section>
 
@@ -153,9 +153,9 @@ export default function JoinClient() {
           <div className="mt-4">
             {leaving === 'confirm' ? (
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-sm text-indigo-100">Leave {membership.className}? Your nickname and class progress will be deleted.</span>
+                <span className="text-sm text-slate-200">Leave {membership.className}? Your nickname and class progress will be deleted.</span>
                 <button type="button" onClick={leave} className="min-h-[44px] rounded-xl bg-red-500 px-4 font-bold text-white hover:bg-red-400">Yes, leave</button>
-                <button type="button" onClick={() => setLeaving('idle')} className="min-h-[44px] rounded-xl border border-indigo-400/50 px-4 font-bold text-indigo-100 hover:bg-indigo-500/20">Stay</button>
+                <button type="button" onClick={() => setLeaving('idle')} className="min-h-[44px] rounded-xl border border-white/20 px-4 font-bold text-slate-200 hover:bg-white/10">Stay</button>
               </div>
             ) : (
               <button
@@ -176,14 +176,14 @@ export default function JoinClient() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border-2 border-indigo-800 bg-[#1A1040] p-6 shadow-xl sm:p-8">
+      <section className="rounded-3xl border-2 border-white/10 bg-[#111C32] p-6 shadow-xl sm:p-8">
         <div className="text-center">
           <div className="text-6xl" aria-hidden>🏫</div>
           <h1 className="mt-2 text-3xl font-black text-yellow-300 sm:text-4xl">Join your class</h1>
-          <p className="mt-2 text-lg text-indigo-100">Type the code from your teacher and pick a name.</p>
+          <p className="mt-2 text-lg text-slate-200">Type the code from your teacher and pick a name.</p>
         </div>
 
-        {notice && <p className="mt-5 rounded-2xl bg-indigo-500/20 p-4 text-base text-indigo-100" role="status">{notice}</p>}
+        {notice && <p className="mt-5 rounded-2xl bg-white/5 p-4 text-base text-slate-200" role="status">{notice}</p>}
 
         <form onSubmit={onSubmit} noValidate className="mt-6 space-y-5" aria-describedby={error ? errId : undefined}>
           <div>
@@ -199,12 +199,12 @@ export default function JoinClient() {
               inputMode="text"
               maxLength={9}
               placeholder="ABC 234"
-              className="mt-2 w-full rounded-2xl border-2 border-indigo-500 bg-[#0F0A1E] px-4 py-4 text-center font-mono text-3xl font-black tracking-[0.3em] text-white placeholder:text-indigo-700 focus:border-yellow-300 focus:outline-none"
+              className="mt-2 w-full rounded-2xl border-2 border-white/20 bg-[#0A1120] px-4 py-4 text-center font-mono text-3xl font-black tracking-[0.3em] text-white placeholder:text-slate-500 focus:border-yellow-300 focus:outline-none"
             />
           </div>
           <div>
             <label htmlFor={nickId} className="block text-lg font-extrabold text-white">Your name in class</label>
-            <p className="text-sm text-indigo-200">Your first name or a made-up robot name. Not your full name, not an email.</p>
+            <p className="text-sm text-slate-300">Your first name or a made-up robot name. Not your full name, not an email.</p>
             <input
               id={nickId}
               name="nickname"
@@ -213,7 +213,7 @@ export default function JoinClient() {
               autoComplete="off"
               maxLength={20}
               placeholder="Asha, Leo, RoboMax…"
-              className="mt-2 w-full rounded-2xl border-2 border-indigo-500 bg-[#0F0A1E] px-4 py-4 text-2xl font-bold text-white placeholder:text-indigo-700 focus:border-yellow-300 focus:outline-none"
+              className="mt-2 w-full rounded-2xl border-2 border-white/20 bg-[#0A1120] px-4 py-4 text-2xl font-bold text-white placeholder:text-slate-500 focus:border-yellow-300 focus:outline-none"
             />
           </div>
           {/* Honeypot — hidden from people and screen readers. */}
@@ -227,7 +227,7 @@ export default function JoinClient() {
           <button
             type="submit"
             disabled={busy}
-            className="flex min-h-[56px] w-full items-center justify-center rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 text-xl font-black text-[#1a1040] shadow-lg hover:brightness-110 disabled:opacity-60"
+            className="flex min-h-[56px] w-full items-center justify-center rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 text-xl font-black text-[#111C32] shadow-lg hover:brightness-110 disabled:opacity-60"
           >
             {busy ? 'Joining…' : 'Join my class 🚀'}
           </button>

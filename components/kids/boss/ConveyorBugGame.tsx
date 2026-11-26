@@ -164,12 +164,12 @@ export function ConveyorBugGame({ onWin, onFail }: {
           display: flex; gap: 8px; justify-content: center;
         }
         .cb-stat {
-          background: #1a1040;
+          background: #111C32;
           color: #FFC9A8;
           padding: 8px 14px;
           border-radius: 999px;
           font-weight: 900;
-          border: 2px solid #4c1d95;
+          border: 2px solid #19263F;
         }
         .cb-belt {
           position: relative;

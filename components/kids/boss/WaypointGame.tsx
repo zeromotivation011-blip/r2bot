@@ -193,8 +193,8 @@ export function WaypointGame({ onWin, onFail }: {
         .wg-arrow-row { display: flex; gap: 6px; }
         .wg-strip {
           padding: 8px 12px;
-          background: rgba(15,10,30,0.6);
-          border: 1px dashed #4c1d95;
+          background: rgba(10,17,32,0.6);
+          border: 1px dashed #19263F;
           border-radius: 12px;
           display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
           min-height: 40px;
@@ -222,11 +222,11 @@ export function WaypointGame({ onWin, onFail }: {
         .wg-go:disabled { opacity: 0.4; cursor: not-allowed; }
         .wg-secondary {
           min-height: 52px; padding: 0 16px;
-          background: #1a1040; color: #FFC9A8;
-          border: 2px solid #4c1d95;
+          background: #111C32; color: #FFC9A8;
+          border: 2px solid #19263F;
           border-radius: 14px; font-weight: 800; cursor: pointer;
         }
-        .wg-attempts { text-align: center; color: #c4b5fd; font-weight: 700; font-size: 13px; }
+        .wg-attempts { text-align: center; color: #A7B0C0; font-weight: 700; font-size: 13px; }
       `}</style>
     </div>
   )
@@ -244,10 +244,10 @@ function ArrowBtn({ label, onClick, disabled }: { label: string; onClick: () => 
       <style jsx>{`
         .wg-arrow-btn {
           width: 60px; height: 60px;
-          background: linear-gradient(135deg, #2a1860, #1a1040);
+          background: linear-gradient(135deg, #19263F, #111C32);
           color: #fde047;
           font-size: 26px; font-weight: 900;
-          border: 2px solid #6d28d9;
+          border: 2px solid #FC6818;
           border-radius: 14px;
           cursor: pointer;
         }

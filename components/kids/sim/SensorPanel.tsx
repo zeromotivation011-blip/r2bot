@@ -23,8 +23,8 @@ const SWATCH: Record<FloorColor, string> = {
 function Card({ title, off, need, children }: { title: string; off?: boolean; need?: Capability; children: React.ReactNode }) {
   return (
     <div className={`rounded-2xl border border-white/10 bg-white/[0.04] p-3 ${off ? 'opacity-50' : ''}`}>
-      <p className="text-[11px] font-black uppercase tracking-wider text-purple-200">{title}</p>
-      {off && need ? <p className="mt-1 text-xs font-bold text-purple-100">🔒 needs {CAPABILITY_NEEDS[need]}</p> : children}
+      <p className="text-[11px] font-black uppercase tracking-wider text-slate-300">{title}</p>
+      {off && need ? <p className="mt-1 text-xs font-bold text-slate-200">🔒 needs {CAPABILITY_NEEDS[need]}</p> : children}
     </div>
   )
 }
@@ -58,7 +58,7 @@ export default function SensorPanel({ live, caps }: { live: WorkbenchLiveState; 
             <span key={i} className={`h-4 w-4 rounded-full border border-white/30 ${on ? 'bg-amber-300 shadow-[0_0_8px_#fcd34d]' : 'bg-white/10'}`} />
           ))}
         </div>
-        <p className="mt-1 text-xs font-bold tabular-nums text-purple-100">offset {(s?.lineOffset ?? 0).toFixed(2)}</p>
+        <p className="mt-1 text-xs font-bold tabular-nums text-slate-200">offset {(s?.lineOffset ?? 0).toFixed(2)}</p>
       </Card>
 
       <Card title="🎨 Floor colour" off={!caps.has('see-color')} need="see-color">
@@ -72,7 +72,7 @@ export default function SensorPanel({ live, caps }: { live: WorkbenchLiveState; 
         <div className="flex items-center gap-2">
           <svg viewBox="-20 -20 40 40" className="h-11 w-11" aria-hidden>
             <circle r="18" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2" />
-            <text y="-11" textAnchor="middle" fontSize="7" fill="#c4b5fd" fontWeight="900">
+            <text y="-11" textAnchor="middle" fontSize="7" fill="#A7B0C0" fontWeight="900">
               0
             </text>
             <line x1="0" y1="0" x2="0" y2="-14" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" transform={`rotate(${heading})`} />
@@ -83,17 +83,17 @@ export default function SensorPanel({ live, caps }: { live: WorkbenchLiveState; 
       </Card>
 
       <Card title="🛡️ Bumper" off={!caps.has('feel-bump')} need="feel-bump">
-        <p className={`mt-1 text-sm font-black ${s?.bumped ? 'text-rose-300' : 'text-purple-100'}`}>{s?.bumped ? 'Pressed!' : 'Not pressed'}</p>
+        <p className={`mt-1 text-sm font-black ${s?.bumped ? 'text-rose-300' : 'text-slate-200'}`}>{s?.bumped ? 'Pressed!' : 'Not pressed'}</p>
       </Card>
 
       <Card title="⚙️ Wheels vs ground">
-        <p className="text-xs font-bold tabular-nums text-purple-100">
+        <p className="text-xs font-bold tabular-nums text-slate-200">
           wheels {(wheel * 100).toFixed(0)} cm/s · robot {(ground * 100).toFixed(0)} cm/s
         </p>
         <p className={`mt-1 text-sm font-black ${slipping ? 'text-rose-300' : 'text-emerald-300'}`} data-testid="sensor-slip">
           {slipping ? '🌀 Slipping!' : wheel > 0.01 ? 'Gripping' : 'Stopped'}
         </p>
-        <p className="text-[11px] tabular-nums text-purple-200">⏱ {(s?.timerS ?? 0).toFixed(1)} s</p>
+        <p className="text-[11px] tabular-nums text-slate-300">⏱ {(s?.timerS ?? 0).toFixed(1)} s</p>
       </Card>
     </div>
   )

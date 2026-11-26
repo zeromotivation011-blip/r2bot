@@ -152,7 +152,7 @@ export function GameShell({ game, howToPlay, lesson, children }: Props) {
               </p>
               {result.reward?.newPersonalBest && <p className="mt-1 font-black text-emerald-300">New personal best!</p>}
               <p className="mt-3 text-white/85">{result.round.message}</p>
-              <p className="mt-3 rounded-2xl bg-white/5 p-3 text-sm text-violet-100/80">
+              <p className="mt-3 rounded-2xl bg-white/5 p-3 text-sm text-slate-300">
                 <span className="font-black text-amber-300">What you learned: </span>
                 {lesson}
               </p>
@@ -165,7 +165,7 @@ export function GameShell({ game, howToPlay, lesson, children }: Props) {
                     </span>
                   ))}
                   {result.reward.levelAfter > result.reward.levelBefore && (
-                    <span className="rounded-full bg-fuchsia-400/20 px-3 py-1 text-fuchsia-200">Level {result.reward.levelAfter}!</span>
+                    <span className="rounded-full bg-amber-400/20 px-3 py-1 text-amber-200">Level {result.reward.levelAfter}!</span>
                   )}
                 </div>
               )}

@@ -48,7 +48,7 @@ function makeFloorTexture(): THREE.CanvasTexture {
   c.height = 512
   const g = c.getContext('2d')
   if (g) {
-    g.fillStyle = '#2A1B4D'
+    g.fillStyle = '#19263F'
     g.fillRect(0, 0, 512, 512)
     g.strokeStyle = 'rgba(196,181,253,0.22)'
     g.lineWidth = 3
@@ -84,11 +84,11 @@ export default function WorkshopSceneClient({ design, snap, driving, driveInput,
   useEffect(() => {
     const host = hostRef.current
     if (!host) return
-    const stage = createStage(host, { background: '#1B1035', xr: true })
+    const stage = createStage(host, { background: '#111C32', xr: true })
     stageRef.current = stage
     const { scene, camera, renderer } = stage
     const reduced = prefersReducedMotion()
-    scene.fog = new THREE.Fog('#1B1035', 9, 18)
+    scene.fog = new THREE.Fog('#111C32', 9, 18)
     camera.position.set(2.1, 1.6, 2.6)
 
     const floor = new THREE.Mesh(
@@ -98,7 +98,7 @@ export default function WorkshopSceneClient({ design, snap, driving, driveInput,
     floor.rotation.x = -Math.PI / 2
     floor.receiveShadow = true
     scene.add(floor)
-    const turntable = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 1, 0.04, 48), new THREE.MeshStandardMaterial({ color: '#4C1D95', roughness: 0.6 }))
+    const turntable = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 1, 0.04, 48), new THREE.MeshStandardMaterial({ color: '#19263F', roughness: 0.6 }))
     turntable.position.y = 0.02
     turntable.receiveShadow = true
     scene.add(turntable)

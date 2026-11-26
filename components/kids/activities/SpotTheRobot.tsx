@@ -80,8 +80,8 @@ export function SpotTheRobot({
       <style jsx>{`
         .str { display: flex; flex-direction: column; gap: 12px; }
         .str-scene {
-          background: rgba(124,58,237,0.18);
-          border: 2px solid #7c3aed;
+          background: rgba(252,104,24,0.18);
+          border: 2px solid #FC6818;
           color: #FFC9A8;
           padding: 10px 14px;
           border-radius: 12px;
@@ -99,8 +99,8 @@ export function SpotTheRobot({
           position: relative;
           min-height: 86px;
           padding: 12px 10px;
-          background: #1a1040;
-          border: 3px solid #4c1d95;
+          background: #111C32;
+          border: 3px solid #19263F;
           border-radius: 18px;
           color: #FFC9A8;
           font-weight: 800;

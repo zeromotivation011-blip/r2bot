@@ -60,7 +60,7 @@ const BlocklyEditorClient = forwardRef<BlocklyEditorHandle, Props>(function Bloc
       // Wheel/trackpad scrolling scrolls the PAGE (no scroll trap); zoom with pinch or the +/− buttons.
       zoom: { controls: true, wheel: false, pinch: true, startScale: coarse ? 0.9 : 0.8, maxScale: 1.6, minScale: 0.4 },
       move: { scrollbars: true, drag: true, wheel: false },
-      grid: { spacing: 24, length: 2, colour: '#2A2060', snap: true },
+      grid: { spacing: 24, length: 2, colour: '#1E2A44', snap: true },
     })
     ws.current = w
     w.addChangeListener(Blockly.Events.disableOrphans)

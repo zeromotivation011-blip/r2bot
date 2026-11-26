@@ -428,7 +428,12 @@ export function createMatch(R: Rapier, setups: [BotSetup, BotSetup]): Match {
     const load = b.mass * G * b.loadMul + b.extraLoad
     const loadSide = load / 2
     const com = local(b, 0, b.spec.comY, 0)
-    let slipping = false
+    // Tyres resist sliding sideways (up to grip × load). Sideways and forward grip share ONE
+    // friction budget per tyre (the friction circle): a tyre that is busy holding the robot
+    // against a side push has less left for driving forward, and the other way round.
+    const latLim = b.grip * load
+    const lat = clamp((-vr * b.mass) / DT / 2, -latLim, latLim)
+    let anySlip = false
     for (let s = 0; s < 2; s++) {
       // s = 0 left (+x local = −right), s = 1 right.
       const side = s === 0 ? -1 : 1
@@ -437,8 +442,10 @@ export function createMatch(R: Rapier, setups: [BotSetup, BotSetup]): Match {
       // A DC motor: push = stall force × (voltage share − speed / no-load speed). Full push when
       // stalled against a rival, none at top speed, and it brakes when the voltage drops.
       const motor = clamp(b.fStall * (u[s] - vSide / (b.vmax * NO_LOAD)), -b.fStall, b.fStall)
-      const gripLim = b.grip * loadSide
-      if (Math.abs(motor) > gripLim) slipping = true
+      const latSide = lat / 2
+      const gripLim = Math.sqrt(Math.max(0, (b.grip * loadSide) ** 2 - latSide * latSide))
+      const slipping = Math.abs(motor) > gripLim
+      if (slipping) anySlip = true
       let F = clamp(motor, -gripLim, gripLim)
       const drag = CRR * loadSide
       F += clamp(-((vSide * b.mEffSide) / DT + F), -drag, drag)
@@ -446,10 +453,7 @@ export function createMatch(R: Rapier, setups: [BotSetup, BotSetup]): Match {
       b.body.applyImpulseAtPoint({ x: F3.x * F * DT, y: 0, z: F3.z * F * DT }, pt, true)
       b.wheel[s] = slipping ? tgt[s] : vSide
     }
-    if (slipping) b.log.slipS += DT
-    // Tyres resist sliding sideways (up to grip × load).
-    const latLim = b.grip * load
-    const lat = clamp((-vr * b.mass) / DT / 2, -latLim, latLim)
+    if (anySlip) b.log.slipS += DT
     b.body.applyImpulse({ x: rgt.x * lat * DT, y: 0, z: rgt.z * lat * DT }, true)
     // Skid-steer drives scrub when turning.
     const scrub = b.spec.drive.scrub

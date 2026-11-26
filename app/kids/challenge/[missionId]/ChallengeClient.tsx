@@ -258,9 +258,9 @@ export default function ChallengeClient() {
           display: inline-block;
           min-height: 48px;
           padding: 0 14px; line-height: 48px;
-          background: rgba(26,16,64,.7);
+          background: rgba(17,28,50,.7);
           color: #FFC9A8;
-          border: 2px solid #4c1d95;
+          border: 2px solid #19263F;
           border-radius: 12px;
           text-decoration: none; font-weight: 800;
           margin-bottom: 18px;
@@ -269,7 +269,7 @@ export default function ChallengeClient() {
         .ch-head .badge {
           display: inline-block;
           background: linear-gradient(135deg, #fde047, #FC6818);
-          color: #1a1040;
+          color: #111C32;
           font-weight: 900;
           font-size: 13px; letter-spacing: 2px;
           padding: 6px 14px;
@@ -290,7 +290,7 @@ export default function ChallengeClient() {
         .intro-bubble {
           display: block; width: 100%;
           padding: 20px 24px;
-          background: #1a1040;
+          background: #111C32;
           border: 3px solid #FC6818;
           border-radius: 22px;
           color: #FFC9A8;
@@ -379,17 +379,17 @@ function SequenceBoss({ steps, onComplete }: { steps: string[]; onComplete: (sta
         .slot {
           display: flex; align-items: center; gap: 10px;
           padding: 12px;
-          background: rgba(26,16,64,.7);
-          border: 2px dashed #4c1d95;
+          background: rgba(17,28,50,.7);
+          border: 2px dashed #19263F;
           border-radius: 12px;
-          color: #c4b5fd;
+          color: #A7B0C0;
           cursor: pointer; font-weight: 700;
         }
         .slot.filled { border-style: solid; border-color: #FF8A4C; color: #FFC9A8; background: rgba(255,138,76,.12); }
         .num {
           width: 28px; height: 28px;
           display: grid; place-items: center;
-          background: #FF8A4C; color: #1a1040;
+          background: #FF8A4C; color: #111C32;
           border-radius: 50%; font-weight: 900;
           flex-shrink: 0;
         }
@@ -398,7 +398,7 @@ function SequenceBoss({ steps, onComplete }: { steps: string[]; onComplete: (sta
           min-height: 52px;
           padding: 10px 14px;
           background: linear-gradient(135deg, #fde047, #FF8A4C);
-          color: #1a1040;
+          color: #111C32;
           border: none; border-radius: 12px;
           font-weight: 800; text-align: left; cursor: pointer;
         }
@@ -462,8 +462,8 @@ function LogicBoss({ question, options, onComplete }: {
       <style jsx>{`
         .lb { display: flex; flex-direction: column; gap: 14px; }
         .q {
-          background: rgba(124,58,237,.18);
-          border: 2px solid #7c3aed;
+          background: rgba(252,104,24,.18);
+          border: 2px solid #FC6818;
           color: #FFC9A8;
           padding: 14px 16px;
           border-radius: 14px;
@@ -476,8 +476,8 @@ function LogicBoss({ question, options, onComplete }: {
         .o {
           min-height: 56px;
           padding: 12px 14px;
-          background: #1a1040;
-          border: 2px solid #4c1d95;
+          background: #111C32;
+          border: 2px solid #19263F;
           color: #FFC9A8;
           border-radius: 14px;
           font-size: 14px;
@@ -537,7 +537,7 @@ function Result({ stars, partAwarded, zone, onBack }: {
           text-shadow: 0 0 30px rgba(253,224,71,.5);
         }
         .stars { font-size: 48px; margin-top: 10px; }
-        .zone { font-size: 18px; color: #c4b5fd; font-weight: 800; margin-top: 6px; }
+        .zone { font-size: 18px; color: #A7B0C0; font-weight: 800; margin-top: 6px; }
         .part {
           margin-top: 22px;
           padding: 20px;
@@ -565,8 +565,8 @@ function Result({ stars, partAwarded, zone, onBack }: {
           display: inline-flex; align-items: center; justify-content: center;
           border: none; cursor: pointer; font-size: 16px;
         }
-        .link { background: linear-gradient(135deg, #FF8A4C, #FC6818); color: #1a1040; }
-        .back { background: #1a1040; color: #FFC9A8; border: 2px solid #4c1d95; }
+        .link { background: linear-gradient(135deg, #FF8A4C, #FC6818); color: #111C32; }
+        .back { background: #111C32; color: #FFC9A8; border: 2px solid #19263F; }
       `}</style>
     </div>
   )
