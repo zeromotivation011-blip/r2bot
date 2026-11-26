@@ -104,8 +104,6 @@ export default function CrossingGameClient({ onFinish }: { onFinish: (r: RoundRe
           for (let xx = a + 3; xx < b - 3; xx += 3.2) ctx.fillRect(X(xx), Y(yy), 1.4 * k, 1.4 * k)
       }
     })
-    // trees on the verge
-    ctx.font = `${Math.round(k * 2.4)}px system-ui, sans-serif`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     // pavement
@@ -195,10 +193,12 @@ export default function CrossingGameClient({ onFinish }: { onFinish: (r: RoundRe
         const z0 = front
         const z1 = front + c.dir * react
         const z2 = z1 + c.dir * brake
-        ctx.fillStyle = 'rgba(255,168,120,.16)'
+        ctx.fillStyle = 'rgba(255,168,120,.28)'
         ctx.fillRect(X(lx - LANE_W / 2 + 0.3), Y(Math.min(z0, z1)), (LANE_W - 0.6) * k, Math.abs(z1 - z0) * k)
-        ctx.fillStyle = 'rgba(252,104,24,.34)'
+        ctx.fillStyle = 'rgba(252,104,24,.5)'
         ctx.fillRect(X(lx - LANE_W / 2 + 0.3), Y(Math.min(z1, z2)), (LANE_W - 0.6) * k, Math.abs(z2 - z1) * k)
+        ctx.fillStyle = '#FFA878'
+        ctx.fillRect(X(lx - LANE_W / 2 + 0.3), Y(z2) - 1, (LANE_W - 0.6) * k, 2)
       }
       const y0 = Math.min(front, back)
       ctx.fillStyle = c.colour
@@ -231,7 +231,7 @@ export default function CrossingGameClient({ onFinish }: { onFinish: (r: RoundRe
     // robot
     const rx = X(s.robotX)
     const ry = Y(PATH_Y)
-    const r = ROBOT_R * k * 1.6
+    const r = ROBOT_R * k * 2.4
     ctx.fillStyle = '#0B1220'
     for (const dx of [-0.7, 0, 0.7]) for (const dy of [-1, 1]) {
       ctx.beginPath()
@@ -259,11 +259,11 @@ export default function CrossingGameClient({ onFinish }: { onFinish: (r: RoundRe
     if (s.robot === 'wait') {
       const bob = reduced ? 0 : Math.sin(s.t * 5) * 2
       ctx.fillStyle = COL.text1
-      rr(ctx, rx - 1.4 * k, ry - r * 2.4 - 2.6 * k + bob, 2.8 * k, 2 * k, 6)
+      rr(ctx, rx - 1.6 * k, ry - r * 2.8 - 2.6 * k + bob, 3.2 * k, 2 * k, 6)
       ctx.fill()
       ctx.fillStyle = '#0A1120'
       ctx.font = `bold ${Math.round(k * 1.5)}px system-ui, sans-serif`
-      ctx.fillText('GO?', rx, ry - r * 2.4 - 1.6 * k + bob)
+      ctx.fillText('GO?', rx, ry - r * 2.8 - 1.6 * k + bob)
     }
     // flash message
     if (s.flash) {
@@ -326,8 +326,10 @@ export default function CrossingGameClient({ onFinish }: { onFinish: (r: RoundRe
           ? nm === 0 && hardBrakes(s) + redMen(s) === 0
             ? `Parcel delivered in ${s.t.toFixed(0)} s, and not one car had to brake hard. That is exactly how a safe robot crosses.`
             : nm > 0
-              ? `Parcel delivered, but there ${nm === 1 ? 'was a near miss' : `were ${nm} near misses`}. Wait until no car’s orange stopping zone reaches the crossing.`
-              : `Parcel delivered in ${s.t.toFixed(0)} s. A car had to brake hard or you crossed on the red signal — wait a little longer for 3 stars.`
+              ? `Not safe yet: there ${nm === 1 ? 'was a near miss' : `were ${nm} near misses`}. A safe robot only goes when no car’s orange stopping zone reaches the crossing. Try again.`
+              : redMen(s) > 0
+                ? `Not safe yet: the robot started on the red “don’t walk” signal. At a signal crossing, wait for the green walk signal. Try again.`
+                : `Parcel delivered in ${s.t.toFixed(0)} s. A car had to brake hard — wait a little longer for a bigger gap for 3 stars.`
           : 'Time ran out before the parcel arrived. Watch the cars’ stopping zones and go as soon as they are all clear.',
     })
   }
@@ -392,7 +394,7 @@ export default function CrossingGameClient({ onFinish }: { onFinish: (r: RoundRe
         <p className="rounded-2xl bg-white/5 px-3 py-2 text-[15px] font-semibold text-[#EEF2F8]" aria-live="polite">
           {status}
         </p>
-        {phase === 'debrief' && <Debrief title={s.robot === 'done' ? 'Parcel delivered!' : 'Out of time'} good={s.robot === 'done' && s.events.length === 0} lines={debrief()} onContinue={finish} />}
+        {phase === 'debrief' && <Debrief title={s.robot !== 'done' ? 'Out of time' : crossingStars(s) === 0 ? 'Delivered, but not safely' : 'Parcel delivered!'} good={s.robot === 'done' && s.events.length === 0} lines={debrief()} onContinue={finish} />}
       </div>
 
       <div className="flex flex-col gap-3">

@@ -160,7 +160,12 @@ Build these exceptionally; everything else is secondary.
   not MP4s), **Workshop** `/kids/workshop` (3D robot builder, camera "magic window" AR on every phone,
   WebXR AR/VR where supported), **Code Lab** `/kids/code-lab/<mission>` (block coding that drives the
   child's own robot; blocks need the matching part — capabilities come from `lib/kids/robot-design.ts`),
-  Robot World `/kids/world` (the original six zones), **Classroom** `/kids/classroom` (teacher, noindex),
+  Robot World `/kids/world` (the original six zones), **Worlds** `/kids/worlds` + `/kids/worlds/<id>` (26 Nov 2026: seven
+  themed worlds — Robot Guardians, Ocean Lab, Robo Zoo, Robot Hospital, Smart Farm, Robot City, Space Station — each with a
+  flagship game in `GAMES` and activities tagged `world: <id>`; `WORLDS` in `lib/kids/universe/worlds.ts`; on the Universe
+  map they sit on the Worlds belt, not as moons), **Games** `/kids/play/<id>` (count them from `GAMES`, never type the
+  number; only games with a built page go in `GAMES`; the phone tab bar is five: Home · Course · Worlds · Games · Hangar),
+  **Classroom** `/kids/classroom` (teacher, noindex),
   `/kids/join` (child joins with code + nickname, noindex) and `/kids/schools` (indexable pitch + pilot form
   through `captureLead()`). One robot shape (`RobotDesign`) and one progress store (`lib/kids-progress.ts`,
   fires `KIDS_PROGRESS_EVENT`) for all of it. **Children never give an email, password, phone or birthday**;

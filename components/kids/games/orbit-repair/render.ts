@@ -393,6 +393,15 @@ function drawCadet(ctx: CanvasRenderingContext2D, v: View, s: CadetState, fx: Fx
   ctx.beginPath()
   ctx.roundRect(x0, y0, mw, mh, 12)
   ctx.fill()
+  // wall panels
+  ctx.strokeStyle = 'rgba(71,85,105,0.35)'
+  ctx.lineWidth = 1
+  for (let i = 1; i < 8; i++) {
+    ctx.beginPath()
+    ctx.moveTo(X(v, i), y0)
+    ctx.lineTo(X(v, i), y0 + mh)
+    ctx.stroke()
+  }
   // window with the Earth
   const wx = X(v, 3.9)
   const wy = Y(v, 2.2)
@@ -410,15 +419,6 @@ function drawCadet(ctx: CanvasRenderingContext2D, v: View, s: CadetState, fx: Fx
   ctx.beginPath()
   ctx.arc(wx, wy, wr, 0, Math.PI * 2)
   ctx.stroke()
-  // panels and handrails
-  ctx.strokeStyle = 'rgba(71,85,105,0.35)'
-  ctx.lineWidth = 1
-  for (let i = 1; i < 8; i++) {
-    ctx.beginPath()
-    ctx.moveTo(X(v, i), y0)
-    ctx.lineTo(X(v, i), y0 + mh)
-    ctx.stroke()
-  }
   ctx.strokeStyle = '#FC6818'
   ctx.lineWidth = 3
   for (const hx of [2, 6]) {
@@ -660,9 +660,20 @@ function drawAce(ctx: CanvasRenderingContext2D, v: View, s: AceState, fx: Fx): v
     ctx.setLineDash([])
     const m = s.at[pl.id]
     if (m) moduleBox(ctx, px, py, ms, m, s.t)
-    label(ctx, pl.label, px, py + ms / 2 + 14, '#A7B0C0', 11)
   }
   const { hand } = drawArm(ctx, v, s.arm, !!s.held, s.t)
+  // Place outlines and labels go on top of the arm, so the hand never hides
+  // where a module belongs (the labels carry their own dark backing).
+  for (const pl of ACE_PLACES) {
+    const px = X(v, pl.p.x)
+    const py = Y(v, pl.p.y)
+    ctx.strokeStyle = 'rgba(226,232,240,0.75)'
+    ctx.lineWidth = 2
+    ctx.setLineDash([4, 4])
+    ctx.strokeRect(px - ms / 2 - 3, py - ms / 2 - 3, ms + 6, ms + 6)
+    ctx.setLineDash([])
+    label(ctx, pl.label, px, py + ms / 2 + 14, '#EEF2F8', 11)
+  }
   if (s.held) moduleBox(ctx, hand.x, hand.y - ms * 0.15, ms * 0.95, s.held, s.t)
   arrow(ctx, hand.x, hand.y, s.arm.hv.x * v.scale * 10, -s.arm.hv.y * v.scale * 10, '#00E5FF', 2.5)
   ctx.restore()

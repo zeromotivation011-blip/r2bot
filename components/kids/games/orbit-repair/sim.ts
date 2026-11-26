@@ -315,7 +315,7 @@ export function createPilot(): PilotState {
   return {
     kind: 'pilot',
     t: 0,
-    arm: { base: v2(0, 0), l1: 7.5, l2: 7.5, hand: v2(3, 6), hv: v2(0, 0), maxSpeed: 0.24, fineSpeed: 0.06, accel: 0.12 },
+    arm: { base: v2(0, 0), l1: 7.5, l2: 7.5, hand: v2(3, 6), hv: v2(0, 0), maxSpeed: 0.24, fineSpeed: 0.1, accel: 0.12 },
     ship: { p: v2(-7.5, 11.6), v: v2(0.11, -0.012), ang: 0, w: 0.004, pin: v2(0, -1.7) },
     captured: false,
     capturedAt: 0,
@@ -578,6 +578,8 @@ export const LEGEND = {
   /** Target tumble rate, rad/s (about 2.9°/s). */
   spin: 0.05,
   syncRange: 12,
+  /** Within this range a sync is cheap enough to hold until capture (HUD shows green). */
+  cheapSyncRange: 5,
   syncRel: 0.12,
   /** Where the servicer's centre must be to capture, in the target's rotating frame. */
   capture: v2(-2.9, 0),
@@ -930,7 +932,9 @@ export function report(s: GameState): Report {
       `You used ${s.puffsUsed} puffs. Each puff changed the robot’s speed by ${CADET.dv} m/s — and floating with nothing to rub against, the robot kept that speed (the station’s air slows it only a tiny bit, so the game leaves it out).`,
       s.bumps > 0
         ? `The robot bonked the wall ${s.bumps} time${s.bumps === 1 ? '' : 's'}. It did not slow down by itself — only the wall (or a puff the other way) stopped it. That is Newton’s first law.`
-        : 'No bonks! You stopped the robot with opposite puffs instead of letting a wall stop it.',
+        : won
+          ? 'No bonks! You stopped the robot with opposite puffs instead of letting a wall stop it.'
+          : 'Puffs that cancel each other (up, down, up…) burn gas but take the robot nowhere. One puff to go, one to stop.',
       s.fastAtDock > 0
         ? `It reached the charger too fast ${s.fastAtDock} time${s.fastAtDock === 1 ? '' : 's'}. To stop, you need as many puffs backwards as you gave forwards.`
         : 'Every puff pushes gas one way and the robot the other way — the plume always points away from where the robot goes.',

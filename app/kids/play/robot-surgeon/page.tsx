@@ -13,9 +13,9 @@ export const runtime = 'nodejs'
 
 const PAGE_URL = 'https://www.r2bot.in/kids/play/robot-surgeon'
 
-const TITLE = 'Robot Hospital: Surgical Robot Game for Kids (Motion Scaling, Bionic Hands, Safety)'
+const TITLE = 'Robot Hospital: Surgical Robot Game for Kids'
 const DESCRIPTION =
-  'Drive a hospital delivery robot, steady a surgical robot’s tool with motion scaling and tremor filtering, tune a bionic hand that reads muscle signals, and run a remote surgery-assist session with a force limit and safety interlocks. Four tiers for ages 7–17.'
+  'Drive a hospital delivery robot, steady a surgical robot’s tool with motion scaling and tremor filtering, tune a bionic hand that reads muscle signals, and run a remote surgery-assist session with a force limit and safety interlocks. Four tiers for ages 8–17.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -38,7 +38,7 @@ const learningLd = {
   description: DESCRIPTION,
   url: PAGE_URL,
   learningResourceType: 'Interactive simulation',
-  educationalLevel: 'Ages 7–17',
+  educationalLevel: 'Ages 8–17',
   audience: { '@type': 'EducationalAudience', educationalRole: 'student', audienceType: 'children' },
   teaches: [
     'Tele-operated surgical robots: the surgeon stays in control',
@@ -61,15 +61,15 @@ const crumbs = breadcrumbJsonLD([
 const TIERS = [
   {
     name: 'Cadet',
-    who: 'about 7 and up',
+    who: 'about 8 and up',
     what: 'Medicine Run. Drive a delivery robot from the pharmacy to three ward doors and back to its charger, while nurses, visitors and a wheelchair user move along the corridors.',
-    tip: 'Switch to careful speed whenever someone is inside the dotted ring. The red ring is the robot’s stop zone: it grows when you go fast, because a fast robot needs more room to brake. Plan the order of the wards so you never drive the same corridor twice.',
+    tip: 'The robot starts in careful speed: switch to fast only on an empty corridor, and back to careful whenever someone is inside the dotted ring. Keep to the right of the corridor to pass people — they step aside for a slow robot. The red box in front is the robot’s stop zone: it grows when you go fast, because a fast robot needs more room to brake. Plan the order of the wards so you never drive the same corridor twice.',
   },
   {
     name: 'Pilot',
     who: 'about 9 and up',
     what: 'Steady Hands. Sit at a surgeon’s console and guide a tool tip along a narrow channel on a practice board. Choose 1:1, 3:1 or 5:1 motion scaling, and switch the tremor filter on or off.',
-    tip: 'At 1:1 every wobble of your finger reaches the tool. Scaling divides the shake, and the filter removes most of what is left — but more scaling means more hand travel, so lift your finger and drag again (that is the clutch). Try every setting and compare your runs.',
+    tip: 'At 1:1 every wobble of your finger reaches the tool. Scaling divides the shake, and the filter removes most of what is left — but more scaling means more hand travel, so lift your finger and drag again (that is the clutch). Three stars need a steady run in 25 s or less, so the best setting is steady enough AND quick enough. Try every setting and compare your runs.',
   },
   {
     name: 'Ace',

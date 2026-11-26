@@ -27,7 +27,7 @@ import {
   type JunctionSettings,
   type Light,
 } from './junction'
-import { COL, fitCanvas, rr, useReducedMotion, useSimLoop } from './shared'
+import { COL, fitCanvas, rr, scrollCanvasIntoView, useReducedMotion, useSimLoop } from './shared'
 import { Debrief, GhostButton, Panel, PrimaryButton, Slider, Stat, type DebriefLine } from './UiClient'
 
 type Phase = 'setup' | 'run' | 'debrief'
@@ -67,6 +67,7 @@ export default function JunctionGameClient({ onFinish }: { onFinish: (r: RoundRe
     play.current = { t: 0, idx: 0 }
     playSound('click')
     setPhase('run')
+    scrollCanvasIntoView(canvas.current, reduced)
   }
 
   const end = useCallback(() => {
@@ -161,8 +162,8 @@ export default function JunctionGameClient({ onFinish }: { onFinish: (r: RoundRe
     lamp(cx + half + u, cy - half - u, ew)
     lamp(cx - half - u, cy + half + u, ew)
     // queued cars
-    const carLen = u * 1.15
-    const carW = u * 1.0
+    const carLen = u * 1.3
+    const carW = u * 0.75
     const drawCar = (x: number, y: number, vertical: boolean, robot: boolean) => {
       const cw = vertical ? carW : carLen
       const ch = vertical ? carLen : carW

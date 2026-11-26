@@ -6,10 +6,10 @@
 // every test ends with a debrief that says WHY it happened.
 //   Cadet  — match the animal trick to the challenge and watch it work.
 //   Pilot  — tune one parameter at three stations (duty factor, wave, flap rate).
-//   Ace    — combine modules for three missions on one small battery.
-//   Legend — design for an unknown terrain mix, then explain the trade-offs.
+//   Ace    — combine modules for three missions on one 7 Wh battery.
+//   Legend — practise, pass a final test on never-seen courses, then explain.
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { playSound } from '@/lib/kids-audio'
 import { CadetScene } from './BotArtClient'
@@ -22,6 +22,7 @@ import {
   BATTERIES,
   CADET_CHALLENGES,
   FLAP,
+  LEGEND_BATTERIES,
   LEGEND_COURSES,
   LEGEND_MIX,
   LEGEND_QUESTIONS,
@@ -42,7 +43,6 @@ import {
   runQuad,
   runSnake,
   shuffled,
-  type BatteryId,
   type CadetOutcome,
   type CourseResult,
   type Design,
@@ -53,6 +53,24 @@ import {
 import { useClock, useRun } from './useAnim'
 
 type Finish = (r: RoundResult) => void
+
+/**
+ * On a phone the animated view sits above the controls, so a test started from
+ * the controls would play off-screen. Bring the view into sight when it starts.
+ */
+function useShowView<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
+  const show = useCallback(() => {
+    const el = ref.current
+    if (!el || typeof window === 'undefined') return
+    if (window.matchMedia('(min-width: 1024px)').matches) return
+    const r = el.getBoundingClientRect()
+    if (r.top >= 0 && r.bottom <= window.innerHeight) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+  }, [])
+  return [ref, show] as const
+}
 
 const BTN =
   'inline-flex min-h-[48px] items-center justify-center rounded-2xl px-5 font-display text-base font-black transition motion-safe:duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.97] disabled:cursor-not-allowed disabled:opacity-40'
@@ -96,13 +114,12 @@ function Steps({ n, at, labels }: { n: number; at: number; labels?: string[] }) 
 
 // ═══ CADET ══════════════════════════════════════════════════════════════════
 
-const CADET_N = 5
+/** Every challenge, every time: each one teaches a different animal trick. */
+const CADET_N = CADET_CHALLENGES.length
 
 function Cadet({ onFinish }: { onFinish: Finish }) {
-  const rounds = useMemo(
-    () => shuffled(CADET_CHALLENGES, 7).slice(0, CADET_N).map((c, i) => ({ ...c, options: shuffled(c.options, 100 + i) })),
-    [],
-  )
+  const rounds = useMemo(() => shuffled(CADET_CHALLENGES, 7).map((c, i) => ({ ...c, options: shuffled(c.options, 100 + i) })), [])
+  const [viewRef, showView] = useShowView<HTMLDivElement>()
   const [idx, setIdx] = useState(0)
   const [trick, setTrick] = useState<TrickId | null>(null)
   const [outcome, setOutcome] = useState<CadetOutcome | null>(null)
@@ -131,6 +148,7 @@ function Cadet({ onFinish }: { onFinish: Finish }) {
     if (!o.ok) setWrong((w) => w + 1)
     else if (triedHere.length === 0) setFirstTry((f) => f + 1)
     setTriedHere((l) => [...l, id])
+    showView()
   }
 
   const next = () => {
@@ -161,7 +179,7 @@ function Cadet({ onFinish }: { onFinish: Finish }) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
       <div className="flex flex-col gap-3">
-        <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0A1120]">
+        <div ref={viewRef} className="scroll-mt-20 overflow-hidden rounded-[28px] border border-white/10 bg-[#0A1120]">
           <CadetScene task={ch.task} trick={runId > 0 ? trick : null} outcome={runId > 0 ? outcome : null} p={runId > 0 ? p : 0} t={t} />
         </div>
         <Steps n={rounds.length} at={idx} />
@@ -257,6 +275,7 @@ function Pilot({ onFinish }: { onFinish: Finish }) {
   const [runId, setRunId] = useState(0)
   const [done, setDone] = useState(false)
   const station = STATIONS[st].id
+  const [viewRef, showView] = useShowView<HTMLDivElement>()
 
   const quad = useMemo(() => runQuad(beta), [beta])
   const snake = useMemo(() => runSnake(amp), [amp])
@@ -279,6 +298,7 @@ function Pilot({ onFinish }: { onFinish: Finish }) {
     setTests((n) => n + 1)
     setDone(false)
     setRunId((r) => r + 1)
+    showView()
   }
   const change = (fn: (v: number) => void) => (v: number) => {
     fn(v)
@@ -314,7 +334,7 @@ function Pilot({ onFinish }: { onFinish: Finish }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-      <div className="flex flex-col gap-3">
+      <div ref={viewRef} className="flex scroll-mt-20 flex-col gap-3">
         <Steps n={3} at={st} labels={STATIONS.map((s) => `${s.emoji} ${s.name}`)} />
         {station === 'quad' && (
           <>
@@ -491,7 +511,7 @@ function Bench({ design, setDesign, disabled, batteries }: { design: Design; set
         <fieldset disabled={disabled}>
           <legend className="font-display text-base font-black text-[#EEF2F8]">Battery</legend>
           <div className="mt-2 grid grid-cols-3 gap-2">
-            {(Object.keys(BATTERIES) as BatteryId[]).map((b) => (
+            {LEGEND_BATTERIES.map((b) => (
               <button
                 key={b}
                 type="button"
@@ -552,13 +572,14 @@ function EnergyBar({ used, cap }: { used: number; cap: number }) {
 
 function Ace({ onFinish }: { onFinish: Finish }) {
   const [mi, setMi] = useState(0)
-  const [design, setDesign] = useState<Design>({ modules: ['wheels'], gait: 'trot', battery: 'small' })
+  const [design, setDesign] = useState<Design>({ modules: ['wheels'], gait: 'trot', battery: 'ace' })
   const [result, setResult] = useState<CourseResult | null>(null)
   const [runId, setRunId] = useState(0)
   const [done, setDone] = useState(false)
   const [tests, setTests] = useState(0)
   const [used, setUsed] = useState(0)
   const mission = ACE_MISSIONS[mi]
+  const [viewRef, showView] = useShowView<HTMLDivElement>()
 
   const onDone = useCallback(() => {
     setDone(true)
@@ -571,10 +592,11 @@ function Ace({ onFinish }: { onFinish: Finish }) {
 
   const test = () => {
     playSound('click')
-    setResult(runCourse(design, mission.course, ACE_BATTERY_J, null))
+    setResult(runCourse({ ...design, battery: mission.battery }, mission.course, ACE_BATTERY_J, null))
     setTests((n) => n + 1)
     setDone(false)
     setRunId((r) => r + 1)
+    showView()
   }
   const edit = (d: Design) => {
     setDesign(d)
@@ -615,13 +637,13 @@ function Ace({ onFinish }: { onFinish: Finish }) {
           <h2 className="font-display text-xl font-black text-[#EEF2F8]">{mission.name}</h2>
           <p className="mt-1 text-[15px] text-[#A7B0C0]">{mission.story}</p>
         </div>
-        <div className="overflow-hidden rounded-[28px] border border-white/10">
+        <div ref={viewRef} className="scroll-mt-20 overflow-hidden rounded-[28px] border border-white/10">
           <CourseStrip course={mission.course} result={result} p={runId > 0 ? p : 0} t={t} running={runId > 0} />
         </div>
         <div className="grid grid-cols-3 gap-2">
           <Stat label="robot mass" value={`${mass} kg`} />
           <Stat label="weight" value={`${(mass * 9.81).toFixed(1)} N`} />
-          <Stat label="battery" value="7 Wh" />
+          <Stat label="battery" value={`${BATTERIES[mission.battery].label}, ${BATTERIES[mission.battery].kg * 1000} g`} />
         </div>
         {done && result && (
           <Debrief ok={result.ok} title={result.ok ? `Mission complete — ${fmtKj(result.energyJ)} used` : 'Why it stopped'}>
@@ -654,7 +676,14 @@ function Ace({ onFinish }: { onFinish: Finish }) {
   )
 }
 
+/** Practice courses: shown after every test, so the child can learn from them. */
 const LEGEND_SEED = 7001
+/**
+ * Final-check courses: never shown until the design is submitted, and a new set
+ * on every attempt, so a design cannot be fitted to a known test set. The one
+ * design that survives the practice set survives each of these 8 of 8.
+ */
+const FINAL_SEEDS = [2, 3, 99, 1234, 23, 314, 2718]
 const LEGEND_PASS = 7
 
 function Legend({ onFinish }: { onFinish: Finish }) {
@@ -669,7 +698,12 @@ function Legend({ onFinish }: { onFinish: Finish }) {
   const [qWrong, setQWrong] = useState(0)
   const [picked, setPicked] = useState<number | null>(null)
   const [best, setBest] = useState(0)
-  const courses = useMemo(() => legendCourses(LEGEND_SEED), [])
+  const [final, setFinal] = useState(false)
+  const [finalTry, setFinalTry] = useState(0)
+  const [finalScore, setFinalScore] = useState(0)
+  const [viewRef, showView] = useShowView<HTMLDivElement>()
+  const seed = final ? FINAL_SEEDS[(finalTry - 1 + FINAL_SEEDS.length) % FINAL_SEEDS.length] : LEGEND_SEED
+  const courses = useMemo(() => legendCourses(seed), [seed])
   const questions = useMemo(() => LEGEND_QUESTIONS.map((q, i) => ({ ...q, options: shuffled(q.options, 300 + i) })), [])
 
   const passed = results ? results.filter((r) => r.ok).length : 0
@@ -682,20 +716,41 @@ function Legend({ onFinish }: { onFinish: Finish }) {
   const running = runId > 0 && !done
   const mass = designMass(design)
 
-  const test = () => {
+  const start = (rs: CourseResult[]) => {
     playSound('click')
-    const rs = runLegend(design, LEGEND_SEED)
     setResults(rs)
     const firstFail = rs.findIndex((r) => !r.ok)
     setView(firstFail >= 0 ? firstFail : 0)
     setTests((n) => n + 1)
-    setBest((b) => Math.max(b, rs.filter((r) => r.ok).length))
     setDone(false)
     setRunId((r) => r + 1)
+    showView()
+  }
+  const test = () => {
+    const rs = runLegend(design, LEGEND_SEED)
+    setFinal(false)
+    setBest((b) => Math.max(b, rs.filter((r) => r.ok).length))
+    start(rs)
+  }
+  const finalTest = () => {
+    const n = finalTry + 1
+    const rs = runLegend(design, FINAL_SEEDS[(n - 1) % FINAL_SEEDS.length])
+    setFinalTry(n)
+    setFinal(true)
+    setFinalScore(rs.filter((r) => r.ok).length)
+    start(rs)
+  }
+  const backToBench = () => {
+    playSound('click')
+    setFinal(false)
+    setRunId(0)
+    setDone(false)
+    setResults(null)
   }
   const edit = (d: Design) => {
     setDesign(d)
     if (done) {
+      setFinal(false)
       setRunId(0)
       setDone(false)
       setResults(null)
@@ -713,14 +768,14 @@ function Legend({ onFinish }: { onFinish: Finish }) {
   }
   const nextQ = () => {
     if (qi + 1 >= questions.length) {
-      let stars = best >= LEGEND_COURSES ? 3 : 2
+      let stars = finalScore >= LEGEND_COURSES ? 3 : 2
       if (qWrong >= 2) stars -= 1
       if (tests > 10) stars -= 1
       stars = Math.max(1, stars)
       onFinish({
         stars,
-        score: best,
-        scoreLabel: `of ${LEGEND_COURSES} unknown courses survived`,
+        score: finalScore,
+        scoreLabel: `of ${LEGEND_COURSES} never-seen courses survived`,
         message:
           'A generalist robot is a pile of compromises: wings force it to stay under about 4 kg, so it cannot also carry wheels; ice forces a careful gait just where it is needed; and the lightest battery that lasts wins because every kilogram costs energy on every metre.',
         badges: ['right-tool', ...(tests >= 5 ? ['never-give-up'] : [])],
@@ -757,7 +812,7 @@ function Legend({ onFinish }: { onFinish: Finish }) {
         </div>
         {picked !== null && !right && (
           <Debrief ok={false} title="Not quite">
-            <p>Think about what your own robot did on the courses — the debrief numbers hold the answer. Try another.</p>
+            <p>Look back at your approved robot: its mass, its weight in newtons and the numbers in each course debrief hold the answer. Try another.</p>
           </Debrief>
         )}
         {right && (
@@ -776,7 +831,7 @@ function Legend({ onFinish }: { onFinish: Finish }) {
         <div className={CARD}>
           <h2 className="font-display text-xl font-black text-[#EEF2F8]">Design for a world you have not seen</h2>
           <p className="mt-1 text-[15px] text-[#A7B0C0]">
-            Your robot will be dropped onto {LEGEND_COURSES} unknown five-stretch courses. Survive at least {LEGEND_PASS} of them, each within {LEGEND_TIME_S / 60} minutes on one battery. You only know the mix:
+            Practise on {LEGEND_COURSES} five-stretch courses. Once your robot survives {LEGEND_PASS} of them, it faces the real test: {LEGEND_COURSES} brand-new courses it has never seen, and it must survive {LEGEND_PASS} of those too — each within {LEGEND_TIME_S / 60} minutes on one battery. You only know the mix:
           </p>
           <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
             {LEGEND_MIX.map((m) => (
@@ -795,7 +850,8 @@ function Legend({ onFinish }: { onFinish: Finish }) {
           <p className="mt-2 text-xs text-[#A7B0C0]">Ice: μ = 0.15. Glass needs pads holding 2 × weight (pads hold 100 N). Wings lift 40 N at most.</p>
         </div>
         {results && cur && (
-          <>
+          <div ref={viewRef} className="flex scroll-mt-20 flex-col gap-3">
+            <p className="text-xs font-black uppercase tracking-wide text-lime-300">{final ? 'Final test · never-seen courses' : 'Practice courses'}</p>
             <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Courses">
               {results.map((r, i) => (
                 <button
@@ -814,7 +870,7 @@ function Legend({ onFinish }: { onFinish: Finish }) {
             <div className="overflow-hidden rounded-[28px] border border-white/10">
               <CourseStrip course={courses[view]} result={cur} p={runId > 0 ? (done ? 1 : p) : 0} t={t} running={runId > 0} />
             </div>
-          </>
+          </div>
         )}
         {!results && (
           <div className="flex min-h-[160px] items-center justify-center rounded-[28px] border border-dashed border-white/15 bg-white/[0.02] p-6 text-center text-[#A7B0C0]">
@@ -822,7 +878,21 @@ function Legend({ onFinish }: { onFinish: Finish }) {
           </div>
         )}
         {done && results && cur && (
-          <Debrief ok={passed >= LEGEND_PASS} title={passed >= LEGEND_PASS ? `${passed} of ${LEGEND_COURSES} courses survived — design approved!` : `${passed} of ${LEGEND_COURSES} survived. Course ${view + 1}:`}>
+          <Debrief
+            ok={passed >= LEGEND_PASS}
+            title={
+              final
+                ? passed >= LEGEND_PASS
+                  ? `${passed} of ${LEGEND_COURSES} never-seen courses survived — design approved!`
+                  : `Only ${passed} of ${LEGEND_COURSES} new courses survived. Course ${view + 1}:`
+                : passed >= LEGEND_PASS
+                  ? `${passed} of ${LEGEND_COURSES} practice courses survived — ready for the final test`
+                  : `${passed} of ${LEGEND_COURSES} survived. Course ${view + 1}:`
+            }
+          >
+            {final && passed < LEGEND_PASS && (
+              <p className="mb-2">Your design fitted the practice courses but not new ones. Real robots meet terrain nobody tested — design for the whole mix, not for one set of courses.</p>
+            )}
             <p>{cur.ok ? `Course ${view + 1} done in ${fmtTime(cur.timeS)} using ${fmtKj(cur.energyJ)}.` : cur.why}</p>
             <SegmentList r={cur} />
             <div className="mt-3">
@@ -839,10 +909,22 @@ function Legend({ onFinish }: { onFinish: Finish }) {
             <Stat label="weight" value={`${(mass * 9.81).toFixed(1)} N`} good={design.modules.includes('wings') ? mass * 9.81 <= 40 : undefined} />
           </div>
         </div>
-        <button type="button" className={PRIMARY} onClick={test} disabled={running || design.modules.length === 0}>
-          {running ? 'Testing on 8 courses…' : 'Test on the unknown courses ▶'}
-        </button>
-        {done && passed >= LEGEND_PASS && (
+        {!(final && done) && (
+          <button type="button" className={PRIMARY} onClick={test} disabled={running || design.modules.length === 0}>
+            {running ? `Testing on ${LEGEND_COURSES} courses…` : `Practise on ${LEGEND_COURSES} courses ▶`}
+          </button>
+        )}
+        {!final && done && passed >= LEGEND_PASS && (
+          <button type="button" className={PRIMARY} onClick={finalTest}>
+            Final test: {LEGEND_COURSES} never-seen courses ▶
+          </button>
+        )}
+        {final && done && passed < LEGEND_PASS && (
+          <button type="button" className={GHOST} onClick={backToBench}>
+            ← Back to the bench
+          </button>
+        )}
+        {final && done && passed >= LEGEND_PASS && (
           <button
             type="button"
             className={PRIMARY}
@@ -855,7 +937,7 @@ function Legend({ onFinish }: { onFinish: Finish }) {
           </button>
         )}
         <p className="text-center text-sm text-[#A7B0C0]">
-          Tests so far: {tests} · best: {best}/{LEGEND_COURSES}
+          Tests so far: {tests} · best practice: {best}/{LEGEND_COURSES}
         </p>
       </div>
     </div>

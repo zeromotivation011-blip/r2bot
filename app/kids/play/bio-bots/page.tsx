@@ -63,7 +63,7 @@ const TIERS = [
   {
     name: 'Cadet',
     who: 'about 6 and up',
-    what: 'Five challenges: clean a skyscraper window, find a leak in a pipe, cross a river, pick a ripe tomato and more. Pick the animal trick that fits, then watch the robot try it.',
+    what: 'Seven challenges: climb a skyscraper window, find a leak in a pipe, cross a river, pick a ripe tomato, land a drone on a branch and more. Pick the animal trick that fits, then watch the robot try it.',
     tip: 'Ask what makes the place hard. Smooth and straight up? Something has to hold on. Narrow? The body has to be thin. Soft and squashy? The grip has to be soft too.',
   },
   {
@@ -81,7 +81,7 @@ const TIERS = [
   {
     name: 'Legend',
     who: '14 and up — a real design problem',
-    what: 'Design one robot for eight courses you cannot see. You only know the mix of terrains and their lengths. Survive at least seven, then explain the trade-offs.',
+    what: 'Design one robot for terrain you have not seen. You only know the mix of terrains and their lengths. Practise on eight courses; once it survives seven, it faces eight brand-new hidden courses and must survive seven of those too. Then explain the trade-offs.',
     tip: 'Find the hardest constraint first. Wings can lift only 40 N, so a robot that must fly has to stay under about 4 kg — that decides what else it may carry. Then make the gait careful only where it has to be.',
   },
 ]

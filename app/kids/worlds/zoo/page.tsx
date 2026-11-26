@@ -39,7 +39,7 @@ const game = getGame(world.game)!
 const activities = byWorld('zoo')
 
 const BAND_LEARN: Record<string, string> = {
-  explorers: 'Match animal tricks to jobs, spot robot animals on a farm, choose a soft or hard grip, send a goat-bot over rocks and build a window-climbing gecko robot.',
+  explorers: 'Match animal tricks to jobs, spot the robots among farm animals, choose a soft or hard grip, send a goat-bot over rocks and build a window-climbing gecko robot.',
   builders: 'Meet famous bio-bots, choose legs or wheels from the height of the bumps, balance a goat-bot on a slope, count a RoboBee’s flaps and design a pipe-inspecting snake on a battery budget.',
   inventors: 'Name bio-bots from their design, build a rule for static and dynamic gaits, size gecko pads with a safety factor, load a pack robot, work out walking energy from the cost of transport and cross mud and rocks.',
   engineers: 'Match each robot to the physics it borrows, find the Froude-number rule for walking and running, scale flapping power with f³, survive a downhill emergency stop with margin, compute crawl speed and design a multi-terrain explorer.',
@@ -53,7 +53,7 @@ const bands: ZooBand[] = KIDS_BANDS.map((b) => ({
   items: activities.filter((a) => a.band === b.id).map((a) => ({ id: a.id, title: a.title, track: a.track, difficulty: a.difficulty, template: a.template })),
 }))
 
-const GAME_TIERS = ['Match the animal trick to the challenge', 'Tune a gait, a snake wave and a flap rate', 'Combine modules on one small battery', 'Design for unknown terrain, then explain']
+const GAME_TIERS = ['Match the animal trick to the challenge', 'Tune a gait, a snake wave and a flap rate', 'Combine modules on one 7 Wh battery', 'Design for unknown terrain, then explain']
 
 const learningLd = {
   '@context': 'https://schema.org',
@@ -87,7 +87,7 @@ const crumbs = breadcrumbJsonLD([
 ])
 
 const FACTS = [
-  { big: '3 feet', small: 'down at all times keeps a walking robot statically stable' },
+  { big: '3+ feet', small: 'down, with the centre of mass inside the shape they make, keeps a walker statically stable' },
   { big: '~120 / s', small: 'wing beats of Harvard’s insect-sized RoboBee' },
   { big: '0 glue', small: 'gecko feet hold on with forces between molecules' },
 ]
@@ -163,7 +163,7 @@ export default function ZooWorldPage() {
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* Flagship game */}
-          <section aria-labelledby="flagship" className="self-start overflow-hidden rounded-[28px] border border-white/10 bg-[#111C32] shadow-[0_8px_24px_rgba(0,0,0,.45)]">
+          <section aria-labelledby="flagship" className="self-start overflow-hidden p-0 rounded-[28px] border border-white/10 bg-[#111C32] shadow-[0_8px_24px_rgba(0,0,0,.45)]">
             <div className={`bg-gradient-to-r ${game.gradient} px-5 py-4`}>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-lime-50">Flagship game · {game.zone}</p>
               <h2 id="flagship" className="font-display text-2xl font-bold text-white">
@@ -266,7 +266,7 @@ export default function ZooWorldPage() {
         </article>
 
         {/* Activities by band */}
-        <section id="activities" aria-labelledby="activities-title" className="scroll-mt-20">
+        <section id="activities" aria-labelledby="activities-title" className="scroll-mt-20 py-0">
           <h2 id="activities-title" className="font-display text-3xl font-bold text-[#EEF2F8]">
             Robo Zoo activities
           </h2>

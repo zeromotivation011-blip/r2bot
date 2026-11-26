@@ -768,6 +768,8 @@ export interface LegendDayLog {
   water: number[]
   irrigated: boolean[]
   skippedForRain: boolean[]
+  /** Zone's roots sat in waterlogged soil today (clay after big water). */
+  waterlogged: boolean[]
   weeds: number
   infected: number
   events: string[]
@@ -942,6 +944,7 @@ function simulateLegend(plan: LegendPlan, season: LegendSeason, goals?: LegendGo
 
     // Water balance and growth.
     const water: number[] = []
+    const waterlogged: boolean[] = []
     for (let z = 0; z < 3; z++) {
       s[z] += w.rain - w.et * (1 + 0.2 * weeds)
       let logged = false
@@ -969,6 +972,7 @@ function simulateLegend(plan: LegendPlan, season: LegendSeason, goals?: LegendGo
       grown += g
       if (frac < 0.15) wiltDays[z]++
       water.push(Math.round(frac * 100))
+      waterlogged.push(logged)
     }
     // A farmer notices plants wilting (two days in a row) and fixes a stuck-wet sensor.
     if (faultActive && wiltDays[season.sensorFault.zone] >= 2) {
@@ -982,7 +986,7 @@ function simulateLegend(plan: LegendPlan, season: LegendSeason, goals?: LegendGo
       events.push('🔧 The farmer noticed the soggy clay and replaced the stuck sensor')
     }
     wiltDays = wiltDays.map((v, z) => ((s[z] / caps[z]) < 0.15 ? v : 0))
-    log.push({ day: d, weather: w, water, irrigated, skippedForRain: skipped, weeds, infected, events })
+    log.push({ day: d, weather: w, water, irrigated, skippedForRain: skipped, waterlogged, weeds, infected, events })
   }
   void pestFound
   void faultFixed
@@ -1006,8 +1010,19 @@ function simulateLegend(plan: LegendPlan, season: LegendSeason, goals?: LegendGo
   else if (yieldPct >= G.yield - 15) baseStars = 1
 
   const energyParts = { pump: round1(energy.pump), weeding: round1(energy.weeding), drone: round1(energy.drone) }
-  const question = makeQuestion(yieldPct, lost, energyParts, round1(drained), round1(waterMm))
+  const question = makeQuestion(yieldPct, lost, energyParts, round1(drained), round1(waterMm), plan.weeding)
   return { log, yieldPct, waterMm: round1(waterMm), drainedMm: round1(drained), energyKWh, chemicalsL, lost, energyParts, targets, baseStars, question }
+}
+
+/** What to do about weed losses depends on what the plan already does. */
+function weedAdvice(weeding: WeedMethod): string {
+  if (weeding === 'robot-weekly')
+    return 'You already chose the most frequent weeding. Weeds regrow in the days between robot passes and drink the water you pump — and more passes would cost energy against your energy goal. That is the real trade-off.'
+  if (weeding === 'robot-fortnight')
+    return 'Weed more often: a weekly robot pass keeps weeds small, for about 1.5 kWh more per pass. Weeds drink the water you pump.'
+  if (weeding === 'spray')
+    return 'One spray slowed the weeds but did not stop them. A weeding robot removes them again and again with no chemicals — at an energy cost.'
+  return 'Nobody weeded, so weeds grew all season and drank the water you pump. A weeding robot removes them with no chemicals.'
 }
 
 const LOSS_LABEL: Record<keyof LegendResult['lost'], string> = {
@@ -1017,7 +1032,14 @@ const LOSS_LABEL: Record<keyof LegendResult['lost'], string> = {
   weeds: 'Weeds stealing water and light',
 }
 
-function makeQuestion(yieldPct: number, lost: LegendResult['lost'], e: LegendResult['energyParts'], drained: number, water: number): LegendQuestion {
+function makeQuestion(
+  yieldPct: number,
+  lost: LegendResult['lost'],
+  e: LegendResult['energyParts'],
+  drained: number,
+  water: number,
+  weeding: WeedMethod,
+): LegendQuestion {
   const lostTotal = lost.drought + lost.waterlog + lost.pests + lost.weeds
   if (lostTotal >= 3) {
     const keys = Object.keys(lost) as (keyof LegendResult['lost'])[]
@@ -1033,7 +1055,7 @@ function makeQuestion(yieldPct: number, lost: LegendResult['lost'], e: LegendRes
             ? 'Big pulses on clay leave its roots in wet, airless soil — smaller pulses, or skip before storms.'
             : worst === 'pests'
               ? 'Scout with the drone more often: spotted early, a pest patch is tiny and cheap to treat.'
-              : 'Weed more often — weeds drink the water you pump.'
+              : weedAdvice(weeding)
       }`,
     }
   }

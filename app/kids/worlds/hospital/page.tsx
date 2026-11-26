@@ -18,7 +18,7 @@ import { HospitalActivities, HospitalProgressCard, type HospitalBand } from '@/c
 export const runtime = 'nodejs'
 
 const PAGE_URL = 'https://www.r2bot.in/kids/worlds/hospital'
-const TITLE = 'Robot Hospital: Medical Robots for Kids — Surgical Robots, Bionic Hands and Safety'
+const TITLE = 'Robot Hospital: Medical Robots for Kids'
 const DESCRIPTION =
   'A robotics world for kids 5–17 about medical robots. Learn how surgeons control surgical robots with motion scaling and tremor filters, how bionic hands read muscle signals, and how hospitals keep robots safe — with a four-tier game and 24 hands-on activities.'
 
@@ -90,7 +90,7 @@ const crumbs = breadcrumbJsonLD([
 const FACTS = [
   { big: '3 : 1', small: 'motion scaling: 3 cm of hand movement becomes 1 cm at the tool' },
   { big: '8–12', small: 'times a second a human hand trembles — filters remove it' },
-  { big: '0', small: 'decisions a surgical robot makes alone: the surgeon is in control' },
+  { big: '100%', small: 'of a da Vinci-style robot’s moves start with the surgeon’s hands at the console' },
 ]
 
 export default function HospitalWorldPage() {

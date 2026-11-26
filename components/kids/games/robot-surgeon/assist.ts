@@ -16,7 +16,9 @@
 //   - Head sensor: while the surgeon looks away from the viewer the robot
 //     freezes. Switch it off and the instruments keep following a hand that
 //     is no longer watching.
-// Seeded: targets and the team's call come at the same time every round.
+// Seeded: targets and the team's call come the same way every round. The
+// call comes soon after the 2nd target is marked (or at 20–26 s), and the
+// session cannot end until it has been answered or ignored.
 
 import { clamp, rng } from './shared'
 
@@ -99,7 +101,10 @@ export interface AssistState {
   targets: Target[]
   /** Looking away from the viewer. */
   lookingAway: boolean
+  /** When the team calls: a few seconds after the 2nd target is marked, or at the fallback time, whichever is first. */
   alertAt: number
+  /** Seeded pause between the 2nd mark and the team's call. */
+  alertLag: number
   alertOpen: boolean
   alertHandled: boolean
   lookAwayLeft: number
@@ -143,7 +148,8 @@ export function makeAssist(cfg: AssistConfig, seed = 13): AssistState {
     video: [],
     targets,
     lookingAway: false,
-    alertAt: 14 + r() * 6,
+    alertAt: 20 + r() * 6,
+    alertLag: 1 + r() * 1.5,
     alertOpen: false,
     alertHandled: false,
     lookAwayLeft: 0,
@@ -174,7 +180,9 @@ export function missingRequired(cfg: AssistConfig): CheckItem[] {
 export function stepAssist(s: AssistState, hdx: number, hdy: number, press: boolean, dt: number) {
   if (s.done || s.timeUp) return
   s.t += dt
-  // The team calls: the surgeon has to look up at them.
+  // The team calls: the surgeon has to look up at them. The call is tied to
+  // progress (after the 2nd mark), so even a fast surgeon meets it.
+  if (!s.alertHandled && !s.alertOpen && marked(s) >= 2) s.alertAt = Math.min(s.alertAt, s.t + s.alertLag)
   if (!s.alertHandled && !s.alertOpen && s.t >= s.alertAt) s.alertOpen = true
   if (s.alertOpen && !s.lookingAway && s.t - s.alertAt > 6) {
     s.alertOpen = false
@@ -250,7 +258,8 @@ export function stepAssist(s: AssistState, hdx: number, hdy: number, press: bool
   }
   s.video.push({ t: s.t, x: s.x, y: s.y, d: s.d, f: s.f })
   while (s.video.length > 2 && s.video[1].t <= s.t - VIDEO_DELAY - 0.05) s.video.shift()
-  if (s.targets.every((tg) => tg.done) && s.d <= 0) s.done = true
+  // The session ends only once the team's call has been dealt with.
+  if (s.targets.every((tg) => tg.done) && s.d <= 0 && s.alertHandled) s.done = true
   if (s.t >= TIME_LIMIT) s.timeUp = true
 }
 

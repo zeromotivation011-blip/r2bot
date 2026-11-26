@@ -67,10 +67,32 @@ function ease(t: number): number {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
 }
 
-function fixBand(f: Fix | undefined): 'green' | 'amber' | 'red' {
-  if (!f) return 'red'
-  return band(f.l * f.s)
+type Outcome = 'good' | 'amber' | 'bad'
+
+/**
+ * How a fix plays out when the scene runs. Judged on the FIX, not only on the
+ * residual band: the expert fix, a fix that makes the harm rare (likelihood 1),
+ * or one that meets the scene's own limit plays the good moment, even when the
+ * matrix still reads amber because the severity cannot drop (a car is still a car).
+ * Amber and bad are kept for weak fixes and no fix.
+ */
+function fixOutcome(h: Hazard, f: Fix | undefined, limit?: number): Outcome {
+  if (!f) return 'bad'
+  const risk = f.l * f.s
+  const b = band(risk)
+  if (b === 'green') return 'good'
+  if (f.id === bestFix(h).id || f.l <= 1 || (limit !== undefined && risk <= limit)) return 'good'
+  return b === 'red' ? 'bad' : 'amber'
 }
+
+/** Why a good fix can still read amber on the matrix. Empty when it does not. */
+function goodButAmberNote(f: Fix | undefined): string {
+  if (!f || band(f.l * f.s) === 'green') return ''
+  if (f.l <= 1) return `Severity stays ${f.s} (${SEVERITY_WORDS[f.s]}) because the harm would still be just as bad if it happened, but the fix has made it rare. That is as low as this one can go.`
+  return `Still ${f.l} × ${f.s} = ${f.l * f.s} on the matrix, but within what this job allows.`
+}
+
+const OUTCOME_COLOR: Record<Outcome, string> = { good: '#22C55E', amber: '#F59E0B', bad: '#EF4444' }
 
 export default function SafetyInspectorGameClient({ tier: rawTier, onFinish }: Props) {
   const tier = Math.max(0, Math.min(3, rawTier))
@@ -392,7 +414,7 @@ export default function SafetyInspectorGameClient({ tier: rawTier, onFinish }: P
           />
         )}
 
-        {phase === 'run' && <RunPanel hs={hs} fixes={fixes} ev={ev} evNone={evNone} sceneId={scene.id} runT={runT} done={runDone} onDebrief={() => setPhase('debrief')} />}
+        {phase === 'run' && <RunPanel hs={hs} fixes={fixes} ev={ev} evNone={evNone} sceneId={scene.id} limit={scene.limit} runT={runT} done={runDone} onDebrief={() => setPhase('debrief')} />}
 
         {phase === 'debrief' && (
           <Debrief
@@ -408,6 +430,7 @@ export default function SafetyInspectorGameClient({ tier: rawTier, onFinish }: P
             defendOk={defendOk}
             defendTotal={scene.defend?.length ?? 0}
             result={result}
+            limit={scene.limit}
             onFinish={() => onFinish(result)}
           />
         )}
@@ -473,8 +496,7 @@ function SceneView({ tier, phase, resolved, cls, sel, focusId, hint, fixes, runT
             const t = runT - i * MOMENT
             if (t >= MOVE || phase === 'debrief') {
               const f = o.fixes.find((x) => x.id === fixes[o.id])
-              const b = fixBand(f)
-              outcome = b === 'green' ? 'good' : b === 'amber' ? 'amber' : 'bad'
+              outcome = fixOutcome(o, f, scene.limit)
             }
           }
           return (
@@ -535,7 +557,7 @@ function SceneView({ tier, phase, resolved, cls, sel, focusId, hint, fixes, runT
             if (t < 0 || t > MOMENT + 0.4) return null
             const p = ease(clamp01(t / MOVE))
             const f = h.fixes.find((x) => x.id === fixes[h.id])
-            const good = fixBand(f) === 'green'
+            const good = fixOutcome(h, f, scene.limit) === 'good'
             // A protected actor stops short; an unprotected one goes all the way in.
             const stopAt = good ? 0.72 : 1
             const k = Math.min(p, stopAt)
@@ -993,6 +1015,7 @@ function RunPanel({
   ev,
   evNone,
   sceneId,
+  limit,
   runT,
   done,
   onDebrief,
@@ -1002,6 +1025,7 @@ function RunPanel({
   ev: Evaluation
   evNone: Evaluation
   sceneId: string
+  limit?: number
   runT: number
   done: boolean
   onDebrief: () => void
@@ -1018,14 +1042,22 @@ function RunPanel({
           const t = runT - i * MOMENT
           if (t < 0) return null
           const f = h.fixes.find((x) => x.id === fixes[h.id])
-          const b = fixBand(f)
+          const oc = fixOutcome(h, f, limit)
+          const note = oc === 'good' ? goodButAmberNote(f) : ''
           const shown = t >= MOVE
           return (
             <li key={h.id} className="flex items-start gap-2 rounded-xl bg-white/5 px-3 py-2 text-[14px] leading-snug text-[#EEF2F8]">
               <span aria-hidden>{harmQ(h.cat).icon}</span>
               <span>
                 <b className="font-display">{h.label}: </b>
-                {!shown ? '…' : b === 'green' ? <span className="text-emerald-200">{h.run.good}</span> : b === 'amber' ? <span className="text-amber-200">Safer, but still risky. {h.run.bad}</span> : <span className="text-rose-200">{h.run.bad}</span>}
+                {!shown ? (
+                  '…'
+                ) : oc === 'good' ? (
+                  <span className="text-emerald-200">
+                    {h.run.good}
+                    {note && <span className="mt-0.5 block text-[12px] text-[#A7B0C0]">{note}</span>}
+                  </span>
+                ) : oc === 'amber' ? <span className="text-amber-200">Safer, but still risky. {h.run.bad}</span> : <span className="text-rose-200">{h.run.bad}</span>}
               </span>
             </li>
           )
@@ -1084,9 +1116,11 @@ function Debrief({
   defendOk,
   defendTotal,
   result,
+  limit,
   onFinish,
 }: {
   tier: number
+  limit?: number
   hs: Hazard[]
   fixes: Record<string, string>
   cls: Record<string, { done: boolean; first: boolean }>
@@ -1112,7 +1146,8 @@ function Debrief({
           const best = bestFix(h)
           const isBest = f?.id === best.id
           const q = harmQ(h.cat)
-          const b = fixBand(f)
+          const oc = fixOutcome(h, f, limit)
+          const note = oc === 'good' ? goodButAmberNote(f) : ''
           return (
             <li key={h.id} className="rounded-2xl border border-white/10 bg-white/5 p-3 text-[14px] leading-snug text-[#EEF2F8]">
               <p className="flex items-center gap-2 font-display font-bold">
@@ -1122,11 +1157,12 @@ function Debrief({
                 {h.label}
               </p>
               <p className="mt-1">
-                <span style={{ color: BAND_COLOR[b] }} className="font-bold">
-                  {b === 'green' ? '✓' : b === 'amber' ? '!' : '✕'} {f?.label}
+                <span style={{ color: OUTCOME_COLOR[oc] }} className="font-bold">
+                  {oc === 'good' ? '✓' : oc === 'amber' ? '!' : '✕'} {f?.label ?? 'No fix chosen'}
                 </span>
               </p>
               <p className="mt-1 text-[#A7B0C0]">{f?.why}</p>
+              {note && <p className="mt-1 text-[12px] text-[#A7B0C0]">{note}</p>}
               {!isBest && tier < 2 && (
                 <p className="mt-1 text-emerald-200">
                   Best fix: {best.label}. {best.why}

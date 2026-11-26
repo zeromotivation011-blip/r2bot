@@ -14,6 +14,7 @@ import {
   DVL_MAX_ALT,
   SURVEY_DT,
   SURVEY_LEVELS,
+  withLander,
   batteryPct,
   coverage,
   createSurvey,
@@ -57,12 +58,14 @@ const MAX_WP = 8
 
 // The child's last plan survives "Play again" / "Try again" (the shell remounts the game).
 const saved: { ace: AcePlan | null; legend: LegendPlan | null } = { ace: null, legend: null }
+/** Lander seed for the next Ace run: starts at a random point, then moves on every launch (and every round). */
+let landerSeed = -1
 
 const BRIEF: Record<2 | 3, { title: string; steps: string[] }> = {
   2: {
     title: 'Ace — AUV search, out of contact',
     steps: [
-      'A science lander with an acoustic transponder sank somewhere in the dashed circle. Your AUV has no tether and no radio once it dives — so you write its program first.',
+      'A science lander with an acoustic transponder sank somewhere in the dashed circle — a different spot every dive. Your AUV has no tether and no radio once it dives — so you write its program first.',
       'Tap the chart to place up to 8 waypoints. The pale band shows where it can hear the transponder (70 m). It will home in, mark the spot and come home by itself.',
       'Win: mark the lander within 15 m of where it really is, get back to the ship. Choose height, speed and sonar rules wisely.',
     ],
@@ -72,7 +75,7 @@ const BRIEF: Record<2 | 3, { title: string; steps: string[] }> = {
     steps: [
       'Map the whole reef box with a multibeam sonar: a fan of 120° that sees a strip about 3.5 × your height wide.',
       'You set the lawn-mower lines: direction, spacing, height above the seabed and speed. Budget: 60 Wh of battery and 60 minutes.',
-      'Win: 90 % of the box mapped SHARP (detail ≤ 1 m and position error ≤ 8 m), then back to the ship.',
+      'Win: 90 % of the box mapped SHARP (detail ≤ 0.6 m and position error ≤ 8 m), then back to the ship.',
     ],
   },
 }
@@ -149,7 +152,9 @@ export default function SurveyGameClient({ tier, onFinish }: Props) {
     primeAudio()
     playSound('click')
     attempts.current += 1
-    simRef.current = createSurvey(L, tier === 2 ? { ace: { ...ace, waypoints: ace.waypoints.map((w) => [w[0], w[1]] as [number, number]) } } : { legend: { ...leg } })
+    if (landerSeed < 0) landerSeed = Math.floor(Math.random() * 100000)
+    const level = tier === 2 ? withLander(L, landerSeed++) : L
+    simRef.current = createSurvey(level, tier === 2 ? { ace: { ...ace, waypoints: ace.waypoints.map((w) => [w[0], w[1]] as [number, number]) } } : { legend: { ...leg } })
     phaseRef.current = 'running'
     setPhase('running')
     setCursor(null)
@@ -259,7 +264,7 @@ export default function SurveyGameClient({ tier, onFinish }: Props) {
         if (s.outcome !== 'running') end(s)
       } else acc = 0
       const v = viewRef.current
-      if (v) drawMap(ctx, v, L, bathyRef.current, s, planRef.current, { showTruth: phaseRef.current === 'done', now: now / 1000, reduced })
+      if (v) drawMap(ctx, v, s?.level ?? L, bathyRef.current, s, planRef.current, { showTruth: phaseRef.current === 'done', now: now / 1000, reduced })
       if (n++ % 4 === 0) drawProfile(pctx, pw, ph, dpr, L, s, planRef.current.route, planRef.current.altitude)
       if (s && now - hudAt > 150) {
         hudAt = now

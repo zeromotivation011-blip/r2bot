@@ -111,12 +111,16 @@ export const PIPE_CM = 15
 export type Gait = 'trot' | 'crawl' | 'auto'
 export const AUTO_SENSOR_KG = 0.15
 
-export type BatteryId = 'small' | 'medium' | 'large'
+export type BatteryId = 'ace' | 'small' | 'medium' | 'large'
+/** Every pack stores about 170 Wh per kilogram, like a real lithium-ion pack. */
 export const BATTERIES: Record<BatteryId, { id: BatteryId; label: string; wh: number; kg: number }> = {
+  ace: { id: 'ace', label: '7 Wh', wh: 7, kg: 0.04 },
   small: { id: 'small', label: '25 Wh', wh: 25, kg: 0.15 },
   medium: { id: 'medium', label: '50 Wh', wh: 50, kg: 0.3 },
   large: { id: 'large', label: '100 Wh', wh: 100, kg: 0.6 },
 }
+/** The packs a Legend designer can choose from (Ace missions use the fixed 7 Wh pack). */
+export const LEGEND_BATTERIES: BatteryId[] = ['small', 'medium', 'large']
 
 export interface Design {
   modules: ModuleId[]
@@ -620,18 +624,18 @@ export const ACE_MISSIONS: Mission[] = [
       { terrain: 'rubble', length: 150 },
       { terrain: 'pipe', length: 40 },
     ],
-    battery: 'small',
+    battery: 'ace',
   },
   {
     id: 'bridge',
     name: 'Bridge inspector',
-    story: 'Travel 300 m along the riverbank, climb a 20 m glass tower to check its sensors, then hop the 30 m river.',
+    story: 'Travel 300 m along the riverbank, climb a 20 m glass tower to check its sensors, then hop the 30 m river. Battery: 7 Wh.',
     course: [
       { terrain: 'flat', length: 300 },
       { terrain: 'glass', length: 20 },
       { terrain: 'gap', length: 30 },
     ],
-    battery: 'small',
+    battery: 'ace',
   },
   {
     id: 'cave',
@@ -643,12 +647,12 @@ export const ACE_MISSIONS: Mission[] = [
       { terrain: 'rubble', length: 100 },
       { terrain: 'flat', length: 200 },
     ],
-    battery: 'small',
+    battery: 'ace',
   },
 ]
 
-/** Ace missions run on a fixed 7 Wh pack (its mass is the small battery’s). */
-export const ACE_BATTERY_J = 7 * 3600
+/** Ace missions run on a fixed 7 Wh, 40 g pack. */
+export const ACE_BATTERY_J = BATTERIES.ace.wh * 3600
 
 // ── Legend: design for an unknown mix ───────────────────────────────────────
 export const LEGEND_MIX: { terrain: Terrain; weight: number; min: number; max: number }[] = [
@@ -709,12 +713,12 @@ export const LEGEND_QUESTIONS: ExplainQ[] = [
     ],
   },
   {
-    id: 'cot',
-    q: 'Why can adding wheels SAVE energy, even though they add weight?',
+    id: 'wings',
+    q: 'Your approved robot flaps over river gaps. Why could it NOT also carry wheels or the bigger 50 Wh battery?',
     options: [
-      { text: 'Wheels are lighter than every other module.', correct: false },
-      { text: 'Rolling has a much lower cost of transport (about 0.1) than walking (0.7–1.2) or slithering (2+), so on long flat ground the saving beats the cost of carrying 0.6 kg more.', correct: true },
-      { text: 'Wheels make the robot faster, and faster always uses less energy.', correct: false },
+      { text: 'Wheels and big batteries do not fit on the same body as wings.', correct: false },
+      { text: 'The wings lift 40 N at most. The robot already weighs 4.0 kg × 9.81 ≈ 39.2 N, so 0.6 kg of wheels (45.1 N) or the 0.15 kg heavier pack (40.7 N) makes weight beat lift, and it can no longer take off over the gaps.', correct: true },
+      { text: 'A bigger battery always runs out faster, and wheels waste energy on every kind of ground.', correct: false },
     ],
   },
   {

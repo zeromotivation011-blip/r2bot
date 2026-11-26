@@ -1,18 +1,18 @@
 // app/kids/page.tsx — the R2BOT Universe home (server component).
 //
-// The hero is the Universe map: four course planets (one per age band), eight
-// game moons and the Hangar, with the child's explorer card and "continue your
+// The hero is the Universe map: four course planets (one per age band), the
+// game moons, the Hangar and the Worlds belt, with the child's explorer card and "continue your
 // mission" — one client island (KidsHubClient) that server-renders every link
 // and label, then fills in the child's progress. Everything below it is plain
 // server HTML for parents, teachers and search engines: what R2BOT Kids is,
-// the four levels and what each one teaches, every game and the real robotics
-// behind it, schools and parents, the app, and the FAQ.
+// the four levels and what each one teaches, the seven worlds, every game and
+// the real robotics behind it, schools and parents, the app, and the FAQ.
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { jsonldScript } from '@/lib/seo/jsonld'
 import { KIDS_BANDS } from '@/lib/kids/bands'
-import { GAMES, PLANETS } from '@/lib/kids/universe/worlds'
+import { GAMES, PLANETS, WORLDS, getGame, numberWord } from '@/lib/kids/universe/worlds'
 import { LEVELS } from '@/lib/kids/curriculum/levels'
 import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
 import type { LevelNumber } from '@/lib/kids/curriculum/types'
@@ -27,8 +27,12 @@ import { ClassMissionsClient } from '@/components/kids/classroom/ClassMissionsCl
 const BASE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in'
 
 const TITLE = 'R2BOT Kids: Explore the Robot Universe (Ages 5–17)'
-const DESCRIPTION =
-  'A robotics universe for ages 5–17: a story-led course, eight real-physics robot games, 400+ hands-on activities in the Skill Galaxy, a 3D robot to build and code, and a Hangar of badges. For homes and schools.'
+/** Counts come from the data, so the copy never goes stale when a game or world is added. */
+const GAMES_WORD = numberWord(GAMES.length)
+const WORLDS_WORD = numberWord(WORLDS.length)
+const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1)
+
+const DESCRIPTION = `A robotics universe for ages 5–17: a story-led course, ${GAMES_WORD} real-physics robot games, ${WORLDS_WORD} worlds from the deep sea to orbit, 400+ hands-on activities, a 3D robot to build and code, and a Hangar of badges. For homes and schools.`
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -49,7 +53,7 @@ export const metadata: Metadata = {
     url: `${BASE}/kids`,
     siteName: 'R2BOT',
     title: 'R2BOT Kids — explore the Robot Universe',
-    description: 'Four course planets, eight real-physics robot games and your own robot to build and code. Ages 5–17.',
+    description: `Four course planets, ${WORLDS_WORD} worlds, ${GAMES_WORD} real-physics robot games and your own robot to build and code. Ages 5–17.`,
     images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT Kids' }],
   },
 }
@@ -64,7 +68,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'What is the R2BOT Universe?',
-    a: 'It is the map your child explores. Four planets hold the course — one 24-session story season per age band — and eight moons hold standalone games about drones, robot arms, circuits, Mars rovers, machine learning, mapping, swarms and robot sumo. The Hangar in the middle keeps their robot, avatar and badges.',
+    a: `It is the map your child explores. Four planets hold the course — one 24-session story season per age band — and eight moons hold standalone games about drones, robot arms, circuits, Mars rovers, machine learning, mapping, swarms and robot sumo. Along the edge sit ${WORLDS_WORD} worlds where robots really work — the deep sea, a space station, a hospital, a farm, a city, a robot zoo and Robot Guardians, about robot safety — each with its own game and activities. The Hangar in the middle keeps their robot, avatar and badges.`,
   },
   {
     q: 'Are the games really teaching robotics?',
@@ -148,7 +152,7 @@ export default function KidsHubPage() {
             </h1>
           </div>
           <p className="hidden max-w-md text-[17px] text-[#A7B0C0] sm:block">
-            Fly to a planet to start your course, or land on a moon to play a real robotics game.
+            Fly to a planet to start your course, land on a moon to play, or visit a world where robots really work.
           </p>
         </div>
         {/* Renders nothing unless this device joined a class that has missions. */}
@@ -178,7 +182,8 @@ export default function KidsHubPage() {
           <ul className="grid gap-3 sm:grid-cols-2">
             {[
               { icon: '🪐', t: 'Four course planets', d: 'A 24-session story season for each age band, every session ending in a build, a coding challenge and a short check.' },
-              { icon: '🎮', t: 'Eight real games', d: 'Drones, robot arms, circuits, rovers, robot brains, mazes, swarms and sumo — each with Cadet to Legend tiers.' },
+              { icon: '🎮', t: `${cap(GAMES_WORD)} real games`, d: 'Drones, robot arms, circuits, rovers, robot brains, mazes, swarms, sumo and one for every world — each with Cadet to Legend tiers.' },
+              { icon: '🧭', t: `${cap(WORLDS_WORD)} worlds`, d: 'The deep sea, a space station, a hospital, a farm, a city, a robot zoo and Robot Guardians: where robots really work.' },
               { icon: '🌌', t: `${ACTIVITY_COUNT_LABEL} activities`, d: 'The Skill Galaxy: ten tracks of short, hands-on missions — tune, wire, sort, program — at four age levels.' },
               { icon: '🏫', t: 'Ready for classrooms', d: 'Teachers assign sessions and activities to a class; children join with a code and a nickname, nothing more.' },
               { icon: '🤖', t: 'One robot, always yours', d: 'Built part by part in 3D. A robot without a distance sensor really cannot see the wall.' },
@@ -277,10 +282,54 @@ export default function KidsHubPage() {
         </p>
       </section>
 
+      {/* ── The worlds ─────────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-12" aria-labelledby="worlds-h">
+        <h2 id="worlds-h" className="font-display text-2xl font-bold text-[#EEF2F8] sm:text-3xl">
+          {cap(WORLDS_WORD)} worlds where robots really work
+        </h2>
+        <p className="mt-2 max-w-3xl text-[17px] text-[#A7B0C0]">
+          The course teaches the ideas; the worlds show them at work. Each world is a real place robots are used today, with its own
+          four-tier game and activities for every age band.
+        </p>
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {WORLDS.map((w) => {
+            const g = getGame(w.game)
+            return (
+              <li key={w.id}>
+                <Link
+                  href={`/kids/worlds/${w.id}`}
+                  className="group flex h-full min-h-[48px] items-start gap-3 rounded-[20px] border border-white/10 bg-white/[0.03] p-4 transition hover:border-white/20 hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+                >
+                  <span
+                    className={`grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gradient-to-br ${w.gradient} text-2xl shadow-[inset_-4px_-6px_10px_rgba(0,0,0,.4)]`}
+                    aria-hidden
+                  >
+                    {w.emoji}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block font-display font-bold text-[#EEF2F8]">{w.name}</span>
+                    <span className="block text-[14px] text-[#A7B0C0]">{w.tagline}</span>
+                    {g && <span className="mt-1 block text-[13px] font-semibold text-cyan-300">Game: {g.name}</span>}
+                  </span>
+                </Link>
+              </li>
+            )
+          })}
+          <li>
+            <Link
+              href="/kids/worlds"
+              className="flex h-full min-h-[48px] items-center justify-center rounded-[20px] border border-dashed border-amber-400/40 p-4 font-display font-bold text-amber-300 transition hover:border-amber-300 hover:bg-amber-500/[0.06] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+            >
+              All worlds →
+            </Link>
+          </li>
+        </ul>
+      </section>
+
       {/* ── The games ──────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-12" aria-labelledby="games-h">
         <h2 id="games-h" className="font-display text-2xl font-bold text-[#EEF2F8] sm:text-3xl">
-          Eight games with real robotics inside
+          {cap(GAMES_WORD)} games with real robotics inside
         </h2>
         <p className="mt-2 max-w-2xl text-[17px] text-[#A7B0C0]">
           No tap-the-right-answer busywork. Each game runs on a real system, and each has four tiers — Cadet, Pilot, Ace

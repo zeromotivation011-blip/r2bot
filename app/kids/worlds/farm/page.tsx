@@ -40,8 +40,8 @@ const game = getGame(world.game)!
 const activities = byWorld('farm')
 
 const BAND_LEARN: Record<string, string> = {
-  explorers: 'Find the robots on a farm, give each one its job, sort ripe fruit from green, program a watering robot, read a soil sensor and set the line that turns the sprinkler on.',
-  builders: 'Choose sensors for a robot tractor, build a rule that tells weeds from carrots, tune a noisy irrigation valve, plan round muddy ground, combine soil and forecast checks, and work out drip-line water.',
+  explorers: 'Find the robots on a farm, give each one its job, sort what is ripe from what still has to grow, program a watering robot, read a soil sensor and set the line that turns the sprinkler on.',
+  builders: 'Choose sensors for a robot tractor, build a rule that tells weeds from carrots, spot a sick cow from her collar data, plan round muddy ground, combine soil and forecast checks, and work out drip-line water.',
   inventors: 'Identify real farm robots from their designs, train a ripeness classifier, read an NDVI trace from a drone, trace an irrigation controller in code, stop a pump chattering with hysteresis and plan a multi-stop orchard tour.',
   engineers: 'Pick k to beat bad training labels, choose between NDVI and leaf temperature, estimate a season of water in cubic metres, filter a glitchy probe, order a picking robot’s priorities and design the cheapest night-time sensor kit.',
 }

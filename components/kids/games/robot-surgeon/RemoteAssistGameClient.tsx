@@ -57,6 +57,8 @@ export default function RemoteAssistGameClient({ onFinish }: { onFinish: (r: Rou
   const limitNow = useRef(false)
   const markedRef = useRef(0)
   const alertRef = useRef(false)
+  /** Several fixed steps can run in one frame: the end-of-session block must run once. */
+  const ended = useRef(false)
 
   const missing = missingRequired(cfg)
 
@@ -64,11 +66,13 @@ export default function RemoteAssistGameClient({ onFinish }: { onFinish: (r: Rou
     if (missing.length) return
     sim.current = makeAssist(cfg)
     markedRef.current = 0
+    ended.current = false
     setPhase('session')
     playSound('unlock')
   }
 
   const step = useCallback((dt: number) => {
+    if (ended.current) return
     const s = sim.current
     const k = keys.current
     const kx = (k.right ? 1 : 0) - (k.left ? 1 : 0)
@@ -93,6 +97,7 @@ export default function RemoteAssistGameClient({ onFinish }: { onFinish: (r: Rou
     if (s.alertOpen && !alertRef.current) playSound('unlock')
     alertRef.current = s.alertOpen
     if (s.done || s.timeUp) {
+      ended.current = true
       playSound(s.done ? 'star' : 'wrong')
       setPhase('debrief')
     }

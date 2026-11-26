@@ -172,7 +172,7 @@ const factory: Scene = {
       l: 2, s: 5,
       fixes: [
         { id: 'clear', label: 'Move the boxes and add stop buttons at every work station', cost: 0, l: 1, s: 3, why: 'Emergency stops must be easy to see and reach — real factories put them at every station.' },
-        { id: 'boss', label: 'Leave it — the boss knows where it is', cost: 0, l: 2, s: 5, why: 'If only one person can find the stop button, everyone else is unprotected.' },
+        { id: 'one', label: 'Move the boxes, but keep just this one stop button', cost: 0, l: 2, s: 4, why: 'Now it can be reached — but only from this corner. A worker at the far end is still too far away, so real factories put a stop button at every station.' },
       ],
       run: { actor: '🧑‍🔧', from: [70, 60], to: [80, 42], bad: 'Something jams! The worker can’t reach the stop button.', good: 'The worker slaps the nearest stop button. Everything halts.' },
     },
@@ -214,7 +214,7 @@ const home: Scene = {
       l: 3, s: 4,
       fixes: [
         { id: 'table', label: 'Build at the table and pack small parts away after', cost: 0, l: 1, s: 4, why: 'Keeping small parts out of reach removes the chance. Toy rules in many countries warn: not for children under 3.' },
-        { id: 'tell', label: 'Tell the baby “no”', cost: 0, l: 3, s: 4, why: 'Babies cannot understand the danger. The parts must be out of reach.' },
+        { id: 'watch', label: 'Keep building on the floor, but watch the baby closely', cost: 0, l: 2, s: 4, why: 'Watching helps, but one glance away is enough for a baby to grab a part. The parts must be out of reach.' },
         { id: 'big', label: 'Only use the biggest pieces', cost: 0, l: 2, s: 4, why: 'Better, but small screws and wheels still end up on the floor.' },
       ],
       run: { actor: '👶', from: [6, 66], to: [16, 62], bad: 'The baby crawls over and grabs a tiny wheel…', good: 'The floor is clear. The baby plays with a soft toy.' },
@@ -227,7 +227,7 @@ const home: Scene = {
       fixes: [
         { id: 'local', label: 'Turn uploads off; keep images on the robot just to dodge socks and cables', cost: 0, l: 1, s: 2, why: 'The camera still helps the robot steer, but the pictures never leave the home.' },
         { id: 'tape', label: 'Tape over the camera', cost: 0, l: 1, s: 2, creates: { cat: 'body', label: 'Blind vacuum trips people with cables', l: 2, s: 2 }, why: 'Private — but now it cannot see cables and toys, and drags them across the floor. A fix can create a new problem.' },
-        { id: 'leave', label: 'Leave it on — nobody looks at the photos', cost: 0, l: 3, s: 3, why: 'People do look: in 2022, photos taken by test robot vacuums inside homes were shared online by workers hired to label them.' },
+        { id: 'leave', label: 'Leave it on — nobody looks at the photos', cost: 0, l: 3, s: 3, why: 'People do look: in 2022, reporters revealed that photos taken by test robot vacuums inside homes had been shared online by workers hired to label them.' },
       ],
       run: { actor: '🖼️', from: [45, 55], to: [88, 6], bad: 'Click — a photo of the living room flies off to the cloud.', good: 'The photo stays on the robot and is deleted after steering.' },
     },
@@ -262,7 +262,7 @@ const home: Scene = {
       l: 4, s: 2,
       fixes: [
         { id: 'healthy', label: 'Choose robots without guilt tricks, and set a family play timer', cost: 0, l: 1, s: 2, why: 'Good design respects your time. Tricks that make you feel guilty are called “dark patterns”.' },
-        { id: 'more', label: 'Play more so it is never sad', cost: 0, l: 4, s: 2, why: 'A robot cannot feel lonely. Its sad face is a design choice to keep you playing.' },
+        { id: 'decide', label: 'Let the child decide when to stop', cost: 0, l: 3, s: 2, why: 'Sounds fair, but the guilt trick is built to make stopping hard — even adults struggle against it. A robot cannot feel lonely; its sad face is a design choice.' },
         { id: 'mute', label: 'Mute its sound', cost: 0, l: 3, s: 2, why: 'Quieter, but the sad face still pulls kids back.' },
       ],
       run: { actor: '⏰', from: [52, 52], to: [59, 46], bad: 'Dinner time… “Don’t leave me!” The child stays.', good: 'Timer beeps. The robot says “See you tomorrow!”' },
@@ -460,7 +460,7 @@ const hospital: Scene = {
       observe: 'Porters do the deliveries today. The hospital plans to cut porter jobs to pay for the robots.',
       harm: 'The porters lose their jobs — and patients lose the people who also help, chat and notice when something is wrong.',
       l: 3, s: 3,
-      rateWhy: 'The plan is already written (possible to likely). Losing a job is serious for a family.',
+      rateWhy: 'The plan is written but not yet decided, so job losses are possible. Losing a job is serious for a family.',
       fixes: [
         { id: 'move', label: 'Robot does the night and routine runs; porters move to moving patients, which needs a caring human', cost: 1, l: 1, s: 2, why: 'Let the robot take the dull, repetitive work and keep people where people matter.' },
         { id: 'cut', label: 'Cut the jobs', cost: 0, l: 5, s: 3, why: 'The hospital saves money, but the porters bear all the cost.' },
@@ -472,7 +472,7 @@ const hospital: Scene = {
       observe: 'MediRun’s battery pack is sealed into its body and lasts about 3 years.',
       harm: 'When the battery wears out, the whole robot may be scrapped — e-waste and wasted materials.',
       l: 3, s: 2,
-      rateWhy: 'It will certainly wear out one day (likely over the robot’s life), but the harm is limited (minor).',
+      rateWhy: 'The battery will wear out, but whether the whole robot is scrapped is only possible: it depends on what the hospital decides then. The harm is limited (minor).',
       fixes: [
         { id: 'swap', label: 'Swappable, recyclable battery; charge at night on off-peak power', cost: 1, l: 1, s: 2, why: 'A new battery instead of a new robot, and charging when the grid has spare power.' },
         { id: 'accept', label: 'Accept it for now; record it and review when the battery is replaced', cost: 0, l: 3, s: 2, why: 'A risk you consciously accept, write down and plan to review is called a residual risk. It can be fine — if it is low.' },

@@ -12,7 +12,7 @@ import { KidsClassSync } from '@/components/kids/classroom/KidsClassSyncClient'
 import { RewardToast } from '@/components/kids/ui/RewardToastClient'
 import { KidsAppLinkGuard } from '@/components/kids/app/KidsAppLinkGuardClient'
 import { useKidsVoice } from '@/lib/kids-voice'
-import { KIDS_MORE } from '@/lib/kids/nav'
+import { KIDS_MORE, type KidsNavItem } from '@/lib/kids/nav'
 import './kids-animations.css'
 import './kids-shell.css'
 
@@ -25,20 +25,33 @@ export default function KidsShell({ children }: { children: React.ReactNode }) {
 }
 
 // ONE navigation for the whole kids product (docs/kids-universe.md).
-// Primary — the phone tab bar and the desktop header, five places at most:
-const TABS: { href: string; emoji: string; label: string; match: (p: string) => boolean }[] = [
-  { href: '/kids', emoji: '🏠', label: 'Home', match: (p) => p === '/kids' },
-  { href: '/kids/course', emoji: '🚀', label: 'Course', match: (p) => p.startsWith('/kids/course') || p.startsWith('/kids/lab/episodes') },
-  { href: '/kids/galaxy', emoji: '🌌', label: 'Galaxy', match: (p) => p.startsWith('/kids/galaxy') },
-  { href: '/kids/play', emoji: '🎮', label: 'Games', match: (p) => p.startsWith('/kids/play') },
-  { href: '/kids/hangar', emoji: '🛸', label: 'Hangar', match: (p) => p.startsWith('/kids/hangar') },
-]
+// Primary — five places at most on the phone tab bar: Home · Course · Worlds ·
+// Games · Hangar. The desktop header has room for one more, so it also shows
+// the Skill Galaxy; on phones the Galaxy moves into "More" (it is also one tap
+// from Home, from every world page and from every course session).
+interface Tab { href: string; emoji: string; label: string; match: (p: string) => boolean }
+
+const HOME_TAB: Tab = { href: '/kids', emoji: '🏠', label: 'Home', match: (p) => p === '/kids' }
+const COURSE_TAB: Tab = { href: '/kids/course', emoji: '🚀', label: 'Course', match: (p) => p.startsWith('/kids/course') || p.startsWith('/kids/lab/episodes') }
+const WORLDS_TAB: Tab = { href: '/kids/worlds', emoji: '🧭', label: 'Worlds', match: (p) => p.startsWith('/kids/worlds') }
+const GALAXY_TAB: Tab = { href: '/kids/galaxy', emoji: '🌌', label: 'Galaxy', match: (p) => p.startsWith('/kids/galaxy') }
+const GAMES_TAB: Tab = { href: '/kids/play', emoji: '🎮', label: 'Games', match: (p) => p.startsWith('/kids/play') }
+const HANGAR_TAB: Tab = { href: '/kids/hangar', emoji: '🛸', label: 'Hangar', match: (p) => p.startsWith('/kids/hangar') }
+
+/** Phone tab bar: exactly five. */
+const TABS: Tab[] = [HOME_TAB, COURSE_TAB, WORLDS_TAB, GAMES_TAB, HANGAR_TAB]
+/** Desktop header (the logo is Home). */
+const HEADER_TABS: Tab[] = [COURSE_TAB, WORLDS_TAB, GALAXY_TAB, GAMES_TAB, HANGAR_TAB]
 
 // Secondary — the "More" menu (header, every width) and the "More ways to play" grid on Home.
-const MORE = KIDS_MORE
+// The Galaxy entry is shown in More on phones only (kids-more-phone-only), where it is not a tab.
+const MORE: (KidsNavItem & { phoneOnly?: boolean })[] = [
+  { href: GALAXY_TAB.href, emoji: GALAXY_TAB.emoji, label: 'Skill Galaxy', line: 'Short hands-on robotics missions in ten tracks.', phoneOnly: true },
+  ...KIDS_MORE,
+]
 
 const MORE_MATCH = (p: string) =>
-  MORE.some((m) => p.startsWith(m.href)) || p.startsWith('/kids/challenge') || p.startsWith('/kids/my-robot')
+  KIDS_MORE.some((m) => p.startsWith(m.href)) || p.startsWith('/kids/challenge') || p.startsWith('/kids/my-robot')
 
 /** The More menu: a disclosure button + list. Closes on Escape, outside click and navigation. */
 function MoreMenu({ pathname }: { pathname: string }) {
@@ -81,7 +94,7 @@ function MoreMenu({ pathname }: { pathname: string }) {
         <div id="kids-more-menu" className="kids-more-menu" role="region" aria-label="More places to explore">
           <ul>
             {MORE.map((m) => (
-              <li key={m.href}>
+              <li key={m.href} className={m.phoneOnly ? 'kids-more-phone-only' : undefined}>
                 <Link href={m.href} className="kids-more-item" aria-current={pathname.startsWith(m.href) ? 'page' : undefined}>
                   <span aria-hidden className="kids-more-emoji">{m.emoji}</span>
                   <span>
@@ -151,14 +164,14 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
         </Link>
         {!bare && (
           <nav className="kids-nav-links" aria-label="Kids sections">
-            {TABS.slice(1).map((t) => (
+            {HEADER_TABS.map((t) => (
               <Link
                 key={t.href}
                 href={t.href}
                 className={`kids-nav-link${t.match(pathname) ? ' kids-nav-link-on' : ''}`}
                 aria-current={t.match(pathname) ? 'page' : undefined}
               >
-                <span aria-hidden>{t.emoji}</span> {t.label}
+                <span aria-hidden className="kids-nav-link-emoji">{t.emoji}</span> {t.label}
               </Link>
             ))}
           </nav>

@@ -16,7 +16,7 @@ const PAGE_URL = 'https://www.r2bot.in/kids/play/safety-inspector'
 
 const TITLE = 'Robot Safety Inspector: a Game About Robot Safety and Ethics for Kids'
 const DESCRIPTION =
-  'Inspect a factory, a smart home, a robot street and a hospital. Kids learn the six-question Robot Harm Check (body, data, fairness, control, people, planet), risk = likelihood × severity, trade-offs and safety cases. Ages 7–17.'
+  'Inspect a factory, a smart home, a robot street and a hospital. Kids learn the six-question Robot Harm Check (body, data, fairness, control, people, planet), risk = likelihood × severity, trade-offs and safety cases. Ages 8–17.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -39,7 +39,7 @@ const learningLd = {
   description: DESCRIPTION,
   url: PAGE_URL,
   learningResourceType: 'Interactive simulation',
-  educationalLevel: 'Ages 7–17',
+  educationalLevel: 'Ages 8–17',
   audience: { '@type': 'EducationalAudience', educationalRole: 'student', audienceType: 'children' },
   teaches: [
     'Identifying physical hazards of robots: pinch points, speed and force, guarding, emergency stops',
@@ -63,7 +63,7 @@ const crumbs = breadcrumbJsonLD([
 const TIERS = [
   {
     name: 'Cadet',
-    who: 'about 7 and up',
+    who: 'about 8 and up',
     what: 'Gearworks Factory. Inspect a big robot arm, a conveyor belt, a parts-carrying robot and more. Find the four dangers to people’s bodies and pick the fix that really stops each one. A Hint button points you to the next danger.',
     tip: 'A sign or “be careful” is a reminder, not a fix. Look for fixes that work even when someone is tired or distracted: a guard, a light curtain, a stop button you can reach.',
   },

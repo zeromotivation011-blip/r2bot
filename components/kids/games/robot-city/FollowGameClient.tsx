@@ -13,6 +13,7 @@ import {
   A_WET,
   CAR_LEN,
   FOG_RANGE,
+  FLOW_TARGET,
   FOG_START,
   HUMAN_REACT,
   LATENCY,
@@ -20,16 +21,19 @@ import {
   LEAD_SPEED,
   MARGIN_OK,
   ROUTE,
+  TIME_FAST,
+  TIME_LIMIT,
   VAN_AT,
-  followStars,
+  followVerdict,
+  laneFlow,
+  maxFlowHeadway,
   maxSafeSpeed,
   runFollow,
-  safetyMargin,
   stopDist,
   type FollowResult,
   type FollowSettings,
 } from './follow'
-import { COL, fitCanvas, rr, useReducedMotion, useSimLoop } from './shared'
+import { COL, fitCanvas, rr, scrollCanvasIntoView, useReducedMotion, useSimLoop } from './shared'
 import { Debrief, GhostButton, Panel, PrimaryButton, Slider, Stat, type DebriefLine } from './UiClient'
 
 type Phase = 'setup' | 'run' | 'debrief'
@@ -53,6 +57,8 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
   const dHumanWet = stopDist(v, A_WET, HUMAN_REACT)
   const gapM = 2 + set.headway * Math.min(v, LEAD_SPEED)
   const safeFog = maxSafeSpeed(FOG_RANGE, A_WET)
+  const flow = laneFlow(set)
+  const flowMaxH = maxFlowHeadway()
 
   const start = () => {
     const r = runFollow(set)
@@ -61,6 +67,7 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
     play.current = { t: 0, idx: 0, crashSounded: false }
     playSound('click')
     setPhase('run')
+    scrollCanvasIntoView(canvas.current, reduced)
   }
 
   const step = useCallback(
@@ -88,12 +95,12 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
     const r = result
     const f = r ? r.frames[play.current.idx] : null
     const egoS = f ? f.s : 0
-    const span = 72 // metres across the canvas
+    const span = 48 // metres across the canvas
     const k = w / span
     const camS = egoS - span * 0.22
     const X = (s: number) => (s - camS) * k
     const roadY = h * 0.5
-    const laneW = Math.min(h * 0.22, 4 * k)
+    const laneW = Math.min(h * 0.2, 3.6 * k)
     ctx.clearRect(0, 0, w, h)
     // verges + buildings
     ctx.fillStyle = '#16233B'
@@ -149,9 +156,9 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
       const aNow = egoFront >= FOG_START ? A_WET : A_DRY
       const react = f.v * LATENCY
       const brake = (f.v * f.v) / (2 * aNow)
-      ctx.fillStyle = 'rgba(255,168,120,.22)'
+      ctx.fillStyle = 'rgba(255,168,120,.3)'
       ctx.fillRect(X(egoFront), laneC - laneW * 0.45, react * k, laneW * 0.9)
-      ctx.fillStyle = 'rgba(252,104,24,.38)'
+      ctx.fillStyle = 'rgba(252,104,24,.55)'
       ctx.fillRect(X(egoFront + react), laneC - laneW * 0.45, brake * k, laneW * 0.9)
     }
     // the van
@@ -167,7 +174,7 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
       }
     }
     // lead car
-    if (f && f.leadS !== null) carRect(f.leadS - CAR_LEN, '#E2E8F0', f.leadBraking || f.leadV < 0.3)
+    if (f && f.leadS !== null) carRect(f.leadS, '#E2E8F0', f.leadBraking || f.leadV < 0.3)
     // fog: everything beyond the sensor range fades out
     if (inFog) {
       const edge = X(egoFront + FOG_RANGE)
@@ -191,18 +198,20 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
         }
       }
     }
-    // sensor range marker
-    const rangeM = inFog ? FOG_RANGE : 60
-    ctx.strokeStyle = 'rgba(0,229,255,.7)'
-    ctx.setLineDash([4, 4])
-    ctx.lineWidth = 1.5
-    ctx.beginPath()
-    ctx.moveTo(X(egoFront + rangeM), roadY - laneW * 0.1)
-    ctx.lineTo(X(egoFront + rangeM), roadY + laneW * 1.1)
-    ctx.stroke()
-    ctx.setLineDash([])
-    ctx.fillStyle = COL.cyan
-    ctx.fillText(inFog ? `sees ${FOG_RANGE} m` : 'sees far', X(egoFront + rangeM) + 4, roadY + laneW * 1.15)
+    // sensor range marker — only in the fog (in clear weather the car sees
+    // about 150 m, far beyond the edge of this view)
+    if (inFog) {
+      ctx.strokeStyle = 'rgba(0,229,255,.7)'
+      ctx.setLineDash([4, 4])
+      ctx.lineWidth = 1.5
+      ctx.beginPath()
+      ctx.moveTo(X(egoFront + FOG_RANGE), roadY - laneW * 0.1)
+      ctx.lineTo(X(egoFront + FOG_RANGE), roadY + laneW * 1.1)
+      ctx.stroke()
+      ctx.setLineDash([])
+      ctx.fillStyle = COL.cyan
+      ctx.fillText(`sees only ${FOG_RANGE} m`, X(egoFront + FOG_RANGE) + 4, roadY + laneW * 1.15)
+    }
     // our car
     carRect(egoS, COL.amber, !!f && f.a < -1)
     ctx.fillStyle = '#1A1103'
@@ -232,7 +241,9 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
   useSimLoop(phase === 'run', step, draw, 60)
 
   const r = result
-  const stars = r ? followStars(set, r) : 0
+  const verdict = r ? followVerdict(set, r) : null
+  const stars = verdict?.stars ?? 0
+  const flowAdvice = `A ${set.headway.toFixed(1)} s gap lets only about ${Math.round(flow / 10) * 10} cars per hour through this lane; the city needs ${FLOW_TARGET.toLocaleString('en')}. Shorten the gap to ${flowMaxH.toFixed(1)} s or less — as long as the car can still stop behind the car ahead.`
 
   const debrief = (): DebriefLine[] => {
     if (!r) return []
@@ -247,12 +258,24 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
         icon: '🚐',
         text: `In the fog the car saw the van only ${FOG_RANGE} m ahead, but at ${set.speedKmh} km/h on a wet road it needs ${dWet.toFixed(0)} m to stop. It touched the van at ${r.crashed.speedKmh.toFixed(0)} km/h. The fastest speed that can stop in ${FOG_RANGE} m is about ${safeFog.toFixed(0)} km/h.`,
       })
+    else if (verdict?.limit === 'late')
+      lines.push({
+        icon: '⏰',
+        text: `No bumps, but the parcel took ${r.time.toFixed(0)} s and had to arrive within ${TIME_LIMIT} s. A car that crawls everywhere is safe but useless, and it holds up the traffic behind it. Raise the cruise speed: on the dry road it can go faster than the car ahead allows, and in the fog about ${safeFog.toFixed(0)} km/h is the most it can stop from in ${FOG_RANGE} m.`,
+      })
     else {
-      lines.push({ icon: '✅', text: `No bumps. The car finished the ${ROUTE} m route in ${r.time.toFixed(0)} s.` })
-      lines.push({ icon: '🚗', text: `When the car ahead braked hard, your car stopped with ${r.minLeadGap.toFixed(1)} m to spare.` })
+      lines.push({ icon: '✅', text: `No bumps. The car finished the ${ROUTE} m route in ${r.time.toFixed(0)} s (limit ${TIME_LIMIT} s; ${TIME_FAST} s or less counts as fast).` })
+      lines.push({ icon: '🚗', text: `When the car ahead braked hard, your car stopped ${r.minLeadGap.toFixed(1)} m behind its bumper.` })
       if (r.vanMargin !== null) lines.push({ icon: '🚐', text: `In the fog it saw the van ${FOG_RANGE} m away and stopped ${r.vanMargin.toFixed(1)} m short of it, then waited and passed it slowly.` })
-      if (safetyMargin(r) < MARGIN_OK) lines.push({ icon: '📏', text: `That was very close — less than ${MARGIN_OK} m. Real self-driving cars plan to keep a bigger safety margin.` })
-      if (set.speedKmh < 44) lines.push({ icon: '🐢', text: `Safe! But the car could go a little faster and still stop in time. The limit in fog is about ${safeFog.toFixed(0)} km/h.` })
+      if (verdict?.limit === 'tight-lead')
+        lines.push({ icon: '📏', text: `Too close behind the car ahead: only ${r.minLeadGap.toFixed(1)} m left (${MARGIN_OK} m is the minimum here). Increase the following gap — the car ahead can brake harder than yours.` })
+      if (verdict?.limit === 'tight-van')
+        lines.push({ icon: '📏', text: `Too close to the van in the fog: only ${r.vanMargin?.toFixed(1)} m left (${MARGIN_OK} m is the minimum). The gap setting does not help here — slow down to about 44–46 km/h so the car can stop inside the ${FOG_RANGE} m it can see.` })
+      if (verdict && verdict.stars >= 2 && !verdict.fast)
+        lines.push({ icon: '🐢', text: `Safe, but not fast: ${r.time.toFixed(0)} s. The car could go faster and still stop in time — in the fog the limit is about ${safeFog.toFixed(0)} km/h, so try 44–46 km/h.` })
+      if (verdict && verdict.stars >= 2 && !verdict.flowOk) lines.push({ icon: '🚦', text: flowAdvice })
+      if (verdict?.stars === 3)
+        lines.push({ icon: '🚦', text: `Your ${set.headway.toFixed(1)} s gap lets about ${Math.round(flow / 10) * 10} cars per hour through the lane — enough for the city's ${FLOW_TARGET.toLocaleString('en')}. Fast reactions let a robot car keep a shorter gap than a person safely could.` })
     }
     lines.push({ icon: '🧠', text: `A self-driving car reacts in about ${LATENCY} s; a careful person takes about ${HUMAN_REACT} s. At ${set.speedKmh} km/h on a wet road a person would need ${dHumanWet.toFixed(0)} m to stop — your car needs ${dWet.toFixed(0)} m.` })
     return lines
@@ -270,9 +293,17 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
         ? r.crashed.where === 'van'
           ? `Too fast for the fog: a car must be able to stop within the distance it can see.`
           : `Too close to the car in front: the gap must cover the reaction distance plus the difference in braking.`
-        : stars === 3
-          ? `${set.speedKmh} km/h with a ${set.headway.toFixed(1)} s gap: quick, and it could always stop in the distance it could see.`
-          : `Safe drive. ${set.speedKmh < 44 ? 'You can go a bit faster' : 'Keep a bigger safety margin'} for 3 stars.`,
+        : verdict?.limit === 'late'
+          ? `Safe but late: ${r.time.toFixed(0)} s, and the limit is ${TIME_LIMIT} s. Raise the cruise speed.`
+          : verdict?.limit === 'tight-lead'
+            ? `Too close behind the car ahead when it braked. Increase the following gap.`
+            : verdict?.limit === 'tight-van'
+              ? `Too close to the van in the fog. Slow down to about 44–46 km/h — the gap does not matter there.`
+              : verdict?.limit === 'slow'
+                ? `Safe drive. Go a bit faster — up to about 46 km/h still stops in the fog — for 3 stars.`
+                : verdict?.limit === 'flow'
+                  ? `Safe and fast, but the gap is so big that too few cars fit through the lane. Shorten it to ${flowMaxH.toFixed(1)} s or less for 3 stars.`
+                  : `${set.speedKmh} km/h with a ${set.headway.toFixed(1)} s gap: quick, it kept the lane flowing, and it could always stop in the distance it could see.`,
     })
   }
 
@@ -295,7 +326,7 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
                 <h3 className="mt-1 font-display text-2xl font-bold text-white">Safe Speed</h3>
                 <p className="mt-2 text-[16px] leading-snug text-[#EEF2F8]">
                   Set your self-driving car’s <b>cruise speed</b> and <b>following gap</b>, then let it drive itself. The car ahead will brake suddenly, and
-                  later heavy rain and fog hide a broken-down van. Fastest settings that never bump win.
+                  later heavy rain and fog hide a broken-down van. The parcel must arrive within {TIME_LIMIT} s, and big gaps clog the lane. Find the fastest, tightest settings that never bump.
                 </p>
                 <p className="mt-2 text-[14px] text-[#A7B0C0]">Tests so far: {tests}</p>
               </div>
@@ -307,7 +338,7 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
           <Stat label="Gap ahead" value={hud.gap !== null ? `${Math.max(0, hud.gap).toFixed(1)} m` : '—'} tone={hud.gap !== null && hud.gap < 3 ? 'warn' : 'plain'} />
           <Stat label="Route" value={`${Math.min(ROUTE, hud.s).toFixed(0)} m`} />
         </div>
-        {phase === 'debrief' && r && <Debrief title={r.crashed ? 'Bump!' : 'Route complete'} good={!r.crashed} lines={debrief()} onContinue={finish} />}
+        {phase === 'debrief' && r && <Debrief title={r.crashed ? 'Bump!' : verdict?.limit === 'late' ? 'Too slow: the parcel is late' : 'Route complete'} good={stars > 0} lines={debrief()} onContinue={finish} />}
       </div>
 
       <div className="flex flex-col gap-3">
@@ -333,7 +364,7 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
             )}
             {phase === 'run' && (
               <GhostButton pressed={fast} onClick={() => setFast((x) => !x)}>
-                {fast ? '⏩ Fast' : '▶ Normal speed'}
+                {fast ? '▶ Back to normal speed' : '⏩ Fast forward'}
               </GhostButton>
             )}
             {phase === 'debrief' && (
@@ -359,11 +390,14 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
             <li>
               In fog the car can see: <b className="text-cyan-300">{FOG_RANGE} m</b>
             </li>
+            <li>
+              Cars per hour this lane can carry at your gap: <b className={flow >= FLOW_TARGET ? 'text-emerald-300' : 'text-amber-300'}>{Math.round(flow / 10) * 10}</b> (city needs {FLOW_TARGET.toLocaleString('en')})
+            </li>
           </ul>
           <p className="mt-2 text-[13px] leading-snug text-[#6E7888]">Braking distance grows with speed × speed: double the speed, four times the braking distance.</p>
         </Panel>
         <p className="px-1 text-[13px] text-[#6E7888]">
-          Lead car: {Math.round(LEAD_SPEED * 3.6)} km/h, turns off at {LEAD_EXIT} m. Van at {VAN_AT} m.
+          Lead car: {Math.round(LEAD_SPEED * 3.6)} km/h, turns off at {LEAD_EXIT} m. Van at {VAN_AT} m. Time limit {TIME_LIMIT} s.
         </p>
       </div>
     </div>

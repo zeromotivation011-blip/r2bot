@@ -13,9 +13,9 @@ export const runtime = 'nodejs'
 
 const PAGE_URL = 'https://www.r2bot.in/kids/play/robot-city'
 
-const TITLE = 'Robot City: Self-Driving Car Game for Kids (Stopping Distance, Traffic Lights, Safety Rules)'
+const TITLE = 'Robot City: Self-Driving Car Game for Kids'
 const DESCRIPTION =
-  'Help a delivery robot cross busy roads, tune a self-driving car’s speed and following gap against its stopping distance, time the traffic lights of a busy junction, and write the rules a robotaxi follows when the unexpected happens. Four tiers for ages 7–17.'
+  'Help a delivery robot cross busy roads, tune a self-driving car’s speed and following gap against its stopping distance, time the traffic lights of a busy junction, and write the rules a robotaxi follows when the unexpected happens. Four tiers for ages 8–17.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -38,7 +38,7 @@ const learningLd = {
   description: DESCRIPTION,
   url: PAGE_URL,
   learningResourceType: 'Interactive simulation',
-  educationalLevel: 'Ages 7–17',
+  educationalLevel: 'Ages 8–17',
   audience: { '@type': 'EducationalAudience', educationalRole: 'student', audienceType: 'children' },
   teaches: [
     'Stopping distance = reaction distance + braking distance, and why it grows with speed squared',
@@ -61,7 +61,7 @@ const crumbs = breadcrumbJsonLD([
 const TIERS = [
   {
     name: 'Cadet',
-    who: 'about 7 and up',
+    who: 'about 8 and up',
     what: 'Crossing Patrol. A pavement delivery robot carries a parcel across a signal crossing, a zebra crossing and a road with no crossing at all. It stops at every kerb and asks you, its remote helper, “Go?”',
     tip: 'Every car paints an orange stopping zone on the road in front of it. If any zone already reaches the crossing, that car could not stop in time — wait. At the traffic lights, only start on the walking signal, even if the road looks empty.',
   },
@@ -69,7 +69,7 @@ const TIERS = [
     name: 'Pilot',
     who: 'about 9 and up',
     what: 'Safe Speed. Choose a self-driving car’s cruise speed and following gap. It then drives a test route by itself: the car ahead brakes suddenly, and later rain and fog hide a broken-down van.',
-    tip: 'Read the “stopping distance” panel before you drive. On a wet road the car must be able to stop inside the 30 m it can see. The gap is in seconds, so it grows by itself when the car goes faster.',
+    tip: 'Read the “stopping distance” panel before you drive. On a wet road the car must be able to stop inside the 30 m it can see. The gap is in seconds, so it grows by itself when the car goes faster. Too small and you bump the car ahead; too big and too few cars fit through the lane. The parcel also has a time limit, so crawling fails too.',
   },
   {
     name: 'Ace',
@@ -81,7 +81,7 @@ const TIERS = [
     name: 'Legend',
     who: '14 and up',
     what: 'Rulebook. Write up to eight IF … THEN rules for a robotaxi, put them in priority order, and pass a six-scenario safety test suite: a ball then a child, an ambulance, sun glare at a red light, a plastic bag with a car close behind, road works, and an ordinary trip.',
-    tip: 'Watch the replay of every failed test and read which rule was in control. Protecting people goes at the top. Do not over-react: an emergency stop for a plastic bag can cause a crash behind you. When the car cannot understand a scene, it should stop safely and ask a person.',
+    tip: 'Watch the replay of every failed test and read which rule was in control. Protecting people goes at the top. Do not over-react: an emergency stop for a plastic bag can cause a crash behind you. When the car cannot understand a scene, it should stop safely and ask a person. For 3 stars the rulebook must also pass a hidden stress test with a slower reaction time, so leave a margin.',
   },
 ]
 

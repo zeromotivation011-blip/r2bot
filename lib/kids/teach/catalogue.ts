@@ -60,11 +60,13 @@ export function gameHref(id: string): string {
 }
 
 /**
- * Games that have a live page under app/kids/play/<id>. GAMES also lists games
- * that are announced but not built yet (Robo Sumo Arena); assigning one would
- * send a child to a 404. Add an id here in the same change that ships its page.
+ * Games that have a live page under app/kids/play/<id>. Assigning a game that
+ * is not here would send a child to a 404, so add an id in the same change
+ * that ships its page. Since 26 Nov 2026 every entry in GAMES has a page,
+ * including the seven world flagship games.
  */
 export const PLAYABLE_GAME_IDS: ReadonlySet<string> = new Set([
+  'sumo-arena',
   'drone-hover',
   'arm-factory',
   'circuit-city',
@@ -72,6 +74,14 @@ export const PLAYABLE_GAME_IDS: ReadonlySet<string> = new Set([
   'robot-brain',
   'maze-mapper',
   'swarm-reef',
+  // World flagship games
+  'safety-inspector',
+  'ocean-rescue',
+  'bio-bots',
+  'robot-surgeon',
+  'smart-farm',
+  'robot-city',
+  'orbit-repair',
 ])
 
 export function isPlayableGame(id: string): boolean {

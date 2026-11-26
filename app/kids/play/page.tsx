@@ -8,24 +8,26 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { jsonldScript, breadcrumbJsonLD } from '@/lib/seo/jsonld'
-import { GAMES } from '@/lib/kids/universe/worlds'
+import { GAMES, numberWord } from '@/lib/kids/universe/worlds'
 import { TIER_NAMES } from '@/lib/kids/universe/tiers'
 import { KIDS_BANDS } from '@/lib/kids/bands'
 
 const BASE = 'https://www.r2bot.in'
+/** From the data, so the count never goes stale. */
+const GAMES_WORD_CAP = ((w: string) => w.charAt(0).toUpperCase() + w.slice(1))(numberWord(GAMES.length))
 const URL = `${BASE}/kids/play`
 
 export const metadata: Metadata = {
-  title: 'Robot Games for Kids: 8 Real-Physics Robotics Games (Ages 5–17)',
+  title: `Robot Games for Kids: ${GAMES.length} Real-Physics Robotics Games (Ages 5–17)`,
   description:
-    'Eight free robotics games for ages 5–17 that run on real science: tune a drone’s PID controller, program a sumo robot, steer a Mars rover through radio delay, train a robot brain, map a maze and more.',
+    `${GAMES_WORD_CAP} free robotics games for ages 5–17 that run on real science: tune a drone’s PID controller, program a sumo robot, steer a Mars rover through radio delay, pilot an underwater robot, catch a spacecraft with a robot arm and more.`,
   alternates: { canonical: URL },
   openGraph: {
     type: 'website',
     url: URL,
     siteName: 'R2BOT',
     title: 'R2BOT Kids games — real robotics inside every game',
-    description: 'Drones, robot arms, circuits, rovers, robot brains, mazes, swarms and sumo. Four tiers each, Cadet to Legend.',
+    description: 'Drones, robot arms, circuits, rovers, robot brains, mazes, swarms, sumo, and games for the ocean, space, city, farm, hospital, zoo and robot safety worlds. Four tiers each, Cadet to Legend.',
     images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT Kids games' }],
   },
 }
@@ -60,7 +62,7 @@ export default function KidsGamesPage() {
       <section className="mx-auto max-w-6xl px-4 pb-6 pt-6 sm:pt-10" aria-labelledby="games-h">
         <p className="text-[13px] font-bold uppercase tracking-[.14em] text-amber-300">R2BOT Kids · Games</p>
         <h1 id="games-h" className="mt-1 font-display text-3xl font-bold text-[#EEF2F8] sm:text-4xl">
-          Eight robot games with real robotics inside
+          {GAMES_WORD_CAP} robot games with real robotics inside
         </h1>
         <p className="mt-3 max-w-3xl text-[17px] leading-relaxed text-[#A7B0C0]">
           Pick a game. Every one runs on a real system — physics, feedback control, kinematics, circuits, planning or

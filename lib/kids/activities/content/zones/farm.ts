@@ -1,7 +1,7 @@
 // lib/kids/activities/content/zones/farm.ts
 // Smart Farm — Skill Galaxy activities about agricultural robots: soil and
 // crop sensors, precision irrigation, drones and NDVI, picking and weeding
-// robots, autonomous tractors and saving water and chemicals.
+// robots, autonomous tractors, livestock collars and saving water and chemicals.
 // Six per band, difficulty rising. Every one is tagged world: 'farm'.
 // Run `npx tsx lib/kids/activities/verify.ts` after editing.
 
@@ -44,7 +44,7 @@ export const farm: KidsActivity[] = [
     template: 'robot-match',
     difficulty: 1,
     world: 'farm',
-    intro: 'Four farm robots are ready for work. Look at what each one has — wings, an arm, wheels or a cup — and give each robot its job!',
+    intro: 'Four farm robots are ready for work. Look at what each one has — propellers, an arm, wheels or soft cups — and give each robot its job!',
     takeaway: 'Each farm robot is built for one job: what it has (propellers, a gripper, wheels, a camera) shows what it can do.',
     realWorld: 'Real farms use drones to check crops, robots to milk cows, and robots to pick fruit.',
     params: {
@@ -72,11 +72,11 @@ export const farm: KidsActivity[] = [
     template: 'classify-sort',
     difficulty: 2,
     world: 'farm',
-    intro: 'The picking robot must only pick ripe fruit. Help it learn: put each fruit in the right basket — ready to pick, or leave it to grow.',
-    takeaway: 'A picking robot decides from what its camera sees, like colour. Green tomatoes and strawberries are not ripe yet.',
+    intro: 'The picking robot must only pick ripe fruit. Help it learn: put each thing it sees in the right basket — ready to pick, or leave it to grow.',
+    takeaway: 'A picking robot decides from what its camera sees, like colour. Here, red means ripe; flowers and green plants need more time to grow.',
     realWorld: 'Strawberry-picking robots use cameras to find fruit that is red all over before they pick.',
     params: {
-      task: 'Sort each fruit: pick it now, or leave it to ripen.',
+      task: 'Sort each one: pick it now, or leave it to grow.',
       categories: [
         { id: 'pick', label: 'Pick now', icon: '🧺' },
         { id: 'wait', label: 'Leave it to grow', icon: '⏳' },
@@ -84,16 +84,16 @@ export const farm: KidsActivity[] = [
       features: [{ key: 'colour', label: 'Colour', kind: 'word' }],
       items: [
         { id: 'red-tomato', label: 'Red tomato', icon: '🍅', features: { colour: 'red' }, category: 'pick' },
-        { id: 'green-tomato', label: 'Green tomato', icon: '🟢', features: { colour: 'green' }, category: 'wait', why: 'A green tomato is still growing. It turns red when it is ripe.' },
+        { id: 'tomato-flower', label: 'Tomato flower', icon: '🌼', features: { colour: 'yellow' }, category: 'wait', why: 'A yellow tomato flower comes first. The tomato grows from it, starts green and turns red when it is ripe.' },
         { id: 'red-strawberry', label: 'Red strawberry', icon: '🍓', features: { colour: 'red' }, category: 'pick' },
-        { id: 'white-strawberry', label: 'Pale strawberry', icon: '⚪', features: { colour: 'white' }, category: 'wait', why: 'Strawberries start pale and turn red as they ripen.' },
-        { id: 'red-pepper', label: 'Red pepper', icon: '🌶️', features: { colour: 'red' }, category: 'pick' },
-        { id: 'green-berry', label: 'Green strawberry', icon: '🫛', features: { colour: 'green' }, category: 'wait' },
+        { id: 'strawberry-shoot', label: 'Strawberry plant, no fruit yet', icon: '🌱', features: { colour: 'green' }, category: 'wait', why: 'Only green leaves so far. The berries come later, pale at first, then red.' },
+        { id: 'red-chilli', label: 'Red chilli', icon: '🌶️', features: { colour: 'red' }, category: 'pick' },
+        { id: 'apple-bud', label: 'Apple blossom', icon: '🌸', features: { colour: 'pink' }, category: 'wait', why: 'A blossom is a flower. If a bee visits it, it can grow into an apple months later.' },
       ],
       mode: 'sort',
       showFeatures: true,
     },
-    solution: { placements: { 'red-tomato': 'pick', 'green-tomato': 'wait', 'red-strawberry': 'pick', 'white-strawberry': 'wait', 'red-pepper': 'pick', 'green-berry': 'wait' } },
+    solution: { placements: { 'red-tomato': 'pick', 'tomato-flower': 'wait', 'red-strawberry': 'pick', 'strawberry-shoot': 'wait', 'red-chilli': 'pick', 'apple-bud': 'wait' } },
   },
   {
     id: 'farm-path-water-the-thirsty-plants',
@@ -196,20 +196,20 @@ export const farm: KidsActivity[] = [
     difficulty: 1,
     world: 'farm',
     intro: 'A tractor with no driver must find its field, follow the crop rows in bright sun and stop if a sheep wanders in front. Pick its sensors — three fit.',
-    takeaway: 'Each sensor answers one question. A robot tractor needs position, a way to see the rows and a way to spot obstacles.',
-    realWorld: 'Self-driving tractors use satellite positioning accurate to a few centimetres, plus cameras and obstacle sensors.',
+    takeaway: 'Each sensor answers one question. A robot tractor needs position, a way to see the rows, and a way to spot obstacles far enough ahead to stop in time.',
+    realWorld: 'Self-driving tractors use satellite positioning corrected to a few centimetres (RTK), cameras to follow rows, and LiDAR or radar to spot people and animals ahead.',
     params: {
       mission: 'Robot tractor, sunny day',
       conditions: ['sunlight'],
       needs: [
         { capability: 'position', label: 'Drive to the right field' },
         { capability: 'line', label: 'Follow the crop row' },
-        { capability: 'distance-far', label: 'Stop for a sheep ahead' },
+        { capability: 'distance-far', label: 'Stop for a sheep far ahead' },
       ],
-      available: ['gps', 'camera', 'ultrasonic', 'line', 'microphone', 'bump'],
+      available: ['gps', 'camera', 'lidar', 'ir-distance', 'line', 'microphone', 'bump'],
       maxSensors: 3,
     },
-    solution: { sensors: ['gps', 'camera', 'ultrasonic'] },
+    solution: { sensors: ['gps', 'camera', 'lidar'] },
   },
   {
     id: 'farm-sort-weed-or-crop-rule',
@@ -252,35 +252,47 @@ export const farm: KidsActivity[] = [
     solution: { rule: { feature: 'dist', threshold: 4, ifTrue: 'weed', ifFalse: 'crop' } },
   },
   {
-    id: 'farm-tune-irrigation-valve',
-    title: 'Set the irrigation valve',
+    id: 'farm-sort-cow-collar-alerts',
+    title: 'Which cow needs the vet?',
     track: 'sensors',
     band: 'builders',
-    template: 'threshold-tuner',
+    template: 'classify-sort',
     difficulty: 3,
     world: 'farm',
-    intro: 'The valve opens when the soil is too dry and shuts when it is wet enough. The sensor is a bit jumpy. Find a threshold that gets almost every decision right.',
-    takeaway: 'Real sensors are noisy. Put the threshold in the middle of the gap between the two levels, far from both.',
-    realWorld: 'Drip-irrigation controllers open their valves from soil-sensor readings, saving water compared with watering on a timer.',
+    intro: 'Every cow here wears a smart collar that counts her minutes of chewing the cud and her steps each day. A cow that suddenly chews much less is often getting ill. Sort the herd, then build the alert rule.',
+    takeaway: 'Pick the reading that tracks the problem. Chewing drops when a cow is ill; steps also jump when a cow is ready to breed, and she is not sick.',
+    realWorld: 'Dairy farms worldwide use collars or ear tags that track chewing and movement and alert the farmer when a cow chews much less than usual, often before she looks ill.',
     params: {
-      sensor: { name: 'Soil moisture', unit: '%', min: 0, max: 60 },
-      states: {
-        low: { label: 'Too dry', icon: '🥀', level: 18, action: 'Open valve' },
-        high: { label: 'Wet enough', icon: '🌿', level: 38, action: 'Close valve' },
-      },
-      timeline: [
-        { t: 0, state: 'high' },
-        { t: 2.5, state: 'low' },
-        { t: 5, state: 'high' },
-        { t: 7.5, state: 'low' },
-        { t: 10, state: 'high' },
+      task: 'Sort the herd, then make a rule: healthy, or call the vet?',
+      categories: [
+        { id: 'ok', label: 'Healthy', icon: '✅' },
+        { id: 'vet', label: 'Call the vet', icon: '🩺' },
       ],
-      trace: { durationS: 12, sampleHz: 10, noise: 2.5, seed: 21 },
-      rampS: 0.6,
-      allowedErrorPct: 6,
-      liveStats: true,
+      features: [
+        { key: 'chew', label: 'Chewing the cud', kind: 'number', unit: 'min a day' },
+        { key: 'steps', label: 'Steps', kind: 'number', unit: 'a day' },
+      ],
+      items: [
+        { id: 'daisy', label: 'Daisy', icon: '🐄', features: { chew: 520, steps: 2600 }, category: 'ok' },
+        { id: 'rosa', label: 'Rosa', icon: '🐄', features: { chew: 210, steps: 1500 }, category: 'vet', why: 'Rosa chews for only 210 minutes — less than half of a healthy cow. Something is wrong.' },
+        { id: 'luna', label: 'Luna', icon: '🐄', features: { chew: 430, steps: 9800 }, category: 'ok', why: 'Luna walks a lot today because she is ready to breed, but she still chews normally. She is not ill.' },
+        { id: 'maple', label: 'Maple', icon: '🐄', features: { chew: 180, steps: 2400 }, category: 'vet', why: 'Maple walks a normal amount, but she has almost stopped chewing. That is the warning sign.' },
+        { id: 'pearl', label: 'Pearl', icon: '🐄', features: { chew: 550, steps: 2000 }, category: 'ok' },
+        { id: 'tilly', label: 'Tilly', icon: '🐄', features: { chew: 260, steps: 2900 }, category: 'vet' },
+        { id: 'bella', label: 'Bella', icon: '🐄', features: { chew: 480, steps: 3100 }, category: 'ok' },
+      ],
+      testItems: [
+        { id: 't1', label: 'New cow', icon: '🐄', features: { chew: 500, steps: 2200 }, category: 'ok' },
+        { id: 't2', label: 'New cow', icon: '🐄', features: { chew: 150, steps: 1800 }, category: 'vet' },
+        { id: 't3', label: 'New cow', icon: '🐄', features: { chew: 450, steps: 8800 }, category: 'ok' },
+        { id: 't4', label: 'New cow', icon: '🐄', features: { chew: 240, steps: 3300 }, category: 'vet' },
+      ],
+      mode: 'both',
     },
-    solution: { threshold: 28 },
+    solution: {
+      placements: { daisy: 'ok', rosa: 'vet', luna: 'ok', maple: 'vet', pearl: 'ok', tilly: 'vet', bella: 'ok' },
+      rule: { feature: 'chew', threshold: 350, ifTrue: 'ok', ifFalse: 'vet' },
+    },
   },
   {
     id: 'farm-plan-tractor-to-the-barn',
@@ -388,7 +400,7 @@ export const farm: KidsActivity[] = [
     template: 'robot-match',
     difficulty: 2,
     world: 'farm',
-    intro: 'Five real farm robots, names hidden. Read each design — power, sensors, tools — and work out which job it was built for. One job has no robot here.',
+    intro: 'Five real farm robots, names hidden. Read each design — power, sensors, tools — and work out which job it was built for.',
     takeaway: 'A robot’s design reveals its job: lasers or blades for weeds, nozzles for spraying, soft cups for milking, solar panels for slow all-day work.',
     realWorld: 'All of these robots work on real farms today, from Europe and the Americas to Asia and Oceania.',
     params: {
@@ -397,15 +409,15 @@ export const farm: KidsActivity[] = [
       robots: [
         { id: 'see-spray', name: 'See & Spray', icon: '🚜', clues: ['Cameras along a wide boom', 'Spray nozzles that open one by one'], fact: 'John Deere’s See & Spray looks at every plant and sprays herbicide only onto weeds.', job: 'spot-spray' },
         { id: 'laser', name: 'LaserWeeder', icon: '🔦', clues: ['Pulled behind a tractor', 'Cameras and many lasers pointing down'], fact: 'Carbon Robotics’ LaserWeeder finds weeds with AI vision and burns them with lasers — no chemicals.', job: 'weed' },
-        { id: 'astronaut', name: 'Lely Astronaut', icon: '🐄', clues: ['A robot arm under a stall', 'A camera finds each teat'], fact: 'In voluntary milking, cows walk in when they choose; the arm attaches the cups by itself.', job: 'milk' },
+        { id: 'astronaut', name: 'Lely Astronaut', icon: '🤖', clues: ['A robot arm under a stall', 'A camera finds each teat'], fact: 'In voluntary milking, cows walk in when they choose; the arm attaches the cups by itself.', job: 'milk' },
         { id: 'farmdroid', name: 'FarmDroid', icon: '☀️', clues: ['Solar panels on top', 'Records where every seed was sown'], fact: 'FarmDroid is solar powered: it sows seeds, remembers their positions and hoes weeds around them.', job: 'sow' },
-        { id: 'agras', name: 'Spray drone', icon: '🛸', clues: ['Eight propellers', 'A tank of liquid under its body'], fact: 'Spray drones treat rice and other crops from the air, even on steep or flooded fields.', job: 'air-spray' },
+        { id: 'agras', name: 'Spray drone', icon: '⚙️', clues: ['Eight propellers', 'A tank of liquid under its body'], fact: 'Spray drones treat rice and other crops from the air, even on steep or flooded fields.', job: 'air-spray' },
       ],
       jobs: [
         { id: 'spot-spray', label: 'Spray only the weeds in a big field', icon: '🎯' },
         { id: 'weed', label: 'Kill weeds without chemicals', icon: '🌱' },
         { id: 'milk', label: 'Milk cows whenever they want', icon: '🥛' },
-        { id: 'sow', label: 'Sow seeds and hoe around them, all day', icon: '🌾' },
+        { id: 'sow', label: 'Sow seeds and hoe around them, all day', icon: '🫘' },
         { id: 'air-spray', label: 'Treat a flooded rice paddy', icon: '🌾' },
       ],
     },

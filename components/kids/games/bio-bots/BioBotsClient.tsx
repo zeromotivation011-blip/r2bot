@@ -43,10 +43,10 @@ const HOW_TO_PLAY = (
         <b>Pilot:</b> tune one number at three stations — how long each foot stays down, how wide a snake wave is, how fast wings flap.
       </li>
       <li>
-        <b>Ace:</b> combine modules for three missions on one small battery. Weight costs energy on every metre.
+        <b>Ace:</b> combine modules for three missions on one 7 Wh battery. Weight costs energy on every metre.
       </li>
       <li>
-        <b>Legend:</b> design one robot for courses you cannot see, then explain the trade-offs.
+        <b>Legend:</b> practise, then send one robot onto courses it has never seen, and explain the trade-offs.
       </li>
     </ul>
     <p>Use touch or the keyboard (Tab, Enter, arrow keys on sliders). The same design always gives the same result.</p>

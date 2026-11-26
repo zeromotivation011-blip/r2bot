@@ -16,13 +16,13 @@ import { ZH_TOPICS } from '@/lib/ai-robotics-zh';
 import { HI_TOPICS } from '@/lib/ai-robotics-hi';
 import { ES_TOPICS } from '@/lib/ai-robotics-es';
 import { listPublishedCourses, hasVideo } from '@/lib/courses';
-import { GROUP_UPDATED, pageUpdated as at } from '@/lib/content-dates';
+import { GROUP_UPDATED, PAGE_UPDATED, pageUpdated as at } from '@/lib/content-dates';
 import { ATLAS_ROBOTS_REDIRECTED } from '@/lib/canonical-map';
 import { getAllDailyLifeArticles } from '@/lib/daily-life-articles/loader';
 import { listTranslations, atlasPath } from '@/lib/atlas-i18n';
 import { ROS2_FIXES } from '@/lib/ros2-fixes';
 import { EPISODES as KIDS_EPISODES } from '@/lib/kids/stories';
-import { GAMES as KIDS_GAMES } from '@/lib/kids/universe/worlds';
+import { GAMES as KIDS_GAMES, WORLDS as KIDS_WORLDS } from '@/lib/kids/universe/worlds';
 import { TRACKS as KIDS_TRACKS } from '@/lib/kids/activities/types';
 import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1';
 
@@ -196,7 +196,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Skill Galaxy tracks (the 400+ activity pages themselves are noindex: playable, not reference).
     ...KIDS_TRACKS.map((t) => ({ url: `${BASE}/kids/galaxy/${t.id}`, lastModified: at('/kids/galaxy'), changeFrequency: 'monthly' as const, priority: 0.6 })),
     // Universe games: every game has a built, indexable page.
-    ...KIDS_GAMES.map((g) => ({ url: `${BASE}/kids/play/${g.id}`, lastModified: at('/kids/play'), changeFrequency: 'monthly' as const, priority: 0.7 })),
+    // (world flagship games carry their own date in lib/content-dates.ts; the rest fall back to /kids/play's).
+    ...KIDS_GAMES.map((g) => ({ url: `${BASE}/kids/play/${g.id}`, lastModified: PAGE_UPDATED[`/kids/play/${g.id}`] ? at(`/kids/play/${g.id}`) : at('/kids/play'), changeFrequency: 'monthly' as const, priority: 0.7 })),
+    // Universe worlds: the index and one indexable page per world (lib/kids/universe/worlds.ts WORLDS).
+    { url: `${BASE}/kids/worlds`, lastModified: at('/kids/worlds'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    ...KIDS_WORLDS.map((w) => ({ url: `${BASE}/kids/worlds/${w.id}`, lastModified: at(`/kids/worlds/${w.id}`), changeFrequency: 'monthly' as const, priority: 0.7 })),
     { url: `${BASE}/kids/world`, lastModified: at('/kids/world'), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE}/kids/schools`, lastModified: at('/kids/schools'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/stories`, lastModified: at('/kids/stories'), changeFrequency: 'monthly' as const, priority: 0.7 },

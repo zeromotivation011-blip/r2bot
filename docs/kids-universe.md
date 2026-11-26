@@ -19,9 +19,27 @@ learning) and four difficulty tiers — **Cadet, Pilot, Ace, Legend** — so a
 ## The map
 - **Planets** (`lib/kids/universe/worlds.ts` → `PLANETS`): the four course levels
   (curriculum in `lib/kids/curriculum/`), 24 sessions each.
-- **Zones / games** (`GAMES`): standalone advanced games at `/kids/play/<id>`.
+- **Zones / games** (`GAMES`): standalone advanced games at `/kids/play/<id>`. Only
+  games with a built, QA'd page are in `GAMES` (it feeds the map, the sitemap, the
+  Hangar and `PLAYABLE_GAME_IDS` in `lib/kids/teach/catalogue.ts`). Copy never types
+  the count: use `numberWord(GAMES.length)`.
+- **Worlds** (`WORLDS`, 26 Nov 2026): seven themed places where robots really work —
+  Robot Guardians, Ocean Lab, Robo Zoo, Robot Hospital, Smart Farm, Robot City, Space
+  Station. Each has an indexable page `/kids/worlds/<id>`, a flagship game in `GAMES`
+  (`world.game`; `WORLD_GAME_IDS`, `worldForGame()`) and Skill Galaxy activities tagged
+  `world: <id>` (`byWorld()`). The index is `/kids/worlds`. On the map the flagship games
+  are NOT moons: the worlds sit on the **Worlds belt** along the bottom edge, so the phone
+  map keeps 4 planets + 8 moons + the Hangar. World progress (activities done, game
+  played) is `components/kids/universe/WorldProgressClient.tsx`, shown on `/kids/worlds`
+  and in the Hangar; activity ids come from the server, never the activity params.
 - **Hangar**: the child's robot (`lib/kids/robot-design.ts`), avatar, badges, unlocks.
 - **Lab**: the real-physics simulator (`lib/kids/sim/`), Rapier + Blockly.
+
+## Navigation — one shell
+`app/kids/KidsShell.tsx`. Phone tab bar, exactly five: **Home · Course · Worlds · Games ·
+Hangar**. Desktop header (logo = Home): Course · Worlds · Galaxy · Games · Hangar. On
+phones the Skill Galaxy is the first item of "More" (hidden there on desktop, where it is
+a header link). Secondary surfaces: `KIDS_MORE` in `lib/kids/nav.ts`.
 
 ## Data — one store
 `lib/kids-progress.ts` is the only progress store (localStorage, synced to a

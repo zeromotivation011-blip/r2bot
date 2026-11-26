@@ -424,7 +424,7 @@ export const city: KidsActivity[] = [
       items: [
         { id: 'light', label: 'Is the traffic light red or green?', icon: '🚦', features: { need: 'colour' }, category: 'camera' },
         { id: 'sign', label: 'Read a speed-limit sign', icon: '🔢', features: { need: 'writing' }, category: 'camera' },
-        { id: 'lines', label: 'Find the painted lane lines', icon: '〰️', features: { need: 'paint' }, category: 'camera', why: 'Paint is flat, so it has no shape for lidar to measure — but a camera sees its colour.' },
+        { id: 'lines', label: 'Find the painted lane lines', icon: '〰️', features: { need: 'paint' }, category: 'camera', why: 'Cameras see the paint’s colour and pattern best. Lidar can only pick up bright paint from how strongly it reflects the laser.' },
         { id: 'kerb', label: 'Exact shape of the kerb at night', icon: '📐', features: { need: '3-D shape' }, category: 'lidar', why: 'Lidar brings its own laser light, so it measures shapes in the dark.' },
         { id: 'bike', label: 'Precise outline of a parked bike', icon: '🚲', features: { need: '3-D shape' }, category: 'lidar' },
         { id: 'fog', label: 'A car 150 m ahead in thick fog', icon: '🌫️', features: { need: 'see through fog' }, category: 'radar', why: 'Radio waves pass through fog and rain far better than light does.' },

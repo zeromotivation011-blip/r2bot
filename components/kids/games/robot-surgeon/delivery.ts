@@ -10,10 +10,15 @@
 //   - Like real mobile robots it carries a laser scanner with two safety
 //     fields: a SLOW field (1.6 m) and a STOP field.
 //     Entering the slow field while fast is the driver's mistake (a warning).
-//     The STOP field is 0.15 m plus the braking distance at the current speed
-//     (so it grows with speed, as on real robots): if someone is inside it
-//     while the robot closes in, it makes an automatic protective stop and
-//     waits — safe, but slow.
+//     The STOP field is a box in front of the robot, in the direction it is
+//     driving: as wide as the robot plus 0.1 m each side, and as long as
+//     0.15 m plus the braking distance at the current speed (so it grows with
+//     speed, as on real robots). If someone is inside it, the robot makes an
+//     automatic protective stop and waits — safe, but slow. One person met
+//     once counts as one stop, however long the meeting lasts.
+//   - People keep to their right and step further aside (or round the other
+//     side) when the robot comes near, so a robot that keeps to its own right
+//     and goes slowly can always pass.
 //   - Hitting a wall at speed is a bump (bumper switch).
 // Deterministic: people walk seeded patrols, so the same driving gives the
 // same result.
@@ -30,7 +35,15 @@ export const BRAKE = 1.6
 export const SLOW_FIELD = 1.6
 /** Protective stop field grows with speed, as on real mobile robots: margin + braking distance. */
 export const stopField = (v: number) => 0.15 + (v * v) / (2 * BRAKE)
-export const TIME_LIMIT = 150
+/** Long enough to finish in careful speed all the way (about 185 s); 3 stars need 110 s or less. */
+export const TIME_LIMIT = 240
+/** Half-width of the stop field box. */
+export const STOP_HALF_W = ROBOT_R + 0.1
+/** Seconds the robot holds still after a protective stop. */
+export const STOP_HOLD = 1.2
+/** How far people keep from the corridor centre line: normally, and when stepping aside. */
+const SIDE_WALK = 0.45
+const SIDE_ASIDE = 0.75
 
 // # wall · . floor · P pharmacy + charger · A/B/C ward doors
 export const MAP = [
@@ -90,6 +103,8 @@ interface Person {
   speed: number
   pause: number
   icon: string
+  /** Signed distance from the centre line (+ = the person's right). */
+  side: number
 }
 
 export interface DeliveryState {
@@ -112,6 +127,8 @@ export interface DeliveryState {
   stopHold: number
   /** Index set of people currently inside the slow field (so one pass = one warning). */
   nearFlags: boolean[]
+  /** People who already caused a protective stop on this meeting (one meeting = one counted stop). */
+  stopFlags: boolean[]
   bumpCooldown: number
   distance: number
   /** Short-lived messages for the screen. */
@@ -129,7 +146,8 @@ export function makeDelivery(seed = 7): DeliveryState {
     { path: [c(3, 3), c(11, 3)], icon: '🧑‍⚕️', speed: 0.75 },
     { path: [c(2, 7), c(11, 7)], icon: '🧓', speed: 0.45 },
     { path: [c(7, 1), c(11, 1)], icon: '👩‍⚕️', speed: 0.7 },
-    { path: [c(1, 2), c(1, 5), c(3, 5)], icon: '🧑‍🦽', speed: 0.55 },
+    // Kept clear of the charger, so nobody is beside the robot when the shift starts.
+    { path: [c(3, 5), c(1, 5), c(1, 3)], icon: '🧑‍🦽', speed: 0.55 },
   ].map((p, i) => {
     const seg = 0
     const f = r()
@@ -137,7 +155,7 @@ export function makeDelivery(seed = 7): DeliveryState {
     const b = p.path[1]
     const bx = a.x + (b.x - a.x) * f * 0.6
     const by = a.y + (b.y - a.y) * f * 0.6
-    return { ...p, seg, dir: (i % 2 ? -1 : 1) as 1 | -1, bx, by, x: bx, y: by, pause: r() * 2 }
+    return { ...p, seg, dir: (i % 2 ? -1 : 1) as 1 | -1, bx, by, x: bx, y: by, pause: r() * 2, side: SIDE_WALK }
   })
   for (const p of people) placeOnRight(p)
   return {
@@ -147,7 +165,8 @@ export function makeDelivery(seed = 7): DeliveryState {
     vx: 0,
     vy: 0,
     heading: 0,
-    fast: true,
+    // Start careful: the child chooses when it is safe to go fast.
+    fast: false,
     delivered: { A: false, B: false, C: false },
     done: false,
     timeUp: false,
@@ -157,6 +176,7 @@ export function makeDelivery(seed = 7): DeliveryState {
     autoStops: 0,
     stopHold: 0,
     nearFlags: people.map(() => false),
+    stopFlags: people.map(() => false),
     bumpCooldown: 0,
     distance: 0,
     flash: null,
@@ -164,21 +184,49 @@ export function makeDelivery(seed = 7): DeliveryState {
   }
 }
 
+/** Unit direction of a person's travel, and their right-hand side (screen y points down). */
+function frame(p: Person) {
+  const a = p.path[p.seg]
+  const b = p.path[Math.min(p.seg + 1, p.path.length - 1)]
+  let dx = (b.x - a.x) * p.dir
+  let dy = (b.y - a.y) * p.dir
+  const d = Math.hypot(dx, dy) || 1
+  dx /= d
+  dy /= d
+  return { fx: dx, fy: dy, rx: -dy, ry: dx }
+}
+
 function movePeople(s: DeliveryState, dt: number) {
   for (const p of s.people) {
+    // Step aside: when the robot is near, move over to whichever side of the
+    // corridor it is NOT on (normally your own right), close to the wall.
+    const dRobot = Math.hypot(s.x - p.x, s.y - p.y)
+    const fr = frame(p)
+    const robotLat = (s.x - p.bx) * fr.rx + (s.y - p.by) * fr.ry
+    const want = dRobot < 2.5 ? (robotLat > 0.1 ? -SIDE_ASIDE : SIDE_ASIDE) : SIDE_WALK
+    const ds = want - p.side
+    const sideStep = 1.0 * dt
+    p.side += Math.abs(ds) <= sideStep ? ds : Math.sign(ds) * sideStep
     if (p.pause > 0) {
       p.pause -= dt
+      placeOnRight(p)
       continue
     }
     const target = p.path[p.dir === 1 ? p.seg + 1 : p.seg]
-    // People politely wait when the robot is right in front of them.
-    const dRobot = Math.hypot(s.x - p.x, s.y - p.y)
-    const towardRobot = (target.x - p.x) * (s.x - p.x) + (target.y - p.y) * (s.y - p.y) > 0
-    if (dRobot < ROBOT_R + PERSON_R + 0.35 && towardRobot) continue
     const dx = target.x - p.bx
     const dy = target.y - p.by
     const d = Math.hypot(dx, dy)
     const step = p.speed * dt
+    // Wait (and keep stepping aside) rather than walk into the robot.
+    if (d > 1e-6) {
+      const nx = p.x + (dx / d) * step
+      const ny = p.y + (dy / d) * step
+      const dNext = Math.hypot(s.x - nx, s.y - ny)
+      if (dNext < ROBOT_R + PERSON_R + 0.08 && dNext < dRobot) {
+        placeOnRight(p)
+        continue
+      }
+    }
     if (d <= step) {
       p.bx = target.x
       p.by = target.y
@@ -203,18 +251,11 @@ function movePeople(s: DeliveryState, dt: number) {
   }
 }
 
-/** People keep to the right-hand side of the corridor, 0.45 m off the centre line. */
+/** People keep to the right-hand side of the corridor (p.side metres off the centre line). */
 function placeOnRight(p: Person) {
-  const a = p.path[p.seg]
-  const b = p.path[Math.min(p.seg + 1, p.path.length - 1)]
-  let dx = (b.x - a.x) * p.dir
-  let dy = (b.y - a.y) * p.dir
-  const d = Math.hypot(dx, dy) || 1
-  dx /= d
-  dy /= d
-  // Screen y points down, so "right of travel" is (−dy, dx).
-  p.x = p.bx - dy * 0.45
-  p.y = p.by + dx * 0.45
+  const fr = frame(p)
+  p.x = p.bx + fr.rx * p.side
+  p.y = p.by + fr.ry * p.side
 }
 
 /** Push a circle out of wall cells; returns true if it touched one. */
@@ -303,20 +344,27 @@ export function stepDelivery(s: DeliveryState, input: { x: number; y: number }, 
     const dx = s.x - p.x
     const dy = s.y - p.y
     const d = Math.hypot(dx, dy)
-    const gap = d - ROBOT_R - PERSON_R
     if (d < ROBOT_R + PERSON_R && d > 1e-6) {
       const push = ROBOT_R + PERSON_R - d
       s.x += (dx / d) * push
       s.y += (dy / d) * push
     }
-    // Protective stop: someone inside the stop field while we are moving toward them.
-    const closing = -(s.vx * dx + s.vy * dy) / Math.max(d, 1e-6)
-    if (gap < stopField(speed) && closing > 0.15 && s.stopHold <= 0) {
-      s.autoStops++
-      s.vx = 0
-      s.vy = 0
-      s.stopHold = 1.5
-      s.flash = { text: 'Safety stop! Someone was too close.', ttl: 1.8, kind: 'bad' }
+    // Protective stop: someone inside the stop box in front of the robot.
+    if (speed > 0.15 && s.stopHold <= 0) {
+      const ux = s.vx / speed
+      const uy = s.vy / speed
+      const ahead = -(dx * ux + dy * uy)
+      const lateral = Math.abs(-dx * uy + dy * ux)
+      if (ahead > 0 && lateral < STOP_HALF_W + PERSON_R && ahead - ROBOT_R - PERSON_R < stopField(speed)) {
+        if (!s.stopFlags[i]) {
+          s.autoStops++
+          s.stopFlags[i] = true
+        }
+        s.vx = 0
+        s.vy = 0
+        s.stopHold = STOP_HOLD
+        s.flash = { text: 'Safety stop! Keep right and go slowly to pass.', ttl: 1.8, kind: 'bad' }
+      }
     }
     const inSlow = d < SLOW_FIELD
     if (inSlow) {
@@ -326,7 +374,10 @@ export function stepDelivery(s: DeliveryState, input: { x: number; y: number }, 
         s.nearFlags[i] = true
         s.flash = { text: 'Too fast near a person — slow down!', ttl: 1.6, kind: 'warn' }
       }
-    } else if (d > SLOW_FIELD + 0.4) s.nearFlags[i] = false
+    } else if (d > SLOW_FIELD + 0.4) {
+      s.nearFlags[i] = false
+      s.stopFlags[i] = false
+    }
   })
 
   s.distance += Math.hypot(s.x - px, s.y - py)

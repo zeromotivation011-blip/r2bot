@@ -36,8 +36,8 @@ const HOW_TO_PLAY = (
         crossing, and wait for 🚶 at the traffic lights.
       </li>
       <li>
-        <b>Pilot — Safe Speed:</b> set a self-driving car’s cruise speed and following gap, then watch it drive itself past a sudden stop and through fog. Fastest
-        settings that never bump win.
+        <b>Pilot — Safe Speed:</b> set a self-driving car’s cruise speed and following gap, then watch it drive itself past a sudden stop and through fog. Beat the
+        time limit and keep the lane flowing without ever bumping.
       </li>
       <li>
         <b>Ace — Junction Timer:</b> set the green times at a busy crossroads with human and robot drivers. Get the average wait down without making anyone wait
@@ -45,7 +45,8 @@ const HOW_TO_PLAY = (
       </li>
       <li>
         <b>Legend — Rulebook:</b> write IF … THEN rules for a robotaxi, put them in the right order, and pass all six safety tests: a ball and a child, an
-        ambulance, sun glare, a plastic bag, road works and a normal trip.
+        ambulance, sun glare, a plastic bag, road works and a normal trip. For 3 stars your rules must also survive a hidden stress test where the car reacts
+        more slowly — test as often as you like.
       </li>
     </ul>
     <p>After each round, “Why it happened” explains your result from the numbers. Same choices, same result: it is fair and repeatable.</p>

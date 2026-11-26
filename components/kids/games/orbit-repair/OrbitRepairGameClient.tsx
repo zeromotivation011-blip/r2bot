@@ -60,7 +60,7 @@ const BRIEF: Record<TierIndex, { title: string; steps: string[]; controls: strin
       'Fly the arm’s hand to the yellow grapple pin and move WITH the ship until the speed difference is under 5 cm/s.',
       'Then press Grab. Grabbing while the speeds differ bumps the ship away — or worse.',
     ],
-    controls: 'Hold the arrows (or arrow keys) to move the hand. Fine mode (F) moves slowly and precisely. Grab = Space.',
+    controls: 'Hold the arrows (or arrow keys) to move the hand. Fine mode (F) caps the hand just under the ship’s speed: hold an arrow the way the ship drifts and you stay matched while the pin creeps up to you. Grab = Space.',
   },
   2: {
     title: 'Ace — swap the broken module',
@@ -75,10 +75,10 @@ const BRIEF: Record<TierIndex, { title: string; steps: string[]; controls: strin
     title: 'Legend — full servicing mission',
     steps: [
       'Fly the servicer from 30 m out to a tumbling satellite and capture it. You fly from the ground: commands take 1 s to arrive and the video is 1 s old.',
-      'Within 12 m and slow, press Sync to match the tumble — the satellite then looks still, but holding sync burns fuel every second (more the farther out you are).',
+      'Within 12 m and slow, press Sync to match the tumble — the satellite then looks still, but holding sync burns fuel every second, more the farther out you are. Get to about 5 m first so the fuel lasts.',
       'Reach the green capture ring at under 4 cm/s and Grab. Keep 15 fuel to stop the tumble afterwards.',
     ],
-    controls: 'Tap arrows to puff (each puff 0.04 m/s, 1.2 fuel). Sync = X, Grab = Space, Predictor = P.',
+    controls: 'Tap arrows to puff (each puff 0.04 m/s, 1.2 fuel). Sync = X, Grab = Space. Predictor (P) draws a dashed ghost where you will be once your commands arrive.',
   },
 }
 
@@ -572,11 +572,11 @@ export default function OrbitRepairGameClient({ tier: tierProp, onFinish }: Prop
             </div>
           )}
         </div>
-        <p className="px-1 text-[13px] text-[#6E7888]">{brief.controls}</p>
+        <p className="hidden px-1 text-[13px] text-[#6E7888] lg:block">{brief.controls}</p>
       </div>
 
       <div className="flex flex-col gap-3">
-        <section className="rounded-[20px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-3" aria-label="Mission data">
+        <section className="order-2 rounded-[20px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-3 lg:order-1" aria-label="Mission data">
           {tier === 0 && (
             <div className="grid grid-cols-2 gap-2">
               <Stat label="Speed" value={`${hud.speed.toFixed(2)} m/s`} tone={hud.speed <= CADET.dockSpeed ? 'good' : 'warn'} sub={hud.speed <= CADET.dockSpeed ? 'Slow enough to latch' : 'Too fast to latch'} />
@@ -611,7 +611,7 @@ export default function OrbitRepairGameClient({ tier: tierProp, onFinish }: Prop
                   <p className="text-[12px] font-bold uppercase tracking-wide text-[#A7B0C0]">Spacecraft twist</p>
                   <p className={`font-display text-xl font-bold tabular-nums ${Math.abs(hud.theta) > ACE.warnDeg ? 'text-red-300' : Math.abs(hud.theta) > 2 ? 'text-amber-300' : 'text-emerald-300'}`}>{hud.theta.toFixed(1)}°</p>
                 </div>
-                <div className="relative mt-1 h-5 rounded-full bg-gradient-to-r from-red-500/50 via-emerald-500/40 to-red-500/50" role="meter" aria-label="Spacecraft twist in degrees" aria-valuemin={-ACE.limitDeg} aria-valuemax={ACE.limitDeg} aria-valuenow={Number(hud.theta.toFixed(1))}>
+                <div className="relative mt-1 h-5 rounded-full bg-gradient-to-r from-red-500/50 via-emerald-500/40 to-red-500/50" role="meter" aria-label="Spacecraft twist in degrees" aria-valuemin={0 - ACE.limitDeg} aria-valuemax={ACE.limitDeg} aria-valuenow={Number(hud.theta.toFixed(1))}>
                   <div className="absolute inset-y-[-3px] w-1.5 rounded bg-white shadow" style={{ left: `calc(${((Math.max(-ACE.limitDeg, Math.min(ACE.limitDeg, hud.theta)) + ACE.limitDeg) / (2 * ACE.limitDeg)) * 100}% - 3px)` }} />
                 </div>
                 <p className="mt-1 text-[12px] text-[#6E7888]">Antenna loses Earth beyond ±{ACE.limitDeg}°. Reaction wheels: {Math.round(Math.abs(hud.wheel) * 100)}% effort.</p>
@@ -636,7 +636,7 @@ export default function OrbitRepairGameClient({ tier: tierProp, onFinish }: Prop
                 <p className="mt-1 text-[12px] text-[#6E7888]">White line: fuel you must keep to stop the tumble.</p>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <Stat label="Range" value={`${hud.range.toFixed(1)} m`} tone={hud.range <= LEGEND.syncRange ? 'good' : 'plain'} sub={hud.synced ? 'Synced to tumble' : `Sync within ${LEGEND.syncRange} m`} />
+                <Stat label="Range" value={`${hud.range.toFixed(1)} m`} tone={hud.range <= LEGEND.cheapSyncRange ? 'good' : hud.range <= LEGEND.syncRange ? 'warn' : 'plain'} sub={hud.synced ? 'Synced to tumble' : hud.range <= LEGEND.cheapSyncRange ? 'Close: sync is cheap here' : hud.range <= LEGEND.syncRange ? 'Closer = cheaper sync' : `Sync within ${LEGEND.syncRange} m`} />
                 <Stat
                   label={hud.synced ? 'Closing speed' : 'Speed'}
                   value={`${(hud.rel * 100).toFixed(1)} cm/s`}
@@ -650,7 +650,8 @@ export default function OrbitRepairGameClient({ tier: tierProp, onFinish }: Prop
           )}
         </section>
 
-        <section className="rounded-[20px] border border-white/10 bg-[#111C32] p-3" aria-label="Controls">
+        {/* On phones the controls sit directly under the scene, so the arrows and the robot are on screen together. */}
+        <section className="order-1 rounded-[20px] border border-white/10 bg-[#111C32] p-3 lg:order-2" aria-label="Controls">
           <div className="flex items-start gap-3">
             {pad}
             <div className="flex flex-1 flex-col gap-2">
@@ -694,7 +695,7 @@ export default function OrbitRepairGameClient({ tier: tierProp, onFinish }: Prop
               )}
             </div>
           </div>
-          {tier === 3 && <p className="mt-2 text-[12px] leading-snug text-[#6E7888]">The dashed ghost shows where the servicer will be once every command you sent has arrived — a predictor display, as real teleoperators use.</p>}
+          {tier === 3 && <p className="mt-2 hidden text-[12px] lg:block leading-snug text-[#6E7888]">The dashed ghost shows where the servicer will be once every command you sent has arrived — a predictor display, as real teleoperators use.</p>}
         </section>
       </div>
     </div>

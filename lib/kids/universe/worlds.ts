@@ -5,6 +5,10 @@
 // not exist.
 //
 // Pure data. Safe on server and client.
+//
+// GAMES holds every game with a built, QA'd page under app/kids/play/<id>: the
+// eight original Universe games (the map's moons) and, since 26 Nov 2026, the
+// seven world flagship games (the map's Worlds belt; see WORLDS below).
 
 import type { BandId } from '../bands'
 
@@ -158,26 +162,25 @@ export const GAMES: UniverseGame[] = [
     tiers: 4,
     gradient: 'from-indigo-500 to-blue-800',
   },
-]
-
-/**
- * Flagship games of the WORLDS below. Kept OUT of GAMES until each is built and
- * tested, so the Universe map and the sitemap never link to an unbuilt page.
- * Move an entry into GAMES when its page ships.
- */
-export const WORLD_GAMES: UniverseGame[] = [
-  // ── World flagship games (Nov 2026: Robot Guardians + six worlds) ──
-  { id: 'safety-inspector', name: 'Robot Safety Inspector', zone: 'Robot Guardians HQ', emoji: '🛡️', hook: 'Inspect robots in a factory, a home and a street — find every danger before it hurts someone.', teaches: 'The Robot Harm Check: physical safety (pinch points, speed near people, emergency stops), data and privacy, fairness and bias, human control, effects on people, and the planet.', skills: ['design', 'sensors', 'logic'], minBand: 'explorers', tiers: 4, gradient: 'from-emerald-400 to-teal-700' },
+  // ── World flagship games (26 Nov 2026: one per world in WORLDS below; each page built and QA'd) ──
+  { id: 'safety-inspector', name: 'Robot Safety Inspector', zone: 'Robot Guardians HQ', emoji: '🛡️', hook: 'Inspect robots in a factory, a home, a street and a hospital — find every danger before it hurts someone.', teaches: 'The Robot Harm Check: physical safety (pinch points, speed near people, emergency stops), data and privacy, fairness and bias, human control, effects on people, and the planet.', skills: ['design', 'sensors', 'logic'], minBand: 'builders', tiers: 4, gradient: 'from-emerald-400 to-teal-700' },
   { id: 'ocean-rescue', name: 'Deep Sea Rescue', zone: 'Ocean Lab', emoji: '🌊', hook: 'Pilot an underwater robot through currents and darkness to rescue a lost sensor buoy.', teaches: 'Buoyancy, pressure with depth, sonar ranging (speed of sound in water), tethered vs autonomous vehicles, navigating without GPS.', skills: ['physics', 'sensors', 'control'], minBand: 'explorers', tiers: 4, gradient: 'from-cyan-500 to-blue-900' },
-  { id: 'bio-bots', name: 'Robo Zoo: Bio-Bot Lab', zone: 'Robo Zoo', emoji: '🦎', hook: 'Copy nature’s tricks — gecko feet, snake slither, bird flapping — to build robots that move like animals.', teaches: 'Biomimicry: gait and stability, friction and adhesion, legged vs wheeled locomotion, energy efficiency, soft robotics.', skills: ['design', 'motion', 'physics'], minBand: 'explorers', tiers: 4, gradient: 'from-lime-400 to-green-800' },
-  { id: 'robot-surgeon', name: 'Robot Hospital', zone: 'Robot Hospital', emoji: '🏥', hook: 'Steady a surgical robot’s hands, fit a robotic arm to a patient, and run the hospital’s helper robots.', teaches: 'Precision and motion scaling, tremor filtering, haptic feedback, prosthetics controlled by muscle signals, safety checks in medical robots.', skills: ['control', 'kinematics', 'sensors'], minBand: 'builders', tiers: 4, gradient: 'from-rose-300 to-red-700' },
+  { id: 'bio-bots', name: 'Robo Zoo: Bio-Bot Lab', zone: 'Robo Zoo', emoji: '🦎', hook: 'Copy nature’s tricks — gecko feet, snake slither, bird flapping — to build robots that move like animals.', teaches: 'Biomimicry: gait and stability (support polygons), friction and adhesion, legged vs wheeled locomotion, lift, and energy efficiency (cost of transport).', skills: ['design', 'motion', 'physics'], minBand: 'explorers', tiers: 4, gradient: 'from-lime-400 to-green-800' },
+  { id: 'robot-surgeon', name: 'Robot Hospital', zone: 'Robot Hospital', emoji: '🏥', hook: 'Drive a delivery robot through the wards, steady a surgical robot’s tool and tune a bionic hand that reads muscle signals.', teaches: 'Precision and motion scaling, tremor filtering, prosthetic hands controlled by muscle signals (EMG), force limits and safety interlocks in medical robots.', skills: ['control', 'kinematics', 'sensors'], minBand: 'builders', tiers: 4, gradient: 'from-rose-300 to-red-700' },
   { id: 'smart-farm', name: 'Smart Farm', zone: 'Smart Farm', emoji: '🚜', hook: 'Run a farm with drones, picking robots and soil sensors — grow more food with less water.', teaches: 'Sensor-driven decisions (moisture, colour ripeness), drone coverage paths, robotic picking with vision, trade-offs between yield, water and energy.', skills: ['sensors', 'ai', 'planning'], minBand: 'explorers', tiers: 4, gradient: 'from-yellow-400 to-green-700' },
   { id: 'robot-city', name: 'Robot City', zone: 'Robot City', emoji: '🏙️', hook: 'Keep a city of self-driving cars, delivery robots and smart traffic lights moving — safely.', teaches: 'Perception and right-of-way rules, traffic signal timing, multi-robot coordination, safe stopping distances, why autonomous vehicles must handle the unexpected.', skills: ['ai', 'control', 'planning'], minBand: 'builders', tiers: 4, gradient: 'from-sky-400 to-indigo-800' },
   { id: 'orbit-repair', name: 'Orbit Repair Crew', zone: 'Space Station', emoji: '🛰️', hook: 'Use a space station’s robot arm to catch a supply ship and repair a satellite in zero gravity.', teaches: 'Motion without friction (Newton’s first law), momentum and reaction, slow precise approaches, robotic arm grappling, teleoperation with delay.', skills: ['physics', 'kinematics', 'control'], minBand: 'builders', tiers: 4, gradient: 'from-slate-300 to-indigo-900' },
 ]
 
 export function getGame(id: string): UniverseGame | undefined {
-  return GAMES.find((g) => g.id === id) ?? WORLD_GAMES.find((g) => g.id === id)
+  return GAMES.find((g) => g.id === id)
+}
+
+const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty']
+
+/** "fifteen" for 15 — so copy that counts games or worlds never goes stale. Digits above twenty. */
+export function numberWord(n: number): string {
+  return NUMBER_WORDS[n] ?? String(n)
 }
 
 export function getPlanet(level: number): Planet | undefined {
@@ -215,4 +218,12 @@ export const WORLDS: UniverseWorld[] = [
 
 export function getWorld(id: string): UniverseWorld | undefined {
   return WORLDS.find((w) => w.id === id)
+}
+
+/** Ids of the games that are a world's flagship (shown on the map's Worlds belt, not as moons). */
+export const WORLD_GAME_IDS: ReadonlySet<string> = new Set(WORLDS.map((w) => w.game))
+
+/** The world a game belongs to, if it is a world's flagship game. */
+export function worldForGame(gameId: string): UniverseWorld | undefined {
+  return WORLDS.find((w) => w.game === gameId)
 }

@@ -122,3 +122,15 @@ NEXT after the running workflows (final pass, worlds, AI): Wave 1 of the roadmap
 - [x] Robo Sumo Arena built + QA'd + fixed; Robot Guardians and Ocean Lab worlds built; Ask Spark + Talk to your robot built — 31e37ae.
 - [~] Resumed: worlds (wf_b6431468-d62: QA guardians/ocean, build zoo/hospital/farm/city/station, integrate) and AI (wf_464254ea-2cd: QA spark/talk, build Vision Lab + How Robots Think).
 - NEXT when both finish: ONE final pass = the failed final:integrate of wf_883ec17f-c66 extended with roadmap Wave 1 (mount AskSpark in the shell, /kids/ai + /kids/worlds in nav, one navigation, GA4 off on kids pages, parental gate, privacy page children's section, purple Blockly theme → brand, globals.css section padding issue, build + phone click-through + independent check).
+
+## 26 Nov 2026 — Worlds integrated into the Universe
+- [x] All seven worlds QA'd and fixed by their own agents (guardians, ocean, zoo, hospital, farm, city, station).
+- [x] Flagship games moved from `WORLD_GAMES` into `GAMES` (`WORLD_GAMES` removed): safety-inspector, ocean-rescue, bio-bots, robot-surgeon, smart-farm, robot-city, orbit-repair. 15 games; copy counts come from `numberWord(GAMES.length)`.
+- [x] `PLAYABLE_GAME_IDS` (teach catalogue) now lists all 15, including sumo-arena, which had a page but was still missing.
+- [x] `/kids/worlds` index (server, indexable, ItemList + breadcrumb JSON-LD, per-world progress island).
+- [x] Universe map: Worlds belt along the bottom edge (7 world stations, tick when the game is played); moons stay the 8 original games.
+- [x] Navigation: phone tabs Home · Course · Worlds · Games · Hangar; desktop header adds Galaxy; Galaxy in More on phones.
+- [x] Hangar: World progress section (activities done per world + game played).
+- [x] /kids: Worlds section, counts; /kids/play: counts.
+- [x] Sitemap: /kids/worlds, /kids/worlds/<id>, /kids/play/<game> for the seven games; dates in `lib/content-dates.ts`.
+

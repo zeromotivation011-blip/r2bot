@@ -103,7 +103,7 @@ export interface Car {
 
 const COLOURS = ['#E2E8F0', '#38BDF8', '#F87171', '#FBBF24', '#A3E635', '#F472B6', '#94A3B8', '#2DD4BF']
 
-/** Lane centre x of a road for a direction. Cars keep left of the centre line on screen: down = left lane. */
+/** Lane centre x of a road for a direction. Cars drive on the right-hand side of the road: a car heading down the screen uses the lane on the screen's left (its own right). */
 export function laneX(road: Road, dir: 1 | -1): number {
   return road.cx + (dir === 1 ? -LANE_W / 2 : LANE_W / 2)
 }
@@ -405,8 +405,10 @@ export function redMen(s: CrossingState) {
 
 export function crossingStars(s: CrossingState): number {
   if (s.robot !== 'done') return 0
-  if (nearMisses(s) > 0) return 1
-  if (hardBrakes(s) + redMen(s) > 0) return 2
+  // Stepping in front of a car that cannot stop, or starting on the "don't walk"
+  // signal, fails the round however quickly the parcel arrived: safety first.
+  if (nearMisses(s) > 0 || redMen(s) > 0) return 0
+  if (hardBrakes(s) > 0) return 2
   return 3
 }
 

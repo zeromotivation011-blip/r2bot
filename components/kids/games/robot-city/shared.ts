@@ -146,3 +146,16 @@ export function buzz(ms: number) {
     /* not supported */
   }
 }
+
+/**
+ * On small screens the settings sit below the canvas, so after pressing a
+ * start button the child would be looking at buttons, not the simulation.
+ * Bring the canvas back into view (only when it is not already fully visible).
+ */
+export function scrollCanvasIntoView(el: HTMLElement | null, reduced: boolean) {
+  if (!el || typeof window === 'undefined') return
+  if (window.matchMedia('(min-width: 1024px)').matches) return
+  const r = el.getBoundingClientRect()
+  if (r.top >= 0 && r.bottom <= window.innerHeight) return
+  el.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' })
+}

@@ -5,7 +5,7 @@
 // first match wins), run a six-scenario safety test suite, watch any test as a
 // replay, and fix the rules until every test passes. Model in ./rules.ts.
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { playSound } from '@/lib/kids-audio'
 import {
@@ -17,6 +17,8 @@ import {
   STARTER,
   rulesStars,
   runSuite,
+  STRESS_LATENCY,
+  stressFailures,
   type ActionId,
   type CondId,
   type Frame,
@@ -96,7 +98,8 @@ export default function RulesGameClient({ onFinish }: { onFinish: (r: RoundResul
     const cam = carS - span * 0.3
     const X = (s: number) => (s - cam) * k
     const yMid = h * 0.52
-    const Y = (y: number) => yMid + y * k * 0.9
+    const ky = Math.min(k * 1.7, h / 20)
+    const Y = (y: number) => yMid + y * ky
     ctx.clearRect(0, 0, w, h)
     ctx.fillStyle = '#16233B'
     ctx.fillRect(0, 0, w, h)
@@ -138,7 +141,7 @@ export default function RulesGameClient({ onFinish }: { onFinish: (r: RoundResul
         if (o.kind === 'parked' || o.kind === 'follower' || o.kind === 'ambulance') {
           const col = o.kind === 'parked' ? '#64748B' : o.kind === 'follower' ? '#E2E8F0' : '#F8FAFC'
           ctx.fillStyle = col
-          rr(ctx, x, Y(o.y) - 0.85 * k, o.len * k, 1.7 * k, 4)
+          rr(ctx, x, Y(o.y) - 0.85 * ky, o.len * k, 1.7 * ky, 4)
           ctx.fill()
           if (o.kind === 'ambulance') {
             ctx.fillStyle = COL.red
@@ -163,7 +166,7 @@ export default function RulesGameClient({ onFinish }: { onFinish: (r: RoundResul
     if (f) {
       const x0 = X(f.s - CAR_LEN)
       ctx.fillStyle = COL.amber
-      rr(ctx, x0, Y(f.y) - 0.9 * k, CAR_LEN * k, 1.8 * k, 5)
+      rr(ctx, x0, Y(f.y) - 0.9 * ky, CAR_LEN * k, 1.8 * ky, 5)
       ctx.fill()
       ctx.fillStyle = '#1A1103'
       ctx.beginPath()
@@ -252,7 +255,8 @@ export default function RulesGameClient({ onFinish }: { onFinish: (r: RoundResul
 
   const passed = results ? results.filter((r) => r.pass).length : 0
   const allPass = !!results && passed === SCENARIOS.length && !dirty
-  const stars = rulesStars(allPass, runs)
+  const stress = useMemo(() => (allPass ? stressFailures(rules) : []), [allPass, rules])
+  const stars = rulesStars(allPass, stress.length)
 
   const finish = () => {
     onFinish({
@@ -261,13 +265,25 @@ export default function RulesGameClient({ onFinish }: { onFinish: (r: RoundResul
       scoreLabel: `of ${SCENARIOS.length} safety tests`,
       attempts: runs,
       message: allPass
-        ? `Your ${rules.length}-rule rulebook passed all ${SCENARIOS.length} safety tests after ${runs} test run${runs === 1 ? '' : 's'}.`
+        ? stress.length === 0
+          ? `Your ${rules.length}-rule rulebook passed all ${SCENARIOS.length} safety tests, and still passed them all when the car reacted ${STRESS_LATENCY} s late. That is a robust rulebook.`
+          : `Your rulebook passed all ${SCENARIOS.length} safety tests, but with a slower ${STRESS_LATENCY} s reaction it failed: ${stress.map((x) => SCENARIOS.find((sc) => sc.id === x.id)?.name ?? x.id).join(', ')}. Give it more margin for 3 stars.`
         : `${passed} of ${SCENARIOS.length} tests passed. A self-driving car needs every safety test to pass before it may carry passengers.`,
     })
   }
 
   const debrief = (): DebriefLine[] => {
     const lines: DebriefLine[] = [{ icon: '✅', text: `All ${SCENARIOS.length} scenarios passed with ${rules.length} rules after ${runs} test run${runs === 1 ? '' : 's'}.` }]
+    if (stress.length === 0)
+      lines.push({ icon: '💪', text: `Stress test passed: the hidden re-run with the car reacting in ${STRESS_LATENCY} s instead of 0.3 s passed too. Your rules leave a safety margin.` })
+    else
+      for (const x of stress) {
+        const sc = SCENARIOS.find((c) => c.id === x.id)
+        lines.push({
+          icon: '🧯',
+          text: `Stress test (car reacting in ${STRESS_LATENCY} s instead of 0.3 s) — ${sc?.name ?? x.id}: ${x.reason}${x.id === 'ball' ? ' A ball in the road often means a child is close behind: slowing right down when you see one buys the margin.' : ' Your rules only just worked; acting earlier or more gently would leave a margin.'}`,
+        })
+      }
     lines.push({ icon: '🔝', text: 'Order matters: the first true rule wins, so the rules that protect people must sit above the ones that keep the car moving.' })
     lines.push({ icon: '⚖️', text: 'Over-reacting is dangerous too: an emergency stop for a plastic bag can cause a crash behind you. Good rules are proportionate.' })
     lines.push({ icon: '🎧', text: 'When the car does not understand a scene, it stops safely and asks a person. Real robotaxi companies run remote assistance centres for exactly this.' })
@@ -363,6 +379,9 @@ export default function RulesGameClient({ onFinish }: { onFinish: (r: RoundResul
                       </option>
                     ))}
                   </select>
+                </div>
+                <div className="mt-1 flex items-start gap-1.5 pl-5">
+                  <p className="flex-1 text-[12px] leading-snug text-[#6E7888]">{condOf(r.when).detail}</p>
                   <button type="button" aria-label={`Move rule ${i + 1} up`} disabled={i === 0} onClick={() => move(i, -1)} className={`h-11 w-11 shrink-0 rounded-xl border border-white/15 bg-white/5 font-bold text-white disabled:opacity-30 ${FOCUS}`}>
                     ↑
                   </button>
@@ -379,7 +398,6 @@ export default function RulesGameClient({ onFinish }: { onFinish: (r: RoundResul
                     ✕
                   </button>
                 </div>
-                <p className="mt-1 pl-5 text-[12px] leading-snug text-[#6E7888]">{condOf(r.when).detail}</p>
               </li>
             ))}
           </ol>

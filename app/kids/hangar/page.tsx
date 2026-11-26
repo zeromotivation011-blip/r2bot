@@ -16,6 +16,8 @@ import { HangarRecordsClient, type CourseBadgeInfo } from '@/components/kids/han
 // map below reaches the client, never the (large) curriculum itself.
 import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
 import { CertificateButtonClient } from '@/components/kids/teach/CertificateButtonClient'
+import { byWorld } from '@/lib/kids/activities/content'
+import { WORLDS } from '@/lib/kids/universe/worlds'
 
 export const runtime = 'nodejs'
 
@@ -23,7 +25,7 @@ const BASE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_U
 
 const TITLE = 'Robot Hangar for Kids: Your Robot, Badges and Rewards'
 const DESCRIPTION =
-  'The R2BOT Kids hangar: see your own robot in 3D, paint it and add decals, trails and skins you earned by learning, and check your badge wall, personal bests and course progress. Ages 5–17.'
+  'The R2BOT Kids hangar: see your own robot in 3D, paint it and add decals, trails and skins you earned by learning, and check your badge wall, personal bests, course progress and world progress. Ages 5–17.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -54,6 +56,9 @@ const courseBadges: Record<string, CourseBadgeInfo> = Object.fromEntries(
   LEVEL1_SESSIONS.map((s) => [s.badge.id, { name: s.badge.name, icon: s.badge.icon, earnedFor: s.badge.earnedFor }]),
 )
 
+/** Each world's activity ids (server-side), so the Hangar can show world progress without loading activity params. */
+const worldActivityIds: Record<string, string[]> = Object.fromEntries(WORLDS.map((w) => [w.id, byWorld(w.id).map((a) => a.id)]))
+
 export default function HangarPage() {
   return (
     <>
@@ -67,7 +72,7 @@ export default function HangarPage() {
       </header>
 
       <HangarClient />
-      <HangarRecordsClient courseBadges={courseBadges} />
+      <HangarRecordsClient courseBadges={courseBadges} worldActivityIds={worldActivityIds} />
 
       <section aria-label="Level 1 certificate" className="mx-auto max-w-6xl px-4 pt-6">
         <CertificateButtonClient level={1} />

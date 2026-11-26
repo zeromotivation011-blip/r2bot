@@ -66,8 +66,12 @@ export const BEAM_DEG = 1.5
 /** Multibeam fan: 120°, so the swath is 2·tan(60°) ≈ 3.46 × altitude wide. */
 export const SWATH_PER_ALT = 2 * Math.tan((60 * Math.PI) / 180)
 export const SWATH_MAX = 160
-/** Survey order: seabed detail of 1 m or better. Beam footprint ≈ altitude × 2·tan(beam/2). */
-export const DETAIL_M = 1
+/**
+ * Survey order: seabed detail of 0.6 m or better. Beam footprint ≈ altitude × 2·tan(beam/2),
+ * so with a 1.5° beam the spot passes up to about 23 m — stricter than the 30 m DVL limit,
+ * which makes height a real trade between swath (wider when higher) and detail (sharper when lower).
+ */
+export const DETAIL_M = 0.6
 export const CELL = 10
 /** Map data placed with a position error above this is "smeared". */
 export const SMEAR_M = 8
@@ -161,6 +165,24 @@ export function swathWidth(alt: number): number {
 
 export function footprint(alt: number): number {
   return alt * 2 * Math.tan(((BEAM_DEG / 2) * Math.PI) / 180)
+}
+
+/**
+ * The Ace level with the lander dropped at a seeded spot inside the dashed search circle.
+ * Every run uses a new seed, so the true spot revealed after one run is no help on the next:
+ * the plan has to search the circle, not fly to a remembered point or the centre.
+ */
+export function withLander(L: SurveyLevel, seed: number): SurveyLevel {
+  const area = L.searchArea
+  if (!area || !L.buoy) return L
+  const rand = rng((L.seed * 7919 + seed * 104729) >>> 0)
+  const ang = rand() * Math.PI * 2
+  // Uniform over a ring 62–90 % of the radius out: never dead centre (where one central
+  // waypoint would hear it) and never on the rim (where a fair search could miss it).
+  const rad = area.r * Math.sqrt(0.62 ** 2 + (0.9 ** 2 - 0.62 ** 2) * rand())
+  const x = clamp(area.x + Math.cos(ang) * rad, 20, L.width - 20)
+  const y = clamp(area.y + Math.sin(ang) * rad, 20, L.height - 20)
+  return { ...L, buoy: { x: Math.round(x), y: Math.round(y) } }
 }
 
 export function propPower(speed: number): number {

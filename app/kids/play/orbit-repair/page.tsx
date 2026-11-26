@@ -70,7 +70,7 @@ const TIERS = [
     name: 'Pilot',
     who: 'about 9 and up',
     what: 'A cargo ship drifts past with its thrusters switched off. Drive the station’s robot arm so its hand reaches the grapple pin and moves along with it, then grab when the speed difference is under 5 cm/s.',
-    tip: 'Do not aim at where the pin is — aim at where it is going. Start moving the hand the same way as the ship early, then use fine mode for the last half-metre.',
+    tip: 'Do not aim at where the pin is — aim at where it is going. Start moving the hand the same way as the ship early, then switch on fine mode for the last metre: its top speed is just under the ship’s, so holding the arrow the way the ship drifts keeps you matched while the pin catches up with the hand.',
   },
   {
     name: 'Ace',
@@ -161,10 +161,10 @@ export default function OrbitRepairPage() {
           “move, wait, check” habits and onboard autonomy that can stop the robot by itself. Those are exactly the skills the Legend tier asks for.
         </p>
         <p className="mt-6 flex flex-wrap gap-4">
-          <Link href="/kids/worlds/station" className="font-bold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids/worlds/station" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
             ← The Space Station world
           </Link>
-          <Link href="/kids" className="font-bold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
             Back to the R2BOT Universe
           </Link>
         </p>

@@ -23,6 +23,7 @@ import {
   legendStars,
   runLegend,
   type LegendPlan,
+  type LegendResult,
   type WeedMethod,
 } from './model'
 import { BTN_GHOST, BTN_PRIMARY, CARD, showField, Choice, Debrief, Slider, usePlayback } from './FarmPartsClient'
@@ -36,6 +37,81 @@ function soilWaterColour(pct: number): string {
   }
   const u = (t - 0.5) / 0.5
   return `rgb(${Math.round(106 - 70 * u)},${Math.round(140 - 10 * u)},${Math.round(60 + 60 * u)})`
+}
+
+/**
+ * The whole season as evidence: soil water per zone (with the half-full line
+ * below which plants slow down), waterlogged days on clay, weed cover and
+ * aphid spread. Lets the child answer "what cost the most?" by reading data.
+ */
+function SeasonRecord({ result, pestZone }: { result: LegendResult; pestZone: number }) {
+  const n = result.log.length
+  const W = 200
+  const H = 40
+  const x = (i: number) => ((i + 0.5) / n) * W
+  const zones = LEGEND_ZONES.map((z, zi) => {
+    const pts = result.log.map((d, i) => `${x(i).toFixed(1)},${(H - (d.water[zi] / 100) * H).toFixed(1)}`).join(' ')
+    const dryDays = result.log.filter((d) => d.water[zi] < 50).length
+    const soggyDays = result.log.filter((d) => d.waterlogged[zi]).length
+    return { z, zi, pts, dryDays, soggyDays }
+  })
+  const maxWeeds = Math.max(...result.log.map((d) => d.weeds))
+  const weedTop = Math.max(0.4, maxWeeds)
+  const weedPts = result.log.map((d, i) => `${x(i).toFixed(1)},${(H - (d.weeds / weedTop) * H).toFixed(1)}`).join(' ')
+  const aphidDays = result.log.filter((d) => d.infected > 0).length
+  const maxAphids = Math.max(1, ...result.log.map((d) => d.infected))
+  const row = 'grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-2'
+  const label = 'text-[13px] font-bold leading-tight text-[#A7B0C0]'
+  return (
+    <section className={CARD} aria-label="Season record: soil water, weeds and aphids, day by day">
+      <h3 className="font-display font-bold text-[#EEF2F8]">Season record, day by day</h3>
+      <p className="mt-0.5 text-[13px] text-[#A7B0C0]">Use this to answer the question. Plants grow slower on every day a line is in the red, below half full.</p>
+      <div className="mt-2 grid gap-2">
+        {zones.map(({ z, zi, pts, dryDays, soggyDays }) => (
+          <div key={z} className={row}>
+            <span className={label}>
+              {SOILS[z].name}
+              <span className="block text-[11px] font-semibold text-[#6E7888]">
+                {dryDays} dry day{dryDays === 1 ? '' : 's'}
+                {soggyDays > 0 ? ` · ${soggyDays} soggy` : ''}
+              </span>
+            </span>
+            <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="h-11 w-full rounded-md bg-white/[0.04]" role="img" aria-label={`${SOILS[z].name}: below half full on ${dryDays} of ${n} days${soggyDays ? `, waterlogged on ${soggyDays}` : ''}`}>
+              <rect x={0} y={H / 2} width={W} height={H / 2} className="fill-rose-500/15" />
+              {result.log.map((d, i) => (d.waterlogged[zi] ? <rect key={i} x={x(i) - W / n / 2} y={0} width={W / n} height={H} className="fill-sky-400/30" /> : null))}
+              <line x1={0} x2={W} y1={H / 2} y2={H / 2} className="stroke-rose-300" strokeWidth={0.6} strokeDasharray="3 2" vectorEffect="non-scaling-stroke" />
+              <polyline points={pts} fill="none" className="stroke-cyan-300" strokeWidth={1.6} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+            </svg>
+          </div>
+        ))}
+        <div className={row}>
+          <span className={label}>
+            Weeds
+            <span className="block text-[11px] font-semibold text-[#6E7888]">peak {Math.round(maxWeeds * 100)} % cover</span>
+          </span>
+          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="h-11 w-full rounded-md bg-white/[0.04]" role="img" aria-label={`Weed cover peaked at ${Math.round(maxWeeds * 100)} percent`}>
+            <polyline points={weedPts} fill="none" className="stroke-lime-300" strokeWidth={1.6} vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <div className={row}>
+          <span className={label}>
+            Aphids · {LEGEND_ZONES[pestZone] ? SOILS[LEGEND_ZONES[pestZone]].name : ''}
+            <span className="block text-[11px] font-semibold text-[#6E7888]">
+              {aphidDays} day{aphidDays === 1 ? '' : 's'} in the field
+            </span>
+          </span>
+          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="h-11 w-full rounded-md bg-white/[0.04]" role="img" aria-label={`Aphids were in the field for ${aphidDays} days`}>
+            {result.log.map((d, i) =>
+              d.infected > 0 ? <rect key={i} x={x(i) - W / n / 2 + 0.3} y={H - (d.infected / maxAphids) * H} width={W / n - 0.6} height={(d.infected / maxAphids) * H} className="fill-orange-400" /> : null,
+            )}
+          </svg>
+        </div>
+      </div>
+      <p className="mt-2 text-[12px] text-[#6E7888]">
+        Blue line: how full each zone&apos;s soil was. Dashed line: half full. Blue bands: roots in waterlogged clay. Weeds steal a share of growth every day they are there.
+      </p>
+    </section>
+  )
 }
 
 export default function LegendClient({ onFinish }: { onFinish: (r: RoundResult) => void }) {
@@ -66,8 +142,9 @@ export default function LegendClient({ onFinish }: { onFinish: (r: RoundResult) 
     if (day < 0) return []
     const out: { day: number; text: string }[] = []
     for (let d = 0; d <= day; d++) for (const e of result.log[d].events) out.push({ day: d, text: e })
-    return out.slice(-6).reverse()
-  }, [day, result])
+    // While the season plays, show the latest few; afterwards the whole diary is evidence.
+    return ran ? out.reverse() : out.slice(-6).reverse()
+  }, [day, ran, result])
 
   const finish = () => {
     const right = answer === result.question.answer
@@ -150,12 +227,14 @@ export default function LegendClient({ onFinish }: { onFinish: (r: RoundResult) 
           </ol>
         </div>
 
-        <section className={CARD} aria-live="polite" aria-label="Farm diary">
-          <h3 className="font-display font-bold text-[#EEF2F8]">Farm diary</h3>
+        {ran && <SeasonRecord result={result} pestZone={season.pest.zone} />}
+
+        <section className={CARD} aria-live={ran ? 'off' : 'polite'} aria-label="Farm diary">
+          <h3 className="font-display font-bold text-[#EEF2F8]">Farm diary{ran ? ` · all ${recent.length} events` : ''}</h3>
           {recent.length === 0 ? (
             <p className="mt-1 text-[14px] text-[#A7B0C0]">Events appear here as the season runs. You do not know them in advance — your rules must cope.</p>
           ) : (
-            <ul className="mt-1 space-y-1 text-[14px] leading-snug text-[#EEF2F8]">
+            <ul className={`mt-1 space-y-1 text-[14px] leading-snug text-[#EEF2F8] ${ran ? 'max-h-64 overflow-y-auto pr-1' : ''}`} tabIndex={ran ? 0 : undefined}>
               {recent.map((e, i) => (
                 <li key={`${e.day}-${i}`}>
                   <span className="font-display font-bold text-amber-300">Day {e.day + 1}</span> {e.text}

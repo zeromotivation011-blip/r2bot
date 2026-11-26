@@ -16,6 +16,7 @@ import {
   KEY_SPEED,
   MM_PER_PX,
   PATH,
+  STAR_TIME,
   TIME_LIMIT,
   TREMOR_MM,
   accuracy,
@@ -49,6 +50,8 @@ export default function SteadyHandsGameClient({ onFinish }: { onFinish: (r: Roun
   const [over, setOver] = useState(false)
   const [hud, setHud] = useState({ t: 0, acc: 1, started: false, progress: 0, touches: 0 })
   const lastTouches = useRef(0)
+  /** Several fixed steps can run in one frame: the end-of-run block must run once. */
+  const ended = useRef(false)
 
   const apply = (next: SteadySettings) => {
     if (sim.current.started) return
@@ -58,6 +61,7 @@ export default function SteadyHandsGameClient({ onFinish }: { onFinish: (r: Roun
   }
 
   const step = useCallback((dt: number) => {
+    if (ended.current) return
     const s = sim.current
     const k = keys.current
     const kx = (k.right ? 1 : 0) - (k.left ? 1 : 0)
@@ -71,6 +75,7 @@ export default function SteadyHandsGameClient({ onFinish }: { onFinish: (r: Roun
       buzz(25)
     }
     if (s.finished || s.timeUp) {
+      ended.current = true
       playSound(s.finished ? 'star' : 'wrong')
       HISTORY.push({ scale: s.settings.scale, filter: s.settings.filter, acc: accuracy(s), t: s.t, finished: s.finished })
       setOver(true)
@@ -242,10 +247,12 @@ export default function SteadyHandsGameClient({ onFinish }: { onFinish: (r: Roun
         text: `The tool stayed inside ${Math.round(acc * 100)}% of the time and touched the edge ${s.touches} time${s.touches === 1 ? '' : 's'}.`,
       },
     ]
-    if (s.settings.scale > 1) lines.push({ icon: '⏱️', text: `The price of scaling: your hand travelled ${s.settings.scale} times further than the tool. Lift your finger and move again — like the clutch pedal real surgeons use to re-centre their hands.` })
+    if (s.settings.scale > 1) lines.push({ icon: '⏱️', text: `The price of scaling: your hand travelled ${s.handTravel.toFixed(0)} mm, ${s.settings.scale} times further than the tool. Lift your finger and move again — like the clutch pedal real surgeons use to re-centre their hands.` })
     else lines.push({ icon: '💡', text: 'At 1:1 every tiny wobble of your finger goes straight to the tool. Try 3:1 or 5:1: big, comfortable hand moves become small, precise tool moves.' })
     if (!s.settings.filter) lines.push({ icon: '🧹', text: 'The tremor filter was off. It lets slow, meant movements through and blocks fast shakes — try it on.' })
     else lines.push({ icon: '🧹', text: 'The filter blocked the fast shake but added a tiny delay: the tool glides after your hand instead of jumping.' })
+    if (s.finished && s.t > STAR_TIME && accuracy(s) >= 0.96)
+      lines.push({ icon: '⭐', text: `Steady, but it took ${s.t.toFixed(0)} s — three stars need ${STAR_TIME} s or less. Real surgeons pick the scaling that is steady enough AND quick enough: often 3:1 with the filter on.` })
     return lines
   }
 
@@ -325,6 +332,7 @@ export default function SteadyHandsGameClient({ onFinish }: { onFinish: (r: Roun
               </p>
             </div>
             <p className="text-[13px] leading-snug text-[#A7B0C0]">{hud.started ? 'Settings are locked while the tool is in the channel.' : 'Settings lock once the tool enters the channel. Move to the green START dot.'}</p>
+            <p className="text-[13px] leading-snug text-[#A7B0C0]">⭐⭐⭐ Stay inside the channel and reach the end in {STAR_TIME} s or less.</p>
           </div>
         </Panel>
         {HISTORY.length > 0 && (

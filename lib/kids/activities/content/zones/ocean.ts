@@ -55,7 +55,7 @@ export const ocean: KidsActivity[] = [
         { id: 'octopus', icon: '🐙', x: 58, y: 50, size: 9, label: 'Octopus', target: false, fact: 'An octopus is a clever animal. Some robot makers even copy its soft arms!' },
         { id: 'fish', icon: '🐠', x: 86, y: 18, size: 7, label: 'Clownfish', target: false, fact: 'A fish is alive. Robots are machines that people build.' },
         { id: 'crab', icon: '🦀', x: 12, y: 54, size: 7, label: 'Crab', target: false, fact: 'A crab walks sideways on its legs — it is an animal.' },
-        { id: 'anchor', icon: '⚓', x: 48, y: 36, size: 8, label: 'Old anchor', target: false, fact: 'An anchor is a machine part, but it cannot sense or move by itself.' },
+        { id: 'anchor', icon: '⚓', x: 48, y: 36, size: 8, label: 'Old anchor', target: false, fact: 'An anchor is a heavy metal tool. It cannot sense or move by itself.' },
         { id: 'shell', icon: '🐚', x: 66, y: 56, size: 6, label: 'Shell', target: false, fact: 'A shell was once a home for a sea animal. It cannot move by itself.' },
       ],
     },
@@ -415,7 +415,7 @@ export const ocean: KidsActivity[] = [
     world: 'ocean',
     intro: 'An ROV dived, then hovered while it filmed a shipwreck. Its pressure sensor turns pressure into depth, but the readings wobble. What depth did it really hover at?',
     takeaway: 'Depth sensors measure pressure: about 1 atmosphere more every 10 m. Real readings are noisy, so you read the middle of the wobble.',
-    realWorld: 'Every ROV and AUV knows its depth from a pressure sensor — one of the few things that works perfectly underwater.',
+    realWorld: 'Every ROV and AUV knows its depth from a pressure sensor — one of the most reliable sensors underwater, though it must be corrected for tides and air pressure.',
     params: {
       sensor: { name: 'Depth (from pressure)', unit: 'm', min: 0, max: 50 },
       keyframes: [

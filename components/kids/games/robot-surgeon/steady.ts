@@ -24,6 +24,8 @@ export const TREMOR_MM = 1.8
 export const TREMOR_HZ = [9.1, 10.6]
 export const FILTER_FC = 3
 export const TIME_LIMIT = 90
+/** Three stars also need the channel done in this time: high scaling costs hand travel, and hand travel costs time. */
+export const STAR_TIME = 25
 /** Hand millimetres per CSS pixel dragged on the pad. */
 export const MM_PER_PX = 0.35
 /** Keyboard hand speed, mm/s. */
@@ -112,6 +114,8 @@ export interface SteadyState {
   /** Measured shake at the tool: running RMS of (tool − tool without tremor). */
   shakeSq: number
   shakeN: number
+  /** How far the surgeon's hand moved (mm) once the run started. */
+  handTravel: number
   /** Recent tool positions for the trail. */
   trail: { x: number; y: number; ok: boolean }[]
   /** Tool position the same filter would give without tremor (to measure shake honestly). */
@@ -151,6 +155,7 @@ export function makeSteady(settings: SteadySettings, seed = 11): SteadyState {
     maxDev: 0,
     shakeSq: 0,
     shakeN: 0,
+    handTravel: 0,
     trail: [],
     qx: s0.x,
     qy: s0.y,
@@ -190,6 +195,7 @@ export function stepSteady(s: SteadyState, hdx: number, hdy: number, dt: number)
   const sc = s.settings.scale
   s.hx += hdx
   s.hy += hdy
+  if (s.started) s.handTravel += Math.hypot(hdx, hdy)
   s.noiseX = 0.9 * s.noiseX + 0.1 * gauss(s.rand) * 0.25
   s.noiseY = 0.9 * s.noiseY + 0.1 * gauss(s.rand) * 0.25
   const tr = tremor(s)
@@ -256,7 +262,7 @@ export function shakeRms(s: SteadyState): number {
 export function steadyStars(s: SteadyState): number {
   if (!s.finished) return 0
   const acc = accuracy(s)
-  if (acc >= 0.96 && s.touches <= 2) return 3
+  if (acc >= 0.96 && s.touches <= 2 && s.t <= STAR_TIME) return 3
   if (acc >= 0.88) return 2
   if (acc >= 0.75) return 1
   return 0

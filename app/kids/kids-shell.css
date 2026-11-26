@@ -95,6 +95,17 @@
 @media (max-width: 900px) {
   .kids-nav-links { display: none; }
 }
+/* Five header links fit from 901px: tighten them (and drop the emoji) until there is room. */
+@media (min-width: 901px) and (max-width: 1180px) {
+  .kids-nav { gap: 8px; }
+  .kids-nav-links { gap: 2px; flex-wrap: nowrap; }
+  .kids-nav-link { padding: 0 10px; }
+  .kids-nav-link-emoji { display: none; }
+}
+/* The Skill Galaxy is a header link on wide screens and a More item on phones. */
+@media (min-width: 901px) {
+  .kids-more-phone-only { display: none; }
+}
 @media (max-width: 900px) {
   .kids-tabbar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 35;

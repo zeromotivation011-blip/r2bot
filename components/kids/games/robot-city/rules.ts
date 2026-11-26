@@ -34,7 +34,7 @@ export const CONDITIONS: { id: CondId; label: string; icon: string; detail: stri
   { id: 'person-ahead', label: 'A person or vehicle is in my lane ahead', icon: '🧍', detail: 'Lidar, radar and camera agree: something big and solid is in the lane within 45 m.' },
   { id: 'small-object', label: 'A small object is in my lane ahead', icon: '🎈', detail: 'Something small is in the lane within 40 m: a ball, a bag, a traffic cone.' },
   { id: 'ball-recent', label: 'I saw a ball near the road (last 4 s)', icon: '⚽', detail: 'The camera recognised a ball in or near the road in the last 4 seconds.' },
-  { id: 'siren', label: 'I hear a siren / see flashing blue lights', icon: '🚑', detail: 'Microphones and cameras detect an emergency vehicle within 150 m.' },
+  { id: 'siren', label: 'I hear a siren / see flashing emergency lights', icon: '🚑', detail: 'Microphones and cameras detect an emergency vehicle within 150 m.' },
   { id: 'camera-glare', label: 'My camera is blinded by glare', icon: '☀️', detail: 'Low sun shines straight into the camera; it cannot see colours or signs. Lidar and radar still work.' },
   { id: 'light-unknown', label: 'A traffic light is ahead but I cannot read it', icon: '❔', detail: 'The map says there is a traffic light within 70 m, but the camera cannot see its colour.' },
   { id: 'red-light', label: 'The traffic light ahead is red or amber', icon: '🔴', detail: 'The camera reads a red or amber light within 70 m, and the car is before the stop line.' },
@@ -319,13 +319,13 @@ export const ALL_FALSE: Percepts = {
   'people-pavement': false,
 }
 
-export function runScenario(sc: Scenario, rules: Rule[], keepFrames = true): ScenarioResult {
+export function runScenario(sc: Scenario, rules: Rule[], keepFrames = true, latency = LATENCY): ScenarioResult {
   const w = sc.init()
   const car: CarState = { t: 0, s: 0, v: LIMIT, y: 0, remoteAsked: 0, remoteCleared: false }
   const frames: Frame[] = []
   const decisions: { rule: number; action: ActionId }[] = []
   const vHist: number[] = []
-  const lag = Math.round(LATENCY / DT)
+  const lag = Math.round(latency / DT)
   let reason = ''
   let pass = false
   let stalled = 0
@@ -428,8 +428,8 @@ export function runScenario(sc: Scenario, rules: Rule[], keepFrames = true): Sce
   return { id: sc.id, pass, reason, frames, time: car.t }
 }
 
-export function runSuite(rules: Rule[], keepFrames = true): ScenarioResult[] {
-  return SCENARIOS.map((sc) => runScenario(sc, rules, keepFrames))
+export function runSuite(rules: Rule[], keepFrames = true, latency = LATENCY): ScenarioResult[] {
+  return SCENARIOS.map((sc) => runScenario(sc, rules, keepFrames, latency))
 }
 
 export const STARTER: Rule[] = [
@@ -437,9 +437,22 @@ export const STARTER: Rule[] = [
   { when: 'small-object', then: 'brake-hard' },
 ]
 
-export function rulesStars(passedAll: boolean, runs: number): number {
+/**
+ * The stress test: the same six scenarios with the car's reaction slowed from
+ * 0.3 s to 0.8 s (a busy computer, a dirty sensor, a late detection). A rulebook
+ * that only just passes at 0.3 s has no safety margin; a robust one keeps
+ * passing. Stars reward robustness, never the number of test runs: testing
+ * again and again in simulation is exactly what engineers should do.
+ */
+export const STRESS_LATENCY = 0.8
+
+export function stressFailures(rules: Rule[]): ScenarioResult[] {
+  return runSuite(rules, false, STRESS_LATENCY).filter((r) => !r.pass)
+}
+
+export function rulesStars(passedAll: boolean, stressFailed: number): number {
   if (!passedAll) return 0
-  if (runs <= 5) return 3
-  if (runs <= 10) return 2
+  if (stressFailed === 0) return 3
+  if (stressFailed === 1) return 2
   return 1
 }

@@ -14,7 +14,7 @@ const PAGE_URL = 'https://www.r2bot.in/kids/play/smart-farm'
 
 const TITLE = 'Smart Farm: Farm Robot Game for Kids (Soil Sensors, Drones, Picking Robots)'
 const DESCRIPTION =
-  'Run a farm with robots. Kids read soil-moisture sensors, set irrigation thresholds, plan a drone’s lawnmower survey with an NDVI camera, program a tomato-picking robot that light tries to fool, and balance harvest, water, energy and chemicals over a season — four tiers from age 7 to 17.'
+  'Run a farm with robots. Kids read soil-moisture sensors, set irrigation thresholds, plan a drone’s lawnmower survey with an NDVI camera, program a tomato-picking robot that light tries to fool, and balance harvest, water, energy and chemicals over a season — four tiers from age 5 to 17.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -37,7 +37,7 @@ const learningLd = {
   description: DESCRIPTION,
   url: PAGE_URL,
   learningResourceType: 'Interactive simulation',
-  educationalLevel: 'Ages 7–17',
+  educationalLevel: 'Ages 5–17',
   audience: { '@type': 'EducationalAudience', educationalRole: 'student', audienceType: 'children' },
   teaches: [
     'Soil-moisture sensors and precision irrigation',
@@ -61,7 +61,7 @@ const crumbs = breadcrumbJsonLD([
 const TIERS = [
   {
     name: 'Cadet',
-    who: 'about 7 and up',
+    who: 'about 5 and up (a grown-up can read along)',
     what: 'Twelve plants, three days. Every plant has a soil sensor. Water the ones whose sensor is below the orange line, then send the watering robot.',
     tip: 'Do not trust the leaves. A plant can look perfectly happy while its soil is already dry — leaves droop only when it is nearly too late. Water above the line just makes puddles.',
   },
@@ -95,7 +95,7 @@ export default function SmartFarmPage() {
 
       <article className="mx-auto max-w-4xl px-4 pb-16 pt-8 text-[17px] leading-relaxed text-[#A7B0C0]">
         <p className="text-sm font-bold uppercase tracking-wide text-lime-300">
-          <Link href="/kids/worlds/farm" className="hover:underline">
+          <Link href="/kids/worlds/farm" className="inline-flex min-h-[44px] items-center hover:underline">
             Smart Farm world
           </Link>{' '}
           · flagship game
@@ -167,10 +167,10 @@ export default function SmartFarmPage() {
           judging ripeness under changing outdoor light is one of the hard problems you just solved.
         </p>
         <p className="mt-6 flex flex-wrap gap-4">
-          <Link href="/kids/worlds/farm" className="font-bold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids/worlds/farm" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
             Explore the Smart Farm world →
           </Link>
-          <Link href="/kids" className="font-bold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
             ← Back to the R2BOT Universe
           </Link>
         </p>

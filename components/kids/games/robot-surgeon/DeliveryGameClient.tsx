@@ -18,6 +18,7 @@ import {
   PERSON_R,
   ROWS,
   SLOW_FIELD,
+  STOP_HALF_W,
   TIME_LIMIT,
   WARDS,
   deliveryScore,
@@ -40,10 +41,12 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
   const keys = useRef({ up: false, down: false, left: false, right: false })
   const pad = useRef({ up: false, down: false, left: false, right: false })
   const [phase, setPhase] = useState<Phase>('ready')
-  const [hud, setHud] = useState({ t: 0, delivered: 0, events: 0, fast: true })
+  const [hud, setHud] = useState({ t: 0, delivered: 0, events: 0, fast: false })
   const reduced = useReducedMotion()
   const lastEvents = useRef(0)
   const lastDelivered = useRef(0)
+  /** Several fixed steps can run in one frame: the end-of-shift block must run once. */
+  const ended = useRef(false)
 
   const input = () => {
     const k = keys.current
@@ -52,6 +55,7 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
   }
 
   const step = useCallback((dt: number) => {
+    if (ended.current) return
     const s = sim.current
     stepDelivery(s, input(), dt)
     const ev = safetyEvents(s)
@@ -66,6 +70,7 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
       playSound('correct')
     }
     if (s.done || s.timeUp) {
+      ended.current = true
       playSound(s.done ? 'star' : 'wrong')
       setPhase('debrief')
     }
@@ -142,15 +147,18 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
     ctx.arc(rx, ry, SLOW_FIELD * m2px, 0, Math.PI * 2)
     ctx.stroke()
     ctx.setLineDash([])
-    ctx.strokeStyle = s.stopHold > 0 ? COL.red : 'rgba(239,68,68,.6)'
-    ctx.lineWidth = s.stopHold > 0 ? 3 : 1.5
-    ctx.beginPath()
-    ctx.arc(rx, ry, (ROBOT_R + stopField(speed)) * m2px, 0, Math.PI * 2)
-    ctx.stroke()
     ctx.save()
     ctx.translate(rx, ry)
     ctx.rotate(s.heading)
+    // Stop field: a box in front of the robot that grows with speed.
     const r = ROBOT_R * m2px
+    const boxL = (ROBOT_R + stopField(speed)) * m2px
+    const boxW = STOP_HALF_W * m2px
+    ctx.fillStyle = s.stopHold > 0 ? 'rgba(239,68,68,.35)' : 'rgba(239,68,68,.14)'
+    ctx.fillRect(0, -boxW, boxL, 2 * boxW)
+    ctx.strokeStyle = s.stopHold > 0 ? COL.red : 'rgba(239,68,68,.7)'
+    ctx.lineWidth = s.stopHold > 0 ? 3 : 1.5
+    ctx.strokeRect(0, -boxW, boxL, 2 * boxW)
     ctx.fillStyle = COL.amber
     rr(ctx, -r, -r, 2 * r, 2 * r, r * 0.4)
     ctx.fill()
@@ -248,7 +256,7 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
         text: `You drove fast near a person ${s.fastNearPerson} time${s.fastNearPerson === 1 ? '' : 's'} (top speed near people: ${s.worstNearSpeed.toFixed(1)} m/s). A robot needs room to stop: at ${FAST} m/s it needs ${stopDist(FAST).toFixed(2)} m to brake, at ${CAREFUL} m/s only ${stopDist(CAREFUL).toFixed(2)} m.`,
       })
     else lines.push({ icon: '🐢', text: 'You always slowed down near people — exactly what real delivery robots do with their laser scanners.' })
-    if (s.autoStops) lines.push({ icon: '🛑', text: `The robot made ${s.autoStops} automatic safety stop${s.autoStops === 1 ? '' : 's'}: someone was inside its red stop zone. Safe — but each one cost time. Driving slowly near people avoids them.` })
+    if (s.autoStops) lines.push({ icon: '🛑', text: `The robot made ${s.autoStops} automatic safety stop${s.autoStops === 1 ? '' : 's'}: someone was inside the red stop box in front of it. Safe — but each one cost time. Keeping to the right and driving slowly near people avoids them: people step aside for a slow robot.` })
     if (s.bumps) lines.push({ icon: '💥', text: `${s.bumps} wall bump${s.bumps === 1 ? '' : 's'}. Real robots have a soft bumper switch that stops the motors on any touch.` })
     if (!s.done) lines.push({ icon: '🗺️', text: 'Tip: the eye clinic is at the bottom left, the heart ward in the middle, the children’s ward top right. Pick an order that does not go back and forth.' })
     return lines
@@ -273,6 +281,9 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
                 <h3 className="mt-1 font-display text-2xl font-bold text-white">Medicine Run</h3>
                 <p className="mt-2 text-[16px] leading-snug text-[#EEF2F8]">
                   Take medicine to the <b>three coloured ward doors</b>, then drive back to the 🔌 charger. Slow down near people — watch the dotted ring.
+                </p>
+                <p className="mt-2 text-[15px] leading-snug text-[#A7B0C0]">
+                  Keep to the <b className="text-[#EEF2F8]">right</b> of the corridor, like the people do. They step aside for a slow robot, so you can pass.
                 </p>
                 <PrimaryButton className="mt-4" onClick={() => setPhase('run')}>
                   Start the shift
@@ -336,7 +347,10 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
               <span className="font-bold text-amber-300">Dotted ring</span> — slow zone: go careful when a person is inside it.
             </li>
             <li>
-              <span className="font-bold text-rose-300">Red ring</span> — stop zone. It grows when you go fast, because a fast robot needs more room to brake.
+              <span className="font-bold text-rose-300">Red box</span> — stop zone in front of the robot. It grows when you go fast, because a fast robot needs more room to brake.
+            </li>
+            <li>
+              <span className="font-bold text-cyan-300">Keep right</span> — pass people on your right-hand side of the corridor. If the robot stops, steer a little to the right and go on slowly.
             </li>
           </ul>
         </Panel>

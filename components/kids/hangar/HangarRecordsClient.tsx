@@ -2,7 +2,7 @@
 
 // components/kids/hangar/HangarRecordsClient.tsx
 // The Hangar's record room: the badge wall (by track), personal bests per game
-// and tier, course progress per planet, and certificates. Every number comes
+// and tier, course progress per planet, world progress, and certificates. Every number comes
 // from lib/kids-progress.ts; nothing is invented. Before the child's progress
 // is read (server render, first paint) the lists render with neutral states so
 // the HTML is meaningful and the layout does not move.
@@ -12,7 +12,8 @@ import { useId, useState } from 'react'
 import { SparkCharacter } from '@/components/kids/SparkCharacter'
 import { UNIVERSE_BADGES, type BadgeTrack, type UniverseBadge } from '@/lib/kids/universe/rewards'
 import { TIER_NAMES } from '@/lib/kids/universe/tiers'
-import { GAMES, PLANETS } from '@/lib/kids/universe/worlds'
+import { GAMES, PLANETS, WORLDS } from '@/lib/kids/universe/worlds'
+import { WorldProgressBar } from '@/components/kids/universe/WorldProgressClient'
 import { useHangarState } from './useHangarState'
 
 /** A course (curriculum) badge as the server passes it in: real names from the curriculum. */
@@ -58,7 +59,14 @@ function formatScore(n: number): string {
 
 const card = 'rounded-[28px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4 shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:p-5'
 
-export function HangarRecordsClient({ courseBadges = {} }: { courseBadges?: Record<string, CourseBadgeInfo> }) {
+export function HangarRecordsClient({
+  courseBadges = {},
+  worldActivityIds = {},
+}: {
+  courseBadges?: Record<string, CourseBadgeInfo>
+  /** World id → its Skill Galaxy activity ids (from the server). */
+  worldActivityIds?: Record<string, string[]>
+}) {
   const { ready, progress } = useHangarState()
   const [showAll, setShowAll] = useState(false)
   const [openCourse, setOpenCourse] = useState<string | null>(null)
@@ -260,6 +268,40 @@ export function HangarRecordsClient({ courseBadges = {} }: { courseBadges?: Reco
               </li>
             )
           })}
+        </ul>
+      </section>
+
+      {/* ── World progress ── */}
+      <section aria-labelledby="worlds-h" className={card}>
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <h2 id="worlds-h" className="font-display text-2xl font-bold text-white">
+            World progress
+          </h2>
+          <Link href="/kids/worlds" className="inline-flex min-h-[44px] items-center font-display text-sm font-bold text-amber-300 underline-offset-4 hover:underline">
+            All worlds →
+          </Link>
+        </div>
+        <p className="mt-1 text-sm text-[#A7B0C0]">Activities finished in each world, and whether you have played its game.</p>
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {WORLDS.map((w) => (
+            <li key={w.id}>
+              <Link
+                href={`/kids/worlds/${w.id}`}
+                className="block h-full rounded-[20px] border border-white/[0.08] bg-[#0A1120]/50 p-3 transition hover:-translate-y-0.5 hover:border-white/25 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.98]"
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gradient-to-br ${w.gradient} text-2xl shadow-[inset_-4px_-6px_10px_rgba(0,0,0,.35)]`} aria-hidden>
+                    {w.emoji}
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="font-display text-base font-bold leading-tight text-white">{w.name}</h3>
+                    <p className="text-xs text-[#A7B0C0]">{w.tagline}</p>
+                  </div>
+                </div>
+                <WorldProgressBar ids={worldActivityIds[w.id] ?? []} gameId={w.game} worldName={w.name} />
+              </Link>
+            </li>
+          ))}
         </ul>
       </section>
 

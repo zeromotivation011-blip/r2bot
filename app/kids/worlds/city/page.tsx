@@ -19,7 +19,7 @@ import { CityActivities, CityProgressCard, type CityBand } from '@/components/ki
 export const runtime = 'nodejs'
 
 const PAGE_URL = 'https://www.r2bot.in/kids/worlds/city'
-const TITLE = 'Robot City: Self-Driving Cars for Kids — Stopping Distance, Smart Traffic Lights and Delivery Robots'
+const TITLE = 'Robot City: Self-Driving Cars and Smart Streets for Kids'
 const DESCRIPTION =
   'A robotics world for kids 5–17 about robots on city streets. Learn how self-driving cars see with cameras, lidar and radar, why stopping distance grows with speed squared, how smart traffic lights work and how robots handle the unexpected — with a four-tier game and 24 hands-on activities.'
 

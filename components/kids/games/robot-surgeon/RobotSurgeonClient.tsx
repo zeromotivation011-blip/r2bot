@@ -31,8 +31,8 @@ const HOW_TO_PLAY = (
     <p>Welcome to the Robot Hospital. Every tier puts you in charge of a different medical robot — and every robot keeps people safe in its own way.</p>
     <ul className="list-disc space-y-1 pl-5">
       <li>
-        <b>Cadet — Medicine Run:</b> drive the delivery robot (arrow pad, arrows or WASD) to the three coloured ward doors and back to its charger. Switch to
-        🐢 careful speed (Space) near people.
+        <b>Cadet — Medicine Run:</b> drive the delivery robot (arrow pad, arrows or WASD) to the three coloured ward doors and back to its charger. It starts in
+        🐢 careful speed; Space switches to fast. Keep to the right of the corridor to pass people.
       </li>
       <li>
         <b>Pilot — Steady Hands:</b> you are at a surgeon’s console. Drag on the hand pad to guide the tool tip along the channel. Pick the motion scaling and

@@ -14,7 +14,7 @@ const PAGE_URL = 'https://www.r2bot.in/kids/play/ocean-rescue'
 
 const TITLE = 'Deep Sea Rescue: Underwater Robot Game for Kids (ROVs, AUVs, Sonar)'
 const DESCRIPTION =
-  'Pilot an underwater robot through currents and darkness to rescue a lost sensor buoy. Kids learn buoyancy and ballast, pressure with depth, sonar echoes at 1,500 m/s, tethers and navigation without GPS — four tiers from age 7 to 17.'
+  'Pilot an underwater robot through currents and darkness to rescue a lost sensor buoy. Kids learn buoyancy and ballast, pressure with depth, sonar echoes at 1,500 m/s, tethers and navigation without GPS — four tiers for ages 5 to 17.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -37,7 +37,7 @@ const learningLd = {
   description: DESCRIPTION,
   url: PAGE_URL,
   learningResourceType: 'Interactive simulation',
-  educationalLevel: 'Ages 7–17',
+  educationalLevel: 'Ages 5–17',
   audience: { '@type': 'EducationalAudience', educationalRole: 'student', audienceType: 'children' },
   teaches: [
     'Buoyancy and Archimedes’ principle',
@@ -61,7 +61,7 @@ const crumbs = breadcrumbJsonLD([
 const TIERS = [
   {
     name: 'Cadet',
-    who: 'about 7 and up',
+    who: 'about 5–7 with a grown-up, and up',
     what: 'Fly a tethered robot in a harbour. It is already balanced, so it hovers when you let go. Ping the sonar, follow the arrow to the buoy, hold still to grab it and bring it up to the ship.',
     tip: 'The robot keeps gliding after you let go — water is heavy to push aside. Tap the arrows near the seabed instead of holding them. Watch the buoy: in the dark it looks grey, and it turns orange only when your lights reach it.',
   },
@@ -80,8 +80,8 @@ const TIERS = [
   {
     name: 'Legend',
     who: '14 and up — a real survey-planning problem',
-    what: 'Map a whole reef with a multibeam sonar fan before the 60 Wh battery or the 60-minute clock runs out. Every map cell must be sharp and placed correctly.',
-    tip: 'Height sets three things at once: the swath width (about 3.5 × height), the size of each sonar spot (detail), and whether the DVL can lock. Then pick a spacing a little narrower than the swath and the cheapest speed between “always-on electronics” and “drag grows with speed cubed”.',
+    what: 'Map a whole reef with a multibeam sonar fan before the 60 Wh battery or the 60-minute clock runs out. 90 % of the map must be sharp and placed correctly.',
+    tip: 'Height sets three things at once: the swath width (about 3.5 × height), the size of each sonar spot (detail — it must be 0.6 m or smaller, which means flying no higher than about 23 m), and whether the DVL can lock (within 30 m). Then pick a spacing a little narrower than the swath and the cheapest speed between “always-on electronics” and “drag grows with speed cubed”.',
   },
 ]
 
@@ -95,7 +95,7 @@ export default function OceanRescuePage() {
 
       <article className="mx-auto max-w-4xl px-4 pb-16 pt-8 text-[17px] leading-relaxed text-[#A7B0C0]">
         <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">
-          <Link href="/kids/worlds/ocean" className="hover:underline">
+          <Link href="/kids/worlds/ocean" className="inline-flex min-h-[44px] items-center hover:underline">
             Ocean Lab
           </Link>{' '}
           · flagship game
@@ -183,10 +183,10 @@ export default function OceanRescuePage() {
           where it is without GPS.
         </p>
         <p className="mt-6 flex flex-wrap gap-4">
-          <Link href="/kids/worlds/ocean" className="font-bold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids/worlds/ocean" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
             Explore the Ocean Lab world →
           </Link>
-          <Link href="/kids" className="font-bold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
             ← Back to the R2BOT Universe
           </Link>
         </p>

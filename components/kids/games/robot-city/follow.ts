@@ -13,6 +13,8 @@
 //   - Braking is limited by grip: about 7 m/s² on a dry road, 4 m/s² on a wet one.
 //   - Stopping distance = v × latency + v² / (2a). It grows with speed SQUARED.
 //   - The following gap is a TIME gap: gap = 2 m + headway × v, so it grows with speed.
+// Positions: `s` is always a car's REAR bumper; its front is s + CAR_LEN. The
+// gap to the car ahead is bumper to bumper: leadRear − (s + CAR_LEN).
 // Deterministic: same settings, same drive.
 // Pure logic: no React, no DOM.
 
@@ -90,7 +92,8 @@ export function runFollow(set: FollowSettings): FollowResult {
   let t = 0
   let s = 0
   let v = Math.min(vSet, LEAD_SPEED)
-  let leadS: number | null = 2 + CAR_LEN + h * v + 0.01
+  // leadS = the lead car's REAR bumper. Start exactly at the chosen gap.
+  let leadS: number | null = CAR_LEN + 2 + h * v + 0.01
   let leadV = LEAD_SPEED
   let leadStoppedFor = 0
   let leadPhase: 'cruise' | 'brake' | 'stopped' | 'go' = 'cruise'
@@ -123,7 +126,7 @@ export function runFollow(set: FollowSettings): FollowResult {
     const inFog = s + CAR_LEN >= FOG_START - 20
     const range = inFog ? FOG_RANGE : CLEAR_RANGE
     const vanVisible = !vanPassed && VAN_AT - (s + CAR_LEN) <= range
-    hist.push({ leadS: leadS !== null && leadS - CAR_LEN - s <= range ? leadS : null, leadV, vanVisible })
+    hist.push({ leadS: leadS !== null && leadS - (s + CAR_LEN) <= range ? leadS : null, leadV, vanVisible })
     const p = hist.length > delaySteps ? hist[hist.length - 1 - delaySteps] : { leadS: null, leadV: 0, vanVisible: false }
     if (p.vanVisible && vanSeenAt === null) vanSeenAt = v * 3.6
 
@@ -138,7 +141,7 @@ export function runFollow(set: FollowSettings): FollowResult {
       const la = prev.leadS !== null ? (p.leadV - prev.leadV) / (6 * DT) : 0
       // Where the lead is NOW according to old data: it moved on since.
       const ahead = Math.max(0, p.leadV * LATENCY + 0.5 * la * LATENCY * LATENCY)
-      const gap = p.leadS + ahead - CAR_LEN - s
+      const gap = p.leadS + ahead - (s + CAR_LEN)
       if (la < -3 && gap < 3 * v + 4) aCmd = -aMaxNow // emergency braking ahead: brake as hard as the grip allows
       const want = 2 + h * v
       const acc = 0.35 * (gap - want) + 0.9 * (p.leadV - v)
@@ -170,7 +173,7 @@ export function runFollow(set: FollowSettings): FollowResult {
 
     // ── checks ──
     if (leadS !== null) {
-      const gap = leadS - CAR_LEN - s
+      const gap = leadS - (s + CAR_LEN)
       if (gap < minLeadGap) minLeadGap = gap
       if (gap <= 0) {
         crashed = { where: 'lead', t, s, speedKmh: (v - leadV) * 3.6 }
@@ -178,7 +181,7 @@ export function runFollow(set: FollowSettings): FollowResult {
     }
     if (!vanPassed && s + CAR_LEN >= VAN_AT) crashed = { where: 'van', t, s, speedKmh: v * 3.6 }
     if (i % 2 === 0 || crashed)
-      frames.push({ t, s, v, a, leadS, leadV, leadBraking: leadPhase === 'brake', van: !vanPassed, seen: p.vanVisible, gap: leadS !== null ? leadS - CAR_LEN - s : null })
+      frames.push({ t, s, v, a, leadS, leadV, leadBraking: leadPhase === 'brake', van: !vanPassed, seen: p.vanVisible, gap: leadS !== null ? leadS - (s + CAR_LEN) : null })
     if (crashed) break
   }
   return { frames, crashed, time: t, minLeadGap, vanMargin, hardestBrake: hardest, vanSeenAt }
@@ -189,11 +192,61 @@ export function safetyMargin(r: FollowResult): number {
   return Math.min(r.minLeadGap, r.vanMargin ?? Infinity)
 }
 
+/** A stop that leaves less than this in front of the bumper is too close. */
 export const MARGIN_OK = 1.5 // m
+/** The delivery must arrive within this time, or it is late (fails). */
+export const TIME_LIMIT = 105 // s
+/** A run this quick (or quicker) counts as fast. */
+export const TIME_FAST = 96 // s
+/**
+ * Lane capacity the city needs on this street. Traffic engineers plan city
+ * lanes for about 1,800 cars per hour. Every car in a queue takes up its own
+ * length plus its gap, so the bigger the gap, the fewer cars fit through.
+ */
+export const FLOW_TARGET = 1800 // cars per hour per lane
+
+/**
+ * Cars per hour one lane can carry if every car follows at this time gap at
+ * the street's speed: 3600 s ÷ (time from one front bumper to the next).
+ */
+export function laneFlow(set: FollowSettings): number {
+  const v = Math.min(set.speedKmh / 3.6, LEAD_SPEED)
+  const frontToFront = (CAR_LEN + 2 + set.headway * v) / v
+  return 3600 / frontToFront
+}
+
+/** Largest time gap (s) that still meets FLOW_TARGET at the street's speed. */
+export function maxFlowHeadway(): number {
+  return 3600 / FLOW_TARGET - (CAR_LEN + 2) / LEAD_SPEED
+}
+
+export type FollowLimit = 'crash-lead' | 'crash-van' | 'late' | 'tight-lead' | 'tight-van' | 'slow' | 'flow' | null
+
+export interface FollowVerdict {
+  stars: number
+  /** What held the score back (null = nothing, 3 stars). */
+  limit: FollowLimit
+  fast: boolean
+  flowOk: boolean
+}
+
+/**
+ * Stars: a bump or a late delivery fails (0). Stopping closer than MARGIN_OK
+ * to the car ahead or to the van is 1 star. A safe run is 2 stars; 3 stars needs
+ * it to be fast (speed: the fog limit) AND to keep the lane flowing (gap: not
+ * too big). So speed is traded against stopping distance in the fog, and the
+ * gap is traded between the car ahead's emergency stop and the lane's capacity.
+ */
+export function followVerdict(set: FollowSettings, r: FollowResult): FollowVerdict {
+  const fast = r.time <= TIME_FAST
+  const flowOk = laneFlow(set) >= FLOW_TARGET
+  if (r.crashed) return { stars: 0, limit: r.crashed.where === 'van' ? 'crash-van' : 'crash-lead', fast, flowOk }
+  if (r.time > TIME_LIMIT) return { stars: 0, limit: 'late', fast, flowOk }
+  if (safetyMargin(r) < MARGIN_OK) return { stars: 1, limit: r.minLeadGap <= (r.vanMargin ?? Infinity) ? 'tight-lead' : 'tight-van', fast, flowOk }
+  if (fast && flowOk) return { stars: 3, limit: null, fast, flowOk }
+  return { stars: 2, limit: fast ? 'flow' : 'slow', fast, flowOk }
+}
 
 export function followStars(set: FollowSettings, r: FollowResult): number {
-  if (r.crashed) return 0
-  if (set.speedKmh >= 44 && safetyMargin(r) >= MARGIN_OK) return 3
-  if (set.speedKmh >= 36) return 2
-  return 1
+  return followVerdict(set, r).stars
 }

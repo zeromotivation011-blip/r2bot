@@ -73,6 +73,8 @@ export default function BionicHandGameClient({ onFinish }: { onFinish: (r: Round
   const carry = useRef(0)
   const [hud, setHud] = useState<{ grip: Grip; env: number; t: number; task: string; icon: string; intent: Grip }>({ grip: 'open', env: 0, t: 0, task: '', icon: '🖐️', intent: 'open' })
   const lastGrip = useRef<Grip>('open')
+  /** Several fixed steps can run in one frame: the end-of-test block must run once. */
+  const ended = useRef(false)
 
   const update = (patch: Partial<EmgSettings>) => {
     if (mode !== 'try') return
@@ -94,8 +96,10 @@ export default function BionicHandGameClient({ onFinish }: { onFinish: (r: Round
         const a = act.current
         stepEmg(s, n, (t) => a * (1 + 0.06 * Math.sin(t * 3)), false)
       } else if (mode === 'test') {
+        if (ended.current) return
         stepEmg(s, n, scriptActivation, true)
         if (s.t >= SCRIPT_END) {
+          ended.current = true
           playSound(emgStars(s) > 0 ? 'star' : 'wrong')
           setMode('debrief')
         }
@@ -214,6 +218,7 @@ export default function BionicHandGameClient({ onFinish }: { onFinish: (r: Round
     squeeze.current = 0.05
     sim.current = makeEmg(settings)
     lastGrip.current = 'open'
+    ended.current = false
     setMode('test')
     playSound('click')
   }

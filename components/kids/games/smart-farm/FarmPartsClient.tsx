@@ -185,7 +185,7 @@ export function Choice<T extends string | number>({
               playSound('click')
               onChange(o.value)
             }}
-            className={`min-h-[44px] rounded-xl border px-3 py-1 text-left text-[14px] font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 disabled:opacity-50 ${
+            className={`min-h-[44px] min-w-[44px] rounded-xl border px-3 py-1 text-left text-[14px] font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 disabled:opacity-50 ${
               value === o.value ? 'border-amber-400 bg-amber-500 text-[#1A1103]' : 'border-white/15 bg-white/5 text-[#EEF2F8] hover:bg-white/10'
             }`}
           >

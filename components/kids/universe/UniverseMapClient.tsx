@@ -2,8 +2,11 @@
 
 // components/kids/universe/UniverseMapClient.tsx
 // The hero of the kids home: the R2BOT Universe as a living star map. Four
-// course planets (PLANETS) with the child's progress ring, eight game moons
-// (GAMES), and the Hangar station in the middle. Pure SVG + CSS: no canvas, no
+// course planets (PLANETS) with the child's progress ring, the eight original
+// game moons (GAMES that are not a world's flagship), the Hangar station in the
+// middle and, along the bottom edge, the Worlds belt: the seven themed worlds
+// (WORLDS), each opening its world page. Worlds sit in their own belt rather
+// than as fifteen more bodies, so the phone map stays readable. Pure SVG + CSS: no canvas, no
 // three.js, nothing heavy on first load. It server-renders with every link and
 // label in place (rings at zero), then fills in the child's progress — same
 // size before and after, so nothing shifts.
@@ -15,7 +18,7 @@ import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import type { KidsProgress } from '@/lib/kids-progress'
 import { BAND_ORDER, getBand, type BandId } from '@/lib/kids/bands'
-import { GAMES, PLANETS, type Planet, type UniverseGame } from '@/lib/kids/universe/worlds'
+import { GAMES, PLANETS, WORLDS, WORLD_GAME_IDS, type Planet, type UniverseGame, type UniverseWorld } from '@/lib/kids/universe/worlds'
 import { SESSIONS_PER_LEVEL, gamesPlayed, sessionsDoneOn } from './universe-state'
 import './universe.css'
 
@@ -43,6 +46,9 @@ const GAME_POS: Record<string, Pos> = {
 
 const HANGAR_POS: Pos = [50, 50, 50, 48]
 
+/** The moons: every game that is not a world's flagship (those live on the Worlds belt). */
+const MOONS = GAMES.filter((g) => !WORLD_GAME_IDS.has(g.id))
+
 function posStyle(p: Pos): CSSProperties {
   return { '--mx': `${p[0]}%`, '--my': `${p[1]}%`, '--dx': `${p[2]}%`, '--dy': `${p[3]}%` } as CSSProperties
 }
@@ -69,8 +75,9 @@ export function UniverseMapClient({ progress }: UniverseMapProps) {
   const played = progress ? gamesPlayed(progress) : new Set<string>()
 
   return (
+    <div className="w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#060C18] shadow-[0_8px_24px_rgba(0,0,0,.45)]">
     <div
-      className="relative aspect-[3/5] w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#060C18] shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:aspect-[4/3]"
+      className="relative aspect-[3/5] w-full overflow-hidden sm:aspect-[4/3]"
       role="group"
       aria-label="Universe map"
     >
@@ -120,14 +127,72 @@ export function UniverseMapClient({ progress }: UniverseMapProps) {
         <PlanetNode key={pl.id} planet={pl} index={i} progress={progress} childBand={band} />
       ))}
 
-      {GAMES.map((g, i) => (
+      {MOONS.map((g, i) => (
         <MoonNode key={g.id} game={g} index={i} childBand={band} played={played.has(g.id)} />
       ))}
 
       <p className="pointer-events-none absolute inset-x-0 bottom-2 hidden text-center text-xs font-semibold text-[#A7B0C0]/80 sm:block" aria-hidden>
-        Planets are your course · moons are games · tap anything to fly there
+        Planets are your course · moons are games · worlds are below · tap anything to fly there
       </p>
     </div>
+    <WorldsBelt played={played} />
+    </div>
+  )
+}
+
+/**
+ * The Worlds belt: a strip along the bottom of the map, like an asteroid belt
+ * at the edge of the system. Seven world "stations", one tap each to the world
+ * page. Scrolls sideways on a phone; one row on wider screens. A world shows a
+ * tick once its flagship game has a finished round.
+ */
+function WorldsBelt({ played }: { played: Set<string> }) {
+  return (
+    <nav aria-labelledby="uv-worlds-h" className="relative border-t border-white/10 bg-gradient-to-b from-[#0A1120] to-[#060C18] px-3 pb-3 pt-2.5 sm:px-4">
+      <div aria-hidden className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/40 to-transparent" />
+      <div className="flex items-center justify-between gap-3">
+        <h2 id="uv-worlds-h" className="font-display text-[15px] font-bold text-[#EEF2F8] sm:text-base">
+          <span aria-hidden className="mr-1.5">🧭</span>Worlds
+          <span className="ml-2 hidden text-[13px] font-semibold text-[#A7B0C0] sm:inline">where robots really work</span>
+        </h2>
+        <Link
+          href="/kids/worlds"
+          className="inline-flex min-h-[44px] shrink-0 items-center rounded-xl px-2 text-[14px] font-bold text-amber-300 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+        >
+          All worlds →
+        </Link>
+      </div>
+      <ul className="-mx-3 mt-1 flex snap-x gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-7 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
+        {WORLDS.map((w) => (
+          <li key={w.id} className="shrink-0 snap-start sm:shrink">
+            <WorldStation world={w} played={played.has(w.game)} />
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+function WorldStation({ world, played }: { world: UniverseWorld; played: boolean }) {
+  return (
+    <Link
+      href={`/kids/worlds/${world.id}`}
+      aria-label={`${world.name} world: ${world.tagline}${played ? ' You have played its game.' : ''}`}
+      className="group flex w-[86px] flex-col items-center gap-1 rounded-2xl px-1 py-1.5 text-center outline-none transition hover:bg-white/[0.05] focus-visible:ring-4 focus-visible:ring-amber-400/60 sm:w-auto"
+    >
+      <span
+        className={`relative grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br ${world.gradient} text-2xl shadow-[inset_-5px_-6px_12px_rgba(0,0,0,.45),0_4px_14px_rgba(0,0,0,.5)] ring-2 transition duration-200 group-hover:scale-110 group-active:scale-95 motion-reduce:transition-none ${
+          played ? 'ring-amber-300/80' : 'ring-white/15'
+        }`}
+        aria-hidden
+      >
+        {world.emoji}
+        {played && (
+          <span className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full bg-amber-500 text-[11px] font-black text-[#1A1103]">✓</span>
+        )}
+      </span>
+      <span className="text-[12px] font-bold leading-tight text-[#EEF2F8] sm:text-[13px]">{world.name}</span>
+    </Link>
   )
 }
 
