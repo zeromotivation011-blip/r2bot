@@ -111,7 +111,8 @@ function shapeProblems(p: Params, a: Answer): string[] {
     seen.add(pl.item)
     if (!Number.isInteger(pl.pos) || pl.pos < 0 || pl.pos > p.beamLength) out.push('Every item must sit on a peg of the beam.')
   }
-  if (p.mustUseAll && seen.size !== p.tray.length) out.push(`Use all ${p.tray.length} items from the tray.`)
+  if (p.mustUseAll && seen.size !== p.tray.length)
+    out.push(p.tray.length === 1 ? `Put the ${(p.tray[0].label ?? 'item').toLowerCase()} on the beam.` : `Use all ${p.tray.length} items from the tray.`)
   return out
 }
 
@@ -125,9 +126,15 @@ function success(p: Params, a: Answer): boolean {
   return side > 0 ? net < -EPS : net > EPS
 }
 
-/** Exhaustive search over fulcrum × placements, using sets of reachable moments. Returns one solution or null. */
-export function findSolution(p: Params): Answer | null {
+/**
+ * Exhaustive search over fulcrum × placements, using sets of reachable net
+ * moments (success depends only on the fulcrum and the net moment). Returns one
+ * solution (or null) and whether EVERY reachable state succeeds (= trivial).
+ */
+export function analyse(p: Params): { solution: Answer | null; allSucceed: boolean } {
   const fulcrums = p.fulcrumMovable ? Array.from({ length: p.beamLength + 1 }, (_, i) => i) : [p.fulcrum]
+  let solution: Answer | null = null
+  let allSucceed = true
   for (const f of fulcrums) {
     // reachable: map net-moment key → placements
     let reach = new Map<string, { net: number; placed: Placement[] }>()
@@ -147,10 +154,17 @@ export function findSolution(p: Params): Answer | null {
     })
     for (const st of reach.values()) {
       const a = { fulcrum: f, placed: st.placed }
-      if (success(p, a)) return a
+      if (success(p, a)) solution ??= a
+      else allSucceed = false
     }
+    if (solution && !allSucceed) break
   }
-  return null
+  return { solution, allSucceed }
+}
+
+/** One solution, or null. */
+export function findSolution(p: Params): Answer | null {
+  return analyse(p).solution
 }
 
 function validate(p: Params): string[] {
@@ -175,29 +189,40 @@ function validate(p: Params): string[] {
   if (p.tolerance !== undefined && !(p.tolerance >= 0)) e.push('tolerance cannot be negative.')
   if (e.length) return e
   // Already solved before the child does anything? Then there is nothing to learn.
-  if (!p.mustUseAll && success(p, { fulcrum: p.fulcrum, placed: [] })) e.push('Trivial: the start position already meets the goal.')
-  if (!findSolution(p)) e.push('Unsolvable: no placement of the tray items (and pivot) meets the goal.')
+  if (!p.mustUseAll && success(p, { fulcrum: p.fulcrum, placed: [] })) {
+    e.push('Trivial: the start position already meets the goal.')
+    return e
+  }
+  const { solution, allSucceed } = analyse(p)
+  if (!solution) e.push('Unsolvable: no placement of the tray items (and pivot) meets the goal.')
+  else if (allSucceed) e.push('Trivial: every possible placement meets the goal (tolerance too loose?), so where things go does not matter.')
   return e
 }
 
 const r1 = (n: number) => Math.round(n * 10) / 10
 
+/**
+ * Feedback leads with what happened and what to do. The moment sums
+ * (weight × distance) are added only when the activity shows moments
+ * (showMoments: true, ages 11+) — young children get the action alone.
+ */
 function check(p: Params, a: Answer): CheckResult {
   const shape = shapeProblems(p, a)
   if (shape.length) return { correct: false, score: 0, feedback: shape[0] }
   const { net, left, right } = netMoment(p, a)
-  const sums = `Left side: ${r1(left)} kg·pegs, right side: ${r1(right)} kg·pegs (weight × distance from the pivot).`
+  const maths = !!p.showMoments
+  const sums = maths ? ` Left side: ${r1(left)} kg·pegs, right side: ${r1(right)} kg·pegs (weight × distance from the pivot).` : ''
   if (success(p, a)) {
     if (p.goal === 'balance')
       return {
         correct: true,
         score: 1,
-        feedback: `${sums} They match, so the beam stays level. A light weight far from the pivot can balance a heavy one close to it.`,
+        feedback: `Level!${sums}${maths ? ' They match.' : ''} A light weight far from the pivot can balance a heavy one close to it.`,
       }
     return {
       correct: true,
       score: 1,
-      feedback: `${sums} Your side wins, so the load goes up. The longer your side of the lever, the less weight you need — that is mechanical advantage.`,
+      feedback: `Up it goes!${sums} The longer your side of the lever, the less weight you need — that is mechanical advantage.`,
     }
   }
   const heavier = net > 0 ? 'right' : 'left'
@@ -208,25 +233,26 @@ function check(p: Params, a: Answer): CheckResult {
     return {
       correct: false,
       score: close ? 0.5 : 0,
-      feedback: `${sums} The ${heavier} side pushes ${r1(diff)} more, so it goes down. Move weight further out on the ${lighter} side, or closer to the pivot on the ${heavier} side${
+      feedback: `The ${heavier} side goes down. Move weight further out on the ${lighter} side, or closer to the middle on the ${heavier} side${
         p.fulcrumMovable ? ' — or slide the pivot towards the heavy side' : ''
-      }.`,
+      }.${sums}${maths ? ` The ${heavier} side has ${r1(diff)} more.` : ''}`,
     }
   }
   const load = p.fixed[p.liftIndex ?? 0]
-  if (load.pos === a.fulcrum) return { correct: false, score: 0, feedback: `The ${load.label ?? 'load'} is right on top of the pivot, so it can never go up or down. Move the pivot.` }
+  const name = load.label ?? 'load'
+  if (load.pos === a.fulcrum) return { correct: false, score: 0, feedback: `The ${name} is right on top of the pivot, so it can never go up or down. Move the pivot.` }
   if (Math.abs(net) <= EPS)
     return {
       correct: false,
       score: 0.5,
-      feedback: `${sums} Exactly balanced — so the ${load.label ?? 'load'} hovers but does not go up. You need just a little more turning push on your side.`,
+      feedback: `So close — exactly balanced, so the ${name} hovers but does not go up. You need just a little more push on your side.${sums}`,
     }
   return {
     correct: false,
     score: 0,
-    feedback: `${sums} The ${load.label ?? 'load'}'s side is still the heavier one, so it stays down. Put your weight further from the pivot${
+    feedback: `The ${name} stays down — its side is still the heavier one. Put your weight further from the pivot${
       p.fulcrumMovable ? ', or move the pivot closer to the load' : ''
-    } — a longer lever arm multiplies your push.`,
+    }: a longer lever arm multiplies your push.${sums}`,
   }
 }
 

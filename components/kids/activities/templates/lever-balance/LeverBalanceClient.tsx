@@ -19,6 +19,7 @@ import {
   useAnimationFrame,
   useAttempts,
   useReducedMotion,
+  useSvgScale,
 } from '../gear-train/TemplateFrameClient'
 
 const W = 400
@@ -45,7 +46,8 @@ export default function LeverBalanceClient({ params, band, onSubmit, onDone }: T
   const [angle, setAngle] = useState(0)
   const angleRef = useRef(0)
   const velRef = useRef(0)
-  const svgRef = useRef<SVGSVGElement>(null)
+  const sv = useSvgScale(W)
+  const svgRef = sv.ref
   const dragRef = useRef<number | null>(null)
   const reduced = useReducedMotion()
   const att = useAttempts(onSubmit, onDone)
@@ -170,7 +172,7 @@ export default function LeverBalanceClient({ params, band, onSubmit, onDone }: T
           {p.goal === 'balance'
             ? 'Make the beam balance — perfectly level.'
             : `Lift the ${loadSide?.label ?? 'load'} ${loadSide?.emoji ?? ''} off the ground.`}
-          {p.mustUseAll ? ` Use all ${p.tray.length} items.` : ''}
+          {p.mustUseAll ? (p.tray.length === 1 ? ` Use the ${(p.tray[0].label ?? 'weight').toLowerCase()}.` : ` Use all ${p.tray.length} items.`) : ''}
         </p>
       </div>
 
@@ -218,7 +220,7 @@ export default function LeverBalanceClient({ params, band, onSubmit, onDone }: T
               <g key={i}>
                 <circle cx={px(i)} cy={BEAM_Y + 2} r={2.2} fill="#0A1120" />
                 {(showMoments || i === fulcrum) && (L <= 12 || i % 2 === 0) && (
-                  <text x={px(i)} y={BEAM_Y + 20} textAnchor="middle" fontSize={9} fill={i === fulcrum ? '#FFA878' : '#6E7888'}>
+                  <text x={px(i)} y={BEAM_Y + 10 + sv.font(9)} textAnchor="middle" fontSize={sv.font(9)} fontWeight={700} fill={i === fulcrum ? '#FFA878' : '#A7B0C0'}>
                     {showMoments ? Math.abs(i - fulcrum) : ''}
                   </text>
                 )}
@@ -264,7 +266,7 @@ export default function LeverBalanceClient({ params, band, onSubmit, onDone }: T
                       {d.emoji}
                     </text>
                   )}
-                  <text x={px(d.pos)} y={base - h - 3} textAnchor="middle" fontSize={10} fontWeight={700} fill="#EEF2F8">
+                  <text x={px(d.pos)} y={base - h - 3} textAnchor="middle" fontSize={sv.font(10)} fontWeight={700} fill="#EEF2F8">
                     {d.mass}
                   </text>
                 </g>
@@ -272,11 +274,11 @@ export default function LeverBalanceClient({ params, band, onSubmit, onDone }: T
             })}
           </g>
           {loadSide && (
-            <text x={8} y={18} fontSize={11} fill="#A7B0C0">
+            <text x={8} y={18} fontSize={sv.font(11)} fill="#A7B0C0">
               Lift: {loadSide.label ?? 'load'} ({loadSide.mass} kg)
             </text>
           )}
-          <text x={W - 8} y={18} textAnchor="end" fontSize={11} fill="#A7B0C0">
+          <text x={W - 8} y={loadSide ? 18 + sv.font(11) + 4 : 18} textAnchor="end" fontSize={sv.font(11)} fill="#A7B0C0">
             numbers = kg{showMoments ? ' · pegs from pivot' : ''}
           </text>
         </svg>
