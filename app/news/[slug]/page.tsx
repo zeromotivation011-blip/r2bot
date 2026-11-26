@@ -21,7 +21,9 @@ const SITE =
     ? process.env.NEXT_PUBLIC_SITE_URL
     : 'https://www.r2bot.in'
 
-export const revalidate = 3600
+// A story never changes once archived, and these pages are noindex. Daily is
+// plenty; hourly cost ~240 ISR write units a day for nothing (26 Nov 2026).
+export const revalidate = 86400
 
 // The archive grows between deploys, so we cannot pre-render every slug at build
 // time. dynamicParams = true lets new stories render on demand; the notFound()

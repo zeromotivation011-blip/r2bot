@@ -16,7 +16,9 @@ import { jsonldScript } from '@/lib/seo/jsonld'
 import { HREFLANG_HOME } from '@/lib/hreflang'
 
 export const runtime = 'nodejs'
-export const revalidate = 3600
+// 3 hours: news, Lens and newly-live lessons stay current without paying an ISR
+// write every hour (the Hobby ISR-write allowance, 26 Nov 2026).
+export const revalidate = 10800
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
