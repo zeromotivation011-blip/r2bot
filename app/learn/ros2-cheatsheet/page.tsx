@@ -261,7 +261,8 @@ export default function Ros2CheatsheetPage() {
         <ul className="mt-2 grid gap-2 text-sm sm:grid-cols-2">
           <li><Link href="/atlas/concept/ros2" className="text-amber-300 hover:underline">ROS 2 — what it is and why robots use it</Link></li>
           <li><Link href="/atlas/concept/quality-of-service" className="text-amber-300 hover:underline">Quality of Service (QoS) — why two nodes cannot see each other</Link></li>
-          <li><Link href="/ros2" className="text-amber-300 hover:underline">ROS 2 Playground — try these commands in your browser</Link></li>
+          <li><Link href="/atlas/concept/colcon" className="text-amber-300 hover:underline">colcon — what colcon build does, flags and common errors</Link></li>
+          <li><Link href="/ros2"className="text-amber-300 hover:underline">ROS 2 Playground — try these commands in your browser</Link></li>
           <li><Link href="/academy/wire" className="text-amber-300 hover:underline">Wire track — Arduino to ROS 2, six written lessons</Link></li>
           <li><Link href="/ros2/fix/ros2-command-not-found" className="text-amber-300 hover:underline">Fix: “ros2: command not found”</Link></li>
           <li><Link href="/ros2/fix/nodes-cannot-see-each-other" className="text-amber-300 hover:underline">Fix: ROS 2 nodes can’t see each other</Link></li>

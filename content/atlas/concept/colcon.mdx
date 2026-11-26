@@ -1,79 +1,284 @@
 ---
-title: colcon
+title: colcon (ROS 2 Build Tool)
 slug: colcon
 bucket: concept
 category: control
 summary: >-
-  colcon is the build tool that compiles a ROS 2 workspace — resolving dependencies between many
-  packages and building them in the right order, the everyday command that turns source code into
-  a runnable robot.
+  colcon is the ROS 2 build tool: what colcon build does, the build/install/log folders, the
+  build-source-run loop, the flags worth knowing and the errors beginners hit.
 difficulty: 2
+difficultyLabel: Classroom
 tags:
   - software
   - ros2
   - tooling
+  - build-system
 seeAlso:
   - ros2
   - ros-node
-  - ros-topic
+  - ros2-launch
+  - docker-robotics
+  - python-robotics
   - rosbag
-lastReviewed: 2026-07-10T00:00:00.000Z
+relatedTerms:
+  - ros2
+  - ros-node
+  - ros2-launch
+  - docker-robotics
+prerequisiteTerms:
+  - ros2
+unlocksTerms:
+  - ros-node
+  - ros2-launch
+lastReviewed: 2026-11-27T00:00:00.000Z
 sources:
-  - title: 'colcon documentation'
-    url: 'https://colcon.readthedocs.io/'
-  - title: 'ROS 2 — Using colcon to build packages'
-    url: 'https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html'
+  - title: 'ROS 2 Documentation (Jazzy), Using colcon to build packages'
+    url: 'https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html'
+  - title: 'ROS 2 Documentation (Jazzy), Creating a workspace'
+    url: 'https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html'
+  - title: 'colcon documentation, Quick start'
+    url: 'https://colcon.readthedocs.io/en/released/user/quick-start.html'
+  - title: 'colcon documentation, What is a workspace?'
+    url: 'https://colcon.readthedocs.io/en/released/user/what-is-a-workspace.html'
+  - title: 'colcon documentation, Using multiple workspaces'
+    url: 'https://colcon.readthedocs.io/en/released/user/using-multiple-workspaces.html'
+  - title: 'colcon documentation, build verb reference'
+    url: 'https://colcon.readthedocs.io/en/released/reference/verb/build.html'
+  - title: 'colcon documentation, Package selection arguments'
+    url: 'https://colcon.readthedocs.io/en/released/reference/package-selection-arguments.html'
+  - title: 'colcon documentation, Executor arguments'
+    url: 'https://colcon.readthedocs.io/en/released/reference/executor-arguments.html'
+  - title: 'colcon documentation, How to'
+    url: 'https://colcon.readthedocs.io/en/released/user/how-to.html'
+  - title: 'colcon documentation, test-result verb reference'
+    url: 'https://colcon.readthedocs.io/en/released/reference/verb/test-result.html'
+youtubeSearchQuery: colcon build ros2 workspace tutorial
 laymanExplanation: >-
-  colcon is the command you run to build a ROS 2 project. A robot's software is made of many
-  packages, and colcon figures out the correct order to build them and compiles them all together.
+  A ROS 2 robot's software is not one program but dozens of small packages that depend on each
+  other, like chapters that each refer to earlier ones. colcon is the tool that reads which package
+  needs which, builds them in the right order, and puts the results in one place your terminal can
+  use. You type colcon build, then source the result, then run your robot's code.
 technicalDefinition: >-
-  colcon is a command-line meta-build tool that builds, tests, and manages collections of ROS 2
-  (and other) packages, resolving inter-package dependencies and build order.
+  colcon ("collective construction") is a command-line meta-build tool for building, testing and
+  using multiple software packages. In ROS 2 it discovers packages in a workspace, reads their
+  manifests (package.xml) to build a dependency graph, invokes the build tool for each package's build
+  type (CMake for ament_cmake and cmake packages, setuptools for ament_python) in topological order,
+  out of source, by default into per-package install prefixes, and generates setup scripts that add the installed packages to the shell
+  environment. For ROS 2 it replaces catkin_make, catkin_make_isolated, catkin_tools and ament_tools.
+realRobotsThatUseThis: []
+indianExample: ''
+industryApplications:
+  - ROS 2 robot software development
+  - Continuous integration for robot code
+  - Docker images for deployed robots
+mindBlowingFact: >-
+  colcon has no idea how to compile C++ or package Python itself. It is a conductor: it works out
+  the order, then hands each package to that package's own build system (CMake, setuptools) and
+  writes the setup scripts that let your shell use the results.
 quizQuestion:
-  q: colcon is used to…
+  q: >-
+    You ran colcon build in ~/ros2_ws and it succeeded, but in a fresh terminal ros2 run my_pkg
+    my_node says "Package 'my_pkg' not found". What is the most likely fix?
   options:
-    - Charge the robot
-    - Build a ROS 2 workspace of packages in dependency order
-    - Stream camera data
-    - Plan robot paths
+    - Run colcon build again with --symlink-install
+    - Run source install/setup.bash from the workspace root in that terminal
+    - Delete the build folder and reinstall ROS 2
+    - Move my_pkg out of the src folder
   answer: 1
   explanation: >-
-    colcon compiles a workspace of many packages, resolving their dependencies and building them in
-    the correct order.
+    colcon puts built packages in the workspace's install/ folder, and a terminal only knows about
+    them after you source install/setup.bash (or local_setup.bash, if ROS 2 itself is already sourced in that terminal) in that terminal. Building again
+    changes nothing if the shell never loads the result.
 ---
 
-A ROS 2 robot's software isn't one project — it's a **workspace** of many packages (drivers, message definitions, nodes, libraries) that depend on each other. The tool that builds them all correctly is **colcon**.
+colcon is the command-line tool that builds a ROS 2 workspace. You point it at a folder of packages, it works out which package depends on which, builds them in that order, and installs the results with a setup script that makes them usable from your terminal.
 
-## What it does
+![A ROS 2 workspace before and after colcon build. On the left, the src folder holds three packages: my_msgs, my_driver and my_app, with arrows showing my_driver depends on my_msgs and my_app depends on both. In the middle, colcon build reads those dependencies and builds them in order: 1 my_msgs, 2 my_driver, 3 my_app. On the right, three new folders appear next to src: build for intermediate files, install for the finished packages and their setup scripts, and log for build logs. Below, the loop every ROS 2 developer repeats: colcon build, then source install/setup.bash, then ros2 run or ros2 launch](/images/atlas/diagrams/colcon.svg)
 
-`colcon build` scans your workspace, works out the **dependency graph** between packages (this node needs those messages, which need that library), and builds them in the right order. It replaced ROS 1's `catkin_make`, and it's the command every ROS 2 developer runs dozens of times a day.
+## Start here: what problem does colcon solve?
 
-```diagram
-{ "type": "flow", "title": "Source packages to a runnable workspace", "nodes": ["Many source packages", "colcon resolves order", "Build each in sequence", "Sourced, runnable workspace"], "caption": "colcon figures out what depends on what, builds accordingly, and produces an install space you 'source' to run your nodes." }
+A robot's software in [ROS 2](/atlas/concept/ros2) is split into **packages**. One package might hold only message definitions, another a motor driver, another the navigation logic, another the launch files that start everything. A real robot can have dozens of them, many written by other people, some in C++ and some in Python.
+
+Those packages depend on each other. The driver cannot compile until the message definitions it uses exist. The application cannot run until the driver is installed. Building them by hand means remembering that order and running a different build command for each kind of package.
+
+colcon does that bookkeeping for you. Its own documentation describes it as a tool "to improve the workflow of building, testing and using multiple software packages", which "automates the process, handles the ordering and sets up the environment to use the packages." The name is short for **collective construction**.
+
+## The three-command loop
+
+Almost all day-to-day ROS 2 work is this loop, run from the root of your workspace (the folder that contains `src/`):
+
+```bash
+# Terminal 1: build only
+cd ~/ros2_ws
+colcon build --symlink-install    # 1. build every package in src/
+
+# Terminal 2: source and run
+cd ~/ros2_ws
+source install/setup.bash         # 2. load the result into this terminal
+ros2 run my_app my_node           # 3. use it (or ros2 launch ...)
 ```
 
-## The everyday workflow
+1. **Build.** `colcon build` finds the packages, orders them and builds each one.
+2. **Source.** colcon writes setup scripts into `install/`. Sourcing one adds your packages to the paths the `ros2` command searches. Until you do this in a terminal, that terminal cannot see what you built.
+3. **Run.** `ros2 run` starts a single [node](/atlas/concept/ros-node); `ros2 launch` starts a whole system from a [launch file](/atlas/concept/ros2-launch).
 
-A typical ROS 2 cycle:
+Change code, build again in terminal 1, run again in terminal 2. Keep the build terminal free of your workspace's setup script (see the sourcing section below). Source again in each new terminal, and after a build adds a new package.
 
-1. `colcon build` — compile the workspace (or `--packages-select my_pkg` to build just one).
-2. `source install/setup.bash` — make the freshly built packages available to your shell.
-3. `ros2 run` / `ros2 launch` — start your [nodes](/atlas/concept/ros-node).
+## How it works
 
-Handy options include `--symlink-install` (edit Python/config files without rebuilding), parallel builds across packages, and `colcon test` to run a package's tests.
+### 1. The workspace
 
-## Why it matters in practice
+A colcon workspace is simply a folder. By convention your packages go in a `src/` subfolder; colcon searches the subfolders for packages, so `src/` is a habit rather than a rule. Before the first build the workspace is just:
 
-- **Scales to big projects.** Real robots have dozens or hundreds of packages; colcon manages the build so you don't hand-order it.
-- **Language-agnostic.** It builds C++ (via CMake/ament) and Python packages in the same workspace.
-- **Isolated and reproducible.** Each package builds cleanly, and the resulting install space is what you deploy.
+```text
+ros2_ws/
+└── src/
+    ├── my_msgs/
+    ├── my_driver/
+    └── my_app/
+```
 
-The common beginner stumbles are forgetting to **source** the workspace after building (so `ros2 run` can't find the node), and building from the wrong directory — both quick to learn.
+### 2. Discovery and the dependency graph
+
+colcon looks for packages in the workspace and reads each package's manifest. For ROS packages that is `package.xml`, in the format defined by REP 149 (the older format 2 is also accepted). The manifest lists what the package depends on, and from those lists colcon builds a **dependency graph** and sorts it so every package comes after the packages it needs. You can see the result yourself:
+
+```bash
+colcon list     # every package colcon found
+colcon graph    # the same packages in build order, with their dependencies
+```
+
+### 3. Building each package with its own tool
+
+colcon does not compile anything itself. For each package it calls that package's own build system, chosen by its **build type**. The ROS 2 documentation recommends `ament_cmake` (C++ packages built through CMake) and `ament_python` (Python packages built through setuptools), and plain `cmake` packages are supported too. That is why one workspace can mix C++ and Python packages and still build with one command.
+
+Packages that do not depend on each other can build at the same time. colcon's parallel executor, the default when it is installed, builds up to one package per logical CPU core at a time, and each CMake package also compiles with one make job per core.
+
+### 4. Out-of-source builds and the three new folders
+
+colcon directs every package to build out of source, so build files go into separate folders, not into your source code. After the first build, three folders appear next to `src/`:
+
+| Folder | What is in it | Safe to delete? |
+|---|---|---|
+| `build/` | Intermediate files, one subfolder per package (where CMake actually runs) | Yes, but the next build starts from scratch. If you built with `--symlink-install`, delete `install/` too, because it links into `build/` |
+| `install/` | The finished packages, plus the `setup.bash` / `local_setup.bash` scripts you source | Yes, then rebuild. Anything sourcing it breaks until you do |
+| `log/` | Logs of every colcon run, the first place to look when a build fails | Yes |
+
+By default each package is installed into its own subfolder of `install/` (an **isolated** install). That gives better isolation between packages, so a dependency you forgot to declare is more likely to show up as a build error. ROS 1 users will notice there is no `devel/` space; colcon requires every package to install itself.
+
+### 5. Sourcing: underlays and overlays
+
+The workspace you build sits on top of something else, usually your ROS 2 installation in `/opt/ros/<distro>`. The ROS 2 documentation calls the installation the **underlay** and your workspace the **overlay**. The overlay can add packages and can also override a package from the underlay with your own copy (this works for most packages, but the colcon docs list cases where an override does not fully take effect).
+
+Two setup scripts are generated, and the difference matters:
+
+- `install/setup.bash` loads your workspace **and** the underlays it was built against.
+- `install/local_setup.bash` loads **only** your workspace, for when the underlay is already sourced.
+
+The ROS 2 workspace tutorial adds an important rule: source the overlay in a **new terminal**, not the one you built in, because "sourcing an overlay in the same terminal where you built, or likewise building where an overlay is sourced, may create complex issues."
+
+## Worked example: building only what you need
+
+Take the three packages from the diagram: `my_msgs` (message definitions), `my_driver` (depends on `my_msgs`) and `my_app` (depends on both). A full `colcon build` builds them in the order my_msgs → my_driver → my_app. On a large workspace, rebuilding everything after every change wastes minutes, so colcon has **package selection** flags. What each one builds here:
+
+| You run | What gets built | When to use it |
+|---|---|---|
+| `colcon build` | my_msgs, my_driver, my_app | First build, or after pulling many changes |
+| `colcon build --packages-select my_app` | my_app only | You changed only my_app and its dependencies are already built |
+| `colcon build --packages-up-to my_app` | my_msgs, my_driver, my_app | First build of my_app in a big workspace: it plus everything it needs, nothing else |
+| `colcon build --packages-above my_msgs` | my_msgs, my_driver, my_app | You changed a message in my_msgs: rebuild it and everything that depends on it |
+| `colcon build --packages-skip my_app` | my_msgs, my_driver | my_app is broken and you want the rest |
+
+The catch with `--packages-select` is in the colcon docs: it "assumes that you have built dependencies of the selected packages within the workspace before." On a fresh clone it usually fails (unless the underlay already provides those dependencies), where `--packages-up-to` succeeds. In this tiny workspace three of the commands build the same packages; in a workspace of fifty they would not.
+
+## Flags worth knowing
+
+| Flag | What it does | Why you would use it |
+|---|---|---|
+| `--symlink-install` | Links installed files back to the source and build folders instead of copying them, where possible | Edit an existing Python file, launch file or YAML config and the change takes effect without rebuilding (new files still need a build) |
+| `--packages-select`, `--packages-up-to`, `--packages-above` | Build a subset (see the table above) | Faster iteration |
+| `--executor sequential` | Build one package at a time | The ROS 2 docs suggest it on CPU-, RAM- or I/O-limited machines such as a Raspberry Pi, where a parallel build can freeze the screen and mouse |
+| `--parallel-workers N` | Cap the number of packages built at once | A middle ground between full parallel and sequential. It limits packages, not compiler jobs inside a package; set `MAKEFLAGS=-jN` for that |
+| `--event-handlers console_direct+` | Print build output live instead of only to `log/` | Watching a slow or failing build |
+| `--continue-on-error` | Keep building other packages when one fails (packages that depend on it are skipped) | Find every broken package in one run |
+| `--cmake-args -DCMAKE_BUILD_TYPE=Release` | Pass options through to CMake | Optimised C++ builds; `-DBUILD_TESTING=OFF` skips building tests |
+| `--merge-install` | Install all packages into one shared prefix instead of one folder each | Shorter environment variables; the ROS 2 docs use it on Windows, which limits path length. The cost is weaker isolation between packages |
+
+Note that `--symlink-install` only helps for existing files that need no compiling. C++ changes, new files, interface (`.msg`/`.srv`/`.action`) changes, and changes to `CMakeLists.txt`, `package.xml` or `setup.py` still need a build.
+
+To leave a folder out of the build entirely, put an empty file named `COLCON_IGNORE` in it.
+
+## Testing with colcon
+
+The same tool runs tests across the workspace:
+
+```bash
+colcon test                           # run every package's tests
+colcon test --packages-select my_app  # just one package
+colcon test-result --verbose          # show details of each failure
+```
+
+By default `colcon test` exits successfully even when tests fail. In CI, use `colcon test --return-code-on-test-failure`, or follow it with `colcon test-result --verbose`, which exits non-zero on any failure.
+
+colcon passes test runs to each package's own test tool, pytest for Python and CTest for CMake, and arguments can go straight through: `colcon test --packages-select my_app --ctest-args -R my_test` runs only the CMake tests whose names match `my_test`.
+
+## Common errors and what they mean
+
+| Symptom | Usual cause | Fix |
+|---|---|---|
+| `colcon: command not found` | colcon is not installed (it is a separate package from ROS 2) | `sudo apt install python3-colcon-common-extensions` (Ubuntu) or `pip install -U colcon-common-extensions` |
+| `Package 'my_pkg' not found` after a successful build | This terminal has not sourced the workspace | `source install/setup.bash` from the workspace root (full walkthrough: [ros2: command not found](/ros2/fix/ros2-command-not-found)) |
+| `build/`, `install/` and `log/` appeared inside `src/` | colcon was run from the wrong folder | Delete those three folders from `src/` and run colcon from the workspace root |
+| CMake says it could not find a package configuration file for a dependency | The underlay is not sourced, a system dependency is missing, or a dependency in this workspace has not been built yet (for example after `--packages-select`) | Source `/opt/ros/<distro>/setup.bash`, then run `rosdep install -i --from-path src --rosdistro <distro> -y` |
+| A build passes on your machine but fails in a fresh terminal, in CI or for a colleague | You built in a terminal where this workspace's `install/` was already sourced, which hid a dependency missing from `package.xml` | Build in one terminal; source and run in another |
+| The machine freezes during the build | Too many compiler jobs for the RAM: colcon builds several packages at once, and each C++ package also compiles on every core | `MAKEFLAGS=-j2 colcon build --executor sequential` (lower `-j` further if needed) |
+| A Python edit has no effect | Built without `--symlink-install`, so the old copy in `install/` runs | Rebuild. To switch to `--symlink-install`, delete `build/` and `install/` first (switching an existing workspace without cleaning can fail) |
+
+## colcon vs catkin_make
+
+ROS 1 developers built with `catkin_make` (or `catkin build` from catkin_tools). The ROS 2 documentation describes colcon as "an iteration on" `catkin_make`, `catkin_make_isolated`, `catkin_tools` and `ament_tools`. The practical differences:
+
+| | catkin_make (ROS 1) | colcon (ROS 2) |
+|---|---|---|
+| Build style | One combined CMake project | Each package built separately, in dependency order |
+| devel space | Yes, a `devel/` folder you can source without installing | No; every package must install. `--symlink-install` gives the fast-edit benefit instead |
+| Package types | catkin (CMake) | ament_cmake, ament_python, plain CMake; ROS 1 catkin packages too |
+| Script you source | `devel/setup.bash` | `install/setup.bash` |
+
+colcon is not tied to ROS. It builds plain CMake and Python packages, and a ROS 2 installation built from source is itself a colcon workspace.
+
+## Where you'll see it
+
+- **Every ROS 2 tutorial and project**: the build step in the ROS 2 beginner tutorials, and in the build instructions of most ROS 2 packages on GitHub.
+- **Building ROS 2 from source**: a source installation of ROS 2 is a colcon workspace, which you then use as the underlay for your own.
+- **[Docker](/atlas/concept/docker-robotics) images and CI**: a Dockerfile for a ROS 2 robot typically runs `colcon build` as one of its steps, and CI pipelines for ROS 2 code typically run `colcon build` and `colcon test` on every change.
+- **Mixed-language robots**: C++ drivers and Python nodes in one workspace, one build command.
 
 ## Why it matters
 
-colcon is the unglamorous but essential command that turns a ROS 2 codebase into a running robot. Every ROS 2 project passes through it, so knowing the build-source-run loop is day-one knowledge for ROS development.
+colcon is the step between writing robot code and running it, so it is often the first thing that goes wrong for a ROS 2 beginner: the build works but `ros2 run` says the package is not found, or a change does not show up. Almost every one of those problems comes back to three ideas on this page: the workspace has `src`, `build`, `install` and `log` folders; the terminal only sees what you have sourced; and packages build in dependency order. Get those right and colcon becomes the boring, reliable command it is meant to be.
+
+## Common questions
+
+### What is colcon in ROS 2?
+
+colcon is the build tool used in ROS 2. It finds the packages in a workspace, works out their dependency order from each package's `package.xml`, builds them with their own build systems (CMake for C++, setuptools for Python) and installs them with setup scripts you source to use them. The name stands for "collective construction".
+
+### What does colcon build do?
+
+It builds every package in the current workspace in dependency order, putting intermediate files in `build/`, the finished packages and their setup scripts in `install/`, and logs in `log/`. Run it from the workspace root, then `source install/setup.bash` before using the packages.
+
+### Why does ros2 run say my package is not found after colcon build?
+
+Because the terminal has not loaded the workspace. Building writes your package into `install/`, but a terminal only searches it after `source install/setup.bash` has been run in that terminal. Every new terminal needs it again, unless you add it to your shell's startup file.
+
+### Do I need to run colcon build after every change?
+
+For C++ code, and for changes to `package.xml`, `CMakeLists.txt` or `setup.py`, yes. For edits to existing Python, launch and config files, not if you built with `--symlink-install`: the installed copy is a link back to your source, so the edit takes effect the next time you run the node. Adding a new file still needs a build.
 
 ## Related
 
-[ROS 2](/atlas/concept/ros2) · [ROS node](/atlas/concept/ros-node) · [ROS topic](/atlas/concept/ros-topic) · [rosbag](/atlas/concept/rosbag)
+- [ROS 2](/atlas/concept/ros2): the framework colcon builds for
+- [ROS node](/atlas/concept/ros-node): what you run once the build is sourced
+- [ROS 2 launch](/atlas/concept/ros2-launch): starting many nodes at once after a build
+- [Docker for robotics](/atlas/concept/docker-robotics): where `colcon build` runs inside an image
+- [ROS 2 cheat sheet](/learn/ros2-cheatsheet): every colcon, rosdep and ros2 command on one page

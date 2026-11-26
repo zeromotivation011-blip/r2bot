@@ -109,6 +109,10 @@ export const BLOG_TO_ATLAS: Record<string, string> = {
  * position and 0 clicks, and pos 1 for "chassis on a humanoid robot". It owns the
  * robot-chassis queries, humanoid included; humanoid-robot keeps locomotion.
  *
+ * 27 Nov 2026 (Search Console, task 51): /atlas/concept/colcon had ~6.2 average
+ * position and ~0.9% CTR on ~110 impressions. It owns the colcon queries; the
+ * ROS 2 cheat sheet lists the commands and links here for the explanation.
+ *
  * Query → owning path.
  */
 export const ATLAS_QUERY_OWNER: Record<string, string> = {
@@ -144,6 +148,10 @@ export const ATLAS_QUERY_OWNER: Record<string, string> = {
   'chassis on robot': '/atlas/concept/chassis',
   'chassis on a humanoid robot': '/atlas/concept/chassis',
   'robot chassis material': '/atlas/concept/chassis',
+  colcon: '/atlas/concept/colcon',
+  'what is colcon': '/atlas/concept/colcon',
+  'colcon build': '/atlas/concept/colcon',
+  'colcon ros2': '/atlas/concept/colcon',
   costmap: '/atlas/concept/costmap',
   'what is a costmap': '/atlas/concept/costmap',
   'costmap ros2': '/atlas/concept/costmap',
