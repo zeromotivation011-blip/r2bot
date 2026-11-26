@@ -105,6 +105,10 @@ export const BLOG_TO_ATLAS: Record<string, string> = {
  * queries and links to behavior-trees for the comparison. motor-driver owns
  * "motor driver"; h-bridge keeps the circuit-level explanation.
  *
+ * 26 Nov 2026 (Search Console, task 51): /atlas/concept/chassis had ~6.4 average
+ * position and 0 clicks, and pos 1 for "chassis on a humanoid robot". It owns the
+ * robot-chassis queries, humanoid included; humanoid-robot keeps locomotion.
+ *
  * Query → owning path.
  */
 export const ATLAS_QUERY_OWNER: Record<string, string> = {
@@ -136,6 +140,10 @@ export const ATLAS_QUERY_OWNER: Record<string, string> = {
   'motor driver': '/atlas/concept/motor-driver',
   'what is a motor driver': '/atlas/concept/motor-driver',
   'motor driver for robots': '/atlas/concept/motor-driver',
+  'robot chassis': '/atlas/concept/chassis',
+  'chassis on robot': '/atlas/concept/chassis',
+  'chassis on a humanoid robot': '/atlas/concept/chassis',
+  'robot chassis material': '/atlas/concept/chassis',
   costmap: '/atlas/concept/costmap',
   'what is a costmap': '/atlas/concept/costmap',
   'costmap ros2': '/atlas/concept/costmap',
