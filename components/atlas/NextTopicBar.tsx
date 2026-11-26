@@ -41,6 +41,7 @@ export function NextTopicBar({
   const [hidden, setHidden] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const lastY = useRef(0)
+  const barRef = useRef<HTMLElement>(null)
 
   const [dismissed, setDismissed] = useState(false)
 
@@ -104,6 +105,23 @@ export function NextTopicBar({
     return [...unlocks, ...bucketPicks].slice(0, 3)
   }, [currentSlug, unlocksTerms, bucket, allNodes, refreshKey])
 
+  const shown = visible && !dismissed && !hidden && recs.length > 0
+
+  // Lift the site-wide back-to-top button above the bar while the bar is shown
+  // (it sat on top of the close button on phones).
+  useEffect(() => {
+    const root = document.documentElement
+    const clear = () => {
+      root.style.removeProperty('--btt-bottom')
+    }
+    if (!shown || !barRef.current) {
+      clear()
+      return
+    }
+    root.style.setProperty('--btt-bottom', `${barRef.current.offsetHeight + 12}px`)
+    return clear
+  }, [shown])
+
   if (!visible || dismissed || recs.length === 0) return null
 
   const dismiss = () => {
@@ -117,6 +135,7 @@ export function NextTopicBar({
 
   return (
     <aside
+      ref={barRef}
       className={`ntb ${hidden ? 'is-hidden' : ''}`}
       role="complementary"
       aria-label="Suggested next concepts"
@@ -168,7 +187,9 @@ export function NextTopicBar({
         </div>
       </div>
 
-      <style jsx>{`
+      {/* global: the cards are next/link components, which styled-jsx scoping
+          does not reach, so scoped rules never styled them. Names are ntb-*. */}
+      <style jsx global>{`
         .ntb {
           position: fixed; left: 0; right: 0; bottom: 0;
           z-index: 40;
@@ -246,9 +267,9 @@ export function NextTopicBar({
           .ntb-inner { padding: 10px 12px; border-radius: 14px; }
           .ntb-head { margin-bottom: 6px; }
           .ntb-cards { grid-template-columns: minmax(0, 1fr) auto; }
-          .ntb-cards :global(.ntb-extra) { display: none; }
-          .ntb-cards :global(.ntb-card) { min-height: 44px; padding: 8px 12px; }
-          .ntb-cards :global(.ntb-card-sub) { display: none; }
+          .ntb-cards .ntb-extra { display: none; }
+          .ntb-cards .ntb-card { min-height: 44px; padding: 8px 12px; }
+          .ntb-cards .ntb-card-sub { display: none; }
         }
       `}</style>
     </aside>
