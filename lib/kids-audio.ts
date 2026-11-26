@@ -171,7 +171,7 @@ export function sparkSays(text: string, onDone?: () => void): void {
   const utt = new SpeechSynthesisUtterance(text)
   utt.rate = 0.88     // slightly slower — kids need time to process
   utt.pitch = 1.25    // slightly higher — friendlier, robot-like
-  utt.lang = 'en-IN'  // Indian English accent where available
+  utt.lang = (typeof navigator !== 'undefined' && navigator.language) || 'en'  // the child's own language/accent (global product)
   utt.volume = 1
 
   // Some browsers benefit from picking an Indian/English voice explicitly.
@@ -233,7 +233,7 @@ export function sparkListen(
   let rec: SpeechRecognitionLike | null = null
   try {
     rec = new SR()
-    rec.lang = 'en-IN'
+    rec.lang = (typeof navigator !== 'undefined' && navigator.language) || 'en'
     rec.interimResults = false
     rec.maxAlternatives = 3
     rec.onresult = (e) => {
