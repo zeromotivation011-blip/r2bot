@@ -52,13 +52,19 @@ export function startPoses(tier: number, seed: number, youDesign?: RobotDesign):
   // Cadet faces the rival; Pilot starts facing AWAY (it must search, and must not drive off);
   // Ace and Legend start half-turned.
   const youYaw = tier === 0 ? jitter() : tier === 1 ? Math.PI + jitter() : (rnd() < 0.5 ? 1 : -1) * (Math.PI / 4) + jitter()
+  if (tier === 1) {
+    // Pilot: back to back, and you start near the edge facing it. Twister spins round, finds you
+    // and charges your back: only a line card that backs up keeps you on the ring.
+    const front = youDesign ? robotSpec(youDesign).body.front : 0.078
+    return { you: { x: 0, z: -(RING_R - front - 0.03), yaw: Math.PI + jitter() }, rival: { x: 0, z: 0.2, yaw: rivalYaw } }
+  }
   if (tier === 2) {
     // Ace: Dodger starts BEHIND you, facing your back, and shoves you toward the edge at the bell.
     // Your edge sensors are the only warning you get; backing up is the only defence.
     // You start facing the edge with your edge sensors just over the white line (2.5 cm inside the rim).
     const front = youDesign ? robotSpec(youDesign).body.front : 0.078
-    const zY = -(RING_R - front - Number(process.env.RIM ?? 0.03))
-    const gap = Number(process.env.GAP ?? 0.2)
+    const zY = -(RING_R - front - 0.03)
+    const gap = 0.2
     return { you: { x: 0, z: zY, yaw: Math.PI + jitter() }, rival: { x: 0, z: zY + gap, yaw: Math.PI + jitter() * 0.5 } }
   }
   return {
@@ -71,7 +77,7 @@ export function startPoses(tier: number, seed: number, youDesign?: RobotDesign):
  * Weight-class matching for Ace. Dodger's motors are set so its push is DODGER_PUSH_SHARE of yours,
  * whatever robot you built: the bout tests your program, not your parts (parts are Legend's job).
  */
-export const DODGER_PUSH_SHARE = Number(process.env.RATIO ?? 0.85)
+export const DODGER_PUSH_SHARE = 0.78
 export function rivalMotorMul(tier: number, youDesign: RobotDesign, youBallast: number): number {
   if (tier !== 2) return 1
   const you = botStats(youDesign, youBallast)

@@ -30,12 +30,6 @@ export interface FsmProgram {
   pushThroughEdge: boolean
   recover: { backMs: number; turnMs: number; speed: number; dir: 1 | -1 }
   /** Rival-only extras. */
-  /**
-   * The matador: when a rival comes at it from closer than `cm`, back away until the rear edge sensor
-   * feels the white line, wait there facing it, and side-step at the last moment (dodge.cm), so the
-   * charger arrives at the line with nothing in front of it.
-   */
-  retreat?: { cm: number }
   /** While searching, turn to keep facing the rival whenever the sensor has it (or had it in the last 1.2 s). */
   track?: boolean
   /** Opening move at the bell: curve right (1), left (−1) or drive straight (0) for `ms`. */
@@ -43,12 +37,11 @@ export interface FsmProgram {
   dodge?: { cm: number; ms: number; dir: 1 | -1; speed: number; /** ms of hard pivot before the dash */ turnMs: number; /** only side-step a rival closing faster than this, cm/s */ minClosing: number }
 }
 
-type FsmState = 'OPEN' | 'BACKOFF' | 'SEARCH' | 'CHARGE' | 'RECOVER' | 'RETREAT' | 'HOLD' | 'DODGE'
+type FsmState = 'OPEN' | 'BACKOFF' | 'SEARCH' | 'CHARGE' | 'RECOVER' | 'DODGE'
 
 const steer = (speed: number, bearing: number): [number, number] => {
   // Turn toward the echo: a target to the right speeds up the left wheel.
-  const K = Number(process.env.STEER ?? 0.6)
-  const k = Math.max(-K, Math.min(K, bearing / 25))
+  const k = Math.max(-0.6, Math.min(0.6, bearing / 25))
   return [speed * (1 + k), speed * (1 - k)]
 }
 
@@ -86,7 +79,6 @@ export function fsmController(p: FsmProgram): Controller {
       prevDist = s.distCm
       dodgeCooldown = Math.max(0, dodgeCooldown - dtMs)
       const dodgeNow = !!p.dodge && dodgeCooldown === 0 && s.distCm !== null && s.distCm < p.dodge.cm && s.distCm > 6 && closing > p.dodge.minClosing
-      const retreatNow = !!p.retreat && dodgeCooldown === 0 && s.distCm !== null && s.distCm < p.retreat.cm && closing > 20 && s.edgeBack < 50
 
       // Transitions, checked in order.
       switch (state) {
@@ -100,7 +92,6 @@ export function fsmController(p: FsmProgram): Controller {
         case 'SEARCH':
           if (edge) go('RECOVER')
           else if (dodgeNow) go('DODGE')
-          else if (retreatNow) go('RETREAT')
           else if (seen) go('CHARGE')
           break
         case 'CHARGE':
@@ -110,17 +101,6 @@ export function fsmController(p: FsmProgram): Controller {
           break
         case 'RECOVER':
           if (tIn >= p.recover.backMs + p.recover.turnMs) go(seen ? 'CHARGE' : 'SEARCH')
-          break
-        case 'RETREAT':
-          // Back off until the rear sensor feels the white line, then hold there.
-          if (dodgeNow) go('DODGE')
-          else if (s.edgeBack >= 50 || tIn >= 1500) go('HOLD')
-          break
-        case 'HOLD':
-          // At the line, facing the rival: side-step its charge, push it if it only creeps up.
-          if (dodgeNow) go('DODGE')
-          else if (seen && closing < 15) go('CHARGE')
-          else if (sinceAny > 1200) go('SEARCH')
           break
         case 'DODGE':
           // No RECOVER mid-step: the dash itself curves away from the line (see the action below).
@@ -162,16 +142,6 @@ export function fsmController(p: FsmProgram): Controller {
           const { backMs, speed, dir } = p.recover
           if (tIn < backMs) return { l: -speed, r: -speed, state: 'RECOVER' }
           return { l: dir * speed * 0.8, r: -dir * speed * 0.8, state: 'RECOVER' }
-        }
-        case 'RETREAT': {
-          const k = s.distCm !== null ? Math.max(-0.3, Math.min(0.3, s.bearingDeg / 30)) : 0
-          const sp = p.dodge?.speed ?? 80
-          return { l: -sp * (1 - k), r: -sp * (1 + k), state: 'RETREAT' }
-        }
-        case 'HOLD': {
-          const k = s.distCm !== null ? Math.max(-1, Math.min(1, s.bearingDeg / 10)) : anyBearing >= 0 ? 1 : -1
-          const sp = p.search.speed
-          return { l: sp * k, r: -sp * k, state: 'HOLD' }
         }
         case 'DODGE': {
           // A real side-step: pivot hard out of the charge's line, then dash forward to clear it.
@@ -333,14 +303,14 @@ export const RIVAL_TWISTER: FsmProgram = {
 /** Ace rival: circles the ring and side-steps a charge, then comes back at your side. */
 export const RIVAL_DODGER: FsmProgram = {
   search: { mode: 'spin', dir: -1, speed: 50 },
-  seeCm: 25,
+  seeCm: 12,
   charge: { speed: 100 },
   lostMs: 400,
   edgeThreshold: 50,
   pushThroughEdge: true,
   recover: { backMs: 400, turnMs: 450, speed: 70, dir: -1 },
-  dodge: { cm: 40, ms: 600, dir: 1, speed: 90, turnMs: 200, minClosing: 25 },
-  retreat: { cm: 45 },
+  opening: { ms: 1500, dir: 0, speed: 100, backOffMs: 900 },
+  dodge: { cm: 40, ms: 600, dir: 1, speed: 100, turnMs: 150, minClosing: 30 },
   track: true,
 }
 

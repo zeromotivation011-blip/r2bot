@@ -110,3 +110,10 @@ To resume later: games → resume run wf_e021636c-616; schools + app → relaunc
 - [~] Product review wf_12dd6b07-421 → docs/kids-product-review.md (roadmap).
 - AI integration to add to the roadmap: Ask Spark (kid-safe mentor via existing Co-pilot, capped, switchable cost), talk-to-your-robot (language → editable blocks), on-device Vision Lab, "how the robot thinks" visualisations, AI Academy world, AI inside every world, teacher AI insights.
 - [~] AI integration wf_464254ea-2cd (app-first): Ask Spark mentor (+free offline FAQ mode), Talk to your robot (free on-device parser + optional AI), Vision Lab (on-device), How Robots Think hub (/kids/ai: neural playground, learning robot, robot senses). Paid AI calls OFF unless KIDS_AI_ENABLED=true, Haiku, per-IP daily caps. Mounting (AskSpark in shell, /kids/ai in nav) happens in the final integration after the worlds.
+
+## Roadmap adopted (docs/kids-product-review.md, 7806126)
+Decisions taken by default (founder can override):
+- Robo Sumo: bouts against a house "Champion bot" ladder; no child-vs-child ranking.
+- Teens 14–17: an "R2BOT Lab" look (same universe, grown-up skin) instead of "Kids" branding.
+- GA4 off on kids pages; replace with privacy-safe, cookieless counts later (no new vendor).
+NEXT after the running workflows (final pass, worlds, AI): Wave 1 of the roadmap as ONE integration build (one navigation incl. Galaxy/Worlds/AI, one currency, one robot Garage, retire old Robot World into the Universe, progress backup code, rewards you can hear, access settings, Lite 3D tier, Ask Spark safety incl. a kind response + help resources when a child says they are being hurt, privacy page, audit URLs), then Wave 2 (Levels 2–4 courses, mastery + spaced review, Robodex, careers, teacher gradebook, projector mode...).

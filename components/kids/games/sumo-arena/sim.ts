@@ -101,8 +101,6 @@ export interface SumoSensors {
   /** Edge sensors (front-left, front-right): reflected light 0–100. Black ring ≈ 8, white line ≈ 92. */
   edgeL: number
   edgeR: number
-  /** Rear edge sensor, centre back (the rivals' programs use it to feel the line behind them). */
-  edgeBack: number
 }
 
 export interface DriveCmd {
@@ -349,7 +347,7 @@ export function createMatch(R: Rapier, setups: [BotSetup, BotSetup]): Match {
       loadMul: 1,
       extraLoad: 0,
       cmd: { l: 0, r: 0, state: 'READY' },
-      sensors: { tMs: 0, distCm: null, bearingDeg: 0, edgeL: 8, edgeR: 8, edgeBack: 8 },
+      sensors: { tMs: 0, distCm: null, bearingDeg: 0, edgeL: 8, edgeR: 8 },
       wheel: [0, 0],
       out: false,
       log: emptyLog(),
@@ -398,14 +396,12 @@ export function createMatch(R: Rapier, setups: [BotSetup, BotSetup]): Match {
     }
     const sl = local(b, b.halfX * 0.75, 0, b.spec.body.front + 0.005)
     const sr = local(b, -b.halfX * 0.75, 0, b.spec.body.front + 0.005)
-    const sb = local(b, 0, 0, b.spec.body.back - 0.005)
     return {
       tMs: Math.round(t * 1000),
       distCm: nA > 0 ? Math.round(best * 1000) / 10 : null,
       bearingDeg: nA > 0 ? sumA / nA : 0,
       edgeL: Math.round(edgeReading(sl.x, sl.z)),
       edgeR: Math.round(edgeReading(sr.x, sr.z)),
-      edgeBack: Math.round(edgeReading(sb.x, sb.z)),
     }
   }
 
