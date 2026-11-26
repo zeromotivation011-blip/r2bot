@@ -25,7 +25,8 @@ export function BackToTop() {
       style={{
         position: 'fixed',
         right: 24,
-        bottom: 96,
+        // NextTopicBar raises this while it is on screen so the two never overlap.
+        bottom: 'var(--btt-bottom, 96px)',
         width: 40,
         height: 40,
         borderRadius: 999,

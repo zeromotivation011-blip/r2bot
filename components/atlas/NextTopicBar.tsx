@@ -9,6 +9,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { getVisitedSlugs, pickCuriousSlug } from '@/lib/atlas-xp'
 import { loadAtlasIndex } from '@/components/atlas/useAtlasIndex'
 
+const DISMISS_KEY = 'r2-ntb-dismissed'
+
 interface AtlasNodeLite {
   slug: string
   type: string
@@ -39,18 +41,38 @@ export function NextTopicBar({
   const [hidden, setHidden] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const lastY = useRef(0)
+  const barRef = useRef<HTMLElement>(null)
 
+  const [dismissed, setDismissed] = useState(false)
+
+  // Read the per-tab dismissal. Storage can throw (private mode, blocked
+  // site data), so a failure just means the bar can come back.
   useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        // Show the bar once the user has scrolled past 60% of the page.
-        setVisible(!entry.isIntersecting)
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -60% 0px' },
-    )
-    const sentinel = document.getElementById('main-content')
-    if (sentinel) obs.observe(sentinel)
-    return () => obs.disconnect()
+    try {
+      if (window.sessionStorage.getItem(DISMISS_KEY) === '1') setDismissed(true)
+    } catch {
+      /* storage unavailable */
+    }
+  }, [])
+
+  // Show the bar only when the reader is near the end of the entry: the bottom
+  // of <main> is within half a screen of the bottom of the viewport. It used to
+  // appear while the entry was still being read and, on a phone, stacked four
+  // cards over ~45% of the screen (task 99, 26 Nov 2026).
+  useEffect(() => {
+    const main = document.getElementById('main-content')
+    if (!main) return
+    const check = () => {
+      const bottom = main.getBoundingClientRect().bottom
+      setVisible(bottom < window.innerHeight * 1.5)
+    }
+    check()
+    window.addEventListener('scroll', check, { passive: true })
+    window.addEventListener('resize', check)
+    return () => {
+      window.removeEventListener('scroll', check)
+      window.removeEventListener('resize', check)
+    }
   }, [])
 
   // Hide on scroll-up, show on scroll-down
@@ -83,22 +105,54 @@ export function NextTopicBar({
     return [...unlocks, ...bucketPicks].slice(0, 3)
   }, [currentSlug, unlocksTerms, bucket, allNodes, refreshKey])
 
-  if (!visible || recs.length === 0) return null
+  const shown = visible && !dismissed && !hidden && recs.length > 0
+
+  // Lift the site-wide back-to-top button above the bar while the bar is shown
+  // (it sat on top of the close button on phones).
+  useEffect(() => {
+    const root = document.documentElement
+    const clear = () => {
+      root.style.removeProperty('--btt-bottom')
+    }
+    if (!shown || !barRef.current) {
+      clear()
+      return
+    }
+    root.style.setProperty('--btt-bottom', `${barRef.current.offsetHeight + 12}px`)
+    return clear
+  }, [shown])
+
+  if (!visible || dismissed || recs.length === 0) return null
+
+  const dismiss = () => {
+    setDismissed(true)
+    try {
+      window.sessionStorage.setItem(DISMISS_KEY, '1')
+    } catch {
+      /* storage unavailable: hidden for this page view only */
+    }
+  }
 
   return (
     <aside
+      ref={barRef}
       className={`ntb ${hidden ? 'is-hidden' : ''}`}
       role="complementary"
       aria-label="Suggested next concepts"
     >
       <div className="ntb-inner">
-        <p className="ntb-eyebrow">🚀 Ready for more?</p>
+        <div className="ntb-head">
+          <p className="ntb-eyebrow">Ready for more?</p>
+          <button type="button" className="ntb-close" onClick={dismiss} aria-label="Hide suggested next concepts">
+            <span aria-hidden>×</span>
+          </button>
+        </div>
         <div className="ntb-cards">
-          {recs.map(r => (
+          {recs.map((r, i) => (
             <Link
               key={r.slug}
               href={`/atlas/${r.type}/${r.slug}`}
-              className="ntb-card"
+              className={i > 0 ? 'ntb-card ntb-extra' : 'ntb-card'}
             >
               <span className="ntb-card-arrow" aria-hidden>→</span>
               <span className="ntb-card-body">
@@ -133,12 +187,14 @@ export function NextTopicBar({
         </div>
       </div>
 
-      <style jsx>{`
+      {/* global: the cards are next/link components, which styled-jsx scoping
+          does not reach, so scoped rules never styled them. Names are ntb-*. */}
+      <style jsx global>{`
         .ntb {
           position: fixed; left: 0; right: 0; bottom: 0;
           z-index: 40;
           background: linear-gradient(180deg, rgba(11,18,32,0), rgba(11,18,32,0.95) 30%);
-          padding: 22px 16px 18px;
+          padding: 22px 16px calc(18px + env(safe-area-inset-bottom, 0px));
           transition: transform .3s cubic-bezier(.22,.61,.36,1), opacity .25s;
           opacity: 1;
         }
@@ -151,8 +207,19 @@ export function NextTopicBar({
           padding: 14px 16px;
           backdrop-filter: blur(8px);
         }
-        .ntb-eyebrow {
+        .ntb-head {
+          display: flex; align-items: center; justify-content: space-between;
           margin: 0 0 10px;
+        }
+        .ntb-close {
+          width: 44px; height: 44px; margin: -12px -12px -12px 0;
+          display: inline-flex; align-items: center; justify-content: center;
+          background: none; border: 0; border-radius: 10px;
+          color: #a1a1aa; font-size: 22px; line-height: 1; cursor: pointer;
+        }
+        .ntb-close:hover { color: #fff; background: rgba(255,255,255,0.06); }
+        .ntb-eyebrow {
+          margin: 0;
           font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
           color: #fde047; font-weight: 900;
         }
@@ -192,6 +259,18 @@ export function NextTopicBar({
           border-color: rgba(252,104,24,0.4);
         }
         .ntb-surprise .ntb-card-arrow { color: #FF8A4C; }
+
+        /* Phones: one suggestion and "Surprise me" side by side, no subtitles,
+           so the bar is about a sixth of the screen instead of almost half. */
+        @media (max-width: 639px) {
+          .ntb { padding: 16px 12px calc(10px + env(safe-area-inset-bottom, 0px)); }
+          .ntb-inner { padding: 10px 12px; border-radius: 14px; }
+          .ntb-head { margin-bottom: 6px; }
+          .ntb-cards { grid-template-columns: minmax(0, 1fr) auto; }
+          .ntb-cards .ntb-extra { display: none; }
+          .ntb-cards .ntb-card { min-height: 44px; padding: 8px 12px; }
+          .ntb-cards .ntb-card-sub { display: none; }
+        }
       `}</style>
     </aside>
   )
