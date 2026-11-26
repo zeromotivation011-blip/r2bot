@@ -62,3 +62,11 @@ Contracts: `docs/kids-universe.md`, `docs/kids-design.md`.
    phone, independent review workflow, fixes. Update CLAUDE.md §6.
 10. **Morning report** for the founder: what exists, screenshots, what to test,
     migrations to run, how to publish the apps.
+
+## Run order after the 22:00 usage-limit stop (resumed 01:15 UTC)
+Scripts live in ~/.claude/projects/-home-user-r2bot/<session>/workflows/scripts/ (all carry a RESUMING note).
+1. RUNNING: Skill Galaxy — kids-skill-galaxy-wf_f9984ffd-0ef.js (run wf_762783f5-9f5); Universe home fix — run wf_e5a3ddba-357 (resumed).
+2. NEXT when (1) finishes or capacity allows: course + episodes — Workflow({scriptPath: .../kids-course-and-episodes-wf_e343e5bb-6dd.js}).
+3. THEN: games — Workflow({scriptPath: .../kids-universe-games-wf_e021636c-616.js, resumeFromRunId: 'wf_e021636c-616'}) (drone-hover build is cached).
+4. THEN steps 5–10 of "Remaining, in order".
+If a run fails on the limit again: wait for the reset time in the failure message, then relaunch the same script (resumeFromRunId where results were cached).
