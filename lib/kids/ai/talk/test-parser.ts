@@ -23,6 +23,8 @@ import { programOutline } from './describe'
 import { canonicalise, missionDesign, TALK_MISSIONS, missionsFor } from './missions'
 import { parsePlan } from './parser'
 import { validateProgram } from './schema'
+import { kidSafeSay, looksPrivate } from './privacy'
+import { withBlocksAtUnknown } from './parser'
 
 let failures = 0
 let passes = 0
@@ -171,6 +173,18 @@ check('at least 40 phrases', CASES.length >= 40, String(CASES.length))
   check('schema: text in a condition must be a colour', !validateProgram({ body: [{ op: 'if', cond: { k: 'compare', op: '=', a: { k: 'sensor', s: 'floor_color' }, b: { k: 'text', v: 'purple dragon' } }, then: [] }] }).ok)
   const said = validateProgram({ body: [{ op: 'say', text: { k: 'text', v: 'I am the boss' } }, { op: 'say', text: { k: 'text', v: 'Hello' } }, { op: 'beep' }] }, 'say hello and beep')
   check('schema: drops words the child never wrote', said.ok && outline(said.program) === 'say “Hello” / beep' && said.dropped.length === 1, said.ok ? outline(said.program) : said.error)
+  // Non-Latin words must also have been written by the child (QA: Cyrillic / Devanagari bypass).
+  const cyr = validateProgram({ body: [{ op: 'say', text: { k: 'text', v: 'hi Дурак тупой' } }, { op: 'beep' }] }, 'say hi')
+  check('schema: non-Latin words not in the source are dropped', cyr.ok && outline(cyr.program) === 'beep' && cyr.dropped.length === 1, cyr.ok ? outline(cyr.program) : cyr.error)
+  const dev = validateProgram({ body: [{ op: 'say', text: { k: 'text', v: 'तुम बेवकूफ हो' } }, { op: 'beep' }] }, 'नमस्ते बोलो')
+  check('schema: Devanagari words not in the source are dropped', dev.ok && outline(dev.program) === 'beep', dev.ok ? outline(dev.program) : dev.error)
+  const devOk = validateProgram({ body: [{ op: 'say', text: { k: 'text', v: 'नमस्ते' } }] }, 'say नमस्ते')
+  check('schema: the child’s own non-Latin words are kept', devOk.ok && outline(devOk.program) === 'say “नमस्ते”', devOk.ok ? outline(devOk.program) : devOk.error)
+  const mean = validateProgram({ body: [{ op: 'say', text: { k: 'text', v: 'you are stupid' } }] }, 'say you are stupid')
+  check('schema: unkind say words are masked', mean.ok && !/stupid/.test(outline(mean.program)), mean.ok ? outline(mean.program) : mean.error)
+  check('schema: maths in a number slot rejected', !validateProgram({ body: [{ op: 'drive_for', speedPct: { k: 'math', op: '*', a: { k: 'number', v: 9999 }, b: { k: 'number', v: 9999 } }, seconds: { k: 'number', v: 2 } }] }).ok)
+  check('schema: a condition is not motor power', !validateProgram({ body: [{ op: 'set_motors', leftPct: { k: 'sensor', s: 'bumped' }, rightPct: { k: 'compare', op: '<', a: { k: 'number', v: 1 }, b: { k: 'number', v: 2 } } }] }).ok)
+  check('schema: sensor as repeat count rejected', !validateProgram({ body: [{ op: 'repeat', times: { k: 'sensor', s: 'timer_s' }, body: [{ op: 'beep' }] }] }).ok)
   // Everything the parser makes is valid by the same schema.
   let allValid = true
   for (const [w] of CASES) {
@@ -183,6 +197,27 @@ check('at least 40 phrases', CASES.length >= 40, String(CASES.length))
     }
   }
   check('schema: every parser program passes the schema unchanged', allValid)
+}
+
+// ── 4b. Privacy, kind words, stop, AI splice ─────────────────────────────
+{
+  for (const t of ['my email is a@b.com', 'call 98765 43210', 'my name is Alice', 'I live at 12 Main Street', 'follow @coolkid99', 'go to www.example.com', 'i am 9 years old', 'my school is Oak Primary'])
+    check(`privacy: flags “${t}”`, looksPrivate(t) !== null)
+  for (const t of ['drive 50 cm then turn left', 'repeat 4 times', 'do a backflip', 'say hello world', 'go to the red mat'])
+    check(`privacy: allows “${t}”`, looksPrivate(t) === null, String(looksPrivate(t)))
+  check('kind words: masked', kidSafeSay('you are stupid').masked && !/stupid/.test(kidSafeSay('you are stupid').text))
+  check('kind words: friendly text untouched', !kidSafeSay('hello, I can see!').masked && !kidSafeSay('shell skill').masked)
+  const meanSay = parsePlan('say you are stupid')
+  check('parser: unkind say masked', !/stupid/.test(outline(meanSay.program)), outline(meanSay.program))
+  const st = parsePlan('drive until the wall is close then stop')
+  check('parser: no double stop after drive-until', st.blockCount === 3 && st.ok, `${outline(st.program)} (${st.blockCount})`)
+  const st2 = parsePlan('stop then stop')
+  check('parser: stop stop counts once', st2.blockCount === 1, outline(st2.program))
+  const mixed = parsePlan('drive 30 cm, then do a backflip, then beep')
+  check('parser: unknown piece reported alone', mixed.unknown.length === 1 && !mixed.unknown[0].includes('beep'), JSON.stringify(mixed.unknown))
+  const spliced = withBlocksAtUnknown(mixed, [{ op: 'light_on', id: 'ai1' }])
+  check('splice: AI blocks go where the unknown words were', outline(spliced) === outline({ body: [mixed.program.body[0], { op: 'light_on', id: 'x' }, ...mixed.program.body.slice(1)] }), outline(spliced))
+  check('splice: original program untouched', outline(mixed.program) === 'drive 30 cm at 50% / beep' || !outline(mixed.program).includes('light'), outline(mixed.program))
 }
 
 // ── 5. Blockly round trip ────────────────────────────────────────────────

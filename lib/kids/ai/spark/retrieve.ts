@@ -3,10 +3,10 @@
 // content — Skill Galaxy activities, Universe games, worlds, course sessions
 // and the Atlas entries Spark's notebook points to — and returns the best
 // matches for a question. The server passes them to the model as context and
-// turns the best one into a "Show me" link.
+// turns the best live kids page into a "Show me" link.
 //
 // Server-side only in practice: it imports every activity (large). The client
-// never imports this file; offline it uses the notebook's own Atlas links.
+// never imports this file; offline it answers from the notebook alone.
 
 import { bandAllows, type BandId } from '../../bands'
 import { ALL_ACTIVITIES } from '../../activities/content'
@@ -16,6 +16,7 @@ import { LEVELS } from '../../curriculum/levels'
 import { SPARK_FAQ } from './faq'
 import { tokens } from './match'
 import { titleFromSlug } from './offline'
+import { isLiveKidsHref } from './live'
 import type { SparkLink, SparkLinkKind } from './types'
 
 export interface SparkDoc {
@@ -102,7 +103,8 @@ export function sparkDocs(): SparkDoc[] {
       kind: 'atlas',
       title: titleFromSlug(f.atlas),
       text: f.a,
-      href: `/atlas/concept/${f.atlas}`,
+      // Grounding only: Spark never links outside /kids (see ./live.ts).
+      href: '',
       emoji: '📖',
       // Atlas pages are written for teens and adults.
       band: 'inventors',
@@ -110,7 +112,9 @@ export function sparkDocs(): SparkDoc[] {
     })
   }
 
-  DOCS = docs
+  // Unbuilt games and worlds are neither linked nor used as grounding, so
+  // neither Spark nor the model sends a child to a page that does not exist.
+  DOCS = docs.filter((d) => d.kind === 'atlas' || isLiveKidsHref(d.href))
   return DOCS
 }
 
@@ -148,7 +152,9 @@ export function retrieve(question: string, band: BandId, limit = 4, minScore = 2
   return picked
 }
 
-export function toLink(d: SparkDoc): SparkLink {
+/** A "Show me" link for a doc, or null when it is not a live kids page. */
+export function toLink(d: SparkDoc): SparkLink | null {
+  if (d.kind === 'atlas' || !isLiveKidsHref(d.href)) return null
   const prefix: Record<SparkLinkKind, string> = {
     atlas: 'Read',
     activity: 'Try',

@@ -19,6 +19,7 @@ import { cleanRequest, offlineReply, withPrivacyNote } from '@/lib/kids/ai/spark
 import { isOlderBand } from '@/lib/kids/ai/spark/match'
 import { STARTER_QUESTIONS } from '@/lib/kids/ai/spark/faq'
 import type { OpenSparkDetail } from '@/lib/kids/ai/spark/open'
+import { isLiveKidsHref } from '@/lib/kids/ai/spark/live'
 import { SPARK_MAX_QUESTION, type SparkContext, type SparkMode, type SparkReply } from '@/lib/kids/ai/spark/types'
 import { canSpeak, setVoiceMuted, speakNatural, stopSpeaking, voiceMuted, warmNaturalVoices } from '@/components/kids/activities/speech'
 import { SparkFace } from './AskSparkClient'
@@ -450,8 +451,9 @@ export default function SparkSheetClient({ initial, onClose }: SheetProps) {
               </svg>
             </button>
           </form>
-          <p className="mt-2 text-center text-xs leading-snug text-[#6E7888]">
-            Spark is an AI. It can make mistakes. Grown-ups: Spark never asks for personal details and nothing your child types is saved.
+          <p className="mt-2 text-center text-[13px] leading-snug text-[#A7B0C0]">
+            Spark can make mistakes. Grown-ups: R2BOT doesn’t store questions; they may be sent to an AI service (Anthropic) to answer.
+            {micOk ? ' The mic uses your browser’s speech service (such as Google or Apple).' : ''}
           </p>
         </div>
       </div>
@@ -491,6 +493,8 @@ function SparkBubble({ turn, speaking, canReplay, busy, onReplay, onFollowUp, on
     )
   }
   const r = turn.reply
+  // Belt and braces: never show a link that leaves R2BOT Kids or leads to an unbuilt page.
+  const links = (r?.links ?? []).filter((l) => isLiveKidsHref(l.href))
   return (
     <div className="mr-6 flex flex-col gap-2 self-start">
       <div className="rounded-[20px] rounded-bl-md border border-white/[0.08] bg-[#19263F] px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,.35)]">
@@ -511,9 +515,9 @@ function SparkBubble({ turn, speaking, canReplay, busy, onReplay, onFollowUp, on
         <p className="whitespace-pre-line text-[17px] leading-relaxed">{turn.text}</p>
       </div>
 
-      {r && r.links.length > 0 && (
+      {links.length > 0 && (
         <div className="flex flex-col gap-2">
-          {r.links.map((l) => (
+          {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}

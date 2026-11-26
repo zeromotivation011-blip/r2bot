@@ -88,9 +88,12 @@ export default function TalkPage() {
           word that is wrong.
         </p>
         <p className="mt-3">
-          The robot’s language brain runs on the device, even offline, and nothing a child types is saved on a server. Where it is switched on, an optional
-          AI helper can try a phrase the robot’s own brain does not know: the words are sent only when the child presses the button, are not stored, and the
-          answer is checked block by block before the robot will run it.
+          The robot’s language brain runs on the device, even offline, and R2BOT saves nothing a child types. The optional microphone uses the
+          browser’s own speech service, which may send the recording to that company (Google, in Chrome and on Android) to turn it into words. Where it is
+          switched on, an optional AI helper can try a phrase the robot’s own brain does not know: only the words it did not understand are sent, only when
+          the child presses the button, and never anything that looks like a name, address, email or phone number. R2BOT stores none of it, though the AI
+          provider may keep requests for a short time for safety checks. Every answer is checked block by block before the robot will run it, and the
+          robot only says kind words.
         </p>
       </article>
     </>

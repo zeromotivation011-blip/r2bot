@@ -570,7 +570,7 @@ export const FLAP = {
   climb: 1.1,
   distanceM: 40,
   speedMs: 4,
-  batteryJ: 120,
+  batteryJ: 180,
 } as const
 
 export interface FlapResult {

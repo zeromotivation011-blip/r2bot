@@ -23,6 +23,7 @@
 import type { Expr, Program, Stmt } from '../../sim/program'
 import { countStmts } from '../../sim/program'
 import { stmtText } from './describe'
+import { kidSafeSay } from './privacy'
 
 // ── Public shapes ─────────────────────────────────────────────────────────
 
@@ -142,6 +143,13 @@ class Ctx {
   unbounded: Unbounded | null = null
   /** Statements of the previous step, for "do it again". */
   lastStepStmts: Stmt[] = []
+  /** Where the first piece the parser could not understand would have gone. */
+  unknownSlot: { list: Stmt[]; index: number } | null = null
+
+  markUnknown(words: string, list: Stmt[]): void {
+    this.unknown.push(words)
+    if (!this.unknownSlot) this.unknownSlot = { list, index: list.length }
+  }
 
   constructor(answers: Record<string, string>) {
     this.answers = answers
@@ -738,7 +746,13 @@ function parseSimple(ctx: Ctx, clause: string, quotes: string[]): Emitted | null
     let text = restoreQuotes(m[1], quotes).replace(/\s+/g, ' ').trim()
     if (!text) text = 'Hello!'
     if (text.length > LIMITS.sayChars) text = text.slice(0, LIMITS.sayChars).trim()
-    return { stmts: [{ op: 'say', id: ctx.id(), text: { k: 'text', v: text } }], intent: `SAY “${text}”`, notes: [] }
+    const safe = kidSafeSay(text)
+    text = safe.text
+    return {
+      stmts: [{ op: 'say', id: ctx.id(), text: { k: 'text', v: text } }],
+      intent: `SAY “${text}”`,
+      notes: safe.masked ? ['R2BOT robots only say kind words, so I hid one. Try something friendly!'] : [],
+    }
   }
   // Lights before turns: "turn ON the light" is not a turn.
   m = /\b(?:turn|switch|put|flick)\s+(on|off)\s+(?:the\s+|your\s+)?(?:head\s*)?(?:lights?|lamp|torch|headlights?)\b|\b(?:turn|switch|put)\s+(?:the\s+|your\s+)?(?:head\s*)?(?:lights?|lamp|torch|headlights?)\s+(on|off)\b|\b(?:lights?|lamp|torch|headlights?)\s+(on|off)\b/.exec(clause)
@@ -876,7 +890,7 @@ function parseClause(ctx: Ctx, raw: string, quotes: string[], list: Stmt[], dept
   if (/^(?:do (?:it|that|this|the same)(?: thing)? again|again|repeat (?:that|it|this)|same again|one more time)$/.test(clause)) {
     if (ctx.lastStepStmts.length === 0) {
       pushStep(ctx, words, '???', [], ['“Again” — but there is nothing before it to do again.'], depth, false)
-      ctx.unknown.push(words)
+      ctx.markUnknown(words, list)
       return
     }
     const copy = cloneWithIds(ctx, ctx.lastStepStmts)
@@ -955,7 +969,13 @@ function parseClause(ctx: Ctx, raw: string, quotes: string[], list: Stmt[], dept
   if (!em) {
     const why = isSay ? '' : suggestFor(clause)
     pushStep(ctx, words, '???', [], [`I don’t know how to do “${restoreQuotes(clause, quotes)}” yet.${why ? ` ${why}` : ''}`], depth, false)
-    ctx.unknown.push(restoreQuotes(clause, quotes))
+    ctx.markUnknown(restoreQuotes(clause, quotes), list)
+    return
+  }
+  // "drive until the wall is close, then stop": the drive-until already ends with a stop block.
+  if (em.stmts.length === 1 && em.stmts[0].op === 'stop' && list[list.length - 1]?.op === 'stop') {
+    pushStep(ctx, restoreQuotes(words, quotes), 'STOP (already stopped)', [], ['The step before already ends with a STOP block, so I didn’t add a second one. Robots don’t need telling twice!'], depth)
+    ctx.unbounded = null
     return
   }
   if (until && !/until|NOT/.test(em.intent) && em.intent !== '???') em.notes.push(`I couldn’t use “until” with this action, so I ignored it.`)
@@ -1159,6 +1179,41 @@ function parseSentence(ctx: Ctx, sentence: string, quotes: string[], list: Stmt[
 
 // ── 6. The entry point ────────────────────────────────────────────────────
 
+/** Where the first not-understood piece of each parsed program would have gone (kept off the JSON shape). */
+const UNKNOWN_SLOTS = new WeakMap<Program, { list: Stmt[]; index: number }>()
+
+/**
+ * A copy of `result.program` with `insert` placed where the first piece the parser did not understand
+ * was said — how the AI helper's blocks (made from ONLY the not-understood words) join the child's own.
+ * Falls back to the end of the program.
+ */
+export function withBlocksAtUnknown(result: ParseResult, insert: Stmt[]): Program {
+  const slot = UNKNOWN_SLOTS.get(result.program)
+  let placed = false
+  const copyList = (list: Stmt[]): Stmt[] => {
+    const out = list.map(copyStmt)
+    if (slot && slot.list === list && !placed) {
+      out.splice(Math.min(slot.index, out.length), 0, ...insert)
+      placed = true
+    }
+    return out
+  }
+  const copyStmt = (s: Stmt): Stmt => {
+    switch (s.op) {
+      case 'repeat':
+      case 'repeat_until':
+      case 'forever':
+        return { ...s, body: copyList(s.body) }
+      case 'if':
+        return s.else ? { ...s, then: copyList(s.then), else: copyList(s.else) } : { ...s, then: copyList(s.then) }
+      default:
+        return { ...s }
+    }
+  }
+  const body = copyList(result.program.body)
+  return { body: placed ? body : [...body, ...insert] }
+}
+
 export function parsePlan(input: string, opts: ParseOptions = {}): ParseResult {
   const ctx = new Ctx(opts.answers ?? {})
   const { text, quotes } = normalise(input)
@@ -1166,6 +1221,7 @@ export function parsePlan(input: string, opts: ParseOptions = {}): ParseResult {
   const sentences = text.split(/(?<!\d)\.(?!\d)|[!?;\n]+/).map((x) => x.trim()).filter(Boolean)
   for (const s of sentences) parseSentence(ctx, s, quotes, body, 0)
   const program: Program = { body }
+  if (ctx.unknownSlot) UNKNOWN_SLOTS.set(program, ctx.unknownSlot)
   const blockCount = countStmts(body)
   return {
     program,

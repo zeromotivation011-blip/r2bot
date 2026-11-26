@@ -246,12 +246,13 @@ export function MissionList<M extends ThinkMission>({
   )
 }
 
-export function MissionDone<M extends ThinkMission>({ mission, onClose }: { mission: M | null; onClose: () => void }) {
+/** Mission-complete card. `hold` keeps it out of the way (e.g. while a test run plays) without losing it. */
+export function MissionDone<M extends ThinkMission>({ mission, onClose, hold = false }: { mission: M | null; onClose: () => void; hold?: boolean }) {
   const ref = useRef<HTMLButtonElement>(null)
   useEffect(() => {
-    if (mission) ref.current?.focus()
-  }, [mission])
-  if (!mission) return null
+    if (mission && !hold) ref.current?.focus({ preventScroll: true })
+  }, [mission, hold])
+  if (!mission || hold) return null
   return (
     <div role="status" aria-live="polite" className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-40 mx-auto max-w-md rounded-[20px] border border-emerald-400/50 bg-[#0E2A22] p-4 shadow-[0_8px_24px_rgba(0,0,0,.6)] motion-safe:animate-[slide-up-fade_.25s_cubic-bezier(.22,.61,.36,1)]">
       <p className="font-display text-lg font-bold text-emerald-300">Mission complete: {mission.title}</p>

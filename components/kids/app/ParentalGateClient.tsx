@@ -26,7 +26,12 @@ export interface ParentalGateProps {
 
 export function ParentalGate({ target, onPass, onCancel }: ParentalGateProps) {
   const ref = useRef<HTMLDialogElement>(null)
-  const [q, setQ] = useState(newQuestion)
+  // Fixed first question for the server render, randomised after mount — a
+  // random initial state caused a hydration mismatch on every kids page.
+  const [q, setQ] = useState({ a: 7, b: 5 })
+  useEffect(() => {
+    setQ(newQuestion())
+  }, [])
   const [entry, setEntry] = useState('')
   const [err, setErr] = useState('')
 

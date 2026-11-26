@@ -19,6 +19,8 @@ export interface NeuralSnapshot {
   accuracy: number
   /** True when the robot (perceptron rule) moved the line, not the child. */
   lineByRobot: boolean
+  /** True when the child moved the line by hand after placing the current dots. */
+  lineMovedByChild: boolean
   hiddenLayers: number
   totalHidden: number
   features: FeatureSet
@@ -48,7 +50,7 @@ export const NEURAL_MISSIONS: NeuralMission[] = [
     goal: 'Clear the board. Tap to put 4 orange and 4 blue dots, then draw a line that splits them.',
     lesson: 'Examples are how a robot learns. You chose the examples AND the answer.',
     xp: 20,
-    check: (s) => s.mode === 'hand' && s.dataset === 'own' && s.ownOrange >= 4 && s.ownCyan >= 4 && s.accuracy >= 1,
+    check: (s) => s.mode === 'hand' && s.dataset === 'own' && s.ownOrange >= 4 && s.ownCyan >= 4 && s.lineMovedByChild && !s.lineByRobot && s.accuracy >= 1,
   },
   {
     id: 'robot-tries',

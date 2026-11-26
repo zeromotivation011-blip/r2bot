@@ -10,7 +10,7 @@ import { BAND_ORDER, type BandId } from '../../bands'
 import { faqAnswer, followUpsFor, matchFaq, WEAK_MATCH } from './match'
 import { ruleHint } from './hints'
 import { cleanChildText, cleanContextText, PRIVACY_REMINDER, SAFETY_REPLIES, unsafeCategory } from './safety'
-import type { SparkContext, SparkLink, SparkMode, SparkReply } from './types'
+import type { SparkContext, SparkMode, SparkReply } from './types'
 
 export function titleFromSlug(slug: string): string {
   return slug
@@ -19,11 +19,9 @@ export function titleFromSlug(slug: string): string {
     .join(' ')
 }
 
-/** Atlas link for a notebook entry, only for children old enough for the Atlas (11+). */
-export function atlasLinkFor(slug: string | undefined, band: BandId): SparkLink | null {
-  if (!slug || BAND_ORDER.indexOf(band) < BAND_ORDER.indexOf('inventors')) return null
-  return { kind: 'atlas', label: `Read: ${titleFromSlug(slug)}`, href: `/atlas/concept/${slug}`, emoji: '📖' }
-}
+// Spark never links to the Atlas (or anywhere outside /kids): the adult site
+// has an email sign-up form. Notebook entries keep their Atlas slug only as
+// grounding for the model. See ./live.ts.
 
 export interface CleanedRequest {
   question: string
@@ -46,7 +44,9 @@ export function cleanRequest(question: unknown, context: unknown): CleanedReques
 
 /** A safety reply when the question (or its context) is not for Spark; else null. */
 export function safetyReply(question: string, context: SparkContext, band: BandId): SparkReply | null {
-  const cat = unsafeCategory(`${question} ${context.topic ?? ''} ${context.failureReason ?? ''}`)
+  // Each field is checked on its own so one cannot hide words from another.
+  const parts = [question, context.topic, context.programSummary, context.failureReason]
+  const cat = parts.reduce<ReturnType<typeof unsafeCategory>>((found, p) => found ?? (p ? unsafeCategory(p) : null), null)
   if (!cat) return null
   return {
     answer: SAFETY_REPLIES[cat],
@@ -67,23 +67,20 @@ export function offlineReply(question: string, context: SparkContext, band: Band
   if (safe) return safe
 
   if (mode === 'hint') {
-    const top = matchFaq(`${context.topic ?? ''} ${context.failureReason ?? ''} ${question}`, 1)[0]
-    const link = top && top.score >= 0.4 ? atlasLinkFor(top.faq.atlas, band) : null
     return {
       answer: ruleHint(context, band),
       source: 'hint',
-      links: link ? [link] : [],
+      links: [],
       followUps: ['How do I fix my program?', 'What is a loop in coding?', 'What is an if/else?'],
     }
   }
 
   const [best] = matchFaq(question, 1)
   if (best && best.score >= WEAK_MATCH) {
-    const link = atlasLinkFor(best.faq.atlas, band)
     return {
       answer: faqAnswer(best.faq, band),
       source: 'faq',
-      links: link ? [link] : [],
+      links: [],
       followUps: followUpsFor(question, best.faq.id, band),
     }
   }

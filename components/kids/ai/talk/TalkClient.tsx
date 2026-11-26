@@ -23,7 +23,8 @@ import type { ChallengeResult } from '@/lib/kids/sim/challenge'
 import type { BlocklyEditorHandle } from '@/components/kids/sim/BlocklyEditorClient'
 import type { CameraMode } from '@/components/kids/sim/renderer'
 import type { StageRunRequest } from '@/components/kids/sim/ChallengeStageClient'
-import { EXAMPLE_PHRASES, LIMITS, parsePlan, type ParseResult, type Question } from '@/lib/kids/ai/talk/parser'
+import { EXAMPLE_PHRASES, LIMITS, parsePlan, withBlocksAtUnknown, type ParseResult, type Question, type Step } from '@/lib/kids/ai/talk/parser'
+import { looksPrivate } from '@/lib/kids/ai/talk/privacy'
 import { canonicalise, FREE_PLAY, missionDesign, missionsFor, type TalkMission } from '@/lib/kids/ai/talk/missions'
 import { validateProgram } from '@/lib/kids/ai/talk/schema'
 import { stmtText } from '@/lib/kids/ai/talk/describe'
@@ -131,18 +132,35 @@ export default function TalkClient() {
   const [online, setOnline] = useState(true)
   const [aiState, setAiState] = useState<'idle' | 'asking' | 'off' | 'error'>('idle')
   const [aiMessage, setAiMessage] = useState<string | null>(null)
-  const aiAvailable = useRef<boolean | null>(null)
+  /** null = not asked yet / offline; the button only shows once the server says the helper is on. */
+  const [aiAvailable, setAiAvailable] = useState<boolean | null>(null)
+  const [micMessage, setMicMessage] = useState<string | null>(null)
   const [usedHelp, setUsedHelp] = useState(false)
 
   useEffect(() => {
     setCanListen(speechRecognitionSupported())
     setCanSpeak(speechSupported())
     setOnline(navigator.onLine)
-    const on = () => setOnline(true)
+    let cancelled = false
+    const checkAi = () => {
+      if (!navigator.onLine) return
+      fetch('/api/kids/talk', { cache: 'no-store' })
+        .then((g) => (g.ok ? (g.json() as Promise<{ enabled?: boolean }>) : { enabled: false }))
+        .then((j) => {
+          if (!cancelled) setAiAvailable(j.enabled === true)
+        })
+        .catch(() => {})
+    }
+    checkAi()
+    const on = () => {
+      setOnline(true)
+      checkAi()
+    }
     const off = () => setOnline(false)
     window.addEventListener('online', on)
     window.addEventListener('offline', off)
     return () => {
+      cancelled = true
       window.removeEventListener('online', on)
       window.removeEventListener('offline', off)
       stopListen.current?.()
@@ -342,14 +360,26 @@ export default function TalkClient() {
       return
     }
     setListening(true)
+    setMicMessage(null)
     stopListen.current = sparkListen(
       (heard) => {
         setListening(false)
+        if (!heard) {
+          setMicMessage('I didn’t catch that. Try again, or type it instead.')
+          return
+        }
         const words = (text ? `${text.replace(/[\s,.]*$/, '')}, ` : '') + heard
         setText(words.slice(0, LIMITS.maxChars))
         understand(words)
       },
-      () => setListening(false),
+      () => {
+        setListening(false)
+        setMicMessage(
+          navigator.onLine
+            ? 'The microphone didn’t work this time. Check it is allowed, or type your plan instead.'
+            : 'The microphone needs the internet. You can still type your plan — your robot understands typing offline.',
+        )
+      },
     )
   }
 
@@ -362,51 +392,76 @@ export default function TalkClient() {
 
   // ── The optional AI helper ────────────────────────────────────────────
   const askAi = async () => {
+    if (!parsed || parsed.unknown.length === 0) return
     if (!navigator.onLine) {
       setAiState('error')
       setAiMessage('You’re offline, so only your robot’s own brain can help. Try shorter steps: “drive 50 cm, then turn left”.')
       return
     }
+    // Only the pieces the robot did not understand are sent — never the whole plan.
+    const pieces = parsed.unknown.slice(0, 4)
+    const joined = pieces.join(', then ')
+    // Checked on the whole text box too: if anything private is anywhere in it, nothing is sent at all.
+    const priv = looksPrivate(text) ?? looksPrivate(joined)
+    if (priv) {
+      setAiState('error')
+      setAiMessage(`That looks like ${priv}, so I won’t send it anywhere. Keep private things private — robots only need moves!`)
+      return
+    }
+    if (joined.length > LIMITS.maxChars) {
+      setAiState('error')
+      setAiMessage('That is a lot of words! Try saying it in smaller steps.')
+      return
+    }
     setAiState('asking')
     try {
-      if (aiAvailable.current === null) {
-        const g = await fetch('/api/kids/talk', { cache: 'no-store' })
-        aiAvailable.current = g.ok && ((await g.json()) as { enabled?: boolean }).enabled === true
-      }
-      if (!aiAvailable.current) {
+      const res = await fetch('/api/kids/talk', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pieces }) })
+      const j = (await res.json()) as { ok?: boolean; program?: unknown; message?: string; reason?: string }
+      if (j.reason === 'disabled') {
+        setAiAvailable(false)
         setAiState('off')
         return
       }
-      const res = await fetch('/api/kids/talk', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text }) })
-      const j = (await res.json()) as { ok?: boolean; program?: unknown; message?: string }
-      const v = j.ok ? validateProgram(j.program, text) : null
+      const v = j.ok ? validateProgram(j.program, joined) : null
       if (!v || !v.ok) {
         setAiState('error')
         setAiMessage(j.message ?? 'The AI helper could not turn that into blocks.')
         return
       }
-      setWordProgram(v.program)
+      // The AI's blocks go where the not-understood words were; everything else stays the child's own.
+      const merged = withBlocksAtUnknown(parsed, v.program.body)
+      const aiIds = new Set(v.program.body.map((s) => s.id))
+      setWordProgram(merged)
+      const aiStep: Step = {
+        words: joined,
+        tokens: [{ t: '🤖 AI helper', role: 'words' }],
+        intent: 'The AI helper’s guess',
+        stmtIds: [...aiIds],
+        blocks: v.program.body.map(stmtText),
+        notes: ['An AI made this guess from the words I didn’t understand. Check every block — AI can be wrong too! Press Run to test it.'],
+        understood: true,
+        depth: parsed.steps.find((st) => !st.understood)?.depth ?? 0,
+      }
+      let placedStep = false
+      const steps: Step[] = []
+      for (const st of parsed.steps) {
+        if (st.understood) steps.push(st)
+        else if (!placedStep) {
+          steps.push(aiStep)
+          placedStep = true
+        }
+      }
+      if (!placedStep) steps.push(aiStep)
       setParsed({
-        program: v.program,
-        steps: [
-          {
-            words: text,
-            tokens: [{ t: '🤖 AI helper', role: 'words' }],
-            intent: 'The AI helper’s guess',
-            stmtIds: v.program.body.map((s) => s.id),
-            blocks: v.program.body.map(stmtText),
-            notes: ['An AI made this guess from your words. Check every block — AI can be wrong too! Press Run to test it.'],
-            understood: true,
-            depth: 0,
-          },
-        ],
-        questions: [],
+        program: merged,
+        steps,
+        questions: parsed.questions,
         unknown: [],
-        ok: true,
-        blockCount: countStmts(v.program.body),
+        ok: parsed.questions.length === 0,
+        blockCount: countStmts(merged.body),
       })
       setUsedHelp(true)
-      loadIntoEditor(v.program)
+      loadIntoEditor(merged)
       setAiState('idle')
     } catch {
       setAiState('error')
@@ -744,7 +799,14 @@ export default function TalkClient() {
                   </button>
                 )}
               </div>
-              <p className="mt-2 text-xs text-slate-500">Your robot understands you right here on this device, and nothing is saved. Never type your name or anything private.</p>
+              {micMessage && (
+                <p className="mt-2 text-sm text-amber-200" role="status">
+                  {micMessage}
+                </p>
+              )}
+              <p className="mt-2 text-xs text-slate-500">
+                What you type is understood right here on this device and isn’t saved.{canListen ? ' The 🎤 button uses your browser’s speech service, which may send your voice to that company to turn it into words.' : ''} Never type or say your name or anything private.
+              </p>
             </form>
 
             {parsed ? (
@@ -771,9 +833,9 @@ export default function TalkClient() {
                 {parsed.unknown.length > 0 && (
                   <div className="mt-3 rounded-2xl border border-white/10 bg-[#0A1120] p-3">
                     <p className="text-[15px] text-slate-200">
-                      My on-device brain only knows robot words. Say it in smaller steps{aiState === 'off' ? '.' : ' — or ask the AI helper to have a go.'}
+                      My on-device brain only knows robot words. Say it in smaller steps{aiAvailable && online && aiState !== 'off' ? ' — or ask the AI helper to have a go.' : '.'}
                     </p>
-                    {aiState !== 'off' && (
+                    {aiAvailable && online && aiState !== 'off' && (
                       <button
                         type="button"
                         onClick={askAi}
@@ -784,8 +846,11 @@ export default function TalkClient() {
                         {aiState === 'asking' ? 'Asking…' : '✨ Ask the AI helper'}
                       </button>
                     )}
-                    {aiState !== 'off' && <p className="mt-1 text-xs text-slate-500">The AI helper sends only these words, only when you press it, and keeps nothing.</p>}
-                    {aiState === 'off' && <p className="mt-1 text-sm text-slate-400">(The AI helper is switched off here — the on-device brain does all the work.)</p>}
+                    {aiAvailable && online && aiState !== 'off' && (
+                      <p className="mt-1 text-xs text-slate-500">
+                        Only the words I didn’t understand are sent, and only when you press it. R2BOT doesn’t save them; the AI company may keep them for a short time for safety checks. Never include names, addresses or anything private.
+                      </p>
+                    )}
                     {aiMessage && <p className="mt-2 text-sm text-rose-200">{aiMessage}</p>}
                   </div>
                 )}

@@ -7,7 +7,7 @@ import type { BandId } from '../../bands'
 import { SPARK_FAQ, type SparkFaq } from './faq'
 
 const STOP = new Set(
-  'a an the is are was were be been am do does did doing to of in on at for with and or but so if then than that this these those it its it’s i me my you your we our they them he she his her what whats which who whom how why when where can could would should will shall may might must there here about from into over under up down out not no yes very just really please tell explain know want like make made get got thing things some any all much many more most one also hey hi hello spark'.split(
+  'a an the is are was were be been am do does did doing to of in on at for with and or but so if then than that this these those it its it’s i me my you your we our they them he she his her what whats which who whom how why when where can could would should will shall may might must there here about from into over under up down out not no yes very just really please tell explain know want like make made get got have has having thing things some any all much many more most one also hey hi hello spark'.split(
     ' ',
   ),
 )
@@ -15,6 +15,13 @@ const STOP = new Set(
 // "robot" appears in almost every question, so it counts for little (LOW_WEIGHT)
 // rather than nothing — "what's a robot?" must still find its answer.
 const LOW_WEIGHT: Record<string, number> = { robot: 0.35, work: 0.5, use: 0.5 }
+
+// Everyday words that can appear in any question. A match carried only by these
+// (plus "robot") is not an answer: "what is your name" once found "Where does
+// the word robot come from?" through the keyword "name".
+const GENERIC = new Set(
+  'name word call thing way kind sort part good bad big small old new best cool fun people person day time look go come help need real nice'.split(' '),
+)
 
 /** Light stemming: good enough for kid questions, never clever. */
 function stem(w: string): string {
@@ -69,6 +76,7 @@ interface FaqIndexEntry {
   qTokens: Set<string>
   kTokens: Set<string>
   phrases: string[]
+  exact: string[]
 }
 
 let INDEX: FaqIndexEntry[] | null = null
@@ -81,6 +89,7 @@ function faqIndex(): FaqIndexEntry[] {
     kTokens: new Set(faq.k.flatMap(tokens)),
     // Only phrases with two real words earn a bonus ("how far" must not beat "mars").
     phrases: faq.k.filter((k) => tokens(k).length >= 2).map(normalise),
+    exact: (faq.phrases ?? []).map(normalise),
   }))
   return INDEX
 }
@@ -92,7 +101,7 @@ export interface FaqMatch {
 }
 
 export const STRONG_MATCH = 0.6
-export const WEAK_MATCH = 0.35
+export const WEAK_MATCH = 0.45
 
 /** Rank notebook entries for a question. */
 export function matchFaq(question: string, limit = 3): FaqMatch[] {
@@ -103,22 +112,29 @@ export function matchFaq(question: string, limit = 3): FaqMatch[] {
   for (const e of faqIndex()) {
     let hit = 0
     let possible = 0
+    let specific = false
     for (const t of qt) {
       const w = LOW_WEIGHT[t] ?? 1
       possible += 1.2 * w
-      if (e.qTokens.has(t)) hit += 1.2 * w
-      else if (e.kTokens.has(t)) hit += w
+      const found = e.qTokens.has(t) ? 1.2 * w : e.kTokens.has(t) ? w : 0
+      hit += found
+      if (found && !(t in LOW_WEIGHT) && !GENERIC.has(t)) specific = true
     }
     let phraseBonus = 0
     for (const p of e.phrases) if (norm.includes(` ${p} `)) phraseBonus += 1.5
+    for (const p of e.exact) if (norm.includes(` ${p} `)) phraseBonus += 2
     // Exact question (ignoring punctuation) is a certain match.
     if (normalise(e.faq.q) === normalise(question)) phraseBonus += 5
     if (!hit && !phraseBonus) continue
     const denom = Math.max(2, Math.min(possible / 1.2, 6))
     const coverage = possible ? Math.min(1, hit / possible) : 0
     const score = Math.min(1.5, 0.55 * coverage + 0.45 * Math.min(1, (hit + phraseBonus) / denom) + 0.1 * Math.min(phraseBonus, 3))
-    // A match carried only by weak words ("robot") is never "strong".
-    out.push({ faq: e.faq, score: hit + phraseBonus < 1 ? Math.min(score, 0.5) : score })
+    // A match carried only by weak words ("robot") is never "strong"; one
+    // carried only by everyday words ("name", "thing") is not a match at all.
+    // (Unless every word of the question is in the entry's own question: "what's a robot?")
+    const ownWords = qt.every((t) => e.qTokens.has(t))
+    const capped = !specific && !phraseBonus && !ownWords ? Math.min(score, 0.3) : hit + phraseBonus < 1 ? Math.min(score, 0.5) : score
+    out.push({ faq: e.faq, score: capped })
   }
   return out.sort((a, b) => b.score - a.score).slice(0, limit)
 }

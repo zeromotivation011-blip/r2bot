@@ -10,6 +10,7 @@
 
 import type { Expr, Program, SensorId, Stmt } from '../../sim/program'
 import { LIMITS } from './parser'
+import { kidSafeSay } from './privacy'
 
 export const MAX_STMTS = 40
 export const MAX_DEPTH = 4
@@ -27,23 +28,30 @@ function isObj(x: unknown): x is Record<string, unknown> {
   return !!x && typeof x === 'object' && !Array.isArray(x)
 }
 
-/** Compare words ignoring case and punctuation. */
-function wordsKey(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+/** Words in any script (letters and digits), lower-cased, punctuation ignored. */
+function tokens(s: string): string[] {
+  return s.normalize('NFKC').toLowerCase().match(/[\p{L}\p{M}\p{N}]+/gu) ?? []
 }
 
 export function validateProgram(raw: unknown, source?: string): Validation {
   let n = 0
   let count = 0
   const dropped: string[] = []
-  const srcKey = source !== undefined ? ` ${wordsKey(source)} ` : null
+  const srcKey = source !== undefined ? ` ${tokens(source).join(' ')} ` : null
 
+  // A number slot (distance, speed, seconds, times …) takes a plain number only, clamped to the
+  // arena's limits — never maths or a sensor, which could slip past the clamp.
   const num = (x: unknown, lo: number, hi: number): Expr => {
     const e = expr(x, 0)
-    if (e.k === 'number') {
-      if (!Number.isFinite(e.v)) throw new Invalid('not a number')
-      return { k: 'number', v: Math.min(hi, Math.max(lo, Math.round(e.v * 100) / 100)) }
-    }
+    if (e.k !== 'number' || !Number.isFinite(e.v)) throw new Invalid('a number slot needs a plain number')
+    return { k: 'number', v: Math.min(hi, Math.max(lo, Math.round(e.v * 100) / 100)) }
+  }
+  // Motor power is the one slot where a sensor formula is allowed (line following steers with
+  // "50 + line_offset × 40"): the engine clamps every motor to ±100 % whatever the formula gives.
+  const motor = (x: unknown): Expr => {
+    const e = expr(x, 0)
+    if (e.k === 'number') return { k: 'number', v: Math.min(LIMITS.speedMax, Math.max(-LIMITS.speedMax, Math.round(e.v * 100) / 100)) }
+    if (e.k !== 'math' && e.k !== 'sensor') throw new Invalid('motor power must be a number or a formula')
     return e
   }
 
@@ -106,7 +114,7 @@ export function validateProgram(raw: unknown, source?: string): Validation {
       case 'turn_degrees':
         return { op: 'turn_degrees', id, deg: num(x.deg, -LIMITS.deg, LIMITS.deg), speedPct: num(x.speedPct, LIMITS.speedMin, S) }
       case 'set_motors':
-        return { op: 'set_motors', id, leftPct: num(x.leftPct, -S, S), rightPct: num(x.rightPct, -S, S) }
+        return { op: 'set_motors', id, leftPct: motor(x.leftPct), rightPct: motor(x.rightPct) }
       case 'wait':
         return { op: 'wait', id, seconds: num(x.seconds, 0, LIMITS.seconds) }
       case 'repeat':
@@ -122,13 +130,14 @@ export function validateProgram(raw: unknown, source?: string): Validation {
       case 'say': {
         const t = isObj(x.text) && typeof x.text.v === 'string' ? x.text.v : typeof x.text === 'string' ? x.text : null
         if (t === null) throw new Invalid('bad say')
-        const v = t.replace(/[^\p{L}\p{N} !?.,'’-]/gu, '').trim().slice(0, LIMITS.sayChars)
-        // Only words the child wrote may be said.
-        if (!v || (srcKey !== null && !srcKey.includes(` ${wordsKey(v)} `))) {
+        const v = t.replace(/[^\p{L}\p{M}\p{N} !?.,'’-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, LIMITS.sayChars)
+        const words = tokens(v)
+        // Only words the child wrote, in the order they wrote them, may be said — in any script.
+        if (!v || words.length === 0 || (srcKey !== null && !srcKey.includes(` ${words.join(' ')} `))) {
           dropped.push(v || '(empty)')
           return null
         }
-        return { op: 'say', id, text: { k: 'text', v } }
+        return { op: 'say', id, text: { k: 'text', v: kidSafeSay(v).text } }
       }
       default:
         if ((SIMPLE as readonly string[]).includes(x.op)) return { op: x.op as (typeof SIMPLE)[number], id }

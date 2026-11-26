@@ -218,5 +218,5 @@ export function sensesMissionsFor(tier: TierName): SensesMission[] {
 }
 
 export function mysteryBox(spot: { x: number; y: number }): RoomObject {
-  return { id: MYSTERY_ID, name: 'Hidden box', kind: 'box', x: spot.x, y: spot.y, hx: 0.25, hy: 0.25, h: 0.55, color: '#B07CE8', material: 'solid' }
+  return { id: MYSTERY_ID, name: 'Hidden box', kind: 'box', x: spot.x, y: spot.y, hx: 0.25, hy: 0.25, h: 0.55, color: '#F59E0B', material: 'solid' }
 }

@@ -2,36 +2,55 @@
 //
 // OPTIONAL AI upgrade for "Talk to your robot" (/kids/ai/talk). The free,
 // on-device parser (lib/kids/ai/talk/parser.ts) handles everything it can;
-// only a phrase it could not understand is sent here, and only when the child
-// presses "Ask the AI helper".
+// only the PIECES it could not understand are sent here (never the whole
+// plan), and only when the child presses "Ask the AI helper".
 //
 // Cost control (the founder does not want extra cost):
 //   * OFF unless the server env var KIDS_AI_ENABLED === 'true' (503 otherwise —
 //     the page then simply keeps the on-device parser);
 //   * the cheapest Haiku model already used in this repo, max_tokens 400;
 //   * strict caps through lib/rate-limit.ts: per IP 4 a minute and 20 a day,
-//     and a site-wide ceiling (KIDS_AI_DAILY_CAP, default 300 calls a day).
+//     and a site-wide ceiling (KIDS_AI_DAILY_CAP, default 300 calls a day; 0
+//     switches the helper off). The site-wide bucket is only counted once the
+//     per-IP rules pass, so one client cannot use up everyone's allowance.
 //
-// Safety: the system prompt is fixed here — the client sends only the child's
-// words (≤ 300 characters). The answer must be a block program that passes
-// the strict schema (lib/kids/ai/talk/schema.ts); anything else is refused.
-// Nothing the child types is stored or logged; only hashed rate-limit
-// counters are kept.
+// Privacy: anything that looks personal (email, long number, @handle, web
+// address, "my name is …", "I live at …") makes the route refuse BEFORE any
+// model call (lib/kids/ai/talk/privacy.ts) — nothing is redacted and sent.
+//
+// Safety: the system prompt is fixed here — the client sends only the
+// not-understood pieces (≤ 4 pieces, ≤ 400 characters in all). The answer must
+// be a block program that passes the strict schema (lib/kids/ai/talk/schema.ts);
+// anything else is refused. Nothing the child types is stored or logged by
+// R2BOT; only hashed rate-limit counters are kept.
 
 import Anthropic from '@anthropic-ai/sdk'
 import type { NextRequest } from 'next/server'
-import { anyRateLimited, clientIp } from '@/lib/rate-limit'
+import { anyRateLimited, clientIp, isRateLimited } from '@/lib/rate-limit'
 import { validateProgram } from '@/lib/kids/ai/talk/schema'
+import { looksPrivate } from '@/lib/kids/ai/talk/privacy'
+import { LIMITS } from '@/lib/kids/ai/talk/parser'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const MODEL = 'claude-haiku-4-5-20251001'
 const MAX_TOKENS = 400
-const MAX_CHARS = 300
+const MAX_CHARS = LIMITS.maxChars
+const MAX_PIECES = 4
+const DEFAULT_DAILY_CAP = 300
+
+/** KIDS_AI_DAILY_CAP: unset or not a number → 300; 0 → helper off; at most 5000. */
+function dailyCap(): number {
+  const raw = process.env.KIDS_AI_DAILY_CAP
+  if (raw === undefined || raw.trim() === '') return DEFAULT_DAILY_CAP
+  const n = Number(raw)
+  if (!Number.isFinite(n)) return DEFAULT_DAILY_CAP
+  return Math.max(0, Math.min(5000, Math.floor(n)))
+}
 
 function enabled(): boolean {
-  return process.env.KIDS_AI_ENABLED === 'true' && Boolean(process.env.ANTHROPIC_API_KEY)
+  return process.env.KIDS_AI_ENABLED === 'true' && Boolean(process.env.ANTHROPIC_API_KEY) && dailyCap() > 0
 }
 
 function reply(status: number, body: Record<string, unknown>): Response {
@@ -82,26 +101,38 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   const raw = await req.text().catch(() => '')
   if (!raw || raw.length > 2000) return reply(400, { ok: false, reason: 'bad-request', message: 'That message was too long.' })
-  let text = ''
+  let pieces: string[] = []
   try {
-    const body = JSON.parse(raw) as { text?: unknown }
-    text = typeof body.text === 'string' ? body.text : ''
+    const body = JSON.parse(raw) as { pieces?: unknown }
+    if (Array.isArray(body.pieces)) pieces = body.pieces.filter((p): p is string => typeof p === 'string')
   } catch {
     return reply(400, { ok: false, reason: 'bad-request', message: 'Malformed request.' })
   }
-  text = text.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, MAX_CHARS)
+  pieces = pieces
+    .slice(0, MAX_PIECES)
+    .map((p) => p.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim())
+    .filter((p) => p.length > 0)
+  const text = pieces.join(', then ')
   if (text.length < 2) return reply(400, { ok: false, reason: 'bad-request', message: 'Say what your robot should do first.' })
+  if (text.length > MAX_CHARS) return reply(400, { ok: false, reason: 'too-long', message: 'That is a lot of words! Try saying it in smaller steps.' })
 
+  // Refuse — do not redact and send — when anything looks personal.
+  const priv = looksPrivate(text)
+  if (priv) return reply(422, { ok: false, reason: 'private', message: `That looks like ${priv}. Keep private things private — robots only need moves!` })
+
+  // Per-IP rules first; the site-wide bucket is counted only for a request that passed them.
   const ip = clientIp(req.headers)
-  const dailyCap = Math.max(0, Math.min(5000, Number(process.env.KIDS_AI_DAILY_CAP ?? 300) || 300))
+  const busy = 'The AI helper has had enough questions for today. Your robot’s own brain still works — try simpler words!'
   if (
     await anyRateLimited([
       { scope: 'kids-talk:ip-min', subject: ip, windowSeconds: 60, max: 4 },
       { scope: 'kids-talk:ip-day', subject: ip, windowSeconds: 86_400, max: 20 },
-      { scope: 'kids-talk:all-day', subject: 'all', windowSeconds: 86_400, max: dailyCap },
     ])
   ) {
-    return reply(429, { ok: false, reason: 'rate-limited', message: 'The AI helper has had enough questions for today. Your robot’s own brain still works — try simpler words!' })
+    return reply(429, { ok: false, reason: 'rate-limited', message: busy })
+  }
+  if (await isRateLimited({ scope: 'kids-talk:all-day', subject: 'all', windowSeconds: 86_400, max: dailyCap() })) {
+    return reply(429, { ok: false, reason: 'rate-limited', message: busy })
   }
 
   let out: string

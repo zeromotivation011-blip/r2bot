@@ -21,6 +21,8 @@ export interface SparkFaq {
   a: string
   more?: string
   atlas?: string
+  /** Exact phrases that always point here, even when made of common words ("your name"). */
+  phrases?: string[]
 }
 
 export const SPARK_FAQ: SparkFaq[] = [
@@ -90,7 +92,8 @@ export const SPARK_FAQ: SparkFaq[] = [
   {
     id: 'robots-feel',
     q: 'Do robots have feelings?',
-    k: ['feelings', 'feel', 'emotions', 'happy', 'sad', 'alive', 'love'],
+    k: ['feelings', 'feel', 'emotions', 'happy', 'sad', 'alive', 'love', 'lonely', 'angry'],
+    phrases: ['robots feel', 'robot feel', 'robots get sad', 'robot get sad', 'robots be sad', 'robots get lonely'],
     a: 'No. Robots do not have feelings, even if they have a smiley face. They follow programs. Some robots are designed to show faces so people feel comfortable, but nothing inside is happy or sad.',
     more: 'Social robots can recognise expressions and respond, but that is pattern matching, not emotion.',
     atlas: 'social-robotics',
@@ -105,6 +108,19 @@ export const SPARK_FAQ: SparkFaq[] = [
     id: 'spark-who',
     q: 'Who are you, Spark?',
     k: ['who are you', 'spark', 'your name', 'are you a robot', 'are you ai'],
+    phrases: [
+      'your name',
+      'who are you',
+      'what are you',
+      'how old are you',
+      'where are you',
+      'where are you from',
+      'who made you',
+      'who built you',
+      'are you a robot',
+      'are you an ai',
+      'are you ai',
+    ],
     a: 'I am Spark, the R2BOT Kids helper! I am a computer program, not a person. I can answer robot questions and give you hints — but I can make mistakes, so check with a grown-up too.',
   },
 
@@ -113,6 +129,7 @@ export const SPARK_FAQ: SparkFaq[] = [
     id: 'what-sensor',
     q: 'What is a sensor?',
     k: ['sensor', 'sensors', 'notice', 'detect'],
+    phrases: ['sensors work', 'sensor work', 'what do sensors do', 'types of sensors', 'kinds of sensors'],
     a: 'A sensor is a robot’s sense, like your eyes, ears and skin. It notices something — light, sound, distance, touch — and turns it into a number the robot’s computer can use.',
     more: 'Sensors measure a physical quantity and convert it into an electrical signal; the computer reads that signal as a number.',
     atlas: 'sensor',
@@ -512,6 +529,7 @@ export const SPARK_FAQ: SparkFaq[] = [
     id: 'robots-safe',
     q: 'Are robots dangerous?',
     k: ['dangerous', 'safe', 'safety', 'hurt', 'take over', 'evil'],
+    phrases: ['scared of robots', 'afraid of robots', 'robots scary', 'robots dangerous'],
     a: 'Robots only do what people design them to do. Engineers add safety features: emergency stop buttons, sensors that slow the robot when people are near, and fences around big factory arms.',
     more: 'Cobots (collaborative robots) are designed to work next to people and limit their force and speed if they touch someone.',
     atlas: 'robot-safety',

@@ -49,6 +49,9 @@ function rgba(c: readonly [number, number, number], a: number) {
   return `rgba(${c[0]},${c[1]},${c[2]},${a})`
 }
 
+/** Robot fixes allowed before the lab says the dots may not be splittable by one line. */
+const MAX_ROBOT_FIXES = 150
+
 export default function NeuralPlaygroundClient() {
   const [tier, setTier] = useTier()
   const [mode, setMode] = useState<NeuralMode>('hand')
@@ -61,6 +64,11 @@ export default function NeuralPlaygroundClient() {
   const [angle, setAngle] = useState(90)
   const [offset, setOffset] = useState(0.55)
   const [lineByRobot, setLineByRobot] = useState(false)
+  /** The child moved the line by hand since the dots last changed (the own-dots mission needs a real answer, not a lucky old line). */
+  const [lineMoved, setLineMoved] = useState(false)
+  /** Robot fixes since the dots or the line last changed by hand; capped so "keep fixing" always ends. */
+  const fixesRef = useRef(0)
+  const [fixStuck, setFixStuck] = useState(false)
   const [lastFixed, setLastFixed] = useState<Pt | null>(null)
   const rngRef = useRef(makeRng(5))
 
@@ -173,6 +181,7 @@ export default function NeuralPlaygroundClient() {
       ownCyan: own.cyan,
       accuracy: mode === 'hand' ? handAcc : stats.accuracy,
       lineByRobot,
+      lineMovedByChild: lineMoved,
       hiddenLayers: layers,
       totalHidden: layers * neurons,
       features: fs,
@@ -181,7 +190,14 @@ export default function NeuralPlaygroundClient() {
     }
     if (points.length < 4) return
     for (const m of missions) if (!ms.done.includes(m.id) && m.check(snap)) ms.complete(m)
-  }, [mode, dataset, own, handAcc, stats, lineByRobot, layers, neurons, fs, points.length, missions, ms])
+  }, [mode, dataset, own, handAcc, stats, lineByRobot, lineMoved, layers, neurons, fs, points.length, missions, ms])
+
+  // New dots: the old line is no longer an answer to them, and the robot gets a fresh fix budget.
+  useEffect(() => {
+    setLineMoved(false)
+    fixesRef.current = 0
+    setFixStuck(false)
+  }, [points])
 
   // ── Data actions ──
   const loadData = (id: DatasetId) => {
@@ -232,6 +248,14 @@ export default function NeuralPlaygroundClient() {
       playSound('correct')
       return
     }
+    if (fixesRef.current >= MAX_ROBOT_FIXES) {
+      // Mixed-up dots (or dots right on the line) can make the rule tip back and
+      // forth for ever. Stop and say why instead of running with no feedback.
+      setAutoFix(false)
+      setFixStuck(true)
+      return
+    }
+    fixesRef.current++
     playSound('click')
     const { angleDeg, offset: off } = angleFromLine(r.line)
     setAngle(Math.round(angleDeg))
@@ -344,7 +368,10 @@ export default function NeuralPlaygroundClient() {
                   onChange={(v) => {
                     setAngle(v)
                     setLineByRobot(false)
+                    setLineMoved(true)
                     setAutoFix(false)
+                    fixesRef.current = 0
+                    setFixStuck(false)
                   }}
                 />
                 <Slider
@@ -357,7 +384,10 @@ export default function NeuralPlaygroundClient() {
                   onChange={(v) => {
                     setOffset(v)
                     setLineByRobot(false)
+                    setLineMoved(true)
                     setAutoFix(false)
+                    fixesRef.current = 0
+                    setFixStuck(false)
                   }}
                 />
               </div>
@@ -371,8 +401,14 @@ export default function NeuralPlaygroundClient() {
               </div>
               <p className="mt-2 text-sm text-slate-300">
                 The orange side of the line says “orange”. The robot picks one dot it got wrong and tips the line toward it — the perceptron rule from 1958.
-                {lastFixed && lineByRobot && <span className="text-amber-300"> It just learned from the ringed dot.</span>}
+                {lastFixed && lineByRobot && !fixStuck && <span className="text-amber-300"> It just learned from the ringed dot.</span>}
               </p>
+              {fixStuck && (
+                <p role="status" className="mt-2 rounded-2xl bg-amber-500/10 p-3 text-[15px] text-amber-100">
+                  The robot tried {MAX_ROBOT_FIXES} fixes and the line keeps tipping back and forth. Maybe no straight line can split these dots — some orange and blue
+                  ones are mixed up. Move a dot, or switch to Train and give the brain a hidden layer.
+                </p>
+              )}
             </Panel>
           ) : (
             <Panel title="Train the brain">

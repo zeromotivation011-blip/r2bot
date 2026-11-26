@@ -20,11 +20,11 @@ import Anthropic from '@anthropic-ai/sdk'
 import type { NextRequest } from 'next/server'
 import { BAND_ORDER, type BandId } from '@/lib/kids/bands'
 import { anyRateLimited, clientIp, isRateLimited } from '@/lib/rate-limit'
-import { cleanRequest, offlineReply, safetyReply, withPrivacyNote, atlasLinkFor } from '@/lib/kids/ai/spark/offline'
+import { cleanRequest, offlineReply, safetyReply, withPrivacyNote } from '@/lib/kids/ai/spark/offline'
 import { faqAnswer, followUpsFor, matchFaq, STRONG_MATCH } from '@/lib/kids/ai/spark/match'
 import { retrieve, toLink } from '@/lib/kids/ai/spark/retrieve'
 import { sparkSystemPrompt, sparkUserMessage } from '@/lib/kids/ai/spark/prompt'
-import { unsafeCategory } from '@/lib/kids/ai/spark/safety'
+import { EMAIL_RE, unsafeAnswer, URL_RE } from '@/lib/kids/ai/spark/safety'
 import type { SparkLink, SparkMode, SparkReply } from '@/lib/kids/ai/spark/types'
 
 export const runtime = 'nodejs'
@@ -63,7 +63,12 @@ function isBand(v: unknown): v is BandId {
   return typeof v === 'string' && (BAND_ORDER as string[]).includes(v)
 }
 
-/** Model output hygiene: plain text, no links/emails, sane length, SHOW: line removed. */
+/**
+ * Model output hygiene: plain text, sane length, SHOW: line removed. An answer
+ * that contains a link or an email address is not repaired (removing them
+ * leaves broken sentences like "email me at for more"): it is rejected, and
+ * the notebook answers instead.
+ */
 function tidyAnswer(raw: string): { text: string; show: number | null } {
   let show: number | null = null
   const m = raw.match(/\n?\s*SHOW:\s*(none|\d+)\s*$/i)
@@ -72,9 +77,14 @@ function tidyAnswer(raw: string): { text: string; show: number | null } {
     show = /^\d+$/.test(m[1]) ? Number(m[1]) : null
     text = raw.slice(0, m.index)
   }
+  URL_RE.lastIndex = 0
+  EMAIL_RE.lastIndex = 0
+  if (URL_RE.test(text) || EMAIL_RE.test(text) || /\bSHOW:/i.test(text)) {
+    URL_RE.lastIndex = 0
+    EMAIL_RE.lastIndex = 0
+    return { text: '', show: null }
+  }
   text = text
-    .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '')
-    .replace(/\b(?:https?:\/\/|www\.)\S+/gi, '')
     .replace(/^#+\s*/gm, '')
     .replace(/\*\*|__|`/g, '')
     .replace(/^\s*[-*•]\s+/gm, '')
@@ -124,17 +134,19 @@ export async function POST(req: NextRequest): Promise<Response> {
   if (safe) return json(withPrivacyNote(safe, removedPersonal))
 
   const docs = retrieve(`${question} ${context.topic ?? ''}`, band, 4)
-  const links: SparkLink[] = docs.slice(0, 2).map((d) => toLink(d.doc))
+  const links: SparkLink[] = docs
+    .map((d) => toLink(d.doc))
+    .filter((l): l is SparkLink => l !== null)
+    .slice(0, 2)
 
   // 3. Strong notebook match: free, instant, already reviewed.
   if (mode === 'ask') {
     const [best] = matchFaq(question, 1)
     if (best && best.score >= STRONG_MATCH) {
-      const atlas = atlasLinkFor(best.faq.atlas, band)
       const reply: SparkReply = {
         answer: faqAnswer(best.faq, band),
         source: 'faq',
-        links: dedupeLinks([...links, ...(atlas ? [atlas] : [])]).slice(0, 3),
+        links,
         followUps: followUpsFor(question, best.faq.id, band),
       }
       return json(withPrivacyNote(reply, removedPersonal))
@@ -175,9 +187,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     )
     const text = res.content.map((b) => (b.type === 'text' ? b.text : '')).join('').trim()
     const { text: answer, show } = tidyAnswer(text)
-    if (!answer || unsafeCategory(answer)) return fallback()
+    if (!answer || unsafeAnswer(answer)) return fallback()
 
-    const chosen = show && docs[show - 1] ? [toLink(docs[show - 1].doc)] : []
+    const shown = show && docs[show - 1] ? toLink(docs[show - 1].doc) : null
+    const chosen = shown ? [shown] : []
     const reply: SparkReply = {
       answer,
       source: 'ai',

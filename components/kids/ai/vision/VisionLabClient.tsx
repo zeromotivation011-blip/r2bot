@@ -257,7 +257,15 @@ export default function VisionLabClient() {
   const facingRef = useRef(facing)
   facingRef.current = facing
 
+  // Every start gets a token. stopCamera (leave, background, "Sample pictures")
+  // bumps it, so a getUserMedia that resolves late is stopped, never shown.
+  const camReqRef = useRef(0)
+  const camPendingRef = useRef(false)
+  const mountedRef = useRef(false)
+
   const stopCamera = useCallback(() => {
+    camReqRef.current += 1
+    camPendingRef.current = false
     streamRef.current?.getTracks().forEach((t) => t.stop())
     streamRef.current = null
     if (videoRef.current) videoRef.current.srcObject = null
@@ -270,6 +278,9 @@ export default function VisionLabClient() {
         return
       }
       stopCamera()
+      const token = camReqRef.current
+      const stale = () => token !== camReqRef.current || !mountedRef.current || document.hidden
+      camPendingRef.current = true
       setCamState('starting')
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -280,15 +291,29 @@ export default function VisionLabClient() {
           },
           audio: false,
         })
+        if (stale()) {
+          // The child left, backgrounded the app or chose sample pictures while
+          // the permission prompt was open: end this stream at once.
+          stream.getTracks().forEach((t) => t.stop())
+          return
+        }
+        camPendingRef.current = false
         streamRef.current = stream
         const v = videoRef.current
         if (v) {
           v.srcObject = stream
           await v.play().catch(() => undefined)
         }
+        if (stale()) {
+          if (streamRef.current === stream) stopCamera()
+          else stream.getTracks().forEach((t) => t.stop())
+          return
+        }
         setCamState('on')
         setSource('camera')
       } catch (e) {
+        if (stale()) return
+        camPendingRef.current = false
         const name = e instanceof Error ? e.name : ''
         setCamState(
           name === 'NotAllowedError' || name === 'SecurityError' ? 'denied' : name === 'NotFoundError' || name === 'OverconstrainedError' ? 'nocam' : 'error',
@@ -301,8 +326,9 @@ export default function VisionLabClient() {
 
   // Camera is always stopped on leave, and paused when the app goes to the background.
   useEffect(() => {
+    mountedRef.current = true
     const onHide = () => {
-      if (document.hidden && streamRef.current) {
+      if (document.hidden && (streamRef.current || camPendingRef.current)) {
         stopCamera()
         setCamState('paused')
       }
@@ -313,13 +339,14 @@ export default function VisionLabClient() {
     return () => {
       document.removeEventListener('visibilitychange', onHide)
       window.removeEventListener('pagehide', onPageHide)
+      mountedRef.current = false
       stopCamera()
     }
   }, [stopCamera])
 
   const switchToSamples = () => {
     stopCamera()
-    setCamState((s) => (s === 'on' || s === 'paused' || s === 'explain' ? 'off' : s))
+    setCamState((s) => (s === 'on' || s === 'starting' || s === 'paused' || s === 'explain' ? 'off' : s))
     setSource('samples')
   }
 
@@ -1286,7 +1313,7 @@ export default function VisionLabClient() {
         </ol>
         <p className="mt-3 text-sm text-slate-300">
           Finish a mission to earn the <strong className="text-white">🧠 Robot Teacher</strong> badge and XP. Want to build a robot with a camera eye?{' '}
-          <Link href="/kids/workshop" className="text-amber-300 underline underline-offset-2">
+          <Link href="/kids/workshop" className="inline-flex min-h-11 items-center text-amber-300 underline underline-offset-2">
             Open the Workshop
           </Link>
           .

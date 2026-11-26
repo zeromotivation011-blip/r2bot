@@ -41,7 +41,7 @@ export const CAM_HEIGHT = 0.3
 export const CAM_FOV = (62 * Math.PI) / 180
 export const LIDAR_HEIGHT = 0.2
 export const LIDAR_RANGE = 8
-export const SONAR_HEIGHT = 0.12
+export const SONAR_HEIGHT = 0.06
 export const SONAR_HALF_ANGLE = (15 * Math.PI) / 180
 export const SONAR_RANGE = 4
 export const DEPTH_RANGE = 5
@@ -250,7 +250,7 @@ function distToSeg(px: number, py: number, s: Seg): number {
 }
 
 export const LINE_SENSORS = 5
-export const LINE_SPACING = 0.025
+export const LINE_SPACING = 0.04
 export const LINE_AHEAD = 0.12
 
 /**

@@ -12,7 +12,7 @@ export interface LearnSnapshot {
   test: { reached: boolean; steps: number; optimal: number } | null
   epsilon: number
   icy: boolean
-  /** Training episodes run with ε ≥ 0.2 since the last reset. */
+  /** Training episodes run with ε ≥ 0.3 since the last reset. */
   exploredEpisodes: number
   ownWalls: number
   ownLava: number
