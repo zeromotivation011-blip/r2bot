@@ -1,0 +1,60 @@
+import type { Activity } from '@/lib/kids/activities/types'
+import type { Answer, Params } from './logic'
+
+export const samples: Activity<Params, Answer>[] = [
+  {
+    id: 'sample-binary-encoder-arrow-pixels',
+    title: 'What does the robot see?',
+    track: 'electronics',
+    band: 'explorers',
+    template: 'binary-encoder',
+    difficulty: 1,
+    intro: 'Spark’s tiny camera sends its picture as rows of 1s and 0s. A 1 means a bright pixel. Light up the pixels to see what Spark sees!',
+    takeaway: 'Robots store pictures as bits: each tiny square is lit (1) or dark (0).',
+    realWorld: 'Every phone camera, robot camera and LED screen stores pictures as millions of numbers like these.',
+    params: {
+      mode: 'pixels',
+      width: 5,
+      height: 5,
+      rows: [0b00100, 0b00010, 0b11111, 0b00010, 0b00100],
+      codes: 'binary',
+      reveal: 'an arrow pointing right',
+    },
+    solution: { bits: [[0, 0, 1, 0, 0], [0, 0, 0, 1, 0], [1, 1, 1, 1, 1], [0, 0, 0, 1, 0], [0, 0, 1, 0, 0]] },
+  },
+  {
+    id: 'sample-binary-encoder-motor-speed',
+    title: 'Set the motor speed',
+    track: 'electronics',
+    band: 'builders',
+    template: 'binary-encoder',
+    difficulty: 2,
+    intro: 'The rover’s motor chip reads its speed from five switches called bits. Mission control says: speed 19. Flip the right bits!',
+    takeaway: 'In binary each bit is worth double the one to its right (1, 2, 4, 8, 16). Add the lit ones to get the number.',
+    realWorld: 'Microcontrollers set motor speed by writing a binary number into a register many times every second.',
+    params: { mode: 'number', bits: 5, target: 19, showPlaceValues: true, label: 'Motor speed' },
+    solution: { bits: [[1, 0, 0, 1, 1]] },
+  },
+  {
+    id: 'sample-binary-encoder-parity-fix',
+    title: 'Noise on the radio link',
+    track: 'electronics',
+    band: 'engineers',
+    template: 'binary-encoder',
+    difficulty: 4,
+    intro: 'A Mars rover’s data block crossed space and a cosmic ray flipped one bit. Use the row and column parity checks to find it and flip it back — no resending needed.',
+    takeaway: 'Two-dimensional parity can locate and correct a single flipped bit: the odd row and odd column cross at the error.',
+    realWorld: 'Spacecraft and the memory in robots use error-correcting codes (like Hamming and Reed–Solomon) built on this idea.',
+    params: {
+      mode: 'parity',
+      task: 'fix',
+      data: [
+        [1, 0, 1, 1],
+        [0, 1, 1, 0],
+        [1, 1, 0, 1],
+      ],
+      flip: [1, 2],
+    },
+    solution: { bits: [[1, 0, 1, 1, 1], [0, 1, 1, 0, 0], [1, 1, 0, 1, 1], [0, 0, 0, 0, 0]] },
+  },
+]
