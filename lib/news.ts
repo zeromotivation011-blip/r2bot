@@ -263,7 +263,9 @@ async function fetchFeed(f: RawFeed): Promise<RSSItem[]> {
   try {
     const res = await fetch(f.url, {
       headers: { 'User-Agent': 'R2BOT-NewsAggregator/2.0 (+https://r2bot.in)' },
-      next: { revalidate: 1800 },
+      // 3 hours. A fetch revalidate lower than the page's wins, so this 30-minute
+      // value made / and /news regenerate (one ISR write each) every 30 minutes.
+      next: { revalidate: 10800 },
       signal: AbortSignal.timeout(9000),
     })
     if (!res.ok) return []

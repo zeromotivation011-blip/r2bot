@@ -9,7 +9,10 @@ import { ShortEmbed, LessonQuiz } from '@/components/shorts/ShortsClient'
 import { jsonldScript } from '@/lib/seo/jsonld'
 
 const BASE = 'https://www.r2bot.in'
-export const revalidate = 3600
+// Every 6 hours, not hourly: each regeneration is an ISR write and the hourly
+// rate put the Hobby plan's monthly ISR-write allowance at risk (26 Nov 2026).
+// publishAt is always 00:00 UTC, so a lesson still switches itself on by 06:00 UTC.
+export const revalidate = 21600
 export function generateStaticParams() { return SHORTS.filter((s) => SHORTS_ZH[s.slug]).map((s) => ({ slug: s.slug })) }
 // Unknown slugs must be a real 404. notFound() alone answered 200 live (22 Nov
 // 2026): the response had already started streaming, so the not-found UI arrived

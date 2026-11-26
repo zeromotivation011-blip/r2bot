@@ -38,7 +38,9 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 3600;
+// 3 hours. /news was the largest ISR writer on the site (~780 write units a day
+// at hourly); the feed is a daily digest, not a live ticker.
+export const revalidate = 10800;
 
 export default async function NewsPage() {
   const [initialData, archived] = await Promise.all([

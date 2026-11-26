@@ -36,7 +36,7 @@ export interface ShortLesson {
    * description works the moment it publishes) but it is noindex, left out of
    * the sitemap, hubs, search, mini-courses and "next" links, and the video
    * slot shows a release notice instead of an embed. It switches itself on when
-   * the date passes (pages revalidate hourly). No deploy is needed on the day.
+   * the date passes (lesson pages revalidate every 6 hours; publishAt is 00:00 UTC). No deploy is needed on the day.
    */
   publishAt?: string
   /**

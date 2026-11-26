@@ -5,7 +5,7 @@
 import { getNewsData } from '@/lib/news';
 
 export const runtime = 'nodejs';
-export const revalidate = 1800; // 30 min
+export const revalidate = 10800; // 3 h, same as the feed fetch in lib/news.ts
 
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -54,7 +54,7 @@ ${items}
   return new Response(xml, {
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=1800, s-maxage=1800, stale-while-revalidate=600',
+      'Cache-Control': 'public, max-age=1800, s-maxage=10800, stale-while-revalidate=600',
     },
   });
 }

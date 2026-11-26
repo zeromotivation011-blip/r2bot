@@ -10,7 +10,8 @@ import { jsonldScript } from '@/lib/seo/jsonld';
 const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 const PAGE_URL = `${BASE_URL}/robots`;
 
-export const revalidate = 3600;
+// The robot list is code (lib/robots-data.ts) and changes only with a deploy.
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: 'Famous Robots | Encyclopedia of Real Robots',

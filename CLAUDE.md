@@ -86,6 +86,11 @@ Everything we ship is measured against the best products in the world, not "good
 
 > **Deploys are automatic.** A merge to `main` triggers a Vercel build and goes live in ~5 minutes.
 > No `npx vercel --prod` step. Pages 404 until the build finishes.
+> **The site went dark for ~3.5 days (13 Nov ~00:30 → 16 Nov ~12:00 UTC):** Vercel logged zero requests,
+> GA4 logged none, and Search Console filed 30 real pages under "Blocked due to other 4xx". The most likely
+> cause is a Hobby usage limit; ISR writes were running at 8–26K a day. Every `revalidate` is an ISR write
+> each time a stale page is requested (crawlers included), so do not set `revalidate` below what the page
+> needs, and check Vercel → Usage before adding hourly routes.
 > Supabase migrations are NOT automatic: Ravi runs each new file in `supabase/migrations/`
 > in the Supabase SQL editor. Write migrations so the code degrades safely until then.
 
@@ -123,7 +128,7 @@ Build these exceptionally; everything else is secondary.
   in EN/ZH/HI/ES. Every new Short gets a lesson page, added to `lib/shorts.ts`.
   A lesson with a future `publishAt` (see `lib/shorts-scheduled.ts`) is reachable but noindex and left out
   of the sitemap, hubs, search, mini-courses and "next" links until that day; it switches on by itself
-  (pages revalidate hourly). A Short that repeats an existing topic is attached to that lesson as an
+  (lesson pages revalidate every 6 hours, so by 06:00 UTC; hourly ISR was eating the Hobby ISR-write allowance). A Short that repeats an existing topic is attached to that lesson as an
   `extraVideos` entry instead of getting a second URL. Always go through `liveShorts()`, never `SHORTS`,
   for anything a visitor or crawler sees.
 - **Course path** (`/courses`) — the five-course video journey, 50 lessons, 85%-watched gating,
