@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+"""Writes content/courses/how-robots-really-work/course.json (Series 2, Course E)."""
+import json
+import os
+
+LESSONS = [
+    {
+        "id": "01-actuators-the-muscles-of-a-robot",
+        "title": "Actuators: The Muscles of a Robot",
+        "summary": "Explain what an actuator is and the main kinds — motors, hydraulics and pneumatics — that create robot motion.",
+        "videoNo": 1, "durationMin": 4,
+        "quiz": [
+            {"q": "What is an actuator, in a robot?", "options": ["A part that converts energy (electrical, hydraulic or pneumatic) into motion", "A part that only stores data", "A sticker placed on the robot's body"], "answer": 0, "why": "Actuators are the 'muscles' that turn stored energy into physical movement."},
+            {"q": "Which actuator type is most common in small robots and consumer electronics?", "options": ["Electric motors", "Hydraulic cylinders only", "Steam pistons"], "answer": 0, "why": "Electric motors are compact, efficient and widely used across small to medium robots."},
+            {"q": "When might a robot use hydraulic actuators instead of electric motors?", "options": ["When very high force in a compact size is needed, like heavy machinery", "Hydraulics are only used in toy robots", "Never; hydraulics are purely theoretical"], "answer": 0, "why": "Hydraulics can deliver very high force relative to their size, which is why they appear in heavy-duty equipment and some powerful robots."},
+            {"q": "What's a trade-off of pneumatic (air-powered) actuators?", "options": ["Fast and simple, but less precise at holding a very exact position", "They are always the most precise actuator type available", "They require no compressor or air supply at all"], "answer": 0, "why": "Pneumatics are great for quick, strong bursts of motion but are typically less precise for fine positional control than electric servos."},
+        ],
+    },
+    {
+        "id": "02-servo-stepper-or-brushless",
+        "title": "Servo, Stepper or Brushless: Which Motor and Why",
+        "summary": "Compare three common robot motor types and when an engineer would pick each one.",
+        "videoNo": 2, "durationMin": 4,
+        "quiz": [
+            {"q": "What makes a servo motor useful for precise positioning?", "options": ["It includes built-in feedback that lets it hold or reach an exact angle", "It has no way to know its own position", "It can only spin continuously with no control"], "answer": 0, "why": "Servos combine a motor with a feedback sensor, enabling accurate position control."},
+            {"q": "What is a key advantage of a stepper motor?", "options": ["It can move in precise, known steps without needing a feedback sensor", "It is the lightest motor type in existence", "It never needs any power to move"], "answer": 0, "why": "Steppers move in discrete, predictable steps, which lets some designs track position without extra sensors."},
+            {"q": "Why are brushless motors often chosen for drones and high-performance robots?", "options": ["They offer high efficiency, speed and durability with less mechanical wear", "They are the cheapest motor type available", "They cannot spin fast enough for any robot use"], "answer": 0, "why": "Brushless motors avoid the friction and wear of brushes, giving strong efficiency and longevity, especially at high speed."},
+            {"q": "If precise, repeatable position control at low cost matters more than raw speed, which is often chosen?", "options": ["A stepper motor", "A jet engine", "A simple light bulb"], "answer": 0, "why": "Steppers are a classic choice when the priority is reliable, repeatable positioning on a budget."},
+        ],
+    },
+    {
+        "id": "03-gyroscopes-and-accelerometers",
+        "title": "Gyroscopes and Accelerometers: A Robot's Inner Ear",
+        "summary": "Compare what a gyroscope and an accelerometer each measure, and why robots need both together.",
+        "videoNo": 3, "durationMin": 4,
+        "quiz": [
+            {"q": "What does a gyroscope primarily measure?", "options": ["Rotation or angular velocity", "Only temperature", "Sound volume"], "answer": 0, "why": "Gyroscopes sense how fast something is rotating around an axis."},
+            {"q": "What does an accelerometer primarily measure?", "options": ["Acceleration, including the pull of gravity", "Only colour", "Only humidity"], "answer": 0, "why": "Accelerometers measure changes in velocity, including the constant acceleration of gravity, which helps sense tilt."},
+            {"q": "Why do robots often combine both sensors instead of using just one?", "options": ["Together they give a fuller, more reliable picture of orientation and movement than either alone", "Using two sensors together is purely a cost-saving measure", "They cannot function at all unless paired"], "answer": 0, "why": "Each sensor has blind spots; fusing both gives more complete and stable orientation estimates."},
+            {"q": "Why is the comparison to an 'inner ear' apt for these sensors?", "options": ["Like the human inner ear, they help sense balance, tilt and motion", "The inner ear and these sensors have no similarity at all", "Because they are shaped like an ear"], "answer": 0, "why": "The human inner ear senses balance and motion biologically, similar in function to what these sensors do electronically."},
+        ],
+    },
+    {
+        "id": "04-degrees-of-freedom",
+        "title": "Degrees of Freedom: How a Robot Arm Plans Its Reach",
+        "summary": "Understand what a 'degree of freedom' is and why more joints let an arm reach more positions and angles.",
+        "videoNo": 4, "durationMin": 4,
+        "quiz": [
+            {"q": "What does 'degrees of freedom' mean for a robot arm?", "options": ["The number of independent ways its joints can move", "The arm's total weight", "How many colours it can be painted"], "answer": 0, "why": "Each independent joint movement adds one degree of freedom, expanding the arm's possible positions."},
+            {"q": "Why does a human-like arm typically need around 6-7 degrees of freedom to match human dexterity?", "options": ["That many independent joints let it reach a target position and orientation from many angles, like a human arm can", "One degree of freedom is already enough for any task", "Degrees of freedom have no effect on reach or orientation"], "answer": 0, "why": "Roughly six or seven degrees of freedom are typically needed to freely position and orient an end effector, similar to the human arm."},
+            {"q": "What's a downside of adding more degrees of freedom to a robot arm?", "options": ["More complexity in planning movement, and more cost and possible failure points", "It makes the arm completely unable to move", "There are no downsides whatsoever"], "answer": 0, "why": "Each added joint increases mechanical complexity and the computational work needed to plan smooth movement."},
+            {"q": "What is 'inverse kinematics' used for, briefly?", "options": ["Figuring out what joint angles are needed to put the hand at a desired point", "Measuring a robot's weight", "Painting a robot's surface"], "answer": 0, "why": "Inverse kinematics solves for the joint angles that achieve a desired end-effector position, a core planning step for arms."},
+        ],
+    },
+    {
+        "id": "05-grippers-and-robot-hands",
+        "title": "Grippers and Robot Hands: How to Hold Anything",
+        "summary": "Compare simple two-finger grippers, suction grippers and dexterous hands, and when each is the right tool.",
+        "videoNo": 5, "durationMin": 4,
+        "quiz": [
+            {"q": "What is a simple two-finger (parallel-jaw) gripper best suited for?", "options": ["Picking up predictable, rigid objects of a known shape", "Threading a needle with human-level dexterity", "Reading braille with its fingertips"], "answer": 0, "why": "Simple grippers are reliable and fast for consistent, known object shapes but lack fine dexterity."},
+            {"q": "How does a suction (vacuum) gripper typically pick things up?", "options": ["By creating a vacuum seal against a flat or smooth surface", "By spinning the object rapidly", "By heating the object until it sticks"], "answer": 0, "why": "Suction grippers rely on an airtight seal and vacuum pressure to lift items, which works well on flat or smooth surfaces."},
+            {"q": "Why might a warehouse choose a suction gripper over a multi-fingered hand for packing boxes?", "options": ["It's simpler, faster and cheaper for flat or box-like items", "Suction grippers can grip irregular soft objects better than any hand", "Suction grippers are illegal in commercial warehouses"], "answer": 0, "why": "For predictable, mostly flat-surfaced items, a suction gripper is often the more practical and cost-effective choice."},
+            {"q": "When is a complex, multi-fingered dexterous hand worth its extra cost and complexity?", "options": ["When a wide variety of irregular objects need delicate, adaptable handling", "Only when no objects need to be picked up at all", "Only for painting walls"], "answer": 0, "why": "Dexterous hands earn their complexity when flexibility across many object shapes and delicate handling truly matters."},
+        ],
+    },
+    {
+        "id": "06-the-kalman-filter",
+        "title": "The Kalman Filter: Guessing Better Than the Sensors",
+        "summary": "See, with a simple example, how a Kalman filter blends noisy sensor readings into a smoother, more trustworthy estimate.",
+        "videoNo": 6, "durationMin": 5,
+        "quiz": [
+            {"q": "What problem does a Kalman filter help solve?", "options": ["Combining noisy, imperfect sensor data into a more accurate estimate of what's really happening", "Painting a robot more efficiently", "Making a robot's motors run faster"], "answer": 0, "why": "Kalman filtering blends multiple noisy measurements with a model to produce a better estimate than any single reading."},
+            {"q": "Why can't a robot simply trust its raw sensor reading at every instant?", "options": ["Sensors have noise and small errors that can mislead a robot moment to moment", "Sensors are always perfectly accurate with zero error", "Robots have no sensors to begin with"], "answer": 0, "why": "All real sensors carry some noise or error, so smoothing/filtering their output gives more reliable estimates."},
+            {"q": "What does a Kalman filter use, besides the latest sensor reading, to improve its estimate?", "options": ["A model predicting what should happen next, blended with the new measurement", "Nothing else; it uses only the newest raw reading", "A coin flip to decide the estimate"], "answer": 0, "why": "The filter combines a predictive model with new sensor data, weighting each by how much it trusts them."},
+            {"q": "Where might a Kalman filter be used in a real robot?", "options": ["Estimating position or orientation by combining GPS, inertial sensors and other data", "Choosing the robot's paint colour", "Deciding the robot's name"], "answer": 0, "why": "Kalman filters are widely used in navigation systems to fuse multiple sensors into one smooth position/orientation estimate."},
+        ],
+    },
+    {
+        "id": "07-how-robots-choose-a-route",
+        "title": "How Robots Choose a Route (Dijkstra and A*)",
+        "summary": "See how pathfinding algorithms like Dijkstra and A* let a robot find the shortest safe route on a map.",
+        "videoNo": 7, "durationMin": 5,
+        "quiz": [
+            {"q": "What problem do pathfinding algorithms like Dijkstra and A* solve for a robot?", "options": ["Finding the shortest or most efficient route between two points on a map", "Deciding what colour to paint the robot", "Choosing which battery brand to use"], "answer": 0, "why": "These are classic algorithms designed specifically to find efficient paths through a graph or map."},
+            {"q": "What extra idea does the A* algorithm add on top of Dijkstra's approach?", "options": ["A smart estimate (heuristic) of distance to the goal, which helps search faster", "A* removes the need for any map at all", "A* only works if there is exactly one path available"], "answer": 0, "why": "A* uses an estimated 'cost to go' heuristic to prioritize promising paths, often finding a good route faster than plain Dijkstra."},
+            {"q": "Why does a robot need its environment represented as a map or graph to use these algorithms?", "options": ["The algorithms work by comparing paths between connected points/nodes on that representation", "The algorithms work directly on raw video with no map needed", "Maps have nothing to do with pathfinding"], "answer": 0, "why": "Both algorithms operate over a graph structure representing possible positions and connections, which is why mapping matters first."},
+            {"q": "What happens if the map used for planning is wrong or outdated?", "options": ["The robot may plan a path that doesn't match reality, risking collisions or getting stuck", "The algorithm always self-corrects with no issue", "Robots ignore maps entirely so this has no effect"], "answer": 0, "why": "Pathfinding is only as good as the map it works from; a stale map can lead to a poor or unsafe route in reality."},
+        ],
+    },
+    {
+        "id": "08-ros-the-operating-system-for-robots",
+        "title": "ROS: The Operating System for Robots",
+        "summary": "Understand what ROS actually is: a framework of reusable parts for robots to communicate and share work.",
+        "videoNo": 8, "durationMin": 4,
+        "quiz": [
+            {"q": "What is ROS, broadly speaking?", "options": ["A widely used framework of tools and libraries that helps different robot software parts communicate", "A physical robot sold in stores", "A single company's one proprietary robot model"], "answer": 0, "why": "ROS (Robot Operating System) is open-source middleware and tooling that robotics developers commonly build on."},
+            {"q": "Why is ROS useful for teams building robots?", "options": ["It lets different software components (sensors, planning, control) talk to each other in a standard way", "It removes the need for any programming at all", "It only works with one specific robot brand, globally"], "answer": 0, "why": "ROS standardizes how different pieces of robot software exchange messages, which saves teams from reinventing that plumbing."},
+            {"q": "Is ROS itself a physical operating system like Windows or Linux?", "options": ["No — it's middleware/tools that typically run on top of a real OS like Linux", "Yes, it replaces Linux entirely on robots", "ROS requires no underlying computer at all"], "answer": 0, "why": "ROS is not a full OS kernel; it's a framework of libraries and tools, usually run on top of Linux."},
+            {"q": "What's a benefit of ROS being widely adopted across the robotics community?", "options": ["Lots of shared code, tutorials and tools that teams can reuse instead of building from scratch", "No benefit; wide adoption only causes confusion", "It guarantees every robot built with it works perfectly with zero bugs"], "answer": 0, "why": "Broad adoption means a large ecosystem of reusable packages and community knowledge, which speeds up development."},
+        ],
+    },
+    {
+        "id": "09-what-a-robotics-engineer-really-does",
+        "title": "What a Robotics Engineer Really Does, and How to Become One",
+        "summary": "See the real day-to-day mix of mechanical, electrical and software work, and a realistic path to get started.",
+        "videoNo": 9, "durationMin": 5,
+        "quiz": [
+            {"q": "What mix of skills does robotics engineering typically draw on?", "options": ["Mechanical design, electronics, and software/control, often all three together", "Only painting and design skills", "Only advanced mathematics with no hands-on work"], "answer": 0, "why": "Robotics is inherently interdisciplinary, blending hardware design, electronics, and software/control engineering."},
+            {"q": "What does a robotics engineer's day-to-day work often actually look like?", "options": ["Debugging real hardware and code issues, testing, and iterating, not constant dramatic breakthroughs", "Nonstop high-drama action exactly like in films", "Simply watching robots work with no hands-on involvement"], "answer": 0, "why": "Much real engineering work is methodical debugging, testing and incremental improvement rather than movie-style moments."},
+            {"q": "What's a realistic first step for a beginner wanting to get into robotics?", "options": ["Starting with an accessible kit or simulator and building small projects", "Immediately building a full humanoid robot alone with no prior experience", "Waiting until a university degree is finished before touching any hardware"], "answer": 0, "why": "Small, approachable kits and simulators let beginners build real skills and confidence before tackling bigger projects."},
+            {"q": "Why do many robotics engineers continue learning throughout their careers?", "options": ["The field changes quickly with new sensors, algorithms and hardware emerging regularly", "Robotics knowledge was fully completed decades ago, with nothing left to learn", "Engineers in this field never need to update their skills"], "answer": 0, "why": "Rapid advances in AI, sensors and hardware mean continuous learning is a normal part of a robotics career."},
+        ],
+    },
+    {
+        "id": "10-robot-competitions-and-first-projects",
+        "title": "Robot Competitions and First Projects for Beginners",
+        "summary": "See how sumo and line-following competitions, plus accessible kits, give beginners a concrete way to start.",
+        "videoNo": 10, "durationMin": 4,
+        "quiz": [
+            {"q": "What's the basic goal in a typical sumo robot competition?", "options": ["Push the opposing robot out of a ring while staying inside it yourself", "Build the tallest robot possible", "Programme the robot to sing a song"], "answer": 0, "why": "Sumo robot competitions are about pushing an opponent out of the ring using sensors and strategy, within set rules."},
+            {"q": "What skill does a line-following robot competition mainly test?", "options": ["Using sensors to detect and follow a path accurately and quickly", "Speaking multiple languages fluently", "Painting the most attractive robot body"], "answer": 0, "why": "Line-following challenges focus on sensor-based control, tuning a robot to track a path reliably and fast."},
+            {"q": "Why are beginner kits like LEGO Mindstorms often recommended as a first project?", "options": ["They combine easy building, sensors and simple programming in one accessible package", "They require an advanced engineering degree to even open the box", "They cannot be programmed at all"], "answer": 0, "why": "These kits are specifically designed to introduce real robotics concepts without requiring specialized tools or deep expertise."},
+            {"q": "What's a key benefit of entering a robot competition as a beginner?", "options": ["A concrete goal and deadline that pushes practical learning and problem-solving", "Competitions guarantee a job in robotics immediately", "Competitions require no building or programming at all"], "answer": 0, "why": "Having a real goal and deadline is a strong, practical way to learn by doing, which many beginners find motivating."},
+        ],
+    },
+]
+
+course = {
+    "title": "How Robots Really Work: Parts, Brains and Careers",
+    "order": 10,
+    "tagline": "The ideas behind every robot, then how to start building your own.",
+    "description": "Ten lessons on what's really inside a robot: actuators and motors, balance sensors, degrees of freedom, grippers, the Kalman filter, pathfinding, ROS, what a robotics engineer actually does, and how to take your first steps.",
+    "outcome": "After this course you can name a robot's main parts, explain how it senses and plans, and describe a realistic path into robotics as a hobby or a career.",
+    "level": "Beginner",
+    "levelLabel": "Beginner, no experience needed",
+    "whoFor": "Anyone who wants to understand what's really inside a robot, or is considering robotics as a hobby or career.",
+    "prerequisites": "None. No maths or coding needed, though curiosity about how things work helps.",
+    "status": "published",
+    "instructor": "R2BOT",
+    "presenters": ["R2BOT"],
+    "updated": "2026-11-27",
+    "availability": "soon",
+    "minutes": 44,
+    "outcomes": [
+        "Name a robot's main actuators and sensors, and what each does",
+        "Explain degrees of freedom and why robot arms need several joints",
+        "Describe, at a high level, how a Kalman filter and a pathfinding algorithm help a robot act",
+        "Explain what ROS is and why robotics teams use it",
+        "Describe a realistic first step into robotics as a hobby or career",
+    ],
+    "finalActivity": {
+        "lessonId": "10-robot-competitions-and-first-projects",
+        "title": "Plan your first robot project",
+        "prompt": "Write one sentence naming a small first robot project you could realistically try, and one sentence on which part (actuator, sensor, or software) you'd want to learn first and why.",
+    },
+    "lessons": [
+        {"id": l["id"], "title": l["title"], "summary": l["summary"], "youtubeId": "", "videoNo": l["videoNo"], "durationMin": l["durationMin"], "quiz": l["quiz"]}
+        for l in LESSONS
+    ],
+}
+
+out_dir = os.path.join("content", "courses", "how-robots-really-work")
+os.makedirs(out_dir, exist_ok=True)
+out_path = os.path.join(out_dir, "course.json")
+with open(out_path, "w") as f:
+    json.dump(course, f, indent=2, ensure_ascii=False)
+    f.write("\n")
+print("Wrote", out_path, "with", len(course["lessons"]), "lessons")

@@ -1,0 +1,533 @@
+{
+  "title": "Robots at Home and in the City",
+  "order": 8,
+  "tagline": "The robots you can already meet — in your home, your street, and your city.",
+  "description": "Ten lessons on the robots already around us: vacuum and lawn-mowing robots, window and pool cleaners, cooking and delivery robots, warehouse robots, surgical robots, toy kits, AI-driven robots, and service robots in shops, hotels and hospitals.",
+  "outcome": "After this course you can explain how the everyday robots around you actually sense, move and work, and tell a real smart robot from a scripted toy.",
+  "level": "Beginner",
+  "levelLabel": "Beginner, no experience needed",
+  "whoFor": "Anyone who has used or seen a robot vacuum, delivery robot or hospital robot and wants to know how it really works.",
+  "prerequisites": "None. No maths or coding needed.",
+  "status": "published",
+  "instructor": "R2BOT",
+  "presenters": [
+    "R2BOT"
+  ],
+  "updated": "2026-11-27",
+  "availability": "soon",
+  "minutes": 41,
+  "outcomes": [
+    "Explain how a robot vacuum and a robot mower each find their way around",
+    "Describe what cooking, delivery and warehouse robots actually automate",
+    "Explain clearly that a surgical robot is controlled by a surgeon, not autonomous",
+    "Tell a genuinely programmable robot kit from a scripted toy",
+    "Describe where AI language models fit into a robot's control system"
+  ],
+  "finalActivity": {
+    "lessonId": "10-robots-in-shops-hotels-and-hospitals",
+    "title": "Spot a robot's real job",
+    "prompt": "Think of a robot you've seen in a shop, hotel, hospital or on the street. Write one sentence on the specific task it does, and one sentence on what it is NOT able to do on its own."
+  },
+  "lessons": [
+    {
+      "id": "01-how-a-robot-vacuum-finds-its-way",
+      "title": "How a Robot Vacuum Finds Its Way Around Your Home",
+      "summary": "See how bump sensors, lasers (LIDAR) and mapping let a robot vacuum cover a room without a human steering it.",
+      "youtubeId": "",
+      "videoNo": 1,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "How do many modern robot vacuums build a map of your home?",
+          "options": [
+            "Using LIDAR or cameras to scan the room and build a floor plan",
+            "By asking the homeowner to draw a map",
+            "They never build any map"
+          ],
+          "answer": 0,
+          "why": "Many current models use laser (LIDAR) or visual mapping to understand room layout rather than moving at random."
+        },
+        {
+          "q": "What does a bump sensor help a robot vacuum do?",
+          "options": [
+            "Detect a collision and change direction",
+            "Measure the floor's temperature",
+            "Charge the battery"
+          ],
+          "answer": 0,
+          "why": "A bump sensor tells the robot it has hit something, so it can turn and continue cleaning."
+        },
+        {
+          "q": "Why do robot vacuums often get stuck on cables or loose socks?",
+          "options": [
+            "Their sensors can struggle to detect thin, low-lying or soft obstacles",
+            "They are programmed to stop on purpose",
+            "They cannot move at all on carpets"
+          ],
+          "answer": 0,
+          "why": "Thin cables and soft fabric are harder for typical sensors to reliably detect compared to furniture or walls."
+        },
+        {
+          "q": "Why is building a map useful, beyond just avoiding walls?",
+          "options": [
+            "It lets the robot clean efficiently and remember which areas are already done",
+            "A map has no real benefit",
+            "Maps are only used for marketing photos"
+          ],
+          "answer": 0,
+          "why": "A stored map lets the robot plan efficient paths and avoid repeating the same spot unnecessarily."
+        }
+      ]
+    },
+    {
+      "id": "02-lawn-mowing-robots",
+      "title": "Lawn-Mowing Robots: How They Stay in the Garden",
+      "summary": "Learn how a boundary wire — or newer GPS-based systems — keeps a robot mower inside your garden.",
+      "youtubeId": "",
+      "videoNo": 2,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What has traditionally kept a robot mower from wandering out of the garden?",
+          "options": [
+            "A buried boundary wire that the mower detects and turns back from",
+            "A person walking behind it the whole time",
+            "Nothing; it just guesses"
+          ],
+          "answer": 0,
+          "why": "A perimeter wire emits a signal the mower senses, so it knows where the lawn ends."
+        },
+        {
+          "q": "What is a newer alternative to boundary wires in some robot mowers?",
+          "options": [
+            "GPS or satellite-based positioning for wire-free boundaries",
+            "A long rope tied to a tree",
+            "Nothing; wires are the only method that has ever existed"
+          ],
+          "answer": 0,
+          "why": "Some newer models use satellite positioning to define boundaries without burying any wire."
+        },
+        {
+          "q": "Why do robot mowers usually mow in short, frequent sessions rather than one long cut?",
+          "options": [
+            "Frequent light trims keep the grass healthier and need less power per session",
+            "It is required by law",
+            "Longer sessions are impossible for any mower"
+          ],
+          "answer": 0,
+          "why": "Frequent light mowing is gentler on the grass and spreads out battery use."
+        },
+        {
+          "q": "What sensor commonly helps a mower avoid cutting itself on an obstacle like a rock?",
+          "options": [
+            "Collision or lift sensors",
+            "A smell sensor",
+            "A sound-only microphone"
+          ],
+          "answer": 0,
+          "why": "Collision detection (and lift sensors that stop the blade if tilted) protect both the mower and the obstacle."
+        }
+      ]
+    },
+    {
+      "id": "03-window-and-pool-cleaning-robots",
+      "title": "Window and Pool Cleaning Robots",
+      "summary": "Understand suction and tracked wheels for window robots, and navigation underwater for pool-cleaning robots.",
+      "youtubeId": "",
+      "videoNo": 3,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "How does a window-cleaning robot usually stay attached to a vertical glass surface?",
+          "options": [
+            "Suction or vacuum pressure holding it to the glass",
+            "Strong magnets that work on any surface",
+            "It does not stay attached; a person holds it"
+          ],
+          "answer": 0,
+          "why": "Most window robots use a vacuum/suction mechanism to grip smooth glass as they move."
+        },
+        {
+          "q": "What happens to many window-cleaning robots if the power cuts out?",
+          "options": [
+            "A backup system (like a battery-powered suction or safety tether) usually keeps them from falling",
+            "They always fall immediately with no backup",
+            "Nothing changes about their operation"
+          ],
+          "answer": 0,
+          "why": "Reputable window robots include battery backup for suction or a safety tether, precisely because losing grip would be dangerous."
+        },
+        {
+          "q": "How does a pool-cleaning robot typically move and navigate underwater?",
+          "options": [
+            "Tracked wheels or propulsion driven by a program or sensors mapping the pool shape",
+            "It floats randomly with no control at all",
+            "A diver manually pushes it around"
+          ],
+          "answer": 0,
+          "why": "Pool robots use powered tracks or thrusters along with internal logic to cover the pool systematically."
+        },
+        {
+          "q": "What's a key design difference between a window robot and a pool robot?",
+          "options": [
+            "A window robot must grip a vertical surface; a pool robot must work fully submerged",
+            "They are identical machines used interchangeably",
+            "Neither robot uses any sensors"
+          ],
+          "answer": 0,
+          "why": "Each is engineered for a very different physical environment — vertical dry glass versus fully submerged water."
+        }
+      ]
+    },
+    {
+      "id": "04-robot-chefs-and-cooking-robots",
+      "title": "Robot Chefs and Cooking Robots: What They Can Really Do",
+      "summary": "See what cooking robots actually automate today — and why judging doneness is still a hard sensing problem.",
+      "youtubeId": "",
+      "videoNo": 4,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What do most current cooking robots automate well?",
+          "options": [
+            "Repetitive steps like stirring, flipping or precise ingredient dispensing",
+            "Inventing brand new recipes from imagination",
+            "Tasting food and deciding if it needs more salt"
+          ],
+          "answer": 0,
+          "why": "Robots excel at repeatable, precisely timed actions; judgment calls like taste are still hard."
+        },
+        {
+          "q": "How can a cooking robot judge when food like onions are done?",
+          "options": [
+            "Sensors like cameras, colour detection or temperature probes, combined with timing",
+            "It always guesses randomly",
+            "It cannot judge this at all, ever"
+          ],
+          "answer": 0,
+          "why": "Visual and temperature sensing paired with programmed timing helps approximate what a human chef judges by eye and smell."
+        },
+        {
+          "q": "Why is taste and texture judgment still a hard problem for robots?",
+          "options": [
+            "These are subtle, subjective senses that are difficult to replicate with current sensors",
+            "Robots are not allowed to cook food",
+            "All foods taste identical to sensors"
+          ],
+          "answer": 0,
+          "why": "Taste and texture involve nuanced human perception that current sensor technology only approximates."
+        },
+        {
+          "q": "Where are cooking robots currently most useful commercially?",
+          "options": [
+            "High-volume, repeatable food prep like fast food or central kitchens",
+            "Fine dining where every dish must be totally unique each time",
+            "Nowhere; no cooking robots are deployed commercially"
+          ],
+          "answer": 0,
+          "why": "Repeatable, high-volume preparation suits current robot capabilities better than highly varied creative cooking."
+        }
+      ]
+    },
+    {
+      "id": "05-delivery-robots-on-pavements",
+      "title": "Delivery Robots on Pavements and in Restaurants",
+      "summary": "See how sidewalk delivery robots sense pedestrians and crossings, and how restaurant robots navigate tables.",
+      "youtubeId": "",
+      "videoNo": 5,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What sensors help a sidewalk delivery robot avoid pedestrians?",
+          "options": [
+            "Cameras and distance sensors (like LIDAR) detecting people and obstacles",
+            "No sensors; people must move for it",
+            "A loudspeaker that scares everyone away"
+          ],
+          "answer": 0,
+          "why": "Delivery robots use cameras and ranging sensors to detect and avoid people and objects in real time."
+        },
+        {
+          "q": "How does a sidewalk robot typically handle crossing a street?",
+          "options": [
+            "It slows or stops, checks for traffic using sensors, and crosses when clear (often cautiously)",
+            "It always runs through traffic at full speed",
+            "Crossing streets is never attempted by any delivery robot"
+          ],
+          "answer": 0,
+          "why": "Road crossings are high-risk, so these robots are typically conservative, checking carefully before crossing."
+        },
+        {
+          "q": "How does a restaurant delivery robot usually find its way between tables?",
+          "options": [
+            "Pre-mapped floor layout combined with sensors to avoid chairs, people and other obstacles",
+            "Random movement with no planning",
+            "A staff member drives it manually every trip"
+          ],
+          "answer": 0,
+          "why": "Restaurant robots typically use a stored map of the floor plus live obstacle sensing to navigate between tables."
+        },
+        {
+          "q": "What is a current limitation of pavement delivery robots?",
+          "options": [
+            "They can struggle in bad weather, crowded areas, or unusual obstacles like construction",
+            "They can deliver to literally any location on Earth instantly",
+            "They need no navigation system at all"
+          ],
+          "answer": 0,
+          "why": "Unusual, messy or crowded environments remain harder for current delivery robots than clear, familiar routes."
+        }
+      ]
+    },
+    {
+      "id": "06-warehouse-robots",
+      "title": "Warehouse Robots: How Online Orders Get Packed",
+      "summary": "Follow an online order through a modern warehouse, where robots bring shelves to people (and increasingly, to other robots).",
+      "youtubeId": "",
+      "videoNo": 6,
+      "durationMin": 5,
+      "quiz": [
+        {
+          "q": "In many modern warehouses, what do mobile robots do instead of a worker walking to a shelf?",
+          "options": [
+            "Bring the whole shelf or pod to the worker's station",
+            "Nothing; all shelves are still fetched manually everywhere",
+            "Only deliver snacks to workers"
+          ],
+          "answer": 0,
+          "why": "'Goods-to-person' systems use robots to bring shelving units directly to a picking station, saving walking time."
+        },
+        {
+          "q": "What helps warehouse robots avoid colliding with each other in a busy aisle?",
+          "options": [
+            "Centralized traffic coordination plus onboard obstacle sensors",
+            "Nothing; collisions are common and expected constantly",
+            "They never operate near each other"
+          ],
+          "answer": 0,
+          "why": "A coordinating system plans robot paths to avoid conflicts, backed up by each robot's own collision sensors."
+        },
+        {
+          "q": "Why do robotic arms often handle the final pick-and-pack step for certain items?",
+          "options": [
+            "For items with predictable shapes, a robot arm can grasp and pack repeatably and fast",
+            "Arms are only used for cleaning floors",
+            "Packing is always done entirely by hand everywhere"
+          ],
+          "answer": 0,
+          "why": "Repeatable item shapes are well suited to robotic grasping, which speeds up the packing stage."
+        },
+        {
+          "q": "What part of warehouse fulfilment is typically hardest to automate fully?",
+          "options": [
+            "Handling a huge variety of irregular, fragile or unusually shaped items",
+            "Moving a shelf in a straight line",
+            "Reading a barcode"
+          ],
+          "answer": 0,
+          "why": "Great variety in item shape, size and fragility is still a major challenge for fully automated picking."
+        }
+      ]
+    },
+    {
+      "id": "07-surgical-robots",
+      "title": "Surgical Robots: What the Robot Really Does in an Operation",
+      "summary": "Clarify that a surgeon controls the robot's arms directly — the robot does not operate on its own.",
+      "youtubeId": "",
+      "videoNo": 7,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "Does a surgical robot like the da Vinci system operate on its own?",
+          "options": [
+            "No — a surgeon controls its arms directly from a console throughout the operation",
+            "Yes, it fully decides and performs surgery with no human involved",
+            "It only works if no surgeon is present"
+          ],
+          "answer": 0,
+          "why": "Surgical robots are teleoperated tools: the surgeon's hand movements directly drive the instrument tips."
+        },
+        {
+          "q": "What advantage does a surgical robot's arm often give over a human hand alone?",
+          "options": [
+            "Finer, steadier movement and a wider range of motion through small incisions",
+            "It replaces the need for any surgeon training",
+            "It makes incisions larger"
+          ],
+          "answer": 0,
+          "why": "Robotic arms can filter hand tremor and rotate instruments in ways a human wrist alone cannot, enabling precise minimally invasive surgery."
+        },
+        {
+          "q": "Why are surgical robots usually used for minimally invasive procedures?",
+          "options": [
+            "Smaller incisions with precise robotic tools can mean less trauma and faster recovery",
+            "They only work through very large open incisions",
+            "Incision size has no bearing on their use"
+          ],
+          "answer": 0,
+          "why": "A major benefit of these systems is enabling precise work through small incisions, aiding faster patient recovery."
+        },
+        {
+          "q": "What is the surgeon's role during a robot-assisted operation?",
+          "options": [
+            "Actively controlling every movement of the instruments from a console",
+            "Simply watching while the machine decides everything",
+            "Only present in case the robot asks a question"
+          ],
+          "answer": 0,
+          "why": "The surgeon is in active, continuous control the entire time — the system is a sophisticated steering tool, not an autonomous decision-maker."
+        }
+      ]
+    },
+    {
+      "id": "08-robot-toys-and-kits",
+      "title": "Robot Toys and Kits: What Is Smart and What Is Not",
+      "summary": "Tell the difference between simple pre-programmed toy robots and real programmable educational kits.",
+      "youtubeId": "",
+      "videoNo": 8,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What usually makes a toy robot only 'seem' smart?",
+          "options": [
+            "It follows a small set of fixed pre-programmed reactions, not real decision-making",
+            "It contains a full research-grade AI model",
+            "It was built by a university lab"
+          ],
+          "answer": 0,
+          "why": "Many toy robots have a limited library of canned responses rather than any flexible reasoning."
+        },
+        {
+          "q": "What makes an educational robotics kit genuinely different from a basic toy?",
+          "options": [
+            "It's programmable, letting the user write and change its actual behaviour",
+            "It is always more expensive, which is the only difference",
+            "It has more stickers on the box"
+          ],
+          "answer": 0,
+          "why": "A real kit exposes programmability, so behaviour comes from code the learner writes, not a fixed factory script."
+        },
+        {
+          "q": "Why might a parent check whether a 'smart' toy robot is actually programmable?",
+          "options": [
+            "To judge whether it will teach real skills or just repeat fixed canned actions",
+            "Programmability makes no difference to the toy's educational value",
+            "All robot toys are identical in capability"
+          ],
+          "answer": 0,
+          "why": "If the goal is learning, true programmability (versus fixed scripted behaviour) is the key differentiator."
+        },
+        {
+          "q": "What's an example of a genuinely programmable beginner kit mentioned in this course?",
+          "options": [
+            "Kits like LEGO Mindstorms, which let users write real programs",
+            "A plush toy with a recorded voice line",
+            "A plastic figure with no electronics"
+          ],
+          "answer": 0,
+          "why": "LEGO Mindstorms and similar kits let beginners actually write and test programs, unlike simple scripted toys."
+        }
+      ]
+    },
+    {
+      "id": "09-ai-robots-chatbot-gets-a-body",
+      "title": "AI Robots: How a Chatbot Gets a Body",
+      "summary": "See how a large language model is connected to a robot's sensors and motors to turn chat into physical action.",
+      "youtubeId": "",
+      "videoNo": 9,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What role does an AI language model typically play when connected to a robot?",
+          "options": [
+            "Interpreting instructions and planning, which is then translated into motor commands",
+            "Directly controlling every motor's exact voltage with no other software",
+            "Replacing all of the robot's physical hardware"
+          ],
+          "answer": 0,
+          "why": "A language model usually handles high-level understanding and planning, while separate control software executes precise motor commands."
+        },
+        {
+          "q": "Why can't a chat-focused AI model alone safely control a robot's motors?",
+          "options": [
+            "It isn't designed for the precise, fast, safety-critical control loops motors need",
+            "Chat models already perfectly control motors with no other software",
+            "Robots have no motors to control"
+          ],
+          "answer": 0,
+          "why": "Safe, precise real-time motor control needs dedicated control systems; a language model provides reasoning, not millisecond-level motor signals."
+        },
+        {
+          "q": "What's a realistic task for an 'AI robot' combining a chatbot and a robot body today?",
+          "options": [
+            "Understanding a spoken instruction and planning a simple multi-step action",
+            "Performing any task perfectly on the first try with zero errors",
+            "Replacing a surgeon with no other systems involved"
+          ],
+          "answer": 0,
+          "why": "Current systems can reasonably interpret instructions and plan simple actions, though reliability and complexity are still limited."
+        },
+        {
+          "q": "Why is grounding an AI model's understanding in real sensor data important for a robot?",
+          "options": [
+            "Without real sensor feedback, the model's plans may not match the robot's actual surroundings",
+            "Sensors are unnecessary if the AI model is large enough",
+            "Grounding only matters for text chatbots, not robots"
+          ],
+          "answer": 0,
+          "why": "A plan based on outdated or missing sensor data can lead the robot to act incorrectly in the real world."
+        }
+      ]
+    },
+    {
+      "id": "10-robots-in-shops-hotels-and-hospitals",
+      "title": "Robots in Shops, Hotels and Hospitals",
+      "summary": "Tour service robots already working in the real world: greeting, delivering, cleaning and assisting.",
+      "youtubeId": "",
+      "videoNo": 10,
+      "durationMin": 4,
+      "quiz": [
+        {
+          "q": "What's a common role for a robot in a retail shop today?",
+          "options": [
+            "Monitoring inventory shelves or assisting with simple customer questions",
+            "Fully replacing every human employee instantly",
+            "Cooking meals in the stockroom"
+          ],
+          "answer": 0,
+          "why": "Shop robots today are commonly used for things like shelf-scanning and basic customer assistance, alongside human staff."
+        },
+        {
+          "q": "How does a hotel delivery robot typically move between floors?",
+          "options": [
+            "It can be integrated with elevator systems to call and ride lifts on its own",
+            "It is carried by hand up every flight of stairs",
+            "It cannot move between floors at all"
+          ],
+          "answer": 0,
+          "why": "Many hotel robots are integrated with building elevator systems so they can autonomously travel between floors."
+        },
+        {
+          "q": "What's a typical role for a robot in a hospital, besides surgery?",
+          "options": [
+            "Transporting supplies, medicines or samples between departments",
+            "Making medical diagnoses with full legal authority, unsupervised",
+            "Replacing nurses entirely"
+          ],
+          "answer": 0,
+          "why": "Hospital logistics robots commonly handle transport tasks, which frees up staff time rather than making medical decisions."
+        },
+        {
+          "q": "What do shop, hotel and hospital service robots mostly have in common?",
+          "options": [
+            "They work in structured indoor spaces doing specific, repeatable support tasks",
+            "They all fly using propellers",
+            "They require no sensors whatsoever"
+          ],
+          "answer": 0,
+          "why": "These service robots typically operate in controlled indoor environments doing narrow, well-defined support jobs."
+        }
+      ]
+    }
+  ]
+}
