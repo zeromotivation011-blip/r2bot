@@ -243,7 +243,7 @@ export function ParentReportClient({ sessions, className = '' }: { sessions: Rep
                   <li><strong className="text-amber-200">Ask {report.name === 'Your explorer' ? 'your child' : report.name}:</strong> “{report.latest.askYourChild}”</li>
                 </>
               )}
-              <li><strong className="text-amber-200">So far:</strong> {report.totalSessions} of {sessions.length} Level 1 sessions and {report.totalBadges} badges.</li>
+              <li><strong className="text-amber-200">So far:</strong> {report.totalSessions} of {sessions.length} Level 1 sessions and {report.totalBadges} {report.totalBadges === 1 ? 'badge' : 'badges'}.</li>
             </ul>
             <p className="pr-no-print mt-3 text-sm">
               {report.nextSession && <Link href={`/kids/course/1/${report.nextSession.number}`} className="font-semibold text-amber-300 hover:underline">Open Session {report.nextSession.number} →</Link>}

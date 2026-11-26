@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import ParentsClient from './ParentsClient'
+import { ParentReport } from '@/components/kids/teach/ParentReport'
 
 export const runtime = 'nodejs'
 
@@ -13,5 +14,12 @@ export const metadata: Metadata = {
 }
 
 export default function ParentsPage() {
-  return <ParentsClient />
+  return (
+    <>
+      <ParentsClient />
+      <section id="weekly-report" aria-label="This week’s report" className="mx-auto max-w-5xl px-4 py-10">
+        <ParentReport />
+      </section>
+    </>
+  )
 }

@@ -13,6 +13,7 @@ import { TRACKS } from '@/lib/kids/activities/types'
 import { getBand } from '@/lib/kids/bands'
 import ActivityPlayerClient, { type PlayerActivity } from '@/components/kids/activities/ActivityPlayerClient'
 import { TEMPLATE_HOW } from '@/components/kids/galaxy/copy'
+import { ShareToClassroom } from '@/components/kids/teach/ShareToClassroom'
 
 export const runtime = 'nodejs'
 export const dynamicParams = false
@@ -98,6 +99,10 @@ export default async function ActivityPage({ params }: { params: Params }) {
           <Link href="/kids/galaxy" className="font-semibold text-amber-300 underline-offset-4 hover:underline">
             Skill Galaxy
           </Link>
+        </p>
+        <p className="mt-4 flex flex-wrap items-center gap-3 text-[15px]">
+          <span>Teachers: post this mission to your class.</span>
+          <ShareToClassroom path={`/kids/galaxy/${a.track}/${a.id}`} title={a.title} variant="chip" />
         </p>
       </article>
     </main>

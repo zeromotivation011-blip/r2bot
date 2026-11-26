@@ -384,7 +384,7 @@ export async function downloadKidCertificate(c: KidCertificateInput): Promise<vo
 
   doc.setFontSize(8.5)
   doc.setTextColor(...GREY)
-  doc.text('Every child who learns the skills earns this same certificate. No rankings, ever.', W / 2, H - 21, { align: 'center' })
+  doc.text('Every child who learns the skills earns this same certificate. No rankings, ever.', W / 2, H - 28, { align: 'center' })
   save(doc, `r2bot-kids-level-${c.level}-certificate.pdf`)
 }
 
@@ -434,6 +434,6 @@ export async function downloadTrainingCertificate(c: TrainingCertificateInput): 
   doc.setTextColor(...GREY)
   doc.text('date completed', W / 2, 165, { align: 'center' })
   doc.setFontSize(8.5)
-  doc.text('Self-paced professional learning. Not an accredited qualification.', W / 2, H - 21, { align: 'center' })
+  doc.text('Self-paced professional learning. Not an accredited qualification.', W / 2, H - 28, { align: 'center' })
   save(doc, 'r2bot-kids-teacher-training-certificate.pdf')
 }

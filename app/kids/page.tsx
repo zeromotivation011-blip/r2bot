@@ -19,6 +19,7 @@ import type { LevelNumber } from '@/lib/kids/curriculum/types'
 import { InstallAppClient } from '@/components/kids/InstallAppClient'
 import type { SessionTitles } from '@/components/kids/universe/ContinueCardClient'
 import { KidsHubClient } from './KidsHubClient'
+import { ClassMissionsClient } from '@/components/kids/classroom/ClassMissionsClient'
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in'
 
@@ -149,6 +150,8 @@ export default function KidsHubPage() {
             Fly to a planet to start your course, or land on a moon to play a real robotics game.
           </p>
         </div>
+        {/* Renders nothing unless this device joined a class that has missions. */}
+        <ClassMissionsClient className="mb-4" />
         <KidsHubClient sessionTitles={SESSION_TITLES} playableLevels={PLAYABLE_LEVELS} />
       </section>
 

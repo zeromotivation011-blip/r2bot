@@ -166,6 +166,7 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
         <div className="flex flex-wrap gap-2">
           <Link href={`/kids/classroom/${classId}/card`} className={`${btn} bg-amber-500 text-black hover:bg-amber-400`}>🖨️ Print join card</Link>
           <button type="button" onClick={downloadCsv} disabled={!members.length} className={`${btn} border border-white/15 text-slate-100 hover:bg-white/5 disabled:opacity-50`}>⬇️ Download CSV</button>
+          <Link href="/kids/teach" className={`${btn} border border-white/15 text-slate-100 hover:bg-white/5`}>📘 Lesson guides</Link>
           <button type="button" onClick={() => void load()} className={`${btn} border border-white/15 text-slate-100 hover:bg-white/5`}>↻ Refresh</button>
           {confirm === 'code' ? (
             <span className="flex flex-wrap items-center gap-2 rounded-xl bg-white/5 px-3 py-1">

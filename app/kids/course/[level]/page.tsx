@@ -15,6 +15,7 @@ import { LEVELS } from '@/lib/kids/curriculum/levels'
 import type { Level, LevelNumber } from '@/lib/kids/curriculum/types'
 import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
 import { PLANETS } from '@/lib/kids/universe/worlds'
+import { CertificateButtonClient } from '@/components/kids/teach/CertificateButtonClient'
 import SeasonMapClient, { type MapAct, type MapNode } from '@/components/kids/course/SeasonMapClient'
 
 export const runtime = 'nodejs'
@@ -150,6 +151,7 @@ export default async function LevelPage({ params }: Params) {
               ))}
             </ul>
           </div>
+          {l.number === 1 && <CertificateButtonClient level={1} />}
         </aside>
       </div>
 

@@ -20,7 +20,11 @@ export interface AssignmentDbRow {
 
 export function toAssignment(r: AssignmentDbRow): KidsAssignment | null {
   if (!isAssignmentKind(r.kind)) return null
+  // An item that no longer resolves (renamed, retired, or a game whose page is
+  // not live) is dropped for everyone, so the teacher's done/total never counts
+  // a mission the child cannot see or open.
   const item = resolveItem(r.kind, r.item_id)
+  if (!item) return null
   return {
     id: r.id,
     kind: r.kind,
@@ -30,7 +34,7 @@ export function toAssignment(r: AssignmentDbRow): KidsAssignment | null {
     note: r.note,
     dueDate: r.due_date,
     createdAt: r.created_at,
-    href: item?.href ?? '/kids',
+    href: item.href,
   }
 }
 

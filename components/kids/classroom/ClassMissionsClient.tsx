@@ -119,7 +119,7 @@ export function ClassMissionsClient({ compact = false, className = '' }: ClassMi
     const next = todo[0]
     return (
       <Link
-        href={next ? next.href : '/kids/join'}
+        href={next ? next.href : '/kids'}
         className={`flex min-h-[56px] items-center gap-3 rounded-[20px] border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-white hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 ${className}`}
       >
         <span aria-hidden className="text-2xl">🍎</span>

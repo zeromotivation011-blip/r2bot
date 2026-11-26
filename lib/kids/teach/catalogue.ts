@@ -59,6 +59,25 @@ export function gameHref(id: string): string {
   return `/kids/play/${id}`
 }
 
+/**
+ * Games that have a live page under app/kids/play/<id>. GAMES also lists games
+ * that are announced but not built yet (Robo Sumo Arena); assigning one would
+ * send a child to a 404. Add an id here in the same change that ships its page.
+ */
+export const PLAYABLE_GAME_IDS: ReadonlySet<string> = new Set([
+  'drone-hover',
+  'arm-factory',
+  'circuit-city',
+  'mars-rover',
+  'robot-brain',
+  'maze-mapper',
+  'swarm-reef',
+])
+
+export function isPlayableGame(id: string): boolean {
+  return PLAYABLE_GAME_IDS.has(id)
+}
+
 let cached: Catalogue | null = null
 
 export function getCatalogue(): Catalogue {
@@ -79,7 +98,7 @@ export function getCatalogue(): Catalogue {
       difficulty: a.difficulty,
       href: activityHref(a.track, a.id),
     })),
-    games: GAMES.map((g) => ({
+    games: GAMES.filter((g) => isPlayableGame(g.id)).map((g) => ({
       id: g.id,
       title: g.name,
       emoji: g.emoji,
@@ -102,6 +121,6 @@ export function resolveItem(kind: AssignmentKind, itemId: string): { title: stri
     const a = getActivity(itemId)
     return a ? { title: a.title, href: activityHref(a.track, a.id) } : null
   }
-  const g = getGame(itemId)
+  const g = isPlayableGame(itemId) ? getGame(itemId) : undefined
   return g ? { title: g.name, href: gameHref(g.id) } : null
 }

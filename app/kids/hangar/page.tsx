@@ -15,6 +15,7 @@ import { HangarRecordsClient, type CourseBadgeInfo } from '@/components/kids/han
 // Read-only, server-side: the real names of the course badges. Only the small
 // map below reaches the client, never the (large) curriculum itself.
 import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
+import { CertificateButtonClient } from '@/components/kids/teach/CertificateButtonClient'
 
 export const runtime = 'nodejs'
 
@@ -67,6 +68,10 @@ export default function HangarPage() {
 
       <HangarClient />
       <HangarRecordsClient courseBadges={courseBadges} />
+
+      <section aria-label="Level 1 certificate" className="mx-auto max-w-6xl px-4 pt-6">
+        <CertificateButtonClient level={1} />
+      </section>
 
       {/* Server-rendered explanation for parents, teachers and search engines. */}
       <section aria-labelledby="about-hangar" className="mx-auto max-w-3xl px-4 pb-16 pt-10 text-[#A7B0C0]">
