@@ -4,8 +4,9 @@
 // The child's explorer card: avatar, explorer name, level + title + XP bar,
 // stars, badges, days explored this week and this week's three quests. Every
 // number comes from the progress store via levelInfo()/questStatus()/
-// daysExploredThisWeek() — nothing is invented. Before hydration it renders a
-// skeleton of the same size, so the page never jumps.
+// daysExploredThisWeek() — nothing is invented. Before hydration it reserves
+// the height of a new explorer's card (742px, measured at 390px and 1280px),
+// the first view most visitors and every crawler get, so that case never jumps.
 
 import type { KidsProgress } from '@/lib/kids-progress'
 import { getBand } from '@/lib/kids/bands'
@@ -28,7 +29,7 @@ export function ExplorerCardClient({ progress, onboarded, onStart, onEdit }: Exp
   return (
     <section
       aria-labelledby="explorer-h"
-      className="relative h-full min-h-[540px] overflow-hidden rounded-[28px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]"
+      className={`relative h-full overflow-hidden ${progress ? '' : 'min-h-[742px]'} rounded-[28px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]`}
     >
       <h2 id="explorer-h" className="sr-only">
         Your explorer
@@ -147,40 +148,45 @@ function Filled({ p, onboarded, onStart, onEdit }: { p: KidsProgress; onboarded:
         </div>
       )}
 
-      {/* Stats */}
-      <dl className="mt-4 grid grid-cols-3 gap-2">
-        <Stat label="Stars" value={p.totalStars} icon="⭐" />
-        <Stat label="Badges" value={badgeCount} icon="🏅" />
-        <div className="rounded-2xl border border-white/10 bg-[#0A1120]/60 px-2 py-2.5 text-center">
-          <dt className="text-[12px] font-semibold text-[#A7B0C0]">This week</dt>
-          <dd className="font-display text-xl font-bold text-[#EEF2F8]">
-            {days}
-            <span className="text-sm text-[#6E7888]">/7 days</span>
-          </dd>
-        </div>
-      </dl>
+      {/* Stars, badges and days explored. A brand-new explorer has none yet, so Spark's welcome takes this space. */}
+      {!fresh && (
+        <>
+          {/* Stats */}
+          <dl className="mt-4 grid grid-cols-3 gap-2">
+            <Stat label="Stars" value={p.totalStars} icon="⭐" />
+            <Stat label="Badges" value={badgeCount} icon="🏅" />
+            <div className="rounded-2xl border border-white/10 bg-[#0A1120]/60 px-2 py-2.5 text-center">
+              <dt className="text-[12px] font-semibold text-[#A7B0C0]">This week</dt>
+              <dd className="font-display text-xl font-bold text-[#EEF2F8]">
+                {days}
+                <span className="text-sm text-[#6E7888]">/7 days</span>
+              </dd>
+            </div>
+          </dl>
 
-      {/* Days explored this week, Monday to Sunday */}
-      <div className="mt-2 flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-[#0A1120]/60 px-3 py-2">
-        <p className="text-[13px] font-semibold text-[#A7B0C0]">Days</p>
-        <div
-          className="flex gap-1.5"
-          role="img"
-          aria-label={`Explored on ${dots.map((d, i) => (d ? DAY_NAMES[i] : null)).filter(Boolean).join(', ') || 'no days yet'} this week`}
-        >
-          {dots.map((on, i) => (
-            <span
-              key={i}
-              title={`${DAY_NAMES[i]}${on ? ': explored' : ''}`}
-              className={`grid h-7 w-7 place-items-center rounded-full text-[12px] font-bold ${
-                on ? 'bg-amber-500 text-[#1A1103]' : i === todayIdx ? 'bg-white/5 text-[#EEF2F8] ring-2 ring-amber-400/70' : 'bg-white/10 text-[#A7B0C0]'
-              }`}
+          {/* Days explored this week, Monday to Sunday */}
+          <div className="mt-2 flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-[#0A1120]/60 px-3 py-2">
+            <p className="text-[13px] font-semibold text-[#A7B0C0]">Days</p>
+            <div
+              className="flex gap-1.5"
+              role="img"
+              aria-label={`Explored on ${dots.map((d, i) => (d ? DAY_NAMES[i] : null)).filter(Boolean).join(', ') || 'no days yet'} this week`}
             >
-              {DAY_LETTERS[i]}
-            </span>
-          ))}
-        </div>
-      </div>
+              {dots.map((on, i) => (
+                <span
+                  key={i}
+                  title={`${DAY_NAMES[i]}${on ? ': explored' : ''}`}
+                  className={`grid h-7 w-7 place-items-center rounded-full text-[12px] font-bold ${
+                    on ? 'bg-amber-500 text-[#1A1103]' : i === todayIdx ? 'bg-white/5 text-[#EEF2F8] ring-2 ring-amber-400/70' : 'bg-white/10 text-[#A7B0C0]'
+                  }`}
+                >
+                  {DAY_LETTERS[i]}
+                </span>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Quests */}
       <div className="mt-5">

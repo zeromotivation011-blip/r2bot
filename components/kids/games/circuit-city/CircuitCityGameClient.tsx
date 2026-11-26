@@ -586,7 +586,9 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
         finished.current = true
         const m = mistakes.shorts + mistakes.burns
         let stars = m === 0 ? 3 : m <= 2 ? 2 : 1
-        if (report.quality < 0.99) stars = Math.min(stars, report.quality >= 0.6 ? 2 : 1)
+        // Quality (how close to the ideal design) caps the stars: ±3 mA of 15 mA, or a frugal night-light, keeps 3.
+        if (report.quality < 0.7) stars = Math.min(stars, 2)
+        if (report.quality < 0.35) stars = Math.min(stars, 1)
         const placed = partsRef.current.filter((p) => !p.locked).length
         const score = Math.max(
           100,

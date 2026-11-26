@@ -324,6 +324,8 @@ export class ArmSim {
   pc = 0
   private action: Action | null = null
   runStart = 0
+  /** Sim time when the last run stopped (or -1 if none has run yet). */
+  runEnd = -1
 
   // Dynamics
   private hist: { tip: V3; th1: number }[] = []
@@ -445,12 +447,14 @@ export class ArmSim {
     this.action = null
     this.running = true
     this.runStart = this.time
+    this.runEnd = -1
     this.peakTorque = 0
     this.peakGrip = 0
     this.hist = []
   }
 
   stop(): void {
+    if (this.running) this.runEnd = this.time
     this.running = false
     this.action = null
   }
@@ -606,7 +610,7 @@ export class ArmSim {
         if (this.loop && this.prog.length) {
           this.pc = 0
         } else {
-          this.running = false
+          this.stop()
           this.events.push({ type: 'planDone' })
           return
         }
@@ -644,7 +648,7 @@ export class ArmSim {
       } else {
         if (this.cfg.indexed && this.queue.length === 0 && !this.parts.some((p) => p.state === 'belt')) {
           // Nothing left to wait for: the shift is over.
-          this.running = false
+          this.stop()
           this.events.push({ type: 'planDone' })
           return
         }
@@ -674,7 +678,7 @@ export class ArmSim {
     } else if (a.kind === 'wait') {
       if (this.partAtSensor()) this.endAction()
       else if (this.queue.length === 0 && !this.parts.some((p) => p.state === 'belt')) {
-        this.running = false
+        this.stop()
         this.action = null
         this.events.push({ type: 'planDone' })
       }
@@ -827,7 +831,7 @@ export class ArmSim {
     }
     if (this.remaining() === 0) {
       this.done = true
-      this.running = false
+      this.stop()
       this.events.push({ type: 'done' })
     }
   }

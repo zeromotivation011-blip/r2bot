@@ -155,7 +155,7 @@ function check(p: Params, a: Answer): CheckResult {
     const r = runProgram(worlds[i], program)
     if (r.outcome !== 'goal') {
       const label = worlds.length > 1 ? `map ${i + 1}` : ''
-      const others = worlds.length > 1 && i > 0 ? ` It worked on ${i === 1 ? 'map 1' : `maps 1–${i}`}, so the route is memorised rather than general — use the sensor block to decide each turn.` : ''
+      const others = worlds.length > 1 && i > 0 && !opsUsed(program).has('ifWall') ? ` It worked on ${i === 1 ? 'map 1' : `maps 1–${i}`}, so the route is memorised rather than general — use the sensor block to decide each turn.` : ''
       return { correct: false, score: i / worlds.length * 0.5, feedback: explainRun(worlds[i], program, r, theme, label) + others }
     }
   }

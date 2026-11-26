@@ -55,8 +55,8 @@ export function pickMission(p: KidsProgress, titles: SessionTitles, playable: re
     // The last planet's season is finished: nothing left to "continue".
     return {
       eyebrow: `${planet.name} complete!`,
-      title: 'Season finished. Replay a game or visit the Hangar',
-      detail: `All ${SESSIONS_PER_LEVEL} sessions done. Your badges and robot are waiting in the Hangar.`,
+      title: 'Season finished!',
+      detail: `All ${SESSIONS_PER_LEVEL} sessions done. Replay a game or visit your robot in the Hangar.`,
       href: '/kids/hangar',
       cta: 'Open the Hangar',
       icon: '🏆',

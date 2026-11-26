@@ -49,7 +49,7 @@ export const samples: Activity<Params, Answer>[] = [
       liveTilt: true,
       showMoments: true,
     },
-    solution: { fulcrum: 2, placed: [{ item: 0, pos: 12 }] },
+    solution: { fulcrum: 1, placed: [{ item: 0, pos: 12 }] },
     after: ['mech-lever-seesaw-friends'],
   },
   {
@@ -59,7 +59,7 @@ export const samples: Activity<Params, Answer>[] = [
     band: 'engineers',
     template: 'lever-balance',
     difficulty: 4,
-    intro: 'A 2 kg arm beam carries a 3 kg gripper at its tip. Use exactly three counterweights so the shoulder motor holds it level with zero effort. The beam’s own weight counts.',
+    intro: 'A 2 kg arm beam carries a 3 kg gripper at its tip. Place counterweights from the tray so the shoulder motor holds it level with zero effort. The beam’s own weight counts.',
     takeaway: 'Counterweights cancel the moment at a joint, so the motor only has to move the arm, not hold it up. The beam’s own weight acts at its middle.',
     realWorld: 'Industrial arms and tower cranes use counterweights so their motors and brakes carry far less load.',
     params: {

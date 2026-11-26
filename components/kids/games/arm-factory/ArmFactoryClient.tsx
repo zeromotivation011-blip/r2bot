@@ -104,7 +104,7 @@ function takeSnap(sim: ArmSim): Snap {
     gripForce: sim.liveGrip,
     peakTorque: sim.peakTorque,
     peakGrip: sim.peakGrip,
-    runTime: sim.running || sim.done ? sim.time - sim.runStart : 0,
+    runTime: sim.running ? sim.time - sim.runStart : sim.runEnd >= 0 ? sim.runEnd - sim.runStart : 0,
     time: sim.time,
     graspDist: p && !sim.held ? sim.graspDistance(p) : null,
     queue,

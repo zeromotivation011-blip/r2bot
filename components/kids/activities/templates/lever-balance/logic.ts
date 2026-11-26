@@ -215,6 +215,12 @@ function check(p: Params, a: Answer): CheckResult {
   }
   const load = p.fixed[p.liftIndex ?? 0]
   if (load.pos === a.fulcrum) return { correct: false, score: 0, feedback: `The ${load.label ?? 'load'} is right on top of the pivot, so it can never go up or down. Move the pivot.` }
+  if (Math.abs(net) <= EPS)
+    return {
+      correct: false,
+      score: 0.5,
+      feedback: `${sums} Exactly balanced — so the ${load.label ?? 'load'} hovers but does not go up. You need just a little more turning push on your side.`,
+    }
   return {
     correct: false,
     score: 0,

@@ -102,6 +102,7 @@ export class FactoryScene {
   private ringEdge: THREE.LineLoop
   private ringH = NaN
   private pathLine: THREE.Line
+  private pathDots: THREE.Points
   private dropLine: THREE.Line
   private dropDot: THREE.Mesh
   private graspRing: THREE.Mesh
@@ -243,9 +244,12 @@ export class FactoryScene {
     s.add(this.ringEdge)
 
     // Planned path.
-    this.pathLine = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.95 }))
+    this.pathLine = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ vertexColors: true, toneMapped: false }))
     this.pathLine.visible = false
     s.add(this.pathLine)
+    this.pathDots = new THREE.Points(this.pathLine.geometry, new THREE.PointsMaterial({ size: 0.022, vertexColors: true, toneMapped: false }))
+    this.pathDots.visible = false
+    s.add(this.pathDots)
 
     // Drop line from the fingertips to whatever is below.
     this.dropLine = new THREE.Line(
@@ -711,16 +715,16 @@ export class FactoryScene {
         pos[i * 3 + 1] = p.y
         pos[i * 3 + 2] = p.z
         const bad = x.path.bad[i]
-        col[i * 3] = bad ? 1 : 0.2
-        col[i * 3 + 1] = bad ? 0.25 : 0.95
-        col[i * 3 + 2] = bad ? 0.25 : 0.55
+        col[i * 3] = bad ? 1 : 0.13
+        col[i * 3 + 1] = bad ? 0.15 : 0.9
+        col[i * 3 + 2] = bad ? 0.15 : 0.35
       }
       const g = this.pathLine.geometry
       g.setAttribute('position', new THREE.BufferAttribute(pos, 3))
       g.setAttribute('color', new THREE.BufferAttribute(col, 3))
       g.computeBoundingSphere()
-      this.pathLine.visible = true
-    } else this.pathLine.visible = false
+      this.pathLine.visible = this.pathDots.visible = true
+    } else this.pathLine.visible = this.pathDots.visible = false
 
     // Drop line
     const tip = sim.tip
