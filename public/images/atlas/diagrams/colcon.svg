@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">What colcon build does to a ROS 2 workspace</title>
+  <desc id="d">A ROS 2 workspace before and after colcon build. On the left, the src folder holds three packages: my_msgs, my_driver and my_app. Arrows show that my_driver depends on my_msgs and my_app depends on both. In the middle, colcon build reads those dependencies from each package.xml and builds the packages in order: first my_msgs, then my_driver, then my_app. On the right, three new folders appear next to src: build for intermediate files, install for the finished packages and their setup scripts, and log for build logs. Along the bottom is the loop every ROS 2 developer repeats: colcon build, then source install/setup.bash, then ros2 run or ros2 launch, then edit the code and build again.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f59e0b"/></marker>
+  </defs>
+  <rect width="640" height="420" rx="16" fill="#0f172a"/>
+  <text x="30" y="44" font-size="16" font-weight="700" fill="#e2e8f0">What colcon build does</text>
+  <text x="610" y="44" font-size="12" fill="#64748b" letter-spacing="1.5" text-anchor="end">ROS 2 WORKSPACE</text>
+
+  <!-- left: src with packages -->
+  <rect x="30" y="66" width="176" height="226" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="46" y="90" font-size="13" font-weight="700" fill="#e2e8f0">ros2_ws/src/</text>
+  <text x="46" y="106" font-size="10.5" fill="#64748b">your packages (you write)</text>
+
+  <rect x="56" y="124" width="124" height="32" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="118" y="145" font-size="12" fill="#bae6fd" text-anchor="middle">my_msgs</text>
+  <rect x="56" y="184" width="124" height="32" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="118" y="205" font-size="12" fill="#bae6fd" text-anchor="middle">my_driver</text>
+  <rect x="56" y="244" width="124" height="32" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="118" y="265" font-size="12" fill="#bae6fd" text-anchor="middle">my_app</text>
+  <!-- dependency arrows (depends on) -->
+  <path d="M118 184 L118 160" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M118 244 L118 220" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M56 260 C36 240 36 160 52 144" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#a)"/>
+  <text x="126" y="175" font-size="10" fill="#94a3b8">depends on</text>
+  <text x="126" y="235" font-size="10" fill="#94a3b8">depends on</text>
+
+  <!-- middle: colcon -->
+  <rect x="236" y="66" width="168" height="226" rx="10" fill="#111827" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="320" y="90" font-size="13" font-weight="700" fill="#fde68a" text-anchor="middle">colcon build</text>
+  <text x="320" y="106" font-size="10.5" fill="#94a3b8" text-anchor="middle">reads each package.xml,</text>
+  <text x="320" y="120" font-size="10.5" fill="#94a3b8" text-anchor="middle">sorts by dependency</text>
+  <circle cx="264" cy="148" r="11" fill="#f59e0b"/><text x="264" y="152" font-size="11" font-weight="700" fill="#0f172a" text-anchor="middle">1</text>
+  <text x="284" y="152" font-size="12" fill="#e2e8f0">my_msgs</text>
+  <circle cx="264" cy="190" r="11" fill="#f59e0b"/><text x="264" y="194" font-size="11" font-weight="700" fill="#0f172a" text-anchor="middle">2</text>
+  <text x="284" y="194" font-size="12" fill="#e2e8f0">my_driver</text>
+  <circle cx="264" cy="232" r="11" fill="#f59e0b"/><text x="264" y="236" font-size="11" font-weight="700" fill="#0f172a" text-anchor="middle">3</text>
+  <text x="284" y="236" font-size="12" fill="#e2e8f0">my_app</text>
+  <text x="320" y="272" font-size="10" fill="#94a3b8" text-anchor="middle">each built by its own tool</text>
+  <text x="320" y="285" font-size="10" fill="#94a3b8" text-anchor="middle">(CMake, setuptools)</text>
+  <path d="M208 178 L230 178" stroke="#f59e0b" stroke-width="2" marker-end="url(#b)"/>
+  <path d="M406 178 L428 178" stroke="#f59e0b" stroke-width="2" marker-end="url(#b)"/>
+
+  <!-- right: output folders -->
+  <rect x="434" y="66" width="176" height="226" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="450" y="90" font-size="13" font-weight="700" fill="#e2e8f0">new, next to src/</text>
+  <text x="450" y="106" font-size="10.5" fill="#64748b">created by colcon</text>
+  <rect x="450" y="120" width="144" height="44" rx="6" fill="#1e293b" stroke="#94a3b8"/>
+  <text x="462" y="139" font-size="12" font-weight="600" fill="#e2e8f0">build/</text>
+  <text x="462" y="155" font-size="10" fill="#94a3b8">intermediate files</text>
+  <rect x="450" y="172" width="144" height="56" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="462" y="191" font-size="12" font-weight="600" fill="#fde68a">install/</text>
+  <text x="462" y="206" font-size="10" fill="#94a3b8">finished packages +</text>
+  <text x="462" y="219" font-size="10" fill="#94a3b8">setup.bash to source</text>
+  <rect x="450" y="236" width="144" height="44" rx="6" fill="#1e293b" stroke="#94a3b8"/>
+  <text x="462" y="255" font-size="12" font-weight="600" fill="#e2e8f0">log/</text>
+  <text x="462" y="271" font-size="10" fill="#94a3b8">what happened, per run</text>
+
+  <!-- bottom loop -->
+  <text x="30" y="324" font-size="12" font-weight="700" fill="#e2e8f0">The everyday loop</text>
+  <rect x="30" y="336" width="150" height="40" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="105" y="361" font-size="12" fill="#fde68a" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace">colcon build</text>
+  <rect x="214" y="336" width="200" height="40" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="314" y="361" font-size="12" fill="#bae6fd" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace">source install/setup.bash</text>
+  <rect x="448" y="336" width="162" height="40" rx="8" fill="#1e293b" stroke="#94a3b8"/>
+  <text x="529" y="361" font-size="12" fill="#e2e8f0" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace">ros2 run / launch</text>
+  <path d="M182 356 L208 356" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M416 356 L442 356" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M529 378 C529 404 105 404 105 382" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#a)"/>
+  <text x="317" y="408" font-size="10.5" fill="#94a3b8" text-anchor="middle">edit code, build again (source once per new terminal)</text>
+</svg>
