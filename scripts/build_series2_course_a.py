@@ -1,0 +1,189 @@
+#!/usr/bin/env python3
+"""Writes content/courses/movie-robots-vs-real-robots/course.json (Series 2, Course A).
+Run: python3 scripts/build_series2_course_a.py
+"""
+import json
+import os
+
+LESSONS = [
+    {
+        "id": "01-could-a-terminator-really-exist",
+        "title": "Could a Terminator Really Exist?",
+        "summary": "Work out, with real battery numbers, why a self-powered humanoid like the T-800 is science fiction.",
+        "videoNo": 1,
+        "durationMin": 4,
+        "quiz": [
+            {"q": "Today's best humanoid robot batteries last for about how long at peak performance?", "options": ["About 5 hours", "About 5 days", "About 5 months"], "answer": 0, "why": "Figure AI's F.03 battery gives roughly 5 hours at peak output — real batteries, not movie ones."},
+            {"q": "Why can't a small battery run a robot for decades, as films sometimes suggest?", "options": ["Batteries are illegal above a certain size", "Energy storage per kilogram is far below what that much runtime needs", "Robots are not allowed to run unattended"], "answer": 1, "why": "Lithium-ion stores far less energy per kilogram than a power cell would need to run a human-sized robot for years."},
+            {"q": "Comparing energy density, lithium-ion batteries store roughly how much less energy per kilogram than gasoline?", "options": ["About the same", "Around 2 times less", "Around 50 times less"], "answer": 2, "why": "Gasoline packs roughly 50 times more energy per kilogram than lithium-ion, which is why liquid fuel still beats batteries for long, heavy-duty runtimes."},
+            {"q": "What is the biggest real engineering barrier to a Terminator-style robot, more than appearance?", "options": ["Finding the right paint colour", "Power, actuators and control working together at human-like performance for a long time", "Making a voice chip"], "answer": 1, "why": "Looking humanoid is the easy part; sustaining human-level strength, dexterity and endurance on a portable power source is the hard, unsolved part."},
+        ],
+    },
+    {
+        "id": "02-could-a-real-wall-e-clean-up-earth",
+        "title": "Could a Real WALL-E Clean Up Earth?",
+        "summary": "Compare WALL-E's one-robot-does-everything story with how real cleanup and compaction robots actually work.",
+        "videoNo": 2,
+        "durationMin": 4,
+        "quiz": [
+            {"q": "Real-world waste robots today mostly do what, compared to WALL-E?", "options": ["One narrow job each, like sorting recyclables", "Every waste job a planet needs, alone", "Nothing yet — no waste robots exist"], "answer": 0, "why": "Today's waste-handling robots are specialists (sorting, compacting, hauling) rather than one generalist like WALL-E."},
+            {"q": "What makes compacting trash into a cube, like WALL-E does, mechanically demanding?", "options": ["It needs very little force", "It needs sustained high force and durable parts to survive constant wear", "It only works on paper"], "answer": 1, "why": "Repeated heavy compaction is hard on motors and structure, which is why real compactors are big fixed machines, not small mobile robots."},
+            {"q": "Why would cleaning up a whole planet's waste need more than one robot design?", "options": ["Waste types and terrain vary too much for one machine to handle well", "All waste looks the same everywhere", "Robots cannot sort materials"], "answer": 0, "why": "Different waste (organic, plastic, electronic) and different terrain each suit different specialised machines, not a single do-everything robot."},
+            {"q": "What's a realistic version of 'WALL-E's job' happening today?", "options": ["Nothing comparable exists", "Fleets of specialised sorting and recycling robots in waste facilities", "A single robot that already cleans entire cities alone"], "answer": 1, "why": "Modern recycling centres already use robotic arms and sorting systems — just as a fleet of specialists, not one generalist."},
+        ],
+    },
+    {
+        "id": "03-could-a-robot-like-r2-d2-really-exist",
+        "title": "Could a Robot Like R2-D2 Really Exist?",
+        "summary": "Check R2-D2's rolling, tool-arm, translator abilities against what wheeled utility robots can really do.",
+        "videoNo": 3,
+        "durationMin": 4,
+        "quiz": [
+            {"q": "Which part of R2-D2 is closest to robots that already exist?", "options": ["Rolling with tool arms for a specific job", "Faster-than-light travel", "Reading minds"], "answer": 0, "why": "Small wheeled utility robots with extending tool arms already exist for maintenance and inspection work."},
+            {"q": "Why is R2-D2's instant translation of every language still unrealistic for a small onboard robot?", "options": ["Translation needs huge processing power and data most small robots don't carry", "Robots cannot make sounds", "There is only one spoken language on Earth"], "answer": 0, "why": "Broad real-time translation today typically relies on large models and heavy compute, usually run in the cloud, not squeezed into a small astromech-sized unit."},
+            {"q": "What would be the hardest part of giving a real robot R2-D2's range of tools?", "options": ["Nothing — tools are simple to add", "Packing many different actuators and power into a small body without it becoming too heavy or fragile", "Tools are banned by robotics safety rules"], "answer": 1, "why": "Every added tool needs its own actuator, wiring and power draw, which quickly adds size and weight to a small body."},
+            {"q": "A real rolling utility robot like R2-D2 would most likely be used for…", "options": ["Inspecting equipment and carrying tools in tight spaces", "Replacing human pilots unsupervised", "Nothing; wheels can't be useful in the field"], "answer": 0, "why": "Compact wheeled robots are good at exactly this: moving through tight spaces to inspect or carry things."},
+        ],
+    },
+    {
+        "id": "04-can-a-robot-understand-every-language",
+        "title": "C-3PO: Can a Robot Understand Every Language?",
+        "summary": "Look at how real translation AI works, and why 'fluent in six million forms of communication' is still fiction.",
+        "videoNo": 4,
+        "durationMin": 4,
+        "quiz": [
+            {"q": "Modern translation AI mostly learns language from…", "options": ["Huge amounts of text and speech data", "A single rulebook written by one person", "Guessing randomly until it's right"], "answer": 0, "why": "Today's translation systems are trained on massive datasets of real language examples, not hand-written rules."},
+            {"q": "Why do translation systems still struggle with some languages?", "options": ["Those languages have far less training data available", "All languages are equally easy for computers", "It is impossible to translate any language with AI"], "answer": 0, "why": "Less-documented languages have less data to train on, so accuracy is uneven across languages."},
+            {"q": "What is still missing compared to C-3PO's fluent understanding of any form of communication?", "options": ["Robust, instant understanding of truly novel or invented communication forms", "Any translation ability at all", "The ability to speak any words out loud"], "answer": 0, "why": "Real systems are strong on known human languages but not on inventing understanding for entirely unknown communication, which is where fiction goes further."},
+            {"q": "Why is 'six million forms of communication' an exaggeration for any real system?", "options": ["No database or model currently holds that much distinct linguistic coverage with high accuracy", "Six million is actually too small a number", "All languages are identical in structure"], "answer": 0, "why": "Maintaining high-quality understanding across millions of distinct forms is far beyond today's coverage, which focuses on a few hundred major languages well."},
+        ],
+    },
+    {
+        "id": "05-do-asimovs-three-laws-work-in-real-life",
+        "title": "Asimov's Three Laws: Why They Don't Work in Real Life",
+        "summary": "Walk through the Three Laws of Robotics and the real-world loophole that breaks the First Law.",
+        "videoNo": 5,
+        "durationMin": 4,
+        "quiz": [
+            {"q": "Asimov's First Law says a robot may not injure a human or, through inaction, allow…", "options": ["A human to come to harm", "A robot to be damaged", "A door to stay open"], "answer": 0, "why": "The First Law combines both: no direct harm, and no harm through standing by and doing nothing."},
+            {"q": "Why do real engineers find the Three Laws hard to actually programme?", "options": ["'Harm' and 'human' are not simple, clearly measurable things for software to judge in every situation", "The laws are too short to type into code", "Robots cannot follow any instructions"], "answer": 0, "why": "Turning a vague concept like 'harm' into precise, reliable code that holds up in every real situation is an unsolved problem."},
+            {"q": "What's an example of a conflict that breaks a strict reading of the First Law?", "options": ["Two humans need conflicting help at once, and the robot cannot fully satisfy both", "A robot refuses to move at all", "A robot only works on sunny days"], "answer": 0, "why": "When helping one person risks or limits help to another, a simple rule can't resolve the trade-off cleanly."},
+            {"q": "What do real robot safety systems use instead of Asimov's three sentences?", "options": ["Detailed engineering standards, sensors, and specific rules for specific situations", "Nothing; real robots have no safety rules", "A single moral statement memorised by the robot"], "answer": 0, "why": "Real-world safety relies on concrete engineering standards and situational rules, not one elegant universal law."},
+        ],
+    },
+    {
+        "id": "06-androids-how-close-are-we",
+        "title": "Androids: How Close Are We to Robots That Look Human?",
+        "summary": "See what today's most human-looking androids can and can't do, and why faces are the hardest part.",
+        "videoNo": 6,
+        "durationMin": 4,
+        "quiz": [
+            {"q": "What is typically the hardest part of making an android look convincingly human?", "options": ["The face and its subtle expressions", "The legs", "The paint colour"], "answer": 0, "why": "Human faces carry huge subtlety in micro-expressions that are extremely hard to replicate convincingly with motors and skin."},
+            {"q": "What does 'uncanny valley' describe?", "options": ["The discomfort people feel when something looks almost, but not quite, human", "A place where robots are built", "A type of robot motor"], "answer": 0, "why": "The uncanny valley is the dip in comfort when a robot is close to human-looking but something feels subtly wrong."},
+            {"q": "Today's most advanced androids are mainly used for…", "options": ["Research, demonstrations and limited public interaction", "Replacing all human jobs", "Flying planes"], "answer": 0, "why": "Current androids are impressive demonstrations and research platforms, not yet general-purpose workers."},
+            {"q": "Why do many functional humanoid robots (not androids) skip a human-like face entirely?", "options": ["A simple or no face avoids uncanny valley discomfort and is cheaper to build", "Faces are against safety regulations", "Faces make robots heavier than anything else on the body"], "answer": 0, "why": "Skipping a detailed face sidesteps the uncanny valley problem and simplifies the build, which is why many humanoids have simple screens or no face."},
+        ],
+    },
+    {
+        "id": "07-cyborgs-and-bionic-limbs",
+        "title": "Cyborgs and Bionic Limbs: Real People with Robot Parts",
+        "summary": "Meet the real bionic limbs and implants people use today, and what they can and can't feel.",
+        "videoNo": 7,
+        "durationMin": 4,
+        "quiz": [
+            {"q": "A modern bionic hand mainly reads control signals from…", "options": ["The user's remaining muscle or nerve signals", "A keyboard the user types on", "Random motion"], "answer": 0, "why": "Bionic limbs typically pick up electrical signals from the wearer's own muscles or nerves to decide how to move."},
+            {"q": "Can current advanced bionic hands give the wearer a sense of touch?", "options": ["Some can provide limited feedback like pressure or texture cues", "They give full human-level touch sensation", "They give no feedback of any kind, ever"], "answer": 0, "why": "Some advanced prosthetics provide limited sensory feedback, but it's far from the full range of human touch."},
+            {"q": "What is a cyborg, in the everyday sense used in this video?", "options": ["A person whose body is combined with technology, like an implant or bionic limb", "A robot that looks exactly like a person", "A fictional-only concept with no real examples"], "answer": 0, "why": "In common usage, a cyborg is simply a person integrated with technology — a real and already-existing category, unlike a fully fictional android."},
+            {"q": "What is a major ongoing challenge for bionic limbs?", "options": ["Making control natural, comfortable and durable for daily life", "Finding any material light enough to use", "Legal bans on all prosthetics"], "answer": 0, "why": "Getting a limb to feel natural, last through daily wear, and respond accurately is still an active area of engineering."},
+        ],
+    },
+    {
+        "id": "08-the-clockwork-robots-of-the-1700s",
+        "title": "The Clockwork Robots of the 1700s",
+        "summary": "Discover the mechanical automatons that wrote, drew and played music centuries before electronics existed.",
+        "videoNo": 8,
+        "durationMin": 4,
+        "quiz": [
+            {"q": "What powered the automatons of the 1700s, since there was no electricity?", "options": ["Wound-up springs and gears, like a clock", "Batteries", "Steam engines the size of houses"], "answer": 0, "why": "These automatons used clockwork mechanisms — springs and precisely cut gears — just like mechanical clocks of the era."},
+            {"q": "What could the famous 'Writer' automaton actually do?", "options": ["Dip a pen and write a pre-set message by hand", "Understand language and compose new sentences", "Speak out loud"], "answer": 0, "why": "The Writer followed a fixed mechanical program encoded in cams to trace out specific letters — impressive mimicry, not understanding."},
+            {"q": "Why do these clockwork automatons matter to robotics history?", "options": ["They show that the idea of a machine performing lifelike actions is centuries old", "They were the first robots to use computer chips", "They proved electricity was unnecessary forever"], "answer": 0, "why": "They demonstrate that the dream of lifelike automated machines long predates electronics and computing."},
+            {"q": "What is the key difference between a clockwork automaton and a modern robot?", "options": ["A modern robot can sense its environment and adjust; a clockwork automaton just repeats a fixed mechanical sequence", "Automatons are always bigger", "There is no real difference"], "answer": 0, "why": "Automatons replay one fixed sequence with no sensing or feedback; modern robots can sense and adapt."},
+        ],
+    },
+    {
+        "id": "09-how-theme-park-animatronics-move",
+        "title": "How Theme-Park Animatronics Move",
+        "summary": "Look under the skin of a theme-park animatronic figure: the hidden motors, air cylinders and show control system.",
+        "videoNo": 9,
+        "durationMin": 4,
+        "quiz": [
+            {"q": "Many theme-park animatronics get quick, powerful motion from…", "options": ["Compressed air (pneumatics) rather than only electric motors", "Magic", "Nothing; they don't actually move"], "answer": 0, "why": "Pneumatic actuators give the fast, strong bursts of motion often seen in animatronic figures."},
+            {"q": "What runs the precise timing between an animatronic's movements and its audio?", "options": ["A show control system synchronising pre-programmed cues", "Nothing; it's all improvised live", "A human puppeteer manually timing every move"], "answer": 0, "why": "Show control systems cue motion, lights and sound together on a precise programmed timeline."},
+            {"q": "Why do animatronics not need true intelligence to seem lifelike?", "options": ["They replay a carefully designed fixed show, not open-ended decisions", "They secretly contain a human operator every time", "They are not actually controlled at all"], "answer": 0, "why": "A well-designed repeating show can look convincingly lifelike without any real-time decision-making."},
+            {"q": "What's a key design goal for animatronic figures beyond movement?", "options": ["Reliability — working correctly thousands of times a day for guests", "Being as heavy as possible", "Avoiding any kind of show timing"], "answer": 0, "why": "Theme parks need figures to perform reliably show after show, all day, every day."},
+        ],
+    },
+    {
+        "id": "10-robot-pets-can-a-machine-be-a-friend",
+        "title": "Robot Pets: Can a Machine Be a Friend?",
+        "summary": "From Aibo to modern companion robots, see what robot pets actually sense, and what 'companionship' means here.",
+        "videoNo": 10,
+        "durationMin": 4,
+        "quiz": [
+            {"q": "What do robot pets like Aibo use to seem responsive to their owner?", "options": ["Sensors like touch, sound and cameras paired with programmed behaviours", "Nothing; they move completely at random", "A live human controlling them remotely"], "answer": 0, "why": "Robot pets combine sensors with programmed responses to react in ways that feel attentive."},
+            {"q": "Why might a robot pet help some people, such as those in care homes?", "options": ["It can offer a sense of companionship and routine without the demands of a living animal", "It can fully replace human relationships", "It requires no care or charging at all"], "answer": 0, "why": "Robot pets are used in some care settings to offer comfort and routine without the responsibilities of a live animal — a real, documented use case."},
+            {"q": "What's a key limitation of a robot pet's 'emotions'?", "options": ["They are simulated behaviours, not genuine feelings", "They are identical to human emotions", "They make the robot legally a living being"], "answer": 0, "why": "A robot pet's reactions are designed behaviours triggered by sensors, not subjective feelings."},
+            {"q": "How has robot pet technology changed since early models like Aibo?", "options": ["Newer models use better sensors and AI for more natural-feeling responses", "It has not changed at all since the 1990s", "Robot pets have been discontinued entirely"], "answer": 0, "why": "Sensor and AI improvements have made companion robots noticeably more responsive over time."},
+        ],
+    },
+]
+
+course = {
+    "title": "Movie Robots vs Real Robots",
+    "order": 6,
+    "tagline": "Could the robots from the films actually exist? What's real, what's still fiction.",
+    "description": "Ten short, fact-checked lessons that take famous robots from films — the Terminator, WALL-E, R2-D2, C-3PO, androids and more — and compare them to what real robotics can and can't do today.",
+    "outcome": "After this course you can explain, with real numbers and examples, which parts of famous movie robots are realistic and which are still science fiction.",
+    "level": "Beginner",
+    "levelLabel": "Beginner, no experience needed",
+    "whoFor": "Anyone who has watched a robot movie and wondered 'could that actually happen?' — no robotics background needed.",
+    "prerequisites": "None. No maths or coding needed.",
+    "status": "published",
+    "instructor": "R2BOT",
+    "presenters": ["R2BOT"],
+    "updated": "2026-11-27",
+    "availability": "soon",
+    "minutes": 40,
+    "outcomes": [
+        "Explain why a Terminator-style power source is not realistic with today's batteries",
+        "Describe what real rolling utility and translation robots can actually do",
+        "Explain why Asimov's Three Laws are hard to turn into real code",
+        "Describe what makes androids and bionic limbs realistic, and what's still missing",
+        "Trace the idea of lifelike machines from 1700s clockwork to today's animatronics and robot pets",
+    ],
+    "finalActivity": {
+        "lessonId": "10-robot-pets-can-a-machine-be-a-friend",
+        "title": "Pick one movie robot and fact-check it",
+        "prompt": "Pick one robot from a film you know. Write one sentence on what part of it is realistic today, and one sentence on what part is still science fiction, and why.",
+    },
+    "lessons": [
+        {
+            "id": l["id"],
+            "title": l["title"],
+            "summary": l["summary"],
+            "youtubeId": "",
+            "videoNo": l["videoNo"],
+            "durationMin": l["durationMin"],
+            "quiz": l["quiz"],
+        }
+        for l in LESSONS
+    ],
+}
+
+out_dir = os.path.join("content", "courses", "movie-robots-vs-real-robots")
+os.makedirs(out_dir, exist_ok=True)
+out_path = os.path.join(out_dir, "course.json")
+with open(out_path, "w") as f:
+    json.dump(course, f, indent=2, ensure_ascii=False)
+    f.write("\n")
+print("Wrote", out_path, "with", len(course["lessons"]), "lessons")
