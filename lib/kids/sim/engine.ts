@@ -31,9 +31,9 @@
 import type { Collider, ImpulseJoint, RigidBody, World } from '@dimforge/rapier3d-compat'
 import type { RobotDesign } from '../robot-design'
 import { capabilitiesOf } from '../robot-design'
-import { floorAt, onLine, type Arena, type FloorColor, type Vec2 } from './arena'
+import { floorAt, moverAt, onLine, type Arena, type FloorColor, type Vec2 } from './arena'
 import type { Rapier } from './rapier'
-import { robotSpec, SURFACES, type RobotSpec } from './robot-spec'
+import { DRIVES, robotSpec, SURFACES, type RobotSpec } from './robot-spec'
 
 export const DT = 1 / 60
 const G = 9.81
@@ -42,6 +42,17 @@ const DISTANCE_CONE_DEG = [-12, -6, 0, 6, 12]
 /** The echo cone also spreads downward, so low things (a box, a ball) are seen, not just walls at head height. */
 const DISTANCE_PITCH_DEG = [0, -10, -20, -30]
 const LINE_SAMPLES = [-1, -0.5, 0, 0.5, 1]
+/**
+ * DC motor back-EMF: the push a motor can give falls as the wheel spins faster,
+ * reaching zero at NO_LOAD × the drive's top speed. On the flat that costs
+ * almost nothing (the robot still reaches its target speed); with a heavy load
+ * or uphill the robot settles at a lower speed — "fixed power slows under load".
+ */
+const NO_LOAD = 1.3
+/** Below this fraction of stall force the curve is clamped (a motor never quite gives up). */
+const MOTOR_FLOOR = 0.12
+/** Tip out drops a scooped load this far in front of the body's front edge: on the next Level 1 tile for every body. */
+const SCOOP_DROP_AHEAD = 0.2
 
 type V3 = { x: number; y: number; z: number }
 type Q = { x: number; y: number; z: number; w: number }
@@ -77,7 +88,7 @@ export function headingToYaw(deg: number): number {
 
 export interface SimEvent {
   t: number
-  kind: 'say' | 'beep' | 'grab' | 'drop' | 'crash' | 'miss' | 'stalled'
+  kind: 'say' | 'beep' | 'grab' | 'drop' | 'crash' | 'miss' | 'stalled' | 'touch' | 'light' | 'pen'
   text?: string
 }
 
@@ -145,6 +156,10 @@ export interface Sim {
   /** Metres the wheel surfaces slid over the ground (true slip, per contact; a spin on the spot is not slip). */
   readonly slipTravel: number
   readonly crashed: boolean
+  /** Ids of props and movers the robot (or what it carries) has touched, in the order first touched. */
+  readonly touched: ReadonlySet<string>
+  /** Where each pick-up object is now (x, y, z). */
+  objectPos(id: string): V3 | null
   dispose(): void
 }
 
@@ -198,9 +213,18 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     const pts = new Float32Array([-hw, 0, -hl, hw, 0, -hl, -hw, 0, hl, hw, 0, hl, -hw, r.height, hl, hw, r.height, hl])
     const desc = R.ColliderDesc.convexHull(pts)
     if (desc) {
-      const c = world.createCollider(desc.setTranslation(r.center[0], 0, r.center[1]).setRotation(yawQuat(headingToYaw(r.riseHeadingDeg))).setFriction(0.7))
+      const c = world.createCollider(desc.setTranslation(r.center[0], r.base ?? 0, r.center[1]).setRotation(yawQuat(headingToYaw(r.riseHeadingDeg))).setFriction(0.7))
       floorHandles.add(c.handle)
     }
+  }
+
+  // ── Decks: raised flat floors (a platform, a landing) ──────────────────
+  for (const dk of arena.decks ?? []) {
+    const base = dk.base ?? 0
+    const c = world.createCollider(
+      R.ColliderDesc.cuboid(dk.size[0] / 2, (dk.height - base) / 2, dk.size[1] / 2).setTranslation(dk.center[0], (dk.height + base) / 2, dk.center[1]).setFriction(0.7),
+    )
+    floorHandles.add(c.handle)
   }
 
   // ── Pushable boxes and pick-up objects ─────────────────────────────────
@@ -212,12 +236,38 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
   })
   const pickups = new Map<string, RigidBody>()
   for (const o of arena.objects) {
-    const body = world.createRigidBody(R.RigidBodyDesc.dynamic().setTranslation(o.pos[0], o.size, o.pos[1]).setAngularDamping(0.8).setLinearDamping(0.3))
+    const body = world.createRigidBody(R.RigidBodyDesc.dynamic().setTranslation(o.pos[0], (o.base ?? 0) + o.size, o.pos[1]).setAngularDamping(0.8).setLinearDamping(0.3))
     const desc = o.kind === 'ball' ? R.ColliderDesc.ball(o.size) : R.ColliderDesc.cuboid(o.size, o.size, o.size)
     const vol = o.kind === 'ball' ? (4 / 3) * Math.PI * o.size ** 3 : 8 * o.size ** 3
     world.createCollider(desc.setDensity(o.mass / vol).setFriction(0.6), body)
     dyn.push({ id: o.id, body })
     pickups.set(o.id, body)
+  }
+
+  // ── Named props (static) and movers (kinematic, on a timetable) ─────────
+  /** Collider handle → prop/mover id, for touch tracking. */
+  const named = new Map<number, string>()
+  for (const p of arena.props ?? []) {
+    const base = p.base ?? 0
+    const desc =
+      p.shape.kind === 'circle'
+        ? R.ColliderDesc.cylinder(p.height / 2, p.shape.radius)
+        : R.ColliderDesc.cuboid(p.shape.size[0] / 2, p.height / 2, p.shape.size[1] / 2)
+    const c = world.createCollider(desc.setTranslation(p.shape.center[0], base + p.height / 2, p.shape.center[1]).setFriction(0.4))
+    named.set(c.handle, p.id)
+  }
+  const movers: { id: string; body: RigidBody; height: number }[] = []
+  const moverPose = (m: NonNullable<Arena['movers']>[number], t: number) => {
+    const at = moverAt(m, t)
+    // Absent = lowered under the floor, out of every ray and contact.
+    return { x: at.pos[0], y: at.present ? m.height / 2 : -m.height / 2 - 0.5, z: at.pos[1] }
+  }
+  for (const m of arena.movers ?? []) {
+    const p0 = moverPose(m, 0)
+    const body = world.createRigidBody(R.RigidBodyDesc.kinematicPositionBased().setTranslation(p0.x, p0.y, p0.z))
+    const c = world.createCollider(R.ColliderDesc.cuboid(m.size[0] / 2, m.height / 2, m.size[1] / 2).setFriction(0.4), body)
+    named.set(c.handle, m.id)
+    movers.push({ id: m.id, body, height: m.height })
   }
 
   // ── The robot ──────────────────────────────────────────────────────────
@@ -276,6 +326,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
   let lineN = 0
   let lineSum = 0
   let slipTravel = 0
+  const touched = new Set<string>()
   let sensorCache: SensorReadings | null = null
   const events: SimEvent[] = []
   const trail: number[] = []
@@ -349,7 +400,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     let bumped = false
     if (caps.has('feel-bump')) {
       const bp = local(0, b.bottom + 0.03, b.front + 0.015)
-      world.intersectionsWithShape(bp, q, new R.Cuboid(halfX + 0.01, 0.025, 0.015), () => {
+      world.intersectionsWithShape(bp, q, new R.Cuboid(halfX, 0.025, 0.015), () => {
         bumped = true
         return false
       }, undefined, undefined, undefined, robot, (c) => notRobot(c) && !floorHandles.has(c.handle))
@@ -437,13 +488,20 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       scrubMu += mu / 2
       // Ground speed of this side's contact along f (a left turn speeds the right side up).
       const vSide = vf + side * spec.track * wn
-      const drag = (surf.crr * spec.drive.sinkage + (isWheel ? surf.wheelOnlyDrag + surf.wheelSpeedDrag * Math.abs(vSide) : 0)) * loadSide
+      const drag =
+        (surf.crr * spec.drive.sinkage + (isWheel ? surf.wheelOnlyDrag + surf.wheelSpeedDrag * Math.abs(vSide) : 0)) * loadSide +
+        (surf.plough ?? 0) * Math.abs(vSide) * (spec.drive.sinkage / DRIVES.wheels2.sinkage)
       // Traction: the floor pushes the wheel toward "no slip" (also making up for the drag it
       // will meet), limited by grip (mu × load) and by the motor's torque limit.
       const slip = wheelSpeed[s] - vSide
-      const want = ((slip * mEffSide) / DT + Math.sign(wheelSpeed[s]) * drag) * 0.8
+      // A stopped geared motor holds the robot on a slope (it is not free-wheeling): it pushes
+      // against this side's share of gravity along the ground, as well as against any rolling.
+      const hold = target[s] === 0 && wheelSpeed[s] === 0 ? (G * f.y * (spec.mass + (holding ? holding.mass : 0))) / 2 : 0
+      const want = ((slip * mEffSide) / DT + Math.sign(wheelSpeed[s]) * drag) * 0.8 + hold
       const gripLimit = mu * loadSide
-      const motorLimit = spec.drive.maxForcePerSide
+      // Back-EMF taken at the ground speed: a gripping wheel turns at it, and a spinning wheel in
+      // sand is modelled by the slip branch below (its push is the floor's grip, not the motor's).
+      const motorLimit = spec.drive.maxForcePerSide * clamp(1 - Math.abs(vSide) / (spec.drive.maxSpeed * (spec.drive.noLoad ?? NO_LOAD)), MOTOR_FLOOR, 1)
       const limit = Math.min(gripLimit, motorLimit)
       let F = clamp(want, -limit, limit)
       if (Math.abs(want) > motorLimit && motorLimit < gripLimit) {
@@ -475,7 +533,34 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     }
   }
 
+  /** A scooped object is a sensor while carried (no contacts), solid again once tipped out. */
+  function setSolid(body: RigidBody, solid: boolean): void {
+    for (let i = 0; i < body.numColliders(); i++) body.collider(i).setSensor(!solid)
+  }
+
+  function checkTouches(c: Collider): void {
+    world.contactPairsWith(c, (other) => {
+      const id = named.get(other.handle)
+      if (id === undefined || touched.has(id)) return
+      let hit = false
+      world.contactPair(c, other, (manifold) => {
+        if (manifold.numContacts() > 0) hit = true
+      })
+      if (hit) {
+        touched.add(id)
+        events.push({ t: time, kind: 'touch', text: id })
+      }
+    })
+  }
+
   function checkCrash(): void {
+    if (named.size > 0) {
+      checkTouches(chassis)
+      if (holding) {
+        const n = holding.body.numColliders()
+        for (let i = 0; i < n; i++) checkTouches(holding.body.collider(i))
+      }
+    }
     let touching = false
     world.contactPairsWith(chassis, (other) => {
       if (!wallHandles.has(other.handle)) return
@@ -510,8 +595,20 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     get crashed() {
       return crashed
     },
+    touched,
+    objectPos(id) {
+      const body = pickups.get(id)
+      if (!body) return null
+      const p = body.translation()
+      return { x: p.x, y: p.y, z: p.z }
+    },
     step() {
       applyDrive()
+      for (let i = 0; i < movers.length; i++) {
+        const m = (arena.movers ?? [])[i]
+        const p = moverPose(m, time + DT)
+        movers[i].body.setNextKinematicTranslation(p)
+      }
       world.step()
       time += DT
       for (let s = 0; s < 2; s++) {
@@ -560,7 +657,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
         wheelAngle: [wheelAngle[0], wheelAngle[1]],
         wheelSpeed: [surfSpeed[0], surfSpeed[1]],
         groundSpeed: Math.hypot(v.x, v.z),
-        bodies: dyn.map((x) => ({ id: x.id, p: x.body.translation(), q: x.body.rotation() })),
+        bodies: [...dyn, ...movers].map((x) => ({ id: x.id, p: x.body.translation(), q: x.body.rotation() })),
         lightOn,
         holding: holding?.id ?? null,
         penDown,
@@ -571,6 +668,23 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       if (!close) {
         if (holding) {
           world.removeImpulseJoint(holding.joint, true)
+          setSolid(holding.body, true)
+          if (design.tool === 'scoop') {
+            // Tip out: the bucket swings forward and drops the load on the tile in front (if there is room).
+            const o = arena.objects.find((x) => x.id === holding?.id)
+            const size = o?.size ?? 0.03
+            const drop = local(0, size + 0.012, spec.body.front + SCOOP_DROP_AHEAD)
+            const shape = o?.kind === 'ball' ? new R.Ball(size * 0.95) : new R.Cuboid(size * 0.95, size * 0.95, size * 0.95)
+            const held = holding.body
+            let room = true
+            world.intersectionsWithShape(drop, robot.rotation(), shape, () => {
+              room = false
+              return false
+            }, undefined, undefined, undefined, robot, (c) => notRobot(c) && !floorHandles.has(c.handle) && c.parent()?.handle !== held.handle)
+            if (room) held.setTranslation(drop, true)
+            held.setLinvel({ x: 0, y: 0, z: 0 }, true)
+            held.setAngvel({ x: 0, y: 0, z: 0 }, true)
+          }
           events.push({ t: time, kind: 'drop', text: holding.id })
           holding = null
           sensorCache = null
@@ -586,15 +700,37 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
         const p = body.translation()
         const dd = Math.hypot(p.x - tip.x, p.z - tip.z)
         // Within reach sideways AND at claw height (a ball on top of a box is out of reach).
-        if (dd <= o.size + 0.05 && Math.abs(p.y - tip.y) <= o.size + 0.06 && (!best || dd < best.d)) best = { id: o.id, body, d: dd }
+        if (dd <= o.size + spec.toolReach && Math.abs(p.y - tip.y) <= o.size + 0.06 && (!best || dd < best.d)) best = { id: o.id, body, d: dd }
       }
       if (!best) {
         events.push({ t: time, kind: 'miss' })
         return false
       }
-      // Hold it at the claw: snap to the tip, then weld with a fixed joint (its mass now rides on the robot).
       const o = arena.objects.find((x) => x.id === best.id)
       const lift = (o?.size ?? 0.03) + 0.01
+      if (design.tool === 'scoop') {
+        // A scoop slides under the thing and swings it up into a bucket over the wheels, so even a
+        // heavy load rides on the robot's back instead of tipping it onto its nose on a slope.
+        const size = o?.size ?? 0.03
+        const anchorLocal = { x: 0, y: spec.body.top + size + 0.005, z: 0 }
+        best.body.setTranslation(local(anchorLocal.x, anchorLocal.y, anchorLocal.z), true)
+        best.body.setRotation(robot.rotation(), true)
+        best.body.setLinvel(robot.linvel(), true)
+        const joint = world.createImpulseJoint(
+          R.JointData.fixed(anchorLocal, { x: 0, y: 0, z: 0, w: 1 }, { x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0, w: 1 }),
+          robot,
+          best.body,
+          true,
+        )
+        joint.setContactsEnabled(false)
+        // In the bucket it rides above the floor: it does not drag on ramps or snag on the way.
+        setSolid(best.body, false)
+        holding = { id: best.id, joint, body: best.body, mass: o?.mass ?? 0 }
+        events.push({ t: time, kind: 'grab', text: best.id })
+        sensorCache = null
+        return true
+      }
+      // A claw: snap to the tip, then weld with a fixed joint (its mass now rides on the robot).
       const anchorLocal = { x: spec.toolTip[0], y: Math.max(spec.toolTip[1], lift), z: spec.toolTip[2] + (o?.size ?? 0.03) * 0.6 }
       const anchor = local(anchorLocal.x, anchorLocal.y, anchorLocal.z)
       // Would the object end up inside a wall or a box? Then the claw cannot close on it.
@@ -627,10 +763,17 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     },
     setPen(down) {
       if (down && !penDown && trail.length > 0) trail.push(NaN, NaN)
+      if (down !== penDown) events.push({ t: time, kind: 'pen', text: down ? 'down' : 'up' })
       penDown = down
+      // A turn on the spot leaves a dot: the pen marks where it touches down.
+      if (down) {
+        const tip = local(spec.penTip[0], 0, spec.penTip[1])
+        trail.push(tip.x, tip.z)
+      }
       sensorCache = null
     },
     setLight(on) {
+      if (on !== lightOn) events.push({ t: time, kind: 'light', text: on ? 'on' : 'off' })
       lightOn = on
       sensorCache = null // a camera in the dark sees again at once
     },

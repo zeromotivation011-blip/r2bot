@@ -18,6 +18,12 @@ export interface DriveSpec {
   maxSpeed: number
   /** Most force one side's motor can push with, N (the torque limit at the ground). */
   maxForcePerSide: number
+  /**
+   * Back-EMF: the push falls linearly with speed and reaches zero at noLoad × maxSpeed (default 1.3).
+   * Two-wheel drive is 1.0 with a strong stall force: on the flat it barely matters, while a heavy
+   * load uphill settles at a slower speed (Level 1 Session 14 is calibrated on it in verify.ts).
+   */
+  noLoad?: number
   /** How fast the motor can change wheel speed with no load, m/s². */
   wheelAccel: number
   /** Multiplies the floor's grip (tyres < tracks). */
@@ -36,7 +42,7 @@ export const DRIVES: Record<RobotDesign['drive'], DriveSpec> = {
   // tuned so sand drag (0.24 × 1.45 ≈ 0.35 × load) sits just under sand grip (0.38 × load),
   // and wheels plough harder the faster they go (SURFACES.sand.wheelSpeedDrag): in sand a
   // two-wheeler crawls a couple of cm a second with its wheels spinning hard.
-  wheels2: { maxSpeed: 0.42, maxForcePerSide: 3.2, wheelAccel: 3, grip: 1, sinkage: 1.45, scrub: 0.05, wheelRadius: 0.05, mass: 0.25 },
+  wheels2: { maxSpeed: 0.42, maxForcePerSide: 4.4, noLoad: 1, wheelAccel: 3, grip: 1, sinkage: 1.45, scrub: 0.05, wheelRadius: 0.05, mass: 0.25 },
   // Fast and stable; four tyres share the load a bit better but must skid to turn.
   wheels4: { maxSpeed: 0.46, maxForcePerSide: 3.6, wheelAccel: 3, grip: 1.05, sinkage: 1.6, scrub: 0.55, wheelRadius: 0.0425, mass: 0.4 },
   // Slower, heavier, grips everything; turning scrubs a lot.
@@ -54,6 +60,12 @@ export interface SurfaceSpec {
   wheelOnlyDrag: number
   /** Wheels only: extra drag per m/s of speed (a wheel ploughing through soft ground). Gives a slow crawl, not a dead stop. */
   wheelSpeedDrag: number
+  /**
+   * Ploughing drag per side in N per m/s that does NOT grow with weight (the tyre's width
+   * pushing sand aside), scaled by the drive's sinkage relative to two wheels. Used by
+   * Level 1 soft sand so every body slows to about the same speed.
+   */
+  plough?: number
 }
 
 export const SURFACES: Record<Surface, SurfaceSpec> = {
@@ -61,6 +73,9 @@ export const SURFACES: Record<Surface, SurfaceSpec> = {
   carpet: { mu: 0.9, crr: 0.08, wheelOnlyDrag: 0, wheelSpeedDrag: 0 },
   // Soft: low grip, lots of drag for anything that sinks.
   sand: { mu: 0.38, crr: 0.24, wheelOnlyDrag: 0, wheelSpeedDrag: 1.6 },
+  // Level 1 beach sand (Session 15): firm enough to grip, soft enough to drag. A two-wheeler at
+  // Hop power (80 %) runs at about half its mat speed; it slows, it never stops. Tuned in verify.ts.
+  'soft-sand': { mu: 0.75, crr: 0.03, wheelOnlyDrag: 0, wheelSpeedDrag: 0, plough: 15 },
   // Almost no grip: you cannot speed up or stop quickly.
   ice: { mu: 0.05, crr: 0.01, wheelOnlyDrag: 0, wheelSpeedDrag: 0 },
   rocks: { mu: 0.75, crr: 0.06, wheelOnlyDrag: 0.45, wheelSpeedDrag: 0 },
@@ -106,7 +121,9 @@ export interface RobotSpec {
   floorSensorHalfWidth: number
   /** Tool tip in robot space (gripper / scoop reach point). */
   toolTip: [number, number, number]
-  /** Pen tip in robot space. */
+  /** How far from the tool tip an object's edge may be and still be grabbed, metres. */
+  toolReach: number
+  /** Pen tip in robot space: the turning centre (midpoint of the drive axle), so a turn on the spot leaves a dot. */
   penTip: [number, number]
 }
 
@@ -126,7 +143,11 @@ export function robotSpec(d: RobotDesign): RobotSpec {
     eye: [0, body.top + 0.045, body.front * 0.6],
     floorSensorZ: body.front - 0.01,
     floorSensorHalfWidth: 0.04,
-    toolTip: [0, lift + 0.04, body.front + 0.06],
-    penTip: [0, body.back + 0.005],
+    // A claw closes just in front of the body; a scoop is a long shovel that reaches into the
+    // next Level 1 tile (an object on the tile in front, near edge, about 24 cm from the centre).
+    toolTip: [0, lift + 0.04, body.front + (d.tool === 'scoop' ? 0.13 : 0.06)],
+    toolReach: d.tool === 'scoop' ? 0.09 : 0.05,
+    // The drive wheels sit on the body's centre line, so the turning centre is (0, 0).
+    penTip: [0, 0],
   }
 }

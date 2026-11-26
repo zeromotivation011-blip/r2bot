@@ -65,7 +65,7 @@ export interface Params {
    * Young bands: 5–7 slots, 1 level. Older: up to 12 slots, 2–3 levels.
    */
   deck: { fromCm: number; toCm: number; slots: number; levels: number[] }
-  /** Every test must pass (1–4). Young bands: one slope. Older: up AND down, plus braking. */
+  /** Every test must pass (1–4). Young bands: one slope. Older: up AND down, plus braking. A hidden-by-default "Standing still" (flat, no brake) test is always added unless one is listed — a robot that tips over parked is never right. */
   tests: TiltTest[]
   /** Safety margin: the tip point must stay this many cm inside the wheels (default 0). Engineers: 1–5 cm. */
   minMarginCm?: number
@@ -97,13 +97,26 @@ export interface TestResult {
   ok: boolean
   /** Which way it would tip if it fails. */
   tips?: 'backward' | 'forward'
+  /** True for the built-in "Standing still" test (added when Params.tests has no flat, no-brake test). */
+  implicit?: boolean
 }
 
 export interface ComResult {
   mass: number
   x: number
   h: number
+  /** Every test that must pass: the implicit "Standing still" test first (when added), then Params.tests in order. */
   tests: TestResult[]
+}
+
+/** The built-in flat-ground test: a robot that falls over standing still is never correct. */
+export const STANDING_STILL: TiltTest = { slopeDeg: 0, label: 'Standing still' }
+
+/** The tests actually run: Params.tests, preceded by "Standing still" unless an explicit flat, no-brake test exists. */
+export function allTests(p: Params): { test: TiltTest; implicit: boolean }[] {
+  const hasFlat = p.tests.some((t) => t.slopeDeg === 0 && !t.brakeG)
+  const out = p.tests.map((t) => ({ test: t, implicit: false }))
+  return hasFlat ? out : [{ test: STANDING_STILL, implicit: true }, ...out]
 }
 
 const EPS = 1e-9
@@ -143,11 +156,12 @@ export function tipPoint(com: { x: number; h: number }, t: TiltTest): number {
 export function evaluate(p: Params, a: Answer): ComResult {
   const com = centreOfMass(p, a)
   const margin = p.minMarginCm ?? 0
-  const tests = p.tests.map((t) => {
+  const tests = allTests(p).map(({ test: t, implicit }) => {
     const x = tipPoint(com, t)
     const m = Math.min(x, p.wheelbaseCm - x)
     const ok = x >= margin - EPS && x <= p.wheelbaseCm - margin + EPS
     const r: TestResult = { test: t, tipPoint: x, margin: m, ok }
+    if (implicit) r.implicit = true
     if (!ok) r.tips = x < p.wheelbaseCm / 2 ? 'backward' : 'forward'
     return r
   })
@@ -283,6 +297,12 @@ function check(p: Params, a: Answer): CheckResult {
   if (f.test.slopeDeg !== 0) causes.push(`the slope shifts it ${f.test.slopeDeg > 0 ? 'back' : 'forward'} by height × tan(angle)`)
   if (f.test.brakeG) causes.push('braking throws it forward')
   const why = causes.length ? ` (${causes.join(', and ')} — the higher the balance point, the bigger the shift)` : ''
+  if (f.implicit && f.margin < 0)
+    return {
+      correct: false,
+      score: Math.round((passed / r.tests.length) * 0.8 * 100) / 100,
+      feedback: `${where} That is ${r1(-f.margin)} cm past the ${wheel} wheel, so the robot tips ${f.tips} just standing still. Move heavy parts ${move} so the balance point sits between the wheels.`,
+    }
   const lands =
     f.margin >= 0
       ? `lands only ${r1(f.margin)} cm inside the ${wheel} wheel — less than the ${p.minMarginCm} cm safety margin${why}, so it is too close to tipping ${f.tips}`

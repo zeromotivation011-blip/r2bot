@@ -19,6 +19,7 @@ import {
   useAnimationFrame,
   useAttempts,
   useReducedMotion,
+  useSvgScale,
 } from './TemplateFrameClient'
 
 const MODULE = 2 // SVG units per tooth of diameter (all gears share one tooth size, so they mesh)
@@ -83,10 +84,18 @@ function angles(placed: Placed[], theta0: number): number[] {
 function fmt(n: number): string {
   if (n >= 100) return Math.round(n).toString()
   if (n >= 10) return n.toFixed(1)
+  if (n > 0 && n < 0.1) return n.toPrecision(2) // 0.0041, not 0.00
   return n.toFixed(2)
 }
 
+/** Motor turns : output turns, e.g. "244 : 1" for a big reduction, "1 : 2.50" for gearing up. */
+function ratioLabel(outPerMotor: number): string {
+  if (outPerMotor <= 0) return '—'
+  return outPerMotor < 1 ? `${fmt(1 / outPerMotor)} : 1` : `1 : ${fmt(outPerMotor)}`
+}
+
 function rangeLabel(r: Range, unit: string): string {
+  if (r.min !== undefined && r.max !== undefined && r.min === r.max) return `exactly ${r.min} ${unit}`
   if (r.min !== undefined && r.max !== undefined) return `${r.min}–${r.max} ${unit}`
   if (r.min !== undefined) return `≥ ${r.min} ${unit}`
   return `≤ ${r.max} ${unit}`
@@ -179,7 +188,9 @@ export default function GearTrainClient({ params, band, onSubmit, onDone }: Temp
   const minX = -(MODULE * gears[0]) / 2 - pad - 40 // motor box
   const maxX = Math.max(...placed.map((g) => g.x + (MODULE * g.z) / 2)) + pad + 46 // output icon
   const maxR = Math.max(...placed.map((g) => (MODULE * g.z) / 2)) + MODULE
-  const vb = `${minX} ${-maxR - pad} ${maxX - minX} ${2 * maxR + 2 * pad + (showMath ? 26 : 0)}`
+  const vbH = 2 * maxR + 2 * pad + (showMath ? 36 : 0)
+  const vb = `${minX} ${-maxR - pad} ${maxX - minX} ${vbH}`
+  const sv = useSvgScale(maxX - minX, vbH)
   const last = placed[placed.length - 1]
   const outIcon = OUTPUT_ICON[p.output ?? 'wheel']
   const showNumbers = live || !!att.result
@@ -202,11 +213,11 @@ export default function GearTrainClient({ params, band, onSubmit, onDone }: Temp
       </div>
 
       <div className="relative mt-3 overflow-hidden rounded-[20px] border border-white/10 bg-[#0A1120]">
-        <svg viewBox={vb} className="block h-[230px] w-full sm:h-[300px]" role="img" aria-label={`Gear train with ${gears.length} gears: ${gears.join(', ')} teeth. Output ${fmt(sim.outputRpm)} rpm, turning the ${sim.direction} way as the motor.`}>
+        <svg ref={sv.ref} viewBox={vb} className="block h-[230px] w-full sm:h-[300px]" role="img" aria-label={`Gear train with ${gears.length} gears: ${gears.join(', ')} teeth. Output ${fmt(sim.outputRpm)} rpm, turning the ${sim.direction} way as the motor.`}>
           {/* motor */}
           <g>
             <rect x={minX + 6} y={-26} width={44} height={52} rx={8} fill="#19263F" stroke="rgba(255,255,255,.16)" />
-            <text x={minX + 28} y={5} textAnchor="middle" fontSize={14} fontWeight={700} fill="#FFA878">
+            <text x={minX + 28} y={5} textAnchor="middle" fontSize={sv.font(14, 13)} fontWeight={700} fill="#FFA878">
               M
             </text>
             <rect x={minX + 50} y={-4} width={-minX - 50} height={8} fill="#6E7888" />
@@ -215,6 +226,9 @@ export default function GearTrainClient({ params, band, onSubmit, onDone }: Temp
             const isDriverOnShared = g.sharedAxleWith !== null
             const colour = i === 0 ? '#FC6818' : i === placed.length - 1 ? '#00B8D4' : isDriverOnShared ? '#A7B0C0' : '#6E7888'
             const selected = i === sel
+            // Compound gearboxes stack stages in depth; draw every other stage as the
+            // "back" layer (see-through, outlined) so overlapping gears read as layers.
+            const back = p.mode === 'compound' && Math.floor(i / 2) % 2 === 1
             return (
               <g
                 key={i}
@@ -224,13 +238,24 @@ export default function GearTrainClient({ params, band, onSubmit, onDone }: Temp
                 aria-hidden="true"
               >
                 <g transform={`rotate(${((th[i] ?? 0) * 180) / Math.PI})`}>
-                  <path d={gearPath(g.z)} fill={colour} fillOpacity={isDriverOnShared ? 0.95 : 0.85} stroke={selected ? '#FFFFFF' : 'rgba(10,17,32,.8)'} strokeWidth={selected ? 2 : 1} />
+                  <path
+                    d={gearPath(g.z)}
+                    fill={colour}
+                    fillOpacity={back ? 0.22 : isDriverOnShared ? 0.95 : 0.85}
+                    stroke={selected ? '#FFFFFF' : back ? colour : 'rgba(10,17,32,.8)'}
+                    strokeWidth={selected ? 2 : back ? 1.5 : 1}
+                  />
                   <circle r={(MODULE * g.z) / 2 - 1.25 * MODULE - 3} fill="#0A1120" fillOpacity={0.35} />
                   <line x1={0} y1={0} x2={(MODULE * g.z) / 2 - 4} y2={0} stroke="#0A1120" strokeWidth={2.5} strokeLinecap="round" />
                 </g>
                 <circle r={4} fill="#EEF2F8" />
+                {reduced && spinning && !isDriverOnShared && (
+                  <text x={0} y={-(MODULE * g.z) / 2 - MODULE - 4} textAnchor="middle" fontSize={sv.font(14, 14)} fontWeight={800} fill={colour}>
+                    {(sim.gearRpm[i] ?? 0) >= 0 ? '↻' : '↺'}
+                  </text>
+                )}
                 {showMath && (
-                  <text x={0} y={maxR + (isDriverOnShared ? 22 : 12)} textAnchor="middle" fontSize={11} fontWeight={700} fill={isDriverOnShared ? '#A7B0C0' : '#EEF2F8'}>
+                  <text x={0} y={maxR + 12 + (isDriverOnShared ? sv.font(11) + 1 : 0)} textAnchor="middle" fontSize={sv.font(11)} fontWeight={700} fill={isDriverOnShared ? '#A7B0C0' : '#EEF2F8'}>
                     {g.z}T
                   </text>
                 )}
@@ -243,7 +268,7 @@ export default function GearTrainClient({ params, band, onSubmit, onDone }: Temp
             <g transform={`translate(${(MODULE * last.z) / 2 + pad + 26} 0) rotate(${(((th[th.length - 1] ?? 0) * 180) / Math.PI).toFixed(1)})`}>
               <circle r={18} fill="#111C32" stroke="#00E5FF" strokeWidth={2} />
               {[0, 60, 120].map((a) => (
-                <line key={a} x1={0} y1={0} x2={16 * Math.cos((a * Math.PI) / 90)} y2={16 * Math.sin((a * Math.PI) / 90)} stroke="#00E5FF" strokeWidth={2} />
+                <line key={a} x1={0} y1={0} x2={(16 * Math.cos((a * Math.PI) / 90)).toFixed(2)} y2={(16 * Math.sin((a * Math.PI) / 90)).toFixed(2)} stroke="#00E5FF" strokeWidth={2} />
               ))}
             </g>
           </g>
@@ -252,7 +277,7 @@ export default function GearTrainClient({ params, band, onSubmit, onDone }: Temp
           <span>Motor {p.motorRpm} rpm {sim.gearRpm[0] >= 0 ? '↻' : '↺'}</span>
         </div>
         {reduced && spinning && (
-          <p className="absolute bottom-2 left-3 text-xs font-semibold text-[#A7B0C0]">Motion is off (reduced motion): the arrows show each gear's direction.</p>
+          <p className="absolute bottom-2 left-3 text-xs font-semibold text-[#A7B0C0]">Motion is off (reduced motion): the ↻ / ↺ arrows show which way each gear turns.</p>
         )}
       </div>
 
@@ -320,7 +345,7 @@ export default function GearTrainClient({ params, band, onSubmit, onDone }: Temp
         <Readout label="Output speed" value={showNumbers ? fmt(sim.outputRpm) : '?'} unit="rpm" tone={showNumbers && p.target.rpm ? (rpmOk ? 'good' : 'bad') : 'plain'} />
         <Readout label="Direction" value={showNumbers ? (sim.direction === 'same' ? 'Same ↻' : 'Opposite ↺') : '?'} tone="cyan" />
         {sim.outputTorque !== null && <Readout label="Output force" value={showNumbers ? fmt(sim.outputTorque) : '?'} unit="N·cm" />}
-        {showMath && <Readout label="Speed ratio" value={showNumbers ? `${fmt(sim.speedRatio)} : 1` : '?'} />}
+        {showMath && <Readout label="Motor : output" value={showNumbers ? ratioLabel(sim.speedRatio) : '?'} />}
       </div>
 
       {showMath && showNumbers && (

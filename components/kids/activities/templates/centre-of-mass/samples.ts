@@ -17,10 +17,13 @@ export const samples: Activity<Params, Answer>[] = [
     realWorld: 'Stair-climbing and ramp robots move their battery or lean forward so they do not tip backwards.',
     params: {
       wheelbaseCm: 20,
-      chassis: { mass: 1, x: 10, h: 6 },
+      // Motors sit at the back, so the bare chassis balances 7 cm from the back wheel.
+      // Slots at 0, 5, 10, 15, 20 cm: only 15 and 20 survive the 42° ramp; the
+      // middle (10) tips backwards and nothing hangs past the front wheel.
+      chassis: { mass: 1, x: 7, h: 6 },
       items: [{ mass: 2, label: 'Battery', emoji: '🔋' }],
-      deck: { fromCm: -6, toCm: 26, slots: 5, levels: [14] },
-      tests: [{ slopeDeg: 35, label: 'Up the ramp' }],
+      deck: { fromCm: 0, toCm: 20, slots: 5, levels: [14] },
+      tests: [{ slopeDeg: 42, label: 'Up the ramp' }],
       liveCom: true,
       showMath: false,
     },

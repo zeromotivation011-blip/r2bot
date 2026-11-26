@@ -1,0 +1,110 @@
+// components/kids/activities/templates/signal-graph/samples.ts
+// Three reference activities (easy → hard), one per task kind.
+// validate() is empty and check(solution) is correct for each.
+
+import type { Activity } from '@/lib/kids/activities/types'
+import type { Answer, Params } from './logic'
+
+export const samples: Activity<Params, Answer>[] = [
+  {
+    id: 'sense-graph-three-black-lines',
+    title: 'Where were the black lines?',
+    track: 'sensors',
+    band: 'explorers',
+    template: 'signal-graph',
+    difficulty: 1,
+    intro: 'Spark drove over a white floor with black stripes. Its floor sensor drew this picture. Tap each place where Spark was on a black stripe!',
+    takeaway: 'Black reflects little light, so the reading dips. A robot “sees” a line as a dip in its graph.',
+    realWorld: 'Line-following robots in factories and competitions read exactly this kind of signal hundreds of times a second.',
+    params: {
+      sensor: { name: 'Floor light sensor', unit: '%', min: 0, max: 100 },
+      keyframes: [
+        { t: 0, v: 80 },
+        { t: 2, v: 80 },
+        { t: 2, v: 15 },
+        { t: 2.8, v: 15 },
+        { t: 2.8, v: 80 },
+        { t: 5, v: 80 },
+        { t: 5, v: 15 },
+        { t: 5.8, v: 15 },
+        { t: 5.8, v: 80 },
+        { t: 8, v: 80 },
+        { t: 8, v: 15 },
+        { t: 8.8, v: 15 },
+        { t: 8.8, v: 80 },
+        { t: 10, v: 80 },
+      ],
+      trace: { durationS: 10, sampleHz: 10, noise: 1.5, seed: 7 },
+      task: {
+        kind: 'mark',
+        prompt: 'Tap every black stripe.',
+        events: [
+          { t: 2.4, label: 'stripe 1' },
+          { t: 5.4, label: 'stripe 2' },
+          { t: 8.4, label: 'stripe 3' },
+        ],
+        toleranceS: 0.6,
+      },
+      scene: [
+        { t: 2.4, icon: '⬛', label: 'stripe' },
+        { t: 5.4, icon: '⬛', label: 'stripe' },
+        { t: 8.4, icon: '⬛', label: 'stripe' },
+      ],
+      showReadout: true,
+    },
+    solution: { marks: [2.4, 5.3, 8.5] },
+    badges: ['line-rider'],
+  },
+  {
+    id: 'sense-graph-parked-distance',
+    title: 'How far was the wall, really?',
+    track: 'sensors',
+    band: 'inventors',
+    template: 'signal-graph',
+    difficulty: 3,
+    intro: 'A rover parked in front of a wall. Its ultrasonic sensor never gives the same number twice — and two readings are wild glitches. What was the real distance while it was parked?',
+    takeaway: 'Every real sensor is noisy. The true value is the middle of the fuzz; robots average many readings and ignore glitches.',
+    realWorld: 'Parking sensors in cars filter ultrasonic readings exactly like this before they beep.',
+    params: {
+      sensor: { name: 'Ultrasonic distance', unit: 'cm', min: 0, max: 200 },
+      keyframes: [
+        { t: 0, v: 150 },
+        { t: 3, v: 42 },
+        { t: 8, v: 42 },
+        { t: 10, v: 120 },
+      ],
+      trace: { durationS: 10, sampleHz: 10, noise: 4, spikes: 2, seed: 21 },
+      task: { kind: 'level', prompt: 'Drag the line to the real distance while the rover was parked (3–8 s).', from: 3, to: 8, toleranceAbs: 3 },
+      showReadout: true,
+    },
+    solution: { level: 42 },
+    badges: ['wall-whisperer'],
+  },
+  {
+    id: 'sense-graph-gripper-current',
+    title: 'How long did the gripper hold the can?',
+    track: 'sensors',
+    band: 'engineers',
+    template: 'signal-graph',
+    difficulty: 4,
+    intro: 'This is the gripper motor’s current. When it squeezes a can the current rises and stays up; the first moment has an inrush spike. Measure how long it held the can.',
+    takeaway: 'Motor current is a hidden sensor: it rises with load, so robots can “feel” a grip, a jam or a stall without a touch sensor.',
+    realWorld: 'Industrial grippers and robot vacuums detect jams and full grips by watching motor current.',
+    params: {
+      sensor: { name: 'Gripper motor current', unit: 'mA', min: 0, max: 600 },
+      keyframes: [
+        { t: 0, v: 60 },
+        { t: 3.2, v: 60 },
+        { t: 3.2, v: 520 },
+        { t: 3.5, v: 320 },
+        { t: 6.8, v: 320 },
+        { t: 6.8, v: 60 },
+        { t: 10, v: 60 },
+      ],
+      trace: { durationS: 10, sampleHz: 20, noise: 10, spikes: 3, seed: 1337 },
+      task: { kind: 'duration', prompt: 'Place the two cursors where the grip starts and ends.', from: 3.2, to: 6.8, toleranceS: 0.15 },
+      showReadout: false,
+    },
+    solution: { span: [3.2, 6.8] },
+  },
+]

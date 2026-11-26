@@ -19,6 +19,7 @@ import {
   useAnimationFrame,
   useAttempts,
   useReducedMotion,
+  useSvgScale,
 } from '../gear-train/TemplateFrameClient'
 
 const KIND: Record<LocoKind, { name: string; icon: string; size: string; width: string }> = {
@@ -109,8 +110,8 @@ function Robot({ kind, d, spin, step }: { kind: LocoKind; d: number; spin: numbe
           const a = (i % 2 === 0 ? swing : -swing) * 1
           return (
             <g key={lx}>
-              <line x1={lx} y1={-L} x2={lx + Math.sin(a) * L * 0.7} y2={-Math.max(0, Math.cos(a) * L * 0.08)} stroke="#A7B0C0" strokeWidth={2.5} strokeLinecap="round" />
-              <circle cx={lx + Math.sin(a) * L * 0.7} cy={-1} r={2} fill="#EEF2F8" />
+              <line x1={lx} y1={-L} x2={(lx + Math.sin(a) * L * 0.7).toFixed(2)} y2={(-Math.max(0, Math.cos(a) * L * 0.08)).toFixed(2)} stroke="#A7B0C0" strokeWidth={2.5} strokeLinecap="round" />
+              <circle cx={(lx + Math.sin(a) * L * 0.7).toFixed(2)} cy={-1} r={2} fill="#EEF2F8" />
             </g>
           )
         })}
@@ -189,8 +190,8 @@ function SizeSlider({ id, label, unit, range, value, onChange }: { id: string; l
 }
 
 /** Top-down footprint at true scale: how much ground carries the weight. */
-function Footprint({ a, pressure, worst }: { a: Answer; pressure: number; worst: number }) {
-  const S = 1.1 // px per cm
+function Footprint({ a }: { a: Answer }) {
+  const S = 1.6 // px per cm
   const patches: { x: number; y: number; w: number; h: number; round?: boolean }[] = []
   if (a.kind === 'wheels') {
     const len = 0.2 * a.diameterCm
@@ -206,16 +207,16 @@ function Footprint({ a, pressure, worst }: { a: Answer; pressure: number; worst:
     ])
       patches.push({ x: fx - (a.widthCm * S) / 2, y: fy - (a.widthCm * S) / 2, w: a.widthCm * S, h: a.widthCm * S, round: true })
   }
-  const heat = Math.min(1, pressure / Math.max(worst, 1))
-  const fill = heat > 0.999 ? '#FC6818' : '#00B8D4'
+  // One colour, no threshold: whether it sinks is for the test run to show.
+  const fill = '#00B8D4'
   return (
-    <svg viewBox="-70 -45 140 90" className="h-[90px] w-[140px] shrink-0" role="img" aria-label={`Footprint: ${Math.round(contactArea(a) * 10000)} square centimetres on the ground`}>
+    <svg viewBox="-70 -45 140 90" className="h-[112px] w-[174px] shrink-0" role="img" aria-label={`Footprint: ${Math.round(contactArea(a) * 10000)} square centimetres on the ground`}>
       <rect x={-40} y={-30} width={80} height={60} rx={8} fill="none" stroke="rgba(255,255,255,.16)" strokeDasharray="3 3" />
       {patches.map((q, i) =>
         q.round ? (
-          <circle key={i} cx={q.x + q.w / 2} cy={q.y + q.h / 2} r={q.w / 2} fill={fill} fillOpacity={0.75} />
+          <circle key={i} cx={q.x + q.w / 2} cy={q.y + q.h / 2} r={Math.max(2, q.w / 2)} fill={fill} fillOpacity={0.85} />
         ) : (
-          <rect key={i} x={q.x} y={q.y} width={Math.max(1.5, q.w)} height={Math.max(1.5, q.h)} rx={2} fill={fill} fillOpacity={0.75} />
+          <rect key={i} x={q.x} y={q.y} width={Math.max(3, q.w)} height={Math.max(3, q.h)} rx={1.5} fill={fill} fillOpacity={0.85} />
         ),
       )}
     </svg>
@@ -251,7 +252,6 @@ export default function WheelTerrainClient({ params, band, onSubmit, onDone }: T
   const result = useMemo(() => run(p, answer), [p, answer])
   const geo = useMemo(() => geometry(p), [p])
   const path = useMemo(() => runPath(p, geo.segs, result), [p, geo.segs, result])
-  const worstBearing = Math.min(...p.course.map((c) => TERRAIN[c.terrain].bearing).filter((b) => Number.isFinite(b)), Infinity)
 
   const edit = (fn: () => void) => {
     if (att.result) att.clear()
@@ -305,6 +305,7 @@ export default function WheelTerrainClient({ params, band, onSubmit, onDone }: T
 
   const top = geo.minY - 70
   const bottom = geo.maxY + 34
+  const sv = useSvgScale(VW, bottom - top)
   const vb = `0 ${top} ${VW} ${bottom - top}`
 
   const courseText = p.course
@@ -322,7 +323,7 @@ export default function WheelTerrainClient({ params, band, onSubmit, onDone }: T
       </div>
 
       <div className="relative mt-3 overflow-hidden rounded-[20px] border border-white/10 bg-[#0A1120]">
-        <svg viewBox={vb} className="block h-[210px] w-full sm:h-[260px]" role="img" aria-label={`Test course. ${result.finished ? 'This design can finish.' : ''}`}>
+        <svg ref={sv.ref} viewBox={vb} className="block h-[210px] w-full sm:h-[260px]" role="img" aria-label={`Test course: ${courseText}.${phase === 'shown' ? (result.finished ? ' The robot finished.' : ` The robot got stuck: ${reason === 'sinks' ? 'it sank' : reason === 'slips' ? 'it slipped' : reason === 'stalls' ? 'it stalled' : 'a step was too tall'}.`) : ''}`}>
           {/* terrain */}
           {geo.segs.map((s, i) => {
             const c = p.course[i]
@@ -361,7 +362,7 @@ export default function WheelTerrainClient({ params, band, onSubmit, onDone }: T
                     const yy = s.y0 + ((s.y1 - s.y0) * (k + 0.5)) / (n * 2)
                     return <circle key={k} cx={xx} cy={yy - 1} r={1.5} fill="#A8A29E" />
                   })}
-                <text x={(s.x0 + s.x1) / 2} y={Math.max(s.y0, s.y1) + 22} textAnchor="middle" fontSize={10} fontWeight={700} fill="#A7B0C0">
+                <text x={(s.x0 + s.x1) / 2} y={Math.max(s.y0, s.y1) + 22} textAnchor="middle" fontSize={sv.font(10)} fontWeight={700} fill="#A7B0C0">
                   {T.name}
                   {c.slopeDeg ? ` ${c.slopeDeg > 0 ? '↗' : '↘'}${Math.abs(c.slopeDeg)}°` : ''}
                 </text>
@@ -463,10 +464,10 @@ export default function WheelTerrainClient({ params, band, onSubmit, onDone }: T
 
       {/* footprint + numbers */}
       <div className="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-[#111C32] p-3">
-        <Footprint a={answer} pressure={result.pressureKPa} worst={worstBearing} />
+        <Footprint a={answer} />
         <p className="min-w-[180px] flex-1 text-[15px] leading-snug text-[#A7B0C0]">
           {young
-            ? 'Blue patches touch the ground. More ground touched = the weight is spread out = less sinking.'
+            ? 'The blue patches are where the robot touches the ground. More ground touched = the weight is spread out = less sinking.'
             : `Ground contact ${Math.round(contactArea(answer) * 10000)} cm². Pressure = weight ÷ area; soft ground holds only so much.`}
         </p>
       </div>

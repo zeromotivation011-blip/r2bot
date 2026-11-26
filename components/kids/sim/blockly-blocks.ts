@@ -53,7 +53,7 @@ export function defineBlocks(): void {
     // Motion
     stmt('motion_blocks', 'drive_for', '🚗 drive at %1 %% speed for %2 seconds', [num('SPEED'), num('SECONDS')], 'Drive straight. Negative speed drives backwards.'),
     stmt('motion_blocks', 'drive_distance', '📏 drive %1 cm at %2 %% speed', [num('CM'), num('SPEED')], 'Counts wheel turns (encoders). If the wheels slip, the robot goes less far than it thinks!'),
-    stmt('motion_blocks', 'turn_degrees', '↻ turn %1 ° at %2 %% speed', [num('DEG'), num('SPEED')], 'Positive turns right, negative turns left. Uses the gyro. Fast turns can overshoot.'),
+    stmt('motion_blocks', 'turn_degrees', '↻ turn %1 ° at %2 %% speed', [num('DEG'), num('SPEED')], 'Positive turns left, negative turns right (like maths and real robots). Uses the gyro. Fast turns can overshoot.'),
     stmt('motion_blocks', 'set_motors', '⚙️ motors: left %1 %% right %2 %%', [num('LEFT'), num('RIGHT')], 'Set each side’s motor and keep going. Different speeds make the robot curve.'),
     stmt('motion_blocks', 'stop', '✋ stop motors', [], 'Stop both motors. A fast robot still rolls a little!'),
     stmt('motion_blocks', 'wait', '⏳ wait %1 seconds', [num('SECONDS')], 'Do nothing for a while (the motors keep doing what they were doing).'),

@@ -141,7 +141,8 @@ function inRange(v: number, r: Range | undefined): boolean {
   return true
 }
 
-function rangeText(r: Range, unit: string): string {
+export function rangeText(r: Range, unit: string): string {
+  if (r.min !== undefined && r.max !== undefined && r.min === r.max) return `exactly ${r.min} ${unit}`
   if (r.min !== undefined && r.max !== undefined) return `between ${r.min} and ${r.max} ${unit}`
   if (r.min !== undefined) return `at least ${r.min} ${unit}`
   return `at most ${r.max} ${unit}`
@@ -196,6 +197,24 @@ export function findSolutions(p: Params, limit = 1): number[][] {
   return found
 }
 
+/** Calls `visit` for every train the child could legally build, until it returns true. */
+function forEachTrain(p: Params, visit: (gears: number[]) => boolean): void {
+  const sizes = [...new Set(p.inventory)].sort((a, b) => a - b)
+  const step = p.mode === 'compound' ? 2 : 1
+  const cur: number[] = []
+  const rec = (len: number): boolean => {
+    if (cur.length === len) return shapeProblems(p, cur).length === 0 ? visit([...cur]) : false
+    const choices = cur.length === 0 && p.motorGear !== undefined ? [p.motorGear] : sizes
+    for (const g of choices) {
+      cur.push(g)
+      if (rec(len)) return true
+      cur.pop()
+    }
+    return false
+  }
+  for (let len = 2; len <= p.maxGears; len += step) if (rec(len)) return
+}
+
 function validate(p: Params): string[] {
   const e: string[] = []
   if (p.mode !== 'chain' && p.mode !== 'compound') e.push('mode must be "chain" or "compound".')
@@ -225,8 +244,16 @@ function validate(p: Params): string[] {
   const sizes = new Set(p.inventory).size
   if (Math.pow(sizes, p.maxGears) > 1_000_000) e.push('Too many combinations: reduce inventory sizes or maxGears.')
   if (e.length) return e
-  // Not already solved by the motor alone (a 1:1 pair would be trivial only if the target allows ratio 1).
-  if (findSolutions(p).length === 0) e.push('Unsolvable: no train from this inventory meets the target.')
+  // Solvable, but not trivially: at least one legal train must miss the target.
+  let good = 0
+  let bad = 0
+  forEachTrain(p, (g) => {
+    if (meets(p, simulate(p, g))) good++
+    else bad++
+    return good > 0 && bad > 0
+  })
+  if (good === 0) e.push('Unsolvable: no train from this inventory meets the target.')
+  else if (bad === 0) e.push('Trivial: every train the child can build meets the target, so the choice teaches nothing.')
   return e
 }
 

@@ -10,7 +10,7 @@
 import { useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import type { TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
-import { evaluate, slotX, type Answer, type ComPlacement, type Params, type TiltTest } from './logic'
+import { allTests, evaluate, slotX, type Answer, type ComPlacement, type Params, type TiltTest } from './logic'
 import {
   FeedbackPanel,
   Readout,
@@ -21,12 +21,13 @@ import {
   useAnimationFrame,
   useAttempts,
   useReducedMotion,
+  useSvgScale,
 } from '../gear-train/TemplateFrameClient'
 
 const VW = 400
 const VH = 270
 const CX = 200
-const CY = 190
+const CY = 200
 const ITEM_COLOURS = ['#FC6818', '#FFA878', '#F59E0B', '#FB923C']
 const TEST_IN = 0.55 // seconds to tilt in
 const TEST_HOLD = 0.75 // seconds to hold / fall
@@ -49,24 +50,27 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
 
   const [placed, setPlaced] = useState<ComPlacement[]>([])
   const [sel, setSel] = useState<number>(0) // item index selected
-  const [view, setView] = useState(0) // which test the ramp previews
+  // which test the ramp previews — start on the first real test, not the built-in "Standing still"
+  const [view, setView] = useState(() => (allTests(params)[0]?.implicit ? 1 : 0))
   const [phase, setPhase] = useState<Phase>('idle')
   const [anim, setAnim] = useState({ idx: 0, t: 0 })
   const animRef = useRef({ idx: 0, t: 0 })
   const reduced = useReducedMotion()
   const att = useAttempts(onSubmit, onDone)
+  const sv = useSvgScale(VW)
 
   const answer: Answer = useMemo(() => ({ placed }), [placed])
   const ev = useMemo(() => evaluate(p, answer), [p, answer])
   const allPlaced = placed.length === p.items.length
   const firstFail = ev.tests.findIndex((t) => !t.ok)
+  const tests = ev.tests.map((r) => r.test)
 
   // ---- geometry (cm → px) ----
   const xs = [p.deck.fromCm, p.deck.toCm, 0, L, ...(p.fixed ?? []).map((f) => f.x)]
   const minX = Math.min(...xs)
   const maxX = Math.max(...xs)
   const maxH = Math.max(levels[levels.length - 1] + 6, ...(p.fixed ?? []).map((f) => f.h + 4), p.chassis.h + 4)
-  const s = Math.min(250 / (maxX - minX), 120 / maxH)
+  const s = Math.min(280 / (maxX - minX), 150 / maxH)
   const X = (x: number) => (x - (minX + maxX) / 2) * s
   const Y = (h: number) => -h * s
   const slotGap = p.deck.slots > 1 ? ((p.deck.toCm - p.deck.fromCm) / (p.deck.slots - 1)) * s : 40
@@ -79,7 +83,7 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
   // ---- which tilt to draw ----
   const testing = phase === 'testing'
   const shownIdx = testing ? anim.idx : phase === 'shown' && firstFail >= 0 ? firstFail : view
-  const test = p.tests[shownIdx] ?? p.tests[0]
+  const test = tests[shownIdx] ?? tests[0]
   const tiltFrac = testing ? Math.min(1, anim.t / TEST_IN) : 1
   const theta = test.slopeDeg * tiltFrac
   const res = ev.tests[shownIdx]
@@ -87,13 +91,16 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
   const fallFrac = testing ? Math.max(0, Math.min(1, (anim.t - TEST_IN) / TEST_HOLD)) : 1
   const tipDeg = falling ? 32 * (reduced ? 1 : fallFrac * fallFrac) : 0
   const showCom = live || phase !== 'idle'
+  // Pass/fail is only revealed by running the tests — live mode shows the balance
+  // point and its line, but the child still has to judge where it lands.
+  const revealed = phase !== 'idle'
 
   useAnimationFrame(testing, (dt) => {
     const a = animRef.current
     a.t += dt
     const r = ev.tests[a.idx]
     if (a.t >= TEST_IN + TEST_HOLD) {
-      if (!r.ok || a.idx >= p.tests.length - 1) {
+      if (!r.ok || a.idx >= ev.tests.length - 1) {
         setPhase('shown')
         att.submit(answer)
         return
@@ -178,25 +185,31 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
   const tipRot = res.tips === 'forward' ? tipDeg : -tipDeg
   const margin = p.minMarginCm ?? 0
   const lineOk = res.ok
+  const lineColour = !revealed ? '#00E5FF' : lineOk ? '#22C55E' : '#FC6818'
   const tipX = X(res.tipPoint)
   const brake = test.brakeG ?? 0
 
-  const sceneLabel = `Robot on ${testLabel(test)}. ${allPlaced ? '' : 'Not every part is placed yet. '}${showCom ? (res.ok ? 'It stays up.' : `It tips ${res.tips}.`) : ''}`
+  const sceneLabel = `Robot on ${testLabel(test)}. ${allPlaced ? '' : 'Not every part is placed yet. '}${revealed ? (res.ok ? 'It stays up.' : `It tips ${res.tips}.`) : ''}`
+  const names = p.items.map((i) => `the ${i.label.toLowerCase()}`)
+  const itemList = names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0]
+  // Tap targets: at least 44 real pixels wide and tall, even if they overlap neighbours.
+  const hitW = Math.max(slotGap, sv.px(44))
+  const hitH = Math.max(boxH + 4, sv.px(44))
 
   return (
     <TemplateCard label="Centre of mass test ramp">
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-amber-500 px-3 py-1 font-display text-sm font-bold text-[#1A1103]">Job</span>
         <p className="text-[17px] font-semibold">
-          Place {p.items.map((i) => i.label.toLowerCase()).join(', ')} so the robot stays on its wheels on every test
+          Place {itemList} so the robot stays on its wheels on every test
           {margin ? `, at least ${margin} cm inside the wheels` : ''}.
         </p>
       </div>
 
       {/* tests */}
       <div className="mt-3 flex flex-wrap gap-2" role="tablist" aria-label="Tilt tests">
-        {p.tests.map((t, i) => {
-          const known = showCom && allPlaced
+        {tests.map((t, i) => {
+          const known = revealed && allPlaced
           const ok = ev.tests[i].ok
           return (
             <button
@@ -220,7 +233,7 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
       </div>
 
       <div className="relative mt-3 overflow-hidden rounded-[20px] border border-white/10 bg-[#0A1120]" onKeyDown={onKey}>
-        <svg viewBox={`0 0 ${VW} ${VH}`} className="block h-auto w-full" role="img" aria-label={sceneLabel}>
+        <svg ref={sv.ref} viewBox={`0 0 ${VW} ${VH}`} className="block h-auto w-full" role="img" aria-label={sceneLabel}>
           <defs>
             <pattern id="com-ground" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
               <line x1={0} y1={0} x2={0} y2={10} stroke="rgba(255,255,255,.08)" strokeWidth={4} />
@@ -267,7 +280,7 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
                   <text x={X(f.x)} y={Y(f.h) + 4} textAnchor="middle" fontSize={11}>
                     {f.emoji ?? ''}
                   </text>
-                  <text x={X(f.x)} y={Y(f.h) - 16} textAnchor="middle" fontSize={10} fontWeight={700} fill="#A7B0C0">
+                  <text x={X(f.x)} y={Y(f.h) - 16} textAnchor="middle" fontSize={sv.font(10)} fontWeight={700} fill="#A7B0C0">
                     {f.label} {f.mass} kg
                   </text>
                 </g>
@@ -281,10 +294,10 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
                     return (
                       <rect
                         key={`${si}-${li}`}
-                        x={x - slotGap / 2}
-                        y={Y(h) - boxH - 2}
-                        width={slotGap}
-                        height={boxH + 4}
+                        x={x - hitW / 2}
+                        y={Y(h) - boxH / 2 - hitH / 2}
+                        width={hitW}
+                        height={hitH}
                         fill="transparent"
                         className="cursor-pointer"
                         onClick={() => placeAt(si, li)}
@@ -332,8 +345,8 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
               {/* centre of mass + line of gravity (effective gravity includes braking) */}
               {showCom && (
                 <g pointerEvents="none">
-                  <line x1={X(ev.x)} y1={Y(ev.h)} x2={tipX} y2={0} stroke={lineOk ? '#22C55E' : '#FC6818'} strokeWidth={2} strokeDasharray="5 4" />
-                  <circle cx={tipX} cy={0} r={4} fill={lineOk ? '#22C55E' : '#FC6818'} />
+                  <line x1={X(ev.x)} y1={Y(ev.h)} x2={tipX} y2={0} stroke={lineColour} strokeWidth={2} strokeDasharray="5 4" />
+                  <circle cx={tipX} cy={0} r={4} fill={lineColour} />
                   <g transform={`translate(${X(ev.x)} ${Y(ev.h)})`}>
                     <circle r={8} fill="#0A1120" stroke="#00E5FF" strokeWidth={2} />
                     <path d="M0,0 L0,-8 A8,8 0 0,1 8,0 Z M0,0 L0,8 A8,8 0 0,1 -8,0 Z" fill="#00E5FF" />
@@ -344,16 +357,16 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
           </g>
           {brake > 0 && (testing || phase === 'shown' || live) && (
             <g>
-              <text x={12} y={22} fontSize={12} fontWeight={800} fill="#FFA878">
+              <text x={12} y={22} fontSize={sv.font(12, 13)} fontWeight={800} fill="#FFA878">
                 BRAKING {brake} g →
               </text>
-              <text x={12} y={38} fontSize={10} fill="#A7B0C0">
+              <text x={12} y={22 + sv.font(16, 18)} fontSize={sv.font(10)} fill="#A7B0C0">
                 the robot “feels” gravity tilted forward
               </text>
             </g>
           )}
-          {showCom && (
-            <text x={VW - 10} y={22} textAnchor="end" fontSize={12} fontWeight={800} fill={lineOk ? '#22C55E' : '#FFA878'}>
+          {revealed && (
+            <text x={VW - 10} y={22} textAnchor="end" fontSize={sv.font(12, 13)} fontWeight={800} fill={lineOk ? '#22C55E' : '#FFA878'}>
               {lineOk ? 'Stays up' : `Tips ${res.tips}!`}
             </text>
           )}

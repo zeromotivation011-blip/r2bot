@@ -14,7 +14,7 @@
 // feedback is the template's own kind explanation, and after three misses a
 // "finish for now" exit appears so nobody is trapped.
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import type { CheckResult, TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
 
@@ -98,6 +98,44 @@ export function useAnimationFrame(active: boolean, cb: (dt: number) => void): vo
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
   }, [active])
+}
+
+/**
+ * Keeps SVG text and tap targets readable when a viewBox is scaled down on a
+ * phone. Attach `ref` to the <svg>; `px(n)` is how many viewBox units make n
+ * real pixels, and `font(base)` is `base` but never under 12 rendered px.
+ * The first render (server and client) assumes 1:1, so hydration matches.
+ */
+export function useSvgScale<T extends Element = SVGSVGElement>(
+  viewBoxWidth: number,
+  /** Pass when the svg has a fixed CSS height (then it may be scaled by height, not width). */
+  viewBoxHeight?: number,
+): {
+  ref: RefObject<T | null>
+  px: (n: number) => number
+  font: (base: number, minPx?: number) => number
+} {
+  const ref = useRef<T | null>(null)
+  const [k, setK] = useState(1)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const update = () => {
+      const { width: w, height: h } = el.getBoundingClientRect()
+      if (!(w > 0)) return
+      // preserveAspectRatio "meet": the smaller of the two scales wins.
+      const kw = viewBoxWidth / w
+      const kh = viewBoxHeight && h > 0 ? viewBoxHeight / h : 0
+      setK(Math.round(Math.max(kw, kh) * 100) / 100)
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [viewBoxWidth, viewBoxHeight])
+  const px = useCallback((n: number) => n * k, [k])
+  const font = useCallback((base: number, minPx = 12) => Math.round(Math.max(base, minPx * k) * 10) / 10, [k])
+  return { ref, px, font }
 }
 
 export const btnPrimary =

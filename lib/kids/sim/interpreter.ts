@@ -30,6 +30,8 @@ export interface InterpreterCtx {
   vars: Map<string, number>
   /** Block id currently running (for the editor's highlight). */
   active: string | null
+  /** Every block id that has started running at least once (a challenge can ask "did the loop actually run?"). */
+  ran: Set<string>
   /** Ticks completed (advanced by the runner). */
   tick: number
   ops: number
@@ -129,6 +131,7 @@ function* loopPass(body: Stmt[], ctx: InterpreterCtx): Gen {
 
 function* runStmt(s: Stmt, ctx: InterpreterCtx): Gen {
   ctx.active = s.id
+  ctx.ran.add(s.id)
   if (++ctx.ops > OPS_PER_TICK) yield
   const sim = ctx.sim
   const n = (e: Expr) => num(evaluate(e, ctx))
@@ -168,7 +171,9 @@ function* runStmt(s: Stmt, ctx: InterpreterCtx): Gen {
       return
     }
     case 'turn_degrees': {
-      const deg = n(s.deg)
+      // Block convention (the curriculum contract, ROS/maths): positive = turn LEFT, counter-clockwise.
+      // The gyro heading is a compass (it grows turning right), so a left turn makes it smaller.
+      const deg = -n(s.deg)
       const sp = Math.abs(n(s.speedPct))
       if (deg === 0 || sp === 0) return
       const dir = Math.sign(deg)
@@ -255,7 +260,7 @@ export interface Interpreter {
 }
 
 export function createInterpreter(program: Program, sim: Sim): Interpreter {
-  const ctx: InterpreterCtx = { sim, vars: new Map(), active: null, tick: 0, ops: 0 }
+  const ctx: InterpreterCtx = { sim, vars: new Map(), active: null, ran: new Set(), tick: 0, ops: 0 }
   const gen = runList(program.body, ctx)
   let done = false
   let started = false

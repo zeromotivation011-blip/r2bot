@@ -11,7 +11,15 @@
 //   6. regressions found in review: sensors are a pure read, loop timing is
 //      exact, a wall is not "slipping", a spin is not "stuck", stalled blocks
 //      give up, low objects are seen, forever programs can succeed, disabled
-//      blocks do not run, light_on takes effect at once.
+//      blocks do not run, light_on takes effect at once;
+//   7. Level 1 calibration: turn_degrees +90 is a LEFT turn, the pen draws at
+//      the turning centre (a turn on the spot leaves a dot), soft sand halves a
+//      two-wheeler's speed without stopping it, a heavy load slows it uphill and
+//      a stopped robot holds on a slope;
+//   8. every Level 1 challenge arena (lib/kids/sim/arenas/level1.ts): its
+//      palette, required parts and start match the curriculum session; its
+//      reference program succeeds with the session's robot for ALL FOUR bodies;
+//      every taught mistake fails for the taught reason; runs are deterministic.
 //
 // Run:  npx tsx lib/kids/sim/verify.ts
 
@@ -26,6 +34,11 @@ import { createInterpreter } from './interpreter'
 import type { Expr, Program, Stmt } from './program'
 import { loadRapier, type Rapier } from './rapier'
 import { createRun, runHeadless, type RunResult } from './run'
+import { LEVEL1_ARENAS, sessionDesign, toPalette } from './arenas/level1'
+import { awardStars, compile, createChallengeRun, judgeChallengeRun, referenceFor, runChallengeHeadless } from './challenge'
+import { LEVEL1_SESSIONS } from '../curriculum/level1'
+import { HEADING_DEG } from './arenas/level1'
+import type { BodyId } from '../robot-design'
 
 const N = (v: number): Expr => ({ k: 'number', v })
 const offsetTimes = (k: number): Expr => ({ k: 'math', op: '*', a: N(k), b: { k: 'sensor', s: 'line_offset' } })
@@ -76,7 +89,8 @@ const open = (over: Partial<Arena> = {}): Arena => ({
 })
 
 function runTurn(sim: Sim, speed: number): number {
-  const interp = createInterpreter({ body: [{ op: 'turn_degrees', id: 't', deg: { k: 'number', v: 90 }, speedPct: { k: 'number', v: speed } }] }, sim)
+  // -90 = a quarter turn RIGHT (positive is left): the compass heading grows by 90.
+  const interp = createInterpreter({ body: [{ op: 'turn_degrees', id: 't', deg: { k: 'number', v: -90 }, speedPct: { k: 'number', v: speed } }] }, sim)
   for (let i = 0; i < 600 && interp.advance(); i++) sim.step()
   for (let i = 0; i < 90; i++) sim.step() // let it come to rest
   const h = sim.headingUnwrapped()
@@ -311,6 +325,138 @@ async function main(): Promise<void> {
     const after = sim.sensors().floorColor
     push('light: light_on then floor colour reads at once', before === 'black' && after === 'red', `${before} → ${after}`)
     sim.dispose()
+  }
+
+  // ── Level 1 calibration ───────────────────────────────────────────────────
+  {
+    const sim = createSim(R, open(), DEFAULT_DESIGN)
+    const it = createInterpreter({ body: [{ op: 'turn_degrees', id: 't', deg: N(90), speedPct: N(40) }] }, sim)
+    for (let i = 0; i < 600 && it.advance(); i++) sim.step()
+    push('turn: turn_degrees +90 is a quarter turn LEFT (the curriculum contract)', Math.abs(sim.sensors().headingDeg - 270) < 2, `heading ${sim.sensors().headingDeg}°`)
+    sim.dispose()
+  }
+  {
+    // Pen at the turning centre: a quarter turn on the spot leaves a dot (< 1 cm), for every body.
+    const spread: string[] = []
+    let ok = true
+    for (const body of ['box', 'dome', 'tall', 'bug'] as BodyId[]) {
+      const sim = createSim(R, open(), { ...DEFAULT_DESIGN, body, tool: 'pen' })
+      const it = createInterpreter({ body: [{ op: 'pen_down', id: 'p' }, { op: 'turn_degrees', id: 't', deg: N(-90), speedPct: N(40) }, { op: 'turn_degrees', id: 't2', deg: N(180), speedPct: N(40) }] }, sim)
+      for (let i = 0; i < 900 && it.advance(); i++) sim.step()
+      let w = 0
+      for (let i = 0; i + 1 < sim.trail.length; i += 2) w = Math.max(w, Math.hypot(sim.trail[i] - sim.trail[0], sim.trail[i + 1] - sim.trail[1]))
+      ok = ok && w < 0.01
+      spread.push(`${body} ${(w * 100).toFixed(1)} cm`)
+      sim.dispose()
+    }
+    push('pen: draws at the turning centre — a turn on the spot leaves a dot', ok, spread.join(', '))
+  }
+  {
+    // Soft sand: about half the mat speed at Hop power, for every body; never a stop.
+    const out: string[] = []
+    let ok = true
+    for (const body of ['box', 'dome', 'tall', 'bug'] as BodyId[]) {
+      const d = { ...DEFAULT_DESIGN, body }
+      const go = (floor: Arena['floor']) => {
+        const sim = createSim(R, open({ floor }), d)
+        const z0 = sim.snapshot().robot.p.z
+        sim.setMotors(80, 80)
+        for (let i = 0; i < Math.round(3 / DT); i++) sim.step()
+        const z = sim.snapshot().robot.p.z - z0
+        sim.dispose()
+        return z
+      }
+      const r = go('soft-sand') / go('tile')
+      ok = ok && r > 0.4 && r < 0.6
+      out.push(`${body} ${(r * 100).toFixed(0)}%`)
+    }
+    push('soft sand (Level 1): a two-wheeler goes about half as far, never stops', ok, out.join(', '))
+  }
+  {
+    // A stopped robot holds still on a 10° ramp (geared motors), and a heavy load slows it uphill.
+    // A 10° ramp from z = -2.0 to -0.4 (rise 28 cm); the robot starts 40 cm before it.
+    const ramp = open({ ramps: [{ center: [0, -1.2], size: [0.8, 1.6], height: 0.28, riseHeadingDeg: 0 }], start: { pos: [0, -2.4], headingDeg: 0 } })
+    const climb = (extra: number) => {
+      const sim = createSim(R, extra > 0 ? { ...ramp, objects: [{ id: 'w', kind: 'cube', pos: [0, -2.4 + 0.2], size: 0.04, mass: extra }] } : ramp, { ...DEFAULT_DESIGN, tool: 'scoop' })
+      if (extra > 0) sim.grip(true)
+      sim.setMotors(80, 80)
+      for (let i = 0; i < Math.round(4 / DT); i++) sim.step()
+      const z1 = sim.snapshot().robot.p.z
+      sim.setMotors(0, 0)
+      for (let i = 0; i < Math.round(2 / DT); i++) sim.step()
+      const z2 = sim.snapshot().robot.p.z
+      sim.dispose()
+      return { up: z1 + 2.4, back: z1 - z2 }
+    }
+    const light = climb(0)
+    const heavy = climb(0.8)
+    push('ramp: a 0.8 kg load slows a two-wheeler uphill; stopped, it holds', heavy.up < light.up * 0.85 && heavy.back < 0.01 && light.back < 0.01, `4 s from the foot: ${(light.up * 100).toFixed(0)} cm empty, ${(heavy.up * 100).toFixed(0)} cm loaded; rolled back ${(light.back * 100).toFixed(1)} / ${(heavy.back * 100).toFixed(1)} cm after stopping`)
+  }
+
+  // ── Level 1 challenge arenas ──────────────────────────────────────────────
+  push('level 1: one challenge arena per session', LEVEL1_ARENAS.length === 24 && LEVEL1_ARENAS.every((a, i) => a.id === LEVEL1_SESSIONS[i].id), LEVEL1_ARENAS.map((a) => a.id).join(' '))
+  for (const ch of LEVEL1_ARENAS) {
+    const session = LEVEL1_SESSIONS.find((x) => x.id === ch.id)
+    if (!session) {
+      push(`${ch.id}: matches a curriculum session`, false, 'no session')
+      continue
+    }
+    const spec = session.challenge
+    const pal = JSON.stringify(toPalette(spec.allowedBlocks))
+    const start = ch.arena.start
+    const specStart = spec.arena.start
+    push(
+      `${ch.id}: palette, parts and start match the curriculum`,
+      pal === JSON.stringify(ch.palette) &&
+        JSON.stringify([...spec.arena.requires].sort()) === JSON.stringify([...ch.requires].sort()) &&
+        start.headingDeg === HEADING_DEG[specStart.heading] &&
+        ch.specArena === spec.arena.id &&
+        ch.title === spec.title,
+      `${ch.palette.map((b) => b.label).join(', ')} | needs ${ch.requires.join('+') || 'nothing'} | ${spec.arena.id}`,
+    )
+    const results: string[] = []
+    let allOk = true
+    for (const body of ['box', 'dome', 'tall', 'bug'] as BodyId[]) {
+      const d = sessionDesign(ch, { ...DEFAULT_DESIGN, body })
+      const ref = referenceFor(ch, d)
+      const r = runChallengeHeadless(R, ch, d, ref)
+      allOk = allOk && r.success
+      results.push(`${body} ${r.success ? `✓ ${r.time}s` : `✗ ${r.reason}: ${r.message}`}`)
+    }
+    push(`${ch.id}: reference succeeds with the session robot (all 4 bodies)`, allOk, results.join(' · '))
+    const box = sessionDesign(ch, { ...DEFAULT_DESIGN, body: 'box' })
+    for (const f of ch.failures) {
+      const out: string[] = []
+      let ok = true
+      for (const body of ['box', 'dome', 'tall', 'bug'] as BodyId[]) {
+        const d = { ...sessionDesign(ch, { ...DEFAULT_DESIGN, body }), ...(f.parts ?? {}) }
+        const r = runChallengeHeadless(R, ch, d, f.program ?? referenceFor(ch, d))
+        ok = ok && !r.success && r.reason === f.expect
+        out.push(`${body} ${r.success ? 'succeeded' : r.reason}`)
+      }
+      push(`${ch.id}: taught mistake “${f.name}” fails with "${f.expect}"`, ok, out.join(' · '))
+    }
+    // A robot without the needed part is refused with a "fit the part" message.
+    const needsPart = ch.requires.find((c) => c !== 'move')
+    if (needsPart) {
+      const bare = { ...box, head: 'antenna' as const, tool: 'none' as const, sensor: 'none' as const }
+      const r = runChallengeHeadless(R, ch, bare, ch.reference)
+      push(`${ch.id}: without the ${needsPart} part the run is refused`, !r.success && r.reason === 'missing-part', r.message)
+    }
+    // Deterministic, and stars computed.
+    const prog = compile(ch.palette, ch.reference)
+    const fp = () => {
+      const cr = createChallengeRun(R, ch, box, prog)
+      for (let k = 0; k < Math.ceil((ch.arena.timeLimit + 4) / DT) && !cr.done; k++) cr.tick()
+      const p = cr.run.sim.snapshot().robot.p
+      const res = judgeChallengeRun(ch, cr, prog, ch.reference)
+      cr.run.sim.dispose()
+      return { key: [p.x, p.y, p.z].map((v) => v.toFixed(9)).join('|'), res }
+    }
+    const a1 = fp()
+    const a2 = fp()
+    const stars = awardStars(ch, { nodes: ch.reference, program: prog, result: a1.res, history: [] })
+    push(`${ch.id}: deterministic; ${stars.stars}★ for the reference`, a1.key === a2.key && stars.stars >= 1, `${a1.key.slice(0, 40)}${stars.claimable.length ? ` (claimable: ${stars.claimable.join(', ')})` : ''}`)
   }
 
   let failed = 0

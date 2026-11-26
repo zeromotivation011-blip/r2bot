@@ -14,8 +14,9 @@
 //   3. GRIP — on a slope the robot slips if tan(slope) is more than the grip
 //      (friction coefficient) of the ground. Tracks and feet grip a bit better.
 //   4. PUSH — the drive force is motor torque ÷ wheel radius, so a BIGGER wheel
-//      is faster but pushes more weakly. Uphill it must beat weight × (sin θ +
-//      rolling resistance × cos θ) or it stalls.
+//      is faster but pushes more weakly. A leg is a lever too: its push is
+//      torque ÷ leg length (the hip motor turns the whole leg). Uphill every
+//      drive must beat weight × (sin θ + resistance × cos θ) or it stalls.
 //   5. SPEED — wheels/tracks: π × diameter × rpm ÷ 60, slowed by rough or soft
 //      ground; legs: ~half a leg length per step, one step per motor turn.
 //
@@ -112,8 +113,9 @@ export interface Params {
   /** Wheel/sprocket/leg-crank speed after the gearbox, rpm (10–600). Default 120. */
   motorRpm?: number
   /**
-   * Total drive torque at the wheels, N·m. When given, slopes need enough PUSH
-   * (torque ÷ radius) — bigger wheels push more weakly. Omit for ages 5–10.
+   * Total drive torque at the wheels (or hips), N·m. When given, slopes need
+   * enough PUSH — torque ÷ wheel radius, or torque ÷ leg length for legs — so
+   * bigger wheels and longer legs push more weakly. Omit for ages 5–10.
    */
   motorTorqueNm?: number
   /** The run must finish within this many seconds. Omit = just finish. */
@@ -180,7 +182,9 @@ export function run(p: Params, a: Answer): RunResult {
   const W = p.robotMassKg * G
   const pressureKPa = W / contactArea(a) / 1000
   const climb = climbCm(a)
-  const pushN = p.motorTorqueNm !== undefined && a.kind !== 'legs' ? p.motorTorqueNm / (a.diameterCm / 200) : null
+  // Lever arm: wheel / sprocket radius, or the whole leg (hip joint to foot).
+  const armM = a.kind === 'legs' ? a.diameterCm / 100 : a.diameterCm / 200
+  const pushN = p.motorTorqueNm !== undefined ? p.motorTorqueNm / armM : null
   const v0 = topSpeed(p, a)
   const segments: SegmentRun[] = []
   let total = 0
@@ -225,9 +229,12 @@ export function run(p: Params, a: Answer): RunResult {
           fail = {
             reason: 'stalls',
             at: s.length * 0.25,
-            explain: `going up needs ${Math.round(need)} N of push but the motors give only ${Math.round(pushN)} N with ${a.diameterCm} cm ${
-              a.kind === 'tracks' ? 'sprockets' : 'wheels'
-            } (push = torque ÷ radius). Smaller wheels push harder.`,
+            explain:
+              a.kind === 'legs'
+                ? `going up needs ${Math.round(need)} N of push but the hip motors give only ${Math.round(pushN)} N with ${a.diameterCm} cm legs (push = torque ÷ leg length). Shorter legs push harder.`
+                : `going up needs ${Math.round(need)} N of push but the motors give only ${Math.round(pushN)} N with ${a.diameterCm} cm ${
+                    a.kind === 'tracks' ? 'sprockets' : 'wheels'
+                  } (push = torque ÷ radius). Smaller ${a.kind === 'tracks' ? 'sprockets' : 'wheels'} push harder.`,
           }
       }
     }

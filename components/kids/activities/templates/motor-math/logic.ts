@@ -205,7 +205,7 @@ export function explain(p: Params, r: DriveResult): string {
   const turnsPart =
     p.command === 'ticks'
       ? (p.ticksPerRev ?? 1) === 1
-        ? `${r2(r.turns)} turns`
+        ? `${r2(r.turns)} turn${r.turns === 1 ? '' : 's'}`
         : `${r2(r.turns * (p.ticksPerRev ?? 1))} ticks ÷ ${p.ticksPerRev} per turn = ${r2(r.turns)} turns`
       : `${r2(r.turnsPerS)} turns a second × ${r2(r.timeS)} s = ${r2(r.turns)} turns`
   const slip = (p.slip ?? 0) > 0 ? ` minus ${Math.round((p.slip ?? 0) * 100)}% slip` : ''

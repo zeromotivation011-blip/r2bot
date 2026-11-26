@@ -33,6 +33,7 @@ export default function PredictOutputClient({ params, onSubmit, onDone, band }: 
   const view = params.view ?? 'python'
   const [showPy, setShowPy] = useState(view === 'python')
   const askOutput = params.ask.kind === 'output'
+  const askName = params.ask.kind === 'variable' ? params.ask.name : ''
   const showCount = params.showOutputCount ?? true
   const expectedLen = compiled?.expected.length ?? 1
   const [values, setValues] = useState<string[]>(() => Array.from({ length: askOutput ? (showCount ? expectedLen : 1) : 1 }, () => ''))
@@ -44,7 +45,7 @@ export default function PredictOutputClient({ params, onSubmit, onDone, band }: 
   const locked = !!state.result?.correct || state.done
 
   // Trace player (unlocked after the first prediction).
-  const trace = compiled?.result.trace ?? []
+  const trace = useMemo(() => compiled?.result.trace ?? [], [compiled])
   const [step, setStep] = useState(-1)
   const [playing, setPlaying] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -195,11 +196,11 @@ export default function PredictOutputClient({ params, onSubmit, onDone, band }: 
       </Panel>
 
       <div className="flex flex-col gap-3">
-        <Panel title={askOutput ? 'Your prediction: what does the robot print?' : `Your prediction: what is ${params.ask.name} at the end?`}>
+        <Panel title={askOutput ? 'Your prediction: what does the robot print?' : `Your prediction: what is ${askName} at the end?`}>
           <div className="rounded-xl bg-[#060B16] p-3" role="group" aria-label="Prediction">
             {values.map((v, i) => (
               <label key={i} className="mb-1.5 flex items-center gap-2 last:mb-0">
-                <span className="w-16 shrink-0 font-mono text-[14px] text-[#6E7888]">{askOutput ? `line ${i + 1}` : `${params.ask.kind === 'variable' ? params.ask.name : ''} =`}</span>
+                <span className="w-16 shrink-0 font-mono text-[14px] text-[#6E7888]">{askOutput ? `line ${i + 1}` : `${askName} =`}</span>
                 <input
                   ref={(el) => { inputs.current[i] = el }}
                   value={v}
@@ -207,7 +208,7 @@ export default function PredictOutputClient({ params, onSubmit, onDone, band }: 
                   autoComplete="off"
                   spellCheck={false}
                   disabled={locked}
-                  aria-label={askOutput ? `Printed line ${i + 1}` : `Final value of ${params.ask.kind === 'variable' ? params.ask.name : ''}`}
+                  aria-label={askOutput ? `Printed line ${i + 1}` : `Final value of ${askName}`}
                   onFocus={() => setFocus(i)}
                   onChange={(e) => setValue(i, e.target.value.slice(0, 7))}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !locked) submit() }}

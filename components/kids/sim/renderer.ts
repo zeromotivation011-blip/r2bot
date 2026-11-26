@@ -26,7 +26,7 @@ const COLOR_HEX: Record<FloorColor, string> = {
   blue: '#3B82F6',
   yellow: '#FACC15',
 }
-const SURFACE_BASE: Record<Surface, string> = { tile: '#E2E8F0', carpet: '#B4536B', sand: '#E9C98B', ice: '#BAE6FD', rocks: '#9CA3AF' }
+const SURFACE_BASE: Record<Surface, string> = { tile: '#E2E8F0', carpet: '#B4536B', sand: '#E9C98B', 'soft-sand': '#F2D9A6', ice: '#BAE6FD', rocks: '#9CA3AF' }
 const PX_PER_M = 320
 
 function drawShape(ctx: CanvasRenderingContext2D, s: Shape2D, toPx: (x: number, z: number) => [number, number]): void {
@@ -86,7 +86,7 @@ function floorTexture(arena: Arena): THREE.CanvasTexture {
       for (let i = 0; i < n; i++) {
         const x = rnd() * w * PX_PER_M
         const y = rnd() * d * PX_PER_M
-        if (s === 'sand') {
+        if (s === 'sand' || s === 'soft-sand') {
           ctx.fillStyle = rnd() > 0.5 ? 'rgba(180,140,80,0.5)' : 'rgba(255,240,200,0.5)'
           ctx.fillRect(x, y, 3, 3)
         } else if (s === 'carpet') {
@@ -145,8 +145,47 @@ function floorTexture(arena: Arena): THREE.CanvasTexture {
     })
     ctx.stroke()
   }
+  // Level 1 tile grid, drawn over the floor so a child can count squares.
+  if (arena.grid) {
+    const { cols, rows, tile } = arena.grid
+    ctx.strokeStyle = 'rgba(15,23,42,0.28)'
+    ctx.lineWidth = 3
+    for (let c = 0; c <= cols; c++) {
+      const x = (c - cols / 2) * tile
+      const [ax, ay] = toPx(-x, (rows / 2) * tile)
+      const [bx, by] = toPx(-x, (-rows / 2) * tile)
+      ctx.beginPath()
+      ctx.moveTo(ax, ay)
+      ctx.lineTo(bx, by)
+      ctx.stroke()
+    }
+    for (let r = 0; r <= rows; r++) {
+      const z = (rows / 2 - r) * tile
+      const [ax, ay] = toPx((cols / 2) * tile, z)
+      const [bx, by] = toPx((-cols / 2) * tile, z)
+      ctx.beginPath()
+      ctx.moveTo(ax, ay)
+      ctx.lineTo(bx, by)
+      ctx.stroke()
+    }
+  }
+  // Dotted guides for drawing tasks.
+  ctx.setLineDash([0.025 * PX_PER_M, 0.025 * PX_PER_M])
+  ctx.strokeStyle = 'rgba(234,88,12,0.75)'
+  ctx.lineWidth = 0.012 * PX_PER_M
+  for (const gd of arena.guides ?? []) {
+    ctx.beginPath()
+    gd.points.forEach((p, i) => {
+      const [x, y] = toPx(p[0], p[1])
+      if (i === 0) ctx.moveTo(x, y)
+      else ctx.lineTo(x, y)
+    })
+    ctx.stroke()
+  }
+  ctx.setLineDash([])
   // Region labels.
-  ctx.font = `800 ${0.07 * PX_PER_M}px system-ui, sans-serif`
+  // Small enough that a label fits inside a Level 1 tile (35 cm).
+  ctx.font = `800 ${(arena.grid ? 0.042 : 0.07) * PX_PER_M}px system-ui, sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   for (const r of arena.regions) {
@@ -167,6 +206,52 @@ function shapeMesh(s: Shape2D, mat: THREE.Material): THREE.Mesh {
   m.rotation.x = -Math.PI / 2
   m.position.set(s.center[0], 0.003, s.center[1])
   return m
+}
+
+/** A simple, readable model for a named thing in the world, built from the floor up. */
+function propMesh(kind: string, size: [number, number], height: number, color = '#F59E0B', round = false): THREE.Object3D {
+  const g = new THREE.Group()
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.55 })
+  const add = (m: THREE.Mesh, y: number) => {
+    m.position.y = y
+    m.castShadow = true
+    m.receiveShadow = true
+    g.add(m)
+  }
+  const [w, d] = size
+  if (kind === 'person') {
+    const r = Math.min(w, d) / 2
+    add(new THREE.Mesh(new THREE.CylinderGeometry(r * 0.75, r, height * 0.72, 20), mat), height * 0.36)
+    add(new THREE.Mesh(new THREE.SphereGeometry(r * 0.7, 20, 14), new THREE.MeshStandardMaterial({ color: '#FDE7C7', roughness: 0.6 })), height * 0.72 + r * 0.6)
+    return g
+  }
+  if (kind === 'dog') {
+    const r = Math.min(w, d) / 2
+    add(new THREE.Mesh(new RoundedBoxGeometry(r * 2, height * 0.55, r * 2.4, 2, r * 0.3), mat), height * 0.4)
+    add(new THREE.Mesh(new THREE.SphereGeometry(r * 0.7, 16, 12), mat), height * 0.85)
+    return g
+  }
+  if (kind === 'flowers') {
+    const r = Math.min(w, d) / 2
+    add(new THREE.Mesh(new THREE.CylinderGeometry(r, r * 0.8, height * 0.6, 20), new THREE.MeshStandardMaterial({ color: '#B45309', roughness: 0.7 })), height * 0.3)
+    add(new THREE.Mesh(new THREE.SphereGeometry(r * 0.95, 16, 12), mat), height * 0.75)
+    return g
+  }
+  if (kind === 'fountain') {
+    const r = Math.min(w, d) / 2
+    add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, height * 0.5, 28), new THREE.MeshStandardMaterial({ color: '#94A3B8', roughness: 0.5 })), height * 0.25)
+    add(new THREE.Mesh(new THREE.CylinderGeometry(r * 0.85, r * 0.85, 0.01, 28), mat), height * 0.5 + 0.006)
+    add(new THREE.Mesh(new THREE.CylinderGeometry(r * 0.12, r * 0.12, height * 0.5, 12), new THREE.MeshStandardMaterial({ color: '#CBD5E1' })), height * 0.75)
+    return g
+  }
+  if (kind === 'barrier') {
+    add(new THREE.Mesh(new THREE.BoxGeometry(w, height * 0.25, d), new THREE.MeshStandardMaterial({ color: '#F8FAFC', roughness: 0.5 })), height * 0.85)
+    add(new THREE.Mesh(new THREE.BoxGeometry(w, height * 0.25, d * 1.01), mat), height * 0.6)
+    return g
+  }
+  const geo = round ? new THREE.CylinderGeometry(w / 2, w / 2, height, 28) : new RoundedBoxGeometry(w, height, d, 2, Math.min(0.02, w / 6, d / 6))
+  add(new THREE.Mesh(geo, mat), height / 2)
+  return g
 }
 
 export interface FramePoses {
@@ -220,8 +305,8 @@ export class SimRenderer {
   private io: IntersectionObserver | null = null
 
   constructor(container: HTMLElement) {
-    this.stage = createStage(container, { background: '#120A2E', shadows: true, fov: 45 })
-    this.stage.scene.fog = new THREE.Fog('#120A2E', 6, 14)
+    this.stage = createStage(container, { background: '#0A1120', shadows: true, fov: 45 })
+    this.stage.scene.fog = new THREE.Fog('#0A1120', 6, 14)
     this.stage.scene.add(this.arenaGroup, this.robotRoot)
     this.controls = new OrbitControls(this.stage.camera, this.stage.renderer.domElement)
     this.controls.enableDamping = true
@@ -235,7 +320,7 @@ export class SimRenderer {
     this.trailAttr.setUsage(THREE.DynamicDrawUsage)
     this.trailGeo.setAttribute('position', this.trailAttr)
     this.trailGeo.setDrawRange(0, 0)
-    this.trailMesh = new THREE.Mesh(this.trailGeo, new THREE.MeshBasicMaterial({ color: '#7C3AED', side: THREE.DoubleSide }))
+    this.trailMesh = new THREE.Mesh(this.trailGeo, new THREE.MeshBasicMaterial({ color: '#EA580C', side: THREE.DoubleSide }))
     this.trailMesh.frustumCulled = false
     this.stage.scene.add(this.trailMesh)
 
@@ -312,7 +397,7 @@ export class SimRenderer {
     const [cx, cz] = arena.center
 
     // Surroundings: a big soft ground so the arena does not float in space.
-    const ground = new THREE.Mesh(new THREE.CircleGeometry(12, 48), new THREE.MeshStandardMaterial({ color: '#1E1548', roughness: 1 }))
+    const ground = new THREE.Mesh(new THREE.CircleGeometry(12, 48), new THREE.MeshStandardMaterial({ color: '#111C32', roughness: 1 }))
     ground.rotation.x = -Math.PI / 2
     ground.position.set(cx, -0.002, cz)
     ground.receiveShadow = true
@@ -338,8 +423,11 @@ export class SimRenderer {
       this.arenaGroup.add(m)
     }
 
+    const deckTopMat = new THREE.MeshStandardMaterial({ color: '#E2E8F0', roughness: 0.8 })
+    const sideMat = new THREE.MeshStandardMaterial({ color: '#F97316', roughness: 0.7 })
+
     // Walls (boundary + authored).
-    const wallMat = new THREE.MeshStandardMaterial({ color: '#6D28D9', roughness: 0.6 })
+    const wallMat = new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.6 })
     const capMat = new THREE.MeshStandardMaterial({ color: '#F59E0B', roughness: 0.4 })
     const wall = (a: [number, number], b: [number, number], h: number, t: number) => {
       const len = Math.hypot(b[0] - a[0], b[1] - a[1])
@@ -381,11 +469,40 @@ export class SimRenderer {
       geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
       geo.computeVertexNormals()
       const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: '#F97316', roughness: 0.7, side: THREE.DoubleSide }))
-      m.position.set(r.center[0], 0, r.center[1])
+      m.position.set(r.center[0], r.base ?? 0, r.center[1])
       m.rotation.y = headingToYaw(r.riseHeadingDeg)
       m.castShadow = true
       m.receiveShadow = true
       this.arenaGroup.add(m)
+    }
+
+    // Decks: raised floors (platforms, landings), sides a little darker than the top.
+    for (const dk of arena.decks ?? []) {
+      const base = dk.base ?? 0
+      const m = new THREE.Mesh(
+        new THREE.BoxGeometry(dk.size[0], dk.height - base, dk.size[1]),
+        [sideMat, sideMat, deckTopMat, sideMat, sideMat, sideMat],
+      )
+      m.position.set(dk.center[0], (dk.height + base) / 2, dk.center[1])
+      m.castShadow = true
+      m.receiveShadow = true
+      this.arenaGroup.add(m)
+    }
+
+    // Named props (static) and movers (moved every frame from the sim).
+    for (const p of arena.props ?? []) {
+      const obj = propMesh(p.kind, p.shape.kind === 'circle' ? [p.shape.radius * 2, p.shape.radius * 2] : p.shape.size, p.height, p.color, p.shape.kind === 'circle')
+      obj.position.set(p.shape.center[0], p.base ?? 0, p.shape.center[1])
+      this.arenaGroup.add(obj)
+    }
+    for (const m of arena.movers ?? []) {
+      const obj = propMesh(m.kind, m.size, m.height, m.color, m.kind === 'person')
+      // The sim reports a mover's centre; the mesh is built from the floor up.
+      const holder = new THREE.Group()
+      obj.position.y = -m.height / 2
+      holder.add(obj)
+      this.arenaGroup.add(holder)
+      this.bodies.set(m.id, holder)
     }
 
     // Pushable boxes and pick-up objects (moved every frame from the sim).
@@ -401,7 +518,7 @@ export class SimRenderer {
       const geo = o.kind === 'ball' ? new THREE.SphereGeometry(o.size, 24, 16) : new RoundedBoxGeometry(o.size * 2, o.size * 2, o.size * 2, 2, o.size * 0.2)
       const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: o.color ?? '#F43F5E', roughness: 0.4 }))
       m.castShadow = true
-      m.position.set(o.pos[0], o.size, o.pos[1])
+      m.position.set(o.pos[0], (o.base ?? 0) + o.size, o.pos[1])
       this.arenaGroup.add(m)
       this.bodies.set(o.id, m)
     }
@@ -430,7 +547,7 @@ export class SimRenderer {
     this.arenaGroup.add(ring)
 
     // Start marker.
-    const start = new THREE.Mesh(new THREE.RingGeometry(0.11, 0.125, 40), new THREE.MeshBasicMaterial({ color: '#A78BFA', transparent: true, opacity: 0.8 }))
+    const start = new THREE.Mesh(new THREE.RingGeometry(0.11, 0.125, 40), new THREE.MeshBasicMaterial({ color: '#22D3EE', transparent: true, opacity: 0.8 }))
     start.rotation.x = -Math.PI / 2
     start.position.set(arena.start.pos[0], 0.003, arena.start.pos[1])
     this.arenaGroup.add(start)

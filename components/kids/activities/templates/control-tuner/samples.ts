@@ -1,0 +1,82 @@
+// components/kids/activities/templates/control-tuner/samples.ts
+// Three reference activities (easy → hard). validate() is empty and
+// check(solution) is correct for each.
+
+import type { Activity } from '@/lib/kids/activities/types'
+import type { Answer, Params } from './logic'
+
+export const samples: Activity<Params, Answer>[] = [
+  {
+    id: 'control-tune-park-at-dock',
+    title: 'Park at the charging dock',
+    track: 'control',
+    band: 'builders',
+    template: 'control-tuner',
+    difficulty: 2,
+    intro: 'Spark must roll 1 metre and stop at its charging dock without crashing past it. Try full-power bang-bang, then a P controller that pushes less as it gets closer.',
+    takeaway: 'Proportional control pushes hard when far away and gently when close, so the robot slows down and stops on target.',
+    realWorld: 'Robot vacuums docking, lifts stopping at a floor and 3-D printer heads all slow down as they near their target.',
+    params: {
+      plant: 'position',
+      label: 'Drive to the dock',
+      controller: ['bang-bang', 'p'],
+      gains: { kp: { min: 0.5, max: 12, step: 0.5 } },
+      target: 1,
+      durationS: 8,
+      physics: { drag: 3 },
+      spec: { maxOvershootPct: 10, settleS: 6 },
+      showCode: false,
+    },
+    solution: { controller: 'p', kp: 3 },
+    badges: ['smooth-operator'],
+  },
+  {
+    id: 'control-tune-cruise-pi',
+    title: 'Cruise control for a delivery bot',
+    track: 'control',
+    band: 'inventors',
+    template: 'control-tuner',
+    difficulty: 3,
+    intro: 'The delivery bot must cruise at exactly 2 m/s. With only P it always runs a little slow, because drag never stops pushing back. Add I to finish the job.',
+    takeaway: 'The I term adds up leftover error over time, so it keeps pushing until the error is truly zero.',
+    realWorld: 'Car cruise control and every robot wheel-speed controller uses a PI loop like this.',
+    params: {
+      plant: 'speed',
+      label: 'Cruise at 2 m/s',
+      controller: 'pi',
+      gains: { kp: { min: 0, max: 10, step: 0.5 }, ki: { min: 0, max: 5, step: 0.25 } },
+      target: 2,
+      durationS: 10,
+      spec: { maxOvershootPct: 15, settleS: 6, maxSteadyErr: 0.05 },
+      showCode: false,
+    },
+    solution: { kp: 4, ki: 1 },
+    badges: ['pid-tuner'],
+  },
+  {
+    id: 'control-tune-drone-pid-gust',
+    title: 'Hold the drone through a gust',
+    track: 'control',
+    band: 'engineers',
+    template: 'control-tuner',
+    difficulty: 5,
+    intro: 'Tune a full PID altitude controller: climb to 2 m without overshooting, cancel gravity with the I term, and recover from a downward gust at 6 s. The height sensor is noisy.',
+    takeaway: 'P sets the speed of response, D damps it (but amplifies noise), and I removes steady error and rejects constant disturbances like gravity.',
+    realWorld: 'Every quadcopter flight controller (PX4, ArduPilot, Betaflight) runs cascaded PID loops tuned exactly like this.',
+    params: {
+      plant: 'altitude',
+      label: 'Hover at 2 m',
+      controller: 'pid',
+      gains: { kp: { min: 0, max: 40, step: 1 }, ki: { min: 0, max: 20, step: 0.5 }, kd: { min: 0, max: 15, step: 0.5 } },
+      target: 2,
+      durationS: 12,
+      disturbance: { t: 6, force: -4, durationS: 1 },
+      sensorNoise: 0.01,
+      seed: 42,
+      spec: { maxOvershootPct: 10, settleS: 10, maxSteadyErr: 0.05, bandPct: 5 },
+      showCode: true,
+    },
+    solution: { kp: 20, ki: 10, kd: 8 },
+    badges: ['hover-hero', 'pid-tuner'],
+  },
+]

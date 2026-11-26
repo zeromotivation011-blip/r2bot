@@ -523,7 +523,13 @@ export function editDistance(a: Cmd[], b: Cmd[]): number {
 }
 
 /** Kind, specific explanation of a failed run. */
+/** One kind sentence explaining a run (always starts with a capital letter). */
 export function explainRun(world: World, program: Cmd[], r: RunResult, theme: Theme, mapLabel = ''): string {
+  const s = explainRunRaw(world, program, r, theme, mapLabel)
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+function explainRunRaw(world: World, program: Cmd[], r: RunResult, theme: Theme, mapLabel = ''): string {
   const t = THEMES[theme]
   const where = mapLabel ? ` on ${mapLabel}` : ''
   const last = r.frames[r.frames.length - 1]

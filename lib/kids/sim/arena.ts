@@ -5,12 +5,17 @@
 //
 // Coordinates: x across, z forward, y up. The floor is the plane y = 0.
 // Heading 0 faces +z; heading grows when the robot turns RIGHT (clockwise seen
-// from above), like a compass.
+// from above), like a compass. (The turn_degrees BLOCK is the other way round:
+// positive = LEFT, the curriculum's ROS/maths convention — see interpreter.ts.)
 
 export type Vec2 = [number, number]
 
-/** What the floor is made of. Changes how much grip and drag each drive gets. */
-export type Surface = 'tile' | 'carpet' | 'sand' | 'ice' | 'rocks'
+/**
+ * What the floor is made of. Changes how much grip and drag each drive gets.
+ * 'soft-sand' is the Level 1 beach: it halves a two-wheeler's speed but never
+ * stops it ('sand' is the deep Level 2 fair-test sand that bogs wheels down).
+ */
+export type Surface = 'tile' | 'carpet' | 'sand' | 'soft-sand' | 'ice' | 'rocks'
 
 /** Colours a colour sensor (or a lit camera) can report. */
 export type FloorColor = 'white' | 'black' | 'red' | 'green' | 'blue' | 'yellow'
@@ -51,6 +56,8 @@ export interface Ramp {
   height: number
   /** Direction the slope rises toward, in compass degrees (0 = +z). */
   riseHeadingDeg: number
+  /** Raised: the wedge sits on top of this height (a ramp between two landings). Default 0. */
+  base?: number
 }
 
 export interface PushBox {
@@ -69,6 +76,65 @@ export interface PickupObject {
   size: number
   mass: number
   color?: string
+  /** Resting on something raised (a shelf, a ramp), metres above the floor. Default 0. */
+  base?: number
+}
+
+/**
+ * A named thing in the world (a flowerpot, a stall, a hedge, a person). Static
+ * and solid. The engine records every touch by id, so a challenge can say
+ * "don't knock the flowerpot" about one thing and allow touching another.
+ */
+export interface Prop {
+  id: string
+  /** Look and label for the renderer ('crate', 'flowers', 'person', 'hedge'…). */
+  kind: string
+  label?: string
+  shape: Shape2D
+  height: number
+  color?: string
+  /** Raised off the floor (a deck, a cog on a wall), metres. Default 0. */
+  base?: number
+}
+
+export interface Deck {
+  center: Vec2
+  size: Vec2
+  height: number
+  base?: number
+}
+
+/** One keyframe of a moving thing: where it is at time t (linear in between) and whether it is there at all. */
+export interface MoverKey {
+  t: number
+  pos: Vec2
+  /** false = lowered out of the way (a bridge barrier that is down, a visitor who has left). Holds until the next key. */
+  present?: boolean
+}
+
+/** Something that moves on a fixed timetable: a bread cart, a bridge barrier, a visitor. Same every run. */
+export interface Mover {
+  id: string
+  kind: string
+  label?: string
+  /** Footprint [x, z], metres. */
+  size: Vec2
+  height: number
+  color?: string
+  keys: MoverKey[]
+}
+
+/** A faint dotted guide painted on the floor for drawing tasks. Not a tape line: sensors do not see it. */
+export interface GuidePath {
+  points: Vec2[]
+}
+
+/** The tile grid a Level 1 arena is authored on: (col, row) from the top-left. */
+export interface ArenaGrid {
+  cols: number
+  rows: number
+  /** Tile size, metres. */
+  tile: number
 }
 
 export type Goal =
@@ -95,6 +161,12 @@ export interface Arena {
   objects: PickupObject[]
   start: { pos: Vec2; headingDeg: number }
   goal: Goal
+  props?: Prop[]
+  movers?: Mover[]
+  /** Raised flat floors: a platform, a landing. Top at `height`, solid down to `base` (default 0). */
+  decks?: Deck[]
+  guides?: GuidePath[]
+  grid?: ArenaGrid
   /** Hard stop for any program (forever loops end here). */
   timeLimit: number
 }
@@ -148,4 +220,21 @@ export function floorAt(arena: Arena, x: number, z: number, ignoreLines = false)
   }
   if (!ignoreLines && onLine(arena, x, z)) color = 'black'
   return { surface, color, dark }
+}
+
+/** Where a mover is at time t: its position and whether it is present. */
+export function moverAt(m: Mover, t: number): { pos: Vec2; present: boolean } {
+  const k = m.keys
+  if (k.length === 0) return { pos: [0, 0], present: false }
+  if (t <= k[0].t) return { pos: k[0].pos, present: k[0].present !== false }
+  for (let i = 0; i + 1 < k.length; i++) {
+    const a = k[i]
+    const b = k[i + 1]
+    if (t < b.t) {
+      const u = b.t === a.t ? 1 : (t - a.t) / (b.t - a.t)
+      return { pos: [a.pos[0] + (b.pos[0] - a.pos[0]) * u, a.pos[1] + (b.pos[1] - a.pos[1]) * u], present: a.present !== false }
+    }
+  }
+  const last = k[k.length - 1]
+  return { pos: last.pos, present: last.present !== false }
 }

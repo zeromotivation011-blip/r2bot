@@ -362,7 +362,7 @@ function Scene({ p, kind, setting, t, strain, reduced }: { p: Params; kind: Mach
         <g transform={`rotate(${reduced ? 0 : turn % 360} ${cx} ${cy})`}>
           <circle cx={cx} cy={cy} r={R} fill="none" stroke="#00B8D4" strokeWidth={4} />
           {[0, 90, 180, 270].map((a) => (
-            <line key={a} x1={cx} y1={cy} x2={cx + R * Math.cos((a * Math.PI) / 180)} y2={cy + R * Math.sin((a * Math.PI) / 180)} stroke="#00B8D4" strokeWidth={2} />
+            <line key={a} x1={cx} y1={cy} x2={(cx + R * Math.cos((a * Math.PI) / 180)).toFixed(2)} y2={(cy + R * Math.sin((a * Math.PI) / 180)).toFixed(2)} stroke="#00B8D4" strokeWidth={2} />
           ))}
           <circle cx={cx + R} cy={cy} r={6} fill="#FC6818" />
         </g>
