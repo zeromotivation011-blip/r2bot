@@ -14,6 +14,8 @@ const CW = 180 // column width
 const RH = 100 // row height
 const NW = 156 // node width
 const NH = 58 // node height
+const LANE = 14 // gap between loop-back lanes
+const SVG_MIN_SCALE = 0.86 // never draw below this, so 14-unit labels stay ≥12px; wide charts scroll on phones
 
 interface Pt { x: number; y: number }
 
@@ -116,9 +118,9 @@ export default function FlowchartBuilderClient({ params, onSubmit, onDone }: Tem
   const cols = Math.max(...params.nodes.map((n) => n.at[0])) + 1
   const rowsN = Math.max(...params.nodes.map((n) => n.at[1])) + 1
   const center = (n: FlowNode): Pt => ({ x: n.at[0] * CW + CW / 2, y: n.at[1] * RH + RH / 2 })
-  const W = cols * CW + 30
+  const isBack = (from: FlowNode, to: FlowNode) => !(to.at[1] > from.at[1]) && !(to.at[1] === from.at[1] && from.kind === 'decision')
   const H = rowsN * RH
-  const route = (from: FlowNode, to: FlowNode): { d: string; port: Pt } => {
+  const route = (from: FlowNode, to: FlowNode, lane = 0): { d: string; port: Pt } => {
     const a = center(from)
     const b = center(to)
     const top = { x: b.x, y: b.y - NH / 2 }
@@ -145,10 +147,11 @@ export default function FlowchartBuilderClient({ params, onSubmit, onDone }: Tem
     }
     // Back edge (loop): down, out to a lane right of both, up above the target, into its top.
     const p = { x: a.x, y: a.y + NH / 2 }
-    const lane = Math.max(from.at[0], to.at[0]) * CW + CW / 2 + NW / 2 + 12
-    const downY = p.y + 14
-    const upY = top.y - 16
-    return { d: `M${p.x} ${p.y} V${downY} H${lane} V${upY} H${b.x} V${top.y}`, port: p }
+    // Each loop gets its own lane (and its own height), so two loops never share a line.
+    const laneX = Math.max(from.at[0], to.at[0]) * CW + CW / 2 + NW / 2 + 12 + lane * LANE
+    const downY = p.y + 14 + lane * 8
+    const upY = top.y - 16 - lane * 6
+    return { d: `M${p.x} ${p.y} V${downY} H${laneX} V${upY} H${b.x} V${top.y}`, port: p }
   }
 
   const edges: { from: FlowNode; to: FlowNode; kind: 'next' | 'yes' | 'no' }[] = []
@@ -158,6 +161,9 @@ export default function FlowchartBuilderClient({ params, onSubmit, onDone }: Tem
     if (n.kind === 'decision') { push(swap ? n.no : n.yes, 'yes'); push(swap ? n.yes : n.no, 'no') } else push(n.next, 'next')
   })
 
+  let backCount = 0
+  const lanes = edges.map((e) => (isBack(e.from, e.to) ? backCount++ : 0))
+  const W = cols * CW + 30 + Math.max(0, backCount - 1) * LANE
   const step = run ? run.r.steps[run.i] : null
   const token = step ? byId.get(step.node) : null
   const tokenPt = token ? center(token) : null
@@ -168,10 +174,10 @@ export default function FlowchartBuilderClient({ params, onSubmit, onDone }: Tem
   const selNode = sel ? byId.get(sel) : undefined
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:items-start">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:items-start">
       <Panel title="The robot's flowchart" className="lg:sticky lg:top-4">
         <div className="overflow-x-auto rounded-xl bg-[#060B16]">
-          <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full min-w-[320px]" role="img" aria-label={`Flowchart with ${params.nodes.length} boxes${step && token ? `. The robot is at ${nodeText(token)}` : ''}.`}>
+          <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" style={{ minWidth: Math.round(W * SVG_MIN_SCALE) }} role="img" aria-label={`Flowchart with ${params.nodes.length} boxes${step && token ? `. The robot is at ${nodeText(token)}` : ''}.`}>
             <defs>
               <marker id="fc-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                 <path d="M0 0 L10 5 L0 10 Z" fill="#6E7888" />
@@ -181,7 +187,7 @@ export default function FlowchartBuilderClient({ params, onSubmit, onDone }: Tem
               </marker>
             </defs>
             {edges.map((e, k) => {
-              const { d, port } = route(e.from, e.to)
+              const { d, port } = route(e.from, e.to, lanes[k])
               const hot = run ? run.r.steps.slice(0, run.i + 1).some((s, j, arr) => s.node === e.from.id && arr[j + 1]?.node === e.to.id) : false
               return (
                 <g key={k}>
@@ -194,7 +200,7 @@ export default function FlowchartBuilderClient({ params, onSubmit, onDone }: Tem
                     return (
                       <g>
                         <rect x={lx} y={ly} width={30} height={18} rx={9} className="fill-[#060B16]" />
-                        <text x={lx + 15} y={ly + 13} textAnchor="middle" className={`font-display text-[13px] font-bold ${e.kind === 'yes' ? 'fill-[#4ADE80]' : 'fill-red-300'}`}>
+                        <text x={lx + 15} y={ly + 13} textAnchor="middle" className={`font-display text-[14px] font-bold ${e.kind === 'yes' ? 'fill-[#4ADE80]' : 'fill-red-300'}`}>
                           {e.kind}
                         </text>
                       </g>
@@ -210,7 +216,9 @@ export default function FlowchartBuilderClient({ params, onSubmit, onDone }: Tem
               const isSel = sel === n.id && !locked
               const active = step?.node === n.id
               const done = visited.has(n.id)
-              const lines = wrap(n.kind === 'start' ? n.label ?? 'Start' : n.kind === 'end' ? n.label ?? 'End' : card ? `${card.icon ? card.icon + ' ' : ''}${card.label}` : isSlot ? (n.kind === 'decision' ? '+ question' : '+ action') : '', n.kind === 'decision' ? 13 : 17)
+              const lines = isSlot && !card
+                ? [`Box ${slots.indexOf(n.id) + 1}`, n.kind === 'decision' ? '+ question' : '+ action']
+                : wrap(n.kind === 'start' ? n.label ?? 'Start' : n.kind === 'end' ? n.label ?? 'End' : card ? `${card.icon ? card.icon + ' ' : ''}${card.label}` : '', n.kind === 'decision' ? 13 : 17)
               const base = active ? 'fill-[#0E3245] stroke-[#00E5FF]' : isSlot && !card ? 'fill-[#0A1120] stroke-amber-400' : n.kind === 'decision' ? 'fill-[#2A2003] stroke-[#EAB308]' : n.kind === 'action' ? 'fill-[#19263F] stroke-amber-400/70' : 'fill-[#0F2A1E] stroke-[#22C55E]'
               const shape =
                 n.kind === 'decision' ? (
@@ -230,7 +238,7 @@ export default function FlowchartBuilderClient({ params, onSubmit, onDone }: Tem
                   {isSel && isSlot && <rect x={ct.x - NW / 2 - 7} y={ct.y - NH / 2 - 9} width={NW + 14} height={NH + 18} rx={14} className="fill-amber-500/10 stroke-amber-300" strokeWidth={2} strokeDasharray="4 4" />}
                   {shape}
                   {lines.map((l, k) => (
-                    <text key={k} x={ct.x} y={ct.y + 5 + (k - (lines.length - 1) / 2) * 16} textAnchor="middle" className={`pointer-events-none font-display text-[13px] font-bold ${isSlot && !card ? 'fill-amber-300' : 'fill-[#EEF2F8]'}`}>
+                    <text key={k} x={ct.x} y={ct.y + 5 + (k - (lines.length - 1) / 2) * 16} textAnchor="middle" className={`pointer-events-none font-display text-[14px] font-bold ${isSlot && !card ? 'fill-amber-300' : 'fill-[#EEF2F8]'}`}>
                       {l}
                     </text>
                   ))}

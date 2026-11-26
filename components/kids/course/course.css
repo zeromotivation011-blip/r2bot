@@ -1,0 +1,28 @@
+/* components/kids/course/course.css — motion for the course player.
+   Every animation is used behind Tailwind's motion-safe: variant. */
+@keyframes course-pop {
+  0% { opacity: 0; transform: translateY(6px) scale(.96); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes course-badge-in {
+  0% { opacity: 0; transform: scale(.4) rotate(-12deg); }
+  60% { opacity: 1; transform: scale(1.12) rotate(4deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+/* The rays are centred with translate(-50%,-50%); the keyframes keep that
+   translate, because an animated transform replaces the element's own. */
+@keyframes course-rays {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+.course-rays { transform: translate(-50%, -50%); }
+@keyframes course-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* app/globals.css gives every <section> 120px of vertical padding (a marketing-page
+   rule). Inside the course runner, a section without its own padding has none.
+   :where() keeps this at element specificity, so any Tailwind p-/py- class wins. */
+:where(.course-runner) section { padding-top: 0; padding-bottom: 0; }

@@ -44,7 +44,7 @@ export const samples: Activity<Params, Answer>[] = [
     difficulty: 4,
     intro: 'A Mars rover’s data block crossed space and a cosmic ray flipped one bit. Use the row and column parity checks to find it and flip it back — no resending needed.',
     takeaway: 'Two-dimensional parity can locate and correct a single flipped bit: the odd row and odd column cross at the error.',
-    realWorld: 'Spacecraft and the memory in robots use error-correcting codes (like Hamming and Reed–Solomon) built on this idea.',
+    realWorld: 'Spacecraft and the memory chips in robots use error-correcting codes such as Hamming codes, which extend this parity idea to fix flipped bits automatically.',
     params: {
       mode: 'parity',
       task: 'fix',

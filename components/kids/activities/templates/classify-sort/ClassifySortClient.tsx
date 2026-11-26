@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent as RPointerEven
 import type { TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
 import { applyRule, logic, runRule, thresholdsFor, wordValues, type Answer, type Item, type Params, type Rule } from './logic'
-import { FeedbackPanel, TemplateCard, btnGhost, btnPrimary, chip, useAttempts, useReducedMotion } from '../gear-train/TemplateFrameClient'
+import { FeedbackPanel, TemplateCard, btnGhost, btnPrimary, chip, useAttempts, useReducedMotion, useSvgScale } from '../gear-train/TemplateFrameClient'
 import { IconBox } from '../spot-in-scene/glyphs'
 
 const BIN_TINT = ['#FC6818', '#00B8D4', '#22C55E', '#FFD166']
@@ -30,7 +30,7 @@ export default function ClassifySortClient({ params: p, onSubmit, onDone }: Temp
 
   // ── drag state ──
   const [drag, setDrag] = useState<{ id: string; x: number; y: number } | null>(null)
-  const dragStart = useRef<{ id: string; x: number; y: number; moved: boolean } | null>(null)
+  const dragStart = useRef<{ id: string; x: number; y: number; moved: boolean; lastX: number; lastY: number; pointerId: number } | null>(null)
 
   const place = (itemId: string, binId: string | null) => {
     if (solved) return
@@ -48,28 +48,40 @@ export default function ClassifySortClient({ params: p, onSubmit, onDone }: Temp
   const placeRef = useRef(place)
   placeRef.current = place
 
+  const justDragged = useRef(false)
   const onCardPointerDown = (e: RPointerEvent<HTMLButtonElement>, id: string) => {
     if (solved || stage !== 'sort') return
-    dragStart.current = { id, x: e.clientX, y: e.clientY, moved: false }
+    // Touch gives the card an implicit pointer capture; release it so the
+    // move/up events are ordinary window events wherever the finger goes.
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId)
+    dragStart.current = { id, x: e.clientX, y: e.clientY, moved: false, lastX: e.clientX, lastY: e.clientY, pointerId: e.pointerId }
   }
   useEffect(() => {
     const move = (e: PointerEvent) => {
       const d = dragStart.current
-      if (!d) return
+      if (!d || e.pointerId !== d.pointerId) return
+      d.lastX = e.clientX
+      d.lastY = e.clientY
       if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 8) return
+      if (!d.moved) window.getSelection?.()?.removeAllRanges()
       d.moved = true
       setDrag({ id: d.id, x: e.clientX, y: e.clientY })
     }
     const up = (e: PointerEvent) => {
       const d = dragStart.current
+      if (!d || e.pointerId !== d.pointerId) return
       dragStart.current = null
-      if (!d) return
-      if (d.moved) {
-        const el = document.elementFromPoint(e.clientX, e.clientY)?.closest('[data-bin]') as HTMLElement | null
-        if (el) placeRef.current(d.id, el.dataset.bin === '__tray' ? null : el.dataset.bin ?? null)
-        setDrag(null)
-        setSelected(null)
-      }
+      if (!d.moved) return
+      // pointercancel carries no useful position: drop where the finger last was.
+      const x = e.type === 'pointercancel' ? d.lastX : e.clientX
+      const y = e.type === 'pointercancel' ? d.lastY : e.clientY
+      const el = document.elementFromPoint(x, y)?.closest('[data-bin]') as HTMLElement | null
+      if (el) placeRef.current(d.id, el.dataset.bin === '__tray' ? null : el.dataset.bin ?? null)
+      setDrag(null)
+      setSelected(null)
+      // Swallow the click the browser may fire on the card after a drag.
+      justDragged.current = true
+      window.setTimeout(() => (justDragged.current = false), 0)
     }
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
@@ -82,8 +94,14 @@ export default function ClassifySortClient({ params: p, onSubmit, onDone }: Temp
   }, [])
 
   const onCardClick = (id: string) => {
-    if (dragStart.current?.moved) return
+    if (justDragged.current || dragStart.current?.moved) return
     if (solved || stage !== 'sort') return
+    // Holding a card and tapping a card that is already in a bin means "put mine in that bin too".
+    if (selected && selected !== id && placements[id]) {
+      place(selected, placements[id])
+      setSelected(null)
+      return
+    }
     playSound('click')
     setSelected((s) => (s === id ? null : id))
   }
@@ -186,17 +204,21 @@ export default function ClassifySortClient({ params: p, onSubmit, onDone }: Temp
       type="button"
       data-item={item.id}
       onPointerDown={(e) => onCardPointerDown(e, item.id)}
-      onClick={() => onCardClick(item.id)}
+      onClick={(e) => {
+        // The card handles its own tap; the bin/tray behind it must not also react.
+        e.stopPropagation()
+        onCardClick(item.id)
+      }}
       aria-pressed={selected === item.id}
       disabled={stage !== 'sort' && !verdict}
       className={`relative flex min-h-[48px] touch-none select-none flex-col items-center justify-center gap-0.5 rounded-2xl border px-2 py-1.5 text-center transition-transform duration-150 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.97] ${
         selected === item.id ? 'border-amber-400 bg-amber-500/20 motion-safe:-translate-y-0.5' : 'border-white/15 bg-[#19263F]'
-      } ${drag?.id === item.id ? 'opacity-40' : ''} ${compact ? 'w-[88px]' : 'w-[104px]'}`}
+      } ${drag?.id === item.id ? 'opacity-40' : ''} ${compact ? 'w-[96px]' : 'w-[108px]'}`}
     >
       <IconBox icon={item.icon} px={compact ? 28 : 34} />
       <span className="text-[13px] font-semibold leading-tight text-[#EEF2F8]">{item.label}</span>
       {(showFeat || stage === 'rule') && (
-        <span className="text-[11px] leading-tight text-[#A7B0C0]">
+        <span className="text-[13px] leading-tight text-[#A7B0C0]">
           {p.features.map((f) => fmt(item.features[f.key], f.unit)).join(' · ')}
         </span>
       )}
@@ -255,7 +277,7 @@ export default function ClassifySortClient({ params: p, onSubmit, onDone }: Temp
                   <p className="flex items-center gap-1.5 font-display text-[15px] font-bold" style={{ color: BIN_TINT[ci] }}>
                     <span aria-hidden className="text-xl">{c.icon}</span> {c.label}
                   </p>
-                  <div className="mt-1 flex flex-wrap gap-1.5" onClick={(e) => e.stopPropagation()}>
+                  <div className="mt-1 flex flex-wrap gap-1.5">
                     {inBin.map((it) => card(it, true))}
                   </div>
                 </div>
@@ -300,6 +322,7 @@ export default function ClassifySortClient({ params: p, onSubmit, onDone }: Temp
             {feat.kind === 'number' ? (
               <NumberLine
                 items={p.items}
+                stops={thresholdsFor(p, feat.key)}
                 featKey={feat.key}
                 unit={feat.unit}
                 min={range.min}
@@ -408,6 +431,8 @@ function RuleSide({ label, cat, colour }: { label: string; cat?: { label: string
 /** 1-D plot of every example on the chosen feature, with a draggable threshold. */
 function NumberLine(props: {
   items: Item[]
+  /** Midpoints between example values: always reachable, so the best rule can be set exactly. */
+  stops: number[]
   featKey: string
   unit?: string
   min: number
@@ -417,15 +442,32 @@ function NumberLine(props: {
   disabled: boolean
   onChange: (v: number) => void
 }) {
-  const { items, featKey, unit, min, max, threshold, tint, disabled, onChange } = props
+  const { items, stops, featKey, unit, min, max, threshold, tint, disabled, onChange } = props
   const W = 400
   const H = 96
   const X = (v: number) => 16 + ((W - 32) * (v - min)) / (max - min)
-  const svg = useRef<SVGSVGElement>(null)
+  const { ref: svg, font } = useSvgScale<SVGSVGElement>(W)
   const dragging = useRef(false)
   const span = max - min
   const step = span > 50 ? 1 : span > 5 ? 0.5 : 0.1
-  const snap = (v: number) => Math.round(Math.max(min, Math.min(max, v)) / step) * step
+  // Every position the threshold can take: a round-number grid plus the
+  // midpoints between examples (which the grid may skip when values are close).
+  const grid = useMemo(() => {
+    const out = new Set<number>(stops.map((v) => Math.round(v * 1e6) / 1e6))
+    for (let v = Math.ceil(min / step) * step; v <= max + 1e-9; v += step) out.add(Math.round(v * 1e6) / 1e6)
+    return [...out].sort((a, b) => a - b)
+  }, [stops, min, max, step])
+  const snap = (v: number) => {
+    let best = grid[0] ?? v
+    for (const g of grid) if (Math.abs(g - v) < Math.abs(best - v)) best = g
+    return best
+  }
+  const nudge = (dir: 1 | -1, times: number) => {
+    let i = grid.findIndex((g) => Math.abs(g - threshold) < 1e-9)
+    if (i < 0) i = grid.findIndex((g) => g > threshold) - (dir > 0 ? 1 : 0)
+    onChange(grid[Math.max(0, Math.min(grid.length - 1, i + dir * times))])
+  }
+  const shown = (v: number) => Math.round(v * 100) / 100
   const fromEvent = (clientX: number) => {
     const b = svg.current?.getBoundingClientRect()
     if (!b) return
@@ -452,8 +494,8 @@ function NumberLine(props: {
         aria-label="Threshold"
         aria-valuemin={min}
         aria-valuemax={max}
-        aria-valuenow={threshold}
-        aria-valuetext={`${threshold}${unit ? ' ' + unit : ''}`}
+        aria-valuenow={shown(threshold)}
+        aria-valuetext={`${shown(threshold)}${unit ? ' ' + unit : ''}`}
         onPointerDown={(e) => {
           if (disabled) return
           dragging.current = true
@@ -464,13 +506,13 @@ function NumberLine(props: {
         onPointerUp={() => (dragging.current = false)}
         onKeyDown={(e) => {
           if (disabled) return
-          const d = (e.shiftKey ? 10 : 1) * step
+          const times = e.shiftKey ? 10 : 1
           if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
             e.preventDefault()
-            onChange(snap(threshold + d))
+            nudge(1, times)
           } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
             e.preventDefault()
-            onChange(snap(threshold - d))
+            nudge(-1, times)
           }
         }}
       >
@@ -479,7 +521,7 @@ function NumberLine(props: {
         {Array.from({ length: ticks + 1 }, (_, i) => min + ((max - min) * i) / ticks).map((v) => (
           <g key={v}>
             <line x1={X(v)} x2={X(v)} y1={57} y2={63} stroke="#6E7888" />
-            <text x={X(v)} y={78} fill="#A7B0C0" fontSize={11} textAnchor="middle">
+            <text x={X(v)} y={78 + (font(11, 13) - 11) * 0.6} fill="#A7B0C0" fontSize={font(11, 13)} textAnchor="middle">
               {Math.round(v * 10) / 10}
             </text>
           </g>
@@ -494,14 +536,11 @@ function NumberLine(props: {
         <text x={X(threshold)} y={12} fontSize={10} fontWeight={700} fill="#1A1103" textAnchor="middle">
           ⇔
         </text>
-        <text x={W - 16} y={94} fill="#A7B0C0" fontSize={11} textAnchor="end">
-          {unit ?? ''}
-        </text>
       </svg>
       <p className="text-[13px] text-[#A7B0C0]">
-        Dots = examples (colour = their real bin). Drag the orange line, or use the arrow keys. Threshold:{' '}
+        Dots = examples (colour = their real bin){unit ? `, values in ${unit}` : ''}. Drag the orange line, or use the arrow keys. Threshold:{' '}
         <b className="font-display text-amber-300">
-          {Math.round(threshold * 100) / 100}
+          {shown(threshold)}
           {unit ? ' ' + unit : ''}
         </b>
       </p>

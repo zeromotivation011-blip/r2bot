@@ -45,7 +45,7 @@ export const samples: Activity<Params, Answer>[] = [
     difficulty: 3,
     intro: 'The rover must stop when the wall is close and drive when the path is clear. Its distance readings are noisy, so one line makes it stutter. Add hysteresis!',
     takeaway: 'Hysteresis uses two switch points: change your mind only when the reading is clearly past the line. It stops chattering.',
-    realWorld: 'Thermostats, robot bumpers and car parking sensors all use hysteresis so they don’t click on and off constantly.',
+    realWorld: 'Thermostats, robot cliff sensors and IR line sensors (through a Schmitt trigger) use hysteresis so they don’t click on and off constantly.',
     params: {
       sensor: { name: 'Ultrasonic distance', unit: 'cm', min: 0, max: 100 },
       states: {

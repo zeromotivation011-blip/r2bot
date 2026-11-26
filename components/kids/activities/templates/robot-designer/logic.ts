@@ -74,6 +74,30 @@ export interface Params {
   slots: Slot[]
   /** Show live gauges while choosing (default true). Off (ages 14+) = compute it yourself, then test. */
   liveGauges?: boolean
+  /**
+   * A battery already fitted, Wh (young bands with no battery slot). Every
+   * design that draws power needs energy from somewhere: either this or a
+   * battery part (energyWh). Shown as "battery included".
+   */
+  builtInBatteryWh?: number
+  /** Friendly names for terrain ids on part cards, e.g. { floor: 'indoor floors' }. Common ids have defaults. */
+  terrainNames?: Record<string, string>
+}
+
+const TERRAIN_NAMES: Record<string, string> = {
+  floor: 'indoor floors',
+  road: 'roads and pavements',
+  sand: 'sand',
+  mud: 'mud',
+  grass: 'grass',
+  stairs: 'stairs',
+  water: 'water',
+  snow: 'snow',
+  air: 'air',
+}
+
+export function terrainName(p: Params, id: string): string {
+  return p.terrainNames?.[id] ?? TERRAIN_NAMES[id] ?? id
 }
 
 export interface Answer {
@@ -103,7 +127,7 @@ export function totals(p: Params, ids: string[]): Totals {
   const ps = partsOf(p, ids)
   const sum = (f: (x: Part) => number) => ps.reduce((a, x) => a + f(x), 0)
   const powerW = sum((x) => x.powerW)
-  const energyWh = sum((x) => x.energyWh ?? 0)
+  const energyWh = sum((x) => x.energyWh ?? 0) + (p.builtInBatteryWh ?? 0)
   const drives = ps.filter((x) => x.payloadKg !== undefined || x.terrains)
   const payloadKg = drives.length ? Math.min(...drives.map((x) => x.payloadKg ?? Infinity)) : null
   return {
@@ -126,6 +150,11 @@ export interface Problem {
 
 export function problems(p: Params, ids: string[]): Problem[] {
   const out: Problem[] = []
+  const known = new Set(p.slots.flatMap((s) => s.parts.map((x) => x.id)))
+  const unknown = ids.filter((id) => !known.has(id))
+  if (unknown.length) out.push({ kind: 'slot', text: `“${unknown[0]}” is not one of the parts on offer.` })
+  if (new Set(ids).size !== ids.length) out.push({ kind: 'slot', text: 'Each part can only be fitted once.' })
+  if (out.length) return out
   for (const s of p.slots) {
     const n = ids.filter((id) => s.parts.some((x) => x.id === id)).length
     const min = s.min ?? 1
@@ -141,7 +170,9 @@ export function problems(p: Params, ids: string[]): Problem[] {
     out.push({ kind: 'payload', text: `The robot weighs ${r2(t.massKg)} kg but its drive can only carry ${r2(t.payloadKg)} kg — the motors would stall. Use lighter parts or a stronger drive.` })
   if (t.cost > p.budget) out.push({ kind: 'budget', text: `It costs ${t.cost} coins — ${t.cost - p.budget} over the budget of ${p.budget}. Swap an expensive part for a cheaper one that still does the job.` })
   if (p.maxMassKg !== undefined && t.massKg > p.maxMassKg + 1e-9) out.push({ kind: 'mass', text: `It weighs ${r2(t.massKg)} kg; the limit is ${p.maxMassKg} kg. Heavy batteries and tools add up fast.` })
-  if (p.minRuntimeMin !== undefined && t.runtimeMin + 1e-9 < p.minRuntimeMin)
+  if (t.powerW > 0 && t.energyWh <= 0)
+    out.push({ kind: 'runtime', text: `Its parts need ${t.powerW} W of power, but there is no battery — the robot can’t move at all. Add a battery.` })
+  else if (p.minRuntimeMin !== undefined && t.runtimeMin + 1e-9 < p.minRuntimeMin)
     out.push({
       kind: 'runtime',
       text: `The battery lasts ${Math.floor(t.runtimeMin)} minutes (${t.energyWh} Wh ÷ ${t.powerW} W × 60) but the job needs ${p.minRuntimeMin}. Use a bigger battery or parts that draw less power.`,
@@ -212,7 +243,11 @@ function validate(p: Params): string[] {
   }
   for (const need of p.requires ?? []) if (!p.abilityLabels?.[need]) out.push(`requires ${need}: missing from abilityLabels`)
   if (!p.slots.some((s) => s.parts?.some((x) => x.terrains))) out.push('at least one part must be a drive (with terrains)')
-  if (p.minRuntimeMin !== undefined && !p.slots.some((s) => s.parts?.some((x) => x.energyWh))) out.push('minRuntimeMin needs at least one battery part (energyWh)')
+  const hasBatteryPart = p.slots.some((s) => s.parts?.some((x) => x.energyWh))
+  if (p.minRuntimeMin !== undefined && !hasBatteryPart && !p.builtInBatteryWh) out.push('minRuntimeMin needs a battery part (energyWh) or builtInBatteryWh')
+  if (p.builtInBatteryWh !== undefined && !(p.builtInBatteryWh > 0)) out.push('builtInBatteryWh must be > 0')
+  if (!hasBatteryPart && !p.builtInBatteryWh && p.slots.some((s) => s.parts?.some((x) => x.powerW > 0)))
+    out.push('parts draw power but there is no battery: add a battery slot or set builtInBatteryWh (a robot with no energy cannot move)')
   if (combos > 20000) out.push(`too many combinations (${combos}); keep it under 20 000`)
   if (out.length) return out
   const sols = solutions(p, 1)

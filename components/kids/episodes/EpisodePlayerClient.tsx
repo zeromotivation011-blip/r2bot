@@ -7,18 +7,27 @@
 // pauses, and kid-sized controls (play/pause, replay line, skip, captions,
 // speed, sound, full screen).
 //
-// Props: { sessionId, onDone }. `onDone` fires once when the episode has
-// played to its end. The player itself reports the reward
+// Props: { sessionId, onDone, onUnavailable? }. `onDone` fires once when the
+// episode has played to its end. The player itself reports the reward
 // (reportActivity kind 'episode', id `episode-<sessionId>`), so callers must
 // NOT report 'episode' again.
 //
+// When the 3D cartoon cannot play (no WebGL, the engine fails to load, or the
+// device stays too slow and the child taps "storybook"), the player calls
+// `onUnavailable` — or, without that prop, throws during render so the
+// caller's error boundary can show its storyboard (EpisodeStepClient does).
+//
 // ?record=1 on the page URL: autoplay, no controls, choices auto-continue,
-// and the clip timings are exposed for scripts/kids-voices/record-episode.mjs.
+// and the director is exposed as window.__episode for
+// scripts/kids-voices/record-episode.mjs (only then, and removed on unmount).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SparkCharacter } from '@/components/kids/SparkCharacter'
-import { loadDesign } from '@/lib/kids/robot-design'
+import { playSound } from '@/lib/kids-audio'
+import { DEFAULT_DESIGN, loadDesign } from '@/lib/kids/robot-design'
 import { reportActivity } from '@/lib/kids/universe/rewards'
+import { VOICE_CREDIT } from '@/lib/kids/episodes/credits'
+import type { ChoiceOption, TurnIcon } from '@/lib/kids/episodes/interactions'
 import { planEpisode, type Beat, type ChoiceBeat, type EpisodePlan } from '@/lib/kids/episodes/plan'
 import { episodeUrl, normaliseSessionId, type EpisodeData } from '@/lib/kids/episodes/types'
 import type { Director } from './engine/director'
@@ -26,7 +35,34 @@ import type { Director } from './engine/director'
 export interface EpisodePlayerProps {
   sessionId: string
   onDone: () => void
+  /** The 3D cartoon cannot play here. Without it, the player throws for the caller's error boundary. */
+  onUnavailable?: (reason: Unavailable) => void
 }
+
+export type Unavailable = 'no-webgl' | 'engine-failed' | 'too-slow'
+
+/** Can this browser make a WebGL context at all? (Checked before the engine loads.) */
+function webglAvailable(): boolean {
+  try {
+    const c = document.createElement('canvas')
+    const gl = (c.getContext('webgl2') ?? c.getContext('webgl')) as WebGLRenderingContext | null
+    if (!gl) return false
+    gl.getExtension('WEBGL_lose_context')?.loseContext()
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** The child's robot's name for captions — never the default "Sparky" next to "Spark". */
+function robotNameOf(name: string | undefined): string {
+  const n = (name ?? '').trim()
+  return n && n !== DEFAULT_DESIGN.name ? n : 'Your robot'
+}
+
+const TURN_ICON: Record<TurnIcon, string> = { say: '🗣️', move: '🔄', point: '👉', count: '🔢', clap: '👏', hands: '🙌', wave: '👋', think: '💭' }
+
+type EpisodeWindow = Window & { __episode?: { director: Director; duration: number; startedAt: number }; __episodeDone?: boolean }
 
 type DirectorModule = typeof import('./engine/director')
 
@@ -47,6 +83,9 @@ const SPEAKER: Record<string, { name: string; chip: string }> = {
 }
 
 const SPEEDS = [0.75, 1, 1.25] as const
+
+/** Sensing words get the cyan chip, everything else R2BOT orange. */
+const CYAN_WORDS = new Set(['SENSE', 'SENSOR', 'BUMPER', 'ECHO'])
 
 function fmt(t: number): string {
   const s = Math.max(0, Math.floor(t))
@@ -77,14 +116,17 @@ const I = {
   exitFull: 'M8 5h2v5H5V8h3V5Zm6 0h2v3h3v2h-5V5ZM5 14h5v5H8v-3H5v-2Zm9 0h5v2h-3v3h-2v-5Z',
 }
 
-export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayerProps) {
+export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }: EpisodePlayerProps) {
   const id = useMemo(() => normaliseSessionId(sessionId) ?? sessionId, [sessionId])
   const wrapRef = useRef<HTMLDivElement>(null)
   const hostRef = useRef<HTMLDivElement>(null)
   const directorRef = useRef<Director | null>(null)
   const doneRef = useRef(false)
+  const aliveRef = useRef(true)
   const onDoneRef = useRef(onDone)
   onDoneRef.current = onDone
+  const onUnavailableRef = useRef(onUnavailable)
+  onUnavailableRef.current = onUnavailable
 
   const [data, setData] = useState<EpisodeData | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -97,7 +139,9 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1)
   const [muted, setMuted] = useState(false)
   const [choice, setChoice] = useState<ChoiceBeat | null>(null)
-  const [reply, setReply] = useState<string | null>(null)
+  const [reply, setReply] = useState<ChoiceOption | null>(null)
+  const [unavailable, setUnavailable] = useState<Unavailable | null>(null)
+  const [slow, setSlow] = useState(false)
   const [ended, setEnded] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const [chrome, setChrome] = useState(true)
@@ -122,7 +166,7 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
     else window.setTimeout(warm, 1200)
     try {
       setCaptions(localStorage.getItem('r2bot:kids-captions') !== 'off')
-      setRobotName(loadDesign().name || 'Your robot')
+      setRobotName(robotNameOf(loadDesign().name))
     } catch {
       // storage blocked: defaults are fine
     }
@@ -132,7 +176,24 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
     }
   }, [id])
 
-  useEffect(() => () => directorRef.current?.dispose(), [])
+  useEffect(() => {
+    aliveRef.current = true
+    return () => {
+      aliveRef.current = false
+      directorRef.current?.dispose()
+      directorRef.current = null
+      delete (window as EpisodeWindow).__episode
+    }
+  }, [])
+
+  const giveUp = useCallback((reason: Unavailable) => {
+    if (!aliveRef.current) return
+    directorRef.current?.dispose()
+    directorRef.current = null
+    setPhase('poster')
+    if (onUnavailableRef.current) onUnavailableRef.current(reason)
+    else setUnavailable(reason)
+  }, [])
 
   const finish = useCallback(() => {
     setEnded(true)
@@ -144,7 +205,7 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
     } catch {
       // progress storage unavailable — the episode still ends normally
     }
-    ;(window as Window & { __episodeDone?: boolean }).__episodeDone = true
+    ;(window as EpisodeWindow).__episodeDone = true
     onDoneRef.current()
   }, [id, record])
 
@@ -153,42 +214,60 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
       directorRef.current?.play()
       return
     }
+    if (!webglAvailable()) {
+      giveUp('no-webgl')
+      return
+    }
     setPhase('loading')
     setProgress(0.05)
     const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const mod = await loadEngine()
-    if (!hostRef.current) return
-    const d = new mod.Director(hostRef.current, data, plan, {
-      calm,
-      design: loadDesign(),
-      record,
-      onTime: (t, bi) => {
-        setTime(t)
-        setBeatIndex(bi)
-      },
-      onBeat: (bi) => setBeatIndex(bi),
-      onChoice: (c) => {
-        setChoice(c)
-        setReply(null)
-        setChrome(true)
-      },
-      onEnd: finish,
-      onPlayState: setPlaying,
-      onChoiceEnd: () => {
-        setChoice(null)
-        setReply(null)
-      },
-    })
-    directorRef.current = d
-    d.unlockAudio()
-    d.setSpeed(speed)
-    d.setMuted(muted)
-    await d.preload((done, total) => setProgress(0.1 + 0.9 * (done / Math.max(1, total))))
-    const w = window as Window & { __episode?: { director: Director; duration: number; startedAt: number } }
-    w.__episode = { director: d, duration: plan.duration, startedAt: Date.now() }
+    let d: Director | null = null
+    try {
+      const mod = await loadEngine()
+      if (!aliveRef.current || !hostRef.current) return
+      d = new mod.Director(hostRef.current, data, plan, {
+        calm,
+        design: loadDesign(),
+        record,
+        onTime: (t, bi) => {
+          setTime(t)
+          setBeatIndex(bi)
+        },
+        onBeat: (bi) => setBeatIndex(bi),
+        onChoice: (c) => {
+          setChoice(c)
+          setReply(null)
+          setChrome(true)
+        },
+        onEnd: finish,
+        onPlayState: setPlaying,
+        onChoiceEnd: () => {
+          setChoice(null)
+          setReply(null)
+        },
+        onSlow: () => setSlow(true),
+      })
+      directorRef.current = d
+      d.unlockAudio()
+      d.setSpeed(speed)
+      d.setMuted(muted)
+      await d.preload((done, total) => aliveRef.current && setProgress(0.1 + 0.9 * (done / Math.max(1, total))))
+    } catch {
+      // No WebGL context after all, a lost context, or the engine chunk failed.
+      if (d) d.dispose()
+      directorRef.current = null
+      giveUp('engine-failed')
+      return
+    }
+    // The child may have left while the voices loaded.
+    if (!aliveRef.current || directorRef.current !== d) {
+      d.dispose()
+      return
+    }
+    if (record) (window as EpisodeWindow).__episode = { director: d, duration: plan.duration, startedAt: Date.now() }
     setPhase('ready')
     d.play()
-  }, [data, plan, record, finish, speed, muted])
+  }, [data, plan, record, finish, speed, muted, giveUp])
 
   // Record mode: start by itself.
   useEffect(() => {
@@ -197,23 +276,37 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
 
   // Choices: record mode answers for the viewer after a beat.
   const answer = useCallback(
-    (opt: string | null) => {
-      if (!choice) return
-      setReply(choice.reply)
-      void opt
+    (opt: ChoiceOption | null) => {
+      if (!choice || reply) return
+      if (!opt) {
+        // Nobody answered: carry on gently.
+        setChoice(null)
+        directorRef.current?.resolveChoice(null, 0)
+        return
+      }
+      setReply(opt)
+      try {
+        playSound(opt.good === false ? 'click' : 'correct')
+      } catch {
+        // sound is optional
+      }
+      const k = choice.options.indexOf(opt)
+      const clip = choice.replyClips[k] ?? null
+      const hold = Math.max(opt.good === false ? 3.2 : 2.4, clip ? clip.dur / speed + 0.4 : 0)
+      directorRef.current?.resolveChoice(opt.good ?? null, hold, k)
       window.setTimeout(() => {
+        if (!aliveRef.current) return
         setChoice(null)
         setReply(null)
-        directorRef.current?.resolveChoice()
-      }, 1500)
+      }, hold * 1000)
     },
-    [choice],
+    [choice, reply, speed],
   )
   useEffect(() => {
-    if (!choice || record) return
-    const t = window.setTimeout(() => answer(null), 15000)
+    if (!choice || record || reply) return
+    const t = window.setTimeout(() => answer(null), 25000)
     return () => window.clearTimeout(t)
-  }, [choice, record, answer])
+  }, [choice, record, reply, answer])
 
   // Controls auto-hide while playing.
   const poke = useCallback(() => {
@@ -296,6 +389,9 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
     [phase, toggle, toggleCaptions, toggleFullscreen, toggleMute, poke],
   )
 
+  // No onUnavailable: hand over to the caller's error boundary (the storyboard).
+  if (unavailable) throw new Error(`episode-player-unavailable:${unavailable}`)
+
   // ── Derived view state ───────────────────────────────────────────────────
 
   const beat = plan?.beats[beatIndex] ?? null
@@ -319,13 +415,17 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
     if (who === 'myrobot') name = robotName
     if (who === 'guest' && 'guestName' in clip && clip.guestName) name = clip.guestName.split(',')[0]
     if (beat.kind === 'previously') name = 'Last time…'
-    return { words: clip.words.length ? clip.words.map((w) => w[0]) : clip.text.split(/\s+/), current, name, chip: meta.chip }
+    return { words: clip.words.length ? clip.words.map((w) => w[0]) : clip.text.split(/\s+/), current, name, chip: meta.chip, text: clip.text }
   }, [beat, time, robotName])
+  // One announcement per line for screen readers (the karaoke highlight would flood them).
+  const spoken = caption ? `${caption.name}: ${caption.text}` : ''
+  const turn = phase === 'ready' && beat?.kind === 'turn' && beat.turn ? beat.turn : null
+  const turnP = turn && beat ? Math.min(1, Math.max(0, (time - beat.start) / beat.dur)) : 0
 
   const pct = plan ? Math.min(100, (time / plan.duration) * 100) : 0
-  const showTitle = beat?.kind === 'title' && data
-  const showNext = beat?.kind === 'next' && data
-  const showCard = beat?.kind === 'card'
+  const showTitle = phase === 'ready' && beat?.kind === 'title' && data
+  const showNext = phase === 'ready' && beat?.kind === 'next' && data
+  const showCard = phase === 'ready' && beat?.kind === 'card'
   const sceneFade = beat?.kind === 'establish' && time - beat.start < 0.45
 
   const seekFromPointer = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -343,11 +443,14 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
     <div
       ref={wrapRef}
       className={`group/player relative isolate w-full overflow-hidden bg-[#0A1120] text-[#EEF2F8] shadow-[0_8px_24px_rgba(0,0,0,.45)] ${
-        fullscreen || record ? 'h-full rounded-none' : 'aspect-[4/5] rounded-[28px] border border-white/10 sm:aspect-video'
+        fullscreen || record
+          ? 'h-full rounded-none'
+          : // Never taller than the screen: the width follows the height cap, so the captions and controls stay in view.
+            'mx-auto aspect-[4/5] w-[min(100%,calc((100svh-5rem)*4/5))] rounded-[28px] border border-white/10 sm:aspect-video sm:w-[min(100%,max(560px,calc((100svh-13rem)*16/9)))]'
       }`}
       onPointerMove={phase === 'ready' ? poke : undefined}
       onKeyDown={onKey}
-      tabIndex={-1}
+      tabIndex={0}
       role="region"
       aria-label={data ? `Episode ${data.number}: ${data.title}` : 'Episode player'}
     >
@@ -394,7 +497,7 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
           )}
           {data && phase === 'poster' && (
             <p className="relative mt-4 text-sm text-[#A7B0C0]">
-              {plan ? `${Math.round(plan.duration / 60)} min · voices, captions, music` : ' '}
+              {plan ? `${Math.ceil(plan.duration / 60)} min · voices, captions, music` : ' '}
             </p>
           )}
         </div>
@@ -425,7 +528,7 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
       {/* Captions */}
       {captions && caption && phase === 'ready' && !choice && (
         <div className={`pointer-events-none absolute inset-x-0 flex justify-center px-3 transition-[bottom] duration-200 ${chrome && !record ? 'bottom-[5.5rem]' : 'bottom-4'}`}>
-          <p className="max-w-3xl rounded-2xl bg-[#0A1120]/80 px-4 py-2.5 text-center text-[17px] font-semibold leading-snug backdrop-blur-sm sm:text-xl" aria-live="polite">
+          <p className="max-w-3xl rounded-2xl bg-[#0A1120]/80 px-4 py-2.5 text-center text-[17px] font-semibold leading-snug backdrop-blur-sm sm:text-xl" aria-hidden="true">
             <span className={`mr-2 inline-block rounded-full px-2.5 py-0.5 align-middle font-display text-xs font-bold uppercase tracking-wide ${caption.chip}`}>{caption.name}</span>
             {caption.words.map((w, i) => (
               <span key={i} className={i === caption.current ? 'text-amber-300' : i < caption.current ? 'text-white' : 'text-white/75'}>
@@ -436,29 +539,81 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
         </div>
       )}
 
+      {/* The idea words of the line, popping in as chips (decorative: the caption says them). */}
+      {phase === 'ready' && beat?.kind === 'line' && beat.labels.length > 0 && !choice && !slow && (
+        <div key={beatIndex} aria-hidden="true" className="pointer-events-none absolute left-3 top-3 flex flex-wrap gap-2 sm:left-5 sm:top-5">
+          {beat.labels.map((l, i) => (
+            <span
+              key={l}
+              style={{ animationDelay: `${i * 120}ms` }}
+              className={`rounded-xl px-3 py-1 font-display text-sm font-bold tracking-wider shadow-[0_6px_16px_rgba(0,0,0,.35)] motion-safe:animate-[bounce_0.7s_ease-out_1_both] sm:text-lg ${
+                CYAN_WORDS.has(l) ? 'bg-cyan-400 text-[#0A1120]' : 'bg-amber-500 text-[#1A1103]'
+              }`}
+            >
+              {l}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <p className="sr-only" aria-live="polite">
+        {captions ? spoken : ''}
+      </p>
+
+      {/* Your turn: a timed call-and-response hold. */}
+      {turn && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center p-3 pt-4 sm:pt-6" role="status">
+          <div className="relative flex max-w-xl items-center gap-3 rounded-[24px] border border-cyan-300/40 bg-[#111C32]/90 px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,.45)] backdrop-blur-sm motion-safe:animate-[pulse_1.6s_ease-in-out_infinite] sm:gap-4 sm:px-5">
+            <span className="relative grid h-14 w-14 shrink-0 place-items-center" aria-hidden="true">
+              <svg viewBox="0 0 56 56" className="absolute inset-0 -rotate-90">
+                <circle cx="28" cy="28" r="25" fill="none" stroke="rgba(255,255,255,.12)" strokeWidth="5" />
+                <circle cx="28" cy="28" r="25" fill="none" stroke="#22D3EE" strokeWidth="5" strokeLinecap="round" strokeDasharray={157} strokeDashoffset={157 * turnP} />
+              </svg>
+              <span className="text-2xl">{TURN_ICON[turn.icon]}</span>
+            </span>
+            <span className="min-w-0 text-left">
+              <span className="block font-display text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">Your turn!</span>
+              <span className="block font-display text-base font-bold leading-snug text-white sm:text-lg">{turn.prompt}</span>
+              {turn.say && <span className="block font-display text-lg font-bold leading-snug text-amber-300 sm:text-2xl">{turn.say}</span>}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Choice: "what do you think?" */}
       {choice && (
-        <div className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-[#0A1120]/90 via-[#0A1120]/40 to-transparent p-4 sm:items-center">
-          <div className="w-full max-w-lg rounded-[28px] border border-white/15 bg-[#111C32]/95 p-5 text-center shadow-[0_8px_24px_rgba(0,0,0,.45)]">
+        // At the bottom, so the cast stays in view while they wait for the answer.
+        <div className="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-[#0A1120]/85 via-[#0A1120]/20 to-transparent p-3 sm:p-5">
+          <div className="w-full max-w-xl rounded-[28px] border border-white/15 bg-[#111C32]/95 p-4 text-center shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:p-5">
             <p className="font-display text-sm font-bold uppercase tracking-wider text-cyan-300">What do you think?</p>
             <p className="mt-1 font-display text-xl font-bold text-white sm:text-2xl">{choice.prompt}</p>
             {reply ? (
-              <p className="mt-4 rounded-2xl bg-amber-500 px-4 py-3 font-display text-lg font-bold text-[#1A1103]" role="status">
-                {reply}
+              <p
+                className={`mt-4 rounded-2xl px-4 py-3 font-display text-lg font-bold ${reply.good === false ? 'border border-cyan-300/50 bg-cyan-400/15 text-white' : 'bg-amber-500 text-[#1A1103]'}`}
+                role="status"
+              >
+                <span aria-hidden="true">{reply.good === false ? '🤔 ' : '⭐ '}</span>
+                {reply.reply}
               </p>
             ) : (
               <div className="mt-4 flex flex-wrap justify-center gap-3">
                 {choice.options.map((o) => (
                   <button
-                    key={o}
+                    key={o.label}
                     type="button"
                     onClick={() => answer(o)}
-                    className="h-14 min-w-28 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-5 font-display text-lg font-bold text-white transition hover:-translate-y-0.5 hover:border-amber-400 active:scale-[.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+                    disabled={record}
+                    className="min-h-14 min-w-28 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-5 py-2 font-display text-lg font-bold text-white transition hover:-translate-y-0.5 hover:border-amber-400 active:scale-[.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
                   >
-                    {o}
+                    {o.label}
                   </button>
                 ))}
               </div>
+            )}
+            {!reply && !record && (
+              <button type="button" onClick={() => answer(null)} className="mt-3 min-h-11 px-3 text-sm font-bold text-[#A7B0C0] underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60">
+                Keep watching →
+              </button>
             )}
           </div>
         </div>
@@ -477,19 +632,19 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
           >
             <Icon d={I.replay} className="h-5 w-5" /> Watch again
           </button>
-          <p className="mt-5 max-w-md text-xs text-[#6E7888]">Voices made with Piper TTS (VCTK and alba voices: University of Edinburgh, CC BY 4.0).</p>
+          <p className="mt-5 max-w-lg text-[13px] leading-snug text-[#A7B0C0]">{VOICE_CREDIT}</p>
         </div>
       )}
 
       {/* Controls */}
-      {phase === 'ready' && !record && (
+      {phase === 'ready' && !record && !choice && (
         <div
           className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0A1120]/95 via-[#0A1120]/70 to-transparent px-3 pb-2 pt-6 transition-opacity duration-200 ${
             chrome || !playing ? 'opacity-100' : 'pointer-events-none opacity-0'
           }`}
         >
           <div
-            className="group/bar relative mx-1 mb-1 flex h-6 cursor-pointer items-center"
+            className="group/bar relative mx-1 flex h-11 cursor-pointer touch-none items-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
             role="slider"
             tabIndex={0}
             aria-label="Episode position"
@@ -537,6 +692,25 @@ export default function EpisodePlayerClient({ sessionId, onDone }: EpisodePlayer
             </button>
             <button type="button" className={ctrlBtn} onClick={toggleFullscreen} aria-label={fullscreen ? 'Exit full screen' : 'Full screen'}>
               <Icon d={fullscreen ? I.exitFull : I.full} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* This device cannot keep up even at the lowest quality: offer the storybook. */}
+      {slow && phase === 'ready' && !record && !ended && !choice && !turn && (
+        <div className="absolute inset-x-0 top-0 flex justify-center p-3">
+          <div className="flex max-w-md flex-wrap items-center justify-center gap-2 rounded-2xl border border-white/15 bg-[#111C32]/95 px-3 py-2 text-sm text-[#EEF2F8] shadow-[0_8px_24px_rgba(0,0,0,.45)]">
+            <span>The cartoon is running slowly on this device.</span>
+            <button
+              type="button"
+              onClick={() => giveUp('too-slow')}
+              className="min-h-11 rounded-xl bg-amber-500 px-3 font-display font-bold text-[#1A1103] hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+            >
+              📖 Read it as a storybook
+            </button>
+            <button type="button" onClick={() => setSlow(false)} className="min-h-11 rounded-xl px-3 font-bold text-[#A7B0C0] hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60">
+              Keep watching
             </button>
           </div>
         </div>

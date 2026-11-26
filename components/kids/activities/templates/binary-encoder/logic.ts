@@ -39,7 +39,7 @@ export interface NumberParams {
   target: number
   /** Show each lamp's place value (1, 2, 4, …) under it. Default true. */
   showPlaceValues?: boolean
-  /** Show the running decimal total while the child flips. Default true. */
+  /** Show the running decimal total + gauge while the child flips. Default: true for explorers/builders, false for inventors/engineers (they add it up themselves). */
   showTotal?: boolean
   /** What the register means, shown as the gauge label ("Motor speed", "Light sensor"). ≤ 24 chars. */
   label?: string
@@ -47,7 +47,7 @@ export interface NumberParams {
 
 export interface PixelParams {
   mode: 'pixels'
-  /** 3–8 columns. */
+  /** 3–8 columns (3–6 when codes is 'binary'). Cells are 44px; 7–8 scroll sideways on a phone, so keep younger bands at ≤ 6. */
   width: number
   /** 3–8 rows. */
   height: number
@@ -179,6 +179,9 @@ function validate(p: Params): string[] {
       if (!Number.isInteger(p.width) || p.width < 3 || p.width > 8) errs.push('width must be an integer 3–8')
       if (!Number.isInteger(p.height) || p.height < 3 || p.height > 8) errs.push('height must be an integer 3–8')
       if (!['binary', 'decimal', 'hex'].includes(p.codes)) errs.push('codes must be binary, decimal or hex')
+      // Pixels are 44px tap targets; with long binary row codes beside them,
+      // anything wider than 6 does not fit a phone.
+      else if (p.codes === 'binary' && p.width > 6) errs.push('width above 6 needs decimal or hex row codes (binary codes that long do not fit on a phone)')
       if (errs.length) break
       if (!Array.isArray(p.rows) || p.rows.length !== p.height) errs.push(`rows must have exactly ${p.height} numbers (one per row)`)
       else p.rows.forEach((n, i) => { if (!Number.isInteger(n) || n < 0 || n >= 2 ** p.width) errs.push(`rows[${i}] must be an integer 0–${2 ** p.width - 1}`) })
@@ -210,7 +213,13 @@ function validate(p: Params): string[] {
           const [r, c] = p.flip
           if (!Number.isInteger(r) || !Number.isInteger(c) || r < 0 || c < 0 || r > p.data.length || c > w) errs.push(`flip must be inside the ${p.data.length + 1}×${w + 1} block`)
         }
-      } else if (p.flip !== undefined) errs.push('flip is only used with task "fix"')
+      } else {
+        if (p.flip !== undefined) errs.push('flip is only used with task "fix"')
+        // Parity bits start at 0, so an all-even block is solved before the child
+        // does anything; an all-odd one is solved by tapping every bit blindly.
+        if (!p.data.some((r) => ones(r) % 2 === 1)) errs.push('add needs at least one row with an odd number of 1s — otherwise it starts solved')
+        else if (p.data.length > 1 && !p.data.some((r) => ones(r) % 2 === 0)) errs.push('add with several rows needs at least one already-even row, so the child has to count rather than tap every parity bit')
+      }
       break
     }
     default:

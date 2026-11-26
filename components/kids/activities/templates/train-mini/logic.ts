@@ -44,7 +44,12 @@ export interface Params {
   initialPoints: Pt[]
   /** Held-out test points with TRUE labels. 3–16. */
   testPoints: Pt[]
-  /** Show test points (as hollow rings) while training. Default true for ages 5–10. Off = real held-out testing. */
+  /**
+   * Show test points (dashed rings, colour = true answer) while training.
+   * Default true. false = real held-out testing (use for ages 11+): the test
+   * points stay invisible until "Test the AI", and minDistFromTest is not
+   * applied, so the plane gives no clue where they are.
+   */
   showTestPoints?: boolean
   /** How many points the child may add (0–12). 0 = only k can be tuned. */
   maxNewPoints: number
@@ -53,8 +58,9 @@ export interface Params {
   /** Fraction of test points that must be right, 0.5–1. */
   minAccuracy: number
   /**
-   * Added points must stay at least this far (plane units) from every test
-   * point — you may not just copy the answers onto the test. Default 1.2.
+   * When the test points are VISIBLE, added points must stay at least this
+   * far (plane units) from every test point, so the child cannot just copy
+   * the answers onto the test. Default 1.2. Ignored when showTestPoints is false.
    */
   minDistFromTest?: number
   /** Draw the shaded decision regions (default true). Off for an extra challenge (predict first). */
@@ -104,10 +110,20 @@ export function kChoicesOf(p: Params): number[] {
   return p.kChoices && p.kChoices.length ? p.kChoices : [1]
 }
 
+/** Are the test points drawn while the child trains? (Default true.) */
+export function testsVisible(p: Params): boolean {
+  return p.showTestPoints !== false
+}
+
+/** Minimum distance from test points, or 0 when they are hidden (no clue leaks). */
+export function minTestDist(p: Params): number {
+  return testsVisible(p) ? (p.minDistFromTest ?? 1.2) : 0
+}
+
 function placementProblem(p: Params, pt: Pt): string | null {
   if (!(pt.x >= 0 && pt.x <= 10 && pt.y >= 0 && pt.y <= 10)) return 'outside the plane'
-  const md = p.minDistFromTest ?? 1.2
-  if (p.testPoints.some((t) => dist2(t, pt) < md * md - 1e-9)) return 'too close to a test point'
+  const md = minTestDist(p)
+  if (md > 0 && p.testPoints.some((t) => dist2(t, pt) < md * md - 1e-9)) return 'too close to a test point'
   if (!p.classes.some((c) => c.id === pt.cls)) return 'unknown class'
   return null
 }
@@ -162,7 +178,9 @@ function validate(p: Params): string[] {
   if (!findSolution(p)) out.push('no reachable answer meets minAccuracy (tried every k with up to maxNewPoints greedy points) — add points, allow more, or lower minAccuracy')
   // It must not be already solved with zero effort — the child has to DO something.
   const ks = kChoicesOf(p)
-  if (ks.length === 1 && evaluate(p, { added: [], k: ks[0] }).accuracy + 1e-9 >= p.minAccuracy) out.push('the starting dataset already passes — nothing for the child to do')
+  const passes = (k: number) => evaluate(p, { added: [], k }).accuracy + 1e-9 >= p.minAccuracy
+  if (passes(ks[0])) out.push(`the starting dataset already passes with the default k = ${ks[0]} — nothing for the child to do`)
+  else if (ks.every(passes)) out.push('every k already passes with no added points — nothing for the child to do')
   return out
 }
 

@@ -10,7 +10,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import type { TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
-import { classify, kChoicesOf, type Answer, type Params, type Pt } from './logic'
+import { classify, kChoicesOf, minTestDist, testsVisible, type Answer, type Params, type Pt } from './logic'
 import { FeedbackPanel, Readout, TemplateCard, btnGhost, btnPrimary, chip, useAttempts, useReducedMotion } from '../gear-train/TemplateFrameClient'
 
 const S = 300 // plane size in svg units
@@ -20,7 +20,7 @@ const GRID = 30 // decision-region resolution
 const sx = (x: number) => PAD + (x / 10) * S
 const sy = (y: number) => 10 + S - (y / 10) * S
 
-export default function TrainMiniClient({ params: p, band, onSubmit, onDone }: TemplateProps<Params, Answer>) {
+export default function TrainMiniClient({ params: p, onSubmit, onDone }: TemplateProps<Params, Answer>) {
   const att = useAttempts(onSubmit, onDone)
   const reduced = useReducedMotion()
   const ks = kChoicesOf(p)
@@ -39,7 +39,7 @@ export default function TrainMiniClient({ params: p, band, onSubmit, onDone }: T
   const timer = useRef<number | undefined>(undefined)
   useEffect(() => () => window.clearTimeout(timer.current), [])
   const solved = !!att.result?.correct
-  const showTests = p.showTestPoints ?? (band === 'explorers' || band === 'builders')
+  const showTests = testsVisible(p)
   const showRegions = p.showRegions ?? true
   const train = useMemo(() => [...p.initialPoints, ...added], [p.initialPoints, added])
   const colour = (id: string | null) => p.classes.find((c) => c.id === id)?.colour ?? '#6E7888'
@@ -66,7 +66,7 @@ export default function TrainMiniClient({ params: p, band, onSubmit, onDone }: T
     fn()
   }
 
-  const md = p.minDistFromTest ?? 1.2
+  const md = minTestDist(p)
   const addAt = (x: number, y: number) =>
     edit(() => {
       const pt = { x: Math.round(x * 2) / 2, y: Math.round(y * 2) / 2, cls }
@@ -81,7 +81,7 @@ export default function TrainMiniClient({ params: p, band, onSubmit, onDone }: T
         playSound('wrong')
         return
       }
-      if (p.testPoints.some((t) => Math.hypot(t.x - pt.x, t.y - pt.y) < md - 1e-9)) {
+      if (md > 0 && p.testPoints.some((t) => Math.hypot(t.x - pt.x, t.y - pt.y) < md - 1e-9)) {
         setNote('That spot is kept for testing — training data must not copy the test. Try a little further away.')
         playSound('wrong')
         return

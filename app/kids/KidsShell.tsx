@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { SparkGuide } from '@/components/kids/SparkGuide'
 import { ConfettiProvider, useConfettiEventBridge } from '@/components/kids/Confetti'
 import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
+import { levelInfo } from '@/lib/kids/universe/rewards'
 import { InstallAppClient } from '@/components/kids/InstallAppClient'
 import { KidsClassSync } from '@/components/kids/classroom/KidsClassSyncClient'
 import { RewardToast } from '@/components/kids/ui/RewardToastClient'
@@ -31,12 +32,16 @@ const TABS: { href: string; emoji: string; label: string; match: (p: string) => 
 
 function KidsShellInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? ''
-  const [stars, setStars] = useState(0)
+  const [lvl, setLvl] = useState<{ level: number; title: string; xp: number } | null>(null)
   const { voiceOn, toggle, cancel } = useKidsVoice()
   useConfettiEventBridge()
 
   useEffect(() => {
-    const read = () => setStars(getProgress().totalStars)
+    const read = () => {
+      const xp = getProgress().xp
+      const li = levelInfo(xp)
+      setLvl({ level: li.level, title: li.title, xp })
+    }
     read()
     window.addEventListener(KIDS_PROGRESS_EVENT, read)
     // Older Robot World screens write progress in several steps; keep a slow poll as a safety net.
@@ -69,7 +74,6 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
         fontSize: '18px',
       }}
     >
-      {/* Twinkling stars backdrop — applied to all kids pages */}
 
       <header className="kids-nav">
         <Link href="/kids" className="kids-nav-brand" aria-label="R2BOT Kids home">
@@ -102,7 +106,10 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           >
             <span aria-hidden>{voiceOn ? '🔊' : '🔇'}</span>
           </button>
-          <div className="kids-nav-stars" aria-label={`${stars} stars`}>⭐ {stars}</div>
+          <Link href="/kids/hangar" className="kids-nav-stars" aria-label={lvl ? `Level ${lvl.level}, ${lvl.title}, ${lvl.xp} XP — open your hangar` : 'Open your hangar'}>
+            {/* Reserved width so the header never shifts after hydration. */}
+            <span className="inline-block min-w-[3.5rem] text-center">{lvl ? `Lv ${lvl.level}` : 'Lv 1'}</span>
+          </Link>
         </div>
       </header>
 

@@ -10,7 +10,7 @@
 import { useMemo, useRef, useState } from 'react'
 import type { TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
-import { partsOf, problems, totals, type Answer, type Params, type Part } from './logic'
+import { partsOf, problems, terrainName, totals, type Answer, type Params, type Part } from './logic'
 import { FeedbackPanel, TemplateCard, btnPrimary, useAnimationFrame, useAttempts, useReducedMotion } from '../gear-train/TemplateFrameClient'
 
 const TERRAIN_STYLE: Record<string, { ground: string; sky: string; deco: string }> = {
@@ -97,6 +97,7 @@ export default function RobotDesignerClient({ params: p, onSubmit, onDone }: Tem
           <li className="rounded-full bg-white/10 px-3 py-1">🪙 ≤ {p.budget} coins</li>
           {p.maxMassKg !== undefined && <li className="rounded-full bg-white/10 px-3 py-1">⚖️ ≤ {p.maxMassKg} kg</li>}
           {p.minRuntimeMin !== undefined && <li className="rounded-full bg-white/10 px-3 py-1">🔋 ≥ {p.minRuntimeMin} min</li>}
+          {p.builtInBatteryWh !== undefined && <li className="rounded-full bg-white/10 px-3 py-1">🔋 Battery included ({p.builtInBatteryWh} Wh)</li>}
           {p.requires.map((r) => (
             <li key={r} className="rounded-full bg-white/10 px-3 py-1">
               ✔ {p.abilityLabels[r] ?? r}
@@ -160,14 +161,14 @@ export default function RobotDesignerClient({ params: p, onSubmit, onDone }: Tem
                         </span>
                         <span className="font-display text-[15px] font-bold leading-tight text-[#EEF2F8]">{x.name}</span>
                       </span>
-                      <span className="mt-1 text-[12px] leading-snug text-[#A7B0C0]">
+                      <span className="mt-1 text-[14px] leading-snug text-[#A7B0C0]">
                         🪙 {x.cost} · {r1(x.massKg)} kg{x.powerW ? ` · ${x.powerW} W` : ''}
                         {x.energyWh ? ` · ${x.energyWh} Wh` : ''}
                         {x.payloadKg !== undefined ? ` · carries ${x.payloadKg} kg` : ''}
                       </span>
-                      {x.terrains && <span className="text-[12px] text-[#00E5FF]">Goes on: {x.terrains.join(', ')}</span>}
-                      {x.gives?.length ? <span className="text-[12px] text-[#22C55E]">+ {x.gives.map((g) => p.abilityLabels[g] ?? g).join(', ')}</span> : null}
-                      {x.note && <span className="mt-0.5 text-[12px] italic leading-snug text-[#A7B0C0]">{x.note}</span>}
+                      {x.terrains && <span className="text-[14px] leading-snug text-[#00E5FF]">Goes on: {x.terrains.map((id) => terrainName(p, id)).join(', ')}</span>}
+                      {x.gives?.length ? <span className="text-[14px] leading-snug text-[#22C55E]">+ {x.gives.map((g) => p.abilityLabels[g] ?? g).join(', ')}</span> : null}
+                      {x.note && <span className="mt-0.5 text-[14px] italic leading-snug text-[#A7B0C0]">{x.note}</span>}
                     </button>
                   )
                 })}
@@ -180,7 +181,7 @@ export default function RobotDesignerClient({ params: p, onSubmit, onDone }: Tem
       {/* Gauges */}
       {showGauges ? (
         <div className="mt-4 grid gap-2 sm:grid-cols-2" aria-live="polite">
-          <Gauge label="Cost" value={t.cost} max={p.budget} unit="coins" text={`${t.cost} / ${p.budget}`} />
+          <Gauge label="Cost" value={t.cost} max={p.budget} unit="coins" text={`${t.cost} / ${p.budget} coins`} />
           {p.maxMassKg !== undefined && <Gauge label="Mass" value={t.massKg} max={p.maxMassKg} unit="kg" text={`${r1(t.massKg)} / ${p.maxMassKg} kg`} />}
           {t.payloadKg !== null && <Gauge label="Drive can carry" value={t.massKg} max={t.payloadKg} unit="kg" text={`${r1(t.massKg)} of ${t.payloadKg} kg`} />}
           {p.minRuntimeMin !== undefined && (
@@ -225,7 +226,7 @@ export default function RobotDesignerClient({ params: p, onSubmit, onDone }: Tem
   )
 }
 
-function Gauge({ label, value, max, unit, text, invert }: { label: string; value: number; max: number; unit: string; text: string; invert?: boolean }) {
+function Gauge({ label, value, max, text, invert }: { label: string; value: number; max: number; unit: string; text: string; invert?: boolean }) {
   // Normal gauges must stay at or under max; inverted ones (runtime) must reach it.
   const good = invert ? value >= max - 1e-9 : value <= max + 1e-9
   const frac = Math.max(0, Math.min(1, invert ? value / (max * 2) : value / max))
@@ -235,7 +236,7 @@ function Gauge({ label, value, max, unit, text, invert }: { label: string; value
         <p className="text-xs font-semibold uppercase tracking-wide text-[#A7B0C0]">{label}</p>
         <p className={`font-display text-[15px] font-bold tabular-nums ${good ? 'text-[#22C55E]' : 'text-amber-300'}`}>{text}</p>
       </div>
-      <div className="relative mt-1.5 h-3 overflow-hidden rounded-full bg-white/10" role="meter" aria-label={label} aria-valuenow={Math.round(value * 10) / 10} aria-valuemin={0} aria-valuemax={max} aria-valuetext={`${text} ${unit}`}>
+      <div className="relative mt-1.5 h-3 overflow-hidden rounded-full bg-white/10" role="meter" aria-label={label} aria-valuenow={Math.round(value * 10) / 10} aria-valuemin={0} aria-valuemax={max} aria-valuetext={text}>
         <div className={`h-full rounded-full transition-[width] duration-300 ${good ? 'bg-[#22C55E]' : 'bg-amber-500'}`} style={{ width: `${frac * 100}%` }} />
         {invert && <div className="absolute inset-y-0 left-1/2 w-0.5 bg-white/60" />}
       </div>

@@ -32,6 +32,7 @@ const CW = 150 // column width (svg units)
 const RH = 92 // row height
 const GW = 64 // gate body width
 const GH = 46 // gate body height
+const SVG_MIN_SCALE = 0.85 // smallest on-screen scale of the circuit drawing
 
 const INPUT_ICON: Record<InputKind, string> = { switch: '🔘', button: '🟠', bumper: '🛡️', light: '💡', sensor: '📡', battery: '🔋' }
 const OUTPUT_ICON: Record<OutputKind, string> = { motor: '⚙️', led: '💡', buzzer: '🔔', door: '🚪', pump: '💧' }
@@ -128,7 +129,7 @@ export default function LogicGatesClient({ params, onSubmit, onDone }: TemplateP
           <p className="text-[17px] leading-relaxed text-[#EEF2F8]">{params.story}</p>
         </Panel>
       )}
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-start">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-start">
         <Panel title="The circuit">
           <div className="mb-2 flex flex-wrap gap-2" role="group" aria-label="Inputs — tap to switch">
             {params.inputs.map((i) => (
@@ -149,8 +150,9 @@ export default function LogicGatesClient({ params, onSubmit, onDone }: TemplateP
             ))}
           </div>
 
-          <div className="overflow-x-auto rounded-xl bg-[#060B16]">
-            <svg viewBox={`-10 -6 ${W + 20} ${H + 12}`} className="block h-auto w-full min-w-[340px]" role="img" aria-label={describe()}>
+          <div className="overflow-x-auto overscroll-x-contain rounded-xl bg-[#060B16]">
+            {/* Never drawn below 0.85 scale, so the smallest caption (15 units) stays ≥12px; wide circuits scroll on phones. */}
+            <svg viewBox={`-10 -6 ${W + 20} ${H + 12}`} className="block h-auto w-full" style={{ minWidth: Math.round((W + 20) * SVG_MIN_SCALE) }} role="img" aria-label={describe()}>
               <defs>
                 <filter id="lg-glow" x="-50%" y="-50%" width="200%" height="200%">
                   <feGaussianBlur stdDeviation="3" result="b" />
@@ -196,10 +198,10 @@ export default function LogicGatesClient({ params, onSubmit, onDone }: TemplateP
                   >
                     {isSel && !g.fixed && <rect x={-10} y={-10} width={GW + 26} height={GH + 20} rx={12} className="fill-amber-500/10 stroke-amber-400" strokeWidth={2} strokeDasharray="5 4" />}
                     <GateShape type={r.type} on={on} fixed={!!g.fixed} />
-                    <text x={GW / 2 - (r.type === 'NOT' ? 8 : 2)} y={GH / 2 + 5} textAnchor="middle" className={`pointer-events-none font-display text-[13px] font-bold ${r.type ? (on ? 'fill-[#04151A]' : 'fill-[#EEF2F8]') : 'fill-amber-300'}`}>
+                    <text x={GW / 2 - (r.type === 'NOT' ? 8 : 2)} y={GH / 2 + 5} textAnchor="middle" className={`pointer-events-none font-display text-[17px] font-bold ${r.type ? (on ? 'fill-[#04151A]' : 'fill-[#EEF2F8]') : 'fill-amber-300'}`}>
                       {r.type ?? '?'}
                     </text>
-                    <text x={GW / 2} y={GH + 16} textAnchor="middle" className="pointer-events-none fill-[#6E7888] text-[11px] font-semibold">Gate {gi + 1}{g.fixed ? ' 🔒' : ''}</text>
+                    <text x={GW / 2} y={GH + 20} textAnchor="middle" className="pointer-events-none fill-[#8D97A8] text-[15px] font-semibold">Gate {gi + 1}{g.fixed ? ' 🔒' : ''}</text>
                   </g>
                 )
               })}
@@ -211,13 +213,16 @@ export default function LogicGatesClient({ params, onSubmit, onDone }: TemplateP
                   <g key={o.id} transform={`translate(${p.x} ${p.y})`}>
                     <circle cx={26} cy={0} r={24} className={on ? 'fill-amber-500 stroke-amber-300' : 'fill-[#19263F] stroke-white/20'} strokeWidth={2} filter={on && !reduced ? 'url(#lg-glow)' : undefined} />
                     <text x={26} y={8} textAnchor="middle" className={`text-[22px] ${on && !reduced && (o.kind ?? 'led') === 'motor' ? 'motion-safe:animate-spin [transform-box:fill-box] [transform-origin:center]' : ''}`}>{OUTPUT_ICON[o.kind ?? 'led']}</text>
-                    <text x={26} y={40} textAnchor="middle" className="fill-[#A7B0C0] text-[11px] font-semibold">{o.label.length > 16 ? o.label.slice(0, 15) + '…' : o.label}</text>
+                    <text x={26} y={42} textAnchor="middle" className="fill-[#A7B0C0] text-[15px] font-semibold">{o.label.length > 16 ? o.label.slice(0, 15) + '…' : o.label}</text>
                   </g>
                 )
               })}
             </svg>
           </div>
 
+          {(W + 20) * SVG_MIN_SCALE > 340 && (
+            <p className="mt-1 text-[13px] text-[#8D97A8] sm:hidden" aria-hidden>Swipe the circuit sideways to see all of it →</p>
+          )}
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[14px] font-semibold text-[#A7B0C0]" aria-live="polite">
             {params.outputs.map((o) => (
               <span key={o.id}>
@@ -310,9 +315,17 @@ export default function LogicGatesClient({ params, onSubmit, onDone }: TemplateP
                     const current = params.inputs.every((i) => env[i.id] === row[i.id])
                     return (
                       <tr key={r} onClick={() => setRow(row)} className={`cursor-pointer ${current ? 'outline outline-2 outline-amber-400' : ''}`}>
-                        {params.inputs.map((i) => (
-                          <td key={i.id} className={`rounded-md py-2 ${row[i.id] ? 'bg-[#00B8D4]/20 text-[#00E5FF]' : 'bg-[#0A1120] text-[#6E7888]'}`}>
-                            <button type="button" onClick={(e) => { e.stopPropagation(); setRow(row) }} className="min-h-8 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400" aria-label={`Test row ${r + 1}`}>
+                        {params.inputs.map((i, ii) => (
+                          <td key={i.id} className={`rounded-md p-0 ${row[i.id] ? 'bg-[#00B8D4]/20 text-[#00E5FF]' : 'bg-[#0A1120] text-[#6E7888]'}`}>
+                            {/* The whole row is the 44px tap target (tr onClick); one button per row carries keyboard focus. */}
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); setRow(row) }}
+                              tabIndex={ii === 0 ? 0 : -1}
+                              aria-hidden={ii === 0 ? undefined : true}
+                              className="min-h-11 w-full px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                              aria-label={ii === 0 ? `Test row ${r + 1}: ${params.inputs.map((x) => `${x.id} ${onOff(row[x.id], notation)}`).join(', ')}` : undefined}
+                            >
                               {onOff(row[i.id], notation)}
                             </button>
                           </td>
@@ -321,7 +334,7 @@ export default function LogicGatesClient({ params, onSubmit, onDone }: TemplateP
                           const want = evalExpr(targets[k], row)
                           const got = s[o.from] ?? null
                           return (
-                            <td key={o.id} className="rounded-md bg-[#0A1120] px-1 py-2">
+                            <td key={o.id} className="h-11 rounded-md bg-[#0A1120] px-1 py-1">
                               {showTarget && <span className="text-[#EEF2F8]">{onOff(want, notation)}</span>}
                               {showTarget && <span className="text-[#6E7888]"> · </span>}
                               <span className={got === null ? 'text-[#6E7888]' : !showTarget ? 'text-[#EEF2F8]' : got === want ? 'text-[#4ADE80]' : 'text-red-400'}>

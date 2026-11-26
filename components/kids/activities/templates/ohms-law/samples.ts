@@ -35,7 +35,7 @@ export const samples: Activity<Params, Answer>[] = [
     band: 'inventors',
     template: 'ohms-law',
     difficulty: 3,
-    intro: 'A 9 V battery must light a blue status LED at 10–20 mA, with a ¼-watt resistor that must not overheat. Choose a standard E12 resistor — the meter only shows after you test.',
+    intro: 'A 9 V battery must light a blue status LED at 10–20 mA. Choose a standard E12 resistor — the meter only shows after you test.',
     takeaway: 'Resistor = (battery voltage − LED voltage) ÷ current. Then round to a standard value that keeps the current in range.',
     realWorld: 'Electronics engineers do this sum for every indicator LED on a circuit board, then pick the nearest standard value.',
     params: {
@@ -43,7 +43,7 @@ export const samples: Activity<Params, Answer>[] = [
       battery: { fixed: 9 },
       resistor: { e12: { min: 47, max: 2200 } },
       led: { colour: 'blue' },
-      target: { currentMa: { min: 10, max: 20 }, resistorRatingW: 0.25 },
+      target: { currentMa: { min: 10, max: 20 } },
       liveMeter: false,
       showFormula: true,
     },

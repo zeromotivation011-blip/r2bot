@@ -79,6 +79,7 @@ export const samples: Activity<Params, Answer>[] = [
       available: ['camera', 'lidar', 'ultrasonic', 'ir-distance', 'thermal', 'imu', 'bump', 'gps'],
       maxSensors: 4,
       budget: 30,
+      cheapestOnly: true,
       showCapabilities: false,
       noExtras: true,
     },

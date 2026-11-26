@@ -17,7 +17,7 @@
 
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { capabilitiesOf, CAPABILITY_NEEDS, getPart, type RobotDesign } from '@/lib/kids/robot-design'
+import { capabilitiesOf, CAPABILITY_NEEDS, getPart, ROBOT_PARTS_3D, type Capability, type RobotPart, type RobotDesign } from '@/lib/kids/robot-design'
 import {
   awardStars,
   compile,
@@ -28,6 +28,7 @@ import {
   startPoses,
   type Challenge,
   type ChallengeResult,
+  type PaletteBlock,
   type PicNode,
 } from '@/lib/kids/sim/challenge'
 import { blockNeeds, type Program } from '@/lib/kids/sim/program'
@@ -65,13 +66,50 @@ interface Props {
   onResult: (outcome: SimChallengeOutcome) => void
   /** Called when the child taps "Fit the …": save the fitted robot if you keep one. */
   onDesignChange?: (design: RobotDesign) => void
-  /** Offer "Show me a way" after this many unsuccessful runs (0 = never). Default 3. */
+  /** Offer "Show me a way" (and the fuller hint) after this many unsuccessful runs (0 = never). Default 3. */
   showMeAfter?: number
+  /** A program saved earlier (e.g. before a reload); blocks not in this palette are dropped. */
+  initialNodes?: PicNode[]
+  /** Called whenever the child changes the program, so the caller can keep it. */
+  onProgramChange?: (nodes: PicNode[]) => void
+}
+
+/** Keep only blocks this palette knows, with fresh uids (a saved program may be stale or hand-edited). */
+function restoreNodes(saved: unknown, palette: PaletteBlock[]): PicNode[] | null {
+  if (!Array.isArray(saved)) return null
+  const keys = new Map(palette.map((b) => [b.key, b]))
+  const walk = (list: unknown[], depth: number): PicNode[] => {
+    const out: PicNode[] = []
+    if (depth > 6) return out
+    for (const raw of list) {
+      if (!raw || typeof raw !== 'object') continue
+      const r = raw as { key?: unknown; choice?: unknown; children?: unknown }
+      const b = typeof r.key === 'string' ? keys.get(r.key) : undefined
+      if (!b) continue
+      const n: PicNode = { uid: '', key: b.key }
+      if ((typeof r.choice === 'number' || typeof r.choice === 'string') && b.choice?.values.includes(r.choice)) n.choice = r.choice
+      if (b.container) n.children = Array.isArray(r.children) ? walk(r.children, depth + 1) : []
+      out.push(n)
+    }
+    return out
+  }
+  const nodes = walk(saved, 0)
+  return nodes.length > 0 ? cloneNodes(nodes) : null
+}
+
+/** Which part unlocks a block that needs `cap`: the challenge's own fit, then a part named on a block, then any part. */
+function partFor(cap: Capability, block: PaletteBlock, ch: Challenge): RobotPart | undefined {
+  const own = ch.fit.map((f) => getPart(f.slot, f.id)).find((p) => p?.gives.includes(cap))
+  if (own) return own
+  const givers = ROBOT_PARTS_3D.filter((p) => p.slot !== 'body' && p.gives.includes(cap))
+  // A part named on any block that needs this capability ("Scoop up" → Scoop, so "Tip out" goes with it).
+  const labels = [block, ...ch.palette.filter((b) => blockNeeds(b.op) === cap)].map((b) => b.label.toLowerCase())
+  return givers.find((p) => labels.some((l) => l.includes(p.id))) ?? givers[0]
 }
 
 type Phase = 'edit' | 'running' | 'done'
 
-export default function SimChallengeClient({ arena: ch, design, onResult, onDesignChange, showMeAfter = 3 }: Props) {
+export default function SimChallengeClient({ arena: ch, design, onResult, onDesignChange, showMeAfter = 3, initialNodes, onProgramChange }: Props) {
   const [fitted, setFitted] = useState<RobotDesign>(design)
   // Follow the caller's robot when it really changes (not when a parent re-renders with an equal object).
   const designKey = `${design.name}|${design.body}|${design.drive}|${design.head}|${design.tool}|${design.sensor}|${design.primary}|${design.accent}`
@@ -80,14 +118,16 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
   const toFit = useMemo(() => partsToFit(ch, fitted, caps), [ch, fitted, caps])
   const missingCaps = ch.requires.filter((c) => !caps.has(c))
 
-  const [nodes, setNodes] = useState<PicNode[]>(() => cloneNodes(ch.starter))
-  const [cursor, setCursor] = useState<Cursor>({ parent: null, index: ch.starter.length })
+  const [nodes, setNodes] = useState<PicNode[]>(() => restoreNodes(initialNodes, ch.palette) ?? cloneNodes(ch.starter))
+  const [cursor, setCursor] = useState<Cursor>(() => ({ parent: null, index: (restoreNodes(initialNodes, ch.palette) ?? ch.starter).length }))
   const [phase, setPhase] = useState<Phase>('edit')
   const [result, setResult] = useState<ChallengeResult | null>(null)
   const [stars, setStars] = useState<{ stars: number; two: boolean; three: boolean; claimable: ('two' | 'three')[] } | null>(null)
   const [claimed, setClaimed] = useState<Set<'two' | 'three'>>(new Set())
   const [attempts, setAttempts] = useState(0)
   const [fails, setFails] = useState(0)
+  /** The fuller hint (result.reveal) is shown from the same failed run that offers "Show me a way". */
+  const revealNow = showMeAfter > 0 && fails >= showMeAfter
   const historyRef = useRef<PicNode[][]>([])
   const [run, setRun] = useState<StageRunRequest | null>(null)
   const [resetNonce, setResetNonce] = useState(0)
@@ -102,8 +142,23 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
   const lastRef = useRef<{ program: Program; nodes: PicNode[] } | null>(null)
   const viewRef = useRef<HTMLDivElement>(null)
 
-  // A new challenge: its starter program, a clean slate.
+  // Tell the caller about every program change (it may keep it across a reload).
+  const programChangeRef = useRef(onProgramChange)
+  programChangeRef.current = onProgramChange
+  const firstProgramRef = useRef(true)
   useEffect(() => {
+    if (firstProgramRef.current) {
+      firstProgramRef.current = false
+      return
+    }
+    programChangeRef.current?.(nodes)
+  }, [nodes])
+
+  // A new challenge: its starter program (or the one kept for it), a clean slate.
+  const challengeIdRef = useRef(ch.id)
+  useEffect(() => {
+    if (challengeIdRef.current === ch.id) return
+    challengeIdRef.current = ch.id
     setNodes(cloneNodes(ch.starter))
     setCursor({ parent: null, index: ch.starter.length })
     setPhase('edit')
@@ -129,6 +184,41 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
     }
     return out
   }, [ch, caps])
+
+  /** For each locked block, the part that would unlock it — never one that takes away a part the mission needs. */
+  const lockedFits = useMemo(() => {
+    const out = new Map<string, { part: RobotPart; blocks: string[]; keys: string[] }>()
+    for (const b of ch.palette) {
+      if (!locked.has(b.key)) continue
+      const need = blockNeeds(b.op) ?? (b.fixed.cond !== undefined ? blockNeeds(String(b.fixed.cond) === 'bumped' ? 'bumped' : 'distance_cm') : null)
+      if (!need) continue
+      const part = partFor(need, b, ch)
+      if (!part) continue
+      const after = capabilitiesOf(fitParts(fitted, [{ slot: part.slot, id: part.id }]))
+      if (ch.requires.some((c) => !after.has(c))) continue
+      const k = `${part.slot}:${part.id}`
+      const e = out.get(k) ?? { part, blocks: [], keys: [] }
+      e.blocks.push(b.op === 'say' ? 'Say' : b.label)
+      e.keys.push(b.key)
+      out.set(k, e)
+    }
+    return [...out.values()]
+  }, [ch, locked, fitted])
+
+  const lockedWhy = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const f of lockedFits) for (const k of f.keys) m.set(k, `needs the ${f.part.name}`)
+    return m
+  }, [lockedFits])
+
+  const swapIn = (part: RobotPart) => {
+    const old = getPart(part.slot, (fitted as unknown as Record<string, string>)[part.slot])
+    const d = fitParts(fitted, [{ slot: part.slot, id: part.id }])
+    setFitted(d)
+    onDesignChange?.(d)
+    playSound('unlock')
+    setBubble(old && old.id !== 'none' ? `${part.name} on! (The ${old.name} came off — one ${part.slot} at a time.)` : `${part.name} fitted!`)
+  }
 
   const fit = () => {
     const d = fitParts(fitted, toFit)
@@ -179,13 +269,14 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
         playSound(s.stars >= 3 ? 'levelup' : 'star')
         sparkSays(`You did it! ${s.stars} star${s.stars === 1 ? '' : 's'}!`)
       } else {
-        setFails((f) => f + 1)
+        const failsNow = fails + 1
+        setFails(failsNow)
         playSound('wrong')
-        sparkSays(res.message)
+        sparkSays(res.reveal && showMeAfter > 0 && failsNow >= showMeAfter ? `${res.message} ${res.reveal}` : res.message)
       }
       onResult({ success: res.success, stars: s.stars, attempts: n, program: last.program, nodes: last.nodes, result: res })
     },
-    [attempts, ch, onResult],
+    [attempts, ch, fails, onResult, showMeAfter],
   )
 
   const claim = (which: 'two' | 'three') => {
@@ -356,6 +447,11 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
                 <>
                   <p className="font-display text-lg font-bold text-amber-200">Not yet — let’s fix it!</p>
                   <p className="text-[15px] font-semibold text-slate-100">{result.message}</p>
+                  {result.reveal && revealNow && (
+                    <p className="mt-1 text-[15px] font-bold text-amber-100" data-testid="challenge-reveal">
+                      💡 {result.reveal}
+                    </p>
+                  )}
                 </>
               )}
             </div>
@@ -422,6 +518,28 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
             Start over
           </button>
         </div>
+        {lockedFits.length > 0 && (
+          <div className="flex flex-col gap-2 rounded-2xl border border-cyan-400/30 bg-cyan-400/[0.07] p-3" data-testid="swap-parts">
+            <p className="text-[15px] font-bold text-cyan-100">🔧 Want to use more blocks? Swap a part — your choice!</p>
+            <div className="flex flex-wrap gap-2">
+              {lockedFits.map(({ part, blocks }) => (
+                <button
+                  key={`${part.slot}:${part.id}`}
+                  type="button"
+                  onClick={() => swapIn(part)}
+                  disabled={running}
+                  data-testid={`swap-${part.id}`}
+                  className="flex min-h-[48px] flex-col items-start justify-center rounded-2xl bg-cyan-400 px-3 py-1.5 text-left text-[#0A1120] shadow transition-transform hover:bg-cyan-300 active:scale-[.97] disabled:opacity-40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+                >
+                  <span className="text-sm font-black">
+                    {part.emoji} Fit the {part.name}
+                  </span>
+                  <span className="text-[11px] font-bold leading-tight">for {blocks.join(', ')}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <PictureProgramClient
           palette={ch.palette}
           nodes={nodes}
@@ -432,6 +550,7 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
             if (phase === 'done') setPhase('edit')
           }}
           locked={locked}
+          lockedWhy={lockedWhy}
           activeUid={activeUid}
           disabled={running}
         />

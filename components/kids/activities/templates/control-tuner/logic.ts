@@ -67,7 +67,7 @@ export interface Params {
     settleS?: number
     /** Band half-width as % of the step. Default 5. */
     bandPct?: number
-    /** Max |error| averaged over the last 10 % of the run (target units). */
+    /** Max average |error| over the last 10 % of the run (target units). A response still wobbling round the target fails this. */
     maxSteadyErr?: number
   }
   /** Show the Python-style control loop with live numbers. Default on for ages 14+. */
@@ -197,7 +197,8 @@ export function simulate(p: Params, a: Answer): SimResult {
   for (let i = 0; i < Y.length; i++) if (Math.abs(Y[i] - p.target) > band) lastOut = i
   const settleS = lastOut === Y.length - 1 ? Infinity : lastOut < 0 ? 0 : T[lastOut + 1]
   const tail = Y.slice(Math.floor(Y.length * 0.9))
-  const steadyErr = Math.abs(tail.reduce((s, v) => s + v, 0) / tail.length - p.target)
+  // Mean ABSOLUTE error: a response that keeps oscillating around the target must not average to zero.
+  const steadyErr = tail.reduce((s, v) => s + Math.abs(v - p.target), 0) / tail.length
   let wobbles = 0
   let crossed = false
   let prevSign = Math.sign(p.target - Y[0])
@@ -256,8 +257,7 @@ function validate(p: Params): string[] {
   validRange(p.gains?.kp, 'kp', out)
   validRange(p.gains?.ki, 'ki', out)
   validRange(p.gains?.kd, 'kd', out)
-  if (!Number.isFinite(p.target) || p.target === 0) out.push('target must be a non-zero number')
-  if (p.plant === 'altitude' && p.target < 0) out.push('altitude target must be above the ground')
+  if (!Number.isFinite(p.target) || !(p.target > 0)) out.push('target must be a positive number (the run starts from 0 and the scenes show forward motion / height)')
   if (!(p.durationS >= 3 && p.durationS <= 30)) out.push('durationS: 3–30')
   const ph = p.physics
   if (ph && ((ph.mass !== undefined && !(ph.mass > 0)) || (ph.drag !== undefined && !(ph.drag >= 0)) || (ph.uMax !== undefined && !(ph.uMax > 0))))
@@ -275,6 +275,8 @@ function validate(p: Params): string[] {
   if (!tunable && kinds.length === 1) out.push('nothing to tune: give a gain range or a choice of controllers')
   if (out.length) return out
   if (!findSolution(p)) out.push('no gains in the allowed ranges meet the spec — widen the ranges or relax the spec')
+  if (kinds.length > 1 && kinds.includes('bang-bang') && passes(p, simulate(p, { controller: 'bang-bang' })))
+    out.push('bang-bang already meets the spec, so the lesson (it chatters and never settles) is lost — tighten the spec (e.g. add maxSteadyErr or settleS)')
   return out
 }
 

@@ -19,14 +19,17 @@ export const SCENE_H = 62.5
 
 export interface SceneObject {
   id: string
-  /** Emoji, or a built-in vector glyph 'svg:<name>' (see glyphs.tsx: vacuum, mower, lidar, camera, radar, ultrasonic, car, amr, dock, arm, drone). */
+  /** Emoji, or a built-in vector glyph 'svg:<name>' (see glyphs.tsx: vacuum, mower, lidar, camera, radar, ultrasonic, car, amr, dock, arm, forklift, shelf, drone, pod). */
   icon: string
   /** Centre position on the 100 × 62.5 canvas. */
   x: number
   y: number
   /** Icon size (canvas units, 4–16). Tap area is at least 44 px on any screen. */
   size: number
-  /** Name, shown when tapped. */
+  /**
+   * Name, shown when tapped and read by screen readers. In label mode name
+   * the PLACE ("Roof unit", "Front bumper"), never the kind ("Lidar").
+   */
   label: string
   /** Is it something to find? */
   target: boolean
@@ -48,7 +51,11 @@ export interface Params {
   decor?: { icon: string; x: number; y: number; size: number }[]
   /** 2–16 objects, at least 1 target. */
   objects: SceneObject[]
-  /** Label mode (ages 11+): each found target must be given its kind from this list. */
+  /**
+   * Label mode (ages 11+): each found target must be given its kind from this
+   * list. Every object is then drawn as a neutral pod (its real icon would give
+   * the kind away) and facts stay hidden until the labels pass.
+   */
   kinds?: { id: string; label: string }[]
   /** Wrong taps allowed before the check fails (default: unlimited for ages 5–10 — set 2–3 for older). */
   maxWrongTaps?: number
@@ -59,7 +66,7 @@ export interface Answer {
   found: string[]
   /** Label mode: target id → kind id. */
   labels?: Record<string, string>
-  /** How many non-targets were tapped along the way. */
+  /** How many DIFFERENT non-targets were tapped (re-tapping one to reread it is free). */
   wrongTaps?: number
 }
 
@@ -114,7 +121,11 @@ function check(p: Params, a: Answer): CheckResult {
     if (wrong.length) {
       const w = wrong[0]
       const kl = (id: string | undefined) => p.kinds!.find((k) => k.id === id)?.label ?? id
-      return { correct: false, score: 0.6 + 0.4 * (1 - wrong.length / targets.length), feedback: `${w.label} isn’t a ${kl(lab[w.id])}. Clue: ${w.fact}` }
+      return {
+        correct: false,
+        score: 0.6 + 0.4 * (1 - wrong.length / targets.length),
+        feedback: `${wrong.length === 1 ? 'One label is' : `${wrong.length} labels are`} not right yet — for example, “${w.label}” isn’t ${article(String(kl(lab[w.id])))}. Think about what that spot can see, and what that sensor has to measure there.`,
+      }
     }
   }
   return {
@@ -122,6 +133,11 @@ function check(p: Params, a: Answer): CheckResult {
     score: 1,
     feedback: `You found all ${targets.length}${p.kinds ? ' and named every one' : ''}! ${targets.length > 1 ? 'Each one is there for a reason — tap them again to reread why.' : targets[0].fact}`,
   }
+}
+
+function article(word: string): string {
+  const w = word.toLowerCase()
+  return `${/^[aeiou]/.test(w) ? 'an' : 'a'} ${w}`
 }
 
 function hintArea(o: SceneObject): string {

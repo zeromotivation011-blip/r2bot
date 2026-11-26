@@ -58,7 +58,7 @@ export const samples: Activity<Params, Answer>[] = [
     template: 'motor-math',
     difficulty: 4,
     intro: 'A 6.5 cm wheel, a 360-tick encoder and 5% slip on dusty floor. Command ticks and rpm so the rover stops 118–122 cm away in 3.5–4.5 s.',
-    takeaway: 'Odometry: distance = ticks ÷ ticks-per-rev × π·d. Slip makes it under-read reality, so robots fuse it with other sensors.',
+    takeaway: 'Odometry: distance = ticks ÷ ticks-per-rev × π·d. Slip makes odometry over-read — the wheels turn more than the robot moves — so robots fuse it with other sensors.',
     realWorld: 'Mars rovers compare wheel odometry with camera-based visual odometry because their wheels slip in sand.',
     params: {
       command: 'ticks',

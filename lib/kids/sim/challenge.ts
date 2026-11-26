@@ -259,6 +259,12 @@ export interface ChallengeResult {
   message: string
   /** Every criterion that failed, in order, as messages. */
   problems: string[]
+  /**
+   * A fuller hint that gives more of the answer away (e.g. the whole order of
+   * sounds). The player shows it only after several failed runs — the same
+   * point at which it offers "Show me a way" — so a first failure teaches.
+   */
+  reveal?: string
   time: number
   /** Which start pose failed (multi-start challenges). */
   startIndex: number
@@ -451,6 +457,7 @@ export function judgeChallengeRun(ch: Challenge, cr: ChallengeRun, program: Prog
   const sens = sim.sensors()
   const problems: { reason: ChallengeFail; message: string }[] = []
   const fail = (reason: ChallengeFail, message: string) => problems.push({ reason, message })
+  let reveal: { message: string; text: string } | undefined
   const stmts = stmtsOf(program.body)
   const ran = run.interp?.ctx.ran ?? new Set<string>()
   const timedOut = run.result?.reason === 'timeout'
@@ -465,7 +472,15 @@ export function judgeChallengeRun(ch: Challenge, cr: ChallengeRun, program: Prog
         return
       }
       case 'reach-zone':
-        if (!watch.reachedAt.has(i)) fail(timedOut ? 'timeout' : 'short', `Your robot did not get to ${c.label} yet. Does it need more time — a bigger Repeat?`)
+        if (!watch.reachedAt.has(i)) {
+          const loops = stmts.some((s) => FAMILY_OPS.loop.includes(s.op))
+          fail(
+            timedOut ? 'timeout' : 'short',
+            loops
+              ? `Your robot did not get to ${c.label} yet. Does it need more time — a bigger Repeat?`
+              : `Your robot did not get to ${c.label} yet. It needs to keep going — try a Repeat.`,
+          )
+        }
         return
       case 'no-touch': {
         const hits = [...sim.touched].filter((id) => !c.ids || c.ids.includes(id))
@@ -476,7 +491,11 @@ export function judgeChallengeRun(ch: Challenge, cr: ChallengeRun, program: Prog
         return
       }
       case 'sound-sequence':
-        if (!soundsMatch(sim.events, c.steps)) fail('order', orderHint(c.steps))
+        if (!soundsMatch(sim.events, c.steps)) {
+          const message = orderHint(c.steps, sim.events)
+          fail('order', message)
+          reveal = { message, text: fullOrder(c.steps) }
+        }
         return
       case 'say-before-move': {
         const said = sim.events.find((e) => e.kind === 'say' && (e.text ?? '').toLowerCase() === c.text.toLowerCase())
@@ -504,7 +523,7 @@ export function judgeChallengeRun(ch: Challenge, cr: ChallengeRun, program: Prog
         const ranN = stmts.filter((s) => ran.has(s.id)).length
         if (c.max !== undefined && n > c.max) fail('blocks', `That works, but it uses ${n} blocks. Can you do it with ${c.max} or fewer? (A Repeat helps.)`)
         else if (c.min !== undefined && n < c.min) fail('blocks', `Add more steps: use at least ${c.min} blocks.`)
-        else if (c.minRun !== undefined && ranN < c.minRun) fail('blocks', `Only ${ranN} blocks ran. Make a show with at least ${c.minRun}.`)
+        else if (c.minRun !== undefined && ranN < c.minRun) fail('blocks', `Only ${ranN} block${ranN === 1 ? '' : 's'} ran. Make a show with at least ${c.minRun}.`)
         else
           for (const f of c.needs ?? []) {
             if (!stmts.some((s) => FAMILY_OPS[f].includes(s.op))) {
@@ -553,13 +572,51 @@ export function judgeChallengeRun(ch: Challenge, cr: ChallengeRun, program: Prog
   // The most useful message first: a bump, then where it ended, then the rest.
   const order: ChallengeFail[] = ['collision', 'crossed', 'dark', 'order', 'not-delivered', 'drawing', 'short', 'timeout', 'moving', 'facing', 'no-bump', 'blocks']
   problems.sort((a, b) => order.indexOf(a.reason) - order.indexOf(b.reason))
-  if (problems.length > 0) return { ...base, success: false, reason: problems[0].reason, message: problems[0].message, problems: problems.map((p) => p.message) }
+  if (problems.length > 0) {
+    const out: ChallengeResult = { ...base, success: false, reason: problems[0].reason, message: problems[0].message, problems: problems.map((p) => p.message) }
+    // The full answer only travels with the problem it belongs to.
+    if (reveal && problems[0].message === reveal.message) out.reveal = reveal.text
+    return out
+  }
   return { ...base, success: true, reason: null, message: 'You did it!', problems: [] }
 }
 
-function orderHint(steps: SoundStep[]): string {
+type SoundWord = { kind: 'beep' } | { kind: 'say'; text: string }
+
+function soundWord(s: SoundWord): string {
+  return s.kind === 'beep' ? 'Beep' : 'Say'
+}
+
+function sameSound(a: SoundWord, b: SoundWord): boolean {
+  return a.kind === b.kind && (a.kind === 'beep' || (b.kind === 'say' && a.text.toLowerCase() === b.text.toLowerCase()))
+}
+
+/**
+ * A first-failure hint that teaches without solving: it names only the first
+ * sound that is missing or out of place. The whole order is `fullOrder`,
+ * which the player reveals after several failed runs.
+ */
+export function orderHint(steps: SoundStep[], events: { t: number; kind: string; text?: string }[]): string {
+  const want: SoundWord[] = steps.filter((s): s is SoundWord => s.kind !== 'pause')
+  const got: SoundWord[] = events
+    .filter((e) => e.kind === 'beep' || e.kind === 'say')
+    .map((e) => (e.kind === 'beep' ? { kind: 'beep' as const } : { kind: 'say' as const, text: e.text ?? '' }))
+  if (got.length === 0) return 'Your robot did not make a sound. Which sound should come first?'
+  const n = Math.min(want.length, got.length)
+  for (let j = 0; j < n; j++) {
+    if (sameSound(want[j], got[j])) continue
+    if (j === 0) return `Not quite. Should the ${soundWord(got[0])} really come first?`
+    return `Something should happen before the ${soundWord(got[j])}. Look at sound ${j + 1}.`
+  }
+  if (got.length < want.length) return `Good start! After the ${soundWord(got[got.length - 1])}, your robot still has more to do.`
+  // Every sound is there in order, so a wait is missing (or too short).
+  return 'The sounds are in the right order. Does your robot need to wait somewhere?'
+}
+
+/** The whole order, for when the child has tried a few times. */
+export function fullOrder(steps: SoundStep[]): string {
   const words = steps.map((s) => (s.kind === 'beep' ? 'beep' : s.kind === 'say' ? `say “${s.text}”` : `wait ${s.seconds} s`))
-  return `Not quite the right order. Try: ${words.join(', then ')}.`
+  return `Here is the order: ${words.join(', then ')}.`
 }
 
 /** Run every start pose to the end, headless. Fails on the first start that fails. */

@@ -304,6 +304,20 @@ function validate(p: Params): string[] {
   })
   if (p.maxSteps !== undefined && (!Number.isInteger(p.maxSteps) || p.maxSteps < 10 || p.maxSteps > 300)) errs.push('maxSteps must be an integer 10–300')
   if (errs.length) return errs
+  // Names must exist: a typo in a question's variable would make it silently
+  // answer "no" every time, and an expectation nobody writes can never be met.
+  const written = new Set<string>()
+  p.cards.forEach((c) => { if (c.kind === 'action') (c.effects ?? []).forEach((e) => written.add(e.var)) })
+  p.cases.forEach((cs, i) => {
+    const known = new Set([...Object.keys(p.vars ?? {}), ...Object.keys(cs.vars ?? {}), ...Object.keys(cs.sensors ?? {})])
+    p.cards.forEach((c) => {
+      if (c.kind === 'decision' && c.test && !known.has(c.test.var)) errs.push(`card "${c.id}" asks about "${c.test.var}", which is not a variable or sensor in cases[${i}] ("${cs.name}")`)
+    })
+    Object.keys(cs.expect).forEach((k) => {
+      if (!known.has(k) && !written.has(k)) errs.push(`cases[${i}].expect.${k} is not a variable: no action card writes it and vars does not define it`)
+    })
+  })
+  if (errs.length) return errs
   // Every node reachable from start?
   const seen = new Set<string>()
   const stack = [starts[0].id]

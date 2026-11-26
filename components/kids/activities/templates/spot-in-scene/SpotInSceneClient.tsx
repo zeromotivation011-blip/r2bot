@@ -14,6 +14,8 @@ import { SCENE_H, SCENE_W, type Answer, type Params, type SceneObject } from './
 import { Glyph, IconBox } from './glyphs'
 import { FeedbackPanel, TemplateCard, btnPrimary, chip, useAttempts } from '../gear-train/TemplateFrameClient'
 
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
+
 export default function SpotInSceneClient({ params: p, onSubmit, onDone }: TemplateProps<Params, Answer>) {
   const att = useAttempts(onSubmit, onDone)
   const [found, setFound] = useState<string[]>([])
@@ -27,6 +29,10 @@ export default function SpotInSceneClient({ params: p, onSubmit, onDone }: Templ
   const targets = p.objects.filter((o) => o.target)
   const allFound = targets.every((o) => found.includes(o.id))
   const allLabelled = !p.kinds || targets.every((o) => labels[o.id])
+  // Label mode hides what each target IS (icon and fact) until the labels pass.
+  const labelMode = !!p.kinds
+  const revealKinds = !labelMode || solved || att.done
+  const iconOf = (o: SceneObject) => (revealKinds || (!o.target && missed.includes(o.id)) ? o.icon : 'svg:pod')
 
   useEffect(() => {
     const el = wrap.current
@@ -46,11 +52,13 @@ export default function SpotInSceneClient({ params: p, onSubmit, onDone }: Templ
         setFound((f) => [...f, o.id])
         playSound(found.length + 1 === targets.length ? 'star' : 'correct')
       } else playSound('click')
-    } else {
-      if (!missed.includes(o.id)) setMissed((m) => [...m, o.id])
+    } else if (!missed.includes(o.id)) {
+      // Only the first tap on a non-target counts; tapping it again to reread
+      // why it isn't one is free.
+      setMissed((m) => [...m, o.id])
       setWrongTaps((w) => w + 1)
       playSound('wrong')
-    }
+    } else playSound('click')
   }
 
   const reset = () => {
@@ -86,7 +94,7 @@ export default function SpotInSceneClient({ params: p, onSubmit, onDone }: Templ
         </p>
       </div>
 
-      <div ref={wrap} className="mt-3 overflow-hidden rounded-[20px] border border-white/10">
+      <div ref={wrap} className="relative mt-3 overflow-hidden rounded-[20px] border border-white/10">
         <svg viewBox={`0 0 ${SCENE_W} ${SCENE_H}`} className="block w-full select-none" role="group" aria-label="Scene">
           <Backdrop kind={p.backdrop} />
           {(p.decor ?? []).map((d, i) => (
@@ -101,7 +109,7 @@ export default function SpotInSceneClient({ params: p, onSubmit, onDone }: Templ
                 key={o.id}
                 role="button"
                 tabIndex={0}
-                aria-label={isFound ? `${o.label} (found)` : isMiss ? `${o.label} (not one)` : 'Something in the scene'}
+                aria-label={isFound ? `${o.label}, found` : isMiss ? `${o.label}, not one` : o.label}
                 aria-pressed={isFound}
                 onClick={() => tap(o)}
                 onKeyDown={(e) => {
@@ -114,15 +122,9 @@ export default function SpotInSceneClient({ params: p, onSubmit, onDone }: Templ
               >
                 <circle cx={o.x} cy={o.y} r={r} fill="transparent" />
                 <circle className="ring" cx={o.x} cy={o.y} r={o.size / 2 + 1} fill="none" stroke="#FFA878" strokeWidth={0.6} opacity={0} />
-                <Glyph icon={o.icon} x={o.x} y={o.y} size={o.size} />
+                <Glyph icon={iconOf(o)} x={o.x} y={o.y} size={o.size} />
                 {isFound && (
-                  <g className="motion-safe:animate-[fadeIn_.2s_ease-out]" pointerEvents="none">
-                    <circle cx={o.x} cy={o.y} r={o.size / 2 + 1.2} fill="none" stroke="#22C55E" strokeWidth={0.9} />
-                    <rect x={o.x - 9} y={o.y + o.size / 2 + 0.6} width={18} height={4} rx={1.5} fill="#22C55E" />
-                    <text x={o.x} y={o.y + o.size / 2 + 3.5} fontSize={2.6} fontWeight={700} fill="#04150A" textAnchor="middle">
-                      {o.label.length > 14 ? o.label.slice(0, 13) + '…' : o.label}
-                    </text>
-                  </g>
+                  <circle className="motion-safe:animate-[fadeIn_.2s_ease-out]" pointerEvents="none" cx={o.x} cy={o.y} r={o.size / 2 + 1.2} fill="none" stroke="#22C55E" strokeWidth={0.9} />
                 )}
                 {isMiss && !isFound && (
                   <g pointerEvents="none">
@@ -133,6 +135,19 @@ export default function SpotInSceneClient({ params: p, onSubmit, onDone }: Templ
             )
           })}
         </svg>
+        {/* Name tags in HTML so they stay readable (≥ 13 px) on a phone. */}
+        {targets
+          .filter((o) => found.includes(o.id))
+          .map((o) => (
+            <span
+              key={o.id}
+              aria-hidden
+              className="pointer-events-none absolute max-w-[40%] -translate-x-1/2 truncate rounded-md bg-[#22C55E] px-1.5 py-0.5 text-[13px] font-bold leading-tight text-[#04150A] motion-safe:animate-[fadeIn_.2s_ease-out]"
+              style={{ left: `${(o.x / SCENE_W) * 100}%`, top: `${((o.y + o.size / 2 + 0.8) / SCENE_H) * 100}%` }}
+            >
+              {o.label}
+            </span>
+          ))}
       </div>
 
       {last && (
@@ -144,7 +159,7 @@ export default function SpotInSceneClient({ params: p, onSubmit, onDone }: Templ
           }`}
         >
           <b className={last.target ? 'text-[#22C55E]' : 'text-amber-300'}>{last.target ? `Found: ${last.label}! ` : `${last.label} — not one. `}</b>
-          {last.target ? last.fact : `It’s not, because ${last.fact}`}
+          {last.target ? (revealKinds ? cap(last.fact) : 'Now choose below what kind it is.') : `It’s not, because ${last.fact}`}
         </p>
       )}
 
@@ -157,7 +172,7 @@ export default function SpotInSceneClient({ params: p, onSubmit, onDone }: Templ
               .map((o) => (
                 <li key={o.id} className="flex flex-wrap items-center gap-2">
                   <span className="flex min-w-[9rem] items-center gap-2 text-[15px] font-semibold text-[#EEF2F8]">
-                    <IconBox icon={o.icon} px={26} /> {o.label}
+                    <IconBox icon={iconOf(o)} px={26} /> {o.label}
                   </span>
                   <span className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={`Kind of ${o.label}`}>
                     {p.kinds!.map((k) => (
@@ -178,6 +193,7 @@ export default function SpotInSceneClient({ params: p, onSubmit, onDone }: Templ
                       </button>
                     ))}
                   </span>
+                  {revealKinds && <span className="basis-full text-[14px] leading-snug text-[#A7B0C0]">{cap(o.fact)}</span>}
                 </li>
               ))}
           </ul>

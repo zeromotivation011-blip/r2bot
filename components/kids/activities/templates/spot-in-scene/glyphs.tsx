@@ -1,6 +1,6 @@
 // components/kids/activities/templates/spot-in-scene/glyphs.tsx
 // Small vector glyphs for robots and sensors that have no emoji (robot vacuum,
-// lidar, radar…). Content authors write `icon: 'svg:lidar'`; anything else is
+// lidar, radar, forklift…). Content authors write `icon: 'svg:lidar'`; anything else is
 // drawn as text (emoji). Used by spot-in-scene, robot-match, estimate and
 // classify-sort. Pure SVG — no hooks, safe in any client component.
 
@@ -95,6 +95,42 @@ const SHAPES: Record<string, ReactElement> = {
       <path d="M40 78 L40 52 L70 30" stroke="#FC6818" strokeWidth="10" strokeLinecap="round" fill="none" />
       <circle cx="40" cy="52" r="7" fill="#C9D4E5" />
       <path d="M70 30 L84 22 M70 30 L82 40" stroke="#C9D4E5" strokeWidth="5" strokeLinecap="round" />
+    </g>
+  ),
+  forklift: (
+    <g>
+      <rect x="40" y="18" width="6" height="60" fill="#2A3A5C" />
+      <rect x="46" y="70" width="40" height="5" fill="#C9D4E5" />
+      <path d="M8 74 L8 44 Q8 38 14 38 L28 38 L34 26 L40 26 L40 74 Z" fill="#FFB020" />
+      <path d="M16 38 L16 24 Q16 20 20 20 L34 20 L34 26" stroke="#2A3A5C" strokeWidth="3" fill="none" />
+      <rect x="4" y="60" width="10" height="12" rx="2" fill="#2A3A5C" />
+      <circle cx="16" cy="78" r="8" fill={INK} />
+      <circle cx="34" cy="78" r="8" fill={INK} />
+      <circle cx="16" cy="78" r="3" fill="#6E7888" />
+      <circle cx="34" cy="78" r="3" fill="#6E7888" />
+    </g>
+  ),
+  shelf: (
+    <g>
+      <rect x="10" y="10" width="5" height="80" fill="#6E7888" />
+      <rect x="85" y="10" width="5" height="80" fill="#6E7888" />
+      {[30, 58, 86].map((y) => (
+        <rect key={y} x="10" y={y} width="80" height="4" fill="#9AA6B8" />
+      ))}
+      <rect x="20" y="14" width="22" height="16" fill="#C08457" />
+      <rect x="48" y="18" width="16" height="12" fill="#D9A066" />
+      <rect x="18" y="42" width="18" height="16" fill="#D9A066" />
+      <rect x="42" y="40" width="26" height="18" fill="#C08457" />
+      <rect x="24" y="70" width="28" height="16" fill="#C08457" />
+      <rect x="58" y="72" width="20" height="14" fill="#D9A066" />
+    </g>
+  ),
+  /** A neutral "something is mounted here" pod — hides what kind it is. */
+  pod: (
+    <g>
+      <circle cx="50" cy="50" r="38" fill="#19263F" stroke="#A7B0C0" strokeWidth="6" strokeDasharray="10 7" />
+      <path d="M40 40 Q40 28 50 28 Q61 28 61 39 Q61 46 53 50 Q50 52 50 58" stroke="#EEF2F8" strokeWidth="7" fill="none" strokeLinecap="round" />
+      <circle cx="50" cy="70" r="4.5" fill="#EEF2F8" />
     </g>
   ),
   drone: (

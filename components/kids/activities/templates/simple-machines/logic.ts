@@ -49,7 +49,7 @@ export interface Params {
   rampFriction?: number
   /** Pulley system efficiency η (0.5–1). 1 = ideal; real rope-and-pulley blocks are ~0.8–0.9. */
   pulleyEfficiency?: number
-  /** Lever: distance from the pivot to the load, metres. Default 0.5. */
+  /** Lever: distance from the pivot to the load, metres. Default 0.5. The load end can rise at most 2 × this, so `height` must not exceed it when a lever is offered. */
   leverLoadArm?: number
   /** Wheel & axle: radius of the drum the rope winds on, cm. Default 2. */
   axleRadiusCm?: number
@@ -185,9 +185,23 @@ function validate(p: Params): string[] {
     if (o.kind === 'pulley' && (!Number.isInteger(o.min) || !Number.isInteger(o.max) || !Number.isInteger(o.step) || o.max > 8))
       e.push('pulley strands must be whole numbers, at most 8.')
   }
+  // A lever's load end swings on an arc of radius leverLoadArm: it can rise at most 2 × that.
+  if (kinds.has('lever') && p.height > 2 * (p.leverLoadArm ?? 0.5) + EPS)
+    e.push(`lever: a ${p.leverLoadArm ?? 0.5} m load arm can raise its end at most ${2 * (p.leverLoadArm ?? 0.5)} m — lower the height or lengthen leverLoadArm.`)
   if (e.length) return e
   if (weight(p) <= p.maxEffort) e.push('Trivial: the robot can lift the load straight up, so no machine is needed.')
-  if (!bestDistance(p)) e.push('Unsolvable: no machine setting meets the effort and distance limits.')
+  const best = bestDistance(p)
+  if (!best) e.push('Unsolvable: no machine setting meets the effort and distance limits.')
+  else {
+    const least = (p.goal ?? 'works') === 'least-distance'
+    const every = p.machines.every((o) =>
+      gridValues(o).every((v) => {
+        const r = simulate(p, { machine: o.kind, setting: v })
+        return works(p, r) && (!least || r.distance <= best.distance + 1e-6)
+      }),
+    )
+    if (every) e.push('Trivial: every machine and every slider setting works, so the choice teaches nothing.')
+  }
   return e
 }
 

@@ -39,7 +39,7 @@ export const samples: Activity<Params, Answer>[] = [
     difficulty: 3,
     intro: 'The delivery bot must cruise at exactly 2 m/s. With only P it always runs a little slow, because drag never stops pushing back. Add I to finish the job.',
     takeaway: 'The I term adds up leftover error over time, so it keeps pushing until the error is truly zero.',
-    realWorld: 'Car cruise control and every robot wheel-speed controller uses a PI loop like this.',
+    realWorld: 'Car cruise control and most robot wheel-speed controllers use a PI loop like this.',
     params: {
       plant: 'speed',
       label: 'Cruise at 2 m/s',
@@ -62,7 +62,7 @@ export const samples: Activity<Params, Answer>[] = [
     difficulty: 5,
     intro: 'Tune a full PID altitude controller: climb to 2 m without overshooting, cancel gravity with the I term, and recover from a downward gust at 6 s. The height sensor is noisy.',
     takeaway: 'P sets the speed of response, D damps it (but amplifies noise), and I removes steady error and rejects constant disturbances like gravity.',
-    realWorld: 'Every quadcopter flight controller (PX4, ArduPilot, Betaflight) runs cascaded PID loops tuned exactly like this.',
+    realWorld: 'PX4 and ArduPilot drones hold altitude with cascaded PID loops like this.',
     params: {
       plant: 'altitude',
       label: 'Hover at 2 m',

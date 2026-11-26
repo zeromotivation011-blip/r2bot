@@ -67,12 +67,24 @@ export interface InventoryItem {
   count: number
 }
 
+/**
+ * What a goal is about — give exactly ONE of:
+ *   edge: a FIXED part's edge id (never a slot: the same tray part could sit
+ *         in another gap of the same series branch and work just as well);
+ *   item: a tray item id (count must be 1) — the goal follows that part into
+ *         whichever gap the child put it in. Use this for placed parts.
+ */
+export interface GoalRef {
+  edge?: string
+  item?: string
+}
+
 export type Goal =
-  /** A bulb/LED/motor edge must be lit/running ('on') or dark/stopped ('off'). */
-  | { edge: string; want: 'on' | 'off' }
-  /** The current through an edge (mA, absolute) must fall in a range. Ages 11+. */
-  | { edge: string; currentMa: { min?: number; max?: number } }
-  /** These bulbs/LEDs must be equally bright (currents within 5 %) and on. */
+  /** A bulb/LED/motor must be lit/running ('on') or dark/stopped ('off'). */
+  | (GoalRef & { want: 'on' | 'off' })
+  /** The current through a part (mA, absolute) must fall in a range. Ages 11+. */
+  | (GoalRef & { currentMa: { min?: number; max?: number } })
+  /** These bulbs/LEDs (fixed edge ids or count-1 tray item ids) must be equally bright (currents within 5 %) and on. */
   | { equal: string[] }
 
 export interface Params {
@@ -81,7 +93,10 @@ export interface Params {
   edges: EdgeDef[]
   /** 1–5 kinds of part in the tray. Offer tempting wrong ones (a wire that shorts, a too-small resistor). */
   inventory: InventoryItem[]
-  /** 1–4 goals. Short circuits and burnt LEDs always fail, without being listed. */
+  /**
+   * 1–4 goals. Short circuits (the battery sees less than 1 Ω outside itself)
+   * and burnt LEDs always fail, without being listed.
+   */
   goals: Goal[]
   /** One-line job shown above the circuit ("Light bulb A but not bulb B"). */
   job: string
@@ -92,8 +107,6 @@ export interface Params {
    * powers on when the child presses "Switch on" — predict first (ages 11+).
    */
   liveSim?: boolean
-  /** Battery current above this (A) counts as a short circuit. Default 1.5. */
-  shortLimitA?: number
 }
 
 export interface Placement {
@@ -130,6 +143,8 @@ export interface CircuitState {
 }
 
 const R_INT = 0.5
+/** A battery whose outside path is below this many ohms is short-circuited (a wire or paperclip straight across it). */
+const R_SHORT = 1
 const R_WIRE = 0.01
 const R_LED = 10
 const GMIN = 1e-9
@@ -258,7 +273,6 @@ export function solveCircuit(p: Params, ans: Answer): CircuitState {
     if (!changed) break
   }
 
-  const limit = (p.shortLimitA ?? 1.5) * 1000
   let short = false
   let shortEdge: string | undefined
   const edges: EdgeState[] = els.map((e) => {
@@ -287,7 +301,9 @@ export function solveCircuit(p: Params, ans: Answer): CircuitState {
     } else if (part?.kind === 'motor') {
       on = Math.abs(mA) >= (part.ratedMa ?? 100)
       brightness = Math.min(1, Math.abs(mA) / ((part.ratedMa ?? 100) * 3))
-    } else if (part?.kind === 'battery' && Math.abs(mA) > limit) {
+    } else if (part?.kind === 'battery' && Math.abs(I) > (part.volts ?? 3) / (R_INT + R_SHORT)) {
+      // Judge the short by the LOAD, not by a current limit: a legal 12 V circuit with two
+      // 15 Ω bulbs draws 1.6 A, but its outside resistance is 7.5 Ω — not a short.
       short = true
       shortEdge = e.id
     }
@@ -324,36 +340,46 @@ export function partName(part: PartSpec): string {
   return part.label ?? part.kind
 }
 
-function edgeName(p: Params, id: string): string {
-  const e = p.edges.find((x) => x.id === id)
-  const part = e?.part
-  return part?.label ?? (part ? `the ${partName(part)}` : `slot ${id}`)
-}
-
 interface GoalOutcome {
   ok: boolean
   why: string
 }
 
-function goalOutcome(p: Params, s: CircuitState, g: Goal): GoalOutcome {
-  const get = (id: string) => s.edges.find((e) => e.id === id)
+/** The edge a goal reference points at, for this answer (undefined: the item is not placed). */
+export function refEdge(p: Params, a: Answer, ref: string): string | undefined {
+  const e = p.edges.find((x) => x.id === ref)
+  if (e && !e.slot) return e.id
+  return p.edges.find((x) => x.slot && a?.placed?.[x.id]?.item === ref)?.id
+}
+
+function refName(p: Params, ref: string): string {
+  const e = p.edges.find((x) => x.id === ref)
+  if (e?.part) return e.part.label ?? `the ${partName(e.part)}`
+  const it = p.inventory.find((i) => i.id === ref)
+  return it ? (it.part.label ?? `the ${partName(it.part)}`) : `part ${ref}`
+}
+
+function goalOutcome(p: Params, a: Answer, s: CircuitState, g: Goal): GoalOutcome {
+  const get = (id: string | undefined) => (id ? s.edges.find((e) => e.id === id) : undefined)
   if ('equal' in g) {
-    const es = g.equal.map(get).filter((e): e is EdgeState => !!e)
+    const missing = g.equal.find((r) => !refEdge(p, a, r))
+    if (missing) return { ok: false, why: `${refName(p, missing)} is not in the circuit yet` }
+    const es = g.equal.map((r) => get(refEdge(p, a, r))).filter((e): e is EdgeState => !!e)
     const cur = es.map((e) => Math.abs(e.currentMa))
     const lo = Math.min(...cur)
     const hi = Math.max(...cur)
     const ok = es.every((e) => e.on) && hi > 0 && (hi - lo) / hi <= 0.05
     return { ok, why: ok ? '' : es.some((e) => !e.on) ? 'not all of them are on' : 'they are not equally bright — one gets more current than the other' }
   }
-  const e = get(g.edge)
-  if (!e) return { ok: false, why: 'missing part' }
-  const name = e.part ? (e.part.label ?? `the ${partName(e.part)}`) : edgeName(p, g.edge)
+  const ref = g.item ?? g.edge ?? ''
+  const name = refName(p, ref)
+  const e = get(refEdge(p, a, ref))
+  if (!e) return { ok: 'want' in g && g.want === 'off', why: `${name} is not in the circuit yet — snap it into a gap` }
   if ('want' in g) {
     const ok = g.want === 'on' ? e.on : !e.on
     if (ok) return { ok, why: '' }
     if (g.want === 'on') {
-      if (!e.part) return { ok, why: 'a gap in the circuit is still empty — fill it with a part' }
-      if (e.part.kind === 'led' && (e.flipped ? -e.volts : e.volts) < 0) return { ok, why: `${name} is in backwards — an LED only lets current flow from + to −` }
+      if (e.part?.kind === 'led' && (e.flipped ? -e.volts : e.volts) < 0) return { ok, why: `${name} is in backwards — an LED only lets current flow from + to −` }
       if (Math.abs(e.currentMa) < 0.5) return { ok, why: `no current reaches ${name}: the loop is not complete (or a wire lets the current go round it)` }
       return { ok, why: `${name} gets only ${Math.round(Math.abs(e.currentMa))} mA — not enough to ${e.part?.kind === 'motor' ? 'turn' : 'glow'}` }
     }
@@ -367,7 +393,7 @@ function goalOutcome(p: Params, s: CircuitState, g: Goal): GoalOutcome {
 
 export function evaluate(p: Params, a: Answer): { state: CircuitState; outcomes: GoalOutcome[]; burnt: EdgeState | undefined } {
   const state = solveCircuit(p, a)
-  return { state, outcomes: p.goals.map((g) => goalOutcome(p, state, g)), burnt: state.edges.find((e) => e.burnt) }
+  return { state, outcomes: p.goals.map((g) => goalOutcome(p, a, state, g)), burnt: state.edges.find((e) => e.burnt) }
 }
 
 function works(p: Params, a: Answer): boolean {
@@ -435,14 +461,37 @@ function validate(p: Params): string[] {
   const batteries = (p.edges ?? []).filter((e) => e.part?.kind === 'battery').length + (p.inventory ?? []).filter((i) => i.part.kind === 'battery').length
   if (batteries === 0) out.push('the circuit needs a battery (fixed or in the tray)')
   if (!p.goals || p.goals.length < 1 || p.goals.length > 4) out.push('goals: 1–4')
+  const canGlow = (k?: PartKind) => k === 'bulb' || k === 'led' || k === 'motor'
+  /** Checks one goal reference; returns the part kind it points at. */
+  const checkRef = (r: string | undefined, where: string): PartKind | undefined => {
+    if (!r) return undefined
+    const e = (p.edges ?? []).find((x) => x.id === r)
+    const it = (p.inventory ?? []).find((i) => i.id === r)
+    if (e && it) out.push(`${where}: "${r}" is both an edge id and a tray item id — rename one`)
+    if (e?.slot)
+      out.push(`${where}: "${r}" is a slot — a goal on a gap is ambiguous (the same part could sit in another gap of that branch). Point it at the tray part with { item: '…' }`)
+    else if (e) return e.part?.kind
+    else if (it) {
+      if (it.count !== 1) out.push(`${where}: tray item "${r}" has count ${it.count} — goals can only follow a part the tray holds once`)
+      return it.part.kind
+    } else out.push(`${where}: unknown edge or tray item "${r}"`)
+    return undefined
+  }
   for (const g of p.goals ?? []) {
-    const refs = 'equal' in g ? g.equal : [g.edge]
-    for (const r of refs) if (!eids.has(r)) out.push(`goal refers to unknown edge ${r}`)
-    if ('want' in g) {
-      const e = p.edges.find((x) => x.id === g.edge)
-      const canGlow = (k?: PartKind) => k === 'bulb' || k === 'led' || k === 'motor'
-      if (e && !e.slot && !canGlow(e.part?.kind)) out.push(`goal on ${g.edge}: only bulbs, LEDs and motors can be on/off`)
+    if ('equal' in g) {
+      if (!Array.isArray(g.equal) || g.equal.length < 2) out.push('equal goal needs at least 2 parts')
+      for (const r of g.equal ?? []) {
+        const k = checkRef(r, 'equal goal')
+        if (k && k !== 'bulb' && k !== 'led') out.push(`equal goal: "${r}" must be a bulb or LED`)
+      }
+      continue
     }
+    if (!!g.edge === !!g.item) {
+      out.push('each on/off or current goal needs exactly one of edge or item')
+      continue
+    }
+    const k = checkRef(g.item ?? g.edge, `goal on ${g.item ?? g.edge}`)
+    if ('want' in g && k && !canGlow(k)) out.push(`goal on ${g.item ?? g.edge}: only bulbs, LEDs and motors can be on/off`)
   }
   if (out.length) return out
   if (works(p, { placed: {} })) out.push('the circuit already does the job with every slot empty')
@@ -465,7 +514,7 @@ function check(p: Params, a: Answer): CheckResult {
     return {
       correct: false,
       score: 0.2,
-      feedback: `The LED burnt out: ${Math.round(burnt.currentMa)} mA is more than it can take (about 30 mA). Put a resistor in series with it to hold the current back.`,
+      feedback: `The LED burnt out: ${Math.round(Math.abs(burnt.currentMa))} mA is more than it can take (about 30 mA). Put a resistor in series with it to hold the current back.`,
     }
   const passed = outcomes.filter((o) => o.ok).length
   const fail = outcomes.find((o) => !o.ok)

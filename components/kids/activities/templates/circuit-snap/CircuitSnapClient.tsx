@@ -10,13 +10,31 @@ import { useMemo, useRef, useState } from 'react'
 import type { TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
 import { evaluate, partName, type Answer, type EdgeDef, type EdgeState, type Params, type PartSpec, type Placement } from './logic'
-import { LED_HEX } from '../ohms-law/logic'
-import { FeedbackPanel, TemplateCard, btnGhost, btnPrimary, useAnimationFrame, useAttempts, useReducedMotion } from '../gear-train/TemplateFrameClient'
+import { LED_HEX, bandsFor } from '../ohms-law/logic'
+import { FeedbackPanel, TemplateCard, btnGhost, btnPrimary, useAnimationFrame, useAttempts, useReducedMotion, useSvgScale } from '../gear-train/TemplateFrameClient'
 
-const VW = 400
-const VH = 230
-const GX = (x: number) => 32 + x * 42
-const GY = (y: number) => 22 + y * 38
+// Grid → viewBox units. The viewBox is fitted to the nodes actually used (plus
+// room for labels), so a phone shows the circuit as big as it can.
+const CX = 42
+const CY = 38
+const GX = (x: number) => x * CX
+const GY = (y: number) => y * CY
+/** Layout assumes text up to this many viewBox units (what 13 px needs on a 340 px phone). */
+const F_LAYOUT = 15
+const SLOT_HALF = 30
+const textW = (t: string, f = F_LAYOUT) => t.length * 0.58 * f
+const isVertical = (ang: number) => Math.abs(ang) > 45 && Math.abs(ang) < 135
+/** Split a label into at most two lines (so a vertical part's label stays narrow). */
+function labelLines(t: string): string[] {
+  const w = t.split(' ')
+  if (w.length < 2 || t.length <= 7) return [t]
+  const half = Math.ceil(w.length / 2)
+  return [w.slice(0, half).join(' '), w.slice(half).join(' ')]
+}
+function labelOf(part: PartSpec): string {
+  const l = part.label ?? ''
+  return part.kind === 'battery' ? `${l ? `${l} ` : ''}${part.volts ?? 3} V` : l
+}
 
 function icon(part: PartSpec): string {
   switch (part.kind) {
@@ -111,6 +129,46 @@ export default function CircuitSnapClient({ params: p, band, onSubmit, onDone }:
   const nodeAt = (id: string) => p.nodes.find((n) => n.id === id)!
   const short = on && ev.state.short
 
+  // Fit the viewBox to the circuit: label room on the outer sides only.
+  const box = useMemo(() => {
+    const xs = p.nodes.map((n) => n.x)
+    const ys = p.nodes.map((n) => n.y)
+    const minX = Math.min(...xs)
+    const maxX = Math.max(...xs)
+    let left = SLOT_HALF + 6
+    let right = SLOT_HALF + 6
+    for (const e of p.edges) {
+      const A = p.nodes.find((n) => n.id === e.a)!
+      const B = p.nodes.find((n) => n.id === e.b)!
+      if (A.x !== B.x) continue // horizontal: label above, meter below
+      const parts = e.slot ? p.inventory.map((i) => i.part) : e.part ? [e.part] : []
+      const w = Math.max(0, ...parts.map((pt) => Math.max(0, ...labelLines(labelOf(pt)).map((l) => (l ? textW(l) : 0)))))
+      const meterW = textW('888 mA')
+      if (A.x === minX) {
+        left = Math.max(left, w ? 26 + w + 6 : 0)
+        right = Math.max(right, minX === maxX ? 30 + meterW : 0)
+      } else if (A.x === maxX) right = Math.max(right, 26 + Math.max(w, meterW) + 6)
+    }
+    const x0 = GX(minX) - left
+    const y0 = GY(Math.min(...ys)) - (SLOT_HALF + 2 + F_LAYOUT)
+    const w = GX(maxX) - GX(minX) + left + right
+    const h = GY(Math.max(...ys)) - GY(Math.min(...ys)) + SLOT_HALF + 2 + F_LAYOUT + 34 + F_LAYOUT
+    return { x0, y0, w, h, minX, maxX }
+  }, [p.nodes, p.edges, p.inventory])
+  const { ref: svgRef, font } = useSvgScale<SVGSVGElement>(box.w)
+  const fs = font(11, 13)
+  /**
+   * Meter baseline for a vertical part: always on its right. On the right-hand
+   * edge the label is there too, so the meter goes under the label (it used to
+   * sit on the left and collide with the middle branch's meter).
+   */
+  const meterY = (part: PartSpec, my: number, labelRight: boolean) => {
+    const n = labelLines(labelOf(part)).filter(Boolean).length
+    if (!n || !labelRight) return my + fs * 0.35
+    const first = my + fs * 0.35 - ((n - 1) * fs * 1.1) / 2
+    return first + (n - 1) * fs * 1.1 + fs * 1.15
+  }
+
   return (
     <TemplateCard label="Circuit snap">
       <div className="flex flex-wrap items-center gap-2">
@@ -118,10 +176,19 @@ export default function CircuitSnapClient({ params: p, band, onSubmit, onDone }:
         <p className="text-[17px] font-semibold">{p.job}</p>
       </div>
 
-      <div className="relative mt-3 overflow-hidden rounded-[20px] border border-white/10 bg-[#0A1120]">
+      <div className="relative mt-3 overflow-hidden rounded-[20px] border border-white/10 bg-[#0A1120] px-1 py-2">
+        {(short || !on) && (
+          <p
+            className={`absolute right-2 top-2 z-10 rounded-full px-3 py-1 font-display text-sm font-bold ${short ? 'bg-amber-500 text-[#1A1103]' : 'bg-white/10 text-[#A7B0C0]'}`}
+            aria-hidden
+          >
+            {short ? '⚠ Short circuit' : 'Power off'}
+          </p>
+        )}
         <svg
-          viewBox={`0 0 ${VW} ${VH}`}
-          className="block h-auto w-full select-none"
+          ref={svgRef}
+          viewBox={`${box.x0} ${box.y0} ${box.w} ${box.h}`}
+          className="mx-auto block h-auto w-full max-w-[560px] select-none"
           role="img"
           aria-label={`Circuit diagram. ${on ? (short ? 'Short circuit!' : 'Power is on.') : 'Power is off.'}`}
         >
@@ -176,9 +243,31 @@ export default function CircuitSnapClient({ params: p, band, onSubmit, onDone }:
             const flipped = !!pl?.flipped
             return (
               <g key={`p${e.id}`}>
-                {part && <PartSymbol part={part} x={mx} y={my} ang={ang + (flipped ? 180 : 0)} st={st} phase={phase} short={short} />}
+                {part && (
+                  <PartSymbol
+                    part={part}
+                    x={mx}
+                    y={my}
+                    ang={ang + (flipped ? 180 : 0)}
+                    st={st}
+                    phase={phase}
+                    short={short}
+                    fs={fs}
+                    labelSide={isVertical(ang) && A.x === box.maxX && box.maxX !== box.minX ? 'right' : 'left'}
+                  />
+                )}
                 {part && showMeters && on && st && part.kind !== 'wire' && part.kind !== 'insulator' && (
-                  <text x={mx + (Math.abs(ang) < 45 || Math.abs(ang) > 135 ? 0 : 30)} y={my + (Math.abs(ang) < 45 || Math.abs(ang) > 135 ? 28 : 4)} textAnchor="middle" fontSize={10} fontWeight={800} fill="#00E5FF">
+                  <text
+                    x={isVertical(ang) ? mx + 24 : mx}
+                    y={isVertical(ang) ? meterY(part, my, A.x === box.maxX && box.maxX !== box.minX) : my + 22 + fs * 0.8}
+                    textAnchor={isVertical(ang) ? 'start' : 'middle'}
+                    fontSize={fs}
+                    fontWeight={800}
+                    fill="#00E5FF"
+                    stroke="#0A1120"
+                    strokeWidth={3}
+                    paintOrder="stroke"
+                  >
                     {Math.round(Math.abs(st.currentMa))} mA
                   </text>
                 )}
@@ -190,17 +279,17 @@ export default function CircuitSnapClient({ params: p, band, onSubmit, onDone }:
                     onClick={() => tapSlot(e.id)}
                     className="cursor-pointer"
                   >
-                    <rect x={mx - 26} y={my - 26} width={52} height={52} rx={12} fill="transparent" />
+                    <rect x={mx - SLOT_HALF} y={my - SLOT_HALF} width={SLOT_HALF * 2} height={SLOT_HALF * 2} rx={12} fill="transparent" />
                     {!part && (
                       <>
                         <line x1={GX(A.x)} y1={GY(A.y)} x2={GX(B.x)} y2={GY(B.y)} stroke="#FC6818" strokeWidth={2} strokeDasharray="5 5" opacity={0.6} />
-                        <circle cx={mx} cy={my} r={15} fill="#19263F" stroke={sel ? '#FC6818' : '#A7B0C0'} strokeWidth={2} strokeDasharray="4 3" className={sel && !reduced ? 'animate-pulse' : undefined} />
-                        <text x={mx} y={my + 5} textAnchor="middle" fontSize={16} fontWeight={800} fill={sel ? '#FFA878' : '#A7B0C0'}>
+                        <circle cx={mx} cy={my} r={Math.max(15, fs)} fill="#19263F" stroke={sel ? '#FC6818' : '#A7B0C0'} strokeWidth={2} strokeDasharray="4 3" className={sel && !reduced ? 'animate-pulse' : undefined} />
+                        <text x={mx} y={my + Math.max(16, fs * 1.2) * 0.35} textAnchor="middle" fontSize={Math.max(16, fs * 1.2)} fontWeight={800} fill={sel ? '#FFA878' : '#A7B0C0'}>
                           {slots.indexOf(e) + 1}
                         </text>
                       </>
                     )}
-                    {part && <rect x={mx - 24} y={my - 24} width={48} height={48} rx={12} fill="none" stroke={sel ? '#FC6818' : '#FFA878'} strokeOpacity={0.5} strokeDasharray="4 3" />}
+                    {part && <rect x={mx - SLOT_HALF + 2} y={my - SLOT_HALF + 2} width={SLOT_HALF * 2 - 4} height={SLOT_HALF * 2 - 4} rx={12} fill="none" stroke={sel ? '#FC6818' : '#FFA878'} strokeOpacity={0.5} strokeDasharray="4 3" />}
                   </g>
                 )}
               </g>
@@ -209,16 +298,6 @@ export default function CircuitSnapClient({ params: p, band, onSubmit, onDone }:
           {p.nodes.map((n) => (
             <circle key={n.id} cx={GX(n.x)} cy={GY(n.y)} r={3.2} fill="#A7B0C0" />
           ))}
-          {!on && (
-            <text x={VW - 10} y={VH - 8} textAnchor="end" fontSize={11} fontWeight={700} fill="#6E7888">
-              power off
-            </text>
-          )}
-          {short && (
-            <text x={VW / 2} y={VH - 8} textAnchor="middle" fontSize={13} fontWeight={800} fill="#FC6818">
-              ⚠ SHORT CIRCUIT
-            </text>
-          )}
         </svg>
       </div>
 
@@ -294,10 +373,31 @@ export default function CircuitSnapClient({ params: p, band, onSubmit, onDone }:
   )
 }
 
-function PartSymbol({ part, x, y, ang, st, phase, short }: { part: PartSpec; x: number; y: number; ang: number; st?: EdgeState; phase: number; short: boolean }) {
-  const upright = Math.abs(ang) > 90 ? ang - 180 : ang // keep text readable
-  const label = part.label
+function PartSymbol({
+  part,
+  x,
+  y,
+  ang,
+  st,
+  phase,
+  short,
+  fs,
+  labelSide,
+}: {
+  part: PartSpec
+  x: number
+  y: number
+  ang: number
+  st?: EdgeState
+  phase: number
+  short: boolean
+  fs: number
+  labelSide: 'left' | 'right'
+}) {
+  const vertical = isVertical(ang)
+  const lines = labelLines(labelOf(part))
   const k = part.kind
+  const bands = k === 'resistor' ? bandsFor(part.ohms ?? 100) : []
   const glow = st?.brightness ?? 0
   return (
     <g transform={`translate(${x} ${y})`}>
@@ -309,7 +409,7 @@ function PartSymbol({ part, x, y, ang, st, phase, short }: { part: PartSpec; x: 
             <line x1={4} y1={0} x2={20} y2={0} stroke="#6E7888" strokeWidth={3.5} />
             <line x1={-4} y1={-13} x2={-4} y2={13} stroke={short ? '#FC6818' : '#EEF2F8'} strokeWidth={3} />
             <line x1={4} y1={-7} x2={4} y2={7} stroke={short ? '#FC6818' : '#EEF2F8'} strokeWidth={5} />
-            <text x={-12} y={-6} fontSize={10} fontWeight={800} fill="#FFA878" transform={`rotate(${-ang} -12 -6)`}>
+            <text x={-14} y={-8} fontSize={fs} fontWeight={800} fill="#FFA878" textAnchor="middle" transform={`rotate(${-ang} -14 -8)`}>
               +
             </text>
           </g>
@@ -319,9 +419,10 @@ function PartSymbol({ part, x, y, ang, st, phase, short }: { part: PartSpec; x: 
             <line x1={-20} y1={0} x2={-14} y2={0} stroke="#6E7888" strokeWidth={3.5} />
             <line x1={14} y1={0} x2={20} y2={0} stroke="#6E7888" strokeWidth={3.5} />
             <rect x={-14} y={-6} width={28} height={12} rx={4} fill="#D9C3A0" />
-            <rect x={-8} y={-6} width={3} height={12} fill="#7B3F00" />
-            <rect x={-2} y={-6} width={3} height={12} fill="#111" />
-            <rect x={4} y={-6} width={3} height={12} fill="#E02424" />
+            {/* the real 4-band colour code for this value */}
+            {bands.map((b, i) => (
+              <rect key={i} x={-10 + i * 5 + (i === 3 ? 3 : 0)} y={-6} width={3} height={12} fill={b.hex} />
+            ))}
           </g>
         )}
         {k === 'led' && (
@@ -361,18 +462,20 @@ function PartSymbol({ part, x, y, ang, st, phase, short }: { part: PartSpec; x: 
           </g>
         )}
       </g>
-      {(label || k === 'battery') && (
+      {lines[0] && (
         <text
-          x={0}
-          y={Math.abs(upright) < 45 ? -18 : 0}
-          dx={Math.abs(upright) < 45 ? 0 : -24}
-          textAnchor={Math.abs(upright) < 45 ? 'middle' : 'end'}
-          fontSize={10}
+          x={vertical ? (labelSide === 'right' ? 24 : -24) : 0}
+          y={vertical ? fs * 0.35 - ((lines.length - 1) * fs * 1.1) / 2 : -18 - (lines.length - 1) * fs * 1.1}
+          textAnchor={vertical ? (labelSide === 'right' ? 'start' : 'end') : 'middle'}
+          fontSize={fs}
           fontWeight={700}
-          fill="#A7B0C0"
+          fill="#C9D1DE"
         >
-          {label ?? ''}
-          {k === 'battery' ? `${label ? ' ' : ''}${part.volts ?? 3} V` : ''}
+          {lines.map((l, i) => (
+            <tspan key={i} x={vertical ? (labelSide === 'right' ? 24 : -24) : 0} dy={i === 0 ? 0 : fs * 1.1}>
+              {l}
+            </tspan>
+          ))}
         </text>
       )}
     </g>

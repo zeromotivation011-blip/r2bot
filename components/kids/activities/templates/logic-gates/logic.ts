@@ -306,7 +306,7 @@ export function findSolution(p: Params): Answer | null | 'too-big' {
     if (choose) {
       const src = sourcesFor(p, gi)
       if (g.inputs.length === 1) src.forEach((s) => wirings.push([s]))
-      else src.forEach((a, i) => src.slice(i + 1).forEach((b) => wirings.push([a, b])))
+      else src.forEach((a, i) => src.slice(i).forEach((b) => wirings.push([a, b]))) // [a, a] too: a NAND with tied inputs is NOT
     } else wirings.push(g.inputs)
     return { types, wirings }
   })
@@ -389,18 +389,23 @@ function check(p: Params, a: Answer): CheckResult {
     if (p.wiring === 'choose') {
       const allowed = sourcesFor(p, gi)
       if (r.inputs.some((s) => !allowed.includes(s))) return { correct: false, score: 0, feedback: 'A gate can only read the inputs or a gate to its left — signals flow one way, from inputs to outputs.' }
-      if (r.inputs.length === 2 && r.inputs[0] === r.inputs[1]) return { correct: false, score: 0, feedback: `Both wires of one gate come from the same place (${r.inputs[0]}). A gate needs two different signals to compare.` }
     }
   }
   const { wrong, total, first } = compare(p, a)
   const score = (total - wrong) / total
   const rowCount = 1 << p.inputs.length
+  const tied = circuit.find((g) => g.inputs.length === 2 && g.inputs[0] === g.inputs[1] && (g.type === 'NAND' || g.type === 'NOR' || g.type === 'AND' || g.type === 'OR'))
+  const tiedNote = !tied
+    ? ''
+    : tied.type === 'NAND' || tied.type === 'NOR'
+      ? ` Tying both inputs of a ${tied.type} together turns it into NOT — that trick is the first step in building every other gate from ${tied.type} alone.`
+      : ` Tying both inputs of an ${tied.type} together just passes the signal through unchanged.`
   if (!first) {
     const outs = p.outputs.map((o) => o.label).join(' and ')
     return {
       correct: true,
       score: 1,
-      feedback: `Every one of the ${rowCount} input combinations gives the right answer, so ${outs} will behave correctly in every situation. Real robot chips are built from millions of gates like these.`,
+      feedback: `Every one of the ${rowCount} input combinations gives the right answer, so ${outs} will behave correctly in every situation. Real robot chips are built from millions of gates like these.${tiedNote}`,
     }
   }
   const m: Mismatch = first

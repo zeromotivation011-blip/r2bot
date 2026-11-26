@@ -224,10 +224,13 @@ export interface Params {
   /** Most sensors the robot can carry (1–6). Small robots ⇒ choose carefully. */
   maxSensors: number
   /**
-   * Optional budget in credits (see SENSORS[x].cost). With a budget the child
-   * must find the CHEAPEST working set, not just "take everything" — ages 11+.
+   * Optional budget in credits (see SENSORS[x].cost). Any working set within
+   * the budget passes (a dearer one than necessary gets a "can you spot a
+   * cheaper set?" nudge) — ages 11+. Set `cheapestOnly` to demand the cheapest.
    */
   budget?: number
+  /** With a budget: only the cheapest working set counts as correct. Default false. */
+  cheapestOnly?: boolean
   /**
    * Show what each sensor senses on its card. Default: on for Explorers and
    * Builders, off for older bands (they must know or read the "how" text).
@@ -317,6 +320,12 @@ export function cheapestSolution(p: Params): SensorId[] | null {
   return best
 }
 
+/** End a reason with a full stop (sensor "why" strings are written without one). */
+function sentence(t: string): string {
+  const s = t.trim()
+  return s && !/[.!?]$/.test(s) ? `${s}.` : s
+}
+
 function validate(p: Params): string[] {
   const out: string[] = []
   if (!p.mission?.trim()) out.push('mission name is required')
@@ -343,8 +352,11 @@ function validate(p: Params): string[] {
   })
   if (out.length) return out
   if (!cheapestSolution(p)) out.push('no set of offered sensors meets every checkpoint within maxSensors/budget')
+  if (p.cheapestOnly && p.budget === undefined) out.push('cheapestOnly needs a budget')
   // A puzzle where everything on the shelf works is not a choice.
   const all = runMission(p, p.available)
+  if (!p.noExtras && legal(p, p.available) && all.every((o) => o.ok))
+    out.push('fitting the whole shelf already passes — lower maxSensors below the shelf size, add a budget, or set noExtras')
   if (p.available.every((s) => all.some((o) => o.by === s)) && p.budget === undefined && p.maxSensors >= p.available.length)
     out.push('every offered sensor is needed and fits — add at least one tempting wrong sensor or lower maxSensors')
   return out
@@ -362,7 +374,7 @@ function check(p: Params, a: Answer): CheckResult {
     return {
       correct: false,
       score: 0,
-      feedback: `Those sensors cost ${cost} credits but the budget is ${p.budget}. Real engineers face this every day: find the cheapest set that still does every job.`,
+      feedback: `Those sensors cost ${cost} credits but the budget is ${p.budget}. Real engineers face this every day: find a set that still does every job for less.`,
     }
   const run = runMission(p, sensors)
   const passed = run.filter((o) => o.ok).length
@@ -373,7 +385,7 @@ function check(p: Params, a: Answer): CheckResult {
     return {
       correct: false,
       score,
-      feedback: `${passed} of ${run.length} checkpoints passed. At checkpoint ${idx} ("${firstFail.need.label}") the robot failed: ${firstFail.why} Which sensor works there?`,
+      feedback: `${passed} of ${run.length} checkpoints passed. At checkpoint ${idx} ("${firstFail.need.label}") the robot failed: ${sentence(firstFail.why ?? '')} Which sensor works there?`,
     }
   }
   const extras = extrasIn(p, sensors)
@@ -385,6 +397,12 @@ function check(p: Params, a: Answer): CheckResult {
     }
   const cheapest = cheapestSolution(p)
   const cheapestCost = cheapest ? costOf(cheapest) : cost
+  if (p.budget !== undefined && cost > cheapestCost && p.cheapestOnly)
+    return {
+      correct: false,
+      score: 0.8,
+      feedback: `Every checkpoint passed for ${cost} credits — but this job asks for the CHEAPEST set, and one costing only ${cheapestCost} credits also works. Which sensor could a cheaper one replace?`,
+    }
   if (p.budget !== undefined && cost > cheapestCost)
     return {
       correct: true,

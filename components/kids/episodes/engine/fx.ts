@@ -347,7 +347,8 @@ export class Fx {
       this.sceneGroup.add(ball)
       this.sceneUpdaters.push((t) => {
         const p = ((t * 0.35) % 1) * 2 - 1
-        ball.position.set(p * 2.4, 0.1, 1.2)
+        // Rolls across the open floor on Bolt's side, never across a face in close-up.
+        ball.position.set(1.0 + p * 1.6, 0.1, 1.45 + Math.sin(p * 3) * 0.12)
         ball.rotation.z = -p * 24
       })
     }
@@ -445,7 +446,8 @@ export class Fx {
       g.add(ball)
       this.sceneGroup.add(g)
       this.sceneUpdaters.push((t, _dt, a) => {
-        if (a.boltHead) g.position.copy(a.boltHead).add(new THREE.Vector3(0.25, 0.42 + Math.sin(t * 2) * 0.03, 0))
+        // Up and to Bolt's outer side, away from the group (Spark stands to his left).
+        if (a.boltHead) g.position.copy(a.boltHead).add(new THREE.Vector3(0.42, 0.5 + Math.sin(t * 2) * 0.03, -0.1))
         g.visible = a.boltHead !== null
       })
     }
@@ -568,7 +570,8 @@ export class Fx {
     this.clear(this.lineGroup)
     this.lineUpdaters = []
     this.lineStart = t
-    if (!beat || beat.kind !== 'line') return
+    if (!beat || (beat.kind !== 'line' && beat.kind !== 'insert')) return
+    const labelLift = beat.kind === 'insert' ? 0.3 : 0.55
     const fx = new Set<LineEffect>(beat.lineEffects)
 
     if (fx.has('beam')) {
@@ -584,13 +587,20 @@ export class Fx {
       }
       this.lineGroup.add(cone)
       this.lineUpdaters.push((tt, _dt, a) => {
-        const dir = new THREE.Vector3(Math.sin(a.robotYaw), 0, Math.cos(a.robotYaw))
-        cone.position.copy(a.robotHead).addScaledVector(dir, 0.95)
+        // A sensor beam belongs to the robot: with no robot on set, there is no beam
+        // (it used to sit on Spark's face). It sweeps across the frame, not into the lens.
+        const on = a.robot !== null
+        cone.visible = on
+        rings.forEach((r) => (r.visible = on))
+        if (!on) return
+        const yaw = a.robotYaw + 0.95
+        const dir = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw))
+        cone.position.copy(a.robotHead).addScaledVector(dir, 1.15)
         cone.lookAt(a.robotHead)
         cone.rotateX(Math.PI / 2)
         rings.forEach((r, i) => {
           const p = ((tt * 0.8 + i / 3) % 1)
-          r.position.copy(a.robotHead).addScaledVector(dir, 0.15 + p * 1.7)
+          r.position.copy(a.robotHead).addScaledVector(dir, 0.35 + p * 1.6)
           r.lookAt(a.robotHead)
           r.scale.setScalar(0.4 + p * 2)
           ;(r.material as THREE.MeshBasicMaterial).opacity = 0.8 * (1 - p)
@@ -654,7 +664,9 @@ export class Fx {
       })
     }
 
-    if (beat.labels.length) {
+    // Line beats show their concept words as chips in the player's HTML layer
+    // (never clipped or overlapping at any aspect); only inserts label the robot in 3D.
+    if (beat.labels.length && beat.kind === 'insert') {
       const sprites = beat.labels.map((l) => labelSprite(l, SENSOR_WORDS.has(l) ? 'cyan' : 'orange', 0.2))
       sprites.forEach((s) => this.lineGroup.add(s))
       this.lineUpdaters.push((tt, _dt, a, p) => {
@@ -665,7 +677,7 @@ export class Fx {
           const pop = appear < 1 ? 1 + Math.sin(appear * Math.PI) * 0.25 : 1
           const base = s.userData.baseScale as THREE.Vector3
           s.scale.set(base.x * appear * pop, base.y * appear * pop, 1)
-          s.position.set(anchor.x + (i - (n - 1) / 2) * 0.62, anchor.y + 0.55 + (this.calm ? 0 : Math.sin(tt * 2 + i) * 0.03), anchor.z + 0.1)
+          s.position.set(anchor.x + (i - (n - 1) / 2) * 0.62, anchor.y + labelLift + (this.calm ? 0 : Math.sin(tt * 2 + i) * 0.03), anchor.z + 0.1)
         })
       })
     }

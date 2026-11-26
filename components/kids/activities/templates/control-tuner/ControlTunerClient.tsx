@@ -5,12 +5,14 @@
 // bot or a hovering drone) acts out the simulated response while the graph
 // draws it against the spec — overshoot ceiling, settle band, deadline. The
 // last run stays as a ghost so the child sees what each change did.
+// Runs are free (tuning is iterative by nature); only "Submit this tuning" is
+// a graded attempt.
 
 import { useMemo, useRef, useState } from 'react'
 import type { TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
 import { PLANT_INFO, kindsOf, resolve, simulate, usesGain, type Answer, type ControllerKind, type Params, type SimResult } from './logic'
-import { FeedbackPanel, Readout, TemplateCard, btnPrimary, chip, useAnimationFrame, useAttempts, useReducedMotion } from '../gear-train/TemplateFrameClient'
+import { FeedbackPanel, Readout, TemplateCard, btnGhost, btnPrimary, chip, useAnimationFrame, useAttempts, useReducedMotion, useSvgScale } from '../gear-train/TemplateFrameClient'
 
 const VW = 400
 const PH = 190
@@ -39,6 +41,10 @@ export default function ControlTunerClient({ params: p, band, onSubmit, onDone }
   const [ghost, setGhost] = useState<SimResult | null>(null)
   const [play, setPlay] = useState<number | null>(null)
   const playRef = useRef(0)
+  const finishedRef = useRef(true)
+  const [shownKey, setShownKey] = useState<string | null>(null)
+  const { ref: plotRef, font } = useSvgScale<SVGSVGElement>(VW)
+  const fs = font(10, 12)
   const reduced = useReducedMotion()
   const att = useAttempts(onSubmit, onDone)
   const solved = !!att.result?.correct
@@ -53,6 +59,7 @@ export default function ControlTunerClient({ params: p, band, onSubmit, onDone }
     [kind, g, p.gains, kinds.length],
   )
   const eff = resolve(p, answer)
+  const key = JSON.stringify(answer)
 
   // Plot scale
   const yMax = Math.max(Math.abs(p.target) * 1.6, ...(shown ? shown.y.map(Math.abs) : [0]), ...(ghost ? ghost.y.map(Math.abs) : [0]))
@@ -66,11 +73,14 @@ export default function ControlTunerClient({ params: p, band, onSubmit, onDone }
   useAnimationFrame(play !== null, (dt) => {
     const nu = Math.min(1, playRef.current + dt / playS)
     playRef.current = nu
-    setPlay(nu)
     if (nu >= 1) {
+      // A late frame can arrive before play=null commits: finish exactly once.
+      if (finishedRef.current) return
+      finishedRef.current = true
       setPlay(null)
-      att.submit(answer)
+      return
     }
+    setPlay(nu)
   })
 
   const edit = (fn: () => void) => {
@@ -80,16 +90,28 @@ export default function ControlTunerClient({ params: p, band, onSubmit, onDone }
   }
 
   const run = () => {
+    if (play !== null) return
     playSound('click')
+    if (att.result) att.clear()
     const r = simulate(p, answer)
     if (shown) setGhost(shown)
     setShown(r)
-    if (reduced) {
-      att.submit(answer)
-      return
-    }
+    setShownKey(key)
+    if (reduced) return
+    finishedRef.current = false
     playRef.current = 0
     setPlay(0)
+  }
+
+  const submitTuning = () => {
+    if (play !== null) return
+    if (shownKey !== key) {
+      // Show what is being graded.
+      if (shown) setGhost(shown)
+      setShown(simulate(p, answer))
+      setShownKey(key)
+    }
+    att.submit(answer)
   }
 
   const path = (r: SimResult, upto: number) =>
@@ -130,15 +152,15 @@ export default function ControlTunerClient({ params: p, band, onSubmit, onDone }
       {/* scene */}
       <div className="mt-3 overflow-hidden rounded-[20px] border border-white/10 bg-[#0A1120]">
         <svg viewBox={`0 0 ${VW} 104`} className="block h-auto w-full" role="img" aria-label={`${info.quantity} now ${r2(yNow)} ${info.unit}, target ${p.target} ${info.unit}`}>
-          {p.plant === 'position' && <PositionScene y={yNow} target={p.target} />}
-          {p.plant === 'speed' && <SpeedScene v={yNow} dist={travelled[idx] ?? 0} target={p.target} />}
-          {p.plant === 'altitude' && <AltitudeScene h={yNow} target={p.target} thrust={uNow} t={tNow} gust={!!p.disturbance && tNow >= p.disturbance.t && tNow < p.disturbance.t + p.disturbance.durationS} />}
+          {p.plant === 'position' && <PositionScene y={yNow} target={p.target} fs={font(11, 13)} />}
+          {p.plant === 'speed' && <SpeedScene v={yNow} dist={travelled[idx] ?? 0} target={p.target} fs={font(11, 13)} />}
+          {p.plant === 'altitude' && <AltitudeScene fs={font(11, 13)} h={yNow} target={p.target} thrust={uNow} t={tNow} gust={!!p.disturbance && tNow >= p.disturbance.t && tNow < p.disturbance.t + p.disturbance.durationS} />}
         </svg>
       </div>
 
       {/* response plot */}
       <div className="mt-2 overflow-hidden rounded-[20px] border border-white/10 bg-[#0A1120]">
-        <svg viewBox={`0 0 ${VW} ${PH}`} className="block h-auto w-full" role="img" aria-label={shown ? `Response: overshoot ${r1(shown.overshootPct)} percent` : 'Response graph, press Run'}>
+        <svg ref={plotRef} viewBox={`0 0 ${VW} ${PH}`} className="block h-auto w-full" role="img" aria-label={shown ? `Response: overshoot ${r1(shown.overshootPct)} percent` : 'Response graph, press Run'}>
           <rect x={L} y={Y(p.target + bandW)} width={VW - L - R} height={Math.max(1, Y(p.target - bandW) - Y(p.target + bandW))} fill="#22C55E" opacity={0.12} />
           <line x1={L} x2={VW - R} y1={Y(p.target)} y2={Y(p.target)} stroke="#22C55E" strokeWidth={1.5} strokeDasharray="6 4" />
           {p.spec.maxOvershootPct !== undefined && (
@@ -156,31 +178,29 @@ export default function ControlTunerClient({ params: p, band, onSubmit, onDone }
           <line x1={L} x2={L} y1={TOP} y2={BOT} stroke="#6E7888" />
           <line x1={L} x2={VW - R} y1={BOT} y2={BOT} stroke="#6E7888" />
           {[0, 0.5, 1].map((f) => (
-            <text key={f} x={X(p.durationS * f)} y={BOT + 14} textAnchor="middle" fontSize={10} fill="#A7B0C0">
+            <text key={f} x={X(p.durationS * f)} y={BOT + 3 + fs} textAnchor={f === 1 ? 'end' : f === 0 ? 'start' : 'middle'} fontSize={fs} fill="#A7B0C0">
               {r1(p.durationS * f)} s
             </text>
           ))}
-          <text x={L - 4} y={Y(p.target) + 3.5} textAnchor="end" fontSize={10} fill="#22C55E">
+          <text x={L - 4} y={Y(p.target) + fs * 0.35} textAnchor="end" fontSize={fs} fill="#22C55E">
             {p.target}
           </text>
-          <text x={L - 4} y={Y(0) + 3.5} textAnchor="end" fontSize={10} fill="#A7B0C0">
+          <text x={L - 4} y={Y(0) + fs * 0.35} textAnchor="end" fontSize={fs} fill="#A7B0C0">
             0
           </text>
-          <text x={VW - R} y={BOT + 26} textAnchor="end" fontSize={10} fontWeight={700} fill="#A7B0C0">
-            {info.quantity} ({info.unit}) over time
-          </text>
+
           {ghost && <path d={path(ghost, ghost.t.length)} fill="none" stroke="#6E7888" strokeWidth={1.5} strokeDasharray="4 3" />}
           {shown && <path d={path(shown, upto)} fill="none" stroke="#00E5FF" strokeWidth={2.5} strokeLinejoin="round" />}
           {shown && <circle cx={X(tNow)} cy={Y(yNow)} r={4} fill="#00E5FF" />}
           {p.spec.settleS !== undefined && (
-            <text x={X(p.spec.settleS) + 3} y={TOP + 10} fontSize={9} fill="#A7B0C0">
+            <text x={X(p.spec.settleS) + 3} y={TOP + fs} fontSize={fs} fontWeight={700} fill="#A7B0C0" stroke="#0A1120" strokeWidth={3} paintOrder="stroke">
               deadline
             </text>
           )}
         </svg>
       </div>
       <p className="mt-1 text-xs text-[#A7B0C0]">
-        Green band = close enough. Orange dashes = overshoot limit.{ghost ? ' Grey dashes = your last run.' : ''}
+        Graph: {info.quantity} ({info.unit}) over time. Green band = close enough. Orange dashes = overshoot limit.{ghost ? ' Grey dashes = your last run.' : ''}
         {p.disturbance ? ' Blue = gust.' : ''}
       </p>
 
@@ -258,10 +278,14 @@ motor(clamp(power, ${p.plant === 'altitude' ? 0 : -(p.physics?.uMax ?? info.uMax
       )}
 
       {!att.result && (
-        <div className="mt-4">
-          <button type="button" className={btnPrimary} onClick={run} disabled={play !== null}>
-            {play !== null ? 'Running…' : shown ? 'Run again' : 'Run'}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button type="button" className={shown ? btnGhost : btnPrimary} onClick={run} disabled={play !== null}>
+            {play !== null ? 'Running…' : shown ? '▶ Run again' : '▶ Run'}
           </button>
+          <button type="button" className={shown ? btnPrimary : btnGhost} onClick={submitTuning} disabled={play !== null}>
+            Submit this tuning
+          </button>
+          <span className="text-sm text-[#A7B0C0]">Runs are free — try, look, adjust.</span>
         </div>
       )}
       <FeedbackPanel att={att} />
@@ -282,14 +306,14 @@ function Bot({ x, y }: { x: number; y: number }) {
   )
 }
 
-function PositionScene({ y, target }: { y: number; target: number }) {
+function PositionScene({ y, target, fs }: { y: number; target: number; fs: number }) {
   const span = Math.abs(target) * 1.5
   const X = (v: number) => 40 + ((VW - 80) * (v + 0)) / span
   return (
     <g>
       <rect x={0} y={84} width={VW} height={20} fill="#111C32" />
       <rect x={X(target) - 3} y={36} width={6} height={48} fill="#22C55E" />
-      <text x={X(target)} y={30} textAnchor="middle" fontSize={11} fontWeight={700} fill="#22C55E">
+      <text x={X(target)} y={32} textAnchor="middle" fontSize={fs} fontWeight={700} fill="#22C55E">
         dock
       </text>
       <line x1={X(0)} y1={70} x2={X(0)} y2={86} stroke="#A7B0C0" strokeWidth={2} />
@@ -298,7 +322,7 @@ function PositionScene({ y, target }: { y: number; target: number }) {
   )
 }
 
-function SpeedScene({ v, dist, target }: { v: number; dist: number; target: number }) {
+function SpeedScene({ v, dist, target, fs }: { v: number; dist: number; target: number; fs: number }) {
   const px = 60 // px per metre
   const off = (dist * px) % 40
   return (
@@ -308,17 +332,17 @@ function SpeedScene({ v, dist, target }: { v: number; dist: number; target: numb
         <rect key={i} x={i * 40 - off} y={92} width={20} height={4} fill="#6E7888" />
       ))}
       <Bot x={200} y={78} />
-      <text x={20} y={26} fontSize={13} fontWeight={800} fill="#00E5FF" className="font-display">
+      <text x={20} y={10 + fs} fontSize={Math.max(13, fs + 2)} fontWeight={800} fill="#00E5FF" className="font-display">
         {r2(v)} m/s
       </text>
-      <text x={VW - 20} y={26} textAnchor="end" fontSize={11} fontWeight={700} fill="#22C55E">
+      <text x={VW - 20} y={10 + fs} textAnchor="end" fontSize={fs} fontWeight={700} fill="#22C55E">
         target {target} m/s
       </text>
     </g>
   )
 }
 
-function AltitudeScene({ h, target, thrust, t, gust }: { h: number; target: number; thrust: number; t: number; gust: boolean }) {
+function AltitudeScene({ h, target, thrust, t, gust, fs }: { h: number; target: number; thrust: number; t: number; gust: boolean; fs: number }) {
   const top = Math.abs(target) * 1.6
   const Y = (v: number) => 92 - (80 * Math.min(top, Math.max(0, v))) / top
   const spin = (t * 40) % 2 < 1
@@ -326,7 +350,7 @@ function AltitudeScene({ h, target, thrust, t, gust }: { h: number; target: numb
     <g>
       <rect x={0} y={92} width={VW} height={12} fill="#111C32" />
       <line x1={0} x2={VW} y1={Y(target)} y2={Y(target)} stroke="#22C55E" strokeDasharray="6 4" />
-      <text x={VW - 12} y={Y(target) - 4} textAnchor="end" fontSize={11} fontWeight={700} fill="#22C55E">
+      <text x={VW - 12} y={Y(target) - 4} textAnchor="end" fontSize={fs} fontWeight={700} fill="#22C55E">
         {target} m
       </text>
       {gust && (
@@ -340,7 +364,7 @@ function AltitudeScene({ h, target, thrust, t, gust }: { h: number; target: numb
         <line x1={12} x2={24} y1={-9} y2={-9} stroke="#EEF2F8" strokeWidth={spin ? 1.5 : 3} />
         {thrust > 0 && <rect x={-3} y={3} width={6} height={Math.min(14, thrust * 0.6)} rx={2} fill="#00E5FF" opacity={0.6} />}
       </g>
-      <text x={20} y={26} fontSize={13} fontWeight={800} fill="#00E5FF" className="font-display">
+      <text x={20} y={10 + fs} fontSize={Math.max(13, fs + 2)} fontWeight={800} fill="#00E5FF" className="font-display">
         {r2(h)} m
       </text>
     </g>

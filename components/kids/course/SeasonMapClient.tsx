@@ -96,7 +96,8 @@ export default function SeasonMapClient({ level, playable, nodes, acts }: Props)
   return (
     <div className="flex flex-col gap-4">
       {/* Where am I? */}
-      <section
+      <div
+        role="region"
         aria-label="Your progress this season"
         className="rounded-[20px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4 shadow-[0_8px_24px_rgba(0,0,0,.45)]"
       >
@@ -135,7 +136,7 @@ export default function SeasonMapClient({ level, playable, nodes, acts }: Props)
             The story and the 24 sessions are planned (below). The episodes, builds and challenges for this level are being made now; until then, Level 1 is ready to play.
           </p>
         )}
-      </section>
+      </div>
 
       {/* The road */}
       <ol className="relative" style={{ height }} aria-label={`The ${nodes.length} sessions of this season`}>

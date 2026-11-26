@@ -8,7 +8,7 @@
 import * as THREE from 'three'
 import { createStage, type Stage } from '@/components/kids/three/stage'
 import type { RobotDesign } from '@/lib/kids/robot-design'
-import { beatAt, type Beat, type CastId, type ChoiceBeat, type EpisodePlan, type ScenePlan, type SetId, type TimeOfDay } from '@/lib/kids/episodes/plan'
+import { beatAt, type AsideClip, type Beat, type CastId, type ChoiceBeat, type EpisodePlan, type ScenePlan, type SetId, type ShotKind, type TimeOfDay } from '@/lib/kids/episodes/plan'
 import { envelopeAt, type EpisodeData, type VoicedClip } from '@/lib/kids/episodes/types'
 import { buildActor, buildHuman, extraLook, idleState, robotMaterials, type Actor, type ActorState, type Emotion, type Gesture } from './characters'
 import { Fx, type FxAnchors } from './fx'
@@ -25,8 +25,10 @@ export interface DirectorOptions {
   onChoice: (choice: ChoiceBeat) => void
   onEnd: () => void
   onPlayState: (playing: boolean) => void
-  /** Record mode only: the director ends a choice pause by itself. */
+  /** The open question was closed by the director (record mode, or a seek). */
   onChoiceEnd?: () => void
+  /** Called once when the device stays too slow (< ~15 fps) at the lowest quality. */
+  onSlow?: () => void
 }
 
 /** Seconds into a beat when its voice clip starts. */
@@ -52,7 +54,8 @@ interface ActorRuntime {
 
 const SLOT: Record<CastId, [number, number]> = {
   myrobot: [0, 0.95],
-  bolt: [0.8, 1.15],
+  // Off to the side and in front: never between the camera and Spark.
+  bolt: [1.75, 0.85],
   spark: [0.95, -0.1],
   amara: [-0.95, 0.05],
   lucia: [-1.75, -0.35],
@@ -174,11 +177,19 @@ export class Director {
   private delayedStarted = -1
   private xrayInside: THREE.Group | null = null
   private extrasShown = 0
+  private resolved = new Set<number>()
+  private releaseAt = 0
+  /** Spark speaking outside the script (a question, a reply), on the render clock. */
+  private aside: { clip: AsideClip; at: number } | null = null
+  private choiceIdx: number[] = []
+  private extrasCap = 99
+  private shotKind: ShotKind = 'establish'
 
   constructor(container: HTMLElement, data: EpisodeData, plan: EpisodePlan, opts: DirectorOptions) {
     this.data = data
     this.plan = plan
     this.opts = opts
+    this.choiceIdx = plan.beats.flatMap((b, i) => (b.kind === 'choice' ? [i] : []))
     this.stage = createStage(container, { lights: false, shadows: true, fov: 35 })
     const { scene, renderer } = this.stage
     renderer.toneMappingExposure = 1.1
@@ -200,8 +211,14 @@ export class Director {
     scene.add(this.hemi)
     this.sun = new THREE.DirectionalLight('#FFF6E8', 2.6)
     this.sun.castShadow = true
+    // Start where the device can probably hold it, then adapt (adaptQuality).
     const mobile = Math.min(window.innerWidth, window.innerHeight) < 600
-    this.sun.shadow.mapSize.set(mobile ? 1024 : 2048, mobile ? 1024 : 2048)
+    const nav = navigator as Navigator & { deviceMemory?: number }
+    const weak = (nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 4
+    this.quality = opts.record ? 3 : weak ? 2 : 3
+    if (!opts.record) renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, weak ? 1 : 1.5))
+    const shadowSize = opts.record ? 2048 : mobile || weak ? 512 : 1024
+    this.sun.shadow.mapSize.set(shadowSize, shadowSize)
     const sc = this.sun.shadow.camera
     sc.left = -9
     sc.right = 9
@@ -268,7 +285,11 @@ export class Director {
 
   /** Fetch the voice clips. */
   async preload(onProgress?: (done: number, total: number) => void): Promise<void> {
-    const files = this.plan.beats.flatMap((b) => (b.clip ? [b.clip.file] : []))
+    const files = this.plan.beats.flatMap((b) => [
+      ...(b.clip ? [b.clip.file] : []),
+      ...(b.choice?.promptClip ? [b.choice.promptClip.file] : []),
+      ...(b.choice?.replyClips ?? []).flatMap((c) => (c ? [c.file] : [])),
+    ])
     await this.voices.preload(files, onProgress)
   }
 
@@ -320,9 +341,15 @@ export class Director {
   seek(t: number): void {
     this.time = THREE.MathUtils.clamp(t, 0, this.plan.duration - 0.01)
     this.ended = false
+    // Seeking away from an open question closes it.
+    if (this.waiting) this.opts.onChoiceEnd?.()
     this.waiting = false
+    this.releaseAt = 0
+    this.aside = null
     this.delayedStarted = -1
     this.voices.stop()
+    // Questions after the new position are asked again.
+    for (const i of [...this.resolved]) if (this.plan.beats[i].start >= this.time) this.resolved.delete(i)
     this.beatIndex = -1
     this.enterBeat(beatAt(this.plan, this.time))
     if (this.playing) this.syncAudio()
@@ -348,12 +375,28 @@ export class Director {
     this.seek(next ? next.start : this.plan.duration - 0.05)
   }
 
-  /** The child answered a choice beat. */
-  resolveChoice(): void {
-    if (!this.waiting) return
-    this.waiting = false
-    const b = this.plan.beats[this.beatIndex]
-    this.time = b.start + b.dur + 0.001
+  /**
+   * The child answered a choice beat: the film runs on through the beat's
+   * short reaction (a cheer for a good answer, a thoughtful nod otherwise).
+   */
+  resolveChoice(good: boolean | null = null, holdSec = 0, option = -1): void {
+    if (!this.waiting || this.releaseAt > 0) return
+    // Spark answers the child's choice out loud.
+    const reply = option >= 0 ? this.plan.beats[this.beatIndex]?.choice?.replyClips[option] ?? null : null
+    if (reply) this.startAside(reply)
+    else if (option < 0 && this.aside) {
+      this.voices.stop()
+      this.aside = null
+    }
+    // The cast reacts now; the film moves on after the reply (or `holdSec`).
+    this.releaseAt = this.renderClock + Math.max(0.001, holdSec, reply ? reply.dur / this.speed + 0.4 : 0)
+    for (const [id, rt] of this.actors) {
+      if (!rt.visible) continue
+      rt.state.emotion = good === false ? 'surprised' : 'happy'
+      rt.state.gesture = id === 'bolt' || id === 'myrobot' ? 'none' : good === false ? 'think' : 'cheer'
+      rt.state.gestureT = 0
+    }
+    if (good !== false && this.playing) this.fx.confetti(this.castCenter().center.clone().add(new THREE.Vector3(0, 1.4, 0)), this.opts.calm ? 10 : 30)
   }
 
   /** Clip-start log + music, for the MP4 recorder. */
@@ -404,7 +447,7 @@ export class Director {
     if (offset >= 0 && offset < b.clip.dur) this.startClip(b.clip, offset)
   }
 
-  private startClip(clip: VoicedClip, offset: number): void {
+  private startClip(clip: Pick<VoicedClip, 'file'>, offset: number): void {
     if (this.opts.record) this.recordLog.push({ file: clip.file, at: this.wallTime, offset })
     else this.voices.play(clip.file, offset)
   }
@@ -432,9 +475,38 @@ export class Director {
         rt.state.emotion = se === 'happy' ? 'happy' : se === 'surprised' ? 'surprised' : 'neutral'
       }
     }
-    if (b.kind === 'choice' && b.choice) {
+    // Reaction cutaways and "your turn" holds carry the mood of the line before.
+    const prev = this.plan.beats[i - 1]
+    const prevText = prev?.clip && 'text' in prev.clip ? prev.clip.text : ''
+    if (b.kind === 'react' && b.shot.subject) {
+      const rt = this.actors.get(b.shot.subject)
+      if (rt) {
+        const e = emotionOf(prevText)
+        rt.state.emotion = e === 'neutral' ? 'happy' : e
+        rt.state.gesture = b.shot.subject === 'bolt' || b.shot.subject === 'myrobot' ? 'none' : e === 'worried' ? 'think' : 'none'
+        rt.state.gestureT = 0
+      }
+    }
+    if (b.kind === 'turn' && b.turn) {
+      const g: Gesture = b.turn.icon === 'wave' ? 'wave' : b.turn.icon === 'point' ? 'point' : b.turn.icon === 'think' ? 'think' : b.turn.icon === 'move' || b.turn.icon === 'clap' ? 'cheer' : 'explain'
+      for (const [id, rt] of this.actors) {
+        rt.state.emotion = 'happy'
+        rt.state.gesture = id === 'bolt' || id === 'myrobot' ? 'none' : id === b.shot.subject ? g : 'none'
+        rt.state.gestureT = 0
+      }
+    }
+    if (b.kind === 'choice') {
+      for (const rt of this.actors.values()) {
+        rt.state.emotion = 'happy'
+        rt.state.gesture = 'none'
+      }
+    }
+    if (b.kind === 'choice' && b.choice && !this.resolved.has(i)) {
       this.waiting = true
+      this.choiceWait = 0
       this.voices.stop()
+      this.aside = null
+      if (b.choice.promptClip) this.startAside(b.choice.promptClip)
       this.opts.onChoice(b.choice)
     }
     if (this.playing && b.clip && clipLead(b) === 0) this.startClip(b.clip, Math.max(0, this.time - b.start))
@@ -641,7 +713,16 @@ export class Director {
     const set = this.currentSet
     if (!set) return
     const aspect = this.stage.camera.aspect || 16 / 9
+    // Portrait screens (4:5 on phones): open the lens a little, and size shots
+    // by the width they must hold, so nobody is cut at the edge.
+    const portrait = aspect < 1
     const narrow = aspect < 1.2 ? 1.2 / aspect : 1
+    const fovBoost = portrait ? 1 + (1 - aspect) * 0.9 : 1
+    /** Camera distance that fits `width` metres across the frame at vertical fov `fovV`. */
+    const fit = (width: number, fovV: number) => {
+      const h = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(fovV * fovBoost) / 2) * aspect)
+      return width / 2 / Math.tan(h / 2)
+    }
     const shot = b.shot
     const from = new THREE.Vector3()
     const to = new THREE.Vector3()
@@ -650,14 +731,20 @@ export class Director {
     const scene = this.sceneIndex >= 0 ? this.plan.scenes[this.sceneIndex] : undefined
     const subj = shot.subject
     const head = this.headOf(subj)
-    let kind = b.kind === 'title' || b.kind === 'previously' || b.kind === 'next' || b.kind === 'card' ? (b.kind === 'previously' ? 'wide' : 'establish') : shot.kind
+    let kind: ShotKind = b.kind === 'title' || b.kind === 'previously' || b.kind === 'next' || b.kind === 'card' ? (b.kind === 'previously' ? 'wide' : 'establish') : shot.kind
     const otherHead = this.headOf(shot.other)
-    if (kind === 'two' && !(head && otherHead)) kind = 'close'
+    if ((kind === 'two' || kind === 'ots') && !(head && otherHead)) kind = 'close'
+    if (kind === 'insert' && !this.actors.get('myrobot')?.visible) kind = 'wide'
     switch (kind) {
       case 'establish': {
         from.copy(set.establish.from)
         to.copy(set.establish.to)
-        if (narrow > 1) from.lerp(to, -0.25 * (narrow - 1))
+        if (narrow > 1) {
+          from.lerp(to, -0.25 * (narrow - 1))
+          // A portrait frame only holds a slice: aim it at the people, not the empty set.
+          const cast = scene?.cast.length ? this.castCenter() : null
+          if (cast) to.lerp(new THREE.Vector3(cast.center.x, Math.max(0.7, cast.top * 0.5), cast.center.z), 0.6)
+        }
         push = 0.14
         fov = 38
         break
@@ -667,7 +754,7 @@ export class Director {
           // Nobody on set: a second establishing angle, swung round the target.
           const off = set.establish.from.clone().sub(set.establish.to)
           off.applyAxisAngle(new THREE.Vector3(0, 1, 0), shot.side * 0.28)
-          off.multiplyScalar(0.8)
+          off.multiplyScalar(0.8 * Math.max(1, narrow * 0.85))
           from.copy(set.establish.to).add(off)
           to.copy(set.establish.to)
           push = 0.1
@@ -675,7 +762,8 @@ export class Director {
           break
         }
         const { center, radius, top } = this.castCenter()
-        const dist = (2.3 + radius * 1.25) * narrow
+        fov = 35
+        const dist = Math.max(2.3 + radius * 1.25, fit(radius * 2 + 1.2, fov))
         from.set(center.x * 0.7 + (shot.side > 0 ? 0.5 : -0.5), Math.max(1.3, top * 0.85) + 0.35, center.z + dist)
         to.set(center.x * 0.85, Math.max(0.65, top * 0.52), center.z - 0.2)
         push = 0.08
@@ -701,17 +789,29 @@ export class Director {
       case 'under': {
         const r = this.actors.get('myrobot')
         const base = r ? r.to.clone() : new THREE.Vector3(0, 0, 0.95)
-        from.set(base.x + 0.55, base.y + 0.09, base.z + 0.75)
+        from.set(base.x + 0.55, base.y + 0.09, base.z + 0.75 * Math.max(1, narrow * 0.8))
         to.set(base.x, base.y + 0.14, base.z)
         fov = 42
         push = 0.12
+        break
+      }
+      case 'insert': {
+        // A cut-in on the child's robot, three-quarter front, room above for the label.
+        const r = this.actors.get('myrobot')
+        const base = r ? r.to.clone() : new THREE.Vector3(0, 0, 0.95)
+        const eh = r ? r.actor.eyeHeight : 0.4
+        const d = Math.max(1.35, fit(1.3, 34))
+        from.set(base.x + shot.side * d * 0.5, base.y + eh * 1.05, base.z + d * 0.87)
+        to.set(base.x, base.y + eh * 0.8 + 0.12, base.z)
+        fov = 34
+        push = 0.16
         break
       }
       case 'low': {
         const r = this.actors.get('myrobot')
         const base = r ? r.to.clone() : new THREE.Vector3(0, 0, 0.95)
         const eh = r ? r.actor.eyeHeight : 0.4
-        from.set(base.x + 0.35 * shot.side, base.y + eh * 0.55, base.z + 1.25 * narrow)
+        from.set(base.x + 0.35 * shot.side, base.y + eh * 0.55, base.z + 1.25 * Math.max(1, narrow * 0.8))
         to.set(base.x, base.y + eh * 0.95, base.z)
         fov = 40
         push = 0.12
@@ -720,10 +820,33 @@ export class Director {
       case 'two': {
         if (head && otherHead) {
           const mid = head.clone().add(otherHead).multiplyScalar(0.5)
-          const span = head.distanceTo(otherHead)
-          from.set(mid.x, mid.y + 0.25, mid.z + (1.2 + span * 1.1) * narrow)
-          to.copy(mid).add(new THREE.Vector3(0, -0.1, 0))
+          const span = Math.hypot(head.x - otherHead.x, head.z - otherHead.z)
+          fov = 35
+          const dist = Math.max(1.2 + span * 1.1, fit(span + 1.1, fov))
+          from.set(mid.x + shot.side * 0.25, mid.y + 0.25, mid.z + dist)
+          to.copy(mid).add(new THREE.Vector3(0, -0.12, 0))
           push = 0.06
+        }
+        break
+      }
+      case 'ots': {
+        // Over the listener's shoulder: their head soft at the frame edge, the speaker's face beyond.
+        if (head && otherHead) {
+          const dir = head.clone().sub(otherHead)
+          dir.y = 0
+          dir.normalize()
+          const sideV = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(shot.side)
+          // Keep the camera on the audience side of the line.
+          if (sideV.z < 0) sideV.negate()
+          // Far enough back that the shoulder is a soft edge, not a wall of hair.
+          from.copy(otherHead).addScaledVector(dir, -1.45).addScaledVector(sideV, 0.75)
+          from.y = Math.max(otherHead.y, head.y) + 0.22
+          // Under a brim (Mr Diego, Captain Ingrid) the eyes need a lower camera.
+          if (subj === 'diego' || subj === 'ingrid' || subj === 'lollipop') from.y = head.y + 0.02
+          if (from.z < head.z + 0.6) from.z = head.z + 0.6
+          to.copy(head).add(new THREE.Vector3(0, -0.05, 0))
+          fov = portrait ? 38 : 33
+          push = 0.08
         }
         break
       }
@@ -737,12 +860,14 @@ export class Director {
         }
         const rt = this.actors.get(subj)
         const small = subj === 'bolt' || subj === 'myrobot' || subj === 'noor'
-        const dist = (small ? 1.25 : subj === 'spark' ? 1.55 : 1.7) * narrow
+        const dist = Math.max(small ? 1.25 : subj === 'spark' ? 1.55 : 1.7, fit(small ? 0.8 : 1.05, 32))
+        // A brimmed hat (Mr Diego, Captain Ingrid): look from a touch lower, so the eyes read.
+        const hatLift = subj === 'diego' || subj === 'ingrid' || subj === 'lollipop' ? -0.1 : 0.03
         if (kind === 'close-front') {
-          from.set(head.x * 0.85, head.y + 0.03, head.z + dist)
+          from.set(head.x * 0.85, head.y + hatLift, head.z + dist)
         } else {
           const yaw = (rt?.yaw ?? 0) + shot.side * 0.42
-          from.set(head.x + Math.sin(yaw) * dist, head.y + 0.08, head.z + Math.max(0.45, Math.cos(yaw) * dist))
+          from.set(head.x + Math.sin(yaw) * dist, head.y + hatLift + 0.05, head.z + Math.max(0.45, Math.cos(yaw) * dist))
         }
         to.copy(head).add(new THREE.Vector3(0, -0.06, 0))
         push = 0.12
@@ -756,11 +881,12 @@ export class Director {
     if (set.interior) {
       from.x = THREE.MathUtils.clamp(from.x, -3.9, 3.9)
       from.y = THREE.MathUtils.clamp(from.y, 0.15, 3.0)
+      from.z = Math.min(from.z, 6.2)
     }
     // The maze: stay between the hedges.
     if (set.id === 'maze') from.x = THREE.MathUtils.clamp(from.x, -3.0, 3.0)
     if (scene?.closeUp === 'table' && kind !== 'establish' && this.robotOnTable && kind === 'wide') {
-      from.set(0.6, 1.7, 1.8)
+      from.set(0.6, 1.7, 1.8 * Math.max(1, narrow * 0.8))
       to.set(0, 0.9, -1)
     }
     this.camFrom.copy(from)
@@ -769,33 +895,58 @@ export class Director {
     this.camFromEnd.copy(from).lerp(to, calm ? 0 : push)
     this.camToEnd.copy(to)
     if (!calm && (kind === 'establish' || kind === 'wide')) this.camFromEnd.x += shot.side * 0.35
-    this.camFov = fov
+    this.camFov = fov * fovBoost
+    this.shotKind = kind
   }
 
-  /** In close shots, nobody may stand between the camera and the face. */
-  private clearSightLine(b: Beat): void {
-    const k = b.shot.kind
-    if (b.kind !== 'line' || !(k === 'close' || k === 'close-front' || k === 'two' || k === 'low')) return
-    const cam = this.stage.camera.position
+  /**
+   * Framing pass for close shots: nobody may stand between the camera and the
+   * face, and nobody but the subject (and the listener in a two-shot) may be
+   * sliced by the frame edge. Extras leave close-ups altogether.
+   */
+  private clearFrame(b: Beat): void {
+    const k = this.shotKind
+    const close = k === 'close' || k === 'close-front' || k === 'two' || k === 'ots' || k === 'low' || k === 'insert'
+    if (!close || b.kind === 'establish') return
+    const camera = this.stage.camera
+    const cam = camera.position
     const subject = this.headOf(b.shot.subject)
-    if (!subject) return
-    const seg = subject.clone().sub(cam)
-    const len = seg.length()
-    seg.normalize()
-    const test = (root: THREE.Object3D, h: number) => {
+    const seg = subject ? subject.clone().sub(cam) : null
+    const len = seg ? seg.length() : 0
+    seg?.normalize()
+    const blocks = (root: THREE.Object3D, h: number) => {
+      if (!seg) return false
       const p = root.position.clone().add(new THREE.Vector3(0, h * 0.7, 0)).sub(cam)
       const along = p.dot(seg)
       if (along <= 0.05 || along >= len - 0.25) return false
       return p.addScaledVector(seg, -along).length() < 0.32
     }
-    for (const [id, rt] of this.actors) {
-      if (!rt.visible || id === b.shot.subject || id === b.shot.other) continue
-      if (test(rt.actor.root, rt.actor.height)) rt.actor.root.visible = false
+    const v = new THREE.Vector3()
+    const cutByEdge = (root: THREE.Object3D, h: number) => {
+      // Centre of the body on screen: well inside, or well outside, is fine.
+      v.copy(root.position).add(new THREE.Vector3(0, h * 0.55, 0)).project(camera)
+      return v.z < 1 && Math.abs(v.x) > 0.5 && Math.abs(v.x) < 1.45 && Math.abs(v.y) < 1.4
     }
-    for (const ex of this.extras) if (ex.root.visible && test(ex.root, ex.height)) ex.root.visible = false
+    for (const [id, rt] of this.actors) {
+      if (!rt.visible || id === b.shot.subject) continue
+      const keep = id === b.shot.other && (k === 'two' || k === 'ots')
+      if (keep) continue
+      if (blocks(rt.actor.root, rt.actor.height) || cutByEdge(rt.actor.root, rt.actor.height)) rt.actor.root.visible = false
+    }
+    if (k !== 'two') for (const ex of this.extras) ex.root.visible = false
   }
 
   // ── Frame ─────────────────────────────────────────────────────────────────
+
+  /** The first unanswered choice beat starting in (from, to], or −1. */
+  private choiceBetween(from: number, to: number): number {
+    for (const i of this.choiceIdx) {
+      const st = this.plan.beats[i].start
+      if (st > to) break
+      if (st > from && !this.resolved.has(i)) return i
+    }
+    return -1
+  }
 
   /** Live playback: the episode clock follows the wall clock (the voices do), the animation clock the frame clock. */
   private liveFrame(t: number, dt: number): void {
@@ -812,9 +963,8 @@ export class Director {
     this.wallTime += dt
     if (this.waiting) {
       this.choiceWait += dt
-      if (this.choiceWait > 3.6) {
-        this.choiceWait = 0
-        this.resolveChoice()
+      if (this.choiceWait > this.recordChoiceWait && this.releaseAt === 0) {
+        this.resolveChoice(null, 0.001)
         this.opts.onChoiceEnd?.()
       }
     }
@@ -828,30 +978,97 @@ export class Director {
   private wallTime = 0
   private choiceWait = 0
   private slowFrames = 0
-  private quality = 2
+  private quality = 3
 
-  /** Drop resolution, then shadows, when a device cannot keep up. */
+  /**
+   * When a device cannot keep up, step down: 3 → 2 pixel ratio 1 → 1 no
+   * shadows, no lamps, fewer extras → 0 render scale 0.75, no extras. Still
+   * under ~15 fps at 0 for a few seconds: onSlow (the player offers the storybook).
+   */
   private adaptQuality(wall: number): void {
-    if (this.quality === 0 || !this.playing) return
+    if (!this.playing || this.waiting || this.opts.record) return
+    if (this.quality === 0) {
+      this.verySlow = wall > 1 / 15 ? this.verySlow + wall : Math.max(0, this.verySlow - wall * 2)
+      if (this.verySlow > 4 && !this.slowReported) {
+        this.slowReported = true
+        this.opts.onSlow?.()
+      }
+      return
+    }
     this.slowFrames = wall > 0.05 ? this.slowFrames + 1 : Math.max(0, this.slowFrames - 2)
-    if (this.slowFrames > 45) {
+    if (this.slowFrames > 40) {
       this.slowFrames = 0
       this.quality--
       const r = this.stage.renderer
-      if (this.quality === 1) r.setPixelRatio(1)
-      else {
+      if (this.quality === 2) r.setPixelRatio(1)
+      else if (this.quality === 1) {
         r.shadowMap.enabled = false
         this.sun.castShadow = false
+        for (const l of this.lamps) l.visible = false
+        this.extrasCap = 3
+        this.fixMaterials()
+      } else {
+        r.setPixelRatio(0.75)
+        this.extrasCap = 0
       }
     }
+  }
+
+  /** Materials compiled with shadows must be recompiled once shadows go off. */
+  private fixMaterials(): void {
+    this.stage.scene.traverse((o) => {
+      const m = (o as THREE.Mesh).material
+      const list = Array.isArray(m) ? m : m ? [m] : []
+      for (const x of list) x.needsUpdate = true
+    })
+  }
+
+  private verySlow = 0
+  private slowReported = false
+
+  private startAside(clip: AsideClip): void {
+    this.aside = { clip, at: this.renderClock }
+    if (this.playing || this.opts.record) this.startClip(clip, 0)
+  }
+
+  /** Spark's mouth while an aside plays. */
+  private asideTalk(): number {
+    if (!this.aside) return 0
+    const k = (this.renderClock - this.aside.at) * this.speed
+    if (k > this.aside.clip.dur) {
+      this.aside = null
+      return 0
+    }
+    return envelopeAt(this.aside.clip.env, k)
+  }
+
+  /** The longest the recorder waits on a question (it answers nothing). */
+  private get recordChoiceWait(): number {
+    const c = this.plan.beats[this.beatIndex]?.choice?.promptClip
+    return Math.max(3.6, c ? c.dur + 1.4 : 0)
+  }
+
+  private releaseChoice(): void {
+    this.releaseAt = 0
+    this.waiting = false
+    this.resolved.add(this.beatIndex)
+    const b = this.plan.beats[this.beatIndex]
+    this.time = b.start + 0.001
   }
 
   private frame(t: number, dt: number, wall: number): void {
     if (this.disposed) return
     this.renderClock = t
+    if (this.waiting && this.releaseAt > 0 && t >= this.releaseAt) this.releaseChoice()
     const calm = this.opts.calm
     if (this.playing && !this.waiting && !this.ended) {
-      this.time += wall * this.speed
+      const next = this.time + wall * this.speed
+      // Never step over a question: a long frame would jump a choice beat.
+      const ci = this.choiceBetween(this.time, next)
+      if (ci >= 0) {
+        this.time = this.plan.beats[ci].start
+        this.enterBeat(ci)
+      } else this.time = next
       if (this.time >= this.plan.duration) {
         this.time = this.plan.duration
         this.ended = true
@@ -878,7 +1095,8 @@ export class Director {
     // Music ducks under speech.
     const clipT = b.clip ? this.time - (b.start + clipLead(b)) : -1
     const voiced = b.clip ? clipT >= 0 && clipT <= b.clip.dur : false
-    this.music?.duck(voiced ? 0.45 : 1)
+    const aside = this.asideTalk()
+    this.music?.duck(voiced || this.aside ? 0.45 : 1)
 
     // Camera: a slow push over the beat, a breath of handheld drift.
     const cam = this.stage.camera
@@ -905,7 +1123,8 @@ export class Director {
       const st = rt.state
       st.gestureT += dt
       const isSpeaker = b.speaker === id
-      st.talk = isSpeaker ? talk : 0
+      st.talk = isSpeaker ? talk : id === 'spark' && this.aside ? aside : 0
+      st.speaking = isSpeaker || (id === 'spark' && this.aside !== null)
       // Entrance walk
       const k = rt.enterDur > 0 ? THREE.MathUtils.clamp((t - rt.enterAt) / rt.enterDur, 0, 1) : 1
       const root = rt.actor.root
@@ -939,14 +1158,22 @@ export class Director {
             st.look = listener && id !== 'myrobot' ? listener.clone().lerp(cam.position, 0.6) : cam.position.clone()
           }
         } else st.look = speakerHead
+      } else if (b.kind === 'react') {
+        // The listener takes in what was just said.
+        st.look = id === b.shot.subject ? this.headOf(b.shot.other) ?? cam.position.clone() : this.headOf(b.shot.other)
+      } else if (b.kind === 'choice' || b.kind === 'turn') {
+        // Everyone turns to the child.
+        st.look = cam.position.clone()
+      } else if (b.kind === 'insert') {
+        st.look = robotLookTarget && id !== 'myrobot' ? robotLookTarget : cam.position.clone()
       } else {
         st.look = this.fx.clockLight ? this.fx.clockLight.position : robotLookTarget && id !== 'myrobot' ? robotLookTarget : cam.position.clone()
       }
       rt.actor.update(t, dt, st, calm)
     }
-    this.extras.forEach((ex, i) => (ex.root.visible = i < this.extrasShown))
+    this.extras.forEach((ex, i) => (ex.root.visible = i < Math.min(this.extrasShown, this.extrasCap)))
     for (const ex of this.extras) if (ex.root.visible) ex.update(t, dt, { ...idleState(), look: speakerHead }, calm)
-    this.clearSightLine(b)
+    this.clearFrame(b)
 
     // Set animation + scene hooks
     const set = this.currentSet
@@ -982,7 +1209,8 @@ export class Director {
       robotHead,
       robotYaw: robotRt?.visible ? robotRt.actor.root.rotation.y : 0,
       speakerHead,
-      boltHead: this.headOf('bolt'),
+      // Bolt's thought bubble only while Bolt himself is in the frame.
+      boltHead: this.actors.get('bolt')?.actor.root.visible ? this.headOf('bolt') : null,
     }
     this.fx.update(t, dt, anchors, beatP)
 

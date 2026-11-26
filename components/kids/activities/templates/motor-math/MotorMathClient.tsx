@@ -18,6 +18,7 @@ import {
   useAnimationFrame,
   useAttempts,
   useReducedMotion,
+  useSvgScale,
 } from '../gear-train/TemplateFrameClient'
 
 const VW = 400
@@ -35,6 +36,11 @@ function knobInfo(k: Knob, p: Params): { label: string; unit: string } {
   if (k === 'diameterCm') return { label: 'Wheel diameter', unit: 'cm' }
   if (k === 'timeS') return { label: 'Run time', unit: 's' }
   return (p.ticksPerRev ?? 1) === 1 ? { label: 'Wheel turns', unit: 'turns' } : { label: 'Encoder ticks', unit: 'ticks' }
+}
+
+/** "1 turn", "3 turns", "1 tick" — other units (cm, s, rpm) do not change. */
+function unitFor(v: number, unit: string): string {
+  return v === 1 && (unit === 'turns' || unit === 'ticks') ? unit.slice(0, -1) : unit
 }
 
 const snap = (r: SizeRange, v: number) => Math.round(Math.max(r.min, Math.min(r.max, r.min + Math.round((v - r.min) / r.step) * r.step)) * 1e6) / 1e6
@@ -78,6 +84,7 @@ export default function MotorMathClient({ params, band, onSubmit, onDone }: Temp
   const uRef = useRef(0)
   const reduced = useReducedMotion()
   const att = useAttempts(onSubmit, onDone)
+  const sv = useSvgScale(VW)
 
   const r = useMemo(() => drive(p, vals), [p, vals])
 
@@ -160,7 +167,7 @@ export default function MotorMathClient({ params, band, onSubmit, onDone }: Temp
       </div>
 
       <div className="relative mt-3 overflow-hidden rounded-[20px] border border-white/10 bg-[#0A1120]">
-        <svg viewBox={`0 0 ${VW} 170`} className="block h-auto w-full" role="img" aria-label={`Drive track ${trackCm} cm long. ${phase === 'shown' ? `The robot drove ${fmt(r.distanceCm)} cm.` : ''}`}>
+        <svg ref={sv.ref} viewBox={`0 0 ${VW} 170`} className="block h-auto w-full" role="img" aria-label={`Drive track ${trackCm} cm long. ${phase === 'shown' ? `The robot drove ${fmt(r.distanceCm)} cm.` : ''}`}>
           {/* target zone */}
           {zone && (
             <g>
@@ -168,7 +175,7 @@ export default function MotorMathClient({ params, band, onSubmit, onDone }: Temp
               <line x1={zoneA} y1={GROUND - 74} x2={zoneA} y2={GROUND} stroke="#22C55E" strokeWidth={1.5} strokeDasharray="4 3" />
               <line x1={zoneB} y1={GROUND - 74} x2={zoneB} y2={GROUND} stroke="#22C55E" strokeWidth={1.5} strokeDasharray="4 3" />
               {p.goal && (
-                <text x={(zoneA + zoneB) / 2} y={GROUND - 80} textAnchor="middle" fontSize={11} fontWeight={800} fill="#22C55E">
+                <text x={(zoneA + zoneB) / 2} y={GROUND - 80} textAnchor="middle" fontSize={sv.font(11)} fontWeight={800} fill="#22C55E">
                   {p.goal}
                 </text>
               )}
@@ -180,14 +187,14 @@ export default function MotorMathClient({ params, band, onSubmit, onDone }: Temp
           {Array.from({ length: 6 }, (_, i) => (
             <g key={i}>
               <line x1={X(i * ticksMajor)} y1={GROUND} x2={X(i * ticksMajor)} y2={GROUND + 10} stroke="#A7B0C0" strokeWidth={1.5} />
-              <text x={X(i * ticksMajor)} y={GROUND + 22} textAnchor="middle" fontSize={10} fill="#A7B0C0">
+              <text x={X(i * ticksMajor)} y={GROUND + 10 + sv.font(10)} textAnchor={i === 5 ? 'end' : 'middle'} fontSize={sv.font(10)} fill="#A7B0C0">
                 {Math.round(i * ticksMajor)}
                 {i === 5 ? ' cm' : ''}
               </text>
             </g>
           ))}
           <line x1={X0} y1={GROUND - 60} x2={X0} y2={GROUND} stroke="#EEF2F8" strokeWidth={2} />
-          <text x={X0 + 3} y={GROUND - 64} fontSize={10} fontWeight={700} fill="#A7B0C0">
+          <text x={X0 + 3} y={GROUND - 64} fontSize={sv.font(10)} fontWeight={700} fill="#A7B0C0">
             start
           </text>
           {/* one mark per wheel turn: each is one circumference apart */}
@@ -197,7 +204,7 @@ export default function MotorMathClient({ params, band, onSubmit, onDone }: Temp
               <g key={k}>
                 <line x1={X(k * perTurnCm)} y1={GROUND - 4} x2={X(k * perTurnCm)} y2={GROUND + 4} stroke="#FC6818" strokeWidth={2.5} />
                 {r.turns <= 12 && (
-                  <text x={X(k * perTurnCm)} y={GROUND + 36} textAnchor="middle" fontSize={9} fontWeight={700} fill="#FFA878">
+                  <text x={X(k * perTurnCm)} y={GROUND + 14 + 2 * sv.font(10)} textAnchor="middle" fontSize={sv.font(9)} fontWeight={700} fill="#FFA878">
                     {k}
                   </text>
                 )}
@@ -214,15 +221,15 @@ export default function MotorMathClient({ params, band, onSubmit, onDone }: Temp
             </g>
           </g>
           {offTrack && (
-            <text x={VW - 6} y={GROUND - 30} textAnchor="end" fontSize={12} fontWeight={800} fill="#FFA878">
+            <text x={VW - 6} y={GROUND - 30} textAnchor="end" fontSize={sv.font(12)} fontWeight={800} fill="#FFA878">
               → {fmt(r.distanceCm)} cm
             </text>
           )}
-          <text x={VW - 8} y={16} textAnchor="end" fontSize={12} fontWeight={800} fill="#EEF2F8">
+          <text x={VW - 8} y={16} textAnchor="end" fontSize={sv.font(12)} fontWeight={800} fill="#EEF2F8">
             ⏱ {simClock.toFixed(1)} s{r.timeS > MAX_VISUAL_S && phase === 'running' ? ' (sped up)' : ''}
           </text>
           {r.turns <= 12 && (
-            <text x={8} y={16} fontSize={11} fontWeight={700} fill="#FFA878">
+            <text x={8} y={16} fontSize={sv.font(11)} fontWeight={700} fill="#FFA878">
               wheel turns: {phase === 'idle' ? 0 : turnsDone}
             </text>
           )}
@@ -243,7 +250,7 @@ export default function MotorMathClient({ params, band, onSubmit, onDone }: Temp
                   {info.label}
                 </label>
                 <span className="font-display text-xl font-bold tabular-nums text-amber-300">
-                  {v} {info.unit}
+                  {v} {unitFor(v, info.unit)}
                 </span>
               </div>
               <div className="mt-1 flex items-center gap-2">
@@ -260,7 +267,7 @@ export default function MotorMathClient({ params, band, onSubmit, onDone }: Temp
                   disabled={phase === 'running'}
                   onChange={(e) => edit(k, snap(range, Number(e.target.value)))}
                   className="h-12 w-full cursor-pointer accent-amber-500"
-                  aria-valuetext={`${v} ${info.unit}`}
+                  aria-valuetext={`${v} ${unitFor(v, info.unit)}`}
                 />
                 <button type="button" className={`${btnGhost} min-w-[48px] px-0`} aria-label={`More ${info.label.toLowerCase()}`} disabled={v >= range.max - 1e-9 || phase === 'running'} onClick={() => edit(k, snap(range, v + range.step))}>
                   +

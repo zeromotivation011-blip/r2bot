@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import EpisodeLabClient from '@/components/kids/episodes/EpisodeLabClient'
 import manifest from '@/lib/kids/episodes/audio-manifest.json'
+import { VOICE_CREDIT } from '@/lib/kids/episodes/credits'
 import { normaliseSessionId, type EpisodeData } from '@/lib/kids/episodes/types'
 
 export const runtime = 'nodejs'
@@ -48,12 +49,13 @@ export default async function EpisodePreviewPage({ params }: Params) {
   const next = EPISODES[idx + 1] ?? null
   return (
     <main className="mx-auto max-w-6xl px-4 pb-16 pt-4 sm:pt-6">
-      <header className="mb-4">
-        <p className="font-display text-sm font-bold uppercase tracking-wider text-amber-300">Episode engine · preview</p>
-        <h1 className="mt-1 font-display text-2xl font-bold text-white sm:text-4xl">
+      <header className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h1 className="font-display text-xl font-bold text-white sm:text-2xl">
           Episode {ep.number}: {ep.title}
         </h1>
-        <p className="mt-1 text-[#A7B0C0]">Session “{ep.sessionTitle}” · Level 1 · Lantern Hill</p>
+        <p className="text-sm text-[#A7B0C0]">
+          <span className="font-bold text-amber-300">Preview</span> · Session “{ep.sessionTitle}” · Level 1 · Lantern Hill
+        </p>
       </header>
 
       <EpisodeLabClient sessionId={ep.sessionId} nextId={next?.sessionId ?? null} nextTitle={next?.title ?? null} />
@@ -78,7 +80,7 @@ export default async function EpisodePreviewPage({ params }: Params) {
         </ol>
       </nav>
 
-      <details className="mt-8 rounded-[20px] border border-white/10 bg-white/[0.03] p-4">
+      <details id="script" className="mt-8 rounded-[20px] border border-white/10 bg-white/[0.03] p-4">
         <summary className="cursor-pointer font-display font-bold text-white">Read the script</summary>
         {ep.previously && <p className="mt-3 italic text-[#A7B0C0]">Last time… {ep.previously.text}</p>}
         {ep.scenes.map((sc, i) => (
@@ -94,10 +96,7 @@ export default async function EpisodePreviewPage({ params }: Params) {
           </section>
         ))}
         <p className="mt-4 italic text-[#A7B0C0]">Next time… {ep.cliffhanger.text}</p>
-        <p className="mt-4 text-xs text-[#6E7888]">
-          Voices made with Piper TTS. Amara, Bolt, Noor, Ms Mei and Mr Diego use the VCTK corpus (CSTR, University of Edinburgh, CC BY 4.0); Captain Ingrid uses the Piper
-          “alba” voice (University of Edinburgh DataShare, CC BY 4.0).
-        </p>
+        <p className="mt-4 text-[13px] text-[#A7B0C0]">{VOICE_CREDIT}</p>
       </details>
     </main>
   )

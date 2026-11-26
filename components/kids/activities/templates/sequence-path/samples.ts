@@ -43,6 +43,7 @@ export const samples: Activity<Params, Answer>[] = [
       maxBlocks: 6,
       maxDepth: 1,
       theme: 'mars',
+      reference: [{ op: 'repeat', times: 3, body: [{ op: 'forward' }, { op: 'right' }, { op: 'forward' }, { op: 'left' }] }],
     },
     solution: {
       program: [
@@ -82,6 +83,7 @@ export const samples: Activity<Params, Answer>[] = [
       maxDepth: 2,
       python: 'on',
       theme: 'hospital',
+      reference: [{ op: 'untilGoal', body: [{ op: 'ifWall', then: [{ op: 'left' }], else: [{ op: 'forward' }] }] }],
     },
     solution: {
       program: [{ op: 'untilGoal', body: [{ op: 'ifWall', then: [{ op: 'left' }], else: [{ op: 'forward' }] }] }],

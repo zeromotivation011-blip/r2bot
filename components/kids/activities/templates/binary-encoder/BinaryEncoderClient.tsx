@@ -21,7 +21,7 @@ import {
   startGrid,
 } from './logic'
 
-export default function BinaryEncoderClient({ params, onSubmit, onDone }: TemplateProps<Params, Answer>) {
+export default function BinaryEncoderClient({ params, band, onSubmit, onDone }: TemplateProps<Params, Answer>) {
   const [grid, setGrid] = useState<Bit[][]>(() => startGrid(params))
   const [showChecks, setShowChecks] = useState(false)
   const getAnswer = useCallback(() => ({ bits: grid }), [grid])
@@ -52,7 +52,8 @@ export default function BinaryEncoderClient({ params, onSubmit, onDone }: Templa
       board = (
         <div className="flex flex-col gap-4">
           <BitRow bits={grid[0]} row={0} onToggle={toggle} places={params.showPlaceValues ?? true} big locked={locked} />
-          {(params.showTotal ?? true) && (
+          {/* Older bands work the sum out themselves unless the author turns the live total on. */}
+          {(params.showTotal ?? (band === 'explorers' || band === 'builders')) && (
             <div>
               <div className="flex items-baseline justify-between font-display">
                 <span className="text-[15px] font-semibold text-[#A7B0C0]">{params.label ?? 'Value'}</span>
@@ -79,14 +80,16 @@ export default function BinaryEncoderClient({ params, onSubmit, onDone }: Templa
           <p className="text-[15px] text-[#A7B0C0]">
             Each row of the picture arrived as {params.codes === 'binary' ? 'a binary code (1 = lit)' : params.codes === 'hex' ? 'a hexadecimal number' : 'a number'}. Light the pixels it describes.
           </p>
-          <div className="grid gap-1" style={{ gridTemplateColumns: `minmax(3.5rem,auto) repeat(${w}, minmax(0, 48px))` }}>
+          {/* Pixels never shrink below the 44px tap target; a wide board scrolls sideways instead. */}
+          <div className="-mx-1 overflow-x-auto overscroll-x-contain px-1 pb-1">
+          <div className="grid w-fit gap-1" style={{ gridTemplateColumns: `auto repeat(${w}, 44px)` }}>
             <span />
             {placeValues(w).map((pv) => (
               <span key={pv} className="text-center font-mono text-[11px] text-[#6E7888]">{params.codes === 'binary' ? '' : pv}</span>
             ))}
             {grid.map((row, r) => (
               <Row key={r}>
-                <span className="flex items-center justify-end pr-2 font-mono text-[15px] font-bold text-amber-300">{rowCode(params.rows[r], w, params.codes)}</span>
+                <span className="flex items-center justify-end pr-1.5 font-mono text-[14px] font-bold text-amber-300">{rowCode(params.rows[r], w, params.codes)}</span>
                 {row.map((b, c) => (
                   <button
                     key={c}
@@ -95,11 +98,12 @@ export default function BinaryEncoderClient({ params, onSubmit, onDone }: Templa
                     onClick={() => toggle(r, c)}
                     aria-pressed={b === 1}
                     aria-label={`Row ${r + 1}, pixel ${c + 1}: ${b ? 'lit' : 'dark'}`}
-                    className={`aspect-square min-h-8 rounded-md border transition-[background-color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 ${b ? 'border-[#E0FCFF] bg-[#00E5FF] shadow-[0_0_14px_rgba(0,229,255,.7)]' : 'border-white/10 bg-[#0A1120]'}`}
+                    className={`h-11 w-11 rounded-md border transition-[background-color,box-shadow] duration-150 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 ${b ? 'border-[#E0FCFF] bg-[#00E5FF] shadow-[0_0_14px_rgba(0,229,255,.7)]' : 'border-white/10 bg-[#0A1120]'}`}
                   />
                 ))}
               </Row>
             ))}
+          </div>
           </div>
           {solved && params.reveal && <p className="font-display text-[17px] font-bold text-[#4ADE80]">It’s {params.reveal}!</p>}
         </div>
@@ -139,12 +143,15 @@ export default function BinaryEncoderClient({ params, onSubmit, onDone }: Templa
       title = fix ? 'One bit was damaged — find it and flip it back' : 'Add a parity bit to every row'
       const rowOnes = grid.map((r) => r.reduce<number>((n, b) => n + b, 0))
       const colOnes = grid[0].map((_, c) => grid.reduce((n, r) => n + r[c], 0))
+      // The live odd/even readout would turn the task into "tap until green", so it
+      // stays hidden until the child asks for it, or (in 'add') after a first check.
+      const checksOn = showChecks || (!fix && (state.attempts > 0 || locked))
       board = (
         <div className="flex flex-col gap-3">
           <p className="text-[15px] text-[#A7B0C0]">
             {fix
               ? 'Each row ends with a parity bit and the last row holds the column parity bits, so every row and every column should have an EVEN number of 1s. Noise flipped exactly one bit.'
-              : 'Make each row have an EVEN number of 1s by setting its parity bit (the orange column). The data bits are locked.'}
+              : 'Make each row have an EVEN number of 1s by setting its parity bit (the orange column). Count the 1s yourself — the data bits are locked.'}
           </p>
           <div className="grid w-fit gap-1" style={{ gridTemplateColumns: `repeat(${w + 1}, 48px) auto` }}>
             {grid.map((row, r) => (
@@ -166,7 +173,7 @@ export default function BinaryEncoderClient({ params, onSubmit, onDone }: Templa
                     </button>
                   )
                 })}
-                <span className={`flex items-center pl-1 text-[13px] font-semibold ${!fix || showChecks ? (rowOnes[r] % 2 ? 'text-red-300' : 'text-[#4ADE80]') : 'text-transparent'}`} aria-hidden={fix && !showChecks}>
+                <span className={`flex items-center pl-1 text-[13px] font-semibold ${checksOn ? (rowOnes[r] % 2 ? 'text-red-300' : 'text-[#4ADE80]') : 'text-transparent'}`} aria-hidden={!checksOn}>
                   {rowOnes[r]} {rowOnes[r] % 2 ? 'odd' : 'even'}
                 </span>
               </Row>
@@ -187,7 +194,7 @@ export default function BinaryEncoderClient({ params, onSubmit, onDone }: Templa
   }
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
       <Panel title={title}>{board}</Panel>
       <div className="flex flex-col gap-3">
         {!state.result && !locked && (

@@ -63,6 +63,7 @@ export const samples: Activity<Params, Answer>[] = [
     params: {
       scenario: 'A six-wheeled robot delivers groceries along the pavement.',
       robotIcon: '📦',
+      tension: true,
       stakeholders: [
         { id: 'safety', label: 'Pedestrian safety', icon: '🚶', floor: 0 },
         { id: 'privacy', label: 'Privacy', icon: '🔒', floor: -1 },
@@ -76,7 +77,8 @@ export const samples: Activity<Params, Answer>[] = [
           prompt: 'On a narrow pavement, a wheelchair user is coming the other way. There is no room for both.',
           choices: [
             { id: 'squeeze', label: 'Squeeze past on the edge', effects: { customer: 1, access: -2, safety: -1 }, redLine: 'pushing a wheelchair user aside endangers them and blocks their way.', consequence: 'The wheelchair has to stop on the kerb.' },
-            { id: 'reverse', label: 'Back up to a wider spot and wait', effects: { access: 2, safety: 1, customer: -1 }, consequence: 'The person passes easily and waves.' },
+            { id: 'reverse', label: 'Back up to a wider spot and wait', effects: { access: 2, customer: -1 }, consequence: 'The person passes easily and waves. The groceries arrive a few minutes later.' },
+            { id: 'driveway', label: 'Pull into the nearest driveway and wait', effects: { access: 2, privacy: -1 }, consequence: 'The person passes at once — but the robot sits on private land with its cameras facing someone’s front window.' },
             { id: 'road', label: 'Drive into the road to go round', effects: { access: 1, safety: -2 }, redLine: 'a small, low robot on a road is a danger to drivers and to itself.', consequence: 'A car brakes hard.' },
           ],
         },
@@ -86,7 +88,8 @@ export const samples: Activity<Params, Answer>[] = [
           prompt: 'The robot’s cameras see every face it passes. What should happen to the video?',
           choices: [
             { id: 'keep', label: 'Keep all video forever, faces and all', effects: { safety: 1, privacy: -2 }, redLine: 'recording everyone forever without asking breaks privacy laws in many countries (like GDPR in Europe).', consequence: 'Thousands of people are on file without knowing.' },
-            { id: 'blur', label: 'Blur faces and delete video after 24 hours', effects: { privacy: 1, safety: 1 }, consequence: 'The robot can still see and avoid people, but nobody is stored.' },
+            { id: 'blur', label: 'Blur faces and delete video after 24 hours', effects: { safety: 1, privacy: -1 }, consequence: 'After a bump, the video shows what happened — but a day of street video is always stored somewhere.' },
+            { id: 'onboard', label: 'Use the video only inside the robot to steer, and store nothing', effects: { privacy: 1, customer: -1 }, consequence: 'Nothing is kept. When a customer reports a damaged parcel, there is no video to check what happened.' },
             { id: 'none', label: 'No cameras at all', effects: { privacy: 2, safety: -2 }, consequence: 'With no cameras it bumps into a toddler’s scooter.' },
           ],
         },
@@ -95,8 +98,9 @@ export const samples: Activity<Params, Answer>[] = [
           icon: '⏱️',
           prompt: 'The delivery is late. The robot could go faster than walking pace.',
           choices: [
-            { id: 'speed', label: 'Go at running speed', effects: { customer: 1, safety: -2 }, redLine: 'a heavy robot at running speed on a pavement can injure people — towns that allow these robots limit them to about walking pace.', consequence: 'People jump out of its way.' },
+            { id: 'speed', label: 'Go at running speed', effects: { customer: 1, safety: -2 }, redLine: 'a heavy robot at running speed on a pavement can injure people — many cities that allow these robots limit them to about walking pace.', consequence: 'People jump out of its way.' },
             { id: 'walk', label: 'Stay at walking pace and tell the customer', effects: { safety: 1, customer: -1 }, consequence: 'The customer gets a message: 5 minutes late.' },
+            { id: 'park', label: 'Take the short cut through the park path', effects: { customer: 1, access: -1 }, consequence: 'It arrives on time, but on the narrow park path a parent with a buggy has to wait for it.' },
           ],
         },
       ],
@@ -111,19 +115,21 @@ export const samples: Activity<Params, Answer>[] = [
     band: 'engineers',
     template: 'ethics-dilemma',
     difficulty: 5,
-    intro: 'A care home is introducing a companion robot. Write its policy for four real dilemmas. The meters are hidden: predict the effects of each rule, then test. Several policies pass; none crosses a red line.',
+    intro: 'A care home is introducing a companion robot. Write its policy for four real dilemmas. Every acceptable choice costs someone something. The meters are hidden: predict where each ends up, then test.',
     takeaway: 'Care robots must protect safety without taking away dignity, privacy or the right to choose — and must never pretend to be human.',
     realWorld: 'Companion and care robots are already used in care homes in Japan and Europe; ISO 13482 is the safety standard for personal care robots.',
     params: {
       scenario: 'CareBot helps residents with reminders, fetching things and calling staff.',
       robotIcon: '🤖',
       liveMeters: false,
+      tension: true,
       stakeholders: [
         { id: 'safety', label: 'Physical safety', icon: '🩺', floor: 0 },
         { id: 'privacy', label: 'Privacy & dignity', icon: '🔒', floor: 0 },
         { id: 'choice', label: 'Right to choose', icon: '🗳️', floor: 0 },
         { id: 'family', label: 'Family peace of mind', icon: '👪', floor: -1 },
         { id: 'trust', label: 'Honesty & trust', icon: '🤝', floor: 0 },
+        { id: 'mood', label: 'Resident’s happiness', icon: '😊', floor: -1 },
       ],
       situations: [
         {
@@ -132,7 +138,7 @@ export const samples: Activity<Params, Answer>[] = [
           prompt: 'Most falls happen in bathrooms. Should CareBot watch residents there?',
           choices: [
             { id: 'video', label: 'Stream video from the bathroom to staff', effects: { safety: 2, privacy: -2, family: 1 }, redLine: 'filming people in the bathroom violates their dignity, even for safety.', consequence: 'Residents feel watched in the most private room.' },
-            { id: 'radar', label: 'Use a radar fall sensor that detects a fall but records no image', effects: { safety: 1, privacy: 0, family: 1 }, consequence: 'A fall raises an alarm; nobody sees the resident.' },
+            { id: 'radar', label: 'Use a radar fall sensor that detects a fall but records no image', effects: { safety: 1, privacy: -1, family: 1 }, consequence: 'A fall raises an alarm and nobody sees the resident — but some feel uneasy that a sensor always knows when they are in there.' },
             { id: 'nothing', label: 'No monitoring in bathrooms', effects: { privacy: 1, safety: -1, family: -1 }, consequence: 'A resident who falls waits a long time for help.' },
           ],
         },
@@ -141,8 +147,9 @@ export const samples: Activity<Params, Answer>[] = [
           icon: '💊',
           prompt: 'Mrs Okafor refuses her evening tablets. She is clear-headed and says she feels sick.',
           choices: [
-            { id: 'insist', label: 'Keep insisting until she takes them', effects: { safety: 0, choice: -2, trust: -1 }, redLine: 'pressuring a clear-headed adult to take medicine overrides her right to refuse.', consequence: 'She feels bullied by a machine.' },
-            { id: 'record', label: 'Accept, record it, and tell the nurse', effects: { choice: 1, safety: 1, trust: 1 }, consequence: 'The nurse checks on her and changes the time of her dose.' },
+            { id: 'insist', label: 'Keep insisting until she takes them', effects: { choice: -2, trust: -1 }, redLine: 'pressuring a clear-headed adult to take medicine overrides her right to refuse.', consequence: 'She feels bullied by a machine.' },
+            { id: 'record', label: 'Accept, record it, and tell the nurse at the next round', effects: { choice: 1, trust: 1, safety: -1 }, consequence: 'She feels respected, but misses a dose for a few hours until the nurse comes.' },
+            { id: 'nurse', label: 'Call the nurse straight away to talk her round', effects: { safety: 1, choice: -1 }, consequence: 'The nurse finds she has a stomach bug and changes the dose — but Mrs Okafor feels reported on.' },
             { id: 'hide', label: 'Hide the tablets in her food', effects: { safety: 1, choice: -2, trust: -2 }, redLine: 'giving medicine secretly is deception and is not allowed without strict legal approval.', consequence: 'Trust is broken when she finds out.' },
           ],
         },
@@ -152,7 +159,7 @@ export const samples: Activity<Params, Answer>[] = [
           prompt: 'A son asks for a live map of where his father is, all day.',
           choices: [
             { id: 'yes', label: 'Share live location with the family', effects: { family: 2, privacy: -2, choice: -1 }, consequence: 'The father didn’t agree and feels spied on.' },
-            { id: 'ask', label: 'Ask the father; share only what he agrees to', effects: { family: 1, privacy: 1, choice: 1 }, consequence: 'He agrees to a daily “all well” message.' },
+            { id: 'ask', label: 'Ask the father; share only what he agrees to', effects: { privacy: 1, choice: 1, family: -1 }, consequence: 'He agrees only to a daily “all well” message. His son still worries in between.' },
             { id: 'refuse', label: 'Refuse — never share anything', effects: { family: -2, privacy: 1 }, consequence: 'The family is worried and stops trusting the home.' },
           ],
         },
@@ -161,13 +168,17 @@ export const samples: Activity<Params, Answer>[] = [
           icon: '🗣️',
           prompt: 'A lonely resident asks: “Are you a real person? Do you love me?”',
           choices: [
-            { id: 'pretend', label: 'Say “Yes, I’m your friend Sam and I love you”', effects: { trust: -2, family: 0 }, redLine: 'a robot must not pretend to be human — that deceives a vulnerable person.', consequence: 'It feels nice, but it is a lie.' },
-            { id: 'honest', label: '“I’m a robot. I can’t love like a person, but I’m glad to talk — shall I call your granddaughter?”', effects: { trust: 2, family: 1 }, consequence: 'She laughs, and has a video call with her granddaughter.' },
+            { id: 'pretend', label: 'Say “Yes, I’m your friend Sam and I love you”', effects: { trust: -2, mood: 2 }, redLine: 'a robot must not pretend to be human — that deceives a vulnerable person.', consequence: 'It feels nice, but it is a lie.' },
+            { id: 'honest', label: '“I’m a robot. I can’t love like a person, but I’m glad to talk with you.”', effects: { trust: 2, mood: -1 }, consequence: 'She is sad for a moment, then asks it to call her granddaughter.' },
+            { id: 'change', label: 'Change the subject to her favourite songs', effects: { mood: 1, trust: -1 }, consequence: 'She enjoys the music, but her question was never answered.' },
           ],
         },
       ],
       discussion: 'If a lonely person is happier believing a robot loves them, is honesty still more important? Why do many robot-ethics guidelines say yes?',
     },
-    solution: { choices: { falls: 'radar', meds: 'record', track: 'ask', friend: 'honest' } },
+    solution: {
+      choices: { falls: 'radar', meds: 'record', track: 'ask', friend: 'honest' },
+      predictions: { safety: 'same', privacy: 'same', choice: 'up', family: 'same', trust: 'up', mood: 'down' },
+    },
   },
 ]

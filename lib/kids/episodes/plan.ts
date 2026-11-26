@@ -8,6 +8,8 @@
 
 import type { CharacterId } from '../curriculum/types'
 import type { EpisodeData, EpisodeLineData, EpisodeSceneData, VoicedText } from './types'
+import joinAudio from './interaction-audio.json'
+import { interactionsFor, type ChoiceOption, type TurnIcon } from './interactions'
 
 export type SetId =
   | 'hill'
@@ -56,7 +58,8 @@ export type SceneEffect =
 
 export type LineEffect = 'beam' | 'think' | 'arrow-forward' | 'arrow-left' | 'arrow-right' | 'drive' | 'cheer'
 
-export type ShotKind = 'establish' | 'wide' | 'close' | 'close-front' | 'two' | 'top' | 'robot-eye' | 'low' | 'under'
+/** ots = over the listener's shoulder onto the speaker; insert = a cut-in on the child's robot (the part being explained). */
+export type ShotKind = 'establish' | 'wide' | 'close' | 'close-front' | 'two' | 'ots' | 'top' | 'robot-eye' | 'low' | 'under' | 'insert'
 
 export interface Shot {
   kind: ShotKind
@@ -82,13 +85,44 @@ export interface ScenePlan {
   action: string
 }
 
-export interface ChoiceBeat {
-  prompt: string
-  options: string[]
-  reply: string
+/** A voiced clip outside the script: Spark reading a question, a reply or a "your turn". */
+export interface AsideClip {
+  file: string
+  dur: number
+  env: string
 }
 
-export type BeatKind = 'title' | 'previously' | 'card' | 'establish' | 'line' | 'choice' | 'next'
+export interface ChoiceBeat {
+  prompt: string
+  options: ChoiceOption[]
+  /** Spark reads the question and its options (for children who cannot read yet). */
+  promptClip: AsideClip | null
+  /** One reply per option, same order. */
+  replyClips: (AsideClip | null)[]
+}
+
+type JoinAudio = Record<string, Record<string, { prompt: AsideClip; replies: AsideClip[] }>>
+
+function joinClips(sessionId: string, after: number): { prompt: AsideClip; replies: AsideClip[] } | null {
+  const e = (joinAudio as unknown as JoinAudio)[sessionId]?.[String(after)]
+  if (!e?.prompt?.file) return null
+  const strip = (c: AsideClip): AsideClip => ({ file: c.file, dur: c.dur, env: c.env })
+  return { prompt: strip(e.prompt), replies: (e.replies ?? []).map(strip) }
+}
+
+export interface TurnBeat {
+  prompt: string
+  say: string | null
+  icon: TurnIcon
+}
+
+/**
+ * title / previously / next: the bookends. establish: the scene's opening shot
+ * (the cast walks on). line: a voiced line. react: a reaction cutaway to a
+ * listener. insert: a cut-in on the child's robot with the part's label.
+ * choice: the film waits for the child's answer. turn: a timed "your turn" hold.
+ */
+export type BeatKind = 'title' | 'previously' | 'card' | 'establish' | 'line' | 'react' | 'insert' | 'choice' | 'turn' | 'next'
 
 export interface Beat {
   kind: BeatKind
@@ -105,6 +139,8 @@ export interface Beat {
   lineEffects: LineEffect[]
   labels: string[]
   choice: ChoiceBeat | null
+  /** For 'turn' beats. */
+  turn?: TurnBeat
   /** For 'card' beats. */
   cardText?: string
 }
@@ -260,7 +296,7 @@ const CONCEPTS: [RegExp, string][] = [
   [/\bwait\b/i, 'WAIT'],
   [/\bpen down\b/i, 'PEN DOWN'],
   [/\bpen up\b/i, 'PEN UP'],
-  [/\bif\b/, 'IF'],
+  [/\bIF\b|[“"]if[”"]/, 'IF'],
   [/\bsquare\b/i, 'SQUARE'],
   [/\bsteps?\b/i, 'STEPS'],
   [/\bsafe(ty)?\b/i, 'SAFE'],
@@ -287,28 +323,11 @@ export function lineEffects(text: string, who: CharacterId): LineEffect[] {
   return out
 }
 
-/** A gentle "what do you think?" pause after a question to the child. Max two per episode. */
-export function choiceFor(line: EpisodeLineData): ChoiceBeat | null {
-  if (line.who === 'narrator' || line.who === 'bolt' || line.who === 'myrobot') return null
-  const sentences = line.text.split(/(?<=[.!?…])\s+/).filter(Boolean)
-  const last = sentences[sentences.length - 1] ?? ''
-  if (!last.trim().endsWith('?')) return null
-  const q = last.trim()
-  if (q.length > 70) return null
-  if (/^(hello|what was that|really|ready)\b/i.test(q)) return null
-  const toChild = /\byou\b|\bour\b|\bwe\b/i.test(q)
-  if (!toChild) return null
-  const yesNo = /^(is|can|do|does|will|should|are|could|did|would|shall)\b/i.test(q)
-  return {
-    prompt: q,
-    options: yesNo ? ['Yes!', 'No', 'Not sure'] : ['I have an idea!', 'Show me!'],
-    reply: yesNo ? 'Good thinking! Let’s find out.' : 'Great! Let’s see what happens.',
-  }
-}
-
 // ── The plan ────────────────────────────────────────────────────────────────
 
 const GAP = 0.45
+/** Labels worth a cut-in on the robot itself. */
+const PART_LABELS = new Set(['BATTERY', 'BRAIN', 'MOTOR', 'WHEELS', 'SENSOR', 'BUMPER', 'ECHO', 'PEN DOWN', 'PEN UP'])
 const SCENE_GAP = 0.55
 
 function addressesChild(text: string): boolean {
@@ -352,53 +371,122 @@ export function planEpisode(ep: EpisodeData): EpisodePlan {
     push({ kind: 'previously', scene: -1, dur: ep.previously.dur + 0.9, shot: { ...none, kind: 'wide' }, clip: ep.previously, who: 'narrator', speaker: null, lineEffects: [], labels: [], choice: null })
   }
 
-  let choices = 0
+  const interactions = new Map(interactionsFor(ep.sessionId).map((x) => [x.after, x]))
+  let inserts = 0
+  let reacts = 0
+  let lastFront = -9
+  let lineCount = 0
   ep.scenes.forEach((sc, si) => {
     const plan = scenes[si]
     if (plan.afterShare) {
       push({ kind: 'card', scene: si, dur: 2.6, shot: none, clip: null, who: null, speaker: null, lineEffects: [], labels: [], choice: null, cardText: 'After you share your project…' })
     }
     const firstIsNarrator = sc.lines[0]?.who === 'narrator'
-    // The action moment before the dialogue: longer when the script gives the scene time for it.
+    // The action moment before the dialogue: long enough for the cast to walk on
+    // and the set to read, longer when the script gives the scene time for it.
     const voiced = sc.lines.reduce((n, l) => n + l.dur + GAP, 0)
-    const estDur = plan.closeUp ? 1.4 : firstIsNarrator ? 1.2 : Math.min(4, Math.max(2.2, (sc.seconds - voiced) * 0.2))
+    const estDur = plan.closeUp ? 2 : firstIsNarrator ? 1.8 : Math.min(4.6, Math.max(3, (sc.seconds - voiced) * 0.3))
     const estKind: ShotKind = plan.closeUp === 'top' ? 'top' : plan.closeUp === 'robot-eye' ? 'robot-eye' : 'establish'
     push({ kind: 'establish', scene: si, dur: estDur, shot: { kind: estKind, subject: null, other: null, side: 1 }, clip: null, who: null, speaker: null, lineEffects: [], labels: [], choice: null })
 
     let prevSpeaker: CastId | null = null
     let side = 1
     let run = 0
+    const robotOnSet = plan.cast.includes('myrobot')
     sc.lines.forEach((ln, li) => {
+      lineCount++
       const speaker = castIdOf(ln.who, ln.guestName)
+      const listener = (except: CastId | null): CastId | null =>
+        (prevSpeaker && prevSpeaker !== except ? prevSpeaker : null) ??
+        plan.cast.find((c) => c !== except && (c === 'amara' || c === 'spark' || c === 'lucia')) ??
+        plan.cast.find((c) => c !== except) ??
+        null
+      // "Watch Bolt…": cut to the one we are told to watch.
+      const watch = /\bwatch (bolt|the robot|amara|spark|nana)\b/i.exec(ln.text)?.[1].toLowerCase()
+      const watched: CastId | null = watch === 'bolt' ? 'bolt' : watch === 'the robot' ? 'myrobot' : watch === 'amara' ? 'amara' : watch === 'spark' ? 'spark' : watch === 'nana' ? 'lucia' : null
       let shot: Shot
       if (plan.closeUp === 'top') shot = { kind: 'top', subject: speaker, other: null, side }
       else if (plan.closeUp === 'robot-eye') shot = { kind: 'robot-eye', subject: speaker, other: null, side }
       else if (plan.closeUp === 'under' || plan.closeUp === 'xray') shot = { kind: li % 2 === 0 ? 'under' : 'close', subject: li % 2 === 0 ? 'myrobot' : speaker, other: null, side }
       else if (!speaker) shot = { kind: li % 2 === 0 ? 'wide' : 'establish', subject: null, other: null, side }
+      else if (watched && plan.cast.includes(watched) && watched !== speaker) shot = { kind: 'close', subject: watched, other: speaker, side: -side }
       else if (speaker === 'myrobot') shot = { kind: 'low', subject: 'myrobot', other: null, side }
-      else if (addressesChild(ln.text) && (speaker === 'lucia' || speaker === 'spark' || speaker === 'amara')) shot = { kind: 'close-front', subject: speaker, other: null, side }
-      else if (li === 0 && !firstIsNarrator) shot = { kind: 'wide', subject: speaker, other: null, side }
+      else if (addressesChild(ln.text) && (speaker === 'lucia' || speaker === 'spark' || speaker === 'amara') && lineCount - lastFront >= 3) {
+        // Talking to the child: straight down the lens — but not every time.
+        lastFront = lineCount
+        shot = { kind: 'close-front', subject: speaker, other: null, side }
+      } else if (li === 0 && !firstIsNarrator) shot = { kind: 'wide', subject: speaker, other: null, side }
+      else if (prevSpeaker && prevSpeaker !== speaker && li % 3 === 1) shot = { kind: 'ots', subject: speaker, other: prevSpeaker, side }
       else if (prevSpeaker && prevSpeaker !== speaker && li % 3 === 2) shot = { kind: 'two', subject: speaker, other: prevSpeaker, side }
       else if (prevSpeaker === speaker) {
         // The same character again: vary the size of the shot, not just the side.
         run++
         side = -side
-        const listener = plan.cast.find((c) => c !== speaker && c === 'myrobot') ?? plan.cast.find((c) => c !== speaker) ?? null
-        if (run % 3 === 1 && listener) shot = { kind: 'two', subject: speaker, other: listener, side }
-        else if (run % 3 === 2) shot = { kind: 'wide', subject: speaker, other: null, side }
-        else shot = { kind: 'close', subject: speaker, other: listener, side }
+        const l = listener(speaker)
+        if (run % 3 === 1 && l) shot = { kind: 'two', subject: speaker, other: l, side }
+        else if (run % 3 === 2 && l) shot = { kind: 'ots', subject: speaker, other: l, side }
+        else shot = { kind: 'wide', subject: speaker, other: null, side }
       } else {
         run = 0
-        shot = { kind: 'close', subject: speaker, other: prevSpeaker, side }
+        const l = listener(speaker)
+        shot = l && addressesChild(ln.text) ? { kind: 'two', subject: speaker, other: l, side } : { kind: 'close', subject: speaker, other: prevSpeaker, side }
       }
       const effects = lineEffects(ln.text, ln.who)
-      const dur = ln.dur + GAP + (li === sc.lines.length - 1 ? SCENE_GAP : 0)
-      push({ kind: 'line', scene: si, dur, shot, clip: ln, who: ln.who, speaker, lineEffects: effects, labels: lineLabels(ln.text), choice: null })
-      const choice = choices < 2 ? choiceFor(ln) : null
-      if (choice) {
-        choices++
-        push({ kind: 'choice', scene: si, dur: 0.01, shot: { kind: 'close-front', subject: speaker ?? 'spark', other: null, side }, clip: null, who: null, speaker: null, lineEffects: [], labels: [], choice })
+      const labels = lineLabels(ln.text)
+      const lastInScene = li === sc.lines.length - 1
+      // The robot keeps driving a moment after it speaks: the demo, not just the words.
+      const demo = speaker === 'myrobot' && effects.includes('drive') ? 1.2 : 0
+      const inter = interactions.get(ln.i)
+      push({ kind: 'line', scene: si, dur: ln.dur + GAP + demo + (lastInScene && !inter ? SCENE_GAP : 0), shot, clip: ln, who: ln.who, speaker, lineEffects: effects, labels, choice: null })
+
+      const audio = inter ? joinClips(ep.sessionId, ln.i) : null
+      const host: CastId | null = plan.cast.includes('spark') ? 'spark' : speaker
+      if (inter?.kind === 'choice') {
+        // Everyone turns to the child. The film waits here until they answer;
+        // the beat itself is the reaction after the answer.
+        push({
+          kind: 'choice',
+          scene: si,
+          dur: 1.1,
+          shot: { kind: 'wide', subject: speaker ?? 'spark', other: null, side },
+          clip: null,
+          who: null,
+          speaker: null,
+          lineEffects: [],
+          labels: [],
+          choice: { prompt: inter.prompt, options: inter.options, promptClip: audio?.prompt ?? null, replyClips: inter.options.map((_, k) => audio?.replies[k] ?? null) },
+        })
+      } else if (inter?.kind === 'turn') {
+        // Spark says "Your turn!…", then the film holds while the child joins in.
+        const clip = audio && host === 'spark' ? { ...audio.prompt, text: inter.prompt, words: [] } : null
+        push({
+          kind: 'turn',
+          scene: si,
+          dur: inter.seconds + (clip ? clip.dur + 0.2 : 0),
+          shot: { kind: 'close-front', subject: host ?? 'spark', other: null, side },
+          clip,
+          who: clip ? 'spark' : null,
+          speaker: clip ? 'spark' : null,
+          lineEffects: [],
+          labels: [],
+          choice: null,
+          turn: { prompt: inter.prompt, say: inter.say ?? null, icon: inter.icon },
+        })
+        lastFront = lineCount
+      } else if (robotOnSet && inserts < 4 && labels.some((l) => PART_LABELS.has(l)) && speaker !== 'myrobot' && !plan.closeUp) {
+        // Cut in on the part being explained.
+        inserts++
+        push({ kind: 'insert', scene: si, dur: 2.2, shot: { kind: 'insert', subject: 'myrobot', other: speaker, side: inserts % 2 ? 1 : -1 }, clip: null, who: null, speaker: null, lineEffects: [], labels: labels.filter((l) => PART_LABELS.has(l)), choice: null })
+      } else if (speaker && !lastInScene && !plan.closeUp && reacts < 6 && li % 3 === 2) {
+        // A reaction cutaway: a listener takes the line in.
+        const next = castIdOf(sc.lines[li + 1].who, sc.lines[li + 1].guestName)
+        const r = (['bolt', 'myrobot', 'amara', 'spark', 'lucia'] as CastId[]).find((c) => plan.cast.includes(c) && c !== speaker && c !== next)
+        if (r) {
+          reacts++
+          push({ kind: 'react', scene: si, dur: 1.15, shot: { kind: 'close', subject: r, other: speaker, side: -side }, clip: null, who: null, speaker: null, lineEffects: [], labels: [], choice: null })
+        }
       }
+      if (lastInScene && inter) t += SCENE_GAP
       if (speaker) prevSpeaker = speaker
     })
   })

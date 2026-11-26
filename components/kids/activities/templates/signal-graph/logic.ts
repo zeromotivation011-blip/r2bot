@@ -82,6 +82,60 @@ export interface Answer {
   span?: [number, number]
 }
 
+/** A "nice" step (1, 2 or 5 × 10ⁿ) that splits `span` into about `target` parts. The UI snaps the level line to niceStep(range, 100). */
+export function niceStep(span: number, target: number): number {
+  const raw = span / target
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)))
+  const m = raw / pow
+  return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * pow
+}
+
+/** The level line moves in steps of this many sensor units. */
+export function levelStep(p: Params): number {
+  return niceStep(p.sensor.max - p.sensor.min, 100)
+}
+
+/** Range (max − min) of the SAMPLED clean signal inside [t0, t1] — what the child can actually see. */
+function sampledSwing(trace: Sample[], t0: number, t1: number): number {
+  let lo = Infinity
+  let hi = -Infinity
+  for (const s of trace) {
+    if (s.t < t0 - 1e-9 || s.t > t1 + 1e-9) continue
+    lo = Math.min(lo, s.clean)
+    hi = Math.max(hi, s.clean)
+  }
+  return hi > lo ? hi - lo : 0
+}
+
+/**
+ * Every clear jump in the sampled clean signal: a run of same-direction
+ * changes that is at least `minJump` tall and no longer than `maxLenS`.
+ * Returns the middle time of each run.
+ */
+export function visibleJumps(trace: Sample[], minJump: number, maxLenS: number): number[] {
+  const out: number[] = []
+  let i = 1
+  while (i < trace.length) {
+    const d = trace[i].clean - trace[i - 1].clean
+    if (Math.abs(d) < 1e-9) {
+      i++
+      continue
+    }
+    const dir = Math.sign(d)
+    const start = i - 1
+    let end = i
+    while (end + 1 < trace.length && Math.sign(trace[end + 1].clean - trace[end].clean) === dir && Math.abs(trace[end + 1].clean - trace[end].clean) > 1e-9) end++
+    const tall = Math.abs(trace[end].clean - trace[start].clean)
+    const len = trace[end].t - trace[start].t
+    if (tall >= minJump && len <= maxLenS + 1e-9) out.push((trace[start].t + trace[end].t) / 2)
+    i = end + 1
+  }
+  return out
+}
+
+/** Nearest time the UI can place a cursor/marker on (cursors snap to samples). */
+const snapToSample = (t: number, hz: number) => Math.round(t * hz) / hz
+
 export function traceOf(p: Params): Sample[] {
   return makeTrace(p.keyframes, p.trace, p.sensor)
 }
@@ -127,29 +181,34 @@ function validate(p: Params): string[] {
   const span = p.sensor.max - p.sensor.min
   const tk = p.task
   if (!tk?.prompt?.trim()) out.push('task.prompt is required')
+  const hz = p.trace.sampleHz
+  const trace = traceOf(p)
+  const minJump = Math.max(0.1 * span, 3 * p.trace.noise)
   if (tk.kind === 'mark') {
     if (!(tk.toleranceS > 0 && tk.toleranceS <= 2)) out.push('toleranceS: (0, 2]')
+    else if (tk.toleranceS < 1 / (2 * hz) - 1e-9) out.push(`toleranceS must be ≥ half a sample period (${+(1 / (2 * hz)).toFixed(3)} s): markers snap to samples`)
     if (!Array.isArray(tk.events) || tk.events.length < 1 || tk.events.length > 8) out.push('events: 1–8')
     else {
       tk.events.forEach((e, i) => {
         if (!(e.t > 0 && e.t < D)) out.push(`event ${i + 1} is outside the trace`)
         if (i > 0 && e.t - tk.events[i - 1].t <= 2 * tk.toleranceS) out.push(`events ${i} and ${i + 1} are closer than twice the tolerance`)
-        // The event must be VISIBLE: the clean signal changes clearly around it.
-        let lo = Infinity
-        let hi = -Infinity
-        for (let j = 0; j <= 40; j++) {
-          const v = cleanAt(p.keyframes, e.t - tk.toleranceS + (2 * tk.toleranceS * j) / 40)
-          lo = Math.min(lo, v)
-          hi = Math.max(hi, v)
-        }
-        const dv = hi - lo
-        if (dv < Math.max(0.1 * span, 3 * p.trace.noise)) out.push(`event ${i + 1} at ${e.t}s: the signal barely changes there (needs ≥ 10 % of the range and ≥ 3× noise)`)
+        if (Math.abs(snapToSample(e.t, hz) - e.t) > tk.toleranceS + 1e-9) out.push(`event ${i + 1} at ${e.t}s: no sample lies within the tolerance, so no marker can hit it`)
+        // The event must be VISIBLE in the sampled data: the clean signal changes clearly around it.
+        if (sampledSwing(trace, e.t - tk.toleranceS, e.t + tk.toleranceS) < minJump)
+          out.push(`event ${i + 1} at ${e.t}s: the sampled signal barely changes there (needs ≥ 10 % of the range and ≥ 3× noise)`)
       })
+      // …and every clear jump the child can see must belong to a listed event, or tapping it is marked wrong.
+      for (const j of visibleJumps(trace, minJump, 2 * tk.toleranceS)) {
+        if (!tk.events.some((e) => Math.abs(e.t - j) <= tk.toleranceS + 1e-9))
+          out.push(`there is a clear jump at about ${r1(j)} s that no event covers — list it, or remove it from the keyframes`)
+      }
     }
   } else if (tk.kind === 'level') {
     if (!(tk.from >= 0 && tk.to <= D && tk.to - tk.from >= 0.5)) out.push('level window must be inside the trace and ≥ 0.5 s long')
+    const step = levelStep(p)
     if (!(tk.toleranceAbs > 0)) out.push('toleranceAbs must be > 0')
     else if (tk.toleranceAbs > 0.25 * span) out.push('toleranceAbs is so wide that any guess wins')
+    else if (tk.toleranceAbs < step / 2 - 1e-9) out.push(`toleranceAbs must be ≥ ${step / 2} ${p.sensor.unit}: the line moves in ${step} ${p.sensor.unit} steps`)
     // A level task needs a calm stretch: the clean signal should not swing much in the window.
     if (!out.length) {
       let lo = Infinity
@@ -160,10 +219,20 @@ function validate(p: Params): string[] {
         hi = Math.max(hi, v)
       }
       if (hi - lo > 2 * tk.toleranceAbs) out.push('the clean signal changes too much inside the level window to have one true reading')
+      const truth = trueLevel(p, tk.from, tk.to)
+      const step = levelStep(p)
+      if (Math.abs(Math.round(truth / step) * step - truth) > tk.toleranceAbs + 1e-9) out.push('no position of the level line is within the tolerance of the true reading')
     }
   } else if (tk.kind === 'duration') {
     if (!(tk.from > 0 && tk.to < D && tk.to > tk.from)) out.push('duration from/to must be inside the trace with to > from')
     if (!(tk.toleranceS > 0 && tk.toleranceS < (tk.to - tk.from) / 2)) out.push('toleranceS must be > 0 and less than half the event length')
+    else {
+      if (tk.toleranceS < 1 / (2 * hz) - 1e-9) out.push(`toleranceS must be ≥ half a sample period: cursors snap to samples`)
+      for (const [name, t] of [['from', tk.from], ['to', tk.to]] as const) {
+        if (Math.abs(snapToSample(t, hz) - t) > tk.toleranceS + 1e-9) out.push(`duration ${name}: no sample lies within the tolerance`)
+        if (sampledSwing(trace, t - tk.toleranceS, t + tk.toleranceS) < minJump) out.push(`duration ${name} at ${t}s: the signal does not clearly change there, so the child cannot see where the event ${name === 'from' ? 'starts' : 'ends'}`)
+      }
+    }
   } else out.push('task.kind must be mark, level or duration')
   for (const s of p.scene ?? []) if (!(s.t >= 0 && s.t <= D)) out.push('scene items must be inside the trace')
   return out

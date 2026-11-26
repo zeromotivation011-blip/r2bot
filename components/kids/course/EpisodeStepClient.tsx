@@ -63,7 +63,7 @@ class PlayerBoundary extends Component<{ fallback: ReactNode; children: ReactNod
 // ── Storyboard ────────────────────────────────────────────────────────────
 
 const CAST: Record<CharacterId, { name: string; face: string; chip: string }> = {
-  narrator: { name: 'Narrator', face: '📖', chip: 'bg-white/15 text-[#EEF2F8]' },
+  narrator: { name: 'Narrator', face: '📖', chip: 'bg-[#19263F] text-[#EEF2F8]' },
   spark: { name: 'Spark', face: '🤖', chip: 'bg-amber-500 text-[#1A1103]' },
   amara: { name: 'Amara', face: '👧🏾', chip: 'bg-yellow-300 text-[#1A1103]' },
   lucia: { name: 'Nana Lucía', face: '👵🏽', chip: 'bg-rose-300 text-[#1A1103]' },
@@ -77,7 +77,7 @@ const SKIES = [
   'from-[#1B2E55] via-[#22406E] to-[#0A1120]',
   'from-[#3A2614] via-[#5A3A1A] to-[#0A1120]',
   'from-[#0F3A3F] via-[#145057] to-[#0A1120]',
-  'from-[#2B1B3A] via-[#3E2140] to-[#0A1120]',
+  'from-[#3A1E22] via-[#4E2A2C] to-[#0A1120]',
   'from-[#123222] via-[#1C4A33] to-[#0A1120]',
 ]
 
@@ -208,11 +208,10 @@ export default function EpisodeStepClient({ sessionId, sessionNumber, episode, w
   return (
     <EpisodeCtx.Provider value={{ episode, sessionNumber }}>
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-3">
-        <div className="flex flex-wrap items-end gap-2">
-          <div className="mr-auto min-w-0">
-            <p className="font-display text-xs font-bold uppercase tracking-wider text-cyan-300">Episode {sessionNumber}</p>
-            <h2 className="font-display text-2xl font-bold leading-tight text-[#EEF2F8]">{episode.title}</h2>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="mr-auto min-w-0 font-display text-xs font-bold uppercase tracking-wider text-cyan-300">
+            Episode {sessionNumber} · <span className="normal-case tracking-normal">{episode.title}</span>
+          </h2>
           <div className="flex gap-1 rounded-2xl bg-white/[0.05] p-1" role="group" aria-label="How to watch">
             {(
               [

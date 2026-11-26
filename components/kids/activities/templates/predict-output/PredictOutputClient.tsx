@@ -140,7 +140,7 @@ export default function PredictOutputClient({ params, onSubmit, onDone, band }: 
   const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '−', '0', '⌫']
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-start">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-start">
       <Panel
         className="lg:sticky lg:top-4"
         title={

@@ -77,7 +77,7 @@ export default function CoursePage() {
         </p>
       </header>
 
-      <section aria-labelledby="planets-h" className="mx-auto max-w-6xl px-4 pt-6">
+      <section aria-labelledby="planets-h" className="mx-auto max-w-6xl px-4 pb-0 pt-6">
         <h2 id="planets-h" className="sr-only">
           The four levels
         </h2>
@@ -96,7 +96,7 @@ export default function CoursePage() {
                 >
                   <div className="flex items-start gap-4">
                     <span
-                      className={`grid h-20 w-20 shrink-0 place-items-center rounded-full bg-gradient-to-br ${planet.gradient} text-4xl shadow-[inset_-8px_-10px_18px_rgba(0,0,0,.45),0_0_30px_rgba(252,104,24,.15)] transition-transform motion-safe:group-hover:rotate-6`}
+                      className={`grid h-16 w-16 shrink-0 sm:h-20 sm:w-20 place-items-center rounded-full bg-gradient-to-br ${planet.gradient} text-3xl sm:text-4xl shadow-[inset_-8px_-10px_18px_rgba(0,0,0,.45),0_0_30px_rgba(252,104,24,.15)] transition-transform motion-safe:group-hover:rotate-6`}
                       aria-hidden
                     >
                       {planet.emoji}
@@ -107,9 +107,15 @@ export default function CoursePage() {
                       </p>
                       <h3 className="font-display text-2xl font-bold leading-tight text-[#EEF2F8]">{planet.name}</h3>
                       <p className="text-[13px] font-semibold text-[#6E7888]">{band.grades}</p>
+                      <span
+                        className={`mt-1.5 inline-block rounded-full px-3 py-1 text-xs font-black uppercase tracking-wide sm:hidden ${playable ? 'bg-amber-500 text-[#1A1103]' : 'bg-cyan-400/15 text-cyan-200'}`}
+                        aria-hidden
+                      >
+                        {playable ? 'Play now' : 'Arriving soon'}
+                      </span>
                     </div>
                     <span
-                      className={`ml-auto shrink-0 rounded-full px-3 py-1 text-xs font-black uppercase tracking-wide ${playable ? 'bg-amber-500 text-[#1A1103]' : 'bg-cyan-400/15 text-cyan-200'}`}
+                      className={`ml-auto hidden shrink-0 rounded-full px-3 py-1 text-xs font-black uppercase tracking-wide sm:inline-block ${playable ? 'bg-amber-500 text-[#1A1103]' : 'bg-cyan-400/15 text-cyan-200'}`}
                     >
                       {playable ? 'Play now' : 'Arriving soon'}
                     </span>
@@ -135,7 +141,7 @@ export default function CoursePage() {
         </ol>
       </section>
 
-      <section aria-labelledby="how-h" className="mx-auto max-w-6xl px-4 pt-14">
+      <section aria-labelledby="how-h" className="mx-auto max-w-6xl px-4 pb-0 pt-14">
         <h2 id="how-h" className="font-display text-2xl font-bold text-[#EEF2F8] sm:text-3xl">
           How every session works
         </h2>
@@ -159,7 +165,7 @@ export default function CoursePage() {
         </ol>
       </section>
 
-      <section aria-labelledby="principles-h" className="mx-auto max-w-3xl px-4 pt-14 text-[#A7B0C0]">
+      <section aria-labelledby="principles-h" className="mx-auto max-w-3xl px-4 pb-0 pt-14 text-[#A7B0C0]">
         <h2 id="principles-h" className="font-display text-2xl font-bold text-[#EEF2F8] sm:text-3xl">
           What makes this course different
         </h2>

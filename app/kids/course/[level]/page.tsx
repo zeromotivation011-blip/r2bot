@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: `${BASE}/kids/course/${l.number}` },
-    robots: playable ? undefined : { index: false, follow: true },
+    robots: playable ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
       type: 'website',
       url: `${BASE}/kids/course/${l.number}`,
@@ -95,9 +95,9 @@ export default async function LevelPage({ params }: Params) {
 
       {/* Hero */}
       <header className="relative overflow-hidden">
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 pb-4 pt-6 sm:flex-row sm:items-center sm:pt-10">
+        <div className="mx-auto flex max-w-6xl items-start gap-4 px-4 pb-4 pt-5 sm:items-center sm:gap-5 sm:pt-10">
           <span
-            className={`grid h-24 w-24 shrink-0 place-items-center rounded-full bg-gradient-to-br ${planet?.gradient ?? 'from-amber-300 to-orange-600'} text-5xl shadow-[inset_-10px_-12px_22px_rgba(0,0,0,.45),0_0_60px_rgba(252,104,24,.25)] sm:h-32 sm:w-32 sm:text-6xl`}
+            className={`mt-8 grid h-16 w-16 shrink-0 place-items-center rounded-full bg-gradient-to-br ${planet?.gradient ?? 'from-amber-300 to-orange-600'} text-3xl sm:mt-0 shadow-[inset_-10px_-12px_22px_rgba(0,0,0,.45),0_0_60px_rgba(252,104,24,.25)] sm:h-32 sm:w-32 sm:text-6xl`}
             aria-hidden
           >
             {planet?.emoji}
@@ -117,13 +117,13 @@ export default async function LevelPage({ params }: Params) {
               Level {l.number} · {planet?.name} · {l.name} · ages {l.ages}
             </p>
             <h1 className="mt-1 font-display text-3xl font-bold leading-tight text-[#EEF2F8] sm:text-5xl">{l.season.title}</h1>
-            <p className="mt-2 max-w-3xl text-[17px] leading-relaxed text-[#A7B0C0]">{l.season.premise}</p>
+            <p className="mt-2 line-clamp-3 max-w-3xl text-[16px] leading-relaxed text-[#A7B0C0] sm:line-clamp-none sm:text-[17px]">{l.season.premise}</p>
           </div>
         </div>
       </header>
 
       <div className="mx-auto grid max-w-6xl gap-8 px-4 pt-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <section aria-labelledby="map-h" className="min-w-0">
+        <section aria-labelledby="map-h" className="min-w-0 py-0">
           <h2 id="map-h" className="sr-only">
             Season map
           </h2>
@@ -154,7 +154,7 @@ export default async function LevelPage({ params }: Params) {
       </div>
 
       {/* Server text: what the level teaches, for parents, teachers and search. */}
-      <section aria-labelledby="learn-h" className="mx-auto max-w-3xl px-4 pt-14 text-[#A7B0C0]">
+      <section aria-labelledby="learn-h" className="mx-auto max-w-3xl px-4 pb-0 pt-14 text-[#A7B0C0]">
         <h2 id="learn-h" className="font-display text-2xl font-bold text-[#EEF2F8] sm:text-3xl">
           What children learn in {l.season.title}
         </h2>

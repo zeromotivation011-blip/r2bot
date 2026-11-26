@@ -268,7 +268,7 @@ function validate(p: Params): string[] {
 const r1 = (n: number) => Math.round(n * 10) / 10
 
 function testName(t: TiltTest): string {
-  if (t.label) return t.label
+  if (t.label) return `the “${t.label}” test`
   const slope = t.slopeDeg === 0 ? 'flat ground' : `a ${Math.abs(t.slopeDeg)}° ${t.slopeDeg > 0 ? 'climb' : 'descent'}`
   return t.brakeG ? `a hard stop (${t.brakeG} g) on ${slope}` : slope
 }
@@ -278,16 +278,21 @@ function check(p: Params, a: Answer): CheckResult {
   if (shape.length) return { correct: false, score: 0, feedback: shape[0] }
   const r = evaluate(p, a)
   const passed = r.tests.filter((t) => t.ok).length
-  const where = `The balance point (centre of mass) is ${r1(r.x)} cm from the back wheel and ${r1(r.h)} cm off the ground.`
+  // Numbers and the tan/brake reasoning only when the activity shows the maths (ages 11+);
+  // young children get what happened and what to do.
+  const maths = p.showMath === true
+  const where = maths ? `The balance point (centre of mass) is ${r1(r.x)} cm from the back wheel and ${r1(r.h)} cm off the ground. ` : ''
   const marginNote = (p.minMarginCm ?? 0) > 0 ? ` (with a ${p.minMarginCm} cm safety margin)` : ''
   if (passed === r.tests.length) {
     const tight = r.tests.reduce((m, t) => (t.margin < m.margin ? t : m), r.tests[0])
     return {
       correct: true,
       score: 1,
-      feedback: `${where} On every test the line straight down from it lands between the wheels${marginNote} — closest call: ${r1(
-        tight.margin,
-      )} cm inside on ${testName(tight.test)}. Heavy parts low and between the wheels keep a robot on its feet.`,
+      feedback: maths
+        ? `${where}On every test the line straight down from it lands between the wheels${marginNote} — closest call: ${r1(tight.margin)} cm inside on ${testName(
+            tight.test,
+          )}. Heavy parts low and between the wheels keep a robot on its feet.`
+        : `It stays on its wheels! The balance point stays between the wheels on every test.`,
     }
   }
   const f = r.tests.find((t) => !t.ok) as TestResult
@@ -301,7 +306,9 @@ function check(p: Params, a: Answer): CheckResult {
     return {
       correct: false,
       score: Math.round((passed / r.tests.length) * 0.8 * 100) / 100,
-      feedback: `${where} That is ${r1(-f.margin)} cm past the ${wheel} wheel, so the robot tips ${f.tips} just standing still. Move heavy parts ${move} so the balance point sits between the wheels.`,
+      feedback: maths
+        ? `${where}That is ${r1(-f.margin)} cm past the ${wheel} wheel, so the robot tips ${f.tips} just standing still. Move heavy parts ${move} so the balance point sits between the wheels.`
+        : `It tips over ${f.tips} just standing still — the balance point is past the ${wheel} wheel. Move the heavy parts ${move}, between the wheels.`,
     }
   const lands =
     f.margin >= 0
@@ -310,7 +317,9 @@ function check(p: Params, a: Answer): CheckResult {
   return {
     correct: false,
     score: Math.round((passed / r.tests.length) * 0.8 * 100) / 100,
-    feedback: `${where} On ${testName(f.test)} the line straight down from it ${lands}. Move heavy parts ${move}, or lower — a low balance point barely shifts.`,
+    feedback: maths
+      ? `${where}On ${testName(f.test)} the line straight down from it ${lands}. Move heavy parts ${move}, or lower — a low balance point barely shifts.`
+      : `It tips ${f.tips} on ${testName(f.test)}. Move the heavy parts ${move}${p.deck.levels.length > 1 ? ', or lower' : ''} so the balance point stays between the wheels.`,
   }
 }
 

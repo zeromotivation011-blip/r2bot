@@ -232,7 +232,7 @@ function check(p: Params, a: Answer): CheckResult {
   const f = rule ? p.features.find((x) => x.key === rule.feature) : undefined
   if (!rule || !f) return { correct: false, score: 0, feedback: 'Build the robot’s rule first: pick a feature to look at.' }
   if (f.kind === 'number' && !Number.isFinite(rule.threshold)) return { correct: false, score: 0, feedback: `Set a threshold for ${f.label.toLowerCase()}.` }
-  if (f.kind === 'word' && !rule.equals) return { correct: false, score: 0, feedback: `Pick which ${f.label.toLowerCase()} the rule looks for.` }
+  if (f.kind === 'word' && !rule.equals) return { correct: false, score: 0, feedback: `Pick the value of “${f.label}” the rule looks for.` }
   if (rule.ifTrue === rule.ifFalse) return { correct: false, score: 0.2, feedback: 'Both sides of your rule go to the same bin, so the robot would put everything in one place. Send each side to a different bin.' }
   const run = runRule(p, rule)
   const minAcc = p.minAccuracy ?? 1

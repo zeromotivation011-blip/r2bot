@@ -61,6 +61,13 @@ export interface Params {
   theme?: Theme
   /** Show a "ghost" of the shortest route at the start (Explorers scaffold). Default false. */
   showHintPath?: boolean
+  /**
+   * The author's own working program, never shown to the child. validate() runs
+   * it through check(), which is how it proves a puzzle is solvable when a plain
+   * route cannot: REQUIRED when `extraWorlds` is set, or when `maxBlocks` is
+   * below the shortest flat route (so a loop is needed). Optional otherwise.
+   */
+  reference?: Cmd[]
 }
 
 /** The child's program. */
@@ -89,17 +96,46 @@ function validate(p: Params): string[] {
   if (p.maxDepth !== undefined && (!Number.isInteger(p.maxDepth) || p.maxDepth < 1 || p.maxDepth > 4)) errs.push('maxDepth must be an integer 1–4')
   if (p.python !== undefined && !['off', 'toggle', 'on'].includes(p.python)) errs.push('python must be off, toggle or on')
   if (p.theme !== undefined && !(p.theme in THEMES)) errs.push(`unknown theme "${String(p.theme)}"`)
-  // A flat route needs at least (distance) forward blocks; if loops are not
-  // offered, the budget must fit a shortest route.
-  if (errs.length === 0 && p.maxBlocks !== undefined && !p.palette.includes('repeat') && !p.palette.includes('untilGoal')) {
-    const r = shortestRouteBlocks(p.world)
-    if (r > p.maxBlocks) errs.push(`maxBlocks ${p.maxBlocks} is below the shortest route (${r} blocks) and no loop block is offered — unsolvable`)
+  if (p.reference !== undefined) errs.push(...programShapeErrors(p.reference, 'reference'))
+  if (errs.length) return errs
+  // Solvability. A flat route (moves + turns from the palette) is the floor; a
+  // loop can only shorten it. Anything a flat route cannot prove needs the
+  // author's reference program, which must pass check() like a child's answer.
+  const flat = shortestRouteBlocks(p.world, p.palette)
+  if (!Number.isFinite(flat)) {
+    errs.push('no route reaches the goal (and every gem) with the blocks in the palette — add turns or move the walls')
+    return errs
+  }
+  const extraFlat = (p.extraWorlds ?? []).map((w) => shortestRouteBlocks(w, p.palette))
+  extraFlat.forEach((r, i) => { if (!Number.isFinite(r)) errs.push(`extraWorlds[${i}] cannot be solved with the blocks in the palette`) })
+  if (errs.length) return errs
+  const loops = p.palette.includes('repeat') || p.palette.includes('untilGoal')
+  const overBudget = p.maxBlocks !== undefined && flat > p.maxBlocks
+  if (overBudget && !loops) {
+    errs.push(`maxBlocks ${p.maxBlocks} is below the shortest route (${flat} blocks) and no loop block is offered — unsolvable`)
+    return errs
+  }
+  const needsReference = overBudget || (p.extraWorlds?.length ?? 0) > 0
+  if (needsReference && !p.reference) {
+    errs.push(overBudget
+      ? `maxBlocks ${p.maxBlocks} is below the shortest flat route (${flat} blocks): add a \`reference\` program that proves a loop fits`
+      : 'extraWorlds is set: add a `reference` program that solves every map, to prove one program can')
+    return errs
+  }
+  if (p.reference) {
+    const r = check(p, { program: p.reference })
+    if (!r.correct) errs.push(`reference program does not pass: ${r.feedback}`)
   }
   return errs
 }
 
-/** Blocks in the shortest flat program (moves + turns) that visits every gem then the goal. Exact via BFS over (cell, dir, gems). */
-export function shortestRouteBlocks(world: World): number {
+/**
+ * Blocks in the shortest flat program (moves + turns) that visits every gem then
+ * the goal, using only the primitive blocks in `palette` (default: all four).
+ * Exact via BFS over (cell, dir, gems). Infinity when no such route exists.
+ */
+export function shortestRouteBlocks(world: World, palette: Op[] = ['forward', 'back', 'left', 'right']): number {
+  const has = (o: Op) => palette.includes(o)
   const gems = world.gems ?? []
   const D: Record<string, [number, number]> = { N: [0, -1], E: [1, 0], S: [0, 1], W: [-1, 0] }
   const L: Record<string, string> = { N: 'W', W: 'S', S: 'E', E: 'N' }
@@ -115,8 +151,11 @@ export function shortestRouteBlocks(world: World): number {
     const next: [number, number, string, number][] = []
     for (const [c, r, d, m] of frontier) {
       if (c === world.goal[0] && r === world.goal[1] && m === full) return depth
-      const cand: [number, number, string][] = [[c, r, L[d]], [c, r, R[d]]]
-      for (const s of [1, -1]) {
+      const cand: [number, number, string][] = []
+      if (has('left')) cand.push([c, r, L[d]])
+      if (has('right')) cand.push([c, r, R[d]])
+      for (const s of [has('forward') ? 1 : 0, has('back') ? -1 : 0]) {
+        if (!s) continue
         const nc = c + D[d][0] * s
         const nr = r + D[d][1] * s
         if (!blocked(nc, nr)) cand.push([nc, nr, d])
@@ -164,10 +203,12 @@ function check(p: Params, a: Answer): CheckResult {
     return {
       correct: false,
       score: 0.6,
-      feedback: `It works! But it uses ${used} blocks and the ${t.robot}’s memory only holds ${p.maxBlocks}. Look for a group of blocks that repeats and wrap it in a Repeat block — that is what loops are for.`,
+      feedback: p.palette.includes('repeat')
+        ? `It works! But it uses ${used} blocks and the ${t.robot}’s memory only holds ${p.maxBlocks}. Look for a group of blocks that repeats and wrap it in a Repeat block — that is what loops are for.`
+        : `It works! But it uses ${used} blocks and the ${t.robot}’s memory only holds ${p.maxBlocks}. Find a shorter route — every extra turn or step costs a block.`,
     }
   }
-  const best = worlds.length === 1 && !p.palette.includes('untilGoal') ? shortestRouteBlocks(p.world) : Infinity
+  const best = worlds.length === 1 && !p.palette.includes('untilGoal') ? shortestRouteBlocks(p.world, p.palette) : Infinity
   const note = p.maxBlocks !== undefined
     ? ` ${used} of ${p.maxBlocks} blocks — ${used < p.maxBlocks ? 'with memory to spare' : 'a perfect fit'}.`
     : Number.isFinite(best) && used <= best

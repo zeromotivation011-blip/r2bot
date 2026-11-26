@@ -9,9 +9,9 @@
 import { useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import type { TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
-import { traceOf, trueLevel, type Answer, type Params } from './logic'
+import { levelStep, niceStep, traceOf, trueLevel, type Answer, type Params } from './logic'
 import { r1 } from './trace'
-import { FeedbackPanel, TemplateCard, btnGhost, btnPrimary, useAnimationFrame, useAttempts, useReducedMotion } from '../gear-train/TemplateFrameClient'
+import { FeedbackPanel, TemplateCard, btnGhost, btnPrimary, useAnimationFrame, useAttempts, useReducedMotion, useSvgScale } from '../gear-train/TemplateFrameClient'
 
 const VW = 400
 const VH = 236
@@ -20,13 +20,6 @@ const R = 10
 const TOP = 34
 const BOT = 204
 const SWEEP_S = 3.2
-
-function niceStep(span: number, target: number): number {
-  const raw = span / target
-  const pow = Math.pow(10, Math.floor(Math.log10(raw)))
-  const m = raw / pow
-  return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * pow
-}
 
 export default function SignalGraphClient({ params: p, band, onSubmit, onDone }: TemplateProps<Params, Answer>) {
   const tk = p.task
@@ -42,7 +35,7 @@ export default function SignalGraphClient({ params: p, band, onSubmit, onDone }:
   const tOf = (x: number) => Math.max(0, Math.min(D, ((x - L) * D) / (VW - L - R)))
   const vOf = (y: number) => Math.max(min, Math.min(max, min + ((BOT - y) * (max - min)) / (BOT - TOP)))
   const snapT = (t: number) => Math.round(t / dtS) * dtS
-  const vStep = niceStep(max - min, 100)
+  const vStep = levelStep(p)
   const snapV = (v: number) => Math.round(v / vStep) * vStep
 
   const [marks, setMarks] = useState<number[]>([])
@@ -55,7 +48,9 @@ export default function SignalGraphClient({ params: p, band, onSubmit, onDone }:
   const sweepRef = useRef(1)
   const [playing, setPlaying] = useState(false)
   const dragging = useRef(false)
-  const svgRef = useRef<SVGSVGElement>(null)
+  const { ref: svgRef, font } = useSvgScale<SVGSVGElement>(VW)
+  const fs = font(10, 12) // axis text: never under 12 real px
+  const fsB = font(11, 13) // key readouts
   const reduced = useReducedMotion()
   const att = useAttempts(onSubmit, onDone)
   const solved = !!att.result?.correct
@@ -183,6 +178,7 @@ export default function SignalGraphClient({ params: p, band, onSubmit, onDone }:
   const shown = samples.filter((s) => s.t <= visibleUntil + 1e-9)
   const path = shown.map((s, i) => `${i ? 'L' : 'M'}${X(s.t).toFixed(1)} ${Y(s.v).toFixed(1)}`).join(' ')
   const nearest = samples[Math.max(0, Math.min(samples.length - 1, Math.round(cursor / dtS)))]
+  const levelW = Math.max(56, (`${r1(level)} ${unit}`.length * 0.6 + 1) * fsB)
   const tStep = niceStep(D, 6)
   const vGrid = niceStep(max - min, 4)
   const tTicks = Array.from({ length: Math.floor(D / tStep) + 1 }, (_, i) => i * tStep)
@@ -242,19 +238,19 @@ export default function SignalGraphClient({ params: p, band, onSubmit, onDone }:
             vTicks.map((v) => <line key={`v${v}`} x1={L} x2={VW - R} y1={Y(v)} y2={Y(v)} stroke="#19263F" strokeWidth={1} />)}
           {showGrid && tTicks.map((t) => <line key={`t${t}`} x1={X(t)} x2={X(t)} y1={TOP} y2={BOT} stroke="#19263F" strokeWidth={1} />)}
           {vTicks.map((v) => (
-            <text key={`vl${v}`} x={L - 5} y={Y(v) + 3.5} textAnchor="end" fontSize={10} fill="#A7B0C0">
+            <text key={`vl${v}`} x={L - 4} y={Y(v) + fs * 0.35} textAnchor="end" fontSize={fs} fill="#A7B0C0">
               {r1(v)}
             </text>
           ))}
           {tTicks.map((t) => (
-            <text key={`tl${t}`} x={X(t)} y={BOT + 14} textAnchor="middle" fontSize={10} fill="#A7B0C0">
+            <text key={`tl${t}`} x={X(t)} y={BOT + 4 + fs} textAnchor="middle" fontSize={fs} fill="#A7B0C0">
               {r1(t)}
             </text>
           ))}
-          <text x={VW - R} y={BOT + 28} textAnchor="end" fontSize={10} fontWeight={700} fill="#A7B0C0">
+          <text x={VW - R} y={Math.min(VH - 2, BOT + 8 + 2 * fs)} textAnchor="end" fontSize={fs} fontWeight={700} fill="#A7B0C0">
             time (s)
           </text>
-          <text x={6} y={TOP - 4} fontSize={10} fontWeight={700} fill="#A7B0C0">
+          <text x={4} y={TOP - 4} fontSize={fs} fontWeight={700} fill="#A7B0C0">
             {unit}
           </text>
           <line x1={L} x2={L} y1={TOP} y2={BOT} stroke="#6E7888" />
@@ -267,8 +263,8 @@ export default function SignalGraphClient({ params: p, band, onSubmit, onDone }:
               {span.map((s, i) => (
                 <g key={i}>
                   <line x1={X(s)} x2={X(s)} y1={TOP} y2={BOT} stroke="#00E5FF" strokeWidth={activeEnd === i ? 3 : 2} />
-                  <rect x={X(s) - 9} y={BOT - 18} width={18} height={18} rx={5} fill={activeEnd === i ? '#00E5FF' : '#19263F'} stroke="#00E5FF" />
-                  <text x={X(s)} y={BOT - 5} textAnchor="middle" fontSize={10} fontWeight={800} fill={activeEnd === i ? '#0A1120' : '#00E5FF'}>
+                  <rect x={X(s) - fsB / 2 - 5} y={BOT - fsB - 10} width={fsB + 10} height={fsB + 10} rx={5} fill={activeEnd === i ? '#00E5FF' : '#19263F'} stroke="#00E5FF" />
+                  <text x={X(s)} y={BOT - 5 - fsB * 0.15} textAnchor="middle" fontSize={fsB} fontWeight={800} fill={activeEnd === i ? '#0A1120' : '#00E5FF'}>
                     {i === 0 ? 'A' : 'B'}
                   </text>
                 </g>
@@ -291,8 +287,8 @@ export default function SignalGraphClient({ params: p, band, onSubmit, onDone }:
             marks.map((m, i) => (
               <g key={i}>
                 <line x1={X(m)} x2={X(m)} y1={TOP} y2={BOT} stroke="#FC6818" strokeWidth={2.5} />
-                <circle cx={X(m)} cy={TOP + 2} r={6} fill="#FC6818" />
-                <text x={X(m)} y={TOP + 5.5} textAnchor="middle" fontSize={9} fontWeight={800} fill="#1A1103">
+                <circle cx={X(m)} cy={TOP + fs * 0.6} r={fs * 0.65 + 1} fill="#FC6818" />
+                <text x={X(m)} y={TOP + fs * 0.95} textAnchor="middle" fontSize={fs} fontWeight={800} fill="#1A1103">
                   {i + 1}
                 </text>
               </g>
@@ -303,8 +299,8 @@ export default function SignalGraphClient({ params: p, band, onSubmit, onDone }:
             <g>
               <rect x={X(tk.from)} y={TOP} width={X(tk.to) - X(tk.from)} height={BOT - TOP} fill="#FC6818" opacity={0.06} />
               <line x1={L} x2={VW - R} y1={Y(level)} y2={Y(level)} stroke="#FC6818" strokeWidth={2.5} strokeDasharray="7 4" />
-              <rect x={VW - R - 58} y={Y(level) - 11} width={56} height={22} rx={7} fill="#FC6818" />
-              <text x={VW - R - 30} y={Y(level) + 4} textAnchor="middle" fontSize={11} fontWeight={800} fill="#1A1103">
+              <rect x={VW - R - 2 - levelW} y={Y(level) - fsB / 2 - 5} width={levelW} height={fsB + 10} rx={7} fill="#FC6818" />
+              <text x={VW - R - 2 - levelW / 2} y={Y(level) + fsB * 0.35} textAnchor="middle" fontSize={fsB} fontWeight={800} fill="#1A1103">
                 {r1(level)} {unit}
               </text>
             </g>

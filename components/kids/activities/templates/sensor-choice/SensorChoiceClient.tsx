@@ -19,7 +19,7 @@ import {
   type Params,
   type SensorId,
 } from './logic'
-import { FeedbackPanel, TemplateCard, btnGhost, btnPrimary, useAnimationFrame, useAttempts, useReducedMotion } from '../gear-train/TemplateFrameClient'
+import { FeedbackPanel, TemplateCard, btnGhost, btnPrimary, useAnimationFrame, useAttempts, useReducedMotion, useSvgScale } from '../gear-train/TemplateFrameClient'
 
 const VW = 400
 const VH = 150
@@ -35,6 +35,8 @@ export default function SensorChoiceClient({ params: p, band, onSubmit, onDone }
   const [phase, setPhase] = useState<Phase>('build')
   const [t, setT] = useState(0) // progress in checkpoints (0..needs.length)
   const tRef = useRef(0)
+  const finishedRef = useRef(true)
+  const { ref: svgRef, font } = useSvgScale<SVGSVGElement>(VW)
   const [openHow, setOpenHow] = useState<SensorId | null>(null)
   const reduced = useReducedMotion()
   const att = useAttempts(onSubmit, onDone)
@@ -56,6 +58,9 @@ export default function SensorChoiceClient({ params: p, band, onSubmit, onDone }
     tRef.current = nt
     setT(nt)
     if (nt >= stopAt) {
+      // A late frame can arrive before phase='shown' commits: submit exactly once.
+      if (finishedRef.current) return
+      finishedRef.current = true
       setPhase('shown')
       att.submit({ sensors: fitted })
     }
@@ -90,7 +95,10 @@ export default function SensorChoiceClient({ params: p, band, onSubmit, onDone }
       setT(stopAt)
       setPhase('shown')
       att.submit({ sensors: fitted })
-    } else setPhase('running')
+    } else {
+      finishedRef.current = false
+      setPhase('running')
+    }
   }
 
   const reached = Math.floor(t + 1e-9)
@@ -113,6 +121,7 @@ export default function SensorChoiceClient({ params: p, band, onSubmit, onDone }
       {/* The mission route */}
       <div className="relative mt-3 overflow-hidden rounded-[20px] border border-white/10 bg-[#0A1120]">
         <svg
+          ref={svgRef}
           viewBox={`0 0 ${VW} ${VH}`}
           className="block h-auto w-full"
           role="img"
@@ -137,7 +146,7 @@ export default function SensorChoiceClient({ params: p, band, onSubmit, onDone }
             strokeLinecap="round"
             opacity={phase === 'build' ? 0 : 0.8}
           />
-          <text x={X(0)} y={PATH_Y + 30} textAnchor="middle" fontSize={11} fontWeight={700} fill="#A7B0C0">
+          <text x={X(0)} y={PATH_Y + 22 + font(11, 13) * 0.6} textAnchor="middle" fontSize={font(11, 13)} fontWeight={700} fill="#A7B0C0">
             start
           </text>
           {p.needs.map((need, i) => {
@@ -148,8 +157,8 @@ export default function SensorChoiceClient({ params: p, band, onSubmit, onDone }
             const extra = (need.conditions ?? []).map((c) => CONDITION_LABEL[c].icon).join('')
             return (
               <g key={i}>
-                <circle cx={X(k)} cy={PATH_Y} r={15} fill="#111C32" stroke={col} strokeWidth={3} />
-                <text x={X(k)} y={PATH_Y + 5} textAnchor="middle" fontSize={14} fontWeight={800} fill={col} className="font-display">
+                <circle cx={X(k)} cy={PATH_Y} r={Math.max(15, font(14, 14) * 0.85)} fill="#111C32" stroke={col} strokeWidth={3} />
+                <text x={X(k)} y={PATH_Y + font(14, 14) * 0.36} textAnchor="middle" fontSize={font(14, 14)} fontWeight={800} fill={col} className="font-display">
                   {done ? (o.ok ? '✓' : '✗') : k}
                 </text>
                 {extra && (

@@ -25,7 +25,11 @@ export type Cell = [row: number, col: number]
 
 export interface Params {
   task: string
-  /** Rows of the map (3–14 rows, 3–14 columns, all the same length). */
+  /**
+   * Rows of the map (3–14 rows, 3–10 columns, all the same length). Phones:
+   * up to 7 columns keeps squares ≥ 44 px at 390 px wide; 8–10 columns only
+   * for ages 11+ (taps snap to the nearest legal next square, which helps).
+   */
   map: string[]
   /** Per-cell entry cost of terrain. Defaults: sand ':' 2, mud '~' 4. Floor, S, G and checkpoints cost 1. */
   costs?: { sand?: number; mud?: number }
@@ -221,7 +225,7 @@ function validate(p: Params): string[] {
   if (!p.task?.trim()) out.push('task is required')
   const rows = p.map.length
   const cols = p.map[0]?.length ?? 0
-  if (rows < 3 || rows > 14 || cols < 3 || cols > 14) out.push('map: 3–14 rows and 3–14 columns')
+  if (rows < 3 || rows > 14 || cols < 3 || cols > 10) out.push('map: 3–14 rows and 3–10 columns (squares get too small to tap on a phone)')
   if (p.map.some((r) => r.length !== cols)) out.push('every map row must be the same length')
   if (p.map.some((r) => /[^SG#.~:123]/.test(r))) out.push('map may only use S G # . ~ : 1 2 3')
   const all = p.map.join('')

@@ -412,6 +412,171 @@ function room(b: SetBuild, g: THREE.Group, w: number, d: number, h: number, wall
   b.lamps.push(new THREE.Vector3(1.2, h - 0.5, 0.5), new THREE.Vector3(-2.2, h - 0.5, -1.5))
 }
 
+/** Set dressing for Nana Lucía's workshop: a lived-in room, not bare walls. */
+function workshopDressing(b: SetBuild, g: THREE.Group): void {
+  // Warm wood panelling on the lower walls.
+  put(g, box(9, 1.0, 0.03, '#C98A4B', 0.9), 0, 0.5, -3.97)
+  for (const side of [-1, 1]) {
+    const p = box(0.03, 1.0, 7, '#C98A4B', 0.9)
+    put(g, p, side * 4.47, 0.5, -0.5)
+    put(g, box(0.05, 0.05, 7, '#7C2D12'), side * 4.46, 1.02, -0.5)
+  }
+  put(g, box(9, 0.05, 0.05, '#7C2D12'), 0, 1.02, -3.95)
+
+  // A big window on the right wall: sky, the hill and the Lantern Clock outside.
+  const view = canvasTexture(512, 384, (c) => {
+    const sky = c.createLinearGradient(0, 0, 0, 384)
+    sky.addColorStop(0, '#5FB3EA')
+    sky.addColorStop(0.65, '#CDEBFF')
+    sky.addColorStop(1, '#FFE7C2')
+    c.fillStyle = sky
+    c.fillRect(0, 0, 512, 384)
+    c.fillStyle = '#FFFFFF'
+    for (const [x, y, r] of [[90, 80, 28], [125, 72, 34], [160, 84, 24], [360, 120, 22], [392, 112, 30]]) {
+      c.beginPath()
+      c.arc(x, y, r, 0, Math.PI * 2)
+      c.fill()
+    }
+    c.fillStyle = '#6DBB5C'
+    c.beginPath()
+    c.moveTo(0, 384)
+    c.quadraticCurveTo(170, 210, 330, 290)
+    c.quadraticCurveTo(430, 330, 512, 300)
+    c.lineTo(512, 384)
+    c.fill()
+    // The clock tower on the hill.
+    c.fillStyle = '#B45309'
+    c.fillRect(196, 168, 34, 78)
+    c.fillStyle = '#7C2D12'
+    c.beginPath()
+    c.moveTo(190, 170)
+    c.lineTo(213, 138)
+    c.lineTo(236, 170)
+    c.fill()
+    c.fillStyle = '#FFF7E0'
+    c.beginPath()
+    c.arc(213, 192, 11, 0, Math.PI * 2)
+    c.fill()
+    c.fillStyle = '#4D9A4A'
+    for (const [x, y] of [[60, 330], [300, 300], [450, 320]]) {
+      c.beginPath()
+      c.arc(x, y, 26, 0, Math.PI * 2)
+      c.fill()
+    }
+  })
+  const win = mesh(new THREE.PlaneGeometry(1.8, 1.3), new THREE.MeshStandardMaterial({ map: view, emissive: '#FFFFFF', emissiveMap: view, emissiveIntensity: 0.85 }), false, false)
+  put(g, win, 4.46, 1.85, -1.2, -Math.PI / 2)
+  for (const dz of [-0.92, 0.92]) put(g, box(0.08, 1.42, 0.07, '#FFFFFF'), 4.44, 1.85, -1.2 + dz)
+  for (const dy of [-0.68, 0.68]) put(g, box(0.08, 0.07, 1.9, '#FFFFFF'), 4.44, 1.85 + dy, -1.2)
+  put(g, box(0.06, 1.3, 0.04, '#FFFFFF'), 4.43, 1.85, -1.2)
+  put(g, box(0.22, 0.06, 2.0, '#F5F5F4'), 4.36, 1.15, -1.2) // sill
+  put(g, flowerpot('#F43F5E'), 4.3, 1.18, -1.75)
+  for (const dz of [-1.25, 1.25]) put(g, rbox(0.06, 1.7, 0.42, '#FC6818', 0.02, 0.95), 4.38, 1.9, -1.2 + dz) // curtains
+
+  // Posters and a pegboard on the back wall.
+  const poster = (draw: (c: CanvasRenderingContext2D) => void, w: number, h: number, x: number, y: number, tilt = 0) => {
+    const tex = canvasTexture(256, Math.round((256 * h) / w), draw)
+    const m = mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 }), false, false)
+    m.rotation.z = tilt
+    put(g, m, x, y, -3.95)
+  }
+  poster(
+    (c) => {
+      c.fillStyle = '#0A1120'
+      c.fillRect(0, 0, 256, 340)
+      c.textAlign = 'center'
+      c.font = 'bold 40px sans-serif'
+      const words: [string, string][] = [['SENSE', '#22D3EE'], ['THINK', '#FFB020'], ['ACT', '#FC6818']]
+      words.forEach(([w, col], i) => {
+        c.fillStyle = col
+        c.beginPath()
+        c.arc(128, 62 + i * 105, 34, 0, Math.PI * 2)
+        c.fill()
+        c.fillStyle = '#0A1120'
+        c.fillText(String(i + 1), 128, 76 + i * 105)
+        c.fillStyle = '#FFFFFF'
+        c.font = 'bold 26px sans-serif'
+        c.fillText(w, 128, 122 + i * 105)
+        c.font = 'bold 40px sans-serif'
+      })
+    },
+    0.62,
+    0.82,
+    -1.25,
+    2.2,
+    0.03,
+  )
+  poster(
+    (c) => {
+      c.fillStyle = '#1D4ED8'
+      c.fillRect(0, 0, 256, 192)
+      c.strokeStyle = 'rgba(255,255,255,.25)'
+      for (let i = 0; i < 256; i += 16) {
+        c.beginPath()
+        c.moveTo(i, 0)
+        c.lineTo(i, 192)
+        c.moveTo(0, i)
+        c.lineTo(256, i)
+        c.stroke()
+      }
+      c.strokeStyle = '#FFFFFF'
+      c.lineWidth = 4
+      c.strokeRect(88, 50, 80, 70)
+      c.strokeRect(108, 70, 14, 14)
+      c.strokeRect(134, 70, 14, 14)
+      c.beginPath()
+      c.arc(100, 136, 16, 0, Math.PI * 2)
+      c.arc(156, 136, 16, 0, Math.PI * 2)
+      c.moveTo(128, 50)
+      c.lineTo(128, 30)
+      c.stroke()
+    },
+    0.86,
+    0.64,
+    1.25,
+    2.25,
+    -0.04,
+  )
+  // Pegboard with tools.
+  put(g, box(1.3, 0.78, 0.03, '#D6B48A', 0.95), 0, 1.6, -3.96)
+  for (let i = 0; i < 7; i++) for (let j = 0; j < 4; j++) put(g, mesh(new THREE.CircleGeometry(0.012, 6), mat('#8A6A4A', 0.9), false, false), -0.54 + i * 0.18, 1.32 + j * 0.18, -3.94)
+  put(g, box(0.05, 0.42, 0.03, '#64748B', 0.4), -0.42, 1.6, -3.92) // wrench handle
+  put(g, mesh(new THREE.TorusGeometry(0.06, 0.02, 6, 12, Math.PI * 1.5), mat('#64748B', 0.35, 0.6)), -0.42, 1.85, -3.92)
+  put(g, box(0.05, 0.3, 0.03, '#B45309'), -0.12, 1.55, -3.92) // hammer handle
+  put(g, box(0.2, 0.07, 0.05, '#475569', 0.4), -0.12, 1.72, -3.92)
+  put(g, box(0.035, 0.22, 0.03, '#FC6818'), 0.16, 1.62, -3.92) // screwdriver
+  put(g, box(0.012, 0.16, 0.012, '#CBD5E1', 0.3), 0.16, 1.43, -3.92)
+  put(g, mesh(new THREE.TorusGeometry(0.1, 0.025, 6, 16), mat('#22C55E', 0.6)), 0.42, 1.62, -3.92) // coil of wire
+
+  // Bunting across the room.
+  const flagCols = ['#FC6818', '#22D3EE', '#FACC15', '#F8FAFC']
+  for (let i = 0; i < 15; i++) {
+    const x = -3.8 + i * 0.54
+    const sag = Math.sin((i / 14) * Math.PI) * 0.28
+    const tri = mesh(new THREE.ConeGeometry(0.1, 0.22, 3), mat(flagCols[i % 4], 0.8), false, false)
+    tri.rotation.x = Math.PI
+    put(g, tri, x, 3.05 - sag, -3.3)
+  }
+
+  // A warm desk lamp on the bench, a stool, and a plant by the door.
+  const lampG = new THREE.Group()
+  put(lampG, cyl(0.1, 0.12, 0.03, '#0E7490', 12), 0, 0.015, 0)
+  const arm = put(lampG, cyl(0.012, 0.012, 0.42, '#0E7490', 6), 0.06, 0.21, 0)
+  arm.rotation.z = -0.3
+  const shade = put(lampG, mesh(new THREE.ConeGeometry(0.1, 0.14, 14, 1, true), mat('#0E7490', 0.5)), 0.16, 0.42, 0)
+  shade.rotation.z = 0.9
+  const bulb = new THREE.MeshStandardMaterial({ color: '#FFF1C1', emissive: '#FFC861', emissiveIntensity: 1.4 })
+  b.glow.push(bulb)
+  put(lampG, mesh(new THREE.SphereGeometry(0.04, 8, 6), bulb, false), 0.2, 0.38, 0)
+  put(g, lampG, 1.0, 0.79, -1.4)
+  put(g, cyl(0.2, 0.2, 0.05, '#B45309', 14), 1.6, 0.5, -0.3)
+  for (const [dx, dz] of [[-0.12, -0.12], [0.12, -0.12], [-0.12, 0.12], [0.12, 0.12]]) put(g, box(0.035, 0.5, 0.035, '#78350F'), 1.6 + dx, 0.25, -0.3 + dz)
+  const plant = flowerpot('#FACC15')
+  plant.scale.setScalar(1.9)
+  put(g, plant, -3.9, 0, 1.2)
+  b.lamps.splice(2, 0, new THREE.Vector3(1.2, 1.25, -1.3))
+}
+
 function shelvesWithJars(g: THREE.Group, x: number, z: number): void {
   for (let r = 0; r < 4; r++) {
     put(g, box(1.8, 0.05, 0.4, '#92400E'), x, 0.55 + r * 0.55, z)
@@ -490,6 +655,7 @@ const BUILDERS: Record<SetId, Builder> = {
     put(g, mesh(new THREE.SphereGeometry(0.09, 10, 8), bulb, false), 0, 2.45, -1.1)
     for (let i = 0; i < 6; i++) put(g, mesh(gearGeometry(0.18 + rnd() * 0.1, 10, 0.05), mat('#94A3B8', 0.35, 0.7)), -4.45, 1.2 + i * 0.35, -2 + rnd() * 1.5, Math.PI / 2)
     put(g, rbox(1.2, 0.04, 2.2, '#9F1239', 0.02, 0.95), 0, 0.01, 1.0) // rug
+    workshopDressing(b, g)
     b.lightSpot.set(1.6, 0.25, 1.6)
     b.establish = { from: new THREE.Vector3(2.6, 2.3, 5.2), to: new THREE.Vector3(0, 1.0, -1) }
   },

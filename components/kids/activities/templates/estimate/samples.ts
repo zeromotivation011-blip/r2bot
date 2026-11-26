@@ -23,7 +23,7 @@ export const samples: Activity<Params, Answer>[] = [
       step: 1,
       answer: 22,
       tolerance: { kind: 'percent', pct: 30 },
-      picture: { icon: '🧹', reference: '🚪 door' },
+      picture: { icon: 'svg:vacuum', reference: '🚪 door' },
       reasoning: ['A robot vacuum is about as tall as your hand is wide: about 9 cm.', 'A door is about 2 metres tall — that is 200 cm.', '200 ÷ 9 is about 22 robot vacuums.'],
     },
     solution: { value: 20 },

@@ -23,6 +23,8 @@ interface Props {
   onChange: (nodes: PicNode[], cursor: Cursor) => void
   /** Palette keys the robot cannot use yet (its part is missing). */
   locked: Set<string>
+  /** Optional words for a locked block ("needs the Drawing Pen"); default "fit the part". */
+  lockedWhy?: Map<string, string>
   /** uid of the block that is running (lit up). */
   activeUid: string | null
   disabled: boolean
@@ -106,7 +108,7 @@ export function describeNode(b: PaletteBlock, n: PicNode): string {
 
 // ── Component ─────────────────────────────────────────────────────────────
 
-export default function PictureProgramClient({ palette, nodes, cursor, onChange, locked, activeUid, disabled }: Props) {
+export default function PictureProgramClient({ palette, nodes, cursor, onChange, locked, lockedWhy, activeUid, disabled }: Props) {
   const pal = paletteByKey(palette)
 
   const add = (b: PaletteBlock) => {
@@ -255,7 +257,7 @@ export default function PictureProgramClient({ palette, nodes, cursor, onChange,
               </span>
               <span className="text-sm font-black leading-tight text-slate-50">
                 {b.op === 'say' ? 'Say…' : b.label}
-                {isLocked && <span className="block text-[11px] text-rose-200">🔒 fit the part</span>}
+                {isLocked && <span className="block text-[11px] text-rose-200">🔒 {lockedWhy?.get(b.key) ?? 'fit the part'}</span>}
               </span>
             </button>
           )

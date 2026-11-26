@@ -7,7 +7,8 @@ import type { Answer, Params } from './logic'
 
 const ABILITIES: Record<string, string> = {
   grip: 'Pick things up',
-  'see-obstacles': 'See obstacles',
+  'see-obstacles': 'See obstacles before touching them',
+  'feel-bumps': 'Feel a bump',
   'see-plants': 'Recognise plants',
   'remove-weeds': 'Remove weeds',
   gps: 'Know where it is outdoors',
@@ -31,6 +32,7 @@ export const samples: Activity<Params, Answer>[] = [
       terrain: 'sand',
       terrainLabel: 'Soft sand',
       budget: 100,
+      builtInBatteryWh: 60,
       requires: ['grip'],
       abilityLabels: ABILITIES,
       slots: [
@@ -106,7 +108,7 @@ export const samples: Activity<Params, Answer>[] = [
           parts: [
             { id: 'camera', name: 'Camera', icon: '📷', cost: 30, massKg: 0.1, powerW: 3, gives: ['see-obstacles'], note: 'Sees well — when there is light.' },
             { id: 'lamp', name: 'LED headlights', icon: '🔦', cost: 15, massKg: 0.2, powerW: 10, gives: ['light'] },
-            { id: 'bumper', name: 'Bump switch', icon: '🔘', cost: 5, massKg: 0.1, powerW: 0, note: 'Only notices a wall when it has already hit it.' },
+            { id: 'bumper', name: 'Bump switch', icon: '🔘', cost: 5, massKg: 0.1, powerW: 0, gives: ['feel-bumps'], note: 'Detects obstacles by touch — only once it has already hit them.' },
           ],
         },
       ],

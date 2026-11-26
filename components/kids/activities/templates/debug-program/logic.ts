@@ -26,6 +26,7 @@ import {
   countBlocks,
   editDistance,
   explainRun,
+  newBlock,
   nestingDepth,
   opsUsed,
   programShapeErrors,
@@ -96,8 +97,73 @@ function validate(p: Params): string[] {
   const missing = [...opsUsed(p.buggy)].filter((o) => !pal.includes(o))
   if (missing.length) errs.push(`buggy uses blocks not in the palette: ${missing.join(', ')}`)
   const worlds = [p.world, ...(p.extraWorlds ?? [])]
-  if (worlds.every((w) => runProgram(w, p.buggy).outcome === 'goal')) errs.push('buggy already solves every map — there is no bug to find')
+  if (worlds.every((w) => runProgram(w, p.buggy).outcome === 'goal')) {
+    errs.push('buggy already solves every map — there is no bug to find')
+    return errs
+  }
+  const fix = findFix(p)
+  if (fix === 'cap') errs.push(`too many combinations to prove a fix exists within ${p.maxEdits} edits — lower maxEdits or shorten buggy`)
+  else if (!fix) errs.push(`no program within ${p.maxEdits} single-block ${p.maxEdits === 1 ? 'edit' : 'edits'} of buggy (using the palette) reaches the goal on every map — unsolvable`)
   return errs
+}
+
+const MAX_FIX_CANDIDATES = 40000
+
+/** Every program one single-block edit away from `list` (the edits editDistance counts as 1). */
+function oneEdit(list: Cmd[], pal: Op[], depth: number, maxDepth: number): Cmd[][] {
+  const out: Cmd[][] = []
+  const prims: Op[] = pal.filter((o) => o === 'forward' || o === 'back' || o === 'left' || o === 'right')
+  const insertable = pal.filter((o) => prims.includes(o) || depth + 1 <= maxDepth)
+  const at = (i: number, c: Cmd | null): Cmd[] => [...list.slice(0, i), ...(c ? [c] : []), ...list.slice(i + 1)]
+  for (let i = 0; i <= list.length; i++) {
+    insertable.forEach((o) => out.push([...list.slice(0, i), newBlock(o), ...list.slice(i)]))
+    if (i === list.length) break
+    const c = list[i]
+    if (c.op === 'forward' || c.op === 'back' || c.op === 'left' || c.op === 'right') {
+      prims.forEach((o) => { if (o !== c.op) out.push(at(i, { op: o } as Cmd)) })
+      out.push(at(i, null))
+    } else if (c.op === 'repeat') {
+      for (let t = 1; t <= 20; t++) if (t !== c.times) out.push(at(i, { ...c, times: t }))
+      if (c.body.length === 0) out.push(at(i, null))
+      oneEdit(c.body, pal, depth + 1, maxDepth).forEach((b) => out.push(at(i, { ...c, body: b })))
+    } else if (c.op === 'untilGoal') {
+      if (c.body.length === 0) out.push(at(i, null))
+      oneEdit(c.body, pal, depth + 1, maxDepth).forEach((b) => out.push(at(i, { ...c, body: b })))
+    } else {
+      if (c.then.length === 0 && c.else.length === 0) out.push(at(i, null))
+      oneEdit(c.then, pal, depth + 1, maxDepth).forEach((b) => out.push(at(i, { ...c, then: b })))
+      oneEdit(c.else, pal, depth + 1, maxDepth).forEach((b) => out.push(at(i, { ...c, else: b })))
+    }
+  }
+  return out
+}
+
+/**
+ * Breadth-first search for a program within `maxEdits` single-block edits of
+ * `buggy` that reaches the goal on every map. Returns it, null when none
+ * exists, or 'cap' when the search grew past MAX_FIX_CANDIDATES.
+ */
+export function findFix(p: Params): Cmd[] | null | 'cap' {
+  const pal = paletteFor(p)
+  const maxDepth = p.maxDepth ?? 2
+  const worlds = [p.world, ...(p.extraWorlds ?? [])]
+  const seen = new Set<string>([JSON.stringify(p.buggy)])
+  let level: Cmd[][] = [p.buggy]
+  for (let e = 1; e <= p.maxEdits; e++) {
+    const next: Cmd[][] = []
+    for (const prog of level) {
+      for (const cand of oneEdit(prog, pal, 0, maxDepth)) {
+        const k = JSON.stringify(cand)
+        if (seen.has(k)) continue
+        seen.add(k)
+        if (seen.size > MAX_FIX_CANDIDATES) return 'cap'
+        if (worlds.every((w) => runProgram(w, cand).outcome === 'goal')) return cand
+        next.push(cand)
+      }
+    }
+    level = next
+  }
+  return null
 }
 
 function check(p: Params, a: Answer): CheckResult {

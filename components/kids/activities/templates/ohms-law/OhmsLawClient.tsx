@@ -8,31 +8,8 @@
 import { useMemo, useRef, useState } from 'react'
 import type { TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
-import { LED_HEX, choicesOf, fmtOhms, isChoice, solve, truthFor, type Answer, type Params } from './logic'
-import { FeedbackPanel, Readout, TemplateCard, btnGhost, btnPrimary, chip, useAnimationFrame, useAttempts, useReducedMotion } from '../gear-train/TemplateFrameClient'
-
-const BAND_HEX = ['#111111', '#7B3F00', '#E02424', '#F97316', '#FACC15', '#16A34A', '#2563EB', '#8B5CF6', '#9CA3AF', '#F9FAFB']
-const BAND_NAME = ['black', 'brown', 'red', 'orange', 'yellow', 'green', 'blue', 'violet', 'grey', 'white']
-const GOLD = '#D4AF37'
-
-/** 4-band colour code: two digits, a multiplier, gold tolerance. */
-function bandsFor(ohms: number): { hex: string; name: string }[] {
-  let exp = Math.floor(Math.log10(ohms)) - 1
-  let digits = Math.round(ohms / Math.pow(10, exp))
-  if (digits >= 100) {
-    digits = Math.round(digits / 10)
-    exp += 1
-  }
-  const d1 = Math.floor(digits / 10)
-  const d2 = digits % 10
-  const mult = exp < 0 ? { hex: GOLD, name: 'gold (×0.1)' } : { hex: BAND_HEX[exp], name: `${BAND_NAME[exp]} (×${Math.pow(10, exp)})` }
-  return [
-    { hex: BAND_HEX[d1], name: BAND_NAME[d1] },
-    { hex: BAND_HEX[d2], name: BAND_NAME[d2] },
-    mult,
-    { hex: GOLD, name: 'gold (±5 %)' },
-  ]
-}
+import { LED_HEX, bandsFor, choicesOf, fmtOhms, isChoice, solve, truthFor, type Answer, type Params } from './logic'
+import { FeedbackPanel, Readout, TemplateCard, btnGhost, btnPrimary, chip, useAnimationFrame, useAttempts, useReducedMotion, useSvgScale } from '../gear-train/TemplateFrameClient'
 
 const f2 = (n: number) => +n.toFixed(n >= 100 ? 0 : n >= 10 ? 1 : 2)
 
@@ -73,6 +50,9 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
   const [phase, setPhase] = useState(0)
   const phaseRef = useRef(0)
   const reduced = useReducedMotion()
+  const { ref: svgRef, font } = useSvgScale<SVGSVGElement>(400)
+  const fsMeter = font(13, 14)
+  const fsSmall = font(11, 12)
   const att = useAttempts(onSubmit, onDone)
   const solved = !!att.result?.correct
 
@@ -82,7 +62,9 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
   const predict = p.mode === 'predict'
   const q = p.ask?.quantity ?? 'I'
   const reveal = predict ? solved || att.attempts >= 3 : liveMeter || tested
-  const flowing = reveal && res.currentMa > 0.05
+  // Predicting V or R needs the current: the meter is the given, so it shows from the start.
+  const meterOn = reveal || (predict && q !== 'I')
+  const flowing = meterOn && res.currentMa > 0.05
 
   // Electron speed: proportional to current (clamped so it stays readable).
   const speed = Math.min(220, 12 + res.currentMa * 4)
@@ -110,7 +92,7 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
   }
 
   const ledColour = p.led ? LED_HEX[p.led.colour] : '#fff'
-  const glow = reveal && p.led && !res.ledBurnt ? Math.min(1, res.currentMa / 20) : 0
+  const glow = meterOn && p.led && !res.ledBurnt ? Math.min(1, res.currentMa / 20) : 0
   const bands = bandsFor(ohms)
   const needle = Math.min(1, res.currentMa / 40)
   const needleAng = -150 + needle * 120 // degrees, -150..-30
@@ -123,7 +105,7 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
   return (
     <TemplateCard label="Ohm's law circuit">
       <div className="relative overflow-hidden rounded-[20px] border border-white/10 bg-[#0A1120]">
-        <svg viewBox="0 0 400 220" className="block h-auto w-full" role="img" aria-label={`Circuit: ${hideV ? '?' : volts} volt battery, ${hideRes ? '?' : fmtOhms(ohms)} resistor${p.led ? `, ${p.led.colour} LED` : ''}.${reveal ? ` Current ${f2(res.currentMa)} milliamps.` : ''}`}>
+        <svg ref={svgRef} viewBox="0 0 400 220" className="block h-auto w-full" role="img" aria-label={`Circuit: ${hideV ? '?' : volts} volt battery, ${hideRes ? '?' : fmtOhms(ohms)} resistor${p.led ? `, ${p.led.colour} LED` : ''}.${meterOn ? ` Current ${f2(res.currentMa)} milliamps.` : ''}`}>
           {/* wires */}
           <polyline points={PATH.map((pt) => pt.join(',')).join(' ')} fill="none" stroke="#6E7888" strokeWidth={4} strokeLinejoin="round" />
           {/* electrons */}
@@ -133,13 +115,13 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
           <g>
             <rect x={36} y={78} width={48} height={64} rx={8} fill="#19263F" stroke="#A7B0C0" strokeWidth={1.5} />
             <rect x={52} y={72} width={16} height={7} rx={2} fill="#A7B0C0" />
-            <text x={60} y={104} textAnchor="middle" fontSize={15} fontWeight={800} fill="#FFA878" className="font-display">
+            <text x={60} y={104} textAnchor="middle" fontSize={font(15, 14)} fontWeight={800} fill="#FFA878" className="font-display">
               {hideV ? '?' : volts}
             </text>
-            <text x={60} y={120} textAnchor="middle" fontSize={11} fontWeight={700} fill="#A7B0C0">
+            <text x={60} y={121} textAnchor="middle" fontSize={fsSmall} fontWeight={700} fill="#A7B0C0">
               volts
             </text>
-            <text x={60} y={136} textAnchor="middle" fontSize={12} fontWeight={800} fill="#A7B0C0">
+            <text x={60} y={137} textAnchor="middle" fontSize={fsSmall} fontWeight={800} fill="#A7B0C0">
               + −
             </text>
           </g>
@@ -148,7 +130,7 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
           <g>
             <rect x={150} y={29} width={100} height={22} rx={11} fill={res.resistorHot && reveal ? '#B45309' : '#D9C3A0'} />
             {showBands && !hideRes && bands.map((b, i) => <rect key={i} x={166 + i * 18 + (i === 3 ? 10 : 0)} y={29} width={8} height={22} fill={b.hex} />)}
-            <text x={200} y={70} textAnchor="middle" fontSize={13} fontWeight={800} fill="#EEF2F8" className="font-display">
+            <text x={200} y={72} textAnchor="middle" fontSize={font(13, 14)} fontWeight={800} fill="#EEF2F8" className="font-display">
               {hideRes ? '? Ω' : fmtOhms(ohms)}
             </text>
           </g>
@@ -159,7 +141,7 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
               {glow > 0 && <circle cx={340} cy={98} r={14 + glow * 26} fill={ledColour} opacity={0.12 + glow * 0.3} />}
               <path d="M326 86 L354 86 L340 108 Z" fill={res.ledBurnt && reveal ? '#3F3F46' : glow > 0 ? ledColour : '#2A3650'} stroke={ledColour} strokeWidth={1.5} />
               <line x1={326} y1={110} x2={354} y2={110} stroke={ledColour} strokeWidth={3} />
-              <text x={318} y={140} textAnchor="end" fontSize={11} fontWeight={700} fill="#A7B0C0">
+              <text x={320} y={142} textAnchor="end" fontSize={fsSmall} fontWeight={700} fill="#A7B0C0">
                 {p.led.colour} LED
               </text>
               {res.ledBurnt && reveal && (
@@ -170,7 +152,7 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
             </g>
           )}
           {!p.led && (
-            <text x={318} y={114} textAnchor="end" fontSize={11} fontWeight={700} fill="#A7B0C0">
+            <text x={320} y={114} textAnchor="end" fontSize={fsSmall} fontWeight={700} fill="#A7B0C0">
               wire
             </text>
           )}
@@ -187,12 +169,13 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
               stroke="#FC6818"
               strokeWidth={2.5}
               strokeLinecap="round"
-              opacity={reveal ? 1 : 0.25}
+              opacity={meterOn ? 1 : 0.25}
               style={{ transition: reduced ? undefined : 'all 400ms cubic-bezier(.22,.61,.36,1)' }}
             />
             <circle r={3} fill="#FC6818" />
-            <text y={16} textAnchor="middle" fontSize={10} fontWeight={800} fill="#00E5FF" className="font-display">
-              {reveal ? `${f2(res.currentMa)} mA` : '? mA'}
+            <rect x={30} y={-fsMeter * 0.75 - 4} width={fsMeter * 4.6 + 8} height={fsMeter + 8} rx={6} fill="#0A1120" stroke="#00B8D4" strokeOpacity={0.5} />
+            <text x={34} y={fsMeter * 0.3} fontSize={fsMeter} fontWeight={800} fill="#00E5FF" className="font-display">
+              {meterOn ? `${f2(res.currentMa)} mA` : '? mA'}
             </text>
           </g>
         </svg>
@@ -312,7 +295,18 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
               <span className="font-display text-lg font-bold text-[#A7B0C0]">{unitQ}</span>
             </div>
           </label>
-          {predict && q === 'I' && <p className="mt-1 text-sm text-[#A7B0C0]">Known: {volts} V battery, {fmtOhms(ohms)}{p.led ? `, LED forward voltage ≈ ${res.vf} V` : ''}.</p>}
+          <p className="mt-2 text-[15px] text-[#EEF2F8]">
+            <span className="font-semibold text-[#A7B0C0]">Known: </span>
+            {[
+              q !== 'V' ? `${volts} V battery` : null,
+              q !== 'R' ? `${fmtOhms(ohms)} resistor` : null,
+              q !== 'I' ? `the meter reads ${f2(res.currentMa)} mA` : null,
+              p.led ? `LED forward voltage ≈ ${res.vf} V` : null,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+            .
+          </p>
         </div>
       )}
 
@@ -346,7 +340,7 @@ export default function OhmsLawClient({ params: p, band, onSubmit, onDone }: Tem
       )}
       {predict && reveal && (
         <p className="mt-2 text-sm text-[#A7B0C0]">
-          Meter shows {f2(q === 'I' ? res.currentMa : truthFor(p))} {unitQ}.
+          {q === 'I' ? `The meter shows ${f2(res.currentMa)} mA.` : q === 'V' ? `The battery is ${f2(truthFor(p))} V.` : `The resistor is ${fmtOhms(truthFor(p))}.`}
         </p>
       )}
       <FeedbackPanel att={att} onRetry={() => setTested(false)} />

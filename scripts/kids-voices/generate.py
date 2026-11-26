@@ -66,6 +66,9 @@ class VoiceSpec:
     beeps: bool = False  # Bolt: beep/woof tokens become chirps and barks
     gain_db: float = 0.0
     sentence_gap: float = 0.28
+    # True: shift pitch with rubberband and keep the formants (no "chipmunk"), for
+    # an adult voice playing a child. Off by default; decide after a listening pass.
+    formant: bool = False
     extra: list[str] = field(default_factory=list)
 
 
@@ -233,7 +236,9 @@ def read_wav(path: Path) -> np.ndarray:
 def shape_filter(spec: VoiceSpec) -> str:
     """The ffmpeg -af chain for a character. Tempo is preserved, so word timings hold."""
     chain: list[str] = ['highpass=f=70']
-    if abs(spec.pitch - 1) > 1e-3:
+    if abs(spec.pitch - 1) > 1e-3 and spec.formant:
+        chain += [f'rubberband=pitch={spec.pitch:.4f}:formant=preserved:pitchq=quality']
+    elif abs(spec.pitch - 1) > 1e-3:
         chain += [f'asetrate={SR}*{spec.pitch:.4f}', f'aresample={SR}', f'atempo={1 / spec.pitch:.5f}']
     pre = ','.join(chain)
     tail = 'acompressor=threshold=-20dB:ratio=3:attack=5:release=80,loudnorm=I=-17:TP=-1.5:LRA=7'
@@ -326,7 +331,8 @@ def spec_for(who: str, guest_name: str | None) -> tuple[str, VoiceSpec]:
 
 
 def line_hash(spec: VoiceSpec, text: str) -> str:
-    h = hashlib.sha1(json.dumps([SCHEMA, spec.__dict__, text], sort_keys=True, default=str).encode()).hexdigest()
+    d = {k: v for k, v in spec.__dict__.items() if not (k == 'formant' and v is False)}  # old hashes stay valid
+    h = hashlib.sha1(json.dumps([SCHEMA, d, text], sort_keys=True, default=str).encode()).hexdigest()
     return h[:12]
 
 

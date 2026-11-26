@@ -11,30 +11,18 @@
 import { useMemo, useState } from 'react'
 import type { TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
-import { band as passBand, fromFactors, nice, type Answer, type Factor, type Params } from './logic'
+import { band as passBand, fromFactors, nice, sliderScale, snapTo, SLIDER_STEPS, type Answer, type Factor, type Params } from './logic'
 import { FeedbackPanel, TemplateCard, btnPrimary, useAttempts } from '../gear-train/TemplateFrameClient'
-import { IconBox } from '../spot-in-scene/glyphs'
+import { Glyph } from '../spot-in-scene/glyphs'
 
 const slider = 'h-11 w-full cursor-pointer rounded-xl accent-amber-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60'
-
-/** Map a slider position 0..1000 to a value and back (linear or log). */
-function scale(min: number, max: number, log?: boolean) {
-  return {
-    toValue: (s: number) => (log ? min * Math.pow(max / min, s / 1000) : min + ((max - min) * s) / 1000),
-    toSlider: (v: number) => (log ? (1000 * Math.log(v / min)) / Math.log(max / min) : (1000 * (v - min)) / (max - min)),
-  }
-}
-
-function snapTo(v: number, step: number, min: number, max: number) {
-  const s = Math.round(v / step) * step
-  return Math.max(min, Math.min(max, Math.round(s * 1e6) / 1e6))
-}
+const scale = sliderScale
 
 export default function EstimateClient({ params: p, onSubmit, onDone }: TemplateProps<Params, Answer>) {
   const att = useAttempts(onSubmit, onDone)
   const sc = scale(p.min, p.max, p.log)
-  const [value, setValue] = useState(() => snapTo(sc.toValue(p.log ? 500 : 0), p.step, p.min, p.max))
-  const [factors, setFactors] = useState<number[]>(() => (p.factors ?? []).map((f) => snapTo(scale(f.min, f.max, f.log).toValue(f.log ? 500 : 500), f.step, f.min, f.max)))
+  const [value, setValue] = useState(() => snapTo(sc.toValue(p.log ? SLIDER_STEPS / 2 : 0), p.step, p.min, p.max))
+  const [factors, setFactors] = useState<number[]>(() => (p.factors ?? []).map((f) => snapTo(scale(f.min, f.max, f.log).toValue(SLIDER_STEPS / 2), f.step, f.min, f.max)))
   const solved = !!att.result?.correct
   const estimate = p.factors ? fromFactors(p, factors) : value
   const showTruth = solved || att.done
@@ -47,10 +35,8 @@ export default function EstimateClient({ params: p, onSubmit, onDone }: Template
 
   const submit = () => {
     playSound('click')
-    att.submit(p.factors ? { value: estimate, factors } : { value })
+    att.submit(p.factors ? { value: estimate, factors, attempt: att.attempts } : { value, attempt: att.attempts })
   }
-
-  const towerCount = p.picture && !p.factors ? Math.max(0, Math.min(60, Math.round(value))) : 0
 
   return (
     <TemplateCard label="Estimate">
@@ -60,23 +46,7 @@ export default function EstimateClient({ params: p, onSubmit, onDone }: Template
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#A7B0C0]">Your estimate</p>
         <p className="font-display text-5xl font-bold tabular-nums text-amber-300 sm:text-6xl">{nice(estimate)}</p>
         <p className="text-[15px] font-semibold text-[#A7B0C0]">{p.unit}</p>
-        {p.picture && !p.factors && (
-          <div className="mt-3 flex items-end gap-4" aria-hidden>
-            <div className="flex w-[64px] flex-col-reverse items-center">
-              {Array.from({ length: towerCount }, (_, i) => (
-                <span key={i} className="-mt-1.5 motion-safe:animate-[fadeIn_.15s_ease-out]">
-                  <IconBox icon={p.picture!.icon} px={Math.max(10, Math.min(22, 260 / Math.max(1, towerCount)))} />
-                </span>
-              ))}
-            </div>
-            {p.picture.reference && (
-              <div className="flex flex-col items-center text-[#A7B0C0]">
-                <span className="text-[72px] leading-none">{[...p.picture.reference][0]}</span>
-                <span className="text-xs">{p.picture.reference.replace(/^\S+\s*/, '')}</span>
-              </div>
-            )}
-          </div>
-        )}
+        {p.picture && !p.factors && <Tower p={p} count={Math.max(0, Math.min(60, Math.round(value)))} />}
       </div>
 
       {p.factors ? (
@@ -102,7 +72,7 @@ export default function EstimateClient({ params: p, onSubmit, onDone }: Template
           <input
             type="range"
             min={0}
-            max={1000}
+            max={SLIDER_STEPS}
             step={1}
             value={Math.round(sc.toSlider(value))}
             disabled={solved}
@@ -145,6 +115,60 @@ export default function EstimateClient({ params: p, onSubmit, onDone }: Template
   )
 }
 
+/**
+ * The guess as a stack of icons beside the reference, both drawn with ONE
+ * unit: the reference is exactly `answer` icons tall. The scene has a fixed
+ * height, so icons shrink as the stack grows and the card never gets taller.
+ */
+function Tower({ p, count }: { p: Params; count: number }) {
+  const pic = p.picture!
+  const H = 200 // drawing height in px (viewBox units = px at full width)
+  const top = 16
+  const ground = top + H
+  const unit = H / Math.max(count, p.answer * 1.15, 1)
+  const iconW = Math.max(14, Math.min(48, unit * 3.2))
+  const refTok = pic.reference ? pic.reference.trim().split(/\s+/)[0] : ''
+  const refName = pic.reference ? pic.reference.trim().replace(/^\S+\s*/, '') : ''
+  const refH = p.answer * unit
+  const towerX = 70
+  const refX = 170
+  const reached = count >= p.answer
+  return (
+    <figure className="mt-3 w-full max-w-[320px]">
+      <svg viewBox={`0 0 260 ${ground + 22}`} className="h-auto w-full" aria-hidden>
+        <line x1={10} x2={250} y1={ground} y2={ground} stroke="#6E7888" strokeWidth={2} />
+        {Array.from({ length: count }, (_, i) => (
+          <g key={i}>
+            <Glyph icon={pic.icon} x={towerX} y={ground - unit * (i + 0.5)} size={Math.max(unit * 1.25, Math.min(iconW, unit * 2.4))} />
+          </g>
+        ))}
+        {refTok && (refTok === '🚪' || refTok === 'svg:door' ? (
+          <g>
+            <rect x={refX - refH * 0.22} y={ground - refH} width={refH * 0.44} height={refH} rx={3} fill="#7C4A2A" stroke="#C08457" strokeWidth={2} />
+            <rect x={refX - refH * 0.16} y={ground - refH * 0.93} width={refH * 0.32} height={refH * 0.38} rx={2} fill="none" stroke="#C08457" strokeWidth={1.5} />
+            <rect x={refX - refH * 0.16} y={ground - refH * 0.48} width={refH * 0.32} height={refH * 0.42} rx={2} fill="none" stroke="#C08457" strokeWidth={1.5} />
+            <circle cx={refX + refH * 0.14} cy={ground - refH * 0.5} r={Math.max(2, refH * 0.025)} fill="#FFD166" />
+          </g>
+        ) : (
+          <Glyph icon={refTok} x={refX} y={ground - refH / 2} size={refH} />
+        ))}
+        {refTok && <line x1={towerX - iconW / 2 - 4} x2={refX + refH * 0.24 + 4} y1={ground - refH} y2={ground - refH} stroke="#A7B0C0" strokeWidth={1} strokeDasharray="4 4" />}
+        <text x={towerX} y={ground + 17} fontSize={13} fill="#FFA878" textAnchor="middle">
+          your {count}
+        </text>
+        {refName && (
+          <text x={refX} y={ground + 17} fontSize={13} fill="#A7B0C0" textAnchor="middle">
+            {refName}
+          </text>
+        )}
+      </svg>
+      <figcaption className="sr-only">
+        {`Your tower of ${count} is ${reached ? 'as tall as or taller than' : 'shorter than'} the ${refName || 'reference'}.`}
+      </figcaption>
+    </figure>
+  )
+}
+
 function FactorSlider({ f, value, disabled, onChange, showTrue }: { f: Factor; value: number; disabled: boolean; onChange: (v: number) => void; showTrue: boolean }) {
   const sc = scale(f.min, f.max, f.log)
   return (
@@ -161,7 +185,7 @@ function FactorSlider({ f, value, disabled, onChange, showTrue }: { f: Factor; v
       <input
         type="range"
         min={0}
-        max={1000}
+        max={SLIDER_STEPS}
         value={Math.round(sc.toSlider(value))}
         disabled={disabled}
         onChange={(e) => onChange(snapTo(sc.toValue(Number(e.target.value)), f.step, f.min, f.max))}

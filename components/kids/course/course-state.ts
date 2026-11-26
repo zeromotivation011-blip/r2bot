@@ -7,6 +7,8 @@
 // localStorage key r2bot_kids_course_v1:
 //   { v: 1, last: "L1-S09", sessions: { "L1-S09": { step: 3, reached: 3, … } } }
 
+import type { PicNode } from '@/lib/kids/sim/challenge'
+
 export const COURSE_KEY = 'r2bot_kids_course_v1'
 export const COURSE_EVENT = 'r2bot:kids-course'
 
@@ -38,6 +40,10 @@ export interface SessionState {
   done?: boolean
   /** Stars reported to the rewards engine last time (replays only report an improvement). */
   reportedStars?: number
+  /** The challenge's first success was reported as kind 'challenge' (weekly quest), once. */
+  challengeReported?: boolean
+  /** The child's picture program in the challenge, so a reload keeps their work. */
+  program?: PicNode[]
   updated: string
 }
 

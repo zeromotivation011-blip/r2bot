@@ -4,14 +4,16 @@
 // Drag the threshold through a cloud of noisy readings. Two strips under the
 // graph compare what was REALLY happening with what the ROBOT THINKS; every
 // flicker shows up as a stripe. Older bands add a hysteresis band and a
-// moving-average filter. "Test drive" replays the run, then checks.
+// moving-average filter. "Test drive" replays the run as often as the child
+// likes (free — tuning is meant to be iterative); "Submit this tuning" is the
+// only graded attempt.
 
 import { useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import type { TemplateProps } from '@/lib/kids/activities/types'
 import { playSound } from '@/lib/kids-audio'
 import { simulate, type Answer, type Params, type WorldState } from './logic'
 import { r1 } from '../signal-graph/trace'
-import { FeedbackPanel, Readout, TemplateCard, btnPrimary, useAnimationFrame, useAttempts, useReducedMotion } from '../gear-train/TemplateFrameClient'
+import { FeedbackPanel, Readout, TemplateCard, btnGhost, btnPrimary, useAnimationFrame, useAttempts, useReducedMotion, useSvgScale } from '../gear-train/TemplateFrameClient'
 
 const VW = 400
 const VH = 250
@@ -39,8 +41,14 @@ export default function ThresholdTunerClient({ params: p, band, onSubmit, onDone
   const [win, setWin] = useState(1)
   const [play, setPlay] = useState<number | null>(null)
   const playRef = useRef(0)
+  const finishedRef = useRef(true)
   const dragging = useRef(false)
-  const svgRef = useRef<SVGSVGElement>(null)
+  /** The settings that were last test-driven (their result may be shown even when liveStats is off). */
+  const [drivenKey, setDrivenKey] = useState<string | null>(null)
+  const [drives, setDrives] = useState(0)
+  const { ref: svgRef, font } = useSvgScale<SVGSVGElement>(VW)
+  const fs = font(10, 12)
+  const fsB = font(11, 13)
   const reduced = useReducedMotion()
   const att = useAttempts(onSubmit, onDone)
   const solved = !!att.result?.correct
@@ -50,6 +58,7 @@ export default function ThresholdTunerClient({ params: p, band, onSubmit, onDone
     [threshold, hyst, win, p.knobs],
   )
   const run = useMemo(() => simulate(p, answer), [p, answer])
+  const key = `${threshold}|${hyst}|${win}`
   const D = p.trace.durationS
   const X = (t: number) => L + ((VW - L - R) * t) / D
   const Y = (v: number) => BOT - ((BOT - TOP) * (v - min)) / span
@@ -62,11 +71,15 @@ export default function ThresholdTunerClient({ params: p, band, onSubmit, onDone
     const i1 = Math.floor(nu * (run.decision.length - 1))
     for (let i = i0 + 1; i <= i1; i++) if (run.decision[i] !== run.decision[i - 1]) playSound('click')
     playRef.current = nu
-    setPlay(nu)
     if (nu >= 1) {
+      // A late frame can arrive before play=null commits: finish exactly once.
+      if (finishedRef.current) return
+      finishedRef.current = true
       setPlay(null)
-      att.submit(answer)
+      setDrivenKey(key)
+      return
     }
+    setPlay(nu)
   })
 
   const edit = (fn: () => void) => {
@@ -95,15 +108,26 @@ export default function ThresholdTunerClient({ params: p, band, onSubmit, onDone
   }
 
   const test = () => {
+    if (play !== null) return
     playSound('click')
+    if (att.result) att.clear()
+    setDrives((d) => d + 1)
     if (reduced) {
-      att.submit(answer)
+      setDrivenKey(key)
       return
     }
+    finishedRef.current = false
     playRef.current = 0
     setPlay(0)
   }
 
+  const submitTuning = () => {
+    if (play !== null) return
+    att.submit(answer)
+    setDrivenKey(key)
+  }
+
+  const thW = Math.max(60, (`${r1(threshold)} ${unit}`.length * 0.6 + 1) * fsB)
   const n = run.samples.length
   const cut = play === null ? n : Math.max(1, Math.floor(play * (n - 1)) + 1)
   const sw = (VW - L - R) / Math.max(1, n - 1)
@@ -115,7 +139,9 @@ export default function ThresholdTunerClient({ params: p, band, onSubmit, onDone
   const cur = play === null ? null : Math.min(n - 1, cut - 1)
   const curState = cur !== null ? run.decision[cur] : null
   const truthState = cur !== null ? run.truth[cur] : null
-  const showStats = live || att.result !== null
+  // liveStats off: the robot's decisions (and how good they are) only show after a test drive of THESE settings.
+  const revealed = live || play !== null || drivenKey === key || att.result !== null
+  const showStats = live || (play === null && drivenKey === key) || att.result !== null
 
   return (
     <TemplateCard label="Threshold tuner">
@@ -154,14 +180,12 @@ export default function ThresholdTunerClient({ params: p, band, onSubmit, onDone
           {[0, 0.25, 0.5, 0.75, 1].map((f) => (
             <g key={f}>
               <line x1={L} x2={VW - R} y1={Y(min + f * span)} y2={Y(min + f * span)} stroke="#19263F" />
-              <text x={L - 5} y={Y(min + f * span) + 3.5} textAnchor="end" fontSize={10} fill="#A7B0C0">
+              <text x={L - 4} y={Y(min + f * span) + fs * 0.35} textAnchor="end" fontSize={fs} fill="#A7B0C0">
                 {r1(min + f * span)}
               </text>
             </g>
           ))}
-          <text x={4} y={TOP + 8} fontSize={9} fontWeight={700} fill="#A7B0C0">
-            {unit}
-          </text>
+
 
           {/* hysteresis band */}
           {hyst > 0 && <rect x={L} y={Y(threshold + hyst / 2)} width={VW - L - R} height={Y(threshold - hyst / 2) - Y(threshold + hyst / 2)} fill="#FC6818" opacity={0.13} />}
@@ -187,27 +211,27 @@ export default function ThresholdTunerClient({ params: p, band, onSubmit, onDone
               <line x1={L} x2={VW - R} y1={Y(threshold - hyst / 2)} y2={Y(threshold - hyst / 2)} stroke="#FC6818" strokeDasharray="4 4" />
             </>
           )}
-          <rect x={VW - R - 62} y={Y(threshold) - 11} width={60} height={22} rx={7} fill="#FC6818" />
-          <text x={VW - R - 32} y={Y(threshold) + 4} textAnchor="middle" fontSize={11} fontWeight={800} fill="#1A1103">
+          <rect x={VW - R - 2 - thW} y={Y(threshold) - fsB / 2 - 5} width={thW} height={fsB + 10} rx={7} fill="#FC6818" />
+          <text x={VW - R - 2 - thW / 2} y={Y(threshold) + fsB * 0.35} textAnchor="middle" fontSize={fsB} fontWeight={800} fill="#1A1103">
             {r1(threshold)} {unit}
           </text>
 
           {/* strips: truth vs decision */}
-          <text x={L - 4} y={S1 + 15} textAnchor="end" fontSize={9} fontWeight={700} fill="#A7B0C0">
-            Really
-          </text>
-          <text x={L - 4} y={S2 + 15} textAnchor="end" fontSize={9} fontWeight={700} fill="#A7B0C0">
-            Robot
-          </text>
           {run.truth.map((s, i) => (
             <rect key={`t${i}`} x={X(run.samples[i].t) - sw / 2} y={S1} width={sw + 0.4} height={STRIP_H} fill={colourOf(s)} opacity={0.85} />
           ))}
-          {run.decision.slice(0, cut).map((s, i) => (
+          {!revealed && <rect x={L} y={S2} width={VW - L - R} height={STRIP_H} fill="#19263F" />}
+          {revealed && run.decision.slice(0, cut).map((s, i) => (
             <rect key={`d${i}`} x={X(run.samples[i].t) - sw / 2} y={S2} width={sw + 0.4} height={STRIP_H} fill={colourOf(s)} opacity={0.85} />
           ))}
-          {run.decision.slice(0, cut).map((s, i) =>
+          {revealed && run.decision.slice(0, cut).map((s, i) =>
             s !== run.truth[i] ? <rect key={`x${i}`} x={X(run.samples[i].t) - sw / 2} y={S2 + STRIP_H} width={sw + 0.4} height={4} fill="#EEF2F8" /> : null,
           )}
+          {(['Really', revealed ? 'Robot' : 'Robot: test drive to see'] as const).map((t, i) => (
+            <text key={t} x={L + 4} y={(i ? S2 : S1) + STRIP_H / 2 + fs * 0.35} fontSize={fs} fontWeight={800} fill="#EEF2F8" stroke="#0A1120" strokeWidth={3} paintOrder="stroke">
+              {t}
+            </text>
+          ))}
           {cur !== null && <line x1={X(run.samples[cur].t)} x2={X(run.samples[cur].t)} y1={TOP} y2={S2 + STRIP_H + 4} stroke="#EEF2F8" strokeWidth={1.5} />}
         </svg>
         {cur !== null && curState && truthState && (
@@ -225,7 +249,9 @@ export default function ThresholdTunerClient({ params: p, band, onSubmit, onDone
         <span>
           <span className="mr-1 inline-block h-3 w-3 rounded-sm bg-[#00B8D4] align-middle" /> {p.states.low.label}
         </span>
-        <span>White tick = robot got it wrong. Drag the graph or use arrow keys to move the line.</span>
+        <span>
+          {live ? 'White tick = robot got it wrong. ' : 'Test drive to see what the robot decides. '}Drag the graph or use arrow keys to move the line. Axis in {unit}.
+        </span>
       </div>
 
       {/* controls */}
@@ -294,10 +320,14 @@ export default function ThresholdTunerClient({ params: p, band, onSubmit, onDone
       )}
 
       {!att.result && (
-        <div className="mt-4">
-          <button type="button" className={btnPrimary} onClick={test} disabled={play !== null}>
-            {play !== null ? 'Test driving…' : 'Test drive'}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button type="button" className={drives === 0 ? btnPrimary : btnGhost} onClick={test} disabled={play !== null}>
+            {play !== null ? 'Test driving…' : drives === 0 ? 'Test drive' : '▶ Test drive again'}
           </button>
+          <button type="button" className={drives === 0 ? btnGhost : btnPrimary} onClick={submitTuning} disabled={play !== null}>
+            Submit this tuning
+          </button>
+          <span className="text-sm text-[#A7B0C0]">Test drives are free — tune, drive, tune again.</span>
         </div>
       )}
       <FeedbackPanel att={att} />

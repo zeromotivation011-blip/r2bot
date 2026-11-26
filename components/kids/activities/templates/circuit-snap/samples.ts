@@ -128,8 +128,8 @@ export const samples: Activity<Params, Answer>[] = [
         { id: 'wire', part: { kind: 'wire' }, count: 2 },
       ],
       goals: [
-        { edge: 's1', want: 'on' },
-        { edge: 's1', currentMa: { min: 10, max: 25 } },
+        { item: 'led', want: 'on' },
+        { item: 'led', currentMa: { min: 10, max: 25 } },
         { edge: 'motor', want: 'on' },
       ],
       liveSim: false,

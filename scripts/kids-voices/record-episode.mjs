@@ -3,7 +3,10 @@
 // Records one R2BOT Kids episode to an MP4 (1280×720) for YouTube and classrooms.
 //
 //   node scripts/kids-voices/record-episode.mjs --session L1-S01 --out /tmp/l1-s1.mp4 \
-//        [--base http://localhost:3611] [--fps 24] [--crf 20]
+//        [--base http://localhost:3611] [--fps 24] [--crf 18] [--lufs -14]
+// Defaults are upload-master quality: CRF 18 with x264's animation tuning
+// (flat-shaded 3D with gradients bands at lower rates) and the mix
+// normalised to -14 LUFS (YouTube's reference).
 //
 // Needs a running site (npx next dev / next start), Playwright (local or global:
 // NODE_PATH=$(npm root -g)) with Chromium, and ffmpeg.
@@ -35,7 +38,8 @@ const session = arg('session', 'L1-S01')
 const out = resolve(arg('out', join(tmpdir(), `${session.toLowerCase()}.mp4`)))
 const base = arg('base', 'http://localhost:3611')
 const fps = Number(arg('fps', '24'))
-const crf = arg('crf', '20')
+const crf = arg('crf', '18')
+const lufs = Number(arg('lufs', '-14'))
 const W = 1280
 const H = 720
 
@@ -82,7 +86,7 @@ try {
   console.log(`episode ${session}: ${duration.toFixed(1)} s of story at ${fps} fps`)
 
   // Video: frames → ffmpeg (H.264, yuv420p for every player).
-  const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(fps), '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', crf, '-pix_fmt', 'yuv420p', '-r', String(fps), videoOnly], {
+  const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(fps), '-i', '-', '-c:v', 'libx264', '-preset', 'slow', '-tune', 'animation', '-crf', crf, '-pix_fmt', 'yuv420p', '-r', String(fps), videoOnly], {
     stdio: ['pipe', 'ignore', 'inherit'],
   })
   const ffDone = new Promise((res, rej) => ff.on('close', (c) => (c === 0 ? res() : rej(new Error(`ffmpeg video exited ${c}`)))))
@@ -127,10 +131,10 @@ try {
     filters.push(`[${n}:a]atrim=start=${Math.max(0, e.offset).toFixed(3)},asetpts=PTS-STARTPTS,aresample=48000,adelay=${delay}:all=1[v${i}]`)
     labels.push(`[v${i}]`)
   })
-  filters.push(`${labels.join('')}amix=inputs=${labels.length}:normalize=0:duration=first,atrim=0:${wallLength.toFixed(3)},alimiter=limit=0.95[a]`)
+  filters.push(`${labels.join('')}amix=inputs=${labels.length}:normalize=0:duration=first,atrim=0:${wallLength.toFixed(3)},loudnorm=I=${lufs}:TP=-1.5:LRA=11,aresample=48000[a]`)
   await run('ffmpeg', ['-v', 'error', '-y', ...inputs, '-filter_complex', filters.join(';'), '-map', '[a]', '-ac', '2', audioMix])
 
-  await run('ffmpeg', ['-v', 'error', '-y', '-i', videoOnly, '-i', audioMix, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', '-shortest', out])
+  await run('ffmpeg', ['-v', 'error', '-y', '-i', videoOnly, '-i', audioMix, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', '-shortest', out])
   console.log(`wrote ${out} — ${wallLength.toFixed(1)} s, ${frames} frames, ${log.length} voice clips`)
 } finally {
   await browser.close()

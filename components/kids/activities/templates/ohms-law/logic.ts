@@ -141,6 +141,29 @@ function rangeText(r: Range, unit: string): string {
   return `at most ${r.max} ${unit}`
 }
 
+const BAND_HEX = ['#111111', '#7B3F00', '#E02424', '#F97316', '#FACC15', '#16A34A', '#2563EB', '#8B5CF6', '#9CA3AF', '#F9FAFB']
+const BAND_NAME = ['black', 'brown', 'red', 'orange', 'yellow', 'green', 'blue', 'violet', 'grey', 'white']
+const GOLD = '#D4AF37'
+
+/** 4-band colour code: two digits, a multiplier, gold tolerance. */
+export function bandsFor(ohms: number): { hex: string; name: string }[] {
+  let exp = Math.floor(Math.log10(ohms)) - 1
+  let digits = Math.round(ohms / Math.pow(10, exp))
+  if (digits >= 100) {
+    digits = Math.round(digits / 10)
+    exp += 1
+  }
+  const d1 = Math.floor(digits / 10)
+  const d2 = digits % 10
+  const mult = exp < 0 ? { hex: GOLD, name: 'gold (×0.1)' } : { hex: BAND_HEX[exp], name: `${BAND_NAME[exp]} (×${Math.pow(10, exp)})` }
+  return [
+    { hex: BAND_HEX[d1], name: BAND_NAME[d1] },
+    { hex: BAND_HEX[d2], name: BAND_NAME[d2] },
+    mult,
+    { hex: GOLD, name: 'gold (±5 %)' },
+  ]
+}
+
 export const fmtOhms = (r: number) => (r >= 1e6 ? `${+(r / 1e6).toFixed(2)} MΩ` : r >= 1000 ? `${+(r / 1000).toFixed(2)} kΩ` : `${+r.toFixed(2)} Ω`)
 const f2 = (n: number) => +n.toFixed(n >= 100 ? 0 : n >= 10 ? 1 : 2)
 
@@ -197,6 +220,16 @@ function validate(p: Params): string[] {
       if (sol.length === 0) out.push('no battery/resistor combination meets the target')
       const all = choicesOf(p.battery).length * choicesOf(p.resistor).length
       if (sol.length === all) out.push('every choice works — this is not a puzzle')
+      const rating = p.target?.resistorRatingW
+      if (rating !== undefined) {
+        // The rating must matter: some choice that keeps the LED alive must overheat the resistor.
+        let binds = false
+        for (const v of choicesOf(p.battery)) for (const r of choicesOf(p.resistor)) {
+          const res = solve(p, v, r)
+          if (!res.ledBurnt && res.resistorHot) binds = true
+        }
+        if (!binds) out.push('resistorRatingW never matters: no choice overheats the resistor without burning the LED first — drop it, or use a plain resistor circuit')
+      }
     }
   } else if (p.mode === 'predict') {
     if (isChoice(p.battery) || isChoice(p.resistor)) out.push('predict mode needs a fixed battery and resistor')

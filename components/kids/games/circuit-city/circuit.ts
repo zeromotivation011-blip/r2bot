@@ -285,7 +285,7 @@ export function solve(parts: Part[], lux: number): Solution {
   const state = new Map<string, boolean>() // LED on / comparator closed
   for (const p of parts) if (p.kind === 'led' || p.kind === 'lamp' || p.kind === 'comparator') state.set(p.id, false)
 
-  let volts = new Float64Array(n)
+  let volts: Float64Array = new Float64Array(n)
   const vOf = (node: number) => {
     const k = idx(node)
     return k < 0 ? 0 : volts[k]

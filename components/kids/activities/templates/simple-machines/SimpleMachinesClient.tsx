@@ -17,6 +17,7 @@ import {
   useAnimationFrame,
   useAttempts,
   useReducedMotion,
+  useSvgScale,
 } from '../gear-train/TemplateFrameClient'
 
 const LABEL: Record<MachineKind, { name: string; setting: string; unit: string; icon: string }> = {
@@ -273,6 +274,8 @@ function LoadBox({ x, y, p }: { x: number; y: number; p: Params }) {
 function Scene({ p, kind, setting, t, strain, reduced }: { p: Params; kind: MachineKind; setting: number; t: number; strain: boolean; reduced: boolean }) {
   const H = 150 // px for the lift height
   const shelfY = GROUND - H
+  const sv = useSvgScale(400)
+  const fs = sv.font(10)
   const aria = `${LABEL[kind].name} set to ${setting}${LABEL[kind].unit ? ' ' + LABEL[kind].unit : ''}.`
   let body: ReactElement
   if (kind === 'ramp') {
@@ -317,7 +320,7 @@ function Scene({ p, kind, setting, t, strain, reduced }: { p: Params; kind: Mach
         <line x1={cx + 24} y1={topY} x2={300} y2={GROUND - 26} stroke="#FFA878" strokeWidth={2} />
         <LoadBox x={cx} y={GROUND - lift} p={p} />
         <Robot x={306} y={GROUND} strain={strain} flip />
-        <text x={cx + 32} y={lowerBlockY + 4} fontSize={11} fontWeight={700} fill="#FFA878">
+        <text x={cx + 32} y={lowerBlockY + 4} fontSize={sv.font(11)} fontWeight={700} fill="#FFA878">
           {n} strand{n === 1 ? '' : 's'}
         </text>
       </g>
@@ -341,7 +344,7 @@ function Scene({ p, kind, setting, t, strain, reduced }: { p: Params; kind: Mach
           <LoadBox x={loadX + 6} y={pivotY - 4} p={p} />
           <Robot x={effX} y={pivotY - 4} strain={strain} />
         </g>
-        <text x={px} y={GROUND + 12} textAnchor="middle" fontSize={10} fill="#A7B0C0">
+        <text x={px} y={GROUND + fs + 1} textAnchor="middle" fontSize={fs} fill="#A7B0C0">
           pivot
         </text>
       </g>
@@ -374,19 +377,19 @@ function Scene({ p, kind, setting, t, strain, reduced }: { p: Params; kind: Mach
     )
   }
   return (
-    <svg viewBox="0 0 400 244" className="block h-auto w-full" role="img" aria-label={aria}>
+    <svg ref={sv.ref} viewBox="0 0 400 256" className="block h-auto w-full" role="img" aria-label={aria}>
       <style>{`@keyframes sm-shake{0%{transform:translateX(0)}50%{transform:translateX(1.5px)}100%{transform:translateX(0)}}`}</style>
-      <rect x={0} y={GROUND} width={400} height={16} fill="#111C32" />
+      <rect x={0} y={GROUND} width={400} height={28} fill="#111C32" />
       {kind !== 'ramp' && (
         <g>
           <line x1={0} y1={shelfY} x2={400} y2={shelfY} stroke="#22C55E" strokeDasharray="4 4" strokeWidth={1} />
-          <text x={396} y={shelfY - 4} textAnchor="end" fontSize={10} fill="#22C55E">
+          <text x={392} y={shelfY - 4} textAnchor="end" fontSize={fs} fill="#22C55E">
             target height {p.height} m
           </text>
         </g>
       )}
       {body}
-      <text x={6} y={GROUND + 13} fontSize={10} fill="#6E7888">
+      <text x={388} y={GROUND + fs + 1} textAnchor="end" fontSize={fs} fontWeight={700} fill="#A7B0C0">
         weight {forceTextShort(p)}
       </text>
     </svg>
