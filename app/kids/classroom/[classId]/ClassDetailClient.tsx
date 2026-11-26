@@ -17,6 +17,7 @@ import {
 import { ParentNote } from '@/components/kids/classroom/ParentNote'
 import { RobotMiniCard } from '@/components/kids/classroom/RobotMiniCard'
 import { LessonPlanPanel } from '@/components/kids/classroom/LessonPlanPanel'
+import { AssignmentsPanelClient } from '@/components/kids/classroom/AssignmentsPanelClient'
 
 type State =
   | { kind: 'loading' }
@@ -243,6 +244,8 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
           </div>
         </section>
       )}
+
+      <AssignmentsPanelClient classId={classId} band={cls.band} members={members} />
 
       <section aria-labelledby="roster-h">
         <div className="flex flex-wrap items-end justify-between gap-2">

@@ -81,3 +81,7 @@ If a run fails on the limit again: wait for the reset time in the failure messag
 - [x] Skill Galaxy complete: 400 authored activities, all reviewed — abf76b6.
 - [~] Games QA/fix (run wf_e021636c-616); schools + app (run wf_fe308336-2e2, with the founder's rule: never create Supabase projects or use Supabase/Vercel tools — migration FILES only).
 - Founder (07:10): no extra payments. If the usage limit hits, WAIT for the reset; keep the final pass as one lean job.
+
+## 07:35 UTC — PAUSED by the founder
+All workflows stopped; hourly check-in trig_01JjzPC4SVkb4GiS7ax68hkk DISABLED (not deleted).
+To resume later: games → resume run wf_e021636c-616; schools + app → relaunch kids-schools-and-app script; then one lean final pass (integration, design, build, QA).

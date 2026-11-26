@@ -6,6 +6,7 @@
 // same whatever RLS says; RLS (migration 0054) is the second lock.
 
 import type { NextRequest } from 'next/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { isRateLimited } from '@/lib/rate-limit'
 import { MAX_CLASSES_PER_TEACHER, cleanText, isBandId, type KidsClassSummary } from '@/lib/kids/classroom'
 import {
@@ -114,10 +115,30 @@ export async function POST(req: NextRequest): Promise<Response> {
       .select(CLASS_COLUMNS)
       .single()
     if (!error && data) {
-      return Response.json({ ok: true, class: toClassSummary(data as ClassDbRow, 0) }, { status: 201, headers: NO_STORE })
+      const created = data as ClassDbRow
+      await linkToMySchool(admin, created.id, user.id)
+      return Response.json({ ok: true, class: toClassSummary(created, 0) }, { status: 201, headers: NO_STORE })
     }
     if (error && isMissingTable(error)) return notReadyResponse()
     if (error?.code !== '23505') return jsonError(500, 'Could not create the class.')
   }
   return jsonError(500, 'Could not create the class. Try again.')
+}
+
+/**
+ * A teacher in a school (migration 0055) gets new classes in that school.
+ * Best effort and silent: before 0055 runs the lookup fails and nothing changes.
+ */
+async function linkToMySchool(admin: SupabaseClient, classId: string, teacherId: string): Promise<void> {
+  try {
+    const { data, error } = await admin
+      .from('kids_school_teachers')
+      .select('school_id')
+      .eq('teacher_id', teacherId)
+      .maybeSingle()
+    if (error || !data) return
+    await admin.from('kids_classes').update({ school_id: (data as { school_id: string }).school_id }).eq('id', classId).eq('teacher_id', teacherId)
+  } catch {
+    /* schools not switched on yet */
+  }
 }

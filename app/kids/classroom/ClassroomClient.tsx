@@ -14,6 +14,7 @@ import {
   TeacherSignIn,
 } from '@/components/kids/classroom/TeacherGateClient'
 import { ParentNote } from '@/components/kids/classroom/ParentNote'
+import { SchoolPanelClient } from '@/components/kids/classroom/SchoolPanelClient'
 
 type State =
   | { kind: 'loading' }
@@ -70,6 +71,8 @@ export default function ClassroomClient() {
           </button>
         )}
       </header>
+
+      <SchoolPanelClient />
 
       {showCreate && (
         <CreateClassForm
@@ -217,7 +220,7 @@ function HowItWorks() {
   const steps = [
     { n: 1, t: 'Create a class', d: 'Pick a grade band. You get a 6-character code.' },
     { n: 2, t: 'Put the card on the wall', d: 'Children go to r2bot.in/kids/join, type the code and a nickname. No email, no account.' },
-    { n: 3, t: 'Teach, then look', d: 'Use the 6-week plan. Stars, episodes, missions and robots appear on your roster as children play.' },
+    { n: 3, t: 'Teach, assign, look', d: 'Use the lesson guides, assign sessions or activities with due dates, and watch stars, missions and robots appear on your roster as children play.' },
   ]
   return (
     <section aria-labelledby="how-h">
@@ -231,6 +234,10 @@ function HowItWorks() {
           </li>
         ))}
       </ol>
+      <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+        <Link href="/kids/teach" className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 hover:underline">Lesson guides for every session →</Link>
+        <Link href="/kids/teach/training" className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 hover:underline">Teacher training with certificate →</Link>
+      </p>
     </section>
   )
 }

@@ -1,6 +1,11 @@
 // app/kids/manifest.webmanifest/route.ts
 // Web app manifest for R2BOT Kids as its own installable app, scoped to /kids.
 // The main site keeps app/manifest.ts; app/kids/layout.tsx points kids pages here.
+//
+// Kept in step with the native shell in apps/kids-mobile (Capacitor): same name,
+// navy background/theme, same icon art, both orientations, scope /kids. The PWA
+// opens /kids?source=pwa and the store app opens /kids?source=app, so the two
+// installs can be told apart in analytics without any SDK in the app.
 
 export const dynamic = 'force-static'
 
@@ -10,13 +15,17 @@ export function GET() {
     name: 'R2BOT Kids — Build, Code & Explore Robots',
     short_name: 'R2BOT Kids',
     description: 'Build your own robot in 3D, see it in AR, code it through missions and watch animated robot stories. Ages 5–17.',
-    start_url: '/kids?source=app',
+    start_url: '/kids?source=pwa',
     scope: '/kids',
+    lang: 'en',
+    dir: 'ltr',
     display: 'standalone',
     orientation: 'any',
     background_color: '#0A1120',
     theme_color: '#0A1120',
     categories: ['education', 'kids', 'games'],
+    // The PWA is a first-class install; never nudge people to a store listing instead.
+    prefer_related_applications: false,
     icons: [
       { src: '/kids-icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
       { src: '/kids-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },

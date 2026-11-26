@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- R2BOT Kids: navy everywhere so no white flash between splash and the site. -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/r2bot_navy</item>
+        <item name="colorPrimaryDark">@color/r2bot_navy</item>
+        <item name="colorAccent">@color/r2bot_orange</item>
+        <item name="android:windowBackground">@color/r2bot_navy</item>
+        <item name="android:statusBarColor">@color/r2bot_navy</item>
+        <item name="android:navigationBarColor">@color/r2bot_navy</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@null</item>
+        <item name="android:windowBackground">@color/r2bot_navy</item>
+    </style>
+
+    <!-- Android 12+ system splash: navy with the adaptive icon; older devices use @drawable/splash. -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="android:background">@drawable/splash</item>
+        <item name="windowSplashScreenBackground">@color/r2bot_navy</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    </style>
+</resources>

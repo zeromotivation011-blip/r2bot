@@ -203,6 +203,29 @@ export default function KidsSchoolsPage() {
           </p>
         </section>
 
+        {/* ── Teacher tools (0055) ─────────────────────────────────── */}
+        <section aria-labelledby="tools-h">
+          <h2 id="tools-h" className={H2}>Tools for teachers and school leads</h2>
+          <p className="mt-2 max-w-3xl text-slate-300">Everything a teacher needs to run R2BOT Kids without extra prep, and everything a school lead needs to see it working.</p>
+          <ul className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              { emoji: '📘', title: 'A lesson guide for every session', body: 'All 24 Level 1 sessions have a printable 40-minute plan: warm-up, timing, discussion, misconceptions, differentiation and a note for families. Download as PDF or share to Google Classroom.', href: '/kids/teach', cta: 'Browse the guides' },
+              { emoji: '🍎', title: 'Assignments with due dates', body: 'Assign a course session, any Skill Galaxy activity or a game to a class. Children see “From your teacher” missions; you see who has finished.', href: '/kids/classroom', cta: 'Open the Classroom' },
+              { emoji: '🏫', title: 'One school, every class', body: 'Create a school and invite colleagues with a school code. The school admin sees every class with a school-wide summary — counts only, never children’s nicknames.', href: '/kids/classroom/school', cta: 'Set up a school' },
+              { emoji: '🎓', title: 'Teacher training with a certificate', body: 'Six short self-paced modules, about 45 minutes: running a class, the physics lab, assigning and tracking, supporting every child, safety and privacy.', href: '/kids/teach/training', cta: 'Start the training' },
+              { emoji: '📜', title: 'Certificates for children', body: 'A child who finishes all 24 sessions of Level 1 can download a certificate with their explorer name and robot. Every child who learns the skills earns the same one.', href: '/kids/course/1', cta: 'See Level 1' },
+              { emoji: '🏠', title: 'A weekly report for families', body: 'Parents get a printable weekly report from their child’s own device: what was learned, badges earned and a five-minute activity to try at home.', href: '/kids/parents', cta: 'For parents' },
+            ].map((t) => (
+              <li key={t.title} className={`${CARD} flex flex-col`}>
+                <div className="text-3xl" aria-hidden>{t.emoji}</div>
+                <h3 className="mt-3 text-lg font-extrabold text-white">{t.title}</h3>
+                <p className="mt-1 flex-1 text-[15px] leading-relaxed text-slate-300">{t.body}</p>
+                <Link href={t.href} className="mt-4 inline-flex min-h-[44px] items-center font-bold text-amber-300 hover:underline">{t.cta} →</Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+
         {/* ── Devices ──────────────────────────────────────────────── */}
         <section aria-labelledby="devices-h" className="grid gap-8 lg:grid-cols-2">
           <div>

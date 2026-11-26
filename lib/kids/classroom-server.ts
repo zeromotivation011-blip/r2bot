@@ -18,6 +18,7 @@ import {
   type KidsClassSummary,
   type KidsMemberRow,
 } from './classroom'
+import { SCHOOLS_NOT_READY, SCHOOLS_NOT_READY_MESSAGE } from './classroom-assignments'
 
 export function newJoinCode(): string {
   let s = ''
@@ -148,4 +149,30 @@ export async function loadOwnedClass(
     .maybeSingle()
   if (error) return isMissingTable(error) ? 'missing-table' : null
   return (data as ClassDbRow | null) ?? null
+}
+
+// ── Schools and assignments (migration 0055) ─────────────────────────────────
+// Kept apart from the 0054 helpers so a missing 0055 never takes classes down.
+
+export const SCHOOL_CODE_LENGTH = 8
+
+export function newSchoolCode(): string {
+  let s = ''
+  for (let i = 0; i < SCHOOL_CODE_LENGTH; i++) s += JOIN_CODE_ALPHABET[randomInt(JOIN_CODE_ALPHABET.length)]
+  return s
+}
+
+/** True when the error means migration 0055 has not been run (table or column missing). */
+export function isMissingSchoolSchema(err: PostgrestError | null | undefined): boolean {
+  if (!err) return false
+  if (err.code === '42P01' || err.code === '42703' || err.code === 'PGRST205' || err.code === 'PGRST204' || err.code === 'PGRST200') return true
+  return /(kids_schools|kids_school_teachers|kids_assignments|school_id|kids_school_role)/.test(err.message ?? '') &&
+    /(does not exist|could not find|schema cache|relationship)/i.test(err.message ?? '')
+}
+
+export function schoolsNotReadyResponse(): Response {
+  return Response.json(
+    { ok: false, error: SCHOOLS_NOT_READY_MESSAGE, code: SCHOOLS_NOT_READY },
+    { status: 503, headers: { 'Cache-Control': 'no-store' } },
+  )
 }

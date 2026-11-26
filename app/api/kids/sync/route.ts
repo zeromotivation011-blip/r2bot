@@ -10,7 +10,7 @@
 
 import type { NextRequest } from 'next/server'
 import { anyRateLimited, clientIp } from '@/lib/rate-limit'
-import { SNAPSHOT_MAX_BYTES, isBandId, parseSnapshot, type JoinedClassInfo } from '@/lib/kids/classroom'
+import { SNAPSHOT_MAX_BYTES, fitSnapshot, isBandId, parseSnapshot, snapshotBytes, type JoinedClassInfo } from '@/lib/kids/classroom'
 import {
   adminOrNull,
   hashToken,
@@ -36,7 +36,8 @@ interface MemberWithClass {
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
-  const raw = await readJsonCapped(req, SNAPSHOT_MAX_BYTES + 256)
+  // The request may carry more than fits (lists are trimmed below), never more than twice the column.
+  const raw = await readJsonCapped(req, SNAPSHOT_MAX_BYTES * 2 + 256)
   if (!raw || typeof raw !== 'object') return jsonError(413, 'Snapshot too large or malformed.')
   const body = raw as SyncBody
   if (!isTokenShape(body.token)) return jsonError(400, 'Missing member token.')
@@ -67,9 +68,10 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   const update: { last_active_at: string; snapshot?: unknown } = { last_active_at: new Date().toISOString() }
   if (body.snapshot !== undefined) {
-    const snap = parseSnapshot(body.snapshot)
-    if (!snap) return jsonError(400, 'Malformed snapshot.')
-    if (JSON.stringify(snap).length > SNAPSHOT_MAX_BYTES) return jsonError(413, 'Snapshot too large.')
+    const parsed = parseSnapshot(body.snapshot)
+    if (!parsed) return jsonError(400, 'Malformed snapshot.')
+    const snap = fitSnapshot(parsed)
+    if (snapshotBytes(snap) > SNAPSHOT_MAX_BYTES) return jsonError(413, 'Snapshot too large.')
     update.snapshot = snap
   }
   const { error: upErr } = await admin.from('kids_class_members').update(update).eq('id', member.id)

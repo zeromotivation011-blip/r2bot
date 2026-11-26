@@ -46,10 +46,9 @@ const config = {
   ios: {
     contentInset: 'never' as const,
     // App-bound domains: WKWebView will only run script on www.r2bot.in and
-    // the bundled page (WKAppBoundDomains in Info.plist).
+    // the bundled page (WKAppBoundDomains in ios/App/App/Info.plist).
     limitsNavigationsToAppBoundDomains: true,
     preferredContentMode: 'mobile' as const,
-    scheme: 'R2BOT Kids',
   },
   plugins: {
     SplashScreen: {

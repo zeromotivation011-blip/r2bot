@@ -88,6 +88,54 @@ $$;
 revoke all on function public.kids_school_role(uuid) from public, anon;
 grant execute on function public.kids_school_role(uuid) to authenticated;
 
+-- A class may only be linked to a school its own teacher belongs to, whoever
+-- writes the row (0054 lets a teacher update their own class directly).
+create or replace function public.kids_classes_check_school()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.school_id is not null and not exists (
+    select 1 from public.kids_school_teachers t
+    where t.school_id = new.school_id and t.teacher_id = new.teacher_id
+  ) then
+    raise exception 'kids_classes.school_id must be a school the class teacher belongs to'
+      using errcode = '42501';
+  end if;
+  return new;
+end
+$$;
+
+drop trigger if exists kids_classes_check_school on public.kids_classes;
+create trigger kids_classes_check_school
+  before insert or update of school_id, teacher_id on public.kids_classes
+  for each row execute function public.kids_classes_check_school();
+
+-- When a teacher leaves (or is removed from) a school, their classes leave it too.
+create or replace function public.kids_school_teachers_unlink_classes()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.kids_classes
+     set school_id = null, updated_at = now()
+   where school_id = old.school_id and teacher_id = old.teacher_id;
+  return old;
+end
+$$;
+
+drop trigger if exists kids_school_teachers_unlink_classes on public.kids_school_teachers;
+create trigger kids_school_teachers_unlink_classes
+  after delete on public.kids_school_teachers
+  for each row execute function public.kids_school_teachers_unlink_classes();
+
+revoke all on function public.kids_classes_check_school() from public, anon, authenticated;
+revoke all on function public.kids_school_teachers_unlink_classes() from public, anon, authenticated;
+
 -- ── RLS ──────────────────────────────────────────────────────────────────
 -- Every route uses the service-role client after checking the signed-in
 -- teacher; these policies are the second lock. None uses `auth.uid() is null`.

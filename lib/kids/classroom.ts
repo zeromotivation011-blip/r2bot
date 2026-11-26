@@ -232,6 +232,60 @@ export function parseSnapshot(x: unknown): ClassSnapshot | null {
   }
 }
 
+/**
+ * Bytes the snapshot takes in Postgres. jsonb prints a space after every ":"
+ * and ",", so JSON.stringify alone undercounts; counting both (even inside
+ * strings) can only overestimate, which is the safe side of the CHECK.
+ */
+export function snapshotBytes(snap: ClassSnapshot): number {
+  const json = JSON.stringify(snap)
+  const extra = (json.match(/[:,]/g) ?? []).length
+  return new TextEncoder().encode(json).length + extra
+}
+
+/**
+ * Make a parsed snapshot fit SNAPSHOT_MAX_BYTES (the column's CHECK). Drops the
+ * least important entries first — the tail of activitiesDone beyond the first
+ * 60 (the browser puts the class's assigned activities first), then halves of
+ * the story and code maps, then the rest — so a very busy child still syncs
+ * instead of getting a 413, and assignment ticks stay right.
+ */
+/** Activity ids always kept while anything older can still be trimmed (a class has at most 60 assignments). */
+const KEEP_ACTIVITIES = 60
+
+export function fitSnapshot(snap: ClassSnapshot, maxBytes: number = SNAPSHOT_MAX_BYTES): ClassSnapshot {
+  if (snapshotBytes(snap) <= maxBytes) return snap
+  const out: ClassSnapshot = {
+    ...snap,
+    activitiesDone: [...snap.activitiesDone],
+    gamesPlayed: [...snap.gamesPlayed],
+    episodesDone: { ...snap.episodesDone },
+    codeMissions: { ...snap.codeMissions },
+  }
+  const halve = (m: Record<string, number>): Record<string, number> => {
+    const keys = Object.keys(m)
+    return Object.fromEntries(keys.slice(0, Math.floor(keys.length / 2)).map((k) => [k, m[k]]))
+  }
+  while (snapshotBytes(out) > maxBytes) {
+    if (out.activitiesDone.length > KEEP_ACTIVITIES) {
+      out.activitiesDone = out.activitiesDone.slice(0, Math.max(KEEP_ACTIVITIES, out.activitiesDone.length - 20))
+    } else if (Object.keys(out.episodesDone).length > 0 || Object.keys(out.codeMissions).length > 0) {
+      // Older counters go before the assignment-relevant lists.
+      if (Object.keys(out.episodesDone).length >= Object.keys(out.codeMissions).length) out.episodesDone = halve(out.episodesDone)
+      else out.codeMissions = halve(out.codeMissions)
+    } else if (out.activitiesDone.length > 0) {
+      out.activitiesDone = out.activitiesDone.slice(0, Math.max(0, out.activitiesDone.length - 10))
+    } else if (out.gamesPlayed.length > 0) {
+      out.gamesPlayed = []
+    } else {
+      out.stuck = {}
+      out.robot = null
+      break
+    }
+  }
+  return out
+}
+
 // ── Robot card ───────────────────────────────────────────────────────────────
 /** A robot name a teacher may see: passes the nickname rules, else the default name. */
 export function safeRobotName(name: string): string {
