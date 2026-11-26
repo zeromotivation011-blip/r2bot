@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">Side view of a two-deck differential-drive robot chassis</title>
+  <desc id="d">Side view of a small two-wheeled robot chassis in three layers. The bottom plate carries the drive motor and wheel near the front, a caster at the back, and the battery placed low and close to the drive axle. Standoffs and a side wall between the decks hold an upper deck with the computer and motor driver. A short mast on the upper deck carries a lidar with a clear view all round. The base_link coordinate frame is marked on the bottom plate above the drive wheel axle, with x pointing forward and z pointing up. Labels note that heavy parts go low and near the drive axle, sensors go on stiff seats with a clear view, and decks joined by a side wall or bracing act like a box, which is stiffer than either plate alone; standoffs alone do not.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#38bdf8"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f59e0b"/></marker>
+  </defs>
+  <rect width="640" height="400" rx="16" fill="#0f172a"/>
+  <text x="30" y="44" font-size="16" font-weight="700" fill="#e2e8f0">Inside a robot chassis</text>
+  <text x="610" y="44" font-size="12" fill="#64748b" letter-spacing="1.5" text-anchor="end">SIDE VIEW</text>
+
+  <!-- floor -->
+  <line x1="40" y1="330" x2="460" y2="330" stroke="#334155" stroke-width="2"/>
+
+  <!-- lidar mast + lidar -->
+  <rect x="236" y="118" width="8" height="40" fill="#475569"/>
+  <rect x="212" y="94" width="56" height="26" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="240" y="112" font-size="11" fill="#bae6fd" text-anchor="middle">lidar</text>
+
+  <!-- upper deck -->
+  <rect x="90" y="158" width="320" height="10" rx="3" fill="#94a3b8"/>
+  <rect x="120" y="134" width="88" height="24" rx="4" fill="#1e293b" stroke="#94a3b8"/>
+  <text x="164" y="150" font-size="11" fill="#e2e8f0" text-anchor="middle">computer</text>
+  <rect x="292" y="138" width="86" height="20" rx="4" fill="#1e293b" stroke="#94a3b8"/>
+  <text x="335" y="152" font-size="11" fill="#e2e8f0" text-anchor="middle">motor driver</text>
+
+  <!-- standoffs -->
+  <rect x="104" y="168" width="6" height="66" fill="#64748b"/>
+  <rect x="180" y="168" width="6" height="66" fill="#64748b"/>
+  <rect x="214" y="168" width="6" height="66" fill="#64748b"/>
+  <!-- side wall at the front ties the decks into a box -->
+  <rect x="398" y="168" width="10" height="66" fill="#94a3b8" opacity="0.9"/>
+  <path d="M402 172 L402 230" stroke="#0f172a" stroke-width="1" stroke-dasharray="2 4"/>
+
+  <!-- base plate -->
+  <rect x="80" y="234" width="340" height="12" rx="3" fill="#f59e0b"/>
+  <!-- battery (low, central) -->
+  <rect x="234" y="206" width="104" height="28" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="286" y="225" font-size="12" font-weight="600" fill="#fde68a" text-anchor="middle">battery</text>
+
+  <!-- drive motor + wheel (front = right) -->
+  <rect x="372" y="246" width="40" height="18" rx="3" fill="#334155" stroke="#94a3b8"/>
+  <text x="392" y="259" font-size="10" fill="#e2e8f0" text-anchor="middle">motor</text>
+  <circle cx="350" cy="296" r="34" fill="none" stroke="#e2e8f0" stroke-width="6"/>
+  <circle cx="350" cy="296" r="5" fill="#e2e8f0"/>
+
+  <!-- caster (rear) -->
+  <rect x="116" y="246" width="12" height="62" fill="#64748b"/>
+  <circle cx="122" cy="316" r="13" fill="none" stroke="#e2e8f0" stroke-width="4"/>
+  <text x="122" y="356" font-size="11" fill="#94a3b8" text-anchor="middle">caster</text>
+  <text x="350" y="356" font-size="11" fill="#94a3b8" text-anchor="middle">drive wheel</text>
+
+  <!-- base_link frame -->
+  <circle cx="350" cy="240" r="4" fill="#38bdf8"/>
+  <line x1="350" y1="240" x2="404" y2="240" stroke="#38bdf8" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="350" y1="240" x2="350" y2="196" stroke="#38bdf8" stroke-width="2" marker-end="url(#a)"/>
+  <text x="410" y="236" font-size="11" fill="#38bdf8">x</text>
+  <text x="356" y="198" font-size="11" fill="#38bdf8">z</text>
+
+  <!-- callouts -->
+  <g font-size="12" fill="#cbd5e1">
+    <text x="472" y="104" font-weight="600" fill="#bae6fd">Sensors: stiff seat,</text>
+    <text x="472" y="120" font-weight="600" fill="#bae6fd">clear view</text>
+    <line x1="468" y1="108" x2="274" y2="106" stroke="#38bdf8" stroke-width="1" stroke-dasharray="3 3"/>
+
+    <text x="472" y="170" font-weight="600" fill="#e2e8f0">Decks + side wall</text>
+    <text x="472" y="186">(or bracing) act like a box,</text>
+    <text x="472" y="202">far stiffer than either</text>
+    <text x="472" y="218">plate. Standoffs alone don't.</text>
+    <line x1="468" y1="192" x2="410" y2="196" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3"/>
+
+    <text x="472" y="262" font-weight="600" fill="#38bdf8">base_link</text>
+    <text x="472" y="278">the frame the software</text>
+    <text x="472" y="294">measures from (REP 105)</text>
+    <line x1="468" y1="266" x2="356" y2="242" stroke="#38bdf8" stroke-width="1" stroke-dasharray="3 3"/>
+
+    <text x="30" y="84" font-weight="600" fill="#fde68a">Heavy parts low</text>
+    <text x="30" y="100">and near the drive axle,</text>
+    <text x="30" y="116">to keep traction</text>
+    <line x1="110" y1="122" x2="236" y2="212" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#b)"/>
+  </g>
+</svg>

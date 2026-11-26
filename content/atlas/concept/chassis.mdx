@@ -1,69 +1,280 @@
 ---
-title: Chassis (robot)
-category: hardware
+title: Robot Chassis
+slug: chassis
 summary: >-
-  A robot's chassis is its structural skeleton — the rigid frame that holds all
-  components in their correct positions and transmits forces between them
-  without bending, twisting, or breaking.
-seeAlso: []
-sources:
-  - title: ROS Discourse — Chassis design considerations for ground robots
-    url: 'https://discourse.ros.org/t/chassis-design-for-mobile-robots/23456'
-  - title: MIT OpenCourseWare — Introduction to mechanical design for robots
-    url: 'https://ocw.mit.edu/courses/2-12-introduction-to-robotics-fall-2005/'
-lastReviewed: 2026-05-19T00:00:00.000Z
+  A robot chassis is the frame every part bolts to: what it does, types for wheeled, humanoid, legged and flying robots, materials compared, how to design one.
+category: hardware
+bucket: concept
+difficulty: 2
+difficultyLabel: Classroom
+lastReviewed: 2026-11-26T00:00:00.000Z
 tags:
   - hardware
   - mechanical
   - structural
-difficulty: 3
+  - mobile-robot
+  - design
+seeAlso:
+  - differential-drive
+  - skid-steer
+  - mecanum-wheel
+  - humanoid-robot
+  - center-of-mass
+  - link-robot
+  - carbon-fibre-composite
+  - ros2-urdf
+  - wheels-vs-tracks
+  - drone
+relatedTerms:
+  - differential-drive
+  - center-of-mass
+  - humanoid-robot
+  - link-robot
+  - ros2-urdf
+prerequisiteTerms:
+  - robot
+unlocksTerms:
+  - differential-drive
+  - center-of-mass
+sources:
+  - title: 'Etymonline, "chassis" (motor-car sense from 1903, from French châssis "frame")'
+    url: 'https://www.etymonline.com/word/chassis'
+  - title: 'ASM Aerospace Specification Metals, Aluminum 6061-T6; 6061-T651 data sheet'
+    url: 'https://www.aerospacemetals.com/wp-content/uploads/2023/06/Aluminum-6061-T6-6061-T651.pdf'
+  - title: 'ASM Aerospace Specification Metals, Aluminum 7075-T6; 7075-T651 data sheet'
+    url: 'https://www.aerospacemetals.com/wp-content/uploads/2023/06/Aluminum-7075-T6-7075-T651.pdf'
+  - title: 'Elgin, Carbon Steel Grade 1018 data sheet'
+    url: 'https://www.mwcomponents.com/uploads/Resource-Center/Elgin-Material-Sheets/Carbon-Steel-Grade-1018-Data-Sheet_Elgin.pdf'
+  - title: 'UltiMaker PLA technical data sheet v5.00 (distributor copy)'
+    url: 'https://www.alloys.com.au/Documents/Ultimaker-PLA-TDS-v5.00.pdf'
+  - title: 'UltiMaker PETG technical data sheet v1.00'
+    url: 'https://um-support-files.ultimaker.com/materials/2.85mm/tds/PETG/Ultimaker-PETG-TDS-v1.00.pdf'
+  - title: 'Toray Composite Materials America, T300 data sheet'
+    url: 'https://www.toraycma.com/wp-content/uploads/T300-Data-Sheet.pdf'
+  - title: 'D. Roylance, MIT, "Beam Displacements" (course notes, three-point bending)'
+    url: 'https://web.mit.edu/course/3/3.11/www/modules/bdisp.pdf'
+  - title: 'ROS REP 105, Coordinate Frames for Mobile Platforms (base_link)'
+    url: 'https://www.ros.org/reps/rep-0105.html'
+  - title: 'ROBOTIS e-Manual, TurtleBot3 features and specifications'
+    url: 'https://emanual.robotis.com/docs/en/platform/turtlebot3/features/'
+  - title: 'TurtleBot 4 User Manual, Features'
+    url: 'https://turtlebot.github.io/turtlebot4-user-manual/overview/features.html'
+  - title: 'NASA, Valkyrie (R5) fact sheet'
+    url: 'https://www.nasa.gov/wp-content/uploads/2023/06/r5-fact-sheet.pdf'
+  - title: 'Unitree, G1 humanoid specifications'
+    url: 'https://www.unitree.com/g1'
+  - title: 'Unitree, H1 humanoid specifications'
+    url: 'https://www.unitree.com/h1'
+  - title: 'PX4 User Guide, Airframes Reference'
+    url: 'https://docs.px4.io/main/en/airframes/airframe_reference.html'
+  - title: 'Wikipedia, IP code (IEC 60529 ratings table)'
+    url: 'https://en.wikipedia.org/wiki/IP_code'
+youtubeSearchQuery: robot chassis design explained
 laymanExplanation: >-
-  Before a robot can think, sense, or move, it needs to hold together. Drop a
-  battery, a computer, four motors, and twelve sensors into a pile and you have
-  a parts list, not a robot. Mount them onto a rigid frame that keeps each
-  component exactly where it belongs, and suddenly the whole system works as
-  one. That frame is the chassis.
-realRobotsThatUseThis: []
-indianExample: ''
-relatedTerms: []
-prerequisiteTerms: []
-unlocksTerms: []
-quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
-difficultyLabel: Classroom
+  Before a robot can think, sense or move, it has to hold together. A battery, a computer, motors
+  and sensors in a pile are a parts list, not a robot. Bolt them to one stiff frame that keeps each
+  part exactly where it belongs, and they start working as one machine. That frame is the chassis.
 technicalDefinition: >-
-  A robot's chassis is its structural skeleton — the rigid frame that holds all
-  components in their correct positions and transmits forces between them
-  without bending, twisting, or breaking.
-slug: chassis
-bucket: concept
+  A robot chassis is the primary load-bearing structure of the machine: the plates, extrusions,
+  shells and brackets that locate every component relative to the others and carry loads (weight,
+  drive forces, impacts, reaction torques) between them. Its design trades bending and torsional
+  stiffness, strength and mass, and fixes the robot's centre of mass, footprint and the reference
+  frame the software measures from (base_link in ROS).
+realRobotsThatUseThis:
+  - TurtleBot 3
+  - TurtleBot 4
+  - NASA Valkyrie
+  - Unitree G1
+indianExample: ''
+industryApplications:
+  - Warehouse and delivery robots
+  - Educational robot kits
+  - Humanoid robots
+  - Drones
+mindBlowingFact: >-
+  Doubling the thickness of a chassis plate makes it eight times stiffer in bending, because
+  stiffness grows with the cube of thickness. That is why a 3 mm aluminium plate beats a 2.1 mm
+  steel plate of the same stiffness on weight: the lighter metal can afford to be thicker.
+quizQuestion:
+  q: >-
+    Your robot's 3 mm base plate sags too much under the battery. You swap it for the same plate
+    in 6 mm of the same material. Roughly how much stiffer is it in bending?
+  options:
+    - Twice as stiff
+    - Four times as stiff
+    - Eight times as stiff
+    - No change, because the material is the same
+  answer: 2
+  explanation: >-
+    A rectangular plate's bending stiffness depends on its second moment of area, I = b·h³/12, so
+    doubling the thickness h multiplies I, and the stiffness, by 2³ = 8. The deflection under the
+    same load drops to one-eighth. The plate also weighs twice as much, which is the trade-off.
 ---
 
-Before a [robot](/atlas/concept/robot) can think, sense, or move, it needs to hold together. Drop a battery, a computer, four motors, and twelve sensors into a pile and you have a parts list, not a robot. Mount them onto a rigid frame that keeps each component exactly where it belongs, and suddenly the whole system works as one. That frame is the chassis.
+A robot chassis is the frame that every other part of the robot is mounted on. It holds the motors, battery, computer and sensors in fixed positions, carries the forces between them, and decides where the robot's weight sits.
 
-A **chassis** is the structural backbone of a robot — the rigid assembly of plates, tubes, brackets, and fasteners that gives the machine its shape, supports every component, and carries loads between them. The word comes from French automotive engineering, where it described the frame onto which a car's body and drivetrain were bolted. The meaning in [robotics](/atlas/concept/robotics) is identical.
+![Side view of a small two-wheeled robot chassis in three layers. The bottom plate carries a drive motor and wheel at the front, a caster at the back and the battery low, close to the drive axle. Four standoffs and a side wall hold an upper deck with the computer and motor driver. A short mast on top carries a lidar. The base_link frame is marked on the bottom plate above the drive-wheel axle, with x forward and z up](/images/atlas/diagrams/chassis.svg)
 
-## What a chassis must do
+## Start here: the skeleton, not the skin
 
-A chassis is not just a mounting plate. It must be stiff enough to keep components in alignment (a [camera](/atlas/concept/camera-vision) that flexes relative to the wheels it is supposed to guide is useless), strong enough to survive the forces the robot generates or encounters (a jumping robot lands hard; a manipulator arm pushes back against whatever it grabs), and light enough not to become the biggest drain on the battery. Those three requirements — stiffness, strength, and low mass — are almost always in tension with each other.
+Think of your own skeleton. Muscles, organs and skin all attach to it, and it keeps them in the right place when you walk, jump or fall. A robot chassis does the same job. A [camera](/atlas/concept/camera-vision) only knows where the wheels are going if the frame between them does not bend. A motor can only push the robot forward if the bracket holding it does not twist.
 
-## Materials
+The word came into English from French *châssis*, "frame". English used it for a window frame long before cars; the motor-car sense, "base frame of an automobile", is recorded from 1903. Robotics borrowed the car meaning: the chassis is the frame, the covers are the body.
 
-**Aluminium alloy** (6061 or 7075 series) dominates hobby and small commercial robots. It is light, easy to machine or laser-cut, and strong enough for most tasks. **Carbon-fibre composite** is stiffer and lighter still, preferred for drones and high-performance legged robots where every gram costs battery life. **Steel** is heavier but cheaper and better at absorbing impacts — common in combat robotics. **3D-printed plastics** (PLA, PETG, ABS) are ideal for prototyping and low-load applications: fast to produce, cheap to iterate, but more flexible and less heat-tolerant than metal.
+For most mobile robots, "the chassis" and "the base" mean the same thing: the bottom structure with the drive wheels. For a humanoid, a quadruped or a drone, the word stretches, and the sections below cover each.
 
-## Chassis types in ground robots
+## What a chassis has to do
 
-A differential-drive robot (two driven wheels, one passive castor) often uses a flat platform chassis — simple, low, easy to build. A legged robot needs a central body chassis that houses the compute and power while attaching to multiple leg mechanisms. An arm robot's chassis is typically a base plate that must absorb the torque reaction when the arm pushes against an object.
+A good chassis does six jobs at once. Most design decisions are trades between them.
+
+| Job | What goes wrong if it fails |
+|---|---|
+| **Stay stiff** (resist bending and twisting) | Sensors drift out of alignment, wheels lose contact on uneven floors, gears mesh badly |
+| **Stay strong** (not crack or bend for good) | A drop, a collision or a heavy payload leaves the frame permanently bent |
+| **Stay light** | Every gram of frame is a gram the motors must carry and the battery must pay for |
+| **Put the weight low and central** | A high or off-centre [centre of mass](/atlas/concept/center-of-mass) tips the robot on slopes and hard stops |
+| **Stay serviceable** | If the battery or computer cannot come out without taking the robot apart, every fix takes an hour |
+| **Protect what is inside** | Dust, water, heat and loose cables are a more common cause of failed electronics than structural loads |
+
+Stiffness and strength are not the same thing. Stiffness is how much a part bends under a load and then springs back. Strength is how much load it takes before it bends for good or breaks. A robot chassis usually fails on stiffness long before strength: a plate that sags 2 mm under the battery is unlikely to break, but the bending can tip sensors mounted away from its centre by a degree or so, enough to spoil a lidar map.
+
+## How it works: why thickness beats material
+
+The load on a chassis plate is mostly bending: the battery and computer push down in the middle, and the wheels hold it up near the ends. Engineers model that as a beam resting on two supports with a load in the middle, called three-point bending. The deflection at the middle is
+
+**δ = F·L³ / (48·E·I)**
+
+where F is the load, L the span between supports, E the material's stiffness (Young's modulus) and I the plate's *second moment of area*. For a flat rectangular plate of width b and thickness h, **I = b·h³ / 12**.
+
+Two things follow, and they explain most of chassis design:
+
+1. **Thickness matters most.** I grows with h³, so doubling a plate's thickness makes it 8 times stiffer. Doubling the span makes it 8 times floppier (L³).
+2. **Material stiffness only enters once, as E.** A stiffer material helps, but less than you might expect once you account for weight.
+
+### Worked example: one plate, four materials
+
+A base plate 300 mm long between the wheel supports and 150 mm wide carries a 50 N load in the middle (a battery and computer of about 5 kg). Using the formula above with each material's data-sheet modulus (for PLA, the flexural modulus, which is the one measured in bending):
+
+| Material | E (GPa) | Density (g/cm³) | Sag of a 3 mm plate | Thickness for the same sag as 3 mm aluminium | Mass of that plate |
+|---|---|---|---|---|---|
+| Aluminium 6061-T6 | 68.9 | 2.70 | 1.2 mm | 3.0 mm | 365 g |
+| Aluminium 7075-T6 | 71.7 | 2.81 | 1.2 mm | 2.96 mm | 374 g |
+| Carbon steel 1018 | 200 | 7.87 | 0.4 mm | 2.1 mm | 745 g |
+| PLA, 3D-printed flat, solid | 3.02 | 1.24 | about 28 mm | 8.5 mm | 475 g |
+
+Steel is three times stiffer than aluminium, but to match the aluminium plate it can only get 30% thinner, and it is nearly three times as dense, so the steel plate weighs about twice as much. Printed PLA is about 23 times less stiff, so it needs a plate nearly three times thicker, which ends up heavier than the aluminium one. (The 28 mm figure is outside the small-sag range the formula is meant for; read it as "far too floppy".)
+
+That is why aluminium plate and extrusion dominate small and mid-size robots. The 7075 alloy is barely stiffer than 6061 (71.7 against 68.9 GPa); what it buys is strength (a yield strength of 503 MPa against 276 MPa), which matters for parts that take impacts, not for plates that need to stay flat.
+
+Two caveats for printed parts. The PLA figure above is for a solid test bar printed flat; UltiMaker's data sheet gives a flexural modulus of 3.02 GPa printed flat and 2.74 GPa printed upright, and real prints with partial infill are lighter but less stiff again. And printed parts are best made stiff by shape: ribs, walls and boxes add I without adding much material.
+
+### Shape beats thickness
+
+The formula's lesson goes further than plates. Material far from the bending axis adds stiffness fastest, so a box, a channel or a tube is much stiffer than a flat plate of the same weight. A two-deck chassis, the layout in the diagram above, shows the catch: standoffs alone are slender posts, so the two decks still bend mostly as two separate plates. Add side walls, gussets or diagonal braces between the decks and they start to act as one box, far stiffer than either plate alone. Aluminium extrusion frames with corner brackets get their stiffness the same way.
+
+## Chassis by robot type
+
+### Wheeled robots
+
+The drive layout shapes the chassis more than anything else:
+
+- **[Differential drive](/atlas/concept/differential-drive)**: two driven wheels plus one or two casters. A flat, often round plate with the wheels on its centre line, so the robot turns on the spot. The battery goes low and between the drive wheels to keep weight on them.
+- **[Skid steer](/atlas/concept/skid-steer)**: four or six fixed wheels, turned by driving the sides at different speeds. The wheels scrub sideways in every turn, so the chassis and axle mounts take large side loads. Usually a rectangular box frame.
+- **[Ackermann steering](/atlas/concept/ackermann-steering)**: car-style steering. The chassis carries a steering linkage at the front and is long, like a car's.
+- **[Mecanum](/atlas/concept/mecanum-wheel)** and other [holonomic drives](/atlas/concept/holonomic-drive): all four wheels must stay on the ground or the robot drifts. A perfectly rigid four-wheel frame lifts one wheel on an uneven floor, so these robots often use a pivoting axle or a suspension that lets the wheels follow the floor while the main frame stays stiff.
+- **[Tracked](/atlas/concept/tracked-robot)**: the chassis carries the track frames, idlers and tensioners; see [wheels vs tracks](/atlas/concept/wheels-vs-tracks).
+
+### Real wheeled examples
+
+| Robot | How the chassis is built | Size and mass | Maximum payload |
+|---|---|---|---|
+| TurtleBot 3 Burger | Stacked modular "waffle plates" on supports (8 plates in a Burger, 24 in a Waffle Pi) | 138 × 178 × 192 mm, 1 kg with computer, battery and sensors | 15 kg |
+| TurtleBot 4 | An iRobot Create 3 as the base, with the TurtleBot 4 shell, a user-interface (UI) board and a sensor tower added on top | 342 × 339 × 351 mm, 3,945 g | 9 kg |
+
+The two show the two common routes. TurtleBot 3 is built from plates you rearrange, so the same parts make different robots. TurtleBot 4 starts from a finished mobile base and adds structure on top of it, which is how many research robots are built: buy a proven base, design only the payload deck.
+
+### Humanoid robots: where is the chassis?
+
+A humanoid has no single flat base. The job of the chassis is shared between the **pelvis** and the **torso**, with the legs and arms as chains of [links](/atlas/concept/link-robot) attached to them.
+
+- The **pelvis** is usually the robot's reference. NASA's fact sheet for its Valkyrie humanoid says "the pelvis is considered the robot's base frame, and includes two IMU's": it is where the robot measures its own motion from, the way a wheeled robot uses its base plate.
+- The **torso** is the main container. In Valkyrie it houses the first arm joint on each side, two linear actuators that move the torso against the pelvis, and the computer and power systems. Valkyrie weighs 300 pounds (about 136 kg), stands 6 feet 2 inches (1.88 m) and carries a 1.8 kWh battery.
+- Commercial humanoids are much lighter. Unitree lists its G1 at about 35 kg with battery and 1,320 mm tall, with a quick-release battery, and its H1 at about 47 kg and about 1.8 m, with an 864 Wh battery that is "quickly replaceable".
+
+So if you are asked about "the chassis on a humanoid robot", the honest answer is the pelvis-and-torso structure: it carries the battery and computers, it is the frame every limb attaches to, and it is the base frame the control software balances. Because a humanoid must keep its [centre of mass](/atlas/concept/center-of-mass) over its feet, every gram in the torso and arms costs balance as well as battery. See [humanoid robot](/atlas/concept/humanoid-robot) for how they walk.
+
+### Legged robots
+
+A [quadruped](/atlas/concept/quadruped-robot) body is a box: it houses the battery and computer and carries the four hip joints at its corners. Each landing sends a jolt up through the legs and into that box at the hip mounts, so those mounts have to be among the strongest parts of the body.
+
+### Drones
+
+Drone builders say *frame*, and the flight software calls the overall configuration the *airframe*. PX4, a widely used open-source flight stack, lists its supported multicopter geometries as Quadrotor +, Quadrotor H, Quadrotor x and more, and choosing one loads a default motor count and layout, which current PX4 versions let you adjust in the control-allocation settings. A drone frame is the extreme case of the stiffness-per-gram trade, which is why [carbon-fibre composite](/atlas/concept/carbon-fibre-composite) is common: Toray's T300 data sheet gives the fibre a density of 1.76 g/cm³ and a tensile modulus of 230 GPa, and a unidirectional laminate (60% fibre by volume, epoxy) 140 GPa along the fibres. That laminate figure is for one direction only; plates are laid up with layers at several angles to be stiff every way, so a plate's figure in any one direction is lower.
+
+### Robot arms
+
+An arm's chassis is its base: the mount that has to resist the reaction torque when the arm swings or lifts. A loose base turns into position error at the gripper, magnified by the arm's length.
+
+## Materials at a glance
+
+| Material | Good for | Watch out for |
+|---|---|---|
+| Aluminium 6061 plate and extrusion | Most mobile robot frames: light, easy to cut and drill, stiff for its weight | Threads in thin plate strip easily; use nuts or inserts |
+| Aluminium 7075 | Highly loaded brackets and parts that take impacts | Almost the same stiffness as 6061 (about 4% more) and costs more; harder to bend into shape |
+| Steel | Combat and heavy-duty robots, axles, high-wear parts | Heavy; rusts unless treated |
+| Carbon-fibre composite | Drones and legged robots where every gram counts | Cutting dust needs care; stiff along fibres, weaker across; drilled holes can split |
+| 3D-printed PLA / PETG | Prototypes, brackets, sensor mounts, covers | Much less stiff (UltiMaker lists tensile moduli of 3.25 GPa for PLA and 1.94 GPa for PETG, printed flat); weaker between layers; PLA softens in heat |
+
+## Designing a chassis: a working checklist
+
+1. **List what it carries.** Mass and size of the battery, computer, motors, sensors and payload. Add them up; that sum, plus the frame, is what the motors must move (the [motor torque calculator](/tools/motor-torque-calculator) takes it from there).
+2. **Put the heavy things low and central.** The battery is usually the heaviest part. Low and between the drive wheels keeps the robot from tipping and keeps traction on the driven wheels.
+3. **Give sensors a stiff, clear seat.** Mount the [IMU](/atlas/concept/imu) on the stiffest part of the frame, near the centre, not on a cantilevered bracket that vibrates. Give the lidar and cameras a clear field of view above or ahead of everything else.
+4. **Plan the cable runs.** Leave room for wires with strain relief and no sharp edges; a wire chafed through on a sharp edge is one of the most common failures in student robots.
+5. **Make the battery and computer reachable** without dismantling the drive.
+6. **Decide on protection.** Indoors, a cover against fingers and dust is enough. Outdoors, enclosures are rated with an IP code from IEC 60529: the first digit is protection against solids, the second against water. IP54 means dust-protected and splash-resistant from any direction; IP67 means dust-tight and survives immersion to 1 m for 30 minutes.
+7. **Check the numbers.** Use the deflection formula above for the main plate, then build a quick prototype in printed or laser-cut parts before cutting metal.
+
+## Common mistakes
+
+- **One giant 3D print.** It takes a day to reprint after one bad hole, and it is the floppiest option. Print brackets; use plate or extrusion for the main frame.
+- **Battery on top.** A high centre of mass makes the robot tip on ramps and when it brakes.
+- **IMU on a thin overhang.** The sensor reads the bracket's vibration, not the robot's motion.
+- **No room to grow.** Every robot gains a sensor or two. Leave spare mounting holes and some spare payload.
+
+## The chassis in software
+
+Software needs a fixed point on the robot to measure everything from, and that point lives on the chassis. ROS's REP 105 defines it: "The coordinate frame called base_link is rigidly attached to the mobile robot base." Where exactly is up to the builder; it is often placed between the drive wheels. In a [URDF](/atlas/concept/ros2-urdf) robot description the chassis is usually the root link, and every sensor's position is written as an offset from it, which [tf](/atlas/concept/tf-transform) then uses to turn a lidar reading into a point in the robot's frame. If the real chassis does not match those offsets, the map and the robot disagree about where things are.
+
+## Where you'll see it
+
+- **Teaching and research robots**: TurtleBot-style stacked decks on a differential-drive base.
+- **Warehouse robots**: low, wide, heavy-duty bases that carry shelves or totes.
+- **Humanoids**: a pelvis and torso structure holding battery, computers and limbs.
+- **Drones**: carbon or plastic frames where grams decide flight time.
 
 ## Why it matters
 
-A poorly designed chassis makes everything else harder: motors that vibrate loose, sensors that drift out of calibration, wiring that chafes against a sharp edge. Good chassis design is invisible — the robot simply works, holds together, and does not surprise the engineer with structural failures mid-demonstration.
+A chassis is the first thing you build and the last thing anyone notices. When it is right, the sensors stay calibrated, the wheels keep traction and the robot survives being dropped off a step. When it is wrong, it shows up as problems that look like software bugs: drifting odometry, noisy IMU readings, a map that smears. Getting it right is mostly geometry and a few lines of arithmetic, not exotic materials.
 
----
+## Common questions
 
-*The word "chassis" entered engineering English from the French word for a window frame — a reminder that even the most utilitarian structural concept has a surprisingly elegant origin.*
+### What is the chassis of a robot?
+
+It is the robot's main frame: the structure that the motors, battery, computer and sensors are mounted on, and that carries the forces between them. On a wheeled robot it is usually the base with the drive wheels; on a humanoid its role is taken by the pelvis and torso; on a drone it is called the frame.
+
+### Does a humanoid robot have a chassis?
+
+Not a single flat one. The pelvis acts as the base frame (NASA's Valkyrie uses it as the reference frame and puts two IMUs in it) and the torso houses the battery, computers and the first joints of the arms. Together they do what a chassis does on a wheeled robot.
+
+### What is the best material for a robot chassis?
+
+For most small and mid-size robots, aluminium plate or extrusion: it is easy to work and, for a plate of a given stiffness, lighter than steel or printed plastic. Carbon fibre is lighter still for drones and legged robots. 3D-printed parts are best for prototypes, brackets and mounts. Whatever the material, thickness and shape (ribs, boxes, tubes) matter more than the material itself.
+
+## Related
+
+- [Differential drive](/atlas/concept/differential-drive): the most common chassis layout for small mobile robots
+- [Centre of mass](/atlas/concept/center-of-mass): why the battery goes low
+- [Humanoid robot](/atlas/concept/humanoid-robot): how a torso-and-pelvis robot balances
+- [Link (robotics)](/atlas/concept/link-robot): the rigid bodies a robot's structure is made of
+- [URDF](/atlas/concept/ros2-urdf): how software describes the chassis and everything mounted on it
