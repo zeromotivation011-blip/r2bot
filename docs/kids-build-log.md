@@ -70,3 +70,9 @@ Scripts live in ~/.claude/projects/-home-user-r2bot/<session>/workflows/scripts/
 3. RUNNING since 03:12 (run wf_e021636c-616 resumed): games — Workflow({scriptPath: .../kids-universe-games-wf_e021636c-616.js, resumeFromRunId: 'wf_e021636c-616'}) (drone-hover build is cached).
 4. THEN steps 5–10 of "Remaining, in order".
 If a run fails on the limit again: wait for the reset time in the failure message, then relaunch the same script (resumeFromRunId where results were cached).
+
+## 06:15 UTC (second limit stop ~04:00, reset 06:10)
+- [x] Skill Galaxy engine: 26 templates + player + galaxy map + verify — committed 4ef1750. 238 activities live (160 authored: motion, mechanics, sensors, control).
+- [~] Galaxy content for code, electronics, ai, design, space, world + reviews — resumed (run wf_762783f5-9f5).
+- [~] Games: drone-hover done; 6 remaining — resumed (run wf_e021636c-616).
+- Then: schools, app wrapper, design pass, integration QA, morning report.
