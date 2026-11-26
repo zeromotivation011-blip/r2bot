@@ -323,7 +323,10 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
         lineAction: tier === 1 ? pilot.rules.find((r) => r.cond === 'line')?.action : undefined,
         tier,
       })
-      if (tier === 3 && tactic) rep.reasons.unshift(`${rival.name} used its ${SENSEI_TACTICS[tactic].name.toLowerCase()}: it ${SENSEI_TACTICS[tactic].what}.`)
+      if (tier === 3 && tactic) {
+        rep.reasons.unshift(`${rival.name} used its ${SENSEI_TACTICS[tactic].name.toLowerCase()}: it ${SENSEI_TACTICS[tactic].what}.`)
+        if (result.winner !== 'you') rep.tip += ' The Design bay can help too: compare your real push with its push, and remember two wedges cancel out.'
+      }
       setReport(rep)
       const won = result.winner === 'you'
       playSound(won ? 'correct' : 'wrong')
@@ -721,7 +724,7 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
       <div className="flex min-w-0 flex-col gap-3">
         <section className="rounded-[20px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4">
           <h2 className="font-display text-lg font-black text-white">
-            Bout #{boutSeed(tier, tier === 3 ? roundIdx : 0)} <span className="text-sm font-bold text-[#A7B0C0]">vs {rival.name}</span>
+            Bout #{boutSeed(tier, tier === 3 ? (seriesOver ? Math.max(0, roundIdx - 1) : roundIdx) : 0)} <span className="text-sm font-bold text-[#A7B0C0]">vs {rival.name}</span>
           </h2>
           <p className="mt-1 text-[15px] leading-snug text-[#EEF2F8]">{goal}</p>
           <p className="mt-2 text-sm text-[#A7B0C0]">{rival.blurb}</p>
