@@ -6,10 +6,10 @@
 // watch news arrive minutes late. The simulation in ./sim decides what really
 // happens on Mars; Earth only learns about it after the light delay.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { playSound, primeAudio } from '@/lib/kids-audio'
-import { buildMap, MAPS_PER_TIER, TIERS, type RuleId, type TierIndex } from './terrain'
+import { buildMap, legendStarLines, MAPS_PER_TIER, TIERS, type RuleId, type TierConfig, type TierIndex } from './terrain'
 import {
   CAPACITY_WH,
   CELL_M,
@@ -19,6 +19,7 @@ import {
   createSim,
   evaluate,
   fmtClock,
+  heaterW,
   isOver,
   previewPlan,
   sendUplink,
@@ -58,13 +59,53 @@ interface Hud {
   solar: number
   uplinks: number
   nextPass: string | null
+  nextPassMb: number
   onRover: number
-  received: number
+  heater: number
+}
+
+/** A tiny external store, so the HUD can update ~8×/s without re-rendering the whole game. */
+interface HudStore {
+  get: () => Hud | null
+  set: (h: Hud) => void
+  sub: (fn: () => void) => () => void
+}
+
+function makeHudStore(): HudStore {
+  let cur: Hud | null = null
+  const subs = new Set<() => void>()
+  return {
+    get: () => cur,
+    set: (h) => {
+      if (cur && (Object.keys(h) as (keyof Hud)[]).every((k) => h[k] === cur?.[k])) return
+      cur = h
+      subs.forEach((fn) => fn())
+    },
+    sub: (fn) => {
+      subs.add(fn)
+      return () => {
+        subs.delete(fn)
+      }
+    },
+  }
+}
+
+function useHud(store: HudStore): Hud | null {
+  return useSyncExternalStore(store.sub, store.get, () => null)
+}
+
+/** Elements that use Enter/Space themselves; the game must not steal those keys. */
+function isInteractive(el: HTMLElement | null): boolean {
+  if (!el) return false
+  if (el.isContentEditable) return true
+  if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A', 'SUMMARY'].includes(el.tagName)) return true
+  const role = el.getAttribute('role')
+  return role === 'switch' || role === 'radio' || role === 'button' || role === 'link' || role === 'checkbox' || role === 'tab'
 }
 
 const RULE_INFO: Record<RuleId, { name: string; text: string; icon: string }> = {
   haz: { name: 'Hazard avoidance', icon: '🪨', text: 'IF a rock or steep slope is ahead THEN steer around it and carry on.' },
-  vo: { name: 'Visual odometry', icon: '👁️', text: 'Compare camera pictures to measure real movement, so slip is caught. Drives 40% slower.' },
+  vo: { name: 'Visual odometry', icon: '👁️', text: 'Compare camera pictures to measure real movement, so slip is caught. Each drive takes 40% longer.' },
   power: { name: 'Power guard', icon: '🔋', text: 'IF battery is below 20% THEN stop and charge in the Sun (or park if it is too dark).' },
   aegis: { name: 'AEGIS science', icon: '✨', text: 'IF an interesting rock is next to the rover THEN zap it with the laser — no need to ask Earth.' },
   scifirst: { name: 'Science first', icon: '📦', text: 'At each relay pass, send science data before pictures.' },
@@ -74,7 +115,7 @@ const BRIEF = [
   'Drive to target ① and run Science 🔬 on it. Signals take 4 minutes each way. Build the turns and drives, check the orange line, then Send. ★★★ = done in 2 plans or fewer.',
   'The delay is 12 minutes now. Plan the WHOLE route in one go. Avoid rocks, steep slopes (striped) and dark dunes — deep sand traps a rover for good. ★★★ = one plan.',
   '20-minute delay. Pale rippled sand makes wheels slip, and small rocks are too small to see from orbit. Switch on onboard rules so the rover handles surprises without waiting for you. ★★★ = one plan.',
-  'One Mars day (sol). Four targets, a battery charged by the Sun, and only 60 MB per relay pass. Use AutoNav 🧭, rules and smart timing to get the most science to Earth before 17:15. ★★★ = 230 points.',
+  'One Mars day (sol). Four targets, a battery charged by the Sun (the heaters drain it in the cold morning), and relay passes that carry only 40, 60 and 40 MB. Use AutoNav 🧭, rules and smart timing to get the most science to Earth before 17:15.',
 ]
 
 function cmdLabel(c: Cmd, tier: TierIndex): string {
@@ -115,12 +156,97 @@ function cmdSpeak(c: Cmd): string {
   }
 }
 
+function ClockBar({ store, sim, cfg, speed, onSpeed }: { store: HudStore; sim: Sim; cfg: TierConfig; speed: number; onSpeed: () => void }) {
+  const h = useHud(store)
+  return (
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-white/10 bg-[#111C32] px-3 py-1.5 text-sm">
+      <span className="font-display text-lg font-black tabular-nums text-white" aria-label="Mars local time">
+        🕒 {fmtClock(clockAt(sim, h?.t ?? 0))}
+      </span>
+      <span className="text-[#A7B0C0]">mission +{Math.round(h?.t ?? 0)} min</span>
+      {cfg.legend && h && (
+        <span className="flex items-center gap-1.5 text-[#A7B0C0]" aria-label={`Battery ${h.whPct} percent, solar ${h.solar} watts${h.heater ? `, heaters ${h.heater} watts` : ''}`}>
+          <span aria-hidden>🔋</span>
+          <span className="relative inline-block h-3 w-14 overflow-hidden rounded-full bg-white/10">
+            <span className={`absolute inset-y-0 left-0 ${h.whPct < 20 ? 'bg-red-500' : h.whPct < 35 ? 'bg-amber-400' : 'bg-emerald-400'}`} style={{ width: `${Math.max(0, Math.min(100, h.whPct))}%` }} />
+          </span>
+          <b className="tabular-nums text-white">{h.whPct}%</b>
+          <span aria-hidden>☀️</span>
+          <b className="tabular-nums text-white">{h.solar} W</b>
+          {h.heater > 0 && (
+            <>
+              <span aria-hidden>🌡️</span>
+              <b className="tabular-nums text-sky-200">−{h.heater} W</b>
+            </>
+          )}
+        </span>
+      )}
+      <span className="ml-auto flex gap-2">
+        <button
+          type="button"
+          onClick={onSpeed}
+          aria-pressed={speed === 4}
+          className={`min-h-[44px] rounded-xl border px-3 font-black ${speed === 4 ? 'border-amber-400 bg-amber-400 text-[#1A1103]' : 'border-white/15 bg-white/5 text-white'}`}
+        >
+          ⏩ ×4
+        </button>
+      </span>
+    </div>
+  )
+}
+
+function StatusLine({ store, phase, started, endingSol, stuck, delay }: { store: HudStore; phase: Phase; started: boolean; endingSol: boolean; stuck: boolean; delay: number }) {
+  const h = useHud(store)
+  const text = (() => {
+    if (phase === 'over') return 'Mission over — see why it happened below.'
+    if (!started) return 'Planning. The mission clock starts when you press Send.'
+    if (stuck) return 'The rover is stuck, but its radio works: fast-forwarding so the relay passes can send its data home…'
+    if (endingSol) return 'Fast-forwarding to the end of the sol…'
+    if (h?.idle) return 'Your turn: plan the next drive. (Clock paused while you plan.)'
+    if (h && h.inFlight > 0) return `Commands flying to Mars… arrive in ${h.inFlight} min.`
+    return `Rover working. Everything you see is ${delay} min old.`
+  })()
+  return (
+    <p className="mt-2 rounded-xl bg-[#0a1120] px-3 py-2 text-sm font-bold text-amber-300" aria-live="polite">
+      {text}
+    </p>
+  )
+}
+
+function MissionStats({ store, legend }: { store: HudStore; legend: boolean }) {
+  const h = useHud(store)
+  return (
+    <>
+      <span>
+        Plans sent: <b className="text-white">{h?.uplinks ?? 0}</b>
+      </span>
+      {legend && (
+        <>
+          <span>
+            Science: <b className="text-white">{h?.points ?? 0} pts</b>
+          </span>
+          {h?.nextPass && (
+            <span>
+              Next relay pass: <b className="text-white">{h.nextPass}</b> ({h.nextPassMb} MB)
+            </span>
+          )}
+          <span>
+            Waiting on rover: <b className="text-white">{h?.onRover ?? 0} MB</b>
+          </span>
+        </>
+      )}
+    </>
+  )
+}
+
 export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props) {
   const tier = Math.max(0, Math.min(3, tierProp)) as TierIndex
   const cfg = TIERS[tier]
   const [mapNo, setMapNo] = useState(mapChoice[tier])
   const map = useMemo(() => buildMap(tier, mapNo), [tier, mapNo])
-  const simRef = useRef<Sim>(createSim(tier, map))
+  const [firstSim] = useState(() => createSim(tier, map))
+  const simRef = useRef<Sim>(firstSim)
+  const [hudStore] = useState(makeHudStore)
   const [plan, setPlan] = useState<Cmd[]>([])
   const [rules, setRules] = useState<RuleId[]>([])
   const [driveN, setDriveN] = useState(3)
@@ -128,13 +254,19 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
   const [speed, setSpeed] = useState(1)
   const [log, setLog] = useState<LogLine[]>([])
   const [outcome, setOutcome] = useState<Outcome | null>(null)
-  const [hud, setHud] = useState<Hud | null>(null)
   const [canvasH, setCanvasH] = useState(320)
   const [paused, setPaused] = useState(false)
+  const [endingSol, setEndingSol] = useState(false)
+  const [stuck, setStuck] = useState(false)
   const [, setVersion] = useState(0)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const slotRef = useRef<HTMLDivElement>(null)
+  const colRef = useRef<HTMLDivElement>(null)
+  const [pinH, setPinH] = useState(0)
+  const onScreenRef = useRef(true)
   const debriefRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<View | null>(null)
   const fxRef = useRef<Fx | null>(null)
@@ -156,6 +288,8 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
     terrainRef.current = bakeTerrain(map)
     setPlan([])
     setLog([])
+    setStuck(false)
+    setEndingSol(false)
     setVersion((n) => n + 1)
   }, [tier, map])
 
@@ -218,6 +352,13 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
           playSound('wrong')
           fx?.alarm()
           addLog(`🛑 Rover (at ${when}): wheels spinning, rover sinking into deep sand. It is stuck.`, 'bad')
+          if (cfg.legend) {
+            // Its radio still works: run the sol on so queued data can go home.
+            endSolRef.current = true
+            setEndingSol(true)
+            setStuck(true)
+            addLog('📡 The radio still works. Any data on board will go up with the next relay passes.', 'info')
+          }
           break
         case 'dead':
           playSound('wrong')
@@ -266,6 +407,7 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
     const sim = simRef.current
     sim.ended = true
     endSolRef.current = false
+    setEndingSol(false)
     const o = evaluate(sim)
     setOutcome(o)
     setPhase('over')
@@ -289,6 +431,16 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
       badges,
       attempts: Math.max(1, sim.uplinks.length),
     })
+    // The shell centres its results card over the whole game, which is far
+    // taller than a phone screen. Bring the card itself into view.
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.requestAnimationFrame(() =>
+      window.requestAnimationFrame(() => {
+        const card = rootRef.current?.parentElement?.querySelector<HTMLElement>('[role="dialog"][aria-label="Round results"] > div')
+        if (card) card.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' })
+        else rootRef.current?.scrollIntoView({ block: 'start' })
+      }),
+    )
   }, [outcome, onFinish, tier])
 
   // ── the loop ──
@@ -365,7 +517,7 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
         const last = sim.uplinks[sim.uplinks.length - 1]
         const pass = sim.passes.find((p) => !p.done)
         const knownT = sim.t - cfg.delay
-        setHud({
+        hudStore.set({
           t: sim.t,
           running,
           idle: sim.earthKnowsIdle,
@@ -375,8 +527,9 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
           solar: Math.round(solarW(clockAt(sim, sim.t))),
           uplinks: sim.uplinks.length,
           nextPass: pass ? fmtClock(clockAt(sim, pass.t)) : null,
+          nextPassMb: pass ? pass.mb : 0,
           onRover: sim.downlinkQueue.filter((d) => d.made <= knownT).reduce((s, d) => s + d.mb, 0),
-          received: sim.delivered.filter((a) => a.ev.k === 'science' || a.ev.k === 'aegis').length,
+          heater: cfg.legend ? Math.round(heaterW(clockAt(sim, sim.t))) : 0,
         })
       }
       raf = requestAnimationFrame(frame)
@@ -389,13 +542,22 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
       last = performance.now()
     }
     document.addEventListener('visibilitychange', onVis)
+    // Keys only drive the game while the map is actually on screen.
+    const io = new IntersectionObserver(
+      ([e]) => {
+        onScreenRef.current = e.isIntersecting && e.intersectionRatio >= 0.3
+      },
+      { threshold: [0, 0.3, 0.6, 1] },
+    )
+    io.observe(wrap)
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
+      io.disconnect()
       document.removeEventListener('visibilitychange', onVis)
       fxRef.current = null
     }
-  }, [map, cfg, onArrival, endRound])
+  }, [map, cfg, onArrival, endRound, hudStore])
 
   // ── plan editing ──
   const canEdit = phase === 'plan'
@@ -409,9 +571,12 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
           playSound('click')
           return [...p.slice(0, -1), { k: 'fwd', n: lastC.n + c.n }]
         }
-        if (c.k === 'turn' && lastC?.k === 'turn' && Math.abs(lastC.d + c.d) <= 4) {
+        if (c.k === 'turn' && lastC?.k === 'turn') {
+          // Merge turns, wrapping round a full circle: five right turns of
+          // 90° are one right turn, not 180° + 180° + 90°.
           playSound('click')
-          const d = lastC.d + c.d
+          let d = (((lastC.d + c.d) % 8) + 8) % 8
+          if (d > 4) d -= 8
           return d === 0 ? p.slice(0, -1) : [...p.slice(0, -1), { k: 'turn', d }]
         }
         if (p.length >= cfg.maxCmds) {
@@ -445,17 +610,55 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
   const endSol = () => {
     primeAudio()
     endSolRef.current = true
+    setEndingSol(true)
     setPhase('live')
     addLog('🌇 Ending the sol: waiting for the last relay pass and its data…', 'info')
   }
 
+  // Phones: pin the map while planning or watching; release it for the
+  // debrief, and once the game has scrolled away (the article below).
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px) and (min-height: 600px)')
+    let raf = 0
+    const check = () => {
+      raf = 0
+      const slot = slotRef.current
+      const col = colRef.current
+      const root = rootRef.current
+      if (!slot || !col || !root) return
+      const colH = col.offsetHeight
+      const top = slot.getBoundingClientRect().top
+      const bottom = root.getBoundingClientRect().bottom
+      const want = mq.matches && phase !== 'over' && top < 0 && bottom > colH + 120
+      setPinH(want ? Math.max(slot.offsetHeight, colH) : 0)
+    }
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(check)
+    }
+    check()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [phase])
+
   // Keyboard: arrows build the plan, Enter sends.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement | null
-      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return
+      if (e.altKey || e.ctrlKey || e.metaKey) return
+      const el = e.target instanceof HTMLElement ? e.target : null
       if (document.querySelector('[role="dialog"]')) return
       if (phaseRef.current !== 'plan') return
+      if (el && (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable)) return
+      // Only while the child is in the game: focus inside it, or the map on
+      // screen. Reading the article below must scroll, not add drives.
+      const inGame = !!el && !!rootRef.current?.contains(el)
+      if (!inGame && !onScreenRef.current) return
+      // Buttons, links and switches use Enter and Space themselves.
+      if ((e.key === 'Enter' || e.key === ' ') && isInteractive(el)) return
       if (e.key === 'ArrowUp') add({ k: 'fwd', n: 1 })
       else if (e.key === 'ArrowLeft') add({ k: 'turn', d: -turnStep })
       else if (e.key === 'ArrowRight') add({ k: 'turn', d: turnStep })
@@ -474,65 +677,38 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
 
   const sim = simRef.current
   const started = sim.uplinks.length > 0
-  const h = hud
-  const statusText = (() => {
-    if (phase === 'over') return 'Mission over — see why it happened below.'
-    if (!started) return 'Planning. The mission clock starts when you press Send.'
-    if (endSolRef.current) return 'Fast-forwarding to the end of the sol…'
-    if (h?.idle) return 'Your turn: plan the next drive. (Clock paused while you plan.)'
-    if (h && h.inFlight > 0) return `Commands flying to Mars… arrive in ${h.inFlight} min.`
-    return `Rover working. Everything you see is ${cfg.delay} min old.`
-  })()
+  const brief = cfg.legend ? `${BRIEF[tier]} ★★★ = ${legendStarLines(mapNo)[0]} points on this map.` : BRIEF[tier]
+  const timeNote = `Time is sped up: 1 second here = ${cfg.minPerSec} Mars minutes. A real one-way signal takes about 3 to 22 minutes, depending on where Earth and Mars are in their orbits. 1 square = ${CELL_M} m.`
 
   const btn =
     'inline-flex min-h-[48px] items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.09] to-white/[0.03] px-3 font-black text-white transition hover:border-white/25 active:scale-[.97] disabled:opacity-40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60'
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_380px]">
-      {/* ── map ── */}
-      <div className="flex min-w-0 flex-col gap-2">
-        <div ref={wrapRef} className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0a1120] shadow-[0_8px_24px_rgba(0,0,0,.45)]">
-          <canvas
-            ref={canvasRef}
-            className="block w-full"
-            style={{ height: canvasH }}
-            role="img"
-            aria-label={`Map of Mars, ${map.W * CELL_M} by ${map.H * CELL_M} metres. Rover at the landing site, ${map.targets.length} science target${map.targets.length > 1 ? 's' : ''}. ${statusText}`}
-          />
-          {paused && (
-            <div className="absolute inset-0 flex items-center justify-center bg-slate-950/70 text-lg font-black text-white">Paused — come back to the tab</div>
-          )}
+    <div ref={rootRef} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_380px]">
+      {/* ── map ── On phones the map is pinned to the top of the screen while
+          the child builds the plan below it, so the orange preview line stays
+          in sight. (CSS sticky cannot work here: the site's body is a scroll
+          container, so this pins with position: fixed and leaves a slot.) */}
+      <div ref={slotRef} className="min-w-0 lg:self-start" style={pinH ? { height: pinH } : undefined}>
+        <div
+          ref={colRef}
+          className={`flex min-w-0 flex-col gap-1.5 ${pinH ? 'fixed inset-x-0 top-0 z-30 border-b border-white/10 bg-[#0B1020]/95 px-3 pb-1.5 pt-1.5 shadow-[0_8px_24px_rgba(0,0,0,.5)]' : ''}`}
+        >
+          <div ref={wrapRef} className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0a1120] shadow-[0_8px_24px_rgba(0,0,0,.45)]">
+            <canvas
+              ref={canvasRef}
+              className="block w-full"
+              style={{ height: canvasH }}
+              role="img"
+              aria-label={`Map of Mars, ${map.W * CELL_M} by ${map.H * CELL_M} metres. Rover at the landing site, ${map.targets.length} science target${map.targets.length > 1 ? 's' : ''}.`}
+            />
+            {paused && (
+              <div className="absolute inset-0 flex items-center justify-center bg-slate-950/70 text-lg font-black text-white">Paused — come back to the tab</div>
+            )}
+          </div>
+          <ClockBar store={hudStore} sim={sim} cfg={cfg} speed={speed} onSpeed={() => setSpeed((s) => (s === 1 ? 4 : 1))} />
+          <p className="hidden px-1 text-xs text-[#6E7888] lg:block">{timeNote}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-[#111C32] px-3 py-2 text-sm">
-          <span className="font-display text-lg font-black tabular-nums text-white" aria-label="Mars local time">
-            🕒 {fmtClock(clockAt(sim, h?.t ?? 0))}
-          </span>
-          <span className="text-[#A7B0C0]">Mars time · mission +{Math.round(h?.t ?? 0)} min</span>
-          {cfg.legend && h && (
-            <span className="flex items-center gap-1.5 text-[#A7B0C0]" aria-label={`Battery ${h.whPct} percent, solar ${h.solar} watts`}>
-              <span aria-hidden>🔋</span>
-              <span className="relative inline-block h-3 w-16 overflow-hidden rounded-full bg-white/10">
-                <span className={`absolute inset-y-0 left-0 ${h.whPct < 20 ? 'bg-red-500' : h.whPct < 35 ? 'bg-amber-400' : 'bg-emerald-400'}`} style={{ width: `${Math.max(0, Math.min(100, h.whPct))}%` }} />
-              </span>
-              <b className="tabular-nums text-white">{h.whPct}%</b>
-              <span aria-hidden>☀️</span>
-              <b className="tabular-nums text-white">{h.solar} W</b>
-            </span>
-          )}
-          <span className="ml-auto flex gap-2">
-            <button
-              type="button"
-              onClick={() => setSpeed((s) => (s === 1 ? 4 : 1))}
-              aria-pressed={speed === 4}
-              className={`min-h-[44px] rounded-xl border px-3 font-black ${speed === 4 ? 'border-amber-400 bg-amber-400 text-[#1A1103]' : 'border-white/15 bg-white/5 text-white'}`}
-            >
-              ⏩ ×4
-            </button>
-          </span>
-        </div>
-        <p className="px-1 text-xs text-[#6E7888]">
-          Time is sped up: 1 second here = {cfg.minPerSec} Mars minutes. A real one-way signal takes about 3 to 22 minutes, depending on where Earth and Mars are in their orbits. 1 square = {CELL_M} m.
-        </p>
       </div>
 
       {/* ── mission control ── */}
@@ -541,29 +717,10 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
           <h2 className="font-display text-lg font-black text-white">
             {cfg.name} mission <span className="text-sm font-bold text-[#A7B0C0]">· map {mapNo + 1}/{MAPS_PER_TIER}</span>
           </h2>
-          <p className="mt-1 text-[15px] leading-snug text-[#EEF2F8]">{BRIEF[tier]}</p>
-          <p className="mt-2 rounded-xl bg-[#0a1120] px-3 py-2 text-sm font-bold text-amber-300" aria-live="polite">
-            {statusText}
-          </p>
+          <p className="mt-1 text-[15px] leading-snug text-[#EEF2F8]">{brief}</p>
+          <StatusLine store={hudStore} phase={phase} started={started} endingSol={endingSol} stuck={stuck} delay={cfg.delay} />
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[#A7B0C0]">
-            <span>
-              Plans sent: <b className="text-white">{h?.uplinks ?? 0}</b>
-            </span>
-            {cfg.legend && (
-              <>
-                <span>
-                  Science: <b className="text-white">{h?.points ?? 0} pts</b>
-                </span>
-                {h?.nextPass && (
-                  <span>
-                    Next relay pass: <b className="text-white">{h.nextPass}</b> (60 MB)
-                  </span>
-                )}
-                <span>
-                  Waiting on rover: <b className="text-white">{h?.onRover ?? 0} MB</b>
-                </span>
-              </>
-            )}
+            <MissionStats store={hudStore} legend={cfg.legend} />
             {!started && phase === 'plan' && (
               <button
                 type="button"
@@ -659,7 +816,7 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
 
             <div className="mt-3">
               <p className="text-xs font-bold uppercase tracking-wide text-[#A7B0C0]">
-                Plan ({plan.length}/{cfg.maxCmds}) — keys: ↑ drive, ← → turn, S science, ⌫ undo, Enter send
+                Plan ({plan.length}/{cfg.maxCmds}) — keys: ↑ drive, ← → turn, S science{cfg.legend ? ', P photo' : ''}, ⌫ undo, Enter send
               </p>
               {plan.length === 0 ? (
                 <p className="mt-1 rounded-xl border border-dashed border-white/15 p-3 text-sm text-[#A7B0C0]">
@@ -783,6 +940,7 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
             </ul>
           )}
         </section>
+        <p className="px-1 text-xs text-[#6E7888] lg:hidden">{timeNote}</p>
       </div>
     </div>
   )

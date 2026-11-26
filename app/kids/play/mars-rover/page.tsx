@@ -79,8 +79,8 @@ const TIERS = [
   {
     name: 'Legend',
     who: '14 and up — a real mission-planning challenge',
-    what: 'One whole Mars day. Four targets worth different points, a solar battery that charges only when the Sun is high, and relay passes that carry only 60 MB each. Score is the science that reaches Earth, plus energy left for the night.',
-    tip: 'Driving in the cold early morning drains the battery fast, so think about a Wait or the Power guard. AutoNav needs good position knowledge, so pair it with Visual odometry. Pictures cost bandwidth: take one only when it changes a decision.',
+    what: 'One whole Mars day. Four targets worth different points, a solar battery that charges only when the Sun is high, and relay passes that carry only 40, 60 and 40 MB. Score is the science that reaches Earth, plus energy left for the night. Every map has a par score from our solver, and ★★★ needs 85% of it.',
+    tip: 'At dawn the heaters are still running and the Sun is weak, so driving straight away drains the battery fast: think about a Wait or the Power guard. Time your samples so their data catches a relay pass. AutoNav needs good position knowledge, so pair it with Visual odometry. Pictures cost bandwidth: take one only when it changes a decision.',
   },
 ]
 
@@ -140,7 +140,7 @@ export default function MarsRoverPage() {
           craters, and every map is checked to have a safe route. Each square is 5 metres and the rover drives one square in 2 minutes, about the top
           speed of a real Mars rover. Commands reach Mars only after the delay; the rover runs them step by step; reports and pictures come back
           after the delay again, and that is all you ever see while playing. Slip on sand is modelled cell by cell, so a rover without visual
-          odometry really does lose track of where it is. In Legend the battery charges with the angle of the Sun and drains with every drive,
+          odometry really does lose track of where it is. In Legend the battery charges with the angle of the Sun and drains with every drive and with the heaters that keep the rover warm in the cold morning,
           and data leaves Mars only during relay passes. Time is sped up so a mission fits in a few minutes, and the clock pauses while you plan.
           After each round a debrief explains why things happened, and the map reveals where the rover really drove.
         </p>

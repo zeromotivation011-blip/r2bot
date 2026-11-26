@@ -26,8 +26,9 @@ export interface View {
   h: number
 }
 
-export function makeView(width: number): View {
-  const cell = Math.min(84, width / COLS)
+/** Size the board to fit both the available width and (optionally) height. */
+export function makeView(width: number, height = Infinity): View {
+  const cell = Math.max(24, Math.min(84, width / COLS, height / ROWS))
   return { cell, w: cell * COLS, h: cell * ROWS }
 }
 

@@ -128,7 +128,8 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
     simRef.current = new ArmSim(cfg)
     if (cfg.mode === 'program' || cfg.pendant) simRef.current.beltOn = false
   }
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  /** Holds the WebGL <canvas>, which the render effect creates and removes itself. */
+  const glHostRef = useRef<HTMLDivElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<FactoryScene | null>(null)
   const [snap, setSnap] = useState<Snap>(() => takeSnap(simRef.current as ArmSim))
@@ -200,7 +201,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
         const stars = mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1
         finishRound({
           stars,
-          score: r1(sim.time),
+          score: r1(sim.time - Math.max(0, sim.firstInput)),
           scoreLabel: 'seconds',
           lowerIsBetter: true,
           message:
@@ -479,14 +480,21 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
   // ── Render loop ───────────────────────────────────────────────────────────
 
   useEffect(() => {
-    const canvas = canvasRef.current
+    const host = glHostRef.current
     const wrap = wrapRef.current
-    if (!canvas || !wrap) return
+    if (!host || !wrap) return
+    // A fresh <canvas> per scene: dispose() force-loses its WebGL context (so
+    // GPU memory is freed on every round change), and a lost context can never
+    // be reused, so the next scene (or a Strict Mode re-run) must not share it.
+    const canvas = document.createElement('canvas')
+    canvas.className = 'absolute inset-0 block h-full w-full'
+    host.appendChild(canvas)
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let scene: FactoryScene
     try {
       scene = new FactoryScene(canvas, { pillar: cfg.pillar, reducedMotion: reduced })
     } catch (err) {
+      canvas.remove()
       console.error('Arm Factory: 3D view failed to start', err)
       say('This device could not start 3D graphics. Try another browser.', 'bad')
       return
@@ -542,6 +550,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
       ro.disconnect()
       document.removeEventListener('visibilitychange', onVis)
       scene.dispose()
+      canvas.remove()
       sceneRef.current = null
     }
   }, [cfg, say, tier])
@@ -629,7 +638,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
     const moved = Math.hypot(e.clientX - down.current.x, e.clientY - down.current.y)
     down.current = null
     if (moved > 10) return
-    const c = canvasRef.current
+    const c = glHostRef.current
     const scene = sceneRef.current
     if (!c || !scene) return
     const r = c.getBoundingClientRect()
@@ -702,14 +711,14 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
           : `Sorted ${snap.sorted}/${LEGEND_PARTS} · ${snap.runTime.toFixed(1)} s`
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_400px]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1fr)_400px]">
       <div
         ref={wrapRef}
         className="relative aspect-[4/3] w-full self-start overflow-hidden rounded-3xl border border-white/10 bg-slate-950 lg:sticky lg:top-3 lg:aspect-auto lg:h-[600px]"
       >
-        <canvas
-          ref={canvasRef}
-          className={`absolute inset-0 h-full w-full touch-manipulation ${cfg.mode === 'plan' ? 'cursor-crosshair' : ''}`}
+        <div
+          ref={glHostRef}
+          className={`absolute inset-0 touch-manipulation ${cfg.mode === 'plan' ? 'cursor-crosshair' : ''}`}
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           aria-label="3D view of the robot arm, the conveyor belt and three coloured bins"
@@ -726,7 +735,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
               role="radio"
               aria-checked={cam === c}
               onClick={() => setCam(c)}
-              className={`min-h-[40px] min-w-[44px] rounded-lg px-2 text-xs font-black capitalize ${cam === c ? 'bg-amber-400 text-slate-900' : 'text-white/75 hover:text-white'}`}
+              className={`min-h-[44px] min-w-[44px] rounded-lg px-2 text-xs font-black capitalize ${cam === c ? 'bg-amber-400 text-slate-900' : 'text-white/75 hover:text-white'}`}
             >
               {c}
             </button>
@@ -754,7 +763,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
           <div
             key={coach.id}
             role="status"
-            className={`absolute inset-x-2 bottom-14 mx-auto max-w-lg rounded-2xl px-3 py-2 text-center text-sm font-bold shadow-xl sm:bottom-16 ${
+            className={`pointer-events-none absolute inset-x-2 bottom-14 mx-auto max-w-lg rounded-2xl px-3 py-2 text-center text-sm font-bold shadow-xl sm:bottom-16 ${
               coach.tone === 'good' ? 'bg-emerald-500/90 text-white' : coach.tone === 'bad' ? 'bg-rose-600/90 text-white' : 'bg-slate-800/95 text-white'
             }`}
           >

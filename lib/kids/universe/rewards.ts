@@ -91,7 +91,7 @@ export const UNIVERSE_BADGES: UniverseBadge[] = [
   { id: 'pid-tuner', name: 'PID Tuner', icon: '📈', track: 'control', earnedFor: 'you tuned a controller until it stopped wobbling.' },
   { id: 'hover-hero', name: 'Hover Hero', icon: '🚁', track: 'control', earnedFor: 'you held a drone steady at its target height.' },
   { id: 'arm-artist', name: 'Arm Artist', icon: '🦾', track: 'mechanics', earnedFor: 'you moved a robot arm joint by joint to grab something.' },
-  { id: 'gear-head', name: 'Gear Head', icon: '⚙️', track: 'mechanics', earnedFor: 'you chose the right gear for speed or strength.' },
+  { id: 'gear-head', name: 'Gear Head', icon: '⚙️', track: 'mechanics', earnedFor: 'you matched a machine’s speed to its strength — the right gear, or the right arm speed for a heavy load.' },
   { id: 'circuit-closer', name: 'Circuit Closer', icon: '💡', track: 'electronics', earnedFor: 'you built a complete circuit that worked.' },
   { id: 'ohms-friend', name: "Ohm's Friend", icon: 'Ω', track: 'electronics', earnedFor: 'you picked a resistor that kept an LED safe.' },
   { id: 'robot-teacher', name: 'Robot Teacher', icon: '🧠', track: 'ai', earnedFor: 'you trained a robot brain with your own examples.' },

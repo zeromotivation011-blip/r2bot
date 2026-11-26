@@ -38,6 +38,24 @@ export function mulberry32(seed: number): () => number {
   }
 }
 
+/**
+ * A reproducible random number in [0, 1) for one particular reading. Noise is
+ * keyed by WHERE and WHEN it happens (square, beam, how many times this square
+ * has been scanned), not drawn from one shared stream, so changing a setting
+ * only changes the readings it really affects. Real sensor noise is independent
+ * from reading to reading; this keeps that and makes it repeatable.
+ */
+export function hash01(seed: number, a: number, b: number, c: number, d: number): number {
+  let h = (seed ^ 0x9e3779b9) >>> 0
+  for (const v of [a, b, c, d]) {
+    h = Math.imul(h ^ (v >>> 0), 0x85ebca6b) >>> 0
+    h = (h ^ (h >>> 13)) >>> 0
+    h = Math.imul(h, 0xc2b2ae35) >>> 0
+    h = (h ^ (h >>> 16)) >>> 0
+  }
+  return h / 4294967296
+}
+
 // ── Directions ───────────────────────────────────────────────────────────────
 
 /** 0 = North (up), 1 = East, 2 = South, 3 = West. */
@@ -530,6 +548,51 @@ export function plan(W: number, H: number, passable: (i: number) => boolean, sta
   return { found: found >= 0, path, order, dist, expanded: order.length, algo }
 }
 
+export interface RaceRow {
+  algo: PlannerId
+  /** Squares examined over all trips. */
+  expanded: number
+  /** Total route length over all trips. */
+  steps: number
+  /** Trips where this planner's route was longer than the shortest one. */
+  longer: number
+  /** The worst detour on one trip, in extra steps. */
+  maxExtra: number
+}
+
+/**
+ * A fair planner race: the same seeded trips between floor squares of the
+ * real maze, planned by BFS, A* and greedy best-first. Shows the trade-off
+ * honestly — squares checked against route length — on long trips, where the
+ * difference between the planners actually appears.
+ */
+export function plannerRace(maze: Maze, trips = 40): RaceRow[] {
+  const free: number[] = []
+  for (let i = 0; i < maze.W * maze.H; i++) if (!maze.wall[i]) free.push(i)
+  const rng = mulberry32(maze.seed ^ 0x2545f491)
+  const pass = (i: number): boolean => !maze.wall[i]
+  const rows: RaceRow[] = (['bfs', 'astar', 'greedy'] as const).map((algo) => ({ algo, expanded: 0, steps: 0, longer: 0, maxExtra: 0 }))
+  let done = 0
+  for (let guard = 0; done < trips && guard < trips * 4; guard++) {
+    const a = free[Math.floor(rng() * free.length)]
+    const b = free[Math.floor(rng() * free.length)]
+    if (Math.abs((a % maze.W) - (b % maze.W)) + Math.abs(Math.floor(a / maze.W) - Math.floor(b / maze.W)) < 8) continue
+    done++
+    const res = rows.map((r) => plan(maze.W, maze.H, pass, a, [b], r.algo))
+    const best = Math.min(...res.map((r) => r.path.length))
+    res.forEach((r, k) => {
+      rows[k].expanded += r.expanded
+      rows[k].steps += r.path.length
+      const extra = r.path.length - best
+      if (extra > 0) {
+        rows[k].longer++
+        rows[k].maxExtra = Math.max(rows[k].maxExtra, extra)
+      }
+    })
+  }
+  return rows
+}
+
 // ── The robot and its map ────────────────────────────────────────────────────
 
 export interface Beam {
@@ -577,7 +640,10 @@ export class World {
   /** Squares that became known in the last scan. */
   newlyKnown: number[] = []
   escaped = false
-  private rng: () => number
+  /** How many times each square has been scanned / each move tried (noise keys). */
+  private scanCount: Uint16Array
+  private moveCount: Uint16Array
+  private noiseSeed: number
   private lThresh: number
 
   constructor(tier: TierIndex, mazeIdx: number, batteryMax: number, trust?: number) {
@@ -595,7 +661,9 @@ export class World {
     this.visits = new Uint16Array(this.W * this.H)
     this.visits[this.pos] = 1
     this.trail = [this.pos]
-    this.rng = mulberry32(this.maze.seed ^ 0x5bd1e995)
+    this.noiseSeed = (this.maze.seed ^ 0x5bd1e995) >>> 0
+    this.scanCount = new Uint16Array(this.W * this.H)
+    this.moveCount = new Uint16Array(this.W * this.H * 4)
     const p = trust ?? this.cfg.trust
     this.lThresh = Math.log(p / (1 - p))
     // The robot knows the square it is standing on is floor.
@@ -636,6 +704,8 @@ export class World {
     const x0 = this.x()
     const y0 = this.y()
     this.scans++
+    const visit = this.scanCount[this.pos]
+    this.scanCount[this.pos] = Math.min(65000, visit + 1)
     const beams: Beam[] = []
     const step = cfg.beams === 8 ? 1 : 2
     for (let d = 0; d < 8; d += step) {
@@ -665,8 +735,8 @@ export class World {
       let wrong = false
       let dropped = false
       if (cfg.noise > 0 || cfg.dropout > 0) {
-        const r = this.rng()
-        const r2 = this.rng()
+        const r = hash01(this.noiseSeed, this.pos, d, visit, 0)
+        const r2 = hash01(this.noiseSeed, this.pos, d, visit, 1)
         if (r < cfg.dropout) dropped = true
         else if (r < cfg.dropout + cfg.noise) {
           wrong = true
@@ -729,7 +799,10 @@ export class World {
       this.lo[n] = Math.max(this.lo[n], 4)
       return 'bump'
     }
-    if (this.cfg.slip > 0 && this.rng() < this.cfg.slip) {
+    const mk = this.pos * 4 + d
+    const tries = this.moveCount[mk]
+    this.moveCount[mk] = Math.min(65000, tries + 1)
+    if (this.cfg.slip > 0 && hash01(this.noiseSeed, this.pos, d, tries, 2) < this.cfg.slip) {
       this.slips++
       this.battery -= 1
       return 'slip'
@@ -1107,12 +1180,76 @@ export function runHeadless(tier: TierIndex, mazeIdx: number, settings: AutoSett
 }
 
 export const ACE_BASELINE: AutoSettings = { scans: 1, trust: 0.7, planner: 'bfs', eastBias: 0, frontierRule: 'path' }
-export const LEGEND_DEFAULT: AutoSettings = { scans: 1, trust: 0.55, planner: 'bfs', eastBias: 0, frontierRule: 'straight' }
-export const LEGEND_REFERENCES: { name: string; settings: AutoSettings }[] = [
-  { name: 'Quick & trusting (BFS, 1 scan, 55%)', settings: { scans: 1, trust: 0.55, planner: 'bfs', eastBias: 0, frontierRule: 'straight' } },
-  { name: 'Careful (A*, 2 scans, 80%)', settings: { scans: 2, trust: 0.8, planner: 'astar', eastBias: 0, frontierRule: 'straight' } },
-  { name: 'Careful + east hunch (A*, 2 scans, 80%, bias 1)', settings: { scans: 2, trust: 0.8, planner: 'astar', eastBias: 1, frontierRule: 'straight' } },
-]
+/** A middling first brain: it gets out, but leaves plenty to improve. */
+export const LEGEND_DEFAULT: AutoSettings = { scans: 2, trust: 0.65, planner: 'bfs', eastBias: 0, frontierRule: 'straight' }
+
+// ── Legend mission score ─────────────────────────────────────────────────────
+// The Legend mission is "get out AND bring back a map the rescue team can
+// trust". A wrong square on the map costs as much as WRONG_SQUARE_COST energy,
+// because a team that trusts a ghost wall (or walks into a missing one) pays
+// for it later. So a careless, fast brain no longer wins.
+
+export const WRONG_SQUARE_COST = 5
+
+export function missionCost(s: RunSummary): number {
+  // Whole numbers, so the score a child sees is exactly the one that is judged.
+  return s.escaped ? Math.round(s.energy + WRONG_SQUARE_COST * s.wrong) : Infinity
+}
+
+export const LEGEND_SCANS = [1, 2, 3, 4] as const
+export const LEGEND_TRUSTS = [0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9] as const
+export const LEGEND_PLANNERS: readonly PlannerId[] = ['bfs', 'astar', 'greedy']
+export const LEGEND_BIASES = [0, 1, 2] as const
+
+export function settingsKey(s: AutoSettings): string {
+  return `${s.scans}|${Math.round(s.trust * 100)}|${s.planner}|${s.eastBias}`
+}
+
+/** Every brain the Legend panel can build (4 × 8 × 3 × 3 = 288). */
+export function allLegendSettings(): AutoSettings[] {
+  const out: AutoSettings[] = []
+  for (const scans of LEGEND_SCANS)
+    for (const trust of LEGEND_TRUSTS)
+      for (const planner of LEGEND_PLANNERS)
+        for (const eastBias of LEGEND_BIASES) out.push({ scans, trust, planner, eastBias, frontierRule: 'straight' })
+  return out
+}
+
+export interface LegendSweep {
+  results: Map<string, RunSummary>
+  /** Mission costs of every brain, best first (Infinity = did not get out). */
+  costs: number[]
+  /** Cost needed for 3 stars (top 10%) and 2 stars (top 40%). */
+  three: number
+  two: number
+}
+
+const sweepCache = new Map<number, { todo: AutoSettings[]; results: Map<string, RunSummary>; done: LegendSweep | null }>()
+
+/**
+ * Runs every possible Legend brain on one maze, a few at a time, so the stars
+ * are relative to what is actually possible on THAT maze. Call with a time
+ * budget from the frame loop; returns the finished sweep once all are run.
+ */
+export function legendSweep(idx: number, budgetMs = Infinity): LegendSweep | null {
+  let st = sweepCache.get(idx)
+  if (!st) {
+    st = { todo: allLegendSettings(), results: new Map(), done: null }
+    sweepCache.set(idx, st)
+  }
+  if (st.done) return st.done
+  const battery = batteryFor(3, idx)
+  const t0 = Date.now()
+  while (st.todo.length) {
+    const s = st.todo.pop() as AutoSettings
+    st.results.set(settingsKey(s), runHeadless(3, idx, s, battery))
+    if (Date.now() - t0 > budgetMs) return null
+  }
+  const costs = [...st.results.values()].map(missionCost).sort((a, b) => a - b)
+  const at = (q: number): number => costs[Math.max(0, Math.ceil(q * costs.length) - 1)]
+  st.done = { results: st.results, costs, three: at(0.1), two: at(0.4) }
+  return st.done
+}
 
 export interface PilotStats {
   /** Longest loop the robot can fall into from the start. */
@@ -1180,15 +1317,16 @@ export function batteryFor(tier: TierIndex, idx: number): number {
     const s = runHeadless(2, idx, ACE_BASELINE, 1e9)
     b = Math.round(s.energy * 1.5) + 10
   } else {
-    // 1.6 × the median of four sensible set-ups: careful robots win, careless ones run dry.
+    // Generous: most brains get out, so the stars (from legendSweep) decide
+    // how good a brain is. 2.5 × the median of four sensible set-ups.
     const sensible: AutoSettings[] = [
-      { scans: 1, trust: 0.8, planner: 'astar', eastBias: 1, frontierRule: 'straight' },
-      { scans: 2, trust: 0.7, planner: 'astar', eastBias: 1, frontierRule: 'straight' },
+      { scans: 1, trust: 0.7, planner: 'astar', eastBias: 0, frontierRule: 'straight' },
+      { scans: 2, trust: 0.7, planner: 'bfs', eastBias: 0, frontierRule: 'straight' },
       { scans: 2, trust: 0.8, planner: 'astar', eastBias: 1, frontierRule: 'straight' },
-      { scans: 3, trust: 0.8, planner: 'astar', eastBias: 1, frontierRule: 'straight' },
+      { scans: 1, trust: 0.8, planner: 'astar', eastBias: 1, frontierRule: 'straight' },
     ]
     const e = sensible.map((st) => runHeadless(3, idx, st, 1e9).energy).sort((a, c) => a - c)
-    b = Math.round(((e[1] + e[2]) / 2) * 1.6) + 10
+    b = Math.round(((e[1] + e[2]) / 2) * 2.5) + 10
   }
   budgetCache.set(key, b)
   return b

@@ -329,13 +329,13 @@ export function PlanEditor(props: {
                   {s.kind === 'move' ? `Move → ${s.label}` : s.kind === 'grip' ? '✊ Grip' : '✋ Release'}
                 </span>
                 {props.badSteps.has(i) && <span className="text-xs font-black text-red-300">hits!</span>}
-                <button type="button" aria-label={`Move step ${i + 1} up`} onClick={() => props.onMoveStep(i, -1)} className="h-9 w-9 rounded-md text-white/60 hover:bg-white/10">
+                <button type="button" aria-label={`Move step ${i + 1} up`} onClick={() => props.onMoveStep(i, -1)} className="h-11 w-11 rounded-md text-white/60 hover:bg-white/10">
                   ↑
                 </button>
-                <button type="button" aria-label={`Move step ${i + 1} down`} onClick={() => props.onMoveStep(i, 1)} className="h-9 w-9 rounded-md text-white/60 hover:bg-white/10">
+                <button type="button" aria-label={`Move step ${i + 1} down`} onClick={() => props.onMoveStep(i, 1)} className="h-11 w-11 rounded-md text-white/60 hover:bg-white/10">
                   ↓
                 </button>
-                <button type="button" aria-label={`Delete step ${i + 1}`} onClick={() => props.onRemove(i)} className="h-9 w-9 rounded-md text-red-300 hover:bg-red-500/20">
+                <button type="button" aria-label={`Delete step ${i + 1}`} onClick={() => props.onRemove(i)} className="h-11 w-11 rounded-md text-red-300 hover:bg-red-500/20">
                   ✕
                 </button>
               </li>
@@ -432,7 +432,7 @@ export function ProgramEditor(props: {
     ;[next[i], next[k]] = [next[k], next[i]]
     setProgram(next)
   }
-  const sel = 'min-h-[40px] rounded-lg border border-white/15 bg-slate-800 px-1.5 text-sm font-bold text-white disabled:opacity-50'
+  const sel = 'min-h-[44px] rounded-lg border border-white/15 bg-slate-800 px-1.5 text-sm font-bold text-white disabled:opacity-50'
   return (
     <div className="space-y-3">
       <Panel title="Live sensors">
@@ -527,10 +527,10 @@ export function ProgramEditor(props: {
                   ))}
                 </select>
                 <span className="ml-auto flex">
-                  <button type="button" aria-label={`Move step ${i + 1} up`} disabled={props.running} onClick={() => move(i, -1)} className="h-10 w-9 rounded-md text-white/60 hover:bg-white/10">
+                  <button type="button" aria-label={`Move step ${i + 1} up`} disabled={props.running} onClick={() => move(i, -1)} className="h-11 w-11 rounded-md text-white/60 hover:bg-white/10">
                     ↑
                   </button>
-                  <button type="button" aria-label={`Move step ${i + 1} down`} disabled={props.running} onClick={() => move(i, 1)} className="h-10 w-9 rounded-md text-white/60 hover:bg-white/10">
+                  <button type="button" aria-label={`Move step ${i + 1} down`} disabled={props.running} onClick={() => move(i, 1)} className="h-11 w-11 rounded-md text-white/60 hover:bg-white/10">
                     ↓
                   </button>
                   <button
@@ -538,7 +538,7 @@ export function ProgramEditor(props: {
                     aria-label={`Delete step ${i + 1}`}
                     disabled={props.running}
                     onClick={() => setProgram(program.filter((_, k) => k !== i))}
-                    className="h-10 w-9 rounded-md text-red-300 hover:bg-red-500/20"
+                    className="h-11 w-11 rounded-md text-red-300 hover:bg-red-500/20"
                   >
                     ✕
                   </button>
@@ -578,7 +578,7 @@ export function ProgramEditor(props: {
                 role="radio"
                 aria-checked={props.timeScale === n}
                 onClick={() => props.setTimeScale(n)}
-                className={`min-h-[40px] min-w-[40px] rounded-lg text-sm font-black ${props.timeScale === n ? 'bg-amber-400 text-slate-900' : 'text-white/70'}`}
+                className={`min-h-[44px] min-w-[44px] rounded-lg text-sm font-black ${props.timeScale === n ? 'bg-amber-400 text-slate-900' : 'text-white/70'}`}
               >
                 {n}×
               </button>

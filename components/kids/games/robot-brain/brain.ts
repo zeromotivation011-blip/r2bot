@@ -28,6 +28,8 @@ export interface Example {
   n: number
   /** The shape actually drawn, when it differs from the label (bad data). */
   truth?: ClassId
+  /** For augmented copies: the id of the drawing they were made from. */
+  parent?: number
 }
 
 export interface FeatureVec {
@@ -233,17 +235,18 @@ export function train(examples: Example[], classes: ClassId[], rep: Representati
 }
 
 function emptyVotes(): Record<ClassId, number> {
-  return { left: 0, right: 0, circle: 0, stop: 0 }
+  return { left: 0, right: 0, circle: 0, tri: 0, stop: 0 }
 }
 
-export function predictVec(brain: TrainedBrain, q: Float32Array, skip = -1): Prediction {
+export function predictVec(brain: TrainedBrain, q: Float32Array, skip?: (index: number) => boolean): Prediction {
   const votes = emptyVotes()
   if (!brain.examples.length) return { label: null, votes, neighbours: [], unfamiliar: true }
   const all: Neighbour[] = []
   for (let i = 0; i < brain.vecs.length; i++) {
-    if (i === skip) continue
+    if (skip?.(i)) continue
     all.push({ index: i, dist: distance(q, brain.vecs[i]) })
   }
+  if (!all.length) return { label: null, votes, neighbours: [], unfamiliar: true }
   all.sort((a, b) => a.dist - b.dist || a.index - b.index)
   const near = all.slice(0, Math.max(1, Math.min(brain.k, all.length)))
   let total = 0
@@ -271,6 +274,9 @@ export interface TestItem {
   truth: ClassId
   /** Plain-language note on how it was drawn ("tilted 20°, small, moved left"). */
   note: string
+  /** Degrees it was turned, and whether it was drawn in a hurry. */
+  rot?: number
+  hurried?: boolean
 }
 
 export interface Graded {
@@ -316,6 +322,21 @@ export function trainingAccuracy(brain: TrainedBrain): number {
   return ok / brain.examples.length
 }
 
+/**
+ * Leave-one-out accuracy: each training example is hidden while it is tested,
+ * so it cannot vote for itself — and neither can its augmented copies (or the
+ * drawing it was copied from), which would be cheating just the same.
+ */
+export function leaveOneOutAccuracy(brain: TrainedBrain): number {
+  if (brain.examples.length < 2) return 0
+  const group = brain.examples.map((e) => e.parent ?? e.id)
+  let ok = 0
+  brain.vecs.forEach((v, i) => {
+    if (predictVec(brain, v, (j) => group[j] === group[i]).label === brain.examples[i].label) ok++
+  })
+  return ok / brain.examples.length
+}
+
 // ── Explaining mistakes ─────────────────────────────────────────────────────
 
 export function exampleName(e: Example, glyph: string): string {
@@ -340,7 +361,7 @@ export function ordinal(n: number): string {
   return n + (s[(v - 20) % 10] || s[v] || s[0])
 }
 
-export type MistakeCause = 'mislabel' | 'outvoted' | 'position' | 'unfamiliar' | 'lookalike'
+export type MistakeCause = 'mislabel' | 'outvoted' | 'position' | 'tilt' | 'hurried' | 'unfamiliar' | 'lookalike'
 
 export interface MistakeReason {
   cause: MistakeCause
@@ -372,6 +393,26 @@ export function explainMistake(brain: TrainedBrain, g: Graded, glyph: (c: ClassI
     return {
       cause: 'position',
       text: `This ${was} was ${g.item.note}. Raw pixels compare which squares have ink, so a moved or resized drawing lands on different squares and looks like a ${said}.`,
+    }
+  }
+  const tilt = Math.abs(g.item.rot ?? 0)
+  if (brain.rep === 'features' && tilt >= 20 && !brain.examples.some((e) => e.source === 'augment')) {
+    return {
+      cause: 'tilt',
+      text: `This ${was} was turned ${Math.round(tilt)}°. Engineered features undo position and size, but NOT rotation, so a turned drawing still looks different. Tilted examples (or augmented copies) teach the robot about turning.`,
+    }
+  }
+  if (g.item.hurried) {
+    const rest = g.item.note.replace(/(, )?drawn in a hurry/, '').replace(/^, /, '')
+    return {
+      cause: 'hurried',
+      text: `This ${was} was drawn in a hurry${rest ? ` (${rest})` : ''}, and none of the closest examples looked like that. Teach the robot some quick, messy ${was} drawings too.`,
+    }
+  }
+  if (tilt >= 20) {
+    return {
+      cause: 'tilt',
+      text: `This ${was} was turned ${Math.round(tilt)}°, more than most of the examples. Features don't undo rotation, so it ended up nearer a ${said}. More turned ${was} examples would help.`,
     }
   }
   if (g.pred.unfamiliar) {

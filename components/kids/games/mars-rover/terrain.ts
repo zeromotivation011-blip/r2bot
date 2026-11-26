@@ -133,6 +133,23 @@ export const TIERS: TierConfig[] = [
   },
 ]
 
+/** Legend: total points of the four targets on every map. */
+export const LEGEND_TARGET_TOTAL = 240
+
+/**
+ * Legend "par" per map: the best single-plan score our solver found by trying
+ * every target order (2–4 targets), every set of onboard rules and a 0–120 min
+ * dawn wait (4,800 plans per map). ★★★ needs 85% of par, ★★ 55%. Re-run the
+ * solver and update these numbers if the Legend simulation or maps change.
+ */
+export const LEGEND_PAR = [253, 235, 299, 209, 257, 292]
+
+/** [★★★ line, ★★ line, par] for a Legend map. */
+export function legendStarLines(mapNo: number): [number, number, number] {
+  const par = LEGEND_PAR[mapNo] ?? 250
+  return [Math.round(par * 0.85), Math.round(par * 0.55), par]
+}
+
 export interface Target {
   id: number
   x: number
@@ -151,6 +168,8 @@ export interface BonusRock {
 
 export interface MarsMap {
   seed: number
+  /** Which of the tier's maps this is (0-based). */
+  no: number
   W: number
   H: number
   /** Height 0..1 per cell (for slope + shading). */
@@ -343,6 +362,14 @@ function buildOnce(tier: TierConfig, seed: number): MarsMap {
     }
   }
 
+  // Legend: farther targets are worth more, but every map offers the same
+  // total (about 240 points), so the star thresholds are fair on every map.
+  if (tier.legend && targets.length) {
+    const raw = targets.map((t) => 20 + Math.hypot(t.x - start.x, t.y - start.y) * 3.2)
+    const sum = raw.reduce((s, v) => s + v, 0)
+    targets.forEach((t, i) => (t.value = Math.round((LEGEND_TARGET_TOTAL * raw[i]) / sum / 5) * 5))
+  }
+
   const reserved = (x: number, y: number) =>
     (Math.abs(x - start.x) <= 1 && Math.abs(y - start.y) <= 1) || targets.some((t) => t.x === x && t.y === y)
 
@@ -392,7 +419,7 @@ function buildOnce(tier: TierConfig, seed: number): MarsMap {
   const craters: { x: number; y: number; r: number }[] = []
   for (let k = 0; k < 3 + Math.floor(W / 6); k++) craters.push({ x: rnd() * W, y: rnd() * H, r: 0.6 + rnd() * 1.6 })
 
-  return { seed, W, H, height, rock, hidden, dune, steep, slip, start, targets, bonus, craters }
+  return { seed, no: 0, W, H, height, rock, hidden, dune, steep, slip, start, targets, bonus, craters }
 }
 
 /** Build a solvable map for a tier. Deterministic for (tier, mapNo). */
@@ -412,14 +439,19 @@ export function buildMap(tierIndex: TierIndex, mapNo: number): MarsMap {
       }
       longest = Math.max(longest, L)
     }
-    // The straight line must not be a free ride: a direct route has to be
-    // longer than the straight-line distance (something is in the way).
+    // Reject maps whose shortest safe route is a long detour (more than 6
+    // moves longer than the straight line), so a good plan fits within the
+    // command limit. Nothing here forces a hazard onto the straight line; Ace
+    // and Legend place hidden rocks on it on purpose in buildOnce.
     if (ok && tier.targets === 1) {
       const t = m.targets[0]
       const direct = tier.turn90Only ? Math.abs(t.x - m.start.x) + Math.abs(t.y - m.start.y) : Math.max(Math.abs(t.x - m.start.x), Math.abs(t.y - m.start.y))
       if (longest > direct + 6) ok = false
     }
-    if (ok) return m
+    if (ok) {
+      m.no = mapNo
+      return m
+    }
   }
   // Fallback: the last attempt with its hazards cleared (never reached in practice).
   const m = buildOnce(tier, base)
@@ -427,6 +459,7 @@ export function buildMap(tierIndex: TierIndex, mapNo: number): MarsMap {
   m.hidden.fill(false)
   m.dune.fill(false)
   m.steep.fill(false)
+  m.no = mapNo
   return m
 }
 

@@ -223,17 +223,17 @@ export const BRIEFS: Record<TierIndex, Brief> = {
   },
   3: {
     title: 'Search and rescue',
-    goal: 'Find at least 4 of 6 hidden beacons and search 60% of the reef before the batteries run out.',
+    goal: 'Find at least 5 of 6 hidden beacons and search 75% of the reef before the batteries run out.',
     steps: [
-      '14 robots leave the dock. Dark water has not been searched yet.',
-      'Batteries drain from moving and from sensing: a bigger radius sees more but empties faster.',
-      '3 stars: all 6 beacons, 92% searched, 5 collisions or fewer.',
+      '14 robots leave the dock. Dark water has not been searched yet. The mission ends when every battery is flat.',
+      'Batteries drain from moving and from sensing: a bigger radius sees more but empties faster. Every crash and bump costs battery too.',
+      '3 stars: all 6 beacons, 90% searched, 3 collisions or fewer.',
     ],
     hints: [
       'A tight flock searches like one big robot. To search, robots need to spread out.',
       'Robots have no map. “Leave a trail” lets them mark where they have been — the orange glow.',
       '“Explore” makes each robot swim away from the trail, toward water nobody has searched.',
-      'Try a medium sensing radius (about 60–80). Too big drains the batteries; too small searches thin strips.',
+      'Watch when the batteries go flat. A big radius sees a wide strip but dies early; a small one lasts longer but sees a thin strip. Find the balance.',
     ],
   },
 }

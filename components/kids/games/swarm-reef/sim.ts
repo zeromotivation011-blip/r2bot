@@ -17,13 +17,24 @@ export const WORLD_W = 1000
 export const WORLD_H = 700
 export const DT = 1 / 60
 export const ROBOT_R = 5
-const ACC = 190 // max steering acceleration, units/s² per unit weight
+const ACC = 190 // steering acceleration, units/s² per unit of rule push
+/**
+ * Thruster limit: the SUM of all rule pushes is capped, so a robot can never
+ * accelerate harder than F_MAX × ACC (≈ 475 units/s²). However high the
+ * weights go, a robot needs a moment to stop, turn or reverse.
+ */
+const F_MAX = 2.5
 const DRAG = 0.7 // water drag, 1/s
 /** Separation only reacts to neighbours this close (or the sensing radius, if smaller). */
 export const PERSONAL_SPACE = 55
 /** Battery drain (percent per second): just staying on, plus sensing cost per unit of radius. */
-export const BATTERY_BASE = 1.6
-export const BATTERY_PER_RADIUS = 0.02
+export const BATTERY_BASE = 2.0
+export const BATTERY_PER_RADIUS = 0.03
+/** Battery lost (percent) by a robot that hits a rock, and by each robot in a robot-robot bump. */
+export const BATTERY_CRASH = 3
+export const BATTERY_BUMP = 1.5
+/** Legend ends early once every beacon is found and this much of the reef has been searched. */
+export const LEGEND_FULL_COVERAGE = 98
 
 export interface Weights {
   sep: number
@@ -138,6 +149,9 @@ export interface SimState {
   arrived: number
   events: SimEvent[]
   contact: Uint8Array
+  /** Scratch buffers for stepSim (kept here so a step allocates nothing). */
+  ax: Float32Array
+  ay: Float32Array
   // Ace
   phaseIdx: number
   quality: number
@@ -407,6 +421,8 @@ export function createSim(m: Mission, w: Weights): SimState {
     arrived: 0,
     events: [],
     contact: new Uint8Array(m.robots * m.robots),
+    ax: new Float32Array(m.robots),
+    ay: new Float32Array(m.robots),
     phaseIdx: 0,
     quality: 0,
     phaseScores: (m.phases ?? []).map(() => 0),
@@ -524,8 +540,9 @@ export function stepSim(s: SimState): void {
     }
   }
 
-  const ax = new Float32Array(n)
-  const ay = new Float32Array(n)
+  const { ax, ay } = s
+  ax.fill(0)
+  ay.fill(0)
   let neighbourSum = 0
   let strays = 0
   let liveCount = 0
@@ -603,10 +620,9 @@ export function stepSim(s: SimState): void {
       const px = r.x + r.vx * 0.35
       const py = r.y + r.vy * 0.35
       for (const ob of m.obstacles) {
-        for (const [qx0, qy0] of [
-          [r.x, r.y],
-          [px, py],
-        ]) {
+        for (let probe = 0; probe < 2; probe++) {
+          const qx0 = probe === 0 ? r.x : px
+          const qy0 = probe === 0 ? r.y : py
           const c = closestOnObstacle(ob, qx0, qy0)
           const d = c.d - ROBOT_R
           if (d < avoidR) {
@@ -682,6 +698,12 @@ export function stepSim(s: SimState): void {
     if (r.y < edge) fy += (edge - r.y) / edge
     if (r.y > WORLD_H - edge) fy -= (r.y - (WORLD_H - edge)) / edge
 
+    // Thruster limit: however the rules add up, the push is capped
+    const fl = Math.hypot(fx, fy)
+    if (fl > F_MAX) {
+      fx = (fx / fl) * F_MAX
+      fy = (fy / fl) * F_MAX
+    }
     ax[i] = fx * ACC
     ay[i] = fy * ACC
   }
@@ -757,6 +779,7 @@ export function stepSim(s: SimState): void {
       s.crashes++
       s.events.push({ type: 'crash', x: r.x, y: r.y })
       r.inWall = true
+      if (m.battery) r.battery -= BATTERY_CRASH
     } else if (!near) {
       r.inWall = false
     }
@@ -765,12 +788,6 @@ export function stepSim(s: SimState): void {
     if (m.battery) {
       const spn = Math.hypot(r.vx, r.vy) / vmax
       r.battery -= (BATTERY_BASE + 1.2 * spn * spn + R * BATTERY_PER_RADIUS) * DT
-      if (r.battery <= 0) {
-        r.battery = 0
-        r.alive = false
-        r.offAt = s.t
-        s.events.push({ type: 'flat', x: r.x, y: r.y })
-      }
     }
 
     // arrival
@@ -818,6 +835,10 @@ export function stepSim(s: SimState): void {
           if (!(a.arrived && b.arrived)) {
             s.bumps++
             s.events.push({ type: 'bump', x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 })
+            if (m.battery) {
+              a.battery -= BATTERY_BUMP
+              b.battery -= BATTERY_BUMP
+            }
           }
         }
       } else if (d2 > (D + 3) * (D + 3)) {
@@ -826,8 +847,16 @@ export function stepSim(s: SimState): void {
     }
   }
 
-  // Legend: coverage, shared trail, beacons
+  // Legend: flat batteries, coverage, shared trail, beacons
   if (m.battery) {
+    for (const r of robots) {
+      if (r.alive && r.battery <= 0) {
+        r.battery = 0
+        r.alive = false
+        r.offAt = s.t
+        s.events.push({ type: 'flat', x: r.x, y: r.y })
+      }
+    }
     const decay = 1 - 0.035 * DT
     for (let c = 0; c < s.trail.length; c++) s.trail[c] *= decay
     const senseR = R
@@ -838,14 +867,9 @@ export function stepSim(s: SimState): void {
       // smear onto the 4 neighbours so the trail has a gradient to follow
       const gx0 = Math.floor(r.x / CELL)
       const gy0 = Math.floor(r.y / CELL)
-      for (const [ox, oy] of [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-      ]) {
-        const gx = gx0 + ox
-        const gy = gy0 + oy
+      for (let nb = 0; nb < 4; nb++) {
+        const gx = gx0 + (nb === 0 ? 1 : nb === 1 ? -1 : 0)
+        const gy = gy0 + (nb === 2 ? 1 : nb === 3 ? -1 : 0)
         if (gx >= 0 && gy >= 0 && gx < GRID_W && gy < GRID_H) s.trail[gy * GRID_W + gx] += w.trail * 0.35 * DT
       }
       for (let gy = gy0 - cr; gy <= gy0 + cr; gy++) {
@@ -902,9 +926,15 @@ export function stepSim(s: SimState): void {
   if (m.food && s.arrived >= n) s.done = true
   if (m.battery) {
     if (robots.every((r) => !r.alive)) s.done = true
-    if (s.found.length && s.found.every(Boolean)) s.done = true
+    // The mission is over when the batteries are flat, time is up, or the reef
+    // has been searched end to end (every beacon AND almost every cell).
+    if (s.found.length && s.found.every(Boolean) && coveragePct(s) >= LEGEND_FULL_COVERAGE) s.done = true
   }
-  if (s.done && m.battery) s.stats.minBatteryEnd = Math.min(...robots.map((r) => r.battery))
+  if (s.done && m.battery) {
+    let minB = 100
+    for (const r of robots) minB = Math.min(minB, r.battery)
+    s.stats.minBatteryEnd = minB
+  }
 }
 
 /** Run a whole mission headless (tests, tuning). */
@@ -984,7 +1014,7 @@ export function scoreRun(s: SimState): Outcome {
         why.push(`Time ran out with ${n - s.arrived} robots still on the wrong side. Robots that hit the wall head-on can get stuck pushing against it — avoidance and a bit more goal-seeking help them slide along to the gap.`)
       if (stars > 0)
         why.unshift(
-          `${s.arrived} of ${n} robots made it through with ${s.crashes} wall crashes and ${s.bumps} bumps. No robot planned a route: each one just kept its space, matched its neighbours and steered away from rocks, and a tidy queue formed by itself at the gap.`,
+          `${s.arrived} of ${n} robots made it through with ${s.crashes} wall crash${s.crashes === 1 ? '' : 'es'} and ${s.bumps} bump${s.bumps === 1 ? '' : 's'}. No robot planned a route: each one just kept its space, matched its neighbours and steered away from rocks, and a tidy queue formed by itself at the gap.`,
         )
       if (why.length === 0) why.push('Balance it: enough avoidance to feel the wall early, enough separation to keep space, and alignment so they queue instead of jostle.')
     }
@@ -1051,9 +1081,9 @@ export function scoreRun(s: SimState): Outcome {
   const collisions = s.crashes + s.bumps
   const score = Math.max(0, Math.round(found * 100 + cov * 6 + (m.timeLimit - allFoundAt) * 4 - collisions * 3))
   let stars = 0
-  if (found >= 4 && cov >= 60) stars = 1
-  if (found >= 5 && cov >= 80 && collisions <= 20) stars = 2
-  if (found >= 6 && cov >= 92 && collisions <= 5) stars = 3
+  if (found >= 5 && cov >= 75) stars = 1
+  if (found >= 5 && cov >= 88 && collisions <= 8) stars = 2
+  if (found >= 6 && cov >= 90 && collisions <= 3) stars = 3
   if (w.explore < 0.4 || w.trail < 0.4)
     why.push(
       w.trail < 0.4
@@ -1062,12 +1092,23 @@ export function scoreRun(s: SimState): Outcome {
     )
   if (w.coh > 0.8)
     why.push(`Cohesion ${w.coh.toFixed(1)} kept the swarm in one ball. A ball of ${n} robots searches like one big robot — for searching, you want them to spread out.`)
+  const flatAll = s.robots.every((r) => !r.alive)
+  const life = Math.round(100 / (BATTERY_BASE + 0.43 + Math.max(10, w.radius) * BATTERY_PER_RADIUS))
+  if (flatAll && stars < 3)
+    why.push(
+      `Every battery was flat by ${s.t.toFixed(1)} s. With a ${w.radius}-unit radius a robot cruising and bumping nothing lasts about ${life} s — ${
+        w.radius >= 60 ? 'a smaller radius would last longer, if the robots spread out well enough to cover the gaps' : 'a slightly bigger radius sees more each second, but drains faster'
+      }.`,
+    )
   if (w.radius > 110) why.push(`A ${w.radius}-unit sensing radius sees a lot, but sensing costs power: the batteries ran flat sooner.`)
   if (w.radius < 45) why.push(`With a ${w.radius}-unit radius each robot searched a thin strip, so coverage grew slowly.`)
-  if (collisions > 40) why.push(`${collisions} collisions — raise separation and avoidance so robots don’t waste battery bumping into each other and the rocks.`)
+  if (collisions > 3)
+    why.push(
+      `${collisions} collisions — every crash and bump costs battery. Raise separation and avoidance so robots don’t waste power hitting each other and the rocks.`,
+    )
   if (stars > 0)
     why.unshift(
-      `Found ${found} of ${nb} beacons and searched ${Math.round(cov)}% of the reef. Each robot only saw a small circle, but by leaving a fading trail and steering away from trails, the swarm shared one memory of where it had been — like ants, which do the same with chemical pheromones.`,
+      `Found ${found} of ${nb} beacons and searched ${Math.round(cov)}% of the reef. Each robot only saw a small circle, but by leaving a fading trail and steering away from trails, the swarm shared one memory of where it had been. Ants share memory with pheromone trails too — but an ant trail says “come here”, and ours says “already searched, go somewhere else”.`,
     )
   if (why.length === 0) why.push('Spread out (separation up, cohesion down), leave a trail and explore away from it, and pick a sensing radius that sees enough without draining the battery.')
   return {

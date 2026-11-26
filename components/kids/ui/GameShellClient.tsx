@@ -117,7 +117,7 @@ export function GameShell({ game, howToPlay, lesson, children }: Props) {
                   setTier(i)
                   restart()
                 }}
-                className={`min-h-[40px] rounded-lg px-2.5 text-sm font-black sm:px-3 ${tier === i ? 'bg-amber-400 text-slate-900' : 'text-white/70 hover:text-white'}`}
+                className={`min-h-[44px] rounded-lg px-2.5 text-sm font-black sm:px-3 ${tier === i ? 'bg-amber-400 text-slate-900' : 'text-white/70 hover:text-white'}`}
               >
                 {t}
               </button>
@@ -127,7 +127,7 @@ export function GameShell({ game, howToPlay, lesson, children }: Props) {
             ref={helpBtn}
             type="button"
             onClick={() => setHelp(true)}
-            className="min-h-[44px] rounded-xl border border-white/15 bg-white/5 px-3 font-black text-white hover:bg-white/10"
+            className="min-h-[44px] min-w-[44px] rounded-xl border border-white/15 bg-white/5 px-3 font-black text-white hover:bg-white/10"
             aria-label="How to play"
           >
             ?
@@ -140,7 +140,7 @@ export function GameShell({ game, howToPlay, lesson, children }: Props) {
 
         {result && (
           <div className="absolute inset-0 z-20 flex items-center justify-center rounded-3xl bg-slate-950/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Round results">
-            <div className="w-full max-w-md rounded-3xl border-2 border-amber-300/50 bg-gradient-to-b from-violet-950 to-slate-950 p-6 text-center shadow-2xl">
+            <div className="w-full max-w-md rounded-3xl border-2 border-amber-300/50 bg-gradient-to-b from-[#19263F] to-[#0A1120] p-6 text-center shadow-2xl">
               <p className="text-4xl" aria-label={`${result.round.stars} stars`}>
                 {[0, 1, 2].map((i) => (
                   <span key={i} className={i < result.round.stars ? '' : 'opacity-20 grayscale'}>⭐</span>

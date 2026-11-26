@@ -22,6 +22,7 @@ import { getAllDailyLifeArticles } from '@/lib/daily-life-articles/loader';
 import { listTranslations, atlasPath } from '@/lib/atlas-i18n';
 import { ROS2_FIXES } from '@/lib/ros2-fixes';
 import { EPISODES as KIDS_EPISODES } from '@/lib/kids/stories';
+import { GAMES as KIDS_GAMES } from '@/lib/kids/universe/worlds';
 import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
@@ -189,6 +190,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/kids/course`, lastModified: at('/kids/course'), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${BASE}/kids/course/1`, lastModified: at('/kids/course/1'), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${BASE}/kids/hangar`, lastModified: at('/kids/hangar'), changeFrequency: 'monthly' as const, priority: 0.5 },
+    // Universe games: only those with a built page (sumo-arena is not built yet).
+    ...KIDS_GAMES.filter((g) => g.id !== 'sumo-arena').map((g) => ({ url: `${BASE}/kids/play/${g.id}`, lastModified: at('/kids/play'), changeFrequency: 'monthly' as const, priority: 0.7 })),
     { url: `${BASE}/kids/world`, lastModified: at('/kids/world'), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE}/kids/schools`, lastModified: at('/kids/schools'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/stories`, lastModified: at('/kids/stories'), changeFrequency: 'monthly' as const, priority: 0.7 },

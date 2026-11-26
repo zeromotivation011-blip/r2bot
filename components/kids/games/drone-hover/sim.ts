@@ -47,7 +47,9 @@ export const DRONE = {
   diskAreaSide: 2 * Math.PI * 0.1 * 0.1,
   figureOfMerit: 0.65,
   angDamping: 0.012,
-  /** Legend battery: 4-cell lithium pack. */
+  /** Legend battery: a 4-cell lithium pack's voltage curve. The capacity is
+   *  time-compressed: a real 1 kg quad carries roughly 40–80 Wh; 3 Wh lets an
+   *  80-second course show the sag a real pack shows over 10–15 minutes. */
   vFull: 16.8,
   vEmptyOC: 14.0,
   internalR: 0.12,
@@ -158,6 +160,12 @@ export const CADET_PAYLOAD = 0.3
 export const PILOT_PAYLOAD = 0.35
 export const ACE_PAYLOAD = 0.4
 export const LEGEND_PAYLOAD = 0.4
+
+/** Pilot: a win may not overshoot by more than this, m. */
+export const PILOT_MAX_OVERSHOOT = 0.75
+/** Ace and Legend: the lowest flight score that still counts as a win. */
+export const ACE_MIN_WIN = 550
+export const LEGEND_MIN_WIN = 450
 
 export function buildMission(tier: TierIndex): Mission {
   const base: Mission = {
@@ -728,7 +736,9 @@ export function scoreFlight(s: SimState): FlightReport {
         scoreLabel: 'crashed',
         lowerIsBetter: true,
         stats,
-        message: `Bump! The drone ${s.crashReason}. It fell because thrust was much smaller than weight for too long. Next time, push the throttle up gently before it drops too fast.`,
+        message: s.crashReason.includes('airspace')
+          ? `Whoosh! The drone ${s.crashReason}. Thrust was much bigger than weight for too long, so it kept speeding up. Next time, when it climbs fast, take the throttle down until the blue bar sits on the red line.`
+          : `Bump! The drone ${s.crashReason}. It fell because thrust was much smaller than weight for too long. Next time, push the throttle up gently before it drops too fast.`,
       }
     }
     if (s.outcome !== 'complete') {
@@ -774,10 +784,39 @@ export function scoreFlight(s: SimState): FlightReport {
           : 'The brain was too weak or too wild to catch it. Check the graph: did it wobble bigger and bigger (too much Kp, not enough D) or just sink (too little Kp)?'
       return { stars: 0, score: 0, scoreLabel: 'crashed', lowerIsBetter: false, stats, message: `The drone ${s.crashReason}. ${why}` }
     }
+    const maxZ = s.log.reduce((a, r) => Math.max(a, r.z), 0)
+    const k = m.tier === 1 ? s.gains.kp : s.gains.kp + s.gains.ki
+    if (maxZ < 0.3 || k <= 0) {
+      return {
+        stars: 0,
+        score: 0,
+        scoreLabel: 'never took off',
+        lowerIsBetter: false,
+        stats,
+        message:
+          k <= 0
+            ? `The drone never really flew to the target (highest point ${maxZ.toFixed(2)} m). With ${m.tier === 1 ? 'Kp' : 'Kp and Ki'} at 0 the brain adds no push at all when it is too low, and the hover guess alone only just balances the weight, so it just drifts with the air. Give it some P so being too low makes extra thrust.`
+            : 'The drone barely lifted off: the push was too weak to beat the weight. Raise Kp so a big error makes a big push.',
+      }
+    }
     const tol = m.tier === 1 ? 0.3 : 0.06
     const base = m.tier === 1 ? 1000 - 22 * s.iae - 350 * s.overshoot - 6 * st - 40 * wh : 1000 - 30 * s.iae - 450 * s.overshoot - 8 * st - 40 * wh
     const score = Math.round(clamp(base, 0, 1000))
     let message: string
+    // A win must also look under control: Pilot may not overshoot wildly, and
+    // Ace needs a decent flight score, not just a lucky last three seconds.
+    const wildOvershoot = m.tier === 1 && s.overshoot > PILOT_MAX_OVERSHOOT
+    const minWin = m.tier === 1 ? 0 : ACE_MIN_WIN
+    if (finalErr <= tol && wildOvershoot) {
+      message = `It ended on target, but it overshot by ${s.overshoot.toFixed(2)} m on the way — more than the ${PILOT_MAX_OVERSHOOT} m Sky Port allows near the tower. Kp = ${s.gains.kp.toFixed(0)} pushes so hard that the motor lag and the small fixed damper cannot stop it in time. Lower Kp until the overshoot shrinks.`
+      return { stars: 0, score, scoreLabel: 'flight score', lowerIsBetter: false, stats, message }
+    }
+    if (finalErr <= tol && score < minWin) {
+      message = `It ended on target, but the flight score was ${score} — a win needs ${minWin}. ${
+        s.overshoot > 0.4 ? `It overshot by ${s.overshoot.toFixed(2)} m: more D (or less Kp) brakes it.` : st > 4 ? `It took ${st.toFixed(1)} s to settle: more Kp and I react faster.` : 'Big errors along the way add up: look at the graph after the parcel and the downdraft.'
+      }`
+      return { stars: 0, score, scoreLabel: 'flight score', lowerIsBetter: false, stats, message }
+    }
     if (finalErr > tol) {
       if (bias > 0.08 && m.tier === 1)
         message = `It hovered ${bias.toFixed(2)} m too low. With P only, the brain needs an error to make extra thrust — the heavier parcel needed ${(PILOT_PAYLOAD * G).toFixed(1)} N more, so it sagged until Kp × error matched that. Raise Kp to shrink the sag.`
@@ -828,10 +867,29 @@ export function scoreFlight(s: SimState): FlightReport {
     }
   }
   const score = Math.round(clamp(1000 - 7 * s.t - 4 * s.iae - 150 * s.overshoot - 25 * wh, 0, 1000))
+  if (score < LEGEND_MIN_WIN) {
+    const slow = s.t > 70
+    return {
+      stars: 0,
+      score,
+      scoreLabel: 'flight score',
+      lowerIsBetter: false,
+      stats,
+      message: `Course finished, but the flight score was ${score} — a Legend needs ${LEGEND_MIN_WIN}. ${
+        slow
+          ? `It took ${s.t.toFixed(0)} s: the drone kept drifting out of the rings before each 1.2 s hold. Tune for clean arrivals (Kd_x) and a steady height (I).`
+          : s.overshoot > 0.6
+            ? `It overshot by up to ${s.overshoot.toFixed(2)} m at the waypoints. More Kd_x (or less Kp_x) brakes the arrivals.`
+            : 'Big errors between waypoints and the energy used both cost points. A smoother, faster brain scores higher.'
+      }`,
+    }
+  }
   const stars = score >= 580 ? 3 : score >= 520 ? 2 : 1
   let message: string
   if (s.overshoot > 0.6) message = `Course complete! Your biggest overshoot was ${s.overshoot.toFixed(2)} m — the outer loop is pushing harder than it can brake. More Kd_x (or slightly less Kp_x) makes the arrivals clean.`
   else if (sat > 0.45) message = 'Course complete! The motors spent a lot of time maxed out, which wastes the battery. Softer inner-loop gains keep the motors in their happy range.'
+  else if (s.gains.ki <= 0)
+    message = `Course complete — with no I term! The fast inner loop held the tilt and the outer loop chose it, but nothing removed the steady height error as the battery sagged to ${s.volts.toFixed(1)} V and the parcel dropped. The ${m.wpRadius} m rings were just wide enough to forgive it. Add some Ki to wipe out that error.`
   else message = `Legendary flying! The fast inner loop held the tilt, the slower outer loop chose the tilt, and I kept the height as the battery sagged to ${s.volts.toFixed(1)} V and the parcel dropped.`
   return { stars, score, scoreLabel: 'flight score', lowerIsBetter: false, stats, message }
 }

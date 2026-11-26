@@ -714,7 +714,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
   const shortNow = sol.shorted
 
   return (
-    <div className="grid select-none gap-3 lg:grid-cols-[minmax(0,1fr)_340px]">
+    <div className="grid select-none gap-3 pb-[88px] min-[901px]:pb-0 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="flex min-w-0 flex-col gap-2">
         <section className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] px-4 py-3">
           <p className="text-xs font-black uppercase tracking-widest text-amber-300">
@@ -886,7 +886,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
           </section>
         )}
 
-        {def.tier === 2 && signLed && <OhmHelper v={sol.battV} vf={ledVf(signLed)} name={def.tier === 3 ? 'white night-light LED' : 'red sign LED'} />}
+        {def.tier === 2 && signLed && <OhmHelper v={sol.battV} vf={ledVf(signLed)} name="red sign LED" />}
 
         <section className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">
           <div className="flex items-center justify-between gap-2">

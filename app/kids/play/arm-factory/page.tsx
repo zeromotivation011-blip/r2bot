@@ -40,7 +40,7 @@ const jsonLd = {
       description: DESCRIPTION,
       inLanguage: 'en',
       learningResourceType: 'Simulation',
-      educationalLevel: 'Ages 8–17',
+      educationalLevel: 'Ages 7–17',
       teaches: ['forward kinematics', 'inverse kinematics', 'robot workspace', 'pick and place programming', 'payload and torque limits'],
       gamePlatform: 'Web browser',
       applicationCategory: 'Game',
@@ -104,7 +104,7 @@ export default function ArmFactoryPage() {
           <h3 className="text-2xl font-black text-white">Joints, links and the workspace</h3>
           <p className="mt-2">
             A robot arm is a chain: rigid <b>links</b> joined by motors called <b>joints</b>. Our arm has three. The base joint turns the whole arm
-            around, the shoulder lifts the upper arm (45 cm long) and the elbow bends the forearm (40 cm). A wrist below the elbow stays level, so
+            around, the shoulder lifts the upper arm (45 cm long) and the elbow bends the forearm (40 cm). A small wrist at the end of the forearm turns to stay level, so
             the gripper always points straight down — palletising robots in warehouses are built the same way. Every place the fingertips can
             reach makes up the arm&apos;s <b>workspace</b>. In the game it is drawn on the floor as an amber ring: outside it, no choice of joint
             angles can get there. Each joint also has <b>limits</b>. The base cannot spin all the way round, because the cables inside it would

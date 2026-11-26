@@ -50,21 +50,27 @@ export function bakeTerrain(m: MarsMap): HTMLCanvasElement {
   const high: [number, number, number] = [222, 140, 86]
   const sand: [number, number, number] = [226, 168, 106]
   const duneC: [number, number, number] = [104, 58, 34]
+  const hasSlip = m.slip.some((v) => v > 0)
+  // Height once per pixel (plus one extra row/column), so the hill-shade can
+  // use neighbouring pixels instead of sampling the noise three times.
+  const HW = c.width + 1
+  const hts = new Float32Array(HW * (c.height + 1))
+  for (let py = 0; py <= c.height; py++) for (let px = 0; px <= c.width; px++) hts[py * HW + px] = heightAt(px / PX, py / PX, m.seed)
+  const gScale = 0.06 * PX
   for (let py = 0; py < c.height; py++) {
     for (let px = 0; px < c.width; px++) {
       const x = px / PX
       const y = py / PX
-      const hgt = heightAt(x, y, m.seed)
-      const e = 0.06
-      const gx = heightAt(x + e, y, m.seed) - hgt
-      const gy = heightAt(x, y + e, m.seed) - hgt
+      const hgt = hts[py * HW + px]
+      const gx = (hts[py * HW + px + 1] - hgt) * gScale
+      const gy = (hts[(py + 1) * HW + px] - hgt) * gScale
       // Light from the upper left (north-west), like a real hill-shade map.
       const shade = Math.max(0.62, Math.min(1.28, 1 - (gx + gy) * 9))
       let col = hgt < 0.5 ? mix(low, mid, hgt / 0.5) : mix(mid, high, Math.min(1, (hgt - 0.5) / 0.4))
       const ci = idx(m, Math.min(m.W - 1, Math.floor(x)), Math.min(m.H - 1, Math.floor(y)))
       // Sand follows the same noise field the simulation samples per square,
       // blended softly so its edges look natural.
-      const sn = m.slip.some((v) => v > 0) ? valueNoise((x - 0.5) / 3.2, (y - 0.5) / 3.2, m.seed + 101) : 0
+      const sn = hasSlip ? valueNoise((x - 0.5) / 3.2, (y - 0.5) / 3.2, m.seed + 101) : 0
       const sandT = Math.max(0, Math.min(1, (sn - 0.47) / 0.08))
       const s = sandT * Math.max(0.3, m.slip[ci])
       if (s > 0) {

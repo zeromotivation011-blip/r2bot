@@ -53,6 +53,29 @@ const memory = new Map<number, { weights: Weights; last: Outcome | null; attempt
 
 const SPEEDS = [1, 2, 4] as const
 
+/** Nearest robot that is still running (to robot `from`), or the first running robot when from < 0. -1 if none. */
+function nearestLive(s: SimState, from: number): number {
+  const o = from >= 0 ? s.robots[from] : null
+  let best = -1
+  let bd = Infinity
+  s.robots.forEach((r, i) => {
+    if (!r.alive || i === from) return
+    const d = o ? Math.hypot(r.x - o.x, r.y - o.y) : i
+    if (d < bd) {
+      bd = d
+      best = i
+    }
+  })
+  return best
+}
+
+/** The results card stays phone-sized: a long reason is cut to its first sentence. */
+function shortWhy(t: string): string {
+  if (t.length <= 200) return t
+  const m = t.match(/^.*?[.!?](?=\s|$)/)
+  return m ? m[0] : t
+}
+
 export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props) {
   const tier = Math.max(0, Math.min(3, tierProp)) as TierIndex
   const mission = useMemo(() => buildMission(tier), [tier])
@@ -66,6 +89,8 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
   const [hintsShown, setHintsShown] = useState(0)
   const [outcome, setOutcome] = useState<Outcome | null>(null)
   const [hud, setHud] = useState<Hud | null>(null)
+  /** Said once when the robot in robot's-eye view switches off and the view moves on. */
+  const [eyeNote, setEyeNote] = useState('')
   const lastOutcome = remembered?.last ?? null
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -83,10 +108,11 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
   speedRef.current = speed
   selectedRef.current = selected
 
-  // Live weights: the swarm obeys a slider the moment it moves.
+  // The rules lock while the swarm swims: a run is scored on one design only,
+  // so the same rules always give the same run (and the debrief describes them).
   useEffect(() => {
     weightsRef.current = weights
-    simRef.current.w = { ...weights }
+    if (phaseRef.current === 'ready') simRef.current.w = { ...weights }
     const mem = memory.get(tier)
     memory.set(tier, { weights, last: mem?.last ?? null, attempts: mem?.attempts ?? 0 })
   }, [weights, tier])
@@ -108,7 +134,8 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
           stars: o.stars,
           score: o.score,
           scoreLabel: o.scoreLabel,
-          message: [o.headline, ...o.why.slice(0, 2)].join(' '),
+          // Short on purpose: the full debrief is shown under the reef.
+          message: [o.headline, shortWhy(o.why[0] ?? '')].join(' ').trim(),
           badges: o.stars > 0 && tier >= 1 ? ['swarm-captain'] : undefined,
           attempts,
         })
@@ -150,7 +177,8 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
     let raf = 0
     let last = performance.now()
     let acc = 0
-    let hudT = 0
+    let hudT = 1
+    let hudSeen = ''
     let clock = 0
     const soundGate = { arrive: 0, crash: 0, bump: 0 }
 
@@ -186,14 +214,29 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
             playSound('wrong')
           }
         }
+        // Robot's-eye view: if the watched robot switches off, follow its nearest live neighbour
+        const sel = selectedRef.current
+        if (sel >= 0 && !s.robots[sel]?.alive) {
+          const next = nearestLive(s, sel)
+          selectedRef.current = next
+          setSelected(next)
+          setEyeNote(
+            next >= 0
+              ? 'The robot you were watching switched off, so the view jumped to its nearest neighbour that is still running.'
+              : 'Every robot has switched off, so there is nothing left to watch.',
+          )
+        }
         if (s.done) complete(s)
       }
       fx.update(dt)
       drawWorld(g, view, s, scenery, fx, { time: clock, selected: selectedRef.current, reduced, showAllBeacons: s.done }, dt)
 
+      // Only refresh the HUD while something is changing (it re-renders the panel)
       hudT += dt
-      if (hudT > 0.12) {
+      const changing = phaseRef.current === 'running' || hudSeen !== phaseRef.current
+      if (changing && hudT > 0.12) {
         hudT = 0
+        hudSeen = phaseRef.current
         const ph = s.m.phases?.[s.phaseIdx]
         const live = s.robots.filter((r) => r.alive)
         setHud({
@@ -258,8 +301,15 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
       reset()
     } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
       e.preventDefault()
-      const n = simRef.current.robots.length
-      setSelected((i) => (i < 0 ? 0 : (i + (e.key === 'ArrowRight' ? 1 : n - 1)) % n))
+      const robots = simRef.current.robots
+      const n = robots.length
+      const dir = e.key === 'ArrowRight' ? 1 : n - 1
+      setSelected((i) => {
+        let j = i < 0 ? 0 : (i + dir) % n
+        for (let k = 0; k < n && !robots[j].alive; k++) j = (j + dir) % n
+        return robots[j].alive ? j : -1
+      })
+      setEyeNote('')
     } else if (e.key === 'Escape') {
       setSelected(-1)
     }
@@ -271,6 +321,7 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
     const y = ((e.clientY - rect.top) / rect.height) * WORLD_H
     const i = pickRobot(simRef.current, x, y, 45)
     setSelected((cur) => (i === cur ? -1 : i))
+    setEyeNote('')
     if (i >= 0) playSound('click')
   }
 
@@ -284,26 +335,27 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
   let bar = 0
   if (h) {
     if (tier <= 1) {
-      main = `${h.arrived}/${n} at the food`
-      sub = tier === 1 ? `${h.crashes} wall crashes · ${h.bumps} bumps` : `${h.bumps} bumps`
+      main = tier === 1 ? `${h.arrived}/${n} through · ${h.crashes}/12 crashes` : `${h.arrived}/${n} at the food`
+      sub = tier === 1 ? `${h.crashes} wall crashes (12 max) · ${h.bumps} bumps` : `${h.bumps} bumps`
       bar = h.arrived / n
     } else if (tier === 2) {
       main = `${h.phaseLabel}: ${h.quality}%`
       sub = `${h.alive} robots · ${h.phaseLeft.toFixed(0)} s left in this shape`
       bar = h.quality / 100
     } else {
-      main = `${h.found}/6 beacons · ${h.coverage}% searched`
+      main = `${h.found}/${mission.beacons?.length ?? 0} beacons · ${h.coverage}% searched`
       sub = `${h.alive} robots running · battery ${h.battery}%`
       bar = h.coverage / 100
     }
   }
 
   const running = phase === 'running'
+  const locked = phase !== 'ready'
   const shownOutcome = outcome ?? (phase === 'ready' ? lastOutcome : null)
 
   return (
-    <div ref={rootRef} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="flex min-w-0 flex-col gap-3">
+    <div ref={rootRef} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px] lg:grid-rows-[auto_1fr]">
+      <div className="flex min-w-0 flex-col gap-3 lg:col-start-1 lg:row-start-1">
         {/* Mission brief */}
         <div className="rounded-[20px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-3 sm:p-4">
           <p className="text-xs font-black uppercase tracking-widest text-cyan-300">
@@ -334,7 +386,7 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
                 <p className="font-display text-sm font-black sm:text-base" data-testid="swarm-hud">
                   {main}
                 </p>
-                <p className="hidden text-xs text-slate-300 sm:block">{sub}</p>
+                <p className="text-[11px] leading-tight text-slate-300 sm:text-xs">{sub}</p>
                 <div className="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-white/10 sm:w-44">
                   <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-[width] duration-150" style={{ width: `${Math.round(Math.min(1, bar) * 100)}%` }} />
                 </div>
@@ -401,7 +453,10 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
           </button>
           <button
             type="button"
-            onClick={() => setSelected((i) => (i >= 0 ? -1 : 0))}
+            onClick={() => {
+              setEyeNote('')
+              setSelected((i) => (i >= 0 ? -1 : nearestLive(simRef.current, -1)))
+            }}
             aria-pressed={selected >= 0}
             className={`min-h-[44px] rounded-2xl border px-4 font-bold ${selected >= 0 ? 'border-cyan-300 bg-cyan-400/15 text-cyan-100' : 'border-white/15 bg-white/5 text-white hover:bg-white/10'}`}
           >
@@ -416,43 +471,16 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
             {weights.radius > 55 && <> The red circle is its personal space: separation only pushes neighbours that close.</>}
           </p>
         )}
-
-        {/* Why it happened */}
-        {shownOutcome && (
-          <section className="rounded-[20px] border border-amber-300/30 bg-amber-400/[0.06] p-4" aria-live="polite" data-testid="swarm-debrief">
-            <h3 className="font-display text-lg font-black text-amber-300">
-              {outcome ? 'Why it happened' : 'Last run — why it happened'}
-              <span className="ml-2 text-base" aria-label={`${shownOutcome.stars} stars`}>
-                {[0, 1, 2].map((i) => (
-                  <span key={i} className={i < shownOutcome.stars ? '' : 'opacity-25 grayscale'}>
-                    ⭐
-                  </span>
-                ))}
-              </span>
-            </h3>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {shownOutcome.stats.map((st) => (
-                <span key={st.label} className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">
-                  {st.label}: <span className="text-cyan-200">{st.value}</span>
-                </span>
-              ))}
-            </div>
-            <ul className="mt-3 space-y-2 text-[15px] text-slate-100">
-              {shownOutcome.why.map((w) => (
-                <li key={w} className="flex gap-2">
-                  <span aria-hidden className="text-amber-300">
-                    ▸
-                  </span>
-                  <span>{w}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+        {eyeNote && (
+          <p className="rounded-2xl border border-white/15 bg-white/5 p-3 text-sm text-slate-200" role="status">
+            {eyeNote}
+          </p>
         )}
+
       </div>
 
-      {/* Rule panel */}
-      <aside className="flex flex-col gap-3" aria-label="Swarm rules">
+      {/* Rule panel: on a phone it sits straight under the controls, before the debrief */}
+      <aside className="flex flex-col gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-1" aria-label="Swarm rules">
         <div className="rounded-[20px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-3">
           <div className="flex items-center justify-between">
             <h3 className="font-display text-lg font-black text-white">Your swarm’s rules</h3>
@@ -462,19 +490,24 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
                 setWeights({ ...mission.defaults })
                 playSound('click')
               }}
-              className="min-h-[44px] rounded-xl px-3 text-sm font-bold text-slate-300 hover:text-white"
+              disabled={locked}
+              className="min-h-[44px] rounded-xl px-3 text-sm font-bold text-slate-300 hover:text-white disabled:opacity-40"
             >
               Defaults
             </button>
           </div>
-          <p className="text-sm text-slate-400">Every robot follows these same rules, using only what it senses. You can change them while the swarm swims.</p>
-          <div className="mt-3 flex flex-col gap-2">
+          <p className="text-sm text-slate-400" aria-live="polite">
+            {locked
+              ? 'Rules are locked while the swarm swims, so every run is fair. Press Reset (or wait for the end) to change them.'
+              : 'Every robot follows these same rules, using only what it senses. Set them, then launch.'}
+          </p>
+          <div className={`mt-3 flex flex-col gap-2 ${locked ? 'opacity-60' : ''}`}>
             {mission.enabled.map((k) => {
               const r = RULES[k]
               const v = weights[k]
               const id = `swarm-${k}`
               return (
-                <div key={k} className="rounded-2xl border border-white/10 bg-[#111C32] p-3">
+                <div key={k} className="rounded-2xl border border-white/10 bg-[#111C32] px-3 py-2 sm:p-3">
                   <div className="flex items-center gap-2">
                     <span className={k === 'radius' ? 'text-cyan-300' : 'text-amber-300'}>{r.icon}</span>
                     <label htmlFor={id} className="flex-1 font-display font-black text-white">
@@ -493,7 +526,8 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
                     step={r.step}
                     value={v}
                     onChange={(e) => setW(k, Number(e.target.value))}
-                    className="mt-2 h-11 w-full cursor-pointer accent-amber-400"
+                    disabled={locked}
+                    className="mt-1 h-11 w-full cursor-pointer accent-amber-400 disabled:cursor-not-allowed sm:mt-2"
                     aria-describedby={`${id}-d`}
                   />
                   <p id={`${id}-d`} className="text-sm text-slate-300">
@@ -535,6 +569,39 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
           </p>
         )}
       </aside>
+
+      {/* Why it happened */}
+      {shownOutcome && (
+        <section className="min-w-0 self-start lg:col-start-1 lg:row-start-2 rounded-[20px] border border-amber-300/30 bg-amber-400/[0.06] p-4" aria-live="polite" data-testid="swarm-debrief">
+          <h3 className="font-display text-lg font-black text-amber-300">
+            {outcome ? 'Why it happened' : 'Last run — why it happened'}
+            <span className="ml-2 text-base" aria-label={`${shownOutcome.stars} stars`}>
+              {[0, 1, 2].map((i) => (
+                <span key={i} className={i < shownOutcome.stars ? '' : 'opacity-25 grayscale'}>
+                  ⭐
+                </span>
+              ))}
+            </span>
+          </h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {shownOutcome.stats.map((st) => (
+              <span key={st.label} className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">
+                {st.label}: <span className="text-cyan-200">{st.value}</span>
+              </span>
+            ))}
+          </div>
+          <ul className="mt-3 space-y-2 text-[15px] text-slate-100">
+            {shownOutcome.why.map((w) => (
+              <li key={w} className="flex gap-2">
+                <span aria-hidden className="text-amber-300">
+                  ▸
+                </span>
+                <span>{w}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   )
 }

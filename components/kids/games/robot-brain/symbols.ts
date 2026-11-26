@@ -10,7 +10,7 @@ export type Pt = [number, number]
 export type Stroke = Pt[]
 export type Drawing = Stroke[]
 
-export type ClassId = 'left' | 'right' | 'circle' | 'stop'
+export type ClassId = 'left' | 'right' | 'circle' | 'tri' | 'stop'
 
 export interface SymbolClass {
   id: ClassId
@@ -29,6 +29,7 @@ export const SYMBOLS: Record<ClassId, SymbolClass> = {
   left: { id: 'left', name: 'Left arrow', glyph: '←', action: 'West chute', color: '#22d3ee', tw: 'text-cyan-300 border-cyan-300/60 bg-cyan-400/15' },
   right: { id: 'right', name: 'Right arrow', glyph: '→', action: 'East chute', color: '#fb923c', tw: 'text-orange-300 border-orange-300/60 bg-orange-400/15' },
   circle: { id: 'circle', name: 'Circle', glyph: '○', action: 'Local delivery', color: '#4ade80', tw: 'text-green-300 border-green-300/60 bg-green-400/15' },
+  tri: { id: 'tri', name: 'Triangle', glyph: '△', action: 'Fragile shelf', color: '#a78bfa', tw: 'text-violet-300 border-violet-300/60 bg-violet-400/15' },
   stop: { id: 'stop', name: 'Stop cross', glyph: '✕', action: 'Return to sender', color: '#f472b6', tw: 'text-pink-300 border-pink-300/60 bg-pink-400/15' },
 }
 
@@ -73,15 +74,22 @@ export interface Variation {
   stretch: number
   /** Chance of stray specks (0..1) and how many at most. */
   specks: number
+  /** Chance of a hurried style: a circle left open, a one-sided or hooked
+   *  arrow head, a cross with one short arm. Real handwriting does this. */
+  sloppy?: number
 }
 
 export const VARIATION = {
+  /** A careful copy of the textbook shape: the ✨ Sample button. */
+  neat: { rot: 6, scale: [0.9, 1.05], shift: 0.03, jitter: 0.02, wobble: 0.05, stretch: 0.1, specks: 0 },
   gentle: { rot: 8, scale: [0.85, 1.05], shift: 0.04, jitter: 0.02, wobble: 0.05, stretch: 0.12, specks: 0 },
   everyday: { rot: 14, scale: [0.7, 1.05], shift: 0.08, jitter: 0.025, wobble: 0.07, stretch: 0.18, specks: 0 },
-  /** Legend's unseen test: rotated, scaled, moved, noisy. */
-  wild: { rot: 24, scale: [0.45, 1.05], shift: 0.2, jitter: 0.035, wobble: 0.09, stretch: 0.25, specks: 0.7 },
-  /** For augmentation of the child's own drawings. */
-  augment: { rot: 18, scale: [0.6, 1.0], shift: 0.15, jitter: 0, wobble: 0, stretch: 0.15, specks: 0 },
+  /** Cadet and Pilot test parcels: strangers' handwriting, often hurried. */
+  strangers: { rot: 20, scale: [0.55, 1.05], shift: 0.13, jitter: 0.03, wobble: 0.08, stretch: 0.22, specks: 0, sloppy: 0.4 },
+  /** Legend's unseen exam: strongly tilted, squashed, scaled, moved, smudged, sometimes hurried. */
+  wild: { rot: 35, scale: [0.45, 1.05], shift: 0.2, jitter: 0.035, wobble: 0.09, stretch: 0.32, specks: 0.7, sloppy: 0.25 },
+  /** For augmentation of the child's own drawings: turned up to 35° either way. */
+  augment: { rot: 35, scale: [0.6, 1.0], shift: 0.15, jitter: 0, wobble: 0, stretch: 0.25, specks: 0 },
 } satisfies Record<string, Variation>
 
 /** What happened to a generated drawing — used to explain mistakes. */
@@ -91,20 +99,39 @@ export interface DrawMeta {
   dx: number
   dy: number
   specks: number
+  /** Drawn in a hurry (open circle, one-sided head, short arm). */
+  hurried?: boolean
 }
 
 // ── Templates (symbol units: centred at 0, about −1..1) ─────────────────────
 
-function arrowTemplate(rng: Rng, dir: 1 | -1): Drawing {
-  const head = range(rng, 0.35, 0.6)
+function arrowTemplate(rng: Rng, dir: 1 | -1, hurried: boolean): Drawing {
+  const style = hurried ? Math.floor(rng() * 3) : -1
+  const head = style === 1 ? range(rng, 0.55, 0.8) : range(rng, 0.35, 0.6)
   const spread = range(rng, 0.32, 0.55)
   const tip = 0.9 * dir
-  const tail = -0.9 * dir
+  // A hurried arrow can have a stubby shaft (style 1).
+  const tail = (style === 1 ? -0.35 : -0.9) * dir
   const shaft: Stroke = [
     [tail, range(rng, -0.04, 0.04)],
     [tip, 0],
   ]
   const back = tip - head * dir
+  if (style === 0) {
+    // One-sided head: the line ends in a single hook.
+    const side = rng() < 0.5 ? -1 : 1
+    return [[shaft[0], [tip, 0], [back, side * spread]]]
+  }
+  if (style === 2) {
+    // Drawn in one go: tail → tip → one barb, then the other barb lifted.
+    return [
+      [shaft[0], [tip, 0], [back, -spread]],
+      [
+        [back, spread],
+        [tip, 0],
+      ],
+    ]
+  }
   const headStroke: Stroke = [
     [back, -spread],
     [tip, 0],
@@ -114,45 +141,86 @@ function arrowTemplate(rng: Rng, dir: 1 | -1): Drawing {
   return rng() < 0.5 ? [shaft, headStroke] : [headStroke, shaft]
 }
 
-function circleTemplate(rng: Rng): Drawing {
+function circleTemplate(rng: Rng, hurried: boolean): Drawing {
   const start = range(rng, 0, Math.PI * 2)
-  const sweep = Math.PI * 2 * range(rng, 0.92, 1.08)
+  // A hurried circle is left open, or overshoots into a loop.
+  const sweep = Math.PI * 2 * (hurried ? (rng() < 0.6 ? range(rng, 0.68, 0.82) : range(rng, 1.2, 1.35)) : range(rng, 0.92, 1.08))
   const dir = rng() < 0.5 ? 1 : -1
+  const drift = hurried ? range(rng, 0.1, 0.2) : 0
   const pts: Stroke = []
   const n = 40
   for (let i = 0; i <= n; i++) {
     const a = start + dir * sweep * (i / n)
     // Hand-drawn circles drift a little in radius.
-    const r = 0.85 * (1 + 0.06 * Math.sin(a * 2 + start))
+    const r = 0.85 * (1 + 0.06 * Math.sin(a * 2 + start)) * (1 - drift * (i / n))
     pts.push([Math.cos(a) * r, Math.sin(a) * r])
   }
   return [pts]
 }
 
-function stopTemplate(rng: Rng): Drawing {
+/** Chaikin corner-cutting: what a quick hand does to sharp corners. */
+function roundCorners(s: Stroke, passes: number, closed: boolean): Stroke {
+  let pts = s
+  for (let p = 0; p < passes; p++) {
+    const out: Stroke = closed ? [] : [pts[0]]
+    const n = closed ? pts.length : pts.length - 1
+    for (let i = 0; i < n; i++) {
+      const [x0, y0] = pts[i]
+      const [x1, y1] = pts[(i + 1) % pts.length]
+      out.push([0.75 * x0 + 0.25 * x1, 0.75 * y0 + 0.25 * y1], [0.25 * x0 + 0.75 * x1, 0.25 * y0 + 0.75 * y1])
+    }
+    if (closed) out.push(out[0])
+    else out.push(pts[pts.length - 1])
+    pts = out
+  }
+  return pts
+}
+
+function triangleTemplate(rng: Rng, hurried: boolean): Drawing {
+  // Usually point-up, but people draw them a little turned.
+  const turn = range(rng, -0.25, 0.25)
+  const r = 0.9
+  const v: Stroke = [0, 1, 2].map((i) => {
+    const a = -Math.PI / 2 + turn + (i * 2 * Math.PI) / 3
+    return [Math.cos(a) * r * range(rng, 0.9, 1.08), Math.sin(a) * r * 0.95 + 0.15] as Pt
+  })
+  const start = Math.floor(rng() * 3)
+  const ring: Stroke = [v[start], v[(start + 1) % 3], v[(start + 2) % 3], v[start]]
+  if (!hurried) return [ring]
+  // Hurried: rounded corners, and the last side often stops short.
+  const soft = roundCorners(ring.slice(0, 3), 2, true)
+  const keep = Math.floor(soft.length * range(rng, 0.85, 1))
+  return [soft.slice(0, Math.max(4, keep))]
+}
+
+function stopTemplate(rng: Rng, hurried: boolean): Drawing {
   const a = range(rng, 0.62, 0.8)
   const b = range(rng, 0.62, 0.8)
+  // A hurried cross has one short arm that stops near the middle.
+  const cut = hurried ? range(rng, 0.35, 0.6) : 1
   const s1: Stroke = [
     [-a, -b],
     [a, b],
   ]
   const s2: Stroke = [
     [a, -b],
-    [-a, b],
+    [a - 2 * a * cut, -b + 2 * b * cut],
   ]
   return rng() < 0.5 ? [s1, s2] : [s2, s1]
 }
 
-function template(cls: ClassId, rng: Rng): Drawing {
+function template(cls: ClassId, rng: Rng, hurried: boolean): Drawing {
   switch (cls) {
     case 'left':
-      return arrowTemplate(rng, -1)
+      return arrowTemplate(rng, -1, hurried)
     case 'right':
-      return arrowTemplate(rng, 1)
+      return arrowTemplate(rng, 1, hurried)
     case 'circle':
-      return circleTemplate(rng)
+      return circleTemplate(rng, hurried)
+    case 'tri':
+      return triangleTemplate(rng, hurried)
     case 'stop':
-      return stopTemplate(rng)
+      return stopTemplate(rng, hurried)
   }
 }
 
@@ -219,7 +287,9 @@ function place(d: Drawing, v: Variation, rng: Rng): { drawing: Drawing; meta: Dr
 
 /** A fresh, hand-drawn-looking symbol. */
 export function generateDrawing(cls: ClassId, v: Variation, rng: Rng): { drawing: Drawing; meta: DrawMeta } {
-  return place(template(cls, rng), v, rng)
+  const hurried = (v.sloppy ?? 0) > 0 && rng() < (v.sloppy ?? 0)
+  const out = place(template(cls, rng, hurried), v, rng)
+  return { drawing: out.drawing, meta: { ...out.meta, hurried } }
 }
 
 /**

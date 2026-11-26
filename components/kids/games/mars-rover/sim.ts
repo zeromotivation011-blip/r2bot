@@ -15,6 +15,7 @@ import {
   DIRS,
   TIERS,
   idx,
+  legendStarLines,
   inside,
   type MarsMap,
   type RuleId,
@@ -208,6 +209,16 @@ const DRIVE_W = 100
 const VO_W = 15
 const SCI_W = 55
 const PHOTO_W = 12
+/** Electric heaters keep the electronics and motors warm in the cold morning. */
+const HEATER_W = 45
+/** Battery state of charge at dawn (the night heaters used the rest). */
+export const START_PCT = 33
+/** Relay-orbiter passes: Mars local time and how much data each can carry. */
+export const PASSES: { clock: number; mb: number }[] = [
+  { clock: 10 * 60 + 30, mb: 40 },
+  { clock: 13 * 60 + 30, mb: 60 },
+  { clock: 16 * 60 + 30, mb: 40 },
+]
 
 export function clockAt(sim: Sim, t: number): number {
   return sim.tier.startClock + t
@@ -216,6 +227,13 @@ export function clockAt(sim: Sim, t: number): number {
 export function fmtClock(min: number): string {
   const m = ((Math.round(min) % 1440) + 1440) % 1440
   return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
+}
+
+/** Heater power: full at dawn, off once the Sun has warmed the rover (10:30). */
+export function heaterW(clockMin: number): number {
+  const off = 10 * 60 + 30
+  if (clockMin >= off) return 0
+  return Math.min(HEATER_W, (HEATER_W * (off - clockMin)) / 180)
 }
 
 export function solarW(clockMin: number): number {
@@ -233,7 +251,7 @@ export function createSim(tierIndex: TierIndex, map: MarsMap): Sim {
     ex: map.start.x,
     ey: map.start.y,
     slipAcc: 0,
-    wh: CAPACITY_WH * 0.45,
+    wh: (CAPACITY_WH * START_PCT) / 100,
     status: 'idle',
     plan: [],
     cur: null,
@@ -245,7 +263,7 @@ export function createSim(tierIndex: TierIndex, map: MarsMap): Sim {
     seq: 0,
   }
   const passes = tier.legend
-    ? [10 * 60 + 30, 13 * 60 + 30, 16 * 60 + 30].map((c) => ({ t: c - tier.startClock, mb: 60, used: 0, done: false }))
+    ? PASSES.map((p) => ({ t: p.clock - tier.startClock, mb: p.mb, used: 0, done: false }))
     : []
   const sim: Sim = {
     tierIndex,
@@ -271,7 +289,7 @@ export function createSim(tierIndex: TierIndex, map: MarsMap): Sim {
     points: 0,
     earthKnowsIdle: true,
     terminalAtEarth: null,
-    stats: { faults: {}, slips: 0, slipsCaught: 0, avoids: 0, sciMiss: 0, charges: 0, minWhPct: 45, imagesSent: 0, parked: 0 },
+    stats: { faults: {}, slips: 0, slipsCaught: 0, avoids: 0, sciMiss: 0, charges: 0, minWhPct: START_PCT, imagesSent: 0, parked: 0 },
     trail: [{ x: map.start.x, y: map.start.y }],
     ended: false,
   }
@@ -497,8 +515,10 @@ function powerGuard(sim: Sim): boolean {
   if (r.wh >= CAPACITY_WH * 0.2) return false
   sim.stats.charges++
   emit(sim, { k: 'charge' })
-  if (solarW(clockAt(sim, sim.t)) <= BASE_W + 10) {
-    // Too dark to charge: park and save energy for the night.
+  const clock = clockAt(sim, sim.t)
+  if (clock >= 12 * 60 && solarW(clock) <= BASE_W + 10) {
+    // Afternoon and too dark to charge: park and save energy for the night.
+    // (In the morning the Sun is rising, so it waits and charges instead.)
     r.status = 'fault'
     sim.stats.parked++
     endSequence(sim, true)
@@ -899,7 +919,8 @@ export function tick(sim: Sim): Arrival[] {
     }
     // Energy.
     if (sim.tier.legend) {
-      const net = solarW(clockAt(sim, sim.t)) - loadW(r)
+      const clock = clockAt(sim, sim.t)
+      const net = solarW(clock) - loadW(r) - heaterW(clock)
       r.wh = Math.min(CAPACITY_WH, r.wh + (net * DT) / 60)
       sim.stats.minWhPct = Math.min(sim.stats.minWhPct, (r.wh / CAPACITY_WH) * 100)
       if (r.wh <= 0) {
@@ -1029,7 +1050,10 @@ export interface Outcome {
 }
 
 export function isOver(sim: Sim): boolean {
-  if (sim.terminalAtEarth) return true
+  if (sim.terminalAtEarth === 'dead') return true
+  // A stuck rover still has its radio (Spirit sent science home for months
+  // after it got stuck), so in Legend the relay passes carry on to sunset.
+  if (sim.terminalAtEarth === 'stuck' && !sim.tier.legend) return true
   if (sim.t >= sim.tier.timeLimit) return true
   if (!sim.tier.legend && sim.scienceAtEarth.size >= sim.map.targets.length) return true
   return false
@@ -1047,11 +1071,13 @@ export function evaluate(sim: Sim): Outcome {
   if (st.faults.edge) why.push('A drive would have left the mapped area, so the rover stopped.')
   if (st.faults.blocked || st.faults.noroute) why.push('Its cameras found no safe way through, so it stopped and called home.')
   if (sim.rover.status === 'stuck') why.push('It drove into deep sand and dug itself in. Wheels spin, rover sinks — the real rover Spirit got stuck like this in 2009 and never drove again.')
+  if (sim.rover.status === 'stuck' && tier.legend)
+    why.push('A stuck rover still has its radio, so the relay passes kept carrying its data home. Spirit sent science back for about ten months after it got stuck.')
   if (st.slips > 0 && !st.slipsCaught)
     why.push(`Loose sand made the wheels slip ${st.slips}×. The wheels turned but the rover did not move, so its wheel-count (dead reckoning) said it had gone further than it really had.`)
   if (st.slipsCaught > 0) why.push(`Visual odometry caught ${st.slipsCaught} wheel slips by comparing camera pictures, so the rover kept driving until it had really arrived.`)
   if (st.avoids > 0) why.push(`Hazard avoidance steered around ${st.avoids} rock${st.avoids > 1 ? 's' : ''} on its own — no need to wait ${2 * d} minutes for Earth.`)
-  if (st.sciMiss > 0) why.push(`Science ran ${st.sciMiss}× on the wrong spot. The instruments only reach a rock right next to the wheels.`)
+  if (st.sciMiss > 0) why.push(`Science ran ${st.sciMiss}× on the wrong spot. Science only works with the rover parked ON the target square: the arm reaches just the ground at its front wheels.`)
   if (sim.photos.length && !tier.legend && st.slips > 0 && !st.slipsCaught) why.push('The pictures showed where the rover REALLY was — that is how mission teams find out about slip.')
   if (uplinks > 0) why.push(`You sent ${uplinks} plan${uplinks > 1 ? 's' : ''}. Each one costs at least ${2 * d} minutes of waiting for signals (${d} there, ${d} back): ${waitMin} minutes in total.`)
 
@@ -1081,19 +1107,21 @@ export function evaluate(sim: Sim): Outcome {
   const nightRisk = sim.rover.status !== 'dead' && pct < 25
   const total = sim.points + energyBonus - (nightRisk ? 20 : 0)
   const unsent = sim.downlinkQueue.length
-  if (unsent) why.push(`${unsent} data item${unsent > 1 ? 's were' : ' was'} still waiting on the rover when the last relay pass ended. Only data that reaches Earth counts.`)
-  if (sim.rover.status === 'dead') why.push('The battery ran flat and the rover went into safe mode. Driving early, before the Sun is high, drains the battery fast — the Power guard rule waits for sunshine.')
+  if (unsent) why.push(`${unsent} data item${unsent > 1 ? 's were' : ' was'} still waiting on the rover when the last relay pass ended. The passes carry only 40, 60 and 40 MB, and only data that reaches Earth counts.`)
+  if (sim.rover.status === 'dead') why.push('The battery ran flat and the rover went into safe mode. In the cold early morning the heaters use power and the Sun is weak, so driving straight away drains the battery fast. A Wait at dawn, or the Power guard rule, lets the Sun do the work.')
   if (nightRisk) why.push(`The battery ended at ${Math.round(pct)}%. The heaters need energy to survive the −80 °C night, so finishing below 25% costs points.`)
   if (st.parked) why.push('Late in the day the Sun was too low to charge, so the power guard parked the rover to save energy for the night.')
   if (st.charges) why.push(`The power guard stopped to charge ${st.charges}× — it kept the rover alive.`)
   if (sim.aegisAtEarth.size) why.push(`AEGIS found ${sim.aegisAtEarth.size} bonus rock${sim.aegisAtEarth.size > 1 ? 's' : ''} by itself while driving — real science done with no human in the loop.`)
-  const stars = sim.rover.status === 'dead' || total <= 0 || sim.scienceAtEarth.size === 0 ? 0 : total >= 230 ? 3 : total >= 150 ? 2 : 1
+  const [s3, s2, par] = legendStarLines(sim.map.no)
+  const stars = sim.rover.status === 'dead' || total <= 0 || sim.scienceAtEarth.size === 0 ? 0 : total >= s3 ? 3 : total >= s2 ? 2 : 1
+  if (stars > 0 && stars < 3) why.push(`★★★ on this map needs ${s3} points. Our best computer plan scored ${par} — try a different target order, or time your drives for the Sun and the relay passes.`)
   const msg =
     stars === 0
       ? sim.rover.status === 'dead'
         ? 'Low-power safe mode: the rover had to stop everything to stay alive. Watch the Sun and the battery!'
         : sim.rover.status === 'stuck'
-          ? 'The rover is stuck in deep sand. AutoNav can only avoid dunes that are on its map.'
+          ? 'The rover got stuck in deep sand before any science reached Earth. AutoNav 🧭 steers around the dunes on the orbital map, but a ▲ drive goes exactly where you point it.'
           : 'No science reached Earth this sol. Sample a target and make sure its data fits in a relay pass.'
       : `${sim.scienceAtEarth.size} of ${sim.map.targets.length} targets' data reached Earth${sim.aegisAtEarth.size ? ` plus ${sim.aegisAtEarth.size} AEGIS find${sim.aegisAtEarth.size > 1 ? 's' : ''}` : ''}, battery ${Math.round(pct)}%.`
   return { won: stars > 0, stars, score: total, scoreLabel: 'science pts', lowerIsBetter: false, message: msg, why }
@@ -1103,6 +1131,6 @@ export function evaluate(sim: Sim): Outcome {
 export function runToEnd(sim: Sim): Arrival[] {
   const out: Arrival[] = []
   let n = 0
-  while (sim.t < sim.tier.timeLimit && !sim.terminalAtEarth && n++ < 100000) out.push(...tick(sim))
+  while (sim.t < sim.tier.timeLimit && sim.terminalAtEarth !== 'dead' && n++ < 100000) out.push(...tick(sim))
   return out
 }

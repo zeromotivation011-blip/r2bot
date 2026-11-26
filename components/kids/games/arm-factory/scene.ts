@@ -103,6 +103,8 @@ export class FactoryScene {
   private ringH = NaN
   private pathLine: THREE.Line
   private pathDots: THREE.Points
+  /** The plan the path buffers were last built from (rebuilt only on change). */
+  private pathSrc: SceneExtras['path'] = null
   private dropLine: THREE.Line
   private dropDot: THREE.Mesh
   private graspRing: THREE.Mesh
@@ -121,7 +123,7 @@ export class FactoryScene {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' })
     this.renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1))
     this.renderer.shadowMap.enabled = true
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    this.renderer.shadowMap.type = THREE.PCFShadowMap
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     this.renderer.toneMappingExposure = 1.05
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -706,23 +708,7 @@ export class FactoryScene {
 
     // Planned path
     if (x.path && x.path.pts.length > 1) {
-      const n = x.path.pts.length
-      const pos = new Float32Array(n * 3)
-      const col = new Float32Array(n * 3)
-      for (let i = 0; i < n; i++) {
-        const p = x.path.pts[i]
-        pos[i * 3] = p.x
-        pos[i * 3 + 1] = p.y
-        pos[i * 3 + 2] = p.z
-        const bad = x.path.bad[i]
-        col[i * 3] = bad ? 1 : 0.13
-        col[i * 3 + 1] = bad ? 0.15 : 0.9
-        col[i * 3 + 2] = bad ? 0.15 : 0.35
-      }
-      const g = this.pathLine.geometry
-      g.setAttribute('position', new THREE.BufferAttribute(pos, 3))
-      g.setAttribute('color', new THREE.BufferAttribute(col, 3))
-      g.computeBoundingSphere()
+      if (x.path !== this.pathSrc) this.buildPath(x.path)
       this.pathLine.visible = this.pathDots.visible = true
     } else this.pathLine.visible = this.pathDots.visible = false
 
@@ -787,6 +773,27 @@ export class FactoryScene {
     return 0
   }
 
+  private buildPath(path: NonNullable<SceneExtras['path']>): void {
+    this.pathSrc = path
+    const n = path.pts.length
+    const pos = new Float32Array(n * 3)
+    const col = new Float32Array(n * 3)
+    for (let i = 0; i < n; i++) {
+      const p = path.pts[i]
+      pos[i * 3] = p.x
+      pos[i * 3 + 1] = p.y
+      pos[i * 3 + 2] = p.z
+      const bad = path.bad[i]
+      col[i * 3] = bad ? 1 : 0.13
+      col[i * 3 + 1] = bad ? 0.15 : 0.9
+      col[i * 3 + 2] = bad ? 0.15 : 0.35
+    }
+    const g = this.pathLine.geometry
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3))
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3))
+    g.computeBoundingSphere()
+  }
+
   dispose(): void {
     this.scene.traverse((o) => {
       const mesh = o as THREE.Mesh
@@ -801,8 +808,10 @@ export class FactoryScene {
     })
     this.partGeo.dispose()
     this.bandGeo.dispose()
-    // No forceContextLoss(): React may remount on the same <canvas>, and a lost
-    // context cannot be recovered from that element.
     this.renderer.dispose()
+    // The owner creates a fresh <canvas> for every scene and never reuses one,
+    // so release the GPU context now instead of waiting for the browser to
+    // evict it ("Too many active WebGL contexts").
+    this.renderer.forceContextLoss()
   }
 }

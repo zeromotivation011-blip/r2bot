@@ -62,26 +62,26 @@ const TIERS = [
   {
     name: 'Cadet',
     who: 'about 8 and up, with a grown-up if needed',
-    what: 'Teach Sorta two labels, ← and →. Draw three of each, then watch eight parcels ride the belt. Six correct wins.',
+    what: 'Teach Sorta two labels, ← and →. Draw three of each, then watch ten parcels drawn by other people ride the belt. Eight correct wins.',
     tip: 'Make the arrow head big and clear: it is the only thing that tells left from right. Watch the live bars while you draw — if they wobble between ← and →, your examples are too alike.',
   },
   {
     name: 'Pilot',
     who: 'about 10 and up',
-    what: 'Three labels: ←, → and ○. The twelve test parcels were drawn by other people, so the score is real accuracy on unseen data. Reach 75%.',
-    tip: 'Draw each label a few different ways: big and small, neat and quick, starting from different ends. A brain that has seen variety copes with strangers’ handwriting.',
+    what: 'Four labels: ←, →, ○ and △. Sixteen parcels drawn in a hurry by strangers (open circles, rounded triangles, one-sided arrow heads), and every run brings new ones, so the score is real accuracy on unseen data. Thirteen correct wins.',
+    tip: '○ and △ are the hard pair. Teach more than the minimum, and include quick, messy drawings as well as neat ones: the ✨ Sample button only gives tidy textbook shapes, and strangers don’t draw like a textbook.',
   },
   {
     name: 'Ace',
     who: 'about 12 and up',
-    what: 'A hurried intern trained the robot: nine ←, seven ✕ and only one tiny →, plus a few labels that are simply wrong. Run it, read the confusion matrix, then fix the data until it scores 85%.',
-    tip: 'Look at the bars beside each label: are they fair? Tap every drawing in a crowded row and ask “does this match its label?” Delete or relabel the ones that don’t, then add → examples.',
+    what: 'A hurried intern trained the robot. The ← row shows twelve drawings, but four of them are really → with the wrong label; there are seven ✕ and only one tiny →. Run it, read the confusion matrix, then fix the data until it scores 85%. The third star needs clean data, with no wrong labels left.',
+    tip: 'Tap every drawing in the crowded ← row and ask “does this match its label?” Relabelling the wrong ones fixes two problems at once: the bad labels and the missing →. Deleting them alone leaves → out-voted.',
   },
   {
     name: 'Legend',
     who: '14 and up — a real data-science challenge',
-    what: 'Four labels. Choose the representation (raw pixels or engineered features) and k, clean a factory dataset, add your own drawings, augment them, and check on a validation set. Then pass a one-shot final exam on 24 unseen drawings that are tilted, resized, moved and smudged.',
-    tip: 'Never trust training accuracy: with k = 1 it is always 100%. Use the validation set to compare designs in the experiment log, change one thing at a time, and only take the exam when validation is comfortably above the target.',
+    what: 'Four labels. Choose the representation (raw pixels or engineered features) and k, clean a factory dataset, add your own drawings, augment them, and compare designs on a validation set. Then take the final exam: 24 brand-new drawings tilted up to 35°, squashed, moved, smudged and drawn in a hurry. 22 correct wins, and a bonus question decides the third star.',
+    tip: 'Never trust training accuracy: with k = 1 it is always 100%. Watch the leave-one-out and validation columns in the experiment log, change one thing at a time, and remember that engineered features undo position and size but not rotation. Tilted drawings and augmentation cover turning.',
   },
 ]
 
@@ -107,6 +107,7 @@ export default function RobotBrainPage() {
           <strong>features</strong>. The simplest features are raw pixels: lay a grid over the picture and record how much ink is in each square.
           Better features are <em>engineered</em>: first find where the drawing is and how big it is, centre it and resize it, then count which
           directions the lines go. Engineered features ignore things that do not matter (where you drew, how big) and keep what does (the shape).
+          They do not undo rotation, though: a turned arrow still looks different, so the robot needs turned examples to learn that.
         </p>
 
         <h2 className="mt-10 text-2xl font-black text-white">k-nearest-neighbours: the brain inside the game</h2>
@@ -127,7 +128,9 @@ export default function RobotBrainPage() {
         <ul className="mt-3 list-disc space-y-2 pl-6 text-white/80">
           <li>
             <strong>Held-out test data.</strong> A model must be scored on examples it never saw while learning. That is why the test parcels are
-            drawn by the game, not by you, and are the same every time you play a tier — so your score is fair and depends only on your teaching.
+            drawn by the game, not by you, and why every run brings brand-new parcels: if you could re-test on the same ones, you would end up
+            teaching the robot the answers instead of the idea. Legend adds a <strong>validation set</strong> you may check as often as you like,
+            and keeps the exam separate for that reason.
           </li>
           <li>
             <strong>Biased data.</strong> If one label has far fewer examples, or if some examples carry the wrong label, the model learns the bias.
@@ -140,8 +143,9 @@ export default function RobotBrainPage() {
           <li>
             <strong>Overfitting.</strong> A model that memorises its training data scores perfectly on that data and badly on anything new. With
             k = 1 every training example is its own nearest neighbour, so training accuracy is always 100% — a number that tells you nothing.
-            Variety in the data, <strong>data augmentation</strong> (adding tilted, moved and resized copies) and better features all help a model
-            generalise.
+            <strong>Leave-one-out</strong> accuracy is the honest version: hide each example (and any copies of it) and see if the rest get it
+            right. Variety in the data, <strong>data augmentation</strong> (adding turned, moved and resized copies) and better features all help a
+            model generalise.
           </li>
         </ul>
 

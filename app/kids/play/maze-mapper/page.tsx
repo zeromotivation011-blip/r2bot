@@ -15,7 +15,7 @@ const PAGE_URL = `${BASE}/kids/play/maze-mapper`
 
 const TITLE = 'Maze Mapper Game for Kids: How Robots Map and Escape a Maze'
 const DESCRIPTION =
-  'Guide a robot through a fog-covered maze with a range sensor. Kids learn occupancy grid maps, wall-following and why it loops, frontier exploration, BFS and A* path planning, and how robots cope with noisy sensors. Four tiers, ages 8 to 17.'
+  'Guide a robot through a fog-covered maze with a range sensor. Kids learn occupancy grid maps, wall-following and why it loops, frontier exploration, BFS and A* path planning, and how robots cope with noisy sensors. Four tiers for ages 11 to 17, from Cadet to Legend.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -38,7 +38,7 @@ const learningLd = {
   description: DESCRIPTION,
   url: PAGE_URL,
   learningResourceType: 'Interactive simulation',
-  educationalLevel: 'Ages 8–17',
+  educationalLevel: 'Ages 11–17',
   audience: { '@type': 'EducationalAudience', educationalRole: 'student', audienceType: 'children' },
   teaches: [
     'Occupancy grid maps (free, occupied, unknown)',
@@ -60,13 +60,13 @@ const crumbs = breadcrumbJsonLD([
 const TIERS = [
   {
     name: 'Cadet',
-    who: 'about 8 and up, with a grown-up if needed',
+    who: '11 and up (younger players can try it with a grown-up)',
     what: 'You drive. Every move fires four sensor beams that paint the map: dark green for floor, bright blocks for walls. Find the green exit and drive out — the more of the maze you map first, the more stars.',
     tip: 'Peek into side corridors before you pass them: one step in and the beams reach several squares. Press Hint when you are stuck and a yellow trail leads to the nearest unexplored edge.',
   },
   {
     name: 'Pilot',
-    who: 'about 10 and up',
+    who: '11 and up',
     what: 'The robot drives itself with a wall-follower: keep one hand on a wall and walk. Pick left or right. The robot starts next to a wall that floats free in the middle of the maze — and you have only a few hand-driven moves to fix it.',
     tip: 'If the robot comes back to the same square facing the same way, it will loop forever. The wall it held glows yellow: that is an island. Drive to a wall that touches the outside of the maze, then start the follower again.',
   },
@@ -74,13 +74,13 @@ const TIERS = [
     name: 'Ace',
     who: 'about 12 and up',
     what: 'You choose where to explore. Glowing squares are frontiers, where the known map meets the unknown. Each trip is planned with breadth-first search, and you watch its wavefront ripple out. When the exit appears, plan the escape.',
-    tip: 'Nearest-first is a good rule, but the exit is always in the east wall. A far frontier on the east side can be worth more than a near one in the west. Stop exploring as soon as you know a way out.',
+    tip: 'Pressing Nearest every time only ties the nearest-frontier robot. To beat it you need an idea the robot does not have: the exit is always in the east wall. Stop exploring as soon as you know a way out.',
   },
   {
     name: 'Legend',
     who: '14 and up — a real engineering challenge',
-    what: 'One reading in five is wrong, some vanish, and the wheels slip. You design the robot’s brain: scans per stop, the trust level, the planner (BFS, A* or greedy) and an east hunch. Then compare your brain with others on the same maze.',
-    tip: 'A trust level of 55% believes a single echo, so ghost walls block corridors and phantom gaps appear in walls. Raise the trust to about 80% and take one or two scans per stop. Use A* so planning costs less energy, and add some east hunch.',
+    what: 'One reading in five is wrong, some vanish, and the wheels slip. You design the robot’s brain: scans per stop, the trust level, the planner (BFS, A* or greedy) and an east hunch. The mission is to get out AND bring back a map a rescue team can trust: every wrong square on the map adds to the mission cost, just like wasted energy. Stars compare your brain with all 288 brains the panel can build, on the same maze.',
+    tip: 'Work like an engineer: change one setting, run again, and read the “change one thing at a time” table. Watch both energy and wrong squares — a brain that is fast but believes every echo brings back a map full of ghost walls, and a brain that doubts everything burns energy looking again. Each maze has its own best brain.',
   },
 ]
 
@@ -132,7 +132,7 @@ export default function MazeMapperPage() {
           sensor is honest only most of the time: about one beam in five reads one square too short or too long, some beams return nothing, and
           the wheels sometimes slip. The map then works like a real one, using <strong>log-odds</strong>: each reading adds a little evidence for
           “free” or “wall”, and a square only counts as known when the evidence passes the trust level you choose. One bad echo gets out-voted by
-          many good ones. When the robot really is unsure, it can touch a square with its bumper, which is never wrong.
+          many good ones. When the robot really is unsure, it can touch a square with its bumper, which is never wrong. The noise is random but repeatable: each reading’s error is fixed by where and when it is taken, so the same brain on the same maze always gives the same run, and a change you make only alters the readings it really affects.
         </p>
         <p className="mt-3 text-white/80">
           To keep things focused, the robot always knows exactly where it is: its motion sensor notices every wheel slip. Real robots also have
@@ -164,7 +164,7 @@ export default function MazeMapperPage() {
           where to look next, and plan a route — while never trusting one reading too much.
         </p>
         <p className="mt-6">
-          <Link href="/kids" className="font-bold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
             ← Back to the R2BOT Universe
           </Link>
         </p>

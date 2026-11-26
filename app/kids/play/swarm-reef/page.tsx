@@ -13,7 +13,7 @@ export const runtime = 'nodejs'
 const BASE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in'
 const PAGE_URL = `${BASE}/kids/play/swarm-reef`
 
-const TITLE = 'Swarm Robotics Game for Kids: Boids, Emergence and Search-and-Rescue Swarms'
+const TITLE = 'Swarm Robotics Game for Kids: Boids and Emergence'
 const DESCRIPTION =
   'Command a swarm of underwater robots by setting the rules each robot follows: separation, alignment, cohesion, obstacle avoidance and a shared trail. Kids learn emergence and decentralised control in a real boids simulation — four tiers from age 8 to 17.'
 
@@ -78,8 +78,8 @@ const TIERS = [
   {
     name: 'Legend',
     who: '14 and up — a real research problem',
-    what: 'Search and rescue. Fourteen robots with limited batteries must find six hidden beacons and search as much of the reef as possible. Moving costs energy and so does sensing: a bigger radius sees more but drains faster.',
-    tip: 'A flock is a terrible search pattern — it searches like one big robot. Spread out with separation and almost no cohesion. Then give the swarm a memory: robots leave a fading trail and “explore” steers each one away from trails, toward unsearched water. For three stars, balance the trail strength against how fast it fades, and pick a radius that sees enough without killing the battery.',
+    what: 'Search and rescue. Fourteen robots with limited batteries must find six hidden beacons and search as much of the reef as possible. Moving costs energy and so does sensing: a bigger radius sees more but drains faster, and every crash or bump costs battery too. The mission ends when the last battery is flat.',
+    tip: 'A flock is a terrible search pattern — it searches like one big robot. Spread out with separation and almost no cohesion. Then give the swarm a memory: robots leave a fading trail and “explore” steers each one away from trails, toward unsearched water. For three stars, balance the trail strength against how fast it fades, and pick a radius that sees enough without killing the battery — a big radius searches a wide strip but dies early.',
   },
 ]
 
@@ -119,11 +119,13 @@ export default function SwarmReefPage() {
 
         <h2 className="mt-10 font-display text-2xl font-black text-white">What the game simulates</h2>
         <p className="mt-3 text-slate-300">
-          Swarm Reef is a real boids simulation stepped 60 times a second. Every robot has a position, a velocity, a top speed and a limit on how
-          hard it can turn, and it feels water drag and an ocean current. Each step, every robot looks only at the neighbours inside its own{' '}
+          Swarm Reef is a real boids simulation stepped 60 times a second. Every robot has a position, a velocity, a top speed and a thruster
+          limit (all the rule pushes added together are capped, so it cannot stop or turn instantly), and it feels water drag and an ocean
+          current. Each step, every robot looks only at the neighbours inside its own{' '}
           <strong>sensing radius</strong> and adds up the pushes from each rule, multiplied by the <strong>weights</strong> you set. Separation acts
           only inside a smaller personal space, just as in Reynolds’ model. Collisions with rocks and with other robots are detected and counted.
-          Random numbers come from a fixed seed, so the same rules always give the same run and your score depends only on your design.
+          Random numbers come from a fixed seed and the rules lock while the swarm swims, so the same rules always give the same run and your
+          score depends only on your design.
         </p>
         <p className="mt-3 text-slate-300">
           The Cadet level is based on a famous result in animal behaviour: in 2005, Iain Couzin and colleagues showed that a small number of

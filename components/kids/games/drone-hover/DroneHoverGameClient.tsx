@@ -116,7 +116,7 @@ const BRIEF: Record<TierIndex, { title: string; steps: string[] }> = {
     steps: [
       'The drone flies itself to 3 m with your Kp.',
       'At 8 s a 0.35 kg parcel clips on. At 16 s the target jumps to 5 m.',
-      'Win: finish within 0.30 m of the target. Stars: small error, small overshoot, quick settle.',
+      'Win: finish within 0.30 m of the target and never overshoot by more than 0.75 m. Stars: small error, small overshoot, quick settle.',
     ],
   },
   2: {
@@ -124,15 +124,15 @@ const BRIEF: Record<TierIndex, { title: string; steps: string[] }> = {
     steps: [
       'Gusts all flight long, a 0.4 kg parcel at 10 s, target 5 m at 18 s.',
       'A big downdraft hits at 24 s, then the target drops to 2.5 m at 30 s.',
-      'Win: finish within 0.06 m — only an I term can beat the parcel’s sag that precisely.',
+      'Win: finish within 0.06 m with a flight score of 550+. Only an I term can beat the parcel’s sag that precisely.',
     ],
   },
   3: {
     title: 'Legend — cascaded control, waypoint course',
     steps: [
-      'Six waypoints. Hold each one for 1.2 s inside its ring.',
+      'Six waypoints. Hold each one for 1.2 s inside its ring. Win: finish with a flight score of 450+.',
       'Carry a 0.4 kg parcel and drop it at waypoint 4. Gusts up to 7 m/s sideways.',
-      'The battery sags as it empties — less thrust for the same command. No flight predictor: you are the engineer.',
+      'The battery sags as it empties — less thrust for the same command (sped up: a real pack takes 10–15 minutes). No flight predictor: you are the engineer.',
     ],
   },
 }
@@ -265,6 +265,12 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
   const [report, setReport] = useState<FlightReport | null>(null)
   const [paused, setPaused] = useState(false)
   const [plainFirst, setPlainFirst] = useState(false)
+  // Small screens: the action bar floats above the kids tab bar while the game is on screen.
+  const [barFixed, setBarFixed] = useState(false)
+  // Large screens: the controls column scrolls inside the viewport (runtime-measured height).
+  const [asideMax, setAsideMax] = useState<number | null>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const asideRef = useRef<HTMLElement>(null)
 
   const worldRef = useRef<HTMLCanvasElement>(null)
   const plotRef = useRef<HTMLCanvasElement>(null)
@@ -284,6 +290,43 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
   useEffect(() => {
     const band = getProgress().band
     setPlainFirst(band === 'explorers' || band === 'builders')
+  }, [])
+
+  useEffect(() => {
+    const grid = gridRef.current
+    if (!grid || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([e]) => setBarFixed(e.isIntersecting), { threshold: 0 })
+    io.observe(grid)
+    return () => io.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const aside = asideRef.current
+    if (!aside) return
+    const mq = window.matchMedia('(min-width: 1024px)')
+    let raf = 0
+    const measure = () => {
+      raf = 0
+      if (!mq.matches) {
+        setAsideMax(null)
+        return
+      }
+      const top = Math.max(12, aside.getBoundingClientRect().top)
+      setAsideMax(Math.max(320, Math.round(window.innerHeight - top - 12)))
+    }
+    const queue = () => {
+      if (!raf) raf = requestAnimationFrame(measure)
+    }
+    measure()
+    window.addEventListener('scroll', queue, { passive: true })
+    window.addEventListener('resize', queue)
+    mq.addEventListener('change', queue)
+    return () => {
+      if (raf) cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', queue)
+      window.removeEventListener('resize', queue)
+      mq.removeEventListener('change', queue)
+    }
   }, [])
 
   // Flight predictor: Pilot sees the whole flight; Ace sees a calm-air step; Legend flies blind.
@@ -321,7 +364,8 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
     const el = worldRef.current
     if (el) {
       const r = el.getBoundingClientRect()
-      if (r.top < 0 || r.bottom > window.innerHeight) {
+      // Leave room for the sticky kids header above and the tab bar + action bar below.
+      if (r.top < 64 || r.bottom > window.innerHeight - 150) {
         const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
         el.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' })
       }
@@ -574,10 +618,10 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
   const brief = BRIEF[tier]
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div ref={gridRef} className="grid gap-3 pb-24 lg:grid-cols-[minmax(0,1fr)_360px] lg:pb-0">
       <div className="flex min-w-0 flex-col gap-2 lg:sticky lg:top-3 lg:self-start">
         <div className="relative h-[330px] overflow-hidden rounded-3xl border border-white/10 bg-slate-950 sm:h-[420px] lg:h-[470px]">
-          <canvas ref={worldRef} className="block h-full w-full" role="img" aria-label={`Drone flight view. Height ${hud.z.toFixed(1)} metres, target ${hud.tz.toFixed(1)} metres.`} />
+          <canvas ref={worldRef} className="block h-full w-full scroll-mt-[84px]" role="img" aria-label={`Drone flight view. Height ${hud.z.toFixed(1)} metres, target ${hud.tz.toFixed(1)} metres.`} />
 
           {/* HUD */}
           <div className="pointer-events-none absolute left-2 top-2 flex flex-wrap gap-1.5 text-xs font-bold sm:text-sm" aria-live="off">
@@ -616,7 +660,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
                 <span className="mt-1 text-[10px] font-black uppercase text-cyan-200">thrust</span>
                 <span className="text-[10px] font-black uppercase text-rose-300">— weight</span>
               </div>
-              <div className="pointer-events-none absolute bottom-3 left-3 right-20 rounded-xl bg-slate-900/75 p-2">
+              <div className="pointer-events-none absolute bottom-3 left-3 w-[36%] max-w-[230px] rounded-xl bg-slate-900/75 p-2">
                 <p className="text-xs font-bold text-white">{hud.phase === 0 ? 'Hover in the green band' : 'Parcel on — hover again!'}</p>
                 <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-white/10">
                   <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-lime-300 transition-[width] duration-100" style={{ width: `${Math.min(100, (hud.hold / holdNeed) * 100)}%` }} />
@@ -641,6 +685,67 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
           )}
           {paused && (
             <div className="absolute inset-0 flex items-center justify-center bg-slate-950/60 text-xl font-black text-white">Paused</div>
+          )}
+        </div>
+
+        <div
+          className={`z-20 flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/90 p-2 backdrop-blur ${
+            barFixed ? 'max-lg:fixed max-lg:inset-x-2 max-lg:bottom-[calc(75px+env(safe-area-inset-bottom))] min-[901px]:max-lg:bottom-3 max-lg:shadow-2xl max-lg:shadow-black/60' : ''
+          }`}
+          role="toolbar"
+          aria-label="Flight controls"
+        >
+          {tier > 0 && phase === 'ready' && (
+            <button type="button" onClick={launch} className="min-h-[52px] flex-1 rounded-2xl bg-amber-400 px-5 text-lg font-black text-slate-900 shadow-lg shadow-amber-500/30 hover:bg-amber-300 active:scale-[0.98]">
+              🚀 Launch
+            </button>
+          )}
+          {tier === 0 && phase === 'ready' && (
+            <button type="button" onClick={() => setThr(0.3)} className="min-h-[52px] flex-1 rounded-2xl bg-amber-400 px-5 text-lg font-black text-slate-900 hover:bg-amber-300">
+              🚀 Start rotors
+            </button>
+          )}
+          {tier === 0 && (
+            <div className="flex items-center gap-1.5 lg:hidden">
+              <HoldButton label="Less throttle" onStep={() => setThr(throttleRef.current - 0.01)} disabled={phase === 'done'}>
+                −
+              </HoldButton>
+              <span className="w-12 text-center font-mono text-lg font-black text-amber-200" aria-hidden>
+                {Math.round(throttle * 100)}%
+              </span>
+              <HoldButton label="More throttle" onStep={() => setThr(throttleRef.current + 0.01)} disabled={phase === 'done'}>
+                +
+              </HoldButton>
+            </div>
+          )}
+          {phase === 'flying' && (
+            <button type="button" onClick={abort} className="min-h-[52px] flex-1 rounded-2xl border-2 border-rose-300/60 px-5 font-black text-rose-100 hover:bg-rose-500/20">
+              {tier === 0 ? '↺ Restart' : '✋ Abort'}
+            </button>
+          )}
+          {tier > 0 && (
+            <div className="flex rounded-2xl border border-white/15 p-1" role="radiogroup" aria-label="Simulation speed">
+              {[1, 2, 4].map((sp) => (
+                <button
+                  key={sp}
+                  type="button"
+                  role="radio"
+                  aria-checked={speed === sp}
+                  onClick={() => {
+                    speedRef.current = sp
+                    setSpeed(sp)
+                  }}
+                  className={`min-h-[44px] min-w-[44px] rounded-xl px-2 text-sm font-black ${speed === sp ? 'bg-white/20 text-white' : 'text-white/60'}`}
+                >
+                  {sp}×
+                </button>
+              ))}
+            </div>
+          )}
+          {tier > 0 && phase === 'ready' && (
+            <button type="button" onClick={() => setGains(defaultGains(tier))} className="min-h-[44px] rounded-2xl border border-white/15 px-3 text-sm font-bold text-white/70 hover:bg-white/10">
+              Reset gains
+            </button>
           )}
         </div>
 
@@ -691,7 +796,12 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
         )}
       </div>
 
-      <aside className="flex flex-col gap-3 lg:max-h-[min(760px,calc(100vh-24px))] lg:overflow-y-auto lg:overscroll-contain lg:pr-1" aria-label="Flight brain controls">
+      <aside
+        ref={asideRef}
+        className="flex flex-col gap-3 lg:overflow-y-auto lg:overscroll-contain lg:pr-1"
+        style={asideMax ? { maxHeight: asideMax } : undefined}
+        aria-label="Flight brain controls"
+      >
         <section className="rounded-2xl border border-white/10 bg-white/5 p-3">
           <h2 className="font-black text-white">{brief.title}</h2>
           <ol className="mt-1 list-decimal space-y-1 pl-5 text-sm text-white/75">
@@ -753,7 +863,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
               ))}
             {tier === 3 &&
               LEGEND_SLIDERS.map((grp) => (
-                <section key={grp.title} className="flex flex-col gap-2">
+                <div key={grp.title} role="group" aria-label={grp.title} className="flex flex-col gap-2">
                   <div>
                     <h3 className="font-black text-amber-200">{grp.title}</h3>
                     <p className="text-xs text-white/55">{grp.note}</p>
@@ -761,54 +871,13 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
                   {grp.items.map((d) => (
                     <GainSlider key={d.key} def={d} value={gains[d.key]} onChange={(v) => setGain(d.key, v)} disabled={locked} />
                   ))}
-                </section>
+                </div>
               ))}
             {tier === 1 && <p className="text-xs text-white/55">The dotted line on the graph predicts this flight before you launch — move Kp and watch it change.</p>}
             {tier === 2 && <p className="text-xs text-white/55">The dotted line predicts the first 10 s in calm air only. Gusts, the parcel and the downdraft are up to your tuning.</p>}
           </>
         )}
 
-        <div className="sticky bottom-2 z-10 flex flex-wrap gap-2 rounded-2xl bg-slate-950/80 p-2 backdrop-blur">
-          {tier > 0 && phase === 'ready' && (
-            <button type="button" onClick={launch} className="min-h-[52px] flex-1 rounded-2xl bg-amber-400 px-5 text-lg font-black text-slate-900 shadow-lg shadow-amber-500/30 hover:bg-amber-300 active:scale-[0.98]">
-              🚀 Launch
-            </button>
-          )}
-          {tier === 0 && phase === 'ready' && (
-            <button type="button" onClick={() => setThr(0.3)} className="min-h-[52px] flex-1 rounded-2xl bg-amber-400 px-5 text-lg font-black text-slate-900 hover:bg-amber-300">
-              🚀 Start rotors
-            </button>
-          )}
-          {phase === 'flying' && (
-            <button type="button" onClick={abort} className="min-h-[52px] flex-1 rounded-2xl border-2 border-rose-300/60 px-5 font-black text-rose-100 hover:bg-rose-500/20">
-              {tier === 0 ? '↺ Restart' : '✋ Abort'}
-            </button>
-          )}
-          {tier > 0 && (
-            <div className="flex rounded-2xl border border-white/15 p-1" role="radiogroup" aria-label="Simulation speed">
-              {[1, 2, 4].map((sp) => (
-                <button
-                  key={sp}
-                  type="button"
-                  role="radio"
-                  aria-checked={speed === sp}
-                  onClick={() => {
-                    speedRef.current = sp
-                    setSpeed(sp)
-                  }}
-                  className={`min-h-[44px] min-w-[44px] rounded-xl px-2 text-sm font-black ${speed === sp ? 'bg-white/20 text-white' : 'text-white/60'}`}
-                >
-                  {sp}×
-                </button>
-              ))}
-            </div>
-          )}
-          {tier > 0 && phase === 'ready' && (
-            <button type="button" onClick={() => setGains(defaultGains(tier))} className="min-h-[44px] rounded-2xl border border-white/15 px-3 text-sm font-bold text-white/70 hover:bg-white/10">
-              Reset gains
-            </button>
-          )}
-        </div>
       </aside>
     </div>
   )

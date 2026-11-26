@@ -60,19 +60,19 @@ const TIERS = [
   {
     name: 'Pilot',
     who: 'about 10 and up',
-    what: 'The drone flies itself with a proportional (P) controller. You choose one number, Kp, then a parcel clips on and the target jumps from 3 m to 5 m.',
+    what: 'The drone flies itself with a proportional (P) controller. You choose one number, Kp, then a parcel clips on and the target jumps from 3 m to 5 m. To win, finish within 30 cm of the target without overshooting it by more than 75 cm.',
     tip: 'With P alone, extra weight leaves a sag of (extra weight ÷ Kp). A bigger Kp shrinks the sag, but too big and every correction overshoots. Use the dotted prediction line to find the sweet spot.',
   },
   {
     name: 'Ace',
     who: 'about 12 and up',
-    what: 'Full PID control through gusts, a heavier parcel, a sudden downdraft and two target changes. To win, the drone must finish within 6 cm of the target.',
+    what: 'Full PID control through gusts, a heavier parcel, a sudden downdraft and two target changes. To win, the drone must finish within 6 cm of the target with a flight score of at least 550.',
     tip: 'Start with P and D only and get a clean step without wobble. Then add a little I to remove the leftover sag. Too much I makes slow, wide swings. Watch the green I line on the graph grow while the parcel is on.',
   },
   {
     name: 'Legend',
     who: '14 and up — a real engineering challenge',
-    what: 'A two-dimensional waypoint course. Three loops work together: an inner loop holds the tilt, an outer loop chooses the tilt to move sideways, and a PID loop holds the height. The parcel drops halfway and the battery sags as it empties.',
+    what: 'A two-dimensional waypoint course. Three loops work together: an inner loop holds the tilt, an outer loop chooses the tilt to move sideways, and a PID loop holds the height. The parcel drops halfway and the battery sags as it empties. Finishing the course is not enough: a win needs a flight score of at least 450.',
     tip: 'Tune from the inside out. Make the tilt loop fast and well damped first (a drone that wobbles in tilt cannot fly anywhere). Then tune the position loop several times slower. Finally add I to the height loop for the battery sag and the lighter drone after the drop.',
   },
 ]
@@ -127,7 +127,9 @@ export default function DroneHoverPage() {
           Sky Port is a real physics simulation, stepped 200 times a second. The drone has mass and feels gravity. Each motor takes a moment to
           change speed (motor lag), which is the reason too much P makes it overshoot and ring. Air resists motion, and gusts follow the smooth
           &ldquo;1 − cosine&rdquo; shape aircraft engineers use. Power is worked out from rotor momentum theory, so a twitchy controller really does
-          use more energy. In Legend the battery voltage sags as it empties and under heavy load, and the motors lose thrust with it. Sensors are
+          use more energy. In Legend the battery voltage sags as it empties and under heavy load, and the motors lose thrust with it. The battery is sped up: a real 1 kg
+          drone carries about 40–80 watt-hours and sags over 10–15 minutes, so the game uses a tiny 3 Wh pack to show the same sag in one
+          80-second course. Sensors are
           slightly noisy at Ace and Legend, just like a real barometer. The gusts are the same every time you fly a tier, so your score depends only
           on your design.
         </p>

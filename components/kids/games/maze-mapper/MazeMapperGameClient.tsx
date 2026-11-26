@@ -5,12 +5,12 @@
 // The round rules live in ./game (MazeGame) and the simulation in ./sim; this
 // file is the canvas, the controls and the debrief panel.
 
-import { useCallback, useEffect, useReducer, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useReducer, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { primeAudio } from '@/lib/kids-audio'
-import { MazeGame, type Snapshot } from './game'
+import { MazeGame, PLANNER_NAMES, type Snapshot } from './game'
 import { cellAt, drawScene, makeView, type RevealMode, type View } from './render'
-import { LEGEND_DEFAULT, MAZES_PER_TIER, type AutoSettings, type PlannerId, type TierIndex } from './sim'
+import { LEGEND_DEFAULT, MAZES_PER_TIER, WRONG_SQUARE_COST, type AutoSettings, type PlannerId, type TierIndex } from './sim'
 
 interface Props {
   tier: number
@@ -39,7 +39,7 @@ const BRIEF: Record<TierIndex, { title: string; steps: string[] }> = {
     steps: [
       'Glowing squares are frontiers: the edge of the known map. Tap one (or press Nearest) to explore it.',
       'Each trip is planned with BFS — watch the ripple (wavefront) spread through the known map.',
-      'When the exit appears, press Plan escape. Match the nearest-frontier robot’s step count for 3 stars.',
+      'When the exit appears, press Plan escape. Pressing Nearest every time ties the nearest-frontier robot (2 stars). Beat it for 3 stars: the exit is always in the east wall.',
     ],
   },
   3: {
@@ -47,7 +47,7 @@ const BRIEF: Record<TierIndex, { title: string; steps: string[] }> = {
     steps: [
       'One beam in five lies (off by a square) and some vanish. Wheels sometimes slip. Hatched squares are uncertain.',
       'Design the brain: scans per stop, how sure it must be (trust), the planner, and an east hunch (the exit is in the east wall).',
-      'Run, read the debrief, compare with other brains on this SAME maze, re-tune. Use ≤ 55% of the battery for 3 stars.',
+      `Mission: get out AND bring back a map you can trust. Mission cost = energy used + ${WRONG_SQUARE_COST} for every wrong square. 3 stars = a top-10% brain for this maze.`,
     ],
   },
 }
@@ -79,10 +79,10 @@ function loadSettings(): AutoSettings {
     if (raw) {
       const p = JSON.parse(raw) as Partial<AutoSettings>
       return {
-        scans: Math.min(4, Math.max(1, Number(p.scans) || 1)),
-        trust: Math.min(0.9, Math.max(0.55, Number(p.trust) || 0.55)),
+        scans: Math.min(4, Math.max(1, Math.round(Number(p.scans)) || LEGEND_DEFAULT.scans)),
+        trust: Math.min(0.9, Math.max(0.55, Math.round((Number(p.trust) || LEGEND_DEFAULT.trust) * 20) / 20)),
         planner: p.planner === 'astar' || p.planner === 'greedy' ? p.planner : 'bfs',
-        eastBias: Math.min(2, Math.max(0, Number(p.eastBias) || 0)),
+        eastBias: Math.min(2, Math.max(0, Math.round(Number(p.eastBias)) || 0)),
         frontierRule: 'straight',
       }
     }
@@ -148,6 +148,19 @@ function Seg<T extends string | number>({ value, options, onChange, label }: { v
   )
 }
 
+function raceLesson(race: { algo: PlannerId; expanded: number; longer: number; maxExtra: number }[]): string {
+  const by = (a: PlannerId) => race.find((r) => r.algo === a)
+  const bfs = by('bfs')
+  const astar = by('astar')
+  const greedy = by('greedy')
+  if (!bfs || !astar || !greedy) return ''
+  const pct = Math.round((astar.expanded / Math.max(1, bfs.expanded)) * 100)
+  const g = greedy.longer
+    ? `Greedy checked the fewest (${greedy.expanded}) but took a longer route on ${greedy.longer} trip${greedy.longer === 1 ? '' : 's'}, once by ${greedy.maxExtra} extra steps: following only the guess walks it into dead ends.`
+    : `Greedy checked the fewest (${greedy.expanded}) and was lucky here: it never took a longer route.`
+  return `BFS and A* always find a shortest route. A* checked ${astar.expanded} squares, about ${pct}% of BFS’s ${bfs.expanded}, because its guess points it at the goal. ${g}`
+}
+
 const ARROW_ICON: Record<number, string> = { 0: 'M12 5l7 8H5z', 1: 'M19 12l-8 7V5z', 2: 'M12 19l-7-8h14z', 3: 'M5 12l8-7v14z' }
 
 function DPad({ onMove, disabled }: { onMove: (d: number) => void; disabled: boolean }) {
@@ -178,7 +191,7 @@ function DPad({ onMove, disabled }: { onMove: (d: number) => void; disabled: boo
           onMove(d)
         }
       }}
-      className={`flex h-14 w-14 touch-none select-none items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-95 active:bg-amber-400 active:text-slate-900 disabled:opacity-40 ${cls}`}
+      className={`flex h-12 w-12 touch-none sm:h-14 sm:w-14 select-none items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-95 active:bg-amber-400 active:text-slate-900 disabled:opacity-40 ${cls}`}
     >
       <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden>
         <path d={ARROW_ICON[d]} fill="currentColor" />
@@ -191,7 +204,7 @@ function DPad({ onMove, disabled }: { onMove: (d: number) => void; disabled: boo
       {pad(0, 'up', '')}
       <span />
       {pad(3, 'left', '')}
-      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-xs font-bold text-white/40" aria-hidden>
+      <span className="flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14 bg-white/5 text-xs font-bold text-white/40" aria-hidden>
         R2
       </span>
       {pad(1, 'right', '')}
@@ -202,9 +215,9 @@ function DPad({ onMove, disabled }: { onMove: (d: number) => void; disabled: boo
   )
 }
 
-function Stat({ label, value, tone = 'text-white' }: { label: string; value: ReactNode; tone?: string }) {
+function Stat({ label, value, tone = 'text-white', className = '' }: { label: string; value: ReactNode; tone?: string; className?: string }) {
   return (
-    <div className="min-w-[72px] rounded-xl border border-white/10 bg-white/[0.04] px-2.5 py-1.5">
+    <div className={`min-w-[64px] rounded-xl border border-white/10 bg-white/[0.04] px-2 py-1.5 sm:px-2.5 ${className}`}>
       <p className="text-[11px] font-bold uppercase tracking-wide text-white/50">{label}</p>
       <p className={`font-display text-lg font-black leading-tight ${tone}`}>{value}</p>
     </div>
@@ -216,6 +229,7 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
   const [, bump] = useReducer((x: number) => x + 1, 0)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<View | null>(null)
   const [settings, setSettings] = useState<AutoSettings>(() => (typeof window === 'undefined' ? { ...LEGEND_DEFAULT } : loadSettings()))
   const [speed, setSpeed] = useState(1)
@@ -368,6 +382,13 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
     if (o.stars > 0) writeNum(attemptsKey(tier), 0)
     else writeNum(attemptsKey(tier), attempts)
     if (o.stars === 0) attempts = 0
+    // The results card is centred on the whole game column, which on a phone is
+    // taller than the screen: bring the column's middle to the middle first.
+    const root = rootRef.current
+    if (root) {
+      const r = root.getBoundingClientRect()
+      window.scrollTo({ top: Math.max(0, window.scrollY + r.top + r.height / 2 - window.innerHeight / 2), behavior: 'auto' })
+    }
     onFinish({
       stars: o.stars,
       score: o.score,
@@ -377,6 +398,12 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
       badges: o.stars > 0 ? ['map-maker'] : undefined,
       attempts: o.stars > 0 ? attempts : undefined,
     })
+  }
+
+  const scrollToMaze = () => {
+    // On a phone the Run button sits below the settings; bring the maze back into view.
+    const el = wrapRef.current
+    if (el && window.matchMedia('(max-width: 1023px)').matches) el.scrollIntoView({ block: 'start', behavior: 'auto' })
   }
 
   const retry = () => {
@@ -400,11 +427,12 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
   const o = cur.outcome
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="flex min-w-0 flex-col gap-2">
+    <div ref={rootRef} className="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,1fr)_360px]">
+      {/* On phones both columns dissolve (max-lg:contents) so the controls can sit right under the maze. */}
+      <div className="flex min-w-0 flex-col gap-2 max-lg:contents">
         {/* Live stats */}
-        <div className="flex flex-wrap gap-2" aria-label="Robot status">
-          <div className="min-w-[132px] flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-2.5 py-1.5">
+        <div className="flex flex-wrap gap-1.5 max-lg:order-1 sm:gap-2" aria-label="Robot status">
+          <div className="min-w-[96px] flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-2.5 py-1.5">
             <p className="text-[11px] font-bold uppercase tracking-wide text-white/50">Battery</p>
             <div className="mt-1 h-3 overflow-hidden rounded-full bg-white/10" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(batteryPct * 100)} aria-label="Battery">
               <div className={`h-full rounded-full transition-[width] duration-200 ${batteryPct > 0.4 ? 'bg-emerald-400' : batteryPct > 0.15 ? 'bg-amber-400' : 'bg-rose-500'}`} style={{ width: `${batteryPct * 100}%` }} />
@@ -417,15 +445,18 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
           {tier === 0 && <Stat label="Mapped" value={`${Math.round(cur.coverage * 100)}%`} tone="text-cyan-200" />}
           {tier === 1 && <Stat label="Hand-drive" value={cur.manualLeft} tone="text-amber-200" />}
           {tier === 1 && <Stat label="Loops" value={cur.loops} tone={cur.loops ? 'text-amber-300' : 'text-white'} />}
-          {tier === 2 && <Stat label="Target" value={`≤ ${cur.baseline}`} tone="text-amber-200" />}
+          {tier === 2 && <Stat label="3★: beat" value={cur.baseline} tone="text-amber-200" />}
           {tier === 2 && <Stat label="Frontiers" value={cur.frontierCount} tone="text-cyan-200" />}
           {tier === 3 && <Stat label="Bumps / slips" value={`${cur.bumps} / ${cur.slips}`} tone="text-rose-200" />}
-          {tier === 3 && <Stat label="Think energy" value={cur.compute.toFixed(1)} tone="text-cyan-200" />}
-          <Stat label="Exit" value={cur.exitSeen ? 'Seen' : '???'} tone={cur.exitSeen ? 'text-emerald-300' : 'text-white/60'} />
+          {tier === 3 && <Stat label="3★ cost ≤" value={cur.legendThree === null ? '…' : Math.round(cur.legendThree)} tone="text-amber-200" />}
+          <Stat label="Exit" value={cur.exitSeen ? 'Seen' : '???'} tone={cur.exitSeen ? 'text-emerald-300' : 'text-white/60'} className={tier === 1 ? 'max-sm:hidden' : ''} />
         </div>
 
         {/* The maze */}
-        <div className="relative mx-auto w-full" style={{ maxWidth: `calc(66vh * ${aspect.toFixed(3)})` }}>
+        <div
+          className={`relative mx-auto w-full max-lg:order-2 lg:max-w-[calc(62vh*var(--mm-aspect))] ${tier <= 1 ? 'max-w-[calc(38vh*var(--mm-aspect))]' : 'max-w-[calc(46vh*var(--mm-aspect))]'}`}
+          style={{ '--mm-aspect': aspect.toFixed(3) } as CSSProperties}
+        >
           <div ref={wrapRef} className="relative w-full overflow-hidden rounded-3xl border border-teal-300/20 bg-[#0A1120] shadow-[0_8px_24px_rgba(0,0,0,.45)]" style={{ aspectRatio: `${game.world.W} / ${game.world.H}` }}>
             <canvas
               ref={canvasRef}
@@ -465,15 +496,15 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
             </div>
           )}
         </div>
-        <p className="min-h-[3rem] rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-semibold text-white/85" aria-live="polite">
+        <p className="min-h-[3rem] rounded-2xl border max-lg:order-4 border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-semibold text-white/85" aria-live="polite">
           {cur.status}
         </p>
       </div>
 
       {/* Side panel */}
-      <aside className="flex flex-col gap-3">
+      <aside className="flex flex-col gap-3 max-lg:contents">
         {cur.phase !== 'reveal' && (
-          <section className="rounded-[20px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4">
+          <section className="rounded-[20px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4 max-lg:order-5">
             <h2 className="font-display text-lg font-black text-amber-300">{brief.title}</h2>
             <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-white/80">
               {brief.steps.map((x) => (
@@ -493,7 +524,7 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
 
         {/* Legend brain designer */}
         {tier === 3 && cur.phase === 'brief' && (
-          <section className="space-y-3 rounded-[20px] border border-cyan-300/20 bg-cyan-400/[0.04] p-4" aria-label="Robot brain settings">
+          <section className="space-y-3 rounded-[20px] border border-cyan-300/20 bg-cyan-400/[0.04] p-4 max-lg:order-6" aria-label="Robot brain settings">
             <div>
               <p className="text-sm font-black text-white">Scans at every stop</p>
               <p className="text-xs text-white/60">More looks = more evidence per square. Each extra scan costs 0.5 energy.</p>
@@ -549,12 +580,15 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
                 />
               </div>
             </div>
+            <Btn tone="primary" className="w-full text-lg" onClick={() => (primeAudio(), scrollToMaze(), game.start())}>
+              Run this brain ▶
+            </Btn>
           </section>
         )}
 
         {/* Controls */}
         {cur.phase !== 'reveal' && (
-          <section className="order-first rounded-[20px] border border-white/10 bg-white/[0.03] p-4 lg:order-none">
+          <section className="order-first rounded-[20px] border border-white/10 bg-white/[0.03] p-2.5 max-lg:order-3 sm:p-4">
             {cur.phase === 'brief' && tier >= 2 && (
               <Btn tone="primary" className="w-full text-lg" onClick={() => (primeAudio(), game.start())}>
                 {tier === 3 ? 'Run the robot ▶' : 'Start exploring ▶'}
@@ -643,7 +677,7 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
 
         {/* Map legend */}
         {cur.phase !== 'reveal' && (
-          <section className="rounded-[20px] border border-white/10 bg-white/[0.03] p-3 text-xs text-white/70">
+          <section className="rounded-[20px] border border-white/10 bg-white/[0.03] p-3 text-xs text-white/70 max-lg:order-7">
             <p className="font-black text-white/85">Reading the map</p>
             <ul className="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
               <li className="flex items-center gap-2">
@@ -679,7 +713,7 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
 
         {/* Debrief */}
         {cur.phase === 'reveal' && o && (
-          <section className="rounded-[20px] border-2 border-amber-300/40 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-4" aria-label="Debrief">
+          <section className="rounded-[20px] border-2 border-amber-300/40 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-4 max-lg:order-5" aria-label="Debrief">
             <p className="text-3xl" aria-label={`${o.stars} stars`}>
               {[0, 1, 2].map((i) => (
                 <span key={i} className={i < o.stars ? '' : 'opacity-20 grayscale'}>
@@ -695,59 +729,66 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
                 <li key={w}>{w}</li>
               ))}
             </ul>
-            {o.compare && (
+            {o.tries && (
               <div className="mt-3 overflow-x-auto">
-                <h3 className="text-sm font-black uppercase tracking-wide text-cyan-300">Same maze, other brains</h3>
+                <h3 className="text-sm font-black uppercase tracking-wide text-cyan-300">Change one thing at a time</h3>
+                <p className="text-[11px] text-white/55">Your brain, then the same brain with ONE setting changed, on this same maze. That is how engineers tune: one change, compare, repeat.</p>
                 <table className="mt-1 w-full text-left text-xs text-white/80">
                   <thead className="text-white/50">
                     <tr>
                       <th className="py-1 pr-2 font-bold">Brain</th>
-                      <th className="py-1 pr-2 font-bold">Out?</th>
                       <th className="py-1 pr-2 font-bold">Energy</th>
-                      <th className="py-1 pr-2 font-bold">Moves</th>
-                      <th className="py-1 font-bold">Map right</th>
+                      <th className="py-1 pr-2 font-bold">Wrong</th>
+                      <th className="py-1 pr-2 font-bold">Cost</th>
+                      <th className="py-1 font-bold">Stars</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {o.compare.map((r) => (
+                    {o.tries.map((r) => (
                       <tr key={r.name} className={r.mine ? 'font-black text-amber-200' : ''}>
                         <td className="py-1 pr-2">{r.name}</td>
-                        <td className="py-1 pr-2">{r.s.escaped ? '✓' : '✗'}</td>
-                        <td className="py-1 pr-2">{Math.round(r.s.energy)}</td>
-                        <td className="py-1 pr-2">{r.s.steps}</td>
-                        <td className="py-1">{Math.round(r.s.accuracy * 100)}%</td>
+                        <td className="py-1 pr-2">{r.escaped ? Math.round(r.energy) : '—'}</td>
+                        <td className="py-1 pr-2">{r.escaped ? r.wrong : '—'}</td>
+                        <td className="py-1 pr-2">{r.escaped ? r.cost : 'not out'}</td>
+                        <td className="py-1" aria-label={`${r.stars} stars`}>
+                          {r.stars ? '★'.repeat(r.stars) : '✗'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                {o.rank && (
+                  <p className="mt-1 text-[11px] text-white/55">
+                    On this maze: 3 stars needs a cost of {o.rank.three} or less, 2 stars {o.rank.two} or less. Each maze has its own best brain.
+                  </p>
+                )}
               </div>
             )}
-            {o.planners && (
+            {o.race && (
               <div className="mt-3 overflow-x-auto">
-                <h3 className="text-sm font-black uppercase tracking-wide text-cyan-300">Your settings, three planners</h3>
+                <h3 className="text-sm font-black uppercase tracking-wide text-cyan-300">Planner race: 40 long trips</h3>
+                <p className="text-[11px] text-white/55">The same 40 trips across this maze’s real layout, planned three ways.</p>
                 <table className="mt-1 w-full text-left text-xs text-white/80">
                   <thead className="text-white/50">
                     <tr>
                       <th className="py-1 pr-2 font-bold">Planner</th>
-                      <th className="py-1 pr-2 font-bold">Out?</th>
                       <th className="py-1 pr-2 font-bold">Squares checked</th>
-                      <th className="py-1 pr-2 font-bold">Think energy</th>
-                      <th className="py-1 font-bold">Moves</th>
+                      <th className="py-1 pr-2 font-bold">Total route</th>
+                      <th className="py-1 font-bold">Longer than shortest</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {o.planners.map((r) => (
-                      <tr key={r.name} className={r.mine ? 'font-black text-amber-200' : ''}>
-                        <td className="py-1 pr-2">{r.name}</td>
-                        <td className="py-1 pr-2">{r.s.escaped ? '✓' : '✗'}</td>
-                        <td className="py-1 pr-2">{r.s.expanded}</td>
-                        <td className="py-1 pr-2">{r.s.compute.toFixed(1)}</td>
-                        <td className="py-1">{r.s.steps}</td>
+                    {o.race.map((r) => (
+                      <tr key={r.algo} className={r.algo === settings.planner ? 'font-black text-amber-200' : ''}>
+                        <td className="py-1 pr-2">{PLANNER_NAMES[r.algo]}</td>
+                        <td className="py-1 pr-2">{r.expanded}</td>
+                        <td className="py-1 pr-2">{r.steps}</td>
+                        <td className="py-1">{r.longer ? `${r.longer} trips (up to +${r.maxExtra})` : 'never'}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-                <p className="mt-1 text-[11px] text-white/50">Noise makes every run a little different, so a planner can win or lose by luck of the readings. Try a few settings.</p>
+                <p className="mt-1 text-[11px] text-white/55">{raceLesson(o.race)}</p>
               </div>
             )}
             <div className="mt-4 flex flex-wrap gap-2">

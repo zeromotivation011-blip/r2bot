@@ -42,30 +42,30 @@ export const TIERS: TierConfig[] = [
     canAugment: false,
     showMatrix: false,
     hasValidation: false,
-    stars: [0.75, 0.875, 1],
+    stars: [0.8, 0.9, 1],
     testSeed: 1101,
-    testPerClass: 4,
-    testVariation: VARIATION.gentle,
-    goal: 'Teach the sorter ← and →. Draw 3 of each, then sort 8 parcels. Get 6 right to win.',
+    testPerClass: 5,
+    testVariation: VARIATION.strangers,
+    goal: 'Teach the sorter ← and →. Draw 3 of each, then sort 10 parcels drawn by other people. Get 8 right to win.',
     intro: 'Hi! I am Sorta. I can’t read arrows yet. Draw some for me and tell me which is which!',
   },
   {
     index: 1,
-    classes: ['left', 'right', 'circle'],
+    classes: ['left', 'right', 'circle', 'tri'],
     minPerClass: 3,
-    maxExamples: 36,
+    maxExamples: 48,
     k: 3,
     chooseK: false,
     chooseRep: false,
     canAugment: false,
     showMatrix: false,
     hasValidation: false,
-    stars: [0.75, 0.9, 1],
+    stars: [13 / 16, 15 / 16, 1],
     testSeed: 2207,
     testPerClass: 4,
-    testVariation: VARIATION.everyday,
-    goal: 'Three labels now. The 12 test parcels were drawn by OTHER people — your robot has never seen them. Reach 75% accuracy.',
-    intro: 'New labels! Circles mean local delivery. Test parcels come from strangers, so teach me what arrows and circles look like in general.',
+    testVariation: VARIATION.strangers,
+    goal: 'Four labels, and ○ and △ are easy to mix up. 16 parcels drawn in a hurry by strangers, new ones every run. Sort 13 right to win.',
+    intro: 'New labels! ○ means local delivery, △ means fragile. Strangers draw fast: open circles, rounded triangles. Teach me what each one looks like in general.',
   },
   {
     index: 2,
@@ -82,26 +82,26 @@ export const TIERS: TierConfig[] = [
     testSeed: 3313,
     testPerClass: 5,
     testVariation: VARIATION.everyday,
-    goal: 'An intern trained me in a hurry. Run me, read the confusion matrix, then FIX THE DATA until I score 85%.',
+    goal: 'An intern trained me in a hurry. Run me, read the confusion matrix, then FIX THE DATA until I score 85%. The 3rd star needs clean data: no wrong labels left.',
     intro: 'The intern says I’m trained. Run the test and see what happens… then look hard at my data.',
   },
   {
     index: 3,
     classes: ['left', 'right', 'circle', 'stop'],
     minPerClass: 2,
-    maxExamples: 80,
+    maxExamples: 100,
     k: 1,
     chooseK: true,
     chooseRep: true,
     canAugment: true,
     showMatrix: true,
     hasValidation: true,
-    stars: [0.85, 0.92, 0.92],
+    stars: [0.9, 0.95, 0.95],
     testSeed: 4421,
     testPerClass: 6,
     testVariation: VARIATION.wild,
-    goal: 'Design the brain: pick k and raw pixels or features, clean the factory data, add your own, then pass the ONE-shot final exam (85%) on 24 unseen, tilted, resized, noisy parcels.',
-    intro: 'Legend lab. Validation is free; the final exam happens once. Don’t trust training accuracy.',
+    goal: 'Design the brain: pick k and raw pixels or features, clean the factory data, add and augment drawings, then pass the final exam: 22 of 24 brand-new parcels, tilted up to 35°, squashed, smudged and hurried.',
+    intro: 'Legend lab. Validation is free; every exam is 24 parcels nobody has seen, and you get one go per round. Don’t trust training accuracy.',
   },
 ]
 
@@ -115,6 +115,7 @@ function describe(meta: DrawMeta): string {
   const ax = Math.abs(meta.dx)
   const ay = Math.abs(meta.dy)
   if (Math.max(ax, ay) > 0.09) bits.push(ax >= ay ? `moved ${meta.dx < 0 ? 'left' : 'right'}` : `moved ${meta.dy < 0 ? 'up' : 'down'}`)
+  if (meta.hurried) bits.push('drawn in a hurry')
   if (meta.specks) bits.push(meta.specks === 1 ? 'with a smudge' : `with ${meta.specks} smudges`)
   return bits.length ? bits.join(', ') : 'neatly drawn'
 }
@@ -126,7 +127,7 @@ export function makeTestSet(classes: ClassId[], perClass: number, v: Variation, 
   for (let i = 0; i < perClass; i++)
     for (const c of classes) {
       const { drawing, meta } = generateDrawing(c, v, rng)
-      items.push({ drawing, truth: c, note: describe(meta) })
+      items.push({ drawing, truth: c, note: describe(meta), rot: meta.rot, hurried: !!meta.hurried })
     }
   // Fisher–Yates with the same rng: fair and repeatable.
   for (let i = items.length - 1; i > 0; i--) {
@@ -136,13 +137,23 @@ export function makeTestSet(classes: ClassId[], perClass: number, v: Variation, 
   return items
 }
 
-export function tierTestSet(t: TierConfig): TestItem[] {
-  return makeTestSet(t.classes, t.testPerClass, t.testVariation, t.testSeed)
+/**
+ * The test parcels for one run. Every run gets a NEW seed, so a child can
+ * never tune their data to parcels they have already seen: a held-out test
+ * stays held out.
+ */
+export function tierTestSet(t: TierConfig, run: number): TestItem[] {
+  return makeTestSet(t.classes, t.testPerClass, t.testVariation, t.testSeed + run * 7919)
 }
 
-/** Legend's validation set: same kind of drawings as the exam, different seed. */
+/** Legend's validation set: same kind of drawings as the exam, fixed, reusable. */
 export function tierValidationSet(t: TierConfig): TestItem[] {
-  return makeTestSet(t.classes, 4, t.testVariation, t.testSeed + 77)
+  return makeTestSet(t.classes, 5, t.testVariation, t.testSeed + 77)
+}
+
+/** Parcels needed for a fraction of `total` (13/16 of 16 → 13). */
+export function needed(frac: number, total: number): number {
+  return Math.ceil(frac * total - 1e-9)
 }
 
 let nextId = 1
@@ -153,8 +164,11 @@ export function newId(): number {
 /** The data each tier starts with (the child's own drawings are added on top). */
 export function starterData(t: TierConfig): Example[] {
   if (t.index === 2) {
-    // The intern's lopsided dataset: lots of ←, lots of ✕, ONE tiny →, and two
-    // → drawings carelessly labelled ←.
+    // The intern's dataset has TWO problems, and both matter:
+    //  · lopsided: 8 ←, 7 ✕ and ONE tiny, off-centre →;
+    //  · four ordinary → drawings carelessly labelled ←. They sit right where
+    //    real → parcels land, so they out-vote any → the child adds.
+    // Relabelling them fixes most of it; deleting them alone leaves one →.
     const rng = makeRng(9091)
     const out: Example[] = []
     const add = (label: ClassId, truth: ClassId, v: Variation, n: number) => {
@@ -163,10 +177,10 @@ export function starterData(t: TierConfig): Example[] {
     }
     let nl = 0
     let ns = 0
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 8; i++) {
       add('left', 'left', VARIATION.gentle, ++nl)
       if (i < 7) add('stop', 'stop', VARIATION.gentle, ++ns)
-      if (i === 3 || i === 6) add('left', 'right', VARIATION.gentle, ++nl)
+      if (i % 2 === 1) add('left', 'right', VARIATION.everyday, ++nl)
     }
     add('right', 'right', { ...VARIATION.gentle, scale: [0.42, 0.45], shift: 0.2 }, 1)
     return out
@@ -176,7 +190,7 @@ export function starterData(t: TierConfig): Example[] {
     const rng = makeRng(7310)
     const out: Example[] = []
     const wrong: Record<string, ClassId> = { 'circle-2': 'stop', 'right-4': 'left', 'stop-3': 'circle' }
-    const counts: Record<ClassId, number> = { left: 0, right: 0, circle: 0, stop: 0 }
+    const counts: Record<ClassId, number> = { left: 0, right: 0, circle: 0, tri: 0, stop: 0 }
     for (let i = 1; i <= 4; i++)
       for (const c of t.classes) {
         const { drawing } = generateDrawing(c, VARIATION.gentle, rng)

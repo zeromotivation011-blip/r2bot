@@ -296,13 +296,22 @@ function drawTargetBand(ctx: CanvasRenderingContext2D, v: View, s: SimState, tim
   const m = s.mission
   const top = pz(v, s.target.z + m.band)
   const bot = pz(v, s.target.z - m.band)
+  // A solid, clearly bounded band: "hover in the green band" must be visible over the dusk sky.
   const g = ctx.createLinearGradient(0, top, 0, bot)
-  const a = s.inBand ? 0.32 : 0.18
-  g.addColorStop(0, `rgba(52,211,153,0)`)
+  const a = s.inBand ? 0.42 : 0.3
+  g.addColorStop(0, `rgba(52,211,153,${a * 0.7})`)
   g.addColorStop(0.5, `rgba(52,211,153,${a})`)
-  g.addColorStop(1, `rgba(52,211,153,0)`)
+  g.addColorStop(1, `rgba(52,211,153,${a * 0.7})`)
   ctx.fillStyle = g
-  ctx.fillRect(0, top - 6, v.w, bot - top + 12)
+  ctx.fillRect(0, top, v.w, bot - top)
+  ctx.strokeStyle = s.inBand ? 'rgba(167,243,208,0.95)' : 'rgba(110,231,183,0.7)'
+  ctx.lineWidth = 1.5
+  ctx.beginPath()
+  ctx.moveTo(0, top)
+  ctx.lineTo(v.w, top)
+  ctx.moveTo(0, bot)
+  ctx.lineTo(v.w, bot)
+  ctx.stroke()
   const y = pz(v, s.target.z)
   ctx.save()
   ctx.setLineDash([10, 8])

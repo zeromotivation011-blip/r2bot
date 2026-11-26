@@ -313,6 +313,9 @@ export class ArmSim {
   /** The belt only runs once the round has started. */
   beltOn = true
   time = 0
+  /** Sim time of the child's first arm command (-1 until then). Timed scores
+   *  start here, not at mount, so reading the help first costs nothing. */
+  firstInput = -1
   events: SimEvent[] = []
   stats: Stats = { sorted: 0, wrong: 0, dropped: 0, rejected: 0, bumps: 0, crashes: 0, missedGrips: 0, slips: 0, overloads: 0 }
   done = false
@@ -387,17 +390,24 @@ export class ArmSim {
 
   // ── Commands ──
 
+  private markInput(): void {
+    if (this.firstInput < 0) this.firstInput = this.time
+  }
+
   setTarget(i: number, v: number): void {
+    this.markInput()
     this.targets[i] = clampJoint(i, v)
     this.bumpLatch = false
   }
 
   setTargets(j: Joints): void {
+    this.markInput()
     for (let i = 0; i < 3; i++) this.targets[i] = clampJoint(i, j[i])
     this.bumpLatch = false
   }
 
   toggleGrip(): void {
+    this.markInput()
     if (this.gripDir === 1 || (this.grip >= 1 && this.gripDir === 0)) this.release()
     else this.closeGrip()
   }

@@ -14,7 +14,7 @@ function Skeleton() {
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]" aria-busy="true" aria-label="Loading The Labyrinth">
       <div className="flex flex-col gap-2">
         <div className="h-[58px] animate-pulse rounded-xl bg-white/5" />
-        <div className="mx-auto aspect-[23/21] w-full max-w-[calc(66vh*1.1)] animate-pulse rounded-3xl border border-teal-300/20 bg-gradient-to-br from-slate-900 via-teal-950 to-slate-950" />
+        <div className="mx-auto aspect-[23/21] w-full max-w-[calc(62vh*1.1)] animate-pulse rounded-3xl border border-teal-300/20 bg-gradient-to-br from-slate-900 via-teal-950 to-slate-950" />
         <div className="h-12 animate-pulse rounded-2xl bg-white/5" />
       </div>
       <div className="flex flex-col gap-3">

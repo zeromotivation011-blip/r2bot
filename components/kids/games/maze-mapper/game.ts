@@ -10,20 +10,30 @@ import {
   DX4,
   DY4,
   Explorer,
-  LEGEND_REFERENCES,
+  LEGEND_BIASES,
+  LEGEND_PLANNERS,
+  LEGEND_SCANS,
+  LEGEND_TRUSTS,
+  WRONG_SQUARE_COST,
   batteryFor,
   followerDir,
   handWallComp,
+  legendSweep,
+  missionCost,
   pilotStats,
   plan,
+  plannerRace,
   runHeadless,
+  settingsKey,
   summarize,
   trueDistances,
   truePath,
   World,
   type AutoSettings,
+  type LegendSweep,
   type PlanResult,
-  type RunSummary,
+  type PlannerId,
+  type RaceRow,
   type TickResult,
   type TierIndex,
 } from './sim'
@@ -31,11 +41,18 @@ import { Fx, type RevealMode, type SceneState, type Wave } from './render'
 
 export type Phase = 'brief' | 'play' | 'reveal'
 
-export interface CompareRow {
+/** Legend: what one changed setting would have done on the same maze. */
+export interface TryRow {
   name: string
   mine?: boolean
-  s: RunSummary
+  escaped: boolean
+  cost: number
+  energy: number
+  wrong: number
+  stars: number
 }
+
+export const PLANNER_NAMES: Record<PlannerId, string> = { bfs: 'BFS', astar: 'A*', greedy: 'Greedy' }
 
 export interface Outcome {
   escaped: boolean
@@ -45,8 +62,12 @@ export interface Outcome {
   lowerIsBetter: boolean
   headline: string
   why: string[]
-  compare: CompareRow[] | null
-  planners: CompareRow[] | null
+  /** Legend: your brain and every one-setting change of it. */
+  tries: TryRow[] | null
+  /** Legend: the same long trips planned by all three planners. */
+  race: RaceRow[] | null
+  /** Legend: how your brain ranks among every brain the panel can build. */
+  rank: { beats: number; of: number; best: number; three: number; two: number } | null
 }
 
 export interface Snapshot {
@@ -73,6 +94,8 @@ export interface Snapshot {
   outcome: Outcome | null
   baseline: number
   optimal: number
+  /** Legend: mission cost needed for 3 stars on this maze (null until worked out). */
+  legendThree: number | null
 }
 
 const STEP_SEC = 0.17
@@ -107,6 +130,9 @@ export class MazeGame {
   private exitAnnounced = false
   private onChange: () => void
   private lastClick = 0
+  /** Hand-drive presses that arrived during a glide (at most 2), so quick taps are not lost. */
+  private queued: number[] = []
+  private sweep: LegendSweep | null = null
 
   constructor(tier: TierIndex, mazeIdx: number, settings: AutoSettings, reduced: boolean, onChange: () => void) {
     this.tier = tier
@@ -167,10 +193,11 @@ export class MazeGame {
     const m = this.world.maze
     this.optimal = trueDistances(m, m.start)[m.exit]
     this.baseline = this.tier === 2 ? runHeadless(2, this.mazeIdx, ACE_BASELINE, 1e9).steps : 0
+    this.sweep = this.tier === 3 ? legendSweep(this.mazeIdx, 0) : null
   }
 
   private briefStatus(): string {
-    return ['Drive with the arrows. Map the maze, then find the green exit.', 'Pick a hand and start the wall-follower.', 'Choose where to explore: tap a glowing frontier or press Nearest.', 'Set up the robot’s brain, then press Run.'][this.tier]
+    return ['Drive with the arrows. Map the maze, then find the green exit.', 'Pick a hand and start the wall-follower.', 'Choose where to explore: tap a glowing frontier or press Nearest.', 'Design the robot’s brain, then press Run.'][this.tier]
   }
 
   /** Switch maze (brief phase only). */
@@ -198,6 +225,7 @@ export class MazeGame {
     this.outcome = null
     this.lastPlan = null
     this.anim = null
+    this.queued = []
     this.wait = 0
     this.followSeen.clear()
     this.followComp.clear()
@@ -254,6 +282,7 @@ export class MazeGame {
       outcome: this.outcome,
       baseline: this.baseline,
       optimal: this.optimal,
+      legendThree: this.sweep ? this.sweep.three : null,
     }
   }
 
@@ -261,8 +290,12 @@ export class MazeGame {
 
   manualMove(d: number): void {
     if (this.phase === 'brief') this.start()
-    if (this.phase !== 'play' || this.busy) return
-    if (this.tier >= 2) return
+    if (this.phase !== 'play' || this.tier >= 2) return
+    if (this.busy || this.wait > 0) {
+      // Remember the press; it runs as soon as the robot finishes its glide.
+      if (this.queued.length < 2) this.queued.push(d)
+      return
+    }
     if (this.following) this.stopFollower()
     if (this.manualUsed >= this.manualCap) {
       this.status = 'Hand-drive limit reached. Let the wall-follower drive from here.'
@@ -446,8 +479,12 @@ export class MazeGame {
   stepOnce(): void {
     if (this.phase === 'brief') this.start()
     if (this.phase !== 'play' || this.tier !== 3) return
+    if (this.anim) return
     this.running = false
+    this.wait = 0
+    this.status = 'Paused. Each press of Step makes one decision.'
     this.logicTick()
+    this.onChange()
   }
 
   setReveal(m: RevealMode): void {
@@ -499,6 +536,19 @@ export class MazeGame {
       sc.target = this.phase === 'play' ? this.explorer.target : -1
     }
     this.fx.update(dt)
+
+    // Legend: try every possible brain on this maze in the background, a few
+    // milliseconds per frame, so the stars are measured against what is possible.
+    if (this.tier === 3 && !this.sweep) {
+      this.sweep = legendSweep(this.mazeIdx, 6)
+      if (this.sweep) this.onChange()
+    }
+
+    // Cadet/Pilot: a hand-drive press that arrived during the glide.
+    if (this.queued.length && !this.anim && this.phase === 'play') {
+      if (this.wait > 0) this.wait -= dt
+      else this.manualMove(this.queued.shift() as number)
+    } else if (this.phase !== 'play') this.queued = []
 
     if (this.phase !== 'play' || !this.running) return
     if (this.wait > 0) {
@@ -583,7 +633,7 @@ export class MazeGame {
     this.scene.shake = 0.6
     playSound('wrong')
     this.fx.ring(w.x(), w.y(), '#fbbf24', 1.2)
-    this.status = `Loop! The robot is back where it started, facing the same way. The ${this.hand}-hand wall it held is an island (glowing yellow) — it never touches the outside. Drive by hand to a different wall, then start again.`
+    this.status = `Loop! The robot is back on a square it already drove through, facing the same way, so it will repeat the same circuit forever. The ${this.hand}-hand wall it held is an island (glowing yellow) — it never touches the outside. Drive by hand to a different wall, then start again.`
     this.onChange()
   }
 
@@ -693,8 +743,9 @@ export class MazeGame {
     let scoreLabel = ''
     let lowerIsBetter = false
     let headline = ''
-    let compare: CompareRow[] | null = null
-    let planners: CompareRow[] | null = null
+    let tries: TryRow[] | null = null
+    let race: RaceRow[] | null = null
+    let rank: Outcome['rank'] = null
     const unknownFloor = Math.round((1 - cov) * w.maze.freeCount)
 
     if (this.tier === 0) {
@@ -722,57 +773,84 @@ export class MazeGame {
       score = w.steps
       scoreLabel = 'steps'
       lowerIsBetter = true
-      stars = escaped ? (w.steps <= this.baseline ? 3 : w.steps <= Math.round(this.baseline * 1.25) ? 2 : 1) : 0
-      headline = escaped ? `Escaped in ${w.steps} steps. The always-nearest-frontier robot needs ${this.baseline}; with a perfect map the best is ${this.optimal}.` : reason
+      const base = this.baseline
+      stars = escaped ? (w.steps < base ? 3 : w.steps <= Math.round(base * 1.2) ? 2 : 1) : 0
+      headline = escaped
+        ? `Escaped in ${w.steps} steps. The always-nearest-frontier robot needs ${base}${w.steps < base ? ' — you beat it!' : w.steps === base ? ' — a tie.' : '.'} With a perfect map the best is ${this.optimal}.`
+        : reason
       why.push('A frontier is the edge between what the robot knows and what it does not. Going to a frontier is the fastest way to learn something new.')
-      why.push(
-        w.steps <= this.baseline
-          ? 'You matched or beat “nearest frontier first”. Greedy-nearest is a good rule, but not the best one: thinking about WHERE the exit probably is can do better.'
-          : `The nearest-frontier robot did it in ${this.baseline}. Long trips to far frontiers and backtracking out of dead ends cost steps.`,
-      )
-      why.push(`BFS (breadth-first search) spreads out one step at a time, like a ripple. The first time the ripple touches the goal, that route is the shortest possible on the robot’s map. Your robot planned ${w.plans} times and checked ${w.expandedTotal} squares in total.`)
+      if (w.steps < base) why.push(`You beat “nearest frontier first” by ${base - w.steps} step${base - w.steps === 1 ? '' : 's'}. Nearest-first is a good rule, but it ignores what you know — that the exit is always in the east wall. Choosing frontiers with that in mind is what real explorers call using a prior.`)
+      else if (w.steps === base) why.push(`You tied the robot that always picks the nearest frontier — pressing Nearest every time IS that robot. To beat it (3 stars), use something it doesn't: the exit is always in the east wall, so a frontier on the east side can be worth more than a closer one in the west. And escape the moment a route is known.`)
+      else why.push(`The nearest-frontier robot did it in ${base}. Long trips to far frontiers and backtracking out of dead ends cost steps. Beat ${base} for 3 stars.`)
+      why.push(`BFS (breadth-first search) spreads out one step at a time, like a ripple. The first time the ripple touches the goal, that route is the shortest possible on the robot’s map. Your robot planned ${w.plans} time${w.plans === 1 ? '' : 's'} and checked ${w.expandedTotal} squares in total.`)
       why.push(`The robot only mapped ${Math.round(cov * 100)}% of the maze — it didn’t need the rest. Exploration stops paying once the way out is known.`)
     } else {
-      score = Math.round(used)
-      scoreLabel = 'energy used'
-      lowerIsBetter = true
-      const usedFrac = used / w.batteryMax
-      stars = escaped ? (usedFrac <= 0.55 ? 3 : usedFrac <= 0.8 ? 2 : 1) : 0
-      headline = escaped ? `Escaped using ${Math.round(usedFrac * 100)}% of the battery: ${w.steps} moves, ${w.bumps} bumps, ${w.slips} slips.` : reason
+      const sw = legendSweep(this.mazeIdx) as LegendSweep
+      this.sweep = sw
+      const mine = summarize(w)
+      const cost = missionCost(mine)
       const wrong = acc.wrongFloor + acc.wrongWalls
+      const usedR = Math.round(used)
+      score = escaped ? Math.round(cost) : 0
+      scoreLabel = 'mission cost'
+      lowerIsBetter = true
+      const starsFor = (c: number): number => (!Number.isFinite(c) ? 0 : c <= sw.three ? 3 : c <= sw.two ? 2 : 1)
+      stars = escaped ? starsFor(cost) : 0
+      const beats = sw.costs.filter((c) => c > cost).length
+      rank = { beats: escaped ? beats : 0, of: sw.costs.length, best: Math.round(sw.costs[0]), three: Math.round(sw.three), two: Math.round(sw.two) }
+      headline = escaped
+        ? `Mission cost ${Math.round(cost)} = ${usedR} energy + ${wrong} wrong square${wrong === 1 ? '' : 's'} × ${WRONG_SQUARE_COST}. ${stars === 3 ? 'A top-10% brain for this maze!' : `3 stars needs ${Math.round(sw.three)} or less.`}`
+        : reason
       why.push(
         wrong > 0
-          ? `The final map still has ${wrong} wrong square${wrong === 1 ? '' : 's'} (red crosses): ${acc.wrongWalls} ghost wall${acc.wrongWalls === 1 ? '' : 's'} and ${acc.wrongFloor} wall${acc.wrongFloor === 1 ? '' : 's'} mistaken for floor. Each comes from noisy readings the robot trusted.`
-          : 'The final map has no wrong squares: the evidence out-voted every noisy reading.',
+          ? `The map you brought back has ${wrong} wrong square${wrong === 1 ? '' : 's'} (red crosses): ${acc.wrongWalls} ghost wall${acc.wrongWalls === 1 ? '' : 's'} and ${acc.wrongFloor} real wall${acc.wrongFloor === 1 ? '' : 's'} marked as floor. Each one costs ${WRONG_SQUARE_COST}: a rescue team using this map would be fooled by it.`
+          : 'The map you brought back has no wrong squares: the evidence out-voted every noisy reading.',
+      )
+      const t = this.settings.trust
+      const thresh = Math.log(t / (1 - t))
+      const nWall = Math.floor(thresh / w.cfg.lOcc) + 1
+      const nFloor = Math.floor(thresh / -w.cfg.lFree) + 1
+      const need = `At ${Math.round(t * 100)}% trust, a square nobody has looked at becomes a wall after ${nWall} “wall” reading${nWall === 1 ? '' : 's'} and floor after ${nFloor} “floor” reading${nFloor === 1 ? '' : 's'}.`
+      why.push(
+        nWall === 1
+          ? `${need} So a single bad echo can draw a ghost wall across a corridor. Fast, but the map pays.`
+          : nWall >= 3
+            ? `${need} The map is careful, but every doubtful square means stopping to look again (${w.scans} scans for ${w.steps} moves).`
+            : `${need} Each reading adds or subtracts log-odds evidence, so one bad echo gets out-voted by the next good ones.`,
+      )
+      if (this.settings.scans > 1)
+        why.push(`You asked for ${this.settings.scans} scans at every stop, at ${this.world.cfg.extraScanCost} energy for each extra one — even where the map was already sure. The robot also looks again by itself when a frontier stays doubtful. Were all those extra scans worth it?`)
+      why.push(
+        this.settings.eastBias === 0
+          ? 'No east hunch: the robot chose between frontiers almost blindly, so tiny differences in the map sent it down different corridors — that is why results without a hunch swing so much. The exit is always in the east wall. Using what you already know (a “prior”) makes a robot’s choices steadier, and real robots do it too.'
+          : `Your east hunch (${this.settings.eastBias === 1 ? 'some' : 'strong'}) pulled the robot toward the east wall, where the exit must be. A prior like this cuts out whole wrong corridors — but a strong one can drag the robot past nearer, useful frontiers.`,
       )
       why.push(
-        this.settings.trust < 0.7
-          ? 'With a low trust level ONE reading decides a square, so a single bad echo can draw a wall across a corridor or open a hole in a wall. More scans and a higher trust level make the map slower but honest.'
-          : 'A higher trust level means a square only counts once several readings agree. Each reading adds or subtracts log-odds evidence, so one bad echo gets out-voted.',
+        `Your planner (${PLANNER_NAMES[this.settings.planner]}) checked ${w.expandedTotal} squares for ${w.computeEnergy.toFixed(1)} energy. Most of the robot’s trips were short hops to nearby frontiers; on hops that short all three planners usually find the same route, so the planner mostly changes thinking energy. The race below shows where planners really differ: long trips.`,
       )
-      why.push(
-        `Planning cost ${w.computeEnergy.toFixed(1)} energy for ${w.expandedTotal} squares checked. ${this.settings.planner === 'bfs' ? 'BFS checks everything in rings around the robot.' : this.settings.planner === 'astar' ? 'A* aims at the goal with a distance guess (the heuristic), so it checks far fewer squares and still finds the shortest path.' : 'Greedy only follows the guess, so it checks very few squares but can pick a longer path.'}`,
-      )
-      if (this.settings.eastBias === 0) why.push('Tip: the exit is always in the east wall. A robot that leans toward the east (the “east hunch”) uses what it knows — that is prior knowledge, and real robots use it too.')
-      compare = this.compareRows()
-      planners = this.plannerRows()
+      why.push(escaped ? `Your brain beats ${beats} of the ${sw.costs.length} brains this panel can build, on this maze. The best possible mission cost here is ${Math.round(sw.costs[0])}.` : `Of the ${sw.costs.length} brains this panel can build, ${sw.costs.filter(Number.isFinite).length} get out of this maze.`)
+      tries = this.tryRows(sw, mine, starsFor)
+      race = plannerRace(w.maze)
     }
-    return { escaped, stars, score, scoreLabel, lowerIsBetter, headline, why, compare, planners }
+    return { escaped, stars, score, scoreLabel, lowerIsBetter, headline, why, tries, race, rank }
   }
 
-  private compareRows(): CompareRow[] {
-    const b = this.world.batteryMax
-    const rows: CompareRow[] = [{ name: 'Your robot', mine: true, s: summarize(this.world) }]
-    for (const r of LEGEND_REFERENCES) rows.push({ name: r.name, s: runHeadless(3, this.mazeIdx, r.settings, b) })
-    return rows
-  }
-
-  private plannerRows(): CompareRow[] {
-    const b = this.world.batteryMax
-    return (['bfs', 'astar', 'greedy'] as const).map((p) => ({
-      name: p === 'bfs' ? 'BFS' : p === 'astar' ? 'A*' : 'Greedy',
-      mine: p === this.settings.planner,
-      s: runHeadless(3, this.mazeIdx, { ...this.settings, planner: p }, b),
-    }))
+  /** One change at a time: what each single setting change would have done here. */
+  private tryRows(sw: LegendSweep, mine: ReturnType<typeof summarize>, starsFor: (c: number) => number): TryRow[] {
+    const s = this.settings
+    const row = (name: string, st: AutoSettings, own = false): TryRow | null => {
+      const r = own ? mine : sw.results.get(settingsKey(st))
+      if (!r) return null
+      const cost = missionCost(r)
+      return { name, mine: own, escaped: r.escaped, cost, energy: r.energy, wrong: r.wrong, stars: starsFor(cost) }
+    }
+    const out: (TryRow | null)[] = [row('Your brain', s, true)]
+    const ti = LEGEND_TRUSTS.findIndex((v) => Math.abs(v - s.trust) < 1e-6)
+    if (ti > 0) out.push(row(`Trust ${Math.round(LEGEND_TRUSTS[ti - 1] * 100)}%`, { ...s, trust: LEGEND_TRUSTS[ti - 1] }))
+    if (ti >= 0 && ti < LEGEND_TRUSTS.length - 1) out.push(row(`Trust ${Math.round(LEGEND_TRUSTS[ti + 1] * 100)}%`, { ...s, trust: LEGEND_TRUSTS[ti + 1] }))
+    for (const sc of LEGEND_SCANS) if (Math.abs(sc - s.scans) === 1) out.push(row(`${sc} scan${sc === 1 ? '' : 's'} per stop`, { ...s, scans: sc }))
+    for (const b of LEGEND_BIASES) if (b !== s.eastBias) out.push(row(`East hunch: ${['none', 'some', 'strong'][b]}`, { ...s, eastBias: b }))
+    for (const p of LEGEND_PLANNERS) if (p !== s.planner) out.push(row(`Planner: ${PLANNER_NAMES[p]}`, { ...s, planner: p }))
+    return out.filter((r): r is TryRow => r !== null)
   }
 }
