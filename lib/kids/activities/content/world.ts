@@ -79,8 +79,8 @@ export const world: KidsActivity[] = [
     band: 'explorers',
     template: 'classify-sort',
     difficulty: 2,
-    intro: 'A robot can sense, decide and move all by itself. Look at who decides what each thing does. Is it a robot, or not?',
-    takeaway: 'A robot senses the world, decides by itself and acts. If a person makes every decision, it is a machine or a toy, not a robot.',
+    intro: 'A robot can sense, decide and move all by itself. Think about what each thing can notice and do. Is it a robot, or not?',
+    takeaway: 'A robot senses the world and acts, and most decide a lot by themselves. A toy car that only does what the remote says is not a robot.',
     realWorld: 'Engineers often describe robots with three words: sense, think, act.',
     params: {
       task: 'Sort each thing: robot or not a robot?',
@@ -90,7 +90,7 @@ export const world: KidsActivity[] = [
       ],
       features: [{ key: 'who', label: 'Who decides?', kind: 'word' }],
       mode: 'sort',
-      showFeatures: true,
+      showFeatures: false,
       items: [
         { id: 'vac', label: 'Robot vacuum', icon: '🧹', features: { who: 'it decides itself' }, category: 'robot', why: 'It senses walls and decides where to clean next.' },
         { id: 'mower', label: 'Robot lawn mower', icon: '🌱', features: { who: 'it decides itself' }, category: 'robot', why: 'It finds its own way round the garden.' },
@@ -198,7 +198,6 @@ export const world: KidsActivity[] = [
     },
     solution: { threshold: 100 },
     after: ['world-ex-04'],
-    badges: ['wall-whisperer'],
   },
   {
     id: 'world-ex-07',
@@ -266,7 +265,7 @@ export const world: KidsActivity[] = [
       task: 'Plan the quickest route to the ward.',
       map: ['S~~~..', '.~~~.#', '.#....', '.#.##.', '...#.G'],
       terrainNames: { mud: 'Crowd' },
-      tolerance: 0.25,
+      tolerance: 0,
       reveal: 'dijkstra',
       robotLabel: 'Delivery robot',
       goalLabel: 'Ward',
@@ -283,7 +282,7 @@ export const world: KidsActivity[] = [
     difficulty: 5,
     intro: 'A delivery robot rolls along the pavement with someone’s dinner. Two tricky moments are coming! Choose what it should do, and watch the meters.',
     takeaway: 'Robots share pavements with people, so good rules let people go first, even if the dinner is a bit late.',
-    realWorld: 'Cities that allow delivery robots usually require them to give way to people and move at walking pace.',
+    realWorld: 'Cities that allow delivery robots usually require them to give way to people and set a speed limit.',
     params: {
       scenario: 'A small delivery robot carries a dinner along a city pavement.',
       robotIcon: '📦',
@@ -336,7 +335,7 @@ export const world: KidsActivity[] = [
       robots: [
         { id: 'zipline', name: 'Zipline drone', icon: '✈️', clues: ['Fixed wings', 'Drops packages by parachute', 'Flies itself'], fact: 'Since 2016 Zipline drones have flown blood and medicines to clinics in Rwanda, dropping them by parachute.', job: 'clinic' },
         { id: 'truck', name: 'Driverless haul truck', icon: '🚛', clues: ['Wheels taller than a person', 'Carries rock day and night', 'Watched from a far-away control room'], fact: 'In Australia’s Pilbara, giant driverless trucks carry iron ore around the clock, watched from a control room far away.', job: 'mine' },
-        { id: 'bomb', name: 'Bomb-disposal robot', icon: '🦾', clues: ['Tank tracks', 'A long gripper arm', 'Driven by a person from far away'], fact: 'Police bomb-disposal robots are driven from a safe distance, so nobody has to go close to danger.', job: 'police' },
+        { id: 'bomb', name: 'Bomb-disposal robot', icon: '🦾', clues: ['Tank tracks', 'A long gripper arm', 'Driven by a person from far away'], fact: 'It is a remote-operated robot: its cameras and arm do the risky work while a person decides from a safe distance, so nobody has to go close to danger.', job: 'police' },
         { id: 'tally', name: 'Shelf-scanning robot', icon: '🛒', clues: ['Tall and thin', 'Cameras from top to bottom', 'Rolls slowly down aisles'], fact: 'Shelf-scanning robots roll down supermarket aisles taking photos, spotting empty shelves and wrong prices.', job: 'shop' },
       ],
       jobs: [
@@ -367,7 +366,7 @@ export const world: KidsActivity[] = [
       ],
       features: [{ key: 'kind', label: 'The job is…', kind: 'word' }],
       mode: 'sort',
-      showFeatures: true,
+      showFeatures: false,
       allowedMistakes: 1,
       items: [
         { id: 'weld', label: 'The same weld, 1,000 times a day', icon: '🔥', features: { kind: 'dull' }, category: 'robot', why: 'Repeating one exact move all day is perfect for a robot.' },
@@ -397,7 +396,7 @@ export const world: KidsActivity[] = [
       scenario: 'TutorBot helps a class of 9-year-olds with reading and maths.',
       robotIcon: '🤖',
       stakeholders: [
-        { id: 'learning', label: 'Real learning', icon: '📚' },
+        { id: 'learning', label: 'Real learning', icon: '📚', floor: 1 },
         { id: 'privacy', label: 'Privacy', icon: '🔒' },
         { id: 'fairness', label: 'Fair to everyone', icon: '⚖️' },
       ],
@@ -499,7 +498,7 @@ export const world: KidsActivity[] = [
     template: 'estimate',
     difficulty: 3,
     intro: 'A clinic 50 km away needs blood for a patient, fast. A delivery drone flies at about 100 km per hour. How many minutes until it arrives?',
-    takeaway: 'Speed = distance ÷ time. A drone flying straight over hills takes half an hour; a truck on winding roads could take hours.',
+    takeaway: 'Time = distance ÷ speed. A drone flying straight over hills takes half an hour; a truck on winding roads could take hours.',
     realWorld: 'Zipline drones in Rwanda and Ghana deliver blood to clinics in well under an hour, often saving many hours by road.',
     params: {
       question: 'Minutes for a drone at 100 km/h to fly 50 km',
@@ -587,7 +586,6 @@ export const world: KidsActivity[] = [
     },
     solution: { threshold: 145 },
     after: ['world-bu-04'],
-    badges: ['wall-whisperer'],
   },
   {
     id: 'world-bu-09',
@@ -597,7 +595,7 @@ export const world: KidsActivity[] = [
     template: 'spot-in-scene',
     difficulty: 4,
     intro: 'Streets are filling up with robots. Some machines here drive or fly themselves; others are controlled by people. Find the 3 robots.',
-    takeaway: 'A robot senses and decides for itself. A bus with a driver or a traffic light on a timer is a machine, but not a robot.',
+    takeaway: 'Robots sense and act, and most decide much by themselves. A bus with a driver or a traffic light on a timer is a machine, not a robot.',
     realWorld: 'Robotaxis without drivers now carry passengers in cities in the USA and China, and delivery robots roll along pavements in several countries.',
     params: {
       prompt: 'Find the 3 robots in the street.',
@@ -608,7 +606,7 @@ export const world: KidsActivity[] = [
         { id: 'drone', icon: 'svg:drone', x: 78, y: 14, size: 9, label: 'Delivery drone', target: true, fact: 'It flies its own route and lowers a parcel on a line.' },
         { id: 'bus', icon: '🚌', x: 84, y: 46, size: 12, label: 'Bus with a driver', target: false, fact: 'a person drives this bus — it is a machine, not a robot.' },
         { id: 'bike', icon: '🚲', x: 30, y: 30, size: 8, label: 'Bicycle', target: false, fact: 'the rider does all the sensing and steering.' },
-        { id: 'lights', icon: '🚦', x: 10, y: 24, size: 9, label: 'Traffic light', target: false, fact: 'most traffic lights follow a timer; they are automatic, but they don’t sense and decide like a robot.' },
+        { id: 'lights', icon: '🚦', x: 10, y: 24, size: 9, label: 'Traffic light', target: false, fact: 'this traffic light just follows a timer — it is automatic, but it doesn’t sense and decide like a robot.' },
         { id: 'dog', icon: '🐕', x: 64, y: 56, size: 7, label: 'Dog', target: false, fact: 'a dog senses, thinks and moves — but it is an animal, not a machine.' },
       ],
     },
@@ -750,7 +748,7 @@ export const world: KidsActivity[] = [
       robotIcon: '🚓',
       liveMeters: false,
       stakeholders: [
-        { id: 'safety', label: 'Shoppers’ safety', icon: '🦺' },
+        { id: 'safety', label: 'Shoppers’ safety', icon: '🦺', floor: 0 },
         { id: 'privacy', label: 'Privacy', icon: '🔒' },
         { id: 'trust', label: 'Trust in the centre', icon: '🤝' },
       ],
@@ -911,7 +909,7 @@ export const world: KidsActivity[] = [
     difficulty: 4,
     intro: 'Some robots work right beside people; others must be fenced off. Look at speed, payload and colour. Build ONE rule that sorts every robot, then test it on new ones.',
     takeaway: 'Safety depends on how a robot moves near people, not its colour: slow, force-limited robots can share space; fast ones need guarding.',
-    realWorld: 'The industrial robot standard ISO 10218 uses 250 mm/s as a “reduced speed” for working near people; faster robots are fenced or watched by safety sensors.',
+    realWorld: 'ISO 10218 limits a robot to 250 mm/s in manual teach mode, when a person stands close to program it; cobots must also limit force (ISO/TS 15066).',
     params: {
       task: 'Find one rule: does this robot need a safety fence?',
       mode: 'rule',
@@ -941,7 +939,6 @@ export const world: KidsActivity[] = [
     },
     solution: { rule: { feature: 'speed', threshold: 250, ifTrue: 'fence', ifFalse: 'beside' } },
     after: ['world-in-06'],
-    badges: ['robot-teacher'],
   },
   {
     id: 'world-in-08',
@@ -952,7 +949,7 @@ export const world: KidsActivity[] = [
     difficulty: 4,
     intro: 'A pavement robot must drop parcels at houses 1 and 2 (any order), then reach its hub. Market crowds cost 4, the school-gate zone costs 2. Plan the cheapest trip.',
     takeaway: 'Robots in towns plan around people, not just walls. Giving busy places a higher cost makes the planner choose quieter, safer routes.',
-    realWorld: 'Delivery robot companies mark school gates and markets as slow or avoid zones, and plan routes around them at busy times.',
+    realWorld: 'Delivery robot planners can mark busy places such as school gates and markets as slow or no-go zones at busy times.',
     params: {
       task: 'Deliver to 1 and 2, then reach the hub, as cheaply as possible.',
       map: ['S..:::..1', '.#.#.#.#.', '...~~~...', '.#~~~#.#.', '2..~~...G'],
@@ -965,7 +962,6 @@ export const world: KidsActivity[] = [
     },
     solution: { path: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [3, 0], [2, 0], [1, 0], [0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [1, 8], [2, 8], [3, 8], [4, 8]] },
     after: ['world-in-06'],
-    badges: ['map-maker'],
   },
   {
     id: 'world-in-09',
@@ -974,7 +970,7 @@ export const world: KidsActivity[] = [
     band: 'inventors',
     template: 'robot-designer',
     difficulty: 4,
-    intro: 'After an earthquake, people may be trapped under rubble. Design a rescue robot that crosses rubble, finds warm bodies in the dark and lets rescuers talk to survivors.',
+    intro: 'After an earthquake, people may be trapped under rubble. Design a rescue robot that crosses rubble, finds people by their body heat in the dark and lets rescuers talk to survivors.',
     takeaway: 'Rescue robots trade size for reach: small, tough bodies that crawl through gaps, with thermal cameras, lights and two-way audio.',
     realWorld: 'Rescue robots searched the World Trade Center rubble in 2001, and robots were used after earthquakes in Japan and Türkiye.',
     params: {
@@ -985,7 +981,7 @@ export const world: KidsActivity[] = [
       maxMassKg: 30,
       minRuntimeMin: 120,
       requires: ['find-people', 'see-dark', 'talk'],
-      abilityLabels: { 'find-people': 'Find warm bodies', 'see-dark': 'See in the dark', talk: 'Let rescuers talk to survivors' },
+      abilityLabels: { 'find-people': 'Find people by their body heat', 'see-dark': 'See in the dark', talk: 'Let rescuers talk to survivors' },
       slots: [
         {
           id: 'drive',
@@ -1471,7 +1467,7 @@ export const world: KidsActivity[] = [
       stakeholders: [
         { id: 'workers', label: 'Dockworkers', icon: '👷', floor: -1 },
         { id: 'safety', label: 'Safety', icon: '🦺', floor: 0 },
-        { id: 'economy', label: 'Port’s competitiveness', icon: '📈', floor: -1 },
+        { id: 'economy', label: 'Port’s competitiveness', icon: '📈', floor: -2 },
         { id: 'town', label: 'The port town', icon: '🏘️', floor: -1 },
       ],
       situations: [
@@ -1501,7 +1497,7 @@ export const world: KidsActivity[] = [
           prompt: 'The system can track every remaining worker’s location all shift.',
           choices: [
             { id: 'all', label: 'Track everyone for efficiency', effects: { economy: 1, workers: -2 }, consequence: 'Managers see everything; trust collapses.' },
-            { id: 'safetyonly', label: 'Track location only inside automated zones, for safety', effects: { safety: 1, workers: -1 }, consequence: 'Robots know where people are; some feel watched.' },
+            { id: 'safetyonly', label: 'Track location only inside automated zones, for safety', effects: { safety: 1, workers: -1, economy: 1 }, consequence: 'Robots know where people are, so there are fewer emergency stoppages; some feel watched.' },
           ],
         },
         {
@@ -1510,15 +1506,15 @@ export const world: KidsActivity[] = [
           prompt: 'Robots can work all night, but the noise keeps the town awake.',
           choices: [
             { id: 'nonstop', label: 'Run 24 hours at full noise', effects: { economy: 2, town: -2 }, consequence: 'More ships handled; residents complain.' },
-            { id: 'quiet', label: 'Night work with quieter electric machines only', effects: { town: 1, economy: -1 }, consequence: 'Slower nights, better sleep for the town.' },
+            { id: 'quiet', label: 'Night work with quieter electric machines only', effects: { town: 2, economy: -1 }, consequence: 'Slower nights, better sleep for the town.' },
           ],
         },
       ],
       discussion: 'Who should pay for the costs of automation — the company, the workers, the town or the customers? How would you decide?',
     },
     solution: {
-      choices: { jobs: 'retrain', mixed: 'zones', data: 'safetyonly', pace: 'nonstop' },
-      predictions: { workers: 'same', safety: 'up', economy: 'same', town: 'down' },
+      choices: { jobs: 'retrain', mixed: 'zones', data: 'safetyonly', pace: 'quiet' },
+      predictions: { workers: 'same', safety: 'up', economy: 'down', town: 'up' },
     },
     after: ['world-en-03', 'world-en-09'],
   },
