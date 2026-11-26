@@ -1006,7 +1006,7 @@ export const motion: KidsActivity[] = [
     template: 'predict-output',
     difficulty: 4,
     intro: 'Forward kinematics for a differential-drive robot, in integer maths. Predict all three printed lines: speed, turn rate ×100, and turning radius.',
-    takeaway: 'v = (vL + vR) / 2, ω = (vR − vL) / track, and the turning radius R = v / ω. Equal wheel speeds give an infinite radius: straight.',
+    takeaway: 'v = (vL + vR) / 2, ω = (vR − vL) / track and R = v / ω. Equal wheel speeds give an infinite radius: straight.',
     realWorld: 'ROS 2’s diff_drive_controller runs these same equations many times a second to turn wheel speeds into robot motion.',
     params: {
       code: [
