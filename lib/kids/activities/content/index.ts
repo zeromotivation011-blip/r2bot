@@ -40,6 +40,7 @@ import { ai } from './ai'
 import { design } from './design'
 import { space } from './space'
 import { world } from './world'
+import { ZONE_FILES } from './zones'
 
 import { samples as binaryEncoderSamples } from '@/components/kids/activities/templates/binary-encoder/samples'
 import { samples as centreOfMassSamples } from '@/components/kids/activities/templates/centre-of-mass/samples'
@@ -117,7 +118,15 @@ export const SAMPLE_ACTIVITIES: Activity[] = asActivities([
   ...wheelTerrainSamples,
 ])
 
-export const CONTENT_ACTIVITIES: Activity[] = Object.values(CONTENT_BY_FILE).flat()
+/** Activities written for a Universe world (content/zones/<world>.ts). */
+export const ZONE_ACTIVITIES: Activity[] = Object.values(ZONE_FILES).flatMap((list) => asActivities(list))
+
+export const CONTENT_ACTIVITIES: Activity[] = [...Object.values(CONTENT_BY_FILE).flat(), ...ZONE_ACTIVITIES]
+
+/** A world's activities in galaxy order. */
+export function byWorld(world: string): Activity[] {
+  return orderActivities(ALL_ACTIVITIES.filter((a) => a.world === world))
+}
 
 const contentIds = new Set(CONTENT_ACTIVITIES.map((a) => a.id))
 

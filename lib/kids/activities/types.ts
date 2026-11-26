@@ -145,6 +145,8 @@ export interface Activity<P = unknown, A = unknown> {
   solution?: A
   /** Universe badge ids this activity contributes to (see rewards.ts). */
   badges?: string[]
+  /** Universe world this activity belongs to (lib/kids/universe/worlds.ts WORLDS), if any. */
+  world?: import('../universe/worlds').WorldId
   /** Activity ids that should be done first (same track). */
   after?: string[]
 }
