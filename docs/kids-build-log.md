@@ -85,3 +85,8 @@ If a run fails on the limit again: wait for the reset time in the failure messag
 ## 07:35 UTC — PAUSED by the founder
 All workflows stopped; hourly check-in trig_01JjzPC4SVkb4GiS7ax68hkk DISABLED (not deleted).
 To resume later: games → resume run wf_e021636c-616; schools + app → relaunch kids-schools-and-app script; then one lean final pass (integration, design, build, QA).
+
+## 13:25 UTC — RESUMED ("complete everything")
+- [~] Games QA/fix — run wf_e021636c-616 resumed.
+- [~] Schools + mobile app — run wf_fe308336-2e2 resumed.
+- Check-in trig_01JjzPC4SVkb4GiS7ax68hkk re-enabled (hourly at :11); it launches the final lean pass when both finish, then reports and deletes itself.
