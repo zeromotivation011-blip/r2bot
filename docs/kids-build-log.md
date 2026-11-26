@@ -20,7 +20,7 @@ Contracts: `docs/kids-universe.md`, `docs/kids-design.md`.
 - [~] Level 1 playable (24 verified arenas + course player) and 3D episode engine + Piper voices (workflow wf_e343e5bb-6dd) — steps 3–4
 - [~] 7 games: drone-hover, arm-factory, circuit-city, mars-rover, robot-brain,
       maze-mapper, swarm-reef (workflow wf_e021636c-616)
-- [~] Universe home + Hangar (workflow wf_e5a3ddba-357) — steps 1-2 below
+- [x] Universe home + Hangar — committed 33ed172
 - [~] **SKILL GALAXY — the backbone (founder, 20:40 UTC: "a full gamified system with 100s of different activities… understand my vision")**: 26 interactive templates, activity player, galaxy map, 400 verified activities (10 tracks × 4 bands × 10). Workflow wf_f9984ffd-0ef. Contract: lib/kids/activities/types.ts.
 - Hourly self check-in: scheduled task trig_01JjzPC4SVkb4GiS7ax68hkk (delete when done)
 
@@ -66,7 +66,7 @@ Contracts: `docs/kids-universe.md`, `docs/kids-design.md`.
 ## Run order after the 22:00 usage-limit stop (resumed 01:15 UTC)
 Scripts live in ~/.claude/projects/-home-user-r2bot/<session>/workflows/scripts/ (all carry a RESUMING note).
 1. RUNNING: Skill Galaxy — kids-skill-galaxy-wf_f9984ffd-0ef.js (run wf_762783f5-9f5); Universe home fix — run wf_e5a3ddba-357 (resumed).
-2. NEXT when (1) finishes or capacity allows: course + episodes — Workflow({scriptPath: .../kids-course-and-episodes-wf_e343e5bb-6dd.js}).
+2. RUNNING since 01:30 (run wf_3a794bc3-0d3): course + episodes — Workflow({scriptPath: .../kids-course-and-episodes-wf_e343e5bb-6dd.js}).
 3. THEN: games — Workflow({scriptPath: .../kids-universe-games-wf_e021636c-616.js, resumeFromRunId: 'wf_e021636c-616'}) (drone-hover build is cached).
 4. THEN steps 5–10 of "Remaining, in order".
 If a run fails on the limit again: wait for the reset time in the failure message, then relaunch the same script (resumeFromRunId where results were cached).
