@@ -17,7 +17,7 @@ Contracts: `docs/kids-universe.md`, `docs/kids-design.md`.
 - [x] Brand pass on the shell (navy + R2BOT orange, helmet logo)
 - [x] Curriculum: 4 levels, Level 1 in full — committed 68ad024 (docs/kids-curriculum.md)
 - [x] Physics lab: Rapier + Blockly, /kids/lab/sim — committed 68ad024
-- [~] Level 1 playable (24 verified arenas + course player) and 3D episode engine + Piper voices (workflow wf_e343e5bb-6dd) — steps 3–4
+- [x] Level 1 playable (24 verified arenas + course player) and 3D episodes with Piper voices — committed 7cb6ece. Open: episodes are 75–153 s (target 3–5 min needs more script); voices need a human listening pass.
 - [~] 7 games: drone-hover, arm-factory, circuit-city, mars-rover, robot-brain,
       maze-mapper, swarm-reef (workflow wf_e021636c-616)
 - [x] Universe home + Hangar — committed 33ed172
@@ -66,7 +66,7 @@ Contracts: `docs/kids-universe.md`, `docs/kids-design.md`.
 ## Run order after the 22:00 usage-limit stop (resumed 01:15 UTC)
 Scripts live in ~/.claude/projects/-home-user-r2bot/<session>/workflows/scripts/ (all carry a RESUMING note).
 1. RUNNING: Skill Galaxy — kids-skill-galaxy-wf_f9984ffd-0ef.js (run wf_762783f5-9f5); Universe home fix — run wf_e5a3ddba-357 (resumed).
-2. RUNNING since 01:30 (run wf_3a794bc3-0d3): course + episodes — Workflow({scriptPath: .../kids-course-and-episodes-wf_e343e5bb-6dd.js}).
-3. THEN: games — Workflow({scriptPath: .../kids-universe-games-wf_e021636c-616.js, resumeFromRunId: 'wf_e021636c-616'}) (drone-hover build is cached).
+2. DONE 03:10: course + episodes (7cb6ece) — Workflow({scriptPath: .../kids-course-and-episodes-wf_e343e5bb-6dd.js}).
+3. RUNNING since 03:12 (run wf_e021636c-616 resumed): games — Workflow({scriptPath: .../kids-universe-games-wf_e021636c-616.js, resumeFromRunId: 'wf_e021636c-616'}) (drone-hover build is cached).
 4. THEN steps 5–10 of "Remaining, in order".
 If a run fails on the limit again: wait for the reset time in the failure message, then relaunch the same script (resumeFromRunId where results were cached).
