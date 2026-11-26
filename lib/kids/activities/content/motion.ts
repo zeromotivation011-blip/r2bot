@@ -226,7 +226,7 @@ export const motion: KidsActivity[] = [
     difficulty: 4,
     intro: 'When Spark stops suddenly, it wants to tip forwards onto its nose! Where should the heavy battery go so Spark stays on its wheels?',
     takeaway: 'Stopping fast makes a robot lean forwards. Heavy parts kept low and not too far forward stop it tipping over.',
-    realWorld: 'Delivery robots and buses keep their heavy batteries down low, near the floor, so they stay steady when they brake.',
+    realWorld: 'Electric cars and delivery robots carry their heavy batteries in the floor, down low, so they stay steady when they brake.',
     params: {
       wheelbaseCm: 20,
       chassis: { mass: 1, x: 10, h: 5 },
@@ -518,7 +518,7 @@ export const motion: KidsActivity[] = [
     band: 'inventors',
     template: 'motor-math',
     difficulty: 1,
-    intro: 'A hospital robot must cruise at 40–45 cm/s, a calm walking pace. Its wheels are 6.5 cm across. Set the motor speed.',
+    intro: 'A hospital robot must cruise at 40–45 cm/s, a slow and gentle pace. Its wheels are 6.5 cm across. Set the motor speed.',
     takeaway: 'Speed = π × wheel diameter × rpm ÷ 60. Doubling rpm doubles the speed; so does doubling the wheel size.',
     realWorld: 'Hospital delivery robots are limited to walking pace so they can share corridors safely with patients and staff.',
     params: {
@@ -526,7 +526,7 @@ export const motion: KidsActivity[] = [
       knobs: { rpm: { min: 30, max: 300, step: 10 } },
       fixed: { diameterCm: 6.5, timeS: 2 },
       target: { speedCmS: { min: 40, max: 45 } },
-      goal: 'Walking pace 🚶',
+      goal: 'Gentle pace 🚶',
       liveReadout: false,
       showMath: true,
     },
@@ -887,7 +887,7 @@ export const motion: KidsActivity[] = [
     difficulty: 2,
     intro: 'A 30 kg legged robot must cross rocks, climb a 20° gravel slope and go up stairs. Its hip motors give 45 N·m. Size the legs and feet.',
     takeaway: 'Long legs climb tall steps but push weakly (push = torque ÷ leg length). The design window sits between the stair height and the slope.',
-    realWorld: 'Quadruped designers balance leg length against hip torque; Spot’s legs are about the height of a stair step and a half.',
+    realWorld: 'Quadruped designers trade leg length against hip-motor torque: longer legs step higher but need stronger motors or bigger gearboxes.',
     params: {
       robotMassKg: 30,
       motorRpm: 60,

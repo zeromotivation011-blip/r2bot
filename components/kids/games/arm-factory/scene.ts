@@ -55,7 +55,7 @@ interface Rig {
 }
 
 const CAMS: Record<CamPreset, { pos: THREE.Vector3; look: THREE.Vector3 }> = {
-  front: { pos: new THREE.Vector3(0.75, 1.9, 1.55), look: new THREE.Vector3(0, 0.05, -0.12) },
+  front: { pos: new THREE.Vector3(0.95, 2.25, 1.2), look: new THREE.Vector3(-0.02, 0.02, -0.12) },
   top: { pos: new THREE.Vector3(0, 2.75, 0.02), look: new THREE.Vector3(0, 0, -0.02) },
   side: { pos: new THREE.Vector3(2.1, 0.95, 0.35), look: new THREE.Vector3(0, 0.2, -0.05) },
 }

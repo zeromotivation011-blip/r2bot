@@ -148,9 +148,9 @@ export function Pendant({
     <div>
       <p className="mb-2 text-sm text-white/70">
         Real factory arms are taught with a <b className="text-white">teach pendant</b>: drive the arm to a spot, save it, then jump back to it
-        with one press. Save a pose above the belt and one above each bin.
+        with one press. Save a pose low over the belt and one above each bin — then go home first if the arm needs to clear a bin wall.
       </p>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
         {slots.map((s, i) => (
           <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-2 text-center">
             <p className="text-xs font-black text-white/60">P{i + 1}</p>
@@ -174,7 +174,7 @@ export function Pendant({
       <button type="button" onClick={onHome} className="mt-2 min-h-[44px] w-full rounded-xl border border-white/15 text-sm font-black text-white/80 hover:bg-white/10">
         ⌂ Go home (tuck the arm)
       </button>
-      <p className="mt-1 hidden text-xs text-white/45 sm:block">Keys: 1/2/3 go · Shift+1/2/3 save</p>
+      <p className="mt-1 hidden text-xs text-white/45 sm:block">Keys: 1–4 go · Shift+1–4 save</p>
     </div>
   )
 }

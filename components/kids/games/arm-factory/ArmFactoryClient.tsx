@@ -136,7 +136,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
   const [cam, setCam] = useState<CamPreset>('front')
   const [started, setStarted] = useState(false)
   const [hint, setHint] = useState(false)
-  const [slots, setSlots] = useState<(Joints | null)[]>([null, null, null])
+  const [slots, setSlots] = useState<(Joints | null)[]>([null, null, null, null])
   // Ace
   const [aim, setAim] = useState<{ x: number; z: number; label: string | null } | null>(null)
   const [height, setHeight] = useState(0.3)
@@ -601,9 +601,9 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
           s.toggleGrip()
           return
         }
-        if (cfg.pendant && ['1', '2', '3', '!', '@', '#'].includes(e.key)) {
-          const idx = ['1', '2', '3'].indexOf(e.key)
-          const sidx = ['!', '@', '#'].indexOf(e.key)
+        if (cfg.pendant && ['1', '2', '3', '4', '!', '@', '#', '$'].includes(e.key)) {
+          const idx = ['1', '2', '3', '4'].indexOf(e.key)
+          const sidx = ['!', '@', '#', '$'].indexOf(e.key)
           if (e.shiftKey || sidx >= 0) saveSlot(sidx >= 0 ? sidx : idx)
           else goSlot(idx)
         }
@@ -732,7 +732,11 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
             </button>
           ))}
         </div>
-        <div className="pointer-events-none absolute bottom-2 left-2 rounded-xl bg-slate-950/75 px-2.5 py-1.5 font-mono text-[10px] leading-tight text-cyan-200 sm:text-xs">
+        <div
+          className={`pointer-events-none absolute left-2 rounded-xl bg-slate-950/75 px-2.5 py-1.5 font-mono text-[10px] leading-tight text-cyan-200 sm:text-xs ${
+            cfg.mode === 'jog' ? 'top-11 lg:bottom-2 lg:top-auto' : 'bottom-2'
+          }`}
+        >
           <div>
             B {Math.round(snap.j[0] / DEG)}° · S {Math.round(snap.j[1] / DEG)}° · E {Math.round(snap.j[2] / DEG)}°
           </div>
@@ -755,6 +759,44 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
             }`}
           >
             {coach.text}
+          </div>
+        )}
+        {cfg.mode === 'jog' && (
+          // Phones: the side panel scrolls away under the 3D view, so the buttons
+          // needed mid-move ride on the view itself.
+          <div className="absolute bottom-2 right-2 flex gap-1.5 lg:hidden" aria-label="Quick controls">
+            {cfg.pendant && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => sim.setTargets(HOME)}
+                  aria-label="Go home"
+                  className="h-11 w-11 rounded-xl bg-slate-900/90 text-lg font-black text-white ring-1 ring-white/20 active:bg-white/20"
+                >
+                  ⌂
+                </button>
+                {slots.map((s, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    disabled={!s}
+                    onClick={() => goSlot(i)}
+                    aria-label={`Go to saved pose ${i + 1}`}
+                    className="h-11 w-11 rounded-xl bg-amber-400 text-base font-black text-slate-900 active:bg-amber-300 disabled:bg-slate-900/80 disabled:text-white/30"
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </>
+            )}
+            <button
+              type="button"
+              onClick={toggleGrip}
+              aria-label={snap.gripClosed ? 'Open gripper' : 'Close gripper'}
+              className={`h-11 min-w-[44px] rounded-xl px-2 text-xl font-black shadow-lg ${snap.gripClosed ? 'bg-cyan-400 text-slate-900' : 'bg-emerald-400 text-slate-900'}`}
+            >
+              {snap.gripClosed ? '✋' : '✊'}
+            </button>
           </div>
         )}
         {cfg.pendant && !started && (

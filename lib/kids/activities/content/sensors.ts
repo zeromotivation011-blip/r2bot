@@ -55,7 +55,7 @@ export const sensors: KidsActivity[] = [
     difficulty: 1,
     intro: 'You see with your eyes, hear with your ears and feel with your skin. Robot sensors copy our senses! Put each sensor with the sense it is like.',
     takeaway: 'Robot sensors work like our senses: cameras and light sensors catch light, microphones catch sound, and switches feel a push.',
-    realWorld: 'A robot vacuum has all three kinds: light sensors to spot stairs, a microphone in some models, and a bumper that feels.',
+    realWorld: 'A robot vacuum uses light sensors to spot the stairs and a bumper switch to feel the furniture.',
     params: {
       task: 'Which of our senses is each robot sensor like?',
       mode: 'sort',
@@ -792,7 +792,7 @@ export const sensors: KidsActivity[] = [
         { t: 8, state: 'low' },
         { t: 10, state: 'high' },
       ],
-      trace: { durationS: 12, sampleHz: 10, noise: 6, seed: 23 },
+      trace: { durationS: 12, sampleHz: 10, noise: 7, seed: 11 },
       rampS: 0.3,
       knobs: { hysteresis: { max: 30 } },
       allowedErrorPct: 5,
@@ -813,7 +813,7 @@ export const sensors: KidsActivity[] = [
     difficulty: 3,
     intro: 'This warehouse robot carries four different sensors. Find all four, then name each one from where it sits and what that spot must sense. Only two wrong taps allowed.',
     takeaway: 'Each sensor sits where its job is: a laser low down for feet and pallets, a camera up high, a bumper at the front, encoders in the wheels.',
-    realWorld: 'Warehouse robots must meet safety standards that require a safety laser scanner and an emergency bumper around people.',
+    realWorld: 'Warehouse robots that work near people follow safety standards such as ISO 3691-4, and most carry a safety laser scanner that slows or stops them.',
     params: {
       prompt: 'Find the 4 sensors, then label each one.',
       backdrop: 'warehouse',
@@ -851,7 +851,7 @@ export const sensors: KidsActivity[] = [
     difficulty: 4,
     intro: 'A 12-count encoder sits on the motor, behind a 10:1 gearbox: 120 counts for each wheel turn. The wheel is 8 cm across. Stop exactly 148–152 cm away. Predict, then run.',
     takeaway: 'Putting the encoder on the motor, before the gearbox, multiplies its counts per wheel turn — finer distance measurement for free.',
-    realWorld: 'Most hobby and classroom robot motors have a small magnetic encoder on the motor shaft behind the gearbox, exactly like this.',
+    realWorld: 'Many hobby and classroom robot motors have a small magnetic encoder on the motor shaft, behind the gearbox, exactly like this.',
     params: {
       command: 'ticks',
       ticksPerRev: 120,
@@ -1013,7 +1013,7 @@ export const sensors: KidsActivity[] = [
     difficulty: 2,
     intro: 'An industrial robot cell hides four kinds of sensor: one for safety, one for vision, one for touch and one for the arm’s sense of its own body. Find and name them.',
     takeaway: 'Robot arms sense the outside world (cameras, light curtains, force) and themselves (joint encoders). Engineers call the second proprioception.',
-    realWorld: 'Safety standards require light curtains or scanners around industrial arms; force-torque sensors let arms polish, sand and assemble gently.',
+    realWorld: 'Industrial arms are guarded by fences, light curtains or laser scanners, and force-torque sensors let them polish, sand and assemble gently.',
     params: {
       prompt: 'Find the 4 sensors, then label each one.',
       backdrop: 'factory',
@@ -1233,7 +1233,7 @@ export const sensors: KidsActivity[] = [
         { t: 8, state: 'high' },
         { t: 9.5, state: 'low' },
       ],
-      trace: { durationS: 12, sampleHz: 20, noise: 0.35, spikes: 3, seed: 41 },
+      trace: { durationS: 12, sampleHz: 20, noise: 0.35, spikes: 6, seed: 11 },
       rampS: 0.2,
       knobs: { hysteresis: { max: 1.5 }, filter: { maxWindow: 12 } },
       allowedErrorPct: 5,

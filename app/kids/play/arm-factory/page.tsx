@@ -68,7 +68,7 @@ const TIERS = [
     name: 'Pilot',
     who: 'ages 9–12',
     body: 'Now the belt moves at 8 cm a second and it never waits. Use the teach pendant, the same idea real factory technicians use: drive the arm to a pose, save it, and jump back to it with one press. Park the open gripper over the belt and close it as a part slides in.',
-    tip: 'Save P1 low over the belt and P2/P3 high over bins. The fingers take a quarter of a second to close, so grab a moment early.',
+    tip: 'Save P1 low over the belt and P2–P4 high over the three bins. Tap Home between a bin and the belt so the arm clears the bin walls. The fingers take a quarter of a second to close, so grab a moment early.',
   },
   {
     name: 'Ace',

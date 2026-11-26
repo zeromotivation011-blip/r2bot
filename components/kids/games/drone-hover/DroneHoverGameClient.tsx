@@ -691,7 +691,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
         )}
       </div>
 
-      <aside className="flex flex-col gap-3">
+      <aside className="flex flex-col gap-3 lg:max-h-[min(760px,calc(100vh-24px))] lg:overflow-y-auto lg:overscroll-contain lg:pr-1" aria-label="Flight brain controls">
         <section className="rounded-2xl border border-white/10 bg-white/5 p-3">
           <h2 className="font-black text-white">{brief.title}</h2>
           <ol className="mt-1 list-decimal space-y-1 pl-5 text-sm text-white/75">
