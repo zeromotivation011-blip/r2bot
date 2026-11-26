@@ -111,11 +111,65 @@ export interface ClassSnapshot {
   robot: string | null
   /** Robot World levels retried 2+ times without 2+ stars: "zone/level" -> attempts. */
   stuck: Record<string, number>
+  /** Course sessions finished: "L1-S05" -> best stars (1–3). Added with 0055. */
+  sessionsDone: Record<string, number>
+  /**
+   * Skill Galaxy activity ids finished (lib/kids/activities/progress.ts). Capped
+   * by count and bytes; the browser sends the class's assigned ones first, then
+   * the most recent, so assignment completion stays exact.
+   */
+  activitiesDone: string[]
+  /** Game ids played with at least one star (from personal bests). */
+  gamesPlayed: string[]
 }
 
 export const EMPTY_SNAPSHOT: ClassSnapshot = {
   v: 1, totalStars: 0, completedLevels: 0, completedZones: [], episodesDone: {}, codeMissions: {},
   robotsBuilt: 0, totalMinutesPlayed: 0, band: null, robot: null, stuck: {},
+  sessionsDone: {}, activitiesDone: [], gamesPlayed: [],
+}
+
+/** Most activity ids a snapshot carries, and the bytes they may use (the whole snapshot stays under SNAPSHOT_MAX_BYTES). */
+export const SNAPSHOT_MAX_ACTIVITIES = 260
+export const SNAPSHOT_ACTIVITY_BYTES = 4200
+const SESSION_KEY_RE = /^L[1-4]-S\d{2}$/
+const ITEM_ID_RE = /^[a-z0-9][a-z0-9_-]{0,63}$/
+
+/** Keep ids in order until the count or byte budget runs out (JSON: id + quotes + comma). */
+export function capIds(ids: readonly string[], maxCount: number, maxBytes: number): string[] {
+  const out: string[] = []
+  const seen = new Set<string>()
+  let bytes = 2
+  for (const id of ids) {
+    if (out.length >= maxCount) break
+    if (seen.has(id) || !ITEM_ID_RE.test(id)) continue
+    const cost = id.length + 3
+    if (bytes + cost > maxBytes) break
+    seen.add(id)
+    out.push(id)
+    bytes += cost
+  }
+  return out
+}
+
+function sessionMap(x: unknown): Record<string, number> {
+  const out: Record<string, number> = {}
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return out
+  let n = 0
+  for (const [k, v] of Object.entries(x as Record<string, unknown>)) {
+    if (n >= 96) break
+    if (!SESSION_KEY_RE.test(k)) continue
+    const val = int(v, 3)
+    if (val <= 0) continue
+    out[k] = val
+    n++
+  }
+  return out
+}
+
+function idList(x: unknown, maxCount: number, maxBytes: number): string[] {
+  if (!Array.isArray(x)) return []
+  return capIds(x.filter((v): v is string => typeof v === 'string'), maxCount, maxBytes)
 }
 
 const KEY_RE = /^[a-z0-9][a-z0-9/_-]{0,63}$/
@@ -172,6 +226,9 @@ export function parseSnapshot(x: unknown): ClassSnapshot | null {
     band: isBandId(o.band) ? o.band : null,
     robot,
     stuck: starMap(o.stuck, 20, 1000),
+    sessionsDone: sessionMap(o.sessionsDone),
+    activitiesDone: idList(o.activitiesDone, SNAPSHOT_MAX_ACTIVITIES, SNAPSHOT_ACTIVITY_BYTES),
+    gamesPlayed: idList(o.gamesPlayed, 30, 900),
   }
 }
 

@@ -1,0 +1,30 @@
+{
+  "name": "r2bot-kids-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "R2BOT Kids native shell (Capacitor) for Google Play and the App Store. Loads https://www.r2bot.in/kids; bundles only the offline page.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "type-check": "tsc -p tsconfig.json",
+    "assets": "capacitor-assets generate --android --ios --assetPath resources --iconBackgroundColor '#0A1120' --iconBackgroundColorDark '#0A1120' --splashBackgroundColor '#0A1120' --splashBackgroundColorDark '#0A1120'",
+    "sync": "cap sync",
+    "open:android": "cap open android",
+    "open:ios": "cap open ios",
+    "android:debug": "cap sync android && cd android && ./gradlew assembleDebug",
+    "android:release": "cap sync android && cd android && ./gradlew bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.3",
+    "@capacitor/core": "^8.6.3",
+    "@capacitor/ios": "^8.6.3",
+    "@capacitor/splash-screen": "^8.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.6.3",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
