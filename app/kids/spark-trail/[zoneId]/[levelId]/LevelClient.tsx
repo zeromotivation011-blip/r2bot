@@ -408,7 +408,7 @@ function CelebrationPanel({
 
       {partAwarded && (
         <div className="panel-celebration-part">
-          🔧 You earned a new robot part — view it in <Link href="/kids/my-robot">My Robot</Link>!
+          🔧 You earned a new robot part — fit it to your robot in the <Link href="/kids/hangar">Garage</Link>!
         </div>
       )}
       {zoneJustDone && (

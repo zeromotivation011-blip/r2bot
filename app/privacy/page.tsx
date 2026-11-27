@@ -15,7 +15,7 @@ export default function PrivacyPage() {
       lede="We collect the minimum we need to make R2BOT work. We never sell your data. Every section below has the short version on top."
     >
       <p style={{ fontSize: 13, color: 'var(--muted)' }}>
-        Last updated: 26 November 2026 (R2BOT Kids section added). Effective immediately.
+        Last updated: 27 November 2026 (R2BOT Kids: counter, backup code and parent email detail). Effective immediately.
       </p>
 
       <h2>Short version</h2>
@@ -103,6 +103,10 @@ export default function PrivacyPage() {
           name and avatar, and the robot a child designs are saved in the browser&apos;s own
           storage (local storage) on that device. They are not sent to us. Clearing the
           browser&apos;s site data, or uninstalling the app, deletes them.</li>
+        <li>The <strong>progress backup code</strong> (in the Hangar and in Settings) is made on the
+          device and holds the explorer and robot nicknames and the progress, so it can be restored
+          on another device. It is never sent to R2BOT. Please keep it private, like a saved game
+          file, and do not post it publicly.</li>
       </ul>
       <h3>Joining a teacher&apos;s class (optional)</h3>
       <ul>
@@ -150,8 +154,11 @@ export default function PrivacyPage() {
       <h3>Analytics</h3>
       <ul>
         <li>Google Analytics is not loaded on R2BOT Kids pages, and never inside the R2BOT Kids
-          app. We count page views with our own first-party counter, which sends the page address
-          and nothing else: no cookie, no identifier, no IP address stored.</li>
+          app. We count page views with our own first-party counter. It sends the page address, the
+          referring site, and whether this device has visited before (a yes/no flag kept in the
+          browser&apos;s own storage on the device); our server adds the country and the device type
+          (phone, tablet or computer). These are kept only as aggregate counts: no cookie, no
+          identifier, no IP address stored.</li>
         <li>Inside the app, any link that leaves R2BOT Kids (to the main site or anywhere else)
           sits behind a parental gate: a grown-up has to answer a question first.</li>
       </ul>
@@ -160,6 +167,11 @@ export default function PrivacyPage() {
         <li>Teachers sign in with their own adult account to create a class; the &quot;What we
           collect&quot; section above applies to them. The schools pilot form is for adults and
           asks for a work email.</li>
+        <li>In the parent hub, a parent or carer can choose to give <strong>their own</strong> email
+          address for a weekly email about R2BOT Kids. Nothing is sent until the address is
+          confirmed through the link in a confirmation email (double opt-in), every email has an
+          unsubscribe link, and a parent can also email <strong>hello@r2bot.in</strong> to be removed.
+          We never ask for a child&apos;s email.</li>
       </ul>
 
       <h2>Security</h2>

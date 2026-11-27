@@ -163,6 +163,7 @@ export function HangarClient() {
     paintNow ? `painted ${paintNow.name}` : '',
     cosmetics.skin ? `wearing the ${unlocksOf('skin').find((u) => u.id === cosmetics.skin)?.name ?? 'skin'}` : '',
     cosmetics.decal ? `with a ${unlocksOf('decal').find((u) => u.id === cosmetics.decal)?.name ?? 'decal'} decal` : '',
+    cosmetics.booster ? 'with the Rocket Booster on its back' : '',
   ]
     .filter(Boolean)
     .join(', ')
@@ -180,7 +181,7 @@ export function HangarClient() {
             <div className={`absolute inset-0 transition-opacity duration-500 ${sceneReady ? 'opacity-100' : 'opacity-0'}`}>
               <HangarScene
                 design={design}
-                look={{ decal: cosmetics.decal, skin: cosmetics.skin, trail: cosmetics.trail }}
+                look={{ decal: cosmetics.decal, skin: cosmetics.skin, trail: cosmetics.trail, booster: cosmetics.booster }}
                 driveToken={driveToken}
                 onDriveEnd={() => setDriving(false)}
                 onReady={() => setSceneReady(true)}
@@ -318,7 +319,7 @@ export function HangarClient() {
                   d="M12.9 2.2a4.5 4.5 0 0 0-5.6 5.7L2.6 12.6a2 2 0 1 0 2.8 2.8l4.7-4.7a4.5 4.5 0 0 0 5.7-5.6l-2.6 2.6-2.3-.5-.5-2.3 2.5-2.7Z"
                 />
               </svg>
-              Build in Workshop
+              Change parts
             </Link>
           </div>
         </div>

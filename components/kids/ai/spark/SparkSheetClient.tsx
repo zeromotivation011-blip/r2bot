@@ -15,7 +15,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { bandForAge, type BandId } from '@/lib/kids/bands'
 import { getProgress } from '@/lib/kids-progress'
 import { reportActivity } from '@/lib/kids/universe/rewards'
-import { cleanRequest, offlineReply, withPrivacyNote } from '@/lib/kids/ai/spark/offline'
+import { cleanRequest, offlineReply, safetyReply, withPrivacyNote } from '@/lib/kids/ai/spark/offline'
 import { isOlderBand } from '@/lib/kids/ai/spark/match'
 import { STARTER_QUESTIONS } from '@/lib/kids/ai/spark/faq'
 import type { OpenSparkDetail } from '@/lib/kids/ai/spark/open'
@@ -23,6 +23,7 @@ import { isLiveKidsHref } from '@/lib/kids/ai/spark/live'
 import { SPARK_MAX_QUESTION, type SparkContext, type SparkMode, type SparkReply } from '@/lib/kids/ai/spark/types'
 import { canSpeak, setVoiceMuted, speakNatural, stopSpeaking, voiceMuted, warmNaturalVoices } from '@/components/kids/activities/speech'
 import { SparkFace } from './AskSparkClient'
+import HelplineCardClient from './HelplineCardClient'
 
 interface Turn {
   id: number
@@ -35,6 +36,22 @@ interface Turn {
 interface SheetProps {
   initial: OpenSparkDetail | null
   onClose: () => void
+  /**
+   * A grown-up switched Ask Spark off on this device (lib/kids/parent-controls.ts).
+   * The sheet then answers nothing, but "Get help" and the helpline card still
+   * work: safety help is never behind a switch or a parental gate.
+   */
+  helpOnly?: boolean
+}
+
+/** What "Worried or not safe?" shows. Local, offline, never sent anywhere. */
+const HELP_REPLY: SparkReply = {
+  answer:
+    "If something is worrying you, or you don't feel safe, you are not in trouble. Tell a grown-up you trust right now — a parent, a teacher or another adult you feel safe with. You can also call a free helpline for kids:",
+  source: 'safety',
+  links: [],
+  followUps: [],
+  crisis: true,
 }
 
 const REWARD_KEY = 'r2bot_kids_spark_reward_day'
@@ -83,7 +100,7 @@ function recognitionCtor(): RecognitionCtor | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null
 }
 
-export default function SparkSheetClient({ initial, onClose }: SheetProps) {
+export default function SparkSheetClient({ initial, onClose, helpOnly = false }: SheetProps) {
   const [band] = useState<BandId>(() => childBand())
   const [turns, setTurns] = useState<Turn[]>([])
   const [draft, setDraft] = useState('')
@@ -201,23 +218,32 @@ export default function SparkSheetClient({ initial, onClose }: SheetProps) {
   // ── Ask ───────────────────────────────────────────────────────────────
   const ask = useCallback(
     async (rawQuestion: string, mode: SparkMode) => {
-      const { question, context: ctx, removedPersonal } = cleanRequest(rawQuestion, context.current)
-      if (!question && mode === 'ask') return
+      if (helpOnly) return
+      const request = cleanRequest(rawQuestion, context.current)
+      const { question, context: ctx, removedPersonal } = request
+      // Safety runs on this device first: a child telling Spark something
+      // serious (or anything else Spark must not answer) is answered here and
+      // the words never leave the phone — not to R2BOT, not to the AI.
+      const local = safetyReply(request, band)
+      if (!local && !question && mode === 'ask') return
       stopSpeaking()
       setBusy(true)
       const childId = nextId.current++
       const sparkId = nextId.current++
-      const shownQuestion = mode === 'hint' && !question ? 'Can I have a hint?' : question
+      // A blocked message is shown as typed (it is on the child's own screen only).
+      const shownQuestion = local && rawQuestion.trim() ? rawQuestion.trim().slice(0, SPARK_MAX_QUESTION) : mode === 'hint' && !question ? 'Can I have a hint?' : question
       setTurns((t) => [...t, { id: childId, who: 'child', text: shownQuestion }, { id: sparkId, who: 'spark', text: '', pending: true }])
       setDraft('')
 
       let reply: SparkReply
       const offlineAnswer = (note?: string): SparkReply => {
-        const r = withPrivacyNote(offlineReply(question, ctx, band, mode), removedPersonal)
+        const r = withPrivacyNote(offlineReply(request, band, mode), removedPersonal)
         return note ? { ...r, note: r.note ? `${note} ${r.note}` : note } : r
       }
 
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      if (local) {
+        reply = withPrivacyNote(local, removedPersonal)
+      } else if (typeof navigator !== 'undefined' && !navigator.onLine) {
         reply = offlineAnswer("You're offline, so this answer is from Spark's notebook.")
       } else {
         const ctrl = new AbortController()
@@ -241,20 +267,29 @@ export default function SparkSheetClient({ initial, onClose }: SheetProps) {
 
       setTurns((t) => t.map((x) => (x.id === sparkId ? { ...x, text: reply.answer, reply, pending: false } : x)))
       setBusy(false)
-      say(sparkId, reply.answer)
+      // The voice is English-only for now: a Hindi or Spanish answer is read, not spoken.
+      if (!reply.lang || reply.lang === 'en') say(sparkId, reply.answer)
       if (reply.source !== 'safety' && reply.source !== 'unknown') rewardOncePerDay()
     },
-    [band, say],
+    [band, say, helpOnly],
   )
+
+  /** "Worried or not safe?": the helpline card, straight away, with no typing. */
+  const showHelp = useCallback(() => {
+    stopSpeaking()
+    const id = nextId.current++
+    setTurns((t) => [...t, { id, who: 'spark', text: HELP_REPLY.answer, reply: HELP_REPLY }])
+    say(id, HELP_REPLY.answer)
+  }, [say])
 
   // Opened from another screen with a question or a hint request.
   useEffect(() => {
-    if (asked.current || !initial) return
+    if (asked.current || !initial || helpOnly) return
     asked.current = true
     context.current = { topic: initial.topic, programSummary: initial.programSummary, failureReason: initial.failureReason }
     const hint = Boolean(initial.failureReason || initial.programSummary)
     if (hint || initial.question) void ask(initial.question ?? '', hint ? 'hint' : 'ask')
-  }, [initial, ask])
+  }, [initial, ask, helpOnly])
 
   // ── Voice input ───────────────────────────────────────────────────────
   const toggleMic = useCallback(() => {
@@ -356,7 +391,15 @@ export default function SparkSheetClient({ initial, onClose }: SheetProps) {
       {/* Conversation */}
       <div ref={listRef} className="flex-1 overflow-y-auto overscroll-contain px-4 py-4" aria-live="polite">
         <div className="mx-auto flex max-w-2xl flex-col gap-3">
-          {turns.length === 0 && (
+          {helpOnly && turns.length === 0 && (
+            <div className="rounded-[20px] border border-white/[0.08] bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4 shadow-[0_8px_24px_rgba(0,0,0,.45)]">
+              <p className="font-display text-lg font-bold">Spark is resting 😴</p>
+              <p className="mt-1 text-[17px] leading-relaxed text-[#A7B0C0]">
+                A grown-up has switched Ask Spark off on this device. If something is worrying you, tap the button below.
+              </p>
+            </div>
+          )}
+          {!helpOnly && turns.length === 0 && (
             <div className="rounded-[20px] border border-white/[0.08] bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4 shadow-[0_8px_24px_rgba(0,0,0,.45)]">
               <p className="font-display text-lg font-bold">Hi! I’m Spark. 👋</p>
               <p className="mt-1 text-[17px] leading-relaxed text-[#A7B0C0]">
@@ -391,7 +434,7 @@ export default function SparkSheetClient({ initial, onClose }: SheetProps) {
       {/* Composer: thumb zone */}
       <div className="border-t border-white/[0.08] bg-[#111C32] px-3 pb-[calc(env(safe-area-inset-bottom)+10px)] pt-2">
         <div className="mx-auto max-w-2xl">
-          {turns.length === 0 && (
+          {!helpOnly && turns.length === 0 && (
             <div className="-mx-1 mb-2 flex gap-2 overflow-x-auto px-1 pb-1" aria-label="Questions to try">
               {starters.map((q) => (
                 <button
@@ -407,7 +450,8 @@ export default function SparkSheetClient({ initial, onClose }: SheetProps) {
             </div>
           )}
           <form
-            className="flex items-center gap-2"
+            hidden={helpOnly}
+            className={`${helpOnly ? 'hidden' : 'flex'} items-center gap-2`}
             onSubmit={(e) => {
               e.preventDefault()
               if (!busy) void ask(draft, 'ask')
@@ -451,7 +495,14 @@ export default function SparkSheetClient({ initial, onClose }: SheetProps) {
               </svg>
             </button>
           </form>
-          <p className="mt-2 text-center text-[13px] leading-snug text-[#A7B0C0]">
+          <button
+            type="button"
+            onClick={showHelp}
+            className={`mx-auto mt-2 flex min-h-[44px] items-center justify-center gap-2 rounded-2xl px-4 text-[15px] font-bold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/60 active:scale-95 ${helpOnly ? 'w-full bg-amber-500 text-[#1A1103]' : 'text-cyan-300 underline underline-offset-2'}`}
+          >
+            <span aria-hidden="true">💛</span> Worried or not safe? Get help
+          </button>
+          <p hidden={helpOnly} className="mt-1 text-center text-[13px] leading-snug text-[#A7B0C0]">
             Spark can make mistakes. Grown-ups: R2BOT doesn’t store questions; they may be sent to an AI service (Anthropic) to answer.
             {micOk ? ' The mic uses your browser’s speech service (such as Google or Apple).' : ''}
           </p>
@@ -500,7 +551,7 @@ function SparkBubble({ turn, speaking, canReplay, busy, onReplay, onFollowUp, on
       <div className="rounded-[20px] rounded-bl-md border border-white/[0.08] bg-[#19263F] px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,.35)]">
         <div className="mb-1 flex items-center gap-2">
           <span className="text-xs font-bold uppercase tracking-wide text-amber-300">{r ? SOURCE_LABEL[r.source] : 'Spark'}</span>
-          {canReplay && (
+          {canReplay && (!r?.lang || r.lang === 'en') && (
             <button
               type="button"
               onClick={onReplay}
@@ -512,8 +563,12 @@ function SparkBubble({ turn, speaking, canReplay, busy, onReplay, onFollowUp, on
           )}
         </div>
         {r?.note && <p className="mb-2 text-sm text-[#A7B0C0]">{r.note}</p>}
-        <p className="whitespace-pre-line text-[17px] leading-relaxed">{turn.text}</p>
+        <p lang={r?.lang ?? 'en'} className="whitespace-pre-line text-[17px] leading-relaxed">
+          {turn.text}
+        </p>
       </div>
+
+      {r?.crisis && <HelplineCardClient lang={r.lang ?? 'en'} />}
 
       {links.length > 0 && (
         <div className="flex flex-col gap-2">

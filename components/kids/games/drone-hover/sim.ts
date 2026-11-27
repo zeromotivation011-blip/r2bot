@@ -165,7 +165,12 @@ export const LEGEND_PAYLOAD = 0.4
 export const PILOT_MAX_OVERSHOOT = 0.75
 /** Ace and Legend: the lowest flight score that still counts as a win. */
 export const ACE_MIN_WIN = 550
-export const LEGEND_MIN_WIN = 450
+/**
+ * Legend: 520. Measured 27 Nov 2026 over 2,000 random slider settings
+ * (/kids roadmap #10): at 450, 4.8% of random tunes won; at 520, 1.3% do, while
+ * a tuned brain scores 600+. Stars: 520 = 1, 550 = 2, 580 = 3.
+ */
+export const LEGEND_MIN_WIN = 520
 
 export function buildMission(tier: TierIndex): Mission {
   const base: Mission = {
@@ -884,7 +889,7 @@ export function scoreFlight(s: SimState): FlightReport {
       }`,
     }
   }
-  const stars = score >= 580 ? 3 : score >= 520 ? 2 : 1
+  const stars = score >= 580 ? 3 : score >= 550 ? 2 : 1
   let message: string
   if (s.overshoot > 0.6) message = `Course complete! Your biggest overshoot was ${s.overshoot.toFixed(2)} m — the outer loop is pushing harder than it can brake. More Kd_x (or slightly less Kp_x) makes the arrivals clean.`
   else if (sat > 0.45) message = 'Course complete! The motors spent a lot of time maxed out, which wastes the battery. Softer inner-loop gains keep the motors in their happy range.'

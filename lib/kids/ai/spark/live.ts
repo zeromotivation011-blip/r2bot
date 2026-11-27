@@ -4,30 +4,19 @@
 // Co-pilot) carries an email sign-up form, which a child must never see
 // (CLAUDE.md §6: children never give an email).
 //
-// Games and worlds are being built one by one, so they are listed here by id
-// when their page ships. Add the id in the same change that adds
-// app/kids/play/<id>/page.tsx or app/kids/worlds/<id>/page.tsx.
+// Games and worlds come from lib/kids/universe/worlds.ts: only games with a
+// built page go in GAMES and every world in WORLDS has a page (CLAUDE.md §6),
+// so the lists here can never drift from what exists.
 // Galaxy activities and course levels are statically generated for every
 // entry in their data, so every one of them is live.
 
-/** Games with a page at /kids/play/<id> (checked 26 Nov 2026). */
-export const SPARK_LIVE_GAMES: ReadonlySet<string> = new Set([
-  'arm-factory',
-  'bio-bots',
-  'circuit-city',
-  'drone-hover',
-  'mars-rover',
-  'maze-mapper',
-  'ocean-rescue',
-  'robot-brain',
-  'robot-surgeon',
-  'safety-inspector',
-  'sumo-arena',
-  'swarm-reef',
-])
+import { GAMES, WORLDS } from '../../universe/worlds'
 
-/** Worlds with a page at /kids/worlds/<id> (checked 26 Nov 2026). */
-export const SPARK_LIVE_WORLDS: ReadonlySet<string> = new Set(['guardians', 'hospital', 'ocean', 'zoo'])
+/** Games with a page at /kids/play/<id>. */
+export const SPARK_LIVE_GAMES: ReadonlySet<string> = new Set(GAMES.map((g) => g.id))
+
+/** Worlds with a page at /kids/worlds/<id>. */
+export const SPARK_LIVE_WORLDS: ReadonlySet<string> = new Set<string>(WORLDS.map((w) => w.id))
 
 /** Only kids pages that exist. Anything outside /kids (the Atlas included) is refused. */
 export function isLiveKidsHref(href: string): boolean {

@@ -1,6 +1,12 @@
 // lib/kids/activities/content/index.ts
-// THE list of Skill Galaxy activities: every track file in this folder plus,
-// as a starter set, the reference samples shipped with each template.
+// THE list of Skill Galaxy activities: every track file in this folder.
+//
+// The reference samples shipped with each template (SAMPLE_ACTIVITIES) are
+// NOT in the live Galaxy (27 Nov 2026, roadmap #18): they are test-bench
+// fixtures, reviewed only for "the template works", and a child must never
+// meet unreviewed content. They still run in verify.ts and power the
+// /kids/lab/templates/* benches. To ship a sample, review it and copy it into
+// a track file with the same id (step 3 below) — it then goes live.
 //
 // ── Authoring guide (short version; the full one is in docs) ────────────────
 // 1. Open content/<track>.ts and add an object to the array:
@@ -20,7 +26,8 @@
 //        },
 //      ]
 // 2. Run `npx tsx lib/kids/activities/verify.ts` — it must print no ✗.
-// 3. A content activity with the same id as a template sample replaces it.
+// 3. A content activity with the same id as a template sample replaces it
+//    (and is the only way a sample reaches children).
 //
 // Pages read ALL_ACTIVITIES on the server and pass light summaries to the
 // browser (see summarize() in ../progress.ts); never import this file from a
@@ -130,8 +137,11 @@ export function byWorld(world: string): Activity[] {
 
 const contentIds = new Set(CONTENT_ACTIVITIES.map((a) => a.id))
 
-/** Every activity: authored content first, then any sample it does not replace. */
-export const ALL_ACTIVITIES: Activity[] = [...CONTENT_ACTIVITIES, ...SAMPLE_ACTIVITIES.filter((a) => !contentIds.has(a.id))]
+/** Template samples not (yet) promoted into a track file. Never shown to children. */
+export const UNPROMOTED_SAMPLES: Activity[] = SAMPLE_ACTIVITIES.filter((a) => !contentIds.has(a.id))
+
+/** Every LIVE activity: authored content only (samples are gated, see above). */
+export const ALL_ACTIVITIES: Activity[] = CONTENT_ACTIVITIES
 
 const BY_ID = new Map(ALL_ACTIVITIES.map((a) => [a.id, a]))
 

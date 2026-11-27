@@ -39,6 +39,8 @@ import {
 import { getProgress } from '@/lib/kids-progress'
 import { reportBestRun } from '@/lib/kids/universe/rewards'
 import { playSound } from '@/lib/kids-audio'
+import { useParentControls } from '@/lib/kids/parent-controls'
+import { requireGrownUp } from '@/components/kids/app/ParentalGateClient'
 import type { TierName } from '@/lib/kids/universe/tiers'
 import { ConfidenceBars, FeatureView, LossChart, ScoreView, ThumbCanvas, type ClassView } from './VisionWidgetsClient'
 
@@ -264,6 +266,10 @@ export default function VisionLabClient() {
   // Every start gets a token. stopCamera (leave, background, "Sample pictures")
   // bumps it, so a getUserMedia that resolves late is stopped, never shown.
   const camReqRef = useRef(0)
+  // The parent hub's "Camera and AR" switch covers the Vision Lab too, and the
+  // first camera start in a visit asks a grown-up (requireGrownUp).
+  const cameraAllowed = useParentControls().camera !== false
+  const grownUpOkRef = useRef(false)
   const camPendingRef = useRef(false)
   const mountedRef = useRef(false)
 
@@ -353,6 +359,15 @@ export default function VisionLabClient() {
     setCamState((s) => (s === 'on' || s === 'starting' || s === 'paused' || s === 'explain' ? 'off' : s))
     setSource('samples')
   }
+
+  // A grown-up switched the camera off in the parent hub (another tab, or
+  // before this page loaded): stop any stream and fall back to samples.
+  useEffect(() => {
+    if (cameraAllowed) return
+    stopCamera()
+    setCamState((s) => (s === 'on' || s === 'starting' || s === 'paused' || s === 'explain' ? 'off' : s))
+    setSource('samples')
+  }, [cameraAllowed, stopCamera])
 
   // First sample picture, and redraw when the room light changes.
   useEffect(() => {
@@ -954,6 +969,7 @@ export default function VisionLabClient() {
             <button type="button" className={source === 'samples' ? btnPrimary : btnGhost} aria-pressed={source === 'samples'} onClick={switchToSamples}>
               🖼️ Sample pictures
             </button>
+            {cameraAllowed && (
             <button
               type="button"
               className={source === 'camera' && camState === 'on' ? btnPrimary : btnGhost}
@@ -964,6 +980,7 @@ export default function VisionLabClient() {
             >
               📷 Use my camera
             </button>
+            )}
             {source === 'camera' && camState === 'on' && (
               <button
                 type="button"
@@ -987,7 +1004,22 @@ export default function VisionLabClient() {
                 and forgotten when you leave. Nothing is uploaded or saved.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <button type="button" className={btnPrimary} onClick={() => void startCamera(facing)}>
+                <button
+                  type="button"
+                  className={btnPrimary}
+                  onClick={() => {
+                    // A grown-up says yes once per visit (parent hub switch + the gate).
+                    if (grownUpOkRef.current) {
+                      void startCamera(facing)
+                      return
+                    }
+                    void requireGrownUp({ message: 'This turns on the camera.' }).then((ok) => {
+                      if (!ok) return
+                      grownUpOkRef.current = true
+                      void startCamera(facing)
+                    })
+                  }}
+                >
                   Turn on camera
                 </button>
                 <button type="button" className={btnGhost} onClick={() => setCamState('off')}>

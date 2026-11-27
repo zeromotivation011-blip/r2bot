@@ -11,9 +11,12 @@ import { InstallAppClient } from '@/components/kids/InstallAppClient'
 import { KidsClassSync } from '@/components/kids/classroom/KidsClassSyncClient'
 import { RewardToast } from '@/components/kids/ui/RewardToastClient'
 import { KidsAppLinkGuard } from '@/components/kids/app/KidsAppLinkGuardClient'
+import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
+import { ParentTimeKeeper } from '@/components/kids/parents/ParentTimeKeeperClient'
 import { useKidsVoice } from '@/lib/kids-voice'
 import { KIDS_MORE, KIDS_SETTINGS, type KidsNavItem } from '@/lib/kids/nav'
 import { openSpark } from '@/lib/kids/ai/spark/open'
+import { useParentControls } from '@/lib/kids/parent-controls'
 import './kids-animations.css'
 import './kids-shell.css'
 
@@ -80,7 +83,7 @@ const MORE: (KidsNavItem & { phoneOnly?: boolean })[] = [
 ]
 
 const MORE_MATCH = (p: string) =>
-  [...KIDS_MORE, KIDS_SETTINGS].some((m) => p.startsWith(m.href)) || p.startsWith('/kids/challenge') || p.startsWith('/kids/my-robot')
+  [...KIDS_MORE, KIDS_SETTINGS].some((m) => p.startsWith(m.href)) || p.startsWith('/kids/challenge')
 
 /** The More menu: a disclosure button + list. Closes on Escape, outside click and navigation. */
 function MoreMenu({ pathname }: { pathname: string }) {
@@ -145,6 +148,9 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
   const [lvl, setLvl] = useState<{ level: number; title: string; xp: number } | null>(null)
   const { voiceOn, toggle, cancel } = useKidsVoice()
   useConfettiEventBridge()
+  // A grown-up can switch Ask Spark off in the parent hub: the header button
+  // then reads "Need help?" and opens the help-only sheet (safety help stays).
+  const sparkOn = useParentControls().askSpark
 
   useEffect(() => {
     const read = () => {
@@ -208,7 +214,12 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
         )}
         <div className="kids-nav-right">
           {game && (
-            <button type="button" onClick={() => openSpark()} className="kids-spark-btn" aria-label="Ask Spark, your robot helper">
+            <button
+              type="button"
+              onClick={() => openSpark()}
+              className="kids-spark-btn"
+              aria-label={sparkOn !== false ? 'Ask Spark, your robot helper' : 'Need help? Get help from a grown-up'}
+            >
               <SparkMini />
             </button>
           )}
@@ -235,13 +246,16 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
       {!bare && (
         <footer className="kids-footer">
           <span className="kids-footer-label">For grown-ups:</span>
-          <Link href="/kids/parents">Parents</Link>
-          <Link href="/kids/teach">Teachers</Link>
-          <Link href="/kids/schools">Schools</Link>
+          {/* Grown-up pages and links that leave /kids ask a grown-up first (parental gate). */}
+          <GrownUpLink href="/kids/parents" grant>Parents</GrownUpLink>
+          <GrownUpLink href="/kids/teach">Teachers</GrownUpLink>
+          <GrownUpLink href="/kids/schools">Schools</GrownUpLink>
           <Link href="/kids/join">Join a class</Link>
-          <Link href="/kids/classroom">Teacher classroom</Link>
-          <Link href="/privacy#kids">Privacy</Link>
-          <Link href="/">R2BOT.in</Link>
+          <GrownUpLink href="/kids/classroom">Teacher classroom</GrownUpLink>
+          <GrownUpLink href="/privacy#kids">Privacy</GrownUpLink>
+          <GrownUpLink href="/" message="This opens R2BOT for grown-ups.">R2BOT for grown-ups</GrownUpLink>
+          {/* Parent controls: daily time / quiet hours wind-down banner (never a lock). */}
+          <ParentTimeKeeper />
         </footer>
       )}
 

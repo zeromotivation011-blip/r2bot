@@ -107,7 +107,7 @@ export default function KidsGamesPage() {
             {GAMES.map((g) => (
               <div key={g.id} className="rounded-[20px] border border-white/10 bg-white/[0.03] p-4">
                 <dt className="font-display font-bold text-[#EEF2F8]">
-                  <Link href={`/kids/play/${g.id}`} className="underline-offset-4 hover:underline">{g.emoji} {g.name}</Link>
+                  <Link href={`/kids/play/${g.id}`} className="inline-flex min-h-[44px] items-center underline-offset-4 hover:underline">{g.emoji} {g.name}</Link>
                 </dt>
                 <dd className="mt-1 text-[15px]">{g.teaches}</dd>
               </div>

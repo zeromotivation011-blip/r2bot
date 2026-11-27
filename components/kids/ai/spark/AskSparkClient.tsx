@@ -11,6 +11,7 @@ import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { OPEN_SPARK_EVENT, type OpenSparkDetail } from '@/lib/kids/ai/spark/open'
+import { useParentControls } from '@/lib/kids/parent-controls'
 
 const loadSheet = () => import('./SparkSheetClient')
 const SparkSheet = dynamic(loadSheet, { ssr: false })
@@ -54,6 +55,11 @@ export default function AskSparkClient({ hideOn = DEFAULT_HIDE_ON }: AskSparkPro
     }
   }, [])
 
+  // A grown-up can switch Ask Spark off (parent hub). The floating button then
+  // stays, relabelled "Need help?", and opens the "Spark is resting" sheet
+  // whose "Get help" button and helpline card still work — safety help is
+  // never behind the switch or the parental gate.
+  const sparkOn = useParentControls().askSpark !== false
   const hidden = hideOn.some((p) => pathname === p || pathname.startsWith(`${p}/`))
 
   if (!mounted) return null
@@ -63,14 +69,14 @@ export default function AskSparkClient({ hideOn = DEFAULT_HIDE_ON }: AskSparkPro
         <button
           type="button"
           onClick={() => show(null)}
-          aria-label="Ask Spark, your robot helper"
+          aria-label={sparkOn ? 'Ask Spark, your robot helper' : 'Need help? Get help from a grown-up'}
           className="fixed right-4 z-40 flex h-14 items-center gap-2 rounded-full bg-amber-500 pl-2 pr-4 font-display text-base font-extrabold text-[#1A1103] shadow-[0_8px_24px_rgba(0,0,0,.45)] transition-transform duration-200 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-95 bottom-[calc(env(safe-area-inset-bottom)+84px)] min-[901px]:bottom-6 min-[901px]:right-6"
         >
           <SparkFace />
-          <span>Ask Spark</span>
+          <span>{sparkOn ? 'Ask Spark' : 'Need help?'}</span>
         </button>
       )}
-      {open && <SparkSheet key={requestId} initial={request} onClose={() => setOpen(false)} />}
+      {open && <SparkSheet key={requestId} initial={request} onClose={() => setOpen(false)} helpOnly={!sparkOn} />}
     </>,
     document.body,
   )

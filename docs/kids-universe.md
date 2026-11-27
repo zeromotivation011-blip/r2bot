@@ -32,7 +32,16 @@ learning) and four difficulty tiers — **Cadet, Pilot, Ace, Legend** — so a
   map keeps 4 planets + 8 moons + the Hangar. World progress (activities done, game
   played) is `components/kids/universe/WorldProgressClient.tsx`, shown on `/kids/worlds`
   and in the Hangar; activity ids come from the server, never the activity params.
-- **Hangar**: the child's robot (`lib/kids/robot-design.ts`), avatar, badges, unlocks.
+- **Hangar = the Garage** (`/kids/hangar`, 27 Nov 2026): the robot's ONE home (`lib/kids/robot-design.ts`),
+  avatar, badges, unlocks. `components/kids/hangar/GarageClient.tsx`: rename the robot
+  (`RobotDesign.name`, checked by `checkNickname`, letters and numbers only; used by Workshop,
+  Code Lab, Classroom and certificates), a "Share robot card" 1200×630 PNG made on the device
+  (robot, parts, level, stars; never the child's name), and the six Spark Trail parts with
+  "Fit to robot" (`TRAIL_PART_FITS`, `isTrailPartFitted`, `fitTrailPart`): Spark's Head → Camera
+  Eye, Mighty Arm → Gripper Claw, Sensor Backpack → Colour Sensor, Speedy Wheels → two wheels,
+  Control Center Body → Box Body; Rocket Booster is a 3D-bay-only look (`cosmetics.booster`,
+  saved with the looks and in the backup code). `/kids/my-robot` 308s to `/kids/hangar`
+  (`next.config.mjs`; the page also calls `permanentRedirect`). Building parts stays in the Workshop.
 - **Lab**: the real-physics simulator (`lib/kids/sim/`), Rapier + Blockly.
 
 ## Navigation — one shell
@@ -50,6 +59,53 @@ Ordinary pages: a floating button above the tab bar. Game and full-screen pages 
 `code-lab/*`, `workshop`, `lab/*`, `stories/*`, course sessions, Galaxy activities, `ai/*`,
 `spark-trail/*`, `challenge/*`): no floating button — a 44–48px Spark button in the header
 calls `openSpark()`. Hidden on grown-up pages. Offline FAQ unless `KIDS_AI_ENABLED=true`.
+When a grown-up switches Spark off (`useParentControls().askSpark`) both buttons STAY,
+relabelled "Need help?", and open the "Spark is resting" sheet whose "Get help" button and
+helpline card still work: safety help is never behind the switch. Helpline anchors carry
+`data-kids-safety` and tel: links are never gated by the store app's link guard.
+The parental gate's wrong-answer count and 20 s pause live in sessionStorage
+(`r2bot_kids_gate_lock`), shared by every gate in the tab, so Cancel + reopen cannot skip them.
+The parent "Camera" switch covers Workshop AR AND the Vision Lab (both also ask the gate).
+
+## Ask Spark safety (roadmap #78)
+- ONE classifier for server and device: `classifySpark()` in `lib/kids/ai/spark/safety.ts`
+  (+ `patterns-i18n.ts`, `lang.ts`), run on the child's raw words before personal details are
+  stripped. Categories: disclosure (someone hurts me), self-harm, wellbeing, jailbreak,
+  homework cheating, a child sharing their own details.
+- The sheet checks every message ON THE DEVICE first; anything blocked is answered locally
+  and never sent to the model. The server (`app/api/kids/spark/route.ts`) answers crisis
+  categories before the rate limit, so a child in trouble is never told to slow down.
+- Disclosure / self-harm / wellbeing: a kind, short answer (shorter for Explorers) in the
+  child's language with `crisis: true`, plus the **helpline card**
+  (`HelplineCardClient.tsx`, `helplines.ts`): region from the device time zone then language
+  (IN 1098, UK 0800 1111, US 988 + Childhelp, CA, AU, IE, ES ANAR + 116 111, EU 116 111;
+  childhelplineinternational.org always). Offline, never behind the parental gate, 44px+.
+- A "Worried or not safe? Get help" button is always in the sheet. No transcripts are stored.
+- Red team: `lib/kids/ai/spark/redteam/{prompts,verify}.ts` (373 prompts in EN/HI/ES incl.
+  60 ordinary questions, every FAQ and starter question as false-positive checks), in CI.
+  The patterns were written against the suite: grow the held-out set, and get a native
+  review of the Hindi and Spanish replies before launch in those languages.
+
+## Grown-ups: parental gate and parent controls (roadmap #2, #14)
+- Gate: `components/kids/app/ParentalGateClient.tsx`. A multiplication in words (a teen number
+  × one digit), keypad or keyboard; three wrong answers pause it 20 s; no personal data.
+  Use `await requireGrownUp({ message?, target?, grant? })` in a click handler, or wrap UI in
+  `<ParentalGate>`. Key presses stop at the dialog.
+- `<GrownUpLink>` (`components/kids/app/GrownUpLinkClient.tsx`) for EVERY grown-up or outbound
+  link (kids footer, Share to Classroom, AR "Start AR"/"Turn on camera", settings reset).
+  With outbound links switched off, links leaving /kids render as plain text. The adult
+  `SiteFooter` is not rendered under /kids (`HideOnEmbed kids` in `app/layout.tsx`).
+- Controls: `lib/kids/parent-controls.ts` (device-only localStorage): `dailyMinutes`,
+  `quietHours`, `askSpark`, `camera`, `outboundLinks`. React `useParentControls()`,
+  `useKidsTimeStatus()`; non-React `sparkAllowed()`, `cameraAllowed()`,
+  `outboundLinksAllowed()`, `isQuietTime()`. `ParentTimeKeeperClient` (in the kids footer)
+  shows a wind-down note 5 min before the budget, a "time for a break" note after it and a
+  quiet-hours note. It NEVER locks the screen. Camera off hides the Workshop's "See it in your
+  room" and AR shows a kind message.
+- `/kids/parents`: a public, indexable explainer; behind the gate the hub
+  (`ParentHubClient.tsx`): this week in plain words, totals, a try-at-home idea, Galaxy track
+  progress, the robot's parts, the controls, an optional PARENT email for R2BOT Weekly via
+  `/api/leads` → `captureLead()` (source `kids-parents`, honeypot, no child data), reset.
 
 ## Settings — one device-only store
 `lib/kids/settings.ts` (localStorage only; no account). Page `/kids/settings` (noindex),
@@ -87,6 +143,23 @@ personal bests, and fires `REWARD_EVENT`; `components/kids/ui/RewardToastClient.
 Surfaces that keep their own per-item stars (Story Theatre, Code Lab missions, Spark Trail
 levels, `/kids/challenge`) call `reportBestRun(...)`, which reports only a first finish or a
 better score, so replays never farm XP.
+Game results go through `reportBestRun` in `GameShellClient` ("Beat your best to earn more XP"):
+first finish = full XP, improvement = half, replay = 0. `RewardResult` carries `kind`, `id`, `xpBefore`.
+- **Quests** (`lib/kids/universe/quests.ts`): 49 quests tagged by band, with source, track,
+  min-star and improvement filters. Each week a band gets 3 quests of different kinds plus a
+  bonus 4th, the same for every child in the band; missing a week costs nothing. Course-only
+  quests are hidden unless `hasOpenCourse(p)` (add `'builders'` to `COURSE_OPEN_BANDS` when
+  Level 2 ships). `bugfix` counts the debug-program Galaxy activities (`DEBUG_ACTIVITY_IDS`);
+  `build` counts a robot save once a day (`reportRobotSaved()`, called by `RewardToastClient`).
+  UI: `components/kids/universe/QuestPanelClient.tsx` (picture cards + speaker for Explorers,
+  a list for older bands), used by the Explorer card.
+- **Unlocks** (`lib/kids/universe/unlocks.ts`): something at every level 1–60 (paints, a
+  `title` kind; `bestTitle(p.unlocks)`).
+- **Ceremony**: `components/kids/ui/LevelUpCeremonyClient.tsx`, ~3 s, skippable (button and
+  Escape), reduced-motion aware, loaded by `RewardToast` only on a level-up. Distinct sounds
+  per reward type in `lib/kids-audio.ts` (`badge`, `quest`, `stamp`, `best`); Spark speaks
+  badges, quests and level-ups for Explorers.
+- Checks: `lib/kids/universe/rewards.verify.ts` (CI).
 Rules: reward learning and effort, not time; personal bests, never rankings or
 leaderboards; no streak that punishes a missed day.
 
@@ -110,6 +183,23 @@ Each game:
 - respects `prefers-reduced-motion`; pauses when the tab is hidden; disposes on unmount;
 - uses no new npm packages (three.js, Rapier and Blockly are already installed);
 - is deterministic where it scores (seeded randomness), so a result is fair.
+
+## Offline (roadmap #17)
+`public/kids-sw.js` (VERSION `r2bot-kids-v3`, scope /kids, registered by KidsShell in
+production). Install precaches 10 pages (/kids, hangar, settings, galaxy, course, worlds, play,
+and the sumo-arena, drone-hover and maze-mapper games) plus the JS/CSS each lists and the chunks
+they load on demand (read from Next's webpack chunk map; if that format changes they are cached
+on first use instead). Pages: network first, keyed by path (`?source=` ignored), saved copy after
+4 s or a 5xx; an unseen page gets a built-in offline page. Static: cache first. Episode audio:
+its own cache `r2bot-kids-audio-1` that a version bump keeps. Never cached: /api/*, RSC
+requests, /kids/classroom, /kids/join. Rename a precached game route → update `PRECACHE_PAGES`.
+
+## Content hygiene (roadmap #18)
+`ALL_ACTIVITIES` is authored content only: the template samples are not in the live Galaxy
+(their URLs 404) and the `/kids/lab/templates/*` benches 404 in production
+(`app/kids/lab/templates/bench.ts`). `/kids/challenge/*` is canonical + noindex. Spark's game and
+world lists come from `GAMES` and `WORLDS`. Before promoting a sample, give
+`design-estimate-vacuum-tower` and the three `world-match-*` samples realWorld text.
 
 ## Never
 Leaderboards or comparing children. Collecting any personal data from a child.

@@ -174,14 +174,22 @@ Build these exceptionally; everything else is secondary.
   `lib/kids-progress.ts`, UI `components/kids/hangar/BackupCodeClient.tsx` in the Hangar and Settings: no personal data,
   a restore merges and never lowers progress), **Games** `/kids/play/<id>` (count them from `GAMES`, never type the
   number; only games with a built page go in `GAMES`; the phone tab bar is five: Home · Course · Worlds · Games · Hangar),
-  **Classroom** `/kids/classroom` (teacher, noindex),
+  **Garage** `/kids/hangar` (the robot's one home: rename, robot card, Spark Trail parts fitted to the real robot;
+  `/kids/my-robot` 308s there), **Parents** `/kids/parents` (public explainer; behind the parental gate a hub with the
+  week in plain words and device-only controls in `lib/kids/parent-controls.ts` — daily time and quiet hours as gentle
+  banners, never a lock; Ask Spark / camera / outbound-link switches), **Classroom** `/kids/classroom` (teacher, noindex),
   `/kids/join` (child joins with code + nickname, noindex) and `/kids/schools` (indexable pitch + pilot form
   through `captureLead()`). One robot shape (`RobotDesign`) and one progress store (`lib/kids-progress.ts`,
   fires `KIDS_PROGRESS_EVENT`) for all of it. XP, badges and quests come ONLY from `reportActivity` in
   `lib/kids/universe/rewards.ts` (older per-item-star surfaces use `reportBestRun`, which pays a first finish or a
   better score, never a replay); the one star total shown anywhere is `collectedStars()`. **Children never give an email, password, phone or birthday**;
-  classroom identity is a random token whose SHA-256 is stored server-side. R2BOT Kids installs as its own
-  PWA (`/kids/manifest.webmanifest`, `public/kids-sw.js`, scope `/kids`). The camera is allowed site-wide
+  classroom identity is a random token whose SHA-256 is stored server-side. Every grown-up or outbound link goes
+  through the **parental gate** (`requireGrownUp()` / `<GrownUpLink>` in `components/kids/app/`); the adult footer does
+  not render under /kids. **Spark safety**: one classifier (`classifySpark()`) on device and server; a child saying they
+  are hurt gets a kind answer and a regional helpline card, never gated, never sent to the model; the red-team suite
+  (`lib/kids/ai/spark/redteam/verify.ts`) runs in CI with the rewards, backup, activities and Code Lab verifies. Weekly
+  quests and unlocks to level 60 live in `lib/kids/universe/{quests,unlocks}.ts`. R2BOT Kids installs as its own
+  PWA (`/kids/manifest.webmanifest`, `public/kids-sw.js` precaches the core screens for offline, scope `/kids`). The camera is allowed site-wide
   (`camera=(self)`) only for Workshop AR; frames never leave the device.
 
 **Parked (code kept, hidden from nav + noindex until scale):** jobs, leaderboard, schools,

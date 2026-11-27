@@ -7,7 +7,9 @@
 //     robot (Workshop, Code Lab, AR) then shows the new paint for free.
 //   - DECAL, TRAIL and SKIN are Hangar-only looks with no effect on what the
 //     robot can do, so they live in their own localStorage key,
-//     `r2bot_kids_hangar_v1` = { decal, trail, skin, workshopColour }.
+//     `r2bot_kids_hangar_v1` = { decal, trail, skin, workshopColour, booster }.
+//     `booster` = the Spark Trail Rocket Booster add-on is on (owned only
+//     when `earnedParts` holds 'robot-rocket-pack'; drawn in the bay only).
 //     `workshopColour` remembers the colour the child picked in the Workshop
 //     before their first earned paint, so "Workshop colour" can put it back.
 //
@@ -30,9 +32,14 @@ export interface HangarCosmetics {
   skin: string | null
   /** The Workshop colour before an earned paint replaced it. */
   workshopColour: string | null
+  /** The Spark Trail Rocket Booster add-on is fitted (Hangar bay only). */
+  booster: boolean
 }
 
-export const EMPTY_COSMETICS: HangarCosmetics = { decal: null, trail: null, skin: null, workshopColour: null }
+export const EMPTY_COSMETICS: HangarCosmetics = { decal: null, trail: null, skin: null, workshopColour: null, booster: false }
+
+/** The Spark Trail part that unlocks the booster add-on. */
+export const BOOSTER_PART_ID = 'robot-rocket-pack'
 
 const HEX = /^#[0-9A-Fa-f]{6}$/
 
@@ -49,7 +56,7 @@ export function loadCosmetics(): HangarCosmetics {
     if (!o || typeof o !== 'object') return { ...EMPTY_COSMETICS }
     const r = o as Record<string, unknown>
     const wc = str(r.workshopColour)
-    return { decal: str(r.decal), trail: str(r.trail), skin: str(r.skin), workshopColour: wc && HEX.test(wc) ? wc : null }
+    return { decal: str(r.decal), trail: str(r.trail), skin: str(r.skin), workshopColour: wc && HEX.test(wc) ? wc : null, booster: r.booster === true }
   } catch {
     return { ...EMPTY_COSMETICS }
   }
@@ -99,7 +106,13 @@ export function ownedOnly(c: HangarCosmetics, p: KidsProgress): HangarCosmetics 
     const u = UNLOCKS.find((x) => x.id === id && x.kind === kind)
     return u && owns(u, p) ? id : null
   }
-  return { ...c, decal: keep(c.decal, 'decal'), trail: keep(c.trail, 'trail'), skin: keep(c.skin, 'skin') }
+  return {
+    ...c,
+    decal: keep(c.decal, 'decal'),
+    trail: keep(c.trail, 'trail'),
+    skin: keep(c.skin, 'skin'),
+    booster: c.booster && p.earnedParts.includes(BOOSTER_PART_ID),
+  }
 }
 
 /** Short look descriptions, said in the picker and used as alt text. */

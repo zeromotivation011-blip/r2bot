@@ -74,7 +74,7 @@ const TIERS = [
   {
     name: 'Legend',
     who: '14 and up — a real engineering challenge',
-    what: 'A two-dimensional waypoint course. Three loops work together: an inner loop holds the tilt, an outer loop chooses the tilt to move sideways, and a PID loop holds the height. The parcel drops halfway and the battery sags as it empties. Finishing the course is not enough: a win needs a flight score of at least 450.',
+    what: 'A two-dimensional waypoint course. Three loops work together: an inner loop holds the tilt, an outer loop chooses the tilt to move sideways, and a PID loop holds the height. The parcel drops halfway and the battery sags as it empties. Finishing the course is not enough: a win needs a flight score of at least 520.',
     tip: 'Tune from the inside out. Make the tilt loop fast and well damped first (a drone that wobbles in tilt cannot fly anywhere). Then tune the position loop several times slower. Finally add I to the height loop for the battery sag and the lighter drone after the drop.',
   },
 ]

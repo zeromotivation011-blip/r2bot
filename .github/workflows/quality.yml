@@ -34,3 +34,7 @@ jobs:
         run: npx tsx lib/kids/activities/verify.ts
       - name: Kids progress backup code round-trips, merges without losing progress, and refuses bad codes
         run: npx tsx lib/kids/progress-backup.verify.ts
+      - name: Kids rewards — an unlock at every level, every quest reachable, no XP for replays
+        run: npx tsx lib/kids/universe/rewards.verify.ts
+      - name: Ask Spark safety — red-team set (EN/HI/ES), 100% disclosure + self-harm, 0 false positives
+        run: npx tsx lib/kids/ai/spark/redteam/verify.ts

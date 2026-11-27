@@ -12,7 +12,8 @@
 
 import { collectedStars, type KidsProgress } from '@/lib/kids-progress'
 import { getBand } from '@/lib/kids/bands'
-import { daysExploredThisWeek, levelInfo, questStatus } from '@/lib/kids/universe/rewards'
+import { daysExploredThisWeek, levelInfo } from '@/lib/kids/universe/rewards'
+import { QuestPanelClient } from './QuestPanelClient'
 import { Spark } from '@/components/kids/story/characters'
 import { Avatar } from './avatars'
 import { hasStarted, weekDots } from './universe-state'
@@ -31,7 +32,7 @@ export function ExplorerCardClient({ progress, onboarded, onStart, onEdit }: Exp
   return (
     <section
       aria-labelledby="explorer-h"
-      className={`relative h-full min-h-[654px] overflow-hidden lg:min-h-0 rounded-[28px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]`}
+      className={`relative h-full min-h-[760px] overflow-hidden lg:min-h-0 rounded-[28px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]`}
     >
       <h2 id="explorer-h" className="sr-only">
         Your explorer
@@ -69,7 +70,6 @@ function Skeleton() {
 function Filled({ p, onboarded, onStart, onEdit }: { p: KidsProgress; onboarded: boolean; onStart: () => void; onEdit: () => void }) {
   const now = new Date()
   const li = levelInfo(p.xp)
-  const quests = questStatus(p, now)
   const days = daysExploredThisWeek(p, now)
   const dots = weekDots(p, now)
   const badgeCount = Object.keys(p.badges).length
@@ -192,48 +192,9 @@ function Filled({ p, onboarded, onStart, onEdit }: { p: KidsProgress; onboarded:
         </>
       )}
 
-      {/* Quests */}
+      {/* Quests: picture cards for Explorers, a list for older bands. */}
       <div className="mt-5">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-          <h3 className="font-display text-lg font-bold text-[#EEF2F8]">This week&rsquo;s quests</h3>
-          <p className="text-[13px] font-semibold text-[#A7B0C0]">New quests every Monday</p>
-        </div>
-        <ul className="mt-2 space-y-2">
-          {quests.map(({ quest, count, done }) => {
-            const shown = Math.min(count, quest.target)
-            return (
-              <li
-                key={quest.id}
-                className={`flex items-center gap-3 rounded-2xl border px-3 py-2.5 ${done ? 'border-green-500/40 bg-green-500/10' : 'border-white/10 bg-[#0A1120]/60'}`}
-              >
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/5 text-xl" aria-hidden>
-                  {done ? '✅' : quest.icon}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <p className="text-[15px] font-semibold leading-snug text-[#EEF2F8]">{quest.title}</p>
-                    <span className="shrink-0 text-[12px] font-bold text-amber-300">+{quest.xp} XP</span>
-                  </div>
-                  <div className="mt-1 flex items-center gap-2">
-                    <div
-                      className="h-2 flex-1 overflow-hidden rounded-full bg-white/10"
-                      role="progressbar"
-                      aria-label={quest.title}
-                      aria-valuemin={0}
-                      aria-valuemax={quest.target}
-                      aria-valuenow={shown}
-                    >
-                      <div className={`h-full rounded-full ${done ? 'bg-green-500' : 'bg-cyan-400'}`} style={{ width: `${(shown / quest.target) * 100}%` }} />
-                    </div>
-                    <span className="text-[12px] font-bold text-[#A7B0C0]">
-                      {shown}/{quest.target}
-                    </span>
-                  </div>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+        <QuestPanelClient progress={p} now={now} />
       </div>
     </div>
   )

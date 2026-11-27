@@ -9,7 +9,8 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { UniverseGame } from '@/lib/kids/universe/worlds'
-import { reportActivity, type RewardResult } from '@/lib/kids/universe/rewards'
+import { reportBestRun, type RewardResult } from '@/lib/kids/universe/rewards'
+import { getProgress } from '@/lib/kids-progress'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { fireConfetti } from '@/components/kids/Confetti'
 import { TIER_NAMES } from '@/lib/kids/universe/tiers'
@@ -51,7 +52,7 @@ export function GameShell({ game, howToPlay, lesson, children }: Props) {
   const [tier, setTier] = useState(0)
   const [round, setRound] = useState(0)
   const [help, setHelp] = useState(false)
-  const [result, setResult] = useState<{ round: RoundResult; reward: RewardResult | null } | null>(null)
+  const [result, setResult] = useState<{ round: RoundResult; reward: RewardResult | null; best?: number } | null>(null)
   const helpBtn = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -71,13 +72,20 @@ export function GameShell({ game, howToPlay, lesson, children }: Props) {
     setRound((r) => r + 1)
   }, [])
 
+  // XP only for a first win or a better score on this game + tier (reportBestRun):
+  // replaying a round you already won, without beating your best, earns nothing,
+  // so XP and quests cannot be farmed. The reward sounds and the level-up
+  // ceremony come from RewardToastClient; the shell only says "round won/lost".
   const finish = useCallback(
     (r: RoundResult) => {
       let reward: RewardResult | null = null
+      let best: number | undefined
       if (r.stars > 0) {
-        reward = reportActivity({
+        const id = `${game.id}:t${tier}`
+        best = getProgress().personalBests[id]
+        reward = reportBestRun({
           kind: 'game',
-          id: `${game.id}:t${tier}`,
+          id,
           stars: r.stars,
           score: r.score,
           lowerIsBetter: r.lowerIsBetter,
@@ -85,12 +93,12 @@ export function GameShell({ game, howToPlay, lesson, children }: Props) {
           attempts: r.attempts,
           xp: 20 + tier * 15,
         })
-        playSound('levelup')
+        playSound('correct')
         if (r.stars === 3) fireConfetti()
       } else {
         playSound('wrong')
       }
-      setResult({ round: r, reward })
+      setResult({ round: r, reward, best: reward ? undefined : best })
     },
     [game.id, tier],
   )
@@ -156,6 +164,11 @@ export function GameShell({ game, howToPlay, lesson, children }: Props) {
                 <span className="font-black text-amber-300">What you learned: </span>
                 {lesson}
               </p>
+              {!result.reward && result.round.stars > 0 && result.best !== undefined && (
+                <p className="mt-3 text-sm font-semibold text-[#A7B0C0]">
+                  Your best on {TIER_NAMES[tier]} is {Number.isInteger(result.best) ? result.best : result.best.toFixed(1)}. Beat it to earn more XP!
+                </p>
+              )}
               {result.reward && (
                 <div className="mt-3 flex flex-wrap justify-center gap-2 text-sm font-bold">
                   <span className="rounded-full bg-amber-400/20 px-3 py-1 text-amber-200">+{result.reward.xpGained} XP</span>

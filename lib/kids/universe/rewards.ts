@@ -13,6 +13,9 @@
 //   - Every unlock is earned by doing something, never bought.
 
 import { getProgress, saveProgress, type KidsProgress } from '../../kids-progress'
+import type { BandId } from '../bands'
+import { DEBUG_ACTIVITY_IDS, drawQuests, questMatches, weekKey, type ActivityKind, type Quest } from './quests'
+import { UNLOCKS, type Unlock } from './unlocks'
 
 // ── Levels ─────────────────────────────────────────────────────────────────
 
@@ -110,96 +113,46 @@ export function getBadge(id: string): UniverseBadge | undefined {
   return UNIVERSE_BADGES.find((b) => b.id === id)
 }
 
-// ── Unlocks (cosmetics & parts) ──────────────────────────────────────────────
+// ── Unlocks (cosmetics, titles) — the data lives in ./unlocks.ts ─────────────
 
-export interface Unlock {
-  id: string
-  kind: 'paint' | 'decal' | 'trail' | 'skin' | 'avatar' | 'sound'
-  name: string
-  /** Earned at this player level… */
-  atLevel?: number
-  /** …or by this badge. */
-  byBadge?: string
-  /** For paints: the colour. */
-  value?: string
-}
+export { UNLOCKS, unlocksAtLevel, unlockUse, bestTitle, type Unlock } from './unlocks'
 
-export const UNLOCKS: Unlock[] = [
-  { id: 'paint-neon-lime', kind: 'paint', name: 'Neon Lime', atLevel: 2, value: '#A3E635' },
-  { id: 'paint-ocean', kind: 'paint', name: 'Deep Ocean', atLevel: 3, value: '#0EA5E9' },
-  { id: 'paint-galaxy', kind: 'paint', name: 'Galaxy Purple', atLevel: 5, value: '#7C3AED' },
-  { id: 'paint-lava', kind: 'paint', name: 'Lava Red', atLevel: 8, value: '#DC2626' },
-  { id: 'paint-gold', kind: 'paint', name: 'Champion Gold', atLevel: 15, value: '#EAB308' },
-  { id: 'paint-chrome', kind: 'paint', name: 'Chrome', atLevel: 25, value: '#CBD5E1' },
-  { id: 'decal-lightning', kind: 'decal', name: 'Lightning Bolt', byBadge: 'first-drive' },
-  { id: 'decal-eye', kind: 'decal', name: 'Sensor Eye', byBadge: 'wall-whisperer' },
-  { id: 'decal-wave', kind: 'decal', name: 'Line Wave', byBadge: 'line-rider' },
-  { id: 'decal-gear', kind: 'decal', name: 'Golden Gear', byBadge: 'gear-head' },
-  { id: 'trail-sparkle', kind: 'trail', name: 'Sparkle Trail', atLevel: 4 },
-  { id: 'trail-rainbow', kind: 'trail', name: 'Rainbow Trail', atLevel: 12 },
-  { id: 'trail-plasma', kind: 'trail', name: 'Plasma Trail', byBadge: 'pid-tuner' },
-  { id: 'skin-mars', kind: 'skin', name: 'Mars Dust Skin', byBadge: 'mars-planner' },
-  { id: 'skin-circuit', kind: 'skin', name: 'Circuit Board Skin', byBadge: 'circuit-closer' },
-  { id: 'avatar-robo-cat', kind: 'avatar', name: 'Robo-Cat helmet', atLevel: 6 },
-  { id: 'avatar-astronaut-gold', kind: 'avatar', name: 'Gold astronaut suit', atLevel: 20 },
-  { id: 'sound-retro', kind: 'sound', name: 'Retro beeps', atLevel: 10 },
-]
+// ── Quests (weekly, gentle, by band) — the pool lives in ./quests.ts ─────────
 
-// ── Quests (weekly, gentle) ──────────────────────────────────────────────────
+export { QUEST_POOL, weekKey, isCourseOnly, sourceOf, type ActivityKind, type Quest, type QuestSource } from './quests'
 
-export type ActivityKind =
-  | 'session' // a curriculum session finished
-  | 'challenge' // a physics challenge solved
-  | 'game' // a Universe game round finished
-  | 'episode' // an episode watched with its check
-  | 'build' // the robot design changed and saved
-  | 'project' // a "make it yours" project shared
-  | 'bugfix' // a failing program fixed by the child
-  | 'activity' // a Skill Galaxy activity completed
+/**
+ * Bands whose course level is playable today (Level 1 = Explorers). Keep in step
+ * with PLAYABLE_LEVELS in app/kids/page.tsx when Level 2 ships.
+ */
+export const COURSE_OPEN_BANDS: readonly BandId[] = ['explorers']
 
-export interface Quest {
-  id: string
-  title: string
-  icon: string
-  kind: ActivityKind
-  target: number
-  xp: number
-}
+/** lib/kids course state (components/kids/course/course-state.ts COURSE_KEY), read raw so lib never imports components. */
+const COURSE_STATE_KEY = 'r2bot_kids_course_v1'
 
-const QUEST_POOL: Quest[] = [
-  { id: 'q-activities-5', title: 'Complete 5 Skill Galaxy activities', icon: '✨', kind: 'activity', target: 5, xp: 60 },
-  { id: 'q-activities-10', title: 'Complete 10 Skill Galaxy activities', icon: '🌌', kind: 'activity', target: 10, xp: 120 },
-  { id: 'q-challenges-3', title: 'Solve 3 robot challenges', icon: '🏁', kind: 'challenge', target: 3, xp: 60 },
-  { id: 'q-games-2', title: 'Play 2 Universe games', icon: '🎮', kind: 'game', target: 2, xp: 40 },
-  { id: 'q-episode-1', title: 'Watch an episode to the end', icon: '🎬', kind: 'episode', target: 1, xp: 30 },
-  { id: 'q-build-1', title: 'Upgrade your robot', icon: '🛠️', kind: 'build', target: 1, xp: 30 },
-  { id: 'q-session-2', title: 'Finish 2 course sessions', icon: '📘', kind: 'session', target: 2, xp: 80 },
-  { id: 'q-bugfix-1', title: 'Fix a bug in your own program', icon: '🐞', kind: 'bugfix', target: 1, xp: 40 },
-  { id: 'q-project-1', title: 'Finish a Make-it-Yours project', icon: '🌟', kind: 'project', target: 1, xp: 100 },
-]
-
-/** ISO week key, e.g. "2026-W48". Deterministic, so every device agrees. */
-export function weekKey(d: Date = new Date()): string {
-  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
-  const day = t.getUTCDay() || 7
-  t.setUTCDate(t.getUTCDate() + 4 - day)
-  const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1))
-  const week = Math.ceil(((t.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
-  return `${t.getUTCFullYear()}-W${String(week).padStart(2, '0')}`
-}
-
-/** This week's three quests (rotates weekly, same for everyone). */
-export function currentQuests(d: Date = new Date()): Quest[] {
-  const wk = weekKey(d)
-  let h = 0
-  for (const c of wk) h = (h * 31 + c.charCodeAt(0)) >>> 0
-  const pool = [...QUEST_POOL]
-  const out: Quest[] = []
-  while (out.length < 3 && pool.length) {
-    h = (h * 1103515245 + 12345) >>> 0
-    out.push(pool.splice(h % pool.length, 1)[0])
+/**
+ * True when the child has a course session open to them: their band's level is
+ * playable, or they have started or finished a session. Course-only quests are
+ * hidden otherwise (a teen with no playable level must never see an impossible quest).
+ */
+export function hasOpenCourse(p: KidsProgress): boolean {
+  if (p.band === null || COURSE_OPEN_BANDS.includes(p.band)) return true
+  if (Object.keys(p.sessionsDone).length > 0) return true
+  if (typeof window === 'undefined') return false
+  try {
+    const raw = window.localStorage.getItem(COURSE_STATE_KEY)
+    if (!raw) return false
+    const o = JSON.parse(raw) as { sessions?: Record<string, { done?: boolean }> }
+    return Boolean(o.sessions && Object.values(o.sessions).some((st) => st && !st.done))
+  } catch {
+    return false
   }
-  return out
+}
+
+/** This week's quests for this child: three for their band and a bonus fourth one. */
+export function currentQuests(d: Date = new Date(), p?: KidsProgress): Quest[] {
+  const prog = p ?? getProgress()
+  return drawQuests(d, { band: prog.band, courseOpen: hasOpenCourse(prog) })
 }
 
 /** Quest progress is stored under "<weekKey>:<questId>" so a new week starts fresh without wiping anything. */
@@ -207,10 +160,18 @@ function questKey(q: Quest, d: Date = new Date()): string {
   return `${weekKey(d)}:${q.id}`
 }
 
-export function questStatus(p: KidsProgress = getProgress(), d: Date = new Date()): { quest: Quest; count: number; done: boolean }[] {
-  return currentQuests(d).map((quest) => {
+export interface QuestState {
+  quest: Quest
+  count: number
+  done: boolean
+  /** The fourth, stretch quest of the week. */
+  bonus: boolean
+}
+
+export function questStatus(p: KidsProgress = getProgress(), d: Date = new Date()): QuestState[] {
+  return currentQuests(d, p).map((quest) => {
     const count = p.questProgress[questKey(quest, d)] ?? 0
-    return { quest, count, done: count >= quest.target }
+    return { quest, count, done: count >= quest.target, bonus: Boolean(quest.bonus) }
   })
 }
 
@@ -240,9 +201,14 @@ export interface ActivityReport {
 }
 
 export interface RewardResult {
+  /** What was reported (kind + id), so a listener can tell rewards apart. */
+  kind: ActivityKind
+  id: string
   xpGained: number
   levelBefore: number
   levelAfter: number
+  /** XP before this report, so a level-up ceremony can fill the bar from where it was. */
+  xpBefore: number
   newBadges: UniverseBadge[]
   /** Curriculum or other badge ids recorded for the first time that are not in UNIVERSE_BADGES. */
   newOtherBadges: string[]
@@ -269,22 +235,69 @@ function today(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
+/** The child's local calendar day, YYYY-MM-DD (for once-a-day rewards). */
+function localDay(d: Date = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+/** Share of the base XP a replay earns when it beats the child's own best (a first finish earns it all). */
+export const IMPROVEMENT_XP_SHARE = 0.5
+
+/** True when `score` beats `prev` (no previous best always counts). */
+export function beatsBest(score: number, prev: number | undefined, lowerIsBetter = false): boolean {
+  return prev === undefined || (lowerIsBetter ? score < prev : score > prev)
+}
+
 /**
- * For the older surfaces that keep their own per-item stars (Story Theatre, Code
- * Lab missions, Spark Trail levels, boss challenges): report only the first
- * finish and runs that beat the child's own best `score`, so replaying the same
- * thing never farms XP. Returns null when nothing was reported.
+ * THE rule for anything that can be replayed (games, Story Theatre, Code Lab
+ * missions, Spark Trail levels, boss challenges, think/vision missions): report
+ * only the first finish and runs that beat the child's own best `score`, so
+ * replaying the same thing never farms XP. An improvement earns
+ * IMPROVEMENT_XP_SHARE of the base XP (plus the personal-best bonus).
+ * Returns null — nothing reported, 0 XP — for a replay that did not improve.
  */
 export function reportBestRun(r: ActivityReport & { score: number }): RewardResult | null {
+  if (!Number.isFinite(r.score)) return null
   const prev = getProgress().personalBests[r.id]
-  if (prev !== undefined && !(r.lowerIsBetter ? r.score < prev : r.score > prev)) return null
-  return reportActivity(r)
+  if (!beatsBest(r.score, prev, r.lowerIsBetter)) return null
+  if (prev === undefined) return reportActivity(r)
+  return reportActivity({ ...r, xp: Math.max(1, Math.round((r.xp ?? DEFAULT_XP[r.kind]) * IMPROVEMENT_XP_SHARE)) })
+}
+
+const BUILD_DAY_KEY = 'r2bot_kids_build_day'
+
+/**
+ * The child saved their robot (Workshop "Garage" saves): reports kind 'build'
+ * at most once per local day — the "Upgrade your robot" quests and the Maker
+ * Spirit badge. RewardToastClient calls this when `robotsBuilt` goes up, so
+ * every save path counts without each one importing the rewards engine.
+ */
+export function reportRobotSaved(now: Date = new Date()): RewardResult | null {
+  if (typeof window === 'undefined') return null
+  const day = localDay(now)
+  try {
+    if (window.localStorage.getItem(BUILD_DAY_KEY) === day) return null
+    window.localStorage.setItem(BUILD_DAY_KEY, day)
+  } catch {
+    return null // storage blocked: skip rather than risk repeating it
+  }
+  return reportActivity({ kind: 'build', id: 'robot-save' })
+}
+
+/**
+ * The child fixed a broken program (a debug-program activity, a "fix" mission).
+ * First fix of each `id` only. Skill Galaxy debug-program activities need no
+ * call: reportActivity counts them as a bugfix by id (DEBUG_ACTIVITY_IDS).
+ */
+export function reportBugFixed(id: string, stars?: number): RewardResult | null {
+  return reportBestRun({ kind: 'bugfix', id: `bugfix-${id}`, stars, score: 1 })
 }
 
 /**
  * Report something the child did. Returns everything they earned so the caller
  * can celebrate it, and fires REWARD_EVENT on window with the RewardResult as
  * `detail` so the global reward toast can show it without the caller's help.
+ * Anything that can be replayed must come through reportBestRun instead.
  */
 export function reportActivity(r: ActivityReport): RewardResult {
   const p = getProgress()
@@ -299,19 +312,20 @@ export function reportActivity(r: ActivityReport): RewardResult {
   const personalBests = { ...p.personalBests }
   if (typeof r.score === 'number' && Number.isFinite(r.score)) {
     const prev = personalBests[r.id]
-    const better = prev === undefined || (r.lowerIsBetter ? r.score < prev : r.score > prev)
-    if (better) {
+    if (beatsBest(r.score, prev, r.lowerIsBetter)) {
       personalBests[r.id] = r.score
       newPersonalBest = prev !== undefined
       if (newPersonalBest) xp += 10
     }
   }
 
+  const debugFix = r.kind === 'activity' && DEBUG_ACTIVITY_IDS.has(r.id)
+
   // Badges
   const badges = { ...p.badges }
   const earned = [...(r.badges ?? [])]
   if ((r.attempts ?? 0) >= 5) earned.push('never-give-up')
-  if (r.kind === 'bugfix') earned.push('debugger')
+  if (r.kind === 'bugfix' || debugFix) earned.push('debugger')
   if (r.kind === 'episode') earned.push('storyteller')
   if (r.kind === 'build') earned.push('designer')
   const newBadges: UniverseBadge[] = []
@@ -325,11 +339,12 @@ export function reportActivity(r: ActivityReport): RewardResult {
     xp += 25
   }
 
-  // Quests
+  // Quests: this child's quests this week (their band; course-only ones only with an open course).
   const questProgress = { ...p.questProgress }
   const questsCompleted: Quest[] = []
-  for (const q of currentQuests()) {
-    if (q.kind !== r.kind) continue
+  const event = { kind: r.kind, id: r.id, stars, improved: newPersonalBest }
+  for (const q of currentQuests(new Date(), p)) {
+    if (!questMatches(q, event)) continue
     const k = questKey(q)
     const prev = questProgress[k] ?? 0
     if (prev >= q.target) continue
@@ -369,9 +384,12 @@ export function reportActivity(r: ActivityReport): RewardResult {
   })
 
   const result: RewardResult = {
+    kind: r.kind,
+    id: r.id,
     xpGained: Math.max(0, xp),
     levelBefore: before,
     levelAfter: after,
+    xpBefore: p.xp,
     newBadges,
     newOtherBadges,
     newUnlocks,

@@ -36,7 +36,7 @@ export default function WorldPage() {
                 </span>
                 <div>
                   <h3 className="font-bold text-white">
-                    <Link href={`/kids/spark-trail/${z.id}`} className="hover:underline">
+                    <Link href={`/kids/spark-trail/${z.id}`} className="inline-flex min-h-[44px] items-center hover:underline">
                       {i + 1}. {z.name}
                     </Link>
                   </h3>

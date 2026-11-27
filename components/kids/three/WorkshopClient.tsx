@@ -25,6 +25,7 @@ import { CAPABILITY_LABEL, SLOT_LABEL, SLOT_ORDER } from '@/lib/kids/code-lab/la
 import { getProgress, saveProgress } from '@/lib/kids-progress'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { fireConfetti } from '@/components/kids/Confetti'
+import { useParentControls } from '@/lib/kids/parent-controls'
 import type { DriveInput, WorkshopSceneApi } from './WorkshopSceneClient'
 
 function SceneSkeleton() {
@@ -52,6 +53,8 @@ export default function WorkshopClient() {
   const [toast, setToast] = useState<Toast | null>(null)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [arOpen, setArOpen] = useState(false)
+  // A grown-up can switch the camera off in the parent hub; then the AR entry is hidden.
+  const cameraOn = useParentControls().camera
   const [vrSupported, setVrSupported] = useState(false)
   const [inVR, setInVR] = useState(false)
   const driveInput = useRef<DriveInput>({ up: false, down: false, left: false, right: false })
@@ -232,6 +235,7 @@ export default function WorkshopClient() {
             <button type="button" onClick={() => void downloadCard()} className="min-h-[48px] rounded-2xl bg-white/10 px-4 font-bold focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">
               🖼️ Robot card
             </button>
+            {cameraOn && (
             <button
               type="button"
               onClick={() => {
@@ -242,6 +246,7 @@ export default function WorkshopClient() {
             >
               📱 See it in your room
             </button>
+            )}
             {vrSupported && !inVR && (
               <button type="button" onClick={() => void enterVR()} className="min-h-[48px] rounded-2xl bg-cyan-400 px-4 font-black text-[#0A1120] focus:outline-none focus-visible:ring-4 focus-visible:ring-white">
                 🥽 Stand next to it (VR)

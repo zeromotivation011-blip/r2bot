@@ -51,6 +51,15 @@ export interface SparkReply {
   followUps: string[]
   /** One short line shown above the answer (e.g. "Answer from Spark's notebook"). */
   note?: string
+  /**
+   * The child told Spark something serious (being hurt, scared of someone,
+   * asked for photos, bullied, wanting to hurt themselves, very sad). The app
+   * shows the region-aware helpline card under the answer. Such a message is
+   * never sent to the AI.
+   */
+  crisis?: boolean
+  /** The language the safety answer is written in ('en' when absent). */
+  lang?: 'en' | 'hi' | 'es'
 }
 
 export const SPARK_MAX_QUESTION = 300

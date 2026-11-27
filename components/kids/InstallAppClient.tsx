@@ -6,6 +6,8 @@
 //   - Android / desktop Chrome & Edge: uses the captured beforeinstallprompt.
 //   - iPhone / iPad Safari: there is no prompt API, so show the two taps.
 //   - Already installed (standalone display): says so.
+// The service worker saves the main screens on install, so the installed app opens
+// with no network (see public/kids-sw.js); the help text says so.
 
 import { useEffect, useState } from 'react'
 
@@ -88,7 +90,7 @@ export function InstallAppClient({ compact = false }: { compact?: boolean }) {
     'inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl px-5 font-black transition hover:scale-[1.03] focus-visible:outline focus-visible:outline-4 focus-visible:outline-amber-300'
 
   if (mode === 'installed') {
-    return compact ? null : <p className="font-bold text-emerald-300">✓ Installed — open it from your home screen.</p>
+    return compact ? null : <p className="font-bold text-emerald-300">✓ Installed — open it from your home screen. It works offline too.</p>
   }
 
   if (mode === 'prompt' && evt) {
@@ -129,6 +131,7 @@ export function InstallAppClient({ compact = false }: { compact?: boolean }) {
               </li>
             </ol>
           )}
+          <p className="mt-2 text-white/70">Once installed, your robot, games and saved stories work without the internet.</p>
         </div>
       )}
     </div>

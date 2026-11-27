@@ -142,5 +142,43 @@ NEXT after the running workflows (final pass, worlds, AI): Wave 1 of the roadmap
 - [x] Settings `/kids/settings` + `lib/kids/settings.ts`: sound/volume, voice (synced with the header button), less motion (also in `stage.ts`), larger text (boot script before first paint), Lite 3D (DPR 1, no AA, no shadows; Hangar mirror too).
 - [x] Progress backup code (no personal data) in the Hangar and Settings; 51-check verify in CI.
 - [x] One currency, step 1: Story Theatre, Code Lab, Spark Trail levels and boss challenges now report through `reportBestRun` (first finish or better score only); parents page and Explorer card show `collectedStars()`.
-- [ ] Still open from Wave 1: parental gate, kids privacy section, `/kids/my-robot` merged into the Hangar (Spark Trail parts not yet shown there, so the route stays and links to the Hangar), quests/XP engine fixes, unlocks to 60, teacher stats, parent hub, offline precache, content hygiene, one block language.
+- [x] (superseded below) Wave 1 leftovers were picked up on 27 Nov.
 
+
+## 27 Nov 2026 — Wave 1, second integration (gate, parents, quests, Garage, safety, offline)
+Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-universe.md):
+- [x] #2 Parental gate: words-multiplication gate, `requireGrownUp()`, `<ParentalGate>`, `<GrownUpLink>` on every kids-footer grown-up link, Share to Classroom, AR entry and the Settings reset. Adult `SiteFooter` no longer renders under /kids.
+- [x] #14 Parent hub: public explainer + gated hub (week in plain words, controls, parent-only R2BOT Weekly via `captureLead()` source `kids-parents`). Controls: daily time + quiet hours (banner, never a lock), Ask Spark / camera / outbound-link switches, wired into the shell's Spark buttons and the Workshop AR button.
+- [x] #10 Quests and XP: 49 band-tagged quests, 3 + bonus per week, bugfix and build completable, course-only quests hidden without an open course, game XP via `reportBestRun` (improvement half, replay 0), drone Legend needs 520.
+- [x] #11 An unlock at every level to 60 (paints + titles).
+- [x] #22 Rewards you can hear and see: level-up ceremony, sounds per reward type, Spark speaks rewards for Explorers, quest picture cards (Explorer card uses `QuestPanelClient`).
+- [x] #7 One robot, one Garage: /kids/hangar is the Garage (rename, robot card PNG, Spark Trail parts fit to the real robot); `/kids/my-robot` 308s there.
+- [x] #78 Ask Spark safety: one classifier on device + server, kind crisis answers + regional helpline card without a gate, red-team suite 373/373 in CI.
+- [x] #18 Content hygiene: template samples out of the live Galaxy, benches 404 in production, `/kids/challenge/*` canonical + noindex.
+- [x] #17 Offline: kids-sw v3 precaches the new product (10 pages + their lazy chunks), audio cache kept across versions.
+- [x] #1 Kids privacy section on /privacy (`#kids`); GA4, the adult footer and the adult Academy progress banner are off on kids pages (the first-party path counter and the on-demand AuthModal remain).
+
+Still open from Wave 1:
+- [ ] #3 Navigation rename (Learn / Play / Garage / Me tabs; today Home · Course · Worlds · Games · Hangar; renaming the Hangar tab "Garage" is a nav-label change only).
+- [ ] #6 Rank naming (XP level → "Rank", rename "Star Cadet"), `/kids/activities` → `/kids/printables`.
+- [ ] #8 Episodes Theatre on the Piper voices; #9 band-aware "Your next mission" for 8–17.
+- [ ] #12 Robot Passport (server-side code restore; needs a migration). The offline backup code exists.
+- [ ] #13 Teachers see the whole Universe (classroom-stats, CSV, stuck signal).
+- [ ] #15 Immersive play mode leftovers (48px tier/"?" buttons, Exit confirm); #16 webglcontextlost + poster fallback everywhere.
+- [ ] #19 /kids OG image; #20 one `/kids/grown-ups` front door; #21 one block language (Code Lab → Blockly).
+- [ ] Follow-ups: Workshop should mark parts that came from the Spark Trail (`TRAIL_PART_FITS`); show `title-*` unlocks somewhere (`bestTitle()`); native review of Hindi/Spanish Spark replies; confirm offline on real Android/iOS devices; check the reward-toast pile-up on phones when a robot rename triggers a badge plus several unlocks at once.
+
+
+## 27 Nov 2026 — Final fix wave (child, policy, engineering checks)
+- [x] Spark switched off: the floating and header buttons stay as "Need help?" and open the help-only sheet (helpline card reachable). Parent hub toggle text says so.
+- [x] Store app: tel: links and `data-kids-safety` anchors (the 3 in `HelplineCardClient`) bypass `KidsAppLinkGuardClient`; outside links are still gated (verified in Playwright with the app UA + Asia/Kolkata).
+- [x] Level-up ceremony: no auto-close on touch/no-hover devices, with an equippable unlock, or for Explorers; any press on the card holds it. Desktop mouse still closes at 3.2 s.
+- [x] Quest picture cards hide the speaker when voice is off; bonus row titles are capitalised ("Complete 10 …").
+- [x] Tap targets ≥44px: /kids/play game links, Spark Trail zone links, Story Theatre breadcrumb, `.kids-nav-brand`.
+- [x] Vision Lab honours the parent camera switch (button hidden, stream stopped) and asks `requireGrownUp()` before the first `getUserMedia` of a visit; parent page + hub toggle name both camera places.
+- [x] Talk to your robot: `classifySpark`/`isCrisis` on the device (helpline card, AI button hidden) and in `/api/kids/talk` (422 `crisis`, never sent to the model).
+- [x] /privacy: counter described accurately (path, referrer, new/returning flag, country, device type, aggregate only), backup-code bullet, parent weekly email bullet; `lib/content-dates.ts` bumped. Backup .txt text now says it holds the nicknames.
+- [x] Removed the dead Google Fonts preconnect/dns-prefetch from `app/layout.tsx` (Supabase preconnect left: the root layout cannot tell /kids without going dynamic).
+- [x] Parental gate cool-down persists across Cancel/reopen (sessionStorage `r2bot_kids_gate_lock`).
+- [x] kids-sw: STATIC trim keeps a keep-list (`/kids/__sw-keep.json` in the pages cache) of each precached page's chunks + the dynamic chunks found at install; refreshed when a precached page's HTML is saved again.
+- [ ] Follow-up: dynamic (lazy) chunks of a precached page are only re-recorded on a worker reinstall, not on a page refresh after a deploy; Supabase preconnect still on /kids.

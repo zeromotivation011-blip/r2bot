@@ -526,7 +526,7 @@ function Result({ stars, partAwarded, zone, onBack }: {
       )}
 
       <div className="btns">
-        <Link href="/kids/my-robot" className="btn link">🤖 See my robot</Link>
+        <Link href="/kids/hangar" className="btn link">🤖 See my robot</Link>
         <button onClick={onBack} className="btn back">🗺️ Back to world map</button>
       </div>
 

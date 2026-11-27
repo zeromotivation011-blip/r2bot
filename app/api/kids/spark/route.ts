@@ -6,6 +6,10 @@
 //      self-identifying phrases removed). Nothing the child types is stored or
 //      logged — only hashed rate-limit counters exist.
 //   2. Safety: unsafe or personal topics get a kind, fixed reply. No model call.
+//      A disclosure, self-harm or wellbeing message gets the crisis reply
+//      (`crisis: true`, the app shows the helpline card) and is never sent
+//      to the model. The device runs the same classifier first and does not
+//      even send those (see SparkSheetClient).
 //   3. Notebook: a strong match in the local FAQ is answered from it. No model call.
 //   4. AI (only when KIDS_AI_ENABLED === 'true' and the key is set, and the
 //      per-IP daily cap is not reached): Claude Haiku, fixed system prompt,
@@ -121,17 +125,20 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   const band: BandId = isBand(body.band) ? body.band : 'builders'
   const mode: SparkMode = body.mode === 'hint' ? 'hint' : 'ask'
-  const { question, context, removedPersonal } = cleanRequest(body.question, body.context)
+  const request = cleanRequest(body.question, body.context)
+  const { question, context, removedPersonal } = request
+
+  // 2. Safety first — before the rate limit (a child telling us something
+  //    serious is never told to slow down) and never sent to the model. The
+  //    raw words were classified inside cleanRequest; nothing is logged.
+  const safe = safetyReply(request, band)
+  if (safe) return json(withPrivacyNote(safe, removedPersonal))
   if (!question && mode === 'ask') return json({ error: 'empty' }, 400)
 
   const ip = clientIp(req.headers)
   if (await isRateLimited({ scope: 'kids-spark:burst', subject: ip, windowSeconds: 60, max: BURST_PER_MINUTE })) {
     return json({ error: 'slow_down' }, 429)
   }
-
-  // 2. Safety first — never sent to the model.
-  const safe = safetyReply(question, context, band)
-  if (safe) return json(withPrivacyNote(safe, removedPersonal))
 
   const docs = retrieve(`${question} ${context.topic ?? ''}`, band, 4)
   const links: SparkLink[] = docs
@@ -155,7 +162,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   // 5. Fallback, shared by every path below.
   const fallback = (note?: string): Response => {
-    const off = offlineReply(question, context, band, mode)
+    const off = offlineReply(request, band, mode)
     const merged: SparkReply = {
       ...off,
       answer:

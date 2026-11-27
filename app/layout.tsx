@@ -85,9 +85,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Marks JS as available before first paint so scroll-reveal can hide
             content without ever hiding it from no-JS readers or crawlers. */}
         <script dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js")' }} />
-        {/* Perf: resolve font and Supabase DNS early. */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        {/* Perf: resolve Supabase DNS early. (No Google Fonts preconnect: next/font
+            self-hosts the fonts, and it opened a connection to Google from kids pages.) */}
         <link rel="preconnect" href="https://bxgtocghjypbomszwvfr.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="//bxgtocghjypbomszwvfr.supabase.co" />
         <link
@@ -106,13 +105,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SkipToContent />
         <AuthProvider>
           <ToastProvider>
-            <HideOnEmbed><ProgressBanner /></HideOnEmbed>
+            <HideOnEmbed kids><ProgressBanner /></HideOnEmbed>
             {children}
             {/* One footer for the whole site. Section layouts can add a header
                 (see components/SiteChrome.tsx), but pages that render their own
                 <Nav /> could never be given a footer that way, so for most of
                 the site the page simply stopped at the last paragraph. */}
-            <HideOnEmbed><SiteFooter /></HideOnEmbed>
+            <HideOnEmbed kids><SiteFooter /></HideOnEmbed>
             <AuthModal />
           </ToastProvider>
         </AuthProvider>

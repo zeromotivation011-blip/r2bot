@@ -1,8 +1,11 @@
-// app/kids/hangar/page.tsx — the Robot Hangar (server component).
+// app/kids/hangar/page.tsx — the Robot Hangar, the child's one Garage (server component).
 //
 // The child's robot in a 3D hangar bay, customised with looks they have
-// earned (paints, decals, trails, skins), plus their badge wall, personal
-// bests, course progress per planet and certificates. The interactive parts are
+// earned (paints, decals, trails, skins), its robot card (name + shareable
+// picture, formerly /kids/my-robot, which now 308s here), the Spark Trail
+// parts they earned (each fits a real Workshop slot), plus their badge wall,
+// personal bests, course progress per planet and certificates. The Workshop
+// stays the 3D builder and AR view. The interactive parts are
 // two client islands (components/kids/hangar/); the 3D bay is next/dynamic
 // behind a same-size poster. Everything a search engine or a parent needs to
 // understand the page is rendered here on the server.
@@ -11,6 +14,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { jsonldScript } from '@/lib/seo/jsonld'
 import { BackupCodeClient } from '@/components/kids/hangar/BackupCodeClient'
+import { GarageClient, type TrailPartInfo } from '@/components/kids/hangar/GarageClient'
 import { HangarClient } from '@/components/kids/hangar/HangarClient'
 import { HangarRecordsClient, type CourseBadgeInfo } from '@/components/kids/hangar/HangarRecordsClient'
 // Read-only, server-side: the real names of the course badges. Only the small
@@ -19,14 +23,16 @@ import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
 import { CertificateButtonClient } from '@/components/kids/teach/CertificateButtonClient'
 import { byWorld } from '@/lib/kids/activities/content'
 import { WORLDS } from '@/lib/kids/universe/worlds'
+// Server-side only: the Spark Trail parts and zone names (the big zone data stays off the client).
+import { KIDS_ZONES, ROBOT_PARTS } from '@/lib/kids-world-data'
 
 export const runtime = 'nodejs'
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in'
 
-const TITLE = 'Robot Hangar for Kids: Your Robot, Badges and Rewards'
+const TITLE = 'Robot Hangar for Kids: Your Robot Garage, Parts and Badges'
 const DESCRIPTION =
-  'The R2BOT Kids hangar: see your own robot in 3D, paint it and add decals, trails and skins you earned by learning, and check your badge wall, personal bests, course progress and world progress. Ages 5–17.'
+  'The R2BOT Kids hangar is your robot’s garage: see your robot in 3D, name it, share its robot card, fit the parts you earned on the Spark Trail, add looks earned by learning, and check your badges and best scores. Ages 5–17.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -53,6 +59,14 @@ const jsonLd = {
   inLanguage: 'en',
 }
 
+const trailParts: TrailPartInfo[] = ROBOT_PARTS.map((p) => ({
+  id: p.id,
+  name: p.name,
+  emoji: p.emoji,
+  description: p.description,
+  zoneName: KIDS_ZONES.find((z) => z.id === p.zone)?.name ?? 'a Spark Trail zone',
+}))
+
 const courseBadges: Record<string, CourseBadgeInfo> = Object.fromEntries(
   LEVEL1_SESSIONS.map((s) => [s.badge.id, { name: s.badge.name, icon: s.badge.icon, earnedFor: s.badge.earnedFor }]),
 )
@@ -65,15 +79,22 @@ export default function HangarPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(jsonLd) }} />
       <header className="mx-auto max-w-6xl px-4 pb-4 pt-6">
-        <p className="font-display text-sm font-bold uppercase tracking-wider text-amber-300">Robot Hangar · My robot</p>
-        <h1 className="mt-1 font-display text-3xl font-bold text-white sm:text-4xl">Your robot’s home base</h1>
+        <p className="font-display text-sm font-bold uppercase tracking-wider text-amber-300">Robot Hangar · My robot’s garage</p>
+        <h1 className="mt-1 font-display text-3xl font-bold text-white sm:text-4xl">Your robot’s garage</h1>
         <p className="mt-2 max-w-3xl text-[#A7B0C0]">
-          Your one robot lives here. Spin it around, try on the looks you have earned, and see your XP, stars, badges and best scores in one
-          place. Build new parts in the Workshop, then come back.
+          Your one robot lives here. Spin it around, name it, share its robot card, fit the parts you found on the Spark Trail and try on
+          the looks you have earned. Your XP, stars, badges and best scores are here too.
         </p>
+        <Link
+          href="/kids/workshop"
+          className="mt-4 inline-flex min-h-[48px] items-center gap-2 rounded-2xl border border-amber-400/40 bg-amber-500/10 px-4 font-display text-base font-bold text-amber-200 transition hover:border-amber-400 hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+        >
+          Build or change parts in the Workshop →
+        </Link>
       </header>
 
       <HangarClient />
+      <GarageClient trailParts={trailParts} />
       <HangarRecordsClient courseBadges={courseBadges} worldActivityIds={worldActivityIds} />
 
       <section aria-label="Level 1 certificate" className="mx-auto max-w-6xl px-4 pt-6">
@@ -101,6 +122,24 @@ export default function HangarPage() {
           : one body, one set of parts, one name. Here they can turn it around under the lights, take it for a short test drive and change how
           it looks. To change what it can <em>do</em> — wheels or legs, a gripper or a headlight, a line sensor or a bumper — they go back to the
           Workshop, because parts are an engineering choice, not a costume.
+        </p>
+        <h3 className="mt-6 font-display text-xl font-bold text-white">One robot, with a name and a robot card</h3>
+        <p className="mt-2">
+          There is only one robot, and this is its garage. Its name is the name the Code Lab, the Classroom and the course certificates
+          use, so changing it here changes it everywhere. Robot names use letters and numbers only, and we ask for a made-up robot name rather
+          than the child&rsquo;s own. &ldquo;Share robot card&rdquo; draws a picture of the robot, its parts and its level on the device; it
+          never includes the child&rsquo;s name, and nothing is uploaded.
+        </p>
+        <h3 className="mt-6 font-display text-xl font-bold text-white">Parts found on the Spark Trail</h3>
+        <p className="mt-2">
+          Finishing a zone on the{' '}
+          <Link href="/kids/spark-trail" className="-my-3 inline-block py-3 font-semibold text-amber-300 underline-offset-4 hover:underline">
+            Spark Trail
+          </Link>{' '}
+          earns a robot part. Each one fits a real slot on the robot: Spark&rsquo;s Head fits as a Camera Eye, the Mighty Arm as a Gripper
+          Claw, the Sensor Backpack as a Colour Sensor, Speedy Wheels as two motor wheels and the Control Center Body as a Box Body. Fitting
+          one gives the robot that part&rsquo;s abilities in the Code Lab, just like choosing it in the Workshop. The Rocket Booster is just
+          for show: real ground robots do not fly on rockets, so it only appears in the hangar bay.
         </p>
         <h3 className="mt-6 font-display text-xl font-bold text-white">Looks are earned by learning</h3>
         <p className="mt-2">

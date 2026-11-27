@@ -10,7 +10,7 @@ native shell only needs a new store release when something in this folder change
 | Name | R2BOT Kids |
 | Loads | `https://www.r2bot.in/kids?source=app` (the PWA uses `?source=pwa`) |
 | Allowed in-app hosts | `www.r2bot.in` only. Every other link opens in the system browser |
-| Offline page | `www/index.html`, bundled. Navy and orange, with a retry button and a parental gate |
+| Offline | The site's service worker (`public/kids-sw.js`) keeps the main screens working with no network after one online launch (see "What works offline"). `www/index.html` is the bundled fallback for a first launch with no network: navy and orange, a retry button and a parental gate |
 | Permissions | Internet, and the Camera (Workshop AR only, asked at runtime). Nothing else |
 | SDKs | None besides Capacitor core and splash-screen. No ads, no analytics, no Firebase, no push |
 | User-Agent | The normal WebView UA plus `R2BOTKidsApp/1.0`, so the site can tell when it runs in the app |
@@ -25,6 +25,34 @@ native shell only needs a new store release when something in this folder change
 
 This folder has its own `package.json`. It is **not** part of the web app's
 dependencies, and Vercel never builds it.
+
+## What works offline
+
+The app and the PWA share one service worker, `public/kids-sw.js` on the website (scope `/kids`).
+It installs on the first online launch and works in both WebViews: Android WebView supports service
+workers for remote pages, and iOS WKWebView does because the app uses App-Bound Domains
+(`WKAppBoundDomains = www.r2bot.in`).
+
+| Works offline | How |
+|---|---|
+| Home, Hangar, Settings, Skill Galaxy, Course map, Worlds, Games hub, and the Sumo Arena, Drone Hover and Maze Mapper games | Saved when the worker installs (the page plus the JS/CSS its HTML references) |
+| Any other `/kids` page the child has already opened | Saved on each online visit, network first; the newest 40 are kept |
+| Story episodes the child has already played | Voice clips are saved the first time an episode plays (up to about 2,000 clips, roughly 40–60 MB) and survive website updates |
+| Progress, stars, badges, the robot design, settings | Always on the device (`localStorage`), so nothing is lost offline |
+| Slow school Wi-Fi | If a saved page exists and the network takes longer than 4 s, the saved page is shown and refreshed in the background |
+
+| Needs the internet | Why |
+|---|---|
+| A page never opened before | Shows a branded offline page (built into the worker) with links to the saved screens and a retry button |
+| Joining a class, teacher pages, syncing progress to a class | Server calls (`/api/*` is never cached; `/kids/classroom` and `/kids/join` are never saved) |
+| Ask Spark with AI on, Talk to your robot with AI on | Server calls. The offline FAQ answers still work |
+| Episodes never played, 3D parts loaded on demand for screens never opened | Not downloaded yet |
+| First launch with no network at all | The worker is not installed yet, so Capacitor shows `www/index.html` |
+
+Updating the worker is a website deploy, not a store release. Bump `VERSION` in `public/kids-sw.js`
+when its caching rules change; old page and code caches are deleted on activate (audio is kept).
+To test: open the app online once, switch on airplane mode, relaunch, and check Home and the Hangar
+load, then open a page you have never visited and check the offline page appears.
 
 ## Layout
 
@@ -183,7 +211,7 @@ no CocoaPods. **Building, signing and uploading need a Mac with Xcode 16 or late
    `CAPBridgeViewController` subclass that sets `webView.allowsBackForwardNavigationGestures = true`.
 8. Guideline 4.2 (minimum functionality): Apple rejects "just a website". The arguments for this
    app are camera AR, an offline screen, no browser chrome, a kid-safe locked domain, and the parental gate.
-   Put those in the review notes, with a demo class code for the reviewer.
+   Put those in the review notes, with a demo class code for the reviewer, and mention that the main screens and saved episodes work offline (see "What works offline").
 
 ## What the website must do (r2bot.in, not this folder)
 
@@ -217,6 +245,7 @@ Inside the app, `/kids` pages must:
   (`com.android.tools.build:gradle`). JDK 21 and Gradle 8.14 were present, but without the SDK and
   AGP Gradle cannot configure the project. Run `npm run android:debug` on any machine with Android
   Studio installed.
-- Before the first release, verify on a real device: the camera prompt in Workshop AR, the offline page (airplane
+- Before the first release, verify on a real device: the camera prompt in Workshop AR, offline use after one online launch (airplane
+  mode: Home, Hangar and an already-played episode must load), the bundled offline page (first launch in airplane
   mode, then retry; and Back from the offline page must step back past the failed page or leave the app, never loop), Back walking through history, that `https://r2bot.in/…` (apex, used by the
   gate) redirects to www, and the adaptive icon on a Pixel launcher.

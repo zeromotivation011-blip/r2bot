@@ -18,6 +18,7 @@ import {
   DT,
   DRONE,
   G,
+  LEGEND_MIN_WIN,
   type FlightReport,
   type Gains,
   type Sample,
@@ -130,7 +131,7 @@ const BRIEF: Record<TierIndex, { title: string; steps: string[] }> = {
   3: {
     title: 'Legend — cascaded control, waypoint course',
     steps: [
-      'Six waypoints. Hold each one for 1.2 s inside its ring. Win: finish with a flight score of 450+.',
+      `Six waypoints. Hold each one for 1.2 s inside its ring. Win: finish with a flight score of ${LEGEND_MIN_WIN}+ (finishing is not enough).`,
       'Carry a 0.4 kg parcel and drop it at waypoint 4. Gusts up to 7 m/s sideways.',
       'The battery sags as it empties — less thrust for the same command (sped up: a real pack takes 10–15 minutes). No flight predictor: you are the engineer.',
     ],

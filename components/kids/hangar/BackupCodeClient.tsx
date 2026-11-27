@@ -46,20 +46,20 @@ function today(): string {
 
 function looksExtra(): string {
   const c = loadCosmetics()
-  return JSON.stringify({ d: c.decal, t: c.trail, s: c.skin, w: c.workshopColour })
+  return JSON.stringify({ d: c.decal, t: c.trail, s: c.skin, w: c.workshopColour, b: c.booster || undefined })
 }
 
 function restoreLooks(raw: string | undefined): boolean {
   if (!raw) return false
   const cur = loadCosmetics()
-  if (cur.decal || cur.trail || cur.skin || cur.workshopColour) return false
+  if (cur.decal || cur.trail || cur.skin || cur.workshopColour || cur.booster) return false
   try {
     const o: unknown = JSON.parse(raw)
     if (!o || typeof o !== 'object') return false
     const r = o as Record<string, unknown>
     const s = (x: unknown) => (typeof x === 'string' && x.length < 64 ? x : null)
-    const next: HangarCosmetics = { ...EMPTY_COSMETICS, decal: s(r.d), trail: s(r.t), skin: s(r.s), workshopColour: s(r.w) }
-    if (!next.decal && !next.trail && !next.skin && !next.workshopColour) return false
+    const next: HangarCosmetics = { ...EMPTY_COSMETICS, decal: s(r.d), trail: s(r.t), skin: s(r.s), workshopColour: s(r.w), booster: r.b === true }
+    if (!next.decal && !next.trail && !next.skin && !next.workshopColour && !next.booster) return false
     // loadCosmetics() and ownedOnly() re-validate on every read, so a stale id is harmless.
     saveCosmetics(next)
     return true
@@ -158,7 +158,8 @@ export function BackupCodeClient({ headingLevel = 2 }: { headingLevel?: 2 | 3 })
       'To restore: open www.r2bot.in/kids/hangar on any device,',
       'choose "Restore from a code" and paste the whole code below (or pick this file).',
       'Restoring never lowers progress that is already there.',
-      'This code holds robot progress only: no name, email or other personal details.',
+      'It holds the explorer and robot nicknames and robot progress only:',
+      'never an email or other personal details. Keep it private.',
       '',
       code,
       '',

@@ -17,6 +17,8 @@ import { animateRobot, buildRobot } from '@/lib/kids/robot3d'
 import type { RobotDesign } from '@/lib/kids/robot-design'
 import { playSound } from '@/lib/kids-audio'
 import { createStage, prefersReducedMotion, type Stage } from './stage'
+import { requireGrownUp } from '@/components/kids/app/ParentalGateClient'
+import { useParentControls } from '@/lib/kids/parent-controls'
 
 type Phase = 'intro' | 'xr' | 'camera' | 'denied' | 'nocamera' | 'error'
 
@@ -31,6 +33,7 @@ export default function ARViewClient({ design, onClose }: Props) {
   const [scale, setScale] = useState(1)
   const [toast, setToast] = useState<string | null>(null)
   const [hitTest, setHitTest] = useState(false)
+  const cameraOn = useParentControls().camera
   const videoRef = useRef<HTMLVideoElement>(null)
   const hostRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -397,7 +400,18 @@ export default function ARViewClient({ design, onClose }: Props) {
           </button>
         </div>
 
-        {phase === 'intro' && (
+        {phase === 'intro' && !cameraOn && (
+          <div className="pointer-events-auto m-auto w-[min(92vw,30rem)] rounded-3xl border border-white/10 bg-[#111C32] p-6 text-center shadow-2xl">
+            <p className="text-5xl" aria-hidden>📷</p>
+            <h2 className="mt-2 text-xl font-black">The camera is switched off</h2>
+            <p className="mt-2 text-base text-slate-200">A grown-up turned off the camera on this device. Your robot is still waiting for you in the Workshop!</p>
+            <button type="button" onClick={close} className="mt-4 min-h-[48px] rounded-2xl bg-amber-500 px-6 font-black text-[#1A1103] focus:outline-none focus-visible:ring-4 focus-visible:ring-white">
+              Back to the Workshop
+            </button>
+          </div>
+        )}
+
+        {phase === 'intro' && cameraOn && (
           <div className="pointer-events-auto m-auto w-[min(92vw,30rem)] rounded-3xl border border-white/10 bg-[#111C32] p-6 shadow-2xl">
             <h2 className="text-2xl font-black">See your robot in your room</h2>
             {arSupported && (
@@ -405,7 +419,7 @@ export default function ARViewClient({ design, onClose }: Props) {
                 <p className="text-base text-slate-200">Your device can do real AR. Your robot will appear about one big step in front of you{'—'}tap the floor to move it.</p>
                 <button
                   type="button"
-                  onClick={() => void startXR()}
+                  onClick={() => void requireGrownUp({ message: 'This turns on the camera for AR. Nothing is recorded or sent.' }).then((ok) => { if (ok) void startXR() })}
                   className="mt-3 min-h-[48px] w-full rounded-2xl bg-amber-500 px-5 font-black text-black focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
                 >
                   🕶️ Start AR
@@ -420,7 +434,7 @@ export default function ARViewClient({ design, onClose }: Props) {
               </p>
               <button
                 type="button"
-                onClick={() => void startCamera()}
+                onClick={() => void requireGrownUp({ message: 'This turns on the camera. The video stays on this device.' }).then((ok) => { if (ok) void startCamera() })}
                 className="mt-3 min-h-[48px] w-full rounded-2xl bg-emerald-400 px-5 font-black text-black focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
               >
                 📷 Turn on camera

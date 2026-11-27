@@ -18,6 +18,9 @@
 // address, "my name is …", "I live at …") makes the route refuse BEFORE any
 // model call (lib/kids/ai/talk/privacy.ts) — nothing is redacted and sent.
 //
+// Disclosures: the Ask Spark classifier (lib/kids/ai/spark/safety.ts) runs
+// first; a crisis is refused with reason 'crisis' and never reaches the model.
+//
 // Safety: the system prompt is fixed here — the client sends only the
 // not-understood pieces (≤ 4 pieces, ≤ 400 characters in all). The answer must
 // be a block program that passes the strict schema (lib/kids/ai/talk/schema.ts);
@@ -29,6 +32,7 @@ import type { NextRequest } from 'next/server'
 import { anyRateLimited, clientIp, isRateLimited } from '@/lib/rate-limit'
 import { validateProgram } from '@/lib/kids/ai/talk/schema'
 import { looksPrivate } from '@/lib/kids/ai/talk/privacy'
+import { classifySpark, isCrisis } from '@/lib/kids/ai/spark/safety'
 import { LIMITS } from '@/lib/kids/ai/talk/parser'
 
 export const runtime = 'nodejs'
@@ -115,6 +119,12 @@ export async function POST(req: NextRequest): Promise<Response> {
   const text = pieces.join(', then ')
   if (text.length < 2) return reply(400, { ok: false, reason: 'bad-request', message: 'Say what your robot should do first.' })
   if (text.length > MAX_CHARS) return reply(400, { ok: false, reason: 'too-long', message: 'That is a lot of words! Try saying it in smaller steps.' })
+
+  // A disclosure ("someone hits me", "I want to hurt myself") is NEVER sent to
+  // the model, same contract as Ask Spark: the client shows the helpline card.
+  if (isCrisis(classifySpark(text))) {
+    return reply(422, { ok: false, reason: 'crisis', message: 'That sounds important. Please tell a grown-up you trust. You can also call a helpline.' })
+  }
 
   // Refuse — do not redact and send — when anything looks personal.
   const priv = looksPrivate(text)

@@ -199,6 +199,8 @@ const nextConfig = {
       // exist. Its games are unique, so they were kept and renamed rather than dropped.
       { source: '/kids/world', destination: '/kids/spark-trail', permanent: true },
       { source: '/kids/world/:path*', destination: '/kids/spark-trail/:path*', permanent: true },
+      // 27 Nov 2026: /kids/my-robot merged into the Hangar (the robot's one Garage).
+      { source: '/kids/my-robot', destination: '/kids/hangar', permanent: true },
       ...atlasRobotCanonical,
       // 19 Nov 2026: the Short _lZ0noG8Tg4 repeats the robot-lawn-mower lesson. Its YouTube
       // description links here, so the slug it was written for points at the one lesson

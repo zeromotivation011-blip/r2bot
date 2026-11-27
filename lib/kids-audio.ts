@@ -16,6 +16,11 @@ export type SoundType =
   | 'levelup'
   | 'zonecomplete'
   | 'unlock'
+  // Reward sounds (roadmap #22): one distinct sound per reward type.
+  | 'badge' // a new badge: a bright two-chord chime
+  | 'quest' // a weekly quest done: a rising "ta-da" with a bell on top
+  | 'stamp' // the rank stamps in at a level-up: a low thump + click
+  | 'best' // a new personal best: a quick upward run
 
 let ctx: AudioContext | null = null
 let masterGain: GainNode | null = null
@@ -157,6 +162,35 @@ export function playSound(type: SoundType) {
 
     case 'unlock':
       sweep({ from: 220, to: 880, durationMs: 400, type: 'sawtooth' })
+      break
+
+    case 'badge':
+      // two bright chords, like a medal being pinned on
+      tone({ freq: NOTES.E2, durationMs: 160, type: 'triangle', startAt: 0,    peakGain: 0.45 })
+      tone({ freq: NOTES.G2, durationMs: 160, type: 'triangle', startAt: 0,    peakGain: 0.35 })
+      tone({ freq: NOTES.G2, durationMs: 260, type: 'triangle', startAt: 0.16, peakGain: 0.5 })
+      tone({ freq: NOTES.C3, durationMs: 260, type: 'triangle', startAt: 0.16, peakGain: 0.4 })
+      break
+
+    case 'quest':
+      // "ta-da": G → C' with a high bell
+      tone({ freq: NOTES.G,  durationMs: 120, type: 'sine', startAt: 0,    peakGain: 0.5 })
+      tone({ freq: NOTES.C2, durationMs: 320, type: 'sine', startAt: 0.12, peakGain: 0.55 })
+      tone({ freq: NOTES.C3 * 2, durationMs: 380, type: 'sine', startAt: 0.14, peakGain: 0.18 })
+      break
+
+    case 'stamp':
+      // low thump + click: the rank badge landing
+      sweep({ from: 180, to: 60, durationMs: 160, type: 'sine' })
+      tone({ freq: 2200, durationMs: 40, type: 'square', startAt: 0.02, peakGain: 0.12 })
+      break
+
+    case 'best':
+      // quick upward run C-D-E-G
+      tone({ freq: NOTES.C2, durationMs: 70, type: 'sine', startAt: 0,    peakGain: 0.4 })
+      tone({ freq: NOTES.D * 2, durationMs: 70, type: 'sine', startAt: 0.06, peakGain: 0.45 })
+      tone({ freq: NOTES.E2, durationMs: 70, type: 'sine', startAt: 0.12, peakGain: 0.5 })
+      tone({ freq: NOTES.G2, durationMs: 160, type: 'sine', startAt: 0.18, peakGain: 0.55 })
       break
   }
 }

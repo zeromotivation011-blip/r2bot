@@ -1,14 +1,10 @@
-import MyRobotWrapper from './MyRobotWrapper'
+// app/kids/my-robot — retired 27 Nov 2026 (roadmap #7, "one robot, one Garage").
+// The robot card, name and Spark Trail parts now live in the Hangar. The
+// permanent redirect belongs in next.config.mjs; this page is the fallback so
+// an old link still lands in the right place (308) until that is in.
 
-export const runtime = 'nodejs'
+import { permanentRedirect } from 'next/navigation'
 
-export const metadata = {
-  title: 'My Robot — Robot World',
-  description: 'Customize your very own robot built from parts you earn.',
-  // Client-rendered Robot World screens: /kids/spark-trail is the indexed entry.
-  robots: { index: false, follow: true },
-}
-
-export default function MyRobotPage() {
-  return <MyRobotWrapper />
+export default function MyRobotPage(): never {
+  permanentRedirect('/kids/hangar')
 }

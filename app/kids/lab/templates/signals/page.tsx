@@ -2,18 +2,20 @@
 // electronics and control activity templates (sensor-choice, signal-graph,
 // circuit-snap, ohms-law, threshold-tuner, control-tuner). Each template is
 // shown with its three sample activities so builders and content authors can
-// play them. Not indexed, not in the sitemap, not linked from any nav.
+// play them. Not indexed, not in the sitemap, not linked from any nav; 404 in production (../bench.ts).
 
 import type { Metadata } from 'next'
+import { requireTemplateBench } from '../bench'
 import SignalsLabClient from './SignalsLabClient'
 
 export const metadata: Metadata = {
   title: 'Sensors, circuits and control activity templates (test bench)',
   description: 'Test bench for the R2BOT Kids sensor, electronics and control activity templates.',
-  robots: { index: false, follow: false },
+  robots: { index: false, follow: false, nocache: true },
 }
 
 export default function SignalsTemplatesPage() {
+  requireTemplateBench()
   return (
     <main className="mx-auto max-w-4xl px-3 pb-16 pt-4 sm:px-6 sm:pt-8">
       <p className="font-display text-sm font-bold uppercase tracking-wider text-amber-300">Activity templates · test bench</p>

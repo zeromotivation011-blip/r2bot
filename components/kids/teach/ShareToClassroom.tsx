@@ -2,11 +2,13 @@
 //
 // "Share to Google Classroom" — the official share link
 // (https://classroom.google.com/share?url=…), so no API key, no script and no
-// tracking: it is a plain link that opens Classroom in a new tab, where the
+// tracking: a link (behind the parental gate) that opens Classroom in a new tab, where the
 // teacher picks the class and posts it as an assignment or material.
 // Works in server and client components (no hooks, no 'use client').
 //
 //   <ShareToClassroom path="/kids/galaxy/motion/motion-spin-turn" title="Spin turn" />
+
+import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app')
   ? process.env.NEXT_PUBLIC_SITE_URL
@@ -48,16 +50,16 @@ export function ShareToClassroom({ path, title, variant = 'button', className = 
     ? 'inline-flex min-h-[44px] items-center gap-1.5 rounded-xl border border-white/15 px-3 text-sm font-semibold text-slate-100 hover:border-emerald-400/50 hover:bg-emerald-500/10'
     : 'inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-4 font-bold text-white hover:border-emerald-400/60 hover:bg-emerald-500/10'
   return (
-    <a
+    <GrownUpLink
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+      newTab
+      message="This opens Google Classroom in a new tab."
       className={`${base} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 print:hidden ${className}`}
       aria-label={`Share${title ? ` “${title}”` : ''} to Google Classroom (opens in a new tab)`}
     >
       <ClassroomIcon size={variant === 'chip' ? 18 : 20} />
       <span>{variant === 'chip' ? 'Classroom' : 'Share to Google Classroom'}</span>
-    </a>
+    </GrownUpLink>
   )
 }
 

@@ -39,6 +39,7 @@ export const LEAD_SOURCES = [
   'academy-waitlist',
   'schools-interest',
   'kids-schools', // /kids/schools "Request a school pilot"
+  'kids-parents', // /kids/parents hub: a parent's own email for R2BOT Weekly (no child data)
   'footer',
 ] as const
 

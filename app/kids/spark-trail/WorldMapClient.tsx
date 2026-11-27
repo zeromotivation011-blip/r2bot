@@ -204,7 +204,7 @@ export default function WorldMapClient() {
             </div>
           )
         })}
-        <Link href="/kids/my-robot" className="wm-myrobot">
+        <Link href="/kids/hangar" className="wm-myrobot">
           🤖 {robotName}
         </Link>
       </div>

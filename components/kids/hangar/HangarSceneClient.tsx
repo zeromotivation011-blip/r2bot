@@ -21,6 +21,8 @@ export interface HangarLook {
   decal: string | null
   skin: string | null
   trail: string | null
+  /** The Spark Trail Rocket Booster add-on (two boosters on the robot's back). */
+  booster: boolean
 }
 
 interface Props {
@@ -191,6 +193,36 @@ function applySkin(robot: THREE.Object3D, primary: string, skinId: string | null
     m.roughness = look.roughness
     m.metalness = look.metalness
     m.needsUpdate = true
+  }
+}
+
+/** The Spark Trail Rocket Booster: two little boosters on the back of the body (forward is +z). */
+function addBooster(robot: THREE.Group): void {
+  robot.updateMatrixWorld(true)
+  const handles = getRobotHandles(robot)
+  const body = handles?.slots.body ?? robot
+  const parent: THREE.Object3D = handles?.bodyGroup ?? robot
+  const box = new THREE.Box3().setFromObject(body)
+  const h = Math.max(0.16, (box.max.y - box.min.y) * 0.6)
+  const shell = new THREE.MeshStandardMaterial({ color: '#EF4444', roughness: 0.35, metalness: 0.3 })
+  const nozzle = new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.4, metalness: 0.7 })
+  const flame = new THREE.MeshStandardMaterial({ color: '#FFA878', emissive: '#FC6818', emissiveIntensity: 1.4, roughness: 0.4 })
+  const yMid = box.min.y + (box.max.y - box.min.y) * 0.55
+  for (const side of [1, -1]) {
+    const g = new THREE.Group()
+    const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, h, 16), shell)
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.08, 16), shell)
+    cap.position.y = h / 2 + 0.04
+    const bell = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.055, 0.05, 16), nozzle)
+    bell.position.y = -h / 2 - 0.025
+    const fire = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.09, 12), flame)
+    fire.rotation.x = Math.PI
+    fire.position.y = -h / 2 - 0.095
+    for (const m of [tube, cap, bell]) m.castShadow = true
+    g.add(tube, cap, bell, fire)
+    const world = new THREE.Vector3(box.getCenter(new THREE.Vector3()).x + side * Math.min(0.12, (box.max.x - box.min.x) * 0.28), yMid, box.min.z - 0.04)
+    g.position.copy(parent.worldToLocal(world))
+    parent.add(g)
   }
 }
 
@@ -553,6 +585,7 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
     const robot = buildRobot(design)
     applySkin(robot, design.primary, look.skin)
     addDecal(robot, look.decal)
+    if (look.booster) addBooster(robot)
     if (old) {
       robot.position.copy(old.position)
       robot.rotation.copy(old.rotation)
@@ -564,7 +597,7 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
     ;(driveRef.current ? stage.scene : turntable).add(robot)
     robotRef.current = robot
     wakeRef.current()
-  }, [design, look.skin, look.decal])
+  }, [design, look.skin, look.decal, look.booster])
 
   useEffect(() => {
     trailKindRef.current = look.trail

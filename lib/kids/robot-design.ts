@@ -352,3 +352,39 @@ export function decodeDesign(s: string): RobotDesign | null {
   }
   return d
 }
+
+// ── Spark Trail parts → Workshop parts (additive, 27 Nov 2026) ──────────────
+// Finishing a Spark Trail zone earns a part (`earnedParts` in lib/kids-progress.ts,
+// ids from ROBOT_PARTS in lib/kids-world-data.ts). There is only one robot, so
+// each earned part FITS a real slot on the RobotDesign: "Fit it" in the Garage
+// (/kids/hangar) puts that Workshop part on the robot, and every surface that
+// draws or drives the robot (Workshop, Code Lab, AR, Classroom) follows.
+// `slot: null` = a Garage add-on with no engineering effect (the Rocket Booster
+// is drawn in the Hangar bay only; real ground robots do not fly on rockets).
+export interface TrailPartFit {
+  slot: Slot | null
+  /** The RobotDesign part id it fits, when `slot` is set. */
+  part: string | null
+}
+
+export const TRAIL_PART_FITS: Record<string, TrailPartFit> = {
+  'robot-head': { slot: 'head', part: 'camera' },
+  'robot-body': { slot: 'body', part: 'box' },
+  'robot-arm': { slot: 'tool', part: 'gripper' },
+  'robot-legs': { slot: 'drive', part: 'wheels2' },
+  'robot-sensor-pack': { slot: 'sensor', part: 'color' },
+  'robot-rocket-pack': { slot: null, part: null },
+}
+
+/** True when the design already wears the Workshop part this trail part fits. */
+export function isTrailPartFitted(d: RobotDesign, trailPartId: string): boolean {
+  const fit = TRAIL_PART_FITS[trailPartId]
+  return Boolean(fit && fit.slot && fit.part && d[fit.slot] === fit.part)
+}
+
+/** The design with the trail part's Workshop part fitted (unchanged for add-ons or unknown ids). */
+export function fitTrailPart(d: RobotDesign, trailPartId: string): RobotDesign {
+  const fit = TRAIL_PART_FITS[trailPartId]
+  if (!fit || !fit.slot || !fit.part || !getPart(fit.slot, fit.part)) return d
+  return { ...d, [fit.slot]: fit.part }
+}

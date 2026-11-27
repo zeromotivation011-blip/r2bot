@@ -5,6 +5,7 @@
 
 import { useEffect, useId, useState } from 'react'
 import { playSound, primeAudio, sparkSays } from '@/lib/kids-audio'
+import { requireGrownUp } from '@/components/kids/app/ParentalGateClient'
 import { resetKidsSettings, suggestLite3D, updateKidsSettings, useKidsSettings, type KidsSettings } from '@/lib/kids/settings'
 
 interface SwitchRowProps {
@@ -189,7 +190,8 @@ export default function SettingsClient() {
         </p>
         <button
           type="button"
-          onClick={() => {
+          onClick={async () => {
+            if (!(await requireGrownUp({ message: 'This resets the settings.' }))) return
             resetKidsSettings()
             setSaved('Settings reset to the defaults')
           }}

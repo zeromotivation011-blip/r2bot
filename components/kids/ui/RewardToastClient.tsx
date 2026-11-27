@@ -5,19 +5,36 @@
 // lib/kids/universe/rewards.ts and celebrates level-ups, new badges, unlocks
 // and finished quests — so no screen has to build its own celebration.
 //
-// Rewards you can hear: ONE sound per reward event (levelup > unlock > star),
-// only when sound effects are on (playSound checks the kids Settings), and the
-// same news is read out to screen readers through a polite live region.
+// Rewards you can hear and see (roadmap #22):
+//   - A level-up opens the level-up ceremony (LevelUpCeremonyClient, loaded on
+//     demand): the XP bar fills, the rank stamps in, the new unlock drops in.
+//     It shows the level and its unlocks; badges and quests stay as toasts.
+//   - Otherwise ONE sound per reward event, distinct per reward type
+//     (unlock > badge > quest > personal best), only when sound effects are on
+//     (playSound checks the kids Settings).
+//   - Explorers (5–7, pre-readers): Spark says every badge and quest aloud when
+//     voice is on (sparkSays checks the Settings); the ceremony says level-ups.
+//   - The same news is read out to screen readers through a polite live region.
 //
-// It also keeps the kids Settings classes on <html> (larger text, reduce motion,
-// lite 3D) in step while the shell is mounted, and removes them on the way out
-// of /kids — see lib/kids/settings.ts.
+// It also:
+//   - reports a robot save (Workshop, Garage, Hangar paint…) as kind 'build', at
+//     most once a day (reportRobotSaved), on ROBOT_CHANGED_EVENT or when
+//     `robotsBuilt` goes up — so every save path counts for the "Upgrade your
+//     robot" quests without importing the rewards engine;
+//   - keeps the kids Settings classes on <html> (larger text, reduce motion,
+//     lite 3D) in step while the shell is mounted, and removes them on the way
+//     out of /kids — see lib/kids/settings.ts.
 
-import { useEffect, useRef, useState } from 'react'
-import { REWARD_EVENT, type RewardResult } from '@/lib/kids/universe/rewards'
-import { playSound, type SoundType } from '@/lib/kids-audio'
+import dynamic from 'next/dynamic'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { REWARD_EVENT, reportRobotSaved, type RewardResult } from '@/lib/kids/universe/rewards'
+import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
+import { ROBOT_CHANGED_EVENT } from '@/lib/kids/robot-design'
+import { playSound, sparkSays, type SoundType } from '@/lib/kids-audio'
 import { applyKidsSettingsToDocument, readKidsSettings, subscribeKidsSettings, useKidsReducedMotion } from '@/lib/kids/settings'
 import '@/components/kids/settings/kids-settings.css'
+
+const LevelUpCeremony = dynamic(() => import('./LevelUpCeremonyClient'), { ssr: false })
 
 interface Toast {
   id: number
@@ -32,8 +49,15 @@ let seq = 0
 export function rewardSound(r: RewardResult): SoundType | null {
   if (r.levelAfter > r.levelBefore) return 'levelup'
   if (r.newUnlocks.length) return 'unlock'
-  if (r.newBadges.length || r.questsCompleted.length) return 'star'
+  if (r.newBadges.length) return 'badge'
+  if (r.questsCompleted.length) return 'quest'
   return null
+}
+
+/** Two level-ups close together become one ceremony from the first level to the last. */
+function mergeCeremony(a: RewardResult | null, b: RewardResult): RewardResult {
+  if (!a) return b
+  return { ...b, levelBefore: a.levelBefore, xpBefore: a.xpBefore, xpGained: a.xpGained + b.xpGained, newUnlocks: [...a.newUnlocks, ...b.newUnlocks] }
 }
 
 const TOAST_MS = 5200
@@ -41,6 +65,7 @@ const TOAST_MS = 5200
 export function RewardToast() {
   const [toasts, setToasts] = useState<Toast[]>([])
   const [announcement, setAnnouncement] = useState('')
+  const [ceremony, setCeremony] = useState<RewardResult | null>(null)
   const reduced = useKidsReducedMotion()
   // Guards against one event being handled twice (e.g. a duplicate listener in dev).
   const seen = useRef<WeakSet<Event>>(new WeakSet())
@@ -57,24 +82,68 @@ export function RewardToast() {
     }
   }, [])
 
+  // A robot save (the design changed, or robotsBuilt went up) → 'build', once a day.
+  useEffect(() => {
+    let built = getProgress().robotsBuilt
+    let pending = 0
+    const saved = () => {
+      window.clearTimeout(pending)
+      // After the saving code has finished its own work.
+      pending = window.setTimeout(() => reportRobotSaved(), 0)
+    }
+    const onProgress = () => {
+      const now = getProgress().robotsBuilt
+      if (now > built) saved()
+      built = now
+    }
+    window.addEventListener(KIDS_PROGRESS_EVENT, onProgress)
+    window.addEventListener(ROBOT_CHANGED_EVENT, saved)
+    return () => {
+      window.removeEventListener(KIDS_PROGRESS_EVENT, onProgress)
+      window.removeEventListener(ROBOT_CHANGED_EVENT, saved)
+      window.clearTimeout(pending)
+    }
+  }, [])
+
   useEffect(() => {
     const onReward = (e: Event) => {
       if (seen.current.has(e)) return
       seen.current.add(e)
       const r = (e as CustomEvent<RewardResult>).detail
       if (!r) return
+      const levelUp = r.levelAfter > r.levelBefore
       const next: Toast[] = []
-      if (r.levelAfter > r.levelBefore) next.push({ id: ++seq, icon: '🚀', title: `Level ${r.levelAfter}!`, body: 'You levelled up. New things may be unlocked in your hangar.' })
+      // A level-up and its unlocks are shown by the ceremony; badges and quests stay toasts.
+      if (!levelUp) for (const u of r.newUnlocks) next.push({ id: ++seq, icon: '🎁', title: `Unlocked: ${u.name}`, body: 'Find it in your robot hangar.' })
       for (const b of r.newBadges) next.push({ id: ++seq, icon: b.icon, title: `Badge: ${b.name}`, body: `You earned this because ${b.earnedFor}` })
-      for (const u of r.newUnlocks) next.push({ id: ++seq, icon: '🎁', title: `Unlocked: ${u.name}`, body: 'Find it in your robot hangar.' })
-      for (const q of r.questsCompleted) next.push({ id: ++seq, icon: q.icon, title: 'Quest complete!', body: `${q.title} · +${q.xp} XP` })
-      if (!next.length) return
+      for (const q of r.questsCompleted) next.push({ id: ++seq, icon: q.icon, title: q.bonus ? 'Bonus quest complete!' : 'Quest complete!', body: `${q.title} · +${q.xp} XP` })
+      if (!next.length && !levelUp) return
 
-      const sound = rewardSound(r)
-      if (sound) playSound(sound)
+      // Sound: the ceremony plays its own; otherwise one sound for the biggest news.
+      if (levelUp) setCeremony((c) => mergeCeremony(c, r))
+      else {
+        const sound = rewardSound(r)
+        if (sound) playSound(sound)
+      }
+
+      const said: string[] = []
+      if (levelUp) said.push(`Level ${r.levelAfter}!${r.newUnlocks.length ? ` Unlocked: ${r.newUnlocks.map((u) => u.name).join(', ')}.` : ''}`)
+      said.push(...next.map((t) => `${t.title} ${t.body}`))
       // A trailing no-break space alternates so the same news twice is still announced.
-      setAnnouncement(next.map((t) => `${t.title} ${t.body}`).join(' ') + (seq % 2 ? '\u00A0' : ''))
+      setAnnouncement(said.join(' ') + (seq % 2 ? ' ' : ''))
 
+      // Explorers can't read yet: Spark says badges and quests (the ceremony says level-ups).
+      if (r.progress.band === 'explorers' && !levelUp && next.length) {
+        const words = [
+          ...r.newBadges.map((b) => `You earned the ${b.name} badge, because ${b.earnedFor}`),
+          ...r.questsCompleted.map((q) => `Quest complete! ${q.say}`),
+          ...(r.newUnlocks.length ? [`You unlocked ${r.newUnlocks.map((u) => u.name).join(' and ')}!`] : []),
+        ]
+        // A beat later, so a screen's own "Well done!" is not cut off mid-word.
+        if (words.length) timers.current.push(window.setTimeout(() => sparkSays(words.join(' ')), 1200))
+      }
+
+      if (!next.length) return
       setToasts((t) => [...t, ...next].slice(-4))
       for (const t of next) {
         timers.current.push(window.setTimeout(() => setToasts((all) => all.filter((x) => x.id !== t.id)), TOAST_MS))
@@ -90,6 +159,7 @@ export function RewardToast() {
   }, [])
 
   const dismiss = (id: number) => setToasts((all) => all.filter((x) => x.id !== id))
+  const closeCeremony = useCallback(() => setCeremony(null), [])
 
   return (
     <>
@@ -113,6 +183,7 @@ export function RewardToast() {
         ))}
         <style>{`@keyframes kidsToastIn { from { opacity: 0; transform: translateY(-8px) scale(.97) } to { opacity: 1; transform: none } }`}</style>
       </div>
+      {ceremony && <LevelUpCeremony key={`${ceremony.levelBefore}-${ceremony.levelAfter}`} result={ceremony} onClose={closeCeremony} />}
     </>
   )
 }

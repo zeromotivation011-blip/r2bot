@@ -7,7 +7,8 @@
 // capture phase — before Next's <Link> handler — and any link that would leave
 // /kids (the adult site, another host, mailto:, a store page) opens the
 // parental gate instead. After a correct answer the browser navigates for real;
-// the native shell sends other hosts to the system browser.
+// the native shell sends other hosts to the system browser. Exceptions: tel:
+// links and anchors carrying data-kids-safety (helplines) are never gated.
 
 import { useCallback, useEffect, useState } from 'react'
 import { detectKidsApp, isInsideKids, KIDS_APP_CLASS } from '@/lib/kids/app-context'
@@ -25,8 +26,11 @@ export function KidsAppLinkGuard() {
       const el = e.target instanceof Element ? e.target.closest('a[href]') : null
       if (!(el instanceof HTMLAnchorElement)) return
       if (el.hasAttribute('download')) return
+      // Safety help is NEVER behind the parental gate: helpline phone numbers
+      // and the helpline directory (HelplineCardClient marks its anchors).
+      if (el.hasAttribute('data-kids-safety')) return
       const raw = el.getAttribute('href') ?? ''
-      if (raw.startsWith('#') || /^(blob|data|javascript):/i.test(raw)) return
+      if (raw.startsWith('#') || /^(blob|data|javascript|tel):/i.test(raw)) return
       if (isInsideKids(el.href, window.location.origin)) return
       e.preventDefault()
       e.stopPropagation()

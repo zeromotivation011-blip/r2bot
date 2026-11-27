@@ -1,18 +1,20 @@
 // app/kids/lab/templates/thinking/page.tsx — internal test bench for the eight
 // AI, design and world activity templates (classify-sort, train-mini,
 // path-planner, robot-designer, ethics-dilemma, robot-match, estimate,
-// spot-in-scene). Not indexed, not in the sitemap, not linked from any nav.
+// spot-in-scene). Not indexed, not in the sitemap, not linked from any nav; 404 in production (../bench.ts).
 
 import type { Metadata } from 'next'
+import { requireTemplateBench } from '../bench'
 import ThinkingLabClient from './ThinkingLabClient'
 
 export const metadata: Metadata = {
   title: 'Activity templates: AI, design & world (test bench)',
   description: 'Internal test bench for the R2BOT Kids AI, design and robots-in-society activity templates.',
-  robots: { index: false, follow: false },
+  robots: { index: false, follow: false, nocache: true },
 }
 
 export default function ThinkingTemplatesLabPage() {
+  requireTemplateBench()
   return (
     <main className="mx-auto max-w-7xl px-3 pb-16 pt-4 sm:px-4 sm:pt-6">
       <p className="font-display text-sm font-bold uppercase tracking-wider text-amber-300">Template test bench · AI, design &amp; world</p>

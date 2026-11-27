@@ -25,6 +25,8 @@ import type { CameraMode } from '@/components/kids/sim/renderer'
 import type { StageRunRequest } from '@/components/kids/sim/ChallengeStageClient'
 import { EXAMPLE_PHRASES, LIMITS, parsePlan, withBlocksAtUnknown, type ParseResult, type Question, type Step } from '@/lib/kids/ai/talk/parser'
 import { looksPrivate } from '@/lib/kids/ai/talk/privacy'
+import { classifySpark, isCrisis } from '@/lib/kids/ai/spark/safety'
+import HelplineCardClient from '@/components/kids/ai/spark/HelplineCardClient'
 import { canonicalise, FREE_PLAY, missionDesign, missionsFor, type TalkMission } from '@/lib/kids/ai/talk/missions'
 import { validateProgram } from '@/lib/kids/ai/talk/schema'
 import { stmtText } from '@/lib/kids/ai/talk/describe'
@@ -132,6 +134,11 @@ export default function TalkClient() {
   const [online, setOnline] = useState(true)
   const [aiState, setAiState] = useState<'idle' | 'asking' | 'off' | 'error'>('idle')
   const [aiMessage, setAiMessage] = useState<string | null>(null)
+  // A disclosure typed into the robot box ("someone hits me") gets the same
+  // helpline card as Ask Spark and is never sent to the AI helper.
+  const [serverCrisis, setServerCrisis] = useState(false)
+  useEffect(() => setServerCrisis(false), [text])
+  const crisis = useMemo(() => serverCrisis || (parsed !== null && isCrisis(classifySpark(text))), [serverCrisis, parsed, text])
   /** null = not asked yet / offline; the button only shows once the server says the helper is on. */
   const [aiAvailable, setAiAvailable] = useState<boolean | null>(null)
   const [micMessage, setMicMessage] = useState<string | null>(null)
@@ -401,6 +408,10 @@ export default function TalkClient() {
     // Only the pieces the robot did not understand are sent — never the whole plan.
     const pieces = parsed.unknown.slice(0, 4)
     const joined = pieces.join(', then ')
+    if (isCrisis(classifySpark(text)) || isCrisis(classifySpark(joined))) {
+      setServerCrisis(true)
+      return
+    }
     // Checked on the whole text box too: if anything private is anywhere in it, nothing is sent at all.
     const priv = looksPrivate(text) ?? looksPrivate(joined)
     if (priv) {
@@ -417,6 +428,11 @@ export default function TalkClient() {
     try {
       const res = await fetch('/api/kids/talk', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pieces }) })
       const j = (await res.json()) as { ok?: boolean; program?: unknown; message?: string; reason?: string }
+      if (j.reason === 'crisis') {
+        setAiState('idle')
+        setServerCrisis(true)
+        return
+      }
       if (j.reason === 'disabled') {
         setAiAvailable(false)
         setAiState('off')
@@ -809,6 +825,14 @@ export default function TalkClient() {
               </p>
             </form>
 
+            {crisis && (
+              <section className="rounded-[20px] border border-amber-400/40 bg-[#111C32] p-4" aria-label="Help from a grown-up" role="status">
+                <p className="font-display text-lg font-bold text-white">That sounds important.</p>
+                <p className="mt-1 text-[15px] text-slate-200">Please tell a grown-up you trust, like a parent or a teacher. You can also call a helpline. It is free and kind.</p>
+                <HelplineCardClient />
+              </section>
+            )}
+
             {parsed ? (
               <section className="rounded-[20px] border border-white/[0.08] bg-[#111C32] p-3" aria-label="How I understood you">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -835,7 +859,7 @@ export default function TalkClient() {
                     <p className="text-[15px] text-slate-200">
                       My on-device brain only knows robot words. Say it in smaller steps{aiAvailable && online && aiState !== 'off' ? ' — or ask the AI helper to have a go.' : '.'}
                     </p>
-                    {aiAvailable && online && aiState !== 'off' && (
+                    {aiAvailable && online && aiState !== 'off' && !crisis && (
                       <button
                         type="button"
                         onClick={askAi}
