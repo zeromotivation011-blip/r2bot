@@ -8,6 +8,8 @@
 // from above), like a compass. (The turn_degrees BLOCK is the other way round:
 // positive = LEFT, the curriculum's ROS/maths convention — see interpreter.ts.)
 
+import type { ArenaBattery, Charger } from './battery'
+
 export type Vec2 = [number, number]
 
 /**
@@ -144,6 +146,8 @@ export type Goal =
   | { kind: 'stop-in-zone'; zone: Shape2D; noCrash: true }
   /** Finish inside the zone having stayed near the line for most of the run. */
   | { kind: 'follow-line'; zone: Shape2D; minOnLine: number }
+  /** Visit a spot (`visit`), then come back and stop in the zone (a charger): roadmap #39 return-to-charger. */
+  | { kind: 'visit-and-return'; visit: Shape2D; zone: Shape2D; noCrash?: boolean }
 
 export interface Arena {
   id: string
@@ -169,6 +173,10 @@ export interface Arena {
   grid?: ArenaGrid
   /** Hard stop for any program (forever loops end here). */
   timeLimit: number
+  /** Power (roadmap #39): with a battery the robot can sag, slow and run flat. Without one it is only metered. */
+  battery?: ArenaBattery
+  /** Charging pads: stopped on one, the battery fills. */
+  chargers?: Charger[]
 }
 
 // ── Geometry helpers shared by the engine, the renderer and the checks ────

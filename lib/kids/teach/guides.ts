@@ -12,7 +12,7 @@
 
 import { LEVEL1_SESSIONS } from '../curriculum/level1'
 import { levelByNumber } from '../curriculum/levels'
-import type { ConceptId, Session } from '../curriculum/types'
+import type { ConceptId, LevelNumber, Session } from '../curriculum/types'
 import { ALL_ACTIVITIES } from '../activities/content'
 import { orderActivities } from '../activities/progress'
 import { TRACKS, type TrackId } from '../activities/types'
@@ -75,7 +75,8 @@ export interface GuideExtension {
 }
 
 export interface TeacherGuide {
-  level: 1
+  /** Level 1 here; Level 2 guides come from ./guides-level2, Levels 3–4 from curriculum/level3/teacher-guide (route through ./all-guides). */
+  level: LevelNumber
   number: number
   id: string
   title: string

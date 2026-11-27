@@ -27,7 +27,7 @@
 
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { REWARD_EVENT, reportRobotSaved, type RewardResult } from '@/lib/kids/universe/rewards'
+import { REWARD_EVENT, reportActivity, reportRobotSaved, type RewardResult } from '@/lib/kids/universe/rewards'
 import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
 import { ROBOT_CHANGED_EVENT } from '@/lib/kids/robot-design'
 import { playSound, sparkSays, type SoundType } from '@/lib/kids-audio'
@@ -101,6 +101,28 @@ export function RewardToast() {
     return () => {
       window.removeEventListener(KIDS_PROGRESS_EVENT, onProgress)
       window.removeEventListener(ROBOT_CHANGED_EVENT, saved)
+      window.clearTimeout(pending)
+    }
+  }, [])
+
+  // Robodex card found or a maker's story heard → claim any careers badge now due
+  // (kind 'discovery': 0 XP, no quest counts it). The claim code is loaded on the
+  // first event, so the shell's first load does not carry the card catalogue.
+  useEffect(() => {
+    let pending = 0
+    const claim = () => {
+      window.clearTimeout(pending)
+      pending = window.setTimeout(() => {
+        void import('@/lib/kids/makers/claim').then(({ claimCareerBadges }) => {
+          claimCareerBadges((id) => reportActivity({ kind: 'discovery', id: `careers-${id}`, xp: 0, badges: [id] }))
+        })
+      }, 0)
+    }
+    window.addEventListener('r2bot:kids-robodex', claim) // = ROBODEX_EVENT (lib/kids/robodex/store.ts)
+    window.addEventListener('r2bot:kids-makers-heard', claim) // = MAKERS_HEARD_EVENT (lib/kids/makers/heard.ts)
+    return () => {
+      window.removeEventListener('r2bot:kids-robodex', claim)
+      window.removeEventListener('r2bot:kids-makers-heard', claim)
       window.clearTimeout(pending)
     }
   }, [])

@@ -26,6 +26,9 @@ export const KIDS_MORE: KidsNavItem[] = [
   { href: '/kids/code-lab', emoji: '🧩', label: 'Code Lab', line: 'Snap blocks together to drive your own robot.' },
   { href: '/kids/spark-trail', emoji: '🗺️', label: 'Spark Trail', line: 'Six zones of quick games with Spark, from robot parts to first code.' },
   { href: '/kids/lab/sim', emoji: '🧪', label: 'Physics Lab', line: 'A real-physics robot sandbox (beta).' },
+  { href: '/kids/lab/power', emoji: '🔋', label: 'Power Lab', line: 'Build a battery pack and get home before it runs flat.' },
+  { href: '/kids/robodex', emoji: '📇', label: 'Robodex', line: 'Collect real robots from every world by playing.' },
+  { href: '/kids/careers', emoji: '🌟', label: 'Robotics careers', line: 'Meet the makers who build robots, and the skills they use.' },
   { href: '/kids/activities', emoji: '✂️', label: 'Make at Home', line: 'Printable paper robots and unplugged games.' },
 ]
 

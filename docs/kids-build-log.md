@@ -202,3 +202,35 @@ Still open from batch A:
 - [ ] Episode `fx.ts` and the canvas worlds' own effects follow calm only through the episode `calm` flag and `fireConfetti`; a world that draws its own particles should check `kidsCalm()`.
 - [ ] Owners of swapped stores (activities, course, hangar, classroom membership, think, vision, codelab, worlds): moving to `profileKey()` must remove the key from `SWAPPED_KEYS` in the same commit.
 - [ ] activities/verify warning: "variables" has a single template for Explorers (the course plan has nothing on variables at that age).
+
+## 27 Nov 2026 — Wave 2, batch B (courses 2–4, Robodex, makers, robot depth, recorder, battery)
+Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-universe.md):
+- [x] #23 Courses for Levels 2–4: all 72 remaining sessions written (Level 2 "The Island Post" with its own
+  `L2Session` runner; Levels 3 "Ridgeback Station" and 4 "Red Valley" in the shared `Session` type with
+  `SessionReuse` play cards). All four level pages playable, indexable and in the sitemap; certificates for
+  every level; teacher guides for every session (`lib/kids/teach/all-guides.ts`), `/kids/teach` retitled for
+  ages 5–17; `COURSE_OPEN_BANDS` = all four bands. Verifies: `curriculum/verify.ts`, `curriculum/level3/verify.ts`.
+- [x] #32 Robodex (`/kids/robodex`), toast mounted in `KidsShell`, collection in the backup code.
+- [x] #34 Meet the Makers + Career Constellation (`/kids/careers`, maker pages), `careers` badge track claimed
+  through `reportActivity({ kind: 'discovery' })`.
+- [x] #35 Graduate to R2BOT (`/kids/next-step`, noindex, gated for under-13s).
+- [x] #33 Robot that grows (`upgrades`), spec sheet. #36 X-ray and explode. #37 Robot's-eye view (sim pages now
+  pass sensors for every robot).
+- [x] #38 Flight Recorder (lab, Power Lab, course challenges) + ghost of your own best. #39 Battery model and
+  Power Lab (`/kids/lab/power`), `battery_pct` sensor (Talk schema too). Nav: Power Lab, Robodex, Robotics careers in More.
+
+Still open from batch B:
+- [ ] #38 games' own sims (sumo, drone, …) are not recorded: needs a hook in `GameShellClient`.
+- [ ] #33 upgrades change the spec sheet and visuals, not sim physics (`robot-spec.ts` mass); #39 runtime should
+  match `specSheet()`. AR (`ARViewClient`) does not show the World form yet.
+- [ ] #23 Level 3–4 sim gaps noted in the teacher notes: no reflectance block (L3 S4), no battery block in those
+  sessions' arenas yet, no dead zone, no carry positions — each session's playable challenge stands in.
+- [ ] #23 `?tier=` in `GameShellClient` and `?demo=` in `SimLabClient`, so a session can open the exact tier/arena
+  (today the child picks it). Physics Lab arena challenges are self-reported ("I finished it"): the lab has no store.
+- [ ] #23 "coming in <month>" waitlists are moot (all levels shipped); the course waitlist copy was removed with PLAYABLE.
+- [ ] #30 reads the `misconception` ids on wrong options (both session types) — capture + Class Mind Map not built.
+- [x] Garage: Robodex shelf mounted; the Garage names course badges of all four levels.
+- [ ] `/kids/next-step` not yet linked from the Engineers home or `/kids/parents`; the class view still names only
+  Level 1 course badges; the Garage certificate button shows Level 1 only (could follow the child's band).
+- [ ] Shared-tablet "Done" could wipe the ghost store's `::_none` key.
+- [ ] curriculum/verify warns: two Physics Lab arenas are each used by two Level 2 sessions (different tasks).

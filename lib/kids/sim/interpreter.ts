@@ -76,6 +76,8 @@ export function evaluate(e: Expr, ctx: InterpreterCtx): Value {
           return s.headingDeg
         case 'timer_s':
           return s.timerS
+        case 'battery_pct':
+          return Math.round(ctx.sim.battery().soc * 100)
       }
       return 0
     }

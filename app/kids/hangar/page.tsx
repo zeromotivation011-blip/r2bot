@@ -21,7 +21,11 @@ import { HangarRecordsClient, type CourseBadgeInfo } from '@/components/kids/han
 // Read-only, server-side: the real names of the course badges. Only the small
 // map below reaches the client, never the (large) curriculum itself.
 import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
+import { LEVEL2_SESSIONS } from '@/lib/kids/curriculum/level2'
+import { LEVEL3_SESSIONS } from '@/lib/kids/curriculum/level3'
+import { LEVEL4_SESSIONS } from '@/lib/kids/curriculum/level4'
 import { CertificateButtonClient } from '@/components/kids/teach/CertificateButtonClient'
+import RobodexShelfClient from '@/components/kids/robodex/RobodexShelfClient'
 import { byWorld } from '@/lib/kids/activities/content'
 import { WORLDS } from '@/lib/kids/universe/worlds'
 // Server-side only: the Spark Trail parts and zone names (the big zone data stays off the client).
@@ -69,7 +73,7 @@ const trailParts: TrailPartInfo[] = ROBOT_PARTS.map((p) => ({
 }))
 
 const courseBadges: Record<string, CourseBadgeInfo> = Object.fromEntries(
-  LEVEL1_SESSIONS.map((s) => [s.badge.id, { name: s.badge.name, icon: s.badge.icon, earnedFor: s.badge.earnedFor }]),
+  [...LEVEL1_SESSIONS, ...LEVEL2_SESSIONS, ...LEVEL3_SESSIONS, ...LEVEL4_SESSIONS].map((s) => [s.badge.id, { name: s.badge.name, icon: s.badge.icon, earnedFor: s.badge.earnedFor }]),
 )
 
 /** Each world's activity ids (server-side), so the Hangar can show world progress without loading activity params. */
@@ -100,6 +104,9 @@ export default function HangarPage() {
         <ConceptConstellationClient compact />
       </div>
       <HangarRecordsClient courseBadges={courseBadges} worldActivityIds={worldActivityIds} />
+      <div className="mx-auto max-w-6xl px-4 pt-6">
+        <RobodexShelfClient />
+      </div>
 
       <section aria-label="Level 1 certificate" className="mx-auto max-w-6xl px-4 pt-6">
         <CertificateButtonClient level={1} />

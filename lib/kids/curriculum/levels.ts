@@ -520,7 +520,12 @@ export const LEVELS: Level[] = [
     certificate: {
       title: 'R2BOT Kids · Builder',
       wording: '{name} rebuilt {robotName} as the Island Post rover. {name} can measure and steer precisely, follow lines with if / else, choose parts from a fair test, sort with sensors, test a program until it is reliable, and design for the people who will use it.',
-      criteria: ['Ran the four projects in the simulator, each meeting its constraints (recorded by the simulator).', 'Recorded and used a fair-test results table (Session 13).', 'A final route that succeeded in ten runs in a row (Session 22 method, recorded by the simulator).'],
+      // Criteria the product can actually see (Wave 2, written with the sessions in ./level2).
+      criteria: [
+        'Finished all 24 sessions of The Island Post, including the four “Make it yours” projects (sessions 6, 12, 18, 24): each session counts only after its game challenge was won and its three-question check answered (recorded on the device).',
+        'Won the challenge tier in every session — from Robo Sumo on Cadet to the Robot Hospital round — and practised in a verified Code Lab or Physics Lab arena.',
+        'Kept and used a fair-test results table (session 13) and a ten-run test log (session 22), checked by a teacher or parent.',
+      ],
     },
     blocks: cumulative(2),
     bridge: L2_BRIDGE,

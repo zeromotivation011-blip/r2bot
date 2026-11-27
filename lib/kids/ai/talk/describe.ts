@@ -13,6 +13,7 @@ const SENSOR_WORDS: Record<string, string> = {
   bumped: 'bumped',
   heading_deg: 'heading',
   timer_s: 'timer',
+  battery_pct: 'battery %',
 }
 
 export function exprText(e: Expr): string {

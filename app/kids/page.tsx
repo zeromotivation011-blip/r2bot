@@ -15,6 +15,9 @@ import { KIDS_BANDS } from '@/lib/kids/bands'
 import { GAMES, PLANETS, WORLDS, getGame, numberWord } from '@/lib/kids/universe/worlds'
 import { LEVELS } from '@/lib/kids/curriculum/levels'
 import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
+import { LEVEL2_SESSIONS } from '@/lib/kids/curriculum/level2'
+import { LEVEL3_SESSIONS } from '@/lib/kids/curriculum/level3'
+import { LEVEL4_SESSIONS } from '@/lib/kids/curriculum/level4'
 import type { LevelNumber } from '@/lib/kids/curriculum/types'
 import { InstallAppClient } from '@/components/kids/InstallAppClient'
 import type { SessionTitles } from '@/components/kids/universe/ContinueCardClient'
@@ -124,11 +127,11 @@ const ACTIVITY_COUNT_LABEL = `${Math.floor(ALL_ACTIVITIES.length / 100) * 100}+`
 const SESSION_TITLES: SessionTitles = Object.fromEntries(LEVELS.map((l) => [l.number, l.sessions.map((s) => s.title)]))
 
 /**
- * Sessions written in full, per level. Levels 2–4 are outlines today; when a
- * level's sessions are written (lib/kids/curriculum/level<N>), add them here.
+ * Sessions written in full, per level (all four since Wave 2). A level whose
+ * sessions are not all written shows as arriving soon.
  * Server-only: none of this reaches the client bundle, only the level numbers.
  */
-const WRITTEN_SESSIONS: Partial<Record<LevelNumber, readonly { number: number }[]>> = { 1: LEVEL1_SESSIONS }
+const WRITTEN_SESSIONS: Partial<Record<LevelNumber, readonly { number: number }[]>> = { 1: LEVEL1_SESSIONS, 2: LEVEL2_SESSIONS, 3: LEVEL3_SESSIONS, 4: LEVEL4_SESSIONS }
 
 /** A level is playable when every session in its outline has been written. */
 const PLAYABLE_LEVELS: number[] = LEVELS.filter((l) => {

@@ -2,9 +2,10 @@
 //
 // A winding path of the 24 sessions (the four "Make it yours" projects are
 // the big star stops), the season story, the robot the child ends with and
-// the certificate. Level 1 is playable and indexed; Levels 2–4 show their
-// planned season honestly as "arriving soon" and stay noindex until playable
-// (CLAUDE.md §12: never advertise what you noindex — they are not in the sitemap).
+// the certificate. All four levels are written in full (Wave 2), so all four
+// are playable, indexed and in the sitemap. PLAYABLE stays as the switch: a
+// level that is not written shows its season as "arriving soon" and is noindex
+// (CLAUDE.md §12: never advertise what you noindex).
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -14,6 +15,9 @@ import { KIDS_BANDS } from '@/lib/kids/bands'
 import { LEVELS } from '@/lib/kids/curriculum/levels'
 import type { Level, LevelNumber } from '@/lib/kids/curriculum/types'
 import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
+import { LEVEL2_SESSIONS } from '@/lib/kids/curriculum/level2'
+import { LEVEL3_SESSIONS } from '@/lib/kids/curriculum/level3'
+import { LEVEL4_SESSIONS } from '@/lib/kids/curriculum/level4'
 import { PLANETS } from '@/lib/kids/universe/worlds'
 import { CertificateButtonClient } from '@/components/kids/teach/CertificateButtonClient'
 import SeasonMapClient, { type MapAct, type MapNode } from '@/components/kids/course/SeasonMapClient'
@@ -24,7 +28,10 @@ export const dynamicParams = false
 const BASE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in'
 
 /** Levels whose sessions are written in full (and so playable and indexable). */
-const PLAYABLE = new Set<number>([1])
+const PLAYABLE = new Set<number>([1, 2, 3, 4])
+
+/** Each level's written sessions, for the badge icons on the map. */
+const ICONS: Record<number, { number: number; badge: { icon: string } }[]> = { 1: LEVEL1_SESSIONS, 2: LEVEL2_SESSIONS, 3: LEVEL3_SESSIONS, 4: LEVEL4_SESSIONS }
 
 type Params = { params: Promise<{ level: string }> }
 
@@ -68,7 +75,7 @@ export default async function LevelPage({ params }: Params) {
   const playable = PLAYABLE.has(l.number)
 
   const nodes: MapNode[] = l.sessions.map((s) => {
-    const full = l.number === 1 ? LEVEL1_SESSIONS.find((x) => x.number === s.number) : undefined
+    const full = ICONS[l.number]?.find((x) => x.number === s.number)
     return { number: s.number, title: s.title, objective: s.objective, kind: s.kind, icon: full?.badge.icon }
   })
   const acts: MapAct[] = l.season.arc.map((a) => ({ title: a.title, summary: a.summary, sessions: a.sessions }))
@@ -151,7 +158,7 @@ export default async function LevelPage({ params }: Params) {
               ))}
             </ul>
           </div>
-          {l.number === 1 && <CertificateButtonClient level={1} />}
+          {playable && <CertificateButtonClient level={l.number} />}
         </aside>
       </div>
 

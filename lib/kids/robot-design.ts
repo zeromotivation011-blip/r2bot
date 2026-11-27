@@ -232,8 +232,247 @@ export interface RobotDesign {
   sensor: SensorId
   primary: string
   accent: string
+  /**
+   * Upgrade slots the child unlocks by playing (roadmap #33): power pack, motor
+   * type, a second sensor, a jointed arm and a World form. Optional, so every
+   * design saved before them (and every surface that never reads them) works
+   * unchanged; a missing slot means the starter part (`UPGRADE_DEFAULT`).
+   */
+  upgrades?: RobotUpgrades
   /** Bumped when the shape changes so stored designs can be migrated. */
   v: 1
+}
+
+// ── Upgrade slots (27 Nov 2026, roadmap #33: a robot that grows with the child) ──
+// Five more slots, unlocked by play (rules in lib/kids/robot-growth.ts). Kept
+// apart from `Slot` so the Code Lab, the simulator's physics and the Garage —
+// which work on the five base slots — need no change. A second floor sensor
+// DOES add its capabilities (two sensors = two blocks), so a line + bumper robot
+// can follow a line and feel a wall.
+
+export type UpgradeSlot = 'power' | 'motor' | 'sensor2' | 'arm' | 'chassis'
+export type PowerId = 'aa' | 'lipo' | 'bigpack' | 'solar'
+export type MotorId = 'gear' | 'speedy' | 'torque' | 'brushless'
+export type ArmId = 'none' | 'arm2' | 'arm3'
+/** The robot's World form. 'ground' is the everyday robot; the others are earned in a World. */
+export type ChassisId = 'ground' | 'drone' | 'sub' | 'humanoid'
+
+export interface RobotUpgrades {
+  power?: PowerId
+  motor?: MotorId
+  sensor2?: SensorId
+  arm?: ArmId
+  chassis?: ChassisId
+}
+
+export const UPGRADE_SLOTS: UpgradeSlot[] = ['power', 'motor', 'sensor2', 'arm', 'chassis']
+
+export const UPGRADE_DEFAULT: Required<RobotUpgrades> = { power: 'aa', motor: 'gear', sensor2: 'none', arm: 'none', chassis: 'ground' }
+
+export const UPGRADE_SLOT_LABEL: Record<UpgradeSlot, string> = {
+  power: 'Power',
+  motor: 'Motors',
+  sensor2: '2nd sensor',
+  arm: 'Arm',
+  chassis: 'World form',
+}
+
+export interface UpgradePart {
+  id: string
+  slot: UpgradeSlot
+  name: string
+  emoji: string
+  what: string
+  withIt: string
+  withoutIt: string
+  realWorld: string
+  /** Capabilities it adds (only the second sensor adds any). */
+  gives: Capability[]
+}
+
+export const UPGRADE_PARTS: UpgradePart[] = [
+  // ── Power packs ──────────────────────────────────────────────────────────
+  {
+    id: 'aa', slot: 'power', name: 'AA Battery Box', emoji: '🔋',
+    what: 'Four rechargeable AA batteries in a little box: 4.8 volts.',
+    withIt: 'Easy to find and safe to swap. Enough energy for a long play.',
+    withoutIt: 'With no battery the brain and the motors get no electricity at all.',
+    realWorld: 'School robot kits and TV remotes run on AA batteries.',
+    gives: [],
+  },
+  {
+    id: 'lipo', slot: 'power', name: 'Lithium Pack', emoji: '⚡',
+    what: 'A flat lithium battery (7.4 volts) that holds much more energy for its weight.',
+    withIt: 'More energy and more push, without making the robot heavy.',
+    withoutIt: 'AA batteries are heavier for the same energy, so the robot runs out sooner.',
+    realWorld: 'Phones, drones and robot vacuums all use lithium batteries.',
+    gives: [],
+  },
+  {
+    id: 'bigpack', slot: 'power', name: 'Big Power Pack', emoji: '🔌',
+    what: 'A large 11.1-volt lithium pack with three cells in a row.',
+    withIt: 'Hours of driving — but it is heavy, and weight costs energy too.',
+    withoutIt: 'A small battery means short missions and a trip back to the charger.',
+    realWorld: 'Delivery and warehouse robots carry big packs to work a whole shift.',
+    gives: [],
+  },
+  {
+    id: 'solar', slot: 'power', name: 'Solar + Lithium', emoji: '☀️',
+    what: 'A lithium pack topped up by a solar panel on the robot’s back.',
+    withIt: 'In sunshine the panel pays for the brain and sensors, so the battery lasts longer.',
+    withoutIt: 'Out in a field, far from a plug, the robot has to come home to charge.',
+    realWorld: 'Farm robots and Mars rovers charge from the Sun while they work.',
+    gives: [],
+  },
+  // ── Motors ───────────────────────────────────────────────────────────────
+  {
+    id: 'gear', slot: 'motor', name: 'Gear Motors', emoji: '⚙️',
+    what: 'Small motors with gears that trade some speed for strength.',
+    withIt: 'A good balance: not too fast, not too weak.',
+    withoutIt: 'Without gears a little motor spins fast but cannot push the robot.',
+    realWorld: 'Almost every toy and school robot uses gear motors.',
+    gives: [],
+  },
+  {
+    id: 'speedy', slot: 'motor', name: 'Speedy Motors', emoji: '🏎️',
+    what: 'Motors geared for speed: the wheels turn faster but push less hard.',
+    withIt: 'A faster robot on flat floors.',
+    withoutIt: 'A race takes longer — but speedy motors struggle up ramps and with heavy loads.',
+    realWorld: 'Racing robots and line-following competitions use fast motors.',
+    gives: [],
+  },
+  {
+    id: 'torque', slot: 'motor', name: 'Torque Motors', emoji: '🐂',
+    what: 'Motors geared for strength (torque): slow, but they can push hard.',
+    withIt: 'Pushes heavy boxes and climbs ramps without stalling.',
+    withoutIt: 'A weaker motor stalls when the load is heavy.',
+    realWorld: 'Sumo robots and tractors are slow and strong.',
+    gives: [],
+  },
+  {
+    id: 'brushless', slot: 'motor', name: 'Brushless Motors', emoji: '🌀',
+    what: 'Motors with no rubbing brushes inside, run by a clever controller.',
+    withIt: 'Fast AND strong, and they waste less energy as heat.',
+    withoutIt: 'Brushed motors wear out and turn more of the battery into heat.',
+    realWorld: 'Every drone and electric car uses brushless motors.',
+    gives: [],
+  },
+  // ── Second floor sensor (same parts as the first) ────────────────────────
+  {
+    id: 'none', slot: 'sensor2', name: 'No 2nd Sensor', emoji: '➖',
+    what: 'Just one floor sensor.',
+    withIt: 'Simpler wiring and a lighter robot.',
+    withoutIt: '—',
+    realWorld: 'Many simple robots manage with one sensor.',
+    gives: [],
+  },
+  {
+    id: 'line', slot: 'sensor2', name: 'Extra Line Sensor', emoji: '〰️',
+    what: 'A second row of little lights that see dark and bright floor.',
+    withIt: 'Pair it with a bumper or colour sensor and your robot can follow lines AND do the other job.',
+    withoutIt: 'One sensor means choosing: follow lines OR see colours OR feel bumps.',
+    realWorld: 'Factory robots follow floor lines and also feel for obstacles.',
+    gives: ['follow-line'],
+  },
+  {
+    id: 'color', slot: 'sensor2', name: 'Extra Colour Sensor', emoji: '🎨',
+    what: 'A second sensor that looks down and names the floor colour.',
+    withIt: 'Your robot can follow a line and still stop on a red square.',
+    withoutIt: 'A line-follower with one sensor cannot also read colour signals.',
+    realWorld: 'Sorting robots read colours while they move along a track.',
+    gives: ['see-color'],
+  },
+  {
+    id: 'bumper', slot: 'sensor2', name: 'Extra Bumper', emoji: '🛡️',
+    what: 'A soft bumper with a switch, fitted as a second sensor.',
+    withIt: 'If every other sensor misses something, the bumper still feels it.',
+    withoutIt: 'A robot that trusts one sensor can crash when that sensor is fooled.',
+    realWorld: 'Robot vacuums use cliff sensors, bumpers and more — never just one.',
+    gives: ['feel-bump'],
+  },
+  // ── Arm ──────────────────────────────────────────────────────────────────
+  {
+    id: 'none', slot: 'arm', name: 'No Arm', emoji: '✋',
+    what: 'No jointed arm — the tool sits on the front of the body.',
+    withIt: 'Light and simple.',
+    withoutIt: '—',
+    realWorld: 'Most robot vacuums have no arm at all.',
+    gives: [],
+  },
+  {
+    id: 'arm2', slot: 'arm', name: 'Two-Joint Arm', emoji: '💪',
+    what: 'An arm with a shoulder and an elbow, like yours.',
+    withIt: 'Your robot can reach up onto a shelf and further in front.',
+    withoutIt: 'The robot can only reach what is right at its front edge.',
+    realWorld: 'Mobile robots in warehouses carry arms to pick from shelves.',
+    gives: [],
+  },
+  {
+    id: 'arm3', slot: 'arm', name: 'Three-Joint Arm', emoji: '🦾',
+    what: 'A longer arm with a shoulder, an elbow and a wrist.',
+    withIt: 'The wrist turns the tool to the right angle before it grabs.',
+    withoutIt: 'Without a wrist the claw has to approach from one direction only.',
+    realWorld: 'The space station’s robot arm has joints like a giant human arm.',
+    gives: [],
+  },
+  // ── World forms ──────────────────────────────────────────────────────────
+  {
+    id: 'ground', slot: 'chassis', name: 'Ground Robot', emoji: '🤖',
+    what: 'Your everyday robot that drives on the floor.',
+    withIt: 'Drives and works in the Code Lab and the Physics Lab.',
+    withoutIt: '—',
+    realWorld: 'Most robots that work with people drive on the ground.',
+    gives: [],
+  },
+  {
+    id: 'drone', slot: 'chassis', name: 'Farm Drone', emoji: '🚁',
+    what: 'Four spinning rotors lift your robot into the air.',
+    withIt: 'Flies over a whole field in minutes to check the crops.',
+    withoutIt: 'A ground robot has to drive down every row.',
+    realWorld: 'Farmers use drones to spot thirsty or sick plants from above.',
+    gives: [],
+  },
+  {
+    id: 'sub', slot: 'chassis', name: 'Ocean Sub', emoji: '🐠',
+    what: 'A waterproof hull with floats and a propeller.',
+    withIt: 'Dives under the sea where people cannot easily go.',
+    withoutIt: 'Water would get into the electronics of a land robot.',
+    realWorld: 'Underwater robots explore shipwrecks and study the deep ocean.',
+    gives: [],
+  },
+  {
+    id: 'humanoid', slot: 'chassis', name: 'Space Humanoid', emoji: '🧑‍🚀',
+    what: 'Two legs and two arms, shaped like a person.',
+    withIt: 'Can use tools and handles that were made for people.',
+    withoutIt: 'A wheeled robot cannot climb a ladder or turn a valve made for hands.',
+    realWorld: 'Robonaut 2 worked on the International Space Station with astronauts.',
+    gives: [],
+  },
+]
+
+export function upgradesForSlot(slot: UpgradeSlot): UpgradePart[] {
+  return UPGRADE_PARTS.filter((p) => p.slot === slot)
+}
+
+export function getUpgrade(slot: UpgradeSlot, id: string): UpgradePart | undefined {
+  return UPGRADE_PARTS.find((p) => p.slot === slot && p.id === id)
+}
+
+/** Every upgrade slot filled in (missing → the starter part). */
+export function upgradesOf(d: RobotDesign): Required<RobotUpgrades> {
+  return { ...UPGRADE_DEFAULT, ...(d.upgrades ?? {}) }
+}
+
+/** Keep only known upgrade ids, and drop slots that hold the starter part (so a stored design stays small). */
+export function cleanUpgrades(u: unknown): RobotUpgrades | undefined {
+  if (!u || typeof u !== 'object') return undefined
+  const o = u as Record<string, unknown>
+  const out: Record<string, string> = {}
+  for (const slot of UPGRADE_SLOTS) {
+    const v = o[slot]
+    if (typeof v === 'string' && v !== UPGRADE_DEFAULT[slot] && getUpgrade(slot, v)) out[slot] = v
+  }
+  return Object.keys(out).length ? (out as RobotUpgrades) : undefined
 }
 
 export const ROBOT_COLORS = ['#F59E0B', '#3B82F6', '#10B981', '#EF4444', '#8B5CF6', '#EC4899', '#94A3B8', '#FACC15', '#14B8A6', '#F97316'] as const
@@ -264,6 +503,9 @@ export function capabilitiesOf(d: RobotDesign): Set<Capability> {
     const part = getPart(slot, d[slot])
     part?.gives.forEach((c) => caps.add(c))
   }
+  // A second floor sensor is a real second sensor: its capability is added too.
+  const s2 = d.upgrades?.sensor2
+  if (s2) getUpgrade('sensor2', s2)?.gives.forEach((c) => caps.add(c))
   return caps
 }
 
@@ -312,10 +554,13 @@ function loadDesignAt(key: string): RobotDesign {
     const parsed: unknown = JSON.parse(raw)
     if (!isDesign(parsed)) return { ...DEFAULT_DESIGN }
     // Validate each slot against the catalogue so a stale id never breaks rendering.
-    const d = { ...DEFAULT_DESIGN, ...parsed }
+    const d: RobotDesign = { ...DEFAULT_DESIGN, ...parsed }
     for (const slot of ['body', 'drive', 'head', 'tool', 'sensor'] as Slot[]) {
-      if (!getPart(slot, d[slot])) (d as Record<Slot, string>)[slot] = DEFAULT_DESIGN[slot]
+      if (!getPart(slot, d[slot])) (d as unknown as Record<Slot, string>)[slot] = DEFAULT_DESIGN[slot]
     }
+    const upgrades = cleanUpgrades(d.upgrades)
+    if (upgrades) d.upgrades = upgrades
+    else delete d.upgrades
     return d
   } catch {
     return { ...DEFAULT_DESIGN }
@@ -343,10 +588,28 @@ export function saveDesignOf(profileId: string | null, d: RobotDesign): void {
   }
 }
 
-/** Short shareable code for a design (no server needed): e.g. "box.tracks.camera.gripper.line.F59E0B.3B82F6.Sparky" */
+/**
+ * Short shareable code for a design (no server needed): e.g. "box.tracks.camera.gripper.line.F59E0B.3B82F6.Sparky",
+ * plus a 9th field for the upgrade slots when any is fitted ("lipo~torque~bumper~arm2~drone", "-" = starter part).
+ * The name never contains a dot, so older 8-field codes decode exactly as before.
+ */
 export function encodeDesign(d: RobotDesign): string {
   const name = d.name.replace(/[^A-Za-z0-9 ]/g, '').slice(0, 20)
-  return [d.body, d.drive, d.head, d.tool, d.sensor, d.primary.slice(1), d.accent.slice(1), encodeURIComponent(name)].join('.')
+  const fields = [d.body, d.drive, d.head, d.tool, d.sensor, d.primary.slice(1), d.accent.slice(1), encodeURIComponent(name)]
+  const up = cleanUpgrades(d.upgrades)
+  if (up) fields.push(UPGRADE_SLOTS.map((s) => up[s] ?? '-').join('~'))
+  return fields.join('.')
+}
+
+function decodeUpgrades(field: string | undefined): RobotUpgrades | undefined {
+  if (!field) return undefined
+  const parts = field.split('~')
+  const raw: Record<string, string> = {}
+  UPGRADE_SLOTS.forEach((s, i) => {
+    const v = parts[i]
+    if (v && v !== '-') raw[s] = v
+  })
+  return cleanUpgrades(raw)
 }
 
 export function decodeDesign(s: string): RobotDesign | null {
@@ -357,7 +620,7 @@ export function decodeDesign(s: string): RobotDesign | null {
   // design, and keep only the characters encodeDesign() itself allows.
   let name: string
   try {
-    name = decodeURIComponent(p.slice(7).join('.'))
+    name = decodeURIComponent(p[7])
   } catch {
     return null
   }
@@ -376,6 +639,8 @@ export function decodeDesign(s: string): RobotDesign | null {
   for (const slot of ['body', 'drive', 'head', 'tool', 'sensor'] as Slot[]) {
     if (!getPart(slot, d[slot])) return null
   }
+  const upgrades = decodeUpgrades(p[8])
+  if (upgrades) d.upgrades = upgrades
   return d
 }
 

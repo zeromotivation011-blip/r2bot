@@ -34,7 +34,9 @@ import {
 import { blockNeeds, type Program } from '@/lib/kids/sim/program'
 import { playSound, sparkSays } from '@/lib/kids-audio'
 import PictureProgramClient, { cloneNodes, type Cursor } from './PictureProgramClient'
-import type { StageRunRequest } from './ChallengeStageClient'
+import type { StageRecording, StageReplay, StageRunRequest } from './ChallengeStageClient'
+import FlightRecorderClient, { RecorderTimelineClient } from './FlightRecorderClient'
+import { reasonFromChallenge } from '@/lib/kids/sim/recorder'
 import type { CameraMode } from './renderer'
 
 function StageSkeleton() {
@@ -130,6 +132,13 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
   const revealNow = showMeAfter > 0 && fails >= showMeAfter
   const historyRef = useRef<PicNode[][]>([])
   const [run, setRun] = useState<StageRunRequest | null>(null)
+  // Flight Recorder (roadmap #38)
+  const [rec, setRec] = useState<StageRecording | null>(null)
+  const [replay, setReplay] = useState<StageReplay | null>(null)
+  const [replayT, setReplayT] = useState(0)
+  const [replaying, setReplaying] = useState(false)
+  const [ghostOn, setGhostOn] = useState(true)
+  const [ghostNews, setGhostNews] = useState<StageRecording['ghostNews'] | null>(null)
   const [resetNonce, setResetNonce] = useState(0)
   const [speed, setSpeed] = useState(1)
   const [camera, setCamera] = useState<CameraMode>('follow')
@@ -236,6 +245,9 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
     setStars(null)
     setClaimed(new Set())
     setPhase('running')
+    setReplay(null)
+    setReplaying(false)
+    setGhostNews(null)
     setRun({ nonce: Date.now(), program, nodes })
     playSound('click')
     // Phones: bring the robot into view.
@@ -244,6 +256,10 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
   }
 
   const reset = () => {
+    setRec(null)
+    setReplay(null)
+    setReplaying(false)
+    setGhostNews(null)
     setPhase('edit')
     setResult(null)
     setStars(null)
@@ -300,6 +316,46 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
   const multi = startPoses(ch).length > 1
   const running = phase === 'running'
 
+  // A new robot or a new challenge: the old recording no longer matches the arena.
+  useEffect(() => {
+    setRec(null)
+    setReplay(null)
+    setReplaying(false)
+  }, [fitted, ch])
+
+  const onRecording = useCallback((r: StageRecording) => {
+    setRec(r)
+    if (!r.live) {
+      const end = r.frames.length > 0 ? r.frames[r.frames.length - 1].t : 0
+      setReplayT(end)
+      if (r.ghostNews) setGhostNews(r.ghostNews)
+    }
+  }, [])
+  const recFrames = rec && rec.frames.length > 1 ? rec.frames : []
+  const recEnd = recFrames.length > 0 ? recFrames[recFrames.length - 1].t : 0
+  const recT = running ? recEnd : replayT
+  const recResult = result ? { success: result.success, reason: reasonFromChallenge(result.reason), goalDistance: Number.NaN, message: result.message } : null
+  const recParts = { distance: capabilitiesOf(fitted).has('see-wall'), line: capabilitiesOf(fitted).has('follow-line'), bump: capabilitiesOf(fitted).has('feel-bump') }
+  const seek = (t: number) => {
+    if (running || recFrames.length < 2) return
+    setReplaying(false)
+    setReplayT(t)
+    setCardOpen(false)
+    setReplay({ t, playing: false, nonce: Date.now() })
+  }
+  const toggleReplay = () => {
+    if (running || recFrames.length < 2) return
+    if (replaying) {
+      setReplaying(false)
+      setReplay({ t: replayT, playing: false, nonce: Date.now() })
+      return
+    }
+    const from = replayT >= recEnd - 0.01 ? 0 : replayT
+    setCardOpen(false)
+    setReplaying(true)
+    setReplay({ t: from, playing: true, nonce: Date.now() })
+  }
+
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-start lg:gap-4" data-testid="sim-challenge" data-challenge={ch.id}>
       {/* Mission + parts */}
@@ -355,6 +411,13 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
             onDone={onDone}
             onReady={() => setReady(true)}
             onStart={(i, n) => setStartInfo({ i, n })}
+            onRecording={onRecording}
+            replay={replay}
+            onReplayT={(t, playing) => {
+              setReplayT(t)
+              setReplaying(playing)
+            }}
+            ghostOn={ghostOn}
           />
           {bubble && (
             <div className="pointer-events-none absolute left-1/2 top-3 max-w-[78%] -translate-x-1/2 rounded-2xl bg-white px-4 py-2 text-center text-sm font-black text-[#0A1120] shadow-lg" aria-live="polite">
@@ -362,7 +425,7 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
             </div>
           )}
           {multi && startInfo && running && (
-            <div className="pointer-events-none absolute left-3 top-3 rounded-xl bg-black/55 px-3 py-1.5 text-xs font-black text-cyan-200 backdrop-blur">
+            <div className="pointer-events-none absolute left-3 top-16 rounded-xl bg-black/55 px-3 py-1.5 text-xs font-black text-cyan-200 backdrop-blur">
               Start {startInfo.i + 1} of {startInfo.n}
             </div>
           )}
@@ -489,6 +552,9 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
             ))}
           </div>
         </div>
+        {recFrames.length > 0 && (
+          <RecorderTimelineClient frames={recFrames} events={rec?.events ?? []} result={recResult} t={recT} onSeek={seek} replaying={replaying} onReplay={toggleReplay} live={running} />
+        )}
       </div>
 
       {/* Picture blocks */}
@@ -555,6 +621,33 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
           disabled={running}
         />
       </section>
+
+      {/* Flight Recorder (roadmap #38): graphs, why it failed, the ghost of the best run. */}
+      {recFrames.length > 0 && (
+        <div className="min-w-0 lg:col-span-2">
+          <FlightRecorderClient
+            frames={recFrames}
+            events={rec?.events ?? []}
+            result={recResult}
+            parts={recParts}
+            t={recT}
+            onSeek={seek}
+            replaying={replaying}
+            onReplay={toggleReplay}
+            live={running}
+            ghost={rec?.ghost ?? null}
+            ghostOn={ghostOn}
+            onGhostToggle={() => setGhostOn((v) => !v)}
+            ghostNews={ghostNews ?? null}
+            batteryCoupled={ch.arena.battery !== undefined}
+            drainScale={ch.arena.battery?.drainScale ?? 1}
+            onShowView={() => {
+              const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+              viewRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' })
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 }

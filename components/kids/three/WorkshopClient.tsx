@@ -10,23 +10,45 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   capabilitiesOf,
+  cleanUpgrades,
   decodeDesign,
   encodeDesign,
   getPart,
+  getUpgrade,
   loadDesign,
   partsForSlot,
   ROBOT_COLORS,
   saveDesign,
   DEFAULT_DESIGN,
+  TRAIL_PART_FITS,
+  UPGRADE_SLOT_LABEL,
+  UPGRADE_SLOTS,
+  upgradesForSlot,
+  upgradesOf,
   type RobotDesign,
   type Slot,
+  type UpgradeSlot,
 } from '@/lib/kids/robot-design'
 import { CAPABILITY_LABEL, SLOT_LABEL, SLOT_ORDER } from '@/lib/kids/code-lab/labels'
-import { getProgress, saveProgress } from '@/lib/kids-progress'
+import { getProgress, KIDS_PROGRESS_EVENT, saveProgress, type KidsProgress } from '@/lib/kids-progress'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { fireConfetti } from '@/components/kids/Confetti'
 import { useParentControls } from '@/lib/kids/parent-controls'
+import { useKidsReducedMotion } from '@/lib/kids/settings'
+import {
+  isUpgradeUnlocked,
+  learnedSlots,
+  partLearned,
+  robotGreeting,
+  trailPartKeys,
+  unlockRule,
+  upgradeCount,
+  wireSignal,
+  wiringOf,
+} from '@/lib/kids/robot-growth'
 import type { DriveInput, WorkshopSceneApi } from './WorkshopSceneClient'
+import LookInsideClient from './LookInsideClient'
+import SpecSheetClient from './SpecSheetClient'
 
 function SceneSkeleton() {
   return (
@@ -41,12 +63,23 @@ const WorkshopScene = dynamic(() => import('./WorkshopSceneClient'), { ssr: fals
 const ARView = dynamic(() => import('./ARViewClient'), { ssr: false })
 
 type Toast = { text: string; tone: 'good' | 'info' }
+type AnyTab = Slot | UpgradeSlot
+
+const isUpgradeSlot = (s: AnyTab): s is UpgradeSlot => (UPGRADE_SLOTS as string[]).includes(s)
 
 export default function WorkshopClient() {
   const [design, setDesign] = useState<RobotDesign>(DEFAULT_DESIGN)
   const [readOnly, setReadOnly] = useState(false)
-  const [slot, setSlot] = useState<Slot>('body')
-  const [snap, setSnap] = useState<{ slot: Slot; n: number } | null>(null)
+  const [slot, setSlot] = useState<AnyTab>('body')
+  const [snap, setSnap] = useState<{ slot: AnyTab; n: number } | null>(null)
+  /** The child's progress (unlocks, learned parts, band), read on the device after mount. */
+  const [progress, setProgress] = useState<KidsProgress | null>(null)
+  const [xray, setXrayState] = useState(false)
+  const [explode, setExplodeState] = useState(0)
+  const [activeWire, setActiveWire] = useState<string | null>(null)
+  const [readout, setReadout] = useState<string | null>(null)
+  /** A locked upgrade the child tapped: its card shows how to earn it. */
+  const [preview, setPreview] = useState<{ slot: UpgradeSlot; id: string } | null>(null)
   const [driving, setDriving] = useState(false)
   const [inSand, setInSand] = useState(false)
   const [dirty, setDirty] = useState(false)
@@ -55,6 +88,7 @@ export default function WorkshopClient() {
   const [arOpen, setArOpen] = useState(false)
   // A grown-up can switch the camera off in the parent hub; then the AR entry is hidden.
   const cameraOn = useParentControls().camera
+  const reducedMotion = useKidsReducedMotion()
   const [vrSupported, setVrSupported] = useState(false)
   const [inVR, setInVR] = useState(false)
   const driveInput = useRef<DriveInput>({ up: false, down: false, left: false, right: false })
@@ -74,6 +108,18 @@ export default function WorkshopClient() {
     }
   }, [])
 
+  // Progress drives unlocks and the glow; follow it if the child earns something in another tab.
+  useEffect(() => {
+    const read = () => setProgress(getProgress())
+    read()
+    window.addEventListener(KIDS_PROGRESS_EVENT, read)
+    window.addEventListener('storage', read)
+    return () => {
+      window.removeEventListener(KIDS_PROGRESS_EVENT, read)
+      window.removeEventListener('storage', read)
+    }
+  }, [])
+
   const flash = useCallback((text: string, tone: Toast['tone'] = 'good') => {
     setToast({ text, tone })
     window.setTimeout(() => setToast(null), 2600)
@@ -87,6 +133,71 @@ export default function WorkshopClient() {
     setSnap((p) => ({ slot: s, n: (p?.n ?? 0) + 1 }))
     setDirty(true)
   }
+
+  const chooseUpgrade = (s: UpgradeSlot, id: string) => {
+    if (readOnly) return
+    if (upgradesOf(design)[s] === id) {
+      setPreview(null)
+      return
+    }
+    if (progress && !isUpgradeUnlocked(progress, s, id)) {
+      playSound('click')
+      setPreview({ slot: s, id })
+      return
+    }
+    setPreview(null)
+    primeAudio()
+    playSound('click')
+    setDesign((d) => {
+      const upgrades = cleanUpgrades({ ...upgradesOf(d), [s]: id })
+      const next: RobotDesign = { ...d }
+      if (upgrades) next.upgrades = upgrades
+      else delete next.upgrades
+      return next
+    })
+    setSnap((p) => ({ slot: s, n: (p?.n ?? 0) + 1 }))
+    setDirty(true)
+  }
+
+  // X-ray / explode / signals.
+  const band = progress?.band ?? null
+  const describeWire = useCallback(
+    (id: string, d: RobotDesign) => {
+      const wire = wiringOf(d).find((w) => w.id === id)
+      if (!wire) return null
+      const api = apiRef.current
+      const drive = api?.readDrive() ?? { leftPct: 0, rightPct: 0 }
+      return wireSignal(wire, d, band, { distanceCm: api?.measureDistanceCm() ?? null, leftPct: drive.leftPct, rightPct: drive.rightPct })
+    },
+    [band],
+  )
+  const tapWire = useCallback(
+    (id: string) => {
+      primeAudio()
+      playSound('click')
+      setActiveWire(id)
+      setReadout(describeWire(id, design))
+    },
+    [describeWire, design],
+  )
+  const setXray = (on: boolean) => {
+    primeAudio()
+    playSound('click')
+    setXrayState(on)
+    if (!on) {
+      setActiveWire(null)
+      setReadout(null)
+    }
+  }
+  // A part change can remove the wire that was lit; keep the readout honest.
+  useEffect(() => {
+    if (!activeWire) return
+    const text = describeWire(activeWire, design)
+    if (text === null) {
+      setActiveWire(null)
+      setReadout(null)
+    } else setReadout(text)
+  }, [design, activeWire, describeWire])
 
   const setColor = (which: 'primary' | 'accent', c: string) => {
     if (readOnly) return
@@ -171,7 +282,15 @@ export default function WorkshopClient() {
 
   const caps = capabilitiesOf(design)
   const capList = [...caps]
-  const current = getPart(slot, design[slot])
+  const up = upgradesOf(design)
+  const shownId = isUpgradeSlot(slot) ? (preview && preview.slot === slot ? preview.id : up[slot]) : design[slot]
+  const current = isUpgradeSlot(slot) ? getUpgrade(slot, shownId) : getPart(slot, shownId)
+  const learned = progress && !readOnly ? learnedSlots(progress, design) : []
+  const greeting = progress && !readOnly ? robotGreeting(progress, design) : null
+  const trailKeys = progress ? trailPartKeys(progress.earnedParts, TRAIL_PART_FITS) : new Set<string>()
+  const counts = progress ? upgradeCount(progress) : null
+  const unlocked = (s: UpgradeSlot, id: string) => readOnly || !progress || isUpgradeUnlocked(progress, s, id)
+  const currentLocked = isUpgradeSlot(slot) && current ? !unlocked(slot, current.id) : false
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-10">
@@ -189,6 +308,19 @@ export default function WorkshopClient() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         {/* ── 3D view ── */}
         <section aria-label="Your robot in 3D" className="py-0">
+          {greeting && (
+            <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-2" data-testid="robot-greeting">
+              <p className="mr-auto font-bold text-slate-50">
+                <span aria-hidden>💬 </span>
+                {greeting.text}
+              </p>
+              {greeting.next && (
+                <Link href={greeting.next.href} className="inline-flex min-h-[44px] items-center font-black text-amber-300 underline-offset-4 hover:underline">
+                  Next mission: {greeting.next.emoji} {greeting.next.title} →
+                </Link>
+              )}
+            </div>
+          )}
           <div ref={viewRef} className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-[#111C32] shadow-2xl">
             <WorkshopScene
               design={design}
@@ -199,10 +331,27 @@ export default function WorkshopClient() {
               onSand={setInSand}
               onVRSupport={setVrSupported}
               onVRChange={setInVR}
-              label={`3D model of ${design.name}. Drag to spin, pinch or scroll to zoom.`}
+              xray={xray && !driving}
+              explode={driving ? 0 : explode}
+              learned={learned}
+              activeWire={activeWire}
+              onWireTap={tapWire}
+              label={`3D model of ${design.name}${xray ? ', X-ray on: tap a wire to see its signal' : ''}. Drag to spin, pinch or scroll to zoom.`}
             />
             <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/50 px-3 py-1 text-sm font-black">🤖 {design.name}</div>
-            {!driving && <p className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/45 px-3 py-1 text-xs font-bold text-slate-200">Drag to spin · pinch to zoom</p>}
+            {!driving && (
+              <p className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/45 px-3 py-1 text-xs font-bold text-slate-200">
+                {xray ? 'Tap a wire · drag to spin' : 'Drag to spin · pinch to zoom'}
+              </p>
+            )}
+            {xray && readout && !driving && (
+              <p className="pointer-events-none absolute inset-x-3 bottom-11 rounded-xl bg-[#0A1120]/85 px-3 py-1.5 text-xs font-bold sm:text-sm text-cyan-100 backdrop-blur" aria-hidden data-testid="wire-caption">
+                ⚡ {readout}
+              </p>
+            )}
+            {learned.length > 0 && !driving && !xray && (
+              <p className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/50 px-3 py-1 text-xs font-black text-cyan-200">✨ Glowing = parts you learned to use</p>
+            )}
             {driving && inSand && !caps.has('rough-ground') && (
               <p role="status" className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-full bg-amber-500 px-3 py-1 text-sm font-black text-black">
                 🏜️ Wheels slipping in the sand! Tracks or legs would cross it.
@@ -261,6 +410,26 @@ export default function WorkshopClient() {
           )}
           {driving && <p className="mt-2 text-sm text-slate-300">Drive with the arrow buttons or your keyboard arrows. Try the sandy patch — which parts get across?</p>}
 
+          <LookInsideClient
+            design={design}
+            xray={xray}
+            explode={explode}
+            activeWire={activeWire}
+            readout={readout}
+            disabled={driving}
+            onXray={setXray}
+            onExplode={setExplodeState}
+            onWire={(id) => {
+              tapWire(id)
+              // Bring the robot into view so the child sees the signal travel.
+              const view = viewRef.current
+              if (view) {
+                const r = view.getBoundingClientRect()
+                if (r.bottom < 80 || r.top > window.innerHeight - 80) view.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' })
+              }
+            }}
+          />
+
           <div className="mt-4 rounded-2xl bg-white/5 p-4">
             <h2 className="text-lg font-black">{design.name} can…</h2>
             <ul className="mt-2 flex flex-wrap gap-2">
@@ -275,6 +444,8 @@ export default function WorkshopClient() {
               Program {design.name} in the Code Lab →
             </Link>
           </div>
+
+          <SpecSheetClient design={design} band={band} />
         </section>
 
         {/* ── Parts ── */}
@@ -292,30 +463,80 @@ export default function WorkshopClient() {
                 {getPart(s, design[s])?.emoji} {SLOT_LABEL[s]}
               </button>
             ))}
+            <p className="w-full px-2 pt-2 text-[11px] font-black uppercase tracking-wider text-[#A7B0C0]">
+              Upgrades{counts ? ` · ${counts.unlocked} of ${counts.total} earned` : ''}
+            </p>
+            {UPGRADE_SLOTS.map((s) => (
+              <button
+                key={s}
+                role="tab"
+                type="button"
+                aria-selected={slot === s}
+                onClick={() => {
+                  setSlot(s)
+                  setPreview(null)
+                }}
+                data-testid={`upgrade-tab-${s}`}
+                className={`min-h-[44px] shrink-0 rounded-xl px-3 text-sm font-black focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400 ${slot === s ? 'bg-amber-500 text-black' : 'text-slate-200 hover:bg-white/10'}`}
+              >
+                {getUpgrade(s, up[s])?.emoji} {UPGRADE_SLOT_LABEL[s]}
+              </button>
+            ))}
           </div>
 
-          <div role="tabpanel" aria-label={SLOT_LABEL[slot]} className="mt-3">
+          <div role="tabpanel" aria-label={isUpgradeSlot(slot) ? UPGRADE_SLOT_LABEL[slot] : SLOT_LABEL[slot]} className="mt-3">
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
-              {partsForSlot(slot).map((p) => {
-                const on = design[slot] === p.id
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    disabled={readOnly}
-                    aria-pressed={on}
-                    onClick={() => choose(slot, p.id)}
-                    className={`min-h-[72px] rounded-2xl border-2 p-2 text-left transition focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400 ${
-                      on ? 'border-amber-400 bg-amber-400/15' : 'border-white/10 bg-white/5 hover:border-white/30'
-                    }`}
-                  >
-                    <span className="block text-2xl" aria-hidden>
-                      {p.emoji}
-                    </span>
-                    <span className="block text-sm font-black leading-tight">{p.name}</span>
-                  </button>
-                )
-              })}
+              {isUpgradeSlot(slot)
+                ? upgradesForSlot(slot).map((p) => {
+                    const on = up[slot] === p.id
+                    const open = unlocked(slot, p.id)
+                    const glow = progress ? partLearned(progress, slot, p.id) : false
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        disabled={readOnly}
+                        aria-pressed={on}
+                        aria-label={open ? undefined : `${p.name}, locked: ${unlockRule(slot, p.id).how}`}
+                        onClick={() => chooseUpgrade(slot, p.id)}
+                        data-testid={`upgrade-${slot}-${p.id}`}
+                        className={`relative min-h-[72px] rounded-2xl border-2 p-2 text-left transition focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400 ${
+                          on ? 'border-amber-400 bg-amber-400/15' : open ? 'border-white/10 bg-white/5 hover:border-white/30' : 'border-dashed border-white/15 bg-white/[0.02] text-slate-400'
+                        }`}
+                      >
+                        <span className={`block text-2xl ${open ? '' : 'opacity-40 grayscale'}`} aria-hidden>
+                          {p.emoji}
+                        </span>
+                        <span className="block text-sm font-black leading-tight">{p.name}</span>
+                        {!open && <span className="mt-0.5 block text-[11px] font-bold leading-tight text-slate-300">🔒 Earn it in play</span>}
+                        {open && glow && <span className="mt-0.5 block text-[11px] font-black text-cyan-200">✨ learned</span>}
+                      </button>
+                    )
+                  })
+                : partsForSlot(slot).map((p) => {
+                    const on = design[slot] === p.id
+                    const glow = progress ? partLearned(progress, slot, p.id) : false
+                    const trail = trailKeys.has(`${slot}:${p.id}`)
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        disabled={readOnly}
+                        aria-pressed={on}
+                        onClick={() => choose(slot, p.id)}
+                        className={`min-h-[72px] rounded-2xl border-2 p-2 text-left transition focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400 ${
+                          on ? 'border-amber-400 bg-amber-400/15' : 'border-white/10 bg-white/5 hover:border-white/30'
+                        }`}
+                      >
+                        <span className="block text-2xl" aria-hidden>
+                          {p.emoji}
+                        </span>
+                        <span className="block text-sm font-black leading-tight">{p.name}</span>
+                        {trail && <span className="mt-0.5 block text-[11px] font-black text-amber-300" data-testid={`trail-${slot}-${p.id}`}>⭐ From the Spark Trail</span>}
+                        {glow && <span className="mt-0.5 block text-[11px] font-black text-cyan-200">✨ learned</span>}
+                      </button>
+                    )
+                  })}
             </div>
 
             {current && (
@@ -323,6 +544,14 @@ export default function WorkshopClient() {
                 <h3 className="text-xl font-black">
                   {current.emoji} {current.name}
                 </h3>
+                {currentLocked && isUpgradeSlot(slot) && (
+                  <p className="mt-2 rounded-xl bg-white/5 p-2 text-sm font-bold text-slate-100">
+                    🔒 {unlockRule(slot, current.id).how} to unlock it.{' '}
+                    <Link href={unlockRule(slot, current.id).href} className="inline-flex min-h-[44px] items-center font-black text-amber-300 underline-offset-4 hover:underline">
+                      Go there →
+                    </Link>
+                  </p>
+                )}
                 <p className="mt-1 text-slate-200">{current.what}</p>
                 <dl className="mt-3 space-y-2 text-sm">
                   <div className="rounded-xl bg-emerald-400/10 p-2">
@@ -501,7 +730,14 @@ async function drawRobotCard(design: RobotDesign, shot: string | null): Promise<
     g.fillText(`${SLOT_LABEL[s]}:`, 60, y)
     g.fillStyle = '#FFFFFF'
     g.fillText(`${p.emoji} ${p.name}`, 380, y)
-    y += 52
+    y += 46
+  }
+  // Upgrades the child earned and fitted (starter parts are not listed).
+  const fitted = design.upgrades ? UPGRADE_SLOTS.map((s) => design.upgrades?.[s] && getUpgrade(s, design.upgrades[s] as string)).filter((p): p is NonNullable<typeof p> => Boolean(p)) : []
+  if (fitted.length) {
+    g.fillStyle = '#FFA878'
+    g.font = 'bold 30px system-ui, sans-serif'
+    y = wrapText(g, `Upgrades: ${fitted.map((p) => p.name).join(', ')}.`, 60, y + 6, W - 120, 38) + 44
   }
   const caps = [...capabilitiesOf(design)].map((cap) => CAPABILITY_LABEL[cap])
   g.fillStyle = '#6EE7B7'
@@ -515,7 +751,8 @@ async function drawRobotCard(design: RobotDesign, shot: string | null): Promise<
   return c.toDataURL('image/png')
 }
 
-function wrapText(g: CanvasRenderingContext2D, text: string, x: number, y: number, maxW: number, lh: number) {
+/** Draw wrapped text; returns the y of the last line. */
+function wrapText(g: CanvasRenderingContext2D, text: string, x: number, y: number, maxW: number, lh: number): number {
   const words = text.split(' ')
   let line = ''
   for (const w of words) {
@@ -527,4 +764,5 @@ function wrapText(g: CanvasRenderingContext2D, text: string, x: number, y: numbe
     } else line = test
   }
   if (line) g.fillText(line, x, y)
+  return y
 }

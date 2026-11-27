@@ -34,6 +34,7 @@ import { capabilitiesOf } from '../robot-design'
 import { floorAt, moverAt, onLine, type Arena, type FloorColor, type Vec2 } from './arena'
 import type { Rapier } from './rapier'
 import { DRIVES, robotSpec, SURFACES, type RobotSpec } from './robot-spec'
+import { createBattery, electronicsAmps, motorAmps, stepBattery, voltageFactor, type BatteryState } from './battery'
 
 export const DT = 1 / 60
 const G = 9.81
@@ -88,7 +89,7 @@ export function headingToYaw(deg: number): number {
 
 export interface SimEvent {
   t: number
-  kind: 'say' | 'beep' | 'grab' | 'drop' | 'crash' | 'miss' | 'stalled' | 'touch' | 'light' | 'pen'
+  kind: 'say' | 'beep' | 'grab' | 'drop' | 'crash' | 'miss' | 'stalled' | 'touch' | 'light' | 'pen' | 'battery'
   text?: string
 }
 
@@ -98,10 +99,27 @@ export interface BodyPose {
   q: Q
 }
 
+/** One ray of the ultrasonic echo cone (roadmap #37, robot's-eye view). */
+export interface SensorBeam {
+  /** World-space end: what it hit, or its full range. */
+  to: V3
+  hit: boolean
+  /** Distance measured flat along the floor, cm (DISTANCE_MAX_CM when nothing was hit). */
+  cm: number
+  /** Direction in the robot's frame: left/right of straight ahead (+ = left) and down from level, degrees. */
+  yawDeg: number
+  pitchDeg: number
+}
+
 export interface SensorReadings {
   distanceCm: number
   /** World-space beam for the renderer: from the eye to what it hit (or max range). */
   beam: { from: V3; to: V3; hit: boolean }
+  /**
+   * Every ray of the echo cone (DISTANCE_PITCH_DEG × DISTANCE_CONE_DEG = 20), all from
+   * `beam.from`, row by row (level first). `distanceCm` is the nearest of them.
+   */
+  beams: SensorBeam[]
   lineSamples: boolean[]
   lineSeen: boolean
   lineOffset: number
@@ -156,11 +174,29 @@ export interface Sim {
   /** Metres the wheel surfaces slid over the ground (true slip, per contact; a spin on the spot is not slip). */
   readonly slipTravel: number
   readonly crashed: boolean
+  /** The battery (roadmap #39): live state, read-only for callers. Metered only unless the arena has a battery. */
+  battery(): Readonly<BatteryState>
+  /** What the drive did on the last tick, for the Flight Recorder (roadmap #38). A copy. */
+  telemetry(): DriveTelemetry
   /** Ids of props and movers the robot (or what it carries) has touched, in the order first touched. */
   readonly touched: ReadonlySet<string>
   /** Where each pick-up object is now (x, y, z). */
   objectPos(id: string): V3 | null
   dispose(): void
+}
+
+/** One tick of the drive, per side [left, right]. */
+export interface DriveTelemetry {
+  /** Motor command, -100..100 %. */
+  motorPct: [number, number]
+  /** Wheel surface speed the motor turns, m/s. */
+  wheelSpeed: [number, number]
+  /** Speed of that side's contact over the ground, m/s. */
+  groundSpeed: [number, number]
+  /** Is the tyre sliding (grip ran out)? */
+  slipping: [boolean, boolean]
+  /** Force the motor put into the floor, N. */
+  force: [number, number]
 }
 
 interface DynBody {
@@ -328,6 +364,18 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
   let slipTravel = 0
   const touched = new Set<string>()
   let sensorCache: SensorReadings | null = null
+  // Power (roadmap #39). Kept apart from the drive maths: applyDrive only reads `vFactor` and writes the forces.
+  const battery = createBattery(arena.battery)
+  const powerParts = { head: design.head, sensor: design.sensor, tool: design.tool }
+  /** Motor command per side, %, as last set. */
+  const cmdPct: [number, number] = [0, 0]
+  const motorForce: [number, number] = [0, 0]
+  const sideGround: [number, number] = [0, 0]
+  const sideSlip: [boolean, boolean] = [false, false]
+  /** Power the skid-steer scrub took this tick, W (the motors pay for it). */
+  let scrubWatts = 0
+  /** Voltage factor for this tick's motors (1 unless an arena battery sags or runs flat). */
+  let vFactor = 1
   const events: SimEvent[] = []
   const trail: number[] = []
   let prevPos = robot.translation()
@@ -363,6 +411,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     let hit = false
     const heldHandle = holding ? holding.body.handle : -1
     const seen = (c: Collider) => notRobot(c) && (!floorHandles.has(c.handle) || isRampFace(c)) && c.parent()?.handle !== heldHandle
+    const beams: SensorBeam[] = []
     for (const pitchDeg of DISTANCE_PITCH_DEG) {
       const pa = (pitchDeg * Math.PI) / 180
       const cp = Math.cos(pa)
@@ -377,6 +426,13 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
           bestTo = add(eye, scale(dir, h.timeOfImpact))
           hit = true
         }
+        beams.push({
+          to: add(eye, scale(dir, h ? h.timeOfImpact : range)),
+          hit: Boolean(h),
+          cm: h ? Math.round(h.timeOfImpact * cp * 1000) / 10 : DISTANCE_MAX_CM,
+          yawDeg: deg,
+          pitchDeg: -pitchDeg,
+        })
       }
     }
     // Floor sensors (sampled in step(), read here).
@@ -387,7 +443,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     // Lost the line: report the side it was last seen on, like real line-sensor arrays.
     const lineOffset = n > 0 ? lineSum / n : lastLineOffset === 0 ? 0 : Math.sign(lastLineOffset)
     let floorColor: FloorColor
-    if (design.sensor === 'color') {
+    if (design.sensor === 'color' || design.upgrades?.sensor2 === 'color') {
       const p = add(center, scale(fwd, spec.floorSensorZ))
       floorColor = floorAt(arena, p.x, p.z).color // the colour sensor has its own little LEDs
     } else {
@@ -408,6 +464,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     return {
       distanceCm: Math.round(best * 1000) / 10,
       beam: { from: eye, to: bestTo, hit },
+      beams,
       lineSamples: samples,
       lineSeen: n > 0,
       lineOffset: Math.round(lineOffset * 100) / 100,
@@ -452,8 +509,11 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     const origin = add(pos, scale(up, 0.06))
     const hit = world.castRayAndGetNormal(new R.Ray(origin, scale(up, -1)), 0.06 + 0.03, true, undefined, undefined, undefined, robot, notRobot)
     // Motors spin the wheels toward their target (limited spin-up).
+    vFactor = voltageFactor(battery)
+    motorForce[0] = motorForce[1] = 0
+    scrubWatts = 0
     for (let s = 0; s < 2; s++) {
-      const dv = clamp(target[s] - wheelSpeed[s], -spec.drive.wheelAccel * DT, spec.drive.wheelAccel * DT)
+      const dv = clamp(target[s] * vFactor - wheelSpeed[s], -spec.drive.wheelAccel * DT, spec.drive.wheelAccel * DT)
       wheelSpeed[s] += dv
     }
     // Off the ground (or on its side) every wheel turn is slip.
@@ -461,6 +521,8 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       surfSpeed[0] = wheelSpeed[0]
       surfSpeed[1] = wheelSpeed[1]
       slipTravel += ((Math.abs(wheelSpeed[0]) + Math.abs(wheelSpeed[1])) / 2) * DT
+      sideGround[0] = sideGround[1] = 0
+      sideSlip[0] = sideSlip[1] = true
     }
     if (!hit) return airborne()
     const n = norm(hit.normal)
@@ -501,9 +563,11 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       const gripLimit = mu * loadSide
       // Back-EMF taken at the ground speed: a gripping wheel turns at it, and a spinning wheel in
       // sand is modelled by the slip branch below (its push is the floor's grip, not the motor's).
-      const motorLimit = spec.drive.maxForcePerSide * clamp(1 - Math.abs(vSide) / (spec.drive.maxSpeed * (spec.drive.noLoad ?? NO_LOAD)), MOTOR_FLOOR, 1)
+      const motorLimit = vFactor * spec.drive.maxForcePerSide * clamp(1 - Math.abs(vSide) / (spec.drive.maxSpeed * (spec.drive.noLoad ?? NO_LOAD)), MOTOR_FLOOR, 1)
       const limit = Math.min(gripLimit, motorLimit)
       let F = clamp(want, -limit, limit)
+      motorForce[s] = F
+      sideGround[s] = vSide
       if (Math.abs(want) > motorLimit && motorLimit < gripLimit) {
         // The motor stalls under load: the wheel is dragged toward the ground speed.
         wheelSpeed[s] += (vSide - wheelSpeed[s]) * 0.25
@@ -513,6 +577,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       // stands still and the encoders count nothing. Only when grip runs out does it spin
       // ahead of the robot: that is slip, and the encoders over-count.
       const slipping = Math.abs(want) > gripLimit
+      sideSlip[s] = slipping
       surfSpeed[s] = slipping ? wheelSpeed[s] : vSide
       if (slipping) slipTravel += (Math.abs(wheelSpeed[s] - vSide) * DT) / 2
       // Rolling drag works like friction: it can hold the robot still against a weak push,
@@ -530,6 +595,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       const tLimit = spec.drive.scrub * scrubMu * load * (length / 4)
       const tq = clamp((-wn * iy) / DT / 2, -tLimit, tLimit)
       robot.applyTorqueImpulse(scale(n, tq * DT), true)
+      if (target[0] !== 0 || target[1] !== 0) scrubWatts = Math.abs(tq * wn)
     }
   }
 
@@ -572,6 +638,28 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       crashed = true
       events.push({ t: time, kind: 'crash' })
     }
+  }
+
+  /** Drain (or charge) the battery for the tick that just ran. Never touches the physics directly. */
+  function stepPower(): void {
+    const supply = Math.max(battery.volts, 0.1)
+    let motors = 0
+    for (let s = 0; s < 2; s++) motors += motorAmps(motorForce[s], spec.drive.maxForcePerSide, Math.abs(wheelSpeed[s]) > 0.005)
+    // Scrubbing sideways is paid for by the motors, at about 60 % efficiency.
+    motors += scrubWatts / (supply * 0.6)
+    const load = electronicsAmps(powerParts, lightOn, holding !== null) + motors
+    let charge = 0
+    if (arena.chargers && target[0] === 0 && target[1] === 0) {
+      const p = robot.translation()
+      const v = robot.linvel()
+      if (Math.hypot(v.x, v.z) < 0.03) {
+        for (const c of arena.chargers) {
+          if (Math.hypot(p.x - c.center[0], p.z - c.center[1]) <= c.radius) charge = Math.max(charge, c.amps)
+        }
+      }
+    }
+    const ev = stepBattery(battery, load, motors, charge, DT)
+    if (ev) events.push({ t: time, kind: 'battery', text: ev })
   }
 
   const sim: Sim = {
@@ -626,6 +714,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       prevPos = p
       checkCrash()
       sampleLine()
+      stepPower()
       if (penDown) {
         const tip = local(spec.penTip[0], 0, spec.penTip[1])
         const n = trail.length
@@ -638,6 +727,8 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     setMotors(l, r) {
       target[0] = (clamp(l, -100, 100) / 100) * spec.drive.maxSpeed
       target[1] = (clamp(r, -100, 100) / 100) * spec.drive.maxSpeed
+      cmdPct[0] = clamp(l, -100, 100)
+      cmdPct[1] = clamp(r, -100, 100)
     },
     encoders() {
       return [enc[0], enc[1]]
@@ -648,6 +739,18 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     sensors() {
       if (!sensorCache) sensorCache = computeSensors()
       return sensorCache
+    },
+    battery() {
+      return battery
+    },
+    telemetry() {
+      return {
+        motorPct: [cmdPct[0], cmdPct[1]],
+        wheelSpeed: [wheelSpeed[0], wheelSpeed[1]],
+        groundSpeed: [sideGround[0], sideGround[1]],
+        slipping: [sideSlip[0], sideSlip[1]],
+        force: [motorForce[0], motorForce[1]],
+      }
     },
     snapshot() {
       const v = robot.linvel()

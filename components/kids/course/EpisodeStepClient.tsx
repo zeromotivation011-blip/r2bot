@@ -200,10 +200,12 @@ interface Props {
   watched: boolean
   onWatched: () => void
   onNext: () => void
+  /** Levels 2+ have no 3D episode file: the storybook is the episode (no Cartoon toggle). */
+  storybookOnly?: boolean
 }
 
-export default function EpisodeStepClient({ sessionId, sessionNumber, episode, watched, onWatched, onNext }: Props) {
-  const [mode, setMode] = useState<'player' | 'storyboard'>('player')
+export default function EpisodeStepClient({ sessionId, sessionNumber, episode, watched, onWatched, onNext, storybookOnly = false }: Props) {
+  const [mode, setMode] = useState<'player' | 'storyboard'>(storybookOnly ? 'storyboard' : 'player')
   const storyboard = <Storyboard episode={episode} sessionNumber={sessionNumber} onDone={onWatched} />
   return (
     <EpisodeCtx.Provider value={{ episode, sessionNumber }}>
@@ -212,6 +214,7 @@ export default function EpisodeStepClient({ sessionId, sessionNumber, episode, w
           <h2 className="mr-auto min-w-0 font-display text-xs font-bold uppercase tracking-wider text-cyan-300">
             Episode {sessionNumber} · <span className="normal-case tracking-normal">{episode.title}</span>
           </h2>
+          {!storybookOnly && (
           <div className="flex gap-1 rounded-2xl bg-white/[0.05] p-1" role="group" aria-label="How to watch">
             {(
               [
@@ -230,8 +233,9 @@ export default function EpisodeStepClient({ sessionId, sessionNumber, episode, w
               </button>
             ))}
           </div>
+          )}
         </div>
-        {mode === 'player' ? (
+        {mode === 'player' && !storybookOnly ? (
           <PlayerBoundary fallback={storyboard}>
             <EpisodePlayer sessionId={sessionId} onDone={onWatched} />
           </PlayerBoundary>

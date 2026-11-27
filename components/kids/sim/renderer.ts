@@ -15,6 +15,8 @@ import type { Arena, FloorColor, Shape2D, Surface } from '@/lib/kids/sim/arena'
 import { headingToYaw, type SensorReadings, type SimSnapshot } from '@/lib/kids/sim/engine'
 import { MODEL_SCALE } from '@/lib/kids/sim/robot-spec'
 import { createStage, prefersReducedMotion, type Stage } from '@/components/kids/three/stage'
+import { capabilitiesOf } from '@/lib/kids/robot-design'
+import { SensorView } from './sensor-view'
 
 export type CameraMode = 'follow' | 'orbit' | 'top'
 
@@ -260,6 +262,8 @@ export interface FramePoses {
   alpha: number
   sensors: SensorReadings | null
   trail: number[]
+  /** Flight Recorder ghost (roadmap #38): the best run's pose at this moment, or null to hide it. */
+  ghost?: { p: { x: number; y: number; z: number }; q: { x: number; y: number; z: number; w: number } } | null
 }
 
 export class SimRenderer {
@@ -267,6 +271,8 @@ export class SimRenderer {
   private arenaGroup = new THREE.Group()
   private robotRoot = new THREE.Group()
   private robotModel: THREE.Group | null = null
+  /** See-through copy of the robot that replays the best run (roadmap #38). */
+  private ghostModel: THREE.Group | null = null
   private bodies = new Map<string, THREE.Object3D>()
   private trailMesh: THREE.Mesh
   private trailGeo: THREE.BufferGeometry
@@ -303,6 +309,10 @@ export class SimRenderer {
   private awakeUntil = 0
   private onScreen = true
   private io: IntersectionObserver | null = null
+  /** Robot's-eye picture-in-picture (roadmap #37). */
+  private sensorView: SensorView
+  /** Draw the distance beam only for a robot that has a distance sensor (the page may pass sensors for any robot). */
+  private seesWalls = false
 
   constructor(container: HTMLElement) {
     this.stage = createStage(container, { background: '#0A1120', shadows: true, fov: 45 })
@@ -332,6 +342,14 @@ export class SimRenderer {
     this.beamDot = new THREE.Mesh(new THREE.SphereGeometry(0.012, 12, 8), new THREE.MeshBasicMaterial({ color: '#34D399' }))
     this.beamDot.visible = false
     this.stage.scene.add(this.beam, this.beamDot)
+    this.sensorView = new SensorView(
+      container,
+      this.stage,
+      this.robotRoot,
+      () => (this.robotModel ? [this.robotModel, this.beam, this.beamDot] : [this.beam, this.beamDot]),
+      () => this.wake(),
+      this.reduced,
+    )
 
     this.stage.onFrame((t, dt) => {
       this.elapsed = t
@@ -569,6 +587,8 @@ export class SimRenderer {
     })
     this.robotModel = model
     this.robotRoot.add(model)
+    this.seesWalls = capabilitiesOf(design).has('see-wall')
+    this.sensorView.setDesign(design)
     this.wake()
   }
 
@@ -582,6 +602,14 @@ export class SimRenderer {
   private draw(f: FramePoses, dt: number): void {
     const { prev, cur, alpha } = f
     this.lerpPose(this.robotRoot, prev.robot, cur.robot, alpha)
+    if (this.ghostModel) {
+      const g = f.ghost ?? null
+      this.ghostModel.visible = g !== null
+      if (g) {
+        this.ghostModel.position.set(g.p.x, g.p.y, g.p.z)
+        this.ghostModel.quaternion.set(g.q.x, g.q.y, g.q.z, g.q.w)
+      }
+    }
     if (this.prevBodies !== prev.bodies) {
       this.prevBodies = prev.bodies
       this.prevBodyIndex.clear()
@@ -614,7 +642,9 @@ export class SimRenderer {
     }
     // Distance sensor beam.
     const s = f.sensors
-    if (s && s.beam) {
+    this.sensorView.update(s, dt)
+    // With the robot's-eye view on, its 20 rays replace the single cone.
+    if (s && s.beam && this.seesWalls && !this.sensorView.isOn) {
       const from = this.v1.set(s.beam.from.x, s.beam.from.y, s.beam.from.z)
       const to = this.v2.set(s.beam.to.x, s.beam.to.y, s.beam.to.z)
       const len = from.distanceTo(to)
@@ -742,11 +772,39 @@ export class SimRenderer {
     cam.lookAt(this.camTarget)
   }
 
+  /** Show a see-through ghost of this robot (the best run), or remove it with null. Posed by FramePoses.ghost. */
+  setGhost(design: RobotDesign | null): void {
+    if (this.ghostModel) {
+      this.stage.scene.remove(this.ghostModel)
+      disposeObject(this.ghostModel)
+      this.ghostModel = null
+    }
+    if (!design) return
+    const inner = buildRobot(design)
+    inner.scale.setScalar(MODEL_SCALE)
+    inner.traverse((o) => {
+      const m = o as THREE.Mesh
+      if (!m.isMesh) return
+      m.castShadow = false
+      // One shared-look cyan glass material per mesh (disposed with the model).
+      m.material = new THREE.MeshBasicMaterial({ color: '#00E5FF', transparent: true, opacity: 0.28, depthWrite: false })
+    })
+    const root = new THREE.Group()
+    root.add(inner)
+    root.visible = false
+    root.renderOrder = 2
+    this.ghostModel = root
+    this.stage.scene.add(root)
+    this.wake()
+  }
+
   dispose(): void {
     this.frameFn = null
     this.io?.disconnect()
+    this.sensorView.dispose()
     this.controls.dispose()
     if (this.robotModel) disposeObject(this.robotModel)
+    this.setGhost(null)
     this.stage.dispose()
   }
 }

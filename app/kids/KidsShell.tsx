@@ -25,6 +25,7 @@ import './kids-shell.css'
 // nothing of it is in the first load (the sheet itself is a second chunk, fetched
 // when the phone is idle).
 const AskSpark = dynamic(() => import('@/components/kids/ai/spark/AskSparkClient'), { ssr: false })
+const RobodexToast = dynamic(() => import('@/components/kids/robodex/RobodexToastClient'), { ssr: false })
 
 /** Grown-up screens: no floating Spark button (openSpark() still works there). */
 const SPARK_HIDE_GROWNUP = ['/kids/classroom', '/kids/join', '/kids/parents', '/kids/teach', '/kids/schools']
@@ -269,6 +270,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
       {/* Pushes a progress snapshot to the teacher, only if this child joined a class. */}
       <KidsClassSync />
       <RewardToast />
+      <RobodexToast />
       {/* Inside the store app: links that leave /kids go through a parental gate. */}
       <KidsAppLinkGuard />
 

@@ -4,16 +4,17 @@
 // Everything is generated from the curriculum (teacherNotes, parent note, the
 // session's episode/build/code/challenge/check), so it can never drift from
 // what children see. Indexable: teachers search for "robotics lesson plan for
-// 5 year olds", and this is real, complete server HTML. The child's session
-// page (/kids/course/1/N) stays noindex; the two link to each other.
+// 5 year olds", and this is real, complete server HTML. All four levels
+// (lib/kids/teach/all-guides.ts). The child's session page
+// (/kids/course/<level>/N) stays noindex; the two link to each other.
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { jsonldScript } from '@/lib/seo/jsonld'
 import { authorRef } from '@/lib/author'
-import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
-import { guideFor, type TeacherGuide } from '@/lib/kids/teach/guides'
+import { levelByNumber } from '@/lib/kids/curriculum/levels'
+import { allGuideParams, anyGuideFor, isL34Guide, isLevel2Guide, type AnyTeacherGuide } from '@/lib/kids/teach/all-guides'
 import { TRAINING_TOTAL_MINUTES } from '@/lib/kids/teach/training'
 import { ShareToClassroom } from '@/components/kids/teach/ShareToClassroom'
 import { GuideActionsClient } from '@/components/kids/teach/GuideActionsClient'
@@ -26,15 +27,16 @@ const BASE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_U
 type Params = { params: Promise<{ level: string; session: string }> }
 
 export function generateStaticParams() {
-  return LEVEL1_SESSIONS.map((s) => ({ level: '1', session: String(s.number) }))
+  return allGuideParams()
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const p = await params
-  const g = guideFor(p.level, p.session)
+  const g = anyGuideFor(p.level, p.session)
   if (!g) return {}
-  const title = `Session ${g.number}: ${g.title} — Robotics Lesson Plan, Ages 5–7`
-  const description = `A ready-to-teach 40-minute robotics lesson plan: ${g.objective} Unplugged warm-up, minute-by-minute timing, discussion questions, misconceptions, differentiation and a note for families. Free, printable PDF.`
+  const lvl = levelByNumber(g.level)
+  const title = `Session ${g.number}: ${g.title} — Robotics Lesson Plan, Ages ${lvl.ages}`
+  const description = `A ready-to-teach ${g.durationMin}-minute robotics lesson plan (Level ${g.level}, ages ${lvl.ages}): ${g.objective} Unplugged warm-up, minute-by-minute timing, discussion questions, misconceptions, differentiation and a note for families. Free, printable PDF.`
   const url = `${BASE}${g.guideHref}`
   return {
     title,
@@ -51,8 +53,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   }
 }
 
-function jsonLd(g: TeacherGuide) {
+function jsonLd(g: AnyTeacherGuide) {
   const url = `${BASE}${g.guideHref}`
+  const lvl = levelByNumber(g.level)
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -64,7 +67,7 @@ function jsonLd(g: TeacherGuide) {
         url,
         inLanguage: 'en',
         learningResourceType: 'Lesson plan',
-        educationalLevel: 'Ages 5–7 (Explorers)',
+        educationalLevel: `Ages ${lvl.ages} (${lvl.name})`,
         audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
         timeRequired: `PT${g.durationMin}M`,
         teaches: g.objectives.map((o) => o.text),
@@ -72,7 +75,7 @@ function jsonLd(g: TeacherGuide) {
         isAccessibleForFree: true,
         author: authorRef(),
         publisher: { '@type': 'Organization', name: 'R2BOT', url: BASE },
-        isPartOf: { '@type': 'Course', name: 'R2BOT Kids Level 1 — Explorers', url: `${BASE}/kids/course/1` },
+        isPartOf: { '@type': 'Course', name: `R2BOT Kids Level ${g.level} — ${lvl.name}`, url: `${BASE}/kids/course/${g.level}` },
       },
       {
         '@type': 'BreadcrumbList',
@@ -91,8 +94,10 @@ const h2 = 'font-display text-xl font-bold text-white'
 
 export default async function TeacherGuidePage({ params }: Params) {
   const p = await params
-  const g = guideFor(p.level, p.session)
+  const g = anyGuideFor(p.level, p.session)
   if (!g) notFound()
+  const lvl = levelByNumber(g.level)
+  const sessionCount = lvl.sessions.length
   const total = g.timing.reduce((a, t) => a + t.minutes, 0)
 
   return (
@@ -103,7 +108,7 @@ export default async function TeacherGuidePage({ params }: Params) {
         <ol className="flex flex-wrap items-center gap-1.5">
           <li><Link href="/kids/teach" className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 hover:underline">Teacher guides</Link></li>
           <li aria-hidden>/</li>
-          <li>Level 1</li>
+          <li>Level {g.level}</li>
           <li aria-hidden>/</li>
           <li aria-current="page">Session {g.number}</li>
         </ol>
@@ -111,18 +116,18 @@ export default async function TeacherGuidePage({ params }: Params) {
 
       <header className="mt-3">
         <p className="teach-accent text-sm font-bold uppercase tracking-wider text-amber-300">
-          Teacher guide · Level 1 · Session {g.number} of 24
+          Teacher guide · Level {g.level} · Session {g.number} of {sessionCount}
         </p>
         <h1 className="mt-2 font-display text-3xl font-bold leading-tight text-white sm:text-5xl">
           {g.title}
-          <span className="block text-lg font-semibold text-slate-300 sm:text-2xl">A {g.durationMin}-minute robotics lesson plan for ages 5–7</span>
+          <span className="block text-lg font-semibold text-slate-300 sm:text-2xl">A {g.durationMin}-minute robotics lesson plan for ages {lvl.ages}</span>
         </h1>
         <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-200">{g.objective}</p>
         <ul className="mt-4 flex flex-wrap gap-2 text-sm" aria-label="At a glance">
           <li className="rounded-full bg-amber-500/15 px-3 py-1 font-semibold text-amber-200">⏱ {g.durationMin} minutes</li>
           <li className="rounded-full bg-white/[0.06] px-3 py-1 text-slate-200">{g.kind === 'project' ? 'Project session' : 'Lesson'}</li>
           {g.act && <li className="rounded-full bg-white/[0.06] px-3 py-1 text-slate-200">Act: {g.act.title} (sessions {g.act.sessions[0]}–{g.act.sessions[1]})</li>}
-          <li className="rounded-full bg-white/[0.06] px-3 py-1 text-slate-200">Explorers · ages 5–7</li>
+          <li className="rounded-full bg-white/[0.06] px-3 py-1 text-slate-200">{lvl.name} · ages {lvl.ages}</li>
         </ul>
         <div className="teach-no-print mt-6 flex flex-wrap items-center gap-3">
           <GuideActionsClient guide={g} />
@@ -195,6 +200,44 @@ export default async function TeacherGuidePage({ params }: Params) {
         </ol>
       </section>
 
+      {isLevel2Guide(g) && (
+        <section className={`${card} mt-5`} aria-labelledby="practise-h">
+          <h2 id="practise-h" className={h2}>Practise and challenge, as played today</h2>
+          <dl className="mt-3 space-y-3 text-[15px] leading-relaxed">
+            <div>
+              <dt className="font-bold text-amber-200">
+                Practice arena: <Link href={g.practise.arena.href} className="text-amber-300 hover:underline">{g.practise.arena.title}</Link>
+              </dt>
+              <dd className="text-slate-200">{g.practise.arena.task} {g.practise.arena.why}</dd>
+            </div>
+            <div>
+              <dt className="font-bold text-amber-200">
+                Challenge: <Link href={g.practise.game.href} className="text-amber-300 hover:underline">{g.practise.game.title}</Link>
+              </dt>
+              <dd className="text-slate-200">{g.practise.game.goal}</dd>
+            </div>
+          </dl>
+        </section>
+      )}
+
+      {isL34Guide(g) && (
+        <section className={`${card} mt-5`} aria-labelledby="play-h">
+          <h2 id="play-h" className={h2}>The challenge, as played today</h2>
+          <p className="mt-3 text-[15px] leading-relaxed text-slate-200">
+            {g.play.href ? <Link href={g.play.href} className="font-bold text-amber-300 hover:underline">{g.play.title}</Link> : <span className="font-bold">{g.play.title}</span>}
+            {g.play.detail ? ` — ${g.play.detail}` : ''}
+          </p>
+          {g.lookFor.length > 0 && (
+            <>
+              <h3 className="mt-4 font-bold text-emerald-300">What to look for</h3>
+              <ul className="mt-2 space-y-2 text-[15px] leading-relaxed text-slate-200">
+                {g.lookFor.map((x) => <li key={x}>{x}</li>)}
+              </ul>
+            </>
+          )}
+        </section>
+      )}
+
       <div className="mt-5 grid gap-5 md:grid-cols-2">
         <section className={card} aria-labelledby="disc-h">
           <h2 id="disc-h" className={h2}>Discussion questions</h2>
@@ -209,6 +252,9 @@ export default async function TeacherGuidePage({ params }: Params) {
               <div key={m.idea}>
                 <dt className="teach-accent font-semibold text-amber-200">“{m.idea}”</dt>
                 <dd className="mt-0.5 text-[15px] leading-relaxed text-slate-300">{m.correction}</dd>
+                {isL34Guide(g) && g.reteach.find((r) => r.idea === m.idea)?.reteach && (
+                  <dd className="mt-1 text-[15px] leading-relaxed text-cyan-200">5-minute reteach: {g.reteach.find((r) => r.idea === m.idea)?.reteach}</dd>
+                )}
               </div>
             ))}
           </dl>
@@ -271,13 +317,13 @@ export default async function TeacherGuidePage({ params }: Params) {
 
       <nav aria-label="Other sessions" className="teach-no-print mt-10 grid gap-3 sm:grid-cols-2">
         {g.prev ? (
-          <Link href={`/kids/teach/1/${g.prev.number}`} className="flex min-h-[64px] flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-amber-400/50">
+          <Link href={`/kids/teach/${g.level}/${g.prev.number}`} className="flex min-h-[64px] flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 hover:border-amber-400/50">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">← Session {g.prev.number}</span>
             <span className="font-bold text-white">{g.prev.title}</span>
           </Link>
         ) : <span />}
         {g.next && (
-          <Link href={`/kids/teach/1/${g.next.number}`} className="flex min-h-[64px] flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-right hover:border-amber-400/50">
+          <Link href={`/kids/teach/${g.level}/${g.next.number}`} className="flex min-h-[64px] flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-right hover:border-amber-400/50">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Session {g.next.number} →</span>
             <span className="font-bold text-white">{g.next.title}</span>
           </Link>

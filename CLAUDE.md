@@ -177,7 +177,10 @@ Build these exceptionally; everything else is secondary.
   hints cap a finish at 2 stars via the one `HintLadderClient`), and the **progress backup code** (`exportProgressCode`/`importProgressCode` in
   `lib/kids-progress.ts`, UI `components/kids/hangar/BackupCodeClient.tsx` in the Hangar and Settings: no personal data,
   a restore merges and never lowers progress), **Games** `/kids/play/<id>` (count them from `GAMES`, never type the
-  number; only games with a built page go in `GAMES`; the phone tab bar is five: Home · Course · Worlds · Games · Hangar),
+  number; only games with a built page go in `GAMES`; the phone tab bar is five: Home · Course · Worlds · Games · Hangar), **Course** `/kids/course/<1-4>` (all four
+levels written; level pages indexable, session pages noindex; teacher guides for every session at `/kids/teach`),
+**Robodex** `/kids/robodex` (real-robot cards earned only by doing), **Makers** `/kids/careers` (count from `MAKERS`),
+**Power Lab** `/kids/lab/power` (battery model; sim runs have a Flight Recorder),
   **Garage** `/kids/hangar` (the robot's one home: rename, robot card, Spark Trail parts fitted to the real robot;
   `/kids/my-robot` 308s there), **Parents** `/kids/parents` (public explainer; behind the parental gate a hub with the
   week in plain words and device-only controls in `lib/kids/parent-controls.ts` — daily time and quiet hours as gentle

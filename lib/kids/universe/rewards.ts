@@ -65,7 +65,7 @@ export function levelInfo(xp: number): LevelInfo {
 
 // ── Badges ─────────────────────────────────────────────────────────────────
 
-export type BadgeTrack = 'motion' | 'sensing' | 'logic' | 'control' | 'mechanics' | 'electronics' | 'ai' | 'design' | 'explorer' | 'grit'
+export type BadgeTrack = 'motion' | 'sensing' | 'logic' | 'control' | 'mechanics' | 'electronics' | 'ai' | 'design' | 'explorer' | 'grit' | 'careers'
 
 export interface UniverseBadge {
   id: string
@@ -75,6 +75,18 @@ export interface UniverseBadge {
   /** "You earned this because you can …" — said aloud. */
   earnedFor: string
 }
+
+/**
+ * Meet the Makers + Robodex badges (lib/kids/makers/careers.ts decides when they
+ * are due; lib/kids/makers/claim.ts claims them through reportActivity with the
+ * 'discovery' kind, which no quest counts and which pays 0 XP).
+ */
+export const CAREER_BADGE_LIST: (UniverseBadge & { track: 'careers' })[] = [
+  { id: 'robodex-first', name: 'Robot Spotter', icon: '🔭', track: 'careers', earnedFor: 'you discovered your first real robot for your Robodex.' },
+  { id: 'robodex-world', name: 'World Collector', icon: '🗂️', track: 'careers', earnedFor: 'you found every real robot in one world of the Robodex.' },
+  { id: 'maker-listener', name: 'Meet the Makers', icon: '👩‍🔧', track: 'careers', earnedFor: 'you heard the stories of three people who work with robots.' },
+  { id: 'career-constellation', name: 'Career Star', icon: '🌟', track: 'careers', earnedFor: 'you have every skill one robotics job uses most.' },
+]
 
 /**
  * Universe-wide badges. Curriculum sessions also award their own badges (their
@@ -107,6 +119,7 @@ export const UNIVERSE_BADGES: UniverseBadge[] = [
   { id: 'planet-hopper', name: 'Planet Hopper', icon: '🪐', track: 'explorer', earnedFor: 'you explored a new world of the Universe.' },
   { id: 'never-give-up', name: 'Never Give Up', icon: '💪', track: 'grit', earnedFor: 'you kept trying after five tries and solved it.' },
   { id: 'debugger', name: 'Bug Hunter', icon: '🐞', track: 'grit', earnedFor: 'you found and fixed a bug in your own program.' },
+  ...CAREER_BADGE_LIST,
 ]
 
 export function getBadge(id: string): UniverseBadge | undefined {
@@ -122,10 +135,10 @@ export { UNLOCKS, unlocksAtLevel, unlockUse, bestTitle, type Unlock } from './un
 export { QUEST_POOL, weekKey, isCourseOnly, sourceOf, type ActivityKind, type Quest, type QuestSource } from './quests'
 
 /**
- * Bands whose course level is playable today (Level 1 = Explorers). Keep in step
- * with PLAYABLE_LEVELS in app/kids/page.tsx when Level 2 ships.
+ * Bands whose course level is playable today. All four levels are written
+ * (Wave 2). Keep in step with PLAYABLE_LEVELS in app/kids/page.tsx.
  */
-export const COURSE_OPEN_BANDS: readonly BandId[] = ['explorers']
+export const COURSE_OPEN_BANDS: readonly BandId[] = ['explorers', 'builders', 'inventors', 'engineers']
 
 /** lib/kids course state (components/kids/course/course-state.ts COURSE_KEY), read raw so lib never imports components. */
 const COURSE_STATE_KEY = 'r2bot_kids_course_v1'
@@ -229,6 +242,7 @@ const DEFAULT_XP: Record<ActivityKind, number> = {
   project: 120,
   bugfix: 20,
   activity: 15,
+  discovery: 0,
 }
 
 export const REWARD_EVENT = 'r2bot:kids-reward'

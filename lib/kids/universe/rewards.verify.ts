@@ -207,7 +207,9 @@ async function main() {
 
   // ── hasOpenCourse ──
   const base = P.getProgress()
-  check('an engineer with no session has no open course', !R.hasOpenCourse({ ...base, band: 'engineers', sessionsDone: {} }))
+  // All four levels are playable since Wave 2: every band has an open course. (Course-only
+  // quests stay hidden for a closed course: the draw loop above checks course=false for every band.)
+  check('every band has an open course (all four levels playable)', BAND_ORDER.every((b) => R.hasOpenCourse({ ...base, band: b, sessionsDone: {} })))
   check('an explorer has an open course (Level 1 is playable)', R.hasOpenCourse({ ...base, band: 'explorers' }))
   check('a started session opens the course for any band', R.hasOpenCourse({ ...base, band: 'engineers', sessionsDone: { 'L1-S01': 2 } }))
   store.set('r2bot_kids_course_v1', JSON.stringify({ v: 1, sessions: { 'L1-S02': { step: 2, reached: 2 } } }))
@@ -258,7 +260,7 @@ async function main() {
   store.clear()
   P.saveProgress({ band: 'engineers' })
   const mine = R.currentQuests(new Date(), P.getProgress())
-  check('an engineer never gets a course-only quest without a course', !mine.some(Q.isCourseOnly))
+  check('an engineer gets the course-open draw (Level 4 is playable)', mine.map((q) => q.id).join() === Q.drawQuests(new Date(), { band: 'engineers', courseOpen: true }).map((q) => q.id).join())
   const gq = mine.find((q) => q.kind === 'activity' && (!q.sources || q.sources.includes('galaxy')) && !q.minStars)
   if (gq) {
     const acts = galaxyFor('engineers', gq.idPrefixes).slice(0, gq.target)

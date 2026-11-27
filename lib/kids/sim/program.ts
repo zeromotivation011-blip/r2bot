@@ -9,7 +9,7 @@
 
 import { CAPABILITY_NEEDS, capabilitiesOf, type Capability, type RobotDesign } from '../robot-design'
 
-export type SensorId = 'distance_cm' | 'line_seen' | 'line_offset' | 'floor_color' | 'bumped' | 'heading_deg' | 'timer_s'
+export type SensorId = 'distance_cm' | 'line_seen' | 'line_offset' | 'floor_color' | 'bumped' | 'heading_deg' | 'timer_s' | 'battery_pct'
 
 export type Expr =
   | { k: 'number'; v: number }
@@ -53,6 +53,7 @@ export const SENSOR_NEEDS: Record<SensorId, Capability | null> = {
   bumped: 'feel-bump',
   heading_deg: null, // gyro is built in
   timer_s: null,
+  battery_pct: null, // every robot can read its own battery (roadmap #39)
 }
 
 export const STMT_NEEDS: Partial<Record<StmtOp, Capability>> = {

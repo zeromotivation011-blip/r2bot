@@ -13,13 +13,18 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { capabilitiesOf, type RobotDesign } from '@/lib/kids/robot-design'
-import { DT, type SensorReadings, type SimSnapshot } from '@/lib/kids/sim/engine'
+import { DT, type SensorReadings, type SimEvent, type SimSnapshot } from '@/lib/kids/sim/engine'
 import type { Demo } from '@/lib/kids/sim/demos'
 import type { Program } from '@/lib/kids/sim/program'
 import { loadRapier, type Rapier } from '@/lib/kids/sim/rapier'
 import { createRun, type Run, type RunResult } from '@/lib/kids/sim/run'
+import { beatsGhost, FlightRecorder, framesAround, ghostPose, makeGhost, type FlightFrame, type Ghost, type SensorParts } from '@/lib/kids/sim/recorder'
+import { loadGhost, saveGhost } from '@/lib/kids/sim/ghost-store'
 import { playSound } from '@/lib/kids-audio'
+import { kidsReducedMotion } from '@/lib/kids/settings'
+import BatteryBarClient from './BatteryBarClient'
 import BlocklyEditor, { type BlocklyEditorHandle } from './BlocklyEditorClient'
+import FlightRecorderClient, { RecorderTimelineClient, type GhostNews } from './FlightRecorderClient'
 import type { CameraMode, SimRenderer } from './renderer'
 import SensorPanel from './SensorPanel'
 
@@ -41,6 +46,13 @@ export interface WorkbenchLiveState {
   snap: SimSnapshot | null
   wheelTravel: number
   travelled: number
+  /** Battery (roadmap #39). */
+  battery?: { soc: number; volts: number; amps: number; flat: boolean; charging: boolean; coupled: boolean }
+}
+
+/** Which sensors the Flight Recorder graphs, from the robot's parts. */
+function sensorParts(caps: Set<string>): SensorParts {
+  return { distance: caps.has('see-wall'), line: caps.has('follow-line'), bump: caps.has('feel-bump') }
 }
 
 export default function SimWorkbenchClient({ demo, design, starter }: Props) {
@@ -80,6 +92,34 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
   const caps = useMemo(() => capabilitiesOf(design), [design])
   const capsRef = useRef(caps)
   capsRef.current = caps
+  const parts = useMemo(() => sensorParts(caps as Set<string>), [caps])
+  const partsRef = useRef(parts)
+  partsRef.current = parts
+
+  // ── Flight Recorder (roadmap #38): every run is recorded; after it, scrub or replay it ──
+  const recRef = useRef(new FlightRecorder())
+  const [frames, setFrames] = useState<FlightFrame[]>([])
+  const [recEvents, setRecEvents] = useState<SimEvent[]>([])
+  /** 'replay' = the view shows the recording at replayT instead of the live sim. */
+  const modeRef = useRef<'live' | 'replay'>('live')
+  const replayTRef = useRef(0)
+  const [replayT, setReplayT] = useState(0)
+  const replayingRef = useRef(false)
+  const [replaying, setReplaying] = useState(false)
+  const framesRef = useRef<FlightFrame[]>([])
+  const trailCacheRef = useRef<{ len: number; arr: number[] }>({ len: -1, arr: [] })
+  const [ghost, setGhost] = useState<Ghost | null>(null)
+  const ghostRef = useRef<Ghost | null>(null)
+  const [ghostOn, setGhostOn] = useState(true)
+  const ghostOnRef = useRef(true)
+  const [ghostNews, setGhostNews] = useState<GhostNews | null>(null)
+
+  const publishFrames = useCallback(() => {
+    const f = recRef.current.frames()
+    framesRef.current = f
+    setFrames(f)
+    setRecEvents(recRef.current.events.slice())
+  }, [])
 
   const setPhase = useCallback((p: Phase) => {
     phaseRef.current = p
@@ -96,6 +136,10 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       snap: run.sim.snapshot(),
       wheelTravel: run.sim.wheelTravel,
       travelled: run.sim.travelled,
+      battery: (() => {
+        const b = run.sim.battery()
+        return { soc: b.soc, volts: b.volts, amps: b.amps, flat: b.flat, charging: b.charging, coupled: b.coupled }
+      })(),
     })
   }, [])
 
@@ -111,6 +155,15 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       prevRef.current = s
       curRef.current = s
       accRef.current = 0
+      recRef.current.clear()
+      recRef.current.record(run.sim, partsRef.current, null, true)
+      modeRef.current = 'live'
+      replayingRef.current = false
+      setReplaying(false)
+      replayTRef.current = 0
+      setReplayT(0)
+      setGhostNews(null)
+      publishFrames()
       eventsSeenRef.current = 0
       activeRef.current = null
       editorRef.current?.highlight(null)
@@ -121,7 +174,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       rendererRef.current?.wake()
       return run
     },
-    [publishLive],
+    [publishLive, publishFrames],
   )
 
   // ── Load the engine and the renderer once ────────────────────────────────
@@ -137,6 +190,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
         rendererRef.current = renderer
         renderer.setArena(demoRef.current.arena)
         renderer.setRobot(designRef.current)
+        if (ghostRef.current) renderer.setGhost(designRef.current)
         renderer.onFrame((dt) => frame(dt))
         resetRun()
         setReady(true)
@@ -154,9 +208,40 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- created once; demo/design changes are handled below
   }, [])
 
+  /** The ghost's pose at robot time t, when it is switched on. */
+  function ghostAt(t: number) {
+    const g = ghostRef.current
+    return g && ghostOnRef.current ? ghostPose(g, t) : null
+  }
+
   function frame(dt: number) {
     const run = runRef.current
     if (!run || !curRef.current || !prevRef.current) return null
+    if (modeRef.current === 'replay') {
+      const fr = framesRef.current
+      if (replayingRef.current && fr.length > 1) {
+        const end = fr[fr.length - 1].t
+        let nt = replayTRef.current + dt * speedRef.current
+        if (nt >= end) {
+          nt = end
+          replayingRef.current = false
+          setReplaying(false)
+          rendererRef.current?.setLive(false)
+        }
+        replayTRef.current = nt
+        panelClockRef.current += dt
+        if (panelClockRef.current >= 1 / PANEL_HZ || !replayingRef.current) {
+          panelClockRef.current = 0
+          setReplayT(nt)
+        }
+      }
+      const around = framesAround(fr, replayTRef.current)
+      if (around) {
+        const tc = trailCacheRef.current
+        if (tc.len !== around.a.trailLen) trailCacheRef.current = { len: around.a.trailLen, arr: run.sim.trail.slice(0, around.a.trailLen) }
+        return { prev: around.a.snap, cur: around.b.snap, alpha: around.alpha, sensors: null, trail: trailCacheRef.current.arr, ghost: ghostAt(replayTRef.current) }
+      }
+    }
     if (phaseRef.current === 'running') {
       accRef.current += dt * speedRef.current
       const n = Math.min(MAX_TICKS_PER_FRAME, Math.floor(accRef.current / DT))
@@ -164,6 +249,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       for (let i = 0; i < n && run.status !== 'done'; i++) {
         if (i === n - 1) prevRef.current = run.sim.snapshot()
         run.tick()
+        recRef.current.record(run.sim, partsRef.current, run.interp?.ctx.active ?? null, run.result !== null)
         accRef.current -= DT
       }
       if (n > 0) curRef.current = run.sim.snapshot()
@@ -174,14 +260,18 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
     panelClockRef.current += dt
     if (panelClockRef.current >= 1 / PANEL_HZ) {
       panelClockRef.current = 0
-      if (phaseRef.current === 'running') publishLive()
+      if (phaseRef.current === 'running') {
+        publishLive()
+        publishFrames()
+      }
     }
     return {
       prev: prevRef.current,
       cur: curRef.current,
       alpha: phaseRef.current === 'running' ? Math.min(1, accRef.current / DT) : 1,
-      sensors: capsRef.current.has('see-wall') ? run.sim.sensors() : null,
+      sensors: run.sim.sensors(), // always: the robot's-eye view needs line/colour/bump too; the renderer draws the beam only for robots that see walls
       trail: run.sim.trail,
+      ghost: phaseRef.current === 'ready' ? ghostAt(0) : ghostAt(run.sim.time),
     }
   }
 
@@ -201,6 +291,9 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       else if (e.kind === 'grab') setBubble('Got it!')
       else if (e.kind === 'miss') setBubble('Missed — nothing in my claw’s reach.')
       else if (e.kind === 'stalled' && e.text) setBubble(e.text)
+      else if (e.kind === 'battery' && e.text === 'flat') setBubble('My battery is flat…')
+      else if (e.kind === 'battery' && e.text === 'low') setBubble('Battery low!')
+      else if (e.kind === 'battery' && e.text === 'charging') setBubble('⚡ Charging…')
     }
     eventsSeenRef.current = ev.length
     if (run.status === 'done') {
@@ -210,16 +303,77 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       setResult(run.result)
       setNowDoing(null)
       publishLive()
+      finishRecording(run)
       if (run.result?.success) playSound('correct')
       else if (run.result) playSound('wrong')
     }
   }
+
+  /** The run ended: freeze the recording, open it at the end, and keep a new best as the ghost. */
+  function finishRecording(run: Run) {
+    publishFrames()
+    const fr = framesRef.current
+    const end = fr.length > 0 ? fr[fr.length - 1].t : 0
+    modeRef.current = 'replay'
+    replayTRef.current = end
+    setReplayT(end)
+    const res = run.result
+    if (!res || res.reason === 'missing-part') return
+    const old = ghostRef.current
+    if (beatsGhost(res, old)) {
+      const d = designRef.current
+      const g = makeGhost(demoRef.current.arena.id, fr, res.time, `${d.body}/${d.drive}/${d.head}`)
+      if (g) {
+        saveGhost(g)
+        ghostRef.current = g
+        setGhost(g)
+        rendererRef.current?.setGhost(d)
+        setGhostNews(old ? { kind: 'new-best', delta: old.time - res.time } : { kind: 'first' })
+      }
+    } else if (old && res.success) setGhostNews({ kind: 'behind', delta: res.time - old.time })
+  }
+
+  const onSeek = useCallback((t: number) => {
+    if (phaseRef.current === 'running' || framesRef.current.length < 2) return
+    modeRef.current = 'replay'
+    replayingRef.current = false
+    setReplaying(false)
+    replayTRef.current = t
+    setReplayT(t)
+    rendererRef.current?.wake(0.5)
+  }, [])
+
+  const onReplay = useCallback(() => {
+    const fr = framesRef.current
+    if (phaseRef.current === 'running' || fr.length < 2) return
+    modeRef.current = 'replay'
+    if (replayingRef.current) {
+      replayingRef.current = false
+      setReplaying(false)
+      rendererRef.current?.setLive(false)
+      return
+    }
+    if (replayTRef.current >= fr[fr.length - 1].t - 0.01) replayTRef.current = 0
+    replayingRef.current = true
+    setReplaying(true)
+    rendererRef.current?.setLive(true)
+  }, [])
+
+  const onGhostToggle = useCallback(() => {
+    ghostOnRef.current = !ghostOnRef.current
+    setGhostOn(ghostOnRef.current)
+    rendererRef.current?.wake(0.5)
+  }, [])
 
   // ── Demo or robot changed: rebuild the scene and the run ─────────────────
   useEffect(() => {
     const r = rendererRef.current
     if (!r) return
     r.setArena(demo.arena)
+    const g = loadGhost(demo.arena.id)
+    ghostRef.current = g
+    setGhost(g)
+    r.setGhost(g ? designRef.current : null)
     setPhase('ready')
     resetRun()
   }, [demo, resetRun, setPhase])
@@ -233,6 +387,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
     const wasRunning = sameDemo && (phaseRef.current === 'running' || phaseRef.current === 'paused')
     const last = sameDemo ? resultRef.current : null
     r.setRobot(design)
+    if (ghostRef.current) r.setGhost(design)
     setPhase('ready')
     resetRun()
     // Swapping a part ends the run; say so, and keep the last result the child may have been reading.
@@ -265,8 +420,9 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
     if (phaseRef.current === 'running') {
       setPhase('paused')
       publishLive()
+      publishFrames()
     } else if (phaseRef.current === 'paused') setPhase('running')
-  }, [publishLive, setPhase])
+  }, [publishFrames, publishLive, setPhase])
 
   const onStep = useCallback(() => {
     const run = runRef.current
@@ -284,17 +440,20 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
     const r = runRef.current
     if (!r) return
     // One step = 6 fixed ticks (0.1 s of robot time) so a child can see it move.
+    modeRef.current = 'live'
     for (let i = 0; i < 6 && r.status !== 'done'; i++) {
       prevRef.current = r.sim.snapshot()
       r.tick()
+      recRef.current.record(r.sim, partsRef.current, r.interp?.ctx.active ?? null, r.result !== null)
       curRef.current = r.sim.snapshot()
     }
     prevRef.current = curRef.current
     afterTicks(r)
     if (r.status !== 'done') setPhase('paused')
     publishLive()
+    publishFrames()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- afterTicks reads refs only
-  }, [publishLive, resetRun, setPhase])
+  }, [publishLive, publishFrames, resetRun, setPhase])
 
   const onReset = useCallback(() => {
     setPhase('ready')
@@ -312,6 +471,15 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
   }
 
   const running = phase === 'running'
+  const hasRecording = frames.length > 1
+  const recordEnd = frames.length > 0 ? frames[frames.length - 1].t : 0
+  /** Replaying or scrubbed back: the result card steps aside so the robot is visible. */
+  const rewound = !running && hasRecording && (replaying || replayT < recordEnd - 0.05)
+  const recorderT = running ? (frames.length > 0 ? frames[frames.length - 1].t : 0) : replayT
+  const showView = () => {
+    const reduce = kidsReducedMotion()
+    viewRef.current?.parentElement?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+  }
 
   /** The phone's Run button under the editor: bring the robot into view, then go. */
   const onRunFromEditor = () => {
@@ -358,12 +526,17 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
               </button>
             ))}
           </div>
+          {live.battery && (
+            <div className="absolute right-3 top-[64px]">
+              <BatteryBarClient {...live.battery} />
+            </div>
+          )}
           {nowDoing && (running || phase === 'paused') && (
             <div className="pointer-events-none absolute bottom-3 left-3 max-w-[85%] truncate rounded-xl bg-black/55 px-3 py-1.5 text-xs font-black text-amber-200 backdrop-blur" aria-hidden>
               ▶ {nowDoing}
             </div>
           )}
-          {result && (
+          {result && !rewound && (
             <div
               role="status"
               data-testid="sim-result"
@@ -429,6 +602,40 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
             ))}
           </div>
         </div>
+        {hasRecording && (
+          <RecorderTimelineClient
+            frames={frames}
+            events={recEvents}
+            result={result}
+            t={recorderT}
+            onSeek={onSeek}
+            replaying={replaying}
+            onReplay={onReplay}
+            live={running}
+          />
+        )}
+      </div>
+
+      {/* ── Flight Recorder (roadmap #38): right under the robot on a phone once there is a run; full width on desktop ── */}
+      <div className={`min-w-0 lg:col-span-2 lg:row-start-3 ${hasRecording ? '' : 'hidden lg:block'}`}>
+        <FlightRecorderClient
+          frames={hasRecording ? frames : []}
+          events={recEvents}
+          result={result}
+          parts={parts}
+          t={recorderT}
+          onSeek={onSeek}
+          onShowView={showView}
+          replaying={replaying}
+          onReplay={onReplay}
+          live={running}
+          ghost={ghost}
+          ghostOn={ghostOn}
+          onGhostToggle={onGhostToggle}
+          ghostNews={ghostNews}
+          batteryCoupled={demo.arena.battery !== undefined}
+          drainScale={demo.arena.battery?.drainScale ?? 1}
+        />
       </div>
 
       {/* ── Block editor ────────────────────────────────────────────────── */}

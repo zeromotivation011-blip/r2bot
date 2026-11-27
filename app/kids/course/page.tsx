@@ -1,7 +1,7 @@
 // app/kids/course/page.tsx — the R2BOT Kids course: four planets, one per
 // curriculum level and age band. Server-rendered and indexable: what each
-// level teaches, its story season and where it leads. Level 1 is playable;
-// Levels 2–4 are honest about arriving soon.
+// level teaches, its story season and where it leads. All four levels are
+// written in full and playable (Wave 2); PLAYABLE is the switch.
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -15,7 +15,7 @@ export const runtime = 'nodejs'
 const BASE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in'
 
 /** Levels whose 24 sessions are written in full and playable. */
-const PLAYABLE = new Set([1])
+const PLAYABLE = new Set([1, 2, 3, 4])
 
 const TITLE = 'Robotics Course for Kids (Ages 5–17): Four Levels, One Robot'
 const DESCRIPTION =

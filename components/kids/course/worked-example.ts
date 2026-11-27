@@ -117,6 +117,11 @@ function sameNum(a: unknown, b: number): boolean {
   return typeof a === 'number' ? a === b : Number(a) === b
 }
 
+/** Shorter argument text for a picture block: `variable_get(x)` → `x`, `math(a + b)` → `(a + b)`. */
+function shortArg(a: string): string {
+  return a.replace(/variable_get\(\s*([^()]+?)\s*\)/g, '$1').replace(/\bmath\(/g, '(').replace(/\s+/g, ' ').trim()
+}
+
 function toBlock(st: Stmt, palette: PaletteBlock[]): ExampleBlock {
   const ops = palette.filter((b) => b.op === st.name)
   let text = st.name.replace(/_/g, ' ')
@@ -172,11 +177,14 @@ function toBlock(st: Stmt, palette: PaletteBlock[]): ExampleBlock {
       const cond = (st.args[0] ?? '').replace(/\s+/g, ' ').trim()
       const b = ops.find((x) => String(x.fixed.cond ?? '').replace(/\s+/g, ' ') === cond) ?? ops[0]
       pick(b)
+      // Levels 2–4 write conditions the picture palette has no block for: show the condition itself.
+      if (!b && cond) text = `${st.name === 'if' ? 'If' : 'Repeat until'} ${shortArg(cond)}`
       container = true
       break
     }
     default:
       pick(ops[0])
+      if (!ops[0] && st.args.length) text = `${st.name.replace(/_/g, ' ')} (${st.args.map(shortArg).join(', ')})`
   }
   return { text, icon, container, ...(st.note ? { note: st.note } : {}), ...(st.children ? { children: st.children.map((c) => toBlock(c, palette)) } : {}) }
 }

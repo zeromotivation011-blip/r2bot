@@ -25,6 +25,9 @@ import { EPISODES as KIDS_EPISODES } from '@/lib/kids/stories';
 import { GAMES as KIDS_GAMES, WORLDS as KIDS_WORLDS } from '@/lib/kids/universe/worlds';
 import { TRACKS as KIDS_TRACKS } from '@/lib/kids/activities/types';
 import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1';
+import { LEVEL2_SESSIONS } from '@/lib/kids/curriculum/level2';
+import { guideParamsL34 } from '@/lib/kids/curriculum/level3/teacher-guide';
+import { MAKERS as KIDS_MAKERS } from '@/lib/kids/makers/makers';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -189,7 +192,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/kids/parents`, lastModified: at('/kids/parents'), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE}/kids/activities`, lastModified: at('/kids/activities'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/course`, lastModified: at('/kids/course'), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${BASE}/kids/course/1`, lastModified: at('/kids/course/1'), changeFrequency: 'monthly' as const, priority: 0.8 },
+    // Every course level is written in full and indexable (app/kids/course/[level]/page.tsx PLAYABLE).
+    ...[1, 2, 3, 4].map((n) => ({ url: `${BASE}/kids/course/${n}`, lastModified: at(`/kids/course/${n}`), changeFrequency: 'monthly' as const, priority: 0.8 })),
+    { url: `${BASE}/kids/robodex`, lastModified: at('/kids/robodex'), changeFrequency: 'monthly' as const, priority: 0.6 },
+    { url: `${BASE}/kids/careers`, lastModified: at('/kids/careers'), changeFrequency: 'monthly' as const, priority: 0.6 },
+    ...KIDS_MAKERS.map((m) => ({ url: `${BASE}/kids/careers/${m.id}`, lastModified: GROUP_UPDATED.kidsMakers, changeFrequency: 'monthly' as const, priority: 0.5 })),
+    { url: `${BASE}/kids/lab/power`, lastModified: at('/kids/lab/power'), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE}/kids/hangar`, lastModified: at('/kids/hangar'), changeFrequency: 'monthly' as const, priority: 0.5 },
     { url: `${BASE}/kids/play`, lastModified: at('/kids/play'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/galaxy`, lastModified: at('/kids/galaxy'), changeFrequency: 'monthly' as const, priority: 0.7 },
@@ -213,6 +221,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/kids/teach`, lastModified: at('/kids/teach'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/teach/training`, lastModified: at('/kids/teach/training'), changeFrequency: 'monthly' as const, priority: 0.5 },
     ...LEVEL1_SESSIONS.map((s) => ({ url: `${BASE}/kids/teach/1/${s.number}`, lastModified: at('/kids/teach'), changeFrequency: 'monthly' as const, priority: 0.6 })),
+    ...LEVEL2_SESSIONS.map((s) => ({ url: `${BASE}/kids/teach/2/${s.number}`, lastModified: GROUP_UPDATED.kidsTeachL2, changeFrequency: 'monthly' as const, priority: 0.6 })),
+    ...guideParamsL34().map((g) => ({ url: `${BASE}/kids/teach/${g.level}/${g.session}`, lastModified: GROUP_UPDATED.kidsTeachL34, changeFrequency: 'monthly' as const, priority: 0.6 })),
     { url: `${BASE}/india`, lastModified: at('/india'), changeFrequency: 'monthly' as const, priority: 0.75 },
     { url: `${BASE}/teachers`, lastModified: at('/teachers'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/robots/compare`, lastModified: at('/robots/compare'), changeFrequency: 'monthly' as const, priority: 0.7 },

@@ -26,7 +26,7 @@ export interface BWorkspace {
 
 export const HAT = 'when_run'
 
-export const SENSOR_IDS: SensorId[] = ['distance_cm', 'line_seen', 'line_offset', 'floor_color', 'bumped', 'heading_deg', 'timer_s']
+export const SENSOR_IDS: SensorId[] = ['distance_cm', 'line_seen', 'line_offset', 'floor_color', 'bumped', 'heading_deg', 'timer_s', 'battery_pct']
 const SIMPLE_STMTS = ['stop', 'grip_open', 'grip_close', 'pen_down', 'pen_up', 'light_on', 'light_off', 'beep'] as const
 
 // ── Program → Blockly ─────────────────────────────────────────────────────

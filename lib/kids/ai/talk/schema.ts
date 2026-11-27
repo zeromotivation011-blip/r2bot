@@ -16,7 +16,7 @@ export const MAX_STMTS = 40
 export const MAX_DEPTH = 4
 const MAX_EXPR_DEPTH = 4
 
-const SENSORS: SensorId[] = ['distance_cm', 'line_seen', 'line_offset', 'floor_color', 'bumped', 'heading_deg', 'timer_s']
+const SENSORS: SensorId[] = ['distance_cm', 'line_seen', 'line_offset', 'floor_color', 'bumped', 'heading_deg', 'timer_s', 'battery_pct']
 const COLORS = ['white', 'black', 'red', 'green', 'blue', 'yellow']
 const SIMPLE = ['stop', 'grip_open', 'grip_close', 'pen_down', 'pen_up', 'light_on', 'light_off', 'beep'] as const
 

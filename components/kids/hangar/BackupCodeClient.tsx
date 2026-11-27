@@ -117,7 +117,9 @@ export function BackupCodeClient({ headingLevel = 2 }: { headingLevel?: 2 | 3 })
     setMaking(true)
     setCopied(false)
     try {
-      const c = await exportProgressCode({ extras: { robot: encodeDesign(loadDesign()), looks: looksExtra() } })
+      // The Robodex collection rides along (loaded on demand: the card catalogue stays out of this page's first load).
+      const { robodexBackupExtra } = await import('@/lib/kids/robodex/store')
+      const c = await exportProgressCode({ extras: { robot: encodeDesign(loadDesign()), looks: looksExtra(), robodex: robodexBackupExtra() } })
       setCode(c)
     } finally {
       setMaking(false)
@@ -188,6 +190,10 @@ export function BackupCodeClient({ headingLevel = 2 }: { headingLevel?: 2 | 3 })
       }
       const robot = restoreRobot(r.extras.robot)
       restoreLooks(r.extras.looks)
+      if (r.extras.robodex) {
+        const { restoreRobodexExtra } = await import('@/lib/kids/robodex/store')
+        restoreRobodexExtra(r.extras.robodex)
+      }
       playSound('correct')
       setStatus({ kind: 'ok', text: successLine(r, robot) })
       setPasted('')

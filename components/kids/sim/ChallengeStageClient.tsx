@@ -12,16 +12,39 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { capabilitiesOf, type RobotDesign } from '@/lib/kids/robot-design'
-import { DT, type SimSnapshot } from '@/lib/kids/sim/engine'
+import { DT, type SimEvent, type SimSnapshot } from '@/lib/kids/sim/engine'
 import { createChallengeRun, judgeChallengeRun, startPoses, type Challenge, type ChallengeResult, type ChallengeRun, type PicNode } from '@/lib/kids/sim/challenge'
 import type { Program } from '@/lib/kids/sim/program'
 import { loadRapier, type Rapier } from '@/lib/kids/sim/rapier'
+import { beatsGhost, FlightRecorder, framesAround, ghostPose, makeGhost, type FlightFrame, type Ghost } from '@/lib/kids/sim/recorder'
+import { loadGhost, saveGhost } from '@/lib/kids/sim/ghost-store'
 import { playSound } from '@/lib/kids-audio'
 import type { CameraMode, SimRenderer } from './renderer'
 
 const MAX_TICKS_PER_FRAME = 8
 /** Pause between two start poses, real seconds. */
 const BETWEEN_STARTS = 0.8
+
+/** What the Flight Recorder (roadmap #38) shows for a challenge run. */
+export interface StageRecording {
+  frames: FlightFrame[]
+  events: SimEvent[]
+  /** Still driving (graphs grow) or finished (scrub and replay). */
+  live: boolean
+  ghost: Ghost | null
+  /** Set once, when a finished run became the new ghost (seconds faster; 0 = first ghost), or trailed it. */
+  ghostNews?: { kind: 'new-best' | 'first' | 'behind'; delta?: number }
+}
+
+/** Replay request from the page: show the recording at `t`, playing or still. null = the live robot. */
+export interface StageReplay {
+  t: number
+  playing: boolean
+  /** A new nonce re-applies the request even if t and playing did not change. */
+  nonce: number
+}
+
+const RECORD_PUBLISH_HZ = 10
 
 export interface StageRunRequest {
   nonce: number
@@ -43,9 +66,31 @@ interface Props {
   onDone: (result: ChallengeResult) => void
   onReady: () => void
   onStart: (index: number, total: number) => void
+  /** Flight Recorder: called ~10×/s while driving and once at the end. */
+  onRecording?: (rec: StageRecording) => void
+  replay?: StageReplay | null
+  /** The replay clock moved (about 10×/s while playing, and when it reaches the end). */
+  onReplayT?: (t: number, playing: boolean) => void
+  ghostOn?: boolean
 }
 
-export default function ChallengeStageClient({ challenge, design, run, resetNonce, speed, camera, onActive, onBubble, onDone, onReady, onStart }: Props) {
+export default function ChallengeStageClient({
+  challenge,
+  design,
+  run,
+  resetNonce,
+  speed,
+  camera,
+  onActive,
+  onBubble,
+  onDone,
+  onReady,
+  onStart,
+  onRecording,
+  replay = null,
+  onReplayT,
+  ghostOn = true,
+}: Props) {
   const viewRef = useRef<HTMLDivElement>(null)
   const rendererRef = useRef<SimRenderer | null>(null)
   const rapierRef = useRef<Rapier | null>(null)
@@ -65,8 +110,17 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
   chRef.current = challenge
   const designRef = useRef(design)
   designRef.current = design
-  const cb = useRef({ onActive, onBubble, onDone, onReady, onStart })
-  cb.current = { onActive, onBubble, onDone, onReady, onStart }
+  const cb = useRef({ onActive, onBubble, onDone, onReady, onStart, onRecording, onReplayT })
+  cb.current = { onActive, onBubble, onDone, onReady, onStart, onRecording, onReplayT }
+  // ── Flight Recorder ──
+  const recRef = useRef(new FlightRecorder())
+  const recClockRef = useRef(0)
+  const replayRef = useRef<StageReplay | null>(replay)
+  const trailCacheRef = useRef<{ len: number; arr: number[] }>({ len: -1, arr: [] })
+  const ghostRef = useRef<Ghost | null>(null)
+  const ghostOnRef = useRef(ghostOn)
+  ghostOnRef.current = ghostOn
+  const ghostKey = (c: Challenge) => `challenge:${c.id}`
   const [failed, setFailed] = useState<string | null>(null)
   const [ready, setReady] = useState(false)
 
@@ -77,6 +131,8 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
     runRef.current?.run.sim.dispose()
     const cr = createChallengeRun(R, chRef.current, designRef.current, program, i)
     runRef.current = cr
+    recRef.current.clear()
+    recRef.current.record(cr.run.sim, partsOf(), null, true)
     const s = cr.run.sim.snapshot()
     prevRef.current = s
     curRef.current = s
@@ -85,6 +141,20 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
     activeRef.current = null
     rendererRef.current?.wake()
     return cr
+  }
+
+  function partsOf() {
+    const caps = capabilitiesOf(designRef.current)
+    return { distance: caps.has('see-wall'), line: caps.has('follow-line'), bump: caps.has('feel-bump') }
+  }
+
+  function publishRecording(live: boolean, ghostNews?: StageRecording['ghostNews']) {
+    cb.current.onRecording?.({ frames: recRef.current.frames(), events: recRef.current.events.slice(), live, ghost: ghostRef.current, ghostNews })
+  }
+
+  function ghostAt(t: number) {
+    const g = ghostRef.current
+    return g && ghostOnRef.current ? ghostPose(g, t) : null
   }
 
   function setLive(live: boolean) {
@@ -106,6 +176,8 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
         renderer.setArena(chRef.current.arena)
         renderer.setRobot(designRef.current)
         renderer.setCameraMode(camera)
+        ghostRef.current = loadGhost(ghostKey(chRef.current))
+        if (ghostRef.current) renderer.setGhost(designRef.current)
         renderer.onFrame((dt) => frame(dt))
         place(0, { body: [] })
         setReady(true)
@@ -127,6 +199,28 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
   function frame(dt: number) {
     const cr = runRef.current
     if (!cr || !curRef.current || !prevRef.current) return null
+    const rp = replayRef.current
+    if (!liveRef.current && rp) {
+      const fr = recRef.current.frames()
+      if (rp.playing && fr.length > 1) {
+        const end = fr[fr.length - 1].t
+        rp.t = Math.min(end, rp.t + dt * speedRef.current)
+        recClockRef.current += dt
+        if (rp.t >= end) {
+          rp.playing = false
+          rendererRef.current?.setLive(false)
+          cb.current.onReplayT?.(rp.t, false)
+        } else if (recClockRef.current >= 1 / RECORD_PUBLISH_HZ) {
+          recClockRef.current = 0
+          cb.current.onReplayT?.(rp.t, true)
+        }
+      }
+      const around = framesAround(fr, rp.t)
+      if (around) {
+        if (trailCacheRef.current.len !== around.a.trailLen) trailCacheRef.current = { len: around.a.trailLen, arr: cr.run.sim.trail.slice(0, around.a.trailLen) }
+        return { prev: around.a.snap, cur: around.b.snap, alpha: around.alpha, sensors: null, trail: trailCacheRef.current.arr, ghost: ghostAt(rp.t) }
+      }
+    }
     if (liveRef.current) {
       if (waitRef.current > 0) {
         // Between two start poses: hold the last frame for a moment.
@@ -144,7 +238,13 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
         for (let i = 0; i < n && !cr.done; i++) {
           if (i === n - 1) prevRef.current = cr.run.sim.snapshot()
           cr.tick()
+          recRef.current.record(cr.run.sim, partsOf(), cr.run.interp?.ctx.active ?? null, cr.done)
           accRef.current -= DT
+        }
+        recClockRef.current += dt
+        if (recClockRef.current >= 1 / RECORD_PUBLISH_HZ) {
+          recClockRef.current = 0
+          publishRecording(true)
         }
         if (n > 0) curRef.current = cr.run.sim.snapshot()
         if (n === MAX_TICKS_PER_FRAME) accRef.current = Math.min(accRef.current, DT)
@@ -155,8 +255,9 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
       prev: prevRef.current,
       cur: curRef.current,
       alpha: liveRef.current ? Math.min(1, accRef.current / DT) : 1,
-      sensors: capabilitiesOf(designRef.current).has('see-wall') ? cr.run.sim.sensors() : null,
+      sensors: cr.run.sim.sensors(), // always (robot's-eye view); the renderer gates the beam on see-wall
       trail: cr.run.sim.trail,
+      ghost: liveRef.current ? ghostAt(cr.run.sim.time) : null,
     }
   }
 
@@ -196,6 +297,22 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
     setLive(false)
     activeRef.current = null
     cb.current.onActive(null)
+    // Keep a faster success as the ghost (single-start challenges: a ghost shows one route).
+    let news: StageRecording['ghostNews']
+    if (startPoses(chRef.current).length === 1 && res.reason !== 'missing-part') {
+      const old = ghostRef.current
+      if (beatsGhost(res, old)) {
+        const d = designRef.current
+        const g = makeGhost(ghostKey(chRef.current), recRef.current.frames(), res.time, `${d.body}/${d.drive}/${d.head}`)
+        if (g) {
+          saveGhost(g)
+          ghostRef.current = g
+          rendererRef.current?.setGhost(d)
+          news = old ? { kind: 'new-best', delta: old.time - res.time } : { kind: 'first' }
+        }
+      } else if (old && res.success) news = { kind: 'behind', delta: res.time - old.time }
+    }
+    publishRecording(false, news)
     cb.current.onDone(res)
   }
 
@@ -203,6 +320,7 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
   useEffect(() => {
     if (!run || !ready) return
     reqRef.current = run
+    replayRef.current = null
     startRef.current = 0
     waitRef.current = 0
     const cr = place(0, run.program)
@@ -224,6 +342,9 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
     if (!r || !ready) return
     r.setArena(challenge.arena)
     r.setRobot(design)
+    ghostRef.current = loadGhost(ghostKey(challenge))
+    r.setGhost(ghostRef.current ? design : null)
+    replayRef.current = null
     reqRef.current = null
     setLive(false)
     place(0, { body: [] })
@@ -233,6 +354,18 @@ export default function ChallengeStageClient({ challenge, design, run, resetNonc
   useEffect(() => {
     rendererRef.current?.setCameraMode(camera)
   }, [camera, ready])
+
+  // The page asks for a replay moment (scrub) or to play/pause the replay.
+  useEffect(() => {
+    if (liveRef.current) return
+    replayRef.current = replay ? { ...replay } : null
+    rendererRef.current?.setLive(Boolean(replay?.playing))
+    rendererRef.current?.wake(0.6)
+  }, [replay?.nonce, replay === null]) // eslint-disable-line react-hooks/exhaustive-deps -- value deps only
+
+  useEffect(() => {
+    rendererRef.current?.wake(0.4)
+  }, [ghostOn])
 
   return (
     <div className="absolute inset-0">

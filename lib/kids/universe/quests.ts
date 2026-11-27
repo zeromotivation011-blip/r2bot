@@ -24,6 +24,7 @@ export type ActivityKind =
   | 'project' // a "make it yours" project shared
   | 'bugfix' // a failing program fixed by the child
   | 'activity' // a Skill Galaxy activity completed
+  | 'discovery' // a Robodex / Meet the Makers badge claimed (0 XP; no quest counts it)
 
 /**
  * Where a report came from, worked out from its kind and id (see `sourceOf`).

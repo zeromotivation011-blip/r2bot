@@ -42,7 +42,9 @@ learning) and four difficulty tiers — **Cadet, Pilot, Ace, Legend** — so a
   Control Center Body → Box Body; Rocket Booster is a 3D-bay-only look (`cosmetics.booster`,
   saved with the looks and in the backup code). `/kids/my-robot` 308s to `/kids/hangar`
   (`next.config.mjs`; the page also calls `permanentRedirect`). Building parts stays in the Workshop.
-- **Lab**: the real-physics simulator (`lib/kids/sim/`), Rapier + Blockly.
+- **Lab**: the real-physics simulator (`lib/kids/sim/`), Rapier + Blockly. Physics Lab
+  `/kids/lab/sim` (noindex beta) and Power Lab `/kids/lab/power` (indexable). See "Lab —
+  recorder, battery, robot's-eye view" below.
 
 ## Navigation — one shell
 `app/kids/KidsShell.tsx`. Phone tab bar, exactly five: **Home · Course · Worlds · Games ·
@@ -231,8 +233,9 @@ first finish = full XP, improvement = half, replay = 0. `RewardResult` carries `
 - **Quests** (`lib/kids/universe/quests.ts`): 49 quests tagged by band, with source, track,
   min-star and improvement filters. Each week a band gets 3 quests of different kinds plus a
   bonus 4th, the same for every child in the band; missing a week costs nothing. Course-only
-  quests are hidden unless `hasOpenCourse(p)` (add `'builders'` to `COURSE_OPEN_BANDS` when
-  Level 2 ships). `bugfix` counts the debug-program Galaxy activities (`DEBUG_ACTIVITY_IDS`);
+  quests are hidden unless `hasOpenCourse(p)`; since Wave 2 all four bands are in
+  `COURSE_OPEN_BANDS` (every level is playable). Kind `discovery` (0 XP) is for Robodex /
+  Makers badge claims; no quest counts it. `bugfix` counts the debug-program Galaxy activities (`DEBUG_ACTIVITY_IDS`);
   `build` counts a robot save once a day (`reportRobotSaved()`, called by `RewardToastClient`).
   UI: `components/kids/universe/QuestPanelClient.tsx` (picture cards + speaker for Explorers,
   a list for older bands), used by the Explorer card.
@@ -245,6 +248,72 @@ first finish = full XP, improvement = half, replay = 0. `RewardResult` carries `
 - Checks: `lib/kids/universe/rewards.verify.ts` (CI).
 Rules: reward learning and effort, not time; personal bests, never rankings or
 leaderboards; no streak that punishes a missed day.
+
+## Course — four levels, one progress store (roadmap #23, Wave 2)
+- Levels: `lib/kids/curriculum/level1..4`. Level 1, 3 and 4 use the shared `Session` type and
+  `components/kids/course/SessionRunnerClient.tsx`; Level 2 has its own `L2Session` and
+  `components/kids/course/level2/` runner (server data from `level2/resolve.ts`, server-only).
+  Outlines (titles, objectives, concepts, projects) come from `levels.ts`; each level's verify
+  checks they match. The Builder certificate wording lives in `levels.ts` (`LEVEL2_CERTIFICATE`
+  reads it back: `levels.ts` must never import a level folder — `level2/act1.ts` imports it).
+- Pages: `/kids/course/<1-4>` indexable (in the sitemap; `PLAYABLE` in the level page, the
+  course hub and `PLAYABLE_LEVELS` on `/kids`), `/kids/course/<level>/<n>` noindex.
+- Levels 3–4 reuse what is playable today: `SessionReuse` (`level3/reuse-kit.ts`, light, no
+  imports) names a game tier, Code Lab mission, Physics Lab arena or Galaxy activity. The runner
+  shows a play card (`reuse` + `play` props, href from `playForL34()`), counts it done with
+  `reusePlayDone()` when the child comes back (game tier / mission / activity), or an
+  "I finished it" button for Physics Lab arenas and activities; done = `challengeStars: 1`,
+  reported once through `reportBestRun({ kind: 'challenge' })`. Levels 2+ show the episode as
+  the storybook (`EpisodeStepClient storybookOnly`): there are no 3D episode files for them.
+- Check questions: every wrong option carries `misconception: <id>` (both types), listed with a
+  5-minute reteach in the session's teacher notes — the data #30 will read.
+- Teacher guides: `lib/kids/teach/all-guides.ts` (server only) routes every level —
+  `guides.ts` (L1), `guides-level2.ts` (L2, `practise`), `curriculum/level3/teacher-guide.ts`
+  (L3–4, `play`, `lookFor`, `reteach`). `TeacherGuide.level` is `LevelNumber`. `/kids/teach`
+  lists all four levels; every `/kids/teach/<level>/<n>` is indexable and in the sitemap.
+- Course badges for surfaces that name them: `LEVEL2_BADGES`; L3/L4 from `session.badge`.
+
+## Robodex and Meet the Makers (roadmap #32, #34, #35)
+- Robodex `/kids/robodex` (indexable): cards in `lib/kids/robodex/cards.ts`, a checked
+  `robotSlug` where a `/robots/<slug>` page exists. Cards come ONLY from doing: the evidence is
+  read from the existing stores (`syncRobodex()`), so nothing has to call it. The single hook
+  point is `components/kids/robodex/RobodexToastClient.tsx`, mounted once in `KidsShell`
+  (`dynamic`, `ssr:false`). Per child (`profileKey`); rides in the backup code as
+  `extras.robodex` (`robodexBackupExtra` / `restoreRobodexExtra`, a restore never removes).
+- Makers `/kids/careers` + `/kids/careers/<id>` (indexable, `MAKERS` in
+  `lib/kids/makers/makers.ts`; count from the array). Career Constellation lights skills from
+  `mastery.ts`, fixed order, never ranks.
+- Careers badges: `CAREER_BADGE_LIST` in `rewards.ts` (track `careers`, part of
+  `UNIVERSE_BADGES`); `RewardToastClient` claims them on `r2bot:kids-robodex` /
+  `r2bot:kids-makers-heard` via `claimCareerBadges()` → `reportActivity({ kind: 'discovery', xp: 0 })`.
+- `/kids/next-step` (noindex): Engineers see the main platform through `GrownUpLink`; under-13s
+  only behind `<ParentalGate>`.
+
+## Robot growth, X-ray, robot's-eye view (roadmap #33, #36, #37)
+- `RobotDesign.upgrades?` (power, motor, second sensor, arm, World form) in
+  `lib/kids/robot-design.ts`; unlocked by badges, Code Lab missions and World game rounds
+  (`lib/kids/robot-growth.ts`), never locked again. Old designs and 8-field share codes still
+  decode; a 9th field carries the upgrades (and so the backup code). Upgrades change the spec
+  sheet and visuals, not the sim physics (yet).
+- `buildRobot(design, opts)` in `lib/kids/robot3d.ts` stays backwards-compatible; wiring is
+  derived from parts (`lib/kids/robot-wiring.ts`). Volts/amps only for Inventors and Engineers.
+- `computeSensors` returns `beams[]` (all 20 echo rays). Sim pages pass `run.sim.sensors()`
+  for every robot; the renderer draws the distance beam only for robots that see walls, and
+  `components/kids/sim/sensor-view.ts` draws the robot's-eye PiP. Less motion / Lite 3D respected.
+- Check: `lib/kids/robot-growth.verify.ts` (CI).
+
+## Lab — Flight Recorder, battery, Power Lab (roadmap #38, #39)
+- `lib/kids/sim/recorder.ts`: every Physics Lab, Power Lab and course-challenge run is recorded
+  into a 3-minute ring buffer; recording only reads the sim (verify: a recorded run ends exactly
+  like an unrecorded one). UI `FlightRecorderClient.tsx`: scrub, events, "Why did it fail?", graphs.
+- Ghost of the child's own fastest success: `lib/kids/sim/ghost-store.ts`, per child via
+  `profileKey()` (so NOT in `SWAPPED_KEYS`). "Beat yourself" wording only.
+- `lib/kids/sim/battery.ts`: cells, series/parallel packs, sag, brownout. An arena without a
+  `battery` only meters (physics and every existing result unchanged). Arenas may add
+  `chargers` and the `visit-and-return` goal; fail reasons `flat`, `not-visited`. Sensor
+  `battery_pct` (also accepted by Talk to your robot).
+- Games' own sims are not recorded yet.
+- Checks: `lib/kids/sim/verify.ts` and `lib/kids/sim/flight.verify.ts` (CI).
 
 ## Games — one shell
 Every game renders inside `components/kids/ui/GameShellClient.tsx`:

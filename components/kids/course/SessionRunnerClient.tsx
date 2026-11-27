@@ -21,7 +21,9 @@ import type { Session } from '@/lib/kids/curriculum/types'
 import { getLevel1Arena, sessionDesign } from '@/lib/kids/sim/arenas/level1'
 import { loadDesign, ROBOT_CHANGED_EVENT, saveDesign, DEFAULT_DESIGN, type RobotDesign } from '@/lib/kids/robot-design'
 import { reportActivity, reportBestRun, type RewardResult } from '@/lib/kids/universe/rewards'
-import { getProgress } from '@/lib/kids-progress'
+import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
+import { getActivitiesDone } from '@/lib/kids/activities/progress'
+import { reusePlayDone, TIER_LABEL, type SessionReuse } from '@/lib/kids/curriculum/level3/reuse-kit'
 import { cancelSparkSpeech, playSound, sparkSays } from '@/lib/kids-audio'
 import type { SimChallengeOutcome } from '@/components/kids/sim/SimChallengeClient'
 import type { PicNode } from '@/lib/kids/sim/challenge'
@@ -55,9 +57,13 @@ export interface SessionRunnerProps {
   levelTitle: string
   actTitle: string
   next: { number: number; title: string } | null
+  /** Levels 3–4: the challenge as it can be played today (a game tier, Code Lab mission, Physics Lab arena or Galaxy activity). */
+  reuse?: SessionReuse
+  /** Where `reuse.play` lives (resolved on the server: Galaxy activities need their track). */
+  play?: { title: string; detail: string; href: string | null } | null
 }
 
-export default function SessionRunnerClient({ session, level, levelTitle, actTitle, next }: SessionRunnerProps) {
+export default function SessionRunnerClient({ session, level, levelTitle, actTitle, next, reuse, play }: SessionRunnerProps) {
   const id = session.id
   const [hydrated, setHydrated] = useState(false)
   const [st, setSt] = useState<SessionState>({ step: 0, reached: 0, updated: '' })
@@ -171,6 +177,34 @@ export default function SessionRunnerClient({ session, level, levelTitle, actTit
     [id],
   )
 
+  /** The reused challenge (Levels 3–4) was finished: one star, reported once like an arena win. */
+  const onReuseDone = useCallback(() => {
+    const prev = readSessionState(id)
+    if ((prev.challengeStars ?? 0) > 0) return
+    if (!prev.challengeReported) reportBestRun({ kind: 'challenge', id: `${id}-challenge`, stars: 1, attempts: 1, score: 1 })
+    setSt(writeSessionState(id, { challengeStars: 1, challengeAttempts: prev.challengeAttempts ?? 1, challengeReported: true }))
+  }, [id])
+
+  // A game tier, Code Lab mission or Galaxy activity done elsewhere counts as soon as the child is back.
+  useEffect(() => {
+    if (!reuse || !hydrated || arena) return
+    const check = () => {
+      if (reusePlayDone(reuse.play, getProgress(), getActivitiesDone())) onReuseDone()
+    }
+    check()
+    const onVis = () => {
+      if (document.visibilityState === 'visible') check()
+    }
+    window.addEventListener(KIDS_PROGRESS_EVENT, check)
+    window.addEventListener('focus', check)
+    document.addEventListener('visibilitychange', onVis)
+    return () => {
+      window.removeEventListener(KIDS_PROGRESS_EVENT, check)
+      window.removeEventListener('focus', check)
+      document.removeEventListener('visibilitychange', onVis)
+    }
+  }, [reuse, hydrated, arena, onReuseDone])
+
   const onProgramChange = useCallback((nodes: PicNode[]) => patch({ program: nodes }), [patch])
 
   const challengeDesign = useMemo(() => (arena ? sessionDesign(arena, design) : design), [arena, design])
@@ -264,6 +298,7 @@ export default function SessionRunnerClient({ session, level, levelTitle, actTit
             watched={watched}
             onWatched={() => setWatched(true)}
             onNext={() => goTo(1)}
+            storybookOnly={level >= 2}
           />
         ) : step === 1 ? (
           <BuildStepClient build={session.build} sessionNumber={session.number} design={design} built={!!st.built} onApply={onApply} onNext={() => goTo(2)} />
@@ -286,6 +321,42 @@ export default function SessionRunnerClient({ session, level, levelTitle, actTit
             )}
             {arena ? (
               <SimChallenge arena={arena} design={challengeDesign} onResult={onChallenge} initialNodes={st.program} onProgramChange={onProgramChange} />
+            ) : reuse ? (
+              <div className="rounded-[24px] border border-cyan-400/30 bg-[#111C32] p-5" data-testid="reuse-play">
+                <p className="font-display text-xs font-bold uppercase tracking-wider text-cyan-300">Today&rsquo;s challenge</p>
+                <h2 className="mt-1 font-display text-xl font-bold text-[#EEF2F8] sm:text-2xl">
+                  {play?.title ?? session.challenge.title}
+                  {reuse.play.kind === 'game' && !play && <span className="ml-2 text-base text-amber-300">({TIER_LABEL[reuse.play.tier]} tier)</span>}
+                </h2>
+                <p className="mt-2 text-[16px] leading-relaxed text-[#EEF2F8]">{reuse.play.goal}</p>
+                <p className="mt-2 text-[15px] leading-relaxed text-[#A7B0C0]">{session.challenge.mission}</p>
+                {reuse.play.kind === 'game' && (
+                  <p className="mt-2 text-[15px] text-[#A7B0C0]">
+                    Pick the <span className="font-bold text-amber-300">{TIER_LABEL[reuse.play.tier]}</span> tier (or a harder one) and win a round. Then come back here.
+                  </p>
+                )}
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {play?.href && (
+                    <Link
+                      href={play.href}
+                      className="flex min-h-[52px] items-center rounded-2xl bg-amber-500 px-6 font-display text-lg font-bold text-[#1A1103] hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+                    >
+                      Play it →
+                    </Link>
+                  )}
+                  {!solved && (reuse.play.kind === 'sim-demo' || reuse.play.kind === 'activity') && (
+                    <button
+                      type="button"
+                      onClick={onReuseDone}
+                      data-testid="reuse-done"
+                      className="min-h-[52px] rounded-2xl border border-emerald-400/50 px-5 font-bold text-emerald-200 hover:bg-emerald-400/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+                    >
+                      ✓ I finished it
+                    </button>
+                  )}
+                  {solved && <p className="flex min-h-[52px] items-center font-bold text-emerald-300" role="status">✓ Done! Carry on to the check.</p>}
+                </div>
+              </div>
             ) : (
               <p className="rounded-2xl bg-amber-400/10 p-4 text-amber-100">This challenge is still being built. You can carry on to the questions.</p>
             )}

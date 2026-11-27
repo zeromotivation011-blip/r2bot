@@ -26,6 +26,8 @@ export interface Demo {
   /** A part swap that makes the same program fail, and how it fails. */
   wrongParts: Partial<RobotDesign>
   wrongFails: FailReason
+  /** Program mistakes that fail for a taught reason with the good parts (Power Lab: forgetting the charging stop). */
+  mistakes?: { name: string; program: Program; fails: FailReason }[]
 }
 
 // ── Tiny builders so programs read like the blocks ────────────────────────
