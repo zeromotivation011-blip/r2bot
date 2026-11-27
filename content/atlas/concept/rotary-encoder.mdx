@@ -10,12 +10,12 @@ summary: >-
 difficulty: 2
 tags:
   - sensors
-  - feedback
+  - feedback-loop
   - actuators
 seeAlso:
   - absolute-encoder
   - servo-motor
-  - closed-loop-control
+  - feedback-loop
   - odometry
 lastReviewed: 2026-07-10T00:00:00.000Z
 sources:
@@ -46,7 +46,7 @@ A robot can command a motor to turn, but how does it know the motor actually rea
 
 ## What it does
 
-A rotary encoder sits on a rotating shaft and turns its motion into an electrical signal that says **how far it has turned**. Differentiate that over time and you also get **speed**. This is the feedback that lets a controller compare "where the joint is" to "where I told it to go" — the heart of [closed-loop control](/atlas/concept/closed-loop-control).
+A rotary encoder sits on a rotating shaft and turns its motion into an electrical signal that says **how far it has turned**. Differentiate that over time and you also get **speed**. This is the feedback that lets a controller compare "where the joint is" to "where I told it to go" — the heart of [closed-loop control](/atlas/concept/feedback-loop).
 
 ```diagram
 { "type": "loop", "title": "The encoder closes the control loop", "nodes": ["Command angle", "Motor turns", "Encoder measures actual angle"], "caption": "Without the encoder, the controller is guessing. With it, the loop can correct error every cycle — the basis of precise motion." }
@@ -73,4 +73,4 @@ The rotary encoder is the fundamental position sense of robotics. Without it, mo
 
 ## Related
 
-[Absolute encoder](/atlas/concept/absolute-encoder) · [Servo motor](/atlas/concept/servo-motor) · [Closed-loop control](/atlas/concept/closed-loop-control) · [Odometry](/atlas/concept/odometry)
+[Absolute encoder](/atlas/concept/absolute-encoder) · [Servo motor](/atlas/concept/servo-motor) · [Closed-loop control](/atlas/concept/feedback-loop) · [Odometry](/atlas/concept/odometry)

@@ -45,6 +45,7 @@ export const PAGE_UPDATED: Record<string, string> = {
   '/atlas/concept/chassis': '2026-11-26T00:00:00.000Z',
   '/atlas/concept/colcon': '2026-11-27T00:00:00.000Z',
   '/atlas/concept/depth-sensor': '2026-11-27T00:00:00.000Z',
+  '/atlas/concept/feedback-loop': '2026-11-27T00:00:00.000Z',
   '/atlas/concept/future-of-work-robots': '2026-11-08T00:00:00.000Z',
   '/atlas/company/greyorange': '2026-11-08T00:00:00.000Z',
   '/academy': '2026-11-08T00:00:00.000Z',

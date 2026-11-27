@@ -39,7 +39,7 @@ const ROADMAPS: Roadmap[] = [
       { slug: 'concept/microcontroller', label: 'microcontroller' },
       { slug: 'concept/single-board-computer', label: 'arduino' },
       { slug: 'concept/servo-motor', label: 'servo-motor' },
-      { slug: 'concept/feedback', label: 'feedback-loop' },
+      { slug: 'concept/feedback-loop', label: 'feedback-loop' },
     ],
     academy: 'Spark 01–06',
     skills: ['Basic electronics', 'Arduino programming', 'CAD basics'],
