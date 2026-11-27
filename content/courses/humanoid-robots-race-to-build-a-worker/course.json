@@ -33,7 +33,7 @@
       "id": "01-what-is-a-humanoid-robot-and-why-legs",
       "title": "What Is a Humanoid Robot, and Why Give It Legs?",
       "summary": "Explain what makes a robot 'humanoid' and why legs, not wheels, are the hard but deliberate choice.",
-      "youtubeId": "",
+      "youtubeId": "aR0wHuX3Pzg",
       "videoNo": 1,
       "durationMin": 4,
       "quiz": [
@@ -83,7 +83,7 @@
       "id": "02-who-is-building-humanoid-robots",
       "title": "Who Is Building Humanoid Robots, and What Each Wants",
       "summary": "Survey Optimus, Figure, Atlas, Digit and Unitree, and the different bets each company is making.",
-      "youtubeId": "",
+      "youtubeId": "w4G3q-E8-zs",
       "videoNo": 2,
       "durationMin": 5,
       "quiz": [
@@ -133,7 +133,7 @@
       "id": "03-how-a-humanoid-stays-on-its-feet",
       "title": "How a Humanoid Stays on Its Feet",
       "summary": "See the sense-and-correct loop — gyroscopes, foot sensors and fast control — that keeps a two-legged robot upright.",
-      "youtubeId": "",
+      "youtubeId": "jup7FPGLCLk",
       "videoNo": 3,
       "durationMin": 4,
       "quiz": [
@@ -183,7 +183,7 @@
       "id": "04-why-robot-hands-are-the-hardest-part",
       "title": "Why Robot Hands Are the Hardest Part",
       "summary": "Understand why a dexterous hand, not legs, is often the most expensive and hardest-to-perfect part of a humanoid.",
-      "youtubeId": "",
+      "youtubeId": "HRgUFO1_mm4",
       "videoNo": 4,
       "durationMin": 4,
       "quiz": [
@@ -233,7 +233,7 @@
       "id": "05-how-humanoids-learn-by-watching-people",
       "title": "How Humanoid Robots Learn by Watching People",
       "summary": "See how imitation learning and VR teleoperation let a robot pick up a skill from watching a human do it.",
-      "youtubeId": "",
+      "youtubeId": "N8B4rE5-fQQ",
       "videoNo": 5,
       "durationMin": 4,
       "quiz": [
@@ -283,7 +283,7 @@
       "id": "06-boston-dynamics-from-bigdog-to-atlas",
       "title": "Boston Dynamics: From BigDog to Atlas",
       "summary": "Trace the company's path from the early rough-terrain BigDog quadruped to today's agile Atlas humanoid.",
-      "youtubeId": "",
+      "youtubeId": "YJpBfcI5xGQ",
       "videoNo": 6,
       "durationMin": 5,
       "quiz": [
@@ -333,7 +333,7 @@
       "id": "07-robot-dogs-spot-and-four-legged-machines",
       "title": "Robot Dogs: Spot and the Four-Legged Machines",
       "summary": "Look at why four legs are often a more practical choice than two, and where quadruped robots already work.",
-      "youtubeId": "",
+      "youtubeId": "ZAu-uVnFi_A",
       "videoNo": 7,
       "durationMin": 4,
       "quiz": [
@@ -383,7 +383,7 @@
       "id": "08-exoskeletons-robots-you-wear",
       "title": "Exoskeletons: Robots You Wear",
       "summary": "Learn how wearable exoskeletons add strength or support, and where they're used in industry and rehabilitation.",
-      "youtubeId": "",
+      "youtubeId": "60NE52o7gg4",
       "videoNo": 8,
       "durationMin": 4,
       "quiz": [
@@ -433,7 +433,7 @@
       "id": "09-can-a-humanoid-do-your-housework",
       "title": "Can a Humanoid Do Your Housework? A Reality Check",
       "summary": "Compare demo videos of humanoids folding laundry to what's realistic for unstructured homes today.",
-      "youtubeId": "",
+      "youtubeId": "yWRzTKBeufs",
       "videoNo": 9,
       "durationMin": 4,
       "quiz": [

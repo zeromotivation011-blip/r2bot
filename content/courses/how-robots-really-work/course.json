@@ -33,7 +33,7 @@
       "id": "01-actuators-the-muscles-of-a-robot",
       "title": "Actuators: The Muscles of a Robot",
       "summary": "Explain what an actuator is and the main kinds — motors, hydraulics and pneumatics — that create robot motion.",
-      "youtubeId": "",
+      "youtubeId": "bRSlV6Mja1s",
       "videoNo": 1,
       "durationMin": 4,
       "quiz": [
@@ -83,7 +83,7 @@
       "id": "02-servo-stepper-or-brushless",
       "title": "Servo, Stepper or Brushless: Which Motor and Why",
       "summary": "Compare three common robot motor types and when an engineer would pick each one.",
-      "youtubeId": "",
+      "youtubeId": "p3TTJDR7k9o",
       "videoNo": 2,
       "durationMin": 4,
       "quiz": [
@@ -133,7 +133,7 @@
       "id": "03-gyroscopes-and-accelerometers",
       "title": "Gyroscopes and Accelerometers: A Robot's Inner Ear",
       "summary": "Compare what a gyroscope and an accelerometer each measure, and why robots need both together.",
-      "youtubeId": "",
+      "youtubeId": "5Kl7xKz-Lr8",
       "videoNo": 3,
       "durationMin": 4,
       "quiz": [
@@ -183,7 +183,7 @@
       "id": "04-degrees-of-freedom",
       "title": "Degrees of Freedom: How a Robot Arm Plans Its Reach",
       "summary": "Understand what a 'degree of freedom' is and why more joints let an arm reach more positions and angles.",
-      "youtubeId": "",
+      "youtubeId": "oe8Wu0j6oCk",
       "videoNo": 4,
       "durationMin": 4,
       "quiz": [
@@ -233,7 +233,7 @@
       "id": "05-grippers-and-robot-hands",
       "title": "Grippers and Robot Hands: How to Hold Anything",
       "summary": "Compare simple two-finger grippers, suction grippers and dexterous hands, and when each is the right tool.",
-      "youtubeId": "",
+      "youtubeId": "2GgNnOPbOco",
       "videoNo": 5,
       "durationMin": 4,
       "quiz": [
@@ -283,7 +283,7 @@
       "id": "06-the-kalman-filter",
       "title": "The Kalman Filter: Guessing Better Than the Sensors",
       "summary": "See, with a simple example, how a Kalman filter blends noisy sensor readings into a smoother, more trustworthy estimate.",
-      "youtubeId": "",
+      "youtubeId": "UADq5zUXTcU",
       "videoNo": 6,
       "durationMin": 5,
       "quiz": [
@@ -333,7 +333,7 @@
       "id": "07-how-robots-choose-a-route",
       "title": "How Robots Choose a Route (Dijkstra and A*)",
       "summary": "See how pathfinding algorithms like Dijkstra and A* let a robot find the shortest safe route on a map.",
-      "youtubeId": "",
+      "youtubeId": "tKAuNOIirfU",
       "videoNo": 7,
       "durationMin": 5,
       "quiz": [
@@ -383,7 +383,7 @@
       "id": "08-ros-the-operating-system-for-robots",
       "title": "ROS: The Operating System for Robots",
       "summary": "Understand what ROS actually is: a framework of reusable parts for robots to communicate and share work.",
-      "youtubeId": "",
+      "youtubeId": "ABd4VefTm64",
       "videoNo": 8,
       "durationMin": 4,
       "quiz": [
@@ -433,7 +433,7 @@
       "id": "09-what-a-robotics-engineer-really-does",
       "title": "What a Robotics Engineer Really Does, and How to Become One",
       "summary": "See the real day-to-day mix of mechanical, electrical and software work, and a realistic path to get started.",
-      "youtubeId": "",
+      "youtubeId": "Lkd3w_vWyrA",
       "videoNo": 9,
       "durationMin": 5,
       "quiz": [
@@ -483,7 +483,7 @@
       "id": "10-robot-competitions-and-first-projects",
       "title": "Robot Competitions and First Projects for Beginners",
       "summary": "See how sumo and line-following competitions, plus accessible kits, give beginners a concrete way to start.",
-      "youtubeId": "",
+      "youtubeId": "8pZ2etLrOoY",
       "videoNo": 10,
       "durationMin": 4,
       "quiz": [
