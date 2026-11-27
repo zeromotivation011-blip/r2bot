@@ -102,6 +102,7 @@ export const SIMULATORS: Simulator[] = [
     related: [
       { href: '/atlas/concept/a-star-algorithm', label: 'A* Algorithm' },
       { href: '/atlas/concept/path-planning', label: 'Path Planning' },
+      { href: '/visualizer/compare', label: 'A* vs Dijkstra, side by side' },
       { href: '/atlas/concept/kinematics', label: 'Kinematics' },
     ],
     accent: '#A56BFF',

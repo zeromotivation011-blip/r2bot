@@ -1,149 +1,33 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  COLS,
+  START,
+  GOAL,
+  defaultGrid,
+  medianMs,
+  runAStar,
+  runDijkstra,
+  type CellState,
+  type SearchResult,
+  type Step,
+} from './search';
 
-const COLS = 22;
-const ROWS = 14;
-const START: [number, number] = [1, 7];
-const GOAL: [number, number] = [20, 7];
+type Timed = SearchResult & { ms: number };
 
-type CellState = 'empty' | 'wall';
+const TIMING_RUNS = 15;
+const ASTAR_COLOR = '#22d3ee';
+const DIJKSTRA_COLOR = '#a78bfa';
 
-function key(x: number, y: number) {
-  return `${x},${y}`;
-}
-
-function defaultGrid(): CellState[][] {
-  const g: CellState[][] = [];
-  for (let y = 0; y < ROWS; y++) {
-    const row: CellState[] = [];
-    for (let x = 0; x < COLS; x++) row.push('empty');
-    g.push(row);
-  }
-  // A few starter walls to make it interesting
-  for (let y = 3; y < 10; y++) g[y][10] = 'wall';
-  for (let x = 6; x < 13; x++) g[3][x] = 'wall';
-  return g;
-}
-
-type Step = { x: number; y: number };
-
-type Result = { visited: Step[]; path: Step[]; ms: number };
-
-function neighbours(x: number, y: number, grid: CellState[][]): [number, number][] {
-  const out: [number, number][] = [];
-  const cand = [
-    [x + 1, y],
-    [x - 1, y],
-    [x, y + 1],
-    [x, y - 1],
-  ];
-  for (const [nx, ny] of cand) {
-    if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) continue;
-    if (grid[ny][nx] === 'wall') continue;
-    out.push([nx, ny]);
-  }
-  return out;
-}
-
-function heuristic(x: number, y: number) {
-  return Math.abs(GOAL[0] - x) + Math.abs(GOAL[1] - y);
-}
-
-function runAStar(grid: CellState[][]): Result {
-  const t0 = performance.now();
-  const open = new Map<string, { x: number; y: number; g: number; f: number; parent: string | null }>();
-  const closed = new Set<string>();
-  const visited: Step[] = [];
-
-  open.set(key(...START), { x: START[0], y: START[1], g: 0, f: heuristic(...START), parent: null });
-
-  while (open.size > 0) {
-    let bestKey: string | null = null;
-    let bestF = Infinity;
-    for (const [k, v] of open) {
-      if (v.f < bestF) {
-        bestF = v.f;
-        bestKey = k;
-      }
-    }
-    if (!bestKey) break;
-    const current = open.get(bestKey)!;
-    open.delete(bestKey);
-    closed.add(bestKey);
-    visited.push({ x: current.x, y: current.y });
-
-    if (current.x === GOAL[0] && current.y === GOAL[1]) {
-      // Reconstruct path
-      const path: Step[] = [];
-      const all = new Map(open);
-      all.set(bestKey, current);
-      let k: string | null = bestKey;
-      while (k !== null) {
-        const node: { x: number; y: number; g: number; f: number; parent: string | null } | undefined = all.get(k);
-        if (!node) break;
-        path.unshift({ x: node.x, y: node.y });
-        k = node.parent;
-      }
-      return { visited, path, ms: performance.now() - t0 };
-    }
-
-    for (const [nx, ny] of neighbours(current.x, current.y, grid)) {
-      const nk = key(nx, ny);
-      if (closed.has(nk)) continue;
-      const tentativeG = current.g + 1;
-      const existing = open.get(nk);
-      if (!existing || tentativeG < existing.g) {
-        open.set(nk, { x: nx, y: ny, g: tentativeG, f: tentativeG + heuristic(nx, ny), parent: bestKey });
-      }
-    }
-  }
-  return { visited, path: [], ms: performance.now() - t0 };
-}
-
-function runDijkstra(grid: CellState[][]): Result {
-  const t0 = performance.now();
-  const dist = new Map<string, number>();
-  const parents = new Map<string, string | null>();
-  const visited: Step[] = [];
-  const queue: { x: number; y: number; d: number }[] = [];
-  dist.set(key(...START), 0);
-  parents.set(key(...START), null);
-  queue.push({ x: START[0], y: START[1], d: 0 });
-
-  while (queue.length > 0) {
-    queue.sort((a, b) => a.d - b.d);
-    const current = queue.shift()!;
-    const k = key(current.x, current.y);
-    if (dist.get(k)! < current.d) continue;
-    visited.push({ x: current.x, y: current.y });
-    if (current.x === GOAL[0] && current.y === GOAL[1]) {
-      const path: Step[] = [];
-      let cur: string | null = k;
-      while (cur) {
-        const [cx, cy] = cur.split(',').map((s) => parseInt(s, 10));
-        path.unshift({ x: cx, y: cy });
-        cur = parents.get(cur) ?? null;
-      }
-      return { visited, path, ms: performance.now() - t0 };
-    }
-    for (const [nx, ny] of neighbours(current.x, current.y, grid)) {
-      const nk = key(nx, ny);
-      const nd = current.d + 1;
-      if (!dist.has(nk) || nd < dist.get(nk)!) {
-        dist.set(nk, nd);
-        parents.set(nk, k);
-        queue.push({ x: nx, y: ny, d: nd });
-      }
-    }
-  }
-  return { visited, path: [], ms: performance.now() - t0 };
+function steps(path: Step[]): number {
+  return Math.max(0, path.length - 1);
 }
 
 export function AlgoCompareClient() {
   const [grid, setGrid] = useState<CellState[][]>(() => defaultGrid());
-  const [astar, setAstar] = useState<Result | null>(null);
-  const [dijkstra, setDijkstra] = useState<Result | null>(null);
+  const [astar, setAstar] = useState<Timed | null>(null);
+  const [dijkstra, setDijkstra] = useState<Timed | null>(null);
   const [animTick, setAnimTick] = useState(0);
   const [running, setRunning] = useState(false);
   const tickRef = useRef<number | null>(null);
@@ -151,11 +35,20 @@ export function AlgoCompareClient() {
   const toggleCell = useCallback((x: number, y: number) => {
     if ((x === START[0] && y === START[1]) || (x === GOAL[0] && y === GOAL[1])) return;
     setGrid((g) => g.map((row, ry) => (ry === y ? row.map((c, cx) => (cx === x ? (c === 'wall' ? 'empty' : 'wall') : c)) : row)));
+    setAstar(null);
+    setDijkstra(null);
+    setRunning(false);
   }, []);
 
   const runBoth = useCallback(() => {
-    setAstar(runAStar(grid));
-    setDijkstra(runDijkstra(grid));
+    const a = runAStar(grid);
+    const d = runDijkstra(grid);
+    // Timing is secondary and noisy at this size: median of several runs each,
+    // Dijkstra timed first so A* does not always inherit a warm JIT.
+    const dMs = medianMs(() => runDijkstra(grid), TIMING_RUNS);
+    const aMs = medianMs(() => runAStar(grid), TIMING_RUNS);
+    setAstar({ ...a, ms: aMs });
+    setDijkstra({ ...d, ms: dMs });
     setAnimTick(0);
     setRunning(true);
   }, [grid]);
@@ -181,67 +74,120 @@ export function AlgoCompareClient() {
     setRunning(false);
   };
 
+  const done = astar !== null && dijkstra !== null && !running;
+
   return (
     <div className="mt-10">
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={runBoth}
-          className="rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-5 py-2 text-sm font-extrabold text-[#1a0f00] hover:scale-[1.03]"
+          className="min-h-[44px] rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-5 py-2 text-sm font-extrabold text-[#1a0f00] hover:scale-[1.03]"
         >
           ▶ Run both
         </button>
         <button
           type="button"
           onClick={reset}
-          className="rounded-xl border border-white/15 bg-white/[0.04] px-5 py-2 text-sm font-semibold text-zinc-200 hover:border-white/30"
+          className="min-h-[44px] rounded-xl border border-white/15 bg-white/[0.04] px-5 py-2 text-sm font-semibold text-zinc-200 hover:border-white/30"
         >
           Reset grid
         </button>
-        <p className="ml-auto text-xs text-zinc-500">Click any cell to toggle a wall. Start = green, Goal = amber.</p>
+        <p className="m-0 text-xs text-zinc-500 sm:ml-auto">Click any cell to toggle a wall. Start = green, goal = orange.</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <GridView
           label="A*"
-          color="#22d3ee"
+          color={ASTAR_COLOR}
           grid={grid}
           visited={astar?.visited.slice(0, animTick) ?? []}
+          total={astar?.visited.length}
           path={astar?.path ?? []}
-          ms={astar?.ms}
           showPath={!running}
           onToggle={toggleCell}
         />
         <GridView
           label="Dijkstra"
-          color="#a78bfa"
+          color={DIJKSTRA_COLOR}
           grid={grid}
           visited={dijkstra?.visited.slice(0, animTick) ?? []}
+          total={dijkstra?.visited.length}
           path={dijkstra?.path ?? []}
-          ms={dijkstra?.ms}
           showPath={!running}
           onToggle={toggleCell}
         />
       </div>
 
-      {astar && dijkstra && !running ? (
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <Stat label="A*" subtitle={`${astar.visited.length} cells visited`} time={astar.ms} color="#22d3ee" />
-          <Stat label="Dijkstra" subtitle={`${dijkstra.visited.length} cells visited`} time={dijkstra.ms} color="#a78bfa" />
-        </div>
-      ) : null}
+      <div aria-live="polite">
+        {done && astar && dijkstra ? <Verdict astar={astar} dijkstra={dijkstra} /> : null}
+      </div>
     </div>
   );
 }
 
-function Stat({ label, subtitle, time, color }: { label: string; subtitle: string; time: number; color: string }) {
+function Verdict({ astar, dijkstra }: { astar: Timed; dijkstra: Timed }) {
+  const reached = astar.path.length > 0;
+  const a = astar.visited.length;
+  const d = dijkstra.visited.length;
+  const fewer = d > 0 ? Math.round(((d - a) / d) * 100) : 0;
+
+  return (
+    <div className="mt-6">
+      <p className="m-0 text-base text-zinc-200">
+        {reached ? (
+          <>
+            Both found a shortest path of <strong className="text-white">{steps(astar.path)} steps</strong>.{' '}
+            {a < d ? (
+              <>
+                A* expanded <strong className="text-white">{a}</strong> cells to get there, Dijkstra{' '}
+                <strong className="text-white">{d}</strong>: {fewer}% fewer.
+              </>
+            ) : (
+              <>Here the heuristic gave A* no shortcut: both expanded {a === d ? 'the same number of' : 'almost as many'} cells.</>
+            )}
+          </>
+        ) : (
+          <>No path: the goal is walled off, so both searched every cell they could reach before giving up.</>
+        )}
+      </p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <Stat label="A*" color={ASTAR_COLOR} expanded={a} pathSteps={reached ? steps(astar.path) : null} ms={astar.ms} />
+        <Stat label="Dijkstra" color={DIJKSTRA_COLOR} expanded={d} pathSteps={reached ? steps(dijkstra.path) : null} ms={dijkstra.ms} />
+      </div>
+      <p className="mt-3 text-xs text-zinc-500">
+        Time is the median of {TIMING_RUNS} runs in your browser. On a grid this small both finish in milliseconds and the
+        number moves with your device and how each open list is stored, so cells expanded is the fair comparison: it is the
+        work the heuristic saves, and it grows with the map.
+      </p>
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  color,
+  expanded,
+  pathSteps,
+  ms,
+}: {
+  label: string;
+  color: string;
+  expanded: number;
+  pathSteps: number | null;
+  ms: number;
+}) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
       <p className="m-0 text-xs font-bold uppercase tracking-wider" style={{ color }}>
         {label}
       </p>
-      <p className="mt-1 text-2xl font-extrabold text-white">{time.toFixed(1)}ms</p>
-      <p className="mt-1 text-xs text-zinc-400">{subtitle}</p>
+      <p className="mt-1 text-2xl font-extrabold text-white">
+        {expanded} <span className="text-base font-bold text-zinc-300">cells expanded</span>
+      </p>
+      <p className="mt-1 text-xs text-zinc-400">
+        {pathSteps !== null ? `Path: ${pathSteps} steps` : 'No path'} · {ms < 0.1 ? '<0.1' : ms.toFixed(1)} ms
+      </p>
     </div>
   );
 }
@@ -251,17 +197,17 @@ function GridView({
   color,
   grid,
   visited,
+  total,
   path,
-  ms,
   showPath,
   onToggle,
 }: {
   label: string;
   color: string;
   grid: CellState[][];
-  visited: { x: number; y: number }[];
-  path: { x: number; y: number }[];
-  ms?: number;
+  visited: Step[];
+  total?: number;
+  path: Step[];
   showPath: boolean;
   onToggle: (x: number, y: number) => void;
 }) {
@@ -282,15 +228,13 @@ function GridView({
         <p className="m-0 text-sm font-bold" style={{ color }}>
           {label}
         </p>
-        {typeof ms === 'number' ? <p className="m-0 font-mono text-xs text-zinc-400">{ms.toFixed(1)} ms</p> : null}
+        {typeof total === 'number' ? (
+          <p className="m-0 font-mono text-xs text-zinc-300">
+            {Math.min(visited.length, total)} cells expanded
+          </p>
+        ) : null}
       </div>
-      <div
-        className="grid select-none"
-        style={{
-          gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))`,
-          gap: 1,
-        }}
-      >
+      <div className="grid select-none gap-px" style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}>
         {grid.map((row, y) =>
           row.map((c, x) => {
             const isStart = x === START[0] && y === START[1];
@@ -307,7 +251,7 @@ function GridView({
                 key={k}
                 type="button"
                 onClick={() => onToggle(x, y)}
-                aria-label={`Cell ${x},${y}`}
+                aria-label={`Cell ${x},${y}${c === 'wall' ? ', wall' : ''}`}
                 className="aspect-square rounded-[3px] transition-colors"
                 style={{ background: bg }}
               />
