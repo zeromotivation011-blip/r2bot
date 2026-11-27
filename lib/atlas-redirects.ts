@@ -23,6 +23,8 @@ export const REDIRECTED_ATLAS_CONCEPTS: ReadonlySet<string> = new Set([
   'light-curtain',
   'tof-sensor',
   'last-mile-delivery',
+  // 27 Nov 2026: merged into depth-sensor (one owner for depth sensor / depth camera).
+  'depth-camera',
 ])
 
 export function isRedirectedAtlas(type: string, slug: string): boolean {

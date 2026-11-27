@@ -1,78 +1,282 @@
 ---
-title: Depth sensor
+title: Depth Sensor (Depth Camera)
+slug: depth-sensor
+bucket: concept
 category: sensors
 summary: >-
-  A depth sensor measures the distance to every visible point in a scene
-  simultaneously, producing a 2D image where each pixel encodes depth rather
-  than colour. It gives robots instant 3D awareness of their immediate
-  surroundings.
-seeAlso:
-  - time-of-flight-sensor
-sources:
-  - title: Intel RealSense — Depth camera technology overview
-    url: >-
-      https://www.intel.com/content/www/us/en/architecture-and-technology/realsense-overview.html
-  - title: 'IEEE — Structured light 3D scanning: a survey'
-    url: 'https://ieeexplore.ieee.org/document/8118815'
-lastReviewed: 2026-05-19T00:00:00.000Z
+  A depth sensor (depth camera) measures how far away every point in view is. How stereo,
+  structured light and time-of-flight work, their limits, and how robots use depth in ROS 2.
+difficulty: 3
+difficultyLabel: Classroom
 tags:
   - sensors
   - depth
   - perception
-  - intermediate
-difficulty: 3
+  - rgbd
+  - 3d-vision
+seeAlso:
+  - stereo-vision
+  - structured-light
+  - time-of-flight-sensor
+  - point-cloud
+  - lidar
+  - camera-vision
+relatedTerms:
+  - stereo-vision
+  - structured-light
+  - time-of-flight-sensor
+  - point-cloud
+prerequisiteTerms:
+  - sensor
+  - camera-vision
+unlocksTerms:
+  - point-cloud
+  - sensor-fusion
+lastReviewed: 2026-11-27T00:00:00.000Z
+sources:
+  - title: 'Keselman et al., Intel RealSense Stereoscopic Depth Cameras (2017)'
+    url: 'https://arxiv.org/abs/1705.05548'
+  - title: 'RealSense, Tuning depth cameras for best performance'
+    url: 'https://dev.realsenseai.com/docs/tuning-depth-cameras-for-best-performance/'
+  - title: 'RealSense, D400 Series datasheet (March 2026)'
+    url: 'https://www.realsenseai.com/wp-content/uploads/2026/03/RealSense-D400-Series-Datasheet-Mar-2026.pdf'
+  - title: 'Texas Instruments, Time-of-Flight Camera: An Introduction (SLOA190B)'
+    url: 'https://www.ti.com/lit/pdf/sloa190'
+  - title: 'Microsoft, Azure Kinect DK depth camera'
+    url: 'https://learn.microsoft.com/en-us/previous-versions/azure/kinect-dk/depth-camera'
+  - title: 'Microsoft, Azure Kinect DK hardware specifications'
+    url: 'https://learn.microsoft.com/en-us/previous-versions/azure/kinect-dk/hardware-specification'
+  - title: 'Sarbolandi, Lefloch and Kolb, Kinect Range Sensing: Structured-Light versus Time-of-Flight Kinect (2015)'
+    url: 'https://arxiv.org/abs/1505.05459'
+  - title: 'Apple Support, About Face ID advanced technology'
+    url: 'https://support.apple.com/102381'
+  - title: 'Apple Newsroom, Apple unveils new iPad Pro with LiDAR Scanner (18 March 2020)'
+    url: 'https://www.apple.com/newsroom/2020/03/apple-unveils-new-ipad-pro-with-lidar-scanner-and-trackpad-support-in-ipados/'
+  - title: 'REP 118, Depth Images'
+    url: 'https://reps.openrobotics.org/rep-0118/'
+  - title: 'ROS 2 Documentation (Jazzy), depth_image_proc nodes and components'
+    url: 'https://docs.ros.org/en/jazzy/p/depth_image_proc/doc/components.html'
+  - title: 'TurtleBot 4 User Manual, Features'
+    url: 'https://turtlebot.github.io/turtlebot4-user-manual/overview/features.html'
+youtubeSearchQuery: how does a depth camera work stereo structured light time of flight
 laymanExplanation: >-
-  Imagine a photograph where instead of recording how red, green, or blue each
-  spot is, every pixel records how far away that spot is from the camera. A wall
-  one metre away would be a uniform pale shade; a table two metres away slightly
-  darker; a doorway three metres away darker still. The result is not a colour
-  image — it is a map of distances, a frozen cross
-realRobotsThatUseThis: []
-indianExample: ''
-relatedTerms: []
-prerequisiteTerms: []
-unlocksTerms: []
-quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
-difficultyLabel: Classroom
+  A normal camera records the colour of each spot it sees. A depth sensor records how far away each
+  spot is. The result looks like a black-and-white photo where near things are one shade and far
+  things another, and a robot can turn it straight into a 3D picture of the room to find obstacles,
+  stairs or the object it has to pick up.
 technicalDefinition: >-
-  A depth sensor measures the distance to every visible point in a scene
-  simultaneously, producing a 2D image where each pixel encodes depth rather
-  than colour. It gives robots instant 3D awareness of their immediate
-  surroundings.
-slug: depth-sensor
-bucket: concept
+  A depth sensor (depth camera, range camera, RGB-D camera when paired with colour) produces a dense
+  2D array in which each pixel holds the distance to the scene along the camera's optical (Z) axis.
+  It measures depth by triangulation (passive or active stereo, structured light) or by timing
+  light (continuous-wave or pulsed time-of-flight). With the camera's intrinsic calibration each
+  valid pixel back-projects to a 3D point, so a depth image converts directly into a point cloud.
+realRobotsThatUseThis:
+  - TurtleBot 4 (OAK-D Pro / OAK-D Lite stereo depth camera)
+indianExample: ''
+industryApplications:
+  - Obstacle avoidance for indoor mobile robots
+  - Bin picking and grasp planning for robot arms
+  - 3D mapping and scanning
+  - Face authentication on phones
+mindBlowingFact: >-
+  Light takes about 6.7 nanoseconds to travel one metre and come back. A time-of-flight depth camera
+  measures that tiny delay at every pixel at once, which is why many of them measure the phase
+  shift of a modulated light wave instead of trying to start and stop a clock.
+quizQuestion:
+  q: >-
+    A stereo depth camera has a depth error of about 4 mm at 1 m. Roughly what error should you
+    expect at 2 m, if nothing else changes?
+  options:
+    - About 4 mm, because the error is fixed
+    - About 8 mm, because the error doubles with distance
+    - About 16 mm, because the error grows with the square of the distance
+    - It cannot be estimated without knowing the scene colour
+  answer: 2
+  explanation: >-
+    Stereo depth comes from z = f·B/d, so a fixed matching error in the disparity d turns into a
+    depth error proportional to z². Twice the distance gives about four times the error: roughly
+    15 mm at 2 m for a camera like the RealSense D435.
 ---
 
-Imagine a photograph where instead of recording how red, green, or blue each [spot](/atlas/robot/spot) is, every pixel records how far away that spot is from the [camera](/atlas/concept/camera-vision). A wall one metre away would be a uniform pale shade; a table two metres away slightly darker; a doorway three metres away darker still. The result is not a colour image — it is a map of distances, a frozen cross-section of three-dimensional space.
+A depth sensor, usually built as a **depth camera**, measures how far away every point in its view is. Instead of a colour for each pixel, it gives a distance, so one frame is enough for a robot to know where the floor, the walls, the table and the cup on the table are in 3D.
 
-That is a **depth map**, and the sensor that produces one in real time is a depth sensor.
+![How the three main kinds of depth sensor measure distance. Stereo: two cameras a known distance apart see the same point at slightly different positions, and the shift (disparity) gives the depth, z = f times B divided by d. Structured light: a projector casts a known pattern of infrared dots, and one camera offset from it sees the pattern shift on near and far surfaces. Time-of-flight: the camera sends out modulated infrared light and measures how long it takes to come back, from the phase shift of the returning wave. All three produce the same output: a depth image where each pixel is a distance, which becomes a point cloud](/images/atlas/diagrams/depth-sensor.svg)
 
-## Three ways to measure depth at every pixel
+## Start here: a photo of distances
 
-Depth sensors use one of three main technologies, each with different trade-offs.
+Picture a black-and-white photo of a room where the shade of each pixel means distance instead of brightness: the wall behind is dark, the chair in front is light. That image is a **depth map** (or depth image), and a depth sensor produces one many times a second.
 
-**Structured light** projects an invisible pattern of infrared dots or stripes onto the scene. A second camera, offset from the projector, photographs that pattern. Because the offset camera sees the pattern from a slightly different angle, any surface that is closer or further away distorts the pattern in predictable ways. A processor analyses the distortion and computes depth at each point. The original Microsoft Kinect (2010) used this approach and brought depth sensing to the mass market for the first time at under $150.
+The name varies. "Depth sensor", "depth camera", "range camera" and "3D camera" usually mean the same device. When the depth image comes with an aligned colour image from the same unit, the pair is called **RGB-D** (red, green, blue plus depth). Many depth cameras sold for robotics, such as the RealSense D435 and the OAK-D, are RGB-D cameras.
 
-**Time-of-flight (ToF)** is conceptually simpler: flood the scene with a pulse of infrared light and measure how long the reflection takes to return — not from one beam like a [lidar](/atlas/concept/lidar), but from the entire scene simultaneously, using a sensor array where each pixel is a tiny time-measuring detector. The iPhone's Face ID system uses a ToF depth sensor to map a user's face in 3D; the same technology appears in the TrueDepth camera for AR features.
+Why robots care: a colour camera tells a robot *what* is there, but working out *where* it is from one flat image is hard. A depth camera answers "where" directly, at video rate, from a box small enough to bolt onto a small robot. The TurtleBot 4, a common robot for learning ROS 2, carries one (an OAK-D stereo camera) next to its spinning [lidar](/atlas/concept/lidar).
 
-**Active stereo** is a refinement of basic stereo vision: two cameras offset like eyes, plus projected infrared texture to help matching even on featureless surfaces. Intel's RealSense D400 series uses this, and it is common in research [robotics](/atlas/concept/robotics) because it balances accuracy, range, and cost.
+## The three ways to measure depth at every pixel
 
-## What a [robot](/atlas/concept/robot) does with a depth image
+Almost every depth camera uses one of three principles. Two of them are triangulation, like your two eyes; the third times the light.
 
-A depth map, combined with the camera's known geometry, can be converted into a **[point cloud](/atlas/concept/point-cloud)** — the same kind of 3D dot map that lidar produces, but at video frame rates and from a palm-sized, affordable sensor. Robots use these point clouds for obstacle avoidance, 3D object recognition, bin-picking (identifying and grasping parts randomly piled in a container), and [mapping](/atlas/concept/mapping).
+| | Stereo (passive or active) | Structured light | Time-of-flight (ToF) |
+|---|---|---|---|
+| Principle | Two cameras; depth from the shift between their images | One camera sees how a known projected pattern shifts | Time (or phase delay) for emitted light to return |
+| Needs texture on surfaces? | Yes (an IR projector adds texture indoors) | No, the pattern is the texture | No |
+| Bright sunlight | Works; RealSense says its D415 and D435 tend to do even better in bright light | Projected pattern is easily drowned out | Ambient light lowers signal-to-noise; designs vary |
+| Typical weak spot | Featureless walls; error grows with distance squared | Outdoor use; like stereo, error grows with distance squared | Multipath in corners, maximum unambiguous range |
+| Examples | Intel RealSense D435, Luxonis OAK-D | First Kinect (Xbox 360); Face ID's dot pattern | Azure Kinect DK, Kinect for Xbox One |
 
-The Amazon Robotics fulfilment arms that pick items from shelves use depth sensors to locate objects regardless of their orientation. Humanoid research robots like Agility Robotics' Digit rely on depth cameras to perceive stairs and uneven terrain. Even consumer devices have adopted the technology: robotic vacuum cleaners increasingly use small ToF sensors to build 3D maps of rooms rather than the simpler lidar ring.
+Each of these has its own Atlas entry in more depth: [stereo vision](/atlas/concept/stereo-vision), [structured light](/atlas/concept/structured-light) and [time-of-flight sensor](/atlas/concept/time-of-flight-sensor). Here is the core idea of each.
 
-## Depth sensors versus lidar
+### 1. Stereo: two eyes and a little geometry
 
-Depth sensors and lidar both produce 3D geometry, and the line between them is blurring. Lidar excels outdoors at long range (1–200 m), in any lighting condition, and in rain. Depth sensors are cheaper, faster to set up, and denser at short range (0.3–6 m), but almost all are defeated by bright outdoor sunlight, which drowns out their infrared signals. For indoor robots, depth cameras are often the better choice; for outdoor autonomous vehicles, lidar remains dominant.
+Two cameras sit a fixed distance apart; that distance is the **baseline**, B. A point close to the cameras appears at noticeably different horizontal positions in the left and right images; a far point appears at almost the same position. That shift, measured in pixels, is the **disparity**, d. Intel's RealSense paper gives the relationship:
 
----
+```text
+z = f · B / d
 
-*If every phone now has a depth sensor capable of mapping a face in 3D, what is stopping someone from using the same sensor to 3D-print a fake face and unlock a phone with it?*
+z  depth (same units as B)
+f  focal length, in pixels
+B  baseline between the two cameras
+d  disparity, in pixels
+```
+
+The hard part is finding the same point in both images, which needs visible texture. On a blank white wall every patch looks alike, so the match is ambiguous. **Active stereo** fixes this by adding an infrared projector that sprays a random dot pattern onto the scene; the paper describes its job as generating "texture which makes image matching unambiguous". The cameras do not need to know the pattern, which is the difference from structured light. The projector lets an active stereo camera work in the dark, and because the cameras can also use natural texture lit by the sun, it keeps working outdoors.
+
+### 2. Structured light: a known pattern, one camera
+
+A projector casts a pattern the system already knows, typically infrared dots or stripes, and a camera set a little to one side photographs it. On a near surface the pattern lands in a different place in the image than on a far one, and the shift gives depth by the same triangulation as stereo. The first Kinect, for the Xbox 360, worked this way. Apple's Face ID uses the same idea at arm's length: the TrueDepth camera "captures accurate face data by projecting and analyzing thousands of invisible dots" to build a depth map of your face.
+
+Texas Instruments' introduction to depth cameras notes the catch: structured light is "sensitive to optical interference from the environment". Sunlight is the usual culprit: it washes out the projected pattern, which is why structured-light sensors are mainly indoor devices. RealSense's tuning guide makes the general point that "most depth cameras degrade dramatically in sunlight", and it is the main reason stereo, which can use sunlight, is preferred outdoors.
+
+### 3. Time-of-flight: timing the light
+
+A ToF camera lights the whole scene with infrared and measures, at every pixel, how long the light took to return. Distance is half the round trip at the speed of light, c. Light covers a metre and back in about 6.7 nanoseconds, so most ToF cameras do not time a pulse directly. They modulate the light at a frequency f and measure the **phase shift** φ of the returning wave. TI gives:
+
+```text
+d     = c · φ / (4π · f)     distance from phase shift
+d_amb = c / (2 · f)          maximum unambiguous distance
+```
+
+At f = 20 MHz the unambiguous range is about 7.5 m; at 100 MHz it is about 1.5 m. A higher frequency gives better precision but wraps around sooner, so advanced ToF cameras combine several frequencies to extend the range. Microsoft's Azure Kinect DK is a phase-based camera: it "implements the Amplitude Modulated Continuous Wave (AMCW) Time-of-Flight (ToF) principle" with a 1-megapixel sensor. Others time light at the photon level: Apple says its iPad Pro LiDAR Scanner "operates at the photon level at nano-second speeds" and "measures the distance to surrounding objects up to 5 meters away", indoors and outdoors.
+
+## How a robot uses a depth image
+
+### From pixels to 3D points
+
+A depth image becomes useful once each pixel is turned back into a 3D point. With the camera's calibration (focal lengths fx, fy and image centre cx, cy, from the camera's `camera_info`), the pinhole camera model gives:
+
+```text
+X = (u − cx) · Z / fx
+Y = (v − cy) · Z / fy
+Z = depth at pixel (u, v)
+```
+
+This is exactly the arithmetic ROS 2's `depth_image_proc` package runs for every pixel. Do it for the whole image and you have a [point cloud](/atlas/concept/point-cloud): the same kind of 3D data a lidar gives, but dense and in front of the camera only.
+
+**Worked example.** A 848 × 480 depth image, with fx = fy = 424 px, cx = 424, cy = 240. The pixel at (u, v) = (624, 240) reads 2.0 m. Then X = (624 − 424) × 2.0 / 424 ≈ 0.94 m and Y = 0: the point is 2 m ahead and about 0.94 m to the right of the camera's centre line.
+
+### What robots do with it
+
+- **Obstacle avoidance and navigation.** Mobile robots add depth points to their [costmap](/atlas/concept/costmap) so they see things a flat 2D lidar misses, such as a table top above the scan plane.
+- **Grasping and bin picking.** An arm needs to know the 3D shape and pose of an object before it can plan where to put its fingers.
+- **Mapping.** Depth frames stitched together with the camera's motion build a 3D map of a room, as in RGB-D [SLAM](/atlas/concept/slam).
+- **People and gestures.** Depth makes it easier to separate a person from the background and estimate their pose.
+
+## How accurate is a depth camera?
+
+For stereo the answer has a clean formula. If the disparity can be matched to within a small error Δd, the depth error is:
+
+```text
+Δz ≈ z² · Δd / (f · B)
+```
+
+The z² is the important part: double the distance and the error roughly quadruples. RealSense's tuning guide puts it plainly: "The depth error scales as the square of the distance away."
+
+**Worked example: a RealSense D435.** The D435 has a 50 mm baseline. RealSense's own guide uses an 848-pixel-wide image with a 90° horizontal field of view (so f ≈ 424 px) and a subpixel matching error of 0.08 px for a well-textured target. Plugging those in:
+
+| Distance | Disparity | Theoretical depth error (RMS) |
+|---|---|---|
+| 0.5 m | 42.4 px | ≈ 0.9 mm |
+| 1 m | 21.2 px | ≈ 3.8 mm |
+| 2 m | 10.6 px | ≈ 15 mm |
+| 3 m | 7.1 px | ≈ 34 mm |
+| 4 m | 5.3 px | ≈ 60 mm |
+
+These are best-case numbers on a textured surface; real scenes are noisier. They show why depth cameras are best at short range, why a wider baseline helps at long range, and why RealSense recommends 848 × 480 on the D435: lower resolution means a smaller f in pixels and more error.
+
+Time-of-flight error behaves differently. It depends mainly on how much light returns (TI's noise equation has signal amplitude and ambient light in it), so dark or distant surfaces are noisier, and the modulation frequency sets the trade-off between precision and range. Microsoft quotes the Azure Kinect at a random error of 17 mm or less and a systematic error under 11 mm plus 0.1% of distance, within stated test conditions.
+
+## Where depth sensors fail
+
+Depth cameras mark pixels they cannot measure as invalid (0 or NaN), but some errors, such as multipath and edge pixels, can still come through as wrong distances. Knowing the causes helps you mount and choose one.
+
+- **Too close.** Triangulation needs a minimum distance. RealSense's guide gives the D435's minimum at roughly 17–20 cm at 848 × 480, and notes it shrinks at lower resolution.
+- **Shiny, black or transparent surfaces.** Glass lets light through, mirrors send it elsewhere, black objects send little back. Microsoft lists "Low IR signal" and "Saturated IR signal" among the reasons the Azure Kinect invalidates a pixel.
+- **Corners and edges (multipath).** Light that bounces off two surfaces before returning gives a wrong distance. Azure Kinect pixels "can also be invalidated if they received signals from more than one object in the scene". Pixels on object edges mix foreground and background.
+- **Featureless surfaces for passive stereo.** A white wall with no projector gives nothing to match.
+- **Sunlight for structured light.** The projected pattern is lost in ambient infrared.
+
+## Depth images in ROS 2
+
+[ROS 2](/atlas/concept/ros2) has a convention for depth, set by REP 118. The canonical form is a `sensor_msgs/Image` "encoded as 32-bit float", where "each pixel is a depth (along the camera Z axis) in meters". Drivers may also publish the older raw form: 16-bit unsigned integers in millimetres, where "the value 0 denotes an invalid depth". Note that depth is measured along the camera's Z axis, not along the ray to the point.
+
+The `depth_image_proc` package does the standard conversions. Its components include:
+
+| Component | What it does |
+|---|---|
+| `ConvertMetricNode` | Raw uint16 millimetres to float metres |
+| `PointCloudXyzNode` | Depth image + `camera_info` to an XYZ point cloud on `points` |
+| `PointCloudXyzrgbNode` | Registered depth + colour image to a coloured XYZRGB cloud |
+| `RegisterNode` | Reprojects depth into another camera's frame, such as the colour camera |
+
+A minimal run looks like this; replace the topic name with your camera driver's:
+
+```bash
+ros2 run depth_image_proc point_cloud_xyz_node --ros-args \
+  -r image_rect:=/my_camera/depth/image_rect
+# camera_info is read from the same namespace as the image (/my_camera/depth/camera_info)
+# the cloud appears on /points; add a PointCloud2 display in RViz to see it
+```
+
+## Depth camera or lidar?
+
+Both give 3D geometry, and many robots carry both. A typical lidar sweeps a laser around the robot and measures far and outdoors (rain, fog and direct sun still cost it range), but sees the world as a set of scan lines. A depth camera sees a dense rectangle in front of it at video rate, cheaply and close up, but its stereo error grows quickly with range and some types struggle in sunlight. A common pairing on indoor robots is a 2D lidar for mapping and localisation plus a depth camera for obstacles above and below the scan plane. TurtleBot 4 carries both, although its default Nav2 setup builds its costmaps from the lidar alone. For a full side-by-side, see [lidar vs radar vs camera for robots](/blog/lidar-vs-radar-vs-camera-for-robots).
+
+## Choosing one for a robot
+
+- **Indoor mobile robot or arm at 0.3–3 m:** active stereo (RealSense D400, OAK-D Pro) is a common choice: the projector lets it work in the dark, and outdoors it falls back on natural texture instead of failing.
+- **Outdoors:** stereo, or a sensor whose datasheet states outdoor use; check the ambient light rating rather than assume.
+- **Close-range, high-detail scanning indoors:** structured light gives the densest, most accurate surfaces on untextured objects (TI rates its depth accuracy highest of the three); ToF also needs no texture but is noisier at edges and in corners.
+- **Check the minimum range** against where the object will be. A wrist camera that is 15 cm from the grasp needs a short minimum distance.
+- **Check the driver.** A ROS 2 driver that publishes REP 118 depth plus `camera_info` saves days.
+
+## Where you'll see it
+
+Depth cameras sit on research and teaching robots such as TurtleBot 4, on the wrists and heads of manipulation robots, and on warehouse and service robots that have to avoid people and objects. Outside robotics, the same principles unlock your phone (Face ID's projected dots) and measure rooms for augmented reality (the iPad Pro's LiDAR Scanner).
+
+## Why it matters
+
+Depth is what turns a robot's picture of the world into a model it can act on. A gripper cannot close on a colour; it closes on a position. A depth sensor is the cheapest way to get dense 3D geometry at short range, and understanding its three principles tells you in advance where it will be accurate, where it will lie, and which one to buy for the job.
+
+## Common questions
+
+### What is a depth sensor?
+
+A depth sensor is a device that measures the distance to every point in its view and outputs it as an image, where each pixel holds a distance rather than a colour. Most are depth cameras that work by stereo vision, structured light or time-of-flight, and robots convert their output into a 3D point cloud.
+
+### Is a depth camera the same as a depth sensor?
+
+In practice, yes. "Depth camera" is the most common form of depth sensor: a camera-sized device that outputs a full depth image. When it also outputs an aligned colour image, it is called an RGB-D camera. Single-point distance sensors (ultrasonic, single-beam ToF) measure depth too but only in one direction.
+
+### Do depth cameras work outdoors?
+
+It depends on the type. Stereo cameras can use sunlight as their light source, and RealSense reports its D415 and D435 tend to perform even better in bright light. Structured-light cameras are easily washed out by sunlight. Time-of-flight cameras lose signal-to-noise in strong ambient light, and how much varies by design.
+
+### Why does my depth camera show holes in the image?
+
+Those pixels are marked invalid because the sensor could not measure them reliably: the surface is too close, shiny, black or transparent, light bounced between two surfaces (multipath), or a passive stereo camera found no texture to match. In ROS 2 the raw format marks them as 0 and the float format as NaN (±Inf can mean out of range, per REP 117).
+
+## Related
+
+- [Stereo vision](/atlas/concept/stereo-vision): depth from two cameras, in depth
+- [Structured light](/atlas/concept/structured-light): depth from a projected pattern
+- [Time-of-flight sensor](/atlas/concept/time-of-flight-sensor): depth from timing light
+- [Point cloud](/atlas/concept/point-cloud): what a depth image becomes
+- [Lidar](/atlas/concept/lidar): the long-range alternative

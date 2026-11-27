@@ -59,7 +59,7 @@ export const SHORTS_SCHEDULED_DEC: ShortLesson[] = [
     limit: 'Shiny, black or transparent objects return poor depth, stereo needs texture to match, and infrared patterns get washed out in strong sunlight.',
     demo: 'loop', loop: ['Send light or take two views', 'Work out distance for each pixel', 'Build a 3D picture'],
     quiz: { q: 'What does a depth camera add that a normal camera lacks?', options: ['More colours', 'A distance for every pixel', 'A wider view'], answer: 1, why: 'Each pixel gets a range value, which turns a flat picture into 3D shape.' },
-    atlas: [{ label: 'Depth camera', href: '/atlas/concept/depth-camera' }, { label: 'Stereo vision', href: '/atlas/concept/stereo-vision' }, { label: 'Structured light', href: '/atlas/concept/structured-light' }, { label: 'Time-of-flight sensor', href: '/atlas/concept/time-of-flight-sensor' }], next: 'sunlight-camera',
+    atlas: [{ label: 'Depth camera', href: '/atlas/concept/depth-sensor' }, { label: 'Stereo vision', href: '/atlas/concept/stereo-vision' }, { label: 'Structured light', href: '/atlas/concept/structured-light' }, { label: 'Time-of-flight sensor', href: '/atlas/concept/time-of-flight-sensor' }], next: 'sunlight-camera',
   },
   {
     slug: 'emergency-stop', title: 'Emergency Stop: Why the Red Button Does Not Rely on the Main Software', course: 'work', ids: ['ie_-lNGlXQc'], publishAt: '2026-12-07T15:00:00Z',
@@ -283,7 +283,7 @@ export const SHORTS_SCHEDULED_DEC: ShortLesson[] = [
     limit: 'HDR helps but is not magic: merging exposures can blur fast motion, and looking straight at the sun still blinds the sensor.',
     demo: 'loop', loop: ['Light hits the pixels', 'Bright parts saturate, dark parts drop to noise', 'Detail in between is lost'],
     quiz: { q: 'What is a camera’s dynamic range?', options: ['How far away it can see', 'The span from the darkest to the brightest light it can record at once', 'How many colours it has'], answer: 1, why: 'Outside that span, light is clipped to black or white and its detail is lost.' },
-    atlas: [{ label: 'Camera vision', href: '/atlas/concept/camera-vision' }, { label: 'Depth camera', href: '/atlas/concept/depth-camera' }, { label: 'Computer vision', href: '/atlas/concept/computer-vision' }], next: 'computer-vision',
+    atlas: [{ label: 'Camera vision', href: '/atlas/concept/camera-vision' }, { label: 'Depth camera', href: '/atlas/concept/depth-sensor' }, { label: 'Computer vision', href: '/atlas/concept/computer-vision' }], next: 'computer-vision',
   },
   {
     slug: 'arm-brakes', title: 'Why Robot Arm Brakes Lock When the Power Fails', course: 'work', ids: ['1uRyGNmhsKQ'], publishAt: '2026-12-15T15:00:00Z',

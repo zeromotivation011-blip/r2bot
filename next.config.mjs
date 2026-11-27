@@ -262,6 +262,10 @@ const nextConfig = {
       { source: '/atlas/concept/light-curtain', destination: '/atlas/concept/safety-light-curtain', permanent: true },
       { source: '/atlas/concept/tof-sensor', destination: '/atlas/concept/time-of-flight-sensor', permanent: true },
       { source: '/atlas/concept/last-mile-delivery', destination: '/atlas/concept/last-mile-delivery-robot', permanent: true },
+      // 27 Nov 2026: depth-camera (363 words, ~28 impressions) answered the same
+      // query as depth-sensor (~120 impressions, rewritten from primary sources).
+      // depth-sensor owns "depth sensor" and "depth camera". One owner per query.
+      { source: '/atlas/concept/depth-camera', destination: '/atlas/concept/depth-sensor', permanent: true },
       // The by-line is an editorial identity now, at the owner's request, so
       // the author page moved off a URL that carried a personal name.
       { source: '/author/ravi', destination: '/about/how-this-is-written', permanent: true },

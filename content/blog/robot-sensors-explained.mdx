@@ -33,7 +33,7 @@ Where it fails: soft surfaces (a curtain, a fluffy carpet) absorb sound and retu
 
 **Cameras** give the richest information of any sensor: color, shape, text, faces. The Raspberry Pi Camera Module 3 is $25 for a 12-megapixel Sony IMX708 with autofocus, on a ribbon cable straight into a Pi. The catch is that an image is just millions of numbers; software has to turn them into "a cup, slightly left." Color thresholding on an Arduino-class board can follow a red ball; anything more needs a Pi or better and [computer vision](/atlas/concept/computer-vision) software.
 
-**Depth cameras** add a distance for each pixel. The RealSense D435 ($375) uses two infrared cameras and a projector to compute stereo depth, plus a color camera, in one USB unit. That is the standard sensor on research arms, because an arm needs *what* and *where* in the same frame. See [depth camera](/atlas/concept/depth-camera).
+**Depth cameras** add a distance for each pixel. The RealSense D435 ($375) uses two infrared cameras and a projector to compute stereo depth, plus a color camera, in one USB unit. That is the standard sensor on research arms, because an arm needs *what* and *where* in the same frame. See [depth camera](/atlas/concept/depth-sensor).
 
 Where vision fails: darkness, glare, lighting that changed since training, and anything that moves faster than the processing pipeline. A model that takes 300 ms per frame on a Pi is reporting where the object *was*.
 
