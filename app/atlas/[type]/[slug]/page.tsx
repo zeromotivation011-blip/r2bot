@@ -2,7 +2,7 @@ import { jsonldScript } from '@/lib/seo/jsonld';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
   getAllAtlasEntries,
@@ -116,6 +116,50 @@ export async function generateMetadata(
       type: 'article',
     },
   };
+}
+
+// Shared by both halves of a split body (see splitBeforeFaq).
+const mdComponents: Components = {
+  // The page already renders the entry title as the one <h1>.
+  // 143 entries also start their body with "# Title", which
+  // produced a second <h1>; drop it so each page has exactly one.
+  h1: () => null,
+  code(props) {
+    const { className, children } = props as { className?: string; children?: React.ReactNode };
+    if (/language-quiz/.exec(className || '')) {
+      try {
+        const raw = String(children).trim();
+        const questions = JSON.parse(raw) as QuizQuestion[];
+        return <Quiz questions={questions} />;
+      } catch {
+        return <code className={className}>{children}</code>;
+      }
+    }
+    if (/language-diagram/.exec(className || '')) {
+      try {
+        const raw = String(children).trim();
+        const spec = JSON.parse(raw) as DiagramSpec;
+        return <AtlasDiagram spec={spec} />;
+      } catch {
+        return <code className={className}>{children}</code>;
+      }
+    }
+    return <code className={className}>{children}</code>;
+  },
+};
+
+/**
+ * Split an entry body just before its "Common questions" heading, so the email
+ * ask can sit after the explanation. Returns null (no split, ask stays at the
+ * end) when there is no such heading, when it comes too early to follow a real
+ * explanation, or when it would land inside an open code fence.
+ */
+function splitBeforeFaq(body: string): [string, string] | null {
+  const m = body.match(/^##[ \t]+(?:common questions|frequently asked questions|faq)[ \t]*$/im);
+  if (!m || m.index === undefined || m.index < 1500) return null;
+  const before = body.slice(0, m.index);
+  if ((before.match(/^\s*(```|~~~)/gm) ?? []).length % 2 !== 0) return null;
+  return [before, body.slice(m.index)];
 }
 
 /**
@@ -237,6 +281,7 @@ export default async function AtlasEntryPage(
   const rt = readTime(plain);
   const sourceCount = entry.sources?.length ?? 0;
   const faqItems = extractFAQItems(entry.body);
+  const bodySplit = splitBeforeFaq(entry.body);
   const academyLesson = getAcademyLessonForAtlasTerm(slug);
   // The 60-second video lesson on the same idea, if one exists. Twelve Quick
   // Lessons share a slug with an Atlas concept; linking them makes two pages on
@@ -529,41 +574,28 @@ export default async function AtlasEntryPage(
             />
           </div>
 
-          {/* Body */}
-          <div id="atlas-body" className="prose">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                // The page already renders the entry title as the one <h1>.
-                // 143 entries also start their body with "# Title", which
-                // produced a second <h1>; drop it so each page has exactly one.
-                h1: () => null,
-                code(props) {
-                  const { className, children } = props as { className?: string; children?: React.ReactNode };
-                  if (/language-quiz/.exec(className || '')) {
-                    try {
-                      const raw = String(children).trim();
-                      const questions = JSON.parse(raw) as QuizQuestion[];
-                      return <Quiz questions={questions} />;
-                    } catch {
-                      return <code className={className}>{children}</code>;
-                    }
-                  }
-                  if (/language-diagram/.exec(className || '')) {
-                    try {
-                      const raw = String(children).trim();
-                      const spec = JSON.parse(raw) as DiagramSpec;
-                      return <AtlasDiagram spec={spec} />;
-                    } catch {
-                      return <code className={className}>{children}</code>;
-                    }
-                  }
-                  return <code className={className}>{children}</code>;
-                },
-              }}
-            >
-              {entry.body}
-            </ReactMarkdown>
+          {/* Body. On entries with a "Common questions" section the email ask
+              sits between the explanation and the FAQ: the reader has the
+              answer by then, and the old spot (after Related and two promo
+              blocks) was 72-85% of the way down, 10-25 phone screens in, on the
+              top-impression entries (measured 27 Nov, task 102). One ask per
+              page: the lower InlineSignup renders only when there is no split. */}
+          <div id="atlas-body">
+            <div className="prose">
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                {bodySplit ? bodySplit[0] : entry.body}
+              </ReactMarkdown>
+            </div>
+            {bodySplit ? (
+              <>
+                <InlineSignup />
+                <div className="prose">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                    {bodySplit[1]}
+                  </ReactMarkdown>
+                </div>
+              </>
+            ) : null}
           </div>
 
           {/* Python Playground (only on programming-ish buckets) */}
@@ -593,7 +625,7 @@ export default async function AtlasEntryPage(
           {/* Email ask after the next step, on the pages search sends people to.
               Until 9 Nov 2026 the Atlas — the surface most likely to rank — had
               no capture at all. */}
-          <InlineSignup />
+          {bodySplit ? null : <InlineSignup />}
 
           {/* Interactive visualiser for select concepts */}
           {entry.slug === 'sense-think-act-loop' && (

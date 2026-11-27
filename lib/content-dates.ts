@@ -55,6 +55,7 @@ export const PAGE_UPDATED: Record<string, string> = {
   '/robots/compare': '2026-11-01T00:00:00.000Z',
   '/build': '2026-10-20T00:00:00.000Z',
   '/visualizer': '2026-10-20T00:00:00.000Z',
+  '/visualizer/compare': '2026-11-27T00:00:00.000Z',
   '/diagnostic': '2026-10-12T00:00:00.000Z',
   '/copilot': '2026-10-12T00:00:00.000Z',
   '/careers': '2026-10-12T00:00:00.000Z',
