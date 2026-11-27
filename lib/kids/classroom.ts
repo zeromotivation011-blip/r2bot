@@ -10,6 +10,7 @@
 
 import { BAND_ORDER, type BandId } from './bands'
 import { DEFAULT_DESIGN, decodeDesign, encodeDesign, getPart, type Slot } from './robot-design'
+import { isDay, type ClassGoal } from './classroom-goal'
 
 // ── Join codes ───────────────────────────────────────────────────────────────
 /** No I, L, O, 0 or 1 — a code read off a classroom wall cannot be misread. */
@@ -38,6 +39,8 @@ export const JOIN_URL_DISPLAY = 'r2bot.in/kids/join'
 export const MAX_MEMBERS_PER_CLASS = 60
 export const MAX_CLASSES_PER_TEACHER = 30
 export const SNAPSHOT_MAX_BYTES = 8192
+/** The snapshot column's limit once migration 0056 has run (the sync route falls back to 8192 before). */
+export const SNAPSHOT_MAX_BYTES_V2 = 16384
 
 // ── Nickname ─────────────────────────────────────────────────────────────────
 // Deliberately small and conservative. Long words are matched anywhere in the
@@ -121,13 +124,46 @@ export interface ClassSnapshot {
   activitiesDone: string[]
   /** Game ids played with at least one star (from personal bests). */
   gamesPlayed: string[]
+  // ── Wave 2 (roadmap #13, #30, #31, #40). All optional on the wire: an older
+  //    browser's snapshot parses to the empty values below. ──────────────────
+  /** conceptGridCode(): one letter per concept (n/l/s/f, upper-case = needs help), 16 letters. */
+  concepts: string
+  /**
+   * Evidence behind each concept letter, in CONCEPT_IDS order, "|"-separated:
+   * "wins.tries.misses.daysSinceWin" ("-" when never won), e.g. "3.5.2.4|0.0.0.-|…".
+   */
+  conceptEvidence: string
+  /**
+   * Two digits per entry of activitiesDone, same order: best stars (1–3) then
+   * attempts on the best run (1–9, 9 = nine or more). "31" = 3 stars first try.
+   */
+  activityScores: string
+  /** Skill Galaxy activities missed 2+ times and never solved first try: id -> misses. */
+  galaxyStuck: Record<string, number>
+  /** Course sessions whose challenge was tried 3+ times without a star: "L1-S05" -> attempts. */
+  courseStuck: Record<string, number>
+  /** Wrong check answers by the misconception they reveal: "L2-S04.taller-is-stronger" -> times chosen. Counts only. */
+  misconceptions: Record<string, number>
+  /** Highest game tier with a personal best: game id -> tier (1–9). */
+  gameTiers: Record<string, number>
+  /** Class Power-Up diary: local day -> distinct things done that day. */
+  days: Record<string, number>
 }
 
 export const EMPTY_SNAPSHOT: ClassSnapshot = {
   v: 1, totalStars: 0, completedLevels: 0, completedZones: [], episodesDone: {}, codeMissions: {},
   robotsBuilt: 0, totalMinutesPlayed: 0, band: null, robot: null, stuck: {},
   sessionsDone: {}, activitiesDone: [], gamesPlayed: [],
+  concepts: '', conceptEvidence: '', activityScores: '', galaxyStuck: {}, courseStuck: {},
+  misconceptions: {}, gameTiers: {}, days: {},
 }
+
+/** Shapes of the wave-2 keys (also used by the browser builder). */
+export const MISCONCEPTION_KEY_RE = /^L[1-4]-S\d{2}\.[a-z0-9][a-z0-9-]{0,47}$/
+export const CONCEPT_CODE_RE = /^[nlsfNLSF]{16}$/
+const EVIDENCE_RE = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.(\d{1,3}|-))(\|\d{1,3}\.\d{1,3}\.\d{1,3}\.(\d{1,3}|-)){15}$/
+export const SNAPSHOT_MAX_MISCONCEPTIONS = 24
+export const SNAPSHOT_MAX_DAYS = 40
 
 /** Most activity ids a snapshot carries, and the bytes they may use (the whole snapshot stays under SNAPSHOT_MAX_BYTES). */
 export const SNAPSHOT_MAX_ACTIVITIES = 260
@@ -227,8 +263,71 @@ export function parseSnapshot(x: unknown): ClassSnapshot | null {
     robot,
     stuck: starMap(o.stuck, 20, 1000),
     sessionsDone: sessionMap(o.sessionsDone),
-    activitiesDone: idList(o.activitiesDone, SNAPSHOT_MAX_ACTIVITIES, SNAPSHOT_ACTIVITY_BYTES),
+    ...activitiesWithScores(o.activitiesDone, o.activityScores),
     gamesPlayed: idList(o.gamesPlayed, 30, 900),
+    ...parseWave2(o),
+  }
+}
+
+/**
+ * activitiesDone (capped like capIds) with activityScores kept in step: the
+ * scores line up with the list as SENT, so each kept id keeps its own pair.
+ * Scores are dropped entirely when they do not match the sent list.
+ */
+function activitiesWithScores(rawIds: unknown, rawScores: unknown): Pick<ClassSnapshot, 'activitiesDone' | 'activityScores'> {
+  if (!Array.isArray(rawIds)) return { activitiesDone: [], activityScores: '' }
+  const scores = typeof rawScores === 'string' && rawScores.length === rawIds.length * 2 && /^([1-3][1-9])*$/.test(rawScores) ? rawScores : ''
+  const ids: string[] = []
+  let kept = ''
+  const seen = new Set<string>()
+  let bytes = 2
+  for (let i = 0; i < rawIds.length; i++) {
+    const id = rawIds[i]
+    if (ids.length >= SNAPSHOT_MAX_ACTIVITIES) break
+    if (typeof id !== 'string' || seen.has(id) || !ITEM_ID_RE.test(id)) continue
+    const cost = id.length + 3
+    if (bytes + cost > SNAPSHOT_ACTIVITY_BYTES) break
+    seen.add(id)
+    ids.push(id)
+    if (scores) kept += scores.slice(i * 2, i * 2 + 2)
+    bytes += cost
+  }
+  return { activitiesDone: ids, activityScores: kept }
+}
+
+function keyedInts(x: unknown, re: RegExp, maxKeys: number, maxVal: number): Record<string, number> {
+  const out: Record<string, number> = {}
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return out
+  let n = 0
+  for (const [k, v] of Object.entries(x as Record<string, unknown>)) {
+    if (n >= maxKeys) break
+    if (!re.test(k)) continue
+    const val = int(v, maxVal)
+    if (val <= 0) continue
+    out[k] = val
+    n++
+  }
+  return out
+}
+
+const DAY_KEY_RE = /^\d{4}-\d{2}-\d{2}$/
+
+/** The wave-2 fields of an untrusted snapshot (empty values when absent or malformed). */
+function parseWave2(o: Record<string, unknown>): Pick<ClassSnapshot,
+  'concepts' | 'conceptEvidence' | 'galaxyStuck' | 'courseStuck' | 'misconceptions' | 'gameTiers' | 'days'> {
+  const concepts = typeof o.concepts === 'string' && CONCEPT_CODE_RE.test(o.concepts) ? o.concepts : ''
+  const conceptEvidence = typeof o.conceptEvidence === 'string' && o.conceptEvidence.length <= 400 && EVIDENCE_RE.test(o.conceptEvidence) ? o.conceptEvidence : ''
+  const days: Record<string, number> = {}
+  for (const [k, v] of Object.entries(keyedInts(o.days, DAY_KEY_RE, 120, 200))) if (isDay(k)) days[k] = v
+  const newest = Object.keys(days).sort().reverse().slice(0, SNAPSHOT_MAX_DAYS)
+  return {
+    concepts,
+    conceptEvidence,
+    galaxyStuck: keyedInts(o.galaxyStuck, ITEM_ID_RE, 12, 99),
+    courseStuck: keyedInts(o.courseStuck, SESSION_KEY_RE, 12, 99),
+    misconceptions: keyedInts(o.misconceptions, MISCONCEPTION_KEY_RE, SNAPSHOT_MAX_MISCONCEPTIONS, 99),
+    gameTiers: keyedInts(o.gameTiers, ITEM_ID_RE, 30, 9),
+    days: Object.fromEntries(newest.map((d) => [d, days[d]])),
   }
 }
 
@@ -244,11 +343,12 @@ export function snapshotBytes(snap: ClassSnapshot): number {
 }
 
 /**
- * Make a parsed snapshot fit SNAPSHOT_MAX_BYTES (the column's CHECK). Drops the
- * least important entries first — the tail of activitiesDone beyond the first
- * 60 (the browser puts the class's assigned activities first), then halves of
- * the story and code maps, then the rest — so a very busy child still syncs
- * instead of getting a 413, and assignment ticks stay right.
+ * Make a parsed snapshot fit `maxBytes` (the column's CHECK). Drops the least
+ * important entries first — the tail of activitiesDone beyond the first 60
+ * (the browser puts the class's assigned activities first), then halves of
+ * the story and code maps, game tiers, the oldest misconceptions, then the
+ * rest — so a very busy child still syncs instead of getting a 413, and
+ * assignment ticks, the concept grid and the Power-Up diary stay right.
  */
 /** Activity ids always kept while anything older can still be trimmed (a class has at most 60 assignments). */
 const KEEP_ACTIVITIES = 60
@@ -261,24 +361,37 @@ export function fitSnapshot(snap: ClassSnapshot, maxBytes: number = SNAPSHOT_MAX
     gamesPlayed: [...snap.gamesPlayed],
     episodesDone: { ...snap.episodesDone },
     codeMissions: { ...snap.codeMissions },
+    gameTiers: { ...snap.gameTiers },
+    misconceptions: { ...snap.misconceptions },
   }
   const halve = (m: Record<string, number>): Record<string, number> => {
     const keys = Object.keys(m)
     return Object.fromEntries(keys.slice(0, Math.floor(keys.length / 2)).map((k) => [k, m[k]]))
   }
+  const cutActivities = (n: number) => {
+    out.activitiesDone = out.activitiesDone.slice(0, n)
+    if (out.activityScores) out.activityScores = out.activityScores.slice(0, n * 2)
+  }
   while (snapshotBytes(out) > maxBytes) {
     if (out.activitiesDone.length > KEEP_ACTIVITIES) {
-      out.activitiesDone = out.activitiesDone.slice(0, Math.max(KEEP_ACTIVITIES, out.activitiesDone.length - 20))
+      cutActivities(Math.max(KEEP_ACTIVITIES, out.activitiesDone.length - 20))
     } else if (Object.keys(out.episodesDone).length > 0 || Object.keys(out.codeMissions).length > 0) {
       // Older counters go before the assignment-relevant lists.
       if (Object.keys(out.episodesDone).length >= Object.keys(out.codeMissions).length) out.episodesDone = halve(out.episodesDone)
       else out.codeMissions = halve(out.codeMissions)
+    } else if (Object.keys(out.gameTiers).length > 0) {
+      out.gameTiers = halve(out.gameTiers)
+    } else if (Object.keys(out.misconceptions).length > 8) {
+      // The browser sends the most recent first.
+      out.misconceptions = Object.fromEntries(Object.entries(out.misconceptions).slice(0, 8))
     } else if (out.activitiesDone.length > 0) {
-      out.activitiesDone = out.activitiesDone.slice(0, Math.max(0, out.activitiesDone.length - 10))
+      cutActivities(Math.max(0, out.activitiesDone.length - 10))
     } else if (out.gamesPlayed.length > 0) {
       out.gamesPlayed = []
     } else {
       out.stuck = {}
+      out.galaxyStuck = {}
+      out.courseStuck = {}
       out.robot = null
       break
     }
@@ -324,6 +437,10 @@ export interface KidsClassSummary {
   joinCode: string
   createdAt: string
   memberCount: number
+  /** Class Power-Up goal (migration 0056). Absent before it runs. */
+  goal?: ClassGoal | null
+  /** False while migration 0056 has not run: the goal can only be kept on the teacher's device. */
+  goalReady?: boolean
 }
 
 export interface KidsMemberRow {

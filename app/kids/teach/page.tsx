@@ -11,6 +11,7 @@ import { allGuideIndexes, guideIndexL34 } from '@/lib/kids/teach/all-guides'
 import { levelByNumber } from '@/lib/kids/curriculum/levels'
 import { TRAINING_MODULES, TRAINING_TOTAL_MINUTES } from '@/lib/kids/teach/training'
 import { ShareToClassroom } from '@/components/kids/teach/ShareToClassroom'
+import { presentHref } from '@/lib/kids/teach/present-href'
 
 export const runtime = 'nodejs'
 
@@ -97,6 +98,7 @@ export default function TeachIndexPage() {
           <div className="teach-no-print mt-6 flex flex-wrap gap-3">
             <Link href="/kids/teach/1/1" className="inline-flex min-h-[48px] items-center rounded-xl bg-amber-500 px-5 font-bold text-[#1A1103] hover:bg-amber-400">Start with Session 1</Link>
             <Link href="/kids/teach/training" className="inline-flex min-h-[48px] items-center rounded-xl border border-white/15 bg-white/[0.04] px-5 font-bold text-white hover:bg-white/10">Teacher training ({TRAINING_TOTAL_MINUTES} min)</Link>
+            <Link href="/kids/teach/standards" className="inline-flex min-h-[48px] items-center rounded-xl border border-white/15 bg-white/[0.04] px-5 font-bold text-white hover:bg-white/10">Curriculum standards map</Link>
             <Link href="/kids/classroom" className="inline-flex min-h-[48px] items-center rounded-xl px-3 font-bold text-amber-300 hover:underline">Set up your class →</Link>
           </div>
         </div>
@@ -185,6 +187,8 @@ export default function TeachIndexPage() {
                       <div className="teach-no-print mt-3 flex flex-wrap items-center gap-2">
                         <Link href={`/kids/teach/${l.level}/${s.number}`} className="inline-flex min-h-[44px] items-center rounded-xl bg-amber-500/15 px-3 text-sm font-bold text-amber-200 hover:bg-amber-500/25">Open guide</Link>
                         <ShareToClassroom path={`/kids/course/${l.level}/${s.number}`} title={`Robotics: Level ${l.level}, session ${s.number} — ${s.title}`} variant="chip" />
+                        <Link href={presentHref({ kind: 'session', level: l.level, number: s.number, unplugged: false })} className="inline-flex min-h-[44px] items-center rounded-xl px-3 text-sm font-bold text-slate-200 hover:bg-white/10">Present</Link>
+                        {l.level === 1 && <Link href={`/kids/teach/unplugged/${s.number}`} className="inline-flex min-h-[44px] items-center rounded-xl px-3 text-sm font-bold text-slate-200 hover:bg-white/10">Unplugged</Link>}
                       </div>
                     </li>
                   ))}
@@ -194,6 +198,31 @@ export default function TeachIndexPage() {
           </section>
         )
       })}
+
+      <section className="mt-14" aria-labelledby="anywhere-h">
+        <h2 id="anywhere-h" className="font-display text-2xl font-bold text-white">Every room, every timetable</h2>
+        <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-slate-300">
+          Not every class has a device per pair and a 40-minute period. These run the same lessons with a projector only, with
+          no devices at all, in a mixed-age club, at home, or as a walk-in session.
+        </p>
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { href: '/kids/present', title: 'Present mode', body: 'Any session, episode or simulator full screen on the projector: lesson timer, join code with QR, slow motion, freeze-and-draw and a hands-up check.' },
+            { href: '/kids/teach/unplugged', title: 'Unplugged lessons', body: 'A no-device version of every Level 1 session: human-robot floor grid, command cards, sorting cards and paper gears.' },
+            { href: '/kids/teach/clubs', title: 'Robotics clubs', body: 'Mixed ages in one room: 60–90-minute sessions, a station per age band, a six-week season and a showcase night.' },
+            { href: '/kids/teach/family', title: 'Homeschool family class', body: 'Siblings of different ages, one parent, the same tools a teacher has.' },
+            { href: '/kids/teach/library', title: 'Library drop-in kit', body: 'A printable one-hour walk-in session with volunteers, three stations and a head count with no names.' },
+            { href: '/kids/teach/trust', title: 'Trust & Privacy Pack', body: 'Every field stored, retention, deletion, subprocessors, COPPA/GDPR/DPDP notes, accessibility status and a parent letter. PDF.' },
+          ].map((x) => (
+            <li key={x.href}>
+              <Link href={x.href} className="block h-full min-h-[44px] rounded-[20px] border border-white/10 bg-white/[0.03] p-4 hover:border-amber-400/50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60">
+                <span className="font-display text-lg font-bold text-white">{x.title}</span>
+                <span className="mt-1 block text-[15px] leading-relaxed text-slate-300">{x.body}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="mt-14 grid gap-5 lg:grid-cols-2" aria-labelledby="more-h">
         <h2 id="more-h" className="sr-only">More for teachers</h2>

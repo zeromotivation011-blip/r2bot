@@ -18,6 +18,7 @@ import './story.css'
 import type { Action, Beat, CastMember, CharacterId, ChoiceOption, Emotion, Episode, Lighting, Motion, PropId, Scene, SpeakerId } from '@/lib/kids/stories/types'
 import { CAST } from '@/lib/kids/stories/cast'
 import { lineMs } from '@/lib/kids/stories/timing'
+import { readPresentSignal, usePresentSignal } from '@/lib/kids/teach/present-bridge'
 import { isVoiceMuted, speakLine, speechAvailable, stopSpeech, warmVoices, type SpeakHandle } from '@/lib/kids/stories/speech'
 import { playSfx, primeSfx } from '@/lib/kids/stories/sfx'
 import { playSound, primeAudio } from '@/lib/kids-audio'
@@ -159,7 +160,8 @@ export default function StoryPlayerClient({ episode, next }: Props) {
 
   const say = useCallback((who: SpeakerId, text: string, onEnd: () => void) => {
     speechRef.current?.cancel()
-    const ms = lineMs(text)
+    // Present mode slow motion stretches each line's time on screen (lib/kids/teach/present-bridge).
+    const ms = Math.round(lineMs(text) / Math.max(0.25, readPresentSignal().speed))
     talkRef.current = { active: who !== 'narrator', lastBoundary: 0, hasBoundary: false }
     const end = () => {
       talkRef.current.active = false
@@ -437,6 +439,21 @@ export default function StoryPlayerClient({ episode, next }: Props) {
     setStatus('playing')
     rootRef.current?.focus({ preventScroll: true })
   }
+
+  // Present mode freeze pauses the story; un-freezing resumes it only if Present paused it.
+  const present = usePresentSignal()
+  const frozeRef = useRef(false)
+  useEffect(() => {
+    if (!present.active) return
+    if (present.frozen && status === 'playing') {
+      frozeRef.current = true
+      hush()
+      setStatus('paused')
+    } else if (!present.frozen && frozeRef.current) {
+      frozeRef.current = false
+      if (status === 'paused') setStatus('playing')
+    }
+  }, [present, status, hush])
 
   const togglePlay = () => {
     if (status === 'ready') return start()

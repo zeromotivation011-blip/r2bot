@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation'
 import { AUTH_CHANGED_EVENT } from '@/lib/supabase/lazy'
 import { getBand } from '@/lib/kids/bands'
 import { JOIN_URL_DISPLAY, formatJoinCode, type KidsClassSummary, type KidsMemberRow } from '@/lib/kids/classroom'
-import { relativeTime, teacherFetch } from '@/lib/kids/classroom-api'
-import { classTotals, hardestMissions, memberStats, rosterCsv, stuckLevels } from '@/lib/kids/classroom-stats'
+import { downloadText, fetchInsightCatalogue, fileSlug, relativeTime, teacherFetch } from '@/lib/kids/classroom-api'
+import { classTotals, memberStats, rosterCsv } from '@/lib/kids/classroom-stats'
+import type { InsightCatalogue } from '@/lib/kids/classroom-insights'
 import {
   ClassroomError,
   ClassroomNotReady,
@@ -18,6 +19,9 @@ import { ParentNote } from '@/components/kids/classroom/ParentNote'
 import { RobotMiniCard } from '@/components/kids/classroom/RobotMiniCard'
 import { LessonPlanPanel } from '@/components/kids/classroom/LessonPlanPanel'
 import { AssignmentsPanelClient } from '@/components/kids/classroom/AssignmentsPanelClient'
+import { PowerUpPanelClient } from '@/components/kids/classroom/PowerUpPanelClient'
+import { ClassMindMapClient, WhereToHelpClient } from '@/components/kids/classroom/ClassMindMapClient'
+import { GradebookClient } from '@/components/kids/classroom/GradebookClient'
 
 type State =
   | { kind: 'loading' }
@@ -36,6 +40,7 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
   const [flash, setFlash] = useState<string | null>(null)
   const [confirm, setConfirm] = useState<null | 'code' | 'delete' | { member: string }>(null)
   const [busy, setBusy] = useState(false)
+  const [catalogue, setCatalogue] = useState<InsightCatalogue | null>(null)
 
   const load = useCallback(async (quiet = false) => {
     if (!quiet) setState({ kind: 'loading' })
@@ -44,6 +49,18 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
     else if (r.kind === 'error') setState({ kind: 'error', message: r.message })
     else setState({ kind: r.kind })
   }, [classId])
+
+  const ready0 = state.kind === 'ready'
+  useEffect(() => {
+    if (!ready0 || catalogue) return
+    let alive = true
+    void fetchInsightCatalogue().then((c) => {
+      if (alive) setCatalogue(c)
+    })
+    return () => {
+      alive = false
+    }
+  }, [ready0, catalogue])
 
   useEffect(() => {
     setIsNew(new URLSearchParams(window.location.search).get('new') === '1')
@@ -62,13 +79,6 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
 
   const ready = state.kind === 'ready' ? state : null
   const totals = useMemo(() => (ready ? classTotals(ready.members) : null), [ready])
-  const stuck = useMemo(() => (ready ? stuckLevels(ready.members) : []), [ready])
-  const hard = useMemo(() => (ready ? hardestMissions(ready.members) : []), [ready])
-  const idle = useMemo(() => {
-    if (!ready) return []
-    const weekAgo = Date.now() - 7 * 24 * 3600 * 1000
-    return ready.members.filter((m) => Date.parse(m.lastActiveAt) < weekAgo).map((m) => m.nickname)
-  }, [ready])
 
   if (state.kind === 'loading') return <ClassroomSkeleton />
   if (state.kind === 'signed-out') return <TeacherSignIn next={`/kids/classroom/${classId}`} />
@@ -122,15 +132,7 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
   }
 
   function downloadCsv() {
-    const blob = new Blob([rosterCsv(members)], { type: 'text/csv;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `r2bot-kids-${cls.className.replace(/[^A-Za-z0-9]+/g, '-').toLowerCase() || 'class'}-${new Date().toISOString().slice(0, 10)}.csv`
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    URL.revokeObjectURL(url)
+    downloadText(rosterCsv(members), `r2bot-kids-${fileSlug(cls.className)}-${new Date().toISOString().slice(0, 10)}.csv`)
   }
 
   const btn = 'inline-flex min-h-[44px] items-center justify-center rounded-xl px-4 text-sm font-bold'
@@ -164,8 +166,11 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
         {flash && <p className="rounded-2xl bg-white/5 p-3 text-sm text-slate-200" role="status">{flash}</p>}
 
         <div className="flex flex-wrap gap-2">
-          <Link href={`/kids/classroom/${classId}/card`} className={`${btn} bg-amber-500 text-black hover:bg-amber-400`}>🖨️ Print join card</Link>
-          <button type="button" onClick={downloadCsv} disabled={!members.length} className={`${btn} border border-white/15 text-slate-100 hover:bg-white/5 disabled:opacity-50`}>⬇️ Download CSV</button>
+          <Link href={`/kids/classroom/${classId}/card`} className={`${btn} bg-amber-500 text-[#1A1103] hover:bg-amber-400`}>🖨️ Print join card</Link>
+          <Link href={`/kids/classroom/${classId}/projector`} className={`${btn} border border-white/15 text-slate-100 hover:bg-white/5`}>📽️ Projector view</Link>
+          <Link href={`/kids/present?code=${cls.joinCode}`} className={`${btn} border border-white/15 text-slate-100 hover:bg-white/5`}>🖥️ Present</Link>
+          <Link href="/kids/portfolio/class-certificates" className={`${btn} border border-white/15 text-slate-100 hover:bg-white/5`}>🏅 Class certificates</Link>
+          <button type="button" onClick={downloadCsv} disabled={!members.length} className={`${btn} border border-white/15 text-slate-100 hover:bg-white/5 disabled:opacity-50`}>⬇️ Roster CSV</button>
           <Link href="/kids/teach" className={`${btn} border border-white/15 text-slate-100 hover:bg-white/5`}>📘 Lesson guides</Link>
           <button type="button" onClick={() => void load()} className={`${btn} border border-white/15 text-slate-100 hover:bg-white/5`}>↻ Refresh</button>
           {confirm === 'code' ? (
@@ -195,11 +200,11 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {[
               ['Children', totals.children, '🧒'],
-              ['Active this week', totals.activeThisWeek, '📅'],
+              ['Played this week', totals.activeThisWeek, '📅'],
+              ['Course sessions', totals.sessions, '📘'],
+              ['Skill Galaxy runs', totals.activities, '🌌'],
               ['Stars', totals.stars, '⭐'],
-              ['Episodes watched', totals.episodes, '🎬'],
-              ['Missions solved', totals.missions, '🧩'],
-              ['Levels done', totals.levels, '🗺️'],
+              ['Robots built', totals.robotsBuilt, '🤖'],
             ].map(([label, value, emoji]) => (
               <div key={String(label)} className="rounded-2xl border border-white/10 bg-slate-950/80 p-4">
                 <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400"><span aria-hidden>{emoji} </span>{label}</dt>
@@ -210,41 +215,30 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
         </section>
       )}
 
-      {(stuck.length > 0 || hard.length > 0 || (idle.length > 0 && members.length > 0)) && (
-        <section aria-labelledby="insights-h" className="rounded-3xl border border-white/10 bg-slate-950/80 p-5 sm:p-6">
-          <h2 id="insights-h" className="text-lg font-extrabold text-white">Where to help next</h2>
-          <div className="mt-4 grid gap-5 md:grid-cols-3">
-            {stuck.length > 0 && (
-              <div>
-                <h3 className="text-sm font-bold text-amber-300">Most retried in Robot World</h3>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
-                  {stuck.map((s) => (
-                    <li key={s.key}><strong className="text-white">{s.label}</strong> — {s.children} children, {s.attempts} tries</li>
-                  ))}
-                </ul>
-                <p className="mt-2 text-xs text-slate-400">A good one to work through together on the board.</p>
-              </div>
-            )}
-            {hard.length > 0 && (
-              <div>
-                <h3 className="text-sm font-bold text-amber-300">Code Lab: solved, but only just</h3>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-200">
-                  {hard.map((h) => (
-                    <li key={h.id}><strong className="text-white">{h.label}</strong> — {h.oneStar} of {h.solved} with one star</li>
-                  ))}
-                </ul>
-                <p className="mt-2 text-xs text-slate-400">One star usually means a long program. Ask: “can a loop make it shorter?”</p>
-              </div>
-            )}
-            {idle.length > 0 && (
-              <div>
-                <h3 className="text-sm font-bold text-amber-300">Not played for a week</h3>
-                <p className="mt-2 text-sm text-slate-200">{idle.slice(0, 12).join(', ')}{idle.length > 12 ? ` and ${idle.length - 12} more` : ''}</p>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+      <nav aria-label="On this page" className="-mt-4 flex gap-2 overflow-x-auto pb-1 text-sm">
+        {[
+          ['#powerup-h', 'Power-Up'],
+          ['#mindmap-h', 'Mind Map'],
+          ['#help-h', 'Where to help'],
+          ['#gradebook-h', 'Gradebook'],
+          ['#roster-h', 'Roster'],
+        ].map(([href, label]) => (
+          <a key={href} href={href} className="inline-flex min-h-[44px] shrink-0 items-center rounded-full border border-white/15 bg-white/[0.04] px-4 font-semibold text-slate-100 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60">{label}</a>
+        ))}
+      </nav>
+
+      <PowerUpPanelClient
+        classId={classId}
+        cls={cls}
+        members={members}
+        onGoal={(goal) => setState({ kind: 'ready', cls: { ...cls, goal: cls.goalReady ? goal : cls.goal }, members })}
+      />
+
+      <ClassMindMapClient members={members} catalogue={catalogue} />
+
+      <WhereToHelpClient members={members} catalogue={catalogue} />
+
+      <GradebookClient cls={cls} members={members} catalogue={catalogue} />
 
       <AssignmentsPanelClient classId={classId} band={cls.band} members={members} />
 
@@ -260,15 +254,17 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
           </div>
         ) : (
           <div className="mt-3 overflow-x-auto rounded-2xl border border-white/10 bg-slate-950/80">
-            <table className="w-full min-w-[860px] text-left text-sm">
+            <table className="w-full min-w-[960px] text-left text-sm">
               <caption className="sr-only">Children in {cls.className} and their progress</caption>
               <thead className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-400">
                 <tr>
                   <th scope="col" className="px-4 py-3">Nickname</th>
+                  <th scope="col" className="px-3 py-3">📘 Sessions</th>
+                  <th scope="col" className="px-3 py-3">🌌 Galaxy</th>
+                  <th scope="col" className="px-3 py-3">🧠 Secure</th>
+                  <th scope="col" className="px-3 py-3">🎮 Games</th>
                   <th scope="col" className="px-3 py-3">⭐ Stars</th>
-                  <th scope="col" className="px-3 py-3">🎬 Stories</th>
                   <th scope="col" className="px-3 py-3">🧩 Code Lab</th>
-                  <th scope="col" className="px-3 py-3">🗺️ Levels</th>
                   <th scope="col" className="px-3 py-3">Robot</th>
                   <th scope="col" className="px-3 py-3">Last active</th>
                   <th scope="col" className="px-3 py-3"><span className="sr-only">Actions</span></th>
@@ -281,13 +277,15 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
                   return (
                     <tr key={m.id} className="border-b border-white/5 last:border-0">
                       <th scope="row" className="px-4 py-3 font-bold text-white">{m.nickname}</th>
+                      <td className="px-3 py-3 text-slate-100">{s.sessions}</td>
+                      <td className="px-3 py-3 text-slate-100">{s.activities}</td>
+                      <td className="px-3 py-3 text-slate-100">{s.secure}</td>
+                      <td className="px-3 py-3 text-slate-100">{s.games}</td>
                       <td className="px-3 py-3 text-slate-100">{s.stars}</td>
-                      <td className="px-3 py-3 text-slate-100">{s.episodes}</td>
                       <td className="px-3 py-3 text-slate-100">
                         {s.missions}
                         {s.missions > 0 && <span className="ml-1 text-xs text-slate-400">({s.missionStars}/{s.missions * 3}★)</span>}
                       </td>
-                      <td className="px-3 py-3 text-slate-100">{s.levels}</td>
                       <td className="px-3 py-3"><RobotMiniCard code={m.snapshot.robot} /></td>
                       <td className="px-3 py-3 text-slate-300">{relativeTime(m.lastActiveAt)}</td>
                       <td className="px-3 py-3 text-right">

@@ -18,6 +18,7 @@ import { allGuideParams, anyGuideFor, isL34Guide, isLevel2Guide, type AnyTeacher
 import { TRAINING_TOTAL_MINUTES } from '@/lib/kids/teach/training'
 import { ShareToClassroom } from '@/components/kids/teach/ShareToClassroom'
 import { GuideActionsClient } from '@/components/kids/teach/GuideActionsClient'
+import { PresentButton } from '@/components/kids/present/PresentButton'
 
 export const runtime = 'nodejs'
 export const dynamicParams = false
@@ -132,6 +133,10 @@ export default async function TeacherGuidePage({ params }: Params) {
         <div className="teach-no-print mt-6 flex flex-wrap items-center gap-3">
           <GuideActionsClient guide={g} />
           <ShareToClassroom path={g.sessionHref} title={`Robotics: Session ${g.number} — ${g.title}`} />
+          <PresentButton source={{ kind: 'session', level: g.level, number: g.number, unplugged: false }} gate={false} />
+          {g.level === 1 && (
+            <Link href={`/kids/teach/unplugged/${g.number}`} className="inline-flex min-h-[48px] items-center rounded-xl px-3 font-bold text-amber-300 hover:underline">No devices? Unplugged version →</Link>
+          )}
           <Link href={g.sessionHref} className="inline-flex min-h-[48px] items-center rounded-xl px-3 font-bold text-amber-300 hover:underline">Open the session as a child sees it →</Link>
         </div>
       </header>

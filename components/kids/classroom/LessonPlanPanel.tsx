@@ -39,7 +39,7 @@ export function LessonPlanPanel({ band, headingLevel = 2 }: { band: BandId; head
               <p className="text-slate-300"><strong className="text-white">By the end:</strong> {w.goal}</p>
               <dl className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <dt className="font-semibold text-amber-200">🎬 <Link href={PLAN_LINKS.story} className="underline-offset-2 hover:underline">Story Theatre</Link></dt>
+                  <dt className="font-semibold text-amber-200">🎬 <Link href={PLAN_LINKS.story} className="inline-flex min-h-[44px] items-center underline-offset-2 hover:underline">Story Theatre</Link></dt>
                   <dd className="mt-0.5">
                     <Link href={episodeHref(w.episode.slug)} className={CHIP}>▶ {w.episode.title}</Link>
                     <p className="mt-1.5">{w.story}</p>
@@ -50,11 +50,11 @@ export function LessonPlanPanel({ band, headingLevel = 2 }: { band: BandId; head
                   <dd className="mt-0.5">{w.unplugged}</dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-amber-200">🔧 <Link href={PLAN_LINKS.workshop} className="underline-offset-2 hover:underline">Workshop</Link></dt>
+                  <dt className="font-semibold text-amber-200">🔧 <Link href={PLAN_LINKS.workshop} className="inline-flex min-h-[44px] items-center underline-offset-2 hover:underline">Workshop</Link></dt>
                   <dd className="mt-0.5">{w.workshop}</dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-amber-200">🧩 <Link href={PLAN_LINKS.codeLab} className="underline-offset-2 hover:underline">Code Lab</Link></dt>
+                  <dt className="font-semibold text-amber-200">🧩 <Link href={PLAN_LINKS.codeLab} className="inline-flex min-h-[44px] items-center underline-offset-2 hover:underline">Code Lab</Link></dt>
                   <dd className="mt-0.5">
                     {w.missions.length > 0 && (
                       <ul className="mb-1.5 flex flex-wrap gap-2" aria-label={`Code Lab missions for week ${w.week}`}>

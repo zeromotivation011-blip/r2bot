@@ -28,6 +28,8 @@ import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1';
 import { LEVEL2_SESSIONS } from '@/lib/kids/curriculum/level2';
 import { guideParamsL34 } from '@/lib/kids/curriculum/level3/teacher-guide';
 import { MAKERS as KIDS_MAKERS } from '@/lib/kids/makers/makers';
+import { HOME_BUILDS as KIDS_HOME_BUILDS } from '@/lib/kids/builds/builds';
+import { allUnpluggedLessons } from '@/lib/kids/unplugged';
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in');
 
@@ -190,7 +192,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...AI_TOPICS.map((t) => ({ url: `${BASE}/ai-robotics/${t.slug}`, lastModified: GROUP_UPDATED.aiRobotics, changeFrequency: 'monthly' as const, priority: 0.8 })),
     { url: `${BASE}/kids`, lastModified: at('/kids'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/parents`, lastModified: at('/kids/parents'), changeFrequency: 'monthly' as const, priority: 0.6 },
-    { url: `${BASE}/kids/activities`, lastModified: at('/kids/activities'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    // Make It at Home (formerly /kids/activities, 308 in next.config.mjs): the hub and one page per build (lib/kids/builds/builds.ts).
+    { url: `${BASE}/kids/printables`, lastModified: at('/kids/printables'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    ...KIDS_HOME_BUILDS.map((b) => ({ url: `${BASE}/kids/printables/${b.id}`, lastModified: at('/kids/printables'), changeFrequency: 'monthly' as const, priority: 0.6 })),
     { url: `${BASE}/kids/course`, lastModified: at('/kids/course'), changeFrequency: 'monthly' as const, priority: 0.8 },
     // Every course level is written in full and indexable (app/kids/course/[level]/page.tsx PLAYABLE).
     ...[1, 2, 3, 4].map((n) => ({ url: `${BASE}/kids/course/${n}`, lastModified: at(`/kids/course/${n}`), changeFrequency: 'monthly' as const, priority: 0.8 })),
@@ -223,6 +227,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...LEVEL1_SESSIONS.map((s) => ({ url: `${BASE}/kids/teach/1/${s.number}`, lastModified: at('/kids/teach'), changeFrequency: 'monthly' as const, priority: 0.6 })),
     ...LEVEL2_SESSIONS.map((s) => ({ url: `${BASE}/kids/teach/2/${s.number}`, lastModified: GROUP_UPDATED.kidsTeachL2, changeFrequency: 'monthly' as const, priority: 0.6 })),
     ...guideParamsL34().map((g) => ({ url: `${BASE}/kids/teach/${g.level}/${g.session}`, lastModified: GROUP_UPDATED.kidsTeachL34, changeFrequency: 'monthly' as const, priority: 0.6 })),
+    // Wave 2 batch C: standards map, Trust Pack, clubs / family / library, and the unplugged lessons.
+    ...['standards', 'trust', 'clubs', 'family', 'library', 'unplugged'].map((p) => ({ url: `${BASE}/kids/teach/${p}`, lastModified: at(`/kids/teach/${p}`), changeFrequency: 'monthly' as const, priority: 0.6 })),
+    ...allUnpluggedLessons().map((l) => ({ url: `${BASE}/kids/teach/unplugged/${l.number}`, lastModified: at('/kids/teach/unplugged'), changeFrequency: 'monthly' as const, priority: 0.5 })),
     { url: `${BASE}/india`, lastModified: at('/india'), changeFrequency: 'monthly' as const, priority: 0.75 },
     { url: `${BASE}/teachers`, lastModified: at('/teachers'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/robots/compare`, lastModified: at('/robots/compare'), changeFrequency: 'monthly' as const, priority: 0.7 },

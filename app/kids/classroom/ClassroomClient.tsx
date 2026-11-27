@@ -237,6 +237,7 @@ function HowItWorks() {
       <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
         <Link href="/kids/teach" className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 hover:underline">Lesson guides for every session →</Link>
         <Link href="/kids/teach/training" className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 hover:underline">Teacher training with certificate →</Link>
+        <Link href="/kids/portfolio/class-certificates" className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 hover:underline">Print a class set of certificates →</Link>
       </p>
     </section>
   )

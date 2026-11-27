@@ -17,8 +17,13 @@ import {
   type JoinedClassInfo,
 } from './classroom'
 import { isAssignmentKind, type ChildMission } from './classroom-assignments'
+import { CONCEPT_IDS, conceptGridCode, conceptStates } from './universe/mastery'
+import { clearClassDiary, misconceptionCounts, workDays } from './classroom-diary'
+import type { ChildPowerUp } from './classroom-goal'
 
 const KEY = 'r2bot_kids_class_v1'
+/** components/kids/course/course-state.ts COURSE_KEY (read-only here; a swapped key, so it is the playing child's). */
+const COURSE_KEY = 'r2bot_kids_course_v1'
 /** Fired on window when the membership is created, refreshed or removed. */
 export const KIDS_CLASS_EVENT = 'r2bot:kids-class'
 
@@ -60,6 +65,8 @@ export function clearMembership(): void {
   try {
     window.localStorage.removeItem(KEY)
     window.localStorage.removeItem(MISSIONS_KEY)
+    window.localStorage.removeItem(POWER_UP_KEY)
+    clearClassDiary()
     window.dispatchEvent(new CustomEvent(KIDS_CLASS_EVENT))
   } catch {
     /* ignore */
@@ -100,6 +107,49 @@ export function buildSnapshot(): ClassSnapshot {
   const gamesPlayed = Array.from(new Set(Object.keys(p.personalBests ?? {}).map((k) => k.split(':')[0]))).filter((id) => gameIds.has(id))
   const sessionsDone: Record<string, number> = {}
   for (const [k, v] of Object.entries(p.sessionsDone ?? {})) if (/^L[1-4]-S\d{2}$/.test(k) && v > 0) sessionsDone[k] = Math.min(3, v)
+  const activitiesDone = capIds(doneIds, SNAPSHOT_MAX_ACTIVITIES, SNAPSHOT_ACTIVITY_BYTES)
+  // Two digits per activity: best stars, attempts on the best run (9 = nine or more).
+  const activityScores = activitiesDone
+    .map((id) => `${Math.min(3, Math.max(1, done[id]?.stars ?? 1))}${Math.min(9, Math.max(1, Math.round(done[id]?.attempts ?? 1)))}`)
+    .join('')
+  // Mastery (roadmap #27/#31): the grid letters and the numbers behind them.
+  let concepts = ''
+  let conceptEvidence = ''
+  try {
+    concepts = conceptGridCode(p)
+    const states = conceptStates(p)
+    const byId = new Map(states.map((x) => [x.id, x]))
+    conceptEvidence = CONCEPT_IDS.map((id) => {
+      const x = byId.get(id)
+      if (!x) return '0.0.0.-'
+      const c = (n: number) => Math.min(999, Math.max(0, Math.round(n)))
+      return `${c(x.recentWins)}.${c(x.tries)}.${c(x.misses)}.${x.daysSinceWin === null ? '-' : c(x.daysSinceWin)}`
+    }).join('|')
+  } catch {
+    concepts = ''
+    conceptEvidence = ''
+  }
+  // Galaxy activities missed twice or more and never won first try (from the concept log).
+  const perActivity = new Map<string, { miss: number; win: number }>()
+  for (const t of p.conceptLog ?? []) {
+    const cur = perActivity.get(t.a) ?? { miss: 0, win: 0 }
+    if (t.ok) cur.win += 1
+    else cur.miss += 1
+    perActivity.set(t.a, cur)
+  }
+  const galaxyStuck = Object.fromEntries(
+    [...perActivity.entries()]
+      .filter(([id, r]) => r.miss >= 2 && r.win === 0 && (done[id]?.stars ?? 0) < 2)
+      .sort((a, b) => b[1].miss - a[1].miss)
+      .slice(0, 12)
+      .map(([id, r]) => [id, Math.min(99, r.miss)]),
+  )
+  // Game tiers reached: personal bests are "<game>:t<tier>".
+  const gameTiers: Record<string, number> = {}
+  for (const k of Object.keys(p.personalBests ?? {})) {
+    const m = /^([a-z0-9][a-z0-9_-]{0,63}):t(\d)$/.exec(k)
+    if (m && gameIds.has(m[1])) gameTiers[m[1]] = Math.max(gameTiers[m[1]] ?? 0, Number(m[2]))
+  }
   return {
     v: 1,
     totalStars: p.totalStars,
@@ -108,14 +158,43 @@ export function buildSnapshot(): ClassSnapshot {
     episodesDone: p.episodesDone ?? {},
     codeMissions: p.codeMissions ?? {},
     robotsBuilt: p.robotsBuilt ?? 0,
-    totalMinutesPlayed: Math.round(p.totalMinutesPlayed),
+    // Roadmap #13: minutes are no longer reported to the class (reward learning, not time).
+    totalMinutesPlayed: 0,
     band: p.band,
     robot,
     stuck: stuckTop,
     sessionsDone,
-    activitiesDone: capIds(doneIds, SNAPSHOT_MAX_ACTIVITIES, SNAPSHOT_ACTIVITY_BYTES),
+    activitiesDone,
     gamesPlayed: gamesPlayed.slice(0, 30),
+    concepts,
+    conceptEvidence,
+    activityScores,
+    galaxyStuck,
+    courseStuck: courseStuckSessions(),
+    misconceptions: misconceptionCounts(),
+    gameTiers,
+    days: workDays(),
   }
+}
+
+/** Course sessions whose challenge was tried 3+ times with no star and not finished (course state store). */
+function courseStuckSessions(): Record<string, number> {
+  const out: Record<string, number> = {}
+  try {
+    const raw = window.localStorage.getItem(COURSE_KEY)
+    if (!raw) return out
+    const o = JSON.parse(raw) as { sessions?: Record<string, { challengeAttempts?: unknown; challengeStars?: unknown; done?: unknown }> }
+    const rows = Object.entries(o.sessions ?? {})
+      .filter(([k, v]) => /^L[1-4]-S\d{2}$/.test(k) && !!v && typeof v === 'object')
+      .map(([k, v]) => [k, typeof v.challengeAttempts === 'number' ? v.challengeAttempts : 0, v.challengeStars, v.done] as const)
+      .filter(([, attempts, stars, isDone]) => attempts >= 3 && !stars && !isDone)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 12)
+    for (const [k, attempts] of rows) out[k] = Math.min(99, Math.floor(attempts))
+  } catch {
+    /* a malformed store just means no signal */
+  }
+  return out
 }
 
 // ── "From your teacher" missions (migration 0055) ───────────────────────────
@@ -221,4 +300,65 @@ export async function syncMembership(includeSnapshot: boolean): Promise<SyncOutc
   } catch {
     return 'unavailable'
   }
+}
+
+// ── Class Power-Up (roadmap #40, migration 0056) ─────────────────────────────
+const POWER_UP_KEY = 'r2bot_kids_class_powerup_v1'
+/** Fired on window when the cached class goal changes. */
+export const KIDS_POWER_UP_EVENT = 'r2bot:kids-powerup'
+
+export function loadPowerUp(): ChildPowerUp | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(POWER_UP_KEY)
+    if (!raw) return null
+    const o = JSON.parse(raw) as { p?: ChildPowerUp | null }
+    const p = o.p
+    if (!p || typeof p !== 'object' || !p.goal || typeof p.done !== 'number' || typeof p.target !== 'number') return null
+    return p
+  } catch {
+    return null
+  }
+}
+
+function savePowerUp(p: ChildPowerUp | null): void {
+  try {
+    if (p) window.localStorage.setItem(POWER_UP_KEY, JSON.stringify({ at: new Date().toISOString(), p }))
+    else window.localStorage.removeItem(POWER_UP_KEY)
+    window.dispatchEvent(new CustomEvent(KIDS_POWER_UP_EVENT))
+  } catch {
+    /* storage blocked: the card shows what came back this time */
+  }
+}
+
+export type PowerUpOutcome = { kind: 'ok'; powerUp: ChildPowerUp | null } | { kind: 'none' } | { kind: 'unavailable' }
+
+/** The class goal for this browser's class: 'unavailable' before 0056 or offline (the cached one stays). */
+export async function fetchPowerUp(): Promise<PowerUpOutcome> {
+  const m = loadMembership()
+  if (!m) return { kind: 'none' }
+  try {
+    const res = await fetch('/api/kids/classroom/power-up', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: m.token, today: localDayString() }),
+      cache: 'no-store',
+    })
+    const data = (await res.json().catch(() => ({}))) as { ok?: boolean; removed?: boolean; powerUp?: ChildPowerUp | null }
+    if (res.status === 404 && data.removed) {
+      clearMembership()
+      return { kind: 'none' }
+    }
+    if (res.ok && data.ok) {
+      savePowerUp(data.powerUp ?? null)
+      return { kind: 'ok', powerUp: data.powerUp ?? null }
+    }
+    return { kind: 'unavailable' }
+  } catch {
+    return { kind: 'unavailable' }
+  }
+}
+
+function localDayString(d: Date = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }

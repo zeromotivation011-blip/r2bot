@@ -10,7 +10,7 @@
 
 import type { NextRequest } from 'next/server'
 import { anyRateLimited, clientIp } from '@/lib/rate-limit'
-import { SNAPSHOT_MAX_BYTES, fitSnapshot, isBandId, parseSnapshot, snapshotBytes, type JoinedClassInfo } from '@/lib/kids/classroom'
+import { SNAPSHOT_MAX_BYTES, SNAPSHOT_MAX_BYTES_V2, fitSnapshot, isBandId, parseSnapshot, snapshotBytes, type JoinedClassInfo } from '@/lib/kids/classroom'
 import {
   adminOrNull,
   hashToken,
@@ -37,7 +37,7 @@ interface MemberWithClass {
 
 export async function POST(req: NextRequest): Promise<Response> {
   // The request may carry more than fits (lists are trimmed below), never more than twice the column.
-  const raw = await readJsonCapped(req, SNAPSHOT_MAX_BYTES * 2 + 256)
+  const raw = await readJsonCapped(req, SNAPSHOT_MAX_BYTES_V2 + 4096)
   if (!raw || typeof raw !== 'object') return jsonError(413, 'Snapshot too large or malformed.')
   const body = raw as SyncBody
   if (!isTokenShape(body.token)) return jsonError(400, 'Missing member token.')
@@ -67,14 +67,22 @@ export async function POST(req: NextRequest): Promise<Response> {
   if (!cls) return Response.json({ ok: false, removed: true }, { status: 404 })
 
   const update: { last_active_at: string; snapshot?: unknown } = { last_active_at: new Date().toISOString() }
+  let parsed: ReturnType<typeof parseSnapshot> = null
   if (body.snapshot !== undefined) {
-    const parsed = parseSnapshot(body.snapshot)
+    parsed = parseSnapshot(body.snapshot)
     if (!parsed) return jsonError(400, 'Malformed snapshot.')
-    const snap = fitSnapshot(parsed)
-    if (snapshotBytes(snap) > SNAPSHOT_MAX_BYTES) return jsonError(413, 'Snapshot too large.')
+    // Migration 0056 raises the column's limit to 16 KB; until it runs the
+    // CHECK (8 KB) refuses a bigger row and we retry with the 0054 limit.
+    const snap = fitSnapshot(parsed, SNAPSHOT_MAX_BYTES_V2)
+    if (snapshotBytes(snap) > SNAPSHOT_MAX_BYTES_V2) return jsonError(413, 'Snapshot too large.')
     update.snapshot = snap
   }
-  const { error: upErr } = await admin.from('kids_class_members').update(update).eq('id', member.id)
+  let { error: upErr } = await admin.from('kids_class_members').update(update).eq('id', member.id)
+  if (upErr && upErr.code === '23514' && parsed) {
+    const small = fitSnapshot(parsed, SNAPSHOT_MAX_BYTES)
+    if (snapshotBytes(small) > SNAPSHOT_MAX_BYTES) return jsonError(413, 'Snapshot too large.')
+    ;({ error: upErr } = await admin.from('kids_class_members').update({ ...update, snapshot: small }).eq('id', member.id))
+  }
   if (upErr) return jsonError(500, 'Sync failed.')
 
   const info: JoinedClassInfo = {

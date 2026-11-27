@@ -459,7 +459,7 @@ export default function Level2SessionRunnerClient({ data, level = 2 }: { data: L
             </div>
           </div>
         ) : step === 4 ? (
-          <CheckStepClient quiz={session.quiz} checked={!!st.checked} onChecked={() => patch({ checked: true })} onNext={() => goTo(5)} />
+          <CheckStepClient quiz={session.quiz} sessionKey={session.id} checked={!!st.checked} onChecked={() => patch({ checked: true })} onNext={() => goTo(5)} />
         ) : (
           <BadgeStepClient
             badge={session.badge}

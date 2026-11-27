@@ -27,6 +27,7 @@ import BlocklyEditor, { type BlocklyEditorHandle } from './BlocklyEditorClient'
 import FlightRecorderClient, { RecorderTimelineClient, type GhostNews } from './FlightRecorderClient'
 import type { CameraMode, SimRenderer } from './renderer'
 import SensorPanel from './SensorPanel'
+import { readPresentSignal } from '@/lib/kids/teach/present-bridge'
 
 const MAX_TICKS_PER_FRAME = 8
 const SPEEDS = [0.5, 1, 2, 4] as const
@@ -216,12 +217,15 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
 
   function frame(dt: number) {
     const run = runRef.current
+    // Present mode (lib/kids/teach/present-bridge): slow motion multiplies the speed, freeze stops time.
+    const present = readPresentSignal()
+    const pSpeed = present.frozen ? 0 : present.speed
     if (!run || !curRef.current || !prevRef.current) return null
     if (modeRef.current === 'replay') {
       const fr = framesRef.current
       if (replayingRef.current && fr.length > 1) {
         const end = fr[fr.length - 1].t
-        let nt = replayTRef.current + dt * speedRef.current
+        let nt = replayTRef.current + dt * speedRef.current * pSpeed
         if (nt >= end) {
           nt = end
           replayingRef.current = false
@@ -243,7 +247,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       }
     }
     if (phaseRef.current === 'running') {
-      accRef.current += dt * speedRef.current
+      accRef.current += dt * speedRef.current * pSpeed
       const n = Math.min(MAX_TICKS_PER_FRAME, Math.floor(accRef.current / DT))
       // Only two snapshots per frame: just before the last tick and after it (what the renderer interpolates).
       for (let i = 0; i < n && run.status !== 'done'; i++) {

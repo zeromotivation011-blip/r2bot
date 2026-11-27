@@ -28,7 +28,7 @@ const AskSpark = dynamic(() => import('@/components/kids/ai/spark/AskSparkClient
 const RobodexToast = dynamic(() => import('@/components/kids/robodex/RobodexToastClient'), { ssr: false })
 
 /** Grown-up screens: no floating Spark button (openSpark() still works there). */
-const SPARK_HIDE_GROWNUP = ['/kids/classroom', '/kids/join', '/kids/parents', '/kids/teach', '/kids/schools']
+const SPARK_HIDE_GROWNUP = ['/kids/classroom', '/kids/join', '/kids/parents', '/kids/teach', '/kids/schools', '/kids/present', '/kids/portfolio/class-certificates']
 
 /**
  * Game and full-screen screens, where a floating button would sit on top of the

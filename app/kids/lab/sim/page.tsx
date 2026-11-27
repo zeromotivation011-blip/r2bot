@@ -5,6 +5,7 @@
 
 import type { Metadata } from 'next'
 import SimLabClient from '@/components/kids/sim/SimLabClient'
+import { PresentButton } from '@/components/kids/present/PresentButton'
 
 export const runtime = 'nodejs'
 
@@ -25,6 +26,8 @@ export default function SimLabPage() {
           Your robot is not moving on squares here. It has weight, its motors have a limit, its wheels can slip, and it keeps rolling after
           you say stop. Pick a challenge, build a program with blocks, press Run — then swap a part and see what changes.
         </p>
+        {/* Present mode is a classroom-screen tool: hidden on phones so the robot stays in the first screen. */}
+        <PresentButton source={{ kind: 'sim', id: 'lab' }} className="hidden min-h-[48px] items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-4 font-bold text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 sm:mt-3 sm:inline-flex" />
       </header>
       <SimLabClient />
     </>

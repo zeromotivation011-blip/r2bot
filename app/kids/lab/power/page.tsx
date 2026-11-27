@@ -5,6 +5,7 @@
 
 import type { Metadata } from 'next'
 import PowerLabClient from '@/components/kids/sim/PowerLabClient'
+import { PresentButton } from '@/components/kids/present/PresentButton'
 import { breadcrumbJsonLD, jsonldScript } from '@/lib/seo/jsonld'
 
 export const runtime = 'nodejs'
@@ -61,6 +62,9 @@ export default function PowerLabPage() {
           Energy is the limit every real robot engineer fights. A Mars rover, a vacuum robot and a delivery drone all ask the same questions: how much energy do I carry,
           how fast do I spend it, and can I get back to the charger in time? Build a pack, load it, power it with the sun, then drive a robot home before it runs flat.
         </p>
+        <div className="mt-3">
+          <PresentButton source={{ kind: 'sim', id: 'power' }} />
+        </div>
       </header>
 
       <PowerLabClient />

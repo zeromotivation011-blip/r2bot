@@ -7,6 +7,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import EpisodeLabClient from '@/components/kids/episodes/EpisodeLabClient'
+import { PresentButton } from '@/components/kids/present/PresentButton'
 import manifest from '@/lib/kids/episodes/audio-manifest.json'
 import { VOICE_CREDIT } from '@/lib/kids/episodes/credits'
 import { normaliseSessionId, type EpisodeData } from '@/lib/kids/episodes/types'
@@ -56,6 +57,9 @@ export default async function EpisodePreviewPage({ params }: Params) {
         <p className="text-sm text-[#A7B0C0]">
           <span className="font-bold text-amber-300">Preview</span> · Session “{ep.sessionTitle}” · Level 1 · Lantern Hill
         </p>
+        <div className="w-full sm:ml-auto sm:w-auto">
+          <PresentButton source={{ kind: 'session', level: 1, number: ep.number, unplugged: false }} />
+        </div>
       </header>
 
       <EpisodeLabClient sessionId={ep.sessionId} nextId={next?.sessionId ?? null} nextTitle={next?.title ?? null} />

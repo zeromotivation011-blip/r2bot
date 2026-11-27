@@ -118,8 +118,15 @@ export function BackupCodeClient({ headingLevel = 2 }: { headingLevel?: 2 | 3 })
     setCopied(false)
     try {
       // The Robodex collection rides along (loaded on demand: the card catalogue stays out of this page's first load).
-      const { robodexBackupExtra } = await import('@/lib/kids/robodex/store')
-      const c = await exportProgressCode({ extras: { robot: encodeDesign(loadDesign()), looks: looksExtra(), robodex: robodexBackupExtra() } })
+      // So do the Make It at Home check-ins and the newest portfolio robot snapshots (both per child, short codes).
+      const [{ robodexBackupExtra }, { buildsBackupExtra }, { portfolioBackupExtra }] = await Promise.all([
+        import('@/lib/kids/robodex/store'),
+        import('@/lib/kids/builds/store'),
+        import('@/components/kids/portfolio/portfolio-store'),
+      ])
+      const c = await exportProgressCode({
+        extras: { robot: encodeDesign(loadDesign()), looks: looksExtra(), robodex: robodexBackupExtra(), builds: buildsBackupExtra(), portfolio: portfolioBackupExtra() },
+      })
       setCode(c)
     } finally {
       setMaking(false)
@@ -193,6 +200,15 @@ export function BackupCodeClient({ headingLevel = 2 }: { headingLevel?: 2 | 3 })
       if (r.extras.robodex) {
         const { restoreRobodexExtra } = await import('@/lib/kids/robodex/store')
         restoreRobodexExtra(r.extras.robodex)
+      }
+      if (r.extras.builds) {
+        // The catalogue resolves the short tags back to build ids (loaded only on restore).
+        const [{ restoreBuildsExtra }, { HOME_BUILDS }] = await Promise.all([import('@/lib/kids/builds/store'), import('@/lib/kids/builds/builds')])
+        restoreBuildsExtra(r.extras.builds, HOME_BUILDS.map((b) => b.id))
+      }
+      if (r.extras.portfolio) {
+        const { restorePortfolioExtra } = await import('@/components/kids/portfolio/portfolio-store')
+        restorePortfolioExtra(r.extras.portfolio)
       }
       playSound('correct')
       setStatus({ kind: 'ok', text: successLine(r, robot) })

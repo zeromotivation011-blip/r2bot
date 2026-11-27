@@ -34,7 +34,7 @@ export default function TeachersPage() {
       <h2 style={{ color: '#fff', fontSize: 22, marginTop: 28 }}>What to open</h2>
       <ul style={{ color: 'var(--text-2)', lineHeight: 2, paddingLeft: 20 }}>
         <li><Link href="/ai-robotics" style={{ color: '#FC6818' }}>AI and robotics guides and demos</Link> (also in <Link href="/hi" style={{ color: '#FC6818' }}>Hindi</Link>, <Link href="/es" style={{ color: '#FC6818' }}>Spanish</Link> and <Link href="/zh" style={{ color: '#FC6818' }}>Chinese</Link>)</li>
-        <li><Link href="/kids/activities" style={{ color: '#FC6818' }}>Printable activities</Link></li>
+        <li><Link href="/kids/printables" style={{ color: '#FC6818' }}>Printable activities</Link></li>
         <li><Link href="/robots/directory" style={{ color: '#FC6818' }}>Robot directory</Link> and <Link href="/robots/compare" style={{ color: '#FC6818' }}>compare tool</Link></li>
         <li><Link href="/courses" style={{ color: '#FC6818' }}>Free course path</Link> with quizzes and certificates</li>
         <li><Link href="/india" style={{ color: '#FC6818' }}>Robotics in India</Link>: competitions, programmes and careers</li>

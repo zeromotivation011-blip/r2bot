@@ -29,7 +29,7 @@ export const KIDS_MORE: KidsNavItem[] = [
   { href: '/kids/lab/power', emoji: '🔋', label: 'Power Lab', line: 'Build a battery pack and get home before it runs flat.' },
   { href: '/kids/robodex', emoji: '📇', label: 'Robodex', line: 'Collect real robots from every world by playing.' },
   { href: '/kids/careers', emoji: '🌟', label: 'Robotics careers', line: 'Meet the makers who build robots, and the skills they use.' },
-  { href: '/kids/activities', emoji: '✂️', label: 'Make at Home', line: 'Printable paper robots and unplugged games.' },
+  { href: '/kids/printables', emoji: '✂️', label: 'Make at Home', line: 'Kitchen-table robot builds with a grown-up and a fair test.' },
 ]
 
 /** Settings (sound, motion, text size, progress backup). In More on every width, never on the /kids grid. */

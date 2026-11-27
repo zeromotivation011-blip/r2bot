@@ -20,6 +20,8 @@ import {
   loadMembership,
   syncMembership,
 } from '@/lib/kids/classroom-membership'
+import { KIDS_CLASS_DIARY_EVENT, noteClassWork } from '@/lib/kids/classroom-diary'
+import { REWARD_EVENT, type RewardResult } from '@/lib/kids/universe/rewards'
 
 const DEBOUNCE_MS = 5000
 
@@ -62,13 +64,24 @@ export function KidsClassSync({ showPill = false }: KidsClassSyncProps) {
       if (document.visibilityState === 'hidden') flush()
     }
 
+    // Class Power-Up diary (roadmap #40): each finished thing counts once a day.
+    // noteClassWork fires KIDS_CLASS_DIARY_EVENT, which schedules the sync.
+    const onReward = (e: Event) => {
+      const r = (e as CustomEvent<RewardResult>).detail
+      if (r && typeof r.kind === 'string' && typeof r.id === 'string') noteClassWork(r.kind, r.id)
+    }
+
     window.addEventListener(KIDS_PROGRESS_EVENT, schedule)
+    window.addEventListener(KIDS_CLASS_DIARY_EVENT, schedule)
+    window.addEventListener(REWARD_EVENT, onReward)
     window.addEventListener(ROBOT_CHANGED_EVENT, schedule)
     window.addEventListener(KIDS_CLASS_EVENT, refreshName)
     window.addEventListener('pagehide', flush)
     document.addEventListener('visibilitychange', onHide)
     return () => {
       window.removeEventListener(KIDS_PROGRESS_EVENT, schedule)
+      window.removeEventListener(KIDS_CLASS_DIARY_EVENT, schedule)
+      window.removeEventListener(REWARD_EVENT, onReward)
       window.removeEventListener(ROBOT_CHANGED_EVENT, schedule)
       window.removeEventListener(KIDS_CLASS_EVENT, refreshName)
       window.removeEventListener('pagehide', flush)

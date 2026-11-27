@@ -8,12 +8,16 @@
 import type { NextRequest } from 'next/server'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { cleanText, isBandId } from '@/lib/kids/classroom'
+import { parseGoal } from '@/lib/kids/classroom-goal'
 import {
   CLASS_COLUMNS,
   MEMBER_COLUMNS,
   adminOrNull,
   currentTeacher,
+  goalsNotReadyResponse,
+  isMissingGoalColumn,
   isUuid,
+  loadClassGoal,
   jsonError,
   loadOwnedClass,
   newJoinCode,
@@ -59,8 +63,10 @@ export async function GET(_req: NextRequest, ctx: Ctx): Promise<Response> {
     .order('created_at', { ascending: true })
   if (error) return jsonError(500, 'Could not load the roster.')
   const members = ((data ?? []) as MemberDbRow[]).map(toMemberRow)
+  const goal = await loadClassGoal(g.admin, classId)
+  const summary = { ...toClassSummary(g.cls, members.length), goal: goal === 'not-ready' ? null : goal, goalReady: goal !== 'not-ready' }
   return Response.json(
-    { ok: true, class: toClassSummary(g.cls, members.length), members },
+    { ok: true, class: summary, members },
     { headers: NO_STORE },
   )
 }
@@ -71,13 +77,14 @@ interface PatchBody {
   teacherName?: unknown
   schoolName?: unknown
   band?: unknown
+  goal?: unknown
 }
 
 export async function PATCH(req: NextRequest, ctx: Ctx): Promise<Response> {
   const { classId } = await ctx.params
   const g = await guard(classId)
   if (!g.ok) return g.res
-  const raw = await readJsonCapped(req, 2048)
+  const raw = await readJsonCapped(req, 4096)
   if (!raw || typeof raw !== 'object') return jsonError(400, 'Malformed request.')
   const body = raw as PatchBody
 
@@ -116,6 +123,19 @@ export async function PATCH(req: NextRequest, ctx: Ctx): Promise<Response> {
       .single()
     if (error || !data) return jsonError(500, 'Could not save the class.')
     return Response.json({ ok: true, class: toClassSummary(data as ClassDbRow, 0) }, { headers: NO_STORE })
+  }
+
+  if (body.action === 'goal') {
+    // Class Power-Up (roadmap #40). null clears the goal.
+    const goal = body.goal === null ? null : parseGoal(body.goal)
+    if (body.goal !== null && !goal) return jsonError(400, 'Give the goal a name, a number between 10 and 5000 and an end date within three months.')
+    const { error } = await g.admin
+      .from('kids_classes')
+      .update({ goal, updated_at: new Date().toISOString() })
+      .eq('id', classId)
+      .eq('teacher_id', g.user.id)
+    if (error) return isMissingGoalColumn(error) ? goalsNotReadyResponse() : jsonError(500, 'Could not save the goal.')
+    return Response.json({ ok: true, goal }, { headers: NO_STORE })
   }
 
   return jsonError(400, 'Unknown action.')

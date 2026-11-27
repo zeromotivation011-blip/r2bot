@@ -238,7 +238,7 @@ export default function ParentHubClient({ sessions, tracks, activityTrack }: Par
             <>
               <p className="mt-3 font-display text-lg font-bold text-amber-300">{view.idea.title}</p>
               <p className="mt-1 text-[15px] leading-relaxed text-[#EEF2F8]">{view.idea.body}</p>
-              <p className="mt-3 text-sm text-[#A7B0C0]">About 10 minutes, no screen needed. More ideas in <Link href="/kids/activities" className={`font-semibold text-amber-300 hover:underline ${focus}`}>Make at Home</Link>.</p>
+              <p className="mt-3 text-sm text-[#A7B0C0]">About 10 minutes, no screen needed. More ideas in <Link href="/kids/printables" className={`font-semibold text-amber-300 hover:underline ${focus}`}>Make at Home</Link>.</p>
             </>
           ) : (
             <div className="mt-4 h-24 rounded-2xl bg-white/5" aria-hidden />

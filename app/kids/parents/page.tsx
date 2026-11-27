@@ -133,7 +133,7 @@ export default function ParentsPage() {
           Ten minutes, things you already have. Robot Safari: walk round your home and list every machine that follows instructions on
           its own, from a washing machine to an automatic door. Direction Robot: one person closes their eyes and the other gives only
           exact steps to cross the room. Robot Recipe: write the steps to make a sandwich for a robot that does exactly what it reads,
-          then follow them literally. More in <Link href="/kids/activities" className="font-semibold text-amber-300 underline-offset-2 hover:underline">Make at Home</Link>.
+          then follow them literally. More in <Link href="/kids/printables" className="font-semibold text-amber-300 underline-offset-2 hover:underline">Make at Home</Link>.
         </p>
       </section>
     </div>

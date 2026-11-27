@@ -46,6 +46,8 @@ jobs:
         run: npx tsx lib/kids/universe/mastery.verify.ts
       - name: Kids Robodex + Makers — real /robots slugs, every card findable by every band, backup round trip, Makers on every continent, next-step links exist
         run: npx tsx lib/kids/robodex/verify.ts
+      - name: Kids Make It at Home — hazard tags, minimum band and adult flag on every build, no coin cells for Explorers, no mains, real Robodex links, fair tests and check questions
+        run: npx tsx lib/kids/builds/verify.ts
       - name: Ask Spark safety — red-team set (EN/HI/ES), 100% disclosure + self-harm, 0 false positives
         run: npx tsx lib/kids/ai/spark/redteam/verify.ts
       - name: Kids access — settings store + boot script, and the per-template checklist (names, labels, keyboard, feedback, drag, 44px)
@@ -56,3 +58,9 @@ jobs:
         run: npx tsx lib/kids/sim/verify.ts
       - name: Kids Flight Recorder + battery — pack maths, drain model, pure-read recording, Power Lab challenges, why-did-it-fail, ghosts
         run: npx tsx lib/kids/sim/flight.verify.ts
+      - name: Kids unplugged lessons — one per Level 1 session, 40-minute plans, a paper card for every picture block, every floor-grid answer key played square by square
+        run: npx tsx lib/kids/unplugged/verify.ts
+      - name: Kids Present mode + clubs — a deck for every session, episode and simulator, 5/10/20/5 timer, safe framed paths, QR sizes, club sessions add up
+        run: npx tsx lib/kids/teach/clubs.verify.ts
+      - name: Kids Classroom wave 2 — snapshot counts only, Mind Map and stuck signals need 2+ children, gradebook evidence, Class Power-Up maths, standards
+        run: npx tsx lib/kids/classroom-wave2.verify.ts

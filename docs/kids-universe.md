@@ -353,6 +353,59 @@ requests, /kids/classroom, /kids/join. Rename a precached game route → update 
 world lists come from `GAMES` and `WORLDS`. Before promoting a sample, give
 `design-estimate-vacuum-tower` and the three `world-match-*` samples realWorld text.
 
+## Classroom wave 2 — counts only (roadmap #13, #30, #31, #40)
+- The class snapshot (`ClassSnapshot` in `lib/kids/classroom.ts`, built by `KidsClassSyncClient`) now carries
+  COUNTS only: `concepts` (16 letters) + `conceptEvidence` (wins/tries/misses/days), `activityScores`
+  (stars + tries), `galaxyStuck`, `courseStuck`, `misconceptions` (count per `"<session>.<misconception id>"`,
+  never an answer or text), `gameTiers`, and `days` (things finished per day, for the class goal).
+  `totalMinutesPlayed` is always 0 (no longer sent). Budget 16 KB after migration 0056; before it, the sync
+  retries trimmed to the old 8 KB.
+- **Any change to `ClassSnapshot` must update `CLASS_SNAPSHOT_FIELDS` in `lib/kids/teach/trust-pack.ts` in
+  the same commit** (typed against every field, so type-check fails otherwise). The Trust Pack is what
+  schools read.
+- Misconceptions: `CheckStepClient` gets `sessionKey={session.id}`; a wrong option carrying `misconception`
+  calls `recordMisconception()` (`lib/kids/classroom-diary.ts`, only while the child is in a class).
+  Level 1 options carry no ids yet. Class Mind Map and "Where to help next" show an item only when 2+
+  children share it.
+- Gradebook: children × concepts in roster order (never ranked), evidence on tap, CSV/PDF.
+  `/kids/teach/standards` (indexable) from `lib/kids/classroom-standards.ts`.
+- Class Power-Up (`lib/kids/classroom-goal.ts`, pure): one meter, milestones 25/50/75/100, "who helped"
+  ticks with no counts. A thing counts once per `kind:id` per child per day (from `REWARD_EVENT` in
+  `KidsClassSyncClient`), so replays cannot fill it. Goal in `kids_classes.goal` (migration 0056); before
+  it runs the goal lives on the teacher's device and the child card stays hidden. Projector:
+  `/kids/classroom/<id>/projector`. Both new device stores use `profileKey()`.
+- Check: `lib/kids/classroom-wave2.verify.ts` (CI).
+
+## Teaching tools — Present mode, Trust Pack, clubs, unplugged (roadmap #42, #43, #84, #85)
+- `/kids/present` (noindex, gated entry via `<PresentButton>`): frames any `/kids` path, a session, an
+  episode or a lab with timer, join code + QR (`lib/kids/teach/qr.ts`), slow motion, freeze-and-draw,
+  ask-the-class and a hands-up vote. Ask Spark is hidden there (`SPARK_HIDE_GROWNUP`).
+- **Present bridge** (`lib/kids/teach/present-bridge.ts`): Present sets `window.__r2botPresent` on the
+  framed window and fires `r2bot:present`. Animated pages follow it: `usePresentSignal()` in React, or
+  `readPresentSignal()` inside a frame loop. Multiply your own speed by `speed`; stop time while
+  `frozen`. Wired: `SimWorkbenchClient` (lab + course challenges), `EpisodePlayerClient` (speed + pause),
+  `StoryPlayerClient` (line time + pause). Outside Present the signal is `{ speed: 1, frozen: false }`.
+- Trust Pack `/kids/teach/trust` + on-device PDF; clubs, family nights, library at `/kids/teach/{clubs,
+  family,library}`; unplugged lessons `/kids/teach/unplugged/<n>` (one per Level 1 session, from
+  `allUnpluggedLessons()`). Checks: `lib/kids/unplugged/verify.ts`, `lib/kids/teach/clubs.verify.ts` (CI).
+
+## Make It at Home, portfolio, certificates (roadmap #6, #44, #45)
+- Builds: `lib/kids/builds/` (`HOME_BUILDS`; count from it). Hub `/kids/printables` and
+  `/kids/printables/<id>` (indexable, HowTo JSON-LD); `/kids/activities` 308s to the hub. Every build has
+  hazard tags, a minimum band, a grown-up flag, a fair test and a check question; `lib/kids/builds/verify.ts`
+  enforces the safety rules (#79) in CI.
+- Check-ins: `r2bot_kids_builds_v1` per child (`profileKey`, NOT in `SWAPPED_KEYS`). The check-in pays
+  through `reportBestRun({ kind: 'project', id: 'home-build-<id>', score: 1 })` (first finish only). Teen
+  reflections pass `classifySpark` on the device; personal details are refused; a hurt child gets the
+  helpline card and nothing is saved.
+- Portfolio `/kids/portfolio` (noindex, device-only): reads the existing stores plus its own
+  `r2bot_kids_portfolio_v1` (robot snapshots + teen reflections, `profileKey`). Certificates for levels,
+  Worlds and milestones; teacher class sets at `/kids/portfolio/class-certificates` (noindex; names typed
+  on the device, never sent).
+- Backup code extras: `builds` (`buildsBackupExtra`: 3-char FNV tag + day + fair-test result, no
+  reflections; tags are collision-checked in the builds verify) and `portfolio` (`portfolioBackupExtra`:
+  the newest snapshots that fit 512 chars). Restores merge and never remove.
+
 ## Never
 Leaderboards or comparing children. Collecting any personal data from a child.
 Prices or "free forever". Copying another brand's characters, curriculum or games.

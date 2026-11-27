@@ -96,6 +96,12 @@ export default function HangarPage() {
         >
           Build or change parts in the Workshop →
         </Link>
+        <Link
+          href="/kids/portfolio"
+          className="ml-0 mt-3 inline-flex min-h-[48px] items-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] px-4 font-display text-base font-bold text-[#EEF2F8] transition hover:border-amber-400/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 sm:ml-3"
+        >
+          📁 My portfolio and certificates →
+        </Link>
       </header>
 
       <HangarClient />

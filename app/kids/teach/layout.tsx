@@ -18,6 +18,8 @@ const PRINT_CSS = `
   .teach-doc section, .teach-doc li, .teach-doc tr { break-inside: avoid; }
   .teach-doc h1, .teach-doc h2, .teach-doc h3 { break-after: avoid; }
   .teach-doc { font-size: 11pt; line-height: 1.45; }
+  /* Cut-out cards, maps and gears keep their colours (unplugged lessons, trust pack). */
+  .teach-doc .print-keep { background: var(--pk-bg) !important; border-color: var(--pk-border) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 `
 

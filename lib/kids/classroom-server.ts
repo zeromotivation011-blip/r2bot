@@ -19,6 +19,7 @@ import {
   type KidsMemberRow,
 } from './classroom'
 import { SCHOOLS_NOT_READY, SCHOOLS_NOT_READY_MESSAGE } from './classroom-assignments'
+import { GOALS_NOT_READY, GOALS_NOT_READY_MESSAGE, parseGoal, type ClassGoal } from './classroom-goal'
 
 export function newJoinCode(): string {
   let s = ''
@@ -175,4 +176,29 @@ export function schoolsNotReadyResponse(): Response {
     { ok: false, error: SCHOOLS_NOT_READY_MESSAGE, code: SCHOOLS_NOT_READY },
     { status: 503, headers: { 'Cache-Control': 'no-store' } },
   )
+}
+
+// ── Class Power-Up goal (migration 0056) ─────────────────────────────────────
+// Read and written apart from CLASS_COLUMNS, so a missing 0056 never takes the
+// class page down: the goal simply reads as "not ready".
+
+/** True when the error means migration 0056 has not run (kids_classes.goal missing). */
+export function isMissingGoalColumn(err: PostgrestError | null | undefined): boolean {
+  if (!err) return false
+  if (err.code === '42703' || err.code === 'PGRST204') return true
+  return /goal/.test(err.message ?? '') && /(does not exist|could not find|schema cache)/i.test(err.message ?? '')
+}
+
+export function goalsNotReadyResponse(): Response {
+  return Response.json(
+    { ok: false, error: GOALS_NOT_READY_MESSAGE, code: GOALS_NOT_READY },
+    { status: 503, headers: { 'Cache-Control': 'no-store' } },
+  )
+}
+
+/** The class goal, or 'not-ready' before 0056. */
+export async function loadClassGoal(admin: SupabaseClient, classId: string): Promise<ClassGoal | null | 'not-ready'> {
+  const { data, error } = await admin.from('kids_classes').select('goal').eq('id', classId).maybeSingle()
+  if (error) return isMissingGoalColumn(error) ? 'not-ready' : null
+  return parseGoal((data as { goal?: unknown } | null)?.goal)
 }

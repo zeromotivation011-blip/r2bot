@@ -2,7 +2,8 @@
 
 // components/kids/classroom/ClassMissionsClient.tsx
 //
-// "From your teacher" missions on the child's Universe home. Renders NOTHING
+// "From your teacher" missions (and, above them, the Class Power-Up meter) on
+// the child's Universe home. Renders NOTHING
 // unless this browser has joined a class AND the teacher has assigned
 // something, so it is safe to mount for every child.
 //
@@ -28,6 +29,7 @@ import {
   syncMembership,
 } from '@/lib/kids/classroom-membership'
 import { dueState, formatDue, type ChildMission } from '@/lib/kids/classroom-assignments'
+import { ClassPowerUpCardClient } from './ClassPowerUpCardClient'
 
 const REFRESH_MS = 5 * 60 * 1000
 
@@ -53,7 +55,22 @@ export interface ClassMissionsProps {
   className?: string
 }
 
+/**
+ * The child's class card(s) on the home: the Class Power-Up meter (roadmap
+ * #40, only when the teacher set a goal) and the "From your teacher" missions.
+ * Each renders nothing when there is nothing to show.
+ */
 export function ClassMissionsClient({ compact = false, className = '' }: ClassMissionsProps) {
+  if (compact) return <MissionsCard compact className={className} />
+  return (
+    <>
+      <ClassPowerUpCardClient className={className} />
+      <MissionsCard className={className} />
+    </>
+  )
+}
+
+function MissionsCard({ compact = false, className = '' }: ClassMissionsProps) {
   const [rows, setRows] = useState<Row[] | null>(null)
   const [teacher, setTeacher] = useState<string | null>(null)
   const [showDone, setShowDone] = useState(false)

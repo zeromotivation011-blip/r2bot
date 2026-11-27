@@ -181,6 +181,10 @@ Build these exceptionally; everything else is secondary.
 levels written; level pages indexable, session pages noindex; teacher guides for every session at `/kids/teach`),
 **Robodex** `/kids/robodex` (real-robot cards earned only by doing), **Makers** `/kids/careers` (count from `MAKERS`),
 **Power Lab** `/kids/lab/power` (battery model; sim runs have a Flight Recorder),
+**Make It at Home** `/kids/printables` + `/kids/printables/<id>` (count from `HOME_BUILDS`; `/kids/activities` 308s there),
+**Portfolio** `/kids/portfolio` (noindex, device-only, certificates), **teacher tools** under `/kids/teach` (standards, Trust Pack,
+clubs/family/library, unplugged lessons) and **Present mode** `/kids/present` (noindex; animated pages follow `lib/kids/teach/present-bridge.ts`).
+The class snapshot is counts only; changing `ClassSnapshot` means updating `lib/kids/teach/trust-pack.ts` in the same commit.
   **Garage** `/kids/hangar` (the robot's one home: rename, robot card, Spark Trail parts fitted to the real robot;
   `/kids/my-robot` 308s there), **Parents** `/kids/parents` (public explainer; behind the parental gate a hub with the
   week in plain words and device-only controls in `lib/kids/parent-controls.ts` — daily time and quiet hours as gentle

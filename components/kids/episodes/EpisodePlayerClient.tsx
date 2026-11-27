@@ -33,6 +33,7 @@ import type { ChoiceOption, TurnIcon } from '@/lib/kids/episodes/interactions'
 import { planEpisode, type Beat, type ChoiceBeat, type EpisodePlan } from '@/lib/kids/episodes/plan'
 import { episodeUrl, normaliseSessionId, type EpisodeData } from '@/lib/kids/episodes/types'
 import type { Director } from './engine/director'
+import { readPresentSignal, usePresentSignal } from '@/lib/kids/teach/present-bridge'
 
 export interface EpisodePlayerProps {
   sessionId: string
@@ -276,7 +277,7 @@ export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }
       })
       directorRef.current = d
       d.unlockAudio()
-      d.setSpeed(speed)
+      d.setSpeed(speed * readPresentSignal().speed)
       d.setChannels(voiceOut, musicOut)
       await d.preload((done, total) => aliveRef.current && setProgress(0.1 + 0.9 * (done / Math.max(1, total))))
     } catch {
@@ -377,10 +378,28 @@ export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }
     })
   }, [])
 
+  // Present mode (lib/kids/teach/present-bridge): the teacher's slow motion multiplies the
+  // child's speed, and freeze pauses the episode (and resumes it only if Present paused it).
+  const present = usePresentSignal()
+  const frozeRef = useRef(false)
+  useEffect(() => {
+    if (!present.active) return
+    const d = directorRef.current
+    if (!d) return
+    d.setSpeed(speed * present.speed)
+    if (present.frozen && playing) {
+      frozeRef.current = true
+      d.pause()
+    } else if (!present.frozen && frozeRef.current) {
+      frozeRef.current = false
+      d.play()
+    }
+  }, [present, speed, playing])
+
   const cycleSpeed = useCallback(() => {
     setSpeed((s) => {
       const next = SPEEDS[(SPEEDS.indexOf(s) + 1) % SPEEDS.length]
-      directorRef.current?.setSpeed(next)
+      directorRef.current?.setSpeed(next * readPresentSignal().speed)
       return next
     })
   }, [])

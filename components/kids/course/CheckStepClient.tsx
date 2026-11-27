@@ -10,15 +10,18 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Quiz } from '@/lib/kids/curriculum/types'
 import { cancelSparkSpeech, playSound, sparkSays } from '@/lib/kids-audio'
 import { shuffledOrder } from './course-state'
+import { recordMisconception } from '@/lib/kids/classroom-diary'
 
 interface Props {
   quiz: Quiz
   checked: boolean
   onChecked: () => void
   onNext: () => void
+  /** Session id ("L2-S04"). With it, a wrong answer that names a misconception is counted for the Class Mind Map (classroom-diary; counts only, only in a class). */
+  sessionKey?: string
 }
 
-export default function CheckStepClient({ quiz, checked, onChecked, onNext }: Props) {
+export default function CheckStepClient({ quiz, checked, onChecked, onNext, sessionKey }: Props) {
   const [attempt, setAttempt] = useState(0)
   const [q, setQ] = useState(0)
   const [picked, setPicked] = useState<number | null>(null)
@@ -45,6 +48,10 @@ export default function CheckStepClient({ quiz, checked, onChecked, onNext }: Pr
     setPicked(optIndex)
     const right = optIndex === question.answer
     playSound(right ? 'correct' : 'wrong')
+    if (!right && sessionKey) {
+      const mc = (question.options[optIndex] as { misconception?: string }).misconception
+      if (mc) recordMisconception(sessionKey, mc)
+    }
     sparkSays(`${right ? 'Yes!' : 'Let’s see why.'} ${question.why}`)
     const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     window.setTimeout(() => whyRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' }), 60)

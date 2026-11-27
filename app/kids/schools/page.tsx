@@ -6,6 +6,7 @@ import { KIDS_BANDS } from '@/lib/kids/bands'
 import { CLASS_PLANS, LESSON_SHAPE } from '@/lib/kids/classroom-plan'
 import { LessonPlanPanel } from '@/components/kids/classroom/LessonPlanPanel'
 import PilotFormClient from './PilotFormClient'
+import TrustActionsClient from '@/app/kids/teach/trust/TrustActionsClient'
 
 export const runtime = 'nodejs'
 
@@ -209,7 +210,10 @@ export default function KidsSchoolsPage() {
           <p className="mt-2 max-w-3xl text-slate-300">Everything a teacher needs to run R2BOT Kids without extra prep, and everything a school lead needs to see it working.</p>
           <ul className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[
-              { emoji: '📘', title: 'A lesson guide for every session', body: 'All 24 Level 1 sessions have a printable 40-minute plan: warm-up, timing, discussion, misconceptions, differentiation and a note for families. Download as PDF or share to Google Classroom.', href: '/kids/teach', cta: 'Browse the guides' },
+              { emoji: '📘', title: 'A lesson guide for every session', body: 'Every session of all four levels has a printable plan: warm-up, timing, discussion, misconceptions, differentiation and a note for families. Download as PDF or share to Google Classroom.', href: '/kids/teach', cta: 'Browse the guides' },
+              { emoji: '📽️', title: 'Present mode for one projector', body: 'Any session, episode or simulator full screen: a 5/10/20/5 lesson timer, the join code with a QR code, slow motion, freeze-and-draw, “ask the class” prompts and a hands-up check.', href: '/kids/present', cta: 'Open Present mode' },
+              { emoji: '✂️', title: 'Unplugged lessons, no devices', body: 'A no-device version of every Level 1 session: a human-robot floor grid, printable command cards, sense–think–act sorting cards and paper gears.', href: '/kids/teach/unplugged', cta: 'See the unplugged lessons' },
+              { emoji: '🧩', title: 'Clubs, families and libraries', body: 'Mixed-age club sessions of 60–90 minutes, a family class for homeschoolers, and a printable drop-in kit for libraries and community centres.', href: '/kids/teach/clubs', cta: 'Run a club' },
               { emoji: '🍎', title: 'Assignments with due dates', body: 'Assign a course session, any Skill Galaxy activity or a game to a class. Children see “From your teacher” missions; you see who has finished.', href: '/kids/classroom', cta: 'Open the Classroom' },
               { emoji: '🏫', title: 'One school, every class', body: 'Create a school and invite colleagues with a school code. The school admin sees every class with a school-wide summary — counts only, never children’s nicknames.', href: '/kids/classroom/school', cta: 'Set up a school' },
               { emoji: '🎓', title: 'Teacher training with a certificate', body: 'Six short self-paced modules, about 45 minutes: running a class, the physics lab, assigning and tracking, supporting every child, safety and privacy.', href: '/kids/teach/training', cta: 'Start the training' },
@@ -258,6 +262,17 @@ export default function KidsSchoolsPage() {
               <li><strong className="text-white">No ads, no selling data,</strong> no public profiles, no chat between children.</li>
               <li><strong className="text-white">Designed with COPPA and GDPR (including its rules for children) in mind:</strong> collect the minimum, keep it inside the class, delete it on request.</li>
             </ul>
+          </div>
+          <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[15px] leading-relaxed text-slate-200">
+              <strong className="text-white">School Trust &amp; Privacy Pack.</strong> Every field stored and who sees it, retention and
+              deletion, hosting and subprocessors, COPPA, GDPR, UK Children’s Code and DPDP notes, accessibility status and a template
+              letter for parents — generated from the code.
+            </p>
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <TrustActionsClient compact />
+              <Link href="/kids/teach/trust" className="inline-flex min-h-[48px] items-center rounded-xl px-3 font-bold text-amber-300 hover:underline">Read it online →</Link>
+            </div>
           </div>
         </section>
 
@@ -316,7 +331,7 @@ export default function KidsSchoolsPage() {
                 <li>✓ Lesson plans for every band you teach</li>
                 <li>✓ A direct line for feedback that shapes what we build</li>
               </ul>
-              <p className="mt-5 text-sm text-slate-400">Prefer to start straight away? <Link href="/kids/classroom" className="font-semibold text-amber-300 underline-offset-2 hover:underline">Create a class</Link> — it takes about a minute.</p>
+              <p className="mt-5 text-sm text-slate-400">Prefer to start straight away? <Link href="/kids/classroom" className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 underline-offset-2 hover:underline">Create a class</Link> — it takes about a minute.</p>
             </div>
             <PilotFormClient />
           </div>

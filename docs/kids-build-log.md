@@ -234,3 +234,37 @@ Still open from batch B:
   Level 1 course badges; the Garage certificate button shows Level 1 only (could follow the child's band).
 - [ ] Shared-tablet "Done" could wipe the ghost store's `::_none` key.
 - [ ] curriculum/verify warns: two Physics Lab arenas are each used by two Level 2 sessions (different tasks).
+
+## 27 Nov 2026 — Wave 2, batch C (teachers, Present mode, Trust Pack, Make It at Home, portfolio)
+Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-universe.md):
+- [x] #13 Teachers see the whole Universe: counts-only snapshot (concepts, evidence, activity stars/tries,
+  Galaxy/course stuck, misconceptions, game tiers, days), CSV + "Where to help next" rebuilt; minutes no
+  longer sent. Migration 0056 raises the snapshot to 16 KB (8 KB trimmed retry until it runs).
+- [x] #30 Misconception capture (`CheckStepClient` `sessionKey` → `recordMisconception`) + Class Mind Map
+  with reteach links and projector mode.
+- [x] #31 Gradebook by concept (roster order, evidence, CSV/PDF) + `/kids/teach/standards` (CSTA, NGSS,
+  England NC KS1–3, NEP 2020; PDF per level), linked from `/kids/teach`, in the sitemap.
+- [x] #40 Class Power-Up: goal, one meter, milestones, anonymous ticks, projector, home card, class
+  certificate. Goal column needs migration 0056 (device fallback until then).
+- [x] #42 Present mode `/kids/present`; entries on story pages, lab episodes, Physics Lab (tablet/desktop),
+  Power Lab and the class page; slow motion/freeze wired into the sim, the 3D episodes and Story Theatre.
+- [x] #43 Trust Pack page + PDF (snapshot inventory typed against `ClassSnapshot`, incl. `kids_classes.goal`).
+- [x] #84 Clubs, family nights, library pages. #85 Unplugged lessons (one per Level 1 session) + printables.
+- [x] #44 Make It at Home: builds hub + one page per build, safety verify, check-in store, in the backup code.
+- [x] #45 Portfolio + certificates (levels, Worlds, milestones) + teacher class sets (linked from the
+  Classroom and the class page); snapshots in the backup code.
+- [x] #6 (part) `/kids/activities` → `/kids/printables` (308), nav and parent links updated,
+  `lib/kids-activities.ts` deleted.
+
+Still open from batch C:
+- [ ] Migration **0056** must be run by the founder (`kids_classes.goal`, 16 KB snapshot). Until then the
+  goal stays on the teacher's device and children do not see the Power-Up card.
+- [ ] #30 Level 1 check options carry no `misconception` ids, so Level 1 cannot feed the Mind Map yet.
+- [ ] #6 Rank naming: certificates say "Rank N"; the shell badge still says "Lv".
+- [ ] #84 a real "club / family" class kind needs a migration; leaders use the youngest band for now.
+- [ ] #43 Founder to confirm "database region and DPA on request" wording in the Trust Pack.
+- [ ] Optional: a Robodex `build` trigger so a home build discovers its card; per-profile export in the
+  parent hub (`ParentProfilesClient`) does not carry the builds/portfolio extras yet (Hangar backup does).
+- [ ] Portfolio reflections and build reflections are deliberately not in the backup code (free text stays
+  on the device).
+- [ ] #29 "Teacher locks a child's band" still open (classroom side).

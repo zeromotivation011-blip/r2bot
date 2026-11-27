@@ -201,6 +201,8 @@ const nextConfig = {
       { source: '/kids/world/:path*', destination: '/kids/spark-trail/:path*', permanent: true },
       // 27 Nov 2026: /kids/my-robot merged into the Hangar (the robot's one Garage).
       { source: '/kids/my-robot', destination: '/kids/hangar', permanent: true },
+      // 27 Nov 2026 (roadmap #6, #44): the printables became Make It at Home builds at /kids/printables.
+      { source: '/kids/activities', destination: '/kids/printables', permanent: true },
       ...atlasRobotCanonical,
       // 19 Nov 2026: the Short _lZ0noG8Tg4 repeats the robot-lawn-mower lesson. Its YouTube
       // description links here, so the slug it was written for points at the one lesson

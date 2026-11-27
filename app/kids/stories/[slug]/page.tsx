@@ -10,6 +10,7 @@ import { getBand } from '@/lib/kids/bands'
 import { EPISODES, episodeMinutes, episodeSeconds, getEpisode, nextEpisode, transcript } from '@/lib/kids/stories'
 import { AUTHOR } from '@/lib/author'
 import StoryPlayerLoaderClient from '@/components/kids/story/StoryPlayerLoaderClient'
+import { PresentButton } from '@/components/kids/present/PresentButton'
 
 export const runtime = 'nodejs'
 export const dynamicParams = false
@@ -112,6 +113,9 @@ export default async function EpisodePage({ params }: Params) {
         </div>
         <h1 className="mt-2 text-2xl font-black leading-tight text-white sm:text-4xl">{ep.title}</h1>
         <p className="mt-1 max-w-3xl text-white/75 sm:text-lg">{ep.logline}</p>
+        <div className="mt-3">
+          <PresentButton source={{ kind: 'episode', slug: ep.slug }} />
+        </div>
       </header>
 
       <StoryPlayerLoaderClient episode={ep} next={{ slug: next.slug, title: next.title }} />

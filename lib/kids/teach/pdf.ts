@@ -437,3 +437,8 @@ export async function downloadTrainingCertificate(c: TrainingCertificateInput): 
   doc.text('Self-paced professional learning. Not an accredited qualification.', W / 2, H - 28, { align: 'center' })
   save(doc, 'r2bot-kids-teacher-training-certificate.pdf')
 }
+
+// Shared with the portfolio certificates (components/kids/portfolio/certificate-pdf.ts),
+// so every R2BOT Kids certificate has the same frame, robot and name rendering.
+export { newDoc as newKidsPdf, certificateFrame, drawRobot, drawCentredName, slug as pdfSlug, NAVY, ORANGE, ORANGE_DARK, INK, GREY, LIGHT }
+export type { RGB }
