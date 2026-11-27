@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import type { EnrichedArticle } from '@/lib/news'
+import { trackLead } from '@/lib/analytics'
 
 interface ApiResponse {
   articles: EnrichedArticle[]
@@ -128,7 +129,12 @@ export function NewsPageClient({ initialData }: NewsPageClientProps = {}) {
       })
       const json = await res.json()
       setSubStatus(json.ok ? 'ok' : 'err')
-      if (json.ok) setEmail('')
+      if (json.ok) {
+        setEmail('')
+        // The only capture form that never reported to GA4, so its signups
+        // were missing from the email_signups metric (found 27 Nov, task 102).
+        trackLead('news')
+      }
     } catch {
       setSubStatus('err')
     }
