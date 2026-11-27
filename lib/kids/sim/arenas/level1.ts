@@ -1364,8 +1364,16 @@ export function getLevel1Arena(sessionId: string | number): Challenge | null {
 }
 
 /** The curriculum robot for a session, on the child's own design (their body, name and colours). */
+/**
+ * The session's robot: the child's body, name and colours with the session's parts. Workshop
+ * upgrades (motors, pack, arm) are left off on purpose: each challenge is calibrated on the
+ * starter drive (a hill a gear motor just climbs, sand that halves its speed), and an upgrade
+ * would change the lesson. The Physics Lab and the Power Lab drive the upgraded robot.
+ */
 export function sessionDesign(ch: Challenge, mine: RobotDesign): RobotDesign {
-  return { ...mine, drive: ch.robot.drive, head: ch.robot.head, tool: ch.robot.tool, sensor: ch.robot.sensor }
+  const d: RobotDesign = { ...mine, drive: ch.robot.drive, head: ch.robot.head, tool: ch.robot.tool, sensor: ch.robot.sensor }
+  delete d.upgrades
+  return d
 }
 
 export type { StartPose }

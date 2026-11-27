@@ -16,7 +16,7 @@ export const LEVEL3_REUSE: SessionReuse[] = [
   { session: 'L3-S01', play: { kind: 'activity', id: 'code-in-02', goal: 'Store a number in a byte: see that a variable is a named place that holds a value.' }, practice: ['design-in-01', 'code-in-01'] },
   { session: 'L3-S02', play: { kind: 'activity', id: 'design-in-04', goal: 'Three metres in six seconds: speed × time = distance, then check it.' }, practice: ['motion-in-05', 'space-in-02'] },
   { session: 'L3-S03', play: { kind: 'activity', id: 'control-in-03', goal: 'Tune a camera slider: a proportional correction that settles on its target.' }, practice: ['control-in-01', 'sensors-in-04'] },
-  { session: 'L3-S04', play: { kind: 'activity', id: 'sensors-in-05', goal: 'A worn-out line: set the threshold from real light and dark readings.' }, practice: ['sensors-in-02', 'electronics-in-07'] },
+  { session: 'L3-S04', play: { kind: 'sim-demo', id: 'faded-line', goal: 'Physics Lab “Find the faded line”: read the white and black pads with the reflectance block, set the threshold halfway, and stop on the faded line.' }, practice: ['sensors-in-05', 'sensors-in-02', 'electronics-in-07'] },
   { session: 'L3-S05', play: { kind: 'sim-demo', id: 'follow-line', goal: 'Physics Lab “Follow the line”: reach the green zone steering in proportion to the line offset.' }, practice: ['control-in-06', 'control-in-07'] },
   { session: 'L3-S06', play: { kind: 'code-lab', id: 'parcel-picker', goal: 'Parcel Picker: sense, decide and deliver at the right places, every time.' }, practice: ['design-in-02', 'world-in-08'] },
   // Act 2 — The Weather Mast
@@ -24,7 +24,7 @@ export const LEVEL3_REUSE: SessionReuse[] = [
   { session: 'L3-S08', play: { kind: 'game', id: 'drone-hover', tier: 1, goal: 'Sky Port, Pilot tier: tune the drone until it holds height through gusts without wobbling.' }, practice: ['control-in-05', 'hospital-tune-imaging-arm'], story: 'wobbly-bot' },
   { session: 'L3-S09', play: { kind: 'game', id: 'sumo-arena', tier: 1, goal: 'Robo Sumo, Pilot tier: a search → charge → recover state machine that pushes the Champion bot out.' }, practice: ['ai-in-03', 'code-in-05'] },
   { session: 'L3-S10', play: { kind: 'activity', id: 'ai-in-06', goal: 'Smooth the score: trace a program that keeps a running total and an average.' }, practice: ['farm-graph-ndvi-from-the-drone', 'ocean-graph-read-the-hover-depth'] },
-  { session: 'L3-S11', play: { kind: 'activity', id: 'electronics-in-08', goal: 'Power for a 90-minute lesson: size the battery for the job, with a margin.' }, practice: ['zoo-estimate-walking-energy', 'space-in-03'] },
+  { session: 'L3-S11', play: { kind: 'sim-demo', id: 'power-home-before-flat', goal: 'Power Lab “Home before flat”: reach the flag and stop on the charger before the battery runs flat, watching the battery % block.' }, practice: ['electronics-in-08', 'zoo-estimate-walking-energy', 'space-in-03'] },
   { session: 'L3-S12', play: { kind: 'code-lab', id: 'line-follower', goal: 'Line Follower: check, correct, repeat — all the way round the course.' }, practice: ['hospital-graph-steady-the-shake', 'farm-trace-irrigation-controller'] },
   // Act 3 — The Boulder Field
   { session: 'L3-S13', play: { kind: 'game', id: 'bio-bots', tier: 2, goal: 'Robo Zoo, Ace tier: choose gait or wheels for the terrain and prove it on the course.' }, practice: ['motion-in-03', 'zoo-terrain-mud-and-rocks', 'zoo-rule-static-or-dynamic'] },

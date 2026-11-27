@@ -34,6 +34,8 @@ export interface FloorRegion {
   color?: FloorColor
   /** No light here: a camera cannot see colours unless the robot's light is on. */
   dark?: boolean
+  /** Reflectance the line sensor reads here, 0–100 (calibration pads, worn paint). Default: from the colour. */
+  shade?: number
   label?: string
 }
 
@@ -41,6 +43,11 @@ export interface LinePath {
   points: Vec2[]
   /** Line width in metres (tape is about 2 cm). */
   width: number
+  /**
+   * Reflectance of this line, 0–100 (default 8: fresh black tape). A faded, sun-bleached line
+   * is grey (say 40): line_seen still sees it, but a threshold copied from a fresh line misses it.
+   */
+  shade?: number
 }
 
 export interface Wall {
@@ -228,6 +235,31 @@ export function floorAt(arena: Arena, x: number, z: number, ignoreLines = false)
   }
   if (!ignoreLines && onLine(arena, x, z)) color = 'black'
   return { surface, color, dark }
+}
+
+/**
+ * How much infrared light a floor colour sends back to a reflectance sensor (an IR LED and a
+ * phototransistor looking down), as 0–100. White paper and paint reflect most of it, black tape
+ * very little; coloured paints sit in between (red and yellow pigments reflect near-infrared
+ * well, green and blue absorb more). Typical TCRT5000-style readings, rounded. The sensor has its
+ * own light, so a dark room does not change it.
+ */
+export const REFLECTANCE: Record<FloorColor, number> = { white: 90, yellow: 82, red: 70, green: 35, blue: 30, black: 8 }
+
+/** Reflectance at one floor point, 0–100: lines on top, then the last region that sets a shade or colour. */
+export function reflectanceAt(arena: Arena, x: number, z: number): number {
+  for (const l of arena.lines) {
+    for (let i = 0; i + 1 < l.points.length; i++) {
+      if (distToSegment(x, z, l.points[i], l.points[i + 1]) <= l.width / 2) return l.shade ?? REFLECTANCE.black
+    }
+  }
+  let v = REFLECTANCE.white
+  for (const r of arena.regions) {
+    if (!inShape(r.shape, x, z)) continue
+    if (typeof r.shade === 'number') v = r.shade
+    else if (r.color) v = REFLECTANCE[r.color]
+  }
+  return v
 }
 
 /** Where a mover is at time t: its position and whether it is present. */

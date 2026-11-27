@@ -14,6 +14,7 @@ import { createPortal } from 'react-dom'
 import type React from 'react'
 import { saveProgress, type KidsProgress } from '@/lib/kids-progress'
 import { KIDS_BANDS, getBand, type BandId } from '@/lib/kids/bands'
+import { classBandLock } from '@/lib/kids/classroom-membership-store'
 import { checkNickname } from '@/lib/kids/classroom'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { AVATARS, AVATAR_COLOURS, Avatar, DEFAULT_ME_LOOK, avatarName, displayAvatarId, encodeMeLook, isMeAvatar, isOwned, unlockHint } from './avatars'
@@ -36,7 +37,9 @@ export interface OnboardingDialogProps {
 
 export function OnboardingDialogClient({ progress, mode, onClose }: OnboardingDialogProps) {
   const [step, setStep] = useState(0)
-  const [band, setBand] = useState<BandId | null>(progress.band)
+  // A teacher who set this child's band wins (classroom sync re-applies it anyway).
+  const [lockedBand] = useState<BandId | null>(() => classBandLock())
+  const [band, setBand] = useState<BandId | null>(() => lockedBand ?? progress.band)
   const [name, setName] = useState(progress.explorerName)
   const [nameError, setNameError] = useState('')
   // Teens who never chose see the Lab badge, not the cartoon default (roadmap #83).
@@ -180,8 +183,16 @@ export function OnboardingDialogClient({ progress, mode, onClose }: OnboardingDi
               <h2 id={titleId} ref={headingRef} tabIndex={-1} className="font-display text-2xl font-bold text-[#EEF2F8] outline-none">
                 Who&rsquo;s exploring?
               </h2>
-              <p className="mt-1 text-[15px] text-[#A7B0C0]">Pick your age group. You can still visit every planet and game.</p>
-              <div className="mt-4 grid grid-cols-2 gap-3" role="radiogroup" aria-label="Age group">
+              <p className="mt-1 text-[15px] text-[#A7B0C0]">
+                {lockedBand ? (
+                  <>
+                    Your teacher chose <strong className="text-[#EEF2F8]">{getBand(lockedBand)?.name}</strong> for you. You can still visit every planet and game.
+                  </>
+                ) : (
+                  'Pick your age group. You can still visit every planet and game.'
+                )}
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-3" role="radiogroup" aria-label="Age group" aria-disabled={lockedBand ? true : undefined}>
                 {KIDS_BANDS.map((b) => {
                   const on = band === b.id
                   return (
@@ -190,11 +201,13 @@ export function OnboardingDialogClient({ progress, mode, onClose }: OnboardingDi
                       type="button"
                       role="radio"
                       aria-checked={on}
+                      disabled={!!lockedBand && !on}
                       onClick={() => {
+                        if (lockedBand) return
                         tap()
                         setBand(b.id)
                       }}
-                      className={`relative min-h-[104px] overflow-hidden rounded-2xl border-2 p-3 text-left transition active:scale-[.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 ${
+                      className={`relative min-h-[104px] overflow-hidden rounded-2xl border-2 p-3 text-left transition active:scale-[.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 disabled:cursor-not-allowed disabled:opacity-40 ${
                         on ? 'border-amber-400 bg-amber-500/10' : 'border-white/10 bg-white/[0.04] hover:border-white/25'
                       }`}
                     >

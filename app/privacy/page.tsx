@@ -118,7 +118,7 @@ export default function PrivacyPage() {
         <li>Typing the words, or scanning the passport&apos;s QR code, restores the progress on another
           device. Anyone who has the words can do this, so please keep them private.</li>
         <li>A passport that is not opened or updated for 400 days is deleted automatically. A
-          grown-up can delete it at any time with &quot;Delete my Passport&quot; in the Garage, or by
+          grown-up can delete it at any time with &quot;Delete my Passport&quot; in the Garage or on the Parents page, or by
           emailing <strong>hello@r2bot.in</strong> with the words.</li>
       </ul>
       <h3>Joining a teacher&apos;s class (optional)</h3>
@@ -136,6 +136,9 @@ export default function PrivacyPage() {
           (counts only, never the answer), on which days something was done and how many things
           (for the class Power-Up), the age band, and the Workshop robot design including the
           robot&apos;s name. Time spent playing is not sent.</li>
+        <li>A teacher may set a child&apos;s age band for the class (or for one member). We store
+          only that band; the child&apos;s device then uses it and the band picker says the teacher
+          chose it.</li>
         <li>The child&apos;s device is identified to the class by a random token. We store only a
           SHA-256 hash of it, never anything that identifies the device or the child.</li>
         <li>Only that teacher can see the nickname and snapshot; if the class belongs to a school,

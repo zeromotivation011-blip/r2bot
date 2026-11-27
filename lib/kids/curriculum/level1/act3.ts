@@ -6,6 +6,7 @@
 
 import type { Session } from '../types'
 import {
+  mis,
   BEEP, CREEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, HOP_PCT, LEFT, LIGHT_OFF, LIGHT_ON, MOVE_SET, PART_MASS_KG, PEN_DOWN, PEN_UP,
   REPEAT, RIGHT, SCOOP_UP, TIP_OUT, WAIT,
   arena, episode, kg, lessonTiming, obj, projectTiming, say, teacher,
@@ -135,19 +136,19 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'Which tool carries a ball?',
-        options: [{ text: 'Pen', icon: '🖊️' }, { text: 'Scoop', icon: '🥄' }],
+        options: [mis('Pen', '🖊️', 'any-tool-any-job'), { text: 'Scoop', icon: '🥄' }],
         answer: 1,
         why: 'A scoop can hold things. A pen draws — it can only push a ball away.',
       },
       {
         prompt: 'Your robot has the float. Which block lets it go?',
-        options: [{ text: 'Tip out', icon: '⤵️' }, { text: 'Scoop up', icon: '⤴️' }],
+        options: [{ text: 'Tip out', icon: '⤵️' }, mis('Scoop up', '⤴️', 'scoop-tip-mixed')],
         answer: 0,
         why: 'Tip out lets go of what the scoop holds.',
       },
       {
         prompt: 'Why do robots change tools?',
-        options: [{ text: 'Different jobs need different tools', icon: '🧰' }, { text: 'They don’t — a robot wears every tool at once', icon: '🤹' }],
+        options: [{ text: 'Different jobs need different tools', icon: '🧰' }, mis('They don’t — a robot wears every tool at once', '🤹', 'robot-has-every-tool')],
         answer: 0,
         why: 'Just like you use a spoon for soup and a pencil for drawing, robots use the tool that fits the job.',
       },
@@ -307,19 +308,19 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'Same Hop block. Which goes less far?',
-        options: [{ text: 'Uphill with a heavy load', icon: '⛰️🧱' }, { text: 'On the flat, empty', icon: '➖' }],
+        options: [{ text: 'Uphill with a heavy load', icon: '⛰️🧱' }, mis('On the flat, empty', '➖', 'hills-change-nothing')],
         answer: 0,
         why: 'Heavy loads and hills make the motors work harder, so the robot goes slower — and less far in the same time.',
       },
       {
         prompt: 'Your robot stopped short. What do you do?',
-        options: [{ text: 'Wait for tomorrow — the robot is weaker today', icon: '😴' }, { text: 'Test, then add a hop', icon: '🧪' }],
+        options: [mis('Wait for tomorrow — the robot is weaker today', '😴', 'robot-is-weaker-today'), { text: 'Test, then add a hop', icon: '🧪' }],
         answer: 1,
         why: 'Nothing is broken! Test, see where it stops, and change the program.',
       },
       {
         prompt: 'Why is pushing a full pram uphill harder?',
-        options: [{ text: 'Prams don’t like hills', icon: '😠' }, { text: 'The hill pulls heavy things back down', icon: '⬇️' }],
+        options: [mis('Prams don’t like hills', '😠', 'machines-have-feelings'), { text: 'The hill pulls heavy things back down', icon: '⬇️' }],
         answer: 1,
         why: 'Gravity pulls everything down. Going uphill, you push against it — more weight, more push.',
       },
@@ -478,19 +479,19 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'On ice, the robot stops its wheels. What happens?',
-        options: [{ text: 'It stops at once', icon: '🛑' }, { text: 'It keeps sliding', icon: '⛸️' }],
+        options: [mis('It stops at once', '🛑', 'stopped-wheels-stop-robot'), { text: 'It keeps sliding', icon: '⛸️' }],
         answer: 1,
         why: 'Ice is slippery, so the wheels cannot grip to stop the robot. It slides on.',
       },
       {
         prompt: 'How should a robot drive on ice?',
-        options: [{ text: 'Slowly', icon: '🐢' }, { text: 'Fast', icon: '🐇' }],
+        options: [{ text: 'Slowly', icon: '🐢' }, mis('Fast', '🐇', 'fast-is-fine-on-ice')],
         answer: 0,
         why: 'Going slowly means less sliding when you stop — the same is true for people and cars!',
       },
       {
         prompt: 'Why does the robot go less far in sand?',
-        options: [{ text: 'Sand is slippery, like ice', icon: '🧊' }, { text: 'The wheels sink and it is hard to roll', icon: '🏖️' }],
+        options: [mis('Sand is slippery, like ice', '🧊', 'sand-like-ice'), { text: 'The wheels sink and it is hard to roll', icon: '🏖️' }],
         answer: 1,
         why: 'Soft sand lets the wheels sink in, so rolling takes more push.',
       },
@@ -661,19 +662,19 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'Can our robot see when the bridge is down?',
-        options: [{ text: 'Yes — the Wait block watches the bridge', icon: '⏳' }, { text: 'No — we plan the wait for it', icon: '🙈' }],
+        options: [mis('Yes — the Wait block watches the bridge', '⏳', 'wait-watches-the-world'), { text: 'No — we plan the wait for it', icon: '🙈' }],
         answer: 1,
         why: 'Our robot has no sensor that can see the bridge. So we count the time and plan a wait.',
       },
       {
         prompt: 'The bridge changes its timing. What happens to our plan?',
-        options: [{ text: 'It might not work any more', icon: '⚠️' }, { text: 'It still works', icon: '✅' }],
+        options: [{ text: 'It might not work any more', icon: '⚠️' }, mis('It still works', '✅', 'timed-plan-always-works')],
         answer: 0,
         why: 'A plan with fixed waits only works if the world keeps the same timing. Sensors can help — soon!',
       },
       {
         prompt: 'What should a robot do while it waits?',
-        options: [{ text: 'Show people it is waiting', icon: '⏳' }, { text: 'Hide', icon: '🫣' }],
+        options: [{ text: 'Show people it is waiting', icon: '⏳' }, mis('Hide', '🫣', 'no-need-to-signal')],
         answer: 0,
         why: 'Showing a waiting sign tells people it is not stuck or broken.',
       },
@@ -833,19 +834,19 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'Spark’s camera is an ordinary camera, like your eyes. Can it see in total darkness?',
-        options: [{ text: 'Yes — it sends out its own beam to see', icon: '🔦' }, { text: 'No, it needs light', icon: '🌑' }],
+        options: [mis('Yes — it sends out its own beam to see', '🔦', 'eyes-send-beams'), { text: 'No, it needs light', icon: '🌑' }],
         answer: 1,
         why: 'Ordinary cameras, like eyes, catch light that bounces off things. They do not send out a beam. No light, nothing to see.',
       },
       {
         prompt: 'Why switch the light off when you leave the tunnel?',
-        options: [{ text: 'To save battery energy', icon: '🔋' }, { text: 'The robot cannot drive with its light on', icon: '🚫' }],
+        options: [{ text: 'To save battery energy', icon: '🔋' }, mis('The robot cannot drive with its light on', '🚫', 'light-uses-no-energy')],
         answer: 0,
         why: 'A light uses energy from the battery. Switching it off when it’s not needed saves energy.',
       },
       {
         prompt: 'Why is a light good for safety at night?',
-        options: [{ text: 'People can see the robot coming', icon: '🚶' }, { text: 'The robot needs it to follow its plan', icon: '🗺️' }],
+        options: [{ text: 'People can see the robot coming', icon: '🚶' }, mis('The robot needs it to follow its plan', '🗺️', 'robot-needs-light-to-follow-plan')],
         answer: 0,
         why: 'A light helps people notice the robot, so nobody gets surprised or bumped.',
       },
@@ -991,19 +992,19 @@ export const ACT3: Session[] = [
     quiz: [
       {
         prompt: 'What do engineers ask first?',
-        options: [{ text: 'What colour is cool?', icon: '🌈' }, { text: 'What does the person need?', icon: '🙋' }],
+        options: [mis('What colour is cool?', '🌈', 'design-starts-with-looks'), { text: 'What does the person need?', icon: '🙋' }],
         answer: 1,
         why: 'Good design starts with the person and what they need. Then you choose the parts.',
       },
       {
         prompt: 'Someone walks down a dark hallway at night. Which tool helps?',
-        options: [{ text: 'Headlight', icon: '🔦' }, { text: 'Scoop', icon: '🥄' }, { text: 'Pen', icon: '🖊️' }],
+        options: [{ text: 'Headlight', icon: '🔦' }, mis('Scoop', '🥄', 'any-tool-any-job'), mis('Pen', '🖊️', 'any-tool-any-job')],
         answer: 0,
         why: 'A light helps people see in the dark — and see the robot too.',
       },
       {
         prompt: 'A home robot should be…',
-        options: [{ text: 'Kind and safe', icon: '💛' }, { text: 'As fast as possible', icon: '💨' }],
+        options: [{ text: 'Kind and safe', icon: '💛' }, mis('As fast as possible', '💨', 'faster-is-better')],
         answer: 0,
         why: 'At home there are people, pets and things that can break. Safe and kind comes first.',
       },

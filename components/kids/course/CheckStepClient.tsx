@@ -10,14 +10,19 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Quiz } from '@/lib/kids/curriculum/types'
 import { cancelSparkSpeech, playSound, sparkSays } from '@/lib/kids-audio'
 import { shuffledOrder } from './course-state'
-import { recordMisconception } from '@/lib/kids/classroom-diary'
+import { optionMisconception, recordCheckMisconception } from '@/lib/kids/misconceptions/store'
 
 interface Props {
   quiz: Quiz
   checked: boolean
   onChecked: () => void
   onNext: () => void
-  /** Session id ("L2-S04"). With it, a wrong answer that names a misconception is counted for the Class Mind Map (classroom-diary; counts only, only in a class). */
+  /**
+   * Session id ("L2-S04"). With it, a wrong answer that names a misconception
+   * is counted in the progress store (lib/kids/misconceptions/store.ts: ids and
+   * counts only, on the device). A class sees those counts in its snapshot, as
+   * the Class Mind Map — only after the child has joined one.
+   */
   sessionKey?: string
 }
 
@@ -49,8 +54,8 @@ export default function CheckStepClient({ quiz, checked, onChecked, onNext, sess
     const right = optIndex === question.answer
     playSound(right ? 'correct' : 'wrong')
     if (!right && sessionKey) {
-      const mc = (question.options[optIndex] as { misconception?: string }).misconception
-      if (mc) recordMisconception(sessionKey, mc)
+      const mc = optionMisconception(question.options[optIndex])
+      if (mc) recordCheckMisconception(sessionKey, mc)
     }
     sparkSays(`${right ? 'Yes!' : 'Let’s see why.'} ${question.why}`)
     const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches

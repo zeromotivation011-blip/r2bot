@@ -36,6 +36,7 @@ import {
 } from './sim'
 import { DEG, GRIP_MAX_FORCE, HOME, SHOULDER_MAX_TORQUE, collide, ik, planMove, type Joints, type V3 } from './kinematics'
 import { COLOR_TEXT, GripButton, JointJog, Panel, Pendant, PlanEditor, ProgramEditor, type QueueItem, type SolutionView } from './ArmControlsClient'
+import { markGameMoment, recordGameFrame } from '@/lib/kids/sim/game-recorder'
 
 const STARTER: ProgStep[] = [
   { kind: 'wait', when: 'always' },
@@ -319,6 +320,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
           )
           break
         case 'drop':
+          markGameMoment(sim.time, 'Dropped a part')
           playSound('wrong')
           scene?.burst({ x: e.part.pos.x, y: e.part.pos.y, z: e.part.pos.z }, 0x94a3b8, 16, 0.6)
           if (cfg.mode !== 'program')
@@ -329,10 +331,12 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
           say('A part rode off the end of the belt into the MISSED chute.', 'bad')
           break
         case 'bump':
+          markGameMoment(sim.time, 'Bump')
           playSound('click')
           say(`Bump! The ${e.hit.armPart} touched the ${e.hit.obstacle}, so that joint stopped. Move a different joint to go around it.`, 'bad')
           break
         case 'crash': {
+          markGameMoment(sim.time, 'Crash')
           playSound('wrong')
           scene?.shake()
           const t = sim.tip
@@ -532,6 +536,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
       let n = 0
       while (acc >= DT && n < 2000) {
         sim.step(DT)
+        recordGameFrame(sim.time, { 'Sorted': sim.stats.sorted, 'Dropped': sim.stats.dropped, 'Bumps': sim.stats.bumps })
         acc -= DT
         n++
       }

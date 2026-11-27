@@ -54,6 +54,8 @@ jobs:
         run: npx tsx lib/kids/universe/mastery.verify.ts
       - name: Kids Robodex + Makers — real /robots slugs, every card findable by every band, backup round trip, Makers on every continent, next-step links exist
         run: npx tsx lib/kids/robodex/verify.ts
+      - name: Kids offline app — precache list matches the routes/nav/episodes, deploy refresh, no third-party hints on /kids
+        run: npx tsx lib/kids/offline.verify.ts
       - name: Kids Make It at Home — hazard tags, minimum band and adult flag on every build, no coin cells for Explorers, no mains, real Robodex links, fair tests and check questions
         run: npx tsx lib/kids/builds/verify.ts
       - name: Ask Spark safety — red-team set (EN/HI/ES), 100% disclosure + self-harm, 0 false positives
@@ -74,6 +76,8 @@ jobs:
         run: npx tsx lib/kids/teach/clubs.verify.ts
       - name: Kids Classroom wave 2 — snapshot counts only, Mind Map and stuck signals need 2+ children, gradebook evidence, Class Power-Up maths, standards
         run: npx tsx lib/kids/classroom-wave2.verify.ts
+      - name: Kids misconceptions — every L1–L4 check id exists, every question has a tagged distractor, re-teach links exist, snapshot counts only, band lock, Trust Pack
+        run: npx tsx lib/kids/misconceptions/verify.ts
       - name: Kids shell — five one-word tabs, one gated grown-up door, Rank naming, next mission, 48px game controls + leave guard, WebGL context-loss poster, toast queue cap
         run: npx tsx components/kids/ui/shell.verify.ts
       - name: Kids game Sky Port (drone-hover) — true debriefs per cause, random tunes rarely win (Legend < 3%, Ace < 15%), 3-star Legend needs I, every tier winnable, Cadet follows more time

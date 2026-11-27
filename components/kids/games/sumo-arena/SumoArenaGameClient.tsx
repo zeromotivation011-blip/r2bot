@@ -37,6 +37,7 @@ import { RIVALS, RIVAL_FSM, boutSeed, buildSetups, rivalMotorMul } from './bouts
 import { debrief, pushAt, type Debrief } from './debrief'
 import { DT, EYE_RANGE_CM, MATCH_S, WEIGHT_LIMIT_KG, botStats, createMatch, type BotStats, type Controller, type Match, type MatchResult } from './sim'
 import type { SumoScene } from './render'
+import { recordGameFrame } from '@/lib/kids/sim/game-recorder'
 
 interface Props {
   tier: number
@@ -256,6 +257,10 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
                 break
               }
             }
+          }
+          {
+            const y = m.view().find((b) => b.id === 'you')
+            if (y) recordGameFrame(m.t, { 'Rival distance (cm)': y.distCm, 'Edge left': y.edgeL, 'Edge right': y.edgeR, 'Wheel speed (m/s)': (y.wheel[0] + y.wheel[1]) / 2 })
           }
           scene?.update(m.view())
         }

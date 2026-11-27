@@ -16,6 +16,8 @@ import { getActivitiesDone, type ActivitiesDone } from '@/lib/kids/activities/pr
 import { KIDS_PROGRESS_EVENT, getProgress } from '@/lib/kids-progress'
 import { TIER_NAMES } from '@/lib/kids/universe/tiers'
 import { fireConfetti } from '@/components/kids/Confetti'
+// Calm mode (roadmap #89): no bouncing or pulsing of the world's own (fireConfetti already stops itself).
+import { useKidsCalm } from '@/lib/kids/settings'
 
 export interface HospitalActivity {
   id: string
@@ -139,6 +141,7 @@ function Pulse({ beats, total }: { beats: number; total: number }) {
 }
 
 export function HospitalProgressCard({ ids, gameId }: { ids: string[]; gameId: string }) {
+  const calm = useKidsCalm()
   const { done, tiers, name, ready } = useHospitalProgress(gameId)
   const n = ids.filter((id) => done[id]).length
   const stars = ids.reduce((t, id) => t + (done[id]?.stars ?? 0), 0)
@@ -197,7 +200,7 @@ export function HospitalProgressCard({ ids, gameId }: { ids: string[]; gameId: s
 
       {complete ? (
         <section aria-labelledby="hospital-cert" className="relative overflow-hidden rounded-[28px] border-2 border-amber-300/70 bg-gradient-to-br from-rose-500 via-red-800 to-[#0A1120] p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,.45)]">
-          <p aria-hidden className="text-5xl motion-safe:animate-bounce">
+          <p aria-hidden className={`text-5xl ${calm ? '' : 'motion-safe:animate-bounce'}`}>
             🏥
           </p>
           <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-rose-50">World complete</p>

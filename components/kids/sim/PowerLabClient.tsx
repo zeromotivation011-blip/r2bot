@@ -148,7 +148,11 @@ export default function PowerLabClient() {
   const [useMyPack, setUseMyPack] = useState(false)
   const [mine, setMine] = useState<RobotDesign | null>(null)
 
+  // ?demo=<id> opens that challenge (a course session links straight to it).
   useEffect(() => {
+    const want = new URLSearchParams(window.location.search).get('demo')
+    const d = want ? POWER_DEMOS.find((x) => x.id === want) : undefined
+    if (d) setDemo(d)
     setMine(loadDesign())
   }, [])
 

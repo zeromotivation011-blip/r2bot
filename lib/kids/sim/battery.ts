@@ -20,7 +20,7 @@
 // Cell numbers are typical datasheet values at room temperature (rounded); a
 // real cell varies with brand, age, temperature and how hard it is pushed.
 
-export type Chemistry = 'alkaline' | 'nimh' | 'liion' | 'lifepo4'
+export type Chemistry = 'alkaline' | 'nimh' | 'liion' | 'lipo' | 'lifepo4'
 
 export interface CellSpec {
   id: Chemistry
@@ -104,6 +104,30 @@ export const CELLS: Record<Chemistry, CellSpec> = {
       [1, 4.2],
     ],
   },
+  // Lithium-polymer pouch cell (the flat "LiPo" packs in drones and robot kits): 3.7 V nominal,
+  // 4.2 V full, very low internal resistance (a few milliohms per cell in hobby packs, so it can
+  // give large currents). 2200 mAh is the common size for a 2S/3S robot pack; a pack of bigger
+  // cells sets `cellMah` (PackConfig). Datasheet-typical values, rounded.
+  lipo: {
+    id: 'lipo',
+    name: 'LiPo pouch',
+    format: 'flat pouch, rechargeable',
+    nominalV: 3.7,
+    cutoffV: 3.0,
+    capacityMah: 2200,
+    internalOhm: 0.01,
+    maxAmps: 40,
+    rechargeable: true,
+    massG: 55,
+    ocv: [
+      [0, 3.0],
+      [0.05, 3.4],
+      [0.2, 3.65],
+      [0.5, 3.8],
+      [0.8, 4.0],
+      [1, 4.2],
+    ],
+  },
   // LiFePO4 18650: lower voltage, very flat curve, very long life.
   lifepo4: {
     id: 'lifepo4',
@@ -127,7 +151,7 @@ export const CELLS: Record<Chemistry, CellSpec> = {
   },
 }
 
-export const CHEMISTRIES: Chemistry[] = ['alkaline', 'nimh', 'liion', 'lifepo4']
+export const CHEMISTRIES: Chemistry[] = ['alkaline', 'nimh', 'liion', 'lipo', 'lifepo4']
 
 export interface PackConfig {
   cell: Chemistry
@@ -135,6 +159,12 @@ export interface PackConfig {
   series: number
   /** Rows side by side: capacity and current add. 1–4. */
   parallel: number
+  /**
+   * Optional: cells of the same chemistry but a different capacity (a 5000 mAh LiPo pouch is a
+   * bigger pouch of the same cell). Mass and maximum current grow with it and the internal
+   * resistance falls with it (a bigger cell has more electrode area). Default: the cell's own size.
+   */
+  cellMah?: number
 }
 
 export const MAX_SERIES = 8
@@ -156,17 +186,20 @@ export interface PackInfo {
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v)
 
 export function cleanPack(p: PackConfig): PackConfig {
-  return {
+  const out: PackConfig = {
     cell: CELLS[p.cell] ? p.cell : 'nimh',
     series: clamp(Math.round(p.series) || 1, 1, MAX_SERIES),
     parallel: clamp(Math.round(p.parallel) || 1, 1, MAX_PARALLEL),
   }
+  if (typeof p.cellMah === 'number' && Number.isFinite(p.cellMah) && p.cellMah > 0) out.cellMah = clamp(Math.round(p.cellMah), 200, 20000)
+  return out
 }
 
 export function packInfo(pack: PackConfig): PackInfo {
   const p = cleanPack(pack)
   const c = CELLS[p.cell]
-  const capacityMah = c.capacityMah * p.parallel
+  const size = (p.cellMah ?? c.capacityMah) / c.capacityMah
+  const capacityMah = c.capacityMah * size * p.parallel
   const nominalV = c.nominalV * p.series
   return {
     cells: p.series * p.parallel,
@@ -175,9 +208,9 @@ export function packInfo(pack: PackConfig): PackInfo {
     cutoffV: round(c.cutoffV * p.series, 2),
     capacityMah,
     energyWh: round((nominalV * capacityMah) / 1000, 2),
-    internalOhm: round((c.internalOhm * p.series) / p.parallel, 4),
-    maxAmps: c.maxAmps * p.parallel,
-    massG: c.massG * p.series * p.parallel,
+    internalOhm: round((c.internalOhm * p.series) / (p.parallel * size), 4),
+    maxAmps: round(c.maxAmps * p.parallel * size, 1),
+    massG: round(c.massG * size * p.series * p.parallel, 0),
   }
 }
 
@@ -235,8 +268,8 @@ export interface LoadParts {
   tool: 'none' | 'gripper' | 'scoop' | 'pen' | 'light'
 }
 
-const HEAD_AMPS: Record<LoadParts['head'], number> = { distance: 0.015, camera: 0.18, antenna: 0.04, screen: 0.08 }
-const SENSOR_AMPS: Record<LoadParts['sensor'], number> = { none: 0, line: 0.02, color: 0.025, bumper: 0 }
+export const HEAD_AMPS: Record<LoadParts['head'], number> = { distance: 0.015, camera: 0.18, antenna: 0.04, screen: 0.08 }
+export const SENSOR_AMPS: Record<LoadParts['sensor'], number> = { none: 0, line: 0.02, color: 0.025, bumper: 0 }
 /** A lamp is the hungriest small part; a gripper servo holds a load with a little current. */
 export const LIGHT_AMPS = 0.22
 export const HOLD_AMPS = 0.12
@@ -317,8 +350,14 @@ export interface BatteryState {
 /** The default metered pack: four NiMH AA cells, 4.8 V. */
 export const DEFAULT_PACK: PackConfig = { cell: 'nimh', series: 4, parallel: 1 }
 
-export function createBattery(cfg: ArenaBattery | undefined): BatteryState {
-  const pack = cleanPack(cfg?.pack ?? DEFAULT_PACK)
+/**
+ * @param cfg         the arena's battery (coupled: it can sag, slow and run flat), or undefined
+ * @param meteredPack without an arena battery: the pack the robot carries (its power upgrade,
+ *                    robot-spec.ts powerPack), metered so the battery % and the Flight Recorder
+ *                    follow the robot's own battery. Default DEFAULT_PACK.
+ */
+export function createBattery(cfg: ArenaBattery | undefined, meteredPack?: PackConfig): BatteryState {
+  const pack = cleanPack(cfg?.pack ?? meteredPack ?? DEFAULT_PACK)
   const info = packInfo(pack)
   const soc = clamp(cfg?.startSoc ?? 1, 0, 1)
   const v = packOcv(pack, soc)

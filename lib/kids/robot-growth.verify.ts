@@ -52,6 +52,7 @@ import { GAMES, WORLDS } from './universe/worlds'
 import { buildRobot, getRobotHandles, setExplode, setXray } from './robot3d'
 import { loadRapier } from './sim/rapier'
 import { createSim } from './sim/engine'
+import { cruisePower } from './sim/robot-spec'
 import { DEMOS, designFor } from './sim/demos'
 
 let failed = 0
@@ -158,6 +159,17 @@ async function main(): Promise<void> {
   check('an arm adds reach', sp({ arm: 'arm3' }, { tool: 'gripper' }).reachCm > sp({}, { tool: 'gripper' }).reachCm)
   check('a drone empties its battery fastest', sp({ chassis: 'drone' }).runtimeMin < sp({}).runtimeMin)
   check('legs use more power than two wheels', sp({}, { drive: 'legs' }).watts > sp({}).watts)
+  // #39: a ground robot's spec-sheet runtime IS the simulator's (cruisePower drains with the engine's constants).
+  {
+    let off = 0
+    for (const power of ['aa', 'lipo', 'bigpack'] as const)
+      for (const drive of drives) {
+        const d: RobotDesign = { ...DEFAULT_DESIGN, drive, upgrades: { power } }
+        if (specSheet(d).runtimeMin !== Math.max(1, cruisePower(d).runtimeMin)) off++
+      }
+    check('spec sheet runtime = the simulator’s cruise runtime for every ground pack and drive', off === 0, `${off} differ`)
+  }
+  check('legs run out first, two wheels last (walking costs energy)', sp({}, { drive: 'legs' }).runtimeMin < sp({}, { drive: 'tracks' }).runtimeMin && sp({}, { drive: 'tracks' }).runtimeMin < sp({}).runtimeMin)
   check('the default robot drives at the simulator speed', Math.abs(sp({}).topSpeed - 0.42) < 0.01, String(sp({}).topSpeed))
 
   // ── 5. X-ray wiring ───────────────────────────────────────────────────────

@@ -28,6 +28,7 @@ import {
 } from './sim'
 import { Fx, buildScenery, drawWorld, makeView, pickRobot, type View } from './render'
 import { BRIEFS, RULES } from './rules'
+import { recordGameFrame } from '@/lib/kids/sim/game-recorder'
 
 interface Props {
   tier: number
@@ -251,6 +252,7 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
         let steps = 0
         while (acc >= DT && steps < 16 && !s.done) {
           stepSim(s)
+          recordGameFrame(s.t, { 'Arrived': s.arrived, 'Bumps': s.bumps, 'Crashes': s.crashes, 'Area covered': s.coveredCount })
           acc -= DT
           steps++
         }

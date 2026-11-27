@@ -5,6 +5,7 @@
 
 import type { Session } from '../types'
 import {
+  mis,
   BEEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, LEFT, MOVE_SET, PART_MASS_KG, PEN_DOWN, PEN_UP, REPEAT, RIGHT, kg,
   arena, episode, lessonTiming, obj, projectTiming, say, teacher,
 } from './shared'
@@ -135,19 +136,19 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'What is an algorithm?',
-        options: [{ text: 'A special robot part', icon: '🔩' }, { text: 'Steps in order to do a job', icon: '📋' }],
+        options: [mis('A special robot part', '🔩', 'algorithm-is-a-part'), { text: 'Steps in order to do a job', icon: '📋' }],
         answer: 1,
         why: 'An algorithm is a plan of steps in order — like a recipe or the way to school.',
       },
       {
         prompt: 'Why plan the path before pressing Go?',
-        options: [{ text: 'So the robot does not get lost or bump', icon: '🗺️' }, { text: 'So the robot can read our drawing', icon: '📄' }],
+        options: [{ text: 'So the robot does not get lost or bump', icon: '🗺️' }, mis('So the robot can read our drawing', '📄', 'robot-reads-our-plan')],
         answer: 0,
         why: 'A plan helps us find the right path first. Then the robot follows it exactly.',
       },
       {
         prompt: 'A path goes straight, turns, then goes straight. How many turn blocks?',
-        options: [{ text: 'Three', icon: '3️⃣' }, { text: 'One', icon: '1️⃣' }],
+        options: [mis('Three', '3️⃣', 'every-segment-needs-turn'), { text: 'One', icon: '1️⃣' }],
         answer: 1,
         why: 'Straight, turn, straight has only one turn. Count the corners on the path.',
       },
@@ -311,19 +312,19 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'What is a bug in a program?',
-        options: [{ text: 'A broken robot', icon: '💔' }, { text: 'A mistake in the steps', icon: '🐞' }],
+        options: [mis('A broken robot', '💔', 'bug-means-broken-robot'), { text: 'A mistake in the steps', icon: '🐞' }],
         answer: 1,
         why: 'A bug is a mistake in the program — the robot is fine, the steps are wrong. Engineers called mistakes bugs long ago; once they even found a real moth in a computer and joked it was a real bug.',
       },
       {
         prompt: 'How do you find a bug?',
-        options: [{ text: 'Watch where the robot stops doing the plan', icon: '🔍' }, { text: 'Start again from the top', icon: '🔄' }],
+        options: [{ text: 'Watch where the robot stops doing the plan', icon: '🔍' }, mis('Start again from the top', '🔄', 'bug-means-start-again')],
         answer: 0,
         why: 'Watch the robot and find the first moment it does something different from the plan. Starting again throws away all the steps that were right.',
       },
       {
         prompt: 'Do good engineers make bugs?',
-        options: [{ text: 'Yes, everyone does', icon: '🙋' }, { text: 'Never', icon: '🙅' }],
+        options: [{ text: 'Yes, everyone does', icon: '🙋' }, mis('Never', '🙅', 'good-engineers-never-bug')],
         answer: 0,
         why: 'Everyone makes bugs. Good engineers are good at finding and fixing them.',
       },
@@ -486,19 +487,19 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'Which block makes the robot start drawing?',
-        options: [{ text: 'Pen down', icon: '🖊️⬇️' }, { text: 'Pen up', icon: '🖊️⬆️' }],
+        options: [{ text: 'Pen down', icon: '🖊️⬇️' }, mis('Pen up', '🖊️⬆️', 'pen-up-down-mixed')],
         answer: 0,
         why: 'Pen down touches the paper, so the robot draws as it moves.',
       },
       {
         prompt: 'You forgot "pen up". What happens next time the robot moves?',
-        options: [{ text: 'It stops drawing', icon: '🚫' }, { text: 'It keeps drawing', icon: '〰️' }],
+        options: [mis('It stops drawing', '🚫', 'pen-lifts-itself'), { text: 'It keeps drawing', icon: '〰️' }],
         answer: 1,
         why: 'The pen stays down until a block lifts it. So it keeps drawing!',
       },
       {
         prompt: 'Why is a pen useful for checking a program?',
-        options: [{ text: 'Pen down steers the robot for you', icon: '🖊️' }, { text: 'You can see the path it took', icon: '👀' }],
+        options: [mis('Pen down steers the robot for you', '🖊️', 'pen-moves-robot'), { text: 'You can see the path it took', icon: '👀' }],
         answer: 1,
         why: 'The line shows exactly where the robot went — great for finding bugs.',
       },
@@ -656,19 +657,19 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'When do we use a Repeat block?',
-        options: [{ text: 'When steps happen again and again', icon: '🔁' }, { text: 'When a step happens only once', icon: '1️⃣' }],
+        options: [{ text: 'When steps happen again and again', icon: '🔁' }, mis('When a step happens only once', '1️⃣', 'repeat-is-for-one-step')],
         answer: 0,
         why: 'Repeat does the steps inside it again, as many times as you say.',
       },
       {
         prompt: 'How many turns does a square need?',
-        options: [{ text: '4', icon: '4️⃣' }, { text: '2', icon: '2️⃣' }, { text: '8', icon: '8️⃣' }],
+        options: [{ text: '4', icon: '4️⃣' }, mis('2', '2️⃣', 'square-turn-count'), mis('8', '8️⃣', 'square-turn-count')],
         answer: 0,
         why: 'A square has 4 corners, so the robot turns 4 times — once at each corner.',
       },
       {
         prompt: 'Repeat 3 { clap }. How many claps?',
-        options: [{ text: '4 — once, then 3 more', icon: '👏👏👏👏' }, { text: '3', icon: '👏👏👏' }],
+        options: [mis('4 — once, then 3 more', '👏👏👏👏', 'repeat-means-extra'), { text: '3', icon: '👏👏👏' }],
         answer: 1,
         why: 'Repeat 3 means do it three times: clap, clap, clap!',
       },
@@ -826,19 +827,19 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'Red, blue, red, blue, red, … What comes next?',
-        options: [{ text: 'Blue', icon: '🔵' }, { text: 'Green', icon: '🟢' }],
+        options: [{ text: 'Blue', icon: '🔵' }, mis('Green', '🟢', 'pattern-is-anything')],
         answer: 0,
         why: 'The part that repeats is "red, blue". After red comes blue.',
       },
       {
         prompt: 'One step is: up, turn, along, turn. How do we draw 3 steps?',
-        options: [{ text: 'Repeat 3 around one step', icon: '🔁' }, { text: 'Draw one step only', icon: '1️⃣' }],
+        options: [{ text: 'Repeat 3 around one step', icon: '🔁' }, mis('Draw one step only', '1️⃣', 'pattern-unit-not-seen')],
         answer: 0,
         why: 'Put the steps for one stair inside Repeat 3, and the robot draws all three.',
       },
       {
         prompt: 'Where can you find patterns?',
-        options: [{ text: 'Cloth, tiles, songs and floors', icon: '🧶' }, { text: 'Only in maths books', icon: '📘' }],
+        options: [{ text: 'Cloth, tiles, songs and floors', icon: '🧶' }, mis('Only in maths books', '📘', 'patterns-only-in-maths')],
         answer: 0,
         why: 'Patterns are everywhere: woven cloth, floor tiles, rangoli, music and more.',
       },
@@ -978,19 +979,19 @@ export const ACT2: Session[] = [
     quiz: [
       {
         prompt: 'What does Repeat 4 around "draw a square, turn" make?',
-        options: [{ text: 'One big square', icon: '⬜' }, { text: 'Four squares around a point, like a flower', icon: '🌸' }],
+        options: [mis('One big square', '⬜', 'repeat-makes-bigger'), { text: 'Four squares around a point, like a flower', icon: '🌸' }],
         answer: 1,
         why: 'Each time round it draws a square, then turns. Four squares make a flower shape.',
       },
       {
         prompt: 'How do you move to a new spot without drawing?',
-        options: [{ text: 'Pen down, then hop', icon: '🖊️⬇️' }, { text: 'Pen up, then hop', icon: '🖊️⬆️' }],
+        options: [mis('Pen down, then hop', '🖊️⬇️', 'pen-up-down-mixed'), { text: 'Pen up, then hop', icon: '🖊️⬆️' }],
         answer: 1,
         why: 'With the pen up the robot moves without drawing a line.',
       },
       {
         prompt: 'Your picture came out wrong. What is a good first step?',
-        options: [{ text: 'Watch where it went wrong', icon: '🔍' }, { text: 'Throw it away', icon: '🗑️' }],
+        options: [{ text: 'Watch where it went wrong', icon: '🔍' }, mis('Throw it away', '🗑️', 'bug-means-start-again')],
         answer: 0,
         why: 'Watch the robot draw and find the first wrong line — then fix that block.',
       },

@@ -4,7 +4,8 @@
 // see parseSnapshot in lib/kids/classroom.ts). The member token proves which
 // row to update; the answer carries the class name so the browser can show
 // "Class: 7B ✓", or `removed: true` when the teacher has removed the child (the
-// browser then forgets the membership).
+// browser then forgets the membership). It also carries `lockedBand` when the
+// teacher has set this child's band (roadmap #29); the device then switches.
 //
 // Also used with no snapshot to check that a membership is still valid.
 
@@ -17,6 +18,7 @@ import {
   isMissingTable,
   isTokenShape,
   jsonError,
+  loadMemberBandLock,
   notReadyResponse,
   readJsonCapped,
 } from '@/lib/kids/classroom-server'
@@ -90,6 +92,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     teacherName: cls.teacher_name,
     band: isBandId(cls.band) ? cls.band : 'builders',
     nickname: member.nickname,
+    // Roadmap #29 (migration 0058): null before it runs, so children keep their own band.
+    lockedBand: await loadMemberBandLock(admin, member.id),
   }
   return Response.json({ ok: true, class: info }, { headers: { 'Cache-Control': 'no-store' } })
 }

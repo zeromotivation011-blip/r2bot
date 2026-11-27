@@ -19,6 +19,7 @@ import { levelByNumber } from '../levels'
 import type { ConceptId } from '../types'
 import { LEVEL2_SESSIONS } from './index'
 import type { L2Session } from './types'
+import { gameTierHref, labDemoHref } from '../../sim/lab-links'
 
 export interface ResolvedArena {
   kind: 'code-lab' | 'physics'
@@ -86,7 +87,7 @@ export function resolveArena(s: L2Session): ResolvedArena | null {
   }
   const d = DEMOS.find((x) => x.id === a.id)
   if (!d) return null
-  return { kind: a.kind, id: a.id, title: `${d.title} (Physics Lab)`, emoji: '🧪', href: '/kids/lab/sim', task: a.task, why: a.why, lesson: d.lesson }
+  return { kind: a.kind, id: a.id, title: `${d.title} (Physics Lab)`, emoji: '🧪', href: labDemoHref(d.id), task: a.task, why: a.why, lesson: d.lesson }
 }
 
 export function resolveActivities(s: L2Session): ResolvedActivity[] {
@@ -109,7 +110,7 @@ export function resolveGame(s: L2Session): ResolvedGame | null {
     emoji: g.emoji,
     tier: s.challenge.tier,
     tierName: TIER_NAMES[s.challenge.tier],
-    href: `/kids/play/${g.id}`,
+    href: gameTierHref(g.id, s.challenge.tier),
     goal: s.challenge.goal,
     link: s.challenge.link,
     bestKey: `${g.id}:t${s.challenge.tier}`,

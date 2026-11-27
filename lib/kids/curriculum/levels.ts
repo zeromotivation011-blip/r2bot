@@ -50,7 +50,7 @@ const SHARE_RULE = 'Shared with the class and the child’s family gallery. Neve
 export const BLOCKS_INTRODUCED: Record<LevelNumber, BlockId[]> = {
   1: ['say', 'beep', 'wait', 'drive_for', 'turn_degrees', 'repeat', 'pen_down', 'pen_up', 'grip_close', 'grip_open', 'light_on', 'light_off', 'repeat_until', 'bumped', 'if', 'distance_cm', 'compare'],
   2: ['drive_distance', 'set_motors', 'stop', 'number', 'line_seen', 'if_else', 'forever', 'and', 'or', 'not', 'timer_s', 'floor_color'],
-  3: ['variable_set', 'variable_change', 'variable_get', 'math', 'heading_deg', 'line_offset'],
+  3: ['variable_set', 'variable_change', 'variable_get', 'math', 'heading_deg', 'line_offset', 'reflectance', 'battery_pct'],
   4: [],
 }
 
@@ -295,7 +295,7 @@ const L3_SESSIONS: SessionOutline[] = [
   s(1, 'The Robot’s Memory', 'Use variables to count and remember (deliveries made, distance travelled).', ['variables', 'sense-think-act'], { newBlocks: ['variable_set', 'variable_change', 'variable_get'] }),
   s(2, 'Maths in Motion', 'Calculate distance from speed and time, and check the calculation against a measured distance (distance_cm to a wall before and after the move).', ['variables', 'physics', 'data'], { newBlocks: ['math'] }),
   s(3, 'Keep Your Heading', 'Read the gyro and correct a drifting heading on a slippery snowfield.', ['sensors', 'feedback-control'], { newBlocks: ['heading_deg'] }),
-  s(4, 'Calibrate Your Sensors', 'Measure light and dark readings, store them, and set the threshold from your own data.', ['sensors', 'variables', 'data']),
+  s(4, 'Calibrate Your Sensors', 'Measure light and dark readings, store them, and set the threshold from your own data.', ['sensors', 'variables', 'data'], { newBlocks: ['reflectance'] }),
   s(5, 'Smooth Line Following', 'Steer by how far off the line you are (correction = gain × offset) and compare with if / else.', ['feedback-control', 'variables'], { newBlocks: ['line_offset'] }),
   s(6, 'Make It Yours: The Station Mail Rover', 'Design a rover that delivers to several huts and reports how many deliveries it made.', ['design-process', 'variables']),
   // Act 2 — The Weather Mast
@@ -303,7 +303,7 @@ const L3_SESSIONS: SessionOutline[] = [
   s(8, 'Too Much, Too Little', 'Tune the gain: see wobble when it is too high and slow drift when it is too low.', ['feedback-control', 'debugging', 'data']),
   s(9, 'States: Search, Follow, Done', 'Use a state variable to switch behaviour (find the line, follow it, stop at the end).', ['autonomy', 'variables', 'decomposition']),
   s(10, 'Logging the Weather', 'Record readings into variables and report the minimum, maximum and average.', ['data', 'variables']),
-  s(11, 'The Energy Budget', 'Plan a route within the battery budget; see how mass and speed use energy.', ['physics', 'design-process']),
+  s(11, 'The Energy Budget', 'Plan a route within the battery budget; see how mass and speed use energy.', ['physics', 'design-process'], { newBlocks: ['battery_pct'] }),
   s(12, 'Make It Yours: Weather Mast Inspector', 'Design an inspection run that follows the mast cables, logs readings and returns before the battery runs low.', ['design-process', 'data', 'feedback-control']),
   // Act 3 — The Boulder Field
   s(13, 'Legs or Tracks?', 'Compare legs and tracks on boulders and snow, and choose from measured trade-offs.', ['physics', 'design-process', 'data'], { part: { slot: 'drive', id: 'legs' } }),

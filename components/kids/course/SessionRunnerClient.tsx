@@ -332,7 +332,7 @@ export default function SessionRunnerClient({ session, level, levelTitle, actTit
                 <p className="mt-2 text-[15px] leading-relaxed text-[#A7B0C0]">{session.challenge.mission}</p>
                 {reuse.play.kind === 'game' && (
                   <p className="mt-2 text-[15px] text-[#A7B0C0]">
-                    Pick the <span className="font-bold text-amber-300">{TIER_LABEL[reuse.play.tier]}</span> tier (or a harder one) and win a round. Then come back here.
+                    The game opens on the <span className="font-bold text-amber-300">{TIER_LABEL[reuse.play.tier]}</span> tier. Win a round there (or on a harder tier), then come back here.
                   </p>
                 )}
                 <div className="mt-4 flex flex-wrap gap-3">

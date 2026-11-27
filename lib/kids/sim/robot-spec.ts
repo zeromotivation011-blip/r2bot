@@ -8,8 +8,9 @@
 // metres and a robot about 20 cm across, so the renderer scales the model by
 // MODEL_SCALE.
 
-import type { RobotDesign } from '../robot-design'
+import { UPGRADE_DEFAULT, upgradesOf, type ArmId, type MotorId, type PowerId, type RobotDesign } from '../robot-design'
 import type { Surface } from './arena'
+import { electronicsAmps, MOTOR_NO_LOAD_AMPS, MOTOR_STALL_AMPS, packInfo, type PackConfig } from './battery'
 
 export const MODEL_SCALE = 0.25
 
@@ -35,6 +36,16 @@ export interface DriveSpec {
   /** Wheel radius in metres, for the encoders and the renderer's spin. */
   wheelRadius: number
   mass: number
+  /**
+   * Extra current one side's motors draw whenever that side is moving, A, on top of the current
+   * for the force it pushes. It is the energy a drive wastes inside itself, which rolling drag
+   * does not see. Tracks: the belt bends round the sprockets and rubs the idlers (on hard floors
+   * tracked vehicles need noticeably more power than wheels for the same speed). Legs: a walking
+   * robot lifts its body and swings its legs every step, and its servos hold it up between steps;
+   * a small hobby quadruped with 8 micro servos draws about 0.1 A per servo walking (SG90-class
+   * servos: ~0.1–0.25 A moving), so ≈ 0.4 A per side. Wheels waste almost nothing (0).
+   */
+  moveAmpsPerSide?: number
 }
 
 export const DRIVES: Record<RobotDesign['drive'], DriveSpec> = {
@@ -46,9 +57,9 @@ export const DRIVES: Record<RobotDesign['drive'], DriveSpec> = {
   // Fast and stable; four tyres share the load a bit better but must skid to turn.
   wheels4: { maxSpeed: 0.46, maxForcePerSide: 3.6, wheelAccel: 3, grip: 1.05, sinkage: 1.6, scrub: 0.55, wheelRadius: 0.0425, mass: 0.4 },
   // Slower, heavier, grips everything; turning scrubs a lot.
-  tracks: { maxSpeed: 0.3, maxForcePerSide: 4.5, wheelAccel: 2.5, grip: 1.6, sinkage: 0.35, scrub: 0.8, wheelRadius: 0.035, mass: 0.6 },
+  tracks: { maxSpeed: 0.3, maxForcePerSide: 4.5, wheelAccel: 2.5, grip: 1.6, sinkage: 0.35, scrub: 0.8, wheelRadius: 0.035, mass: 0.6, moveAmpsPerSide: 0.12 },
   // Approximated as a very grippy, slow drive that does not sink and steps over rocks.
-  legs: { maxSpeed: 0.17, maxForcePerSide: 4, wheelAccel: 1.5, grip: 1.8, sinkage: 0.3, scrub: 0.6, wheelRadius: 0.04, mass: 0.5 },
+  legs: { maxSpeed: 0.17, maxForcePerSide: 4, wheelAccel: 1.5, grip: 1.8, sinkage: 0.3, scrub: 0.6, wheelRadius: 0.04, mass: 0.5, moveAmpsPerSide: 0.4 },
 }
 
 export interface SurfaceSpec {
@@ -151,3 +162,128 @@ export function robotSpec(d: RobotDesign): RobotSpec {
     penTip: [0, 0],
   }
 }
+
+// ── Upgrades in the physics (roadmap #33, #39) ───────────────────────────────
+// The Workshop upgrades (lib/kids/robot-design.ts) used to change only the spec
+// sheet and the look. These tables put them into the simulator: the Physics Lab
+// and the Power Lab drive `fittedSpec(design)`, so a torque motor really pushes
+// harder and a big pack really weighs more and lasts longer. The spec sheet
+// (lib/kids/robot-growth.ts specSheet) uses the same numbers; robot-growth.verify
+// and sim/verify check they agree. Course challenges keep the session's own robot
+// without upgrades (arenas/level1.ts sessionDesign), so their calibration holds.
+
+/**
+ * Motor gearing. A gearbox trades speed for force: with gear ratio G the wheel turns
+ * 1/G as fast and pushes G times as hard, so speed × strength stays about 1 (speedy
+ * 1.4 × 0.7 = 0.98, torque 0.7 × 1.6 = 1.12: the torque motor is also a bit bigger).
+ * Brushless motors are more powerful AND more efficient for their size (1.3 × 1.3).
+ */
+export const MOTOR_GEARING: Record<MotorId, { speed: number; strength: number; massDelta: number }> = {
+  gear: { speed: 1, strength: 1, massDelta: 0 },
+  speedy: { speed: 1.4, strength: 0.7, massDelta: 0 },
+  torque: { speed: 0.7, strength: 1.6, massDelta: 0.04 },
+  brushless: { speed: 1.3, strength: 1.3, massDelta: 0.02 },
+}
+
+/**
+ * The battery each power upgrade IS, as a pack the battery model runs.
+ *   aa:      4 × NiMH AA in series: 4 × 1.2 V = 4.8 V, 2000 mAh (9.6 Wh)
+ *   lipo:    2S LiPo: 2 × 3.7 V = 7.4 V, 2200 mAh (16.3 Wh)
+ *   bigpack: 3S LiPo of 5000 mAh cells: 3 × 3.7 V = 11.1 V, 5000 mAh (55.5 Wh)
+ *   solar:   the 2S LiPo; the panel is on top (no sun in the indoor arenas)
+ */
+export const POWER_PACKS: Record<PowerId, PackConfig> = {
+  aa: { cell: 'nimh', series: 4, parallel: 1 },
+  lipo: { cell: 'lipo', series: 2, parallel: 1 },
+  bigpack: { cell: 'lipo', series: 3, parallel: 1, cellMah: 5000 },
+  solar: { cell: 'lipo', series: 2, parallel: 1 },
+}
+
+/** Extra mass over the AA box, kg (the body mass already holds a 4 × AA box). */
+export const POWER_MASS_DELTA: Record<PowerId, number> = { aa: 0, lipo: -0.04, bigpack: 0.28, solar: 0.04 }
+
+/** A jointed arm's mass, kg (servos + links). */
+export const ARM_MASS: Record<ArmId, number> = { none: 0, arm2: 0.15, arm3: 0.22 }
+
+/**
+ * Above this many kg per unit of motor strength a small DC motor is overloaded: it runs further
+ * down its torque–speed line (speed falls as the load torque rises), so the top speed drops in
+ * proportion. Same rule as the spec sheet's top speed.
+ */
+export const OVERLOAD_KG_PER_STRENGTH = 1.6
+
+/** The pack this robot carries (its power upgrade). */
+export function powerPack(d: RobotDesign): PackConfig {
+  return { ...(POWER_PACKS[upgradesOf(d).power] ?? POWER_PACKS.aa) }
+}
+
+/** True when the design has no upgrade that changes the physics (the starter robot). */
+export function hasPhysicsUpgrades(d: RobotDesign): boolean {
+  const up = upgradesOf(d)
+  return up.power !== UPGRADE_DEFAULT.power || up.motor !== UPGRADE_DEFAULT.motor || up.sensor2 !== UPGRADE_DEFAULT.sensor2 || up.arm !== UPGRADE_DEFAULT.arm
+}
+
+/**
+ * The robot as the simulator drives it, upgrades included: mass (pack, motors, 2nd sensor,
+ * arm), top speed and push (motor gearing, overload). A World form (drone, sub, humanoid)
+ * is not a ground robot: the ground arenas keep its base drive, so `chassis` is ignored here.
+ * With no upgrades fitted this is exactly robotSpec(d).
+ */
+export function fittedSpec(d: RobotDesign): RobotSpec {
+  const base = robotSpec(d)
+  if (!hasPhysicsUpgrades(d)) return base
+  const up = upgradesOf(d)
+  const mo = MOTOR_GEARING[up.motor] ?? MOTOR_GEARING.gear
+  const mass = base.mass + (POWER_MASS_DELTA[up.power] ?? 0) + mo.massDelta + (SENSOR_MASS[up.sensor2] ?? 0) + (ARM_MASS[up.arm] ?? 0)
+  const overload = Math.max(1, mass / (OVERLOAD_KG_PER_STRENGTH * mo.strength))
+  const drive: DriveSpec = {
+    ...base.drive,
+    maxSpeed: (base.drive.maxSpeed * mo.speed) / overload,
+    maxForcePerSide: base.drive.maxForcePerSide * mo.strength,
+    mass: base.drive.mass,
+  }
+  return { ...base, drive, mass }
+}
+
+export interface CruisePower {
+  /** Steady current cruising straight on a smooth tile floor at full speed, A. */
+  amps: number
+  /** Of which the two drive motors, A. */
+  motorAmps: number
+  /** Of which the computer, head and sensors, A. */
+  electronicsAmps: number
+  /** Pack voltage (nominal), V, and power, W. */
+  volts: number
+  watts: number
+  /** Minutes from full until the pack is flat at this draw. */
+  runtimeMin: number
+}
+
+/**
+ * The battery's steady draw while cruising on tile, from the SAME constants the engine drains
+ * with (battery.ts): each motor's no-load current plus current ∝ the force it pushes (torque ∝
+ * current), the force being the rolling drag on its side; plus the electronics. sim/verify drives
+ * the headless engine and checks the battery really drains at this rate, so a spec sheet that
+ * shows `runtimeMin` shows how long the simulated robot runs.
+ */
+export function cruisePower(d: RobotDesign): CruisePower {
+  const spec = fittedSpec(d)
+  const G = 9.81
+  const dragPerSide = SURFACES.tile.crr * spec.drive.sinkage * ((spec.mass * G) / 2)
+  const motorAmps = 2 * (MOTOR_NO_LOAD_AMPS + (spec.drive.moveAmpsPerSide ?? 0) + (MOTOR_STALL_AMPS * dragPerSide) / spec.drive.maxForcePerSide)
+  const parts = { head: d.head, sensor: d.sensor, tool: d.tool }
+  const elec = electronicsAmps(parts, false, false)
+  const amps = motorAmps + elec
+  const pack = packInfo(powerPack(d))
+  const runtimeMin = ((pack.capacityMah / 1000) / amps) * 60
+  return {
+    amps: round3(amps),
+    motorAmps: round3(motorAmps),
+    electronicsAmps: round3(elec),
+    volts: pack.nominalV,
+    watts: round3(amps * pack.nominalV),
+    runtimeMin: Math.round(runtimeMin),
+  }
+}
+
+const round3 = (x: number) => Math.round(x * 1000) / 1000

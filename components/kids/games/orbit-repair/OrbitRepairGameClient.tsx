@@ -36,6 +36,7 @@ import {
   type TierIndex,
 } from './sim'
 import { Fx, actorPixel, drawGame, viewFor } from './render'
+import { recordGameFrame } from '@/lib/kids/sim/game-recorder'
 
 interface Props {
   tier: number
@@ -394,6 +395,7 @@ export default function OrbitRepairGameClient({ tier: tierProp, onFinish }: Prop
           syncQ.current = false
           if (s.kind === 'cadet') for (const d of inp.puffs) fx.plume(actorPixel(s, view), d, CADET.size * view.scale)
           step(s, inp)
+          if (s.kind === 'cadet') recordGameFrame(s.t, { 'Speed': Math.hypot(s.v.x, s.v.y), 'Puffs used': s.puffsUsed, 'Bumps': s.bumps })
           acc -= DT
           n++
           if (s.outcome !== 'running') break

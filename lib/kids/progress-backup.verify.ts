@@ -8,6 +8,9 @@
 //   - bad input (empty, junk, a typo, a wrong version, a huge or hostile
 //     payload) is refused with a reason and never throws or writes anything
 //   - KIDS_PROGRESS_EVENT fires on a successful restore
+//   - misconception counts (roadmap #30, `checkMisconceptions`): travel in the
+//     code, merge by the higher count, hostile keys and free text are dropped,
+//     an older code without them restores to an empty map
 //   - profiles (lib/kids/profiles.ts, roadmap #41/#90): the device's original
 //     child becomes member #1 with zero data loss; siblings and classmates never
 //     see each other's progress, robot or Galaxy map; "Done" clears the device;
@@ -66,6 +69,7 @@ async function main() {
     completedLevels: ['spark-garden/what-is-spark'],
     playDays: ['2026-11-20', '2026-11-21'],
     avatar: { id: 'robo', color: '#00B8D4' },
+    checkMisconceptions: { 'L1-S05.turn-moves-forward': 2, 'L2-S04.taller-is-stronger': 1 },
   })
   store.set(ACTS, JSON.stringify({ 'seq-1': { stars: 3, attempts: 1, score: 1, plays: 2, at: '2026-11-20' } }))
   const before = P.getProgress()
@@ -96,6 +100,7 @@ async function main() {
       JSON.stringify(after.unlocks) === JSON.stringify(before.unlocks) &&
       JSON.stringify(after.sessionsDone) === JSON.stringify(before.sessionsDone) &&
       JSON.stringify(after.personalBests) === JSON.stringify(before.personalBests))
+    check(`${mode}: misconception counts restored`, JSON.stringify(after.checkMisconceptions) === JSON.stringify({ 'L1-S05.turn-moves-forward': 2, 'L2-S04.taller-is-stronger': 1 }))
     check(`${mode}: avatar and course levels restored`, after.avatar.id === 'robo' && after.completedLevels.includes('spark-garden/what-is-spark'))
     check(`${mode}: Skill Galaxy activities restored`, JSON.parse(store.get(ACTS) ?? '{}')['seq-1']?.stars === 3)
     check(`${mode}: KIDS_PROGRESS_EVENT fired`, events >= 1)
@@ -114,6 +119,7 @@ async function main() {
     sessionsDone: { 'L1-S01': 1, 'L1-S03': 3 },
     personalBests: { 'drone-hover:pilot': 95 },
     playDays: ['2026-11-25'],
+    checkMisconceptions: { 'L1-S05.turn-moves-forward': 5, 'L3-S02.gain-bigger-is-better': 1 },
   })
   store.set(ACTS, JSON.stringify({ 'seq-1': { stars: 1, attempts: 4, score: 0.5, plays: 5, at: '2026-11-25' } }))
   const m = await P.importProgressCode(codeZ)
@@ -127,6 +133,8 @@ async function main() {
   check('merge: sessions are a union with best stars', mp.sessionsDone['L1-S01'] === 3 && mp.sessionsDone['L1-S03'] === 3 && mp.sessionsDone['L1-S02'] === 2)
   check('merge: personal bests keep the best (95)', mp.personalBests['drone-hover:pilot'] === 95)
   check('merge: play days are a union', mp.playDays.length === 3)
+  check('merge: misconception counts never lower (5 kept) and are a union',
+    mp.checkMisconceptions['L1-S05.turn-moves-forward'] === 5 && mp.checkMisconceptions['L3-S02.gain-bigger-is-better'] === 1 && mp.checkMisconceptions['L2-S04.taller-is-stronger'] === 1)
   const sa = JSON.parse(store.get(ACTS) ?? '{}')['seq-1']
   check('merge: activity keeps best stars and most plays', sa?.stars === 3 && sa?.plays === 5)
   const again = await P.importProgressCode(codeZ)
@@ -190,11 +198,18 @@ async function main() {
   // ── Hostile values are cleaned, not trusted ──
   const hostile = enc({
     v: 1,
-    p: { xp: -50, totalStars: 'lots', band: 'admins', badges: { ok: '2026-11-01', bad: 7 }, unlocks: ['x', 3, 'y'], robotColor: 'red', avatar: { id: 'a', color: 'javascript:' } },
+    p: {
+      xp: -50, totalStars: 'lots', band: 'admins', badges: { ok: '2026-11-01', bad: 7 }, unlocks: ['x', 3, 'y'], robotColor: 'red', avatar: { id: 'a', color: 'javascript:' },
+      checkMisconceptions: { 'L1-S03.order-does-not-matter': 1e9, 'My answer was the wheels': 3, 'L9-S01.x': 1, 'L1-S02.count-the-start-square': -1, 'L1-S07.robot-reads-our-plan': 'two' },
+    },
   })
   const h = await P.importProgressCode(hostile)
   const hp = P.getProgress()
   check('hostile: import ok but bad fields dropped', h.ok && hp.xp === 5000 && hp.totalStars === 41 && hp.band === 'builders' && hp.badges.ok === '2026-11-01' && !('bad' in hp.badges))
+  check('hostile: misconception keys must be "Lx-Syy.id", counts 1–99, no free text',
+    hp.checkMisconceptions['L1-S03.order-does-not-matter'] === 99 &&
+    !Object.keys(hp.checkMisconceptions).some((k) => !/^L[1-4]-S\d{2}\.[a-z0-9][a-z0-9-]*$/.test(k)) &&
+    !('L1-S02.count-the-start-square' in hp.checkMisconceptions) && !('L1-S07.robot-reads-our-plan' in hp.checkMisconceptions))
   check('hostile: list keeps only strings', hp.unlocks.includes('x') && hp.unlocks.includes('y') && !hp.unlocks.some((u) => typeof u !== 'string'))
 
   // ── One star count: old totalStars + course sessions + Galaxy, no double counting ──
@@ -208,6 +223,29 @@ async function main() {
   const blank = await P.exportProgressCode()
   const b = await P.importProgressCode(blank)
   check('a brand-new device exports a valid code', b.ok)
+  check('a code without misconceptions restores to an empty map (safe default)', JSON.stringify(P.getProgress().checkMisconceptions) === '{}')
+
+  // ── The check-step recorder writes the one progress store ──
+  {
+    const S = await import('./misconceptions/store')
+    store.clear()
+    let events = 0
+    const onEv = () => events++
+    target.addEventListener(P.KIDS_PROGRESS_EVENT, onEv)
+    S.recordCheckMisconception('L1-S05', 'turn-moves-forward')
+    S.recordCheckMisconception('L1-S05', 'turn-moves-forward')
+    S.recordCheckMisconception('L1-S10', 'repeat-means-extra')
+    S.recordCheckMisconception('L1-S10', 'Not an id!')
+    S.recordCheckMisconception('nope', 'turn-moves-forward')
+    target.removeEventListener(P.KIDS_PROGRESS_EVENT, onEv)
+    check('recorder: counts by key, refuses free text and bad sessions', JSON.stringify(P.getProgress().checkMisconceptions) === JSON.stringify({ 'L1-S05.turn-moves-forward': 2, 'L1-S10.repeat-means-extra': 1 }))
+    check('recorder: fires KIDS_PROGRESS_EVENT (the class sync listens)', events === 3)
+    check('recorder: most recent first for the snapshot', Object.keys(S.recentCheckMisconceptions())[0] === 'L1-S10.repeat-means-extra')
+    for (let i = 1; i <= 70; i++) S.recordCheckMisconception(`L2-S${String((i % 24) + 1).padStart(2, '0')}`, `idea-${i}`)
+    const kept = P.getProgress().checkMisconceptions
+    check('recorder: keeps at most 60 keys, newest kept', Object.keys(kept).length === 60 && 'L2-S23.idea-70' in kept && !('L1-S05.turn-moves-forward' in kept))
+    check('recorder: is not a reward (no XP, no stars)', P.getProgress().xp === 0 && P.collectedStars() === 0)
+  }
 
   // ── Profiles: migration of the original child into member #1 ──
   await profileChecks(P)
@@ -290,12 +328,29 @@ async function profileChecks(P: ProgressModule) {
 
   // Shared lab tablet: "Done" clears the device.
   PR.setDeviceMode('shared')
+  // Flight Recorder ghosts (lib/kids/sim/ghost-store.ts, a profileKey() store): the child
+  // playing now (Kai) and member #1 each have one before "Done".
+  const GHOSTS = 'r2bot_kids_sim_ghosts_v1'
+  check('the ghost store is a listed per-child base', PR.PROFILE_KEY_BASES.includes(GHOSTS))
+  store.set(GHOSTS, '{"g":{"p1-arena":{}}}')
+  store.set(PR.profileKey(GHOSTS), '{"g":{"kai-arena":{}}}')
+  check("Kai's ghost is in Kai's namespace", store.get(`${GHOSTS}::${kai}`) === '{"g":{"kai-arena":{}}}')
+  // A store this file does not own, whose key happens to end in "::_none".
+  store.set('r2bot_other_cache::_none', 'keep')
   check('Done clears the device back to the picker', PR.finishTurn() && PR.needsPicker() && PR.activeProfileId() === null)
   check('after Done nothing of the last child is visible', P.getProgress().xp === 0 && RD.loadDesign().name !== 'Rex' && !store.has(ACTS) && !store.has(CLASS))
+  check("Done keeps the last child's ghosts (their own namespace) and member #1's", store.get(`${GHOSTS}::${kai}`) === '{"g":{"kai-arena":{}}}' && store.get(GHOSTS) === '{"g":{"p1-arena":{}}}')
+  check('Done does not wipe a "::_none" key that is not a per-child store', store.get('r2bot_other_cache::_none') === 'keep')
   P.saveProgress({ xp: 3 })
+  // A guest's ghost while nobody is signed in goes to the "_none" namespace…
+  store.set(PR.profileKey(GHOSTS), '{"g":{"guest-arena":{}}}')
+  check("a guest's ghost is kept apart in ::_none", store.has(`${GHOSTS}::_none`) && store.get(`${GHOSTS}::${kai}`) === '{"g":{"kai-arena":{}}}')
   PR.switchProfile('p1')
-  check('a guest scribble while nobody is signed in is wiped', ![...store.keys()].some((k) => k.endsWith('::_none')))
+  // …and, like the guest's progress, is wiped when the next child signs in (privacy between children).
+  check('a guest scribble while nobody is signed in is wiped', ![...store.keys()].some((k) => k.endsWith('::_none') && k !== 'r2bot_other_cache::_none'))
   check('after Done the next child gets their own things back', P.getProgress().xp === 900 && RD.loadDesign().name === 'Bolt')
+  check('…their own ghosts too, and the other child keeps theirs', store.get(PR.profileKey(GHOSTS)) === '{"g":{"p1-arena":{}}}' && store.get(`${GHOSTS}::${kai}`) === '{"g":{"kai-arena":{}}}')
+  store.delete('r2bot_other_cache::_none')
 
   // Class join on a shared tablet with nobody signed in makes and signs in a profile.
   PR.finishTurn()

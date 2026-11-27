@@ -9,6 +9,7 @@ const SENSOR_WORDS: Record<string, string> = {
   distance_cm: 'distance',
   line_seen: 'line seen',
   line_offset: 'line offset',
+  reflectance: 'reflectance',
   floor_color: 'floor colour',
   bumped: 'bumped',
   heading_deg: 'heading',

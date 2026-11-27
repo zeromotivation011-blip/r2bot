@@ -4,7 +4,7 @@
 // is the child's only identity for the class. No Supabase here — every call
 // goes to our own route handlers under /api/kids/**.
 
-import { getProgress } from '@/lib/kids-progress'
+import { getProgress, saveProgress } from '@/lib/kids-progress'
 import { encodeDesign, loadDesign } from './robot-design'
 import { getActivitiesDone } from './activities/progress'
 import { GAMES } from './universe/worlds'
@@ -12,6 +12,7 @@ import {
   SNAPSHOT_ACTIVITY_BYTES,
   SNAPSHOT_MAX_ACTIVITIES,
   capIds,
+  isBandId,
   type ClassSnapshot,
   type JoinedClassInfo,
 } from './classroom'
@@ -19,13 +20,15 @@ import { isAssignmentKind, type ChildMission } from './classroom-assignments'
 import { CONCEPT_IDS, conceptGridCode, conceptStates } from './universe/mastery'
 import { clearClassDiary, misconceptionCounts, workDays } from './classroom-diary'
 import type { ChildPowerUp } from './classroom-goal'
-import { CLASS_MEMBERSHIP_KEY, KIDS_CLASS_EVENT, loadMembership, type StoredMembership } from './classroom-membership-store'
+import type { BandId } from './bands'
+import { applyClassBandToProfile } from './profiles'
+import { CLASS_MEMBERSHIP_KEY, KIDS_CLASS_EVENT, classBandLock, loadMembership, type StoredMembership } from './classroom-membership-store'
 
 const KEY = CLASS_MEMBERSHIP_KEY
 /** components/kids/course/course-state.ts COURSE_KEY (read-only here; a swapped key, so it is the playing child's). */
 const COURSE_KEY = 'r2bot_kids_course_v1'
 // The read side lives in classroom-membership-store.ts (light enough for the shell).
-export { KIDS_CLASS_EVENT, loadMembership, type StoredMembership }
+export { KIDS_CLASS_EVENT, classBandLock, loadMembership, type StoredMembership }
 
 export function saveMembership(m: StoredMembership): void {
   try {
@@ -246,6 +249,21 @@ export async function fetchMissions(): Promise<MissionsOutcome> {
   }
 }
 
+/**
+ * Roadmap #29: the teacher set this child's band, so the device follows it.
+ * Writes the progress store only when the band differs (no event loop: the
+ * next sync finds them equal). A band is a range, never an age.
+ */
+function applyBandLock(band: BandId | null): void {
+  if (!band) return
+  try {
+    if (getProgress().band !== band) saveProgress({ band })
+    applyClassBandToProfile(band)
+  } catch {
+    /* storage blocked: the child keeps playing at their current band */
+  }
+}
+
 export type SyncOutcome = 'ok' | 'removed' | 'unavailable'
 
 /** POST the snapshot (or just a check). Updates or clears the stored membership. */
@@ -265,10 +283,14 @@ export async function syncMembership(includeSnapshot: boolean): Promise<SyncOutc
       return 'removed'
     }
     if (res.ok && data.class) {
-      const c = data.class
-      if (c.className !== m.className || c.teacherName !== m.teacherName || c.nickname !== m.nickname || c.band !== m.band) {
+      const c = { ...data.class, lockedBand: isBandId(data.class.lockedBand) ? data.class.lockedBand : null }
+      if (
+        c.className !== m.className || c.teacherName !== m.teacherName || c.nickname !== m.nickname ||
+        c.band !== m.band || c.lockedBand !== (m.lockedBand ?? null)
+      ) {
         saveMembership({ ...m, ...c })
       }
+      applyBandLock(c.lockedBand)
       return 'ok'
     }
     return 'unavailable'

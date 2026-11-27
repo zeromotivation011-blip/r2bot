@@ -159,14 +159,15 @@ Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-u
 - [x] #1 Kids privacy section on /privacy (`#kids`); GA4, the adult footer and the adult Academy progress banner are off on kids pages (the first-party path counter and the on-demand AuthModal remain).
 
 Still open from Wave 1:
-- [ ] #3 Navigation rename (Learn / Play / Garage / Me tabs; today Home · Course · Worlds · Games · Hangar; renaming the Hangar tab "Garage" is a nav-label change only).
-- [ ] #6 Rank naming (XP level → "Rank", rename "Star Cadet"), `/kids/activities` → `/kids/printables`.
-- [ ] #8 Episodes Theatre on the Piper voices; #9 band-aware "Your next mission" for 8–17.
-- [ ] #12 Robot Passport (server-side code restore; needs a migration). The offline backup code exists.
-- [ ] #13 Teachers see the whole Universe (classroom-stats, CSV, stuck signal).
-- [ ] #15 Immersive play mode leftovers (48px tier/"?" buttons, Exit confirm); #16 webglcontextlost + poster fallback everywhere.
-- [ ] #19 /kids OG image; #20 one `/kids/grown-ups` front door; #21 one block language (Code Lab → Blockly).
-- [ ] Follow-ups: Workshop should mark parts that came from the Spark Trail (`TRAIL_PART_FITS`); show `title-*` unlocks somewhere (`bestTitle()`); native review of Hindi/Spanish Spark replies; confirm offline on real Android/iOS devices; check the reward-toast pile-up on phones when a robot rename triggers a badge plus several unlocks at once.
+- [x] #3 Navigation rename (Learn / Play / Garage / Me tabs; today Home · Course · Worlds · Games · Hangar; renaming the Hangar tab "Garage" is a nav-label change only) — done in Wave 2 batch D.
+- [x] #6 Rank naming (XP level → "Rank", rename "Star Cadet"), `/kids/activities` → `/kids/printables` — batches C and D; the parent hub's last "Explorer level" became "Rank" in Wave 3 F.
+- [x] #8 Episodes Theatre on the Piper voices; #9 band-aware "Your next mission" for 8–17 — done in Wave 2 batch D.
+- [x] #12 Robot Passport (server-side code restore; migration 0057) — done in Wave 2 batch D.
+- [x] #13 Teachers see the whole Universe (classroom-stats, CSV, stuck signal) — done in Wave 2 batch C.
+- [x] #15 Immersive play mode leftovers (48px tier/"?" buttons, Exit confirm); #16 webglcontextlost + poster fallback everywhere — done in Wave 2 batch D. Re-checked in Wave 3 F (48×48 at 390 and 1280).
+- [x] #19 /kids OG image; #20 one `/kids/grown-ups` front door; #21 one block vocabulary — done in Wave 2 batch D. A full Blockly port of Code Lab stays open (see batch D).
+- [x] Follow-ups: Workshop marks Spark Trail parts (`WorkshopClient.tsx`, `TRAIL_PART_FITS`); `title-*` unlocks shown (`ExplorerCardClient`, `HangarClient`); reward-toast pile-up capped (`toast-queue.ts`) — all verified already fixed in Wave 3 F.
+- [ ] Still open: native review of Hindi/Spanish Spark replies (needs a native reviewer); confirm offline on real Android/iOS devices (checklist now in `apps/kids-mobile/README.md`; needs a phone).
 
 
 ## 27 Nov 2026 — Final fix wave (child, policy, engineering checks)
@@ -181,7 +182,7 @@ Still open from Wave 1:
 - [x] Removed the dead Google Fonts preconnect/dns-prefetch from `app/layout.tsx` (Supabase preconnect left: the root layout cannot tell /kids without going dynamic).
 - [x] Parental gate cool-down persists across Cancel/reopen (sessionStorage `r2bot_kids_gate_lock`).
 - [x] kids-sw: STATIC trim keeps a keep-list (`/kids/__sw-keep.json` in the pages cache) of each precached page's chunks + the dynamic chunks found at install; refreshed when a precached page's HTML is saved again.
-- [ ] Follow-up: dynamic (lazy) chunks of a precached page are only re-recorded on a worker reinstall, not on a page refresh after a deploy; Supabase preconnect still on /kids.
+- [x] Follow-up: lazy chunks follow a deploy (webpack-runtime fingerprint refresh) and the Supabase preconnect is skipped on /kids — Wave 3 F.
 
 
 ## 27 Nov 2026 — Wave 2, batch A (access, hints, mastery, profiles)
@@ -195,12 +196,12 @@ Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-u
 - [x] #41 Shared-device mode and #90 family profiles: per-child storage, picture passwords for Explorers, "Done" on shared tablets, parent hub per child, Play together `/kids/together` (noindex); profile button in the shell header.
 
 Still open from batch A:
-- [ ] #29 "Teacher locks a child's band" (needs the classroom side).
-- [ ] #27 teacher grid: put `conceptGridCode(getProgress())` into the class sync snapshot and decode with `parseConceptGridCode` (Batch C / classroom owner).
-- [ ] #89 the fixed "what's next" strip in the shell.
-- [ ] Swarm Reef and Bio-Bots keep fixed limits on purpose (simulated mission time is part of the puzzle) — revisit if teachers ask.
-- [ ] Episode `fx.ts` and the canvas worlds' own effects follow calm only through the episode `calm` flag and `fireConfetti`; a world that draws its own particles should check `kidsCalm()`.
-- [ ] Owners of swapped stores (activities, course, hangar, classroom membership, think, vision, codelab, worlds): moving to `profileKey()` must remove the key from `SWAPPED_KEYS` in the same commit.
+- [x] #29 "Teacher locks a child's band" — Wave 3 F (migration 0058).
+- [x] #27 teacher grid: sent by `classroom-membership.ts` and decoded by `classroom-insights.ts` (`gradeRow`) — verified already fixed in Wave 3 F.
+- [x] #89 the fixed "what's next" strip in the shell (`NextStripClient`, Calm only) — Wave 3 F.
+- [ ] (Deliberate, unchanged) Swarm Reef and Bio-Bots keep fixed limits on purpose (simulated mission time is part of the puzzle) — revisit if teachers ask.
+- [x] Episode `fx.ts` and the canvas worlds' own effects follow Calm (`kidsCalm()` in fx, the seven worlds drop bounce/pulse) — Wave 3 F.
+- [ ] (Standing rule) Owners of swapped stores (activities, course, hangar, classroom membership, think, vision, codelab, worlds): moving to `profileKey()` must remove the key from `SWAPPED_KEYS` in the same commit.
 - [ ] activities/verify warning: "variables" has a single template for Explorers (the course plan has nothing on variables at that age).
 
 ## 27 Nov 2026 — Wave 2, batch B (courses 2–4, Robodex, makers, robot depth, recorder, battery)
@@ -220,20 +221,20 @@ Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-u
   Power Lab (`/kids/lab/power`), `battery_pct` sensor (Talk schema too). Nav: Power Lab, Robodex, Robotics careers in More.
 
 Still open from batch B:
-- [ ] #38 games' own sims (sumo, drone, …) are not recorded: needs a hook in `GameShellClient`.
-- [ ] #33 upgrades change the spec sheet and visuals, not sim physics (`robot-spec.ts` mass); #39 runtime should
-  match `specSheet()`. AR (`ARViewClient`) does not show the World form yet.
-- [ ] #23 Level 3–4 sim gaps noted in the teacher notes: no reflectance block (L3 S4), no battery block in those
-  sessions' arenas yet, no dead zone, no carry positions — each session's playable challenge stands in.
-- [ ] #23 `?tier=` in `GameShellClient` and `?demo=` in `SimLabClient`, so a session can open the exact tier/arena
-  (today the child picks it). Physics Lab arena challenges are self-reported ("I finished it"): the lab has no store.
-- [ ] #23 "coming in <month>" waitlists are moot (all levels shipped); the course waitlist copy was removed with PLAYABLE.
-- [ ] #30 reads the `misconception` ids on wrong options (both session types) — capture + Class Mind Map not built.
+- [x] #38 games' own sims are recorded (`game-recorder.ts`, shell hook, seven games) — Wave 3 F.
+- [x] #33 upgrades change sim physics (`fittedSpec`); #39 the spec-sheet runtime is the sim's (`cruisePower`) — Wave 3 F.
+- [ ] AR (`ARViewClient`) does not show the World form yet.
+- [x] #23 reflectance block (L3 S4 plays "Find the faded line") and battery block (L3 S11 plays "Home before flat") — Wave 3 F.
+- [ ] #23 still no motor dead zone and no carry positions in the sim; those sessions' playable challenges stand in.
+- [x] #23 `?tier=` (GameShell) and `?demo=` (Physics Lab and Power Lab, `lab-links.ts`) — Wave 3 F.
+- [ ] Physics Lab arena challenges in a session are still self-reported ("I finished it"): the lab has no store.
+- [x] #23 "coming in <month>" waitlists are moot (all levels shipped); the course waitlist copy was removed with PLAYABLE.
+- [x] #30 misconception capture + Class Mind Map — batch C; Level 1 ids, device record and re-teach in Wave 3 F.
 - [x] Garage: Robodex shelf mounted; the Garage names course badges of all four levels.
-- [ ] `/kids/next-step` not yet linked from the Engineers home or `/kids/parents`; the class view still names only
-  Level 1 course badges; the Garage certificate button shows Level 1 only (could follow the child's band).
-- [ ] Shared-tablet "Done" could wipe the ghost store's `::_none` key.
-- [ ] curriculum/verify warns: two Physics Lab arenas are each used by two Level 2 sessions (different tasks).
+- [x] `/kids/next-step` linked from the Engineers home, the parent hub and the class view — Wave 3 F.
+- [ ] The class view still names only Level 1 course badges; the Garage certificate button shows Level 1 only (could follow the child's band).
+- [x] Shared-tablet "Done" touches only per-child store keys (`wipeNamespace`) — Wave 3 F.
+- [ ] (Open, harmless) curriculum/verify warns: two Physics Lab arenas are each used by two Level 2 sessions (different tasks).
 
 ## 27 Nov 2026 — Wave 2, batch C (teachers, Present mode, Trust Pack, Make It at Home, portfolio)
 Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-universe.md):
@@ -259,15 +260,15 @@ Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-u
 Still open from batch C:
 - [ ] Migration **0056** must be run by the founder (`kids_classes.goal`, 16 KB snapshot). Until then the
   goal stays on the teacher's device and children do not see the Power-Up card.
-- [ ] #30 Level 1 check options carry no `misconception` ids, so Level 1 cannot feed the Mind Map yet.
-- [ ] #6 Rank naming: certificates say "Rank N"; the shell badge still says "Lv".
+- [x] #30 Level 1 check options carry `misconception` ids (81 of 82 wrong options; "A name" in L1-S01 Q2 is deliberately untagged) — Wave 3 F.
+- [x] #6 Rank naming: the shell badge says "Rank N" (batch D).
 - [ ] #84 a real "club / family" class kind needs a migration; leaders use the youngest band for now.
 - [ ] #43 Founder to confirm "database region and DPA on request" wording in the Trust Pack.
 - [ ] Optional: a Robodex `build` trigger so a home build discovers its card; per-profile export in the
   parent hub (`ParentProfilesClient`) does not carry the builds/portfolio extras yet (Hangar backup does).
 - [ ] Portfolio reflections and build reflections are deliberately not in the backup code (free text stays
   on the device).
-- [ ] #29 "Teacher locks a child's band" still open (classroom side).
+- [x] #29 "Teacher locks a child's band" — Wave 3 F.
 
 ## 27 Nov 2026 — Wave 2, batch D (shell, teen, connected robots, passport, voices)
 Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-universe.md):
@@ -298,11 +299,11 @@ Still open from batch D:
 - [ ] Migration **0057** (`kids_passports`) must be run by the founder. Until then the Passport says
   "being switched on" and the offline backup code works as before.
 - [ ] #21 a real port of Code Lab to Blockly stays a Level 2 decision (reasons in `shared-vocabulary.ts`).
-- [ ] `/kids/lab/episodes` does not link to the Episodes Theatre yet; `blockly-blocks.ts` does not import
-  `SHARED_STYLE_COLOURS` yet (the verify keeps them equal).
-- [ ] Parent hub has no "Delete my Passport" entry (Garage has it, behind the gate).
-- [ ] `VOICES.md` has no Story Theatre section (commands are in `generate-stories.py`).
-- [ ] The Robodex toast can overlap the Ask Spark button on phones.
+- [x] `/kids/lab/episodes` links the Episodes Theatre (Wave 3 F). `blockly-blocks.ts` keeps a mirror of
+  `SHARED_STYLE_COLOURS` on purpose — code-lab/verify.ts reads the hex values from blockly-blocks.ts and fails if they differ; an import would make that check vacuous.
+- [x] Parent hub has "Delete my Passport" (`PassportDeleteCardClient`, shared `passport-delete.ts`) — Wave 3 F.
+- [x] `VOICES.md` has a Story Theatre section — Wave 3 F.
+- [x] The Robodex toast sits above the Ask Spark button at every width — Wave 3 F.
 
 ## 27 Nov 2026 — Wave 2 review fixes (child, teacher-policy, engineering checks)
 
@@ -379,3 +380,51 @@ now has a verify in CI (`components/kids/games/<id>/<id>.verify.ts`, quality.yml
 Left open: a shared compact status strip for phones (maze-mapper's status line sits below the fold
 during play; optional, every control is on screen) — not built.
 
+
+## 27 Nov 2026 — Wave 3, batch F (game shell + sim, teacher mind, shell polish, offline)
+
+Four owners re-checked each item on the Wave 2 code first; the integrator applied the cross-owner
+changes. Contracts are in docs/kids-universe.md.
+- [x] **#15** 48px tier/"?" buttons, one Exit, leave guard — already fixed (`GameShellClient.tsx:177,186`).
+  New fix: results card, "How to play" and the leave dialog are portalled to `<body>` (the kids footer
+  painted over the results card on phones); safe-area bottom padding.
+- [x] **#38** games' own sims in the Flight Recorder: `lib/kids/sim/game-recorder.ts`, one recording per
+  round, "Watch the Flight Recorder" on the results card (`GameRecorderClient`, lazy). Recording in Sky
+  Port, Robo Sumo, Mars Rover (mission minutes → seconds, cells → metres), Orbit Repair (Cadet), Swarm
+  Reef, Ocean Rescue dive and Arm Factory, with moments (gusts, bumps, latches, drops, crashes).
+  shell.verify fails if one of the seven stops recording.
+- [x] **#33** upgrades drive the sim (`fittedSpec`: gearing, overload, pack/arm/2nd-sensor mass); course
+  challenges strip upgrades. **#39** the sim meters the robot's own pack (LiPo cell + `cellMah`), and
+  `specSheet()` now takes volts/Ah from `packInfo(POWER_PACKS)`, mass/gearing from robot-spec and a ground
+  robot's runtime/draw from `cruisePower()`: AA 258 min, LiPo 287, Big Pack 589 (the old 110 min AA came
+  from a second power model). Tracks and legs now pay for their own losses in the engine and on the sheet
+  (`moveAmpsPerSide`: tracks 0.12 A, legs 0.4 A per side — 8 micro servos at ~0.1 A walking), so legs
+  run out first (106 min), two wheels last. robot-growth.verify checks sheet = sim for every pack/drive.
+- [x] **#23** `reflectance` block (engine, interpreter, Blockly, Sense panel, curriculum `BlockId`,
+  introduced in L3-S04; Talk schema too) and `battery_pct` in the curriculum (introduced in L3-S11).
+  L3-S04 plays Physics Lab "Find the faded line", L3-S11 Power Lab "Home before flat". `?demo=` in the
+  Physics and Power Labs (`lab-links.ts`); `?tier=` was already fixed. Course copy: "The game opens on
+  the X tier".
+- [x] **#30** Level 1 misconception catalogue (64 entries) and ids on 81 of 82 wrong options; device record
+  `checkMisconceptions` (in the backup code); Trust Pack v1.2; "Re-teach it" in the Class Mind Map; typed
+  `QuizOption.misconception`. **#27** grid already fixed (`classroom-membership.ts:94`).
+- [x] **#29** teacher locks a child's band — **migration 0058** (`kids_classes.band_locked`,
+  `kids_class_members.band_lock`), PATCH actions, `lockedBand` in sync, `BandLockPanelClient`; band
+  pickers (Galaxy, Launch Check, onboarding) say "Your teacher chose …"; the active profile follows.
+- [x] **#89** Calm "what's next" strip (`NextStripClient`, space reserved before paint). Worlds and episode
+  fx follow Calm. Robodex toast above Ask Spark. Parent hub: "Rank", Passport delete card (one
+  `passport-delete.ts`), next-step card; Engineers home "Next step". `wipeNamespace` only touches
+  per-child keys. VOICES.md Story Theatre section. Privacy and Trust Pack name the Parents page for
+  Passport delete; privacy names the teacher band lock.
+- [x] **Offline**: kids-sw deploy refresh by webpack-runtime fingerprint; 29 precached pages; spliced-id
+  lazy chunks and CSS fonts saved; Supabase preconnect skipped on /kids (`SupabasePreconnectClient`);
+  `lib/kids/offline.verify.ts` in CI; real-device checklist in `apps/kids-mobile/README.md`.
+
+Founder: run **0058_kids_class_band.sql** after 0056 and 0057. Until then the band PATCH answers 503
+and the panel says "being switched on"; everything else works.
+
+Left open (and why): AR does not show the World form; no motor dead zone or carry positions in the
+sim; Physics Lab challenges inside a session are self-reported; class view and Garage certificates name
+Level 1 only; native review of Hindi/Spanish Spark replies and a real-phone offline run need people;
+robot-brain Pilot 1★ stays reachable (see `docs/kids-games-qa-todo.md`); a full Blockly port of Code Lab
+remains a Level 2 decision.

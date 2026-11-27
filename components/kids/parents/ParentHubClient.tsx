@@ -17,6 +17,7 @@ import { getActivitiesDone, type ActivitiesDone } from '@/lib/kids/activities/pr
 import { getBadge, levelInfo } from '@/lib/kids/universe/rewards'
 import { getPart, loadDesign, ROBOT_CHANGED_EVENT, type RobotDesign, type Slot } from '@/lib/kids/robot-design'
 import ParentProfilesClient from '@/components/kids/profiles/ParentProfilesClient'
+import PassportDeleteCardClient from './PassportDeleteCardClient'
 import { activeProfile } from '@/lib/kids/profiles'
 import {
   DAILY_MINUTE_CHOICES,
@@ -196,7 +197,8 @@ export default function ParentHubClient({ sessions, tracks, activityTrack }: Par
           ['Days explored', view ? `${view.days} of 7` : '–'],
           ['Course sessions', view ? `${view.sessionsDone} of ${sessions.length}` : '–'],
           ['Activities this week', view ? String(view.activitiesWeek) : '–'],
-          ['Explorer level', view ? `${view.level.level} · ${view.level.title}` : '–'],
+          // The XP number is a "Rank" everywhere (roadmap #6); "Level" only means a course level.
+          ['Rank', view ? `${view.level.level} · ${view.level.title}` : '–'],
         ].map(([k, v]) => (
           <div key={k} className="rounded-2xl border border-white/10 bg-[#111C32] p-3">
             <dt className="text-xs font-semibold uppercase tracking-wider text-[#A7B0C0]">{k}</dt>
@@ -305,7 +307,9 @@ export default function ParentHubClient({ sessions, tracks, activityTrack }: Par
       {/* Family profiles / shared tablet (roadmap #41, #90): each child on this device. */}
       <ParentProfilesClient />
       <ControlsCard />
+      <NextStepCard />
       <WeeklyEmailCard />
+      <PassportDeleteCardClient />
       <DeviceDataCard onReset={() => setSnap((s) => (s ? { ...s, p: getProgress(), acts: getActivitiesDone() } : s))} />
     </div>
   )
@@ -507,12 +511,30 @@ function WeeklyEmailCard() {
   )
 }
 
+// ── Next step (roadmap #35) ─────────────────────────────────────────────────
+
+/** For teenagers: the map from what they secured here to the rest of R2BOT (/kids/next-step, noindex). */
+function NextStepCard() {
+  return (
+    <section aria-labelledby="hub-next" className={`${card} print:hidden`}>
+      <h2 id="hub-next" className={h2}>Ready for more? (ages 13 and up)</h2>
+      <p className="mt-1 text-[15px] leading-relaxed text-[#A7B0C0]">
+        When a teenager has outgrown the kids&rsquo; screens, their next step maps the skills they secured here to Quick Lessons, the Academy,
+        Robot Projects and the ROS 2 Playground on the main R2BOT site. It reads progress on this device only.
+      </p>
+      <Link href="/kids/next-step" className={`mt-4 inline-flex min-h-[48px] items-center rounded-2xl border border-white/15 bg-[#19263F] px-4 font-bold text-[#EEF2F8] hover:bg-white/10 ${focus}`}>
+        See their next step →
+      </Link>
+    </section>
+  )
+}
+
 // ── Device data ─────────────────────────────────────────────────────────────
 
 function DeviceDataCard({ onReset }: { onReset: () => void }) {
   const [msg, setMsg] = useState('')
   const reset = () => {
-    if (!window.confirm('Reset your child’s progress on this device? Stars, badges, levels and completed sessions will be cleared. Save a backup code in the Hangar first if you may want it back.')) return
+    if (!window.confirm('Reset your child’s progress on this device? Stars, badges, rank and completed sessions will be cleared. Save a backup code in the Garage first if you may want it back.')) return
     resetProgress()
     onReset()
     setMsg('Progress reset on this device.')
@@ -522,7 +544,7 @@ function DeviceDataCard({ onReset }: { onReset: () => void }) {
       <h2 id="hub-data" className={h2}>Data on this device</h2>
       <p className="mt-1 text-[15px] leading-relaxed text-[#A7B0C0]">
         Progress, the robot and these controls live in this browser. To move them to another device, use the backup code in the{' '}
-        <Link href="/kids/hangar" className={`font-semibold text-amber-300 hover:underline ${focus}`}>Hangar</Link>. Accessibility and sound are in{' '}
+        <Link href="/kids/hangar" className={`font-semibold text-amber-300 hover:underline ${focus}`}>Garage</Link>. Accessibility and sound are in{' '}
         <Link href="/kids/settings" className={`font-semibold text-amber-300 hover:underline ${focus}`}>Settings</Link>.
       </p>
       <button type="button" onClick={reset} className={`mt-4 min-h-[48px] rounded-2xl border-2 border-rose-400/70 px-4 font-bold text-rose-200 hover:bg-rose-500/10 ${focus}`}>

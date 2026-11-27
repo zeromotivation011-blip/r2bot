@@ -29,9 +29,10 @@ import { exportProgressCode, getProgress, importProgressCode, type ProgressImpor
 import { DEFAULT_DESIGN, decodeDesign, encodeDesign, loadDesign, saveDesign } from '@/lib/kids/robot-design'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { PASSPORT_PARSE_MESSAGES, parsePassport, passportFromHash, passportLink, type PassportSummary } from '@/lib/kids/passport'
-import { createPassport, deletePassport, loadSavedPassport, openPassport, rememberPassport, savePassport, type SavedPassport } from '@/lib/kids/passport-client'
+import { createPassport, loadSavedPassport, openPassport, rememberPassport, savePassport, type SavedPassport } from '@/lib/kids/passport-client'
 import { qrMatrix, qrSvgPath } from '@/lib/kids/teach/qr'
 import { requireGrownUp } from '@/components/kids/app/ParentalGateClient'
+import { deletePassportAsGrownUp } from './passport-delete'
 import { EMPTY_COSMETICS, loadCosmetics, saveCosmetics, type HangarCosmetics } from './cosmetics'
 
 /** Finds a backup code inside any pasted text or downloaded file. */
@@ -187,7 +188,7 @@ ol { margin: 0; padding-left: 5mm; font-size: 9.5pt; line-height: 1.45 } .qr { w
 <p class="sub">${explorer ? `Explorer: <b>${escapeHtml(explorer)}</b> · ` : ''}made ${escapeHtml(today)}</p>
 <div class="words">${words.map((w) => `<span class="w">${escapeHtml(w)}</span>`).join('')}</div>
 <ol><li>Open <b>www.r2bot.in/kids/hangar</b> on any phone, tablet or computer.</li><li>Under “Robot Passport”, type these words and the number — or scan the code.</li><li>Everything comes back. Nothing already there is lowered.</li></ol>
-<p class="note">Keep this card private, like a library card. It holds no email or personal details. A grown-up can delete the Passport from the Garage at any time.</p>
+<p class="note">Keep this card private, like a library card. It holds no email or personal details. A grown-up can delete the Passport at any time, in the Garage or on the Parents page.</p>
 </div><svg class="qr" viewBox="0 0 ${size} ${size}" role="img" aria-label="QR code for this Robot Passport"><rect width="${size}" height="${size}" fill="#fff"/><path d="${qrSvgPath(m)}" fill="#000"/></svg></div></body></html>`
     const frame = document.createElement('iframe')
     frame.setAttribute('aria-hidden', 'true')
@@ -378,20 +379,18 @@ export function BackupCodeClient({ headingLevel = 2 }: { headingLevel?: 2 | 3 })
   const removePassport = async () => {
     primeAudio()
     if (!passport) return
-    const ok = await requireGrownUp({ message: 'This deletes the Robot Passport from R2BOT. Progress on this device stays.' })
-    if (!ok) return
-    if (!window.confirm(`Delete the Passport ${passport.code}? The words will stop working on every device. Progress on this device stays.`)) return
+    // One implementation for the Garage and the parent hub (./passport-delete.ts).
     setPpBusy('delete')
     try {
-      const r = await deletePassport(passport.code)
-      if (!r.ok && !r.notFound) {
+      const r = await deletePassportAsGrownUp(passport.code, { gate: true })
+      if (r.kind === 'cancelled') return
+      if (r.kind === 'failed') {
         failPassport(r)
         return
       }
-      rememberPassport(null)
       setPassport(null)
       playSound('click')
-      setPpStatus({ kind: 'ok', text: 'The Passport is deleted. Progress on this device is still here.' })
+      setPpStatus({ kind: 'ok', text: r.text })
     } finally {
       setPpBusy(null)
     }

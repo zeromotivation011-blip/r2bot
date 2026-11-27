@@ -35,8 +35,9 @@ workers for remote pages, and iOS WKWebView does because the app uses App-Bound 
 
 | Works offline | How |
 |---|---|
-| Home, Hangar, Settings, Skill Galaxy, Course map, Worlds, Games hub, and the Sumo Arena, Drone Hover and Maze Mapper games | Saved when the worker installs (the page plus the JS/CSS its HTML references) |
-| Any other `/kids` page the child has already opened | Saved on each online visit, network first; the newest 40 are kept |
+| The five tabs (Home, Learn, Worlds, Games, Garage), Skill Galaxy, Settings, the Sumo Arena, Drone Hover and Maze Mapper games, Story Theatre and all eight episodes, Workshop, Code Lab, Spark Trail, Physics Lab, Power Lab, Link Lab, Robot Maths, Robodex, Makers, Make at Home | Saved when the worker installs (the page, the JS/CSS its HTML references, and the lazy chunks those load: 3D scenes, game engines, Blockly). The list is `PRECACHE_PAGES` in `public/kids-sw.js`; `lib/kids/offline.verify.ts` (CI) fails if a tab, a "More" place or an episode is missing from it |
+| Any other `/kids` page the child has already opened | Saved on each online visit, network first; up to 60 pages in all (precached ones are never evicted) |
+| After a website deploy | The worker notices the new build on the next online launch (the webpack runtime file name changes) and re-saves every precached page and its chunks in the background, so offline play uses the new build, never a mix |
 | Story episodes the child has already played | Voice clips are saved the first time an episode plays (up to about 2,000 clips, roughly 40–60 MB) and survive website updates |
 | Progress, stars, badges, the robot design, settings | Always on the device (`localStorage`), so nothing is lost offline |
 | Slow school Wi-Fi | If a saved page exists and the network takes longer than 4 s, the saved page is shown and refreshed in the background |
@@ -46,11 +47,17 @@ workers for remote pages, and iOS WKWebView does because the app uses App-Bound 
 | A page never opened before | Shows a branded offline page (built into the worker) with links to the saved screens and a retry button |
 | Joining a class, teacher pages, syncing progress to a class | Server calls (`/api/*` is never cached; `/kids/classroom` and `/kids/join` are never saved) |
 | Ask Spark with AI on, Talk to your robot with AI on | Server calls. The offline FAQ answers still work |
+| How Robots Think (`/kids/ai`) until it has been opened once online | Not precached (its AI parts need the network); saved on the first visit |
 | Episodes never played, 3D parts loaded on demand for screens never opened | Not downloaded yet |
 | First launch with no network at all | The worker is not installed yet, so Capacitor shows `www/index.html` |
 
 Updating the worker is a website deploy, not a store release. Bump `VERSION` in `public/kids-sw.js`
-when its caching rules change; old page and code caches are deleted on activate (audio is kept).
+when its caching rules change; old page and code caches are deleted on activate (audio is kept). An
+ordinary deploy needs no bump: the worker re-precaches by itself when the build changes.
+
+No third-party connection is made from a `/kids` page: no Google Analytics (`components/GoogleAnalyticsClient.tsx`
+skips /kids and the app), no Supabase preconnect (`components/SupabasePreconnectClient.tsx` skips /kids), fonts
+are self-hosted by next/font. The only third-party calls are grown-up actions behind the gate.
 To test: open the app online once, switch on airplane mode, relaunch, and check Home and the Hangar
 load, then open a page you have never visited and check the offline page appears.
 
@@ -212,6 +219,38 @@ no CocoaPods. **Building, signing and uploading need a Mac with Xcode 16 or late
 8. Guideline 4.2 (minimum functionality): Apple rejects "just a website". The arguments for this
    app are camera AR, an offline screen, no browser chrome, a kid-safe locked domain, and the parental gate.
    Put those in the review notes, with a demo class code for the reviewer, and mention that the main screens and saved episodes work offline (see "What works offline").
+
+## Real-device offline checklist (the founder, on a phone)
+
+Headless Chromium tests (Playwright, `context.setOffline`) cover the worker logic, but not WebView
+storage limits, iOS eviction, or airplane-mode quirks. Before each store release, and once after the
+first deploy that changes `public/kids-sw.js`, check on **one Android phone (Chrome + the store app)**
+and **one iPhone (Safari "Add to Home Screen" + the store app)**:
+
+- [ ] **First launch online.** Open R2BOT Kids with Wi-Fi on and leave it on Home for about a minute
+      (the worker saves ~30 screens and their code in the background). Android Chrome: `chrome://inspect`
+      → the device → Application → Service Workers shows `kids-sw.js` *activated*, scope `/kids`.
+- [ ] **Airplane mode, relaunch.** Swipe the app away, switch on airplane mode, open it again. Check each of
+      these loads with no white screen: Home, Learn, Worlds, Games, Garage, Settings, Story Theatre.
+- [ ] **A game offline.** Open Sumo Arena (3D) and play one round. Then Drone Hover and Maze Mapper.
+- [ ] **A story offline.** Open an episode you have played online before: the voice plays. Open one you have
+      never played: the pictures and words work, voice lines are silent (clips are saved only on first play).
+- [ ] **Workshop and Code Lab offline.** Workshop shows the 3D robot (the camera "magic window" may ask for
+      permission; it needs no network). Code Lab blocks drag and the robot moves.
+- [ ] **A page never opened.** Offline, open a Skill Galaxy activity you have never opened: the branded
+      offline page shows, its tiles open saved screens, and the system Back button steps back, never loops.
+- [ ] **Progress survives.** Earn a star offline, go back online, relaunch: the star is still there.
+- [ ] **After a deploy.** With the phone online, wait for a website deploy to finish, open the app once and
+      stay ~1 minute, then repeat the airplane-mode checks for Home, a game and a story: they must load
+      (this is the deploy refresh; a white screen here means a lazy chunk was not re-saved).
+- [ ] **Slow Wi-Fi.** On a weak signal (or Android developer options → network throttling), a saved page
+      appears within about 4 seconds instead of spinning.
+- [ ] **iOS storage.** iPhone: Settings → Safari → Advanced → Website Data → r2bot.in shows some MB stored
+      (not zero). iOS can clear it after weeks of not opening the app; the first online launch re-saves it.
+- [ ] **No third-party traffic.** Optional, with a laptop: Chrome remote debugging → Network tab on `/kids`
+      shows only `www.r2bot.in` requests (no googletagmanager, no supabase.co) until a grown-up action.
+- [ ] **Space.** Android Settings → Apps → R2BOT Kids → Storage: note the size after the first launch
+      (expected tens of MB with episodes played) and report anything above ~150 MB.
 
 ## What the website must do (r2bot.in, not this folder)
 

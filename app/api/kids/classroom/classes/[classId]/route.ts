@@ -1,7 +1,9 @@
 // app/api/kids/classroom/classes/[classId]/route.ts
 //
-// Teacher: one class with its roster (GET), regenerate the join code or edit
-// names (PATCH), delete the class and every member row (DELETE).
+// Teacher: one class with its roster (GET), regenerate the join code, edit
+// names, set the Power-Up goal or the band locks (PATCH; band locks need
+// migration 0058 and answer 503 until it runs), delete the class and every
+// member row (DELETE).
 // Auth: signed-in user must own the class. A class that exists but belongs to
 // someone else answers exactly like one that does not exist (404).
 
@@ -13,7 +15,10 @@ import {
   CLASS_COLUMNS,
   MEMBER_COLUMNS,
   adminOrNull,
+  bandLockNotReadyResponse,
   currentTeacher,
+  isMissingBandLockColumn,
+  loadBandLocks,
   goalsNotReadyResponse,
   isMissingGoalColumn,
   isUuid,
@@ -62,9 +67,19 @@ export async function GET(_req: NextRequest, ctx: Ctx): Promise<Response> {
     .eq('class_id', classId)
     .order('created_at', { ascending: true })
   if (error) return jsonError(500, 'Could not load the roster.')
-  const members = ((data ?? []) as MemberDbRow[]).map(toMemberRow)
+  const locks = await loadBandLocks(g.admin, classId)
+  const members = ((data ?? []) as MemberDbRow[]).map(toMemberRow).map((m) => ({
+    ...m,
+    bandLock: locks === 'not-ready' ? null : locks.members[m.id] ?? null,
+  }))
   const goal = await loadClassGoal(g.admin, classId)
-  const summary = { ...toClassSummary(g.cls, members.length), goal: goal === 'not-ready' ? null : goal, goalReady: goal !== 'not-ready' }
+  const summary = {
+    ...toClassSummary(g.cls, members.length),
+    goal: goal === 'not-ready' ? null : goal,
+    goalReady: goal !== 'not-ready',
+    bandLocked: locks === 'not-ready' ? false : locks.classLocked,
+    bandLockReady: locks !== 'not-ready',
+  }
   return Response.json(
     { ok: true, class: summary, members },
     { headers: NO_STORE },
@@ -78,6 +93,8 @@ interface PatchBody {
   schoolName?: unknown
   band?: unknown
   goal?: unknown
+  locked?: unknown
+  memberId?: unknown
 }
 
 export async function PATCH(req: NextRequest, ctx: Ctx): Promise<Response> {
@@ -136,6 +153,33 @@ export async function PATCH(req: NextRequest, ctx: Ctx): Promise<Response> {
       .eq('teacher_id', g.user.id)
     if (error) return isMissingGoalColumn(error) ? goalsNotReadyResponse() : jsonError(500, 'Could not save the goal.')
     return Response.json({ ok: true, goal }, { headers: NO_STORE })
+  }
+
+  if (body.action === 'band-lock-class') {
+    // Roadmap #29: every child plays at the class band (their device follows on the next sync).
+    if (typeof body.locked !== 'boolean') return jsonError(400, 'Say whether the class band is locked.')
+    const { error } = await g.admin
+      .from('kids_classes')
+      .update({ band_locked: body.locked, updated_at: new Date().toISOString() })
+      .eq('id', classId)
+      .eq('teacher_id', g.user.id)
+    if (error) return isMissingBandLockColumn(error) ? bandLockNotReadyResponse() : jsonError(500, 'Could not save the band setting.')
+    return Response.json({ ok: true, bandLocked: body.locked }, { headers: NO_STORE })
+  }
+
+  if (body.action === 'band-lock-member') {
+    // Roadmap #29: one child's band (null = follow the class). Only a member of THIS class.
+    if (!isUuid(body.memberId)) return jsonError(400, 'Which child?')
+    if (body.band !== null && !isBandId(body.band)) return jsonError(400, 'Pick a band, or “follow the class”.')
+    const { data, error } = await g.admin
+      .from('kids_class_members')
+      .update({ band_lock: body.band })
+      .eq('id', body.memberId)
+      .eq('class_id', classId)
+      .select('id')
+    if (error) return isMissingBandLockColumn(error) ? bandLockNotReadyResponse() : jsonError(500, 'Could not save the band.')
+    if (!data || data.length === 0) return jsonError(404, 'That child is not in this class.')
+    return Response.json({ ok: true, memberId: body.memberId, bandLock: body.band }, { headers: NO_STORE })
   }
 
   return jsonError(400, 'Unknown action.')

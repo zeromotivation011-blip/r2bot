@@ -109,7 +109,7 @@ function challenge(m: { id: string; title: string; mission: string; arena: Arena
 /** Every block a Talk program may contain: the editor offers them all (locked ones say which part they need). */
 export const TALK_TOOLBOX = [
   'drive_for', 'drive_distance', 'turn_degrees', 'set_motors', 'stop', 'wait',
-  'distance_cm', 'line_seen', 'line_offset', 'floor_color', 'bumped', 'heading_deg', 'timer_s',
+  'distance_cm', 'line_seen', 'line_offset', 'reflectance', 'floor_color', 'bumped', 'heading_deg', 'timer_s', 'battery_pct',
   'repeat', 'repeat_until', 'forever', 'if', 'if_else', 'compare', 'and', 'or', 'not',
   'number', 'text', 'math',
   'grip_open', 'grip_close', 'pen_down', 'pen_up', 'light_on', 'light_off', 'say', 'beep',

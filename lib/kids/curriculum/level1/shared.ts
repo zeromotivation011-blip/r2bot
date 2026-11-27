@@ -18,6 +18,7 @@
 
 import { DEFAULT_DESIGN, type BodyId, type DriveId, type HeadId, type SensorId, type ToolId } from '../../robot-design'
 import { DRIVES, robotSpec } from '../../sim/robot-spec'
+import type { L1MisconceptionId } from '../../misconceptions/level1'
 import type {
   AllowedBlock,
   ArenaSpec,
@@ -26,9 +27,26 @@ import type {
   EpisodeScene,
   LearningObjective,
   MappingTag,
+  QuizOption,
   TeacherNotes,
   TimingBlock,
 } from '../types'
+
+// ── Check options ─────────────────────────────────────────────────────────
+
+/** A check option carrying the misconception a wrong pick reveals (roadmap #30). */
+export interface L1TaggedOption extends QuizOption {
+  misconception: L1MisconceptionId
+}
+
+/**
+ * A WRONG check option and the misconception it reveals (an id in
+ * lib/kids/misconceptions/level1.ts — typed, so a typo fails type-check).
+ * A function result, not an object literal, so it sits in a QuizOption[].
+ */
+export function mis(text: string, icon: string, misconception: L1MisconceptionId): L1TaggedOption {
+  return { text, icon, misconception }
+}
 
 // ── Picture blocks ────────────────────────────────────────────────────────
 

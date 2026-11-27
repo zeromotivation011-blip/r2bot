@@ -6,7 +6,7 @@
 
 import type { ArenaSpec, Session } from '../types'
 import {
-  CREW, DIST, GUIDE_LINE, LINE_OFFSET, LINE_SEEN, LOGIC, MAST_LOOP, MEASURING_HALL, MOVE, SAY, SLED_TRACK, TALK, TIMER, TURN, VARS_MATH,
+  BATTERY, CREW, DIST, GUIDE_LINE, LINE_OFFSET, LINE_SEEN, LOGIC, MAST_LOOP, MEASURING_HALL, MOVE, SAY, SLED_TRACK, TALK, TIMER, TURN, VARS_MATH,
 } from './shared'
 import {
   arena, challenge, crit, episode, lessonPlan, makeSession, mc, o, projectPlan, q, right, scene, teacher, wrong,
@@ -529,7 +529,7 @@ export const ACT2: Session[] = [
       title: 'Price the Routes',
       mission: 'Using the energy table, compute the battery each route costs in two variables and say which is cheaper.',
       arena: ROUTE_CHOICE,
-      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, SAY],
+      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, BATTERY, SAY],
       example: [
         'variable_set(ridge, math(math(3 × 6) + math(3 × 1)))  ← 3 m up at 6 %/m, 3 m down at 1 %/m',
         'variable_set(round, math(10 × 2))  ← 10 m flat at 2 %/m',
@@ -545,7 +545,7 @@ export const ACT2: Session[] = [
       title: 'Arrive with Power to Spare',
       mission: 'Choose speed and route so the rover reaches the far mast and could still drive home: it must arrive with at least 50 % battery. Your program computes the prediction, says it, then drives.',
       arena: ROUTE_CHOICE,
-      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, SAY, TURN],
+      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, BATTERY, SAY, TURN],
       example: [
         'variable_set(battery, 100)',
         'variable_set(cost, math(10 × 2))  ← round route, 40 % speed, no tool',
@@ -593,7 +593,7 @@ export const ACT2: Session[] = [
       ],
       faster: ['Work out the heaviest load the rover can carry on the round route and still arrive with 50 %.', 'Add the return journey to the budget.'],
       slower: ['Price one route only, with a worked example for the other.', 'Use a calculator and fill in a cost table.'],
-      notes: ['Honest limit: the live course simulator does not model the battery yet (roadmap #39). Until it does, the drive in the challenge is checked for arrival and the energy prediction is checked against the energy table; the playable challenge is the Skill Galaxy designer “Power for a 90-minute lesson”.'],
+      notes: ['The simulator models the battery (roadmap #39): every robot carries the pack its power upgrade gives it, the “battery %” block reads it and the Flight Recorder graphs it. The playable challenge is the Power Lab arena “Home before flat” (/kids/lab/power?demo=power-home-before-flat), where the battery is real and can run flat; the energy prediction is still checked against the energy table, and the Skill Galaxy designer “Power for a 90-minute lesson” is the practice.'],
     }),
     parent: {
       today: 'Your child planned a robot route against a battery budget, discovering that hills, speed and weight all cost energy.',

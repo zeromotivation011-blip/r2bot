@@ -9,7 +9,7 @@
 
 import { CAPABILITY_NEEDS, capabilitiesOf, type Capability, type RobotDesign } from '../robot-design'
 
-export type SensorId = 'distance_cm' | 'line_seen' | 'line_offset' | 'floor_color' | 'bumped' | 'heading_deg' | 'timer_s' | 'battery_pct'
+export type SensorId = 'distance_cm' | 'line_seen' | 'line_offset' | 'reflectance' | 'floor_color' | 'bumped' | 'heading_deg' | 'timer_s' | 'battery_pct'
 
 export type Expr =
   | { k: 'number'; v: number }
@@ -49,6 +49,7 @@ export const SENSOR_NEEDS: Record<SensorId, Capability | null> = {
   distance_cm: 'see-wall',
   line_seen: 'follow-line',
   line_offset: 'follow-line',
+  reflectance: 'follow-line', // the line sensor's raw brightness (Level 3 Session 4: calibrate light and dark)
   floor_color: 'see-color',
   bumped: 'feel-bump',
   heading_deg: null, // gyro is built in
@@ -124,6 +125,8 @@ export const BLOCK_LABEL: Record<string, string> = {
   distance_cm: 'distance',
   line_seen: 'line seen?',
   line_offset: 'line offset',
+  reflectance: 'reflectance',
+  battery_pct: 'battery %',
   floor_color: 'floor colour',
   bumped: 'bumped?',
   grip_open: 'open claw',

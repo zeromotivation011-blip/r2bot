@@ -19,6 +19,7 @@ import { GALAXY_TAB, KIDS_GROWNUPS_HREF, KIDS_HEADER_TABS, KIDS_MORE, KIDS_SETTI
 import { openSpark } from '@/lib/kids/ai/spark/open'
 import { useParentControls } from '@/lib/kids/parent-controls'
 import { LAB_BRAND, LAB_LABELS, useKidsLook } from '@/lib/kids/teen'
+import { useKidsCalm } from '@/lib/kids/settings'
 import './kids-animations.css'
 import './kids-shell.css'
 
@@ -27,6 +28,8 @@ import './kids-shell.css'
 // when the phone is idle).
 const AskSpark = dynamic(() => import('@/components/kids/ai/spark/AskSparkClient'), { ssr: false })
 const RobodexToast = dynamic(() => import('@/components/kids/robodex/RobodexToastClient'), { ssr: false })
+// The fixed "what's next" strip (roadmap #89): Calm mode only, loaded only then.
+const NextStrip = dynamic(() => import('@/components/kids/universe/NextStripClient'), { ssr: false })
 
 /** Grown-up screens: no floating Spark button (openSpark() still works there). */
 const SPARK_HIDE_GROWNUP = ['/kids/grown-ups', '/kids/classroom', '/kids/join', '/kids/parents', '/kids/teach', '/kids/schools', '/kids/present', '/kids/portfolio/class-certificates']
@@ -147,6 +150,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
   const sparkOn = useParentControls().askSpark
   // Engineers (14–17) see the "R2BOT Lab" look (roadmap #83); kids-teen.css swaps the wordmark.
   const look = useKidsLook().look
+  const calm = useKidsCalm()
 
   useEffect(() => {
     const read = () => {
@@ -179,6 +183,8 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
   // Teacher pages bring their own chrome.
   const bare = pathname.startsWith('/kids/classroom')
   const game = isGameRoute(pathname)
+  // Home has its own mission card; games say what is next on their results card.
+  const nextSlot = !bare && !game && pathname !== '/kids' && pathname !== '/kids/'
 
   return (
     <div
@@ -241,6 +247,15 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
       </header>
+
+      {/* Calm mode: "what's next" in the same place on every ordinary page (roadmap #89).
+          The slot's height is reserved by the html.kids-calm class, which the settings
+          boot script sets before first paint, so the strip loading shifts nothing. */}
+      {nextSlot && (
+        <div className="hidden h-[68px] px-4 pt-3 [html.kids-calm_&]:block print:!hidden" data-kids-next-slot>
+          {calm && <NextStrip pathname={pathname} />}
+        </div>
+      )}
 
       <main className="kids-main">{children}</main>
 

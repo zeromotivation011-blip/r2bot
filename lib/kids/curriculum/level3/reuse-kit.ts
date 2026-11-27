@@ -1,7 +1,11 @@
 // lib/kids/curriculum/level3/reuse-kit.ts
 // What a Level 3 or Level 4 session reuses (roadmap #23), and two helpers a
 // session runner needs: where the reused challenge lives, and whether the
-// child has completed it. LIGHT: no imports at all, safe in a client island.
+// child has completed it. LIGHT: imports only the plain-string link helpers
+// (lab-links.ts has no imports), safe in a client island. Links open the exact
+// tier (?tier=) or arena (?demo=) the session is about.
+
+import { gameTierHref, labDemoHref } from '../../sim/lab-links'
 
 /** The playable challenge, live today. `goal` is the success condition in words. */
 export type ReusePlay =
@@ -9,7 +13,7 @@ export type ReusePlay =
   | { kind: 'game'; id: string; tier: 0 | 1 | 2 | 3; goal: string }
   /** A Code Lab mission (Blockly, real physics): /kids/code-lab/<id>. Done when codeMissions[id] exists. */
   | { kind: 'code-lab'; id: string; goal: string }
-  /** A Physics Lab arena (/kids/lab/sim, lib/kids/sim/demos.ts). Done when the child reports it (the lab has no store). */
+  /** A Physics Lab arena (/kids/lab/sim?demo=<id>, lib/kids/sim/demos.ts) or a Power Lab challenge (/kids/lab/power?demo=power-…). Done when the child reports it (the labs have no store). */
   | { kind: 'sim-demo'; id: string; goal: string }
   /** A Skill Galaxy activity: /kids/galaxy/<track>/<id>. Done when the activities store has it. */
   | { kind: 'activity'; id: string; goal: string }
@@ -50,11 +54,11 @@ export function reusePlayDone(play: ReusePlay, p: ReuseProgress, activitiesDone:
 export function reusePlayHref(play: ReusePlay, activityHref?: (id: string) => string | null): string | null {
   switch (play.kind) {
     case 'game':
-      return `/kids/play/${play.id}`
+      return gameTierHref(play.id, play.tier)
     case 'code-lab':
       return `/kids/code-lab/${play.id}`
     case 'sim-demo':
-      return '/kids/lab/sim'
+      return labDemoHref(play.id)
     case 'activity':
       return activityHref ? activityHref(play.id) : null
   }

@@ -21,6 +21,7 @@ import { ALL_ACTIVITIES } from '../../activities/content'
 import { GAMES } from '../../universe/worlds'
 import { MISSIONS } from '../../code-lab/missions'
 import { DEMOS } from '../../sim/demos'
+import { POWER_DEMOS } from '../../sim/power-demos'
 import { EPISODES } from '../../stories'
 import { BLOCKS_INTRODUCED, LEVELS, levelByNumber } from '../levels'
 import { LEVEL1_SESSIONS } from '../level1'
@@ -116,7 +117,7 @@ function checkReuse(level: LevelNumber, sessions: Session[], reuse: SessionReuse
       ok(!!m, `${s.id}: Code Lab mission "${p.id}" does not exist`)
       if (m) ok(rank(m.band) <= rank(band), `${s.id}: Code Lab mission ${p.id} is for ${m.band}, above ${band}`)
     } else if (p.kind === 'sim-demo') {
-      ok(DEMOS.some((d) => d.id === p.id), `${s.id}: Physics Lab arena "${p.id}" does not exist`)
+      ok([...DEMOS, ...POWER_DEMOS].some((d) => d.id === p.id), `${s.id}: Physics Lab / Power Lab arena "${p.id}" does not exist`)
     } else {
       const a = ACT_BY_ID.get(p.id)
       ok(!!a, `${s.id}: activity "${p.id}" does not exist`)

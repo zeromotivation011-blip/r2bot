@@ -22,6 +22,7 @@ import { AssignmentsPanelClient } from '@/components/kids/classroom/AssignmentsP
 import { PowerUpPanelClient } from '@/components/kids/classroom/PowerUpPanelClient'
 import { ClassMindMapClient, WhereToHelpClient } from '@/components/kids/classroom/ClassMindMapClient'
 import { GradebookClient } from '@/components/kids/classroom/GradebookClient'
+import { BandLockPanelClient } from '@/components/kids/classroom/BandLockPanelClient'
 
 type State =
   | { kind: 'loading' }
@@ -222,6 +223,7 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
           ['#help-h', 'Where to help'],
           ['#gradebook-h', 'Gradebook'],
           ['#roster-h', 'Roster'],
+          ['#band-h', 'Bands'],
         ].map(([href, label]) => (
           <a key={href} href={href} className="inline-flex min-h-[44px] shrink-0 items-center rounded-full border border-white/15 bg-white/[0.04] px-4 font-semibold text-slate-100 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60">{label}</a>
         ))}
@@ -313,6 +315,29 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
           </div>
         )}
       </section>
+
+      <BandLockPanelClient
+        classId={classId}
+        cls={cls}
+        members={members}
+        onClassLocked={(locked) => setState({ kind: 'ready', cls: { ...cls, bandLocked: locked }, members })}
+        onMemberLock={(memberId, b) => setState({ kind: 'ready', cls, members: members.map((m) => (m.id === memberId ? { ...m, bandLock: b } : m)) })}
+      />
+
+      {(cls.band === 'engineers' || members.some((m) => m.snapshot.band === 'engineers')) && (
+        <section aria-labelledby="nextstep-h" className="rounded-[28px] border border-amber-400/30 bg-amber-500/[0.06] p-5 sm:p-6">
+          <p className="text-xs font-bold uppercase tracking-wider text-amber-300">Graduate to R2BOT</p>
+          <h2 id="nextstep-h" className="font-display text-2xl font-bold text-white">Your next step, for Engineers</h2>
+          <p className="mt-1 max-w-3xl text-[15px] text-slate-200">
+            Engineers (14–17) who are ready for more can open <strong className="text-white">Your next step</strong>: it maps the concepts each of them has
+            secured to Quick Lessons, Academy lessons, Robot Projects, the ROS 2 Playground and Career Paths. It is worked out on the child’s own device;
+            nothing is sent to you or compared with anyone.
+          </p>
+          <Link href="/kids/next-step" className="mt-3 inline-flex min-h-[44px] items-center rounded-xl bg-amber-500 px-4 text-sm font-bold text-[#1A1103] hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60">
+            See “Your next step” →
+          </Link>
+        </section>
+      )}
 
       <LessonPlanPanel band={cls.band} />
 

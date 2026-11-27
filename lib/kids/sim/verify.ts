@@ -16,6 +16,10 @@
 //      the turning centre (a turn on the spot leaves a dot), soft sand halves a
 //      two-wheeler's speed without stopping it, a heavy load slows it uphill and
 //      a stopped robot holds on a slope;
+//   9. Wave 3: the reflectance block (L3 S4, "Find the faded line"), Workshop
+//      upgrades in the physics (fittedSpec = specSheet mass and top speed),
+//      the battery each power upgrade carries and its cruise runtime
+//      (cruisePower), deep links (?demo=, ?tier=), the games' Flight Recorder;
 //   8. every Level 1 challenge arena (lib/kids/sim/arenas/level1.ts): its
 //      palette, required parts and start match the curriculum session; its
 //      reference program succeeds with the session's robot for ALL FOUR bodies;
@@ -39,6 +43,16 @@ import { awardStars, compile, createChallengeRun, judgeChallengeRun, referenceFo
 import { LEVEL1_SESSIONS } from '../curriculum/level1'
 import { HEADING_DEG } from './arenas/level1'
 import type { BodyId } from '../robot-design'
+import { POWER as SHEET_POWER, specSheet } from '../robot-growth'
+import { cruisePower, fittedSpec, powerPack, POWER_PACKS, robotSpec } from './robot-spec'
+import { packInfo } from './battery'
+import { POWER_DEMOS } from './power-demos'
+import { gameTierHref, labDemoHref } from './lab-links'
+import { missingParts } from './program'
+import { REFLECTANCE } from './arena'
+import { GAME_MAX_CHANNELS, GameRecorder, hasRecording, markGameMoment, recordGameFrame, setActiveGameRecorder } from './game-recorder'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 const N = (v: number): Expr => ({ k: 'number', v })
 const offsetTimes = (k: number): Expr => ({ k: 'math', op: '*', a: N(k), b: { k: 'sensor', s: 'line_offset' } })
@@ -459,6 +473,8 @@ async function main(): Promise<void> {
     push(`${ch.id}: deterministic; ${stars.stars}★ for the reference`, a1.key === a2.key && stars.stars >= 1, `${a1.key.slice(0, 40)}${stars.claimable.length ? ` (claimable: ${stars.claimable.join(', ')})` : ''}`)
   }
 
+  wave3Checks(R, push)
+
   let failed = 0
   for (const c of checks) {
     if (!c.ok) failed++
@@ -466,6 +482,179 @@ async function main(): Promise<void> {
   }
   console.log(`\n${checks.length - failed}/${checks.length} checks passed`)
   if (failed > 0) process.exit(1)
+}
+
+// ── 9. Wave 3 ──────────────────────────────────────────────────────────────
+function wave3Checks(R: Rapier, push: (name: string, ok: boolean, detail: string) => void): void {
+  // Reflectance: white tile, fresh black tape, a smooth edge, a pure read, and it needs the line sensor.
+  {
+    const arena = open({ lines: [{ width: 0.03, points: [[-1, -1.75], [1, -1.75]] }] })
+    const design: RobotDesign = { ...DEFAULT_DESIGN, sensor: 'line' }
+    const sim = createSim(R, arena, design)
+    const white = sim.sensors().reflectance
+    const seen: number[] = []
+    sim.setMotors(30, 30)
+    for (let i = 0; i < Math.round(3 / DT); i++) {
+      sim.step()
+      seen.push(sim.sensors().reflectance)
+    }
+    const darkest = Math.min(...seen)
+    const between = seen.some((v) => v > REFLECTANCE.black + 5 && v < REFLECTANCE.white - 5)
+    push('reflectance: white tile ≈ 90, black tape ≈ 8, in between on the edge', white === REFLECTANCE.white && darkest === REFLECTANCE.black && between, `start ${white}, darkest ${darkest}, an edge reading ${between ? 'seen' : 'missing'}`)
+    sim.dispose()
+    const prog: Program = { body: [{ op: 'set_var', id: 'v', name: 'r', value: { k: 'sensor', s: 'reflectance' } }] }
+    const lock = missingParts(prog, { ...DEFAULT_DESIGN, sensor: 'none' })
+    push('reflectance: locked without a line sensor, free with one', lock.length === 1 && lock[0].needs === 'follow-line' && missingParts(prog, design).length === 0, lock.map((l) => l.message).join(' '))
+    const a = runPolled(R, arena, design, { body: [{ op: 'drive_for', id: 'd', speedPct: N(40), seconds: N(2) }] }, 0)
+    const b = runPolled(R, arena, design, { body: [{ op: 'drive_for', id: 'd', speedPct: N(40), seconds: N(2) }] }, 1)
+    push('reflectance: reading it never changes a run', a.fp === b.fp, a.fp)
+  }
+
+  // "Find the faded line": the reference wins with every body; a lab threshold of 30 drives over the line.
+  {
+    const demo = DEMOS.find((d) => d.id === 'faded-line')
+    push('faded-line: arena exists (L3 S4)', Boolean(demo), '')
+    if (demo) {
+      const bodies: BodyId[] = ['box', 'dome', 'tall', 'bug']
+      const res = bodies.map((body) => runHeadless(R, demo.arena, designFor({ ...DEFAULT_DESIGN, body }, demo.goodParts), demo.reference).result)
+      push('faded-line: calibrated threshold stops on the faded line, all four bodies', res.every((r) => r.success), res.map((r, i) => `${bodies[i]} ${r.success ? 'ok' : r.reason}`).join(' · '))
+      const lineZ = demo.arena.lines[0].points[0][1]
+      for (const m of demo.mistakes ?? []) {
+        const run = createRun(R, demo.arena, designFor(DEFAULT_DESIGN, demo.goodParts), m.program)
+        for (let i = 0; i < Math.ceil((demo.arena.timeLimit + 4) / DT) && run.status !== 'done'; i++) run.tick()
+        const z = run.sim.snapshot().robot.p.z
+        const r = run.result
+        run.sim.dispose()
+        push(`faded-line: mistake “${m.name}” fails past the line`, Boolean(r && !r.success && (r.reason === 'crashed' || r.reason === 'timeout')) && z > lineZ, `${r?.reason}: ended at z=${z.toFixed(2)} (line at ${lineZ})`)
+      }
+    }
+  }
+
+  // Upgrades in the physics (#33): no upgrades = the starter spec; masses and top speeds match the spec sheet.
+  {
+    const base = robotSpec(DEFAULT_DESIGN)
+    push('upgrades: none fitted = robotSpec exactly', JSON.stringify(fittedSpec(DEFAULT_DESIGN)) === JSON.stringify(base) && JSON.stringify(fittedSpec({ ...DEFAULT_DESIGN, upgrades: { chassis: 'drone' } })) === JSON.stringify(base), '')
+    let worst = ''
+    let ok = true
+    for (const drive of ['wheels2', 'wheels4', 'tracks', 'legs'] as const)
+      for (const power of ['aa', 'lipo', 'bigpack', 'solar'] as const)
+        for (const motor of ['gear', 'speedy', 'torque', 'brushless'] as const)
+          for (const arm of ['none', 'arm2', 'arm3'] as const) {
+            const d: RobotDesign = { ...DEFAULT_DESIGN, drive, upgrades: { power, motor, arm, sensor2: 'bumper' } }
+            const f = fittedSpec(d)
+            const sheet = specSheet(d)
+            const dm = Math.abs(Math.round(f.mass * 100) / 100 - sheet.massKg)
+            const dv = Math.abs(Math.round(f.drive.maxSpeed * 100) / 100 - sheet.topSpeed)
+            if (dm > 0.011 || dv > 0.011) {
+              ok = false
+              worst = `${drive}/${power}/${motor}/${arm}: mass ${f.mass.toFixed(2)} vs ${sheet.massKg}, speed ${f.drive.maxSpeed.toFixed(2)} vs ${sheet.topSpeed}`
+            }
+          }
+    push('upgrades: the sim’s mass and top speed are the spec sheet’s (256 ground designs)', ok, worst || 'all equal to 0.01')
+
+    // Measured on tile: a speedy motor is faster than a gear motor, a torque motor slower but pushes harder.
+    const topSpeed = (d: RobotDesign) => {
+      const sim = createSim(R, open(), d)
+      sim.setMotors(100, 100)
+      for (let i = 0; i < Math.round(4 / DT); i++) sim.step()
+      const v = sim.snapshot().groundSpeed
+      sim.dispose()
+      return v
+    }
+    const gear = topSpeed(DEFAULT_DESIGN)
+    const speedy = topSpeed({ ...DEFAULT_DESIGN, upgrades: { motor: 'speedy' } })
+    const torque = topSpeed({ ...DEFAULT_DESIGN, upgrades: { motor: 'torque' } })
+    push('upgrades: on tile speedy > gear > torque (measured)', speedy > gear * 1.2 && torque < gear * 0.85, `speedy ${speedy.toFixed(3)}, gear ${gear.toFixed(3)}, torque ${torque.toFixed(3)} m/s`)
+    // Up a steep ramp with the claw holding nothing: the torque motor climbs where speedy motors stall.
+    const climb = (motor: 'speedy' | 'torque') => {
+      const arena = open({ ramps: [{ center: [0, -1.2], size: [0.8, 1], height: 0.45, riseHeadingDeg: 0 }] })
+      const sim = createSim(R, arena, { ...DEFAULT_DESIGN, upgrades: { motor, power: 'bigpack', arm: 'arm3' } })
+      sim.setMotors(100, 100)
+      for (let i = 0; i < Math.round(8 / DT); i++) sim.step()
+      const y = sim.snapshot().robot.p.y
+      sim.dispose()
+      return y
+    }
+    const ySpeedy = climb('speedy')
+    const yTorque = climb('torque')
+    push('upgrades: a heavy robot climbs a 24° ramp with torque motors where speedy ones stall', yTorque > ySpeedy + 0.2, `torque reached y=${yTorque.toFixed(2)} m, speedy y=${ySpeedy.toFixed(2)} m`)
+  }
+
+  // The battery follows the robot's pack (#39): metered pack = power upgrade; the engine drains at cruisePower's rate.
+  {
+    for (const [id, pack] of Object.entries(POWER_PACKS)) {
+      const info = packInfo(pack)
+      const sheet = SHEET_POWER[id]
+      const wh = sheet.volts * sheet.ampHours
+      push(`battery: ${id} pack ${info.nominalV} V ${info.capacityMah} mAh matches the spec sheet within 3 %`, Math.abs(info.energyWh - wh) / wh <= 0.03 && Math.abs(info.nominalV - sheet.volts) <= 0.15, `${info.energyWh} Wh vs ${wh.toFixed(2)} Wh`)
+    }
+    const measure = (d: RobotDesign) => {
+      const sim = createSim(R, open({ size: [6, 30], timeLimit: 120 }), d)
+      sim.setMotors(100, 100)
+      for (let i = 0; i < Math.round(3 / DT); i++) sim.step()
+      const used0 = sim.battery().usedMah
+      const secs = 10
+      for (let i = 0; i < Math.round(secs / DT); i++) sim.step()
+      const amps = ((sim.battery().usedMah - used0) / 1000) / (secs / 3600)
+      const packMah = packInfo(sim.battery().pack).capacityMah
+      const same = JSON.stringify(sim.battery().pack) === JSON.stringify(powerPack(d))
+      sim.dispose()
+      return { amps, runtimeMin: ((packMah / 1000) / amps) * 60, same }
+    }
+    const rows: string[] = []
+    let ok = true
+    let samePack = true
+    const runtimes: Record<string, number> = {}
+    for (const power of ['aa', 'lipo', 'bigpack'] as const) {
+      const d: RobotDesign = { ...DEFAULT_DESIGN, upgrades: { power } }
+      const m = measure(d)
+      const c = cruisePower(d)
+      runtimes[power] = m.runtimeMin
+      samePack = samePack && m.same
+      const err = Math.abs(m.amps - c.amps) / c.amps
+      if (err > 0.15) ok = false
+      rows.push(`${power}: sim ${m.amps.toFixed(3)} A (${Math.round(m.runtimeMin)} min) vs cruisePower ${c.amps} A (${c.runtimeMin} min)`)
+    }
+    push('battery: the metered pack is the robot’s power upgrade', samePack, '')
+    push('battery: the engine drains at cruisePower’s rate within 15 % (runtime follows the pack)', ok, rows.join(' · '))
+    push('battery: a bigger pack runs longer (bigpack > lipo > aa)', runtimes.bigpack > runtimes.lipo && runtimes.lipo > runtimes.aa, rows.join(' · '))
+  }
+
+  // Deep links: every lab arena opens on its own page; tiers open in the game.
+  {
+    const okSim = DEMOS.every((d) => !d.id.startsWith('power-') && labDemoHref(d.id) === `/kids/lab/sim?demo=${d.id}`)
+    const okPow = POWER_DEMOS.every((d) => d.id.startsWith('power-') && labDemoHref(d.id) === `/kids/lab/power?demo=${d.id}`)
+    push('links: ?demo= opens the right lab for every arena', okSim && okPow, '')
+    push('links: ?tier= for tiers above Cadet', gameTierHref('sumo-arena', 0) === '/kids/play/sumo-arena' && gameTierHref('sumo-arena', 2) === '/kids/play/sumo-arena?tier=2', '')
+    const lab = readFileSync(join(__dirname, '..', '..', '..', 'components', 'kids', 'sim', 'SimLabClient.tsx'), 'utf8')
+    const power = readFileSync(join(__dirname, '..', '..', '..', 'components', 'kids', 'sim', 'PowerLabClient.tsx'), 'utf8')
+    const shell = readFileSync(join(__dirname, '..', '..', '..', 'components', 'kids', 'ui', 'GameShellClient.tsx'), 'utf8')
+    push('links: SimLab, Power Lab and the game shell read ?demo= / ?tier=', /get\('demo'\)/.test(lab) && /get\('demo'\)/.test(power) && /get\('tier'\)/.test(shell), '')
+  }
+
+  // Blocks: the new sensor is in the shared block set and in the Sense toolbox group.
+  {
+    const src = readFileSync(join(__dirname, '..', '..', '..', 'components', 'kids', 'sim', 'blockly-blocks.ts'), 'utf8')
+    const sense = /name: '👀 Sense'[^\n]*/.exec(src)?.[0] ?? ''
+    push('blocks: reflectance and battery % are defined and in the Sense group', /reporter\('reflectance'/.test(src) && /reporter\('battery_pct'/.test(src) && sense.includes("'reflectance'") && sense.includes("'battery_pct'"), sense.slice(0, 120))
+  }
+
+  // Games' Flight Recorder (#38): throttled, capped, no-op without a shell, safe snapshot.
+  {
+    recordGameFrame(0, { a: 1 }) // no shell: nothing happens, nothing throws
+    const rec = new GameRecorder()
+    setActiveGameRecorder(rec)
+    for (let i = 0; i <= 600; i++) recordGameFrame(i / 60, { 'Height (m)': Math.sin(i / 60), 'Sees rival': i % 120 < 60 })
+    markGameMoment(5, 'Gust!')
+    markGameMoment(5.1, 'Gust!')
+    recordGameFrame(11, { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7 })
+    setActiveGameRecorder(null)
+    recordGameFrame(12, { 'Height (m)': 9 })
+    const snap = rec.snapshot()
+    push('game recorder: 20 frames a second, not 60', snap.frames.length >= 200 && snap.frames.length <= 203, `${snap.frames.length} frames for 10 s`)
+    push('game recorder: channels capped, booleans as 0/1, duplicate moments folded', snap.channels.length === GAME_MAX_CHANNELS && snap.frames[0].v[1] === 1 && snap.moments.length === 1, snap.channels.join(', '))
+    push('game recorder: padded snapshot, nothing recorded after the round', snap.frames.every((f) => f.v.length === snap.channels.length) && snap.frames[snap.frames.length - 1].t === 11 && hasRecording(snap), '')
+  }
 }
 
 void main()

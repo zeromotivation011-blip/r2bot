@@ -8,6 +8,7 @@
 // on a device that has joined a class. classroom-membership.ts re-exports
 // everything here, so other callers keep importing from there.
 
+import type { BandId } from './bands'
 import { isBandId, type JoinedClassInfo } from './classroom'
 
 /** A swapped key (lib/kids/profiles.ts SWAPPED_KEYS): always the playing child's. */
@@ -33,9 +34,20 @@ export function loadMembership(): StoredMembership | null {
       teacherName: typeof o.teacherName === 'string' ? o.teacherName : null,
       band: isBandId(o.band) ? o.band : 'builders',
       nickname: o.nickname,
+      lockedBand: isBandId(o.lockedBand) ? o.lockedBand : null,
       joinedAt: typeof o.joinedAt === 'string' ? o.joinedAt : new Date().toISOString(),
     }
   } catch {
     return null
   }
+}
+
+/**
+ * Roadmap #29: the band this child's teacher set (their own lock or the class
+ * lock), or null when the child chooses. Band pickers should show "Your
+ * teacher chose …" instead of changing it while this is set; the device
+ * already switches to it on every class sync.
+ */
+export function classBandLock(): BandId | null {
+  return loadMembership()?.lockedBand ?? null
 }

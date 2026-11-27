@@ -11,6 +11,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { capabilitiesOf, DEFAULT_DESIGN } from '../robot-design'
 import { blockNeeds } from '../sim/program'
+import { SENSOR_IDS } from '../sim/blockly-json'
 import { BLOCK_INFO, BLOCK_NEEDS, countBlocks, usedTypes } from './blocks'
 import { CODE_LAB_TO_SHARED, SHARED_STYLE_COLOURS } from './shared-vocabulary'
 import type { BlockType } from './types'
@@ -81,6 +82,13 @@ export function verifySharedVocabulary(): VerifyIssue[] {
     const m = new RegExp(`${style}:\\s*'(#[0-9A-Fa-f]{6})'`).exec(blocklySrc)
     if (!m) add(`style ${style} missing from the Blockly theme`)
     else if (m[1].toUpperCase() !== hex.toUpperCase()) add(`style ${style} is ${m[1]} in Blockly but ${hex} in Code Lab`)
+  }
+  // Every sensor of the shared set (SENSOR_IDS: reflectance and battery % included, Wave 3) is a
+  // defined Blockly reporter and sits in the Sense toolbox group, so the Physics Lab can offer it.
+  const senseGroup = /name: '👀 Sense'[^\n]*/.exec(blocklySrc)?.[0] ?? ''
+  for (const sid of SENSOR_IDS) {
+    if (!definedIds.has(sid)) add(`shared sensor “${sid}” has no Blockly reporter`)
+    if (!senseGroup.includes(`'${sid}'`)) add(`shared sensor “${sid}” is missing from the 👀 Sense toolbox group`)
   }
   for (const t of Object.keys(BLOCK_INFO) as BlockType[]) {
     const ref = CODE_LAB_TO_SHARED[t]

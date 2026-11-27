@@ -2,6 +2,8 @@
 // standalone in the 3D episode engine. A lab page: noindex, not in the
 // sitemap, not in any nav. The episode list and the full script are server
 // HTML; the 3D player (three.js) loads only after the poster is tapped.
+// The public home of each episode is the Episodes Theatre
+// (/kids/stories/episodes/<id>, indexable): this preview links there.
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -10,6 +12,7 @@ import EpisodeLabClient from '@/components/kids/episodes/EpisodeLabClient'
 import { PresentButton } from '@/components/kids/present/PresentButton'
 import manifest from '@/lib/kids/episodes/audio-manifest.json'
 import { VOICE_CREDIT } from '@/lib/kids/episodes/credits'
+import { THEATRE_EPISODES } from '@/lib/kids/episodes/theatre'
 import { normaliseSessionId, type EpisodeData } from '@/lib/kids/episodes/types'
 
 export const runtime = 'nodejs'
@@ -48,6 +51,7 @@ export default async function EpisodePreviewPage({ params }: Params) {
   if (!ep) notFound()
   const idx = EPISODES.findIndex((e) => e.sessionId === ep.sessionId)
   const next = EPISODES[idx + 1] ?? null
+  const theatre = THEATRE_EPISODES.find((t) => t.sessionId === ep.sessionId) ?? null
   return (
     <main className="mx-auto max-w-6xl px-4 pb-16 pt-4 sm:pt-6">
       <header className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -57,7 +61,13 @@ export default async function EpisodePreviewPage({ params }: Params) {
         <p className="text-sm text-[#A7B0C0]">
           <span className="font-bold text-amber-300">Preview</span> · Session “{ep.sessionTitle}” · Level 1 · Lantern Hill
         </p>
-        <div className="w-full sm:ml-auto sm:w-auto">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
+          <Link
+            href={theatre?.href ?? '/kids/stories'}
+            className="inline-flex min-h-[44px] items-center rounded-xl border border-white/15 bg-[#19263F] px-3 text-sm font-bold text-[#EEF2F8] hover:bg-white/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+          >
+            🎭 {theatre ? 'Watch in the Episodes Theatre' : 'All episodes in the Theatre'}
+          </Link>
           <PresentButton source={{ kind: 'session', level: 1, number: ep.number, unplugged: false }} />
         </div>
       </header>

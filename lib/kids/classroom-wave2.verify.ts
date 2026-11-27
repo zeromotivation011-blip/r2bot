@@ -204,12 +204,16 @@ async function diaryChecks(): Promise<void> {
   check('discovery claims are not work', d.noteClassWork('discovery', 'robodex', day) === false)
   d.noteClassWork('game', 'sumo:t1', day)
   check('diary sends one number per day', JSON.stringify(d.workDays()) === JSON.stringify({ '2026-11-27': 2 }))
-  d.recordMisconception('L2-S04', 'taller-is-stronger', day)
-  d.recordMisconception('L2-S04', 'taller-is-stronger', day)
-  d.recordMisconception('L2-S04', 'Not An Id!', day)
+  d.recordMisconception('L2-S04', 'taller-is-stronger')
+  d.recordMisconception('L2-S04', 'taller-is-stronger')
+  d.recordMisconception('L2-S04', 'Not An Id!')
   check('misconceptions are counted by key, free text refused', JSON.stringify(d.misconceptionCounts()) === JSON.stringify({ 'L2-S04.taller-is-stronger': 2 }))
+  // Wave 3: the record lives in the one progress store; an older class-only entry is still sent.
+  store.set('r2bot_kids_class_misc_v1', JSON.stringify({ v: 1, m: { 'L1-S05.turn-moves-forward': { n: 3, d: '2026-11-20' }, 'L2-S04.taller-is-stronger': { n: 1, d: '2026-11-20' } } }))
+  const merged = d.misconceptionCounts()
+  check('older class-only misconceptions are merged in (higher count wins)', merged['L1-S05.turn-moves-forward'] === 3 && merged['L2-S04.taller-is-stronger'] === 2)
   d.clearClassDiary()
-  check('leaving a class clears both stores', Object.keys(d.workDays()).length === 0 && Object.keys(d.misconceptionCounts()).length === 0)
+  check('leaving a class clears the diary and the older class-only store', Object.keys(d.workDays()).length === 0 && JSON.stringify(d.misconceptionCounts()) === JSON.stringify({ 'L2-S04.taller-is-stronger': 2 }))
 }
 
 // ── Standards ────────────────────────────────────────────────────────────────

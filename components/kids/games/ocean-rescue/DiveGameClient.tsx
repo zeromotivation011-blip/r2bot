@@ -11,6 +11,7 @@ import { DIVE_DT, DIVE_LEVELS, createDive, netBuoyancy, neutralBallast, ping, sc
 import { DiveFx, drawDive, followCamera, makeDiveView, type DiveView } from './diveRender'
 import { WATER_COASTAL, lightAt, pressureAtm, SOUND_SPEED } from './physics'
 import { Debrief, PadButton, PlanSlider } from './ControlsClient'
+import { markGameMoment, recordGameFrame } from '@/lib/kids/sim/game-recorder'
 
 interface Props {
   tier: 0 | 1
@@ -216,6 +217,7 @@ export default function DiveGameClient({ tier, onFinish }: Props) {
         let n = 0
         while (acc >= DIVE_DT && n < 300) {
           stepDive(s, { h, v: vv })
+          recordGameFrame(s.t, { 'Depth (m)': s.z, 'Ballast (L)': s.ballastL, 'Tether drag (N)': s.tetherDrag })
           acc -= DIVE_DT
           n++
           if (s.outcome !== 'diving') break
@@ -223,16 +225,19 @@ export default function DiveGameClient({ tier, onFinish }: Props) {
         for (const ev of s.events) {
           switch (ev.kind) {
             case 'bump':
+              markGameMoment(s.t, 'Bump')
               playSound('wrong')
               fx.flash = 1
               fx.shake = 8
               showToast('Bump! Slow down near rocks and the seabed.')
               break
             case 'latched':
+              markGameMoment(s.t, 'Latched')
               playSound('levelup')
               showToast(tier === 1 ? 'Latched! The buoy is heavy — pump ballast OUT.' : 'Got it! Now fly up to the ship.')
               break
             case 'taut':
+              markGameMoment(s.t, 'Tether taut')
               playSound('click')
               showToast(`Tether at its limit (${level.tetherLen} m)!`)
               break

@@ -29,6 +29,8 @@ shown on the episode end card and the episode preview page, from one constant
 | Mr Diego (flower seller) | `en_GB-vctk-medium` | p347 | CC BY 4.0 (VCTK) | `hifi_tts_92`, CC BY 4.0 | — |
 | Captain Ingrid | `en_GB-alba-medium` | — | CC BY 4.0 (Univ. of Edinburgh DataShare 10283/3270) | `hifi_tts_92`, CC BY 4.0 | pitch ×0.96 |
 | any other guest | `en_US-bryce-medium` | — | Public domain | — | — |
+| Zippy (robot car, Story Theatre only) | `en_US-joe-medium` | — | CC0 | `rdh` voice, CC0 | quick: length 0.88, pitch ×1.3, robotised 0.4 |
+| Rover (Mars rover, Story Theatre only) | `en_US-john-medium` | — | Public domain (LibriVox) | — | slow: length 1.08, pitch ×0.9, robotised 0.45 |
 
 Spark also reads the "join in" questions, the reply to every answer and the
 "your turn" prompts (`generate-interactions.py`, same `ljspeech` voice).
@@ -75,6 +77,33 @@ tts/bin/python -I scripts/kids-voices/generate-interactions.py --join /tmp/l1-jo
 
 If a script line is added or removed, check the `after:` line numbers in
 `interactions.ts` against `audio-manifest.json`.
+
+## Story Theatre (`/kids/stories`)
+
+The eight Story Theatre episodes (`lib/kids/stories`) use the same Piper voices
+and shaping as the 3D episodes (narrator, Spark, Amara, Nana Lucía, Bolt — the
+`VOICES` in `generate.py`), plus the two story-only machines in the table above
+(Zippy and Rover, `STORY_VOICES` in `generate-stories.py`). A speaker with no
+voice of its own falls back to the narrator.
+
+```bash
+npx tsx scripts/kids-voices/export-stories.ts /tmp/stories.json
+tts/bin/python -I scripts/kids-voices/generate-stories.py --lines /tmp/stories.json --voices <voices dir>
+#   --force                re-synthesise every line (otherwise unchanged lines are kept)
+```
+
+Output: one file per unique speaker + text (key from `lib/kids/episodes/story-voice-key.ts`):
+`public/kids/audio/stories/<key>.ogg` (Opus) + `.m4a` twin (Safari before 18.4), and
+`public/kids/audio/stories/index.json` (`{key: {d: seconds, v: voice, h: hash}}`).
+Lines that no longer exist are deleted. The JSON from `export-stories.ts` is a
+build intermediate: do not commit it.
+
+The player (`lib/kids/episodes/story-voice.ts`) plays a clip when the index has
+the line and falls back to the browser's speech voice when it does not, so an
+edited story line is never silent, just not yet re-voiced: re-run both commands
+after editing `lib/kids/stories`. Clips are fetched and played as blob URLs so the
+kids service worker can cache them for offline (`story-voice.verify.ts` guards it).
+The credit line below covers these voices too.
 
 ## Recording an episode to MP4
 

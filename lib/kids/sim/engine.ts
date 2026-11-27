@@ -31,9 +31,9 @@
 import type { Collider, ImpulseJoint, RigidBody, World } from '@dimforge/rapier3d-compat'
 import type { RobotDesign } from '../robot-design'
 import { capabilitiesOf } from '../robot-design'
-import { floorAt, moverAt, onLine, type Arena, type FloorColor, type Vec2 } from './arena'
+import { floorAt, moverAt, onLine, reflectanceAt, type Arena, type FloorColor, type Vec2 } from './arena'
 import type { Rapier } from './rapier'
-import { DRIVES, robotSpec, SURFACES, type RobotSpec } from './robot-spec'
+import { DRIVES, fittedSpec, powerPack, SURFACES, type RobotSpec } from './robot-spec'
 import { createBattery, electronicsAmps, motorAmps, stepBattery, voltageFactor, type BatteryState } from './battery'
 
 export const DT = 1 / 60
@@ -123,6 +123,11 @@ export interface SensorReadings {
   lineSamples: boolean[]
   lineSeen: boolean
   lineOffset: number
+  /**
+   * Raw reflectance under the middle of the line-sensor bar, 0–100 (white ≈ 90, black tape ≈ 8):
+   * the average over the sensor's ~1 cm spot, so it slides smoothly across a line edge.
+   */
+  reflectance: number
   floorColor: FloorColor
   bumped: boolean
   headingDeg: number
@@ -205,7 +210,8 @@ interface DynBody {
 }
 
 export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
-  const spec = robotSpec(design)
+  // Upgrades included (roadmap #33): motor gearing, pack and arm mass. Without upgrades = robotSpec().
+  const spec = fittedSpec(design)
   const caps = capabilitiesOf(design)
   const world: World = new R.World({ x: 0, y: -G, z: 0 })
   world.timestep = DT
@@ -365,7 +371,8 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
   const touched = new Set<string>()
   let sensorCache: SensorReadings | null = null
   // Power (roadmap #39). Kept apart from the drive maths: applyDrive only reads `vFactor` and writes the forces.
-  const battery = createBattery(arena.battery)
+  // Without an arena battery the robot's own pack (its power upgrade) is metered (roadmap #39).
+  const battery = createBattery(arena.battery, powerPack(design))
   const powerParts = { head: design.head, sensor: design.sensor, tool: design.tool }
   /** Motor command per side, %, as last set. */
   const cmdPct: [number, number] = [0, 0]
@@ -468,11 +475,23 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       lineSamples: samples,
       lineSeen: n > 0,
       lineOffset: Math.round(lineOffset * 100) / 100,
+      reflectance: readReflectance(center, fwd, q),
       floorColor,
       bumped,
       headingDeg: Math.round(wrapHeading() * 10) / 10,
       timerS: Math.round(time * 100) / 100,
     }
+  }
+
+  /** Reflectance under the bar's centre: five points over a 1 cm spot (centre + 6 mm each way), averaged. */
+  function readReflectance(center: V3, fwd: V3, q: Q): number {
+    const right = rot(q, RIGHT)
+    const c = add(center, scale(fwd, spec.floorSensorZ))
+    const r = 0.006
+    const pts: V3[] = [c, add(c, scale(fwd, r)), add(c, scale(fwd, -r)), add(c, scale(right, r)), add(c, scale(right, -r))]
+    let sum = 0
+    for (const p of pts) sum += reflectanceAt(arena, p.x, p.z)
+    return Math.round(sum / pts.length)
   }
 
   /** Read the line-sensor bar. Runs every tick from step(), whether or not a program reads it. */
@@ -644,7 +663,10 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
   function stepPower(): void {
     const supply = Math.max(battery.volts, 0.1)
     let motors = 0
-    for (let s = 0; s < 2; s++) motors += motorAmps(motorForce[s], spec.drive.maxForcePerSide, Math.abs(wheelSpeed[s]) > 0.005)
+    for (let s = 0; s < 2; s++) {
+      const moving = Math.abs(wheelSpeed[s]) > 0.005
+      motors += motorAmps(motorForce[s], spec.drive.maxForcePerSide, moving) + (moving ? (spec.drive.moveAmpsPerSide ?? 0) : 0)
+    }
     // Scrubbing sideways is paid for by the motors, at about 60 % efficiency.
     motors += scrubWatts / (supply * 0.6)
     const load = electronicsAmps(powerParts, lightOn, holding !== null) + motors

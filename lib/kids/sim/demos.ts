@@ -1,5 +1,5 @@
 // lib/kids/sim/demos.ts
-// The four prototype arenas for /kids/lab/sim, each with a reference program
+// The Physics Lab arenas (the four prototypes + "Find the faded line", Level 3 Session 4) for /kids/lab/sim, each with a reference program
 // (the "show me" answer), the blocks in its toolbox, the robot it is meant for,
 // and the "wrong part" that makes the same program fail — the lesson that the
 // robot's parts change what happens.
@@ -40,6 +40,29 @@ const driveFor = (speed: number, seconds: number): Stmt => ({ op: 'drive_for', i
 const driveDistance = (cm: number, speed: number): Stmt => ({ op: 'drive_distance', id: id('drive_distance'), cm: N(cm), speedPct: N(speed) })
 const stop = (): Stmt => ({ op: 'stop', id: id('stop') })
 const say = (text: string): Stmt => ({ op: 'say', id: id('say'), text: T(text) })
+const V = (name: string): Expr => ({ k: 'get_var', name })
+const setVar = (name: string, value: Expr): Stmt => ({ op: 'set_var', id: id('set_var'), name, value })
+const sayExpr = (text: Expr): Stmt => ({ op: 'say', id: id('say'), text })
+/** Creep forward 2 cm at a time until the line sensor reads darker than `below`. */
+const creepUntilDarker = (below: Expr): Stmt => ({
+  op: 'repeat_until',
+  id: id('repeat_until'),
+  cond: { k: 'compare', op: '<', a: S('reflectance'), b: below },
+  body: [driveDistance(2, 20)],
+})
+
+// "Find the faded line" (Level 3 Session 4, The Faded Line). The floor is dirty snow (reads 70);
+// the white pad reads 88, the black pad 10 and the sun-bleached guide line 40. Calibrated,
+// the threshold is (88 + 10) / 2 = 49: the snow (70) is above it and the faded line (40) below.
+// A threshold of 30 copied from a lab with fresh black tape never sees the line (40 is not
+// below 30) and the robot creeps on into the far wall.
+const SNOW = 70
+const PAD_WHITE = 88
+const PAD_BLACK = 10
+const FADED = 40
+const LINE_Z = 0.45
+/** Where the robot's centre stops when its sensor (6–10 cm ahead, by body) is over the line. */
+const FADED_ZONE: Extract<Arena['goal'], { kind: 'stop-in-zone' }>['zone'] = { kind: 'rect', center: [0, LINE_Z - 0.075], size: [0.5, 0.15] }
 
 const MOTION = ['drive_for', 'drive_distance', 'turn_degrees', 'set_motors', 'stop', 'wait']
 
@@ -206,6 +229,61 @@ export const DEMOS: Demo[] = [
     wrongFails: 'missing-part',
   },
 ]
+
+DEMOS.push({
+  id: 'faded-line',
+  title: 'Find the faded line',
+  task: 'Read the white pad and the black pad, set the threshold halfway, drive off the pad, then creep forward and stop on the faded line.',
+  lesson: 'A sensor reading only means “dark” compared with the light and dark measured here, today: calibrate, then set the threshold halfway.',
+  ageHint: 'Ages 11–17',
+  arena: {
+    id: 'faded-line',
+    title: 'Find the faded line',
+    size: [2, 2.6],
+    center: [0, -0.2],
+    floor: 'tile',
+    regions: [
+      { shape: { kind: 'rect', center: [0, -0.2], size: [2, 2.6] }, shade: SNOW, label: 'Snow' },
+      { shape: { kind: 'rect', center: [0, -0.63], size: [0.34, 0.2] }, color: 'white', shade: PAD_WHITE, label: 'White pad' },
+      { shape: { kind: 'rect', center: [0, -0.13], size: [0.34, 0.2] }, color: 'black', shade: PAD_BLACK, label: 'Black pad' },
+    ],
+    lines: [{ width: 0.03, shade: FADED, points: [[-0.9, LINE_Z], [0.9, LINE_Z]] }],
+    walls: [],
+    ramps: [],
+    boxes: [],
+    objects: [],
+    start: { pos: [0, -1.2], headingDeg: 0 },
+    goal: { kind: 'stop-in-zone', zone: FADED_ZONE, noCrash: true },
+    timeLimit: 60,
+  },
+  reference: {
+    body: [
+      driveDistance(50, 30),
+      setVar('light', S('reflectance')),
+      driveDistance(50, 30),
+      setVar('dark', S('reflectance')),
+      setVar('threshold', { k: 'math', op: '/', a: { k: 'math', op: '+', a: V('light'), b: V('dark') }, b: N(2) }),
+      // Off the black pad first, or the search "finds" the pad it is standing on.
+      driveDistance(20, 30),
+      creepUntilDarker(V('threshold')),
+      stop(),
+      sayExpr(V('threshold')),
+    ],
+  },
+  toolbox: [...MOTION, 'repeat_until', 'if', 'if_else', 'compare', 'math', 'number', 'text', 'line_seen', 'reflectance', 'set_var', 'change_var', 'get_var', 'say'],
+  goodParts: { sensor: 'line' },
+  wrongParts: { sensor: 'none' },
+  wrongFails: 'missing-part',
+  mistakes: [
+    {
+      name: 'a threshold of 30 copied from the lab',
+      program: { body: [driveDistance(50, 30), driveDistance(50, 30), driveDistance(20, 30), creepUntilDarker(N(30)), stop()] },
+      // It creeps past the line into the far wall and never stops: a crash, or the clock runs out
+      // pushing against the wall (sim/verify accepts either and checks it went past the line).
+      fails: 'timeout',
+    },
+  ],
+})
 
 export function designFor(base: RobotDesign, parts: Partial<RobotDesign>): RobotDesign {
   return { ...base, ...parts }

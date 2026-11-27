@@ -68,6 +68,8 @@ export function evaluate(e: Expr, ctx: InterpreterCtx): Value {
           return s.lineSeen
         case 'line_offset':
           return s.lineOffset
+        case 'reflectance':
+          return s.reflectance
         case 'floor_color':
           return s.floorColor
         case 'bumped':

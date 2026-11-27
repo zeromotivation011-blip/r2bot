@@ -11,6 +11,7 @@
 import { BAND_ORDER, type BandId } from './bands'
 import { DEFAULT_DESIGN, decodeDesign, encodeDesign, getPart, type Slot } from './robot-design'
 import { isDay, type ClassGoal } from './classroom-goal'
+import { MISCONCEPTION_KEY_RE } from './misconceptions/keys'
 
 // ── Join codes ───────────────────────────────────────────────────────────────
 /** No I, L, O, 0 or 1 — a code read off a classroom wall cannot be misread. */
@@ -142,7 +143,14 @@ export interface ClassSnapshot {
   galaxyStuck: Record<string, number>
   /** Course sessions whose challenge was tried 3+ times without a star: "L1-S05" -> attempts. */
   courseStuck: Record<string, number>
-  /** Wrong check answers by the misconception they reveal: "L2-S04.taller-is-stronger" -> times chosen. Counts only. */
+  /**
+   * Wrong course-check answers (Levels 1–4) by the misconception they reveal:
+   * "<session>.<misconception id>" -> times chosen, e.g.
+   * "L2-S04.taller-is-stronger": 2. COUNTS ONLY — never the question, the
+   * answer text, free text or a time. Keys must match MISCONCEPTION_KEY_RE
+   * (lib/kids/misconceptions/keys.ts); the device reads them from the progress
+   * store. Described for schools in lib/kids/teach/trust-pack.ts.
+   */
   misconceptions: Record<string, number>
   /** Highest game tier with a personal best: game id -> tier (1–9). */
   gameTiers: Record<string, number>
@@ -159,7 +167,7 @@ export const EMPTY_SNAPSHOT: ClassSnapshot = {
 }
 
 /** Shapes of the wave-2 keys (also used by the browser builder). */
-export const MISCONCEPTION_KEY_RE = /^L[1-4]-S\d{2}\.[a-z0-9][a-z0-9-]{0,47}$/
+export { MISCONCEPTION_KEY_RE }
 export const CONCEPT_CODE_RE = /^[nlsfNLSF]{16}$/
 const EVIDENCE_RE = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.(\d{1,3}|-))(\|\d{1,3}\.\d{1,3}\.\d{1,3}\.(\d{1,3}|-)){15}$/
 export const SNAPSHOT_MAX_MISCONCEPTIONS = 24
@@ -442,6 +450,10 @@ export interface KidsClassSummary {
   goal?: ClassGoal | null
   /** False while migration 0056 has not run: the goal can only be kept on the teacher's device. */
   goalReady?: boolean
+  /** Roadmap #29 (migration 0058): every child plays at the class band. */
+  bandLocked?: boolean
+  /** False while migration 0058 has not run: band locks cannot be set yet. */
+  bandLockReady?: boolean
 }
 
 export interface KidsMemberRow {
@@ -450,6 +462,8 @@ export interface KidsMemberRow {
   snapshot: ClassSnapshot
   createdAt: string
   lastActiveAt: string
+  /** Roadmap #29 (migration 0058): a band the teacher set for this child, or null (follow the class). */
+  bandLock?: BandId | null
 }
 
 /** Public, child-facing view of a class — no ids that would let anyone act on it. */
@@ -458,6 +472,19 @@ export interface JoinedClassInfo {
   teacherName: string | null
   band: BandId
   nickname: string
+  /**
+   * Roadmap #29: the band the teacher set for this child (their own lock, or
+   * the class band when the class is locked). The device switches to it on
+   * sync. null/absent = the child chooses.
+   */
+  lockedBand?: BandId | null
+}
+
+/** The band a child must play at: their own lock wins, then the class lock, else none. */
+export function effectiveBandLock(classBand: unknown, classLocked: boolean, memberLock: unknown): BandId | null {
+  if (isBandId(memberLock)) return memberLock
+  if (classLocked && isBandId(classBand)) return classBand
+  return null
 }
 
 /** Error code a route returns when migration 0054 has not been run yet. */

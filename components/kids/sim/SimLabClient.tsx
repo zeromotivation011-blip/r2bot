@@ -8,10 +8,11 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
-import { capabilitiesOf, DEFAULT_DESIGN, getPart, loadDesign, partsForSlot, saveDesign, type RobotDesign, type Slot } from '@/lib/kids/robot-design'
+import { capabilitiesOf, DEFAULT_DESIGN, getPart, getUpgrade, loadDesign, partsForSlot, saveDesign, upgradesOf, UPGRADE_DEFAULT, type RobotDesign, type Slot } from '@/lib/kids/robot-design'
 import { SLOT_LABEL } from '@/lib/kids/code-lab/labels'
 import { DEMOS, designFor, type Demo } from '@/lib/kids/sim/demos'
 import { missingParts, type Program } from '@/lib/kids/sim/program'
+import { hasPhysicsUpgrades } from '@/lib/kids/sim/robot-spec'
 
 /** Same boxes, same order and same sizes as SimWorkbenchClient, so nothing shifts when it arrives. */
 function WorkbenchSkeleton() {
@@ -44,6 +45,17 @@ const STARTERS: Record<string, Program> = {
   'sand-trap': { body: [{ op: 'drive_distance', id: 'start-1', cm: { k: 'number', v: 50 }, speedPct: { k: 'number', v: 80 } }] },
   'stop-before-wall': { body: [] },
   'follow-line': { body: [] },
+  'faded-line': { body: [{ op: 'drive_distance', id: 'start-1', cm: { k: 'number', v: 50 }, speedPct: { k: 'number', v: 30 } }] },
+}
+
+/** Upgrades that change the physics here (roadmap #33), in words: "Torque Motors · Big Power Pack". */
+function upgradeWords(d: RobotDesign): string {
+  const up = upgradesOf(d)
+  const names: string[] = []
+  for (const slot of ['motor', 'power', 'arm', 'sensor2'] as const) {
+    if (up[slot] !== UPGRADE_DEFAULT[slot]) names.push(getUpgrade(slot, up[slot])?.name ?? up[slot])
+  }
+  return names.join(' · ')
 }
 
 const SWITCH_SLOTS: Slot[] = ['drive', 'head', 'sensor']
@@ -66,7 +78,11 @@ export default function SimLabClient() {
   const [saved, setSaved] = useState(false)
 
   // Read the saved robot once, BEFORE the simulator mounts, so the 3D scene and the physics are built once.
+  // ?demo=<id> opens that arena (a course session links straight to its challenge).
   useEffect(() => {
+    const want = new URLSearchParams(window.location.search).get('demo')
+    const d = want ? DEMOS.find((x) => x.id === want) : undefined
+    if (d) setDemo(d)
     setMine(loadDesign())
   }, [])
 
@@ -175,6 +191,11 @@ export default function SimLabClient() {
             {design.sensor !== 'none' ? ` · ${getPart('sensor', design.sensor)?.name}` : ''}
             {caps.has('rough-ground') ? ' · grips rough ground' : ''}
           </p>
+          {hasPhysicsUpgrades(design) && (
+            <p className="mt-1 text-xs font-bold text-cyan-200" data-testid="upgrades-in-physics">
+              ⚙️ Upgrades in the physics: {upgradeWords(design)}
+            </p>
+          )}
           {(differsFromMine || saved) && (
             <button
               type="button"

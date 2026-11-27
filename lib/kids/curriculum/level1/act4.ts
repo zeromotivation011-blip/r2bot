@@ -13,6 +13,7 @@
 
 import type { AllowedBlock, Session } from '../types'
 import {
+  mis,
   BACK_OFF, BEEP, CLEAR_CM, CLOSE_CM, CREEP, CREEP_CM, FLAT_MAT_PHYSICS, HOP, HOP_BACK, HOP_PCT, IF_BUMP, LEFT, LIGHT_OFF, LIGHT_ON,
   OBSTACLE_MIN_CM, PART_MASS_KG, PEN_DOWN, PEN_UP, REPEAT, RIGHT, SCOOP_UP, TILE_CM, TIP_OUT, UNTIL_BUMP, UNTIL_CLOSE, WAIT, WAIT_CLEAR,
   arena, episode, kg, lessonTiming, obj, projectTiming, say, teacher,
@@ -166,19 +167,19 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: 'What does a bumper help a robot do?',
-        options: [{ text: 'See the wall before it gets there', icon: '👀' }, { text: 'Feel a touch', icon: '✋' }, { text: 'Go faster', icon: '💨' }],
+        options: [mis('See the wall before it gets there', '👀', 'bumper-sees'), { text: 'Feel a touch', icon: '✋' }, mis('Go faster', '💨', 'extra-parts-make-it-faster')],
         answer: 1,
         why: 'A bumper is a touch sensor. When it touches something, a switch clicks and the robot knows. Before the touch, it knows nothing.',
       },
       {
         prompt: 'The wall is a different distance every time. What works?',
-        options: [{ text: 'Hop 3, always', icon: '3️⃣' }, { text: 'Keep going until I feel a bump', icon: '🛡️' }],
+        options: [mis('Hop 3, always', '3️⃣', 'timed-plan-always-works'), { text: 'Keep going until I feel a bump', icon: '🛡️' }],
         answer: 1,
         why: 'Counting only works if you know the distance. The sensor finds the wall wherever it is.',
       },
       {
         prompt: 'Why back off a little before turning?',
-        options: [{ text: 'So the robot has room to turn', icon: '↩️' }, { text: 'To say sorry to the wall', icon: '🙇' }],
+        options: [{ text: 'So the robot has room to turn', icon: '↩️' }, mis('To say sorry to the wall', '🙇', 'machines-have-feelings')],
         answer: 0,
         why: 'Right up against a wall, the robot’s corners scrape when it turns. A little space lets it turn freely.',
       },
@@ -340,20 +341,20 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: '“If I feel a bump, I turn.” When does the robot turn?',
-        options: [{ text: 'Only when it feels a bump', icon: '🛡️' }, { text: 'Every time', icon: '🔁' }],
+        options: [{ text: 'Only when it feels a bump', icon: '🛡️' }, mis('Every time', '🔁', 'if-runs-every-time')],
         answer: 0,
         why: '“If” means only sometimes: only when the bumper clicks.',
       },
       {
         prompt: 'Sense, think, act. Which part is the “if”?',
-        options: [{ text: 'Sense', icon: '👂' }, { text: 'Think', icon: '💭' }, { text: 'Act', icon: '🏃' }],
+        options: [mis('Sense', '👂', 'sense-think-act-mixed'), { text: 'Think', icon: '💭' }, mis('Act', '🏃', 'sense-think-act-mixed')],
         answer: 1,
         keepOrder: true,
         why: 'The bumper senses. The “if” thinks — it decides what to do. Turning is the act.',
       },
       {
         prompt: 'Look at this new maze picture. Every corner turns right, like ours. Will your bump-and-turn-right rule find Bolt?',
-        options: [{ text: 'No — it only works in our maze', icon: '❌' }, { text: 'Yes — the same rule works', icon: '✅' }],
+        options: [mis('No — it only works in our maze', '❌', 'rule-only-fits-one-maze'), { text: 'Yes — the same rule works', icon: '✅' }],
         answer: 1,
         why: 'The rule does not need the map. In any maze where every corner turns right, bump-and-turn-right works.',
       },
@@ -518,19 +519,19 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: 'How do Distance Eyes know something is close?',
-        options: [{ text: 'They touch it', icon: '✋' }, { text: 'They see it, like our eyes', icon: '👁️' }, { text: 'They listen for an echo', icon: '🦇' }],
+        options: [mis('They touch it', '✋', 'distance-sensor-is-bumper'), mis('They see it, like our eyes', '👁️', 'distance-eyes-see'), { text: 'They listen for an echo', icon: '🦇' }],
         answer: 2,
         why: 'They send a sound and listen for the echo. A quick echo means something is close. They do not see pictures at all.',
       },
       {
         prompt: 'In thick fog, which still works?',
-        options: [{ text: 'A camera', icon: '📷' }, { text: 'Distance Eyes', icon: '👀' }],
+        options: [mis('A camera', '📷', 'camera-sees-through-fog'), { text: 'Distance Eyes', icon: '👀' }],
         answer: 1,
         why: 'Fog hides light, so cameras struggle. Sound travels through fog, so echoes still work.',
       },
       {
         prompt: 'To never bump into a friend, use…',
-        options: [{ text: 'Until something is close', icon: '👀' }, { text: 'Until I feel a bump', icon: '🛡️' }],
+        options: [{ text: 'Until something is close', icon: '👀' }, mis('Until I feel a bump', '🛡️', 'bump-is-fine-for-people')],
         answer: 0,
         why: 'A bumper only knows after the touch. Distance Eyes stop the robot before it touches.',
       },
@@ -698,19 +699,19 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: 'Someone steps in front of the robot. What should it do?',
-        options: [{ text: 'Go around fast', icon: '💨' }, { text: 'Wait until the path is clear', icon: '✋' }],
+        options: [mis('Go around fast', '💨', 'faster-is-better'), { text: 'Wait until the path is clear', icon: '✋' }],
         answer: 1,
         why: 'Safety comes first. Waiting is always safe; rushing past people is not.',
       },
       {
         prompt: 'Who must make sure a robot is safe?',
-        options: [{ text: 'The people who build and program it', icon: '🧑‍🔧' }, { text: 'The robot, on its own', icon: '🤖' }],
+        options: [{ text: 'The people who build and program it', icon: '🧑‍🔧' }, mis('The robot, on its own', '🤖', 'robot-responsible-for-safety')],
         answer: 0,
         why: 'A robot only follows its program. The people who build and program it decide how careful it is.',
       },
       {
         prompt: 'Why check before EVERY hop, not just once?',
-        options: [{ text: 'People keep moving', icon: '🚶' }, { text: 'It doesn’t matter — checking once at the start is enough', icon: '1️⃣' }],
+        options: [{ text: 'People keep moving', icon: '🚶' }, mis('It doesn’t matter — checking once at the start is enough', '1️⃣', 'check-once-enough')],
         answer: 0,
         why: 'The square changes all the time. A path that was clear a moment ago may not be clear now.',
       },
@@ -882,19 +883,19 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: 'On a hill, “Hop 3” goes…',
-        options: [{ text: 'Further', icon: '🏃' }, { text: 'Less far', icon: '⛰️' }, { text: 'Just the same', icon: '🟰' }],
+        options: [mis('Further', '🏃', 'hills-change-nothing'), { text: 'Less far', icon: '⛰️' }, mis('Just the same', '🟰', 'hills-change-nothing')],
         answer: 1,
         why: 'Going uphill, part of the motor’s push lifts the robot, so each hop is shorter.',
       },
       {
         prompt: 'Why did “until close” work on every ramp?',
-        options: [{ text: 'Every ramp is the same length, so it was counted for us', icon: '📏' }, { text: 'It measures the real wall, wherever it is', icon: '👀' }],
+        options: [mis('Every ramp is the same length, so it was counted for us', '📏', 'sensor-rule-is-counting'), { text: 'It measures the real wall, wherever it is', icon: '👀' }],
         answer: 1,
         why: 'The sensor measures the world as it really is, so hills and slips don’t fool it.',
       },
       {
         prompt: 'Who can work with robots when they grow up?',
-        options: [{ text: 'Anyone who learns — fixers, testers, designers, builders', icon: '🧑‍🔧' }, { text: 'Only grown-up scientists', icon: '🥼' }],
+        options: [{ text: 'Anyone who learns — fixers, testers, designers, builders', icon: '🧑‍🔧' }, mis('Only grown-up scientists', '🥼', 'only-scientists')],
         answer: 0,
         why: 'Many kinds of people work with robots: technicians fix them, others design, build, program and test them. You have done all of those this year!',
       },
@@ -1050,19 +1051,19 @@ export const ACT4: Session[] = [
     quiz: [
       {
         prompt: 'What do engineers do after testing finds a bug?',
-        options: [{ text: 'Fix it and test again', icon: '🔧' }, { text: 'Hide it, because a good show has no bugs', icon: '🙈' }],
+        options: [{ text: 'Fix it and test again', icon: '🔧' }, mis('Hide it, because a good show has no bugs', '🙈', 'good-engineers-never-bug')],
         answer: 0,
         why: 'Bugs are normal. Find where it went wrong, fix it, and test again.',
       },
       {
         prompt: 'Your robot feels, hears echoes, and moves. Which is “act”?',
-        options: [{ text: 'Hearing an echo', icon: '🦇' }, { text: 'Feeling a bump', icon: '🛡️' }, { text: 'Moving its wheels', icon: '🛞' }],
+        options: [mis('Hearing an echo', '🦇', 'sense-think-act-mixed'), mis('Feeling a bump', '🛡️', 'sense-think-act-mixed'), { text: 'Moving its wheels', icon: '🛞' }],
         answer: 2,
         why: 'Feeling and hearing are sensing. Moving is acting. The program in between is thinking.',
       },
       {
         prompt: 'Why use a loop in your show?',
-        options: [{ text: 'To make the program longer, because longer is better', icon: '📜' }, { text: 'To repeat steps with fewer blocks', icon: '🔁' }],
+        options: [mis('To make the program longer, because longer is better', '📜', 'longer-program-better'), { text: 'To repeat steps with fewer blocks', icon: '🔁' }],
         answer: 1,
         why: 'A loop repeats steps, so you don’t have to put the same blocks in again and again.',
       },

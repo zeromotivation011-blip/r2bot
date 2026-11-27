@@ -13,12 +13,14 @@ import {
   EMPTY_SNAPSHOT,
   JOIN_CODE_ALPHABET,
   JOIN_CODE_LENGTH,
+  effectiveBandLock,
   isBandId,
   parseSnapshot,
   type KidsClassSummary,
   type KidsMemberRow,
 } from './classroom'
 import { SCHOOLS_NOT_READY, SCHOOLS_NOT_READY_MESSAGE } from './classroom-assignments'
+import type { BandId } from './bands'
 import { GOALS_NOT_READY, GOALS_NOT_READY_MESSAGE, parseGoal, type ClassGoal } from './classroom-goal'
 
 export function newJoinCode(): string {
@@ -201,4 +203,54 @@ export async function loadClassGoal(admin: SupabaseClient, classId: string): Pro
   const { data, error } = await admin.from('kids_classes').select('goal').eq('id', classId).maybeSingle()
   if (error) return isMissingGoalColumn(error) ? 'not-ready' : null
   return parseGoal((data as { goal?: unknown } | null)?.goal)
+}
+
+// ── Band lock (roadmap #29, migration 0058) ──────────────────────────────────
+// Read and written apart from CLASS_COLUMNS / MEMBER_COLUMNS, so a missing 0058
+// never takes the class page, the roster or the child's sync down.
+
+export const BAND_LOCK_NOT_READY = 'band-lock-not-ready'
+export const BAND_LOCK_NOT_READY_MESSAGE = 'Band settings are being switched on — they will work once the database update has run.'
+
+/** True when the error means migration 0058 has not run (band_locked / band_lock missing). */
+export function isMissingBandLockColumn(err: PostgrestError | null | undefined): boolean {
+  if (!err) return false
+  if (err.code === '42703' || err.code === 'PGRST204') return true
+  return /band_lock/.test(err.message ?? '') && /(does not exist|could not find|schema cache)/i.test(err.message ?? '')
+}
+
+export function bandLockNotReadyResponse(): Response {
+  return Response.json(
+    { ok: false, error: BAND_LOCK_NOT_READY_MESSAGE, code: BAND_LOCK_NOT_READY },
+    { status: 503, headers: { 'Cache-Control': 'no-store' } },
+  )
+}
+
+export interface ClassBandLocks {
+  classLocked: boolean
+  /** member id -> band the teacher set for that child. */
+  members: Record<string, BandId>
+}
+
+/** The class's band locks, or 'not-ready' before 0058. */
+export async function loadBandLocks(admin: SupabaseClient, classId: string): Promise<ClassBandLocks | 'not-ready'> {
+  const cls = await admin.from('kids_classes').select('band_locked').eq('id', classId).maybeSingle()
+  if (cls.error) return isMissingBandLockColumn(cls.error) ? 'not-ready' : { classLocked: false, members: {} }
+  const mem = await admin.from('kids_class_members').select('id, band_lock').eq('class_id', classId).not('band_lock', 'is', null)
+  if (mem.error) return isMissingBandLockColumn(mem.error) ? 'not-ready' : { classLocked: false, members: {} }
+  const members: Record<string, BandId> = {}
+  for (const r of (mem.data ?? []) as { id: string; band_lock: unknown }[]) if (isBandId(r.band_lock)) members[r.id] = r.band_lock
+  return { classLocked: (cls.data as { band_locked?: unknown } | null)?.band_locked === true, members }
+}
+
+/** The band one member must play at (their lock, else the class's when locked), null when free or before 0058. */
+export async function loadMemberBandLock(admin: SupabaseClient, memberId: string): Promise<BandId | null> {
+  const { data, error } = await admin
+    .from('kids_class_members')
+    .select('band_lock, kids_classes(band, band_locked)')
+    .eq('id', memberId)
+    .maybeSingle()
+  if (error || !data) return null
+  const row = data as unknown as { band_lock: unknown; kids_classes: { band: unknown; band_locked: unknown } | null }
+  return effectiveBandLock(row.kids_classes?.band, row.kids_classes?.band_locked === true, row.band_lock)
 }

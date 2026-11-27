@@ -10,6 +10,11 @@
 // small card toast with a link to it. Explicit discoverRobot(id) calls are
 // shown the same way (ROBODEX_EVENT).
 //
+// Where it sits: clear of the Ask Spark button (AskSparkClient: right-4,
+// 56px tall at bottom 84px up to 900px wide; right-6 at bottom 24px from 901px)
+// and of the phone tab bar (up to 900px). So up to 900px it sits ABOVE the Spark
+// button (84 + 56 + 12 = 152px), and from 901px above it too (24 + 56 + 16 = 96px).
+//
 // Calm and reduced motion: no animation. Explorers with voice on hear the name.
 // The store module is loaded on the first event, so the shell's first load
 // does not carry the card catalogue.
@@ -19,7 +24,7 @@ import { useEffect, useRef, useState } from 'react'
 import { playSound } from '@/lib/kids-audio'
 import { KIDS_PROGRESS_EVENT, getProgress } from '@/lib/kids-progress'
 import { readAloud } from '@/lib/kids/read-aloud'
-import { readKidsSettings, useKidsReducedMotion } from '@/lib/kids/settings'
+import { readKidsSettings, useKidsCalm, useKidsReducedMotion } from '@/lib/kids/settings'
 import { REWARD_EVENT } from '@/lib/kids/universe/rewards'
 
 const ROBODEX_EVENT = 'r2bot:kids-robodex' // = ROBODEX_EVENT in lib/kids/robodex/store.ts (kept literal so this file stays tiny)
@@ -35,6 +40,7 @@ interface Toast {
 export default function RobodexToastClient() {
   const [toast, setToast] = useState<Toast | null>(null)
   const reduced = useKidsReducedMotion()
+  const calm = useKidsCalm()
   const timer = useRef<number | null>(null)
   const debounce = useRef<number | null>(null)
 
@@ -80,14 +86,17 @@ export default function RobodexToastClient() {
   }, [])
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+96px)] z-[61] flex justify-center px-3 sm:bottom-6 sm:justify-end">
+    <div
+      className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+152px)] z-[61] flex justify-center px-3 min-[901px]:bottom-24 min-[901px]:justify-end min-[901px]:pr-6"
+      data-robodex-toast
+    >
       <p className="sr-only" role="status" aria-live="polite">
         {toast ? `New Robodex card: ${toast.name}${toast.more ? ` and ${toast.more} more` : ''}.` : ''}
       </p>
       {toast && (
         <div
           key={toast.key}
-          className={`pointer-events-auto flex w-[min(92vw,360px)] items-center gap-3 rounded-[20px] border border-amber-400/50 bg-[#111C32]/95 p-3 shadow-[0_8px_24px_rgba(0,0,0,.45)] ${reduced ? '' : 'motion-safe:animate-[rdxToast_.3s_cubic-bezier(.22,.61,.36,1)]'}`}
+          className={`pointer-events-auto flex w-[min(92vw,360px)] items-center gap-3 rounded-[20px] border border-amber-400/50 bg-[#111C32]/95 p-3 shadow-[0_8px_24px_rgba(0,0,0,.45)] ${reduced || calm ? '' : 'motion-safe:animate-[rdxToast_.3s_cubic-bezier(.22,.61,.36,1)]'}`}
         >
           <style>{`@keyframes rdxToast { from { opacity: 0; transform: translateY(10px) scale(.97) } to { opacity: 1; transform: none } }`}</style>
           <span className="text-3xl" aria-hidden>

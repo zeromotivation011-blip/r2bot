@@ -8,7 +8,7 @@
 import type { Session } from '../types'
 import {
   BEEP, CALIBRATION_STRIP, CREW, DIST, FLOOR_COLOR, GRIP_CLOSE, GRIP_OPEN, GUIDE_LINE, HEADING, HUT_ROW, LINE_OFFSET, LINE_SEEN,
-  LOGIC, MEASURING_HALL, MOVE, SAY, SNOWFIELD, TALK, TIMER, VARS, VARS_MATH,
+  LOGIC, REFLECTANCE, MEASURING_HALL, MOVE, SAY, SNOWFIELD, TALK, TIMER, VARS, VARS_MATH,
 } from './shared'
 import {
   arena, challenge, crit, episode, lessonPlan, makeSession, mc, o, projectPlan, q, right, scene, teacher, wrong,
@@ -384,7 +384,7 @@ export const ACT1: Session[] = [
       title: 'Measure Light and Dark',
       mission: 'Drive onto the white pad and store the reading in light, then onto the black pad and store it in dark. Say both.',
       arena: CALIBRATION_STRIP,
-      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, LINE_SEEN, SAY],
+      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, LINE_SEEN, REFLECTANCE, SAY],
       example: [
         'drive_distance(50, 30)  ← onto the white pad',
         'variable_set(light, reflectance)  ← the line sensor’s raw brightness, 0–100 (see the teacher note)',
@@ -401,7 +401,7 @@ export const ACT1: Session[] = [
       title: 'Find the Faded Line',
       mission: 'Calibrate on the pads, compute threshold = (light + dark) ÷ 2, then creep forward until the reading drops below the threshold and stop on the faded line.',
       arena: CALIBRATION_STRIP,
-      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, LINE_SEEN, SAY],
+      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, LINE_SEEN, REFLECTANCE, SAY],
       example: [
         'drive_distance(50, 30); variable_set(light, reflectance)',
         'drive_distance(50, 30); variable_set(dark, reflectance)',
@@ -451,7 +451,7 @@ export const ACT1: Session[] = [
       faster: ['Calibrate on three pads (white, grey, black) and choose two thresholds for three zones.', 'Re-calibrate automatically whenever the robot crosses the white pad again.'],
       slower: ['Supply light and dark values; students only compute the halfway point.', 'Use a calculator and the variable monitor.'],
       notes: [
-        'Honest limit: the course simulator’s line sensor reports “line seen” and “line offset”, not raw brightness, so the worked program’s “reflectance” reading is shown as a worked example only. The playable challenge is the Skill Galaxy threshold tuner “A worn-out line”, which uses real reflectance traces; the classroom idea (store light and dark, threshold halfway) is the same on any real robot.',
+        'The simulator’s line sensor now has a “reflectance” block (0–100: white about 90, black tape about 8). The playable challenge is the Physics Lab arena “Find the faded line” (/kids/lab/sim?demo=faded-line): dirty snow reads 70, the white pad 88, the black pad 10 and the faded line 40, so a calibrated threshold of 49 finds the line and a threshold of 30 copied from the lab drives straight over it. Watch for the classic bug: after reading the black pad the robot must drive off it before searching, or it “finds” the pad. The Skill Galaxy tuner “A worn-out line” is the practice.',
         'Real line sensors (an IR LED and a phototransistor) work exactly as the episode says: more reflected light, bigger reading.',
       ],
     }),

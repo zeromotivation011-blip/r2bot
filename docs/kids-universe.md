@@ -47,6 +47,9 @@ learning) and four difficulty tiers — **Cadet, Pilot, Ace, Legend** — so a
   recorder, battery, robot's-eye view" below.
 
 ## Navigation — one shell
+Calm mode shows a fixed "what's next" strip (`NextStripClient`, loaded by KidsShell only in Calm) on
+every ordinary page; its space is reserved by `html.kids-calm` before first paint.
+
 `app/kids/KidsShell.tsx` renders the tabs from `lib/kids/nav.ts` (the reasoning for the words is
 written there, roadmap #3). Phone tab bar, exactly five (`KIDS_TABS`): **Home · Learn · Worlds ·
 Games · Garage** (Learn = `/kids/course`, Garage = `/kids/hangar`; routes did not change).
@@ -196,6 +199,10 @@ Star total shown to children and grown-ups: `collectedStars()` (never `totalStar
 Backup without personal data: `exportProgressCode()` → `R2K1.<z|j>.<base64url>.<fnv1a>`
 and `importProgressCode()` (never throws, caps every field, merges with max/union, never
 lowers progress). UI: `components/kids/hangar/BackupCodeClient.tsx` (Hangar and Settings).
+`checkMisconceptions` (Wave 3): wrong check answers as `"<session>.<misconception id>" → count`
+(ids and counts only, capped at 60, default `{}`), written by `CheckStepClient` through
+`lib/kids/misconceptions/store.ts`; travels in the backup code (a restore keeps the higher count
+and drops bad keys and any free text).
 Checks: `lib/kids/progress-backup.verify.ts` (CI).
 
 ### Profiles — one device, several children (roadmap #41, #90)
@@ -216,7 +223,10 @@ Checks: `lib/kids/progress-backup.verify.ts` (CI).
   picker (Explorers unlock with a 3-picture password; older children may add one),
   `ParentProfilesClient` in the parent hub (Family / Shared device). At home adding a child asks
   a grown-up; on a shared tablet "Done" clears the device back to the picker. `/kids/join` binds
-  the class member to a profile (`bindClassMember()`).
+  the class member to a profile (`bindClassMember()`); a teacher's band lock also sets the active
+  profile's band (`applyClassBandToProfile()`).
+- `wipeNamespace` (shared tablet "Done") removes only `PROFILE_KEY_BASES` and swapped keys under
+  `::_none`, never another store's key that happens to end in `::_none`.
 - Play together (`lib/kids/together.ts`, `/kids/together`, noindex): the older child navigates,
   the younger drives; stars through `reportBestRun`, the partner's paid on their next turn.
 
@@ -325,8 +335,14 @@ leaderboards; no streak that punishes a missed day.
 - `RobotDesign.upgrades?` (power, motor, second sensor, arm, World form) in
   `lib/kids/robot-design.ts`; unlocked by badges, Code Lab missions and World game rounds
   (`lib/kids/robot-growth.ts`), never locked again. Old designs and 8-field share codes still
-  decode; a 9th field carries the upgrades (and so the backup code). Upgrades change the spec
-  sheet and visuals, not the sim physics (yet).
+  decode; a 9th field carries the upgrades (and so the backup code). Upgrades change the sim
+  physics: `fittedSpec(d)` in `lib/kids/sim/robot-spec.ts` (motor gearing and overload, pack/arm/2nd
+  sensor mass) drives the engine; course challenges strip upgrades (`sessionDesign`) so their
+  calibration holds. **One source of numbers:** `specSheet()` takes volts/amp-hours from
+  `packInfo(POWER_PACKS[id])`, mass/gearing from `MOTOR_GEARING`, `POWER_MASS_DELTA`, `ARM_MASS`, and a
+  ground robot's runtime and draw from `cruisePower(d)` (the engine's own drain constants, including
+  `moveAmpsPerSide` for tracks and legs) — change a number in robot-spec/battery, never a copy.
+  World forms (drone/sub/humanoid) are never simulated and keep a power-per-kg model.
 - `buildRobot(design, opts)` in `lib/kids/robot3d.ts` stays backwards-compatible; wiring is
   derived from parts (`lib/kids/robot-wiring.ts`). Volts/amps only for Inventors and Engineers.
 - `computeSensors` returns `beams[]` (all 20 echo rays). Sim pages pass `run.sim.sensors()`
@@ -344,7 +360,15 @@ leaderboards; no streak that punishes a missed day.
   `battery` only meters (physics and every existing result unchanged). Arenas may add
   `chargers` and the `visit-and-return` goal; fail reasons `flat`, `not-visited`. Sensor
   `battery_pct` (also accepted by Talk to your robot).
-- Games' own sims are not recorded yet.
+- Games' own sims are recorded too (#38): `lib/kids/sim/game-recorder.ts`. The game shell opens one
+  `GameRecorder` per round; a game adds ONE line after it steps its sim —
+  `recordGameFrame(t, { 'Height (m)': z, … })` (t in SECONDS of game time, ≤ 6 channels, 20 Hz) —
+  and `markGameMoment(t, 'Gust!')` for markers. The results card offers "Watch the Flight Recorder"
+  (`GameRecorderClient`, lazy). shell.verify lists the games that must record.
+- Sensor blocks `reflectance` (raw 0–100 under the line sensor) and `battery_pct` are curriculum
+  `BlockId`s introduced at Level 3; the Physics Lab and Power Lab open a demo with `?demo=<id>`
+  and games a tier with `?tier=` (links built by `lib/kids/sim/lab-links.ts`).
+- The sim meters the robot's own pack (`powerPack(d)` = its power upgrade).
 - **No black screens** (roadmap #16): `createStage()` in `components/kids/three/stage.ts` handles
   `webglcontextlost` with a "3D is resting" poster and "Try again"; when WebGL cannot start it shows
   the poster and throws `WebGLUnavailableError`. A view that builds its own `WebGLRenderer` calls
@@ -380,11 +404,16 @@ Each game:
 - is deterministic where it scores (seeded randomness), so a result is fair.
 
 ## Offline (roadmap #17)
-`public/kids-sw.js` (VERSION `r2bot-kids-v3`, scope /kids, registered by KidsShell in
-production). Install precaches 10 pages (/kids, hangar, settings, galaxy, course, worlds, play,
-and the sumo-arena, drone-hover and maze-mapper games) plus the JS/CSS each lists and the chunks
-they load on demand (read from Next's webpack chunk map; if that format changes they are cached
-on first use instead). Pages: network first, keyed by path (`?source=` ignored), saved copy after
+`public/kids-sw.js` (scope /kids, registered by KidsShell in production). Install precaches the
+five tabs, Galaxy, Settings, every "More" place except `/kids/ai`, the Story Theatre hub and every
+episode, Workshop, Code Lab and the labs (the list is `PRECACHE_PAGES`; `lib/kids/offline.verify.ts`
+fails CI if a tab, "More" place or episode is missing or a listed page does not exist), plus the
+JS/CSS each lists, the chunks they load on demand (read from Next's webpack chunk map, including
+spliced `"static/chunks/"+e+"-<hash>.js"` ids) and the fonts named in the CSS. **Deploy refresh:**
+the worker remembers the webpack runtime file's name; when a kids page from the network names a
+new one it re-runs the precache in the background (one at a time, at most every 10 minutes), so
+lazy chunks follow a deploy without a VERSION bump. No third-party request on /kids: GA is skipped
+and the Supabase preconnect is added by `components/SupabasePreconnectClient.tsx` only off /kids. Pages: network first, keyed by path (`?source=` ignored), saved copy after
 4 s or a 5xx; an unseen page gets a built-in offline page. Static: cache first. Episode audio:
 its own cache `r2bot-kids-audio-1` that a version bump keeps. Never cached: /api/*, RSC
 requests, /kids/classroom, /kids/join. Rename a precached game route → update `PRECACHE_PAGES`.
@@ -407,9 +436,16 @@ world lists come from `GAMES` and `WORLDS`. Before promoting a sample, give
   the same commit** (typed against every field, so type-check fails otherwise). The Trust Pack is what
   schools read.
 - Misconceptions: `CheckStepClient` gets `sessionKey={session.id}`; a wrong option carrying `misconception`
-  calls `recordMisconception()` (`lib/kids/classroom-diary.ts`, only while the child is in a class).
-  Level 1 options carry no ids yet. Class Mind Map and "Where to help next" show an item only when 2+
-  children share it.
+  calls `recordMisconception()` (`lib/kids/classroom-diary.ts`, only while the child is in a class) and
+  the device record (`checkMisconceptions`, always). Every level's ids live in one typed catalogue,
+  `lib/kids/misconceptions/` (idea, correction, child words, 5-minute reteach); `QuizOption.misconception`
+  is typed. Class Mind Map and "Where to help next" show an item only when 2+ children share it, each
+  with a "Re-teach it" box. Check: `lib/kids/misconceptions/verify.ts` (CI).
+- **Teacher band lock** (roadmap #29, migration 0058): `kids_classes.band_locked`,
+  `kids_class_members.band_lock`; PATCH `band-lock-class` / `band-lock-member`; `/api/kids/sync` returns
+  `lockedBand` and the device applies it (`saveProgress({ band })` + the active profile). Band pickers
+  read `classBandLock()` and say "Your teacher chose …" instead of changing it. Before 0058 runs the
+  PATCH answers 503 and the panel says the feature is being switched on.
 - Gradebook: children × concepts in roster order (never ranked), evidence on tap, CSV/PDF.
   `/kids/teach/standards` (indexable) from `lib/kids/classroom-standards.ts`.
 - Class Power-Up (`lib/kids/classroom-goal.ts`, pure): one meter, milestones 25/50/75/100, "who helped"
@@ -454,7 +490,8 @@ world lists come from `GAMES` and `WORLDS`. Before promoting a sample, give
 Random words + number (e.g. CHEETAH-NOVA-BALLOON-89) and a QR (`/kids/hangar#passport=…`); the
 server stores only the SHA-256 of the canonical words plus the same backup code the offline path
 makes (progress + nicknames). Service-role only, RLS on with no policies, rate limited, deleted
-after 400 days unused. Print and Delete go through `requireGrownUp()`. Until 0057 runs the route
+after 400 days unused. Print and Delete go through `requireGrownUp()`. Delete is one function,
+`components/kids/hangar/passport-delete.ts`, used by the Garage and the Parents page. Until 0057 runs the route
 answers 503 and the offline backup code opens by itself. The device copy is
 `profileKey('r2bot_kids_passport_v1')` (per child). Check: `lib/kids/passport.verify.ts` (CI).
 

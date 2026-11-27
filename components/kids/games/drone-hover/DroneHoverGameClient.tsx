@@ -29,6 +29,7 @@ import {
 } from './sim'
 import { Fx, makeView, drawWorld, dronePixel, type View } from './render'
 import { drawPlot, PLOT_COLORS } from './plot'
+import { markGameMoment, recordGameFrame } from '@/lib/kids/sim/game-recorder'
 
 interface Props {
   tier: number
@@ -493,6 +494,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
       for (const ev of s.events) {
         switch (ev.kind) {
           case 'payload-on':
+            markGameMoment(s.t, 'Parcel on')
             playSound('click')
             showToast(`📦 Parcel clipped on: +${ev.mass} kg — heavier now!`)
             break
@@ -505,10 +507,12 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
             }
             break
           case 'target':
+            markGameMoment(s.t, 'New target')
             playSound('click')
             showToast(`🎯 New target: ${ev.z} m`)
             break
           case 'gust':
+            markGameMoment(s.t, 'Gust!')
             showToast(Math.abs(ev.vx) > Math.abs(ev.vz) ? `💨 Side gust ${ev.vx > 0 ? '→' : '←'} ${Math.abs(ev.vx).toFixed(0)} m/s` : ev.vz < 0 ? '💨 Downdraft! Air pushing down' : '💨 Updraft! Air pushing up')
             break
           case 'waypoint':
@@ -551,6 +555,10 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
           if (s.outcome !== 'flying') break
         }
         handleEvents(s)
+        {
+          const L = s.log[s.log.length - 1]
+          if (L) recordGameFrame(L.t, { 'Height (m)': L.z, 'Target (m)': L.zt, 'Thrust (N)': L.thrust, 'Weight (N)': L.weight })
+        }
         if (s.outcome !== 'flying') endFlight(s)
       } else {
         acc = 0

@@ -8,7 +8,9 @@
 // the class receives only COUNTS ("L2-S04.taller-is-stronger": 2). Here they
 // become "9 of 28 think a taller robot carries more without tipping: run the
 // 5-minute reteach in the Session 4 guide", grouped under the concept they
-// belong to. Shown only when 2+ children share it.
+// belong to, with a re-teach suggestion: the unplugged lesson (Level 1) or the
+// guide's unplugged warm-up, the episode to replay, and (Level 1) words to say
+// to the class. Shown only when 2+ children share it.
 //
 // Where to help next: course challenges, Skill Galaxy activities by track,
 // course checks, Spark Trail levels, Code Lab one-star solves, game tiers and
@@ -48,7 +50,7 @@ export function ClassMindMapClient({ members, catalogue, projector = false }: Cl
       ) : nodes.length === 0 ? (
         <div className="mt-4 rounded-[20px] border border-dashed border-white/15 bg-white/[0.02] p-6 text-center">
           <p className="text-slate-200">No shared misconceptions yet.</p>
-          <p className="mt-1 text-sm text-slate-400">They appear after course sessions’ three-question checks (Levels 2–4), once two children choose the same idea.</p>
+          <p className="mt-1 text-sm text-slate-400">They appear after course sessions’ three-question checks (all four levels), once two children choose the same idea.</p>
         </div>
       ) : (
         <ol className="mt-5 grid gap-4 lg:grid-cols-2">
@@ -71,6 +73,27 @@ export function ClassMindMapClient({ members, catalogue, projector = false }: Cl
                         <div className="h-full rounded-full bg-cyan-400" style={{ width: `${Math.round((it.children / Math.max(1, size)) * 100)}%` }} />
                       </div>
                       <p className="mt-1 text-xs text-slate-400">{it.reached} have reached {it.session}. The answer that reveals it: “{it.answer}”.</p>
+                      {!projector && (it.unplugged || it.episode) && (
+                        <div className="mt-2 rounded-2xl border border-amber-400/25 bg-amber-500/[0.06] p-3">
+                          <p className="text-xs font-bold uppercase tracking-wider text-amber-300">Re-teach it</p>
+                          <ul className="mt-1 flex flex-wrap gap-2">
+                            {it.unplugged && (
+                              <li>
+                                <Link href={it.unplugged.href} className="inline-flex min-h-[44px] items-center rounded-xl bg-amber-500 px-3 text-sm font-bold text-[#1A1103] hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60">
+                                  <span aria-hidden className="mr-1">✂️</span>{it.unplugged.title}
+                                </Link>
+                              </li>
+                            )}
+                            {it.episode && (
+                              <li>
+                                <Link href={it.episode.href} className="inline-flex min-h-[44px] items-center rounded-xl border border-white/15 px-3 text-sm font-bold text-slate-100 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60">
+                                  <span aria-hidden className="mr-1">🎬</span>Replay: {it.episode.title}
+                                </Link>
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
                       {!projector && (
                         <div className="mt-2 flex flex-wrap gap-2">
                           <button
@@ -90,7 +113,12 @@ export function ClassMindMapClient({ members, catalogue, projector = false }: Cl
                       )}
                       {(expanded || projector) && (
                         <div className="mt-2 rounded-2xl bg-white/[0.04] p-3 text-[15px] leading-relaxed text-slate-200">
-                          <p><strong className="text-white">The accurate idea:</strong> {it.correction}</p>
+                          {projector && it.childWords ? (
+                            <p><strong className="text-white">Let’s think again:</strong> {it.childWords}</p>
+                          ) : (
+                            <p><strong className="text-white">The accurate idea:</strong> {it.correction}</p>
+                          )}
+                          {it.childWords && !projector && <p className="mt-2"><strong className="text-white">Say it like this:</strong> “{it.childWords}”</p>}
                           {it.reteach && !projector && <p className="mt-2"><strong className="text-white">5-minute reteach:</strong> {it.reteach}</p>}
                         </div>
                       )}

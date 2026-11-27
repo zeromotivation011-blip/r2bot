@@ -16,6 +16,7 @@ import { TRACKS } from '../../activities/types'
 import { getGame } from '../../universe/worlds'
 import { getMission } from '../../code-lab/missions'
 import { DEMOS } from '../../sim/demos'
+import { POWER_DEMOS } from '../../sim/power-demos'
 import { getPart } from '../../robot-design'
 import { levelByNumber } from '../levels'
 import type { Session } from '../types'
@@ -28,6 +29,7 @@ import { LEVEL3_GUIDE } from './guide'
 import { LEVEL4_SESSIONS } from '../level4'
 import { LEVEL4_REUSE } from '../level4/reuse'
 import { LEVEL4_GUIDE } from '../level4/guide'
+import { gameTierHref, labDemoHref } from '../../sim/lab-links'
 
 /** Last time the Level 3–4 guides' wording or structure changed (for the sitemap's lastmod). */
 export const L34_GUIDES_UPDATED = '2026-11-27'
@@ -66,12 +68,12 @@ function playOf(r: SessionReuse | undefined): TeacherGuideL34['play'] {
   switch (p.kind) {
     case 'game': {
       const g = getGame(p.id)
-      return { title: `${g?.name ?? p.id} — ${TIER_LABEL[p.tier]} tier`, detail: p.goal, href: `/kids/play/${p.id}` }
+      return { title: `${g?.name ?? p.id} — ${TIER_LABEL[p.tier]} tier`, detail: p.goal, href: gameTierHref(p.id, p.tier) }
     }
     case 'code-lab':
       return { title: `Code Lab: ${getMission(p.id)?.title ?? p.id}`, detail: p.goal, href: `/kids/code-lab/${p.id}` }
     case 'sim-demo':
-      return { title: `Physics Lab: ${DEMOS.find((d) => d.id === p.id)?.title ?? p.id}`, detail: p.goal, href: '/kids/lab/sim' }
+      return { title: `${p.id.startsWith('power-') ? 'Power Lab' : 'Physics Lab'}: ${[...DEMOS, ...POWER_DEMOS].find((d) => d.id === p.id)?.title ?? p.id}`, detail: p.goal, href: labDemoHref(p.id) }
     case 'activity': {
       const a = ALL_ACTIVITIES.find((x) => x.id === p.id)
       return { title: `Skill Galaxy: ${a?.title ?? p.id}`, detail: p.goal, href: trackHref(p.id) }

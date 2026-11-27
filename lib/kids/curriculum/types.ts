@@ -48,10 +48,12 @@ export type BlockId =
   | 'distance_cm' // needs Distance Eyes or Camera Eye
   | 'line_seen' // boolean — needs Line Sensor
   | 'line_offset' // −1…1 — needs Line Sensor
+  | 'reflectance' // 0–100 raw brightness under the line sensor — needs Line Sensor (Level 3)
   | 'floor_color' // needs Colour Sensor or Camera Eye
   | 'bumped' // boolean — needs Bumper Switch
   | 'heading_deg' // gyro, built in
   | 'timer_s' // built in
+  | 'battery_pct' // 0–100 % charge left — every robot (Level 3)
   // Control
   | 'repeat' // (n) { }
   | 'repeat_until' // (cond) { }
@@ -88,10 +90,12 @@ export const BLOCK_NEEDS: Record<BlockId, Capability | null> = {
   distance_cm: 'see-wall',
   line_seen: 'follow-line',
   line_offset: 'follow-line',
+  reflectance: 'follow-line',
   floor_color: 'see-color',
   bumped: 'feel-bump',
   heading_deg: null,
   timer_s: null,
+  battery_pct: null,
   repeat: null,
   repeat_until: null,
   forever: null,
@@ -340,6 +344,12 @@ export interface QuizOption {
   text: string
   /** Emoji / icon so a non-reader can answer. */
   icon: string
+  /**
+   * For a wrong option: the misconception id it reveals (a key of the level's
+   * misconception catalogue, see lib/kids/misconceptions/). Wrong picks are
+   * counted on the device and, in a class, sent as counts only.
+   */
+  misconception?: string
 }
 
 export interface QuizQuestion {

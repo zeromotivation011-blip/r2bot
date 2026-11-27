@@ -180,7 +180,7 @@ Build these exceptionally; everything else is secondary.
   number; only games with a built page go in `GAMES`; the phone tab bar is five: Home · Learn · Worlds · Games · Garage, from `KIDS_TABS` in `lib/kids/nav.ts`; the XP number is a "Rank", "Level" means a course level), **Course** `/kids/course/<1-4>` (all four
 levels written; level pages indexable, session pages noindex; teacher guides for every session at `/kids/teach`),
 **Robodex** `/kids/robodex` (real-robot cards earned only by doing), **Makers** `/kids/careers` (count from `MAKERS`),
-**Power Lab** `/kids/lab/power` (battery model; sim runs have a Flight Recorder),
+**Power Lab** `/kids/lab/power` (battery model; sim runs and the games' own sims have a Flight Recorder; the spec sheet's runtime is the sim's),
 **Make It at Home** `/kids/printables` + `/kids/printables/<id>` (count from `HOME_BUILDS`; `/kids/activities` 308s there),
 **Robot Passport** (optional server copy under a SHA-256 of random words, migration 0057, route `app/api/kids/passport`), **Robot Maths** `/kids/maths`, **Link Lab** `/kids/lab/network` (+ `/guardian` security check), the Engineers' **R2BOT Lab look** (`lib/kids/teen.ts`, `html[data-kids-look]`), one gated grown-up door `/kids/grown-ups` (the only grown-up link in the kids footer),
 **Portfolio** `/kids/portfolio` (noindex, device-only, certificates), **teacher tools** under `/kids/teach` (standards, Trust Pack,
@@ -189,7 +189,7 @@ The class snapshot is counts only; changing `ClassSnapshot` means updating `lib/
   **Garage** `/kids/hangar` (the robot's one home: rename, robot card, Spark Trail parts fitted to the real robot;
   `/kids/my-robot` 308s there), **Parents** `/kids/parents` (public explainer; behind the parental gate a hub with the
   week in plain words and device-only controls in `lib/kids/parent-controls.ts` — daily time and quiet hours as gentle
-  banners, never a lock; Ask Spark / camera / outbound-link switches), **Classroom** `/kids/classroom` (teacher, noindex),
+  banners, never a lock; Ask Spark / camera / outbound-link switches), **Classroom** `/kids/classroom` (teacher, noindex; a teacher can lock a child's band, migration 0058),
   `/kids/join` (child joins with code + nickname, noindex) and `/kids/schools` (indexable pitch + pilot form
   through `captureLead()`). One robot shape (`RobotDesign`) and one progress store (`lib/kids-progress.ts`,
   fires `KIDS_PROGRESS_EVENT`) for all of it. XP, badges and quests come ONLY from `reportActivity` in

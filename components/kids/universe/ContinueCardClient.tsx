@@ -12,6 +12,7 @@
 //     practise; and a game at the right tier (the next tier they have not won,
 //     or their band's tier), opened on that tier with ?tier=.
 //   - Ages 5–7 get one simple extra: a game that fits, on Cadet.
+//   - Ages 14–17 also get "Next step" → /kids/next-step (Graduate to R2BOT).
 // Session titles come from the curriculum on the server (passed in), so this
 // island stays small.
 
@@ -39,7 +40,7 @@ export interface Mission {
 }
 
 export interface MissionExtra {
-  kind: 'recharge' | 'almost' | 'game' | 'season'
+  kind: 'recharge' | 'almost' | 'game' | 'season' | 'graduate'
   href: string
   icon: string
   /** Short chip, e.g. "Recharge". */
@@ -68,6 +69,9 @@ function extrasFor(p: KidsProgress, band: BandId): MissionExtra[] {
     }
   }
   out.push(gameExtra(p, band))
+  // Engineers (14–17): the way out of the kids' screens into the rest of R2BOT
+  // (roadmap #35, /kids/next-step: noindex, matched to their secured concepts).
+  if (band === 'engineers') out.push({ kind: 'graduate', href: '/kids/next-step', icon: '🎓', chip: 'Next step', label: 'Your skills, mapped to real R2BOT lessons and projects.' })
   return out
 }
 

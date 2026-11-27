@@ -66,6 +66,7 @@ export function defineBlocks(): void {
     reporter('distance_cm', '👀 distance cm', 'Number', 'How far the nearest thing ahead is, in centimetres. Needs Distance Eyes or a Camera Eye.'),
     reporter('line_seen', '〰️ line seen?', 'Boolean', 'True when the line sensor sees the black line. Needs a Line Sensor.'),
     reporter('line_offset', '〰️ line offset', 'Number', 'From -1 (line is to the left) to 1 (line is to the right). Needs a Line Sensor.'),
+    reporter('reflectance', '〰️ reflectance', 'Number', 'How much light bounces back under the line sensor, 0–100: white about 90, black tape about 8, a faded line in between. Needs a Line Sensor.'),
     reporter('floor_color', '🎨 floor colour', 'String', 'The colour of the floor. Needs a Colour Sensor or a Camera Eye (a camera needs light!).'),
     reporter('bumped', '🛡️ bumped?', 'Boolean', 'True while the bumper is pressed. Needs a Bumper Switch.'),
     reporter('heading_deg', '🧭 heading °', 'Number', 'Which way the robot faces, 0–360, from the built-in gyro.'),
@@ -249,7 +250,7 @@ const DEFAULT_INPUTS: Record<string, Record<string, Shadow>> = {
 
 const GROUPS: { name: string; colour: string; ids: string[] }[] = [
   { name: '🚗 Move', colour: STYLE_COLOURS.motion_blocks, ids: ['drive_for', 'drive_distance', 'turn_degrees', 'set_motors', 'stop', 'wait'] },
-  { name: '👀 Sense', colour: STYLE_COLOURS.sensor_blocks, ids: ['distance_cm', 'line_seen', 'line_offset', 'floor_color', 'bumped', 'heading_deg', 'timer_s', 'battery_pct'] },
+  { name: '👀 Sense', colour: STYLE_COLOURS.sensor_blocks, ids: ['distance_cm', 'line_seen', 'line_offset', 'reflectance', 'floor_color', 'bumped', 'heading_deg', 'timer_s', 'battery_pct'] },
   { name: '🔁 Control', colour: STYLE_COLOURS.control_blocks, ids: ['repeat', 'repeat_until', 'forever', 'if', 'if_else', 'compare', 'and', 'or', 'not'] },
   { name: '🔢 Maths', colour: STYLE_COLOURS.math_blocks, ids: ['number', 'text', 'math', 'set_var', 'change_var', 'get_var'] },
   { name: '✋ Do', colour: STYLE_COLOURS.action_blocks, ids: ['grip_open', 'grip_close', 'pen_down', 'pen_up', 'light_on', 'light_off', 'say', 'beep'] },

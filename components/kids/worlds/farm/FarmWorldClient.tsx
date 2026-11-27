@@ -16,6 +16,8 @@ import { getActivitiesDone, type ActivitiesDone } from '@/lib/kids/activities/pr
 import { KIDS_PROGRESS_EVENT, getProgress } from '@/lib/kids-progress'
 import { TIER_NAMES } from '@/lib/kids/universe/tiers'
 import { fireConfetti } from '@/components/kids/Confetti'
+// Calm mode (roadmap #89): no bouncing or pulsing of the world's own (fireConfetti already stops itself).
+import { useKidsCalm } from '@/lib/kids/settings'
 
 export interface FarmActivity {
   id: string
@@ -122,6 +124,7 @@ export function FarmActivities({ bands, gameId }: { bands: FarmBand[]; gameId: s
 const CROPS = ['🌱', '🌿', '🥬', '🌽', '🍅', '🥕']
 
 export function FarmProgressCard({ ids, gameId }: { ids: string[]; gameId: string }) {
+  const calm = useKidsCalm()
   const { done, tiers, name, ready } = useFarmProgress(gameId)
   const n = ids.filter((id) => done[id]).length
   const stars = ids.reduce((t, id) => t + (done[id]?.stars ?? 0), 0)
@@ -154,7 +157,7 @@ export function FarmProgressCard({ ids, gameId }: { ids: string[]; gameId: strin
         <ol className="mt-3 grid grid-cols-6 gap-1 rounded-2xl bg-[#3b2a1c] p-2" aria-label={`${n} of ${ids.length} plots grown`}>
           {ids.map((id, i) => (
             <li key={id} className={`flex aspect-square items-center justify-center rounded-lg text-lg ${done[id] ? 'bg-lime-700/50' : 'bg-[#2a1d12]'}`} aria-hidden>
-              <span className={done[id] ? 'motion-safe:animate-[pulse_1.2s_ease-in-out_1]' : 'opacity-25'}>{done[id] ? CROPS[i % CROPS.length] : '·'}</span>
+              <span className={done[id] ? (calm ? '' : 'motion-safe:animate-[pulse_1.2s_ease-in-out_1]') : 'opacity-25'}>{done[id] ? CROPS[i % CROPS.length] : '·'}</span>
             </li>
           ))}
         </ol>
@@ -180,7 +183,7 @@ export function FarmProgressCard({ ids, gameId }: { ids: string[]; gameId: strin
 
       {complete ? (
         <section aria-labelledby="farm-cert" className="relative overflow-hidden rounded-[28px] border-2 border-amber-300/70 bg-gradient-to-br from-yellow-400 via-green-700 to-[#0A1120] p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,.45)]">
-          <p aria-hidden className="text-5xl motion-safe:animate-bounce">
+          <p aria-hidden className={`text-5xl ${calm ? '' : 'motion-safe:animate-bounce'}`}>
             🚜
           </p>
           <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-yellow-50">World complete</p>

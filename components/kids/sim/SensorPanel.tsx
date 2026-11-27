@@ -58,7 +58,9 @@ export default function SensorPanel({ live, caps }: { live: WorkbenchLiveState; 
             <span key={i} className={`h-4 w-4 rounded-full border border-white/30 ${on ? 'bg-amber-300 shadow-[0_0_8px_#fcd34d]' : 'bg-white/10'}`} />
           ))}
         </div>
-        <p className="mt-1 text-xs font-bold tabular-nums text-slate-200">offset {(s?.lineOffset ?? 0).toFixed(2)}</p>
+        <p className="mt-1 text-xs font-bold tabular-nums text-slate-200">
+          offset {(s?.lineOffset ?? 0).toFixed(2)} · reflectance {s?.reflectance ?? '—'}
+        </p>
       </Card>
 
       <Card title="🎨 Floor colour" off={!caps.has('see-color')} need="see-color">

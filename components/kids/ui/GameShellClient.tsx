@@ -11,8 +11,23 @@
 // the child has touched the game, the round counts as unsaved work: Exit, any
 // other link on the page and a tier change ask first (useLeaveGuard), so a
 // stray tap can no longer wipe a half-built round.
+//
+// Flight Recorder (roadmap #38): the shell opens one GameRecorder per round
+// (lib/kids/sim/game-recorder.ts). A game whose sim loop has numbers worth
+// seeing calls recordGameFrame(t, {...}) / markGameMoment(t, '…') — one line,
+// no props — and the results card offers the graphs with a scrubber.
+//
+// Phones: the kids tab bar is not drawn on /kids/play/* (KidsShell GAME_ROUTE),
+// so nothing fixed sits over the game's controls; the shell's own bottom padding
+// clears the home indicator (env(safe-area-inset-bottom)).
+//
+// The results card, "How to play" and the leave dialog are portalled to <body>:
+// inside <main class="kids-main"> (its own z-index stacking context) the kids
+// footer, which comes later in the page, painted over the results card on phones.
 
+import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { ExitButton, useLeaveGuard } from './LeaveGuardClient'
 import type { UniverseGame } from '@/lib/kids/universe/worlds'
 import { reportBestRun, type RewardResult } from '@/lib/kids/universe/rewards'
@@ -20,6 +35,13 @@ import { getProgress } from '@/lib/kids-progress'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { fireConfetti } from '@/components/kids/Confetti'
 import { TIER_NAMES } from '@/lib/kids/universe/tiers'
+import { GameRecorder, hasRecording, setActiveGameRecorder, type GameRecording } from '@/lib/kids/sim/game-recorder'
+
+// Loaded only when a child opens it on the results card.
+const GameRecorderPanel = dynamic(() => import('@/components/kids/sim/GameRecorderClient'), {
+  ssr: false,
+  loading: () => <div className="mt-4 h-40 animate-pulse rounded-2xl bg-white/5" aria-hidden />,
+})
 
 // Re-exported so existing game imports keep working; the list lives in a plain module.
 export { TIER_NAMES }
@@ -62,7 +84,23 @@ export function GameShell({ game, howToPlay, lesson, exitHref = '/kids/play', ch
   const [tier, setTier] = useState(0)
   const [round, setRound] = useState(0)
   const [help, setHelp] = useState(false)
-  const [result, setResult] = useState<{ round: RoundResult; reward: RewardResult | null; best?: number } | null>(null)
+  const [result, setResult] = useState<{ round: RoundResult; reward: RewardResult | null; best?: number; rec: GameRecording | null } | null>(null)
+  const [showRec, setShowRec] = useState(false)
+  // Dialogs render into <body> (see the header note); only after mount, so SSR never touches document.
+  const [portalOk, setPortalOk] = useState(false)
+  useEffect(() => setPortalOk(true), [])
+  const toBody = (node: ReactNode) => (portalOk ? createPortal(node, document.body) : null)
+  // One recording per round; games write to it through recordGameFrame() (no props).
+  const recRef = useRef<GameRecorder | null>(null)
+  useEffect(() => {
+    const r = new GameRecorder()
+    recRef.current = r
+    setActiveGameRecorder(r)
+    return () => {
+      setActiveGameRecorder(null)
+      recRef.current = null
+    }
+  }, [game.id, tier, round])
   const helpBtn = useRef<HTMLButtonElement>(null)
   // Unsaved work: the child has touched this round and it has no result yet.
   const [dirty, setDirty] = useState(false)
@@ -146,13 +184,15 @@ export function GameShell({ game, howToPlay, lesson, exitHref = '/kids/play', ch
         playSound('wrong')
       }
       setDirty(false)
-      setResult({ round: r, reward, best: reward ? undefined : best })
+      const snap = recRef.current?.snapshot() ?? null
+      setShowRec(false)
+      setResult({ round: r, reward, best: reward ? undefined : best, rec: hasRecording(snap) ? snap : null })
     },
     [game.id, tier],
   )
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-3 px-3 pb-6 pt-3 sm:px-4">
+    <div className="mx-auto flex max-w-6xl flex-col gap-3 px-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 sm:px-4">
       <div className="flex flex-wrap items-center gap-2">
         <ExitButton href={exitHref} onExit={guard.requestLeave} />
         <h1 className="flex items-center gap-2 text-xl font-black text-white sm:text-2xl">
@@ -189,7 +229,7 @@ export function GameShell({ game, howToPlay, lesson, exitHref = '/kids/play', ch
       <div className="relative" onPointerDownCapture={markDirty} onKeyDownCapture={markDirty}>
         {children({ tier, round, finish, restart })}
 
-        {result && (
+        {result && toBody(
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A1120]/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Round results">
             <div className="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl border-2 border-amber-300/50 bg-gradient-to-b from-[#19263F] to-[#0A1120] p-6 text-center shadow-2xl">
               <p className="text-4xl" aria-label={`${result.round.stars} stars`}>
@@ -225,6 +265,20 @@ export function GameShell({ game, howToPlay, lesson, exitHref = '/kids/play', ch
                   )}
                 </div>
               )}
+              {result.rec && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowRec((v) => !v)}
+                    aria-expanded={showRec}
+                    data-testid="open-recorder"
+                    className="mt-4 min-h-[48px] w-full rounded-2xl border border-white/15 bg-white/5 px-4 text-sm font-black text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+                  >
+                    📼 {showRec ? 'Hide the Flight Recorder' : 'Watch the Flight Recorder'}
+                  </button>
+                  {showRec && <GameRecorderPanel rec={result.rec} />}
+                </>
+              )}
               <div className="mt-5 flex flex-wrap justify-center gap-2">
                 <button type="button" onClick={restart} className="min-h-[48px] rounded-2xl bg-amber-400 px-5 font-black text-[#1A1103]">
                   {result.round.stars > 0 ? 'Play again' : 'Try again'}
@@ -247,7 +301,7 @@ export function GameShell({ game, howToPlay, lesson, exitHref = '/kids/play', ch
         )}
       </div>
 
-      {help && (
+      {help && toBody(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A1120]/80 p-4" role="dialog" aria-modal="true" aria-label="How to play">
           <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-white/15 bg-[#19263F] p-6 text-white">
             <h2 className="text-2xl font-black">
@@ -273,7 +327,7 @@ export function GameShell({ game, howToPlay, lesson, exitHref = '/kids/play', ch
           </div>
         </div>
       )}
-      {guard.dialog}
+      {guard.dialog && toBody(guard.dialog)}
     </div>
   )
 }

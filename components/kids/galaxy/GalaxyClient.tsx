@@ -53,7 +53,19 @@ export function MasteryRing({ pct, track, size = 56 }: { pct: number; track: Tra
   )
 }
 
-export function BandPicker({ band, onPick, label }: { band: BandId | null; onPick: (b: BandId) => void; label: string }) {
+export function BandPicker({ band, onPick, label, locked = null }: { band: BandId | null; onPick: (b: BandId) => void; label: string; locked?: BandId | null }) {
+  const lockedInfo = locked ? getBand(locked) : null
+  if (lockedInfo)
+    return (
+      <p className="flex min-h-[52px] items-center gap-2 rounded-2xl border border-cyan-400/30 bg-[#111C32] px-3 text-[15px] text-[#EEF2F8]" data-testid="band-locked">
+        <span className="text-xl" aria-hidden>
+          {lockedInfo.emoji}
+        </span>
+        <span>
+          Your teacher chose <strong className="font-display">{lockedInfo.name}</strong> (ages {lockedInfo.ages}).
+        </span>
+      </p>
+    )
   return (
     <div role="radiogroup" aria-label={label} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       {KIDS_BANDS.map((b) => {
@@ -104,7 +116,7 @@ export function ShowAllToggle({ on, onChange }: { on: boolean; onChange: (v: boo
 const HUB_WINDOW = 16
 
 export default function GalaxyClient({ summaries }: { summaries: ActivitySummary[] }) {
-  const { ready, done, band, setBand } = useGalaxyState()
+  const { ready, done, band, lockedBand, setBand } = useGalaxyState()
   const mastery = useMastery()
   const [showAll, setShowAll] = useState(false)
   const effectiveBand: BandId = band ?? 'builders'
@@ -160,7 +172,7 @@ export default function GalaxyClient({ summaries }: { summaries: ActivitySummary
           </dl>
         </div>
         <div className="mt-4">
-          <BandPicker band={band} onPick={setBand} label="Your age band" />
+          <BandPicker band={band} onPick={setBand} label="Your age band" locked={lockedBand} />
         </div>
         {band && (
           <div className="mt-2">

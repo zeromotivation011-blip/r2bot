@@ -31,6 +31,16 @@
 // dynamic chunks found at install) are recorded in a small JSON entry in the PAGES cache
 // (KEEP_KEY) and never trimmed. A precached page's entry is refreshed whenever its HTML is
 // saved again, so after a deploy the list follows the new chunks.
+//
+// Deploys: kids-sw.js is a static file, so a web deploy does NOT reinstall the worker, and the
+// lazy chunks found at install (3D scenes, game engines, Blockly) would stay the old build's
+// until the next reinstall: offline, a precached page saved after the deploy would ask for a
+// chunk that was never saved. So the worker remembers the build it precached: the URL of the
+// webpack runtime chunk (webpack-<contenthash>.js), which changes whenever any lazy chunk
+// changes because the runtime carries every lazy chunk's content hash. Each kids page that
+// comes back from the network is read for its runtime URL; a different one means a deploy,
+// and the whole precache runs again in the background (pages re-fetched, lazy chunks
+// re-resolved and saved, keep-list rewritten). See KEEP_BUILD and refreshAfterDeploy().
 
 const VERSION = 'r2bot-kids-v3'
 const PAGES = `${VERSION}-pages`
@@ -40,24 +50,54 @@ const STATIC = `${VERSION}-static`
 const AUDIO = 'r2bot-kids-audio-1'
 const CURRENT = [PAGES, STATIC, AUDIO]
 
-const PAGES_MAX = 40
+const PAGES_MAX = 60 // includes the precached pages (never evicted), so leave room above them
 const STATIC_MAX = 200 // hashed chunks + icons; every deploy adds new ones, oldest go first
 const AUDIO_MAX = 2000
 const NAV_TIMEOUT_MS = 4000
 const KEEP_KEY = new URL('/kids/__sw-keep.json', self.location.origin).href
+// Key in the keep-list holding [the webpack runtime URL of the precached build].
+const KEEP_BUILD = '#build'
+// A failed or format-changed refresh must not loop on every navigation.
+const REFRESH_MIN_GAP_MS = 10 * 60 * 1000
 
-// The shell: home, Hangar, Settings, Galaxy, course, worlds, games hub and the flagship games.
+// The shell: the five tabs (Home, Learn, Worlds, Games, Garage), the Galaxy, Settings, every
+// place in the "More" menu (lib/kids/nav.ts KIDS_MORE) that runs on the device, the flagship
+// games, and every Story Theatre episode (all eight share one engine, so each costs only its
+// HTML; voice clips are saved the first time an episode plays). Online-only places are left
+// out on purpose: /kids/ai (Talk to your robot / Ask Spark AI need the network; the hub is
+// saved on first visit like any page), classroom/join (never saved), grown-up pages.
+// lib/kids/offline.verify.ts (CI) checks this list against the app routes, the nav and
+// lib/kids/stories, so a new place or episode cannot silently miss the offline app.
 const PRECACHE_PAGES = [
   '/kids',
-  '/kids/hangar',
-  '/kids/settings',
-  '/kids/galaxy',
   '/kids/course',
   '/kids/worlds',
   '/kids/play',
+  '/kids/hangar',
+  '/kids/galaxy',
+  '/kids/settings',
   '/kids/play/sumo-arena',
   '/kids/play/drone-hover',
   '/kids/play/maze-mapper',
+  '/kids/stories',
+  '/kids/stories/what-makes-a-robot',
+  '/kids/stories/spark-gets-lost',
+  '/kids/stories/robot-that-couldnt-see',
+  '/kids/stories/loop-de-loop-garden',
+  '/kids/stories/traffic-light-robot',
+  '/kids/stories/wobbly-bot',
+  '/kids/stories/line-follower-race',
+  '/kids/stories/rover-on-mars',
+  '/kids/workshop',
+  '/kids/code-lab',
+  '/kids/spark-trail',
+  '/kids/lab/sim',
+  '/kids/lab/power',
+  '/kids/lab/network',
+  '/kids/maths',
+  '/kids/robodex',
+  '/kids/careers',
+  '/kids/printables',
 ]
 const PRECACHE_ASSETS = ['/kids-icon.svg', '/kids-icon-192.png', '/kids/manifest.webmanifest']
 
@@ -130,16 +170,20 @@ async function page(event, url) {
     if (saveable(url, res)) {
       const copy = res.clone()
       const path = new URL(key).pathname
-      const scan = PRECACHE_PAGES.includes(path) ? res.clone() : null
+      const scan = res.clone()
       event.waitUntil(
         cache
           .put(key, copy)
           .then(() => trim(cache, PAGES_MAX, [...PRECACHE_PAGES.map(abs), KEEP_KEY]))
           .then(async () => {
-            if (!scan) return
             const html = await scan.text()
+            const assets = assetsIn(html)
             const keep = await readKeep()
-            await writeKeep({ ...keep, [path]: assetsIn(html) })
+            const build = runtimeIn(assets)
+            const saved = keep[KEEP_BUILD] && keep[KEEP_BUILD][0]
+            // A different build than the one precached: a deploy happened since install.
+            if (build && build !== saved) return refreshAfterDeploy()
+            if (PRECACHE_PAGES.includes(path)) await writeKeep({ ...keep, [path]: assets })
           })
           .catch(() => undefined),
       )
@@ -238,6 +282,25 @@ function assetsIn(html) {
   return [...out]
 }
 
+// The webpack runtime chunk named in a page's HTML: the build fingerprint (see top).
+function runtimeIn(assets) {
+  return assets.find((u) => /\/static\/chunks\/webpack-[^/]+\.js$/.test(u)) || null
+}
+
+let refreshing = null
+let lastRefresh = 0
+function refreshAfterDeploy() {
+  if (refreshing) return refreshing
+  if (Date.now() - lastRefresh < REFRESH_MIN_GAP_MS) return Promise.resolve()
+  lastRefresh = Date.now()
+  refreshing = precache()
+    .catch(() => undefined)
+    .finally(() => {
+      refreshing = null
+    })
+  return refreshing
+}
+
 function abs(path) {
   return new URL(path, self.location.origin).href
 }
@@ -248,11 +311,15 @@ function abs(path) {
 // 'static/chunks/…'. Both are normalised to '/_next/static/…'.
 const ASSET_RE = /(?:\/_next\/)?static\/(?:chunks|css|media)\/[^"'\s<>()\\]+?\.(?:js|css|woff2)/g
 
+// Runs on install and again after a deploy (refreshAfterDeploy). Pages that cannot be fetched
+// this time (offline mid-way) keep their old copy AND their old keep-list entries, so a
+// half-finished refresh never strands a saved page without its chunks.
 async function precache() {
   const pages = await caches.open(PAGES)
   const statics = await caches.open(STATIC)
   const assets = new Set(PRECACHE_ASSETS)
   const perPage = {}
+  const old = await readKeep()
   await Promise.all(
     PRECACHE_PAGES.map(async (path) => {
       try {
@@ -272,26 +339,47 @@ async function precache() {
   // read their webpack ids from the code and turn them into file names with the
   // webpack runtime's own map. If the build format ever changes, the passes find
   // nothing and those chunks are simply cached on first use instead.
+  const complete = PRECACHE_PAGES.every((p) => perPage[p])
+  const kept = {}
+  if (!complete) {
+    // Keep what the pages we could not refresh still point at.
+    for (const [k, v] of Object.entries(old)) if (k !== KEEP_BUILD && !perPage[k]) kept[k] = v
+  }
   const texts = await fetchAll(statics, [...assets])
-  await writeKeep({ ...perPage, '*': PRECACHE_ASSETS.map(abs) }).catch(() => undefined)
+  await writeKeep({ ...old, ...perPage, '*': [...new Set([...(old['*'] || []), ...PRECACHE_ASSETS.map(abs)])] }).catch(() => undefined)
   const runtime = [...texts.entries()].find(([u]) => /\/static\/chunks\/webpack-[^/]+\.js$/.test(u))
   const resolve = runtime ? chunkResolver(runtime[1]) : null
-  if (!resolve) return
-  const seen = new Set(texts.keys())
+  // Only a complete pass may claim the build: otherwise the next navigation tries again.
+  const build = complete && runtime ? { [KEEP_BUILD]: [runtime[0]] } : {}
+  if (!resolve) {
+    await writeKeep({ ...kept, ...perPage, '*': [...new Set([...(kept['*'] || []), ...PRECACHE_ASSETS.map(abs)])], ...build }).catch(() => undefined)
+    return
+  }
+  // Lazy chunks load more lazy chunks (a game page -> its engine -> three.js), so follow
+  // them until nothing new turns up (capped, in case the format ever loops).
+  const seen = new Set([...texts.keys()].map(abs))
+  const css = [...texts.entries()].filter(([u]) => u.endsWith('.css')).map(([, t]) => t)
   let sources = [...texts.values()]
-  for (let pass = 0; pass < 2 && sources.length; pass++) {
+  for (let pass = 0; pass < 6 && sources.length; pass++) {
     const next = new Set()
     for (const code of sources) {
-      for (const m of code.matchAll(/\.e\((\d+)\)/g)) for (const u of resolve(Number(m[1]))) if (!seen.has(u)) next.add(u)
+      for (const m of code.matchAll(/\.e\((\d+)\)/g)) for (const u of resolve(Number(m[1]))) if (!seen.has(abs(u))) next.add(abs(u))
     }
     next.forEach((u) => seen.add(u))
-    sources = [...(await fetchAll(statics, [...next])).values()]
+    const got = await fetchAll(statics, [...next])
+    for (const [u, t] of got) if (u.endsWith('.css')) css.push(t)
+    sources = [...got.values()]
   }
-  await writeKeep({ ...perPage, '*': [...seen].map(abs) }).catch(() => undefined)
+  // Fonts (next/font, self-hosted) are named only inside the CSS files, never in the HTML.
+  const fonts = new Set()
+  for (const t of css) for (const u of assetsIn(t)) if (!seen.has(u)) fonts.add(u)
+  await fetchAll(statics, [...fonts])
+  fonts.forEach((u) => seen.add(u))
+  await writeKeep({ ...kept, ...perPage, '*': [...new Set([...(kept['*'] || []), ...[...seen].map(abs)])], ...build }).catch(() => undefined)
 }
 
 // Saves each URL in the static cache (a few at a time: a phone on school Wi-Fi should not
-// open a hundred sockets at once) and returns the text of every JS file, for the scan above.
+// open a hundred sockets at once) and returns the text of every JS and CSS file, for the scans above.
 async function fetchAll(cache, urls) {
   const texts = new Map()
   const queue = [...urls]
@@ -306,7 +394,7 @@ async function fetchAll(cache, urls) {
           await cache.put(u, fresh.clone())
           res = fresh
         }
-        if (u.endsWith('.js')) texts.set(u, await res.text())
+        if (u.endsWith('.js') || u.endsWith('.css')) texts.set(u, await res.text())
       } catch {
         // Skipped; cached on first use instead.
       }
@@ -327,6 +415,9 @@ function chunkResolver(code) {
   }
   const explicit = new Map()
   for (const m of code.matchAll(/(\d+)===e\?"(static\/chunks\/[^"]+\.js)"/g)) explicit.set(Number(m[1]), m[2])
+  // The same, written as "static/chunks/"+e+"-<hash>.js" (the id spliced in): Next 15 emits
+  // most shared lazy chunks this way, and missing it left e.g. Power Lab's engine unsaved.
+  for (const m of code.matchAll(/(\d+)===e\?"static\/chunks\/"\+e\+"([^"]+\.js)"/g)) explicit.set(Number(m[1]), `static/chunks/${m[1]}${m[2]}`)
   const generic = code.match(/"static\/chunks\/"\+\(\((\{[^}]*\})\)\[e\]\|\|e\)\+"\."\+\((\{[^}]*\})\)\[e\]\+"\.js"/)
   if (!generic && !explicit.size) return null
   const names = toMap(generic && generic[1])
@@ -343,13 +434,15 @@ function chunkResolver(code) {
 
 // ---------------------------------------------------------------- offline page
 
+// Same words and emoji as the tab bar (lib/kids/nav.ts), then the biggest offline places.
 const OFFLINE_LINKS = [
   ['/kids', 'Home', '🏠'],
-  ['/kids/hangar', 'My Hangar', '🚀'],
-  ['/kids/galaxy', 'Skill Galaxy', '🌌'],
-  ['/kids/course', 'Course', '📚'],
+  ['/kids/course', 'Learn', '🚀'],
+  ['/kids/worlds', 'Worlds', '🧭'],
   ['/kids/play', 'Games', '🎮'],
-  ['/kids/worlds', 'Worlds', '🌍'],
+  ['/kids/hangar', 'Garage', '🤖'],
+  ['/kids/stories', 'Story Theatre', '🎬'],
+  ['/kids/galaxy', 'Galaxy', '🌌'],
   ['/kids/settings', 'Settings', '⚙️'],
 ]
 

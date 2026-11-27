@@ -15,7 +15,8 @@
 //    device before profiles existed) keeps the ORIGINAL key, so the migration
 //    moves no data and cannot lose any. Every other profile uses
 //    `<base>::<profileId>`. With no one signed in (shared tablet between
-//    children) the key is `<base>::_none`, which "Done" wipes.
+//    children) the key is `<base>::_none`, which "Done" and the next sign-in wipe
+//    (per-child bases only: see wipeNamespace).
 //
 // 2. SWAPPED keys (`SWAPPED_KEYS` / `SWAPPED_PREFIXES`): stores owned by other
 //    files that read a fixed key (Skill Galaxy, course, hangar looks, class
@@ -488,14 +489,24 @@ export function switchProfile(to: string | null): boolean {
   return true
 }
 
+/**
+ * Removes one namespace of the PER-CHILD stores only: a `profileKey()` base
+ * (PROFILE_KEY_BASES: progress, robot, Flight Recorder ghosts…) or a swapped
+ * stash. It used to remove every key ending in `::<ns>`, so a store this file
+ * does not own that happened to end in `::_none` was wiped by "Done" too.
+ * Each child's own namespace (`::<id>`, or the plain keys of member #1) is
+ * never touched here, so a child's ghosts survive "Done" and come back when
+ * they sign in again (progress-backup.verify.ts checks both).
+ */
 function wipeNamespace(ns: string): void {
   const s = ls()
   if (!s) return
   const suffix = `${SEP}${ns}`
   for (const k of allKeys(s)) {
-    if (k.endsWith(suffix)) {
-      try { s.removeItem(k) } catch { /* ignore */ }
-    }
+    if (!k.endsWith(suffix)) continue
+    const base = k.slice(0, -suffix.length)
+    if (!PROFILE_KEY_BASES.includes(base) && !isSwappedBase(base)) continue
+    try { s.removeItem(k) } catch { /* ignore */ }
   }
 }
 
@@ -654,6 +665,19 @@ export function bindClassMember(input: { nickname: string; className: string; ba
   const made = createProfile({ nickname: input.nickname, band: input.band, className: input.className })
   if (!made.ok) return null
   return switchProfile(made.profile.id) ? made.profile.id : null
+}
+
+/**
+ * A teacher locked this child's band (classroom sync, migration 0058): the active
+ * profile's band follows, so the profile picker and a later profile switch agree
+ * with the progress store. No-op when profiles are not in use or it already matches.
+ */
+export function applyClassBandToProfile(band: BandId): boolean {
+  const st = readProfilesState()
+  if (!st?.active) return false
+  const cur = getProfile(st.active, st)
+  if (!cur || cur.band === band) return false
+  return updateProfile(st.active, { band })
 }
 
 /** The child left their class: untag the active profile. */

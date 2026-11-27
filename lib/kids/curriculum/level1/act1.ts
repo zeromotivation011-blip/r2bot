@@ -6,6 +6,7 @@
 
 import type { Session } from '../types'
 import {
+  mis,
   BEEP, FLAT_MAT_PHYSICS, HOP, HOP_BACK, LEFT, MOVE_SET, PART_MASS_KG, RIGHT, WAIT, kg,
   arena, episode, lessonTiming, obj, projectTiming, say, teacher,
 } from './shared'
@@ -154,19 +155,19 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'Which one is a robot?',
-        options: [{ text: 'A robot vacuum that turns when it bumps a chair', icon: '🤖' }, { text: 'A spoon', icon: '🥄' }, { text: 'A torch with a battery', icon: '🔦' }],
+        options: [{ text: 'A robot vacuum that turns when it bumps a chair', icon: '🤖' }, mis('A spoon', '🥄', 'tools-are-robots'), mis('A torch with a battery', '🔦', 'battery-means-robot')],
         answer: 0,
         why: 'The robot vacuum senses the chair, thinks "turn!", and acts by turning. Sense, think, act! A torch has a battery, but it cannot sense or decide.',
       },
       {
         prompt: 'What does the battery give a robot?',
-        options: [{ text: 'Eyes', icon: '👀' }, { text: 'Energy', icon: '⚡' }, { text: 'A name', icon: '🏷️' }],
+        options: [mis('Eyes', '👀', 'battery-gives-senses'), { text: 'Energy', icon: '⚡' }, { text: 'A name', icon: '🏷️' }],
         answer: 1,
         why: 'A battery stores energy. The robot uses that energy to think and to move.',
       },
       {
         prompt: 'Your robot does what…?',
-        options: [{ text: 'It wants to', icon: '💭' }, { text: 'Its program says, step by step', icon: '📋' }],
+        options: [mis('It wants to', '💭', 'machines-have-feelings'), { text: 'Its program says, step by step', icon: '📋' }],
         answer: 1,
         why: 'A robot follows its program, one step after another. It does not guess what you want.',
       },
@@ -330,19 +331,19 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'What makes the wheels turn?',
-        options: [{ text: 'Wind', icon: '🌬️' }, { text: 'The robot knows where to go, so they turn by themselves', icon: '💭' }, { text: 'A motor', icon: '⚙️' }],
+        options: [mis('Wind', '🌬️', 'motor-not-needed'), mis('The robot knows where to go, so they turn by themselves', '💭', 'robot-knows-where-to-go'), { text: 'A motor', icon: '⚙️' }],
         answer: 2,
         why: 'A motor spins when it gets energy from the battery, and the spin turns the wheel.',
       },
       {
         prompt: 'The light is 2 squares away. Which block?',
-        options: [{ text: 'Hop forward 2', icon: '2️⃣' }, { text: 'Hop forward 3', icon: '3️⃣' }],
+        options: [{ text: 'Hop forward 2', icon: '2️⃣' }, mis('Hop forward 3', '3️⃣', 'count-the-start-square')],
         answer: 0,
         why: 'Count the squares: one, two. Hop 2 lands right on it. Hop 3 goes too far.',
       },
       {
         prompt: 'Why does the robot have a little ball at the back?',
-        options: [{ text: 'To make it go faster', icon: '💨' }, { text: 'To hold it up and roll any way', icon: '⚪' }],
+        options: [mis('To make it go faster', '💨', 'extra-parts-make-it-faster'), { text: 'To hold it up and roll any way', icon: '⚪' }],
         answer: 1,
         why: 'The ball is called a caster. It balances the robot and rolls in any direction.',
       },
@@ -505,19 +506,19 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'A cart is crossing. What should the robot do?',
-        options: [{ text: 'Keep going — the robot will see the cart and stop', icon: '👀' }, { text: 'Wait', icon: '✋' }],
+        options: [mis('Keep going — the robot will see the cart and stop', '👀', 'robot-can-see-without-sensor'), { text: 'Wait', icon: '✋' }],
         answer: 1,
         why: 'Wait until the way is clear, then go. That is how robots — and people — stay safe.',
       },
       {
         prompt: 'Go, Go, Wait. Or Go, Wait, Go. Which lets the cart pass?',
-        options: [{ text: 'Go, Wait, Go', icon: '🟢✋🟢' }, { text: 'Go, Go, Wait', icon: '🟢🟢✋' }],
+        options: [{ text: 'Go, Wait, Go', icon: '🟢✋🟢' }, mis('Go, Go, Wait', '🟢🟢✋', 'order-does-not-matter')],
         answer: 0,
         why: 'The wait must come before the crossing. The same steps in a different order do something different.',
       },
       {
         prompt: 'Does a robot wait by itself if we forget the Wait block?',
-        options: [{ text: 'No', icon: '👎' }, { text: 'Yes', icon: '👍' }],
+        options: [{ text: 'No', icon: '👎' }, mis('Yes', '👍', 'robot-fills-in-steps')],
         answer: 0,
         why: 'No. The robot only does what the program says. If there is no Wait, it does not wait.',
       },
@@ -680,19 +681,19 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'Why does a robot show a face or say what it will do?',
-        options: [{ text: 'Because talking makes it move', icon: '🗣️' }, { text: 'So people know what it will do', icon: '🙂' }],
+        options: [mis('Because talking makes it move', '🗣️', 'say-makes-it-move'), { text: 'So people know what it will do', icon: '🙂' }],
         answer: 1,
         why: 'When people know what a robot will do next, they feel safe and are not surprised.',
       },
       {
         prompt: 'When should the robot say "I am going forward"?',
-        options: [{ text: 'After it moves', icon: '⏭️' }, { text: 'Before it moves', icon: '⏮️' }],
+        options: [mis('After it moves', '⏭️', 'announce-after'), { text: 'Before it moves', icon: '⏮️' }],
         answer: 1,
         why: 'Telling people before you move gives them time to get out of the way.',
       },
       {
         prompt: 'Is the robot’s face really feeling happy?',
-        options: [{ text: 'Yes, robots feel like us', icon: '💗' }, { text: 'No, it is a picture to help people', icon: '🖼️' }],
+        options: [mis('Yes, robots feel like us', '💗', 'machines-have-feelings'), { text: 'No, it is a picture to help people', icon: '🖼️' }],
         answer: 1,
         why: 'The face is a picture on a screen. It helps people understand the robot. Robots do not feel like we do.',
       },
@@ -852,19 +853,19 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'How does your robot turn on the spot?',
-        options: [{ text: 'One wheel forward, one wheel back', icon: '🔄' }, { text: 'It drives forward round a big circle', icon: '⭕' }],
+        options: [{ text: 'One wheel forward, one wheel back', icon: '🔄' }, mis('It drives forward round a big circle', '⭕', 'turn-moves-forward')],
         answer: 0,
         why: 'When the wheels go opposite ways, the robot spins on the spot.',
       },
       {
         prompt: 'Look at the picture: you are standing behind the robot, looking the same way it looks. It turns right. Which way does it go?',
-        options: [{ text: 'To my left', icon: '👈' }, { text: 'To my right', icon: '👉' }],
+        options: [mis('To my left', '👈', 'left-right-mirror'), { text: 'To my right', icon: '👉' }],
         answer: 1,
         why: 'When you look the same way as the robot, its right is your right. Pretend you are inside the robot!',
       },
       {
         prompt: 'Turn right, then turn right again. Which way is the robot facing now?',
-        options: [{ text: 'Backwards — the other way', icon: '↩️' }, { text: 'The same way', icon: '⬆️' }],
+        options: [{ text: 'Backwards — the other way', icon: '↩️' }, mis('The same way', '⬆️', 'turns-dont-add-up')],
         answer: 0,
         why: 'Two quarter turns make a half turn. The robot now faces back the way it came.',
       },
@@ -1012,19 +1013,19 @@ export const ACT1: Session[] = [
     quiz: [
       {
         prompt: 'What do engineers do first?',
-        options: [{ text: 'Press Go and hope', icon: '🤞' }, { text: 'Plan and draw', icon: '✏️' }],
+        options: [mis('Press Go and hope', '🤞', 'skip-the-plan'), { text: 'Plan and draw', icon: '✏️' }],
         answer: 1,
         why: 'Planning first helps you build the right thing. Then you test it.',
       },
       {
         prompt: 'Your dance bumped the edge. What do you do?',
-        options: [{ text: 'Change a step and try again', icon: '🔧' }, { text: 'Throw the plan away — it was a bad plan', icon: '🗑️' }],
+        options: [{ text: 'Change a step and try again', icon: '🔧' }, mis('Throw the plan away — it was a bad plan', '🗑️', 'changed-plan-was-bad')],
         answer: 0,
         why: 'Try, look, fix, try again. Every engineer does this — mistakes help us learn.',
       },
       {
         prompt: 'Hop forward, then hop back. Where is the robot?',
-        options: [{ text: 'Two squares away', icon: '➡️' }, { text: 'Back where it started', icon: '⭐' }],
+        options: [mis('Two squares away', '➡️', 'back-adds-distance'), { text: 'Back where it started', icon: '⭐' }],
         answer: 1,
         why: 'Going back undoes going forward, so the robot ends where it began.',
       },

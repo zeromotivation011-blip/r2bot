@@ -22,12 +22,15 @@ import {
   getPart,
   getUpgrade,
   upgradesOf,
+  type MotorId,
+  type PowerId,
   type RobotDesign,
   type Slot,
   type UpgradeSlot,
 } from './robot-design'
 import type { WireSpec } from './robot-wiring'
-import { robotSpec } from './sim/robot-spec'
+import { COMPUTER_AMPS, HEAD_AMPS, SENSOR_AMPS, packInfo } from './sim/battery'
+import { ARM_MASS, cruisePower, MOTOR_GEARING, POWER_MASS_DELTA, POWER_PACKS, robotSpec } from './sim/robot-spec'
 
 /** A slot of either kind. */
 export type AnySlot = Slot | UpgradeSlot
@@ -226,11 +229,25 @@ interface PowerSpec {
   solarW: number
 }
 
+/** A solar panel's output in sunshine, W (only the solar upgrade carries one). */
+const SOLAR_W: Record<PowerId, number> = { aa: 0, lipo: 0, bigpack: 0, solar: 1.5 }
+
+/**
+ * Volts, amp-hours and mass come from the pack the simulator runs (POWER_PACKS in
+ * sim/robot-spec.ts, through the battery model's packInfo), so the spec sheet and the
+ * sim can never disagree about the battery: AA = 4 × NiMH 1.2 V 2000 mAh (9.6 Wh);
+ * LiPo = 2S 7.4 V 2200 mAh (16.3 Wh); Big Pack = 3S 11.1 V 5000 mAh (55.5 Wh); Solar = the 2S LiPo.
+ */
+function powerSpec(id: PowerId): PowerSpec {
+  const info = packInfo(POWER_PACKS[id])
+  return { volts: info.nominalV, ampHours: info.capacityMah / 1000, massDelta: POWER_MASS_DELTA[id], solarW: SOLAR_W[id] }
+}
+
 export const POWER: Record<string, PowerSpec> = {
-  aa: { volts: 4.8, ampHours: 2.0, massDelta: 0, solarW: 0 },
-  lipo: { volts: 7.4, ampHours: 2.2, massDelta: -0.04, solarW: 0 },
-  bigpack: { volts: 11.1, ampHours: 5.0, massDelta: 0.28, solarW: 0 },
-  solar: { volts: 7.4, ampHours: 2.2, massDelta: 0.04, solarW: 1.5 },
+  aa: powerSpec('aa'),
+  lipo: powerSpec('lipo'),
+  bigpack: powerSpec('bigpack'),
+  solar: powerSpec('solar'),
 }
 
 interface MotorSpec {
@@ -241,11 +258,20 @@ interface MotorSpec {
   massDelta: number
 }
 
+/** Drive power at cruise per motor relative to gear motors, for the World forms' power model. */
+const MOTOR_POWER: Record<MotorId, number> = { gear: 1, speedy: 1.15, torque: 1.1, brushless: 0.8 }
+
+/** Speed, strength and mass are the simulator's own gearing (MOTOR_GEARING in sim/robot-spec.ts). */
+function motorSpec(id: MotorId): MotorSpec {
+  const g = MOTOR_GEARING[id]
+  return { speed: g.speed, strength: g.strength, power: MOTOR_POWER[id], massDelta: g.massDelta }
+}
+
 export const MOTORS: Record<string, MotorSpec> = {
-  gear: { speed: 1, strength: 1, power: 1, massDelta: 0 },
-  speedy: { speed: 1.4, strength: 0.7, power: 1.15, massDelta: 0 },
-  torque: { speed: 0.7, strength: 1.6, power: 1.1, massDelta: 0.04 },
-  brushless: { speed: 1.3, strength: 1.3, power: 0.8, massDelta: 0.02 },
+  gear: motorSpec('gear'),
+  speedy: motorSpec('speedy'),
+  torque: motorSpec('torque'),
+  brushless: motorSpec('brushless'),
 }
 
 /** Electrical draw of each fitted part, W (average while working). */
@@ -253,14 +279,13 @@ const HEAD_W: Record<string, number> = { distance: 0.08, camera: 1.0, antenna: 0
 const TOOL_W: Record<string, number> = { none: 0, gripper: 0.3, scoop: 0.3, pen: 0.05, light: 0.6 }
 const FLOOR_W: Record<string, number> = { none: 0, line: 0.1, color: 0.15, bumper: 0.01 }
 const FLOOR_KG: Record<string, number> = { none: 0, line: 0.03, color: 0.03, bumper: 0.05 }
+/** Arm mass is the simulator's (ARM_MASS); draw and reach are the spec sheet's own. */
 const ARM: Record<string, { kg: number; w: number; reachCm: number }> = {
-  none: { kg: 0, w: 0, reachCm: 0 },
-  arm2: { kg: 0.15, w: 0.8, reachCm: 20 },
-  arm3: { kg: 0.22, w: 1.2, reachCm: 30 },
+  none: { kg: ARM_MASS.none, w: 0, reachCm: 0 },
+  arm2: { kg: ARM_MASS.arm2, w: 0.8, reachCm: 20 },
+  arm3: { kg: ARM_MASS.arm3, w: 1.2, reachCm: 30 },
 }
 const BRAIN_W = 0.6
-/** Drive power per kg at cruise on a smooth floor (both sides together), W/kg. */
-const DRIVE_W_PER_KG: Record<RobotDesign['drive'], number> = { wheels2: 3, wheels4: 3.6, tracks: 4.5, legs: 6.5 }
 /** World forms replace the drive. Speed in m/s, power in W/kg, extra mass in kg. */
 const CHASSIS: Record<string, { speed: number; wPerKg: number; massDelta: number; motors: number } | null> = {
   ground: null,
@@ -322,24 +347,47 @@ export function specSheet(d: RobotDesign): SpecSheet {
   const add = (part: string, w: number) => {
     if (w > 0) breakdown.push({ part, watts: w, amps: 0 })
   }
-  const driveW = (form ? form.wPerKg : DRIVE_W_PER_KG[d.drive]) * massKg * mo.power
   const motors = form ? form.motors : d.drive === 'legs' ? 8 : d.drive === 'wheels4' ? 4 : 2
-  add(form ? `${getUpgrade('chassis', up.chassis)?.name ?? 'World form'} motors` : 'Drive motors', driveW)
-  add('Brain', BRAIN_W)
-  add(getPart('head', d.head)?.name ?? 'Head', HEAD_W[d.head] ?? 0)
-  add(getPart('tool', d.tool)?.name ?? 'Tool', TOOL_W[d.tool] ?? 0)
-  add(getPart('sensor', d.sensor)?.name ?? 'Floor sensor', FLOOR_W[d.sensor] ?? 0)
-  add(getUpgrade('sensor2', up.sensor2)?.name ?? '2nd sensor', FLOOR_W[up.sensor2] ?? 0)
-  add(getUpgrade('arm', up.arm)?.name ?? 'Arm', arm.w)
+  const wattHours = pw.volts * pw.ampHours
+  let runtimeMin: number
+  if (form) {
+    // World forms (drone, sub, humanoid) are not ground robots, so the simulator never drives
+    // them: their draw is a power-per-kg model, and only USABLE of the pack is run down.
+    add(`${getUpgrade('chassis', up.chassis)?.name ?? 'World form'} motors`, form.wPerKg * massKg * mo.power)
+    add('Brain', BRAIN_W)
+    add(getPart('head', d.head)?.name ?? 'Head', HEAD_W[d.head] ?? 0)
+    add(getPart('tool', d.tool)?.name ?? 'Tool', TOOL_W[d.tool] ?? 0)
+    add(getPart('sensor', d.sensor)?.name ?? 'Floor sensor', FLOOR_W[d.sensor] ?? 0)
+    add(getUpgrade('sensor2', up.sensor2)?.name ?? '2nd sensor', FLOOR_W[up.sensor2] ?? 0)
+    add(getUpgrade('arm', up.arm)?.name ?? 'Arm', arm.w)
+    const w = breakdown.reduce((s, l) => s + l.watts, 0)
+    const net = Math.max(w * 0.2, w - pw.solarW)
+    runtimeMin = Math.max(1, Math.round(((wattHours * USABLE) / net) * 60 / 5) * 5)
+  } else {
+    // A ground robot's draw is the simulator's own (roadmap #39): cruisePower() uses the same
+    // constants the engine drains the battery with — each motor's no-load current plus current
+    // ∝ the rolling drag it pushes, plus the computer, head and floor sensor — so the runtime
+    // here is how long the simulated robot really drives, flat out on tile, from full to the
+    // pack's cut-off. The tool, a 2nd sensor and an arm draw nothing while cruising (light off,
+    // nothing held), exactly as in the sim.
+    const cp = cruisePower(d)
+    const V = pw.volts
+    add('Drive motors', cp.motorAmps * V)
+    add('Brain', COMPUTER_AMPS * V)
+    add(getPart('head', d.head)?.name ?? 'Head', (HEAD_AMPS[d.head] ?? 0) * V)
+    add(getPart('sensor', d.sensor)?.name ?? 'Floor sensor', (SENSOR_AMPS[d.sensor] ?? 0) * V)
+    if (pw.solarW > 0) {
+      // In sunshine the panel supplies part of the current (never more than 80 % of it here).
+      const netAmps = Math.max(cp.amps * 0.2, cp.amps - pw.solarW / V)
+      runtimeMin = Math.max(1, Math.round((pw.ampHours / netAmps) * 60))
+    } else runtimeMin = Math.max(1, cp.runtimeMin)
+  }
   breakdown.sort((a, b) => b.watts - a.watts)
   const watts = breakdown.reduce((s, l) => s + l.watts, 0)
   for (const l of breakdown) {
     l.amps = r2(l.watts / pw.volts)
     l.watts = r2(l.watts)
   }
-  const wattHours = pw.volts * pw.ampHours
-  const net = Math.max(watts * 0.2, watts - pw.solarW)
-  const runtimeMin = Math.max(1, Math.round(((wattHours * USABLE) / net) * 60 / 5) * 5)
 
   // Reach: from the body's centre to the tool tip (the simulator's toolTip), plus the arm.
   const toolReach = d.tool === 'gripper' || d.tool === 'scoop' ? (base.toolTip[2] + base.toolReach) * 100 : 0

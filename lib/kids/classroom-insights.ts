@@ -8,7 +8,7 @@
 //   gradebook()        children × concepts, from the mastery letters + evidence
 //   cellEvidence()     what stands behind one cell (the click-through)
 //   classMindMap()     misconceptions the class holds, grouped by concept, with
-//                      the session guide's 5-minute reteach
+//                      the reteach, the unplugged lesson/warm-up and the episode
 //   stuckSignals()     course challenges, Galaxy activities by track, course
 //                      checks and game tiers — only when 2+ children share it
 //   gradebookCsv()     the grid as a spreadsheet
@@ -32,6 +32,10 @@ export interface InsightSession {
   l: number
   /** Session number. */
   n: number
+  /** The no-device way to re-teach it: Level 1's unplugged lesson, or the session guide's unplugged warm-up (title, href). */
+  u?: { t: string; h: string }
+  /** The episode to replay with the class (title, href). */
+  e?: { t: string; h: string }
 }
 
 export interface InsightMisconception {
@@ -45,6 +49,8 @@ export interface InsightMisconception {
   r?: string
   /** The answer option that reveals it (course content, the same for every child). */
   a: string
+  /** Child-friendly words for the teacher to say (Level 1 writes them for every misconception). */
+  c?: string
 }
 
 export interface InsightCatalogue {
@@ -229,6 +235,12 @@ export interface MindMapItem {
   idea: string
   correction: string
   reteach: string | null
+  /** Child-friendly words for the class, when written (Level 1). */
+  childWords: string | null
+  /** The no-device lesson or warm-up to re-teach it with. */
+  unplugged: { title: string; href: string } | null
+  /** The episode to replay. */
+  episode: { title: string; href: string } | null
   answer: string
   /** Children who have picked it at least once. */
   children: number
@@ -244,6 +256,10 @@ export interface MindMapNode {
   /** Children holding at least one misconception under this concept. */
   children: number
   items: MindMapItem[]
+}
+
+function ref(r: { t: string; h: string } | undefined): { title: string; href: string } | null {
+  return r && r.h.startsWith('/kids/') ? { title: r.t, href: r.h } : null
 }
 
 /**
@@ -272,6 +288,9 @@ export function classMindMap(members: readonly KidsMemberRow[], cat: InsightCata
       idea: mc.i,
       correction: mc.k,
       reteach: mc.r ?? null,
+      childWords: mc.c ?? null,
+      unplugged: ref(cat.sessions[mc.s]?.u),
+      episode: ref(cat.sessions[mc.s]?.e),
       answer: mc.a,
       children: set.size,
       reached,

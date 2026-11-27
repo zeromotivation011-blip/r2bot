@@ -443,7 +443,7 @@ export const ACT3: Session[] = [
       ],
       faster: ['Add cost in money (from the part table) as a third column and discuss three-way trade-offs.', 'Write the review minutes: questions asked, answers, actions.'],
       slower: ['Price two configurations instead of three.', 'Use question cards with sentence starters.'],
-      notes: ['Run the review with structured roles: presenter, two questioners, a note-taker. No scores — feedback is two stars and a wish.', 'Honest limit: the battery model is roadmap #39; until it ships, the live energy check uses the part table and the run’s distance.'],
+      notes: ['Run the review with structured roles: presenter, two questioners, a note-taker. No scores — feedback is two stars and a wish.', 'The battery model is live (roadmap #39): in the Physics Lab the robot carries the pack its power upgrade gives it (4 × AA, 2S LiPo or the 3S Big Power Pack), the Flight Recorder graphs charge and current, and the Power Lab (/kids/lab/power?demo=power-pit-stop) has arenas where the pack can really run flat. The energy check can use the battery graph as evidence alongside the part table.'],
     }),
     parent: {
       today: 'Your teen ran a design review: justifying every part of their rover with mass, energy and test results, and answering questions with evidence.',

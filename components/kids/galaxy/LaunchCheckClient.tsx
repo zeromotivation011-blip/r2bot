@@ -44,7 +44,7 @@ const card = 'rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-wh
 
 export default function LaunchCheckClient({ trackId, candidates, summaries }: Props) {
   const track = TRACKS.find((t) => t.id === trackId) ?? TRACKS[0]
-  const { ready, band, setBand, done } = useGalaxyState()
+  const { ready, band, lockedBand, setBand, done } = useGalaxyState()
   const { starts } = useMastery()
   const [stage, setStage] = useState<Stage>('intro')
   const [state, setState] = useState<LaunchState | null>(null)
@@ -168,7 +168,7 @@ export default function LaunchCheckClient({ trackId, candidates, summaries }: Pr
               {ready && !band && (
                 <div className="mt-5">
                   <p className="mb-2 font-display font-bold text-[#EEF2F8]">First, how old are you?</p>
-                  <BandPicker band={band} onPick={setBand} label="Your age band" />
+                  <BandPicker band={band} onPick={setBand} label="Your age band" locked={lockedBand} />
                 </div>
               )}
               <div className="mt-6 flex flex-wrap gap-3">

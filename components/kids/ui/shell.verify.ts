@@ -10,6 +10,9 @@
 //   - no black screens (#16): createStage() handles webglcontextlost with a poster
 //   - reward toasts (follow-up): a burst never shows more than the cap; the
 //     overflow folds into one "+N more" toast
+//   - Wave 3 polish: Calm "what's next" strip (#89), Robodex toast clear of Ask
+//     Spark, Engineers + parent hub link /kids/next-step, parent-hub Passport
+//     delete, worlds and episode fx follow Calm, lab episodes link the Theatre
 //
 // Run:  npx tsx components/kids/ui/shell.verify.ts      (exit 1 on any ✗)
 
@@ -104,9 +107,26 @@ async function main() {
   const gs = src('components/kids/ui/GameShellClient.tsx')
   check('tier buttons are 48px', /role="radio"[\s\S]{0,400}min-h-\[48px\] min-w-\[48px\]/.test(gs))
   check('"?" button is 48px', /min-h-\[48px\] min-w-\[48px\][^"]*"\s*aria-label="How to play"/.test(gs))
-  check('one Exit button with the leave guard', (gs.match(/<ExitButton/g) ?? []).length === 1 && /useLeaveGuard\(/.test(gs) && /\{guard\.dialog\}/.test(gs))
+  check('one Exit button with the leave guard', (gs.match(/<ExitButton/g) ?? []).length === 1 && /useLeaveGuard\(/.test(gs) && /\{guard\.dialog && toBody\(guard\.dialog\)\}/.test(gs))
   check('a touch makes the round unsaved work', /onPointerDownCapture=\{markDirty\}/.test(gs))
   check('?tier= opens the game on a tier', /get\('tier'\)/.test(gs))
+  // Phones: no fixed tab bar over a game's controls, and the shell clears the home indicator.
+  check('no tab bar on /kids/play/* (immersive)', /\^\\\/kids\\\/play\\\/\[\^\/\]\+\//.test(shell) && /\{!bare && !game && \(\s*<nav className="kids-tabbar"/.test(shell))
+  check('game shell pads the bottom for the safe area', /pb-\[calc\([^\]]*env\(safe-area-inset-bottom\)\)\]/.test(gs))
+  // Flight Recorder for the games' own sims (#38): one recording per round, offered on the results card.
+  check('a GameRecorder per round, offered on the results card', /new GameRecorder\(\)/.test(gs) && /setActiveGameRecorder\(r\)/.test(gs) && /\[game\.id, tier, round\]/.test(gs) && /data-testid="open-recorder"/.test(gs))
+  {
+    const recorded = [
+      'drone-hover/DroneHoverGameClient.tsx',
+      'sumo-arena/SumoArenaGameClient.tsx',
+      'mars-rover/MarsRoverGameClient.tsx',
+      'orbit-repair/OrbitRepairGameClient.tsx',
+      'swarm-reef/SwarmReefGameClient.tsx',
+      'ocean-rescue/DiveGameClient.tsx',
+      'arm-factory/ArmFactoryClient.tsx',
+    ].filter((f) => !/recordGameFrame\(/.test(src(`components/kids/games/${f}`)))
+    check('the seven sim games write to the Flight Recorder', recorded.length === 0, recorded.join(', '))
+  }
   const lg = src('components/kids/ui/LeaveGuardClient.tsx')
   check('leave guard catches links in the capture phase', /addEventListener\('click', onClick, true\)/.test(lg))
   check('leave dialog buttons are 52px+', (lg.match(/min-h-\[5[26]px\]/g) ?? []).length >= 2)
@@ -136,6 +156,34 @@ async function main() {
   const gsW3 = src('components/kids/ui/GameShellClient.tsx')
   check('a round hint reaches the shared 2-star cap (Wave 3)', /hintsUsed\?: boolean/.test(gsW3) && /hintsUsed: r\.hintsUsed/.test(gsW3))
   check('results card is fixed to the viewport and scrolls inside (Wave 3)', /fixed inset-0 z-50[^"]*" role="dialog" aria-modal="true" aria-label="Round results"/.test(gsW3) && /max-h-\[90dvh\][^"]*overflow-y-auto/.test(gsW3))
+
+  // ── Wave 3 shell polish ────────────────────────────────────────────────────
+  // #89 the fixed "what's next" strip: Calm mode only, a reserved slot (no shift), not on Home or games.
+  check('"what\'s next" strip: Calm only, height reserved by html.kids-calm', /\[html\.kids-calm_&\]:block/.test(shell) && /\{calm && <NextStrip pathname=\{pathname\} \/>\}/.test(shell))
+  check('"what\'s next" strip: not on Home or game screens', /const nextSlot = !bare && !game && pathname !== '\/kids'/.test(shell))
+  const ns = src('components/kids/universe/NextStripClient.tsx')
+  check('"what\'s next" strip: the Home mission (pickMission), a fixed 56px row, 44px button', /pickMission\(/.test(ns) && /h-14/.test(ns) && /min-h-\[44px\]/.test(ns) && !/animate-/.test(ns))
+  // The Robodex toast sits clear of the Ask Spark button (bottom 84px + 56px tall up to 900px; bottom 24px from 901px).
+  const rdx = src('components/kids/robodex/RobodexToastClient.tsx')
+  const spark = src('components/kids/ai/spark/AskSparkClient.tsx')
+  const px = (re: RegExp, text: string) => Number(re.exec(text)?.[1] ?? NaN)
+  const sparkPhone = px(/bottom-\[calc\(env\(safe-area-inset-bottom\)\+(\d+)px\)\]/, spark)
+  const rdxPhone = px(/bottom-\[calc\(env\(safe-area-inset-bottom\)\+(\d+)px\)\]/, rdx)
+  check('Robodex toast above the Spark button on phones', rdxPhone >= sparkPhone + 56 + 8, `toast ${rdxPhone}px, Spark ${sparkPhone}px + 56px`)
+  check('Robodex toast above the Spark button from 901px', /min-\[901px\]:bottom-6/.test(spark) && /min-\[901px\]:bottom-24/.test(rdx) && !/sm:bottom-6/.test(rdx))
+  // Engineers' home and the parent hub link the Graduate page (#35); the hub can delete a Passport (one implementation).
+  check('Engineers get "Next step" on Home', /band === 'engineers'\) out\.push\(\{ kind: 'graduate', href: '\/kids\/next-step'/.test(src('components/kids/universe/ContinueCardClient.tsx')))
+  const hub = src('components/kids/parents/ParentHubClient.tsx')
+  check('parent hub links /kids/next-step and says Rank', /href="\/kids\/next-step"/.test(hub) && /\['Rank', view/.test(hub) && !/Explorer level/.test(hub))
+  check('parent hub has "Delete my Passport" (shared with the Garage)', /<PassportDeleteCardClient \/>/.test(hub) && /deletePassportAsGrownUp\(/.test(src('components/kids/parents/PassportDeleteCardClient.tsx')) && /deletePassportAsGrownUp\(passport\.code, \{ gate: true \}\)/.test(src('components/kids/hangar/BackupCodeClient.tsx')))
+  // Calm: worlds stop their own bounce/pulse; the episode effects draw no confetti.
+  for (const w of ['city', 'farm', 'guardians', 'hospital', 'ocean', 'station', 'zoo']) {
+    const ws = src(`components/kids/worlds/${w}/${w[0].toUpperCase()}${w.slice(1)}WorldClient.tsx`)
+    check(`world ${w}: no bounce in Calm`, /useKidsCalm\(\)/.test(ws) && !/className="[^"]*animate-/.test(ws))
+  }
+  const fx = src('components/kids/episodes/engine/fx.ts')
+  check('episode fx: Calm read from kidsCalm() and no confetti', /calm \|\| kidsCalm\(\)/.test(fx) && /confetti\(at: THREE\.Vector3, n: number\): void \{\n    if \(this\.calm\) return/.test(fx))
+  check('lab episode preview links the Episodes Theatre', /THEATRE_EPISODES/.test(src('app/kids/lab/episodes/[sessionId]/page.tsx')))
 
   // ── OG image + grown-ups page ──────────────────────────────────────────────
   check('/kids has its own share card', /ImageResponse/.test(src('app/kids/opengraph-image.tsx')))

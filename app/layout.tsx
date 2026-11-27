@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { SiteViewCounter } from '@/components/SiteViewCounter';
 import { GoogleAnalytics } from '@/components/GoogleAnalyticsClient';
+import { SupabasePreconnect } from '@/components/SupabasePreconnectClient';
 import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { SkipToContent } from '@/components/SkipToContent';
@@ -85,10 +86,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Marks JS as available before first paint so scroll-reveal can hide
             content without ever hiding it from no-JS readers or crawlers. */}
         <script dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js")' }} />
-        {/* Perf: resolve Supabase DNS early. (No Google Fonts preconnect: next/font
-            self-hosts the fonts, and it opened a connection to Google from kids pages.) */}
-        <link rel="preconnect" href="https://bxgtocghjypbomszwvfr.supabase.co" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="//bxgtocghjypbomszwvfr.supabase.co" />
+        {/* Perf: the Supabase preconnect is emitted by <SupabasePreconnect /> (body, hoisted
+            into <head> by React) so it can skip /kids: children's pages make no third-party
+            connection. (No Google Fonts preconnect either: next/font self-hosts the fonts.) */}
         <link
           rel="alternate"
           type="application/rss+xml"
@@ -102,6 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        <SupabasePreconnect />
         <SkipToContent />
         <AuthProvider>
           <ToastProvider>

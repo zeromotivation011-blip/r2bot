@@ -10,7 +10,8 @@
 // Record over `keyof ClassSnapshot`, so adding a field to the snapshot a child's
 // device sends (lib/kids/classroom.ts) fails type-check until it is described
 // here — the pack cannot silently fall behind the data. The table columns mirror
-// supabase/migrations/0054_kids_classroom.sql and 0055_kids_schools.sql.
+// supabase/migrations/0054_kids_classroom.sql, 0055_kids_schools.sql,
+// 0056_kids_classroom_wave2.sql and 0058_kids_class_band.sql.
 //
 // Pure data, safe in the browser (the PDF is made on the device by
 // ./pdf-trust.ts) and on the server (/kids/teach/trust).
@@ -29,7 +30,7 @@ import {
 } from '../classroom'
 
 export const TRUST_PACK_UPDATED = '2026-11-27'
-export const TRUST_PACK_VERSION = '1.1'
+export const TRUST_PACK_VERSION = '1.2'
 export const TRUST_CONTACT = 'hello@r2bot.in'
 
 export type Audience = 'teacher' | 'school-admin' | 'child-device' | 'nobody'
@@ -68,7 +69,7 @@ export const CLASS_SNAPSHOT_FIELDS: Record<keyof ClassSnapshot, Omit<DataField, 
   activityScores: { what: 'For each finished activity: best stars (1–3) and how many tries the best run took (1–9).', seenBy: TEACHER, personal: 'no' },
   galaxyStuck: { what: 'Skill Galaxy activities missed two or more times and never solved first try, with the number of misses — so the teacher can help.', seenBy: TEACHER, personal: 'no' },
   courseStuck: { what: 'Course sessions whose challenge was tried three or more times without a star, with the number of tries.', seenBy: TEACHER, personal: 'no' },
-  misconceptions: { what: 'How many times a wrong check answer pointing to a known misconception was chosen (e.g. “taller is stronger”). Counts only, no answers or text.', seenBy: TEACHER, personal: 'no' },
+  misconceptions: { what: 'For course checks (all four levels): how many times a wrong answer pointing to a known misconception was chosen, keyed by session and misconception id (e.g. “L2-S04.taller-is-stronger”: 2). Counts only — never the question, the answer text, free text or when it was chosen.', seenBy: TEACHER, personal: 'no' },
   gameTiers: { what: 'The highest game level reached with a personal best, per game (a number 1–9).', seenBy: TEACHER, personal: 'no' },
   days: { what: 'For the class Power-Up diary: on which days something was done, and how many different things (a date and a number per day).', seenBy: TEACHER, personal: 'no' },
 }
@@ -96,6 +97,7 @@ export const SERVER_TABLES: StoredTable[] = [
       { name: 'nickname', what: 'The name the child picks for the class, 2–20 letters. The form asks for a first name or a made-up robot name and refuses anything that looks like an email, phone number, link or rude word.', seenBy: TEACHER, personal: 'possibly' },
       { name: 'token_hash', what: 'A SHA-256 hash of a random token kept on the child’s device. It lets that device update its own row; it identifies nothing else and the token itself is never stored.', seenBy: 'Nobody (server only)', personal: 'no' },
       { name: 'snapshot', what: `The progress counters listed below, at most ${SNAPSHOT_MAX_BYTES / 1024} KB, or ${SNAPSHOT_MAX_BYTES_V2 / 1024} KB once the Wave 2 database update has run.`, seenBy: TEACHER, personal: 'no' },
+      { name: 'band_lock', what: 'Optional: an age band the teacher sets for this one child (Explorers, Builders, Inventors or Engineers), which the child’s device then follows. A range chosen by the teacher, never an age or birthday. Empty unless the teacher sets it.', seenBy: 'The teacher; the child’s device receives the band', personal: 'no' },
       { name: 'created_at, last_active_at', what: 'When the child joined and when the device last synced.', seenBy: TEACHER, personal: 'no' },
       { name: 'id, class_id', what: 'Random row id and the class it belongs to.', seenBy: 'Nobody (server only)', personal: 'no' },
     ],
@@ -116,6 +118,7 @@ export const SERVER_TABLES: StoredTable[] = [
       { name: 'teacher_name', what: 'Optional name the teacher chooses to show children (up to 40 characters).', seenBy: 'The teacher and the class’s children', personal: 'yes (adult)' },
       { name: 'school_name', what: 'Optional school name (up to 100 characters).', seenBy: 'The teacher and the class’s children', personal: 'no' },
       { name: 'band', what: 'The age band the class is for.', seenBy: 'The teacher and the class’s children', personal: 'no' },
+      { name: 'band_locked', what: 'Yes/no: whether every child in the class plays at the class band (children’s devices follow it on their next sync).', seenBy: 'The teacher; the class’s children receive the band', personal: 'no' },
       { name: 'join_code', what: 'A random six-character code (no I, L, O, 0 or 1).', seenBy: 'The teacher; shared with the class', personal: 'no' },
       { name: 'goal', what: 'The Class Power-Up goal the teacher sets: a title, a target number, a start and end date and a theme (no child data).', seenBy: 'The teacher; shown to the class’s children as one meter', personal: 'no' },
       { name: 'teacher_id, created_at, updated_at', what: 'The teacher’s account id and dates.', seenBy: 'Nobody (server only)', personal: 'yes (adult)' },
@@ -156,7 +159,7 @@ export const SERVER_TABLES: StoredTable[] = [
     ],
     retention: 'Deleted automatically when it has not been opened or saved for 400 days.',
     deletion: [
-      'A grown-up taps “Delete my Passport” in the Garage: deleted at once.',
+      'A grown-up taps “Delete my Passport” in the Garage or on the Parents page: deleted at once.',
       'Read and written only through R2BOT’s server with the service role: row-level security is on with no policies, so no teacher, school or other user can see a row.',
       `A parent or the school emails ${TRUST_CONTACT} with the Passport words: we delete it and confirm.`,
     ],
@@ -173,6 +176,7 @@ export interface DeviceStore {
 export const DEVICE_ONLY: DeviceStore[] = [
   { what: 'Stars, XP, badges, quests, course and activity progress, game personal bests', where: 'The browser’s own storage on that device', leaves: 'Only the counters above go to a class, after joining one; the whole progress goes into a Robot Passport only if one is saved' },
   { what: 'The explorer name, avatar and the robot design', where: 'The browser’s own storage', leaves: 'The robot code goes to the class snapshot after joining; the explorer name never goes to a class (it is inside a Robot Passport if one is saved)' },
+  { what: 'Which misconceptions a child’s wrong course-check answers revealed (ids and counts, e.g. “turn moves forward: 2” — never the answer itself)', where: 'The progress store in the browser’s own storage (also inside the backup code)', leaves: 'Only the counts go to a class, after joining one, as the snapshot’s misconceptions; inside a Robot Passport only if one is saved' },
   { what: 'Family profiles and picture passwords on shared tablets', where: 'The browser’s own storage', leaves: 'Never' },
   { what: 'Settings (sound, voice, text size, contrast, less motion, Lite 3D) and parent controls', where: 'The browser’s own storage', leaves: 'Never' },
   { what: 'The progress backup code', where: 'Made on the device; the family keeps it', leaves: 'Only if someone taps “Save my explorer” (Robot Passport): then the same code is stored on R2BOT under a hash of the Passport words (see kids_passports above)' },

@@ -5,6 +5,7 @@ import { KIDS_ZONES, ZONE_UNLOCK_STARS, partForZone } from './kids-world-data'
 import type { BandId } from './kids/bands'
 import { cleanConceptDays, cleanConceptLog, mergeConceptLog, mergeConceptSecured, type ConceptTry } from './kids/universe/mastery'
 import { activeProfileId, namespacedKey, profileKey, storageKeyFor } from './kids/profiles'
+import { cleanMisconceptionCounts } from './kids/misconceptions/keys'
 
 /** Fired on window after every save, so the classroom sync can push a snapshot. */
 export const KIDS_PROGRESS_EVENT = 'r2bot:kids-progress'
@@ -59,6 +60,13 @@ export interface KidsProgress {
   conceptSecured: Record<string, string>
   /** Track id -> start point "band:minDifficulty" from the Launch Check or "skip to Ace" (lib/kids/activities/pacing.ts). */
   galaxyStart: Record<string, string>
+  /**
+   * Added 27 Nov 2026 (roadmap #30). Wrong course-check picks by the
+   * misconception they reveal: "L1-S05.turn-moves-forward" -> times chosen,
+   * most recent last, capped (lib/kids/misconceptions/store.ts writes it).
+   * Ids and counts only — never the answer text. Read by the class snapshot.
+   */
+  checkMisconceptions: Record<string, number>
 }
 
 /**
@@ -106,6 +114,7 @@ const DEFAULT_PROGRESS: KidsProgress = {
   conceptLog: [],
   conceptSecured: {},
   galaxyStart: {},
+  checkMisconceptions: {},
 }
 
 function isBrowser() {
@@ -470,6 +479,7 @@ function cleanProgress(x: unknown): Partial<KidsProgress> | null {
     for (const [k, v] of Object.entries(x.galaxyStart)) if (/^[a-z]{2,12}$/.test(k) && typeof v === 'string' && GALAXY_START_RE.test(v)) gs[k] = v
     p.galaxyStart = gs
   }
+  if (isObj(x.checkMisconceptions)) p.checkMisconceptions = cleanMisconceptionCounts(x.checkMisconceptions)
   if (isObj(x.avatar)) {
     const id = cleanStr(x.avatar.id, 40)
     const color = cleanStr(x.avatar.color, 9)
@@ -563,6 +573,8 @@ export function mergeProgress(cur: KidsProgress, inc: Partial<KidsProgress>): Ki
     conceptSecured: mergeConceptSecured(cur.conceptSecured ?? {}, inc.conceptSecured),
     // A start point set on this device wins; otherwise take the backup's.
     galaxyStart: { ...(inc.galaxyStart ?? {}), ...(cur.galaxyStart ?? {}) },
+    // Misconception counts: the higher count per key (never lowered), capped.
+    checkMisconceptions: cleanMisconceptionCounts(maxMap(cleanMisconceptionCounts(cur.checkMisconceptions), inc.checkMisconceptions)),
     // Names and looks: this device's choice wins unless it is still the default.
     explorerName: cur.explorerName || inc.explorerName || '',
     robotName: robotIsDefault ? (inc.robotName ?? cur.robotName) : cur.robotName,

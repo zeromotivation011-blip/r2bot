@@ -32,6 +32,7 @@ import {
   type Sim,
 } from './sim'
 import { BAND_PX, Fx, bakeTerrain, cellToPixel, drawFrame, makeView, type View } from './render'
+import { recordGameFrame } from '@/lib/kids/sim/game-recorder'
 
 interface Props {
   tier: number
@@ -492,6 +493,8 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
           acc -= 1
           n++
           const arr = tick(sim)
+          // sim.t is mission MINUTES (DT = 0.25 min; battery Wh += W × DT / 60); the recorder's clock is seconds. Positions are cells of CELL_M metres.
+          recordGameFrame(sim.t * 60, { 'Battery (Wh)': sim.rover.wh, 'Believed vs true (m)': Math.hypot(sim.rover.ex - sim.rover.x, sim.rover.ey - sim.rover.y) * CELL_M })
           arr.forEach(onArrival)
           if (isOver(sim)) {
             endRound()

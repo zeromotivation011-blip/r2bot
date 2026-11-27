@@ -9,6 +9,7 @@ import { buildRobot } from '@/lib/kids/robot3d'
 import { DEFAULT_DESIGN, type BodyId } from '@/lib/kids/robot-design'
 import type { Beat, LineEffect, SceneEffect, ScenePlan } from '@/lib/kids/episodes/plan'
 import type { SetBuild } from './sets'
+import { kidsCalm } from '@/lib/kids/settings'
 
 export interface FxAnchors {
   /** Where the child's robot stands (ground). */
@@ -211,7 +212,9 @@ export class Fx {
   clockLight: THREE.Group | null = null
 
   constructor(calm: boolean) {
-    this.calm = calm
+    // Calm mode (roadmap #89) is read here too, not only through the director's
+    // flag, so every particle this file draws follows the kids setting directly.
+    this.calm = calm || kidsCalm()
     this.group.add(this.sceneGroup, this.lineGroup)
   }
 
@@ -420,8 +423,9 @@ export class Fx {
       let next = 0
       this.sceneUpdaters.push((t) => {
         if (t > next) {
-          next = t + 1.6
-          for (let i = 0; i < 14; i++) {
+          // Calm: a few slow drops instead of a spray (the scene still shows the splash).
+          next = t + (this.calm ? 3.2 : 1.6)
+          for (let i = 0; i < (this.calm ? 5 : 14); i++) {
             const d = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 4), new THREE.MeshBasicMaterial({ color: '#7DD3FC' }))
             d.position.set(-1.4, 0.1, 1.3)
             this.particles.push({ obj: d, v: new THREE.Vector3((Math.random() - 0.5) * 1.6, 1.5 + Math.random() * 1.4, (Math.random() - 0.5) * 1.6), life: 0, max: 1, spin: 0 })
@@ -695,7 +699,9 @@ export class Fx {
 
   private cheered = false
 
+  /** Calm means no confetti at all (as fireConfetti in components/kids/Confetti.tsx). */
   confetti(at: THREE.Vector3, n: number): void {
+    if (this.calm) return
     for (let i = 0; i < n; i++) {
       const c = new THREE.Mesh(this.confettiGeo, this.confettiMats[i % this.confettiMats.length])
       c.position.copy(at)
