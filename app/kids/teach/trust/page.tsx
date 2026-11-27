@@ -112,7 +112,7 @@ export default function TrustPackPage() {
 
       <section id="inventory" className="mt-12 scroll-mt-4" aria-labelledby="inv-h">
         <h2 id="inv-h" className={h2}>Data inventory</h2>
-        <p className="mt-2 max-w-3xl text-[16px] text-slate-300">Server-side tables, in a Supabase Postgres database with row-level security on every table. Nothing about a child exists on the server until the child types a class code.</p>
+        <p className="mt-2 max-w-3xl text-[16px] text-slate-300">Server-side tables, in a Supabase Postgres database with row-level security on every table. Nothing about a child exists on the server until the child types a class code or someone saves a Robot Passport in the Garage.</p>
         {SERVER_TABLES.map((t) => (
           <div key={t.table} className={`${card} mt-5`}>
             <h3 className="font-display text-xl font-bold text-white"><code className="text-amber-300">{t.table}</code></h3>

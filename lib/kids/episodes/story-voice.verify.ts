@@ -34,6 +34,10 @@ const wanted = new Set(lines.map((l) => l.key))
 const stale = Object.keys(voiced).filter((k) => !wanted.has(k))
 if (stale.length) fails.push(`${stale.length} clips no line reads (re-run generate-stories.py to prune): ${stale.slice(0, 5).join(', ')}`)
 const missing = lines.filter((l) => !voiced[l.key])
+// Offline: clips must be fetched (a cacheable 200), never set straight on <audio>.src
+// (that sends a Range request whose 206 the kids service worker cannot keep).
+const playerSrc = readFileSync(join(__dirname, 'story-voice.ts'), 'utf8')
+if (!/await storyClipUrl\(/.test(playerSrc) || !/URL\.createObjectURL/.test(playerSrc)) fails.push('story-voice.ts must play clips from fetched blob URLs (storyClipUrl) so the service worker caches them')
 
 if (fails.length) {
   for (const f of fails) console.error(`✗ ${f}`)

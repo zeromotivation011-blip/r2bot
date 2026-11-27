@@ -128,8 +128,14 @@ export default function PrivacyPage() {
           robot name, and rejects anything that looks like an email, phone number or link), and a
           <strong> progress snapshot</strong> the teacher sees: star totals, Robot World levels and
           zones finished, story episodes, Code Lab missions, course sessions and Skill Galaxy
-          activities finished, games played, minutes played, which levels the child keeps
-          retrying, the age band, and the Workshop robot design including the robot&apos;s name.</li>
+          activities finished (with the best stars and how many tries the best run took), games
+          played and the highest game level reached, which levels, activities and course challenges
+          the child keeps retrying, a one-letter state for each of 16 robotics ideas (not started,
+          learning, secure or fading) with the counts behind it (wins, tries, misses, days since
+          the last win), how often a wrong answer pointing to a known misunderstanding was chosen
+          (counts only, never the answer), on which days something was done and how many things
+          (for the class Power-Up), the age band, and the Workshop robot design including the
+          robot&apos;s name. Time spent playing is not sent.</li>
         <li>The child&apos;s device is identified to the class by a random token. We store only a
           SHA-256 hash of it, never anything that identifies the device or the child.</li>
         <li>Only that teacher can see the nickname and snapshot; if the class belongs to a school,

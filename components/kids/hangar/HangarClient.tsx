@@ -236,7 +236,7 @@ export function HangarClient() {
           <div
             className="h-3 overflow-hidden rounded-full bg-white/10"
             role="progressbar"
-            aria-label="Progress to the next level"
+            aria-label="Progress to the next rank"
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={ready ? Math.round(lvl.progress * 100) : 0}
@@ -290,12 +290,12 @@ export function HangarClient() {
                 <div className="min-w-0">
                   <p className="truncate font-display text-base font-bold leading-tight text-white">{nextUnlock.name}</p>
                   <p className="text-sm text-[#A7B0C0]">
-                    Reach level {nextUnlock.atLevel} · <span className="font-semibold text-white">{xpToNextUnlock.toLocaleString('en-GB')} XP</span> to go
+                    Reach Rank {nextUnlock.atLevel} · <span className="font-semibold text-white">{xpToNextUnlock.toLocaleString('en-GB')} XP</span> to go
                   </p>
                 </div>
               </div>
             ) : (
-              <p className="mt-2 flex min-h-[44px] items-center text-sm text-[#A7B0C0]">Every level look is yours. Badges unlock the rest.</p>
+              <p className="mt-2 flex min-h-[44px] items-center text-sm text-[#A7B0C0]">Every rank look is yours. Badges unlock the rest.</p>
             )}
           </div>
           <div className="mt-auto grid grid-cols-2 gap-3">

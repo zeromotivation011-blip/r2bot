@@ -175,13 +175,13 @@ export default async function LevelPage({ params }: Params) {
                 Act {i + 1}: {a.title} <span className="font-body text-sm font-semibold text-[#6E7888]">(sessions {a.sessions[0]}–{a.sessions[1]})</span>
               </h3>
               <p className="mt-1 leading-relaxed">{a.summary}</p>
-              <ol className="mt-2 space-y-1 text-[15px]" start={a.sessions[0]}>
+              <ol className="mt-2 space-y-0 text-[15px]" start={a.sessions[0]}>
                 {l.sessions
                   .filter((s) => s.number >= a.sessions[0] && s.number <= a.sessions[1])
                   .map((s) => (
                     <li key={s.number}>
                       {playable ? (
-                        <Link href={`/kids/course/${l.number}/${s.number}`} className="-my-2 inline-block py-2 font-semibold text-amber-300 underline-offset-4 hover:underline">
+                        <Link href={`/kids/course/${l.number}/${s.number}`} className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 underline-offset-4 hover:underline">
                           {s.number}. {s.title}
                         </Link>
                       ) : (

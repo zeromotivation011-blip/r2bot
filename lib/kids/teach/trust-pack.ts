@@ -24,11 +24,12 @@ import {
   MAX_CLASSES_PER_TEACHER,
   MAX_MEMBERS_PER_CLASS,
   SNAPSHOT_MAX_BYTES,
+  SNAPSHOT_MAX_BYTES_V2,
   type ClassSnapshot,
 } from '../classroom'
 
 export const TRUST_PACK_UPDATED = '2026-11-27'
-export const TRUST_PACK_VERSION = '1.0'
+export const TRUST_PACK_VERSION = '1.1'
 export const TRUST_CONTACT = 'hello@r2bot.in'
 
 export type Audience = 'teacher' | 'school-admin' | 'child-device' | 'nobody'
@@ -85,7 +86,7 @@ export interface StoredTable {
   deletion: string[]
 }
 
-/** Server-side tables that hold anything about a class (Supabase Postgres, row-level security on every table). */
+/** Server-side tables that hold anything about a child or a class (Supabase Postgres, row-level security on every table). */
 export const SERVER_TABLES: StoredTable[] = [
   {
     table: 'kids_class_members',
@@ -94,7 +95,7 @@ export const SERVER_TABLES: StoredTable[] = [
     fields: [
       { name: 'nickname', what: 'The name the child picks for the class, 2–20 letters. The form asks for a first name or a made-up robot name and refuses anything that looks like an email, phone number, link or rude word.', seenBy: TEACHER, personal: 'possibly' },
       { name: 'token_hash', what: 'A SHA-256 hash of a random token kept on the child’s device. It lets that device update its own row; it identifies nothing else and the token itself is never stored.', seenBy: 'Nobody (server only)', personal: 'no' },
-      { name: 'snapshot', what: `The progress counters listed below, at most ${SNAPSHOT_MAX_BYTES} bytes.`, seenBy: TEACHER, personal: 'no' },
+      { name: 'snapshot', what: `The progress counters listed below, at most ${SNAPSHOT_MAX_BYTES / 1024} KB, or ${SNAPSHOT_MAX_BYTES_V2 / 1024} KB once the Wave 2 database update has run.`, seenBy: TEACHER, personal: 'no' },
       { name: 'created_at, last_active_at', what: 'When the child joined and when the device last synced.', seenBy: TEACHER, personal: 'no' },
       { name: 'id, class_id', what: 'Random row id and the class it belongs to.', seenBy: 'Nobody (server only)', personal: 'no' },
     ],
@@ -143,6 +144,23 @@ export const SERVER_TABLES: StoredTable[] = [
     retention: 'Kept until the admin deletes the school (classes stay; they just leave the school) or the teacher leaves it.',
     deletion: ['The admin deletes the school, or a teacher leaves it. Counts only: the admin never sees children’s nicknames.'],
   },
+  {
+    table: 'kids_passports',
+    purpose: 'Optional Robot Passport: a family can save the child’s progress backup on R2BOT and restore it on another device with a few friendly words (e.g. MAGNET-OTTER-NOVA-7). No account, email or other contact details.',
+    createdWhen: 'Only when the child or a grown-up taps “Save my explorer” in the Garage. Nothing is stored for a child who never does.',
+    fields: [
+      { name: 'code_hash', what: 'A SHA-256 hash of the Passport words. The words themselves are never stored, so R2BOT cannot read them back or link a row to a child.', seenBy: 'Nobody (server only)', personal: 'no' },
+      { name: 'backup', what: 'The same progress backup code the Garage offers offline: stars, XP, badges, course and activity progress, plus the explorer nickname and the robot’s name (both checked like a nickname).', seenBy: 'Nobody but the device that has the words', personal: 'possibly' },
+      { name: 'summary', what: 'Three numbers (XP, badges, sessions) so a restore can say what it found.', seenBy: 'Nobody but the device that has the words', personal: 'no' },
+      { name: 'created_at, updated_at, last_used_at', what: 'When the Passport was made, last saved and last opened.', seenBy: 'Nobody (server only)', personal: 'no' },
+    ],
+    retention: 'Deleted automatically when it has not been opened or saved for 400 days.',
+    deletion: [
+      'A grown-up taps “Delete my Passport” in the Garage: deleted at once.',
+      'Read and written only through R2BOT’s server with the service role: row-level security is on with no policies, so no teacher, school or other user can see a row.',
+      `A parent or the school emails ${TRUST_CONTACT} with the Passport words: we delete it and confirm.`,
+    ],
+  },
 ]
 
 export interface DeviceStore {
@@ -153,11 +171,11 @@ export interface DeviceStore {
 
 /** What stays on the child's own device and is never sent to R2BOT. */
 export const DEVICE_ONLY: DeviceStore[] = [
-  { what: 'Stars, XP, badges, quests, course and activity progress, game personal bests', where: 'The browser’s own storage on that device', leaves: 'Never — only the counters above go to a class, and only after joining one' },
-  { what: 'The explorer name, avatar and the robot design', where: 'The browser’s own storage', leaves: 'The robot code goes to the class snapshot after joining; the explorer name never does' },
+  { what: 'Stars, XP, badges, quests, course and activity progress, game personal bests', where: 'The browser’s own storage on that device', leaves: 'Only the counters above go to a class, after joining one; the whole progress goes into a Robot Passport only if one is saved' },
+  { what: 'The explorer name, avatar and the robot design', where: 'The browser’s own storage', leaves: 'The robot code goes to the class snapshot after joining; the explorer name never goes to a class (it is inside a Robot Passport if one is saved)' },
   { what: 'Family profiles and picture passwords on shared tablets', where: 'The browser’s own storage', leaves: 'Never' },
   { what: 'Settings (sound, voice, text size, contrast, less motion, Lite 3D) and parent controls', where: 'The browser’s own storage', leaves: 'Never' },
-  { what: 'The progress backup code', where: 'Made on the device; the family keeps it', leaves: 'Never sent to R2BOT' },
+  { what: 'The progress backup code', where: 'Made on the device; the family keeps it', leaves: 'Only if someone taps “Save my explorer” (Robot Passport): then the same code is stored on R2BOT under a hash of the Passport words (see kids_passports above)' },
   { what: 'Camera frames (Workshop AR, Vision Lab)', where: 'Processed in the browser, frame by frame', leaves: 'Never recorded or uploaded' },
 ]
 
@@ -214,7 +232,7 @@ export const LAW_NOTES: LawNote[] = [
     law: 'UK Age Appropriate Design Code (Children’s Code)',
     where: 'United Kingdom, under 18',
     points: [
-      'High privacy by default: nothing about a child leaves the device unless they join a class.',
+      'High privacy by default: nothing about a child leaves the device unless they join a class or save a Robot Passport (progress and nicknames under a hash of the Passport words, deleted after 400 days unused).',
       'No geolocation, no profiling, no data sharing, and no nudges to give more data. Time limits and quiet hours are gentle banners set by a parent, never a lock.',
       'Parental controls are visible to the child in plain words; links that leave R2BOT Kids sit behind a parental gate.',
       'Ask Spark answers a child who says they are hurt with a kind message and a helpline card; it never sends that to an AI model.',
@@ -226,7 +244,7 @@ export const LAW_NOTES: LawNote[] = [
     where: 'India, under 18',
     points: [
       'No tracking, behavioural monitoring or targeted advertising directed at children.',
-      'The only server-side data about a child is created when they join a teacher’s class with its code, for that teacher’s teaching.',
+      'Server-side data about a child is created only when they join a teacher’s class with its code (for that teacher’s teaching) or when a Robot Passport is saved (a progress backup under a hash of its words, deleted after 400 days unused).',
       'Erasure on request, at once, by the child, the teacher, a parent or the school.',
     ],
     schoolAction: 'The DPDP Act asks for verifiable parental consent before a child’s data is processed, with duties phasing in under its Rules. Before children join a class, collect parental consent with your usual school forms (the template letter below can be attached).',
@@ -271,7 +289,7 @@ export function parentLetter(): ParentLetter {
       'Dear parent or carer,',
       'This term [class name] will learn robotics with R2BOT Kids (www.r2bot.in/kids): short animated stories, building a robot on screen, programming it with picture blocks, and solving challenges in a simulator. Some lessons use no screens at all.',
       'Your child does not need an account. They will never be asked for an email address, password, phone number, birthday, photo or location. There are no ads, no in-app purchases, no chat between children and no leaderboards.',
-      'In class, your child will type our class code and choose a nickname: a first name or a made-up robot name. That nickname and a short list of progress numbers (stars, lessons and activities finished, minutes played, and the robot they designed) are shared with me so I can see who needs help. No one else can see them.',
+      'In class, your child will type our class code and choose a nickname: a first name or a made-up robot name. That nickname and a short list of progress numbers (stars, lessons and activities finished, which robotics ideas they have mastered, and the robot they designed) are shared with me so I can see who needs help. No one else can see them.',
       'Everything else — stars, badges, the robot, settings — stays on the device your child uses. You can see what your child has done, and set gentle time limits, from the parents page: www.r2bot.in/kids/parents.',
       'You can ask for your child’s class data to be deleted at any time: your child can tap “Leave class”, I can remove them, or you can email hello@r2bot.in. Data is also deleted when I delete the class at the end of the year.',
       'If you have any questions, or you would prefer your child not to join the online class (they can still do every lesson without joining), please let me know by [date].',
@@ -300,7 +318,7 @@ export const TRUST_SECTIONS: TrustSection[] = [
 
 export const ONE_MINUTE: string[] = [
   'Children never give an email, password, phone number, birthday, photo or location. There are no child accounts.',
-  'Progress stays on the child’s device unless the child joins a teacher’s class with its code.',
+  'Progress stays on the child’s device unless the child joins a teacher’s class with its code, or a Robot Passport is saved to move it to another device (no account; deleted after 400 days unused).',
   'In a class, the teacher sees a nickname and progress counters — nothing else, and no one else does.',
   'Deletion is immediate: the child taps “Leave class”, the teacher removes them or deletes the class, or a parent emails us.',
   'No ads, no selling of data, no chat between children, no leaderboards, no Google Analytics on R2BOT Kids.',

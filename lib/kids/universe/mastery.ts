@@ -290,13 +290,20 @@ export function cleanConceptDays(x: unknown): Record<string, string> {
 /** Merge two logs (a restore): union by activity + day + outcome, in day order, capped. Never loses the newest tries. */
 export function mergeConceptLog(a: readonly ConceptTry[], b: readonly ConceptTry[] | undefined): ConceptTry[] {
   if (!b?.length) return [...a]
-  const seen = new Set<string>()
-  const all: ConceptTry[] = []
-  for (const t of [...a, ...b]) {
-    const key = `${t.a}|${t.d}|${t.ok}`
-    if (seen.has(key)) continue
-    seen.add(key)
-    all.push(t)
+  // Duplicates are removed only BETWEEN the logs, never within one: three real
+  // misses on the same activity on the same day stay three (needsHelp counts
+  // them). Per key, the merge keeps max(count in a, count in b), so restoring a
+  // backup of this same device adds nothing and never lowers a count.
+  const key = (t: ConceptTry) => `${t.a}|${t.d}|${t.ok}`
+  const inA = new Map<string, number>()
+  for (const t of a) inA.set(key(t), (inA.get(key(t)) ?? 0) + 1)
+  const inB = new Map<string, number>()
+  const all: ConceptTry[] = [...a]
+  for (const t of b) {
+    const k = key(t)
+    const n = (inB.get(k) ?? 0) + 1
+    inB.set(k, n)
+    if (n > (inA.get(k) ?? 0)) all.push(t)
   }
   // Stable sort by day keeps same-day order.
   return all

@@ -182,7 +182,7 @@ export function GarageClient({ trailParts }: { trailParts: TrailPartInfo[] }) {
         <div className="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-4 shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:p-5">
           <div className="flex items-end justify-between gap-3">
             <h3 className="font-display text-2xl font-bold text-white">Robot card</h3>
-            <p className="text-sm text-[#A7B0C0]">{ready ? `Level ${lvl.level} · ${collectedStars(progress)} ★` : ' '}</p>
+            <p className="text-sm text-[#A7B0C0]">{ready ? `Rank ${lvl.level} · ${collectedStars(progress)} ★` : ' '}</p>
           </div>
 
           <form

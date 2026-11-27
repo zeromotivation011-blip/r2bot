@@ -303,3 +303,46 @@ Still open from batch D:
 - [ ] Parent hub has no "Delete my Passport" entry (Garage has it, behind the gate).
 - [ ] `VOICES.md` has no Story Theatre section (commands are in `generate-stories.py`).
 - [ ] The Robodex toast can overlap the Ask Spark button on phones.
+
+## 27 Nov 2026 — Wave 2 review fixes (child, teacher-policy, engineering checks)
+
+Independent checks of Wave 2 found these; all fixed and re-tested on a production build
+(390×844 and 1280×800):
+- [x] **Episode XP farming.** `EpisodePlayerClient` reported `reportActivity` on every watch (the
+  `doneRef` guard resets on reload): L1-S01 paid 90 XP, then +25 per rewatch. It now uses
+  `reportBestRun({ kind: 'episode', id: 'episode-<id>', score: 1 })`; rewatching pays 0 (browser:
+  90 → 90). rewards.verify checks the player's source and the replay.
+- [x] **Rank, not Level, in the Garage.** Robot card "Rank 6", locked looks "Reach Rank N", progress
+  bar "next rank", parent profile cards "Rank", explainer "grows their rank"; course planets now read
+  "Course Level N" so a child never sees two meanings of "level".
+- [x] **Course session links 44 px.** `/kids/course/[level]` act lists: `inline-flex min-h-[44px]`,
+  no negative margin, `space-y-0` (were 40 px on Levels 3–4).
+- [x] **Removing member #1 erased only progress and robot.** New `PROFILE_KEY_BASES` in
+  `lib/kids/profiles.ts` lists every `profileKey()` base (progress, robot, builds, portfolio, Robodex,
+  Passport words, ghosts, makers heard, class misc + diary, look); `removeProfile('p1')` deletes them
+  all. progress-backup.verify scans every `profileKey(` call site in app/components/lib and fails on a
+  base that is not listed.
+- [x] **Class Power-Up cache leaked between children.** `r2bot_kids_class_powerup_v1` is now in
+  `SWAPPED_KEYS` (it was already cleared by `clearMembership()`); the card also re-reads on
+  `KIDS_PROFILE_EVENT`.
+- [x] **Trust Pack (v1.1).** Adds `kids_passports` to the data inventory (hash, backup, summary, dates;
+  service role only; 400-day purge; delete in the Garage or by email). "Never sent to R2BOT", the
+  one-minute summary, AADC and DPDP points now mention the Passport. Snapshot size reads "8 KB, or
+  16 KB once the Wave 2 database update has run". Parent letter no longer says "minutes played".
+- [x] **/privacy** lists the Wave 2 snapshot (concept letters + evidence, per-activity stars/tries,
+  misconception counts, game tiers, the day diary) and no longer claims minutes played.
+  `parseSnapshot` forces `totalMinutesPlayed` to 0 so an older cached client cannot store minutes.
+- [x] **Gradebook CSV** evidence cells are "3 wins · 5 tries · 2 misses" (Excel read "3/5/2" as a date).
+- [x] **Story Theatre clips offline.** `story-voice.ts` fetches each clip and plays a blob URL (as the
+  episode engine does): `<audio src>` sent a Range request whose 206 the service worker never cached.
+  Browser: after playing a story, its clips are in `r2bot-kids-audio-1`. story-voice.verify guards it.
+- [x] **Bundle.** `/kids/hangar` First Load 228 → 185 kB: the Robodex shelf and the Passport/backup
+  panel load after first paint (`components/kids/hangar/HangarLazyClient.tsx`, `ssr: false`, skeletons
+  measured to the same height, so no shift). The Skill Galaxy `TRACKS` chunk is out of the /kids
+  layout: KidsClassSync reads membership from the new light `lib/kids/classroom-membership-store.ts`
+  and imports the snapshot builder only on a device in a class (layout JS 547 → 523 KB raw).
+- [x] **Restoring a backup kept only one of several same-day misses.** `mergeConceptLog` now removes
+  duplicates only between the two logs (per key: max of the two counts), so `needsHelp` survives a
+  restore. mastery.verify covers it.
+
+Not changed: `/kids/parents` (171 kB) and `/kids/settings` (168 kB) were not split further.

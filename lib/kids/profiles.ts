@@ -10,7 +10,7 @@
 //
 // HOW DATA IS KEPT APART — two mechanisms, one rule each:
 //
-// 1. NAMESPACED keys (`NAMESPACED_BASES`: progress, robot). Readers ask
+// 1. NAMESPACED keys (`PROFILE_KEY_BASES`: progress, robot, builds, Passport...). Readers ask
 //    profileKey(base) for the key. Member #1 ('p1', the child who used this
 //    device before profiles existed) keeps the ORIGINAL key, so the migration
 //    moves no data and cannot lose any. Every other profile uses
@@ -47,6 +47,27 @@ const SEP = '::'
 /** Keys whose readers call profileKey(). Exported for the verify script. */
 export const NAMESPACED_BASES = ['r2bot_kids_v2', 'r2bot_kids_robot_v1'] as const
 
+/**
+ * EVERY base passed to profileKey() anywhere in the app: progress and robot
+ * plus the stores that adopted profileKey() later. Member #1 ('p1') keeps all
+ * of these at the plain key, so removeProfile('p1') deletes each one; a base
+ * missing here would survive the removal (the Passport words did, Nov 2026).
+ * profiles.verify.ts fails CI if a profileKey() call site uses a base that is
+ * not listed. Never list a SWAPPED_KEYS entry here.
+ */
+export const PROFILE_KEY_BASES: readonly string[] = [
+  ...NAMESPACED_BASES,
+  'r2bot_kids_builds_v1', // Make It at Home builds (lib/kids/builds/store.ts)
+  'r2bot_kids_portfolio_v1', // portfolio (components/kids/portfolio/portfolio-store.ts)
+  'r2bot_kids_robodex_v1', // Robodex cards (lib/kids/robodex/store.ts)
+  'r2bot_kids_passport_v1', // Robot Passport restore words (lib/kids/passport-client.ts)
+  'r2bot_kids_sim_ghosts_v1', // Flight Recorder ghosts (lib/kids/sim/ghost-store.ts)
+  'r2bot_kids_makers_heard_v1', // Makers heard (lib/kids/makers/heard.ts)
+  'r2bot_kids_class_misc_v1', // class misconception counts (lib/kids/classroom-diary.ts)
+  'r2bot_kids_class_diary_v1', // class activity diary (lib/kids/classroom-diary.ts)
+  'r2bot_kids_look_v1', // teen "R2BOT Lab" look (lib/kids/teen-boot.ts)
+]
+
 /** Per-child stores read by fixed key elsewhere; swapped on every switch. */
 export const SWAPPED_KEYS: readonly string[] = [
   'r2bot_kids_activities_v1', // Skill Galaxy done map (lib/kids/activities/progress.ts)
@@ -54,6 +75,7 @@ export const SWAPPED_KEYS: readonly string[] = [
   'r2bot_kids_build_day', // once-a-day build reward (rewards.ts)
   'r2bot_kids_class_v1', // class membership token (classroom-membership.ts)
   'r2bot_kids_class_missions_v1', // cached teacher missions
+  'r2bot_kids_class_powerup_v1', // cached Class Power-Up (classroom-membership.ts)
   'r2bot_kids_hangar_v1', // hangar looks (components/kids/hangar/cosmetics.ts)
   'r2bot_kids_onboarded', // universe intro seen
   'r2bot_kids_spark_reward_day', // Ask Spark daily reward
@@ -556,7 +578,8 @@ export function removeProfile(id: string): boolean {
     }
   }
   if (id === LEGACY_PROFILE_ID) {
-    for (const base of NAMESPACED_BASES) {
+    // p1 keeps every profileKey() store at the plain key (namespacedKey).
+    for (const base of PROFILE_KEY_BASES) {
       try { s.removeItem(base) } catch { /* ignore */ }
     }
   }

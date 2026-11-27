@@ -239,6 +239,12 @@ async function main() {
   check('a NaN score reports nothing', R.reportBestRun({ kind: 'game', id: 'x:t0', score: Number.NaN }) === null)
   const gs = src('components/kids/ui/GameShellClient.tsx')
   check('GameShell reports through reportBestRun (no replay XP)', /reportBestRun\(\{\s*kind: 'game'/.test(gs) && !/reportActivity\(/.test(gs))
+  const ep = src('components/kids/episodes/EpisodePlayerClient.tsx')
+  check('the 3D episode player reports through reportBestRun (rewatching pays nothing)', /reportBestRun\(\{\s*kind: 'episode'/.test(ep) && !/reportActivity\(\{/.test(ep))
+  store.clear()
+  const w1 = R.reportBestRun({ kind: 'episode', id: 'episode-L1-S01', score: 1 })
+  const w2 = R.reportBestRun({ kind: 'episode', id: 'episode-L1-S01', score: 1 })
+  check('watching the same episode twice pays XP once', Boolean(w1 && w1.xpGained > 0) && w2 === null)
 
   // ── Debug-program activity → bugfix + Bug Hunter ──
   store.clear()

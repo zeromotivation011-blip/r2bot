@@ -247,7 +247,7 @@ export function HangarRecordsClient({
                   </span>
                   <div className="min-w-0">
                     <h3 className="font-display text-base font-bold leading-tight text-white">{planet.name}</h3>
-                    <p className="text-xs text-[#A7B0C0]">Level {planet.level}</p>
+                    <p className="text-xs text-[#A7B0C0]">Course Level {planet.level}</p>
                   </div>
                 </div>
                 <p className="mt-3 font-display text-sm font-bold text-white">

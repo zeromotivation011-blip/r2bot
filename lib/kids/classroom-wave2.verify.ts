@@ -28,6 +28,7 @@ import { GOAL_PRESETS, addDays, goalProgress, helpedThisWeek, milestonesReached,
 import { cellEvidence, classMindMap, gradebook, gradebookCsv, mindMapHeadline, stuckSignals } from './classroom-insights'
 import { getInsightCatalogue } from './classroom-insights-server'
 import { allStandards } from './classroom-standards'
+import { DEVICE_ONLY, LAW_NOTES, ONE_MINUTE, SERVER_TABLES, parentLetter } from './teach/trust-pack'
 import { LEVEL2_SESSIONS } from './curriculum/level2'
 import { LEVEL3_SESSIONS } from './curriculum/level3'
 import { LEVEL4_SESSIONS } from './curriculum/level4'
@@ -73,6 +74,7 @@ if (rich) {
   check('days: only real calendar days', Object.keys(rich.days).join() === '2026-11-20')
   check('unknown fields never stored', !('answers' in rich) && !('freeText' in rich))
 }
+check('minutes played are always 0 on the server, even from an older client', parseSnapshot({ v: 1, totalMinutesPlayed: 5000 })?.totalMinutesPlayed === 0)
 check('bad concept code dropped', parseSnapshot({ concepts: 'hello' })?.concepts === '')
 check('bad evidence dropped', parseSnapshot({ conceptEvidence: '1.2.3' })?.conceptEvidence === '')
 check('mismatched scores dropped', parseSnapshot({ activitiesDone: ['a'], activityScores: '3131' })?.activityScores === '')
@@ -158,6 +160,7 @@ check('stuck: Galaxy activity appears under its track', sig.galaxy.some((g) => g
 check('stuck: nothing with fewer than 2 children', [...sig.course, ...sig.checks, ...sig.galaxy.flatMap((g) => g.items)].every((x) => x.children >= 2))
 const csv = gradebookCsv(rows)
 check('gradebook CSV: header + one line per child', csv.split('\n').length === 4 && csv.startsWith('Nickname,'))
+check('gradebook CSV evidence cells never look like a date to a spreadsheet', !/(^|,)\d+\/\d+\/\d+(,|$)/m.test(csv) && /\d+ wins · \d+ tries · \d+ misses/.test(csv))
 check('gradebook CSV guards formula injection', gradebookCsv(gradebook([mk('d', '=cmd', {})])).includes("'=cmd"))
 
 // ── Class Power-Up ───────────────────────────────────────────────────────────
@@ -221,8 +224,19 @@ function standardsChecks(): void {
   }
 }
 
+// ── Trust Pack honesty ───────────────────────────────────────────────────────
+function trustChecks(): void {
+  console.log('Trust Pack')
+  const all = JSON.stringify({ SERVER_TABLES, DEVICE_ONLY, LAW_NOTES, ONE_MINUTE, letter: parentLetter() })
+  check('Trust Pack lists the Robot Passport table', SERVER_TABLES.some((t) => t.table === 'kids_passports' && /400 days/.test(t.retention)))
+  check('Trust Pack never claims the backup code is never sent', !/Never sent to R2BOT/.test(all))
+  check('Trust Pack never promises minutes played to teachers', !/minutes played/i.test(all))
+  check('Trust Pack states the Wave 2 snapshot size', /16 KB/.test(all))
+}
+
 void diaryChecks().then(() => {
   standardsChecks()
+  trustChecks()
   if (failures) {
     console.error(`\n${failures} check(s) failed.`)
     process.exit(1)

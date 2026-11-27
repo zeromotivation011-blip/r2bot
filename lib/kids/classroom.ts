@@ -258,7 +258,8 @@ export function parseSnapshot(x: unknown): ClassSnapshot | null {
     episodesDone: starMap(o.episodesDone, 120, 3),
     codeMissions: starMap(o.codeMissions, 200, 3),
     robotsBuilt,
-    totalMinutesPlayed: int(o.totalMinutesPlayed, 1_000_000),
+    // Always 0: minutes of play never leave the device, even from an older cached client.
+    totalMinutesPlayed: 0,
     band: isBandId(o.band) ? o.band : null,
     robot,
     stuck: starMap(o.stuck, 20, 1000),

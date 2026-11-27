@@ -146,7 +146,7 @@ export default function ParentProfilesClient() {
               </div>
               <dl className="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
                 {[
-                  ['Level', `${lvl.level} · ${lvl.title}`],
+                  ['Rank', `${lvl.level} · ${lvl.title}`],
                   ['Course sessions', String(Object.keys(prog.sessionsDone).length)],
                   ['Days this week', `${daysThisWeek(prog, now)} of 7`],
                   ['Last played', lastPlayedText(prog, now)],

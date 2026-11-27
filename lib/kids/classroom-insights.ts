@@ -414,12 +414,13 @@ function csvCell(v: string | number): string {
 
 /** The gradebook as CSV: one row per child, two columns per concept (status, evidence). */
 export function gradebookCsv(rows: readonly GradeRow[]): string {
-  const header = ['Nickname', ...CONCEPT_IDS.flatMap((id) => [`${CONCEPT_INFO[id].name} (status)`, `${CONCEPT_INFO[id].name} (wins/tries/misses)`]), 'Course sessions finished', 'Skill Galaxy activities finished']
+  const header = ['Nickname', ...CONCEPT_IDS.flatMap((id) => [`${CONCEPT_INFO[id].name} (status)`, `${CONCEPT_INFO[id].name} (evidence)`]), 'Course sessions finished', 'Skill Galaxy activities finished']
   const lines = rows.map((r) => {
     const cells = CONCEPT_IDS.flatMap((id) => {
       const c = r.cells[id]
       const status = r.hasData ? `${STATUS_LABEL[c.status]}${c.needsHelp ? ' (needs help)' : ''}` : 'No data yet'
-      return [status, r.hasData ? `${c.wins}/${c.tries}/${c.misses}` : '']
+      // Words, not "3/5/2": spreadsheets read slash-separated numbers as a date.
+      return [status, r.hasData ? `${c.wins} wins · ${c.tries} tries · ${c.misses} misses` : '']
     })
     return [r.member.nickname, ...cells, Object.keys(r.member.snapshot.sessionsDone).length, r.member.snapshot.activitiesDone.length].map(csvCell).join(',')
   })

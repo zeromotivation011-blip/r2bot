@@ -12,9 +12,11 @@
 // player never goes silent and never waits on a missing file.
 //
 // Browser-only. One <audio> element for every line: once primeStoryVoice() has
-// run inside a tap (iOS), later lines start without a gesture. Clips go through
-// the kids service worker's audio cache (/kids/audio/**), so a watched story
-// plays offline.
+// run inside a tap (iOS), later lines start without a gesture. Each clip is
+// FETCHED (a plain 200, which the kids service worker's audio cache keeps) and
+// played from a blob URL, like the episode engine's voices.ts. Setting
+// <audio>.src to the file instead makes the browser send a Range request; the
+// 206 answer is never cached, so a watched story would not play offline.
 
 import { speakLine, type SpeakHandle } from '../stories/speech'
 import type { SpeakerId } from '../stories/types'
@@ -30,6 +32,35 @@ interface StoryVoiceIndex {
 let indexPromise: Promise<StoryVoiceIndex | null> | null = null
 let audio: HTMLAudioElement | null = null
 let ext: 'ogg' | 'm4a' = 'ogg'
+
+// Recent clips as blob URLs (a replayed line or the next scene never refetches).
+const clipUrls = new Map<string, string>()
+const MAX_CLIP_URLS = 40
+
+/** The clip as a blob URL (through the service worker cache); the file path if the fetch fails. */
+export async function storyClipUrl(file: string): Promise<string> {
+  const hit = clipUrls.get(file)
+  if (hit) {
+    clipUrls.delete(file)
+    clipUrls.set(file, hit) // most recent last
+    return hit
+  }
+  if (typeof fetch === 'undefined' || typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') return file
+  try {
+    const res = await fetch(file)
+    if (!res.ok) return file
+    const url = URL.createObjectURL(await res.blob())
+    clipUrls.set(file, url)
+    while (clipUrls.size > MAX_CLIP_URLS) {
+      const [oldFile, oldUrl] = clipUrls.entries().next().value as [string, string]
+      clipUrls.delete(oldFile)
+      if (!audio || audio.src !== oldUrl) URL.revokeObjectURL(oldUrl)
+    }
+    return url
+  } catch {
+    return file // offline and not saved yet: the <audio> error falls back to the browser voice
+  }
+}
 
 /** The voicing index (16 KB), fetched once per page. Null when missing or unreadable. */
 export function loadStoryVoiceIndex(): Promise<StoryVoiceIndex | null> {
@@ -129,11 +160,12 @@ export function speakStoryLine(who: SpeakerId, text: string, expectedMs: number,
     }, onBoundary)
   }
 
-  void loadStoryVoiceIndex().then((idx) => {
+  void loadStoryVoiceIndex().then(async (idx) => {
     if (cancelled || done) return
     const rec = idx?.lines[storyVoiceKey(who, text)]
     if (!a || !idx || !rec) return fallback()
-    const file = `${idx.base}/${storyVoiceKey(who, text)}.${ext}`
+    const file = await storyClipUrl(`${idx.base}/${storyVoiceKey(who, text)}.${ext}`)
+    if (cancelled || done) return
     try {
       // The browser voice may still be talking from an earlier line.
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel()

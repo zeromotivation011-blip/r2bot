@@ -9,7 +9,7 @@
 //
 // Props: { sessionId, onDone, onUnavailable? }. `onDone` fires once when the
 // episode has played to its end. The player itself reports the reward
-// (reportActivity kind 'episode', id `episode-<sessionId>`), so callers must
+// (reportBestRun kind 'episode', id `episode-<sessionId>`), so callers must
 // NOT report 'episode' again.
 //
 // When the 3D cartoon cannot play (no WebGL, the engine fails to load, or the
@@ -27,7 +27,7 @@ import { playSound } from '@/lib/kids-audio'
 import { kidsCalm, kidsReducedMotion, readKidsSettings } from '@/lib/kids/settings'
 import { KIDS_SETTINGS_EVENT } from '@/lib/kids/settings-boot'
 import { DEFAULT_DESIGN, loadDesign } from '@/lib/kids/robot-design'
-import { reportActivity } from '@/lib/kids/universe/rewards'
+import { reportBestRun } from '@/lib/kids/universe/rewards'
 import { VOICE_CREDIT } from '@/lib/kids/episodes/credits'
 import type { ChoiceOption, TurnIcon } from '@/lib/kids/episodes/interactions'
 import { planEpisode, type Beat, type ChoiceBeat, type EpisodePlan } from '@/lib/kids/episodes/plan'
@@ -228,7 +228,8 @@ export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }
     if (doneRef.current) return
     doneRef.current = true
     try {
-      if (!record) reportActivity({ kind: 'episode', id: `episode-${id}` })
+      // reportBestRun: watching again never pays twice (the replay rule).
+      if (!record) reportBestRun({ kind: 'episode', id: `episode-${id}`, score: 1 })
     } catch {
       // progress storage unavailable — the episode still ends normally
     }

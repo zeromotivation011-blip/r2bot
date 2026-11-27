@@ -340,6 +340,70 @@ async function profileChecks(P: ProgressModule) {
     memoryStorage.setItem = realSet
     check('a full storage refuses the switch and keeps the current child intact', !ok && PR.activeProfileId() === 'p1' && P.getProgress().xp === 900 && JSON.parse(store.get(CLASS) ?? '{}').token === 't-nova' && store.get(DRAFT) === '{"blocks":[1]}')
   }
+
+  // Removing member #1 removes EVERY profileKey() store at its plain key
+  // (Passport words, Robodex, builds, portfolio, ghosts, class diary, look...).
+  if (sib2.ok) {
+    for (const base of PR.PROFILE_KEY_BASES) store.set(base, '{"p1":true}')
+    store.set(`r2bot_kids_robodex_v1::${sib2.profile.id}`, '{"leo":true}')
+    PR.switchProfile(sib2.profile.id)
+    const removed = PR.removeProfile('p1')
+    const left = PR.PROFILE_KEY_BASES.filter((b) => store.has(b))
+    check('removing member #1 deletes every profileKey() store it kept at the plain key', removed && left.length === 0, left.join(', '))
+    check("…and leaves the other child's stores alone", store.get(`r2bot_kids_robodex_v1::${sib2.profile.id}`) === '{"leo":true}')
+  }
+  check('the Class Power-Up cache is per child (swapped on switch)', PR.SWAPPED_KEYS.includes('r2bot_kids_class_powerup_v1'))
+
+  // Every profileKey(<base>) call site in the app uses a base in PROFILE_KEY_BASES.
+  const fs = await import('node:fs')
+  const path = await import('node:path')
+  const root = path.resolve(__dirname, '../..')
+  const files: string[] = []
+  const walk = (dir: string) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (e.name === 'node_modules' || e.name.startsWith('.')) continue
+      const f = path.join(dir, e.name)
+      if (e.isDirectory()) walk(f)
+      else if (/\.tsx?$/.test(e.name) && !e.name.includes('.verify.')) files.push(f)
+    }
+  }
+  for (const d of ['app', 'components', 'lib']) walk(path.join(root, d))
+  // NAME → string value, from every `const NAME = 'r2bot_…'` in the app.
+  const consts = new Map<string, Set<string>>()
+  const sources = new Map<string, string>()
+  for (const f of files) {
+    const src = fs.readFileSync(f, 'utf8')
+    sources.set(f, src)
+    for (const m of src.matchAll(/const\s+([A-Z_][A-Z0-9_]*)\s*=\s*'(r2bot_[^']+)'/g)) {
+      const set = consts.get(m[1]) ?? new Set<string>()
+      set.add(m[2])
+      consts.set(m[1], set)
+    }
+  }
+  // A generic reader whose argument is a base read elsewhere (PortfolioClient's readJson(key)).
+  const GENERIC_ARGS = new Set(['key', 'base'])
+  const bad: string[] = []
+  let sites = 0
+  for (const [f, src] of sources) {
+    if (f.endsWith(path.join('lib', 'kids', 'profiles.ts'))) continue
+    for (const m of src.matchAll(/profileKey\(\s*([^)\s]+)\s*\)/g)) {
+      sites++
+      const arg = m[1]
+      const rel = path.relative(root, f)
+      if (/^'[^']*'$/.test(arg)) {
+        if (!PR.PROFILE_KEY_BASES.includes(arg.slice(1, -1))) bad.push(`${rel}: ${arg}`)
+      } else if (GENERIC_ARGS.has(arg)) {
+        continue
+      } else {
+        // The file's own constant first (several files call theirs KEY), then an imported one.
+        const own = [...src.matchAll(new RegExp(`const\\s+${arg}\\s*=\\s*'(r2bot_[^']+)'`, 'g'))].map((x) => x[1])
+        const vals = own.length ? new Set(own) : consts.get(arg)
+        if (!vals || [...vals].some((v) => !PR.PROFILE_KEY_BASES.includes(v))) bad.push(`${rel}: ${arg}`)
+      }
+    }
+  }
+  check(`every profileKey() call site (${sites}) uses a base listed in PROFILE_KEY_BASES`, sites > 10 && bad.length === 0, bad.join('; '))
+  check('no base is both profileKey()-namespaced and swapped', !PR.PROFILE_KEY_BASES.some((b) => PR.SWAPPED_KEYS.includes(b)))
 }
 
 main().catch((e) => {

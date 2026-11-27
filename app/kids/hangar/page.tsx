@@ -13,7 +13,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { jsonldScript } from '@/lib/seo/jsonld'
-import { BackupCodeClient } from '@/components/kids/hangar/BackupCodeClient'
 import { GarageClient, type TrailPartInfo } from '@/components/kids/hangar/GarageClient'
 import { HangarClient } from '@/components/kids/hangar/HangarClient'
 import ConceptConstellationClient from '@/components/kids/galaxy/ConceptConstellationClient'
@@ -25,7 +24,8 @@ import { LEVEL2_SESSIONS } from '@/lib/kids/curriculum/level2'
 import { LEVEL3_SESSIONS } from '@/lib/kids/curriculum/level3'
 import { LEVEL4_SESSIONS } from '@/lib/kids/curriculum/level4'
 import { CertificateButtonClient } from '@/components/kids/teach/CertificateButtonClient'
-import RobodexShelfClient from '@/components/kids/robodex/RobodexShelfClient'
+// Loaded after first paint (the Robodex catalogue and the Passport panel are the page's heaviest islands).
+import { LazyBackupCode, LazyRobodexShelf } from '@/components/kids/hangar/HangarLazyClient'
 import { byWorld } from '@/lib/kids/activities/content'
 import { WORLDS } from '@/lib/kids/universe/worlds'
 // Server-side only: the Spark Trail parts and zone names (the big zone data stays off the client).
@@ -111,7 +111,7 @@ export default function HangarPage() {
       </div>
       <HangarRecordsClient courseBadges={courseBadges} worldActivityIds={worldActivityIds} />
       <div className="mx-auto max-w-6xl px-4 pt-6">
-        <RobodexShelfClient />
+        <LazyRobodexShelf />
       </div>
 
       <section aria-label="Level 1 certificate" className="mx-auto max-w-6xl px-4 pt-6">
@@ -119,7 +119,7 @@ export default function HangarPage() {
       </section>
 
       <div id="backup" className="mx-auto max-w-6xl scroll-mt-24 px-4 pt-6">
-        <BackupCodeClient />
+        <LazyBackupCode />
       </div>
 
       {/* Server-rendered explanation for parents, teachers and search engines. */}
@@ -175,8 +175,8 @@ export default function HangarPage() {
         <h3 className="mt-6 font-display text-xl font-bold text-white">XP and stars: one way to measure progress</h3>
         <p className="mt-2">
           XP is the only thing a child collects. Course sessions, games, Skill Galaxy activities and the AI labs earn it, and it grows their
-          level. Stars (one to three) say how well something went, and the hangar adds up the best stars from everything they have
-          finished. There are no coins, gems or shop: looks unlock with levels and badges.
+          rank. Stars (one to three) say how well something went, and the hangar adds up the best stars from everything they have
+          finished. There are no coins, gems or shop: looks unlock with ranks and badges.
         </p>
         <h3 className="mt-6 font-display text-xl font-bold text-white">Private by design</h3>
         <p className="mt-2">

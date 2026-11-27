@@ -15,11 +15,10 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
 import { ROBOT_CHANGED_EVENT } from '@/lib/kids/robot-design'
-import {
-  KIDS_CLASS_EVENT,
-  loadMembership,
-  syncMembership,
-} from '@/lib/kids/classroom-membership'
+// The light read side only: the snapshot builder (classroom-membership.ts, with
+// the mastery maths and the Skill Galaxy catalogue) loads on demand, and only
+// on a device that has joined a class — not in every /kids page's first load.
+import { KIDS_CLASS_EVENT, loadMembership } from '@/lib/kids/classroom-membership-store'
 import { KIDS_CLASS_DIARY_EVENT, noteClassWork } from '@/lib/kids/classroom-diary'
 import { REWARD_EVENT, type RewardResult } from '@/lib/kids/universe/rewards'
 
@@ -44,7 +43,10 @@ export function KidsClassSync({ showPill = false }: KidsClassSyncProps) {
       if (!pending.current) return
       pending.current = false
       if (!loadMembership()) return
-      void syncMembership(true).then(refreshName)
+      void import('@/lib/kids/classroom-membership')
+        .then((m) => m.syncMembership(true))
+        .then(refreshName)
+        .catch(() => undefined) // offline / chunk failed: the next change tries again
     }
 
     const schedule = () => {

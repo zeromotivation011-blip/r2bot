@@ -46,7 +46,7 @@ jobs:
         run: npx tsx lib/kids/curriculum/level3/verify.ts
       - name: Hint ladder — every activity and Code Lab mission has a "Spark shows me" twin that never gives its answer away
         run: npx tsx components/kids/galaxy/hint-ladder.verify.ts
-      - name: Kids progress backup code round-trips, merges without losing progress, and refuses bad codes
+      - name: Kids progress backup code round-trips, merges without losing progress, and refuses bad codes; removing a profile erases every profileKey() store
         run: npx tsx lib/kids/progress-backup.verify.ts
       - name: Kids rewards — an unlock at every level, every quest reachable, no XP for replays
         run: npx tsx lib/kids/universe/rewards.verify.ts

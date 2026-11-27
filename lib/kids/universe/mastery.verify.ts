@@ -48,6 +48,19 @@ async function main() {
   const T = (a: string, t: string, d: string, ok: 0 | 1, c: Try['c'] = ['loops'], k: Try['k'] = 'code'): Try => ({ a, c, t: t as Try['t'], k, b: 'builders', v: 2, d, ok })
   const none = { conceptSecured: {} as Record<string, string> }
 
+  // ── restoring a backup keeps repeated same-day misses ──
+  {
+    const misses = [T('m1', 'sequence-path', '2026-11-10', 0), T('m1', 'sequence-path', '2026-11-10', 0), T('m1', 'sequence-path', '2026-11-10', 0)]
+    const self = M.mergeConceptLog(misses, misses)
+    check('restoring this device\'s own backup keeps all 3 same-day misses (no more, no fewer)', self.filter((x) => x.ok === 0).length === 3, String(self.length))
+    const older = M.mergeConceptLog(misses, misses.slice(0, 1))
+    check('an older backup with 1 of those misses adds nothing', older.length === 3, String(older.length))
+    const other = M.mergeConceptLog(misses.slice(0, 1), misses)
+    check('a backup with 3 misses onto a device with 1 brings all 3', other.length === 3, String(other.length))
+    const mixed = M.mergeConceptLog([T('x', 'sequence-path', '2026-11-11', 1)], [T('y', 'sequence-path', '2026-11-09', 0)])
+    check('merged logs stay in day order', mixed[0].a === 'y' && mixed[1].a === 'x')
+  }
+
   // ── #27 the secure rule ──
   {
     const log = [T('a1', 'sequence-path', '2026-11-01', 1), T('a2', 'predict-output', '2026-11-03', 1), T('a3', 'sequence-path', '2026-11-05', 1)]

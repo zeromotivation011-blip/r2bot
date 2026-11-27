@@ -12,6 +12,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { KIDS_CLASS_EVENT, KIDS_POWER_UP_EVENT, fetchPowerUp, loadMembership, loadPowerUp } from '@/lib/kids/classroom-membership'
 import { KIDS_CLASS_DIARY_EVENT } from '@/lib/kids/classroom-diary'
+import { KIDS_PROFILE_EVENT } from '@/lib/kids/profiles'
 import { GOAL_THEMES, cosmeticLevel, milestonesReached, type ChildPowerUp } from '@/lib/kids/classroom-goal'
 import { PowerUpMeter } from './PowerUpMeter'
 
@@ -49,6 +50,7 @@ export function ClassPowerUpCardClient({ className = '' }: { className?: string 
     }
     window.addEventListener(KIDS_POWER_UP_EVENT, recompute)
     window.addEventListener(KIDS_CLASS_EVENT, recompute)
+    window.addEventListener(KIDS_PROFILE_EVENT, recompute) // another child's class goal comes back with them
     window.addEventListener(KIDS_CLASS_DIARY_EVENT, onWork)
     return () => {
       alive = false
@@ -56,6 +58,7 @@ export function ClassPowerUpCardClient({ className = '' }: { className?: string 
       if (soon) clearTimeout(soon)
       window.removeEventListener(KIDS_POWER_UP_EVENT, recompute)
       window.removeEventListener(KIDS_CLASS_EVENT, recompute)
+      window.removeEventListener(KIDS_PROFILE_EVENT, recompute)
       window.removeEventListener(KIDS_CLASS_DIARY_EVENT, onWork)
     }
   }, [recompute])

@@ -12,6 +12,9 @@
 //     scripts: cache first, saved on first use. Cap: STATIC_MAX entries.
 //   - Episode audio (/kids/audio/**): saved the first time an episode plays (cache on
 //     play), served from the cache after that; episode.json is stale-while-revalidate.
+//     Both players (episode engine voices.ts, Story Theatre story-voice.ts) FETCH each
+//     clip and play a blob URL: an <audio src> load sends a Range request, and its 206
+//     answer is not cached here (cacheFirst keeps only 200s).
 //     Kept across version bumps (its own cache name). Cap: AUDIO_MAX entries (~20–30 KB
 //     a clip, so roughly 40–60 MB at the cap).
 //   - /api/*, RSC/prefetch payloads, non-GET, other origins: never touched, never cached.

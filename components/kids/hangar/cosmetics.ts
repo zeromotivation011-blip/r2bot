@@ -85,9 +85,9 @@ export function owns(u: Unlock, p: KidsProgress): boolean {
   return false
 }
 
-/** "Reach level 5" / "Earn the PID Tuner badge" — what the child has to do. */
+/** "Reach Rank 5" / "Earn the PID Tuner badge" — what the child has to do. */
 export function howToEarn(u: Unlock): string {
-  if (u.atLevel !== undefined) return `Reach level ${u.atLevel}`
+  if (u.atLevel !== undefined) return `Reach Rank ${u.atLevel}`
   if (u.byBadge) {
     const b = getBadge(u.byBadge)
     return `Earn the ${b ? b.name : u.byBadge} badge`

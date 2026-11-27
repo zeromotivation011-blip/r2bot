@@ -12,7 +12,6 @@ import {
   SNAPSHOT_ACTIVITY_BYTES,
   SNAPSHOT_MAX_ACTIVITIES,
   capIds,
-  isBandId,
   type ClassSnapshot,
   type JoinedClassInfo,
 } from './classroom'
@@ -20,37 +19,13 @@ import { isAssignmentKind, type ChildMission } from './classroom-assignments'
 import { CONCEPT_IDS, conceptGridCode, conceptStates } from './universe/mastery'
 import { clearClassDiary, misconceptionCounts, workDays } from './classroom-diary'
 import type { ChildPowerUp } from './classroom-goal'
+import { CLASS_MEMBERSHIP_KEY, KIDS_CLASS_EVENT, loadMembership, type StoredMembership } from './classroom-membership-store'
 
-const KEY = 'r2bot_kids_class_v1'
+const KEY = CLASS_MEMBERSHIP_KEY
 /** components/kids/course/course-state.ts COURSE_KEY (read-only here; a swapped key, so it is the playing child's). */
 const COURSE_KEY = 'r2bot_kids_course_v1'
-/** Fired on window when the membership is created, refreshed or removed. */
-export const KIDS_CLASS_EVENT = 'r2bot:kids-class'
-
-export interface StoredMembership extends JoinedClassInfo {
-  token: string
-  joinedAt: string
-}
-
-export function loadMembership(): StoredMembership | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = window.localStorage.getItem(KEY)
-    if (!raw) return null
-    const o = JSON.parse(raw) as Partial<StoredMembership>
-    if (typeof o.token !== 'string' || typeof o.className !== 'string' || typeof o.nickname !== 'string') return null
-    return {
-      token: o.token,
-      className: o.className,
-      teacherName: typeof o.teacherName === 'string' ? o.teacherName : null,
-      band: isBandId(o.band) ? o.band : 'builders',
-      nickname: o.nickname,
-      joinedAt: typeof o.joinedAt === 'string' ? o.joinedAt : new Date().toISOString(),
-    }
-  } catch {
-    return null
-  }
-}
+// The read side lives in classroom-membership-store.ts (light enough for the shell).
+export { KIDS_CLASS_EVENT, loadMembership, type StoredMembership }
 
 export function saveMembership(m: StoredMembership): void {
   try {
