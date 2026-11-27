@@ -53,7 +53,7 @@ export default function RemoteAssistGameClient({ onFinish }: { onFinish: (r: Rou
   const keys = useRef({ up: false, down: false, left: false, right: false, press: false })
   const padPress = useRef(false)
   const last = useRef<{ x: number; y: number } | null>(null)
-  const [hud, setHud] = useState({ t: 0, marked: 0, errors: 0, alert: false, looking: false, force: 0 })
+  const [hud, setHud] = useState({ t: 0, limit: TIME_LIMIT, marked: 0, errors: 0, alert: false, looking: false, force: 0 })
   const limitNow = useRef(false)
   const markedRef = useRef(0)
   const alertRef = useRef(false)
@@ -227,7 +227,7 @@ export default function RemoteAssistGameClient({ onFinish }: { onFinish: (r: Rou
   useEffect(() => {
     const id = window.setInterval(() => {
       const s = sim.current
-      setHud({ t: s.t, marked: marked(s), errors: safetyErrors(s), alert: s.alertOpen, looking: s.lookingAway, force: seen(s).f })
+      setHud({ t: s.t, limit: s.timeLimit, marked: marked(s), errors: safetyErrors(s), alert: s.alertOpen, looking: s.lookingAway, force: seen(s).f })
     }, 150)
     return () => window.clearInterval(id)
   }, [])
@@ -280,7 +280,7 @@ export default function RemoteAssistGameClient({ onFinish }: { onFinish: (r: Rou
   const debrief = (): DebriefLine[] => {
     const lines: DebriefLine[] = []
     const traps = checklistErrors(s.cfg)
-    lines.push({ icon: '🎯', text: `${marked(s)} of 4 targets marked${marked(s) ? `, on average ${(s.targets.filter((t) => t.done).reduce((a, t) => a + t.err, 0) / Math.max(1, marked(s))).toFixed(1)} mm from the centre` : ''}. Time ${s.t.toFixed(0)} s of ${TIME_LIMIT} s.` })
+    lines.push({ icon: '🎯', text: `${marked(s)} of 4 targets marked${marked(s) ? `, on average ${(s.targets.filter((t) => t.done).reduce((a, t) => a + t.err, 0) / Math.max(1, marked(s))).toFixed(1)} mm from the centre` : ''}. Time ${s.t.toFixed(0)} s${Number.isFinite(s.timeLimit) ? ` of ${Math.round(s.timeLimit)} s` : ''}.` })
     if (traps.includes('nolimit')) lines.push({ icon: '⛔', text: `You switched off the force limit. Nothing stopped the tool when you pressed too long — peak force ${s.peakForce.toFixed(1)} N (the pad is stressed above ${SAFE_MAX} N). The limit works on the robot itself, with no delay, so it protects the patient even when your view is late.` })
     else if (s.cfg.forceLimit > SAFE_MAX) lines.push({ icon: '⚖️', text: `Your force limit was ${s.cfg.forceLimit.toFixed(1)} N — above the ${SAFE_MAX} N the pad can take, so it could not protect it. ${s.tissueStress ? `The pad was stressed ${s.tissueStress} time${s.tissueStress === 1 ? '' : 's'}.` : 'You were careful, but the limit was not helping.'}` })
     else if (s.cfg.forceLimit < MARK_MIN) lines.push({ icon: '⚖️', text: `Your force limit was ${s.cfg.forceLimit.toFixed(1)} N — below the ${MARK_MIN} N a mark needs, so the robot could never press hard enough. Safe, but the job could not be done.` })
@@ -416,7 +416,7 @@ export default function RemoteAssistGameClient({ onFinish }: { onFinish: (r: Rou
       <div className="flex flex-col gap-3">
         <Panel>
           <div className="grid grid-cols-3 gap-2">
-            <Stat label="Time" value={`${hud.t.toFixed(0)} s`} tone={hud.t > TIME_LIMIT - 20 ? 'warn' : 'plain'} />
+            <Stat label="Time" value={`${hud.t.toFixed(0)} s`} tone={hud.t > hud.limit - 20 ? 'warn' : 'plain'} />
             <Stat label="Marked" value={`${hud.marked}/4`} tone={hud.marked === 4 ? 'good' : 'plain'} />
             <Stat label="Safety" value={hud.errors === 0 ? '✓' : `${hud.errors} ⚠`} tone={hud.errors === 0 ? 'good' : 'bad'} />
           </div>

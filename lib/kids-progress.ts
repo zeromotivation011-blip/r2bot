@@ -3,6 +3,8 @@
 
 import { KIDS_ZONES, ZONE_UNLOCK_STARS, partForZone } from './kids-world-data'
 import type { BandId } from './kids/bands'
+import { cleanConceptDays, cleanConceptLog, mergeConceptLog, mergeConceptSecured, type ConceptTry } from './kids/universe/mastery'
+import { activeProfileId, namespacedKey, profileKey, storageKeyFor } from './kids/profiles'
 
 /** Fired on window after every save, so the classroom sync can push a snapshot. */
 export const KIDS_PROGRESS_EVENT = 'r2bot:kids-progress'
@@ -50,9 +52,27 @@ export interface KidsProgress {
   avatar: { id: string; color: string }
   /** Explorer name shown in the Universe (nickname only — never a real full name). */
   explorerName: string
+  // ── Added 27 Nov 2026 (concept mastery, Recharge missions, Launch Check — lib/kids/universe/mastery.ts) ──
+  /** Skill Galaxy runs as mastery evidence, newest last (capped at CONCEPT_LOG_MAX). */
+  conceptLog: ConceptTry[]
+  /** Concept id -> day (YYYY-MM-DD) it was first secured. */
+  conceptSecured: Record<string, string>
+  /** Track id -> start point "band:minDifficulty" from the Launch Check or "skip to Ace" (lib/kids/activities/pacing.ts). */
+  galaxyStart: Record<string, string>
 }
 
+/**
+ * Base storage key. Each profile on the device has its own copy (lib/kids/profiles.ts):
+ * member #1 (the device's original child) keeps this exact key, so moving to
+ * profiles moved no data; other profiles use `r2bot_kids_v2::<profileId>`.
+ * Always go through progressKey(), never KEY directly.
+ */
 const KEY = 'r2bot_kids_v2'
+
+/** The progress key for whoever is playing now (or for one profile). */
+function progressKey(profileId?: string | null): string {
+  return profileId === undefined ? profileKey(KEY) : namespacedKey(KEY, profileId)
+}
 
 const DEFAULT_PROGRESS: KidsProgress = {
   age: null,
@@ -83,6 +103,9 @@ const DEFAULT_PROGRESS: KidsProgress = {
   playDays: [],
   avatar: { id: 'astro', color: '#F59E0B' },
   explorerName: '',
+  conceptLog: [],
+  conceptSecured: {},
+  galaxyStart: {},
 }
 
 function isBrowser() {
@@ -90,9 +113,18 @@ function isBrowser() {
 }
 
 export function getProgress(): KidsProgress {
+  return readProgressAt(progressKey())
+}
+
+/** One profile's progress without switching to it (parent hub, verify). Read-only. */
+export function getProgressOf(profileId: string | null): KidsProgress {
+  return readProgressAt(progressKey(profileId))
+}
+
+function readProgressAt(key: string): KidsProgress {
   if (!isBrowser()) return { ...DEFAULT_PROGRESS }
   try {
-    const raw = window.localStorage.getItem(KEY)
+    const raw = window.localStorage.getItem(key)
     if (!raw) return { ...DEFAULT_PROGRESS }
     const parsed = JSON.parse(raw)
     return { ...DEFAULT_PROGRESS, ...parsed }
@@ -102,10 +134,11 @@ export function getProgress(): KidsProgress {
 }
 
 export function saveProgress(patch: Partial<KidsProgress>): KidsProgress {
-  const cur = getProgress()
+  const key = progressKey()
+  const cur = readProgressAt(key)
   const next: KidsProgress = { ...cur, ...patch, lastPlayed: new Date().toISOString() }
   if (isBrowser()) {
-    try { window.localStorage.setItem(KEY, JSON.stringify(next)) } catch {}
+    try { window.localStorage.setItem(key, JSON.stringify(next)) } catch {}
     try { window.dispatchEvent(new CustomEvent(KIDS_PROGRESS_EVENT)) } catch {}
   }
   return next
@@ -224,7 +257,7 @@ export function isZoneUnlocked(zoneId: string): boolean {
 
 export function resetProgress(): KidsProgress {
   if (isBrowser()) {
-    try { window.localStorage.removeItem(KEY) } catch {}
+    try { window.localStorage.removeItem(progressKey()) } catch {}
   }
   return { ...DEFAULT_PROGRESS }
 }
@@ -410,6 +443,7 @@ function cleanStrMap(x: unknown, valMax: number, maxItems = 5000): Record<string
   return out
 }
 const HEX_COLOUR = /^#[0-9A-Fa-f]{6}$/
+const GALAXY_START_RE = /^(explorers|builders|inventors|engineers):[1-5]$/
 
 /** Shape-checks a progress object from a backup. Unknown or bad fields are dropped, never trusted. */
 function cleanProgress(x: unknown): Partial<KidsProgress> | null {
@@ -429,6 +463,13 @@ function cleanProgress(x: unknown): Partial<KidsProgress> | null {
   else if (typeof x.band === 'string' && (BAND_IDS as readonly string[]).includes(x.band)) p.band = x.band as BandId
   const badges = cleanStrMap(x.badges, 40)
   if (badges) p.badges = badges
+  if (Array.isArray(x.conceptLog)) p.conceptLog = cleanConceptLog(x.conceptLog)
+  if (isObj(x.conceptSecured)) p.conceptSecured = cleanConceptDays(x.conceptSecured)
+  if (isObj(x.galaxyStart)) {
+    const gs: Record<string, string> = {}
+    for (const [k, v] of Object.entries(x.galaxyStart)) if (/^[a-z]{2,12}$/.test(k) && typeof v === 'string' && GALAXY_START_RE.test(v)) gs[k] = v
+    p.galaxyStart = gs
+  }
   if (isObj(x.avatar)) {
     const id = cleanStr(x.avatar.id, 40)
     const color = cleanStr(x.avatar.color, 9)
@@ -457,10 +498,15 @@ function cleanActivities(x: unknown): Record<string, BackupActivityRecord> {
   return out
 }
 
-function readActivities(): Record<string, BackupActivityRecord> {
+/** Where a profile's Skill Galaxy map lives now (live key when active, its stash otherwise). */
+function activitiesKey(profileId?: string | null): string {
+  return profileId === undefined ? BACKUP_ACTIVITIES_KEY : storageKeyFor(BACKUP_ACTIVITIES_KEY, profileId)
+}
+
+function readActivities(profileId?: string | null): Record<string, BackupActivityRecord> {
   if (!isBrowser()) return {}
   try {
-    const raw = window.localStorage.getItem(BACKUP_ACTIVITIES_KEY)
+    const raw = window.localStorage.getItem(activitiesKey(profileId))
     return raw ? cleanActivities(JSON.parse(raw)) : {}
   } catch {
     return {}
@@ -513,6 +559,10 @@ export function mergeProgress(cur: KidsProgress, inc: Partial<KidsProgress>): Ki
     sessionsDone: maxMap(cur.sessionsDone, inc.sessionsDone),
     questProgress: maxMap(cur.questProgress, inc.questProgress),
     badges,
+    conceptLog: mergeConceptLog(cur.conceptLog ?? [], inc.conceptLog),
+    conceptSecured: mergeConceptSecured(cur.conceptSecured ?? {}, inc.conceptSecured),
+    // A start point set on this device wins; otherwise take the backup's.
+    galaxyStart: { ...(inc.galaxyStart ?? {}), ...(cur.galaxyStart ?? {}) },
     // Names and looks: this device's choice wins unless it is still the default.
     explorerName: cur.explorerName || inc.explorerName || '',
     robotName: robotIsDefault ? (inc.robotName ?? cur.robotName) : cur.robotName,
@@ -562,9 +612,11 @@ function compactProgress(p: KidsProgress): Partial<KidsProgress> {
  * `extras` are small strings the caller owns (e.g. `{ robot: encodeDesign(design) }`),
  * handed back unchanged by importProgressCode.
  */
-export async function exportProgressCode(opts: { extras?: Record<string, string>; compress?: boolean } = {}): Promise<string> {
-  const payload: BackupPayload = { v: 1, p: compactProgress(getProgress()) }
-  const a = readActivities()
+export async function exportProgressCode(opts: { extras?: Record<string, string>; compress?: boolean; profileId?: string | null } = {}): Promise<string> {
+  // Every profile on the device has its own code (lib/kids/profiles.ts); default: whoever is playing.
+  const pid = opts.profileId === undefined || opts.profileId === activeProfileId() ? undefined : opts.profileId
+  const payload: BackupPayload = { v: 1, p: compactProgress(pid === undefined ? getProgress() : getProgressOf(pid)) }
+  const a = readActivities(pid)
   if (Object.keys(a).length) payload.a = a
   const x = cleanStrMap(opts.extras, 512, 8)
   if (x && Object.keys(x).length) payload.x = x
@@ -619,13 +671,16 @@ export async function readProgressCode(
  * the max of every number, the union of every list. Never lowers progress,
  * never throws. Fires KIDS_PROGRESS_EVENT (through saveProgress) on success.
  */
-export async function importProgressCode(code: string): Promise<ProgressImportResult> {
+export async function importProgressCode(code: string, opts: { profileId?: string | null } = {}): Promise<ProgressImportResult> {
   const read = await readProgressCode(code)
   if (!read.ok) return read
   try {
-    const cur = getProgress()
+    // Restores into whoever is playing, or into one named profile (parent hub).
+    const pid = opts.profileId === undefined || opts.profileId === activeProfileId() ? undefined : opts.profileId
+    const pKey = progressKey(pid)
+    const cur = readProgressAt(pKey)
     const merged = mergeProgress(cur, read.progress)
-    const curActs = readActivities()
+    const curActs = readActivities(pid)
     const acts = mergeActivities(curActs, read.activities)
     const added: ProgressImportAdded = {
       xp: merged.xp - cur.xp,
@@ -641,10 +696,16 @@ export async function importProgressCode(code: string): Promise<ProgressImportRe
     void _b
     const changed = JSON.stringify(m) !== JSON.stringify(c) || JSON.stringify(acts) !== JSON.stringify(curActs)
     if (changed && isBrowser() && JSON.stringify(acts) !== JSON.stringify(curActs)) {
-      try { window.localStorage.setItem(BACKUP_ACTIVITIES_KEY, JSON.stringify(acts)) } catch {}
+      try { window.localStorage.setItem(activitiesKey(pid), JSON.stringify(acts)) } catch {}
     }
     // saveProgress always fires KIDS_PROGRESS_EVENT, so every screen refreshes.
-    const progress = saveProgress(merged)
+    let progress: KidsProgress
+    if (pid === undefined) progress = saveProgress(merged)
+    else {
+      progress = { ...merged, lastPlayed: cur.lastPlayed }
+      try { window.localStorage.setItem(pKey, JSON.stringify(progress)) } catch {}
+      try { window.dispatchEvent(new CustomEvent(KIDS_PROGRESS_EVENT)) } catch {}
+    }
     return { ok: true, changed, progress, added, extras: read.extras }
   } catch {
     return { ok: false, reason: 'corrupt' }

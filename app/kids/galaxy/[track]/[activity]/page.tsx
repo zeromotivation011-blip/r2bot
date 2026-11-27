@@ -14,6 +14,8 @@ import { getBand } from '@/lib/kids/bands'
 import ActivityPlayerClient, { type PlayerActivity } from '@/components/kids/activities/ActivityPlayerClient'
 import { TEMPLATE_HOW } from '@/components/kids/galaxy/copy'
 import { ShareToClassroom } from '@/components/kids/teach/ShareToClassroom'
+import { workedTwinFor } from '@/components/kids/galaxy/worked-solution'
+import { TEMPLATE_LOGIC } from '@/lib/kids/activities/logic-registry'
 
 export const runtime = 'nodejs'
 export const dynamicParams = false
@@ -65,12 +67,15 @@ export default async function ActivityPage({ params }: { params: Params }) {
     ...(a.realWorld ? { realWorld: a.realWorld } : {}),
     ...(a.badges?.length ? { badges: a.badges } : {}),
     ...(a.after?.length ? { after: a.after } : {}),
+    ...(a.concepts?.length ? { concepts: a.concepts } : {}),
   }
   const trackSummaries = byTrack(a.track).map(summarize)
+  // "Spark shows me" (hint ladder step 3): a solved twin, words only.
+  const twin = workedTwinFor(a, ALL_ACTIVITIES, (tpl, p, s) => TEMPLATE_LOGIC[tpl].check(p, s))
 
   return (
     <main className="w-full pb-16">
-      <ActivityPlayerClient activity={player} trackActivities={trackSummaries} />
+      <ActivityPlayerClient activity={player} trackActivities={trackSummaries} twin={twin} />
 
       <article className="mx-auto mt-6 max-w-3xl px-4 text-[17px] leading-relaxed text-[#A7B0C0] sm:px-5">
         <h2 className="font-display text-xl font-bold text-[#EEF2F8]">About this mission</h2>

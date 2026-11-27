@@ -182,6 +182,7 @@ export default function LeverBalanceClient({ params, band, onSubmit, onDone }: T
           viewBox={`0 0 ${W} 210`}
           className="block h-auto w-full touch-none select-none"
           role="group"
+          data-keyboard-twin="focusable weights: arrow keys move, Delete removes"
           aria-label={`Beam with ${L} pegs, pivot at peg ${fulcrum}. ${released ? (Math.abs(mom.net) < 1e-9 ? 'Level.' : `${mom.net > 0 ? 'Right' : 'Left'} side down.`) : 'Held level until you let go.'}`}
           onPointerDown={(e) => {
             if (sel === null) return

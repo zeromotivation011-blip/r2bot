@@ -248,9 +248,17 @@ export default function ClassifySortClient({ params: p, onSubmit, onDone }: Temp
           <p className="mt-2 text-[15px] text-[#A7B0C0]">Drag each card into a bin — or tap a card, then tap a bin.</p>
           <div
             data-bin="__tray"
+            role="button"
+            tabIndex={0}
             onClick={() => onBinClick(null)}
+            onKeyDown={(e) => {
+              if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault()
+                onBinClick(null)
+              }
+            }}
             className="mt-3 flex min-h-[72px] flex-wrap justify-center gap-2 rounded-[20px] border border-dashed border-white/15 bg-[#0A1120]/60 p-2"
-            aria-label="Cards to sort"
+            aria-label={selected ? 'Cards to sort — put the selected card back here' : 'Cards to sort'}
           >
             {tray.length === 0 ? <p className="self-center text-sm text-[#6E7888]">All cards are in bins.</p> : tray.map((it) => card(it))}
           </div>

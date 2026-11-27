@@ -18,6 +18,8 @@ import {
   type StoredMembership,
 } from '@/lib/kids/classroom-membership'
 import { ParentNote } from '@/components/kids/classroom/ParentNote'
+import { activeProfile, bindClassMember, readProfilesState, setPassword, unbindClassMember } from '@/lib/kids/profiles'
+import PicturePasswordClient from '@/components/kids/profiles/PicturePasswordClient'
 
 type View = 'loading' | 'form' | 'joined'
 
@@ -32,6 +34,8 @@ export default function JoinClient() {
   const [busy, setBusy] = useState(false)
   const [leaving, setLeaving] = useState<'idle' | 'confirm' | 'busy'>('idle')
   const [notice, setNotice] = useState<string | null>(null)
+  // Shared tablet: an Explorer (5–7) whose profile was just made picks a picture key.
+  const [pwFor, setPwFor] = useState<string | null>(null)
   const codeId = useId()
   const nickId = useId()
   const errId = useId()
@@ -83,6 +87,12 @@ export default function JoinClient() {
         return
       }
       const m: StoredMembership = { ...data.class, token: data.token, joinedAt: new Date().toISOString() }
+      // Profiles on this device (lib/kids/profiles.ts): tag the child playing now
+      // with the class, or — nobody signed in on a shared tablet — make their
+      // profile and sign it in FIRST, so the membership lands in it.
+      const pid = bindClassMember({ nickname: data.class.nickname, className: data.class.className, band: data.class.band })
+      const prof = pid ? activeProfile() : null
+      if (prof && !prof.pw && prof.band === 'explorers' && readProfilesState()?.mode === 'shared') setPwFor(prof.id)
       saveMembership(m)
       setMembership(m)
       setJustJoined(true)
@@ -112,6 +122,7 @@ export default function JoinClient() {
         return
       }
       clearMembership()
+      unbindClassMember()
       setMembership(null)
       setJustJoined(false)
       setLeaving('idle')
@@ -125,6 +136,25 @@ export default function JoinClient() {
 
   if (view === 'loading') {
     return <div className="h-72 rounded-3xl border-2 border-white/10 bg-[#111C32]/70" aria-hidden />
+  }
+
+  if (view === 'joined' && membership && pwFor) {
+    return (
+      <section className="rounded-3xl border-2 border-emerald-400/40 bg-[#111C32] p-6 shadow-xl sm:p-8" aria-live="polite">
+        <p className="text-center text-lg text-slate-200">
+          You&rsquo;re in, <strong className="text-white">{membership.nickname}</strong>! This tablet is shared, so pick a secret key.
+        </p>
+        <div className="mt-5">
+          <PicturePasswordClient
+            mode="set"
+            onDone={(seq) => {
+              setPassword(pwFor, seq)
+              setPwFor(null)
+            }}
+          />
+        </div>
+      </section>
+    )
   }
 
   if (view === 'joined' && membership) {

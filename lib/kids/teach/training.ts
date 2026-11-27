@@ -225,7 +225,7 @@ export const TRAINING_MODULES: TrainingModule[] = [
       {
         heading: 'Access for every child',
         paragraphs: [
-          'Every sound has a visual twin (a beep flashes a ring, “Say” shows a speech bubble); colours always come with a shape or an icon; blocks are tapped, never dragged; keyboard and switch access work on every control; a reduced-motion setting calms the episode camera.',
+          'Every sound has a visual twin (a beep flashes a ring, “Say” shows a speech bubble); colours always come with a shape or an icon; blocks are tapped, never dragged; switch and keyboard scanning work on every button and option (the fast canvas games still need touch or a pointer); a reduced-motion setting calms the episode camera.',
         ],
       },
     ],

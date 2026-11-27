@@ -20,7 +20,7 @@ Every session (30–40 minutes) has the same shape: **Episode** (a 3–5 minute 
 
 **No ranking, ever.** No leaderboards, no comparing children, no streak pressure. Stars reward care (planning first, fixing a bug, explaining why), never speed against others. Every child who learns the skills earns the same certificate.
 
-**Built for every child.** Deaf and hard-of-hearing, low-vision and colour-blind children, and children with motor or attention needs take the same course, not a cut-down one. Nothing depends on one sense alone: every spoken line is captioned, every sound has a visual twin, colour never carries meaning without a shape or icon, and every tap target works by switch or keyboard.
+**Built for every child.** Deaf and hard-of-hearing, low-vision and colour-blind children, and children with motor or attention needs take the same course, not a cut-down one. Nothing depends on one sense alone: every spoken line is captioned, every sound has a visual twin, colour never carries meaning without a shape or icon, and switch and keyboard scanning work on every button and option (the fast canvas games still need touch or a pointer).
 
 **Accurate and global.** No wrong physics or sensor claims, even for five-year-olds: simplified, never false. Characters, places and everyday examples come from many countries; India appears as one setting among many, never the default.
 
@@ -127,7 +127,7 @@ Earned by: Ran all four “Make it yours” projects (sessions 6, 12, 18, 24) in
 - Pre-readers and early readers: every block, hint and question is spoken; icons carry meaning; screens use very few words.
 - Short attention spans: a 40-minute class changes activity every 2–8 minutes and starts unplugged, with the body.
 - Concrete before abstract: one hop = one tile on the mat; quarter turns only; the sensor condition is hidden inside one picture block.
-- Every child: captions and a visual twin for every sound, shape and icon as well as colour, tap or switch access instead of dragging, and a reduced-motion setting (see “Access for every child”).
+- Every child: captions and a visual twin for every sound, shape and icon as well as colour, tap, switch or keyboard scanning instead of dragging, and a reduced-motion setting (see “Access for every child”).
 - Left and right are still being learned at 5–7: turns are taught from the robot’s point of view with body games first.
 - Fine motor control varies: big tap targets, no dragging required, pairs share one device (driver and navigator).
 - Gentle stories: problems are puzzles, never danger; cliffhangers are curiosity, not fear.

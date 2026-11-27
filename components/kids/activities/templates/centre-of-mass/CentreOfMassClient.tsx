@@ -300,6 +300,7 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
                         height={hitH}
                         fill="transparent"
                         className="cursor-pointer"
+                        data-keyboard-twin="part radio buttons + move arrows"
                         onClick={() => placeAt(si, li)}
                       >
                         <title>{taken ? p.items[taken.item].label : `Slot ${si + 1}, shelf ${li + 1}`}</title>
@@ -334,7 +335,7 @@ export default function CentreOfMassClient({ params, band, onSubmit, onDone }: T
                 const y = Y(levels[q.level])
                 const active = q.item === sel
                 return (
-                  <g key={q.item} onClick={() => placeAt(q.slot, q.level)} className="cursor-pointer">
+                  <g key={q.item} onClick={() => placeAt(q.slot, q.level)} className="cursor-pointer" data-keyboard-twin="part radio buttons">
                     <rect x={x - size / 2} y={y - size} width={size} height={size} rx={4} fill={ITEM_COLOURS[q.item % 4]} stroke={active ? '#FFFFFF' : '#0A1120'} strokeWidth={active ? 2.5 : 1} />
                     <text x={x} y={y - size / 2 + 4} textAnchor="middle" fontSize={Math.max(9, size * 0.5)} pointerEvents="none">
                       {it.emoji ?? ''}

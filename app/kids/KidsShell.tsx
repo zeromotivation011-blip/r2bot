@@ -13,6 +13,7 @@ import { RewardToast } from '@/components/kids/ui/RewardToastClient'
 import { KidsAppLinkGuard } from '@/components/kids/app/KidsAppLinkGuardClient'
 import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
 import { ParentTimeKeeper } from '@/components/kids/parents/ParentTimeKeeperClient'
+import ProfileSwitcherClient from '@/components/kids/profiles/ProfileSwitcherClient'
 import { useKidsVoice } from '@/lib/kids-voice'
 import { KIDS_MORE, KIDS_SETTINGS, type KidsNavItem } from '@/lib/kids/nav'
 import { openSpark } from '@/lib/kids/ai/spark/open'
@@ -44,6 +45,7 @@ const GAME_ROUTE = [
   /^\/kids\/ai\/[^/]+/,
   /^\/kids\/spark-trail\/[^/]+/,
   /^\/kids\/challenge\//,
+  /^\/kids\/together/,
 ]
 const isGameRoute = (p: string) => GAME_ROUTE.some((r) => r.test(p))
 
@@ -234,6 +236,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           >
             <span aria-hidden>{voiceOn ? '🔊' : '🔇'}</span>
           </button>
+          <ProfileSwitcherClient />
           <Link href="/kids/hangar" className="kids-nav-stars" aria-label={lvl ? `Level ${lvl.level}, ${lvl.title}, ${lvl.xp} XP — open your hangar` : 'Open your hangar'}>
             {/* Reserved width so the header never shifts after hydration. */}
             <span className="inline-block min-w-[3.5rem] text-center">{lvl ? `Lv ${lvl.level}` : 'Lv 1'}</span>

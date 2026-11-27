@@ -116,7 +116,7 @@ export function FeedbackCard({ state, giveUpAfter = 3 }: { state: AttemptState; 
       <div className="flex items-start gap-3">
         <SparkFace mood={ok ? 'happy' : 'think'} />
         <div className="min-w-0 flex-1">
-          <p className={`font-display text-[19px] font-bold ${ok ? 'text-[#4ADE80]' : 'text-amber-300'}`}>{ok ? 'You did it!' : result.score && result.score >= 0.5 ? 'So close!' : 'Not yet — let’s find out why'}</p>
+          <p data-cue={ok ? 'ok' : 'no'} className={`font-display text-[19px] font-bold ${ok ? 'text-[#4ADE80]' : 'text-amber-300'}`}>{ok ? 'You did it!' : result.score && result.score >= 0.5 ? 'So close!' : 'Not yet — let’s find out why'}</p>
           <p className="mt-1 text-[17px] leading-relaxed text-[#EEF2F8]">{result.feedback}</p>
         </div>
       </div>

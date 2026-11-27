@@ -16,6 +16,7 @@ import { jsonldScript } from '@/lib/seo/jsonld'
 import { BackupCodeClient } from '@/components/kids/hangar/BackupCodeClient'
 import { GarageClient, type TrailPartInfo } from '@/components/kids/hangar/GarageClient'
 import { HangarClient } from '@/components/kids/hangar/HangarClient'
+import ConceptConstellationClient from '@/components/kids/galaxy/ConceptConstellationClient'
 import { HangarRecordsClient, type CourseBadgeInfo } from '@/components/kids/hangar/HangarRecordsClient'
 // Read-only, server-side: the real names of the course badges. Only the small
 // map below reaches the client, never the (large) curriculum itself.
@@ -95,6 +96,9 @@ export default function HangarPage() {
 
       <HangarClient />
       <GarageClient trailParts={trailParts} />
+      <div className="mx-auto max-w-6xl px-4 pt-6">
+        <ConceptConstellationClient compact />
+      </div>
       <HangarRecordsClient courseBadges={courseBadges} worldActivityIds={worldActivityIds} />
 
       <section aria-label="Level 1 certificate" className="mx-auto max-w-6xl px-4 pt-6">

@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { getBand } from '@/lib/kids/bands'
 import type { Track } from '@/lib/kids/activities/types'
-import { nodeStates, type ActivitiesDone, type ActivitySummary, type NodeState } from '@/lib/kids/activities/progress'
+import { nodeStates, type ActivitiesDone, type ActivitySummary, type NodeState, type StartPoint } from '@/lib/kids/activities/progress'
 
 interface Props {
   track: Track
@@ -23,6 +23,8 @@ interface Props {
   ready: boolean
   /** Most stars per row (fewer on narrow screens: at least ~92px each). */
   cols?: number
+  /** The child's start point in this track (Launch Check): the "next" star is the first open one from here. */
+  start?: StartPoint
 }
 
 const ROW_H = 112
@@ -42,7 +44,7 @@ function StarGlyph({ state, gradientId }: { state: NodeState; gradientId: string
   )
 }
 
-export function Constellation({ track, activities, allOfTrack, done, ready, cols: maxCols = 4 }: Props) {
+export function Constellation({ track, activities, allOfTrack, done, ready, cols: maxCols = 4, start }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(0)
   useEffect(() => {
@@ -59,7 +61,7 @@ export function Constellation({ track, activities, allOfTrack, done, ready, cols
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const gradientId = `g-${track.id}-${uid}`
   const [lockedMsg, setLockedMsg] = useState<string | null>(null)
-  const states = useMemo(() => (ready ? nodeStates(activities, done) : {}), [activities, done, ready])
+  const states = useMemo(() => (ready ? nodeStates(activities, done, { start }) : {}), [activities, done, ready, start])
   const titleOf = useMemo(() => new Map(allOfTrack.map((a) => [a.id, a.title])), [allOfTrack])
 
   const rows = Math.max(1, Math.ceil(activities.length / cols))

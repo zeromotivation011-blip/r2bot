@@ -20,7 +20,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { levelInfo, unlockUse, type RewardResult, type Unlock } from '@/lib/kids/universe/rewards'
 import { playSound, sparkSays } from '@/lib/kids-audio'
-import { useKidsReducedMotion } from '@/lib/kids/settings'
+import { useKidsCalm, useKidsReducedMotion } from '@/lib/kids/settings'
 
 const KIND_ICON: Record<Unlock['kind'], string> = {
   paint: '🎨',
@@ -51,7 +51,9 @@ export interface LevelUpCeremonyProps {
 }
 
 export default function LevelUpCeremonyClient({ result, onClose }: LevelUpCeremonyProps) {
-  const reduced = useKidsReducedMotion()
+  // Calm mode plays the ceremony without its motion too.
+  const calm = useKidsCalm()
+  const reduced = useKidsReducedMotion() || calm
   // 0 = bar empty, 1 = bar filling, 2 = rank stamped, 3 = unlock shown.
   const [timelinePhase, setPhase] = useState(0)
   // Reduced motion may switch on after the first render (the hook reads the device): always the final frame then.

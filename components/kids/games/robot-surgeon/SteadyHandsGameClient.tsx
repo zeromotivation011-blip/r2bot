@@ -48,7 +48,7 @@ export default function SteadyHandsGameClient({ onFinish }: { onFinish: (r: Roun
   const keys = useRef({ up: false, down: false, left: false, right: false })
   const last = useRef<{ x: number; y: number } | null>(null)
   const [over, setOver] = useState(false)
-  const [hud, setHud] = useState({ t: 0, acc: 1, started: false, progress: 0, touches: 0 })
+  const [hud, setHud] = useState({ t: 0, limit: TIME_LIMIT, acc: 1, started: false, progress: 0, touches: 0 })
   const lastTouches = useRef(0)
   /** Several fixed steps can run in one frame: the end-of-run block must run once. */
   const ended = useRef(false)
@@ -188,7 +188,7 @@ export default function SteadyHandsGameClient({ onFinish }: { onFinish: (r: Roun
   useEffect(() => {
     const id = window.setInterval(() => {
       const s = sim.current
-      setHud({ t: s.t, acc: accuracy(s), started: s.started, progress: s.progress / (PATH.length - 1), touches: s.touches })
+      setHud({ t: s.t, limit: s.timeLimit, acc: accuracy(s), started: s.started, progress: s.progress / (PATH.length - 1), touches: s.touches })
     }, 200)
     return () => window.clearInterval(id)
   }, [])
@@ -294,7 +294,7 @@ export default function SteadyHandsGameClient({ onFinish }: { onFinish: (r: Roun
       <div className="flex flex-col gap-3">
         <Panel>
           <div className="grid grid-cols-3 gap-2">
-            <Stat label="Time" value={`${hud.t.toFixed(0)} s`} tone={hud.t > TIME_LIMIT - 15 ? 'warn' : 'plain'} />
+            <Stat label="Time" value={`${hud.t.toFixed(0)} s`} tone={hud.t > hud.limit - 15 ? 'warn' : 'plain'} />
             <Stat label="Inside" value={hud.started ? `${Math.round(hud.acc * 100)}%` : '—'} tone={!hud.started ? 'plain' : hud.acc >= 0.9 ? 'good' : hud.acc >= 0.75 ? 'warn' : 'bad'} />
             <Stat label="Done" value={`${Math.round(hud.progress * 100)}%`} />
           </div>

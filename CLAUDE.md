@@ -168,9 +168,13 @@ Build these exceptionally; everything else is secondary.
   robot), **Ask Spark** (the kid-safe mentor, mounted once in `KidsShell` via `next/dynamic`; a floating button on
   ordinary pages, a header button on game/full-screen pages, hidden on grown-up pages; answers from the offline FAQ in
   `lib/kids/ai/spark/faq.ts` unless `KIDS_AI_ENABLED=true`), **Settings** `/kids/settings` (noindex; one device-only store
-  `lib/kids/settings.ts` — sound, volume, voice, less motion, larger text, Lite 3D; hooks `useKidsSettings`,
-  `useKidsReducedMotion`, `useKidsLite3D`, `liteDpr()`, `kidsRenderHints()`; `<html>` classes `kids-large-text`,
-  `kids-reduce-motion`, `kids-lite-3d`), and the **progress backup code** (`exportProgressCode`/`importProgressCode` in
+  `lib/kids/settings.ts` — sound, volume, music, voice, read-aloud, less motion, text size, high contrast, dyslexia,
+  colour-safe, calm, more time/untimed, switch scanning, Lite 3D; hooks `useKidsSettings`, `useKidsReducedMotion`,
+  `useKidsLite3D`, `useKidsCalm`, `useKidsTime`, `liteDpr()`, `kidsRenderHints()`; every child-facing timer goes through
+  `kidsTimeLimit()`; a tap-only shape needs role+tabIndex+Enter or `data-keyboard-twin`), **Profiles** (`lib/kids/profiles.ts`:
+  siblings / shared tablets on one device; a new per-child store uses `profileKey()` OR `SWAPPED_KEYS`, never both),
+  **Mastery** (activity `concepts`, secure/fading in `lib/kids/universe/mastery.ts`, Recharge missions, Launch Check;
+  hints cap a finish at 2 stars via the one `HintLadderClient`), and the **progress backup code** (`exportProgressCode`/`importProgressCode` in
   `lib/kids-progress.ts`, UI `components/kids/hangar/BackupCodeClient.tsx` in the Hangar and Settings: no personal data,
   a restore merges and never lowers progress), **Games** `/kids/play/<id>` (count them from `GAMES`, never type the
   number; only games with a built page go in `GAMES`; the phone tab bar is five: Home · Course · Worlds · Games · Hangar),
@@ -187,7 +191,7 @@ Build these exceptionally; everything else is secondary.
   through the **parental gate** (`requireGrownUp()` / `<GrownUpLink>` in `components/kids/app/`); the adult footer does
   not render under /kids. **Spark safety**: one classifier (`classifySpark()`) on device and server; a child saying they
   are hurt gets a kind answer and a regional helpline card, never gated, never sent to the model; the red-team suite
-  (`lib/kids/ai/spark/redteam/verify.ts`) runs in CI with the rewards, backup, activities and Code Lab verifies. Weekly
+  (`lib/kids/ai/spark/redteam/verify.ts`) runs in CI with the rewards, backup, activities, mastery, hint-ladder, access and Code Lab verifies. Weekly
   quests and unlocks to level 60 live in `lib/kids/universe/{quests,unlocks}.ts`. R2BOT Kids installs as its own
   PWA (`/kids/manifest.webmanifest`, `public/kids-sw.js` precaches the core screens for offline, scope `/kids`). The camera is allowed site-wide
   (`camera=(self)`) only for Workshop AR; frames never leave the device.

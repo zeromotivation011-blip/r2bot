@@ -175,7 +175,7 @@ export default function LogicGatesClient({ params, onSubmit, onDone }: TemplateP
               {params.inputs.map((i) => {
                 const p = pos[i.id]
                 return (
-                  <g key={i.id} transform={`translate(${p.x} ${p.y})`} className="cursor-pointer" onClick={() => flip(i.id)}>
+                  <g key={i.id} transform={`translate(${p.x} ${p.y})`} className="cursor-pointer" data-keyboard-twin="input switch buttons" onClick={() => flip(i.id)}>
                     <rect x={0} y={-24} width={92} height={48} rx={12} className={env[i.id] ? 'fill-[#0E3245] stroke-[#00E5FF]' : 'fill-[#19263F] stroke-white/20'} strokeWidth={2} />
                     <text x={14} y={7} className="fill-[#EEF2F8] font-display text-[22px] font-bold">{i.id}</text>
                     <text x={40} y={6} className="text-[18px]">{INPUT_ICON[i.kind ?? 'switch']}</text>
@@ -194,6 +194,7 @@ export default function LogicGatesClient({ params, onSubmit, onDone }: TemplateP
                     key={g.id}
                     transform={`translate(${p.x} ${p.y - GH / 2})`}
                     className={g.fixed ? '' : 'cursor-pointer'}
+                    data-keyboard-twin="Gate slot tab buttons"
                     onClick={() => { if (!g.fixed && !locked) { playSound('click'); setSel(g.id) } }}
                   >
                     {isSel && !g.fixed && <rect x={-10} y={-10} width={GW + 26} height={GH + 20} rx={12} className="fill-amber-500/10 stroke-amber-400" strokeWidth={2} strokeDasharray="5 4" />}
@@ -314,7 +315,7 @@ export default function LogicGatesClient({ params, onSubmit, onDone }: TemplateP
                     const s = simulate(params, circuit, row)
                     const current = params.inputs.every((i) => env[i.id] === row[i.id])
                     return (
-                      <tr key={r} onClick={() => setRow(row)} className={`cursor-pointer ${current ? 'outline outline-2 outline-amber-400' : ''}`}>
+                      <tr key={r} onClick={() => setRow(row)} data-keyboard-twin="the row's button" className={`cursor-pointer ${current ? 'outline outline-2 outline-amber-400' : ''}`}>
                         {params.inputs.map((i, ii) => (
                           <td key={i.id} className={`rounded-md p-0 ${row[i.id] ? 'bg-[#00B8D4]/20 text-[#00E5FF]' : 'bg-[#0A1120] text-[#6E7888]'}`}>
                             {/* The whole row is the 44px tap target (tr onClick); one button per row carries keyboard focus. */}

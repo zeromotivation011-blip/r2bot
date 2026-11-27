@@ -8,6 +8,10 @@
 //   - bad input (empty, junk, a typo, a wrong version, a huge or hostile
 //     payload) is refused with a reason and never throws or writes anything
 //   - KIDS_PROGRESS_EVENT fires on a successful restore
+//   - profiles (lib/kids/profiles.ts, roadmap #41/#90): the device's original
+//     child becomes member #1 with zero data loss; siblings and classmates never
+//     see each other's progress, robot or Galaxy map; "Done" clears the device;
+//     backup codes work per profile
 //
 // Run:  npx tsx lib/kids/progress-backup.verify.ts      (exit 1 on any ✗)
 
@@ -205,8 +209,137 @@ async function main() {
   const b = await P.importProgressCode(blank)
   check('a brand-new device exports a valid code', b.ok)
 
+  // ── Profiles: migration of the original child into member #1 ──
+  await profileChecks(P)
+
   console.log(failures ? `\n${failures} check(s) failed` : '\nAll progress backup checks passed')
   process.exit(failures ? 1 : 0)
+}
+
+type ProgressModule = typeof import('../kids-progress')
+
+async function profileChecks(P: ProgressModule) {
+  const PR = await import('./profiles')
+  const RD = await import('./robot-design')
+  const ACTS = 'r2bot_kids_activities_v1'
+  const CLASS = 'r2bot_kids_class_v1'
+  const DRAFT = 'r2bot_kids_codelab_draft_first-steps'
+  store.clear()
+
+  // A device used before profiles existed.
+  P.saveProgress({ xp: 900, totalStars: 12, explorerName: 'Nova', band: 'explorers', badges: { 'first-drive': '2026-11-02' } })
+  RD.saveDesign({ ...RD.DEFAULT_DESIGN, name: 'Bolt', primary: '#22C55E' })
+  store.set(ACTS, JSON.stringify({ 'seq-1': { stars: 3, attempts: 1, score: 1, plays: 1, at: '2026-11-20' } }))
+  store.set(CLASS, JSON.stringify({ token: 't-nova', className: '3B', nickname: 'Nova', band: 'explorers', teacherName: null }))
+  store.set(DRAFT, '{"blocks":[1]}')
+  const legacyRaw = new Map(store)
+
+  check('no profiles stored: the original child is active as p1', PR.activeProfileId() === 'p1' && PR.readProfilesState() === null)
+  check('no profiles stored: progress reads the original key', P.getProgress().xp === 900)
+  const st = PR.ensureProfiles()
+  check('migration: member #1 is the original child, named from the progress', st.profiles.length === 1 && st.profiles[0].id === 'p1' && st.profiles[0].nickname === 'Nova' && st.profiles[0].band === 'explorers' && st.active === 'p1')
+  let untouched = true
+  for (const [k, v] of legacyRaw) if (store.get(k) !== v) untouched = false
+  check('migration: zero data moved or lost (every original key byte-identical)', untouched)
+  check('migration: member #1 still sees progress, robot, Galaxy and class', P.getProgress().xp === 900 && RD.loadDesign().name === 'Bolt' && P.collectedStars() >= 15 && store.has(CLASS))
+  check('migration is idempotent', JSON.stringify(PR.ensureProfiles()) === JSON.stringify(st))
+
+  // A sibling joins.
+  const sib = PR.createProfile({ nickname: 'Kai', band: 'inventors', picture: '🦖' })
+  check('a second profile can be added', sib.ok)
+  if (!sib.ok) return
+  const kai = sib.profile.id
+  check('adding a profile does not switch to it', PR.activeProfileId() === 'p1' && P.getProgress().xp === 900)
+  check('switch to the sibling', PR.switchProfile(kai))
+  check('sibling starts fresh: progress', P.getProgress().xp === 0 && P.getProgress().totalStars === 0)
+  check('sibling starts fresh: robot, Galaxy map, class, Code Lab draft', RD.loadDesign().name !== 'Bolt' && !store.has(ACTS) && !store.has(CLASS) && !store.has(DRAFT))
+  P.saveProgress({ xp: 40, explorerName: 'Kai' })
+  RD.saveDesign({ ...RD.DEFAULT_DESIGN, name: 'Rex' })
+  store.set(ACTS, JSON.stringify({ 'gear-1': { stars: 2, attempts: 1, score: 1, plays: 1, at: '2026-11-21' } }))
+  check('sibling writes go to their own namespace', store.has(`r2bot_kids_v2::${kai}`) && JSON.parse(store.get('r2bot_kids_v2') ?? '{}').xp === 900)
+  check("member #1's data is safe while the sibling plays", P.getProgressOf('p1').xp === 900 && RD.loadDesignOf('p1').name === 'Bolt')
+
+  check('switch back to member #1', PR.switchProfile('p1'))
+  check('member #1 gets everything back', P.getProgress().xp === 900 && RD.loadDesign().name === 'Bolt' && JSON.parse(store.get(CLASS) ?? '{}').token === 't-nova' && store.get(DRAFT) === '{"blocks":[1]}' && 'seq-1' in JSON.parse(store.get(ACTS) ?? '{}'))
+  check("the sibling's data waits in its own place", P.getProgressOf(kai).xp === 40 && RD.loadDesignOf(kai).name === 'Rex' && 'gear-1' in JSON.parse(store.get(`${ACTS}::${kai}`) ?? '{}'))
+  check('no stash left behind for the active profile', ![...store.keys()].some((k) => k.endsWith('::p1')))
+
+  // Backup codes per profile.
+  const kaiCode = await P.exportProgressCode({ profileId: kai })
+  const p1Code = await P.exportProgressCode()
+  const kaiRead = await P.readProgressCode(kaiCode)
+  check("export of a profile that is not playing holds that profile's progress and Galaxy", kaiRead.ok && kaiRead.progress.xp === 40 && 'gear-1' in kaiRead.activities)
+  const p1Read = await P.readProgressCode(p1Code)
+  check('export without a profile is whoever is playing', p1Read.ok && p1Read.progress.xp === 900)
+  const third = PR.createProfile({ nickname: 'Ada', band: 'builders' })
+  if (!third.ok) return
+  const ada = third.profile.id
+  const imp = await P.importProgressCode(kaiCode, { profileId: ada })
+  check('restore into a named profile', imp.ok && P.getProgressOf(ada).xp === 40 && 'gear-1' in JSON.parse(store.get(`${ACTS}::${ada}`) ?? '{}'))
+  check('restore into a named profile leaves the player untouched', P.getProgress().xp === 900 && P.getProgressOf(kai).xp === 40)
+  PR.switchProfile(kai)
+  const imp2 = await P.importProgressCode(p1Code)
+  check('restore on the active profile merges into that profile only', imp2.ok && P.getProgress().xp === 900 && P.getProgressOf('p1').xp === 900 && P.getProgressOf(ada).xp === 40)
+
+  // Picture password (Explorers).
+  check('picture password: set', PR.setPassword('p1', ['🍎', '⭐', '🐟']))
+  check('picture password: right order unlocks', PR.checkPassword('p1', ['🍎', '⭐', '🐟']))
+  check('picture password: wrong order does not', !PR.checkPassword('p1', ['⭐', '🍎', '🐟']))
+  check('picture password is not stored as the pictures', !(store.get(PR.PROFILES_KEY) ?? '').includes('🍎'))
+  check('no password: tap to play', PR.checkPassword(kai, []))
+
+  // Shared lab tablet: "Done" clears the device.
+  PR.setDeviceMode('shared')
+  check('Done clears the device back to the picker', PR.finishTurn() && PR.needsPicker() && PR.activeProfileId() === null)
+  check('after Done nothing of the last child is visible', P.getProgress().xp === 0 && RD.loadDesign().name !== 'Rex' && !store.has(ACTS) && !store.has(CLASS))
+  P.saveProgress({ xp: 3 })
+  PR.switchProfile('p1')
+  check('a guest scribble while nobody is signed in is wiped', ![...store.keys()].some((k) => k.endsWith('::_none')))
+  check('after Done the next child gets their own things back', P.getProgress().xp === 900 && RD.loadDesign().name === 'Bolt')
+
+  // Class join on a shared tablet with nobody signed in makes and signs in a profile.
+  PR.finishTurn()
+  const bound = PR.bindClassMember({ nickname: 'Zuri', className: '3B', band: 'explorers' })
+  check('joining a class on a shared tablet makes a profile and signs it in', !!bound && PR.activeProfileId() === bound && PR.activeProfile()?.nickname === 'Zuri' && P.getProgress().xp === 0)
+  store.set(CLASS, JSON.stringify({ token: 't-zuri', className: '3B', nickname: 'Zuri', band: 'explorers', teacherName: null }))
+  PR.switchProfile('p1')
+  check("each class member keeps their own token", JSON.parse(store.get(CLASS) ?? '{}').token === 't-nova' && JSON.parse(store.get(`${CLASS}::${bound}`) ?? '{}').token === 't-zuri')
+  PR.finishTurn()
+  check('the same nickname in the same class signs back in, no duplicate', PR.bindClassMember({ nickname: 'zuri', className: '3B', band: 'explorers' }) === bound && (PR.readProfilesState()?.profiles.length ?? 0) === 4)
+
+  // Play together missions: every map solvable, stars from bumps.
+  const T = await import('./together')
+  for (const m of T.TOGETHER_MISSIONS) check(`play together: "${m.title}" can be finished`, T.missionSolvable(m))
+  check('play together: 0 bumps 3★, 2 bumps 2★, 5 bumps 1★', T.starsFor(0) === 3 && T.starsFor(2) === 2 && T.starsFor(5) === 1)
+
+  // Play together credits wait for the partner.
+  PR.addTogetherCredit(kai, { id: 'together-crater', stars: 3 })
+  PR.switchProfile(kai)
+  const credits = PR.takeTogetherCredits()
+  check('a play-together credit reaches the partner once', credits.length === 1 && credits[0].stars === 3 && PR.takeTogetherCredits().length === 0)
+
+  // Removing a profile removes every byte it stored.
+  PR.switchProfile('p1')
+  check('remove a profile', PR.removeProfile(kai))
+  check('removed profile leaves nothing behind', ![...store.keys()].some((k) => k.endsWith(`::${kai}`)) && P.getProgressOf('p1').xp === 900)
+  check('the last profile cannot be removed', (() => {
+    for (const p of PR.readProfilesState()?.profiles ?? []) if (p.id !== 'p1') PR.removeProfile(p.id)
+    return !PR.removeProfile('p1') && P.getProgress().xp === 900
+  })())
+
+  // A storage error mid-switch changes nothing.
+  const sib2 = PR.createProfile({ nickname: 'Leo' })
+  if (sib2.ok) {
+    const realSet = memoryStorage.setItem
+    let n = 0
+    memoryStorage.setItem = (k: string, v: string) => {
+      if (++n > 2) throw new Error('QuotaExceededError')
+      realSet(k, v)
+    }
+    const ok = PR.switchProfile(sib2.profile.id)
+    memoryStorage.setItem = realSet
+    check('a full storage refuses the switch and keeps the current child intact', !ok && PR.activeProfileId() === 'p1' && P.getProgress().xp === 900 && JSON.parse(store.get(CLASS) ?? '{}').token === 't-nova' && store.get(DRAFT) === '{"blocks":[1]}')
+  }
 }
 
 main().catch((e) => {

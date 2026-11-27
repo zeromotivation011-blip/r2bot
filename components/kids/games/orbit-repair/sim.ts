@@ -21,6 +21,10 @@
 //    them. The teaching page says so.
 
 export const DT = 1 / 60
+
+/** Maps a mission's base time limit to this round's (the kids "more time" setting; Infinity = untimed). */
+export type TimeLimitFn = (base: number) => number
+const sameLimit: TimeLimitFn = (b) => b
 export type TierIndex = 0 | 1 | 2 | 3
 
 export interface Vec {
@@ -98,6 +102,8 @@ export interface Pickup {
 export interface CadetState {
   kind: 'cadet'
   t: number
+  /** Time limit (s) after the kids "more time" setting; Infinity when untimed. */
+  limit: number
   p: Vec
   v: Vec
   puffsUsed: number
@@ -114,10 +120,11 @@ export interface CadetState {
   fastAtDock: number
 }
 
-export function createCadet(): CadetState {
+export function createCadet(timeLimit: TimeLimitFn = sameLimit): CadetState {
   return {
     kind: 'cadet',
     t: 0,
+    limit: timeLimit(CADET.timeLimit),
     p: { ...CADET.start },
     v: v2(0, 0),
     puffsUsed: 0,
@@ -206,7 +213,7 @@ function stepCadet(s: CadetState, inp: Input): void {
   if (s.outOfPuffsAt !== null && s.t - s.outOfPuffsAt > 8) {
     s.outcome = 'lost'
     s.reason = 'Out of gas before docking.'
-  } else if (s.t > CADET.timeLimit) {
+  } else if (s.t > s.limit) {
     s.outcome = 'lost'
     s.reason = 'The shift ended before the robot docked.'
   }
@@ -296,6 +303,8 @@ export function pinVel(sh: Ship): Vec {
 export interface PilotState {
   kind: 'pilot'
   t: number
+  /** Time limit (s) after the kids "more time" setting; Infinity when untimed. */
+  limit: number
   arm: Arm
   ship: Ship
   captured: boolean
@@ -311,10 +320,11 @@ export interface PilotState {
   lastBumpT: number
 }
 
-export function createPilot(): PilotState {
+export function createPilot(timeLimit: TimeLimitFn = sameLimit): PilotState {
   return {
     kind: 'pilot',
     t: 0,
+    limit: timeLimit(PILOT.timeLimit),
     arm: { base: v2(0, 0), l1: 7.5, l2: 7.5, hand: v2(3, 6), hv: v2(0, 0), maxSpeed: 0.24, fineSpeed: 0.1, accel: 0.12 },
     ship: { p: v2(-7.5, 11.6), v: v2(0.11, -0.012), ang: 0, w: 0.004, pin: v2(0, -1.7) },
     captured: false,
@@ -405,7 +415,7 @@ function stepPilot(s: PilotState, inp: Input): void {
   if (pin.x > 0 && reach > s.arm.l1 + s.arm.l2 - 0.2) {
     s.outcome = 'lost'
     s.reason = 'The cargo ship drifted out of the arm’s reach.'
-  } else if (s.t > PILOT.timeLimit) {
+  } else if (s.t > s.limit) {
     s.outcome = 'lost'
     s.reason = 'Time ran out for the capture window.'
   }
@@ -451,6 +461,8 @@ export const ACE_PLACES: Place[] = [
 export interface AceState {
   kind: 'ace'
   t: number
+  /** Time limit (s) after the kids "more time" setting; Infinity when untimed. */
+  limit: number
   arm: Arm
   held: ModuleId | null
   at: Record<PlaceId, ModuleId | null>
@@ -467,10 +479,11 @@ export interface AceState {
   wrongOrder: number
 }
 
-export function createAce(): AceState {
+export function createAce(timeLimit: TimeLimitFn = sameLimit): AceState {
   return {
     kind: 'ace',
     t: 0,
+    limit: timeLimit(ACE.timeLimit),
     arm: { base: v2(0, 2.5), l1: 5.5, l2: 5.5, hand: v2(0, 7.5), hv: v2(0, 0), maxSpeed: 0.32, fineSpeed: 0.07, accel: 0.16 },
     held: null,
     at: { slot: 'old', bayA: null, bayB: 'new' },
@@ -557,7 +570,7 @@ function stepAce(s: AceState, inp: Input): void {
   if (s.at.slot === 'new' && !s.held) {
     s.outcome = 'won'
     s.reason = 'Module swapped.'
-  } else if (s.t > ACE.timeLimit) {
+  } else if (s.t > s.limit) {
     s.outcome = 'lost'
     s.reason = 'The repair window closed before the swap was finished.'
   }
@@ -618,6 +631,8 @@ export interface Snapshot {
 export interface LegendState {
   kind: 'legend'
   t: number
+  /** Time limit (s) after the kids "more time" setting; Infinity when untimed. */
+  limit: number
   p: Vec
   v: Vec
   pr: Vec
@@ -639,10 +654,11 @@ export interface LegendState {
   grabTries: number
 }
 
-export function createLegend(): LegendState {
+export function createLegend(timeLimit: TimeLimitFn = sameLimit): LegendState {
   const s: LegendState = {
     kind: 'legend',
     t: 0,
+    limit: timeLimit(LEGEND.timeLimit),
     p: { ...LEGEND.start },
     v: v2(0, 0),
     pr: v2(0, 0),
@@ -879,7 +895,7 @@ function stepLegend(s: LegendState, inp: Input): void {
     s.reason = 'Out of fuel before the capture.'
     return
   }
-  if (s.t > LEGEND.timeLimit) {
+  if (s.t > s.limit) {
     s.outcome = 'lost'
     s.reason = 'The communication pass ended before the mission was done.'
     return
@@ -896,11 +912,11 @@ function stepLegend(s: LegendState, inp: Input): void {
 
 export type GameState = CadetState | PilotState | AceState | LegendState
 
-export function createState(tier: TierIndex): GameState {
-  if (tier === 0) return createCadet()
-  if (tier === 1) return createPilot()
-  if (tier === 2) return createAce()
-  return createLegend()
+export function createState(tier: TierIndex, timeLimit: TimeLimitFn = sameLimit): GameState {
+  if (tier === 0) return createCadet(timeLimit)
+  if (tier === 1) return createPilot(timeLimit)
+  if (tier === 2) return createAce(timeLimit)
+  return createLegend(timeLimit)
 }
 
 export function step(s: GameState, inp: Input): void {

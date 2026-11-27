@@ -290,7 +290,7 @@ export const L1_COMMON_NOTES: string[] = [
   'Everything is spoken AND shown: every block, hint and question has a voice, captions and a picture. In class the teacher plays the episode once for everyone; on devices keep the volume low with captions on, or use a headphone splitter so both children in a pair can listen.',
   'Pairs, not individuals: one "driver" taps, one "navigator" checks the plan. Swap at half time.',
   'Never compare children. Stars are about care ("you planned first", "you fixed a bug"), not speed.',
-  'Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch / keyboard access works on every tap target; a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.',
+  'Access: every sound has a visual twin (a beep flashes a ring, Say shows a speech bubble); colours always come with a shape or icon; every block is tapped, never dragged, and switch and keyboard scanning work on every button and option (the fast canvas games still need touch or a pointer); a reduced-motion setting slows the episode camera. See "Access for every child" in the school guide.',
 ]
 
 export function teacher(t: Omit<TeacherNotes, 'notes'> & { notes?: string[] }): TeacherNotes {

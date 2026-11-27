@@ -15,6 +15,10 @@
 
 import type { ComponentType } from 'react'
 import type { BandId } from '../bands'
+import type { ConceptId } from '../curriculum/types'
+
+/** The concept strands shared with the course (lib/kids/curriculum CONCEPT_SPIRAL). */
+export type { ConceptId }
 
 /** The ten skill tracks of the Skill Galaxy. */
 export type TrackId =
@@ -132,6 +136,14 @@ export interface Activity<P = unknown, A = unknown> {
   track: TrackId
   band: BandId
   template: TemplateId
+  /**
+   * The concept strands this activity practises, most important first (1–3).
+   * Same ids as the course's CONCEPT_SPIRAL, so mastery (lib/kids/universe/mastery.ts),
+   * Recharge missions and the teacher's concept grid speak one language.
+   * Required for every live activity (KidsActivity + verify.ts); optional here
+   * only so template test-bench samples need not carry it.
+   */
+  concepts?: ConceptId[]
   /** 1 (easiest in its band) … 5 (hardest in its band). */
   difficulty: 1 | 2 | 3 | 4 | 5
   /** Spoken + shown before starting: the mission, in story form (≤ 40 words). */

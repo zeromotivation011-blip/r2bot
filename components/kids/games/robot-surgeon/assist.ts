@@ -21,6 +21,7 @@
 // session cannot end until it has been answered or ignored.
 
 import { clamp, rng } from './shared'
+import { kidsTimeLimit } from '@/lib/kids/settings'
 
 export const PAD_W = 80
 export const PAD_H = 50
@@ -118,6 +119,8 @@ export interface AssistState {
   peakForce: number
   done: boolean
   timeUp: boolean
+  /** This round's limit in seconds after the kids "more time" setting (Infinity when untimed). */
+  timeLimit: number
   rand: () => number
   driftX: number
   driftY: number
@@ -162,6 +165,7 @@ export function makeAssist(cfg: AssistConfig, seed = 13): AssistState {
     peakForce: 0,
     done: false,
     timeUp: false,
+    timeLimit: kidsTimeLimit(TIME_LIMIT),
     rand: r,
     driftX: (r() - 0.5) * 4,
     driftY: 2 + r() * 2,
@@ -260,7 +264,7 @@ export function stepAssist(s: AssistState, hdx: number, hdy: number, press: bool
   while (s.video.length > 2 && s.video[1].t <= s.t - VIDEO_DELAY - 0.05) s.video.shift()
   // The session ends only once the team's call has been dealt with.
   if (s.targets.every((tg) => tg.done) && s.d <= 0 && s.alertHandled) s.done = true
-  if (s.t >= TIME_LIMIT) s.timeUp = true
+  if (s.t >= s.timeLimit) s.timeUp = true
 }
 
 /** What the surgeon sees: the robot as it was VIDEO_DELAY ago. */
@@ -299,6 +303,7 @@ export function assistStars(s: AssistState): number {
 export function assistScore(s: AssistState): number {
   const m = marked(s)
   const acc = s.targets.filter((t) => t.done).reduce((a, t) => a + Math.max(0, 100 - 40 * t.err), 0)
-  const time = s.done ? Math.max(0, Math.round((TIME_LIMIT - s.t) * 3)) : 0
+  // No time bonus in untimed play.
+  const time = s.done && Number.isFinite(s.timeLimit) ? Math.max(0, Math.round((TIME_LIMIT - s.t) * 3)) : 0
   return Math.max(0, m * 200 + Math.round(acc) + time - 150 * safetyErrors(s))
 }

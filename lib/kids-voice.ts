@@ -7,13 +7,17 @@
 import { useCallback, useEffect, useState } from 'react'
 import { sparkSays, cancelSparkSpeech } from './kids-audio'
 import { KIDS_SETTINGS_EVENT } from './kids/settings-boot'
+import { updateKidsSettings } from './kids/settings'
 
 const STORAGE_KEY = 'r2bot_kids_voice'
 
 function readInitial(): boolean {
   if (typeof window === 'undefined') return true
-  const raw = window.localStorage.getItem(STORAGE_KEY)
-  return raw !== 'false' // default true (any non-'false' value -> on)
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) !== 'false' // default true (any non-'false' value -> on)
+  } catch {
+    return true
+  }
 }
 
 export interface KidsVoiceApi {
@@ -64,17 +68,13 @@ export function useKidsVoice(): KidsVoiceApi {
     cancelSparkSpeech()
   }, [])
 
+  // Through the Settings store, so its subscribers (read-aloud, the Settings
+  // page, quest cards) follow the header button at once.
   const toggle = useCallback(() => {
-    setVoiceOn(prev => {
-      const next = !prev
-      try {
-        window.localStorage.setItem(STORAGE_KEY, String(next))
-      } catch {
-        /* noop — private mode etc. */
-      }
-      if (!next) cancelSparkSpeech()
-      return next
-    })
+    const next = !readInitial()
+    updateKidsSettings({ voice: next })
+    if (!next) cancelSparkSpeech()
+    setVoiceOn(next)
   }, [])
 
   return { voiceOn, speak, toggle, cancel }
@@ -87,9 +87,5 @@ export function readVoicePref(): boolean {
 
 export function writeVoicePref(on: boolean): void {
   if (typeof window === 'undefined') return
-  try {
-    window.localStorage.setItem(STORAGE_KEY, String(on))
-  } catch {
-    /* noop */
-  }
+  updateKidsSettings({ voice: on })
 }

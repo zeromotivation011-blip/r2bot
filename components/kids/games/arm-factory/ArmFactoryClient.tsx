@@ -8,6 +8,7 @@
 //   Ace    — inverse kinematics: tap a point, pick elbow-up/down, plan waypoints round a pillar.
 //   Legend — write a looping pick-and-place program under payload, torque and cycle-time limits.
 
+import { kidsTimeLimit } from '@/lib/kids/settings'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { playSound } from '@/lib/kids-audio'
@@ -125,7 +126,8 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
   const cfg = useMemo(() => tierConfig(tier, round), [tier, round])
   const simRef = useRef<ArmSim | null>(null)
   if (!simRef.current) {
-    simRef.current = new ArmSim(cfg)
+    // Kids "more time" setting scales the shift (Infinity when untimed).
+    simRef.current = new ArmSim(Number.isFinite(cfg.timeLimit) ? { ...cfg, timeLimit: kidsTimeLimit(cfg.timeLimit) } : cfg)
     if (cfg.mode === 'program' || cfg.pendant) simRef.current.beltOn = false
   }
   /** Holds the WebGL <canvas>, which the render effect creates and removes itself. */

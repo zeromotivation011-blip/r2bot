@@ -11,10 +11,12 @@ import { orderActivities, trackMastery, visibleBands, type ActivitySummary } fro
 import { Constellation } from './ConstellationClient'
 import { MasteryRing, ShowAllToggle } from './GalaxyClient'
 import { useGalaxyState } from './useGalaxyState'
+import { useMastery } from './useMastery'
 
 export default function TrackClient({ trackId, activities }: { trackId: TrackId; activities: ActivitySummary[] }) {
   const track = TRACKS.find((t) => t.id === trackId) ?? TRACKS[0]
   const { ready, done, band } = useGalaxyState()
+  const { starts } = useMastery()
   const [showAll, setShowAll] = useState(false)
   const ordered = useMemo(() => orderActivities(activities), [activities])
   const bands = useMemo(() => new Set(visibleBands(band ?? 'builders', showAll || !band)), [band, showAll])
@@ -48,7 +50,7 @@ export default function TrackClient({ trackId, activities }: { trackId: TrackId;
       {band && !showAll && <p className="mt-3 text-[15px] text-[#A7B0C0]">Showing missions for {getBand(band)?.name} and the bands either side.</p>}
       <div className="mt-4">
         {shown.length ? (
-          <Constellation track={track} activities={shown} allOfTrack={ordered} done={done} ready={ready} cols={5} />
+          <Constellation track={track} activities={shown} allOfTrack={ordered} done={done} ready={ready} cols={5} start={starts[trackId]} />
         ) : (
           <p className="rounded-2xl border border-dashed border-white/[0.16] p-4 text-center text-[15px] text-[#A7B0C0]">New missions for your age are landing here soon.</p>
         )}

@@ -109,18 +109,47 @@ The parent "Camera" switch covers Workshop AR AND the Vision Lab (both also ask 
 
 ## Settings — one device-only store
 `lib/kids/settings.ts` (localStorage only; no account). Page `/kids/settings` (noindex),
-which also mounts the progress backup code. Fields: `sound`, `volume`, `voice` (same key as
-`lib/kids-voice.ts`, `r2bot_kids_voice`), `reduceMotion`, `largeText`, `lite3d`.
+which also mounts the progress backup code and quick setups (Calm and quiet / Help me read /
+Easy to see). Fields: `sound`, `volume`, `music`, `voice` (same key as `lib/kids-voice.ts`,
+`r2bot_kids_voice`; the header button writes through the store, so muting it also stops
+read-aloud), `readAloud`, `reduceMotion`, `textSize` (normal/large/larger; `largeText` is derived
+from it), `highContrast`, `dyslexia`, `colourSafe`, `calm`, `timeScale` (1/1.5/2), `untimed`,
+`scanMode` (off/step/auto), `scanSpeed`, `lite3d` (roadmap #25, #89).
 - Every change fires `KIDS_SETTINGS_EVENT` (`r2bot:kids-settings`); other tabs follow via `storage`.
 - React: `useKidsSettings()`, `useKidsReducedMotion()` (device preference OR the setting),
-  `useKidsLite3D()`. Non-React: `readKidsSettings()`, `kidsReducedMotion()`, `kidsLite3D()`.
+  `useKidsLite3D()`, `useKidsCalm()`, `useKidsTime()`. Non-React: `readKidsSettings()`,
+  `kidsReducedMotion()`, `kidsLite3D()`, `kidsCalm()`, `kidsMusicOn()`, `kidsTime()`.
+- **Timers:** every child-facing countdown goes through `kidsTimeLimit(base)` (Infinity when
+  untimed, so `t >= limit` never fires) and skips any time bonus when untimed. Done: Robot
+  Surgeon (3 games), Orbit Repair, Arm Factory, Conveyor Bug. Pure sims take the limit as a
+  parameter (`createState(tier, kidsTimeLimit)`) so they stay deterministic. Swarm Reef and
+  Bio-Bots keep their limits on purpose: there the clock is simulated mission time, part of
+  the engineering puzzle, not the child's reaction speed.
+- **Calm:** `fire()` in `Confetti.tsx` returns early, `playSound` swaps fanfares for one soft
+  chime, the level-up ceremony plays without motion, episodes build a calm scene; music beds
+  play only when `music` is on.
+- **Read everything to me** (`lib/kids/read-aloud.ts`, runtime
+  `components/kids/settings/access-runtime.ts`, code-split, loaded only when read-aloud or
+  scanning is on): a tap on text reads it, a tap on a button reads its name and still works,
+  a half-second hold reads without pressing; every aria-live / role=status / role=alert change
+  is spoken. Markup: `data-read-aloud`, `data-read-aloud="text"`, `data-read-aloud="off"`,
+  `speakFeedback()`, `<ReadAloud>` / `<ReadAloudButton>`.
+- **Scanning:** step (Space moves, Enter picks) or auto; stays inside an open dialog. A tap-only
+  SVG/div shape must be `role="button"` + `tabIndex={0}` + Enter/Space, or carry
+  `data-keyboard-twin="<the real control>"` when a focusable control already does the same.
+- **Colour-safe cues:** a verdict carries `data-cue="ok|no|warn|info"` (icon + border style);
+  patterns `.kids-cue-stripes|dots|grid`.
+- Check: `lib/kids/access.verify.ts` (CI): store, boot script and a per-template checklist
+  (names, labels, keyboard, alt, feedback, drag, 44px). A ratchet: `BASELINE` is empty; any new
+  issue fails.
 - three.js: `kidsRenderHints()` → `{ dpr, antialias, shadows }`, `liteDpr()`. `createStage()`
   in `components/kids/three/stage.ts` already applies them, and its `prefersReducedMotion()`
   returns `kidsReducedMotion()`. A view that makes its own renderer must use these too.
 - `<html>` classes, set before first paint by `KIDS_SETTINGS_BOOT_SCRIPT` (in
   `app/kids/layout.tsx`) and kept in step by `RewardToastClient` (removed on leaving /kids):
   `kids-large-text` (kids text ~112%), `kids-reduce-motion` (animations cut),
-  `kids-lite-3d` (informational). CSS: `components/kids/settings/kids-settings.css`.
+  `kids-lite-3d` (informational), plus one class per new access setting (high contrast,
+  dyslexia, colour-safe, calm, text size, scanning). CSS: `components/kids/settings/kids-settings.css`.
 - `playSound` (lib/kids-audio.ts) is silent when sound is off and follows the volume;
   `sparkSays` is silent when voice is off.
 
@@ -135,8 +164,62 @@ and `importProgressCode()` (never throws, caps every field, merges with max/unio
 lowers progress). UI: `components/kids/hangar/BackupCodeClient.tsx` (Hangar and Settings).
 Checks: `lib/kids/progress-backup.verify.ts` (CI).
 
+### Profiles — one device, several children (roadmap #41, #90)
+`lib/kids/profiles.ts`. A device with no profiles behaves exactly as before (no profile button).
+- Progress and robot use per-child keys: the child who used the device first is `p1` and keeps
+  the original keys (`r2bot_kids_v2`, `r2bot_kids_robot_v1`); others use `<key>::<profileId>`
+  (`profileKey(base)`). `getProgressOf(id)`, `loadDesignOf`/`saveDesignOf`; backup codes take an
+  optional `{ profileId }`.
+- Stores read by a fixed key elsewhere (Galaxy map, course, hangar looks, class membership and
+  missions, onboarded, Spark reward day, build day, vision, `r2bot_think_*`, Code Lab drafts,
+  game-seen and world-complete flags) are SWAPPED on each switch (`SWAPPED_KEYS` /
+  `SWAPPED_PREFIXES`): the playing child's data sits at the plain key. A switch is
+  all-or-nothing and rolls back on a storage error.
+- **Rule:** a new per-child localStorage store uses `profileKey(base)` OR is added to
+  `SWAPPED_KEYS` — never both (one child's data could overwrite another's). Moving a swapped
+  store to `profileKey()` removes it from `SWAPPED_KEYS` in the same commit.
+- UI (`components/kids/profiles/`): `ProfileSwitcherClient` in the shell header, "Who's playing?"
+  picker (Explorers unlock with a 3-picture password; older children may add one),
+  `ParentProfilesClient` in the parent hub (Family / Shared device). At home adding a child asks
+  a grown-up; on a shared tablet "Done" clears the device back to the picker. `/kids/join` binds
+  the class member to a profile (`bindClassMember()`).
+- Play together (`lib/kids/together.ts`, `/kids/together`, noindex): the older child navigates,
+  the younger drives; stars through `reportBestRun`, the partner's paid on their next turn.
+
+## Mastery — concepts, Recharge, Launch Check (roadmap #27–#29)
+- Every activity names 1–3 `ConceptId`s from the course's concept list; `activities/verify.ts`
+  fails on a missing, unknown or duplicate concept, or one only a single template practises.
+- `lib/kids/universe/mastery.ts` (pure): a concept is **secure** after 3 first-try wins on 3
+  different activities using 2 templates within 21 days; it **fades** after 21 days with no
+  first-try win, and one first-try win recharges it. A hinted win never counts as first-try.
+- Store fields in `lib/kids-progress.ts`: `conceptLog`, `conceptSecured`, `galaxyStart` (empty by
+  default; the backup code cleans and merges them).
+- Evidence: `recordActivityResult(id, run, activity, { assisted })` and
+  `recordActivityMiss(activity)` in `lib/kids/activities/progress.ts` (the activity player and
+  `finishGalaxyRun` in `lib/kids/activities/run.ts` call them).
+- Daily plan: `dailyMissionPlan()` = 1 new + 1 recharge (a fading concept, a different template
+  from its last win) + 1 stretch, worked out from the state at the start of the day; skipping a
+  day costs nothing.
+- Launch Check (`lib/kids/activities/launch-check.ts`, `/kids/galaxy/launch-check[/track]`,
+  noindex): 6–8 missions stepping up/down; pacing (`lib/kids/activities/pacing.ts`) sets the
+  per-track start (Cadet/Pilot/Ace/Legend). `PacingNudgeClient` offers "skip to Ace?" after
+  three first-try wins and an easier mission on the same concept after two misses in a row.
+- Constellations: `/kids/galaxy/concepts` (indexable) and a compact grid in the Garage.
+  Teachers: `conceptGridCode(progress)` (16 letters, decode `parseConceptGridCode`) is ready
+  for the class snapshot. Check: `lib/kids/universe/mastery.verify.ts` (CI).
+
+## Hint ladder (roadmap #26)
+One component, `components/kids/galaxy/HintLadderClient.tsx`, in the Galaxy activity player and
+Code Lab. It appears only after a failed try: goal → clue (the last `CheckResult.feedback`, then
+a template tip from `hint-tips.ts`) → "Spark shows me": a solved twin built on the server by
+`workedTwinFor()` (`worked-solution.ts`; Code Lab `codelab/worked-twin.ts`), never the activity
+itself and never the same answer, sent as words only. Any hint caps the finish at 2 stars and
+still earns XP; the report carries `hintsUsed` and `reportActivity` enforces the cap. Check:
+`components/kids/galaxy/hint-ladder.verify.ts` (CI).
+
 ## Rewards — one function
-`lib/kids/universe/rewards.ts` → `reportActivity({ kind, id, stars, score, badges, attempts })`.
+`lib/kids/universe/rewards.ts` → `reportActivity({ kind, id, stars, score, badges, attempts, hintsUsed })`
+(`hintsUsed` caps stars at 2).
 It alone decides XP, level (`levelInfo`), badges, unlocks, weekly quests and
 personal bests, and fires `REWARD_EVENT`; `components/kids/ui/RewardToastClient.tsx`
 (mounted in the shell) celebrates. **Never** write those fields directly.

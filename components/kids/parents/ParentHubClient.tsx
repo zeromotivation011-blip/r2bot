@@ -16,6 +16,8 @@ import { KIDS_PROGRESS_EVENT, collectedStars, getProgress, resetProgress, type K
 import { getActivitiesDone, type ActivitiesDone } from '@/lib/kids/activities/progress'
 import { getBadge, levelInfo } from '@/lib/kids/universe/rewards'
 import { getPart, loadDesign, ROBOT_CHANGED_EVENT, type RobotDesign, type Slot } from '@/lib/kids/robot-design'
+import ParentProfilesClient from '@/components/kids/profiles/ParentProfilesClient'
+import { activeProfile } from '@/lib/kids/profiles'
 import {
   DAILY_MINUTE_CHOICES,
   updateParentControls,
@@ -153,7 +155,8 @@ export default function ParentHubClient({ sessions, tracks, activityTrack }: Par
     const idea = latest ? { title: `After “${latest.title}”`, body: latest.tryAtHome } : fallback
 
     return {
-      name: p.explorerName || 'Your child',
+      // With profiles, the week shown is the child playing now (lib/kids/profiles.ts).
+      name: activeProfile()?.nickname || p.explorerName || 'Your child',
       level: levelInfo(p.xp ?? 0),
       stars: collectedStars(p),
       days: (p.playDays ?? []).filter((d) => inLastWeek(d, now)).length,
@@ -299,6 +302,8 @@ export default function ParentHubClient({ sessions, tracks, activityTrack }: Par
         </section>
       </div>
 
+      {/* Family profiles / shared tablet (roadmap #41, #90): each child on this device. */}
+      <ParentProfilesClient />
       <ControlsCard />
       <WeeklyEmailCard />
       <DeviceDataCard onReset={() => setSnap((s) => (s ? { ...s, p: getProgress(), acts: getActivitiesDone() } : s))} />

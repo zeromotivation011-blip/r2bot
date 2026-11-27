@@ -8,6 +8,8 @@
 // Every part carries plain-language "what it does", "with it" and "without it"
 // so a 7-year-old learns why a part exists by what breaks when it is missing.
 
+import { namespacedKey, profileKey } from './profiles'
+
 export type BodyId = 'box' | 'dome' | 'tall' | 'bug'
 export type DriveId = 'wheels2' | 'wheels4' | 'tracks' | 'legs'
 export type HeadId = 'camera' | 'distance' | 'antenna' | 'screen'
@@ -280,6 +282,10 @@ export const CAPABILITY_NEEDS: Record<Capability, string> = {
 }
 
 // ── Storage ────────────────────────────────────────────────────────────────
+/**
+ * Base key. Each profile on the device has its own robot (lib/kids/profiles.ts):
+ * member #1 keeps this exact key, others use `r2bot_kids_robot_v1::<profileId>`.
+ */
 const KEY = 'r2bot_kids_robot_v1'
 export const ROBOT_CHANGED_EVENT = 'r2bot:kids-robot'
 
@@ -290,9 +296,18 @@ function isDesign(x: unknown): x is RobotDesign {
 }
 
 export function loadDesign(): RobotDesign {
+  return loadDesignAt(profileKey(KEY))
+}
+
+/** One profile's robot without switching to it (parent hub, backup codes). */
+export function loadDesignOf(profileId: string | null): RobotDesign {
+  return loadDesignAt(namespacedKey(KEY, profileId))
+}
+
+function loadDesignAt(key: string): RobotDesign {
   if (typeof window === 'undefined') return { ...DEFAULT_DESIGN }
   try {
-    const raw = window.localStorage.getItem(KEY)
+    const raw = window.localStorage.getItem(key)
     if (!raw) return { ...DEFAULT_DESIGN }
     const parsed: unknown = JSON.parse(raw)
     if (!isDesign(parsed)) return { ...DEFAULT_DESIGN }
@@ -310,10 +325,21 @@ export function loadDesign(): RobotDesign {
 export function saveDesign(d: RobotDesign): void {
   if (typeof window === 'undefined') return
   try {
-    window.localStorage.setItem(KEY, JSON.stringify(d))
+    window.localStorage.setItem(profileKey(KEY), JSON.stringify(d))
     window.dispatchEvent(new CustomEvent(ROBOT_CHANGED_EVENT))
   } catch {
     /* storage full or blocked — the design simply is not remembered */
+  }
+}
+
+/** Save one profile's robot without switching to it (parent hub restore). */
+export function saveDesignOf(profileId: string | null, d: RobotDesign): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(namespacedKey(KEY, profileId), JSON.stringify(d))
+    window.dispatchEvent(new CustomEvent(ROBOT_CHANGED_EVENT))
+  } catch {
+    /* storage full or blocked */
   }
 }
 

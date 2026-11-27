@@ -16,6 +16,7 @@
 // surgeon's is usually a fraction of a millimetre — but so are the tissues.
 
 import { clamp, gauss, rng } from './shared'
+import { kidsTimeLimit } from '@/lib/kids/settings'
 
 export const BOARD_W = 60 // mm
 export const BOARD_H = 36 // mm
@@ -106,6 +107,8 @@ export interface SteadyState {
   started: boolean
   finished: boolean
   timeUp: boolean
+  /** This round's limit in seconds after the kids "more time" setting (Infinity when untimed). */
+  timeLimit: number
   samples: number
   inside: number
   touches: number
@@ -148,6 +151,7 @@ export function makeSteady(settings: SteadySettings, seed = 11): SteadyState {
     started: false,
     finished: false,
     timeUp: false,
+    timeLimit: kidsTimeLimit(TIME_LIMIT),
     samples: 0,
     inside: 0,
     touches: 0,
@@ -248,7 +252,7 @@ export function stepSteady(s: SteadyState, hdx: number, hdy: number, dt: number)
     }
   }
   if (s.progress >= PATH.length - 3 && n.d <= HALF_W * 1.5) s.finished = true
-  if (s.t >= TIME_LIMIT) s.timeUp = true
+  if (s.t >= s.timeLimit) s.timeUp = true
 }
 
 export function accuracy(s: SteadyState): number {

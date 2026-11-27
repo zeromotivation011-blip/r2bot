@@ -232,6 +232,7 @@ export default function FlowchartBuilderClient({ params, onSubmit, onDone }: Tem
                 <g
                   key={n.id}
                   onClick={() => { if (isSlot && !locked) { playSound('click'); setSel(n.id) } }}
+                  data-keyboard-twin="Box tab buttons"
                   className={isSlot && !locked ? 'cursor-pointer' : ''}
                   opacity={run && !done && !active ? 0.75 : 1}
                 >

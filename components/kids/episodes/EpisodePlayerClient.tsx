@@ -24,7 +24,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SparkCharacter } from '@/components/kids/SparkCharacter'
 import { playSound } from '@/lib/kids-audio'
-import { readKidsSettings } from '@/lib/kids/settings'
+import { kidsCalm, kidsReducedMotion, readKidsSettings } from '@/lib/kids/settings'
 import { KIDS_SETTINGS_EVENT } from '@/lib/kids/settings-boot'
 import { DEFAULT_DESIGN, loadDesign } from '@/lib/kids/robot-design'
 import { reportActivity } from '@/lib/kids/universe/rewards'
@@ -140,13 +140,15 @@ export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }
   const [captions, setCaptions] = useState(true)
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1)
   const [muted, setMuted] = useState(false)
-  // Kids Settings: 'Sound effects' gates the music bed, 'Spark talks' the voice clips.
+  // Kids Settings: 'Sound effects' and 'Music' gate the music bed, 'Spark talks' the voice clips.
   const [soundSetting, setSoundSetting] = useState(true)
+  const [musicSetting, setMusicSetting] = useState(true)
   const [voiceSetting, setVoiceSetting] = useState(true)
   useEffect(() => {
     const sync = () => {
       const st = readKidsSettings()
       setSoundSetting(st.sound)
+      setMusicSetting(st.music && st.volume > 0)
       setVoiceSetting(st.voice)
     }
     sync()
@@ -158,7 +160,7 @@ export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }
     }
   }, [])
   const voiceOut = !muted && voiceSetting
-  const musicOut = !muted && soundSetting
+  const musicOut = !muted && soundSetting && musicSetting
   useEffect(() => {
     directorRef.current?.setChannels(voiceOut, musicOut)
   }, [voiceOut, musicOut])
@@ -244,7 +246,8 @@ export default function EpisodePlayerClient({ sessionId, onDone, onUnavailable }
     }
     setPhase('loading')
     setProgress(0.05)
-    const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Calm scenes: reduced motion (device or kids setting) or the kids calm mode.
+    const calm = kidsReducedMotion() || kidsCalm()
     let d: Director | null = null
     try {
       const mod = await loadEngine()

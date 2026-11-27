@@ -2,10 +2,12 @@
 
 // Zone 2-ish boss: "Factory Line Bug"
 // A conveyor belt animates items left to right. Some are "bugs" (wrong shape/colour).
-// Tap them before they fall off the end. 30-second timer. 3 bugs needed.
+// Tap them before they fall off the end. 32-second timer (scaled by the kids
+// "more time" setting; untimed play ends when the bugs are caught). 3 bugs needed.
 
 import { useEffect, useRef, useState } from 'react'
 import { playSound, primeAudio, sparkSays } from '@/lib/kids-audio'
+import { kidsTimeLimit } from '@/lib/kids/settings'
 
 interface Item {
   id: number
@@ -36,12 +38,15 @@ export function ConveyorBugGame({ onWin, onFail }: {
   const spawnTimer = useRef<ReturnType<typeof setInterval> | null>(null)
   const tickTimer = useRef<ReturnType<typeof setInterval> | null>(null)
   const startedAt = useRef(Date.now())
+  /** This round's length after the kids "more time" setting (Infinity when untimed). */
+  const gameMs = useRef(GAME_MS)
 
   useEffect(() => {
     sparkSays('Three faulty items are on the line. Tap each one before it falls off!')
   }, [])
 
   useEffect(() => {
+    gameMs.current = kidsTimeLimit(GAME_MS)
     spawnTimer.current = setInterval(() => {
       const id = ++itemId.current
       const isBug = Math.random() < 0.35
@@ -59,7 +64,7 @@ export function ConveyorBugGame({ onWin, onFail }: {
 
     tickTimer.current = setInterval(() => {
       const elapsed = Date.now() - startedAt.current
-      const left = Math.max(0, GAME_MS - elapsed) / 1000
+      const left = Math.max(0, gameMs.current - elapsed) / 1000
       setTimeLeft(Math.ceil(left))
       // Remove items that fell off
       setItems(prev => {
@@ -75,7 +80,7 @@ export function ConveyorBugGame({ onWin, onFail }: {
         if (newMissed > 0) setMissed(m => m + newMissed)
         return surviving
       })
-      if (elapsed >= GAME_MS) {
+      if (elapsed >= gameMs.current) {
         setOver(true)
       }
     }, 200)
@@ -85,6 +90,11 @@ export function ConveyorBugGame({ onWin, onFail }: {
       if (tickTimer.current) clearInterval(tickTimer.current)
     }
   }, [])
+
+  // Untimed play has no clock to end the round: it ends when the bugs are caught.
+  useEffect(() => {
+    if (bugsCaught >= BUGS_NEEDED && !Number.isFinite(gameMs.current)) setOver(true)
+  }, [bugsCaught])
 
   useEffect(() => {
     if (!over) return
@@ -121,8 +131,8 @@ export function ConveyorBugGame({ onWin, onFail }: {
         <div className="cb-stat" aria-label={`Bugs caught: ${bugsCaught}`}>
           🐞 {bugsCaught} / {BUGS_NEEDED}
         </div>
-        <div className="cb-stat" aria-label={`Time left: ${timeLeft} seconds`}>
-          ⏱ {timeLeft}s
+        <div className="cb-stat" aria-label={Number.isFinite(timeLeft) ? `Time left: ${timeLeft} seconds` : 'No time limit'}>
+          ⏱ {Number.isFinite(timeLeft) ? `${timeLeft}s` : '∞'}
         </div>
         <div className="cb-stat" aria-label={`Missed: ${missed}`}>
           ❌ {missed}

@@ -182,3 +182,23 @@ Still open from Wave 1:
 - [x] Parental gate cool-down persists across Cancel/reopen (sessionStorage `r2bot_kids_gate_lock`).
 - [x] kids-sw: STATIC trim keeps a keep-list (`/kids/__sw-keep.json` in the pages cache) of each precached page's chunks + the dynamic chunks found at install; refreshed when a precached page's HTML is saved again.
 - [ ] Follow-up: dynamic (lazy) chunks of a precached page are only re-recorded on a worker reinstall, not on a page refresh after a deploy; Supabase preconnect still on /kids.
+
+
+## 27 Nov 2026 — Wave 2, batch A (access, hints, mastery, profiles)
+Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-universe.md):
+- [x] #25 Access settings: music, read-aloud ("read everything to me", aria-live feedback spoken), text size, high contrast, dyslexia, colour-safe cues (`data-cue` on the FeedbackCard/FeedbackPanel verdicts), more time / untimed, switch scanning (step/auto); quick setups on /kids/settings; per-template checklist `lib/kids/access.verify.ts` in CI with an empty baseline (the 9 tap-only shapes now have keyboard handlers or a `data-keyboard-twin`). School-guide wording no longer overclaims (switch/keyboard on every button and option; canvas games still need touch; time is a device setting).
+- [x] #89 Calm and sensory: separate sound/music/voice; calm = no confetti (`fire()` returns), soft chime, ceremony without motion, calm episode scene; music beds gated by `music`; untimed play. Timers through `kidsTimeLimit()`: Robot Surgeon ×3, Orbit Repair, Arm Factory, Conveyor Bug (time bonuses skipped when untimed).
+- [x] #26 Hint ladder + "Spark shows me" in the Galaxy player (twin built on the activity page) and Code Lab; hints cap at 2 stars (also enforced in `reportActivity` via `hintsUsed`).
+- [x] #27 Concept tags (all activities) + secure/fading mastery; constellations on `/kids/galaxy/concepts` (indexable, in the sitemap) and in the Garage.
+- [x] #28 Recharge missions (1 new + 1 recharge + 1 stretch) in the Galaxy.
+- [x] #29 Launch Check + pacing nudges ("skip to Ace?", easier twin after two misses), wired into the activity player (misses and assisted wins logged).
+- [x] #41 Shared-device mode and #90 family profiles: per-child storage, picture passwords for Explorers, "Done" on shared tablets, parent hub per child, Play together `/kids/together` (noindex); profile button in the shell header.
+
+Still open from batch A:
+- [ ] #29 "Teacher locks a child's band" (needs the classroom side).
+- [ ] #27 teacher grid: put `conceptGridCode(getProgress())` into the class sync snapshot and decode with `parseConceptGridCode` (Batch C / classroom owner).
+- [ ] #89 the fixed "what's next" strip in the shell.
+- [ ] Swarm Reef and Bio-Bots keep fixed limits on purpose (simulated mission time is part of the puzzle) — revisit if teachers ask.
+- [ ] Episode `fx.ts` and the canvas worlds' own effects follow calm only through the episode `calm` flag and `fireConfetti`; a world that draws its own particles should check `kidsCalm()`.
+- [ ] Owners of swapped stores (activities, course, hangar, classroom membership, think, vision, codelab, worlds): moving to `profileKey()` must remove the key from `SWAPPED_KEYS` in the same commit.
+- [ ] activities/verify warning: "variables" has a single template for Explorers (the course plan has nothing on variables at that age).

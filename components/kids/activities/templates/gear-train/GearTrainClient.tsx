@@ -235,6 +235,7 @@ export default function GearTrainClient({ params, band, onSubmit, onDone }: Temp
                 transform={`translate(${g.x} 0)`}
                 onClick={() => edit(() => setSel(i))}
                 className="cursor-pointer"
+                data-keyboard-twin="gear list buttons"
                 aria-hidden="true"
               >
                 <g transform={`rotate(${((th[i] ?? 0) * 180) / Math.PI})`}>

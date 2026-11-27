@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { playSound, primeAudio } from '@/lib/kids-audio'
+import { kidsTimeLimit } from '@/lib/kids/settings'
 import {
   ACE,
   CADET,
@@ -215,7 +216,7 @@ export default function OrbitRepairGameClient({ tier: tierProp, onFinish }: Prop
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
-  const stateRef = useRef<GameState>(createState(tier))
+  const stateRef = useRef<GameState>(createState(tier, kidsTimeLimit))
   const fxRef = useRef<Fx | null>(null)
   const phaseRef = useRef<Phase>('brief')
   const puffQ = useRef<Dir[]>([])

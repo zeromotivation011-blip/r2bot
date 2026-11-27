@@ -7,25 +7,34 @@
 // Only the template this activity uses is downloaded (components/kids/activities/registry.ts).
 // The server page passes the activity WITHOUT its solution, and light
 // summaries of the same track for the "next" suggestions.
+// Roadmap #26: after a failed try the hint ladder (components/kids/galaxy/
+// HintLadderClient) offers goal → clue → "Spark shows me" on a twin activity
+// (`twin`, words only, built on the server by workedTwinFor). Any hint caps
+// the stars at 2; XP is still earned and `hintsUsed` goes to the report.
 
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { Activity } from '@/lib/kids/activities/types'
+import type { Activity, CheckResult } from '@/lib/kids/activities/types'
 import { TRACKS, activityXp } from '@/lib/kids/activities/types'
 import { getBand } from '@/lib/kids/bands'
 import {
   getActivitiesDone,
   masteryBadgeId,
   nextActivities,
+  recordActivityMiss,
   recordActivityResult,
   starsForAttempts,
   trackMastery,
   type ActivitySummary,
 } from '@/lib/kids/activities/progress'
-import { reportActivity, type RewardResult } from '@/lib/kids/universe/rewards'
+import { reportActivity, type ActivityReport, type RewardResult } from '@/lib/kids/universe/rewards'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { fireConfetti } from '@/components/kids/Confetti'
 import { useGalaxyState } from '@/components/kids/galaxy/useGalaxyState'
+import HintLadderClient, { type LadderStep } from '@/components/kids/galaxy/HintLadderClient'
+import PacingNudgeClient from '@/components/kids/galaxy/PacingNudgeClient'
+import { TEMPLATE_TIP } from '@/components/kids/galaxy/hint-tips'
+import type { WorkedTwin } from '@/components/kids/galaxy/worked-solution'
 import { PLAYABLE } from './registry'
 import { canSpeak, setVoiceMuted, speakNatural, stopSpeaking, voiceMuted, warmNaturalVoices } from './speech'
 
@@ -35,7 +44,12 @@ interface Props {
   activity: PlayerActivity
   /** Summaries of the activity's track (for next suggestions and mastery). */
   trackActivities: ActivitySummary[]
+  /** "Spark shows me": a solved twin of the same template (words only). Omit/null = the ladder stops at the clue. */
+  twin?: WorkedTwin | null
 }
+
+/** Stars after hints: using the ladder caps a finish at 2 (it still earns XP). */
+export const HINT_STAR_CAP = 2
 
 type Stage = 'intro' | 'play' | 'done'
 
@@ -48,6 +62,7 @@ interface Finish {
   improved: boolean
   bestStars: number
   mastery: { badge: string; earned: boolean } | null
+  hinted: boolean
 }
 
 const focusRing = 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60'
@@ -76,7 +91,7 @@ function DifficultyDots({ d }: { d: number }) {
   )
 }
 
-export default function ActivityPlayerClient({ activity, trackActivities }: Props) {
+export default function ActivityPlayerClient({ activity, trackActivities, twin = null }: Props) {
   const track = TRACKS.find((t) => t.id === activity.track) ?? TRACKS[0]
   const band = getBand(activity.band)
   const { ready, done, band: childBand } = useGalaxyState()
@@ -90,6 +105,16 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
   const stopRef = useRef<() => void>(() => undefined)
   const doneHeading = useRef<HTMLHeadingElement>(null)
   const stageTop = useRef<HTMLDivElement>(null)
+  const goalCard = useRef<HTMLDivElement>(null)
+  const templateTop = useRef<HTMLDivElement>(null)
+  // Hint ladder state (#26). Kept across "Try again" after a miss; reset on a new start.
+  const [failures, setFailures] = useState(0)
+  const [lastFeedback, setLastFeedback] = useState('')
+  const [hintsUsed, setHintsUsed] = useState(false)
+  const hintsUsedRef = useRef(false)
+  const [goalLit, setGoalLit] = useState(false)
+  const [ladderStep, setLadderStep] = useState<0 | LadderStep>(0)
+  const [ladderKey, setLadderKey] = useState(0)
   const Play = PLAYABLE[activity.template]
 
   const speak = useCallback((text: string) => {
@@ -117,7 +142,8 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
 
   const previousBest = ready ? (done[activity.id]?.stars ?? 0) : 0
 
-  const start = () => {
+  /** Start (or restart) the template. `keepHelp`: after a miss, the hint ladder stays where it was. */
+  const start = (keepHelp = false) => {
     primeAudio()
     stopRef.current()
     setSpeaking(false)
@@ -126,24 +152,65 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
     setFinish(null)
     setStage('play')
     setRun((r) => r + 1)
+    if (!keepHelp) {
+      setFailures(0)
+      setLastFeedback('')
+      setHintsUsed(false)
+      hintsUsedRef.current = false
+      setGoalLit(false)
+      setLadderStep(0)
+      setLadderKey((k) => k + 1)
+    }
     requestAnimationFrame(() => stageTop.current?.scrollIntoView({ block: 'start', behavior: 'smooth' }))
   }
 
-  const onChecked = useCallback(() => {
+  const onChecked = useCallback((r: CheckResult) => {
     setAttempts((n) => n + 1)
+    if (!r.correct) {
+      setFailures((n) => n + 1)
+      if (r.feedback) setLastFeedback(r.feedback)
+    }
   }, [])
+
+  const onHintStep = useCallback((step: LadderStep) => {
+    hintsUsedRef.current = true
+    setHintsUsed(true)
+    setLadderStep((s) => (step > s ? step : s))
+    if (step === 1) {
+      setGoalLit(true)
+      requestAnimationFrame(() => goalCard.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
+    }
+  }, [])
+
+  const onYourTurn = () => {
+    if (stage === 'done') {
+      // From the "come back to this one" card: a fresh try, help kept.
+      start(true)
+      return
+    }
+    requestAnimationFrame(() => {
+      templateTop.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      templateTop.current?.focus({ preventScroll: true })
+    })
+  }
+
+  const clues = useMemo(() => [lastFeedback, TEMPLATE_TIP[activity.template]].filter((c): c is string => Boolean(c)), [lastFeedback, activity.template])
 
   const onDone = useCallback(
     (r: { correct: boolean; attempts: number; score: number }) => {
       const tries = Math.max(1, r.attempts)
+      const hinted = hintsUsedRef.current
       if (!r.correct) {
-        setFinish({ correct: false, attempts: tries, score: r.score, stars: 0, reward: null, improved: false, bestStars: getActivitiesDone()[activity.id]?.stars ?? 0, mastery: null })
+        recordActivityMiss(activity)
+        setFailures((n) => Math.max(1, n))
+        setFinish({ correct: false, attempts: tries, score: r.score, stars: 0, reward: null, improved: false, bestStars: getActivitiesDone()[activity.id]?.stars ?? 0, mastery: null, hinted })
         setStage('done')
         return
       }
-      const stars = starsForAttempts(tries)
+      // Hints cap the finish at 2 stars (roadmap #26); XP is still earned below.
+      const stars = hinted ? Math.min(HINT_STAR_CAP, starsForAttempts(tries)) : starsForAttempts(tries)
       const before = getActivitiesDone()
-      const outcome = recordActivityResult(activity.id, { stars, attempts: tries, score: r.score })
+      const outcome = recordActivityResult(activity.id, { stars, attempts: tries, score: r.score }, activity, { assisted: hinted })
       const after = { ...before, [activity.id]: outcome.record }
 
       // Mastery: every activity of this track in this band is done.
@@ -157,7 +224,9 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
         // First finish, or more stars than before: report once. Replays without
         // improvement earn nothing, so XP can't be farmed by repeating.
         const extra = outcome.firstTime ? 0 : -Math.round(activityXp(activity) * 0.5)
-        reward = reportActivity({
+        // `hintsUsed` rides along for rewards.ts / learning telemetry (#76); the
+        // star cap is already applied above, so the report is correct either way.
+        const report: ActivityReport = {
           kind: 'activity',
           id: activity.id,
           xp: Math.max(5, activityXp(activity) + extra),
@@ -165,7 +234,9 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
           score: Math.round(r.score * 100),
           attempts: tries,
           badges: [...(activity.badges ?? []), ...(masteryEarned ? [badge] : [])],
-        })
+          hintsUsed: hinted,
+        }
+        reward = reportActivity(report)
       }
       playSound(stars === 3 ? 'levelup' : 'star')
       if (stars === 3 || masteryEarned) fireConfetti()
@@ -178,6 +249,7 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
         improved: outcome.improved,
         bestStars: outcome.record.stars,
         mastery: now ? { badge, earned: masteryEarned } : null,
+        hinted,
       })
       setStage('done')
     },
@@ -226,6 +298,11 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
             Try {attempts}
           </span>
         )}
+        {stage === 'play' && hintsUsed && (
+          <span className="rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-sm font-semibold text-amber-200" data-testid="hint-cap">
+            Hint used · up to 2 ⭐
+          </span>
+        )}
         <button type="button" onClick={toggleVoice} aria-pressed={!muted} className={`${ghostBtn} min-h-[44px] px-3 text-sm`} aria-label={muted ? 'Turn voice on' : 'Turn voice off'}>
           <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M11 5 6 9H2v6h4l5 4V5z" />
@@ -266,7 +343,7 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
               </h1>
               <p className="mt-3 text-[19px] leading-relaxed text-[#EEF2F8] sm:text-xl">{activity.intro}</p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <button type="button" onClick={start} className={primaryBtn} autoFocus>
+                <button type="button" onClick={() => start()} className={primaryBtn} autoFocus>
                   {previousBest > 0 ? 'Play again' : 'Start mission'} <span aria-hidden>→</span>
                 </button>
                 {speechOk && (
@@ -295,16 +372,36 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
 
       {stage === 'play' && (
         <section aria-label={`Activity: ${activity.title}`} className="flex flex-col gap-3">
-          <div className="flex items-start gap-3 rounded-[20px] border border-white/[0.08] bg-[#111C32] p-3 sm:p-4">
+          <div
+            ref={goalCard}
+            data-testid="mission-goal"
+            data-goal-lit={goalLit ? 'true' : undefined}
+            className={`scroll-mt-24 flex items-start gap-3 rounded-[20px] border bg-[#111C32] p-3 transition-shadow duration-300 sm:p-4 ${
+              goalLit ? 'border-amber-400 shadow-[0_0_0_4px_rgba(252,104,24,.35),0_8px_24px_rgba(0,0,0,.45)]' : 'border-white/[0.08]'
+            }`}
+          >
             <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${track.gradient} text-xl`} aria-hidden>
               {track.icon}
             </span>
             <div className="min-w-0">
+              {goalLit && <p className="font-display text-xs font-bold uppercase tracking-wider text-amber-300">Your goal</p>}
               <h1 className="font-display text-lg font-bold leading-tight text-[#EEF2F8] sm:text-xl">{activity.title}</h1>
-              <p className="mt-0.5 text-[15px] leading-snug text-[#A7B0C0]">{activity.intro}</p>
+              <p className={`mt-0.5 leading-snug ${goalLit ? 'text-[17px] text-[#EEF2F8]' : 'text-[15px] text-[#A7B0C0]'}`}>{activity.intro}</p>
             </div>
           </div>
+          <div ref={templateTop} tabIndex={-1} className="scroll-mt-24 focus:outline-none" aria-label="Your try" />
+          {failures >= 2 && <PacingNudgeClient stage="play" activity={activity} trackActivities={trackActivities} wrongInARow={failures} />}
           <Play key={run} params={activity.params} band={activity.band} onChecked={onChecked} onDone={onDone} />
+          <HintLadderClient
+            available={failures > 0}
+            goal={activity.intro}
+            clues={clues}
+            worked={twin ? { title: twin.title, intro: twin.intro, steps: twin.steps, why: twin.why } : null}
+            onStep={onHintStep}
+            onYourTurn={onYourTurn}
+            resetKey={`${activity.id}:${ladderKey}`}
+            initialStep={ladderStep}
+          />
         </section>
       )}
 
@@ -315,11 +412,12 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
               <>
                 <Stars n={finish.stars} size="text-5xl" />
                 <h2 id="done-title" ref={doneHeading} tabIndex={-1} className="mt-3 font-display text-3xl font-bold text-[#EEF2F8] focus:outline-none">
-                  {finish.stars === 3 ? 'First try. Brilliant!' : finish.stars === 2 ? 'Solved it!' : 'You kept going and solved it!'}
+                  {finish.hinted ? 'Solved with Spark’s help!' : finish.stars === 3 ? 'First try. Brilliant!' : finish.stars === 2 ? 'Solved it!' : 'You kept going and solved it!'}
                 </h2>
                 <p className="mt-1 text-[#A7B0C0]">
                   {finish.attempts === 1 ? 'Solved in 1 try.' : `Solved in ${finish.attempts} tries.`}
                   {!finish.improved && ` Your best is still ${finish.bestStars} ${finish.bestStars === 1 ? 'star' : 'stars'}.`}
+                  {finish.hinted && ' Using a hint keeps it to 2 stars at most. Play again without hints to aim for 3.'}
                 </p>
                 <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm font-bold">
                   {finish.reward ? (
@@ -354,7 +452,7 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
               </>
             )}
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <button type="button" onClick={start} className={finish.correct ? ghostBtn : primaryBtn}>
+              <button type="button" onClick={() => start(!finish.correct)} className={finish.correct ? ghostBtn : primaryBtn}>
                 {finish.correct ? 'Play again' : 'Try again'}
               </button>
               <Link href="/kids/galaxy" className={finish.correct && suggestions.length === 0 ? primaryBtn : ghostBtn}>
@@ -362,6 +460,21 @@ export default function ActivityPlayerClient({ activity, trackActivities }: Prop
               </Link>
             </div>
           </div>
+
+          <PacingNudgeClient stage="done" activity={activity} trackActivities={trackActivities} />
+
+          {!finish.correct && (
+            <HintLadderClient
+              available
+              goal={activity.intro}
+              clues={clues}
+              worked={twin ? { title: twin.title, intro: twin.intro, steps: twin.steps, why: twin.why } : null}
+              onStep={onHintStep}
+              onYourTurn={onYourTurn}
+              resetKey={`${activity.id}:${ladderKey}`}
+              initialStep={ladderStep}
+            />
+          )}
 
           <div className="grid gap-3 sm:grid-cols-2">
             <article className="rounded-[20px] border border-amber-400/30 bg-[#111C32] p-5">

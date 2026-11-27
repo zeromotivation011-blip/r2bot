@@ -20,3 +20,130 @@ html.kids-reduce-motion *::after {
   transition-delay: 0ms !important;
   scroll-behavior: auto !important;
 }
+
+/* Biggest text (~125%): kids-larger-text is set together with kids-large-text. */
+html.kids-large-text.kids-larger-text { font-size: 125%; }
+html.kids-large-text.kids-larger-text .kids-main { font-size: 1.25em; }
+
+/* ─── Access + calm (roadmap #25 / #89) ──────────────────────────────────────
+   Classes set by lib/kids/settings.ts (and the boot script, before first paint).
+   They work on markup that already exists: Tailwind arbitrary colour classes are
+   matched by attribute so no component has to opt in. */
+
+/* Visible focus for every keyboard user: anything in the kids shell that brings
+   no focus style of its own gets the orange ring. */
+.kids-main :focus-visible:not([class*="focus-visible:"]),
+.kids-footer :focus-visible:not([class*="focus-visible:"]) {
+  outline: 3px solid #FF8A4C;
+  outline-offset: 3px;
+}
+
+/* High contrast: near-white text, bright borders, solid surfaces, a thick
+   white+orange focus ring, underlined links. Colourful content (worlds, games,
+   badges) keeps its colours; the greys and see-through whites go. */
+html.kids-high-contrast body { color: #FFFFFF; }
+html.kids-high-contrast :is([class*="text-[#A7B0C0]"], [class*="text-[#6E7888]"], [class*="text-[#94A3B8]"], [class*="text-slate-3"], [class*="text-slate-4"], [class*="text-slate-5"], [class*="text-gray-4"], [class*="text-gray-5"], [class*="text-white/"]) {
+  color: #F4F6FA !important;
+}
+html.kids-high-contrast :is([class*="text-amber-500"], [class*="text-amber-600"], [class*="text-[#FC6818]"]) { color: #FFB98F !important; }
+html.kids-high-contrast :is([class*="text-[#00B8D4]"], [class*="text-cyan-5"], [class*="text-cyan-6"]) { color: #6CF0FF !important; }
+html.kids-high-contrast :is([class*="border-white/"], .kids-nav, .kids-tabbar, .kids-more-menu, .kids-voice-toggle) {
+  border-color: rgba(255, 255, 255, 0.7) !important;
+}
+/* Some global resets zero a button's border width; in high contrast every bordered control shows its edge. */
+html.kids-high-contrast .border[class*="border-white/"] { border-width: 2px !important; border-style: solid; }
+html.kids-high-contrast [class*="from-white/"] { background-image: none !important; background-color: #0B1424 !important; }
+html.kids-high-contrast :is([class*="bg-white/"], [class*="bg-[#111C32]"], [class*="bg-[#19263F]"]) { background-color: #060B16 !important; }
+html.kids-high-contrast :is(.kids-main, .kids-footer) a:not([class*="rounded"]) { text-decoration: underline; text-underline-offset: 3px; }
+html.kids-high-contrast :is(.opacity-50, .opacity-60, [disabled], [aria-disabled="true"]) { opacity: 0.8 !important; }
+html.kids-high-contrast :is(button, [role="button"], a)[disabled],
+html.kids-high-contrast :is(button, [role="button"])[aria-disabled="true"] { border-style: dashed !important; }
+html.kids-high-contrast ::placeholder { color: #D9DEE7 !important; opacity: 1; }
+html.kids-high-contrast :focus-visible {
+  outline: 4px solid #FFFFFF !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 8px #FC6818 !important;
+}
+
+/* Dyslexia-friendly reading: no new font download, a plain system stack with
+   clear letter shapes (Verdana where the device has it, else the system sans),
+   wider letter, word and line spacing, no italics, no justified text. Code and
+   numbers in monospace stay monospace. */
+html.kids-dyslexia :is(.kids-main, .kids-nav, .kids-tabbar, .kids-footer, .kids-more-menu, [role="dialog"]),
+html.kids-dyslexia :is(.kids-main, .kids-nav, .kids-tabbar, .kids-footer, .kids-more-menu, [role="dialog"]) :not(code, pre, kbd, samp, .font-mono, .font-mono *) {
+  font-family: Verdana, Tahoma, "Trebuchet MS", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-style: normal !important;
+}
+html.kids-dyslexia .kids-main :is(p, li, dd, dt, label, blockquote, figcaption, td, th, legend, summary) {
+  letter-spacing: 0.05em;
+  word-spacing: 0.16em;
+  line-height: 1.75 !important;
+  text-align: left !important;
+}
+html.kids-dyslexia .kids-main :is(h1, h2, h3, h4) { letter-spacing: 0.02em; line-height: 1.35 !important; }
+html.kids-dyslexia .kids-main p { max-width: 68ch; }
+
+/* Colour-blind safe cues. Colour must never be the only signal, so:
+   1. Mark results with data-cue — the cue gets a shape AND, in this mode, an icon:
+        data-cue="ok"   ✓ solid border     (right / safe / on)
+        data-cue="no"   ✕ dashed border    (wrong / danger / off)
+        data-cue="warn" ▲ dotted border    (careful / almost)
+        data-cue="info" ● double border    (neutral / hint)
+   2. Chosen/pressed/selected controls get a double white ring (a shape, not a hue).
+   3. Areas told apart by colour (zones, wires, chart bars) add a pattern class:
+        .kids-cue-stripes / .kids-cue-dots / .kids-cue-grid (patterns show in this mode only).
+   Guidance for builders: always pair colour with a word or an icon too
+   ("✓ Lit" not just green), and never use red/green as the only pair. */
+html.kids-colour-safe [data-cue]::before {
+  display: inline-block;
+  margin-right: 0.35em;
+  font-weight: 800;
+  font-style: normal;
+}
+html.kids-colour-safe [data-cue="ok"]::before { content: "✓"; }
+html.kids-colour-safe [data-cue="no"]::before { content: "✕"; }
+html.kids-colour-safe [data-cue="warn"]::before { content: "▲"; }
+html.kids-colour-safe [data-cue="info"]::before { content: "●"; }
+html.kids-colour-safe [data-cue="ok"] { border-style: solid !important; }
+html.kids-colour-safe [data-cue="no"] { border-style: dashed !important; }
+html.kids-colour-safe [data-cue="warn"] { border-style: dotted !important; }
+html.kids-colour-safe [data-cue="info"] { border-style: double !important; }
+html.kids-colour-safe :is([aria-pressed="true"], [aria-checked="true"], [aria-selected="true"]):not([role="switch"]) {
+  box-shadow: inset 0 0 0 3px #0A1120, inset 0 0 0 6px #FFFFFF !important;
+}
+html.kids-colour-safe [aria-invalid="true"] { outline: 3px dashed #FFFFFF !important; outline-offset: 2px; }
+html.kids-colour-safe .kids-cue-stripes { background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 5px, transparent 5px 11px) !important; }
+html.kids-colour-safe .kids-cue-dots { background-image: radial-gradient(rgba(255, 255, 255, 0.4) 1.5px, transparent 2px) !important; background-size: 9px 9px !important; }
+html.kids-colour-safe .kids-cue-grid { background-image: linear-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.28) 1px, transparent 1px) !important; background-size: 10px 10px !important; }
+
+/* Read everything to me: text blocks are tappable (no text-selection callout
+   on a long press — the press reads instead), and what is being read gets a
+   cyan outline so a new reader can follow along. */
+html.kids-read-aloud .kids-main { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+html.kids-read-aloud .kids-main :is(input, textarea, [contenteditable="true"]) { -webkit-user-select: text; user-select: text; }
+html.kids-read-aloud .kids-main :is([data-read-aloud]:not([data-read-aloud="off"]), p, h1, h2, h3, li) { cursor: pointer; }
+.kids-reading {
+  outline: 3px solid #00E5FF !important;
+  outline-offset: 4px;
+  border-radius: 8px;
+  background-color: rgba(0, 229, 255, 0.08);
+}
+
+/* Calm mode: no confetti, still celebrations, no bouncing mascots. Canvas and
+   3D effects read kidsCalm() from lib/kids/settings.ts. */
+html.kids-calm span[style*="confetti-fall"] { display: none !important; }
+html.kids-calm :is(.spark-mood-happy, .spark-mood-celebrating, .spark-mood-proud, .spark-mood-surprised, .animate-bounce, .animate-ping, [class*="animate-[bounce"], [class*="animate-[course-pop"], [class*="animate-[course-rays"], [class*="animate-[course-badge-in"]) {
+  animation: none !important;
+}
+
+/* Keyboard/switch scanning: the scanned control wears a big, unmistakable ring. */
+html.kids-scan :focus-visible,
+html.kids-scan .kids-scan-target {
+  outline: 5px solid #FFFFFF !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 10px #FC6818 !important;
+  border-radius: 12px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html.kids-scan:not(.kids-reduce-motion) .kids-scan-target { transition: box-shadow 0.12s ease-out; }
+}

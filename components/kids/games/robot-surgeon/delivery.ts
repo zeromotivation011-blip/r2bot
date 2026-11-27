@@ -24,6 +24,7 @@
 // same result.
 
 import { clamp, rng } from './shared'
+import { kidsTimeLimit } from '@/lib/kids/settings'
 
 export const CELL_M = 2
 export const ROBOT_R = 0.35
@@ -118,6 +119,8 @@ export interface DeliveryState {
   delivered: Record<string, boolean>
   done: boolean
   timeUp: boolean
+  /** This round's limit in seconds after the kids "more time" setting (Infinity when untimed). */
+  timeLimit: number
   people: Person[]
   /** Counted mistakes. */
   fastNearPerson: number
@@ -170,6 +173,7 @@ export function makeDelivery(seed = 7): DeliveryState {
     delivered: { A: false, B: false, C: false },
     done: false,
     timeUp: false,
+    timeLimit: kidsTimeLimit(TIME_LIMIT),
     people,
     fastNearPerson: 0,
     bumps: 0,
@@ -390,7 +394,7 @@ export function stepDelivery(s: DeliveryState, input: { x: number; y: number }, 
   }
   const all = WARDS.every((w) => s.delivered[w.id])
   if (all && Math.hypot(s.x - HOME.x, s.y - HOME.y) < 0.8) s.done = true
-  if (s.t >= TIME_LIMIT) s.timeUp = true
+  if (s.t >= s.timeLimit) s.timeUp = true
 }
 
 export function safetyEvents(s: DeliveryState): number {
@@ -407,7 +411,8 @@ export function deliveryStars(s: DeliveryState): number {
 
 export function deliveryScore(s: DeliveryState): number {
   const n = WARDS.filter((w) => s.delivered[w.id]).length
-  const timeBonus = s.done ? Math.max(0, Math.round((TIME_LIMIT - s.t) * 4)) : 0
+  // No time bonus in untimed play.
+  const timeBonus = s.done && Number.isFinite(s.timeLimit) ? Math.max(0, Math.round((TIME_LIMIT - s.t) * 4)) : 0
   return Math.max(0, n * 150 + (s.done ? 150 : 0) + timeBonus - 60 * safetyEvents(s))
 }
 

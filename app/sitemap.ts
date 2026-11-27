@@ -193,6 +193,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/kids/hangar`, lastModified: at('/kids/hangar'), changeFrequency: 'monthly' as const, priority: 0.5 },
     { url: `${BASE}/kids/play`, lastModified: at('/kids/play'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/galaxy`, lastModified: at('/kids/galaxy'), changeFrequency: 'monthly' as const, priority: 0.7 },
+    { url: `${BASE}/kids/galaxy/concepts`, lastModified: at('/kids/galaxy/concepts'), changeFrequency: 'monthly' as const, priority: 0.6 },
     // Skill Galaxy tracks (the 400+ activity pages themselves are noindex: playable, not reference).
     ...KIDS_TRACKS.map((t) => ({ url: `${BASE}/kids/galaxy/${t.id}`, lastModified: at('/kids/galaxy'), changeFrequency: 'monthly' as const, priority: 0.6 })),
     // Universe games: every game has a built, indexable page.

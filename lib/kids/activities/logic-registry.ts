@@ -7,7 +7,7 @@
 // Also the TYPE map from a template id to its Params and Answer, so content
 // files get full type-checking per template (see KidsActivity).
 
-import type { Activity, TemplateId, TemplateLogic } from './types'
+import type { Activity, ConceptId, TemplateId, TemplateLogic } from './types'
 
 import { logic as binaryEncoderLogic, type Params as BinaryEncoderParams, type Answer as BinaryEncoderAnswer } from '@/components/kids/activities/templates/binary-encoder/logic'
 import { logic as centreOfMassLogic, type Params as CentreOfMassParams, type Answer as CentreOfMassAnswer } from '@/components/kids/activities/templates/centre-of-mass/logic'
@@ -72,12 +72,15 @@ export type AnswerOf<T extends TemplateId> = TemplateTypes[T]['answer']
 /** An activity typed by its template: `params` and `solution` are checked against that template. */
 export type ActivityFor<T extends TemplateId> = Activity<ParamsOf<T>, AnswerOf<T>> & { template: T }
 
+/** A live (authored) activity must name its concepts: mastery and Recharge missions depend on them. */
+export type LiveActivityFor<T extends TemplateId> = ActivityFor<T> & { concepts: ConceptId[] }
+
 /**
  * Any activity, as a union discriminated by `template`. Content files declare
  * `export const motion: KidsActivity[] = [ … ]` and TypeScript checks each
  * object literal against the Params/Answer of the template it names.
  */
-export type KidsActivity = { [T in TemplateId]: ActivityFor<T> }[TemplateId]
+export type KidsActivity = { [T in TemplateId]: LiveActivityFor<T> }[TemplateId]
 
 type AnyLogic = TemplateLogic<unknown, unknown>
 

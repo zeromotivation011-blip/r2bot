@@ -198,6 +198,8 @@ export interface ActivityReport {
   lowerIsBetter?: boolean
   /** Number of attempts it took; 5+ then success earns "Never Give Up". */
   attempts?: number
+  /** A hint (goal / clue / "Spark shows me") was used: stars are capped at 2; XP is still paid. */
+  hintsUsed?: boolean
 }
 
 export interface RewardResult {
@@ -303,7 +305,7 @@ export function reportActivity(r: ActivityReport): RewardResult {
   const p = getProgress()
   const before = levelInfo(p.xp).level
 
-  const stars = Math.max(0, Math.min(3, Math.floor(r.stars ?? 0)))
+  const stars = Math.max(0, Math.min(r.hintsUsed ? 2 : 3, Math.floor(r.stars ?? 0)))
   let xp = r.xp ?? DEFAULT_XP[r.kind]
   if (stars) xp = Math.round(xp * (0.6 + 0.2 * stars)) // 1★ 80%, 2★ 100%, 3★ 120%
 

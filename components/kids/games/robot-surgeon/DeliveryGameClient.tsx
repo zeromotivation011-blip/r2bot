@@ -41,7 +41,7 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
   const keys = useRef({ up: false, down: false, left: false, right: false })
   const pad = useRef({ up: false, down: false, left: false, right: false })
   const [phase, setPhase] = useState<Phase>('ready')
-  const [hud, setHud] = useState({ t: 0, delivered: 0, events: 0, fast: false })
+  const [hud, setHud] = useState({ t: 0, limit: TIME_LIMIT, delivered: 0, events: 0, fast: false })
   const reduced = useReducedMotion()
   const lastEvents = useRef(0)
   const lastDelivered = useRef(0)
@@ -193,7 +193,7 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
   useEffect(() => {
     const id = window.setInterval(() => {
       const s = sim.current
-      setHud({ t: s.t, delivered: WARDS.filter((w) => s.delivered[w.id]).length, events: safetyEvents(s), fast: s.fast })
+      setHud({ t: s.t, limit: s.timeLimit, delivered: WARDS.filter((w) => s.delivered[w.id]).length, events: safetyEvents(s), fast: s.fast })
     }, 200)
     return () => window.clearInterval(id)
   }, [])
@@ -249,7 +249,7 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
   const debrief = (): DebriefLine[] => {
     const lines: DebriefLine[] = []
     const n = WARDS.filter((w) => s.delivered[w.id]).length
-    lines.push({ icon: '💊', text: `${n} of 3 wards got their medicine${s.done ? ' and the robot is back on its charger' : ''}. Time: ${s.t.toFixed(0)} s of ${TIME_LIMIT} s. It drove ${s.distance.toFixed(0)} m.` })
+    lines.push({ icon: '💊', text: `${n} of 3 wards got their medicine${s.done ? ' and the robot is back on its charger' : ''}. Time: ${s.t.toFixed(0)} s${Number.isFinite(s.timeLimit) ? ` of ${Math.round(s.timeLimit)} s` : ''}. It drove ${s.distance.toFixed(0)} m.` })
     if (s.fastNearPerson)
       lines.push({
         icon: '🐢',
@@ -336,7 +336,7 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
         </Panel>
         <Panel>
           <div className="grid grid-cols-3 gap-2">
-            <Stat label="Time" value={`${hud.t.toFixed(0)} s`} tone={hud.t > TIME_LIMIT - 20 ? 'warn' : 'plain'} />
+            <Stat label="Time" value={`${hud.t.toFixed(0)} s`} tone={hud.t > hud.limit - 20 ? 'warn' : 'plain'} />
             <Stat label="Wards" value={`${hud.delivered}/3`} tone={hud.delivered === 3 ? 'good' : 'plain'} />
             <Stat label="Safety" value={hud.events === 0 ? '✓' : `${hud.events} ⚠`} tone={hud.events === 0 ? 'good' : 'bad'} />
           </div>

@@ -196,7 +196,7 @@ export function FeedbackPanel<A>({ att, onRetry }: FeedbackProps<A>) {
         good ? 'border-[#22C55E]/50 bg-[#22C55E]/10' : 'border-amber-400/50 bg-amber-500/10'
       }`}
     >
-      <p className={`font-display text-lg font-bold ${good ? 'text-[#22C55E]' : 'text-amber-300'}`}>
+      <p data-cue={good ? 'ok' : 'no'} className={`font-display text-lg font-bold ${good ? 'text-[#22C55E]' : 'text-amber-300'}`}>
         {good ? 'It works!' : attempts >= 3 ? 'Nearly — look at the numbers' : 'Not yet — here is why'}
       </p>
       <p className="mt-1 text-[17px] leading-relaxed text-[#EEF2F8]">{result.feedback}</p>

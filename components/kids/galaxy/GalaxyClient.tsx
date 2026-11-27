@@ -9,9 +9,31 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { KIDS_BANDS, getBand, type BandId } from '@/lib/kids/bands'
 import { TRACKS, type Track, type TrackId } from '@/lib/kids/activities/types'
-import { dailyMissions, localDay, orderActivities, trackMastery, visibleBands, type ActivitySummary } from '@/lib/kids/activities/progress'
+import { dailyMissionPlan, localDay, orderActivities, trackMastery, visibleBands, type ActivitySummary, type MissionKind } from '@/lib/kids/activities/progress'
+import { describeStart } from '@/lib/kids/activities/pacing'
+import { CONCEPT_INFO } from '@/lib/kids/universe/mastery'
 import { Constellation } from './ConstellationClient'
 import { useGalaxyState } from './useGalaxyState'
+import { useMastery } from './useMastery'
+
+/** Today's three missions: what each kind means, in the child's words. */
+const MISSION_KIND: Record<MissionKind, { label: string; chip: string }> = {
+  new: { label: 'New', chip: 'text-amber-300' },
+  recharge: { label: 'Recharge', chip: 'text-amber-300' },
+  practice: { label: 'Practise', chip: 'text-[#67E8F9]' },
+  stretch: { label: 'Stretch', chip: 'text-[#86EFAC]' },
+  explore: { label: 'Explore', chip: 'text-amber-300' },
+}
+
+function BatteryMini({ cells }: { cells: number }) {
+  return (
+    <span className="inline-flex items-center gap-[2px] rounded border border-white/25 p-[2px] align-middle" aria-hidden>
+      {[0, 1, 2, 3].map((i) => (
+        <span key={i} className={`h-2 w-1.5 rounded-[1px] ${i < cells ? 'bg-amber-400' : 'bg-white/10'}`} />
+      ))}
+    </span>
+  )
+}
 
 const focusRing = 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60'
 
@@ -83,6 +105,7 @@ const HUB_WINDOW = 16
 
 export default function GalaxyClient({ summaries }: { summaries: ActivitySummary[] }) {
   const { ready, done, band, setBand } = useGalaxyState()
+  const mastery = useMastery()
   const [showAll, setShowAll] = useState(false)
   const effectiveBand: BandId = band ?? 'builders'
   const bands = useMemo(() => new Set(visibleBands(effectiveBand, showAll || !band)), [effectiveBand, showAll, band])
@@ -93,7 +116,18 @@ export default function GalaxyClient({ summaries }: { summaries: ActivitySummary
     return m
   }, [summaries])
 
-  const missions = useMemo(() => (ready ? dailyMissions(summaries, effectiveBand, localDay()) : []), [ready, summaries, effectiveBand])
+  const missionsReady = ready && mastery.ready
+  const missions = useMemo(
+    () =>
+      missionsReady
+        ? dailyMissionPlan(summaries, effectiveBand, localDay(), {
+            done,
+            mastery: { conceptLog: mastery.log, conceptSecured: mastery.secured },
+            starts: mastery.starts,
+          })
+        : [],
+    [missionsReady, summaries, effectiveBand, done, mastery.log, mastery.secured, mastery.starts],
+  )
   const doneCount = ready ? summaries.filter((a) => done[a.id]).length : 0
   const starCount = ready ? summaries.reduce((s, a) => s + (done[a.id]?.stars ?? 0), 0) : 0
   const bandInfo = getBand(effectiveBand)
@@ -141,14 +175,17 @@ export default function GalaxyClient({ summaries }: { summaries: ActivitySummary
           <h2 id="missions-title" className="font-display text-2xl font-bold text-[#EEF2F8]">
             Today’s Galaxy missions
           </h2>
-          <span className="text-sm text-[#6E7888]">New ones every day</span>
+          <span className="text-sm text-[#6E7888]">New ones every day · skipping a day costs nothing</span>
         </div>
         <ol className="mt-3 grid gap-3 md:grid-cols-3">
-          {!ready
+          {!missionsReady
             ? [0, 1, 2].map((i) => <li key={i} className="h-[112px] rounded-[20px] border border-white/[0.08] bg-[#111C32] motion-safe:animate-pulse" />)
-            : missions.map((m, i) => {
+            : missions.map(({ activity: m, kind, concept, conceptState }) => {
                 const t = TRACKS.find((x) => x.id === m.track) ?? TRACKS[0]
-                const d = done[m.id]
+                const rec = done[m.id]
+                const d = rec && rec.at === localDay() ? rec : undefined
+                const k = MISSION_KIND[kind]
+                const forConcept = concept ? CONCEPT_INFO[concept] : undefined
                 return (
                   <li key={m.id}>
                     <Link
@@ -161,11 +198,26 @@ export default function GalaxyClient({ summaries }: { summaries: ActivitySummary
                         {t.icon}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[13px] font-semibold uppercase tracking-wider text-amber-300">
-                          Mission {i + 1} · {t.name}
+                        <span className={`block text-[13px] font-semibold uppercase tracking-wider ${k.chip}`}>
+                          {kind === 'recharge' && <span aria-hidden>⚡ </span>}
+                          {k.label} · {forConcept ? forConcept.name : t.name}
                         </span>
                         <span className="mt-0.5 block font-display text-lg font-bold leading-tight text-[#EEF2F8]">{m.title}</span>
-                        <span className="mt-0.5 block text-sm text-[#A7B0C0]">{d ? `Done · ${'★'.repeat(d.stars)}` : getBand(m.band)?.name}</span>
+                        <span className="mt-0.5 block text-sm text-[#A7B0C0]">
+                          {d ? (
+                            `Done today · ${'★'.repeat(d.stars)}`
+                          ) : kind === 'recharge' && conceptState ? (
+                            <>
+                              <BatteryMini cells={conceptState.cells} /> Battery low: one first-try win recharges it
+                            </>
+                          ) : kind === 'practice' ? (
+                            'Light another star in this constellation'
+                          ) : kind === 'stretch' ? (
+                            'A step harder than usual'
+                          ) : (
+                            `${t.name} · ${getBand(m.band)?.name}`
+                          )}
+                        </span>
                       </span>
                       <span aria-hidden className={`text-xl ${d ? 'text-[#22C55E]' : 'text-amber-300'}`}>
                         {d ? '✓' : '→'}
@@ -175,6 +227,48 @@ export default function GalaxyClient({ summaries }: { summaries: ActivitySummary
                 )
               })}
         </ol>
+      </section>
+
+      {/* Launch Check + skill constellations */}
+      <section aria-label="Your start and your skills" className="grid gap-3 sm:grid-cols-2">
+        <Link
+          href="/kids/galaxy/launch-check"
+          className={`flex min-h-[88px] items-center gap-4 rounded-[20px] border border-white/[0.08] bg-[#111C32] p-4 transition-transform duration-200 hover:-translate-y-0.5 hover:border-white/20 active:scale-[.98] ${focusRing}`}
+        >
+          <span className="text-3xl" aria-hidden>
+            🧭
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-lg font-bold text-[#EEF2F8]">Launch Check</span>
+            <span className="block text-[14px] text-[#A7B0C0]">
+              {mastery.ready && Object.keys(mastery.starts).length
+                ? `Start points set in ${Object.keys(mastery.starts).length} of ${TRACKS.length} tracks`
+                : 'A few quick missions find the right place to start'}
+            </span>
+          </span>
+          <span aria-hidden className="text-amber-300">
+            →
+          </span>
+        </Link>
+        <Link
+          href="/kids/galaxy/concepts"
+          className={`flex min-h-[88px] items-center gap-4 rounded-[20px] border border-white/[0.08] bg-[#111C32] p-4 transition-transform duration-200 hover:-translate-y-0.5 hover:border-white/20 active:scale-[.98] ${focusRing}`}
+        >
+          <span className="text-3xl" aria-hidden>
+            ✨
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-lg font-bold text-[#EEF2F8]">Skill constellations</span>
+            <span className="block text-[14px] text-[#A7B0C0]">
+              {mastery.ready && mastery.states.some((s) => s.status !== 'new')
+                ? `${mastery.states.filter((s) => s.status === 'secure').length} secure · ${mastery.states.filter((s) => s.status === 'fading').length} to recharge`
+                : 'Sixteen big ideas to light up'}
+            </span>
+          </span>
+          <span aria-hidden className="text-amber-300">
+            →
+          </span>
+        </Link>
       </section>
 
       {/* The constellations */}
@@ -205,7 +299,10 @@ export default function GalaxyClient({ summaries }: { summaries: ActivitySummary
                         {t.name}
                       </Link>
                     </h3>
-                    <p className="text-[15px] text-[#A7B0C0]">{t.blurb}</p>
+                    <p className="text-[15px] text-[#A7B0C0]">
+                      {t.blurb}
+                      {mastery.starts[t.id] && <span className="ml-1 text-[13px] font-semibold text-[#86EFAC]">· Start: {describeStart(mastery.starts[t.id])}</span>}
+                    </p>
                   </div>
                   <span className="text-right font-display text-sm font-bold text-[#A7B0C0]">
                     {ready ? `${m.pct}%` : ''}
@@ -215,7 +312,7 @@ export default function GalaxyClient({ summaries }: { summaries: ActivitySummary
                 <div className="mt-3">
                   {shown.length ? (
                     <>
-                      <Constellation track={t} activities={shown} allOfTrack={all} done={done} ready={ready} />
+                      <Constellation track={t} activities={shown} allOfTrack={all} done={done} ready={ready} start={mastery.starts[t.id]} />
                       {inBand.length > shown.length && (
                         <Link href={`/kids/galaxy/${t.id}`} className={`mt-1 flex min-h-[44px] items-center justify-center rounded-xl text-[15px] font-semibold text-amber-300 hover:text-amber-200 ${focusRing}`}>
                           All {inBand.length} {t.name} missions →

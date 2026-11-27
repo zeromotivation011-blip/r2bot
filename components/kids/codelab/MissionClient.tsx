@@ -3,7 +3,9 @@
 // components/kids/codelab/MissionClient.tsx
 // One Code Lab mission: the child's own robot in a 3D arena, the block
 // editor, run / step / reset with the running block highlighted, kind and
-// specific errors, hints after two failed runs, stars, and the Python view.
+// specific errors, the hint ladder after a failed run (goal → clue → "Spark
+// shows me" a twin mission, roadmap #26; a hint caps the stars at 2 but still
+// earns XP), stars, and the Python view.
 // Capabilities matter: a mission that needs a part the robot lacks offers a
 // one-tap "Add the part" that updates the saved Workshop design.
 
@@ -11,7 +13,7 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { capabilitiesOf, CAPABILITY_NEEDS, loadDesign, ROBOT_CHANGED_EVENT, saveDesign, DEFAULT_DESIGN, type RobotDesign } from '@/lib/kids/robot-design'
-import { countBlocks, toPython } from '@/lib/kids/code-lab/blocks'
+import { BLOCK_INFO, countBlocks, toPython } from '@/lib/kids/code-lab/blocks'
 import { initialState, parseArena, runMission, starsFor, type Frame, type RunResult } from '@/lib/kids/code-lab/interpreter'
 import { changedParts, designWith, missingCaps } from '@/lib/kids/code-lab/parts'
 import { isValidProgram } from '@/lib/kids/code-lab/tree'
@@ -21,6 +23,8 @@ import { reportBestRun } from '@/lib/kids/universe/rewards'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { fireConfetti } from '@/components/kids/Confetti'
 import BlockEditorClient from './BlockEditorClient'
+import HintLadderClient, { type LadderStep, type WorkedExample } from '@/components/kids/galaxy/HintLadderClient'
+import type { WinRule } from '@/lib/kids/code-lab/types'
 
 function ArenaSkeleton() {
   return (
@@ -33,6 +37,7 @@ function ArenaSkeleton() {
 const Arena = dynamic(() => import('./ArenaClient'), { ssr: false, loading: ArenaSkeleton })
 
 const SPEED_MS = [950, 680, 460, 300, 170]
+const BLOCK_LABEL: Partial<Record<string, string>> = Object.fromEntries(Object.values(BLOCK_INFO).map((b) => [b.type, b.label]))
 
 interface Props {
   mission: MissionPublic
@@ -45,9 +50,24 @@ type Status =
   | { kind: 'running' }
   | { kind: 'fail'; message: string }
   | { kind: 'progress'; message: string }
-  | { kind: 'win'; stars: 1 | 2 | 3; added: number }
+  | { kind: 'win'; stars: 1 | 2 | 3; added: number; hinted: boolean }
 
 const draftKey = (id: string) => `r2bot_kids_codelab_draft_${id}`
+
+/** Hints cap a Code Lab finish at 2 stars (roadmap #26). */
+const HINT_STAR_CAP = 2
+
+/** The win rule in words, for step 1 of the hint ladder. */
+function winWords(win: WinRule): string {
+  const parts: string[] = []
+  if (win.goal) parts.push('end on the 🏁 flag')
+  if (win.gems) parts.push('collect every 💎 gem')
+  if (win.deliver) parts.push('put every 📦 box on a drop zone')
+  if (win.draw) parts.push('draw the exact shape with the pen')
+  if (!parts.length) return ''
+  const last = parts.pop()
+  return `To win: ${parts.length ? `${parts.join(', ')} and ${last}` : last}.`
+}
 
 export default function MissionClient({ mission, next, previous }: Props) {
   const [design, setDesign] = useState<RobotDesign>(DEFAULT_DESIGN)
@@ -57,7 +77,14 @@ export default function MissionClient({ mission, next, previous }: Props) {
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const [speed, setSpeed] = useState(2)
   const [fails, setFails] = useState(0)
-  const [hintsShown, setHintsShown] = useState(0)
+  const [hintsUsed, setHintsUsed] = useState(false)
+  const hintsUsedRef = useRef(false)
+  const [lastFail, setLastFail] = useState('')
+  const [goalLit, setGoalLit] = useState(false)
+  const [worked, setWorked] = useState<WorkedExample | null | 'loading'>('loading')
+  const workedRequested = useRef(false)
+  const editorRef = useRef<HTMLElement>(null)
+  const arenaRef = useRef<HTMLDivElement>(null)
   const [showPython, setShowPython] = useState(mission.band === 'engineers')
   const [errorId, setErrorId] = useState<string | null>(null)
   const [locked, setLocked] = useState(false)
@@ -134,6 +161,7 @@ export default function MissionClient({ mission, next, previous }: Props) {
     if (!r.won) {
       setErrorId(r.errorBlockId)
       setStatus({ kind: 'fail', message: r.message })
+      setLastFail(r.message)
       setFails((f) => f + 1)
       playSound('wrong')
       trace.current = null
@@ -147,12 +175,15 @@ export default function MissionClient({ mission, next, previous }: Props) {
       return 'continue'
     }
     // Every arena won.
-    const hinted = hintsShown > 0
-    const stars = starsFor(blockCount, mission.budget, hinted)
+    const hinted = hintsUsedRef.current
+    const unhinted = starsFor(blockCount, mission.budget, false)
+    const stars: 1 | 2 | 3 = hinted ? (Math.min(HINT_STAR_CAP, unhinted) as 1 | 2) : unhinted
     const { starsAdded, progress } = completeCodeMission(mission.id, stars)
-    reportBestRun({ kind: 'challenge', id: `codelab-${mission.id}`, stars, score: stars })
+    // `hintsUsed` rides along for rewards.ts / learning telemetry (#76); the cap is applied above.
+    const report: Parameters<typeof reportBestRun>[0] = { kind: 'challenge', id: `codelab-${mission.id}`, stars, score: stars, hintsUsed: hinted }
+    reportBestRun(report)
     setBestStars(progress.codeMissions[mission.id] ?? stars)
-    setStatus({ kind: 'win', stars, added: starsAdded })
+    setStatus({ kind: 'win', stars, added: starsAdded, hinted })
     playSound('levelup')
     fireConfetti({ count: 60 })
     trace.current = null
@@ -242,7 +273,31 @@ export default function MissionClient({ mission, next, previous }: Props) {
 
   const running = status.kind === 'running'
   const python = toPython(program)
-  const hintAvailable = fails >= 2 && hintsShown < mission.hints.length
+  const goalText = [mission.task, winWords(mission.win), mission.mustUse?.length ? `Use the ${mission.mustUse.map((t) => `“${BLOCK_LABEL[t] ?? t}”`).join(' and ')} block${mission.mustUse.length > 1 ? 's' : ''}.` : ''].filter(Boolean).join(' ')
+  // The last written hint spells the answer out; "Spark shows me" (a twin) replaces it.
+  const clues = [lastFail, ...mission.hints.slice(0, Math.max(1, mission.hints.length - 1))].filter(Boolean)
+
+  const onHintStep = (step: LadderStep) => {
+    hintsUsedRef.current = true
+    setHintsUsed(true)
+    if (step === 1) {
+      setGoalLit(true)
+      requestAnimationFrame(() => arenaRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
+    }
+    if (step === 3 && !workedRequested.current) {
+      workedRequested.current = true
+      import('./worked-twin')
+        .then((m) => setWorked(m.codeLabWorked(mission.id)))
+        .catch(() => setWorked(null))
+    }
+  }
+
+  const onYourTurn = () => {
+    requestAnimationFrame(() => {
+      editorRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      editorRef.current?.focus({ preventScroll: true })
+    })
+  }
   const activeId = running || trace.current ? frame.blockId : null
 
   return (
@@ -306,7 +361,15 @@ export default function MissionClient({ mission, next, previous }: Props) {
               <span className="self-center text-xs text-slate-300">One program must solve every map.</span>
             </div>
           )}
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-[#111C32]">
+          {goalLit && (
+            <p className="mb-2 rounded-2xl border border-amber-400/50 bg-amber-500/10 p-3 text-[17px] font-bold text-[#EEF2F8]" data-testid="codelab-goal">
+              <span className="mr-1 font-display text-xs uppercase tracking-wider text-amber-300">Your goal</span> {goalText}
+            </p>
+          )}
+          <div
+            ref={arenaRef}
+            className={`relative aspect-[4/3] w-full scroll-mt-24 overflow-hidden rounded-3xl border bg-[#111C32] transition-shadow duration-300 ${goalLit ? 'border-amber-400 shadow-[0_0_0_4px_rgba(252,104,24,.35)]' : 'border-white/10'}`}
+          >
             <Arena
               arena={mission.arenas[arenaIdx]}
               design={design}
@@ -367,7 +430,8 @@ export default function MissionClient({ mission, next, previous }: Props) {
                     ? `Perfect — you solved it in ${blockCount} ${blockCount === 1 ? "block" : "blocks"}.`
                     : status.stars === 2
                       ? `Solved! Can you do it in ${mission.budget} ${mission.budget === 1 ? 'block' : 'blocks'} or fewer for three stars?`
-                      : 'Solved with a hint! Try again without hints to earn more stars.'}
+                      : 'You kept going and solved it! Try it in fewer blocks for more stars.'}
+                  {status.hinted && ' Solved with Spark’s help: hints keep it to 2 stars at most. Play again without hints to aim for 3.'}
                   {status.added > 0 ? ` +${status.added} ⭐ added.` : ''}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -386,26 +450,26 @@ export default function MissionClient({ mission, next, previous }: Props) {
                 </div>
               </div>
             )}
-            {hintAvailable && status.kind !== 'running' && status.kind !== 'win' && (
-              <button type="button" onClick={() => setHintsShown((h) => h + 1)} className="mt-2 min-h-[44px] rounded-2xl bg-amber-400/20 px-4 font-bold text-amber-100">
-                💡 Need a hint?
-              </button>
-            )}
-            {hintsShown > 0 && (
-              <ul className="mt-2 space-y-1">
-                {mission.hints.slice(0, hintsShown).map((h, i) => (
-                  <li key={i} className="rounded-xl bg-amber-400/10 p-2 text-sm">
-                    💡 {h}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
+          {status.kind !== 'win' && (
+            <div className="mt-3">
+              <HintLadderClient
+                available={fails > 0}
+                goal={goalText}
+                clues={clues}
+                worked={worked}
+                onStep={onHintStep}
+                onYourTurn={onYourTurn}
+                resetKey={mission.id}
+              />
+            </div>
+          )}
+          {hintsUsed && status.kind !== 'win' && <p className="mt-2 text-sm text-amber-200">Hint used · up to 2 ⭐ this time</p>}
           {bestStars > 0 && status.kind !== 'win' && <p className="mt-2 text-sm text-slate-300">Your best: {'⭐'.repeat(bestStars)}</p>}
         </section>
 
         {/* ── Editor ── */}
-        <section aria-label="Code editor" className="py-0">
+        <section ref={editorRef} tabIndex={-1} aria-label="Code editor" className="scroll-mt-24 py-0 focus:outline-none">
           <BlockEditorClient
             program={program}
             onChange={(p) => {

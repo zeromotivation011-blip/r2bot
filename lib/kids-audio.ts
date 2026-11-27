@@ -2,7 +2,10 @@
 // Web Audio API helpers — no files, no npm packages.
 // Respects document.hidden and the kids Settings (lib/kids/settings.ts):
 // sound effects off → playSound is silent; master gain = MAX_MASTER × volume
-// (default volume 0.6 → 0.3, the original level); voice off → sparkSays is silent.
+// (default volume 0.6 → 0.3, the original level); voice off → sparkSays is silent;
+// calm mode (#89) → every fanfare/reward sound becomes one soft chime and the
+// "wrong" buzz becomes a gentle low note. Music is a separate switch: music beds
+// (episode engine) read kidsMusicOn() from lib/kids/settings.ts.
 
 import { readKidsSettings } from './kids/settings'
 
@@ -106,6 +109,9 @@ const NOTES = {
   C3: 1046.5,
 }
 
+/** Calm mode: these are replaced by one soft chime. */
+const CALM_SOFTEN: ReadonlySet<SoundType> = new Set<SoundType>(['levelup', 'zonecomplete', 'unlock', 'badge', 'quest', 'stamp', 'best', 'star', 'correct'])
+
 export function playSound(type: SoundType) {
   if (typeof document !== 'undefined' && document.hidden) return
   const settings = readKidsSettings()
@@ -116,6 +122,19 @@ export function playSound(type: SoundType) {
   got.master.gain.setValueAtTime(MAX_MASTER * settings.volume, got.ctx.currentTime)
   // Browsers start a context suspended until a user gesture; resume when we can.
   if (got.ctx.state === 'suspended') void got.ctx.resume().catch(() => undefined)
+
+  if (settings.calm) {
+    if (CALM_SOFTEN.has(type)) {
+      // One soft, low two-note chime: "done", without the fanfare.
+      tone({ freq: NOTES.E, durationMs: 220, type: 'sine', startAt: 0, peakGain: 0.22 })
+      tone({ freq: NOTES.G, durationMs: 320, type: 'sine', startAt: 0.14, peakGain: 0.2 })
+      return
+    }
+    if (type === 'wrong') {
+      tone({ freq: NOTES.E, durationMs: 220, type: 'sine', peakGain: 0.18 })
+      return
+    }
+  }
 
   switch (type) {
     case 'click':

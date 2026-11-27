@@ -7,12 +7,15 @@
 //   - `solution`, when present, is accepted by check()
 //   - every `after` id exists, is in the same track, and there are no cycles
 //   - badge ids are known Universe badges (warning otherwise)
+//   - every live activity names 1–3 known concepts (roadmap #27), and every
+//     concept is practised by at least two templates (mastery needs two)
 // Then prints a coverage table per track × band.
 //
 // Run:  npx tsx lib/kids/activities/verify.ts      (exit 1 on any ✗)
 
 import { BAND_ORDER, type BandId } from '../bands'
 import { getBadge } from '../universe/rewards'
+import { CONCEPT_IDS, SECURE_TEMPLATES, isConceptId } from '../universe/mastery'
 import { ALL_ACTIVITIES, CONTENT_ACTIVITIES, SAMPLE_ACTIVITIES } from './content'
 import { TEMPLATE_LOGIC } from './logic-registry'
 import { TRACKS, type Activity, type TrackId } from './types'
@@ -88,6 +91,15 @@ export function verifyActivities(list: Activity[] = ALL_ACTIVITIES): VerifyIssue
       else if (d.track !== a.track) err(id, `after: "${dep}" is in track ${d.track}, not ${a.track}`)
       else if (dep === a.id) err(id, 'after: lists itself')
     }
+    const live = !sampleIds.has(a.id) || CONTENT_ACTIVITIES.some((c) => c.id === a.id)
+    if (!Array.isArray(a.concepts) || a.concepts.length === 0) {
+      if (live) err(id, 'concepts: every live activity names 1–3 concepts (lib/kids/universe/mastery.ts CONCEPT_IDS)')
+      else warn(id, 'concepts: none (fine for a sample; required before it goes live)')
+    } else {
+      if (a.concepts.length > 3) err(id, `concepts: ${a.concepts.length} listed (max 3, most important first)`)
+      for (const c of a.concepts) if (!isConceptId(c)) err(id, `concepts: unknown concept "${String(c)}"`)
+      if (new Set(a.concepts).size !== a.concepts.length) err(id, 'concepts: duplicate concept')
+    }
     for (const b of a.badges ?? []) {
       if (!getBadge(b)) warn(id, `badge "${b}" is not a Universe badge (it will be recorded, but not celebrated)`)
     }
@@ -108,7 +120,33 @@ export function verifyActivities(list: Activity[] = ALL_ACTIVITIES): VerifyIssue
   }
   for (const a of list) visit(a.id, [])
 
+  // Mastery needs first-try wins on two different templates: a concept that only
+  // one template practises could never become secure.
+  const live = list.filter((a) => CONTENT_ACTIVITIES.some((c) => c.id === a.id))
+  for (const [c, row] of Object.entries(conceptCoverage(live))) {
+    const all = new Set(Object.values(row).flat())
+    if (all.size > 0 && all.size < SECURE_TEMPLATES) err(`concept:${c}`, `only ${all.size} template practises it; mastery needs ${SECURE_TEMPLATES}`)
+    for (const b of BAND_ORDER) {
+      const n = new Set(row[b]).size
+      if (n > 0 && n < SECURE_TEMPLATES) warn(`concept:${c}`, `${b}: only ${n} template (a child in this band can only secure it with a neighbouring band's missions)`)
+    }
+  }
+
   return issues
+}
+
+/** Concept × band → the templates that practise it. */
+export function conceptCoverage(list: Activity[] = ALL_ACTIVITIES): Record<string, Record<BandId, string[]>> {
+  const out: Record<string, Record<BandId, string[]>> = {}
+  for (const c of CONCEPT_IDS) out[c] = { explorers: [], builders: [], inventors: [], engineers: [] }
+  for (const a of list) {
+    for (const c of a.concepts ?? []) {
+      const row = out[c]
+      if (!row || !row[a.band]) continue
+      if (!row[a.band].includes(a.template)) row[a.band].push(a.template)
+    }
+  }
+  return out
 }
 
 export function coverage(list: Activity[] = ALL_ACTIVITIES): Record<TrackId, Record<BandId, number>> {
@@ -133,6 +171,11 @@ if (isMain) {
     const total = BAND_ORDER.reduce((s, b) => s + row[b], 0)
     console.log(`${t.id.padEnd(12)}${BAND_ORDER.map((b) => pad(row[b], 11)).join('')}${pad(total, 8)}`)
   }
+  const cc = conceptCoverage()
+  const used = (c: string, b: BandId) => ALL_ACTIVITIES.filter((a) => a.band === b && a.concepts?.includes(c as never)).length
+  console.log(`\n${'concept (missions/templates)'.padEnd(30)}${BAND_ORDER.map((b) => pad(b, 11)).join('')}`)
+  for (const c of CONCEPT_IDS) console.log(`${c.padEnd(30)}${BAND_ORDER.map((b) => pad(`${used(c, b)}/${cc[c][b].length}`, 11)).join('')}`)
+
   const empty = TRACKS.flatMap((t) => BAND_ORDER.filter((b) => cov[t.id][b] === 0).map((b) => `${t.id}×${b}`))
   if (empty.length) console.log(`\nEmpty cells (${empty.length}): ${empty.join(', ')}`)
 

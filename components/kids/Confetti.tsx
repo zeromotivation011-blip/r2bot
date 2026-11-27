@@ -14,6 +14,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { kidsCalm } from '@/lib/kids/settings'
 
 const PALETTE = [
   '#FFD700', // gold
@@ -96,6 +97,8 @@ export function ConfettiProvider({ children }: { children: React.ReactNode }) {
 
   const fire = useCallback((opts: FireOptions = {}) => {
     if (typeof window === 'undefined') return
+    // Kids calm mode: no confetti at all (the CSS hides it too).
+    if (kidsCalm()) return
     const reduced =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
