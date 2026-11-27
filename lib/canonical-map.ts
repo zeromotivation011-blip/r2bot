@@ -113,9 +113,19 @@ export const BLOG_TO_ATLAS: Record<string, string> = {
  * position and ~0.9% CTR on ~110 impressions. It owns the colcon queries; the
  * ROS 2 cheat sheet lists the commands and links here for the explanation.
  *
+ * 27 Nov 2026 (Search Console, task 51): /atlas/concept/depth-sensor had ~7.2
+ * average position and 1 click on ~120 impressions. It owns "depth sensor" and
+ * "depth camera" (RGB-D included); the thinner depth-camera entry was merged into
+ * it and 308s there. stereo-vision, structured-light and time-of-flight-sensor
+ * keep the per-technology detail and link back.
+ *
  * Query → owning path.
  */
 export const ATLAS_QUERY_OWNER: Record<string, string> = {
+  'depth sensor': '/atlas/concept/depth-sensor',
+  'depth camera': '/atlas/concept/depth-sensor',
+  'what is a depth camera': '/atlas/concept/depth-sensor',
+  'rgb-d camera': '/atlas/concept/depth-sensor',
   lqr: '/atlas/concept/lqr-controller',
   'lqr controller': '/atlas/concept/lqr-controller',
   'linear quadratic regulator': '/atlas/concept/lqr-controller',
