@@ -11,6 +11,7 @@ import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { buildMap, legendStarLines, MAPS_PER_TIER, TIERS, type RuleId, type TierConfig, type TierIndex } from './terrain'
 import {
+  addCmd,
   CAPACITY_WH,
   CELL_M,
   DT,
@@ -266,6 +267,8 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
   const slotRef = useRef<HTMLDivElement>(null)
   const colRef = useRef<HTMLDivElement>(null)
   const [pinH, setPinH] = useState(0)
+  // Where the pinned map sits: just under the sticky kids header (0 if there is none).
+  const [pinTop, setPinTop] = useState(0)
   const onScreenRef = useRef(true)
   const debriefRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<View | null>(null)
@@ -565,27 +568,11 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
     (c: Cmd) => {
       if (phaseRef.current !== 'plan') return
       primeAudio()
-      setPlan((p) => {
-        const lastC = p[p.length - 1]
-        if (c.k === 'fwd' && lastC?.k === 'fwd' && lastC.n + c.n <= 9) {
-          playSound('click')
-          return [...p.slice(0, -1), { k: 'fwd', n: lastC.n + c.n }]
-        }
-        if (c.k === 'turn' && lastC?.k === 'turn') {
-          // Merge turns, wrapping round a full circle: five right turns of
-          // 90° are one right turn, not 180° + 180° + 90°.
-          playSound('click')
-          let d = (((lastC.d + c.d) % 8) + 8) % 8
-          if (d > 4) d -= 8
-          return d === 0 ? p.slice(0, -1) : [...p.slice(0, -1), { k: 'turn', d }]
-        }
-        if (p.length >= cfg.maxCmds) {
-          playSound('wrong')
-          return p
-        }
-        playSound('click')
-        return [...p, c]
-      })
+      const prev = planRef.current
+      const next = addCmd(prev, c, cfg.maxCmds)
+      playSound(next === prev ? 'wrong' : 'click')
+      planRef.current = next
+      setPlan(next)
     },
     [cfg.maxCmds],
   )
@@ -629,7 +616,11 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
       const colH = col.offsetHeight
       const top = slot.getBoundingClientRect().top
       const bottom = root.getBoundingClientRect().bottom
-      const want = mq.matches && phase !== 'over' && top < 0 && bottom > colH + 120
+      // The kids header is sticky: pin the map under it, not over it.
+      const nav = document.querySelector('.kids-nav')
+      const headerBottom = Math.max(0, Math.round(nav ? nav.getBoundingClientRect().bottom : 0))
+      const want = mq.matches && phase !== 'over' && top < headerBottom && bottom > headerBottom + colH + 120
+      setPinTop(headerBottom)
       setPinH(want ? Math.max(slot.offsetHeight, colH) : 0)
     }
     const onScroll = () => {
@@ -677,7 +668,8 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
 
   const sim = simRef.current
   const started = sim.uplinks.length > 0
-  const brief = cfg.legend ? `${BRIEF[tier]} ★★★ = ${legendStarLines(mapNo)[0]} points on this map.` : BRIEF[tier]
+  const lines = legendStarLines(mapNo)
+  const brief = cfg.legend ? `${BRIEF[tier]} On this map ★ = ${lines.s1}, ★★ = ${lines.s2}, ★★★ = ${lines.s3} points.` : BRIEF[tier]
   const timeNote = `Time is sped up: 1 second here = ${cfg.minPerSec} Mars minutes. A real one-way signal takes about 3 to 22 minutes, depending on where Earth and Mars are in their orbits. 1 square = ${CELL_M} m.`
 
   const btn =
@@ -687,12 +679,13 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
     <div ref={rootRef} className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_380px]">
       {/* ── map ── On phones the map is pinned to the top of the screen while
           the child builds the plan below it, so the orange preview line stays
-          in sight. (CSS sticky cannot work here: the site's body is a scroll
-          container, so this pins with position: fixed and leaves a slot.) */}
+          in sight. It pins with position: fixed under the sticky kids header and
+          leaves a slot the same height, so nothing below jumps. */}
       <div ref={slotRef} className="min-w-0 lg:self-start" style={pinH ? { height: pinH } : undefined}>
         <div
           ref={colRef}
-          className={`flex min-w-0 flex-col gap-1.5 ${pinH ? 'fixed inset-x-0 top-0 z-30 border-b border-white/10 bg-[#0B1020]/95 px-3 pb-1.5 pt-1.5 shadow-[0_8px_24px_rgba(0,0,0,.5)]' : ''}`}
+          className={`flex min-w-0 flex-col gap-1.5 ${pinH ? 'fixed inset-x-0 z-20 border-b border-white/10 bg-[#0B1020]/95 px-3 pb-1.5 pt-1.5 shadow-[0_8px_24px_rgba(0,0,0,.5)]' : ''}`}
+          style={pinH ? { top: pinTop } : undefined}
         >
           <div ref={wrapRef} className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0a1120] shadow-[0_8px_24px_rgba(0,0,0,.45)]">
             <canvas

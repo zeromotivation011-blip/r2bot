@@ -9,6 +9,7 @@ import { GameTeacherStrip } from '@/components/kids/games/GameTeacherStrip'
 import { getGame } from '@/lib/kids/universe/worlds'
 import { jsonldScript, breadcrumbJsonLD } from '@/lib/seo/jsonld'
 import DroneHoverClient from '@/components/kids/games/drone-hover/DroneHoverClient'
+import { ACE_MIN_WIN, LEGEND_MIN_WIN } from '@/components/kids/games/drone-hover/sim'
 
 export const runtime = 'nodejs'
 
@@ -68,13 +69,13 @@ const TIERS = [
   {
     name: 'Ace',
     who: 'about 12 and up',
-    what: 'Full PID control through gusts, a heavier parcel, a sudden downdraft and two target changes. To win, the drone must finish within 6 cm of the target with a flight score of at least 550.',
+    what: `Full PID control through gusts, a heavier parcel, a sudden downdraft and two target changes. To win, the drone must finish within 6 cm of the target with a flight score of at least ${ACE_MIN_WIN}.`,
     tip: 'Start with P and D only and get a clean step without wobble. Then add a little I to remove the leftover sag. Too much I makes slow, wide swings. Watch the green I line on the graph grow while the parcel is on.',
   },
   {
     name: 'Legend',
     who: '14 and up — a real engineering challenge',
-    what: 'A two-dimensional waypoint course. Three loops work together: an inner loop holds the tilt, an outer loop chooses the tilt to move sideways, and a PID loop holds the height. The parcel drops halfway and the battery sags as it empties. Finishing the course is not enough: a win needs a flight score of at least 520.',
+    what: `A two-dimensional waypoint course. Three loops work together: an inner loop holds the tilt, an outer loop chooses the tilt to move sideways, and a PID loop holds the height. The parcel drops halfway and the battery sags as it empties. Finishing the course is not enough: a win needs a flight score of at least ${LEGEND_MIN_WIN}, and 3 stars need an I term in the height loop.`,
     tip: 'Tune from the inside out. Make the tilt loop fast and well damped first (a drone that wobbles in tilt cannot fly anywhere). Then tune the position loop several times slower. Finally add I to the height loop for the battery sag and the lighter drone after the drop.',
   },
 ]

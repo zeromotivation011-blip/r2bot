@@ -138,7 +138,7 @@ export default async function LevelPage({ params }: Params) {
           <SeasonMapClient level={l.number} playable={playable} nodes={nodes} acts={acts} />
         </section>
 
-        <aside className="flex flex-col gap-4 lg:sticky lg:top-4 lg:self-start" aria-label="About this season">
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start" aria-label="About this season">
           <div className="rounded-[20px] border border-white/10 bg-[#111C32] p-5">
             <h2 className="font-display text-lg font-bold text-[#EEF2F8]">Where the story happens</h2>
             <p className="mt-1 text-[15px] leading-relaxed text-[#A7B0C0]">{l.season.setting}</p>

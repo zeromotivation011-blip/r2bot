@@ -64,14 +64,14 @@ const TIERS = [
   {
     name: 'Cadet',
     who: 'about 8 and up, with a grown-up if needed',
-    what: 'Teach Sorta two labels, ← and →. Draw three of each, then watch ten parcels drawn by other people ride the belt. Eight correct wins.',
+    what: 'Teach Sorta two labels, ← and →. Draw three of each, then watch ten parcels drawn by other people ride the belt. Eight correct wins; three stars need all ten, taught with your own drawings.',
     tip: 'Make the arrow head big and clear: it is the only thing that tells left from right. Watch the live bars while you draw — if they wobble between ← and →, your examples are too alike.',
   },
   {
     name: 'Pilot',
     who: 'about 10 and up',
     what: 'Four labels: ←, →, ○ and △. Sixteen parcels drawn in a hurry by strangers (open circles, rounded triangles, one-sided arrow heads), and every run brings new ones, so the score is real accuracy on unseen data. Thirteen correct wins.',
-    tip: '○ and △ are the hard pair. Teach more than the minimum, and include quick, messy drawings as well as neat ones: the ✨ Sample button only gives tidy textbook shapes, and strangers don’t draw like a textbook.',
+    tip: '○ and △ are the hard pair. Teach more than the minimum, and include quick, messy drawings as well as neat ones: the ✨ Sample button only gives tidy textbook shapes, and strangers don’t draw like a textbook. A round taught with ✨ samples can earn at most two stars.',
   },
   {
     name: 'Ace',
@@ -82,8 +82,8 @@ const TIERS = [
   {
     name: 'Legend',
     who: '14 and up — a real data-science challenge',
-    what: 'Four labels. Choose the representation (raw pixels or engineered features) and k, clean a factory dataset, add your own drawings, augment them, and compare designs on a validation set. Then take the final exam: 24 brand-new drawings tilted up to 35°, squashed, moved, smudged and drawn in a hurry. 22 correct wins, and a bonus question decides the third star.',
-    tip: 'Never trust training accuracy: with k = 1 it is always 100%. Watch the leave-one-out and validation columns in the experiment log, change one thing at a time, and remember that engineered features undo position and size but not rotation. Tilted drawings and augmentation cover turning.',
+    what: 'Four labels. Choose the representation (raw pixels or engineered features) and k, clean a factory dataset, add your own drawings, augment them, and compare designs on a validation set. Then take the final exam: 24 brand-new drawings tilted up to 45°, squashed, moved, smudged and drawn in a hurry. 22 correct wins, 23 earn the second star, and a bonus question decides the third. Every exam uses parcels nobody has seen before.',
+    tip: 'Never trust training accuracy: with k = 1 it is always 100%. Watch the leave-one-out and validation columns in the experiment log, change one thing at a time, and remember that engineered features undo position and size but not rotation. Augmentation copies every drawing turned up to 45° — and copies its label too, so clean the factory data first.',
   },
 ]
 

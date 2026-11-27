@@ -30,6 +30,8 @@ export interface Example {
   truth?: ClassId
   /** For augmented copies: the id of the drawing they were made from. */
   parent?: number
+  /** For augmented copies: the original came from the ✨ Sample button. */
+  sampled?: boolean
 }
 
 export interface FeatureVec {

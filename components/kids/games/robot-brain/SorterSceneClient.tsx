@@ -2,9 +2,11 @@
 
 // components/kids/games/robot-brain/SorterSceneClient.tsx
 // Owns the depot canvas: sizing, the animation loop (paused when the tab is
-// hidden), reduced motion, and handing a test run to the scene.
+// hidden), reduced motion and calm (the kids settings, which include the
+// device preference), and handing a test run to the scene.
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { useKidsCalm, useKidsReducedMotion } from '@/lib/kids/settings'
 import { SorterScene, type RunParcel, type SceneCallbacks } from './scene'
 import type { ClassId, Drawing } from './symbols'
 
@@ -29,6 +31,8 @@ export const SorterSceneClient = forwardRef<SorterSceneHandle, Props>(function S
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sceneRef = useRef<SorterScene | null>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
+  const reduced = useKidsReducedMotion()
+  const calm = useKidsCalm()
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -37,10 +41,6 @@ export const SorterSceneClient = forwardRef<SorterSceneHandle, Props>(function S
     if (!canvas || !wrap || !ctx) return
     const scene = new SorterScene(ctx)
     sceneRef.current = scene
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    scene.setReducedMotion(mq.matches)
-    const onMq = () => scene.setReducedMotion(mq.matches)
-    mq.addEventListener('change', onMq)
 
     const size = () => {
       const r = wrap.getBoundingClientRect()
@@ -69,11 +69,15 @@ export const SorterSceneClient = forwardRef<SorterSceneHandle, Props>(function S
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
-      mq.removeEventListener('change', onMq)
       document.removeEventListener('visibilitychange', onVis)
       sceneRef.current = null
     }
   }, [])
+
+  useEffect(() => {
+    sceneRef.current?.setReducedMotion(reduced)
+    sceneRef.current?.setCalm(calm)
+  }, [reduced, calm])
 
   useEffect(() => {
     sceneRef.current?.setClasses(classes)

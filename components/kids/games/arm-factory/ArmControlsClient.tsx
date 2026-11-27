@@ -420,6 +420,8 @@ export function ProgramEditor(props: {
   total: number
   target3: number
   target2: number
+  /** Slowest shift that still passes (the line's takt time), s. */
+  targetPass: number
   queue: QueueItem[]
   report: { ok: boolean; title: string; body: string } | null
 }) {
@@ -586,7 +588,7 @@ export function ProgramEditor(props: {
           </div>
         </div>
         <p className="mt-1.5 text-xs text-white/50">
-          ⭐⭐⭐ ≤ {props.target3}s · ⭐⭐ ≤ {props.target2}s · ⭐ all 8 sorted. A dropped part or a motor overload stops the line.
+          ⭐⭐⭐ ≤ {props.target3}s · ⭐⭐ ≤ {props.target2}s · ⭐ all {props.total} sorted in ≤ {props.targetPass}s. A dropped part or a motor overload stops the line.
         </p>
       </Panel>
     </div>

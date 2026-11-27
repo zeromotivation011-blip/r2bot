@@ -88,7 +88,7 @@ export default function BuildStepClient({ build, sessionNumber, design, built, o
   return (
     <div className="mx-auto grid w-full max-w-5xl gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
       {/* The robot */}
-      <div className="flex flex-col gap-2 lg:sticky lg:top-4">
+      <div className="flex flex-col gap-2 lg:sticky lg:top-20">
         <div className="relative h-[42vh] min-h-[260px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0A1120] lg:h-[460px]">
           <BayPoster colour={preview.primary} />
           {bayOk && (

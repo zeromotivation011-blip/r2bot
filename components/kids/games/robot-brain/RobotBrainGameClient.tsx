@@ -12,7 +12,6 @@ import { playSound, primeAudio } from '@/lib/kids-audio'
 import {
   evaluate,
   exampleName,
-  explainMistake,
   featurize,
   inkLength,
   leaveOneOutAccuracy,
@@ -22,11 +21,11 @@ import {
   trainingAccuracy,
   type Evaluation,
   type Example,
-  type MistakeCause,
   type Representation,
-  type TrainedBrain,
 } from './brain'
-import { augmentDrawing, generateDrawing, makeRng, SYMBOLS, VARIATION, type ClassId, type Drawing } from './symbols'
+import { augmentDataset, CAP_NOTE, deleteExample, finishStars, nextNumber, relabelExample, runStars, summarize, usedSamples, wrongLeft, type RunResult } from './debrief'
+import { shuffledQuiz } from './quiz'
+import { generateDrawing, makeRng, SYMBOLS, VARIATION, type ClassId, type Drawing } from './symbols'
 import { DEFAULT_REP, glyph, needed, newId, starterData, tierTestSet, tierValidationSet, TIERS, type TierConfig } from './tiers'
 import { DrawPadClient } from './DrawPadClient'
 import { DrawingThumb, GridView } from './DrawingThumb'
@@ -48,12 +47,6 @@ interface LogRow {
   valAcc: number
 }
 
-interface RunResult {
-  kind: 'test' | 'exam'
-  ev: Evaluation
-  brain: TrainedBrain
-}
-
 /**
  * Kept across rounds of the same tier, so "Try again" never throws away a
  * child's drawings. `runs` counts test runs: each run gets brand-new parcels.
@@ -63,84 +56,12 @@ const CACHE = new Map<number, { examples: Example[]; k: number; rep: Representat
 const pct = (x: number) => Math.round(x * 100)
 const K_CHOICES = [1, 3, 5, 7, 9]
 
-/** Wrong labels still hiding in a dataset. */
-const wrongLeft = (xs: Example[]) => xs.filter((e) => e.truth && e.truth !== e.label).length
-
-function starsFor(run: RunResult, cfg: TierConfig): number {
-  const { correct, total } = run.ev
-  let stars = 0
-  if (correct >= needed(cfg.stars[0], total)) stars = 1
-  if (correct >= needed(cfg.stars[1], total)) stars = 2
-  // Legend's 3rd star is the bonus question, not a score.
-  if (cfg.index < 3 && correct >= needed(cfg.stars[2], total)) stars = 3
-  // Ace: a perfect score with wrong labels still in the data was luck, not a fix.
-  if (cfg.index === 2 && stars === 3 && wrongLeft(run.brain.examples) > 0) stars = 2
-  return stars
-}
-
-function perfectHeadline(run: RunResult, cfg: TierConfig): string {
-  const xs = run.brain.examples
-  switch (cfg.index) {
-    case 0:
-      return 'Every arrow went the right way, even the hurried ones: your examples showed Sorta that the pointy end decides left or right.'
-    case 1:
-      return 'Not one mistake on strangers’ hurried drawings: your examples covered the ways people really draw ○ and △, so the brain generalised.'
-    case 2: {
-      const bad = wrongLeft(xs)
-      const right = xs.filter((e) => e.label === 'right').length
-      return bad
-        ? `Every parcel right — but ${bad} example${bad === 1 ? ' is' : 's are'} still labelled wrong. You won by out-numbering them with ${right} → examples; on harder parcels they would still mislead the robot. Fix the labels for the 3rd star.`
-        : `You cleaned the data: no wrong labels left, and ${right} → examples so → isn’t out-voted any more. Every vote counted fairly.`
-    }
-    default:
-      return 'Perfect on unseen, tilted, messy drawings: features ignored where and how big things were drawn, and your varied and augmented examples covered the turning and the hurry.'
-  }
-}
-
-const CAUSE_LESSON: Record<MistakeCause, string> = {
-  mislabel: 'Some training examples had the WRONG label, and the robot copied that mistake. Find them in your data and relabel or delete them.',
-  outvoted: 'Your data was lopsided: one label had far fewer examples, so it kept getting out-voted. Add more examples of the rare label.',
-  position: 'Raw pixels only compare which squares have ink, so a moved or resized drawing looks different. Engineered features fix position and size.',
-  tilt: 'Turned drawings fooled the robot. Engineered features fix position and size but not rotation — tilted examples or augmented copies teach it about turning.',
-  hurried: 'Hurried drawings (open circles, rounded corners, one-sided arrow heads) fooled the robot. Teach it some quick, messy examples as well as neat ones.',
-  unfamiliar: 'Some test drawings looked unlike anything in your data. Add more varied examples: bigger, smaller, tilted, messier.',
-  lookalike: 'Some test drawings were closer to the wrong examples. Draw more examples of the labels that got mixed up, in different styles.',
-}
-
-function summarize(run: RunResult, cfg: TierConfig): { headline: string; causes: { text: string; cause: MistakeCause; index: number; exampleId: number | null; also?: number[] }[] } {
-  const wrong = run.ev.graded.map((g, index) => ({ g, index })).filter((x) => !x.g.correct)
-  if (!wrong.length) return { headline: perfectHeadline(run, cfg), causes: [] }
-  const causes = wrong.map(({ g, index }) => {
-    const r = explainMistake(run.brain, g, glyph)
-    const nb = g.pred.neighbours[0]
-    return { ...r, index, exampleId: nb ? run.brain.examples[nb.index].id : null }
-  })
-  const tally = new Map<MistakeCause, number>()
-  causes.forEach((c) => tally.set(c.cause, (tally.get(c.cause) ?? 0) + 1))
-  const top = [...tally.entries()].sort((a, b) => b[1] - a[1])[0][0]
-  // Most common mix-up, e.g. "→ read as ←"
-  const pairs = new Map<string, number>()
-  wrong.forEach(({ g }) => {
-    const key = `${glyph(g.item.truth)} read as ${g.pred.label ? glyph(g.pred.label) : '?'}`
-    pairs.set(key, (pairs.get(key) ?? 0) + 1)
-  })
-  const [pair, pn] = [...pairs.entries()].sort((a, b) => b[1] - a[1])[0]
-  // Same reason for several parcels → one row ("Parcels 1, 2, 7: …").
-  const grouped: typeof causes = []
-  const others = new Map<string, number[]>()
-  for (const c of causes) {
-    const key = c.text.replace(/\(.*?\)/g, '')
-    if (others.has(key)) others.get(key)!.push(c.index)
-    else {
-      others.set(key, [c.index])
-      grouped.push(c)
-    }
-  }
-  return {
-    headline: `Most mistakes: ${pair} (${pn}×). ${CAUSE_LESSON[top]}`,
-    causes: grouped.map((c) => ({ ...c, also: others.get(c.text.replace(/\(.*?\)/g, ''))!.slice(1) })),
-  }
-}
+/**
+ * Where this page load's run numbering starts. Each run's parcels come from its
+ * run number, so a reload (which also forgets the data) never brings back an
+ * exam the child has already seen the answers to.
+ */
+const SESSION_RUN0 = Math.floor(Math.random() * 100_000) * 10
 
 function ConfusionMatrix({ ev, classes }: { ev: Evaluation; classes: ClassId[] }) {
   return (
@@ -188,57 +109,6 @@ function ConfusionMatrix({ ev, classes }: { ev: Evaluation; classes: ClassId[] }
   )
 }
 
-interface Quiz {
-  q: string
-  /** The first option is the right one; they are shuffled before showing. */
-  options: [string, string, string]
-  explain: string
-}
-
-/** Legend's bonus star. The wrong options are mistakes real teams make, not jokes. */
-const QUIZZES: Quiz[] = [
-  {
-    q: 'Brain A: k = 1, training 100%, validation 61%. Brain B: k = 5, training 93%, validation 86%. A teammate says “ship A, it scored 100%”. What is the best reply?',
-    options: [
-      'A’s 100% is automatic: with k = 1 every training drawing is its own nearest neighbour, so it only proves memory. Compare validation, where B wins.',
-      'A is better on known drawings, so ship A and add B’s validation drawings to A’s training data to fix the rest.',
-      'Average the two numbers: A scores 80.5% overall and B 89.5%, so ship B because its average is higher.',
-    ],
-    explain:
-      'Training accuracy with the example allowed to vote for itself measures memory, not understanding. Validation (or leave-one-out) is the honest estimate. Averaging in a number that is always 100% only hides the problem, and once you train on the validation drawings they stop being a fair check.',
-  },
-  {
-    q: 'You try ten brain designs, check each on the SAME validation set, and keep the best: 95% on validation. What should you expect on the final exam?',
-    options: [
-      'Probably a little lower. Picking the best of ten lets some lucky fit to those exact validation drawings sneak in, which is why the exam uses fresh drawings.',
-      'Exactly 95%, because validation and exam drawings are made the same way.',
-      'Higher than 95%, because the exam has more drawings, and more drawings always means a higher score.',
-    ],
-    explain:
-      'Every time you choose using the validation set, a little of it leaks into your design. The winner of ten tries is partly the luckiest. That’s why real teams keep a final test set they look at once.',
-  },
-  {
-    q: 'After you add augmented (turned, moved, resized) copies, validation goes UP but leave-one-out accuracy on the training data goes DOWN a little. How can both happen?',
-    options: [
-      'The training data now has harder, more varied drawings, so they are harder to get right — but they cover more of what new drawings really look like.',
-      'Augmentation copied some labels wrongly, and wrong labels always raise validation.',
-      'Leave-one-out always goes down when you add data, so the drop says nothing about the copies.',
-    ],
-    explain:
-      'Augmentation makes the training set more like the messy real world. A harder training set can lower training scores, but the brain generalises better, and only scores on unseen data show that.',
-  },
-]
-
-function shuffledQuiz(round: number): { quiz: Quiz; order: number[] } {
-  const quiz = QUIZZES[round % QUIZZES.length]
-  // The right answer moves around from round to round (never the same slot twice in a row for a question).
-  const slot = (Math.floor(round / QUIZZES.length) + 1 + round) % 3
-  const wrong = makeRng(round * 31 + 7)() < 0.5 ? [1, 2] : [2, 1]
-  const order = [...wrong]
-  order.splice(slot, 0, 0)
-  return { quiz, order }
-}
-
 export default function RobotBrainGameClient({ tier, onFinish }: Props) {
   const cfg = TIERS[Math.min(TIERS.length - 1, Math.max(0, tier))]
   const cached = CACHE.get(cfg.index)
@@ -246,7 +116,7 @@ export default function RobotBrainGameClient({ tier, onFinish }: Props) {
   const [k, setK] = useState(cached?.k ?? cfg.k)
   const [rep, setRep] = useState<Representation>(cached?.rep ?? DEFAULT_REP[cfg.index])
   const [log, setLog] = useState<LogRow[]>(cached?.log ?? [])
-  const [runs, setRuns] = useState(cached?.runs ?? 0)
+  const [runs, setRuns] = useState(cached?.runs ?? SESSION_RUN0)
   const [current, setCurrent] = useState<ClassId>(cfg.classes[0])
   const [drawing, setDrawing] = useState<Drawing>([])
   const [drawingSource, setDrawingSource] = useState<'you' | 'sample'>('you')
@@ -325,7 +195,7 @@ export default function RobotBrainGameClient({ tier, onFinish }: Props) {
       playSound('wrong')
       return
     }
-    const n = Math.max(0, ...examples.filter((e) => e.label === current && e.source === drawingSource).map((e) => e.n)) + 1
+    const n = nextNumber(examples, current, drawingSource)
     const ex: Example = { id: newId(), label: current, drawing, source: drawingSource, n }
     setExamples((xs) => [...xs, ex])
     setDrawing([])
@@ -345,52 +215,37 @@ export default function RobotBrainGameClient({ tier, onFinish }: Props) {
     const rng = makeRng(cfg.index * 1000 + sampleSeed.current++ * 7919)
     setDrawing(generateDrawing(current, VARIATION.neat, rng).drawing)
     setDrawingSource('sample')
-    setNote(`Here’s a neat textbook ${glyph(current)}. Press “Add” to teach it to me — but real parcels are messier than this!`)
+    setNote(`Here’s a neat textbook ${glyph(current)}. Press “Add” to teach it to me — but real parcels are messier than this, and a round taught with samples can earn at most 2 stars.`)
     playSound('click')
   }, [cfg.index, current])
 
   const removeExample = (id: number) => {
-    setExamples((xs) => xs.filter((e) => e.id !== id))
+    const hadCopies = examples.some((e) => e.parent === id)
+    setExamples((xs) => deleteExample(xs, id))
     setSelected(null)
-    setNote('Deleted. Data is cleaner now — run me again to see if it helped.')
+    setNote(`Deleted${hadCopies ? ', with its augmented copies' : ''}. Run me again to see if it helped — and check every label still has enough examples.`)
     playSound('click')
   }
 
   const relabel = (id: number, to: ClassId) => {
-    setExamples((xs) => {
-      const me = xs.find((e) => e.id === id)
-      if (!me) return xs
-      // Number it within its new label AND its own source: "the intern's 2nd →".
-      const n = Math.max(0, ...xs.filter((e) => e.label === to && e.source === me.source && e.id !== id).map((e) => e.n)) + 1
-      return xs.map((e) => (e.id === id ? { ...e, label: to, n, truth: e.truth && e.truth !== to ? e.truth : undefined } : e))
-    })
+    const copies = examples.filter((e) => e.parent === id).length
+    setExamples((xs) => relabelExample(xs, id, to))
     setSelected(null)
-    setNote(`Relabelled as ${glyph(to)}. Good data detective work!`)
+    setNote(`Relabelled as ${glyph(to)}${copies ? ` (and its ${copies} augmented cop${copies === 1 ? 'y' : 'ies'})` : ''}. Good data detective work!`)
     playSound('correct')
   }
 
   const augment = () => {
-    const base = examples.filter((e) => e.source !== 'augment')
-    const own = base.filter((e) => e.source === 'you' || e.source === 'sample')
-    const room = cfg.maxExamples - base.length
-    const copies: Example[] = []
-    const per: Record<ClassId, number> = { left: 0, right: 0, circle: 0, tri: 0, stop: 0 }
-    for (const e of own) {
-      const rng = makeRng(e.id * 131 + 17)
-      for (let j = 0; j < 2 && copies.length < room; j++) {
-        per[e.label]++
-        copies.push({ id: newId(), label: e.label, drawing: augmentDrawing(e.drawing, VARIATION.augment, rng), source: 'augment', n: per[e.label], parent: e.id })
-      }
-    }
-    setExamples([...base, ...copies])
+    const out = augmentDataset(examples, cfg.maxExamples)
+    setExamples(out.examples)
     setNote(
-      copies.length
-        ? `Added ${copies.length} copies of your drawings, turned up to 35°, moved and resized. That’s data augmentation!${copies.length < own.length * 2 ? ' (My memory filled up, so not every drawing got two copies.)' : ''}`
-        : room <= 0
+      out.added
+        ? `Added ${out.added} turned, moved and resized copies of the training data — up to 45°. That’s data augmentation!${out.added < out.wanted ? ' (My memory filled up, so not every drawing got two copies.)' : ''}${out.wrongCopies ? ` Careful: ${out.wrongCopies} cop${out.wrongCopies === 1 ? 'y carries' : 'ies carry'} a WRONG label, because copies keep the label of the drawing they came from. Clean first!` : ''}`
+        : cfg.maxExamples - examples.filter((e) => e.source !== 'augment').length <= 0
           ? 'My memory is full. Delete some examples to make room for copies.'
           : 'Draw some examples first, then I can make copies of them.',
     )
-    playSound(copies.length ? 'unlock' : 'wrong')
+    playSound(out.added ? 'unlock' : 'wrong')
   }
 
   const removeCopies = () => {
@@ -477,21 +332,23 @@ export default function RobotBrainGameClient({ tier, onFinish }: Props) {
   const finishRound = (quizRight: boolean | null) => {
     if (!run) return
     const acc = run.ev.accuracy
-    let stars = starsFor(run, cfg)
-    if (cfg.index === 3 && stars > 0) stars = Math.min(3, stars + (quizRight ? 1 : 0))
+    const { stars, capped } = finishStars(run, cfg, quizRight)
     const sum = summarize(run, cfg)
     const message =
       stars > 0
-        ? `${run.ev.correct} of ${run.ev.total} parcels sorted correctly. ${sum.headline}`
+        ? `${run.ev.correct} of ${run.ev.total} parcels sorted correctly. ${sum.headline}${capped === 'samples' ? ` ${CAP_NOTE.samples}` : ''}`
         : `${run.ev.correct} of ${run.ev.total} — the target was ${needed(cfg.stars[0], run.ev.total)}. ${sum.headline}`
-    onFinish({
+    const result: RoundResult & { hintsUsed?: boolean } = {
       stars,
       score: pct(acc),
       scoreLabel: '% accuracy',
       message,
       badges: stars > 0 ? ['robot-teacher'] : undefined,
       attempts,
-    })
+      // ✨ Sample drawings are the game doing the drawing: the shared hint rule (max 2 stars).
+      hintsUsed: usedSamples(run.brain.examples),
+    }
+    onFinish(result)
   }
 
   const onPadKey = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -612,20 +469,23 @@ export default function RobotBrainGameClient({ tier, onFinish }: Props) {
                   )
                 })}
               </div>
-              <DrawPadClient drawing={drawing} onChange={onDraw} ink="#0f172a" label={`Drawing pad. Draw a ${SYMBOLS[current].name}.`} />
+              {/* Phones: cap the pad by the screen height so labels, live bars, pad and Add all fit in one view. */}
+              <div className="mx-auto w-full max-w-[min(100%,36svh)] sm:max-w-none">
+                <DrawPadClient drawing={drawing} onChange={onDraw} ink="#0f172a" label={`Drawing pad. Draw a ${SYMBOLS[current].name}.`} />
+              </div>
               <div className="flex gap-1.5">
                 <button
                   type="button"
                   onClick={addExample}
-                  className="min-h-[48px] flex-[2] rounded-2xl bg-amber-400 px-3 font-black text-slate-900 transition-transform active:scale-[.97] disabled:opacity-40"
+                  className="min-h-[48px] flex-[1.6] whitespace-nowrap rounded-2xl bg-amber-400 px-3 font-black text-slate-900 transition-transform active:scale-[.97] disabled:opacity-40"
                   disabled={!hasInk}
                 >
                   Add as {SYMBOLS[current].glyph}
                 </button>
-                <button type="button" onClick={clearPad} className="min-h-[48px] flex-1 rounded-2xl border border-white/15 bg-white/5 px-2 font-bold text-white">
+                <button type="button" onClick={clearPad} className="min-h-[48px] flex-1 whitespace-nowrap rounded-2xl border border-white/15 bg-white/5 px-2 font-bold text-white">
                   Clear
                 </button>
-                <button type="button" onClick={sample} className="min-h-[48px] flex-1 rounded-2xl border border-white/15 bg-white/5 px-2 font-bold text-white" title="Can’t draw right now? Get a sample drawing">
+                <button type="button" onClick={sample} className="min-h-[48px] flex-1 whitespace-nowrap rounded-2xl border border-white/15 bg-white/5 px-2 font-bold text-white" title="Can’t draw right now? Get a sample drawing (max 2 stars)">
                   ✨ Sample
                 </button>
               </div>
@@ -703,6 +563,10 @@ export default function RobotBrainGameClient({ tier, onFinish }: Props) {
               <b className="text-amber-300">Why it happened: </b>
               {summary.headline}
             </p>
+
+            {passed && runStars(run, cfg).capped === 'samples' && (
+              <p className="mt-2 rounded-xl bg-amber-400/10 px-3 py-2 text-sm font-bold text-amber-200">✨ {CAP_NOTE.samples}</p>
+            )}
 
             {cfg.index === 2 && passed && wrongLeft(run.brain.examples) > 0 && (
               <p className="mt-2 rounded-xl bg-amber-400/10 px-3 py-2 text-sm font-bold text-amber-200">
@@ -804,7 +668,7 @@ export default function RobotBrainGameClient({ tier, onFinish }: Props) {
                   <>
                     {passed && (
                       <button type="button" onClick={() => finishRound(null)} className="min-h-[48px] rounded-2xl bg-amber-400 px-5 font-black text-slate-900">
-                        Collect {'⭐'.repeat(starsFor(run, cfg))}
+                        Collect {'⭐'.repeat(runStars(run, cfg).stars)}
                       </button>
                     )}
                     <button
@@ -876,7 +740,7 @@ export default function RobotBrainGameClient({ tier, onFinish }: Props) {
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               <button type="button" onClick={augment} disabled={phase !== 'train'} className="min-h-[44px] flex-1 rounded-xl border border-white/15 bg-white/5 px-2 text-sm font-bold text-white">
-                Augment my drawings
+                Augment the training data
               </button>
               {examples.some((e) => e.source === 'augment') && (
                 <button type="button" onClick={removeCopies} disabled={phase !== 'train'} className="min-h-[44px] rounded-xl border border-white/15 px-2 text-sm font-bold text-white/70">
@@ -1012,7 +876,7 @@ export default function RobotBrainGameClient({ tier, onFinish }: Props) {
                     {Math.max(cfg.minPerClass - counts.own[c], counts.all[c] < 1 ? 1 : 0)}× {glyph(c)}
                   </b>
                 ))}
-                {cfg.index === 3 && <span className="block text-xs text-white/50">(your own drawings — the factory data doesn’t count)</span>}
+                {cfg.index === 3 && <span className="block text-xs text-white/50">(your own drawings or ✨ samples — the factory data doesn’t count)</span>}
               </p>
             )}
             <button
@@ -1025,8 +889,8 @@ export default function RobotBrainGameClient({ tier, onFinish }: Props) {
             </button>
             <p className="mt-1 text-center text-xs text-white/50">
               {cfg.hasValidation
-                ? `One go per round: ${testItems.length} brand-new parcels, tilted, squashed, smudged and hurried. Win at ${needed(cfg.stars[0], testItems.length)} of ${testItems.length}.`
-                : `${testItems.length} brand-new parcels the robot has never seen. Win at ${needed(cfg.stars[0], testItems.length)}.${ownTotal ? '' : ' Draw first!'}`}
+                ? `One go per round: ${testItems.length} brand-new parcels, tilted, squashed, smudged and hurried. Win at ${needed(cfg.stars[0], testItems.length)} of ${testItems.length}, ⭐⭐ at ${needed(cfg.stars[1], testItems.length)}; the bonus question gives ⭐⭐⭐.`
+                : `${testItems.length} brand-new parcels the robot has never seen. Win at ${needed(cfg.stars[0], testItems.length)}, ⭐⭐ at ${needed(cfg.stars[1], testItems.length)}, ⭐⭐⭐ at ${needed(cfg.stars[2], testItems.length)}.${ownTotal ? '' : ' Draw first!'}`}
             </p>
           </div>
         )}

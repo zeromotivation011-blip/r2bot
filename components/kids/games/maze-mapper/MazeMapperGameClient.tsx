@@ -8,9 +8,10 @@
 import { useCallback, useEffect, useReducer, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { primeAudio } from '@/lib/kids-audio'
+import { kidsReducedMotion, useKidsCalm, useKidsReducedMotion } from '@/lib/kids/settings'
 import { MazeGame, PLANNER_NAMES, type Snapshot } from './game'
 import { cellAt, drawScene, makeView, type RevealMode, type View } from './render'
-import { LEGEND_DEFAULT, MAZES_PER_TIER, WRONG_SQUARE_COST, type AutoSettings, type PlannerId, type TierIndex } from './sim'
+import { LEGEND_DEFAULT, LEGEND_THREE_SHARE, MAZES_PER_TIER, WRONG_SQUARE_COST, type AutoSettings, type PlannerId, type TierIndex } from './sim'
 
 interface Props {
   tier: number
@@ -23,7 +24,7 @@ const BRIEF: Record<TierIndex, { title: string; steps: string[] }> = {
     steps: [
       'Your robot is lost in fog. Drive it with the arrows (or tap where you want to go).',
       'Each move fires 4 sensor beams. Beams paint floor (dark green) and walls (bright blocks).',
-      'Find the green exit and drive out. Map 50% for 2 stars, 80% for 3 stars.',
+      'Find the green exit and drive out. Map 50% for 2 stars, 80% for 3 stars. Using a hint caps the round at 2 stars.',
     ],
   },
   1: {
@@ -47,7 +48,7 @@ const BRIEF: Record<TierIndex, { title: string; steps: string[] }> = {
     steps: [
       'One beam in five lies (off by a square) and some vanish. Wheels sometimes slip. Hatched squares are uncertain.',
       'Design the brain: scans per stop, how sure it must be (trust), the planner, and an east hunch (the exit is in the east wall).',
-      `Mission: get out AND bring back a map you can trust. Mission cost = energy used + ${WRONG_SQUARE_COST} for every wrong square. 3 stars = a top-10% brain for this maze.`,
+      `Mission: get out AND bring back a map you can trust. Mission cost = energy used + ${WRONG_SQUARE_COST} for every wrong square. 3 stars = a top-${Math.round(LEGEND_THREE_SHARE * 100)}% brain for this maze.`,
     ],
   },
 }
@@ -237,11 +238,17 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
   const finishedRef = useRef(false)
 
   if (gameRef.current === null && typeof window !== 'undefined') {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const reduced = kidsReducedMotion()
     const idx = Math.min(MAZES_PER_TIER - 1, Math.max(0, readNum(`r2bot_maze_mapper_maze_t${tier}`, 0)))
     gameRef.current = new MazeGame(tier, idx, settings, reduced, () => bump())
   }
   const game = gameRef.current
+  // Kids Settings (less motion, calm) follow live, not only at load.
+  const reducedMotion = useKidsReducedMotion()
+  const calm = useKidsCalm()
+  useEffect(() => {
+    if (game) game.setMotion(reducedMotion || kidsReducedMotion(), calm)
+  }, [game, reducedMotion, calm])
 
   // MazeGame calls bump() on every change; the snapshot is re-read each render.
   const cur: Snapshot | null = game ? game.snapshot() : null
@@ -401,9 +408,17 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
   }
 
   const scrollToMaze = () => {
-    // On a phone the Run button sits below the settings; bring the maze back into view.
-    const el = wrapRef.current
-    if (el && window.matchMedia('(max-width: 1023px)').matches) el.scrollIntoView({ block: 'start', behavior: 'auto' })
+    // "Run this brain" sits below the settings: bring the maze (and, on a
+    // desktop, the Pause/Step buttons at the top of the side panel) back into view.
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      wrapRef.current?.scrollIntoView({ block: 'start', behavior: 'auto' })
+      return
+    }
+    const root = rootRef.current
+    // Land just below the sticky kids header, not under it.
+    const nav = document.querySelector('.kids-nav')
+    const headerBottom = nav ? Math.max(0, nav.getBoundingClientRect().bottom) : 0
+    if (root) window.scrollTo({ top: Math.max(0, window.scrollY + root.getBoundingClientRect().top - headerBottom - 8), behavior: 'auto' })
   }
 
   const retry = () => {
@@ -600,8 +615,8 @@ export default function MazeMapperGameClient({ tier: tierProp, onFinish }: Props
                 <DPad onMove={(d) => game.manualMove(d)} disabled={cur.phase !== 'brief' && cur.phase !== 'play'} />
                 <div className="flex min-w-[140px] flex-1 flex-col gap-2">
                   {tier === 0 && (
-                    <Btn onClick={() => game.showHint()} label="Show a hint (H)">
-                      💡 Hint
+                    <Btn onClick={() => game.showHint()} label="Show a hint (H). A hint caps this round at 2 stars.">
+                      💡 Hint <span className="text-xs font-bold text-white/60">(max 2★)</span>
                     </Btn>
                   )}
                   {tier === 1 && (

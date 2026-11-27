@@ -68,7 +68,16 @@ links and `data-leave-guard="off"` excepted). Used by `GameShellClient` (after t
 a round; `?tier=<n>` opens a tier), the Galaxy `ActivityPlayerClient` (while a mission is in
 play) and `SimWorkbenchClient` (Physics/Power Lab, once the program is touched, until solved).
 **Toasts**: at most 2 on a phone, 3 wider; queue of 5, the rest folds into "+N more"
-(`components/kids/ui/toast-queue.ts`); nothing shows behind the level-up ceremony.
+(`components/kids/ui/toast-queue.ts`); nothing shows behind the level-up ceremony. On /kids/play/*
+the toasts hug the top edge and never catch a tap (taps go through to the game; they still time
+out). **Game results card** (`GameShellClient`): `fixed inset-0 z-50`, scrolls inside
+(`max-h-[90dvh]`), so it is on screen however tall the game column is. `RoundResult.hintsUsed`
+goes to `reportBestRun`, so a game's own hint cap is also enforced by the rewards engine.
+**Sticky inside kids:** `app/kids/kids-shell.css` sets `overflow-x: clip` on html/body for pages
+with `.kids-nav` (overflow hidden made body a scroll container, so nothing stuck) and
+`scroll-padding-top` for the header. The header really sticks now: a sticky panel uses
+`lg:top-20` (not top-3/top-4), and a JS-pinned phone element (Mars Rover map, Swarm Reef reef)
+pins at the `.kids-nav` bottom, never at top 0.
 **Your next mission** (roadmap #9): `ContinueCardClient` leads with the next session; ages 8–17
 also get "Also today" (a Recharge/almost-secure concept + a game at the right tier).
 **R2BOT Lab look** (roadmap #83): Engineers (14–17) get `<html data-kids-look="lab">` before first
@@ -145,7 +154,8 @@ from it), `highContrast`, `dyslexia`, `colourSafe`, `calm`, `timeScale` (1/1.5/2
   `kidsReducedMotion()`, `kidsLite3D()`, `kidsCalm()`, `kidsMusicOn()`, `kidsTime()`.
 - **Timers:** every child-facing countdown goes through `kidsTimeLimit(base)` (Infinity when
   untimed, so `t >= limit` never fires) and skips any time bonus when untimed. Done: Robot
-  Surgeon (3 games), Orbit Repair, Arm Factory, Conveyor Bug. Pure sims take the limit as a
+  Surgeon (3 games), Orbit Repair, Arm Factory (every Legend re-run too), Conveyor Bug, Sky Port
+  (Cadet; the Pilot/Ace/Legend clocks are simulated mission time). Pure sims take the limit as a
   parameter (`createState(tier, kidsTimeLimit)`) so they stay deterministic. Swarm Reef and
   Bio-Bots keep their limits on purpose: there the clock is simulated mission time, part of
   the engineering puzzle, not the child's reaction speed.

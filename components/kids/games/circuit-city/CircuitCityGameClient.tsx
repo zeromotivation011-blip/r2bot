@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { playSound, primeAudio } from '@/lib/kids-audio'
+import { useKidsCalm, useKidsReducedMotion, useKidsTime } from '@/lib/kids/settings'
 import {
   COLS,
   LED_BURN_A,
@@ -33,7 +34,7 @@ import {
   type Part,
   type PartKind,
 } from './circuit'
-import { FLAT_CHARGE, TIERS, applyMod, batteryCharge, findLoad, liveGoals, nearestResistor, runTest, type TestReport } from './levels'
+import { FLAT_CHARGE, TIERS, applyMod, batteryCharge, findLoad, liveGoals, nearestResistor, roundStars, runTest, withFreshBattery, type TestReport } from './levels'
 import { burst, draw, makeView, nodePx, pickEdge, pickNode, smokePuff, stepParticles, type Edge, type Particle, type View } from './render'
 import CitySceneClient, { type SceneLoads } from './CitySceneClient'
 import PartIcon, { type ToolKind } from './PartIcon'
@@ -119,6 +120,11 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
   const [mistakes, setMistakes] = useState({ shorts: 0, burns: 0 })
   const [tests, setTests] = useState(0)
   const [hintLevel, setHintLevel] = useState(0)
+  /** The Ohm's-law helper's worked answer was revealed (counts as an answer hint). */
+  const [helperUsed, setHelperUsed] = useState(false)
+  const reducedMotion = useKidsReducedMotion()
+  const calm = useKidsCalm()
+  const timeScale = useKidsTime().scale
   const [testRun, setTestRun] = useState<{ report: TestReport; idx: number } | null>(null)
   const [debrief, setDebrief] = useState<TestReport | null>(null)
   const [cursor, setCursor] = useState<Edge>({ a: 2 * COLS + 2, b: 2 * COLS + 3 })
@@ -149,10 +155,10 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
   const shortRef = useRef({ active: false, acc: 0, sparkT: 0 })
   const wireDrag = useRef<{ last: number } | null>(null)
   const pressed = useRef<string | null>(null)
-  const live = useRef({ parts: displayParts, sol, selected, tool, probe, sensePick, cursor, kbd, testing: false })
+  const live = useRef({ parts: displayParts, sol, selected, tool, probe, sensePick, cursor, kbd, testing: false, reduced: false, calm: false })
 
   useEffect(() => {
-    live.current = { parts: displayParts, sol, selected, tool, probe, sensePick, cursor, kbd, testing: !!testRun }
+    live.current = { parts: displayParts, sol, selected, tool, probe, sensePick, cursor, kbd, testing: !!testRun, reduced: reducedMotion, calm }
   })
 
   const events = useRef<{ burn: (p: Part, amps: number) => void; shortStart: (amps: number) => void; shortEnd: () => void; drain: (amount: number) => void }>({
@@ -167,8 +173,10 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
         commit(partsRef.current.map((q) => (q.id === p.id ? { ...q, burnt: true } : q)))
         const a = nodePx(viewRef.current, p.a)
         const b = nodePx(viewRef.current, p.b)
-        burst(particlesRef.current, (a.x + b.x) / 2, (a.y + b.y) / 2, 26, ['#fde68a', '#fb923c', '#ffffff', '#f87171'], 220)
-        smokePuff(particlesRef.current, (a.x + b.x) / 2, (a.y + b.y) / 2)
+        if (!live.current.reduced && !live.current.calm) {
+          burst(particlesRef.current, (a.x + b.x) / 2, (a.y + b.y) / 2, 26, ['#fde68a', '#fb923c', '#ffffff', '#f87171'], 220)
+          smokePuff(particlesRef.current, (a.x + b.x) / 2, (a.y + b.y) / 2)
+        }
         playSound('wrong')
         setMistakes((m) => ({ ...m, burns: m.burns + 1 }))
         setSelected(p.id)
@@ -187,7 +195,14 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
       },
       shortEnd: () => {
         const c = batteryCharge(partsRef.current)
-        if (c < FLAT_CHARGE) {
+        // The short can "end" only because the battery is now too flat to push
+        // a big current: the wire is still there. Check with a full battery.
+        if (solve(withFreshBattery(partsRef.current), 1).shorted) {
+          setSpark({
+            tone: 'warn',
+            text: `The short circuit drained the battery to ${Math.round(c * 100)}%, and the wire joining + to − is still there. Remove that wire first, then fit fresh batteries.`,
+          })
+        } else if (c < FLAT_CHARGE) {
           setSpark({
             tone: 'warn',
             text: `The short is gone — but it drained the battery to ${Math.round(c * 100)}%. A flat battery can’t light anything, even with perfect wiring. Tap “Fit fresh batteries”.`,
@@ -208,7 +223,6 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
     if (!canvas || !wrap) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let dpr = Math.min(2, window.devicePixelRatio || 1)
     const resize = () => {
       dpr = Math.min(2, window.devicePixelRatio || 1)
@@ -239,6 +253,9 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
       time += dt
       const d = live.current
       const view = viewRef.current
+      // Reduce motion (device or kids setting) stops the moving dots and sparks; calm stops the sparks.
+      const reduced = d.reduced
+      const quiet = d.reduced || d.calm
 
       // Dots: speed proportional to current (clamped so it stays readable).
       for (const p of d.parts) {
@@ -277,7 +294,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
             sh.acc = 0
           }
           const bat = d.parts.find((p) => p.kind === 'battery')
-          if (bat && sh.sparkT > 0.18 && !reduced) {
+          if (bat && sh.sparkT > 0.18 && !quiet) {
             sh.sparkT = 0
             const a = nodePx(view, bat.a)
             burst(particlesRef.current, a.x, a.y, 8, ['#fde68a', '#fb923c', '#ffffff'], 140)
@@ -348,7 +365,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
       playSound('correct')
       const a = nodePx(viewRef.current, fresh.a)
       const b = nodePx(viewRef.current, fresh.b)
-      burst(particlesRef.current, (a.x + b.x) / 2, (a.y + b.y) / 2, 18, ['#fde68a', '#86efac', '#67e8f9', '#ffa878'], 150)
+      if (!live.current.reduced && !live.current.calm) burst(particlesRef.current, (a.x + b.x) / 2, (a.y + b.y) / 2, 18, ['#fde68a', '#86efac', '#67e8f9', '#ffa878'], 150)
       const i = Math.abs(partCurrent(sol, fresh.id))
       setSpark({ tone: 'good', text: `${loadName(fresh.loadId ?? '')} is on — ${formatAmps(i)} is flowing through it. ${i > 0.02 && fresh.kind !== 'motor' ? 'That is more than an LED likes (20 mA)!' : 'Look at the dots: that is the current going round the loop.'}` })
     }
@@ -634,7 +651,8 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
     const attempts = report.flat ? Math.max(1, tests) : tests + 1
     setTests(report.flat ? tests : attempts)
     setTestRun({ report, idx: 0 })
-    const STEP_MS = 1300
+    // Each situation stays on screen long enough to read; "more time" slows it down.
+    const STEP_MS = 1300 * timeScale
     report.steps.forEach((s, k) => {
       timers.current.push(
         window.setTimeout(() => {
@@ -653,15 +671,11 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
         }
         finished.current = true
         const m = mistakes.shorts + mistakes.burns
-        let stars = m === 0 ? 3 : m <= 2 ? 2 : 1
-        // Quality (how close to the ideal design) caps the stars: ±3 mA of 15 mA, or a frugal night-light, keeps 3.
-        if (report.quality < 0.7) stars = Math.min(stars, 2)
-        if (report.quality < 0.35) stars = Math.min(stars, 1)
-        // Ace and Legend are design challenges: big hints and guess-and-test cost stars.
-        const paidHints = hintsCost ? Math.max(0, hintLevel - 1) : 0
-        if (paidHints > 0) stars = Math.min(stars, 3 - paidHints)
-        if (hintsCost && attempts > 3) stars = Math.min(stars, 2)
-        stars = Math.max(1, stars)
+        // A hint that gives away part of the answer caps the finish at 2 stars
+        // (the shared rule; reportActivity enforces the same cap from hintsUsed).
+        const paidHints = Math.max(0, hintLevel - def.freeHints) + (helperUsed ? 1 : 0)
+        const hintsUsed = paidHints > 0
+        const stars = roundStars({ mistakes: m, quality: report.quality, paidHints, attempts, designTier: hintsCost })
         const placed = partsRef.current.filter((p) => !p.locked).length
         const score = Math.max(
           100,
@@ -675,14 +689,16 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
         } catch {
           /* ignore */
         }
-        onFinish({
+        const result: RoundResult & { hintsUsed?: boolean } = {
           stars,
           score,
           scoreLabel: `points · ${report.metric}`,
-          message: report.why,
+          message: hintsUsed ? `${report.why} (You used an answer hint, so this finish is capped at 2 stars — try it again without one for 3.)` : report.why,
           badges: def.tier >= 2 ? ['circuit-closer', 'ohms-friend'] : ['circuit-closer'],
           attempts,
-        })
+          hintsUsed,
+        }
+        onFinish(result)
       }, report.steps.length * STEP_MS + 400),
     )
   }
@@ -712,6 +728,8 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
   const signLed = findLoad(parts, def.tier === 3 ? 'N' : 'S')
   const stormOn = !!step?.mod.knockOut
   const shortNow = sol.shorted
+  // A short that is still wired but no longer "rushing" only because the battery is dead.
+  const shortWired = useMemo(() => flat && solve(withFreshBattery(parts), 1).shorted, [flat, parts])
 
   return (
     <div className="grid select-none gap-3 pb-[88px] min-[901px]:pb-0 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -729,7 +747,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
         </div>
 
         <SparkBar tone={spark.tone} text={sensePick ? 'Tap a dot on the board for the comparator’s sense lead.' : spark.text} />
-        {flat && !testRun && !shortNow && (
+        {flat && !testRun && !shortNow && !shortWired && (
           <button
             type="button"
             onClick={freshBatteries}
@@ -799,6 +817,15 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
           <button type="button" onClick={clearBoard} className="min-h-[48px] rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-bold text-white/70 hover:bg-white/10">
             Clear board
           </button>
+          {/* On phones the goals panel sits below the board: a Test button right by the parts keeps it in reach. */}
+          <button
+            type="button"
+            onClick={runTestNow}
+            disabled={!!testRun}
+            className="min-h-[48px] rounded-xl bg-amber-400 px-4 text-sm font-black text-slate-900 transition-transform active:scale-95 disabled:opacity-60 lg:hidden"
+          >
+            {testRun ? 'Testing…' : 'Test it!'}
+          </button>
         </div>
         <p className="text-xs text-white/50">
           {tool === 'wire' ? 'Drag from dot to dot to draw wires, or tap a gap between two dots.' : 'Tap a gap between two dots to place, or drag a part from the box onto the board.'} Wire colour shows voltage: blue = 0 V, orange-red = high. Faster dots = more current.
@@ -846,7 +873,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
                 ))}
               </ul>
               <p className="mt-2 text-white/85">{debrief.why}</p>
-              {debrief.flat && flat && (
+              {debrief.flat && charge < 0.999 && (
                 <button type="button" onClick={freshBatteries} className="mt-2 min-h-[44px] w-full rounded-xl border border-amber-300/60 bg-amber-400/15 px-3 font-bold text-amber-100">
                   Fit fresh batteries
                 </button>
@@ -875,10 +902,12 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
               onChange={(e) => setLux(Math.round(Math.pow(10, Number(e.target.value))))}
               className="mt-2 h-11 w-full accent-amber-400"
             />
+            {/* The slider is logarithmic, so 1 · 10 · 100 · 1000 lux sit at equal steps. */}
             <div className="flex justify-between text-xs text-white/50">
-              <span>midnight 1</span>
-              <span>dusk 100</span>
-              <span>room by day 1000</span>
+              <span>1 night</span>
+              <span>10 dusk</span>
+              <span>100 late day</span>
+              <span>1000 room by day</span>
             </div>
             <p className="mt-1 text-xs text-white/70">
               The LDR is now <b className="text-white">{formatOhms(Math.round(ldrOhms(displayLux)))}</b>. Circuit power: <b className="text-white">{formatWatts(sol.power)}</b>
@@ -886,7 +915,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
           </section>
         )}
 
-        {def.tier === 2 && signLed && <OhmHelper v={sol.battV} vf={ledVf(signLed)} name="red sign LED" />}
+        {def.tier === 2 && signLed && <OhmHelper v={sol.battV} vf={ledVf(signLed)} name="red sign LED" revealed={helperUsed} onReveal={() => setHelperUsed(true)} />}
 
         <section className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm">
           <div className="flex items-center justify-between gap-2">
@@ -897,14 +926,15 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
               onClick={() => setHintLevel((h) => Math.min(def.hints.length, h + 1))}
               className="min-h-[44px] rounded-xl border border-amber-300/50 px-3 font-bold text-amber-200 disabled:opacity-40"
             >
-              {hintLevel === 0 ? 'Show hint' : `Next hint${hintsCost ? ' (−1 ★)' : ''}`}
+              {hintLevel === 0 ? 'Show hint' : 'Next hint'}
+              {hintLevel >= def.freeHints && hintLevel < def.hints.length && <span className="ml-1 text-xs">(max 2 ★)</span>}
             </button>
           </div>
-          {hintsCost && (
-            <p className="mt-1 text-xs text-white/60">
-              The first hint is free. Each hint after it costs a star{def.tier === 3 ? ', and there is no Ohm’s-law helper here — you are the engineer' : ''}. More than three tests also caps you at 2 stars.
-            </p>
-          )}
+          <p className="mt-1 text-xs text-white/60">
+            {def.freeHints === 1 ? 'The first hint explains the idea and is free.' : `The first ${def.freeHints} hints explain the idea and are free.`} Hints after that give away part of the answer, so
+            they cap this round at 2 stars{def.tier === 3 ? '. There is no Ohm’s-law helper here — you are the engineer' : ''}.
+            {hintsCost ? ' More than three tests also caps you at 2 stars.' : ''}
+          </p>
           {hintLevel > 0 && (
             <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-white/80">
               {def.hints.slice(0, hintLevel).map((h) => (
@@ -1000,6 +1030,12 @@ function Inspector({
         <dd className="text-cyan-300">{part.kind === 'battery' ? formatAmps(-i) : formatAmps(i)}</dd>
         <dt className="text-white/50">Voltage across</dt>
         <dd className="text-cyan-300">{formatVolts(Math.abs(vd))}</dd>
+        {part.kind === 'lamp' && (
+          <>
+            <dt className="text-white/50">Built-in resistor</dt>
+            <dd className="text-cyan-300">{formatOhms(part.ohms ?? 220)}</dd>
+          </>
+        )}
         {part.kind === 'battery' && (
           <>
             <dt className="text-white/50">Charge</dt>
@@ -1128,7 +1164,7 @@ function Multimeter({ probe, parts, sol }: { probe: Probe | null; parts: Part[];
   )
 }
 
-function OhmHelper({ v, vf, name }: { v: number; vf: number; name: string }) {
+function OhmHelper({ v, vf, name, revealed, onReveal }: { v: number; vf: number; name: string; revealed: boolean; onReveal: () => void }) {
   const [ma, setMa] = useState(15)
   const r = (v - vf) / (ma / 1000)
   const near = nearestResistor(Math.max(1, r), RESISTOR_VALUES)
@@ -1141,9 +1177,18 @@ function OhmHelper({ v, vf, name }: { v: number; vf: number; name: string }) {
       </label>
       <input id="cc-ma" type="range" min={10} max={20} step={1} value={ma} onChange={(e) => setMa(Number(e.target.value))} className="h-11 w-full accent-amber-400" />
       <p className="mt-1 rounded-xl bg-black/30 p-2 text-center font-mono text-sm text-cyan-200">
-        R = (V − Vf) ÷ I = ({v > 0.1 ? v.toFixed(2) : '?'} − {vf.toFixed(1)}) ÷ {(ma / 1000).toFixed(3)} ≈ {v > vf ? `${Math.round(r)} Ω` : '?'}
+        R = (V − Vf) ÷ I = ({v > 0.1 ? v.toFixed(2) : '?'} − {vf.toFixed(1)}) ÷ {(ma / 1000).toFixed(3)} ≈ {revealed && v > vf ? `${Math.round(r)} Ω` : '? Ω'}
       </p>
-      {v > vf && <p className="mt-1 text-xs text-white/60">Closest value in the parts box: {formatOhms(near)}. V is the battery’s voltage right now.</p>}
+      {revealed ? (
+        v > vf && <p className="mt-1 text-xs text-white/60">Closest value in the parts box: {formatOhms(near)}. V is the battery’s voltage right now.</p>
+      ) : (
+        <>
+          <p className="mt-1 text-xs text-white/60">Do the division yourself (V is the battery’s voltage right now), then pick the closest resistor.</p>
+          <button type="button" onClick={onReveal} className="mt-2 min-h-[44px] w-full rounded-xl border border-white/15 bg-white/5 px-3 text-sm font-bold text-white/80 hover:bg-white/10">
+            Work it out for me <span className="text-xs text-amber-200">(max 2 ★)</span>
+          </button>
+        </>
+      )}
     </section>
   )
 }

@@ -139,15 +139,24 @@ export const LEGEND_TARGET_TOTAL = 240
 /**
  * Legend "par" per map: the best single-plan score our solver found by trying
  * every target order (2–4 targets), every set of onboard rules and a 0–120 min
- * dawn wait (4,800 plans per map). ★★★ needs 85% of par, ★★ 55%. Re-run the
- * solver and update these numbers if the Legend simulation or maps change.
+ * dawn wait (9,600 plans per map). ★★★ needs 85% of par, ★★ 60%, and even ★
+ * needs 40% (about two targets home), so one lucky sample is not a Legend
+ * win. mars-rover.verify.ts re-runs the solver in CI and fails if these
+ * numbers drift from the simulation.
  */
 export const LEGEND_PAR = [253, 235, 299, 209, 257, 292]
 
-/** [★★★ line, ★★ line, par] for a Legend map. */
-export function legendStarLines(mapNo: number): [number, number, number] {
+export interface LegendLines {
+  s3: number
+  s2: number
+  s1: number
+  par: number
+}
+
+/** Star lines (points) for a Legend map. */
+export function legendStarLines(mapNo: number): LegendLines {
   const par = LEGEND_PAR[mapNo] ?? 250
-  return [Math.round(par * 0.85), Math.round(par * 0.55), par]
+  return { s3: Math.round(par * 0.85), s2: Math.round(par * 0.6), s1: Math.round(par * 0.4), par }
 }
 
 export interface Target {

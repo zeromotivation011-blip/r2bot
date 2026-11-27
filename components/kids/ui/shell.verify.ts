@@ -132,6 +132,10 @@ async function main() {
   const rt = src('components/kids/ui/RewardToastClient.tsx')
   check('two toasts at once on phones, three wider', /mq\.matches \? 3 : 2/.test(rt))
   check('no toast behind the level-up ceremony', /ceremony \? \[\] : queue\.slice\(0, maxVisible\)/.test(rt))
+  check('on game pages toasts never catch a tap (Wave 3)', /startsWith\('\/kids\/play\/'\)/.test(rt) && /onGame \? 'pointer-events-none/.test(rt))
+  const gsW3 = src('components/kids/ui/GameShellClient.tsx')
+  check('a round hint reaches the shared 2-star cap (Wave 3)', /hintsUsed\?: boolean/.test(gsW3) && /hintsUsed: r\.hintsUsed/.test(gsW3))
+  check('results card is fixed to the viewport and scrolls inside (Wave 3)', /fixed inset-0 z-50[^"]*" role="dialog" aria-modal="true" aria-label="Round results"/.test(gsW3) && /max-h-\[90dvh\][^"]*overflow-y-auto/.test(gsW3))
 
   // ── OG image + grown-ups page ──────────────────────────────────────────────
   check('/kids has its own share card', /ImageResponse/.test(src('app/kids/opengraph-image.tsx')))

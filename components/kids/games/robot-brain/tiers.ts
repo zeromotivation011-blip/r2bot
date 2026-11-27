@@ -1,6 +1,6 @@
 // components/kids/games/robot-brain/tiers.ts
-// What each tier asks, and the seeded data it uses. Same tier → same test
-// parcels every time, so a score depends only on the child's training data.
+// What each tier asks, and the seeded data it uses. Every run gets its own
+// seed (tierTestSet), so a test is never re-taken on parcels already seen.
 
 import type { Example, Representation, TestItem } from './brain'
 import { generateDrawing, makeRng, SYMBOLS, VARIATION, type ClassId, type DrawMeta, type Variation } from './symbols'
@@ -100,7 +100,7 @@ export const TIERS: TierConfig[] = [
     testSeed: 4421,
     testPerClass: 6,
     testVariation: VARIATION.wild,
-    goal: 'Design the brain: pick k and raw pixels or features, clean the factory data, add and augment drawings, then pass the final exam: 22 of 24 brand-new parcels, tilted up to 35°, squashed, smudged and hurried.',
+    goal: 'Design the brain: pick k and raw pixels or features, clean the factory data, add and augment drawings, then pass the final exam: 22 of 24 brand-new parcels, tilted up to 45°, squashed, smudged and hurried.',
     intro: 'Legend lab. Validation is free; every exam is 24 parcels nobody has seen, and you get one go per round. Don’t trust training accuracy.',
   },
 ]

@@ -847,3 +847,62 @@ export class ArmSim {
   }
 }
 
+
+// ── Scoring and debriefs (pure, checked by arm-factory.verify.ts) ───────────
+
+/** Legend star times, calibrated on the fixed stream: the best programs we
+ *  found finish in about 33.5 s. */
+export const LEGEND_TARGET3 = 35
+export const LEGEND_TARGET2 = 45
+/** The line's takt time: a shift slower than this does not pass. Slowing EVERY
+ *  move (the brute-force fix) takes 97 s at 30 %, and a random speed on each
+ *  move of the starter program passes only about 3 times in 100; slowing just
+ *  the heavy-part moves passes in about 36 s. */
+export const LEGEND_PASS = 60
+
+/** Cadet stars. Any hint caps a finish at 2 stars (the shared hint rule). */
+export function cadetStars(mistakes: number, hinted: boolean): number {
+  const s = mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1
+  return hinted ? Math.min(2, s) : s
+}
+
+/** Legend stars for a finished shift; 0 = did not pass. */
+export function legendStars(sorted: number, t: number): number {
+  if (sorted < LEGEND_PARTS || t > LEGEND_PASS) return 0
+  return t <= LEGEND_TARGET3 ? 3 : t <= LEGEND_TARGET2 ? 2 : 1
+}
+
+export interface ShiftReport {
+  ok: boolean
+  title: string
+  body: string
+}
+
+/**
+ * What to tell the child when a Legend shift ends without passing. Each line
+ * names a cause that really happened, so a part that fell on the floor is never
+ * blamed on the wrong bin (and the other way round). Returns null on a pass.
+ */
+export function legendShiftReport(stats: Stats, t: number): ShiftReport | null {
+  if (legendStars(stats.sorted, t) > 0) return null
+  if (stats.sorted >= LEGEND_PARTS) {
+    return {
+      ok: false,
+      title: `All ${LEGEND_PARTS} sorted, but the shift took ${t.toFixed(1)} s`,
+      body: `The line needs the shift done in ${LEGEND_PASS} s or less. Slowing every move keeps the grip safe but wastes time on the light parts. Keep light-part moves fast and add slower "heavy only" moves for the steel parts.`,
+    }
+  }
+  const causes: string[] = []
+  if (stats.wrong > 0)
+    causes.push(
+      `${stats.wrong} part${stats.wrong === 1 ? '' : 's'} went to the wrong bin. "Above its bin" reads the colour of the part in the gripper, so grip before you move there.`,
+    )
+  if (stats.dropped > 0)
+    causes.push(
+      `${stats.dropped} part${stats.dropped === 1 ? '' : 's'} fell on the floor: the gripper let go when it was not over a bin. Put "Release" straight after "Above its bin".`,
+    )
+  if (stats.rejected > 0)
+    causes.push(`${stats.rejected} part${stats.rejected === 1 ? '' : 's'} rode off the end of the belt without being picked.`)
+  if (!causes.length) causes.push('Some parts were never picked up. Check that the program grips at the pick spot every time round.')
+  return { ok: false, title: `Shift over: ${stats.sorted} of ${LEGEND_PARTS} in the right bin`, body: causes.join(' ') }
+}

@@ -7,11 +7,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { playSound, primeAudio } from '@/lib/kids-audio'
+import { liteDpr, useKidsCalm, useKidsReducedMotion } from '@/lib/kids/settings'
 import {
   DT,
   aceScores,
   buildMission,
+  capForHints,
   coveragePct,
+  FREE_HINTS,
   createSim,
   scoreRun,
   stepSim,
@@ -102,11 +105,61 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
   const selectedRef = useRef(-1)
   const weightsRef = useRef<Weights>(weights)
   const finishedRef = useRef(false)
+  const hintsRef = useRef(0)
+  // Less motion (device or kids setting) and calm mode both quieten the reef:
+  // no sway, no shake, fewer particles.
+  const reducedMotion = useKidsReducedMotion()
+  const calm = useKidsCalm()
+  const quiet = reducedMotion || calm
+  const quietRef = useRef(quiet)
+  quietRef.current = quiet
+  // ── Pinned reef on a phone ──────────────────────────────────────────────
+  // On a phone the rules sit below the reef. While the child scrolls them, the
+  // reef and run controls stay pinned under the header, so the swarm is always
+  // in view. (position: fixed with a same-height placeholder: CSS sticky does not
+  // work here because the page's html/body clip horizontal overflow.)
+  const slotRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const [pin, setPin] = useState<{ top: number; left: number; width: number; height: number } | null>(null)
+  useEffect(() => {
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const slot = slotRef.current
+      const stage = stageRef.current
+      const root = rootRef.current
+      if (!slot || !stage || !root) return
+      const phone = window.innerWidth < 1024 && window.innerHeight >= 640
+      const nav = document.querySelector('.kids-nav')
+      const headerBottom = Math.max(0, nav ? nav.getBoundingClientRect().bottom : 0)
+      const sr = slot.getBoundingClientRect()
+      const h = stage.offsetHeight
+      // Pin while the slot has scrolled under the header and the game still has room below it
+      const want = phone && sr.top < headerBottom && root.getBoundingClientRect().bottom > headerBottom + h + 80
+      setPin((cur) => {
+        if (!want) return cur ? null : cur
+        const next = { top: Math.round(headerBottom), left: Math.round(sr.left), width: Math.round(sr.width), height: h }
+        return cur && cur.top === next.top && cur.left === next.left && cur.width === next.width && cur.height === next.height ? cur : next
+      })
+    }
+    const schedule = () => {
+      if (!raf) raf = window.requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    return () => {
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      if (raf) window.cancelAnimationFrame(raf)
+    }
+  }, [])
   const finishTimer = useRef<number | null>(null)
 
   phaseRef.current = phase
   speedRef.current = speed
   selectedRef.current = selected
+  hintsRef.current = hintsShown
 
   // The rules lock while the swarm swims: a run is scored on one design only,
   // so the same rules always give the same run (and the debrief describes them).
@@ -121,7 +174,10 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
     (s: SimState) => {
       if (finishedRef.current) return
       finishedRef.current = true
-      const o = scoreRun(s)
+      const raw = scoreRun(s)
+      // A hint that gave away settings caps the finish at 2 stars (the shared rule).
+      const o = capForHints(raw, hintsRef.current)
+      const capped = o.stars < raw.stars
       setOutcome(o)
       setPhase('done')
       const mem = memory.get(tier)
@@ -135,7 +191,7 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
           score: o.score,
           scoreLabel: o.scoreLabel,
           // Short on purpose: the full debrief is shown under the reef.
-          message: [o.headline, shortWhy(o.why[0] ?? '')].join(' ').trim(),
+          message: [o.headline, shortWhy(o.why[0] ?? ''), capped ? '(Capped at 2 stars: you used an answer hint.)' : ''].join(' ').trim(),
           badges: o.stars > 0 && tier >= 1 ? ['swarm-captain'] : undefined,
           attempts,
         })
@@ -143,8 +199,7 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
         // below the reef, so bring the middle of the game into view.
         const root = rootRef.current
         if (root) {
-          const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-          window.requestAnimationFrame(() => root.scrollIntoView({ block: 'center', behavior: reducedMotion ? 'auto' : 'smooth' }))
+          window.requestAnimationFrame(() => root.scrollIntoView({ block: 'center', behavior: quietRef.current ? 'auto' : 'smooth' }))
         }
       }, 1800)
     },
@@ -158,13 +213,12 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
     if (!canvas || !wrap) return
     const g = canvas.getContext('2d')
     if (!g) return
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const fx = new Fx(reduced)
+    const fx = new Fx(quietRef.current)
     const scenery = buildScenery(mission)
-    let view: View = makeView(wrap.clientWidth, Math.min(2, window.devicePixelRatio || 1))
+    let view: View = makeView(wrap.clientWidth, liteDpr(2))
 
     const resize = () => {
-      const dpr = Math.min(2, window.devicePixelRatio || 1)
+      const dpr = liteDpr(2)
       view = makeView(wrap.clientWidth, dpr)
       canvas.width = Math.round(view.w * dpr)
       canvas.height = Math.round(view.h * dpr)
@@ -228,6 +282,8 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
         }
         if (s.done) complete(s)
       }
+      const reduced = quietRef.current
+      fx.reduced = reduced
       fx.update(dt)
       drawWorld(g, view, s, scenery, fx, { time: clock, selected: selectedRef.current, reduced, showAllBeacons: s.done }, dt)
 
@@ -344,7 +400,7 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
       bar = h.quality / 100
     } else {
       main = `${h.found}/${mission.beacons?.length ?? 0} beacons · ${h.coverage}% searched`
-      sub = `${h.alive} robots running · battery ${h.battery}%`
+      sub = `${h.alive} running · battery ${h.battery}% · ${h.crashes + h.bumps} collisions`
       bar = h.coverage / 100
     }
   }
@@ -370,98 +426,108 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
           </ul>
         </div>
 
-        {/* The reef */}
-        <div
-          ref={wrapRef}
-          className="relative w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#071226] shadow-[0_8px_24px_rgba(0,0,0,.45)] outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
-          tabIndex={0}
-          onKeyDown={onKey}
-          role="application"
-          aria-label="Swarm Reef simulation. Space to launch or pause, R to reset, arrow keys to pick a robot for robot's-eye view."
-        >
-          <canvas ref={canvasRef} className="block w-full touch-manipulation" onPointerDown={onPointer} data-testid="swarm-canvas" />
-          {h && (
-            <div className="pointer-events-none absolute inset-x-2 top-2 flex items-start justify-between gap-2 text-white">
-              <div className="rounded-xl bg-slate-950/80 px-2 py-1 sm:px-2.5 sm:py-1.5">
-                <p className="font-display text-sm font-black sm:text-base" data-testid="swarm-hud">
-                  {main}
-                </p>
-                <p className="text-[11px] leading-tight text-slate-300 sm:text-xs">{sub}</p>
-                <div className="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-white/10 sm:w-44">
-                  <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-[width] duration-150" style={{ width: `${Math.round(Math.min(1, bar) * 100)}%` }} />
+        <div ref={slotRef} style={pin ? { height: pin.height } : undefined}>
+          <div
+            ref={stageRef}
+            data-testid="swarm-stage"
+            data-pinned={pin ? 'true' : undefined}
+            className={`flex flex-col gap-2 ${pin ? 'fixed z-20 bg-[#0A1120] pb-2 shadow-[0_8px_24px_rgba(0,0,0,.45)]' : ''}`}
+            style={pin ? { top: pin.top, left: pin.left, width: pin.width } : undefined}
+          >
+            {/* The reef */}
+            <div
+              ref={wrapRef}
+              className="relative w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#071226] shadow-[0_8px_24px_rgba(0,0,0,.45)] outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+              tabIndex={0}
+              onKeyDown={onKey}
+              role="application"
+              aria-label="Swarm Reef simulation. Space to launch or pause, R to reset, arrow keys to pick a robot for robot's-eye view."
+            >
+              <canvas ref={canvasRef} className="block w-full touch-manipulation" onPointerDown={onPointer} data-testid="swarm-canvas" />
+              {h && (
+                <div className="pointer-events-none absolute inset-x-2 top-2 flex items-start justify-between gap-2 text-white">
+                  <div className="rounded-xl bg-slate-950/80 px-2 py-1 sm:px-2.5 sm:py-1.5">
+                    <p className="font-display text-sm font-black sm:text-base" data-testid="swarm-hud">
+                      {main}
+                    </p>
+                    <p className="text-[11px] leading-tight text-slate-300 sm:text-xs">{sub}</p>
+                    <div className="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-white/10 sm:w-44">
+                      <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-[width] duration-150" style={{ width: `${Math.round(Math.min(1, bar) * 100)}%` }} />
+                    </div>
+                  </div>
+                  <div className="rounded-xl bg-slate-950/80 px-2 py-1 text-right sm:px-2.5 sm:py-1.5">
+                    <p className="font-display text-sm font-black tabular-nums sm:text-base">
+                      {h.t.toFixed(1)}
+                      <span className="text-slate-400"> / {mission.timeLimit} s</span>
+                    </p>
+                    {speed > 1 && <p className="text-[11px] font-bold text-amber-300">{speed}× speed</p>}
+                  </div>
                 </div>
-              </div>
-              <div className="rounded-xl bg-slate-950/80 px-2 py-1 text-right sm:px-2.5 sm:py-1.5">
-                <p className="font-display text-sm font-black tabular-nums sm:text-base">
-                  {h.t.toFixed(1)}
-                  <span className="text-slate-400"> / {mission.timeLimit} s</span>
-                </p>
-                {speed > 1 && <p className="text-[11px] font-bold text-amber-300">{speed}× speed</p>}
-              </div>
+              )}
+              {phase === 'ready' && (
+                <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
+                  <p className="rounded-full bg-slate-950/75 px-3 py-1 text-xs font-bold text-cyan-100 sm:text-sm">Tap a robot to see what it can sense</p>
+                </div>
+              )}
+              {phase === 'paused' && (
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/30">
+                  <p className="rounded-2xl bg-slate-950/80 px-4 py-2 font-display text-lg font-black text-white">Paused</p>
+                </div>
+              )}
+              {phase === 'done' && outcome && (
+                <div className={`pointer-events-none absolute inset-x-0 top-1/3 flex justify-center ${quiet ? '' : 'motion-safe:animate-pulse'}`}>
+                  <p className={`rounded-2xl px-5 py-2 font-display text-2xl font-black ${outcome.stars > 0 ? 'bg-emerald-400 text-slate-900' : 'bg-slate-900/90 text-white'}`}>{outcome.headline}</p>
+                </div>
+              )}
             </div>
-          )}
-          {phase === 'ready' && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
-              <p className="rounded-full bg-slate-950/75 px-3 py-1 text-xs font-bold text-cyan-100 sm:text-sm">Tap a robot to see what it can sense</p>
-            </div>
-          )}
-          {phase === 'paused' && (
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/30">
-              <p className="rounded-2xl bg-slate-950/80 px-4 py-2 font-display text-lg font-black text-white">Paused</p>
-            </div>
-          )}
-          {phase === 'done' && outcome && (
-            <div className="pointer-events-none absolute inset-x-0 top-1/3 flex justify-center motion-safe:animate-pulse">
-              <p className={`rounded-2xl px-5 py-2 font-display text-2xl font-black ${outcome.stars > 0 ? 'bg-emerald-400 text-slate-900' : 'bg-slate-900/90 text-white'}`}>{outcome.headline}</p>
-            </div>
-          )}
-        </div>
 
-        {/* Run controls */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={launch}
-            disabled={phase === 'done'}
-            data-testid="swarm-launch"
-            className="min-h-[52px] flex-1 whitespace-nowrap rounded-2xl bg-amber-400 px-6 font-display text-lg font-black text-[#1A1103] shadow-[0_8px_24px_rgba(0,0,0,.45)] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.97] disabled:opacity-50 sm:flex-none"
-          >
-            {phase === 'ready' ? 'Launch' : running ? 'Pause' : phase === 'paused' ? 'Resume' : 'Finished'}
-          </button>
-          <div className="flex rounded-2xl border border-white/15 bg-white/5 p-1" role="radiogroup" aria-label="Simulation speed">
-            {SPEEDS.map((sp) => (
+            {/* Run controls */}
+            <div className="flex flex-wrap items-center gap-2">
               <button
-                key={sp}
                 type="button"
-                role="radio"
-                aria-checked={speed === sp}
-                data-testid={`swarm-speed-${sp}`}
-                onClick={() => setSpeed(sp)}
-                className={`min-h-[44px] min-w-[44px] rounded-xl px-2 font-black ${speed === sp ? 'bg-cyan-400 text-slate-900' : 'text-white/75 hover:text-white'}`}
+                onClick={launch}
+                disabled={phase === 'done'}
+                data-testid="swarm-launch"
+                className="min-h-[52px] flex-1 whitespace-nowrap rounded-2xl bg-amber-400 px-6 font-display text-lg font-black text-[#1A1103] shadow-[0_8px_24px_rgba(0,0,0,.45)] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.97] disabled:opacity-50 sm:flex-none"
               >
-                {sp}×
+                {phase === 'ready' ? 'Launch' : running ? 'Pause' : phase === 'paused' ? 'Resume' : 'Finished'}
               </button>
-            ))}
+              <div className="flex rounded-2xl border border-white/15 bg-white/5 p-1" role="radiogroup" aria-label="Simulation speed">
+                {SPEEDS.map((sp) => (
+                  <button
+                    key={sp}
+                    type="button"
+                    role="radio"
+                    aria-checked={speed === sp}
+                    data-testid={`swarm-speed-${sp}`}
+                    onClick={() => setSpeed(sp)}
+                    className={`min-h-[44px] min-w-[44px] rounded-xl px-2 font-black ${speed === sp ? 'bg-cyan-400 text-slate-900' : 'text-white/75 hover:text-white'}`}
+                  >
+                    {sp}×
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={reset}
+                disabled={phase === 'ready' || phase === 'done'}
+                className="min-h-[44px] rounded-2xl border border-white/15 bg-white/5 px-4 font-bold text-white hover:bg-white/10 disabled:opacity-40"
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEyeNote('')
+                  setSelected((i) => (i >= 0 ? -1 : nearestLive(simRef.current, -1)))
+                }}
+                aria-pressed={selected >= 0}
+                className={`min-h-[44px] rounded-2xl border px-4 font-bold ${selected >= 0 ? 'border-cyan-300 bg-cyan-400/15 text-cyan-100' : 'border-white/15 bg-white/5 text-white hover:bg-white/10'}`}
+              >
+                Robot’s-eye view
+              </button>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={reset}
-            disabled={phase === 'ready' || phase === 'done'}
-            className="min-h-[44px] rounded-2xl border border-white/15 bg-white/5 px-4 font-bold text-white hover:bg-white/10 disabled:opacity-40"
-          >
-            Reset
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setEyeNote('')
-              setSelected((i) => (i >= 0 ? -1 : nearestLive(simRef.current, -1)))
-            }}
-            aria-pressed={selected >= 0}
-            className={`min-h-[44px] rounded-2xl border px-4 font-bold ${selected >= 0 ? 'border-cyan-300 bg-cyan-400/15 text-cyan-100' : 'border-white/15 bg-white/5 text-white hover:bg-white/10'}`}
-          >
-            Robot’s-eye view
-          </button>
         </div>
 
         {selected >= 0 && (
@@ -552,8 +618,10 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
               className="min-h-[44px] rounded-xl border border-amber-300/50 px-3 text-sm font-black text-amber-200 disabled:opacity-40"
             >
               {hintsShown === 0 ? 'Give me a hint' : hintsShown < brief.hints.length ? 'Another hint' : 'No more hints'}
+              {hintsShown >= FREE_HINTS && hintsShown < brief.hints.length && <span className="ml-1 text-xs">(max 2 ★)</span>}
             </button>
           </div>
+          <p className="mt-1 text-xs text-slate-400">The first hint explains the idea and is free. The others give away settings, so a win after them is capped at 2 stars.</p>
           {hintsShown > 0 && (
             <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-slate-200">
               {brief.hints.slice(0, hintsShown).map((t) => (

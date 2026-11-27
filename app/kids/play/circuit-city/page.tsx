@@ -67,13 +67,13 @@ const TIERS = [
     name: 'Ace',
     who: 'about 11 and up',
     what: 'Keep a bare red LED shop sign between 10 and 20 milliamps by choosing its resistor, and make a motor turn the Ferris wheel at the same time.',
-    tip: 'Ohm’s law: the resistor must drop the voltage the LED does not use. R = (V − Vf) ÷ I = (6 − 2) ÷ 0.015 ≈ 267 Ω, so pick the nearest real value. Give the motor its own parallel path: it needs hundreds of milliamps and would starve if it shared the LED’s resistor.',
+    tip: 'Ohm’s law: the resistor must drop the voltage the LED does not use, so R = (V − Vf) ÷ I. Put in the battery’s voltage, the red LED’s 2 V and a current of about 15 mA (0.015 A), then pick the nearest real value from the parts box. Give the motor its own parallel path: it needs hundreds of milliamps and would starve if it shared the LED’s resistor.',
   },
   {
     name: 'Legend',
     who: '14 and up — a real design challenge',
     what: 'Design an automatic night-light: a light sensor (LDR) and a resistor form a voltage divider, a comparator watches the divider’s middle voltage and switches a white LED on when it gets dark. Daytime power must stay under 10 mW.',
-    tip: 'Work out the divider voltage at 100 lux and at 10 lux and put your threshold between them. Then check the power: P = V² ÷ R, so a 10 kΩ divider wastes about a hundred times less than a 100 Ω one. The white LED needs about 3 V, so its resistor is (4.5 − 3) ÷ 0.015 = 100 Ω.',
+    tip: 'Measure the divider’s middle voltage with the multimeter at 100 lux and at 10 lux, and put your threshold between them. Then check the power: P = V² ÷ R, so a divider made of big resistors wastes far less than one made of small ones. The white LED needs about 3 V; work out its resistor with Ohm’s law from the battery’s real voltage. The sensor sits indoors, where a daylit room is about 1,000 lux (outdoor sunshine is 10,000–100,000 lux).',
   },
 ]
 

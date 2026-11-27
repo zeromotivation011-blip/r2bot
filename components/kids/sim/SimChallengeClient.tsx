@@ -397,7 +397,7 @@ export default function SimChallengeClient({ arena: ch, design, onResult, onDesi
       </section>
 
       {/* Arena */}
-      <div ref={viewRef} className="flex min-w-0 scroll-mt-2 flex-col gap-2 lg:sticky lg:top-4">
+      <div ref={viewRef} className="flex min-w-0 scroll-mt-2 flex-col gap-2 lg:sticky lg:top-20">
         <div className="relative h-[44vh] min-h-[280px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0A1120] sm:h-[50vh] lg:h-[520px]">
           <Stage
             challenge={ch}

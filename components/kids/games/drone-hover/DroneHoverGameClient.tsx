@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import type { RoundResult } from '@/components/kids/ui/GameShellClient'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { getProgress } from '@/lib/kids-progress'
+import { kidsTimeLimit, useKidsCalm, useKidsReducedMotion } from '@/lib/kids/settings'
 import {
   buildMission,
   createSim,
@@ -18,6 +19,7 @@ import {
   DT,
   DRONE,
   G,
+  ACE_MIN_WIN,
   LEGEND_MIN_WIN,
   type FlightReport,
   type Gains,
@@ -125,13 +127,13 @@ const BRIEF: Record<TierIndex, { title: string; steps: string[] }> = {
     steps: [
       'Gusts all flight long, a 0.4 kg parcel at 10 s, target 5 m at 18 s.',
       'A big downdraft hits at 24 s, then the target drops to 2.5 m at 30 s.',
-      'Win: finish within 0.06 m with a flight score of 550+. Only an I term can beat the parcel’s sag that precisely.',
+      `Win: finish within 0.06 m with a flight score of ${ACE_MIN_WIN}+. Only an I term can beat the parcel’s sag that precisely.`,
     ],
   },
   3: {
     title: 'Legend — cascaded control, waypoint course',
     steps: [
-      `Six waypoints. Hold each one for 1.2 s inside its ring. Win: finish with a flight score of ${LEGEND_MIN_WIN}+ (finishing is not enough).`,
+      `Six waypoints. Hold each one for 1.2 s inside its ring. Win: finish with a flight score of ${LEGEND_MIN_WIN}+ (finishing is not enough). 3 stars need an I term.`,
       'Carry a 0.4 kg parcel and drop it at waypoint 4. Gusts up to 7 m/s sideways.',
       'The battery sags as it empties — less thrust for the same command (sped up: a real pack takes 10–15 minutes). No flight predictor: you are the engineer.',
     ],
@@ -204,7 +206,7 @@ function HoldButton({ onStep, label, children, disabled }: { onStep: () => void;
         // keyboard activation (Enter/Space) has detail 0; pointer presses are handled above
         if (e.detail === 0) onStep()
       }}
-      className="flex h-12 min-w-[48px] select-none items-center justify-center rounded-xl border border-white/20 bg-white/10 px-3 text-2xl font-black text-white hover:bg-white/20 active:scale-95 disabled:opacity-40"
+      className="flex h-12 min-w-[48px] select-none items-center max-lg:scroll-mb-32 justify-center rounded-xl border border-white/20 bg-white/10 px-3 text-2xl font-black text-white hover:bg-white/20 active:scale-95 disabled:opacity-40"
       style={{ touchAction: 'none' }}
     >
       {children}
@@ -217,7 +219,9 @@ function GainSlider({ def, value, onChange, disabled, live }: { def: SliderDef; 
   const clampV = (v: number) => Math.round(Math.max(def.min, Math.min(def.max, v)) / def.step) * def.step
   const decimals = def.step < 0.05 ? 2 : def.step < 1 ? (def.step < 0.1 ? 2 : 1) : 0
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+    // max-lg:scroll-mb-32: on phones the flight-controls bar is fixed at the bottom
+    // (~84px with its gap); focus and scroll-into-view keep the slider above it.
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-3 max-lg:scroll-mb-32">
       <div className="flex items-baseline justify-between gap-2">
         <label htmlFor={id} className="font-black text-white">
           {def.label} <span className="font-mono text-sm text-amber-300">{def.sym}</span>
@@ -237,7 +241,7 @@ function GainSlider({ def, value, onChange, disabled, live }: { def: SliderDef; 
           value={value}
           disabled={disabled}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="h-11 w-full cursor-pointer accent-amber-400 disabled:cursor-not-allowed"
+          className="h-11 w-full cursor-pointer accent-amber-400 disabled:cursor-not-allowed max-lg:scroll-mb-32"
           aria-describedby={`${id}-help`}
         />
         <HoldButton label={`Raise ${def.sym}`} onStep={() => onChange(clampV(value + def.step))} disabled={disabled}>
@@ -256,7 +260,16 @@ function GainSlider({ def, value, onChange, disabled, live }: { def: SliderDef; 
 
 export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props) {
   const tier = Math.max(0, Math.min(3, tierProp)) as TierIndex
-  const mission = useMemo(() => buildMission(tier), [tier])
+  // The Cadet clock (flying by hand) follows the kids "more time" setting; read once per round.
+  const mission = useMemo(() => buildMission(tier, kidsTimeLimit), [tier])
+  const reducedMotion = useKidsReducedMotion()
+  const calm = useKidsCalm()
+  const reducedRef = useRef(false)
+  const calmRef = useRef(false)
+  useEffect(() => {
+    reducedRef.current = reducedMotion
+    calmRef.current = calm
+  }, [reducedMotion, calm])
   const [gains, setGains] = useState<Gains>(() => defaultGains(tier))
   const [phase, setPhase] = useState<Phase>('ready')
   const [hud, setHud] = useState<Hud>(EMPTY_HUD)
@@ -367,8 +380,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
       const r = el.getBoundingClientRect()
       // Leave room for the sticky kids header above and the tab bar + action bar below.
       if (r.top < 64 || r.bottom > window.innerHeight - 150) {
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        el.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' })
+        el.scrollIntoView({ block: 'start', behavior: reducedRef.current ? 'auto' : 'smooth' })
       }
     }
   }, [mission, gains])
@@ -404,14 +416,18 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
       setReport(r)
       const fx = fxRef.current
       const v = viewRef.current
+      // Calm and less-motion: no screen shake, no red flash, a smaller burst.
+      const quiet = calmRef.current || reducedRef.current
       if (s.outcome === 'crash' && fx && v) {
         const p = dronePixel(v, s)
-        fx.burst(p.x, p.y, 40, '#fb923c')
-        fx.shake = 14
-        fx.flash = 1
+        fx.burst(p.x, p.y, quiet ? 10 : 40, '#fb923c')
+        if (!quiet) {
+          fx.shake = 14
+          fx.flash = 1
+        }
       } else if (r.stars > 0 && fx && v) {
         const p = dronePixel(v, s)
-        fx.burst(p.x, p.y, 36, '#fde047')
+        fx.burst(p.x, p.y, quiet ? 10 : 36, '#fde047')
         playSound('star')
       }
       const badges = r.stars > 0 ? ['hover-hero', ...(tier >= 2 ? ['pid-tuner'] : [])] : undefined
@@ -440,8 +456,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
     const ctx = canvas.getContext('2d')
     const pctx = plotCanvas.getContext('2d')
     if (!ctx || !pctx) return
-    const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const fx = new Fx(reduced)
+    const fx = new Fx(reducedRef.current)
     fxRef.current = fx
     let plotSize = { w: 300, h: 140, dpr: 1 }
 
@@ -540,6 +555,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
       } else {
         acc = 0
       }
+      fx.reduced = reducedRef.current
       if (v) {
         if (!pausedRef.current) fx.update(dtReal, s, v)
         drawWorld(ctx, v, s, fx, (now - start) / 1000)
@@ -620,9 +636,9 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
 
   return (
     <div ref={gridRef} className="grid gap-3 pb-24 lg:grid-cols-[minmax(0,1fr)_360px] lg:pb-0">
-      <div className="flex min-w-0 flex-col gap-2 lg:sticky lg:top-3 lg:self-start">
+      <div className="flex min-w-0 flex-col gap-2 lg:sticky lg:top-20 lg:self-start">
         <div className="relative h-[330px] overflow-hidden rounded-3xl border border-white/10 bg-slate-950 sm:h-[420px] lg:h-[470px]">
-          <canvas ref={worldRef} className="block h-full w-full scroll-mt-[84px]" role="img" aria-label={`Drone flight view. Height ${hud.z.toFixed(1)} metres, target ${hud.tz.toFixed(1)} metres.`} />
+          <canvas ref={worldRef} className="block h-full w-full scroll-mt-2" role="img" aria-label={`Drone flight view. Height ${hud.z.toFixed(1)} metres, target ${hud.tz.toFixed(1)} metres.`} />
 
           {/* HUD */}
           <div className="pointer-events-none absolute left-2 top-2 flex flex-wrap gap-1.5 text-xs font-bold sm:text-sm" aria-live="off">

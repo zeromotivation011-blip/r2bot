@@ -346,3 +346,36 @@ Independent checks of Wave 2 found these; all fixed and re-tested on a productio
   restore. mastery.verify covers it.
 
 Not changed: `/kids/parents` (171 kB) and `/kids/settings` (168 kB) were not split further.
+
+## 27 Nov 2026 — Wave 3, batch E (every games QA finding)
+
+Seven game owners re-checked every finding in `docs/kids-games-qa-todo.md` against the Wave 2 code,
+fixed what still reproduced and recorded "ALREADY FIXED" (with file:line) for the rest; each game
+now has a verify in CI (`components/kids/games/<id>/<id>.verify.ts`, quality.yml).
+- [x] **Sky Port (drone-hover)** — Ace minimum win 550 → 600 (random tunes win 10.2%), Legend 3★
+  needs a working I term, Cadet clock follows "more time", kids less-motion/calm stop shake/flash,
+  brand dusk sky (no purple), phone controls `scroll-mb-32` above the fixed bar.
+- [x] **Circuit City** — a flat battery never blames correct wiring (full-battery re-judge), true
+  series/no-path debriefs, Legend hints give no values (random Legend wins 0.40%), paid hints cap
+  at 2★, lux ladder and built-in resistor labels true, kids motion settings honoured.
+- [x] **Train the Robot Brain** — 45° exam + whole-set augmentation (random design 7.5%), samples
+  cap at 2★, new parcels per page load, true delete/augment debriefs, leave-one-out column, phone
+  fit. Pilot 1★ (13/16) stays reachable on purpose (sim plateaus near 89%; harder defaults were
+  luck) — the one item kept open in the QA file.
+- [x] **Arm Factory** — true Legend shift debrief per cause, 60 s takt (random speeds 8/300, never
+  2★), helper ghost caps at 2★, "more time" on re-runs, phone camera buttons/Stop off the view.
+- [x] **Mars Rover Command** — Legend stars 40/60/85% of per-map par (no battery or no VO → no 3★),
+  stuck-rover debrief names the real cause, `addCmd()` pure and verified.
+- [x] **Swarm Reef** — `LEGEND_STARS`, trail detection threshold (random win falls each tier;
+  Legend 2.5%, never 3★), true failure headlines, hint cap, phone reef pinned under the header.
+- [x] **Maze Mapper** — Legend 3★ = top 5% of 288 brains, true Ace/Pilot/Legend debriefs, Cadet
+  hint caps at 2★, live kids settings, "Run this brain" scrolls the maze back.
+- [x] **Shared (integrator):** `RoundResult.hintsUsed` → `reportBestRun` (GameShellClient); results
+  card `fixed inset-0 z-50` + inner scroll; reward toasts pass taps through on /kids/play/*; kids
+  `overflow-x: clip` so sticky works (header now sticks; `lg:sticky` panels moved to `lg:top-20`;
+  Mars Rover's phone map pins under the header); `scroll-padding-top` for the header; lastmod for
+  the six play pages whose copy changed (`lib/content-dates.ts`). shell.verify covers the first three.
+
+Left open: a shared compact status strip for phones (maze-mapper's status line sits below the fold
+during play; optional, every control is on screen) — not built.
+

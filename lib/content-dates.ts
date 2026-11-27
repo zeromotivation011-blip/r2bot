@@ -100,6 +100,13 @@ export const PAGE_UPDATED: Record<string, string> = {
   '/kids/play/smart-farm': '2026-11-26T00:00:00.000Z',
   '/kids/play/robot-city': '2026-11-26T00:00:00.000Z',
   '/kids/play/orbit-repair': '2026-11-26T00:00:00.000Z',
+  // Wave 3 games QA (27 Nov 2026): page copy changed with the fixed star rules / debriefs.
+  '/kids/play/mars-rover': '2026-11-27T00:00:00.000Z',
+  '/kids/play/drone-hover': '2026-11-27T00:00:00.000Z',
+  '/kids/play/circuit-city': '2026-11-27T00:00:00.000Z',
+  '/kids/play/arm-factory': '2026-11-27T00:00:00.000Z',
+  '/kids/play/robot-brain': '2026-11-27T00:00:00.000Z',
+  '/kids/play/swarm-reef': '2026-11-27T00:00:00.000Z',
   '/kids/galaxy': '2026-11-27T00:00:00.000Z',
   '/kids/galaxy/concepts': '2026-11-27T00:00:00.000Z',
   '/kids/workshop': '2026-11-27T00:00:00.000Z',

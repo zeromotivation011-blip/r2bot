@@ -3,7 +3,7 @@
 // and a tiny diagram for each. Shared by the game UI. No hooks, no state.
 
 import type { ReactNode } from 'react'
-import type { TierIndex, WeightKey } from './sim'
+import { RANGES, type TierIndex, type WeightKey } from './sim'
 
 export interface RuleDef {
   key: WeightKey
@@ -31,9 +31,7 @@ export const RULES: Record<WeightKey, RuleDef> = {
     name: 'Separation',
     kid: 'Don’t bump! Move away from robots that are too close.',
     pro: 'Repulsion from neighbours inside personal space, stronger the closer they are.',
-    min: 0,
-    max: 3,
-    step: 0.1,
+    ...RANGES.sep,
     icon: (
       <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
         <Dot x={13} y={16} />
@@ -47,9 +45,7 @@ export const RULES: Record<WeightKey, RuleDef> = {
     name: 'Alignment',
     kid: 'Copy your neighbours: swim the same way they swim.',
     pro: 'Steer toward the average velocity of the neighbours you can sense.',
-    min: 0,
-    max: 3,
-    step: 0.1,
+    ...RANGES.ali,
     icon: (
       <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
         <path d="M4 9h20m-4-4 4 4-4 4M4 16h20m-4-4 4 4-4 4M4 23h20m-4-4 4 4-4 4" {...stroke} />
@@ -61,9 +57,7 @@ export const RULES: Record<WeightKey, RuleDef> = {
     name: 'Cohesion',
     kid: 'Stay together: move toward the middle of your neighbours.',
     pro: 'Steer toward the centre of mass of the neighbours you can sense.',
-    min: 0,
-    max: 3,
-    step: 0.1,
+    ...RANGES.coh,
     icon: (
       <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
         <Dot x={16} y={16} />
@@ -76,9 +70,7 @@ export const RULES: Record<WeightKey, RuleDef> = {
     name: 'Go to food',
     kid: 'Head for the food — if you can smell it.',
     pro: 'Goal-seeking steer. Only informed robots (gold scouts) sense the goal from afar.',
-    min: 0,
-    max: 3,
-    step: 0.1,
+    ...RANGES.goal,
     icon: (
       <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
         <circle cx={16} cy={16} r={11} {...stroke} />
@@ -92,9 +84,7 @@ export const RULES: Record<WeightKey, RuleDef> = {
     name: 'Avoid rocks',
     kid: 'Feel the rock before you hit it, and turn away.',
     pro: 'Repulsion from obstacles inside sensing range, with a short look-ahead along your velocity.',
-    min: 0,
-    max: 3,
-    step: 0.1,
+    ...RANGES.avoid,
     icon: (
       <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
         <path d="M18 26c-4 0-8-3-8-7 0-5 5-8 9-7s7 4 6 8c0 3-3 6-7 6z" fill="currentColor" opacity={0.35} />
@@ -107,9 +97,7 @@ export const RULES: Record<WeightKey, RuleDef> = {
     name: 'Shape pull',
     kid: 'Swim to the nearest bit of the glowing shape.',
     pro: 'Spring toward the closest point of the broadcast shape. No robot has an assigned slot.',
-    min: 0,
-    max: 3,
-    step: 0.1,
+    ...RANGES.shape,
     icon: (
       <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
         <circle cx={16} cy={16} r={11} {...stroke} strokeDasharray="4 4" />
@@ -122,9 +110,7 @@ export const RULES: Record<WeightKey, RuleDef> = {
     name: 'Explore',
     kid: 'Go where the trail is faint — places nobody has searched.',
     pro: 'Descend the shared trail field: steer toward the direction with the least pheromone.',
-    min: 0,
-    max: 3,
-    step: 0.1,
+    ...RANGES.explore,
     icon: (
       <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
         <circle cx={16} cy={16} r={12} {...stroke} />
@@ -137,9 +123,7 @@ export const RULES: Record<WeightKey, RuleDef> = {
     name: 'Leave a trail',
     kid: 'Drop a fading glow wherever you swim, so others know you were here.',
     pro: 'Deposit rate of a virtual pheromone that evaporates over time (stigmergy).',
-    min: 0,
-    max: 4,
-    step: 0.1,
+    ...RANGES.trail,
     icon: (
       <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
         <circle cx={5} cy={24} r={1.5} fill="currentColor" opacity={0.3} />
@@ -154,9 +138,7 @@ export const RULES: Record<WeightKey, RuleDef> = {
     name: 'Sensing radius',
     kid: 'How far each robot can see. Robots only know about neighbours inside this circle.',
     pro: 'Neighbourhood radius in world units (the reef is 1000 × 700). In Legend, sensing costs battery.',
-    min: 20,
-    max: 160,
-    step: 5,
+    ...RANGES.radius,
     unit: '',
     icon: (
       <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden>
@@ -223,15 +205,15 @@ export const BRIEFS: Record<TierIndex, Brief> = {
   },
   3: {
     title: 'Search and rescue',
-    goal: 'Find at least 5 of 6 hidden beacons and search 75% of the reef before the batteries run out.',
+    goal: 'Find at least 5 of 6 hidden beacons and search 85% of the reef, with 10 collisions or fewer, before the batteries run out.',
     steps: [
-      '14 robots leave the dock. Dark water has not been searched yet. The mission ends when every battery is flat.',
+      '14 robots leave the dock. Dark water has not been searched yet. The mission ends when every battery is flat, or once the whole reef has been searched.',
       'Batteries drain from moving and from sensing: a bigger radius sees more but empties faster. Every crash and bump costs battery too.',
-      '3 stars: all 6 beacons, 90% searched, 3 collisions or fewer.',
+      '2 stars: 88% searched with 6 collisions or fewer. 3 stars: all 6 beacons, 90% searched, 3 collisions or fewer — the far corners are the hard part.',
     ],
     hints: [
       'A tight flock searches like one big robot. To search, robots need to spread out.',
-      'Robots have no map. “Leave a trail” lets them mark where they have been — the orange glow.',
+      'Robots have no map. “Leave a trail” lets them mark where they have been — the orange glow. A very faint trail is too weak for their sensors to notice.',
       '“Explore” makes each robot swim away from the trail, toward water nobody has searched.',
       'Watch when the batteries go flat. A big radius sees a wide strip but dies early; a small one lasts longer but sees a thin strip. Find the balance.',
     ],

@@ -179,7 +179,7 @@ function Cadet({ onFinish }: { onFinish: Finish }) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
       <div className="flex flex-col gap-3">
-        <div ref={viewRef} className="scroll-mt-20 overflow-hidden rounded-[28px] border border-white/10 bg-[#0A1120]">
+        <div ref={viewRef} className="scroll-mt-2 overflow-hidden rounded-[28px] border border-white/10 bg-[#0A1120]">
           <CadetScene task={ch.task} trick={runId > 0 ? trick : null} outcome={runId > 0 ? outcome : null} p={runId > 0 ? p : 0} t={t} />
         </div>
         <Steps n={rounds.length} at={idx} />
@@ -334,7 +334,7 @@ function Pilot({ onFinish }: { onFinish: Finish }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-      <div ref={viewRef} className="flex scroll-mt-20 flex-col gap-3">
+      <div ref={viewRef} className="flex scroll-mt-2 flex-col gap-3">
         <Steps n={3} at={st} labels={STATIONS.map((s) => `${s.emoji} ${s.name}`)} />
         {station === 'quad' && (
           <>
@@ -637,7 +637,7 @@ function Ace({ onFinish }: { onFinish: Finish }) {
           <h2 className="font-display text-xl font-black text-[#EEF2F8]">{mission.name}</h2>
           <p className="mt-1 text-[15px] text-[#A7B0C0]">{mission.story}</p>
         </div>
-        <div ref={viewRef} className="scroll-mt-20 overflow-hidden rounded-[28px] border border-white/10">
+        <div ref={viewRef} className="scroll-mt-2 overflow-hidden rounded-[28px] border border-white/10">
           <CourseStrip course={mission.course} result={result} p={runId > 0 ? p : 0} t={t} running={runId > 0} />
         </div>
         <div className="grid grid-cols-3 gap-2">
@@ -850,7 +850,7 @@ function Legend({ onFinish }: { onFinish: Finish }) {
           <p className="mt-2 text-xs text-[#A7B0C0]">Ice: μ = 0.15. Glass needs pads holding 2 × weight (pads hold 100 N). Wings lift 40 N at most.</p>
         </div>
         {results && cur && (
-          <div ref={viewRef} className="flex scroll-mt-20 flex-col gap-3">
+          <div ref={viewRef} className="flex scroll-mt-2 flex-col gap-3">
             <p className="text-xs font-black uppercase tracking-wide text-lime-300">{final ? 'Final test · never-seen courses' : 'Practice courses'}</p>
             <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Courses">
               {results.map((r, i) => (

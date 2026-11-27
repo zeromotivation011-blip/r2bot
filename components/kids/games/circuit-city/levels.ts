@@ -37,6 +37,12 @@ export interface TierDef {
   /** Fewest parts a tidy solution needs (for the score). */
   minParts: number
   hints: string[]
+  /**
+   * How many hints only explain the idea. Any hint past these gives away part
+   * of the answer, so it caps the finish at 2 stars (the shared hint rule:
+   * the round reports `hintsUsed`, and reportActivity enforces the cap).
+   */
+  freeHints: number
   defaultOhms: number
 }
 
@@ -63,6 +69,7 @@ export const TIERS: TierDef[] = [
       'Choose Wire, then drag from dot to dot along the top row: from the battery’s top (+) to the house light’s top. Do the same along the bottom row.',
       'Pick the Switch and drop it on one of the wire gaps — or remove one wire and put the switch there. Tap the switch to turn it on.',
     ],
+    freeHints: 1,
     defaultOhms: 1000,
   },
   {
@@ -86,6 +93,7 @@ export const TIERS: TierDef[] = [
       'In series, the 6 V is shared: each LED lamp needs about 2 V before it even starts to glow, so three in a row leave almost nothing.',
       'Make a ladder: a top rail from + and a bottom rail to −, with each lamp as its own rung between them (parallel). Each lamp then gets the full 6 V.',
     ],
+    freeHints: 2,
     defaultOhms: 1000,
   },
   {
@@ -112,6 +120,7 @@ export const TIERS: TierDef[] = [
       'For 15 mA: R = 4 V ÷ 0.015 A ≈ 267 Ω. The nearest values you can pick are 220 Ω and 330 Ω.',
       'Give the motor its own rung straight across the battery (parallel). If it shares the LED’s path, the resistor starves it.',
     ],
+    freeHints: 1,
     defaultOhms: 1000,
   },
   {
@@ -136,9 +145,10 @@ export const TIERS: TierDef[] = [
     minParts: 14,
     hints: [
       'An LDR’s resistance is low in bright light (a few hundred Ω) and huge in the dark (tens of kΩ). Put it in series with a resistor across the battery: that is a voltage divider.',
-      'Build your divider, then be a scientist: set the sky slider to dusk (100 lux) and measure the middle point with the Multimeter, then do the same at 10 lux. Your threshold must sit between those two readings — and the mode decides which side means ON.',
+      'Build your divider, then be a scientist: set the sky slider to 100 lux (late afternoon) and measure the middle point with the Multimeter, then do the same at 10 lux (dusk). Your threshold must sit between those two readings — and the mode decides which side means ON.',
       'The LED branch is a loop of its own: + → a resistor → the LED (+ leg towards +) → the comparator’s switch → −. Work the resistor out with Ohm’s law from the battery’s real voltage and the white LED’s 3 V. Daytime power is mostly the divider: P = V² ÷ R, so bigger divider resistors waste less.',
     ],
+    freeHints: 1,
     defaultOhms: 1000,
   },
 ]
@@ -238,12 +248,13 @@ export interface TestReport {
 }
 
 // Light at the sensor, which sits indoors by a bedroom window. A daylit room
-// is a few hundred to ~1,000 lux; outdoors it would be 10,000–100,000 lux.
+// is a few hundred to ~1,000 lux; outdoors it would be 10,000–100,000 lux
+// (overcast ~1,000–10,000). Indoors at dusk is ~10 lux; a moonless night < 1 lux.
 export const LEGEND_SWEEP = [
   { lux: 1000, label: 'Noon in the room' },
   { lux: 300, label: 'Cloudy afternoon' },
-  { lux: 100, label: 'Dusk' },
-  { lux: 10, label: 'Lights low' },
+  { lux: 100, label: 'Late afternoon' },
+  { lux: 10, label: 'Dusk' },
   { lux: 3, label: 'Night' },
   { lux: 1, label: 'Midnight' },
 ]
@@ -256,11 +267,19 @@ export function batteryCharge(parts: Part[]): number {
   return b ? b.charge ?? 1 : 1
 }
 
-export function flatBatteryText(parts: Part[]): string {
+/** The same board with the battery swapped for a full one. */
+export function withFreshBattery(parts: Part[]): Part[] {
+  return parts.map((p) => (p.kind === 'battery' ? { ...p, charge: 1 } : p))
+}
+
+export function flatBatteryText(parts: Part[], wiringOk: boolean, freshWhy = ''): string {
   const b = parts.find((p) => p.kind === 'battery')
   const c = batteryCharge(parts)
   const emf = b ? batteryEmf(b) : 0
-  return `The battery is flat — only ${Math.round(c * 100)}% left, so it pushes just ${formatVolts(emf)} instead of ${formatVolts(b ? (b.cells ?? 2) * 1.5 : 0)}. The short circuit drained it. A flat battery can’t push enough current, so this test can’t judge your wiring yet. Tap “Fit fresh batteries” and test again.`
+  const full = b ? (b.cells ?? 2) * 1.5 : 0
+  const head = `The battery is ${c < FLAT_CHARGE ? 'flat' : 'low'}: only ${Math.round(c * 100)}% left, so it pushes ${formatVolts(emf)} instead of ${formatVolts(full)}. A short circuit drains a battery fast.`
+  if (wiringOk) return `${head} Your wiring is right: with fresh batteries this circuit passes. Tap “Fit fresh batteries” and test again.`
+  return `${head} Tap “Fit fresh batteries”. Even with fresh batteries, though, this circuit would not pass yet: ${freshWhy}`
 }
 
 function runTierTest(def: TierDef, parts: Part[]): TestReport {
@@ -278,10 +297,16 @@ function runTierTest(def: TierDef, parts: Part[]): TestReport {
 
 export function runTest(def: TierDef, parts: Part[]): TestReport {
   const report = runTierTest(def, parts)
-  // A drained battery makes good wiring look broken. Say so before any
-  // wiring diagnosis, so a child is never told a correct circuit is wrong.
-  if (!report.pass && batteryCharge(parts) < FLAT_CHARGE) return { ...report, why: flatBatteryText(parts), flat: true }
-  return report
+  if (report.pass || batteryCharge(parts) >= 0.999) return report
+  // A drained battery makes good wiring look broken (a dim LED reads as "series"
+  // or "resistor too big"). Judge the same wiring on a full battery first, so a
+  // child is never told a correct circuit is wrong.
+  const fresh = runTierTest(def, withFreshBattery(parts))
+  if (fresh.pass) return { ...report, why: flatBatteryText(parts, true), flat: true }
+  if (batteryCharge(parts) < FLAT_CHARGE) return { ...report, why: flatBatteryText(parts, false, fresh.why), flat: true }
+  // Low but not flat, and the wiring itself is the problem: explain the wiring
+  // as it behaves on a full battery.
+  return { ...report, why: `Your battery is at ${Math.round(batteryCharge(parts) * 100)}%, so here is what this wiring does on a full one: ${fresh.why}` }
 }
 
 function testCadet(def: TierDef, parts: Part[]): TestReport {
@@ -322,11 +347,20 @@ function testPilot(def: TierDef, parts: Part[]): TestReport {
   let why: string
   const backwards = lamps.find((l) => l && (s1.vd.get(l.id) ?? 0) < -0.5)
   const currents = lamps.map((l) => (l ? partCurrent(s1, l.id) : 0))
-  const same = currents.every((c) => Math.abs(c - currents[0]) < 1e-4)
+  // Topology, not brightness: swap each lamp for a plain two-way resistor and
+  // look at the currents. Equal non-zero currents = one shared path (series);
+  // zero = no complete loop through that lamp. (A dim lamp alone can't tell
+  // series wiring from a flat battery or a missing wire.)
+  const linear = solve(base.map((p) => (p.loadId && ids.includes(p.loadId) ? { ...p, kind: 'resistor' as const, ohms: 220, burnt: false } : p)), def.lux)
+  const linI = lamps.map((l) => (l ? Math.abs(partCurrent(linear, l.id)) : 0))
+  const unpowered = lamps.flatMap((l, k) => (l && linI[k] < 1e-5 ? [k + 1] : []))
+  const series = !unpowered.length && linI.every((c) => Math.abs(c - linI[0]) < 0.01 * linI[0])
   if (!lamps.every(Boolean)) why = 'Not all three streetlights are on the board yet. Place lamps 1, 2 and 3.'
   else if (s1.shorted) why = 'A wire connects + straight to −, a short circuit. The current takes that easy path and the lamps get almost nothing.'
   else if (backwards) why = `Lamp ${backwards.loadId?.slice(1)} is backwards. An LED is a one-way street for current: its + leg must face the battery’s + side. Select it and press Flip.`
-  else if (!allBright && same && currents[0] < 0.01)
+  else if (!allBright && unpowered.length)
+    why = `${unpowered.length === 3 ? 'None of the lamps has' : `Lamp ${unpowered.join(' and lamp ')} ${unpowered.length === 1 ? 'has' : 'have'}`} no complete path from + back to −, so no current can flow there. Wire a + rail and a − rail, and connect each lamp between them.`
+  else if (!allBright && series)
     why = `The lamps are in series — one single path. They share the 6 V, and each LED needs about 2 V before it glows, so almost no current gets through (${formatAmps(currents[0])}). Give each lamp its own path (parallel).`
   else if (!allBright) why = 'Some lamps are dim or dark. Each lamp needs its own complete path from + to −. Check for gaps and lamps sharing a path.'
   else if (!survive)
@@ -423,6 +457,22 @@ function senseText(parts: Part[], sol: Solution): string {
   const vs = sol.v.get(c.sense)
   if (vs === undefined) return 'The comparator’s sense lead touches a dot with nothing on it.'
   return `The sense point was ${formatVolts(vs)}, and your comparator switches ON when it is ${c.mode === 'above' ? 'above' : 'below'} ${formatVolts(c.threshold ?? 2)}.`
+}
+
+/**
+ * Stars for a passed test. Mistakes (shorts, popped LEDs) and design quality
+ * set the base; then the shared hint rule: any hint that gives away part of
+ * the answer caps the finish at 2 stars. On the design tiers (Ace, Legend)
+ * guess-and-test (more than three judged tests) caps at 2 as well.
+ */
+export function roundStars(o: { mistakes: number; quality: number; paidHints: number; attempts: number; designTier: boolean }): number {
+  let stars = o.mistakes === 0 ? 3 : o.mistakes <= 2 ? 2 : 1
+  // Quality (how close to the ideal design): ±3 mA of 15 mA, or a frugal night-light, keeps 3.
+  if (o.quality < 0.7) stars = Math.min(stars, 2)
+  if (o.quality < 0.35) stars = Math.min(stars, 1)
+  if (o.paidHints > 0) stars = Math.min(stars, 2)
+  if (o.designTier && o.attempts > 3) stars = Math.min(stars, 2)
+  return Math.max(1, stars)
 }
 
 /** Ideal resistor for an LED at a target current, for the Ohm's-law helper. */

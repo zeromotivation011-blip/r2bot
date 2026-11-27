@@ -87,6 +87,15 @@ export class Fx {
   private rings: Ring[] = []
   constructor(private reduced: boolean) {}
 
+  /** Reduced motion or calm mode (kids Settings): no sparkles, rings or bursts. */
+  setQuiet(q: boolean): void {
+    this.reduced = q
+    if (q) {
+      this.ps = []
+      this.rings = []
+    }
+  }
+
   /** Little sparkles where squares become known (in square units). */
   sparkle(cx: number, cy: number, color: string, n = 3): void {
     if (this.reduced || this.ps.length > 260) return

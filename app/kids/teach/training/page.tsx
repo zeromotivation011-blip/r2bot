@@ -70,7 +70,7 @@ export default function TrainingPage() {
         </p>
       </header>
 
-      <div className="teach-no-print sticky top-2 z-10 mt-6">
+      <div className="teach-no-print sticky top-20 z-10 mt-6">
         <TrainingProgressClient />
       </div>
 

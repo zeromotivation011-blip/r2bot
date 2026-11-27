@@ -1219,10 +1219,19 @@ export interface LegendSweep {
   results: Map<string, RunSummary>
   /** Mission costs of every brain, best first (Infinity = did not get out). */
   costs: number[]
-  /** Cost needed for 3 stars (top 10%) and 2 stars (top 40%). */
+  /** Cost needed for 3 stars (top LEGEND_THREE_SHARE) and 2 stars (top LEGEND_TWO_SHARE). */
   three: number
   two: number
 }
+
+/**
+ * Legend stars are relative to every brain the panel can build on that maze.
+ * 3 stars = the best 5% (was 10%: a random brain then had a 1-in-10 chance of
+ * 3 stars, which is luck, not engineering). Ties at the cut all count, so the
+ * real share can be a little higher; legend.verify keeps it under 8%.
+ */
+export const LEGEND_THREE_SHARE = 0.05
+export const LEGEND_TWO_SHARE = 0.4
 
 const sweepCache = new Map<number, { todo: AutoSettings[]; results: Map<string, RunSummary>; done: LegendSweep | null }>()
 
@@ -1247,7 +1256,7 @@ export function legendSweep(idx: number, budgetMs = Infinity): LegendSweep | nul
   }
   const costs = [...st.results.values()].map(missionCost).sort((a, b) => a - b)
   const at = (q: number): number => costs[Math.max(0, Math.ceil(q * costs.length) - 1)]
-  st.done = { results: st.results, costs, three: at(0.1), two: at(0.4) }
+  st.done = { results: st.results, costs, three: at(LEGEND_THREE_SHARE), two: at(LEGEND_TWO_SHARE) }
   return st.done
 }
 

@@ -202,9 +202,11 @@ export class Fx {
 
 function drawSky(ctx: CanvasRenderingContext2D, v: View, fx: Fx, time: number): void {
   const g = ctx.createLinearGradient(0, 0, 0, v.h)
-  g.addColorStop(0, '#0b1026')
-  g.addColorStop(0.45, '#2a1650')
-  g.addColorStop(0.8, '#7c2d5a')
+  // Brand dusk (docs/kids-design.md): R2BOT navy overhead, slate-blue, a rust
+  // glow and an orange horizon. No purple: the green band must read over it.
+  g.addColorStop(0, '#0A1120')
+  g.addColorStop(0.45, '#19263F')
+  g.addColorStop(0.8, '#5a2f24')
   g.addColorStop(1, '#f97316')
   ctx.fillStyle = g
   ctx.fillRect(0, 0, v.w, v.h)
@@ -233,7 +235,7 @@ function drawSky(ctx: CanvasRenderingContext2D, v: View, fx: Fx, time: number): 
   ctx.stroke()
 
   for (const c of fx.clouds) {
-    ctx.fillStyle = 'rgba(196,181,253,0.10)'
+    ctx.fillStyle = 'rgba(148,163,184,0.10)'
     ctx.beginPath()
     ctx.ellipse(c.x, c.y, c.r * 1.8, c.r * 0.55, 0, 0, Math.PI * 2)
     ctx.ellipse(c.x + c.r * 0.8, c.y - c.r * 0.25, c.r, c.r * 0.5, 0, 0, Math.PI * 2)
@@ -244,7 +246,7 @@ function drawSky(ctx: CanvasRenderingContext2D, v: View, fx: Fx, time: number): 
 function drawCity(ctx: CanvasRenderingContext2D, v: View, fx: Fx): void {
   for (const b of fx.buildings) {
     const top = v.oy - b.h
-    ctx.fillStyle = '#1a1236'
+    ctx.fillStyle = '#111C32'
     ctx.fillRect(b.x, top, b.w, b.h)
     ctx.fillStyle = 'rgba(251,191,36,0.55)'
     for (const w of b.windows) if (w.on) ctx.fillRect(b.x + w.x, top + w.y, 4, 5)

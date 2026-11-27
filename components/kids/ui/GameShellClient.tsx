@@ -36,6 +36,8 @@ export interface RoundResult {
   message: string
   badges?: string[]
   attempts?: number
+  /** A hint was used this round: the shared rule caps the finish at 2 stars (reportActivity enforces it). */
+  hintsUsed?: boolean
 }
 
 export interface GameApi {
@@ -135,6 +137,7 @@ export function GameShell({ game, howToPlay, lesson, exitHref = '/kids/play', ch
           lowerIsBetter: r.lowerIsBetter,
           badges: r.badges,
           attempts: r.attempts,
+          hintsUsed: r.hintsUsed,
           xp: 20 + tier * 15,
         })
         playSound('correct')
@@ -187,8 +190,8 @@ export function GameShell({ game, howToPlay, lesson, exitHref = '/kids/play', ch
         {children({ tier, round, finish, restart })}
 
         {result && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center rounded-3xl bg-[#0A1120]/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Round results">
-            <div className="w-full max-w-md rounded-3xl border-2 border-amber-300/50 bg-gradient-to-b from-[#19263F] to-[#0A1120] p-6 text-center shadow-2xl">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A1120]/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Round results">
+            <div className="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl border-2 border-amber-300/50 bg-gradient-to-b from-[#19263F] to-[#0A1120] p-6 text-center shadow-2xl">
               <p className="text-4xl" aria-label={`${result.round.stars} stars`}>
                 {[0, 1, 2].map((i) => (
                   <span key={i} className={i < result.round.stars ? '' : 'opacity-20 grayscale'}>⭐</span>

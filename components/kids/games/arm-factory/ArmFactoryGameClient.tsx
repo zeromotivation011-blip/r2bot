@@ -43,7 +43,7 @@ const HOW_TO_PLAY = (
         <b>Ace:</b> tap a spot and the arm solves its own joint angles. Pick elbow-up or elbow-down, add waypoints, and steer round the yellow pillar.
       </li>
       <li>
-        <b>Legend:</b> write a looping program for 8 parts. Heavy parts (⚖) slip or overload the motor if you move too fast. Beat the cycle time.
+        <b>Legend:</b> write a looping program for 8 parts. Heavy parts (⚖) slip or overload the motor if you move too fast, but slowing every move makes the shift too slow: it must finish in 60 s.
       </li>
     </ul>
     <p>Use the Front / Top / Side buttons to look from another angle — Top view is great for aiming.</p>

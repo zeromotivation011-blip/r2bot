@@ -81,7 +81,7 @@ const TIERS = [
     name: 'Legend',
     who: '14 and up — a real research problem',
     what: 'Search and rescue. Fourteen robots with limited batteries must find six hidden beacons and search as much of the reef as possible. Moving costs energy and so does sensing: a bigger radius sees more but drains faster, and every crash or bump costs battery too. The mission ends when the last battery is flat.',
-    tip: 'A flock is a terrible search pattern — it searches like one big robot. Spread out with separation and almost no cohesion. Then give the swarm a memory: robots leave a fading trail and “explore” steers each one away from trails, toward unsearched water. For three stars, balance the trail strength against how fast it fades, and pick a radius that sees enough without killing the battery — a big radius searches a wide strip but dies early.',
+    tip: 'A flock is a terrible search pattern — it searches like one big robot. Spread out with separation and almost no cohesion. Then give the swarm a memory: robots leave a fading trail and “explore” steers each one away from trails, toward unsearched water. Make the trail strong enough to notice: like any real sensor, a robot’s trail sensor has a detection threshold, and a very faint trail reads as clean water. For three stars, balance the trail strength against how fast it fades, and pick a radius that sees enough without killing the battery — a big radius searches a wide strip but dies early.',
   },
 ]
 

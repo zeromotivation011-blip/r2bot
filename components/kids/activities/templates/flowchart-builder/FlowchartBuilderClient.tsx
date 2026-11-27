@@ -175,7 +175,7 @@ export default function FlowchartBuilderClient({ params, onSubmit, onDone }: Tem
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:items-start">
-      <Panel title="The robot's flowchart" className="lg:sticky lg:top-4">
+      <Panel title="The robot's flowchart" className="lg:sticky lg:top-20">
         <div className="overflow-x-auto rounded-xl bg-[#060B16]">
           <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" style={{ minWidth: Math.round(W * SVG_MIN_SCALE) }} role="img" aria-label={`Flowchart with ${params.nodes.length} boxes${step && token ? `. The robot is at ${nodeText(token)}` : ''}.`}>
             <defs>

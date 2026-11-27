@@ -86,10 +86,12 @@ export const VARIATION = {
   everyday: { rot: 14, scale: [0.7, 1.05], shift: 0.08, jitter: 0.025, wobble: 0.07, stretch: 0.18, specks: 0 },
   /** Cadet and Pilot test parcels: strangers' handwriting, often hurried. */
   strangers: { rot: 20, scale: [0.55, 1.05], shift: 0.13, jitter: 0.03, wobble: 0.08, stretch: 0.22, specks: 0, sloppy: 0.4 },
-  /** Legend's unseen exam: strongly tilted, squashed, scaled, moved, smudged, sometimes hurried. */
-  wild: { rot: 35, scale: [0.45, 1.05], shift: 0.2, jitter: 0.035, wobble: 0.09, stretch: 0.32, specks: 0.7, sloppy: 0.25 },
-  /** For augmentation of the child's own drawings: turned up to 35° either way. */
-  augment: { rot: 35, scale: [0.6, 1.0], shift: 0.15, jitter: 0, wobble: 0, stretch: 0.25, specks: 0 },
+  /** Legend's unseen exam: strongly tilted (parcels ride the belt at any angle), squashed, scaled, moved,
+   *  smudged, sometimes hurried. 45° is past what engineered features tolerate, so the exam needs turned
+   *  training data (augmentation), not just a good k. */
+  wild: { rot: 45, scale: [0.45, 1.05], shift: 0.2, jitter: 0.035, wobble: 0.09, stretch: 0.32, specks: 0.7, sloppy: 0.25 },
+  /** For augmentation of the training data: turned up to 45° either way, like the exam. */
+  augment: { rot: 45, scale: [0.6, 1.0], shift: 0.15, jitter: 0, wobble: 0, stretch: 0.25, specks: 0 },
 } satisfies Record<string, Variation>
 
 /** What happened to a generated drawing — used to explain mistakes. */

@@ -81,7 +81,7 @@ const TIERS = [
   {
     name: 'Legend',
     who: '14 and up — a real mission-planning challenge',
-    what: 'One whole Mars day. Four targets worth different points, a solar battery that charges only when the Sun is high, and relay passes that carry only 40, 60 and 40 MB. Score is the science that reaches Earth, plus energy left for the night. Every map has a par score from our solver, and ★★★ needs 85% of it.',
+    what: 'One whole Mars day. Four targets worth different points, a solar battery that charges only when the Sun is high, and relay passes that carry only 40, 60 and 40 MB. Score is the science that reaches Earth, plus energy left for the night. Every map has a par score from our solver: ★ needs 40% of it (about two targets home), ★★ 60% and ★★★ 85%.',
     tip: 'At dawn the heaters are still running and the Sun is weak, so driving straight away drains the battery fast: think about a Wait or the Power guard. Time your samples so their data catches a relay pass. AutoNav needs good position knowledge, so pair it with Visual odometry. Pictures cost bandwidth: take one only when it changes a decision.',
   },
 ]

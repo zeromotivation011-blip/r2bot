@@ -142,7 +142,7 @@ export default function PredictOutputClient({ params, onSubmit, onDone, band }: 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-start">
       <Panel
-        className="lg:sticky lg:top-4"
+        className="lg:sticky lg:top-20"
         title={
           <span className="flex items-center justify-between gap-2">
             <span>The robot&apos;s program</span>

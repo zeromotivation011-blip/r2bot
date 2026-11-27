@@ -17,14 +17,14 @@ export const WORLD_W = 1000
 export const WORLD_H = 700
 export const DT = 1 / 60
 export const ROBOT_R = 5
-const ACC = 190 // steering acceleration, units/s² per unit of rule push
+export const ACC = 190 // steering acceleration, units/s² per unit of rule push
 /**
  * Thruster limit: the SUM of all rule pushes is capped, so a robot can never
  * accelerate harder than F_MAX × ACC (≈ 475 units/s²). However high the
  * weights go, a robot needs a moment to stop, turn or reverse.
  */
-const F_MAX = 2.5
-const DRAG = 0.7 // water drag, 1/s
+export const F_MAX = 2.5
+export const DRAG = 0.7 // water drag, 1/s
 /** Separation only reacts to neighbours this close (or the sensing radius, if smaller). */
 export const PERSONAL_SPACE = 55
 /** Battery drain (percent per second): just staying on, plus sensing cost per unit of radius. */
@@ -33,6 +33,36 @@ export const BATTERY_PER_RADIUS = 0.03
 /** Battery lost (percent) by a robot that hits a rock, and by each robot in a robot-robot bump. */
 export const BATTERY_CRASH = 3
 export const BATTERY_BUMP = 1.5
+/**
+ * Smallest trail a robot's sensor can detect (like any chemical or light
+ * sensor, it has a detection threshold). Below it the water reads as clean, so
+ * a robot that barely marks its path leaves nothing for "explore" to read.
+ */
+export const TRAIL_SENSE_MIN = 0.15
+/**
+ * Legend star rules (each star needs everything in its row). Measured on 400
+ * random slider settings (legend sweep in swarm-reef.verify.ts): about 4% win
+ * 1 star and none win 2; a hand-tuned spread-out swarm with a trail reaches 3.
+ */
+export const LEGEND_STARS = [
+  { beacons: 5, coverage: 85, collisions: 10 },
+  { beacons: 5, coverage: 88, collisions: 6 },
+  { beacons: 6, coverage: 90, collisions: 3 },
+] as const
+
+/** Slider ranges (rules.tsx reads these, and so does the verify script). */
+export const RANGES: Record<WeightKey, { min: number; max: number; step: number }> = {
+  sep: { min: 0, max: 3, step: 0.1 },
+  ali: { min: 0, max: 3, step: 0.1 },
+  coh: { min: 0, max: 3, step: 0.1 },
+  goal: { min: 0, max: 3, step: 0.1 },
+  avoid: { min: 0, max: 3, step: 0.1 },
+  shape: { min: 0, max: 3, step: 0.1 },
+  explore: { min: 0, max: 3, step: 0.1 },
+  trail: { min: 0, max: 4, step: 0.1 },
+  radius: { min: 20, max: 160, step: 5 },
+}
+
 /** Legend ends early once every beacon is found and this much of the reef has been searched. */
 export const LEGEND_FULL_COVERAGE = 98
 
@@ -364,10 +394,10 @@ export function currentAt(m: Mission, x: number, y: number, t: number): { cx: nu
   }
 }
 
-function clampLen(x: number, y: number, max: number): [number, number] {
+/** Scale factor that shortens (x, y) to at most `max` long (1 when it already fits). A number, not a tuple, so a step allocates nothing. */
+function clampK(x: number, y: number, max: number): number {
   const l = Math.hypot(x, y)
-  if (l > max && l > 0) return [(x / l) * max, (y / l) * max]
-  return [x, y]
+  return l > max && l > 0 ? max / l : 1
 }
 
 // ── Create ─────────────────────────────────────────────────────────────────
@@ -585,13 +615,19 @@ export function stepSim(s: SimState): void {
     let fx = 0
     let fy = 0
     if (k > 0) {
-      const [sepx, sepy] = clampLen(sx, sy, 1.5)
+      const sepxK = clampK(sx, sy, 1.5)
+      const sepx = sx * sepxK
+      const sepy = sy * sepxK
       fx += w.sep * sepx
       fy += w.sep * sepy
-      const [alx, aly] = clampLen((avx / k - r.vx) / vmax, (avy / k - r.vy) / vmax, 1)
+      const alxK = clampK((avx / k - r.vx) / vmax, (avy / k - r.vy) / vmax, 1)
+      const alx = ((avx / k - r.vx) / vmax) * alxK
+      const aly = ((avy / k - r.vy) / vmax) * alxK
       fx += w.ali * alx
       fy += w.ali * aly
-      const [chx, chy] = clampLen((cx / k - r.x) / R, (cy / k - r.y) / R, 1)
+      const chxK = clampK((cx / k - r.x) / R, (cy / k - r.y) / R, 1)
+      const chx = ((cx / k - r.x) / R) * chxK
+      const chy = ((cy / k - r.y) / R) * chxK
       fx += w.coh * chx
       fy += w.coh * chy
     }
@@ -607,7 +643,9 @@ export function stepSim(s: SimState): void {
         fx += 1.2 * (dx / d) * pull - (0.8 * r.vx) / vmax
         fy += 1.2 * (dy / d) * pull - (0.8 * r.vy) / vmax
       } else if (r.scout || d < R + m.food.r) {
-        const [gx, gy] = clampLen(dx / d - r.vx / vmax, dy / d - r.vy / vmax, 1)
+        const gxK = clampK(dx / d - r.vx / vmax, dy / d - r.vy / vmax, 1)
+        const gx = (dx / d - r.vx / vmax) * gxK
+        const gy = (dy / d - r.vy / vmax) * gxK
         fx += w.goal * gx
         fy += w.goal * gy
       }
@@ -641,7 +679,9 @@ export function stepSim(s: SimState): void {
           }
         }
       }
-      const [aox, aoy] = clampLen(ox, oy, 2)
+      const aoxK = clampK(ox, oy, 2)
+      const aox = ox * aoxK
+      const aoy = oy * aoxK
       fx += w.avoid * aox
       fy += w.avoid * aoy
     }
@@ -649,7 +689,9 @@ export function stepSim(s: SimState): void {
     // Shape pull (Ace): every robot knows the shape, nobody has an assigned slot
     if (shape && w.shape > 0) {
       const q = closestOnShape(shape, r.x, r.y)
-      const [spx, spy] = clampLen((q.qx - r.x) / 15, (q.qy - r.y) / 15, 1.5)
+      const spxK = clampK((q.qx - r.x) / 15, (q.qy - r.y) / 15, 1.5)
+      const spx = ((q.qx - r.x) / 15) * spxK
+      const spy = ((q.qy - r.y) / 15) * spxK
       fx += w.shape * spx
       fy += w.shape * spy
     }
@@ -664,13 +706,15 @@ export function stepSim(s: SimState): void {
         const ang = (a / 8) * Math.PI * 2
         const dx = Math.cos(ang)
         const dy = Math.sin(ang)
-        const v = trailAt(s, r.x + dx * look, r.y + dy * look)
+        const v = Math.max(0, trailAt(s, r.x + dx * look, r.y + dy * look) - TRAIL_SENSE_MIN)
         ex -= dx * v
         ey -= dy * v
         total += v
       }
       if (total > 1e-3) {
-        const [exx, exy] = clampLen(ex / (total * 0.35), ey / (total * 0.35), 1)
+        const exxK = clampK(ex / (total * 0.35), ey / (total * 0.35), 1)
+        const exx = (ex / (total * 0.35)) * exxK
+        const exy = (ey / (total * 0.35)) * exxK
         fx += w.explore * exx
         fy += w.explore * exy
       }
@@ -1005,6 +1049,8 @@ export function scoreRun(s: SimState): Outcome {
         )
       if (why.length === 0) why.push('Try a little more cohesion and alignment so the robots who cannot smell the food stay with the scouts who can.')
     } else {
+      if (stars === 0 && arrivedPct >= 80 && s.crashes > 12)
+        why.push(`${s.arrived} of ${n} robots got through, but with ${s.crashes} wall crashes — the most allowed is 12. Real robots that hit walls get damaged, so a crash-heavy run does not count.`)
       if (w.avoid < 0.5 && s.crashes > 6)
         why.push(`Obstacle avoidance was ${w.avoid.toFixed(1)}, so robots only noticed the rock wall by hitting it: ${s.crashes} crashes. Avoidance lets them feel the wall before they touch it and slide along it to the gap.`)
       if (w.sep < 0.8 && s.bumps > 15) why.push(`Separation was low, so robots squeezed together in the gap and bumped ${s.bumps} times. More separation keeps a safe space around each robot.`)
@@ -1023,7 +1069,7 @@ export function scoreRun(s: SimState): Outcome {
       stars,
       score: m.tier === 0 ? Math.round(arrivedPct) : safety,
       scoreLabel: m.tier === 0 ? '% reached the food' : 'safe-passage score',
-      headline: stars > 0 ? 'The swarm made it!' : 'Not enough robots made it.',
+      headline: stars > 0 ? 'The swarm made it!' : m.tier === 1 && arrivedPct >= 80 ? 'Too many wall crashes.' : 'Not enough robots made it.',
       why,
       stats: [
         { label: 'Reached food', value: `${s.arrived}/${n}` },
@@ -1057,7 +1103,16 @@ export function scoreRun(s: SimState): Outcome {
       why.unshift(
         `Formation scores — ring ${Math.round(ring)}, healed ring ${Math.round(heal)}, line ${Math.round(line)}. No robot had a fixed spot: each one just followed your local rules, and the shape appeared — and repaired itself when robots dropped out. That self-healing is why engineers love swarms.`,
       )
-    if (why.length === 0) why.push('Try: separation high, cohesion off, a firm shape pull, and a sensing radius bigger than the gap between robots.')
+    if (stars === 0) {
+      const names = ['ring', 'healed ring', 'line']
+      const weakest = sc.indexOf(Math.min(...sc))
+      why.unshift(
+        total < 62
+          ? `Your formation score was ${Math.round(total)} — it needs 62 to win. The weakest shape was the ${names[weakest]} (${Math.round(sc[weakest])}).`
+          : `Your formation score was ${Math.round(total)}, but every shape must score at least 45 and the ${names[weakest]} only scored ${Math.round(sc[weakest])}.`,
+      )
+    }
+    if (why.length === (stars === 0 ? 1 : 0)) why.push('Try: separation high, cohesion off, a firm shape pull, and a sensing radius bigger than the gap between robots.')
     return {
       stars,
       score: Math.round(total),
@@ -1080,10 +1135,19 @@ export function scoreRun(s: SimState): Outcome {
   const allFoundAt = s.found.every(Boolean) ? Math.max(...s.foundAt) : m.timeLimit
   const collisions = s.crashes + s.bumps
   const score = Math.max(0, Math.round(found * 100 + cov * 6 + (m.timeLimit - allFoundAt) * 4 - collisions * 3))
+  const L = LEGEND_STARS
   let stars = 0
-  if (found >= 5 && cov >= 75) stars = 1
-  if (found >= 5 && cov >= 88 && collisions <= 8) stars = 2
-  if (found >= 6 && cov >= 90 && collisions <= 3) stars = 3
+  if (found >= L[0].beacons && cov >= L[0].coverage && collisions <= L[0].collisions) stars = 1
+  if (stars === 1 && found >= L[1].beacons && cov >= L[1].coverage && collisions <= L[1].collisions) stars = 2
+  if (stars === 2 && found >= L[2].beacons && cov >= L[2].coverage && collisions <= L[2].collisions) stars = 3
+  if (stars === 0) {
+    // Say exactly which part of the goal was missed (the run's own numbers).
+    const missed: string[] = []
+    if (found < L[0].beacons) missed.push(`found ${found} of ${nb} beacons (the goal is ${L[0].beacons})`)
+    if (cov < L[0].coverage) missed.push(`searched ${Math.round(cov)}% of the reef (the goal is ${L[0].coverage}%)`)
+    if (collisions > L[0].collisions) missed.push(`had ${collisions} collisions (the most allowed is ${L[0].collisions})`)
+    why.push(`The swarm ${missed.join(', and ')}.`)
+  }
   if (w.explore < 0.4 || w.trail < 0.4)
     why.push(
       w.trail < 0.4
@@ -1102,20 +1166,31 @@ export function scoreRun(s: SimState): Outcome {
     )
   if (w.radius > 110) why.push(`A ${w.radius}-unit sensing radius sees a lot, but sensing costs power: the batteries ran flat sooner.`)
   if (w.radius < 45) why.push(`With a ${w.radius}-unit radius each robot searched a thin strip, so coverage grew slowly.`)
-  if (collisions > 3)
+  if (collisions > 3) {
+    const low = [w.sep < 1.5 ? 'separation' : '', w.avoid < 1.5 ? 'avoidance' : ''].filter(Boolean)
     why.push(
-      `${collisions} collisions — every crash and bump costs battery. Raise separation and avoidance so robots don’t waste power hitting each other and the rocks.`,
+      `${collisions} collisions — every crash and bump costs battery${
+        low.length ? `. Raise ${low.join(' and ')} so robots don’t waste power hitting ${w.sep < 1.5 ? 'each other' : 'the rocks'}${low.length === 2 ? ' and the rocks' : ''}.` : ', even with strong separation and avoidance: fast robots in narrow water between rocks still meet.'
+      }`,
     )
+  }
   if (stars > 0)
     why.unshift(
       `Found ${found} of ${nb} beacons and searched ${Math.round(cov)}% of the reef. Each robot only saw a small circle, but by leaving a fading trail and steering away from trails, the swarm shared one memory of where it had been. Ants share memory with pheromone trails too — but an ant trail says “come here”, and ours says “already searched, go somewhere else”.`,
     )
-  if (why.length === 0) why.push('Spread out (separation up, cohesion down), leave a trail and explore away from it, and pick a sensing radius that sees enough without draining the battery.')
+  if (stars === 0 && why.length === 1) why.push('Spread out (separation up, cohesion down), leave a trail and explore away from it, and pick a sensing radius that sees enough without draining the battery.')
   return {
     stars,
     score,
     scoreLabel: 'rescue points',
-    headline: stars > 0 ? 'Rescue complete!' : 'Not enough of the reef was searched.',
+    headline:
+      stars > 0
+        ? 'Rescue complete!'
+        : found < LEGEND_STARS[0].beacons
+          ? 'Too few beacons were found.'
+          : cov < LEGEND_STARS[0].coverage
+            ? 'Not enough of the reef was searched.'
+            : 'Too many collisions.',
     why,
     stats: [
       { label: 'Beacons', value: `${found}/${nb}` },
@@ -1123,5 +1198,18 @@ export function scoreRun(s: SimState): Outcome {
       { label: 'Time', value: `${s.t.toFixed(1)} s` },
       { label: 'Collisions', value: String(collisions) },
     ],
+  }
+}
+
+/** The first hint explains the idea and is free; the later ones give away settings. */
+export const FREE_HINTS = 1
+
+/** The shared hint rule: after a hint that gives away settings, a finish is capped at 2 stars. */
+export function capForHints(o: Outcome, hintsShown: number): Outcome {
+  if (hintsShown <= FREE_HINTS || o.stars <= 2) return o
+  return {
+    ...o,
+    stars: 2,
+    why: [...o.why, 'You opened a hint that gives away settings, so this finish is capped at 2 stars. Win it again without those hints for 3.'],
   }
 }

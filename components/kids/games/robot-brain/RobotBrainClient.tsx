@@ -36,15 +36,16 @@ const HOW_TO_PLAY = (
       Sorta the sorter robot routes parcels by the symbol drawn on their label — but its brain is empty. <b>You</b> teach it, with examples.
     </p>
     <ul className="list-disc space-y-1 pl-5">
-      <li>Pick a label (← → ○ ✕), draw it on the pad with your finger or mouse, and press <b>Add</b>. Sorta guesses live while you draw.</li>
+      <li>Pick a label (← → ○ △ ✕), draw it on the pad with your finger or mouse, and press <b>Add</b>. Sorta guesses live while you draw.</li>
       <li>
         <b>Run the sorter</b>: test parcels drawn by other people ride the belt. Sorta can only use what you taught it.
       </li>
       <li>
-        <b>Cadet:</b> ← and →. <b>Pilot:</b> three labels, accuracy %. <b>Ace:</b> an intern’s messy data — read the confusion matrix and fix it.{' '}
+        <b>Cadet:</b> ← and →. <b>Pilot:</b> four labels and strangers’ hurried drawings. <b>Ace:</b> an intern’s messy data — read the confusion matrix and fix it.{' '}
         <b>Legend:</b> choose k and raw pixels vs features, check on a validation set, then pass a one-shot exam.
       </li>
     </ul>
+    <p>✨ Sample draws a neat example for you (handy if drawing is hard right now); a round taught with samples earns at most 2 stars.</p>
     <p>Keyboard: Tab to the pad controls; number keys pick a label, S adds a sample drawing, Enter adds it, C clears.</p>
   </>
 )

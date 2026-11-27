@@ -33,6 +33,7 @@
 //     out of /kids — see lib/kids/settings.ts.
 
 import dynamic from 'next/dynamic'
+import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { REWARD_EVENT, reportActivity, reportRobotSaved, type RewardResult } from '@/lib/kids/universe/rewards'
 import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
@@ -83,6 +84,10 @@ export function RewardToast() {
   const [announcement, setAnnouncement] = useState('')
   const [ceremony, setCeremony] = useState<RewardResult | null>(null)
   const reduced = useKidsReducedMotion()
+  // On a game page the toasts sit over live controls: there they never catch a
+  // tap (it goes through to the game) and they hug the top edge, clear of the
+  // phone action bars; they still time out on their own.
+  const onGame = (usePathname() ?? '').startsWith('/kids/play/')
   // Guards against one event being handled twice (e.g. a duplicate listener in dev).
   const seen = useRef<WeakSet<Event>>(new WeakSet())
   const timers = useRef<number[]>([])
@@ -223,14 +228,14 @@ export function RewardToast() {
     <>
       {/* Screen readers hear every reward once; the visual toasts are aria-hidden to avoid double reading. */}
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
-      <div className="pointer-events-none fixed right-3 top-20 z-[60] flex w-[min(92vw,340px)] flex-col gap-2" aria-hidden="true">
+      <div className={`pointer-events-none fixed right-3 z-[60] flex w-[min(92vw,340px)] flex-col gap-2 ${onGame ? 'top-2' : 'top-20'}`} aria-hidden="true" data-game-toasts={onGame ? 'pass-through' : undefined}>
         {visible.map((t) => (
           <button
             key={t.id}
             type="button"
             tabIndex={-1}
             onClick={() => dismiss(t.id)}
-            className={`pointer-events-auto flex min-h-[48px] w-full items-start gap-3 rounded-2xl border border-amber-400/40 bg-[#111C32]/95 p-3 text-left shadow-[0_8px_24px_rgba(0,0,0,.45)] ${reduced ? '' : 'motion-safe:animate-[kidsToastIn_.3s_cubic-bezier(.22,.61,.36,1)]'}`}
+            className={`${onGame ? 'pointer-events-none opacity-95' : 'pointer-events-auto'} flex min-h-[48px] w-full items-start gap-3 rounded-2xl border border-amber-400/40 bg-[#111C32]/95 p-3 text-left shadow-[0_8px_24px_rgba(0,0,0,.45)] ${reduced ? '' : 'motion-safe:animate-[kidsToastIn_.3s_cubic-bezier(.22,.61,.36,1)]'}`}
           >
             <span className="text-2xl" aria-hidden>{t.icon}</span>
             <span className="block">

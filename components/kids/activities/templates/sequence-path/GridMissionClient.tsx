@@ -128,7 +128,7 @@ export function GridMission<P>(props: GridMissionProps<P>) {
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
-      <Panel className="lg:sticky lg:top-4">
+      <Panel className="lg:sticky lg:top-20">
         {worlds.length > 1 && (
           <div className="mb-2 flex gap-2" role="tablist" aria-label="Maps">
             {worlds.map((_, i) => (

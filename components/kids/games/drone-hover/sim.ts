@@ -116,6 +116,12 @@ export interface Mission {
   wpHold: number
   /** Airspace ceiling, m. */
   ceiling: number
+  /**
+   * Cadet only: multiplies the star times. The Cadet clock is the child's own
+   * reaction time, so it follows the kids "more time" setting (kidsTimeLimit);
+   * the other tiers' clocks are simulated mission time and stay fixed.
+   */
+  starScale: number
   worldW: number
   worldH: number
   seed: number
@@ -163,16 +169,32 @@ export const LEGEND_PAYLOAD = 0.4
 
 /** Pilot: a win may not overshoot by more than this, m. */
 export const PILOT_MAX_OVERSHOOT = 0.75
-/** Ace and Legend: the lowest flight score that still counts as a win. */
-export const ACE_MIN_WIN = 550
+/**
+ * Ace: the lowest flight score that still counts as a win. 600, measured
+ * 27 Nov 2026 over 3,000 uniformly random (Kp, Ki, Kd) settings: at 550, 19.6%
+ * of random tunes won; at 600, 12.3% do (any tune with Ki = 0 still loses: it
+ * cannot finish within 6 cm). A tip-following tune (Kp 30, Ki 3, Kd 10) scores
+ * 620+. Stars: 600 = 1, 640 = 2, 690 = 3 (690+: 1.5% of random tunes).
+ */
+export const ACE_MIN_WIN = 600
+export const ACE_STARS = { two: 640, three: 690 } as const
+/** Cadet: finish times (s) for 3 and 2 stars, before the "more time" setting. */
+export const CADET_STARS = { three: 30, two: 45 } as const
 /**
  * Legend: 520. Measured 27 Nov 2026 over 2,000 random slider settings
  * (/kids roadmap #10): at 450, 4.8% of random tunes won; at 520, 1.3% do, while
  * a tuned brain scores 600+. Stars: 520 = 1, 550 = 2, 580 = 3.
  */
 export const LEGEND_MIN_WIN = 520
+/** Legend: the I push (N) must peak at least this high to count as doing work. */
+export const LEGEND_I_WORK_N = 1
 
-export function buildMission(tier: TierIndex): Mission {
+/**
+ * @param timeLimit the kids "more time" setting (`kidsTimeLimit` in the client;
+ *   identity by default so the verify script and the predictor stay deterministic).
+ *   Only the Cadet clock uses it: there the child flies by hand.
+ */
+export function buildMission(tier: TierIndex, timeLimit: (base: number) => number = (b) => b): Mission {
   const base: Mission = {
     tier,
     duration: 90,
@@ -193,12 +215,16 @@ export function buildMission(tier: TierIndex): Mission {
     wpRadius: 0.4,
     wpHold: 1,
     ceiling: 7.4,
+    starScale: 1,
     worldW: 10,
     worldH: 7.5,
     seed: 1000 + tier,
   }
   if (tier === 0) {
-    return { ...base, duration: 90, manualAssist: 3, band: 0.5, gusts: makeGusts(11, 6, 85, 9, 1.6, 0) }
+    const duration = timeLimit(90)
+    // Untimed (Infinity): no clock, and the star times get the most generous "more time" scale.
+    const starScale = Number.isFinite(duration) ? Math.max(1, duration / 90) : 2
+    return { ...base, duration, starScale, manualAssist: 3, band: 0.5, gusts: makeGusts(11, 6, 85, 9, 1.6, 0) }
   }
   if (tier === 1) {
     return {
@@ -756,7 +782,7 @@ export function scoreFlight(s: SimState): FlightReport {
         message: 'Time ran out. Look at the thrust gauge: the drone only stays still when the thrust bar sits right on the weight line. Find that throttle and leave it there.',
       }
     }
-    const stars = t <= 30 ? 3 : t <= 45 ? 2 : 1
+    const stars = t <= CADET_STARS.three * m.starScale ? 3 : t <= CADET_STARS.two * m.starScale ? 2 : 1
     return {
       stars,
       score: Math.round(t * 10) / 10,
@@ -830,8 +856,8 @@ export function scoreFlight(s: SimState): FlightReport {
       else message = `The final height was ${finalErr.toFixed(2)} m off — not steady enough. Look at the graph to see whether it sags (more P or I) or swings (more D).`
       return { stars: 0, score, scoreLabel: 'flight score', lowerIsBetter: false, stats, message }
     }
-    const t3 = m.tier === 1 ? 670 : 690
-    const t2 = m.tier === 1 ? 630 : 620
+    const t3 = m.tier === 1 ? 670 : ACE_STARS.three
+    const t2 = m.tier === 1 ? 630 : ACE_STARS.two
     const stars = score >= t3 ? 3 : score >= t2 ? 2 : 1
     if (s.overshoot > 0.4) message = `Target held — but it overshot by ${s.overshoot.toFixed(2)} m after the step. Overshoot means too much push and too little braking: a touch more D (or a little less Kp) smooths it.`
     else if (st > 4) message = `Steady in the end, but it took ${st.toFixed(1)} s to settle. A slow settle means the brain reacts gently — more Kp makes it faster (watch the overshoot).`
@@ -889,12 +915,24 @@ export function scoreFlight(s: SimState): FlightReport {
       }`,
     }
   }
-  const stars = score >= 580 ? 3 : score >= 550 ? 2 : 1
+  // Without I, nothing removes the height error the battery sag and the parcel
+  // drop leave (P alone needs an error to make extra thrust: F = Kp·e), so a
+  // brain whose I term never did real work tops out at 2 stars: 3 stars means
+  // the whole cascade, I included. "Real work" = the I push peaked at 1 N or
+  // more (a quarter of the 0.4 kg parcel's 3.9 N weight); a token Ki of 0.5
+  // peaks under 0.5 N on this 25-second course and changes nothing.
+  const iPeak = s.log.reduce((a, r) => Math.max(a, Math.abs(r.i)), 0)
+  const iWorked = s.gains.ki > 0 && iPeak >= LEGEND_I_WORK_N
+  const rawStars = score >= 580 ? 3 : score >= 550 ? 2 : 1
+  const stars = iWorked ? rawStars : Math.min(2, rawStars)
+  const capNote = rawStars > stars ? ' That caps it at 2 stars: a Legend 3-star brain uses I.' : ''
   let message: string
-  if (s.overshoot > 0.6) message = `Course complete! Your biggest overshoot was ${s.overshoot.toFixed(2)} m — the outer loop is pushing harder than it can brake. More Kd_x (or slightly less Kp_x) makes the arrivals clean.`
+  if (s.gains.ki <= 0)
+    message = `Course complete — with no I term! The fast inner loop held the tilt and the outer loop chose it, but nothing removed the steady height error as the battery sagged to ${s.volts.toFixed(1)} V and the parcel dropped. The ${m.wpRadius} m rings were just wide enough to forgive it.${capNote} Add some Ki to wipe out that error.`
+  else if (!iWorked)
+    message = `Course complete! Your I term was so small that its push never passed ${iPeak.toFixed(1)} N, so it could not remove the height error from the battery sag and the parcel drop.${capNote} A bigger Ki lets I build up faster.`
+  else if (s.overshoot > 0.6) message = `Course complete! Your biggest overshoot was ${s.overshoot.toFixed(2)} m — the outer loop is pushing harder than it can brake. More Kd_x (or slightly less Kp_x) makes the arrivals clean.`
   else if (sat > 0.45) message = 'Course complete! The motors spent a lot of time maxed out, which wastes the battery. Softer inner-loop gains keep the motors in their happy range.'
-  else if (s.gains.ki <= 0)
-    message = `Course complete — with no I term! The fast inner loop held the tilt and the outer loop chose it, but nothing removed the steady height error as the battery sagged to ${s.volts.toFixed(1)} V and the parcel dropped. The ${m.wpRadius} m rings were just wide enough to forgive it. Add some Ki to wipe out that error.`
   else message = `Legendary flying! The fast inner loop held the tilt, the slower outer loop chose the tilt, and I kept the height as the battery sagged to ${s.volts.toFixed(1)} V and the parcel dropped.`
   return { stars, score, scoreLabel: 'flight score', lowerIsBetter: false, stats, message }
 }

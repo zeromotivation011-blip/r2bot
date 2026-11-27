@@ -23,6 +23,12 @@ import {
   LEGEND_PARTS,
   PART_HALF,
   tierConfig,
+  cadetStars,
+  legendShiftReport,
+  legendStars,
+  LEGEND_PASS,
+  LEGEND_TARGET2,
+  LEGEND_TARGET3,
   type PartColor,
   type PlanStep,
   type ProgStep,
@@ -41,9 +47,8 @@ const STARTER: ProgStep[] = [
   { kind: 'release', when: 'always' },
   { kind: 'move', pose: 'home', speed: 100, when: 'always' },
 ]
-/** Calibrated on the fixed Legend stream: the best programs we found finish in about 33.5 s. */
-const TARGET3 = 35
-const TARGET2 = 45
+const TARGET3 = LEGEND_TARGET3
+const TARGET2 = LEGEND_TARGET2
 const ACE_SPEED = 0.6
 
 interface Snap {
@@ -139,6 +144,8 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
   const [cam, setCam] = useState<CamPreset>('front')
   const [started, setStarted] = useState(false)
   const [hint, setHint] = useState(false)
+  /** Set once the helper ghost (it shows a working pose) has been switched on this round. */
+  const hintUsedRef = useRef(false)
   const [slots, setSlots] = useState<(Joints | null)[]>([null, null, null, null])
   // Ace
   const [aim, setAim] = useState<{ x: number; z: number; label: string | null } | null>(null)
@@ -200,19 +207,25 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
       const st = sim.stats
       if (tier === 0) {
         const mistakes = st.wrong + st.dropped
-        const stars = mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1
-        finishRound({
+        const hintsUsed = hintUsedRef.current
+        const stars = cadetStars(mistakes, hintsUsed)
+        // `hintsUsed` rides along for the shared reward cap (reportActivity caps
+        // a hinted finish at 2 stars); the stars above are already capped.
+        const result: RoundResult & { hintsUsed?: boolean } = {
           stars,
           score: r1(sim.time - Math.max(0, sim.firstInput)),
           scoreLabel: 'seconds',
           lowerIsBetter: true,
-          message:
+          message: `${
             mistakes === 0
-              ? 'All three parts sorted with no slips! You chose every joint angle yourself and the hand ended up exactly on the part — that is forward kinematics: angles in, hand position out.'
-              : `All three parts sorted, with ${mistakes} oops along the way. Each joint moves the hand in a circle around that joint, so small angle changes near the base swing the hand a long way.`,
+              ? 'All three parts sorted with no slips! The hand ended up exactly on each part — that is forward kinematics: joint angles in, hand position out.'
+              : `All three parts sorted, with ${mistakes} oops along the way. Each joint moves the hand in a circle around that joint, so small angle changes near the base swing the hand a long way.`
+          }${hintsUsed ? ' You used the helper ghost, so this finish is capped at 2 stars — find the angles yourself next time for 3.' : ''}`,
           badges: ['arm-artist'],
           attempts: 1 + mistakes,
-        })
+          hintsUsed,
+        }
+        finishRound(result)
       } else if (tier === 1) {
         const c = st.sorted
         const stars = c >= 6 ? 3 : c === 5 ? 2 : c === 4 ? 1 : 0
@@ -244,15 +257,12 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
         })
       } else {
         const t = sim.time - sim.runStart
-        if (st.sorted < LEGEND_PARTS) {
-          setReport({
-            ok: false,
-            title: `Shift over: ${st.sorted} of ${LEGEND_PARTS} in the right bin`,
-            body: `${st.wrong} part(s) went to the wrong bin. "Above its bin" reads the colour of the part in the gripper — make sure you grip before you move there.`,
-          })
+        const failed = legendShiftReport(st, t)
+        if (failed) {
+          setReport(failed)
           return
         }
-        const stars = t <= TARGET3 ? 3 : t <= TARGET2 ? 2 : 1
+        const stars = legendStars(st.sorted, t)
         finishRound({
           stars,
           score: r1(t),
@@ -690,8 +700,15 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
     refresh()
   }
 
+  const stopRun = () => {
+    simRef.current?.stop()
+    if (cfg.mode === 'plan') setArmVersion((v) => v + 1)
+    else refresh()
+  }
+
   const runShift = () => {
-    const fresh = new ArmSim(cfg)
+    // Same "more time" scaling as the first sim (it was lost on every re-run).
+    const fresh = new ArmSim(Number.isFinite(cfg.timeLimit) ? { ...cfg, timeLimit: kidsTimeLimit(cfg.timeLimit) } : cfg)
     fresh.beltOn = true
     simRef.current = fresh
     runsRef.current++
@@ -712,122 +729,146 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
           ? `Part ${Math.min(3, snap.sorted + 1)} of 3 · Crashes ${snap.crashes}`
           : `Sorted ${snap.sorted}/${LEGEND_PARTS} · ${snap.runTime.toFixed(1)} s`
 
+  const camButtons = (['front', 'top', 'side'] as CamPreset[]).map((c) => (
+    <button
+      key={c}
+      type="button"
+      role="radio"
+      aria-checked={cam === c}
+      onClick={() => setCam(c)}
+      className={`min-h-[44px] min-w-[44px] rounded-lg px-2 text-xs font-black capitalize ${cam === c ? 'bg-amber-400 text-slate-900' : 'text-white/75 hover:text-white'}`}
+    >
+      {c}
+    </button>
+  ))
+
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,1fr)_400px]">
-      <div
-        ref={wrapRef}
-        className="relative aspect-[4/3] w-full self-start overflow-hidden rounded-3xl border border-white/10 bg-slate-950 lg:sticky lg:top-3 lg:aspect-auto lg:h-[600px]"
-      >
-        <div
-          ref={glHostRef}
-          className={`absolute inset-0 touch-manipulation ${cfg.mode === 'plan' ? 'cursor-crosshair' : ''}`}
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          aria-label="3D view of the robot arm, the conveyor belt and three coloured bins"
-          role="img"
-        />
-        <div className="pointer-events-none absolute left-2 top-2 rounded-xl bg-slate-950/75 px-2.5 py-1.5 text-xs font-black text-white sm:text-sm" aria-live="polite">
-          {goal}
-        </div>
-        <div className="absolute right-2 top-2 flex gap-1 rounded-xl bg-slate-950/75 p-1" role="radiogroup" aria-label="Camera">
-          {(['front', 'top', 'side'] as CamPreset[]).map((c) => (
-            <button
-              key={c}
-              type="button"
-              role="radio"
-              aria-checked={cam === c}
-              onClick={() => setCam(c)}
-              className={`min-h-[44px] min-w-[44px] rounded-lg px-2 text-xs font-black capitalize ${cam === c ? 'bg-amber-400 text-slate-900' : 'text-white/75 hover:text-white'}`}
-            >
-              {c}
-            </button>
-          ))}
+      <div className="min-w-0 self-start lg:sticky lg:top-20">
+        {/* Phones: the camera buttons sit above the view, not on it. On the view
+            they covered the belt in Top view, and a tap on a part near them was
+            snapped to the button by the browser's touch adjustment. */}
+        <div className="mb-2 flex justify-end lg:hidden">
+          <div className="flex gap-1 rounded-xl bg-slate-950/75 p-1" role="radiogroup" aria-label="Camera">
+            {camButtons}
+          </div>
         </div>
         <div
-          className={`pointer-events-none absolute left-2 rounded-xl bg-slate-950/75 px-2.5 py-1.5 font-mono text-[10px] leading-tight text-cyan-200 sm:text-xs ${
-            cfg.mode === 'jog' ? 'top-11 lg:bottom-2 lg:top-auto' : 'bottom-2'
-          }`}
+          ref={wrapRef}
+          className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-slate-950 lg:aspect-auto lg:h-[600px]"
         >
-          <div>
-            B {Math.round(snap.j[0] / DEG)}° · S {Math.round(snap.j[1] / DEG)}° · E {Math.round(snap.j[2] / DEG)}°
-          </div>
-          <div>
-            hand x {cm(snap.tip.x)} · y {cm(snap.tip.y)} · z {cm(-snap.tip.z)} cm
-          </div>
-          {snap.held && (
-            <div className={COLOR_TEXT[snap.held.color]}>
-              holding {COLOR_SYMBOL[snap.held.color]} {snap.held.heavy ? '1.6 kg' : '0.4 kg'}
-            </div>
-          )}
-          {cfg.mode === 'jog' && snap.graspDist !== null && <div className="text-white/80">part {cm(snap.graspDist)} cm away</div>}
-        </div>
-        {coach && (
           <div
-            key={coach.id}
-            role="status"
-            className={`pointer-events-none absolute inset-x-2 bottom-14 mx-auto max-w-lg rounded-2xl px-3 py-2 text-center text-sm font-bold shadow-xl sm:bottom-16 ${
-              coach.tone === 'good' ? 'bg-emerald-500/90 text-white' : coach.tone === 'bad' ? 'bg-rose-600/90 text-white' : 'bg-slate-800/95 text-white'
+            ref={glHostRef}
+            className={`absolute inset-0 touch-manipulation ${cfg.mode === 'plan' ? 'cursor-crosshair' : ''}`}
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            aria-label="3D view of the robot arm, the conveyor belt and three coloured bins"
+            role="img"
+          />
+          <div className="pointer-events-none absolute left-2 top-2 rounded-xl bg-slate-950/75 px-2.5 py-1.5 text-xs font-black text-white sm:text-sm" aria-live="polite">
+            {goal}
+          </div>
+          {/* Laptops: the camera buttons float on the view. */}
+          <div className="absolute right-2 top-2 hidden gap-1 rounded-xl bg-slate-950/75 p-1 lg:flex" role="radiogroup" aria-label="Camera">
+            {camButtons}
+          </div>
+          <div
+            className={`pointer-events-none absolute left-2 rounded-xl bg-slate-950/75 px-2.5 py-1.5 font-mono text-[10px] leading-tight text-cyan-200 sm:text-xs ${
+              cfg.mode === 'jog' ? 'top-11 lg:bottom-2 lg:top-auto' : 'bottom-2'
             }`}
           >
-            {coach.text}
-          </div>
-        )}
-        {cfg.mode === 'jog' && (
-          // Phones: the side panel scrolls away under the 3D view, so the buttons
-          // needed mid-move ride on the view itself.
-          <div className="absolute bottom-2 right-2 flex gap-1.5 lg:hidden" aria-label="Quick controls">
-            {cfg.pendant && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => sim.setTargets(HOME)}
-                  aria-label="Go home"
-                  className="h-11 w-11 rounded-xl bg-slate-900/90 text-lg font-black text-white ring-1 ring-white/20 active:bg-white/20"
-                >
-                  ⌂
-                </button>
-                {slots.map((s, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    disabled={!s}
-                    onClick={() => goSlot(i)}
-                    aria-label={`Go to saved pose ${i + 1}`}
-                    className="h-11 w-11 rounded-xl bg-amber-400 text-base font-black text-slate-900 active:bg-amber-300 disabled:bg-slate-900/80 disabled:text-white/30"
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-              </>
+            <div>
+              B {Math.round(snap.j[0] / DEG)}° · S {Math.round(snap.j[1] / DEG)}° · E {Math.round(snap.j[2] / DEG)}°
+            </div>
+            <div>
+              hand x {cm(snap.tip.x)} · y {cm(snap.tip.y)} · z {cm(-snap.tip.z)} cm
+            </div>
+            {snap.held && (
+              <div className={COLOR_TEXT[snap.held.color]}>
+                holding {COLOR_SYMBOL[snap.held.color]} {snap.held.heavy ? '1.6 kg' : '0.4 kg'}
+              </div>
             )}
-            <button
-              type="button"
-              onClick={toggleGrip}
-              aria-label={snap.gripClosed ? 'Open gripper' : 'Close gripper'}
-              className={`h-11 min-w-[44px] rounded-xl px-2 text-xl font-black shadow-lg ${snap.gripClosed ? 'bg-cyan-400 text-slate-900' : 'bg-emerald-400 text-slate-900'}`}
-            >
-              {snap.gripClosed ? '✋' : '✊'}
-            </button>
+            {cfg.mode === 'jog' && snap.graspDist !== null && <div className="text-white/80">part {cm(snap.graspDist)} cm away</div>}
           </div>
-        )}
-        {cfg.pendant && !started && (
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-950/40">
-            <div className="max-w-xs rounded-3xl bg-slate-900/95 p-4 text-center shadow-2xl">
-              <p className="text-sm text-white/80">Six parts are coming. Save your poses first if you like — the belt waits until you start it.</p>
+          {coach && (
+            <div
+              key={coach.id}
+              role="status"
+              className={`pointer-events-none absolute inset-x-2 bottom-14 mx-auto max-w-lg rounded-2xl px-3 py-2 text-center text-sm font-bold shadow-xl sm:bottom-16 ${
+                coach.tone === 'good' ? 'bg-emerald-500/90 text-white' : coach.tone === 'bad' ? 'bg-rose-600/90 text-white' : 'bg-slate-800/95 text-white'
+              }`}
+            >
+              {coach.text}
+            </div>
+          )}
+          {cfg.mode === 'jog' && (
+            // Phones: the side panel scrolls away under the 3D view, so the buttons
+            // needed mid-move ride on the view itself.
+            <div className="absolute bottom-2 right-2 flex gap-1.5 lg:hidden" aria-label="Quick controls">
+              {cfg.pendant && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => sim.setTargets(HOME)}
+                    aria-label="Go home"
+                    className="h-11 w-11 rounded-xl bg-slate-900/90 text-lg font-black text-white ring-1 ring-white/20 active:bg-white/20"
+                  >
+                    ⌂
+                  </button>
+                  {slots.map((s, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      disabled={!s}
+                      onClick={() => goSlot(i)}
+                      aria-label={`Go to saved pose ${i + 1}`}
+                      className="h-11 w-11 rounded-xl bg-amber-400 text-base font-black text-slate-900 active:bg-amber-300 disabled:bg-slate-900/80 disabled:text-white/30"
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </>
+              )}
               <button
                 type="button"
-                onClick={() => {
-                  sim.beltOn = true
-                  setStarted(true)
-                  playSound('click')
-                }}
-                className="mt-3 min-h-[52px] w-full rounded-2xl bg-emerald-400 text-lg font-black text-slate-900"
+                onClick={toggleGrip}
+                aria-label={snap.gripClosed ? 'Open gripper' : 'Close gripper'}
+                className={`h-11 min-w-[44px] rounded-xl px-2 text-xl font-black shadow-lg ${snap.gripClosed ? 'bg-cyan-400 text-slate-900' : 'bg-emerald-400 text-slate-900'}`}
               >
-                ▶ Start the belt
+                {snap.gripClosed ? '✋' : '✊'}
               </button>
             </div>
-          </div>
-        )}
+          )}
+          {cfg.mode !== 'jog' && snap.running && (
+            // Phones: the editor's Stop button is far below the view while a
+            // run plays, so a second Stop rides on the view itself.
+            <button
+              type="button"
+              onClick={stopRun}
+              className="absolute bottom-2 right-2 min-h-[48px] rounded-xl bg-red-500 px-4 text-base font-black text-white shadow-lg lg:hidden"
+            >
+              ■ Stop
+            </button>
+          )}
+          {cfg.pendant && !started && (
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-950/40">
+              <div className="max-w-xs rounded-3xl bg-slate-900/95 p-4 text-center shadow-2xl">
+                <p className="text-sm text-white/80">Six parts are coming. Save your poses first if you like — the belt waits until you start it.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    sim.beltOn = true
+                    setStarted(true)
+                    playSound('click')
+                  }}
+                  className="mt-3 min-h-[52px] w-full rounded-2xl bg-emerald-400 text-lg font-black text-slate-900"
+                >
+                  ▶ Start the belt
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -846,11 +887,16 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
                 </ol>
                 <button
                   type="button"
-                  onClick={() => setHint((h) => !h)}
+                  onClick={() =>
+                    setHint((h) => {
+                      if (!h) hintUsedRef.current = true
+                      return !h
+                    })
+                  }
                   aria-pressed={hint}
                   className={`mt-2 min-h-[44px] w-full rounded-xl text-sm font-black ${hint ? 'bg-emerald-400 text-slate-900' : 'border border-white/15 text-white/80 hover:bg-white/10'}`}
                 >
-                  {hint ? '👻 Hide the helper ghost' : '👻 Show me a pose that works'}
+                  {hint ? '👻 Hide the helper ghost' : '👻 Show me a pose that works (max ⭐⭐)'}
                 </button>
               </Panel>
             )}
@@ -886,10 +932,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
             }
             onClear={() => setPlan([])}
             onRun={runPlan}
-            onStop={() => {
-              simRef.current?.stop()
-              setArmVersion((v) => v + 1)
-            }}
+            onStop={stopRun}
             running={snap.running}
             pc={snap.pc}
           />
@@ -899,10 +942,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
             program={program}
             setProgram={setProgram}
             onRun={runShift}
-            onStop={() => {
-              simRef.current?.stop()
-              refresh()
-            }}
+            onStop={stopRun}
             onStarter={() => setProgram(STARTER)}
             running={snap.running}
             pc={snap.pc}
@@ -917,6 +957,7 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
             total={LEGEND_PARTS}
             target3={TARGET3}
             target2={TARGET2}
+            targetPass={LEGEND_PASS}
             queue={snap.queue}
             report={report}
           />

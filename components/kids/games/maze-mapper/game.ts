@@ -13,6 +13,7 @@ import {
   LEGEND_BIASES,
   LEGEND_PLANNERS,
   LEGEND_SCANS,
+  LEGEND_THREE_SHARE,
   LEGEND_TRUSTS,
   WRONG_SQUARE_COST,
   batteryFor,
@@ -121,7 +122,11 @@ export class MazeGame {
   baseline = 0
   optimal = 0
   lastPlan: { algo: string; expanded: number; length: number } | null = null
+  /** Cadet: hints shown this round. A hint does the finding for you, so it caps the finish at 2 stars (the shared rule). */
+  hintsUsed = 0
   private reduced: boolean
+  /** Kids calm mode: no particles, no screen shake (the glide still animates). */
+  private calm = false
   private anim: { fx: number; fy: number; tx: number; ty: number; age: number; dur: number } | null = null
   private wait = 0
   private followSeen = new Set<number>()
@@ -147,6 +152,15 @@ export class MazeGame {
     this.scene = this.freshScene()
     this.computeRefs()
     this.status = this.briefStatus()
+  }
+
+  /** Follow the kids Settings live: reduced motion (device OR kids setting) and calm. */
+  setMotion(reduced: boolean, calm: boolean): void {
+    this.reduced = reduced
+    this.calm = calm
+    this.fx.setQuiet(reduced || calm)
+    this.scene.reduced = reduced
+    if (reduced || calm) this.scene.shake = 0
   }
 
   private makeWorld(): World {
@@ -222,6 +236,7 @@ export class MazeGame {
     this.following = false
     this.loops = 0
     this.manualUsed = 0
+    this.hintsUsed = 0
     this.outcome = null
     this.lastPlan = null
     this.anim = null
@@ -352,7 +367,8 @@ export class MazeGame {
     }
     const r = plan(w.W, w.H, w.passable, w.pos, f, 'bfs')
     this.scene.hint = r.found ? r.path : null
-    this.status = 'The yellow dashes lead to the nearest unexplored edge.'
+    if (r.found) this.hintsUsed++
+    this.status = 'The yellow dashes lead to the nearest unexplored edge. (A hint caps this round at 2 stars.)'
     playSound('click')
     this.onChange()
   }
@@ -511,7 +527,7 @@ export class MazeGame {
     sc.t += dt
     sc.beamAge += dt
     sc.bumpAge += dt
-    sc.shake = Math.max(0, sc.shake - dt * 3)
+    sc.shake = this.calm ? 0 : Math.max(0, sc.shake - dt * 3)
     if (sc.wave) {
       sc.wave.age += dt
       if (sc.wave.age > sc.wave.dur + 1.3) sc.wave = null
@@ -633,7 +649,7 @@ export class MazeGame {
     this.scene.shake = 0.6
     playSound('wrong')
     this.fx.ring(w.x(), w.y(), '#fbbf24', 1.2)
-    this.status = `Loop! The robot is back on a square it already drove through, facing the same way, so it will repeat the same circuit forever. The ${this.hand}-hand wall it held is an island (glowing yellow) — it never touches the outside. Drive by hand to a different wall, then start again.`
+    this.status = `Loop! The robot is back on a square it already drove through, facing the same way, so it will repeat the same circuit forever. The ${this.hand}-hand wall it held is an island${island.size ? ' (glowing yellow)' : ''} — it never touches the outside. Drive by hand to a different wall, then start again.`
     this.onChange()
   }
 
@@ -751,8 +767,11 @@ export class MazeGame {
     if (this.tier === 0) {
       score = Math.round(cov * 100)
       scoreLabel = '% mapped'
-      stars = escaped ? (cov >= 0.8 ? 3 : cov >= 0.5 ? 2 : 1) : 0
-      headline = escaped ? `You escaped in ${w.steps} moves and mapped ${score}% of the maze.` : reason
+      const raw = escaped ? (cov >= 0.8 ? 3 : cov >= 0.5 ? 2 : 1) : 0
+      stars = this.hintsUsed > 0 ? Math.min(2, raw) : raw
+      headline = escaped
+        ? `You escaped in ${w.steps} moves and mapped ${score}% of the maze.${this.hintsUsed > 0 && raw === 3 ? ' You used a hint, so this finish is capped at 2 stars — map it again without one for 3.' : ''}`
+        : reason
       why.push(`Every move fired 4 sensor beams up to ${w.cfg.range} squares. A beam marks the squares it passes as floor and the square that stops it as wall — that grid of free / wall / unknown is an occupancy map.`)
       why.push(unknownFloor > 0 ? `${unknownFloor} floor squares stayed unknown: no beam ever reached them. Dead ends hide behind corners, so a robot must go and look.` : 'Every floor square got mapped — nothing left unknown!')
       why.push(`The shortest possible escape was ${this.optimal} moves (green dashes). Mapping more costs moves: real robots trade a complete map against time and battery.`)
@@ -766,7 +785,9 @@ export class MazeGame {
       why.push(
         this.loops > 0
           ? `Your robot looped ${this.loops} time${this.loops === 1 ? '' : 's'}: it was holding an island — a wall that floats free in the middle. Following an island just goes round and round it.`
-          : 'Your robot never looped: the wall it held was joined to the outside wall.',
+          : escaped
+            ? 'Your robot never looped: the wall it held was joined to the outside wall.'
+            : `The battery ran out before the wall-follower finished a trip${w.bumps ? ` — ${w.bumps} bump${w.bumps === 1 ? '' : 's'} into walls cost energy too` : ''}. Start the follower early and let it do the walking.`,
       )
       why.push('Islands only exist in mazes with loops. In a “perfect” maze (no loops) every wall touches the outside, so wall-following always works. Robots use smarter methods (like frontier search) when they cannot trust that.')
     } else if (this.tier === 2) {
@@ -779,11 +800,12 @@ export class MazeGame {
         ? `Escaped in ${w.steps} steps. The always-nearest-frontier robot needs ${base}${w.steps < base ? ' — you beat it!' : w.steps === base ? ' — a tie.' : '.'} With a perfect map the best is ${this.optimal}.`
         : reason
       why.push('A frontier is the edge between what the robot knows and what it does not. Going to a frontier is the fastest way to learn something new.')
-      if (w.steps < base) why.push(`You beat “nearest frontier first” by ${base - w.steps} step${base - w.steps === 1 ? '' : 's'}. Nearest-first is a good rule, but it ignores what you know — that the exit is always in the east wall. Choosing frontiers with that in mind is what real explorers call using a prior.`)
+      if (!escaped) why.push(`The robot did not get out, so there is no score to compare with the nearest-frontier robot (${base} steps). Explore toward the east wall, and press Plan escape as soon as the exit glows green.`)
+      else if (w.steps < base) why.push(`You beat “nearest frontier first” by ${base - w.steps} step${base - w.steps === 1 ? '' : 's'}. Nearest-first is a good rule, but it ignores what you know — that the exit is always in the east wall. Choosing frontiers with that in mind is what real explorers call using a prior.`)
       else if (w.steps === base) why.push(`You tied the robot that always picks the nearest frontier — pressing Nearest every time IS that robot. To beat it (3 stars), use something it doesn't: the exit is always in the east wall, so a frontier on the east side can be worth more than a closer one in the west. And escape the moment a route is known.`)
       else why.push(`The nearest-frontier robot did it in ${base}. Long trips to far frontiers and backtracking out of dead ends cost steps. Beat ${base} for 3 stars.`)
       why.push(`BFS (breadth-first search) spreads out one step at a time, like a ripple. The first time the ripple touches the goal, that route is the shortest possible on the robot’s map. Your robot planned ${w.plans} time${w.plans === 1 ? '' : 's'} and checked ${w.expandedTotal} squares in total.`)
-      why.push(`The robot only mapped ${Math.round(cov * 100)}% of the maze — it didn’t need the rest. Exploration stops paying once the way out is known.`)
+      if (escaped) why.push(`The robot only mapped ${Math.round(cov * 100)}% of the maze — it didn’t need the rest. Exploration stops paying once the way out is known.`)
     } else {
       const sw = legendSweep(this.mazeIdx) as LegendSweep
       this.sweep = sw
@@ -799,12 +821,12 @@ export class MazeGame {
       const beats = sw.costs.filter((c) => c > cost).length
       rank = { beats: escaped ? beats : 0, of: sw.costs.length, best: Math.round(sw.costs[0]), three: Math.round(sw.three), two: Math.round(sw.two) }
       headline = escaped
-        ? `Mission cost ${Math.round(cost)} = ${usedR} energy + ${wrong} wrong square${wrong === 1 ? '' : 's'} × ${WRONG_SQUARE_COST}. ${stars === 3 ? 'A top-10% brain for this maze!' : `3 stars needs ${Math.round(sw.three)} or less.`}`
+        ? `Mission cost ${Math.round(cost)} = ${usedR} energy + ${wrong} wrong square${wrong === 1 ? '' : 's'} × ${WRONG_SQUARE_COST}. ${stars === 3 ? `A top-${Math.round(LEGEND_THREE_SHARE * 100)}% brain for this maze!` : `3 stars needs ${Math.round(sw.three)} or less.`}`
         : reason
       why.push(
         wrong > 0
-          ? `The map you brought back has ${wrong} wrong square${wrong === 1 ? '' : 's'} (red crosses): ${acc.wrongWalls} ghost wall${acc.wrongWalls === 1 ? '' : 's'} and ${acc.wrongFloor} real wall${acc.wrongFloor === 1 ? '' : 's'} marked as floor. Each one costs ${WRONG_SQUARE_COST}: a rescue team using this map would be fooled by it.`
-          : 'The map you brought back has no wrong squares: the evidence out-voted every noisy reading.',
+          ? `The map ${escaped ? 'you brought back' : 'so far'} has ${wrong} wrong square${wrong === 1 ? '' : 's'} (red crosses): ${acc.wrongWalls} ghost wall${acc.wrongWalls === 1 ? '' : 's'} and ${acc.wrongFloor} real wall${acc.wrongFloor === 1 ? '' : 's'} marked as floor. Each one costs ${WRONG_SQUARE_COST}: a rescue team using this map would be fooled by it.`
+          : `The map ${escaped ? 'you brought back' : 'so far'} has no wrong squares: the evidence out-voted every noisy reading.`,
       )
       const t = this.settings.trust
       const thresh = Math.log(t / (1 - t))

@@ -11,6 +11,16 @@
   --spark-bg: #0A1120;
   --spark-card: #111C32;
 }
+/* globals.css sets overflow-x: hidden on BOTH html and body, which makes body
+   a scroll container that never scrolls, so position: sticky did nothing on any
+   kids page (the header scrolled away: top -900 after a 900px scroll, Wave 3).
+   clip trims sideways overflow without making a scroll container. Scoped to
+   pages with the kids header; browsers without clip keep the hidden fallback. */
+html:has(.kids-nav), body:has(.kids-nav) { overflow-x: clip; }
+/* Now that the header really sticks, anything scrolled into view (results cards,
+   anchors, focus) lands below it, not under it. */
+html:has(.kids-nav) { scroll-padding-top: calc(84px + env(safe-area-inset-top)); }
+
 .kids-nav {
   position: sticky; top: 0; z-index: 30;
   display: flex; align-items: center; justify-content: space-between;

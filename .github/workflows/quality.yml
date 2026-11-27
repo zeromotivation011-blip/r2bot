@@ -76,3 +76,17 @@ jobs:
         run: npx tsx lib/kids/classroom-wave2.verify.ts
       - name: Kids shell — five one-word tabs, one gated grown-up door, Rank naming, next mission, 48px game controls + leave guard, WebGL context-loss poster, toast queue cap
         run: npx tsx components/kids/ui/shell.verify.ts
+      - name: Kids game Sky Port (drone-hover) — true debriefs per cause, random tunes rarely win (Legend < 3%, Ace < 15%), 3-star Legend needs I, every tier winnable, Cadet follows more time
+        run: npx tsx components/kids/games/drone-hover/drone-hover.verify.ts
+      - name: Kids game Circuit City — a drained battery never blames correct wiring, true series/no-path debriefs, random Legend settings win < 3%, answer hints cap at 2 stars, quoted physics true
+        run: npx tsx components/kids/games/circuit-city/circuit-city.verify.ts
+      - name: Kids game Arm Factory — true grip/weight physics, IK round-trips, random Legend speeds pass < 5% and never 2★, slow-everything misses the 60 s takt, true debrief per cause, helper ghost caps at 2 stars
+        run: npx tsx components/kids/games/arm-factory/arm-factory.verify.ts
+      - name: Kids game Train the Robot Brain — random Legend designs on uncleaned data pass < 12%, cleaning + augmentation both matter, new parcels every run, true debriefs (Ace delete-only, rotation, headlines), ✨ samples cap at 2 stars
+        run: npx tsx components/kids/games/robot-brain/robot-brain.verify.ts
+      - name: Kids game Mars Rover Command — Legend par matches the solver, 3★ needs Visual odometry + battery planning (not hidden AEGIS rocks), random Legend plans 3★ < 8% / win < 40%, true dune/battery/off-target debriefs, stuck rover's data still reaches Earth, every Cadet–Ace map has a one-plan route
+        run: npx tsx components/kids/games/mars-rover/mars-rover.verify.ts
+      - name: Kids game Swarm Reef — random settings win less at every tier up (Legend < 6%, never 3★), Legend runs on after the last beacon, same rules same run, thruster cap true, true debrief per failure cause, faint trails unreadable, answer hints cap at 2 stars
+        run: npx tsx components/kids/games/swarm-reef/swarm-reef.verify.ts
+      - name: Kids game Maze Mapper — Legend counts wrong map squares (careless brain never 3★), random Legend brain 3★ < 8%, seeded per-reading noise, planner race shows A*/greedy differences, Ace one-button only ties, true debrief per failure cause, Cadet hint caps at 2 stars, every tier winnable
+        run: npx tsx components/kids/games/maze-mapper/maze-mapper.verify.ts

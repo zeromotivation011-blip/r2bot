@@ -165,6 +165,13 @@ export interface Stats {
   minWhPct: number
   imagesSent: number
   parked: number
+  /**
+   * What was driving when the rover dug into a dune: a plain ▲ drive (goes
+   * exactly where it is pointed), or AutoNav / a hazard-avoidance detour
+   * (which steer round orbital-map dunes, so they only reach one when the
+   * rover is not where it thinks it is). The debrief must name the right one.
+   */
+  stuckBy: 'drive' | 'autonav' | 'detour' | null
 }
 
 export interface Sim {
@@ -289,7 +296,7 @@ export function createSim(tierIndex: TierIndex, map: MarsMap): Sim {
     points: 0,
     earthKnowsIdle: true,
     terminalAtEarth: null,
-    stats: { faults: {}, slips: 0, slipsCaught: 0, avoids: 0, sciMiss: 0, charges: 0, minWhPct: START_PCT, imagesSent: 0, parked: 0 },
+    stats: { faults: {}, slips: 0, slipsCaught: 0, avoids: 0, sciMiss: 0, charges: 0, minWhPct: START_PCT, imagesSent: 0, parked: 0, stuckBy: null },
     trail: [{ x: map.start.x, y: map.start.y }],
     ended: false,
   }
@@ -723,6 +730,7 @@ function finishAction(sim: Sim) {
     }
     sense(sim)
     if (m.dune[idx(m, r.x, r.y)]) {
+      sim.stats.stuckBy = c && c.k === 'goto' ? 'autonav' : c && c.k === 'fwd' && c.path ? 'detour' : 'drive'
       r.status = 'stuck'
       r.plan = []
       r.cur = null
@@ -820,6 +828,27 @@ function relay(sim: Sim) {
     sim.downlinkQueue = keep
     if (p.used > 0) sim.signals.push({ dir: 'down', sentAt: sim.t, arriveAt: sim.t + sim.tier.delay, kind: 'relay' })
   }
+}
+
+// ── plan editing (pure, so the verify script can test it) ─────────────────
+
+/**
+ * Add one command to a plan the way the plan builder does: drives in a row
+ * merge (up to 9 squares), turns in a row merge and wrap round a full circle
+ * (five right 90° turns are ONE right 90° turn; a full circle disappears), and
+ * nothing is added past the tier's command limit. Returns the same array when
+ * nothing changed.
+ */
+export function addCmd(plan: Cmd[], c: Cmd, maxCmds: number): Cmd[] {
+  const lastC = plan[plan.length - 1]
+  if (c.k === 'fwd' && lastC?.k === 'fwd' && lastC.n + c.n <= 9) return [...plan.slice(0, -1), { k: 'fwd', n: lastC.n + c.n }]
+  if (c.k === 'turn' && lastC?.k === 'turn') {
+    let d = (((lastC.d + c.d) % 8) + 8) % 8
+    if (d > 4) d -= 8
+    return d === 0 ? plan.slice(0, -1) : [...plan.slice(0, -1), { k: 'turn', d }]
+  }
+  if (plan.length >= maxCmds) return plan
+  return [...plan, c]
 }
 
 // ── Earth side ─────────────────────────────────────────────────────────────
@@ -1059,6 +1088,22 @@ export function isOver(sim: Sim): boolean {
   return false
 }
 
+/**
+ * Why the rover reached a dune, in words that are true for how it got there.
+ * A ▲ drive goes exactly where it points. AutoNav and the hazard-avoidance
+ * detour plan round every dune on the orbital map, so they only reach one when
+ * the rover's own position estimate is wrong (wheel slip without visual
+ * odometry, or an old fix).
+ */
+export function stuckReason(sim: Sim): string {
+  const by = sim.stats.stuckBy
+  if (by === 'autonav' || by === 'detour') {
+    const who = by === 'autonav' ? 'AutoNav' : 'Hazard avoidance'
+    return `${who} steers round the dunes on the orbital map, but it plans from where the rover THINKS it is. Slipping wheels had moved the rover off that spot, so its safe route ran into deep sand. Visual odometry 👁️ keeps that position honest.`
+  }
+  return 'A ▲ drive goes exactly where you point it, so the orange line must never cross a dark dune. No rover can drive out of sand that deep.'
+}
+
 export function evaluate(sim: Sim): Outcome {
   const tier = sim.tier
   const uplinks = sim.uplinks.length
@@ -1086,7 +1131,7 @@ export function evaluate(sim: Sim): Outcome {
     if (!won) {
       const reason =
         sim.rover.status === 'stuck'
-          ? 'The rover is stuck in deep sand. Plan routes around the dark dunes — no rover can drive out of soft sand that deep.'
+          ? `The rover is stuck in deep sand. ${stuckReason(sim)}`
           : sim.rover.sampled.size > 0
             ? 'The sample was taken but its data did not reach Earth before time ran out.'
             : `Time ran out. With a ${d}-minute delay each way, every extra plan is expensive — try to plan the whole route in one go.`
@@ -1113,17 +1158,22 @@ export function evaluate(sim: Sim): Outcome {
   if (st.parked) why.push('Late in the day the Sun was too low to charge, so the power guard parked the rover to save energy for the night.')
   if (st.charges) why.push(`The power guard stopped to charge ${st.charges}× — it kept the rover alive.`)
   if (sim.aegisAtEarth.size) why.push(`AEGIS found ${sim.aegisAtEarth.size} bonus rock${sim.aegisAtEarth.size > 1 ? 's' : ''} by itself while driving — real science done with no human in the loop.`)
-  const [s3, s2, par] = legendStarLines(sim.map.no)
-  const stars = sim.rover.status === 'dead' || total <= 0 || sim.scienceAtEarth.size === 0 ? 0 : total >= s3 ? 3 : total >= s2 ? 2 : 1
+  const { s3, s2, s1, par } = legendStarLines(sim.map.no)
+  const home = sim.scienceAtEarth.size
+  const stars = sim.rover.status === 'dead' || home === 0 ? 0 : total >= s3 ? 3 : total >= s2 ? 2 : total >= s1 ? 1 : 0
   if (stars > 0 && stars < 3) why.push(`★★★ on this map needs ${s3} points. Our best computer plan scored ${par} — try a different target order, or time your drives for the Sun and the relay passes.`)
+  const homeText = `${home} of ${sim.map.targets.length} targets' data reached Earth${sim.aegisAtEarth.size ? ` plus ${sim.aegisAtEarth.size} AEGIS find${sim.aegisAtEarth.size > 1 ? 's' : ''}` : ''}`
   const msg =
-    stars === 0
-      ? sim.rover.status === 'dead'
-        ? 'Low-power safe mode: the rover had to stop everything to stay alive. Watch the Sun and the battery!'
-        : sim.rover.status === 'stuck'
-          ? 'The rover got stuck in deep sand before any science reached Earth. AutoNav 🧭 steers around the dunes on the orbital map, but a ▲ drive goes exactly where you point it.'
+    sim.rover.status === 'dead'
+      ? 'Low-power safe mode: the rover had to stop everything to stay alive. Watch the Sun and the battery!'
+      : home === 0
+        ? sim.rover.status === 'stuck'
+          ? `The rover got stuck in deep sand before any science reached Earth. ${stuckReason(sim)}`
           : 'No science reached Earth this sol. Sample a target and make sure its data fits in a relay pass.'
-      : `${sim.scienceAtEarth.size} of ${sim.map.targets.length} targets' data reached Earth${sim.aegisAtEarth.size ? ` plus ${sim.aegisAtEarth.size} AEGIS find${sim.aegisAtEarth.size > 1 ? 's' : ''}` : ''}, battery ${Math.round(pct)}%.`
+        : stars === 0
+          ? `${homeText} (${total} pts)${sim.rover.status === 'stuck' ? ' — the stuck rover\'s radio still sent it home' : ''}. A Legend ★ on this map needs ${s1} points, so get at least two targets home and keep the battery healthy.`
+          : `${homeText}, battery ${Math.round(pct)}%.`
+  if (sim.rover.status === 'stuck' && !msg.includes(stuckReason(sim))) why.unshift(stuckReason(sim))
   return { won: stars > 0, stars, score: total, scoreLabel: 'science pts', lowerIsBetter: false, message: msg, why }
 }
 

@@ -81,7 +81,7 @@ const TIERS = [
   {
     name: 'Legend',
     who: 'ages 14–17 and anyone who likes a hard problem',
-    body: 'Write a looping program that sorts a stream of eight parts. Three are heavy steel parts. Move too fast and the needed grip force passes what the rubber fingers can hold, or the shoulder motor overloads, and the line stops. Beat a cycle-time target with steps that run only for heavy or only for light parts.',
+    body: 'Write a looping program that sorts a stream of eight parts. Three are heavy steel parts. Move too fast and the needed grip force passes what the rubber fingers can hold, or the shoulder motor overloads, and the line stops. The line needs the whole shift done in 60 seconds, and three stars needs 35: slowing every move is too slow, so use steps that run only for heavy or only for light parts.',
     tip: 'Watch the two gauges. A lift straight up asks for the most grip, because the fingers must fight gravity and the upward push together. Ask yourself which steps you even need.',
   },
 ]

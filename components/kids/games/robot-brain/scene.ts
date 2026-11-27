@@ -80,6 +80,7 @@ export class SorterScene {
   private counts: number[] = []
   private particles: Particle[] = []
   private reduced = false
+  private calm = false
   // Idle (training) view
   private idleDrawing: Drawing = []
   private idlePred: ClassId | null = null
@@ -109,6 +110,11 @@ export class SorterScene {
 
   setReducedMotion(r: boolean) {
     this.reduced = r
+  }
+
+  /** Calm mode (kids settings): no screen shake, smaller bursts. Motion itself stays. */
+  setCalm(c: boolean) {
+    this.calm = c
   }
 
   setClasses(c: ClassId[]) {
@@ -173,8 +179,9 @@ export class SorterScene {
     return Math.max(40, Math.min(58, this.w * 0.085))
   }
 
-  private burst(x: number, y: number, color: string, n: number) {
+  private burst(x: number, y: number, color: string, n0: number) {
     if (this.reduced) return
+    const n = this.calm ? Math.ceil(n0 / 3) : n0
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2
       const sp = 60 + Math.random() * 160
@@ -209,7 +216,7 @@ export class SorterScene {
         if (good) this.burst(this.chuteX(Math.max(0, ci)), this.chuteY - 10, SYMBOLS[p.truth].color, 26)
         else {
           this.burst(this.chuteX(Math.max(0, ci)), this.chuteY - 10, '#ef4444', 14)
-          if (!this.reduced) this.shake = 0.35
+          if (!this.reduced && !this.calm) this.shake = 0.35
         }
         this.cb.onParcel?.(this.idx, good)
       } else if (this.phase === 'land' && this.pt >= LAND) {
