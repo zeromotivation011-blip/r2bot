@@ -5,6 +5,7 @@
 import type { Metadata } from 'next'
 import SettingsClient from '@/components/kids/settings/SettingsClient'
 import { BackupCodeClient } from '@/components/kids/hangar/BackupCodeClient'
+import LabLookToggleClient from '@/components/kids/teen/LabLookToggleClient'
 
 const BASE = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in')
 
@@ -22,6 +23,10 @@ export default function KidsSettingsPage() {
       <h1 className="font-display text-3xl font-bold text-[#EEF2F8] sm:text-4xl">Settings</h1>
       <p className="mt-2 text-[#A7B0C0]">Make R2BOT Kids sound, read, look, move and wait the way you like.</p>
       <SettingsClient />
+      {/* Automatic / R2BOT Lab / R2BOT Kids (roadmap #83). */}
+      <div className="mt-6">
+        <LabLookToggleClient />
+      </div>
       {/* The progress backup code (also in the Hangar): no accounts, so this is how progress moves devices. */}
       <div id="backup" className="mt-6 scroll-mt-24">
         <BackupCodeClient />

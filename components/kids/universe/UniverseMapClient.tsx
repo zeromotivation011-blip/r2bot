@@ -105,12 +105,12 @@ export function UniverseMapClient({ progress }: UniverseMapProps) {
         </svg>
       </div>
 
-      {/* Hangar: the station in the middle (the child's robot, avatar and badges). */}
+      {/* Garage: the station in the middle (the child's robot, avatar and badges). */}
       <Link
         href="/kids/hangar"
         className="uv-pos group absolute z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center rounded-2xl outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
         style={posStyle(HANGAR_POS)}
-        aria-label="Hangar: your robot, avatar and badges"
+        aria-label="Garage: your robot, avatar and badges"
       >
         <span className="relative grid h-16 w-16 place-items-center sm:h-20 sm:w-20">
           <span className="uv-pulse absolute inset-0 rounded-full border-2 border-amber-400/50 motion-reduce:hidden" aria-hidden />
@@ -120,7 +120,7 @@ export function UniverseMapClient({ progress }: UniverseMapProps) {
             <img src="/kids-icon.svg" alt="" width={40} height={40} className="h-9 w-9 sm:h-11 sm:w-11" />
           </span>
         </span>
-        <span className="mt-1 rounded-full bg-[#0A1120]/80 px-2 py-0.5 font-display text-[13px] font-bold text-amber-300 sm:text-sm">Hangar</span>
+        <span className="mt-1 rounded-full bg-[#0A1120]/80 px-2 py-0.5 font-display text-[13px] font-bold text-amber-300 sm:text-sm">Garage</span>
       </Link>
 
       {PLANETS.map((pl, i) => (

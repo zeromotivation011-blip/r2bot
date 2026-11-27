@@ -9,7 +9,7 @@
 
 import Link from 'next/link'
 import type { KidsProgress } from '@/lib/kids-progress'
-import { Avatar } from './avatars'
+import { Avatar, displayAvatarId } from './avatars'
 import { pickMission, type SessionTitles } from './ContinueCardClient'
 import { hasStarted } from './universe-state'
 
@@ -43,7 +43,7 @@ export function MissionStripClient({ progress, onboarded, titles, playable, onSt
     return (
       <div className={`${BOX} uv-pop`}>
         <span className="shrink-0" aria-hidden>
-          <Avatar id={progress.avatar?.id ?? 'astro'} color={progress.avatar?.color ?? '#FC6818'} size={52} />
+          <Avatar id={displayAvatarId(progress.avatar, progress.band)} color={progress.avatar?.color ?? '#FC6818'} size={52} />
         </span>
         <p className="min-w-0 flex-1 text-[15px] font-semibold leading-snug text-[#EEF2F8]">
           New here? <span className="text-[#A7B0C0]">Set up your explorer.</span>

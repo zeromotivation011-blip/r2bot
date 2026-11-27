@@ -15,9 +15,10 @@ import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
 import { ParentTimeKeeper } from '@/components/kids/parents/ParentTimeKeeperClient'
 import ProfileSwitcherClient from '@/components/kids/profiles/ProfileSwitcherClient'
 import { useKidsVoice } from '@/lib/kids-voice'
-import { KIDS_MORE, KIDS_SETTINGS, type KidsNavItem } from '@/lib/kids/nav'
+import { GALAXY_TAB, KIDS_GROWNUPS_HREF, KIDS_HEADER_TABS, KIDS_MORE, KIDS_SETTINGS, KIDS_TABS, type KidsNavItem } from '@/lib/kids/nav'
 import { openSpark } from '@/lib/kids/ai/spark/open'
 import { useParentControls } from '@/lib/kids/parent-controls'
+import { LAB_BRAND, LAB_LABELS, useKidsLook } from '@/lib/kids/teen'
 import './kids-animations.css'
 import './kids-shell.css'
 
@@ -28,7 +29,7 @@ const AskSpark = dynamic(() => import('@/components/kids/ai/spark/AskSparkClient
 const RobodexToast = dynamic(() => import('@/components/kids/robodex/RobodexToastClient'), { ssr: false })
 
 /** Grown-up screens: no floating Spark button (openSpark() still works there). */
-const SPARK_HIDE_GROWNUP = ['/kids/classroom', '/kids/join', '/kids/parents', '/kids/teach', '/kids/schools', '/kids/present', '/kids/portfolio/class-certificates']
+const SPARK_HIDE_GROWNUP = ['/kids/grown-ups', '/kids/classroom', '/kids/join', '/kids/parents', '/kids/teach', '/kids/schools', '/kids/present', '/kids/portfolio/class-certificates']
 
 /**
  * Game and full-screen screens, where a floating button would sit on top of the
@@ -58,24 +59,13 @@ export default function KidsShell({ children }: { children: React.ReactNode }) {
   )
 }
 
-// ONE navigation for the whole kids product (docs/kids-universe.md).
-// Primary — five places at most on the phone tab bar: Home · Course · Worlds ·
-// Games · Hangar. The desktop header has room for one more, so it also shows
-// the Skill Galaxy; on phones the Galaxy moves into "More" (it is also one tap
-// from Home, from every world page and from every course session).
-interface Tab { href: string; emoji: string; label: string; match: (p: string) => boolean }
-
-const HOME_TAB: Tab = { href: '/kids', emoji: '🏠', label: 'Home', match: (p) => p === '/kids' }
-const COURSE_TAB: Tab = { href: '/kids/course', emoji: '🚀', label: 'Course', match: (p) => p.startsWith('/kids/course') || p.startsWith('/kids/lab/episodes') }
-const WORLDS_TAB: Tab = { href: '/kids/worlds', emoji: '🧭', label: 'Worlds', match: (p) => p.startsWith('/kids/worlds') }
-const GALAXY_TAB: Tab = { href: '/kids/galaxy', emoji: '🌌', label: 'Galaxy', match: (p) => p.startsWith('/kids/galaxy') }
-const GAMES_TAB: Tab = { href: '/kids/play', emoji: '🎮', label: 'Games', match: (p) => p.startsWith('/kids/play') }
-const HANGAR_TAB: Tab = { href: '/kids/hangar', emoji: '🛸', label: 'Hangar', match: (p) => p.startsWith('/kids/hangar') }
-
-/** Phone tab bar: exactly five. */
-const TABS: Tab[] = [HOME_TAB, COURSE_TAB, WORLDS_TAB, GAMES_TAB, HANGAR_TAB]
-/** Desktop header (the logo is Home). */
-const HEADER_TABS: Tab[] = [COURSE_TAB, WORLDS_TAB, GALAXY_TAB, GAMES_TAB, HANGAR_TAB]
+// ONE navigation for the whole kids product (docs/kids-universe.md, lib/kids/nav.ts).
+// Primary — five places on the phone tab bar: Home · Learn · Worlds · Games ·
+// Garage (why these words: lib/kids/nav.ts). The desktop header has room for one
+// more, so it also shows the Skill Galaxy; on phones the Galaxy moves into
+// "More" (it is also one tap from Home, from every world page and every session).
+const TABS = KIDS_TABS
+const HEADER_TABS = KIDS_HEADER_TABS
 
 // Secondary — the "More" menu (header, every width) and the "More ways to play" grid on Home.
 // The Galaxy entry is shown in More on phones only (kids-more-phone-only), where it is not a tab.
@@ -148,26 +138,30 @@ function MoreMenu({ pathname }: { pathname: string }) {
 
 function KidsShellInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? ''
-  const [lvl, setLvl] = useState<{ level: number; title: string; xp: number } | null>(null)
+  // The XP level is a "Rank" (roadmap #6): "Level" only means a course level.
+  const [rank, setRank] = useState<{ level: number; title: string; xp: number } | null>(null)
   const { voiceOn, toggle, cancel } = useKidsVoice()
   useConfettiEventBridge()
   // A grown-up can switch Ask Spark off in the parent hub: the header button
   // then reads "Need help?" and opens the help-only sheet (safety help stays).
   const sparkOn = useParentControls().askSpark
+  // Engineers (14–17) see the "R2BOT Lab" look (roadmap #83); kids-teen.css swaps the wordmark.
+  const look = useKidsLook().look
 
   useEffect(() => {
     const read = () => {
       const xp = getProgress().xp
       const li = levelInfo(xp)
-      setLvl({ level: li.level, title: li.title, xp })
+      setRank({ level: li.level, title: li.title, xp })
     }
     read()
+    // Every write goes through saveProgress, which fires KIDS_PROGRESS_EVENT (no polling
+    // since every surface reports through the rewards engine); `storage` covers other tabs.
     window.addEventListener(KIDS_PROGRESS_EVENT, read)
-    // Older Robot World screens write progress in several steps; keep a slow poll as a safety net.
-    const t = setInterval(read, 4000)
+    window.addEventListener('storage', read)
     return () => {
       window.removeEventListener(KIDS_PROGRESS_EVENT, read)
-      clearInterval(t)
+      window.removeEventListener('storage', read)
     }
   }, [])
 
@@ -196,7 +190,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
     >
 
       <header className="kids-nav">
-        <Link href="/kids" className="kids-nav-brand" aria-label="R2BOT Kids home">
+        <Link href="/kids" className="kids-nav-brand" aria-label={look === 'lab' ? LAB_BRAND.homeLabel : 'R2BOT Kids home'}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/kids-icon.svg" alt="" width={36} height={36} className="kids-nav-logo" />
           <span className="kids-nav-brand-text">R2BOT <span className="kids-nav-brand-kids">Kids</span></span>
@@ -210,7 +204,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
                 className={`kids-nav-link${t.match(pathname) ? ' kids-nav-link-on' : ''}`}
                 aria-current={t.match(pathname) ? 'page' : undefined}
               >
-                <span aria-hidden className="kids-nav-link-emoji">{t.emoji}</span> {t.label}
+                <span aria-hidden className="kids-nav-link-emoji">{t.emoji}</span> <TabWord label={t.label} />
               </Link>
             ))}
           </nav>
@@ -238,9 +232,12 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
             <span aria-hidden>{voiceOn ? '🔊' : '🔇'}</span>
           </button>
           <ProfileSwitcherClient />
-          <Link href="/kids/hangar" className="kids-nav-stars" aria-label={lvl ? `Level ${lvl.level}, ${lvl.title}, ${lvl.xp} XP — open your hangar` : 'Open your hangar'}>
+          <Link href="/kids/hangar" className="kids-nav-stars" aria-label={rank ? `Rank ${rank.level}, ${rank.title}, ${rank.xp} XP. Open your Garage` : 'Open your Garage'}>
             {/* Reserved width so the header never shifts after hydration. */}
-            <span className="inline-block min-w-[3.5rem] text-center">{lvl ? `Lv ${lvl.level}` : 'Lv 1'}</span>
+            <span className="inline-block min-w-[4.25rem] text-center">
+              <span className="kids-rank-word">Rank </span>
+              {rank ? rank.level : 1}
+            </span>
           </Link>
         </div>
       </header>
@@ -249,19 +246,19 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
 
       {!bare && (
         <footer className="kids-footer">
-          <span className="kids-footer-label">For grown-ups:</span>
-          {/* Grown-up pages and links that leave /kids ask a grown-up first (parental gate). */}
-          <GrownUpLink href="/kids/parents" grant>Parents</GrownUpLink>
-          <GrownUpLink href="/kids/teach">Teachers</GrownUpLink>
-          <GrownUpLink href="/kids/schools">Schools</GrownUpLink>
+          {/* ONE grown-up door (roadmap #20): Parents, Teachers, Classroom, Schools, the
+              Trust Pack, privacy and the main site all live behind /kids/grown-ups,
+              which opens through the parental gate. Joining a class is the child's own. */}
+          <GrownUpLink href={KIDS_GROWNUPS_HREF} grant message="This opens the page for parents and teachers.">
+            For grown-ups
+          </GrownUpLink>
           <Link href="/kids/join">Join a class</Link>
-          <GrownUpLink href="/kids/classroom">Teacher classroom</GrownUpLink>
-          <GrownUpLink href="/privacy#kids">Privacy</GrownUpLink>
-          <GrownUpLink href="/" message="This opens R2BOT for grown-ups.">R2BOT for grown-ups</GrownUpLink>
-          {/* Parent controls: daily time / quiet hours wind-down banner (never a lock). */}
-          <ParentTimeKeeper />
         </footer>
       )}
+
+      {/* Parent controls: daily time / quiet hours wind-down banner (never a lock).
+          Here, beside the reward toasts, so it also runs on game screens. */}
+      {!bare && <ParentTimeKeeper />}
 
       {/* Ask Spark: a floating button above the tab bar on ordinary pages; on game
           screens it is hidden here and the header's small Spark button opens it. */}
@@ -283,7 +280,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
             return (
               <Link key={t.href} href={t.href} className={`kids-tab${on ? ' kids-tab-on' : ''}`} aria-current={on ? 'page' : undefined}>
                 <span className="kids-tab-emoji" aria-hidden>{t.emoji}</span>
-                <span className="kids-tab-label">{t.label}</span>
+                <span className="kids-tab-label"><TabWord label={t.label} /></span>
               </Link>
             )
           })}
@@ -305,5 +302,20 @@ function SparkMini() {
       <line x1="20" y1="11" x2="20" y2="6.5" stroke="#FF8A4C" strokeWidth="2" strokeLinecap="round" />
       <circle cx="20" cy="5.5" r="2" fill="#FFA878" />
     </svg>
+  )
+}
+
+/**
+ * A tab's word in both looks (roadmap #83): the boot script sets
+ * html[data-kids-look] before first paint, so CSS shows the right one with no flicker.
+ */
+function TabWord({ label }: { label: string }) {
+  const lab = LAB_LABELS[label]
+  if (!lab || lab === label) return <>{label}</>
+  return (
+    <>
+      <span className="kids-kids-only">{label}</span>
+      <span className="kids-lab-only">{lab}</span>
+    </>
   )
 }

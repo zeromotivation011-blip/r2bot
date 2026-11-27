@@ -175,13 +175,14 @@ Build these exceptionally; everything else is secondary.
   siblings / shared tablets on one device; a new per-child store uses `profileKey()` OR `SWAPPED_KEYS`, never both),
   **Mastery** (activity `concepts`, secure/fading in `lib/kids/universe/mastery.ts`, Recharge missions, Launch Check;
   hints cap a finish at 2 stars via the one `HintLadderClient`), and the **progress backup code** (`exportProgressCode`/`importProgressCode` in
-  `lib/kids-progress.ts`, UI `components/kids/hangar/BackupCodeClient.tsx` in the Hangar and Settings: no personal data,
+  `lib/kids-progress.ts`, UI `components/kids/hangar/BackupCodeClient.tsx` in the Garage and Settings: no personal data,
   a restore merges and never lowers progress), **Games** `/kids/play/<id>` (count them from `GAMES`, never type the
-  number; only games with a built page go in `GAMES`; the phone tab bar is five: Home · Course · Worlds · Games · Hangar), **Course** `/kids/course/<1-4>` (all four
+  number; only games with a built page go in `GAMES`; the phone tab bar is five: Home · Learn · Worlds · Games · Garage, from `KIDS_TABS` in `lib/kids/nav.ts`; the XP number is a "Rank", "Level" means a course level), **Course** `/kids/course/<1-4>` (all four
 levels written; level pages indexable, session pages noindex; teacher guides for every session at `/kids/teach`),
 **Robodex** `/kids/robodex` (real-robot cards earned only by doing), **Makers** `/kids/careers` (count from `MAKERS`),
 **Power Lab** `/kids/lab/power` (battery model; sim runs have a Flight Recorder),
 **Make It at Home** `/kids/printables` + `/kids/printables/<id>` (count from `HOME_BUILDS`; `/kids/activities` 308s there),
+**Robot Passport** (optional server copy under a SHA-256 of random words, migration 0057, route `app/api/kids/passport`), **Robot Maths** `/kids/maths`, **Link Lab** `/kids/lab/network` (+ `/guardian` security check), the Engineers' **R2BOT Lab look** (`lib/kids/teen.ts`, `html[data-kids-look]`), one gated grown-up door `/kids/grown-ups` (the only grown-up link in the kids footer),
 **Portfolio** `/kids/portfolio` (noindex, device-only, certificates), **teacher tools** under `/kids/teach` (standards, Trust Pack,
 clubs/family/library, unplugged lessons) and **Present mode** `/kids/present` (noindex; animated pages follow `lib/kids/teach/present-bridge.ts`).
 The class snapshot is counts only; changing `ClassSnapshot` means updating `lib/kids/teach/trust-pack.ts` in the same commit.

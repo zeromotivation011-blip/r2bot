@@ -1,7 +1,8 @@
 'use client'
 
 // components/kids/universe/ExplorerCardClient.tsx
-// The child's explorer card: avatar, explorer name, level + title + XP bar,
+// The child's explorer card: avatar, explorer name, the title they wear (the
+// best `title-*` unlock, bestTitle()), Rank + rank name + XP bar,
 // stars, badges, days explored this week and this week's three quests. Every
 // number comes from the progress store via levelInfo()/questStatus()/
 // daysExploredThisWeek() — nothing is invented. On phones and tablets the card
@@ -9,13 +10,16 @@
 // (Spark's welcome) and a returning one's (stats + days), at 390px. So the
 // skeleton, the fresh card and the filled card are one size and nothing below
 // jumps. On desktop it fills the grid row beside the map.
+//
+// Words (roadmap #6): the XP level is a **Rank** ("Rank 4 · Bolt Tinkerer"), so
+// "Level" only ever means a course level.
 
 import { collectedStars, type KidsProgress } from '@/lib/kids-progress'
 import { getBand } from '@/lib/kids/bands'
-import { daysExploredThisWeek, levelInfo } from '@/lib/kids/universe/rewards'
+import { bestTitle, daysExploredThisWeek, levelInfo } from '@/lib/kids/universe/rewards'
 import { QuestPanelClient } from './QuestPanelClient'
 import { Spark } from '@/components/kids/story/characters'
-import { Avatar } from './avatars'
+import { Avatar, displayAvatarId } from './avatars'
 import { hasStarted, weekDots } from './universe-state'
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -77,6 +81,7 @@ function Filled({ p, onboarded, onStart, onEdit }: { p: KidsProgress; onboarded:
   const fresh = !onboarded && !hasStarted(p)
   const name = p.explorerName || 'Explorer'
   const todayIdx = (now.getDay() + 6) % 7
+  const worn = bestTitle(p.unlocks)
 
   return (
     <div className="uv-pop">
@@ -87,15 +92,22 @@ function Filled({ p, onboarded, onStart, onEdit }: { p: KidsProgress; onboarded:
           className="group relative shrink-0 rounded-full outline-none transition active:scale-95 focus-visible:ring-4 focus-visible:ring-amber-400/60"
           aria-label={fresh ? 'Set up your explorer' : 'Change your avatar and name'}
         >
-          <Avatar id={p.avatar?.id ?? 'astro'} color={p.avatar?.color ?? '#FC6818'} size={72} />
+          <Avatar id={displayAvatarId(p.avatar, p.band)} color={p.avatar?.color ?? '#FC6818'} size={72} />
           <span className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full bg-amber-500 text-[#1A1103] shadow ring-2 ring-[#111C32]" aria-hidden>
             <PencilIcon />
           </span>
         </button>
         <div className="min-w-0 flex-1">
           <p className="truncate font-display text-2xl font-bold leading-tight text-[#EEF2F8]">{fresh ? 'Welcome, explorer!' : name}</p>
+          {!fresh && worn && (
+            <p className="mt-1 inline-flex max-w-full items-center gap-1 truncate rounded-full border border-amber-400/40 bg-amber-500/10 px-2.5 py-0.5 text-[13px] font-bold text-amber-300">
+              <span aria-hidden>🎖️</span>
+              <span className="sr-only">Title: </span>
+              {worn.name}
+            </p>
+          )}
           <p className="mt-0.5 text-[15px] font-semibold text-[#A7B0C0]">
-            Level <span className="font-display text-amber-300">{li.level}</span> · {li.title}
+            Rank <span className="font-display text-amber-300">{li.level}</span> · {li.title}
           </p>
           {band && (
             <p className="mt-0.5 text-[13px] font-semibold text-[#6E7888]">
@@ -111,13 +123,13 @@ function Filled({ p, onboarded, onStart, onEdit }: { p: KidsProgress; onboarded:
           <div className="flex items-baseline justify-between text-[13px] font-semibold text-[#A7B0C0]">
             <span>XP</span>
             <span>
-              <span className="font-display text-[#EEF2F8]">{li.xpIntoLevel}</span> / {li.xpForNext} to level {li.level + 1}
+              <span className="font-display text-[#EEF2F8]">{li.xpIntoLevel}</span> / {li.xpForNext} to Rank {li.level + 1}
             </span>
           </div>
           <div
             className="mt-1 h-3 overflow-hidden rounded-full bg-white/10"
             role="progressbar"
-            aria-label={`Experience towards level ${li.level + 1}`}
+            aria-label={`Experience towards Rank ${li.level + 1}`}
             aria-valuemin={0}
             aria-valuemax={li.xpForNext}
             aria-valuenow={li.xpIntoLevel}

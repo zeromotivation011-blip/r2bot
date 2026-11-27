@@ -1,5 +1,5 @@
 // components/kids/games/sumo-arena/render.ts
-// The Battle Dome in three.js: a raised black dohyo with its white edge line and
+// The Push Lab ring in three.js: a raised black dohyo with its white edge line and
 // brown start lines, the child's own robot (lib/kids/robot3d.ts) and the rival,
 // the distance beam and edge-sensor lights. Only imported from the game client,
 // which is itself loaded with next/dynamic({ ssr: false }).

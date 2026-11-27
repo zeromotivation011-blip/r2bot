@@ -1,5 +1,5 @@
 // components/kids/makers/MakerAvatar.tsx — a Maker's portrait, drawn in SVG
-// from lib/kids/makers/makers.ts MakerLook (skin, hair, headscarf, glasses,
+// from lib/kids/makers/makers.ts MakerLook (skin, hair, headscarf, turban, kippah, glasses,
 // hearing aids, a wheelchair, a bionic hand). Server-safe (no hooks), so it
 // renders in the server HTML. Decorative unless `label` is given.
 
@@ -86,8 +86,15 @@ export function MakerAvatar({ look, size = 96, label, className }: MakerAvatarPr
         <rect x="53" y="70" width="14" height="16" rx="5" fill={look.skin} />
         {/* head */}
         <circle cx="60" cy="54" r="21" fill={look.skin} />
-        {!look.headscarf && look.hair !== 'afro' && <Hair look={look} />}
+        {!look.headscarf && !look.turban && look.hair !== 'afro' && <Hair look={look} />}
         {look.headscarf && <path d="M37 54c0-16 10-27 23-27s23 11 23 27c-3-10-11-17-23-17s-20 7-23 17z" fill={look.headscarf} />}
+        {look.turban && (
+          <g>
+            <path d="M36 50c0-17 11-28 24-28s24 11 24 28c-6-6-14-9-24-9s-18 3-24 9z" fill={look.turban} />
+            <path d="M40 40c8-6 16-8 24-6M44 33c8-4 16-4 22 0" fill="none" stroke="#0A1120" strokeOpacity=".25" strokeWidth="2" strokeLinecap="round" />
+          </g>
+        )}
+        {look.kippah && <path d="M50 34c2-5 18-5 20 0z" fill={look.kippah} />}
         {/* face */}
         <circle cx="52" cy="55" r="2.6" fill="#1A1103" />
         <circle cx="68" cy="55" r="2.6" fill="#1A1103" />

@@ -37,11 +37,11 @@ export interface LevelInfo {
 }
 
 const RANK_TITLES: { from: number; title: string }[] = [
-  { from: 1, title: 'Star Cadet' },
+  { from: 1, title: 'Star Rookie' }, // was "Star Cadet": Cadet is the first game tier (roadmap #6)
   { from: 5, title: 'Bolt Tinkerer' },
   { from: 10, title: 'Circuit Ranger' },
   { from: 15, title: 'Sensor Scout' },
-  { from: 20, title: 'Code Pilot' },
+  { from: 20, title: 'Code Captain' }, // was "Code Pilot": Pilot is a game tier
   { from: 28, title: 'Robot Engineer' },
   { from: 36, title: 'Autonomy Architect' },
   { from: 45, title: 'Mission Commander' },

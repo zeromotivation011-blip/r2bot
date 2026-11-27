@@ -7,8 +7,13 @@
 //
 // Run:  npx tsx lib/kids/code-lab/verify.ts
 
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { capabilitiesOf, DEFAULT_DESIGN } from '../robot-design'
-import { BLOCK_NEEDS, countBlocks, usedTypes } from './blocks'
+import { blockNeeds } from '../sim/program'
+import { BLOCK_INFO, BLOCK_NEEDS, countBlocks, usedTypes } from './blocks'
+import { CODE_LAB_TO_SHARED, SHARED_STYLE_COLOURS } from './shared-vocabulary'
+import type { BlockType } from './types'
 import { runMission } from './interpreter'
 import { MISSIONS } from './missions'
 import { designWith } from './parts'
@@ -50,6 +55,52 @@ export function verifyMissions(): VerifyIssue[] {
   const bands = new Map<string, number>()
   for (const m of MISSIONS) bands.set(m.band, (bands.get(m.band) ?? 0) + 1)
   if (MISSIONS.length < 20) issues.push({ mission: '*', problem: `only ${MISSIONS.length} missions (need 20+)` })
+  return [...issues, ...verifySharedVocabulary()]
+}
+
+/**
+ * One block language (roadmap #21, shared-vocabulary.ts): every Code Lab block
+ * names a real shared-set block, the same part locks it in both editors, it is
+ * drawn in the shared colour with the shared emoji, and the shared colours
+ * still match the Blockly theme in components/kids/sim/blockly-blocks.ts.
+ */
+export function verifySharedVocabulary(): VerifyIssue[] {
+  const issues: VerifyIssue[] = []
+  const add = (problem: string) => issues.push({ mission: 'vocabulary', problem })
+  // Statement and sensor ids of the shared set, read from the Blockly definitions (no Blockly import in Node).
+  let blocklySrc = ''
+  try {
+    blocklySrc = readFileSync(join(process.cwd(), 'components/kids/sim/blockly-blocks.ts'), 'utf8')
+  } catch {
+    add('cannot read components/kids/sim/blockly-blocks.ts (run from the repo root)')
+    return issues
+  }
+  const definedIds = new Set<string>()
+  for (const m of blocklySrc.matchAll(/(?:type:\s*'|stmt\('[a-z_]+',\s*'|reporter\(')([a-z_]+)'/g)) definedIds.add(m[1])
+  for (const [style, hex] of Object.entries(SHARED_STYLE_COLOURS)) {
+    const m = new RegExp(`${style}:\\s*'(#[0-9A-Fa-f]{6})'`).exec(blocklySrc)
+    if (!m) add(`style ${style} missing from the Blockly theme`)
+    else if (m[1].toUpperCase() !== hex.toUpperCase()) add(`style ${style} is ${m[1]} in Blockly but ${hex} in Code Lab`)
+  }
+  for (const t of Object.keys(BLOCK_INFO) as BlockType[]) {
+    const ref = CODE_LAB_TO_SHARED[t]
+    if (!definedIds.has(ref.stmt)) add(`${t} → shared block “${ref.stmt}” is not defined in the Blockly set`)
+    if (ref.sensor && !definedIds.has(ref.sensor)) add(`${t} → shared sensor “${ref.sensor}” is not defined in the Blockly set`)
+    // Same part, same lock: the Code Lab block needs what the shared block (or its sensor) needs. `move` is every robot.
+    const mine = BLOCK_NEEDS[t] ?? null
+    const shared = blockNeeds(ref.sensor ?? ref.stmt)
+    if ((mine === 'move' ? null : mine) !== shared) add(`${t} needs ${mine ?? 'nothing'} in Code Lab but ${shared ?? 'nothing'} as ${ref.sensor ?? ref.stmt}`)
+    if (BLOCK_INFO[t].emoji !== ref.emoji) add(`${t} emoji ${BLOCK_INFO[t].emoji} differs from the shared ${ref.emoji}`)
+    if (!BLOCK_INFO[t].tone.includes(SHARED_STYLE_COLOURS[ref.style])) add(`${t} chip is not drawn in the shared ${ref.style} colour`)
+    // The picture must mean the same thing in both editors: the shared block's label carries the emoji,
+    // or its toolbox group does (🚗 Move). "Turn left" shows ↺, the mirror of the shared turn's ↻.
+    const id = ref.sensor ?? ref.stmt
+    const def = new RegExp(`(?:'${id}',\\s*'([^']*)'|type: '${id}',\\s*message0: '([^']*)')`).exec(blocklySrc)
+    const label = def ? (def[1] ?? def[2] ?? '') : ''
+    const group = new RegExp(`name: '([^']*)'[^\\n]*'${id}'`).exec(blocklySrc)?.[1] ?? ''
+    const same = label.includes(ref.emoji) || group.startsWith(ref.emoji) || (t === 'left' && label.includes('↻'))
+    if (!same) add(`${t}: ${ref.emoji} is neither on the shared block ${id} (“${label}”) nor on its group (“${group}”)`)
+  }
   return issues
 }
 
@@ -64,5 +115,5 @@ if (isMain) {
     for (const i of issues) console.error(`✗ ${i.mission}: ${i.problem}`)
     process.exit(1)
   }
-  console.log('✓ every reference solution wins on every arena')
+  console.log('✓ every reference solution wins on every arena; Code Lab blocks match the shared block set')
 }

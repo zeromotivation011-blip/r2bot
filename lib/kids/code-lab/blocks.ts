@@ -1,9 +1,10 @@
 // lib/kids/code-lab/blocks.ts
-// The block catalogue: labels, colours, which capability each block needs,
+// The block catalogue: labels, colours (from the shared block set), which capability each block needs,
 // creating fresh blocks, counting them, and the Python-style view.
 
 import type { Capability } from '../robot-design'
 import type { Block, BlockType, TileColor } from './types'
+import { CODE_LAB_TO_SHARED, SHARED_STYLE_CHIP } from './shared-vocabulary'
 
 export interface BlockInfo {
   type: BlockType
@@ -14,21 +15,30 @@ export interface BlockInfo {
   group: 'move' | 'loop' | 'sense' | 'tool'
 }
 
+// Labels are Code Lab's own grid words; colour and emoji come from the shared
+// block set (shared-vocabulary.ts, roadmap #21) so every block looks the same
+// here and in the Physics Lab.
+const chip = (t: BlockType): string => {
+  const style = CODE_LAB_TO_SHARED[t].style
+  return style in SHARED_STYLE_CHIP ? SHARED_STYLE_CHIP[style as keyof typeof SHARED_STYLE_CHIP] : SHARED_STYLE_CHIP.action_blocks
+}
+const info = (type: BlockType, label: string, group: BlockInfo['group']): BlockInfo => ({ type, label, emoji: CODE_LAB_TO_SHARED[type].emoji, tone: chip(type), group })
+
 export const BLOCK_INFO: Record<BlockType, BlockInfo> = {
-  forward: { type: 'forward', label: 'Move forward', emoji: '⬆️', tone: 'bg-sky-700 text-white', group: 'move' },
-  left: { type: 'left', label: 'Turn left', emoji: '↺', tone: 'bg-sky-700 text-white', group: 'move' },
-  right: { type: 'right', label: 'Turn right', emoji: '↻', tone: 'bg-sky-700 text-white', group: 'move' },
-  repeat: { type: 'repeat', label: 'Repeat', emoji: '🔁', tone: 'bg-amber-500 text-black', group: 'loop' },
-  repeatUntil: { type: 'repeatUntil', label: 'Repeat until at 🏁', emoji: '🔂', tone: 'bg-amber-500 text-black', group: 'loop' },
-  ifWall: { type: 'ifWall', label: 'If wall ahead', emoji: '🧱', tone: 'bg-violet-600 text-white', group: 'sense' },
-  ifColor: { type: 'ifColor', label: 'If on colour', emoji: '🎨', tone: 'bg-violet-600 text-white', group: 'sense' },
-  ifLine: { type: 'ifLine', label: 'If line ahead', emoji: '〰️', tone: 'bg-violet-600 text-white', group: 'sense' },
-  pickup: { type: 'pickup', label: 'Pick up', emoji: '🦾', tone: 'bg-emerald-500 text-black', group: 'tool' },
-  drop: { type: 'drop', label: 'Drop', emoji: '📥', tone: 'bg-emerald-500 text-black', group: 'tool' },
-  penDown: { type: 'penDown', label: 'Pen down', emoji: '🖊️', tone: 'bg-emerald-500 text-black', group: 'tool' },
-  penUp: { type: 'penUp', label: 'Pen up', emoji: '✋', tone: 'bg-emerald-500 text-black', group: 'tool' },
-  lightOn: { type: 'lightOn', label: 'Light on', emoji: '🔦', tone: 'bg-emerald-500 text-black', group: 'tool' },
-  say: { type: 'say', label: 'Say', emoji: '💬', tone: 'bg-pink-700 text-white', group: 'tool' },
+  forward: info('forward', 'Move forward', 'move'),
+  left: info('left', 'Turn left', 'move'),
+  right: info('right', 'Turn right', 'move'),
+  repeat: info('repeat', 'Repeat', 'loop'),
+  repeatUntil: info('repeatUntil', 'Repeat until at 🏁', 'loop'),
+  ifWall: info('ifWall', 'If wall ahead', 'sense'),
+  ifColor: info('ifColor', 'If on colour', 'sense'),
+  ifLine: info('ifLine', 'If line ahead', 'sense'),
+  pickup: info('pickup', 'Pick up', 'tool'),
+  drop: info('drop', 'Drop', 'tool'),
+  penDown: info('penDown', 'Pen down', 'tool'),
+  penUp: info('penUp', 'Pen up', 'tool'),
+  lightOn: info('lightOn', 'Light on', 'tool'),
+  say: info('say', 'Say', 'tool'),
 }
 
 /** The capability a block needs. Blocks not listed work on every robot that can move. */

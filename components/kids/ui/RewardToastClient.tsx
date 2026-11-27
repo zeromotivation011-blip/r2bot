@@ -15,6 +15,13 @@
 //   - Explorers (5–7, pre-readers): Spark says every badge and quest aloud when
 //     voice is on (sparkSays checks the Settings); the ceremony says level-ups.
 //   - The same news is read out to screen readers through a polite live region.
+//   - No pile-up (27 Nov 2026): toasts wait in a queue and at most two show at
+//     once on a phone (three on a wider screen), each for its own 5 s from the
+//     moment it appears. Nothing shows behind the level-up ceremony; the queue
+//     resumes when it closes. When a burst brings more than five (a robot rename
+//     can earn a badge, a quest and several unlocks at once), the extras fold into
+//     one "+N more rewards" toast that points to the Garage. Screen readers still
+//     hear every reward once, straight away.
 //
 // It also:
 //   - reports a robot save (Workshop, Garage, Hangar paint…) as kind 'build', at
@@ -33,17 +40,24 @@ import { ROBOT_CHANGED_EVENT } from '@/lib/kids/robot-design'
 import { playSound, sparkSays, type SoundType } from '@/lib/kids-audio'
 import { applyKidsSettingsToDocument, readKidsSettings, subscribeKidsSettings, useKidsReducedMotion } from '@/lib/kids/settings'
 import '@/components/kids/settings/kids-settings.css'
+import { enqueueToasts, type Toast } from './toast-queue'
 
 const LevelUpCeremony = dynamic(() => import('./LevelUpCeremonyClient'), { ssr: false })
 
-interface Toast {
-  id: number
-  icon: string
-  title: string
-  body: string
-}
-
 let seq = 0
+
+/** Two toasts at once on a phone, three on a wider screen. */
+function useMaxVisible(): number {
+  const [n, setN] = useState(2)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 640px)')
+    const read = () => setN(mq.matches ? 3 : 2)
+    read()
+    mq.addEventListener('change', read)
+    return () => mq.removeEventListener('change', read)
+  }, [])
+  return n
+}
 
 /** The one sound for a reward event, or null when there is nothing to celebrate. */
 export function rewardSound(r: RewardResult): SoundType | null {
@@ -63,13 +77,17 @@ function mergeCeremony(a: RewardResult | null, b: RewardResult): RewardResult {
 const TOAST_MS = 5200
 
 export function RewardToast() {
-  const [toasts, setToasts] = useState<Toast[]>([])
+  // The queue; the first `maxVisible` are on screen (none while the ceremony is open).
+  const [queue, setQueue] = useState<Toast[]>([])
+  const maxVisible = useMaxVisible()
   const [announcement, setAnnouncement] = useState('')
   const [ceremony, setCeremony] = useState<RewardResult | null>(null)
   const reduced = useKidsReducedMotion()
   // Guards against one event being handled twice (e.g. a duplicate listener in dev).
   const seen = useRef<WeakSet<Event>>(new WeakSet())
   const timers = useRef<number[]>([])
+  // One hide timer per toast, started when it first appears on screen.
+  const shownTimers = useRef<Map<number, number>>(new Map())
 
   // Settings → <html> classes while the kids shell is mounted.
   useEffect(() => {
@@ -136,7 +154,7 @@ export function RewardToast() {
       const levelUp = r.levelAfter > r.levelBefore
       const next: Toast[] = []
       // A level-up and its unlocks are shown by the ceremony; badges and quests stay toasts.
-      if (!levelUp) for (const u of r.newUnlocks) next.push({ id: ++seq, icon: '🎁', title: `Unlocked: ${u.name}`, body: 'Find it in your robot hangar.' })
+      if (!levelUp) for (const u of r.newUnlocks) next.push({ id: ++seq, icon: '🎁', title: `Unlocked: ${u.name}`, body: 'Find it in your Garage.' })
       for (const b of r.newBadges) next.push({ id: ++seq, icon: b.icon, title: `Badge: ${b.name}`, body: `You earned this because ${b.earnedFor}` })
       for (const q of r.questsCompleted) next.push({ id: ++seq, icon: q.icon, title: q.bonus ? 'Bonus quest complete!' : 'Quest complete!', body: `${q.title} · +${q.xp} XP` })
       if (!next.length && !levelUp) return
@@ -149,7 +167,7 @@ export function RewardToast() {
       }
 
       const said: string[] = []
-      if (levelUp) said.push(`Level ${r.levelAfter}!${r.newUnlocks.length ? ` Unlocked: ${r.newUnlocks.map((u) => u.name).join(', ')}.` : ''}`)
+      if (levelUp) said.push(`Rank ${r.levelAfter}!${r.newUnlocks.length ? ` Unlocked: ${r.newUnlocks.map((u) => u.name).join(', ')}.` : ''}`)
       said.push(...next.map((t) => `${t.title} ${t.body}`))
       // A trailing no-break space alternates so the same news twice is still announced.
       setAnnouncement(said.join(' ') + (seq % 2 ? ' ' : ''))
@@ -166,10 +184,7 @@ export function RewardToast() {
       }
 
       if (!next.length) return
-      setToasts((t) => [...t, ...next].slice(-4))
-      for (const t of next) {
-        timers.current.push(window.setTimeout(() => setToasts((all) => all.filter((x) => x.id !== t.id)), TOAST_MS))
-      }
+      setQueue((q) => enqueueToasts(q, next))
     }
     window.addEventListener(REWARD_EVENT, onReward)
     const pending = timers.current
@@ -180,15 +195,36 @@ export function RewardToast() {
     }
   }, [])
 
-  const dismiss = (id: number) => setToasts((all) => all.filter((x) => x.id !== id))
+  const dismiss = useCallback((id: number) => {
+    const t = shownTimers.current.get(id)
+    if (t !== undefined) window.clearTimeout(t)
+    shownTimers.current.delete(id)
+    setQueue((all) => all.filter((x) => x.id !== id))
+  }, [])
   const closeCeremony = useCallback(() => setCeremony(null), [])
+
+  // On screen now: the head of the queue, held back while the ceremony is open.
+  const visible = ceremony ? [] : queue.slice(0, maxVisible)
+  const visibleKey = visible.map((t) => t.id).join(',')
+  useEffect(() => {
+    for (const id of visibleKey ? visibleKey.split(',').map(Number) : []) {
+      if (!shownTimers.current.has(id)) shownTimers.current.set(id, window.setTimeout(() => dismiss(id), TOAST_MS))
+    }
+  }, [visibleKey, dismiss])
+  useEffect(() => {
+    const map = shownTimers.current
+    return () => {
+      for (const t of map.values()) window.clearTimeout(t)
+      map.clear()
+    }
+  }, [])
 
   return (
     <>
       {/* Screen readers hear every reward once; the visual toasts are aria-hidden to avoid double reading. */}
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
       <div className="pointer-events-none fixed right-3 top-20 z-[60] flex w-[min(92vw,340px)] flex-col gap-2" aria-hidden="true">
-        {toasts.map((t) => (
+        {visible.map((t) => (
           <button
             key={t.id}
             type="button"

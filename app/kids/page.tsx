@@ -1,7 +1,7 @@
 // app/kids/page.tsx — the R2BOT Universe home (server component).
 //
 // The hero is the Universe map: four course planets (one per age band), the
-// game moons, the Hangar and the Worlds belt, with the child's explorer card and "continue your
+// game moons, the Garage and the Worlds belt, with the child's explorer card and "your next
 // mission" — one client island (KidsHubClient) that server-renders every link
 // and label, then fills in the child's progress. Everything below it is plain
 // server HTML for parents, teachers and search engines: what R2BOT Kids is,
@@ -26,6 +26,8 @@ import { KIDS_MORE } from '@/lib/kids/nav'
 import { ALL_ACTIVITIES } from '@/lib/kids/activities/content'
 import { TRACKS } from '@/lib/kids/activities/types'
 import { ClassMissionsClient } from '@/components/kids/classroom/ClassMissionsClient'
+import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
+import { KIDS_GROWNUPS_HREF } from '@/lib/kids/nav'
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('vercel.app') ? process.env.NEXT_PUBLIC_SITE_URL : 'https://www.r2bot.in'
 
@@ -35,7 +37,7 @@ const GAMES_WORD = numberWord(GAMES.length)
 const WORLDS_WORD = numberWord(WORLDS.length)
 const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1)
 
-const DESCRIPTION = `A robotics universe for ages 5–17: a story-led course, ${GAMES_WORD} real-physics robot games, ${WORLDS_WORD} worlds from the deep sea to orbit, 400+ hands-on activities, a 3D robot to build and code, and a Hangar of badges. For homes and schools.`
+const DESCRIPTION = `A robotics universe for ages 5–17: a story-led course, ${GAMES_WORD} real-physics robot games, ${WORLDS_WORD} worlds from the deep sea to orbit, 400+ hands-on activities, a 3D robot to build and code, and a Garage of badges. For homes and schools.`
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -57,7 +59,7 @@ export const metadata: Metadata = {
     siteName: 'R2BOT',
     title: 'R2BOT Kids — explore the Robot Universe',
     description: `Four course planets, ${WORLDS_WORD} worlds, ${GAMES_WORD} real-physics robot games and your own robot to build and code. Ages 5–17.`,
-    images: [{ url: '/og-default.png', width: 1200, height: 630, alt: 'R2BOT Kids' }],
+    // The image is app/kids/opengraph-image.tsx (the kids share card).
   },
 }
 
@@ -71,7 +73,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'What is the R2BOT Universe?',
-    a: `It is the map your child explores. Four planets hold the course — one 24-session story season per age band — and eight moons hold standalone games about drones, robot arms, circuits, Mars rovers, machine learning, mapping, swarms and robot sumo. Along the edge sit ${WORLDS_WORD} worlds where robots really work — the deep sea, a space station, a hospital, a farm, a city, a robot zoo and Robot Guardians, about robot safety — each with its own game and activities. The Hangar in the middle keeps their robot, avatar and badges.`,
+    a: `It is the map your child explores. Four planets hold the course — one 24-session story season per age band — and eight moons hold standalone games about drones, robot arms, circuits, Mars rovers, machine learning, mapping, swarms and robot sumo. Along the edge sit ${WORLDS_WORD} worlds where robots really work — the deep sea, a space station, a hospital, a farm, a city, a robot zoo and Robot Guardians, about robot safety — each with its own game and activities. The Garage in the middle keeps their robot, avatar and badges.`,
   },
   {
     q: 'Are the games really teaching robotics?',
@@ -149,7 +151,7 @@ export default function KidsHubPage() {
       <section className="mx-auto max-w-6xl px-4 pb-6 pt-5 sm:pt-8" aria-labelledby="universe-h">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
           <div>
-            <p className="text-[13px] font-bold uppercase tracking-[.14em] text-amber-300">R2BOT Kids · ages 5–17</p>
+            <p className="text-[13px] font-bold uppercase tracking-[.14em] text-amber-300"><span className="kids-kids-only">R2BOT Kids</span><span className="kids-lab-only">R2BOT Lab</span> · ages 5–17</p>
             <h1 id="universe-h" className="mt-1 font-display text-3xl font-bold leading-tight tracking-tight text-[#EEF2F8] sm:text-[44px]">
               Explore the <span className="text-amber-500">Robot Universe</span>
             </h1>
@@ -399,9 +401,10 @@ export default function KidsHubPage() {
 
       {/* ── Schools, parents, class code ───────────────────────────────────── */}
       <section className="mx-auto grid max-w-6xl gap-4 px-4 py-10 md:grid-cols-3" aria-label="For schools and parents">
-        <Link
+        {/* Grown-up pages open through the parental gate (roadmap #2, #20). */}
+        <GrownUpLink
           href="/kids/schools"
-          className="rounded-[28px] border border-amber-400/40 bg-gradient-to-br from-amber-500/15 to-transparent p-6 transition hover:border-amber-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 md:col-span-2"
+          className="block rounded-[28px] border border-amber-400/40 bg-gradient-to-br from-amber-500/15 to-transparent p-6 transition hover:border-amber-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 md:col-span-2"
         >
           <p className="text-sm font-bold uppercase tracking-wider text-amber-300">For schools</p>
           <h2 className="mt-1 font-display text-2xl font-bold text-[#EEF2F8]">Run a robotics class with no lab and no kits</h2>
@@ -410,7 +413,7 @@ export default function KidsHubPage() {
             dashboard — with a plan for each age band.
           </p>
           <span className="mt-4 inline-block font-bold text-amber-300">See how schools use it →</span>
-        </Link>
+        </GrownUpLink>
         <div className="grid gap-4">
           <Link
             href="/kids/join"
@@ -419,13 +422,14 @@ export default function KidsHubPage() {
             <h2 className="font-display text-lg font-bold text-[#EEF2F8]">🎟️ Got a class code?</h2>
             <p className="mt-1 text-[15px] text-[#A7B0C0]">Join your teacher’s class with just a nickname.</p>
           </Link>
-          <Link
-            href="/kids/parents"
-            className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 transition hover:border-white/25 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+          <GrownUpLink
+            href={KIDS_GROWNUPS_HREF}
+            grant
+            className="block rounded-[28px] border border-white/10 bg-white/[0.04] p-5 transition hover:border-white/25 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
           >
-            <h2 className="font-display text-lg font-bold text-[#EEF2F8]">👪 For parents</h2>
-            <p className="mt-1 text-[15px] text-[#A7B0C0]">What your child learns, screen-time tips and how progress works.</p>
-          </Link>
+            <h2 className="font-display text-lg font-bold text-[#EEF2F8]">👪 For parents and teachers</h2>
+            <p className="mt-1 text-[15px] text-[#A7B0C0]">What your child learns, the parent hub and controls, teacher guides and privacy.</p>
+          </GrownUpLink>
         </div>
       </section>
 

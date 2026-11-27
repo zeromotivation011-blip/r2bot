@@ -19,7 +19,8 @@ import type { Action, Beat, CastMember, CharacterId, ChoiceOption, Emotion, Epis
 import { CAST } from '@/lib/kids/stories/cast'
 import { lineMs } from '@/lib/kids/stories/timing'
 import { readPresentSignal, usePresentSignal } from '@/lib/kids/teach/present-bridge'
-import { isVoiceMuted, speakLine, speechAvailable, stopSpeech, warmVoices, type SpeakHandle } from '@/lib/kids/stories/speech'
+import { isVoiceMuted, speechAvailable, warmVoices, type SpeakHandle } from '@/lib/kids/stories/speech'
+import { primeStoryVoice, speakStoryLine, stopStoryVoice } from '@/lib/kids/episodes/story-voice'
 import { playSfx, primeSfx } from '@/lib/kids/stories/sfx'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { completeEpisode } from '@/lib/kids-progress'
@@ -169,7 +170,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
       onEnd()
     }
     if (voiceOn()) {
-      speechRef.current = speakLine(who, text, ms, end, () => {
+      speechRef.current = speakStoryLine(who, text, ms, end, () => {
         talkRef.current.lastBoundary = performance.now()
         talkRef.current.hasBoundary = true
       })
@@ -216,7 +217,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
     const motions = motionTimers.current
     const curtains = curtainTimers.current
     return () => {
-      stopSpeech()
+      stopStoryVoice()
       motions.forEach(clearTimeout)
       curtains.forEach(clearTimeout)
     }
@@ -427,6 +428,7 @@ export default function StoryPlayerClient({ episode, next }: Props) {
   const start = () => {
     primeAudio()
     primeSfx()
+    primeStoryVoice()
     // iOS only allows speech that starts inside a tap; a silent line unlocks it.
     if (voiceOn()) {
       try {

@@ -3,8 +3,36 @@
 // child can pick, plus the avatar unlocks from lib/kids/universe/rewards.ts
 // (earned by levelling up, never bought). Pure SVG, no state — safe on the
 // server and in client islands.
+//
+// Inclusion (roadmap #87): a child can also draw THEMSELVES — a "me" avatar
+// with any skin tone, hair type and colour, a headscarf, turban/patka or kippah,
+// glasses, hearing aids, a wheelchair or a bionic hand (AvatarMakerClient). It is
+// stored in the same `progress.avatar.id` string ("me-…", see encodeMeLook), so
+// the progress store, the backup code and the class sync need no change. Nothing
+// is gendered: no default depends on a boy/girl choice, and there is no such choice.
+// Teen look (roadmap #83): the "lab" badge replaces the cartoon default for
+// Engineers (displayAvatarId).
 
 import { UNLOCKS } from '@/lib/kids/universe/rewards'
+import { MakerAvatar } from '@/components/kids/makers/MakerAvatar'
+import { decodeMeLook, describeMeLook, isMeAvatar, meLookToMaker } from '@/lib/kids/avatar-look'
+
+// The "me" avatar data lives in lib/kids/avatar-look.ts (pure, verifiable); re-exported for the pickers.
+export {
+  DEFAULT_ME_LOOK,
+  ME_COVERS,
+  ME_HAIR,
+  ME_HAIR_COLOURS,
+  ME_SKINS,
+  decodeMeLook,
+  describeMeLook,
+  displayAvatarId,
+  encodeMeLook,
+  isMeAvatar,
+  meLookToMaker,
+  type MeCover,
+  type MeLook,
+} from '@/lib/kids/avatar-look'
 
 export interface AvatarDef {
   id: string
@@ -20,6 +48,7 @@ export const AVATARS: AvatarDef[] = [
   { id: 'drone', name: 'Drone pal' },
   { id: 'owl', name: 'Robo-owl' },
   { id: 'comet', name: 'Comet pilot' },
+  { id: 'lab', name: 'Lab badge' },
   { id: 'robo-cat', name: 'Robo-Cat', unlock: 'avatar-robo-cat' },
   { id: 'astro-gold', name: 'Gold astronaut', unlock: 'avatar-astronaut-gold' },
 ]
@@ -51,7 +80,7 @@ export const AVATAR_COLOURS: ColourDef[] = [
 export function unlockHint(unlockId: string | undefined): string {
   const u = UNLOCKS.find((x) => x.id === unlockId)
   if (!u) return ''
-  if (u.atLevel) return `Reach level ${u.atLevel}`
+  if (u.atLevel) return `Reach Rank ${u.atLevel}`
   if (u.byBadge) return 'Earn a badge'
   return 'Keep exploring'
 }
@@ -73,6 +102,7 @@ function shade(hex: string, amt: number): string {
 
 /** One avatar, drawn at any size. `title` makes it an image for assistive tech; omit for decoration. */
 export function Avatar({ id, color, size = 64, title }: { id: string; color: string; size?: number; title?: string }) {
+  if (isMeAvatar(id)) return <MakerAvatar look={meLookToMaker(decodeMeLook(id), color)} size={size} label={title} className="block" />
   const c = color
   const dark = shade(color, -0.45)
   const light = shade(color, 0.45)
@@ -228,6 +258,18 @@ function renderFace(id: string, c: string, dark: string, light: string, gid: str
           <circle cx="32" cy="55" r="2" fill={c} />
         </g>
       )
+    case 'lab':
+      return (
+        <g>
+          <circle cx="32" cy="32" r="22" fill="#0A1120" stroke="#00E5FF" strokeOpacity=".7" strokeWidth="1.5" />
+          <path d="M14 32h8M42 32h8M32 14v8M32 42v8" stroke="#00E5FF" strokeWidth="2" strokeLinecap="round" />
+          <rect x="20" y="25" width="24" height="14" rx="4" fill={c} />
+          <rect x="23" y="29" width="18" height="6" rx="3" fill="#0A1120" />
+          <rect x="25" y="31" width="6" height="2" rx="1" fill="#67E8F9" />
+          <rect x="33" y="31" width="6" height="2" rx="1" fill="#67E8F9" />
+          <path d="M18 18l4 4M46 18l-4 4M18 46l4-4M46 46l-4-4" stroke={light} strokeOpacity=".6" strokeWidth="1.5" strokeLinecap="round" />
+        </g>
+      )
     case 'astro':
     default:
       return (
@@ -245,3 +287,12 @@ function renderFace(id: string, c: string, dark: string, light: string, gid: str
       )
   }
 }
+
+// ── "Me" avatars (roadmap #87): data + encoding in lib/kids/avatar-look.ts ───
+
+/** An avatar's name (robot avatars by AVATARS, "me" avatars described). */
+export function avatarName(id: string): string {
+  if (isMeAvatar(id)) return describeMeLook(decodeMeLook(id))
+  return AVATARS.find((a) => a.id === id)?.name ?? 'Avatar'
+}
+

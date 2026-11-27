@@ -5,6 +5,7 @@
 
 import * as THREE from 'three'
 import { kidsRenderHints } from '@/lib/kids/settings'
+import { guardWebGLContext } from '@/components/kids/three/stage'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import { L1, L2, SHOULDER_H, TOOL, reachRing, type Joints, type V3 } from './kinematics'
 import {
@@ -118,6 +119,7 @@ export class FactoryScene {
   private pLife: Float32Array
   private pNext = 0
   private time = 0
+  private unguard: () => void = () => {}
 
   constructor(canvas: HTMLCanvasElement, opts: { pillar: boolean; reducedMotion: boolean }) {
     this.reduced = opts.reducedMotion
@@ -130,6 +132,8 @@ export class FactoryScene {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     this.renderer.toneMappingExposure = 1.05
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
+    // No black screens (roadmap #16): a lost GPU context shows the "3D is resting" poster.
+    if (canvas.parentElement) this.unguard = guardWebGLContext(this.renderer, canvas.parentElement)
 
     const s = this.scene
     s.background = new THREE.Color(0x0b1024)
@@ -811,6 +815,7 @@ export class FactoryScene {
     })
     this.partGeo.dispose()
     this.bandGeo.dispose()
+    this.unguard()
     this.renderer.dispose()
     // The owner creates a fresh <canvas> for every scene and never reuses one,
     // so release the GPU context now instead of waiting for the browser to

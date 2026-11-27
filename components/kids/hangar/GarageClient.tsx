@@ -28,7 +28,7 @@ import {
   type RobotDesign,
   type Slot,
 } from '@/lib/kids/robot-design'
-import { levelInfo } from '@/lib/kids/universe/rewards'
+import { bestTitle, levelInfo } from '@/lib/kids/universe/rewards'
 import { BOOSTER_PART_ID, saveCosmetics } from './cosmetics'
 import { useHangarState } from './useHangarState'
 
@@ -134,6 +134,7 @@ export function GarageClient({ trailParts }: { trailParts: TrailPartInfo[] }) {
     try {
       const blob = await drawCard(design, {
         level: levelInfo(progress.xp),
+        worn: bestTitle(progress.unlocks)?.name ?? null,
         stars: collectedStars(progress),
         found: foundCount,
         total: trailParts.length,
@@ -345,6 +346,8 @@ export function GarageClient({ trailParts }: { trailParts: TrailPartInfo[] }) {
 
 interface CardFacts {
   level: { level: number; title: string }
+  /** The best title the child has earned (bestTitle()), worn on the card. */
+  worn: string | null
   stars: number
   found: number
   total: number
@@ -552,7 +555,7 @@ function drawCard(d: RobotDesign, f: CardFacts): Promise<Blob | null> {
   ctx.fillText(d.name || 'My Robot', 60, 172, 620)
   ctx.fillStyle = '#A7B0C0'
   ctx.font = `600 28px ${font}`
-  ctx.fillText(`Level ${f.level.level} ${f.level.title} · ${f.stars} stars`, 60, 222, 620)
+  ctx.fillText(`Rank ${f.level.level} ${f.worn ?? f.level.title} · ${f.stars} stars`, 60, 222, 620)
   ctx.font = `26px ${font}`
   let y = 290
   for (const slot of SLOTS) {

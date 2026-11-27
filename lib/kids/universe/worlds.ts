@@ -69,9 +69,9 @@ export const GAMES: UniverseGame[] = [
   {
     id: 'sumo-arena',
     name: 'Robo Sumo Arena',
-    zone: 'Battle Dome',
-    emoji: '🥊',
-    hook: 'Program your robot to push rival bots out of the ring — with real physics.',
+    zone: 'Push Lab',
+    emoji: '🏟️',
+    hook: 'Program your robot to grip the floor and push a rival bot out of the ring — traction and pushing force, with real physics.',
     teaches: 'Sensing an opponent, state machines (search → charge → recover), traction, mass and momentum.',
     skills: ['physics', 'sensors', 'logic', 'design'],
     minBand: 'builders',

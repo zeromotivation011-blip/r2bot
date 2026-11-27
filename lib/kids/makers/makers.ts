@@ -29,6 +29,10 @@ export interface MakerLook {
   hairColor: string
   /** A headscarf in this colour (covers the hair). */
   headscarf?: string
+  /** A turban or patka in this colour (covers the hair; roadmap #87 explorer avatars). */
+  turban?: string
+  /** A kippah in this colour (sits on the hair). */
+  kippah?: string
   glasses?: boolean
   hearingAid?: boolean
   wheelchair?: boolean

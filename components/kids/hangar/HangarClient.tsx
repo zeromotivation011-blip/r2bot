@@ -12,7 +12,7 @@ import type React from 'react'
 import { useCallback, useId, useRef, useState } from 'react'
 import { collectedStars } from '@/lib/kids-progress'
 import { DEFAULT_DESIGN, saveDesign } from '@/lib/kids/robot-design'
-import { daysExploredThisWeek, levelInfo, MAX_LEVEL, xpForLevel, type Unlock } from '@/lib/kids/universe/rewards'
+import { bestTitle, daysExploredThisWeek, levelInfo, MAX_LEVEL, xpForLevel, type Unlock } from '@/lib/kids/universe/rewards'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { howToEarn, LOOK_NOTES, owns, saveCosmetics, unlocksOf, type CosmeticKind } from './cosmetics'
 import { HangarPoster } from './HangarPoster'
@@ -72,6 +72,7 @@ export function HangarClient() {
   const baseId = useId()
 
   const lvl = levelInfo(progress.xp)
+  const worn = bestTitle(progress.unlocks)?.name ?? null
   const name = progress.explorerName.trim() || 'Explorer'
   const paints = unlocksOf('paint')
   const allLooks = (['paint', 'decal', 'trail', 'skin'] as CosmeticKind[]).flatMap(unlocksOf)
@@ -222,10 +223,10 @@ export function HangarClient() {
                 {!ready ? (
                   '\u00A0'
                 ) : lvl.level >= MAX_LEVEL ? (
-                  <>Level {lvl.level} · Top level reached</>
+                  <>Rank {lvl.level} · Top rank reached</>
                 ) : (
                   <>
-                    Level {lvl.level} · {lvl.xpIntoLevel.toLocaleString('en-GB')} / {lvl.xpForNext.toLocaleString('en-GB')} XP to level{' '}
+                    Rank {lvl.level} · {lvl.xpIntoLevel.toLocaleString('en-GB')} / {lvl.xpForNext.toLocaleString('en-GB')} XP to rank{' '}
                     {lvl.level + 1}
                   </>
                 )}
@@ -245,7 +246,7 @@ export function HangarClient() {
           <dl className="grid grid-cols-3 gap-2 text-center">
             {[
               // The one currency (XP) and the one quality mark (stars), the same everywhere.
-              { k: 'XP', v: progress.xp.toLocaleString('en-GB'), hint: 'XP grows your level. Lessons, games and activities earn it.' },
+              { k: 'XP', v: progress.xp.toLocaleString('en-GB'), hint: 'XP grows your rank. Lessons, games and activities earn it.' },
               { k: 'Stars', v: ready ? collectedStars(progress).toLocaleString('en-GB') : '0', hint: 'Your best stars from every lesson, story, mission and activity.' },
               { k: 'Badges', v: Object.keys(progress.badges).length, hint: 'Skill badges you have earned.' },
             ].map((s) => (

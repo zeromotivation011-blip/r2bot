@@ -16,7 +16,8 @@ import { saveProgress, type KidsProgress } from '@/lib/kids-progress'
 import { KIDS_BANDS, getBand, type BandId } from '@/lib/kids/bands'
 import { checkNickname } from '@/lib/kids/classroom'
 import { playSound, primeAudio } from '@/lib/kids-audio'
-import { AVATARS, AVATAR_COLOURS, Avatar, isOwned, unlockHint } from './avatars'
+import { AVATARS, AVATAR_COLOURS, Avatar, DEFAULT_ME_LOOK, avatarName, displayAvatarId, encodeMeLook, isMeAvatar, isOwned, unlockHint } from './avatars'
+import AvatarMakerClient from './AvatarMakerClient'
 import { markOnboarded } from './universe-state'
 
 const ADJ = ['Captain', 'Rocket', 'Turbo', 'Cosmic', 'Clever', 'Super', 'Nova', 'Pixel', 'Solar', 'Zippy', 'Mighty', 'Lunar']
@@ -38,7 +39,10 @@ export function OnboardingDialogClient({ progress, mode, onClose }: OnboardingDi
   const [band, setBand] = useState<BandId | null>(progress.band)
   const [name, setName] = useState(progress.explorerName)
   const [nameError, setNameError] = useState('')
-  const [avatarId, setAvatarId] = useState(progress.avatar?.id ?? 'astro')
+  // Teens who never chose see the Lab badge, not the cartoon default (roadmap #83).
+  const [avatarId, setAvatarId] = useState(() => displayAvatarId(progress.avatar, progress.band))
+  // Robot avatars, or "Draw me" (roadmap #87).
+  const [avatarKind, setAvatarKind] = useState<'robot' | 'me'>(() => (isMeAvatar(progress.avatar?.id) ? 'me' : 'robot'))
   const [colour, setColour] = useState(progress.avatar?.color ?? '#FC6818')
   const [ideaSeed, setIdeaSeed] = useState(7)
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -62,6 +66,13 @@ export function OnboardingDialogClient({ progress, mode, onClose }: OnboardingDi
   useEffect(() => {
     headingRef.current?.focus()
   }, [step])
+
+  // Picking Engineers swaps an untouched cartoon default for the Lab badge (and back).
+  const untouchedAvatar = displayAvatarId(progress.avatar, 'engineers') === 'lab'
+  useEffect(() => {
+    if (!untouchedAvatar) return
+    setAvatarId((id) => (band === 'engineers' && id === 'astro' ? 'lab' : band !== 'engineers' && id === 'lab' ? 'astro' : id))
+  }, [band, untouchedAvatar])
 
   const close = useCallback(() => {
     markOnboarded()
@@ -279,13 +290,43 @@ export function OnboardingDialogClient({ progress, mode, onClose }: OnboardingDi
                 Pick your avatar
               </h2>
               <div className="mt-3 flex items-center gap-4">
-                <Avatar id={avatarId} color={colour} size={88} title={`Your avatar: ${AVATARS.find((a) => a.id === avatarId)?.name ?? ''}`} />
+                <Avatar id={avatarId} color={colour} size={88} title={`Your avatar: ${avatarName(avatarId)}`} />
                 <div>
                   <p className="font-display text-xl font-bold text-[#EEF2F8]">{checkNickname(name).ok ? name.trim() : 'Explorer'}</p>
-                  <p className="text-[14px] text-[#A7B0C0]">Earn more avatars and colours as you level up.</p>
+                  <p className="text-[14px] text-[#A7B0C0]">Earn more avatars and colours as your Rank goes up.</p>
                 </div>
               </div>
-              <div className="mt-4 grid grid-cols-4 gap-2" role="radiogroup" aria-label="Avatar">
+              <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl bg-white/[0.04] p-1" role="tablist" aria-label="Kind of avatar">
+                {(
+                  [
+                    ['robot', 'Robot avatars'],
+                    ['me', 'Draw me'],
+                  ] as const
+                ).map(([k, label]) => (
+                  <button
+                    key={k}
+                    type="button"
+                    role="tab"
+                    aria-selected={avatarKind === k}
+                    onClick={() => {
+                      tap()
+                      setAvatarKind(k)
+                      if (k === 'me' && !isMeAvatar(avatarId)) setAvatarId(encodeMeLook(DEFAULT_ME_LOOK))
+                    }}
+                    className={`min-h-[48px] rounded-xl font-display text-[16px] font-bold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 ${
+                      avatarKind === k ? 'bg-amber-500 text-[#1A1103]' : 'text-[#A7B0C0] hover:text-[#EEF2F8]'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {avatarKind === 'me' && (
+                <div className="mt-3">
+                  <AvatarMakerClient value={avatarId} colour={colour} onChange={setAvatarId} />
+                </div>
+              )}
+              <div className={`mt-4 grid grid-cols-4 gap-2${avatarKind === 'me' ? ' hidden' : ''}`} role="radiogroup" aria-label="Avatar">
                 {AVATARS.map((a) => {
                   const owned = isOwned(a.unlock, unlocks)
                   const on = avatarId === a.id

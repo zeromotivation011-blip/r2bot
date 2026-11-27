@@ -47,14 +47,36 @@ learning) and four difficulty tiers — **Cadet, Pilot, Ace, Legend** — so a
   recorder, battery, robot's-eye view" below.
 
 ## Navigation — one shell
-`app/kids/KidsShell.tsx`. Phone tab bar, exactly five: **Home · Course · Worlds · Games ·
-Hangar**. Desktop header (logo = Home): Course · Worlds · Galaxy · Games · Hangar. On
-phones the Skill Galaxy is the first item of "More" (hidden there on desktop, where it is
-a header link). Secondary surfaces: `KIDS_MORE` in `lib/kids/nav.ts` — More lists Galaxy
-(phones only), How Robots Think `/kids/ai`, Stories, Workshop, Code Lab, Spark Trail
-`/kids/spark-trail` (the old Robot World; `/kids/world/*` 308s there), Physics Lab, Make at
-Home, then Settings (`KIDS_SETTINGS`). Schools and teacher pages live in the kids footer.
-The More menu is pinned to the screen and scrolls when taller than it.
+`app/kids/KidsShell.tsx` renders the tabs from `lib/kids/nav.ts` (the reasoning for the words is
+written there, roadmap #3). Phone tab bar, exactly five (`KIDS_TABS`): **Home · Learn · Worlds ·
+Games · Garage** (Learn = `/kids/course`, Garage = `/kids/hangar`; routes did not change).
+Desktop header (`KIDS_HEADER_TABS`, logo = Home): Learn · Worlds · Galaxy · Games · Garage. On
+phones the Skill Galaxy is the first item of "More" (hidden there on desktop, where it is a
+header link). Secondary surfaces: `KIDS_MORE` — never type how many; each place listed once, then
+Settings (`KIDS_SETTINGS`). The More menu is pinned to the screen and scrolls when taller than it.
+**One grown-up door** (roadmap #20): the kids footer has exactly one gated link, "For grown-ups"
+→ `/kids/grown-ups` (`KIDS_GROWNUPS_HREF`, indexable), which lists `KIDS_GROWNUP_DOORS` (parents,
+teachers, classroom, schools, Trust Pack, privacy, main site; `leaves: true` follows the parent
+"outbound links" switch), plus "Join a class". No other grown-up link in the footer.
+**Rank, not Level** (roadmap #6): the XP number is "Rank N" everywhere a child sees it (header
+badge, Explorer card, Garage, toasts, ceremony, results, map). "Level" means a course level only.
+The Explorer card and Garage show the worn title `bestTitle(p.unlocks)`.
+**Leaving a game** (roadmap #15): `components/kids/ui/LeaveGuardClient.tsx` —
+`const guard = useLeaveGuard(dirty)`, one `<ExitButton href onExit={guard.requestLeave} />`,
+`{guard.dialog}`. While `dirty`, every same-site link tap asks "Leave this game?" first (grown-up
+links and `data-leave-guard="off"` excepted). Used by `GameShellClient` (after the first touch of
+a round; `?tier=<n>` opens a tier), the Galaxy `ActivityPlayerClient` (while a mission is in
+play) and `SimWorkbenchClient` (Physics/Power Lab, once the program is touched, until solved).
+**Toasts**: at most 2 on a phone, 3 wider; queue of 5, the rest folds into "+N more"
+(`components/kids/ui/toast-queue.ts`); nothing shows behind the level-up ceremony.
+**Your next mission** (roadmap #9): `ContinueCardClient` leads with the next session; ages 8–17
+also get "Also today" (a Recharge/almost-secure concept + a game at the right tier).
+**R2BOT Lab look** (roadmap #83): Engineers (14–17) get `<html data-kids-look="lab">` before first
+paint (`KIDS_LOOK_BOOT_SCRIPT` in `lib/kids/teen-boot.ts`, synced by `KidsLookSyncClient`, styles in
+`app/kids/kids-teen.css`). Per-look text uses `.kids-lab-only` / `.kids-kids-only` (CSS, no
+flicker); the shell's tab words come from `LAB_LABELS`. The child's choice (Automatic / Lab / Kids,
+`LabLookToggleClient` in Settings) is stored under `profileKey('r2bot_kids_look_v1')` — per child,
+so NOT in `SWAPPED_KEYS`. `useKidsLook()` reads it.
 
 **Ask Spark** is mounted once in the shell (`AskSparkClient`, `next/dynamic`, `ssr:false`).
 Ordinary pages: a floating button above the tab bar. Game and full-screen pages (`play/*`,
@@ -313,6 +335,17 @@ leaderboards; no streak that punishes a missed day.
   `chargers` and the `visit-and-return` goal; fail reasons `flat`, `not-visited`. Sensor
   `battery_pct` (also accepted by Talk to your robot).
 - Games' own sims are not recorded yet.
+- **No black screens** (roadmap #16): `createStage()` in `components/kids/three/stage.ts` handles
+  `webglcontextlost` with a "3D is resting" poster and "Try again"; when WebGL cannot start it shows
+  the poster and throws `WebGLUnavailableError`. A view that builds its own `WebGLRenderer` calls
+  `guardWebGLContext(renderer, container)` and the returned remover BEFORE it disposes (dispose
+  force-loses the context). A view with its own poster passes `poster: false` (Garage).
+- **Link Lab** `/kids/lab/network` + **Robot Security Check** `/kids/lab/network/guardian` (roadmap
+  #88, indexable): `components/kids/net/` — a pure seeded link sim (delay, loss, jitter, radio
+  shadow) with fixes the child switches on (ack + retry, sequence numbers, watchdog, speed limit,
+  prediction); a tap-only, defensive four-step security mission (no password is ever typed).
+  Rewards via `reportBestRun` (`net-link-<level>`, `net-guardian-check`). Guardians activities live
+  in `lib/kids/activities/content/zones/guardians-net.ts`. Check: `components/kids/net/net.verify.ts` (CI).
 - Checks: `lib/kids/sim/verify.ts` and `lib/kids/sim/flight.verify.ts` (CI).
 
 ## Games — one shell
@@ -405,6 +438,40 @@ world lists come from `GAMES` and `WORLDS`. Before promoting a sample, give
 - Backup code extras: `builds` (`buildsBackupExtra`: 3-char FNV tag + day + fair-test result, no
   reflections; tags are collision-checked in the builds verify) and `portfolio` (`portfolioBackupExtra`:
   the newest snapshots that fit 512 chars). Restores merge and never remove.
+
+## Robot Passport (roadmap #12) — migration 0057
+`lib/kids/passport*.ts`, route `app/api/kids/passport`, UI in `BackupCodeClient` (Garage + Settings).
+Random words + number (e.g. CHEETAH-NOVA-BALLOON-89) and a QR (`/kids/hangar#passport=…`); the
+server stores only the SHA-256 of the canonical words plus the same backup code the offline path
+makes (progress + nicknames). Service-role only, RLS on with no policies, rate limited, deleted
+after 400 days unused. Print and Delete go through `requireGrownUp()`. Until 0057 runs the route
+answers 503 and the offline backup code opens by itself. The device copy is
+`profileKey('r2bot_kids_passport_v1')` (per child). Check: `lib/kids/passport.verify.ts` (CI).
+
+## Story voices and Episodes Theatre (roadmap #8)
+Story Theatre lines play recorded Piper clips (`public/kids/audio/stories/`, same cast voices as the
+3D episodes) through `speakStoryLine()` / `primeStoryVoice()` / `stopStoryVoice()` in
+`lib/kids/episodes/story-voice.ts`, falling back to the browser voice for any line without a clip.
+Re-voice with `scripts/kids-voices/generate-stories.py`. The Episodes Theatre shelf
+(`EpisodesTheatreShelf`) sits on `/kids/stories`; one indexable page per course episode at
+`/kids/stories/episodes/<sessionId>` (`THEATRE_EPISODES`, in the sitemap). Check:
+`lib/kids/episodes/story-voice.verify.ts` (CI).
+
+## One block language (roadmap #21)
+Code Lab keeps its grid interpreter (tap-first, verifiable missions) but its blocks share the
+Blockly set's colours and emoji; `lib/kids/code-lab/shared-vocabulary.ts` maps each Code Lab block
+to the shared block and holds the porting path. The Code Lab verify checks that the same robot part
+locks a block in both editors and that the colours match.
+
+## Robot Maths and inclusion (roadmap #86, #87)
+- `/kids/maths` + `/kids/maths/<concept>` (indexable; count from `MATHS_CONCEPTS` in
+  `lib/kids/maths/concepts.ts`, each with a worked example per band); Galaxy activities in
+  `lib/kids/activities/content/maths.ts`. Check: `lib/kids/maths/verify.ts` (CI).
+- "Draw me" avatar (`AvatarMakerClient`, data `lib/kids/avatar-look.ts`): skin tones, hair, head
+  coverings, glasses, hearing aids, wheelchair, bionic hand; no gender question. Saved as a
+  `me-…` id in the existing `avatar.id` (no new store). Engineers who never chose an avatar see the
+  Lab badge (`displayAvatarId`). No combat wording in game zones (sumo is the "Push Lab").
+  Check: `lib/kids/inclusion/verify.ts` (CI).
 
 ## Never
 Leaderboards or comparing children. Collecting any personal data from a child.

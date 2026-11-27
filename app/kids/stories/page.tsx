@@ -11,6 +11,7 @@ import { CAST, MAIN_CAST } from '@/lib/kids/stories/cast'
 import type { CharacterId } from '@/lib/kids/stories/types'
 import { CastPortrait } from '@/components/kids/story/CastPortrait'
 import WatchedBadgeClient from '@/components/kids/story/WatchedBadgeClient'
+import { EpisodesTheatreShelf } from '@/components/kids/episodes/EpisodesTheatreShelf'
 import '@/components/kids/story/story.css'
 
 export const runtime = 'nodejs'
@@ -86,6 +87,8 @@ export default function StoriesPage() {
           ))}
         </ul>
       </header>
+
+      <EpisodesTheatreShelf />
 
       {KIDS_BANDS.map((band) => {
         const eps = episodesForBand(band.id)

@@ -287,7 +287,7 @@ export default function HangarSceneClient({ design, look, driveToken, onDriveEnd
     if (!host) return
     let stage: Stage
     try {
-      stage = createStage(host, { background: BG, lights: false })
+      stage = createStage(host, { background: BG, lights: false, poster: false })
     } catch {
       cb.current.onError()
       return

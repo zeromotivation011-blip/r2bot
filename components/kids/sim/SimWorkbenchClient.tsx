@@ -12,6 +12,7 @@
 // wall-clock time, so the same program gives the same result on any device.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ExitButton, useLeaveGuard } from '@/components/kids/ui/LeaveGuardClient'
 import { capabilitiesOf, type RobotDesign } from '@/lib/kids/robot-design'
 import { DT, type SensorReadings, type SimEvent, type SimSnapshot } from '@/lib/kids/sim/engine'
 import type { Demo } from '@/lib/kids/sim/demos'
@@ -40,6 +41,8 @@ interface Props {
   design: RobotDesign
   /** Program loaded into the editor when the demo changes. */
   starter: Program
+  /** Where the Exit button goes (roadmap #15). */
+  exitHref?: string
 }
 
 export interface WorkbenchLiveState {
@@ -56,7 +59,7 @@ function sensorParts(caps: Set<string>): SensorParts {
   return { distance: caps.has('see-wall'), line: caps.has('follow-line'), bump: caps.has('feel-bump') }
 }
 
-export default function SimWorkbenchClient({ demo, design, starter }: Props) {
+export default function SimWorkbenchClient({ demo, design, starter, exitHref = '/kids' }: Props) {
   const viewRef = useRef<HTMLDivElement>(null)
   const editorRef = useRef<BlocklyEditorHandle>(null)
   const rendererRef = useRef<SimRenderer | null>(null)
@@ -81,6 +84,11 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
   const [speed, setSpeedState] = useState<number>(1)
   const [camera, setCamera] = useState<CameraMode>('follow')
   const [result, setResult] = useState<RunResult | null>(null)
+  // Roadmap #15: once the child has touched the program, leaving asks first (the
+  // program is not saved anywhere). A solved run is safe: its reward is already kept.
+  const [touched, setTouched] = useState(false)
+  useEffect(() => setTouched(false), [demo.id])
+  const guard = useLeaveGuard(touched && !result?.success, { title: 'Leave the lab?', line: 'Your program is not saved, so it will be lost.' })
   const [bubble, setBubble] = useState<string | null>(null)
   const [live, setLive] = useState<WorkbenchLiveState>({ sensors: null, snap: null, wheelTravel: 0, travelled: 0 })
   /** The running block in words, shown over the 3D view (on a phone the editor's highlight is off-screen). */
@@ -645,6 +653,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
       {/* ── Block editor ────────────────────────────────────────────────── */}
       <div className="flex min-w-0 flex-col gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-1">
         <div className="flex flex-wrap items-center gap-2">
+          <ExitButton href={exitHref} onExit={guard.requestLeave} className="text-sm" />
           <h2 className="mr-auto text-lg font-black text-white">Your program</h2>
           <button
             type="button"
@@ -662,7 +671,12 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
             🧹 Start over
           </button>
         </div>
-        <div className="relative h-[460px] overflow-hidden rounded-3xl border border-white/10 lg:h-[540px]" data-testid="sim-editor">
+        <div
+          className="relative h-[460px] overflow-hidden rounded-3xl border border-white/10 lg:h-[540px]"
+          data-testid="sim-editor"
+          onPointerDownCapture={() => setTouched(true)}
+          onKeyDownCapture={() => setTouched(true)}
+        >
           <BlocklyEditor ref={editorRef} toolbox={demo.toolbox} caps={caps} initial={starter} resetKey={demo.id} />
           {/* Phones: Run from where the child is editing; it scrolls the robot into view first. */}
           <button
@@ -694,6 +708,7 @@ export default function SimWorkbenchClient({ demo, design, starter }: Props) {
           <SensorPanel live={live} caps={caps} />
         </div>
       </div>
+      {guard.dialog}
     </div>
   )
 }

@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         <li>R2 Co-pilot conversations are logged for 30 days to improve the Atlas, then deleted.</li>
         <li>We count page views with a simple first-party counter (no cookies, no IP address, no user ID) and use Google Analytics for anonymous usage statistics — but never on R2BOT Kids.</li>
         <li>We never sell, rent, or share your data with third parties for marketing.</li>
-        <li>R2BOT Kids asks children for nothing: progress stays on the device. <a href="#kids">Details for parents</a>.</li>
+        <li>R2BOT Kids asks children for nothing: progress stays on the device unless a child chooses to save a Robot Passport (a hash of a few random words, no personal data). <a href="#kids">Details for parents</a>.</li>
         <li>You can delete everything we have about you by emailing <strong>hello@r2bot.in</strong>.</li>
       </ul>
 
@@ -103,10 +103,23 @@ export default function PrivacyPage() {
           name and avatar, and the robot a child designs are saved in the browser&apos;s own
           storage (local storage) on that device. They are not sent to us. Clearing the
           browser&apos;s site data, or uninstalling the app, deletes them.</li>
-        <li>The <strong>progress backup code</strong> (in the Hangar and in Settings) is made on the
+        <li>The <strong>progress backup code</strong> (in the Garage and in Settings) is made on the
           device and holds the explorer and robot nicknames and the progress, so it can be restored
           on another device. It is never sent to R2BOT. Please keep it private, like a saved game
           file, and do not post it publicly.</li>
+      </ul>
+      <h3>Robot Passport (optional)</h3>
+      <ul>
+        <li>Only if a child taps &quot;Save my explorer&quot; in the Garage, the device makes a few
+          random words and a number (for example CHEETAH-NOVA-BALLOON-89). The progress (the same
+          contents as the backup code, including the explorer and robot nicknames) is stored on our
+          server under a <strong>SHA-256 hash of those words</strong>. We never store the words
+          themselves, and nothing that identifies the child or the device.</li>
+        <li>Typing the words, or scanning the passport&apos;s QR code, restores the progress on another
+          device. Anyone who has the words can do this, so please keep them private.</li>
+        <li>A passport that is not opened or updated for 400 days is deleted automatically. A
+          grown-up can delete it at any time with &quot;Delete my Passport&quot; in the Garage, or by
+          emailing <strong>hello@r2bot.in</strong> with the words.</li>
       </ul>
       <h3>Joining a teacher&apos;s class (optional)</h3>
       <ul>

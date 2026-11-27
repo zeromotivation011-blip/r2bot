@@ -48,6 +48,7 @@ import { design } from './design'
 import { space } from './space'
 import { world } from './world'
 import { ZONE_FILES } from './zones'
+import { maths } from './maths'
 
 import { samples as binaryEncoderSamples } from '@/components/kids/activities/templates/binary-encoder/samples'
 import { samples as centreOfMassSamples } from '@/components/kids/activities/templates/centre-of-mass/samples'
@@ -128,7 +129,10 @@ export const SAMPLE_ACTIVITIES: Activity[] = asActivities([
 /** Activities written for a Universe world (content/zones/<world>.ts). */
 export const ZONE_ACTIVITIES: Activity[] = Object.values(ZONE_FILES).flatMap((list) => asActivities(list))
 
-export const CONTENT_ACTIVITIES: Activity[] = [...Object.values(CONTENT_BY_FILE).flat(), ...ZONE_ACTIVITIES]
+/** Robot Maths (roadmap #86): one activity per maths concept per band, in ordinary tracks (content/maths.ts). */
+export const MATHS_ACTIVITIES: Activity[] = asActivities(maths)
+
+export const CONTENT_ACTIVITIES: Activity[] = [...Object.values(CONTENT_BY_FILE).flat(), ...ZONE_ACTIVITIES, ...MATHS_ACTIVITIES]
 
 /** A world's activities in galaxy order. */
 export function byWorld(world: string): Activity[] {

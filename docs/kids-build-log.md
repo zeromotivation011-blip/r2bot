@@ -268,3 +268,38 @@ Still open from batch C:
 - [ ] Portfolio reflections and build reflections are deliberately not in the backup code (free text stays
   on the device).
 - [ ] #29 "Teacher locks a child's band" still open (classroom side).
+
+## 27 Nov 2026 — Wave 2, batch D (shell, teen, connected robots, passport, voices)
+Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-universe.md):
+- [x] #3 Tab words: Home · Learn · Worlds · Games · Garage (five kept; reasoning in `lib/kids/nav.ts`).
+  The shell's 4-second progress poll is gone.
+- [x] #6 Rank: "Rank N" in the header, Explorer card, Garage, Galaxy results, toasts, ceremony, map;
+  two rank titles renamed (Star Rookie, Code Captain). Closes the batch C "Lv" item.
+- [x] #9 Your next mission: next session first, plus "Also today" (Recharge/almost-secure concept + a
+  game at the right tier, `GameShell ?tier=`) for ages 8–17.
+- [x] #15 Immersive play: 48px tier/"?" buttons, one Exit, "Leave this game?" guard — in GameShell,
+  Galaxy activities and the Physics/Power Lab workbench.
+- [x] #16 No black screens: stage context-loss poster + "Try again"; Arm Factory guarded too.
+- [x] #19 `/kids` share card (`app/kids/opengraph-image.tsx`).
+- [x] #20 One gated grown-up door `/kids/grown-ups` (indexable, in the sitemap).
+- [x] Follow-ups: toast cap and "+N more"; ParentTimeKeeper runs on game screens; worn title chip.
+- [x] #83 R2BOT Lab look for Engineers (boot script, CSS, tab words, Settings toggle, Lab badge).
+- [x] #86 Robot Maths hub + concept pages + Galaxy activities. #87 Inclusion ("Draw me" avatar,
+  turban/kippah for makers, sumo zone renamed "Push Lab").
+- [x] #88 Link Lab + Robot Security Check + Guardians activities (registered in `zones/index.ts`),
+  in More and the sitemap.
+- [x] #12 Robot Passport (privacy notice updated). #21 one block vocabulary (shared colours/emoji, no
+  Blockly port — see `shared-vocabulary.ts`). #8 Story Theatre voiced with Piper + Episodes Theatre
+  shelf and pages.
+- [x] Site-wide: `button { border: none }` in `app/globals.css` became `border-width:0; border-style:solid`,
+  so Tailwind `border` classes on buttons draw again (it had hidden selected states).
+
+Still open from batch D:
+- [ ] Migration **0057** (`kids_passports`) must be run by the founder. Until then the Passport says
+  "being switched on" and the offline backup code works as before.
+- [ ] #21 a real port of Code Lab to Blockly stays a Level 2 decision (reasons in `shared-vocabulary.ts`).
+- [ ] `/kids/lab/episodes` does not link to the Episodes Theatre yet; `blockly-blocks.ts` does not import
+  `SHARED_STYLE_COLOURS` yet (the verify keeps them equal).
+- [ ] Parent hub has no "Delete my Passport" entry (Garage has it, behind the gate).
+- [ ] `VOICES.md` has no Story Theatre section (commands are in `generate-stories.py`).
+- [ ] The Robodex toast can overlap the Ask Spark button on phones.

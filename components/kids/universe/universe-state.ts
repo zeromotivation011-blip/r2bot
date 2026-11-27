@@ -10,6 +10,7 @@ import { getProgress, KIDS_PROGRESS_EVENT, type KidsProgress } from '@/lib/kids-
 import { BAND_ORDER, type BandId } from '@/lib/kids/bands'
 import { GAMES, PLANETS, type UniverseGame } from '@/lib/kids/universe/worlds'
 import { weekKey } from '@/lib/kids/universe/rewards'
+import { conceptStates, type ConceptState } from '@/lib/kids/universe/mastery'
 
 /** Sessions per planet (each curriculum level is a 24-session season). */
 export const SESSIONS_PER_LEVEL = 24
@@ -97,4 +98,35 @@ export function suggestGame(p: KidsProgress, band: BandId): UniverseGame {
 
 export function planetForBand(band: BandId | null) {
   return PLANETS.find((pl) => pl.band === band) ?? PLANETS[0]
+}
+
+// ── "Your next mission" for ages 8–17 (roadmap #9) ─────────────────────────
+
+/** The tier a band starts on: Explorers Cadet, Builders Pilot, Inventors Ace, Engineers Legend. */
+function bandTier(band: BandId, g: UniverseGame): number {
+  return Math.min(Math.max(0, BAND_ORDER.indexOf(band)), g.tiers - 1)
+}
+
+/** The next tier worth playing: one above the best tier already won, else the band's tier. */
+export function nextTierFor(p: KidsProgress, g: UniverseGame, band: BandId): number {
+  let won = -1
+  for (const k of Object.keys(p.personalBests)) {
+    const m = /^(.+):t(\d+)$/.exec(k)
+    if (m && m[1] === g.id) won = Math.max(won, Number(m[2]))
+  }
+  if (won < 0) return bandTier(band, g)
+  return Math.min(won + 1, g.tiers - 1)
+}
+
+/** The concept to practise today, from the child's own mastery: a fading one first, else the nearest to secure. */
+export function masteryPick(p: KidsProgress, today?: string): { state: ConceptState; kind: 'recharge' | 'almost' } | null {
+  if (!p.conceptLog?.length) return null
+  const states = conceptStates({ conceptLog: p.conceptLog, conceptSecured: p.conceptSecured ?? {} }, today)
+  const fading = states
+    .filter((s) => s.status === 'fading' || (s.status === 'secure' && s.cells <= 2))
+    .sort((a, b) => a.cells - b.cells || (b.daysSinceWin ?? 0) - (a.daysSinceWin ?? 0))
+  if (fading[0]) return { state: fading[0], kind: 'recharge' }
+  const learning = states.filter((s) => s.status === 'learning').sort((a, b) => b.progress - a.progress)
+  if (learning[0]) return { state: learning[0], kind: 'almost' }
+  return null
 }

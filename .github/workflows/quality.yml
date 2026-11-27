@@ -30,8 +30,16 @@ jobs:
         run: npm run lint
       - name: Every Code Lab mission is solvable by its reference program
         run: npx tsx lib/kids/code-lab/verify.ts
+      - name: Kids Robot Passport — word list, forgiving parsing, QR links, server backup check
+        run: npx tsx lib/kids/passport.verify.ts
+      - name: Story Theatre Piper voices — index intact, every clip present (unvoiced lines only warn)
+        run: npx tsx lib/kids/episodes/story-voice.verify.ts
       - name: Every Skill Galaxy activity is valid and its solution passes its template
         run: npx tsx lib/kids/activities/verify.ts
+      - name: Kids Robot Maths (every band, worked examples, missions)
+        run: npx tsx lib/kids/maths/verify.ts
+      - name: Kids inclusion and representation
+        run: npx tsx lib/kids/inclusion/verify.ts
       - name: Kids course — every session's arena, activities, game tier and story exist and fit the age; checks carry misconception tags
         run: npx tsx lib/kids/curriculum/verify.ts
       - name: Kids course Levels 3–4 — 48 sessions match the outline, blocks and parts fit, 40-minute plans, misconception-tagged checks, reused challenges exist for the band
@@ -58,9 +66,13 @@ jobs:
         run: npx tsx lib/kids/sim/verify.ts
       - name: Kids Flight Recorder + battery — pack maths, drain model, pure-read recording, Power Lab challenges, why-did-it-fail, ghosts
         run: npx tsx lib/kids/sim/flight.verify.ts
+      - name: Kids Link Lab + Robot Security Check (#88) — deterministic link sim, every level docks with its protections and breaks without, one right answer per security step, Guardians best ids
+        run: npx tsx components/kids/net/net.verify.ts
       - name: Kids unplugged lessons — one per Level 1 session, 40-minute plans, a paper card for every picture block, every floor-grid answer key played square by square
         run: npx tsx lib/kids/unplugged/verify.ts
       - name: Kids Present mode + clubs — a deck for every session, episode and simulator, 5/10/20/5 timer, safe framed paths, QR sizes, club sessions add up
         run: npx tsx lib/kids/teach/clubs.verify.ts
       - name: Kids Classroom wave 2 — snapshot counts only, Mind Map and stuck signals need 2+ children, gradebook evidence, Class Power-Up maths, standards
         run: npx tsx lib/kids/classroom-wave2.verify.ts
+      - name: Kids shell — five one-word tabs, one gated grown-up door, Rank naming, next mission, 48px game controls + leave guard, WebGL context-loss poster, toast queue cap
+        run: npx tsx components/kids/ui/shell.verify.ts

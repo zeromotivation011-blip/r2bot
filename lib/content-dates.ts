@@ -75,7 +75,14 @@ export const PAGE_UPDATED: Record<string, string> = {
   '/kids/course/4': '2026-11-27T00:00:00.000Z',
   '/kids/robodex': '2026-11-27T00:00:00.000Z',
   '/kids/careers': '2026-11-27T00:00:00.000Z',
+  // Robot Maths (roadmap #86): the hub and one page per concept (lib/kids/maths/concepts.ts).
+  '/kids/maths': '2026-11-27T00:00:00.000Z',
   '/kids/lab/power': '2026-11-27T00:00:00.000Z',
+  // Link Lab + Robot Security Check (roadmap #88).
+  '/kids/lab/network': '2026-11-27T00:00:00.000Z',
+  '/kids/lab/network/guardian': '2026-11-27T00:00:00.000Z',
+  // The one grown-up front door (roadmap #20).
+  '/kids/grown-ups': '2026-11-27T00:00:00.000Z',
   '/kids/hangar': '2026-11-27T00:00:00.000Z',
   '/kids/play': '2026-11-26T00:00:00.000Z',
   '/kids/worlds': '2026-11-26T00:00:00.000Z',
@@ -96,7 +103,7 @@ export const PAGE_UPDATED: Record<string, string> = {
   '/kids/galaxy': '2026-11-27T00:00:00.000Z',
   '/kids/galaxy/concepts': '2026-11-27T00:00:00.000Z',
   '/kids/workshop': '2026-11-27T00:00:00.000Z',
-  '/kids/stories': '2026-11-25T00:00:00.000Z',
+  '/kids/stories': '2026-11-27T00:00:00.000Z',
   '/kids/code-lab': '2026-11-25T00:00:00.000Z',
   '/kids/teach': '2026-11-27T00:00:00.000Z',
   '/kids/teach/training': '2026-11-26T00:00:00.000Z',
@@ -142,6 +149,10 @@ export const GROUP_UPDATED = {
   robots: new Date('2026-11-09T00:00:00.000Z'),
   /** /kids/careers/<maker>: the 20 maker pages (lib/kids/makers/makers.ts). */
   kidsMakers: new Date('2026-11-27T00:00:00.000Z'),
+  /** /kids/maths/<concept>: the Robot Maths concept pages (lib/kids/maths/concepts.ts). */
+  kidsMaths: new Date('2026-11-27T00:00:00.000Z'),
+  /** /kids/stories/episodes/<sessionId>: the Episodes Theatre pages (lib/kids/episodes/theatre.ts). */
+  kidsTheatre: new Date('2026-11-27T00:00:00.000Z'),
   /** /kids/teach/2/<n> (= TEACH_GUIDES_L2_UPDATED in lib/kids/teach/guides-level2.ts). */
   kidsTeachL2: new Date('2026-11-27T00:00:00.000Z'),
   /** /kids/teach/3|4/<n> (= L34_GUIDES_UPDATED in lib/kids/curriculum/level3/teacher-guide.ts). */

@@ -13,6 +13,7 @@
 // the stars at 2; XP is still earned and `hintsUsed` goes to the report.
 
 import Link from 'next/link'
+import { ExitButton, useLeaveGuard } from '@/components/kids/ui/LeaveGuardClient'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Activity, CheckResult } from '@/lib/kids/activities/types'
 import { TRACKS, activityXp } from '@/lib/kids/activities/types'
@@ -96,6 +97,8 @@ export default function ActivityPlayerClient({ activity, trackActivities, twin =
   const band = getBand(activity.band)
   const { ready, done, band: childBand } = useGalaxyState()
   const [stage, setStage] = useState<Stage>('intro')
+  // Mid-mission, a stray tap on a link asks first (roadmap #15).
+  const guard = useLeaveGuard(stage === 'play', { title: 'Leave this mission?', line: 'Your mission is not finished, so it will not be saved.', stay: 'Keep going' })
   const [run, setRun] = useState(0)
   const [attempts, setAttempts] = useState(0)
   const [finish, setFinish] = useState<Finish | null>(null)
@@ -289,9 +292,13 @@ export default function ActivityPlayerClient({ activity, trackActivities, twin =
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-3 pb-10 pt-3 sm:px-5">
       {/* Top bar */}
       <div className="flex flex-wrap items-center gap-2">
-        <Link href={`/kids/galaxy/${track.id}`} className={`${ghostBtn} min-h-[44px] px-3 text-sm`}>
-          <span aria-hidden>←</span> {track.icon} {track.name}
-        </Link>
+        {stage === 'play' ? (
+          <ExitButton href={`/kids/galaxy/${track.id}`} onExit={guard.requestLeave} className="text-sm" />
+        ) : (
+          <Link href={`/kids/galaxy/${track.id}`} className={`${ghostBtn} min-h-[44px] px-3 text-sm`}>
+            <span aria-hidden>←</span> {track.icon} {track.name}
+          </Link>
+        )}
         <span className="ml-auto" />
         {stage === 'play' && attempts > 0 && (
           <span className="rounded-full border border-white/[0.08] bg-[#111C32] px-3 py-2 text-sm font-semibold text-[#A7B0C0]" aria-live="polite">
@@ -436,7 +443,7 @@ export default function ActivityPlayerClient({ activity, trackActivities, twin =
                     </span>
                   )}
                   {finish.reward && finish.reward.levelAfter > finish.reward.levelBefore && (
-                    <span className="rounded-full bg-amber-300/20 px-3 py-1.5 text-amber-200">Level {finish.reward.levelAfter}!</span>
+                    <span className="rounded-full bg-amber-300/20 px-3 py-1.5 text-amber-200">Rank {finish.reward.levelAfter}!</span>
                   )}
                 </div>
               </>
@@ -535,7 +542,7 @@ export default function ActivityPlayerClient({ activity, trackActivities, twin =
           </div>
         </section>
       )}
+      {guard.dialog}
     </div>
   )
 }
-

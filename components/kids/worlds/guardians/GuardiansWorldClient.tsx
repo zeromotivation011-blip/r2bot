@@ -5,7 +5,9 @@
 //   ActivitiesByBand — the world's activities per age band (server-rendered
 //                      links; ticks appear once progress is read on the device);
 //   ProgressCard     — how much of the world is done, the game tiers cleared,
-//                      and the world-complete "Robot Guardian" certificate.
+//                      the connected-robots missions (Robot Security Check,
+//                      Link Lab; roadmap #88) and the world-complete
+//                      "Robot Guardian" certificate.
 // Progress is read from lib/kids/activities/progress.ts (localStorage) and
 // refreshed on KIDS_PROGRESS_EVENT. Nothing here writes progress.
 
@@ -33,17 +35,27 @@ export interface BandGroup {
   items: WorldActivity[]
 }
 
+/** Personal-best ids of the connected-robots missions (roadmap #88, components/kids/net). */
+const SECURITY_CHECK_ID = 'net-guardian-check'
+const LINK_LAB_PREFIX = 'net-link-'
+const LINK_LAB_LEVELS = 6
+
 function useWorldProgress(gameId: string) {
   const [done, setDone] = useState<ActivitiesDone>({})
   const [tiers, setTiers] = useState<boolean[]>([false, false, false, false])
   const [name, setName] = useState('')
   const [ready, setReady] = useState(false)
+  const [security, setSecurity] = useState<number | null>(null)
+  const [linkDocked, setLinkDocked] = useState(0)
   useEffect(() => {
     const read = () => {
       setDone(getActivitiesDone())
       const p = getProgress()
       setTiers(TIER_NAMES.map((_, i) => p.personalBests[`${gameId}:t${i}`] !== undefined))
       setName(p.explorerName || '')
+      const sec = p.personalBests[SECURITY_CHECK_ID]
+      setSecurity(typeof sec === 'number' ? sec : null)
+      setLinkDocked(Object.entries(p.personalBests).filter(([k, v]) => k.startsWith(LINK_LAB_PREFIX) && v >= 1).length)
       setReady(true)
     }
     read()
@@ -54,7 +66,7 @@ function useWorldProgress(gameId: string) {
       window.removeEventListener('storage', read)
     }
   }, [gameId])
-  return { done, tiers, name, ready }
+  return { done, tiers, name, ready, security, linkDocked }
 }
 
 const TEMPLATE_LABEL: Record<string, string> = {
@@ -116,7 +128,7 @@ export function ActivitiesByBand({ bands, gameId }: { bands: BandGroup[]; gameId
 }
 
 export function ProgressCard({ ids, gameId }: { ids: string[]; gameId: string }) {
-  const { done, tiers, name, ready } = useWorldProgress(gameId)
+  const { done, tiers, name, ready, security, linkDocked } = useWorldProgress(gameId)
   const n = ids.filter((id) => done[id]).length
   const stars = ids.reduce((t, id) => t + (done[id]?.stars ?? 0), 0)
   const complete = ready && n === ids.length && ids.length > 0
@@ -169,6 +181,53 @@ export function ProgressCard({ ids, gameId }: { ids: string[]; gameId: string })
           </ul>
         </div>
         {!ready && <p className="mt-3 text-sm text-[#6E7888]">Progress is saved on this device.</p>}
+      </section>
+
+      <section aria-labelledby="world-connected" className="rounded-[20px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]">
+        <h2 id="world-connected" className="font-display text-xl font-bold text-[#EEF2F8]">
+          Connected robots
+        </h2>
+        <p className="mt-1 text-[15px] leading-snug text-[#A7B0C0]">Robots on a network need guarding too: from the wrong people, and from a radio link that fails.</p>
+        <ul className="mt-3 flex flex-col gap-2">
+          <li>
+            <Link
+              href="/kids/lab/network/guardian"
+              className="flex min-h-[56px] items-center gap-3 rounded-2xl border border-white/10 bg-[#111C32] px-3 py-2 text-[#EEF2F8] transition hover:-translate-y-0.5 hover:border-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 motion-reduce:hover:translate-y-0"
+            >
+              <span aria-hidden className="text-2xl">🔐</span>
+              <span className="flex-1">
+                <span className="block text-[15px] font-semibold leading-snug">Robot Security Check</span>
+                <span className="block text-[13px] text-[#A7B0C0]">Factory passwords, signed updates, least privilege · ages 8+</span>
+              </span>
+              <span className="shrink-0 font-display text-sm font-bold text-amber-300">
+                {security !== null ? (
+                  <>
+                    <span aria-hidden>{'★'.repeat(security)}</span>
+                    <span className="sr-only">best {security} of 3 stars</span>
+                  </>
+                ) : (
+                  'New'
+                )}
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/kids/lab/network"
+              className="flex min-h-[56px] items-center gap-3 rounded-2xl border border-white/10 bg-[#111C32] px-3 py-2 text-[#EEF2F8] transition hover:-translate-y-0.5 hover:border-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 motion-reduce:hover:translate-y-0"
+            >
+              <span aria-hidden className="text-2xl">📡</span>
+              <span className="flex-1">
+                <span className="block text-[15px] font-semibold leading-snug">Link Lab</span>
+                <span className="block text-[13px] text-[#A7B0C0]">Lost messages, delay and watchdog stops · ages 11+</span>
+              </span>
+              <span className="shrink-0 font-display text-sm font-bold text-emerald-300">
+                {linkDocked}/{LINK_LAB_LEVELS}
+                <span className="sr-only"> levels docked</span>
+              </span>
+            </Link>
+          </li>
+        </ul>
       </section>
 
       {complete ? (

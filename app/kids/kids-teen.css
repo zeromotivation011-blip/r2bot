@@ -1,0 +1,110 @@
+/* app/kids/kids-teen.css — the teen "R2BOT Lab" look (roadmap #83).
+   Applies when <html data-kids-look="lab">: set before first paint by
+   KIDS_LOOK_BOOT_SCRIPT (lib/kids/teen-boot.ts) for the Engineers band (14–17)
+   or a child who chose it, kept in step by KidsLookSyncClient, removed on
+   leaving /kids. A real stylesheet (not styled-jsx) so it is in the first paint.
+
+   What changes: the "Kids" wordmark becomes a LAB tag, nav chrome moves to the
+   main R2BOT typography and a telemetry-HUD style (cyan lines, mono labels,
+   tighter radii), emoji in the chrome go monochrome, body text steps down from
+   18 to 16px. What never changes: navy + R2BOT orange for actions, dark text on
+   orange, 44px+ targets, focus rings, the access settings (larger text, high
+   contrast, less motion all still win: nothing here animates). */
+
+/* Show/hide helpers any kids page can use for per-look words. */
+html:not([data-kids-look="lab"]) .kids-lab-only { display: none !important; }
+html[data-kids-look="lab"] .kids-kids-only { display: none !important; }
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+html[data-kids-look="lab"] .kids-nav {
+  background:
+    linear-gradient(rgba(10, 17, 32, 0.93), rgba(10, 17, 32, 0.93)),
+    repeating-linear-gradient(90deg, rgba(0, 229, 255, 0.07) 0 1px, transparent 1px 28px);
+  border-bottom-color: rgba(0, 229, 255, 0.22);
+}
+html[data-kids-look="lab"] .kids-nav-brand { font-weight: 700; letter-spacing: 0; }
+html[data-kids-look="lab"] .kids-nav-logo {
+  border-radius: 8px;
+  box-shadow: 0 0 0 1.5px rgba(0, 229, 255, 0.65), 0 0 12px rgba(0, 229, 255, 0.25);
+}
+/* "R2BOT Kids" → "R2BOT LAB". The word is drawn by CSS so it is right before
+   hydration; the link's accessible name comes from the shell (useKidsLook). */
+html[data-kids-look="lab"] .kids-nav-brand-kids { display: none; }
+html[data-kids-look="lab"] .kids-nav-brand-text::after {
+  content: "Lab";
+  display: inline-block;
+  margin-left: 2px;
+  padding: 1px 7px;
+  border: 1px solid rgba(0, 229, 255, 0.55);
+  border-radius: 6px;
+  color: #67E8F9;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  vertical-align: 0.12em;
+}
+html[data-kids-look="lab"] .kids-nav-link {
+  border-radius: 10px;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+html[data-kids-look="lab"] .kids-nav-link-emoji { display: none; }
+html[data-kids-look="lab"] .kids-nav-link:hover { background: rgba(0, 229, 255, 0.06); }
+html[data-kids-look="lab"] .kids-nav-link-on {
+  background: rgba(0, 229, 255, 0.08);
+  border-color: rgba(0, 229, 255, 0.4);
+  color: #67E8F9;
+}
+/* Rank chip: a HUD readout instead of an orange pill. */
+html[data-kids-look="lab"] .kids-nav-stars {
+  background: rgba(0, 229, 255, 0.06);
+  border: 1px solid rgba(0, 229, 255, 0.5);
+  border-radius: 10px;
+  box-shadow: none;
+  color: #67E8F9;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+html[data-kids-look="lab"] .kids-voice-toggle,
+html[data-kids-look="lab"] .kids-spark-btn { border-radius: 12px; }
+html[data-kids-look="lab"] .kids-more-btn { border-radius: 10px; }
+html[data-kids-look="lab"] .kids-more-menu { border-radius: 14px; border-color: rgba(0, 229, 255, 0.25); }
+html[data-kids-look="lab"] .kids-more-item { border-radius: 10px; }
+html[data-kids-look="lab"] .kids-more-emoji { filter: grayscale(1); opacity: 0.85; }
+
+/* ── Phone tab bar ──────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  html[data-kids-look="lab"] .kids-tabbar { border-top-color: rgba(0, 229, 255, 0.22); }
+  html[data-kids-look="lab"] .kids-tab {
+    border-radius: 10px;
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  html[data-kids-look="lab"] .kids-tab-emoji { filter: grayscale(1); opacity: 0.8; font-size: 19px; }
+  html[data-kids-look="lab"] .kids-tab-on {
+    background: rgba(0, 229, 255, 0.08);
+    box-shadow: inset 0 2px 0 #00E5FF;
+    color: #67E8F9;
+  }
+  html[data-kids-look="lab"] .kids-tab-on .kids-tab-emoji { transform: none; filter: none; opacity: 1; }
+}
+
+/* ── Page body ──────────────────────────────────────────────────────────── */
+/* Main R2BOT reading size (the kids layer runs at 18px). In rem, so the
+   Larger text settings (html at 112% / 125%) still scale it up. */
+html[data-kids-look="lab"] .kids-main,
+html[data-kids-look="lab"].kids-large-text .kids-main,
+html[data-kids-look="lab"].kids-large-text.kids-larger-text .kids-main { font-size: 1rem; }
+html[data-kids-look="lab"] .kids-main h1,
+html[data-kids-look="lab"] .kids-main h2 { letter-spacing: -0.01em; }
+/* Spec-sheet shapes: tighter radii on content cards. */
+html[data-kids-look="lab"] .kids-main .rounded-\[28px\] { border-radius: 16px; }
+html[data-kids-look="lab"] .kids-main .rounded-\[20px\] { border-radius: 14px; }
+html[data-kids-look="lab"] .kids-main .rounded-3xl { border-radius: 16px; }
+html[data-kids-look="lab"] .kids-footer { font-family: var(--font-mono), ui-monospace, monospace; font-size: 13px; }

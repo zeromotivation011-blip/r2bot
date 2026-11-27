@@ -1,16 +1,27 @@
 'use client'
 
 // components/kids/universe/ContinueCardClient.tsx
-// "Continue your mission": the next unfinished session on the child's planet,
-// or — when their planet's season is still being written and they have not
-// started it — a game that fits their band. Session titles come from the
-// curriculum on the server (passed in), so this island stays small.
+// "Your next mission" (roadmap #9): one clear next step on every visit, chosen
+// for the child's band.
+//   - Every band: the next unfinished session on their own planet (all four
+//     levels are playable since Wave 2), or "fly on" when the season is done.
+//   - Ages 8–17 also get "also today" picks worked out from their mastery
+//     (lib/kids/universe/mastery.ts, read from the progress store — no activity
+//     data is shipped to this page): a concept whose battery is running low
+//     ("Recharge"), or the one closest to secure, which today's Galaxy missions
+//     practise; and a game at the right tier (the next tier they have not won,
+//     or their band's tier), opened on that tier with ?tier=.
+//   - Ages 5–7 get one simple extra: a game that fits, on Cadet.
+// Session titles come from the curriculum on the server (passed in), so this
+// island stays small.
 
 import Link from 'next/link'
 import type { KidsProgress } from '@/lib/kids-progress'
-import { getBand } from '@/lib/kids/bands'
+import { getBand, type BandId } from '@/lib/kids/bands'
 import { getPlanet } from '@/lib/kids/universe/worlds'
-import { SESSIONS_PER_LEVEL, planetForBand, sessionsDoneOn, suggestGame } from './universe-state'
+import { TIER_NAMES } from '@/lib/kids/universe/tiers'
+import { CONCEPT_INFO } from '@/lib/kids/universe/mastery'
+import { SESSIONS_PER_LEVEL, masteryPick, nextTierFor, planetForBand, sessionsDoneOn, suggestGame } from './universe-state'
 
 /** Level number -> session titles in order (index 0 = session 1). */
 export type SessionTitles = Record<number, string[]>
@@ -23,7 +34,41 @@ export interface Mission {
   cta: string
   icon: string
   gradient: string
-  alt?: { href: string; label: string }
+  /** "Also today": up to two smaller next steps (mastery and a game tier). */
+  extras: MissionExtra[]
+}
+
+export interface MissionExtra {
+  kind: 'recharge' | 'almost' | 'game' | 'season'
+  href: string
+  icon: string
+  /** Short chip, e.g. "Recharge". */
+  chip: string
+  label: string
+}
+
+function gameExtra(p: KidsProgress, band: BandId): MissionExtra {
+  const g = suggestGame(p, band)
+  const tier = nextTierFor(p, g, band)
+  const name = TIER_NAMES[tier] ?? TIER_NAMES[0]
+  return { kind: 'game', href: `/kids/play/${g.id}?tier=${tier}`, icon: g.emoji, chip: name, label: `Play ${g.name} on ${name}` }
+}
+
+function extrasFor(p: KidsProgress, band: BandId): MissionExtra[] {
+  const out: MissionExtra[] = []
+  if (band !== 'explorers') {
+    const m = masteryPick(p)
+    if (m) {
+      const info = CONCEPT_INFO[m.state.id]
+      out.push(
+        m.kind === 'recharge'
+          ? { kind: 'recharge', href: '/kids/galaxy', icon: info.icon, chip: 'Recharge', label: `${info.name}: its battery is low. Today’s Galaxy missions top it up.` }
+          : { kind: 'almost', href: '/kids/galaxy', icon: info.icon, chip: 'Almost secure', label: `${info.name}: one more first-try win in the Galaxy.` },
+      )
+    }
+  }
+  out.push(gameExtra(p, band))
+  return out
 }
 
 /**
@@ -34,9 +79,8 @@ export interface Mission {
 export function pickMission(p: KidsProgress, titles: SessionTitles, playable: readonly number[]): Mission {
   const planet = planetForBand(p.band)
   const done = new Set(sessionsDoneOn(p, planet.level))
-  const band = getBand(p.band)
-  const game = suggestGame(p, p.band ?? 'explorers')
-  const gameAlt = { href: `/kids/play/${game.id}`, label: `Or play ${game.name}` }
+  const bandId: BandId = p.band ?? 'explorers'
+  const extras = extrasFor(p, bandId)
 
   if (done.size >= SESSIONS_PER_LEVEL) {
     const nextPlanet = getPlanet(planet.level + 1)
@@ -49,19 +93,19 @@ export function pickMission(p: KidsProgress, titles: SessionTitles, playable: re
         cta: 'Fly there',
         icon: nextPlanet.emoji,
         gradient: nextPlanet.gradient,
-        alt: gameAlt,
+        extras,
       }
     }
     // The last planet's season is finished: nothing left to "continue".
     return {
       eyebrow: `${planet.name} complete!`,
       title: 'Season finished!',
-      detail: `All ${SESSIONS_PER_LEVEL} sessions done. Replay a game or visit the Hangar.`,
+      detail: `All ${SESSIONS_PER_LEVEL} sessions done. Replay a game or visit your Garage.`,
       href: '/kids/hangar',
-      cta: 'Open the Hangar',
+      cta: 'Open the Garage',
       icon: '🏆',
       gradient: planet.gradient,
-      alt: gameAlt,
+      extras,
     }
   }
 
@@ -71,26 +115,30 @@ export function pickMission(p: KidsProgress, titles: SessionTitles, playable: re
 
   if (playable.includes(planet.level) || done.size > 0) {
     return {
-      eyebrow: done.size ? 'Continue your mission' : 'Your first mission',
+      eyebrow: done.size ? 'Your next mission' : 'Your first mission',
       title: title ? `Session ${next}: ${title}` : `Session ${next}`,
       detail: `${planet.name} · ${done.size} of ${SESSIONS_PER_LEVEL} sessions done`,
       href: `/kids/course/${planet.level}`,
       cta: done.size ? 'Continue' : 'Start',
       icon: planet.emoji,
       gradient: planet.gradient,
-      alt: gameAlt,
+      extras,
     }
   }
 
+  // A planet whose season is not written yet (none today): a game that fits, and the season map.
+  const band = getBand(p.band)
+  const game = suggestGame(p, bandId)
+  const tier = nextTierFor(p, game, bandId)
   return {
     eyebrow: band ? `Picked for ${band.name}` : 'Try this game',
     title: game.name,
     detail: game.hook,
-    href: `/kids/play/${game.id}`,
-    cta: 'Play',
+    href: `/kids/play/${game.id}?tier=${tier}`,
+    cta: `Play on ${TIER_NAMES[tier] ?? TIER_NAMES[0]}`,
     icon: game.emoji,
     gradient: game.gradient,
-    alt: { href: `/kids/course/${planet.level}`, label: `See the ${planet.name} season` },
+    extras: [{ kind: 'season', href: `/kids/course/${planet.level}`, icon: planet.emoji, chip: 'Season', label: `See the ${planet.name} season` }],
   }
 }
 
@@ -105,7 +153,7 @@ export function ContinueCardClient({ progress, titles, playable }: ContinueCardP
   return (
     <section
       aria-labelledby="continue-h"
-      className="relative min-h-[262px] overflow-hidden sm:min-h-[183px] rounded-[28px] border border-white/10 bg-[#111C32] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]"
+      className="relative min-h-[300px] overflow-hidden sm:min-h-[250px] rounded-[28px] border border-white/10 bg-[#111C32] p-5 shadow-[0_8px_24px_rgba(0,0,0,.45)]"
     >
       {m ? (
         <div className="uv-pop flex h-full flex-col">
@@ -124,27 +172,42 @@ export function ContinueCardClient({ progress, titles, playable }: ContinueCardP
               <p className="mt-0.5 text-[14px] text-[#A7B0C0]">{m.detail}</p>
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div className="mt-4">
             <Link
               href={m.href}
               className="inline-flex min-h-[52px] items-center justify-center rounded-2xl bg-amber-500 px-6 font-display text-lg font-bold text-[#1A1103] shadow-lg shadow-amber-500/25 transition hover:-translate-y-0.5 hover:bg-amber-400 active:scale-[.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
             >
               {m.cta} →
             </Link>
-            {m.alt && (
-              <Link
-                href={m.alt.href}
-                className="inline-flex min-h-[48px] items-center rounded-xl px-2 text-[15px] font-semibold text-cyan-300 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
-              >
-                {m.alt.label}
-              </Link>
-            )}
           </div>
+          {m.extras.length > 0 && (
+            <div className="mt-4">
+              <p className="text-[12px] font-bold uppercase tracking-wide text-[#6E7888]">Also today</p>
+              <ul className="mt-1.5 grid gap-2 sm:grid-cols-2">
+                {m.extras.map((x) => (
+                  <li key={x.kind}>
+                    <Link
+                      href={x.href}
+                      className="flex min-h-[52px] items-center gap-3 rounded-2xl border border-white/10 bg-[#0A1120]/60 px-3 py-2 transition hover:border-white/25 active:scale-[.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+                    >
+                      <span className="text-2xl" aria-hidden>
+                        {x.icon}
+                      </span>
+                      <span className="min-w-0">
+                        <span className={`block text-[12px] font-bold uppercase tracking-wide ${x.kind === 'game' ? 'text-cyan-300' : 'text-amber-300'}`}>{x.chip}</span>
+                        <span className="block text-[14px] font-semibold leading-snug text-[#EEF2F8]">{x.label}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       ) : (
         <>
           <h2 id="continue-h" className="sr-only">
-            Continue your mission
+            Your next mission
           </h2>
           <div className="animate-pulse motion-reduce:animate-none" aria-hidden>
           <div className="flex gap-4">
@@ -156,6 +219,10 @@ export function ContinueCardClient({ progress, titles, playable }: ContinueCardP
             </div>
           </div>
           <div className="mt-4 h-[52px] w-36 rounded-2xl bg-white/10" />
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            <div className="h-[52px] rounded-2xl bg-white/10" />
+            <div className="h-[52px] rounded-2xl bg-white/10" />
+          </div>
           </div>
         </>
       )}

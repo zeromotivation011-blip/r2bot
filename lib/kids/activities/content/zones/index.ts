@@ -5,6 +5,7 @@
 
 import type { WorldId } from '../../../universe/worlds'
 import { guardians } from './guardians'
+import { guardiansNet } from './guardians-net'
 import { ocean } from './ocean'
 import { zoo } from './zoo'
 import { hospital } from './hospital'
@@ -12,4 +13,13 @@ import { farm } from './farm'
 import { city } from './city'
 import { station } from './station'
 
-export const ZONE_FILES: Record<WorldId, readonly unknown[]> = { guardians, ocean, zoo, hospital, farm, city, station }
+export const ZONE_FILES: Record<WorldId, readonly unknown[]> = {
+  // Connected robots + robot cybersecurity (roadmap #88) are Guardians activities too.
+  guardians: [...guardians, ...guardiansNet],
+  ocean,
+  zoo,
+  hospital,
+  farm,
+  city,
+  station,
+}

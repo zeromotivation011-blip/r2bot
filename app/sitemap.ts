@@ -28,6 +28,8 @@ import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1';
 import { LEVEL2_SESSIONS } from '@/lib/kids/curriculum/level2';
 import { guideParamsL34 } from '@/lib/kids/curriculum/level3/teacher-guide';
 import { MAKERS as KIDS_MAKERS } from '@/lib/kids/makers/makers';
+import { MATHS_CONCEPTS as KIDS_MATHS } from '@/lib/kids/maths/concepts';
+import { THEATRE_EPISODES as KIDS_THEATRE } from '@/lib/kids/episodes/theatre';
 import { HOME_BUILDS as KIDS_HOME_BUILDS } from '@/lib/kids/builds/builds';
 import { allUnpluggedLessons } from '@/lib/kids/unplugged';
 
@@ -201,7 +203,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/kids/robodex`, lastModified: at('/kids/robodex'), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE}/kids/careers`, lastModified: at('/kids/careers'), changeFrequency: 'monthly' as const, priority: 0.6 },
     ...KIDS_MAKERS.map((m) => ({ url: `${BASE}/kids/careers/${m.id}`, lastModified: GROUP_UPDATED.kidsMakers, changeFrequency: 'monthly' as const, priority: 0.5 })),
+    // Robot Maths (roadmap #86): the hub and one page per concept.
+    { url: `${BASE}/kids/maths`, lastModified: at('/kids/maths'), changeFrequency: 'monthly' as const, priority: 0.6 },
+    ...KIDS_MATHS.map((c) => ({ url: `${BASE}/kids/maths/${c.id}`, lastModified: GROUP_UPDATED.kidsMaths, changeFrequency: 'monthly' as const, priority: 0.5 })),
     { url: `${BASE}/kids/lab/power`, lastModified: at('/kids/lab/power'), changeFrequency: 'monthly' as const, priority: 0.6 },
+    // Link Lab + Robot Security Check (roadmap #88).
+    { url: `${BASE}/kids/lab/network`, lastModified: at('/kids/lab/network'), changeFrequency: 'monthly' as const, priority: 0.6 },
+    { url: `${BASE}/kids/lab/network/guardian`, lastModified: at('/kids/lab/network/guardian'), changeFrequency: 'monthly' as const, priority: 0.6 },
+    // The one grown-up front door (roadmap #20).
+    { url: `${BASE}/kids/grown-ups`, lastModified: at('/kids/grown-ups'), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: `${BASE}/kids/hangar`, lastModified: at('/kids/hangar'), changeFrequency: 'monthly' as const, priority: 0.5 },
     { url: `${BASE}/kids/play`, lastModified: at('/kids/play'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/galaxy`, lastModified: at('/kids/galaxy'), changeFrequency: 'monthly' as const, priority: 0.7 },
@@ -220,6 +230,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/kids/schools`, lastModified: at('/kids/schools'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/stories`, lastModified: at('/kids/stories'), changeFrequency: 'monthly' as const, priority: 0.7 },
     ...KIDS_EPISODES.map((e) => ({ url: `${BASE}/kids/stories/${e.slug}`, lastModified: new Date(e.updated), changeFrequency: 'monthly' as const, priority: 0.6 })),
+    // Episodes Theatre (roadmap #8): one page per voiced 3D course episode.
+    ...KIDS_THEATRE.map((e) => ({ url: `${BASE}${e.href}`, lastModified: GROUP_UPDATED.kidsTheatre, changeFrequency: 'monthly' as const, priority: 0.5 })),
     { url: `${BASE}/kids/workshop`, lastModified: at('/kids/workshop'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/code-lab`, lastModified: at('/kids/code-lab'), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${BASE}/kids/teach`, lastModified: at('/kids/teach'), changeFrequency: 'monthly' as const, priority: 0.7 },

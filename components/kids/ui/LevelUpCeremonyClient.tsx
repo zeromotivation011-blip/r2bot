@@ -42,7 +42,7 @@ const CLOSE_MS = 3200
 export function ceremonyLine(r: RewardResult): string {
   const li = levelInfo(r.progress.xp)
   const u = r.newUnlocks[0]
-  return `Level ${r.levelAfter}! You are a ${li.title}.${u ? ` You unlocked ${u.name}!` : ''}`
+  return `Rank ${r.levelAfter}! You are a ${li.title}.${u ? ` You unlocked ${u.name}!` : ''}`
 }
 
 export interface LevelUpCeremonyProps {
@@ -159,7 +159,7 @@ export default function LevelUpCeremonyClient({ result, onClose }: LevelUpCeremo
           Skip
         </button>
 
-        <p className="font-display text-sm font-bold uppercase tracking-[0.2em] text-amber-300">Level up!</p>
+        <p className="font-display text-sm font-bold uppercase tracking-[0.2em] text-amber-300">Rank up!</p>
 
         {/* The rank stamp */}
         <div className="mt-4 flex justify-center" aria-hidden>
@@ -172,15 +172,15 @@ export default function LevelUpCeremonyClient({ result, onClose }: LevelUpCeremo
           </div>
         </div>
         <h2 id="levelup-title" className={`mt-3 font-display text-2xl font-bold text-[#EEF2F8] ${phase >= 2 ? '' : 'opacity-0'}`}>
-          Level {result.levelAfter} · {li.title}
+          Rank {result.levelAfter} · {li.title}
         </h2>
 
         {/* The XP bar filling up */}
         <div className="mt-4">
           <div className="flex items-baseline justify-between text-[13px] font-semibold text-[#A7B0C0]">
-            <span>Level {result.levelBefore}</span>
+            <span>Rank {result.levelBefore}</span>
             <span className="font-display text-amber-300">+{result.xpGained} XP</span>
-            <span>Level {result.levelAfter}</span>
+            <span>Rank {result.levelAfter}</span>
           </div>
           <div className="mt-1 h-3 overflow-hidden rounded-full bg-white/10">
             <div

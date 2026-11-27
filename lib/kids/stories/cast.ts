@@ -1,5 +1,7 @@
 // lib/kids/stories/cast.ts
 // Who is who in the Story Theatre. All original characters.
+// Humans: Amara (a girl inventor) and Nana Lucía (her grandmother, a retired
+// engineer): two women in engineering on purpose. Machines carry no gender.
 
 import type { SpeakerId } from './types'
 
@@ -10,7 +12,11 @@ export interface CastInfo {
   bio: string
   /** Caption colour (Tailwind text class). */
   captionClass: string
-  /** Speech voice: pitch 0–2, rate 0.1–10. Different per character so kids can tell them apart. */
+  /**
+   * Speech voice: pitch 0–2, rate 0.1–10. Different per character so kids can tell them apart.
+   * Inclusion (roadmap #87, checked by lib/kids/inclusion/verify.ts): only the human
+   * characters ask for a voice gender; robots, machines and the narrator are 'any'.
+   */
   voice: { pitch: number; rate: number; prefer: 'female' | 'male' | 'any' }
 }
 
@@ -55,7 +61,8 @@ export const CAST: Record<SpeakerId, CastInfo> = {
     name: 'Rover',
     bio: 'A six-wheeled exploration rover working on Mars.',
     captionClass: 'text-amber-300',
-    voice: { pitch: 0.8, rate: 0.95, prefer: 'male' },
+    // A machine has no gender (roadmap #87): the low pitch alone keeps Rover distinct.
+    voice: { pitch: 0.8, rate: 0.95, prefer: 'any' },
   },
   narrator: {
     id: 'narrator',

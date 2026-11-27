@@ -223,3 +223,8 @@ body:has(.kids-main) [data-site-footer] { display: none; }
     max-height: calc(100dvh - 160px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
 }
+
+/* Header rank badge ("Rank 7"): on the narrowest phones the number alone keeps the row on one line. */
+@media (max-width: 359px) {
+  .kids-rank-word { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}
