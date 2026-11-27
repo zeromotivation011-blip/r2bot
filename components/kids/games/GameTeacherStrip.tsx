@@ -2,6 +2,7 @@
 // Server component: "Share to Google Classroom" + where to find teaching help.
 
 import Link from 'next/link'
+import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
 import { ShareToClassroom } from '@/components/kids/teach/ShareToClassroom'
 import type { UniverseGame } from '@/lib/kids/universe/worlds'
 
@@ -13,9 +14,9 @@ export function GameTeacherStrip({ game }: { game: Pick<UniverseGame, 'id' | 'na
     >
       <span className="font-display font-bold text-[#EEF2F8]">Teaching this?</span>
       <ShareToClassroom path={`/kids/play/${game.id}`} title={`${game.name} — R2BOT Kids`} variant="chip" />
-      <Link href="/kids/teach" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
+      <GrownUpLink href="/kids/teach" grant className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
         Teacher hub
-      </Link>
+      </GrownUpLink>
       <Link href="/kids/play" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
         All games
       </Link>

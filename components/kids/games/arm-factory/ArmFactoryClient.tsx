@@ -36,7 +36,7 @@ import {
 } from './sim'
 import { DEG, GRIP_MAX_FORCE, HOME, SHOULDER_MAX_TORQUE, collide, ik, planMove, type Joints, type V3 } from './kinematics'
 import { COLOR_TEXT, GripButton, JointJog, Panel, Pendant, PlanEditor, ProgramEditor, type QueueItem, type SolutionView } from './ArmControlsClient'
-import { markGameMoment, recordGameFrame } from '@/lib/kids/sim/game-recorder'
+import { markGameMoment, recordGameFrame, restartGameRecording } from '@/lib/kids/sim/game-recorder'
 
 const STARTER: ProgStep[] = [
   { kind: 'wait', when: 'always' },
@@ -716,6 +716,8 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
     const fresh = new ArmSim(Number.isFinite(cfg.timeLimit) ? { ...cfg, timeLimit: kidsTimeLimit(cfg.timeLimit) } : cfg)
     fresh.beltOn = true
     simRef.current = fresh
+    // The new sim's clock starts at 0 (ArmSim.time): the failed shift's frames go.
+    restartGameRecording()
     runsRef.current++
     setReport(null)
     fresh.runProgram(program)

@@ -95,7 +95,7 @@ export function AssignmentsPanelClient({ classId, band, members }: AssignmentsPa
       )}
       {state.kind === 'error' && (
         <p className="mt-4 rounded-2xl bg-red-500/10 p-4 text-sm text-red-100" role="alert">
-          {state.message} <button type="button" onClick={() => void load()} className="ml-2 font-bold underline">Try again</button>
+          {state.message} <button type="button" onClick={() => void load()} className="ml-2 inline-flex min-h-[44px] items-center px-2 font-bold underline">Try again</button>
         </p>
       )}
 

@@ -70,6 +70,23 @@ async function main() {
   const doorsClient = src('app/kids/grown-ups/GrownUpDoorsClient.tsx')
   check('grown-up doors ask the gate', /requireGrownUp\(/.test(doorsClient) && /consumeGrownUpPass\(\)/.test(doorsClient))
   check('grown-up doors respect the links-out switch', /outboundLinks/.test(doorsClient))
+  // Every child-surface link to a grown-up page goes through the gate (COPPA: a child
+  // must never be one tap from the schools pilot form's name + email fields).
+  {
+    const { readdirSync, statSync } = await import('node:fs')
+    const walk = (dir: string): string[] =>
+      readdirSync(join(ROOT, dir)).flatMap((n) => {
+        const rel = `${dir}/${n}`
+        return statSync(join(ROOT, rel)).isDirectory() ? walk(rel) : /\.tsx$/.test(n) ? [rel] : []
+      })
+    const grownUpDirs = /^(app\/kids\/(teach|parents|schools|grown-ups|classroom)\/|components\/kids\/(teach|parents|classroom)\/)/
+    const plain = [...walk('app/kids'), ...walk('components/kids')]
+      .filter((f) => !grownUpDirs.test(f))
+      .filter((f) => /<Link[^>]*href="\/kids\/(teach|parents|schools|grown-ups)["/?#]/.test(src(f)))
+    check('no plain <Link> from a child page to a grown-up page', plain.length === 0, plain.join(', '))
+    const pilot = src('app/kids/schools/PilotFormClient.tsx')
+    check('schools pilot form sits behind the parental gate', /<ParentalGate[^>]*>\s*<PilotForm \/>/.test(pilot))
+  }
 
   // ── Rank naming ────────────────────────────────────────────────────────────
   const R = await import('../../../lib/kids/universe/rewards')
@@ -126,6 +143,42 @@ async function main() {
       'arm-factory/ArmFactoryClient.tsx',
     ].filter((f) => !/recordGameFrame\(/.test(src(`components/kids/games/${f}`)))
     check('the seven sim games write to the Flight Recorder', recorded.length === 0, recorded.join(', '))
+  }
+  {
+    // A sim restarted inside one round (Abort, Reset, a re-run) starts again at t=0:
+    // its frames must REPLACE the aborted run's, not trail after them.
+    const GR = await import('../../../lib/kids/sim/game-recorder')
+    const climb = (rec: { frame: (t: number, v: Record<string, number>) => void }) => {
+      for (let i = 0; i <= 80; i++) rec.frame(i * 0.05, { 'Height (m)': 1 + i * 0.1 })
+    }
+    const hover = (rec: { frame: (t: number, v: Record<string, number>) => void }) => {
+      for (let i = 0; i <= 60; i++) rec.frame(i * 0.05, { 'Height (m)': 2 })
+    }
+    // 1) The game says so (restartGameRecording) — the abort/reset/re-run buttons do.
+    const r1 = new GR.GameRecorder()
+    GR.setActiveGameRecorder(r1)
+    climb(r1)
+    GR.markGameMoment(3.9, 'Gust!')
+    GR.restartGameRecording()
+    hover(r1)
+    GR.setActiveGameRecorder(null)
+    const s1 = r1.snapshot()
+    const at2 = GR.gameFrameAt(s1.frames, 2)
+    check('recorder: a restarted sim replaces the aborted run', s1.frames.length === 61 && at2?.v[0] === 2 && s1.moments.length === 0 && s1.frames[s1.frames.length - 1].t <= 3.0001, `${s1.frames.length} frames, h@2s=${at2?.v[0]}, ${s1.moments.length} moments`)
+    // 2) A game forgets to say so: a clock that jumps back clears the old run too.
+    const r2 = new GR.GameRecorder()
+    climb(r2)
+    r2.mark(3.9, 'Gust!')
+    hover(r2)
+    const s2 = r2.snapshot()
+    check('recorder: a clock that jumps back starts a fresh recording', s2.frames.length === 61 && GR.gameFrameAt(s2.frames, 2)?.v[0] === 2 && s2.moments.length === 0)
+    const restarts = [
+      ['drone-hover/DroneHoverGameClient.tsx', 2],
+      ['swarm-reef/SwarmReefGameClient.tsx', 2],
+      ['arm-factory/ArmFactoryClient.tsx', 1],
+    ] as const
+    const missing = restarts.filter(([f, n]) => (src(`components/kids/games/${f}`).match(/restartGameRecording\(\)/g) ?? []).length < n).map(([f]) => f)
+    check('Drone Hover abort/launch, Swarm Reef reset/launch, Arm Factory re-run restart the recording', missing.length === 0, missing.join(', '))
   }
   const lg = src('components/kids/ui/LeaveGuardClient.tsx')
   check('leave guard catches links in the capture phase', /addEventListener\('click', onClick, true\)/.test(lg))

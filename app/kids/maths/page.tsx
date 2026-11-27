@@ -5,6 +5,7 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
 import MathsBandFocusClient from '@/components/kids/maths/MathsBandFocusClient'
 import { breadcrumbJsonLD, jsonldScript } from '@/lib/seo/jsonld'
 import { KIDS_BANDS } from '@/lib/kids/bands'
@@ -129,9 +130,9 @@ export default function RobotMathsPage() {
             the middle years, ratio, proportion, percentages and graphs at 11–13, and vectors, trigonometry and statistics at 14–17. Every worked
             example on these pages is checked automatically, so the numbers are right. The pages work as short starters for a lesson, and the
             missions as practice; children need no account and give no personal details. Teachers will find more classroom material in{' '}
-            <Link href="/kids/teach" className={link}>
+            <GrownUpLink href="/kids/teach" grant className={link}>
               R2BOT Kids for teachers
-            </Link>
+            </GrownUpLink>
             .
           </p>
         </article>

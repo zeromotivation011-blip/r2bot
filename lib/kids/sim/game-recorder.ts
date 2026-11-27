@@ -25,6 +25,8 @@ export const GAME_MAX_CHANNELS = 6
 export const GAME_RECORD_CAPACITY = GAME_RECORD_HZ * 300
 /** Most moments kept per round. */
 export const GAME_MAX_MOMENTS = 60
+/** A frame this many seconds before the last one means the sim restarted. */
+export const GAME_RESTART_GAP = 0.5
 
 export interface GameFrame {
   t: number
@@ -66,12 +68,31 @@ export class GameRecorder {
   }
 
   /**
-   * Record the game's numbers at game time `t` (seconds). Throttled to GAME_RECORD_HZ;
-   * a frame with a time earlier than the last one (a restarted sim) is ignored.
+   * Start again inside the same round: a game restarted its sim (Abort, Reset, a
+   * re-run) and the new sim's clock is back at 0. The aborted run's frames and
+   * moments are dropped, so the results card shows only the run that counted.
+   */
+  restart(): void {
+    this.buf = new Array(this.capacity)
+    this.start = 0
+    this.count = 0
+    this.lastT = -Infinity
+    this.channels.length = 0
+    this.moments = []
+    this.dropped = 0
+  }
+
+  /**
+   * Record the game's numbers at game time `t` (seconds). Throttled to GAME_RECORD_HZ.
+   * A time clearly earlier than the last frame (more than GAME_RESTART_GAP) means the
+   * sim restarted without saying so: the old run is cleared and this frame starts the
+   * new one. Smaller steps back are jitter and are ignored.
    * Booleans are stored as 1/0 so a "sees the rival?" channel draws as a step.
    */
   frame(t: number, values: Record<string, number | boolean | null | undefined>): void {
-    if (!Number.isFinite(t) || t < this.lastT + 1 / GAME_RECORD_HZ - 1e-9) return
+    if (!Number.isFinite(t)) return
+    if (t < this.lastT - GAME_RESTART_GAP) this.restart()
+    if (t < this.lastT + 1 / GAME_RECORD_HZ - 1e-9) return
     this.lastT = t
     for (const k of Object.keys(values)) {
       if (!this.channels.includes(k) && this.channels.length < GAME_MAX_CHANNELS) this.channels.push(k)
@@ -128,6 +149,14 @@ export function setActiveGameRecorder(r: GameRecorder | null): void {
 
 export function activeGameRecorder(): GameRecorder | null {
   return active
+}
+
+/**
+ * Games call this when they restart their sim inside one round (Abort, Reset, a
+ * re-run), so the recording holds only the new run. Does nothing when no shell is recording.
+ */
+export function restartGameRecording(): void {
+  active?.restart()
 }
 
 /** Games call this from their sim loop. Does nothing when no shell is recording. */

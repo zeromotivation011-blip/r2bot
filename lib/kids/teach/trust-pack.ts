@@ -30,7 +30,7 @@ import {
 } from '../classroom'
 
 export const TRUST_PACK_UPDATED = '2026-11-27'
-export const TRUST_PACK_VERSION = '1.2'
+export const TRUST_PACK_VERSION = '1.3'
 export const TRUST_CONTACT = 'hello@r2bot.in'
 
 export type Audience = 'teacher' | 'school-admin' | 'child-device' | 'nobody'
@@ -58,7 +58,7 @@ export const CLASS_SNAPSHOT_FIELDS: Record<keyof ClassSnapshot, Omit<DataField, 
   codeMissions: { what: 'Code Lab missions finished and the best stars for each (1–3).', seenBy: TEACHER, personal: 'no' },
   robotsBuilt: { what: 'How many robots were built in the Workshop (a number).', seenBy: TEACHER, personal: 'no' },
   totalMinutesPlayed: { what: 'No longer sent (always 0). Minutes of play stay on the device.', seenBy: 'Nobody', personal: 'no' },
-  band: { what: 'The age band the child chose (Explorers 5–7, Builders 8–10, Inventors 11–13, Engineers 14–17) — a range, never an age or birthday.', seenBy: TEACHER, personal: 'no' },
+  band: { what: 'The age band the child plays at (Explorers 5–7, Builders 8–10, Inventors 11–13, Engineers 14–17), chosen by the child or set by the teacher — a range, never an age or birthday.', seenBy: TEACHER, personal: 'no' },
   robot: { what: 'A short code for the robot the child designed: parts, colours and the robot’s name (the name is checked like a nickname).', seenBy: TEACHER, personal: 'possibly' },
   stuck: { what: 'Spark Trail levels retried two or more times without two stars, with the number of tries — so the teacher can help.', seenBy: TEACHER, personal: 'no' },
   sessionsDone: { what: 'Course sessions finished (e.g. “L1-S05”) and the best stars for each.', seenBy: TEACHER, personal: 'no' },

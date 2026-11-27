@@ -2,13 +2,24 @@
 
 // "Request a school pilot". Goes through the one capture path: POST /api/leads
 // → captureLead() in lib/lead-capture.ts, source 'kids-schools'. Adults only:
-// this is the school's contact, never a child's.
+// this is the school's contact, never a child's. The page is indexable and can be
+// landed on directly, so the form itself sits behind the parental gate: a child
+// who arrives here sees a locked card, never a name or email field.
 
 import { useId, useState } from 'react'
+import { ParentalGate } from '@/components/kids/app/ParentalGateClient'
 
 const ROLES = ['Teacher', 'Head of department / coordinator', 'Principal / head teacher', 'IT or digital lead', 'Parent-teacher association', 'Other'] as const
 
 export default function PilotFormClient() {
+  return (
+    <ParentalGate title="For teachers and school leaders" lead="The pilot form asks for a grown-up's name and work email.">
+      <PilotForm />
+    </ParentalGate>
+  )
+}
+
+function PilotForm() {
   const [f, setF] = useState({ name: '', email: '', school: '', country: '', role: '', students: '', website: '' })
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
   const [pending, setPending] = useState(false)

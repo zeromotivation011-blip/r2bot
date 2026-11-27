@@ -29,7 +29,7 @@ import {
 } from './sim'
 import { Fx, makeView, drawWorld, dronePixel, type View } from './render'
 import { drawPlot, PLOT_COLORS } from './plot'
-import { markGameMoment, recordGameFrame } from '@/lib/kids/sim/game-recorder'
+import { markGameMoment, recordGameFrame, restartGameRecording } from '@/lib/kids/sim/game-recorder'
 
 interface Props {
   tier: number
@@ -373,6 +373,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
     playSound('click')
     attemptsRef.current += 1
     simRef.current = createSim(mission, gains)
+    restartGameRecording()
     if (fxRef.current) fxRef.current.box = null
     phaseRef.current = 'flying'
     setPhase('flying')
@@ -393,6 +394,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
     throttleRef.current = 0
     setThrottle(0)
     simRef.current = createSim(mission, gains)
+    restartGameRecording()
     if (fxRef.current) fxRef.current.box = null
     setHud(EMPTY_HUD)
   }, [mission, gains])

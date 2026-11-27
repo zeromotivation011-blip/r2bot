@@ -6,6 +6,7 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
 import { jsonldScript, breadcrumbJsonLD } from '@/lib/seo/jsonld'
 import { ALL_ACTIVITIES, allSummaries } from '@/lib/kids/activities/content'
 import { orderActivities } from '@/lib/kids/activities/progress'
@@ -166,9 +167,9 @@ export default function ConceptsPage() {
             The constellations are a child’s own picture of what they know, not a grade. Teachers using an R2BOT Kids class see the same
             sixteen strands per child, so a lesson can start from the idea that is fading rather than the next page in the book. Parents can
             find a plain-words summary of the week in the{' '}
-            <Link href="/kids/parents" className={link}>
+            <GrownUpLink href="/kids/parents" grant className={link}>
               parents’ page
-            </Link>
+            </GrownUpLink>
             .
           </p>
         </article>

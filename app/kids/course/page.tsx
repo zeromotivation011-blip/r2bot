@@ -5,6 +5,7 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
 import { jsonldScript } from '@/lib/seo/jsonld'
 import { KIDS_BANDS } from '@/lib/kids/bands'
 import { LEVELS, PRINCIPLES } from '@/lib/kids/curriculum/levels'
@@ -180,9 +181,9 @@ export default function CoursePage() {
         <p className="mt-8">
           Teachers: every session has a 40-minute plan, an unplugged warm-up, discussion questions and common
           misconceptions — open &ldquo;For grown-ups&rdquo; inside any session, or see{' '}
-          <Link href="/kids/schools" className="-my-3 inline-block py-3 font-semibold text-amber-300 underline-offset-4 hover:underline">
+          <GrownUpLink href="/kids/schools" grant className="-my-3 inline-block py-3 font-semibold text-amber-300 underline-offset-4 hover:underline">
             R2BOT Kids for schools
-          </Link>
+          </GrownUpLink>
           .
         </p>
       </section>

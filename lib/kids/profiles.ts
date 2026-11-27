@@ -53,8 +53,8 @@ export const NAMESPACED_BASES = ['r2bot_kids_v2', 'r2bot_kids_robot_v1'] as cons
  * plus the stores that adopted profileKey() later. Member #1 ('p1') keeps all
  * of these at the plain key, so removeProfile('p1') deletes each one; a base
  * missing here would survive the removal (the Passport words did, Nov 2026).
- * profiles.verify.ts fails CI if a profileKey() call site uses a base that is
- * not listed. Never list a SWAPPED_KEYS entry here.
+ * progress-backup.verify.ts (the profile-key check) fails CI if a profileKey()
+ * call site uses a base that is not listed. Never list a SWAPPED_KEYS entry here.
  */
 export const PROFILE_KEY_BASES: readonly string[] = [
   ...NAMESPACED_BASES,

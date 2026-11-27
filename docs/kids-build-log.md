@@ -428,3 +428,19 @@ sim; Physics Lab challenges inside a session are self-reported; class view and G
 Level 1 only; native review of Hindi/Spanish Spark replies and a real-phone offline run need people;
 robot-brain Pilot 1★ stays reachable (see `docs/kids-games-qa-todo.md`); a full Blockly port of Code Lab
 remains a Level 2 decision.
+
+### Wave 3 review fixes (27 Nov 2026)
+
+- [x] **Flight Recorder restarts.** A sim restarted inside one round (Sky Port Abort/Launch, Swarm Reef
+  Reset/Launch, Arm Factory's re-run after a failed shift) used to leave the aborted run's frames and
+  "Gust!" markers in the recording, because frames earlier than the last were ignored. New
+  `restartGameRecording()` / `GameRecorder.restart()` clears frames, channels and moments; the three games
+  call it, and `frame()` also starts afresh when the clock jumps back more than 0.5 s
+  (`GAME_RESTART_GAP`). shell.verify checks both paths and the call sites.
+- [x] **Parental gate.** The Learn tab's "R2BOT Kids for schools" link, the teacher-hub links on every
+  game page, /kids/play and /kids/maths, and the parents' link on /kids/galaxy/concepts are now
+  `<GrownUpLink grant>`. The schools pilot form (name + work email) renders behind `<ParentalGate>`, so a
+  child landing on /kids/schools directly sees a locked card; the page's words stay server-rendered.
+  shell.verify fails on any plain `<Link>` from a child page to /kids/teach|parents|schools|grown-ups.
+- [x] Assignments "Try again" is 44px tall. Trust Pack v1.3: the snapshot `band` is "chosen by the child
+  or set by the teacher" (migration 0058 band lock). profiles.ts comment names progress-backup.verify.ts.

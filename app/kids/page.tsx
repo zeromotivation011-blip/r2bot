@@ -404,6 +404,7 @@ export default function KidsHubPage() {
         {/* Grown-up pages open through the parental gate (roadmap #2, #20). */}
         <GrownUpLink
           href="/kids/schools"
+          grant
           className="block rounded-[28px] border border-amber-400/40 bg-gradient-to-br from-amber-500/15 to-transparent p-6 transition hover:border-amber-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 md:col-span-2"
         >
           <p className="text-sm font-bold uppercase tracking-wider text-amber-300">For schools</p>

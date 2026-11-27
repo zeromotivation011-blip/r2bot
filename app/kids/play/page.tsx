@@ -7,6 +7,7 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
 import { jsonldScript, breadcrumbJsonLD } from '@/lib/seo/jsonld'
 import { GAMES, numberWord } from '@/lib/kids/universe/worlds'
 import { TIER_NAMES } from '@/lib/kids/universe/tiers'
@@ -143,7 +144,7 @@ export default function KidsGamesPage() {
           <p className="mt-2">
             Each game works on a phone, tablet, laptop or classroom board, with touch or a keyboard. Teachers can share
             any game to Google Classroom from its page; the{' '}
-            <Link href="/kids/teach" className="font-bold text-amber-300 underline-offset-4 hover:underline">teacher hub</Link>{' '}
+            <GrownUpLink href="/kids/teach" grant className="font-bold text-amber-300 underline-offset-4 hover:underline">teacher hub</GrownUpLink>{' '}
             has session guides and a short training course.
             For a guided path, the{' '}
             <Link href="/kids/course" className="font-bold text-amber-300 underline-offset-4 hover:underline">course</Link>{' '}

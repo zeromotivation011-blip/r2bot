@@ -28,7 +28,7 @@ import {
 } from './sim'
 import { Fx, buildScenery, drawWorld, makeView, pickRobot, type View } from './render'
 import { BRIEFS, RULES } from './rules'
-import { recordGameFrame } from '@/lib/kids/sim/game-recorder'
+import { recordGameFrame, restartGameRecording } from '@/lib/kids/sim/game-recorder'
 
 interface Props {
   tier: number
@@ -333,6 +333,7 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
     primeAudio()
     if (phaseRef.current === 'ready') {
       simRef.current = createSim(mission, { ...weightsRef.current })
+      restartGameRecording()
       finishedRef.current = false
       playSound('click')
       setPhase('running')
@@ -346,6 +347,7 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
   const reset = useCallback(() => {
     if (phaseRef.current === 'done') return
     simRef.current = createSim(mission, { ...weightsRef.current })
+    restartGameRecording()
     finishedRef.current = false
     setOutcome(null)
     setPhase('ready')
