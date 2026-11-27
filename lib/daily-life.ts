@@ -148,7 +148,6 @@ export const DAILY_LIFE_ARTICLES: DailyLifeArticle[] = [
       { slug: 'sense-think-act-loop', label: 'Sense-Think-Act Loop' },
       { slug: 'feedback-loop', label: 'Feedback Loops' },
       { slug: 'sensor', label: 'Sensors' },
-      { slug: 'closed-loop-control', label: 'Closed-Loop Control' },
     ],
     content: '',
   },

@@ -119,9 +119,19 @@ export const BLOG_TO_ATLAS: Record<string, string> = {
  * it and 308s there. stereo-vision, structured-light and time-of-flight-sensor
  * keep the per-technology detail and link back.
  *
+ * 27 Nov 2026 (task 93): feedback, feedback-loop and closed-loop-control were
+ * three entries on one idea; feedback-loop (pos ~3.3, 0 clicks) was rewritten and
+ * owns all three queries; the other two 308 there. open-loop-control stays
+ * separate and links back.
+ *
  * Query → owning path.
  */
 export const ATLAS_QUERY_OWNER: Record<string, string> = {
+  'feedback loop': '/atlas/concept/feedback-loop',
+  'feedback loop in robotics': '/atlas/concept/feedback-loop',
+  'closed loop control': '/atlas/concept/feedback-loop',
+  'closed-loop control': '/atlas/concept/feedback-loop',
+  'feedback control': '/atlas/concept/feedback-loop',
   'depth sensor': '/atlas/concept/depth-sensor',
   'depth camera': '/atlas/concept/depth-sensor',
   'what is a depth camera': '/atlas/concept/depth-sensor',

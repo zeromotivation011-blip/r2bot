@@ -77,7 +77,7 @@ A second type, the **absolute encoder**, encodes the actual angular position in 
 
 ## Why robots need them
 
-Without position [feedback](/atlas/concept/feedback), a robot arm is essentially open-loop: you command the motor to spin for a certain time and hope the arm ends up where intended. Friction, load variation, and mechanical wear mean it almost certainly will not. An encoder closes the loop: the motor controller continuously compares where the encoder says the [joint](/atlas/concept/joint) is versus where it should be, and corrects the difference thousands of times per second. This is called **PID control** (Proportional-Integral-Derivative), and it is the workhorse algorithm of almost every motor-driven robot in existence.
+Without position [feedback](/atlas/concept/feedback-loop), a robot arm is essentially open-loop: you command the motor to spin for a certain time and hope the arm ends up where intended. Friction, load variation, and mechanical wear mean it almost certainly will not. An encoder closes the loop: the motor controller continuously compares where the encoder says the [joint](/atlas/concept/joint) is versus where it should be, and corrects the difference thousands of times per second. This is called **PID control** (Proportional-Integral-Derivative), and it is the workhorse algorithm of almost every motor-driven robot in existence.
 
 ## Encoders in action
 

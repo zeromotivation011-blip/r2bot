@@ -266,6 +266,11 @@ const nextConfig = {
       // query as depth-sensor (~120 impressions, rewritten from primary sources).
       // depth-sensor owns "depth sensor" and "depth camera". One owner per query.
       { source: '/atlas/concept/depth-camera', destination: '/atlas/concept/depth-sensor', permanent: true },
+      // 27 Nov 2026 (task 93): feedback, feedback-loop and closed-loop-control were
+      // three entries on one idea. feedback-loop is the one Google ranks (pos ~3.3),
+      // so it was rewritten from sources and owns all three queries.
+      { source: '/atlas/concept/feedback', destination: '/atlas/concept/feedback-loop', permanent: true },
+      { source: '/atlas/concept/closed-loop-control', destination: '/atlas/concept/feedback-loop', permanent: true },
       // The by-line is an editorial identity now, at the owner's request, so
       // the author page moved off a URL that carried a personal name.
       { source: '/author/ravi', destination: '/about/how-this-is-written', permanent: true },

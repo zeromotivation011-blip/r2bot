@@ -1,72 +1,258 @@
 ---
-title: Feedback Loop in Robotics
-summary: >-
-  A feedback loop continuously measures a robot's output and adjusts its input
-  to reach a desired target. It is the most fundamental control concept in all
-  of robotics.
+title: Feedback Loop (Closed-Loop Control)
+slug: feedback-loop
+bucket: concept
 category: control
-lastReviewed: 2026-05-21T00:00:00.000Z
-sources:
-  - title: 'Feedback'
-    url: 'https://en.wikipedia.org/wiki/Feedback'
+summary: >-
+  A feedback loop measures what a robot actually did, compares it with what it should do and
+  corrects the difference. Closed-loop control explained: parts, gains, loop rates, examples.
+difficulty: 2
+difficultyLabel: Classroom
 tags:
   - control
   - pid
   - closed-loop
 seeAlso:
   - pid-controller
-  - closed-loop-control
-  - feedback
-  - finite-state-machine
+  - open-loop-control
+  - cascade-control
+  - encoder
+  - servo-motor
   - hardware-in-the-loop
-difficulty: 3
+relatedTerms:
+  - pid-controller
+  - open-loop-control
+  - cascade-control
+  - encoder
+prerequisiteTerms:
+  - sensor
+  - actuator
+unlocksTerms:
+  - pid-controller
+  - cascade-control
+lastReviewed: 2026-11-27T00:00:00.000Z
+sources:
+  - title: 'Åström and Murray, Feedback Systems: An Introduction for Scientists and Engineers, Chapter 1 summary'
+    url: 'https://www.cds.caltech.edu/~murray/amwiki/Introduction.html'
+  - title: 'ODrive documentation, Control structure and tuning'
+    url: 'https://github.com/odriverobotics/ODrive/blob/master/docs/control.rst'
+  - title: 'ros2_control (Jazzy), controller_manager parameters'
+    url: 'https://github.com/ros-controls/ros2_control/blob/jazzy/controller_manager/src/controller_manager_parameters.yaml'
+  - title: 'ros2_control (Jazzy), Controller Manager user documentation'
+    url: 'https://github.com/ros-controls/ros2_control/blob/jazzy/controller_manager/doc/userdoc.rst'
+  - title: 'Franka Robotics, Franka Control Interface overview'
+    url: 'https://frankarobotics.github.io/docs/overview.html'
+  - title: 'Universal Robots, Real-Time Data Exchange (RTDE) guide'
+    url: 'https://docs.universal-robots.com/tutorials/communication-protocol-tutorials/rtde-guide.html'
+youtubeSearchQuery: feedback loop closed loop control explained robotics
 laymanExplanation: >-
-  A feedback loop is a control structure where the system measures its own
-  output, compares it with a target (the setpoint), computes the error, and
-  feeds that error back into the input to drive the output toward the target.
-  It's the backbone of every stable robotic system.
-realRobotsThatUseThis: []
-indianExample: ''
-relatedTerms: []
-prerequisiteTerms: []
-unlocksTerms: []
-quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
-difficultyLabel: Classroom
+  A feedback loop is how a robot checks its own work. It measures what is really happening, compares
+  that with what it wanted, and uses the difference to correct itself, over and over. A thermostat
+  does it with temperature; a robot arm does it with joint angles hundreds of times a second.
 technicalDefinition: >-
-  A feedback loop continuously measures a robot's output and adjusts its input
-  to reach a desired target. It is the most fundamental control concept in all
-  of robotics.
-slug: feedback-loop
-bucket: concept
+  A feedback loop (closed-loop control) is a control structure in which a sensor measures the
+  controlled variable, the measurement is subtracted from a reference (setpoint) to form an error,
+  and a controller maps the error to an actuator command, so the system's output influences its own
+  input. Negative feedback reduces the error (and, with integral action, removes it in steady state) and gives robustness to model uncertainty and
+  disturbances, at the cost of possible instability and injected sensor noise. Open-loop control
+  omits the measurement path.
+realRobotsThatUseThis:
+  - Franka robot arms (1 kHz real-time control interface)
+  - Universal Robots e-Series (500 Hz control loop)
+indianExample: ''
+industryApplications:
+  - Joint position and torque control in robot arms
+  - Motor speed control in mobile robots and drones
+  - Temperature, pressure and flow control in process plants
+mindBlowingFact: >-
+  A feedback controller does not need to know why it is off target. A heavier payload, a worn gear
+  or a gust of wind all show up the same way, as error, and the loop corrects them all without a
+  model of any of them.
+quizQuestion:
+  q: >-
+    A robot joint under proportional (P) control sags 3° below its target when it holds a heavy
+    tool. What change removes the sag completely, in steady state?
+  options:
+    - Doubling the proportional gain
+    - Adding an integral (I) term to the controller
+    - Running the control loop at a lower rate
+    - Removing the joint encoder
+  answer: 1
+  explanation: >-
+    With P control alone, the motor only pushes when there is error, so it settles where gain times
+    error equals the load: doubling the gain halves the sag but never removes it. An integral term
+    keeps growing while any error remains, so in steady state it supplies the holding torque and the
+    error goes to zero.
 ---
 
-# Feedback Loop in Robotics
+A feedback loop is a robot checking its own work. It measures what is actually happening, compares it with what should be happening, and uses the difference to correct itself, again and again. Control engineers call this **closed-loop control** or **feedback control**: three names for the same idea, and the reason robots can be accurate in a world that never behaves exactly as planned.
 
-## What is it?
+![A feedback loop for a robot joint. A setpoint of 90 degrees enters a comparison circle, which subtracts the measured angle to give the error. The error goes into the controller, which sends a command to the motor and joint (the plant). A disturbance, such as a heavy payload, pushes on the joint. An encoder measures the real joint angle and feeds it back to the comparison circle, closing the loop. A note says the loop repeats at a fixed rate, for example 500 to 1,000 times a second on robot arms such as UR and Franka](/images/atlas/diagrams/feedback-loop.svg)
 
-A feedback loop is a control structure where the system measures its own output, compares it with a target (the setpoint), computes the error, and feeds that error back into the input to drive the output toward the target. It's the backbone of every stable robotic system.
+## Start here: reaching for a cup
+
+When you reach for a cup you do not fire your arm muscles once and hope. Your eyes track your hand, your brain notices it drifting left and nudges it right, your fingers feel contact and adjust their grip. Doing, checking and correcting happen continuously.
+
+A thermostat does the same with less elegance. It measures the room temperature, compares it with the temperature you set, and switches the heating on when the room is too cold and off when it is warm enough. Measure, compare, correct, repeat.
+
+Robots do this everywhere: a joint holding an angle, a wheel holding a speed, a drone holding its height, a gripper holding a force. In each case the loop has the same parts.
+
+## The parts of a feedback loop
+
+| Part | What it is | Robot joint example |
+|---|---|---|
+| **Setpoint** (reference) | What you want | Joint angle 90° |
+| **Sensor** | Measures what you have | [Encoder](/atlas/concept/encoder) on the joint |
+| **Error** | Setpoint minus measurement | 90° − 87° = 3° |
+| **Controller** | Turns error into a command | [PID controller](/atlas/concept/pid-controller) |
+| **Actuator** | Acts on the command | Motor and gearbox |
+| **Plant** | The thing being controlled | The arm link and its load |
+| **Disturbance** | Anything the controller did not plan for | A heavy tool, friction, a push |
+
+The loop is "closed" because information travels in a circle: command out, measurement back. Åström and Murray, in their textbook *Feedback Systems*, put it formally: a system is closed loop "if the systems are interconnected in a cycle and open loop when this interconnection is broken."
+
+## Open loop vs closed loop
+
+An [open-loop](/atlas/concept/open-loop-control) system sends a command and never checks the result: a toaster timer, a sprinkler on a schedule, a stepper motor told to take 200 steps with nothing confirming it did.
+
+| | Open loop | Closed loop (feedback) |
+|---|---|---|
+| Measures the result? | No | Yes, continuously |
+| Handles disturbances | Only ones it measures or predicts; a heavier load or a slip goes uncorrected | Yes: any disturbance shows up as error |
+| Needs a sensor | No | Yes |
+| Stability | Cannot make a stable system unstable, but cannot stabilise an unstable one (a balancing robot) either | Can stabilise an unstable system, but can itself oscillate if gains or delays are wrong |
+| Typical use | Simple, predictable, cheap tasks | Anything that must be accurate under changing conditions |
+
+Most real robots use both. A trajectory planner computes the motion in advance (open loop, a "feedforward" command), and feedback corrects whatever the plan got wrong. ODrive, a widely used motor controller (its v3 firmware is open source), adds a velocity feedforward term straight into its position loop for exactly this reason.
 
 ## How it works
 
-The loop has four parts: a sensor that measures the actual output, a comparator that subtracts measured from desired to compute error, a controller (often PID) that converts error into a command, and an actuator that applies the command. The cycle repeats continuously — typically hundreds to thousands of times per second — until the error is near zero.
+### Negative feedback
 
-## Real-world example
+Almost all control loops use **negative feedback**: the measurement is subtracted from the setpoint, so the correction pushes against the error. Too cold, heat more; too far left, steer right. The error shrinks.
 
-A cruise-control system in a car is a feedback loop — measure speed, compare to setpoint, adjust throttle. A robotic arm holding position uses feedback at each joint. A Roomba's wall-following is a feedback loop based on side-sensor distance.
+**Positive feedback** adds the measurement instead, so a small error can grow instead of shrinking. It is what makes a microphone howl when it hears its own speaker. In control it is usually a fault, a sign flipped in the wiring or the code: the joint runs away from its target instead of towards it. If a new robot joint slams to its limit the moment you enable the loop, a reversed motor or encoder direction is the first thing to check.
 
-## Why it matters for robotics
+### What feedback buys you
 
-Open-loop systems blow up under disturbance; feedback loops self-correct. Mastering feedback is the difference between a robotics hobbyist and an engineer. Every PID tuner, ROS2 control node, and DRDO Daksh stabiliser is a feedback loop in disguise.
+Åström and Murray single out two key properties of feedback: "its ability to provide robustness to uncertainty and its use in design of dynamics." In plain words:
 
-## See also
+- **Robustness.** The controller does not need a perfect model. A heavier payload, a worn gear, a battery at 60% all show up as error, and the loop corrects them without knowing their cause.
+- **Disturbance rejection.** A push, a bump or a gust is measured and corrected.
+- **Shaping the response.** By choosing the controller, you choose how fast the robot responds and how much it overshoots.
 
-- [Pid Controller](/atlas/concept/pid-controller)
-- [Closed Loop Control](/atlas/concept/closed-loop-control)
-- [Feedback](/atlas/concept/feedback)
-- [State Machine](/atlas/concept/finite-state-machine)
+They are just as clear about the costs: feedback "can cause instability if not used properly and it can couple noise from sensors into the dynamics of a system." A loop is only as good as its sensor, and a loop with too much gain oscillates.
+
+### Proportional, integral, derivative
+
+The most common controller is the [PID controller](/atlas/concept/pid-controller). Its three terms answer three questions about the error:
+
+- **P, proportional:** how big is the error now? Push harder the further off you are.
+- **I, integral:** has an error persisted? Keep adding push while it does.
+- **D, derivative:** how fast is the error changing? Ease off before you overshoot.
+
+The integral term exists because, as the *Feedback Systems* summary puts it, the proportional term "on its own does not force the error to zero", while "integral action provides a mechanism for ensuring that the error is zero in steady state." The worked example below shows why.
+
+## Worked example: a joint that sags
+
+A robot joint holds a 1 kg tool at the end of a light 0.2 m link (the link's own mass is ignored here), held horizontal. Gravity pulls on it with a torque of:
+
+```text
+τ_load = m · g · r = 1 kg × 9.81 m/s² × 0.2 m ≈ 2 N·m
+```
+
+The joint uses **P control**: motor torque = Kp × error. The joint stops moving when the motor torque exactly balances the load, so in steady state:
+
+```text
+Kp · e_ss = τ_load      →      e_ss = τ_load / Kp
+```
+
+Using τ_load = 2 N·m:
+
+| Proportional gain Kp | Steady-state sag e_ss |
+|---|---|
+| 20 N·m/rad | 0.10 rad ≈ 5.7° |
+| 40 N·m/rad | 0.05 rad ≈ 2.9° |
+| 80 N·m/rad | 0.025 rad ≈ 1.4° |
+| 160 N·m/rad | 0.0125 rad ≈ 0.7° |
+
+Doubling the gain halves the sag but never removes it: a P controller only pushes when there is error, so some error must remain to hold the load. And gain cannot rise forever; past a point, sensor noise and delay make the joint buzz or oscillate.
+
+Add an **integral term** and the picture changes. As long as any error remains, the integral keeps growing, and with it the motor torque, until the torque supplies the full 2 N·m with the error at zero. That is why almost every position loop that must hold a load has an I term, or an explicit gravity-compensation term computed from the arm's model.
+
+## Loops inside loops
+
+Real motor controllers stack several feedback loops, each tuned to respond faster (higher bandwidth) than the one around it. This is **[cascade control](/atlas/concept/cascade-control)**. ODrive's documentation describes its controller as "a cascaded style position, velocity and current control loop":
+
+1. The **position loop** (P) compares the target angle with the encoder and outputs a velocity command.
+2. The **velocity loop** (PI) compares that with the measured speed and outputs a current (torque) command.
+3. The **current loop** (PI) drives the motor's current to that command.
+
+In ODrive all three run on every control cycle, 125 microseconds apart (8 kHz); what differs is how quickly each one reacts. Because each inner loop settles faster than the loop around it, the outer loop sees a cleaner, better-behaved system: the position loop can simply ask for a speed and trust the velocity loop to deliver it. Switch ODrive to velocity mode and the position loop is simply removed; switch to torque mode and only the current loop runs.
+
+## How fast must the loop run?
+
+A loop can only correct what it has measured, so as a rule of thumb it runs ten or more times faster than the motion it has to control. Some published rates:
+
+| System | Feedback loop rate | Source |
+|---|---|---|
+| Franka robot arms, Franka Control Interface | 1 kHz (every 1 ms) | Franka documentation |
+| Universal Robots e-Series arms | 500 Hz real-time control loop (every 2 ms) | UR RTDE guide |
+| ODrive motor controller (position, velocity and current loops) | 8 kHz (every 125 µs) | ODrive documentation |
+| ROS 2 `ros2_control` controller manager | 100 Hz by default (`update_rate`), set per robot | ros2_control parameters |
+
+Delay matters as much as rate. A correction based on a measurement that is already old can arrive just in time to make things worse, which is how a loop with too much gain and too much delay starts to oscillate. This is why robot arms run their innermost loops on dedicated real-time hardware and why ros2_control's documentation asks for "as little jitter as possible in the main control loop".
+
+## Feedback loops in ROS 2
+
+In [ROS 2](/atlas/concept/ros2), the loop that connects controllers to hardware runs inside **ros2_control** (the innermost current and velocity loops usually stay in the motor drive's own firmware). Its controller manager runs one real-time loop which, in the words of its parameter definition, "reads states from hardware, updates controllers and writes commands to hardware" at `update_rate` times a second:
+
+```yaml
+controller_manager:
+  ros__parameters:
+    update_rate: 500   # Hz: read sensors -> update controllers -> write commands
+```
+
+Every cycle the hardware component's `read()` fills in measured joint states (the sensor side), each active controller's `update()` computes new commands (a PID or trajectory controller computes them from the error), and `write()` sends them to the motors (the actuator). That is the feedback loop of the diagram above, run 500 times a second.
+
+## Common mistakes
+
+- **Wrong sign.** A reversed encoder or motor turns negative feedback into positive feedback; the joint runs away instead of settling.
+- **Gain too high.** The joint overshoots and oscillates, or buzzes from amplified sensor noise.
+- **Integral windup.** While the actuator is saturated (motor at full power), the integral keeps growing, and the robot overshoots badly once it catches up. Limit or freeze the integral while saturated.
+- **A loop slower than the thing it controls.** A 10 Hz loop cannot balance a system that falls over in 50 ms.
+- **Trusting a bad sensor.** Feedback faithfully corrects towards whatever the sensor says. A slipping or miscalibrated encoder becomes a wrong position, held precisely; a noisy one makes the joint jitter.
+
+## Where you'll see it
+
+Every servo motor and every joint of an industrial arm is a feedback loop around a position sensor: an encoder or resolver in an arm, a potentiometer in a hobby servo. Drones hold their attitude with fast loops around gyroscopes. Mobile robots hold wheel speed with encoder feedback and follow paths with slower loops around their position estimate. Grippers close until a force sensor (or the motor's current) says enough. Outside robotics: thermostats, cruise control, autopilots, and your own sense of balance.
+
+## Why it matters
+
+Without feedback, a robot can only be as accurate as its model of the world, and the world never matches the model. Feedback lets a robot be accurate anyway, by measuring and correcting instead of predicting perfectly. It is the first idea in control engineering, and almost everything else in the field (PID tuning, cascade control, state estimation, model-predictive control) is a way to build a better feedback loop.
+
+## Common questions
+
+### What is a feedback loop in robotics?
+
+A feedback loop is a cycle in which a robot measures what it is actually doing with a sensor, compares the measurement with the target (the setpoint), and uses the difference (the error) to correct its motors. It repeats continuously, often hundreds or thousands of times a second, so the robot stays on target even when loads and conditions change.
+
+### Is closed-loop control the same as a feedback loop?
+
+Yes. Closed-loop control, feedback control and a feedback loop describe the same structure: the output is measured and fed back to the controller. "Closed loop" refers to the circle the information travels; open-loop control has no measurement path back.
+
+### What is the difference between open-loop and closed-loop control?
+
+Open-loop control sends a command without checking the result, so any disturbance goes uncorrected. Closed-loop control measures the result and corrects the error, which makes it accurate under changing loads and conditions but requires a sensor and careful tuning to stay stable.
+
+### What is negative feedback?
+
+Negative feedback means the correction opposes the error: if the measurement is above the target the controller pushes it down, and if below, up, so the error shrinks. Almost all control loops use it. Positive feedback amplifies the error instead and usually indicates a fault, such as a reversed sensor direction.
+
+## Related
+
+- [PID controller](/atlas/concept/pid-controller): the most common controller inside a feedback loop
+- [Open-loop control](/atlas/concept/open-loop-control): control without measurement, and when it is enough
+- [Cascade control](/atlas/concept/cascade-control): loops inside loops
+- [Encoder](/atlas/concept/encoder): the sensor in most joint and wheel loops
+- [Servo motor](/atlas/concept/servo-motor): a motor with its feedback loop built in

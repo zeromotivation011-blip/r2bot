@@ -75,8 +75,7 @@ export const SIMULATORS: Simulator[] = [
     lesson: { href: '/academy/wire/w-03-pid-control-practice', title: 'W-03: PID Control in Practice' },
     related: [
       { href: '/atlas/concept/pid-controller', label: 'PID Controller' },
-      { href: '/atlas/concept/closed-loop-control', label: 'Closed-Loop Control' },
-      { href: '/atlas/concept/feedback-loop', label: 'Feedback Loop' },
+      { href: '/atlas/concept/feedback-loop', label: 'Feedback Loop (Closed-Loop Control)' },
     ],
     accent: '#00E5FF',
     featured: true,
@@ -295,7 +294,7 @@ export const SIMULATORS: Simulator[] = [
     lesson: { href: '/academy/spark/s-01-what-is-a-robot', title: 'S-01: What is a Robot?' },
     related: [
       { href: '/atlas/concept/sense-think-act-loop', label: 'Sense–Think–Act Loop' },
-      { href: '/atlas/concept/closed-loop-control', label: 'Closed-Loop Control' },
+      { href: '/atlas/concept/feedback-loop', label: 'Closed-Loop Control' },
     ],
     accent: '#A56BFF',
   },

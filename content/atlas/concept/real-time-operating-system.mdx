@@ -14,7 +14,7 @@ tags:
   - real-time
 seeAlso:
   - microcontroller
-  - closed-loop-control
+  - feedback-loop
   - micro-ros
   - ethercat
   - stm32
@@ -62,7 +62,7 @@ The common misconception: "real-time" means "very fast." It actually means **det
 
 ## Where robots use it
 
-- **On the microcontroller** running tight [closed-loop control](/atlas/concept/closed-loop-control) — motor commutation, balance, actuator loops — where jitter is unacceptable. (This is what [micro-ROS](/atlas/concept/micro-ros) runs on.)
+- **On the microcontroller** running tight [closed-loop control](/atlas/concept/feedback-loop) — motor commutation, balance, actuator loops — where jitter is unacceptable. (This is what [micro-ROS](/atlas/concept/micro-ros) runs on.)
 - **Synchronized fieldbuses** like [EtherCAT](/atlas/concept/ethercat) depend on real-time timing end to end.
 - **Safety-critical functions** where a guaranteed response time is required.
 
@@ -74,4 +74,4 @@ The RTOS is the deterministic foundation beneath a robot's most time-critical so
 
 ## Related
 
-[Microcontroller](/atlas/concept/microcontroller) · [Closed-loop control](/atlas/concept/closed-loop-control) · [micro-ROS](/atlas/concept/micro-ros) · [EtherCAT](/atlas/concept/ethercat)
+[Microcontroller](/atlas/concept/microcontroller) · [Closed-loop control](/atlas/concept/feedback-loop) · [micro-ROS](/atlas/concept/micro-ros) · [EtherCAT](/atlas/concept/ethercat)

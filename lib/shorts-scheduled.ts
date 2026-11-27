@@ -52,7 +52,7 @@ export const SHORTS_SCHEDULED: ShortLesson[] = [
     limit: 'Delay comes from sensors, wireless links, slow code and slow motors, and it is easy to add by accident. Remote control over a network makes it worse.',
     demo: 'feedback',
     quiz: { q: 'Why does extra delay make a balancing robot wobble?', options: ['The motors get tired', 'The sensor stops working', 'The correction arrives after the situation has changed'], answer: 2, why: 'A late correction fixes yesterday’s lean and can make today’s worse.' },
-    atlas: [{ label: 'Real-time computing', href: '/atlas/concept/real-time-computing' }, { label: 'Closed-loop control', href: '/atlas/concept/closed-loop-control' }, { label: 'PID controller', href: '/atlas/concept/pid-controller' }], next: 'gain-and-damping',
+    atlas: [{ label: 'Real-time computing', href: '/atlas/concept/real-time-computing' }, { label: 'Closed-loop control', href: '/atlas/concept/feedback-loop' }, { label: 'PID controller', href: '/atlas/concept/pid-controller' }], next: 'gain-and-damping',
   },
   {
     slug: 'reward-hacking', title: 'Reward Hacking: When a Robot Cheats to Win', course: 'control', ids: ['YHcWL4YHgX4'], publishAt: '2026-11-11T00:00:00Z',
@@ -136,7 +136,7 @@ export const SHORTS_SCHEDULED: ShortLesson[] = [
     limit: 'If the load is too big or the move too fast, the motor skips steps and the controller never knows, so the machine loses its place.',
     demo: 'gears',
     quiz: { q: 'What can a basic stepper motor NOT tell you?', options: ['How many pulses it was sent', 'Which direction it was told to move', 'Whether it missed a step'], answer: 2, why: 'Open-loop control has no feedback, so a skipped step goes unnoticed.' },
-    atlas: [{ label: 'Stepper motor', href: '/atlas/concept/stepper-motor' }, { label: 'Open-loop control', href: '/atlas/concept/open-loop-control' }, { label: 'Closed-loop control', href: '/atlas/concept/closed-loop-control' }], next: 'servo-motor',
+    atlas: [{ label: 'Stepper motor', href: '/atlas/concept/stepper-motor' }, { label: 'Open-loop control', href: '/atlas/concept/open-loop-control' }, { label: 'Closed-loop control', href: '/atlas/concept/feedback-loop' }], next: 'servo-motor',
   },
   {
     slug: 'slam-loop-closure', title: 'SLAM Loop Closure: How a Robot Fixes Its Own Map', course: 'senses', ids: ['daV3eZQKadA'], publishAt: '2026-11-14T00:00:00Z',

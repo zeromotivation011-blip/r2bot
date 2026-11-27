@@ -53,7 +53,7 @@ A drone — or UAV (Unmanned Aerial Vehicle) — is a flying [robot](/atlas/conc
 
 A quadcopter has four spinning rotors, two clockwise and two counter-clockwise. By spinning all four equally, the drone hovers (lift balances gravity). By spinning the front two slower and the back two faster, the drone tips forward and accelerates forward. By making one diagonal pair faster than the other, the drone rotates (yaws).
 
-This sounds simple. It's not. A quadcopter is **inherently unstable** — without active control, it tips over instantly. The drone's stability comes entirely from a [feedback](/atlas/concept/feedback) loop: the flight controller reads the gyroscope and accelerometer 1,000+ times per second, calculates the current orientation, compares to the desired orientation, and adjusts each motor's speed in real time.
+This sounds simple. It's not. A quadcopter is **inherently unstable** — without active control, it tips over instantly. The drone's stability comes entirely from a [feedback](/atlas/concept/feedback-loop) loop: the flight controller reads the gyroscope and accelerometer 1,000+ times per second, calculates the current orientation, compares to the desired orientation, and adjusts each motor's speed in real time.
 
 Stop the flight controller for a fraction of a second and the drone falls out of the sky.
 

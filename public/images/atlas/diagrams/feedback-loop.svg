@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">A feedback loop for a robot joint</title>
+  <desc id="d">A feedback loop for a robot joint. A setpoint of 90 degrees enters a comparison circle, which subtracts the measured angle to give the error. The error goes into the controller, which sends a command to the motor and joint, the plant. A disturbance, such as a heavy payload, pushes on the joint. An encoder measures the real joint angle, 87 degrees in the example, and feeds it back to the comparison circle, closing the loop. A note says the loop repeats at a fixed rate, for example 500 to 1,000 times a second on robot arms such as UR and Franka.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f59e0b"/></marker>
+    <marker id="c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#38bdf8"/></marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f87171"/></marker>
+  </defs>
+  <rect width="640" height="380" rx="16" fill="#0f172a"/>
+  <text x="30" y="44" font-size="16" font-weight="700" fill="#e2e8f0">A feedback loop (closed-loop control)</text>
+  <text x="610" y="44" font-size="12" fill="#64748b" letter-spacing="1.5" text-anchor="end">ROBOT JOINT</text>
+
+  <!-- setpoint -->
+  <text x="34" y="128" font-size="12" font-weight="700" fill="#e2e8f0">Setpoint</text>
+  <text x="34" y="146" font-size="11" fill="#fcd34d">90°</text>
+  <path d="M34 160 L104 160" stroke="#f59e0b" stroke-width="2" marker-end="url(#b)"/>
+
+  <!-- comparator -->
+  <circle cx="124" cy="160" r="18" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+  <text x="124" y="165" font-size="16" fill="#fcd34d" text-anchor="middle">Σ</text>
+  <text x="96" y="152" font-size="12" fill="#fcd34d">+</text>
+  <text x="108" y="200" font-size="14" fill="#fca5a5">−</text>
+
+  <!-- error -->
+  <path d="M142 160 L210 160" stroke="#f59e0b" stroke-width="2" marker-end="url(#b)"/>
+  <text x="176" y="148" font-size="11" fill="#fcd34d" text-anchor="middle">error</text>
+  <text x="180" y="180" font-size="10" fill="#94a3b8" text-anchor="middle">90°−87° = 3°</text>
+
+  <!-- controller -->
+  <rect x="212" y="132" width="120" height="56" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="272" y="156" font-size="13" font-weight="700" fill="#e2e8f0" text-anchor="middle">Controller</text>
+  <text x="272" y="174" font-size="10.5" fill="#bae6fd" text-anchor="middle">e.g. PID</text>
+
+  <!-- command -->
+  <path d="M332 160 L398 160" stroke="#f59e0b" stroke-width="2" marker-end="url(#b)"/>
+  <text x="365" y="148" font-size="11" fill="#fcd34d" text-anchor="middle">command</text>
+
+  <!-- plant -->
+  <rect x="400" y="132" width="130" height="56" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="465" y="156" font-size="13" font-weight="700" fill="#e2e8f0" text-anchor="middle">Motor + joint</text>
+  <text x="465" y="174" font-size="10.5" fill="#bae6fd" text-anchor="middle">the plant</text>
+
+  <!-- disturbance -->
+  <text x="465" y="84" font-size="11" fill="#fca5a5" text-anchor="middle">disturbance</text>
+  <text x="465" y="100" font-size="10.5" fill="#94a3b8" text-anchor="middle">heavy tool, friction, a push</text>
+  <path d="M465 106 L465 128" stroke="#f87171" stroke-width="1.8" marker-end="url(#r)"/>
+
+  <!-- output -->
+  <path d="M530 160 L604 160" stroke="#f59e0b" stroke-width="2" marker-end="url(#b)"/>
+  <text x="567" y="148" font-size="11" fill="#fcd34d" text-anchor="middle">actual</text>
+  <text x="567" y="178" font-size="10.5" fill="#94a3b8" text-anchor="middle">87°</text>
+
+  <!-- feedback path -->
+  <path d="M580 160 L580 262" stroke="#38bdf8" stroke-width="2"/>
+  <rect x="400" y="240" width="130" height="44" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="465" y="260" font-size="13" font-weight="700" fill="#e2e8f0" text-anchor="middle">Sensor</text>
+  <text x="465" y="276" font-size="10.5" fill="#bae6fd" text-anchor="middle">encoder</text>
+  <path d="M580 262 L534 262" stroke="#38bdf8" stroke-width="2" marker-end="url(#c)"/>
+  <path d="M400 262 L124 262 L124 182" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#c)"/>
+  <text x="262" y="254" font-size="11" fill="#bae6fd" text-anchor="middle">measured angle fed back</text>
+
+  <!-- note -->
+  <rect x="30" y="306" width="580" height="50" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="320" y="327" font-size="12" fill="#e2e8f0" text-anchor="middle">Measure → compare → correct, repeated at a fixed rate</text>
+  <text x="320" y="345" font-size="10.5" fill="#94a3b8" text-anchor="middle">e.g. 500 to 1,000 times a second on arms such as UR and Franka; open loop has no blue return path</text>
+</svg>
