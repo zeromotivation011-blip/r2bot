@@ -15,6 +15,7 @@
 import type { NextRequest } from 'next/server'
 import { anyRateLimited, clientIp } from '@/lib/rate-limit'
 import {
+  DEFAULT_CLASS_KIND,
   MAX_MEMBERS_PER_CLASS,
   checkNickname,
   isBandId,
@@ -27,6 +28,7 @@ import {
   hashToken,
   isMissingTable,
   jsonError,
+  loadClassKind,
   newMemberToken,
   notReadyResponse,
   readJsonCapped,
@@ -103,11 +105,15 @@ export async function POST(req: NextRequest): Promise<Response> {
     return jsonError(500, 'Something went wrong. Try again.')
   }
 
+  // Roadmap #84 (migration 0059): in a club, family or library class the child
+  // keeps their own band. Read apart: before 0059 every class is a school class.
+  const kind = await loadClassKind(admin, row.id)
   const info: JoinedClassInfo = {
     className: row.class_name,
     teacherName: row.teacher_name,
     band: isBandId(row.band) ? row.band : 'builders',
     nickname: nick.nickname,
+    kind: kind === 'not-ready' ? DEFAULT_CLASS_KIND : kind,
   }
   return Response.json({ ok: true, token, class: info }, { headers: { 'Cache-Control': 'no-store' } })
 }

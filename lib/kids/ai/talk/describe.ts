@@ -75,6 +75,8 @@ export function stmtText(s: Stmt): string {
       return 'pen down'
     case 'pen_up':
       return 'pen up'
+    case 'set_carry':
+      return `carry load ${s.pos}`
     case 'light_on':
       return 'light on'
     case 'light_off':

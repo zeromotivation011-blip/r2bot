@@ -1,15 +1,16 @@
 // app/api/kids/classroom/classes/[classId]/route.ts
 //
 // Teacher: one class with its roster (GET), regenerate the join code, edit
-// names, set the Power-Up goal or the band locks (PATCH; band locks need
-// migration 0058 and answer 503 until it runs), delete the class and every
-// member row (DELETE).
+// names, set the Power-Up goal, the band locks or the class kind (PATCH; band
+// locks need migration 0058 and the kind 0059, each answering 503 until it
+// runs), delete the class and every member row (DELETE). A mixed class (club,
+// family, library) has no whole-class band lock: each child keeps their own.
 // Auth: signed-in user must own the class. A class that exists but belongs to
 // someone else answers exactly like one that does not exist (404).
 
 import type { NextRequest } from 'next/server'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
-import { cleanText, isBandId } from '@/lib/kids/classroom'
+import { DEFAULT_CLASS_KIND, cleanText, isBandId, isClassKind, isMixedKind } from '@/lib/kids/classroom'
 import { parseGoal } from '@/lib/kids/classroom-goal'
 import {
   CLASS_COLUMNS,
@@ -18,7 +19,11 @@ import {
   bandLockNotReadyResponse,
   currentTeacher,
   isMissingBandLockColumn,
+  isMissingKindColumn,
+  isMixedClass,
+  kindNotReadyResponse,
   loadBandLocks,
+  loadClassKind,
   goalsNotReadyResponse,
   isMissingGoalColumn,
   isUuid,
@@ -73,12 +78,15 @@ export async function GET(_req: NextRequest, ctx: Ctx): Promise<Response> {
     bandLock: locks === 'not-ready' ? null : locks.members[m.id] ?? null,
   }))
   const goal = await loadClassGoal(g.admin, classId)
+  const kind = await loadClassKind(g.admin, classId)
   const summary = {
     ...toClassSummary(g.cls, members.length),
     goal: goal === 'not-ready' ? null : goal,
     goalReady: goal !== 'not-ready',
     bandLocked: locks === 'not-ready' ? false : locks.classLocked,
     bandLockReady: locks !== 'not-ready',
+    kind: kind === 'not-ready' ? DEFAULT_CLASS_KIND : kind,
+    kindReady: kind !== 'not-ready',
   }
   return Response.json(
     { ok: true, class: summary, members },
@@ -95,6 +103,7 @@ interface PatchBody {
   goal?: unknown
   locked?: unknown
   memberId?: unknown
+  kind?: unknown
 }
 
 export async function PATCH(req: NextRequest, ctx: Ctx): Promise<Response> {
@@ -155,9 +164,31 @@ export async function PATCH(req: NextRequest, ctx: Ctx): Promise<Response> {
     return Response.json({ ok: true, goal }, { headers: NO_STORE })
   }
 
+  if (body.action === 'kind') {
+    // Roadmap #84 (migration 0059): school, club, family or library. Turning a
+    // class mixed also lifts the whole-class band lock (children keep their own).
+    if (!isClassKind(body.kind)) return jsonError(400, 'Choose what kind of group this is.')
+    const { error } = await g.admin
+      .from('kids_classes')
+      .update({ kind: body.kind, updated_at: new Date().toISOString() })
+      .eq('id', classId)
+      .eq('teacher_id', g.user.id)
+    if (error) return isMissingKindColumn(error) ? kindNotReadyResponse() : jsonError(500, 'Could not save the kind of group.')
+    let bandLocked: boolean | undefined
+    if (isMixedKind(body.kind)) {
+      // Best effort: before 0058 there is no lock to lift.
+      const { error: lockErr } = await g.admin.from('kids_classes').update({ band_locked: false }).eq('id', classId).eq('teacher_id', g.user.id)
+      if (!lockErr) bandLocked = false
+    }
+    return Response.json({ ok: true, kind: body.kind, ...(bandLocked === false ? { bandLocked } : {}) }, { headers: NO_STORE })
+  }
+
   if (body.action === 'band-lock-class') {
     // Roadmap #29: every child plays at the class band (their device follows on the next sync).
     if (typeof body.locked !== 'boolean') return jsonError(400, 'Say whether the class band is locked.')
+    if (body.locked && await isMixedClass(g.admin, classId)) {
+      return jsonError(400, 'In a club, family or library class each child keeps their own band. Set one child’s band below instead.')
+    }
     const { error } = await g.admin
       .from('kids_classes')
       .update({ band_locked: body.locked, updated_at: new Date().toISOString() })

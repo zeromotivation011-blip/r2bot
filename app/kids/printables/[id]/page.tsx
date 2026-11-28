@@ -215,6 +215,7 @@ export default async function BuildPage({ params }: Props) {
             outcomes={b.fairTest.outcomes}
             robodexHref={robodexHref}
             robodexName={card.name}
+            robodexId={card.id}
           />
         </div>
 

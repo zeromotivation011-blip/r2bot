@@ -155,6 +155,12 @@ export type Goal =
   | { kind: 'follow-line'; zone: Shape2D; minOnLine: number }
   /** Visit a spot (`visit`), then come back and stop in the zone (a charger): roadmap #39 return-to-charger. */
   | { kind: 'visit-and-return'; visit: Shape2D; zone: Shape2D; noCrash?: boolean }
+  /**
+   * Carry a pick-up object (`object`, an id in `objects`) to a marked drop position and let go of it
+   * there: the object must end inside `zone`, released (not still in the claw or scoop). The robot
+   * must never tip over on the way (tilt past TIP_DEG, engine.ts).
+   */
+  | { kind: 'deliver'; object: string; zone: Shape2D; label: string }
 
 export interface Arena {
   id: string
@@ -184,6 +190,12 @@ export interface Arena {
   battery?: ArenaBattery
   /** Charging pads: stopped on one, the battery fills. */
   chargers?: Charger[]
+  /**
+   * The motors' dead zone for this arena, % of full power, instead of the robot's own
+   * (RobotSpec.deadZonePct, normally MOTOR_DEAD_ZONE_PCT): a worn gearbox or a cold motor
+   * needs more power before the wheels turn at all. A fault-injection arena sets it.
+   */
+  motorDeadZonePct?: number
 }
 
 // ── Geometry helpers shared by the engine, the renderer and the checks ────

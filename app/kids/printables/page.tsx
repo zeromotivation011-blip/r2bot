@@ -76,7 +76,7 @@ export default function PrintablesPage() {
             </Link>
             <PrintButtonClient label="Print this list" />
           </div>
-          <BuiltTicksClient total={HOME_BUILDS.length} />
+          <BuiltTicksClient total={HOME_BUILDS.length} cardByBuild={Object.fromEntries(HOME_BUILDS.map((b) => [b.id, b.robodex]))} />
         </header>
 
         {groups.map(({ band, builds }) => (

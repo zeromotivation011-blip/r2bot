@@ -13,6 +13,7 @@ import {
   SNAPSHOT_MAX_ACTIVITIES,
   capIds,
   isBandId,
+  isClassKind,
   type ClassSnapshot,
   type JoinedClassInfo,
 } from './classroom'
@@ -22,13 +23,13 @@ import { clearClassDiary, misconceptionCounts, workDays } from './classroom-diar
 import type { ChildPowerUp } from './classroom-goal'
 import type { BandId } from './bands'
 import { applyClassBandToProfile } from './profiles'
-import { CLASS_MEMBERSHIP_KEY, KIDS_CLASS_EVENT, classBandLock, loadMembership, type StoredMembership } from './classroom-membership-store'
+import { CLASS_MEMBERSHIP_KEY, KIDS_CLASS_EVENT, classBandLock, inMixedClass, loadMembership, type StoredMembership } from './classroom-membership-store'
 
 const KEY = CLASS_MEMBERSHIP_KEY
 /** components/kids/course/course-state.ts COURSE_KEY (read-only here; a swapped key, so it is the playing child's). */
 const COURSE_KEY = 'r2bot_kids_course_v1'
 // The read side lives in classroom-membership-store.ts (light enough for the shell).
-export { KIDS_CLASS_EVENT, classBandLock, loadMembership, type StoredMembership }
+export { KIDS_CLASS_EVENT, classBandLock, inMixedClass, loadMembership, type StoredMembership }
 
 export function saveMembership(m: StoredMembership): void {
   try {
@@ -283,10 +284,13 @@ export async function syncMembership(includeSnapshot: boolean): Promise<SyncOutc
       return 'removed'
     }
     if (res.ok && data.class) {
-      const c = { ...data.class, lockedBand: isBandId(data.class.lockedBand) ? data.class.lockedBand : null }
+      const { kind: rawKind, ...rest } = data.class
+      // An answer without a kind (older server) keeps the kind the join gave.
+      const c = { ...rest, lockedBand: isBandId(data.class.lockedBand) ? data.class.lockedBand : null, ...(isClassKind(rawKind) ? { kind: rawKind } : {}) }
       if (
         c.className !== m.className || c.teacherName !== m.teacherName || c.nickname !== m.nickname ||
-        c.band !== m.band || c.lockedBand !== (m.lockedBand ?? null)
+        c.band !== m.band || c.lockedBand !== (m.lockedBand ?? null) ||
+        (isClassKind(c.kind) && c.kind !== m.kind)
       ) {
         saveMembership({ ...m, ...c })
       }

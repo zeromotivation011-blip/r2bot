@@ -64,6 +64,8 @@ jobs:
         run: npx tsx lib/kids/access.verify.ts
       - name: Kids robot that grows — upgrade unlocks, learned-part glow, spec sheet trade-offs, X-ray wires on every robot, 20 echo rays for the robot's-eye view
         run: npx tsx lib/kids/robot-growth.verify.ts
+      - name: Kids AR (See it in your room) — the AR robot is the Workshop robot for every World form × drive (meshes, colours, rotors, learned glow), the form is named, the magic window fits every form on a phone and a laptop
+        run: npx tsx components/kids/three/ar-robot.verify.ts
       - name: Kids physics sim — demos, Level 1 arenas, determinism, calibration
         run: npx tsx lib/kids/sim/verify.ts
       - name: Kids Flight Recorder + battery — pack maths, drain model, pure-read recording, Power Lab challenges, why-did-it-fail, ghosts

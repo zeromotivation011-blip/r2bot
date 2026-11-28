@@ -58,6 +58,8 @@ export const HEADING: AllowedBlock = { id: 'heading_deg', label: 'heading (°)' 
 export const TIMER: AllowedBlock = { id: 'timer_s', label: 'timer (s)' }
 
 export const GRIP_OPEN: AllowedBlock = { id: 'grip_open', label: 'open gripper' }
+/** Where the claw or scoop holds its load (Physics Lab `set_carry`). */
+export const SET_CARRY: AllowedBlock = { id: 'set_carry', label: 'carry load', choices: { pos: ['low', 'high', 'normal'] } }
 export const GRIP_CLOSE: AllowedBlock = { id: 'grip_close', label: 'close gripper' }
 export const LIGHT_ON: AllowedBlock = { id: 'light_on', label: 'light on' }
 export const LIGHT_OFF: AllowedBlock = { id: 'light_off', label: 'light off' }
@@ -202,7 +204,7 @@ export const ICE_SLOPE: ArenaSpec = {
   start: { col: 0, row: 7, heading: 'up' },
   goal: 'Carry the 0.3 kg core box up the 20° ramp to the store at row 0 without tipping backwards.',
   features: ['Ramp rows 5–2 at 20°.', 'Core box 0.3 kg, carried in the scoop (high or low position).'],
-  physics: 'Grippy ramp, grip 0.9, 20°. The scoop can carry high (centre of mass up and back) or low (down and forward).',
+  physics: 'Grippy ramp (tile grip 0.8), 20°. The carry load block holds the box high (centre of mass up and back) or low (down and forward). Physics Lab arena “Low and slow”.',
   requires: ['move', 'grab'],
 }
 

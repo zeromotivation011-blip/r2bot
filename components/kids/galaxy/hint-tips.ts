@@ -13,6 +13,7 @@ export const TEMPLATE_TIP: Record<TemplateId, string> = {
   'flowchart-builder': 'Follow one test case through the chart with your finger. Questions split the path: yes one way, no the other.',
   'logic-gates': 'AND needs both, OR needs at least one, NOT flips it. Try every on/off combination and check the output each time.',
   'binary-encoder': 'Each lamp is worth double the one to its right: 1, 2, 4, 8, 16… Light the biggest one that fits first.',
+  'number-box': 'Put your finger on the box and go one card at a time: add, take out, or empty it first. Say the new number out loud after each card.',
   'gear-train': 'Only the first and last gear set the speed. Small driving big makes it slower and stronger; big driving small makes it faster.',
   'lever-balance': 'Weight × distance from the pivot must be the same on both sides. A light thing far away balances a heavy thing close in.',
   'simple-machines': 'Machines trade push for distance: a longer ramp, more rope strands or a longer handle means less push but more distance.',

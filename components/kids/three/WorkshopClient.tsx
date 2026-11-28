@@ -622,7 +622,7 @@ export default function WorkshopClient() {
         </p>
       )}
 
-      {arOpen && <ARView design={design} onClose={() => setArOpen(false)} />}
+      {arOpen && <ARView design={design} learned={learned} onClose={() => setArOpen(false)} />}
     </div>
   )
 }

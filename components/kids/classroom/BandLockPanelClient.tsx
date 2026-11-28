@@ -6,6 +6,9 @@
 //   - the whole class plays at the class band (kids_classes.band_locked);
 //   - one child plays at a band the teacher picks (kids_class_members.band_lock),
 //     which wins over the class.
+// In a mixed class (club, family, library — roadmap #84) there is no
+// whole-class switch: each child keeps their own band, and the leader can still
+// set one child's band.
 // The child's device follows on its next sync (it opens R2BOT Kids, or a
 // change is saved). Needs migration 0058: before it runs the panel says so and
 // nothing else on the class page changes. A band is a range, never an age.
@@ -21,6 +24,8 @@ export interface BandLockPanelProps {
   members: KidsMemberRow[]
   onClassLocked: (locked: boolean) => void
   onMemberLock: (memberId: string, band: BandId | null) => void
+  /** Roadmap #84: a club, family or library class — each child keeps their own band. */
+  mixed?: boolean
 }
 
 function bandLabel(id: BandId | null | undefined): string {
@@ -28,11 +33,11 @@ function bandLabel(id: BandId | null | undefined): string {
   return b ? `${b.emoji} ${b.name} (${b.ages})` : 'Not chosen yet'
 }
 
-export function BandLockPanelClient({ classId, cls, members, onClassLocked, onMemberLock }: BandLockPanelProps) {
+export function BandLockPanelClient({ classId, cls, members, onClassLocked, onMemberLock, mixed = false }: BandLockPanelProps) {
   const [busy, setBusy] = useState<string | null>(null)
   const [msg, setMsg] = useState<string | null>(null)
   const ready = cls.bandLockReady === true
-  const locked = cls.bandLocked === true
+  const locked = cls.bandLocked === true && !mixed
   const classBand = getBand(cls.band)
 
   async function setClassLock(next: boolean) {
@@ -67,8 +72,9 @@ export function BandLockPanelClient({ classId, cls, members, onClassLocked, onMe
       <p className="text-xs font-bold uppercase tracking-wider text-cyan-300">Age bands</p>
       <h2 id="band-h" className="font-display text-2xl font-bold text-white">Which band children play at</h2>
       <p className="mt-1 max-w-3xl text-[15px] text-slate-300">
-        Children choose a band when they start. You can set it for the whole class or for one child — a younger reader in an older class, or someone ready
-        for more. Their device switches the next time it syncs. A band is an age range, never an age or a birthday.
+        {mixed
+          ? 'This is a mixed-age group: every child keeps the band they chose, and the roster shows it. You can still set the band for one child — say, a confident nine-year-old ready for Inventors. Their device switches the next time it syncs. A band is an age range, never an age or a birthday.'
+          : 'Children choose a band when they start. You can set it for the whole class or for one child — a younger reader in an older class, or someone ready for more. Their device switches the next time it syncs. A band is an age range, never an age or a birthday.'}
       </p>
 
       {!ready ? (
@@ -77,7 +83,7 @@ export function BandLockPanelClient({ classId, cls, members, onClassLocked, onMe
         </p>
       ) : (
         <>
-          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl bg-white/[0.04] p-4">
+          {!mixed && <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl bg-white/[0.04] p-4">
             <button
               type="button"
               role="switch"
@@ -92,12 +98,12 @@ export function BandLockPanelClient({ classId, cls, members, onClassLocked, onMe
               Everyone plays at {classBand ? `${classBand.emoji} ${classBand.name}` : cls.band}
             </button>
             <p className="text-sm text-slate-400">{locked ? 'On: every child’s device switches to this band whenever it syncs.' : 'Off: each child chooses (or follows the band you set for them below).'}</p>
-          </div>
+          </div>}
 
           {members.length > 0 && (
             <ul className="mt-4 divide-y divide-white/5 rounded-2xl border border-white/10" aria-label={`Band for each child in ${cls.className}`}>
               {members.map((m) => {
-                const target = effectiveBandLock(cls.band, locked, m.bandLock ?? null)
+                const target = effectiveBandLock(cls.band, locked, m.bandLock ?? null, mixed ? 'club' : 'school')
                 const pending = target !== null && m.snapshot.band !== null && m.snapshot.band !== target
                 return (
                   <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2">

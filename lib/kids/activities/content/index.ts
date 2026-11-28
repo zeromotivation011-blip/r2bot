@@ -63,6 +63,7 @@ import { samples as gearTrainSamples } from '@/components/kids/activities/templa
 import { samples as leverBalanceSamples } from '@/components/kids/activities/templates/lever-balance/samples'
 import { samples as logicGatesSamples } from '@/components/kids/activities/templates/logic-gates/samples'
 import { samples as motorMathSamples } from '@/components/kids/activities/templates/motor-math/samples'
+import { samples as numberBoxSamples } from '@/components/kids/activities/templates/number-box/samples'
 import { samples as ohmsLawSamples } from '@/components/kids/activities/templates/ohms-law/samples'
 import { samples as pathPlannerSamples } from '@/components/kids/activities/templates/path-planner/samples'
 import { samples as predictOutputSamples } from '@/components/kids/activities/templates/predict-output/samples'
@@ -111,6 +112,7 @@ export const SAMPLE_ACTIVITIES: Activity[] = asActivities([
   ...leverBalanceSamples,
   ...logicGatesSamples,
   ...motorMathSamples,
+  ...numberBoxSamples,
   ...ohmsLawSamples,
   ...pathPlannerSamples,
   ...predictOutputSamples,

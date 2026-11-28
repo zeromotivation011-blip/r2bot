@@ -23,7 +23,7 @@ import { LEVEL1_SESSIONS } from '@/lib/kids/curriculum/level1'
 import { LEVEL2_SESSIONS } from '@/lib/kids/curriculum/level2'
 import { LEVEL3_SESSIONS } from '@/lib/kids/curriculum/level3'
 import { LEVEL4_SESSIONS } from '@/lib/kids/curriculum/level4'
-import { CertificateButtonClient } from '@/components/kids/teach/CertificateButtonClient'
+import { HangarCertificatesClient } from '@/components/kids/hangar/HangarCertificatesClient'
 // Loaded after first paint (the Robodex catalogue and the Passport panel are the page's heaviest islands).
 import { LazyBackupCode, LazyRobodexShelf } from '@/components/kids/hangar/HangarLazyClient'
 import { byWorld } from '@/lib/kids/activities/content'
@@ -114,9 +114,9 @@ export default function HangarPage() {
         <LazyRobodexShelf />
       </div>
 
-      <section aria-label="Level 1 certificate" className="mx-auto max-w-6xl px-4 pt-6">
-        <CertificateButtonClient level={1} />
-      </section>
+      <div className="mx-auto max-w-6xl px-4 pt-6">
+        <HangarCertificatesClient />
+      </div>
 
       <div id="backup" className="mx-auto max-w-6xl scroll-mt-24 px-4 pt-6">
         <LazyBackupCode />

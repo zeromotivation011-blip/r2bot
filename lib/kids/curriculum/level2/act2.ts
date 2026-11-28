@@ -693,7 +693,7 @@ const S12: L2Session = {
     physicsEffect: 'Line legs and measured legs behave differently on rock; test each leg on the surface it really crosses.',
     realWorld: 'Real delivery robots switch between modes: following a mapped path, driving measured stretches, and stopping at a sensed door.',
   },
-  arena: { kind: 'physics', id: 'follow-line', task: 'Leg by leg: follow the line, then add a measured drive_distance leg and a stop that senses the end. Test each leg on its own first.', why: 'The verified Physics Lab line arena has every block a mixed route needs (line_seen, drive_distance, distance_cm, stop).' },
+  arena: { kind: 'physics', id: 'lighthouse-route', task: 'Leg by leg: follow the line until it ends, drive a measured 40 cm across the gap, then stop in the green zone when the lighthouse wall is close. Test each leg on its own first.', why: 'Its own verified arena (Physics Lab “Lighthouse route”) built from three legs that each need a different skill: line_seen for the line, drive_distance for the gap, distance_cm for the stop.' },
   activities: [
     { id: 'motion-bu-07', why: 'Fewest squares to the dock: plan the route before you drive it.' },
     { id: 'design-bu-06', why: 'The greenhouse helper: choose the sensors your design needs.' },

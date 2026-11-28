@@ -32,6 +32,8 @@ import {
 import { POWER_DEMOS, POWER_STARTERS } from '@/lib/kids/sim/power-demos'
 import type { Demo } from '@/lib/kids/sim/demos'
 import { playSound } from '@/lib/kids-audio'
+import { labSolved } from '@/lib/kids/sim/lab-links'
+import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
 
 /** The simulator robots' motors are rated for four NiMH cells. */
 const MOTOR_RATED_V = 4.8
@@ -154,6 +156,18 @@ export default function PowerLabClient() {
     const d = want ? POWER_DEMOS.find((x) => x.id === want) : undefined
     if (d) setDemo(d)
     setMine(loadDesign())
+  }, [])
+
+  /** Challenges this child has solved (the lab's result store, lib/kids/sim/lab-results.ts). */
+  const [solvedIds, setSolvedIds] = useState<Set<string>>(new Set())
+  useEffect(() => {
+    const read = () => {
+      const pb = getProgress().personalBests
+      setSolvedIds(new Set(POWER_DEMOS.filter((x) => labSolved(pb, x.id)).map((x) => x.id)))
+    }
+    read()
+    window.addEventListener(KIDS_PROGRESS_EVENT, read)
+    return () => window.removeEventListener(KIDS_PROGRESS_EVENT, read)
   }, [])
 
   const maxAmps = Math.min(12, Math.max(6, info.maxAmps * 1.5))
@@ -360,6 +374,11 @@ export default function PowerLabClient() {
           {POWER_DEMOS.map((d) => (
             <button key={d.id} type="button" aria-pressed={demo.id === d.id} onClick={() => setDemo(d)} className={chip(demo.id === d.id)} data-testid={`power-demo-${d.id}`}>
               {d.title}
+              {solvedIds.has(d.id) && (
+                <span className="ml-1 text-emerald-300" aria-label="solved">
+                  ✓
+                </span>
+              )}
               <span className="block text-xs font-bold opacity-80">{d.ageHint}</span>
             </button>
           ))}

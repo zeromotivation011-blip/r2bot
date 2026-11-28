@@ -5,7 +5,9 @@
 //   1. Spark's question about the build (a wrong answer gets the hint, no penalty);
 //   2. the right answer saves the check-in (lib/kids/builds/store.ts) and reports
 //      kind 'project' through reportBestRun — first finish only, so re-checking
-//      never farms XP; the global reward toast celebrates;
+//      never farms XP; the global reward toast celebrates; and it discovers the
+//      Robodex card of the real robot that does the same thing (lib/kids/builds/
+//      robodex.ts — an older or restored check-in discovers it on the next visit);
 //   3. optional: what the "try one change" test showed, and for Inventors and
 //      Engineers a one-line reflection, checked on the device (checkReflection;
 //      a child who says they are hurt sees the helpline card, nothing is saved).
@@ -17,6 +19,7 @@ import { useEffect, useId, useState } from 'react'
 import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
 import { BUILDS_EVENT, readBuilds, saveCheckIn, type BuildCheckIn } from '@/lib/kids/builds/store'
 import { checkReflection, REFLECTION_MAX_CHARS } from '@/lib/kids/builds/reflection'
+import { discoverBuildCards } from '@/lib/kids/builds/robodex'
 import { reportBestRun } from '@/lib/kids/universe/rewards'
 import { KIDS_PROFILE_EVENT } from '@/lib/kids/profiles'
 import { playSound } from '@/lib/kids-audio'
@@ -35,6 +38,8 @@ export interface BuildCheckInProps {
   outcomes: [string, string, string]
   robodexHref: string
   robodexName: string
+  /** The Robodex card id this build discovers. */
+  robodexId: string
 }
 
 function isTeen(): boolean {
@@ -51,7 +56,7 @@ const optionBase =
   'flex min-h-[52px] w-full items-center rounded-2xl border px-4 py-2 text-left text-[17px] font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60 active:scale-[.98] motion-reduce:transform-none'
 
 export default function BuildCheckInClient(props: BuildCheckInProps) {
-  const { id, rewardId, title, question, options, answer, why, change, outcomes, robodexHref, robodexName } = props
+  const { id, rewardId, title, question, options, answer, why, change, outcomes, robodexHref, robodexName, robodexId } = props
   const [rec, setRec] = useState<BuildCheckIn | null | undefined>(undefined)
   const [teen, setTeen] = useState(false)
   const [picked, setPicked] = useState<number | null>(null)
@@ -65,6 +70,8 @@ export default function BuildCheckInClient(props: BuildCheckInProps) {
   useEffect(() => {
     const load = () => {
       const r = readBuilds()[id] ?? null
+      // A check-in from before the Robodex trigger (or restored from a backup) still finds its card.
+      if (r) void discoverBuildCards([robodexId])
       setRec(r)
       setReflection(r?.r ?? '')
       setTeen(isTeen())
@@ -78,7 +85,7 @@ export default function BuildCheckInClient(props: BuildCheckInProps) {
       window.removeEventListener(KIDS_PROFILE_EVENT, load)
       window.removeEventListener(KIDS_PROGRESS_EVENT, load)
     }
-  }, [id])
+  }, [id, robodexId])
 
   function choose(i: number) {
     if (rec) return
@@ -97,6 +104,8 @@ export default function BuildCheckInClient(props: BuildCheckInProps) {
     }
     // First finish only: re-checking a build never pays twice.
     reportBestRun({ kind: 'project', id: rewardId, score: 1, stars: attempts === 1 ? 3 : 2, attempts })
+    // The real robot behind the build joins the Robodex (no XP of its own).
+    void discoverBuildCards([robodexId])
     setRec(next)
   }
 

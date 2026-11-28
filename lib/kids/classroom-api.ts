@@ -5,7 +5,7 @@
 // so the teacher pages never load the Supabase browser client themselves.
 
 import { hasSupabaseSessionCookie } from '@/lib/supabase/lazy'
-import { CLASSROOM_NOT_READY } from './classroom'
+import { CLASSROOM_NOT_READY, KIND_NOT_READY } from './classroom'
 import { SCHOOLS_NOT_READY } from './classroom-assignments'
 import { GOALS_NOT_READY, parseGoal, type ClassGoal } from './classroom-goal'
 import type { InsightCatalogue } from './classroom-insights'
@@ -28,7 +28,7 @@ export async function teacherFetch<T>(url: string, init?: RequestInit): Promise<
     })
     const data = (await res.json().catch(() => ({}))) as { error?: string; code?: string } & T
     if (res.status === 401) return { kind: 'signed-out' }
-    if (res.status === 503 && (data.code === CLASSROOM_NOT_READY || data.code === SCHOOLS_NOT_READY || data.code === GOALS_NOT_READY)) return { kind: 'not-ready' }
+    if (res.status === 503 && (data.code === CLASSROOM_NOT_READY || data.code === SCHOOLS_NOT_READY || data.code === GOALS_NOT_READY || data.code === KIND_NOT_READY)) return { kind: 'not-ready' }
     if (res.status === 404) return { kind: 'not-found' }
     if (!res.ok) return { kind: 'error', message: data.error ?? 'Something went wrong. Try again.' }
     return { kind: 'ok', data }

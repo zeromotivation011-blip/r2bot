@@ -3,18 +3,25 @@
 // run through the same interpreter the browser uses, on the cheapest robot
 // that has the mission's capabilities. Also checks the solution fits the block
 // budget, only uses palette blocks, and that every needed capability can be
-// fitted to one robot.
+// fitted to one robot. Since the Blockly port (roadmap #21) it also proves
+// every reference solution is a VALID Blockly program (loaded into a headless
+// Blockly with the real block definitions, saved back, read back) that still
+// wins in the interpreter, and that drafts saved by the old tap editor convert
+// to Blockly JSON without losing a block.
 //
 // Run:  npx tsx lib/kids/code-lab/verify.ts
 
 import { readFileSync } from 'node:fs'
+import * as Blockly from 'blockly/core'
 import { join } from 'node:path'
 import { capabilitiesOf, DEFAULT_DESIGN } from '../robot-design'
 import { blockNeeds } from '../sim/program'
 import { SENSOR_IDS } from '../sim/blockly-json'
 import { BLOCK_INFO, BLOCK_NEEDS, countBlocks, usedTypes } from './blocks'
+import { GRID_BLOCK_DEFS } from './blockly-defs'
+import { DRAFT_FORMAT, GRID_TYPE, HAT, HAT_ID, programToWorkspace, readDraft, withProgram, workspaceToProgram, writeDraft, type BWorkspace } from './blockly-format'
 import { CODE_LAB_TO_SHARED, SHARED_STYLE_COLOURS } from './shared-vocabulary'
-import type { BlockType } from './types'
+import type { Block, BlockType } from './types'
 import { runMission } from './interpreter'
 import { MISSIONS } from './missions'
 import { designWith } from './parts'
@@ -56,7 +63,7 @@ export function verifyMissions(): VerifyIssue[] {
   const bands = new Map<string, number>()
   for (const m of MISSIONS) bands.set(m.band, (bands.get(m.band) ?? 0) + 1)
   if (MISSIONS.length < 20) issues.push({ mission: '*', problem: `only ${MISSIONS.length} missions (need 20+)` })
-  return [...issues, ...verifySharedVocabulary()]
+  return [...issues, ...verifySharedVocabulary(), ...verifyBlocklyPort()]
 }
 
 /**
@@ -112,6 +119,132 @@ export function verifySharedVocabulary(): VerifyIssue[] {
   return issues
 }
 
+// ── The Blockly port (roadmap #21) ─────────────────────────────────────────
+/** Block ids differ after a round trip only if something was lost; compare everything. */
+const same = (a: Block[], b: Block[]) => JSON.stringify(a) === JSON.stringify(b)
+
+let blocklyReady = false
+function headless(): Blockly.Workspace {
+  if (!blocklyReady) {
+    blocklyReady = true
+    // The shared hat, exactly as the editor defines it (components/kids/sim/blockly-blocks.ts).
+    Blockly.common.defineBlocksWithJsonArray([{ type: HAT, message0: '▶ when Run is pressed', nextStatement: null, style: 'hat_blocks' }])
+    Blockly.common.defineBlocksWithJsonArray(GRID_BLOCK_DEFS)
+  }
+  return new Blockly.Workspace()
+}
+
+/** Load into a real (headless) Blockly and save back. Throws on anything Blockly refuses. */
+function throughBlockly(ws: BWorkspace): BWorkspace {
+  const w = headless()
+  const warn = console.warn
+  const warnings: string[] = []
+  console.warn = (...a: unknown[]) => warnings.push(a.map(String).join(' '))
+  try {
+    Blockly.serialization.workspaces.load(JSON.parse(JSON.stringify(ws)) as object, w)
+  } finally {
+    console.warn = warn
+  }
+  if (warnings.length) throw new Error(`Blockly warned: ${warnings.join(' | ')}`)
+  const out = Blockly.serialization.workspaces.save(w) as BWorkspace
+  w.dispose()
+  return out
+}
+
+export function verifyBlocklyPort(): VerifyIssue[] {
+  const issues: VerifyIssue[] = []
+  const add = (mission: string, problem: string) => issues.push({ mission, problem })
+
+  // Definitions: one per Code Lab block, in the shared colour family, picture first, nothing to type.
+  const defs = new Map(GRID_BLOCK_DEFS.map((d) => [d.type, d]))
+  for (const t of Object.keys(BLOCK_INFO) as BlockType[]) {
+    const d = defs.get(GRID_TYPE[t])
+    if (!d) {
+      add('blockly', `no Blockly definition for ${t}`)
+      continue
+    }
+    if (d.style !== CODE_LAB_TO_SHARED[t].style) add('blockly', `${t} is drawn in ${d.style}, the shared block is ${CODE_LAB_TO_SHARED[t].style}`)
+    if (!String(d.message0).startsWith(CODE_LAB_TO_SHARED[t].emoji)) add('blockly', `${t} does not start with its picture ${CODE_LAB_TO_SHARED[t].emoji}`)
+  }
+  const defText = JSON.stringify(GRID_BLOCK_DEFS)
+  if (/field_input|field_number|field_multilinetext/.test(defText)) add('blockly', 'a Code Lab block has a typed field (children choose from dropdowns, they never type)')
+
+  for (const m of MISSIONS) {
+    for (const t of m.palette) if (!defs.has(GRID_TYPE[t])) add(m.id, `palette block ${t} has no Blockly definition`)
+    const design = designWith(DEFAULT_DESIGN, m.needs)
+    if (!design) continue
+    const caps = capabilitiesOf(design)
+    // 1. The reference solution is a valid Blockly program…
+    let saved: BWorkspace
+    try {
+      saved = throughBlockly(programToWorkspace(m.solution))
+    } catch (e) {
+      add(m.id, `reference solution is not a valid Blockly program: ${(e as Error).message}`)
+      continue
+    }
+    // 2. …that reads back as exactly the same program, block for block…
+    const back = workspaceToProgram(saved)
+    if (!same(back, m.solution)) add(m.id, 'reference solution changes on a Blockly round trip')
+    if (countBlocks(back) !== countBlocks(m.solution)) add(m.id, 'block count changes on a Blockly round trip (stars would change)')
+    // 3. …and still wins in the runtime, on every arena.
+    if (!runMission(back, m, caps).won) add(m.id, 'reference solution, read back from Blockly, does not win')
+    // 4. A draft saved by the OLD tap editor (a bare Block[]) converts on load, survives Blockly, and still wins.
+    const legacy = readDraft(JSON.stringify(m.solution))
+    if (!legacy || !legacy.migrated) add(m.id, 'an old-editor draft is not recognised')
+    else {
+      try {
+        const migrated = workspaceToProgram(throughBlockly(legacy.workspace))
+        if (!same(migrated, m.solution) || !runMission(migrated, m, caps).won) add(m.id, 'an old-editor draft loses blocks or stops winning when converted')
+      } catch (e) {
+        add(m.id, `an old-editor draft converts to an invalid Blockly program: ${(e as Error).message}`)
+      }
+    }
+    // 5. The new draft format round-trips through storage.
+    const stored = readDraft(writeDraft(saved))
+    if (!stored || stored.migrated || !same(workspaceToProgram(stored.workspace), m.solution)) add(m.id, 'a Blockly draft does not round-trip through storage')
+  }
+
+  // Migration edge cases: an old draft with out-of-range numbers is clamped to what the dropdowns offer.
+  const odd = readDraft(
+    JSON.stringify([
+      { id: 'a', type: 'forward', n: 0 },
+      { id: 'b', type: 'repeat', n: 50, body: [{ id: 'c', type: 'forward', n: 12 }] },
+      { id: 'd', type: 'ifColor', color: 'purple', body: [], elseBody: [] },
+      { id: 'e', type: 'say', text: 'my name is Sam' },
+    ]),
+  )
+  if (!odd) add('drafts', 'an old draft with odd values is dropped instead of converted')
+  else {
+    try {
+      const p = workspaceToProgram(throughBlockly(odd.workspace))
+      const ok =
+        p.length === 4 &&
+        p[0].type === 'forward' && p[0].n === 1 &&
+        p[1].type === 'repeat' && p[1].n === 20 && p[1].body[0]?.type === 'forward' && (p[1].body[0] as { n: number }).n === 9 &&
+        p[2].type === 'ifColor' && p[2].color === 'blue' &&
+        p[3].type === 'say' && p[3].text === 'Hello!'
+      if (!ok) add('drafts', `odd old draft converted wrongly: ${JSON.stringify(p)}`)
+    } catch (e) {
+      add('drafts', `odd old draft is not valid Blockly: ${(e as Error).message}`)
+    }
+  }
+  // An empty old draft, junk and a foreign object never crash and never invent blocks.
+  const empty = readDraft('[]')
+  if (!empty || workspaceToProgram(empty.workspace).length !== 0) add('drafts', 'an empty old draft does not load as an empty program')
+  for (const junk of ['', 'not json', '{"blocks":[1]}', '[{"type":"nope"}]', 'null', '42']) {
+    if (readDraft(junk) !== null) add('drafts', `junk draft ${JSON.stringify(junk)} was accepted`)
+  }
+  // Loose blocks dragged aside do not run, and an edit made with the buttons keeps them.
+  const loose: BWorkspace = { blocks: { languageVersion: 0, blocks: [...(programToWorkspace([{ id: 'x1', type: 'left' }]).blocks?.blocks ?? []), { type: GRID_TYPE.forward, id: 'loose1', x: 300, y: 300, fields: { N: '2' } }] } }
+  if (workspaceToProgram(loose).length !== 1) add('drafts', 'a loose block was counted as part of the program')
+  const edited = withProgram(loose, [{ id: 'x2', type: 'right' }])
+  if (!edited.blocks?.blocks.some((b) => b.id === 'loose1') || workspaceToProgram(edited)[0]?.type !== 'right') add('drafts', 'an edit lost a loose block or did not change the program')
+  // A stored workspace that lost its hat gets one back.
+  const hatless = readDraft(JSON.stringify({ format: DRAFT_FORMAT, workspace: { blocks: { languageVersion: 0, blocks: [] } } }))
+  if (!hatless || !hatless.workspace.blocks?.blocks.some((b) => b.type === HAT && b.id === HAT_ID)) add('drafts', 'a workspace without the start block is not repaired')
+  return issues
+}
+
 // Run directly with tsx.
 const isMain = typeof process !== 'undefined' && Array.isArray(process.argv) && /verify\.ts$/.test(process.argv[1] ?? '')
 if (isMain) {
@@ -123,5 +256,5 @@ if (isMain) {
     for (const i of issues) console.error(`✗ ${i.mission}: ${i.problem}`)
     process.exit(1)
   }
-  console.log('✓ every reference solution wins on every arena; Code Lab blocks match the shared block set')
+  console.log('✓ every reference solution wins on every arena, is a valid Blockly program that wins after a round trip, old drafts convert; Code Lab blocks match the shared block set')
 }

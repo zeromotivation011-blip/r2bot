@@ -30,6 +30,7 @@ export const LAUNCH_SKIP_STREAK = 3
 const QUICK: ReadonlySet<TemplateId> = new Set<TemplateId>([
   'robot-match',
   'predict-output',
+  'number-box',
   'estimate',
   'sensor-choice',
   'classify-sort',

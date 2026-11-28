@@ -150,7 +150,7 @@ export const ACT1: Session[] = [
       narration: 'Fit two wheels and a caster for the test: a clean differential drive to measure.',
       why: 'A simple, known drive makes the measurement clean; you can repeat it with your own drive afterwards.',
       tryWithout: 'With legs, speed depends on gait timing as well as power — a messier first experiment.',
-      physicsEffect: 'Two-wheel drive tops out at about 0.42 m/s; below about 12 % power the wheels do not turn.',
+      physicsEffect: 'Two-wheel drive tops out at about 0.42 m/s; below 12 % power the motors hum and the wheels do not turn (the simulator’s motor dead zone, the same for every drive).',
       realWorld: 'Engineers characterise every motor on a test bench before trusting it in a controller.',
     },
     code: challenge({
@@ -218,7 +218,10 @@ export const ACT1: Session[] = [
       ],
       faster: ['Repeat the curve with your own drive (legs or tracks) and compare slopes.', 'Use your fitted line to predict the power for exactly 20 cm/s, then test it.'],
       slower: ['Measure four powers only (0, 10, 30, 60).', 'Provide a plotting grid with axes labelled.'],
-      notes: ['Honest limit: the dead zone is part of the Level 4 simulator motor model; the playable challenge today is the Skill Galaxy “Half a metre by encoder”, and the warm-up shows the physics directly.'],
+      notes: [
+        'The playable challenge is the Physics Lab arena “Find the dead zone”: the simulator’s motors have a real dead zone (below 12 % they hum and the wheels stay still; a sagging battery widens it). The reference raises the power 2 % at a time until the distance reading drops, says 12, then parks. A “careful creep at 8 %” never arrives. The lab records the solve and the session counts it by itself.',
+        'In the Flight Recorder the motor graph shows the command rising while the speed stays at zero — “Why did it fail?” names the dead zone. The Skill Galaxy “Half a metre by encoder” stays as practice.',
+      ],
     }),
     parent: {
       today: 'Your teen measured the robot’s speed at different motor powers, plotted a curve and found the “dead zone” where it doesn’t move at all.',

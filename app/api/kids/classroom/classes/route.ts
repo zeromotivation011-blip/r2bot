@@ -8,13 +8,15 @@
 import type { NextRequest } from 'next/server'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { isRateLimited } from '@/lib/rate-limit'
-import { MAX_CLASSES_PER_TEACHER, cleanText, isBandId, type KidsClassSummary } from '@/lib/kids/classroom'
+import { DEFAULT_CLASS_KIND, MAX_CLASSES_PER_TEACHER, cleanText, isBandId, isClassKind, type KidsClassSummary } from '@/lib/kids/classroom'
 import {
   CLASS_COLUMNS,
   adminOrNull,
   currentTeacher,
+  isMissingKindColumn,
   isMissingTable,
   jsonError,
+  loadTeacherClassKinds,
   newJoinCode,
   notReadyResponse,
   readJsonCapped,
@@ -61,7 +63,13 @@ export async function GET(): Promise<Response> {
     suggestedTeacherName = cleanText((profile as { display_name: string }).display_name, 40)
   }
 
-  const classes: KidsClassSummary[] = rows.map((r) => toClassSummary(r, counts.get(r.id) ?? 0))
+  // Roadmap #84 (migration 0059): read apart, so a missing column never hides the list.
+  const kinds = await loadTeacherClassKinds(admin, user.id)
+  const classes: KidsClassSummary[] = rows.map((r) => ({
+    ...toClassSummary(r, counts.get(r.id) ?? 0),
+    kind: kinds === 'not-ready' ? DEFAULT_CLASS_KIND : kinds.get(r.id) ?? DEFAULT_CLASS_KIND,
+    kindReady: kinds !== 'not-ready',
+  }))
   return Response.json({ ok: true, classes, suggestedTeacherName }, { headers: NO_STORE })
 }
 
@@ -70,6 +78,8 @@ interface CreateBody {
   teacherName?: unknown
   schoolName?: unknown
   band?: unknown
+  /** Roadmap #84: school (default), club, family or library. */
+  kind?: unknown
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
@@ -87,6 +97,8 @@ export async function POST(req: NextRequest): Promise<Response> {
   const schoolName = cleanText(body.schoolName, 100)
   if (!className) return jsonError(400, 'Give the class a name, like “7B” or “Robotics Club”.')
   if (!isBandId(body.band)) return jsonError(400, 'Choose a grade band.')
+  if (body.kind !== undefined && !isClassKind(body.kind)) return jsonError(400, 'Choose what kind of group this is.')
+  const kind = isClassKind(body.kind) ? body.kind : DEFAULT_CLASS_KIND
 
   const admin = adminOrNull()
   if (!admin) return notReadyResponse()
@@ -100,8 +112,12 @@ export async function POST(req: NextRequest): Promise<Response> {
     return jsonError(409, `You can have up to ${MAX_CLASSES_PER_TEACHER} classes. Delete an old one first.`)
   }
 
-  // Join codes are unique; retry on the rare collision.
-  for (let attempt = 0; attempt < 5; attempt++) {
+  // Join codes are unique; retry on the rare collision. A school class is the
+  // column default, so it is only written for the other kinds; before 0059
+  // runs that insert fails on the missing column and is retried without it
+  // (kindReady: false tells the leader's device to keep the kind itself).
+  let withKind = kind !== DEFAULT_CLASS_KIND
+  for (let attempt = 0; attempt < 6; attempt++) {
     const { data, error } = await admin
       .from('kids_classes')
       .insert({
@@ -111,13 +127,20 @@ export async function POST(req: NextRequest): Promise<Response> {
         school_name: schoolName || null,
         band: body.band,
         join_code: newJoinCode(),
+        ...(withKind ? { kind } : {}),
       })
       .select(CLASS_COLUMNS)
       .single()
     if (!error && data) {
       const created = data as ClassDbRow
       await linkToMySchool(admin, created.id, user.id)
-      return Response.json({ ok: true, class: toClassSummary(created, 0) }, { status: 201, headers: NO_STORE })
+      const kindReady = kind === DEFAULT_CLASS_KIND ? true : withKind
+      return Response.json({ ok: true, class: { ...toClassSummary(created, 0), kind, kindReady } }, { status: 201, headers: NO_STORE })
+    }
+    // First: a missing kind column (PGRST204 also reads as "missing table").
+    if (error && withKind && isMissingKindColumn(error)) {
+      withKind = false
+      continue
     }
     if (error && isMissingTable(error)) return notReadyResponse()
     if (error?.code !== '23505') return jsonError(500, 'Could not create the class.')

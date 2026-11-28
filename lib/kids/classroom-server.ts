@@ -13,8 +13,14 @@ import {
   EMPTY_SNAPSHOT,
   JOIN_CODE_ALPHABET,
   JOIN_CODE_LENGTH,
+  DEFAULT_CLASS_KIND,
+  KIND_NOT_READY,
+  KIND_NOT_READY_MESSAGE,
   effectiveBandLock,
   isBandId,
+  isClassKind,
+  isMixedKind,
+  type ClassKind,
   parseSnapshot,
   type KidsClassSummary,
   type KidsMemberRow,
@@ -243,14 +249,74 @@ export async function loadBandLocks(admin: SupabaseClient, classId: string): Pro
   return { classLocked: (cls.data as { band_locked?: unknown } | null)?.band_locked === true, members }
 }
 
-/** The band one member must play at (their lock, else the class's when locked), null when free or before 0058. */
+/**
+ * The band one member must play at (their lock, else the class's when locked
+ * and the class is not mixed), null when free or before 0058. The class kind
+ * (0059) is read apart, so a missing 0059 never drops a 0058 lock.
+ */
 export async function loadMemberBandLock(admin: SupabaseClient, memberId: string): Promise<BandId | null> {
   const { data, error } = await admin
     .from('kids_class_members')
-    .select('band_lock, kids_classes(band, band_locked)')
+    .select('band_lock, class_id, kids_classes(band, band_locked)')
     .eq('id', memberId)
     .maybeSingle()
   if (error || !data) return null
-  const row = data as unknown as { band_lock: unknown; kids_classes: { band: unknown; band_locked: unknown } | null }
-  return effectiveBandLock(row.kids_classes?.band, row.kids_classes?.band_locked === true, row.band_lock)
+  const row = data as unknown as { band_lock: unknown; class_id: string; kids_classes: { band: unknown; band_locked: unknown } | null }
+  const classLocked = row.kids_classes?.band_locked === true
+  const kind = !isBandId(row.band_lock) && classLocked ? await loadClassKind(admin, row.class_id) : DEFAULT_CLASS_KIND
+  return effectiveBandLock(row.kids_classes?.band, classLocked, row.band_lock, kind === 'not-ready' ? DEFAULT_CLASS_KIND : kind)
+}
+
+// ── Class kind (roadmap #84, migration 0059) ─────────────────────────────────
+// Read and written apart from CLASS_COLUMNS, so a missing 0059 never takes the
+// class list, the class page, the join or the sync down: every class reads as
+// a school class and the leader's device keeps the kind it chose.
+
+/** True when the error means migration 0059 has not run (kids_classes.kind missing). */
+export function isMissingKindColumn(err: PostgrestError | null | undefined): boolean {
+  if (!err) return false
+  if (err.code === '42703' || err.code === 'PGRST204') return true
+  return /\bkind\b/.test(err.message ?? '') && /(does not exist|could not find|schema cache)/i.test(err.message ?? '')
+}
+
+export function kindNotReadyResponse(): Response {
+  return Response.json(
+    { ok: false, error: KIND_NOT_READY_MESSAGE, code: KIND_NOT_READY },
+    { status: 503, headers: { 'Cache-Control': 'no-store' } },
+  )
+}
+
+function rowKind(x: unknown): ClassKind {
+  return isClassKind(x) ? x : DEFAULT_CLASS_KIND
+}
+
+/** One class's kind, or 'not-ready' before 0059. */
+export async function loadClassKind(admin: SupabaseClient, classId: string): Promise<ClassKind | 'not-ready'> {
+  const { data, error } = await admin.from('kids_classes').select('kind').eq('id', classId).maybeSingle()
+  if (error) return isMissingKindColumn(error) ? 'not-ready' : DEFAULT_CLASS_KIND
+  return rowKind((data as { kind?: unknown } | null)?.kind)
+}
+
+/** Every class kind of one teacher (class id -> kind), or 'not-ready' before 0059. */
+export async function loadTeacherClassKinds(admin: SupabaseClient, teacherId: string): Promise<Map<string, ClassKind> | 'not-ready'> {
+  const { data, error } = await admin.from('kids_classes').select('id, kind').eq('teacher_id', teacherId)
+  if (error) return isMissingKindColumn(error) ? 'not-ready' : new Map()
+  return new Map(((data ?? []) as { id: string; kind: unknown }[]).map((r) => [r.id, rowKind(r.kind)]))
+}
+
+/** True when a class lets each child keep their own band (club, family, library). School before 0059. */
+export async function isMixedClass(admin: SupabaseClient, classId: string): Promise<boolean> {
+  const kind = await loadClassKind(admin, classId)
+  return kind !== 'not-ready' && isMixedKind(kind)
+}
+
+/**
+ * The kind of a member's class for the child's sync answer, or undefined before
+ * 0059 (the device then keeps the kind the join gave it). Never throws.
+ */
+export async function loadMemberClassKind(admin: SupabaseClient, memberId: string): Promise<ClassKind | undefined> {
+  const { data, error } = await admin.from('kids_class_members').select('class_id').eq('id', memberId).maybeSingle()
+  if (error || !data) return undefined
+  const kind = await loadClassKind(admin, (data as { class_id: string }).class_id)
+  return kind === 'not-ready' ? undefined : kind
 }

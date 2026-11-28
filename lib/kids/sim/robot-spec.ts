@@ -14,6 +14,18 @@ import { electronicsAmps, MOTOR_NO_LOAD_AMPS, MOTOR_STALL_AMPS, packInfo, type P
 
 export const MODEL_SCALE = 0.25
 
+/**
+ * The motors' dead zone, % of full power. A small DC gear motor has to beat the static friction
+ * of its gearbox (and the tyres' rolling resistance) before the wheel turns at all: below this
+ * command the motor hums but the wheel stays still. Above it the wheel speed follows the command
+ * as before. 12 % is a well-matched hobby gear motor and driver (the Level 4 story's motor: humming
+ * at 8 %, moving from 12 %); a cheap one with a poor driver can need 20–30 %. Level 4 Session 2
+ * measures it ("Find the dead zone", demos.ts). A sagging
+ * battery widens it (the motor gets less voltage for the same command), and an arena can set its
+ * own (Arena.motorDeadZonePct: a worn motor, a fault).
+ */
+export const MOTOR_DEAD_ZONE_PCT = 12
+
 export interface DriveSpec {
   /** Top wheel/track surface speed at 100 %, m/s. */
   maxSpeed: number
@@ -136,6 +148,8 @@ export interface RobotSpec {
   toolReach: number
   /** Pen tip in robot space: the turning centre (midpoint of the drive axle), so a turn on the spot leaves a dot. */
   penTip: [number, number]
+  /** Motor dead zone, % of full power (MOTOR_DEAD_ZONE_PCT): below it the wheels do not turn. */
+  deadZonePct: number
 }
 
 export function robotSpec(d: RobotDesign): RobotSpec {
@@ -160,6 +174,7 @@ export function robotSpec(d: RobotDesign): RobotSpec {
     toolReach: d.tool === 'scoop' ? 0.09 : 0.05,
     // The drive wheels sit on the body's centre line, so the turning centre is (0, 0).
     penTip: [0, 0],
+    deadZonePct: MOTOR_DEAD_ZONE_PCT,
   }
 }
 

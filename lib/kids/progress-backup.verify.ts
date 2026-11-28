@@ -459,6 +459,43 @@ async function profileChecks(P: ProgressModule) {
   }
   check(`every profileKey() call site (${sites}) uses a base listed in PROFILE_KEY_BASES`, sites > 10 && bad.length === 0, bad.join('; '))
   check('no base is both profileKey()-namespaced and swapped', !PR.PROFILE_KEY_BASES.some((b) => PR.SWAPPED_KEYS.includes(b)))
+
+  // ── Physics Lab / Power Lab results (build log #23, lib/kids/sim/lab-results.ts) ──
+  // A solved lab arena lives in the one progress store (personalBests["lab:<id>"]), is written only
+  // through reportBestRun, travels in the backup code and merges keeping the faster solve.
+  {
+    PR.finishTurn()
+    store.clear()
+    const LR = await import('./sim/lab-results')
+    const RK = await import('./curriculum/level3/reuse-kit')
+    const arena = { timeLimit: 60 }
+    const run = (time: number, success = true) => ({ success, reason: null, message: '', missing: [], time, travelled: 1, wheelTravel: 1, goalDistance: 0, crashed: false, onLineFraction: 0 })
+    const play = { kind: 'sim-demo' as const, id: 'dead-zone', goal: 'Find the dead zone' }
+    const done = () => RK.reusePlayDone(play, P.getProgress())
+    P.saveProgress({ xp: 10, personalBests: { 'drone-hover:t1': 50 } })
+    const oldCode = await P.exportProgressCode()
+    check('lab: a fresh child has no lab results (safe default)', !LR.labSolved(P.getProgress().personalBests, 'dead-zone') && !done() && LR.labBestTime('dead-zone', arena) === null)
+    check('lab: a failed run records nothing', LR.reportLabRun('dead-zone', arena, run(9.5, false)) === null && !done())
+    const first = LR.reportLabRun('dead-zone', arena, run(9.55))
+    check('lab: the first solve is reported once, as a challenge', !!first && first.kind === 'challenge' && first.id === 'lab:dead-zone' && first.xpGained > 0)
+    check('lab: stored as tenths of a second to spare (higher is better)', P.getProgress().personalBests['lab:dead-zone'] === 505 && LR.labBestTime('dead-zone', arena) === 9.5)
+    check('lab: a course session reads the solve (no "I finished it")', done())
+    check('lab: a slower replay pays nothing', LR.reportLabRun('dead-zone', arena, run(12)) === null && P.getProgress().personalBests['lab:dead-zone'] === 505)
+    const faster = LR.reportLabRun('dead-zone', arena, run(8))
+    check('lab: a faster solve is a new personal best', !!faster && faster.newPersonalBest && P.getProgress().personalBests['lab:dead-zone'] === 520)
+    const xp = P.getProgress().xp
+    const labCode = await P.exportProgressCode()
+    store.clear()
+    check('lab: an old code with no lab results restores with none', (await P.importProgressCode(oldCode)).ok && !LR.labSolved(P.getProgress().personalBests, 'dead-zone'))
+    store.clear()
+    const back = await P.importProgressCode(labCode)
+    check('lab: the solve travels in the backup code', back.ok && P.getProgress().personalBests['lab:dead-zone'] === 520 && done() && P.getProgress().xp === xp)
+    store.clear()
+    P.saveProgress({ personalBests: { 'lab:dead-zone': 300, 'lab:core-store-ramp': 410 } })
+    const mergedLab = await P.importProgressCode(labCode)
+    const pb = P.getProgress().personalBests
+    check('lab: a restore keeps the faster solve and never drops one', mergedLab.ok && pb['lab:dead-zone'] === 520 && pb['lab:core-store-ramp'] === 410)
+  }
 }
 
 main().catch((e) => {

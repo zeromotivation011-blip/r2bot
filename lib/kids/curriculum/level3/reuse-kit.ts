@@ -5,7 +5,7 @@
 // (lab-links.ts has no imports), safe in a client island. Links open the exact
 // tier (?tier=) or arena (?demo=) the session is about.
 
-import { gameTierHref, labDemoHref } from '../../sim/lab-links'
+import { gameTierHref, labDemoHref, labSolved } from '../../sim/lab-links'
 
 /** The playable challenge, live today. `goal` is the success condition in words. */
 export type ReusePlay =
@@ -13,7 +13,7 @@ export type ReusePlay =
   | { kind: 'game'; id: string; tier: 0 | 1 | 2 | 3; goal: string }
   /** A Code Lab mission (Blockly, real physics): /kids/code-lab/<id>. Done when codeMissions[id] exists. */
   | { kind: 'code-lab'; id: string; goal: string }
-  /** A Physics Lab arena (/kids/lab/sim?demo=<id>, lib/kids/sim/demos.ts) or a Power Lab challenge (/kids/lab/power?demo=power-…). Done when the child reports it (the labs have no store). */
+  /** A Physics Lab arena (/kids/lab/sim?demo=<id>, lib/kids/sim/demos.ts) or a Power Lab challenge (/kids/lab/power?demo=power-…). Done when the lab has recorded a solve: personalBests["lab:<id>"] (lib/kids/sim/lab-results.ts). */
   | { kind: 'sim-demo'; id: string; goal: string }
   /** A Skill Galaxy activity: /kids/galaxy/<track>/<id>. Done when the activities store has it. */
   | { kind: 'activity'; id: string; goal: string }
@@ -46,7 +46,7 @@ export function reusePlayDone(play: ReusePlay, p: ReuseProgress, activitiesDone:
     case 'activity':
       return activitiesDone[play.id] !== undefined
     case 'sim-demo':
-      return false
+      return labSolved(p.personalBests, play.id)
   }
 }
 

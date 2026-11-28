@@ -11,7 +11,7 @@
 // device sends (lib/kids/classroom.ts) fails type-check until it is described
 // here — the pack cannot silently fall behind the data. The table columns mirror
 // supabase/migrations/0054_kids_classroom.sql, 0055_kids_schools.sql,
-// 0056_kids_classroom_wave2.sql and 0058_kids_class_band.sql.
+// 0056_kids_classroom_wave2.sql, 0058_kids_class_band.sql and 0059_kids_class_kind.sql.
 //
 // Pure data, safe in the browser (the PDF is made on the device by
 // ./pdf-trust.ts) and on the server (/kids/teach/trust).
@@ -29,8 +29,8 @@ import {
   type ClassSnapshot,
 } from '../classroom'
 
-export const TRUST_PACK_UPDATED = '2026-11-27'
-export const TRUST_PACK_VERSION = '1.3'
+export const TRUST_PACK_UPDATED = '2026-11-28'
+export const TRUST_PACK_VERSION = '1.4'
 export const TRUST_CONTACT = 'hello@r2bot.in'
 
 export type Audience = 'teacher' | 'school-admin' | 'child-device' | 'nobody'
@@ -111,14 +111,15 @@ export const SERVER_TABLES: StoredTable[] = [
   },
   {
     table: 'kids_classes',
-    purpose: 'The classes a teacher creates.',
+    purpose: 'The classes a teacher, club leader or parent creates (a school class, a club, a family class or a library group).',
     createdWhen: 'When a signed-in teacher creates a class.',
     fields: [
       { name: 'class_name', what: 'The class name the teacher types (1–60 characters).', seenBy: 'The teacher; shown to children who join', personal: 'no' },
       { name: 'teacher_name', what: 'Optional name the teacher chooses to show children (up to 40 characters).', seenBy: 'The teacher and the class’s children', personal: 'yes (adult)' },
       { name: 'school_name', what: 'Optional school name (up to 100 characters).', seenBy: 'The teacher and the class’s children', personal: 'no' },
-      { name: 'band', what: 'The age band the class is for.', seenBy: 'The teacher and the class’s children', personal: 'no' },
-      { name: 'band_locked', what: 'Yes/no: whether every child in the class plays at the class band (children’s devices follow it on their next sync).', seenBy: 'The teacher; the class’s children receive the band', personal: 'no' },
+      { name: 'kind', what: 'What sort of group it is: a school class, a club, a family class or a library group. In a club, family or library class the ages are mixed and every child keeps the band they chose. A word chosen by the adult, nothing about any child.', seenBy: 'The teacher; shown to the class’s children', personal: 'no' },
+      { name: 'band', what: 'The age band the class is for; in a club, family or library class, the youngest band (used for the shared opening activity).', seenBy: 'The teacher and the class’s children', personal: 'no' },
+      { name: 'band_locked', what: 'Yes/no: whether every child in a school class plays at the class band (children’s devices follow it on their next sync). Always off in a club, family or library class.', seenBy: 'The teacher; the class’s children receive the band', personal: 'no' },
       { name: 'join_code', what: 'A random six-character code (no I, L, O, 0 or 1).', seenBy: 'The teacher; shared with the class', personal: 'no' },
       { name: 'goal', what: 'The Class Power-Up goal the teacher sets: a title, a target number, a start and end date and a theme (no child data).', seenBy: 'The teacher; shown to the class’s children as one meter', personal: 'no' },
       { name: 'teacher_id, created_at, updated_at', what: 'The teacher’s account id and dates.', seenBy: 'Nobody (server only)', personal: 'yes (adult)' },

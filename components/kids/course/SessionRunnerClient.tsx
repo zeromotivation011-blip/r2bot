@@ -335,6 +335,9 @@ export default function SessionRunnerClient({ session, level, levelTitle, actTit
                     The game opens on the <span className="font-bold text-amber-300">{TIER_LABEL[reuse.play.tier]}</span> tier. Win a round there (or on a harder tier), then come back here.
                   </p>
                 )}
+                {reuse.play.kind === 'sim-demo' && (
+                  <p className="mt-2 text-[15px] text-[#A7B0C0]">The lab opens on this arena. Solve it there, then come back here: the lab remembers it.</p>
+                )}
                 <div className="mt-4 flex flex-wrap gap-3">
                   {play?.href && (
                     <Link
@@ -344,7 +347,8 @@ export default function SessionRunnerClient({ session, level, levelTitle, actTit
                       Play it →
                     </Link>
                   )}
-                  {!solved && (reuse.play.kind === 'sim-demo' || reuse.play.kind === 'activity') && (
+                  {/* A lab arena counts itself (the lab records the solve); only a Galaxy activity is self-reported. */}
+                  {!solved && reuse.play.kind === 'activity' && (
                     <button
                       type="button"
                       onClick={onReuseDone}

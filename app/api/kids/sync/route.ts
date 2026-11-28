@@ -19,6 +19,7 @@ import {
   isTokenShape,
   jsonError,
   loadMemberBandLock,
+  loadMemberClassKind,
   notReadyResponse,
   readJsonCapped,
 } from '@/lib/kids/classroom-server'
@@ -94,6 +95,8 @@ export async function POST(req: NextRequest): Promise<Response> {
     nickname: member.nickname,
     // Roadmap #29 (migration 0058): null before it runs, so children keep their own band.
     lockedBand: await loadMemberBandLock(admin, member.id),
+    // Roadmap #84 (migration 0059): undefined before it runs (reads as a school class).
+    kind: await loadMemberClassKind(admin, member.id),
   }
   return Response.json({ ok: true, class: info }, { headers: { 'Cache-Control': 'no-store' } })
 }

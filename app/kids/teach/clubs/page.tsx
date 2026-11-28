@@ -56,7 +56,7 @@ export default function ClubsPage() {
           room while each works at their own level, and older members learn by explaining.
         </p>
         <div className="teach-no-print mt-5 flex flex-wrap gap-3">
-          <Link href="/kids/classroom" className="inline-flex min-h-[48px] items-center rounded-xl bg-amber-500 px-5 font-bold text-[#1A1103] hover:bg-amber-400">Create your club</Link>
+          <Link href="/kids/classroom?kind=club" className="inline-flex min-h-[48px] items-center rounded-xl bg-amber-500 px-5 font-bold text-[#1A1103] hover:bg-amber-400">Create your club</Link>
           <PresentButton source={{ kind: 'episode', slug: weeks[0].stations[0].episode.href.split('/').pop() ?? '' }} gate={false} label="Present week 1’s hook" />
           <Link href="/kids/teach/unplugged" className="inline-flex min-h-[48px] items-center rounded-xl px-3 font-bold text-amber-300 hover:underline">No devices? Unplugged lessons →</Link>
         </div>

@@ -372,7 +372,7 @@ export default function Level2SessionRunnerClient({ data, level = 2 }: { data: L
                   </h2>
                   <p className="mt-1 text-[16px] leading-snug text-[#EEF2F8]">{arena.task}</p>
                   <p className="mt-1 text-[14px] text-[#A7B0C0]">{arena.lesson}</p>
-                  {arena.kind === 'physics' && <p className="mt-1 text-[14px] text-[#A7B0C0]">In the Physics Lab, pick “{arena.title.replace(' (Physics Lab)', '')}” from the challenge list.</p>}
+                  {arena.kind === 'physics' && <p className="mt-1 text-[14px] text-[#A7B0C0]">The button opens the Physics Lab on “{arena.title.replace(' (Physics Lab)', '')}”, ready to go.</p>}
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">

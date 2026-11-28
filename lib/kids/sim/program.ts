@@ -34,6 +34,8 @@ export type Stmt =
   | { op: 'if'; id: string; cond: Expr; then: Stmt[]; else?: Stmt[] }
   | { op: 'grip_open' | 'grip_close' | 'pen_down' | 'pen_up' | 'light_on' | 'light_off' | 'beep'; id: string }
   | { op: 'say'; id: string; text: Expr }
+  /** Move the claw or scoop to a carry position (Level 3 Session 14): high = up and back, low = down and forward. */
+  | { op: 'set_carry'; id: string; pos: 'high' | 'low' | 'normal' }
   | { op: 'set_var'; id: string; name: string; value: Expr }
   | { op: 'change_var'; id: string; name: string; by: Expr }
 
@@ -64,6 +66,7 @@ export const STMT_NEEDS: Partial<Record<StmtOp, Capability>> = {
   pen_up: 'draw',
   light_on: 'light',
   light_off: 'light',
+  set_carry: 'grab',
 }
 
 /** Every block id the program uses (statements and reporters). */
@@ -135,6 +138,7 @@ export const BLOCK_LABEL: Record<string, string> = {
   pen_up: 'pen up',
   light_on: 'light on',
   light_off: 'light off',
+  set_carry: 'carry position',
 }
 
 export function lockMessage(blockId: string, need: Capability): string {

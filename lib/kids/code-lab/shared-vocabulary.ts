@@ -1,7 +1,6 @@
 // lib/kids/code-lab/shared-vocabulary.ts
 //
-// ONE BLOCK LANGUAGE (roadmap #21) — what is shared today, and why Code Lab is
-// not (yet) a Blockly editor.
+// ONE BLOCK LANGUAGE (roadmap #21) — how Code Lab's blocks map onto the shared set.
 //
 // R2BOT Kids has one block vocabulary, the SHARED BLOCK SET in
 // lib/kids/sim/program.ts (Blockly in the Physics Lab and course challenges,
@@ -20,21 +19,21 @@
 //     the shared blocks' emoji — so a child who moves from Code Lab (5–10) to the
 //     Physics Lab (8–17) recognises every block by colour and picture.
 //
-// Why not port the missions to Blockly now (recorded 27 Nov 2026):
-//   1. Code Lab's editor is tap-only with ≥48 px targets and full switch/keyboard
-//      access; Blockly is drag-first and its touch targets on a 390 px phone are
-//      ~28 px. For 5–7-year-olds that is a regression the access checklist
-//      (lib/kids/access.verify.ts) would flag, and PictureProgramClient — the
-//      shared set's own young-child editor — exists precisely to avoid it.
-//   2. The grid interpreter is what makes the missions fair and verifiable
-//      (code-lab/verify.ts runs every reference solution on every arena). The
-//      continuous Rapier sim cannot replace it without re-tuning all 24 missions
-//      and their 3-star budgets.
-//   3. The product review (§ "Move #21 out of Wave 1") schedules the port with
-//      Level 2, the first course that needs blocks beyond the picture set.
-// The port path, when it comes: render Code Lab palettes with the Blockly
-// blocks named below (grid-unit fields instead of cm/degrees), compile the
-// workspace to the Code Lab `Block` tree, keep this interpreter and verify.
+// The port (done 28 Nov 2026). Code Lab's editor IS Blockly now: the same zelos
+// renderer, kids theme, "▶ when Run is pressed" hat and JSON serialization as the
+// Physics Lab, with the grid blocks of blockly-defs.ts (`grid_*`, drawn in the
+// shared styles below). The three reasons it waited, and how each was met:
+//   1. Touch and switch access for 5–7: Blockly is drag-first and small on a
+//      390 px phone. Answer: the tap palette and edit bar stayed (≥ 48 px, Tab +
+//      Enter, ◀ ▶ to pick a block, one switch) and edit the same workspace;
+//      Explorers get a bigger start zoom and bigger chips; every number, colour
+//      and phrase is a dropdown — nothing to type.
+//   2. Fairness: the grid interpreter stays. The workspace compiles to the Code
+//      Lab `Block` tree (blockly-format.ts) and verify.ts runs every reference
+//      solution through a headless Blockly and back before it must still win.
+//   3. Saved work: drafts are Blockly JSON; an old tap-editor draft is converted
+//      on load (readDraft) and the conversion is verified for every mission.
+// No mission needed the old editor: all 24 are expressible.
 
 import type { BlockType } from './types'
 

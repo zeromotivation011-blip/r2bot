@@ -303,8 +303,8 @@ leaderboards; no streak that punishes a missed day.
 - Levels 3–4 reuse what is playable today: `SessionReuse` (`level3/reuse-kit.ts`, light, no
   imports) names a game tier, Code Lab mission, Physics Lab arena or Galaxy activity. The runner
   shows a play card (`reuse` + `play` props, href from `playForL34()`), counts it done with
-  `reusePlayDone()` when the child comes back (game tier / mission / activity), or an
-  "I finished it" button for Physics Lab arenas and activities; done = `challengeStars: 1`,
+  `reusePlayDone()` when the child comes back (game tier / mission / activity / Physics Lab
+  arena — read from the lab store, `lab-results.ts`), or an "I finished it" button for activities; done = `challengeStars: 1`,
   reported once through `reportBestRun({ kind: 'challenge' })`. Levels 2+ show the episode as
   the storybook (`EpisodeStepClient storybookOnly`): there are no 3D episode files for them.
 - Check questions: every wrong option carries `misconception: <id>` (both types), listed with a
@@ -349,6 +349,10 @@ leaderboards; no streak that punishes a missed day.
   for every robot; the renderer draws the distance beam only for robots that see walls, and
   `components/kids/sim/sensor-view.ts` draws the robot's-eye PiP. Less motion / Lite 3D respected.
 - Check: `lib/kids/robot-growth.verify.ts` (CI).
+- AR (camera magic window and WebXR immersive-ar) builds through `buildARRobot()` in
+  `components/kids/three/ar-robot.ts` = `buildRobot(design, { worldForm: true, learned })`, so AR shows
+  the same form, parts, colours and learned glow as the Workshop (only X-ray is left out). Check:
+  `components/kids/three/ar-robot.verify.ts` (CI).
 
 ## Lab — Flight Recorder, battery, Power Lab (roadmap #38, #39)
 - `lib/kids/sim/recorder.ts`: every Physics Lab, Power Lab and course-challenge run is recorded
@@ -369,6 +373,16 @@ leaderboards; no streak that punishes a missed day.
   `BlockId`s introduced at Level 3; the Physics Lab and Power Lab open a demo with `?demo=<id>`
   and games a tier with `?tier=` (links built by `lib/kids/sim/lab-links.ts`).
 - The sim meters the robot's own pack (`powerPack(d)` = its power upgrade).
+- **Motor dead zone** (Wave 4): below `MOTOR_DEAD_ZONE_PCT` (12 %, `RobotSpec.deadZonePct`) the motor
+  hums and the wheels do not turn; a sagging battery widens it and an arena may set
+  `motorDeadZonePct`. `telemetry().humming` feeds the Flight Recorder's "Why did it fail?".
+- **Carry + tipping**: block `set_carry` (low | high | normal, needs `grab`; a curriculum `BlockId`
+  from Level 3) moves the load; goal `deliver` (load released in a zone); a robot tilted past 35°
+  fails `tipped` (also `not-delivered`). The drive pushes at the tyre contact, not the centre of mass
+  (that is what lets a robot tip); sim verify checks that flat-ground starts, reversals and spins never tip.
+- **Lab store**: `lib/kids/sim/lab-results.ts` keeps a solve as `personalBests["lab:<id>"]` via
+  `reportBestRun({ kind: 'challenge' })`, higher-is-better (tenths of a second to spare) so a backup
+  merge (max) keeps the faster solve. Physics Lab and Power Lab report every finished run and show ✓.
 - **No black screens** (roadmap #16): `createStage()` in `components/kids/three/stage.ts` handles
   `webglcontextlost` with a "3D is resting" poster and "Try again"; when WebGL cannot start it shows
   the poster and throws `WebGLUnavailableError`. A view that builds its own `WebGLRenderer` calls
@@ -453,6 +467,14 @@ world lists come from `GAMES` and `WORLDS`. Before promoting a sample, give
   `KidsClassSyncClient`), so replays cannot fill it. Goal in `kids_classes.goal` (migration 0056); before
   it runs the goal lives on the teacher's device and the child card stays hidden. Projector:
   `/kids/classroom/<id>/projector`. Both new device stores use `profileKey()`.
+- **Class kind** (roadmap #84, migration 0059): `kids_classes.kind` = school | club | family | library
+  (`CLASS_KINDS` in `classroom.ts`). In a mixed class (club/family/library) a child keeps their own band:
+  the join does not apply the class band and a whole-class band lock is refused or lifted
+  (`effectiveBandLock`, `joinBandFor`); a leader can still lock one child. `/api/kids/sync` returns
+  `kind`. Before 0059 every class reads as a school; the leader's choice waits in
+  `classroom-kind-store.ts` and is sent once after it runs. Guides preselect with `?kind=`.
+- Course badges of all four levels on the class page (`classCourseBadges()`, roster order, never ranked);
+  `sessionsPerLevel()` in the roster.
 - Check: `lib/kids/classroom-wave2.verify.ts` (CI).
 
 ## Teaching tools — Present mode, Trust Pack, clubs, unplugged (roadmap #42, #43, #84, #85)
@@ -484,6 +506,11 @@ world lists come from `GAMES` and `WORLDS`. Before promoting a sample, give
 - Backup code extras: `builds` (`buildsBackupExtra`: 3-char FNV tag + day + fair-test result, no
   reflections; tags are collision-checked in the builds verify) and `portfolio` (`portfolioBackupExtra`:
   the newest snapshots that fit 512 chars). Restores merge and never remove.
+- Build → Robodex: answering the "I built it" check-in calls `discoverRobot()` for the build's card
+  (`lib/kids/builds/robodex.ts`); earlier or restored check-ins find their card on the next visit to the
+  build page or the hub.
+- Garage certificates: `HangarCertificatesClient` (logic `certificate-levels.ts`) shows every finished
+  level plus the next one (following the band; Level 1 with no band).
 
 ## Robot Passport (roadmap #12) — migration 0057
 `lib/kids/passport*.ts`, route `app/api/kids/passport`, UI in `BackupCodeClient` (Garage + Settings).
@@ -505,10 +532,21 @@ Re-voice with `scripts/kids-voices/generate-stories.py`. The Episodes Theatre sh
 `lib/kids/episodes/story-voice.verify.ts` (CI).
 
 ## One block language (roadmap #21)
-Code Lab keeps its grid interpreter (tap-first, verifiable missions) but its blocks share the
-Blockly set's colours and emoji; `lib/kids/code-lab/shared-vocabulary.ts` maps each Code Lab block
-to the shared block and holds the porting path. The Code Lab verify checks that the same robot part
-locks a block in both editors and that the colours match.
+Code Lab's editor is Blockly (Wave 4), with the Physics Lab's look (zelos, `kidsTheme()`, the same
+"▶ when Run is pressed" start block). Its grid blocks (`grid_*`) are defined in
+`lib/kids/code-lab/blockly-defs.ts` and compiled to the unchanged grid interpreter by
+`lib/kids/code-lab/blockly-format.ts`. **A new Code Lab block needs a `GRID_TYPE` entry plus a
+definition.** Drafts are `{ format: 'codelab-blockly-1', workspace }` under the unchanged key
+`r2bot_kids_codelab_draft_<id>` (still in `SWAPPED_PREFIXES`); `readDraft` converts an old draft on load
+and saves it back. Explorers blocks have no typed fields (verify fails otherwise); the tap palette,
+◀ ▶ block picker and a screen-reader outline keep keyboard and switch access.
+`shared-vocabulary.ts` maps each Code Lab block to the shared block. The Code Lab verify runs every
+reference solution through headless Blockly and back and checks part locks and colours match.
+
+## Number box (Explorers variables)
+Skill Galaxy template `number-box` (`components/kids/activities/templates/number-box/`): a box holds one
+number 0–10, picture cards change it (put in / take out / empty it); questions `end`, `trace`, `missing`.
+No timers, no drag; every number is also drawn as pictures. It is a Launch Check quick template.
 
 ## Robot Maths and inclusion (roadmap #86, #87)
 - `/kids/maths` + `/kids/maths/<concept>` (indexable; count from `MATHS_CONCEPTS` in

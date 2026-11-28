@@ -50,7 +50,7 @@ const SHARE_RULE = 'Shared with the class and the child’s family gallery. Neve
 export const BLOCKS_INTRODUCED: Record<LevelNumber, BlockId[]> = {
   1: ['say', 'beep', 'wait', 'drive_for', 'turn_degrees', 'repeat', 'pen_down', 'pen_up', 'grip_close', 'grip_open', 'light_on', 'light_off', 'repeat_until', 'bumped', 'if', 'distance_cm', 'compare'],
   2: ['drive_distance', 'set_motors', 'stop', 'number', 'line_seen', 'if_else', 'forever', 'and', 'or', 'not', 'timer_s', 'floor_color'],
-  3: ['variable_set', 'variable_change', 'variable_get', 'math', 'heading_deg', 'line_offset', 'reflectance', 'battery_pct'],
+  3: ['variable_set', 'variable_change', 'variable_get', 'math', 'heading_deg', 'line_offset', 'reflectance', 'battery_pct', 'set_carry'],
   4: [],
 }
 
@@ -307,7 +307,7 @@ const L3_SESSIONS: SessionOutline[] = [
   s(12, 'Make It Yours: Weather Mast Inspector', 'Design an inspection run that follows the mast cables, logs readings and returns before the battery runs low.', ['design-process', 'data', 'feedback-control']),
   // Act 3 — The Boulder Field
   s(13, 'Legs or Tracks?', 'Compare legs and tracks on boulders and snow, and choose from measured trade-offs.', ['physics', 'design-process', 'data'], { part: { slot: 'drive', id: 'legs' } }),
-  s(14, 'Centre of Mass', 'Find where a robot tips on a slope and move its load to make it stable.', ['physics']),
+  s(14, 'Centre of Mass', 'Find where a robot tips on a slope and move its load to make it stable.', ['physics'], { newBlocks: ['set_carry'] }),
   s(15, 'Where Am I? Odometry', 'Keep x and y variables up to date from your own drive_distance moves and 90° turns on a grid, and watch the estimate drift from the truth when wheels slip on snow.', ['variables', 'sensors', 'autonomy']),
   s(16, 'Landmarks Fix Drift', 'Use coloured markers to reset the position estimate.', ['sensors', 'variables', 'autonomy']),
   s(17, 'Fragile Samples', 'Approach an ice-core sample slowly, slowing down in proportion to the distance left, then grip gently.', ['feedback-control', 'sequences'], { part: { slot: 'tool', id: 'gripper' } }),

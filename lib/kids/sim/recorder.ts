@@ -194,6 +194,7 @@ export function timelineMarkers(events: readonly SimEvent[]): TimelineMarker[] {
     else if (e.kind === 'grab') out.push({ t: e.t, kind: 'grab', label: 'Grab' })
     else if (e.kind === 'drop') out.push({ t: e.t, kind: 'drop', label: 'Drop' })
     else if (e.kind === 'touch') out.push({ t: e.t, kind: 'touch', label: 'Touch' })
+    else if (e.kind === 'tip') out.push({ t: e.t, kind: 'crash', label: 'Tipped' })
     else if (e.kind === 'battery' && e.text === 'flat') out.push({ t: e.t, kind: 'flat', label: 'Flat' })
     else if (e.kind === 'battery' && e.text === 'low') out.push({ t: e.t, kind: 'low', label: 'Low' })
     else if (e.kind === 'battery' && e.text === 'charging') out.push({ t: e.t, kind: 'charge', label: 'Charging' })
@@ -275,8 +276,21 @@ export function whyFailed(frames: readonly FlightFrame[], events: readonly SimEv
       const t = firstSustained(frames, 0.3, (f) => f.lineSeen === false) ?? end.t
       return { t, kind: 'lost-line', label: 'Lost the line', graph: 'sensors', detail: 'Here the line sensor stopped seeing the line. Look at the line offset just before: it was at the edge, so steer harder or drive slower.' }
     }
+    case 'tipped': {
+      const e = firstEvent('tip')
+      return { t: e?.t ?? end.t, kind: 'end', label: 'Tipped over', graph: 'speed', detail: 'Here the robot tilted past 35° and fell. The balance point (centre of mass) went outside its wheels: carry the load lower and further forward.' }
+    }
+    case 'not-delivered':
+      return { t: end.t, kind: 'end', label: 'Not delivered', graph: 'motors', detail: `${result.message ?? 'The load did not end up in the marked spot.'}` }
     case 'short':
     case 'timeout': {
+      // The dead zone: the program asked for power, but too little to turn the wheels.
+      const hum = firstSustained(frames, 0.5, (f) => Boolean(f.drive.humming && (f.drive.humming[0] || f.drive.humming[1])))
+      if (hum !== null) {
+        const f = frames[frameIndexAt(frames, hum)]
+        const pct = Math.max(Math.abs(f.drive.motorPct[0]), Math.abs(f.drive.motorPct[1]))
+        return { t: hum, kind: 'stopped', label: 'Dead zone', graph: 'motors', detail: `Here the motors got ${Math.round(pct)} % — too little to beat the gearbox’s friction, so they hummed and the wheels did not turn. That is the motor’s dead zone: give it more power.` }
+      }
       let t = end.t
       for (let i = frames.length - 1; i >= 0; i--) {
         if (frames[i].snap.groundSpeed > 0.02) {

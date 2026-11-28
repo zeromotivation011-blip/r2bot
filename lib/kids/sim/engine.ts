@@ -54,6 +54,17 @@ const NO_LOAD = 1.3
 const MOTOR_FLOOR = 0.12
 /** Tip out drops a scooped load this far in front of the body's front edge: on the next Level 1 tile for every body. */
 const SCOOP_DROP_AHEAD = 0.2
+/** Tilted further than this from upright (pitch or roll), the robot has tipped over: it cannot drive on. */
+export const TIP_DEG = 35
+/**
+ * Where the claw or scoop holds a load (the carry positions, Level 3 Session 14). 'normal' is
+ * where it has always ridden (a scoop: in a bucket over the wheels; a claw: just in front);
+ * 'high' lifts it up and back over the robot; 'low' carries it down near the floor and forward.
+ */
+export type CarryPos = 'normal' | 'high' | 'low'
+/** The 'high' carry position: this far above the 'normal' one, metres, and this far behind the body's back edge. */
+const CARRY_HIGH_LIFT = 0.12
+const CARRY_HIGH_BACK = 0.03
 
 type V3 = { x: number; y: number; z: number }
 type Q = { x: number; y: number; z: number; w: number }
@@ -89,7 +100,7 @@ export function headingToYaw(deg: number): number {
 
 export interface SimEvent {
   t: number
-  kind: 'say' | 'beep' | 'grab' | 'drop' | 'crash' | 'miss' | 'stalled' | 'touch' | 'light' | 'pen' | 'battery'
+  kind: 'say' | 'beep' | 'grab' | 'drop' | 'crash' | 'miss' | 'stalled' | 'touch' | 'light' | 'pen' | 'battery' | 'tip' | 'carry'
   text?: string
 }
 
@@ -148,6 +159,8 @@ export interface SimSnapshot {
   holding: string | null
   penDown: boolean
   crashed: boolean
+  /** Has the robot tipped over (tilted past TIP_DEG) at any point? */
+  tipped?: boolean
 }
 
 export interface Sim {
@@ -166,6 +179,13 @@ export interface Sim {
   sensors(): SensorReadings
   snapshot(): SimSnapshot
   grip(close: boolean): boolean
+  /** Move the claw or scoop to a carry position (re-seats a held load). False when the robot has no claw or scoop, or a held load cannot move there. */
+  setCarry(pos: CarryPos): boolean
+  readonly carry: CarryPos
+  /** True once the robot has tipped over (tilted past TIP_DEG). It stays true. */
+  readonly tipped: boolean
+  /** Motor dead zone in force this run, % (the arena's or the robot's). */
+  readonly deadZonePct: number
   setPen(down: boolean): void
   setLight(on: boolean): void
   emit(e: Omit<SimEvent, 't'>): void
@@ -202,6 +222,8 @@ export interface DriveTelemetry {
   slipping: [boolean, boolean]
   /** Force the motor put into the floor, N. */
   force: [number, number]
+  /** Is the command inside the motor's dead zone (the motor hums, the wheel does not turn)? */
+  humming?: [boolean, boolean]
 }
 
 interface DynBody {
@@ -299,6 +321,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     named.set(c.handle, p.id)
   }
   const movers: { id: string; body: RigidBody; height: number }[] = []
+  const moverIds = new Set<string>()
   const moverPose = (m: NonNullable<Arena['movers']>[number], t: number) => {
     const at = moverAt(m, t)
     // Absent = lowered under the floor, out of every ray and contact.
@@ -309,6 +332,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     const body = world.createRigidBody(R.RigidBodyDesc.kinematicPositionBased().setTranslation(p0.x, p0.y, p0.z))
     const c = world.createCollider(R.ColliderDesc.cuboid(m.size[0] / 2, m.height / 2, m.size[1] / 2).setFriction(0.4), body)
     named.set(c.handle, m.id)
+    moverIds.add(m.id)
     movers.push({ id: m.id, body, height: m.height })
   }
 
@@ -335,9 +359,10 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     robot,
   )
   const SKID_R = 0.025
+  const skids: Collider[] = []
   for (const sx of [-1, 1]) {
     for (const z of [b.front * 0.75, b.back * 0.75]) {
-      world.createCollider(frictionless(R.ColliderDesc.ball(SKID_R)).setTranslation(sx * spec.track, SKID_R, z), robot)
+      skids.push(world.createCollider(frictionless(R.ColliderDesc.ball(SKID_R)).setTranslation(sx * spec.track, SKID_R, z), robot))
     }
   }
   const mEffSide = 1 / (1 / spec.mass + (spec.track * spec.track) / iy)
@@ -362,6 +387,13 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
   let penDown = false
   let crashed = false
   let holding: { id: string; joint: ImpulseJoint; body: RigidBody; mass: number } | null = null
+  let carry: CarryPos = 'normal'
+  let tipped = false
+  /** Motor dead zone, % of full power: the arena's (a worn motor, a fault) or the robot's own. */
+  const deadZonePct = Math.max(0, Math.min(90, arena.motorDeadZonePct ?? spec.deadZonePct))
+  /** The wheel speed each motor is driving toward this tick, m/s (0 inside the dead zone). */
+  const driveTgt: [number, number] = [0, 0]
+  const humming: [boolean, boolean] = [false, false]
   let travelled = 0
   let lastLineOffset = 0
   let lineSamples: boolean[] = LINE_SAMPLES.map(() => false)
@@ -532,7 +564,11 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     motorForce[0] = motorForce[1] = 0
     scrubWatts = 0
     for (let s = 0; s < 2; s++) {
-      const dv = clamp(target[s] * vFactor - wheelSpeed[s], -spec.drive.wheelAccel * DT, spec.drive.wheelAccel * DT)
+      // The dead zone: too little power (after any battery sag) and the motor cannot beat its own
+      // gearbox friction: it hums, and the wheel stays where it is.
+      humming[s] = cmdPct[s] !== 0 && Math.abs(cmdPct[s]) * vFactor < deadZonePct
+      driveTgt[s] = humming[s] ? 0 : target[s] * vFactor
+      const dv = clamp(driveTgt[s] - wheelSpeed[s], -spec.drive.wheelAccel * DT, spec.drive.wheelAccel * DT)
       wheelSpeed[s] += dv
     }
     // Off the ground (or on its side) every wheel turn is slip.
@@ -557,7 +593,6 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     const vf = dot(v, f)
     const vr = dot(v, r)
     const wn = dot(wv, n)
-    const com = add(pos, scale(up, spec.comY))
     let scrubMu = 0
     for (let s = 0; s < 2; s++) {
       // s = 0 left, s = 1 right. Left contact sits at -r·track.
@@ -577,7 +612,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       const slip = wheelSpeed[s] - vSide
       // A stopped geared motor holds the robot on a slope (it is not free-wheeling): it pushes
       // against this side's share of gravity along the ground, as well as against any rolling.
-      const hold = target[s] === 0 && wheelSpeed[s] === 0 ? (G * f.y * (spec.mass + (holding ? holding.mass : 0))) / 2 : 0
+      const hold = driveTgt[s] === 0 && wheelSpeed[s] === 0 ? (G * f.y * (spec.mass + (holding ? holding.mass : 0))) / 2 : 0
       const want = ((slip * mEffSide) / DT + Math.sign(wheelSpeed[s]) * drag) * 0.8 + hold
       const gripLimit = mu * loadSide
       // Back-EMF taken at the ground speed: a gripping wheel turns at it, and a spinning wheel in
@@ -602,7 +637,10 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       // Rolling drag works like friction: it can hold the robot still against a weak push,
       // and it never reverses the robot's motion.
       F += clamp(-((vSide * mEffSide) / DT + F), -drag, drag)
-      const point = add(com, scale(r, side * spec.track))
+      // The push acts where the tyre meets the floor, below the centre of mass: speeding up pitches
+      // the nose up a little, and on a slope a load carried high can tip the robot backwards
+      // (Level 3 Session 14). Pushed at the centre of mass instead, nothing could ever tip.
+      const point = add(pos, scale(r, side * spec.track))
       robot.applyImpulseAtPoint(scale(f, F * DT), point, true)
     }
     // Tyres resist sliding sideways.
@@ -623,10 +661,10 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     for (let i = 0; i < body.numColliders(); i++) body.collider(i).setSensor(!solid)
   }
 
-  function checkTouches(c: Collider): void {
+  function checkTouches(c: Collider, only?: ReadonlySet<string>): void {
     world.contactPairsWith(c, (other) => {
       const id = named.get(other.handle)
-      if (id === undefined || touched.has(id)) return
+      if (id === undefined || touched.has(id) || (only && !only.has(id))) return
       let hit = false
       world.contactPair(c, other, (manifold) => {
         if (manifold.numContacts() > 0) hit = true
@@ -641,6 +679,9 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
   function checkCrash(): void {
     if (named.size > 0) {
       checkTouches(chassis)
+      // The skids poke a few millimetres past the front of some bodies: a barrier that stands in
+      // the robot's way is met by them first. (Props are judged by the body, as always.)
+      if (moverIds.size > 0) for (const sk of skids) checkTouches(sk, moverIds)
       if (holding) {
         const n = holding.body.numColliders()
         for (let i = 0; i < n; i++) checkTouches(holding.body.collider(i))
@@ -684,6 +725,51 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     if (ev) events.push({ t: time, kind: 'battery', text: ev })
   }
 
+  /** Where a held load sits in the robot's frame, for this tool and carry position. */
+  function carryAnchor(o: Arena['objects'][number] | undefined, pos: CarryPos): V3 {
+    const size = o?.size ?? 0.03
+    if (design.tool === 'scoop') {
+      const normal = spec.body.top + size + 0.005
+      if (pos === 'high') return { x: 0, y: normal + CARRY_HIGH_LIFT, z: spec.body.back - CARRY_HIGH_BACK }
+      // Low: the bucket lowered in front of the nose, the load's bottom 3 cm above the floor.
+      if (pos === 'low') return { x: 0, y: size + 0.03, z: spec.body.front + size * 0.5 }
+      return { x: 0, y: normal, z: 0 }
+    }
+    const lift = size + 0.01
+    const normal = Math.max(spec.toolTip[1], lift)
+    const z = spec.toolTip[2] + size * 0.6
+    if (pos === 'high') return { x: spec.toolTip[0], y: normal + CARRY_HIGH_LIFT, z }
+    if (pos === 'low') return { x: spec.toolTip[0], y: lift, z }
+    return { x: spec.toolTip[0], y: normal, z }
+  }
+
+  /** Would a claw's load at this anchor sit inside a wall, a box or a prop? */
+  function clawBlocked(o: Arena['objects'][number] | undefined, body: RigidBody, anchorLocal: V3): boolean {
+    const size = o?.size ?? 0.03
+    const shape = o?.kind === 'ball' ? new R.Ball(size * 0.95) : new R.Cuboid(size * 0.95, size * 0.95, size * 0.95)
+    let blocked = false
+    world.intersectionsWithShape(local(anchorLocal.x, anchorLocal.y, anchorLocal.z), robot.rotation(), shape, () => {
+      blocked = true
+      return false
+    }, undefined, undefined, undefined, robot, (c) => notRobot(c) && !floorHandles.has(c.handle) && c.parent()?.handle !== body.handle)
+    return blocked
+  }
+
+  /** Put a load at the anchor and weld it there with a fixed joint (its mass now rides on the robot). */
+  function seat(body: RigidBody, anchorLocal: V3): ImpulseJoint {
+    body.setTranslation(local(anchorLocal.x, anchorLocal.y, anchorLocal.z), true)
+    body.setRotation(robot.rotation(), true)
+    body.setLinvel(robot.linvel(), true)
+    const joint = world.createImpulseJoint(
+      R.JointData.fixed(anchorLocal, { x: 0, y: 0, z: 0, w: 1 }, { x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0, w: 1 }),
+      robot,
+      body,
+      true,
+    )
+    joint.setContactsEnabled(false)
+    return joint
+  }
+
   const sim: Sim = {
     arena,
     design,
@@ -705,6 +791,13 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
     get crashed() {
       return crashed
     },
+    get tipped() {
+      return tipped
+    },
+    get carry() {
+      return carry
+    },
+    deadZonePct,
     touched,
     objectPos(id) {
       const body = pickups.get(id)
@@ -735,6 +828,13 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
       travelled += Math.hypot(p.x - prevPos.x, p.z - prevPos.z)
       prevPos = p
       checkCrash()
+      if (!tipped) {
+        const up = rot(robot.rotation(), { x: 0, y: 1, z: 0 })
+        if (up.y < Math.cos((TIP_DEG * Math.PI) / 180)) {
+          tipped = true
+          events.push({ t: time, kind: 'tip' })
+        }
+      }
       sampleLine()
       stepPower()
       if (penDown) {
@@ -772,6 +872,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
         groundSpeed: [sideGround[0], sideGround[1]],
         slipping: [sideSlip[0], sideSlip[1]],
         force: [motorForce[0], motorForce[1]],
+        humming: [humming[0], humming[1]],
       }
     },
     snapshot() {
@@ -787,6 +888,7 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
         holding: holding?.id ?? null,
         penDown,
         crashed,
+        tipped,
       }
     },
     grip(close) {
@@ -832,57 +934,47 @@ export function createSim(R: Rapier, arena: Arena, design: RobotDesign): Sim {
         return false
       }
       const o = arena.objects.find((x) => x.id === best.id)
-      const lift = (o?.size ?? 0.03) + 0.01
       if (design.tool === 'scoop') {
         // A scoop slides under the thing and swings it up into a bucket over the wheels, so even a
         // heavy load rides on the robot's back instead of tipping it onto its nose on a slope.
-        const size = o?.size ?? 0.03
-        const anchorLocal = { x: 0, y: spec.body.top + size + 0.005, z: 0 }
-        best.body.setTranslation(local(anchorLocal.x, anchorLocal.y, anchorLocal.z), true)
-        best.body.setRotation(robot.rotation(), true)
-        best.body.setLinvel(robot.linvel(), true)
-        const joint = world.createImpulseJoint(
-          R.JointData.fixed(anchorLocal, { x: 0, y: 0, z: 0, w: 1 }, { x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0, w: 1 }),
-          robot,
-          best.body,
-          true,
-        )
-        joint.setContactsEnabled(false)
+        holding = { id: best.id, joint: seat(best.body, carryAnchor(o, carry)), body: best.body, mass: o?.mass ?? 0 }
         // In the bucket it rides above the floor: it does not drag on ramps or snag on the way.
         setSolid(best.body, false)
-        holding = { id: best.id, joint, body: best.body, mass: o?.mass ?? 0 }
         events.push({ t: time, kind: 'grab', text: best.id })
         sensorCache = null
         return true
       }
       // A claw: snap to the tip, then weld with a fixed joint (its mass now rides on the robot).
-      const anchorLocal = { x: spec.toolTip[0], y: Math.max(spec.toolTip[1], lift), z: spec.toolTip[2] + (o?.size ?? 0.03) * 0.6 }
-      const anchor = local(anchorLocal.x, anchorLocal.y, anchorLocal.z)
+      const anchorLocal = carryAnchor(o, carry)
       // Would the object end up inside a wall or a box? Then the claw cannot close on it.
-      const size = o?.size ?? 0.03
-      const shape = o?.kind === 'ball' ? new R.Ball(size * 0.95) : new R.Cuboid(size * 0.95, size * 0.95, size * 0.95)
-      const target = best.body
-      let blocked = false
-      world.intersectionsWithShape(anchor, robot.rotation(), shape, () => {
-        blocked = true
-        return false
-      }, undefined, undefined, undefined, robot, (c) => notRobot(c) && !floorHandles.has(c.handle) && c.parent()?.handle !== target.handle)
-      if (blocked) {
+      if (clawBlocked(o, best.body, anchorLocal)) {
         events.push({ t: time, kind: 'miss' })
         return false
       }
-      best.body.setTranslation(anchor, true)
-      best.body.setRotation(robot.rotation(), true)
-      best.body.setLinvel(robot.linvel(), true)
-      const joint = world.createImpulseJoint(
-        R.JointData.fixed(anchorLocal, { x: 0, y: 0, z: 0, w: 1 }, { x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0, w: 1 }),
-        robot,
-        best.body,
-        true,
-      )
-      joint.setContactsEnabled(false)
-      holding = { id: best.id, joint, body: best.body, mass: o?.mass ?? 0 }
+      holding = { id: best.id, joint: seat(best.body, anchorLocal), body: best.body, mass: o?.mass ?? 0 }
       events.push({ t: time, kind: 'grab', text: best.id })
+      sensorCache = null
+      return true
+    },
+    setCarry(pos) {
+      if (design.tool !== 'scoop' && design.tool !== 'gripper') {
+        events.push({ t: time, kind: 'miss' })
+        return false
+      }
+      if (pos === carry) return true
+      if (holding) {
+        const o = arena.objects.find((x) => x.id === holding?.id)
+        const anchorLocal = carryAnchor(o, pos)
+        // A claw's load is solid: it cannot swing through a wall. (A scooped load rides in the bucket.)
+        if (design.tool === 'gripper' && clawBlocked(o, holding.body, anchorLocal)) {
+          events.push({ t: time, kind: 'miss' })
+          return false
+        }
+        world.removeImpulseJoint(holding.joint, true)
+        holding.joint = seat(holding.body, anchorLocal)
+      }
+      carry = pos
+      events.push({ t: time, kind: 'carry', text: pos })
       sensorCache = null
       return true
     },

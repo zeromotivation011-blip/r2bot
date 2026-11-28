@@ -4,12 +4,15 @@ import { useEffect, useId, useState } from 'react'
 import Link from 'next/link'
 import {
   checkNickname,
+  classKindInfo,
   formatJoinCode,
+  joinBandFor,
   isValidJoinCode,
   normaliseJoinCode,
   type JoinedClassInfo,
 } from '@/lib/kids/classroom'
-import { getBand } from '@/lib/kids/bands'
+import { KIDS_BANDS, getBand, type BandId } from '@/lib/kids/bands'
+import { KIDS_PROGRESS_EVENT, getProgress, saveProgress } from '@/lib/kids-progress'
 import {
   clearMembership,
   loadMembership,
@@ -18,7 +21,7 @@ import {
   type StoredMembership,
 } from '@/lib/kids/classroom-membership'
 import { ParentNote } from '@/components/kids/classroom/ParentNote'
-import { activeProfile, bindClassMember, readProfilesState, setPassword, unbindClassMember } from '@/lib/kids/profiles'
+import { activeProfile, applyClassBandToProfile, bindClassMember, readProfilesState, setPassword, unbindClassMember } from '@/lib/kids/profiles'
 import PicturePasswordClient from '@/components/kids/profiles/PicturePasswordClient'
 
 type View = 'loading' | 'form' | 'joined'
@@ -36,9 +39,24 @@ export default function JoinClient() {
   const [notice, setNotice] = useState<string | null>(null)
   // Shared tablet: an Explorer (5–7) whose profile was just made picks a picture key.
   const [pwFor, setPwFor] = useState<string | null>(null)
+  // Roadmap #84: in a club, family or library class the child keeps (or picks) their own band.
+  const [ownBand, setOwnBand] = useState<BandId | null>(null)
   const codeId = useId()
   const nickId = useId()
   const errId = useId()
+
+  useEffect(() => {
+    const read = () => setOwnBand(getProgress().band)
+    read()
+    window.addEventListener(KIDS_PROGRESS_EVENT, read)
+    return () => window.removeEventListener(KIDS_PROGRESS_EVENT, read)
+  }, [])
+
+  function pickOwnBand(b: BandId) {
+    saveProgress({ band: b })
+    applyClassBandToProfile(b)
+    setOwnBand(b)
+  }
 
   useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get('code')
@@ -90,7 +108,9 @@ export default function JoinClient() {
       // Profiles on this device (lib/kids/profiles.ts): tag the child playing now
       // with the class, or — nobody signed in on a shared tablet — make their
       // profile and sign it in FIRST, so the membership lands in it.
-      const pid = bindClassMember({ nickname: data.class.nickname, className: data.class.className, band: data.class.band })
+      // A school class starts a child with no band at the class band; in a mixed
+      // class (club, family, library) the child keeps or picks their own.
+      const pid = bindClassMember({ nickname: data.class.nickname, className: data.class.className, band: joinBandFor(data.class) })
       const prof = pid ? activeProfile() : null
       if (prof && !prof.pw && prof.band === 'explorers' && readProfilesState()?.mode === 'shared') setPwFor(prof.id)
       saveMembership(m)
@@ -158,8 +178,13 @@ export default function JoinClient() {
   }
 
   if (view === 'joined' && membership) {
-    const band = getBand(membership.band)
-    const who = membership.teacherName ? `${membership.teacherName}’s class` : `class ${membership.className}`
+    const kindInfo = classKindInfo(membership.kind)
+    const mixed = kindInfo.mixed
+    const lockedBand = membership.lockedBand ?? null
+    // A mixed class shows the child's own band (or the one their leader set), never the class band.
+    const band = getBand(mixed ? lockedBand ?? ownBand : membership.band)
+    const groupWord = membership.kind === 'club' ? 'club' : membership.kind === 'family' ? 'family class' : membership.kind === 'library' ? 'group' : 'class'
+    const who = membership.teacherName ? `${membership.teacherName}’s ${groupWord}` : `${groupWord} ${membership.className}`
     return (
       <div className="space-y-6">
         <section className="rounded-3xl border-2 border-emerald-400/40 bg-[#111C32] p-6 text-center shadow-xl sm:p-8" aria-live="polite">
@@ -168,10 +193,33 @@ export default function JoinClient() {
             {justJoined ? `You joined ${who}!` : `You are in ${who}`}
           </h1>
           <p className="mt-2 text-lg text-slate-200">
-            Hi <strong className="text-white">{membership.nickname}</strong>! Class: <strong className="text-white">{membership.className}</strong>
+            Hi <strong className="text-white">{membership.nickname}</strong>! {mixed ? "Group" : "Class"}: <strong className="text-white">{membership.className}</strong>
             {band ? <> · {band.emoji} {band.name}</> : null}
           </p>
-          <p className="mt-3 text-base text-slate-300">Every star you earn now shows up for your teacher.</p>
+          {mixed && (
+            <p className="mt-2 text-base text-slate-200">
+              {kindInfo.emoji} Everyone here plays at their own level{band ? <>: you are <strong className="text-white">{band.emoji} {band.name}</strong></> : null}.
+            </p>
+          )}
+          <p className="mt-3 text-base text-slate-300">Every star you earn now shows up for your {membership.kind === 'family' ? 'grown-up' : membership.kind && membership.kind !== 'school' ? 'leader' : 'teacher'}.</p>
+          {mixed && !lockedBand && !ownBand && (
+            <fieldset className="mt-5 text-left">
+              <legend className="w-full text-center text-lg font-extrabold text-white">Pick your band</legend>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {KIDS_BANDS.map((b) => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => pickOwnBand(b.id)}
+                    className="flex min-h-[56px] items-center gap-3 rounded-2xl border border-white/15 bg-[#0A1120] px-4 text-left font-bold text-white hover:border-amber-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+                  >
+                    <span aria-hidden className="text-2xl">{b.emoji}</span>
+                    <span>{b.name} <span className="font-normal text-slate-300">· ages {b.ages}</span></span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          )}
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             <Link href="/kids/course" className="flex min-h-[52px] items-center justify-center rounded-2xl bg-amber-500 px-4 font-extrabold text-[#1A1103] hover:bg-amber-400">🚀 Course</Link>
             <Link href="/kids/galaxy" className="flex min-h-[52px] items-center justify-center rounded-2xl border border-cyan-400/40 bg-cyan-400/10 px-4 font-extrabold text-cyan-100 hover:bg-cyan-400/20">🌌 Skill Galaxy</Link>

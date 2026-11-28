@@ -20,6 +20,11 @@
 //      upgrades in the physics (fittedSpec = specSheet mass and top speed),
 //      the battery each power upgrade carries and its cruise runtime
 //      (cruisePower), deep links (?demo=, ?tier=), the games' Flight Recorder;
+//  10. Wave 4 (build log #23): the motor dead zone (measured per drive, the arena
+//      override, "Find the dead zone"), carry positions (the carry load block,
+//      "Low and slow": high tips every body on the 20° ramp, low delivers),
+//      the drive pushing at the tyre (no tipping on the flat), every demo's
+//      taught mistakes, and the lab result id the course reads;
 //   8. every Level 1 challenge arena (lib/kids/sim/arenas/level1.ts): its
 //      palette, required parts and start match the curriculum session; its
 //      reference program succeeds with the session's robot for ALL FOUR bodies;
@@ -51,6 +56,13 @@ import { gameTierHref, labDemoHref } from './lab-links'
 import { missingParts } from './program'
 import { REFLECTANCE } from './arena'
 import { GAME_MAX_CHANNELS, GameRecorder, hasRecording, markGameMoment, recordGameFrame, setActiveGameRecorder } from './game-recorder'
+import { MOTOR_DEAD_ZONE_PCT } from './robot-spec'
+import { FlightRecorder, whyFailed } from './recorder'
+import { labResultId, labSolved } from './lab-links'
+import { labScore, labTimeOf } from './lab-results'
+import { reusePlayDone } from '../curriculum/level3/reuse-kit'
+import { LEVEL3_REUSE } from '../curriculum/level3/reuse'
+import { LEVEL4_REUSE } from '../curriculum/level4/reuse'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -474,6 +486,7 @@ async function main(): Promise<void> {
   }
 
   wave3Checks(R, push)
+  wave4Checks(R, push)
 
   let failed = 0
   for (const c of checks) {
@@ -654,6 +667,195 @@ function wave3Checks(R: Rapier, push: (name: string, ok: boolean, detail: string
     push('game recorder: 20 frames a second, not 60', snap.frames.length >= 200 && snap.frames.length <= 203, `${snap.frames.length} frames for 10 s`)
     push('game recorder: channels capped, booleans as 0/1, duplicate moments folded', snap.channels.length === GAME_MAX_CHANNELS && snap.frames[0].v[1] === 1 && snap.moments.length === 1, snap.channels.join(', '))
     push('game recorder: padded snapshot, nothing recorded after the round', snap.frames.every((f) => f.v.length === snap.channels.length) && snap.frames[snap.frames.length - 1].t === 11 && hasRecording(snap), '')
+  }
+}
+
+// ── 10. Wave 4 ─────────────────────────────────────────────────────────────
+function wave4Checks(R: Rapier, push: (name: string, ok: boolean, detail: string) => void): void {
+  /** Steady speed (cm/s) on tile at a motor command, measured over 2 s after 3 s to settle. */
+  const speedAt = (d: RobotDesign, pct: number, over: Partial<Arena> = {}) => {
+    const sim = createSim(R, open({ size: [6, 30], ...over }), d)
+    sim.setMotors(pct, pct)
+    for (let i = 0; i < Math.round(3 / DT); i++) sim.step()
+    const z0 = sim.snapshot().robot.p.z
+    for (let i = 0; i < Math.round(2 / DT); i++) sim.step()
+    const v = ((sim.snapshot().robot.p.z - z0) / 2) * 100
+    const hum = sim.telemetry().humming
+    sim.dispose()
+    return { v, hum: Boolean(hum && hum[0] && hum[1]) }
+  }
+
+  // The dead zone: below it the wheels do not turn (the motor hums), from it they do — every drive.
+  {
+    const rows: string[] = []
+    let ok = true
+    for (const drive of ['wheels2', 'wheels4', 'tracks', 'legs'] as const) {
+      const d: RobotDesign = { ...DEFAULT_DESIGN, drive }
+      const below = [4, 8, MOTOR_DEAD_ZONE_PCT - 1].map((p) => speedAt(d, p))
+      const at = speedAt(d, MOTOR_DEAD_ZONE_PCT)
+      const above = speedAt(d, 30)
+      ok = ok && below.every((b) => Math.abs(b.v) < 0.05 && b.hum) && at.v > 0.5 && !at.hum && above.v > at.v * 2
+      rows.push(`${drive}: ${below.map((b) => b.v.toFixed(1)).join('/')} → ${at.v.toFixed(1)} at ${MOTOR_DEAD_ZONE_PCT} % → ${above.v.toFixed(1)} cm/s at 30 %`)
+    }
+    push(`dead zone: below ${MOTOR_DEAD_ZONE_PCT} % the motors hum and the wheels stay still; from it they turn (every drive)`, ok, rows.join(' · '))
+    const worn = speedAt(DEFAULT_DESIGN, 20, { motorDeadZonePct: 25 })
+    const fine = speedAt(DEFAULT_DESIGN, 20)
+    push('dead zone: an arena can set a worn motor (25 %): 20 % no longer moves', Math.abs(worn.v) < 0.05 && worn.hum && fine.v > 5, `worn ${worn.v.toFixed(1)}, normal ${fine.v.toFixed(1)} cm/s`)
+    // drive_distance inside the dead zone gives up with the stall message instead of hanging.
+    const sim = createSim(R, open(), DEFAULT_DESIGN)
+    const it = createInterpreter({ body: [{ op: 'drive_distance', id: 'd', cm: N(30), speedPct: N(8) }] }, sim)
+    let n = 0
+    while (n < 600 && it.advance()) {
+      sim.step()
+      n++
+    }
+    push('dead zone: drive_distance at 8 % stalls with a message (no endless wait)', n < 600 && sim.events.some((e) => e.kind === 'stalled'), `${n} ticks`)
+    sim.dispose()
+  }
+
+  // "Find the dead zone" (L4 S2): the reference measures the threshold — it says exactly the dead zone.
+  {
+    const demo = DEMOS.find((d) => d.id === 'dead-zone')
+    push('dead-zone: arena exists (L4 S2)', Boolean(demo), '')
+    if (demo) {
+      const said: string[] = []
+      let ok = true
+      for (const body of ['box', 'dome', 'tall', 'bug'] as BodyId[]) {
+        const run = createRun(R, demo.arena, designFor({ ...DEFAULT_DESIGN, body }, demo.goodParts), demo.reference)
+        for (let i = 0; i < Math.ceil((demo.arena.timeLimit + 4) / DT) && run.status !== 'done'; i++) run.tick()
+        const say = run.sim.events.find((e) => e.kind === 'say')?.text
+        said.push(`${body} said ${say} (${run.result?.success ? 'parked' : run.result?.reason})`)
+        ok = ok && Boolean(run.result?.success) && say === String(MOTOR_DEAD_ZONE_PCT)
+        run.sim.dispose()
+      }
+      push(`dead-zone: the reference finds ${MOTOR_DEAD_ZONE_PCT} % and parks, all four bodies`, ok, said.join(' · '))
+      // The Flight Recorder names the dead zone when a creep at 8 % never arrives.
+      const m = demo.mistakes?.[0]
+      if (m) {
+        const run = createRun(R, demo.arena, designFor(DEFAULT_DESIGN, demo.goodParts), m.program)
+        const rec = new FlightRecorder()
+        rec.record(run.sim, { distance: true, line: false, bump: false }, null, true)
+        for (let i = 0; i < Math.ceil((demo.arena.timeLimit + 4) / DT) && run.status !== 'done'; i++) {
+          run.tick()
+          rec.record(run.sim, { distance: true, line: false, bump: false }, run.interp?.ctx.active ?? null)
+        }
+        const why = whyFailed(rec.frames(), run.sim.events, run.result)
+        push('dead-zone: “Why did it fail?” names the dead zone for a creep at 8 %', why?.label === 'Dead zone', `${run.result?.reason}: ${why?.label} — ${why?.detail}`)
+        run.sim.dispose()
+      }
+    }
+  }
+
+  // The drive pushes at the tyre now: hard starts and reversals never tip any robot on the flat.
+  {
+    let ok = true
+    const bad: string[] = []
+    for (const body of ['box', 'dome', 'tall', 'bug'] as BodyId[])
+      for (const drive of ['wheels2', 'wheels4', 'tracks', 'legs'] as const)
+        for (const tool of ['none', 'scoop'] as const) {
+          const sim = createSim(R, open(), { ...DEFAULT_DESIGN, body, drive, tool })
+          for (const [l, r] of [[100, 100], [-100, -100], [100, -100], [100, 100]] as const) {
+            sim.setMotors(l, r)
+            for (let i = 0; i < Math.round(0.8 / DT); i++) sim.step()
+          }
+          if (sim.tipped) {
+            ok = false
+            bad.push(`${body}/${drive}/${tool}`)
+          }
+          sim.dispose()
+        }
+    push('tyre push: full-power starts, reversals and spins never tip a robot on the flat (32 robots)', ok, bad.join(', ') || 'none tipped')
+  }
+
+  // Carry positions: the block round-trips, needs a claw or scoop, and moves the load.
+  {
+    const prog: Program = { body: [{ op: 'grip_close', id: 'g' }, { op: 'set_carry', id: 'c', pos: 'high' }, { op: 'set_carry', id: 'c2', pos: 'low' }] }
+    push('carry: the carry load block survives the Blockly round trip', JSON.stringify(blocklyToProgram(programToBlockly(prog))) === JSON.stringify(prog), '')
+    const lock = missingParts(prog, { ...DEFAULT_DESIGN, tool: 'none' })
+    push('carry: locked without a claw or scoop', lock.some((l) => l.block === 'set_carry' && l.needs === 'grab'), lock.map((l) => l.block).join(', '))
+    const heights: Record<string, string> = {}
+    let ok = true
+    for (const tool of ['scoop', 'gripper'] as const) {
+      const sim = createSim(R, open({ objects: [{ id: 'b', kind: 'cube', pos: [0, -1.85], size: 0.03, mass: 0.1 }] }), { ...DEFAULT_DESIGN, tool })
+      const grabbed = sim.grip(true)
+      const yAt = (pos: 'normal' | 'high' | 'low') => {
+        sim.setCarry(pos)
+        for (let i = 0; i < 20; i++) sim.step()
+        const b = sim.snapshot().bodies.find((x) => x.id === 'b')
+        return b ? b.p.y : NaN
+      }
+      const n = yAt('normal')
+      const h = yAt('high')
+      const l = yAt('low')
+      ok = ok && grabbed && h > n + 0.08 && l < n && sim.snapshot().holding === 'b' && sim.carry === 'low'
+      heights[tool] = `low ${(l * 100).toFixed(0)} < normal ${(n * 100).toFixed(0)} < high ${(h * 100).toFixed(0)} cm`
+      sim.dispose()
+    }
+    push('carry: high lifts the held load, low lowers it (scoop and claw), the load stays held', ok, JSON.stringify(heights))
+    // On the flat, even the high carry does not tip: the slope does it.
+    const sim = createSim(R, open({ objects: [{ id: 'b', kind: 'cube', pos: [0, -1.79], size: 0.04, mass: 0.3 }] }), { ...DEFAULT_DESIGN, tool: 'scoop' })
+    sim.grip(true)
+    sim.setCarry('high')
+    sim.setMotors(40, 40)
+    for (let i = 0; i < Math.round(4 / DT); i++) sim.step()
+    push('carry: carried high on the flat, the robot does not tip', !sim.tipped && sim.snapshot().holding === 'b', '')
+    sim.dispose()
+  }
+
+  // "Low and slow" (L3 S14): low delivers, high tips at the foot of the ramp — for every body.
+  {
+    const demo = DEMOS.find((d) => d.id === 'core-store-ramp')
+    push('core-store-ramp: arena exists (L3 S14)', Boolean(demo), '')
+    if (demo) {
+      const bodies: BodyId[] = ['box', 'dome', 'tall', 'bug']
+      const res = bodies.map((body) => runHeadless(R, demo.arena, designFor({ ...DEFAULT_DESIGN, body }, demo.goodParts), demo.reference).result)
+      push('core-store-ramp: carried low, the core box reaches the store, all four bodies', res.every((r) => r.success), res.map((r, i) => `${bodies[i]} ${r.success ? 'ok' : r.reason}`).join(' · '))
+      const ramp = demo.arena.ramps[0]
+      const deg = (Math.atan(ramp.height / ramp.size[1]) * 180) / Math.PI
+      push('core-store-ramp: the ramp is 20° as the session says', Math.abs(deg - 20) < 0.2, `${deg.toFixed(2)}°`)
+      const tip = demo.mistakes?.find((m) => m.fails === 'tipped')
+      if (tip) {
+        const why: string[] = []
+        let ok = true
+        for (const body of bodies) {
+          const run = createRun(R, demo.arena, designFor({ ...DEFAULT_DESIGN, body }, demo.goodParts), tip.program)
+          const rec = new FlightRecorder()
+          rec.record(run.sim, { distance: true, line: false, bump: false }, null, true)
+          for (let i = 0; i < Math.ceil((demo.arena.timeLimit + 4) / DT) && run.status !== 'done'; i++) {
+            run.tick()
+            rec.record(run.sim, { distance: true, line: false, bump: false }, null)
+          }
+          const w = whyFailed(rec.frames(), run.sim.events, run.result)
+          ok = ok && run.result?.reason === 'tipped' && w?.label === 'Tipped over'
+          why.push(`${body} ${run.result?.reason} at ${w?.t.toFixed(1)} s`)
+          run.sim.dispose()
+        }
+        push('core-store-ramp: carried high, every body tips over (and the recorder says so)', ok, why.join(' · '))
+      }
+    }
+  }
+
+  // Every demo's taught mistakes fail for the taught reason (faded-line is checked above).
+  {
+    for (const demo of DEMOS) {
+      if (demo.id === 'faded-line') continue
+      for (const m of demo.mistakes ?? []) {
+        const r = runHeadless(R, demo.arena, designFor(DEFAULT_DESIGN, demo.goodParts), m.program).result
+        push(`${demo.id}: mistake “${m.name}” fails with "${m.fails}"`, !r.success && r.reason === m.fails, `${r.reason}: ${r.message}`)
+      }
+    }
+  }
+
+  // The lab's result store as the course reads it: personalBests["lab:<id>"], higher is better.
+  {
+    push('lab results: one id per arena, and a stored score decodes to the time', labResultId('dead-zone') === 'lab:dead-zone' && labTimeOf({ timeLimit: 60 }, labScore({ timeLimit: 60 }, { time: 9.55 })) === 9.5, '')
+    const sims = [...LEVEL3_REUSE, ...LEVEL4_REUSE].filter((r) => r.play.kind === 'sim-demo')
+    const ok = sims.every((r) => !reusePlayDone(r.play, { personalBests: {}, codeMissions: {} }) && reusePlayDone(r.play, { personalBests: { [labResultId(r.play.id)]: 1 }, codeMissions: {} }))
+    push(`lab results: the ${sims.length} Level 3–4 lab sessions count done from the store, not a button`, ok && labSolved({ 'lab:x': 3 }, 'x') && !labSolved({ 'lab:x': 0 }, 'x'), sims.map((r) => r.session).join(', '))
+    const src = readFileSync(join(__dirname, '..', '..', '..', 'components', 'kids', 'course', 'SessionRunnerClient.tsx'), 'utf8')
+    push('lab results: the session runner no longer offers "I finished it" for a lab arena', !/reuse\.play\.kind === 'sim-demo' \|\|/.test(src), '')
+    const wb = readFileSync(join(__dirname, '..', '..', '..', 'components', 'kids', 'sim', 'SimWorkbenchClient.tsx'), 'utf8')
+    push('lab results: the workbench (Physics Lab and Power Lab) reports every finished run', /reportLabRun\(/.test(wb), '')
   }
 }
 

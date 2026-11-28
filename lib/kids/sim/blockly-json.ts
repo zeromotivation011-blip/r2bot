@@ -103,6 +103,9 @@ function stmtBlock(s: Stmt): BBlock {
       b.fields = { VAR: s.name }
       b.inputs = { BY: valueInput(s.by) }
       break
+    case 'set_carry':
+      b.fields = { POS: s.pos }
+      break
     default:
       break
   }
@@ -230,6 +233,11 @@ function toStmts(first: BBlock | undefined): Stmt[] {
       case 'change_var':
         out.push({ op: 'change_var', id, name: field(b, 'VAR') || 'x', by: val(inp.BY, { k: 'number', v: 1 }) })
         break
+      case 'set_carry': {
+        const pos = field(b, 'POS')
+        out.push({ op: 'set_carry', id, pos: pos === 'high' ? 'high' : pos === 'low' ? 'low' : 'normal' })
+        break
+      }
       default:
         if ((SIMPLE_STMTS as readonly string[]).includes(b.type)) out.push({ op: b.type as (typeof SIMPLE_STMTS)[number], id })
     }

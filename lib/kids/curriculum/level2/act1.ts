@@ -600,7 +600,7 @@ const S05: L2Session = {
     physicsEffect: 'set_motors sets each side’s power from −100 to 100%. In the simulator the curve radius grows as the difference shrinks; four wheels scrub a little in tight curves.',
     realWorld: 'Robot vacuums, tanks, diggers and the Mars rovers’ cousins on Earth all steer by running their sides at different speeds.',
   },
-  arena: { kind: 'physics', id: 'first-drive', task: 'Reach the yellow circle without a single turn block: use set_motors to curve into it, then stop.', why: 'An open, verified arena: any program that reaches the circle passes, so a curve is a fair alternative route.' },
+  arena: { kind: 'physics', id: 'curve-dock', task: 'Reach the yellow dock, ahead and over to the right, without a single turn block: set the two motors to different speeds to curve into it, then stop.', why: 'Its own verified arena (Physics Lab “Curve to the dock”): the toolbox has no turn block, so the only way in is a curve made by a speed difference. The reference (left 52 %, right 44 % for 10 s) docks with every body.' },
   activities: [
     { id: 'motion-bu-01', why: 'Drive for the right time — then see why a curve is longer than a straight line.' },
     { id: 'motion-bu-08', why: 'Predict what happens as a motor speeds up.' },

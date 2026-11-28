@@ -5,10 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AUTH_CHANGED_EVENT } from '@/lib/supabase/lazy'
 import { getBand } from '@/lib/kids/bands'
-import { JOIN_URL_DISPLAY, formatJoinCode, type KidsClassSummary, type KidsMemberRow } from '@/lib/kids/classroom'
+import { JOIN_URL_DISPLAY, classKindInfo, formatJoinCode, type ClassKind, type KidsClassSummary, type KidsMemberRow } from '@/lib/kids/classroom'
+import { displayClassKind, forgetClassKind, pendingClassKind } from '@/lib/kids/classroom-kind-store'
 import { downloadText, fetchInsightCatalogue, fileSlug, relativeTime, teacherFetch } from '@/lib/kids/classroom-api'
 import { classTotals, memberStats, rosterCsv } from '@/lib/kids/classroom-stats'
-import type { InsightCatalogue } from '@/lib/kids/classroom-insights'
+import { sessionsPerLevel, type InsightCatalogue } from '@/lib/kids/classroom-insights'
 import {
   ClassroomError,
   ClassroomNotReady,
@@ -23,6 +24,8 @@ import { PowerUpPanelClient } from '@/components/kids/classroom/PowerUpPanelClie
 import { ClassMindMapClient, WhereToHelpClient } from '@/components/kids/classroom/ClassMindMapClient'
 import { GradebookClient } from '@/components/kids/classroom/GradebookClient'
 import { BandLockPanelClient } from '@/components/kids/classroom/BandLockPanelClient'
+import { ClassBadgesClient } from '@/components/kids/classroom/ClassBadgesClient'
+import { ClassKindPanelClient } from '@/components/kids/classroom/ClassKindPanelClient'
 
 type State =
   | { kind: 'loading' }
@@ -81,6 +84,25 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
   const ready = state.kind === 'ready' ? state : null
   const totals = useMemo(() => (ready ? classTotals(ready.members) : null), [ready])
 
+  // Roadmap #84: a kind this device kept before migration 0059 is sent once the column exists.
+  const readyCls = ready?.cls ?? null
+  useEffect(() => {
+    if (!readyCls) return
+    const pending = pendingClassKind(readyCls)
+    if (!pending) return
+    let alive = true
+    void teacherFetch<{ kind: ClassKind; bandLocked?: boolean }>(`/api/kids/classroom/classes/${encodeURIComponent(classId)}`, {
+      method: 'PATCH', body: JSON.stringify({ action: 'kind', kind: pending }),
+    }).then((r) => {
+      if (r.kind !== 'ok') return
+      forgetClassKind(classId)
+      if (alive) setState((st) => (st.kind === 'ready' ? { ...st, cls: { ...st.cls, kind: pending, ...(r.data.bandLocked === false ? { bandLocked: false } : {}) } } : st))
+    })
+    return () => {
+      alive = false
+    }
+  }, [readyCls, classId])
+
   if (state.kind === 'loading') return <ClassroomSkeleton />
   if (state.kind === 'signed-out') return <TeacherSignIn next={`/kids/classroom/${classId}`} />
   if (state.kind === 'not-ready') return <ClassroomNotReady />
@@ -97,6 +119,8 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
 
   const { cls, members } = state
   const band = getBand(cls.band)
+  const kind = displayClassKind(cls)
+  const kindInfo = classKindInfo(kind)
 
   async function regenerate() {
     setBusy(true)
@@ -145,7 +169,9 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wider text-slate-400">
-              {band ? `${band.emoji} ${band.name} · ${band.grades}` : cls.band}
+              {kindInfo.mixed
+                ? `${kindInfo.emoji} ${kindInfo.label} · mixed ages · each child keeps their own band`
+                : band ? `${band.emoji} ${band.name} · ${band.grades}` : cls.band}
             </p>
             <h1 className="mt-1 text-3xl font-extrabold text-white sm:text-4xl">{cls.className}</h1>
             <p className="text-slate-300">
@@ -222,6 +248,7 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
           ['#mindmap-h', 'Mind Map'],
           ['#help-h', 'Where to help'],
           ['#gradebook-h', 'Gradebook'],
+          ['#badges-h', 'Badges'],
           ['#roster-h', 'Roster'],
           ['#band-h', 'Bands'],
         ].map(([href, label]) => (
@@ -242,6 +269,8 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
 
       <GradebookClient cls={cls} members={members} catalogue={catalogue} />
 
+      <ClassBadgesClient members={members} catalogue={catalogue} />
+
       <AssignmentsPanelClient classId={classId} band={cls.band} members={members} />
 
       <section aria-labelledby="roster-h">
@@ -261,6 +290,7 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
               <thead className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-400">
                 <tr>
                   <th scope="col" className="px-4 py-3">Nickname</th>
+                  {kindInfo.mixed && <th scope="col" className="px-3 py-3">Band</th>}
                   <th scope="col" className="px-3 py-3">📘 Sessions</th>
                   <th scope="col" className="px-3 py-3">🌌 Galaxy</th>
                   <th scope="col" className="px-3 py-3">🧠 Secure</th>
@@ -279,7 +309,17 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
                   return (
                     <tr key={m.id} className="border-b border-white/5 last:border-0">
                       <th scope="row" className="px-4 py-3 font-bold text-white">{m.nickname}</th>
-                      <td className="px-3 py-3 text-slate-100">{s.sessions}</td>
+                      {kindInfo.mixed && (
+                        <td className="px-3 py-3 text-slate-100">{(() => { const b = getBand(m.snapshot.band); return b ? `${b.emoji} ${b.name}` : 'Not chosen yet' })()}</td>
+                      )}
+                      <td className="px-3 py-3 text-slate-100">
+                        {s.sessions}
+                        {s.sessions > 0 && (
+                          <span className="ml-1 block text-xs text-slate-400">
+                            {sessionsPerLevel(m.snapshot).map((n, i) => (n > 0 ? `L${i + 1} ${n}` : null)).filter(Boolean).join(' · ')}
+                          </span>
+                        )}
+                      </td>
                       <td className="px-3 py-3 text-slate-100">{s.activities}</td>
                       <td className="px-3 py-3 text-slate-100">{s.secure}</td>
                       <td className="px-3 py-3 text-slate-100">{s.games}</td>
@@ -316,10 +356,19 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
         )}
       </section>
 
+      <ClassKindPanelClient
+        classId={classId}
+        kind={kind}
+        ready={cls.kindReady === true}
+        bandLocked={cls.bandLocked === true}
+        onKind={(k, bandLocked) => setState({ kind: 'ready', cls: { ...cls, kind: k, ...(bandLocked === false ? { bandLocked: false } : {}) }, members })}
+      />
+
       <BandLockPanelClient
         classId={classId}
         cls={cls}
         members={members}
+        mixed={kindInfo.mixed}
         onClassLocked={(locked) => setState({ kind: 'ready', cls: { ...cls, bandLocked: locked }, members })}
         onMemberLock={(memberId, b) => setState({ kind: 'ready', cls, members: members.map((m) => (m.id === memberId ? { ...m, bandLock: b } : m)) })}
       />
@@ -339,6 +388,12 @@ export default function ClassDetailClient({ classId }: { classId: string }) {
         </section>
       )}
 
+      {kindInfo.mixed && (
+        <p className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-[15px] text-slate-200">
+          Mixed ages: the plan below is for the youngest band, for the shared hook. Each child then works at their own band’s station —{' '}
+          <Link href={kindInfo.guide} className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 hover:underline">every band’s station, week by week →</Link>
+        </p>
+      )}
       <LessonPlanPanel band={cls.band} />
 
       <ParentNote variant="teacher">

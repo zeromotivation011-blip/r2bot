@@ -18,3 +18,21 @@ export function labDemoHref(id: string): string {
 export function gameTierHref(gameId: string, tier: number): string {
   return tier > 0 ? `/kids/play/${gameId}?tier=${tier}` : `/kids/play/${gameId}`
 }
+
+/**
+ * Where a solved Physics Lab or Power Lab arena is kept: the one progress store's
+ * `personalBests["lab:<id>"]` = tenths of a second to spare on the best solve (higher is better). Written
+ * only through reportBestRun (lib/kids/sim/lab-results.ts), so it rides in the backup code
+ * like every other personal best, and a course session reads it to count the challenge done.
+ */
+export const LAB_RESULT_PREFIX = 'lab:'
+
+export function labResultId(demoId: string): string {
+  return `${LAB_RESULT_PREFIX}${demoId}`
+}
+
+/** Has the child solved this lab arena? `personalBests` is the progress store's. */
+export function labSolved(personalBests: Record<string, number>, demoId: string): boolean {
+  const v = personalBests[labResultId(demoId)]
+  return typeof v === 'number' && Number.isFinite(v) && v > 0
+}

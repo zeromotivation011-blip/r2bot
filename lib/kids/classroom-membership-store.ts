@@ -9,7 +9,7 @@
 // everything here, so other callers keep importing from there.
 
 import type { BandId } from './bands'
-import { isBandId, type JoinedClassInfo } from './classroom'
+import { isBandId, isClassKind, isMixedKind, type JoinedClassInfo } from './classroom'
 
 /** A swapped key (lib/kids/profiles.ts SWAPPED_KEYS): always the playing child's. */
 export const CLASS_MEMBERSHIP_KEY = 'r2bot_kids_class_v1'
@@ -35,6 +35,8 @@ export function loadMembership(): StoredMembership | null {
       band: isBandId(o.band) ? o.band : 'builders',
       nickname: o.nickname,
       lockedBand: isBandId(o.lockedBand) ? o.lockedBand : null,
+      // Roadmap #84: absent on memberships stored before 0059 (= a school class).
+      ...(isClassKind(o.kind) ? { kind: o.kind } : {}),
       joinedAt: typeof o.joinedAt === 'string' ? o.joinedAt : new Date().toISOString(),
     }
   } catch {
@@ -50,4 +52,10 @@ export function loadMembership(): StoredMembership | null {
  */
 export function classBandLock(): BandId | null {
   return loadMembership()?.lockedBand ?? null
+}
+
+/** Roadmap #84: true when this child's class is a club, family or library class (they keep their own band). */
+export function inMixedClass(): boolean {
+  const m = loadMembership()
+  return !!m && isMixedKind(m.kind)
 }

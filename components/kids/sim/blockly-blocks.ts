@@ -162,6 +162,13 @@ export function defineBlocks(): void {
     // Actions
     stmt('action_blocks', 'grip_open', '🦾 open claw', [], 'Needs a Gripper Claw or a Scoop.'),
     stmt('action_blocks', 'grip_close', '🦾 close claw', [], 'Grabs a thing touching the claw. Needs a Gripper Claw or a Scoop.'),
+    stmt(
+      'action_blocks',
+      'set_carry',
+      '🦾 carry load %1',
+      [{ type: 'field_dropdown', name: 'POS', options: [['low ⬇️', 'low'], ['high ⬆️', 'high'], ['normal', 'normal']] }],
+      'Moves the claw or scoop: LOW carries the load down near the floor and forward, HIGH lifts it up and back. Where the load sits moves the robot’s balance point. Needs a Gripper Claw or a Scoop.',
+    ),
     stmt('action_blocks', 'pen_down', '🖊️ pen down', [], 'Start drawing. Needs a Drawing Pen.'),
     stmt('action_blocks', 'pen_up', '🖊️ pen up', [], 'Stop drawing. Needs a Drawing Pen.'),
     stmt('action_blocks', 'light_on', '🔦 light on', [], 'Needs a Headlight.'),
@@ -253,7 +260,7 @@ const GROUPS: { name: string; colour: string; ids: string[] }[] = [
   { name: '👀 Sense', colour: STYLE_COLOURS.sensor_blocks, ids: ['distance_cm', 'line_seen', 'line_offset', 'reflectance', 'floor_color', 'bumped', 'heading_deg', 'timer_s', 'battery_pct'] },
   { name: '🔁 Control', colour: STYLE_COLOURS.control_blocks, ids: ['repeat', 'repeat_until', 'forever', 'if', 'if_else', 'compare', 'and', 'or', 'not'] },
   { name: '🔢 Maths', colour: STYLE_COLOURS.math_blocks, ids: ['number', 'text', 'math', 'set_var', 'change_var', 'get_var'] },
-  { name: '✋ Do', colour: STYLE_COLOURS.action_blocks, ids: ['grip_open', 'grip_close', 'pen_down', 'pen_up', 'light_on', 'light_off', 'say', 'beep'] },
+  { name: '✋ Do', colour: STYLE_COLOURS.action_blocks, ids: ['grip_open', 'grip_close', 'set_carry', 'pen_down', 'pen_up', 'light_on', 'light_off', 'say', 'beep'] },
 ]
 
 export interface LockedBlock {

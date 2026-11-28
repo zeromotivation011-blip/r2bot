@@ -3,19 +3,23 @@
 // app/kids/printables/BuiltTicksClient.tsx — on the Make It at Home list, shows
 // "You have built N" and a ✓ on each build card this child checked in
 // (lib/kids/builds/store.ts, this device only). Server HTML is unchanged until
-// it mounts; the line reserves its height so nothing shifts.
+// it mounts; the line reserves its height so nothing shifts. It also makes sure
+// every checked-in build has discovered its Robodex card (older or restored
+// check-ins; lib/kids/builds/robodex.ts).
 
 import { useEffect, useState } from 'react'
 import { BUILDS_EVENT, readBuilds } from '@/lib/kids/builds/store'
+import { cardsForCheckIns, discoverBuildCards } from '@/lib/kids/builds/robodex'
 import { KIDS_PROFILE_EVENT } from '@/lib/kids/profiles'
 
-export default function BuiltTicksClient({ total }: { total: number }) {
+export default function BuiltTicksClient({ total, cardByBuild = {} }: { total: number; cardByBuild?: Record<string, string> }) {
   const [count, setCount] = useState<number | null>(null)
 
   useEffect(() => {
     const update = () => {
       const built = readBuilds()
       setCount(Object.keys(built).length)
+      void discoverBuildCards(cardsForCheckIns(built, cardByBuild))
       document.querySelectorAll<HTMLElement>('[data-build]').forEach((el) => {
         const tick = el.querySelector<HTMLElement>('.built-tick')
         if (tick) tick.classList.toggle('hidden', !built[el.dataset.build ?? ''])
@@ -30,6 +34,8 @@ export default function BuiltTicksClient({ total }: { total: number }) {
       window.removeEventListener(KIDS_PROFILE_EVENT, update)
       window.removeEventListener('storage', update)
     }
+    // cardByBuild comes from the server render and never changes on the page.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

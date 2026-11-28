@@ -21,6 +21,7 @@ import { loadRapier, type Rapier } from '@/lib/kids/sim/rapier'
 import { createRun, type Run, type RunResult } from '@/lib/kids/sim/run'
 import { beatsGhost, FlightRecorder, framesAround, ghostPose, makeGhost, type FlightFrame, type Ghost, type SensorParts } from '@/lib/kids/sim/recorder'
 import { loadGhost, saveGhost } from '@/lib/kids/sim/ghost-store'
+import { reportLabRun } from '@/lib/kids/sim/lab-results'
 import { playSound } from '@/lib/kids-audio'
 import { kidsReducedMotion } from '@/lib/kids/settings'
 import BatteryBarClient from './BatteryBarClient'
@@ -118,6 +119,8 @@ export default function SimWorkbenchClient({ demo, design, starter, exitHref = '
   const framesRef = useRef<FlightFrame[]>([])
   const trailCacheRef = useRef<{ len: number; arr: number[] }>({ len: -1, arr: [] })
   const [ghost, setGhost] = useState<Ghost | null>(null)
+  /** The lab remembered this solve (first time, or a faster one): the course session reads it. */
+  const [labNews, setLabNews] = useState<'first' | 'faster' | null>(null)
   const ghostRef = useRef<Ghost | null>(null)
   const [ghostOn, setGhostOn] = useState(true)
   const ghostOnRef = useRef(true)
@@ -172,6 +175,7 @@ export default function SimWorkbenchClient({ demo, design, starter, exitHref = '
       replayTRef.current = 0
       setReplayT(0)
       setGhostNews(null)
+      setLabNews(null)
       publishFrames()
       eventsSeenRef.current = 0
       activeRef.current = null
@@ -316,6 +320,9 @@ export default function SimWorkbenchClient({ demo, design, starter, exitHref = '
       setNowDoing(null)
       publishLive()
       finishRecording(run)
+      // The one result store (lab-results.ts): a first solve or a faster one, through reportBestRun.
+      const reward = reportLabRun(demoRef.current.id, demoRef.current.arena, run.result)
+      if (reward) setLabNews(reward.newPersonalBest ? 'faster' : 'first')
       if (run.result?.success) playSound('correct')
       else if (run.result) playSound('wrong')
     }
@@ -560,6 +567,11 @@ export default function SimWorkbenchClient({ demo, design, starter, exitHref = '
               {result.reason !== 'missing-part' && (
                 <p className="mt-1 text-xs font-semibold opacity-80">
                   Time {result.time.toFixed(1)} s · moved {Math.round(result.travelled * 100)} cm · wheels turned {Math.round(result.wheelTravel * 100)} cm
+                </p>
+              )}
+              {result.success && labNews && (
+                <p className="mt-1 text-xs font-black" data-testid="lab-saved">
+                  {labNews === 'first' ? '✓ Saved to your progress' : '✓ Your fastest solve yet — saved'}
                 </p>
               )}
             </div>

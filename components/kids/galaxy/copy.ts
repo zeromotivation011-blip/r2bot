@@ -72,6 +72,7 @@ export const TEMPLATE_HOW: Record<TemplateId, string> = {
   'flowchart-builder': 'You arrange actions and questions into a flowchart, then test it on every situation.',
   'logic-gates': 'You wire AND, OR and NOT gates until the circuit matches the behaviour you need.',
   'binary-encoder': 'You flip bits to encode numbers, pictures or messages the way a computer stores them.',
+  'number-box': 'You follow picture cards that change the number in a robot’s box, the way a computer changes a variable.',
   'gear-train': 'You choose and mesh gears, and the animated gear train shows the speed and direction you made.',
   'lever-balance': 'You place loads and move the pivot until the lever balances, with the turning forces shown.',
   'simple-machines': 'You choose and set up a lever, pulley, ramp or wheel, and the simulation shows the force needed.',

@@ -1,7 +1,7 @@
 // lib/kids/curriculum/level4/reuse.ts
 // What each Level 4 session is built from (roadmap #23). `play` is the
-// challenge beat as a teen can play it TODAY — a Universe game at a tier, or a
-// Skill Galaxy activity — and `practice` lists 2–3 Engineers-band Galaxy
+// challenge beat as a teen can play it TODAY — a Universe game at a tier, a
+// Physics Lab arena or a Skill Galaxy activity — and `practice` lists 2–3 Engineers-band Galaxy
 // activities on the session's concepts. verify.ts (../level3/verify.ts) checks
 // every id, band and concept overlap. Light: safe in a client island.
 
@@ -10,7 +10,7 @@ import type { SessionReuse } from '../level3/reuse-kit'
 export const LEVEL4_REUSE: SessionReuse[] = [
   // Act 1 — Landing
   { session: 'L4-S01', play: { kind: 'activity', id: 'sensors-en-03', goal: 'Name the sensors in a robot cell: map each to the subsystem it feeds.' }, practice: ['sensors-en-04', 'ai-en-09'] },
-  { session: 'L4-S02', play: { kind: 'activity', id: 'motion-en-01', goal: 'Half a metre by encoder: relate motor turns to distance travelled.' }, practice: ['design-en-03', 'mechanics-en-01'] },
+  { session: 'L4-S02', play: { kind: 'sim-demo', id: 'dead-zone', goal: 'Physics Lab “Find the dead zone”: raise the motor power 2 % at a time until the distance reading drops, say that power, then park in the green zone.' }, practice: ['motion-en-01', 'design-en-03', 'mechanics-en-01'] },
   { session: 'L4-S03', play: { kind: 'activity', id: 'motion-en-07', goal: 'Differential-drive kinematics: predict the motion from two wheel speeds.' }, practice: ['motion-en-02', 'mechanics-en-06'] },
   { session: 'L4-S04', play: { kind: 'activity', id: 'ocean-tune-pid-station-keeping', goal: 'Hold still in the current: reject a constant disturbance with feedback.' }, practice: ['control-en-04', 'city-tune-platoon-gap'], story: 'line-follower-race' },
   { session: 'L4-S05', play: { kind: 'game', id: 'drone-hover', tier: 3, goal: 'Sky Port, Legend tier: tune P, I and D to hold height through gusts.' }, practice: ['control-en-10', 'hospital-tune-pid-exo-step', 'control-en-05'] },

@@ -56,7 +56,7 @@ export default function FamilyClassPage() {
           own age band, so the seven-year-old and the twelve-year-old are never stuck on the same lesson.
         </p>
         <div className="teach-no-print mt-5 flex flex-wrap gap-3">
-          <Link href="/kids/classroom" className="inline-flex min-h-[48px] items-center rounded-xl bg-amber-500 px-5 font-bold text-[#1A1103] hover:bg-amber-400">Create your family class</Link>
+          <Link href="/kids/classroom?kind=family" className="inline-flex min-h-[48px] items-center rounded-xl bg-amber-500 px-5 font-bold text-[#1A1103] hover:bg-amber-400">Create your family class</Link>
           <Link href="/kids/parents" className="inline-flex min-h-[48px] items-center rounded-xl border border-white/15 bg-white/[0.04] px-5 font-bold text-white hover:bg-white/10">Parent controls</Link>
         </div>
       </header>

@@ -561,6 +561,20 @@ export class SimRenderer {
       shape.holes.push(hole)
       ring.geometry = new THREE.ShapeGeometry(shape)
     }
+    // A goal up on a deck (the store at the top of a ramp) sits on the deck's top, not under it.
+    const [gx, gz] = arena.goal.zone.center
+    const top = (arena.decks ?? []).reduce((h, dk) => (Math.abs(gx - dk.center[0]) <= dk.size[0] / 2 && Math.abs(gz - dk.center[1]) <= dk.size[1] / 2 ? Math.max(h, dk.height) : h), 0)
+    ring.position.y = top + 0.003
+    if (arena.goal.kind === 'deliver') {
+      // The marked drop spot: a soft fill inside the ring, so it reads as "put it HERE".
+      const fill = shapeMesh(arena.goal.zone, new THREE.MeshBasicMaterial({ color: '#FDE68A', transparent: true, opacity: 0.25, depthWrite: false }))
+      if (arena.goal.zone.kind === 'circle') {
+        fill.geometry.dispose()
+        fill.geometry = new THREE.CircleGeometry(arena.goal.zone.radius, 48)
+      }
+      fill.position.y = top + 0.002
+      this.arenaGroup.add(fill)
+    }
     this.goalRing = ring
     this.arenaGroup.add(ring)
 

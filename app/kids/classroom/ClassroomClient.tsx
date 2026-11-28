@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AUTH_CHANGED_EVENT } from '@/lib/supabase/lazy'
 import { KIDS_BANDS, getBand, type BandId } from '@/lib/kids/bands'
-import { formatJoinCode, type KidsClassSummary } from '@/lib/kids/classroom'
+import { CLASS_KINDS, DEFAULT_CLASS_KIND, classKindInfo, formatJoinCode, isClassKind, type ClassKind, type KidsClassSummary } from '@/lib/kids/classroom'
+import { displayClassKind, rememberClassKind } from '@/lib/kids/classroom-kind-store'
 import { teacherFetch } from '@/lib/kids/classroom-api'
 import {
   ClassroomError,
@@ -87,6 +88,7 @@ export default function ClassroomClient() {
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {state.classes.map((c) => {
               const band = getBand(c.band)
+              const kind = classKindInfo(displayClassKind(c))
               return (
                 <li key={c.id}>
                   <Link
@@ -94,7 +96,9 @@ export default function ClassroomClient() {
                     className="block h-full rounded-2xl border border-white/10 bg-slate-950/80 p-5 transition hover:border-amber-400/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
                   >
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                      {band ? `${band.emoji} ${band.name} · ${band.grades.split(' · ')[0]}` : c.band}
+                      {kind.mixed
+                        ? `${kind.emoji} ${kind.label} · mixed ages`
+                        : band ? `${band.emoji} ${band.name} · ${band.grades.split(' · ')[0]}` : c.band}
                     </p>
                     <p className="mt-1 text-xl font-extrabold text-white">{c.className}</p>
                     {c.schoolName && <p className="text-sm text-slate-400">{c.schoolName}</p>}
@@ -128,9 +132,20 @@ function CreateClassForm({ defaultTeacherName, onCancel }: { defaultTeacherName:
   const [teacherName, setTeacherName] = useState(defaultTeacherName)
   const [schoolName, setSchoolName] = useState('')
   const [band, setBand] = useState<BandId>('builders')
+  const [kind, setKind] = useState<ClassKind>(DEFAULT_CLASS_KIND)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const ids = { cls: useId(), teacher: useId(), school: useId(), err: useId() }
+  const kindInfo = classKindInfo(kind)
+
+  // The club, family and library guides link here with ?kind=… preselected.
+  useEffect(() => {
+    const k = new URLSearchParams(window.location.search).get('kind')
+    if (isClassKind(k)) {
+      setKind(k)
+      if (k !== 'school') setBand('explorers')
+    }
+  }, [])
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -142,10 +157,12 @@ function CreateClassForm({ defaultTeacherName, onCancel }: { defaultTeacherName:
     setBusy(true)
     const r = await teacherFetch<CreateResponse>('/api/kids/classroom/classes', {
       method: 'POST',
-      body: JSON.stringify({ className, teacherName, schoolName, band }),
+      body: JSON.stringify({ className, teacherName, schoolName, band, kind }),
     })
     setBusy(false)
     if (r.kind === 'ok') {
+      // Before migration 0059 the server cannot keep the kind: this device does.
+      if (!r.data.class.kindReady) rememberClassKind(r.data.class.id, kind)
       router.push(`/kids/classroom/${r.data.class.id}?new=1`)
       return
     }
@@ -182,7 +199,34 @@ function CreateClassForm({ defaultTeacherName, onCancel }: { defaultTeacherName:
         </div>
 
         <fieldset>
-          <legend className="text-sm font-semibold text-slate-200">Grade band</legend>
+          <legend className="text-sm font-semibold text-slate-200">What kind of group?</legend>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {CLASS_KINDS.map((k) => {
+              const checked = kind === k.id
+              return (
+                <label
+                  key={k.id}
+                  className={`flex min-h-[64px] cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${checked ? 'border-amber-400 bg-amber-500/10' : 'border-white/10 bg-black/30 hover:border-white/25'}`}
+                >
+                  <input type="radio" name="kind" value={k.id} checked={checked} onChange={() => setKind(k.id)} className="mt-1 h-5 w-5 accent-amber-500" />
+                  <span>
+                    <span className="block font-bold text-white">{k.emoji} {k.label}</span>
+                    <span className="block text-xs text-slate-400">{k.line}</span>
+                  </span>
+                </label>
+              )
+            })}
+          </div>
+          {kindInfo.mixed && (
+            <p className="mt-2 text-sm text-slate-300">
+              Mixed ages: each child picks their own band when they join and keeps it. Your roster shows each child’s band.{' '}
+              <Link href={kindInfo.guide} className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 hover:underline">How to run a {kindInfo.label.toLowerCase()} →</Link>
+            </p>
+          )}
+        </fieldset>
+
+        <fieldset>
+          <legend className="text-sm font-semibold text-slate-200">{kindInfo.bandLegend}</legend>
           <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {KIDS_BANDS.map((b) => {
               const checked = band === b.id
@@ -218,7 +262,7 @@ function CreateClassForm({ defaultTeacherName, onCancel }: { defaultTeacherName:
 
 function HowItWorks() {
   const steps = [
-    { n: 1, t: 'Create a class', d: 'Pick a grade band. You get a 6-character code.' },
+    { n: 1, t: 'Create a class', d: 'A school class, a club, a family class or a library group. Pick a band; you get a 6-character code.' },
     { n: 2, t: 'Put the card on the wall', d: 'Children go to r2bot.in/kids/join, type the code and a nickname. No email, no account.' },
     { n: 3, t: 'Teach, assign, look', d: 'Use the lesson guides, assign sessions or activities with due dates, and watch stars, missions and robots appear on your roster as children play.' },
   ]

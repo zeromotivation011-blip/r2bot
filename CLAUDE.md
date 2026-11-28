@@ -158,7 +158,7 @@ Build these exceptionally; everything else is secondary.
   Engineers 14–17); every kids content item is tagged with one. Surfaces: hub `/kids` (server-rendered),
   **Story Theatre** `/kids/stories/<slug>` (in-browser animated, voiced episodes with choices + quiz —
   not MP4s), **Workshop** `/kids/workshop` (3D robot builder, camera "magic window" AR on every phone,
-  WebXR AR/VR where supported), **Code Lab** `/kids/code-lab/<mission>` (block coding that drives the
+  WebXR AR/VR where supported), **Code Lab** `/kids/code-lab/<mission>` (Blockly block coding, the same block language as the Lab, that drives the
   child's own robot; blocks need the matching part — capabilities come from `lib/kids/robot-design.ts`),
   **Spark Trail** `/kids/spark-trail` (the original six zones, formerly Robot World; `/kids/world/*` 308s there so
   `/kids/world` and `/kids/worlds` never both exist), **Worlds** `/kids/worlds` + `/kids/worlds/<id>` (themed worlds —
@@ -189,7 +189,7 @@ The class snapshot is counts only; changing `ClassSnapshot` means updating `lib/
   **Garage** `/kids/hangar` (the robot's one home: rename, robot card, Spark Trail parts fitted to the real robot;
   `/kids/my-robot` 308s there), **Parents** `/kids/parents` (public explainer; behind the parental gate a hub with the
   week in plain words and device-only controls in `lib/kids/parent-controls.ts` — daily time and quiet hours as gentle
-  banners, never a lock; Ask Spark / camera / outbound-link switches), **Classroom** `/kids/classroom` (teacher, noindex; a teacher can lock a child's band, migration 0058),
+  banners, never a lock; Ask Spark / camera / outbound-link switches), **Classroom** `/kids/classroom` (teacher, noindex; a teacher can lock a child's band, migration 0058; club/family/library classes keep each child's own band, migration 0059),
   `/kids/join` (child joins with code + nickname, noindex) and `/kids/schools` (indexable pitch + pilot form
   through `captureLead()`). One robot shape (`RobotDesign`) and one progress store (`lib/kids-progress.ts`,
   fires `KIDS_PROGRESS_EVENT`) for all of it. XP, badges and quests come ONLY from `reportActivity` in

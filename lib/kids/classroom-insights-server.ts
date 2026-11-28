@@ -20,7 +20,7 @@ import type { InsightCatalogue, InsightMisconception, InsightSession } from './c
 
 function sessionRow(level: LevelNumber, s: AnySession): InsightSession {
   const refs = sessionReteachRefs(level, s)
-  return { t: s.title, c: [...s.concepts], l: level, n: s.number, u: { t: refs.unplugged.title, h: refs.unplugged.href }, e: { t: refs.episode.title, h: refs.episode.href } }
+  return { t: s.title, c: [...s.concepts], l: level, n: s.number, u: { t: refs.unplugged.title, h: refs.unplugged.href }, e: { t: refs.episode.title, h: refs.episode.href }, b: { n: s.badge.name, i: s.badge.icon } }
 }
 
 function misconceptionsOf(level: LevelNumber, s: AnySession): [string, InsightMisconception][] {

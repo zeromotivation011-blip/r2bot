@@ -91,9 +91,9 @@ export const CLUB_FINALE: ClubBlock[] = [
 ]
 
 export const CLUB_SETUP: string[] = [
-  'Sign in as an adult and create a class in the Classroom. Name it after your club. Choose the youngest age band in the club as the class band.',
+  'Sign in as an adult and create a class in the Classroom. Choose “Club” as the kind of group and name it after your club. The band you pick is the youngest in the club: it sets the shared hook, not anyone’s level.',
   'Print the join card. Members join with the code and a first name or a made-up robot name — never an email or anything else.',
-  'Each member then picks their OWN band on their device (Explorers 5–7, Builders 8–10, Inventors 11–13, Engineers 14–17). Their progress, missions and certificates follow that band; your class view shows each member’s band next to their nickname.',
+  'Because it is a club, every member keeps their OWN band (Explorers 5–7, Builders 8–10, Inventors 11–13, Engineers 14–17); a member who has not chosen one yet picks it when they join. Their progress, missions and certificates follow that band; your roster shows each member’s band next to their nickname, and you can still set one member’s band if they need a different level.',
   'Assign the week’s station work from the Classroom (a course session, a Skill Galaxy activity or a game), or simply print this page’s stations.',
   'Use Present mode for the hook and the show-and-tell, with the join code in the corner for newcomers.',
 ]
@@ -108,8 +108,8 @@ export const CLUB_LEADER_NOTES: string[] = [
 ]
 
 export const FAMILY_SETUP: string[] = [
-  'A parent or carer signs in with their own adult account and creates a class in the Classroom — your “family class”. Choose the youngest child’s band.',
-  'Each child joins on their own device (or their own profile on a shared tablet) with the class code and a first name or a nickname. Each keeps their own band.',
+  'A parent or carer signs in with their own adult account and creates a class in the Classroom, choosing “Family class” as the kind of group. The band you pick is the youngest child’s: it sets the shared episode, not anyone’s level.',
+  'Each child joins on their own device (or their own profile on a shared tablet) with the class code and a first name or a nickname. In a family class each child keeps their own band, and picks one when they join if they have not yet.',
   'You now have the same tools a teacher has: every child’s progress in one view, the concepts each one is secure in or still learning, missions you can assign, and the printable teacher guides.',
   'Several families learning together (a co-op) can share one class: one adult creates it and the others help run the sessions.',
 ]
@@ -160,7 +160,7 @@ export const DROP_IN_STATIONS: DropInStation[] = [
     emoji: '💻',
     ages: 'All ages; each child picks their band',
     what: [
-      'Children open www.r2bot.in/kids on a library computer or tablet. No sign-in and no class code: drop-in visitors do not join a class, so nothing about them is stored by R2BOT.',
+      'Children open www.r2bot.in/kids on a library computer or tablet. No sign-in and no class code: drop-in visitors do not join a class, so nothing about them is stored by R2BOT. (For a regular group with the same children every week, a leader can make a “Library group” class instead: mixed ages, each child keeps their own band.)',
       'Ages 5–7: one Story Theatre episode, then the first Code Lab mission. Ages 8–17: the first course session of their band’s level.',
       'Progress stays on that device only. Use the device’s guest mode or clear the site data at closing time.',
     ],

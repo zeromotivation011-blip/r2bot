@@ -21,6 +21,7 @@ import { logic as flowchartBuilderLogic, type Params as FlowchartBuilderParams, 
 import { logic as gearTrainLogic, type Params as GearTrainParams, type Answer as GearTrainAnswer } from '@/components/kids/activities/templates/gear-train/logic'
 import { logic as leverBalanceLogic, type Params as LeverBalanceParams, type Answer as LeverBalanceAnswer } from '@/components/kids/activities/templates/lever-balance/logic'
 import { logic as logicGatesLogic, type Params as LogicGatesParams, type Answer as LogicGatesAnswer } from '@/components/kids/activities/templates/logic-gates/logic'
+import { logic as numberBoxLogic, type Params as NumberBoxParams, type Answer as NumberBoxAnswer } from '@/components/kids/activities/templates/number-box/logic'
 import { logic as motorMathLogic, type Params as MotorMathParams, type Answer as MotorMathAnswer } from '@/components/kids/activities/templates/motor-math/logic'
 import { logic as ohmsLawLogic, type Params as OhmsLawParams, type Answer as OhmsLawAnswer } from '@/components/kids/activities/templates/ohms-law/logic'
 import { logic as pathPlannerLogic, type Params as PathPlannerParams, type Answer as PathPlannerAnswer } from '@/components/kids/activities/templates/path-planner/logic'
@@ -51,6 +52,7 @@ export interface TemplateTypes {
   'lever-balance': { params: LeverBalanceParams; answer: LeverBalanceAnswer }
   'logic-gates': { params: LogicGatesParams; answer: LogicGatesAnswer }
   'motor-math': { params: MotorMathParams; answer: MotorMathAnswer }
+  'number-box': { params: NumberBoxParams; answer: NumberBoxAnswer }
   'ohms-law': { params: OhmsLawParams; answer: OhmsLawAnswer }
   'path-planner': { params: PathPlannerParams; answer: PathPlannerAnswer }
   'predict-output': { params: PredictOutputParams; answer: PredictOutputAnswer }
@@ -104,6 +106,7 @@ export const TEMPLATE_LOGIC: Record<TemplateId, AnyLogic> = {
   'lever-balance': erase(leverBalanceLogic),
   'logic-gates': erase(logicGatesLogic),
   'motor-math': erase(motorMathLogic),
+  'number-box': erase(numberBoxLogic),
   'ohms-law': erase(ohmsLawLogic),
   'path-planner': erase(pathPlannerLogic),
   'predict-output': erase(predictOutputLogic),

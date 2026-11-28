@@ -3,7 +3,7 @@
 // components/kids/activities/registry.ts
 // TemplateId -> the playable template, each loaded with next/dynamic so a page
 // downloads ONLY the template its activity uses. The loaded component is bound
-// to that template's own check(), so the player never imports all 26 logics.
+// to that template's own check(), so the player never imports every logic.
 //
 //   const Play = PLAYABLE[activity.template]
 //   <Play params={activity.params} band={band} onChecked={…} onDone={…} />
@@ -63,6 +63,7 @@ export const PLAYABLE: Record<TemplateId, ComponentType<PlayableProps>> = {
   'lever-balance': dynamic(() => import('./templates/lever-balance').then((m) => bind(m.template)), { ssr: false, loading: TemplateSkeleton }),
   'logic-gates': dynamic(() => import('./templates/logic-gates').then((m) => bind(m.template)), { ssr: false, loading: TemplateSkeleton }),
   'motor-math': dynamic(() => import('./templates/motor-math').then((m) => bind(m.template)), { ssr: false, loading: TemplateSkeleton }),
+  'number-box': dynamic(() => import('./templates/number-box').then((m) => bind(m.template)), { ssr: false, loading: TemplateSkeleton }),
   'ohms-law': dynamic(() => import('./templates/ohms-law').then((m) => bind(m.template)), { ssr: false, loading: TemplateSkeleton }),
   'path-planner': dynamic(() => import('./templates/path-planner').then((m) => bind(m.template)), { ssr: false, loading: TemplateSkeleton }),
   'predict-output': dynamic(() => import('./templates/predict-output').then((m) => bind(m.template)), { ssr: false, loading: TemplateSkeleton }),
@@ -93,6 +94,7 @@ export const TEMPLATE_LOADERS: Record<TemplateId, () => Promise<TemplateDef<unkn
   'lever-balance': () => import('./templates/lever-balance').then((m) => m.template as unknown as TemplateDef<unknown, unknown>),
   'logic-gates': () => import('./templates/logic-gates').then((m) => m.template as unknown as TemplateDef<unknown, unknown>),
   'motor-math': () => import('./templates/motor-math').then((m) => m.template as unknown as TemplateDef<unknown, unknown>),
+  'number-box': () => import('./templates/number-box').then((m) => m.template as unknown as TemplateDef<unknown, unknown>),
   'ohms-law': () => import('./templates/ohms-law').then((m) => m.template as unknown as TemplateDef<unknown, unknown>),
   'path-planner': () => import('./templates/path-planner').then((m) => m.template as unknown as TemplateDef<unknown, unknown>),
   'predict-output': () => import('./templates/predict-output').then((m) => m.template as unknown as TemplateDef<unknown, unknown>),

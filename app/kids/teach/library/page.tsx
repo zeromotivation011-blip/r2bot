@@ -120,8 +120,11 @@ export default function LibraryKitPage() {
       <section className="teach-no-print mt-10 max-w-3xl" aria-labelledby="more-h">
         <h2 id="more-h" className="font-display text-xl font-bold text-white">Turning a drop-in into a club</h2>
         <p className="mt-2 text-[16px] leading-relaxed text-slate-300">
-          If the same children keep coming back, start a weekly club: they join a class with a code and a nickname, keep
-          their own progress, and follow a six-week season with a showcase at the end. See <Link href="/kids/teach/clubs" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline">Club mode</Link>.
+          If the same children keep coming back, start a weekly group: in the Classroom, create a class and choose
+          “Library group” (or “Club”) as the kind of group. Children join with a code and a nickname, keep their own
+          progress and their own age band — a mixed-age group needs no single level — and follow a six-week season with a
+          showcase at the end. See <Link href="/kids/teach/clubs" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline">Club mode</Link> for
+          the weekly plan, or <Link href="/kids/classroom?kind=library" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline">create a library group</Link> (a grown-up’s sign-in is needed).
         </p>
       </section>
     </article>

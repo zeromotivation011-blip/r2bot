@@ -290,3 +290,195 @@ export function designFor(base: RobotDesign, parts: Partial<RobotDesign>): Robot
 }
 
 export const DEMO_BASE: RobotDesign = { ...DEFAULT_DESIGN }
+
+// ── Wave 4 (build log #23): the motor dead zone, carry positions, and an own arena per Level 2 session ──
+
+const SM = (l: Expr, r: Expr): Stmt => ({ op: 'set_motors', id: id('set_motors'), leftPct: l, rightPct: r })
+const wait = (s: number): Stmt => ({ op: 'wait', id: id('wait'), seconds: N(s) })
+const grip = (close: boolean): Stmt => ({ op: close ? 'grip_close' : 'grip_open', id: id(close ? 'grip_close' : 'grip_open') })
+const carry = (pos: 'high' | 'low'): Stmt => ({ op: 'set_carry', id: id('set_carry'), pos })
+const changeVar = (name: string, by: number): Stmt => ({ op: 'change_var', id: id('change_var'), name, by: N(by) })
+const repeatUntil = (cond: Expr, body: Stmt[]): Stmt => ({ op: 'repeat_until', id: id('repeat_until'), cond, body })
+const lt = (a: Expr, b: Expr): Expr => ({ k: 'compare', op: '<', a, b })
+const minus = (a: Expr, b: Expr): Expr => ({ k: 'math', op: '-', a, b })
+const plus = (a: Expr, b: Expr): Expr => ({ k: 'math', op: '+', a, b })
+const times = (a: Expr, b: Expr): Expr => ({ k: 'math', op: '*', a, b })
+
+// "Find the dead zone" (Level 4 Session 2, Circles in the Sand). The robot faces a wall far away and
+// raises its motor power 2 % at a time until the distance reading drops — the first power that
+// moves it. Below the dead zone (MOTOR_DEAD_ZONE_PCT, robot-spec.ts) the motors hum and the
+// wheels stay still, so a careful "creep at 8 %" never arrives.
+export const DEAD_ZONE_PARK: Extract<Arena['goal'], { kind: 'stop-in-zone' }>['zone'] = { kind: 'rect', center: [0, -0.45], size: [1.2, 0.2] }
+DEMOS.push({
+  id: 'dead-zone',
+  title: 'Find the dead zone',
+  task: 'Raise the motor power a little at a time until your robot starts to move, say that power, then park in the green zone.',
+  lesson: 'Below a certain power a motor cannot beat its own friction: it hums but the wheels do not turn. That is the dead zone — measure it, then always command more than it.',
+  ageHint: 'Ages 14–17',
+  arena: {
+    id: 'dead-zone',
+    title: 'Find the dead zone',
+    size: [1.2, 3],
+    center: [0, 0],
+    floor: 'tile',
+    regions: [{ shape: DEAD_ZONE_PARK, color: 'green', label: 'Park here' }],
+    lines: [],
+    // The wall the distance sensor watches (inside its 2 m range from the start).
+    walls: [{ from: [-0.6, 0.35], to: [0.6, 0.35], height: 0.4, thickness: 0.06 }],
+    ramps: [],
+    boxes: [],
+    objects: [],
+    start: { pos: [0, -1.25], headingDeg: 0 },
+    goal: { kind: 'stop-in-zone', zone: DEAD_ZONE_PARK, noCrash: true },
+    timeLimit: 60,
+  },
+  reference: {
+    body: [
+      setVar('power', N(0)),
+      setVar('start', S('distance_cm')),
+      // Moved at least 1 cm closer to the far wall = the wheels are turning.
+      repeatUntil(lt(S('distance_cm'), minus(V('start'), N(1))), [changeVar('power', 2), SM(V('power'), V('power')), wait(0.5)]),
+      stop(),
+      sayExpr(V('power')),
+      driveDistance(78, 30),
+      stop(),
+    ],
+  },
+  toolbox: [...MOTION, 'repeat', 'repeat_until', 'if', 'if_else', 'compare', 'math', 'number', 'distance_cm', 'timer_s', 'set_var', 'change_var', 'get_var', 'say'],
+  goodParts: { head: 'distance' },
+  wrongParts: { head: 'antenna' },
+  wrongFails: 'missing-part',
+  mistakes: [{ name: 'creep at 8 % (inside the dead zone)', program: { body: [SM(N(8), N(8)), wait(20), stop()] }, fails: 'short' }],
+})
+
+// "Low and slow" (Level 3 Session 14, The Core Store Ramp). Scoop up the 0.3 kg core box, climb the
+// 20° ramp to the store and tip the box out on the marked spot. Carried HIGH (up and back) the
+// balance point passes behind the rear wheels on the slope and the robot flips; carried LOW (down
+// and forward) it climbs. The numbers: sim/verify measures the tipping angle for both.
+export const CORE_RAMP_DEG = 20
+const RAMP_LEN = 0.9
+const RAMP_H = Math.round(RAMP_LEN * Math.tan((CORE_RAMP_DEG * Math.PI) / 180) * 1000) / 1000
+export const CORE_STORE_SPOT: Extract<Arena['goal'], { kind: 'deliver' }>['zone'] = { kind: 'rect', center: [0, 0.75], size: [0.5, 0.3] }
+DEMOS.push({
+  id: 'core-store-ramp',
+  title: 'Low and slow',
+  task: 'Scoop up the core box, carry it up the ramp without tipping, and tip it out on the marked spot in the store.',
+  lesson: 'Where a load sits moves the robot’s balance point. Carried high and back on a slope, the balance point passes behind the wheels and the robot flips; carried low and forward, it climbs.',
+  ageHint: 'Ages 11–13',
+  arena: {
+    id: 'core-store-ramp',
+    title: 'Low and slow',
+    size: [1.2, 3],
+    center: [0, -0.2],
+    floor: 'tile',
+    regions: [{ shape: CORE_STORE_SPOT, color: 'yellow', label: 'Store' }],
+    lines: [],
+    walls: [],
+    ramps: [{ center: [0, -0.35], size: [1.2, RAMP_LEN], height: RAMP_H, riseHeadingDeg: 0 }],
+    decks: [{ center: [0, 0.6], size: [1.2, 1.0], height: RAMP_H }],
+    boxes: [],
+    objects: [{ id: 'core-box', kind: 'cube', pos: [0, -1.05], size: 0.04, mass: 0.3, color: '#38BDF8' }],
+    start: { pos: [0, -1.3], headingDeg: 0 },
+    goal: { kind: 'deliver', object: 'core-box', zone: CORE_STORE_SPOT, label: 'core box' },
+    timeLimit: 60,
+  },
+  reference: { body: [grip(true), carry('low'), driveDistance(155, 40), stop(), grip(false), say('Core box stored!')] },
+  toolbox: [...MOTION, 'repeat', 'repeat_until', 'if', 'compare', 'math', 'number', 'set_var', 'change_var', 'get_var', 'grip_close', 'grip_open', 'set_carry', 'say'],
+  goodParts: { tool: 'scoop' },
+  wrongParts: { tool: 'none' },
+  wrongFails: 'missing-part',
+  mistakes: [
+    { name: 'carry it high', program: { body: [grip(true), carry('high'), driveDistance(155, 40), stop(), grip(false)] }, fails: 'tipped' },
+    { name: 'forget to let go', program: { body: [grip(true), carry('low'), driveDistance(155, 40), stop()] }, fails: 'not-delivered' },
+  ],
+})
+
+// "Curve to the dock" (Level 2 Session 5, Smooth Steerer). The dock is ahead and well over to the
+// right, and there is no turn block: only two motors at different speeds make the curve.
+/** Left 52 %, right 44 % for 10 s: a gentle right-hand curve that docks with every body (sim/verify). */
+const CURVE_L = 52
+const CURVE_R = 44
+const CURVE_S = 10
+const DOCK: Extract<Arena['goal'], { kind: 'reach' }>['zone'] = { kind: 'circle', center: [-0.45, 0.45], radius: 0.25 }
+DEMOS.push({
+  id: 'curve-dock',
+  title: 'Curve to the dock',
+  task: 'Reach the yellow dock, ahead and over to the right, without a single turn block: run the two motors at different speeds to curve.',
+  lesson: 'A robot with two drive motors steers by running its sides at different speeds: the slower side is on the inside of the curve, and the bigger the difference, the tighter the curve.',
+  ageHint: 'Ages 8–10',
+  arena: {
+    id: 'curve-dock',
+    title: 'Curve to the dock',
+    size: [2.4, 3],
+    center: [0, 0],
+    floor: 'tile',
+    regions: [{ shape: DOCK, color: 'yellow', label: 'Dock' }],
+    lines: [],
+    walls: [],
+    ramps: [],
+    boxes: [],
+    objects: [],
+    start: { pos: [0.6, -1.1], headingDeg: 0 },
+    goal: { kind: 'reach', zone: DOCK, noCrash: true },
+    timeLimit: 30,
+  },
+  reference: { body: [SM(N(CURVE_L), N(CURVE_R)), wait(CURVE_S), stop(), say('Docked!')] },
+  toolbox: ['drive_for', 'drive_distance', 'set_motors', 'stop', 'wait', 'repeat', 'number', 'say', 'beep'],
+  goodParts: { drive: 'wheels2' },
+  wrongParts: { drive: 'legs' },
+  wrongFails: 'short',
+})
+
+// "Lighthouse route" (Level 2 Session 12, Lighthouse Courier). Three legs, three skills: follow the
+// painted line until it ends, drive a measured 40 cm across the gap, then creep on until the
+// lighthouse wall is close and stop in the green zone.
+const LH_STOP: Extract<Arena['goal'], { kind: 'stop-in-zone' }>['zone'] = { kind: 'rect', center: [0, 1.0], size: [2.4, 0.2] }
+DEMOS.push({
+  id: 'lighthouse-route',
+  title: 'Lighthouse route',
+  task: 'Follow the line until it ends, drive 40 cm across the gap, then stop in the green zone before the lighthouse wall.',
+  lesson: 'A route has legs, and each leg needs its own skill: the line sensor where there is a line, the encoders across the gap, the distance sensor for the stop.',
+  ageHint: 'Ages 8–10',
+  arena: {
+    id: 'lighthouse-route',
+    title: 'Lighthouse route',
+    size: [2.4, 3.2],
+    center: [0, 0],
+    floor: 'tile',
+    regions: [{ shape: LH_STOP, color: 'green', label: 'Stop here' }],
+    lines: [
+      {
+        width: 0.025,
+        points: [
+          [0, -1.45],
+          [0, -1.1],
+          [0.18, -0.8],
+          [0.22, -0.5],
+          [0.05, -0.25],
+          [0, -0.05],
+          [0, 0.15],
+        ],
+      },
+    ],
+    walls: [{ from: [-1.2, 1.25], to: [1.2, 1.25], height: 0.4, thickness: 0.06 }],
+    ramps: [],
+    boxes: [],
+    objects: [],
+    start: { pos: [0, -1.35], headingDeg: 0 },
+    goal: { kind: 'stop-in-zone', zone: LH_STOP, noCrash: true },
+    timeLimit: 60,
+  },
+  reference: {
+    body: [
+      repeatUntil({ k: 'not', a: S('line_seen') }, [SM(plus(N(40), times(N(35), S('line_offset'))), minus(N(40), times(N(35), S('line_offset'))))]),
+      driveDistance(40, 50),
+      repeatUntil(lt(S('distance_cm'), N(20)), [SM(N(50), N(50))]),
+      stop(),
+      say('Message delivered!'),
+    ],
+  },
+  toolbox: [...MOTION, 'repeat_until', 'if', 'if_else', 'compare', 'not', 'math', 'number', 'line_seen', 'line_offset', 'distance_cm', 'say'],
+  goodParts: { head: 'distance', sensor: 'line', drive: 'wheels2' },
+  wrongParts: { sensor: 'none' },
+  wrongFails: 'missing-part',
+})

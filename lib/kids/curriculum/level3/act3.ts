@@ -6,7 +6,7 @@
 
 import type { Session } from '../types'
 import {
-  BOULDER_FIELD, CORE_BAY, CREW, DIST, FLOOR_COLOR, GRIP_CLOSE, GRIP_OPEN, HEADING, ICE_SLOPE, LOGIC, MOVE, SAY, SURVEY_GRID, TALK, TIMER, VARS_MATH,
+  BOULDER_FIELD, CORE_BAY, CREW, DIST, FLOOR_COLOR, GRIP_CLOSE, GRIP_OPEN, HEADING, ICE_SLOPE, LOGIC, MOVE, SAY, SET_CARRY, SURVEY_GRID, TALK, TIMER, VARS_MATH,
 } from './shared'
 import {
   arena, challenge, crit, episode, lessonPlan, makeSession, mc, o, projectPlan, q, right, scene, teacher, wrong,
@@ -146,18 +146,18 @@ export const ACT3: Session[] = [
     build: {
       part: { slot: 'tool', id: 'scoop' },
       action: 'swap',
-      narration: 'Fit the scoop: it can carry the core box high, or low and forward.',
+      narration: 'Fit the scoop: the carry load block holds the core box high (up and back) or low (down and forward).',
       why: 'Where the load sits moves the robot’s balance point — and that decides whether it tips on a slope.',
-      tryWithout: 'With the box held high, the robot flips backwards at about two-thirds of the way up the 20° ramp.',
-      physicsEffect: 'Scoop 0.10 kg; core box 0.3 kg. Carried high, the centre of mass rises by about 4 cm and moves 3 cm back.',
+      tryWithout: 'With the box held high, the robot flips backwards as soon as it starts up the 20° ramp.',
+      physicsEffect: 'Scoop 0.18 kg; core box 0.3 kg. Carried high instead of low, the centre of mass rises by about 4.5 cm and moves about 3.5 cm back: on the 20° ramp the line straight down from it falls behind the rear wheels.',
       realWorld: 'Forklifts keep heavy loads low when moving, and planetary rovers place their heaviest parts low in the body.',
     },
     code: challenge({
       title: 'Carry It High',
       mission: 'Scoop up the core box in the high position, drive up the ramp at 70 %, and watch what happens. Then say what you think went wrong.',
       arena: ICE_SLOPE,
-      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, GRIP_CLOSE, GRIP_OPEN, SAY],
-      example: ['grip_close  ← high carry position', 'drive_distance(350, 70)', 'stop', 'say("I tipped back")  ← the taught failure: the centre of mass passed behind the rear wheels'],
+      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, GRIP_CLOSE, GRIP_OPEN, SET_CARRY, SAY],
+      example: ['grip_close', 'carry_load(high)  ← the high carry position', 'drive_distance(155, 40)', 'stop', 'say("I tipped back")  ← the taught failure: the centre of mass passed behind the rear wheels'],
       success: [crit('uses-blocks', 'Runs the high-carry climb once and records the result (the robot is expected to tip).'), crit('reach-zone', 'Reaches the start of the ramp.')],
       two: 'You predicted the tip before running.',
       three: 'You drew where you think the centre of mass was when it tipped.',
@@ -167,12 +167,12 @@ export const ACT3: Session[] = [
       title: 'Low and Slow',
       mission: 'Get the core box up to the store without tipping. You can change the carry position, the speed and the start.',
       arena: ICE_SLOPE,
-      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, GRIP_CLOSE, GRIP_OPEN, SAY],
-      example: ['grip_close  ← then choose the LOW carry position in the scoop settings', 'drive_distance(100, 30)  ← gentle start', 'drive_distance(250, 40)', 'stop', 'grip_open'],
+      blocks: [...MOVE, ...LOGIC, ...VARS_MATH, GRIP_CLOSE, GRIP_OPEN, SET_CARRY, SAY],
+      example: ['grip_close', 'carry_load(low)  ← down and forward', 'drive_distance(155, 40)', 'stop', 'grip_open  ← tip it out on the store spot'],
       success: [crit('deliver-object', 'The core box ends in the store zone.'), crit('no-collision', 'The robot never tips (pitch stays under 35°).')],
       two: 'You changed only one thing at a time and recorded each try.',
       three: 'You found the fastest speed that still does not tip, with evidence.',
-      hints: ['Where should a heavy load be on a slope?', 'Lower and further forward keeps the balance point inside the wheels.', 'Low carry, gentle start at 30 %, then 40 %.'],
+      hints: ['Where should a heavy load be on a slope?', 'Lower and further forward keeps the balance point inside the wheels.', 'carry_load(low) before the climb, drive about 155 cm at 40 %, then grip_open on the store spot.'],
     }),
     quiz: [
       q('A robot tips over backwards on a ramp when…', [
@@ -192,7 +192,7 @@ export const ACT3: Session[] = [
       ], 'When the wheels accelerate the robot, the body “lags” and pitches back — the same push you feel in a bus that pulls away fast.'),
     ],
     badge: { id: 'l3-balance-keeper', name: 'Balance Keeper', icon: '🎯', earnedFor: 'You kept a loaded robot stable on a slope by moving its centre of mass.' },
-    reward: { note: 'Scoop carry positions (high and low) are now in your part settings.' },
+    reward: { note: 'The carry load block (low and high) is in your toolbox in the Physics Lab.' },
     teacher: teacher({
       timing: lessonPlan(5, 'Tip the box', 'why does a lower load make a robot more stable?'),
       warmup: {
@@ -209,7 +209,10 @@ export const ACT3: Session[] = [
       ],
       faster: ['Find the steepest ramp the robot can climb with the box low.', 'Explain what happens going DOWN the ramp with the box at the front.'],
       slower: ['Start with the box low and try two speeds.', 'Use the side view with the centre-of-mass dot switched on.'],
-      notes: ['Honest limit: the carry-position setting is part of the Level 3 simulator work; the playable challenge today is the Skill Galaxy centre-of-mass activity “A rover that survives the slope”, which uses the same physics.'],
+      notes: [
+        'The playable challenge is the Physics Lab arena “Low and slow” (the same 20° ramp and 0.3 kg core box). The “carry load” block moves the scoop: carried high, every robot body tips over backwards at the foot of the ramp; carried low, it climbs and tips the box out on the store spot. The lab records the solve and the session counts it by itself — no “I finished it”.',
+        'Honest limit: in the simulator the tip comes from where the load sits; a hard start adds only a little, so “slow” matters less here than on a real robot. Use the bus discussion for that part.',
+      ],
     }),
     parent: {
       today: 'Your child found out why robots tip over on slopes, and fixed it by carrying the load lower and further forward.',

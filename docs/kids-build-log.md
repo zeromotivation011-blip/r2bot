@@ -202,7 +202,7 @@ Still open from batch A:
 - [ ] (Deliberate, unchanged) Swarm Reef and Bio-Bots keep fixed limits on purpose (simulated mission time is part of the puzzle) — revisit if teachers ask.
 - [x] Episode `fx.ts` and the canvas worlds' own effects follow Calm (`kidsCalm()` in fx, the seven worlds drop bounce/pulse) — Wave 3 F.
 - [ ] (Standing rule) Owners of swapped stores (activities, course, hangar, classroom membership, think, vision, codelab, worlds): moving to `profileKey()` must remove the key from `SWAPPED_KEYS` in the same commit.
-- [ ] activities/verify warning: "variables" has a single template for Explorers (the course plan has nothing on variables at that age).
+- [x] activities/verify warning: "variables" has a single template for Explorers — `number-box` template + `code-ex-11`…`17` (Wave 4 G).
 
 ## 27 Nov 2026 — Wave 2, batch B (courses 2–4, Robodex, makers, robot depth, recorder, battery)
 Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-universe.md):
@@ -223,18 +223,18 @@ Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-u
 Still open from batch B:
 - [x] #38 games' own sims are recorded (`game-recorder.ts`, shell hook, seven games) — Wave 3 F.
 - [x] #33 upgrades change sim physics (`fittedSpec`); #39 the spec-sheet runtime is the sim's (`cruisePower`) — Wave 3 F.
-- [ ] AR (`ARViewClient`) does not show the World form yet.
+- [x] AR (`ARViewClient`) shows the World form (`buildARRobot` in `components/kids/three/ar-robot.ts`) — Wave 4 G.
 - [x] #23 reflectance block (L3 S4 plays "Find the faded line") and battery block (L3 S11 plays "Home before flat") — Wave 3 F.
-- [ ] #23 still no motor dead zone and no carry positions in the sim; those sessions' playable challenges stand in.
+- [x] #23 motor dead zone (12 %) and carry positions (`set_carry`, tipping) in the sim; L3-S14 and L4-S02 play them — Wave 4 G.
 - [x] #23 `?tier=` (GameShell) and `?demo=` (Physics Lab and Power Lab, `lab-links.ts`) — Wave 3 F.
-- [ ] Physics Lab arena challenges in a session are still self-reported ("I finished it"): the lab has no store.
+- [x] Physics Lab arena challenges in a session read the lab store (`lib/kids/sim/lab-results.ts`) — Wave 4 G.
 - [x] #23 "coming in <month>" waitlists are moot (all levels shipped); the course waitlist copy was removed with PLAYABLE.
 - [x] #30 misconception capture + Class Mind Map — batch C; Level 1 ids, device record and re-teach in Wave 3 F.
 - [x] Garage: Robodex shelf mounted; the Garage names course badges of all four levels.
 - [x] `/kids/next-step` linked from the Engineers home, the parent hub and the class view — Wave 3 F.
-- [ ] The class view still names only Level 1 course badges; the Garage certificate button shows Level 1 only (could follow the child's band).
+- [x] The class view names course badges of Levels 1–4; the Garage shows a certificate per finished level plus the next (`HangarCertificatesClient`) — Wave 4 G.
 - [x] Shared-tablet "Done" touches only per-child store keys (`wipeNamespace`) — Wave 3 F.
-- [ ] (Open, harmless) curriculum/verify warns: two Physics Lab arenas are each used by two Level 2 sessions (different tasks).
+- [x] curriculum/verify warning gone: L2-S05 plays "Curve to the dock", L2-S12 "Lighthouse route" — Wave 4 G.
 
 ## 27 Nov 2026 — Wave 2, batch C (teachers, Present mode, Trust Pack, Make It at Home, portfolio)
 Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-universe.md):
@@ -262,10 +262,11 @@ Still open from batch C:
   goal stays on the teacher's device and children do not see the Power-Up card.
 - [x] #30 Level 1 check options carry `misconception` ids (81 of 82 wrong options; "A name" in L1-S01 Q2 is deliberately untagged) — Wave 3 F.
 - [x] #6 Rank naming: the shell badge says "Rank N" (batch D).
-- [ ] #84 a real "club / family" class kind needs a migration; leaders use the youngest band for now.
+- [x] #84 class kind (school / club / family / library), migration **0059** — Wave 4 G.
 - [ ] #43 Founder to confirm "database region and DPA on request" wording in the Trust Pack.
-- [ ] Optional: a Robodex `build` trigger so a home build discovers its card; per-profile export in the
-  parent hub (`ParentProfilesClient`) does not carry the builds/portfolio extras yet (Hangar backup does).
+- [x] Robodex `build` trigger: an "I built it" check-in discovers the build's card (`lib/kids/builds/robodex.ts`) — Wave 4 G.
+- [ ] Per-profile export in the parent hub (`ParentProfilesClient`) does not carry the builds/portfolio extras yet
+  (Hangar backup does).
 - [ ] Portfolio reflections and build reflections are deliberately not in the backup code (free text stays
   on the device).
 - [x] #29 "Teacher locks a child's band" — Wave 3 F.
@@ -298,7 +299,7 @@ Done (roadmap numbers from docs/kids-product-review.md; contracts in docs/kids-u
 Still open from batch D:
 - [ ] Migration **0057** (`kids_passports`) must be run by the founder. Until then the Passport says
   "being switched on" and the offline backup code works as before.
-- [ ] #21 a real port of Code Lab to Blockly stays a Level 2 decision (reasons in `shared-vocabulary.ts`).
+- [x] #21 Code Lab is Blockly (grid blocks in `lib/kids/code-lab/blockly-defs.ts`, drafts migrate via `readDraft`) — Wave 4 G.
 - [x] `/kids/lab/episodes` links the Episodes Theatre (Wave 3 F). `blockly-blocks.ts` keeps a mirror of
   `SHARED_STYLE_COLOURS` on purpose — code-lab/verify.ts reads the hex values from blockly-blocks.ts and fails if they differ; an import would make that check vacuous.
 - [x] Parent hub has "Delete my Passport" (`PassportDeleteCardClient`, shared `passport-delete.ts`) — Wave 3 F.
@@ -444,3 +445,41 @@ remains a Level 2 decision.
   shell.verify fails on any plain `<Link>` from a child page to /kids/teach|parents|schools|grown-ups.
 - [x] Assignments "Try again" is 44px tall. Trust Pack v1.3: the snapshot `band` is "chosen by the child
   or set by the teacher" (migration 0058 band lock). profiles.ts comment names progress-backup.verify.ts.
+
+## 28 Nov 2026 — Wave 4, batch G (AR form, sim depth, class kinds + certificates, Blockly Code Lab, Explorers variables)
+
+Five owners built; the integrator applied the cross-owner changes. Contracts are in docs/kids-universe.md.
+- [x] **AR World form.** Camera magic window and WebXR AR build the robot with the Workshop's own
+  `buildRobot(design, { worldForm: true, learned })` (`ar-robot.ts`); the header and photo caption name the
+  form; the dialog is portalled to `<body>` (it sat under the sticky header) and Close stays above the
+  "taking a nap" poster. Workshop passes `learned`. `ar-robot.verify.ts` in CI.
+- [x] **#23 dead zone + carry.** `MOTOR_DEAD_ZONE_PCT` = 12 % (a sagging battery widens it; arenas can set
+  `motorDeadZonePct`), `telemetry().humming` in the Flight Recorder; `set_carry` block (low | high | normal,
+  needs `grab`), a `deliver` goal and tipping past 35° (`tipped`, `not-delivered`). The drive now pushes at
+  the tyre contact, not the centre of mass. New arenas `dead-zone` (L4-S02) and `core-store-ramp` (L3-S14).
+  `set_carry` is a curriculum `BlockId` (introduced at Level 3, in L3-S14's blocks) and Talk describes it.
+- [x] **Lab store.** `lib/kids/sim/lab-results.ts`: a solve is `personalBests["lab:<id>"]` via `reportBestRun`
+  (higher is better, so a backup merge keeps the faster solve). Course sessions read it; no "I finished it"
+  button for lab arenas.
+- [x] **Class kinds (#84), migration 0059.** `kids_classes.kind` school/club/family/library; mixed classes
+  keep each child's band (no whole-class lock). Before 0059 the kind is kept on the leader's device
+  (`classroom-kind-store.ts`) and handed over once. Sync now returns `kind`. Trust Pack v1.4.
+- [x] **Badges + certificates.** Class page "Course badges" for Levels 1–4 (roster order, never ranked);
+  Garage `HangarCertificatesClient` (every finished level + the next, following the band).
+- [x] **Build → Robodex.** The "I built it" check-in calls `discoverRobot()`; old or restored check-ins find
+  their card on the next visit.
+- [x] **#21 Code Lab on Blockly.** One block language with the Physics Lab; all 24 missions stay winnable
+  (verify runs every solution through headless Blockly and back); old drafts migrate on load under the same
+  key; Explorers blocks have no typed fields; tap palette, ◀ ▶ block picker and a screen-reader outline.
+- [x] **Explorers variables.** `number-box` template (picture cards change a number in a box; no timers, no
+  drag) and missions `code-ex-11`…`17`; it is a Launch Check quick template.
+- [x] Level 2 runner copy: the lab button opens the arena directly (no "pick it from the list").
+
+Founder: run **0059_kids_class_kind.sql** after 0058. Until then every class reads as a school class and a
+leader's chosen kind waits on their device; everything else works.
+
+Left open (and why): per-profile export in the parent hub still lacks the builds/portfolio extras (each store
+would need a profile-aware reader); the scoop/claw model does not animate to the high carry position (the
+load is drawn where the physics puts it); real WebXR AR cannot run in headless Chromium (same verified
+builder as the magic window); native review of Hindi/Spanish Spark replies and a real-phone offline run
+need people; migrations 0056–0059 wait on the founder.

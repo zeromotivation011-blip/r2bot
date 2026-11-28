@@ -14,7 +14,7 @@ import type { Rapier } from './rapier'
 
 export type RunStatus = 'running' | 'settling' | 'done'
 
-export type FailReason = 'missing-part' | 'crashed' | 'stuck' | 'short' | 'off-line' | 'moving' | 'timeout' | 'flat' | 'not-visited'
+export type FailReason = 'missing-part' | 'crashed' | 'stuck' | 'short' | 'off-line' | 'moving' | 'timeout' | 'flat' | 'not-visited' | 'tipped' | 'not-delivered'
 
 export interface RunResult {
   success: boolean
@@ -78,17 +78,22 @@ export function judge(arena: Arena, sim: Sim, onLineFraction: number, timedOut: 
   const g = arena.goal
   const inZone = reached || inShape(g.zone, x, z)
   const [gx, gz] = goalCenter(arena)
+  // A delivery is measured where the LOAD is, not the robot.
+  const load = g.kind === 'deliver' ? sim.objectPos(g.object) : null
   const base = {
     missing: [],
     time: Math.round(sim.time * 100) / 100,
     travelled: sim.travelled,
     wheelTravel: sim.wheelTravel,
-    goalDistance: Math.hypot(gx - x, gz - z),
+    goalDistance: load ? Math.hypot(gx - load.x, gz - load.z) : Math.hypot(gx - x, gz - z),
     crashed: sim.crashed,
     onLineFraction,
     battery: batteryEnd(sim),
   }
   const fail = (reason: FailReason, message: string): RunResult => ({ ...base, success: false, reason, message })
+  // A robot on its back cannot carry on, whatever else happened.
+  if (sim.tipped) return fail('tipped', 'Your robot tipped over! Where the load sits moves its balance point: carry it lower and further forward, and try again.')
+  if (g.kind === 'deliver') return judgeDeliver(g, sim, base, fail)
   const noCrash = g.kind === 'stop-in-zone' || ((g.kind === 'reach' || g.kind === 'visit-and-return') && g.noCrash === true)
   if (noCrash && sim.crashed) return fail('crashed', 'Bonk! Your robot crashed into the wall. Stop it before it touches.')
   if (!inZone) {
@@ -117,6 +122,29 @@ export function judge(arena: Arena, sim: Sim, onLineFraction: number, timedOut: 
   return { ...base, success: true, reason: null, message: 'You did it! Your robot reached the goal. ⭐' }
 }
 
+function judgeDeliver(
+  g: Extract<Arena['goal'], { kind: 'deliver' }>,
+  sim: Sim,
+  base: Omit<RunResult, 'success' | 'reason' | 'message'>,
+  fail: (reason: FailReason, message: string) => RunResult,
+): RunResult {
+  const p = sim.objectPos(g.object)
+  const held = sim.snapshot().holding === g.object
+  if (!held && p && inShape(g.zone, p.x, p.z)) return { ...base, success: true, reason: null, message: `You did it! The ${g.label} is in the right place. ⭐` }
+  const bat = sim.battery()
+  if (bat.coupled && bat.flat) return fail('flat', `The battery ran flat before the ${g.label} was delivered. Take a shorter route or drive more gently.`)
+  if (sim.slipTravel > 0.25 && sim.slipTravel > sim.travelled) return fail('stuck', `Your robot got stuck — the wheels spun ${Math.round(sim.wheelTravel * 100)} cm but it only moved ${Math.round(sim.travelled * 100)} cm.`)
+  if (held) return fail('not-delivered', `The ${g.label} is still in your robot’s ${sim.design.tool === 'scoop' ? 'scoop' : 'claw'}. Let go of it inside the marked spot.`)
+  return fail('not-delivered', `The ${g.label} ended ${Math.round(base.goalDistance * 100)} cm from the middle of the marked spot. Where should the robot be when it lets go?`)
+}
+
+/** Is the load delivered right now: released and inside the zone? */
+function delivered(g: Extract<Arena['goal'], { kind: 'deliver' }>, sim: Sim): boolean {
+  if (sim.snapshot().holding === g.object) return false
+  const p = sim.objectPos(g.object)
+  return Boolean(p && inShape(g.zone, p.x, p.z))
+}
+
 function batteryEnd(sim: Sim): RunResult['battery'] {
   const b = sim.battery()
   return { soc: Math.round(b.soc * 1000) / 1000, usedMah: Math.round(b.usedMah * 10) / 10, minVolts: Math.round(b.minVolts * 100) / 100, flat: b.flat, coupled: b.coupled }
@@ -125,6 +153,7 @@ function batteryEnd(sim: Sim): RunResult['battery'] {
 /** Goal check while an endless program runs. stop-in-zone needs the robot at rest in the zone for half a second. */
 function goalMet(arena: Arena, sim: Sim, onLineFraction: number, restTicks: number, visited: boolean): boolean {
   const g = arena.goal
+  if (g.kind === 'deliver') return delivered(g, sim)
   if (g.kind === 'stop-in-zone') return restTicks >= Math.round(0.5 / DT)
   if (g.kind === 'visit-and-return') return visited && restTicks >= Math.round(0.5 / DT)
   const p = sim.snapshot().robot.p

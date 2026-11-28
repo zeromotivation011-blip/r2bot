@@ -96,6 +96,55 @@ export function cleanText(raw: unknown, max: number): string {
   return raw.replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, max)
 }
 
+// ── Class kind (roadmap #84, migration 0059) ─────────────────────────────────
+/**
+ * What sort of group a class is. A school class is one age band; a club, a
+ * family class and a library group are MIXED: every child keeps their own band
+ * (the class band is only the youngest band, used for the shared hook). Before
+ * migration 0059 runs the kind lives on the leader's device and the server
+ * treats every class as 'school'.
+ */
+export type ClassKind = 'school' | 'club' | 'family' | 'library'
+export const DEFAULT_CLASS_KIND: ClassKind = 'school'
+
+export interface ClassKindInfo {
+  id: ClassKind
+  label: string
+  emoji: string
+  /** One line for the create form. */
+  line: string
+  /** Each child keeps their own band. */
+  mixed: boolean
+  /** The teacher guide for running this kind of group. */
+  guide: string
+  /** What the class band means for this kind, for the create form. */
+  bandLegend: string
+}
+
+export const CLASS_KINDS: readonly ClassKindInfo[] = [
+  { id: 'school', label: 'School class', emoji: '🏫', line: 'One year group. Everyone plays at the class band.', mixed: false, guide: '/kids/teach', bandLegend: 'Grade band' },
+  { id: 'club', label: 'Club', emoji: '🤖', line: 'After-school or community club, mixed ages. Each child keeps their own band.', mixed: true, guide: '/kids/teach/clubs', bandLegend: 'Youngest band in the club (for the shared hook)' },
+  { id: 'family', label: 'Family class', emoji: '🏡', line: 'Homeschool or siblings of any age. Each child keeps their own band.', mixed: true, guide: '/kids/teach/family', bandLegend: 'Youngest child’s band (for the shared hook)' },
+  { id: 'library', label: 'Library group', emoji: '📚', line: 'A regular library or community-centre group. Each child keeps their own band.', mixed: true, guide: '/kids/teach/library', bandLegend: 'Youngest band in the group (for the shared hook)' },
+]
+
+/** Error code a route returns when migration 0059 has not run (the kind stays on the leader's device). */
+export const KIND_NOT_READY = 'class-kind-not-ready'
+export const KIND_NOT_READY_MESSAGE = 'Class kinds are being switched on — your choice is kept on this device until the database update has run.'
+
+export function isClassKind(x: unknown): x is ClassKind {
+  return typeof x === 'string' && CLASS_KINDS.some((k) => k.id === x)
+}
+
+export function classKindInfo(kind: unknown): ClassKindInfo {
+  return CLASS_KINDS.find((k) => k.id === kind) ?? CLASS_KINDS[0]
+}
+
+/** True when each child in the class keeps their own band (club, family, library). */
+export function isMixedKind(kind: unknown): boolean {
+  return classKindInfo(kind).mixed
+}
+
 // ── Snapshot ─────────────────────────────────────────────────────────────────
 /** What a child's browser sends to the class. Counters only — no free text except the robot code, whose name is checked like a nickname. */
 export interface ClassSnapshot {
@@ -454,6 +503,10 @@ export interface KidsClassSummary {
   bandLocked?: boolean
   /** False while migration 0058 has not run: band locks cannot be set yet. */
   bandLockReady?: boolean
+  /** Roadmap #84 (migration 0059): school, club, family or library. Absent = school. */
+  kind?: ClassKind
+  /** False while migration 0059 has not run: the kind can only be kept on the leader's device. */
+  kindReady?: boolean
 }
 
 export interface KidsMemberRow {
@@ -478,13 +531,32 @@ export interface JoinedClassInfo {
    * sync. null/absent = the child chooses.
    */
   lockedBand?: BandId | null
+  /**
+   * Roadmap #84 (migration 0059): the kind of class. In a club, family or
+   * library class (mixed) the child keeps their own band, so the device never
+   * takes the class band. Absent = school (older answers, before 0059).
+   */
+  kind?: ClassKind
 }
 
-/** The band a child must play at: their own lock wins, then the class lock, else none. */
-export function effectiveBandLock(classBand: unknown, classLocked: boolean, memberLock: unknown): BandId | null {
+/**
+ * The band a child must play at: their own lock wins, then the class lock,
+ * else none. A mixed class (club, family, library) has no class lock: each
+ * child keeps their own band unless the leader set that one child's band.
+ */
+export function effectiveBandLock(classBand: unknown, classLocked: boolean, memberLock: unknown, kind: unknown = DEFAULT_CLASS_KIND): BandId | null {
   if (isBandId(memberLock)) return memberLock
-  if (classLocked && isBandId(classBand)) return classBand
+  if (classLocked && !isMixedKind(kind) && isBandId(classBand)) return classBand
   return null
+}
+
+/**
+ * The band a child's device should START at when joining: the class band for a
+ * school class, none for a mixed class (the child picks their own). Never
+ * overrides a band the child already has (lib/kids/profiles.ts bindClassMember).
+ */
+export function joinBandFor(info: Pick<JoinedClassInfo, 'band' | 'kind'>): BandId | null {
+  return isMixedKind(info.kind) ? null : info.band
 }
 
 /** Error code a route returns when migration 0054 has not been run yet. */

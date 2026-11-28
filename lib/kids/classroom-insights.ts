@@ -36,6 +36,8 @@ export interface InsightSession {
   u?: { t: string; h: string }
   /** The episode to replay with the class (title, href). */
   e?: { t: string; h: string }
+  /** The course badge finishing the session earns (name, icon) — every level. */
+  b?: { n: string; i: string }
 }
 
 export interface InsightMisconception {
@@ -444,4 +446,65 @@ export function gradebookCsv(rows: readonly GradeRow[]): string {
     return [r.member.nickname, ...cells, Object.keys(r.member.snapshot.sessionsDone).length, r.member.snapshot.activitiesDone.length].map(csvCell).join(',')
   })
   return [header.map(csvCell).join(','), ...lines].join('\n')
+}
+
+// ── Course badges (all four levels) ──────────────────────────────────────────
+
+export interface ClassBadge {
+  sessionId: string
+  /** Session number in its level. */
+  n: number
+  name: string
+  icon: string
+  /** Nicknames of the children who earned it, in roster order. */
+  earnedBy: string[]
+}
+
+export interface ClassBadgeLevel {
+  level: 1 | 2 | 3 | 4
+  /** Badges in the level (from the catalogue), whether earned or not. */
+  total: number
+  /** Badges at least one child earned, in session order. */
+  earned: ClassBadge[]
+}
+
+/**
+ * The course badges a class has earned, for all four levels. A course badge is
+ * earned by finishing its session (SessionRunnerClient reports the badge with
+ * the session), so the snapshot's sessionsDone is the evidence: counts only,
+ * nothing new is sent. Levels with no catalogue entry still appear (total 0).
+ */
+export function classCourseBadges(members: readonly KidsMemberRow[], cat: InsightCatalogue): ClassBadgeLevel[] {
+  const levels: ClassBadgeLevel[] = ([1, 2, 3, 4] as const).map((level) => ({ level, total: 0, earned: [] }))
+  const byId = new Map<string, ClassBadge>()
+  for (const s of Object.values(cat.sessions)) {
+    const lv = levels[s.l - 1]
+    if (lv) lv.total++
+  }
+  for (const m of members) {
+    for (const [sid, stars] of Object.entries(m.snapshot.sessionsDone)) {
+      if (stars <= 0) continue
+      const s = cat.sessions[sid]
+      if (!s || !levels[s.l - 1]) continue
+      let b = byId.get(sid)
+      if (!b) {
+        b = { sessionId: sid, n: s.n, name: s.b?.n ?? s.t, icon: s.b?.i ?? '🏅', earnedBy: [] }
+        byId.set(sid, b)
+        levels[s.l - 1].earned.push(b)
+      }
+      b.earnedBy.push(m.nickname)
+    }
+  }
+  for (const lv of levels) lv.earned.sort((a, b) => a.n - b.n)
+  return levels
+}
+
+/** Course sessions finished per level for one child: [L1, L2, L3, L4]. */
+export function sessionsPerLevel(snapshot: Pick<KidsMemberRow['snapshot'], 'sessionsDone'>): [number, number, number, number] {
+  const out: [number, number, number, number] = [0, 0, 0, 0]
+  for (const [sid, stars] of Object.entries(snapshot.sessionsDone)) {
+    const m = /^L([1-4])-S\d{2}$/.exec(sid)
+    if (m && stars > 0) out[Number(m[1]) - 1]++
+  }
+  return out
 }

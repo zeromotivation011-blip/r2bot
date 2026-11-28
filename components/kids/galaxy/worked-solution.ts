@@ -19,6 +19,7 @@ import { BAND_ORDER } from '@/lib/kids/bands'
 import type { AnswerOf, ParamsOf } from '@/lib/kids/activities/logic-registry'
 import { SENSORS } from '@/components/kids/activities/templates/sensor-choice/logic'
 import type { Cmd } from '@/components/kids/activities/templates/sequence-path/engine'
+import { describeNumberBox } from '@/components/kids/activities/templates/number-box/logic'
 
 /** What the player needs to show "Spark shows me". Words only. */
 export interface WorkedTwin {
@@ -449,6 +450,7 @@ export function describeSolution(template: TemplateId, params: unknown, solution
       case 'lever-balance': return run(describeLever)
       case 'logic-gates': return run(describeGates)
       case 'motor-math': return run(describeMotor)
+      case 'number-box': return run<'number-box'>(describeNumberBox)
       case 'ohms-law': return run(describeOhms)
       case 'path-planner': return run(describePath)
       case 'predict-output': return run(describePredict)
@@ -485,6 +487,7 @@ function shapeKey(template: TemplateId, params: unknown): string {
       return String(p.command)
     case 'signal-graph':
       return String((p.task as Record<string, unknown> | undefined)?.kind)
+    case 'number-box':
     case 'predict-output':
       return String((p.ask as Record<string, unknown> | undefined)?.kind)
     case 'spot-in-scene':

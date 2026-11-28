@@ -10,11 +10,17 @@
 //      Drag to move, pinch or slider to resize, and take a photo.
 // The camera is only requested when the child presses the button, after we
 // explain why. The video never leaves the device.
+// Both views show exactly the robot the Workshop shows: World form (drone /
+// sub / humanoid) included, same parts, colours, name and learned-part glow
+// (see ./ar-robot.ts).
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import * as THREE from 'three'
-import { animateRobot, buildRobot } from '@/lib/kids/robot3d'
+import { animateRobot } from '@/lib/kids/robot3d'
 import type { RobotDesign } from '@/lib/kids/robot-design'
+import type { AnySlot } from '@/lib/kids/robot-growth'
+import { AR_FOV, AR_XR_SCALE, arFormLabel, arMagicWindowFrame, buildARRobot } from './ar-robot'
 import { playSound } from '@/lib/kids-audio'
 import { createStage, prefersReducedMotion, type Stage } from './stage'
 import { requireGrownUp } from '@/components/kids/app/ParentalGateClient'
@@ -24,15 +30,24 @@ type Phase = 'intro' | 'xr' | 'camera' | 'denied' | 'nocamera' | 'error'
 
 interface Props {
   design: RobotDesign
+  /** Parts the child learned (they glow in the Workshop, so they glow here too). Optional. */
+  learned?: readonly AnySlot[]
   onClose: () => void
 }
 
-export default function ARViewClient({ design, onClose }: Props) {
+export default function ARViewClient({ design, learned, onClose }: Props) {
+  // A string key, so a fresh array from the parent's render does not rebuild the 3D view.
+  // This component only ever mounts on the client (next/dynamic, ssr: false).
+  const [portalHost] = useState<HTMLElement | null>(() => (typeof document === 'undefined' ? null : document.body))
+  const learnedKey = learned && learned.length ? [...learned].sort().join(',') : ''
+  const form = arFormLabel(design)
   const [phase, setPhase] = useState<Phase>('intro')
   const [arSupported, setArSupported] = useState(false)
   const [scale, setScale] = useState(1)
   const [toast, setToast] = useState<string | null>(null)
   const [hitTest, setHitTest] = useState(false)
+  // The magic window's GPU context was lost (the "taking a nap" poster shows): no photo until it is back.
+  const [lost, setLost] = useState(false)
   const cameraOn = useParentControls().camera
   const videoRef = useRef<HTMLVideoElement>(null)
   const hostRef = useRef<HTMLDivElement>(null)
@@ -137,8 +152,8 @@ export default function ARViewClient({ design, onClose }: Props) {
     teardown()
     const stage = createStage(host, { alpha: true, xr: true, shadows: false })
     stageRef.current = stage
-    const robot = buildRobot(design)
-    robot.scale.setScalar(0.35)
+    const robot = buildARRobot(design, learnedKey ? (learnedKey.split(',') as AnySlot[]) : [])
+    robot.scale.setScalar(AR_XR_SCALE)
     robot.visible = false
     stage.scene.add(robot)
     robotRef.current = robot
@@ -255,11 +270,31 @@ export default function ARViewClient({ design, onClose }: Props) {
     video.srcObject = stream
     void video.play().catch(() => undefined)
 
-    const stage = createStage(host, { alpha: true, fov: 50 })
+    const stage = createStage(host, { alpha: true, fov: AR_FOV, onContextLost: setLost })
     stageRef.current = stage
-    stage.camera.position.set(0, 1.3, 2.6)
-    stage.camera.lookAt(0, 0.3, 0)
-    const robot = buildRobot(design)
+    const robot = buildARRobot(design, learnedKey ? (learnedKey.split(',') as AnySlot[]) : [])
+    // Frame the whole robot (a wide drone or a tall humanoid steps the camera back),
+    // and again whenever the screen turns.
+    let framedAspect = 0
+    const reframe = () => {
+      const aspect = stage.camera.aspect
+      if (Math.abs(aspect - framedAspect) < 0.01) return
+      framedAspect = aspect
+      // Measure the robot as built (not where the child dragged, turned or sized it).
+      const pos = robot.position.clone()
+      const rot = robot.rotation.clone()
+      const size = robot.scale.x
+      robot.position.set(0, 0, 0)
+      robot.rotation.set(0, 0, 0)
+      robot.scale.setScalar(1)
+      const frame = arMagicWindowFrame(robot, aspect)
+      robot.position.copy(pos)
+      robot.rotation.copy(rot)
+      robot.scale.setScalar(size)
+      stage.camera.position.set(...frame.camera)
+      stage.camera.lookAt(...frame.target)
+    }
+    reframe()
     stage.scene.add(robot)
     robotRef.current = robot
     // Invisible floor that still catches a soft shadow on top of the video.
@@ -270,6 +305,7 @@ export default function ARViewClient({ design, onClose }: Props) {
 
     const reduced = prefersReducedMotion()
     stage.onFrame((t) => {
+      reframe()
       robot.scale.setScalar(scaleRef.current)
       animateRobot(robot, t, { moving: false, reducedMotion: reduced })
     })
@@ -325,8 +361,9 @@ export default function ARViewClient({ design, onClose }: Props) {
       el.removeEventListener('pointercancel', up)
       stage.dispose()
       if (stageRef.current === stage) stageRef.current = null
+      setLost(false)
     }
-  }, [phase, design])
+  }, [phase, design, learnedKey])
 
   const turn = (deg: number) => {
     const r = robotRef.current
@@ -357,7 +394,7 @@ export default function ARViewClient({ design, onClose }: Props) {
     g.fillRect(0, h - 44 * dpr, w, 44 * dpr)
     g.fillStyle = '#FDE68A'
     g.font = `bold ${16 * dpr}px system-ui, sans-serif`
-    g.fillText(`${design.name} · built in the R2BOT Robot Workshop`, 14 * dpr, h - 16 * dpr)
+    g.fillText(`${design.name}${form ? ` · ${form.name}` : ''} · built in the R2BOT Robot Workshop`, 14 * dpr, h - 16 * dpr)
     const a = document.createElement('a')
     a.href = c.toDataURL('image/png')
     a.download = `${design.name.replace(/[^A-Za-z0-9]+/g, '-').toLowerCase() || 'robot'}-in-my-room.png`
@@ -381,20 +418,27 @@ export default function ARViewClient({ design, onClose }: Props) {
 
   const liveView = phase === 'camera' || phase === 'xr'
 
-  return (
+  // Portalled to <body>: inside the Workshop the dialog sat in a stacking
+  // context below the sticky kids header, which covered its Close button.
+  if (!portalHost) return null
+  return createPortal(
     <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="See your robot in your room" className="fixed inset-0 z-[70] bg-[#0A1120] text-white">
       {/* Camera feed + transparent 3D layer */}
       <video ref={videoRef} playsInline muted autoPlay className={`absolute inset-0 h-full w-full object-cover ${phase === 'camera' ? '' : 'hidden'}`} />
       <div ref={hostRef} className={`absolute inset-0 ${liveView ? '' : 'pointer-events-none'}`} />
 
-      <div ref={overlayRef} className="pointer-events-none absolute inset-0 flex flex-col">
+      <div ref={overlayRef} className="pointer-events-none absolute inset-0 z-20 flex flex-col">
         <div className="pointer-events-auto flex items-center justify-between gap-2 p-3">
-          <p className="rounded-full bg-black/50 px-4 py-2 text-sm font-bold">📱 {design.name} in your room</p>
+          <p className="rounded-full bg-black/50 px-4 py-2 text-sm font-bold" data-ar-form={form?.id ?? 'ground'}>
+            {form ? <span aria-hidden>{form.emoji} </span> : <span aria-hidden>📱 </span>}
+            {design.name}
+            {form ? ` the ${form.name}` : ''} in your room
+          </p>
           <button
             ref={closeBtnRef}
             type="button"
             onClick={close}
-            className="min-h-[44px] min-w-[44px] rounded-full bg-white/90 px-4 font-bold text-black focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400"
+            className="min-h-[44px] min-w-[44px] shrink-0 whitespace-nowrap rounded-full bg-white/90 px-4 font-bold text-black focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400"
           >
             ✕ Close
           </button>
@@ -494,7 +538,7 @@ export default function ARViewClient({ design, onClose }: Props) {
               <button type="button" onClick={() => turn(-30)} aria-label="Turn robot left" className="min-h-[52px] min-w-[52px] rounded-full bg-white/90 text-2xl text-black">
                 ↺
               </button>
-              <button type="button" onClick={takePhoto} className="min-h-[52px] rounded-full bg-amber-500 px-6 text-lg font-black text-black focus:outline-none focus-visible:ring-4 focus-visible:ring-white">
+              <button type="button" onClick={takePhoto} disabled={lost} className="min-h-[52px] rounded-full bg-amber-500 px-6 disabled:opacity-50 text-lg font-black text-black focus:outline-none focus-visible:ring-4 focus-visible:ring-white">
                 📸 Take photo
               </button>
               <button type="button" onClick={() => turn(30)} aria-label="Turn robot right" className="min-h-[52px] min-w-[52px] rounded-full bg-white/90 text-2xl text-black">
@@ -510,6 +554,7 @@ export default function ARViewClient({ design, onClose }: Props) {
           {toast}
         </p>
       )}
-    </div>
+    </div>,
+    portalHost,
   )
 }

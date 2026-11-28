@@ -72,6 +72,7 @@ export type BlockId =
   // Actions
   | 'grip_open' // needs Gripper Claw or Scoop
   | 'grip_close' // needs Gripper Claw or Scoop
+  | 'set_carry' // (low | high | normal) — where the claw/scoop holds its load (Level 3)
   | 'pen_down' // needs Drawing Pen
   | 'pen_up' // needs Drawing Pen
   | 'light_on' // needs Headlight
@@ -112,6 +113,7 @@ export const BLOCK_NEEDS: Record<BlockId, Capability | null> = {
   variable_get: null,
   grip_open: 'grab',
   grip_close: 'grab',
+  set_carry: 'grab',
   pen_down: 'draw',
   pen_up: 'draw',
   light_on: 'light',

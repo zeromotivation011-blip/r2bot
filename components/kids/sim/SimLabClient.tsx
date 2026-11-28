@@ -13,6 +13,8 @@ import { SLOT_LABEL } from '@/lib/kids/code-lab/labels'
 import { DEMOS, designFor, type Demo } from '@/lib/kids/sim/demos'
 import { missingParts, type Program } from '@/lib/kids/sim/program'
 import { hasPhysicsUpgrades } from '@/lib/kids/sim/robot-spec'
+import { labSolved } from '@/lib/kids/sim/lab-links'
+import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
 
 /** Same boxes, same order and same sizes as SimWorkbenchClient, so nothing shifts when it arrives. */
 function WorkbenchSkeleton() {
@@ -46,6 +48,23 @@ const STARTERS: Record<string, Program> = {
   'stop-before-wall': { body: [] },
   'follow-line': { body: [] },
   'faded-line': { body: [{ op: 'drive_distance', id: 'start-1', cm: { k: 'number', v: 50 }, speedPct: { k: 'number', v: 30 } }] },
+  // A careful creep at 8 %: run it and watch the wheels not turn (the dead zone).
+  'dead-zone': {
+    body: [
+      { op: 'set_motors', id: 'start-1', leftPct: { k: 'number', v: 8 }, rightPct: { k: 'number', v: 8 } },
+      { op: 'wait', id: 'start-2', seconds: { k: 'number', v: 3 } },
+      { op: 'stop', id: 'start-3' },
+    ],
+  },
+  'core-store-ramp': { body: [{ op: 'grip_close', id: 'start-1' }] },
+  'curve-dock': {
+    body: [
+      { op: 'set_motors', id: 'start-1', leftPct: { k: 'number', v: 50 }, rightPct: { k: 'number', v: 50 } },
+      { op: 'wait', id: 'start-2', seconds: { k: 'number', v: 2 } },
+      { op: 'stop', id: 'start-3' },
+    ],
+  },
+  'lighthouse-route': { body: [] },
 }
 
 /** Upgrades that change the physics here (roadmap #33), in words: "Torque Motors · Big Power Pack". */
@@ -76,6 +95,17 @@ export default function SimLabClient() {
   /** What the child fitted in each challenge (kept when they switch tabs and come back). */
   const [fitted, setFitted] = useState<Record<string, RobotDesign>>({})
   const [saved, setSaved] = useState(false)
+  /** Arenas this child has solved (the lab's result store, lab-results.ts). */
+  const [solvedIds, setSolvedIds] = useState<Set<string>>(new Set())
+  useEffect(() => {
+    const read = () => {
+      const pb = getProgress().personalBests
+      setSolvedIds(new Set(DEMOS.filter((d) => labSolved(pb, d.id)).map((d) => d.id)))
+    }
+    read()
+    window.addEventListener(KIDS_PROGRESS_EVENT, read)
+    return () => window.removeEventListener(KIDS_PROGRESS_EVENT, read)
+  }, [])
 
   // Read the saved robot once, BEFORE the simulator mounts, so the 3D scene and the physics are built once.
   // ?demo=<id> opens that arena (a course session links straight to its challenge).
@@ -122,6 +152,11 @@ export default function SimLabClient() {
           >
             <span className="block text-sm font-black">
               {i + 1}. {d.title}
+              {solvedIds.has(d.id) && (
+                <span className="ml-1 text-emerald-300" aria-label="solved">
+                  ✓
+                </span>
+              )}
             </span>
             <span className="block text-xs text-slate-300">{d.ageHint}</span>
           </button>

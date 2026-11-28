@@ -67,6 +67,7 @@ export type TemplateId =
   | 'flowchart-builder' // arrange decisions/actions into a flowchart that solves a scenario
   | 'logic-gates' // wire AND/OR/NOT/XOR to match a truth table or behaviour
   | 'binary-encoder' // bits: numbers, pixels, messages, parity
+  | 'number-box' // a box holds one number; picture cards change it (variables for ages 5–7)
   // Physics & mechanics
   | 'gear-train' // choose gears to hit a speed or torque target (animated)
   | 'lever-balance' // place loads/fulcrum to balance; mechanical advantage

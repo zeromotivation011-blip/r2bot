@@ -10,25 +10,42 @@
 //     child shares; the gradebook keeps roster order;
 //   - Class Power-Up maths: window, distinct work, milestones, helpers;
 //   - the device diary counts a thing once a day and only inside a class;
-//   - standards: every level maps to CSTA, England and concepts with real sessions.
+//   - standards: every level maps to CSTA, England and concepts with real sessions;
+//   - Wave 4: the class kind (school / club / family / library, migration 0059):
+//     mixed classes keep each child's own band, the leader's device keeps the
+//     kind before 0059 and hands it over after, old memberships still read;
+//     course badges for all four levels in the class view; the Garage offers
+//     every finished level's certificate; a home build discovers its Robodex card.
 // Run: npx tsx lib/kids/classroom-wave2.verify.ts
 
+import { readFileSync } from 'node:fs'
 import {
+  CLASS_KINDS,
   EMPTY_SNAPSHOT,
   MISCONCEPTION_KEY_RE,
   SNAPSHOT_MAX_BYTES,
   SNAPSHOT_MAX_BYTES_V2,
+  effectiveBandLock,
   fitSnapshot,
+  isClassKind,
+  isMixedKind,
+  joinBandFor,
   parseSnapshot,
   snapshotBytes,
   type ClassSnapshot,
   type KidsMemberRow,
 } from './classroom'
 import { GOAL_PRESETS, addDays, goalProgress, helpedThisWeek, milestonesReached, parseGoal, suggestedTarget, weekStart, type ClassGoal } from './classroom-goal'
-import { cellEvidence, classMindMap, gradebook, gradebookCsv, mindMapHeadline, stuckSignals } from './classroom-insights'
+import { cellEvidence, classCourseBadges, classMindMap, gradebook, gradebookCsv, mindMapHeadline, sessionsPerLevel, stuckSignals } from './classroom-insights'
+import { certificatePlan } from '../../components/kids/hangar/certificate-levels'
+import { cardsForCheckIns } from './builds/robodex'
+import { HOME_BUILDS } from './builds/builds'
+import { buildsBackupExtra, decodeBuildsExtra } from './builds/store'
+import { ROBODEX_CARDS } from './robodex/cards'
 import { getInsightCatalogue } from './classroom-insights-server'
 import { allStandards } from './classroom-standards'
 import { DEVICE_ONLY, LAW_NOTES, ONE_MINUTE, SERVER_TABLES, parentLetter } from './teach/trust-pack'
+import { CLUB_SETUP, FAMILY_SETUP } from './teach/clubs'
 import { LEVEL2_SESSIONS } from './curriculum/level2'
 import { LEVEL3_SESSIONS } from './curriculum/level3'
 import { LEVEL4_SESSIONS } from './curriculum/level4'
@@ -238,9 +255,93 @@ function trustChecks(): void {
   check('Trust Pack states the Wave 2 snapshot size', /16 KB/.test(all))
 }
 
-void diaryChecks().then(() => {
+// ── Wave 4: class kind, badges, certificates, build → Robodex ───────────────
+function kindChecks(): void {
+  console.log('Class kind (migration 0059)')
+  check('four kinds: school, club, family, library', CLASS_KINDS.map((k) => k.id).join() === 'school,club,family,library')
+  check('only school is single-band', CLASS_KINDS.filter((k) => !k.mixed).map((k) => k.id).join() === 'school')
+  check('unknown kinds are refused', !isClassKind('party') && !isClassKind(undefined) && isClassKind('library'))
+  check('an absent kind (older answer, before 0059) is a school class', !isMixedKind(undefined) && !isMixedKind('nonsense'))
+  check('school class: the class lock applies', effectiveBandLock('builders', true, null, 'school') === 'builders')
+  check('older call without a kind keeps the 0058 behaviour', effectiveBandLock('builders', true, null) === 'builders')
+  check('mixed class: no whole-class lock, each child keeps their band', ['club', 'family', 'library'].every((k) => effectiveBandLock('explorers', true, null, k) === null))
+  check('mixed class: one child’s band set by the leader still wins', effectiveBandLock('explorers', true, 'inventors', 'club') === 'inventors')
+  check('joining a school class starts at the class band', joinBandFor({ band: 'inventors', kind: 'school' }) === 'inventors' && joinBandFor({ band: 'inventors' }) === 'inventors')
+  check('joining a mixed class takes no band from the class', joinBandFor({ band: 'explorers', kind: 'family' }) === null)
+  const sql = readFileSync(new URL('../../supabase/migrations/0059_kids_class_kind.sql', import.meta.url), 'utf8')
+  check('migration 0059 adds kind with default school', /add column if not exists kind text not null default 'school'/.test(sql))
+  check('migration 0059 check constraint matches CLASS_KINDS', sql.includes(`check (kind in (${CLASS_KINDS.map((k) => `'${k.id}'`).join(', ')}))`))
+  const sqlCode = sql.split('\n').filter((l) => !l.trim().startsWith('--')).join('\n')
+  check('migration 0059 adds no policy and never uses auth.uid() is null', !/create policy/i.test(sqlCode) && !/auth\.uid\(\)\s+is\s+null/i.test(sqlCode))
+  check('Trust Pack describes kids_classes.kind', SERVER_TABLES.some((t) => t.table === 'kids_classes' && t.fields.some((f) => f.name === 'kind' && /club/.test(f.what))))
+  check('club and family set-up no longer say "choose the youngest band" as the class band only', CLUB_SETUP.some((l) => /“Club”/.test(l)) && FAMILY_SETUP.some((l) => /“Family class”/.test(l)))
+}
+
+async function kindDeviceChecks(): Promise<void> {
+  console.log('Class kind on the devices')
+  const ks = await import('./classroom-kind-store')
+  const id = '11111111-2222-3333-4444-555555555555'
+  check('nothing kept: a class reads as its server kind', ks.displayClassKind({ id, kind: 'club', kindReady: true }) === 'club')
+  check('before 0059 with nothing kept: school', ks.displayClassKind({ id, kindReady: false }) === 'school')
+  ks.rememberClassKind(id, 'family')
+  check('before 0059: the leader’s device keeps the kind', ks.displayClassKind({ id, kindReady: false }) === 'family')
+  check('before 0059: nothing to hand over yet', ks.pendingClassKind({ id, kindReady: false }) === null)
+  check('after 0059 (server still “school”): the kept kind is shown and handed over', ks.displayClassKind({ id, kind: 'school', kindReady: true }) === 'family' && ks.pendingClassKind({ id, kind: 'school', kindReady: true }) === 'family')
+  check('a kind changed on the server wins and the kept one is dropped', ks.pendingClassKind({ id, kind: 'library', kindReady: true }) === null && ks.localClassKind(id) === null)
+  ks.rememberClassKind(id, 'club')
+  ks.rememberClassKind(id, 'school')
+  check('choosing school keeps nothing', ks.localClassKind(id) === null)
+
+  const ms = await import('./classroom-membership-store')
+  store.set('r2bot_kids_class_v1', JSON.stringify({ token: 't', className: 'C', nickname: 'N', band: 'builders', joinedAt: '2026-11-01T00:00:00Z' }))
+  const oldM = ms.loadMembership()
+  check('a membership saved before 0059 still loads (a school class)', !!oldM && oldM.kind === undefined && !ms.inMixedClass())
+  store.set('r2bot_kids_class_v1', JSON.stringify({ token: 't', className: 'C', nickname: 'N', band: 'explorers', kind: 'club', joinedAt: '2026-11-01T00:00:00Z' }))
+  check('a club membership keeps its kind', ms.loadMembership()?.kind === 'club' && ms.inMixedClass())
+  store.set('r2bot_kids_class_v1', JSON.stringify({ token: 't', className: 'C', nickname: 'N', kind: 'party' }))
+  check('a bad kind is ignored, the membership still loads', ms.loadMembership()?.kind === undefined && ms.loadMembership()?.nickname === 'N')
+  store.delete('r2bot_kids_class_v1')
+}
+
+function badgeAndCertificateChecks(): void {
+  console.log('Course badges (all four levels) and Garage certificates')
+  const cat2 = getInsightCatalogue()
+  check('every session of every level names its badge', Object.values(cat2.sessions).length === 96 && Object.values(cat2.sessions).every((s) => !!s.b && s.b.n.length > 1 && s.b.i.length > 0))
+  const mk2 = (id: string, nick: string, done: Record<string, number>): KidsMemberRow => ({ id, nickname: nick, createdAt: '', lastActiveAt: '', snapshot: { ...EMPTY_SNAPSHOT, sessionsDone: done } })
+  const club = [mk2('a', 'Asha', { 'L1-S01': 3, 'L1-S02': 2 }), mk2('b', 'Leo', { 'L3-S05': 1, 'L1-S01': 1 }), mk2('c', 'Mo', { 'L4-S24': 2 })]
+  const lv = classCourseBadges(club, cat2)
+  check('class badges cover all four levels', lv.map((l) => l.level).join() === '1,2,3,4' && lv.every((l) => l.total === 24))
+  check('Level 1 badge earned by two children, in roster order', lv[0].earned[0]?.sessionId === 'L1-S01' && lv[0].earned[0].earnedBy.join() === 'Asha,Leo' && lv[0].earned[0].name === cat2.sessions['L1-S01'].b?.n)
+  check('Level 3 and 4 badges are named too', lv[2].earned[0]?.name === cat2.sessions['L3-S05'].b?.n && lv[3].earned[0]?.name === cat2.sessions['L4-S24'].b?.n && lv[1].earned.length === 0)
+  check('sessions per level for the roster', sessionsPerLevel(club[1].snapshot).join() === '1,0,1,0')
+
+  const all = (l: number) => Object.fromEntries(Array.from({ length: 24 }, (_, i) => [`L${l}-S${String(i + 1).padStart(2, '0')}`, 2]))
+  check('no progress, no band: Level 1 next, nothing finished', JSON.stringify(certificatePlan({}, null)) === JSON.stringify({ finished: [], next: 1 }))
+  check('the next level follows the band', certificatePlan({}, 'inventors').next === 3 && certificatePlan({}, 'engineers').next === 4)
+  check('every finished level gets its certificate', certificatePlan({ ...all(1), ...all(2), 'L3-S01': 1 }, 'builders').finished.join() === '1,2')
+  check('band level finished: suggest the next one up', certificatePlan({ ...all(2) }, 'builders').next === 3)
+  check('top band finished: fall back to the lowest open level', certificatePlan({ ...all(4) }, 'engineers').next === 1)
+  check('all four finished: four certificates, nothing next', JSON.stringify(certificatePlan({ ...all(1), ...all(2), ...all(3), ...all(4) }, 'explorers')) === JSON.stringify({ finished: [1, 2, 3, 4], next: null }))
+  check('23 of 24 is not finished', certificatePlan({ ...all(1), 'L1-S24': 0 }, null).finished.length === 0)
+
+  console.log('Make It at Home → Robodex')
+  const cards = new Set(ROBODEX_CARDS.map((c) => c.id))
+  const cardByBuild = Object.fromEntries(HOME_BUILDS.map((b) => [b.id, b.robodex]))
+  check('every build points at a real Robodex card', HOME_BUILDS.every((b) => cards.has(b.robodex)))
+  const two = HOME_BUILDS.slice(0, 2)
+  const built = Object.fromEntries(two.map((b) => [b.id, { d: '2026-11-20', a: 1 }]))
+  check('checked-in builds discover their cards (de-duplicated)', cardsForCheckIns(built, cardByBuild).join() === [...new Set(two.map((b) => b.robodex))].join())
+  check('unknown builds discover nothing', cardsForCheckIns({ 'not-a-build': { d: '2026-11-20', a: 1 } }, cardByBuild).length === 0)
+  const restored = decodeBuildsExtra(buildsBackupExtra(built), HOME_BUILDS.map((b) => b.id))
+  check('builds restored from a backup code still discover their cards', cardsForCheckIns(restored, cardByBuild).join() === cardsForCheckIns(built, cardByBuild).join())
+}
+
+void diaryChecks().then(async () => {
   standardsChecks()
   trustChecks()
+  kindChecks()
+  await kindDeviceChecks()
+  badgeAndCertificateChecks()
   if (failures) {
     console.error(`\n${failures} check(s) failed.`)
     process.exit(1)

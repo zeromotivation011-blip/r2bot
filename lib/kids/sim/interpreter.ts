@@ -234,6 +234,11 @@ function* runStmt(s: Stmt, ctx: InterpreterCtx): Gen {
       sim.grip(s.op === 'grip_close')
       yield* waitTicks(Math.round(GRIP_TIME / DT))
       return
+    case 'set_carry':
+      // The arm swings the load to its new place: that takes as long as closing the claw.
+      sim.setCarry(s.pos)
+      yield* waitTicks(Math.round(GRIP_TIME / DT))
+      return
     case 'pen_down':
     case 'pen_up':
       sim.setPen(s.op === 'pen_down')

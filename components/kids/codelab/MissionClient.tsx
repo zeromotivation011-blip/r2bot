@@ -8,6 +8,9 @@
 // earns XP), stars, and the Python view.
 // Capabilities matter: a mission that needs a part the robot lacks offers a
 // one-tap "Add the part" that updates the saved Workshop design.
+// The editor is Blockly, in the one block language of R2BOT Kids (roadmap #21);
+// drafts are Blockly JSON, and a draft saved by the old tap editor is
+// converted on load (lib/kids/code-lab/blockly-format.ts).
 
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -16,7 +19,8 @@ import { capabilitiesOf, CAPABILITY_NEEDS, loadDesign, ROBOT_CHANGED_EVENT, save
 import { BLOCK_INFO, countBlocks, toPython } from '@/lib/kids/code-lab/blocks'
 import { initialState, parseArena, runMission, starsFor, type Frame, type RunResult } from '@/lib/kids/code-lab/interpreter'
 import { changedParts, designWith, missingCaps } from '@/lib/kids/code-lab/parts'
-import { isValidProgram } from '@/lib/kids/code-lab/tree'
+import { programToWorkspace, readDraft, workspaceToProgram, writeDraft, type BWorkspace } from '@/lib/kids/code-lab/blockly-format'
+import { useKidsReducedMotion } from '@/lib/kids/settings'
 import type { Block, MissionPublic } from '@/lib/kids/code-lab/types'
 import { completeCodeMission, getProgress } from '@/lib/kids-progress'
 import { reportBestRun } from '@/lib/kids/universe/rewards'
@@ -90,6 +94,9 @@ export default function MissionClient({ mission, next, previous }: Props) {
   const [locked, setLocked] = useState(false)
   const [bestStars, setBestStars] = useState(0)
   const [addedParts, setAddedParts] = useState<string[] | null>(null)
+  const [loaded, setLoaded] = useState<{ workspace: BWorkspace; key: string } | null>(null)
+  const reducedMotion = useKidsReducedMotion()
+  const scrollBehavior: ScrollBehavior = reducedMotion ? 'auto' : 'smooth'
 
   const timer = useRef<number | null>(null)
   const trace = useRef<{ results: RunResult[]; arena: number; frame: number; won: boolean } | null>(null)
@@ -101,28 +108,25 @@ export default function MissionClient({ mission, next, previous }: Props) {
     const refresh = () => setDesign(loadDesign())
     refresh()
     window.addEventListener(ROBOT_CHANGED_EVENT, refresh)
+    let workspace: BWorkspace = programToWorkspace([])
     try {
-      const raw = window.localStorage.getItem(draftKey(mission.id))
-      const parsed: unknown = raw ? JSON.parse(raw) : null
-      if (isValidProgram(parsed)) setProgram(parsed)
+      const draft = readDraft(window.localStorage.getItem(draftKey(mission.id)))
+      if (draft) {
+        workspace = draft.workspace
+        // A program from the old tap editor: store it in the new format straight away.
+        if (draft.migrated) window.localStorage.setItem(draftKey(mission.id), writeDraft(workspace))
+      }
     } catch {
-      /* no draft */
+      /* no draft, or storage blocked */
     }
+    setProgram(workspaceToProgram(workspace))
+    setLoaded({ workspace, key: `${mission.id}:${Date.now().toString(36)}` })
     const p = getProgress()
     setBestStars(p.codeMissions[mission.id] ?? 0)
     if (previous && !p.codeMissions[previous.id]) setLocked(true)
     if (p.band === 'engineers') setShowPython(true)
     return () => window.removeEventListener(ROBOT_CHANGED_EVENT, refresh)
   }, [mission.id, previous])
-
-  // Save the draft as the child edits.
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(draftKey(mission.id), JSON.stringify(program))
-    } catch {
-      /* storage blocked */
-    }
-  }, [program, mission.id])
 
   useEffect(
     () => () => {
@@ -282,7 +286,7 @@ export default function MissionClient({ mission, next, previous }: Props) {
     setHintsUsed(true)
     if (step === 1) {
       setGoalLit(true)
-      requestAnimationFrame(() => arenaRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
+      requestAnimationFrame(() => arenaRef.current?.scrollIntoView({ block: 'nearest', behavior: scrollBehavior }))
     }
     if (step === 3 && !workedRequested.current) {
       workedRequested.current = true
@@ -294,7 +298,7 @@ export default function MissionClient({ mission, next, previous }: Props) {
 
   const onYourTurn = () => {
     requestAnimationFrame(() => {
-      editorRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      editorRef.current?.scrollIntoView({ block: 'start', behavior: scrollBehavior })
       editorRef.current?.focus({ preventScroll: true })
     })
   }
@@ -470,26 +474,38 @@ export default function MissionClient({ mission, next, previous }: Props) {
 
         {/* ── Editor ── */}
         <section ref={editorRef} tabIndex={-1} aria-label="Code editor" className="scroll-mt-24 py-0 focus:outline-none">
-          <BlockEditorClient
-            program={program}
-            onChange={(p) => {
-              setProgram(p)
-              if (trace.current && !running) {
-                // Cancel a queued "next map" timer too, or it would set the
-                // status to running with no trace and lock the editor.
-                stopTimer()
-                trace.current = null
-                showArena(arenaIdx)
-                if (status.kind === 'progress') setStatus({ kind: 'idle' })
-              }
-            }}
-            palette={mission.palette}
-            caps={caps}
-            budget={mission.budget}
-            activeId={activeId}
-            errorId={errorId}
-            disabled={running}
-          />
+          {loaded ? (
+            <BlockEditorClient
+              initialWorkspace={loaded.workspace}
+              resetKey={loaded.key}
+              band={mission.band}
+              onChange={(p, workspace) => {
+                setProgram(p)
+                // Save the draft (Blockly JSON) as the child edits.
+                try {
+                  window.localStorage.setItem(draftKey(mission.id), writeDraft(workspace))
+                } catch {
+                  /* storage blocked */
+                }
+                if (trace.current && !running) {
+                  // Cancel a queued "next map" timer too, or it would set the
+                  // status to running with no trace and lock the editor.
+                  stopTimer()
+                  trace.current = null
+                  showArena(arenaIdx)
+                  if (status.kind === 'progress') setStatus({ kind: 'idle' })
+                }
+              }}
+              palette={mission.palette}
+              caps={caps}
+              budget={mission.budget}
+              activeId={activeId}
+              errorId={errorId}
+              disabled={running}
+            />
+          ) : (
+            <div className="h-[520px] animate-pulse rounded-2xl bg-white/5" aria-hidden />
+          )}
           <div className="mt-3 rounded-2xl bg-black/30 p-3">
             <button
               type="button"
