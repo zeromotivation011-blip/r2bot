@@ -6,6 +6,7 @@
 import type { Metadata } from 'next'
 import { breadcrumbJsonLD, jsonldScript } from '@/lib/seo/jsonld'
 import TalkClient from '@/components/kids/ai/talk/TalkClient'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
 
 export const runtime = 'nodejs'
 
@@ -87,14 +88,21 @@ export default function TalkPage() {
           beat momentum when parking and follow a line with proportional steering. “Fix it” missions start with someone else’s plan that fails: find the
           word that is wrong.
         </p>
-        <p className="mt-3">
-          The robot’s language brain runs on the device, even offline, and R2BOT saves nothing a child types. The optional microphone uses the
-          browser’s own speech service, which may send the recording to that company (Google, in Chrome and on Android) to turn it into words. Where it is
-          switched on, an optional AI helper can try a phrase the robot’s own brain does not know: only the words it did not understand are sent, only when
-          the child presses the button, and never anything that looks like a name, address, email or phone number. R2BOT stores none of it, though the AI
-          provider may keep requests for a short time for safety checks. Every answer is checked block by block before the robot will run it, and the
-          robot only says kind words.
-        </p>
+        {KIDS_STANDALONE ? (
+          <p className="mt-3">
+            The robot’s language brain runs inside the app, with no internet, and nothing a child types leaves the device or is saved. There is no
+            microphone and no AI helper in the app. Every plan is checked block by block before the robot will run it, and the robot only says kind words.
+          </p>
+        ) : (
+          <p className="mt-3">
+            The robot’s language brain runs on the device, even offline, and R2BOT saves nothing a child types. The optional microphone uses the
+            browser’s own speech service, which may send the recording to that company (Google, in Chrome and on Android) to turn it into words. Where it is
+            switched on, an optional AI helper can try a phrase the robot’s own brain does not know: only the words it did not understand are sent, only when
+            the child presses the button, and never anything that looks like a name, address, email or phone number. R2BOT stores none of it, though the AI
+            provider may keep requests for a short time for safety checks. Every answer is checked block by block before the robot will run it, and the
+            robot only says kind words.
+          </p>
+        )}
       </article>
     </>
   )

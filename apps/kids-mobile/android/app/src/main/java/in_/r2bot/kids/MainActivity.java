@@ -21,6 +21,8 @@ import com.getcapacitor.BridgeActivity;
  *    and sends every link that is not part of the app to the system browser;
  *  - the same page mapping for service-worker fetches;
  *  - {@link KidsChromeClient}: the camera, and only the camera, for Workshop AR;
+ *  - {@link KidsNativePlugin}: saving files, the share sheet, printing and the phone's own
+ *    text-to-speech, which a WebView cannot do (called from lib/kids/native-app.ts);
  *  - Back walks back through the app's history and leaves the app from the home screen.
  *
  * WebView remote debugging needs no code here: with android.webContentsDebuggingEnabled
@@ -30,6 +32,8 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Before super.onCreate: Capacitor registers plugins when it builds the bridge.
+        registerPlugin(KidsNativePlugin.class);
         super.onCreate(savedInstanceState);
 
         final Bridge bridge = getBridge();

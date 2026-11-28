@@ -101,7 +101,7 @@ export const SorterSceneClient = forwardRef<SorterSceneHandle, Props>(function S
   )
 
   return (
-    <div ref={wrapRef} className="relative h-[250px] w-full overflow-hidden rounded-[20px] border border-white/10 sm:h-[300px]">
+    <div ref={wrapRef} data-game-stage="" className="relative h-[250px] w-full overflow-hidden rounded-[20px] border border-white/10 sm:h-[300px]">
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" role="img" aria-label={label} />
     </div>
   )

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import KidsShell from './KidsShell'
-import { KIDS_APP_BOOT_SCRIPT } from '@/lib/kids/app-context'
+import { KIDS_APP_BOOT_SCRIPT, KIDS_STANDALONE } from '@/lib/kids/app-context'
 import { KIDS_SETTINGS_BOOT_SCRIPT } from '@/lib/kids/settings-boot'
 import { KIDS_LOOK_BOOT_SCRIPT } from '@/lib/kids/teen-boot'
 import KidsLookSyncClient from '@/components/kids/teen/KidsLookSyncClient'
@@ -10,8 +10,9 @@ import './kids-teen.css'
 export const runtime = 'nodejs'
 
 // R2BOT Kids installs as its own app (scope /kids), separate from the main site's manifest.
+// The standalone app (KIDS_STANDALONE) is already installed and does not carry the manifest route.
 export const metadata: Metadata = {
-  manifest: '/kids/manifest.webmanifest',
+  ...(KIDS_STANDALONE ? {} : { manifest: '/kids/manifest.webmanifest' }),
   appleWebApp: { capable: true, title: 'R2BOT Kids', statusBarStyle: 'black-translucent' },
   icons: { apple: '/kids-icon-192.png' },
 }

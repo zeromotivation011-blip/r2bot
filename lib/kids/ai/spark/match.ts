@@ -133,7 +133,10 @@ export function matchFaq(question: string, limit = 3): FaqMatch[] {
     // carried only by everyday words ("name", "thing") is not a match at all.
     // (Unless every word of the question is in the entry's own question: "what's a robot?")
     const ownWords = qt.every((t) => e.qTokens.has(t))
-    const capped = !specific && !phraseBonus && !ownWords ? Math.min(score, 0.3) : hit + phraseBonus < 1 ? Math.min(score, 0.5) : score
+    let capped = !specific && !phraseBonus && !ownWords ? Math.min(score, 0.3) : hit + phraseBonus < 1 ? Math.min(score, 0.5) : score
+    // One loose keyword in a longer question is not an answer: "why is the sky blue"
+    // once got the colour-sensor entry through "blue" alone.
+    if (!phraseBonus && !ownWords && qt.length >= 2 && coverage < 0.5) capped = Math.min(capped, WEAK_MATCH - 0.01)
     out.push({ faq: e.faq, score: capped })
   }
   return out.sort((a, b) => b.score - a.score).slice(0, limit)

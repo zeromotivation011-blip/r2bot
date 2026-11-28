@@ -14,6 +14,7 @@
 
 import type { jsPDF as JsPdf } from 'jspdf'
 import type { TeacherGuide } from './guides'
+import { hasKidsNative, saveBlob } from '@/lib/kids/native-app'
 
 type RGB = [number, number, number]
 const NAVY: RGB = [10, 17, 32]
@@ -45,8 +46,19 @@ async function newDoc(orientation: 'portrait' | 'landscape'): Promise<JsPdf> {
   return new jsPDF({ orientation, unit: 'mm', format: 'a4' })
 }
 
-function save(doc: JsPdf, filename: string): void {
-  doc.save(filename)
+/**
+ * Saves the PDF. On the website: jsPDF's own download. In the standalone app an
+ * Android WebView drops that download, so the file goes through the app's native
+ * plugin (Downloads › R2BOT Kids, or the share sheet): lib/kids/native-app.ts.
+ * Throws when nothing could be saved, so the caller's error message shows.
+ */
+export async function savePdf(doc: JsPdf, filename: string): Promise<void> {
+  if (!hasKidsNative()) {
+    doc.save(filename)
+    return
+  }
+  const result = await saveBlob(doc.output('blob'), filename)
+  if (result === 'failed') throw new Error('Could not save the PDF on this device')
 }
 
 /** Draw text with the system font on a canvas (any script) and return it as a PNG with its size in mm. */
@@ -284,7 +296,7 @@ export async function downloadGuidePdf(g: TeacherGuide, siteUrl: string): Promis
   para(`Ask your child: ${g.parent.askYourChild}`, { size: 9.5 })
 
   footer()
-  save(doc, `r2bot-kids-teacher-guide-level-1-session-${String(g.number).padStart(2, '0')}-${slug(g.title)}.pdf`)
+  await savePdf(doc, `r2bot-kids-teacher-guide-level-1-session-${String(g.number).padStart(2, '0')}-${slug(g.title)}.pdf`)
 }
 
 // ── Certificates ─────────────────────────────────────────────────────────────
@@ -385,7 +397,7 @@ export async function downloadKidCertificate(c: KidCertificateInput): Promise<vo
   doc.setFontSize(8.5)
   doc.setTextColor(...GREY)
   doc.text('Every child who learns the skills earns this same certificate. No rankings, ever.', W / 2, H - 28, { align: 'center' })
-  save(doc, `r2bot-kids-level-${c.level}-certificate.pdf`)
+  await savePdf(doc, `r2bot-kids-level-${c.level}-certificate.pdf`)
 }
 
 export interface TrainingCertificateInput {
@@ -435,7 +447,7 @@ export async function downloadTrainingCertificate(c: TrainingCertificateInput): 
   doc.text('date completed', W / 2, 165, { align: 'center' })
   doc.setFontSize(8.5)
   doc.text('Self-paced professional learning. Not an accredited qualification.', W / 2, H - 28, { align: 'center' })
-  save(doc, 'r2bot-kids-teacher-training-certificate.pdf')
+  await savePdf(doc, 'r2bot-kids-teacher-training-certificate.pdf')
 }
 
 // Shared with the portfolio certificates (components/kids/portfolio/certificate-pdf.ts),

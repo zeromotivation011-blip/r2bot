@@ -24,6 +24,7 @@ import { AR_FOV, AR_XR_SCALE, arFormLabel, arMagicWindowFrame, buildARRobot } fr
 import { playSound } from '@/lib/kids-audio'
 import { createStage, prefersReducedMotion, type Stage } from './stage'
 import { requireGrownUp } from '@/components/kids/app/ParentalGateClient'
+import { dataUrlToBlob, saveBlob } from '@/lib/kids/native-app'
 import { useParentControls } from '@/lib/kids/parent-controls'
 
 type Phase = 'intro' | 'xr' | 'camera' | 'denied' | 'nocamera' | 'error'
@@ -395,12 +396,14 @@ export default function ARViewClient({ design, learned, onClose }: Props) {
     g.fillStyle = '#FDE68A'
     g.font = `bold ${16 * dpr}px system-ui, sans-serif`
     g.fillText(`${design.name}${form ? ` · ${form.name}` : ''} · built in the R2BOT Robot Workshop`, 14 * dpr, h - 16 * dpr)
-    const a = document.createElement('a')
-    a.href = c.toDataURL('image/png')
-    a.download = `${design.name.replace(/[^A-Za-z0-9]+/g, '-').toLowerCase() || 'robot'}-in-my-room.png`
-    a.click()
-    playSound('star')
-    showToast('📸 Photo saved to your device!')
+    void saveBlob(dataUrlToBlob(c.toDataURL('image/png')), `${design.name.replace(/[^A-Za-z0-9]+/g, '-').toLowerCase() || 'robot'}-in-my-room.png`, `${design.name} in my room`).then((saved) => {
+      if (saved === 'failed') {
+        showToast('Sorry, this device could not save the photo.')
+        return
+      }
+      playSound('star')
+      showToast(saved === 'saved' ? '📸 Photo saved in Downloads › R2BOT Kids!' : saved === 'shared' ? '📸 Choose where to keep your photo.' : '📸 Photo saved to your device!')
+    })
   }
 
   const close = () => {

@@ -97,7 +97,8 @@ interface RecognitionLike {
 type RecognitionCtor = new () => RecognitionLike
 
 function recognitionCtor(): RecognitionCtor | null {
-  if (typeof window === 'undefined') return null
+  // The standalone app has no microphone permission: typing only.
+  if (typeof window === 'undefined' || KIDS_STANDALONE) return null
   const w = window as unknown as { SpeechRecognition?: RecognitionCtor; webkitSpeechRecognition?: RecognitionCtor }
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null
 }
@@ -508,7 +509,9 @@ export default function SparkSheetClient({ initial, onClose, helpOnly = false }:
             <span aria-hidden="true">💛</span> Worried or not safe? Get help
           </button>
           <p hidden={helpOnly} className="mt-1 text-center text-[13px] leading-snug text-[#A7B0C0]">
-            Spark can make mistakes. Grown-ups: R2BOT doesn’t store questions; they may be sent to an AI service (Anthropic) to answer.
+            {KIDS_STANDALONE
+              ? 'Spark can make mistakes. Grown-ups: Spark answers from a notebook inside the app. Questions stay on this device and are never sent anywhere.'
+              : 'Spark can make mistakes. Grown-ups: R2BOT doesn’t store questions; they may be sent to an AI service (Anthropic) to answer.'}
             {micOk ? ' The mic uses your browser’s speech service (such as Google or Apple).' : ''}
           </p>
         </div>

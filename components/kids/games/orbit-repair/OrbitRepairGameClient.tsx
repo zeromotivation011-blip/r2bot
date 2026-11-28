@@ -510,7 +510,8 @@ export default function OrbitRepairGameClient({ tier: tierProp, onFinish }: Prop
         <div
           ref={wrapRef}
           tabIndex={-1}
-          className="relative h-[330px] overflow-hidden rounded-3xl border border-white/10 bg-[#03060d] outline-none sm:h-[420px] lg:h-[470px]"
+          data-game-stage=""
+          className="kids-stage-fill relative h-[330px] overflow-hidden rounded-3xl border border-white/10 bg-[#03060d] outline-none sm:h-[420px] lg:h-[470px]"
         >
           <canvas ref={canvasRef} className="h-full w-full" role="img" aria-label={`${brief.title}. ${hud.note?.text ?? ''}`} />
 

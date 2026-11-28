@@ -647,7 +647,7 @@ export default function DroneHoverGameClient({ tier: tierProp, onFinish }: Props
   return (
     <div ref={gridRef} className="grid gap-3 pb-24 lg:grid-cols-[minmax(0,1fr)_360px] lg:pb-0">
       <div className="flex min-w-0 flex-col gap-2 lg:sticky lg:top-20 lg:self-start">
-        <div className="relative h-[330px] overflow-hidden rounded-3xl border border-white/10 bg-slate-950 sm:h-[420px] lg:h-[470px]">
+        <div data-game-stage="" className="kids-stage-fill relative h-[330px] overflow-hidden rounded-3xl border border-white/10 bg-slate-950 sm:h-[420px] lg:h-[470px]">
           <canvas ref={worldRef} className="block h-full w-full scroll-mt-2" role="img" aria-label={`Drone flight view. Height ${hud.z.toFixed(1)} metres, target ${hud.tz.toFixed(1)} metres.`} />
 
           {/* HUD */}

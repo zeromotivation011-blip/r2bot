@@ -75,7 +75,7 @@ export default async function MissionPage({ params }: { params: Params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript(crumbs) }} />
       <header className="mx-auto max-w-6xl px-4 pb-4 pt-6 text-gray-200">
         <nav aria-label="Breadcrumb" className="text-sm">
-          <Link href="/kids/code-lab" className="font-bold text-amber-300 underline-offset-4 hover:underline">
+          <Link href="/kids/code-lab" className="-my-3 inline-flex min-h-[44px] items-center font-bold text-amber-300 underline-offset-4 hover:underline">
             ← Code Lab
           </Link>
           {band && (

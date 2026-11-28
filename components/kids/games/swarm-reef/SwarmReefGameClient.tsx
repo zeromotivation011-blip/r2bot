@@ -441,7 +441,8 @@ export default function SwarmReefGameClient({ tier: tierProp, onFinish }: Props)
             {/* The reef */}
             <div
               ref={wrapRef}
-              className="relative w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#071226] shadow-[0_8px_24px_rgba(0,0,0,.45)] outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
+              data-game-stage=""
+              className="kids-stage-swarm relative w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#071226] shadow-[0_8px_24px_rgba(0,0,0,.45)] outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
               tabIndex={0}
               onKeyDown={onKey}
               role="application"

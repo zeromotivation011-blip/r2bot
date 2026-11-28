@@ -25,6 +25,10 @@ the labs, Robot Maths, Robodex, Makers, Make at Home, Settings, Profiles, the Ga
 progress/stars/badges (on the device), the backup code, **Ask Spark** (the offline FAQ answers)
 and **Talk to your robot** (the on-device parser).
 
+Saving a file, printing, the share sheet and reading aloud work on the phone through the app's
+small native plugin (see "How the app serves the pages"). There is no microphone in the app
+(typing only), and Ask Spark says plainly that questions stay on the device.
+
 Not in the app, because they need the R2BOT server: joining a class, the teacher's class pages,
 the Robot Passport server copy, class progress sync (`/api/kids/*`), and the AI modes of Ask Spark
 and Talk. Those screens show a calm "this part needs a grown-up on r2bot.in" note instead of an
@@ -66,6 +70,9 @@ The script refuses to run a release build without the keystore file.
 ## How to test
 
 - **On the phone:** switch on airplane mode before the first launch: everything must still work.
+  Also try the native parts: Garage → backup code → "Download .txt" (a file appears in
+  Downloads › R2BOT Kids), Garage "Share robot card" (share sheet), Make at Home "Print this build"
+  (print dialog), and Settings → "Read everything to me" then Ask Spark (it speaks).
   Try Home, each tab, a game in landscape, a story with voice, Workshop (the camera prompt
   appears only when you open AR), Code Lab, a reload deep inside (pull the app from recents and
   reopen), the system Back button (it steps back; on Home it leaves the app), and a grown-up link
@@ -97,6 +104,22 @@ the root). `android/app/src/main/java/in_/r2bot/kids/`:
     and `mailto:`/`tel:` likewise; other schemes are dropped; frames from other hosts are blocked.
 - `MainActivity.java`: installs the client, uses the same mapping for service-worker fetches, and
   handles Back (WebView history; leaves the app on Home).
+- `KidsNativePlugin.java` (Capacitor plugin `KidsNative`, registered in `MainActivity`): what an
+  Android WebView silently drops. The pages reach it only through `lib/kids/native-app.ts`:
+  - **saving files** (backup code `.txt`, robot card and AR photo `.png`, certificate and teacher
+    PDFs): written to **Downloads › R2BOT Kids** through MediaStore on Android 10+ (no storage
+    permission) with a "Saved in Downloads" toast; on Android 7–9 the share sheet opens instead.
+    The page only says "saved" when the plugin says it was;
+  - **share** (`navigator.share`/`canShare`, e.g. Garage "Share robot card"): the Android share sheet
+    through the app's (unexported) FileProvider;
+  - **print** (`window.print()`: Make at Home, Portfolio, Parents, teacher guides, Trust Pack…):
+    the system print dialog via `WebView.createPrintDocumentAdapter` (it also offers Save as PDF);
+  - **speech** (`speechSynthesis`: Ask Spark's voice, "Read everything to me", the story fallback
+    voice): the phone's own text-to-speech engine, on the device (a `<queries>` entry lets
+    Android 11+ find it). Speech stops when the app goes to the background.
+  `installKidsNativeShims()` (called once from `app/kids/KidsShell.tsx`, standalone build only)
+  points `window.print`, `navigator.share` and `speechSynthesis` at the plugin, so page code is
+  unchanged. In a desktop browser (the Playwright tests) there is no plugin and nothing is replaced.
 - `KidsChromeClient.java` extends `BridgeWebChromeClient`, which already asks for the Android
   `CAMERA` permission when a page calls `getUserMedia({ video })` and grants the web request only
   after it is allowed. The subclass narrows it to the camera only (no microphone/MIDI/media IDs),

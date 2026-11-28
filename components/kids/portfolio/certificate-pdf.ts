@@ -21,6 +21,7 @@ import {
   ORANGE_DARK,
   pdfSafe,
   pdfSlug,
+  savePdf,
 } from '@/lib/kids/teach/pdf'
 
 export interface AchievementInput {
@@ -123,7 +124,7 @@ function drawPage(doc: JsPdf, c: AchievementInput): void {
 export async function downloadAchievementCertificate(c: AchievementInput): Promise<void> {
   const doc = await newKidsPdf('landscape')
   drawPage(doc, c)
-  doc.save(`r2bot-kids-${pdfSlug(c.title)}-certificate.pdf`)
+  await savePdf(doc, `r2bot-kids-${pdfSlug(c.title)}-certificate.pdf`)
 }
 
 export interface ClassSetInput extends Omit<AchievementInput, 'name'> {
@@ -137,5 +138,5 @@ export async function downloadClassCertificates(c: ClassSetInput): Promise<void>
     if (i > 0) doc.addPage('a4', 'landscape')
     drawPage(doc, { ...c, name })
   })
-  doc.save(`r2bot-kids-${pdfSlug(c.title)}-class-set.pdf`)
+  await savePdf(doc, `r2bot-kids-${pdfSlug(c.title)}-class-set.pdf`)
 }

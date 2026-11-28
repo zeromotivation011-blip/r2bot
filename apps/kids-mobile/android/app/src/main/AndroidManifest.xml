@@ -62,6 +62,14 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
+    <!-- Android 11+ package visibility: lets the app find the phone's text-to-speech
+         engine (Ask Spark and "Read everything to me" speak on the device). -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
     <!-- Belt and braces for Designed for Families: strip these even if a future
          library tries to merge them in. -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />

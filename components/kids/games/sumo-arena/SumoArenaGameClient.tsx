@@ -667,7 +667,7 @@ export default function SumoArenaGameClient({ tier, onFinish }: Props) {
   return (
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_380px]">
       <div className="flex min-w-0 flex-col gap-2">
-        <div className="relative h-[300px] overflow-hidden rounded-3xl border border-white/10 bg-[#0A1120] shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:h-[420px] lg:h-[470px]">
+        <div data-game-stage="" className="kids-stage-fill relative h-[300px] overflow-hidden rounded-3xl border border-white/10 bg-[#0A1120] shadow-[0_8px_24px_rgba(0,0,0,.45)] sm:h-[420px] lg:h-[470px]">
           <div ref={wrapRef} className="absolute inset-0" aria-label={`Sumo ring: your robot ${youDesign.name} against ${rival.name}`} role="img" />
           {/* State chips that follow the robots */}
           <div ref={chipYou} className="pointer-events-none absolute left-0 top-0 rounded-full border border-amber-300/60 bg-[#0A1120]/85 px-2 py-0.5 text-xs font-black text-amber-200 opacity-0" aria-hidden>

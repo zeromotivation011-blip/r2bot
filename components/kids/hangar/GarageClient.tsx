@@ -31,6 +31,7 @@ import {
 import { bestTitle, levelInfo } from '@/lib/kids/universe/rewards'
 import { BOOSTER_PART_ID, saveCosmetics } from './cosmetics'
 import { useHangarState } from './useHangarState'
+import { hasKidsNative, saveBlob } from '@/lib/kids/native-app'
 
 /** A Spark Trail part, as the server page passes it (keeps the big zone data off the client). */
 export interface TrailPartInfo {
@@ -150,21 +151,14 @@ export function GarageClient({ trailParts }: { trailParts: TrailPartInfo[] }) {
       if (nav.canShare?.({ files: [file] }) && typeof nav.share === 'function') {
         try {
           await nav.share({ files: [file], title: `${design.name}, my R2BOT robot` })
-          announce('Robot card shared.')
+          announce(hasKidsNative() ? 'Pick an app to send your robot card to.' : 'Robot card shared.')
           return
         } catch {
           /* cancelled or blocked: fall through to a download */
         }
       }
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = fileName
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      window.setTimeout(() => URL.revokeObjectURL(url), 2000)
-      announce('Robot card saved as a picture.')
+      const saved = await saveBlob(blob, fileName, `${design.name}, my R2BOT robot`)
+      announce(saved === 'failed' ? 'Sorry, this device could not save the card.' : saved === 'saved' ? 'Robot card saved in Downloads › R2BOT Kids.' : saved === 'shared' ? 'Choose where to keep the robot card.' : 'Robot card saved as a picture.')
     } finally {
       setSharing(false)
     }

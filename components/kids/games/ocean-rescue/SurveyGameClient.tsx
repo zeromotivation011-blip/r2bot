@@ -351,7 +351,7 @@ export default function SurveyGameClient({ tier, onFinish }: Props) {
   return (
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="flex min-w-0 flex-col gap-2 lg:sticky lg:top-20 lg:self-start">
-        <div className="relative h-[360px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0A1120] sm:h-[440px] lg:h-[440px]">
+        <div data-game-stage="" className="kids-stage-fill relative h-[360px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0A1120] sm:h-[440px] lg:h-[440px]">
           <canvas
             ref={mapRef}
             tabIndex={tier === 2 && phase === 'plan' ? 0 : -1}

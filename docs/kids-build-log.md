@@ -523,3 +523,26 @@ refreshes on the next load, so the window is one stale session.
   `lib/kids-progress.ts` lazily and listen for the event by name (guarded in `lib/kids/sim/verify.ts`).
 - [ ] Not changed: on Code Lab a newly added block is not selected, so − / + appear only after a tap (minor, noted by
   the child check). The kids shell renders a nested second `<main>` on Galaxy activity pages (seen while testing; pre-existing).
+
+## 28 Nov 2026 — Standalone Android app: review fixes
+
+- [x] **Save / share / print / speech in the APK.** An Android WebView drops `<a download>` (blob/data), has no
+  `navigator.share`, ignores `window.print()` and usually has no speech voice, so several buttons did nothing while
+  the page said "saved". New Capacitor plugin `KidsNative` (`apps/kids-mobile/android/…/KidsNativePlugin.java`)
+  saves to Downloads › R2BOT Kids (MediaStore, Android 10+; share sheet on 7–9), opens the share sheet
+  (FileProvider), prints through `createPrintDocumentAdapter`, and speaks with the phone's TextToSpeech.
+  `lib/kids/native-app.ts` is the only caller: `saveBlob()` (backup .txt, robot cards, AR photo, every jsPDF save via
+  `savePdf()`), and `installKidsNativeShims()` (standalone only, from KidsShell) for print/share/speech. Messages
+  now say "saved" only when the plugin says so. Website behaviour unchanged (no plugin → same anchor download).
+- [x] Workshop "🔗 Share" (a link to `https://localhost/...`) is hidden in the app.
+- [x] Ask Spark and Talk to your robot: app wording says questions stay on the device; no mic in the app
+  (`speechRecognitionSupported()` is false there). Spark's notebook no longer answers "why is the sky blue" with the
+  colour sensor (one loose keyword in a longer question is below the match line).
+- [x] App home no longer promotes the schools pitch; `/kids/schools` in the app shows the "needs a grown-up" note
+  instead of class/pilot CTAs and hides server-only tools.
+- [x] Phones held sideways in `/kids/play/*`: the header steps aside, stages marked `data-game-stage` fit under the game
+  bar (`kids-stage-fill` / `kids-stage-ratio` / `kids-stage-swarm` in kids-shell.css; Mars Rover sizes in JS), and
+  KidsShell scrolls the stage into view when text sits above it.
+- [x] Code Lab "← Code Lab" link is a 44 px target. App pages no longer link the PWA manifest the app does not carry.
+- [ ] Needs a real phone: TTS voice quality and language, the print dialog, the share sheet targets, the
+  Downloads toast. Small (9–10 px) labels on the Spark Trail map and the drone-hover graph are unchanged.

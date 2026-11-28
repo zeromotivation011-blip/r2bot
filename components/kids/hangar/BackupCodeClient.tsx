@@ -34,6 +34,7 @@ import { qrMatrix, qrSvgPath } from '@/lib/kids/teach/qr'
 import { requireGrownUp } from '@/components/kids/app/ParentalGateClient'
 import { deletePassportAsGrownUp } from './passport-delete'
 import { KIDS_STANDALONE } from '@/lib/kids/app-context'
+import { saveBlob } from '@/lib/kids/native-app'
 import { NeedsWebNote } from '@/components/kids/app/NeedsWebNote'
 import { looksBackupExtra, restoreLooksExtra } from './cosmetics'
 
@@ -419,14 +420,14 @@ export function BackupCodeClient({ headingLevel = 2 }: { headingLevel?: 2 | 3 })
     setStatus(ok ? { kind: 'ok', text: 'Backup code copied. Paste it somewhere a grown-up keeps safe.' } : { kind: 'error', text: 'Could not copy by itself. The code is selected: press and hold (or Ctrl+C) to copy it.' })
   }
 
-  const download = () => {
+  const download = async () => {
     primeAudio()
     playSound('click')
     const text = [
       'R2BOT Kids — progress backup code',
       `Made on ${today()}`,
       '',
-      'To restore: open www.r2bot.in/kids/hangar on any device,',
+      KIDS_STANDALONE ? 'To restore: open the R2BOT Kids app (or www.r2bot.in/kids/hangar),' : 'To restore: open www.r2bot.in/kids/hangar on any device,',
       'choose "Restore from a code" and paste the whole code below (or pick this file).',
       'Restoring never lowers progress that is already there.',
       'It holds the explorer and robot nicknames and robot progress only:',
@@ -435,15 +436,22 @@ export function BackupCodeClient({ headingLevel = 2 }: { headingLevel?: 2 | 3 })
       code,
       '',
     ].join('\n')
-    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }))
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `r2bot-kids-backup-${today()}.txt`
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
-    setStatus({ kind: 'ok', text: 'Backup file saved. Keep it somewhere safe, like a grown-up’s email or cloud folder.' })
+    const fileName = `r2bot-kids-backup-${today()}.txt`
+    const result = await saveBlob(new Blob([text], { type: 'text/plain;charset=utf-8' }), fileName, 'R2BOT Kids backup code')
+    // Only say "saved" when it was: in the app the file really lands in Downloads (lib/kids/native-app.ts).
+    if (result === 'failed') {
+      setStatus({ kind: 'error', text: 'This device could not save the file. Use "Copy code" and paste it somewhere a grown-up keeps safe.' })
+      return
+    }
+    setStatus({
+      kind: 'ok',
+      text:
+        result === 'saved'
+          ? 'Backup file saved in Downloads › R2BOT Kids. Keep a copy somewhere safe, like a grown-up’s email or cloud folder.'
+          : result === 'shared'
+            ? 'Choose where to keep the backup file, like a grown-up’s email or cloud folder.'
+            : 'Backup file saved. Keep it somewhere safe, like a grown-up’s email or cloud folder.',
+    })
   }
 
   const restore = async (text: string) => {

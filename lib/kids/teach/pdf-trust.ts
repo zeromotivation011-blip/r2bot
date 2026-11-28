@@ -7,7 +7,7 @@
 // Nothing is uploaded.
 
 import type { jsPDF as JsPdf } from 'jspdf'
-import { pdfSafe } from './pdf'
+import { pdfSafe, savePdf } from './pdf'
 import {
   ACCESSIBILITY,
   DEVICE_ONLY,
@@ -252,5 +252,5 @@ export async function downloadTrustPackPdf(siteUrl: string): Promise<void> {
   letter.paragraphs.forEach((p) => w.para(p, { size: 10.5, gap: 3.5 }))
   w.footer()
 
-  doc.save('r2bot-kids-school-trust-pack.pdf')
+  await savePdf(doc, 'r2bot-kids-school-trust-pack.pdf')
 }

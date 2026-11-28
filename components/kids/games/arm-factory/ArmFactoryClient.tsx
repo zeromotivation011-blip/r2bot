@@ -762,7 +762,8 @@ export default function ArmFactoryClient({ tier, round, onFinish }: Props) {
         </div>
         <div
           ref={wrapRef}
-          className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-slate-950 lg:aspect-auto lg:h-[600px]"
+          data-game-stage=""
+          className="kids-stage-ratio relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-slate-950 lg:aspect-auto lg:h-[600px]"
         >
           <div
             ref={glHostRef}

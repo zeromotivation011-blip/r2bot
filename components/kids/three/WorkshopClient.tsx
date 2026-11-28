@@ -48,6 +48,8 @@ import {
 } from '@/lib/kids/robot-growth'
 import type { DriveInput, WorkshopSceneApi } from './WorkshopSceneClient'
 import LookInsideClient from './LookInsideClient'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
+import { dataUrlToBlob, saveBlob } from '@/lib/kids/native-app'
 import SpecSheetClient from './SpecSheetClient'
 
 function SceneSkeleton() {
@@ -232,12 +234,13 @@ export default function WorkshopClient() {
     const shot = apiRef.current?.capture() ?? null
     const card = await drawRobotCard(design, shot)
     if (!card) return
-    const a = document.createElement('a')
-    a.href = card
-    a.download = `${design.name.replace(/[^A-Za-z0-9]+/g, '-').toLowerCase() || 'robot'}-robot-card.png`
-    a.click()
+    const saved = await saveBlob(dataUrlToBlob(card), `${design.name.replace(/[^A-Za-z0-9]+/g, '-').toLowerCase() || 'robot'}-robot-card.png`, `${design.name}, my R2BOT robot`)
+    if (saved === 'failed') {
+      flash('Sorry, this device could not save the robot card.', 'info')
+      return
+    }
     playSound('star')
-    flash('🖼️ Robot card downloaded!')
+    flash(saved === 'saved' ? '🖼️ Robot card saved in Downloads › R2BOT Kids!' : saved === 'shared' ? '🖼️ Choose where to keep your robot card.' : '🖼️ Robot card downloaded!')
   }
 
   const buildOwn = () => {
@@ -378,9 +381,13 @@ export default function WorkshopClient() {
                 💾 Save{dirty ? ' *' : ''}
               </button>
             )}
-            <button type="button" onClick={() => void share()} className="min-h-[48px] rounded-2xl bg-white/10 px-4 font-bold focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">
-              🔗 Share
-            </button>
+            {/* A share link opens the robot on the website, which the standalone app does not
+                use: the app shares the robot card picture instead. */}
+            {!KIDS_STANDALONE && (
+              <button type="button" onClick={() => void share()} className="min-h-[48px] rounded-2xl bg-white/10 px-4 font-bold focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">
+                🔗 Share
+              </button>
+            )}
             <button type="button" onClick={() => void downloadCard()} className="min-h-[48px] rounded-2xl bg-white/10 px-4 font-bold focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">
               🖼️ Robot card
             </button>

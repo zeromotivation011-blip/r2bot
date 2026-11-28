@@ -257,6 +257,7 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
   const [log, setLog] = useState<LogLine[]>([])
   const [outcome, setOutcome] = useState<Outcome | null>(null)
   const [canvasH, setCanvasH] = useState(320)
+  const [canvasW, setCanvasW] = useState<number | null>(null)
   const [paused, setPaused] = useState(false)
   const [endingSol, setEndingSol] = useState(false)
   const [stuck, setStuck] = useState(false)
@@ -461,9 +462,18 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
 
     const resize = () => {
       const dpr = Math.min(2, window.devicePixelRatio || 1)
-      const w = wrap.clientWidth
-      const h = Math.round(w * (map.H / map.W) + BAND_PX)
+      let w = wrap.clientWidth
+      let h = Math.round(w * (map.H / map.W) + BAND_PX)
+      // A phone held sideways: fit the whole map on the screen (narrower, centred) instead of scrolling.
+      if (window.matchMedia('(orientation: landscape) and (max-height: 500px)').matches) {
+        const maxH = Math.max(200, window.innerHeight - 92)
+        if (h > maxH) {
+          h = maxH
+          w = Math.round(((h - BAND_PX) * map.W) / map.H)
+        }
+      }
       setCanvasH(h)
+      setCanvasW(w < wrap.clientWidth ? w : null)
       canvas.width = Math.round(w * dpr)
       canvas.height = Math.round(h * dpr)
       viewRef.current = makeView(w, h, dpr, map)
@@ -690,11 +700,11 @@ export default function MarsRoverGameClient({ tier: tierProp, onFinish }: Props)
           className={`flex min-w-0 flex-col gap-1.5 ${pinH ? 'fixed inset-x-0 z-20 border-b border-white/10 bg-[#0B1020]/95 px-3 pb-1.5 pt-1.5 shadow-[0_8px_24px_rgba(0,0,0,.5)]' : ''}`}
           style={pinH ? { top: pinTop } : undefined}
         >
-          <div ref={wrapRef} className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0a1120] shadow-[0_8px_24px_rgba(0,0,0,.45)]">
+          <div ref={wrapRef} data-game-stage="" className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0a1120] shadow-[0_8px_24px_rgba(0,0,0,.45)]">
             <canvas
               ref={canvasRef}
-              className="block w-full"
-              style={{ height: canvasH }}
+              className={canvasW ? 'mx-auto block' : 'block w-full'}
+              style={canvasW ? { height: canvasH, width: canvasW } : { height: canvasH }}
               role="img"
               aria-label={`Map of Mars, ${map.W * CELL_M} by ${map.H * CELL_M} metres. Rover at the landing site, ${map.targets.length} science target${map.targets.length > 1 ? 's' : ''}.`}
             />

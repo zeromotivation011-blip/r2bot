@@ -369,7 +369,8 @@ export default function CrossingGameClient({ onFinish }: { onFinish: (r: RoundRe
         <div className="relative">
           <canvas
             ref={canvas}
-            className="aspect-[13/9] w-full rounded-[28px] border border-white/10 bg-[#0A1120]"
+            data-game-stage=""
+            className="kids-stage-ratio aspect-[13/9] w-full rounded-[28px] border border-white/10 bg-[#0A1120]"
             role="img"
             aria-label={`City street seen from above. ${status}. Crossings done: ${hud.next} of 3.`}
           />

@@ -511,7 +511,7 @@ export default function TalkClient() {
     <div className="mx-auto max-w-7xl px-3 pb-24 sm:px-4">
       {!online && (
         <p className="mb-3 rounded-2xl border border-cyan-300/40 bg-cyan-400/10 px-4 py-3 text-sm font-bold text-cyan-100" role="status">
-          📴 You’re offline. Your robot’s on-device brain still understands you — only the optional AI helper needs the internet.
+          {KIDS_STANDALONE ? '📴 No internet needed: your robot’s on-device brain understands you right here.' : '📴 You’re offline. Your robot’s on-device brain still understands you — only the optional AI helper needs the internet.'}
         </p>
       )}
 

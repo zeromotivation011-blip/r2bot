@@ -296,7 +296,8 @@ export default function RulesGameClient({ onFinish }: { onFinish: (r: RoundResul
       <div className="flex flex-col gap-2">
         <canvas
           ref={canvas}
-          className="aspect-[13/9] w-full rounded-[28px] border border-white/10 bg-[#0A1120]"
+          data-game-stage=""
+            className="kids-stage-ratio aspect-[13/9] w-full rounded-[28px] border border-white/10 bg-[#0A1120]"
           role="img"
           aria-label={`Test replay: ${SCENARIOS[sel].name}. ${results ? (results[sel].pass ? 'Passed' : `Failed: ${results[sel].reason}`) : 'Not run yet.'}`}
         />

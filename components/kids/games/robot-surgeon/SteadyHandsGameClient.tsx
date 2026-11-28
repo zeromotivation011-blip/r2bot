@@ -260,7 +260,7 @@ export default function SteadyHandsGameClient({ onFinish }: { onFinish: (r: Roun
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="flex flex-col gap-2">
         <div className="relative">
-          <canvas ref={canvas} className="aspect-[5/3] w-full rounded-[28px] border border-white/10" role="img" aria-label={`Camera view of the practice board. Progress ${Math.round(hud.progress * 100)}%.`} />
+          <canvas ref={canvas} data-game-stage="" className="kids-stage-ratio aspect-[5/3] w-full rounded-[28px] border border-white/10" role="img" aria-label={`Camera view of the practice board. Progress ${Math.round(hud.progress * 100)}%.`} />
           <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-[#0A1120]/70 px-2 py-1 text-[12px] font-bold text-cyan-200">3D camera · ×10 zoom</span>
         </div>
         {over ? (

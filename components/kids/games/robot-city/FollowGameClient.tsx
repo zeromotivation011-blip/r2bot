@@ -313,7 +313,8 @@ export default function FollowGameClient({ onFinish }: { onFinish: (r: RoundResu
         <div className="relative">
           <canvas
             ref={canvas}
-            className="aspect-[13/9] w-full rounded-[28px] border border-white/10 bg-[#0A1120]"
+            data-game-stage=""
+            className="kids-stage-ratio aspect-[13/9] w-full rounded-[28px] border border-white/10 bg-[#0A1120]"
             role="img"
             aria-label={`Self-driving car on the test route. Speed ${hud.v.toFixed(0)} kilometres per hour. ${hud.gap !== null ? `Gap to the car ahead ${hud.gap.toFixed(0)} metres.` : ''}`}
           />

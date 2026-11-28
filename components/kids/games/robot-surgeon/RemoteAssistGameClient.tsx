@@ -366,7 +366,7 @@ export default function RemoteAssistGameClient({ onFinish }: { onFinish: (r: Rou
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="flex flex-col gap-2">
         <div className="relative">
-          <canvas ref={canvas} className="aspect-[16/10] w-full rounded-[28px] border border-white/10" role="img" aria-label={`Delayed camera view. ${hud.marked} of 4 targets marked. Force ${hud.force.toFixed(1)} newtons.`} />
+          <canvas ref={canvas} data-game-stage="" className="kids-stage-ratio aspect-[16/10] w-full rounded-[28px] border border-white/10" role="img" aria-label={`Delayed camera view. ${hud.marked} of 4 targets marked. Force ${hud.force.toFixed(1)} newtons.`} />
           {hud.alert && (
             <div className="absolute inset-x-3 bottom-3 flex flex-wrap items-center gap-2 rounded-2xl border-2 border-amber-300 bg-[#0A1120]/95 p-3" role="alert">
               <span className="text-2xl" aria-hidden>

@@ -268,7 +268,8 @@ export default function DeliveryGameClient({ onFinish }: { onFinish: (r: RoundRe
         <div className="relative">
           <canvas
             ref={canvas}
-            className="aspect-[13/9] w-full rounded-[28px] border border-white/10 bg-[#0A1120]"
+            data-game-stage=""
+            className="kids-stage-ratio aspect-[13/9] w-full rounded-[28px] border border-white/10 bg-[#0A1120]"
             role="img"
             aria-label={`Hospital map. ${hud.delivered} of 3 deliveries done. ${hud.events} safety problems.`}
           />

@@ -12,6 +12,7 @@ import { KidsClassSync } from '@/components/kids/classroom/KidsClassSyncClient'
 import { RewardToast } from '@/components/kids/ui/RewardToastClient'
 import { KidsAppLinkGuard } from '@/components/kids/app/KidsAppLinkGuardClient'
 import { KIDS_STANDALONE } from '@/lib/kids/app-context'
+import { installKidsNativeShims } from '@/lib/kids/native-app'
 import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
 import { ParentTimeKeeper } from '@/components/kids/parents/ParentTimeKeeperClient'
 import ProfileSwitcherClient from '@/components/kids/profiles/ProfileSwitcherClient'
@@ -23,6 +24,11 @@ import { LAB_BRAND, LAB_LABELS, useKidsLook } from '@/lib/kids/teen'
 import { useKidsCalm } from '@/lib/kids/settings'
 import './kids-animations.css'
 import './kids-shell.css'
+
+// Standalone app only (a build-time constant, stripped from the website): print,
+// share and speech go through the app's native plugin. At import, so it is in
+// place before any page code runs (lib/kids/native-app.ts).
+if (KIDS_STANDALONE && typeof window !== 'undefined') installKidsNativeShims()
 
 // Ask Spark, the kids' AI helper, on every kids page. Client-only and code-split:
 // nothing of it is in the first load (the sheet itself is a second chunk, fetched
@@ -187,12 +193,33 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
   // Teacher pages bring their own chrome.
   const bare = pathname.startsWith('/kids/classroom')
   const game = isGameRoute(pathname)
+  const play = /^\/kids\/play\/[^/]+/.test(pathname)
+
+  // A phone held sideways in a game: bring the whole stage ([data-game-stage]) into
+  // view when text above it would push it off the screen (kids-shell.css sizes it).
+  useEffect(() => {
+    if (!play) return
+    const mq = window.matchMedia('(orientation: landscape) and (max-height: 500px)')
+    const fit = () => {
+      if (!mq.matches) return
+      const stage = document.querySelector<HTMLElement>('[data-game-stage]')
+      if (!stage) return
+      const r = stage.getBoundingClientRect()
+      if (r.height > 0 && (r.top < 0 || r.bottom > window.innerHeight + 1)) window.scrollTo({ top: Math.max(0, r.top + window.scrollY - 8) })
+    }
+    const timers = [400, 1500].map((ms) => window.setTimeout(fit, ms))
+    mq.addEventListener?.('change', fit)
+    return () => {
+      timers.forEach((t) => window.clearTimeout(t))
+      mq.removeEventListener?.('change', fit)
+    }
+  }, [play])
   // Home has its own mission card; games say what is next on their results card.
   const nextSlot = !bare && !game && pathname !== '/kids' && pathname !== '/kids/'
 
   return (
     <div
-      className={`min-h-screen text-white${game ? ' kids-in-game' : ''}`}
+      className={`min-h-screen text-white${game ? ' kids-in-game' : ''}${play ? ' kids-in-play' : ''}`}
       style={{
         background: 'var(--void, #0A1120)',
         fontSize: '18px',

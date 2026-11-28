@@ -401,8 +401,11 @@ export default function KidsHubPage() {
       </section>
 
       {/* ── Schools, parents, class code ───────────────────────────────────── */}
-      <section className="mx-auto grid max-w-6xl gap-4 px-4 py-10 md:grid-cols-3" aria-label="For schools and parents">
-        {/* Grown-up pages open through the parental gate (roadmap #2, #20). */}
+      <section className={`mx-auto grid max-w-6xl gap-4 px-4 py-10 ${KIDS_STANDALONE ? '' : 'md:grid-cols-3'}`} aria-label="For schools and parents">
+        {/* Grown-up pages open through the parental gate (roadmap #2, #20).
+            The schools pitch is about classes and dashboards, which need the server:
+            not promoted in the standalone app (still reachable from the grown-ups page). */}
+        {!KIDS_STANDALONE && (
         <GrownUpLink
           href="/kids/schools"
           grant
@@ -416,6 +419,7 @@ export default function KidsHubPage() {
           </p>
           <span className="mt-4 inline-block font-bold text-amber-300">See how schools use it →</span>
         </GrownUpLink>
+        )}
         <div className="grid gap-4">
           {/* Joining a class needs the server: not in the standalone app. */}
           {!KIDS_STANDALONE && (

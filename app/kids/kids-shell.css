@@ -148,6 +148,22 @@ html:has(.kids-nav) { scroll-padding-top: calc(84px + env(safe-area-inset-top));
   .kids-voice-toggle { width: 44px; height: 44px; }
 }
 
+/* A phone held sideways in a game (/kids/play/*): the header would take a third
+   of the height and push the arena off the screen. The game bar's Exit is the
+   way out, so the header steps aside until the phone is upright again. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .kids-in-play .kids-nav { display: none; }
+  html:has(.kids-in-play) { scroll-padding-top: 0; }
+  /* The game's stage ([data-game-stage]) fits under the game bar, so nothing
+     needs scrolling mid-drag. KidsShell scrolls it into view if text sits above it.
+     Fixed-height stages fill the height left: */
+  .kids-in-play .kids-stage-fill { height: calc(100dvh - 92px); }
+  /* Fixed-ratio stages (aspect-*): as tall as fits, narrower and centred. */
+  .kids-in-play .kids-stage-ratio { height: calc(100dvh - 92px); width: auto; max-width: 100%; margin-inline: auto; }
+  /* Swarm Reef sizes its canvas from the width (world 1000 x 700). */
+  .kids-in-play .kids-stage-swarm { max-width: calc((100dvh - 92px) * 10 / 7); margin-inline: auto; }
+}
+
 /* ── More menu (header, every width) ─────────────────────────────────────── */
 .kids-more { position: relative; }
 .kids-more-btn {

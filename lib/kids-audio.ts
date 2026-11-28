@@ -8,6 +8,7 @@
 // (episode engine) read kidsMusicOn() from lib/kids/settings.ts.
 
 import { readKidsSettings } from './kids/settings'
+import { KIDS_STANDALONE } from './kids/app-context'
 
 const MAX_MASTER = 0.5
 
@@ -328,7 +329,8 @@ export function speechSupported(): boolean {
 }
 
 export function speechRecognitionSupported(): boolean {
-  if (typeof window === 'undefined') return false
+  // The standalone app has no microphone permission (and no network for a speech service).
+  if (typeof window === 'undefined' || KIDS_STANDALONE) return false
   const w = window as unknown as { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown }
   return Boolean(w.SpeechRecognition || w.webkitSpeechRecognition)
 }

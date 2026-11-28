@@ -6,6 +6,11 @@ import { KIDS_BANDS } from '@/lib/kids/bands'
 import { CLASS_PLANS, LESSON_SHAPE } from '@/lib/kids/classroom-plan'
 import { LessonPlanPanel } from '@/components/kids/classroom/LessonPlanPanel'
 import PilotFormClient from './PilotFormClient'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
+import { NeedsWebNote } from '@/components/kids/app/NeedsWebNote'
+
+/** Teacher tools that need the R2BOT server (hidden in the standalone app). */
+const SERVER_ONLY_TOOLS = ['/kids/classroom', '/kids/classroom/school', '/kids/present']
 import TrustActionsClient from '@/app/kids/teach/trust/TrustActionsClient'
 
 export const runtime = 'nodejs'
@@ -130,11 +135,22 @@ export default function KidsSchoolsPage() {
               dashboard that shows you who is flying and who is stuck. It runs in a browser on the devices your school
               already has, from Grade K to Grade 12.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <a href="#pilot" className="inline-flex min-h-[52px] items-center rounded-xl bg-amber-500 px-6 text-lg font-extrabold text-black hover:bg-amber-400">Request a school pilot</a>
-              <Link href="/kids/classroom" className="inline-flex min-h-[52px] items-center rounded-xl border border-white/20 px-6 text-lg font-bold text-white hover:bg-white/5">Create a class now</Link>
-            </div>
-            <p className="mt-4 text-sm text-slate-400">Teachers sign in with an R2BOT account. Children join with a code and a nickname.</p>
+            {KIDS_STANDALONE ? (
+              // The app has no server: classes, the dashboard and the pilot form live on the website.
+              <NeedsWebNote
+                what="Running a class"
+                detail="The lesson guides, unplugged lessons, club plans and teacher training below all work in this app."
+                className="mt-7"
+              />
+            ) : (
+              <>
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <a href="#pilot" className="inline-flex min-h-[52px] items-center rounded-xl bg-amber-500 px-6 text-lg font-extrabold text-black hover:bg-amber-400">Request a school pilot</a>
+                  <Link href="/kids/classroom" className="inline-flex min-h-[52px] items-center rounded-xl border border-white/20 px-6 text-lg font-bold text-white hover:bg-white/5">Create a class now</Link>
+                </div>
+                <p className="mt-4 text-sm text-slate-400">Teachers sign in with an R2BOT account. Children join with a code and a nickname.</p>
+              </>
+            )}
           </div>
           <div className={`${CARD} text-center`} aria-hidden>
             <p className="text-sm font-bold uppercase tracking-widest text-orange-300">On the classroom wall</p>
@@ -219,7 +235,10 @@ export default function KidsSchoolsPage() {
               { emoji: '🎓', title: 'Teacher training with a certificate', body: 'Six short self-paced modules, about 45 minutes: running a class, the physics lab, assigning and tracking, supporting every child, safety and privacy.', href: '/kids/teach/training', cta: 'Start the training' },
               { emoji: '📜', title: 'Certificates for children', body: 'A child who finishes all 24 sessions of Level 1 can download a certificate with their explorer name and robot. Every child who learns the skills earns the same one.', href: '/kids/course/1', cta: 'See Level 1' },
               { emoji: '🏠', title: 'A weekly report for families', body: 'Parents get a printable weekly report from their child’s own device: what was learned, badges earned and a five-minute activity to try at home.', href: '/kids/parents', cta: 'For parents' },
-            ].map((t) => (
+            ]
+              // Server-only tools (classes, schools, Present mode) are not in the standalone app.
+              .filter((t) => !KIDS_STANDALONE || !SERVER_ONLY_TOOLS.includes(t.href))
+              .map((t) => (
               <li key={t.title} className={`${CARD} flex flex-col`}>
                 <div className="text-3xl" aria-hidden>{t.emoji}</div>
                 <h3 className="mt-3 text-lg font-extrabold text-white">{t.title}</h3>
@@ -317,7 +336,8 @@ export default function KidsSchoolsPage() {
           </div>
         </section>
 
-        {/* ── Pilot form ───────────────────────────────────────────── */}
+        {/* ── Pilot form (needs the server: website only) ───────────── */}
+        {!KIDS_STANDALONE && (
         <section id="pilot" aria-labelledby="pilot-h" className="scroll-mt-24 rounded-3xl border border-amber-400/30 bg-gradient-to-br from-amber-500/10 to-transparent p-6 sm:p-10">
           <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
             <div>
@@ -336,6 +356,7 @@ export default function KidsSchoolsPage() {
             <PilotFormClient />
           </div>
         </section>
+        )}
       </article>
     </>
   )

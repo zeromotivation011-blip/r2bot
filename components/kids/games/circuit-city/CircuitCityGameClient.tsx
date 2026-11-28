@@ -758,7 +758,7 @@ export default function CircuitCityGameClient({ tier, onFinish }: Props) {
           </button>
         )}
 
-        <div ref={wrapRef} className="relative w-full">
+        <div ref={wrapRef} data-game-stage="" className="relative w-full">
           <canvas
             ref={canvasRef}
             tabIndex={0}

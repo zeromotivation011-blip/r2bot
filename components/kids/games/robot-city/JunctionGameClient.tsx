@@ -279,7 +279,8 @@ export default function JunctionGameClient({ onFinish }: { onFinish: (r: RoundRe
         <div className="relative">
           <canvas
             ref={canvas}
-            className="aspect-[13/9] w-full rounded-[28px] border border-white/10 bg-[#0A1120]"
+            data-game-stage=""
+            className="kids-stage-ratio aspect-[13/9] w-full rounded-[28px] border border-white/10 bg-[#0A1120]"
             role="img"
             aria-label={`Crossroads seen from above. ${hud.served} cars have crossed, ${hud.queued} are waiting.`}
           />

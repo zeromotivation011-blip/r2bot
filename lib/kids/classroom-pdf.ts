@@ -10,7 +10,7 @@
 // goes through pdfSafe() from the teacher-guide PDFs.
 
 import type { jsPDF as JsPdf } from 'jspdf'
-import { longDate, pdfSafe } from './teach/pdf'
+import { longDate, pdfSafe, savePdf } from './teach/pdf'
 import { CONCEPT_INFO, STATUS_LABEL, type ConceptId } from './universe/mastery'
 import { STATUS_STYLE, type GradeRow } from './classroom-insights'
 import type { ClassGoal } from './classroom-goal'
@@ -173,7 +173,7 @@ export async function downloadGradebookPdf(g: GradebookPdfInput): Promise<void> 
     }
     footer(doc, W, H, page, 'Concept status from first-try wins in the Skill Galaxy (3 wins, 3 activities, 2 kinds, 21 days = secure). Never a ranking.')
   })
-  doc.save(`r2bot-kids-gradebook-${slug(g.className)}-${g.date.toISOString().slice(0, 10)}.pdf`)
+  await savePdf(doc, `r2bot-kids-gradebook-${slug(g.className)}-${g.date.toISOString().slice(0, 10)}.pdf`)
 }
 
 // ── Standards (one level) ────────────────────────────────────────────────────
@@ -276,7 +276,7 @@ export async function downloadStandardsPdf(lv: StandardsLevel, siteUrl: string):
   y += 3
   para(lv.disclaimer, 8, GREY)
   footer(doc, W, H, page, note)
-  doc.save(`r2bot-kids-standards-level-${lv.level}.pdf`)
+  await savePdf(doc, `r2bot-kids-standards-level-${lv.level}.pdf`)
 }
 
 // ── Class Power-Up certificate ───────────────────────────────────────────────
@@ -342,7 +342,7 @@ export async function downloadClassCertificate(c: ClassCertificateInput): Promis
   doc.setFontSize(8.5)
   doc.setTextColor(...GREY)
   doc.text('A co-operative goal: one meter, no scores, no rankings. R2BOT Kids · r2bot.in/kids', W / 2, H - 26, { align: 'center' })
-  doc.save(`r2bot-kids-class-power-up-${slug(c.className)}.pdf`)
+  await savePdf(doc, `r2bot-kids-class-power-up-${slug(c.className)}.pdf`)
 }
 
 /** Labels for the status legend (used by the gradebook UI and PDF together). */
