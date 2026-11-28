@@ -5,7 +5,6 @@ import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { SkipToContent } from '@/components/SkipToContent';
 import { LowDataMode } from '@/components/LowDataMode';
-import { PWAPrompt } from '@/components/PWAPrompt';
 import { ToastProvider } from '@/components/Toast';
 import { ProgressBanner } from '@/components/ProgressBanner';
 import { AuthProvider } from '@/components/auth/AuthProvider';
@@ -125,7 +124,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             OnboardingModal / LeadCaptureModal are kept in the codebase but are
             no longer mounted. */}
         <HideOnEmbed><LowDataMode /></HideOnEmbed>
-        <HideOnEmbed><PWAPrompt /></HideOnEmbed>
+        {/* PWAPrompt is not mounted (28 Nov 2026). It promised "offline
+            reading", but there is no service worker, so nothing works
+            offline; it had no install action; and on a phone it sat over the
+            bottom of every simulator from the third page view. Remount it only
+            with a real service worker and a beforeinstallprompt button. */}
         {GA_ID && (
           <>
             <Script
