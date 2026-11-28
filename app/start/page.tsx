@@ -35,7 +35,7 @@ const PATHS: {
       { t: 'Course 1: Robotics Foundations', href: '/courses/robotics-foundations' },
       { t: 'Course 2: Build Your First Robot', href: '/courses/build-your-first-robot-pip' },
       { t: 'Course 3: Robot Arms', href: '/courses/robot-arms-build-ari' },
-      { t: 'See all 5 courses and certificates', href: '/courses' },
+      { t: 'See all 10 courses and certificates', href: '/courses' },
     ],
   },
   {

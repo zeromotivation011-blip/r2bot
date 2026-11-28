@@ -47,7 +47,7 @@ export function AtlasNextStep({ topic, lesson, academy }: AtlasNextStepProps) {
         }
       : {
           eyebrow: 'Next: the course path',
-          title: 'Five free courses, from zero to your own robot design',
+          title: 'Ten free courses, from zero to your own robot design',
           body: 'Short videos with a quiz after each one, a final activity and a certificate per course.',
           cta: 'See the course path →',
           href: '/courses',

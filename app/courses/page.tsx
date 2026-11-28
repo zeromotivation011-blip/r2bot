@@ -9,8 +9,8 @@ export const revalidate = 86400
 const BASE = 'https://www.r2bot.in'
 
 export const metadata: Metadata = {
-  title: 'Free Robotics Course Path: 5 Courses, Quizzes and Certificates',
-  description: 'Five free robotics courses in order: foundations, build a robot, robot arms, vision and intelligence. Short videos, quizzes and certificates.',
+  title: 'Free Robotics Course Path: 10 Courses, Quizzes and Certificates',
+  description: 'Ten free robotics courses in order: foundations, build a robot, robot arms, vision, intelligence, movie robots vs real robots, humanoids, robots at home, robots that explore, and how robots really work. Short videos, quizzes and certificates.',
   alternates: { canonical: `${BASE}/courses`, languages: HREFLANG_COURSES },
 }
 
@@ -24,7 +24,7 @@ export default function CoursesPage() {
   return (
     <main className="max-w-5xl mx-auto px-5 py-14">
       <p className="r2-eyebrow">The free course path</p>
-      <h1 className="r2-display">Five free courses, from zero to your own robot design</h1>
+      <h1 className="r2-display">{courses.length} free courses, from zero to your own robot design</h1>
       <p className="r2-lede">Follow the path in order, or jump to the course you need. Each lesson is a short video of about four minutes with a quick quiz, and each course ends with a small final activity and a certificate you can verify and share. Everything is free.</p>
       <p className="mt-3 max-w-2xl rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-gray-300">
         <strong className="text-white">{videosReady} of {lessonsTotal} videos are live right now</strong> ({coursesReady} course{coursesReady === 1 ? '' : 's'} complete). The rest are being recorded — every lesson page shows its own state, and you can get an email when a course opens.

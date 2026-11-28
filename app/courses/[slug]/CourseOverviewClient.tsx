@@ -15,13 +15,14 @@ interface Props {
   finalActivity?: { title: string; prompt: string }
   prev: Nav | null; next: Nav | null
 }
-interface Progress { signedIn: boolean; completed?: string[]; certificateId?: string | null; assignment?: string | null }
+interface Progress { signedIn: boolean; completed?: string[]; certificateId?: string | null; assignment?: string | null; enrolled?: boolean }
 
 export default function CourseOverviewClient(p: Props) {
   const [prog, setProg] = useState<Progress | null>(null)
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; t: string } | null>(null)
+  const [enrolling, setEnrolling] = useState(false)
 
   useEffect(() => {
     fetch(`/api/courses/progress?course=${encodeURIComponent(p.slug)}`).then((r) => r.json()).then((d: Progress) => {
@@ -55,6 +56,15 @@ export default function CourseOverviewClient(p: Props) {
       }
     } catch { setMsg({ ok: false, t: 'Network problem. Try again.' }) }
     setBusy(false)
+  }
+
+  async function enroll() {
+    setEnrolling(true)
+    try {
+      const r = await fetch('/api/courses/enroll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ courseSlug: p.slug }) })
+      if (r.ok) setProg((x) => ({ ...(x ?? { signedIn: true }), enrolled: true }))
+    } catch { /* best-effort; the Start/Continue link still works either way */ }
+    setEnrolling(false)
   }
 
   return (
@@ -98,14 +108,25 @@ export default function CourseOverviewClient(p: Props) {
 
       {prog?.signedIn && (
         <div className="mt-6 rounded-xl border border-white/10 p-4">
-          <div className="flex justify-between text-sm text-gray-300"><span>Your progress</span><span>{pct}%</span></div>
+          <div className="flex justify-between text-sm text-gray-300">
+            <span>Your progress{prog.enrolled && <span className="ml-2 text-green-400 text-xs font-semibold">✓ Enrolled</span>}</span>
+            <span>{pct}%</span>
+          </div>
           <div className="h-2 rounded bg-white/10 mt-2 overflow-hidden"><div className="h-full bg-amber-500" style={{ width: `${pct}%` }} /></div>
           {prog.certificateId && <Link href={`/verify/${prog.certificateId}`} className="r2-link mt-3">🎓 View your certificate →</Link>}
         </div>
       )}
       {readyCount > 0 && (
-        <Link href={`/courses/${p.slug}/${next.id}`} className="btn-primary inline-flex items-center mt-6 px-5 min-h-[48px] rounded-xl font-bold">
-          {done.size > 0 && done.size < p.lessons.length ? 'Continue learning →' : 'Start the course →'}
+        <Link
+          href={`/courses/${p.slug}/${next.id}`}
+          onClick={() => { if (prog?.signedIn && !prog.enrolled) enroll() }}
+          className="btn-primary inline-flex items-center mt-6 px-5 min-h-[48px] rounded-xl font-bold"
+        >
+          {done.size > 0 && done.size < p.lessons.length
+            ? 'Continue learning →'
+            : prog?.signedIn && !prog.enrolled
+              ? (enrolling ? 'Enrolling…' : 'Enroll & start the course →')
+              : 'Start the course →'}
         </Link>
       )}
       {prog && !prog.signedIn && <p className="text-gray-500 text-sm mt-3">You can watch without an account. <Link href="/login" className="r2-link">Sign in</Link> to save progress and earn the certificate.</p>}

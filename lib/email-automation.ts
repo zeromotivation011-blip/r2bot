@@ -102,7 +102,7 @@ export async function runEmailAutomation(): Promise<Result> {
         const html = renderEmail({
           preheader: 'Five short courses. Quizzes, a final activity and a certificate.',
           heading: 'Your free robotics learning path',
-          bodyHtml: `<p>R2BOT has a free path of five courses, from "what is a robot" to robot vision and AI. Each lesson is about four minutes. Pass the quiz, finish the final activity, and get a certificate you can share.</p>${button('See the free course path', `${BASE_URL}/courses`)}`,
+          bodyHtml: `<p>R2BOT has a free path of ten courses, from "what is a robot" to humanoids, robot vision and AI. Each lesson is about four minutes. Pass the quiz, finish the final activity, and get a certificate you can share.</p>${button('See the free course path', `${BASE_URL}/courses`)}`,
           unsubscribeUrl: unsub,
         })
         if (await sendOnce(email, 'welcome-3', 'Your free robotics course path', html, 'welcome')) out.welcome++
@@ -211,7 +211,7 @@ export async function runEmailAutomation(): Promise<Result> {
         const html = renderEmail({
           preheader: 'Robotics this week, in plain English.',
           heading: 'R2BOT Weekly',
-          bodyHtml: `<p>Three things worth knowing this week.</p>${storiesHtml}${lessonHtml}${termHtml}<h3 style="margin:18px 0 6px">Keep learning</h3><p style="margin:0 0 6px">Five free courses with quizzes and certificates.</p>${button('Open the courses', `${BASE_URL}/courses`)}`,
+          bodyHtml: `<p>Three things worth knowing this week.</p>${storiesHtml}${lessonHtml}${termHtml}<h3 style="margin:18px 0 6px">Keep learning</h3><p style="margin:0 0 6px">Ten free courses with quizzes and certificates.</p>${button('Open the courses', `${BASE_URL}/courses`)}`,
           unsubscribeUrl: unsub,
         })
         if (await sendOnce(String(sub.email), kind, 'R2BOT Weekly: robotics in plain English', html, 'weekly')) out.weekly++

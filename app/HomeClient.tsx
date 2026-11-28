@@ -8,6 +8,7 @@ import { Reveal } from '@/components/Reveal'
 import { FeatureTour } from '@/components/FeatureTour'
 import ShortDemo from '@/components/shorts/ShortsDemos'
 import ContinueStrip from '@/components/landing/ContinueStrip'
+import { CourseArt } from '@/components/courses/CourseArt'
 
 type Track = 'spark' | 'wire' | 'forge' | 'edge'
 
@@ -32,6 +33,11 @@ interface HomeClientProps {
   /** Server-rendered Quick Lessons section (keeps the lesson catalogue out of this bundle). */
   shortsSection: ReactNode
   liveLessons: { slug: string; title: string }[]
+  /** All 10 published /courses, for the homepage course path — was hardcoded to the
+   *  original 5 and silently never mentioned the 5 Series 2 courses added 28 Nov 2026. */
+  courses: { slug: string; order: number; title: string; tagline: string }[]
+  liveCourseVideos: number
+  courseLessonsTotal: number
 }
 
 function usePersonalization(): Personalization {
@@ -83,7 +89,7 @@ const TRACK_LABEL: Record<Track, string> = {
   spark: 'Spark', wire: 'Wire', forge: 'Forge', edge: 'Edge',
 }
 
-export default function HomeClient({ atlasCount, projectCount, shortsCount, simCount, news = [], videos = [], shortsSection, liveLessons }: HomeClientProps) {
+export default function HomeClient({ atlasCount, projectCount, shortsCount, simCount, news = [], videos = [], shortsSection, liveLessons, courses, liveCourseVideos, courseLessonsTotal }: HomeClientProps) {
   const personalization = usePersonalization()
   const showDiagnosticBanner = personalization.signedIn && !personalization.track
   return (
@@ -123,7 +129,7 @@ export default function HomeClient({ atlasCount, projectCount, shortsCount, simC
           ten. */}
       <ContinueStrip lessons={liveLessons} />
       <Reveal>{shortsSection}</Reveal>
-      <Reveal><CoursePath /></Reveal>
+      <Reveal><CoursePath courses={courses} liveCourseVideos={liveCourseVideos} courseLessonsTotal={courseLessonsTotal} /></Reveal>
       <Reveal><Features atlasCount={atlasCount} /></Reveal>
       <Reveal><SimulatorShowcase simCount={simCount} /></Reveal>
       <Reveal><Latest news={news} videos={videos} /></Reveal>
@@ -212,27 +218,31 @@ function Hero({ personalization, atlasCount, projectCount, shortsCount, simCount
  * The course path was five identical cards in a row with filled orange number
  * badges and a filled orange button under them — the same shape as every
  * other section on the page. It is a *path*, so it is drawn as one: a rail
- * with the five stops on it, left-aligned, with the copy beside it rather
- * than centred above it. Different shape, same information, and it reads as
- * a sequence instead of a menu.
+ * with the stops on it, left-aligned, with the copy beside it rather than
+ * centred above it. Different shape, same information, and it reads as a
+ * sequence instead of a menu.
+ *
+ * Was hardcoded to the original 5 courses and a stale "23 videos are live"
+ * line — the 5 Series 2 courses added 28 Nov 2026 never appeared here, which
+ * is the reason the homepage never promoted them. Both are now driven by
+ * `courses`/`liveCourseVideos` from listPublishedCourses(), so a new course
+ * or a newly-recorded lesson shows up here with no code change. Each stop
+ * also carries its own CourseArt thumbnail (cropped to a 36px badge) rather
+ * than a bare number, since a course path with no faces on it is what made
+ * the new courses invisible in the first place, and links straight to its
+ * own course page instead of the generic /courses hub.
  */
-function CoursePath() {
-  const steps = [
-    { n: 1, name: 'Robotics Foundations', sub: 'How robots sense, think and act' },
-    { n: 2, name: 'Build Your First Robot', sub: 'A small wheeled robot, step by step' },
-    { n: 3, name: 'Robot Arms', sub: 'Build an arm that picks up a cup' },
-    { n: 4, name: 'Robot Vision', sub: 'Give your robot a camera' },
-    { n: 5, name: 'Robot Intelligence', sub: 'Maps, planning, speech and safety' },
-  ]
+function CoursePath({ courses, liveCourseVideos, courseLessonsTotal }: { courses: { slug: string; order: number; title: string; tagline: string }[]; liveCourseVideos: number; courseLessonsTotal: number }) {
   return (
     <section className="r2-section">
       <div className="r2-wrap r2-split">
         <div className="r2-split__copy">
           <p className="r2-eyebrow">The free course path</p>
-          <h2 className="r2-h2">Five courses, zero to your own robot design</h2>
+          <h2 className="r2-h2">{courses.length} courses, zero to your own robot design</h2>
           <p className="r2-body" style={{ marginTop: '1rem' }}>
-            Fifty short video lessons, a quiz after each one, a final activity and a certificate
-            for every course. 23 videos are live; the rest are being recorded.
+            {courseLessonsTotal} short video lessons, a quiz after each one, a final activity and a
+            certificate for every course. {liveCourseVideos} of {courseLessonsTotal} lesson videos are
+            live; the rest are being recorded.
           </p>
           <p style={{ marginTop: '1.5rem' }}>
             <Link href="/courses" className="r2-link">See the full course path</Link>
@@ -240,13 +250,15 @@ function CoursePath() {
         </div>
 
         <ol className="r2-rail">
-          {steps.map((c) => (
-            <li key={c.n} className="r2-rail__item">
-              <Link href="/courses" className="r2-rail__link">
-                <span className="r2-rail__n" aria-hidden>{c.n}</span>
+          {courses.map((c) => (
+            <li key={c.slug} className="r2-rail__item">
+              <Link href={`/courses/${c.slug}`} className="r2-rail__link">
+                <span className="r2-rail__n" aria-hidden style={{ padding: 0, overflow: 'hidden' }}>
+                  <CourseArt slug={c.slug} order={c.order} title={c.title} style={{ width: '100%', height: '100%' }} />
+                </span>
                 <span>
-                  <span className="r2-rail__name">{c.name}</span>
-                  <span className="r2-meta">{c.sub}</span>
+                  <span className="r2-rail__name">{c.title}</span>
+                  <span className="r2-meta">{c.tagline}</span>
                 </span>
               </Link>
             </li>

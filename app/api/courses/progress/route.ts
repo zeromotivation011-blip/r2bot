@@ -24,11 +24,12 @@ export async function GET(req: NextRequest) {
     return Response.json({ signedIn: true, counts, certificates })
   }
   const course = req.nextUrl.searchParams.get('course') ?? ''
-  const [done, watch, cert, assign] = await Promise.all([
+  const [done, watch, cert, assign, enrolled] = await Promise.all([
     supabase.from('lesson_completions').select('lesson_slug').eq('user_id', user.id).eq('course_slug', course),
     supabase.from('video_watch').select('lesson_slug, position_s, max_pct').eq('user_id', user.id).eq('course_slug', course),
     supabase.from('certificates').select('certificate_id').eq('user_id', user.id).eq('lesson_slug', `course:${course}`).maybeSingle(),
     supabase.from('course_assignments').select('answer').eq('user_id', user.id).eq('course_slug', course).maybeSingle(),
+    supabase.from('course_enrollments').select('course_slug').eq('user_id', user.id).eq('course_slug', course).maybeSingle(),
   ])
   return Response.json({
     signedIn: true,
@@ -36,5 +37,6 @@ export async function GET(req: NextRequest) {
     watch: Object.fromEntries((watch.data ?? []).map((r) => [r.lesson_slug as string, { position: r.position_s as number, maxPct: r.max_pct as number }])),
     certificateId: (cert.data?.certificate_id as string | undefined) ?? null,
     assignment: (assign.data?.answer as string | undefined) ?? null,
+    enrolled: !!enrolled.data,
   })
 }

@@ -77,16 +77,19 @@ export default async function GrowthPage() {
 
   // Course funnel
   const courses = listPublishedCourses()
-  const [watch, comps, assigns, certs] = await Promise.all([
+  const [enrolls, watch, comps, assigns, certs] = await Promise.all([
+    admin.from('course_enrollments').select('user_id, course_slug').limit(50000),
     admin.from('video_watch').select('user_id, course_slug, updated_at').limit(50000),
     admin.from('lesson_completions').select('user_id, course_slug, completed_at').limit(50000),
     admin.from('course_assignments').select('user_id, course_slug').limit(50000),
     admin.from('certificates').select('user_id, lesson_slug').eq('track', 'video').limit(50000),
   ])
+  const enrolled: Record<string, Set<string>> = {}
   const started: Record<string, Set<string>> = {}, finishedLessons: Record<string, Set<string>> = {}
   const assigned: Record<string, Set<string>> = {}, certified: Record<string, Set<string>> = {}
   const lastAct = new Map<string, number>()
   const add = (m: Record<string, Set<string>>, c: string, u: string) => { (m[c] ??= new Set()).add(u) }
+  for (const r of (enrolls.data ?? []) as { user_id: string; course_slug: string }[]) add(enrolled, r.course_slug, r.user_id)
   for (const r of (watch.data ?? []) as { user_id: string; course_slug: string; updated_at: string }[]) {
     add(started, r.course_slug, r.user_id); const k = `${r.user_id}|${r.course_slug}`; lastAct.set(k, Math.max(lastAct.get(k) ?? 0, +new Date(r.updated_at)))
   }
@@ -121,14 +124,16 @@ export default async function GrowthPage() {
         <Stat label="Newsletter subscribers" value={activeSubs} sub="active, receiving the weekly email" />
         <Stat label="New this week" value={new7} sub={`${new30} in the last 30 days`} />
         <Stat label="Learners who stalled" value={stalled} sub="no activity for 5+ days, no certificate" />
+        <Stat label="Course enrollments" value={Object.values(enrolled).reduce((a, s) => a + s.size, 0)} sub="people, across all 10 courses" />
         <Stat label="Certificates issued" value={Object.values(certified).reduce((a, s) => a + s.size, 0)} sub="video courses" />
       </div>
 
       <div style={{ ...card, marginBottom: 16 }}>
         <h3 style={h3}>Course funnel (people)</h3>
         {courses.map((c) => {
-          const s = started[c.slug]?.size ?? 0
-          const rows: [string, number][] = [['Started', s], ['Finished at least one lesson', finishedLessons[c.slug]?.size ?? 0], ['Submitted final activity', assigned[c.slug]?.size ?? 0], ['Got the certificate', certified[c.slug]?.size ?? 0]]
+          const e = enrolled[c.slug]?.size ?? 0
+          const s = e || (started[c.slug]?.size ?? 0)
+          const rows: [string, number][] = [['Enrolled', e], ['Started a lesson', started[c.slug]?.size ?? 0], ['Finished at least one lesson', finishedLessons[c.slug]?.size ?? 0], ['Submitted final activity', assigned[c.slug]?.size ?? 0], ['Got the certificate', certified[c.slug]?.size ?? 0]]
           return (
             <div key={c.slug} style={{ margin: '12px 0 18px' }}>
               <div style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>{c.title}</div>

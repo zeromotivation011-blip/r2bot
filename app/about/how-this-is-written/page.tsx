@@ -92,7 +92,7 @@ export default function HowThisIsWrittenPage() {
           </li>
           <li>
             <Link href="/courses" className="r2-link">The free course path</Link> —
-            five courses from &quot;what is a robot&quot; to designing your own.
+            ten courses from &quot;what is a robot&quot; to designing your own.
           </li>
           <li>
             <Link href="/atlas" className="r2-link">The Atlas</Link> — the

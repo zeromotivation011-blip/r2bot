@@ -12,6 +12,7 @@ import { loadAllProjects } from '@/lib/build/loader'
 import { getNewsData } from '@/lib/news'
 import { getLiveLensVideos } from '@/lib/lens-live'
 import { getAllLens } from '@/lib/lens'
+import { listPublishedCourses, hasVideo } from '@/lib/courses'
 import { jsonldScript } from '@/lib/seo/jsonld'
 import { HREFLANG_HOME } from '@/lib/hreflang'
 
@@ -25,7 +26,7 @@ const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_S
 export const metadata: Metadata = {
   title: 'R2BOT — The clearest way to learn robotics, free',
   description:
-    'Robotics in plain English: 500+ concepts explained from first principles, one-minute video lessons, five free courses and simulators in your browser.',
+    'Robotics in plain English: 500+ concepts explained from first principles, one-minute video lessons, ten free courses and simulators in your browser.',
   keywords: [
     'learn robotics',
     'ROS2 tutorial beginner',
@@ -133,6 +134,19 @@ export default async function HomePage() {
   const simCount = SIMULATORS.length
   const projectCount = loadAllProjects().length
 
+  // Course path data for the homepage — all 10 published courses, counted from
+  // the data (not hardcoded), so a new course or a newly-recorded lesson shows
+  // up here automatically instead of needing a copy edit every time.
+  const publishedCourses = listPublishedCourses()
+  const coursesForHome = publishedCourses.map((c) => ({
+    slug: c.slug,
+    order: c.order ?? 0,
+    title: c.title,
+    tagline: c.tagline || c.description,
+  }))
+  const courseLessonsTotal = publishedCourses.reduce((a, c) => a + c.lessons.length, 0)
+  const liveCourseVideos = publishedCourses.reduce((a, c) => a + c.lessons.filter(hasVideo).length, 0)
+
   // Live homepage teasers — sourced from the automated News + Lens pipelines.
   // Both are cached; failures degrade to an empty array (teasers self-hide).
   const [news, videos] = await Promise.all([
@@ -180,7 +194,7 @@ export default async function HomePage() {
     <CopilotProvider>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonldScript([websiteJsonLd, organizationJsonLd, faqJsonLd]) }} />
       <Nav />
-      <HomeClient atlasCount={atlasCount} projectCount={projectCount} shortsCount={shortsCount} simCount={simCount} shortsSection={shortsSection} liveLessons={liveLessons} news={news} videos={videos} />
+      <HomeClient atlasCount={atlasCount} projectCount={projectCount} shortsCount={shortsCount} simCount={simCount} shortsSection={shortsSection} liveLessons={liveLessons} news={news} videos={videos} courses={coursesForHome} liveCourseVideos={liveCourseVideos} courseLessonsTotal={courseLessonsTotal} />
       <CopilotBubble />
       <CopilotDrawer />
     </CopilotProvider>
