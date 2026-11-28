@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { listPublishedCourses, loadCourseBySlug, toPublicLesson, hasVideo } from '@/lib/courses'
 import LessonClient from './LessonClient'
 import { jsonldScript } from '@/lib/seo/jsonld'
+import { loadLessonNote } from '@/lib/course-notes'
+import LessonNote from '@/components/courses/LessonNote'
 
 export const revalidate = 86400
 export const dynamicParams = true
@@ -31,6 +33,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
   const idx = c ? c.lessons.findIndex((x) => x.id === lessonId) : -1
   if (!c || idx < 0) notFound()
   const l = c.lessons[idx]
+  // Written notes only on lessons with a live video; the rest stay noindex.
+  const note = hasVideo(l) ? loadLessonNote(c.slug, l.id) : null
   const video = {
     '@context': 'https://schema.org', '@type': 'VideoObject',
     name: l.title, description: l.summary,
@@ -46,6 +50,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         index={idx} total={c.lessons.length}
         nextId={c.lessons[idx + 1]?.id ?? null} prevId={c.lessons[idx - 1]?.id ?? null}
         firstReadyId={c.lessons.find(hasVideo)?.id ?? null}
+        notes={note ? <LessonNote body={note.body} updated={note.updated} /> : null}
       />
     </>
   )

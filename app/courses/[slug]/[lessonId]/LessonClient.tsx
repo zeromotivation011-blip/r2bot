@@ -10,6 +10,8 @@ interface Props {
   nextId: string | null; prevId: string | null
   /** First lesson of this course that does have a video, so an unrecorded lesson is never a dead end. */
   firstReadyId: string | null
+  /** Server-rendered written lesson note (components/courses/LessonNote), if this lesson has one. */
+  notes?: React.ReactNode
 }
 interface Review { ok: boolean; why: string | null; answer: number | null }
 interface Result { needsAssignment?: boolean; passed: boolean; score: number; review: Review[]; courseComplete?: boolean; certificateId?: string | null; completed?: number; total?: number; error?: string }
@@ -20,7 +22,7 @@ declare global { interface Window { YT?: { Player: new (el: HTMLElement, o: unkn
 
 const NEED = 0.85
 
-export default function LessonClient({ courseSlug, courseTitle, lesson, index, total, nextId, prevId, firstReadyId }: Props) {
+export default function LessonClient({ courseSlug, courseTitle, lesson, index, total, nextId, prevId, firstReadyId, notes }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const player = useRef<YTPlayer | null>(null)
   const watchedS = useRef(0)
@@ -182,6 +184,8 @@ export default function LessonClient({ courseSlug, courseTitle, lesson, index, t
       )}
 
       {done && !result && <p className="mt-6 text-green-400 font-semibold">✓ You have completed this lesson.</p>}
+
+      {notes}
 
       <div className="flex justify-between mt-10 gap-3">
         {prevId ? <Link href={`/courses/${courseSlug}/${prevId}`} className="rounded-xl border border-white/15 px-4 min-h-[44px] inline-flex items-center text-gray-300">← Previous</Link> : <span />}

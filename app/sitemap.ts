@@ -16,6 +16,7 @@ import { ZH_TOPICS } from '@/lib/ai-robotics-zh';
 import { HI_TOPICS } from '@/lib/ai-robotics-hi';
 import { ES_TOPICS } from '@/lib/ai-robotics-es';
 import { listPublishedCourses, hasVideo } from '@/lib/courses';
+import { loadLessonNote } from '@/lib/course-notes';
 import { GROUP_UPDATED, pageUpdated as at } from '@/lib/content-dates';
 import { ATLAS_ROBOTS_REDIRECTED } from '@/lib/canonical-map';
 import { getAllDailyLifeArticles } from '@/lib/daily-life-articles/loader';
@@ -115,7 +116,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { url: `${BASE}/courses/${c.slug}`, lastModified: new Date(c.updated), changeFrequency: 'monthly' as const, priority: 0.8 },
         ...c.lessons.filter(hasVideo).map((l) => ({
           url: `${BASE}/courses/${c.slug}/${l.id}`,
-          lastModified: new Date(c.updated),
+          // A written lesson note carries its own date (lib/course-notes.ts).
+          lastModified: new Date(loadLessonNote(c.slug, l.id)?.updated ?? c.updated),
           changeFrequency: 'monthly' as const,
           priority: 0.7,
         })),

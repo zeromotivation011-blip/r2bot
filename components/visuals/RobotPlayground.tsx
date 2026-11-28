@@ -451,14 +451,9 @@ export function RobotPlayground() {
         </button>
       </div>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
-          gap: 16,
-          alignItems: 'start',
-        }}
-      >
+      {/* One column on a phone: side by side, the editor was ~160px wide and
+          wrapped every comment one word per line. */}
+      <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         {/* LEFT: Monaco editor */}
         <div style={{ minWidth: 0 }}>
           <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border-2)' }}>
@@ -488,6 +483,7 @@ export function RobotPlayground() {
               onClick={run}
               disabled={running}
               style={{
+                minHeight: 44,
                 padding: '8px 18px',
                 borderRadius: 8,
                 border: '1px solid var(--cyan)',
@@ -505,6 +501,7 @@ export function RobotPlayground() {
               onClick={stop}
               disabled={!running}
               style={{
+                minHeight: 44,
                 padding: '8px 14px',
                 borderRadius: 8,
                 border: '1px solid var(--border-2)',
@@ -525,6 +522,7 @@ export function RobotPlayground() {
                 setOutput([]);
               }}
               style={{
+                minHeight: 44,
                 padding: '8px 14px',
                 borderRadius: 8,
                 border: '1px solid var(--border-2)',
