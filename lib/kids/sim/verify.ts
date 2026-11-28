@@ -60,6 +60,7 @@ import { MOTOR_DEAD_ZONE_PCT } from './robot-spec'
 import { FlightRecorder, whyFailed } from './recorder'
 import { labResultId, labSolved } from './lab-links'
 import { labScore, labTimeOf } from './lab-results'
+import { KIDS_PROGRESS_EVENT } from '../../kids-progress'
 import { reusePlayDone } from '../curriculum/level3/reuse-kit'
 import { LEVEL3_REUSE } from '../curriculum/level3/reuse'
 import { LEVEL4_REUSE } from '../curriculum/level4/reuse'
@@ -856,6 +857,12 @@ function wave4Checks(R: Rapier, push: (name: string, ok: boolean, detail: string
     push('lab results: the session runner no longer offers "I finished it" for a lab arena', !/reuse\.play\.kind === 'sim-demo' \|\|/.test(src), '')
     const wb = readFileSync(join(__dirname, '..', '..', '..', 'components', 'kids', 'sim', 'SimWorkbenchClient.tsx'), 'utf8')
     push('lab results: the workbench (Physics Lab and Power Lab) reports every finished run', /reportLabRun\(/.test(wb), '')
+    // Both lab pages keep the progress store out of their first load: a lazy import, and the event by its name.
+    for (const page of ['PowerLabClient.tsx', 'SimLabClient.tsx']) {
+      const code = readFileSync(join(__dirname, '..', '..', '..', 'components', 'kids', 'sim', page), 'utf8')
+      const lazy = !/^import[^\n]*from '@\/lib\/kids-progress'/m.test(code) && /await import\('@\/lib\/kids-progress'\)/.test(code)
+      push(`lab first load: ${page} loads the progress store lazily and listens for '${KIDS_PROGRESS_EVENT}'`, lazy && code.includes(`'${KIDS_PROGRESS_EVENT}'`), '')
+    }
   }
 }
 

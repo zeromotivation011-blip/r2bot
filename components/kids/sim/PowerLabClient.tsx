@@ -33,7 +33,9 @@ import { POWER_DEMOS, POWER_STARTERS } from '@/lib/kids/sim/power-demos'
 import type { Demo } from '@/lib/kids/sim/demos'
 import { playSound } from '@/lib/kids-audio'
 import { labSolved } from '@/lib/kids/sim/lab-links'
-import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
+
+/** KIDS_PROGRESS_EVENT in lib/kids-progress.ts, by name so that module stays out of the first load. */
+const PROGRESS_EVENT = 'r2bot:kids-progress'
 
 /** The simulator robots' motors are rated for four NiMH cells. */
 const MOTOR_RATED_V = 4.8
@@ -161,13 +163,22 @@ export default function PowerLabClient() {
   /** Challenges this child has solved (the lab's result store, lib/kids/sim/lab-results.ts). */
   const [solvedIds, setSolvedIds] = useState<Set<string>>(new Set())
   useEffect(() => {
-    const read = () => {
+    // The progress store (backup codes, merge, profiles migration) loads lazily so it stays out of
+    // this page's first load; the event is listened to by its name (KIDS_PROGRESS_EVENT).
+    let alive = true
+    const read = async () => {
+      const { getProgress } = await import('@/lib/kids-progress')
+      if (!alive) return
       const pb = getProgress().personalBests
       setSolvedIds(new Set(POWER_DEMOS.filter((x) => labSolved(pb, x.id)).map((x) => x.id)))
     }
-    read()
-    window.addEventListener(KIDS_PROGRESS_EVENT, read)
-    return () => window.removeEventListener(KIDS_PROGRESS_EVENT, read)
+    const onProgress = () => void read()
+    void read()
+    window.addEventListener(PROGRESS_EVENT, onProgress)
+    return () => {
+      alive = false
+      window.removeEventListener(PROGRESS_EVENT, onProgress)
+    }
   }, [])
 
   const maxAmps = Math.min(12, Math.max(6, info.maxAmps * 1.5))

@@ -70,7 +70,9 @@ export async function GET(): Promise<Response> {
     kind: kinds === 'not-ready' ? DEFAULT_CLASS_KIND : kinds.get(r.id) ?? DEFAULT_CLASS_KIND,
     kindReady: kinds !== 'not-ready',
   }))
-  return Response.json({ ok: true, classes, suggestedTeacherName }, { headers: NO_STORE })
+  // kindsReady: false before 0059, so the create form can warn a club, family or library leader
+  // that children will join at the class band until then (it holds even with no class yet).
+  return Response.json({ ok: true, classes, suggestedTeacherName, kindsReady: kinds !== 'not-ready' }, { headers: NO_STORE })
 }
 
 interface CreateBody {

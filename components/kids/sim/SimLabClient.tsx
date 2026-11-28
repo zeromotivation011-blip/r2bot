@@ -14,7 +14,9 @@ import { DEMOS, designFor, type Demo } from '@/lib/kids/sim/demos'
 import { missingParts, type Program } from '@/lib/kids/sim/program'
 import { hasPhysicsUpgrades } from '@/lib/kids/sim/robot-spec'
 import { labSolved } from '@/lib/kids/sim/lab-links'
-import { getProgress, KIDS_PROGRESS_EVENT } from '@/lib/kids-progress'
+
+/** KIDS_PROGRESS_EVENT in lib/kids-progress.ts, by name so that module stays out of the first load. */
+const PROGRESS_EVENT = 'r2bot:kids-progress'
 
 /** Same boxes, same order and same sizes as SimWorkbenchClient, so nothing shifts when it arrives. */
 function WorkbenchSkeleton() {
@@ -98,13 +100,22 @@ export default function SimLabClient() {
   /** Arenas this child has solved (the lab's result store, lab-results.ts). */
   const [solvedIds, setSolvedIds] = useState<Set<string>>(new Set())
   useEffect(() => {
-    const read = () => {
+    // The progress store (backup codes, merge, profiles migration) loads lazily so it stays out of
+    // this page's first load; the event is listened to by its name (KIDS_PROGRESS_EVENT).
+    let alive = true
+    const read = async () => {
+      const { getProgress } = await import('@/lib/kids-progress')
+      if (!alive) return
       const pb = getProgress().personalBests
       setSolvedIds(new Set(DEMOS.filter((d) => labSolved(pb, d.id)).map((d) => d.id)))
     }
-    read()
-    window.addEventListener(KIDS_PROGRESS_EVENT, read)
-    return () => window.removeEventListener(KIDS_PROGRESS_EVENT, read)
+    const onProgress = () => void read()
+    void read()
+    window.addEventListener(PROGRESS_EVENT, onProgress)
+    return () => {
+      alive = false
+      window.removeEventListener(PROGRESS_EVENT, onProgress)
+    }
   }, [])
 
   // Read the saved robot once, BEFORE the simulator mounts, so the 3D scene and the physics are built once.

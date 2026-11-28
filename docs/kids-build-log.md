@@ -506,3 +506,20 @@ need people; migrations 0056–0059 wait on the founder.
 Left open (and why): a tab still running old cached code (the PWA service worker) that switches profile after
 the migration could swap keys the old way once more; new code cannot guard old code. The service worker
 refreshes on the next load, so the window is one stale session.
+
+## 28 Nov 2026 — Wave 4 review fixes
+
+- [x] Explorers number-box "missing card" puzzles (code-ex-15, code-ex-17): the read-aloud question now says the target
+  ("…so the cargo box ends with 4 parcels?") and the target is drawn with pictures (`<Amount>`) beside the box icon.
+  Guarded in `lib/kids/activities/verify.ts`.
+- [x] Consent for club / library classes: a CLUB_SETUP step and the library-group text ask for written permission from
+  each parent or carer before members join (device-only use without it); Trust Pack **1.5** adds the club/library
+  (organisation collects consent) and family (set up by the parent) routes to the COPPA, GDPR and DPDP notes, and the
+  letter's placeholders cover clubs and libraries; the create form and `/kids/teach/library` say the same.
+- [x] Before migration 0059 a mixed-age class no longer silently starts every child at Explorers: GET
+  `/api/kids/classroom/classes` sends `kindsReady`; until 0059 the form warns that children join at the band picked,
+  does not preselect Explorers, and after creating asks the leader to confirm or change that band (PATCH `edit`).
+- [x] Bundle: `/kids/lab/power` 155 → 138 kB and `/kids/lab/sim` 153 → 136 kB First Load JS. Both lab clients load
+  `lib/kids-progress.ts` lazily and listen for the event by name (guarded in `lib/kids/sim/verify.ts`).
+- [ ] Not changed: on Code Lab a newly added block is not selected, so − / + appear only after a tap (minor, noted by
+  the child check). The kids shell renders a nested second `<main>` on Galaxy activity pages (seen while testing; pre-existing).

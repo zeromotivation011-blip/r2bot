@@ -30,7 +30,7 @@ import {
 } from '../classroom'
 
 export const TRUST_PACK_UPDATED = '2026-11-28'
-export const TRUST_PACK_VERSION = '1.4'
+export const TRUST_PACK_VERSION = '1.5'
 export const TRUST_CONTACT = 'hello@r2bot.in'
 
 export type Audience = 'teacher' | 'school-admin' | 'child-device' | 'nobody'
@@ -221,7 +221,7 @@ export const LAW_NOTES: LawNote[] = [
       'Joining a class stores a nickname and progress counters for the teacher; the device is recognised by a random token whose hash is stored, used only to keep that row up to date.',
       'No behavioural advertising, no selling or sharing of data, no public profiles, no chat between children.',
     ],
-    schoolAction: 'When a school uses the Classroom for teaching, the school can give consent for that educational use on parents’ behalf. Tell parents (the template letter below does this) and keep the nickname rule: first names or made-up names only.',
+    schoolAction: 'When a school uses the Classroom for teaching, the school can give consent for that educational use on parents’ behalf. Tell parents (the template letter below does this) and keep the nickname rule: first names or made-up names only. The school route does not cover a club or a library group: there, the organisation running it must collect parental consent itself (the template letter below can be used) before any child joins. A family class is set up by the parent.',
   },
   {
     law: 'GDPR and UK GDPR, including Article 8 (children)',
@@ -231,7 +231,7 @@ export const LAW_NOTES: LawNote[] = [
       'Purpose limitation: class data is used only to show the teacher their class’s progress. It is not used for marketing, profiling or training AI models.',
       'Rights: access and erasure are one tap (“Leave class”) or one email; teachers can remove a child at any time.',
     ],
-    schoolAction: `For class use the school is normally the controller and R2BOT processes the data for it. Record R2BOT Kids in your processing records; if you need a data processing agreement or the database region for a transfer assessment, email ${TRUST_CONTACT}.`,
+    schoolAction: `For class use the school is normally the controller and R2BOT processes the data for it. Record R2BOT Kids in your processing records; if you need a data processing agreement or the database region for a transfer assessment, email ${TRUST_CONTACT}. For a club or a library group, the organisation running it is the controller and must collect parental consent itself before children join (the template letter below can be used); a family class is set up by the parent.`,
   },
   {
     law: 'UK Age Appropriate Design Code (Children’s Code)',
@@ -252,7 +252,7 @@ export const LAW_NOTES: LawNote[] = [
       'Server-side data about a child is created only when they join a teacher’s class with its code (for that teacher’s teaching) or when a Robot Passport is saved (a progress backup under a hash of its words, deleted after 400 days unused).',
       'Erasure on request, at once, by the child, the teacher, a parent or the school.',
     ],
-    schoolAction: 'The DPDP Act asks for verifiable parental consent before a child’s data is processed, with duties phasing in under its Rules. Before children join a class, collect parental consent with your usual school forms (the template letter below can be attached).',
+    schoolAction: 'The DPDP Act asks for verifiable parental consent before a child’s data is processed, with duties phasing in under its Rules. Before children join a class, collect parental consent with your usual school forms (the template letter below can be attached). For a club or a library group, the organisation running it is normally the Data Fiduciary for that use and must collect that parental consent itself before children join (the template letter below can be used); a family class is set up by the parent.',
   },
 ]
 
@@ -286,7 +286,7 @@ export interface ParentLetter {
   paragraphs: string[]
 }
 
-/** The template letter for parents. Square brackets are for the school to fill in. */
+/** The template letter for parents. Square brackets are for the school, club or library to fill in. */
 export function parentLetter(): ParentLetter {
   return {
     subject: 'Robotics lessons with R2BOT Kids — what your child will use and what it stores',
@@ -299,7 +299,7 @@ export function parentLetter(): ParentLetter {
       'You can ask for your child’s class data to be deleted at any time: your child can tap “Leave class”, I can remove them, or you can email hello@r2bot.in. Data is also deleted when I delete the class at the end of the year.',
       'If you have any questions, or you would prefer your child not to join the online class (they can still do every lesson without joining), please let me know by [date].',
       'With thanks,',
-      '[Teacher name], [school]',
+      '[Teacher or leader name], [school, club or library]',
     ],
   }
 }

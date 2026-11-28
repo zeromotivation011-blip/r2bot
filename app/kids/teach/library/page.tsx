@@ -123,7 +123,10 @@ export default function LibraryKitPage() {
           If the same children keep coming back, start a weekly group: in the Classroom, create a class and choose
           “Library group” (or “Club”) as the kind of group. Children join with a code and a nickname, keep their own
           progress and their own age band — a mixed-age group needs no single level — and follow a six-week season with a
-          showcase at the end. See <Link href="/kids/teach/clubs" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline">Club mode</Link> for
+          showcase at the end. Before any child joins, get written permission from their parent or carer (the template
+          letter is in the <Link href="/kids/teach/trust" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline">Trust Pack</Link>):
+          for a library group the library collects that consent, and children without it keep using the parts that stay on
+          the device. See <Link href="/kids/teach/clubs" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline">Club mode</Link> for
           the weekly plan, or <Link href="/kids/classroom?kind=library" className="inline-flex min-h-[44px] items-center font-bold text-amber-300 underline">create a library group</Link> (a grown-up’s sign-in is needed).
         </p>
       </section>

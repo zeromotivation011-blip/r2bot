@@ -76,12 +76,15 @@ export default function NumberBoxClient({ params: p, onSubmit, onDone }: Templat
   const reveal = solved || att.done
   const revealed = reveal ? runCards(p.start, shown.map((c, i) => c ?? p.cards[i])) : null
 
+  // The number the box must end with (the 'missing' puzzle's goal): said aloud AND drawn.
+  const end = runCards(p.start, p.cards)[n - 1]
+
   const question =
     ask.kind === 'end'
       ? `How many ${p.thing.many} are in the ${p.box.name} at the end?`
       : ask.kind === 'trace'
         ? `Show the ${p.box.name} after every card.`
-        : `Which card goes in the gap?`
+        : `Which card goes in the gap so the ${p.box.name} ends with ${count(p, end)}?`
 
   const story = [
     `The ${p.box.name} has ${count(p, p.start)}.`,
@@ -233,9 +236,16 @@ export default function NumberBoxClient({ params: p, onSubmit, onDone }: Templat
 
       {ask.kind === 'missing' && (
         <div className="mt-4" role="group" aria-label={`Cards to try in gap ${ask.gap + 1}`}>
-          <p className="mb-2 text-[15px] text-[#A7B0C0]">
-            The {p.box.name} must end with {count(p, runCards(p.start, p.cards)[n - 1])}. Tap a card to put in the gap.
-          </p>
+          <div className="mb-3 flex items-center gap-3 rounded-2xl border border-amber-400/40 bg-[#111C32] p-3">
+            <span className="text-4xl" aria-hidden>
+              {p.box.icon}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold text-[#A7B0C0]">At the end, the {p.box.name} must have</span>
+              <Amount p={p} n={end} />
+            </span>
+          </div>
+          <p className="mb-2 text-[15px] text-[#A7B0C0]">Tap a card to put in the gap.</p>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {ask.options.map((c, i) => (
               <button

@@ -92,6 +92,7 @@ export const CLUB_FINALE: ClubBlock[] = [
 
 export const CLUB_SETUP: string[] = [
   'Sign in as an adult and create a class in the Classroom. Choose “Club” as the kind of group and name it after your club. The band you pick is the youngest in the club: it sets the shared hook, not anyone’s level.',
+  'Before members join the class, get written permission from each member’s parent or carer (send the template parent letter in the Trust Pack at /kids/teach/trust). For a club, your organisation — not R2BOT and not a school — is responsible for that consent. Members without it use the device-only parts of R2BOT Kids, which store nothing on R2BOT.',
   'Print the join card. Members join with the code and a first name or a made-up robot name — never an email or anything else.',
   'Because it is a club, every member keeps their OWN band (Explorers 5–7, Builders 8–10, Inventors 11–13, Engineers 14–17); a member who has not chosen one yet picks it when they join. Their progress, missions and certificates follow that band; your roster shows each member’s band next to their nickname, and you can still set one member’s band if they need a different level.',
   'Assign the week’s station work from the Classroom (a course session, a Skill Galaxy activity or a game), or simply print this page’s stations.',
@@ -160,7 +161,7 @@ export const DROP_IN_STATIONS: DropInStation[] = [
     emoji: '💻',
     ages: 'All ages; each child picks their band',
     what: [
-      'Children open www.r2bot.in/kids on a library computer or tablet. No sign-in and no class code: drop-in visitors do not join a class, so nothing about them is stored by R2BOT. (For a regular group with the same children every week, a leader can make a “Library group” class instead: mixed ages, each child keeps their own band.)',
+      'Children open www.r2bot.in/kids on a library computer or tablet. No sign-in and no class code: drop-in visitors do not join a class, so nothing about them is stored by R2BOT. (For a regular group with the same children every week, a leader can make a “Library group” class instead: mixed ages, each child keeps their own band. Before any child joins it, get written permission from their parent or carer with the template parent letter in the Trust Pack; the library is responsible for that consent. Children without it keep using the device-only parts, which store nothing on R2BOT.)',
       'Ages 5–7: one Story Theatre episode, then the first Code Lab mission. Ages 8–17: the first course session of their band’s level.',
       'Progress stays on that device only. Use the device’s guest mode or clear the site data at closing time.',
     ],

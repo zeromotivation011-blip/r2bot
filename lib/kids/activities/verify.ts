@@ -19,6 +19,8 @@ import { CONCEPT_IDS, SECURE_TEMPLATES, isConceptId } from '../universe/mastery'
 import { ALL_ACTIVITIES, CONTENT_ACTIVITIES, SAMPLE_ACTIVITIES } from './content'
 import { TEMPLATE_LOGIC } from './logic-registry'
 import { TRACKS, type Activity, type TrackId } from './types'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 export interface VerifyIssue {
   activity: string
@@ -162,6 +164,12 @@ export function coverage(list: Activity[] = ALL_ACTIVITIES): Record<TrackId, Rec
 const isMain = typeof process !== 'undefined' && Array.isArray(process.argv) && /activities[\\/]verify\.ts$/.test(process.argv[1] ?? '')
 if (isMain) {
   const issues = verifyActivities()
+  // A 5-year-old who cannot read must hear AND see the goal of a 'missing card' number-box puzzle.
+  {
+    const nb = readFileSync(join(process.cwd(), 'components', 'kids', 'activities', 'templates', 'number-box', 'NumberBoxClient.tsx'), 'utf8')
+    if (!/gap so the \$\{p\.box\.name\} ends with \$\{count\(p, end\)\}/.test(nb)) issues.push({ activity: 'number-box', problem: 'the read-aloud question of a missing-card puzzle must say the number the box ends with', level: 'error' })
+    if (!/<Amount p=\{p\} n=\{end\} \/>/.test(nb)) issues.push({ activity: 'number-box', problem: 'the target of a missing-card puzzle must be drawn as pictures (<Amount>)', level: 'error' })
+  }
   const cov = coverage()
   const pad = (s: string | number, n: number) => String(s).padStart(n)
   console.log(`Skill Galaxy activities: ${ALL_ACTIVITIES.length} (${CONTENT_ACTIVITIES.length} authored, ${ALL_ACTIVITIES.length - CONTENT_ACTIVITIES.length} template samples)`)

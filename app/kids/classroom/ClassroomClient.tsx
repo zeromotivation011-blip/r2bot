@@ -22,9 +22,9 @@ type State =
   | { kind: 'signed-out' }
   | { kind: 'not-ready' }
   | { kind: 'error'; message: string }
-  | { kind: 'ready'; classes: KidsClassSummary[]; suggestedTeacherName: string }
+  | { kind: 'ready'; classes: KidsClassSummary[]; suggestedTeacherName: string; kindsReady: boolean | null }
 
-interface ListResponse { classes: KidsClassSummary[]; suggestedTeacherName: string }
+interface ListResponse { classes: KidsClassSummary[]; suggestedTeacherName: string; kindsReady?: boolean }
 interface CreateResponse { class: KidsClassSummary }
 
 export default function ClassroomClient() {
@@ -35,7 +35,13 @@ export default function ClassroomClient() {
     setState({ kind: 'loading' })
     const r = await teacherFetch<ListResponse>('/api/kids/classroom/classes')
     if (r.kind === 'ok') {
-      setState({ kind: 'ready', classes: r.data.classes, suggestedTeacherName: r.data.suggestedTeacherName })
+      setState({
+        kind: 'ready',
+        classes: r.data.classes,
+        suggestedTeacherName: r.data.suggestedTeacherName,
+        // An older server sends no kindsReady: fall back to what any listed class says, else unknown.
+        kindsReady: typeof r.data.kindsReady === 'boolean' ? r.data.kindsReady : r.data.classes[0] ? r.data.classes[0].kindReady === true : null,
+      })
       if (r.data.classes.length === 0) setShowCreate(true)
     } else if (r.kind === 'signed-out') setState({ kind: 'signed-out' })
     else if (r.kind === 'not-ready') setState({ kind: 'not-ready' })
@@ -78,6 +84,7 @@ export default function ClassroomClient() {
       {showCreate && (
         <CreateClassForm
           defaultTeacherName={state.suggestedTeacherName}
+          kindsReady={state.kindsReady}
           onCancel={state.classes.length ? () => setShowCreate(false) : undefined}
         />
       )}
@@ -126,7 +133,11 @@ export default function ClassroomClient() {
   )
 }
 
-function CreateClassForm({ defaultTeacherName, onCancel }: { defaultTeacherName: string; onCancel?: () => void }) {
+/**
+ * kindsReady: whether migration 0059 has run (null = not known yet). Before it, a club, family or
+ * library class behaves like a school class for children: everyone joins at the band picked here.
+ */
+function CreateClassForm({ defaultTeacherName, kindsReady, onCancel }: { defaultTeacherName: string; kindsReady: boolean | null; onCancel?: () => void }) {
   const router = useRouter()
   const [className, setClassName] = useState('')
   const [teacherName, setTeacherName] = useState(defaultTeacherName)
@@ -135,17 +146,21 @@ function CreateClassForm({ defaultTeacherName, onCancel }: { defaultTeacherName:
   const [kind, setKind] = useState<ClassKind>(DEFAULT_CLASS_KIND)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  /** A mixed-age class made before 0059: tell the leader on the spot, then go on to the class. */
+  const [notYetMixed, setNotYetMixed] = useState<{ id: string; band: BandId } | null>(null)
   const ids = { cls: useId(), teacher: useId(), school: useId(), err: useId() }
   const kindInfo = classKindInfo(kind)
 
   // The club, family and library guides link here with ?kind=… preselected.
   useEffect(() => {
     const k = new URLSearchParams(window.location.search).get('kind')
-    if (isClassKind(k)) {
-      setKind(k)
-      if (k !== 'school') setBand('explorers')
-    }
+    if (isClassKind(k)) setKind(k)
   }, [])
+  // A mixed-age class starts on its youngest band (the guides say so), but only once 0059 has run:
+  // before it every child joins at this band, so the leader picks the band most members are in.
+  useEffect(() => {
+    if (kindsReady === true && kind !== 'school') setBand('explorers')
+  }, [kindsReady, kind])
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -162,7 +177,13 @@ function CreateClassForm({ defaultTeacherName, onCancel }: { defaultTeacherName:
     setBusy(false)
     if (r.kind === 'ok') {
       // Before migration 0059 the server cannot keep the kind: this device does.
-      if (!r.data.class.kindReady) rememberClassKind(r.data.class.id, kind)
+      if (!r.data.class.kindReady) {
+        rememberClassKind(r.data.class.id, kind)
+        if (kind !== 'school') {
+          setNotYetMixed({ id: r.data.class.id, band })
+          return
+        }
+      }
       router.push(`/kids/classroom/${r.data.class.id}?new=1`)
       return
     }
@@ -171,6 +192,66 @@ function CreateClassForm({ defaultTeacherName, onCancel }: { defaultTeacherName:
         : r.kind === 'signed-out' ? 'Your session ended. Sign in again.'
           : r.kind === 'not-ready' ? 'Classrooms are being switched on. Please try again a little later.'
             : 'Could not create the class.',
+    )
+  }
+
+  /** Keep or change the band of the class just made (PATCH action 'edit'), then open it. */
+  async function confirmBand() {
+    if (!notYetMixed) return
+    if (notYetMixed.band !== band) {
+      setBusy(true)
+      const r = await teacherFetch<CreateResponse>(`/api/kids/classroom/classes/${notYetMixed.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ action: 'edit', className, teacherName, schoolName, band }),
+      })
+      setBusy(false)
+      if (r.kind !== 'ok') {
+        setError('Could not change the band. You can carry on; children will join at the band you first picked.')
+        return
+      }
+    }
+    router.push(`/kids/classroom/${notYetMixed.id}?new=1`)
+  }
+
+  if (notYetMixed) {
+    return (
+      <section className="rounded-3xl border border-amber-400/40 bg-slate-950/80 p-5 sm:p-7" aria-labelledby="created-h">
+        <h2 id="created-h" className="text-xl font-extrabold text-white">Your {kindInfo.label.toLowerCase()} is made — one thing to check</h2>
+        <p role="status" className="mt-3 text-[15px] leading-relaxed text-slate-200">
+          R2BOT is still switching on mixed-age groups. Until that update runs, every child who joins this class starts at the
+          class band below and does not pick their own. Choose the band most of your members are in. Once the update runs,
+          each child keeps their own band, as described.
+        </p>
+        <fieldset className="mt-4">
+          <legend className="text-sm font-semibold text-slate-200">Band children join at for now</legend>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {KIDS_BANDS.map((b) => {
+              const checked = band === b.id
+              return (
+                <label
+                  key={b.id}
+                  className={`flex min-h-[64px] cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${checked ? 'border-amber-400 bg-amber-500/10' : 'border-white/10 bg-black/30 hover:border-white/25'}`}
+                >
+                  <input type="radio" name="band-now" value={b.id} checked={checked} onChange={() => setBand(b.id)} className="mt-1 h-5 w-5 accent-amber-500" />
+                  <span>
+                    <span className="block font-bold text-white">{b.emoji} {b.name} <span className="font-normal text-slate-400">· ages {b.ages}</span></span>
+                    <span className="block text-xs text-slate-400">{b.grades}</span>
+                  </span>
+                </label>
+              )
+            })}
+          </div>
+        </fieldset>
+        {error && <p role="alert" className="mt-3 rounded-xl bg-red-500/15 p-3 text-sm font-semibold text-red-200">{error}</p>}
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => (error ? router.push(`/kids/classroom/${notYetMixed.id}?new=1`) : void confirmBand())}
+          className="mt-4 min-h-[48px] rounded-xl bg-amber-500 px-6 font-bold text-black hover:bg-amber-400 disabled:opacity-60"
+        >
+          {busy ? 'Saving…' : error ? 'Go to the class' : 'Save and go to the class'}
+        </button>
+      </section>
     )
   }
 
@@ -218,15 +299,27 @@ function CreateClassForm({ defaultTeacherName, onCancel }: { defaultTeacherName:
             })}
           </div>
           {kindInfo.mixed && (
-            <p className="mt-2 text-sm text-slate-300">
-              Mixed ages: each child picks their own band when they join and keeps it. Your roster shows each child’s band.{' '}
-              <Link href={kindInfo.guide} className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 hover:underline">How to run a {kindInfo.label.toLowerCase()} →</Link>
-            </p>
+            <div className="mt-2 space-y-2 text-sm text-slate-300">
+              {kindsReady === false ? (
+                <p className="rounded-xl border border-amber-400/40 bg-amber-500/10 p-3 text-amber-100">
+                  Mixed-age groups are still being switched on. Until then, every child joins at the band you pick below and
+                  does not choose their own, so pick the band most of your members are in.
+                </p>
+              ) : (
+                <p>Mixed ages: each child picks their own band when they join and keeps it. Your roster shows each child’s band.</p>
+              )}
+              <p>
+                {kind === 'family'
+                  ? 'A family class is set up by the parent or carer, for their own children.'
+                  : <>Before children join, get written permission from each child’s parent or carer: for a {kindInfo.label.toLowerCase()}, your organisation (not a school) collects that consent. The <Link href="/kids/teach/trust" className="font-semibold text-amber-300 underline">Trust Pack</Link> has a template letter. Children without permission can still use everything that stays on their device.</>}{' '}
+                <Link href={kindInfo.guide} className="inline-flex min-h-[44px] items-center font-semibold text-amber-300 hover:underline">How to run a {kindInfo.label.toLowerCase()} →</Link>
+              </p>
+            </div>
           )}
         </fieldset>
 
         <fieldset>
-          <legend className="text-sm font-semibold text-slate-200">{kindInfo.bandLegend}</legend>
+          <legend className="text-sm font-semibold text-slate-200">{kindInfo.mixed && kindsReady === false ? 'Band every child joins at (for now)' : kindInfo.bandLegend}</legend>
           <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {KIDS_BANDS.map((b) => {
               const checked = band === b.id
