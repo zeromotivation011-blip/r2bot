@@ -4,73 +4,163 @@ slug: gear-ratio
 bucket: concept
 category: actuators
 summary: >-
-  Gear ratio is the trade a robot makes between speed and force — gearing a fast, weak
-  motor down to turn slower but push far harder, which is why almost every robot joint
-  hides a gearbox.
+  Gear ratio is how many turns a gearbox's input makes for one turn of its output. How to calculate it,
+  what it does to speed and torque, efficiency losses, and how to choose one for a robot.
 difficulty: 2
+difficultyLabel: Classroom
 tags:
   - actuators
   - mechanics
   - motors
+  - gears
 seeAlso:
-  - servo-motor
+  - gear-train
   - torque
+  - planetary-gearbox
+  - servo-motor
   - brushless-motor
   - backlash
-  - timing-belt
-lastReviewed: 2026-07-10T00:00:00.000Z
+  - backdrivability
+relatedTerms:
+  - gear-train
+  - torque
+  - backdrivability
+prerequisiteTerms:
+  - torque
+unlocksTerms:
+  - gear-train
+  - backdrivability
+lastReviewed: 2026-11-28T00:00:00.000Z
 sources:
-  - title: 'How gears work (Engineering Toolbox)'
-    url: 'https://www.engineeringtoolbox.com/'
-  - title: 'Harmonic Drive — principles'
-    url: 'https://www.harmonicdrive.net/'
+  - title: 'Gear train (Wikipedia): speed ratio, torque ratio and mechanical advantage'
+    url: 'https://en.wikipedia.org/wiki/Gear_train'
+  - title: 'maxon, Planetary Gearhead GP 32 C datasheet (reductions and efficiency per stage)'
+    url: 'https://www.maxongroup.com/medias/sys_master/root/9406824710174/GP-32-C.pdf'
+  - title: 'Wensing et al. (2017), Proprioceptive Actuator Design in the MIT Cheetah, IEEE Transactions on Robotics (author proof)'
+    url: 'https://fab.cba.mit.edu/classes/865.18/motion/papers/mit-cheetah-actuator.pdf'
 laymanExplanation: >-
-  A gear ratio trades speed for strength. A motor spins fast but weakly; gear it down
-  and the output turns slower but with much more turning force. It's the same idea as
-  a bicycle's low gear for climbing hills.
+  A gear ratio tells you how many times the motor turns for each turn of the output. A 30:1 ratio means
+  the motor spins 30 times for one turn of the wheel: the wheel goes 30 times slower but pushes about 30
+  times harder (a bit less, because gears lose some energy to friction).
 technicalDefinition: >-
-  Gear ratio is the ratio of input to output rotational speed in a gear train; it
-  multiplies torque and divides speed by the same factor (minus friction losses).
+  Gear ratio N is the ratio of input to output angular speed of a gear train, ω_in / ω_out; for one
+  meshing pair it equals driven teeth / driving teeth, and for stages in series the stage ratios
+  multiply. Output torque is τ_out = η · N · τ_in, where η is the transmission efficiency, and the
+  motor's rotor inertia appears at the output multiplied by N².
 quizQuestion:
-  q: A 100:1 gearbox on a motor will…
+  q: >-
+    A motor makes 0.2 N·m at 3,000 rpm and drives a wheel through a 20:1 gearbox that is 75% efficient.
+    What does the wheel get?
   options:
-    - Make the output spin 100× faster
-    - Make the output spin 100× slower with ~100× more torque
-    - Double the battery life
-    - Have no effect on torque
-  answer: 1
+    - 3,000 rpm and 0.2 N·m
+    - 150 rpm and 4.0 N·m
+    - 150 rpm and 3.0 N·m
+    - 60,000 rpm and 0.01 N·m
+  answer: 2
   explanation: >-
-    A 100:1 reduction divides output speed by 100 and multiplies torque by ~100 (before
-    friction losses).
+    Speed is divided by the ratio: 3,000 ÷ 20 = 150 rpm. Torque is multiplied by the ratio and by the
+    efficiency: 0.2 × 20 × 0.75 = 3.0 N·m. Without losses it would be 4.0 N·m.
 ---
 
-An electric motor, on its own, is almost useless to a robot: it spins thousands of times a minute but can barely push. The fix — used in nearly every robot joint — is a **gearbox**, and its key number is the **gear ratio**.
+A gear ratio is the number of turns a gearbox's input makes for **one turn of its output**. A motor geared at 30:1 turns 30 times for every turn of the wheel or joint it drives, so the output is 30 times slower and, apart from friction losses, 30 times stronger. It is the single number that tells you what a gearbox does to a motor's speed and torque.
 
-## The core trade
+This page is about the number: how to calculate it and how to use it. For the hardware that produces it (simple, compound and planetary arrangements, idlers, worm and strain-wave drives) see [gear train](/atlas/concept/gear-train).
 
-Gears trade **speed for [torque](/atlas/concept/torque)**, and the exchange rate is the gear ratio. A **100:1** reduction means the input shaft turns 100 times for every 1 turn of the output. In return:
+## How to calculate a gear ratio
 
-- Output **speed** is divided by 100 (slower).
-- Output **torque** is multiplied by ~100 (much stronger).
+For two meshing gears, the ratio is the number of teeth on the driven gear divided by the number on the driving gear:
 
-```diagram
-{ "type": "flow", "title": "A gearbox trades speed for force", "nodes": ["Motor: fast, weak", "Gearbox 100:1", "Output: slow, strong"], "caption": "The same power comes out — but reshaped. High rpm and low torque become low rpm and high torque, which is what a robot joint actually needs." }
+```text
+N = driven teeth / driving teeth = ω_in / ω_out
 ```
 
-Power is (roughly) conserved — you don't get force for free, you *buy* it with speed. Friction means real gearboxes return 70–95% of the input power, not 100%.
+A 12-tooth motor gear driving a 36-tooth gear gives N = 36 / 12 = 3, written **3:1**. For several stages in series, multiply: a 3:1 stage followed by a 4:1 stage gives 12:1. Gears that sit between two others on their own shafts (idlers) cancel out of the calculation.
 
-## Why robots need it so badly
+### Reading the notation
 
-A [robot arm](/atlas/concept/robot-arm) joint must hold heavy loads steady and move slowly and precisely — the opposite of what a raw motor gives. Legged robots need bursts of high torque to push off the ground. Gearing makes a small, light, cheap motor do the job of a big one. This is why the reduction stage is often the single most important — and expensive — part of a joint.
+"3:1" usually means a **reduction**: the input turns 3 times per output turn. Some sources write the same reduction as 1:3, so read the context. The MIT Cheetah paper, for example, writes its leg actuator's planetary gear train as "1:5.8" in one place and "5.8:1 gear reduction" in another, for the same gearbox. A ratio below 1 (N = 0.5: the output turns twice as fast as the input) is an **overdrive**, rare in robot joints.
 
-## The catch: backlash and stiffness
+## What the ratio does to speed and torque
 
-Gears aren't perfect. **[Backlash](/atlas/concept/backlash)** — tiny slack between meshing teeth — creates a dead zone that ruins precision, so high-end robots use **harmonic drives** or **cycloidal gearboxes** that have almost none. High ratios also make a joint harder to *back-drive* (you can't easily push the output by hand), which matters for [collaborative robots](/atlas/concept/collaborative-robot) that need to feel and yield to contact.
+```text
+output speed  = input speed / N
+output torque = input torque × N × η
+```
 
-## Why it matters
+Here η (eta) is the gearbox efficiency. With no losses, power in equals power out (torque × speed), so torque rises by exactly as much as speed falls. Real gearboxes lose some of it as heat, and they lose more with every stage. The maxon GP 32 C planetary gearhead datasheet is a good example of typical figures:
 
-Nearly every meaningful motion in robotics passes through a gear ratio. Understanding the speed-vs-torque trade — and its costs in backlash and back-drivability — is fundamental to sizing any actuator.
+| Stages | Reductions offered | Max. efficiency |
+|---|---|---|
+| 1 | 3.7:1 to 5.8:1 | 80% |
+| 2 | 14:1 to 33:1 | 75% |
+| 3 | 51:1 to 190:1 | 70% |
+| 4 | 246:1 to 1,093:1 | 60% |
+| 5 | 1,181:1 to 6,285:1 | 50% |
+
+So a high ratio buys a lot of torque, but each extra stage takes a bigger slice of it.
+
+## Worked example: gearing a robot's wheels
+
+A two-wheeled robot weighs 10 kg and has wheels 0.1 m in diameter. Each wheel motor runs at 3,000 rpm with a 30:1 two-stage gearbox (take 75% efficiency).
+
+**Top speed.**
+
+```text
+wheel speed = 3,000 rpm / 30        = 100 rpm
+robot speed = 100/60 rev/s × π × 0.1 m ≈ 0.52 m/s
+```
+
+**Torque to climb a 5° ramp** (ignoring rolling resistance and acceleration):
+
+```text
+force along the slope = m · g · sin 5° = 10 × 9.81 × 0.087 ≈ 8.5 N
+per wheel (two wheels)               ≈ 4.3 N
+torque per wheel = 4.3 N × 0.05 m    ≈ 0.21 N·m
+motor torque     = 0.21 / (30 × 0.75) ≈ 0.0095 N·m
+```
+
+Choose a 60:1 gearbox instead and the motor works about half as hard (a little more if the extra stage lowers the efficiency), but the robot's top speed halves to about 0.26 m/s. That is the gear-ratio decision in one line: **speed against force**, with efficiency taken off the top.
+
+## The hidden effect: inertia grows with N²
+
+A gearbox also changes how heavy the motor feels from the output. The motor rotor's inertia appears at the output multiplied by the **square** of the ratio:
+
+```text
+J_reflected = J_rotor × N²
+```
+
+The MIT Cheetah's leg actuator, for example, has a rotor inertia of 3.0279 × 10⁻⁴ kg·m², which its 5.8:1 gear train turns into 0.0102 kg·m² at the leg. Behind a 51:1 gearbox the same rotor would reflect about 0.79 kg·m², roughly 77 times more. That is why a joint with a very high ratio is hard to push by hand and hits obstacles harder, and why legged and collaborative robots often choose low ratios on purpose (see [backdrivability](/atlas/concept/backdrivability)).
+
+## How to choose a ratio
+
+1. **Start from the task.** Work out the torque the joint or wheel needs (load, slope, acceleration) and the top speed it needs.
+2. **Divide by the motor.** The ratio must be at least required torque ÷ (motor's continuous torque × η), and at most motor's top speed ÷ required output speed.
+3. **Pick inside that window**, leaning low if the robot touches people or the ground hard (backdrivability, reflected inertia) and high if it must hold heavy loads precisely.
+4. **Check the gearbox, not only the motor.** Gearboxes have their own torque and input-speed limits; the GP 32 C, for instance, is rated for 1 N·m continuous in its one-stage version and 6 N·m from three stages up.
+5. **Check the backlash** if position accuracy matters: more stages usually means more play (see [backlash](/atlas/concept/backlash)).
+
+## Common questions
+
+### What is a gear ratio?
+
+A gear ratio is the number of times the input of a gear train turns for one turn of the output. For two gears, it is the driven gear's tooth count divided by the driving gear's. A ratio of 30:1 makes the output 30 times slower and, before friction losses, delivers 30 times the torque.
+
+### How do you calculate gear ratio?
+
+Divide the number of teeth on the driven (output) gear by the number on the driving (input) gear. For multiple stages, calculate each stage and multiply the results. You can also measure it: count input revolutions for one output revolution.
+
+### Does a higher gear ratio mean more torque?
+
+Yes. Output torque is input torque times the ratio times the efficiency, so a higher reduction ratio gives more torque and less speed. The gain is reduced by friction (more stages mean lower efficiency) and comes with more reflected inertia and often more backlash.
+
+### What does a 100:1 gear ratio mean?
+
+The input shaft turns 100 times for each turn of the output. Output speed is 1/100 of the motor speed, and output torque is up to 100 times the motor torque, less the gearbox's losses: a gearbox that is 60% efficient delivers about 60 times the motor torque.
 
 ## Related
 
-[Servo motor](/atlas/concept/servo-motor) · [Torque](/atlas/concept/torque) · [Brushless motor](/atlas/concept/brushless-motor) · [Backlash](/atlas/concept/backlash)
+- [Gear train](/atlas/concept/gear-train): the gears that produce the ratio, and their types
+- [Torque](/atlas/concept/torque): what a reduction multiplies
+- [Planetary gearbox](/atlas/concept/planetary-gearbox): the most common way to get a ratio in a robot joint
+- [Backdrivability](/atlas/concept/backdrivability): why some robots want a low ratio
+- [Backlash](/atlas/concept/backlash): the play that gearing adds

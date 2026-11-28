@@ -1,125 +1,303 @@
 ---
-title: Denavit-Hartenberg Parameters
+title: Denavit-Hartenberg (DH) Parameters
+slug: denavit-hartenberg
 summary: >-
-  Denavit-Hartenberg (DH) parameters are a compact way to describe robot arm
-  geometry. Standard input to forward kinematics calculations.
+  DH parameters describe a robot arm with four numbers per joint (θ, d, a, α). How to assign the frames,
+  build the DH table and matrix, standard vs modified DH, with a worked UR5e example.
 category: fundamentals
 bucket: mechanical-design
-difficulty: advanced
-lastReviewed: 2026-05-21T00:00:00.000Z
+difficulty: 3
+difficultyLabel: Classroom
+lastReviewed: 2026-11-28T00:00:00.000Z
 sources:
-  - title: 'Denavit–Hartenberg parameters'
+  - title: 'Denavit and Hartenberg (1955), A kinematic notation for lower-pair mechanisms based on matrices, Journal of Applied Mechanics 22(2): 215–221'
+    url: 'https://doi.org/10.1115/1.4011045'
+  - title: 'Denavit–Hartenberg parameters (Wikipedia): frame rules, classic and modified matrices'
     url: 'https://en.wikipedia.org/wiki/Denavit%E2%80%93Hartenberg_parameters'
+  - title: 'Universal Robots, DH parameters for calculations of kinematics and dynamics'
+    url: 'https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/'
+  - title: 'Franka Robotics, Control interface specification: Denavit–Hartenberg parameters of Franka Research 3 (Craig convention)'
+    url: 'https://frankarobotics.github.io/docs/robot_specifications.html'
+  - title: 'Robotics Toolbox for Python (Peter Corke), DHRobot, RevoluteDH and RevoluteMDH'
+    url: 'https://github.com/petercorke/robotics-toolbox-python'
+  - title: 'Universal Robots ROS 2 driver, ur_calibration (factory kinematics calibration)'
+    url: 'https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver/tree/main/ur_calibration'
+  - title: 'ROS wiki, URDF joint element (origin xyz/rpy)'
+    url: 'http://wiki.ros.org/urdf/XML/joint'
 tags:
   - denavit-hartenberg
-  - dh
+  - dh-parameters
   - kinematics
-  - arm
-  - parameters
+  - forward-kinematics
+  - robot-arm
 relatedTerms:
   - forward-kinematics
   - inverse-kinematics
+  - homogeneous-transformation
   - robot-arm
   - kinematics
 seeAlso:
-  - link-robot
   - forward-kinematics
+  - homogeneous-transformation
   - inverse-kinematics
+  - link-robot
+  - screw-theory
   - robot-arm
   - kinematics
+prerequisiteTerms:
+  - homogeneous-transformation
+  - degrees-of-freedom
+unlocksTerms:
+  - forward-kinematics
+  - inverse-kinematics
 youtubeSearchQuery: Denavit Hartenberg parameters explained
 laymanExplanation: >-
-  Denavit-Hartenberg (DH) parameters describe the geometry of a robot arm using
-  just four numbers per joint: link length (a), link twist (α), link offset (d),
-  and joint angle (θ). With these four parameters per joint you can compute the
-  position and orientation of the arm's tool in any configuration.
-realRobotsThatUseThis: []
-indianExample: ''
-prerequisiteTerms: []
-unlocksTerms: []
-quizQuestion:
-  q: ''
-  options: []
-  answer: 0
-  explanation: ''
-mindBlowingFact: ''
-industryApplications: []
-difficultyLabel: Classroom
+  DH parameters are a recipe for describing a robot arm with a short table: four numbers for each joint
+  (how far along, how far out, how much twist, and the joint angle). Read the table row by row and you
+  can work out exactly where the robot's hand is for any set of joint angles.
 technicalDefinition: >-
-  Denavit-Hartenberg (DH) parameters are a compact way to describe robot arm
-  geometry. Standard input to forward kinematics calculations.
-slug: denavit-hartenberg
+  The Denavit–Hartenberg convention attaches a coordinate frame to each link of a serial kinematic chain,
+  with z along the joint axis and x along the common normal between consecutive joint axes, so that the
+  transform between consecutive frames is fixed by four parameters: θ (rotation about z), d (offset along
+  z), a (length of the common normal) and α (twist about x). The classic (distal) form is
+  T = Rot_z(θ) · Trans_z(d) · Trans_x(a) · Rot_x(α); the modified (proximal, Craig) form places frames on
+  the near joint and applies Rot_x(α) · Trans_x(a) · Rot_z(θ) · Trans_z(d). One parameter per joint (θ for
+  revolute, d for prismatic) is the joint variable.
+realRobotsThatUseThis:
+  - Universal Robots e-Series (published standard DH table per model)
+  - Franka Research 3 (published DH table in Craig's modified convention)
+indianExample: ''
+industryApplications:
+  - Forward and inverse kinematics for industrial and collaborative arms
+  - Kinematic calibration of robot arms
+  - Teaching robot kinematics in university courses
+mindBlowingFact: >-
+  A general rigid-body pose needs six numbers, yet DH gets away with four per joint. The trick is choosing
+  where to put each frame: by aligning z with the joint axis and x with the common normal, two of the six
+  numbers are always zero by construction.
+quizQuestion:
+  q: >-
+    In a standard DH table for an arm with only revolute joints, which parameter in each row changes as
+    the robot moves?
+  options:
+    - a, the link length
+    - α, the link twist
+    - θ, the joint angle
+    - d, the link offset
+  answer: 2
+  explanation: >-
+    For a revolute joint, θ is the joint variable: it is what the motor changes. a, α and d are fixed by
+    how the arm is built. (For a prismatic, sliding joint it is the other way round: d is the variable and
+    θ is fixed.)
 ---
 
-# Denavit-Hartenberg Parameters
+Denavit-Hartenberg (DH) parameters describe the shape of a robot arm with **four numbers per joint**: a joint angle θ, an offset d, a link length a and a twist α. Written as a table, one row per joint, they are everything you need to calculate where the robot's hand is for any set of joint angles, which is why DH tables appear in nearly every robotics textbook and in the documentation of arms like Universal Robots' UR5e and Franka Research 3.
 
-## What is Denavit-Hartenberg Parameters?
+![The four DH parameters between two joint axes. The z i-minus-1 axis, along joint i's axis, and the z i axis, along joint i-plus-1's axis, are drawn as two skew lines. The common normal, the shortest line between the two axes, is drawn between them and labelled a, the link length. Along the first axis, d is the distance from the previous frame's x axis to where the common normal starts; theta is the rotation about that z axis from the old x to the new x. At the second axis, alpha is the twist about the common normal from the old z axis to the new z axis. A footer gives the DH matrix order: rotate by theta about z, move d along z, move a along x, rotate alpha about x](/images/atlas/diagrams/denavit-hartenberg.svg)
 
-Denavit-Hartenberg (DH) parameters describe the geometry of a robot arm using just four numbers per joint: link length (a), link twist (α), link offset (d), and joint angle (θ). With these four parameters per joint you can compute the position and orientation of the arm's tool in any configuration.
+## Start here: giving directions to the hand
 
-## How It Works
+Imagine guiding someone from a robot's base to its gripper using only the robot's own joints as landmarks. At every joint you would say four things: *turn by this much, move up this far, move out this far, tilt by this much.* Then repeat at the next joint.
 
-DH builds a transformation matrix for each joint that goes from one link frame to the next. The four parameters precisely capture the geometric relationship between consecutive joint axes. Multiplying transforms from base to tool gives the forward-kinematics result. Modern variants (Modified DH by Craig) place the frame origins differently but follow the same idea. Robotics texts and software packages (Robotics Toolbox, MoveIt2 setup) all consume DH tables.
+That is exactly what a DH table is. Each row says how to get from one joint's coordinate frame to the next, using the same four moves every time. Because the moves are always the same kind, a computer can turn every row into a matrix, multiply the matrices together, and get the position and orientation of the hand: the arm's [forward kinematics](/atlas/concept/forward-kinematics).
 
-## Real-World Example
+Jacques Denavit and Richard Hartenberg published the idea in 1955, to give spatial mechanisms a standard notation. It became the standard way to write down robot arm geometry.
 
-Every undergraduate robotics course in India (IIT, NIT, BITS) teaches DH parameters in the first semester of the robotics elective. KUKA and Yaskawa publish DH tables for every commercial arm they sell. ISRO uses DH for its space-manipulator designs.
+## The four parameters
 
-## Why It Matters for Robotics
+Each joint gets a frame whose **z axis points along the joint's axis** of rotation (or sliding). The **x axis points along the common normal**: the shortest line between this joint's axis and the previous one. With frames placed that way, four numbers fix the step from one frame to the next:
 
-DH is the lingua franca of arm kinematics — universally taught, widely used in legacy code, and the language of every robotics textbook. Even though modern code increasingly uses URDF/Xacro, every senior interview will probe DH understanding.
+| Symbol | Name | Measured | Changes as the robot moves? |
+|---|---|---|---|
+| **θ** (theta) | Joint angle | Rotation about the previous z axis, from the old x axis to the new x axis | **Yes**, for a revolute (rotating) joint |
+| **d** | Link offset | Distance along the previous z axis, to the common normal | **Yes**, for a prismatic (sliding) joint |
+| **a** (sometimes r) | Link length | Length of the common normal between the two z axes | No: set by the arm's construction |
+| **α** (alpha) | Link twist | Rotation about the common normal (new x axis), from the old z axis to the new z axis | No: set by the arm's construction |
 
-## Try It Yourself
+Two numbers describe the joint (θ and d, both along the previous joint axis) and two describe the [link](/atlas/concept/link-robot) between joints (a and α, both along the common normal). For each joint, exactly one parameter is the **joint variable**: θ for a revolute joint, d for a prismatic one. Everything else is a constant of the robot.
 
-Take any 6-DOF arm (e.g., the UR5). Look up its DH table from Universal Robots' docs. Implement forward kinematics in Python (15 lines) and verify against MoveIt2's published end-effector pose at the home configuration.
+Watch the letters: in Universal Robots' documentation, as UR's DH page points out, the UR "a" parameter is what Wikipedia calls "r". Some books use r to avoid confusing a with α.
 
-## Quick Quiz
+## How to assign the frames (standard DH)
 
-```quiz
-[
-  {
-    "q": "A DH parameter set has how many numbers per joint?",
-    "options": [
-      "Two",
-      "Four",
-      "Six",
-      "Ten"
-    ],
-    "answer": 1,
-    "explain": "Classic DH uses 4: link length a, twist α, offset d, joint angle θ."
-  },
-  {
-    "q": "DH parameters are used to compute:",
-    "options": [
-      "Battery level",
-      "Forward kinematics of an arm",
-      "Camera exposure",
-      "Wi-Fi range"
-    ],
-    "answer": 1,
-    "explain": "The product of transforms built from DH gives the base-to-tool pose at any configuration."
-  },
-  {
-    "q": "Modified DH (Craig convention) differs by:",
-    "options": [
-      "Using 8 parameters",
-      "Frame-origin placement at the joint axis instead of next link",
-      "Adding cameras",
-      "Using radians only"
-    ],
-    "answer": 1,
-    "explain": "Craig's modified DH attaches each frame at the current joint axis — minor but important difference for some derivations."
-  }
-]
+The parameters only mean something once the frames are placed by the rules. For the standard (classic, "distal") convention:
+
+1. **z axes.** Put each z axis along a joint axis: frame i's z axis lies along the axis of joint i+1, so z₀ is the first joint's axis.
+2. **x axes.** Point each x axis along the common normal between the previous z axis and its own z axis, directed away from the previous one. The frame's origin is where that x axis meets its z axis. If the two z axes intersect, take x perpendicular to both (along their cross product). The base frame's x₀ is yours to choose.
+3. **y axes.** Complete each frame as right-handed: y follows from x and z.
+4. **Read off the four numbers** for each step: θ and d along the old z axis, a and α along the new x axis.
+
+Two special cases cause most of the confusion in practice:
+
+- **Intersecting axes** (common in robot wrists): the common normal has zero length, so **a = 0**.
+- **Parallel axes** (common in shoulder and elbow joints, like the UR5e's joints 2, 3 and 4): there is no unique common normal, so **d becomes a free choice**, and the usual practice is to pick the value that makes the most entries zero. If two axes are only *almost* parallel, the common normal does exist but can lie far away, so a tiny tilt from manufacturing can change d by a large amount. Keep this in mind if you ever calibrate an arm's DH parameters from measurements.
+
+## The DH matrix
+
+Each row of the table becomes one 4×4 [homogeneous transformation](/atlas/concept/homogeneous-transformation), built from the four moves in order (standard DH):
+
+```text
+ⁱ⁻¹Tᵢ = Rot_z(θᵢ) · Trans_z(dᵢ) · Trans_x(aᵢ) · Rot_x(αᵢ)
+
+        ┌ cos θᵢ   −sin θᵢ·cos αᵢ    sin θᵢ·sin αᵢ    aᵢ·cos θᵢ ┐
+      = │ sin θᵢ    cos θᵢ·cos αᵢ   −cos θᵢ·sin αᵢ    aᵢ·sin θᵢ │
+        │   0          sin αᵢ           cos αᵢ             dᵢ    │
+        └   0            0                0                1     ┘
 ```
 
-## Further Reading
+The top-left 3×3 block is the rotation from frame i to frame i−1; the right-hand column is the position of frame i's origin in frame i−1. Multiply the matrices from the base to the last joint and you get the pose of the end of the arm in the base frame:
 
-- [Forward Kinematics](/atlas/concept/forward-kinematics)
-- [Inverse Kinematics](/atlas/concept/inverse-kinematics)
-- [Robot Arm](/atlas/concept/robot-arm)
-- [Kinematics](/atlas/concept/kinematics)
+```text
+⁰T₆ = ⁰T₁ · ¹T₂ · ²T₃ · ³T₄ · ⁴T₅ · ⁵T₆
+```
 
-## Ask R2 About This
+That product is forward kinematics. Six joint angles in, one position and orientation out.
 
-Open the R2 Co-pilot (press **⌘K** anywhere on R2BOT) and ask: *"Explain Denavit-Hartenberg Parameters for a Class 9 student in India, with one real-world Indian example."* You'll get a tailored, sourced answer in seconds.
+## Worked example 1: a two-link planar arm
+
+Start small: an arm with two revolute joints whose axes both point out of the page (parallel), with link lengths 0.4 m and 0.3 m. Both axes are parallel, so α = 0, and with everything in one plane d = 0:
+
+| Joint | θ | d | a | α |
+|---|---|---|---|---|
+| 1 | θ₁ | 0 | 0.4 m | 0 |
+| 2 | θ₂ | 0 | 0.3 m | 0 |
+
+Multiplying the two DH matrices gives the familiar result:
+
+```text
+x = 0.4·cos θ₁ + 0.3·cos(θ₁ + θ₂)
+y = 0.4·sin θ₁ + 0.3·sin(θ₁ + θ₂)
+```
+
+With θ₁ = 30° and θ₂ = 45°: x = 0.4 × 0.866 + 0.3 × 0.259 ≈ **0.424 m**, and y = 0.4 × 0.5 + 0.3 × 0.966 ≈ **0.490 m**. The DH table did nothing magic here; its value is that the same procedure works unchanged for six joints in three dimensions, where nobody wants to work out the geometry by hand.
+
+## Worked example 2: a real arm, the UR5e
+
+Universal Robots publishes the DH parameters of each of its arms. For the UR5e (in metres and radians):
+
+| Joint | a (m) | d (m) | α (rad) | θ |
+|---|---|---|---|---|
+| 1 (base) | 0 | 0.1625 | π/2 | θ₁ |
+| 2 (shoulder) | −0.425 | 0 | 0 | θ₂ |
+| 3 (elbow) | −0.3922 | 0 | 0 | θ₃ |
+| 4 (wrist 1) | 0 | 0.1333 | π/2 | θ₄ |
+| 5 (wrist 2) | 0 | 0.0997 | −π/2 | θ₅ |
+| 6 (wrist 3) | 0 | 0.0996 | 0 | θ₆ |
+
+You can read the arm's shape straight from the table: 0.1625 m up from the base to the shoulder, a 0.425 m upper arm, a 0.3922 m forearm (the a values are negative only because of the direction UR chose for its x axes), then three wrist joints, each axis at right angles to the next (a = 0, α = ±π/2). Unlike many industrial arms, the UR's three wrist axes do not all meet at a single point (d₅ is not zero).
+
+Put all six joint angles at zero and multiply the six matrices. The flange (the tool mounting face) lands at:
+
+```text
+x = a₂ + a₃      = −0.425 − 0.3922   ≈ −0.817 m   (arm stretched out horizontally)
+y = −(d₄ + d₆)   = −(0.1333 + 0.0996) ≈ −0.233 m
+z = d₁ − d₅      =  0.1625 − 0.0997   ≈  0.063 m
+```
+
+Set the shoulder and wrist 1 to −90° instead (θ₂ = θ₄ = −π/2, others zero) and the arm points straight up: the flange rises to z = 0.1625 + 0.425 + 0.3922 + 0.0997 ≈ **1.079 m**. Every number in the result comes from a row of the table.
+
+### The same thing in Python
+
+```python
+import numpy as np
+
+def dh(theta, d, a, alpha):
+    """Standard DH: Rot_z(theta) · Trans_z(d) · Trans_x(a) · Rot_x(alpha)."""
+    ct, st = np.cos(theta), np.sin(theta)
+    ca, sa = np.cos(alpha), np.sin(alpha)
+    return np.array([[ct, -st * ca,  st * sa, a * ct],
+                     [st,  ct * ca, -ct * sa, a * st],
+                     [0.0,      sa,       ca,      d],
+                     [0.0,     0.0,      0.0,    1.0]])
+
+# UR5e, Universal Robots' published DH table (metres, radians)
+a     = [0.0, -0.425, -0.3922, 0.0, 0.0, 0.0]
+d     = [0.1625, 0.0, 0.0, 0.1333, 0.0997, 0.0996]
+alpha = [np.pi / 2, 0.0, 0.0, np.pi / 2, -np.pi / 2, 0.0]
+
+def forward_kinematics(q):
+    T = np.eye(4)
+    for i in range(6):
+        T = T @ dh(q[i], d[i], a[i], alpha[i])
+    return T
+
+print(forward_kinematics([0, 0, 0, 0, 0, 0])[:3, 3].round(4))
+# [-0.8172 -0.2329  0.0628]
+```
+
+Peter Corke's open-source Robotics Toolbox for Python does the same with ready-made classes: a robot is a `DHRobot` built from `RevoluteDH` links (standard DH) or `RevoluteMDH` links (modified DH), and it ships DH models of real arms, among them the UR3, UR5, UR10, Puma 560 and Franka Panda.
+
+### Nominal versus real
+
+A published DH table describes the arm as designed. Each UR robot is also calibrated in the factory, and the `ur_calibration` package of Universal Robots' ROS 2 driver exists to extract that calibration; its documentation warns that without it, "end effector positions might be off in the magnitude of centimeters." The nominal table is right for learning and for simulation. For precise work on a physical arm, use the robot's calibrated kinematics.
+
+## Standard vs modified DH
+
+There are two DH conventions in common use, and **a DH table means nothing until you know which one it uses.**
+
+| | Standard (classic, distal) DH | Modified (proximal, Craig) DH |
+|---|---|---|
+| Frame i sits on | Joint i+1's axis (the far end of link i) | Joint i's axis (the near end of link i) |
+| Order of the moves | Rot_z(θᵢ) · Trans_z(dᵢ) · Trans_x(aᵢ) · Rot_x(αᵢ) | Rot_x(αᵢ₋₁) · Trans_x(aᵢ₋₁) · Rot_z(θᵢ) · Trans_z(dᵢ) |
+| Used by | The textbooks by Spong and colleagues (*Robot Modeling and Control*); Universal Robots' published tables | Craig's *Introduction to Robotics*; Franka's published FR3 table |
+| Robotics Toolbox class | `RevoluteDH` | `RevoluteMDH` |
+
+The two describe the same arm equally well, but the numbers in the table differ, and so does the matrix you must build from them. Franka, for example, states that its Franka Research 3 parameters follow Craig's convention: its table lists d = 0.333 m on joint 1, d = 0.316 m on joint 3, a = 0.0825 m on joint 4, a = −0.0825 m and d = 0.384 m on joint 5, a = 0.088 m on joint 7, and 0.107 m along z to the flange. Feed those into the standard matrix and you get a confidently wrong answer. Note also that in Craig's notation the a and α printed on joint i's row are aᵢ₋₁ and αᵢ₋₁: one more place where an index slips.
+
+## DH vs URDF
+
+In [ROS 2](/atlas/concept/ros2) you will rarely type a DH table. Robots there are described in [URDF](/atlas/concept/ros2-urdf), where each joint has an `<origin xyz="…" rpy="…"/>`: three translations and three rotations from the parent link to the child, with frames placed wherever is convenient, plus an `<axis>` for the joint.
+
+| | DH table | URDF joint origin |
+|---|---|---|
+| Numbers per joint | 4 | 6 (xyz + roll, pitch, yaw), plus the axis |
+| Frame placement | Fixed by rules (z on the axis, x on the common normal) | Free: wherever the designer likes |
+| Strength | Minimal and standard; compact for analysis and calibration | Readable; frames can sit at meaningful places (a bolt pattern, a sensor) |
+| Weakness | Rules are easy to get wrong; frames can land in awkward places | More numbers than strictly needed |
+
+The two are interchangeable. Universal Robots' ROS 2 description package stores each arm's kinematics as xyz/roll/pitch/yaw values that reproduce the DH geometry: for the UR5e the shoulder sits 0.1625 m up, the forearm joint 0.425 m out, the wrist 0.3922 m further, the same numbers as the DH table above.
+
+For a third approach that needs no frames on intermediate links at all, see the product-of-exponentials formulation in [screw theory](/atlas/concept/screw-theory).
+
+## Common mistakes
+
+- **Mixing conventions.** Using a modified (Craig) table with the standard matrix, or the reverse. Check which convention the source uses before anything else.
+- **Off-by-one indexing.** In standard DH, frame i lives on joint i+1's axis. Most frame-placement errors come from forgetting this.
+- **Degrees vs radians.** Tables are often published in radians (π/2) and joint readouts shown in degrees.
+- **Ignoring the zero offset.** The robot's "zero" joint angles in its software need not match θ = 0 in the DH frames. Many libraries add a per-joint offset for this.
+- **Trusting the nominal table for precision work.** Real arms deviate from their drawings; use calibrated parameters when millimetres matter.
+- **Sign conventions.** UR's negative a values are correct for its choice of x direction, not a typo. Do not "fix" them.
+
+## Where you'll see it
+
+DH tables appear in the documentation of commercial arms (Universal Robots publishes them for every model, from the CB-series UR3, UR5 and UR10 to the e-Series and newer arms; Franka for Franka Research 3), in the standard robotics textbooks by Craig and by Spong and colleagues, and in software such as the Robotics Toolbox for Python. They are the usual way to write a robot's geometry in a kinematics or calibration paper, and the usual way it is taught in a first robotics course, before students meet URDF and screw theory.
+
+## Why it matters
+
+Forward kinematics, [inverse kinematics](/atlas/concept/inverse-kinematics), the Jacobian, dynamics and calibration all start from a description of the arm's geometry. DH gives that description in the fewest numbers, in a form that turns directly into code, and in a language that textbooks, manufacturers and papers share. Even if you end up working in URDF or with screw theory, you will read DH tables for the rest of your robotics career.
+
+## Common questions
+
+### What are DH parameters in robotics?
+
+DH (Denavit-Hartenberg) parameters are four numbers per joint that describe the geometry of a robot arm: the joint angle θ, the link offset d, the link length a and the link twist α. Together they define the transform from one joint's coordinate frame to the next, so multiplying those transforms gives the position and orientation of the robot's end effector.
+
+### What do the four DH parameters mean?
+
+θ is the rotation about the previous joint axis (z), d is the distance along that axis, a is the length of the common normal between the two joint axes, and α is the twist between the two axes measured about the common normal. For a revolute joint θ is the variable that changes as the robot moves; for a prismatic joint it is d.
+
+### What is the difference between standard and modified DH parameters?
+
+Standard (classic) DH places each link's frame at the far end of the link, on the next joint's axis, and applies the moves in the order θ, d, a, α. Modified DH, used in Craig's textbook, places the frame at the near end, on the link's own joint axis, and applies α, a, θ, d. Both describe the same robot, but the numbers and the matrix differ, so a table must always be used with the convention it was written in.
+
+### Does ROS use DH parameters?
+
+Not directly. ROS and ROS 2 describe robots in URDF, where each joint has a six-number origin (xyz and roll, pitch, yaw) instead of four DH parameters. The two are interchangeable, and manufacturers such as Universal Robots publish DH tables alongside ROS descriptions that reproduce the same geometry.
+
+## Related
+
+- [Forward kinematics](/atlas/concept/forward-kinematics): what the DH table is used to compute
+- [Homogeneous transformation](/atlas/concept/homogeneous-transformation): the 4×4 matrix behind every DH row
+- [Inverse kinematics](/atlas/concept/inverse-kinematics): the harder problem, joint angles from a target pose
+- [Link (robot)](/atlas/concept/link-robot): the rigid parts the DH table describes
+- [Screw theory](/atlas/concept/screw-theory): the product-of-exponentials alternative to DH

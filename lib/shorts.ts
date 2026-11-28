@@ -170,7 +170,7 @@ const BASE_SHORTS: ShortLesson[] = [
     limit: 'More reduction means slower motion, and gears add backlash (a little play) and friction.',
     demo: 'gears',
     quiz: { q: 'A motor spins at 3000 rpm through a 10:1 reduction. About how fast is the output?', options: ['30000 rpm', '300 rpm', '3000 rpm'], answer: 1, why: 'A reduction divides speed. 3000 divided by 10 is 300 rpm, with more torque in return.' },
-    atlas: [{ label: 'Gear ratio', href: '/atlas/concept/gear-ratio' }, { label: 'Torque', href: '/atlas/concept/torque' }, { label: 'Planetary gearbox', href: '/atlas/concept/planetary-gearbox' }],
+    atlas: [{ label: 'Gear ratio', href: '/atlas/concept/gear-ratio' }, { label: 'Gear train', href: '/atlas/concept/gear-train' }, { label: 'Torque', href: '/atlas/concept/torque' }, { label: 'Planetary gearbox', href: '/atlas/concept/planetary-gearbox' }],
     next: 'servo-motor',
   },
   {
