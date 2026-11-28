@@ -11,6 +11,7 @@
 import type { BandId } from './bands'
 import { profileKey } from './profiles'
 import { isBandId, isClassKind, isMixedKind, type JoinedClassInfo } from './classroom'
+import { KIDS_STANDALONE } from './app-context'
 
 /** Per child: always read through profileKey() (lib/kids/profiles.ts). */
 export const CLASS_MEMBERSHIP_KEY = 'r2bot_kids_class_v1'
@@ -23,7 +24,8 @@ export interface StoredMembership extends JoinedClassInfo {
 }
 
 export function loadMembership(): StoredMembership | null {
-  if (typeof window === 'undefined') return null
+  // The standalone app has no server, so it is never in a class (nothing syncs, nothing is fetched).
+  if (typeof window === 'undefined' || KIDS_STANDALONE) return null
   try {
     const raw = window.localStorage.getItem(profileKey(CLASS_MEMBERSHIP_KEY))
     if (!raw) return null

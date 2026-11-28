@@ -11,7 +11,7 @@
 // links and anchors carrying data-kids-safety (helplines) are never gated.
 
 import { useCallback, useEffect, useState } from 'react'
-import { detectKidsApp, isInsideKids, KIDS_APP_CLASS } from '@/lib/kids/app-context'
+import { detectKidsApp, isInsideKids, KIDS_APP_CLASS, outboundHref } from '@/lib/kids/app-context'
 import { ParentalGate } from './ParentalGateClient'
 
 export function KidsAppLinkGuard() {
@@ -43,7 +43,8 @@ export function KidsAppLinkGuard() {
   const pass = useCallback(() => {
     const t = target
     setTarget(null)
-    if (t) window.location.href = t
+    // Standalone app: a path outside /kids is not in the bundle, so it opens on www.r2bot.in.
+    if (t) window.location.href = outboundHref(t)
   }, [target])
 
   const cancel = useCallback(() => setTarget(null), [])

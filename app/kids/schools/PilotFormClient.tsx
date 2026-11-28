@@ -8,10 +8,14 @@
 
 import { useId, useState } from 'react'
 import { ParentalGate } from '@/components/kids/app/ParentalGateClient'
+import { NeedsWebNote } from '@/components/kids/app/NeedsWebNote'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
 
 const ROLES = ['Teacher', 'Head of department / coordinator', 'Principal / head teacher', 'IT or digital lead', 'Parent-teacher association', 'Other'] as const
 
 export default function PilotFormClient() {
+  // The standalone app has no server to send the form to.
+  if (KIDS_STANDALONE) return <NeedsWebNote what="Asking for a school pilot" />
   return (
     <ParentalGate title="For teachers and school leaders" lead="The pilot form asks for a grown-up's name and work email.">
       <PilotForm />

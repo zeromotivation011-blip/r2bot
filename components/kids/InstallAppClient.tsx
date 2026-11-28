@@ -10,6 +10,7 @@
 // with no network (see public/kids-sw.js); the help text says so.
 
 import { useEffect, useState } from 'react'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -88,6 +89,9 @@ export function InstallAppClient({ compact = false }: { compact?: boolean }) {
 
   const base =
     'inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl px-5 font-black transition hover:scale-[1.03] focus-visible:outline focus-visible:outline-4 focus-visible:outline-amber-300'
+
+  // The standalone app IS the installed app: nothing to install.
+  if (KIDS_STANDALONE) return null
 
   if (mode === 'installed') {
     return compact ? null : <p className="font-bold text-emerald-300">✓ Installed — open it from your home screen. It works offline too.</p>

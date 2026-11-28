@@ -20,6 +20,7 @@ import { LEVEL3_SESSIONS } from '@/lib/kids/curriculum/level3'
 import { LEVEL4_SESSIONS } from '@/lib/kids/curriculum/level4'
 import type { LevelNumber } from '@/lib/kids/curriculum/types'
 import { InstallAppClient } from '@/components/kids/InstallAppClient'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
 import type { SessionTitles } from '@/components/kids/universe/ContinueCardClient'
 import { KidsHubClient } from './KidsHubClient'
 import { KIDS_MORE } from '@/lib/kids/nav'
@@ -416,6 +417,8 @@ export default function KidsHubPage() {
           <span className="mt-4 inline-block font-bold text-amber-300">See how schools use it →</span>
         </GrownUpLink>
         <div className="grid gap-4">
+          {/* Joining a class needs the server: not in the standalone app. */}
+          {!KIDS_STANDALONE && (
           <Link
             href="/kids/join"
             className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 transition hover:border-white/25 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-400/60"
@@ -423,6 +426,7 @@ export default function KidsHubPage() {
             <h2 className="font-display text-lg font-bold text-[#EEF2F8]">🎟️ Got a class code?</h2>
             <p className="mt-1 text-[15px] text-[#A7B0C0]">Join your teacher’s class with just a nickname.</p>
           </Link>
+          )}
           <GrownUpLink
             href={KIDS_GROWNUPS_HREF}
             grant
@@ -434,7 +438,8 @@ export default function KidsHubPage() {
         </div>
       </section>
 
-      {/* ── App install ────────────────────────────────────────────────────── */}
+      {/* ── App install ── (not in the standalone app: it is the app) */}
+      {!KIDS_STANDALONE && (
       <section className="mx-auto max-w-6xl px-4 py-6">
         <div className="flex flex-col items-start gap-4 rounded-[28px] border border-white/10 bg-[#111C32] p-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
@@ -450,6 +455,7 @@ export default function KidsHubPage() {
           <InstallAppClient />
         </div>
       </section>
+      )}
 
       {/* ── FAQ ────────────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-4xl px-4 pb-24 pt-10" aria-labelledby="faq-h">

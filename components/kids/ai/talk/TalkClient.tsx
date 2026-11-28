@@ -31,6 +31,7 @@ import { canonicalise, FREE_PLAY, missionDesign, missionsFor, type TalkMission }
 import { validateProgram } from '@/lib/kids/ai/talk/schema'
 import { stmtText } from '@/lib/kids/ai/talk/describe'
 import UnderstandingClient, { ROLE_LEGEND, stepOfBlock } from './UnderstandingClient'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
 
 function StageSkeleton() {
   return (
@@ -150,7 +151,8 @@ export default function TalkClient() {
     setOnline(navigator.onLine)
     let cancelled = false
     const checkAi = () => {
-      if (!navigator.onLine) return
+      // The standalone app has no server: the on-device parser only (the AI button never shows).
+      if (KIDS_STANDALONE || !navigator.onLine) return
       fetch('/api/kids/talk', { cache: 'no-store' })
         .then((g) => (g.ok ? (g.json() as Promise<{ enabled?: boolean }>) : { enabled: false }))
         .then((j) => {

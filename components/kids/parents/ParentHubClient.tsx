@@ -18,6 +18,7 @@ import { getBadge, levelInfo } from '@/lib/kids/universe/rewards'
 import { getPart, loadDesign, ROBOT_CHANGED_EVENT, type RobotDesign, type Slot } from '@/lib/kids/robot-design'
 import ParentProfilesClient from '@/components/kids/profiles/ParentProfilesClient'
 import PassportDeleteCardClient from './PassportDeleteCardClient'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
 import { activeProfile } from '@/lib/kids/profiles'
 import {
   DAILY_MINUTE_CHOICES,
@@ -308,8 +309,9 @@ export default function ParentHubClient({ sessions, tracks, activityTrack }: Par
       <ParentProfilesClient />
       <ControlsCard />
       <NextStepCard />
-      <WeeklyEmailCard />
-      <PassportDeleteCardClient />
+      {/* The standalone app has no server: no email sign-up, no Passport server copy to delete. */}
+      {!KIDS_STANDALONE && <WeeklyEmailCard />}
+      {!KIDS_STANDALONE && <PassportDeleteCardClient />}
       <DeviceDataCard onReset={() => setSnap((s) => (s ? { ...s, p: getProgress(), acts: getActivitiesDone() } : s))} />
     </div>
   )

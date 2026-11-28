@@ -17,6 +17,7 @@
 import { useRouter } from 'next/navigation'
 import type { MouseEvent, ReactNode } from 'react'
 import { useParentControls } from '@/lib/kids/parent-controls'
+import { outboundHref } from '@/lib/kids/app-context'
 import { requireGrownUp } from './ParentalGateClient'
 
 export interface GrownUpLinkProps {
@@ -68,10 +69,11 @@ export function GrownUpLink({ href, children, className, newTab = false, grant =
     e.preventDefault()
     void requireGrownUp({ target: outside ? href : undefined, message, grant }).then((ok) => {
       if (!ok) return
+      // Standalone app: a path outside /kids is not in the bundle, so it opens on www.r2bot.in.
       if (newTab) {
-        window.open(href, '_blank', 'noopener,noreferrer')
+        window.open(outboundHref(href), '_blank', 'noopener,noreferrer')
       } else if (outside) {
-        window.location.assign(href)
+        window.location.assign(outboundHref(href))
       } else {
         router.push(href)
       }

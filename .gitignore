@@ -46,3 +46,11 @@ reels/**/*.wav
 reels/**/*.mp3
 __pycache__/
 *.pyc
+
+# --- R2BOT Kids standalone app (scripts/kids-app/build-export.mjs) ---
+# The static export copied into the app, the Android SDK path and build output:
+# generated on every build, never committed. The scratch build lives in /tmp.
+apps/kids-mobile/www/
+apps/kids-mobile/android/local.properties
+apps/kids-mobile/android/**/build/
+*.apk

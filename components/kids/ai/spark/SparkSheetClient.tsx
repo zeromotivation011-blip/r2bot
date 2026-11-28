@@ -25,6 +25,7 @@ import { SPARK_MAX_QUESTION, type SparkContext, type SparkMode, type SparkReply 
 import { canSpeak, setVoiceMuted, speakNatural, stopSpeaking, voiceMuted, warmNaturalVoices } from '@/components/kids/activities/speech'
 import { SparkFace } from './AskSparkClient'
 import HelplineCardClient from './HelplineCardClient'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
 
 interface Turn {
   id: number
@@ -244,6 +245,9 @@ export default function SparkSheetClient({ initial, onClose, helpOnly = false }:
 
       if (local) {
         reply = withPrivacyNote(local, removedPersonal)
+      } else if (KIDS_STANDALONE) {
+        // The standalone app has no server: Spark answers from its notebook (the offline FAQ).
+        reply = offlineAnswer()
       } else if (typeof navigator !== 'undefined' && !navigator.onLine) {
         reply = offlineAnswer("You're offline, so this answer is from Spark's notebook.")
       } else {

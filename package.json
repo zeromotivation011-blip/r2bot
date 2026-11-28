@@ -9,6 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
+    "kids:app:export": "node scripts/kids-app/build-export.mjs",
+    "kids:app:verify": "node scripts/kids-app/verify-export.mjs",
     "seed:atlas": "tsx scripts/seed-atlas.ts",
     "link:atlas": "tsx scripts/link-atlas.ts",
     "migrate:atlas": "tsx scripts/migrate-atlas-to-db.ts"

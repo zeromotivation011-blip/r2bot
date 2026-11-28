@@ -11,6 +11,7 @@ import { InstallAppClient } from '@/components/kids/InstallAppClient'
 import { KidsClassSync } from '@/components/kids/classroom/KidsClassSyncClient'
 import { RewardToast } from '@/components/kids/ui/RewardToastClient'
 import { KidsAppLinkGuard } from '@/components/kids/app/KidsAppLinkGuardClient'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
 import { GrownUpLink } from '@/components/kids/app/GrownUpLinkClient'
 import { ParentTimeKeeper } from '@/components/kids/parents/ParentTimeKeeperClient'
 import ProfileSwitcherClient from '@/components/kids/profiles/ProfileSwitcherClient'
@@ -140,7 +141,9 @@ function MoreMenu({ pathname }: { pathname: string }) {
 }
 
 function KidsShellInner({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname() ?? ''
+  // No trailing slash, so exact matches (Home is '/kids') hold in the standalone app,
+  // whose static export uses trailingSlash (/kids/hangar/). A no-op on the website.
+  const pathname = (usePathname() ?? '').replace(/(.)\/+$/, '$1')
   // The XP level is a "Rank" (roadmap #6): "Level" only means a course level.
   const [rank, setRank] = useState<{ level: number; title: string; xp: number } | null>(null)
   const { voiceOn, toggle, cancel } = useKidsVoice()
@@ -176,7 +179,8 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
 
   // Installable app: register the kids service worker (scope /kids only).
   useEffect(() => {
-    if (!('serviceWorker' in navigator) || process.env.NODE_ENV !== 'production') return
+    // Not in the standalone app: every page and asset is already on the device.
+    if (KIDS_STANDALONE || !('serviceWorker' in navigator) || process.env.NODE_ENV !== 'production') return
     navigator.serviceWorker.register('/kids-sw.js', { scope: '/kids' }).catch(() => undefined)
   }, [])
 
@@ -267,7 +271,8 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
           <GrownUpLink href={KIDS_GROWNUPS_HREF} grant message="This opens the page for parents and teachers.">
             For grown-ups
           </GrownUpLink>
-          <Link href="/kids/join">Join a class</Link>
+          {/* Joining a class needs the server: not in the standalone app. */}
+          {!KIDS_STANDALONE && <Link href="/kids/join">Join a class</Link>}
         </footer>
       )}
 
@@ -280,7 +285,7 @@ function KidsShellInner({ children }: { children: React.ReactNode }) {
       <AskSpark hideOn={game ? [...SPARK_HIDE_GROWNUP, pathname] : SPARK_HIDE_GROWNUP} />
 
       {/* Pushes a progress snapshot to the teacher, only if this child joined a class. */}
-      <KidsClassSync />
+      {!KIDS_STANDALONE && <KidsClassSync />}
       <RewardToast />
       <RobodexToast />
       {/* Inside the store app: links that leave /kids go through a parental gate. */}

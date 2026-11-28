@@ -33,6 +33,8 @@ import { createPassport, loadSavedPassport, openPassport, rememberPassport, save
 import { qrMatrix, qrSvgPath } from '@/lib/kids/teach/qr'
 import { requireGrownUp } from '@/components/kids/app/ParentalGateClient'
 import { deletePassportAsGrownUp } from './passport-delete'
+import { KIDS_STANDALONE } from '@/lib/kids/app-context'
+import { NeedsWebNote } from '@/components/kids/app/NeedsWebNote'
 import { looksBackupExtra, restoreLooksExtra } from './cosmetics'
 
 /** Finds a backup code inside any pasted text or downloaded file. */
@@ -491,7 +493,10 @@ export function BackupCodeClient({ headingLevel = 2 }: { headingLevel?: 2 | 3 })
         and robot nicknames and robot progress, never an email or anything else personal.
       </p>
 
-      {/* ── Robot Passport ── */}
+      {/* ── Robot Passport ── (server copy: not in the standalone app, lib/kids/app-context.ts) */}
+      {KIDS_STANDALONE ? (
+        <NeedsWebNote what="The Robot Passport" detail="In the app, the backup code below keeps your progress safe instead." className="mt-4" />
+      ) : (
       <div className="mt-4 rounded-[20px] border border-amber-400/25 bg-amber-500/[0.06] p-3 sm:p-4" data-testid="robot-passport">
         <H2 className="font-display text-xl font-bold text-white">
           <span aria-hidden>🛂 </span>Robot Passport
@@ -577,6 +582,7 @@ export function BackupCodeClient({ headingLevel = 2 }: { headingLevel?: 2 | 3 })
           {ppStatus.kind === 'idle' ? '' : ppStatus.text}
         </p>
       </div>
+      )}
 
       {/* ── Offline backup code ── */}
       <div className="mt-4">

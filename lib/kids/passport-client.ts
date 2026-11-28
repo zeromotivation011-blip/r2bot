@@ -9,6 +9,7 @@
 
 import { profileKey } from './profiles'
 import { PASSPORT_NOT_READY, parsePassport, type PassportSummary } from './passport'
+import { KIDS_STANDALONE } from './app-context'
 
 const STORE = 'r2bot_kids_passport_v1'
 
@@ -49,6 +50,8 @@ export type PassportCall<T> =
   | { ok: false; notReady?: boolean; notFound?: boolean; rate?: boolean; offline?: boolean; error: string }
 
 async function call<T>(body: Record<string, unknown>): Promise<PassportCall<T>> {
+  // The standalone app has no server: never fetch, point at the backup code instead.
+  if (KIDS_STANDALONE) return { ok: false, notReady: true, error: 'The Robot Passport lives on www.r2bot.in. In the app, use a backup code below.' }
   let res: Response
   try {
     res = await fetch('/api/kids/passport', {
