@@ -6,7 +6,7 @@
 // Mirrors KidsRoutes.java + KidsWebViewClient.java + Capacitor's WebViewLocalServer:
 //  - "/"                          -> www/index.html (Capacitor's own root page)
 //  - extensionless "/a/b" or "/a/b/" -> www/a/b/index.html if it exists, else the bundled
-//                                    not-found page (offline.html, 404.html, 404/index.html) with 404
+//                                    not-found page (404.html, 404/index.html) with 404
 //  - a path with an extension     -> that file, or an empty 404
 //  - a top-level NAVIGATION (Sec-Fetch-Mode: navigate) to a local path outside
 //    /, /kids/**, /_next/** and root files is what the app hands to the system
@@ -22,7 +22,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(process.argv[2] ?? join(here, '..', '..', 'www'))
 const port = Number(process.argv[3] ?? 4610)
 const SITE = 'https://www.r2bot.in'
-const NOT_FOUND = ['offline.html', '404.html', '404/index.html']
+const NOT_FOUND = ['404.html', '404/index.html']
 
 // Java's URLConnection.guessContentTypeFromName where it knows the type; Capacitor adds js/mjs/wasm.
 const MIME = {

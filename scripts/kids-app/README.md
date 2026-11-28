@@ -21,7 +21,8 @@ cd apps/kids-mobile && npm run build:apk   # export + cap sync android + gradlew
   page for the server-only grown-up screens (`/kids/classroom`, `/kids/classroom/school`,
   `/kids/join`, `/kids/present`).
 - Removes what a static export cannot hold: the per-class teacher dashboards
-  (`/kids/classroom/[classId]/**`), the share image and the PWA manifest route.
+  (`/kids/classroom/[classId]/**`), the share image and the PWA manifest route; and the
+  internal activity-template test benches (`/kids/lab/templates/*`), which 404 in production.
 - Builds with `output: 'export'`, `trailingSlash: true` and `NEXT_PUBLIC_KIDS_APP=1`.
 
 `NEXT_PUBLIC_KIDS_APP=1` switches on `KIDS_STANDALONE` (`lib/kids/app-context.ts`):
@@ -34,7 +35,6 @@ the backup code, the class sync is off), and gated links that leave `/kids` open
 ```
 index.html           forwards to /kids/
 404.html             "This robot got lost" (kids page)
-offline.html         the hand-written page from apps/kids-mobile/offline/index.html
 app-build.json       { builtFrom (git sha), dirty, pages, kidsPages, removed[] }
 kids/**/index.html   every page; kids/**/index.txt is its RSC payload
 kids/audio/**        story voices;  kids/lab/blockly-media/*  Blockly's images
@@ -44,6 +44,6 @@ _next/static/**      JS, CSS, fonts
 ## Path rule the native layer must follow
 - a path with no file extension → `<path>/index.html` (`/kids/hangar` and `/kids/hangar/` → `kids/hangar/index.html`)
 - anything else → that file (`/_next/static/…`, `/kids/hangar/index.txt`)
-- missing → `404.html`
+- missing → `404.html` (the kids "This robot got lost" page, status 404)
 
 `verify-export.mjs` serves `www/` with exactly this rule.

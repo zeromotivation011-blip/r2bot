@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *    app and wrong here: a reload of /kids/hangar/ would show the root page. A local
  *    request for an extensionless path is answered with {@code <path>/index.html}
  *    from the APK's web assets when that file exists, and with the bundled
- *    "not found" page (offline.html) when it does not. Everything else (the root,
+ *    "not found" page (the export's kids 404.html) when it does not. Everything else (the root,
  *    files with an extension, Capacitor's proxy routes) goes to Capacitor unchanged.
  *
  * 2. Navigation. Only https://localhost (the app) loads in the WebView, and only the
@@ -39,8 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class KidsWebViewClient extends BridgeWebViewClient {
 
-    /** Bundled "not found" page, tried in order (the export's own page first). */
-    private static final String[] NOT_FOUND_ASSETS = { "offline.html", "404.html", "404/index.html" };
+    /** Bundled "not found" page, tried in order (the export's kids "This robot got lost" page). */
+    private static final String[] NOT_FOUND_ASSETS = { "404.html", "404/index.html" };
 
     private final Bridge bridge;
     private final Context context;

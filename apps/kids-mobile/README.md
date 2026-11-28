@@ -35,8 +35,9 @@ error. Nothing breaks without them.
 Needs JDK 21, the Android SDK (Platform 36, Build-Tools 35 or 36; `ANDROID_HOME`, or `sdk.dir`
 in `android/local.properties`, which is gitignored) and Node 22.
 
-1. Produce the bundled export in `apps/kids-mobile/www` (the static-export step at the repo
-   root; it must leave `www/kids/index.html`, `www/_next/static/**` and `www/offline.html`).
+1. Produce the bundled export in `apps/kids-mobile/www`: `npm run kids:app:export` at the repo
+   root (or `npm run export:www` here). It must leave `www/kids/index.html`, `www/_next/static/**`
+   and `www/404.html`. `npm run build:apk` here does export + sync + assembleDebug in one go.
 2. Then, from `apps/kids-mobile` (after `npm ci` once):
 
 ```bash
@@ -44,6 +45,8 @@ android/build-apk.sh
 # = npx cap sync android && cd android && ./gradlew testDebugUnitTest assembleDebug
 # → android/app/build/outputs/apk/debug/app-debug.apk   (signed with the Android debug key)
 ```
+
+Hand testers a copy named for what it is, e.g. `dist/r2bot-kids-test.apk` (`dist/` is gitignored).
 
 If the Gradle wrapper cannot download Gradle, run it with a local Gradle 8.14:
 `GRADLE_BIN=/opt/gradle/bin/gradle android/build-apk.sh`.
@@ -87,7 +90,7 @@ the root). `android/app/src/main/java/in_/r2bot/kids/`:
   - **page mapping:** a request to `https://localhost/<path>` whose last segment has no `.` is
     answered with `<path>/index.html` from the APK's web assets (`/kids/hangar` and `/kids/hangar/`
     → `kids/hangar/index.html`) when it exists, else with the bundled not-found page
-    (`offline.html`, then `404.html`) and status 404. `/`, files with an extension (JS, CSS, RSC
+    (the kids `404.html`, "This robot got lost") and status 404. `/`, files with an extension (JS, CSS, RSC
     `index.txt`, audio, models) and Capacitor's proxy routes go to Capacitor unchanged. `..` is refused;
   - **navigation:** only `/`, `/kids/**`, `/_next/**` and root files load in the WebView. Any other
     local path opens `https://www.r2bot.in<path>` in the system browser (ACTION_VIEW); other hosts
@@ -237,8 +240,8 @@ no CocoaPods. **Building, signing and uploading need a Mac with Xcode 16 or late
    - **No third-party analytics or advertising.** None are in the app. The website must not run
      GA/gtag on `/kids` inside the app (see below).
    - **Parental gate** before any link that leaves the app, any purchase, or any request for
-     permissions beyond the core experience. The offline page implements one: a multiplication
-     question with a typed answer, in `www/index.html`. The website must do the same.
+     permissions beyond the core experience. The bundled pages implement one
+     (`requireGrownUp()` / `<GrownUpLink>`) before every link that leaves the app.
    - Privacy "nutrition label": the same answers as Play's data-safety form. Declare, each as
      **not linked to the user's identity** and **not used for tracking**, purpose *App Functionality*:
      - *Contact Info → Name*: the class nickname (optional, an alias, not a real name).
@@ -247,14 +250,14 @@ no CocoaPods. **Building, signing and uploading need a Mac with Xcode 16 or late
      - *User Content → Other User Content*: the Workshop robot design and the robot name the child types.
      Nothing else. A child who never joins a class sends none of these.
    - The camera usage string is in `ios/App/App/Info.plist` (`NSCameraUsageDescription`).
-6. **App-bound domains** are on (`WKAppBoundDomains = www.r2bot.in`, and
-   `limitsNavigationsToAppBoundDomains: true`), so script only runs on our own site.
+6. **App-bound domains** are on (`WKAppBoundDomains = localhost`, and
+   `limitsNavigationsToAppBoundDomains: true`), so script only runs on the bundled pages.
 7. iOS has no system Back button. The website's own Back controls must be visible on every
    `/kids` screen (they are today). If wanted later, swipe-back can be enabled with a small
    `CAPBridgeViewController` subclass that sets `webView.allowsBackForwardNavigationGestures = true`.
 8. Guideline 4.2 (minimum functionality): Apple rejects "just a website". The arguments for this
-   app are camera AR, an offline screen, no browser chrome, a kid-safe locked domain, and the parental gate.
-   Put those in the review notes, with a demo class code for the reviewer, and mention that the main screens and saved episodes work offline (see "What works offline").
+   app are that every screen is bundled and works with no network, camera AR, no browser chrome, and
+   the parental gate. Put those in the review notes.
 
 
 ## Retired: the remote-site model (until 28 Nov 2026)

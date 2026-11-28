@@ -22,8 +22,7 @@
 //   3. `next build` in the copy with NEXT_PUBLIC_KIDS_APP=1 (lib/kids/app-context.ts
 //      KIDS_STANDALONE: no service worker, no /api calls, gated outbound links
 //      open on www.r2bot.in).
-//   4. Replace apps/kids-mobile/www with the export, add offline.html (from
-//      apps/kids-mobile/offline/index.html) and app-build.json.
+//   4. Replace apps/kids-mobile/www with the export and add app-build.json.
 //
 // Path rule the native layer must follow (trailingSlash export):
 //   a path with no file extension -> <path>/index.html  (/kids/hangar -> kids/hangar/index.html)
@@ -43,7 +42,6 @@ const BUILD = path.resolve(process.env.KIDS_APP_BUILD_DIR || '/tmp/kids-app-buil
 const OVERRIDES = path.join(HERE, 'overrides')
 const MOBILE = path.join(ROOT, 'apps', 'kids-mobile')
 const WWW = path.join(MOBILE, 'www')
-const OFFLINE_SRC = path.join(MOBILE, 'offline', 'index.html')
 
 /** Top-level repo entries never copied into the scratch build. */
 const SKIP_TOP = new Set(['.git', '.next', 'node_modules', 'apps', 'out', 'tsconfig.tsbuildinfo', 'reels', '.vercel', '.env', '.env.local'])
@@ -63,6 +61,9 @@ const REMOVE = [
   ['app/kids/opengraph-image.tsx', 'social share image: no use inside the app'],
   // The PWA manifest route: the app is the installed app.
   ['app/kids/manifest.webmanifest', 'PWA manifest: the native app replaces the PWA install'],
+  // Internal test benches for unreviewed activity templates: 404 in production
+  // (app/kids/lab/templates/bench.ts), so a child must never reach them in the app either.
+  ['app/kids/lab/templates', 'internal template test benches: notFound() in production, children must never reach them'],
 ]
 
 const log = (...a) => console.log('[kids-app]', ...a)
@@ -186,8 +187,6 @@ function install() {
   }
   rm(WWW)
   fs.cpSync(out, WWW, { recursive: true })
-  if (fs.existsSync(OFFLINE_SRC)) fs.copyFileSync(OFFLINE_SRC, path.join(WWW, 'offline.html'))
-  else log('warning: no', path.relative(ROOT, OFFLINE_SRC))
   const pages = countHtml(WWW)
   const kidsPages = countHtml(path.join(WWW, 'kids'))
   const info = {

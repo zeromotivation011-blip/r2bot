@@ -45,7 +45,7 @@ final class KidsRoutes {
     /**
      * True when a navigation to this local path may load inside the app's WebView:
      * the root, everything under /kids, the Next.js build output under /_next, and
-     * single-segment static files at the root (offline.html, index.html, favicon...).
+     * single-segment static files at the root (index.html, 404.html, favicon...).
      * Every other local path is a page of the main website, which the app does not
      * carry: it opens on www.r2bot.in in the system browser instead.
      */
