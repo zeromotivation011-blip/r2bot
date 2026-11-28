@@ -9,9 +9,10 @@
 // everything here, so other callers keep importing from there.
 
 import type { BandId } from './bands'
+import { profileKey } from './profiles'
 import { isBandId, isClassKind, isMixedKind, type JoinedClassInfo } from './classroom'
 
-/** A swapped key (lib/kids/profiles.ts SWAPPED_KEYS): always the playing child's. */
+/** Per child: always read through profileKey() (lib/kids/profiles.ts). */
 export const CLASS_MEMBERSHIP_KEY = 'r2bot_kids_class_v1'
 /** Fired on window when the membership is created, refreshed or removed. */
 export const KIDS_CLASS_EVENT = 'r2bot:kids-class'
@@ -24,7 +25,7 @@ export interface StoredMembership extends JoinedClassInfo {
 export function loadMembership(): StoredMembership | null {
   if (typeof window === 'undefined') return null
   try {
-    const raw = window.localStorage.getItem(CLASS_MEMBERSHIP_KEY)
+    const raw = window.localStorage.getItem(profileKey(CLASS_MEMBERSHIP_KEY))
     if (!raw) return null
     const o = JSON.parse(raw) as Partial<StoredMembership>
     if (typeof o.token !== 'string' || typeof o.className !== 'string' || typeof o.nickname !== 'string') return null

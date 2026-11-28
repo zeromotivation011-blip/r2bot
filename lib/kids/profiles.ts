@@ -8,24 +8,25 @@
 // profile with a picture password of 3 emojis; older children tap their
 // nickname (a picture password is optional for them).
 //
-// HOW DATA IS KEPT APART — two mechanisms, one rule each:
+// HOW DATA IS KEPT APART — one mechanism, one rule:
 //
-// 1. NAMESPACED keys (`PROFILE_KEY_BASES`: progress, robot, builds, Passport...). Readers ask
-//    profileKey(base) for the key. Member #1 ('p1', the child who used this
-//    device before profiles existed) keeps the ORIGINAL key, so the migration
-//    moves no data and cannot lose any. Every other profile uses
-//    `<base>::<profileId>`. With no one signed in (shared tablet between
-//    children) the key is `<base>::_none`, which "Done" and the next sign-in wipe
-//    (per-child bases only: see wipeNamespace).
+// Every per-child store asks profileKey(base) for its key (`PROFILE_KEY_BASES`,
+// and `PROFILE_KEY_PREFIXES` for stores with one key per item, e.g. a Code Lab
+// draft per mission). Member #1 ('p1', the child who used this device before
+// profiles existed) keeps the ORIGINAL key, so turning profiles on moves no
+// data and cannot lose any. Every other profile uses `<base>::<profileId>`.
+// With no one signed in (shared tablet between children) the key is
+// `<base>::_none`, which "Done" and the next sign-in wipe (see wipeNamespace).
+// A switch only changes `active`: no data is copied, so it is instant.
 //
-// 2. SWAPPED keys (`SWAPPED_KEYS` / `SWAPPED_PREFIXES`): stores owned by other
-//    files that read a fixed key (Skill Galaxy, course, hangar looks, class
-//    membership, Vision/Think labs, Code Lab drafts...). The ACTIVE profile's
-//    data sits at the plain key; switching copies it to `<key>::<oldId>` and
-//    brings `<key>::<newId>` back, all-or-nothing (rolled back on a storage
-//    error). Those files need no change to be per-profile.
-//    ⚠ If a reader of a swapped key starts calling profileKey(), REMOVE the key
-//    from SWAPPED_KEYS in the same commit, or the two mechanisms fight.
+// Until 28 Nov 2026 a second mechanism SWAPPED some stores (Skill Galaxy,
+// course, hangar looks, class membership, Vision/Think labs, Code Lab drafts,
+// game-seen and world flags): the ACTIVE child's data sat at the plain key and
+// the others' at `<key>::<id>`. Those stores now call profileKey() too.
+// migrateSwappedLayout() moves a device that still has the old layout, once,
+// before any store is read (readProfilesState runs it): the playing child's
+// data goes to their own namespace and member #1's comes back to the plain key.
+// `LEGACY_SWAPPED_*` lists those stores for the migration only.
 //
 // No state stored (most homes) = one implicit profile 'p1', plain keys: the
 // whole feature costs a single-child device nothing until a grown-up adds a
@@ -54,7 +55,8 @@ export const NAMESPACED_BASES = ['r2bot_kids_v2', 'r2bot_kids_robot_v1'] as cons
  * of these at the plain key, so removeProfile('p1') deletes each one; a base
  * missing here would survive the removal (the Passport words did, Nov 2026).
  * progress-backup.verify.ts (the profile-key check) fails CI if a profileKey()
- * call site uses a base that is not listed. Never list a SWAPPED_KEYS entry here.
+ * call site uses a base that is not listed (or, for a per-item key, a prefix
+ * not in PROFILE_KEY_PREFIXES).
  */
 export const PROFILE_KEY_BASES: readonly string[] = [
   ...NAMESPACED_BASES,
@@ -67,27 +69,53 @@ export const PROFILE_KEY_BASES: readonly string[] = [
   'r2bot_kids_class_misc_v1', // class misconception counts (lib/kids/classroom-diary.ts)
   'r2bot_kids_class_diary_v1', // class activity diary (lib/kids/classroom-diary.ts)
   'r2bot_kids_look_v1', // teen "R2BOT Lab" look (lib/kids/teen-boot.ts)
-]
-
-/** Per-child stores read by fixed key elsewhere; swapped on every switch. */
-export const SWAPPED_KEYS: readonly string[] = [
+  // Swapped until 28 Nov 2026 (see migrateSwappedLayout):
   'r2bot_kids_activities_v1', // Skill Galaxy done map (lib/kids/activities/progress.ts)
   'r2bot_kids_course_v1', // course state (components/kids/course/course-state.ts)
-  'r2bot_kids_build_day', // once-a-day build reward (rewards.ts)
-  'r2bot_kids_class_v1', // class membership token (classroom-membership.ts)
-  'r2bot_kids_class_missions_v1', // cached teacher missions
-  'r2bot_kids_class_powerup_v1', // cached Class Power-Up (classroom-membership.ts)
+  'r2bot_kids_build_day', // once-a-day build reward (lib/kids/universe/rewards.ts)
+  'r2bot_kids_class_v1', // class membership token (lib/kids/classroom-membership-store.ts)
+  'r2bot_kids_class_missions_v1', // cached teacher missions (lib/kids/classroom-membership.ts)
+  'r2bot_kids_class_powerup_v1', // cached Class Power-Up (lib/kids/classroom-membership.ts)
   'r2bot_kids_hangar_v1', // hangar looks (components/kids/hangar/cosmetics.ts)
-  'r2bot_kids_onboarded', // universe intro seen
-  'r2bot_kids_spark_reward_day', // Ask Spark daily reward
-  'r2bot_kids_vision_v1', // Vision Lab missions done
+  'r2bot_kids_onboarded', // universe intro seen (components/kids/universe/universe-state.ts)
+  'r2bot_kids_spark_reward_day', // Ask Spark daily reward (components/kids/ai/spark/SparkSheetClient.tsx)
+  'r2bot_kids_vision_v1', // Vision Lab missions done (lib/kids/ai/vision/missions.ts)
 ]
-export const SWAPPED_PREFIXES: readonly string[] = [
+
+/**
+ * Per-child stores with one key per item (`<prefix><item>`, e.g. one Code Lab
+ * draft per mission): profileKey(`<prefix>${item}`). Member #1 keeps the plain
+ * keys, so removeProfile('p1') deletes every plain key with one of these prefixes.
+ */
+export const PROFILE_KEY_PREFIXES: readonly string[] = [
   'r2bot_think_', // How Robots Think labs done (lib/kids/ai/think/common.ts)
-  'r2bot_kids_codelab_draft_', // Code Lab drafts (MissionClient)
-  'r2bot_game_seen_', // game intro seen (GameShellClient)
-  'r2bot_world_complete_', // World finished flags (worlds/*)
+  'r2bot_kids_codelab_draft_', // Code Lab drafts (components/kids/codelab/MissionClient.tsx)
+  'r2bot_game_seen_', // game intro seen (components/kids/ui/GameShellClient.tsx)
+  'r2bot_world_complete_', // World finished flags (components/kids/worlds/*)
 ]
+
+/**
+ * The stores the retired swap mechanism moved on every switch (before 28 Nov
+ * 2026). Read ONLY by migrateSwappedLayout(); every one of them is now a
+ * profileKey() store (listed above). Exported for the verify script.
+ */
+export const LEGACY_SWAPPED_KEYS: readonly string[] = [
+  'r2bot_kids_activities_v1',
+  'r2bot_kids_course_v1',
+  'r2bot_kids_build_day',
+  'r2bot_kids_class_v1',
+  'r2bot_kids_class_missions_v1',
+  'r2bot_kids_class_powerup_v1',
+  'r2bot_kids_hangar_v1',
+  'r2bot_kids_onboarded',
+  'r2bot_kids_spark_reward_day',
+  'r2bot_kids_vision_v1',
+]
+export const LEGACY_SWAPPED_PREFIXES: readonly string[] = PROFILE_KEY_PREFIXES
+
+/** Set once the device's stores are in the one-mechanism layout (see migrateSwappedLayout). */
+export const LAYOUT_KEY = 'r2bot_kids_profiles_layout'
+const LAYOUT_VERSION = '2'
 
 export type DeviceMode = 'home' | 'shared'
 
@@ -179,9 +207,15 @@ function allKeys(s: Storage): string[] {
   return out
 }
 
-function isSwappedBase(key: string): boolean {
+/** A per-child base: listed in PROFILE_KEY_BASES or starting with a PROFILE_KEY_PREFIXES entry. */
+export function isProfileBase(key: string): boolean {
   if (key.includes(SEP)) return false
-  return SWAPPED_KEYS.includes(key) || SWAPPED_PREFIXES.some((p) => key.startsWith(p))
+  return PROFILE_KEY_BASES.includes(key) || PROFILE_KEY_PREFIXES.some((p) => key.startsWith(p) && key.length > p.length)
+}
+
+function isLegacySwappedBase(key: string): boolean {
+  if (key.includes(SEP)) return false
+  return LEGACY_SWAPPED_KEYS.includes(key) || LEGACY_SWAPPED_PREFIXES.some((p) => key.startsWith(p) && key.length > p.length)
 }
 
 const ID_RE = /^p[0-9a-z]{1,12}$/
@@ -215,6 +249,28 @@ function cleanProfile(x: unknown): KidsProfile | null {
 
 let cache: { raw: string | null; state: ProfilesState | null } | null = null
 
+function parseState(raw: string | null): ProfilesState | null {
+  if (!raw) return null
+  try {
+    const o = JSON.parse(raw) as Record<string, unknown>
+    const profiles = Array.isArray(o.profiles) ? o.profiles.map(cleanProfile).filter((p): p is KidsProfile => !!p) : []
+    const seen = new Set<string>()
+    const unique = profiles.filter((p) => !seen.has(p.id) && (seen.add(p.id), true))
+    const active = typeof o.active === 'string' && unique.some((p) => p.id === o.active) ? o.active : null
+    return { v: 1, mode: o.mode === 'shared' ? 'shared' : 'home', active, profiles: unique }
+  } catch {
+    return null
+  }
+}
+
+function readStateRaw(s: Storage): ProfilesState | null {
+  try {
+    return parseState(s.getItem(PROFILES_KEY))
+  } catch {
+    return null
+  }
+}
+
 /** The stored state, or null when this device never set up profiles (one implicit child, 'p1'). */
 export function readProfilesState(): ProfilesState | null {
   const s = ls()
@@ -225,21 +281,13 @@ export function readProfilesState(): ProfilesState | null {
   } catch {
     return null
   }
-  if (cache && cache.raw === raw) return cache.state
-  let state: ProfilesState | null = null
-  if (raw) {
-    try {
-      const o = JSON.parse(raw) as Record<string, unknown>
-      const profiles = Array.isArray(o.profiles) ? o.profiles.map(cleanProfile).filter((p): p is KidsProfile => !!p) : []
-      const seen = new Set<string>()
-      const unique = profiles.filter((p) => !seen.has(p.id) && (seen.add(p.id), true))
-      const active = typeof o.active === 'string' && unique.some((p) => p.id === o.active) ? o.active : null
-      state = { v: 1, mode: o.mode === 'shared' ? 'shared' : 'home', active, profiles: unique }
-    } catch {
-      state = null
-    }
+  if (cache && cache.raw === raw) {
+    if (cache.state) ensureLayout(s, cache.state)
+    return cache.state
   }
+  const state = parseState(raw)
   cache = { raw, state }
+  if (state) ensureLayout(s, state)
   return state
 }
 
@@ -266,20 +314,146 @@ export function namespacedKey(base: string, profileId: string | null): string {
   return `${base}${SEP}${profileId ?? NO_PROFILE}`
 }
 
+/** Set only inside withProfile(): profileKey() answers for this profile instead of the player. */
+let override: { id: string | null } | null = null
+
 /** THE key for a per-child store, for whoever is playing now. */
 export function profileKey(base: string): string {
-  return namespacedKey(base, activeProfileId())
+  const active = activeProfileId() // also runs the one-time layout migration
+  return namespacedKey(base, override ? override.id : active)
 }
 
 /**
- * Where a per-child store of `profileId` lives right now, for either mechanism:
- * a swapped key is the plain key for the active profile and its stash otherwise.
+ * Where a per-child store of `profileId` lives. Since every per-child store
+ * uses profileKey() this is namespacedKey(); kept for the readers that ask a
+ * named profile's data (parent hub, Robodex), and it makes sure the one-time
+ * layout migration has run first.
  */
 export function storageKeyFor(base: string, profileId: string | null): string {
-  if (isSwappedBase(base)) {
-    return profileId !== null && profileId === activeProfileId() ? base : `${base}${SEP}${profileId ?? NO_PROFILE}`
-  }
+  readProfilesState()
   return namespacedKey(base, profileId)
+}
+
+/**
+ * Runs `fn` with profileKey() answering for `profileId` instead of whoever is
+ * playing, so a store's own reader/writer can serve one named profile (the
+ * parent hub's per-profile backup code: builds, portfolio, Robodex, looks).
+ * Synchronous only: `fn` must not await. Always restored, even if `fn` throws.
+ */
+export function withProfile<T>(profileId: string | null, fn: () => T): T {
+  const prev = override
+  override = { id: profileId }
+  try {
+    return fn()
+  } finally {
+    override = prev
+  }
+}
+
+// ── one-time move from the retired swap layout ──
+
+function ensureLayout(s: Storage, st: ProfilesState): void {
+  try {
+    if (s.getItem(LAYOUT_KEY) === LAYOUT_VERSION) return
+  } catch {
+    return
+  }
+  migrateSwappedLayout(s, st)
+}
+
+function markLayout(s: Storage): void {
+  s.setItem(LAYOUT_KEY, LAYOUT_VERSION)
+}
+
+/**
+ * Moves the stores the retired swap mechanism kept (LEGACY_SWAPPED_*) into
+ * the profileKey() layout. Under the swap the plain key held the PLAYING
+ * child's copy (or a guest's, with nobody signed in) and every other child's
+ * sat at `<key>::<id>`, member #1's included. After it: member #1's copy is at
+ * the plain key, every other child's (and a guest's: `::_none`) at their own
+ * namespace. Nobody's data is merged with anybody else's, nothing is dropped.
+ * All-or-nothing: on a storage error every key is put back and the marker is
+ * not set, so the next read tries again. Runs once (LAYOUT_KEY); a second run
+ * is a no-op. Exported for the verify script; readers never call it.
+ */
+export function migrateSwappedLayout(s: Storage | null = ls(), st: ProfilesState | null = null): boolean {
+  if (!s) return false
+  try {
+    if (s.getItem(LAYOUT_KEY) === LAYOUT_VERSION) return true
+  } catch {
+    return false
+  }
+  const state = st ?? readStateRaw(s)
+  if (!state) return false
+  // Three phases, in this order, so a run cut short (and not rolled back) can
+  // safely run again: 1. copy each playing child's data home, 2. put member
+  // #1's copy at the plain key, 3. drop member #1's old `::p1` copy.
+  const home = new Map<string, string>()
+  const plain = new Map<string, string | null>()
+  const drop: string[] = []
+  const bases = new Set<string>()
+  for (const k of allKeys(s)) {
+    const i = k.indexOf(SEP)
+    const base = i < 0 ? k : k.slice(0, i)
+    if (isLegacySwappedBase(base)) bases.add(base)
+  }
+  const get = (k: string): string | null => {
+    try {
+      return s.getItem(k)
+    } catch {
+      return null
+    }
+  }
+  const legacy = `${SEP}${LEGACY_PROFILE_ID}`
+  for (const base of bases) {
+    const live = get(base)
+    const p1 = get(`${base}${legacy}`)
+    if (state.active === LEGACY_PROFILE_ID) {
+      // Member #1 is playing: the plain key is already theirs. A leftover
+      // `::p1` copy means a switch was interrupted; the live copy wins.
+      if (p1 !== null) {
+        if (live === null) plain.set(base, p1)
+        drop.push(`${base}${legacy}`)
+      }
+      continue
+    }
+    // The plain key holds the playing child's (or the guest's) copy: move it home.
+    const ownKey = `${base}${SEP}${state.active ?? NO_PROFILE}`
+    // live === p1 with a copy already home: phase 2 ran for this key before
+    // (an earlier run was cut short); the plain key is member #1's already.
+    if (live !== null && !(live === p1 && get(ownKey) !== null)) home.set(ownKey, live)
+    // Member #1's copy comes back to the plain key (none: the plain key is emptied).
+    plain.set(base, p1)
+    if (p1 !== null) drop.push(`${base}${legacy}`)
+  }
+  const touched = new Set<string>([...home.keys(), ...plain.keys(), ...drop])
+  const before = new Map<string, string | null>()
+  for (const k of touched) before.set(k, get(k))
+  try {
+    for (const [k, v] of home) s.setItem(k, v)
+    for (const [k, v] of plain) {
+      if (v === null) s.removeItem(k)
+      else s.setItem(k, v)
+    }
+    for (const k of drop) s.removeItem(k)
+    markLayout(s)
+    return true
+  } catch {
+    // Put member #1's and the plain keys back. The copies made home in phase 1
+    // stay: they equal the live data, so the next run rewrites them unchanged,
+    // and if this rollback itself fails part-way, they are what keeps the
+    // playing child's data safe (see the `live === p1` guard above).
+    for (const k of [...plain.keys(), ...drop]) {
+      const v = before.get(k) ?? null
+      try {
+        if (v === null) s.removeItem(k)
+        else s.setItem(k, v)
+      } catch {
+        /* ignore */
+      }
+    }
+    return false
+  }
 }
 
 // ── reading the original child's details (no import of kids-progress) ──
@@ -329,10 +503,7 @@ function newId(existing: KidsProfile[]): string {
  */
 export function ensureProfiles(): ProfilesState {
   const cur = readProfilesState()
-  if (cur) {
-    repair(cur)
-    return cur
-  }
+  if (cur) return cur
   const seed = legacySeed()
   const t = nowIso()
   const state: ProfilesState = {
@@ -353,6 +524,14 @@ export function ensureProfiles(): ProfilesState {
         pending: [],
       },
     ],
+  }
+  // A device that turns profiles on now starts in the one-mechanism layout:
+  // nothing to migrate (member #1 keeps every plain key).
+  const ls0 = ls()
+  try {
+    ls0?.setItem(LAYOUT_KEY, LAYOUT_VERSION)
+  } catch {
+    /* the migration is a no-op for member #1 anyway */
   }
   writeState(state)
   fire(KIDS_PROFILE_EVENT)
@@ -379,31 +558,13 @@ export function activeProfile(): KidsProfile | null {
   return st ? getProfile(st.active, st) : null
 }
 
-// ── swapping the fixed-key stores ──
-
-/** Leftover stash keys for the ACTIVE profile mean a switch was interrupted. */
-function repair(st: ProfilesState): void {
-  const s = ls()
-  if (!s || !st.active) return
-  const suffix = `${SEP}${st.active}`
-  for (const k of allKeys(s)) {
-    if (!k.endsWith(suffix)) continue
-    const base = k.slice(0, -suffix.length)
-    if (!isSwappedBase(base)) continue
-    try {
-      const v = s.getItem(k)
-      if (s.getItem(base) === null && v !== null) s.setItem(base, v)
-      s.removeItem(k)
-    } catch {
-      /* ignore */
-    }
-  }
-}
+// ── switching ──
 
 /**
- * Switch who is playing (null = back to the picker). All-or-nothing: on a
- * storage error nothing changes and false is returned. Fires every store's
- * change event so open screens re-read.
+ * Switch who is playing (null = back to the picker). Every per-child store is
+ * keyed by profileKey(), so nothing is copied: only `active` changes, which is
+ * one write (instant, and nothing to roll back). Fires every store's change
+ * event so open screens re-read.
  */
 export function switchProfile(to: string | null): boolean {
   const s = ls()
@@ -412,77 +573,13 @@ export function switchProfile(to: string | null): boolean {
   if (to !== null && !st.profiles.some((p) => p.id === to)) return false
   const from = st.active
   if (from === to) return true
-  const fromNs = from ?? NO_PROFILE
-  const toNs = to ?? NO_PROFILE
-  const keys = allKeys(s)
-  const canonical = keys.filter(isSwappedBase)
-  const written: string[] = []
-  // 1. Stash the current child's stores (copy). Any error: undo, change nothing.
-  try {
-    for (const k of keys) {
-      // Drop an old stash for `from` that the live data no longer has.
-      if (k.endsWith(`${SEP}${fromNs}`) && isSwappedBase(k.slice(0, -(SEP.length + fromNs.length))) && !canonical.includes(k.slice(0, -(SEP.length + fromNs.length)))) {
-        s.removeItem(k)
-      }
-    }
-    if (from !== null) {
-      for (const k of canonical) {
-        const v = s.getItem(k)
-        if (v === null) continue
-        s.setItem(`${k}${SEP}${fromNs}`, v)
-        written.push(`${k}${SEP}${fromNs}`)
-      }
-    }
-  } catch {
-    for (const k of written) {
-      try { s.removeItem(k) } catch { /* ignore */ }
-    }
-    return false
+  const t = nowIso()
+  const next: ProfilesState = {
+    ...st,
+    active: to,
+    profiles: st.profiles.map((p) => (p.id === to ? { ...p, lastUsedAt: t } : p)),
   }
-  // 2. Clear the live stores and bring the next child's back.
-  const snapshot = new Map<string, string>()
-  for (const k of canonical) {
-    const v = s.getItem(k)
-    if (v !== null) snapshot.set(k, v)
-  }
-  try {
-    for (const k of canonical) s.removeItem(k)
-    const suffix = `${SEP}${toNs}`
-    if (to !== null) {
-      for (const k of allKeys(s)) {
-        if (!k.endsWith(suffix)) continue
-        const base = k.slice(0, -suffix.length)
-        if (!isSwappedBase(base)) continue
-        const v = s.getItem(k)
-        if (v !== null) s.setItem(base, v)
-      }
-    }
-    const t = nowIso()
-    const next: ProfilesState = {
-      ...st,
-      active: to,
-      profiles: st.profiles.map((p) => (p.id === to ? { ...p, lastUsedAt: t } : p)),
-    }
-    if (!writeState(next)) throw new Error('state')
-  } catch {
-    // Roll back: live stores exactly as they were, stash of `from` dropped.
-    try {
-      for (const k of allKeys(s)) if (isSwappedBase(k)) s.removeItem(k)
-      for (const [k, v] of snapshot) s.setItem(k, v)
-      for (const k of written) s.removeItem(k)
-    } catch {
-      /* ignore */
-    }
-    return false
-  }
-  // 3. The next child's stash is now live: drop it.
-  if (to !== null) {
-    for (const k of allKeys(s)) {
-      if (k.endsWith(`${SEP}${toNs}`) && isSwappedBase(k.slice(0, -(SEP.length + toNs.length)))) {
-        try { s.removeItem(k) } catch { /* ignore */ }
-      }
-    }
-  }
+  if (!writeState(next)) return false
   // Nobody signed in: wipe whatever a guest left in the "_none" namespace.
   if (to === null || from === null) wipeNamespace(NO_PROFILE)
   announceSwitch()
@@ -491,8 +588,8 @@ export function switchProfile(to: string | null): boolean {
 
 /**
  * Removes one namespace of the PER-CHILD stores only: a `profileKey()` base
- * (PROFILE_KEY_BASES: progress, robot, Flight Recorder ghosts…) or a swapped
- * stash. It used to remove every key ending in `::<ns>`, so a store this file
+ * (PROFILE_KEY_BASES: progress, robot, Flight Recorder ghosts…, or a
+ * PROFILE_KEY_PREFIXES per-item key). It used to remove every key ending in `::<ns>`, so a store this file
  * does not own that happened to end in `::_none` was wiped by "Done" too.
  * Each child's own namespace (`::<id>`, or the plain keys of member #1) is
  * never touched here, so a child's ghosts survive "Done" and come back when
@@ -505,7 +602,7 @@ function wipeNamespace(ns: string): void {
   for (const k of allKeys(s)) {
     if (!k.endsWith(suffix)) continue
     const base = k.slice(0, -suffix.length)
-    if (!PROFILE_KEY_BASES.includes(base) && !isSwappedBase(base)) continue
+    if (!isProfileBase(base)) continue
     try { s.removeItem(k) } catch { /* ignore */ }
   }
 }
@@ -590,8 +687,9 @@ export function removeProfile(id: string): boolean {
   }
   if (id === LEGACY_PROFILE_ID) {
     // p1 keeps every profileKey() store at the plain key (namespacedKey).
-    for (const base of PROFILE_KEY_BASES) {
-      try { s.removeItem(base) } catch { /* ignore */ }
+    for (const k of allKeys(s)) {
+      if (!isProfileBase(k)) continue
+      try { s.removeItem(k) } catch { /* ignore */ }
     }
   }
   writeState({ ...st, profiles: st.profiles.filter((p) => p.id !== id) })

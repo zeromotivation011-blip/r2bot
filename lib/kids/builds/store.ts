@@ -2,7 +2,7 @@
 // The child's Make It at Home check-ins (roadmap #44): which builds they made,
 // when, what their "try one change" test showed and (teens) a one-line
 // reflection. Device-only localStorage, one store per child via profileKey()
-// (so NOT in SWAPPED_KEYS). No photos, no names: a build id, a day, a choice.
+// (the one per-child mechanism). No photos, no names: a build id, a day, a choice.
 //
 // Rewards are NOT decided here: the check-in reports kind 'project' through
 // reportBestRun (lib/kids/universe/rewards.ts), first finish only.

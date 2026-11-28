@@ -33,7 +33,7 @@ import { createPassport, loadSavedPassport, openPassport, rememberPassport, save
 import { qrMatrix, qrSvgPath } from '@/lib/kids/teach/qr'
 import { requireGrownUp } from '@/components/kids/app/ParentalGateClient'
 import { deletePassportAsGrownUp } from './passport-delete'
-import { EMPTY_COSMETICS, loadCosmetics, saveCosmetics, type HangarCosmetics } from './cosmetics'
+import { looksBackupExtra, restoreLooksExtra } from './cosmetics'
 
 /** Finds a backup code inside any pasted text or downloaded file. */
 const CODE_IN_TEXT = /R2K\d+\.[zj]\.[A-Za-z0-9_-]+\.[0-9a-f]{8}/i
@@ -56,30 +56,6 @@ const secondary = `${btn} border border-white/15 bg-white/[0.06] text-white hove
 function today(): string {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-function looksExtra(): string {
-  const c = loadCosmetics()
-  return JSON.stringify({ d: c.decal, t: c.trail, s: c.skin, w: c.workshopColour, b: c.booster || undefined })
-}
-
-function restoreLooks(raw: string | undefined): boolean {
-  if (!raw) return false
-  const cur = loadCosmetics()
-  if (cur.decal || cur.trail || cur.skin || cur.workshopColour || cur.booster) return false
-  try {
-    const o: unknown = JSON.parse(raw)
-    if (!o || typeof o !== 'object') return false
-    const r = o as Record<string, unknown>
-    const s = (x: unknown) => (typeof x === 'string' && x.length < 64 ? x : null)
-    const next: HangarCosmetics = { ...EMPTY_COSMETICS, decal: s(r.d), trail: s(r.t), skin: s(r.s), workshopColour: s(r.w), booster: r.b === true }
-    if (!next.decal && !next.trail && !next.skin && !next.workshopColour && !next.booster) return false
-    // loadCosmetics() and ownedOnly() re-validate on every read, so a stale id is harmless.
-    saveCosmetics(next)
-    return true
-  } catch {
-    return false
-  }
 }
 
 function restoreRobot(code: string | undefined): boolean {
@@ -122,7 +98,7 @@ async function buildBackupCode(): Promise<string> {
     import('@/components/kids/portfolio/portfolio-store'),
   ])
   return exportProgressCode({
-    extras: { robot: encodeDesign(loadDesign()), looks: looksExtra(), robodex: robodexBackupExtra(), builds: buildsBackupExtra(), portfolio: portfolioBackupExtra() },
+    extras: { robot: encodeDesign(loadDesign()), looks: looksBackupExtra(), robodex: robodexBackupExtra(), builds: buildsBackupExtra(), portfolio: portfolioBackupExtra() },
   })
 }
 
@@ -132,7 +108,7 @@ async function applyBackup(text: string): Promise<Exclude<Status, { kind: 'idle'
   const r = await importProgressCode(found ? found[0] : text)
   if (!r.ok) return { kind: 'error', text: FAIL[r.reason] }
   const robot = restoreRobot(r.extras.robot)
-  restoreLooks(r.extras.looks)
+  restoreLooksExtra(r.extras.looks)
   if (r.extras.robodex) {
     const { restoreRobodexExtra } = await import('@/lib/kids/robodex/store')
     restoreRobodexExtra(r.extras.robodex)

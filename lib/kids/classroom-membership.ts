@@ -22,18 +22,17 @@ import { CONCEPT_IDS, conceptGridCode, conceptStates } from './universe/mastery'
 import { clearClassDiary, misconceptionCounts, workDays } from './classroom-diary'
 import type { ChildPowerUp } from './classroom-goal'
 import type { BandId } from './bands'
-import { applyClassBandToProfile } from './profiles'
+import { applyClassBandToProfile, profileKey } from './profiles'
 import { CLASS_MEMBERSHIP_KEY, KIDS_CLASS_EVENT, classBandLock, inMixedClass, loadMembership, type StoredMembership } from './classroom-membership-store'
 
-const KEY = CLASS_MEMBERSHIP_KEY
-/** components/kids/course/course-state.ts COURSE_KEY (read-only here; a swapped key, so it is the playing child's). */
+/** components/kids/course/course-state.ts COURSE_KEY (read-only here; per child through profileKey()). */
 const COURSE_KEY = 'r2bot_kids_course_v1'
 // The read side lives in classroom-membership-store.ts (light enough for the shell).
 export { KIDS_CLASS_EVENT, classBandLock, inMixedClass, loadMembership, type StoredMembership }
 
 export function saveMembership(m: StoredMembership): void {
   try {
-    window.localStorage.setItem(KEY, JSON.stringify(m))
+    window.localStorage.setItem(profileKey(CLASS_MEMBERSHIP_KEY), JSON.stringify(m))
     window.dispatchEvent(new CustomEvent(KIDS_CLASS_EVENT))
   } catch {
     /* storage blocked: the child can still play, they just won't sync */
@@ -42,9 +41,9 @@ export function saveMembership(m: StoredMembership): void {
 
 export function clearMembership(): void {
   try {
-    window.localStorage.removeItem(KEY)
-    window.localStorage.removeItem(MISSIONS_KEY)
-    window.localStorage.removeItem(POWER_UP_KEY)
+    window.localStorage.removeItem(profileKey(CLASS_MEMBERSHIP_KEY))
+    window.localStorage.removeItem(profileKey(MISSIONS_KEY))
+    window.localStorage.removeItem(profileKey(POWER_UP_KEY))
     clearClassDiary()
     window.dispatchEvent(new CustomEvent(KIDS_CLASS_EVENT))
   } catch {
@@ -160,7 +159,7 @@ export function buildSnapshot(): ClassSnapshot {
 function courseStuckSessions(): Record<string, number> {
   const out: Record<string, number> = {}
   try {
-    const raw = window.localStorage.getItem(COURSE_KEY)
+    const raw = window.localStorage.getItem(profileKey(COURSE_KEY))
     if (!raw) return out
     const o = JSON.parse(raw) as { sessions?: Record<string, { challengeAttempts?: unknown; challengeStars?: unknown; done?: unknown }> }
     const rows = Object.entries(o.sessions ?? {})
@@ -190,7 +189,7 @@ export interface CachedMissions {
 export function loadMissions(): CachedMissions | null {
   if (typeof window === 'undefined') return null
   try {
-    const raw = window.localStorage.getItem(MISSIONS_KEY)
+    const raw = window.localStorage.getItem(profileKey(MISSIONS_KEY))
     if (!raw) return null
     const o = JSON.parse(raw) as Partial<CachedMissions>
     if (!Array.isArray(o.missions) || typeof o.at !== 'string') return null
@@ -208,7 +207,7 @@ export function loadMissions(): CachedMissions | null {
 
 function saveMissions(missions: ChildMission[]): void {
   try {
-    window.localStorage.setItem(MISSIONS_KEY, JSON.stringify({ at: new Date().toISOString(), missions }))
+    window.localStorage.setItem(profileKey(MISSIONS_KEY), JSON.stringify({ at: new Date().toISOString(), missions }))
     window.dispatchEvent(new CustomEvent(KIDS_MISSIONS_EVENT))
   } catch {
     /* storage blocked: the card simply shows what came back this time */
@@ -311,7 +310,7 @@ export const KIDS_POWER_UP_EVENT = 'r2bot:kids-powerup'
 export function loadPowerUp(): ChildPowerUp | null {
   if (typeof window === 'undefined') return null
   try {
-    const raw = window.localStorage.getItem(POWER_UP_KEY)
+    const raw = window.localStorage.getItem(profileKey(POWER_UP_KEY))
     if (!raw) return null
     const o = JSON.parse(raw) as { p?: ChildPowerUp | null }
     const p = o.p
@@ -324,8 +323,8 @@ export function loadPowerUp(): ChildPowerUp | null {
 
 function savePowerUp(p: ChildPowerUp | null): void {
   try {
-    if (p) window.localStorage.setItem(POWER_UP_KEY, JSON.stringify({ at: new Date().toISOString(), p }))
-    else window.localStorage.removeItem(POWER_UP_KEY)
+    if (p) window.localStorage.setItem(profileKey(POWER_UP_KEY), JSON.stringify({ at: new Date().toISOString(), p }))
+    else window.localStorage.removeItem(profileKey(POWER_UP_KEY))
     window.dispatchEvent(new CustomEvent(KIDS_POWER_UP_EVENT))
   } catch {
     /* storage blocked: the card shows what came back this time */

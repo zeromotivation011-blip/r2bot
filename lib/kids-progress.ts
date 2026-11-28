@@ -508,9 +508,9 @@ function cleanActivities(x: unknown): Record<string, BackupActivityRecord> {
   return out
 }
 
-/** Where a profile's Skill Galaxy map lives now (live key when active, its stash otherwise). */
+/** Where a profile's Skill Galaxy map lives (per child, lib/kids/profiles.ts); default: whoever is playing. */
 function activitiesKey(profileId?: string | null): string {
-  return profileId === undefined ? BACKUP_ACTIVITIES_KEY : storageKeyFor(BACKUP_ACTIVITIES_KEY, profileId)
+  return profileId === undefined ? profileKey(BACKUP_ACTIVITIES_KEY) : storageKeyFor(BACKUP_ACTIVITIES_KEY, profileId)
 }
 
 function readActivities(profileId?: string | null): Record<string, BackupActivityRecord> {

@@ -10,10 +10,12 @@
 // KIDS_PROGRESS_EVENT after each save so every listener refreshes.
 
 import { KIDS_PROGRESS_EVENT, getProgress, saveProgress } from '../../kids-progress'
+import { profileKey } from '../profiles'
 import { BAND_ORDER, type BandId } from '../bands'
 import { applyConceptTry, conceptStates, dayNumber, type ConceptId, type ConceptState, type ConceptTry, type MasteryData } from '../universe/mastery'
 import { TRACKS, type Activity, type TemplateId, type TrackId } from './types'
 
+/** Per child: always read through profileKey(ACTIVITIES_KEY) (lib/kids/profiles.ts). */
 export const ACTIVITIES_KEY = 'r2bot_kids_activities_v1'
 
 export interface ActivityRecord {
@@ -58,7 +60,7 @@ export function summarize(a: Activity): ActivitySummary {
 export function getActivitiesDone(): ActivitiesDone {
   if (typeof window === 'undefined') return {}
   try {
-    const raw = window.localStorage.getItem(ACTIVITIES_KEY)
+    const raw = window.localStorage.getItem(profileKey(ACTIVITIES_KEY))
     if (!raw) return {}
     const parsed: unknown = JSON.parse(raw)
     if (!parsed || typeof parsed !== 'object') return {}
@@ -169,7 +171,7 @@ export function recordActivityResult(
   const next = { ...all, [id]: record }
   if (typeof window !== 'undefined') {
     try {
-      window.localStorage.setItem(ACTIVITIES_KEY, JSON.stringify(next))
+      window.localStorage.setItem(profileKey(ACTIVITIES_KEY), JSON.stringify(next))
     } catch {
       /* storage full or blocked: progress just isn't kept */
     }

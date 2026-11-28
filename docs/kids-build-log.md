@@ -201,7 +201,7 @@ Still open from batch A:
 - [x] #89 the fixed "what's next" strip in the shell (`NextStripClient`, Calm only) — Wave 3 F.
 - [ ] (Deliberate, unchanged) Swarm Reef and Bio-Bots keep fixed limits on purpose (simulated mission time is part of the puzzle) — revisit if teachers ask.
 - [x] Episode `fx.ts` and the canvas worlds' own effects follow Calm (`kidsCalm()` in fx, the seven worlds drop bounce/pulse) — Wave 3 F.
-- [ ] (Standing rule) Owners of swapped stores (activities, course, hangar, classroom membership, think, vision, codelab, worlds): moving to `profileKey()` must remove the key from `SWAPPED_KEYS` in the same commit.
+- [x] (Standing rule) Owners of swapped stores (activities, course, hangar, classroom membership, think, vision, codelab, worlds): moving to `profileKey()` must remove the key from `SWAPPED_KEYS` in the same commit. — Done: every swapped store moved to `profileKey()` and the swap mechanism was removed in Wave 4 H.
 - [x] activities/verify warning: "variables" has a single template for Explorers — `number-box` template + `code-ex-11`…`17` (Wave 4 G).
 
 ## 27 Nov 2026 — Wave 2, batch B (courses 2–4, Robodex, makers, robot depth, recorder, battery)
@@ -265,8 +265,8 @@ Still open from batch C:
 - [x] #84 class kind (school / club / family / library), migration **0059** — Wave 4 G.
 - [ ] #43 Founder to confirm "database region and DPA on request" wording in the Trust Pack.
 - [x] Robodex `build` trigger: an "I built it" check-in discovers the build's card (`lib/kids/builds/robodex.ts`) — Wave 4 G.
-- [ ] Per-profile export in the parent hub (`ParentProfilesClient`) does not carry the builds/portfolio extras yet
-  (Hangar backup does).
+- [x] Per-profile export in the parent hub (`ParentProfilesClient`) does not carry the builds/portfolio extras yet
+  (Hangar backup does). — Wave 4 H: robot, looks, Robodex, builds and portfolio ride along via `withProfile()`.
 - [ ] Portfolio reflections and build reflections are deliberately not in the backup code (free text stays
   on the device).
 - [x] #29 "Teacher locks a child's band" — Wave 3 F.
@@ -478,8 +478,31 @@ Five owners built; the integrator applied the cross-owner changes. Contracts are
 Founder: run **0059_kids_class_kind.sql** after 0058. Until then every class reads as a school class and a
 leader's chosen kind waits on their device; everything else works.
 
-Left open (and why): per-profile export in the parent hub still lacks the builds/portfolio extras (each store
-would need a profile-aware reader); the scoop/claw model does not animate to the high carry position (the
+Left open (and why): ~~per-profile export in the parent hub still lacks the builds/portfolio extras~~ (done in
+Wave 4 H); the scoop/claw model does not animate to the high carry position (the
 load is drawn where the physics puts it); real WebXR AR cannot run in headless Chromium (same verified
 builder as the magic window); native review of Hindi/Spanish Spark replies and a real-phone offline run
 need people; migrations 0056–0059 wait on the founder.
+
+## 28 Nov 2026 — Wave 4, batch H (one per-child mechanism: profileKey everywhere)
+
+- [x] **Swap mechanism retired.** `SWAPPED_KEYS`/`SWAPPED_PREFIXES`, `repair()` and the copy/stash code in
+  `switchProfile` are gone; every per-child store uses `profileKey(base)` (fixed keys in `PROFILE_KEY_BASES`,
+  per-item keys `think`, `codelab_draft`, `game_seen`, `world_complete` in `PROFILE_KEY_PREFIXES`). A switch is
+  one write to `active`. Readers moved: activities, rewards, classroom membership/diary, vision missions, think,
+  course and universe state, Spark sheet, Code Lab mission, game shell, all seven World clients.
+- [x] **One-time migration** `migrateSwappedLayout()` (marker `r2bot_kids_profiles_layout`) on the first
+  `readProfilesState()` of a multi-profile device: the playing child's plain-key copy moves to `::<id>` (nobody
+  playing → `::_none`, wiped at the next sign-in as before) and `p1`'s `::p1` copy comes home. Three ordered
+  phases, rollback on a storage error, idempotent; a single-child device writes nothing.
+- [x] **Per-profile export/import** in the parent hub carries robot, looks, Robodex, builds and portfolio
+  through `withProfile(id, fn)` (synchronous; always restores the player). Reflections never ride along.
+  `looksBackupExtra`/`restoreLooksExtra` now live in `cosmetics.ts`; the Garage backup card uses them too.
+- [x] Galaxy cross-tab listener matches namespaced keys (`startsWith`), stale "SWAPPED" comments removed.
+- [x] Tests: `progress-backup.verify.ts` rebuilds the old swap layout (p1, Kai, Ada; each playing, and nobody),
+  interrupted switch, storage error mid-migration and in the rollback, backup codes after the move,
+  `withProfile` extras, and a source scan that no formerly swapped store is read at its bare key.
+
+Left open (and why): a tab still running old cached code (the PWA service worker) that switches profile after
+the migration could swap keys the old way once more; new code cannot guard old code. The service worker
+refreshes on the next load, so the window is one stale session.

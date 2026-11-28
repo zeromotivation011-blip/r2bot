@@ -10,7 +10,7 @@
 // CSS: app/kids/kids-teen.css. Runtime: lib/kids/teen.ts + KidsLookSyncClient.
 
 export const KIDS_LOOK_EVENT = 'r2bot:kids-look'
-/** Per child: stored under profileKey(KIDS_LOOK_KEY) (lib/kids/profiles.ts), never in SWAPPED_KEYS. */
+/** Per child: stored under profileKey(KIDS_LOOK_KEY) (lib/kids/profiles.ts). */
 export const KIDS_LOOK_KEY = 'r2bot_kids_look_v1'
 export const KIDS_BAND_ATTR = 'data-kids-band'
 export const KIDS_LOOK_ATTR = 'data-kids-look'

@@ -12,8 +12,8 @@
 // text into a program.
 //
 // Drafts: the old tap editor stored a bare `Block[]` under
-// `r2bot_kids_codelab_draft_<mission>`. The key is unchanged (it is in
-// SWAPPED_PREFIXES, so profiles keep swapping it); the value is now
+// `r2bot_kids_codelab_draft_<mission>`. The key base is unchanged (per child via
+// profileKey(), prefix in PROFILE_KEY_PREFIXES); the value is now
 // `{ format: 'codelab-blockly-1', workspace }`. `readDraft` accepts both and
 // converts the old one on load, so no child loses a half-built program.
 

@@ -20,6 +20,7 @@
 
 import type { KidsProgress } from '@/lib/kids-progress'
 import { UNLOCKS, getBadge, levelInfo, type Unlock } from '@/lib/kids/universe/rewards'
+import { profileKey } from '@/lib/kids/profiles'
 
 export const HANGAR_KEY = 'r2bot_kids_hangar_v1'
 export const HANGAR_CHANGED_EVENT = 'r2bot:kids-hangar'
@@ -50,7 +51,7 @@ function str(x: unknown): string | null {
 export function loadCosmetics(): HangarCosmetics {
   if (typeof window === 'undefined') return { ...EMPTY_COSMETICS }
   try {
-    const raw = window.localStorage.getItem(HANGAR_KEY)
+    const raw = window.localStorage.getItem(profileKey(HANGAR_KEY))
     if (!raw) return { ...EMPTY_COSMETICS }
     const o: unknown = JSON.parse(raw)
     if (!o || typeof o !== 'object') return { ...EMPTY_COSMETICS }
@@ -65,10 +66,40 @@ export function loadCosmetics(): HangarCosmetics {
 export function saveCosmetics(c: HangarCosmetics): void {
   if (typeof window === 'undefined') return
   try {
-    window.localStorage.setItem(HANGAR_KEY, JSON.stringify(c))
+    window.localStorage.setItem(profileKey(HANGAR_KEY), JSON.stringify(c))
     window.dispatchEvent(new CustomEvent(HANGAR_CHANGED_EVENT))
   } catch {
     /* storage blocked: the look simply is not remembered */
+  }
+}
+
+// ── Backup code (`extras.looks`, the same format BackupCodeClient writes) ──
+
+/** The playing child's looks as a short string for the progress backup code. */
+export function looksBackupExtra(c: HangarCosmetics = loadCosmetics()): string {
+  return JSON.stringify({ d: c.decal, t: c.trail, s: c.skin, w: c.workshopColour, b: c.booster || undefined })
+}
+
+/**
+ * Restores looks from a backup code, only onto a child with no looks yet (a
+ * restore never overwrites a choice made on this device). Returns true when saved.
+ */
+export function restoreLooksExtra(raw: string | undefined): boolean {
+  if (!raw) return false
+  const cur = loadCosmetics()
+  if (cur.decal || cur.trail || cur.skin || cur.workshopColour || cur.booster) return false
+  try {
+    const o: unknown = JSON.parse(raw)
+    if (!o || typeof o !== 'object') return false
+    const r = o as Record<string, unknown>
+    const wc = str(r.w)
+    const next: HangarCosmetics = { decal: str(r.d), trail: str(r.t), skin: str(r.s), workshopColour: wc && HEX.test(wc) ? wc : null, booster: r.b === true }
+    if (!next.decal && !next.trail && !next.skin && !next.workshopColour && !next.booster) return false
+    // loadCosmetics() and ownedOnly() re-validate on every read, so a stale id is harmless.
+    saveCosmetics(next)
+    return true
+  } catch {
+    return false
   }
 }
 

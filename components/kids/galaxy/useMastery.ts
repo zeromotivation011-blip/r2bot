@@ -42,7 +42,7 @@ export function useMastery(): MasteryView {
     }
     read()
     const onStorage = (e: StorageEvent) => {
-      if (!e.key || e.key === 'r2bot_kids_v2') read()
+      if (!e.key || e.key.startsWith('r2bot_kids_v2')) read()
     }
     window.addEventListener(KIDS_PROGRESS_EVENT, read)
     window.addEventListener('storage', onStorage)

@@ -1,6 +1,6 @@
 // lib/kids/makers/heard.ts — which Maker stories this child has heard or read.
 //
-// Browser-only, per child through profileKey() (not in SWAPPED_KEYS). Stores
+// Browser-only, per child through profileKey(). Stores
 // only maker ids from MAKERS; nothing personal. Used for the "Meet the Makers"
 // badge and to mark stories already heard.
 

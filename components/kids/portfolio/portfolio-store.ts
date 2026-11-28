@@ -2,7 +2,7 @@
 // The portfolio's own small store (roadmap #45): robot snapshots (the robot's
 // share code + the day, so the portfolio shows how the robot grew) and teens'
 // one-line reflections on portfolio items. Device-only localStorage, one store
-// per child via profileKey() (so NOT in SWAPPED_KEYS). Never a photo, never a
+// per child via profileKey(). Never a photo, never a
 // name: share codes keep only letters and numbers of the robot's own name.
 // Everything else in the portfolio is READ from the existing stores.
 

@@ -8,7 +8,7 @@
 //  - Decided per child: band 'engineers' → 'lab', anything else → 'kids', unless
 //    the child chose otherwise (a younger child may opt into the Lab look, a teen
 //    may keep the Kids look). The choice lives on the device, per child
-//    (profileKey(KIDS_LOOK_KEY)); it is NOT in SWAPPED_KEYS.
+//    (profileKey(KIDS_LOOK_KEY)).
 //  - <html data-kids-look> is set before paint by KIDS_LOOK_BOOT_SCRIPT
 //    (lib/kids/teen-boot.ts) and kept in step by KidsLookSyncClient.
 //  - The installed PWA keeps one manifest (`short_name` cannot change per band),

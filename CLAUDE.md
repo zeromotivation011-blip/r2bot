@@ -172,7 +172,7 @@ Build these exceptionally; everything else is secondary.
   colour-safe, calm, more time/untimed, switch scanning, Lite 3D; hooks `useKidsSettings`, `useKidsReducedMotion`,
   `useKidsLite3D`, `useKidsCalm`, `useKidsTime`, `liteDpr()`, `kidsRenderHints()`; every child-facing timer goes through
   `kidsTimeLimit()`; a tap-only shape needs role+tabIndex+Enter or `data-keyboard-twin`), **Profiles** (`lib/kids/profiles.ts`:
-  siblings / shared tablets on one device; a new per-child store uses `profileKey()` OR `SWAPPED_KEYS`, never both),
+  siblings / shared tablets on one device; every per-child store uses `profileKey()`, per-item prefixes in `PROFILE_KEY_PREFIXES`; the old swap layout migrates once),
   **Mastery** (activity `concepts`, secure/fading in `lib/kids/universe/mastery.ts`, Recharge missions, Launch Check;
   hints cap a finish at 2 stars via the one `HintLadderClient`), and the **progress backup code** (`exportProgressCode`/`importProgressCode` in
   `lib/kids-progress.ts`, UI `components/kids/hangar/BackupCodeClient.tsx` in the Garage and Settings: no personal data,

@@ -14,6 +14,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { getActivitiesDone, type ActivitiesDone } from '@/lib/kids/activities/progress'
 import { KIDS_PROGRESS_EVENT, getProgress } from '@/lib/kids-progress'
+import { profileKey } from '@/lib/kids/profiles'
 import { TIER_NAMES } from '@/lib/kids/universe/tiers'
 import { fireConfetti } from '@/components/kids/Confetti'
 // Calm mode (roadmap #89): no bouncing or pulsing of the world's own (fireConfetti already stops itself).
@@ -133,7 +134,7 @@ export function OceanProgressCard({ ids, gameId }: { ids: string[]; gameId: stri
     if (!complete || celebrated.current) return
     celebrated.current = true
     try {
-      const key = 'r2bot_world_complete_ocean'
+      const key = profileKey('r2bot_world_complete_ocean') // per child (lib/kids/profiles.ts)
       if (!localStorage.getItem(key)) {
         localStorage.setItem(key, '1')
         fireConfetti()

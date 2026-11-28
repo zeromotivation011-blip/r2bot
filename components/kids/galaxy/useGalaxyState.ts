@@ -36,7 +36,9 @@ export function useGalaxyState(): GalaxyState {
     }
     read()
     const onStorage = (e: StorageEvent) => {
-      if (!e.key || e.key === ACTIVITIES_KEY || e.key === 'r2bot_kids_v2' || e.key === CLASS_MEMBERSHIP_KEY) read()
+      // Per-child keys carry a `::<profile>` suffix (profileKey), so match the base.
+      const k = e.key
+      if (!k || k.startsWith(ACTIVITIES_KEY) || k.startsWith('r2bot_kids_v2') || k.startsWith(CLASS_MEMBERSHIP_KEY)) read()
     }
     window.addEventListener(KIDS_PROGRESS_EVENT, read)
     window.addEventListener(KIDS_CLASS_EVENT, read)

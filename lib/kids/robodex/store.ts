@@ -2,8 +2,7 @@
 //
 // Browser-only (every function is a safe no-op on the server). Per child: the
 // key goes through profileKey() (lib/kids/profiles.ts), so each profile on a
-// shared device has its own collection. It is NOT in SWAPPED_KEYS (the rule:
-// one mechanism per store, never both).
+// shared device has its own collection (the one per-child mechanism).
 //
 //   discoverRobot(id)   mark one card found (for explicit hook points)
 //   syncRobodex()       re-read every evidence store and add what was earned

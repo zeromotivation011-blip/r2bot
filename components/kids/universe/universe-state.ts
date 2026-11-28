@@ -11,6 +11,7 @@ import { BAND_ORDER, type BandId } from '@/lib/kids/bands'
 import { GAMES, PLANETS, type UniverseGame } from '@/lib/kids/universe/worlds'
 import { weekKey } from '@/lib/kids/universe/rewards'
 import { conceptStates, type ConceptState } from '@/lib/kids/universe/mastery'
+import { profileKey } from '@/lib/kids/profiles'
 
 /** Sessions per planet (each curriculum level is a 24-session season). */
 export const SESSIONS_PER_LEVEL = 24
@@ -20,7 +21,7 @@ const ONBOARDED_KEY = 'r2bot_kids_onboarded'
 
 export function readOnboarded(): boolean {
   try {
-    return window.localStorage.getItem(ONBOARDED_KEY) === '1'
+    return window.localStorage.getItem(profileKey(ONBOARDED_KEY)) === '1'
   } catch {
     return false
   }
@@ -28,7 +29,7 @@ export function readOnboarded(): boolean {
 
 export function markOnboarded(): void {
   try {
-    window.localStorage.setItem(ONBOARDED_KEY, '1')
+    window.localStorage.setItem(profileKey(ONBOARDED_KEY), '1')
   } catch {
     /* private mode: the setup simply shows again next time */
   }

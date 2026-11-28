@@ -6,6 +6,7 @@
 
 import type { BandId } from '@/lib/kids/bands'
 import type { TierName } from '@/lib/kids/universe/tiers'
+import { profileKey } from '@/lib/kids/profiles'
 
 /** mulberry32 — tiny, fast, good enough for teaching labs. Returns [0, 1). */
 export function makeRng(seed: number): () => number {
@@ -58,7 +59,8 @@ export interface ThinkMission {
   badges?: string[]
 }
 
-const storeKey = (lab: LabId) => `r2bot_think_${lab}_done`
+/** Per child (profileKey, a PROFILE_KEY_PREFIXES store in lib/kids/profiles.ts). */
+const storeKey = (lab: LabId) => profileKey(`r2bot_think_${lab}_done`)
 
 export function loadDone(lab: LabId): string[] {
   if (typeof window === 'undefined') return []

@@ -14,6 +14,7 @@
 
 import { getProgress, saveProgress, type KidsProgress } from '../../kids-progress'
 import type { BandId } from '../bands'
+import { profileKey } from '../profiles'
 import { DEBUG_ACTIVITY_IDS, drawQuests, questMatches, weekKey, type ActivityKind, type Quest } from './quests'
 import { UNLOCKS, type Unlock } from './unlocks'
 
@@ -153,7 +154,7 @@ export function hasOpenCourse(p: KidsProgress): boolean {
   if (Object.keys(p.sessionsDone).length > 0) return true
   if (typeof window === 'undefined') return false
   try {
-    const raw = window.localStorage.getItem(COURSE_STATE_KEY)
+    const raw = window.localStorage.getItem(profileKey(COURSE_STATE_KEY))
     if (!raw) return false
     const o = JSON.parse(raw) as { sessions?: Record<string, { done?: boolean }> }
     return Boolean(o.sessions && Object.values(o.sessions).some((st) => st && !st.done))
@@ -292,8 +293,8 @@ export function reportRobotSaved(now: Date = new Date()): RewardResult | null {
   if (typeof window === 'undefined') return null
   const day = localDay(now)
   try {
-    if (window.localStorage.getItem(BUILD_DAY_KEY) === day) return null
-    window.localStorage.setItem(BUILD_DAY_KEY, day)
+    if (window.localStorage.getItem(profileKey(BUILD_DAY_KEY)) === day) return null
+    window.localStorage.setItem(profileKey(BUILD_DAY_KEY), day)
   } catch {
     return null // storage blocked: skip rather than risk repeating it
   }

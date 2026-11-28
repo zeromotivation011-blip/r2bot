@@ -45,7 +45,7 @@ interface MiscEntry {
 
 function inClass(): boolean {
   try {
-    return !!window.localStorage.getItem(MEMBERSHIP_KEY)
+    return !!window.localStorage.getItem(profileKey(MEMBERSHIP_KEY))
   } catch {
     return false
   }

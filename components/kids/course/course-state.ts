@@ -4,10 +4,11 @@
 // state only: XP, badges and "session finished" live in lib/kids-progress.ts
 // and are written by reportActivity() alone.
 //
-// localStorage key r2bot_kids_course_v1:
+// localStorage key r2bot_kids_course_v1, per child through profileKey():
 //   { v: 1, last: "L1-S09", sessions: { "L1-S09": { step: 3, reached: 3, … } } }
 
 import type { PicNode } from '@/lib/kids/sim/challenge'
+import { profileKey } from '@/lib/kids/profiles'
 
 export const COURSE_KEY = 'r2bot_kids_course_v1'
 export const COURSE_EVENT = 'r2bot:kids-course'
@@ -58,7 +59,7 @@ const EMPTY: CourseStore = { v: 1, sessions: {} }
 function readStore(): CourseStore {
   if (typeof window === 'undefined') return { ...EMPTY, sessions: {} }
   try {
-    const raw = window.localStorage.getItem(COURSE_KEY)
+    const raw = window.localStorage.getItem(profileKey(COURSE_KEY))
     if (!raw) return { ...EMPTY, sessions: {} }
     const parsed: unknown = JSON.parse(raw)
     if (!parsed || typeof parsed !== 'object' || (parsed as { v?: unknown }).v !== 1) return { ...EMPTY, sessions: {} }
@@ -99,7 +100,7 @@ export function writeSessionState(id: string, patch: Partial<SessionState>): Ses
   store.last = id
   if (typeof window !== 'undefined') {
     try {
-      window.localStorage.setItem(COURSE_KEY, JSON.stringify(store))
+      window.localStorage.setItem(profileKey(COURSE_KEY), JSON.stringify(store))
       window.dispatchEvent(new CustomEvent(COURSE_EVENT))
     } catch {
       /* storage blocked: the session still works, it just will not resume */

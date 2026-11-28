@@ -254,6 +254,183 @@ async function main() {
   process.exit(failures ? 1 : 0)
 }
 
+/**
+ * The retired swap layout (before 28 Nov 2026) moved into the profileKey()
+ * layout by migrateSwappedLayout(). The OLD switch is re-implemented here, so
+ * the device is built exactly as the old code left it, without calling any
+ * profiles.ts function until the migration should run.
+ */
+async function swapMigrationChecks() {
+  const PR = await import('./profiles')
+  const P = await import('../kids-progress')
+  const SEP = '::'
+  // One sample key for every formerly swapped store (fixed keys + one per prefix).
+  const KEYS = [...PR.LEGACY_SWAPPED_KEYS, ...PR.LEGACY_SWAPPED_PREFIXES.map((p) => `${p}sample`)]
+  const isLegacy = (k: string) => !k.includes(SEP) && (PR.LEGACY_SWAPPED_KEYS.includes(k) || PR.LEGACY_SWAPPED_PREFIXES.some((p) => k.startsWith(p) && k.length > p.length))
+  const writeState = (active: string | null, ids: string[]) =>
+    store.set(PR.PROFILES_KEY, JSON.stringify({ v: 1, mode: 'home', active, profiles: ids.map((id) => ({ id, nickname: `Kid ${id}`, picture: '🚀', color: '#FC6818', band: null, pw: null, className: null, createdAt: '', lastUsedAt: '', pending: [] })) }))
+  /** The old switchProfile, swap part only (copy live → ::from, bring ::to back). */
+  const oldSwitch = (from: string | null, to: string | null, ids: string[]) => {
+    const live = [...store.keys()].filter(isLegacy)
+    if (from !== null) for (const k of live) store.set(`${k}${SEP}${from}`, store.get(k) as string)
+    for (const k of live) store.delete(k)
+    if (to !== null) {
+      for (const k of [...store.keys()]) {
+        if (!k.endsWith(`${SEP}${to}`)) continue
+        const base = k.slice(0, -(SEP.length + to.length))
+        if (!isLegacy(base)) continue
+        store.set(base, store.get(k) as string)
+        store.delete(k)
+      }
+    }
+    writeState(to, ids)
+  }
+  /** Each child writes their own value into every swapped store while they play. */
+  const play = (who: string) => {
+    for (const k of KEYS) store.set(k, JSON.stringify({ owner: who, k }))
+  }
+  const own = (who: string, k: string) => JSON.stringify({ owner: who, k })
+  const snapshot = () => JSON.stringify([...store.entries()].sort())
+
+  /** Builds an old-layout device with p1, Kai and Ada; `last` is who is playing (null = nobody). */
+  const oldDevice = (last: string | null, guestData = false) => {
+    store.clear()
+    const ids = ['p1', 'pkai', 'pada']
+    writeState('p1', ids)
+    play('p1')
+    store.set('r2bot_kids_v2', JSON.stringify({ xp: 900 })) // progress was always namespaced: must not move (no profiles.ts call before the migration)
+    oldSwitch('p1', 'pkai', ids)
+    play('pkai')
+    oldSwitch('pkai', 'p1', ids) // swapped back and forth
+    oldSwitch('p1', 'pada', ids)
+    play('pada')
+    oldSwitch('pada', 'pkai', ids)
+    if (last !== 'pkai') oldSwitch('pkai', last, ids)
+    if (last === null && guestData) play('_none')
+    return ids
+  }
+  const expectOwn = (ids: string[], label: string) => {
+    const wrong: string[] = []
+    for (const id of ids) {
+      for (const k of KEYS) {
+        const at = PR.namespacedKey(k, id)
+        if (store.get(at) !== own(id, k)) wrong.push(`${id}:${k}=${store.get(at) ?? 'missing'}`)
+      }
+    }
+    check(`${label}: every child keeps exactly their own data in every store`, wrong.length === 0, wrong.slice(0, 4).join('; '))
+  }
+
+  for (const last of ['pkai', 'p1', null] as const) {
+    const label = `migration (playing: ${last ?? 'nobody'})`
+    const ids = oldDevice(last, last === null)
+    check(`${label}: built the old swapped layout`, !store.has(PR.LAYOUT_KEY) && (last === 'p1' ? store.get(KEYS[0]) === own('p1', KEYS[0]) : store.has(`${KEYS[0]}${SEP}p1`)))
+    const progressBefore = store.get('r2bot_kids_v2')
+    const active = PR.activeProfileId() // the first read migrates
+    check(`${label}: the playing child is unchanged`, active === last)
+    check(`${label}: layout marked`, store.get(PR.LAYOUT_KEY) !== undefined)
+    expectOwn(ids, label)
+    check(`${label}: no child sees another's data through profileKey()`, KEYS.every((k) => last === null || store.get(PR.profileKey(k)) === own(last, k)))
+    if (last === null) check(`${label}: the guest's scribbles moved to ::_none, not onto member #1`, KEYS.every((k) => store.get(`${k}${SEP}_none`) === own('_none', k)))
+    check(`${label}: progress (always per child) did not move`, store.get('r2bot_kids_v2') === progressBefore)
+    check(`${label}: nobody has a stray ::p1 copy`, ![...store.keys()].some((k) => k.endsWith(`${SEP}p1`)))
+    const after = snapshot()
+    check(`${label}: running the migration again changes nothing`, PR.migrateSwappedLayout() && snapshot() === after)
+    PR.readProfilesState()
+    PR.ensureProfiles()
+    check(`${label}: reading and ensuring again changes nothing`, snapshot() === after)
+    // Switching is now instant and still keeps everyone apart.
+    for (const id of ids) {
+      PR.switchProfile(id)
+      check(`${label}: after switching to ${id}, they read their own data`, KEYS.every((k) => store.get(PR.profileKey(k)) === own(id, k)))
+    }
+  }
+
+  // An interrupted old switch: member #1 playing, a stale ::p1 copy and no live key.
+  store.clear()
+  writeState('p1', ['p1', 'pkai'])
+  store.set(`${KEYS[0]}${SEP}p1`, own('p1', KEYS[0]))
+  store.set(`${KEYS[1]}${SEP}p1`, 'stale')
+  store.set(KEYS[1], own('p1', KEYS[1]))
+  store.set(`${KEYS[0]}${SEP}pkai`, own('pkai', KEYS[0]))
+  PR.readProfilesState()
+  check('interrupted switch: member #1 gets their copy back, the live copy wins over a stale one', store.get(KEYS[0]) === own('p1', KEYS[0]) && store.get(KEYS[1]) === own('p1', KEYS[1]) && !store.has(`${KEYS[0]}${SEP}p1`) && !store.has(`${KEYS[1]}${SEP}p1`))
+  check("interrupted switch: the sibling's copy is untouched", store.get(`${KEYS[0]}${SEP}pkai`) === own('pkai', KEYS[0]))
+
+  // A full storage during the migration: nothing is lost, and the next read finishes it.
+  for (const harsh of [false, true]) {
+    const label = harsh ? 'a storage error that also breaks the rollback' : 'a storage error mid-migration'
+    const ids = oldDevice('pkai')
+    const before = new Map(store)
+    const realSet = memoryStorage.setItem
+    let n = 0
+    memoryStorage.setItem = (k: string, v: string) => {
+      n++
+      // 14 stores: writes 1–14 copy Kai's data home, 15+ put member #1's back.
+      if (harsh ? n >= 17 : n === 17) throw new Error('QuotaExceededError')
+      realSet(k, v)
+    }
+    PR.readProfilesState()
+    memoryStorage.setItem = realSet
+    check(`${label}: the layout stays unmarked`, !store.has(PR.LAYOUT_KEY))
+    if (!harsh) check(`${label}: every old key is put back`, [...before].every(([k, v]) => store.get(k) === v))
+    PR.readProfilesState()
+    expectOwn(ids, `${label}, then retried`)
+    check(`${label}, then retried: marked once done`, store.has(PR.LAYOUT_KEY))
+  }
+
+  // A device that never had profiles: nothing to migrate, nothing written.
+  store.clear()
+  store.set(KEYS[0], own('p1', KEYS[0]))
+  check('no profiles: reading writes nothing (no marker on a single-child device)', PR.activeProfileId() === 'p1' && store.size === 1)
+  PR.ensureProfiles()
+  check('turning profiles on marks the layout and moves nothing', store.has(PR.LAYOUT_KEY) && store.get(KEYS[0]) === own('p1', KEYS[0]))
+
+  // Backup codes keep working after the move: a sibling's Skill Galaxy map travels in their code.
+  store.clear()
+  oldDevice('pkai')
+  const kaiActs = JSON.stringify({ 'gear-1': { stars: 2, attempts: 1, score: 1, plays: 1, at: '2026-11-21' } })
+  store.set('r2bot_kids_activities_v1', kaiActs) // Kai is playing: the old live key (unmigrated)
+  store.delete(PR.LAYOUT_KEY)
+  const kaiCode = await P.exportProgressCode() // migrates first, then reads Kai's own key
+  const read = await P.readProgressCode(kaiCode)
+  check("after the move, the player's backup code carries their own Galaxy map", read.ok && 'gear-1' in read.activities && store.get('r2bot_kids_activities_v1::pkai') === kaiActs)
+  const p1Code = await P.exportProgressCode({ profileId: 'p1' })
+  const p1Read = await P.readProgressCode(p1Code)
+  check("…and member #1's code carries none of Kai's", p1Read.ok && !('gear-1' in p1Read.activities))
+
+  // Per-profile extras (parent hub): builds and portfolio go through withProfile().
+  const B = await import('./builds/store')
+  const PF = await import('../../components/kids/portfolio/portfolio-store')
+  const RD = await import('./robot-design')
+  const snap = RD.encodeDesign({ ...RD.DEFAULT_DESIGN, name: 'Kaibot' })
+  store.clear()
+  writeState('p1', ['p1', 'pkai', 'pada'])
+  store.set(PR.LAYOUT_KEY, '2')
+  store.set('r2bot_kids_builds_v1::pkai', JSON.stringify({ 'cardboard-rover': { d: '2026-11-20', a: 2, t: 2, r: 'secret reflection' } }))
+  store.set('r2bot_kids_portfolio_v1::pkai', JSON.stringify({ s: [{ c: snap, d: '2026-11-19' }], r: { 'snap:0': 'my words' } }))
+  const kaiBuilds = PR.withProfile('pkai', () => B.buildsBackupExtra())
+  const kaiPf = PR.withProfile('pkai', () => PF.portfolioBackupExtra())
+  check('withProfile(): the builds extra is that child\'s, not the player\'s', kaiBuilds !== B.buildsBackupExtra() && kaiBuilds.length > 3)
+  check('withProfile(): the portfolio extra is that child\'s', kaiPf.includes(snap) && !PF.portfolioBackupExtra().includes(snap))
+  check('reflections never ride in the extras', !kaiBuilds.includes('secret') && !kaiPf.includes('my words'))
+  check('withProfile() restores the player afterwards', PR.profileKey('r2bot_kids_builds_v1') === 'r2bot_kids_builds_v1')
+  PR.withProfile('pada', () => {
+    B.restoreBuildsExtra(kaiBuilds, ['cardboard-rover'])
+    PF.restorePortfolioExtra(kaiPf)
+  })
+  check('restore into a named profile lands in that profile only', 'cardboard-rover' in JSON.parse(store.get('r2bot_kids_builds_v1::pada') ?? '{}') && (store.get('r2bot_kids_portfolio_v1::pada') ?? '').includes(snap) && !store.has('r2bot_kids_builds_v1') && !store.has('r2bot_kids_portfolio_v1'))
+  let threw = false
+  try {
+    PR.withProfile('pada', () => {
+      throw new Error('x')
+    })
+  } catch {
+    threw = true
+  }
+  check('withProfile() restores the player even when the callback throws', threw && PR.profileKey('r2bot_kids_builds_v1') === 'r2bot_kids_builds_v1')
+  store.clear()
+}
+
 type ProgressModule = typeof import('../kids-progress')
 
 async function profileChecks(P: ProgressModule) {
@@ -290,10 +467,11 @@ async function profileChecks(P: ProgressModule) {
   check('adding a profile does not switch to it', PR.activeProfileId() === 'p1' && P.getProgress().xp === 900)
   check('switch to the sibling', PR.switchProfile(kai))
   check('sibling starts fresh: progress', P.getProgress().xp === 0 && P.getProgress().totalStars === 0)
-  check('sibling starts fresh: robot, Galaxy map, class, Code Lab draft', RD.loadDesign().name !== 'Bolt' && !store.has(ACTS) && !store.has(CLASS) && !store.has(DRAFT))
+  check('sibling starts fresh: robot, Galaxy map, class, Code Lab draft', RD.loadDesign().name !== 'Bolt' && !store.has(PR.profileKey(ACTS)) && !store.has(PR.profileKey(CLASS)) && !store.has(PR.profileKey(DRAFT)))
+  check('a switch copies nothing: member #1 keeps the plain keys', store.get(ACTS) === legacyRaw.get(ACTS) && store.get(CLASS) === legacyRaw.get(CLASS) && store.get(DRAFT) === legacyRaw.get(DRAFT))
   P.saveProgress({ xp: 40, explorerName: 'Kai' })
   RD.saveDesign({ ...RD.DEFAULT_DESIGN, name: 'Rex' })
-  store.set(ACTS, JSON.stringify({ 'gear-1': { stars: 2, attempts: 1, score: 1, plays: 1, at: '2026-11-21' } }))
+  store.set(PR.profileKey(ACTS), JSON.stringify({ 'gear-1': { stars: 2, attempts: 1, score: 1, plays: 1, at: '2026-11-21' } }))
   check('sibling writes go to their own namespace', store.has(`r2bot_kids_v2::${kai}`) && JSON.parse(store.get('r2bot_kids_v2') ?? '{}').xp === 900)
   check("member #1's data is safe while the sibling plays", P.getProgressOf('p1').xp === 900 && RD.loadDesignOf('p1').name === 'Bolt')
 
@@ -338,7 +516,7 @@ async function profileChecks(P: ProgressModule) {
   // A store this file does not own, whose key happens to end in "::_none".
   store.set('r2bot_other_cache::_none', 'keep')
   check('Done clears the device back to the picker', PR.finishTurn() && PR.needsPicker() && PR.activeProfileId() === null)
-  check('after Done nothing of the last child is visible', P.getProgress().xp === 0 && RD.loadDesign().name !== 'Rex' && !store.has(ACTS) && !store.has(CLASS))
+  check('after Done nothing of the last child is visible', P.getProgress().xp === 0 && RD.loadDesign().name !== 'Rex' && !store.has(PR.profileKey(ACTS)) && !store.has(PR.profileKey(CLASS)))
   check("Done keeps the last child's ghosts (their own namespace) and member #1's", store.get(`${GHOSTS}::${kai}`) === '{"g":{"kai-arena":{}}}' && store.get(GHOSTS) === '{"g":{"p1-arena":{}}}')
   check('Done does not wipe a "::_none" key that is not a per-child store', store.get('r2bot_other_cache::_none') === 'keep')
   P.saveProgress({ xp: 3 })
@@ -356,7 +534,7 @@ async function profileChecks(P: ProgressModule) {
   PR.finishTurn()
   const bound = PR.bindClassMember({ nickname: 'Zuri', className: '3B', band: 'explorers' })
   check('joining a class on a shared tablet makes a profile and signs it in', !!bound && PR.activeProfileId() === bound && PR.activeProfile()?.nickname === 'Zuri' && P.getProgress().xp === 0)
-  store.set(CLASS, JSON.stringify({ token: 't-zuri', className: '3B', nickname: 'Zuri', band: 'explorers', teacherName: null }))
+  store.set(PR.profileKey(CLASS), JSON.stringify({ token: 't-zuri', className: '3B', nickname: 'Zuri', band: 'explorers', teacherName: null }))
   PR.switchProfile('p1')
   check("each class member keeps their own token", JSON.parse(store.get(CLASS) ?? '{}').token === 't-nova' && JSON.parse(store.get(`${CLASS}::${bound}`) ?? '{}').token === 't-zuri')
   PR.finishTurn()
@@ -382,14 +560,12 @@ async function profileChecks(P: ProgressModule) {
     return !PR.removeProfile('p1') && P.getProgress().xp === 900
   })())
 
-  // A storage error mid-switch changes nothing.
+  // A storage error mid-switch changes nothing (a switch is one write: `active`).
   const sib2 = PR.createProfile({ nickname: 'Leo' })
   if (sib2.ok) {
     const realSet = memoryStorage.setItem
-    let n = 0
-    memoryStorage.setItem = (k: string, v: string) => {
-      if (++n > 2) throw new Error('QuotaExceededError')
-      realSet(k, v)
+    memoryStorage.setItem = () => {
+      throw new Error('QuotaExceededError')
     }
     const ok = PR.switchProfile(sib2.profile.id)
     memoryStorage.setItem = realSet
@@ -400,14 +576,19 @@ async function profileChecks(P: ProgressModule) {
   // (Passport words, Robodex, builds, portfolio, ghosts, class diary, look...).
   if (sib2.ok) {
     for (const base of PR.PROFILE_KEY_BASES) store.set(base, '{"p1":true}')
+    const perItem = PR.PROFILE_KEY_PREFIXES.map((p) => `${p}x`)
+    for (const k of perItem) store.set(k, '1')
     store.set(`r2bot_kids_robodex_v1::${sib2.profile.id}`, '{"leo":true}')
+    store.set(`r2bot_game_seen_x::${sib2.profile.id}`, '1')
     PR.switchProfile(sib2.profile.id)
     const removed = PR.removeProfile('p1')
-    const left = PR.PROFILE_KEY_BASES.filter((b) => store.has(b))
+    const left = [...PR.PROFILE_KEY_BASES, ...perItem].filter((b) => store.has(b))
     check('removing member #1 deletes every profileKey() store it kept at the plain key', removed && left.length === 0, left.join(', '))
-    check("…and leaves the other child's stores alone", store.get(`r2bot_kids_robodex_v1::${sib2.profile.id}`) === '{"leo":true}')
+    check("…and leaves the other child's stores alone", store.get(`r2bot_kids_robodex_v1::${sib2.profile.id}`) === '{"leo":true}' && store.get(`r2bot_game_seen_x::${sib2.profile.id}`) === '1')
   }
-  check('the Class Power-Up cache is per child (swapped on switch)', PR.SWAPPED_KEYS.includes('r2bot_kids_class_powerup_v1'))
+  check('the Class Power-Up cache is per child (a profileKey() base)', PR.PROFILE_KEY_BASES.includes('r2bot_kids_class_powerup_v1'))
+  check('the swap mechanism is gone: no SWAPPED_KEYS / SWAPPED_PREFIXES export', !('SWAPPED_KEYS' in PR) && !('SWAPPED_PREFIXES' in PR))
+  check('every formerly swapped store is now a profileKey() store', PR.LEGACY_SWAPPED_KEYS.every((k) => PR.PROFILE_KEY_BASES.includes(k)) && PR.LEGACY_SWAPPED_PREFIXES.every((p) => PR.PROFILE_KEY_PREFIXES.includes(p)))
 
   // Every profileKey(<base>) call site in the app uses a base in PROFILE_KEY_BASES.
   const fs = await import('node:fs')
@@ -446,7 +627,12 @@ async function profileChecks(P: ProgressModule) {
       const arg = m[1]
       const rel = path.relative(root, f)
       if (/^'[^']*'$/.test(arg)) {
-        if (!PR.PROFILE_KEY_BASES.includes(arg.slice(1, -1))) bad.push(`${rel}: ${arg}`)
+        const v = arg.slice(1, -1)
+        if (!PR.PROFILE_KEY_BASES.includes(v) && !PR.PROFILE_KEY_PREFIXES.some((p) => v.startsWith(p) && v.length > p.length)) bad.push(`${rel}: ${arg}`)
+      } else if (arg.startsWith('`')) {
+        // A per-item key: `<prefix>${item}…`, the literal head must be a listed prefix.
+        const head = arg.slice(1).split('${')[0]
+        if (!PR.PROFILE_KEY_PREFIXES.some((p) => head.startsWith(p))) bad.push(`${rel}: ${arg}`)
       } else if (GENERIC_ARGS.has(arg)) {
         continue
       } else {
@@ -458,7 +644,27 @@ async function profileChecks(P: ProgressModule) {
     }
   }
   check(`every profileKey() call site (${sites}) uses a base listed in PROFILE_KEY_BASES`, sites > 10 && bad.length === 0, bad.join('; '))
-  check('no base is both profileKey()-namespaced and swapped', !PR.PROFILE_KEY_BASES.some((b) => PR.SWAPPED_KEYS.includes(b)))
+  // No reader of a formerly swapped store still uses the bare key.
+  const bare: string[] = []
+  for (const [f, src] of sources) {
+    if (f.endsWith(path.join('lib', 'kids', 'profiles.ts'))) continue
+    const rel = path.relative(root, f)
+    for (const m of src.matchAll(/localStorage\.(?:getItem|setItem|removeItem)\(\s*([^,)\s]+)/g)) {
+      const arg = m[1]
+      if (arg.startsWith('profileKey(') || arg.startsWith('storageKeyFor(') || arg.startsWith('namespacedKey(')) continue
+      let vals: string[] = []
+      if (/^'[^']*'$/.test(arg)) vals = [arg.slice(1, -1)]
+      else if (arg.startsWith('`')) vals = [arg.slice(1).split('${')[0]]
+      else if (/^[A-Za-z_$][\w$]*$/.test(arg)) {
+        const own = [...src.matchAll(new RegExp(`const\\s+${arg}\\s*=\\s*'(r2bot_[^']+)'`, 'g'))].map((x) => x[1])
+        vals = own.length ? own : [...(consts.get(arg) ?? [])]
+      }
+      if (vals.some((v) => PR.LEGACY_SWAPPED_KEYS.includes(v) || PR.LEGACY_SWAPPED_PREFIXES.some((p) => v.startsWith(p)))) bare.push(`${rel}: ${arg}`)
+    }
+  }
+  check('no formerly swapped store is read or written at its bare key', bare.length === 0, bare.join('; '))
+
+  await swapMigrationChecks()
 
   // ── Physics Lab / Power Lab results (build log #23, lib/kids/sim/lab-results.ts) ──
   // A solved lab arena lives in the one progress store (personalBests["lab:<id>"]), is written only

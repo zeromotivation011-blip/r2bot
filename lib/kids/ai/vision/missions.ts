@@ -12,6 +12,7 @@
 import type { BandId } from '../../bands'
 import type { TierName } from '../../universe/tiers'
 import type { SampleKind } from './samples'
+import { profileKey } from '../../profiles'
 
 export type RobotAction = 'forward' | 'stop' | 'left' | 'right' | 'spin' | 'follow' | 'idle'
 
@@ -301,7 +302,7 @@ const DONE_KEY = 'r2bot_kids_vision_v1'
 export function loadDoneMissions(): string[] {
   if (typeof window === 'undefined') return []
   try {
-    const raw: unknown = JSON.parse(window.localStorage.getItem(DONE_KEY) ?? '[]')
+    const raw: unknown = JSON.parse(window.localStorage.getItem(profileKey(DONE_KEY)) ?? '[]')
     return Array.isArray(raw) ? raw.filter((x): x is string => typeof x === 'string') : []
   } catch {
     return []
@@ -311,7 +312,7 @@ export function loadDoneMissions(): string[] {
 export function saveDoneMissions(ids: string[]): void {
   if (typeof window === 'undefined') return
   try {
-    window.localStorage.setItem(DONE_KEY, JSON.stringify(ids))
+    window.localStorage.setItem(profileKey(DONE_KEY), JSON.stringify(ids))
   } catch {
     /* storage blocked — progress simply is not remembered */
   }

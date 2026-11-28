@@ -87,8 +87,7 @@ also get "Also today" (a Recharge/almost-secure concept + a game at the right ti
 paint (`KIDS_LOOK_BOOT_SCRIPT` in `lib/kids/teen-boot.ts`, synced by `KidsLookSyncClient`, styles in
 `app/kids/kids-teen.css`). Per-look text uses `.kids-lab-only` / `.kids-kids-only` (CSS, no
 flicker); the shell's tab words come from `LAB_LABELS`. The child's choice (Automatic / Lab / Kids,
-`LabLookToggleClient` in Settings) is stored under `profileKey('r2bot_kids_look_v1')` — per child,
-so NOT in `SWAPPED_KEYS`. `useKidsLook()` reads it.
+`LabLookToggleClient` in Settings) is stored under `profileKey('r2bot_kids_look_v1')` — per child. `useKidsLook()` reads it.
 
 **Ask Spark** is mounted once in the shell (`AskSparkClient`, `next/dynamic`, `ssr:false`).
 Ordinary pages: a floating button above the tab bar. Game and full-screen pages (`play/*`,
@@ -211,14 +210,18 @@ Checks: `lib/kids/progress-backup.verify.ts` (CI).
   the original keys (`r2bot_kids_v2`, `r2bot_kids_robot_v1`); others use `<key>::<profileId>`
   (`profileKey(base)`). `getProgressOf(id)`, `loadDesignOf`/`saveDesignOf`; backup codes take an
   optional `{ profileId }`.
-- Stores read by a fixed key elsewhere (Galaxy map, course, hangar looks, class membership and
-  missions, onboarded, Spark reward day, build day, vision, `r2bot_think_*`, Code Lab drafts,
-  game-seen and world-complete flags) are SWAPPED on each switch (`SWAPPED_KEYS` /
-  `SWAPPED_PREFIXES`): the playing child's data sits at the plain key. A switch is
-  all-or-nothing and rolls back on a storage error.
-- **Rule:** a new per-child localStorage store uses `profileKey(base)` OR is added to
-  `SWAPPED_KEYS` — never both (one child's data could overwrite another's). Moving a swapped
-  store to `profileKey()` removes it from `SWAPPED_KEYS` in the same commit.
+- Every other per-child store (Galaxy map, course, hangar looks, class membership and missions,
+  onboarded, Spark reward day, build day, vision, think, Code Lab drafts, game-seen and
+  world-complete flags, Robodex, builds, portfolio, looks…) uses `profileKey(base)` (fixed keys in
+  `PROFILE_KEY_BASES`) or `` profileKey(`<prefix>${item}`) `` with the prefix in
+  `PROFILE_KEY_PREFIXES`. A switch is one write to `active`; nothing is copied.
+- The old swap layout (until 28 Nov 2026) is migrated once by `migrateSwappedLayout()` (marker
+  `r2bot_kids_profiles_layout`); it rolls back on a storage error and is idempotent.
+- `withProfile(id, fn)` (synchronous only) makes `profileKey()` answer for one named profile, e.g.
+  the parent hub's per-child export/import (robot, looks, Robodex, builds, portfolio; never reflections).
+- **Rule:** a new per-child localStorage store uses `profileKey()` — the only mechanism. A per-item
+  key needs its prefix in `PROFILE_KEY_PREFIXES` so wipes and `removeProfile` find it. Cross-tab
+  `storage` listeners match with `startsWith(base)` (namespaced keys carry `::<id>`).
 - UI (`components/kids/profiles/`): `ProfileSwitcherClient` in the shell header, "Who's playing?"
   picker (Explorers unlock with a 3-picture password; older children may add one),
   `ParentProfilesClient` in the parent hub (Family / Shared device). At home adding a child asks
@@ -359,7 +362,7 @@ leaderboards; no streak that punishes a missed day.
   into a 3-minute ring buffer; recording only reads the sim (verify: a recorded run ends exactly
   like an unrecorded one). UI `FlightRecorderClient.tsx`: scrub, events, "Why did it fail?", graphs.
 - Ghost of the child's own fastest success: `lib/kids/sim/ghost-store.ts`, per child via
-  `profileKey()` (so NOT in `SWAPPED_KEYS`). "Beat yourself" wording only.
+  `profileKey()`. "Beat yourself" wording only.
 - `lib/kids/sim/battery.ts`: cells, series/parallel packs, sag, brownout. An arena without a
   `battery` only meters (physics and every existing result unchanged). Arenas may add
   `chargers` and the `visit-and-return` goal; fail reasons `flat`, `not-visited`. Sensor
@@ -495,7 +498,7 @@ world lists come from `GAMES` and `WORLDS`. Before promoting a sample, give
   `/kids/printables/<id>` (indexable, HowTo JSON-LD); `/kids/activities` 308s to the hub. Every build has
   hazard tags, a minimum band, a grown-up flag, a fair test and a check question; `lib/kids/builds/verify.ts`
   enforces the safety rules (#79) in CI.
-- Check-ins: `r2bot_kids_builds_v1` per child (`profileKey`, NOT in `SWAPPED_KEYS`). The check-in pays
+- Check-ins: `r2bot_kids_builds_v1` per child (`profileKey`). The check-in pays
   through `reportBestRun({ kind: 'project', id: 'home-build-<id>', score: 1 })` (first finish only). Teen
   reflections pass `classifySpark` on the device; personal details are refused; a hurt child gets the
   helpline card and nothing is saved.
@@ -537,7 +540,7 @@ Code Lab's editor is Blockly (Wave 4), with the Physics Lab's look (zelos, `kids
 `lib/kids/code-lab/blockly-defs.ts` and compiled to the unchanged grid interpreter by
 `lib/kids/code-lab/blockly-format.ts`. **A new Code Lab block needs a `GRID_TYPE` entry plus a
 definition.** Drafts are `{ format: 'codelab-blockly-1', workspace }` under the unchanged key
-`r2bot_kids_codelab_draft_<id>` (still in `SWAPPED_PREFIXES`); `readDraft` converts an old draft on load
+`r2bot_kids_codelab_draft_<id>` (per child, prefix in `PROFILE_KEY_PREFIXES`); `readDraft` converts an old draft on load
 and saves it back. Explorers blocks have no typed fields (verify fails otherwise); the tap palette,
 ◀ ▶ block picker and a screen-reader outline keep keyboard and switch access.
 `shared-vocabulary.ts` maps each Code Lab block to the shared block. The Code Lab verify runs every

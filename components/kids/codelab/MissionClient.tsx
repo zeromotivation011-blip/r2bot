@@ -21,6 +21,7 @@ import { initialState, parseArena, runMission, starsFor, type Frame, type RunRes
 import { changedParts, designWith, missingCaps } from '@/lib/kids/code-lab/parts'
 import { programToWorkspace, readDraft, workspaceToProgram, writeDraft, type BWorkspace } from '@/lib/kids/code-lab/blockly-format'
 import { useKidsReducedMotion } from '@/lib/kids/settings'
+import { profileKey } from '@/lib/kids/profiles'
 import type { Block, MissionPublic } from '@/lib/kids/code-lab/types'
 import { completeCodeMission, getProgress } from '@/lib/kids-progress'
 import { reportBestRun } from '@/lib/kids/universe/rewards'
@@ -56,7 +57,8 @@ type Status =
   | { kind: 'progress'; message: string }
   | { kind: 'win'; stars: 1 | 2 | 3; added: number; hinted: boolean }
 
-const draftKey = (id: string) => `r2bot_kids_codelab_draft_${id}`
+/** Per child (profileKey, a PROFILE_KEY_PREFIXES store in lib/kids/profiles.ts). */
+const draftKey = (id: string) => profileKey(`r2bot_kids_codelab_draft_${id}`)
 
 /** Hints cap a Code Lab finish at 2 stars (roadmap #26). */
 const HINT_STAR_CAP = 2

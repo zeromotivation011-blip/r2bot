@@ -28,9 +28,11 @@ import {
   setPassword,
   switchProfile,
   updateProfile,
+  withProfile,
   type KidsProfile,
   type ProfilesState,
 } from '@/lib/kids/profiles'
+import { looksBackupExtra, restoreLooksExtra } from '@/components/kids/hangar/cosmetics'
 import PicturePasswordClient from './PicturePasswordClient'
 import NewProfileClient from './NewProfileClient'
 
@@ -297,21 +299,61 @@ function KeyPanel({ profile, onDone }: { profile: KidsProfile; onDone: (msg: str
   )
 }
 
+/** The per-child stores the backup code carries beside the progress (loaded on demand). */
+function extraStores() {
+  return Promise.all([import('@/lib/kids/robodex/store'), import('@/lib/kids/builds/store'), import('@/components/kids/portfolio/portfolio-store')])
+}
+
+/**
+ * One profile's extras, the same set the Hangar backup carries for the child
+ * playing: robot, looks, Robodex, Make It at Home check-ins and the newest
+ * portfolio robot snapshots. Portfolio and build reflections are free text
+ * and stay on this device by design. withProfile() points each store's own
+ * reader at this profile, so nothing is switched and nobody else is read.
+ */
+async function profileExtras(id: string): Promise<Record<string, string>> {
+  const [{ robodexBackupExtra }, { buildsBackupExtra }, { portfolioBackupExtra }] = await extraStores()
+  return withProfile(id, () => ({
+    robot: encodeDesign(loadDesignOf(id)),
+    looks: looksBackupExtra(),
+    robodex: robodexBackupExtra(id),
+    builds: buildsBackupExtra(),
+    portfolio: portfolioBackupExtra(),
+  }))
+}
+
+/** Restores a code's extras into one profile (merge: never removes or overwrites what they have). */
+async function restoreProfileExtras(id: string, extras: Record<string, string>): Promise<void> {
+  // Robot: only onto a profile that still has the starter robot.
+  const d = extras.robot ? decodeDesign(extras.robot) : null
+  if (d && encodeDesign(loadDesignOf(id)) === encodeDesign(DEFAULT_DESIGN)) saveDesignOf(id, d)
+  if (!extras.looks && !extras.robodex && !extras.builds && !extras.portfolio) return
+  const [[{ restoreRobodexExtra }, { restoreBuildsExtra }, { restorePortfolioExtra }], { HOME_BUILDS }] = await Promise.all([extraStores(), import('@/lib/kids/builds/builds')])
+  withProfile(id, () => {
+    restoreLooksExtra(extras.looks)
+    if (extras.robodex) restoreRobodexExtra(extras.robodex)
+    if (extras.builds) restoreBuildsExtra(extras.builds, HOME_BUILDS.map((b) => b.id))
+    if (extras.portfolio) restorePortfolioExtra(extras.portfolio)
+  })
+}
+
 function BackupPanel({ profile }: { profile: KidsProfile }) {
   const [code, setCode] = useState('')
   const [copied, setCopied] = useState(false)
   useEffect(() => {
     let live = true
-    void exportProgressCode({ profileId: profile.id, extras: { robot: encodeDesign(loadDesignOf(profile.id)) } }).then((c) => {
-      if (live) setCode(c)
-    })
+    void profileExtras(profile.id)
+      .then((extras) => exportProgressCode({ profileId: profile.id, extras }))
+      .then((c) => {
+        if (live) setCode(c)
+      })
     return () => {
       live = false
     }
   }, [profile.id])
   return (
     <div className="mt-3 rounded-[20px] border border-white/10 bg-[#0A1120] p-4">
-      <p className="text-sm text-[#A7B0C0]">{profile.nickname}&rsquo;s backup code. It holds progress and the robot, no personal data. Keep it somewhere safe; paste it under Restore on any device.</p>
+      <p className="text-sm text-[#A7B0C0]">{profile.nickname}&rsquo;s backup code. It holds progress, the robot, looks, Robodex cards, home builds and portfolio robots, and no personal data (written reflections stay on this device). Keep it somewhere safe; paste it under Restore on any device.</p>
       <label className="sr-only" htmlFor={`code-${profile.id}`}>Backup code</label>
       <textarea id={`code-${profile.id}`} readOnly value={code} rows={3} className="mt-2 w-full break-all rounded-xl border border-white/15 bg-[#111C32] p-2 font-mono text-xs text-[#EEF2F8]" />
       <button
@@ -341,14 +383,13 @@ function RestorePanel({ profile, onDone }: { profile: KidsProfile; onDone: (msg:
         setError('')
         ensureProfiles()
         const r = await importProgressCode(text, { profileId: profile.id })
-        setBusy(false)
         if (!r.ok) {
+          setBusy(false)
           setError(r.reason === 'checksum' ? 'That code has a typo. Copy it again.' : 'That does not look like an R2BOT Kids backup code.')
           return
         }
-        // Robot: only onto a profile that still has the starter robot.
-        const d = r.extras.robot ? decodeDesign(r.extras.robot) : null
-        if (d && encodeDesign(loadDesignOf(profile.id)) === encodeDesign(DEFAULT_DESIGN)) saveDesignOf(profile.id, d)
+        await restoreProfileExtras(profile.id, r.extras)
+        setBusy(false)
         setText('')
         onDone(r.changed ? `Restored into ${profile.nickname}. Nothing they already had was lowered.` : `${profile.nickname} already had everything in that code.`)
         if (profile.id === activeProfileId()) window.location.reload()

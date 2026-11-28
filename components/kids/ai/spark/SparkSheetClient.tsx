@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { bandForAge, type BandId } from '@/lib/kids/bands'
 import { getProgress } from '@/lib/kids-progress'
 import { reportActivity } from '@/lib/kids/universe/rewards'
+import { profileKey } from '@/lib/kids/profiles'
 import { cleanRequest, offlineReply, safetyReply, withPrivacyNote } from '@/lib/kids/ai/spark/offline'
 import { isOlderBand } from '@/lib/kids/ai/spark/match'
 import { STARTER_QUESTIONS } from '@/lib/kids/ai/spark/faq'
@@ -73,8 +74,8 @@ function localDay(): string {
 function rewardOncePerDay(): void {
   try {
     const today = localDay()
-    if (window.localStorage.getItem(REWARD_KEY) === today) return
-    window.localStorage.setItem(REWARD_KEY, today)
+    if (window.localStorage.getItem(profileKey(REWARD_KEY)) === today) return
+    window.localStorage.setItem(profileKey(REWARD_KEY), today)
     reportActivity({ kind: 'activity', id: 'ask-spark', xp: 5 })
   } catch {
     /* storage blocked: skip the reward rather than risk repeating it */

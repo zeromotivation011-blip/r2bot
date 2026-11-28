@@ -32,6 +32,7 @@ import { ExitButton, useLeaveGuard } from './LeaveGuardClient'
 import type { UniverseGame } from '@/lib/kids/universe/worlds'
 import { reportBestRun, type RewardResult } from '@/lib/kids/universe/rewards'
 import { getProgress } from '@/lib/kids-progress'
+import { profileKey } from '@/lib/kids/profiles'
 import { playSound, primeAudio } from '@/lib/kids-audio'
 import { fireConfetti } from '@/components/kids/Confetti'
 import { TIER_NAMES } from '@/lib/kids/universe/tiers'
@@ -123,10 +124,10 @@ export function GameShell({ game, howToPlay, lesson, exitHref = '/kids/play', ch
 
   useEffect(() => {
     try {
-      const seen = localStorage.getItem(`r2bot_game_seen_${game.id}`)
+      const seen = localStorage.getItem(profileKey(`r2bot_game_seen_${game.id}`))
       if (!seen) {
         setHelp(true)
-        localStorage.setItem(`r2bot_game_seen_${game.id}`, '1')
+        localStorage.setItem(profileKey(`r2bot_game_seen_${game.id}`), '1')
       }
     } catch {
       /* ignore */
