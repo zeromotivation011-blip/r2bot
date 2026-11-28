@@ -124,9 +124,28 @@ export const BLOG_TO_ATLAS: Record<string, string> = {
  * owns all three queries; the other two 308 there. open-loop-control stays
  * separate and links back.
  *
+ * 28 Nov 2026 (task 51): /atlas/concept/denavit-hartenberg had ~7.8 average
+ * position and 1 click on ~156 impressions ("dh parameters", "denavit
+ * hartenberg"). It owns the DH queries; forward-kinematics links to it.
+ *
+ * 28 Nov 2026 (task 93): gear-train (pos ~3.3) and gear-ratio overlapped. They
+ * are differentiated, not merged: gear-train owns the mechanism (simple,
+ * compound, planetary, idlers, types); gear-ratio owns the number (how to
+ * calculate it, speed/torque/efficiency, choosing one). Each links the other.
+ * /shorts/gears keeps the video "how do gears work" query.
+ *
  * Query → owning path.
  */
 export const ATLAS_QUERY_OWNER: Record<string, string> = {
+  'denavit hartenberg': '/atlas/concept/denavit-hartenberg',
+  'denavit-hartenberg parameters': '/atlas/concept/denavit-hartenberg',
+  'dh parameters': '/atlas/concept/denavit-hartenberg',
+  'what are dh parameters': '/atlas/concept/denavit-hartenberg',
+  'gear train': '/atlas/concept/gear-train',
+  'compound gear train': '/atlas/concept/gear-train',
+  'idler gear': '/atlas/concept/gear-train',
+  'gear ratio': '/atlas/concept/gear-ratio',
+  'how to calculate gear ratio': '/atlas/concept/gear-ratio',
   'feedback loop': '/atlas/concept/feedback-loop',
   'feedback loop in robotics': '/atlas/concept/feedback-loop',
   'closed loop control': '/atlas/concept/feedback-loop',

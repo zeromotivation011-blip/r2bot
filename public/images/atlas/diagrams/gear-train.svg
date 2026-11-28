@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 430" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">A simple gear train and a compound gear train</title>
+  <desc id="d">Left: a simple gear train. A 12-tooth motor gear drives a 30-tooth idler, which drives a 36-tooth output gear, each on its own shaft. The idler cancels out, so the ratio is 36 divided by 12, 3 to 1, and the output turns the same way as the motor. Right: a compound gear train. A 12-tooth motor gear drives a 36-tooth gear; a 12-tooth gear fixed on the same shaft drives a 48-tooth output gear. The stage ratios multiply, 3 times 4, giving 12 to 1.</desc>
+  <defs>
+    <marker id="m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#4ade80"/></marker>
+  </defs>
+  <rect width="640" height="430" rx="16" fill="#0f172a"/>
+  <text x="30" y="44" font-size="16" font-weight="700" fill="#e2e8f0">Gear trains: simple vs compound</text>
+  <line x1="315" y1="70" x2="315" y2="352" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- SIMPLE -->
+  <text x="30" y="80" font-size="12" font-weight="700" fill="#94a3b8" letter-spacing="1.5">SIMPLE TRAIN</text>
+  <!-- motor 12T r19 at (56,210) -->
+  <circle cx="56" cy="210" r="19" fill="#1e293b" stroke="#f59e0b" stroke-width="5" stroke-dasharray="3 3"/>
+  <circle cx="56" cy="210" r="3" fill="#f59e0b"/>
+  <text x="56" y="252" font-size="11" fill="#fcd34d" text-anchor="middle">12T</text>
+  <text x="56" y="268" font-size="10" fill="#fcd34d" text-anchor="middle">motor</text>
+  <!-- idler 30T r48 at (123,210) -->
+  <circle cx="123" cy="210" r="48" fill="#1e293b" stroke="#94a3b8" stroke-width="5" stroke-dasharray="3 3"/>
+  <circle cx="123" cy="210" r="3" fill="#94a3b8"/>
+  <text x="123" y="236" font-size="11" fill="#cbd5e1" text-anchor="middle">30T</text>
+  <text x="123" y="278" font-size="10" fill="#cbd5e1" text-anchor="middle">idler</text>
+  <!-- output 36T r58 at (229,210) -->
+  <circle cx="229" cy="210" r="58" fill="#1e293b" stroke="#38bdf8" stroke-width="5" stroke-dasharray="3 3"/>
+  <circle cx="229" cy="210" r="3" fill="#38bdf8"/>
+  <text x="229" y="236" font-size="11" fill="#7dd3fc" text-anchor="middle">36T</text>
+  <text x="229" y="288" font-size="10" fill="#7dd3fc" text-anchor="middle">output</text>
+  <!-- rotation arrows: motor cw, idler ccw, output cw -->
+  <path d="M40 176 A 34 34 0 0 1 76 180" fill="none" stroke="#4ade80" stroke-width="2" marker-end="url(#m)"/>
+  <path d="M146 150 A 64 64 0 0 0 100 150" fill="none" stroke="#4ade80" stroke-width="2" marker-end="url(#m)"/>
+  <path d="M200 140 A 76 76 0 0 1 262 144" fill="none" stroke="#4ade80" stroke-width="2" marker-end="url(#m)"/>
+  <text x="30" y="318" font-size="12" fill="#e2e8f0">ratio = (30/12) × (36/30) = 36/12 = <tspan font-weight="700" fill="#fcd34d">3 : 1</tspan></text>
+  <text x="30" y="338" font-size="11" fill="#94a3b8">The idler cancels out; the output turns the same way as the motor.</text>
+
+  <!-- COMPOUND -->
+  <text x="340" y="80" font-size="12" font-weight="700" fill="#94a3b8" letter-spacing="1.5">COMPOUND TRAIN</text>
+  <!-- 36T r58 at (443,176) -->
+  <circle cx="443" cy="176" r="58" fill="#1e293b" stroke="#94a3b8" stroke-width="5" stroke-dasharray="3 3"/>
+  <text x="404" y="150" font-size="11" fill="#cbd5e1" text-anchor="middle">36T</text>
+  <!-- motor 12T r19 at (366,176) -->
+  <circle cx="366" cy="176" r="19" fill="#1e293b" stroke="#f59e0b" stroke-width="5" stroke-dasharray="3 3"/>
+  <circle cx="366" cy="176" r="3" fill="#f59e0b"/>
+  <text x="366" y="216" font-size="11" fill="#fcd34d" text-anchor="middle">12T</text>
+  <text x="366" y="230" font-size="10" fill="#fcd34d" text-anchor="middle">motor</text>
+  <!-- 48T r77 at (526,224), in front of the 36T -->
+  <circle cx="526" cy="224" r="77" fill="none" stroke="#38bdf8" stroke-width="5" stroke-dasharray="3 3"/>
+  <circle cx="526" cy="224" r="3" fill="#38bdf8"/>
+  <text x="560" y="250" font-size="11" fill="#7dd3fc" text-anchor="middle">48T output</text>
+  <!-- 12T on the 36T's shaft, front -->
+  <circle cx="443" cy="176" r="19" fill="#334155" stroke="#e2e8f0" stroke-width="5" stroke-dasharray="3 3"/>
+  <circle cx="443" cy="176" r="3" fill="#e2e8f0"/>
+  <text x="443" y="106" font-size="10" fill="#cbd5e1" text-anchor="middle">36T and 12T fixed on one shaft</text>
+  <text x="340" y="318" font-size="12" fill="#e2e8f0">ratio = (36/12) × (48/12) = 3 × 4 = <tspan font-weight="700" fill="#fcd34d">12 : 1</tspan></text>
+  <text x="340" y="338" font-size="11" fill="#94a3b8">Stage ratios multiply. The 48T meshes</text><text x="340" y="352" font-size="11" fill="#94a3b8">only with the small 12T on the shared shaft.</text>
+
+  <!-- footer -->
+  <rect x="30" y="366" width="580" height="44" rx="8" fill="#1e293b"/>
+  <text x="320" y="386" font-size="12" fill="#e2e8f0" text-anchor="middle">Each pair: ratio = driven teeth ÷ driver teeth.  Output speed ÷ ratio, torque × ratio × efficiency.</text>
+  <text x="320" y="402" font-size="11" fill="#94a3b8" text-anchor="middle">Each external mesh reverses the direction of rotation.</text>
+</svg>

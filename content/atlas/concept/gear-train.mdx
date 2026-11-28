@@ -4,76 +4,221 @@ slug: gear-train
 bucket: concept
 category: actuators
 summary: >-
-  A gear train is a series of meshing gears that transmits and transforms rotation — multiplying torque,
-  changing speed, or redirecting motion, the mechanical heart of how a robot's motors drive its joints.
+  A gear train is a chain of meshing gears that carries rotation from a motor to an output. Simple,
+  compound and planetary trains, idler gears, how to calculate the ratio, with robot examples.
 difficulty: 2
+difficultyLabel: Classroom
 tags:
   - actuators
   - mechanism
-  - mechanics
+  - gears
+  - power-transmission
 seeAlso:
   - gear-ratio
   - planetary-gearbox
   - harmonic-drive
   - backlash
+  - backdrivability
+  - torque
   - timing-belt
-lastReviewed: 2026-07-10T00:00:00.000Z
+relatedTerms:
+  - gear-ratio
+  - planetary-gearbox
+  - harmonic-drive
+  - backlash
+prerequisiteTerms:
+  - torque
+  - actuator
+unlocksTerms:
+  - planetary-gearbox
+  - harmonic-drive
+  - backdrivability
+lastReviewed: 2026-11-28T00:00:00.000Z
 sources:
-  - title: 'Gear train (Wikipedia)'
+  - title: 'Gear train (Wikipedia): speed ratio, torque ratio, idler and compound trains'
     url: 'https://en.wikipedia.org/wiki/Gear_train'
-  - title: 'Gears and gear trains'
-    url: 'https://en.wikipedia.org/wiki/Gear'
+  - title: 'Epicyclic gearing (Wikipedia): planetary gear ratios'
+    url: 'https://en.wikipedia.org/wiki/Epicyclic_gearing'
+  - title: 'Worm drive (Wikipedia): single-start ratio and self-locking'
+    url: 'https://en.wikipedia.org/wiki/Worm_drive'
+  - title: 'Strain wave gearing (Wikipedia): ratio from the tooth difference'
+    url: 'https://en.wikipedia.org/wiki/Strain_wave_gearing'
+  - title: 'Cycloidal drive (Wikipedia): pins, lobes and ratio'
+    url: 'https://en.wikipedia.org/wiki/Cycloidal_drive'
+  - title: 'maxon, Planetary Gearhead GP 32 C datasheet (reductions, efficiency and backlash per stage)'
+    url: 'https://www.maxongroup.com/medias/sys_master/root/9406824710174/GP-32-C.pdf'
+  - title: 'Wensing et al. (2017), Proprioceptive Actuator Design in the MIT Cheetah, IEEE Transactions on Robotics (author proof)'
+    url: 'https://fab.cba.mit.edu/classes/865.18/motion/papers/mit-cheetah-actuator.pdf'
+  - title: 'ros2_control (Jazzy), transmission_interface: SimpleTransmission'
+    url: 'https://github.com/ros-controls/ros2_control/blob/jazzy/transmission_interface/include/transmission_interface/simple_transmission.hpp'
+youtubeSearchQuery: gear train explained simple compound idler
 laymanExplanation: >-
-  A gear train is a set of gears working together to pass power along, changing the speed and force as it
-  goes. It's how a fast, weak motor gets turned into the slow, strong motion a robot joint needs.
+  A gear train is a row of gears that pass turning motion along, each one pushing the next. Small gears
+  driving big ones make the output turn slower but harder, which is how a small, fast motor ends up
+  moving a heavy robot arm.
 technicalDefinition: >-
-  A gear train is a set of meshing gears transmitting rotation between shafts, with the overall gear ratio
-  set by the ratio of driven to driving teeth, multiplying torque and dividing speed accordingly.
+  A gear train is a mechanism of two or more meshing gears that transmits rotation between shafts. Its
+  overall speed ratio is the product of the ratios of its meshing pairs; in a simple train (one gear per
+  shaft) intermediate idler gears cancel out of the ratio and only reverse direction, while a compound
+  train (two gears fixed on an intermediate shaft) multiplies stage ratios. Ignoring losses, output torque
+  is input torque times the ratio; real trains lose a fraction to friction at each mesh and add backlash
+  and reflected inertia.
+realRobotsThatUseThis:
+  - MIT Cheetah legs (single-stage 5.8:1 planetary gear train)
+  - Robot arm joints with strain-wave (harmonic) gearing
+indianExample: ''
+industryApplications:
+  - Robot joint actuators (planetary, strain-wave and cycloidal reducers)
+  - Wheel drives of mobile robots
+  - Grippers and small servo motors
+mindBlowingFact: >-
+  In a simple chain of gears (one gear per shaft), the gears in the middle do not change the ratio at all,
+  however big or small they are. Only the first and last gear count; each middle gear just flips the direction of rotation.
 quizQuestion:
-  q: The overall ratio of a gear train is determined by…
+  q: >-
+    A 12-tooth motor gear drives a 30-tooth idler, which drives a 36-tooth output gear. What is the
+    overall reduction?
   options:
-    - The color of the gears
-    - The ratio of driven to driving gear teeth
-    - The battery voltage
-    - The number of motors
+    - '2.5:1'
+    - '3:1'
+    - '7.5:1'
+    - '9:1'
   answer: 1
   explanation: >-
-    The gear ratio comes from the tooth counts (driven ÷ driving); a larger driven gear turns slower with
-    more torque.
+    The idler cancels out: (30/12) × (36/30) = 36/12 = 3. A simple train's ratio depends only on the first
+    and last gear. The idler only makes the output turn the same way as the motor.
 ---
 
-A motor spins fast and weak; a robot joint needs to turn slow and strong, sometimes in a different direction or place. The mechanism that bridges the two is a **gear train** — meshing gears that reshape rotation.
+A gear train is a chain of meshing gears that carries rotation from one shaft to another, each gear's teeth pushing the next. In robots its usual job is to turn a motor's fast, weak spin into the slow, strong motion a joint or wheel needs, and the way the gears are arranged (simple, compound, planetary or something more exotic) decides how big that change is, how much space it takes and what it costs in friction and play.
 
-## What it is
+![Two kinds of gear train side by side. On the left, a simple train: a 12-tooth motor gear drives a 30-tooth idler, which drives a 36-tooth output gear, all on separate shafts in a row. The idler cancels out, so the ratio is 36 over 12, 3 to 1, and the output turns the same way as the motor. On the right, a compound train: a 12-tooth gear drives a 36-tooth gear, which is fixed to a 12-tooth gear on the same shaft, which drives a 48-tooth output gear. The stage ratios multiply: 3 times 4 gives 12 to 1](/images/atlas/diagrams/gear-train.svg)
 
-A gear train is a **series of meshing gears** that transmits rotation from a motor to an output. As gears mesh, a small gear driving a large one turns the large one **slower but with more torque** (and vice versa). Chain several stages and you can achieve big transformations. The overall **[gear ratio](/atlas/concept/gear-ratio)** is set by the tooth counts — driven teeth ÷ driving teeth — and it multiplies torque and divides speed by that factor.
+## Start here: one motor, one heavy arm
 
-```diagram
-{ "type": "flow", "title": "Reshaping rotation, stage by stage", "nodes": ["Motor: fast, weak", "Gear stage(s)", "Ratio changes speed/torque", "Output: slow, strong"], "caption": "Each meshing pair changes the speed-torque balance; chaining stages gives large reductions to turn motor spin into useful joint motion." }
+A small electric motor might spin at several thousand revolutions per minute but with very little twisting force ([torque](/atlas/concept/torque)). A robot elbow needs the opposite: a slow turn that can lift a load. Put a small gear on the motor and let it drive a big gear on the elbow, and the big gear turns slower but harder. Add more gears and you can shape the motion further: slow it more, reverse it, move it to another shaft, turn a corner.
+
+That arrangement of gears is the gear train. The single number that summarises what it does is its [gear ratio](/atlas/concept/gear-ratio); this page is about the mechanism that produces that number.
+
+## The words you need
+
+| Term | Meaning |
+|---|---|
+| **Driver** (driving gear) | The gear that turns the next one; on a motor it is usually the small gear, called the pinion |
+| **Driven gear** | The gear that receives motion from another gear |
+| **Mesh** | Two gears in contact, teeth interlocking |
+| **Stage** | One reduction step: a driver and the gear it drives |
+| **Idler** | A gear between driver and driven gear that does no work on its own shaft |
+| **Ratio** | Input speed ÷ output speed; for a pair of gears, driven teeth ÷ driver teeth |
+| **Reduction** | A train whose output turns slower than its input (ratio greater than 1) |
+
+## How a pair of gears works
+
+When two gears mesh, their teeth pass the contact point at the same speed, so the gear with more teeth must turn more slowly. For a driver with N₁ teeth and a driven gear with N₂ teeth:
+
+```text
+speed ratio  = ω_in / ω_out = N₂ / N₁
+torque ratio = τ_out / τ_in = N₂ / N₁   (ignoring friction)
 ```
 
-## What gear trains do
+The torque ratio equals the speed ratio because, with no losses, the power going in (torque × speed) equals the power coming out: whatever you lose in speed you gain in torque. A 12-tooth gear driving a 36-tooth gear is a 3:1 reduction: the output turns three times slower with, ideally, three times the torque. Two external gears in mesh also **turn in opposite directions**.
 
-- **Reduce speed / multiply torque** — the most common job in robots: a reduction gear train turns a fast, weak motor into a slow, strong joint drive.
-- **Change direction of rotation** — meshing gears reverse spin; an idler gear can preserve it.
-- **Redirect and relocate** — bevel gears turn motion 90°, worm gears do that with huge reduction, and gear trains move power across a mechanism.
-- **Split or combine** — drive multiple outputs from one input.
+## Simple gear trains and idlers
 
-## Types you'll meet in robots
+In a **simple gear train** each shaft carries one gear, and the gears sit in a row. Something surprising follows: the overall ratio depends **only on the first and the last gear**. Every gear in between cancels out.
 
-- **Spur / helical trains** — simple parallel-shaft reductions (helical are quieter, smoother).
-- **[Planetary gearbox](/atlas/concept/planetary-gearbox)** — compact, coaxial, high torque density — extremely common on robot joints.
-- **[Harmonic drive](/atlas/concept/harmonic-drive)** — near-zero-[backlash](/atlas/concept/backlash) high reduction, standard in precision robot arms.
-- **Worm, bevel, and cycloidal** — for right-angle drive, self-locking, or heavy-duty low-backlash needs.
+Take a 12-tooth motor gear, a 30-tooth middle gear and a 36-tooth output gear:
 
-## The trade-offs
+```text
+ratio = (30 / 12) × (36 / 30) = 36 / 12 = 3 : 1
+```
 
-Gearing isn't free: it adds **[backlash](/atlas/concept/backlash)** (slack that hurts precision), **friction** (lost efficiency and reduced [backdrivability](/atlas/concept/backdrivability)), weight, and cost. Choosing the gear train — ratio, type, and quality — is a core robot-design decision balancing torque, precision, efficiency, and how the joint should feel and interact.
+The 30 cancels. The middle gear is an **idler**: it changes no speed and no torque at the output. What it does change is direction (each extra external mesh flips the rotation), so with one idler the output turns the same way as the motor. Idlers are also used to bridge a distance between two shafts without making both end gears huge. (A [timing belt](/atlas/concept/timing-belt) or chain does the same job over longer distances and, like a single idler, leaves both end shafts turning the same way.)
 
-## Why it matters
+## Compound gear trains: stages multiply
 
-The gear train is the fundamental power-transmission element between a robot's motors and its motion — the piece that makes practical robot joints possible by converting motor characteristics into what the task needs. Understanding gear trains (and their backlash, friction, and efficiency costs) is essential to designing and understanding any geared robot.
+To get a big reduction without enormous gears, put **two gears of different sizes on the same intermediate shaft**. That is a **compound gear train**, and its stage ratios multiply.
+
+Example: a 12-tooth motor gear drives a 36-tooth gear (3:1). On the same shaft as the 36-tooth gear sits a 12-tooth gear, which drives a 48-tooth output gear (4:1):
+
+```text
+overall ratio = 3 × 4 = 12 : 1
+```
+
+A single pair would need a 144-tooth gear against the 12-tooth pinion to get 12:1. Two stages get there with gears no bigger than 48 teeth.
+
+Multi-stage commercial gearboxes use the same multiplying principle, with planetary stages stacked in series. maxon's GP 32 C planetary gearhead, for instance, has a one-stage version with a reduction of 26/7 (sold as 3.7:1); its 14:1 two-stage version uses that stage twice, for (26/7)² = 676/49. Its five-stage versions reach as much as 6,285:1.
+
+## Gear train types used in robots
+
+| Type | How it is built | Typical reduction | Notes for robots |
+|---|---|---|---|
+| **Spur / helical pairs** | Parallel shafts, straight or angled teeth | Modest per stage; stack stages for more | Simple and efficient; helical teeth run more quietly |
+| **[Planetary (epicyclic)](/atlas/concept/planetary-gearbox)** | Sun gear in the middle, planet gears on a carrier, ring gear outside | With the ring fixed, sun in and carrier out: 1 + ring teeth ÷ sun teeth per stage | Compact and coaxial; very common in robot joints and gearmotors |
+| **Worm drive** | A screw-like worm turning a worm wheel at right angles | Wheel teeth ÷ number of worm starts (a 20-tooth wheel with a single-start worm gives 20:1) | Big reduction in one stage; can be self-locking (the load cannot turn the motor) |
+| **Bevel gears** | Cone-shaped gears between intersecting shafts | Usually low | Turn the drive through a corner, often 90° |
+| **[Strain-wave (harmonic) drive](/atlas/concept/harmonic-drive)** | A flexible toothed cup (flexspline) inside a rigid ring with slightly more teeth, flexed by an elliptical wave generator | Set by the tooth difference: 200 flexspline teeth in a 202-tooth ring give 100:1; roughly 30:1 to 320:1 | Very high reduction in one stage with near-zero backlash; standard in precision arm joints |
+| **Cycloidal drive** | A lobed disc rolling eccentrically inside a ring of pins | With one lobe fewer than pins, the reduction equals the lobe count (10 pins, 9 lobes: 9:1) | High ratio, compact, very low backlash, high torque capacity |
+
+The planetary formula comes from the speeds of its three members: with the ring held still, sun as input and carrier as output, the reduction is (sun teeth + ring teeth) ÷ sun teeth. Hold a different member still (the carrier or the sun) and the same gears give a different ratio: one planetary set can provide three.
+
+## What a gear train costs you
+
+Gears are not free torque. Four costs come with every train, and choosing one is a matter of deciding which costs the robot can live with.
+
+### 1. Friction: efficiency drops with every stage
+
+Each mesh loses some power as heat, so every stage you add takes a slice of the torque. maxon's GP 32 C datasheet, for example, gives a best-case efficiency of 80% for one stage, falling to 50% for five; the full table, and how to account for it, is on the [gear ratio](/atlas/concept/gear-ratio) page. Worm drive teeth mostly slide against each other rather than roll, so they have more friction than spur or planetary gears; that friction is also why a high-ratio worm can self-lock.
+
+### 2. Backlash: play between the teeth
+
+Meshing teeth need a little clearance, so the output can rock slightly before the teeth engage. That is **[backlash](/atlas/concept/backlash)**. The GP 32 C lists an average no-load backlash of 0.7° for one stage and 1.0° for three or more. It sounds tiny, but at the end of a 0.5 m arm link, 1° of play is about 0.5 × 0.01745 ≈ **9 mm** of wobble at the tip. Strain-wave and cycloidal drives are popular in precision arms largely because they keep backlash near zero.
+
+### 3. Reflected inertia: the motor feels N² heavier
+
+Seen from the output, a gearbox multiplies the motor rotor's inertia by the **square** of the ratio N. A joint behind a high-ratio train is therefore hard to push back by hand and hits obstacles hard, which is why running robots such as the MIT Cheetah use a deliberately low ratio (a single 5.8:1 planetary stage) and why collaborative and legged robots care about [backdrivability](/atlas/concept/backdrivability). The numbers are worked through on the [gear ratio](/atlas/concept/gear-ratio) page.
+
+### 4. Size, mass and cost
+
+Every stage adds length, mass and parts. In the GP 32 C, going from one stage to five takes the gearhead from 118 g to 258 g and from 26.5 mm to 56.5 mm long.
+
+## Gear trains in ROS 2
+
+In [ROS 2](/atlas/concept/ros2), the controller usually works in joint units while the motor driver reports motor units, and the gear train sits between them. ros2_control models it as a **transmission**. Its `SimpleTransmission` applies a reduction ratio n and an optional joint offset:
+
+```text
+joint effort   = n × actuator effort
+joint velocity = actuator velocity ÷ n
+joint position = actuator position ÷ n + offset
+```
+
+Its documentation notes that if |n| is greater than one the transmission is "a velocity reducer / effort amplifier". Unlike a real gearbox, this model has no friction or backlash: those you measure, then tune or compensate for in the controller.
+
+## Gear train vs gear ratio
+
+The two terms are easy to confuse. The **gear train** is the hardware: which gears, how many stages, how they are arranged. The **[gear ratio](/atlas/concept/gear-ratio)** is the number the hardware produces: how many turns in per turn out. Two very different trains (a three-stage spur train and a single strain-wave drive, say) can have the same ratio and behave nothing alike in backlash, efficiency and size.
+
+## Common questions
+
+### What is a gear train?
+
+A gear train is a set of two or more meshing gears that transmits rotation from an input shaft to an output shaft. By choosing gear sizes and arrangement, it changes speed and torque (a reduction makes the output slower and stronger), reverses or keeps the direction of rotation, and moves power between shafts.
+
+### How do you calculate the ratio of a gear train?
+
+For each meshing pair, divide the driven gear's teeth by the driver's teeth, then multiply the results for all pairs. In a simple train the intermediate gears cancel, so the ratio is just last gear teeth ÷ first gear teeth. In a compound train, where two gears share a shaft, the stage ratios multiply: a 3:1 stage followed by a 4:1 stage gives 12:1.
+
+### What is the difference between a simple and a compound gear train?
+
+In a simple gear train each shaft carries one gear, so the middle gears are idlers and the ratio depends only on the first and last gear. In a compound gear train an intermediate shaft carries two gears of different sizes, so each stage contributes its own ratio and they multiply, giving large reductions with small gears.
+
+### What does an idler gear do?
+
+An idler gear sits between the driver and the driven gear. It does not change the overall ratio, speed or torque at the output, but it reverses the direction of rotation (so with one idler, input and output turn the same way) and lets two gears that are far apart be connected.
 
 ## Related
 
-[Gear ratio](/atlas/concept/gear-ratio) · [Planetary gearbox](/atlas/concept/planetary-gearbox) · [Harmonic drive](/atlas/concept/harmonic-drive) · [Backlash](/atlas/concept/backlash)
+- [Gear ratio](/atlas/concept/gear-ratio): the number a gear train produces, and how to use it
+- [Planetary gearbox](/atlas/concept/planetary-gearbox): the most common gear train in robot joints
+- [Harmonic drive](/atlas/concept/harmonic-drive): high reduction with no backlash
+- [Backlash](/atlas/concept/backlash): the play between gear teeth
+- [Backdrivability](/atlas/concept/backdrivability): why some robots want a low ratio

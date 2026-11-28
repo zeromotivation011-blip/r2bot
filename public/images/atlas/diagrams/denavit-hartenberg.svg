@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="t d" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <title id="t">The four Denavit-Hartenberg parameters between two joint axes</title>
+  <desc id="d">Two joint axes drawn as skew lines: on the left the z i-minus-1 axis, along joint i's axis, and on the right the z i axis, along joint i-plus-1's axis, tilted relative to the left. The common normal, the shortest line between the two axes, runs between them and is labelled a, the link length. Along the left axis, d is the distance from the previous frame's x axis up to where the common normal starts, and theta is the rotation about the left z axis from the old x axis to the new x axis. At the right axis, alpha is the twist about the common normal from the old z direction to the new z axis. A footer gives the order of the four moves: rotate theta about z, move d along z, move a along x, rotate alpha about x.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f59e0b"/></marker>
+    <marker id="c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#38bdf8"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#4ade80"/></marker>
+  </defs>
+  <rect width="640" height="420" rx="16" fill="#0f172a"/>
+  <text x="30" y="44" font-size="16" font-weight="700" fill="#e2e8f0">Denavit-Hartenberg: four numbers per joint</text>
+  <text x="610" y="44" font-size="12" fill="#64748b" letter-spacing="1.5" text-anchor="end">STANDARD DH</text>
+
+  <!-- left joint axis (z_{i-1}) -->
+  <line x1="170" y1="340" x2="170" y2="80" stroke="#38bdf8" stroke-width="3" marker-end="url(#c)"/>
+  <text x="150" y="80" font-size="13" font-weight="700" fill="#7dd3fc" text-anchor="end">z<tspan font-size="10" dy="4">i−1</tspan></text>
+  <text x="150" y="350" font-size="11" fill="#94a3b8" text-anchor="end">joint i axis</text>
+
+  <!-- old x axis at bottom of d -->
+  <line x1="170" y1="300" x2="250" y2="322" stroke="#94a3b8" stroke-width="2" marker-end="url(#a)"/>
+  <text x="256" y="334" font-size="12" fill="#cbd5e1">x<tspan font-size="9" dy="4">i−1</tspan></text>
+
+  <!-- d along z -->
+  <line x1="148" y1="300" x2="148" y2="180" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="142" y1="300" x2="154" y2="300" stroke="#f59e0b" stroke-width="2"/>
+  <line x1="142" y1="180" x2="154" y2="180" stroke="#f59e0b" stroke-width="2"/>
+  <text x="110" y="246" font-size="15" font-weight="700" fill="#fcd34d">d</text>
+  <text x="62" y="264" font-size="10" fill="#fcd34d">offset along z</text>
+
+  <!-- theta: from old x direction to new x, about z_{i-1} -->
+  <line x1="170" y1="180" x2="236" y2="198" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 4"/>
+  <path d="M222 194 A 54 54 0 0 0 225 181" fill="none" stroke="#4ade80" stroke-width="2" marker-end="url(#g)"/>
+  <text x="240" y="222" font-size="15" font-weight="700" fill="#86efac">θ</text>
+  <text x="254" y="222" font-size="10" fill="#86efac">joint angle, old x → new x</text>
+
+  <!-- common normal = new x axis -->
+  <line x1="170" y1="180" x2="440" y2="180" stroke="#f59e0b" stroke-width="3"/>
+  <line x1="440" y1="180" x2="540" y2="180" stroke="#e2e8f0" stroke-width="2" marker-end="url(#a)"/>
+  <text x="548" y="185" font-size="13" font-weight="700" fill="#e2e8f0">x<tspan font-size="10" dy="4">i</tspan></text>
+  <text x="214" y="168" font-size="15" font-weight="700" fill="#fcd34d" text-anchor="end">a</text>
+  <text x="228" y="168" font-size="10" fill="#fcd34d">link length: the common normal</text>
+  <circle cx="170" cy="180" r="4" fill="#f59e0b"/>
+  <circle cx="440" cy="180" r="5" fill="#e2e8f0"/>
+  <text x="452" y="204" font-size="10" fill="#94a3b8">origin of frame i</text>
+
+  <!-- right joint axis (z_i), tilted -->
+  <line x1="476" y1="340" x2="416" y2="80" stroke="#38bdf8" stroke-width="3" marker-end="url(#c)"/>
+  <text x="404" y="80" font-size="13" font-weight="700" fill="#7dd3fc" text-anchor="end">z<tspan font-size="10" dy="4">i</tspan></text>
+  <text x="482" y="350" font-size="11" fill="#94a3b8">joint i+1 axis</text>
+
+  <!-- ghost of old z direction at right axis -->
+  <line x1="440" y1="180" x2="440" y2="96" stroke="#7dd3fc" stroke-width="1.5" stroke-dasharray="3 4"/>
+  <text x="446" y="104" font-size="10" fill="#7dd3fc">old z direction</text>
+  <!-- alpha twist -->
+  <path d="M440 124 A 56 56 0 0 0 427 125" fill="none" stroke="#4ade80" stroke-width="2" marker-end="url(#g)"/>
+  <text x="456" y="138" font-size="15" font-weight="700" fill="#86efac">α</text>
+  <text x="470" y="138" font-size="10" fill="#86efac">twist about x</text>
+
+  <!-- footer -->
+  <rect x="30" y="366" width="580" height="36" rx="8" fill="#1e293b"/>
+  <text x="320" y="389" font-size="12" fill="#e2e8f0" text-anchor="middle">T = Rot<tspan font-size="9" dy="3">z</tspan><tspan dy="-3">(θ) · Trans</tspan><tspan font-size="9" dy="3">z</tspan><tspan dy="-3">(d) · Trans</tspan><tspan font-size="9" dy="3">x</tspan><tspan dy="-3">(a) · Rot</tspan><tspan font-size="9" dy="3">x</tspan><tspan dy="-3">(α)   ·   θ or d moves; a and α are fixed</tspan></text>
+</svg>
