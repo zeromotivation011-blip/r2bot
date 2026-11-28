@@ -1,0 +1,12 @@
+# R2BOT Kids app: generated, never committed.
+# www/ is the Next.js static export (built by the export script, copied into the APK by `cap sync`).
+/www/
+/node_modules/
+# Android build output, SDK path and signing secrets (see also android/.gitignore)
+/android/local.properties
+/android/keystore.properties
+/android/**/build/
+*.apk
+*.aab
+*.jks
+*.keystore

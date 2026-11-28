@@ -1,85 +1,115 @@
-# R2BOT Kids — Android + iOS app (Capacitor 8)
+# R2BOT Kids — the standalone Android app (Capacitor 8)
 
-The store app is a thin, kid-safe native shell around **https://www.r2bot.in/kids**.
-The website is the product: every Vercel deploy reaches the app instantly. The
-native shell only needs a new store release when something in this folder changes.
+**One app, everything inside it.** The APK carries every R2BOT Kids page, script, style,
+sound, 3D model and the Blockly editor. It does not load www.r2bot.in, needs no account and
+works with no network at all, from the first launch. There is no robot or hardware
+integration. This is the build to install on a phone and test.
 
 | | |
 |---|---|
-| App ID / bundle ID | `in.r2bot.kids` |
-| Name | R2BOT Kids |
-| Loads | `https://www.r2bot.in/kids?source=app` (the PWA uses `?source=pwa`) |
-| Allowed in-app hosts | `www.r2bot.in` only. Every other link opens in the system browser |
-| Offline | The site's service worker (`public/kids-sw.js`) keeps the main screens working with no network after one online launch (see "What works offline"). `www/index.html` is the bundled fallback for a first launch with no network: navy and orange, a retry button and a parental gate |
-| Permissions | Internet, and the Camera (Workshop AR only, asked at runtime). Nothing else |
-| SDKs | None besides Capacitor core and splash-screen. No ads, no analytics, no Firebase, no push |
-| User-Agent | The normal WebView UA plus `R2BOTKidsApp/1.0`, so the site can tell when it runs in the app |
+| App ID | `in.r2bot.kids` · name **R2BOT Kids** · version 1.0.0-test (versionCode 1) |
+| Content | `www/` = the Next.js static export of `/kids` (`output: 'export'`, `trailingSlash: true`), copied into the APK by `cap sync` and served inside the app at `https://localhost/` |
+| Network | Not needed. No `server.url`. Nothing from another host ever loads inside the app |
+| Links out | A link to a non-kids page (e.g. `/privacy`) opens `https://www.r2bot.in/…` in the **system browser**; other sites, `mailto:` and `tel:` open in their own apps; other schemes are dropped. The kids pages put the parental gate in front of these links |
+| Permissions | `INTERNET` (normal, install time; nothing in the app needs it) and `CAMERA` (Workshop AR "magic window", asked at runtime, frames never leave the phone). Nothing else |
+| Backup | `allowBackup="false"`: no Google cloud backup, no adb backup. Progress stays on the phone; the in-app backup code (Garage / Settings) is how a family moves it |
+| SDKs | Capacitor core + splash screen only. No ads, analytics, Firebase or push |
+| User agent | WebView UA + `R2BOTKidsApp/1.0`, so the pages know they run in the app |
+| Screen | Portrait and landscape (games use landscape). No pinch zoom |
 
-> **Not ready to submit yet.** The app lets the child reach any page on www.r2bot.in, not only
-> `/kids`: `allowNavigation` is per host, and the site's own links (client-side navigation included)
-> can lead to the adult site, where the email lead forms, Co-pilot, sign-in and GA all load. Neither
-> Play Families nor the App Store Kids category will pass review until the website changes in
-> "What the website must do" are live: GA off inside the app, outbound links gated, navigation kept
-> inside `/kids`, and a children's section in the privacy policy. Nothing in this native shell
-> can enforce that by itself.
+## What is in the app, and what is not
 
-This folder has its own `package.json`. It is **not** part of the web app's
-dependencies, and Vercel never builds it.
+Everything that runs on the device is in the app: Home and the five tabs, Worlds, Games,
+Story Theatre (voiced), Workshop (3D builder + camera AR), Code Lab (Blockly), Spark Trail,
+the labs, Robot Maths, Robodex, Makers, Make at Home, Settings, Profiles, the Garage,
+progress/stars/badges (on the device), the backup code, **Ask Spark** (the offline FAQ answers)
+and **Talk to your robot** (the on-device parser).
 
-## What works offline
+Not in the app, because they need the R2BOT server: joining a class, the teacher's class pages,
+the Robot Passport server copy, class progress sync (`/api/kids/*`), and the AI modes of Ask Spark
+and Talk. Those screens show a calm "this part needs a grown-up on r2bot.in" note instead of an
+error. Nothing breaks without them.
 
-The app and the PWA share one service worker, `public/kids-sw.js` on the website (scope `/kids`).
-It installs on the first online launch and works in both WebViews: Android WebView supports service
-workers for remote pages, and iOS WKWebView does because the app uses App-Bound Domains
-(`WKAppBoundDomains = www.r2bot.in`).
+## Build the APK (one command)
 
-| Works offline | How |
-|---|---|
-| The five tabs (Home, Learn, Worlds, Games, Garage), Skill Galaxy, Settings, the Sumo Arena, Drone Hover and Maze Mapper games, Story Theatre and all eight episodes, Workshop, Code Lab, Spark Trail, Physics Lab, Power Lab, Link Lab, Robot Maths, Robodex, Makers, Make at Home | Saved when the worker installs (the page, the JS/CSS its HTML references, and the lazy chunks those load: 3D scenes, game engines, Blockly). The list is `PRECACHE_PAGES` in `public/kids-sw.js`; `lib/kids/offline.verify.ts` (CI) fails if a tab, a "More" place or an episode is missing from it |
-| Any other `/kids` page the child has already opened | Saved on each online visit, network first; up to 60 pages in all (precached ones are never evicted) |
-| After a website deploy | The worker notices the new build on the next online launch (the webpack runtime file name changes) and re-saves every precached page and its chunks in the background, so offline play uses the new build, never a mix |
-| Story episodes the child has already played | Voice clips are saved the first time an episode plays (up to about 2,000 clips, roughly 40–60 MB) and survive website updates |
-| Progress, stars, badges, the robot design, settings | Always on the device (`localStorage`), so nothing is lost offline |
-| Slow school Wi-Fi | If a saved page exists and the network takes longer than 4 s, the saved page is shown and refreshed in the background |
+Needs JDK 21, the Android SDK (Platform 36, Build-Tools 35 or 36; `ANDROID_HOME`, or `sdk.dir`
+in `android/local.properties`, which is gitignored) and Node 22.
 
-| Needs the internet | Why |
-|---|---|
-| A page never opened before | Shows a branded offline page (built into the worker) with links to the saved screens and a retry button |
-| Joining a class, teacher pages, syncing progress to a class | Server calls (`/api/*` is never cached; `/kids/classroom` and `/kids/join` are never saved) |
-| Ask Spark with AI on, Talk to your robot with AI on | Server calls. The offline FAQ answers still work |
-| How Robots Think (`/kids/ai`) until it has been opened once online | Not precached (its AI parts need the network); saved on the first visit |
-| Episodes never played, 3D parts loaded on demand for screens never opened | Not downloaded yet |
-| First launch with no network at all | The worker is not installed yet, so Capacitor shows `www/index.html` |
+1. Produce the bundled export in `apps/kids-mobile/www` (the static-export step at the repo
+   root; it must leave `www/kids/index.html`, `www/_next/static/**` and `www/offline.html`).
+2. Then, from `apps/kids-mobile` (after `npm ci` once):
 
-Updating the worker is a website deploy, not a store release. Bump `VERSION` in `public/kids-sw.js`
-when its caching rules change; old page and code caches are deleted on activate (audio is kept). An
-ordinary deploy needs no bump: the worker re-precaches by itself when the build changes.
+```bash
+android/build-apk.sh
+# = npx cap sync android && cd android && ./gradlew testDebugUnitTest assembleDebug
+# → android/app/build/outputs/apk/debug/app-debug.apk   (signed with the Android debug key)
+```
 
-No third-party connection is made from a `/kids` page: no Google Analytics (`components/GoogleAnalyticsClient.tsx`
-skips /kids and the app), no Supabase preconnect (`components/SupabasePreconnectClient.tsx` skips /kids), fonts
-are self-hosted by next/font. The only third-party calls are grown-up actions behind the gate.
-To test: open the app online once, switch on airplane mode, relaunch, and check Home and the Hangar
-load, then open a page you have never visited and check the offline page appears.
+If the Gradle wrapper cannot download Gradle, run it with a local Gradle 8.14:
+`GRADLE_BIN=/opt/gradle/bin/gradle android/build-apk.sh`.
+
+A release build later: create `android/keystore.properties` (see "Signing" below; never commit it
+or a keystore), then `android/build-apk.sh release` → `app-release.apk` + `app-release.aab`.
+The script refuses to run a release build without the keystore file.
+
+## Install it on a phone
+
+- **Copy the file:** send `app-debug.apk` to the phone (USB, Drive, a chat to yourself), tap it,
+  and allow "Install unknown apps" for the app you opened it from when Android asks.
+- **USB debugging:** Settings → About phone → tap *Build number* 7 times → Developer options →
+  *USB debugging* on. Then `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`.
+  A new build with the same debug key installs over the old one and keeps the progress.
+
+## How to test
+
+- **On the phone:** switch on airplane mode before the first launch: everything must still work.
+  Try Home, each tab, a game in landscape, a story with voice, Workshop (the camera prompt
+  appears only when you open AR), Code Lab, a reload deep inside (pull the app from recents and
+  reopen), the system Back button (it steps back; on Home it leaves the app), and a grown-up link
+  (it opens the browser, never inside the app).
+- **Watch what it does:** with USB debugging, open `chrome://inspect` on a computer: the debug
+  build's WebView is listed and you get the full DevTools (console, network, storage).
+- **Without a phone** (CI / no emulator): `node android/tools/serve-like-app.mjs www 4610` serves
+  `www/` with exactly the app's path rules (below) on `http://localhost:4610`; drive it with
+  Playwright at 390×844 touch. Navigations the app would hand to the browser come back with an
+  `X-Kids-App-External` header.
+- **The native rules** have device-free JUnit tests: `cd android && ./gradlew testDebugUnitTest`
+  (`app/src/test/java/in_/r2bot/kids/KidsRoutesTest.java`; also run by `build-apk.sh`).
+
+## How the app serves the pages (native code)
+
+Capacitor's local server answers every path without a file extension with the ROOT `index.html`
+(right for a single-page app, wrong for a multi-page export: reloading `/kids/hangar/` would show
+the root). `android/app/src/main/java/in_/r2bot/kids/`:
+
+- `KidsRoutes.java`: the rules, plain Java (unit-tested).
+- `KidsWebViewClient.java` extends Capacitor's `BridgeWebViewClient` (the bridge keeps working):
+  - **page mapping:** a request to `https://localhost/<path>` whose last segment has no `.` is
+    answered with `<path>/index.html` from the APK's web assets (`/kids/hangar` and `/kids/hangar/`
+    → `kids/hangar/index.html`) when it exists, else with the bundled not-found page
+    (`offline.html`, then `404.html`) and status 404. `/`, files with an extension (JS, CSS, RSC
+    `index.txt`, audio, models) and Capacitor's proxy routes go to Capacitor unchanged. `..` is refused;
+  - **navigation:** only `/`, `/kids/**`, `/_next/**` and root files load in the WebView. Any other
+    local path opens `https://www.r2bot.in<path>` in the system browser (ACTION_VIEW); other hosts
+    and `mailto:`/`tel:` likewise; other schemes are dropped; frames from other hosts are blocked.
+- `MainActivity.java`: installs the client, uses the same mapping for service-worker fetches, and
+  handles Back (WebView history; leaves the app on Home).
+- `KidsChromeClient.java` extends `BridgeWebChromeClient`, which already asks for the Android
+  `CAMERA` permission when a page calls `getUserMedia({ video })` and grants the web request only
+  after it is allowed. The subclass narrows it to the camera only (no microphone/MIDI/media IDs),
+  from the app's own pages only, and always refuses location.
 
 ## Layout
 
 ```
-capacitor.config.ts   app config (no imports, so the repo-root tsc stays green)
+capacitor.config.ts   app config (no server.url; no imports, so the repo-root tsc stays green)
 config.check.mts      type-checks the config against Capacitor's real type (npm run type-check)
-www/index.html        bundled offline fallback (server.errorPath)
+www/                  the bundled static export (generated, gitignored, never committed)
 resources/            icon + splash PNGs; resources/src/*.svg are the sources (from public/kids-icon.svg)
-android/              native Android project (committed)
-ios/                  native iOS project, Swift Package Manager, no CocoaPods (committed)
-```
-
-## Run it on a device
-
-```bash
-cd apps/kids-mobile
-npm ci
-npx cap sync            # copies www/ + config into android/ and ios/
-npx cap open android    # Android Studio
-npx cap open ios        # Xcode (macOS)
+android/              native Android project (committed; build output, local.properties, keystores ignored)
+android/build-apk.sh  the one build command (debug / release)
+android/tools/serve-like-app.mjs   static server with the app's path rules, for browser tests
+ios/                  native iOS project, kept in step (Swift Package Manager); not part of the test build
 ```
 
 To change the icon or splash, edit `resources/src/*.svg`, render them to PNG
@@ -87,25 +117,31 @@ To change the icon or splash, edit `resources/src/*.svg`, render them to PNG
 `npm run assets`. After that, set `values/ic_launcher_background.xml` back to
 `#0A1120`, because the generator resets it to white.
 
-## Android: build and publish on Google Play
+## Store notes (for later; the test APK does not need any of this)
 
-### Toolchain
+> The store notes below were written for the earlier **remote-site model** (the app loaded
+> `https://www.r2bot.in/kids`, with a one-file offline page and the website's service worker).
+> **That model is retired** (28 Nov 2026): the app is bundled. Where a note mentions the
+> website's service worker, `www/index.html` as the offline page, `WKAppBoundDomains = www.r2bot.in`
+> or "web content updates live", read it as history. In the bundled app every content change is a
+> new build (bump `versionCode`), and the store data-safety answers shrink, because the app
+> sends nothing to a server.
+
+### Android: Google Play
+
+#### Toolchain
 JDK 21 and the Android SDK (Platform 36, Build-Tools 36). The easiest way to get
 both is Android Studio. Settings: compile/target SDK **36** (Android 16) and min SDK 24,
 both in `android/variables.gradle`. Google Play requires apps to target an API level
 within about a year of the newest Android release, and the deadline moves every August. API 36
 meets the 2026 requirement. Re-check each summer under *Play Console → Policy status → Target API level*.
 
-### Debug APK
-```bash
-npm run android:debug
-# → android/app/build/outputs/apk/debug/app-debug.apk
-adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-```
-Debug builds turn on WebView remote debugging (`chrome://inspect`). Release builds
-never do (`MainActivity.java`).
+#### Debug APK
+See "Build the APK" at the top (`android/build-apk.sh`). Debug builds turn on WebView
+remote debugging (`chrome://inspect`); release builds never do (Capacitor's default when
+`android.webContentsDebuggingEnabled` is unset).
 
-### Signing (one time)
+#### Signing (one time)
 ```bash
 keytool -genkeypair -v -keystore ~/r2bot-kids-upload.jks -alias upload \
   -keyalg RSA -keysize 4096 -validity 10000
@@ -120,14 +156,14 @@ keyPassword=…
 In Play Console, turn on **Play App Signing**. Google keeps the app-signing key, and
 your `.jks` is only the *upload* key. Keep a backup of it and its passwords in a password manager.
 
-### Release bundle
+#### Release bundle
 1. Bump `versionCode` (+1 on every upload) and `versionName` in `android/app/build.gradle`.
 2. `npm run android:release` produces `android/app/build/outputs/bundle/release/app-release.aab`
 3. In Play Console, create the app, then go to *Testing → Internal testing*, upload the `.aab`, and test on a phone.
    Then promote it to Closed testing and on to Production. A new **personal** developer account
    must run a closed test with at least 12 testers for 14 days before Production unlocks.
 
-### Families policy / "Designed for Families"
+#### Families policy / "Designed for Families"
 The target audience includes children under 13, so the app is in the **Families** program.
 The Families policy is mandatory for it:
 - *App content → Target audience and content*: tick the age groups **5 and under, 6–8, 9–12,
@@ -146,7 +182,7 @@ The Families policy is mandatory for it:
   purchases, and no sharing of location. Answer "users can interact" **No**. The class nickname is
   shown only to the child's teacher, and children cannot message each other.
 
-### Data safety form (Play Console → App content → Data safety)
+#### Data safety form (Play Console → App content → Data safety)
 Answer for the *app*. That includes the website it loads, because Google counts the WebView's
 traffic as the app's.
 
@@ -180,7 +216,7 @@ request deletion.
 snapshot is new collected data and may need a new row here and on Apple's label before the next
 release.
 
-## iOS: build and publish on the App Store
+### iOS: App Store
 
 `npx cap add ios` worked on Linux, because Capacitor 8 uses Swift Package Manager and needs
 no CocoaPods. **Building, signing and uploading need a Mac with Xcode 16 or later.**
@@ -220,71 +256,10 @@ no CocoaPods. **Building, signing and uploading need a Mac with Xcode 16 or late
    app are camera AR, an offline screen, no browser chrome, a kid-safe locked domain, and the parental gate.
    Put those in the review notes, with a demo class code for the reviewer, and mention that the main screens and saved episodes work offline (see "What works offline").
 
-## Real-device offline checklist (the founder, on a phone)
 
-Headless Chromium tests (Playwright, `context.setOffline`) cover the worker logic, but not WebView
-storage limits, iOS eviction, or airplane-mode quirks. Before each store release, and once after the
-first deploy that changes `public/kids-sw.js`, check on **one Android phone (Chrome + the store app)**
-and **one iPhone (Safari "Add to Home Screen" + the store app)**:
+## Retired: the remote-site model (until 28 Nov 2026)
 
-- [ ] **First launch online.** Open R2BOT Kids with Wi-Fi on and leave it on Home for about a minute
-      (the worker saves ~30 screens and their code in the background). Android Chrome: `chrome://inspect`
-      → the device → Application → Service Workers shows `kids-sw.js` *activated*, scope `/kids`.
-- [ ] **Airplane mode, relaunch.** Swipe the app away, switch on airplane mode, open it again. Check each of
-      these loads with no white screen: Home, Learn, Worlds, Games, Garage, Settings, Story Theatre.
-- [ ] **A game offline.** Open Sumo Arena (3D) and play one round. Then Drone Hover and Maze Mapper.
-- [ ] **A story offline.** Open an episode you have played online before: the voice plays. Open one you have
-      never played: the pictures and words work, voice lines are silent (clips are saved only on first play).
-- [ ] **Workshop and Code Lab offline.** Workshop shows the 3D robot (the camera "magic window" may ask for
-      permission; it needs no network). Code Lab blocks drag and the robot moves.
-- [ ] **A page never opened.** Offline, open a Skill Galaxy activity you have never opened: the branded
-      offline page shows, its tiles open saved screens, and the system Back button steps back, never loops.
-- [ ] **Progress survives.** Earn a star offline, go back online, relaunch: the star is still there.
-- [ ] **After a deploy.** With the phone online, wait for a website deploy to finish, open the app once and
-      stay ~1 minute, then repeat the airplane-mode checks for Home, a game and a story: they must load
-      (this is the deploy refresh; a white screen here means a lazy chunk was not re-saved).
-- [ ] **Slow Wi-Fi.** On a weak signal (or Android developer options → network throttling), a saved page
-      appears within about 4 seconds instead of spinning.
-- [ ] **iOS storage.** iPhone: Settings → Safari → Advanced → Website Data → r2bot.in shows some MB stored
-      (not zero). iOS can clear it after weeks of not opening the app; the first online launch re-saves it.
-- [ ] **No third-party traffic.** Optional, with a laptop: Chrome remote debugging → Network tab on `/kids`
-      shows only `www.r2bot.in` requests (no googletagmanager, no supabase.co) until a grown-up action.
-- [ ] **Space.** Android Settings → Apps → R2BOT Kids → Storage: note the size after the first launch
-      (expected tens of MB with episodes played) and report anything above ~150 MB.
-
-## What the website must do (r2bot.in, not this folder)
-
-The app identifies itself with `R2BOTKidsApp/` in the User-Agent and `?source=app` on launch.
-Inside the app, `/kids` pages must:
-1. **Gate every outbound link** with a parental gate (any host other than www.r2bot.in, plus mailto:
-   and store links), using the same math-question pattern as `www/index.html`. On Android and iOS
-   those links leave the app for the system browser.
-2. **Not load GA/gtag or any third-party script** when the UA contains `R2BOTKidsApp`. This is
-   the safest choice for every `/kids` page, since R2BOT Kids is a children's product.
-3. **Keep navigation inside `/kids`.** Links to the adult site (Atlas, Co-pilot, sign-in) should
-   be hidden in the app or sit behind the gate.
-4. **Never ask for** an email, password, phone number or birthday (already the rule).
-5. Keep a visible Back button on every screen (iOS has no system Back).
-
-## How updates work
-
-- **Web content** (lessons, games, stories, fixes): deploy the website as usual and the app shows it on
-  the next launch. No store review is needed.
-- **Native shell** (this folder): a change to `capacitor.config.ts`, `www/index.html`, icons,
-  permissions, a Capacitor upgrade, or the target SDK needs `npx cap sync`, a `versionCode`/Build bump,
-  and a store upload with review. Expect about one release a year for the yearly target-SDK bump.
-- Don't use the app to ship features the store reviewer never saw that change the app's core purpose.
-  Store rules allow web content updates, not a different app.
-
-## Build status from the generating environment (26 Nov 2026)
-
-- Generated with `npx cap add android` / `npx cap add ios` (Capacitor 8.6.3, on Linux).
-- **No APK was built there.** The sandbox's network proxy blocks `dl.google.com`, which serves the
-  Android SDK (platforms, build-tools), the command-line tools and Google's Maven repo
-  (`com.android.tools.build:gradle`). JDK 21 and Gradle 8.14 were present, but without the SDK and
-  AGP Gradle cannot configure the project. Run `npm run android:debug` on any machine with Android
-  Studio installed.
-- Before the first release, verify on a real device: the camera prompt in Workshop AR, offline use after one online launch (airplane
-  mode: Home, Hangar and an already-played episode must load), the bundled offline page (first launch in airplane
-  mode, then retry; and Back from the offline page must step back past the failed page or leave the app, never loop), Back walking through history, that `https://r2bot.in/…` (apex, used by the
-  gate) redirects to www, and the adaptive icon on a Pixel launcher.
+The first shell loaded `https://www.r2bot.in/kids?source=app` (`server.url`), allowed navigation to
+`www.r2bot.in`, and bundled only an offline page (`server.errorPath`); offline use depended on the
+website's service worker (`public/kids-sw.js`). It is gone from `capacitor.config.ts`. The website
+itself still works the same for browsers and the PWA; nothing in this folder affects www.r2bot.in.

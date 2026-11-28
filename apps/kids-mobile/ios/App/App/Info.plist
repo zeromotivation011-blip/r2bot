@@ -68,7 +68,7 @@
 	<string>R2BOT Kids uses the camera so you can see your robot in your room (Workshop AR). Pictures stay on this device and are never saved or sent.</string>
 	<key>WKAppBoundDomains</key>
 	<array>
-		<string>www.r2bot.in</string>
+		<string>localhost</string>
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>

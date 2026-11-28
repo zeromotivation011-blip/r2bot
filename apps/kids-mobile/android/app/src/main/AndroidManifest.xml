@@ -3,13 +3,22 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-      R2BOT Kids: the app needs the network (it loads www.r2bot.in/kids) and the
-      camera (Workshop "magic window" AR; frames never leave the device). Nothing
-      else. No location, contacts, microphone, storage, ads or analytics SDKs.
+      R2BOT Kids (standalone): every page is bundled in the APK and the app works
+      with no network. Two permissions only: INTERNET (normal, install-time; kept so
+      a grown-up's outbound link and future optional features can work, nothing in
+      the app needs it) and CAMERA (Workshop "magic window" AR, asked at runtime;
+      frames never leave the device). No location, contacts, microphone, storage,
+      ads or analytics SDKs.
+
+      allowBackup="false": no Google cloud backup and no adb backup of the app's data.
+      Progress lives on the device (WebView localStorage) and may hold a child's robot
+      name or profile nicknames, so it is not copied to a cloud account. A family moves
+      progress with the in-app backup code (Garage / Settings), which they control.
     -->
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -17,7 +26,7 @@
         android:usesCleartextTraffic="false"
         android:theme="@style/AppTheme">
 
-        <!-- orientation not locked: portrait and landscape both work (tablets, Code Lab). -->
+        <!-- orientation not locked: portrait and landscape both work (games, tablets, Code Lab). -->
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
             android:name=".MainActivity"

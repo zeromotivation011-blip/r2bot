@@ -1,19 +1,30 @@
 package in_.r2bot.kids;
 
-import android.content.pm.ApplicationInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.webkit.ServiceWorkerClient;
+import android.webkit.ServiceWorkerController;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import androidx.activity.OnBackPressedCallback;
+import com.getcapacitor.Bridge;
 import com.getcapacitor.BridgeActivity;
 
 /**
- * R2BOT Kids shell. Everything the child sees is https://www.r2bot.in/kids
- * (plus the bundled offline page); this class only adds what a web page
- * cannot do for itself:
- *  - the system Back button / gesture walks back through the site's history
- *    and only leaves the app from the first page; on the offline page it skips
- *    the failed URL so Back can never loop;
- *  - WebView remote debugging is on for debug builds only, never in release.
+ * R2BOT Kids, the standalone app. Every page, script, sound and 3D model is bundled
+ * in the APK (Capacitor webDir "www", served at https://localhost); nothing is loaded
+ * from www.r2bot.in and the app works with no network. This class only adds what a
+ * web page cannot do for itself:
+ *  - {@link KidsWebViewClient}: maps /kids/hangar/ to kids/hangar/index.html (Capacitor
+ *    would serve the root page), shows the bundled not-found page for unknown paths,
+ *    and sends every link that is not part of the app to the system browser;
+ *  - the same page mapping for service-worker fetches;
+ *  - {@link KidsChromeClient}: the camera, and only the camera, for Workshop AR;
+ *  - Back walks back through the app's history and leaves the app from the home screen.
+ *
+ * WebView remote debugging needs no code here: with android.webContentsDebuggingEnabled
+ * left unset, Capacitor turns it on for debuggable (debug) builds only.
  */
 public class MainActivity extends BridgeActivity {
 
@@ -21,35 +32,35 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        boolean debuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-        WebView.setWebContentsDebuggingEnabled(debuggable);
+        final Bridge bridge = getBridge();
+        if (bridge != null) {
+            final KidsWebViewClient client = new KidsWebViewClient(bridge);
+            bridge.setWebViewClient(client);
+            bridge.getWebView().setWebChromeClient(new KidsChromeClient(bridge));
+
+            if (bridge.getConfig().isResolveServiceWorkerRequests()) {
+                ServiceWorkerController.getInstance().setServiceWorkerClient(
+                    new ServiceWorkerClient() {
+                        @Override
+                        public WebResourceResponse shouldInterceptRequest(WebResourceRequest request) {
+                            WebResourceResponse page = client.mapLocalPage(request);
+                            return page != null ? page : bridge.getLocalServer().shouldInterceptRequest(request);
+                        }
+                    }
+                );
+            }
+        }
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 WebView webView = getBridge() != null ? getBridge().getWebView() : null;
-                if (webView != null && isOnErrorPage(webView)) {
-                    // Capacitor shows the offline page by loadUrl(errorUrl) AFTER the
-                    // failed load, so history ends [.., page before, failed URL, offline page].
-                    // A plain goBack() would retry the failed URL, fail again and push the
-                    // offline page again: a Back trap. Skip the failed entry instead; every
-                    // Back still moves one real page closer to the start, so it always ends.
-                    if (webView.canGoBackOrForward(-2)) {
-                        webView.goBackOrForward(-2);
-                        return;
-                    }
-                    leaveApp();
-                    return;
-                }
-                if (webView != null && webView.canGoBack()) {
+                if (webView != null && !isOnHome(webView) && webView.canGoBack()) {
                     webView.goBack();
                     return;
                 }
-                leaveApp();
-            }
-
-            private void leaveApp() {
-                // First page: leave the app the normal way (predictive back animation).
+                // Home screen (or nothing to go back to): leave the app the normal way,
+                // so the system plays the predictive back animation.
                 setEnabled(false);
                 getOnBackPressedDispatcher().onBackPressed();
                 setEnabled(true);
@@ -57,11 +68,9 @@ public class MainActivity extends BridgeActivity {
         });
     }
 
-    /** True while the bundled offline page (server.errorPath) is showing. */
-    private boolean isOnErrorPage(WebView webView) {
-        String errorUrl = getBridge() != null ? getBridge().getErrorUrl() : null;
+    private static boolean isOnHome(WebView webView) {
         String current = webView.getUrl();
-        if (errorUrl == null || current == null) return false;
-        return current.equals(errorUrl) || current.startsWith(errorUrl + "?") || current.startsWith(errorUrl + "#");
+        if (current == null) return true;
+        return KidsRoutes.isHome(Uri.parse(current).getPath());
     }
 }
